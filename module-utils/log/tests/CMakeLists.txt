@@ -20,6 +20,7 @@ add_catch2_executable(
     LIBS
         module-utils
         module-vfs
+        log    
     USE_FS
 )
 

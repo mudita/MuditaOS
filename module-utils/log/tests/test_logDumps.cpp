@@ -38,7 +38,6 @@ TEST_CASE("Test if logs are dumped to a file without rotation")
 {
     auto app                            = Log::Application{"TestApp", "rev", "tag", "branch"};
     constexpr auto MaxFileSize          = 1024 * 1024; // 1 MB
-    constexpr auto MaxFilesCount        = 3;
     constexpr auto TestLog              = "12345678";
     const std::filesystem::path logsDir = "./ut_logs";
     const auto testLogFile              = logsDir / "TestApp.log";
@@ -50,7 +49,7 @@ TEST_CASE("Test if logs are dumped to a file without rotation")
     std::filesystem::create_directory(logsDir);
 
     // Initialize the logger with test parameters.
-    Log::Logger::get().init(std::move(app), MaxFileSize, MaxFilesCount);
+    Log::Logger::get().init(std::move(app), MaxFileSize);
     REQUIRE(countFiles(logsDir) == 0);
 
     // Dump logs.
@@ -72,7 +71,6 @@ TEST_CASE("Test if log files rotate")
 {
     auto app                            = Log::Application{"TestApp", "rev", "tag", "branch"};
     constexpr auto MaxFileSize          = 10; // 10 bytes
-    constexpr auto MaxFilesCount        = 3;
     constexpr auto TestLog              = "12345678";
     const std::filesystem::path logsDir = "./ut_logs";
     const auto testLogFile              = logsDir / "TestApp.log";
@@ -84,7 +82,7 @@ TEST_CASE("Test if log files rotate")
     std::filesystem::create_directory(logsDir);
 
     // Initialize the logger with test parameters.
-    Log::Logger::get().init(std::move(app), MaxFileSize, MaxFilesCount);
+    Log::Logger::get().init(std::move(app), MaxFileSize);
     REQUIRE(countFiles(logsDir) == 0);
 
     // Dump logs.

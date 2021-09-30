@@ -30,6 +30,8 @@ target_include_directories(board
 )
 
 target_link_libraries(board
+    PRIVATE
+        utils-rotator
     PUBLIC
         fsl
         module-vfs

@@ -8,21 +8,24 @@
 #include "purefs/vfs_subsystem.hpp"
 #include <purefs/filesystem_paths.hpp>
 
+#include <filesystem>
+
 namespace crashdump
 {
+    constexpr inline auto crashDumpFileName = "crashdump.hex";
+
     void CrashDumpWriterVFS::openDump()
     {
-        std::array<char, 64> crashDumpFileName{0};
-        formatCrashDumpFileName(crashDumpFileName);
+        vfs                          = purefs::subsystem::vfs_core();
+        const auto crashDumpFilePath = purefs::dir::getCrashDumpsPath() / crashDumpFileName;
 
-        const auto crashDumpFilePath = purefs::dir::getCrashDumpsPath() / crashDumpFileName.data();
-
-        vfs    = purefs::subsystem::vfs_core();
+        if (!rotator.rotateFile(crashDumpFilePath)) {
+            LOG_FATAL("Failed to rotate crash dumps.");
+        }
         dumpFd = vfs->open(crashDumpFilePath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
         if (dumpFd < 0) {
-            LOG_FATAL("Failed to open crash dump file [%s]. Won't be able to save crash info.",
-                      crashDumpFilePath.c_str());
+            LOG_FATAL("Failed to open crash dump file. Won't be able to save crash info.");
         }
     }
 
