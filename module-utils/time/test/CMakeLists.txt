@@ -15,6 +15,15 @@ add_catch2_executable(
     LIBS
         utils-time
 )
+
+add_catch2_executable(
+    NAME
+        utils-dateCommon
+    SRCS
+        unittest_dateCommon.cpp
+    LIBS
+        utils-time
+)
 # time tests
 add_catch2_executable(
     NAME
