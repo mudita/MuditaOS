@@ -6,21 +6,17 @@
 #include <ApplicationCommon.hpp>
 #include <AppWindow.hpp>
 #include <OptionsList.hpp>
-
-namespace style::bell_options_list
-{
-    inline constexpr auto w                    = 380U;
-    inline constexpr auto h                    = 400U;
-    inline constexpr auto outer_layouts_h      = 64U;
-    inline constexpr auto outer_layouts_margin = 7U;
-} // namespace style::bell_options_list
+#include <apps-common/widgets/BellBaseLayout.hpp>
 
 namespace gui
 {
-    class BellOptionWindow : public AppWindow, protected OptionsList<ListViewWithArrows>
+    class BellShortOptionWindow : public AppWindow, protected OptionsList<ListView>
     {
+      private:
+        BellBaseLayout *body{};
+
       public:
-        BellOptionWindow(app::ApplicationCommon *app, const std::string &name);
+        BellShortOptionWindow(app::ApplicationCommon *app, const std::string &name);
         void setListTitle(const std::string &title);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
