@@ -1309,8 +1309,8 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
     int32_t inputRow   = 0;
     int32_t inputCol   = 0;
 
-    for (inputRow = windowHeightPx - 1; inputRow >= 0; --inputRow) {
-        for (inputCol = 0; inputCol < windowWidthPx - 7; inputCol += pixelsInByte) {
+    for (inputRow = 0; inputRow < windowHeightPx - 1; ++inputRow) {
+        for (inputCol = windowWidthPx - 7; inputCol >= 0; inputCol -= pixelsInByte) {
             // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better
             // performance.
             //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
@@ -1318,13 +1318,13 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
             uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
 
             // Get 4x 2 adjacent pixels to process them as uint32_t for better execution timings
-            uint8_t firstPixelPair  = (dataIn[index] << 4) | dataIn[index + 1];
-            uint8_t secondPixelPair = (dataIn[index + 2] << 4) | dataIn[index + 3];
-            uint8_t thirdPixelPair  = (dataIn[index + 4] << 4) | dataIn[index + 5];
-            uint8_t fourthPixelPair = (dataIn[index + 6] << 4) | dataIn[index + 7];
+            uint8_t firstPixelPair  = (dataIn[index]) | (dataIn[index + 1] << 4);
+            uint8_t secondPixelPair = (dataIn[index + 2]) | (dataIn[index + 3] << 4);
+            uint8_t thirdPixelPair  = (dataIn[index + 4]) | (dataIn[index + 5] << 4);
+            uint8_t fourthPixelPair = (dataIn[index + 6]) | (dataIn[index + 7] << 4);
 
             // Put the pixels in the uint32_t for faster processing
-            pixels = (firstPixelPair) | (secondPixelPair << 8) | (thirdPixelPair << 16) | (fourthPixelPair << 24);
+            pixels = (firstPixelPair << 24) | (secondPixelPair << 16) | (thirdPixelPair << 8) | (fourthPixelPair);
 
             if (invertColors) {
                 pixels = ~pixels;
