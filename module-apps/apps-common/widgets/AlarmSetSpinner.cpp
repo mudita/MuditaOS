@@ -102,7 +102,7 @@ namespace gui
             alarmImg->setImage("bell_alarm_deactivated_W_M");
             break;
         case Status::RINGING:
-            alarmImg->setImage("bell_alarm_ringing_W_M");
+            alarmImg->setImage("bell_alarm_ringing_W_G");
             break;
         case Status::SNOOZE:
             alarmImg->setImage("bell_alarm_snooze_W_M");

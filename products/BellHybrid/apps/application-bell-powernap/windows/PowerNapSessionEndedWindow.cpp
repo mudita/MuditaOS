@@ -14,7 +14,7 @@ namespace gui
 {
     PowerNapSessionEndedWindow::PowerNapSessionEndedWindow(
         app::ApplicationCommon *app, std::shared_ptr<app::powernap::PowerNapSessionEndedContract::Presenter> presenter)
-        : WindowWithTimer(app, gui::window::name::powernapSessionEnded), presenter{std::move(presenter)}
+        : WindowWithTimer(app, window::name::powernapSessionEnded), presenter{std::move(presenter)}
     {
         buildInterface();
     }
@@ -28,14 +28,14 @@ namespace gui
 
     void PowerNapSessionEndedWindow::buildLayout()
     {
-        auto body = new gui::VBox(this, 0, 0, style::window_width, style::window_height);
+        auto body = new VBox(this, 0, 0, style::window_width, style::window_height);
         body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        new gui::Image(body, "tethering_notification_icon"); // TODO: ICON!!!!
+        new Image(body, "big_namaste_W_G");
 
-        auto text = new gui::Text(body, 0, 0, body->getWidth(), powerNapStyle::sessionEnd::textH);
+        auto text = new Text(body, 0, 0, body->getWidth(), powerNapStyle::sessionEnd::textH);
         TextFormat format(FontManager::getInstance().getFont(powerNapStyle::descriptionFont));
-        gui::text::RichTextParser parser;
+        text::RichTextParser parser;
         auto textParsed = parser.parse(utils::translate("app_bell_powernap_session_ended_message"), &format);
         text->setText(std::move(textParsed));
         text->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
