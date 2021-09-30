@@ -5,7 +5,8 @@
 #include "ListView.hpp"
 #include "OptionsModel.hpp"
 
-OptionsModel::OptionsModel(app::ApplicationCommon *app) : application(app)
+OptionsModel::OptionsModel(app::ApplicationCommon *app, unsigned int minimalItemSpaceRequired)
+    : application(app), minimalItemSpaceRequired(minimalItemSpaceRequired)
 {}
 
 auto OptionsModel::requestRecordsCount() -> unsigned int
@@ -15,7 +16,7 @@ auto OptionsModel::requestRecordsCount() -> unsigned int
 
 auto OptionsModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
-    return style::window::label::big_h + gui::option::window::option_bottom_margin;
+    return minimalItemSpaceRequired;
 }
 
 void OptionsModel::requestRecords(const uint32_t offset, const uint32_t limit)

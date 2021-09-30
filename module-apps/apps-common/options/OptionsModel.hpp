@@ -10,10 +10,14 @@
 
 class OptionsModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
 {
-    app::ApplicationCommon *application = nullptr;
+  private:
+    app::ApplicationCommon *application   = nullptr;
+    unsigned int minimalItemSpaceRequired = 0;
 
   public:
-    explicit OptionsModel(app::ApplicationCommon *app);
+    explicit OptionsModel(app::ApplicationCommon *app,
+                          unsigned int minimalItemSpaceRequired = style::window::label::big_h +
+                                                                  gui::option::window::option_bottom_margin);
 
     void clearData();
     void createData(std::list<gui::Option> &optionList);
