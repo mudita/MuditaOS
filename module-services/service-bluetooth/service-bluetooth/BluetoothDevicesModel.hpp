@@ -23,6 +23,7 @@ class BluetoothDevicesModel
     auto getDevices() -> std::vector<Devicei> &;
     void syncDevicesWithApp();
     void setInternalDeviceState(const Devicei &device, const DeviceState &state);
+    void mergeInternalDeviceState(const Devicei &device);
 
   private:
     std::vector<Devicei> devices{};
