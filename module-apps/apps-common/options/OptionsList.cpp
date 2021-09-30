@@ -5,28 +5,30 @@
 
 namespace gui
 {
-    OptionsList::OptionsList(std::shared_ptr<OptionsModel> model, std::list<Option> options)
+    template <class ListType>
+    OptionsList<ListType>::OptionsList(std::shared_ptr<OptionsModel> model, std::list<Option> options)
         : optionsModel{std::move(model)}, options(std::move(options))
     {}
 
-    void OptionsList::createOptions()
+    template <class ListType> void OptionsList<ListType>::createOptions()
     {
         optionsModel->createData(options);
     }
 
-    void OptionsList::refreshOptions(std::list<Option> &&optionList)
+    template <class ListType> void OptionsList<ListType>::refreshOptions(std::list<Option> &&optionList)
     {
         options = std::move(optionList);
         optionsList->rebuildList(listview::RebuildType::InPlace);
     }
 
-    void OptionsList::refreshOptions(std::list<Option> &&optionList, unsigned int pageIndex)
+    template <class ListType>
+    void OptionsList<ListType>::refreshOptions(std::list<Option> &&optionList, unsigned int pageIndex)
     {
         options = std::move(optionList);
         optionsList->rebuildList(listview::RebuildType::OnPageElement, pageIndex);
     }
 
-    void OptionsList::addOptions(std::list<Option> &&optionList)
+    template <class ListType> void OptionsList<ListType>::addOptions(std::list<Option> &&optionList)
     {
         options = std::move(optionList);
         createOptions();
@@ -34,21 +36,22 @@ namespace gui
         optionsList->rebuildList();
     }
 
-    void OptionsList::changeOptions(std::list<Option> &&optionList)
+    template <class ListType> void OptionsList<ListType>::changeOptions(std::list<Option> &&optionList)
     {
         clearOptions();
         addOptions(std::move(optionList));
     }
 
-    void OptionsList::recreateOptions()
+    template <class ListType> void OptionsList<ListType>::recreateOptions()
     {
         clearOptions();
         createOptions();
     }
 
-    void OptionsList::clearOptions()
+    template <class ListType> void OptionsList<ListType>::clearOptions()
     {
         optionsList->clear();
         optionsModel->clearData();
     }
+
 } // namespace gui

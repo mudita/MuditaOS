@@ -21,6 +21,7 @@ target_sources(application-bell-common
         src/widgets/ListItems.cpp
 
         src/options/BellOptionWindow.cpp
+        src/options/BellShortOptionWindow.cpp
         src/options/OptionBellMenu.cpp
     PUBLIC
         include/common/BellFinishedWindow.hpp
@@ -35,6 +36,7 @@ target_sources(application-bell-common
         include/common/widgets/BellSideListItemWithCallbacks.hpp
         include/common/widgets/ListItems.hpp
         include/common/options/BellOptionWindow.hpp
+        include/common/options/BellShortOptionWindow.hpp
         include/common/options/OptionBellMenu.hpp
 )
 
@@ -45,7 +47,7 @@ target_link_libraries(application-bell-common
 
     PRIVATE
         bell::app-main
-        bell::app-alarm 
+        bell::app-alarm
         module-gui
         service-time
         bell::db

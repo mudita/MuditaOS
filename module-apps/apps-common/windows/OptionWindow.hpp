@@ -14,7 +14,7 @@ namespace gui
     ///  Options GUI window with ListView populated accordingly to provided options in window constructor.
     ///
 
-    class OptionWindow : public AppWindow, protected OptionsList
+    class OptionWindow : public AppWindow, protected OptionsList<ListView>
     {
       public:
         OptionWindow(app::ApplicationCommon *app, const std::string &name);

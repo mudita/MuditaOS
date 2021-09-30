@@ -7,15 +7,16 @@
 #include "OptionsModel.hpp"
 
 #include <ListView.hpp>
+#include <ListViewWithArrows.hpp>
 
 namespace gui
 {
-    class OptionsList
+    template <class ListType> class OptionsList
     {
       protected:
         explicit OptionsList(std::shared_ptr<OptionsModel>(app), std::list<Option> = {});
 
-        ListView *optionsList                      = nullptr;
+        ListType *optionsList                      = nullptr;
         std::shared_ptr<OptionsModel> optionsModel = nullptr;
         std::list<Option> options;
 
@@ -27,4 +28,7 @@ namespace gui
         void refreshOptions(std::list<Option> &&optionList);
         void refreshOptions(std::list<Option> &&optionList, unsigned int pageIndex);
     };
+
+    template class OptionsList<ListView>;
+    template class OptionsList<ListViewWithArrows>;
 } // namespace gui
