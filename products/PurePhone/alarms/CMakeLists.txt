@@ -4,11 +4,13 @@ add_library(pure::alarms ALIAS alarms)
 target_sources(alarms
     PRIVATE
         PureAlarmHandler.cpp
+        src/actions/AlarmRecordAction.cpp
         src/actions/PlayAudioActions.cpp
         src/actions/NotifyGUIAction.cpp
 
         include/AbstractAlarmAction.hpp
         include/PureAlarmHandler.hpp
+        src/actions/AlarmRecordAction.hpp
         src/actions/PlayAudioActions.hpp
         src/actions/NotifyGUIAction.hpp
     PUBLIC

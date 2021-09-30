@@ -128,7 +128,8 @@ namespace gui
             }
             newTime->tm_min = utils::toNumeric(minuteInput->getText());
 
-            record->startDate = TimePointFloorMinutes(std::chrono::system_clock::from_time_t(std::mktime(newTime)));
+            auto alarmTime    = TimePointFloorMinutes(std::chrono::system_clock::from_time_t(std::mktime(newTime)));
+            record->startDate = GetFollowingDayTime(alarmTime, std::chrono::system_clock::now());
             record->endDate   = record->startDate;
         };
 

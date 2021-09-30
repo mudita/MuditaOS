@@ -33,6 +33,7 @@ namespace app::alarmClock
 
       private:
         bool onAlarmsRetrieved(const std::vector<AlarmEventRecord> &records, unsigned int alarmsRepoCount);
+        void onAlarmEnableChange(const std::shared_ptr<AlarmEventRecord> record);
         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository;
     };
 } // namespace app::alarmClock
