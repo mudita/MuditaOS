@@ -75,3 +75,17 @@ void BluetoothDevicesModel::setInternalDeviceState(const Devicei &device, const 
     auto dev                      = getDeviceByAddress(device.address);
     dev.value().get().deviceState = state;
 }
+void BluetoothDevicesModel::mergeInternalDeviceState(const Devicei &device)
+{
+    auto deviceInModel = getDeviceByAddress(device.address).value().get();
+
+    if ((deviceInModel.deviceState == DeviceState::ConnectedVoice &&
+         device.deviceState == DeviceState::ConnectedAudio) ||
+        (device.deviceState == DeviceState::ConnectedVoice &&
+         deviceInModel.deviceState == DeviceState::ConnectedAudio)) {
+        setInternalDeviceState(device, DeviceState::ConnectedBoth);
+    }
+    else {
+        setInternalDeviceState(device, device.deviceState);
+    }
+}

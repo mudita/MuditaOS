@@ -127,4 +127,38 @@ TEST_CASE("Device handling")
         devicesModel.removeDevice(device2);
         REQUIRE(devicesModel.getDevices().size() == 2);
     }
+
+    SECTION("Merge devices states - Voice -> Audio")
+    {
+        device1.deviceState = DeviceState::Paired;
+
+        Devicei updatedDevice = device1;
+
+        updatedDevice.deviceState = DeviceState::ConnectedVoice;
+        devicesModel.mergeInternalDeviceState(updatedDevice);
+        REQUIRE(devicesModel.getDeviceByAddress(device1.address).value().get().deviceState ==
+                DeviceState::ConnectedVoice);
+
+        updatedDevice.deviceState = DeviceState::ConnectedAudio;
+        devicesModel.mergeInternalDeviceState(updatedDevice);
+        REQUIRE(devicesModel.getDeviceByAddress(device1.address).value().get().deviceState ==
+                DeviceState::ConnectedBoth);
+    }
+
+    SECTION("Merge devices states - Audio -> Voice")
+    {
+        device1.deviceState = DeviceState::Paired;
+
+        Devicei updatedDevice = device1;
+
+        updatedDevice.deviceState = DeviceState::ConnectedAudio;
+        devicesModel.mergeInternalDeviceState(updatedDevice);
+        REQUIRE(devicesModel.getDeviceByAddress(device1.address).value().get().deviceState ==
+                DeviceState::ConnectedAudio);
+
+        updatedDevice.deviceState = DeviceState::ConnectedVoice;
+        devicesModel.mergeInternalDeviceState(updatedDevice);
+        REQUIRE(devicesModel.getDeviceByAddress(device1.address).value().get().deviceState ==
+                DeviceState::ConnectedBoth);
+    }
 }

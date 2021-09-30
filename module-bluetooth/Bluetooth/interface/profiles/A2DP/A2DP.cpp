@@ -350,6 +350,7 @@ namespace bluetooth
                      AVRCP::mediaTracker.local_seid);
             isConnected    = true;
             auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+            device.deviceState = DeviceState::ConnectedAudio;
             busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(device, true),
                                  service::name::bluetooth);
             break;
