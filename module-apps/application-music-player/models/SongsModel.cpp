@@ -93,6 +93,8 @@ namespace app::music_player
         this->longPressCallback                 = longPressCallback;
         this->bottomBarTemporaryMode            = bottomBarTemporaryMode;
         this->bottomBarRestoreFromTemporaryMode = bottomBarRestoreFromTemporaryMode;
+
+        songsRepository->initCache();
     }
 
     bool SongsModel::isSongPlaying() const noexcept
@@ -108,12 +110,6 @@ namespace app::music_player
     std::optional<audio::Token> SongsModel::getCurrentFileToken() const noexcept
     {
         return songContext.currentFileToken;
-    }
-
-    size_t SongsModel::getCurrentIndex() const
-    {
-        auto index = songsRepository->getFileIndex(songContext.filePath);
-        return index == std::numeric_limits<size_t>::max() ? 0 : index;
     }
 
     std::string SongsModel::getNextFilePath(const std::string &filePath) const
@@ -163,6 +159,11 @@ namespace app::music_player
             return false;
         }
         return updateRecords(records);
+    }
+
+    void SongsModel::updateRepository(const std::string &filePath)
+    {
+        songsRepository->updateRepository(filePath);
     }
 
 } // namespace app::music_player

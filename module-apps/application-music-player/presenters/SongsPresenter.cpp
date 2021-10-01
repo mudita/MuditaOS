@@ -41,6 +41,7 @@ namespace app::music_player
                 changePlayingStateCallback(SongState::Playing);
             }
             updateViewSongState();
+            songsModelInterface->updateRepository(filePath);
         });
     }
 

@@ -31,9 +31,9 @@ namespace app::music_player
 
         void requestRecords(uint32_t offset, uint32_t limit) override;
 
-        size_t getCurrentIndex() const override;
         std::string getNextFilePath(const std::string &filePath) const override;
         std::string getPreviousFilePath(const std::string &filePath) const override;
+        void updateRepository(const std::string &filePath) override;
 
         bool isSongPlaying() const noexcept override;
         void setCurrentSongState(SongState songState) noexcept override;

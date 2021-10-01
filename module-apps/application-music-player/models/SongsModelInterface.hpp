@@ -28,7 +28,6 @@ namespace app::music_player
                                 OnLongPressCallback longPressCallback,
                                 OnSetBottomBarTemporaryCallback bottomBarTemporaryMode,
                                 OnRestoreBottomBarTemporaryCallback bottomBarRestoreFromTemporaryMode) = 0;
-        virtual size_t getCurrentIndex() const                                                         = 0;
         virtual void clearData()                                                                       = 0;
     };
 
@@ -46,5 +45,6 @@ namespace app::music_player
         virtual void clearCurrentSongContext()                                   = 0;
         virtual std::string getNextFilePath(const std::string &filePath) const     = 0;
         virtual std::string getPreviousFilePath(const std::string &filePath) const = 0;
+        virtual void updateRepository(const std::string &filePath)                 = 0;
     };
 } // namespace app::music_player
