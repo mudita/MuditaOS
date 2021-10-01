@@ -29,7 +29,6 @@ namespace gui
         box->setPenWidth(style::window::default_border_no_focus_w);
 
         addAlignedLabelWithValue(box, "GIT revision:", std::string(GIT_REV));
-        addAlignedLabelWithValue(box, "GIT tag:", std::string(GIT_TAG));
         addAlignedLabelWithValue(box, "GIT branch:", std::string(GIT_BRANCH));
         addAlignedLabelWithValue(box, "Version:", std::string(VERSION));
         {
