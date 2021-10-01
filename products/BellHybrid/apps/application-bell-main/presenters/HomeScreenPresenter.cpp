@@ -3,6 +3,7 @@
 
 #include "HomeScreenPresenter.hpp"
 #include "StateController.hpp"
+#include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
 
 #include <apps-common/ApplicationCommon.hpp>
@@ -16,9 +17,10 @@ namespace app::home_screen
 {
     HomeScreenPresenter::HomeScreenPresenter(ApplicationCommon *app,
                                              std::unique_ptr<AbstractAlarmModel> alarmModel,
+                                             std::unique_ptr<AbstractBatteryModel> batteryModel,
                                              std::unique_ptr<AbstractTemperatureModel> temperatureModel,
                                              std::unique_ptr<AbstractTimeModel> timeModel)
-        : app{app}, alarmModel{std::move(alarmModel)},
+        : app{app}, alarmModel{std::move(alarmModel)}, batteryModel{std::move(batteryModel)},
           temperatureModel{std::move(temperatureModel)}, timeModel{std::move(timeModel)}
     {}
 
@@ -71,8 +73,8 @@ namespace app::home_screen
     }
     void HomeScreenPresenter::createData()
     {
-        stateController =
-            std::make_unique<StateController>(*getView(), *this, *temperatureModel, *alarmModel, *timeModel);
+        stateController = std::make_unique<StateController>(
+            *getView(), *this, *batteryModel, *temperatureModel, *alarmModel, *timeModel);
     }
 
     void HomeScreenPresenter::refreshWindow()

@@ -9,6 +9,8 @@
 
 #include <keymap/KeyMap.hpp>
 
+#include <models/BatteryModel.hpp>
+
 #include <boost/sml.hpp>
 #include <time/time_conversion.hpp>
 #include <time/time_constants.hpp>
@@ -36,9 +38,11 @@ namespace app::home_screen
             auto makeAlarmNonEditable = [](AbstractView &view) { view.setAlarmEdit(false); };
             auto hideAlarmTime        = [](AbstractView &view) { view.setAlarmTimeVisible(false); };
             auto showAlarmTime        = [](AbstractView &view) { view.setAlarmTimeVisible(true); };
-            auto updateTemperature    = [](AbstractView &view, AbstractTemperatureModel &temperatureModel) {
-                view.setTemperature(temperatureModel.getTemperature());
-            };
+            auto updateBottomStats =
+                [](AbstractView &view, AbstractBatteryModel &batteryModel, AbstractTemperatureModel &temperatureModel) {
+                    view.setTemperature(temperatureModel.getTemperature());
+                    view.setBatteryLevelState(batteryModel.getLevelState());
+                };
             auto setNewAlarmTime =
                 [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractPresenter &presenter) {
                     alarmModel.setAlarmTime(view.getAlarmTime());
@@ -90,6 +94,7 @@ namespace app::home_screen
         namespace Init
         {
             auto entry = [](AbstractView &view,
+                            AbstractBatteryModel &batteryModel,
                             AbstractTemperatureModel &temperatureModel,
                             AbstractPresenter &presenter,
                             AbstractAlarmModel &alarmModel) {
@@ -98,6 +103,7 @@ namespace app::home_screen
                 view.setAlarmActive(false);
                 view.setAlarmVisible(false);
                 view.setTemperature(temperatureModel.getTemperature());
+                view.setBatteryLevelState(batteryModel.getLevelState());
             };
         } // namespace Init
 
@@ -249,7 +255,7 @@ namespace app::home_screen
                                              "Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::DeepUpPress> / Helpers::showAlarmTime = "ActivatedWait"_s,
-                                             "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
+                                             "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
 
                                              "DeactivatedWait"_s + sml::on_entry<_> / DeactivatedWait::entry,
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
@@ -259,7 +265,7 @@ namespace app::home_screen
 
                                              "DeactivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "DeactivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
-                                             "DeactivatedEdit"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
+                                             "DeactivatedEdit"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
                                              "DeactivatedEdit"_s + event<Events::RotateLeftPress> / AlarmEdit::processRotateLeft,
                                              "DeactivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
                                              "DeactivatedEdit"_s + event<Events::DeepUpPress> / Helpers::detachTimer = "ActivatedWait"_s,
@@ -281,13 +287,13 @@ namespace app::home_screen
                                              "Activated"_s [not Helpers::isAlarmActive] = "Deactivated"_s,
                                              "Activated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Activated"_s,
                                              "Activated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "ActivatedEdit"_s,
-                                             "Activated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
+                                             "Activated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
                                              "Activated"_s + event<Events::DeepDownPress> / Helpers::hideAlarmTime  = "DeactivatedWait"_s,
                                              "Activated"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
-                                             "ActivatedEdit"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
+                                             "ActivatedEdit"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
                                              "ActivatedEdit"_s + event<Events::RotateLeftPress> / AlarmEdit::processRotateLeft,
                                              "ActivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
                                              "ActivatedEdit"_s + event<Events::Timer> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
@@ -330,6 +336,7 @@ namespace app::home_screen
       public:
         Impl(AbstractView &view,
              AbstractPresenter &presenter,
+             AbstractBatteryModel &batteryModel,
              AbstractTemperatureModel &temperatureModel,
              AbstractAlarmModel &alarmModel,
              AbstractTimeModel &timeModel)
@@ -339,6 +346,7 @@ namespace app::home_screen
 #endif
                   view,
                   presenter,
+                  batteryModel,
                   temperatureModel,
                   alarmModel,
                   timeModel}
@@ -354,10 +362,12 @@ namespace app::home_screen
 
     StateController::StateController(AbstractView &view,
                                      AbstractPresenter &presenter,
+                                     AbstractBatteryModel &batteryModel,
                                      AbstractTemperatureModel &temperatureModel,
                                      AbstractAlarmModel &alarmModel,
                                      AbstractTimeModel &timeModel)
-        : pimpl{std::make_unique<StateController::Impl>(view, presenter, temperatureModel, alarmModel, timeModel)},
+        : pimpl{std::make_unique<StateController::Impl>(
+              view, presenter, batteryModel, temperatureModel, alarmModel, timeModel)},
           presenter{presenter}
     {}
 

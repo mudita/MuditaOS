@@ -43,6 +43,7 @@ namespace hal::battery
         if (notification == bsp::fuel_gauge::FuelGaugeUpdate) {
             Store::Battery::modify().level = bsp::fuel_gauge::getBatteryLevel();
         }
+        eventsHandler.onStatusChanged();
     }
 
     void BatteryCharger::setChargingCurrentLimit(std::uint8_t)

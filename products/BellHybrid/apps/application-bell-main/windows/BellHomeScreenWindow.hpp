@@ -5,9 +5,25 @@
 
 #include "models/TemperatureModel.hpp"
 #include "presenters/HomeScreenPresenter.hpp"
+#include "widgets/BellBattery.hpp"
 
 #include <apps-common/GuiTimer.hpp>
 #include <apps-common/windows/AppWindow.hpp>
+
+namespace style::bell_home_screen
+{
+    constexpr inline auto temperature_w = 85U;
+    constexpr inline auto temperature_h = 102U;
+    constexpr inline auto bottom_desc_w = 390U;
+    constexpr inline auto bottom_desc_h = 102U;
+
+    enum class ParentType
+    {
+        SideListView,
+        Window
+    };
+
+} // namespace style::bell_home_screen
 
 namespace gui
 {
@@ -42,6 +58,7 @@ namespace gui
 
         void setTemperature(utils::temperature::Temperature newTemp) override;
         void setBottomDescription(const UTF8 &desc) override;
+        void setBatteryLevelState(const Store::Battery &batteryContext) override;
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
         void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) override;
@@ -50,6 +67,8 @@ namespace gui
         BellBaseLayout *body{};
 
         TimeSetFmtSpinner *time{};
+        HBox *bottomBox{};
+        BellBattery *battery{};
         TextFixedSize *bottomText{};
         AlarmSetSpinner *alarm{};
 
