@@ -1,4 +1,3 @@
 inline const char* GIT_REV="${GIT_REV}";
-inline const char* GIT_TAG="${GIT_TAG}";
 inline const char* GIT_BRANCH="${GIT_BRANCH}";
-inline const char* VERSION="${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}.${CMAKE_PROJECT_VERSION_PATCH}";
+inline const char* VERSION="${PROJECT_VERSION}";

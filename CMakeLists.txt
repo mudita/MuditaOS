@@ -31,6 +31,7 @@ message("Selected product: ${PRODUCT}")
 message("Selected board:   ${BOARD}")
 message("Board revision:   ${BOARD_REVISION}")
 message("PROJECT_TARGET:   ${PROJECT_TARGET}")
+message("Version:          ${OS_VERSION_MAJOR}.${OS_VERSION_MINOR}.${OS_VERSION_PATCH}-${OS_VERSION_LABEL}")
 
 string(REPLACE "TARGET_" "" PROJECT_TARGET_NAME ${PROJECT_TARGET})
 string(TOLOWER "${PROJECT_TARGET_NAME}" PROJECT_TARGET_NAME)
@@ -151,6 +152,10 @@ add_custom_target(
     COMMAND ${CMAKE_COMMAND}
     -DSRC_DIR=${CMAKE_SOURCE_DIR}
     -B ${CMAKE_BINARY_DIR}
+    -DOS_VERSION_MAJOR=${OS_VERSION_MAJOR}
+    -DOS_VERSION_MINOR=${OS_VERSION_MINOR}
+    -DOS_VERSION_PATCH=${OS_VERSION_PATCH}
+    -DOS_VERSION_LABEL=${OS_VERSION_LABEL}
     -P ${CMAKE_SOURCE_DIR}/cmake/modules/GenVersionHpp.cmake
     COMMENT
         "Generating version info"
