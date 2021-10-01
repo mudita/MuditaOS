@@ -1,0 +1,36 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+start
+
+if (currentlyPlayingTrackIndex ⊂ musicFilesCache) then (no) 
+partition "**query** newData" {
+    : offset = currentlyPlayingTrackIndex - cacheThreshold
+     size = cacheMaxSize
+     updateMusicFilesList(offset, size);
+     }
+else (yes)
+  if (
+   currentlyPlayingTrackIndex >
+   musicFilesCache.lastIndex - cacheThreshold
+   ) then (yes)
+   partition "**query** newBackData" {
+    : offset = musicFilesCache.lastIndex + 1
+     size = cacheThreshold
+     updateMusicFilesList(offset, size);
+     }
+  else (no)
+	 if (
+	  currentlyPlayingTrackIndex <
+	  musicFilesCache.firstIndex + cacheThreshold
+	  ) then (yes)
+	  partition "**query** newFrontData" {
+	   : offset = musicFilesCache.firstIndex - cacheThreshold
+	    size = cacheThreshold
+	    updateMusicFilesList(offset, size);
+	    } 
+	 endif
+  endif
+endif
+
+stop
+@enduml
