@@ -52,7 +52,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     }
 
     if (kbdMessage->key.state == RawKey::State::Pressed) {
-        backlightHandler.handleKeyPressed(static_cast<int>(static_cast<gui::KeyCode>(kbdMessage->key.keyCode)));
+        backlightHandler.handleKeyPressed(static_cast<int>(mapKey(static_cast<gui::KeyCode>(kbdMessage->key.keyCode))));
     }
 
     keySequenceMgr->process(kbdMessage->key);
