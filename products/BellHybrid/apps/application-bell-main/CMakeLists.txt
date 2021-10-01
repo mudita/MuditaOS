@@ -4,17 +4,22 @@ add_library(bell::app-main ALIAS application-bell-main)
 target_sources(application-bell-main
     PRIVATE
         ApplicationBellMain.cpp
+        widgets/BellBattery.cpp
         windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
 
+        models/BatteryModel.cpp
         models/TemperatureModel.cpp
 
         presenters/HomeScreenPresenter.cpp
         presenters/StateController.cpp
 
+        widgets/BellBattery.hpp
+
         windows/BellHomeScreenWindow.hpp
         windows/BellMainMenuWindow.hpp
 
+        models/BatteryModel.cpp
         models/TemperatureModel.hpp
 
         presenters/HomeScreenPresenter.hpp
