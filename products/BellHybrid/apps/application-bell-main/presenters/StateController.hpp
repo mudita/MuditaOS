@@ -21,6 +21,7 @@ namespace app::home_screen
 
     class AbstractView;
     class AbstractPresenter;
+    class AbstractBatteryModel;
     class AbstractTemperatureModel;
     class AbstractController
     {
@@ -39,6 +40,7 @@ namespace app::home_screen
       public:
         StateController(AbstractView &view,
                         AbstractPresenter &presenter,
+                        AbstractBatteryModel &batteryModel,
                         AbstractTemperatureModel &temperatureModel,
                         AbstractAlarmModel &alarmModel,
                         AbstractTimeModel &timeModel);
