@@ -1,0 +1,27 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "SongsPresenter" as presenter
+participant "SongsModel" as model
+participant "SongsRepository" as repo
+participant "DataBase" as db
+
+presenter -> model : play
+model -> repo : updateRepository
+repo -> db : GetLimited query
+
+db -> repo : records
+...
+presenter -> model : getNextFilePath
+model -> repo : getNextFilePath
+
+repo -> model : NextFilePath
+model -> presenter : NextFilePath
+...
+presenter -> model : getPreviousFilePath
+model -> repo : getPreviousFilePath
+
+repo -> model : PreviousFilePath
+model -> presenter : PreviousFilePath
+
+@enduml
