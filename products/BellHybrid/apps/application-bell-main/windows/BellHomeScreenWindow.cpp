@@ -106,10 +106,20 @@ namespace gui
         time->setFont(mainWindow::time::font);
         time->activeItem = false;
 
-        bottomText = new TextFixedSize(body->lastBox, 0, 0, 0, 0);
-        bottomText->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        bottomBox = new HBox(body->lastBox, 0, 0, 0, 0);
+        bottomBox->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        bottomBox->setEdges(RectangleEdge::None);
+
+        battery = new BellBattery(bottomBox, 0, 0, 0, 0);
+        battery->setMinimumSize(battery::battery_widget_w, battery::battery_widget_h);
+        battery->setEdges(RectangleEdge::None);
+        battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        battery->setVisible(false);
+
+        bottomText = new TextFixedSize(bottomBox, 0, 0, 0, 0);
+        bottomText->setMaximumSize(style::bell_home_screen::bottom_desc_w, style::bell_home_screen::bottom_desc_h);
         bottomText->setFont(mainWindow::bottomDescription::font_small);
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        bottomText->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Top));
         bottomText->setEdges(RectangleEdge::None);
         bottomText->activeItem = false;
         bottomText->drawUnderline(false);
@@ -150,15 +160,27 @@ namespace gui
     void BellHomeScreenWindow::setTemperature(utils::temperature::Temperature newTemp)
     {
         bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_normal);
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        bottomText->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
         bottomText->setText(utils::temperature::tempToStrDec(newTemp));
+        bottomBox->resizeItems();
     }
 
     void BellHomeScreenWindow::setBottomDescription(const UTF8 &desc)
     {
-        bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_small);
+        battery->setVisible(false);
+        bottomBox->resizeItems();
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_small);
         bottomText->setRichText(desc);
+    }
+
+    void BellHomeScreenWindow::setBatteryLevelState(const Store::Battery &batteryContext)
+    {
+        battery->update(batteryContext);
+        if (!battery->visible) {
+            bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        }
+        bottomBox->resizeItems();
     }
 
     void BellHomeScreenWindow::setTime(std::time_t newTime)

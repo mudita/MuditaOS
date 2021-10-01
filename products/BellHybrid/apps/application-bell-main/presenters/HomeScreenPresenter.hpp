@@ -8,6 +8,7 @@
 #include <apps-common/BasePresenter.hpp>
 #include <common/models/AbstractAlarmModel.hpp>
 #include <gui/input/InputEvent.hpp>
+#include <module-utils/EventStore/EventStore.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <Temperature.hpp>
 #include <time/time_locale.hpp>
@@ -35,6 +36,7 @@ namespace db
 namespace app::home_screen
 {
     class AbstractController;
+    class AbstractBatteryModel;
     class AbstractTemperatureModel;
 
     class AbstractView
@@ -59,9 +61,10 @@ namespace app::home_screen
         virtual void setTime(std::time_t time)                          = 0;
         virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
 
-        /// Bottom box related API(description or time)
-        virtual void setTemperature(utils::temperature::Temperature newTemp) = 0;
-        virtual void setBottomDescription(const UTF8 &desc)                  = 0;
+        /// Bottom box related API(descriptionn battery or time)
+        virtual void setTemperature(utils::temperature::Temperature newTemp)    = 0;
+        virtual void setBottomDescription(const UTF8 &desc)                     = 0;
+        virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
 
         /// Various
         virtual void switchToMenu() = 0;
@@ -90,6 +93,7 @@ namespace app::home_screen
       public:
         HomeScreenPresenter(ApplicationCommon *app,
                             std::unique_ptr<AbstractAlarmModel> alarmModel,
+                            std::unique_ptr<AbstractBatteryModel> batteryModel,
                             std::unique_ptr<AbstractTemperatureModel> temperatureModel,
                             std::unique_ptr<AbstractTimeModel> timeModel);
         virtual ~HomeScreenPresenter();
@@ -115,6 +119,7 @@ namespace app::home_screen
         ApplicationCommon *app;
         sys::TimerHandle timer;
         std::unique_ptr<AbstractAlarmModel> alarmModel;
+        std::unique_ptr<AbstractBatteryModel> batteryModel;
         std::unique_ptr<AbstractTemperatureModel> temperatureModel;
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::shared_ptr<AbstractController> stateController;

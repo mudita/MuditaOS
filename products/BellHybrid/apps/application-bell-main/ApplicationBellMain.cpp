@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
+#include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
 #include "presenters/HomeScreenPresenter.hpp"
 
@@ -45,10 +46,11 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             auto timeModel        = std::make_unique<app::TimeModel>();
+            auto batteryModel     = std::make_unique<app::home_screen::BatteryModel>(app);
             auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(app);
             auto alarmModel       = std::make_unique<app::AlarmModel>(app);
             auto presenter        = std::make_unique<app::home_screen::HomeScreenPresenter>(
-                app, std::move(alarmModel), std::move(temperatureModel), std::move(timeModel));
+                app, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
             return std::make_unique<gui::BellHomeScreenWindow>(app, std::move(presenter));
         });
 
