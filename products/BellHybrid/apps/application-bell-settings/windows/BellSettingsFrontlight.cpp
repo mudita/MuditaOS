@@ -59,6 +59,17 @@ namespace gui
 
     bool BellSettingsFrontlightWindow::onInput(const gui::InputEvent &inputEvent)
     {
+        // this has to be first because body->oninput() catches those keycodes for itself
+        // also because of body->oninput() sends keypresses to spinner, it's value is updated *after* frontlight
+        // brightness set so proper +1 -1 has to be added to to set brightness level corresponding to screen indicator
+        if (inputEvent.isShortRelease(KeyCode::KEY_UP)) {
+            auto value = presenter->getPagesProvider()->getSpinner()->getCurrentValue();
+            presenter->getPagesProvider()->setLiveBrightness(value + 1);
+        }
+        else if (inputEvent.isShortRelease(KeyCode::KEY_DOWN)) {
+            auto value = presenter->getPagesProvider()->getSpinner()->getCurrentValue();
+            presenter->getPagesProvider()->setLiveBrightness(value - 1);
+        }
         if (body->onInput(inputEvent)) {
             return true;
         }
