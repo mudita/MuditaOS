@@ -7,13 +7,13 @@
 #include <windows/OnBoardingLanguageWindow.hpp>
 #include <windows/OnBoardingFinalizeWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
-#include <windows/OnBoardingWelcomeWindow.hpp>
 
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 
 #include <apps-common/messages/OnBoardingMessages.hpp>
-#include <common/BellFinishedWindow.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
+#include <common/windows/BellWelcomeWindow.hpp>
 
 #include <application-bell-settings/models/TemperatureUnitModel.hpp>
 #include <application-bell-settings/models/TimeUnitsModel.hpp>
@@ -50,7 +50,8 @@ namespace app
     void ApplicationBellOnBoarding::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::OnBoardingWelcomeWindow>(app, name);
+            return std::make_unique<gui::BellWelcomeWindow>(
+                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingLanguageWindow); });
         });
 
         windowsFactory.attach(

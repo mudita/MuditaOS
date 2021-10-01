@@ -11,9 +11,8 @@
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/TextFixedSize.hpp>
 #include <module-gui/gui/widgets/ThreeBox.hpp>
-#include <module-gui/gui/widgets/Image.hpp>
 
-#include <common/BellFinishedWindow.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 
 namespace gui
 {

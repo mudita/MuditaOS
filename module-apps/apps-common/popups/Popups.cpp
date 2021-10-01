@@ -38,6 +38,8 @@ namespace gui::popup
             return gui::popup::window::alarm_deactivated_window;
         case ID::Alarm:
             return gui::popup::window::alarm_window;
+        case ID::PowerOff:
+            return gui::popup::window::power_off_window;
         }
 
         return {};

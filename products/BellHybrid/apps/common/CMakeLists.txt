@@ -10,21 +10,28 @@ target_include_directories(application-bell-common
 
 target_sources(application-bell-common
     PRIVATE
+        src/BellPowerOffPresenter.cpp
         src/AlarmModel.cpp
         src/TimeModel.cpp
-        src/BellFinishedWindow.cpp
+        src/windows/BellFinishedWindow.cpp
+        src/windows/BellTurnOffWindow.cpp
+        src/windows/BellWelcomeWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
         src/popups/presenter/AlarmActivatedPresenter.cpp
         src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmDeactivatedWindow.cpp
+        src/popups/BellTurnOffOptionWindow.cpp
         src/widgets/ListItems.cpp
 
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
         src/options/OptionBellMenu.cpp
     PUBLIC
-        include/common/BellFinishedWindow.hpp
+        include/common/BellPowerOffPresenter.hpp
+        include/common/windows/BellFinishedWindow.hpp
+        include/common/windows/BellTurnOffWindow.hpp
+        include/common/windows/BellWelcomeWindow.hpp
         include/common/TimeUtils.hpp
         include/common/models/AbstractAlarmModel.hpp
         include/common/models/AbstractSettingsModel.hpp
@@ -33,6 +40,7 @@ target_sources(application-bell-common
         include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp
+        include/common/popups/BellTurnOffOptionWindow.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
         include/common/widgets/ListItems.hpp
         include/common/options/BellOptionWindow.hpp

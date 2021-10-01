@@ -1,4 +1,5 @@
 add_library(appmgr STATIC)
+add_library(bell::appmgr ALIAS appmgr)
 
 target_sources(appmgr
     PRIVATE
@@ -6,6 +7,7 @@ target_sources(appmgr
     PUBLIC
         include/appmgr/messages/AlarmMessage.hpp
         include/appmgr/ApplicationManager.hpp
+        include/appmgr/messages/PowerOffPopupRequestParams.hpp
 )
 
 target_include_directories(appmgr
