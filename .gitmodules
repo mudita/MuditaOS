@@ -92,3 +92,6 @@
 [submodule "libical"]
 	path = third-party/libical/libical
 	url = https://github.com/mudita/libical
+[submodule "klib"]
+	path = third-party/klib/src
+	url = https://github.com/attractivechaos/klib.git
