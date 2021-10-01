@@ -9,6 +9,7 @@
 
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <common/options/OptionBellMenu.hpp>
+#include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <apps-common/windows/Dialog.hpp>
 
 namespace gui
@@ -46,7 +47,7 @@ namespace gui
         addWinSettings(utils::translate("app_bell_settings_alarm_settings"), BellSettingsAlarmSettingsMenuWindow::name);
         addWinSettings(utils::translate("app_bell_settings_bedtime_tone"), window::name::bellSettingsBedtimeTone);
         addWinSettings(utils::translate("app_bell_settings_advanced"), window::name::bellSettingsAdvanced);
-        addWinSettings(utils::translate("app_bell_settings_turn_off"), window::name::bellSettingsTurnOff);
+        addWinSettings(utils::translate("app_bell_settings_turn_off"), BellTurnOffOptionWindow::defaultName);
 
         return settingsOptionList;
     }

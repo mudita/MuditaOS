@@ -26,11 +26,12 @@
 #include "windows/BellSettingsBedtimeToneWindow.hpp"
 #include "windows/BellSettingsFrontlight.hpp"
 #include "windows/BellSettingsHomeViewWindow.hpp"
-#include "windows/BellSettingsTurnOffWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
 
 #include <apps-common/windows/Dialog.hpp>
-#include <common/BellFinishedWindow.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
+#include <common/windows/BellTurnOffWindow.hpp>
+#include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
@@ -120,10 +121,14 @@ namespace app
                                   return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app);
                               });
 
-        windowsFactory.attach(gui::window::name::bellSettingsTurnOff,
+        windowsFactory.attach(gui::BellTurnOffOptionWindow::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellSettingsTurnOffWindow>(app);
+                                  return std::make_unique<gui::BellTurnOffOptionWindow>(app);
                               });
+
+        windowsFactory.attach(gui::BellTurnOffWindow::name, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::BellTurnOffWindow>(app, std::make_unique<gui::PowerOffPresenter>(app));
+        });
 
         windowsFactory.attach(
             gui::BellSettingsPrewakeUpWindow::name, [this](ApplicationCommon *app, const std::string &name) {
@@ -186,7 +191,7 @@ namespace app
                 return std::make_unique<gui::AboutYourBellWindow>(app, std::move(aboutYourBellPresenter));
             });
 
-        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated});
+        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated, gui::popup::ID::PowerOff});
     }
 
     sys::MessagePointer ApplicationBellSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

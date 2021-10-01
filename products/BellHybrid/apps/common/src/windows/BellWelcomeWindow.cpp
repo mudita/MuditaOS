@@ -1,24 +1,23 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "OnBoardingWelcomeWindow.hpp"
-#include "OnBoardingLanguageWindow.hpp"
+#include "windows/BellWelcomeWindow.hpp"
 
-#include <data/OnBoardingStyle.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/TextFixedSize.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {
-    OnBoardingWelcomeWindow::OnBoardingWelcomeWindow(app::ApplicationCommon *app, const std::string &name)
-        : AppWindow(app, name)
+    BellWelcomeWindow::BellWelcomeWindow(app::ApplicationCommon *app, const std::string &name, Callback onAction)
+        : AppWindow(app, name), onAction{onAction}
     {
         buildInterface();
     }
 
-    void OnBoardingWelcomeWindow::buildInterface()
+    void BellWelcomeWindow::buildInterface()
     {
         AppWindow::buildInterface();
         statusBar->setVisible(false);
@@ -32,14 +31,14 @@ namespace gui
 
         auto welcomeText = new TextFixedSize(body->centerBox);
         welcomeText->setMinimumSize(style::bell_base_layout::w,
-                                    style::bell_base_layout::center_layout_h - window::welcome::midline_correction);
+                                    style::bell_base_layout::center_layout_h - midline_correction);
         welcomeText->setFont(style::window::font::largelight);
         welcomeText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         welcomeText->drawUnderline(false);
         welcomeText->setText(utils::translate("app_bell_onboarding_welcome_message"));
 
         auto midLine = new Rect(body->centerBox, 0, 0, 0, 0);
-        midLine->setMinimumSize(window::welcome::midline_w, window::welcome::midline_h);
+        midLine->setMinimumSize(midline_w, midline_h);
         midLine->setEdges(RectangleEdge::Bottom);
 
         auto informationBody = new HBox(body->lastBox);
@@ -50,11 +49,10 @@ namespace gui
 
         auto sunLogo = new ImageBox(informationBody, new Image("button_icon_sun", ImageTypeSpecifier::W_G));
         sunLogo->setMinimumSizeToFitImage();
-        sunLogo->setMargins(
-            Margins(0, window::welcome::sun_logo_margin_top, window::welcome::sun_logo_margin_right, 0));
+        sunLogo->setMargins(Margins(0, sun_logo_margin_top, sun_logo_margin_right, 0));
 
         auto instructionText = new TextFixedSize(informationBody);
-        instructionText->setMargins(Margins(0, window::welcome::sun_logo_margin_top, 0, 0));
+        instructionText->setMargins(Margins(0, sun_logo_margin_top, 0, 0));
         instructionText->setFont(style::window::font::largelight);
         instructionText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         instructionText->drawUnderline(false);
@@ -67,10 +65,12 @@ namespace gui
         body->resize();
     }
 
-    bool OnBoardingWelcomeWindow::onInput(const InputEvent &inputEvent)
+    bool BellWelcomeWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isKeyRelease(KeyCode::KEY_LF)) {
-            application->switchWindow(gui::window::name::onBoardingLanguageWindow);
+            if (onAction) {
+                onAction();
+            }
         }
         return false;
     }
