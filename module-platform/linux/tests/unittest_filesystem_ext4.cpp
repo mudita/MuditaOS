@@ -227,6 +227,12 @@ TEST_CASE("ext4: Directory tests")
             REQUIRE(fs_core->unlink(path + "/" + filename) == 0);
         }
         REQUIRE(fs_core->rmdir(path) == 0);
+        {
+            // Opendir on the root path without tailing /
+            const auto diro = fs_core->diropen("/sys");
+            REQUIRE(diro);
+            REQUIRE(fs_core->dirclose(diro) == 0);
+        }
     }
 
     REQUIRE(fs_core->umount("/sys") == 0);
