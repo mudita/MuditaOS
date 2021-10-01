@@ -403,7 +403,11 @@ namespace purefs::fs::drivers
             LOG_ERROR("Non ext4 mount point");
             return nullptr;
         }
-        const auto fspath = vmnt->native_path(path);
+        // NOTE: mod path fix for lwext4 open root dir
+        auto fspath = vmnt->native_path(path);
+        if (fspath.empty()) {
+            fspath = vmnt->mount_path();
+        }
         const auto dirp   = std::make_shared<directory_handle_ext4>(mnt, 0);
         ext4_locker _lck(vmnt);
         const auto lret = ext4_dir_open(dirp->dirp(), fspath.c_str());
