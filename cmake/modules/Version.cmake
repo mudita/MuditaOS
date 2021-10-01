@@ -1,92 +1,31 @@
-# from: https://www.mattkeeter.com/blog/2018-01-06-versioning/ (modified)
+# Version cmake sets whole build version
+# it has to be:
+# 1. a parameter to the build, cmake shoudln't guess version - we should provide it explicitly
+# 2. conformant with: https://appnroll.atlassian.net/wiki/spaces/MFP/pages/1168015551/Release+version+and+branch+management
 
 execute_process(COMMAND git rev-parse --short HEAD
                 OUTPUT_VARIABLE GIT_REV
                 OUTPUT_STRIP_TRAILING_WHITESPACE
-                ERROR_QUIET)
+                )
+execute_process(
+                COMMAND git rev-parse --abbrev-ref HEAD
+                OUTPUT_VARIABLE GIT_BRANCH
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                )
 
-if ( NOT SRC_DIR )
-    set(SRC_DIR ${CMAKE_SOURCE_DIR})
-endif()
-# Check whether we got any revision (which isn't
-# always the case, e.g. when someone downloaded a zip
-# file from Github instead of a checkout)
-if ("${GIT_REV}" STREQUAL "")
-    set(GIT_REV "N/A")
-    set(GIT_DIFF "")
-    set(GIT_TAG "N/A")
-    set(GIT_BRANCH "N/A")
-    set(GIT_DAILY_TAG "N/A")
+if ( (NOT OS_VERSION_MAJOR MATCHES [0-9]+) OR (NOT OS_VERSION_MINOR MATCHES [0-9]+) OR (NOT OS_VERSION_PATCH MATCHES [0-9]+) )
+    message( WARNING "Version not set properly! Setting version to 0.0.0! Requires MAJOR.MINOR.PATCH as parameters was: ${OS_VERSION_MAJOR}.${OS_VERSION_MINOR}.${OS_VERSION_PATCH}")
+    set(OS_VERSION_MAJOR "0")
+    set(OS_VERSION_MINOR "0")
+    set(OS_VERSION_PATCH "0")
 else()
-    execute_process(
-        COMMAND bash -c "git diff --quiet --exit-code || echo +"
-        OUTPUT_VARIABLE GIT_DIFF
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        WORKING_DIRECTORY ${SRC_DIR}
-        )
-    execute_process(
-        COMMAND git describe --tags --match "release*" HEAD
-        RESULT_VARIABLE ret
-        OUTPUT_VARIABLE GIT_TAG
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        WORKING_DIRECTORY ${SRC_DIR}
-        ERROR_QUIET
-        )
-        if(NOT ret EQUAL "0")
-            set(GIT_TAG "none")
-        endif()
-    execute_process(
-        COMMAND git tag --points-at HEAD 
-        RESULT_VARIABLE ret
-        OUTPUT_VARIABLE GIT_DAILY_TAG
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        WORKING_DIRECTORY ${SRC_DIR}
-        ERROR_QUIET
-        )
-    execute_process(
-        COMMAND git rev-parse --abbrev-ref HEAD
-        OUTPUT_VARIABLE GIT_BRANCH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-    execute_process(
-        COMMAND uname -r
-        OUTPUT_VARIABLE BUILD_HOST
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-    execute_process(
-        COMMAND git config user.name
-        OUTPUT_VARIABLE BUILD_USER
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-    execute_process(
-        COMMAND date +%F-%T
-        OUTPUT_VARIABLE BUILD_DATE
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-    execute_process(
-        COMMAND grep tskKERNEL_VERSION_NUMBER ${SRC_DIR}/module-os/FreeRTOS/include/task.h
-        COMMAND awk "{print $3}"
-        COMMAND tr -d "\""
-        OUTPUT_VARIABLE KERNEL_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
+    message(STATUS "Version major: ${OS_VERSION_MAJOR} minor: ${OS_VERSION_MINOR} path: ${OS_VERSION_PATCH} label: ${OS_VERSION_LABEL}")
 endif()
 
-if (GIT_DAILY_TAG)
-    string(REPLACE "\n" ";" GIT_DAILY_TAG_LIST ${GIT_DAILY_TAG})
-    list(LENGTH GIT_DAILY_TAG_LIST DAILY_LEN)
-    foreach(TAG_ITEM IN LISTS GIT_DAILY_TAG_LIST)
-        if(${TAG_ITEM} MATCHES "release-([0-9]+).([0-9]+).([0-9]+)")
-            break()
-        elseif(${TAG_ITEM} MATCHES "daily-([0-9]+).([0-9]+).([0-9]+)")
-            continue()
-        endif()
-    endforeach()
+if ( (NOT DEFINED OS_VERSION_LABEL) OR (OS_VERSION_LABEL STREQUAL "") )
+    set(OS_VERSION_LABEL "")
+    set(PROJECT_VERSION ${OS_VERSION_MAJOR}.${OS_VERSION_MINOR}.${OS_VERSION_PATCH})
 else()
-    string(REGEX MATCH "release-([0-9]+).([0-9]+).([0-9]+)" VERSION_RAW ${GIT_TAG})
+    set(PROJECT_VERSION ${OS_VERSION_MAJOR}.${OS_VERSION_MINOR}.${OS_VERSION_PATCH}-${OS_VERSION_LABEL})
 endif()
 
-set(CMAKE_PROJECT_VERSION_MAJOR "${CMAKE_MATCH_1}")
-set(CMAKE_PROJECT_VERSION_MINOR "${CMAKE_MATCH_2}")
-set(CMAKE_PROJECT_VERSION_PATCH "${CMAKE_MATCH_3}")
-set(CMAKE_PROJECT_VERSION "${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}.${CMAKE_PROJECT_VERSION_PATCH}")

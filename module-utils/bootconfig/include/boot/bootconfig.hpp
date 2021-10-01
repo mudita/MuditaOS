@@ -14,15 +14,9 @@ namespace boot
         inline constexpr auto os_type         = "ostype";
         inline constexpr auto os_image        = "imagename";
         inline constexpr auto os_version      = "version";
-        inline constexpr auto version_major   = "major";
-        inline constexpr auto version_minor   = "minor";
-        inline constexpr auto version_patch   = "patch";
-        inline constexpr auto version_string  = "string";
         inline constexpr auto timestamp       = "timestamp";
         inline constexpr auto misc            = "misc";
-        inline constexpr auto builddate       = "builddate";
         inline constexpr auto git_info        = "git";
-        inline constexpr auto os_git_tag      = "git_tag";
         inline constexpr auto os_git_revision = "git_commit";
         inline constexpr auto os_git_branch   = "git_branch";
         inline constexpr auto bootloader      = "bootloader";
