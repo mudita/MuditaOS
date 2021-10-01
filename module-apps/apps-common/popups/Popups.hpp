@@ -25,7 +25,8 @@ namespace gui
             SimNotReady,
             AlarmActivated,
             AlarmDeactivated,
-            Alarm
+            Alarm,
+            PowerOff,
         };
 
         namespace window

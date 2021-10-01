@@ -4,7 +4,7 @@
 #pragma once
 
 #include <presenter/OnBoardingFinalizeWindowPresenter.hpp>
-#include <common/BellFinishedWindow.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 
 namespace gui
 {

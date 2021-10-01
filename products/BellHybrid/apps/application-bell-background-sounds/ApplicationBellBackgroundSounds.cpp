@@ -55,6 +55,8 @@ namespace app
             auto presenter = std::make_unique<bgSounds::BGSoundsVolumePresenter>();
             return std::make_unique<gui::BGSoundsVolumeWindow>(app, std::move(presenter));
         });
+
+        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated, gui::popup::ID::PowerOff});
     }
 
     sys::MessagePointer ApplicationBellBackgroundSounds::DataReceivedHandler(sys::DataMessage *msgl,

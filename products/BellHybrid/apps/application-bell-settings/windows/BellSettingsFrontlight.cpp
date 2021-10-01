@@ -7,7 +7,7 @@
 
 #include <gui/input/InputEvent.hpp>
 #include <apps-common/options/OptionStyle.hpp>
-#include <common/BellFinishedWindow.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include <widgets/SideListView.hpp>
 #include <widgets/BellBaseLayout.hpp>
 

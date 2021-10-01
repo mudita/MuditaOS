@@ -10,4 +10,5 @@ namespace gui::bell_style
 {
     inline constexpr auto font        = ::style::window::font::supersizemelight;
     inline constexpr auto font_center = ::style::window::font::largelight;
+    inline constexpr auto font_top    = ::style::window::font::largelight;
 } // namespace gui::bell_style

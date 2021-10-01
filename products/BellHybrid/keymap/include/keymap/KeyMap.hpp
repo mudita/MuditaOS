@@ -4,21 +4,63 @@
 #pragma once
 
 #include <gui/input/InputEvent.hpp>
+#include <bitset>
 
 /// Key mapping structure to ease translation between PureOS key definitions and nomenclature used throughout the
 /// GUI design
-enum class KeyMap
+enum class KeyMap : std::uint8_t
 {
-    Frontlight    = static_cast<int>(gui::KeyCode::KEY_LF),
-    Back          = static_cast<int>(gui::KeyCode::KEY_RF),
-    LightPress    = static_cast<int>(gui::KeyCode::KEY_ENTER),
-    RotateLeft    = static_cast<int>(gui::KeyCode::KEY_DOWN),
-    RotateRight   = static_cast<int>(gui::KeyCode::KEY_UP),
-    DeepPressUp   = static_cast<int>(gui::KeyCode::KEY_LEFT),
-    DeepPressDown = static_cast<int>(gui::KeyCode::KEY_RIGHT),
+    Frontlight    = 0,
+    Back          = 1,
+    LightPress    = 2,
+    RotateLeft    = 3,
+    RotateRight   = 4,
+    DeepPressUp   = 5,
+    DeepPressDown = 6
 };
 
 inline static KeyMap mapKey(gui::KeyCode key)
 {
-    return KeyMap{key};
+    switch (key) {
+    case gui::KeyCode::KEY_LF:
+        return KeyMap::Frontlight;
+    case gui::KeyCode::KEY_RF:
+        return KeyMap::Back;
+    case gui::KeyCode::KEY_ENTER:
+        return KeyMap::LightPress;
+    case gui::KeyCode::KEY_DOWN:
+        return KeyMap::RotateLeft;
+    case gui::KeyCode::KEY_UP:
+        return KeyMap::RotateRight;
+    case gui::KeyCode::KEY_LEFT:
+        return KeyMap::DeepPressUp;
+    case gui::KeyCode::KEY_RIGHT:
+        return KeyMap::DeepPressDown;
+    default:
+        assert(("Unrecognized key code"));
+        return KeyMap{};
+    }
 }
+
+struct KeyStates
+{
+    using KeySet = std::bitset<32U>;
+
+    void set(KeyMap key, bool value)
+    {
+        states.set(magic_enum::enum_integer(key), value);
+    }
+    bool state(KeyMap key)
+    {
+        return states.test(magic_enum::enum_integer(key));
+    }
+
+    template <typename... Args> bool ifOnlySet(Args... args)
+    {
+        const auto mask = (... | [](auto x) { return KeySet{1UL << magic_enum::enum_integer(x)}; }(args));
+        return (states | mask) == mask;
+    }
+
+  private:
+    KeySet states;
+};
