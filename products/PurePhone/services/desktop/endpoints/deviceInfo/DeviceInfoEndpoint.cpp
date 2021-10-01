@@ -156,7 +156,6 @@ namespace sdesktop::endpoints
              {json::fsFree, std::to_string(freeMbytes)},
              {json::fsFreePercent, std::to_string(freePercent)},
              {json::gitRevision, (std::string)(GIT_REV)},
-             {json::gitTag, (std::string)GIT_TAG},
              {json::gitBranch, (std::string)GIT_BRANCH},
              {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
              {json::version, std::string(VERSION)},

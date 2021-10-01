@@ -83,7 +83,7 @@ int main()
                 abort();
             }
 
-            Log::Logger::get().init(Log::Application{ApplicationName, GIT_REV, GIT_TAG, GIT_BRANCH});
+            Log::Logger::get().init(Log::Application{ApplicationName, GIT_REV, VERSION, GIT_BRANCH});
             /// force initialization of PhonenumberUtil because of its stack usage
             /// otherwise we would end up with an init race and PhonenumberUtil could
             /// be initiated in a task with stack not big enough to handle it
@@ -110,7 +110,7 @@ int main()
         });
 
     LOG_PRINTF("Launching %s \n", ApplicationName);
-    LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
+    LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, VERSION, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
 
     return 0;
