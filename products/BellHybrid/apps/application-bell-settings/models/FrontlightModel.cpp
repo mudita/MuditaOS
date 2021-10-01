@@ -45,8 +45,7 @@ namespace app::bell_settings
 
     void FrontlightModel::createData()
     {
-        frontlightSetSpinner =
-            new gui::Spinner(fmtSpinnerMin, fmtSpinnerMax, fmtSpinnerStep, gui::Boundaries::Continuous);
+        frontlightSetSpinner = new gui::Spinner(fmtSpinnerMin, fmtSpinnerMax, fmtSpinnerStep, gui::Boundaries::Fixed);
         frontlightSetSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         frontlightSetSpinner->setFont(gui::bell_settings_style::time_fmt_set_list_item::font);
 
@@ -55,6 +54,7 @@ namespace app::bell_settings
         frontlightSetSpinner->setFixedFieldWidth(2);
         frontlightSetSpinner->setEdges(gui::RectangleEdge::None);
         frontlightSetSpinner->setCurrentValue(fmtSpinnerMin);
+        frontlightSetSpinner->setFixedFieldWidth(0);
         frontlightSetSpinner->setFocusEdges(gui::RectangleEdge::None);
     }
 
@@ -72,6 +72,19 @@ namespace app::bell_settings
         bsp::eink_frontlight::BrightnessPercentage brightnessValue =
             utils::getNumericValue<float>(settings.getValue(brightnessLevel, settings::SettingsScope::Global));
         LOG_DEBUG("Reading frontlight value %0.1f", brightnessValue);
+        // prevent showing spinner value less than minimum when database empty
+        if (static_cast<unsigned int>(brightnessValue) < fmtSpinnerMin) {
+            brightnessValue = static_cast<bsp::eink_frontlight::BrightnessPercentage>(fmtSpinnerMin);
+        }
         frontlightSetSpinner->setCurrentValue(static_cast<int>(brightnessValue / 10));
+    }
+
+    void FrontlightModel::setLiveBrightness(const int value)
+    {
+        screenLightSettings->setStatus(true);
+        if ((value < static_cast<int>(fmtSpinnerMin)) || (value > static_cast<int>(fmtSpinnerMax))) {
+            return;
+        }
+        screenLightSettings->setBrightness(static_cast<float>(value * 10));
     }
 } // namespace app::bell_settings

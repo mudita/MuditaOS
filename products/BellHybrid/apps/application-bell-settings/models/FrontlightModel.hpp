@@ -24,6 +24,7 @@ namespace app::bell_settings
         auto createData() -> void;
 
         [[nodiscard]] auto getSpinner() -> gui::Spinner *;
+        auto setLiveBrightness(const int value) -> void;
 
       private:
         app::ApplicationCommon *application                                  = nullptr;
