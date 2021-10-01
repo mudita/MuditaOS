@@ -10,11 +10,18 @@ namespace app
 
 namespace gui
 {
-    class PowerOffPresenter
+    class AbstractPowerOffPresenter
+    {
+      public:
+        virtual ~AbstractPowerOffPresenter() = default;
+        virtual void powerOff()              = 0;
+    };
+
+    class PowerOffPresenter : public AbstractPowerOffPresenter
     {
       public:
         PowerOffPresenter(app::ApplicationCommon *app);
-        void powerOff();
+        void powerOff() override;
 
       private:
         app::ApplicationCommon *application;

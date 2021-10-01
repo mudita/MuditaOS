@@ -52,7 +52,6 @@ target_sources(application-bell-settings
         windows/BellSettingsBedtimeToneWindow.cpp
         windows/BellSettingsFrontlight.cpp
         windows/BellSettingsHomeViewWindow.cpp
-        windows/BellSettingsTurnOffWindow.cpp
         windows/BellSettingsWindow.cpp
         windows/advanced/AboutYourBellWindow.cpp
         windows/advanced/BellSettingsAdvancedWindow.cpp
@@ -95,7 +94,6 @@ target_sources(application-bell-settings
         windows/BellSettingsBedtimeToneWindow.hpp
         windows/BellSettingsFrontlight.hpp
         windows/BellSettingsHomeViewWindow.hpp
-        windows/BellSettingsTurnOffWindow.hpp
         windows/BellSettingsWindow.hpp
         windows/advanced/AboutYourBellWindow.hpp
         windows/advanced/BellSettingsLanguageWindow.hpp
@@ -118,7 +116,6 @@ target_link_libraries(application-bell-settings
     PRIVATE
         app
         bellgui
-        bell::app-common
         bell::db
         bell::alarms
         service-appmgr

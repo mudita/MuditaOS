@@ -15,6 +15,6 @@ target_include_directories(sys
 
 target_link_libraries(sys
     PRIVATE
-        appmgr
+        bell::appmgr
         module-sys
 )

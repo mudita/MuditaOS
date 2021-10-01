@@ -5,7 +5,7 @@
 #include "BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "BellSettingsAlarmSettingsWindow.hpp"
 #include "BellSettingsStyle.hpp"
-#include <common/BellFinishedWindow.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 
 #include <apps-common/options/OptionStyle.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>

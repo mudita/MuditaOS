@@ -8,7 +8,7 @@
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
 
 #include <apps-common/ApplicationCommon.hpp>
-#include <common/BellFinishedWindow.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <widgets/SideListView.hpp>
 

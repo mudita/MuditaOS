@@ -7,6 +7,7 @@
 #include <queue.h>
 
 #include <memory>
+#include <cstdint>
 
 namespace hal::battery
 {

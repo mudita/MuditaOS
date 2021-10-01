@@ -5,16 +5,19 @@
 
 #include <common/models/AlarmModel.hpp>
 
+#include <common/BellPowerOffPresenter.hpp>
 #include <common/popups/presenter/AlarmActivatedPresenter.hpp>
 #include <common/popups/AlarmActivatedWindow.hpp>
 #include <common/popups/AlarmDeactivatedWindow.hpp>
+#include <common/popups/BellTurnOffOptionWindow.hpp>
+#include <common/windows/BellTurnOffWindow.hpp>
+#include <common/windows/BellWelcomeWindow.hpp>
 
 namespace app
 {
     void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)
     {
         using namespace gui::popup;
-        app::ApplicationCommon::attachPopups(popupsList);
         for (auto popup : popupsList) {
             switch (popup) {
             case ID::AlarmActivated:
@@ -32,6 +35,20 @@ namespace app
                         auto presenter  = std::make_unique<app::popup::AlarmActivatedPresenter>(alarmModel);
                         return std::make_unique<gui::AlarmDeactivatedWindow>(app, std::move(presenter));
                     });
+                break;
+            case ID::PowerOff:
+                windowsFactory.attach(window::power_off_window, [](ApplicationCommon *app, const std::string &name) {
+                    return std::make_unique<gui::BellTurnOffOptionWindow>(app, window::power_off_window);
+                });
+                windowsFactory.attach(gui::BellTurnOffWindow::name,
+                                      [](ApplicationCommon *app, const std::string &name) {
+                                          return std::make_unique<gui::BellTurnOffWindow>(
+                                              app, std::make_unique<gui::BellPowerOffPresenter>(app));
+                                      });
+                windowsFactory.attach(gui::BellWelcomeWindow::defaultName,
+                                      [](ApplicationCommon *app, const std::string &name) {
+                                          return std::make_unique<gui::BellWelcomeWindow>(app);
+                                      });
                 break;
             default:
                 break;

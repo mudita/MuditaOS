@@ -1,0 +1,10 @@
+add_catch2_executable(
+        NAME
+        bell_evtmgr
+        SRCS
+        unittest_KeySequenceMgr.cpp
+        LIBS
+        bell::evtmgr
+        INCLUDE
+        $<TARGET_PROPERTY:bell::evtmgr,INCLUDE_DIRECTORIES>
+)

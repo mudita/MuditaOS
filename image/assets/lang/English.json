@@ -624,6 +624,8 @@
   "app_bell_powernap_session_ended_message": "<text>Hello!<br />Rise & shine</text>",
   "app_bell_background_sounds_timer_off": "OFF",
   "app_bell_background_sounds_timer_title": "Timer",
+  "app_bell_turn_off_question": "Turn off the device?",
+  "app_bell_goodbye": "Goodbye",
   "app_bell_greeting_msg": [
     "<text>Good Morning!<br />It's a Beautiful Day!</text>",
     "<text>Happy Day!<br />It's a brand new morning!</text>",
