@@ -92,8 +92,7 @@ namespace boot
                                   {boot::json::timestamp, m_timestamp}}},
 
             {boot::json::git_info,
-             json11::Json::object{{boot::json::os_git_tag, std::string(GIT_TAG)},
-                                  {boot::json::os_git_revision, std::string(GIT_REV)},
+             json11::Json::object{{boot::json::os_git_revision, std::string(GIT_REV)},
                                   {boot::json::os_git_branch, std::string(GIT_BRANCH)}}},
             {boot::json::bootloader, json11::Json::object{{boot::json::os_version, m_bootloader_version}}}};
     }
