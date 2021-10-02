@@ -117,6 +117,14 @@ namespace gui
                 presenter->pause();
                 return true;
             }
+            else if (inputEvent.is(KeyCode::KEY_DOWN)) {
+                application->decreaseCurrentVolume();
+                return true;
+            }
+            else if (inputEvent.is(KeyCode::KEY_UP)) {
+                application->increaseCurrentVolume();
+                return true;
+            }
         }
         return AppWindow::onInput(inputEvent);
     }
