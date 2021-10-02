@@ -5,12 +5,13 @@
 #include <ApplicationBellBackgroundSounds.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <data/BGSoundsStyle.hpp>
+#include <popups/data/PopupData.hpp>
 
 namespace gui
 {
     BGSoundsVolumeWindow::BGSoundsVolumeWindow(
         app::ApplicationCommon *app, std::unique_ptr<app::bgSounds::BGSoundsVolumeContract::Presenter> &&presenter)
-        : WindowWithTimer(app, gui::window::name::bgSoundsVolume), presenter{std::move(presenter)}
+        : WindowWithTimer(app, gui::popup::window::volume_window), presenter{std::move(presenter)}
     {
         buildInterface();
         this->presenter->attach(this);
@@ -36,12 +37,15 @@ namespace gui
         topMessage->drawUnderline(false);
 
         auto data = presenter->getVolumeData();
-        spinner   = new UIntegerSpinner({data.min, data.max, data.step}, Boundaries::Fixed);
+        spinner   = new UIntegerSpinner({static_cast<UIntegerSpinner::Type>(data.min),
+                                       static_cast<UIntegerSpinner::Type>(data.max),
+                                       static_cast<UIntegerSpinner::Type>(data.step)},
+                                      Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         spinner->setFont(bgSoundsStyle::valumeValueFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setFocusEdges(RectangleEdge::None);
-        spinner->setCurrentValue(presenter->getCurrentVolume());
+        spinner->setCurrentValue(static_cast<UIntegerSpinner::Type>(presenter->getDefaultVolume()));
         body->getCenterBox()->addWidget(spinner);
 
         setFocusItem(spinner);
@@ -51,18 +55,32 @@ namespace gui
     bool BGSoundsVolumeWindow::onInput(const gui::InputEvent &inputEvent)
     {
         resetTimer();
-        if (spinner->onInput(inputEvent)) {
-            auto currentVolume = spinner->getCurrentValue();
-            presenter->onVolumeChanged(currentVolume);
 
-            auto isMax = currentVolume == presenter->getVolumeData().max;
-            auto isMin = currentVolume == presenter->getVolumeData().min;
-            body->setArrowVisible(BellBaseLayout::Arrow::Left, isMin);
-            body->setArrowVisible(BellBaseLayout::Arrow::Right, isMax);
-
+        if (inputEvent.isShortRelease(KeyCode::KEY_DOWN)) {
+            application->decreaseCurrentVolume();
+            return true;
+        }
+        else if (inputEvent.isShortRelease(KeyCode::KEY_UP)) {
+            application->increaseCurrentVolume();
             return true;
         }
         return WindowWithTimer::onInput(inputEvent);
     }
 
+    void BGSoundsVolumeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        WindowWithTimer::onBeforeShow(mode, data);
+        const auto popupData = dynamic_cast<VolumePopupData *>(data);
+        if (popupData) {
+            volume       = popupData->getVolume();
+            audioContext = popupData->getAudioContext();
+            spinner->setCurrentValue(static_cast<UIntegerSpinner::Type>(volume));
+            auto currentVolume = spinner->getCurrentValue();
+
+            auto isMax = currentVolume == presenter->getVolumeData().max;
+            auto isMin = currentVolume == presenter->getVolumeData().min;
+            body->setArrowVisible(BellBaseLayout::Arrow::Left, not isMin);
+            body->setArrowVisible(BellBaseLayout::Arrow::Right, not isMax);
+        }
+    }
 } // namespace gui
