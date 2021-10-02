@@ -65,7 +65,8 @@ namespace app
         windowsFactory.attach(gui::window::name::bgSoundsPaused, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BGSoundsPausedWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::bgSoundsVolume, [](ApplicationCommon *app, const std::string &name) {
+
+        windowsFactory.attach(gui::popup::window::volume_window, [](ApplicationCommon *app, const std::string &name) {
             auto presenter = std::make_unique<bgSounds::BGSoundsVolumePresenter>();
             return std::make_unique<gui::BGSoundsVolumeWindow>(app, std::move(presenter));
         });

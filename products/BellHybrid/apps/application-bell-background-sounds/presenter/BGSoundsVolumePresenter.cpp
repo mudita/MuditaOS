@@ -5,20 +5,14 @@
 
 namespace app::bgSounds
 {
-    BGSoundsVolumePresenter::BGSoundsVolumePresenter()
-    {}
-
     VolumeData BGSoundsVolumePresenter::getVolumeData()
     {
         return volumeData;
     }
 
-    unsigned int BGSoundsVolumePresenter::getCurrentVolume()
+    audio::Volume BGSoundsVolumePresenter::getDefaultVolume()
     {
-        return currentVolume;
+        return audio::defaultVolume;
     }
-
-    void BGSoundsVolumePresenter::onVolumeChanged(unsigned int volume)
-    {}
 
 } // namespace app::bgSounds

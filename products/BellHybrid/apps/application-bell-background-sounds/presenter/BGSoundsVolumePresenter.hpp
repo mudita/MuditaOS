@@ -4,14 +4,15 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
+#include <module-audio/Audio/AudioCommon.hpp>
 
 namespace app::bgSounds
 {
     using VolumeData = struct VolumeData
     {
-        unsigned int min;
-        unsigned int max;
-        unsigned int step;
+        audio::Volume min;
+        audio::Volume max;
+        audio::Volume step;
     };
 
     class BGSoundsVolumeContract
@@ -25,25 +26,19 @@ namespace app::bgSounds
         class Presenter : public BasePresenter<BGSoundsVolumeContract::View>
         {
           public:
-            virtual VolumeData getVolumeData()                = 0;
-            virtual unsigned int getCurrentVolume()           = 0;
-            virtual void onVolumeChanged(unsigned int volume) = 0;
+            virtual VolumeData getVolumeData()       = 0;
+            virtual audio::Volume getDefaultVolume() = 0;
         };
     };
 
     class BGSoundsVolumePresenter : public BGSoundsVolumeContract::Presenter
     {
-        struct VolumeData volumeData
+        constexpr static struct VolumeData volumeData
         {
-            0U, 10U, 1U
+            audio::minVolume, audio::maxVolume, audio::defaultVolumeStep
         };
-        unsigned int currentVolume = 5U;
 
         VolumeData getVolumeData() override;
-        unsigned int getCurrentVolume() override;
-        void onVolumeChanged(unsigned int volume) override;
-
-      public:
-        BGSoundsVolumePresenter();
+        audio::Volume getDefaultVolume() override;
     };
 } // namespace app::bgSounds
