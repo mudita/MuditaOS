@@ -6,7 +6,7 @@
 #include <ext4_blockdev.h>
 #include <ext4_errno.h>
 #include <unordered_map>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <mutex.hpp>
 #include <cstring>
 #include <purefs/blkdev/disk_manager.hpp>
