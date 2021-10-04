@@ -8,7 +8,6 @@ target_sources(evtmgr
         WorkerEvent.hpp
         internal/StaticData.cpp
         internal/TemperatureApi.cpp
-        internal/key_sequences/LongPressSequence.cpp
         internal/key_sequences/KeySequenceMgr.cpp
         internal/StaticData.hpp
         screen-light-control/ScreenLightControl.cpp
@@ -20,7 +19,8 @@ target_sources(evtmgr
         internal/key_sequences/AlarmActivateSequence.hpp
         internal/key_sequences/AlarmDeactivateSequence.hpp
         internal/key_sequences/ReleaseSequence.hpp
-        internal/key_sequences/LongPressSequence.hpp
+        internal/key_sequences/ResetSequence.hpp
+        internal/key_sequences/GenericLongPressSequence.hpp
     PUBLIC
         include/evtmgr/EventManager.hpp
         include/evtmgr/api/TemperatureApi.hpp

@@ -56,7 +56,10 @@ namespace app
             return std::make_unique<gui::BGSoundsVolumeWindow>(app, std::move(presenter));
         });
 
-        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated, gui::popup::ID::PowerOff});
+        attachPopups({gui::popup::ID::AlarmActivated,
+                      gui::popup::ID::AlarmDeactivated,
+                      gui::popup::ID::PowerOff,
+                      gui::popup::ID::Reboot});
     }
 
     sys::MessagePointer ApplicationBellBackgroundSounds::DataReceivedHandler(sys::DataMessage *msgl,

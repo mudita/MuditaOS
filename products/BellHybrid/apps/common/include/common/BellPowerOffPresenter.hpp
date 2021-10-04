@@ -12,6 +12,7 @@ namespace gui
       public:
         explicit BellPowerOffPresenter(app::ApplicationCommon *app);
         void powerOff() override;
+        void reboot() override;
 
       private:
         app::ApplicationCommon *application;

@@ -10,6 +10,7 @@
 #include <common/popups/AlarmActivatedWindow.hpp>
 #include <common/popups/AlarmDeactivatedWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
+#include <common/popups/BellRebootWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 
@@ -50,9 +51,21 @@ namespace app
                                           return std::make_unique<gui::BellWelcomeWindow>(app);
                                       });
                 break;
+            case ID::Reboot:
+                windowsFactory.attach(window::reboot_window, [](ApplicationCommon *app, const std::string &name) {
+                    return std::make_unique<gui::BellRebootWindow>(app,
+                                                                   std::make_unique<gui::BellPowerOffPresenter>(app));
+                });
             default:
                 break;
             }
         }
+    }
+
+    bool Application::isPopupPermitted(gui::popup::ID) const
+    {
+        return not((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
+                   (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
+                   (isCurrentWindow(gui::BellTurnOffWindow::name)));
     }
 } // namespace app

@@ -5,6 +5,7 @@
 
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 #include <system/Constants.hpp>
 
 namespace gui
@@ -17,6 +18,10 @@ namespace gui
         application->switchWindow(BellWelcomeWindow::defaultName);
         auto msg = std::make_shared<app::UserPowerDownRequest>();
         application->bus.sendUnicast(std::move(msg), service::name::system_manager);
+    }
+    void BellPowerOffPresenter::reboot()
+    {
+        sys::SystemManagerCommon::Reboot(application);
     }
 
 } // namespace gui

@@ -8,12 +8,12 @@ KeySequenceMgr::KeySequenceMgr(std::vector<std::unique_ptr<AbstractKeySequence>>
 {
     auto onIdle = [this](auto &seq) {
         removeFromInProgressList(seq);
-        actionIfPossible(seq);
+        actionIfPossible();
     };
     auto onTriggered = [this](auto &seq) { addToInProgressList(seq); };
     auto onReady     = [this](auto &seq) {
         moveToReadyList(seq);
-        actionIfPossible(seq);
+        actionIfPossible();
     };
     auto onAbort = [this](auto &seq) {
         removeFromInProgressList(seq);
@@ -38,7 +38,7 @@ void KeySequenceMgr::moveToReadyList(const AbstractKeySequence &seq)
         inProgressSequences.remove(&seq);
     }
 }
-void KeySequenceMgr::actionIfPossible(const AbstractKeySequence &seq)
+void KeySequenceMgr::actionIfPossible()
 {
     if (inProgressSequences.empty()) {
         if (const auto s = readySequences.back(); s != nullptr) {

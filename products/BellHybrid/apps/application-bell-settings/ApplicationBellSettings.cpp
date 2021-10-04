@@ -191,7 +191,10 @@ namespace app
                 return std::make_unique<gui::AboutYourBellWindow>(app, std::move(aboutYourBellPresenter));
             });
 
-        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated, gui::popup::ID::PowerOff});
+        attachPopups({gui::popup::ID::AlarmActivated,
+                      gui::popup::ID::AlarmDeactivated,
+                      gui::popup::ID::PowerOff,
+                      gui::popup::ID::Reboot});
     }
 
     sys::MessagePointer ApplicationBellSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
