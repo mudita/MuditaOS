@@ -98,8 +98,8 @@ TEST_CASE("EventRecord tests")
         REQUIRE(event.parent->ID == eventRecord.ID);
 
         event = eventRecord.getNextSingleEvent(testEventStart);
-        REQUIRE(event.startDate == eventRecord.startDate);
-        REQUIRE(event.endDate == TimePointFromString("2020-01-11 13:00:00"));
+        REQUIRE(event.startDate == eventRecord.startDate + date::days{1});
+        REQUIRE(event.endDate == event.startDate + std::chrono::minutes{event.duration});
 
         event = eventRecord.getNextSingleEvent(TimePointFromString("2020-02-27 17:00:00"));
         REQUIRE(event.startDate == TimePointFromString("2020-02-28 12:00:00"));
