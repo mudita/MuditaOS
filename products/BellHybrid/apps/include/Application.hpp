@@ -14,5 +14,6 @@ namespace app
 
       protected:
         void attachPopups(const std::vector<gui::popup::ID> &popupsList) override;
+        bool isPopupPermitted(gui::popup::ID popupId) const override;
     };
 } // namespace app

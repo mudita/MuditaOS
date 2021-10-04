@@ -15,6 +15,7 @@ namespace gui
       public:
         virtual ~AbstractPowerOffPresenter() = default;
         virtual void powerOff()              = 0;
+        virtual void reboot()                = 0;
     };
 
     class PowerOffPresenter : public AbstractPowerOffPresenter
@@ -22,6 +23,7 @@ namespace gui
       public:
         PowerOffPresenter(app::ApplicationCommon *app);
         void powerOff() override;
+        void reboot() override;
 
       private:
         app::ApplicationCommon *application;

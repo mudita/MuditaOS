@@ -45,6 +45,7 @@ namespace hal::battery
         TaskHandle_t batteryWorkerHandle = nullptr;
         unsigned batteryLevel            = 100;
         bool isPlugged                   = false;
+        bool shouldRun                   = true;
 
         void batteryWorker(void *parameters)
         {
@@ -55,7 +56,7 @@ namespace hal::battery
 
             xQueueHandle targetQueueHandle = nullptr;
 
-            while (true) {
+            while (shouldRun) {
                 std::uint8_t buff[fifoBuffSize];
                 std::int32_t readBytes = read(fd, buff, fifoBuffSize);
 
@@ -93,6 +94,8 @@ namespace hal::battery
                 }
                 vTaskDelay(taskDelay);
             }
+            close(fd);
+            vTaskDelete(nullptr);
         }
     } // namespace
 
@@ -111,9 +114,9 @@ namespace hal::battery
 
     void BatteryCharger::deinit()
     {
+        shouldRun      = false;
         IRQQueueHandle = nullptr;
         DCDQueueHandle = nullptr;
-        vTaskDelete(batteryWorkerHandle);
     }
 
     void BatteryCharger::processStateChangeNotification(std::uint8_t notification)

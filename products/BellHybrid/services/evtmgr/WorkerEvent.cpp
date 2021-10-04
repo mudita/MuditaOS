@@ -65,4 +65,25 @@ namespace bell
             }
         }
     }
+    void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
+    {
+        auto message = std::make_shared<sevm::KbdMessage>();
+
+        message->key.keyCode = code;
+
+        switch (event) {
+        case bsp::KeyEvents::Pressed:
+            message->key.state     = RawKey::State::Pressed;
+            message->key.timePress = xTaskGetTickCount();
+            break;
+        case bsp::KeyEvents::Released:
+            message->key.state       = RawKey::State::Released;
+            message->key.timeRelease = xTaskGetTickCount();
+            break;
+        case bsp::KeyEvents::Moved:
+            message->key.state = RawKey::State::Moved;
+            break;
+        }
+        service->bus.sendUnicast(message, service::name::evt_manager);
+    }
 } // namespace bell

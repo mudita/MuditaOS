@@ -5,101 +5,43 @@
 
 #include <catch2/catch.hpp>
 #include <internal/key_sequences/KeySequenceMgr.hpp>
+#include <internal/key_sequences/GenericLongPressSequence.hpp>
 #include <keymap/KeyMap.hpp>
 
 namespace
 {
-    enum class State
+    class TimerMock : public sys::Timer
     {
-        Idle,
-        InProgress,
-        Ready
+        void start() override
+        {}
+        void restart(std::chrono::milliseconds newInterval) override
+        {}
+        void stop() override
+        {}
+        bool isActive() const noexcept override
+        {
+            return false;
+        }
     };
 
-    class TwoKeysSequence : public AbstractKeySequence
+    sys::TimerHandle mockFactory()
+    {
+        auto timer = new TimerMock();
+        return sys::TimerHandle{timer};
+    }
+
+    class TwoKeysSequence : public GenericLongPressSequence<KeyMap::Back, KeyMap::Frontlight>
     {
       public:
-        explicit TwoKeysSequence(KeyMap keyToScan1, KeyMap keyToScan2) : keyToScan1{keyToScan1}, keyToScan2{keyToScan2}
+        TwoKeysSequence() : GenericLongPressSequence<KeyMap::Back, KeyMap::Frontlight>{mockFactory()}
         {}
-        void process(const RawKey &key) override
-        {
-            const auto mappedKey = mapKey(static_cast<gui::KeyCode>(key.keyCode));
-            if (mappedKey != keyToScan1 && mappedKey != keyToScan2) {
-                return;
-            }
-
-            if (mappedKey == keyToScan1) {
-                key1Pressed = key.state == RawKey::State::Pressed;
-            }
-            if (mappedKey == keyToScan2) {
-                key2Pressed = key.state == RawKey::State::Pressed;
-            }
-
-            if (key1Pressed && key2Pressed && state == State::Idle) {
-                state = State::InProgress;
-                trigger();
-            }
-
-            if (not key1Pressed || not key2Pressed) {
-                state = State::Idle;
-                idle();
-            }
-        }
-
-        void make_ready()
-        {
-            state = State::Ready;
-            ready();
-        }
-
-      private:
-        bool key1Pressed{false};
-        bool key2Pressed{false};
-        KeyMap keyToScan1;
-        KeyMap keyToScan2;
-        State state = State::Idle;
     };
 
-    class LongPressSequence : public AbstractKeySequence
+    class LongPressSequence : public GenericLongPressSequence<KeyMap::Back>
     {
       public:
-        explicit LongPressSequence(KeyMap keyToScan) : keyToScan{keyToScan}
+        LongPressSequence() : GenericLongPressSequence<KeyMap::Back>{mockFactory()}
         {}
-        void process(const RawKey &key) override
-        {
-            keyStates.set(mapKey(static_cast<gui::KeyCode>(key.keyCode)), key.state == RawKey::State::Pressed);
-
-            if (gate = keyStates.state(keyToScan) && not keyStates.ifOnlySet(keyToScan); gate) {
-                if (state != State::Idle) {
-                    state = State::Idle;
-                    abort();
-                }
-                return;
-            }
-
-            if (keyStates.state(keyToScan) && state == State::Idle) {
-                state = State::InProgress;
-                trigger();
-            }
-
-            if (not keyStates.state(keyToScan) && state != State::Idle) {
-                state = State::Idle;
-                idle();
-            }
-        }
-
-        void make_ready()
-        {
-            state = State::Ready;
-            ready();
-        }
-
-      private:
-        bool gate{false};
-        KeyStates keyStates;
-
-        KeyMap keyToScan;
-        State state = State::Idle;
     };
 
     RawKey make_press_back()
@@ -141,7 +83,7 @@ TEST_CASE("Single long press")
     std::uint8_t actionTriggered{};
     KeySequenceMgr::SequenceCollection collection;
 
-    auto mockLongPressBack      = std::make_unique<LongPressSequence>(KeyMap::Back);
+    auto mockLongPressBack      = std::make_unique<LongPressSequence>();
     mockLongPressBack->onAction = [&actionTriggered]() { actionTriggered++; };
     LongPressSequence *mockRef  = mockLongPressBack.get();
 
@@ -159,14 +101,14 @@ TEST_CASE("Single long press")
     SECTION("Long press without release")
     {
         keySequenceMgr.process(make_press_back());
-        mockRef->make_ready();
+        mockRef->handleTimer();
         CHECK(actionTriggered == 1);
     }
 
     SECTION("Valid sequence")
     {
         keySequenceMgr.process(make_press_back());
-        mockRef->make_ready();
+        mockRef->handleTimer();
         keySequenceMgr.process(make_release_back());
         CHECK(actionTriggered == 1);
     }
@@ -177,19 +119,19 @@ TEST_CASE("Many long press sequences")
     KeySequenceMgr::SequenceCollection collection;
 
     std::uint8_t actionTriggered_1{};
-    auto longPressBack_1      = std::make_unique<LongPressSequence>(KeyMap::Back);
+    auto longPressBack_1      = std::make_unique<LongPressSequence>();
     longPressBack_1->onAction = [&actionTriggered_1]() { actionTriggered_1++; };
     LongPressSequence *ref_1  = longPressBack_1.get();
     collection.emplace_back(std::move(longPressBack_1));
 
     std::uint8_t actionTriggered_2{};
-    auto longPressBack_2      = std::make_unique<LongPressSequence>(KeyMap::Back);
+    auto longPressBack_2      = std::make_unique<LongPressSequence>();
     longPressBack_2->onAction = [&actionTriggered_2]() { actionTriggered_2++; };
     LongPressSequence *ref_2  = longPressBack_2.get();
     collection.emplace_back(std::move(longPressBack_2));
 
     std::uint8_t actionTriggered_3{};
-    auto longPressBack_3      = std::make_unique<LongPressSequence>(KeyMap::Back);
+    auto longPressBack_3      = std::make_unique<LongPressSequence>();
     longPressBack_3->onAction = [&actionTriggered_3]() { actionTriggered_3++; };
     LongPressSequence *ref_3  = longPressBack_3.get();
     collection.emplace_back(std::move(longPressBack_3));
@@ -202,15 +144,15 @@ TEST_CASE("Many long press sequences")
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
 
-        ref_1->make_ready();
+        ref_1->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
 
-        ref_2->make_ready();
+        ref_2->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
 
-        ref_3->make_ready();
+        ref_3->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
         CHECK(actionTriggered_3 == 1);
@@ -227,11 +169,11 @@ TEST_CASE("Many long press sequences")
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
 
-        ref_1->make_ready();
+        ref_1->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
 
-        ref_2->make_ready();
+        ref_2->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
 
@@ -247,7 +189,7 @@ TEST_CASE("Many long press sequences")
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
 
-        ref_1->make_ready();
+        ref_1->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
 
@@ -263,12 +205,12 @@ TEST_CASE("Many long press sequences")
         CHECK(not actionTriggered_2);
         CHECK(not actionTriggered_3);
 
-        ref_1->make_ready();
+        ref_1->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
         CHECK(not actionTriggered_3);
 
-        ref_2->make_ready();
+        ref_2->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
         CHECK(not actionTriggered_3);
@@ -299,7 +241,7 @@ TEST_CASE("Two keys sequence")
     KeySequenceMgr::SequenceCollection collection;
 
     std::uint8_t actionTriggered_1{};
-    auto sequence          = std::make_unique<TwoKeysSequence>(KeyMap::Back, KeyMap::Frontlight);
+    auto sequence          = std::make_unique<TwoKeysSequence>();
     sequence->onAction     = [&actionTriggered_1]() { actionTriggered_1++; };
     TwoKeysSequence *ref_1 = sequence.get();
     collection.emplace_back(std::move(sequence));
@@ -312,7 +254,7 @@ TEST_CASE("Two keys sequence")
         keySequenceMgr.process(make_press_back());
         CHECK(not actionTriggered_1);
 
-        ref_1->make_ready();
+        ref_1->handleTimer();
         CHECK(actionTriggered_1 == 1);
 
         keySequenceMgr.process(make_release_frontlight());
@@ -328,7 +270,7 @@ TEST_CASE("Two keys sequence")
         CHECK(not actionTriggered_1);
 
         keySequenceMgr.process(make_release_back());
-        ref_1->make_ready();
+        ref_1->handleTimer();
         CHECK(not actionTriggered_1);
 
         keySequenceMgr.process(make_release_frontlight());
@@ -341,19 +283,19 @@ TEST_CASE("Two keys sequence type mixed with long press sequences")
     KeySequenceMgr::SequenceCollection collection;
 
     std::uint8_t actionTriggered_1{};
-    auto sequence1      = std::make_unique<LongPressSequence>(KeyMap::Back);
+    auto sequence1      = std::make_unique<LongPressSequence>();
     sequence1->onAction = [&actionTriggered_1]() { actionTriggered_1++; };
     // LongPressSequence *ref_1 = sequence1.get();
     collection.emplace_back(std::move(sequence1));
 
     std::uint8_t actionTriggered_2{};
-    auto sequence2      = std::make_unique<LongPressSequence>(KeyMap::Back);
+    auto sequence2      = std::make_unique<LongPressSequence>();
     sequence2->onAction = [&actionTriggered_2]() { actionTriggered_2++; };
     // LongPressSequence *ref_2 = sequence2.get();
     collection.emplace_back(std::move(sequence2));
 
     std::uint8_t actionTriggered_3{};
-    auto sequence3         = std::make_unique<TwoKeysSequence>(KeyMap::Back, KeyMap::Frontlight);
+    auto sequence3         = std::make_unique<TwoKeysSequence>();
     sequence3->onAction    = [&actionTriggered_3]() { actionTriggered_3++; };
     TwoKeysSequence *ref_3 = sequence3.get();
     collection.emplace_back(std::move(sequence3));
@@ -387,7 +329,7 @@ TEST_CASE("Two keys sequence type mixed with long press sequences")
         CHECK(not actionTriggered_2);
         CHECK(not actionTriggered_3);
 
-        ref_3->make_ready();
+        ref_3->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
         CHECK(actionTriggered_3 == 1);
@@ -411,7 +353,7 @@ TEST_CASE("Two keys sequence type mixed with long press sequences")
         CHECK(not actionTriggered_2);
         CHECK(not actionTriggered_3);
 
-        ref_3->make_ready();
+        ref_3->handleTimer();
         CHECK(not actionTriggered_1);
         CHECK(not actionTriggered_2);
         CHECK(actionTriggered_3 == 1);

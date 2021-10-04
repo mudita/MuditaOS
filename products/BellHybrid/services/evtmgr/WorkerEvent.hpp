@@ -16,6 +16,7 @@ namespace bell
         void addProductQueues(std::list<sys::WorkerQueueInfo> &queuesList) final;
         void initProductHardware() final;
         void deinitProductHardware() final;
+        void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code) final;
         bool handleMessage(std::uint32_t queueID) override;
         void processRotaryAsShortRelease(bsp::KeyCodes code);
         void handleRotaryEncoderEvent();

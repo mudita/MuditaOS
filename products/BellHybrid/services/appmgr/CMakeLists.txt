@@ -8,6 +8,7 @@ target_sources(appmgr
         include/appmgr/messages/AlarmMessage.hpp
         include/appmgr/ApplicationManager.hpp
         include/appmgr/messages/PowerOffPopupRequestParams.hpp
+        include/appmgr/messages/RebootPopupRequestParams.hpp
 )
 
 target_include_directories(appmgr

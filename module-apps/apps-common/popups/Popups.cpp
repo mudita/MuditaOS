@@ -40,6 +40,8 @@ namespace gui::popup
             return gui::popup::window::alarm_window;
         case ID::PowerOff:
             return gui::popup::window::power_off_window;
+        case ID::Reboot:
+            return gui::popup::window::reboot_window;
         }
 
         return {};
