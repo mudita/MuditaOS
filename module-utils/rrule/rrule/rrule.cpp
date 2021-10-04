@@ -127,7 +127,7 @@ namespace rrule
         do {
             singleEventTimePoint = rruleIter.next();
 
-        } while (singleEventTimePoint != TIME_POINT_INVALID && singleEventTimePoint < rangeStart);
+        } while (singleEventTimePoint != TIME_POINT_INVALID && singleEventTimePoint <= rangeStart);
 
         return singleEventTimePoint;
     }
