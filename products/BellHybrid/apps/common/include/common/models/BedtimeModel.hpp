@@ -10,7 +10,10 @@
 
 namespace app::bell_bedtime
 {
-    inline constexpr auto DEFAULT_BEDTIME_TIME = "21:00";
+    inline constexpr auto DEFAULT_BEDTIME_TIME   = "21:00";
+    inline constexpr auto DEFAULT_BEDTIME_TONE   = "Evening Horizon";
+    inline constexpr auto DEFAULT_BEDTIME_VOLUME = 1;
+
     class BedtimeOnOffModel : public gui::SettingsModel<bool>
     {
       public:
@@ -33,6 +36,24 @@ namespace app::bell_bedtime
         auto getValue() const -> time_t override;
     };
 
+    class BedtimeVolumeModel : public gui::SettingsModel<std::uint8_t>
+    {
+      public:
+        using SettingsModel::SettingsModel;
+
+        void setValue(std::uint8_t value) override;
+        std::uint8_t getValue() const override;
+    };
+
+    class AlarmToneModel : public gui::SettingsModel<UTF8>
+    {
+      public:
+        using SettingsModel::SettingsModel;
+
+        void setValue(UTF8) override;
+        UTF8 getValue() const override;
+    };
+
     class BedtimeModel : public AbstractBedtimeModel
     {
       public:
@@ -40,8 +61,10 @@ namespace app::bell_bedtime
 
         explicit BedtimeModel(sys::Service *app)
         {
-            bedtimeOnOff = std::make_unique<bell_bedtime::BedtimeOnOffModel>(app);
-            bedtimeTime  = std::make_unique<bell_bedtime::BedtimeTimeModel>(app);
+            bedtimeOnOff  = std::make_unique<bell_bedtime::BedtimeOnOffModel>(app);
+            bedtimeTime   = std::make_unique<bell_bedtime::BedtimeTimeModel>(app);
+            bedtimeTone   = std::make_unique<bell_bedtime::AlarmToneModel>(app);
+            bedtimeVolume = std::make_unique<bell_bedtime::BedtimeVolumeModel>(app);
         }
         gui::AbstractSettingsModel<bool> &getBedtimeOnOff() override
         {
@@ -52,8 +75,20 @@ namespace app::bell_bedtime
             return *bedtimeTime;
         }
 
+        gui::AbstractSettingsModel<UTF8> &getBedtimeTone() override
+        {
+            return *bedtimeTone;
+        }
+
+        gui::AbstractSettingsModel<std::uint8_t> &getBedtimeVolume() override
+        {
+            return *bedtimeVolume;
+        }
+
       private:
         std::unique_ptr<gui::AbstractSettingsModel<bool>> bedtimeOnOff;
         std::unique_ptr<gui::AbstractSettingsModel<time_t>> bedtimeTime;
+        std::unique_ptr<gui::AbstractSettingsModel<UTF8>> bedtimeTone;
+        std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> bedtimeVolume;
     };
 } // namespace app::bell_bedtime
