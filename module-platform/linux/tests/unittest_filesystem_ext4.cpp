@@ -64,6 +64,7 @@ TEST_CASE("ext4: Basic mount and functionality")
     REQUIRE(fscore.mount("emmc0part0", "/path", "vfat") == -EBUSY);
     struct statvfs ssv;
     REQUIRE(fscore.stat_vfs("/sys/", ssv) == 0);
+    REQUIRE(fscore.stat_vfs("/sys", ssv) == 0);
 
     REQUIRE(fscore.umount("/sys") == 0);
     REQUIRE(vfs_ext->mount_count() == 0);
