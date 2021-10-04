@@ -17,7 +17,7 @@ class KeySequenceMgr
     void process(const RawKey &key);
 
   private:
-    void actionIfPossible(const AbstractKeySequence &seq);
+    void actionIfPossible();
 
     void moveToReadyList(const AbstractKeySequence &seq);
     bool searchInReadyList(const AbstractKeySequence &seq);
@@ -26,7 +26,7 @@ class KeySequenceMgr
     void addToInProgressList(const AbstractKeySequence &seq);
     void removeFromInProgressList(const AbstractKeySequence &seq);
 
-    SequenceCollection sequenceCollection;
+    const SequenceCollection sequenceCollection;
     std::list<const AbstractKeySequence *> inProgressSequences;
     std::list<const AbstractKeySequence *> readySequences;
 };
