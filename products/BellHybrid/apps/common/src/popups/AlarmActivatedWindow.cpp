@@ -22,11 +22,11 @@ namespace gui
                                                                            std::move(presenter))
     {
         getPresenter()->attach(this);
-        buildInterface();
         getPresenter()->updateAlarmModel([&]() {
             setAlarmTime(getPresenter()->getAlarmTime());
             getPresenter()->activate();
         });
+        buildInterface();
 
         timerCallback = [this](Item &, sys::Timer &) {
             returnToPreviousWindow();
