@@ -46,6 +46,8 @@ namespace
     constexpr auto BluetoothServiceStackDepth = 2560U;
     inline constexpr auto nameSettings        = "ApplicationSettings";
     inline constexpr auto connectionTimeout   = std::chrono::minutes{30};
+    inline constexpr auto btRestartDelay      = std::chrono::milliseconds{500};
+
 } // namespace
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", BluetoothServiceStackDepth)
@@ -268,7 +270,13 @@ auto ServiceBluetooth::handle(message::bluetooth::SetDeviceName *msg) -> std::sh
     bluetooth::set_name(newName);
     settingsHolder->setValue(bluetooth::Settings::DeviceName, newName);
     sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOff));
-    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOn));
+
+    btRestartTimer =
+        sys::TimerFactory::createSingleShotTimer(this, "btRestartTimer", btRestartDelay, [this](sys::Timer &_) {
+            sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOn));
+        });
+    btRestartTimer.start();
+
     return sys::MessageNone{};
 }
 
