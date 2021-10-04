@@ -5,6 +5,7 @@
 
 #include <Audio/AudioDevice.hpp>
 #include <Audio/AudioFormat.hpp>
+#include <Audio/codec.hpp>
 
 #include <portaudio.h>
 
@@ -15,7 +16,7 @@ namespace audio
     class LinuxAudioDevice : public audio::AudioDevice
     {
       public:
-        LinuxAudioDevice();
+        LinuxAudioDevice(const float initialVolume);
         virtual ~LinuxAudioDevice();
 
         auto Start() -> RetCode override;

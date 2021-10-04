@@ -27,12 +27,15 @@ namespace audio_settings
       public:
         virtual ~AbstractAudioSettingsModel() noexcept = default;
 
-        [[nodiscard]] virtual bool isVibrationEnabled() = 0;
-        virtual void setVibrationEnabled()              = 0;
-        virtual void setVibrationDisabled()             = 0;
-        [[nodiscard]] virtual bool isSoundEnabled()     = 0;
-        virtual void setSoundEnabled()                  = 0;
-        virtual void setSoundDisabled()                 = 0;
+        [[nodiscard]] virtual bool isVibrationEnabled()   = 0;
+        virtual void setVibrationEnabled()                = 0;
+        virtual void setVibrationDisabled()               = 0;
+        [[nodiscard]] virtual bool isSystemSoundEnabled() = 0;
+        virtual void setIsSystemSoundEnabled()            = 0;
+        virtual void setIsSystemSoundDisabled()           = 0;
+        [[nodiscard]] virtual bool isSoundEnabled()       = 0;
+        virtual void setSoundEnabled()                    = 0;
+        virtual void setSoundDisabled()                   = 0;
         /// @return sound file path, returns empty string if not found
         [[nodiscard]] virtual std::string getSound() = 0;
         /// @param sound file path
@@ -52,6 +55,9 @@ namespace audio_settings
         bool isVibrationEnabled() override;
         void setVibrationEnabled() override;
         void setVibrationDisabled() override;
+        bool isSystemSoundEnabled() override;
+        void setIsSystemSoundEnabled() override;
+        void setIsSystemSoundDisabled() override;
         bool isSoundEnabled() override;
         void setSoundEnabled() override;
         void setSoundDisabled() override;

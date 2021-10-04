@@ -37,30 +37,6 @@ namespace audio
         return utils::enumToString(setting);
     }
 
-    bool isSystemSound(const PlaybackType &playbackType) noexcept
-    {
-        switch (playbackType) {
-
-        case PlaybackType::Notifications:
-            [[fallthrough]];
-        case PlaybackType::KeypadSound:
-            [[fallthrough]];
-        case PlaybackType::CallRingtone:
-            [[fallthrough]];
-        case PlaybackType::TextMessageRingtone:
-            [[fallthrough]];
-        case PlaybackType::Meditation:
-            return true;
-        case PlaybackType::None:
-            [[fallthrough]];
-        case PlaybackType::Alarm:
-            [[fallthrough]];
-        case PlaybackType::Multimedia:
-            return false;
-        }
-        return false;
-    }
-
     const std::string dbPath(const DbPathElement &element)
     {
         return dbPath(element.setting, element.playbackType, element.profileType);
@@ -82,13 +58,7 @@ namespace audio
         }
 
         if (auto s = str(playbackType); !s.empty()) {
-
-            if (setting == Setting::Volume && isSystemSound(playbackType)) {
-                pathElements.emplace_back(str(PlaybackType::System));
-            }
-            else {
-                pathElements.emplace_back(s);
-            }
+            pathElements.emplace_back(s);
         }
 
         if (auto s = str(setting); !s.empty()) {

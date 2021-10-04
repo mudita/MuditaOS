@@ -24,6 +24,9 @@ namespace gui
         ///  Switches alarm vibration state
         void switchVibrationState();
 
+        ///  Switches manual/system volume state
+        void switchManualVolumeState();
+
         ///  Sets the volume
         ///  @param vol volume value
         void setVolume(uint8_t vol);
@@ -37,6 +40,9 @@ namespace gui
 
         ///  Flag describing if phone vibration is enabled
         bool mVibrationsEnabled = false;
+
+        ///  Flag describing if manual volume is enabled
+        bool mManualVolumeEnabled = false;
 
         /// Audio settings model
         std::unique_ptr<audio_settings::AbstractAudioSettingsModel> mAudioModel;

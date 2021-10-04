@@ -41,10 +41,12 @@ namespace audio
         }
     } // namespace
 
-    LinuxAudioDevice::LinuxAudioDevice()
+    LinuxAudioDevice::LinuxAudioDevice(const float initialVolume)
         : supportedFormats(
               audio::AudioFormat::makeMatrix(supportedSampleRates, supportedBitWidths, supportedChannelModes))
     {
+        setOutputVolume(initialVolume);
+
         static PortAudio portAudio;
     }
 

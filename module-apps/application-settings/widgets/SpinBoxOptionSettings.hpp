@@ -7,14 +7,15 @@
 
 namespace gui
 {
-    class SpinBoxOptionSettings : public option::OptionSettings
+    class SpinBoxOptionSettings : public option::Base
     {
       public:
         SpinBoxOptionSettings(UTF8 text,
                               uint8_t value,
                               uint8_t maxValue,
                               std::function<bool(uint8_t)> updateCallback,
-                              std::function<bool(Item &)> focusChangedCallback = nullptr);
+                              std::function<bool(Item &)> focusChangedCallback = nullptr,
+                              bool indent                                      = false);
 
         [[nodiscard]] auto build() const -> ListItem * override;
 
@@ -22,5 +23,7 @@ namespace gui
         std::function<bool(uint8_t)> updateCallback;
         std::uint8_t maxValue;
         std::uint8_t value;
+        UTF8 text;
+        bool indent = false;
     };
 } // namespace gui
