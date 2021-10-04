@@ -59,7 +59,7 @@ namespace gui
             }
 
             // stop preview playback when we loose focus
-            if (musicStatus == MusicStatus::Play) {
+            if (musicStatus != MusicStatus::Stop) {
                 stopAudioPreview();
             }
 
@@ -68,7 +68,7 @@ namespace gui
 
         onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
             // stop preview playback if it is played
-            if (musicStatus == MusicStatus::Play) {
+            if (musicStatus != MusicStatus::Stop) {
                 stopAudioPreview();
             }
 
@@ -125,7 +125,7 @@ namespace gui
                           token.IsValid());
                 return;
             }
-            musicStatus = MusicStatus::Stop;
+            musicStatus = MusicStatus::Pause;
         });
     }
 

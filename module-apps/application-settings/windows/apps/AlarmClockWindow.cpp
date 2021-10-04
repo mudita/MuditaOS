@@ -20,9 +20,15 @@ namespace gui
     {
         std::list<gui::Option> optionList;
         mVibrationsEnabled = mAudioModel->isVibrationEnabled();
+        mManualVolumeEnabled = mAudioModel->isSystemSoundEnabled();
         mWidgetMaker.addSwitchOption(optionList, utils::translate("app_settings_vibration"), mVibrationsEnabled, [&]() {
             switchVibrationState();
         });
+
+        mWidgetMaker.addSwitchOption(optionList,
+                                     utils::translate("app_settings_apps_alarm_clock_manual_volume"),
+                                     mManualVolumeEnabled,
+                                     [&]() { switchManualVolumeState(); });
 
         auto focusCallback = [&](gui::Item &item) {
             if (item.focus) {
@@ -31,15 +37,18 @@ namespace gui
             return true;
         };
 
-        optionList.emplace_back(std::make_unique<gui::SpinBoxOptionSettings>(
-            utils::translate("app_settings_volume"),
-            mAudioModel->getVolume(),
-            std::ceil(10.0),
-            [&](uint8_t value) {
-                setVolume(value);
-                return true;
-            },
-            focusCallback));
+        if (mManualVolumeEnabled) {
+            optionList.emplace_back(std::make_unique<gui::SpinBoxOptionSettings>(
+                utils::translate("app_settings_volume"),
+                mAudioModel->getVolume(),
+                std::ceil(10.0),
+                [&](uint8_t value) {
+                    setVolume(value);
+                    return true;
+                },
+                focusCallback,
+                true));
+        }
 
         return optionList;
     }
@@ -47,6 +56,12 @@ namespace gui
     void AlarmClockWindow::switchVibrationState()
     {
         (mVibrationsEnabled) ? mAudioModel->setVibrationDisabled() : mAudioModel->setVibrationEnabled();
+        refreshOptionsList();
+    }
+
+    void AlarmClockWindow::switchManualVolumeState()
+    {
+        (mManualVolumeEnabled) ? mAudioModel->setIsSystemSoundEnabled() : mAudioModel->setIsSystemSoundDisabled();
         refreshOptionsList();
     }
 

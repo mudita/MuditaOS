@@ -155,6 +155,14 @@ namespace AudioServiceAPI
             serv, audio::Setting::EnableVibration, settingState == audio::SettingState::Enabled, playbackType);
     }
 
+    audio::RetCode SetSystemSoundSetting(sys::Service *serv,
+                                         audio::SettingState settingState,
+                                         audio::PlaybackType playbackType)
+    {
+        return SetSetting(
+            serv, audio::Setting::IsSystemSound, settingState == audio::SettingState::Enabled, playbackType);
+    }
+
     audio::RetCode SetSoundSetting(sys::Service *serv,
                                    audio::SettingState settingState,
                                    audio::PlaybackType playbackType)
@@ -166,6 +174,11 @@ namespace AudioServiceAPI
     std::optional<audio::SettingState> GetVibrationSetting(sys::Service *serv, audio::PlaybackType playbackType)
     {
         return GetSettingState(serv, audio::Setting::EnableVibration, playbackType);
+    }
+
+    std::optional<audio::SettingState> GetSystemSoundSetting(sys::Service *serv, audio::PlaybackType playbackType)
+    {
+        return GetSettingState(serv, audio::Setting::IsSystemSound, playbackType);
     }
 
     std::optional<audio::SettingState> GetSoundSetting(sys::Service *serv, audio::PlaybackType playbackType)

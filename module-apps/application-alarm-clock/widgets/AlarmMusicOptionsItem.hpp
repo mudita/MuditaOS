@@ -18,6 +18,7 @@ namespace gui
         enum class MusicStatus
         {
             Stop,
+            Pause,
             Play
         };
 

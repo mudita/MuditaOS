@@ -24,7 +24,7 @@ class LinuxAudioFactory : public AudioDeviceFactory
     std::shared_ptr<AudioDevice> getDevice([[maybe_unused]] const audio::Profile &profile) override
     {
         if (profile.GetAudioDeviceType() == AudioDevice::Type::Audiocodec) {
-            return std::make_shared<audio::LinuxAudioDevice>();
+            return std::make_shared<audio::LinuxAudioDevice>(profile.GetAudioConfiguration().outputVolume);
         }
         return nullptr;
     }

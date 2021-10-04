@@ -50,9 +50,16 @@ static constexpr std::initializer_list<std::pair<audio::DbPathElement, const cha
     {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
     {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
 
-    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones}, defaultVolumeLow},
-    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
-    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::Idle}, defaultVolumeLow},
+
+    {DbPathElement{Setting::IsSystemSound, PlaybackType::Notifications, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::IsSystemSound, PlaybackType::KeypadSound, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::IsSystemSound, PlaybackType::CallRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::IsSystemSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::IsSystemSound, PlaybackType::Meditation, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::IsSystemSound, PlaybackType::Alarm, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::IsSystemSound, PlaybackType::None, Profile::Type::Idle}, defaultFalse},
+    {DbPathElement{Setting::IsSystemSound, PlaybackType::Multimedia, Profile::Type::Idle}, defaultFalse},
 
     // ROUTING
     {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP}, "20"},
@@ -164,9 +171,14 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
         bus.sendUnicast(std::make_shared<AudioInternalEOFNotificationMessage>(eof->GetToken()), service::name::audio);
     }
     else if (const auto *dbReq = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbReq) {
-        std::string path = dbPath(dbReq->setting, dbReq->playback, dbReq->profile);
+
+        auto selectedPlayback = generatePlayback(dbReq->playback, dbReq->setting);
+        auto selectedProfile  = generateProfile(dbReq->profile, dbReq->playback);
+
+        std::string path = dbPath(dbReq->setting, selectedPlayback, selectedProfile);
         LOG_DEBUG("ServiceAudio::DBbCallback(%s)", path.c_str());
         auto settings_it = settingsCache.find(path);
+
         if (settingsCache.end() == settings_it) {
             LOG_DEBUG("%s does not exist in cache", path.c_str());
             return std::nullopt;
@@ -225,6 +237,30 @@ bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
     return isEnabled;
 }
 
+bool ServiceAudio::IsSystemSound(const audio::PlaybackType &type)
+{
+    auto isSystemSound =
+        utils::getNumericValue<audio::IsSystemSound>(getSetting(Setting::IsSystemSound, Profile::Type::Idle, type));
+    return isSystemSound;
+}
+
+audio::PlaybackType ServiceAudio::generatePlayback(const audio::PlaybackType &type, const Setting &setting)
+{
+    if (setting == Setting::Volume && IsSystemSound(type)) {
+        return PlaybackType::System;
+    }
+    return type;
+}
+
+Profile::Type ServiceAudio::generateProfile(const audio::Profile::Type &profile, const PlaybackType &playbackType)
+{
+    if (playbackType == audio::PlaybackType::Alarm && !IsSystemSound(playbackType)) {
+        return audio::Profile::Type::Idle;
+    }
+
+    return profile;
+}
+
 bool ServiceAudio::IsOperationEnabled(const audio::PlaybackType &plType, const Operation::Type &opType)
 {
     if (opType == Operation::Type::Router || opType == Operation::Type::Recorder) {
@@ -242,14 +278,22 @@ std::string ServiceAudio::GetSound(const audio::PlaybackType &plType)
 
 ServiceAudio::VibrationType ServiceAudio::GetVibrationType(const audio::PlaybackType &type)
 {
+    auto isOnVibrationMap = [&](auto vibrationType, auto playbackType) {
+        auto continuousVibrations = vibrationMap[vibrationType];
+
+        return std::any_of(continuousVibrations.begin(), continuousVibrations.end(), [type](const auto &playBackType) {
+            return playBackType == type;
+        });
+    };
+
     if (!IsVibrationEnabled(type)) {
         return VibrationType::None;
     }
 
-    if (type == PlaybackType::CallRingtone) {
+    if (isOnVibrationMap(VibrationType::Continuous, type)) {
         return VibrationType::Continuous;
     }
-    else if (type == PlaybackType::Notifications || type == PlaybackType::TextMessageRingtone) {
+    else if (isOnVibrationMap(VibrationType::OneShot, type)) {
         return VibrationType::OneShot;
     }
     return VibrationType::None;
@@ -532,10 +576,7 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> sys::MessagePointer
 {
     auto context = getCurrentContext();
 
-    const auto currentVolume =
-        utils::getNumericValue<int>(getSetting(Setting::Volume, Profile::Type::Idle, PlaybackType::None));
-
-    if (isSystemSound(context.second)) {
+    if (IsSystemSound(context.second) || context.second == audio::PlaybackType::Alarm) {
         // active system sounds can be only muted, no volume control is possible
         if (step < 0) {
             MuteCurrentOperation();
@@ -545,6 +586,9 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> sys::MessagePointer
             return sys::msgHandled();
         }
     }
+
+    const auto currentVolume =
+        utils::getNumericValue<int>(getSetting(Setting::Volume, Profile::Type::Idle, PlaybackType::None));
 
     const auto newVolume = std::clamp(currentVolume + step, static_cast<int>(minVolume), static_cast<int>(maxVolume));
     if (auto input = audioMux.GetIdleInput(); input) {
@@ -675,12 +719,15 @@ std::string ServiceAudio::getSetting(const Setting &setting,
     case Setting::EnableVibration:
     case Setting::EnableSound:
     case Setting::Sound:
+    case Setting::IsSystemSound:
         targetProfile = Profile::Type::Idle;
         break;
     case Setting::Volume:
         if (targetPlayback == PlaybackType::Alarm) {
             targetProfile = Profile::Type::Idle;
         }
+
+        targetPlayback = generatePlayback(targetPlayback);
         break;
     case Setting::Gain:
         break;
@@ -732,6 +779,7 @@ void ServiceAudio::setSetting(const Setting &setting,
         if (updatedPlayback == PlaybackType::Alarm) {
             updatedProfile = Profile::Type::Idle;
         }
+        updatedPlayback = generatePlayback(updatedPlayback);
         break;
     } break;
     case Setting::Gain: {
@@ -743,7 +791,8 @@ void ServiceAudio::setSetting(const Setting &setting,
     } break;
     case Setting::EnableVibration:
     case Setting::EnableSound:
-    case Setting::Sound: {
+    case Setting::Sound:
+    case Setting::IsSystemSound: {
         updatedProfile = audio::Profile::Type::Idle;
         valueToSet     = value;
     } break;
@@ -765,7 +814,8 @@ const audio::Context ServiceAudio::getCurrentContext()
     auto &audio                  = (*activeInput)->audio;
     const auto &currentOperation = audio->GetCurrentOperation();
     const auto currentProfile    = currentOperation.GetProfile();
-    return {currentProfile->GetType(), currentOperation.GetPlaybackType()};
+    const auto playbackType      = generatePlayback(currentOperation.GetPlaybackType());
+    return {currentProfile->GetType(), playbackType};
 }
 
 void ServiceAudio::settingsChanged(const std::string &name, std::string value)
