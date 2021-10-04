@@ -63,6 +63,7 @@ add_catch2_executable(
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_ext4.cpp
     LIBS
         platform
+        module-vfs
     DEPS
         ${EXT4_IMAGE}
     USE_FS
