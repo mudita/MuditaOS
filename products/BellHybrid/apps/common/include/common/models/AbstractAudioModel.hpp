@@ -27,7 +27,8 @@ namespace app
         {
             Chime,
             Alarm,
-            PreWakeup
+            PreWakeup,
+            Bedtime
         };
 
         virtual ~AbstractAudioModel() noexcept                                                            = default;

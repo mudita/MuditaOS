@@ -1,30 +1,33 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BellSettingsBedtimeToneWindow.hpp"
 #include "application-bell-settings/ApplicationBellSettings.hpp"
+
+#include "BellSettingsBedtimeToneSettingsWindow.hpp"
 #include "BellSettingsStyle.hpp"
-#include <common/windows/BellFinishedWindow.hpp>
+#include <common/BellFinishedWindow.hpp>
+
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/SideListView.hpp>
 
 namespace gui
 {
-    BellSettingsBedtimeToneWindow::BellSettingsBedtimeToneWindow(
-        app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::BedtimeSettingsPresenter::Presenter> presenter)
+    BellSettingsBedtimeToneSettingsWindow::BellSettingsBedtimeToneSettingsWindow(
+        app::ApplicationCommon *app,
+        std::unique_ptr<app::bell_settings::AlarmSettingsWindowContract::Presenter> presenter)
         : AppWindow(app, name), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
         buildInterface();
     }
 
-    void BellSettingsBedtimeToneWindow::rebuild()
+    void BellSettingsBedtimeToneSettingsWindow::rebuild()
     {
         erase();
         buildInterface();
     }
 
-    void BellSettingsBedtimeToneWindow::buildInterface()
+    void BellSettingsBedtimeToneSettingsWindow::buildInterface()
     {
         AppWindow::buildInterface();
         statusBar->setVisible(false);
@@ -42,7 +45,7 @@ namespace gui
         setFocusItem(sidelistview);
     }
 
-    bool BellSettingsBedtimeToneWindow::onInput(const gui::InputEvent &inputEvent)
+    bool BellSettingsBedtimeToneSettingsWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (sidelistview->onInput(inputEvent)) {
             return true;
@@ -55,18 +58,19 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    void BellSettingsBedtimeToneWindow::exit()
+    void BellSettingsBedtimeToneSettingsWindow::exit()
     {
         presenter->saveData();
         application->switchWindow(
-            window::bell_finished::defaultName,
-            BellFinishedWindowData::Factory::create("circle_success",
-                                                    utils::translate("app_bell_settings_bedtime_tone_finished"),
-                                                    gui::name::window::main_window));
+            BellFinishedWindow::defaultName,
+            BellFinishedWindowData::Factory::create(
+                "circle_success",
+                utils::translate("app_bell_settings_alarm_settings_alarm_tone_and_light_finished"),
+                app::applicationBellSettingsName));
     }
 
-    void BellSettingsBedtimeToneWindow::onClose(CloseReason reason)
+    void BellSettingsBedtimeToneSettingsWindow::onClose(CloseReason reason)
     {
-        presenter->eraseProviderData();
+        // presenter->eraseProvideerData();
     }
 } /* namespace gui */

@@ -71,7 +71,7 @@ namespace gui
 
     void BedtimeNotificationWindow::onClose(CloseReason reason)
     {
-        auto stopPlaybackVec = std::vector<audio::PlaybackType>({audio::PlaybackType::Alarm});
+        auto stopPlaybackVec = std::vector<audio::PlaybackType>({audio::PlaybackType::Multimedia});
         AudioServiceAPI::Stop(app, stopPlaybackVec);
     }
 
