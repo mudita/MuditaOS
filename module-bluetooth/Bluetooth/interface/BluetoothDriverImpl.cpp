@@ -138,7 +138,7 @@ namespace bluetooth
                 LOG_INFO("Your initscripts is for %s chipset",
                          btstack_chipset_cc256x_lmp_subversion() < lmp_subversion ? "an older" : "a newer");
                 LOG_INFO("Please update Makefile to include the appropriate bluetooth_init_cc256???.c file");
-                exit(10);
+                return;
             }
             LOG_INFO("Using 921600 baud");
             config.baudrate_main = 921600;

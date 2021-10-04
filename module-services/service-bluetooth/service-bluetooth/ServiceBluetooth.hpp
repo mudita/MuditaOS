@@ -80,7 +80,7 @@ class ServiceBluetooth : public sys::Service
   private:
     std::unique_ptr<BluetoothWorker> worker;
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
-    sys::TimerHandle connectionTimeoutTimer;
+    sys::TimerHandle connectionTimeoutTimer, btRestartTimer;
     std::shared_ptr<BluetoothDevicesModel> bluetoothDevicesModel{};
 
     void startTimeoutTimer();
