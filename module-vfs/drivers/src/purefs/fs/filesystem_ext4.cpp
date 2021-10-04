@@ -26,8 +26,7 @@ namespace purefs::fs::drivers
 {
     namespace
     {
-        template <typename T, typename... Args>
-        auto invoke_efs(filesystem_ext4::fsfile zfil, T efs_fun, Args &&... args)
+        template <typename T, typename... Args> auto invoke_efs(filesystem_ext4::fsfile zfil, T efs_fun, Args &&...args)
         {
             auto vfile = std::dynamic_pointer_cast<file_handle_ext4>(zfil);
             if (!vfile) {
@@ -58,7 +57,7 @@ namespace purefs::fs::drivers
             return -err;
         }
         template <typename T, typename... Args>
-        auto invoke_efs(filesystem_ext4::fsmount fmnt, T efs_fun, std::string_view path, Args &&... args)
+        auto invoke_efs(filesystem_ext4::fsmount fmnt, T efs_fun, std::string_view path, Args &&...args)
         {
             auto mntp = std::static_pointer_cast<mount_point_ext4>(fmnt);
             if (!mntp) {
@@ -70,7 +69,7 @@ namespace purefs::fs::drivers
             auto err = efs_fun(native_path.c_str(), std::forward<Args>(args)...);
             return -err;
         }
-        template <typename T, typename... Args> auto invoke_efs(filesystem_ext4::fsdir zdir, T lfs_fun, Args &&... args)
+        template <typename T, typename... Args> auto invoke_efs(filesystem_ext4::fsdir zdir, T lfs_fun, Args &&...args)
         {
             auto vdir = std::dynamic_pointer_cast<directory_handle_ext4>(zdir);
             if (!vdir) {
@@ -345,12 +344,16 @@ namespace purefs::fs::drivers
 
     auto filesystem_ext4::stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int
     {
-        auto mntp = std::static_pointer_cast<mount_point_ext4>(mnt);
+        auto mntp = std::dynamic_pointer_cast<mount_point_ext4>(mnt);
         if (!mntp) {
             LOG_ERROR("Non ext4 mount point");
             return -EBADF;
         }
-        const auto npath = mntp->native_path(file);
+        // NOTE: mod path fix for lwext4 open root dir
+        auto npath = mntp->native_path(file);
+        if (npath.empty()) {
+            npath = mntp->mount_path();
+        }
         ext4_locker _lck(mntp);
         return stat(mntp->mount_path().c_str(), npath.c_str(), &st, mntp->is_ro());
     }
@@ -408,7 +411,7 @@ namespace purefs::fs::drivers
         if (fspath.empty()) {
             fspath = vmnt->mount_path();
         }
-        const auto dirp   = std::make_shared<directory_handle_ext4>(mnt, 0);
+        const auto dirp = std::make_shared<directory_handle_ext4>(mnt, 0);
         ext4_locker _lck(vmnt);
         const auto lret = ext4_dir_open(dirp->dirp(), fspath.c_str());
         dirp->error(-lret);
