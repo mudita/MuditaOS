@@ -139,8 +139,7 @@ namespace alarms
         void onRepoGetFirstNextSingeResponse(OnGetFirstNextSingleProcessed handledCallback,
                                              TimePoint start,
                                              std::vector<AlarmEventRecord> records);
-        void onRepoGetNextResponse(OnGetNextSingleProcessed handledCallback,
-                                   std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
+        void onRepoGetNextResponse(std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
                                    TimePoint start,
                                    OnGetAlarmEventsRecurringInRange recurringCallback,
                                    std::vector<AlarmEventRecord> records);

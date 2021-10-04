@@ -204,7 +204,7 @@ namespace rrule
                 rrule.parseFromString(teststring);
 
                 auto timestamp = rrule.generateNextTimePoint(eventStart, rangeStart);
-                REQUIRE(timestamp == TimePointFromString("2020-01-07 12:00:00"));
+                REQUIRE(timestamp == TimePointFromString("2020-01-08 12:00:00"));
             }
 
             SECTION("Generate Next hourly")
