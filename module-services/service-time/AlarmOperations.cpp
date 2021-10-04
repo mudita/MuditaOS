@@ -113,7 +113,7 @@ namespace alarms
 
         OnGetNextCallback repoGetNextCallback =
             [&, callback, nextEvents, start, repoGetRecurringCallback](std::vector<AlarmEventRecord> records) {
-                onRepoGetNextResponse(callback, nextEvents, start, repoGetRecurringCallback, records);
+                onRepoGetNextResponse(nextEvents, start, repoGetRecurringCallback, records);
             };
 
         alarmEventsRepo->getNext(start, getNextSingleEventsOffset, getNextSingleEventsLimit, repoGetNextCallback);
@@ -231,14 +231,14 @@ namespace alarms
         }
     }
 
-    void AlarmOperationsCommon::onRepoGetNextResponse(OnGetNextSingleProcessed handledCallback,
-                                                      std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
+    void AlarmOperationsCommon::onRepoGetNextResponse(std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
                                                       TimePoint start,
                                                       OnGetAlarmEventsRecurringInRange recurringCallback,
                                                       std::vector<AlarmEventRecord> records)
     {
         if (records.empty()) {
-            handledCallback({});
+            alarmEventsRepo->getAlarmEventsRecurringInRange(
+                start, TIME_POINT_MAX, getNextSingleEventsOffset, getNextSingleEventsLimit, recurringCallback);
         }
         else {
             *nextEvents              = std::move(records);

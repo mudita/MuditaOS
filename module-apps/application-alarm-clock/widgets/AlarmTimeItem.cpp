@@ -130,7 +130,7 @@ namespace gui
 
             auto alarmTime    = TimePointFloorMinutes(std::chrono::system_clock::from_time_t(std::mktime(newTime)));
             record->startDate = GetFollowingDayTime(alarmTime, std::chrono::system_clock::now());
-            record->endDate   = record->startDate;
+            record->endDate   = TIME_POINT_MAX;
         };
 
         onInputCallback(*hourInput);
