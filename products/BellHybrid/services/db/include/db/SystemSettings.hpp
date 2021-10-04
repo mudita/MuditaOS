@@ -33,9 +33,10 @@ namespace bell::settings
     } // namespace Alarm
     namespace Bedtime
     {
-        constexpr inline auto tone     = "bedtime_tone";
         constexpr inline auto active   = "bedtime_active";
         constexpr inline auto time     = "bedtime_time";
+        constexpr inline auto tone     = "bedtime_tone";
+        constexpr inline auto volume   = "bedtime_volume";
         constexpr inline auto duration = "bedtime_duration";
     } // namespace Bedtime
 };    // namespace bell::settings
