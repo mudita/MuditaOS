@@ -7,13 +7,16 @@
 
 namespace gui::bgSoundsStyle
 {
-    inline constexpr auto descriptionFont = style::window::font::largelight;
+    inline constexpr auto descriptionFont = style::window::font::verybiglight;
+    inline constexpr auto titleFont       = style::window::font::largelight;
     inline constexpr auto timerValueFont  = style::window::font::supersizemelight;
     inline constexpr auto valumeValueFont = style::window::font::supersizemelight;
     namespace progress
     {
-        inline constexpr auto bottomDescTopMargin = 20U;
-        inline constexpr auto boxesCount          = 16;
+        inline constexpr auto bottomDescTopMargin = 15U;
+        inline constexpr auto maxProgressValue    = 16;
+        inline constexpr auto titleMaxLines       = 2;
+        inline constexpr auto titleWidth          = 400U;
     } // namespace progress
 
     namespace pause

@@ -8,7 +8,7 @@
 #include <apps-common/widgets/BarGraph.hpp>
 #include <apps-common/widgets/ProgressTimer.hpp>
 #include <apps-common/GuiTimer.hpp>
-#include <Text.hpp>
+#include <TextFixedSize.hpp>
 
 namespace
 {
@@ -23,18 +23,23 @@ namespace
     }
     gui::Text *createTitle(gui::VBox *parent)
     {
-        auto title = new gui::Text(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
-        title->setFont(gui::bgSoundsStyle::descriptionFont);
+        namespace bgStyle = gui::bgSoundsStyle;
+        auto title        = new gui::TextFixedSize(parent, 0, 0, 0, 0);
+        title->setFont(bgStyle::titleFont);
+        title->setMinimumWidth(bgStyle::progress::titleWidth);
+        title->setMinimumHeightToFitText(bgStyle::progress::titleMaxLines);
+        title->drawUnderline(false);
 
         decorateProgressItem(title, gui::Alignment::Vertical::Top);
         return title;
     }
     gui::HBarGraph *createProgress(gui::VBox *parent)
     {
-        auto progressBox = new gui::HBox(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
+        auto progressBox = new gui::HBox(parent, 0, 0, 0, 0);
         decorateProgressItem(progressBox, gui::Alignment::Vertical::Bottom);
-        auto progressBar =
-            new gui::HBarGraph(progressBox, 0, 0, gui::bgSoundsStyle::progress::boxesCount, gui::BarGraphStyle::Heavy);
+        progressBox->setMaximumSize(parent->getWidth(), parent->getHeight() / 2);
+        auto progressBar = new gui::HBarGraph(
+            progressBox, 0, 0, gui::bgSoundsStyle::progress::maxProgressValue, gui::BarGraphStyle::Heavy);
         decorateProgressItem(progressBar, gui::Alignment::Vertical::Center);
         return progressBar;
     }
@@ -91,6 +96,7 @@ namespace gui
         title       = createTitle(vBox);
         progressBar = createProgress(vBox);
         timerText   = createTimer(body->lastBox);
+        vBox->resizeItems();
 
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
             body->setArea({0, 0, newDim.w, newDim.h});
