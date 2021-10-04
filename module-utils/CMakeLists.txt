@@ -6,7 +6,6 @@ add_subdirectory(bootconfig)
 add_subdirectory(Clipboard)
 add_subdirectory(EventStore)
 add_subdirectory(i18n)
-add_subdirectory(ical)
 add_subdirectory(locale)
 add_subdirectory(log)
 add_subdirectory(math)
@@ -25,7 +24,6 @@ target_link_libraries(module-utils
         rrule
         utility
         utils-bootconfig
-        utils-calendar
         utils-locale
         utils-math
         utils-phonenumber
