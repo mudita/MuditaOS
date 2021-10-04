@@ -10,9 +10,11 @@
 #include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
 #include "models/alarm_settings/AlarmSettingsModel.hpp"
 #include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
+#include "models/alarm_settings/BedtimeSettingsListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpSettingsModel.hpp"
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
 #include "models/alarm_settings/SnoozeSettingsModel.hpp"
+#include "presenter/BedtimeSettingsPresenter.hpp"
 #include "presenter/advanced/AboutYourBellWindowPresenter.hpp"
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
 #include "windows/advanced/AboutYourBellWindow.hpp"
@@ -31,6 +33,7 @@
 
 #include <AlarmSoundPaths.hpp>
 #include <apps-common/windows/Dialog.hpp>
+#include <common/models/BedtimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
@@ -119,10 +122,18 @@ namespace app
                                   return std::make_unique<gui::BellSettingsHomeViewWindow>(app);
                               });
 
-        windowsFactory.attach(gui::window::name::bellSettingsBedtimeTone,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app);
-                              });
+        windowsFactory.attach(
+            gui::window::name::bellSettingsBedtimeTone, [this](ApplicationCommon *app, const std::string &name) {
+                auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app);
+                auto audioModel   = std::make_unique<AudioModel>(this);
+                auto soundsRepository =
+                    std::make_unique<SoundsRepository>(alarms::paths::getBedtimeReminderChimesDir());
+                auto provider = std::make_shared<bell_settings::BedtimeSettingsListItemProvider>(
+                    bedtimeModel, soundsRepository->getSongTitles());
+                auto presenter = std::make_unique<bell_settings::BedtimeSettingsPresenter>(
+                    provider, bedtimeModel, std::move(audioModel), std::move(soundsRepository));
+                return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app, std::move(presenter));
+            });
 
         windowsFactory.attach(gui::BellTurnOffOptionWindow::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {

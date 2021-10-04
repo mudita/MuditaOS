@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/BedtimeModel.hpp"
-
 #include <apps-common/ApplicationCommon.hpp>
 #include <db/SystemSettings.hpp>
 #include <ctime>
+
 namespace app::bell_bedtime
 {
     void BedtimeOnOffModel::setValue(bool value)
@@ -60,4 +60,36 @@ namespace app::bell_bedtime
         }
         return std::mktime(&tm);
     }
+
+    void AlarmToneModel::setValue(UTF8 value)
+    {
+        settings.setValue(bell::settings::Bedtime::tone, value, settings::SettingsScope::Global);
+    }
+
+    auto AlarmToneModel::getValue() const -> UTF8
+    {
+        const auto str = settings.getValue(bell::settings::Bedtime::tone, settings::SettingsScope::Global);
+        if (str.empty()) {
+            return DEFAULT_BEDTIME_TONE;
+        }
+        return str;
+    }
+
+    void BedtimeVolumeModel::setValue(std::uint8_t value)
+    {
+        const auto valStr = std::to_string(value);
+        settings.setValue(bell::settings::Bedtime::volume, valStr, settings::SettingsScope::Global);
+    }
+
+    auto BedtimeVolumeModel::getValue() const -> std::uint8_t
+    {
+        const auto str = settings.getValue(bell::settings::Bedtime::volume, settings::SettingsScope::Global);
+        try {
+            return std::stoi(str);
+        }
+        catch (const std::invalid_argument &) {
+            return DEFAULT_BEDTIME_VOLUME;
+        }
+    }
+
 } // namespace app::bell_bedtime
