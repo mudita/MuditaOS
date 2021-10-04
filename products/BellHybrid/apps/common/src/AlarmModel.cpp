@@ -131,8 +131,14 @@ namespace app
 
     AlarmEventRecord AlarmModel::generateDefaultAlarm() const
     {
+        constexpr std::string_view defaultAlarmTime{"07:00:00"};
+
+        auto defaultAlarmTimePoint = TimePointToString(TimePointNow());
+        defaultAlarmTimePoint.replace(
+            defaultAlarmTimePoint.end() - defaultAlarmTime.size(), defaultAlarmTimePoint.end(), defaultAlarmTime);
+
         auto defaultAlarm      = AlarmEventRecord{};
-        defaultAlarm.startDate = TimePointFromString("2021-01-01 07:00:00");
+        defaultAlarm.startDate = TimePointFromString(defaultAlarmTimePoint.c_str());
         defaultAlarm.rruleText = "FREQ=DAILY";
         defaultAlarm.endDate   = TIME_POINT_MAX;
         return defaultAlarm;
