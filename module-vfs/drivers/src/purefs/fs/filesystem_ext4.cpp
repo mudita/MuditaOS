@@ -8,7 +8,7 @@
 #include <purefs/fs/drivers/file_handle_ext4.hpp>
 #include <purefs/fs/drivers/directory_handle_ext4.hpp>
 #include <lwext4/ext4_bdev.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <ext4.h>
 #include <ext4_inode.h>
 #include <ext4_super.h>
