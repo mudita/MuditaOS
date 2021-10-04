@@ -345,12 +345,16 @@ namespace purefs::fs::drivers
 
     auto filesystem_ext4::stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int
     {
-        auto mntp = std::static_pointer_cast<mount_point_ext4>(mnt);
+        auto mntp = std::dynamic_pointer_cast<mount_point_ext4>(mnt);
         if (!mntp) {
             LOG_ERROR("Non ext4 mount point");
             return -EBADF;
         }
-        const auto npath = mntp->native_path(file);
+        // NOTE: mod path fix for lwext4 open root dir
+        auto npath = mntp->native_path(file);
+        if (npath.empty()) {
+            npath = mntp->mount_path();
+        }
         ext4_locker _lck(mntp);
         return stat(mntp->mount_path().c_str(), npath.c_str(), &st, mntp->is_ro());
     }
