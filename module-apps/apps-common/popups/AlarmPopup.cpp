@@ -124,7 +124,7 @@ namespace gui
         alarmTimeLabel->setFont(style::window::font::largelight);
         alarmTimeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
         alarmTimeLabel->setText(getPresenter()->startedAt());
-        alarmTimeLabel->setMinimumWidthToFitText(alarmTimeLabel->getText());
+        alarmTimeLabel->setMaximumWidth(style::window::default_body_width);
         alarmTimeLabel->setMinimumHeightToFitText();
         alarmTimeLabel->setMargins(Margins(
             0, style::popup::alarm::AlarmTimeLabel::top_margin, 0, style::popup::alarm::AlarmTimeLabel::bottom_margin));
@@ -154,7 +154,7 @@ namespace gui
                 gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
             snoozeLabel->setText(utils::translate("app_popup_alarm_snoozed_till") + std::string{" "} +
                                  getPresenter()->snoozedTill());
-            snoozeLabel->setMinimumWidthToFitText(snoozeLabel->getText());
+            snoozeLabel->setMaximumWidth(style::window::default_body_width);
             snoozeLabel->setMinimumHeightToFitText();
         }
     }
@@ -185,5 +185,6 @@ namespace gui
             snoozeLabel->setText(utils::translate("app_popup_alarm_snoozed_till") + std::string{" "} +
                                  getPresenter()->snoozedTill());
         }
+        body->resizeItems();
     }
 } // namespace gui
