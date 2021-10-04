@@ -85,15 +85,33 @@ TEST_CASE("Audio settings string creation")
         std::vector<TestCase> testCases = {
             // system volume
             {PlaybackType::System, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
-            {PlaybackType::Meditation, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
-            {PlaybackType::CallRingtone, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
-            {PlaybackType::KeypadSound, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
-            {PlaybackType::TextMessageRingtone, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::Meditation, Setting::Volume, "audio/RecordingBuiltInMic/Meditation/Volume"},
+            {PlaybackType::CallRingtone, Setting::Volume, "audio/RecordingBuiltInMic/CallRingtone/Volume"},
+            {PlaybackType::KeypadSound, Setting::Volume, "audio/RecordingBuiltInMic/KeypadSound/Volume"},
+            {PlaybackType::TextMessageRingtone,
+             Setting::Volume,
+             "audio/RecordingBuiltInMic/TextMessageRingtone/Volume"},
             {PlaybackType::Notifications, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
-            // other types volume
             {PlaybackType::Alarm, Setting::Volume, "audio/RecordingBuiltInMic/Alarm/Volume"},
             {PlaybackType::Multimedia, Setting::Volume, "audio/RecordingBuiltInMic/Multimedia/Volume"},
             {PlaybackType::None, Setting::Volume, "audio/RecordingBuiltInMic/Volume"},
+
+            // IsSystemSound
+            {PlaybackType::System, Setting::IsSystemSound, "audio/RecordingBuiltInMic/Notifications/IsSystemSound"},
+            {PlaybackType::Meditation, Setting::IsSystemSound, "audio/RecordingBuiltInMic/Meditation/IsSystemSound"},
+            {PlaybackType::CallRingtone,
+             Setting::IsSystemSound,
+             "audio/RecordingBuiltInMic/CallRingtone/IsSystemSound"},
+            {PlaybackType::KeypadSound, Setting::IsSystemSound, "audio/RecordingBuiltInMic/KeypadSound/IsSystemSound"},
+            {PlaybackType::TextMessageRingtone,
+             Setting::IsSystemSound,
+             "audio/RecordingBuiltInMic/TextMessageRingtone/IsSystemSound"},
+            {PlaybackType::Notifications,
+             Setting::IsSystemSound,
+             "audio/RecordingBuiltInMic/Notifications/IsSystemSound"},
+            {PlaybackType::Alarm, Setting::IsSystemSound, "audio/RecordingBuiltInMic/Alarm/IsSystemSound"},
+            {PlaybackType::Multimedia, Setting::IsSystemSound, "audio/RecordingBuiltInMic/Multimedia/IsSystemSound"},
+            {PlaybackType::None, Setting::IsSystemSound, "audio/RecordingBuiltInMic/IsSystemSound"},
 
             // EnableSound
             {PlaybackType::System, Setting::EnableSound, "audio/RecordingBuiltInMic/Notifications/EnableSound"},

@@ -44,7 +44,8 @@ namespace audio
         Gain,
         EnableVibration,
         EnableSound,
-        Sound
+        Sound,
+        IsSystemSound
     };
 
     enum class SettingState : bool
@@ -86,8 +87,6 @@ namespace audio
     [[nodiscard]] const std::string dbPath(const Setting &setting,
                                            const PlaybackType &playbackType,
                                            const Profile::Type &profileType);
-
-    [[nodiscard]] bool isSystemSound(const PlaybackType &playbackType) noexcept;
 
     enum class EventType
     {
