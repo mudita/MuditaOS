@@ -1,8 +1,19 @@
 add_catch2_executable(
         NAME
-        bell_evtmgr
+        bell_evtmgr_KeySequenceMgr
         SRCS
         unittest_KeySequenceMgr.cpp
+        LIBS
+        bell::evtmgr
+        INCLUDE
+        $<TARGET_PROPERTY:bell::evtmgr,INCLUDE_DIRECTORIES>
+)
+
+add_catch2_executable(
+        NAME
+        bell_evtmgr_GenericLongPressSequence
+        SRCS
+        unittest_GenericLongPressSequence.cpp
         LIBS
         bell::evtmgr
         INCLUDE

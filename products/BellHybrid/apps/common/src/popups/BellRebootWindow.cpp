@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "windows/BellTurnOffWindow.hpp"
+#include "popups/BellRebootWindow.hpp"
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <i18n/i18n.hpp>
@@ -9,19 +9,20 @@
 
 namespace gui
 {
-    BellTurnOffWindow::BellTurnOffWindow(app::ApplicationCommon *app,
-                                         std::unique_ptr<AbstractPowerOffPresenter> presenter)
+
+    BellRebootWindow::BellRebootWindow(app::ApplicationCommon *app,
+                                       std::unique_ptr<AbstractPowerOffPresenter> presenter,
+                                       const char *name)
         : WindowWithTimer(app, name), presenter(std::move(presenter))
     {
         buildInterface();
 
         timerCallback = [this](Item &, sys::Timer &) {
-            this->presenter->powerOff();
+            this->presenter->reboot();
             return true;
         };
     }
-
-    void gui::BellTurnOffWindow::buildInterface()
+    void BellRebootWindow::buildInterface()
     {
         WindowWithTimer::buildInterface();
 
@@ -35,12 +36,11 @@ namespace gui
                         style::window_width,
                         style::window_height,
                         "bell_mudita_logo_W_G",
-                        utils::translate("app_bell_goodbye"));
+                        utils::translate("app_bell_reset_message"));
         icon->text->setFont(style::window::font::verybiglight);
     }
-    bool BellTurnOffWindow::onInput(const InputEvent &)
+    bool BellRebootWindow::onInput(const InputEvent &)
     {
         return false;
     }
-
 } // namespace gui

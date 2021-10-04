@@ -7,8 +7,10 @@
 #include "internal/key_sequences/PowerOffSequence.hpp"
 #include "internal/key_sequences/AlarmActivateSequence.hpp"
 #include "internal/key_sequences/AlarmDeactivateSequence.hpp"
+#include "internal/key_sequences/ResetSequence.hpp"
 
 #include <appmgr/messages/PowerOffPopupRequestParams.hpp>
+#include <appmgr/messages/RebootPopupRequestParams.hpp>
 #include <evtmgr/EventManager.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <hal/temperature_source/TemperatureSource.hpp>
@@ -118,6 +120,13 @@ void EventManager::buildKeySequences()
             this, app::manager::actions::ShowPopup, std::make_unique<PowerOffPopupRequestParams>());
     };
     collection.emplace_back(std::move(powerOffSeq));
+
+    auto resetSeq      = std::make_unique<ResetSequence>(*this);
+    resetSeq->onAction = [this]() {
+        app::manager::Controller::sendAction(
+            this, app::manager::actions::ShowPopup, std::make_unique<RebootPopupRequestParams>());
+    };
+    collection.emplace_back(std::move(resetSeq));
 
     auto alarmActivateSeq      = std::make_unique<AlarmActivateSequence>();
     alarmActivateSeq->onAction = [this]() {

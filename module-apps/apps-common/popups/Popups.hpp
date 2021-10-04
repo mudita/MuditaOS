@@ -27,6 +27,7 @@ namespace gui
             AlarmDeactivated,
             Alarm,
             PowerOff,
+            Reboot
         };
 
         namespace window
@@ -48,6 +49,7 @@ namespace gui
             inline constexpr auto alarm_activated_window            = "AlarmActivatedPopup";
             inline constexpr auto alarm_deactivated_window          = "AlarmDeactivatedPopup";
             inline constexpr auto alarm_window                      = "AlarmPopup";
+            inline constexpr auto reboot_window                     = "RebootPopup";
         } // namespace window
 
         std::string resolveWindowName(ID id);

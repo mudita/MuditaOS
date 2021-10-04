@@ -46,7 +46,7 @@ class WorkerEventCommon : public sys::Worker
     virtual void initProductHardware();
     virtual void deinitProductHardware();
 
-    void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code);
+    virtual void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code);
 
     sys::Service *service = nullptr;
 

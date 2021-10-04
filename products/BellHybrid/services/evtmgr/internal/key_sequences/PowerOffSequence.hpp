@@ -3,13 +3,14 @@
 
 #pragma once
 
-#include "LongPressSequence.hpp"
+#include "GenericLongPressSequence.hpp"
+#include <Timers/TimerFactory.hpp>
 
-class PowerOffSequence : public LongPressSequence
+class PowerOffSequence : public GenericLongPressSequence<KeyMap::Back>
 {
   public:
-    explicit PowerOffSequence(sys::Service &service,
-                              std::chrono::milliseconds timeout = std::chrono::milliseconds{5000})
-        : LongPressSequence(KeyMap::Back, service, timeout)
+    explicit PowerOffSequence(sys::Service &service)
+        : GenericLongPressSequence<KeyMap::Back>{sys::TimerFactory::createSingleShotTimer(
+              &service, "poffseq", std::chrono::milliseconds{5000}, [this](auto &) { handleTimer(); })}
     {}
 };
