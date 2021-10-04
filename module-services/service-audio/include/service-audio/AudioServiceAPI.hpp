@@ -142,6 +142,25 @@ namespace AudioServiceAPI
      */
     std::optional<audio::SettingState> GetVibrationSetting(sys::Service *serv, audio::PlaybackType playbackType);
 
+    /** @brief Sets system sound setting state
+     *
+     * @param serv - requesting service.
+     * @param settingState - state to be set.
+     * @param playbackType -  type of playback.
+     * @return Standard service-api return code. Success if suitable.
+     */
+    audio::RetCode SetSystemSoundSetting(sys::Service *serv,
+                                         audio::SettingState settingState,
+                                         audio::PlaybackType playbackType);
+
+    /** @brief Gets system sound setting state
+     *
+     * @param serv - requesting service.
+     * @param playbackType -  type of playback.
+     * @return Requested setting state on success. std::nullopt on failure
+     */
+    std::optional<audio::SettingState> GetSystemSoundSetting(sys::Service *serv, audio::PlaybackType playbackType);
+
     /** @brief Sets sound setting state
      *
      * @param serv - requesting service.

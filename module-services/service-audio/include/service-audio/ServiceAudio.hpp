@@ -51,8 +51,13 @@ class ServiceAudio : public sys::Service
     audio::AudioMux::VibrationStatus vibrationMotorStatus = audio::AudioMux::VibrationStatus::Off;
     std::unique_ptr<settings::Settings> settingsProvider;
     std::map<std::string, std::string> settingsCache;
-    bool bluetoothA2DPConnected = false;
+    bool bluetoothA2DPConnected         = false;
     bool bluetoothVoiceProfileConnected = false;
+
+    std::map<VibrationType, std::list<audio::PlaybackType>> vibrationMap = {
+        {VibrationType::None, {}},
+        {VibrationType::Continuous, {audio::PlaybackType::CallRingtone, audio::PlaybackType::Alarm}},
+        {VibrationType::OneShot, {audio::PlaybackType::Notifications, audio::PlaybackType::TextMessageRingtone}}};
 
     auto IsVibrationMotorOn()
     {
@@ -96,6 +101,10 @@ class ServiceAudio : public sys::Service
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
     auto IsBusy() -> bool;
+    auto IsSystemSound(const audio::PlaybackType &type) -> bool;
+    audio::PlaybackType generatePlayback(const audio::PlaybackType &type,
+                                         const audio::Setting &setting = audio::Setting::Volume);
+    audio::Profile::Type generateProfile(const audio::Profile::Type &profile, const audio::PlaybackType &playbackType);
 
     //! Setter for settings
     //! \param setting Setting to be controlled

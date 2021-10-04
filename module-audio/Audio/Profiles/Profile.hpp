@@ -12,11 +12,12 @@
 
 namespace audio
 {
-    using Volume      = uint32_t;
-    using Gain        = uint32_t;
-    using Position    = float;
-    using Vibrate     = bool;
-    using EnableSound = bool;
+    using Volume        = uint32_t;
+    using Gain          = uint32_t;
+    using Position      = float;
+    using Vibrate       = bool;
+    using EnableSound   = bool;
+    using IsSystemSound = bool;
 
     class Profile
     {

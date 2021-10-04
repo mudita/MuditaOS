@@ -48,6 +48,25 @@ namespace audio_settings
         AudioServiceAPI::SetVibrationSetting(application, audio::SettingState::Disabled, playbackType);
     }
 
+    bool AudioSettingsModel::isSystemSoundEnabled()
+    {
+        auto settingState = AudioServiceAPI::GetSystemSoundSetting(application, playbackType);
+        if (!settingState) {
+            LOG_ERROR("Cannot read vibration setting for %s", audio::str(playbackType).c_str());
+        }
+        return settingState.value_or(audio::SettingState::Disabled) != audio::SettingState::Enabled;
+    }
+
+    void AudioSettingsModel::setIsSystemSoundEnabled()
+    {
+        AudioServiceAPI::SetSystemSoundSetting(application, audio::SettingState::Enabled, playbackType);
+    }
+
+    void AudioSettingsModel::setIsSystemSoundDisabled()
+    {
+        AudioServiceAPI::SetSystemSoundSetting(application, audio::SettingState::Disabled, playbackType);
+    }
+
     bool AudioSettingsModel::isSoundEnabled()
     {
         auto settingState = AudioServiceAPI::GetSoundSetting(application, playbackType);

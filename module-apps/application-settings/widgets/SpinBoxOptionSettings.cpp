@@ -11,9 +11,9 @@ namespace gui
                                                  std::uint8_t value,
                                                  std::uint8_t maxValue,
                                                  std::function<bool(uint8_t)> updateCallback,
-                                                 std::function<bool(Item &)> focusChangedCallback)
-        : option::OptionSettings(text, nullptr, focusChangedCallback, nullptr),
-          updateCallback(std::move(updateCallback)), maxValue(maxValue), value(value)
+                                                 std::function<bool(Item &)> focusChangedCallback,
+                                                 bool indent)
+        : updateCallback(std::move(updateCallback)), maxValue(maxValue), value(value), text(text), indent(indent)
     {}
 
     auto SpinBoxOptionSettings::build() const -> ListItem *
@@ -25,10 +25,13 @@ namespace gui
         optionItem->inputCallback            = spinBox->inputCallback;
         optionItem->focusChangedCallback     = [spinBox](Item &item) { return spinBox->focusChangedCallback(item); };
         optionItem->dimensionChangedCallback = [spinBox](gui::Item &, const BoundingBox &newDim) -> bool {
-            spinBox->setPosition(0, 0);
-            spinBox->setSize(newDim.w, newDim.h);
+            spinBox->setArea({0, 0, newDim.w, newDim.h});
             return true;
         };
+
+        if (indent) {
+            optionItem->setMargins(Margins(option::window::option_left_margin, 0, 0, 0));
+        }
 
         optionItem->addWidget(spinBox);
 
