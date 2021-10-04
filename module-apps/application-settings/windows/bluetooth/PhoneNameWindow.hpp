@@ -10,7 +10,7 @@ namespace gui
     class PhoneNameWindow : public AppWindow
     {
       public:
-        explicit PhoneNameWindow(app::ApplicationCommon *app);
+        PhoneNameWindow(app::ApplicationCommon *app, std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel);
 
       private:
         void buildInterface() override;
@@ -19,7 +19,7 @@ namespace gui
         auto onInput(const InputEvent &inputEvent) -> bool override;
 
         Text *inputField = nullptr;
-        std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
+        std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
 
         static constexpr auto maxNameLength = 248; // Max 248 bytes according to Bluetooth Core Specification v5.2
     };

@@ -398,8 +398,8 @@ namespace app
         windowsFactory.attach(gui::window::name::all_devices, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::AllDevicesWindow>(app, bluetoothSettingsModel);
         });
-        windowsFactory.attach(gui::window::name::phone_name, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::PhoneNameWindow>(app);
+        windowsFactory.attach(gui::window::name::phone_name, [this](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::PhoneNameWindow>(app, bluetoothSettingsModel);
         });
         windowsFactory.attach(gui::window::name::bluetooth_check_passkey,
                               [](ApplicationCommon *app, const std::string &name) {
