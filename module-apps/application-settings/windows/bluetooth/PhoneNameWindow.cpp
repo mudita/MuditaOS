@@ -10,9 +10,10 @@
 
 namespace gui
 {
-    PhoneNameWindow::PhoneNameWindow(app::ApplicationCommon *app) : AppWindow(app, gui::window::name::phone_name)
+    PhoneNameWindow::PhoneNameWindow(app::ApplicationCommon *app,
+                                     std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel)
+        : AppWindow(app, gui::window::name::phone_name), bluetoothSettingsModel(bluetoothSettingsModel)
     {
-        bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);
         bluetoothSettingsModel->requestDeviceName();
         buildInterface();
     }
