@@ -9,7 +9,7 @@
 
 namespace style::bell_options_list
 {
-    inline constexpr auto w                    = 380U;
+    inline constexpr auto w                    = 400U;
     inline constexpr auto h                    = 400U;
     inline constexpr auto outer_layouts_h      = 64U;
     inline constexpr auto outer_layouts_margin = 7U;
