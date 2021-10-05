@@ -3,11 +3,12 @@
 
 #pragma once
 
+#include <appmgr/IdleHandler.hpp>
 #include <service-appmgr/model/ApplicationManagerCommon.hpp>
 
 namespace app::manager
 {
-    class ApplicationManager : public ApplicationManagerCommon
+    class ApplicationManager : public ApplicationManagerCommon, public IdleHandler
     {
       public:
         ApplicationManager(const ApplicationName &serviceName,
@@ -15,6 +16,8 @@ namespace app::manager
                            const ApplicationName &_rootApplicationName);
 
       private:
+        sys::TimerHandle idleTimer;
+
         auto startApplication(ApplicationHandle &app) -> bool override;
         auto resolveHomeApplication() -> std::string override;
         void registerMessageHandlers() override;

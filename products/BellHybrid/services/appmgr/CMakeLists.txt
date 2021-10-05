@@ -4,9 +4,11 @@ add_library(bell::appmgr ALIAS appmgr)
 target_sources(appmgr
     PRIVATE
         ApplicationManager.cpp
+        IdleHandler.cpp
     PUBLIC
         include/appmgr/messages/AlarmMessage.hpp
         include/appmgr/ApplicationManager.hpp
+        include/appmgr/IdleHandler.hpp
         include/appmgr/messages/PowerOffPopupRequestParams.hpp
         include/appmgr/messages/RebootPopupRequestParams.hpp
 )

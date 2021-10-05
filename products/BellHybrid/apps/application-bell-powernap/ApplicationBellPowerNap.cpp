@@ -71,4 +71,8 @@ namespace app
 
         return handleAsyncResponse(resp);
     }
+
+    // Empty: do not start idleTimer on application run
+    void ApplicationBellPowerNap::onStart()
+    {}
 } // namespace app

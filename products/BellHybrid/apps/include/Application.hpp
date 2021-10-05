@@ -15,5 +15,18 @@ namespace app
       protected:
         void attachPopups(const std::vector<gui::popup::ID> &popupsList) override;
         bool isPopupPermitted(gui::popup::ID popupId) const override;
+        void startIdleTimer();
+        void restartIdleTimer();
+        void stopIdleTimer();
+
+      private:
+        sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl) override;
+        sys::MessagePointer handleApplicationSwitch(sys::Message *msgl) override;
+        sys::MessagePointer handleAppClose(sys::Message *msgl) override;
+        sys::MessagePointer handleAppFocusLost(sys::Message *msgl) override;
+
+        virtual void onKeyPressed();
+        virtual void onStart();
+        virtual void onStop();
     };
 } // namespace app
