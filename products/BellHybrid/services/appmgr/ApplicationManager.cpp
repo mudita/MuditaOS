@@ -3,7 +3,10 @@
 
 #include <appmgr/ApplicationManager.hpp>
 #include <appmgr/messages/AlarmMessage.hpp>
+#include <appmgr/messages/IdleTimerMessage.hpp>
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
+
+#include <Timers/TimerFactory.hpp>
 
 namespace app::manager
 {
@@ -13,6 +16,10 @@ namespace app::manager
         : ApplicationManagerCommon(serviceName, std::move(launchers), _rootApplicationName)
     {
         registerMessageHandlers();
+        idleTimer = sys::TimerFactory::createPeriodicTimer(this,
+                                                           "IdleReturn",
+                                                           idleReturnTimeout,
+                                                           [this](sys::Timer &) { idleTimerCallback(); });
     }
 
     auto ApplicationManager::startApplication(ApplicationHandle &app) -> bool
@@ -32,11 +39,37 @@ namespace app::manager
         return rootApplicationName;
     }
 
+    void ApplicationManager::handleIdleTimerRestart(sys::Message *request)
+    {
+        idleTimer.restart(idleReturnTimeout);
+    }
+
+    void ApplicationManager::handleIdleTimerStop(sys::Message *request)
+    {
+        idleTimer.stop();
+    }
+
+    void ApplicationManager::idleTimerCallback()
+    {
+        LOG_INFO("Idle timer rang - going back to home screen");
+        idleTimer.stop();
+        ActionEntry entry{app::manager::actions::Home, {}};
+        handleAction(entry);
+    }
+
     void ApplicationManager::registerMessageHandlers()
     {
         ApplicationManagerCommon::registerMessageHandlers();
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
+        connect(typeid(IdleTimerRestart), [this](sys::Message *request) {
+            handleIdleTimerRestart(request);
+            return sys::msgHandled();
+        });
+        connect(typeid(IdleTimerStop), [this](sys::Message *request) {
+            handleIdleTimerStop(request);
+            return sys::msgHandled();
+        });
         connect(typeid(AlarmActivated), convertibleToActionHandler);
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
     }

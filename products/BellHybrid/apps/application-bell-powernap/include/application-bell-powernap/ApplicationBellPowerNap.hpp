@@ -41,6 +41,8 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
+      private:
+        void idleTimerApplicationStartAction() override;
     };
 
     template <> struct ManifestTraits<ApplicationBellPowerNap>

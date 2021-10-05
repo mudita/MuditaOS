@@ -68,4 +68,7 @@ namespace app
 
         return handleAsyncResponse(resp);
     }
+
+    void ApplicationBellPowerNap::idleTimerApplicationStartAction()
+    {}
 } // namespace app

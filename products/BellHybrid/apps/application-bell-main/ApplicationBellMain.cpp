@@ -8,6 +8,7 @@
 #include "windows/BellHomeScreenWindow.hpp"
 #include "windows/BellMainMenuWindow.hpp"
 
+#include <apps-common/messages/AppMessage.hpp>
 #include <common/models/AlarmModel.hpp>
 #include <common/models/TimeModel.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -96,5 +97,26 @@ namespace app
     auto ApplicationBellMain::isHomeScreenFocused() -> bool
     {
         return GetName() == app::applicationBellName && getCurrentWindow()->getName() == gui::name::window::main_window;
+    }
+
+    void ApplicationBellMain::idleTimerApplicationStartAction()
+    {}
+
+    sys::MessagePointer ApplicationBellMain::handleSwitchWindow(sys::Message *msgl)
+    {
+        auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
+        if (msg) {
+            const auto newWindowName = msg->getWindowName();
+            if (newWindowName == gui::name::window::main_window)
+            {
+                idleTimerStop();
+            }
+            else if (newWindowName == gui::window::name::bell_main_menu ||
+                     newWindowName == gui::window::name::bell_main_menu_dialog)
+            {
+                idleTimerRestart();
+            }
+        }
+         return ApplicationCommon::handleSwitchWindow(msgl);
     }
 } // namespace app

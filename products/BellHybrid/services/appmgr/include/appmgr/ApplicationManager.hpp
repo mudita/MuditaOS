@@ -7,6 +7,8 @@
 
 namespace app::manager
 {
+    constexpr auto idleReturnTimeout = std::chrono::milliseconds{30000};
+
     class ApplicationManager : public ApplicationManagerCommon
     {
       public:
@@ -15,8 +17,14 @@ namespace app::manager
                            const ApplicationName &_rootApplicationName);
 
       private:
+        sys::TimerHandle idleTimer;
+
         auto startApplication(ApplicationHandle &app) -> bool override;
         auto resolveHomeApplication() -> std::string override;
         void registerMessageHandlers() override;
+
+        void handleIdleTimerRestart(sys::Message *request);
+        void handleIdleTimerStop(sys::Message *request);
+        void idleTimerCallback();
     };
 } // namespace app::manager

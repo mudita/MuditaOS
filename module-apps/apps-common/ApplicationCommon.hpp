@@ -173,6 +173,12 @@ namespace app
 
         using OnActionReceived = std::function<ActionResult(manager::actions::ActionParamsPtr &&)>;
 
+        virtual sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl);
+        virtual sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
+        virtual sys::MessagePointer handleAppClose(sys::Message *msgl);
+        virtual sys::MessagePointer handleSwitchWindow(sys::Message *msgl);
+        virtual sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
+
       private:
         std::string default_window;
         State state = State::DEACTIVATED;
@@ -180,20 +186,15 @@ namespace app
         sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);
         sys::MessagePointer handleInputEvent(sys::Message *msgl);
-        sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl);
         sys::MessagePointer handleBatteryStatusChange();
         sys::MessagePointer handleMinuteUpdated(sys::Message *msgl);
         sys::MessagePointer handleAction(sys::Message *msgl);
-        sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
         sys::MessagePointer handleApplicationSwitchLaunch(sys::Message *msgl);
         sys::MessagePointer handleApplicationSwitchOnAction(sys::Message *msgl);
-        sys::MessagePointer handleSwitchWindow(sys::Message *msgl);
         sys::MessagePointer handleUpdateWindow(sys::Message *msgl);
-        sys::MessagePointer handleAppClose(sys::Message *msgl);
         sys::MessagePointer handleAppRebuild(sys::Message *msgl);
         sys::MessagePointer handleAppRefresh(sys::Message *msgl);
         sys::MessagePointer handleGetDOM(sys::Message *msgl);
-        sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
         sys::MessagePointer handleSimStateUpdateMessage(sys::Message *msgl);
 
         virtual bool isPopupPermitted(gui::popup::ID popupId) const;
@@ -242,7 +243,7 @@ namespace app
         ///        RF key) is used
         ///        2. disableAppClose: for use with messageSwitchApplication(...) when switching through app to inform
         ///        that we dont want to close app calling
-        void switchWindow(const std::string &windowName,
+        virtual void switchWindow(const std::string &windowName,
                           gui::ShowMode cmd                     = gui::ShowMode::GUI_SHOW_INIT,
                           std::unique_ptr<gui::SwitchData> data = nullptr,
                           SwitchReason reason                   = SwitchReason::SwitchRequest);

@@ -5,6 +5,7 @@
 
 #include <common/models/AlarmModel.hpp>
 
+#include <appmgr/messages/IdleTimerMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/popups/presenter/AlarmActivatedPresenter.hpp>
 #include <common/popups/AlarmActivatedWindow.hpp>
@@ -12,6 +13,7 @@
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
+#include <service-appmgr/Constants.hpp>
 
 namespace app
 {
@@ -55,4 +57,55 @@ namespace app
             }
         }
     }
+
+    sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)
+    {
+        idleTimerKeyPressedAction();
+        return ApplicationCommon::handleKBDKeyEvent(msgl);
+    }
+
+    sys::MessagePointer Application::handleApplicationSwitch(sys::Message *msgl)
+    {
+        idleTimerApplicationStartAction();
+        return ApplicationCommon::handleApplicationSwitch(msgl);
+    }
+
+    sys::MessagePointer Application::handleAppClose(sys::Message *msgl)
+    {
+        idleTimerApplicationStopAction();
+        return ApplicationCommon::handleAppClose(msgl);
+    }
+
+    sys::MessagePointer Application::handleAppFocusLost(sys::Message *msgl)
+    {
+        idleTimerApplicationStopAction();
+        return ApplicationCommon::handleAppFocusLost(msgl);
+    }
+
+    void Application::idleTimerKeyPressedAction()
+    {
+        idleTimerRestartIfActive();
+    }
+    void Application::idleTimerApplicationStartAction()
+    {
+        idleTimerRestart();
+    }
+    void Application::idleTimerApplicationStopAction()
+    {
+        idleTimerStop();
+    }
+
+    void Application::idleTimerRestartIfActive()
+    {
+        bus.sendUnicast(std::make_shared<IdleTimerRestartIfActive>(), service::name::appmgr);
+    }
+    void Application::idleTimerRestart()
+    {
+        bus.sendUnicast(std::make_shared<IdleTimerRestart>(), service::name::appmgr);
+    }
+    void Application::idleTimerStop()
+    {
+        bus.sendUnicast(std::make_shared<IdleTimerStop>(), service::name::appmgr);
+    }
+
 } // namespace app
