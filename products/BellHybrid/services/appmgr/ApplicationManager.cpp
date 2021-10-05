@@ -3,6 +3,8 @@
 
 #include <appmgr/ApplicationManager.hpp>
 #include <appmgr/messages/AlarmMessage.hpp>
+#include <appmgr/messages/IdleTimerMessage.hpp>
+
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
 
 namespace app::manager
@@ -10,7 +12,7 @@ namespace app::manager
     ApplicationManager::ApplicationManager(const ApplicationName &serviceName,
                                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
                                            const ApplicationName &_rootApplicationName)
-        : ApplicationManagerCommon(serviceName, std::move(launchers), _rootApplicationName)
+        : ApplicationManagerCommon(serviceName, std::move(launchers), _rootApplicationName), IdleHandler(this)
     {
         registerMessageHandlers();
     }
@@ -37,6 +39,18 @@ namespace app::manager
         ApplicationManagerCommon::registerMessageHandlers();
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
+        connect(typeid(StartIdleTimerMessage), [this](sys::Message *request) {
+            handleStartIdleTimer(request);
+            return sys::msgHandled();
+        });
+        connect(typeid(RestartIdleTimerMessage), [this](sys::Message *request) {
+            handleRestartIdleTimer(request);
+            return sys::msgHandled();
+        });
+        connect(typeid(StopIdleTimerMessage), [this](sys::Message *request) {
+            handleStopIdleTimer(request);
+            return sys::msgHandled();
+        });
         connect(typeid(AlarmActivated), convertibleToActionHandler);
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
     }
