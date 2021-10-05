@@ -119,6 +119,7 @@ namespace at
         {AT::ACT_URC_ON, {"AT+QINDCFG=\"act\",1"}},
         {AT::SMS_URC_ON, {"AT+QINDCFG=\"smsincoming\",1"}},
         {AT::SMS_URC_OFF, {"AT+QINDCFG=\"smsincoming\",0"}},
+        {AT::SET_RNDIS, {"AT+QCFG=\"usbnet\",3"}},
 
     };
 

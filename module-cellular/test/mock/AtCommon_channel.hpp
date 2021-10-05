@@ -509,4 +509,61 @@ namespace at
             return result;
         }
     };
+
+    /// provides invalid QSIMSTAT response
+    class QCGFGUsbnet_toLittleTokens : public ChannelMock
+    {
+      public:
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QCFG: \"usbnet\",", "OK"};
+            return result;
+        }
+    };
+
+    /// provides proper QCFGUsbnet response
+    class QCGFGUsbnet_successChannel : public ChannelMock
+    {
+      public:
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QCFG: \"usbnet\",1", "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid QCFGUsbnet response
+    class QCFGUsbnet_toManyTokens : public ChannelMock
+    {
+      public:
+        const std::string net = "1";
+        const std::string bad = "1";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QCFG: \"usbnet\"," + net + "," + bad, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid QCFGUsbnet response
+    class QCFGUsbnet_invalidToken : public ChannelMock
+    {
+      public:
+        const std::string net = "9";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QCFG: \"usbnet\"," + net, "OK"};
+            return result;
+        }
+    };
 } // namespace at
