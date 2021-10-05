@@ -31,7 +31,7 @@ namespace bsp::bell_switches
     using TimerCallback = void (*)(TimerHandle_t timerHandle);
 
     constexpr std::chrono::milliseconds contactOscillationTimeout{30ms};
-    constexpr std::chrono::milliseconds centerKeyPressValidationTimeout{100ms};
+    constexpr std::chrono::milliseconds centerKeyPressValidationTimeout{30ms};
 
     enum class DebounceTimerId : unsigned int
     {
@@ -160,16 +160,18 @@ namespace bsp::bell_switches
         xTimerStop(timerState->timer, 0);
 
         if (!latchEventFlag.wasJustPressed() && qHandleIrq != nullptr) {
-            const auto currentState = timerState->gpio->ReadPin(static_cast<uint32_t>(timerState->pin))
-                                          ? KeyEvents::Released
-                                          : KeyEvents::Pressed;
-            if (currentState != timerState->lastState) {
-                auto val = static_cast<std::uint16_t>(timerState->notificationSource);
-                xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
-            }
+            auto val = static_cast<std::uint16_t>(timerState->notificationSource);
+            xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
         }
 
+        timerState->gpio->ClearPortInterrupts(1U << static_cast<uint32_t>(timerState->pin));
         timerState->gpio->EnableInterrupt(1U << static_cast<uint32_t>(timerState->pin));
+    }
+
+    KeyEvents getLatchState()
+    {
+        return (gpio_sw->ReadPin(static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH)) ? KeyEvents::Released
+                                                                                               : KeyEvents::Pressed);
     }
 
     void addDebounceTimer(DebounceTimerState timerState)
@@ -179,6 +181,16 @@ namespace bsp::bell_switches
 
         if (timerState.notificationSource == NotificationSource::lightCenterKeyPress) {
             state.createTimer(debounceTimerCenterClickCallback, centerKeyPressValidationTimeout);
+        }
+        else if (timerState.notificationSource == NotificationSource::latchKeyPress) {
+            state.createTimer(debounceTimerCallback, contactOscillationTimeout);
+            state.lastState = getLatchState();
+            if (state.lastState == KeyEvents::Released) {
+                latchEventFlag.setReleased();
+            }
+            else {
+                latchEventFlag.setPressed();
+            }
         }
         else {
             state.createTimer(debounceTimerCallback, contactOscillationTimeout);
