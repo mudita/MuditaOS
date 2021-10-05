@@ -586,7 +586,6 @@
   "tethering_phone_mode_change_prohibited": "<text>Tethering włączony.<br /><br />Inne tryby (Połączony, Nie przeszkadzać,<br />Offline) zostały unieważnione przez ten tryb<br />i nie działają.</text>",
   "tethering_menu_access_decline": "<text>Tethering włączony.<br /><br />Aby przejść do menu,<br />wyłącz tethering.</text>",
   "app_bell_settings_time_units_time_fmt_top_message": "Format czasu",
-  "app_bell_settings_time_units_time_fmt_bottom_message": "godziny",
   "app_bell_settings_time_units_time_message": "Czas",
   "app_bell_settings_time_units_finished_message": "Czas i jednostki ustawione.",
   "app_bellmain_alarm": "Alarm",

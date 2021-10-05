@@ -9,14 +9,20 @@
 
 namespace gui
 {
+    namespace window::bell_finished
+    {
+        constexpr inline auto defaultName         = "BellFinishedWindow";
+        constexpr inline auto image_top_margin    = 112U;
+        constexpr inline auto image_bottom_margin = 30U;
+    } // namespace window::bell_finished
+
     class Icon;
 
     class BellFinishedWindow : public WindowWithTimer
     {
       public:
-        static constexpr auto defaultName = "BellFinishedWindow";
-
-        explicit BellFinishedWindow(app::ApplicationCommon *app, const std::string &name = defaultName);
+        explicit BellFinishedWindow(app::ApplicationCommon *app,
+                                    const std::string &name = window::bell_finished::defaultName);
 
       protected:
         void buildInterface() override;

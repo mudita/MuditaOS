@@ -44,13 +44,8 @@ namespace app::bell_settings
     void TimeUnitsModel::createData()
     {
 
-        timeFmtSetListItem =
-            new gui::TimeFormatSetListItem(0,
-                                           0,
-                                           0,
-                                           0,
-                                           utils::translate("app_bell_settings_time_units_time_fmt_top_message"),
-                                           utils::translate("app_bell_settings_time_units_time_fmt_bottom_message"));
+        timeFmtSetListItem = new gui::TimeFormatSetListItem(
+            0, 0, 0, 0, utils::translate("app_bell_settings_time_units_time_fmt_top_message"));
         internalData.push_back(timeFmtSetListItem);
 
         timeSetListItem =

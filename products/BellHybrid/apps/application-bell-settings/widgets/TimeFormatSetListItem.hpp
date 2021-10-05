@@ -19,7 +19,7 @@ namespace gui
       public:
         TimeFormatSetListItem() = delete;
         TimeFormatSetListItem(
-            gui::Length x, gui::Length y, gui::Length w, gui::Length h, const UTF8 &topDesc, const UTF8 &botDesc);
+            gui::Length x, gui::Length y, gui::Length w, gui::Length h, const UTF8 &topDesc, const UTF8 &botDesc = "");
 
         auto getTimeFmt() const noexcept -> utils::time::Locale::TimeFormat;
         auto setTimeFmt(utils::time::Locale::TimeFormat fmt) noexcept -> void;

@@ -28,8 +28,13 @@ namespace gui
         header->setTitleVisibility(false);
         bottomBar->setVisible(false);
 
-        icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
-        icon->text->setFont(style::window::font::verybiglight);
+        if (icon == nullptr) {
+            icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
+            icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+            icon->image->setMargins(
+                {0, window::bell_finished::image_top_margin, 0, window::bell_finished::image_bottom_margin});
+            icon->text->setFont(style::window::font::verybiglight);
+        }
     }
 
     bool BellFinishedWindow::onInput(const InputEvent &inputEvent)
@@ -47,7 +52,7 @@ namespace gui
 
         if (auto metadata = dynamic_cast<BellFinishedWindowData *>(data)) {
             icon->image->set(metadata->icon);
-            icon->text->setText(metadata->text);
+            icon->text->setRichText(metadata->text);
             windowToReturn = metadata->windowToReturn;
         }
     }
