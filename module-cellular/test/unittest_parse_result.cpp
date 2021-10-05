@@ -14,6 +14,7 @@
 #include <at/cmd/CPBR.hpp>
 #include <at/cmd/QNWINFO.hpp>
 #include <at/cmd/QSIMSTAT.hpp>
+#include <at/cmd/QCFGUsbnet.hpp>
 
 #include "mock/AtCommon_channel.hpp"
 #include "PhoneNumber.hpp"
@@ -750,6 +751,66 @@ TEST_CASE("QSIMSTAT parser")
         at::QSIMSTAT_invalidStatus channel;
         auto base     = channel.cmd(cmd);
         auto response = cmd.parseQSIMSTAT(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+}
+TEST_CASE("QCFGUsbnet parser")
+{
+    SECTION("Empty data")
+    {
+        at::cmd::QCFGUsbnet cmd;
+        at::Result result;
+        auto response = cmd.parseQCFGUsbnet(result);
+        REQUIRE(!response);
+    }
+
+    SECTION("Failing channel")
+    {
+        at::cmd::QCFGUsbnet cmd;
+        at::FailingChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQCFGUsbnet(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::ERROR);
+    }
+
+    SECTION("success")
+    {
+        at::cmd::QCFGUsbnet cmd;
+        at::QCGFGUsbnet_successChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQCFGUsbnet(base);
+        REQUIRE(response);
+        REQUIRE(response.net == at::qcfg::usbnet::Net::ECM);
+    }
+
+    SECTION("too few tokens")
+    {
+        at::cmd::QCFGUsbnet cmd;
+        at::QSIMSTAT_toLittleTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQCFGUsbnet(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("Failed - too many tokens")
+    {
+        at::cmd::QCFGUsbnet cmd;
+        at::QCFGUsbnet_toManyTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQCFGUsbnet(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("Failed - invalid token")
+    {
+        at::cmd::QCFGUsbnet cmd;
+        at::QCFGUsbnet_invalidToken channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQCFGUsbnet(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
     }

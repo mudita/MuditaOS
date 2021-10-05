@@ -66,3 +66,12 @@ add_gtest_executable(
         module-sys
         module-cellular
 )
+
+add_catch2_executable(
+        NAME
+        cellular-tethering-handler
+        SRCS
+        unittest_tetheringHandler.cpp
+        LIBS
+        module-cellular
+)

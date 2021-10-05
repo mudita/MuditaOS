@@ -15,6 +15,7 @@
 #include <queries/messages/sms/QuerySMSUpdate.hpp>
 
 #include <at/ATFactory.hpp>
+#include <at/cmd/QCFGUsbnet.hpp>
 #include <ucs2/UCS2.hpp>
 #include <service-appmgr/Constants.hpp>
 
@@ -28,10 +29,12 @@ namespace cellular::internal
     ServiceCellularPriv::ServiceCellularPriv(ServiceCellular *owner)
         : owner{owner}, simCard{std::make_unique<SimCard>()}, state{std::make_unique<State>(owner)},
           networkTime{std::make_unique<NetworkTime>()}, simContacts{std::make_unique<SimContacts>()},
-          imeiGetHandler{std::make_unique<service::ImeiGetHandler>()}
+          imeiGetHandler{std::make_unique<service::ImeiGetHandler>()}, tetheringHandler{
+                                                                           std::make_unique<TetheringHandler>()}
     {
         initSimCard();
         initSMSSendHandler();
+        initTetheringHandler();
     }
 
     void ServiceCellularPriv::initSimCard()
@@ -316,6 +319,46 @@ namespace cellular::internal
             }
             return std::make_shared<cellular::GetImeiResponse>();
         });
+    }
+    void ServiceCellularPriv::initTetheringHandler()
+    {
+        tetheringHandler->onIsRndisEnabled = [this]() -> std::optional<at::qcfg::usbnet::Net> {
+            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+            if (channel == nullptr) {
+                return std::nullopt;
+            }
+            auto command  = at::cmd::QCFGUsbnet(at::cmd::Modifier::None);
+            auto response = channel->cmd(command);
+            auto result   = command.parseQCFGUsbnet(response);
+            if (result) {
+                return result.net;
+            }
+            return std::nullopt;
+        };
+
+        tetheringHandler->onEnableRndis = [this]() -> bool {
+            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+            if (channel == nullptr) {
+                return false;
+            }
+            auto response = channel->cmd(at::AT::SET_RNDIS);
+            if (response) {
+                return true;
+            }
+            return false;
+        };
+
+        tetheringHandler->onEnableUrc = [this]() -> bool { return owner->tetheringTurnOnURC(); };
+
+        tetheringHandler->onDisableUrc = [this]() -> bool { return owner->tetheringTurnOffURC(); };
+
+        tetheringHandler->onSetPassthrough = [](bool enable) {
+            using bsp::cellular::USB::setPassthrough;
+            using bsp::cellular::USB::PassthroughState;
+            setPassthrough(enable ? PassthroughState::ENABLED : PassthroughState::DISABLED);
+        };
+
+        tetheringHandler->onReadMessages = [this]() -> bool { return owner->receiveAllMessages(); };
     }
 
 } // namespace cellular::internal
