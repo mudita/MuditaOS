@@ -16,6 +16,7 @@ target_link_libraries(app
     PRIVATE
         apps-common
         bell::app-common
+        bell::appmgr
 )
 
 add_subdirectory(application-bell-main)

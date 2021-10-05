@@ -5,6 +5,7 @@
 
 #include <common/models/AlarmModel.hpp>
 
+#include <appmgr/messages/IdleTimerMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/popups/presenter/AlarmActivatedPresenter.hpp>
 #include <common/popups/AlarmActivatedWindow.hpp>
@@ -13,6 +14,7 @@
 #include <common/popups/BellRebootWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
+#include <service-appmgr/Constants.hpp>
 
 namespace app
 {
@@ -67,5 +69,59 @@ namespace app
         return not((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
                    (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
                    (isCurrentWindow(gui::BellTurnOffWindow::name)));
+    }
+
+    sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)
+    {
+        onKeyPressed();
+        return ApplicationCommon::handleKBDKeyEvent(msgl);
+    }
+
+    sys::MessagePointer Application::handleApplicationSwitch(sys::Message *msgl)
+    {
+        onStart();
+        return ApplicationCommon::handleApplicationSwitch(msgl);
+    }
+
+    sys::MessagePointer Application::handleAppClose(sys::Message *msgl)
+    {
+        onStop();
+        return ApplicationCommon::handleAppClose(msgl);
+    }
+
+    sys::MessagePointer Application::handleAppFocusLost(sys::Message *msgl)
+    {
+        onStop();
+        return ApplicationCommon::handleAppFocusLost(msgl);
+    }
+
+    void Application::onKeyPressed()
+    {
+        restartIdleTimer();
+    }
+
+    void Application::onStart()
+    {
+        startIdleTimer();
+    }
+
+    void Application::onStop()
+    {
+        stopIdleTimer();
+    }
+
+    void Application::startIdleTimer()
+    {
+        bus.sendUnicast(std::make_shared<StartIdleTimerMessage>(), service::name::appmgr);
+    }
+
+    void Application::restartIdleTimer()
+    {
+        bus.sendUnicast(std::make_shared<RestartIdleTimerMessage>(), service::name::appmgr);
+    }
+
+    void Application::stopIdleTimer()
+    {
+        bus.sendUnicast(std::make_shared<StopIdleTimerMessage>(), service::name::appmgr);
     }
 } // namespace app
