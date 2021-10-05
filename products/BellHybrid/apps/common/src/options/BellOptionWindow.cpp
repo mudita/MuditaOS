@@ -30,7 +30,6 @@ namespace gui
         bottomBar->setVisible(false);
 
         optionsList = new gui::ListViewWithArrows(this, 0, 0, style::window_width, style::window_height, optionsModel);
-        optionsList->setAlignment(Alignment(Alignment::Vertical::Top));
         optionsList->applySizeRestrictions(style::bell_options_list::w,
                                            style::bell_options_list::h,
                                            style::bell_options_list::outer_layouts_h,

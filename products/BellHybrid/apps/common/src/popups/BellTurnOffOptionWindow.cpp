@@ -17,8 +17,6 @@ namespace gui
     {
         addOptions(settingsOptionsList());
         setListTitle(utils::translate("app_bell_turn_off_question"));
-        optionsList->setBoundaries(Boundaries::Continuous);
-        optionsList->setAlignment(Alignment(Alignment::Vertical::Center));
     }
 
     std::list<Option> BellTurnOffOptionWindow::settingsOptionsList()

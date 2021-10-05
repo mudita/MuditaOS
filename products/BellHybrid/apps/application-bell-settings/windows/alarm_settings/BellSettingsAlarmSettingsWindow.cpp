@@ -63,7 +63,7 @@ namespace gui
     {
         presenter->saveData();
         application->switchWindow(
-            BellFinishedWindow::defaultName,
+            window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create(
                 "circle_success",
                 utils::translate("app_bell_settings_alarm_settings_alarm_tone_and_light_finished"),
