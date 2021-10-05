@@ -34,7 +34,7 @@ firefox build/doc/html/index.html
     - [Tethering](../tethering.md)
 
 - Developer Guides
-    - Coding Guidelines
+    - [Coding Guidelines](./MuditaCppCodingGuidelines.md)
     - System architecture
     - Modules
         - Applications
