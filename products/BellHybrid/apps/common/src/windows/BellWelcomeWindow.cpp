@@ -30,7 +30,7 @@ namespace gui
         muditaLogo->setMinimumSizeToFitImage();
 
         auto welcomeText = new TextFixedSize(body->centerBox);
-        welcomeText->setMinimumSize(style::bell_base_layout::w,
+        welcomeText->setMinimumSize(style::bell_base_layout::center_layout_w,
                                     style::bell_base_layout::center_layout_h - midline_correction);
         welcomeText->setFont(style::window::font::largelight);
         welcomeText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));

@@ -86,7 +86,7 @@ namespace gui
         listOverlay->centerBox->setEdges(RectangleEdge::None);
 
         body = new VBox(listOverlay->centerBox);
-        body->setAlignment(Alignment::Vertical::Top);
+        body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         body->setEdges(RectangleEdge::None);
 
         listOverlay->lastBox = new VBox(listOverlay);
@@ -107,10 +107,9 @@ namespace gui
         body->setMaximumSize(w, h);
 
         listOverlay->firstBox->setMinimumSize(w, outerLayoutsH);
-        listOverlay->firstBox->setMargins(Margins(0, 0, 0, outerLayoutsMargin));
         listOverlay->centerBox->setMaximumSize(w, h);
+        listOverlay->centerBox->setMargins(Margins(0, outerLayoutsMargin, 0, outerLayoutsMargin));
         listOverlay->lastBox->setMinimumSize(w, outerLayoutsH);
-        listOverlay->lastBox->setMargins(Margins(0, outerLayoutsMargin, 0, 0));
 
         widgetBody->resizeItems();
     }
@@ -127,7 +126,7 @@ namespace gui
         titleBody->setEditMode(EditMode::Browse);
         titleBody->setText(title);
 
-        body->setAlignment(Alignment(Alignment::Vertical::Top));
+        body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         listOverlay->firstBox->setVisible(true);
 
         listOverlay->resizeItems();
@@ -145,7 +144,11 @@ namespace gui
             auto elementsOnPage = listOverlay->centerBox->widgetArea.h / data.elementMinimalSpaceRequired;
 
             if (boundaries == Boundaries::Continuous) {
-                if (elementsOnPage < data.elementsCount) {
+                if (elementsOnPage == data.elementsCount) {
+                    listOverlay->firstBox->setVisible(true);
+                    listOverlay->lastBox->setVisible(false);
+                }
+                else if (elementsOnPage < data.elementsCount) {
                     listOverlay->firstBox->setVisible(true);
                     listOverlay->lastBox->setVisible(true);
                 }

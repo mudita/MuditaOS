@@ -14,6 +14,7 @@ namespace style::bell_base_layout
     constexpr inline auto outer_layouts_w     = 390U;
     constexpr inline auto outer_layouts_h     = 102U;
     constexpr inline auto outer_layout_margin = 39U;
+    constexpr inline auto center_layout_w     = 504U;
     constexpr inline auto center_layout_h     = h - 2 * outer_layout_margin - 2 * outer_layouts_h;
 
     enum class ParentType
@@ -21,7 +22,6 @@ namespace style::bell_base_layout
         SideListView,
         Window
     };
-
 } // namespace style::bell_base_layout
 
 namespace gui

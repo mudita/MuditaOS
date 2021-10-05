@@ -20,7 +20,6 @@ namespace gui
     {
         addOptions(settingsOptionsList());
         setListTitle(utils::translate("app_bellmain_settings"));
-        optionsList->setBoundaries(Boundaries::Continuous);
     }
 
     std::list<Option> BellSettingsWindow::settingsOptionsList()

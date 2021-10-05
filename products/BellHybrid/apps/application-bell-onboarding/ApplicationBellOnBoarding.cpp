@@ -7,6 +7,7 @@
 #include <windows/OnBoardingLanguageWindow.hpp>
 #include <windows/OnBoardingFinalizeWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
+#include <windows/OnBoardingInstructionPromptWindow.hpp>
 
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
@@ -18,6 +19,8 @@
 #include <application-bell-settings/models/TemperatureUnitModel.hpp>
 #include <application-bell-settings/models/TimeUnitsModel.hpp>
 #include <application-bell-settings/presenter/TimeUnitsPresenter.hpp>
+#include <Timers/TimerFactory.hpp>
+#include <AppMessage.hpp>
 
 namespace app
 {
@@ -43,6 +46,12 @@ namespace app
             }
             return sys::msgNotHandled();
         });
+
+        informationPromptTimer = sys::TimerFactory::createSingleShotTimer(
+            this,
+            OnBoarding::informationTimerName,
+            OnBoarding::informationPromptTimeout,
+            [this]([[maybe_unused]] sys::Timer &timer) { displayInformation(getCurrentWindow()->getName()); });
 
         return sys::ReturnCodes::Success;
     }
@@ -75,6 +84,11 @@ namespace app
                     std::make_unique<OnBoarding::OnBoardingFinalizeWindowPresenter>([&]() { finalizeOnBoarding(); });
                 return std::make_unique<gui::OnBoardingFinalizeWindow>(app, std::move(presenter));
             });
+
+        windowsFactory.attach(gui::window::name::informationOnBoardingWindow,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::OnBoardingInstructionPromptWindow>(app, name);
+                              });
     }
 
     void ApplicationBellOnBoarding::destroyUserInterface()
@@ -88,7 +102,22 @@ namespace app
     sys::MessagePointer ApplicationBellOnBoarding::DataReceivedHandler(sys::DataMessage *msgl,
                                                                        sys::ResponseMessage *resp)
     {
-        auto retMsg = Application::DataReceivedHandler(msgl);
+        auto retMsg = sys::msgNotHandled();
+        // DataReceiveHandler is deprecated so when it will be moved to connect this parts also have to be moved
+        if (msgl->messageType == MessageType::AppInputEvent) {
+            if (!handleInformationOnInputEvent(msgl)) {
+                retMsg = ApplicationCommon::DataReceivedHandler(msgl);
+            }
+        }
+        else if (msgl->messageType == MessageType::AppSwitchWindow) {
+            handleInformationBeforeSwitchWindow(msgl);
+            retMsg = ApplicationCommon::DataReceivedHandler(msgl);
+            handleInformationAfterSwitchWindow();
+        }
+        else {
+            retMsg = Application::DataReceivedHandler(msgl);
+        }
+
         if (auto response = dynamic_cast<sys::ResponseMessage *>(retMsg.get());
             response != nullptr && response->retCode == sys::ReturnCodes::Success) {
             return retMsg;
@@ -100,5 +129,97 @@ namespace app
     void ApplicationBellOnBoarding::finalizeOnBoarding()
     {
         bus.sendUnicast(std::make_shared<onBoarding::FinalizeOnBoarding>(), service::name::appmgr);
+    }
+
+    void ApplicationBellOnBoarding::displayInformation(const std::string &windowToReturn)
+    {
+        auto [icon, text] = getDisplayDataFromState();
+        switchWindow(gui::window::name::informationOnBoardingWindow,
+                     gui::BellFinishedWindowData::Factory::create(icon, utils::translate(text), windowToReturn));
+    }
+
+    OnBoarding::InformationDisplay ApplicationBellOnBoarding::getDisplayDataFromState()
+    {
+        switch (informationState) {
+        case OnBoarding::InformationStates::RotateInfo:
+            return {"button_rotate_W_G", "app_bell_onboarding_info_rotate"};
+        case OnBoarding::InformationStates::LightClickInfo:
+            return {"button_light_press_W_G", "app_bell_onboarding_info_light_click"};
+        case OnBoarding::InformationStates::DeepClickWarningInfo:
+            return {"button_deep_press_W_G", "app_bell_onboarding_info_deep_click_warning"};
+        case OnBoarding::InformationStates::DeepClickCorrectionInfo:
+            return {"button_light_press_W_G", "app_bell_onboarding_info_deep_click_correction"};
+        }
+        return {"", ""};
+    }
+
+    bool ApplicationBellOnBoarding::isInformationPromptPermittedOnCurrentWindow()
+    {
+        auto currentWindow = getCurrentWindow()->getName();
+        return (currentWindow != gui::name::window::main_window &&
+                currentWindow != gui::window::name::finalizeOnBoardingWindow &&
+                currentWindow != gui::window::name::informationOnBoardingWindow);
+    }
+
+    void ApplicationBellOnBoarding::startTimerOnWindows()
+    {
+        if (isInformationPromptPermittedOnCurrentWindow()) {
+            informationPromptTimer.start();
+        }
+    }
+
+    void ApplicationBellOnBoarding::handleInformationBeforeSwitchWindow(sys::DataMessage *msgl)
+    {
+        auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
+
+        auto selectedWindowCondition =
+            getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow &&
+            msg->getWindowName() == getPrevWindow() &&
+            msg->getSenderWindowName() == gui::window::name::informationOnBoardingWindow;
+
+        if (selectedWindowCondition && informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
+
+            informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
+            displayInformation(msg->getWindowName());
+            informationState = OnBoarding::InformationStates::RotateInfo;
+        }
+    }
+
+    void ApplicationBellOnBoarding::handleInformationAfterSwitchWindow()
+    {
+        startTimerOnWindows();
+    }
+
+    bool ApplicationBellOnBoarding::handleInformationOnInputEvent(sys::DataMessage *msgl)
+    {
+        auto inputEvent = static_cast<AppInputEventMessage *>(msgl)->getEvent();
+
+        if (isInformationPromptPermittedOnCurrentWindow()) {
+            startTimerOnWindows();
+
+            if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) || inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN)) {
+                informationState = OnBoarding::InformationStates::LightClickInfo;
+            }
+            else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RIGHT)) {
+                informationState = OnBoarding::InformationStates::DeepClickWarningInfo;
+                displayInformation(getCurrentWindow()->getName());
+            }
+            else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
+                informationState = OnBoarding::InformationStates::RotateInfo;
+            }
+
+            return false;
+        }
+
+        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER) &&
+            informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
+            informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
+
+            displayInformation(getPrevWindow());
+            informationState = OnBoarding::InformationStates::RotateInfo;
+            return true;
+        }
+
+        return false;
     }
 } // namespace app

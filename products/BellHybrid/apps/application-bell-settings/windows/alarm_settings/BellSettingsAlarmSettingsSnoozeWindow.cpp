@@ -62,9 +62,9 @@ namespace gui
     void BellSettingsAlarmSettingsSnoozeWindow::exit()
     {
         presenter->saveData();
-        application->switchWindow(BellFinishedWindow::defaultName,
+        application->switchWindow(window::bell_finished::defaultName,
                                   BellFinishedWindowData::Factory::create(
-                                      "big_check_W_M",
+                                      "big_check_W_G",
                                       utils::translate("app_bell_settings_alarm_settings_snooze_finished"),
                                       BellSettingsAlarmSettingsMenuWindow::name));
     }

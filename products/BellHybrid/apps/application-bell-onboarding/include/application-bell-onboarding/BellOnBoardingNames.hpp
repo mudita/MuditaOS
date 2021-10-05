@@ -10,8 +10,10 @@ namespace app
 
 namespace gui::window::name
 {
-    inline constexpr auto onBoardingWelcomeWindow  = "BellOnBoardingWelcome";
-    inline constexpr auto onBoardingLanguageWindow = "BellOnBoardingLanguage";
-    inline constexpr auto onBoardingSettingsWindow = "BellOnBoardingSettings";
-    inline constexpr auto finalizeOnBoardingWindow = "BellOnBoardingFinalize";
+    inline constexpr auto onBoardingWelcomeWindow     = "BellOnBoardingWelcome";
+    inline constexpr auto onBoardingLanguageWindow    = "BellOnBoardingLanguage";
+    inline constexpr auto onBoardingSettingsWindow    = "BellOnBoardingSettings";
+    inline constexpr auto finalizeOnBoardingWindow    = "BellOnBoardingFinalize";
+    inline constexpr auto informationOnBoardingWindow = "BellOnBoardingInformation";
+
 } // namespace gui::window::name
