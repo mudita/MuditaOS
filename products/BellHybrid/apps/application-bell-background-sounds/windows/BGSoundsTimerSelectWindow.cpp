@@ -99,8 +99,8 @@ namespace gui
     void BGSoundsTimerSelectWindow::createBottomDescription()
     {
         bottomDescription = new gui::Text();
-        bottomDescription->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
-        bottomDescription->setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
+        bottomDescription->setMinimumSize(style::bell_base_layout::outer_layouts_w,
+                                          style::bell_base_layout::outer_layouts_h);
         bottomDescription->setFont(bgSoundsStyle::descriptionFont);
         bottomDescription->setEdges(RectangleEdge::All);
         bottomDescription->activeItem = false;

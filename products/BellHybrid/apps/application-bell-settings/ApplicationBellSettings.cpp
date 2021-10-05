@@ -57,7 +57,7 @@ namespace app
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
             if (gui::window::name::bellSettingsLanguage == getCurrentWindow()->getName()) {
 
-                switchWindow(gui::BellFinishedWindow::defaultName,
+                switchWindow(gui::window::bell_finished::defaultName,
                              gui::BellFinishedWindowData::Factory::create(
                                  "big_check_W_G",
                                  utils::translate("app_bell_settings_advanced_language_set"),
@@ -106,7 +106,7 @@ namespace app
                 return std::make_unique<gui::BellSettingsFrontlightWindow>(app, std::move(presenter));
             });
 
-        windowsFactory.attach(gui::BellFinishedWindow::defaultName,
+        windowsFactory.attach(gui::window::bell_finished::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellFinishedWindow>(app);
                               });

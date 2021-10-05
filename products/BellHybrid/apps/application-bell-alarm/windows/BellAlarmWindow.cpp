@@ -38,7 +38,7 @@ namespace gui
         body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height);
 
         topText = new Label(body->firstBox);
-        topText->setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
+        topText->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
         topText->setText(utils::translate("app_bellmain_alarm"));
         topText->setFont(bell_alarm_style::top_text::font);
         topText->setEdges(RectangleEdge::None);

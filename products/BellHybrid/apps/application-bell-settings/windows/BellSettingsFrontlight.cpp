@@ -41,7 +41,7 @@ namespace gui
         body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height);
 
         topText = new Label(body->firstBox);
-        topText->setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
+        topText->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
         topText->setText(utils::translate("app_bell_settings_frontlight_top_message"));
         topText->setFont(bell_settings_style::top_text::font);
         topText->setEdges(RectangleEdge::None);
@@ -76,9 +76,9 @@ namespace gui
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             presenter->saveData();
 
-            application->switchWindow(BellFinishedWindow::defaultName,
+            application->switchWindow(window::bell_finished::defaultName,
                                       BellFinishedWindowData::Factory::create(
-                                          "big_check_W_M",
+                                          "big_check_W_G",
                                           utils::translate("app_bell_settings_frontlight_finished_message"),
                                           window::name::bellSettingsAdvanced));
             return true;

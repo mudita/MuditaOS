@@ -29,7 +29,7 @@ namespace gui
         centerBox = new VBox(this);
         centerBox->setEdges(RectangleEdge::None);
         centerBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        centerBox->setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
+        centerBox->setMinimumSize(style::bell_base_layout::center_layout_w, style::bell_base_layout::center_layout_h);
 
         lastBox = new VBox(this);
         lastBox->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
@@ -94,7 +94,8 @@ namespace gui
         centerThreeBox->centerBox = new HBox(centerThreeBox);
         centerThreeBox->centerBox->setEdges(RectangleEdge::None);
         centerThreeBox->centerBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
-        centerThreeBox->centerBox->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
+        centerThreeBox->centerBox->setMaximumSize(style::bell_base_layout::center_layout_w,
+                                                  style::bell_base_layout::center_layout_h);
 
         centerThreeBox->lastBox = new HBox(centerThreeBox);
         centerThreeBox->lastBox->setAlignment(Alignment(Alignment::Vertical::Center));

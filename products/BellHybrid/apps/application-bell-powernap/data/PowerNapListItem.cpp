@@ -55,7 +55,8 @@ namespace gui
     void PowerNapListItem::createBottomDescription()
     {
         bottomDescription = new Label(body->lastBox);
-        bottomDescription->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
+        bottomDescription->setMaximumSize(style::bell_base_layout::outer_layouts_w,
+                                          style::bell_base_layout::outer_layouts_h);
         bottomDescription->setFont(powerNapStyle::descriptionFont);
         bottomDescription->setEdges(RectangleEdge::None);
         bottomDescription->activeItem = false;
