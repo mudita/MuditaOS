@@ -5,7 +5,10 @@
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
 
 #include <appmgr/messages/AlarmMessage.hpp>
+#include <appmgr/messages/BatteryShutdown.hpp>
+#include <service-appmgr/messages/SwitchRequest.hpp>
 #include <service-appmgr/Constants.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace sys
 {
@@ -37,5 +40,12 @@ namespace sys
             break;
         }
         return MessageNone{};
+    }
+
+    void SystemManager::batteryShutdownLevelAction()
+    {
+        auto msg = std::make_shared<BatteryShutdown>();
+        bus.sendUnicast(msg, service::name::appmgr);
+        SystemManagerCommon::batteryShutdownLevelAction();
     }
 } // namespace sys

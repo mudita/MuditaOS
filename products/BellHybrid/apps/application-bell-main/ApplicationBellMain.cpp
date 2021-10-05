@@ -6,6 +6,7 @@
 #include "models/TemperatureModel.hpp"
 #include "presenters/HomeScreenPresenter.hpp"
 
+#include "windows/BellBatteryShutdownWindow.hpp"
 #include "windows/BellHomeScreenWindow.hpp"
 #include "windows/BellMainMenuWindow.hpp"
 
@@ -58,6 +59,10 @@ namespace app
         windowsFactory.attach(gui::window::name::bell_main_menu, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellMainMenuWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::bell_battery_shutdown,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellBatteryShutdownWindow>(app);
+                              });
 
         // for demo only - to be removed
         windowsFactory.attach(

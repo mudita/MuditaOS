@@ -9,6 +9,7 @@ target_sources(appmgr
         include/appmgr/messages/AlarmMessage.hpp
         include/appmgr/ApplicationManager.hpp
         include/appmgr/IdleHandler.hpp
+        include/appmgr/messages/BatteryShutdown.hpp
         include/appmgr/messages/PowerOffPopupRequestParams.hpp
         include/appmgr/messages/RebootPopupRequestParams.hpp
 )
@@ -21,6 +22,7 @@ target_include_directories(appmgr
 target_link_libraries(appmgr
    PRIVATE
         module-apps
+        application-bell-main
         application-bell-onboarding
         service-appmgr
    PUBLIC
