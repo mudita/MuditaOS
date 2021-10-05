@@ -134,6 +134,7 @@ namespace at
         SMS_URC_ON,
         ACT_URC_OFF,
         ACT_URC_ON,
+        SET_RNDIS,
     };
 
     enum class commadsSet

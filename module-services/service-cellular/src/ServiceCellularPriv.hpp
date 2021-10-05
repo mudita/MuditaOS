@@ -11,6 +11,7 @@
 #include "NetworkTime.hpp"
 #include "SimContacts.hpp"
 #include "ImeiGetHandler.hpp"
+#include "TetheringHandler.hpp"
 
 namespace cellular::internal
 {
@@ -18,7 +19,7 @@ namespace cellular::internal
     using service::SimCard;
     using service::SimContacts;
     using service::State;
-
+    using service::TetheringHandler;
     class ServiceCellularPriv
     {
         ServiceCellular *owner;
@@ -29,6 +30,7 @@ namespace cellular::internal
         std::unique_ptr<NetworkTime> networkTime;
         std::unique_ptr<SimContacts> simContacts;
         std::unique_ptr<service::ImeiGetHandler> imeiGetHandler;
+        std::unique_ptr<TetheringHandler> tetheringHandler;
         State::PowerState nextPowerState = State::PowerState::Off;
         std::uint8_t multiPartSMSUID     = 0;
 
@@ -47,7 +49,7 @@ namespace cellular::internal
       private:
         void initSimCard();
         void initSMSSendHandler();
-
+        void initTetheringHandler();
         /** Send SMS action used by the SMSSendHandler
          * \param record SMS record to send
          */
