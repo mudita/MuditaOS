@@ -3,9 +3,11 @@
 
 #include <appmgr/ApplicationManager.hpp>
 #include <appmgr/messages/AlarmMessage.hpp>
+#include <appmgr/messages/BatteryShutdown.hpp>
 #include <appmgr/messages/IdleTimerMessage.hpp>
-
+#include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
+#include <service-appmgr/Constants.hpp>
 
 namespace app::manager
 {
@@ -34,6 +36,23 @@ namespace app::manager
         return rootApplicationName;
     }
 
+    auto ApplicationManager::handleDisplayLowBatteryScreen(ActionEntry &action) -> ActionProcessStatus
+    {
+        SwitchRequest switchRequest(
+            service::name::appmgr, resolveHomeApplication(), gui::window::name::bell_battery_shutdown, nullptr);
+        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
+    }
+
+    ActionProcessStatus ApplicationManager::handleAction(ActionEntry &action)
+    {
+        switch (action.actionId) {
+        case actions::DisplayLowBatteryScreen:
+            return handleDisplayLowBatteryScreen(action);
+        default:
+            return ApplicationManagerCommon::handleAction(action);
+        }
+    }
+
     void ApplicationManager::registerMessageHandlers()
     {
         ApplicationManagerCommon::registerMessageHandlers();
@@ -53,5 +72,6 @@ namespace app::manager
         });
         connect(typeid(AlarmActivated), convertibleToActionHandler);
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
+        connect(typeid(BatteryShutdown), convertibleToActionHandler);
     }
 } // namespace app::manager
