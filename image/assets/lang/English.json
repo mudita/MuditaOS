@@ -487,6 +487,7 @@
   "app_phonebook_contact_no_name": "no name",
   "app_phonebook_contact_information": "Information",
   "app_phonebook_ice_contacts_title": "ICE Contacts",
+  "app_phonebook_favourite_contacts_title": "Favourite Contacts",
   "app_phonebook_duplicate_numbers": "Number $CONTACT_SPEED_DIAL$ is assigned to \n $CONTACT_NAME$. Replace it?",
   "app_phonebook_duplicate_speed_dial_title": "Speed dial key ($CONTACT_SPEED_DIAL$)",
   "app_phonebook_options_title": "Options",
