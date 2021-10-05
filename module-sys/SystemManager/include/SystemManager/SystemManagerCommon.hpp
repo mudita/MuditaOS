@@ -134,6 +134,7 @@ namespace sys
         ReturnCodes InitHandler() override;
         virtual void batteryNormalLevelAction();
         virtual void batteryCriticalLevelAction(bool charging);
+        virtual void batteryShutdownLevelAction();
 
       private:
         MessagePointer DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
@@ -183,7 +184,6 @@ namespace sys
         /// used for power management control for the filesystem
         void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
 
-        void batteryShutdownLevelAction();
 
         bool cpuStatisticsTimerInit{false};
 

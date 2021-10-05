@@ -5,6 +5,7 @@ target_sources(application-bell-main
     PRIVATE
         ApplicationBellMain.cpp
         widgets/BellBattery.cpp
+        windows/BellBatteryShutdownWindow.cpp
         windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
 
@@ -16,6 +17,7 @@ target_sources(application-bell-main
 
         widgets/BellBattery.hpp
 
+        windows/BellBatteryShutdownWindow.hpp
         windows/BellHomeScreenWindow.hpp
         windows/BellMainMenuWindow.hpp
 

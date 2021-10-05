@@ -15,11 +15,16 @@ namespace app::manager
                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
                            const ApplicationName &_rootApplicationName);
 
+      protected:
+        auto handleAction(ActionEntry &action) -> ActionProcessStatus override;
+
       private:
         sys::TimerHandle idleTimer;
 
         auto startApplication(ApplicationHandle &app) -> bool override;
         auto resolveHomeApplication() -> std::string override;
-        void registerMessageHandlers() override;
+        auto registerMessageHandlers() -> void override;
+
+        auto handleDisplayLowBatteryScreen(ActionEntry &action) -> ActionProcessStatus;
     };
 } // namespace app::manager
