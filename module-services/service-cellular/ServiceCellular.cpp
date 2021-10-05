@@ -102,6 +102,8 @@
 
 #include <ctime>
 
+#include <at/cmd/QCFGUsbnet.hpp>
+
 const char *ServiceCellular::serviceName = cellular::service::name;
 
 inline constexpr auto cellularStack = 8000;
@@ -291,24 +293,13 @@ void ServiceCellular::registerMessageHandlers()
     phoneModeObserver->subscribe(
         [this](sys::phone_modes::PhoneMode mode) { connectionManager->onPhoneModeChange(mode); });
     phoneModeObserver->subscribe([&](sys::phone_modes::Tethering tethering) {
-        using bsp::cellular::USB::setPassthrough;
-        using bsp::cellular::USB::PassthroughState;
         if (tethering == sys::phone_modes::Tethering::On) {
-            if (!tetheringTurnOffURC()) {
-                LOG_ERROR("Failed to disable URC on tethering enable");
-            }
+            priv->tetheringHandler->enable();
         }
         else {
-            if (!tetheringTurnOnURC()) {
-                LOG_ERROR("Failed to enable URC on tethering disable");
-            }
-            if (!receiveAllMessages()) {
-                LOG_ERROR("Failed to receive all sms after tethering disabling");
-            }
+            priv->tetheringHandler->disable();
             logTetheringCalls();
         }
-        setPassthrough(tethering == sys::phone_modes::Tethering::On ? PassthroughState::ENABLED
-                                                                    : PassthroughState::DISABLED);
     });
 
     priv->connectSimCard();
@@ -892,6 +883,8 @@ bool ServiceCellular::handle_audio_conf_procedure()
                 LOG_ERROR("Failed to handle phone mode");
                 return false;
             }
+
+            priv->tetheringHandler->configure();
 
             priv->state->set(State::ST::APNConfProcedure);
             return true;
