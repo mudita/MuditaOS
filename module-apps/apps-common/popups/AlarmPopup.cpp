@@ -85,9 +85,15 @@ namespace gui
 
     bool AlarmPopup::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease() && inputEvent.is(KeyCode::KEY_RF)) {
-            getPresenter()->stopAlarm();
-            return true;
+        if (inputEvent.isShortRelease()) {
+            if (inputEvent.is(KeyCode::KEY_RF)) {
+                getPresenter()->stopAlarm();
+                return true;
+            }
+            else if (inputEvent.is(KeyCode::KEY_LF)) {
+                getPresenter()->skipToNextSnooze();
+                return true;
+            }
         }
 
         return AppWindow::onInput(inputEvent);
@@ -156,6 +162,9 @@ namespace gui
                                  getPresenter()->snoozedTill());
             snoozeLabel->setMaximumWidth(style::window::default_body_width);
             snoozeLabel->setMinimumHeightToFitText();
+
+            bottomBar->setActive(BottomBar::Side::LEFT, true);
+            bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::skip));
         }
     }
 

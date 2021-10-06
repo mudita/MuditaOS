@@ -143,6 +143,12 @@ namespace app::popup
         LOG_DEBUG("Stopped!");
     }
 
+    void AlarmPopupPresenter::skipToNextSnooze()
+    {
+        this->getModel()->processIfSnoozed();
+        LOG_DEBUG("Snooze skipped");
+    }
+
     void AlarmPopupPresenter::handleAlarmSnoozed()
     {
         getApp()->returnToPreviousWindow();
