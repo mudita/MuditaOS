@@ -191,17 +191,6 @@ namespace gui
         return document->getText();
     }
 
-    bool Text::saveText(UTF8 path)
-    {
-        if (auto file = std::fopen(path.c_str(), "wb")) {
-            auto text = getText();
-            std::fwrite(text.c_str(), text.length(), text.length(), file);
-            std::fclose(file);
-            return true;
-        }
-        return false;
-    }
-
     void Text::setFont(const UTF8 &fontName)
     {
         RawFont *newFont = FontManager::getInstance().getFont(fontName);
