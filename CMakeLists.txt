@@ -23,8 +23,6 @@ include(SerialPort)
 include(CopyGdbInit)
 include(Utils)
 include(ModuleUtils)
-include(FetchBootloader)
-include(FetchPureUpdater)
 include(DiskImage)
 include(AddPackage)
 
@@ -167,8 +165,5 @@ add_custom_target(
 add_library(version-header INTERFACE)
 target_include_directories(version-header INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/source/include>)
 add_dependencies(version-header version)
-
-fetch_ecoboot()
-fetch_updater()
 
 add_subdirectory(products)
