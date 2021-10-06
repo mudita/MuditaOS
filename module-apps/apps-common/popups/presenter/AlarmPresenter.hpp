@@ -111,6 +111,7 @@ namespace app::popup
             virtual bool isSnoozeAble()           = 0;
             virtual void snoozeHit()              = 0;
             virtual void stopAlarm()              = 0;
+            virtual void skipToNextSnooze()       = 0;
             virtual void handleAlarmSnoozed()     = 0;
             virtual void handleAlarmTurnedOff()   = 0;
             virtual bool isSnoozed()              = 0;
@@ -135,6 +136,8 @@ namespace app::popup
         virtual void snoozeHit() override;
         /// action to stop alarm ringing
         virtual void stopAlarm() override;
+        /// action to skip to next snooze
+        virtual void skipToNextSnooze() override;
         /// action to call when we processed snoozing the alarm
         virtual void handleAlarmSnoozed() override;
         /// action to call when we turned off alarm successfully
