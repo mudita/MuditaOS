@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FontManager.hpp"
@@ -45,6 +45,9 @@ namespace gui
     {
 
         auto file = std::fopen(filename.c_str(), "rb");
+        if (file == nullptr) {
+            return nullptr;
+        }
 
         auto fileSize = std::filesystem::file_size(filename);
         std::rewind(file);

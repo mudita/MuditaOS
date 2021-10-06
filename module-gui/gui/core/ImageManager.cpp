@@ -75,6 +75,9 @@ namespace gui
     {
 
         auto file = std::fopen(filename.c_str(), "rb");
+        if (file == nullptr) {
+            return nullptr;
+        }
 
         auto fileSize = std::filesystem::file_size(filename);
 
