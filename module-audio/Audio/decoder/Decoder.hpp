@@ -83,6 +83,7 @@ namespace audio
         uint32_t chanNumber = 0;
         float position      = 0;
         std::FILE *fd       = nullptr;
+        std::unique_ptr<char[]> streamBuffer;
         uint32_t fileSize   = 0;
         std::string filePath;
 

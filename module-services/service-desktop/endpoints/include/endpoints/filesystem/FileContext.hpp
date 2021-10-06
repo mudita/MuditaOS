@@ -39,11 +39,11 @@ class FileContext
   protected:
     std::filesystem::path path{};
     std::FILE *file{};
+    std::unique_ptr<char[]> streamBuffer;
     std::size_t size{};
     std::size_t offset{};
     std::size_t chunkSize{};
     CRC32 runningCrc32Digest;
-    std::unique_ptr<char[]> streamBuffer;
 };
 
 class FileReadContext : public FileContext

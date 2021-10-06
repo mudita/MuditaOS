@@ -17,7 +17,7 @@ FileContext::FileContext(
         throw std::runtime_error("File open error");
     }
 
-    constexpr size_t streamBufferSize = 16384;
+    constexpr size_t streamBufferSize = 64 * 1024;
     streamBuffer                      = std::make_unique<char[]>(streamBufferSize);
     setvbuf(file, streamBuffer.get(), _IOFBF, streamBufferSize);
 

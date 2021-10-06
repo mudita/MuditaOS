@@ -56,7 +56,13 @@ static bool copyFile(const std::filesystem::path &from, const std::filesystem::p
     std::unique_ptr<unsigned char[]> buffer = std::make_unique<unsigned char[]>(purefs::buffer::tar_buf);
     size_t bytes;
 
-    while ((bytes = std::fread(buffer.get(), 1, purefs::buffer::tar_buf, fromFp)) != 0) {
+    constexpr size_t streamBufferSize = 64 * 1024;
+    auto streamBufferFrom             = std::make_unique<char[]>(streamBufferSize);
+    auto streamBufferTo               = std::make_unique<char[]>(streamBufferSize);
+    setvbuf(fromFp, streamBufferFrom.get(), _IOFBF, streamBufferSize);
+    setvbuf(toFp, streamBufferTo.get(), _IOFBF, streamBufferSize);
+
+    while ((bytes = std::fread(buffer.get(), purefs::buffer::tar_buf, 1, fromFp)) != 0) {
         if (std::fwrite(buffer.get(), 1, bytes, toFp) != bytes) {
             return false;
         }
@@ -220,14 +226,16 @@ bool BackupRestore::PackUserFiles(std::filesystem::path &path)
     LOG_INFO("opening tar file...");
 
     int ret = mtar_open(&tarFile, tarFilePath.c_str(), "w");
-
     if (ret != MTAR_ESUCCESS) {
         LOG_ERROR("opening tar file failed, quitting...");
         BackupRestore::RemoveBackupDir(path);
         return false;
     }
 
-    auto buffer = std::make_unique<unsigned char[]>(purefs::buffer::tar_buf);
+    auto buffer                       = std::make_unique<unsigned char[]>(purefs::buffer::tar_buf);
+    constexpr size_t streamBufferSize = 64 * 1024;
+    auto streamBuffer                 = std::make_unique<char[]>(streamBufferSize);
+    setvbuf(tarFile.stream, streamBuffer.get(), _IOFBF, streamBufferSize);
     std::error_code e;
 
     for (auto &direntry : std::filesystem::directory_iterator(path)) {
@@ -356,7 +364,10 @@ bool BackupRestore::UnpackBackupFile(const std::filesystem::path &tarFilePath)
         return false;
     }
 
-    auto buffer = std::make_unique<unsigned char[]>(purefs::buffer::tar_buf);
+    auto buffer                       = std::make_unique<unsigned char[]>(purefs::buffer::tar_buf);
+    constexpr size_t streamBufferSize = 64 * 1024;
+    auto streamBuffer                 = std::make_unique<char[]>(streamBufferSize);
+    setvbuf(tarFile.stream, streamBuffer.get(), _IOFBF, streamBufferSize);
 
     do {
         ret = mtar_read_header(&tarFile, &tarHeader);
@@ -373,6 +384,10 @@ bool BackupRestore::UnpackBackupFile(const std::filesystem::path &tarFilePath)
                 mtar_close(&tarFile);
                 return false;
             }
+
+            constexpr size_t streamBufferSize = 16 * 1024;
+            auto streamBuffer                 = std::make_unique<char[]>(streamBufferSize);
+            setvbuf(file, streamBuffer.get(), _IOFBF, streamBufferSize);
 
             uint32_t loopcount = (tarHeader.size / purefs::buffer::tar_buf) + 1u;
             uint32_t readsize  = 0u;
@@ -394,7 +409,7 @@ bool BackupRestore::UnpackBackupFile(const std::filesystem::path &tarFilePath)
                     return false;
                 }
 
-                if (std::fwrite(buffer.get(), 1, readsize, file) != readsize) {
+                if (std::fwrite(buffer.get(), readsize, 1, file) != readsize) {
                     LOG_ERROR("writting file failed, quitting...");
                     mtar_close(&tarFile);
                     std::fclose(file);
