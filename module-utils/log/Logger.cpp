@@ -68,8 +68,8 @@ namespace Log
 
     void Logger::init(Application app, size_t fileSize)
     {
-        application      = std::move(app);
-        maxFileSize      = fileSize;
+        application = std::move(app);
+        maxFileSize = fileSize;
 #if LOG_USE_COLOR == 1
         enableColors(true);
 #else
@@ -156,6 +156,10 @@ namespace Log
             if (!logFile.good()) {
                 status = -EIO;
             }
+
+            constexpr size_t streamBufferSize = 64 * 1024;
+            auto streamBuffer                 = std::make_unique<char[]>(streamBufferSize);
+            logFile.rdbuf()->pubsetbuf(streamBuffer.get(), streamBufferSize);
 
             if (firstDump) {
                 addFileHeader(logFile);
