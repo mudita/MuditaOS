@@ -42,7 +42,7 @@ curl -o /dev/null -H "Authorization: token $(git config user.apitoken)" "https:/
 
 2. Check if you can list releases on repository:
 ```
-python3 ./tools/download_asset.py -w ./ PureUpdater list                                                                                                                                             21s[cbe063dc6]
+python3 ./tools/download_asset.py -w ./ --repository PureUpdater list                                                                                                                                             21s[cbe063dc6]
 ```
 
 **if not** Then fix your token, or request access to PureUpdater

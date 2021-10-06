@@ -99,6 +99,11 @@ add_image(
 include(AddHexTarget)
 add_hex_target(PurePhone)
 
+include(BinaryAssetsVersions.cmake)
+include(DownloadAsset)
+download_asset(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION})
+download_asset(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION})
+
 include(AddVersionJson)
 add_version_json(PurePhone)
 
