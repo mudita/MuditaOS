@@ -46,11 +46,12 @@ namespace app::bgSounds
 
     class BGSoundsRepository : public AbstractSoundsRepository
     {
-        static constexpr auto musicSubfolderName = "music";
+        static constexpr auto bgsoundsSubfolderPath = "assets/audio/bell/bg_sounds";
 
       public:
         explicit BGSoundsRepository(std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
-                                    std::string musicFolderName = purefs::dir::getUserDiskPath() / musicSubfolderName);
+                                    std::string musicFolderName = purefs::dir::getCurrentOSPath() /
+                                                                  bgsoundsSubfolderPath);
 
         void scanMusicFilesList() override;
         std::vector<tags::fetcher::Tags> getMusicFilesList() const override;
