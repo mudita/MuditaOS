@@ -95,7 +95,7 @@
 [submodule "klib"]
 	path = third-party/klib/src
 	url = https://github.com/attractivechaos/klib.git
-[submodule "third-party/lwext4/lwext4"]
+[submodule "lwext4"]
 	path = third-party/lwext4/lwext4
 	url = ../lwext4.git
 	branch = mudita
