@@ -83,11 +83,12 @@ class Getter(object):
 
     def getReleases(self, args):
         '''List only releases'''
+        print(f"{sys._getframe().f_code.co_name}")
         self.args = args
         self.getGHLogin(args)
         self.getApiToken(args)
         request = self.genRestPrefix() + "releases"
-        print ("Request:", request)
+        print (f"Request: {request}")
         headers = {'accept': 'application/vnd.github.v3+json'}
         page = 0
         itemsOnPage = 100
@@ -121,29 +122,46 @@ class Getter(object):
         for release in self.releases:
             print(release['tag_name'], release['name'], release['published_at'], release['prerelease'], sep=" | ")
 
-    def downloadRelease(self, args):
-        print(sys._getframe().f_code.co_name)
-        self.getReleases(args)
-        print("tag:", args.tag)
-        print("asset:", args.assetRepoName)
-        release = None
-        if args.tag is None:
-            release = self.releases[0]
+    def getProductByName(self, repository: str, product: str, version: str) -> str:
+        '''
+        We have naming convetion of releases:
+        "$Product $Version"
+        where:
+            - product is product built i.e. ecoboot
+            - version - is semantic version we use
+        '''
+        if "bell" in product.lower():
+            product = "bell"
+        elif "pure" in product.lower():
+            product = "pure"
         else:
-            for rel in self.releases:
-                if rel['tag_name'] == args.tag:
-                    release = rel
-                    break
+            print("we require short version in this script - either pure or bell")
+            sys.exit(2)
+
+        return f"{repository} {version}-{product}"
+
+    def downloadRelease(self, args):
+        print(f"{sys._getframe().f_code.co_name} from: {args.repository}")
+        self.getReleases(args)
+        release_requested = self.getProductByName(args.repository, args.product, args.version)
+        release = None
+        for rel in self.releases:
+            # warning just taken first from partial match, should be done differently
+            if release_requested in rel['name']:
+                release = rel
+                break
         if release is None:
-            print("No release with tag:", args.tag)
-        print("release:", release['tag_name'])
+            raise RuntimeError(f"Can't get release by release name: {release_requested} with args: {args}")
+        print(f"Trying to download release from {args.repository} under name: {release_requested}")
         assets = release['assets']
 
+        found = False
         for asset in assets:
             if asset['name'] == args.assetRepoName:
                 self.downloadAsset(asset, args.assetOutName)
-                with open(args.workdir + '/' + args.repository + '.version', 'w+') as versionfile:
-                    versionfile.write(release['tag_name'])
+                found = True
+        if not found:
+            raise(RuntimeError(f"asset not found {args.assetRepoName} and cant be saved as {args.assetOutName}"))
 
     def downloadAsset(self, asset, outName):
         self.createWorkdir()
@@ -182,7 +200,7 @@ def main():
     getter = Getter()
 
     parser = argparse.ArgumentParser(description="Download ecooboot")
-    parser.add_argument('-w', '--workdir', help="Directory where package is build", default="update")
+    parser.add_argument('--workdir', help="Directory where package is build", default="update")
     parser.add_argument('-t', '--token',
                         help="GitHub security token "
                              "by default read from `git config user.apitoken` "
@@ -197,7 +215,7 @@ def main():
                              "`git config -add user.githublogin <login>`",
                         required=(getter.ghLogin is None))
 
-    parser.add_argument('repository', help="repository name from which assets will be downloaded")
+    parser.add_argument('--repository', help="repository name from which assets will be downloaded")
 
     parser.set_defaults(func=getter.run)
     subparsers = parser.add_subparsers(title="commands",
@@ -209,9 +227,10 @@ def main():
     getReleases_args = subparsers.add_parser('download', aliases=['dw'],
                                              description="Download Release based on tag or the latest")
     getReleases_args.set_defaults(func=getter.downloadRelease)
-    getReleases_args.add_argument('tag', help="Download release with selected tag", nargs='?')
-    getReleases_args.add_argument('-n', '--assetRepoName', help="Asset name in repository", required=True)
-    getReleases_args.add_argument('-o', '--assetOutName', help="Asset output name", required=True)
+    getReleases_args.add_argument('--assetRepoName', help="Asset name in repository", required=True)
+    getReleases_args.add_argument('--assetOutName', help="Asset output name", required=True)
+    getReleases_args.add_argument('--version', help="Asset version", required=True)
+    getReleases_args.add_argument('--product', help="Asset product", required=True)
 
     args = parser.parse_args()
     getter.repo = args.repository

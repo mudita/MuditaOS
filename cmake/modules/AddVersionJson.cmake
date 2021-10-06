@@ -6,17 +6,17 @@ function(add_version_json SOURCE_TARGET)
             -DDST_FILE=${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json
             -DBOOTLOADER_FILENAME=ecoboot.bin
             -DBOOTLOADER_FILE=${CMAKE_BINARY_DIR}/ecoboot.bin
-            -DBOOTLOADER_VERSION_FILE=${CMAKE_BINARY_DIR}/ecoboot.version
             -DBOOT_FILENAME=boot.bin
             -DBOOT_FILE=$<TARGET_PROPERTY:${SOURCE_TARGET},BIN_FILE>
             -DBOOT_VERSION=${PROJECT_VERSION}
             -DUPDATER_FILENAME=updater.bin
             -DUPDATER_FILE=${CMAKE_BINARY_DIR}/updater.bin
-            -DUPDATER_VERSION_FILE=${CMAKE_BINARY_DIR}/PureUpdater.version
             -DOS_VERSION_MAJOR=${OS_VERSION_MAJOR}
             -DOS_VERSION_MINOR=${OS_VERSION_MINOR}
             -DOS_VERSION_PATCH=${OS_VERSION_PATCH}
             -DOS_VERSION_LABEL=${OS_VERSION_LABEL}
+            -DECOBOOT_BIN_VERSION=${ECOBOOT_BIN_VERSION}
+            -DUPDATER_BIN_VERSION=${UPDATER_BIN_VERSION}
             -B ${CMAKE_BINARY_DIR}
             -P ${CMAKE_SOURCE_DIR}/cmake/modules/ConfigureVersionJson.cmake
         DEPENDS ecoboot.bin-target

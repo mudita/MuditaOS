@@ -10,7 +10,7 @@
     },
     "bootloader":
     {
-        "version":  "@BOOTLOADER_VERSION@",
+        "version":  "@ECOBOOT_BIN_VERSION@",
         "filename": "@BOOTLOADER_FILENAME@",
         "md5sum":   "@BOOTLOADER_MD5SUM@"
     },
@@ -22,7 +22,7 @@
     },
     "updater":
     {
-        "version":  "@UPDATER_VERSION@",
+        "version":  "@UPDATER_BIN_VERSION@",
         "filename": "@UPDATER_FILENAME@",
         "md5sum":   "@UPDATER_MD5SUM@"
     }
