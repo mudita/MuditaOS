@@ -154,8 +154,6 @@ namespace gui
         virtual void clear();
         bool isEmpty();
         virtual UTF8 getText() const;
-        /// saves text from widget to file at specified path
-        virtual bool saveText(UTF8 path);
         void setFont(const UTF8 &fontName);
         void setFont(RawFont *font);
         void setMinimumWidthToFitText(const UTF8 &text);
