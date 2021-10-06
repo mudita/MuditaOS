@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Encoder.hpp"
@@ -19,6 +19,9 @@ namespace audio
         if (fd == NULL) {
             return;
         }
+        constexpr size_t streamBufferSize = 6;
+        streamBuffer                      = std::make_unique<char[]>(streamBufferSize);
+        setvbuf(fd, streamBuffer.get(), _IOFBF, streamBufferSize);
         isInitialized = true;
     }
 

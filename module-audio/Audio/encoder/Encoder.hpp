@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,8 +40,9 @@ namespace audio
         const Format format;
 
       protected:
-        float position    = 0;
-        std::FILE *fd     = nullptr;
+        float position = 0;
+        std::FILE *fd  = nullptr;
+        std::unique_ptr<char[]> streamBuffer;
         uint32_t fileSize = 0;
         std::string filePath;
 
@@ -49,4 +50,3 @@ namespace audio
     };
 
 } // namespace audio
-

@@ -128,7 +128,6 @@
 #include <Utils.hpp>
 #include <dirent.h>
 
-
 /*
  ** Size of the write buffer used by journal files in bytes.
  */
@@ -152,6 +151,7 @@ struct EcophoneFile
 {
     sqlite3_file base; /* Base class. Must be first. */
     std::FILE *fd;     /* File descriptor */
+    std::unique_ptr<char[]> streamBuffer;
 
     char *aBuffer;             /* Pointer to malloc'd buffer */
     int nBuffer;               /* Valid bytes of data in zBuffer */
@@ -317,6 +317,7 @@ static int ecophoneClose(sqlite3_file *pFile)
     EcophoneFile *p = (EcophoneFile *)pFile;
     rc              = ecophoneFlushBuffer(p);
     sqlite3_free(p->aBuffer);
+    p->streamBuffer.reset();
 
     std::fclose(p->fd);
     return rc;
@@ -616,6 +617,10 @@ static int ecophoneOpen(sqlite3_vfs *pVfs,   /* VFS */
         sqlite3_free(aBuf);
         return SQLITE_CANTOPEN;
     }
+    // set as 16 kB instead 64kB as it is allocated for each open db file
+    constexpr size_t streamBufferSize = 16 * 1024;
+    p->streamBuffer                   = std::make_unique<char[]>(streamBufferSize);
+    setvbuf(p->fd, p->streamBuffer.get(), _IOFBF, streamBufferSize);
     p->aBuffer = aBuf;
 
     if (pOutFlags) {
