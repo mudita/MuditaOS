@@ -23,6 +23,10 @@ namespace audio
             return;
         }
 
+        constexpr size_t streamBufferSize = 16 * 1024;
+        streamBuffer                      = std::make_unique<char[]>(streamBufferSize);
+        setvbuf(fd, streamBuffer.get(), _IOFBF, streamBufferSize);
+
         std::fseek(fd, 0, SEEK_END);
         fileSize = std::ftell(fd);
         std::rewind(fd);
