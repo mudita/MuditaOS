@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AudioMux.hpp"
@@ -11,8 +11,8 @@ namespace audio
         const std::map<PlaybackType, uint8_t> PlaybackTypePriority = {
             {PlaybackType::Meditation, 1},
             {PlaybackType::CallRingtone, 2},
-            {PlaybackType::Multimedia, 3},
-            {PlaybackType::Alarm, 4},
+            {PlaybackType::Alarm, 3},
+            {PlaybackType::Multimedia, 4},
             {PlaybackType::TextMessageRingtone, 5},
             {PlaybackType::Notifications, 5},
             {PlaybackType::KeypadSound, 6},
