@@ -29,6 +29,7 @@ export declare ignore_paths=(
     'module-bluetooth/Bluetooth/glucode/btstack_uart_block_rt1051.h'
     'module-bluetooth/Bluetooth/glucode/hal_time_ms.c'
     'module-bluetooth/lib/btstack/'
+    'module-bsp/board/rt1051/bellpx/bsp/audio/AW8898regs.hpp'
     'module-bsp/board/rt1051/bsp/eMMC/'
     'module-bsp/board/rt1051/bsp/pwr/'
     'module-bsp/board/rt1051/common/board.cpp'

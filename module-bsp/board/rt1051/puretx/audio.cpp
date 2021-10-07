@@ -11,12 +11,12 @@ extern "C"
 #include "dma_config.h"
 }
 
-using namespace bsp;
+using namespace bsp::audio;
 using namespace drivers;
 
-bsp::AudioConfig audioConfig;
+bsp::audio::AudioConfig audioConfig;
 
-void bsp::audioInit()
+void bsp::audio::init()
 {
     audioConfig.pllAudio =
         DriverPLL::Create(static_cast<PLLInstances>(BoardDefinitions ::AUDIO_PLL), DriverPLLParams{});
@@ -51,7 +51,7 @@ void bsp::audioInit()
     SAI_RxInit(BOARD_AUDIOCODEC_SAIx, &audioConfig.config);
 }
 
-void bsp::audioDeinit()
+void bsp::audio::deinit()
 {
     memset(&audioConfig.config, 0, sizeof(audioConfig.config));
     SAI_Deinit(BOARD_AUDIOCODEC_SAIx);
@@ -68,7 +68,7 @@ void bsp::audioDeinit()
     audioConfig.pllAudio.reset();
 }
 
-AudioConfig *bsp::AudioConfig::get()
+AudioConfig *AudioConfig::get()
 {
     return &audioConfig;
 }
