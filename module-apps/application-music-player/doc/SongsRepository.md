@@ -32,3 +32,12 @@ The cache for musicFiles contains a list of songs currently being processed. It 
      - when we receive newFrontData, new records are added at the beginning of the musicFiles cache and records from the end of the list are deleted 
 
 ![](./data/newFrontData.svg)
+
+## Sort/Repeat Mode
+
+  - The repeat mode does not affect the list of songs downloaded by the view (ListViewEngine), so the list view is sorted only by the sort mode.
+  - It is different for the model: each Music Files Cache update must follow the logic shown in the diagram below.
+  - Each change of sort / repeat mode must update the data according to this scheme.
+  - For the shuffle mode, random songs are downloaded to the music files cache, therefore getting the next and previous track is done in the same way as for the other modes.
+
+![](./data/UpdateRepoSortRepeatModes.svg)
