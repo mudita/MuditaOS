@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <functional>
+#include <optional>
 
 namespace at
 {
