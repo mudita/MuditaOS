@@ -4,6 +4,9 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
+#include <apps-common/AudioOperations.hpp>
+#include <common/models/AbstractAudioModel.hpp>
+#include <common/SoundsRepository.hpp>
 #include <memory>
 
 namespace gui
@@ -41,7 +44,9 @@ namespace app::bell_settings
     {
       public:
         AlarmSettingsPresenter(std::shared_ptr<AlarmSettingsListItemProvider> provider,
-                               std::unique_ptr<AbstractAlarmSettingsModel> model);
+                               std::unique_ptr<AbstractAlarmSettingsModel> model,
+                               std::unique_ptr<AbstractAudioModel> audioModel,
+                               std::unique_ptr<AbstractSoundsRepository> soundsRepository);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto saveData() -> void override;
@@ -49,7 +54,12 @@ namespace app::bell_settings
         auto eraseProviderData() -> void override;
 
       private:
+        void stopSound();
+
         std::shared_ptr<AlarmSettingsListItemProvider> provider;
         std::unique_ptr<AbstractAlarmSettingsModel> model;
+        std::unique_ptr<AbstractAudioModel> audioModel;
+        std::unique_ptr<AbstractSoundsRepository> soundsRepository;
+        audio::Token currentToken;
     };
 } // namespace app::bell_settings

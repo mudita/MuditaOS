@@ -9,11 +9,6 @@ namespace bell::settings
     {
         constexpr inline auto unit = "temperature_unit";
     } // namespace Temperature
-    namespace Ringing
-    {
-        constexpr inline auto duration = "ringing_duration";
-        constexpr inline auto tone     = "ringing_tone";
-    } // namespace Ringing
     namespace Snooze
     {
         constexpr inline auto active   = "snooze_active";
@@ -34,5 +29,6 @@ namespace bell::settings
         constexpr inline auto tone        = "alarm_tone";
         constexpr inline auto volume      = "alarm_volume";
         constexpr inline auto lightActive = "alarm_light_active";
+        constexpr inline auto duration    = "alarm_duration";
     } // namespace Alarm
 };    // namespace bell::settings

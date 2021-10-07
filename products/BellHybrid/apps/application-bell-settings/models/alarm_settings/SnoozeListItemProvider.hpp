@@ -3,32 +3,18 @@
 
 #pragma once
 
-#include <models/alarm_settings/AbstractSnoozeSettingsModel.hpp>
-#include <common/widgets/BellSideListItemWithCallbacks.hpp>
-#include <apps-common/InternalModel.hpp>
+#include "SettingsListItemProvider.hpp"
+#include "AbstractSnoozeSettingsModel.hpp"
 
 namespace app::bell_settings
 {
-    class SnoozeListItemProvider : public app::InternalModel<gui::BellSideListItemWithCallbacks *>,
-                                   public gui::ListItemProvider
+    class SnoozeListItemProvider : public SettingsListItemProvider
     {
       public:
-        explicit SnoozeListItemProvider(AbstractSnoozeSettingsModel &model);
-
-        std::vector<gui::BellSideListItemWithCallbacks *> getListItems();
-
-        auto requestRecords(uint32_t offset, uint32_t limit) -> void override;
-
-        [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
-
-        [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
-
-        [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
-
-        std::function<void()> onExit;
+        SnoozeListItemProvider(AbstractSnoozeSettingsModel &model, std::vector<UTF8> chimeTonesRange);
 
       private:
-        void buildListItems();
+        void buildListItems(std::vector<UTF8> chimeTonesRange);
 
         AbstractSnoozeSettingsModel &model;
     };

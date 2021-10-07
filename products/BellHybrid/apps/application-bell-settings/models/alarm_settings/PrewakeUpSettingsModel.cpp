@@ -20,12 +20,12 @@ namespace app::bell_settings
         return std::stoi(str);
     }
 
-    void PrewakeUpChimeToneModel::setValue(std::string value)
+    void PrewakeUpChimeToneModel::setValue(UTF8 value)
     {
         settings.setValue(bell::settings::PrewakeUp::tone, value, settings::SettingsScope::Global);
     }
 
-    std::string PrewakeUpChimeToneModel::getValue() const
+    UTF8 PrewakeUpChimeToneModel::getValue() const
     {
         return settings.getValue(bell::settings::PrewakeUp::tone, settings::SettingsScope::Global);
     }

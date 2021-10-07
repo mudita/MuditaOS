@@ -33,6 +33,9 @@ namespace gui
                              const std::string &topDescription    = "",
                              const std::string &bottomDescription = "");
 
+        void setOnValueChanged(std::function<void(const UIntegerSpinner::Type &)> &&cb);
+        UIntegerSpinner::Type getCurrentValue();
+
       private:
         UIntegerSpinner *spinner{};
     };
@@ -63,6 +66,9 @@ namespace gui
         explicit UTF8ListItem(AbstractSettingsModel<UTF8> &model,
                               UTF8Spinner::Range range,
                               const std::string &topDescription = "");
+
+        void setOnValueChanged(std::function<void(const UTF8 &)> &&cb);
+        UTF8Spinner::Type getCurrentValue();
 
       private:
         UTF8Spinner *spinner{};

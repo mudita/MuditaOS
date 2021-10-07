@@ -58,9 +58,9 @@ namespace alarms
 
     bool PlayToneAction::execute()
     {
-        const auto tone     = settings.getValue(bell::settings::Ringing::tone, settings::SettingsScope::Global);
+        const auto tone     = settings.getValue(bell::settings::Alarm::tone, settings::SettingsScope::Global);
         const auto tonePath = paths::getMusicDir() / tone;
-        const auto valueStr = settings.getValue(bell::settings::Ringing::duration, settings::SettingsScope::Global);
+        const auto valueStr = settings.getValue(bell::settings::Alarm::duration, settings::SettingsScope::Global);
         const auto ringingDuration = std::chrono::seconds{utils::getNumericValue<uint32_t>(valueStr)};
         return play(tonePath, ringingDuration);
     }

@@ -12,9 +12,9 @@ namespace gui
     class BellBatteryShutdownWindow : public gui::AppWindow
     {
       public:
-        static constexpr auto name = "BellBatteryShutdown";
+        static constexpr auto defaultName = "BellBatteryShutdown";
 
-        BellBatteryShutdownWindow(app::ApplicationCommon *app, const std::string &name = name);
+        BellBatteryShutdownWindow(app::ApplicationCommon *app, const std::string &name = defaultName);
 
       private:
         void buildInterface() override;

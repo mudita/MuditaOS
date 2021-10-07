@@ -17,13 +17,13 @@ namespace app::bell_settings
         std::uint8_t getValue() const override;
     };
 
-    class PrewakeUpChimeToneModel : public gui::SettingsModel<std::string>
+    class PrewakeUpChimeToneModel : public gui::SettingsModel<UTF8>
     {
       public:
         using SettingsModel::SettingsModel;
 
-        void setValue(std::string value) override;
-        std::string getValue() const override;
+        void setValue(UTF8 value) override;
+        UTF8 getValue() const override;
     };
 
     class PrewakeUpChimeVolumeModel : public gui::SettingsModel<std::uint8_t>

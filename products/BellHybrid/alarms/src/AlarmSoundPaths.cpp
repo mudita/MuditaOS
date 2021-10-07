@@ -7,6 +7,11 @@
 
 namespace alarms::paths
 {
+    std::filesystem::path getAlarmDir() noexcept
+    {
+        return purefs::dir::getCurrentOSPath() / "assets/audio/bell/alarm";
+    }
+
     std::filesystem::path getMusicDir() noexcept
     {
         return purefs::dir::getUserDiskPath() / "music";
@@ -14,10 +19,10 @@ namespace alarms::paths
 
     std::filesystem::path getPreWakeUpChimesDir() noexcept
     {
-        return purefs::dir::getCurrentOSPath() / "assets/audio/alarm/prewakeup";
+        return purefs::dir::getCurrentOSPath() / "assets/audio/bell/prewakeup";
     }
     std::filesystem::path getSnoozeChimesDir() noexcept
     {
-        return purefs::dir::getCurrentOSPath() / "assets/audio/alarm/snooze";
+        return purefs::dir::getCurrentOSPath() / "assets/audio/bell/chimes";
     }
 } // namespace alarms::paths

@@ -2,36 +2,69 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsStyle.hpp"
-#include <common/widgets/ListItems.hpp>
 #include "AlarmSettingsListItemProvider.hpp"
-
+#include <common/widgets/ListItems.hpp>
 #include <apps-common/ApplicationCommon.hpp>
-#include <gui/widgets/ListViewEngine.hpp>
 
 namespace app::bell_settings
 {
     using namespace gui;
 
-    AlarmSettingsListItemProvider::AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &model) : model{model}
+    AlarmSettingsListItemProvider::AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &model,
+                                                                 std::vector<UTF8> alarmToneRange)
+        : model{model}
     {
-        buildListItems();
+        buildListItems(std::move(alarmToneRange));
     }
 
-    void AlarmSettingsListItemProvider::buildListItems()
+    void AlarmSettingsListItemProvider::buildListItems(std::vector<UTF8> alarmTonesRange)
     {
         constexpr auto itemCount = 4U;
         internalData.reserve(itemCount);
 
-        const auto textRange = UTF8Spinner::Range{{"Meditative\nsurprises"}};
-        internalData.emplace_back(new UTF8ListItem(
-            model.getAlarmTone(), textRange, utils::translate("app_bell_settings_alarm_settings_tone")));
+        auto alarmTone = new UTF8ListItem(model.getAlarmTone(),
+                                          std::move(alarmTonesRange),
+                                          utils::translate("app_bell_settings_alarm_settings_tone"));
+        alarmTone->setOnValueChanged([this](const UTF8 &val) {
+            if (onToneChange) {
+                onToneChange(val);
+            }
+        });
+        alarmTone->onEnter = [this, alarmTone]() {
+            if (onToneEnter) {
+                onToneEnter(alarmTone->getCurrentValue());
+            }
+        };
+        alarmTone->onExit = [this, alarmTone]() {
+            if (onToneExit) {
+                onToneExit(alarmTone->getCurrentValue());
+            }
+        };
+        internalData.emplace_back(alarmTone);
 
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = 1U;
         constexpr auto volumeMax  = 10U;
-        internalData.emplace_back(new NumListItem(model.getAlarmVolume(),
-                                                  UIntegerSpinner::Range{volumeMin, volumeMax, volumeStep},
-                                                  utils::translate("app_bell_settings_alarm_settings_volume")));
+        auto alarmVolume          = new NumListItem(model.getAlarmVolume(),
+                                           UIntegerSpinner::Range{volumeMin, volumeMax, volumeStep},
+                                           utils::translate("app_bell_settings_alarm_settings_volume"));
+        alarmVolume->setOnValueChanged([this](const UIntegerSpinner::Type &val) {
+            if (onVolumeChange) {
+                onVolumeChange(val);
+            }
+        });
+        alarmVolume->onEnter = [this, alarmTone]() {
+            if (onVolumeEnter) {
+                onVolumeEnter(alarmTone->getCurrentValue());
+            }
+        };
+        alarmVolume->onExit = [this, alarmVolume]() {
+            if (onVolumeExit) {
+                onVolumeExit(alarmVolume->getCurrentValue());
+            }
+        };
+
+        internalData.emplace_back(alarmVolume);
 
         internalData.emplace_back(
             new OnOffListItem(model.getAlarmLightOnOff(), utils::translate("app_bell_settings_alarm_settings_light")));
@@ -39,37 +72,5 @@ namespace app::bell_settings
         for (auto item : internalData) {
             item->deleteByList = false;
         }
-    }
-
-    auto AlarmSettingsListItemProvider::requestRecords(uint32_t offset, uint32_t limit) -> void
-    {
-        setupModel(offset, limit);
-        list->onProviderDataUpdate();
-    }
-
-    auto AlarmSettingsListItemProvider::getItem(Order order) -> ListItem *
-    {
-        return getRecord(order);
-    }
-
-    auto AlarmSettingsListItemProvider::requestRecordsCount() -> unsigned int
-    {
-        return internalData.size();
-    }
-
-    auto AlarmSettingsListItemProvider::getMinimalItemSpaceRequired() const -> unsigned int
-    {
-        return style::sidelistview::list_item::w;
-    }
-
-    std::vector<BellSideListItemWithCallbacks *> AlarmSettingsListItemProvider::getListItems()
-    {
-        return internalData;
-    }
-
-    void AlarmSettingsListItemProvider::clearData()
-    {
-        list->reset();
-        eraseInternalData();
     }
 } // namespace app::bell_settings
