@@ -175,10 +175,14 @@ namespace gui
     InputEvent KeyInputSimpleTranslation::translate(RawKey key)
     {
         auto evt = KeyBaseTranslation::set(key);
-        // when last action timed out we don't want to handle key release
         if (isPreviousKeyTimedOut && key.state == RawKey::State::Released) {
+            // when last action timed out we don't want to handle key release
             evt.setState(InputEvent::State::Undefined);
             isPreviousKeyTimedOut = false;
+        }
+        else if (key.state == RawKey::State::Moved) {
+            // translation of single moved event to keyReleasedShort
+            evt.setState(InputEvent::State::keyReleasedShort);
         }
         evt.setKeyCode(getKeyCode(key.keyCode));
         return evt;
