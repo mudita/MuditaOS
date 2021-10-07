@@ -8,12 +8,20 @@
 #include <InputEvent.hpp>
 #include <Text.hpp>
 #include <Image.hpp>
+#include <utility>
 
 namespace gui
 {
-    SpinBox::SpinBox(
-        Item *parent, const std::string &title, UpdateCallback updateCallback, uint8_t maxValue, uint8_t startValue)
-        : HBox(parent, style::window::default_left_margin), updateBarCallback(std::move(updateCallback))
+    SpinBox::SpinBox(Item *parent,
+                     const std::string &title,
+                     UpdateCallback updateCallback,
+                     uint8_t maxValue,
+                     uint8_t startValue,
+                     std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
+                     std::function<void()> bottomBarRestoreFromTemporaryMode)
+        : HBox(parent, style::window::default_left_margin), updateBarCallback(std::move(updateCallback)),
+          bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
+          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
         setMinimumSize(style::window::default_body_width, style::window::label::big_h);
         setPenWidth(style::window::default_border_no_focus_w);
@@ -29,6 +37,17 @@ namespace gui
             leftArrow->setVisible(item.focus);
             rightArrow->setVisible(item.focus);
             resizeItems();
+
+            if (item.focus) {
+                if (this->bottomBarTemporaryMode) {
+                    this->bottomBarTemporaryMode("");
+                }
+            }
+            else {
+                if (this->bottomBarRestoreFromTemporaryMode) {
+                    this->bottomBarRestoreFromTemporaryMode();
+                }
+            }
             return true;
         };
 
