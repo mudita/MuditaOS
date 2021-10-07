@@ -10,20 +10,25 @@ target_sources(
         module-bsp
 
     PRIVATE
-        hal/temperature_source/TemperatureSource.cpp
-        hal/battery_charger/BatteryCharger.cpp
-        hal/key_input/KeyInput.cpp
-        bsp/eink/eink_pin_config.cpp
-        bsp/switches/switches.cpp
-        bsp/rotary_encoder/rotary_encoder.cpp
-        bsp/bell_temp_sensor/bell_temp_sensor.cpp
+        bsp/audio/AW8898driver.cpp
+        bsp/audio/CodecAW8898.cpp
         bsp/battery-charger/battery-charger.cpp
+        bsp/bell_temp_sensor/bell_temp_sensor.cpp
+        bsp/eink/eink_pin_config.cpp
         bsp/fuel_gauge/fuel_gauge.cpp
         bsp/lpm/PowerProfile.cpp
-        pin_mux.c
+        bsp/rotary_encoder/rotary_encoder.cpp
+        bsp/switches/switches.cpp
+
+        hal/battery_charger/BatteryCharger.cpp
+        hal/key_input/KeyInput.cpp
+        hal/temperature_source/TemperatureSource.cpp
+
+        audio.cpp
         clock_config.cpp
-        irq_gpio.cpp
         debug_console.cpp
+        irq_gpio.cpp
+        pin_mux.c
 
 
     PUBLIC

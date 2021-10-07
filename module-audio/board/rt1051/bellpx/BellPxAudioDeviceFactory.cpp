@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellPxAudioDeviceFactory.hpp"
+#include "BellPxAudioCodec.hpp"
 
 #include <Audio/Profiles/Profile.hpp>
 
@@ -18,7 +19,7 @@ std::shared_ptr<AudioDevice> BellPxAudioDeviceFactory::getDevice(const audio::Pr
 
     switch (profile.GetAudioDeviceType()) {
     case AudioDevice::Type::Audiocodec: {
-        LOG_ERROR("Bell audio codec support is not yet implemented.");
+        device = std::make_shared<BellPxAudioCodec>(profile.GetAudioConfiguration());
     } break;
 
     default:
