@@ -17,6 +17,7 @@ target_link_libraries(app
         apps-common
         bell::app-common
         bell::appmgr
+        bell::alarms
 )
 
 add_subdirectory(application-bell-main)

@@ -12,7 +12,9 @@ target_sources(application-bell-common
     PRIVATE
         src/BellPowerOffPresenter.cpp
         src/AlarmModel.cpp
+        src/AudioModel.cpp
         src/TimeModel.cpp
+        src/SoundsRepository.cpp
         src/windows/BellFinishedWindow.cpp
         src/windows/BellTurnOffWindow.cpp
         src/windows/BellWelcomeWindow.cpp
@@ -30,6 +32,7 @@ target_sources(application-bell-common
         src/options/BellShortOptionWindow.cpp
         src/options/OptionBellMenu.cpp
     PUBLIC
+        include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp
         include/common/windows/BellFinishedWindow.hpp
         include/common/windows/BellTurnOffWindow.hpp
@@ -37,8 +40,10 @@ target_sources(application-bell-common
         include/common/TimeUtils.hpp
         include/common/models/AbstractAlarmModel.hpp
         include/common/models/AbstractSettingsModel.hpp
+        include/common/models/AbstractAudioModel.hpp
         include/common/models/AlarmModel.hpp
         include/common/models/TimeModel.hpp
+        include/common/models/AudioModel.hpp
         include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp

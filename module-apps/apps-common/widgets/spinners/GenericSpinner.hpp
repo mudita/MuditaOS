@@ -14,6 +14,8 @@ namespace gui
         using Range = typename Policy::Range;
         using Type  = typename Policy::Type;
 
+        using OnValueChanged = std::function<void(const Type &&)>;
+
         explicit GenericSpinner(Range range,
                                 Boundaries boundaries   = Boundaries::Continuous,
                                 Orientation orientation = Orientation::Vertical);
@@ -26,12 +28,15 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         bool onFocus(bool state) override;
 
+        OnValueChanged onValueChanged;
+
       private:
         void stepNext();
         void stepPrevious();
         bool isPreviousEvent(const InputEvent &inputEvent);
         bool isNextEvent(const InputEvent &inputEvent);
         void update();
+        void invoke();
 
         Policy policy;
         RectangleEdge focusEdges = RectangleEdge::Bottom;
@@ -113,18 +118,28 @@ namespace gui
 
     template <typename Policy> void GenericSpinner<Policy>::stepNext()
     {
-        policy.next();
-        update();
+        if (policy.next()) {
+            update();
+            invoke();
+        }
     }
 
     template <typename Policy> void GenericSpinner<Policy>::stepPrevious()
     {
-        policy.previous();
-        update();
+        if (policy.previous()) {
+            update();
+            invoke();
+        }
     }
 
     template <typename Policy> void GenericSpinner<Policy>::update()
     {
         setText(policy.str());
+    }
+    template <typename Policy> void GenericSpinner<Policy>::invoke()
+    {
+        if (onValueChanged) {
+            onValueChanged(getCurrentValue());
+        }
     }
 } // namespace gui

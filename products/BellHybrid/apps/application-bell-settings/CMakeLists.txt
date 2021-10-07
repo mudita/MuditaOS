@@ -24,7 +24,6 @@ target_sources(application-bell-settings
         ApplicationBellSettings.cpp
         models/FrontlightModel.cpp
         models/SettingsModel.cpp
-        models/SoundFilesModel.cpp
         models/TemperatureUnitModel.cpp
         models/TimeUnitsModel.cpp
         models/advanced/AboutYourBellModel.cpp
@@ -34,6 +33,7 @@ target_sources(application-bell-settings
         models/alarm_settings/PrewakeUpSettingsModel.cpp
         models/alarm_settings/SnoozeListItemProvider.cpp
         models/alarm_settings/SnoozeSettingsModel.cpp
+        models/alarm_settings/SettingsListItemProvider.cpp
 
         presenter/FrontlightPresenter.cpp
         presenter/TimeUnitsPresenter.cpp
@@ -43,7 +43,6 @@ target_sources(application-bell-settings
         presenter/alarm_settings/PrewakeUpPresenter.cpp
         presenter/alarm_settings/SnoozePresenter.cpp
 
-        widgets/SoundFileListItem.cpp
         widgets/TemperatureUnitListItem.cpp
         widgets/TimeFormatSetListItem.cpp
         widgets/TimeSetListItem.cpp
@@ -63,7 +62,6 @@ target_sources(application-bell-settings
         windows/alarm_settings/BellSettingsPrewakeUpWindow.cpp
 
         models/SettingsModel.hpp
-        models/SoundFilesModel.hpp
         models/advanced/AboutYourBellModel.hpp
         models/alarm_settings/AbstractAlarmSettingsModel.hpp
         models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp
@@ -74,6 +72,7 @@ target_sources(application-bell-settings
         models/alarm_settings/PrewakeUpSettingsModel.hpp
         models/alarm_settings/SnoozeListItemProvider.hpp
         models/alarm_settings/SnoozeSettingsModel.hpp
+        models/alarm_settings/SettingsListItemProvider.hpp
 
         presenter/FrontlightPresenter.hpp
         presenter/advanced/AboutYourBellWindowPresenter.hpp
@@ -82,7 +81,6 @@ target_sources(application-bell-settings
         presenter/alarm_settings/PrewakeUpPresenter.hpp
         presenter/alarm_settings/SnoozePresenter.hpp
 
-        widgets/SoundFileListItem.hpp
         widgets/TemperatureUnitListItem.hpp
         widgets/TimeFormatSetListItem.hpp
         widgets/TimeSetListItem.hpp

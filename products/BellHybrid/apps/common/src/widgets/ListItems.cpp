@@ -55,6 +55,14 @@ namespace gui
         getValue = [&model, this]() { model.setValue(spinner->getCurrentValue()); };
         setValue = [&model, this]() { spinner->setCurrentValue(model.getValue()); };
     }
+    void NumListItem::setOnValueChanged(std::function<void(const UIntegerSpinner::Type &)> &&cb)
+    {
+        spinner->onValueChanged = cb;
+    }
+    UIntegerSpinner::Type NumListItem::getCurrentValue()
+    {
+        return spinner->getCurrentValue();
+    }
 
     NumWithStringListItem::NumWithStringListItem(AbstractSettingsModel<std::uint8_t> &model,
                                                  NumWithStringSpinner::Range range,
@@ -125,5 +133,13 @@ namespace gui
 
         getValue = [&model, this]() { model.setValue(spinner->getCurrentValue()); };
         setValue = [&model, this]() { spinner->setCurrentValue(model.getValue()); };
+    }
+    void UTF8ListItem::setOnValueChanged(std::function<void(const UTF8 &)> &&cb)
+    {
+        spinner->onValueChanged = cb;
+    }
+    UTF8Spinner::Type UTF8ListItem::getCurrentValue()
+    {
+        return spinner->getCurrentValue();
     }
 } // namespace gui

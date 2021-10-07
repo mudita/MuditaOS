@@ -1,23 +1,24 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BellSettingsStyle.hpp"
 #include "SnoozeListItemProvider.hpp"
 #include <common/widgets/ListItems.hpp>
 
 #include <apps-common/ApplicationCommon.hpp>
-#include <gui/widgets/ListViewEngine.hpp>
+#include <utility>
 
 namespace app::bell_settings
 {
     using namespace gui;
 
-    SnoozeListItemProvider::SnoozeListItemProvider(AbstractSnoozeSettingsModel &model) : model{model}
+    SnoozeListItemProvider::SnoozeListItemProvider(AbstractSnoozeSettingsModel &model,
+                                                   std::vector<UTF8> chimeTonesRange)
+        : model{model}
     {
-        buildListItems();
+        buildListItems(chimeTonesRange);
     }
 
-    void SnoozeListItemProvider::buildListItems()
+    void SnoozeListItemProvider::buildListItems(std::vector<UTF8> chimeTonesRange)
     {
         constexpr auto itemCount = 5U;
         internalData.reserve(itemCount);
@@ -55,48 +56,57 @@ namespace app::bell_settings
             }
         };
         internalData.emplace_back(chimeInterval);
-        const auto textRange = UTF8Spinner::Range{{"Meditative\nsurprises"}}; // TODO: Full list needed
-        internalData.emplace_back(
-            new UTF8ListItem(model.getSnoozeChimeTone(),
-                             textRange,
-                             utils::translate("app_bell_settings_alarm_settings_snooze_chime_tone")));
+
+        auto snoozeChimeTone = new UTF8ListItem(model.getSnoozeChimeTone(),
+                                                std::move(chimeTonesRange),
+                                                utils::translate("app_bell_settings_alarm_settings_snooze_chime_tone"));
+        snoozeChimeTone->setOnValueChanged([this](const UTF8 &val) {
+            if (onToneChange) {
+                onToneChange(val);
+            }
+        });
+        snoozeChimeTone->onEnter = [this, snoozeChimeTone]() {
+            if (onToneEnter) {
+                onToneEnter(snoozeChimeTone->getCurrentValue());
+            }
+        };
+        snoozeChimeTone->onExit = [this, snoozeChimeTone]() {
+            if (onToneExit) {
+                onToneExit(snoozeChimeTone->getCurrentValue());
+            }
+        };
+        internalData.emplace_back(snoozeChimeTone);
+
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = 1U;
         constexpr auto volumeMax  = 10U;
-        internalData.emplace_back(
+        auto snoozeChimeVolume =
             new NumListItem(model.getSnoozeChimeVolume(),
                             UIntegerSpinner::Range{volumeMin, volumeMax, volumeStep},
-                            utils::translate("app_bell_settings_alarm_settings_snooze_chime_volume")));
+                            utils::translate("app_bell_settings_alarm_settings_snooze_chime_volume"));
+        snoozeChimeVolume->setOnValueChanged([this](const UIntegerSpinner::Type &val) {
+            if (onVolumeChange) {
+                onVolumeChange(val);
+            }
+        });
+
+        snoozeChimeVolume->onEnter = [this, snoozeChimeTone]() {
+            if (onVolumeEnter) {
+                onVolumeEnter(snoozeChimeTone->getCurrentValue());
+            }
+        };
+
+        snoozeChimeVolume->onExit = [this, snoozeChimeVolume]() {
+            if (onVolumeExit) {
+                onVolumeExit(snoozeChimeVolume->getCurrentValue());
+            }
+        };
+
+        internalData.emplace_back(snoozeChimeVolume);
 
         for (auto item : internalData) {
             item->deleteByList = false;
         }
-    }
-
-    auto SnoozeListItemProvider::requestRecords(uint32_t offset, uint32_t limit) -> void
-    {
-        setupModel(offset, limit);
-        list->onProviderDataUpdate();
-    }
-
-    auto SnoozeListItemProvider::getItem(Order order) -> ListItem *
-    {
-        return getRecord(order);
-    }
-
-    auto SnoozeListItemProvider::requestRecordsCount() -> unsigned int
-    {
-        return internalData.size();
-    }
-
-    auto SnoozeListItemProvider::getMinimalItemSpaceRequired() const -> unsigned int
-    {
-        return style::sidelistview::list_item::w;
-    }
-
-    std::vector<BellSideListItemWithCallbacks *> SnoozeListItemProvider::getListItems()
-    {
-        return internalData;
     }
 
 } // namespace app::bell_settings

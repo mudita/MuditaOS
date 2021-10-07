@@ -3,34 +3,18 @@
 
 #pragma once
 
-#include <models/alarm_settings/AbstractAlarmSettingsModel.hpp>
-#include <common/widgets/BellSideListItemWithCallbacks.hpp>
-#include <apps-common/InternalModel.hpp>
+#include "SettingsListItemProvider.hpp"
+#include "AbstractAlarmSettingsModel.hpp"
 
 namespace app::bell_settings
 {
-    class AlarmSettingsListItemProvider : public app::InternalModel<gui::BellSideListItemWithCallbacks *>,
-                                          public gui::ListItemProvider
+    class AlarmSettingsListItemProvider : public SettingsListItemProvider
     {
       public:
-        explicit AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &model);
-
-        std::vector<gui::BellSideListItemWithCallbacks *> getListItems();
-
-        auto requestRecords(uint32_t offset, uint32_t limit) -> void override;
-
-        [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
-
-        [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
-
-        [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
-
-        void clearData();
-
-        std::function<void()> onExit;
+        AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &model, std::vector<UTF8> alarmToneRange);
 
       private:
-        void buildListItems();
+        void buildListItems(std::vector<UTF8> alarmTonesRange);
 
         AbstractAlarmSettingsModel &model;
     };
