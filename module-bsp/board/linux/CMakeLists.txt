@@ -25,7 +25,6 @@ target_sources(module-bsp
                 hal/battery_charger/BatteryCharger.cpp
                 hal/key_input/KeyInput.cpp
                 bell_temp_sensor/bell_temp_sensor.cpp
-                rotary_encoder/rotary_encoder.cpp
 
                 ${CMAKE_CURRENT_BINARY_DIR}/eink-config.h
 )

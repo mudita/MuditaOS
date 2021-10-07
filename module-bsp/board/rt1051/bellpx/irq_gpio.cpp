@@ -8,6 +8,7 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "fsl_common.h"
+#include <fsl_qtmr.h>
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
@@ -28,6 +29,7 @@ namespace bsp
         DisableIRQ(GPIO2_Combined_16_31_IRQn);
         DisableIRQ(GPIO3_Combined_16_31_IRQn);
         DisableIRQ(GPIO5_Combined_0_15_IRQn);
+        DisableIRQ(TMR3_IRQn);
 
         GPIO_PortDisableInterrupts(GPIO1, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO2, UINT32_MAX);
@@ -39,6 +41,10 @@ namespace bsp
         GPIO_PortClearInterruptFlags(GPIO2, UINT32_MAX);
         GPIO_PortClearInterruptFlags(GPIO3, UINT32_MAX);
         GPIO_PortClearInterruptFlags(GPIO5, UINT32_MAX);
+        QTMR_ClearStatusFlags(TMR3,
+                              kQTMR_Channel_0,
+                              kQTMR_CompareFlag | kQTMR_Compare1Flag | kQTMR_Compare2Flag | kQTMR_OverflowFlag |
+                                  kQTMR_EdgeFlag);
 
         EnableIRQ(GPIO1_Combined_0_15_IRQn);
         NVIC_SetPriority(GPIO1_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
@@ -57,6 +63,9 @@ namespace bsp
 
         EnableIRQ(GPIO5_Combined_0_15_IRQn);
         NVIC_SetPriority(GPIO5_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
+
+        EnableIRQ(TMR3_IRQn);
+        NVIC_SetPriority(TMR3_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
     }
 
     extern "C"
@@ -172,6 +181,16 @@ namespace bsp
 
             // Switch context if necessary
             portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+        }
+
+        void TMR3_IRQHandler(void)
+        {
+            QTMR_ClearStatusFlags(TMR3,
+                                  kQTMR_Channel_0,
+                                  kQTMR_CompareFlag | kQTMR_Compare1Flag | kQTMR_Compare2Flag | kQTMR_OverflowFlag |
+                                      kQTMR_EdgeFlag);
+            const uint8_t QTMR3_mask = 99;
+            hal::key_input::generalIRQHandler(QTMR3_mask);
         }
     }
 } // namespace bsp

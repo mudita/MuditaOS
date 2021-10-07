@@ -1,7 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <bsp/rotary_encoder/rotary_encoder.hpp>
+#include "rotary_encoder.hpp"
+#include <bsp/KeyInputCommon.hpp>
 #include <board/BoardDefinitions.hpp>
 #include <timers.h>
 #include <fsl_common.h>
@@ -15,18 +16,23 @@ namespace bsp::rotary_encoder
 {
     namespace
     {
-        constexpr auto POLL_INTERVAL_MS       = 100U;
-        constexpr uint16_t MAX_PER_100MS      = 100U;
+        enum class Direction
+        {
+            forward   = 0x01,
+            backward  = 0x02,
+            undefined = 0xFF
+        };
+        constexpr auto MAX_PER_CHECK          = 100;
         constexpr auto PRIMARY_SOURCE         = kQTMR_ClockCounter0InputPin;
         constexpr auto BOARD_QTMR_ENC_CHANNEL = kQTMR_Channel_0;
         constexpr auto SECONDARY_SOURCE       = kQTMR_Counter1InputPin;
+        constexpr auto INTERRUPT_MODE         = kQTMR_EdgeInterruptEnable;
         auto BOARD_QTMR_ID                    = TMR3;
         xQueueHandle gHandleIrq;
-        TimerHandle_t gTimerHandle;
         uint32_t encCounter;
     } // namespace
 
-    int init(xQueueHandle qHandle)
+    void init(xQueueHandle qHandle)
     {
         gHandleIrq = qHandle;
         qtmr_config_t timerCfg;
@@ -34,63 +40,60 @@ namespace bsp::rotary_encoder
         timerCfg.primarySource   = PRIMARY_SOURCE;
         timerCfg.secondarySource = SECONDARY_SOURCE;
         QTMR_Init(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL, &timerCfg);
+        QTMR_SetupInputCapture(
+            BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL, SECONDARY_SOURCE, false, false, kQTMR_RisingAndFallingEdge);
+        QTMR_EnableInterrupts(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL, INTERRUPT_MODE);
         QTMR_StartTimer(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL, kQTMR_QuadCountMode);
-        if (!gTimerHandle) {
-            gTimerHandle =
-                xTimerCreate("RotEncTimer", pdMS_TO_TICKS(POLL_INTERVAL_MS), true, nullptr, [](TimerHandle_t) {
-                    if (gHandleIrq) {
-                        uint8_t val{0x01};
-                        xQueueSend(gHandleIrq, &val, 0);
-                    }
-                });
-        }
-        if (xTimerStart(gTimerHandle, 0) != pdPASS) {
-            LOG_ERROR("Couldn't start encoder timer");
-        }
+
         LOG_DEBUG("Init rotary encoder driver");
-        const auto ret = (gTimerHandle && gHandleIrq) ? (kStatus_Success) : (kStatus_Fail);
-        LOG_DEBUG("Init rotary encoder driver status %i", ret);
-        return ret;
     }
 
     void deinit()
     {
-        xTimerDelete(gTimerHandle, 50);
-        gTimerHandle = nullptr;
         gHandleIrq   = nullptr;
+        QTMR_DisableInterrupts(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL, INTERRUPT_MODE);
         QTMR_Deinit(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL);
     }
 
-    std::optional<type> WorkerEventHandler()
+    std::vector<KeyEvent> getKeyEvents()
     {
         uint16_t tmp = QTMR_GetCurrentTimerCount(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL);
-        std::optional<type> ret;
+        auto direction = Direction::undefined;
+        std::vector<KeyEvent> out;
 
-        if (tmp != encCounter && encCounter >= 0xFFFFU - MAX_PER_100MS && encCounter <= 0xFFFFU) {
-            if (tmp <= MAX_PER_100MS || tmp > encCounter) {
-                ret = type::forward;
-            }
-            else {
-                ret = type::backward;
-            }
+        int difference = tmp - encCounter;
+        if (difference > MAX_PER_CHECK) {
+            direction = Direction::backward;
         }
-        else if (tmp != encCounter && encCounter <= MAX_PER_100MS) {
-            if ((tmp >= 0xFFFFU - MAX_PER_100MS) || tmp < encCounter) {
-                ret = type::backward;
-            }
-            else {
-                ret = type::forward;
-            }
+        else if (difference < -MAX_PER_CHECK) {
+            direction = Direction::forward;
         }
-        else if (tmp < encCounter) {
-            ret = type::backward;
+        else if (difference > 0) {
+            direction = Direction::forward;
         }
-        else if (tmp > encCounter) {
-            ret = type::forward;
+        else if (difference < 0) {
+            direction = Direction::backward;
         }
         encCounter = tmp;
 
-        return ret;
+        if (direction == Direction::forward) {
+            out.push_back({KeyCodes::JoystickUp, KeyEvents::Moved});
+        }
+        else if (direction == Direction::backward) {
+            out.push_back({KeyCodes::JoystickDown, KeyEvents::Moved});
+        }
+
+        return out;
+    }
+
+    BaseType_t IRQHandler(uint32_t mask)
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        if (gHandleIrq != nullptr) {
+            std::uint8_t val = static_cast<std::uint8_t>(NotificationSource::rotaryEncoder);
+            xQueueSendFromISR(gHandleIrq, &val, &xHigherPriorityTaskWoken);
+        }
+        return xHigherPriorityTaskWoken;
     }
 
 } // namespace bsp::rotary_encoder

@@ -18,12 +18,6 @@ namespace bell
         void deinitProductHardware() final;
         void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code) final;
         bool handleMessage(std::uint32_t queueID) override;
-        void processRotaryAsShortRelease(bsp::KeyCodes code);
-        void handleRotaryEncoderEvent();
-        enum class EventQueues
-        {
-            queueRotaryEncoder = static_cast<int>(WorkerEventQueues::queueRTC) + 1,
-        };
         static constexpr auto rotaryEncoderQueueSize = 64U;
         static constexpr auto rotaryEncoderQueueName = "qRotaryEncoder";
     };
