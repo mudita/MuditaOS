@@ -43,21 +43,6 @@ namespace bsp::bell_switches
         Invalid
     };
 
-    enum class NotificationSource : uint16_t
-    {
-        leftSideKeyPress      = 0x0001,
-        leftSideKeyRelease    = 0x0002,
-        rightSideKeyPress     = 0x0004,
-        rightSideKeyRelease   = 0x0008,
-        lightCenterKeyPress   = 0x0010,
-        lightCenterKeyRelease = 0x0020,
-        latchKeyPress         = 0x0040,
-        latchKeyRelease       = 0x0080,
-        wakeupEvent           = 0x0400,
-        wakeupEventRelease    = 0x0800,
-        Invalid               = 0xFFFF
-    };
-
     void debounceTimerCallback(TimerHandle_t timerHandle);
 
     struct DebounceTimerState
@@ -143,8 +128,26 @@ namespace bsp::bell_switches
                 if (timerState->notificationSource == NotificationSource::latchKeyPress) {
                     latchEventFlag.setReleased();
                 }
-                // Using responding release notification source, which is one bit shifted
-                auto val = (static_cast<std::uint16_t>(timerState->notificationSource) << 1);
+                auto val = NotificationSource::Invalid;
+                switch (timerState->notificationSource) {
+                case NotificationSource::leftSideKeyPress:
+                    val = NotificationSource::leftSideKeyRelease;
+                    break;
+                case NotificationSource::rightSideKeyPress:
+                    val = NotificationSource::rightSideKeyRelease;
+                    break;
+                case NotificationSource::lightCenterKeyPress:
+                    val = NotificationSource::lightCenterKeyRelease;
+                    break;
+                case NotificationSource::latchKeyPress:
+                    val = NotificationSource::latchKeyRelease;
+                    break;
+                case NotificationSource::wakeupEvent:
+                    val = NotificationSource::wakeupEventRelease;
+                    break;
+                default:
+                    break;
+                }
                 xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
                 timerState->lastState = KeyEvents::Pressed;
             }
@@ -345,79 +348,59 @@ namespace bsp::bell_switches
         gpio_wakeup->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_WAKEUP));
     }
 
-    std::vector<KeyEvent> getKeyEvents(KeyNotificationSource notification)
+    std::vector<KeyEvent> getKeyEvents(NotificationSource notification)
     {
         std::vector<KeyEvent> out;
+        KeyEvent keyEvent;
 
-        if (notification & static_cast<uint16_t>(NotificationSource::leftSideKeyPress)) {
+        switch (notification) {
+        case NotificationSource::leftSideKeyPress:
             LOG_DEBUG("leftSideKeyPress");
-            KeyEvent keyEvent{KeyCodes::FnLeft, KeyEvents::Pressed};
+            keyEvent = {KeyCodes::FnLeft, KeyEvents::Pressed};
             out.push_back(keyEvent);
-        }
-
-        if (notification & static_cast<uint16_t>(NotificationSource::leftSideKeyRelease)) {
+            break;
+        case NotificationSource::leftSideKeyRelease:
             LOG_DEBUG("leftSideKeyRelease");
-            KeyEvent keyEvent{KeyCodes::FnLeft, KeyEvents::Released};
+            keyEvent = {KeyCodes::FnLeft, KeyEvents::Released};
             out.push_back(keyEvent);
-        }
-
-        if (notification & static_cast<uint16_t>(NotificationSource::rightSideKeyPress)) {
+            break;
+        case NotificationSource::rightSideKeyPress:
             LOG_DEBUG("rightSideKeyPress");
-            KeyEvent keyEvent{KeyCodes::FnRight, KeyEvents::Pressed};
+            keyEvent = {KeyCodes::FnRight, KeyEvents::Pressed};
             out.push_back(keyEvent);
-        }
-
-        if (notification & static_cast<uint8_t>(NotificationSource::rightSideKeyRelease)) {
+            break;
+        case NotificationSource::rightSideKeyRelease:
             LOG_DEBUG("rightSideKeyRelease");
-            KeyEvent keyEvent{KeyCodes::FnRight, KeyEvents::Released};
+            keyEvent = {KeyCodes::FnRight, KeyEvents::Released};
             out.push_back(keyEvent);
-        }
-
-        if (notification & static_cast<uint16_t>(NotificationSource::lightCenterKeyPress)) {
+            break;
+        case NotificationSource::lightCenterKeyPress:
             LOG_DEBUG("lightCenterKeyPress");
-            KeyEvent keyEvent{KeyCodes::JoystickEnter, KeyEvents::Pressed};
+            keyEvent = {KeyCodes::JoystickEnter, KeyEvents::Moved};
             out.push_back(keyEvent);
-            // workaround for current GUI event processing
-            keyEvent = {KeyCodes::JoystickEnter, KeyEvents::Released};
-            out.push_back(keyEvent);
-        }
-
-        if (notification & static_cast<uint16_t>(NotificationSource::lightCenterKeyRelease)) {
+            break;
+        case NotificationSource::lightCenterKeyRelease:
             LOG_DEBUG("lightCenterKeyRelease");
-            KeyEvent keyEvent{KeyCodes::JoystickEnter, KeyEvents::Pressed};
+            keyEvent = {KeyCodes::JoystickEnter, KeyEvents::Moved};
             out.push_back(keyEvent);
-            // workaround for current GUI event processing
-            keyEvent = {KeyCodes::JoystickEnter, KeyEvents::Released};
-            out.push_back(keyEvent);
-        }
-
-        if (notification & static_cast<uint16_t>(NotificationSource::latchKeyPress)) {
+            break;
+        case NotificationSource::latchKeyPress:
             LOG_DEBUG("latchKeyPress");
-            KeyEvent keyEvent{KeyCodes::JoystickRight, KeyEvents::Pressed};
+            keyEvent = {KeyCodes::JoystickRight, KeyEvents::Moved};
             out.push_back(keyEvent);
-            // workaround for current GUI event processing
-            keyEvent = {KeyCodes::JoystickRight, KeyEvents::Released};
-            out.push_back(keyEvent);
-        }
-
-        if (notification & static_cast<uint16_t>(NotificationSource::latchKeyRelease)) {
+            break;
+        case NotificationSource::latchKeyRelease:
             LOG_DEBUG("latchKeyRelease");
-            KeyEvent keyEvent{KeyCodes::JoystickLeft, KeyEvents::Pressed};
+            keyEvent = {KeyCodes::JoystickLeft, KeyEvents::Moved};
             out.push_back(keyEvent);
-            // workaround for current GUI event processing
-            keyEvent = {KeyCodes::JoystickLeft, KeyEvents::Released};
-            out.push_back(keyEvent);
-        }
-
-        if (notification & static_cast<uint16_t>(NotificationSource::wakeupEvent)) {
+            break;
+        case NotificationSource::wakeupEvent:
             /* Implement wakeup event */
-        }
-
-        if (notification & static_cast<uint16_t>(NotificationSource::wakeupEventRelease)) {
-            KeyEvent keyEvent;
+            break;
+        case NotificationSource::wakeupEventRelease:
             /* Implement wakeup event */
+            break;
         }
-
         return out;
     }
 

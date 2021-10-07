@@ -4,13 +4,14 @@
 #pragma once
 
 #include <hal/key_input/KeyEventDefinitions.hpp>
+#include <bsp/KeyInputCommon.hpp>
 
 #include <cstdint>
 #include <vector>
 
 namespace bsp::bell_switches
 {
-    std::vector<KeyEvent> getKeyEvents(KeyNotificationSource notification);
+    std::vector<KeyEvent> getKeyEvents(NotificationSource notification);
 
     std::int32_t init(xQueueHandle qHandle);
 
