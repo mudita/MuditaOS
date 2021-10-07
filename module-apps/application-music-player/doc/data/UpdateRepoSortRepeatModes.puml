@@ -1,0 +1,28 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+start
+
+if (repeatMode == Shuffle) then (yes) 
+partition "**query** newData" {
+    : ORDER BY RAND;
+    }
+else (no)
+  if (sortMode == ByArtist) then (yes)
+partition "**query** newData" {
+    : ORDER BY Artist ASC, Title ASC;
+    }
+  else (no)
+	 if (sortMode == ByAlbum) then (yes)
+partition "**query** newData" {
+	   : ORDER BY Album ASC, Title ASC;
+	   }
+	 else (no)
+partition "**query** newData" {
+	     : ORDER BY Title ASC, Artist ASC;
+	     }
+	 endif
+  endif
+endif
+
+stop
+@enduml
