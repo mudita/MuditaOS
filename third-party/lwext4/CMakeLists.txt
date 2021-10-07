@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.13)
 add_library(lwext4 STATIC)
 add_library(lwext4::lwext4 ALIAS lwext4)
 
-include(lwext4_macros.cmake)
+
+set( CONFIG_DEBUG_PRINTF ${LWEXT4_DEBUG_PRINTF})
+set( CONFIG_DEBUG_ASSERT ${LWEXT4_DEBUG_ASSERT})
+
 
 target_include_directories(lwext4
     PUBLIC
@@ -10,14 +13,6 @@ target_include_directories(lwext4
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 )
 
-target_compile_definitions(lwext4
-    PRIVATE
-    CONFIG_DEBUG_PRINTF=1
-    CONFIG_DEBUG_ASSERT=0
-    CONFIG_HAVE_OWN_OFLAGS=0
-    CONFIG_HAVE_OWN_ERRNO=0
-    CONFIG_BLOCK_DEV_CACHE_SIZE=256
-)
 target_compile_options(lwext4
     PRIVATE
     -Wno-format
@@ -77,5 +72,4 @@ target_sources(lwext4
         lwext4/include/misc/tree.h
 )
 
-lwext4_output_configure()
-
+configure_file( ext4_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/generated/ext4_config.h @ONLY)

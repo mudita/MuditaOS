@@ -39,6 +39,13 @@ else()
     set (LOG_LUART_ENABLED 0 CACHE INTERNAL "")
 endif()
 
+# Config option for the lwext4
+# LWEXT4 debug options
+option(LWEXT4_DEBUG_PRINTF "LWEXT4 debug printf enable" ON)
+option(LWEXT4_DEBUG_ASSERT "LWEXT4 assert printf enable" OFF)
+# LWEXT4 sectors cache size
+set(LWEXT4_CACHE_SIZE 256 CACHE INTERNAL "")
+
 # add Development Configuration option
 option(WITH_DEVELOPMENT_FEATURES "Include development features" OFF)
 set(DEVELOPER_SETTINGS_OPTIONS_DEFAULT ${WITH_DEVELOPMENT_FEATURES} CACHE INTERNAL "")
