@@ -352,8 +352,8 @@ TEST_CASE("Test AudioMux")
         std::vector<AudioMux::Input> audioInputs;
         AudioMux aMux(audioInputs);
 
-        auto testPlaybackTypeLowPrio  = PlaybackType::Alarm;
-        auto testPlaybackTypeMidPrio  = PlaybackType::Multimedia;
+        auto testPlaybackTypeLowPrio  = PlaybackType::Multimedia;
+        auto testPlaybackTypeMidPrio  = PlaybackType::Alarm;
         auto testPlaybackTypeHighPrio = PlaybackType::CallRingtone;
 
         auto mergableType = PlaybackType::Notifications;
