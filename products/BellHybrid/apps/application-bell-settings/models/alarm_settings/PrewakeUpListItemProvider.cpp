@@ -1,24 +1,24 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BellSettingsStyle.hpp"
-#include <common/widgets/ListItems.hpp>
 #include "PrewakeUpListItemProvider.hpp"
-
+#include <common/widgets/ListItems.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
-#include <widgets/SoundFileListItem.hpp>
+#include <utility>
 
 namespace app::bell_settings
 {
     using namespace gui;
 
-    PrewakeUpListItemProvider::PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &model) : model{model}
+    PrewakeUpListItemProvider::PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &model,
+                                                         std::vector<UTF8> chimeToneRange)
+        : model{model}
     {
-        buildListItems();
+        buildListItems(std::move(chimeToneRange));
     }
 
-    void PrewakeUpListItemProvider::buildListItems()
+    void PrewakeUpListItemProvider::buildListItems(std::vector<UTF8> chimeToneRange)
     {
         constexpr auto itemCount = 4U;
         internalData.reserve(itemCount);
@@ -42,19 +42,50 @@ namespace app::bell_settings
         };
         internalData.emplace_back(chimeDuration);
 
-        internalData.emplace_back(
-            new SoundFileListItem(model.getChimeTone(),
-                                  AlarmSoundType::PreWakeUp,
-                                  AlarmSoundDelegate::fromModel(AlarmSoundsModel{AlarmSoundType::PreWakeUp}),
-                                  utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone")));
+        auto chimeTone = new UTF8ListItem(model.getChimeTone(),
+                                          std::move(chimeToneRange),
+                                          utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone"));
+        chimeTone->setOnValueChanged([this](const UTF8 &val) {
+            if (onToneChange) {
+                onToneChange(val);
+            }
+        });
+        chimeTone->onEnter = [this, chimeTone]() {
+            if (onToneEnter) {
+                onToneEnter(chimeTone->getCurrentValue());
+            }
+        };
+        chimeTone->onExit = [this, chimeTone]() {
+            if (onToneExit) {
+                onToneExit(chimeTone->getCurrentValue());
+            }
+        };
+        internalData.emplace_back(chimeTone);
 
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = 1U;
         constexpr auto volumeMax  = 10U;
-        internalData.emplace_back(
-            new NumListItem(model.getChimeVolume(),
-                            UIntegerSpinner::Range{volumeMin, volumeMax, volumeStep},
-                            utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_volume")));
+        auto volume               = new NumListItem(model.getChimeVolume(),
+                                      UIntegerSpinner::Range{volumeMin, volumeMax, volumeStep},
+                                      utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_volume"));
+        volume->setOnValueChanged([this](const UIntegerSpinner::Type &val) {
+            if (onVolumeChange) {
+                onVolumeChange(val);
+            }
+        });
+
+        volume->onEnter = [this, chimeTone]() {
+            if (onVolumeEnter) {
+                onVolumeEnter(chimeTone->getCurrentValue());
+            }
+        };
+
+        volume->onExit = [this, volume]() {
+            if (onVolumeExit) {
+                onVolumeExit(volume->getCurrentValue());
+            }
+        };
+        internalData.emplace_back(volume);
 
         const auto lightDurationRange = NumWithStringListItem::NumWithStringSpinner::Range{
             NumWithStringListItem::Value{utils::translate("app_settings_toggle_off")},
@@ -76,37 +107,5 @@ namespace app::bell_settings
         for (auto item : internalData) {
             item->deleteByList = false;
         }
-    }
-
-    auto PrewakeUpListItemProvider::requestRecords(uint32_t offset, uint32_t limit) -> void
-    {
-        setupModel(offset, limit);
-        list->onProviderDataUpdate();
-    }
-
-    auto PrewakeUpListItemProvider::getItem(Order order) -> ListItem *
-    {
-        return getRecord(order);
-    }
-
-    auto PrewakeUpListItemProvider::requestRecordsCount() -> unsigned int
-    {
-        return internalData.size();
-    }
-
-    auto PrewakeUpListItemProvider::getMinimalItemSpaceRequired() const -> unsigned int
-    {
-        return style::sidelistview::list_item::w;
-    }
-
-    std::vector<BellSideListItemWithCallbacks *> PrewakeUpListItemProvider::getListItems()
-    {
-        return internalData;
-    }
-
-    void PrewakeUpListItemProvider::clearData()
-    {
-        list->reset();
-        eraseInternalData();
     }
 } // namespace app::bell_settings

@@ -5,6 +5,8 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <models/alarm_settings/AbstractSnoozeSettingsModel.hpp>
+#include <common/models/AbstractAudioModel.hpp>
+#include <common/SoundsRepository.hpp>
 #include <memory>
 
 namespace gui
@@ -36,13 +38,22 @@ namespace app::bell_settings
     {
       public:
         SnoozePresenter(std::shared_ptr<SnoozeListItemProvider> provider,
-                        std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel);
+                        std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel,
+                        std::unique_ptr<AbstractAudioModel> audioModel,
+                        std::unique_ptr<AbstractSoundsRepository> soundsRepository);
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         void saveData() override;
         void loadData() override;
 
       private:
+        void stopSound();
+
         std::shared_ptr<SnoozeListItemProvider> provider;
         std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel;
+        std::unique_ptr<AbstractAudioModel> audioModel;
+        std::unique_ptr<AbstractSoundsRepository> soundsRepository;
+
+        audio::Token currentToken;
+        UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

@@ -40,34 +40,40 @@ namespace gui
             }
         }
 
-        void next()
+        bool next()
         {
+            bool ret{true};
             if (pos >= upRange()) {
                 if (boundaries == Boundaries::Continuous) {
                     pos = 0;
                 }
                 else {
                     pos = upRange();
+                    ret = false;
                 }
             }
             else {
                 pos++;
             }
+            return ret;
         }
 
-        void previous()
+        bool previous()
         {
+            bool ret{true};
             if (pos <= 0) {
                 if (boundaries == Boundaries::Continuous) {
                     pos = upRange();
                 }
                 else {
                     pos = 0;
+                    ret = false;
                 }
             }
             else {
                 pos--;
             }
+            return ret;
         }
 
         void updateRange(Range newRange)
@@ -118,34 +124,40 @@ namespace gui
             currentValue = val;
         }
 
-        void next()
+        bool next()
         {
+            bool ret{true};
             if (currentValue >= range.max) {
                 if (boundaries == Boundaries::Continuous) {
                     currentValue = range.min;
                 }
                 else {
                     currentValue = range.max;
+                    ret          = false;
                 }
             }
             else {
                 currentValue += range.step;
             }
+            return ret;
         }
 
-        void previous()
+        bool previous()
         {
+            bool ret{true};
             if (currentValue <= range.min) {
                 if (boundaries == Boundaries::Continuous) {
                     currentValue = range.max;
                 }
                 else {
                     currentValue = range.min;
+                    ret          = false;
                 }
             }
             else {
                 currentValue -= range.step;
             }
+            return ret;
         }
 
         void updateRange(Range newRange)
@@ -191,34 +203,40 @@ namespace gui
             }
         }
 
-        void next()
+        bool next()
         {
+            bool ret{true};
             if (pos >= upRange()) {
                 if (boundaries == Boundaries::Continuous) {
                     pos = 0;
                 }
                 else {
                     pos = upRange();
+                    ret = false;
                 }
             }
             else {
                 pos++;
             }
+            return ret;
         }
 
-        void previous()
+        bool previous()
         {
+            bool ret{true};
             if (pos <= 0) {
                 if (boundaries == Boundaries::Continuous) {
                     pos = upRange();
                 }
                 else {
                     pos = 0;
+                    ret = false;
                 }
             }
             else {
                 pos--;
             }
+            return ret;
         }
 
         void updateRange(Range newRange)

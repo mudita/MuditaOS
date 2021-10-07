@@ -4,7 +4,10 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
+#include <apps-common/AudioOperations.hpp>
 #include <models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp>
+#include <common/models/AbstractAudioModel.hpp>
+#include <common/SoundsRepository.hpp>
 #include <memory>
 
 namespace gui
@@ -41,7 +44,9 @@ namespace app::bell_settings
     {
       public:
         PrewakeUpWindowPresenter(std::shared_ptr<PrewakeUpListItemProvider> provider,
-                                 std::unique_ptr<AbstractPrewakeUpSettingsModel> model);
+                                 std::unique_ptr<AbstractPrewakeUpSettingsModel> model,
+                                 std::unique_ptr<AbstractAudioModel> audioModel,
+                                 std::unique_ptr<AbstractSoundsRepository> soundsRepository);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto saveData() -> void override;
@@ -49,7 +54,13 @@ namespace app::bell_settings
         auto eraseProviderData() -> void override;
 
       private:
+        void stopSound();
+
         std::shared_ptr<PrewakeUpListItemProvider> provider;
         std::unique_ptr<AbstractPrewakeUpSettingsModel> model;
+        std::unique_ptr<AbstractAudioModel> audioModel;
+        std::unique_ptr<AbstractSoundsRepository> soundsRepository;
+        audio::Token currentToken;
+        UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

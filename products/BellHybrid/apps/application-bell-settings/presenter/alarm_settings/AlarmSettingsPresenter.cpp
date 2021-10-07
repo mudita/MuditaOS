@@ -7,10 +7,39 @@
 namespace app::bell_settings
 {
     AlarmSettingsPresenter::AlarmSettingsPresenter(std::shared_ptr<AlarmSettingsListItemProvider> provider,
-                                                   std::unique_ptr<AbstractAlarmSettingsModel> model)
-        : provider(std::move(provider)), model(std::move(model))
+                                                   std::unique_ptr<AbstractAlarmSettingsModel> model,
+                                                   std::unique_ptr<AbstractAudioModel> audioModel,
+                                                   std::unique_ptr<AbstractSoundsRepository> soundsRepository)
+        : provider(provider),
+          model(std::move(model)), audioModel{std::move(audioModel)}, soundsRepository{std::move(soundsRepository)}
     {
+        auto playResponseCb = [this](audio::RetCode retCode, audio::Token token) {
+            if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
+                          str(retCode).c_str(),
+                          token.IsValid());
+                return;
+            }
+            this->currentToken = token;
+        };
+
+        auto playSound = [this, playResponseCb](const UTF8 &val) {
+            this->audioModel->play(this->soundsRepository->titleToPath(val).value_or(""),
+                                   playResponseCb,
+                                   AbstractAudioModel::PlaybackType::Alarm);
+        };
+
         this->provider->onExit = [this]() { getView()->exit(); };
+
+        this->provider->onToneEnter  = playSound;
+        this->provider->onToneExit   = [this](const auto &) { stopSound(); };
+        this->provider->onToneChange = playSound;
+
+        this->provider->onVolumeEnter  = playSound;
+        this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
+        this->provider->onVolumeChange = [this](const auto &val) {
+            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::Alarm);
+        };
     }
 
     auto AlarmSettingsPresenter::saveData() -> void
@@ -35,5 +64,9 @@ namespace app::bell_settings
     void AlarmSettingsPresenter::eraseProviderData()
     {
         provider->clearData();
+    }
+    void AlarmSettingsPresenter::stopSound()
+    {
+        this->audioModel->stop(currentToken, nullptr);
     }
 } // namespace app::bell_settings
