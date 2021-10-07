@@ -12,10 +12,10 @@
 #include <memory>
 #include <cstdint>
 
-namespace bsp
+namespace bsp::audio
 {
-    void audioInit();
-    void audioDeinit();
+    void init();
+    void deinit();
 
     struct AudioConfig
     {
@@ -30,4 +30,4 @@ namespace bsp
 
         static AudioConfig *get();
     };
-}; // namespace bsp
+}; // namespace bsp::audio

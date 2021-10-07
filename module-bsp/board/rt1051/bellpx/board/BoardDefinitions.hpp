@@ -26,8 +26,8 @@ enum class BoardDefinitions
     AUDIOCODEC_I2C            = static_cast<int>(drivers::I2CInstances ::I2C2),
     AUDIOCODEC_DMAMUX         = static_cast<int>(drivers::DMAMuxInstances ::DMAMUX0),
     AUDIOCODEC_DMA            = static_cast<int>(drivers::DMAInstances ::DMA_0),
-    AUDIOCODEC_TX_DMA_CHANNEL = 6,
-    AUDIOCODEC_RX_DMA_CHANNEL = 7,
+    AUDIOCODEC_TX_DMA_CHANNEL = 2,
+    AUDIOCODEC_RX_DMA_CHANNEL = 3,
     AUDIOCODEC_IRQ            = 31, // GPIO_B1_15  requires pull-up 10kΩ
     AUDIOCODEC_IRQ_GPIO       = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
 
@@ -168,4 +168,23 @@ enum class BoardDefinitions
 
     BELL_TEMP_SENSOR_PWR_GPIO = static_cast<int>(drivers::GPIOInstances ::GPIO_1),
     BELL_TEMP_SENSOR_PWR_PIN  = 27,
+
+    BELL_AUDIOCODEC_GPIO        = static_cast<int>(drivers::GPIOInstances ::GPIO_1),
+    BELL_AUDIOCODEC_RSTN_PA_PIN = 14,
+    BELL_AUDIOCODEC_INTN_PA_PIN = 24,
+
+/**
+ * BELL AUDIOCODEC DEFINITIONS
+ */
+
+/* SAI */
+#define BELL_AUDIOCODEC_SAIx           SAI1
+#define BELL_AUDIOCODEC_SAIx_MUX       kCLOCK_Sai1Mux
+#define BELL_AUDIOCODEC_SAIx_PREDIV    kCLOCK_Sai1PreDiv
+#define BELL_AUDIOCODEC_SAIx_DIV       kCLOCK_Sai1Div
+#define BELL_AUDIOCODEC_SAIx_MCLK_MASK IOMUXC_GPR_GPR1_SAI1_MCLK_DIR_MASK
+
+/* IRQ */
+#define BELL_AUDIOCODEC_SAIx_TX_IRQ SAI1_IRQn
+#define BELL_AUDIOCODEC_SAIx_RX_IRQ SAI1_IRQn
 };
