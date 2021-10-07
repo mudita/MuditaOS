@@ -31,7 +31,6 @@ target_sources(module-bsp
 		bsp/torch/torch.cpp
 		bsp/vibrator/vibrator.cpp
 		bsp/watchdog/watchdog.cpp
-		common/audio.cpp
 		common/board.cpp
 		common/chip.cpp
 		common/startup_mimxrt1052.cpp
