@@ -12,7 +12,6 @@
 namespace
 {
     constexpr auto timerName = "playDurationTimer";
-    constexpr std::chrono::seconds defaultTimerTime{30};
 } // namespace
 
 namespace alarms
@@ -59,6 +58,6 @@ namespace alarms
     {
         const auto tonePath = std::filesystem::path{record.musicTone};
         LOG_DEBUG("play some music: %s", record.musicTone.c_str());
-        return play(tonePath, defaultTimerTime);
+        return play(tonePath);
     }
 } // namespace alarms

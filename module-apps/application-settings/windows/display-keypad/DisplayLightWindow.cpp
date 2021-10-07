@@ -108,19 +108,15 @@ namespace gui
             return true;
         };
 
-        auto setBottomBarOnSpinnerFocus = [&](gui::Item &item) {
-            if (item.focus) {
-                setBottomBarText(utils::translate(style::strings::common::set), BottomBar::Side::CENTER);
-            }
-            return true;
-        };
-
         auto spinner = std::make_unique<gui::SpinBoxOptionSettings>(
             utils::translate("app_settings_display_light_brightness"),
             std::ceil(brightnessValue / brightnessStep),
             std::ceil(screen_light_control::ManualModeParameters::MAX_BRIGHTNESS / brightnessStep),
             setBrightness,
-            setBottomBarOnSpinnerFocus);
+            [&](const UTF8 &text) {
+                application->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
+            },
+            [&]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
         return spinner;
     }

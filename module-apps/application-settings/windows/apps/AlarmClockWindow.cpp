@@ -19,7 +19,7 @@ namespace gui
     std::list<Option> AlarmClockWindow::buildOptionsList()
     {
         std::list<gui::Option> optionList;
-        mVibrationsEnabled = mAudioModel->isVibrationEnabled();
+        mVibrationsEnabled   = mAudioModel->isVibrationEnabled();
         mManualVolumeEnabled = mAudioModel->isSystemSoundEnabled();
         mWidgetMaker.addSwitchOption(optionList, utils::translate("app_settings_vibration"), mVibrationsEnabled, [&]() {
             switchVibrationState();
@@ -30,13 +30,6 @@ namespace gui
                                      mManualVolumeEnabled,
                                      [&]() { switchManualVolumeState(); });
 
-        auto focusCallback = [&](gui::Item &item) {
-            if (item.focus) {
-                setBottomBarText(UTF8(), BottomBar::Side::CENTER);
-            }
-            return true;
-        };
-
         if (mManualVolumeEnabled) {
             optionList.emplace_back(std::make_unique<gui::SpinBoxOptionSettings>(
                 utils::translate("app_settings_volume"),
@@ -46,7 +39,10 @@ namespace gui
                     setVolume(value);
                     return true;
                 },
-                focusCallback,
+                [&](const UTF8 &text) {
+                    application->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
+                },
+                [&]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
                 true));
         }
 
