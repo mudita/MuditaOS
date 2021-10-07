@@ -18,9 +18,11 @@ namespace app
         : app::AsyncCallbackReceiver{application}, application(application)
     {}
 
-    bool AsyncAudioOperations::play(const std::string &filePath, const OnPlayCallback &callback)
+    bool AsyncAudioOperations::play(const std::string &filePath,
+                                    const OnPlayCallback &callback,
+                                    const audio::PlaybackType playbackType)
     {
-        auto msg  = std::make_unique<AudioStartPlaybackRequest>(filePath, audio::PlaybackType::Multimedia);
+        auto msg  = std::make_unique<AudioStartPlaybackRequest>(filePath, playbackType);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
         auto cb   = [callback](auto response) {
             auto result = dynamic_cast<AudioStartPlaybackResponse *>(response);

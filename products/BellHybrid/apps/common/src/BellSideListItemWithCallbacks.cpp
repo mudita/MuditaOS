@@ -26,9 +26,12 @@ namespace gui
     {
         if (focus) {
             setFocusItem(body);
+            if (onEnter) {
+                onEnter();
+            }
         }
         else {
-            setFocusItem(focus ? body : nullptr);
+            setFocusItem(nullptr);
             if (onExit) {
                 onExit();
             }
