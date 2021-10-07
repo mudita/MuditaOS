@@ -92,16 +92,19 @@ namespace bsp::battery_charger
         if (acok != 0) {
             chargerStatus                  = batteryRetval::ChargerNotCharging;
             Store::Battery::modify().state = Store::Battery::State::Discharging;
+            disableCharging();
             LOG_INFO("Discharging battery");
         }
         else if ((chgok == 0) && (acok == 0)) {
             chargerStatus                  = batteryRetval::ChargerCharging;
             Store::Battery::modify().state = Store::Battery::State::Charging;
+            enableCharging();
             LOG_INFO("Charging battery");
         }
         else if ((chgok != 0) && (acok == 0)) {
             chargerStatus                  = batteryRetval::ChargerComplete;
             Store::Battery::modify().state = Store::Battery::State::ChargingDone;
+            disableCharging();
             LOG_INFO("Battery charging complete");
         }
 
