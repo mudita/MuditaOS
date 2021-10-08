@@ -69,6 +69,8 @@ namespace app::home_screen
 
         namespace Events
         {
+            struct BackPress
+            {};
             struct LightPress
             {};
             struct RotateRightPress
@@ -253,6 +255,7 @@ namespace app::home_screen
                                              "Deactivated"_s + sml::on_entry<_> / Deactivated::entry,
                                              "Deactivated"_s [Helpers::isAlarmActive] = "Activated"_s,
                                              "Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
+                                             "Deactivated"_s + event<Events::RotateLeftPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::DeepUpPress> / Helpers::showAlarmTime = "ActivatedWait"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
@@ -271,6 +274,7 @@ namespace app::home_screen
                                              "DeactivatedEdit"_s + event<Events::DeepUpPress> / Helpers::detachTimer = "ActivatedWait"_s,
                                              "DeactivatedEdit"_s + event<Events::Timer> / Helpers::setNewAlarmTime = "WaitForConfirmation"_s,
                                              "DeactivatedEdit"_s + event<Events::LightPress> / Helpers::setNewAlarmTime = "WaitForConfirmation"_s,
+                                             "DeactivatedEdit"_s + event<Events::BackPress> = "Deactivated"_s,
 
                                              "WaitForConfirmation"_s + sml::on_entry<_> / WaitForConfirmation::entry,
                                              "WaitForConfirmation"_s + sml::on_exit<_> / WaitForConfirmation::exit,
@@ -286,6 +290,7 @@ namespace app::home_screen
                                              "Activated"_s + sml::on_entry<_> / Activated::entry,
                                              "Activated"_s [not Helpers::isAlarmActive] = "Deactivated"_s,
                                              "Activated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Activated"_s,
+                                             "Activated"_s + event<Events::RotateLeftPress> / Helpers::makeAlarmEditable = "ActivatedEdit"_s,
                                              "Activated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "ActivatedEdit"_s,
                                              "Activated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
                                              "Activated"_s + event<Events::DeepDownPress> / Helpers::hideAlarmTime  = "DeactivatedWait"_s,
@@ -298,6 +303,7 @@ namespace app::home_screen
                                              "ActivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
                                              "ActivatedEdit"_s + event<Events::Timer> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
                                              "ActivatedEdit"_s + event<Events::LightPress> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
+                                             "ActivatedEdit"_s + event<Events::BackPress> = "Activated"_s,
 
                                              "AlarmRinging"_s + sml::on_entry<_> / AlarmRinging::entry,
                                              "AlarmRinging"_s + sml::on_exit<_> / AlarmRinging::exit,
@@ -378,6 +384,9 @@ namespace app::home_screen
         using namespace sml;
         const auto key = mapKey(inputEvent.getKeyCode());
         switch (key) {
+        case KeyMap::Back:
+            pimpl->sm.process_event(Events::BackPress{});
+            break;
         case KeyMap::LightPress:
             pimpl->sm.process_event(Events::LightPress{});
             break;
