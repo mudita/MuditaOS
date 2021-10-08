@@ -387,10 +387,11 @@ namespace bluetooth
 
     void HFP::HFPImpl::connect()
     {
-        if (!isConnected) {
-            LOG_DEBUG("Connecting the HFP profile");
-            hfp_ag_establish_service_level_connection(device.address);
+        if (isConnected) {
+            disconnect();
         }
+        LOG_DEBUG("Connecting the HFP profile");
+        hfp_ag_establish_service_level_connection(device.address);
     }
 
     void HFP::HFPImpl::disconnect()
