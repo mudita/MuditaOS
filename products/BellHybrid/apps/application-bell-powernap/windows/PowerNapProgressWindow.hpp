@@ -4,6 +4,7 @@
 #pragma once
 
 #include "presenter/PowerNapProgressPresenter.hpp"
+#include <common/widgets/BellStatusClock.hpp>
 #include <AppWindow.hpp>
 
 namespace gui
@@ -15,10 +16,15 @@ namespace gui
         std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter;
         gui::HBarGraph *progressBar = nullptr;
         gui::Text *timerText        = nullptr;
+        gui::BellStatusClock *time  = nullptr;
 
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto onInput(const InputEvent &inputEvent) -> bool override;
+
+        void setTime(std::time_t newTime);
+        void setTimeFormat(utils::time::Locale::TimeFormat fmt);
+        bool updateTime() override;
 
         void buildLayout();
         void configureTimer();
