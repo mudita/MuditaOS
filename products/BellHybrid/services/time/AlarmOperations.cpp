@@ -119,6 +119,8 @@ namespace alarms
                                                   std::make_shared<alarms::BellAlarmClockHandler>(service));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpChime,
                                                   std::make_shared<alarms::PreWakeUpChimeHandler>(service));
+        alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpFrontlight,
+                                                  std::make_shared<alarms::PreWakeUpFrontlightHandler>(service));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::SnoozeChime,
                                                   std::make_shared<alarms::SnoozeChimeHandler>(service));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::BedtimeReminder,
@@ -157,8 +159,8 @@ namespace alarms
             return;
         }
 
-        auto nextEvent = *(nextSingleEvents.front());
-        if (getAlarmEventType(nextEvent) != alarms::AlarmType::Clock) {
+        auto nextEvent = getNextPreWakeUpEvent();
+        if (!nextEvent.isValid()) {
             return;
         }
 
@@ -176,6 +178,23 @@ namespace alarms
             bedtimeEvent.get()->enabled = true;
             handleAlarmEvent(bedtimeEvent, alarms::AlarmType::BedtimeReminder, true);
         }
+    }
+
+    SingleEventRecord AlarmOperations::getNextPreWakeUpEvent()
+    {
+        const auto event = *(nextSingleEvents.front());
+        if (getAlarmEventType(event) != alarms::AlarmType::Clock) {
+            return {};
+        }
+
+        auto found = std::find_if(snoozedSingleEvents.begin(), snoozedSingleEvents.end(), [ev = event](auto &event) {
+            return ev.parent->ID == event->parent->ID;
+        });
+        if (found != snoozedSingleEvents.end()) {
+            return {};
+        }
+
+        return event;
     }
 
     void AlarmOperations::handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision)
@@ -223,6 +242,17 @@ namespace alarms
         for (auto &snoozedEvent : snoozedSingleEvents) {
             handleSnoozeChime(*snoozedEvent, false);
         }
+    }
+
+    void AlarmOperations::onAlarmTurnedOff([[maybe_unused]] const std::shared_ptr<AlarmEventRecord> &event,
+                                           alarms::AlarmType alarmType)
+    {
+        if (alarmType != alarms::AlarmType::Clock) {
+            return;
+        }
+
+        handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
+        handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
     }
 
     PreWakeUp::PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider)

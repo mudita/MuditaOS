@@ -47,18 +47,35 @@ namespace screen_light_control
         float gammaFactor = 2.5f;
     };
 
+    struct LinearProgressModeParameters
+    {
+        using LinearFunctions = std::vector<functions::LinearProgressFunction>;
+
+        /// Manually set starting value of the brightness
+        float startBrightnessValue = 0.0f;
+        /// Vector of linear functions of progressive screen brightness
+        LinearFunctions functions{
+            functions::LinearProgressFunction{.target = 100.0f, .duration = std::chrono::milliseconds{1500}}};
+        /// Hysteresis value of screen brightness control
+        float brightnessHysteresis = 0.0f;
+    };
+
     class Parameters
     {
         std::optional<ManualModeParameters> manualModeParams;
         std::optional<AutomaticModeParameters> autoModeParams;
+        std::optional<LinearProgressModeParameters> linearProgressModeParams;
 
       public:
         Parameters() = default;
-        explicit Parameters(ManualModeParameters manualModeParams)
-            : manualModeParams{std::make_optional(manualModeParams)}
+        explicit Parameters(ManualModeParameters manualModeParams) : manualModeParams{manualModeParams}
         {}
-        explicit Parameters(const AutomaticModeParameters &autoModeParams)
-            : autoModeParams{std::make_optional(autoModeParams)}
+
+        explicit Parameters(const AutomaticModeParameters &autoModeParams) : autoModeParams{autoModeParams}
+        {}
+
+        explicit Parameters(const LinearProgressModeParameters &autoModeParams)
+            : linearProgressModeParams{autoModeParams}
         {}
 
         [[nodiscard]] bool hasManualModeParams() const noexcept
@@ -74,5 +91,12 @@ namespace screen_light_control
         }
 
         [[nodiscard]] auto getAutoModeParams() const noexcept -> const AutomaticModeParameters &;
+
+        [[nodiscard]] bool hasLinearProgressModeParams() const noexcept
+        {
+            return linearProgressModeParams.has_value();
+        }
+
+        [[nodiscard]] auto getLinearProgressModeParams() const noexcept -> const LinearProgressModeParameters &;
     };
 } // namespace screen_light_control

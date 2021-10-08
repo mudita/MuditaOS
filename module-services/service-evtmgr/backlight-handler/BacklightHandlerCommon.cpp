@@ -15,17 +15,17 @@ namespace backlight
         constexpr auto screenLightTimerTimeout = std::chrono::seconds(5);
     } // namespace timers
 
-    HandlerCommon::HandlerCommon(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
-        : settings{std::move(settings)}, screenLightControl{std::make_shared<screen_light_control::ScreenLightControl>(
-                                             parent)},
+    HandlerCommon::HandlerCommon(std::shared_ptr<settings::Settings> settings,
+                                 std::shared_ptr<screen_light_control::ScreenLightController> screenLightController,
+                                 sys::Service *parent)
+        : settings{std::move(settings)}, screenLightController{std::move(screenLightController)},
           screenLightTimer{std::make_shared<sys::TimerHandle>(sys::TimerFactory::createSingleShotTimer(
               parent, timers::screenLightTimerName, timers::screenLightTimerTimeout, [this](sys::Timer &t) {
                   if (getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic &&
-                      screenLightControl->isLightOn()) {
-                      screenLightControl->processRequest(screen_light_control::Action::turnOff);
+                      this->screenLightController->isLightOn()) {
+                      this->screenLightController->processRequest(screen_light_control::Action::turnOff);
                   }
               }))}
-
     {}
 
     void HandlerCommon::init()
@@ -33,32 +33,22 @@ namespace backlight
         using namespace screen_light_control;
         settings->registerValueChange(settings::Brightness::brightnessLevel, [&](const std::string &value) {
             ManualModeParameters params{utils::getNumericValue<float>(value)};
-            screenLightControl->processRequest(Action::setManualModeBrightness, Parameters(params));
+            screenLightController->processRequest(Action::setManualModeBrightness, Parameters(params));
         });
 
         settings->registerValueChange(settings::Brightness::autoMode, [&]([[maybe_unused]] const std::string &value) {
             const auto action = getScreenAutoModeState() == ScreenLightMode::Automatic ? Action::enableAutomaticMode
                                                                                        : Action::disableAutomaticMode;
-            screenLightControl->processRequest(action);
+            screenLightController->processRequest(action);
         });
 
         settings->registerValueChange(settings::Brightness::state, [&]([[maybe_unused]] const std::string &value) {
             const auto action = getScreenLightState() ? Action::turnOn : Action::turnOff;
             if (action == Action::turnOn) {
-                screenLightTimer->start();
+                onScreenLightTurnedOn();
             }
-            screenLightControl->processRequest(action);
+            screenLightController->processRequest(action);
         });
-    }
-
-    void HandlerCommon::processScreenRequest(screen_light_control::Action action,
-                                             const screen_light_control::Parameters &params)
-    {
-        if (action == screen_light_control::Action::enableAutomaticMode) {
-            startScreenLightTimer();
-        }
-        handleScreenLightSettings(action, params);
-        screenLightControl->processRequest(action, params);
     }
 
     auto HandlerCommon::getValue(const std::string &path) const -> std::string
@@ -95,8 +85,8 @@ namespace backlight
     void HandlerCommon::handleScreenLightRefresh()
     {
         if (getScreenLightState() && getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic) {
-            if (!screenLightControl->isLightOn()) {
-                screenLightControl->processRequest(screen_light_control::Action::turnOn);
+            if (!screenLightController->isLightOn()) {
+                screenLightController->processRequest(screen_light_control::Action::turnOn);
             }
             startScreenLightTimer();
         }
@@ -119,7 +109,7 @@ namespace backlight
             break;
         case screen_light_control::Action::turnOn:
             setValue(settings::Brightness::state, utils::to_string(true));
-            screenLightTimer->start();
+            onScreenLightTurnedOn();
             break;
         case screen_light_control::Action::setManualModeBrightness:
             if (params.hasManualModeParams()) {

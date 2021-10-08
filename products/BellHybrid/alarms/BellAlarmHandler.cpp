@@ -40,7 +40,7 @@ namespace alarms
         Actions actions;
         actions.emplace_back(std::make_unique<PlayToneAction>(*service));
         actions.emplace_back(std::make_unique<NotifyGUIAction>(*service));
-        actions.emplace_back(std::make_unique<FrontlightAction>(*service));
+        actions.emplace_back(std::make_unique<FrontlightAction>(*service, FrontlightAction::Mode::Manual));
         return actions;
     }
 
@@ -51,6 +51,17 @@ namespace alarms
     {
         Actions actions;
         actions.emplace_back(createPreWakeUpChimeAction(*service));
+        return actions;
+    }
+
+    PreWakeUpFrontlightHandler::PreWakeUpFrontlightHandler(sys::Service *service)
+        : BellAlarmHandler(getActions(service))
+    {}
+
+    auto PreWakeUpFrontlightHandler::getActions(sys::Service *service) -> Actions
+    {
+        Actions actions;
+        actions.emplace_back(std::make_unique<FrontlightAction>(*service, FrontlightAction::Mode::LinearProgress));
         return actions;
     }
 
