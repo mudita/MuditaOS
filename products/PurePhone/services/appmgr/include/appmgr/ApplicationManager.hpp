@@ -11,6 +11,8 @@
 
 namespace app::manager
 {
+    class SetAutoLockTimeoutRequest;
+
     class ApplicationManager : public ApplicationManagerCommon
     {
       public:
@@ -32,7 +34,6 @@ namespace app::manager
         void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
         void registerMessageHandlers() override;
         void startBackgroundApplications();
-        auto handleAutoLockGetRequest(GetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer override;
         void lockTimeChanged(std::string value);

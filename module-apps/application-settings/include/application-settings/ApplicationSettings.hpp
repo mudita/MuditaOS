@@ -94,7 +94,7 @@ namespace app
         class AutoLockSettings
         {
           public:
-            virtual void getAutoLockTime()                              = 0;
+            virtual auto getAutoLockTime() -> std::chrono::seconds      = 0;
             virtual void setAutoLockTime(std::chrono::seconds lockTime) = 0;
         };
 
@@ -166,7 +166,7 @@ namespace app
         auto getConnectionFrequency() const noexcept -> uint8_t override;
         void setConnectionFrequency(uint8_t val) noexcept override;
 
-        void getAutoLockTime() override;
+        auto getAutoLockTime() -> std::chrono::seconds override;
         void setAutoLockTime(std::chrono::seconds lockTime) override;
 
         auto getCurrentPhoneMode() const noexcept -> sys::phone_modes::PhoneMode override;

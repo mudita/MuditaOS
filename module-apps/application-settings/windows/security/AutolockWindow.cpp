@@ -15,13 +15,13 @@ namespace gui
     namespace
     {
         const std::vector<std::pair<std::string, std::chrono::seconds>> autoLockTimes = {
-            {"15s", std::chrono::seconds{15}},
-            {"30s", std::chrono::seconds{30}},
-            {"1m", std::chrono::minutes{1}},
-            {"2m", std::chrono::minutes{2}},
-            {"5m", std::chrono::minutes{5}},
-            {"10m", std::chrono::minutes{10}},
-            {"20m", std::chrono::minutes{20}}};
+            {"15 s", std::chrono::seconds{15}},
+            {"30 s", std::chrono::seconds{30}},
+            {"1 m", std::chrono::minutes{1}},
+            {"2 m", std::chrono::minutes{2}},
+            {"5 m", std::chrono::minutes{5}},
+            {"10 m", std::chrono::minutes{10}},
+            {"20 m", std::chrono::minutes{20}}};
     } // namespace
 
     AutolockWindow::AutolockWindow(app::ApplicationCommon *app,
@@ -60,13 +60,7 @@ namespace gui
 
     void AutolockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (auto autoLockData = dynamic_cast<const AutoLockData *>(data); data != nullptr) {
-            currentAutoLockTimeout = autoLockData->getValue();
-        }
-        else if (mode == ShowMode::GUI_SHOW_INIT) {
-            autoLockSettings->getAutoLockTime();
-        }
-
+        currentAutoLockTimeout = autoLockSettings->getAutoLockTime();
         auto it = std::find_if(
             autoLockTimes.begin(), autoLockTimes.end(), [&](const std::pair<std::string, std::chrono::seconds> &elem) {
                 return elem.second == currentAutoLockTimeout;
