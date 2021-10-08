@@ -40,7 +40,7 @@ namespace bsp::battery_charger
 
         drivers::DriverGPIOPinParams ACOKPinConfig;
         ACOKPinConfig.dir      = drivers::DriverGPIOPinParams::Direction::Input;
-        ACOKPinConfig.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge;
+        ACOKPinConfig.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::IntFallingEdge;
         ACOKPinConfig.defLogic = 0;
         ACOKPinConfig.pin      = static_cast<std::uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_ACOK_PIN);
         gpio->ConfPin(ACOKPinConfig);
@@ -98,13 +98,11 @@ namespace bsp::battery_charger
         else if ((chgok == 0) && (acok == 0)) {
             chargerStatus                  = batteryRetval::ChargerCharging;
             Store::Battery::modify().state = Store::Battery::State::Charging;
-            enableCharging();
             LOG_INFO("Charging battery");
         }
         else if ((chgok != 0) && (acok == 0)) {
             chargerStatus                  = batteryRetval::ChargerComplete;
             Store::Battery::modify().state = Store::Battery::State::ChargingDone;
-            disableCharging();
             LOG_INFO("Battery charging complete");
         }
 
