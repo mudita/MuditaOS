@@ -350,9 +350,14 @@ namespace alarms
             }
             else {
                 handler->handleOff(*event);
+                onAlarmTurnedOff(event, alarmType);
             }
         }
     }
+
+    void AlarmOperationsCommon::onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event,
+                                                 alarms::AlarmType alarmType)
+    {}
 
     auto AlarmOperationsCommon::processNextEventsQueue(const TimePoint now) -> void
     {

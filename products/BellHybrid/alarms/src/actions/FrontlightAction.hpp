@@ -12,12 +12,17 @@ namespace alarms
     class FrontlightAction : public AbstractAlarmAction
     {
       public:
-        explicit FrontlightAction(sys::Service &service);
+        enum class Mode
+        {
+            Manual,
+            LinearProgress
+        };
+
+        FrontlightAction(sys::Service &service, Mode mode);
         bool execute() override;
         bool turnOff() override;
 
       private:
-        sys::Service &service;
+        std::unique_ptr<AbstractAlarmAction> pimpl;
     };
-
 } // namespace alarms

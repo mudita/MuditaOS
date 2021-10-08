@@ -93,3 +93,8 @@ bool EventRecord::isValid() const
 {
     return (EventInfo::isValid() && Record::isValid());
 }
+
+auto SingleEventRecord::isValid() const -> bool
+{
+    return EventInfo::isValid();
+}

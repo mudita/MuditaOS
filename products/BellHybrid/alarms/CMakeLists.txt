@@ -38,6 +38,7 @@ target_link_libraries(alarms
         bell::db
         bell::appmgr
         bell::app-common
+        bell::evtmgr
         apps-common
    PUBLIC
         module-db

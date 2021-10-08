@@ -1,11 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <evtmgr/BacklightHandler.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
+#include <evtmgr/backlight-handler/BacklightHandler.hpp>
+
+#include <screen-light-control/ScreenLightControl.hpp>
+
 #include <service-db/Settings.hpp>
+
 #include <Timers/TimerFactory.hpp>
-#include <Utils.hpp>
 #include <keymap/KeyMap.hpp>
 
 namespace backlight
@@ -17,29 +19,45 @@ namespace backlight
     } // namespace timers
 
     Handler::Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
-        : HandlerCommon(settings, parent), screenLightControl{getScreenLightControl()}, screenLightTimer{
-                                                                                            getScreenLightTimer()}
+        : HandlerCommon(
+              std::move(settings), std::make_shared<bell::screen_light_control::ScreenLightController>(parent), parent)
     {}
 
-    void Handler::handleKeyPressed([[maybe_unused]] const int key)
+    void Handler::handleKeyPressed([[maybe_unused]] int key)
     {
         handleScreenLightRefresh(key);
     }
 
-    void Handler::handleScreenLightRefresh([[maybe_unused]] const int key)
+    void Handler::handleScreenLightRefresh([[maybe_unused]] int key)
     {
-        if (getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic) {
-            if (!screenLightControl->isLightOn() && (key == static_cast<int>(KeyMap::Frontlight))) {
-                screenLightControl->processRequest(screen_light_control::Action::turnOn);
-                screenLightTimer->restart(timers::screenLightTimerTimeout);
+        auto controller = getScreenLightControl();
+        auto timer      = getScreenLightTimer();
+        if (!controller->isLightOn() && (key == static_cast<int>(KeyMap::Frontlight))) {
+            controller->processRequest(screen_light_control::Action::turnOn);
+            timer->restart(timers::screenLightTimerTimeout);
+        }
+        else if (controller->isLightOn()) {
+            if (controller->isAutoModeOn() || key == static_cast<int>(KeyMap::Frontlight)) {
+                controller->processRequest(screen_light_control::Action::turnOff);
+                timer->stop();
             }
-            else if (screenLightControl->isLightOn() && (key != static_cast<int>(KeyMap::Frontlight))) {
-                screenLightTimer->restart(timers::screenLightTimerHoldTimeout);
+            else {
+                timer->restart(timers::screenLightTimerHoldTimeout);
             }
-            else if (key == static_cast<int>(KeyMap::Frontlight)) {
-                screenLightControl->processRequest(screen_light_control::Action::turnOff);
-                screenLightTimer->stop();
-            }
+        }
+    }
+
+    void Handler::processScreenRequest(screen_light_control::Action action,
+                                       const screen_light_control::Parameters &params)
+    {
+        handleScreenLightSettings(action, params);
+        getScreenLightControl()->processRequest(action, params);
+    }
+
+    void Handler::onScreenLightTurnedOn()
+    {
+        if (!getScreenLightControl()->isAutoModeOn()) {
+            startScreenLightTimer();
         }
     }
 } // namespace backlight

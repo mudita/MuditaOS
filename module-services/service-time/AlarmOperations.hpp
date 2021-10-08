@@ -153,6 +153,7 @@ namespace alarms
         void processEvents(TimePoint now);
         void processNextEventsQueue(const TimePoint now);
         void processSnoozedEventsQueue(const TimePoint now);
+        virtual void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType);
 
         TimePoint getCurrentTime();
         void handleSnoozedAlarmsCountChange();

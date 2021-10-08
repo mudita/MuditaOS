@@ -5,7 +5,7 @@
 
 #include <service-evtmgr/EventManagerCommon.hpp>
 
-#include "BacklightHandler.hpp"
+#include "backlight-handler/BacklightHandler.hpp"
 
 class KeySequenceMgr;
 

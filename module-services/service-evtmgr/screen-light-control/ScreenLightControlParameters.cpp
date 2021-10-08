@@ -18,4 +18,10 @@ namespace screen_light_control
         Expects(hasManualModeParams());
         return manualModeParams.value();
     }
+
+    auto Parameters::getLinearProgressModeParams() const noexcept -> const LinearProgressModeParameters &
+    {
+        Expects(hasLinearProgressModeParams());
+        return linearProgressModeParams.value();
+    }
 } // namespace screen_light_control

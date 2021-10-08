@@ -71,12 +71,19 @@ void EventManager::initProductEvents()
 
     connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
         auto *m = static_cast<sevm::ScreenLightControlMessage *>(msgl);
-        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters());
+        const auto params = m->getParams();
+        backlightHandler.processScreenRequest(m->getAction(), params.value_or(screen_light_control::Parameters()));
         return sys::msgHandled();
     });
 
     connect(typeid(sevm::ScreenLightSetAutoModeParams), [&](sys::Message *msgl) {
         auto *m = static_cast<sevm::ScreenLightSetAutoModeParams *>(msgl);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
+        return sys::msgHandled();
+    });
+
+    connect(typeid(sevm::ScreenLightSetAutoProgressiveModeParams), [&](sys::Message *msgl) {
+        auto *m = static_cast<sevm::ScreenLightSetAutoProgressiveModeParams *>(msgl);
         backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
         return sys::msgHandled();
     });
@@ -93,9 +100,6 @@ void EventManager::initProductEvents()
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
         return msg;
     });
-
-    backlightHandler.processScreenRequest(screen_light_control::Action::enableAutomaticMode,
-                                          screen_light_control::Parameters());
 }
 
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

@@ -22,12 +22,14 @@ namespace backlight
       public:
         Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
 
-        void handleKeyPressed([[maybe_unused]] const int key = 0);
+        void handleKeyPressed(int key = 0);
+
+        void processScreenRequest(screen_light_control::Action action,
+                                  const screen_light_control::Parameters &params) override;
 
       private:
-        std::shared_ptr<screen_light_control::ScreenLightControl> screenLightControl;
-        /// Timer that keeps screen backlight on for a certain time if there was key pressed
-        std::shared_ptr<sys::TimerHandle> screenLightTimer;
-        void handleScreenLightRefresh([[maybe_unused]] const int key = 0);
+        void handleScreenLightRefresh(int key = 0);
+
+        void onScreenLightTurnedOn() override;
     };
 } // namespace backlight
