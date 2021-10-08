@@ -24,6 +24,7 @@ target_sources(application-bell-common
         src/popups/BellTurnOffOptionWindow.cpp
         src/popups/BellRebootWindow.cpp
         src/widgets/ListItems.cpp
+        src/widgets/BellStatusClock.cpp
 
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
@@ -44,6 +45,7 @@ target_sources(application-bell-common
         include/common/popups/BellTurnOffOptionWindow.hpp
         include/common/popups/BellRebootWindow.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
+        include/common/widgets/BellStatusClock.hpp
         include/common/widgets/ListItems.hpp
         include/common/options/BellOptionWindow.hpp
         include/common/options/BellShortOptionWindow.hpp

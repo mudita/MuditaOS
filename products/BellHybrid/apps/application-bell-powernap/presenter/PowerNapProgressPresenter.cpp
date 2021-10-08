@@ -7,6 +7,7 @@
 #include "widgets/PowerNapAlarm.hpp"
 
 #include <apps-common/widgets/ProgressTimer.hpp>
+#include <common/models/TimeModel.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <Utils.hpp>
@@ -22,8 +23,9 @@ namespace app::powernap
 {
     PowerNapProgressPresenter::PowerNapProgressPresenter(app::ApplicationCommon *app,
                                                          settings::Settings *settings,
-                                                         PowerNapAlarm &alarm)
-        : app{app}, settings{settings}, alarm{alarm},
+                                                         PowerNapAlarm &alarm,
+                                                         std::unique_ptr<AbstractTimeModel> timeModel)
+        : app{app}, settings{settings}, alarm{alarm}, timeModel{std::move(timeModel)},
           napAlarmTimer{sys::TimerFactory::createSingleShotTimer(
               app, powernapAlarmTimerName, powernapAlarmTimeout, [this](sys::Timer &) { onNapAlarmFinished(); })}
 
@@ -57,6 +59,11 @@ namespace app::powernap
     {
         alarm.stop();
         getView()->napEnded();
+    }
+
+    void PowerNapProgressPresenter::handleUpdateTimeEvent()
+    {
+        getView()->setTime(timeModel->getCurrentTime());
     }
 
 } // namespace app::powernap
