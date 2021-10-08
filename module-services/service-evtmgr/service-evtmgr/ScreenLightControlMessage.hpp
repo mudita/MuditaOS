@@ -14,15 +14,22 @@ namespace sevm
     class ScreenLightControlMessage : public sys::DataMessage
     {
         const screen_light_control::Action action;
+        std::optional<screen_light_control::Parameters> params;
 
       public:
-        explicit ScreenLightControlMessage(screen_light_control::Action act)
-            : sys::DataMessage(MessageType::ScreenLightControlAction), action(act)
+        explicit ScreenLightControlMessage(screen_light_control::Action act,
+                                           std::optional<screen_light_control::Parameters> params = std::nullopt)
+            : sys::DataMessage(MessageType::ScreenLightControlAction), action(act), params{std::move(params)}
         {}
 
         [[nodiscard]] auto getAction() const noexcept -> screen_light_control::Action
         {
             return action;
+        }
+
+        [[nodiscard]] auto getParams() const noexcept -> const std::optional<screen_light_control::Parameters> &
+        {
+            return params;
         }
     };
 
@@ -37,6 +44,22 @@ namespace sevm
         {}
 
         [[nodiscard]] auto getParams() const noexcept -> const screen_light_control::AutomaticModeParameters &
+        {
+            return params;
+        }
+    };
+
+    class ScreenLightSetAutoProgressiveModeParams : public ScreenLightControlMessage
+    {
+        screen_light_control::LinearProgressModeParameters params;
+
+      public:
+        explicit ScreenLightSetAutoProgressiveModeParams(screen_light_control::LinearProgressModeParameters params)
+            : ScreenLightControlMessage(screen_light_control::Action::setAutomaticModeParameters), params{std::move(
+                                                                                                       params)}
+        {}
+
+        [[nodiscard]] auto getParams() const noexcept -> const screen_light_control::LinearProgressModeParameters &
         {
             return params;
         }

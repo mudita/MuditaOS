@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <evtmgr/BacklightHandler.hpp>
+#include <screen-light-control/ScreenLightControl.hpp>
+
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
@@ -16,19 +18,28 @@ namespace backlight
     } // namespace timers
 
     Handler::Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
-        : HandlerCommon(settings, parent), screenLightControl{getScreenLightControl()},
-          screenLightTimer{getScreenLightTimer()},
-
+        : HandlerCommon(
+              std::move(settings), std::make_shared<pure::screen_light_control::ScreenLightController>(parent), parent),
           keypadLightTimer{sys::TimerFactory::createSingleShotTimer(
               parent, timers::keypadLightTimerName, timers::keypadLightTimerTimeout, [this](sys::Timer &) {
                   bsp::keypad_backlight::shutdown();
               })}
     {}
 
-    void Handler::handleKeyPressed()
+    void Handler::handleKeyPressed([[maybe_unused]] int key)
     {
         handleKeypadLightRefresh();
         handleScreenLightRefresh();
+    }
+
+    void Handler::processScreenRequest(screen_light_control::Action action,
+                                       const screen_light_control::Parameters &params)
+    {
+        if (action == screen_light_control::Action::enableAutomaticMode) {
+            startScreenLightTimer();
+        }
+        handleScreenLightSettings(action, params);
+        getScreenLightControl()->processRequest(action, params);
     }
 
     void Handler::stopKeypadTimer()
@@ -116,10 +127,15 @@ namespace backlight
     void Handler::handleScreenLightRefresh([[maybe_unused]] const int key)
     {
         if (getScreenLightState() && getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic) {
-            if (!screenLightControl->isLightOn()) {
-                screenLightControl->processRequest(screen_light_control::Action::turnOn);
+            if (!getScreenLightControl()->isLightOn()) {
+                getScreenLightControl()->processRequest(screen_light_control::Action::turnOn);
             }
             startScreenLightTimer();
         }
+    }
+
+    void Handler::onScreenLightTurnedOn()
+    {
+        startScreenLightTimer();
     }
 } // namespace backlight

@@ -24,6 +24,7 @@ target_sources(evtmgr
     PUBLIC
         include/evtmgr/EventManager.hpp
         include/evtmgr/api/TemperatureApi.hpp
+        include/evtmgr/backlight-handler/BacklightHandler.hpp
 )
 
 target_include_directories(evtmgr

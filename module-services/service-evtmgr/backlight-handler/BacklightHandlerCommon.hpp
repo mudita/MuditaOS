@@ -19,7 +19,9 @@ namespace backlight
     class HandlerCommon
     {
       public:
-        HandlerCommon(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
+        HandlerCommon(std::shared_ptr<settings::Settings> settings,
+                      std::shared_ptr<screen_light_control::ScreenLightController> screenLightController,
+                      sys::Service *parent);
 
         /// initialise in InitHandler when Service is ready
         void init();
@@ -27,24 +29,27 @@ namespace backlight
         /// Process request of the screen light control
         /// @screen_light_control::Action an action to perform
         /// @screen_light_control::Parameters parameters being set
-        void processScreenRequest(screen_light_control::Action action, const screen_light_control::Parameters &params);
+        virtual void processScreenRequest(screen_light_control::Action action,
+                                          const screen_light_control::Parameters &params) = 0;
 
         [[nodiscard]] auto getScreenLightState() const noexcept -> bool;
         [[nodiscard]] auto getScreenAutoModeState() const noexcept -> screen_light_control::ScreenLightMode;
         [[nodiscard]] auto getScreenBrightnessValue() const noexcept -> bsp::eink_frontlight::BrightnessPercentage;
 
       private:
+        virtual void onScreenLightTurnedOn() = 0;
+
         std::shared_ptr<settings::Settings> settings;
-        std::shared_ptr<screen_light_control::ScreenLightControl> screenLightControl;
+        std::shared_ptr<screen_light_control::ScreenLightController> screenLightController;
 
       public:
         auto getScreenLightTimer() noexcept -> std::shared_ptr<sys::TimerHandle>
         {
             return screenLightTimer;
         }
-        auto getScreenLightControl() noexcept -> std::shared_ptr<screen_light_control::ScreenLightControl>
+        auto getScreenLightControl() noexcept -> std::shared_ptr<screen_light_control::ScreenLightController>
         {
-            return screenLightControl;
+            return screenLightController;
         }
         void handleScreenLightSettings(screen_light_control::Action action,
                                        const screen_light_control::Parameters &params);

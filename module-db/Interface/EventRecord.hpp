@@ -65,4 +65,6 @@ struct SingleEventRecord : public Record, public EventInfo
     SingleEventRecord() = default;
     SingleEventRecord(std::shared_ptr<EventRecord> parent, TimePoint startDate, TimePoint endDate)
         : EventInfo{parent->name, startDate, endDate, parent->duration, parent->isAllDay}, parent{parent} {};
+
+    auto isValid() const -> bool;
 };

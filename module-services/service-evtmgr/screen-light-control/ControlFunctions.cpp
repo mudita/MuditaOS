@@ -95,9 +95,23 @@ namespace screen_light_control::functions
         }
     }
 
+    void setRampState(float state)
+    {
+        rampState = state;
+    }
+
     void setRampTarget(bsp::eink_frontlight::BrightnessPercentage value)
     {
         rampTarget = value;
     }
 
+    bool isRampTargetReached()
+    {
+        return rampTargetReached;
+    }
+
+    bsp::eink_frontlight::BrightnessPercentage getRampState()
+    {
+        return rampState;
+    }
 } // namespace screen_light_control::functions
