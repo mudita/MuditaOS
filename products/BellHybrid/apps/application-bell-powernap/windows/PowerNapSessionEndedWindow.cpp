@@ -28,6 +28,7 @@ namespace gui
 
     void PowerNapSessionEndedWindow::buildLayout()
     {
+        statusBar->setVisible(false);
         auto body = new VBox(this, 0, 0, style::window_width, style::window_height);
         body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 

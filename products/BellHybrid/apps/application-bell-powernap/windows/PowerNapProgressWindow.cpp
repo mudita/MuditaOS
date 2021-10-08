@@ -11,6 +11,7 @@
 #include <apps-common/GuiTimer.hpp>
 #include <Text.hpp>
 
+#include <time/dateCommon.hpp>
 namespace
 {
     void decorateProgressItem(gui::Rect *item, gui::Alignment::Vertical alignment)
@@ -41,7 +42,7 @@ namespace
         using namespace gui::powerNapStyle;
         auto timer = new gui::Text(
             parent, 0, 0, bell_base_layout::w, bell_base_layout::outer_layouts_h - progress::bottomDescTopMargin);
-        timer->setFont(descriptionFont);
+        timer->setFont(napTimerFont);
         timer->setMargins(gui::Margins(0, progress::bottomDescTopMargin, 0, 0));
         decorateProgressItem(timer, gui::Alignment::Vertical::Top);
         return timer;
@@ -74,6 +75,7 @@ namespace gui
     }
     void PowerNapProgressWindow::buildLayout()
     {
+        statusBar->setVisible(false);
         auto body = new gui::BellBaseLayout(this, 0, 0, style::bell_base_layout::w, style::bell_base_layout::h, false);
         auto vBox =
             new VBox(body->getCenterBox(), 0, 0, style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
@@ -81,6 +83,11 @@ namespace gui
         createTitle(vBox);
         progressBar = createProgress(vBox);
         timerText   = createTimer(body->lastBox);
+
+        time = new BellStatusClock(body->firstBox);
+        time->setMaximumSize(body->firstBox->getWidth(), body->firstBox->getHeight());
+        time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        body->firstBox->resizeItems();
 
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
             body->setArea({0, 0, newDim.w, newDim.h});
@@ -109,5 +116,24 @@ namespace gui
     void PowerNapProgressWindow::napEnded()
     {
         application->switchWindow(gui::window::name::powernapSessionEnded, std::make_unique<gui::PowerNapSwitchData>());
+    }
+
+    void PowerNapProgressWindow::setTime(std::time_t newTime)
+    {
+        time->setTime(newTime);
+        time->setTimeFormatSpinnerVisibility(true);
+    }
+
+    void PowerNapProgressWindow::setTimeFormat(utils::time::Locale::TimeFormat fmt)
+    {
+        time->setTimeFormat(fmt);
+    }
+
+    bool PowerNapProgressWindow::updateTime()
+    {
+        if (presenter) {
+            presenter->handleUpdateTimeEvent();
+        }
+        return true;
     }
 } // namespace gui
