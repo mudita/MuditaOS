@@ -31,19 +31,6 @@ class PhonebookItemData : public gui::SwitchData
     }
 };
 
-class PhonebookSearchQuery : public gui::SwitchData
-{
-  public:
-    explicit PhonebookSearchQuery(std::string searchQuery) : searchQuery(std::move(searchQuery)){};
-    const std::string &getQuery() const noexcept
-    {
-        return searchQuery;
-    }
-
-  protected:
-    std::string searchQuery;
-};
-
 class PhonebookSearchResultsData : public gui::SwitchData
 {
   public:
