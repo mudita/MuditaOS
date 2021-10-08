@@ -16,8 +16,6 @@ namespace gui
 
       private:
         void buildInterface() override;
-        auto handleSwitchData(SwitchData *data) -> bool override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto onInput(const InputEvent &inputEvent) -> bool override;
 
         std::shared_ptr<ContactRecord> contact = nullptr;
