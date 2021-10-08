@@ -64,7 +64,9 @@ namespace hal::battery
     extern "C"
     {
         void USB_ChargerDetectedCB(std::uint8_t)
-        {}
+        {
+            bsp::battery_charger::enableCharging();
+        }
     }
 
 } // namespace hal::battery
