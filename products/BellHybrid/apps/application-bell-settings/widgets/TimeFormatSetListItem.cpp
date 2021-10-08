@@ -12,8 +12,8 @@
 
 namespace
 {
-    constexpr auto fmtSpinner12H = "12h";
-    constexpr auto fmtSpinner24H = "24h";
+    constexpr auto fmtSpinner12H = "12 h";
+    constexpr auto fmtSpinner24H = "24 h";
 } // namespace
 
 namespace gui

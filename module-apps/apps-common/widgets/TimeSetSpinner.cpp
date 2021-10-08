@@ -5,6 +5,7 @@
 
 #include <FontManager.hpp>
 #include <RawFont.hpp>
+#include <gui/widgets/ImageBox.hpp>
 #include <gui/widgets/Label.hpp>
 
 static constexpr uint32_t hourMin    = 0;
@@ -17,7 +18,8 @@ static constexpr uint32_t noOfDigits = 2;
 
 namespace gui
 {
-    TimeSetSpinner::TimeSetSpinner(Item *parent, Length x, Length y, Length w, Length h) : HBox(parent, x, y, w, h)
+    TimeSetSpinner::TimeSetSpinner(Item *parent, Size size, Length x, Length y, Length w, Length h)
+        : HBox(parent, x, y, w, h), colonIconData(getColonIconData(size))
     {
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
@@ -33,12 +35,10 @@ namespace gui
 
         addWidget(hour);
 
-        colon = new Label(this);
-        updateColon(noFocusFontName);
+        colon = new ImageBox(this, 0, 0, colonIconData.w, colonIconData.h, new Image(colonIconData.iconName));
         colon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         colon->setEdges(RectangleEdge::None);
         colon->activeItem = false;
-        colon->setText(":");
 
         minute = new Spinner(minuteMin, minuteMax, minuteStep, Boundaries::Continuous);
         updateFont(minute, noFocusFontName);
@@ -107,12 +107,6 @@ namespace gui
         return maxWidth;
     }
 
-    uint32_t TimeSetSpinner::getColonWidth(const std::string &fontName) const noexcept
-    {
-        const RawFont *font = FontManager::getInstance().getFont(fontName);
-        return font->getCharPixelWidth(':');
-    }
-
     auto TimeSetSpinner::handleEnterKey() -> bool
     {
         if (focusItem == hour) {
@@ -152,10 +146,9 @@ namespace gui
         noFocusFontName = std::move(newNoFocusFontName);
 
         updateFont(hour, noFocusFontName);
-        updateColon(noFocusFontName);
         updateFont(minute, noFocusFontName);
 
-        setMinimumSize(hour->widgetMinimumArea.w + getColonWidth(noFocusFontName) + minute->widgetMinimumArea.w,
+        setMinimumSize(hour->widgetMinimumArea.w + colonIconData.w + minute->widgetMinimumArea.w,
                        getFontHeight(noFocusFontName));
         resizeItems();
     }
@@ -169,13 +162,6 @@ namespace gui
         elem->setFont(fontName);
         elem->setMinimumSize(doubleCharWidth, fontHeight);
         elem->setText(elem->getText());
-    }
-
-    auto TimeSetSpinner::updateColon(const std::string &fontName) noexcept -> void
-    {
-        colon->setFont(fontName);
-        colon->setMinimumSize(getColonWidth(fontName), getFontHeight(fontName));
-        colon->setText(":");
     }
 
     auto TimeSetSpinner::setEditMode(EditMode editMode) noexcept -> void
@@ -229,5 +215,22 @@ namespace gui
             updateFont(minute, noFocusFontName);
             setFocusItem(nullptr);
         }
+    }
+
+    auto TimeSetSpinner::getColonIconData(Size size) const noexcept -> ColonIconData
+    {
+        using namespace style::time_set_spinner::colonIconSize;
+        static const ColonIconData smallColonIconData  = {"alarm_colon_W_M", smallW, smallH};
+        static const ColonIconData mediumColonIconData = {"alarm_colon_select_W_M", mediumW, mediumH};
+        static const ColonIconData bigColonIconData    = {"alarm_colon_clock_W_M", bigW, bigH};
+        switch (size) {
+        case Size::SMALL:
+            return smallColonIconData;
+        case Size::MEDIUM:
+            return mediumColonIconData;
+        case Size::BIG:
+            return bigColonIconData;
+        }
+        return {};
     }
 } /* namespace gui */

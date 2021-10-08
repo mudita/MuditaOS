@@ -7,13 +7,12 @@
 #include <gui/widgets/TextConstants.hpp>
 #include <time/time_locale.hpp>
 #include <widgets/spinners/Spinners.hpp>
+#include "TimeSetSpinner.hpp"
 
 #include <string>
 
 namespace gui
 {
-    class TimeSetSpinner;
-
     /// Time set spinner widget class with option for dynamic switching between 24/12-hour format
     /// Automatically recalculates hour upon switching format
     /// Can be used as a basic time displaying widget when @ref EditMode set to 'Browse'
@@ -27,6 +26,7 @@ namespace gui
       public:
         explicit TimeSetFmtSpinner(
             Item *parent                               = nullptr,
+            TimeSetSpinner::Size size                  = TimeSetSpinner::Size::SMALL,
             uint32_t x                                 = 0U,
             uint32_t y                                 = 0U,
             uint32_t w                                 = 0U,
