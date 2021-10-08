@@ -22,19 +22,21 @@ namespace backlight
       public:
         Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
 
-        void handleKeyPressed();
+        void handleKeyPressed(int key = 0);
         /// Process request of the keypad light control
         /// @keypad_backlight::action an action to perform
         /// @return True if request was processed successfully, false otherwise
         auto processKeypadRequest(bsp::keypad_backlight::Action action) -> bool;
 
+        void processScreenRequest(screen_light_control::Action action,
+                                  const screen_light_control::Parameters &params) override;
+
       private:
-        std::shared_ptr<screen_light_control::ScreenLightControl> screenLightControl;
-        /// Timer that keeps screen backlight on for a certain time if there was key pressed
-        std::shared_ptr<sys::TimerHandle> screenLightTimer;
+        std::shared_ptr<settings::Settings> settings;
         /// Timer that keeps key backlight on for a certain time if there was key pressed
         sys::TimerHandle keypadLightTimer;
-
+        /// Timer that keeps screen backlight on for a certain time if there was key pressed
+        sys::TimerHandle screenLightTimer;
         bsp::keypad_backlight::State keypadLightState = bsp::keypad_backlight::State::off;
         bool isKeypadLightInCallMode                  = false;
 
@@ -44,8 +46,7 @@ namespace backlight
         void setKeypadLightState(bsp::keypad_backlight::State value) noexcept;
         void restoreKeypadLightState();
         void handleKeypadLightRefresh();
-        void handleScreenLightRefresh([[maybe_unused]] const int key = 0);
-        void handleScreenLightSettings(screen_light_control::Action action,
-                                       const screen_light_control::Parameters &params);
+        void handleScreenLightRefresh(int key = 0);
+        void onScreenLightTurnedOn() override;
     };
 } // namespace backlight

@@ -42,7 +42,9 @@ namespace bsp::eink_frontlight
 
     void setBrightness(BrightnessPercentage brightness)
     {
-        pwm->SetDutyCycle(gammaCorrection(brightness));
+        if (pwm) {
+            pwm->SetDutyCycle(gammaCorrection(brightness));
+        }
     }
 
     void turnOn()

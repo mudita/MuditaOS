@@ -101,10 +101,12 @@ namespace alarms
         void stopAllSnoozeChimes();
 
       private:
+        SingleEventRecord getNextPreWakeUpEvent();
         void handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
         void handleSnoozeChime(const SingleEventRecord &event, bool newStateOn);
         void handleBedtime(const SingleEventRecord &event, bool decision);
         void processBedtime(TimePoint now);
+        void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType) override;
 
         PreWakeUp preWakeUp;
         std::unique_ptr<SnoozeChimeSettingsProvider> snoozeChimeSettings;

@@ -41,6 +41,15 @@ namespace alarms
         static auto getActions(sys::Service *service) -> Actions;
     };
 
+    class PreWakeUpFrontlightHandler : public BellAlarmHandler
+    {
+      public:
+        explicit PreWakeUpFrontlightHandler(sys::Service *service);
+
+      private:
+        static auto getActions(sys::Service *service) -> Actions;
+    };
+
     class SnoozeChimeHandler : public BellAlarmHandler
     {
       public:
