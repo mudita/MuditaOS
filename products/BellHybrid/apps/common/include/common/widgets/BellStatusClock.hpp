@@ -12,6 +12,7 @@ namespace gui
       public:
         explicit BellStatusClock(
             Item *parent                               = nullptr,
+            TimeSetSpinner::Size size                  = TimeSetSpinner::Size::SMALL,
             uint32_t x                                 = 0U,
             uint32_t y                                 = 0U,
             uint32_t w                                 = 0U,
