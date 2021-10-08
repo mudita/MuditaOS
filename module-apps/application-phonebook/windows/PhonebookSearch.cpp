@@ -36,26 +36,6 @@ namespace gui
         setFocusItem(inputField);
     }
 
-    auto PhonebookSearch::handleSwitchData(SwitchData *data) -> bool
-    {
-        if (data == nullptr) {
-            LOG_ERROR("Received null pointer");
-            return false;
-        }
-
-        auto item = dynamic_cast<PhonebookSearchQuery *>(data);
-        assert(item != nullptr);
-        inputField->setText(item->getQuery());
-
-        return true;
-    }
-
-    void PhonebookSearch::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        inputField->clear();
-        setFocusItem(inputField);
-    }
-
     auto PhonebookSearch::onInput(const InputEvent &inputEvent) -> bool
     {
         if (AppWindow::onInput(inputEvent)) {
