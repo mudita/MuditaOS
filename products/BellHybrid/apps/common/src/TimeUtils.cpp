@@ -29,10 +29,10 @@ namespace utils::time
                 return std::to_string(minutes) + " min";
             }
             else if (minutes == 0) {
-                return std::to_string(hours) + " hrs";
+                return std::to_string(hours) + " h";
             }
             else {
-                return std::to_string(hours) + " hrs & " + std::to_string(minutes) + " min";
+                return std::to_string(hours) + " h & " + std::to_string(minutes) + " min";
             }
         }(duration.getHours(), duration.getMinutes());
         return UTF8("<text>" + prefix + "<br />" + translate("app_bellmain_home_screen_bottom_desc_in") + " " +

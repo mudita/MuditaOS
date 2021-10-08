@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeSetFmtSpinner.hpp"
-#include "TimeSetSpinner.hpp"
 
 #include <date/date.h>
 #include <gui/core/FontManager.hpp>
@@ -12,8 +11,13 @@
 namespace gui
 {
 
-    TimeSetFmtSpinner::TimeSetFmtSpinner(
-        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, utils::time::Locale::TimeFormat timeFormat)
+    TimeSetFmtSpinner::TimeSetFmtSpinner(Item *parent,
+                                         TimeSetSpinner::Size size,
+                                         uint32_t x,
+                                         uint32_t y,
+                                         uint32_t w,
+                                         uint32_t h,
+                                         utils::time::Locale::TimeFormat timeFormat)
         : HBox{parent, x, y, w, h}
     {
         using namespace utils;
@@ -21,7 +25,7 @@ namespace gui
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        timeSetSpinner = new TimeSetSpinner(this, 0, 0, 0, 0);
+        timeSetSpinner = new TimeSetSpinner(this, size, 0, 0, 0, 0);
         timeSetSpinner->setFont(focusFontName, noFocusFontName);
         timeSetSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeSetSpinner->setMargins(Margins(0, 0, 0, 0));

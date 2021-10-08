@@ -197,11 +197,13 @@ namespace app::home_screen
 
         namespace AlarmRinging
         {
-            auto entry = [](AbstractView &view, AbstractPresenter &presenter) {
-                presenter.spawnTimer(defaultAlarmRingingTime);
-                view.setAlarmTimeVisible(false);
-                view.setAlarmTriggered();
-            };
+            auto entry =
+                [](AbstractView &view, AbstractTemperatureModel &temperatureModel, AbstractPresenter &presenter) {
+                    presenter.spawnTimer(defaultAlarmRingingTime);
+                    view.setAlarmTimeVisible(false);
+                    view.setAlarmTriggered();
+                    view.setTemperature(temperatureModel.getTemperature());
+                };
             auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
         } // namespace AlarmRinging
 

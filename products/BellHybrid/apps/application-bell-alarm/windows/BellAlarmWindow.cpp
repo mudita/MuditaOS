@@ -45,7 +45,7 @@ namespace gui
         topText->activeItem = false;
         topText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        timeSetFmtSpinner = new TimeSetFmtSpinner(body->getCenterBox());
+        timeSetFmtSpinner = new TimeSetFmtSpinner(body->getCenterBox(), TimeSetSpinner::Size::MEDIUM);
         timeSetFmtSpinner->setFont(bell_alarm_style::time_set_fmt_spinner::focusFont,
                                    bell_alarm_style::time_set_fmt_spinner::noFocusFont);
         timeSetFmtSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);

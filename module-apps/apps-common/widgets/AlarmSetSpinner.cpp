@@ -26,7 +26,7 @@ namespace gui
         alarmImg->setMargins(Margins(0, 0, 0, 0));
         alarmImg->setMinimumSize(style::alarm_set_spinner::arrow::w, style::alarm_set_spinner::arrow::h);
 
-        timeSpinner = new TimeSetFmtSpinner(this);
+        timeSpinner = new TimeSetFmtSpinner(this, TimeSetSpinner::Size::SMALL);
         timeSpinner->setFont(style::window::font::largelight);
         timeSpinner->setEditMode(EditMode::Browse);
         timeSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -103,6 +103,7 @@ namespace gui
             break;
         case Status::RINGING:
             alarmImg->setImage("bell_alarm_ringing_W_G");
+            alarmImg->setMinimumSizeToFitImage();
             break;
         case Status::SNOOZE:
             alarmImg->setImage("bell_alarm_snooze_W_M");

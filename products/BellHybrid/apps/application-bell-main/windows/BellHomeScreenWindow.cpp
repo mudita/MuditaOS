@@ -98,7 +98,7 @@ namespace gui
         alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
         alarm->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        time = new TimeSetFmtSpinner(body->centerBox);
+        time = new TimeSetFmtSpinner(body->centerBox, TimeSetSpinner::Size::BIG);
         time->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         time->setFont(bellMainStyle::mainWindow::time::font);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -160,7 +160,7 @@ namespace gui
     void BellHomeScreenWindow::setTemperature(utils::temperature::Temperature newTemp)
     {
         bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_normal);
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
+        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         bottomText->setText(utils::temperature::tempToStrDec(newTemp));
         bottomBox->resizeItems();
     }
