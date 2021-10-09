@@ -9,7 +9,7 @@
 #include <apps-common/widgets/ProgressTimer.hpp>
 #include <apps-common/GuiTimer.hpp>
 #include <TextFixedSize.hpp>
-
+#include <time/dateCommon.hpp>
 namespace
 {
     inline constexpr auto bgSoundsTimerName     = "BGSoundsProgressTimer";
@@ -54,6 +54,13 @@ namespace
         decorateProgressItem(timer, gui::Alignment::Vertical::Top);
         return timer;
     }
+    gui::BellStatusClock *createClock(gui::Item *parent)
+    {
+        auto time = new gui::BellStatusClock(parent);
+        time->setMaximumSize(parent->getWidth(), parent->getHeight());
+        time->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        return time;
+    }
 } // namespace
 
 namespace gui
@@ -89,6 +96,7 @@ namespace gui
     }
     void BGSoundsProgressWindow::buildLayout()
     {
+        statusBar->setVisible(false);
         auto body = new gui::BellBaseLayout(this, 0, 0, style::bell_base_layout::w, style::bell_base_layout::h, false);
         auto vBox =
             new VBox(body->getCenterBox(), 0, 0, style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
@@ -96,6 +104,8 @@ namespace gui
         title       = createTitle(vBox);
         progressBar = createProgress(vBox);
         timerText   = createTimer(body->lastBox);
+        time        = createClock(body->firstBox);
+        body->firstBox->resizeItems();
         vBox->resizeItems();
 
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
@@ -141,5 +151,23 @@ namespace gui
     void BGSoundsProgressWindow::onPaused()
     {
         application->switchWindow(gui::window::name::bgSoundsPaused);
+    }
+    void BGSoundsProgressWindow::setTime(std::time_t newTime)
+    {
+        time->setTime(newTime);
+        time->setTimeFormatSpinnerVisibility(true);
+    }
+
+    void BGSoundsProgressWindow::setTimeFormat(utils::time::Locale::TimeFormat fmt)
+    {
+        time->setTimeFormat(fmt);
+    }
+
+    bool BGSoundsProgressWindow::updateTime()
+    {
+        if (presenter) {
+            presenter->handleUpdateTimeEvent();
+        }
+        return true;
     }
 } // namespace gui
