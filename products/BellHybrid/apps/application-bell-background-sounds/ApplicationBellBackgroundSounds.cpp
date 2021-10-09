@@ -13,6 +13,7 @@
 #include "windows/BGSoundsTimerSelectWindow.hpp"
 #include "windows/BGSoundsVolumeWindow.hpp"
 #include "widgets/BGSoundsPlayer.hpp"
+#include <common/models/TimeModel.hpp>
 #include <service-audio/AudioMessage.hpp>
 
 #include <log/log.hpp>
@@ -57,11 +58,13 @@ namespace app
                 auto presenter = std::make_unique<bgSounds::BGSoundsTimerSelectPresenter>(settings.get());
                 return std::make_unique<gui::BGSoundsTimerSelectWindow>(app, std::move(presenter));
             });
-        windowsFactory.attach(
-            gui::window::name::bgSoundsProgress, [this](ApplicationCommon *app, const std::string &name) {
-                auto presenter = std::make_unique<bgSounds::BGSoundsProgressPresenter>(settings.get(), *player);
-                return std::make_unique<gui::BGSoundsProgressWindow>(app, std::move(presenter));
-            });
+        windowsFactory.attach(gui::window::name::bgSoundsProgress,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  auto timeModel = std::make_unique<app::TimeModel>();
+                                  auto presenter = std::make_unique<bgSounds::BGSoundsProgressPresenter>(
+                                      settings.get(), *player, std::move(timeModel));
+                                  return std::make_unique<gui::BGSoundsProgressWindow>(app, std::move(presenter));
+                              });
         windowsFactory.attach(gui::window::name::bgSoundsPaused, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BGSoundsPausedWindow>(app);
         });

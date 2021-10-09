@@ -6,6 +6,7 @@
 #include "widgets/BGSoundsPlayer.hpp"
 #include <ApplicationBellBackgroundSounds.hpp>
 #include <apps-common/widgets/ProgressTimer.hpp>
+#include <common/models/TimeModel.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <Utils.hpp>
@@ -14,9 +15,12 @@
 
 namespace app::bgSounds
 {
-    BGSoundsProgressPresenter::BGSoundsProgressPresenter(settings::Settings *settings, AbstractBGSoundsPlayer &player)
-        : settings{settings}, player{player}
+    BGSoundsProgressPresenter::BGSoundsProgressPresenter(settings::Settings *settings,
+                                                         AbstractBGSoundsPlayer &player,
+                                                         std::unique_ptr<AbstractTimeModel> timeModel)
+        : settings{settings}, player{player}, timeModel{std::move(timeModel)}
     {}
+    BGSoundsProgressPresenter::~BGSoundsProgressPresenter() = default;
 
     void BGSoundsProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
     {
@@ -81,5 +85,8 @@ namespace app::bgSounds
             player.resume(std::move(onResumeCallback));
         }
     }
-
+    void BGSoundsProgressPresenter::handleUpdateTimeEvent()
+    {
+        getView()->setTime(timeModel->getCurrentTime());
+    }
 } // namespace app::bgSounds
