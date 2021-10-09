@@ -6,6 +6,7 @@
 #include "presenter/BGSoundsProgressPresenter.hpp"
 #include "data/BGSoundsAudioData.hpp"
 #include <AppWindow.hpp>
+#include <common/widgets/BellStatusClock.hpp>
 
 namespace gui
 {
@@ -17,11 +18,16 @@ namespace gui
         gui::Text *title            = nullptr;
         gui::HBarGraph *progressBar = nullptr;
         gui::Text *timerText        = nullptr;
+        gui::BellStatusClock *time  = nullptr;
         std::unique_ptr<BGSoundsAudioContext> audioContext;
 
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto onInput(const InputEvent &inputEvent) -> bool override;
+
+        void setTime(std::time_t newTime) override;
+        void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
+        bool updateTime() override;
 
         void buildLayout();
         void configureTimer();

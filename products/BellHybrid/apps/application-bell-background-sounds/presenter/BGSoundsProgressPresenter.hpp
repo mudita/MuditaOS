@@ -6,9 +6,11 @@
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
 #include <tags_fetcher/TagsFetcher.hpp>
+#include <time/time_locale.hpp>
 #include <memory>
 namespace app
 {
+    class AbstractTimeModel;
     class ApplicationCommon;
 } // namespace app
 namespace gui
@@ -31,6 +33,8 @@ namespace app::bgSounds
             ~View()                   = default;
             virtual void onFinished() = 0;
             virtual void onPaused()   = 0;
+            virtual void setTime(std::time_t newTime)                       = 0;
+            virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
         };
 
         class Presenter : public BasePresenter<BGSoundsProgressContract::View>
@@ -41,6 +45,7 @@ namespace app::bgSounds
             virtual void pause()                                                    = 0;
             virtual void resume()                                                   = 0;
             virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
+            virtual void handleUpdateTimeEvent()                                    = 0;
         };
     };
 
@@ -51,16 +56,21 @@ namespace app::bgSounds
         settings::Settings *settings = nullptr;
         AbstractBGSoundsPlayer &player;
         std::unique_ptr<app::TimerWithCallbacks> timer;
+        std::unique_ptr<AbstractTimeModel> timeModel;
 
         void activate(const tags::fetcher::Tags &tags) override;
         void stop() override;
         void pause() override;
         void resume() override;
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
+        void handleUpdateTimeEvent() override;
 
         void onFinished();
 
       public:
-        BGSoundsProgressPresenter(settings::Settings *settings, AbstractBGSoundsPlayer &player);
+        BGSoundsProgressPresenter(settings::Settings *settings,
+                                  AbstractBGSoundsPlayer &player,
+                                  std::unique_ptr<AbstractTimeModel> timeModel);
+        ~BGSoundsProgressPresenter();
     };
 } // namespace app::bgSounds
