@@ -46,6 +46,7 @@ namespace app
         void updateAlarm(AlarmEventRecord &alarm);
         AlarmEventRecord generateDefaultAlarm() const;
         std::shared_ptr<AlarmEventRecord> getAlarmPtr() const;
+        void disableSnooze(AlarmEventRecord &alarm);
 
         ApplicationCommon *app{};
         State state{State::Invalid};

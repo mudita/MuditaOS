@@ -29,11 +29,13 @@ namespace utils::time
         const auto prefix   = translate("app_bellmain_home_screen_bottom_desc");
         const auto duration = Duration{timestamp};
         const auto timeText = [](time_t hours, time_t minutes) -> std::string {
-            if (hours == 0 && minutes == 0) {
-                return "1 min";
-            }
-            else if (hours == 0) {
-                return std::to_string(minutes) + " min";
+            if (hours == 0) {
+                if (minutes == 1) {
+                    return translate("app_bellmain_home_screen_bottom_desc_less_than") + " 1 min";
+                }
+                else {
+                    return std::to_string(minutes) + " min";
+                }
             }
             else if (minutes == 0) {
                 return std::to_string(hours) + " h";
