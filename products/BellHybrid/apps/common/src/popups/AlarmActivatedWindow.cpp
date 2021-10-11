@@ -81,6 +81,6 @@ namespace gui
     void AlarmActivatedWindow::setAlarmTime(time_t alarmTime)
     {
         icon->text->setRichText(utils::time::getBottomDescription(
-            utils::time::calculateTimeDifference(alarmTime, utils::time::getCurrentTime())));
+            utils::time::calculateMinutesDifference(alarmTime, utils::time::getCurrentTime())));
     }
 } /* namespace gui */
