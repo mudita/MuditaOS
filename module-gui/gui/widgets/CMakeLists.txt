@@ -59,6 +59,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/GridLayout.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Lines.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TextLineCursor.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/RawText.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/RichTextParser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TextFormat.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/CheckBoxWithLabel.cpp"
