@@ -4,6 +4,8 @@
 #include <purefs/fs/drivers/mount_point_ext4.hpp>
 #include <mutex.hpp>
 #include <string>
+#include <cstdlib>
+#include <log/log.hpp>
 
 namespace purefs::fs::drivers
 {
@@ -18,6 +20,7 @@ namespace purefs::fs::drivers
             return ret;
         }
     } // namespace
+
     mount_point_ext4::mount_point_ext4(std::shared_ptr<blkdev::internal::disk_handle> diskh,
                                        std::string_view path,
                                        unsigned flags,
@@ -28,13 +31,32 @@ namespace purefs::fs::drivers
 
     mount_point_ext4::~mount_point_ext4()
     {}
+
     auto mount_point_ext4::lock() noexcept -> void
     {
         m_lock->Lock();
     }
+
     auto mount_point_ext4::unlock() noexcept -> void
     {
         m_lock->Unlock();
+    }
+
+    ext4_locker::ext4_locker(std::shared_ptr<mount_point_ext4> mnt_ext) : m_mnt_ext(mnt_ext)
+    {
+        mnt_ext->lock();
+    }
+
+    ext4_locker::~ext4_locker()
+    {
+        auto ptr = m_mnt_ext.lock();
+        if (ptr) {
+            ptr->unlock();
+        }
+        else {
+            LOG_FATAL("Unable to unlock ext4 filesystem");
+            std::abort();
+        }
     }
 
 } // namespace purefs::fs::drivers
