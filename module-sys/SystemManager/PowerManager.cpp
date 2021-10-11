@@ -9,11 +9,6 @@ namespace sys
 {
     namespace
     {
-        inline constexpr uint32_t frequencyShiftLowerThreshold{40};
-        inline constexpr uint32_t frequencyShiftUpperThreshold{60};
-        inline constexpr uint32_t maxBelowThresholdCount{30};
-        inline constexpr uint32_t maxBelowThresholdInRowCount{10};
-        inline constexpr uint32_t maxAboveThresholdCount{3};
         constexpr auto lowestLevelName{"lowestCpuFrequency"};
         constexpr auto middleLevelName{"middleCpuFrequency"};
         constexpr auto highestLevelName{"highestCpuFrequency"};
@@ -38,7 +33,7 @@ namespace sys
         totalTicksCount += ticks;
     }
 
-    PowerManager::PowerManager()
+    PowerManager::PowerManager() : powerProfile{bsp::getPowerProfile()}
     {
         lowPowerControl = bsp::LowPowerMode::Create().value_or(nullptr);
         driverSEMC      = drivers::DriverSEMC::Create("ExternalRAM");
@@ -81,11 +76,12 @@ namespace sys
         const auto currentCpuFreq        = lowPowerControl->GetCurrentFrequencyLevel();
         const auto minFrequencyRequested = cpuGovernor->GetMinimumFrequencyRequested();
 
-        if (cpuLoad > frequencyShiftUpperThreshold && currentCpuFreq < bsp::CpuFrequencyHz::Level_6) {
+        if (cpuLoad > powerProfile.frequencyShiftUpperThreshold && currentCpuFreq < bsp::CpuFrequencyHz::Level_6) {
             aboveThresholdCounter++;
             belowThresholdCounter = 0;
         }
-        else if (cpuLoad < frequencyShiftLowerThreshold && currentCpuFreq > bsp::CpuFrequencyHz::Level_1) {
+        else if (cpuLoad < powerProfile.frequencyShiftLowerThreshold &&
+                 currentCpuFreq > powerProfile.minimalFrequency) {
             belowThresholdCounter++;
             aboveThresholdCounter = 0;
         }
@@ -101,13 +97,19 @@ namespace sys
             ResetFrequencyShiftCounter();
             IncreaseCpuFrequency(minFrequencyRequested);
         }
-        else if (aboveThresholdCounter >= maxAboveThresholdCount) {
-            ResetFrequencyShiftCounter();
-            IncreaseCpuFrequency(bsp::CpuFrequencyHz::Level_6);
+        else if (aboveThresholdCounter >= powerProfile.maxAboveThresholdCount) {
+            if (powerProfile.frequencyIncreaseIntermediateStep && currentCpuFreq < bsp::CpuFrequencyHz::Level_4) {
+                ResetFrequencyShiftCounter();
+                IncreaseCpuFrequency(bsp::CpuFrequencyHz::Level_4);
+            }
+            else {
+                ResetFrequencyShiftCounter();
+                IncreaseCpuFrequency(bsp::CpuFrequencyHz::Level_6);
+            }
         }
         else {
-            if (belowThresholdCounter >=
-                    (isFrequencyLoweringInProgress ? maxBelowThresholdInRowCount : maxBelowThresholdCount) &&
+            if (belowThresholdCounter >= (isFrequencyLoweringInProgress ? powerProfile.maxBelowThresholdInRowCount
+                                                                        : powerProfile.maxBelowThresholdCount) &&
                 currentCpuFreq > minFrequencyRequested) {
                 ResetFrequencyShiftCounter();
                 DecreaseCpuFrequency();
@@ -119,7 +121,7 @@ namespace sys
     {
         const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
 
-        if (freq == bsp::CpuFrequencyHz::Level_1) {
+        if ((freq <= bsp::CpuFrequencyHz::Level_1) && (newFrequency > bsp::CpuFrequencyHz::Level_1)) {
             // connect internal the load resistor
             lowPowerControl->ConnectInternalLoadResistor();
             // turn off power save mode for DCDC inverter
@@ -148,7 +150,7 @@ namespace sys
     void PowerManager::DecreaseCpuFrequency()
     {
         const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
-        auto level      = bsp::CpuFrequencyHz::Level_1;
+        auto level      = powerProfile.minimalFrequency;
 
         switch (freq) {
         case bsp::CpuFrequencyHz::Level_6:
@@ -164,9 +166,11 @@ namespace sys
             level = bsp::CpuFrequencyHz::Level_2;
             break;
         case bsp::CpuFrequencyHz::Level_2:
-            level = bsp::CpuFrequencyHz::Level_1;
+            level = powerProfile.minimalFrequency;
             break;
         case bsp::CpuFrequencyHz::Level_1:
+            [[fallthrough]];
+        case bsp::CpuFrequencyHz::Level_0:
             break;
         }
 
@@ -175,7 +179,7 @@ namespace sys
             SetCpuFrequency(level);
         }
 
-        if (level == bsp::CpuFrequencyHz::Level_1) {
+        if (level <= bsp::CpuFrequencyHz::Level_1) {
             // Enable weak 2P5 and 1P1 LDO and Turn off regular 2P5 and 1P1 LDO
             lowPowerControl->SwitchToLowPowerModeLDO();
 
@@ -233,7 +237,7 @@ namespace sys
     void PowerManager::UpdateCpuFrequencyMonitor(bsp::CpuFrequencyHz currentFreq)
     {
         auto ticks     = xTaskGetTickCount();
-        auto levelName = currentFreq == bsp::CpuFrequencyHz::Level_1
+        auto levelName = currentFreq == powerProfile.minimalFrequency
                              ? lowestLevelName
                              : (currentFreq == bsp::CpuFrequencyHz::Level_6 ? highestLevelName : middleLevelName);
 

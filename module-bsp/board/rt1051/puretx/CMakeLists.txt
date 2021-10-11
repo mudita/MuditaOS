@@ -15,6 +15,7 @@ target_sources(
         bsp/battery_charger/battery_charger.cpp
         bsp/eink/eink_pin_config.cpp
         bsp/keyboard/keyboard.cpp
+        bsp/lpm/PowerProfile.cpp
         pin_mux.c
         clock_config.cpp
         irq_gpio.cpp

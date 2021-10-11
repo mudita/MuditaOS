@@ -31,7 +31,7 @@ namespace sys
 
       protected:
         const std::string name;
-        bsp::CpuFrequencyHz currentFrequencyToHold{bsp::CpuFrequencyHz::Level_1};
+        bsp::CpuFrequencyHz currentFrequencyToHold{bsp::CpuFrequencyHz::Level_0};
         sys::Service *owner{nullptr};
 
         /// function called from the PowerManager context
