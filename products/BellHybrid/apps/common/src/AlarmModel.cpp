@@ -75,6 +75,9 @@ namespace app
         }
         alarmEventPtr->enabled = value;
         updateAlarm(*alarmEventPtr);
+        if (!value) {
+            disableSnooze(*alarmEventPtr);
+        }
     }
     void AlarmModel::updateAlarm(AlarmEventRecord &alarm)
     {
@@ -83,6 +86,12 @@ namespace app
         request->execute(app, this, responseCallback);
 
         cachedRecord = alarm.getNextSingleEvent(TimePointNow());
+    }
+    void AlarmModel::disableSnooze(AlarmEventRecord &alarm)
+    {
+        auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::TurnOffSnoozeRequestMessage>(alarm.ID),
+                                                       service::name::service_time);
+        request->execute(app, this, responseCallback);
     }
     bool AlarmModel::isActive() const
     {

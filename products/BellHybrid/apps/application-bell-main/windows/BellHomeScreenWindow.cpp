@@ -180,6 +180,9 @@ namespace gui
         if (!battery->visible) {
             bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         }
+        else {
+            bottomText->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
+        }
         bottomBox->resizeItems();
     }
 
