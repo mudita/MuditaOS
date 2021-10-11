@@ -39,7 +39,7 @@ TEST_CASE("Power Manager CPU sentinels governor test")
         governor->RegisterNewSentinel(testSentinel_1);
         governor->RegisterNewSentinel(testSentinel_2);
 
-        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyHz::Level_1);
+        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyHz::Level_0);
 
         governor->SetCpuFrequencyRequest("testSentinel_1", bsp::CpuFrequencyHz::Level_4);
         REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyHz::Level_4);
@@ -56,7 +56,10 @@ TEST_CASE("Power Manager CPU sentinels governor test")
         governor->SetCpuFrequencyRequest("bedNameSentinel", bsp::CpuFrequencyHz::Level_6);
         REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyHz::Level_2);
 
-        governor->ResetCpuFrequencyRequest("testSentinel_1");
+        governor->SetCpuFrequencyRequest("testSentinel_1", bsp::CpuFrequencyHz::Level_1);
         REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyHz::Level_1);
+
+        governor->ResetCpuFrequencyRequest("testSentinel_1");
+        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyHz::Level_0);
     }
 }

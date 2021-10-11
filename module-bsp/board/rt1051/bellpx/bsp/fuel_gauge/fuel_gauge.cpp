@@ -28,7 +28,7 @@ namespace bsp::fuel_gauge
             (static_cast<uint8_t>(FuelGaugeAlertCapacityPercent) << static_cast<uint8_t>(CONFIG::shift)) &
             static_cast<uint8_t>(CONFIG::mask);
 
-        constexpr auto POLL_INTERVAL_MS = 60U * 1000U;
+        constexpr auto POLL_INTERVAL_MS = 5U * 60U * 1000U;
 
         enum class CW201xRetCode : int
         {

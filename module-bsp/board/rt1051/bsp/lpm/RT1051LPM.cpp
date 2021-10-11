@@ -72,6 +72,9 @@ namespace bsp
     {
         currentFrequency = freq;
         switch (freq) {
+        case bsp::CpuFrequencyHz::Level_0:
+            CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_4_Mhz);
+            break;
         case bsp::CpuFrequencyHz::Level_1:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_12_Mhz);
             break;
