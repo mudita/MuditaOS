@@ -146,7 +146,8 @@ namespace gui
         ActiveIconFactory factory(this->application);
         const auto &numberView = record.phoneNumber;
         if (record.presentation == PresentationType::PR_UNKNOWN) {
-            numberHBox->addText(callLogStyle::strings::privateNumber, style::window::font::mediumbold);
+            numberHBox->addText(utils::translate(callLogStyle::strings::privateNumber),
+                                style::window::font::mediumbold);
         }
         else {
             numberHBox->addText(numberView.getFormatted(), style::window::font::mediumbold);
