@@ -169,7 +169,7 @@ namespace gui
     {
         battery->setVisible(false);
         bottomBox->resizeItems();
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_small);
         bottomText->setRichText(desc);
     }
