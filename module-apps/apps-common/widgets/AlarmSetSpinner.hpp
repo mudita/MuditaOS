@@ -16,6 +16,16 @@ namespace style::alarm_set_spinner
         inline constexpr auto w = 64U;
         inline constexpr auto h = 64U;
     } // namespace arrow
+    namespace image_default
+    {
+        inline constexpr auto w = 64U;
+        inline constexpr auto h = 64U;
+    } // namespace image_default
+    namespace image_alarm_ringing
+    {
+        inline constexpr auto w = 84U;
+        inline constexpr auto h = 64U;
+    } // namespace image_alarm_ringing
     inline constexpr auto w = 440U;
     inline constexpr auto h = 64U;
 

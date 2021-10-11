@@ -24,7 +24,8 @@ namespace gui
         alarmImg = new ImageBox(this, 0, 0, 0, 0, new Image("bell_alarm_deactivated_W_M"));
         alarmImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         alarmImg->setMargins(Margins(0, 0, 0, 0));
-        alarmImg->setMinimumSize(style::alarm_set_spinner::arrow::w, style::alarm_set_spinner::arrow::h);
+        alarmImg->setMinimumSize(style::alarm_set_spinner::image_default::w,
+                                 style::alarm_set_spinner::image_default::h);
 
         timeSpinner = new TimeSetFmtSpinner(this, TimeSetSpinner::Size::SMALL);
         timeSpinner->setFont(style::window::font::largelight);
@@ -94,6 +95,15 @@ namespace gui
     {
         alarmStatus = status;
 
+        if (alarmStatus == Status::RINGING) {
+            alarmImg->setMinimumSize(style::alarm_set_spinner::image_alarm_ringing::w,
+                                     style::alarm_set_spinner::image_alarm_ringing::h);
+        }
+        else {
+            alarmImg->setMinimumSize(style::alarm_set_spinner::image_default::w,
+                                     style::alarm_set_spinner::image_default::h);
+        }
+
         switch (alarmStatus) {
         case Status::ACTIVATED:
             alarmImg->setImage("bell_alarm_activated_W_M");
@@ -115,6 +125,7 @@ namespace gui
             alarmImg->setImage("bell_alarm_deactivated_W_M");
             break;
         }
+
         resizeItems();
     }
 
