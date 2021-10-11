@@ -29,6 +29,7 @@ namespace gui
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;
         bool onFocus(bool state) override;
+        void setLeadingFillChar(char fillChar);
 
       private:
         int minValue;
@@ -40,6 +41,7 @@ namespace gui
         ///< if current < fixedFieldWidth Label will be filled with 0
         ///< value of 0 means no fixed width.
         RectangleEdge focusEdges = RectangleEdge::Bottom;
+        char leadingFillChar     = '0';
         void updateSpinner();
 
         OnUpdateCallback onUpdate{nullptr};

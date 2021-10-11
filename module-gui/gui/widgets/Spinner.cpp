@@ -103,7 +103,7 @@ namespace gui
     {
         std::stringstream outStream;
         if (fixedFieldWidth > 0) {
-            outStream << std::setw(fixedFieldWidth) << std::setfill('0');
+            outStream << std::setw(fixedFieldWidth) << std::setfill(leadingFillChar);
         }
         outStream << currentValue;
         setText(outStream.str());
@@ -122,6 +122,11 @@ namespace gui
     void Spinner::setFocusEdges(RectangleEdge edges)
     {
         focusEdges = edges;
+    }
+
+    void Spinner::setLeadingFillChar(char fillChar)
+    {
+        leadingFillChar = fillChar;
     }
 
 } // namespace gui

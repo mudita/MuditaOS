@@ -30,6 +30,7 @@ namespace gui
         hour->setEdges(RectangleEdge::None);
         hour->setPenFocusWidth(style::time_set_spinner::focus::size);
         hour->setCurrentValue(0);
+        hour->setLeadingFillChar(' ');
 
         addWidget(hour);
 
