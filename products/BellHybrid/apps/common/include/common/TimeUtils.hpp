@@ -11,5 +11,6 @@ namespace utils::time
 {
     std::time_t getCurrentTime();
     std::time_t calculateTimeDifference(std::time_t alarmTime, std::time_t currentTime);
+    std::time_t calculateMinutesDifference(std::time_t alarmTime, std::time_t currentTime);
     UTF8 getBottomDescription(std::time_t timestamp);
 } // namespace utils::time
