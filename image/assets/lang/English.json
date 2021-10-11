@@ -625,7 +625,7 @@
   "app_bellmain_home_screen_bottom_desc": "Next alarm will ring",
   "app_bellmain_home_screen_bottom_desc_in": "in",
   "app_bellmain_home_screen_bottom_desc_dp": "Deep press to activate",
-  "app_bell_alarm_deactivated": "<text>Alarm deactivated<br /></text>",
+  "app_bell_alarm_deactivated": "<text>Alarm deactivated</text>",
   "app_bell_alarm_set_not_active": "<text>Alarm set.<br />Deep press to activate.</text>",
   "app_bell_settings_advanced_frontlight": "Frontlight",
   "app_bell_settings_frontlight_top_message": "Frontlight intensity",
