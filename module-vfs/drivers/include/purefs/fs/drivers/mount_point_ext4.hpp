@@ -46,16 +46,14 @@ namespace purefs::fs::drivers
     class ext4_locker
     {
       public:
-        explicit ext4_locker(std::shared_ptr<mount_point_ext4> mnt_ext) : m_mnt_ext(mnt_ext)
-        {
-            m_mnt_ext->lock();
-        }
-        ~ext4_locker()
-        {
-            m_mnt_ext->unlock();
-        }
+        explicit ext4_locker(std::shared_ptr<mount_point_ext4> mnt_ext);
+        ~ext4_locker();
+        ext4_locker(ext4_locker &)  = delete;
+        ext4_locker(ext4_locker &&) = delete;
+        ext4_locker &operator=(ext4_locker &) = delete;
+        ext4_locker &operator=(ext4_locker &&) = delete;
 
       private:
-        const std::shared_ptr<mount_point_ext4> m_mnt_ext;
+        const std::weak_ptr<mount_point_ext4> m_mnt_ext;
     };
 } // namespace purefs::fs::drivers
