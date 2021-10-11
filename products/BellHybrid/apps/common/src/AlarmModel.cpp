@@ -141,6 +141,7 @@ namespace app
         defaultAlarm.startDate = TimePointFromString(defaultAlarmTimePoint.c_str());
         defaultAlarm.rruleText = "FREQ=DAILY";
         defaultAlarm.endDate   = TIME_POINT_MAX;
+        defaultAlarm.enabled   = true;
         return defaultAlarm;
     }
 
