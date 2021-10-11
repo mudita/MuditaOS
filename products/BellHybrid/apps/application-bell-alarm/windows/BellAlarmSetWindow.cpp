@@ -51,7 +51,7 @@ namespace gui
         if (presenter->isAlarmActive()) {
             icon->image->set("big_alarm_W_G");
             icon->text->setRichText(utils::time::getBottomDescription(
-                utils::time::calculateTimeDifference(presenter->getAlarmTime(), utils::time::getCurrentTime())));
+                utils::time::calculateMinutesDifference(presenter->getAlarmTime(), utils::time::getCurrentTime())));
         }
         else {
             icon->image->set("big_no-alarm_W_G");

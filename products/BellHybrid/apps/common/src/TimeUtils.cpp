@@ -4,6 +4,7 @@
 #include <common/TimeUtils.hpp>
 
 #include <time/time_conversion.hpp>
+#include <time/dateCommon.hpp>
 
 namespace utils::time
 {
@@ -15,6 +16,12 @@ namespace utils::time
     std::time_t calculateTimeDifference(std::time_t alarmTime, std::time_t currentTime)
     {
         return Duration{alarmTime, currentTime}.get();
+    }
+    std::time_t calculateMinutesDifference(std::time_t alarmTime, std::time_t currentTime)
+    {
+        const auto floorMinutesAlarmTime   = alarmTime - alarmTime % 60;
+        const auto floorMinutesCurrentTime = currentTime - currentTime % 60;
+        return calculateTimeDifference(floorMinutesAlarmTime, floorMinutesCurrentTime);
     }
 
     UTF8 getBottomDescription(std::time_t timestamp)

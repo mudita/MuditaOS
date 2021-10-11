@@ -177,7 +177,7 @@ namespace app::home_screen
                 alarmModel.activate(true);
                 presenter.spawnTimer();
                 view.setBottomDescription(utils::time::getBottomDescription(
-                    utils::time::calculateTimeDifference(view.getAlarmTime(), timeModel.getCurrentTime())));
+                    utils::time::calculateMinutesDifference(view.getAlarmTime(), timeModel.getCurrentTime())));
                 view.setAlarmActive(true);
                 view.setAlarmVisible(true);
             };
