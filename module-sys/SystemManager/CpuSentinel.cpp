@@ -29,10 +29,10 @@ namespace sys
 
     void CpuSentinel::ReleaseMinimumFrequency()
     {
-        if (currentFrequencyToHold != bsp::CpuFrequencyHz::Level_1) {
+        if (currentFrequencyToHold != bsp::CpuFrequencyHz::Level_0) {
             auto msg = std::make_shared<sys::ReleaseCpuFrequencyMessage>(GetName());
             owner->bus.sendUnicast(std::move(msg), service::name::system_manager);
-            currentFrequencyToHold = bsp::CpuFrequencyHz::Level_1;
+            currentFrequencyToHold = bsp::CpuFrequencyHz::Level_0;
         }
     }
 

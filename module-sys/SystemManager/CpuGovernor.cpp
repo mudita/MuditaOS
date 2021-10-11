@@ -9,7 +9,7 @@ namespace sys
 {
 
     GovernorSentinel::GovernorSentinel(std::shared_ptr<CpuSentinel> newSentinel)
-        : sentinelPtr(newSentinel), requestedFrequency(bsp::CpuFrequencyHz::Level_1)
+        : sentinelPtr(newSentinel), requestedFrequency(bsp::CpuFrequencyHz::Level_0)
     {}
 
     [[nodiscard]] auto GovernorSentinel::GetSentinel() const noexcept -> SentinelPointer
@@ -77,12 +77,12 @@ namespace sys
 
     void CpuGovernor::ResetCpuFrequencyRequest(std::string sentinelName)
     {
-        SetCpuFrequencyRequest(sentinelName, bsp::CpuFrequencyHz::Level_1);
+        SetCpuFrequencyRequest(sentinelName, bsp::CpuFrequencyHz::Level_0);
     }
 
     [[nodiscard]] auto CpuGovernor::GetMinimumFrequencyRequested() const noexcept -> bsp::CpuFrequencyHz
     {
-        bsp::CpuFrequencyHz minFrequency = bsp::CpuFrequencyHz::Level_1;
+        bsp::CpuFrequencyHz minFrequency = bsp::CpuFrequencyHz::Level_0;
 
         for (auto &sentinel : sentinels) {
             const auto sentinelFrequency = sentinel->GetRequestedFrequency();

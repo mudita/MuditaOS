@@ -14,6 +14,7 @@ target_sources(module-bsp
                 keypad_backlight/keypad_backlight.cpp
                 light_sensor/light_sensor.cpp
                 lpm/LinuxLPM.cpp
+                lpm/PowerProfile.cpp
                 magnetometer/magnetometer.cpp
                 rtc/rtc.cpp
                 torch/torch.cpp

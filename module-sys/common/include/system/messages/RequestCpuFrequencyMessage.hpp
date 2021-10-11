@@ -29,7 +29,7 @@ namespace sys
 
       private:
         std::string sentinelName;
-        bsp::CpuFrequencyHz frequencyRequested = bsp::CpuFrequencyHz::Level_1;
+        bsp::CpuFrequencyHz frequencyRequested = bsp::CpuFrequencyHz::Level_0;
     };
 
     class ReleaseCpuFrequencyMessage : public sys::DataMessage

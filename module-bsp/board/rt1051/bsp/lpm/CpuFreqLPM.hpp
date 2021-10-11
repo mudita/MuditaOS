@@ -23,6 +23,7 @@ namespace bsp
       public:
         enum class CpuClock
         {
+            CpuClock_Osc_4_Mhz,
             CpuClock_Osc_12_Mhz,
             CpuClock_Osc_24_Mhz,
             CpuClock_Pll2_66_Mhz,
