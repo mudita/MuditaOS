@@ -15,6 +15,7 @@ namespace bsp
     /// Only a few thresholds are available in the current configuration
     enum class CpuFrequencyHz
     {
+        Level_0 = 4000000,
         Level_1 = 12000000,
         Level_2 = 24000000,
         Level_3 = 66000000,

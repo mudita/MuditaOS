@@ -9,6 +9,7 @@
 #include "bsp/lpm/bsp_lpm.hpp"
 #include "drivers/semc/DriverSEMC.hpp"
 #include "CpuGovernor.hpp"
+#include <bsp/lpm/PowerProfile.hpp>
 #include <vector>
 
 namespace sys
@@ -78,6 +79,7 @@ namespace sys
         std::unique_ptr<bsp::LowPowerMode> lowPowerControl;
         std::shared_ptr<drivers::DriverSEMC> driverSEMC;
         std::unique_ptr<CpuGovernor> cpuGovernor;
+        const bsp::PowerProfile powerProfile;
     };
 
 } // namespace sys
