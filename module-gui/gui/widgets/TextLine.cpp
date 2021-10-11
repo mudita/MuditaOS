@@ -3,11 +3,9 @@
 
 #include "TextLine.hpp"
 #include "Common.hpp"
-#include "Label.hpp"
 #include "TextBlock.hpp"
 #include "TextDocument.hpp"
 #include "TextCursor.hpp"
-#include <cstdio>
 #include <RawFont.hpp>
 #include <numeric>
 
@@ -15,14 +13,9 @@ namespace gui
 {
 
     /// helper function to get our text representation
-    Label *buildUITextPart(const UTF8 &text, const TextFormat *format)
+    RawText *buildUITextPart(const UTF8 &text, const TextFormat *format)
     {
-        auto item = new gui::Label(nullptr);
-        item->setText(text);
-        item->setFont(format->getFont());
-        item->setTextColor(format->getColor());
-        item->setSize(item->getTextNeedSpace(), item->getTextHeight());
-        item->setEdges(RectangleEdge::None);
+        auto item = new gui::RawText(text, format->getFont(), format->getColor());
         return item;
     }
 
@@ -67,8 +60,8 @@ namespace gui
             // we can show nothing - this is the end of this line
             if (signsCountToShow == 0) {
                 auto item  = buildUITextPart("", textFormat);
-                widthUsed  = item->getTextNeedSpace();
-                heightUsed = std::max(heightUsed, item->getTextHeight());
+                widthUsed  = item->widgetArea.w;
+                heightUsed = std::max(heightUsed, item->widgetArea.h);
                 lineContent.emplace_back(item);
                 end = TextBlock::End::None;
 
@@ -80,8 +73,8 @@ namespace gui
             // create item for show and update Line data
             auto item = buildUITextPart(textToPrint(signsCountToShow, text), textFormat);
             shownLetterCount += signsCountToShow;
-            widthUsed += item->getTextNeedSpace();
-            heightUsed = std::max(heightUsed, item->getTextHeight());
+            widthUsed += item->widgetArea.w;
+            heightUsed = std::max(heightUsed, item->widgetArea.h);
             lineContent.emplace_back(item);
 
             setLineStartConditions(localCursor.getBlockNumber(), localCursor.getPosition());
