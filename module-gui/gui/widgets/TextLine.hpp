@@ -6,7 +6,7 @@
 #include <numeric>
 #include <list>
 #include "Common.hpp"
-#include "Label.hpp"
+#include "RawText.hpp"
 #include "TextDocument.hpp"
 #include "BoxLayout.hpp"
 #include "TextLineCursor.hpp"
@@ -35,7 +35,7 @@ namespace gui
         Length widthUsed              = 0;
         Length heightUsed             = 0;
         Length maxWidth               = 0;
-        std::list<Label *> lineContent;
+        std::list<RawText *> lineContent;
         Rect *underline = nullptr;
         UnderLineProperties underLineProperties;
         TextBlock::End end                  = TextBlock::End::None;
