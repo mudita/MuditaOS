@@ -222,4 +222,8 @@ namespace app
 
         return false;
     }
+
+    // Empty: do not start idleTimer on application run
+    void ApplicationBellOnBoarding::onStart()
+    {}
 } // namespace app
