@@ -11,7 +11,7 @@
 
 namespace app::manager
 {
-    constexpr auto idleReturnTimeout = std::chrono::seconds{5};
+    constexpr auto idleReturnTimeout = std::chrono::seconds{30};
     using connectFunction            = std::function<bool(const std::type_info &, sys::MessageHandler)>;
 
     class IdleHandler
