@@ -171,9 +171,9 @@ namespace app::popup
 
     std::string AlarmPopupPresenter::startedAt()
     {
-        return utils::time::TimestampFactory()
-            .createTimestamp(utils::time::TimestampType::Clock, TimePointToTimeT(this->getModel()->record->startDate))
-            ->str();
+        return HHMMToLocalizedString(this->getModel()->record->alarmTime.hourOfDay,
+                                     this->getModel()->record->alarmTime.minuteOfHour,
+                                     utils::time::TimestampType::Clock);
     }
 
     AlarmPopupPresenter::AlarmPopupPresenter(ApplicationCommon *app) : AlarmPopupContract::Presenter(app)

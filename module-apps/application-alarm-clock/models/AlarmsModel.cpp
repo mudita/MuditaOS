@@ -47,7 +47,6 @@ namespace app::alarmClock
         auto item               = new gui::AlarmItem(std::make_shared<AlarmRRulePresenter>(record));
         item->activatedCallback = [this, record](gui::Item &) {
             record->enabled = !record->enabled;
-            onAlarmEnableChange(record);
             alarmsRepository->update(*record, nullptr);
             return true;
         };
@@ -78,13 +77,6 @@ namespace app::alarmClock
         }
 
         return updateRecords(records);
-    }
-
-    void AlarmsModel::onAlarmEnableChange(const std::shared_ptr<AlarmEventRecord> record)
-    {
-        if (record->enabled) {
-            record->startDate = GetFollowingDayTime(record->startDate, std::chrono::system_clock::now());
-        }
     }
 
 } // namespace app::alarmClock

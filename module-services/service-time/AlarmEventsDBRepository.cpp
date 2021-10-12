@@ -7,10 +7,8 @@
 #include <module-db/queries/alarm_events/QueryAlarmEventsAdd.hpp>
 #include <module-db/queries/alarm_events/QueryAlarmEventsEdit.hpp>
 #include <module-db/queries/alarm_events/QueryAlarmEventsGet.hpp>
-#include <module-db/queries/alarm_events/QueryAlarmEventsGetBetweenDates.hpp>
-#include <module-db/queries/alarm_events/QueryAlarmEventsGetLimited.hpp>
-#include <module-db/queries/alarm_events/QueryAlarmEventsGetNext.hpp>
-#include <module-db/queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.hpp>
+#include <module-db/queries/alarm_events/QueryAlarmEventsGetEnabled.hpp>
+#include <module-db/queries/alarm_events/QueryAlarmEventsGetInRange.hpp>
 #include <module-db/queries/alarm_events/QueryAlarmEventsRemove.hpp>
 #include <module-db/queries/alarm_events/QueryAlarmEventsToggleAll.hpp>
 
@@ -26,24 +24,20 @@ namespace alarms
             callback, alarmId);
     }
 
-    auto AlarmEventsDBRepository::getAlarmEvents(std::uint32_t offset,
-                                                 std::uint32_t limit,
-                                                 const OnGetAlarmEventsCallback &callback) -> void
+    auto AlarmEventsDBRepository::getAlarmEnabledEvents(const OnGetAlarmEventsCallback &callback) -> void
     {
-        sendQueryWithCallback<db::query::alarmEvents::GetLimited,
-                              db::query::alarmEvents::GetLimitedResult,
-                              OnGetAlarmEventsCallback>(callback, offset, limit);
+        sendQueryWithCallback<db::query::alarmEvents::GetEnabled,
+                              db::query::alarmEvents::GetEnabledResult,
+                              OnGetAlarmEventsCallback>(callback);
     }
 
-    auto AlarmEventsDBRepository::getAlarmEventsInRange(TimePoint start,
-                                                        TimePoint end,
-                                                        std::uint32_t offset,
+    auto AlarmEventsDBRepository::getAlarmEventsInRange(std::uint32_t offset,
                                                         std::uint32_t limit,
                                                         const OnGetAlarmEventsInRangeCallback &callback) -> void
     {
-        sendQueryWithCallback<db::query::alarmEvents::GetBetweenDates,
-                              db::query::alarmEvents::GetBetweenDatesResult,
-                              OnGetAlarmEventsInRangeCallback>(callback, start, end, offset, limit);
+        sendQueryWithCallback<db::query::alarmEvents::GetInRange,
+                              db::query::alarmEvents::GetInRangeResult,
+                              OnGetAlarmEventsInRangeCallback>(callback, offset, limit);
     }
 
     auto AlarmEventsDBRepository::addAlarmEvent(const AlarmEventRecord &alarmEvent,
@@ -67,28 +61,6 @@ namespace alarms
         sendQueryWithCallback<db::query::alarmEvents::Remove,
                               db::query::alarmEvents::RemoveResult,
                               OnRemoveAlarmEventCallback>(callback, id);
-    }
-
-    auto AlarmEventsDBRepository::getNext(TimePoint start,
-                                          std::uint32_t offset,
-                                          std::uint32_t limit,
-                                          const OnGetNextCallback &callback) -> void
-    {
-        sendQueryWithCallback<db::query::alarmEvents::GetNext,
-                              db::query::alarmEvents::GetNextResult,
-                              OnGetNextCallback>(callback, start, offset, limit);
-    }
-
-    auto AlarmEventsDBRepository::getAlarmEventsRecurringInRange(TimePoint start,
-                                                                 TimePoint end,
-                                                                 std::uint32_t offset,
-                                                                 std::uint32_t limit,
-                                                                 const OnGetAlarmEventsRecurringInRange &callback)
-        -> void
-    {
-        sendQueryWithCallback<db::query::alarmEvents::GetRecurringBetweenDates,
-                              db::query::alarmEvents::GetRecurringBetweenDatesResult,
-                              OnGetAlarmEventsRecurringInRange>(callback, start, end, offset, limit);
     }
 
     auto AlarmEventsDBRepository::toggleAll(bool toggle, const OnToggleAll &callback) -> void

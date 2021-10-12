@@ -110,16 +110,8 @@ std::unique_ptr<alarms::IAlarmOperations> AlarmOperationsFixture::getMockedAlarm
 TEST(PreWakeUp, TooEarlyForPreWakeUp)
 {
     alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>());
-    auto event           = AlarmEventRecord(1,
-                                  defName,
-                                  TimePointFromString("2022-11-11 05:06:00"),
-                                  defDuration,
-                                  defAllDay,
-                                  defRRule,
-                                  defMusic,
-                                  defEnabled,
-                                  defSnooze);
-    const auto nextEvent = event.getNextSingleEvent(TimePointFromString("2022-11-11 05:00:00"));
+    auto event           = AlarmEventRecord(1, AlarmTime{5h, 6min}, defMusic, defEnabled, defSnooze, defRRule);
+    const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
 
     const auto decision = preWakeUp.decide(timeInjector(), nextEvent);
@@ -130,16 +122,8 @@ TEST(PreWakeUp, TooEarlyForPreWakeUp)
 TEST(PreWakeUp, TimeToPlayChime)
 {
     alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>());
-    auto event           = AlarmEventRecord(1,
-                                  defName,
-                                  TimePointFromString("2022-11-11 05:05:00"),
-                                  defDuration,
-                                  defAllDay,
-                                  defRRule,
-                                  defMusic,
-                                  defEnabled,
-                                  defSnooze);
-    const auto nextEvent = event.getNextSingleEvent(TimePointFromString("2022-11-11 05:00:00"));
+    auto event           = AlarmEventRecord(1, AlarmTime{5h, 5min}, defMusic, defEnabled, defSnooze, defRRule);
+    const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
 
     const auto decision = preWakeUp.decide(timeInjector(), nextEvent);
@@ -152,16 +136,8 @@ TEST(PreWakeUp, TimeToPlayChimeButDisabled)
     auto settingsProvider = std::make_unique<MockedPreWakeUpSettingsProvider>();
     settingsProvider->setChimeSettings(false, std::chrono::minutes::zero());
     alarms::PreWakeUp preWakeUp(std::move(settingsProvider));
-    auto event           = AlarmEventRecord(1,
-                                  defName,
-                                  TimePointFromString("2022-11-11 05:05:00"),
-                                  defDuration,
-                                  defAllDay,
-                                  defRRule,
-                                  defMusic,
-                                  defEnabled,
-                                  defSnooze);
-    const auto nextEvent = event.getNextSingleEvent(TimePointFromString("2022-11-11 05:00:00"));
+    auto event           = AlarmEventRecord(1, AlarmTime{5h, 5min}, defMusic, defEnabled, defSnooze, defRRule);
+    const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
 
     const auto decision = preWakeUp.decide(timeInjector(), nextEvent);
@@ -172,16 +148,8 @@ TEST(PreWakeUp, TimeToPlayChimeButDisabled)
 TEST(PreWakeUp, TimeToLightFrontlight)
 {
     alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>());
-    auto event           = AlarmEventRecord(1,
-                                  defName,
-                                  TimePointFromString("2022-11-11 05:02:00"),
-                                  defDuration,
-                                  defAllDay,
-                                  defRRule,
-                                  defMusic,
-                                  defEnabled,
-                                  defSnooze);
-    const auto nextEvent = event.getNextSingleEvent(TimePointFromString("2022-11-11 05:00:00"));
+    auto event           = AlarmEventRecord(1, AlarmTime{5h, 2min}, defMusic, defEnabled, defSnooze, defRRule);
+    const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
 
     const auto decision = preWakeUp.decide(timeInjector(), nextEvent);
@@ -194,16 +162,8 @@ TEST(PreWakeUp, TimeToLightFrontlightButDisabled)
     auto settingsProvider = std::make_unique<MockedPreWakeUpSettingsProvider>();
     settingsProvider->setFrontlightSettings(false, std::chrono::minutes::zero());
     alarms::PreWakeUp preWakeUp(std::move(settingsProvider));
-    auto event           = AlarmEventRecord(1,
-                                  defName,
-                                  TimePointFromString("2022-11-11 05:02:00"),
-                                  defDuration,
-                                  defAllDay,
-                                  defRRule,
-                                  defMusic,
-                                  defEnabled,
-                                  defSnooze);
-    const auto nextEvent = event.getNextSingleEvent(TimePointFromString("2022-11-11 05:00:00"));
+    auto event           = AlarmEventRecord(1, AlarmTime{5h, 2min}, defMusic, defEnabled, defSnooze, defRRule);
+    const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
 
     const auto decision = preWakeUp.decide(timeInjector(), nextEvent);
@@ -213,37 +173,31 @@ TEST(PreWakeUp, TimeToLightFrontlightButDisabled)
 
 TEST(Bedtime, TimeToBedDisabled)
 {
-    auto settingsProvider = std::make_unique<MockedBedtimeModel>(false, TimePointFromString("2022-11-11 05:02:00"));
+    auto settingsProvider =
+        std::make_unique<MockedBedtimeModel>(false, TimePointFromStringWithShift("2022-11-11 05:02:00"));
     alarms::Bedtime bedtime(std::move(settingsProvider));
-    ASSERT_FALSE(bedtime.decide(TimePointFromString("2022-11-11 05:02:00")));
-    ASSERT_FALSE(bedtime.decide(TimePointFromString("2022-11-11 07:32:00")));
+    ASSERT_FALSE(bedtime.decide(TimePointFromStringWithShift("2022-11-11 05:02:00")));
+    ASSERT_FALSE(bedtime.decide(TimePointFromStringWithShift("2022-11-11 07:32:00")));
 }
 
 TEST(Bedtime, TimeToBedEnabled)
 {
-    auto settingsProvider = std::make_unique<MockedBedtimeModel>(true, TimePointFromString("2022-11-11 05:02:00"));
+    auto settingsProvider =
+        std::make_unique<MockedBedtimeModel>(true, TimePointFromStringWithShift("2022-11-11 05:02:00"));
     alarms::Bedtime bedtime(std::move(settingsProvider));
-    ASSERT_TRUE(bedtime.decide(TimePointFromString("2022-11-11 05:02:00")));
-    ASSERT_TRUE(bedtime.decide(TimePointFromString("2022-12-03 05:02:01")));
-    ASSERT_TRUE(bedtime.decide(TimePointFromString("2022-12-03 05:02:03")));
-    ASSERT_TRUE(bedtime.decide(TimePointFromString("2022-12-03 05:02:55")));
-    ASSERT_FALSE(bedtime.decide(TimePointFromString("2022-11-11 07:32:00")));
-    ASSERT_FALSE(bedtime.decide(TimePointFromString("2022-11-11 05:01:59")));
+    ASSERT_TRUE(bedtime.decide(TimePointFromStringWithShift("2022-11-11 05:02:00")));
+    ASSERT_TRUE(bedtime.decide(TimePointFromStringWithShift("2022-12-03 05:02:01")));
+    ASSERT_TRUE(bedtime.decide(TimePointFromStringWithShift("2022-12-03 05:02:03")));
+    ASSERT_TRUE(bedtime.decide(TimePointFromStringWithShift("2022-12-03 05:02:55")));
+    ASSERT_FALSE(bedtime.decide(TimePointFromStringWithShift("2022-11-11 07:32:00")));
+    ASSERT_FALSE(bedtime.decide(TimePointFromStringWithShift("2022-11-11 05:01:59")));
 }
 
 TEST(PreWakeUp, TimePointIsNotRoundedToFullMinute)
 {
     alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>());
-    auto event           = AlarmEventRecord(1,
-                                  defName,
-                                  TimePointFromString("2022-11-11 05:05:01"),
-                                  defDuration,
-                                  defAllDay,
-                                  defRRule,
-                                  defMusic,
-                                  defEnabled,
-                                  defSnooze);
-    const auto nextEvent = event.getNextSingleEvent(TimePointFromString("2022-11-11 05:00:00"));
+    auto event           = AlarmEventRecord(1, AlarmTime{5h, 5min}, defMusic, defEnabled, defSnooze, defRRule);
+    const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
 
     const auto decision = preWakeUp.decide(timeInjector(), nextEvent);
@@ -257,15 +211,8 @@ class BellAlarmOperationsFixture : public ::testing::Test
     void SetUp() override
     {
         auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
-        alarmRepoMock->nextRecords.push_back(AlarmEventRecord(1,
-                                                              defName,
-                                                              TimePointFromString("2022-11-11 09:00:00"),
-                                                              defDuration,
-                                                              defAllDay,
-                                                              defRRule,
-                                                              defMusic,
-                                                              defEnabled,
-                                                              defSnooze));
+        auto event         = AlarmEventRecord(1, AlarmTime{9h, 0min}, defMusic, defEnabled, defSnooze, defRRule);
+        alarmRepoMock->nextRecords.push_back(event);
         chimeHandler      = std::make_shared<MockAlarmHandler>();
         frontlightHandler = std::make_shared<MockAlarmHandler>();
 
@@ -275,7 +222,7 @@ class BellAlarmOperationsFixture : public ::testing::Test
                                                      std::make_unique<MockedBedtimeModel>());
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpChime, chimeHandler);
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpFrontlight, frontlightHandler);
-        alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 08:00:00"));
+        alarmOperations->updateEventsCache(TimePointFromStringWithShift("2022-11-11 08:00:00"));
     }
 
     std::unique_ptr<alarms::IAlarmOperations> alarmOperations;
@@ -287,19 +234,19 @@ TEST_F(BellAlarmOperationsFixture, PreWakeUp_TooEarlyToHandle)
 {
     EXPECT_CALL(*chimeHandler, handle(testing::_)).Times(0);
     EXPECT_CALL(*frontlightHandler, handle(testing::_)).Times(0);
-    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 08:54:00"));
+    alarmOperations->minuteUpdated(TimePointFromStringWithShift("2022-11-11 08:54:00"));
 }
 
 TEST_F(BellAlarmOperationsFixture, PreWakeUp_TimeToPlayChime)
 {
     EXPECT_CALL(*chimeHandler, handle(testing::_)).Times(1);
     EXPECT_CALL(*frontlightHandler, handle(testing::_)).Times(0);
-    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 08:55:00"));
+    alarmOperations->minuteUpdated(TimePointFromStringWithShift("2022-11-11 08:55:00"));
 }
 
 TEST_F(BellAlarmOperationsFixture, PreWakeUp_TimeToLightFrontlight)
 {
     EXPECT_CALL(*chimeHandler, handle(testing::_)).Times(0);
     EXPECT_CALL(*frontlightHandler, handle(testing::_)).Times(1);
-    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 08:58:00"));
+    alarmOperations->minuteUpdated(TimePointFromStringWithShift("2022-11-11 08:58:00"));
 }

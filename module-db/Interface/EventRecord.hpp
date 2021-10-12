@@ -28,29 +28,22 @@ struct EventInfo
     EventInfo(const UTF8 &name, TimePoint startDate, TimePoint endDate, uint32_t duration, bool isAllDay)
         : name{name}, startDate{TimePointFloorMinutes(startDate)}, endDate{TimePointFloorMinutes(endDate)},
           duration{duration}, isAllDay{isAllDay} {};
+    EventInfo(TimePoint startDate, TimePoint endDate)
+        : startDate{TimePointFloorMinutes(startDate)}, endDate{TimePointFloorMinutes(endDate)} {};
 
     auto isValid() const -> bool;
 };
 
 struct SingleEventRecord;
 
-struct EventRecord : public Record, public EventInfo
+struct EventRecord : public Record
 {
-    std::string rruleText{""};
-
     EventRecord() = default;
-    EventRecord(uint32_t id,
-                const UTF8 &name,
-                TimePoint startDate,
-                uint32_t duration,
-                bool isAllDay,
-                const std::string &rruleText);
+    explicit EventRecord(uint32_t id);
 
     virtual ~EventRecord(){};
     explicit EventRecord(EventRecord *record);
 
-    auto generateSingleEvents(TimePoint from, TimePoint to, uint32_t count) -> std::vector<SingleEventRecord>;
-    auto getNextSingleEvent(TimePoint from) -> SingleEventRecord;
     auto isValid() const -> bool;
 
     virtual std::shared_ptr<EventRecord> getCopy();
@@ -64,7 +57,7 @@ struct SingleEventRecord : public Record, public EventInfo
 
     SingleEventRecord() = default;
     SingleEventRecord(std::shared_ptr<EventRecord> parent, TimePoint startDate, TimePoint endDate)
-        : EventInfo{parent->name, startDate, endDate, parent->duration, parent->isAllDay}, parent{parent} {};
+        : EventInfo{startDate, endDate}, parent{parent} {};
 
     auto isValid() const -> bool;
 };
