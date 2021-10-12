@@ -6,8 +6,10 @@
 #include "GuiTimer.hpp"            // for GuiTimer
 #include "Item.hpp"                // for Item
 #include "MessageType.hpp"         // for MessageType
+#include "Service/Message.hpp"
 #include "Timers/TimerFactory.hpp" // for Timer
 #include "StatusBar.hpp"
+#include "service-db/DBNotificationMessage.hpp"
 #include "status-bar/Time.hpp"
 #include "Translator.hpp" // for KeyInputSim...
 #include <EventStore.hpp> // for Battery
@@ -16,6 +18,7 @@
 #include <log/debug.hpp>                 // for DEBUG_APPLI...
 #include <log/log.hpp>                   // for LOG_INFO
 #include "messages/AppMessage.hpp"       // for AppSwitchMe...
+#include "messages/AppSwitchWindowPopupMessage.hpp"
 #include "service-appmgr/Controller.hpp" // for Controller
 #include "actions/AlarmClockStatusChangeParams.hpp"
 #include <service-cellular-api>
@@ -35,32 +38,21 @@
 #include <iterator>    // for distance, next
 #include <type_traits> // for add_const<>...
 #include <WindowsFactory.hpp>
+#include <WindowsStack.hpp>
+#include <WindowsPopupFilter.hpp>
 #include <service-gui/Common.hpp>
 #include <Utils.hpp>
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
-#include <popups/AlarmPopup.hpp>
-#include <popups/VolumeWindow.hpp>
-#include <popups/HomeModesWindow.hpp>
-#include <popups/TetheringPhoneModePopup.hpp>
-#include <popups/TetheringConfirmationPopup.hpp>
-#include <popups/PowerOffWindow.hpp>
-#include <popups/presenter/PowerOffPresenter.hpp>
-#include <popups/lock-popups/PhoneLockedWindow.hpp>
-#include <popups/lock-popups/PhoneLockedInfoWindow.hpp>
-#include <popups/lock-popups/PhoneLockInputWindow.hpp>
-#include <popups/lock-popups/PhoneLockChangeInfoWindow.hpp>
-#include <popups/lock-popups/SimLockInputWindow.hpp>
-#include <popups/lock-popups/SimInfoWindow.hpp>
-#include <popups/lock-popups/SimNotReadyWindow.hpp>
 #include <popups/data/PopupData.hpp>
 #include <popups/data/PopupRequestParams.hpp>
 #include <popups/data/AlarmPopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
 #include <popups/data/BluetoothModeParams.hpp>
 #include <locks/data/LockData.hpp>
+#include <magic_enum.hpp>
 
 namespace gui
 {
@@ -108,12 +100,14 @@ namespace app
                                          uint32_t stackDepth,
                                          sys::ServicePriority priority)
         : Service(std::move(name), std::move(parent), stackDepth, priority),
-          default_window(gui::name::window::main_window), windowsStack(this),
+          popupFilter(std::make_unique<gui::popup::Filter>()), windowsStackImpl(std::make_unique<WindowsStack>()),
+          default_window(gui::name::window::main_window),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, statusBarManager{std::make_unique<StatusBarManager>()},
           settings(std::make_unique<settings::Settings>()), statusIndicators{statusIndicators}, phoneLockSubject(this),
           lockPolicyHandler(this), simLockSubject(this)
     {
+        popupFilter->attachWindowsStack(windowsStackImpl.get());
         statusBarManager->enableIndicators({gui::status_bar::Indicator::Time});
 
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
@@ -159,10 +153,7 @@ namespace app
             return actionHandled();
         });
         addActionReceiver(app::manager::actions::ShowPopup, [this](auto &&params) {
-            auto popupParams = static_cast<gui::PopupRequestParams *>(params.get());
-            if (const auto popupId = popupParams->getPopupId(); isPopupPermitted(popupId)) {
-                showPopup(popupId, popupParams);
-            }
+            actionPopupPush(std::forward<decltype(params)>(params));
             return actionHandled();
         });
         addActionReceiver(app::manager::actions::AbortPopup, [this](auto &&params) {
@@ -172,14 +163,16 @@ namespace app
             return actionHandled();
         });
         addActionReceiver(app::manager::actions::NotificationsChanged, [this](auto &&params) {
-            handleNotificationsChanged(std::move(params));
+            handleNotificationsChanged(std::forward<decltype(params)>(params));
             return actionHandled();
         });
+
+        registerPopupBlueprints();
     }
 
     ApplicationCommon::~ApplicationCommon() noexcept
     {
-        windowsStack.windows.clear();
+        windowsStack().clear();
     }
 
     ApplicationCommon::State ApplicationCommon::getState()
@@ -213,7 +206,7 @@ namespace app
 
     void ApplicationCommon::render(gui::RefreshModes mode)
     {
-        if (windowsStack.isEmpty()) {
+        if (windowsStack().isEmpty()) {
             LOG_ERROR("Current window is not defined");
             return;
         }
@@ -238,6 +231,16 @@ namespace app
 
     void ApplicationCommon::updateStatuses(gui::AppWindow *window) const
     {}
+
+    void ApplicationCommon::setDefaultWindow(const std::string &w)
+    {
+        default_window = w;
+    }
+
+    WindowsStack &ApplicationCommon::windowsStack() const
+    {
+        return *windowsStackImpl;
+    }
 
     void ApplicationCommon::updateCurrentWindow(std::unique_ptr<gui::SwitchData> data,
                                                 gui::ShowMode command,
@@ -277,36 +280,43 @@ namespace app
         }
     }
 
-    void ApplicationCommon::returnToPreviousWindow(const uint32_t times)
+    void ApplicationCommon::switchWindowPopup(const std::string &windowName,
+                                              const gui::popup::Disposition &d,
+                                              std::unique_ptr<gui::SwitchData> data,
+                                              SwitchReason reason)
     {
-        if (const auto prevWindow = getPrevWindow(times); prevWindow == gui::name::window::no_window) {
+        bus.sendUnicast(std::make_shared<AppSwitchWindowPopupMessage>(windowName, std::move(data), reason, d),
+                        this->GetName());
+    }
+
+    void ApplicationCommon::returnToPreviousWindow()
+    {
+        auto window = windowsStack().get(previousWindow);
+        if (not window) {
+            LOG_DEBUG("No window to back from - get to previous app");
             app::manager::Controller::switchBack(this);
+            return;
         }
-        else {
-            LOG_INFO("Back to previous window %s", prevWindow.c_str());
-            switchWindow(prevWindow, gui::ShowMode::GUI_SHOW_RETURN);
-        }
+        LOG_INFO("Back to previous window: %s", window->c_str());
+        windowsStack().pop(*window);
+        switchWindow(*window, gui::ShowMode::GUI_SHOW_RETURN);
     }
 
     void ApplicationCommon::popCurrentWindow()
     {
-        if (!windowsStack.stack.empty()) {
-            windowsStack.stack.pop_back();
-        }
+        windowsStack().pop();
     }
 
     void ApplicationCommon::popWindow(const std::string &window)
     {
-        auto popWindow = std::find(windowsStack.stack.begin(), windowsStack.stack.end(), window);
-        if (popWindow != windowsStack.stack.end()) {
-            windowsStack.stack.erase(popWindow);
-        }
+        windowsStack().drop(window);
     }
 
     void ApplicationCommon::refreshWindow(gui::RefreshModes mode)
     {
-        if (not windowsStack.isEmpty()) {
-            auto msg = std::make_shared<AppRefreshMessage>(mode, getCurrentWindow()->getName());
+        auto window = windowsStack().get(topWindow);
+        if (window) {
+            auto msg = std::make_shared<AppRefreshMessage>(mode, *window);
             bus.sendUnicast(msg, this->GetName());
         }
     }
@@ -395,7 +405,7 @@ namespace app
         else if (msg->getEvent().isShortRelease()) {
             longPressTimer.stop();
         }
-        if (not windowsStack.isEmpty() && getCurrentWindow()->onInput(msg->getEvent())) {
+        if (not windowsStack().isEmpty() && getCurrentWindow()->onInput(msg->getEvent())) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -440,9 +450,9 @@ namespace app
 
             auto result = actionHandler(std::move(data));
 
-            if (getState() == State::ACTIVE_FORGROUND && windowsStack.isEmpty()) {
+            if (getState() == State::ACTIVE_FORGROUND && windowsStack().isEmpty()) {
                 LOG_ERROR("OnAction application switch with no window provided. Fallback to default mainWindow.");
-                setActiveWindow(gui::name::window::main_window);
+                pushWindow(default_window);
             }
 
             return result;
@@ -530,63 +540,80 @@ namespace app
     sys::MessagePointer ApplicationCommon::handleSwitchWindow(sys::Message *msgl)
     {
         auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
-        // check if specified window is in the application
+        if (not windowsFactory.isRegistered(msg->getWindowName())) {
+            LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
+            return sys::msgHandled();
+        }
+        auto switchData = std::move(msg->getData());
+        if (switchData && switchData->ignoreCurrentWindowOnStack) {
+            windowsStack().pop();
+        }
+        auto anotherWindowOnTop = (not isCurrentWindow(msg->getWindowName())) and (not windowsStack().isEmpty());
+        if (anotherWindowOnTop) {
+            auto closeReason = gui::Window::CloseReason::WindowSwitch;
+            switch (msg->getReason()) {
+            case SwitchReason::PhoneLock:
+                closeReason = gui::Window::CloseReason::PhoneLock;
+                break;
+            case SwitchReason::Popup:
+                closeReason = gui::Window::CloseReason::Popup;
+                break;
+            default:
+                break;
+            }
+            getCurrentWindow()->onClose(closeReason);
+        }
 
-        if (windowsFactory.isRegistered(msg->getWindowName())) {
-            auto switchData = std::move(msg->getData());
-            if (switchData && switchData->ignoreCurrentWindowOnStack) {
-                popToWindow(getPrevWindow());
-            }
-            if (!isCurrentWindow(msg->getWindowName())) {
-                if (!windowsStack.isEmpty()) {
-                    auto closeReason = gui::Window::CloseReason::WindowSwitch;
-                    switch (msg->getReason()) {
-                    case SwitchReason::PhoneLock:
-                        closeReason = gui::Window::CloseReason::PhoneLock;
-                        break;
-                    case SwitchReason::Popup:
-                        closeReason = gui::Window::CloseReason::Popup;
-                        break;
-                    default:
-                        break;
-                    }
-                    getCurrentWindow()->onClose(closeReason);
-                }
-                setActiveWindow(msg->getWindowName());
-            }
-            LOG_DEBUG("Current window: %s vs %s", getCurrentWindow()->getName().c_str(), msg->getWindowName().c_str());
-            getCurrentWindow()->handleSwitchData(switchData.get());
+        LOG_DEBUG("Current window: %s vs %s", getCurrentWindow()->getName().c_str(), msg->getWindowName().c_str());
+        const auto &[name, data] = msg->getSwitchData();
+        pushWindow(name, data);
+        getCurrentWindow()->handleSwitchData(switchData.get());
 
-            auto ret = dynamic_cast<gui::SwitchSpecialChar *>(switchData.get());
-            if (ret != nullptr && ret->type == gui::SwitchSpecialChar::Type::Response) {
-                auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
-                if (text != nullptr) {
-                    text->addText(ret->getDescription());
-                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                    return sys::msgHandled();
-                }
-            }
-            getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
+        if (handleUpdateTextRefresh(switchData.get())) {
+            return sys::msgHandled();
+        }
+        getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
+
+        /// This is kind of gentle hack on our stateless Application Window management switching
+        /// if we are not requesting for popup and we cant handle next popup - just refresh the window
+        /// else -> popup will refresh it for us
+        if (not tryShowPopup()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
-        else {
-            LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
-        }
         return sys::msgHandled();
+    }
+
+    bool ApplicationCommon::handleUpdateTextRefresh(gui::SwitchData *data)
+    {
+        auto ret = dynamic_cast<gui::SwitchSpecialChar *>(data);
+        if (ret != nullptr && ret->type == gui::SwitchSpecialChar::Type::Response) {
+            auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
+            if (text != nullptr) {
+                text->addText(ret->getDescription());
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                return true;
+            }
+        }
+        return false;
     }
 
     sys::MessagePointer ApplicationCommon::handleUpdateWindow(sys::Message *msgl)
     {
         auto msg = static_cast<AppUpdateWindowMessage *>(msgl);
-
-        if (windowsFactory.isRegistered(msg->getWindowName()) && isCurrentWindow(msg->getWindowName())) {
+        auto haveBuilder = windowsFactory.isRegistered(msg->getWindowName());
+        auto window      = isCurrentWindow(msg->getWindowName());
+        if (haveBuilder && window) {
             const auto &switchData = msg->getData();
             getCurrentWindow()->handleSwitchData(switchData.get());
             getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
             refreshWindow(msg->getRefreshMode());
         }
         else {
-            LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
+            LOG_ERROR("cant update window: %s in app: %s, params: haveBuilder: %s is_on_top: %s",
+                      msg->getWindowName().c_str(),
+                      GetName().c_str(),
+                      haveBuilder ? "yes" : "no",
+                      window ? "yes" : "no");
         }
         return sys::msgHandled();
     }
@@ -595,7 +622,7 @@ namespace app
     {
         setState(State::DEACTIVATING);
 
-        for (const auto &[windowName, window] : windowsStack) {
+        for (const auto &[windowName, window] : windowsStack()) {
             LOG_INFO("Closing a window: %s", windowName.c_str());
             window->onClose(gui::Window::CloseReason::ApplicationClose);
         }
@@ -623,10 +650,7 @@ namespace app
     sys::MessagePointer ApplicationCommon::handleAppRebuild(sys::Message *msgl)
     {
         LOG_INFO("Application %s rebuilding gui", GetName().c_str());
-        for (auto &[name, window] : windowsStack) {
-            LOG_DEBUG("Rebuild: %s", name.c_str());
-            windowsStack.windows[name] = windowsFactory.build(this, name);
-        }
+        windowsStack().rebuildWindows(windowsFactory, this);
         LOG_INFO("Refresh app with focus!");
         if (state == State::ACTIVE_FORGROUND) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
@@ -639,12 +663,14 @@ namespace app
     {
         auto *msg = static_cast<AppRefreshMessage *>(msgl);
         assert(msg);
-        if (windowsStack.isEmpty() || (getCurrentWindow()->getName() != msg->getWindowName())) {
+        if (windowsStack().isEmpty() || (getCurrentWindow()->getName() != msg->getWindowName())) {
             LOG_DEBUG("Ignore request for window %s we are on window %s",
                       msg->getWindowName().c_str(),
-                      windowsStack.isEmpty() ? "none" : getCurrentWindow()->getName().c_str());
+                      windowsStack().isEmpty() ? "none" : getCurrentWindow()->getName().c_str());
             return sys::msgNotHandled();
         }
+        LOG_DEBUG("rendering! %s", msg->getWindowName().c_str());
+
         render(msg->getMode());
         return sys::msgHandled();
     }
@@ -678,7 +704,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleGetDOM(sys::Message *msgl)
     {
-        if (windowsStack.isEmpty()) {
+        if (windowsStack().isEmpty()) {
             LOG_ERROR("Current window is not defined - can't dump DOM");
             return sys::msgNotHandled();
         }
@@ -731,13 +757,8 @@ namespace app
         settings->deinit();
         LOG_INFO("Closing an application: %s", GetName().c_str());
         LOG_INFO("Deleting windows");
-        windowsStack.windows.clear();
+        windowsStack().clear();
         return sys::ReturnCodes::Success;
-    }
-
-    void ApplicationCommon::setActiveWindow(const std::string &windowName)
-    {
-        pushWindow(windowName);
     }
 
     bool ApplicationCommon::adjustCurrentVolume(const int step)
@@ -806,165 +827,47 @@ namespace app
         sender->bus.sendUnicast(msg, application);
     }
 
-    void ApplicationCommon::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode)
+    void ApplicationCommon::actionPopupPush(std::unique_ptr<gui::SwitchData> params)
     {
-        auto flightModeSetting = settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global);
-        bool flightMode        = flightModeSetting == "1" ? true : false;
-
-        using namespace gui::popup;
-        const auto &popupName = resolveWindowName(gui::popup::ID::PhoneModes);
-        if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
-            updateCurrentWindow(std::make_unique<gui::ModesPopupData>(mode, flightMode));
+        auto rdata = dynamic_cast<gui::PopupRequestParams *>(params.get());
+        if (rdata == nullptr) {
+            assert(0 && "invalid popup data received");
+            return;
         }
-        else {
-            switchWindow(popupName, std::make_unique<gui::ModesPopupData>(mode, flightMode));
-        }
-        if (data->getDisposition().windowtype != gui::popup::Disposition::WindowType::Popup) {
-            LOG_ERROR("setting popup window type to popup - fallback");
-            data->setDisposition(gui::popup::Disposition{
-                gui::popup::Disposition::Priority::Normal, gui::popup::Disposition::WindowType::Popup, id});
+        // two lines below is to **not** loose data on copy on dynamic_cast, but to move the data
+        (void)params.release();
+        auto data      = std::unique_ptr<gui::PopupRequestParams>(rdata);
+        auto id        = data->getPopupId();
+        auto blueprint = popupBlueprint.getBlueprint(id);
+        if (!blueprint) {
+            LOG_ERROR("no blueprint to handle %s popup - fallback", std::string(magic_enum::enum_name(id)).c_str());
+            blueprint = popupBlueprintFallback(id);
         }
         auto request = gui::popup::Request(id, std::move(data), *blueprint);
         windowsPopupQueue->pushRequest(std::move(request));
         tryShowPopup();
     }
 
-    void ApplicationCommon::handleVolumeChanged(audio::Volume volume, audio::Context context)
+    gui::popup::Filter &ApplicationCommon::getPopupFilter() const
     {
-        using namespace gui::popup;
-        const auto popupName = resolveWindowName(gui::popup::ID::Volume);
-        if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
-            updateCurrentWindow(std::make_unique<gui::VolumePopupData>(volume, context));
-        }
-        else {
-            switchWindow(popupName, std::make_unique<gui::VolumePopupData>(volume, context));
-        }
+        return *popupFilter;
     }
 
-    void ApplicationCommon::attachPopups(const std::vector<gui::popup::ID> &popupsList)
+    bool ApplicationCommon::tryShowPopup()
     {
-        using namespace gui::popup;
-        for (auto popup : popupsList) {
-            switch (popup) {
-            case ID::Volume:
-                windowsFactory.attach(window::volume_window, [](ApplicationCommon *app, const std::string &name) {
-                    return std::make_unique<gui::VolumeWindow>(app, window::volume_window);
-                });
-                break;
-            case ID::Tethering:
-            case ID::TetheringPhoneModeChangeProhibited:
-                windowsFactory.attach(window::tethering_confirmation_window,
-                                      [](ApplicationCommon *app, const std::string &name) {
-                                          return std::make_unique<gui::TetheringConfirmationPopup>(
-                                              app, window::tethering_confirmation_window);
-                                      });
-                windowsFactory.attach(window::tethering_phonemode_change_window,
-                                      [](ApplicationCommon *app, const std::string &name) {
-                                          return std::make_unique<gui::TetheringPhoneModePopup>(
-                                              app, window::tethering_phonemode_change_window);
-                                      });
-                break;
-            case ID::PhoneModes:
-                windowsFactory.attach(window::phone_modes_window, [](ApplicationCommon *app, const std::string &name) {
-                    return std::make_unique<gui::HomeModesWindow>(app, window::phone_modes_window);
-                });
-                break;
-            case ID::Brightness:
-                break;
-            case ID::PhoneLock:
-            case ID::PhoneLockInput:
-            case ID::PhoneLockInfo:
-            case ID::PhoneLockChangeInfo:
-                windowsFactory.attach(window::phone_lock_window, [](ApplicationCommon *app, const std::string &name) {
-                    return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window);
-                });
-                windowsFactory.attach(
-                    window::phone_lock_info_window, [](ApplicationCommon *app, const std::string &name) {
-                        return std::make_unique<gui::PhoneLockedInfoWindow>(app, window::phone_lock_info_window);
-                    });
-                windowsFactory.attach(
-                    window::phone_lock_input_window, [](ApplicationCommon *app, const std::string &name) {
-                        return std::make_unique<gui::PhoneLockInputWindow>(app, window::phone_lock_input_window);
-                    });
-                windowsFactory.attach(window::phone_lock_change_info_window,
-                                      [](ApplicationCommon *app, const std::string &name) {
-                                          return std::make_unique<gui::PhoneLockChangeInfoWindow>(
-                                              app, window::phone_lock_change_info_window);
-                                      });
-                windowsFactory.attach(window::power_off_window, [](ApplicationCommon *app, const std::string &name) {
-                    auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
-                    return std::make_unique<gui::PowerOffWindow>(app, std::move(presenter));
-                });
-                break;
-            case ID::SimLock:
-            case ID::SimInfo:
-            case ID::SimNotReady:
-                windowsFactory.attach(window::sim_unlock_window, [](ApplicationCommon *app, const std::string &name) {
-                    return std::make_unique<gui::SimLockInputWindow>(app, window::sim_unlock_window);
-                });
-                windowsFactory.attach(window::sim_info_window, [](ApplicationCommon *app, const std::string &name) {
-                    return std::make_unique<gui::SimInfoWindow>(app, window::sim_info_window);
-                });
-                windowsFactory.attach(
-                    window::sim_not_ready_window, [](ApplicationCommon *app, const std::string &name) {
-                        return std::make_unique<gui::SimNotReadyWindow>(app, window::sim_not_ready_window);
-                    });
-                break;
-            case ID::Alarm:
-                windowsFactory.attach(window::alarm_window, [](ApplicationCommon *app, const std::string &name) {
-                    auto presenter = std::make_shared<popup::AlarmPopupPresenter>(app);
-                    return std::make_unique<gui::AlarmPopup>(app, window::alarm_window, presenter);
-                });
-            default:
-                break;
+        auto request = windowsPopupQueue->popRequest(getPopupFilter());
+        if (request) {
+            auto popup = std::string(magic_enum::enum_name(request->getPopupParams().getPopupId()));
+            LOG_DEBUG("handling popup: %s", popup.c_str());
+            /// request handle actually switches window to popup window
+            auto retval = request->handle();
+            if (not retval) {
+                LOG_ERROR("Popup %s handling failure, please check registered blueprint!", popup.c_str());
             }
             LOG_ERROR("no blueprint for popup: %s", popup.c_str());
             return retval;
         }
-    }
-
-    void ApplicationCommon::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
-    {
-        using namespace gui::popup;
-        if (id == ID::PhoneModes) {
-            auto popupParams = static_cast<const gui::PhoneModePopupRequestParams *>(params);
-            handlePhoneModeChanged(popupParams->getPhoneMode());
-        }
-        else if (id == ID::Volume) {
-            auto volumeParams = static_cast<const gui::VolumePopupRequestParams *>(params);
-            LOG_INFO("Playback: %s, volume: %s",
-                     audio::str(volumeParams->getAudioContext().second).c_str(),
-                     std::to_string(volumeParams->getVolume()).c_str());
-            handleVolumeChanged(volumeParams->getVolume(), volumeParams->getAudioContext());
-        }
-        else if (id == ID::PhoneLock) {
-            switchWindow(
-                gui::popup::resolveWindowName(id), gui::ShowMode::GUI_SHOW_INIT, nullptr, SwitchReason::PhoneLock);
-        }
-        else if (id == ID::PhoneLockInput || id == ID::PhoneLockChangeInfo) {
-            auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);
-
-            switchWindow(
-                gui::popup::resolveWindowName(id),
-                std::make_unique<locks::LockData>(popupParams->getLock(), popupParams->getPhoneLockInputTypeAction()));
-        }
-        else if (id == ID::SimLock || id == ID::SimInfo) {
-            auto popupParams = static_cast<const gui::SimUnlockInputRequestParams *>(params);
-
-            switchWindow(gui::popup::resolveWindowName(id),
-                         std::make_unique<locks::SimLockData>(popupParams->getLock(),
-                                                              popupParams->getSimInputTypeAction(),
-                                                              popupParams->getErrorCode()));
-        }
-        else if (id == ID::Alarm) {
-            auto popupParams =
-                const_cast<gui::AlarmPopupRequestParams *>(static_cast<const gui::AlarmPopupRequestParams *>(params));
-            switchWindow(gui::popup::resolveWindowName(id),
-                         std::make_unique<gui::AlarmPopupRequestParams>(popupParams));
-        }
-        else {
-            switchWindow(gui::popup::resolveWindowName(id), gui::ShowMode::GUI_SHOW_INIT, nullptr, SwitchReason::Popup);
-        }
+        return false;
     }
 
     void ApplicationCommon::abortPopup(gui::popup::ID id)
@@ -997,73 +900,69 @@ namespace app
 
     bool ApplicationCommon::popToWindow(const std::string &window)
     {
-        if (window == gui::name::window::no_window) {
-            bool ret = false;
-            if (windowsStack.stack.size() <= 1) {
-                windowsStack.stack.clear();
-                ret = true;
-            }
-            return ret;
-        }
-
-        auto ret = std::find(windowsStack.stack.begin(), windowsStack.stack.end(), window);
-        if (ret != windowsStack.stack.end()) {
-            LOG_INFO("Pop last window(s) [%d] :  %s",
-                     static_cast<int>(std::distance(ret, windowsStack.stack.end())),
-                     ret->c_str());
-            windowsStack.stack.erase(std::next(ret), windowsStack.stack.end());
-            LOG_INFO("Curent window... %s vs %s", ret->c_str(), windowsStack.stack.back().c_str());
-            return true;
-        }
-        return false;
+        windowsStack().pop(popupName);
+        returnToPreviousWindow();
     }
 
-    void ApplicationCommon::pushWindow(const std::string &newWindow)
+    bool ApplicationCommon::userInterfaceDBNotification([[maybe_unused]] sys::Message *msg,
+                                                        [[maybe_unused]] const UiNotificationFilter &filter)
+    {
+        bool handled = false;
+        for (const auto &[name, window] : windowsStack()) {
+            if (filter == nullptr || (filter != nullptr && filter(msg, window->getName()))) {
+                handled |= window->onDatabaseMessage(msg);
+            }
+        }
+        return handled;
+    }
+
+    void ApplicationCommon::pushWindow(const std::string &newWindow, const gui::popup::Disposition &d)
     {
         // handle if window was already on
-        LOG_DEBUG("App: %s window %s request", GetName().c_str(), newWindow.c_str());
-        if (popToWindow(newWindow)) {
+        LOG_INFO("App: %s window %s request", GetName().c_str(), newWindow.c_str());
+        if (newWindow.empty() && windowsStack().popLastWindow()) {
+            LOG_INFO("Empty window request!");
             return;
         }
-        else {
-            windowsStack.push(newWindow, windowsFactory.build(this, newWindow));
+        if (windowsStack().pop(newWindow)) {
+            LOG_INFO("Get back to window!");
+            return;
         }
-#if DEBUG_APPLICATION_MANAGEMENT == 1
-        LOG_DEBUG("[%d] newWindow: %s", (int)windowsStack.stack.size(), newWindow.c_str());
-        for (auto &el : windowsStack.stack) {
-            LOG_DEBUG("-> %s", el.c_str());
-        }
-#endif
-    };
+        LOG_INFO("Create window for stack: %s", newWindow.c_str());
+        windowsStack().push(newWindow, windowsFactory.build(this, newWindow), d);
+    }
 
-    const std::string ApplicationCommon::getPrevWindow(uint32_t count) const
+    std::optional<std::string> ApplicationCommon::getPrevWindow(uint32_t count) const
     {
-        if (this->windowsStack.stack.size() <= 1 || count > this->windowsStack.stack.size()) {
-            return gui::name::window::no_window;
-        }
-        return *std::prev(windowsStack.stack.end(), count + 1);
+        return windowsStack().get(count);
     }
 
     gui::AppWindow *ApplicationCommon::getCurrentWindow()
     {
-        if (windowsStack.stack.size() == 0) {
-            windowsStack.push(default_window, windowsFactory.build(this, default_window));
+        if (windowsStack().isEmpty()) {
+            windowsStack().push(default_window, windowsFactory.build(this, default_window));
         }
-        /// TODO handle nullptr? if not found on stack -> return default
-        return windowsStack.get(windowsStack.stack.back());
+        auto windowname = windowsStack().get(topWindow);
+        auto window     = windowsStack().get(*windowname);
+        if (windowname != window->getName()) {
+            LOG_FATAL("Factory vs Builtin name mismatch ! %s vs %s", windowname->c_str(), window->getName().c_str());
+            window->setName(*windowname);
+        }
+        return window;
     }
 
     bool ApplicationCommon::isCurrentWindow(const std::string &windowName) const noexcept
     {
-        if (windowsStack.isEmpty()) {
-            return false;
+        if (const auto &window = windowsStack().get(windowName); window != nullptr) {
+            return window->getName() == windowName;
         }
-        return windowsStack.stack.back() == windowName;
+        LOG_ERROR("no window: %s", windowName.c_str());
+        return false;
     }
 
     gui::AppWindow *ApplicationCommon::getWindow(const std::string &name)
     {
-        return windowsStack.get(name);
+        return windowsStack().get(name);
     }
 
     void ApplicationCommon::connect(GuiTimer *timer, gui::Item *item)

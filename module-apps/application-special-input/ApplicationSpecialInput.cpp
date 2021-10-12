@@ -9,7 +9,7 @@ using namespace app;
 
 namespace
 {
-    constexpr auto SpecialInputAppStackDepth = 2048U;
+    constexpr auto SpecialInputAppStackDepth = 2200;
 } // namespace
 
 ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
@@ -26,8 +26,6 @@ ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
     windowsFactory.attach(app::char_select, [](ApplicationCommon *app, const std::string &name) {
         return std::make_unique<gui::SpecialInputMainWindow>(app);
     });
-
-    setActiveWindow(app::char_select);
 }
 
 sys::MessagePointer ApplicationSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

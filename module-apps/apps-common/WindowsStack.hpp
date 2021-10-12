@@ -3,22 +3,45 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <map>
+#include <optional>
 #include <vector>
 #include <string>
-#include <AppWindow.hpp>
+#include <ostream>
+#include <log/log.hpp>
+#include "popups/Disposition.hpp"
+
+namespace gui
+{
+    class AppWindow;
+}
 
 namespace app
 {
 
+    class WindowsFactory;
     class ApplicationCommon;
+
+    constexpr auto previousWindow = 1;
+    constexpr auto topWindow      = 0;
+
+    struct WindowData
+    {
+      public:
+        std::string name;
+        gui::popup::Disposition disposition{};
+
+        WindowData(const std::string &name, const gui::popup::Disposition &disposition)
+            : name(name), disposition(disposition)
+        {}
+    };
 
     class WindowsStack
     {
-        std::function<void(WindowsStack &)> onPopCallback = nullptr;
-        std::map<std::string, std::unique_ptr<gui::AppWindow>> windows{};
         std::vector<WindowData> stack;
+        std::map<std::string, std::unique_ptr<gui::AppWindow>> windows{};
         decltype(stack)::iterator findInStack(const std::string &);
 
       public:
@@ -47,11 +70,9 @@ namespace app
         bool pop(const std::string &window);
         bool popLastWindow();
         bool drop(const std::string &window);
-        void dropPendingPopups();
         void clear();
 
         bool rebuildWindows(app::WindowsFactory &windowsFactory, ApplicationCommon *app);
-        void registerOnPopCallback(std::function<void(WindowsStack &)> callback);
     };
 
 } // namespace app

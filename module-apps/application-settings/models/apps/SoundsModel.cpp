@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SoundsModel.hpp"
+#include "AppWindow.hpp"
 
 #include <application-settings/widgets/apps/SettingsSoundItem.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>

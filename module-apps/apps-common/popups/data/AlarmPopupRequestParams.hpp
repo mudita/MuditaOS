@@ -28,7 +28,7 @@ namespace gui
 
         explicit AlarmPopupRequestParams(AlarmPopupRequestParams *p)
             : PopupRequestParams{p->getPopupId()}, type(p->type), record(std::move(p->record)),
-              snoozedAlarms(std::move(p->snoozedAlarms))
+              snoozedAlarms(p->snoozedAlarms)
         {}
 
         [[nodiscard]] AlarmPopupType getPopupType() const

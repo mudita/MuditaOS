@@ -17,14 +17,22 @@ namespace gui
     /// if requested)
     class SwitchData
     {
+        bool popup = false;
+
       protected:
         std::string description = "";
 
       public:
         SwitchData() = default;
         explicit SwitchData(std::string description) : description{std::move(description)} {};
+        explicit SwitchData(std::string description, bool popup) : popup(popup), description{std::move(description)} {};
 
         virtual ~SwitchData() = default;
+
+        [[nodiscard]] bool isPopup() const
+        {
+            return popup;
+        }
         [[nodiscard]] virtual const std::string &getDescription() const
         {
             return description;

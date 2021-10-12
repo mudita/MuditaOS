@@ -29,6 +29,7 @@ namespace gui
             PowerOff,
             Reboot,
             BedtimeNotification,
+            Invalid,
         };
 
         namespace window

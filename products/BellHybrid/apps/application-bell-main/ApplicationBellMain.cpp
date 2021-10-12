@@ -27,7 +27,6 @@
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
-#include <WindowsStack.hpp>
 
 namespace app
 {
@@ -39,7 +38,24 @@ namespace app
                                              std::uint32_t stackDepth)
         : Application(name, parent, statusIndicators, startInBackground, stackDepth)
     {
-        registerOnPopCallback([](WindowsStack &windowsStack) { windowsStack.dropPendingPopups(); });
+
+        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
+            auto val = ((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
+                        (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
+                        (isCurrentWindow(gui::BellTurnOffWindow::name)));
+            if (val) {
+                LOG_INFO("popup blocked");
+                return !val;
+            }
+            if (not(((popupParams.getPopupId() == gui::popup::ID::AlarmActivated ||
+                      popupParams.getPopupId() == gui::popup::ID::AlarmDeactivated)) and
+                    (not isHomeScreenFocused()))) {
+                LOG_INFO("popup blocked");
+                return false;
+            }
+            return true;
+        });
+
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
@@ -138,27 +154,12 @@ namespace app
         if (respMessage != nullptr && respMessage->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
-        auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
-        if (msg != nullptr) {
-            for (auto &[name, window] : windowsStack.windows) {
-                window->onDatabaseMessage(msg);
-            }
+        if (auto msg = dynamic_cast<db::NotificationMessage *>(msgl); msg != nullptr) {
+            userInterfaceDBNotification(
+                msgl, [&]([[maybe_unused]] sys::Message *, [[maybe_unused]] const std::string &) { return true; });
             return sys::msgHandled();
         }
-
         return handleAsyncResponse(resp);
-    }
-
-    void ApplicationBellMain::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
-    {
-        if (id == gui::popup::ID::AlarmActivated || id == gui::popup::ID::AlarmDeactivated) {
-            if (not isHomeScreenFocused()) {
-                switchWindow(gui::popup::resolveWindowName(id));
-            }
-        }
-        else {
-            Application::showPopup(id, params);
-        }
     }
 
     auto ApplicationBellMain::isHomeScreenFocused() -> bool

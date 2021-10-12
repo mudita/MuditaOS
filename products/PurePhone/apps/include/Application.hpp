@@ -11,6 +11,7 @@ namespace app
     {
       protected:
         void updateStatuses(gui::AppWindow *window) const override;
+        void attachPopups(const std::vector<gui::popup::ID> &popupsList) override;
 
       public:
         using ApplicationCommon::ApplicationCommon;

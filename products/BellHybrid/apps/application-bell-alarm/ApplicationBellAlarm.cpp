@@ -54,7 +54,7 @@ namespace app
             priv->timeModel  = std::make_shared<app::TimeModel>();
             priv->alarmPresenter =
                 std::make_shared<bell_alarm::BellAlarmWindowPresenter>(priv->alarmModel, priv->timeModel);
-            return std::make_unique<gui::BellAlarmWindow>(app, priv->alarmPresenter);
+            return std::make_unique<gui::BellAlarmWindow>(app, priv->alarmPresenter, name);
         });
 
         windowsFactory.attach(gui::window::name::bellAlarmSet, [&](ApplicationCommon *app, const std::string &name) {

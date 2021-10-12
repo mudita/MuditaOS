@@ -3,13 +3,14 @@
 
 #include "WindowsFactory.hpp"
 #include <AppWindow.hpp>
+#include <utility>
 
 namespace app
 {
 
     void WindowsFactory::attach(const std::string &name, builder builder)
     {
-        builders[name] = builder;
+        builders[name] = std::move(builder);
     }
 
     auto WindowsFactory::isRegistered(const std::string &name) const -> bool

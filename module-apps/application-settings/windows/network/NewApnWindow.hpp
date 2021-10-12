@@ -8,6 +8,7 @@
 
 #include <ListView.hpp>
 #include <Text.hpp>
+#include <AppWindow.hpp>
 
 namespace gui
 {

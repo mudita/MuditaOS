@@ -9,6 +9,7 @@
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <application-call/data/CallSwitchData.hpp>
 #include <module-apps/application-messages/data/SMSdata.hpp>
+#include <AppWindow.hpp>
 
 using namespace gui;
 

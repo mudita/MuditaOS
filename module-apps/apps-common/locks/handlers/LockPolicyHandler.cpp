@@ -5,6 +5,7 @@
 #include <log/log.hpp>
 #include <ApplicationCommon.hpp>
 #include <gsl/assert>
+#include <AppWindow.hpp>
 
 using namespace locks;
 

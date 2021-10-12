@@ -8,3 +8,5 @@ add_catch2_executable(
     LIBS
         module-apps
 )
+
+add_subdirectory(windows)

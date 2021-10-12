@@ -51,10 +51,10 @@ namespace app
             return retMsg;
         }
 
-        if (msgl->messageType == MessageType::DBServiceNotification) {
-            for (auto &[name, window] : windowsStack.windows) {
-                window->onDatabaseMessage(msgl);
-            }
+        if (userInterfaceDBNotification(msgl,
+                                        [&]([[maybe_unused]] sys::Message *, [[maybe_unused]] const std::string &) {
+                                            return msgl->messageType == MessageType::DBServiceNotification;
+                                        })) {
             return sys::msgHandled();
         }
 
@@ -70,9 +70,6 @@ namespace app
         }
 
         createUserInterface();
-
-        setActiveWindow(calllog::settings::MainWindowStr);
-
         return ret;
     }
 

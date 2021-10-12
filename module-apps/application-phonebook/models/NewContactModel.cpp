@@ -3,6 +3,7 @@
 
 #include "NewContactModel.hpp"
 
+#include "apps-common/windows/AppWindow.hpp"
 #include "application-phonebook/widgets/ContactListItem.hpp"
 #include "application-phonebook/widgets/InputBoxWithLabelAndIconWidget.hpp"
 #include "application-phonebook/widgets/InputLinesWithLabelWidget.hpp"

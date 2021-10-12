@@ -8,6 +8,7 @@
 
 #include <InputEvent.hpp>
 #include <ListView.hpp>
+#include <AppWindow.hpp>
 
 namespace style::quotes::list
 {

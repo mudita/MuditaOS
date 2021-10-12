@@ -5,6 +5,7 @@
 
 #include <application-settings/widgets/network/SimContactImportSelectWidget.hpp>
 #include <ListView.hpp>
+#include <AppWindow.hpp>
 
 SimContactsImportModel::SimContactsImportModel(app::ApplicationCommon *app,
                                                std::unique_ptr<AbstractSimContactsRepository> contactsRepository)

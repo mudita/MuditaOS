@@ -5,6 +5,7 @@
 #include <widgets/TextWithIconsWidget.hpp>
 #include <widgets/ActiveIconFactory.hpp>
 #include <TextFixedSize.hpp>
+#include <AppWindow.hpp>
 
 using namespace gui::option;
 

@@ -17,9 +17,29 @@
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
+#include <apps-common/WindowsPopupFilter.hpp>
 
 namespace app
 {
+    Application::Application(std::string name,
+                             std::string parent,
+                             StatusIndicators statusIndicators,
+                             StartInBackground startInBackground,
+                             uint32_t stackDepth,
+                             sys::ServicePriority priority)
+        : ApplicationCommon(name, parent, statusIndicators, startInBackground, stackDepth, priority)
+    {
+        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
+            bool val = ((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
+                        (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
+                        (isCurrentWindow(gui::BellTurnOffWindow::name)));
+            if (val == true) {
+                LOG_ERROR("block popup - as curent window is in higher order popup");
+            }
+            return !val;
+        });
+    }
+
     void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)
     {
         using namespace gui::popup;
@@ -71,13 +91,6 @@ namespace app
                 break;
             }
         }
-    }
-
-    bool Application::isPopupPermitted(gui::popup::ID) const
-    {
-        return not((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
-                   (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
-                   (isCurrentWindow(gui::BellTurnOffWindow::name)));
     }
 
     sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)

@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneLockSubject.hpp"
+#include "AlarmEventRecord.hpp"
+#include "time/dateCommon.hpp"
 
 #include <service-appmgr/Constants.hpp>
 #include <locks/data/PhoneLockMessages.hpp>
