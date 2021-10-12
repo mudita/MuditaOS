@@ -59,10 +59,8 @@ set(SOURCES
         queries/alarm_events/QueryAlarmEventsAdd.cpp
         queries/alarm_events/QueryAlarmEventsEdit.cpp
         queries/alarm_events/QueryAlarmEventsGet.cpp
-        queries/alarm_events/QueryAlarmEventsGetBetweenDates.cpp
-        queries/alarm_events/QueryAlarmEventsGetLimited.cpp
-        queries/alarm_events/QueryAlarmEventsGetNext.cpp
-        queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.cpp
+        queries/alarm_events/QueryAlarmEventsGetEnabled.cpp
+        queries/alarm_events/QueryAlarmEventsGetInRange.cpp
         queries/alarm_events/QueryAlarmEventsRemove.cpp
         queries/alarm_events/QueryAlarmEventsToggleAll.cpp
         queries/calllog/QueryCalllogGet.cpp

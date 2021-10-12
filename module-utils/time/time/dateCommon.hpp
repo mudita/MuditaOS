@@ -259,20 +259,19 @@ inline std::string TimePointToString(const TimePoint &tp, date::years years)
         std::chrono::time_point_cast<std::chrono::seconds>(timePoint + time_of_day.hours() + time_of_day.minutes()));
 }
 
-inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std::string format = "")
+inline std::string HHMMToLocalizedString(std::chrono::hours hours,
+                                         std::chrono::minutes minutes,
+                                         utils::time::TimestampType type,
+                                         const std::string format = "")
 {
     using namespace utils::time;
-    auto time      = TimePointToTimeT(tp);
-    auto timestamp = TimestampFactory().createTimestamp(TimestampType::Date, time);
-    return timestamp->str(format);
-}
 
-inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std::string format = "")
-{
-    using namespace utils::time;
-    auto time = TimePointToTimeT(tp);
+    const auto nowTimeT = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    const auto nowLocal = std::localtime(&nowTimeT);
+    nowLocal->tm_hour   = hours.count();
+    nowLocal->tm_min    = minutes.count();
 
-    auto timestamp = TimestampFactory().createTimestamp(TimestampType::Time, time);
+    auto timestamp = TimestampFactory().createTimestamp(type, std::mktime(nowLocal));
     return timestamp->str(format);
 }
 
@@ -365,6 +364,18 @@ inline TimePoint GetFollowingDayTime(const TimePoint &tp, const TimePoint &relat
     else {
         return tp;
     }
+}
+
+inline TimePoint nextTimePointFromHHMM(std::chrono::hours hours, std::chrono::minutes minutes, const TimePoint &from)
+{
+    const auto fromTimeT = std::chrono::system_clock::to_time_t(from);
+    const auto fromLocal = std::localtime(&fromTimeT);
+
+    fromLocal->tm_hour = hours.count();
+    fromLocal->tm_min  = minutes.count();
+    auto nextTime      = TimePointFloorMinutes(std::chrono::system_clock::from_time_t(std::mktime(fromLocal)));
+
+    return GetFollowingDayTime(nextTime, from);
 }
 
 inline std::string createUID()
