@@ -37,9 +37,6 @@ namespace sdesktop::endpoints
         if (ctx.getBody()["ui"] == true) {
             return *uiHelper;
         }
-        if (ctx.getBody()["fs"] == true) {
-            return *fsHelper;
-        }
         return *helper;
     }
 

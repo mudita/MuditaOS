@@ -50,11 +50,11 @@ target_sources(
         developerMode/Mode/UI_Helper.cpp
         developerMode/event/ATRequest.cpp
         developerMode/event/DomRequest.cpp
-        developerMode/fs/FS_Helper.cpp
         factoryReset/FactoryResetEndpoint.cpp
         filesystem/FileContext.cpp
         filesystem/FileOperations.cpp
         filesystem/FilesystemEndpoint.cpp
+        filesystem/FS_Helper.cpp
         nullEndpoint/NullEndpoint.cpp
         restore/RestoreEndpoint.cpp
         restore/RestoreHelper.cpp
@@ -74,11 +74,11 @@ target_sources(
         include/endpoints/developerMode/Mode/UI_Helper.hpp
         include/endpoints/developerMode/event/ATRequest.hpp
         include/endpoints/developerMode/event/DomRequest.hpp
-        include/endpoints/developerMode/fs/FS_Helper.hpp
         include/endpoints/factoryReset/FactoryResetEndpoint.hpp
         include/endpoints/filesystem/FileContext.hpp
         include/endpoints/filesystem/FileOperations.hpp
         include/endpoints/filesystem/FilesystemEndpoint.hpp
+        include/endpoints/filesystem/FS_Helper.hpp
         include/endpoints/nullEndpoint/NullEndpoint.hpp
         include/endpoints/restore/RestoreEndpoint.hpp
         include/endpoints/restore/RestoreHelper.hpp
