@@ -18,7 +18,6 @@ namespace gui
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setFocusEdges(RectangleEdge::None);
         spinner->setCurrentValue(onStr);
-
         body->getCenterBox()->addWidget(spinner);
 
         getValue = [&model, this]() { model.setValue(isActive()); };
@@ -41,16 +40,9 @@ namespace gui
         spinner->setFont(bell_style::font);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setFocusEdges(RectangleEdge::None);
-
-        auto bottomText = new TextFixedSize(body->lastBox);
-        bottomText->setMaximumSize(::style::bell_base_layout::w, ::style::bell_base_layout::outer_layouts_h);
-        bottomText->setFont(::style::bell_sidelist_item::description_font);
-        bottomText->setEdges(RectangleEdge::None);
-        bottomText->activeItem = false;
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        bottomText->setText(bottomDescription);
-        bottomText->drawUnderline(false);
         body->getCenterBox()->addWidget(spinner);
+
+        setupBottomDescription(bottomDescription);
 
         getValue = [&model, this]() { model.setValue(spinner->getCurrentValue()); };
         setValue = [&model, this]() { spinner->setCurrentValue(model.getValue()); };
@@ -93,14 +85,7 @@ namespace gui
         spinner->setFocusEdges(RectangleEdge::None);
         body->getCenterBox()->addWidget(spinner);
 
-        bottomText = new TextFixedSize(body->lastBox);
-        bottomText->setMaximumSize(::style::bell_base_layout::w, ::style::bell_base_layout::outer_layouts_h);
-        bottomText->setFont(::style::bell_sidelist_item::description_font);
-        bottomText->setEdges(RectangleEdge::None);
-        bottomText->activeItem = false;
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        bottomText->setText(bottomDescription);
-        bottomText->drawUnderline(false);
+        setupBottomDescription(bottomDescription);
 
         inputCallback = [&, range](Item &item, const InputEvent &event) {
             const auto result = body->onInput(event);
