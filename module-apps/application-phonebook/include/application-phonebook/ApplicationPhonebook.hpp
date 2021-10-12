@@ -6,6 +6,7 @@
 #include "Application.hpp"
 
 #include <string>
+#include <application-phonebook/models/SearchRequestModel.hpp>
 
 namespace gui::window::name
 {
@@ -30,6 +31,8 @@ namespace app
 
     class ApplicationPhonebook : public app::Application
     {
+        std::shared_ptr<SearchRequestModel> searchRequestModel;
+
       public:
         explicit ApplicationPhonebook(std::string name                    = name_phonebook,
                                       std::string parent                  = {},

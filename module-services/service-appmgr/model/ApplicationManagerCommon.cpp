@@ -24,6 +24,7 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
+#include <AppWindowConstants.hpp>
 
 #include <algorithm>
 #include <utility>

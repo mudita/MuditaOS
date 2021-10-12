@@ -26,6 +26,7 @@ target_sources(apps-common
 		lock-popups/SimNotReadyWindow.cpp
 		presenter/PowerOffPresenter.cpp
 		presenter/AlarmPresenter.cpp
+		data/PopupRequestParamsBase.cpp
 
 	PRIVATE
 		HomeModesWindow.hpp

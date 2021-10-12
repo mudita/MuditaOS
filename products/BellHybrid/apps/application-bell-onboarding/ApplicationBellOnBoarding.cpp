@@ -88,7 +88,7 @@ namespace app
             gui::window::name::finalizeOnBoardingWindow, [this](ApplicationCommon *app, const std::string &name) {
                 auto presenter =
                     std::make_unique<OnBoarding::OnBoardingFinalizeWindowPresenter>([&]() { finalizeOnBoarding(); });
-                return std::make_unique<gui::OnBoardingFinalizeWindow>(app, std::move(presenter));
+                return std::make_unique<gui::OnBoardingFinalizeWindow>(app, std::move(presenter), name);
             });
 
         windowsFactory.attach(gui::window::name::informationOnBoardingWindow,
@@ -184,7 +184,7 @@ namespace app
 
         auto selectedWindowCondition =
             getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow &&
-            msg->getWindowName() == getPrevWindow() &&
+            msg->getWindowName() == *getPrevWindow() &&
             msg->getSenderWindowName() == gui::window::name::informationOnBoardingWindow;
 
         if (selectedWindowCondition && informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
@@ -215,7 +215,7 @@ namespace app
                      inputEvent.isKeyRelease(gui::KeyCode::KEY_LEFT)) {
                 informationState = OnBoarding::InformationStates::DeepClickWarningInfo;
                 if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
-                    displayInformation(getPrevWindow());
+                    displayInformation(*getPrevWindow());
                 }
                 else {
                     displayInformation(getCurrentWindow()->getName());
@@ -225,7 +225,7 @@ namespace app
                 if (informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
                     informationPromptTimer.stop();
                     informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
-                    displayInformation(getPrevWindow());
+                    displayInformation(*getPrevWindow());
                 }
                 else {
                     informationState = OnBoarding::InformationStates::RotateInfo;
@@ -237,13 +237,13 @@ namespace app
                 switch (informationState) {
                 case OnBoarding::InformationStates::DeepClickCorrectionInfo:
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(getPrevWindow());
+                        switchWindow(*getPrevWindow());
                         return true;
                     }
                     break;
                 case OnBoarding::InformationStates::LightClickInfo:
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(getPrevWindow());
+                        switchWindow(*getPrevWindow());
                         return true;
                     }
                     break;
@@ -251,7 +251,7 @@ namespace app
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) ||
                         inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN) ||
                         inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(getPrevWindow());
+                        switchWindow(*getPrevWindow());
                         return true;
                     }
                     break;

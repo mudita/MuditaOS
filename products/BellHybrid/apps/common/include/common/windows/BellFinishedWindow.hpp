@@ -19,8 +19,7 @@ namespace gui
     class BellFinishedWindow : public WindowWithTimer
     {
       public:
-        explicit BellFinishedWindow(app::ApplicationCommon *app,
-                                    const std::string &name = window::bell_finished::defaultName);
+        explicit BellFinishedWindow(app::ApplicationCommon *app, const std::string &name);
 
       protected:
         void buildInterface() override;

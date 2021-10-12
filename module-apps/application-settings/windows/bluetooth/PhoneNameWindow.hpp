@@ -4,6 +4,7 @@
 
 #include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
 #include <Text.hpp>
+#include <AppWindow.hpp>
 
 namespace gui
 {

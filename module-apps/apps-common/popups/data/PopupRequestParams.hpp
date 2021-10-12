@@ -4,9 +4,8 @@
 #pragma once
 
 #include "popups/Popups.hpp"
+#include "PopupRequestParamsBase.hpp"
 
-#include <memory>
-#include <service-appmgr/Actions.hpp>
 #include <PhoneModes/Common.hpp>
 #include <module-audio/Audio/AudioCommon.hpp>
 #include <locks/widgets/Lock.hpp>
@@ -14,23 +13,6 @@
 
 namespace gui
 {
-
-    class PopupRequestParams : public app::manager::actions::ActionParams
-    {
-      public:
-        explicit PopupRequestParams(gui::popup::ID popupId)
-            : app::manager::actions::ActionParams{"Popup request parameters"}, popupId{popupId}
-        {}
-
-        [[nodiscard]] auto getPopupId() const noexcept
-        {
-            return popupId;
-        }
-
-      private:
-        gui::popup::ID popupId;
-    };
-
     class PhoneUnlockInputRequestParams : public PopupRequestParams
     {
       public:

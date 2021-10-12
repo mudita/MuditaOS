@@ -4,6 +4,7 @@
 #pragma once
 
 #include <apps-common/ApplicationCommon.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 
 namespace gui
 {

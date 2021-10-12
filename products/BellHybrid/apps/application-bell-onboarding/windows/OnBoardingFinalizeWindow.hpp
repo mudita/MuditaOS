@@ -14,7 +14,8 @@ namespace gui
       public:
         OnBoardingFinalizeWindow(
             app::ApplicationCommon *app,
-            std::unique_ptr<app::OnBoarding::OnBoardingFinalizeWindowContract::Presenter> &&presenter);
+            std::unique_ptr<app::OnBoarding::OnBoardingFinalizeWindowContract::Presenter> &&presenter,
+            const std::string &name);
 
       private:
         std::unique_ptr<app::OnBoarding::OnBoardingFinalizeWindowContract::Presenter> presenter;

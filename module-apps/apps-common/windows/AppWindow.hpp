@@ -9,6 +9,7 @@
 #include <gui/widgets/Window.hpp>
 #include <Service/Service.hpp>
 #include <Service/Message.hpp>
+#include "AppWindowConstants.hpp"
 
 namespace app
 {
@@ -17,15 +18,6 @@ namespace app
 
 namespace gui
 {
-    namespace name
-    {
-        namespace window
-        {
-            inline constexpr auto main_window = "MainWindow";
-            inline constexpr auto no_window   = "";
-        } // namespace window
-    }     // namespace name
-
     /*
      * @brief This is wrapper for gui window used within applications.
      */

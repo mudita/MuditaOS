@@ -16,9 +16,9 @@
 
 namespace gui
 {
-    PhonebookMainWindow::PhonebookMainWindow(app::ApplicationCommon *app)
-        : AppWindow(app, gui::name::window::main_window), phonebookModel{
-                                                              std::make_shared<PhonebookModel>(this->application)}
+    PhonebookMainWindow::PhonebookMainWindow(app::ApplicationCommon *app, std::shared_ptr<SearchRequestModel> model)
+        : AppWindow(app, gui::name::window::main_window),
+          model(std::move(model)), phonebookModel{std::make_shared<PhonebookModel>(this->application)}
     {
         buildInterface();
     }
@@ -87,8 +87,8 @@ namespace gui
         LOG_INFO("onBeforeShow");
 
         auto contactRequest = dynamic_cast<PhonebookSearchRequest *>(data);
-        requestedSearch     = contactRequest != nullptr;
-        if (requestedSearch) {
+        model->setRequested(contactRequest != nullptr);
+        if (model->requestedSearch()) {
             enableNewContact                       = false;
             phonebookModel->messagesSelectCallback = [=](gui::PhonebookItem *item) {
                 std::unique_ptr<PhonebookSearchRequest> data = std::make_unique<PhonebookSearchRequest>();
@@ -168,11 +168,6 @@ namespace gui
         return false;
     }
 
-    bool PhonebookMainWindow::isSearchRequested() const
-    {
-        return requestedSearch;
-    }
-
     void PhonebookMainWindow::onEmptyList()
     {
         navBar->setActive(gui::nav_bar::Side::Left, false);
@@ -184,7 +179,7 @@ namespace gui
 
     void PhonebookMainWindow::onListFilled()
     {
-        if (!isSearchRequested()) {
+        if (not model->requestedSearch()) {
             navBar->setActive(gui::nav_bar::Side::Left, true);
             navBar->setActive(gui::nav_bar::Side::Center, true);
             header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);

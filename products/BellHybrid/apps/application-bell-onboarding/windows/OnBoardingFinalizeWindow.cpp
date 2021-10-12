@@ -11,8 +11,9 @@ namespace gui
 {
     OnBoardingFinalizeWindow::OnBoardingFinalizeWindow(
         app::ApplicationCommon *app,
-        std::unique_ptr<app::OnBoarding::OnBoardingFinalizeWindowContract::Presenter> &&presenter)
-        : BellFinishedWindow(app), presenter{std::move(presenter)}
+        std::unique_ptr<app::OnBoarding::OnBoardingFinalizeWindowContract::Presenter> &&presenter,
+        const std::string &name)
+        : BellFinishedWindow(app, name), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
         buildInterface();

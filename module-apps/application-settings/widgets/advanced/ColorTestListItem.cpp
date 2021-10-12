@@ -3,6 +3,7 @@
 
 #include "ColorTestListItem.hpp"
 #include "ColorTestListStyle.hpp"
+#include <Label.hpp>
 
 namespace gui
 {

@@ -9,6 +9,7 @@
 #include <application-alarm-clock/widgets/AlarmRRuleOptionsItem.hpp>
 #include <application-alarm-clock/presenter/AlarmRRulePresenter.hpp>
 #include <application-alarm-clock/widgets/AlarmClockStyle.hpp>
+#include <AppWindow.hpp>
 
 #include <ListView.hpp>
 

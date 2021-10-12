@@ -1,0 +1,11 @@
+add_catch2_executable(
+    NAME
+        windows-management
+    SRCS
+        tests-main.cpp
+        test-WindowsStack.cpp
+        test-WindowsPopupQueue.cpp
+        test-WindowsPopupFilter.cpp
+    LIBS
+    module-gui
+)

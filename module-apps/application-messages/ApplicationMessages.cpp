@@ -88,14 +88,11 @@ namespace app
         if (msgl->messageType == MessageType::DBServiceNotification) {
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             if (msg != nullptr) {
-                // window-specific actions
-                if (msg->interface == db::Interface::Name::SMSThread || msg->interface == db::Interface::Name::SMS) {
-                    for (auto &[name, window] : windowsStack.windows) {
-                        window->onDatabaseMessage(msg);
-                    }
-                }
-                // app-wide actions
-                // <none>
+                userInterfaceDBNotification(msgl,
+                                            [&]([[maybe_unused]] sys::Message *, [[maybe_unused]] const std::string &) {
+                                                return msg->interface == db::Interface::Name::SMSThread ||
+                                                       msg->interface == db::Interface::Name::SMS;
+                                            });
                 return std::make_shared<sys::ResponseMessage>();
             }
         }

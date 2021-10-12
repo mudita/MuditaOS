@@ -33,13 +33,22 @@
 #include <locks/handlers/SimLockSubject.hpp>
 #include <locks/handlers/LockPolicyHandler.hpp>
 #include "WindowsFactory.hpp"
-#include "WindowsStack.hpp"
+#include "WindowsPopupQueue.hpp"
+#include "PopupBlueprintFactory.hpp"
+#include "AppSwitchReason.hpp"
+#include "AppStartupReason.hpp"
 
 namespace app
 {
     class WindowsStack;
-
+    using UiNotificationFilter = std::function<bool(sys::Message *, const std::string &name)>;
 } // namespace app
+
+namespace db
+{
+    class NotificationMessage;
+}
+
 namespace gui
 {
     class AppWindow;
@@ -47,6 +56,10 @@ namespace gui
     class Item;
     class PopupRequestParams;
     class KeyInputSimpleTranslation;
+    namespace popup
+    {
+        class Filter;
+    }
 } // namespace gui
 namespace settings
 {
@@ -69,20 +82,6 @@ namespace app
     {
         Success,
         Failure
-    };
-
-    enum class StartupReason
-    {
-        Launch,   // Default startup causing application MainWindow to be added to stack.
-        OnAction, // Switch to application  was caused by action. Enum is used to prevent called applications to
-        // switch to main window on application switch and allow declared handler to switch to desired window.
-    };
-
-    enum class SwitchReason
-    {
-        SwitchRequest,
-        PhoneLock,
-        Popup
     };
 
     struct StartInBackground
@@ -181,8 +180,12 @@ namespace app
         virtual sys::MessagePointer handleSwitchWindow(sys::Message *msgl);
         virtual sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
         virtual void updateStatuses(gui::AppWindow *window) const;
+        void setDefaultWindow(const std::string &w);
 
       private:
+        std::unique_ptr<gui::popup::Filter> popupFilter;
+        std::unique_ptr<WindowsStack> windowsStackImpl;
+        WindowsStack &windowsStack() const;
         std::string default_window;
         State state = State::DEACTIVATED;
 
@@ -194,16 +197,23 @@ namespace app
         sys::MessagePointer handleAction(sys::Message *msgl);
         sys::MessagePointer handleApplicationSwitchLaunch(sys::Message *msgl);
         sys::MessagePointer handleApplicationSwitchOnAction(sys::Message *msgl);
+        /// this method filters out:
+        /// 1. refresh for windows we do not have builder
+        /// 2. refresh for windows which are not on top (to avoid building things we do not want to show
+        ///    i.e. due to delayed refresh
         sys::MessagePointer handleUpdateWindow(sys::Message *msgl);
+        bool handleUpdateTextRefresh(gui::SwitchData *data);
         sys::MessagePointer handleAppRebuild(sys::Message *msgl);
         sys::MessagePointer handleAppRefresh(sys::Message *msgl);
         sys::MessagePointer handleGetDOM(sys::Message *msgl);
         sys::MessagePointer handleSimStateUpdateMessage(sys::Message *msgl);
 
-        virtual bool isPopupPermitted(gui::popup::ID popupId) const;
-
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
         std::unordered_map<manager::actions::ActionId, OnActionReceived> receivers;
+        void switchWindowPopup(const std::string &windowName,
+                               const gui::popup::Disposition &disposition,
+                               std::unique_ptr<gui::SwitchData> data = nullptr,
+                               SwitchReason reason                   = SwitchReason::SwitchRequest);
 
       public:
         sys::TimerHandle longPressTimer;
@@ -236,7 +246,6 @@ namespace app
 
         /// Method sending switch command for another window. It will switch window within active application.
         /// To switch windows between applications use app::manager::Controller::switchApplication
-        /// it will effectively trigger setActiveWindow and change on windows stack
         ///
         /// @param windowName name of window to show, only required parameter, our windows stack uses string names as
         /// id's
@@ -258,8 +267,8 @@ namespace app
         };
 
         /// Method used to go back to desired window by using the index difference on stack value
-        ///@param ignoredWindowsNumber: defines how many windows will be skipped while going back on stack
-        void returnToPreviousWindow(const uint32_t times = 1);
+        /// @param ignoredWindowsNumber: defines how many windows will be skipped while going back on stack
+        [[deprecated]] void returnToPreviousWindow();
 
         /// Find and pop window from stack by window name
         void popWindow(const std::string &window);
@@ -287,12 +296,6 @@ namespace app
         /// Deinitialization function.
         /// Called upon Application exit and/or termination request.
         sys::ReturnCodes DeinitHandler() override;
-
-        /// function to set active window for application
-        /// if none window is selected main window is used
-        /// if window name is "LastWindow" then previous window is selected
-        /// it modifies windows stack
-        void setActiveWindow(const std::string &windowName);
 
         /// see suspendInProgress documentation
         virtual void setSuspendFlag(bool val)
@@ -344,40 +347,36 @@ namespace app
 
       protected:
         void longPressTimerCallback();
+        /// Method to register all possible popups to handle in application
+        virtual void registerPopupBlueprints();
+        /// fallback method  to get popup if none is added
+        std::optional<gui::popup::Blueprint> popupBlueprintFallback(gui::popup::ID id);
         /// Method used to register all windows and widgets in application
         virtual void createUserInterface() = 0;
         /// Method closing application's windows.
         virtual void destroyUserInterface() = 0;
 
-        /// Handle the change of phone mode and tethering mode
-        /// @param mode new phone mode
-        /// @param tethering new tethering mode
-        void handlePhoneModeChanged(sys::phone_modes::PhoneMode mode);
-
-        /// Handles volume changed event
-        /// @param volume current volume level
-        /// @param context audio context which contains current profile and playback
-        void handleVolumeChanged(audio::Volume volume, audio::Context context);
-
         /// @ingrup AppWindowStack
-        WindowsStack windowsStack;
         WindowsFactory windowsFactory;
+        std::unique_ptr<WindowsPopupQueue> windowsPopupQueue = std::make_unique<WindowsPopupQueue>();
+        PopupBlueprintFactory popupBlueprint;
 
         /// Method used to attach popups windows to application
-        virtual void attachPopups(const std::vector<gui::popup::ID> &popupsList);
-        virtual void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params);
+        virtual void attachPopups(const std::vector<gui::popup::ID> &popupsList) = 0;
+        virtual void actionPopupPush(std::unique_ptr<gui::SwitchData> params);
+        virtual bool tryShowPopup();
         void abortPopup(gui::popup::ID id);
 
+        bool userInterfaceDBNotification(sys::Message *msg, const UiNotificationFilter &filter = nullptr);
+        virtual gui::popup::Filter &getPopupFilter() const;
+
       public:
-        /// @ingrup AppWindowStack
-        /// get to the first time we entered this &window
-        bool popToWindow(const std::string &window);
         /// push window to the top of windows stack
         /// @ingrup AppWindowStack
-        void pushWindow(const std::string &newWindow);
+        void pushWindow(const std::string &newWindow, const gui::popup::Disposition &d = gui::popup::WindowDisposition);
         /// getter for previous window name
         /// @ingrup AppWindowStack
-        const std::string getPrevWindow(uint32_t count = 1) const;
+        std::optional<std::string> getPrevWindow(uint32_t count = 1) const;
         /// clears windows stack
         /// @ingrup AppWindowStack
         void cleanPrevWindw();
@@ -385,8 +384,10 @@ namespace app
         /// if there is none - returns default window
         /// @ingrup AppWindowStack
         gui::AppWindow *getCurrentWindow();
+        /// @ingrup AppWindowStack
         bool isCurrentWindow(const std::string &windowName) const noexcept;
 
+        /// @ingrup AppWindowStack
         gui::AppWindow *getWindow(const std::string &name);
         /// to avoid conflicts with connect below
         using Service::connect;

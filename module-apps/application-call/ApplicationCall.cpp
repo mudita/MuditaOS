@@ -19,12 +19,14 @@
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <time/time_conversion.hpp>
+#include <WindowsPopupFilter.hpp>
 
 #include <cassert>
 #include <memory>
 
 namespace app
 {
+
     ApplicationCall::ApplicationCall(std::string name,
                                      std::string parent,
                                      StatusIndicators statusIndicators,
@@ -32,6 +34,12 @@ namespace app
         : Application(name, parent, statusIndicators, startInBackground, app::call_stack_size)
     {
         using namespace gui::status_bar;
+        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
+            if (popupParams.getPopupId() == gui::popup::ID::Volume) {
+                return true;
+            }
+            return this->getCallState() == call::State::IDLE;
+        });
         statusBarManager->enableIndicators(
             {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
@@ -116,14 +124,6 @@ namespace app
         }
         returnToPreviousWindow();
         return true;
-    }
-
-    bool ApplicationCall::isPopupPermitted(gui::popup::ID popupId) const
-    {
-        if (popupId == gui::popup::ID::Volume) {
-            return true;
-        }
-        return getCallState() == call::State::IDLE;
     }
 
     // Invoked upon receiving data message
