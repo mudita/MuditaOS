@@ -84,7 +84,11 @@ namespace app::alarmClock
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
             auto rec                              = new AlarmEventRecord();
-            rec->startDate                        = TimePointNow();
+
+            const auto now   = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            const auto local = std::localtime(&now);
+            rec->alarmTime   = AlarmTime{std::chrono::hours{local->tm_hour}, std::chrono::minutes{local->tm_min}};
+
             rec->snoozeDuration                   = 10;
             auto event                            = std::make_shared<AlarmEventRecord>(*rec);
             std::unique_ptr<AlarmRecordData> data = std::make_unique<AlarmRecordData>(event);

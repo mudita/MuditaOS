@@ -11,22 +11,19 @@
 
 namespace db::query::alarmEvents
 {
-    class GetLimited : public Query
+    class GetEnabled : public Query
     {
       public:
-        GetLimited(uint32_t offset, uint32_t limit);
+        GetEnabled();
         [[nodiscard]] auto debugInfo() const -> std::string override;
-
-        const uint32_t offset = 0;
-        const uint32_t limit  = 0;
     };
 
-    class GetLimitedResult : public QueryResult
+    class GetEnabledResult : public QueryResult
     {
         const std::vector<AlarmEventRecord> records;
 
       public:
-        explicit GetLimitedResult(std::vector<AlarmEventRecord> records);
+        explicit GetEnabledResult(std::vector<AlarmEventRecord> records);
         [[nodiscard]] auto getResult() const -> std::vector<AlarmEventRecord>;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;

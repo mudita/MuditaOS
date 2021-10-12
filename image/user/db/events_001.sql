@@ -11,12 +11,13 @@ CREATE TABLE IF NOT EXISTS events(
                   rrule TEXT DEFAULT ''
 );
 
-CREATE TABLE IF NOT EXISTS alarm_events(
+CREATE TABLE IF NOT EXISTS alarms(
                   _id INTEGER PRIMARY KEY,
-                  event_id INTEGER,
+                  hour INTEGER,
+                  minute INTEGER,
                   music_tone TEXT,
                   enabled BOOLEAN,
                   snooze_duration INTEGER,
-                  FOREIGN KEY (event_id) REFERENCES events (_id)
+                  rrule TEXT DEFAULT ''
 );
 

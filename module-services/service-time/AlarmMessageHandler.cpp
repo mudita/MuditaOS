@@ -69,21 +69,7 @@ namespace alarms
                                   std::pair<std::vector<AlarmEventRecord>, std::uint32_t>>(
             request,
             [&](AlarmsGetInRangeRequestMessage *request, IAlarmOperations::OnGetAlarmsInRangeProcessed callback) {
-                alarmOperations->getAlarmsInRange(
-                    request->start, request->end, request->offset, request->limit, std::move(callback));
-            });
-    }
-
-    auto AlarmMessageHandler::handleGetFirstNextSingleEvent(AlarmGetFirstNextSingleEventRequestMessage *request)
-        -> std::shared_ptr<AlarmGetFirstNextSingleEventResponseMessage>
-    {
-        return handleWithCallback<AlarmGetFirstNextSingleEventRequestMessage,
-                                  AlarmGetFirstNextSingleEventResponseMessage,
-                                  SingleEventRecord>(
-            request,
-            [&]([[maybe_unused]] AlarmGetFirstNextSingleEventRequestMessage *request,
-                IAlarmOperations::OnGetFirstNextSingleProcessed callback) {
-                alarmOperations->getFirstNextSingleEvent(TimePointNow(), std::move(callback));
+                alarmOperations->getAlarmsInRange(request->offset, request->limit, std::move(callback));
             });
     }
 
@@ -94,7 +80,7 @@ namespace alarms
                                   AlarmGetNextSingleEventsResponseMessage,
                                   std::vector<SingleEventRecord>>(
             request,
-            [&](AlarmGetNextSingleEventsRequestMessage *request, IAlarmOperations::OnGetNextSingleProcessed callback) {
+            [&](AlarmGetNextSingleEventsRequestMessage *request, IAlarmOperations::OnGetAlarmsProcessed callback) {
                 alarmOperations->getNextSingleEvents(TimePointNow(), callback);
             });
     }

@@ -24,8 +24,7 @@ namespace alarms
         bool requestAddAlarm(sys::Service *serv, const AlarmEventRecord &alarmEvent);
         bool requestUpdateAlarm(sys::Service *serv, const AlarmEventRecord &alarmEvent);
         bool requestRemoveAlarm(sys::Service *serv, unsigned int id);
-        bool requestGetAlarmsInRange(
-            sys::Service *serv, TimePoint start, TimePoint end, unsigned int offset, unsigned int limit);
+        bool requestGetAlarmsInRange(sys::Service *serv, unsigned int offset, unsigned int limit);
         bool requestGetNextSingleEvents(sys::Service *serv);
         bool requestTurnOffRingingAlarm(sys::Service *serv, const std::uint32_t id);
         bool requestSnoozeRingingAlarm(sys::Service *serv, const std::uint32_t id, const TimePoint nextAlarmTime);
