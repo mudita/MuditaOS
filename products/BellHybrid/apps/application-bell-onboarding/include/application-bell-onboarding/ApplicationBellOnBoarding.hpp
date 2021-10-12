@@ -38,6 +38,7 @@ namespace app
         bool handleInformationOnInputEvent(sys::DataMessage *msgl);
         void handleInformationBeforeSwitchWindow(sys::DataMessage *msgl);
         void handleInformationAfterSwitchWindow();
+        void onStart() override;
 
       public:
         explicit ApplicationBellOnBoarding(std::string name                    = applicationBellOnBoardingName,
