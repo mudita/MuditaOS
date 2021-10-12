@@ -50,7 +50,10 @@ namespace gui
 
     void AlarmItem::setAlarm()
     {
-        timeLabel->setText(TimePointToLocalizedTimeString(getPresenter()->getAlarm()->startDate));
+        auto time = HHMMToLocalizedString(getPresenter()->getAlarm()->alarmTime.hourOfDay,
+                                          getPresenter()->getAlarm()->alarmTime.minuteOfHour,
+                                          utils::time::TimestampType::Time);
+        timeLabel->setText(time);
         onOffImage->switchState(getPresenter()->getAlarm()->enabled ? ButtonState::On : ButtonState::Off);
 
         if (getPresenter()->hasRecurrence()) {
