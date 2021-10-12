@@ -23,4 +23,24 @@ namespace gui
         topMessage->setText(description);
         topMessage->drawUnderline(false);
     }
+
+    void BellSideListItem::setupBottomDescription(const std::string &description)
+    {
+        bottomText = new TextFixedSize(body->lastBox);
+        bottomText->setMaximumSize(::style::bell_base_layout::w, ::style::bell_base_layout::outer_layouts_h);
+        bottomText->setFont(::style::bell_sidelist_item::description_font);
+        bottomText->setEdges(RectangleEdge::None);
+        bottomText->activeItem = false;
+        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        bottomText->setText(description);
+        bottomText->drawUnderline(false);
+    }
+
+    void BellSideListItem::setBottomDescribtionText(const std::string &description)
+    {
+        if (bottomText != nullptr) {
+            bottomText->setText(description);
+        }
+    }
+
 } /* namespace gui */

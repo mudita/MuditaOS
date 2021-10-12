@@ -13,12 +13,17 @@ namespace style::bell_sidelist_item
 
 namespace gui
 {
-
+    class TextFixedSize;
     class BellSideListItem : public ListItemWithDescription
     {
       public:
         BellBaseLayout *body = nullptr;
 
         explicit BellSideListItem(const std::string &description);
+        void setupBottomDescription(const std::string &description);
+        void setBottomDescribtionText(const std::string &description);
+
+      protected:
+        TextFixedSize *bottomText = nullptr;
     };
 } /* namespace gui */
