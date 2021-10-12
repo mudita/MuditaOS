@@ -35,6 +35,8 @@ add_compile_definitions(
         _HAVE_SQLITE_CONFIG_H
         CPP_FREERTOS_NO_EXCEPTIONS
         _GLIBCXX_HAVE_DIRENT_H
+        __GTHREADS
+        _GLIBCXX_GCC_GTHR_SINGLE_H
 )
 
 add_compile_options(
