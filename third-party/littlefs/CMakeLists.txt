@@ -19,8 +19,13 @@ target_sources(littlefs
 )
 
 target_compile_definitions(littlefs 
-    PUBLIC 
+    PUBLIC
         LFS_THREADSAFE 
+)
+
+target_compile_options( littlefs
+    PRIVATE
+        -Wno-array-bounds
 )
 
 target_include_directories(littlefs

@@ -20,7 +20,7 @@ extern "C"
 
 #include <cstdint>
 
-extern std::uint8_t __sdram_cached_start[];
+extern std::uint32_t __sdram_cached_start[];
 
 namespace bsp
 {

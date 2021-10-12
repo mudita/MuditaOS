@@ -10,6 +10,7 @@
 #include "fsl_sai_edma.h"
 
 #include <memory>
+#include <cstdint>
 
 namespace bsp
 {
