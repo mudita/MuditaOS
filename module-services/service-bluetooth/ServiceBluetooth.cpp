@@ -334,8 +334,12 @@ auto ServiceBluetooth::handle(message::bluetooth::DisconnectResult *msg) -> std:
     }
     bluetoothDevicesModel->syncDevicesWithApp();
     settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, std::string());
-    bus.sendMulticast(std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Enabled),
-                      sys::BusChannel::BluetoothModeChanges);
+
+    if (auto btOn = std::visit(bluetooth::BoolVisitor(), settingsHolder->getValue(bluetooth::Settings::State)); btOn) {
+        bus.sendMulticast(
+            std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Enabled),
+            sys::BusChannel::BluetoothModeChanges);
+    }
 
     bus.sendMulticast(std::make_shared<message::bluetooth::DisconnectResult>(msg->getDevice()),
                       sys::BusChannel::BluetoothNotifications);
