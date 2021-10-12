@@ -39,10 +39,9 @@ namespace alarms
             return sendRequest<AlarmRemoveRequestMessage>(serv, id);
         }
 
-        bool requestGetAlarmsInRange(
-            sys::Service *serv, TimePoint start, TimePoint end, unsigned int offset, unsigned int limit)
+        bool requestGetAlarmsInRange(sys::Service *serv, unsigned int offset, unsigned int limit)
         {
-            return sendRequest<AlarmsGetInRangeRequestMessage>(serv, start, end, offset, limit);
+            return sendRequest<AlarmsGetInRangeRequestMessage>(serv, offset, limit);
         }
 
         bool requestGetNextSingleEvents(sys::Service *serv)

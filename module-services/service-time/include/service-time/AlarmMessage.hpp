@@ -97,14 +97,8 @@ namespace alarms
     class AlarmsGetInRangeRequestMessage : public AlarmMessage
     {
       public:
-        AlarmsGetInRangeRequestMessage(
-            const std::chrono::time_point<std::chrono::system_clock> start = TIME_POINT_INVALID,
-            const std::chrono::time_point<std::chrono::system_clock> end   = TIME_POINT_INVALID,
-            std::uint32_t offset                                           = 0,
-            std::uint32_t limit                                            = 0)
-            : start(start), end(end), offset(offset), limit(limit){};
-        const std::chrono::time_point<std::chrono::system_clock> start;
-        const std::chrono::time_point<std::chrono::system_clock> end;
+        AlarmsGetInRangeRequestMessage(std::uint32_t offset = 0, std::uint32_t limit = 0)
+            : offset(offset), limit(limit){};
         const std::uint32_t offset;
         const std::uint32_t limit;
     };
@@ -117,9 +111,6 @@ namespace alarms
         std::vector<AlarmEventRecord> alarms;
         const std::uint32_t count = 0;
     };
-
-    class AlarmGetFirstNextSingleEventRequestMessage : public AlarmMessage
-    {};
 
     class AlarmGetFirstNextSingleEventResponseMessage : public AlarmResponse
     {

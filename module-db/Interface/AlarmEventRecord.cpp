@@ -7,10 +7,8 @@
 #include <queries/alarm_events/QueryAlarmEventsAdd.hpp>
 #include <queries/alarm_events/QueryAlarmEventsEdit.hpp>
 #include <queries/alarm_events/QueryAlarmEventsGet.hpp>
-#include <queries/alarm_events/QueryAlarmEventsGetBetweenDates.hpp>
-#include <queries/alarm_events/QueryAlarmEventsGetLimited.hpp>
-#include <queries/alarm_events/QueryAlarmEventsGetNext.hpp>
-#include <queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.hpp>
+#include <queries/alarm_events/QueryAlarmEventsGetEnabled.hpp>
+#include <queries/alarm_events/QueryAlarmEventsGetInRange.hpp>
 #include <queries/alarm_events/QueryAlarmEventsRemove.hpp>
 #include <queries/alarm_events/QueryAlarmEventsToggleAll.hpp>
 
@@ -19,24 +17,23 @@
 std::vector<AlarmEventRecord> generateRecordsVector(const std::vector<AlarmEventsTableRow> &tableRowVector);
 
 AlarmEventRecord::AlarmEventRecord(uint32_t id,
-                                   const UTF8 &name,
-                                   TimePoint startDate,
-                                   uint32_t duration,
-                                   bool isAllDay,
-                                   const std::string &rruleText,
+                                   const AlarmTime alarmTime,
                                    const std::string &musicTone,
                                    bool enabled,
-                                   uint32_t snoozeDuration)
-    : EventRecord{id, name, startDate, duration, isAllDay, rruleText}, musicTone{musicTone}, enabled{enabled},
-      snoozeDuration{snoozeDuration} {};
+                                   uint32_t snoozeDuration,
+                                   const std::string &rruleText)
+    : EventRecord{id}, alarmTime{alarmTime}, musicTone{musicTone}, enabled{enabled},
+      snoozeDuration{snoozeDuration}, rruleText{rruleText}
+{}
 
 AlarmEventRecord::AlarmEventRecord(const AlarmEventsTableRow &aeRow)
-    : EventRecord{aeRow.ID, aeRow.name, aeRow.startDate, aeRow.duration, aeRow.isAllDay, aeRow.rruleText},
-      musicTone{aeRow.musicTone}, enabled{aeRow.enabled}, snoozeDuration{aeRow.snoozeDuration} {};
+    : EventRecord{aeRow.ID}, alarmTime{std::chrono::hours{aeRow.hourOfDay}, std::chrono::minutes{aeRow.minuteOfHour}},
+      musicTone{aeRow.musicTone}, enabled{aeRow.enabled}, snoozeDuration{aeRow.snoozeDuration}, rruleText{
+                                                                                                    aeRow.rruleText} {};
 
 auto AlarmEventRecord::isValid() const -> bool
 {
-    return (startDate != TIME_POINT_INVALID && ID != 0);
+    return (ID != 0);
 }
 
 AlarmEventRecordInterface::AlarmEventRecordInterface(EventsDB *eventsDB) : eventsDB(eventsDB)
@@ -56,18 +53,11 @@ std::unique_ptr<db::QueryResult> AlarmEventRecordInterface::runQuery(std::shared
     if (typeid(*query) == typeid(db::query::alarmEvents::Get)) {
         return runQueryImplGet(std::static_pointer_cast<db::query::alarmEvents::Get>(query));
     }
-    if (typeid(*query) == typeid(db::query::alarmEvents::GetLimited)) {
-        return runQueryImplGetLimited(std::static_pointer_cast<db::query::alarmEvents::GetLimited>(query));
+    if (typeid(*query) == typeid(db::query::alarmEvents::GetEnabled)) {
+        return runQueryImplGetEnabled(std::static_pointer_cast<db::query::alarmEvents::GetEnabled>(query));
     }
-    if (typeid(*query) == typeid(db::query::alarmEvents::GetBetweenDates)) {
-        return runQueryImplGetBetweenDates(std::static_pointer_cast<db::query::alarmEvents::GetBetweenDates>(query));
-    }
-    if (typeid(*query) == typeid(db::query::alarmEvents::GetNext)) {
-        return runQueryImplGetNext(std::static_pointer_cast<db::query::alarmEvents::GetNext>(query));
-    }
-    if (typeid(*query) == typeid(db::query::alarmEvents::GetRecurringBetweenDates)) {
-        return runQueryImplGetRecurringBetweenDates(
-            std::static_pointer_cast<db::query::alarmEvents::GetRecurringBetweenDates>(query));
+    if (typeid(*query) == typeid(db::query::alarmEvents::GetInRange)) {
+        return runQueryImplGetInRange(std::static_pointer_cast<db::query::alarmEvents::GetInRange>(query));
     }
     if (typeid(*query) == typeid(db::query::alarmEvents::Remove)) {
         return runQueryImplRemove(std::static_pointer_cast<db::query::alarmEvents::Remove>(query));
@@ -108,52 +98,26 @@ std::unique_ptr<db::query::alarmEvents::GetResult> AlarmEventRecordInterface::ru
     return response;
 }
 
-std::unique_ptr<db::query::alarmEvents::GetBetweenDatesResult> AlarmEventRecordInterface::runQueryImplGetBetweenDates(
-    std::shared_ptr<db::query::alarmEvents::GetBetweenDates> query)
+std::unique_ptr<db::query::alarmEvents::GetInRangeResult> AlarmEventRecordInterface::runQueryImplGetInRange(
+    std::shared_ptr<db::query::alarmEvents::GetInRange> query)
 {
-    const auto count = eventsDB->alarmEvents.count();
-    const auto alarmEventsRows =
-        eventsDB->alarmEvents.getBetweenDates(query->start, query->end, query->offset, query->limit);
-    const auto recordVector = generateRecordsVector(alarmEventsRows);
-
-    auto response = std::make_unique<db::query::alarmEvents::GetBetweenDatesResult>(recordVector, count);
-    response->setRequestQuery(query);
-
-    return response;
-}
-
-std::unique_ptr<db::query::alarmEvents::GetLimitedResult> AlarmEventRecordInterface::runQueryImplGetLimited(
-    std::shared_ptr<db::query::alarmEvents::GetLimited> query)
-{
+    const auto count           = eventsDB->alarmEvents.count();
     const auto alarmEventsRows = eventsDB->alarmEvents.getLimitOffset(query->offset, query->limit);
     const auto recordVector    = generateRecordsVector(alarmEventsRows);
 
-    auto response = std::make_unique<db::query::alarmEvents::GetLimitedResult>(recordVector);
+    auto response = std::make_unique<db::query::alarmEvents::GetInRangeResult>(recordVector, count);
     response->setRequestQuery(query);
 
     return response;
 }
 
-std::unique_ptr<db::query::alarmEvents::GetNextResult> AlarmEventRecordInterface::runQueryImplGetNext(
-    std::shared_ptr<db::query::alarmEvents::GetNext> query)
+std::unique_ptr<db::query::alarmEvents::GetEnabledResult> AlarmEventRecordInterface::runQueryImplGetEnabled(
+    std::shared_ptr<db::query::alarmEvents::GetEnabled> query)
 {
-    const auto alarmEventsRows = eventsDB->alarmEvents.getNext(query->start, query->offset, query->limit);
+    const auto alarmEventsRows = eventsDB->alarmEvents.getEnabled();
     const auto recordVector    = generateRecordsVector(alarmEventsRows);
 
-    auto response = std::make_unique<db::query::alarmEvents::GetNextResult>(recordVector);
-    response->setRequestQuery(query);
-
-    return response;
-}
-
-std::unique_ptr<db::query::alarmEvents::GetRecurringBetweenDatesResult> AlarmEventRecordInterface::
-    runQueryImplGetRecurringBetweenDates(std::shared_ptr<db::query::alarmEvents::GetRecurringBetweenDates> query)
-{
-    const auto alarmEventsRows =
-        eventsDB->alarmEvents.getRecurringBetweenDates(query->start, query->end, query->offset, query->limit);
-    const auto recordVector = generateRecordsVector(alarmEventsRows);
-
-    auto response = std::make_unique<db::query::alarmEvents::GetRecurringBetweenDatesResult>(recordVector);
+    auto response = std::make_unique<db::query::alarmEvents::GetEnabledResult>(recordVector);
     response->setRequestQuery(query);
 
     return response;
@@ -191,4 +155,19 @@ std::vector<AlarmEventRecord> generateRecordsVector(const std::vector<AlarmEvent
 std::shared_ptr<EventRecord> AlarmEventRecord::getCopy()
 {
     return std::make_shared<AlarmEventRecord>(*this);
+}
+
+SingleEventRecord AlarmEventRecord::getNextSingleEvent(TimePoint from)
+{
+    auto parentEvent = getCopy();
+
+    TimePoint alarmTimePoint = nextTimePointFromHHMM(alarmTime.hourOfDay, alarmTime.minuteOfHour, from);
+    if (rruleText.empty()) {
+        return SingleEventRecord(parentEvent, alarmTimePoint, TIME_POINT_MAX);
+    }
+    else {
+        rrule::RRule recurence(rruleText);
+        const TimePoint timepoint = recurence.generateNextTimePoint(alarmTimePoint, from);
+        return SingleEventRecord(parentEvent, timepoint, TIME_POINT_MAX);
+    }
 }
