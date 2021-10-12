@@ -12,6 +12,7 @@
 #include "MmiPullWindow.hpp"
 #include "MmiPushWindow.hpp"
 #include "Reboot.hpp"
+#include "WindowsPopupFilter.hpp"
 
 #include <apps-common/messages/AppMessage.hpp>
 #include <AppWindow.hpp>
@@ -46,6 +47,9 @@ namespace app
         statusBarManager->set(Indicator::SimCard,
                               std::make_shared<SIMConfiguration>(SIMConfiguration::DisplayMode::OnlyInactiveState));
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+
+        getPopupFilter().addAppDependentFilter(
+            [&](const gui::PopupRequestParams & /*popupParams*/) { return !blockAllPopups; });
 
         addActionReceiver(app::manager::actions::ShowMMIResponse, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_pull, std::move(data));
@@ -195,14 +199,6 @@ namespace app
             return true;
         }
         return false;
-    }
-
-    bool ApplicationDesktop::isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const
-    {
-        if (blockAllPopups) {
-            return false;
-        }
-        return true;
     }
 
     void ApplicationDesktop::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)

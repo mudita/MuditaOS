@@ -39,8 +39,6 @@ namespace app
         // done
         void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams) override;
 
-        bool isPopupPermitted(gui::popup::ID popupId) const override;
-
         void setOsUpdateVersion(const std::string &value);
 
       private:

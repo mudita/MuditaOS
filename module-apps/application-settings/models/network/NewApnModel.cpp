@@ -8,6 +8,7 @@
 #include <application-settings/widgets/network/ApnInputWidget.hpp>
 
 #include <ListView.hpp>
+#include <AppWindow.hpp>
 
 NewApnModel::NewApnModel(app::ApplicationCommon *app) : application(app)
 {}

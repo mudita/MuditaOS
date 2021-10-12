@@ -6,6 +6,7 @@
 #include <application-alarm-clock/widgets/AlarmClockStyle.hpp>
 #include <ListView.hpp>
 #include <time/time_locale.hpp>
+#include <AppWindow.hpp>
 
 namespace app::alarmClock
 {

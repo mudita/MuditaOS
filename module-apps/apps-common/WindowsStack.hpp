@@ -3,58 +3,75 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <map>
+#include <optional>
 #include <vector>
 #include <string>
-#include <AppWindow.hpp>
+#include <ostream>
+#include <log/log.hpp>
+#include "popups/Disposition.hpp"
+
+namespace gui
+{
+    class AppWindow;
+}
 
 namespace app
 {
 
+    class WindowsFactory;
     class ApplicationCommon;
+
+    constexpr auto previousWindow = 1;
+    constexpr auto topWindow      = 0;
+
+    struct WindowData
+    {
+      public:
+        std::string name;
+        gui::popup::Disposition disposition{};
+
+        WindowData(const std::string &name, const gui::popup::Disposition &disposition)
+            : name(name), disposition(disposition)
+        {}
+    };
 
     class WindowsStack
     {
-        ApplicationCommon *parent;
+        std::vector<WindowData> stack;
+        std::map<std::string, std::unique_ptr<gui::AppWindow>> windows{};
+        decltype(stack)::iterator findInStack(const std::string &);
 
       public:
-        WindowsStack(ApplicationCommon *parent) : parent(parent)
-        {}
+        WindowsStack() = default;
 
-        std::vector<std::string> stack;
-        std::map<std::string, std::unique_ptr<gui::AppWindow>> windows;
+        /// iterators, unfortunately used in applications
+        std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator begin() const;
+        std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator end() const;
+        [[nodiscard]] bool isEmpty() const noexcept;
 
-        std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator begin() const
-        {
-            return std::begin(windows);
-        }
+        /// add window on top of stack
+        void push(const std::string &name,
+                  std::unique_ptr<gui::AppWindow> window,
+                  const gui::popup::Disposition &disposition = gui::popup::WindowDisposition);
 
-        std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator end() const
-        {
-            return std::end(windows);
-        }
+        /// window getters
+        gui::AppWindow *get(const std::string &name) const;
+        std::optional<std::string> get(uint32_t depth = 0) const;
+        std::optional<WindowData> getWindowData(uint32_t depth = 0) const;
 
-        [[nodiscard]] auto getParent() const
-        {
-            return parent;
-        }
+        /// functions removing windows from stack
+        /// `pop`  functions - handle last, latest window
+        /// `drop` functions - remove any window on stack
+        /// return false on pop empty
+        bool pop() noexcept;
+        bool pop(const std::string &window);
+        bool popLastWindow();
+        bool drop(const std::string &window);
+        void clear();
 
-        auto push(const std::string &name, std::unique_ptr<gui::AppWindow> window)
-        {
-            windows[name] = std::move(window);
-            stack.push_back(name);
-        }
-
-        gui::AppWindow *get(const std::string &name) const
-        {
-            auto ret = windows.find(name);
-            return ret == std::end(windows) ? nullptr : ret->second.get();
-        }
-
-        [[nodiscard]] auto isEmpty() const noexcept
-        {
-            return stack.size() == 0;
-        }
+        bool rebuildWindows(app::WindowsFactory &windowsFactory, ApplicationCommon *app);
     };
 } // namespace app

@@ -12,6 +12,7 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <Service/Message.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
+#include <AppWindowConstants.hpp>
 
 namespace app
 {
@@ -77,7 +78,6 @@ namespace app
                                  StartInBackground startInBackground = {false});
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
-        bool isPopupPermitted(gui::popup::ID popupId) const override;
 
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
         {

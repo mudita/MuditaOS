@@ -6,6 +6,7 @@
 #include <application-settings/widgets/display-keypad/CategoryWidget.hpp>
 
 #include <ListView.hpp>
+#include <AppWindow.hpp>
 
 namespace style::quotes::list
 {

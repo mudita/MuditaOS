@@ -8,6 +8,7 @@
 
 #include <ListView.hpp>
 #include <widgets/DateAndTimeStyle.hpp>
+#include <AppWindow.hpp>
 
 DateAndTimeModel::DateAndTimeModel(app::ApplicationCommon *application) : app(application)
 {}

@@ -9,6 +9,7 @@
 
 #include <gui/widgets/Image.hpp>
 #include <time/time_conversion.hpp>
+#include <gui/widgets/Label.hpp>
 
 namespace gui
 {

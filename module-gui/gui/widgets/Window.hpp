@@ -76,6 +76,14 @@ namespace gui
             return name;
         };
 
+        /// function to set name - some windows have different name set in
+        /// - builder
+        /// - actual window name
+        [[deprecated]] void setName(const std::string &name)
+        {
+            this->name = name;
+        }
+
         /// used for fetching unique name of window
         virtual std::string getUniqueName()
         {

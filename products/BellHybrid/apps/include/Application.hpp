@@ -13,10 +13,15 @@ namespace app
         using ApplicationCommon::ApplicationCommon;
         void resumeIdleTimer();
         void suspendIdleTimer();
+        explicit Application(std::string name,
+                             std::string parent                  = "",
+                             StatusIndicators statusIndicators   = StatusIndicators{},
+                             StartInBackground startInBackground = {false},
+                             uint32_t stackDepth                 = 4096,
+                             sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
       protected:
         void attachPopups(const std::vector<gui::popup::ID> &popupsList) override;
-        bool isPopupPermitted(gui::popup::ID popupId) const override;
         void startIdleTimer();
         void restartIdleTimer();
         void stopIdleTimer();

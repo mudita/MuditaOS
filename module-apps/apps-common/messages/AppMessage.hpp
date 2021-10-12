@@ -4,11 +4,16 @@
 #pragma once
 
 #include "Common.hpp"
+#include "popups/Disposition.hpp"
 #include "SwitchData.hpp"
 #include "gui/input/InputEvent.hpp"
 #include "BaseAppMessage.hpp"
+#include "AppSwitchReason.hpp"
+#include "AppStartupReason.hpp"
 #include <memory>
 #include <string>
+#include <service-appmgr/Actions.hpp>
+#include <utility>
 
 namespace app
 {
@@ -49,14 +54,13 @@ namespace app
     // target
     class AppSwitchMessage : public AppMessage
     {
-      protected:
+      private:
         // name of the application to which switch is performed.
         std::string targetApplication;
         // name of the window to which switch should be performed.
         std::string targetWindow;
         // optional data for the target window.
         std::unique_ptr<gui::SwitchData> data;
-
         StartupReason startupReason = StartupReason::Launch;
 
       public:
@@ -129,7 +133,13 @@ namespace app
                                SwitchReason reason   = SwitchReason::SwitchRequest)
             : AppMessage(MessageType::AppSwitchWindow), window{window},
               senderWindow{senderWindow}, command{command}, reason{reason}, data{std::move(data)} {};
+
         virtual ~AppSwitchWindowMessage() = default;
+
+        [[nodiscard]] virtual bool toPopupRequest() const
+        {
+            return false;
+        }
 
         const std::string &getWindowName() const
         {
@@ -151,6 +161,11 @@ namespace app
         {
             return data;
         };
+
+        virtual std::pair<const std::string &, gui::popup::Disposition> getSwitchData()
+        {
+            return {window, gui::popup::WindowDisposition};
+        }
     };
 
     class AppUpdateWindowMessage : public AppMessage

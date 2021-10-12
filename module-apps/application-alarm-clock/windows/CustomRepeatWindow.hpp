@@ -7,6 +7,7 @@
 
 #include <Application.hpp>
 #include <ListView.hpp>
+#include <AppWindow.hpp>
 
 namespace app::alarmClock
 {

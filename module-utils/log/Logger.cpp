@@ -25,7 +25,11 @@ namespace Log
                                                             {"ServiceEink", logger_level::LOGINFO},
                                                             {"ServiceDB", logger_level::LOGINFO},
                                                             {CRIT_STR, logger_level::LOGTRACE},
-                                                            {IRQ_STR, logger_level::LOGTRACE}};
+                                                            {IRQ_STR, logger_level::LOGTRACE},
+                                                            {"FileIndexer", logger_level::LOGINFO},
+                                                            {"ServiceAudio", logger_level::LOGERROR},
+                                                            {"EventManager", logger_level::LOGINFO}};
+
     const char *Logger::levelNames[]                     = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
     std::ostream &operator<<(std::ostream &stream, const Application &application)

@@ -5,6 +5,7 @@
 
 #include <application-settings/models/system/DateAndTimeModel.hpp>
 #include <application-settings/windows/WindowNames.hpp>
+#include <AppWindow.hpp>
 
 namespace gui
 {

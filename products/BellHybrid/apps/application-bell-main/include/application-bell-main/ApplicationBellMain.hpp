@@ -40,10 +40,10 @@ namespace app
         }
 
       private:
-        void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params) override;
         auto isHomeScreenFocused() -> bool;
         void onStart() override;
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
+        void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
     };
 
     template <> struct ManifestTraits<ApplicationBellMain>

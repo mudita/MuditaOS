@@ -18,7 +18,7 @@ namespace gui
     } // namespace
 
     ChargingBatteryWindow::ChargingBatteryWindow(app::ApplicationCommon *app)
-        : AppWindow(app, app::window::name::dead_battery)
+        : AppWindow(app, app::window::name::charging_battery)
     {
         buildInterface();
         preventsAutoLock = true;
