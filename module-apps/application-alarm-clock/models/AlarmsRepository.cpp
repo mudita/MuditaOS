@@ -18,8 +18,7 @@ namespace app::alarmClock
 
     void AlarmsDBRepository::getLimited(std::uint32_t offset, std::uint32_t limit, const OnGetCallback &callback)
     {
-        auto request =
-            std::make_unique<alarms::AlarmsGetInRangeRequestMessage>(TIME_POINT_INVALID, TIME_POINT_MAX, offset, limit);
+        auto request = std::make_unique<alarms::AlarmsGetInRangeRequestMessage>(offset, limit);
         auto task = async(std::move(request), service::name::service_time); // -> std::unique_ptr<AsyncRequest>;
         auto cb   = [callback](auto response) {
             auto result = dynamic_cast<alarms::AlarmsGetInRangeResponseMessage *>(response);

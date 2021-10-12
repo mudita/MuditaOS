@@ -9,10 +9,8 @@
 #include <queries/alarm_events/QueryAlarmEventsAdd.hpp>
 #include <queries/alarm_events/QueryAlarmEventsEdit.hpp>
 #include <queries/alarm_events/QueryAlarmEventsGet.hpp>
-#include <queries/alarm_events/QueryAlarmEventsGetLimited.hpp>
-#include <queries/alarm_events/QueryAlarmEventsGetBetweenDates.hpp>
-#include <queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.hpp>
-#include <queries/alarm_events/QueryAlarmEventsGetNext.hpp>
+#include <queries/alarm_events/QueryAlarmEventsGetEnabled.hpp>
+#include <queries/alarm_events/QueryAlarmEventsGetInRange.hpp>
 #include <queries/alarm_events/QueryAlarmEventsRemove.hpp>
 #include <queries/alarm_events/QueryAlarmEventsToggleAll.hpp>
 #include <catch2/catch.hpp>
@@ -23,20 +21,18 @@
 #include <cstring>
 #include <filesystem>
 
-TEST_CASE("AlarmEventRecord tests")
+using namespace std::chrono_literals;
+
+TEST_CASE("AlarmEventRecord queries tests")
 {
-    constexpr auto testName1          = "TestAlarmName1";
-    constexpr auto testName2          = "TestAlarmName2";
-    constexpr auto testName3          = "TestAlarmName3";
-    constexpr auto testDuration       = 60;
-    constexpr auto testIsAllDay       = false;
+    constexpr auto testAlarmHour      = 12h;
+    constexpr auto testAlarmMinute    = 0min;
     constexpr auto testEmptyRRuleText = "";
     constexpr auto testRRuleFiveDays  = "FREQ=DAILY;COUNT=5";
     constexpr auto testRRuleDaily     = "FREQ=DAILY";
     constexpr auto testMusicTone      = "music.wav";
     constexpr auto testEnabled        = true;
     constexpr auto testSnoozeDuration = 15;
-    const auto testEventStart         = TimePointFromString("2020-01-11 12:00:00");
 
     Database::initialize();
 
@@ -49,26 +45,20 @@ TEST_CASE("AlarmEventRecord tests")
     AlarmEventRecordInterface alarmEventRecordInterface(&eventsDB);
 
     auto getQuery = [&](uint32_t id,
-                        const UTF8 &name,
-                        TimePoint startDate,
-                        TimePoint endDate,
-                        uint32_t duration,
-                        bool isAllDay,
-                        const std::string &rruleText,
+                        std::chrono::hours hour,
+                        std::chrono::minutes minute,
                         const std::string &musicTone,
                         bool enabled,
-                        uint32_t snoozeDuration) {
+                        uint32_t snoozeDuration,
+                        const std::string &rruleText) {
         auto query  = std::make_shared<db::query::alarmEvents::Get>(id);
         auto ret    = alarmEventRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::alarmEvents::GetResult *>(ret.get());
         REQUIRE(result != nullptr);
         auto alarmRec = result->getResult();
         REQUIRE(alarmRec.ID == id);
-        REQUIRE(alarmRec.name == name);
-        REQUIRE(alarmRec.startDate == startDate);
-        REQUIRE(alarmRec.endDate == endDate);
-        REQUIRE(alarmRec.duration == duration);
-        REQUIRE(alarmRec.isAllDay == isAllDay);
+        REQUIRE(alarmRec.alarmTime.hourOfDay.count() == hour.count());
+        REQUIRE(alarmRec.alarmTime.minuteOfHour.count() == minute.count());
         REQUIRE(alarmRec.rruleText == rruleText);
         REQUIRE(alarmRec.musicTone == musicTone);
         REQUIRE(alarmRec.enabled == enabled);
@@ -77,16 +67,13 @@ TEST_CASE("AlarmEventRecord tests")
         return alarmRec;
     };
 
-    auto addQuery = [&](const UTF8 &name,
-                        TimePoint startDate,
-                        uint32_t duration,
-                        bool isAllDay,
-                        const std::string &rruleText,
+    auto addQuery = [&](std::chrono::hours hour,
+                        std::chrono::minutes minute,
                         const std::string &musicTone,
                         bool enabled,
-                        uint32_t snoozeDuration) {
-        auto alarmEvent =
-            AlarmEventRecord(0, name, startDate, duration, isAllDay, rruleText, musicTone, enabled, snoozeDuration);
+                        uint32_t snoozeDuration,
+                        const std::string &rruleText) {
+        auto alarmEvent = AlarmEventRecord(0, AlarmTime{hour, minute}, musicTone, enabled, snoozeDuration, rruleText);
         auto query  = std::make_shared<db::query::alarmEvents::Add>(alarmEvent);
         auto ret    = alarmEventRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::alarmEvents::AddResult *>(ret.get());
@@ -94,30 +81,19 @@ TEST_CASE("AlarmEventRecord tests")
         REQUIRE(result->getResult());
     };
 
-    auto getLimitedQuery = [&](const uint32_t offset, const uint32_t limit) {
-        auto query  = std::make_shared<db::query::alarmEvents::GetLimited>(offset, limit);
+    auto getInRangeQuery = [&](const uint32_t offset, const uint32_t limit) {
+        auto query  = std::make_shared<db::query::alarmEvents::GetInRange>(offset, limit);
         auto ret    = alarmEventRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::alarmEvents::GetLimitedResult *>(ret.get());
+        auto result = dynamic_cast<db::query::alarmEvents::GetInRangeResult *>(ret.get());
         REQUIRE(result != nullptr);
-        auto alarmsRec = result->getResult();
+        auto alarmsRec = result->getResult().first;
         return alarmsRec;
     };
 
-    auto getBetweenDatesQuery =
-        [&](const TimePoint start, const TimePoint end, const uint32_t offset, const uint32_t limit) {
-            const auto query  = std::make_shared<db::query::alarmEvents::GetBetweenDates>(start, end, offset, limit);
-            const auto ret    = alarmEventRecordInterface.runQuery(query);
-            const auto result = dynamic_cast<db::query::alarmEvents::GetBetweenDatesResult *>(ret.get());
-            REQUIRE(result != nullptr);
-            auto alarmsRec = result->getResult();
-            return alarmsRec;
-        };
-
-    auto getRecurringBetweenDatesQuery = [&](TimePoint start, TimePoint end, uint32_t offset, uint32_t limit) {
-        const auto query =
-            std::make_shared<db::query::alarmEvents::GetRecurringBetweenDates>(start, end, offset, limit);
+    auto getEnabledQuery = [&]() {
+        const auto query  = std::make_shared<db::query::alarmEvents::GetEnabled>();
         const auto ret    = alarmEventRecordInterface.runQuery(query);
-        const auto result = dynamic_cast<db::query::alarmEvents::GetRecurringBetweenDatesResult *>(ret.get());
+        const auto result = dynamic_cast<db::query::alarmEvents::GetEnabledResult *>(ret.get());
         REQUIRE(result != nullptr);
         auto alarmsRec = result->getResult();
         return alarmsRec;
@@ -131,15 +107,6 @@ TEST_CASE("AlarmEventRecord tests")
         REQUIRE(result->getResult());
     };
 
-    auto getNextQuery = [&](const TimePoint start, const uint32_t offset, const uint32_t limit) {
-        const auto query  = std::make_shared<db::query::alarmEvents::GetNext>(start, offset, limit);
-        const auto ret    = alarmEventRecordInterface.runQuery(query);
-        const auto result = dynamic_cast<db::query::alarmEvents::GetNextResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        auto alarmsRec = result->getResult();
-        return alarmsRec;
-    };
-
     auto toggleAll = [&](const bool toggle) {
         auto query  = std::make_shared<db::query::alarmEvents::ToggleAll>(toggle);
         auto ret    = alarmEventRecordInterface.runQuery(query);
@@ -151,19 +118,12 @@ TEST_CASE("AlarmEventRecord tests")
 
     SECTION("Add remove add")
     {
-        auto retAlarmEvents = getLimitedQuery(0, 10);
+        auto retAlarmEvents = getInRangeQuery(0, 10);
         REQUIRE(retAlarmEvents.size() == 0);
 
-        addQuery(testName1,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testRRuleDaily,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
+        addQuery(testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testRRuleDaily);
 
-        retAlarmEvents = getLimitedQuery(0, 10);
+        retAlarmEvents = getInRangeQuery(0, 10);
         REQUIRE(retAlarmEvents.size() == 1);
 
         const auto queryRemove  = std::make_shared<db::query::alarmEvents::Remove>(1);
@@ -172,149 +132,51 @@ TEST_CASE("AlarmEventRecord tests")
         REQUIRE(resultRemove != nullptr);
         REQUIRE(resultRemove->getResult());
 
-        retAlarmEvents = getLimitedQuery(0, 10);
+        retAlarmEvents = getInRangeQuery(0, 10);
         REQUIRE(retAlarmEvents.size() == 0);
 
-        addQuery(testName1,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testRRuleDaily,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
+        addQuery(testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testRRuleDaily);
 
-        retAlarmEvents = getLimitedQuery(0, 10);
+        retAlarmEvents = getInRangeQuery(0, 10);
         REQUIRE(retAlarmEvents.size() == 1);
     }
 
     SECTION("Add & Get")
     {
-        addQuery(testName1,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        addQuery(testName2,
-                 TimePointFromString("2020-06-11 19:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 false,
-                 testSnoozeDuration);
-        addQuery(testName3,
-                 TimePointFromString("2020-09-11 23:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
+        addQuery(testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
+        addQuery(19h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
+        addQuery(23h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
 
-        getQuery(1,
-                 testName1,
-                 testEventStart,
-                 TimePointFromString("2020-01-11 13:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        getQuery(2,
-                 testName2,
-                 TimePointFromString("2020-06-11 19:00:00"),
-                 TimePointFromString("2020-06-11 20:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 false,
-                 testSnoozeDuration);
-        getQuery(3,
-                 testName3,
-                 TimePointFromString("2020-09-11 23:00:00"),
-                 TimePointFromString("2020-09-12 00:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
+        getQuery(1, testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
+        getQuery(2, 19h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
+        getQuery(3, 23h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
     }
 
     SECTION("Add & Get Recurring")
     {
-        addQuery(testName1,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testRRuleDaily,
+        addQuery(testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testRRuleDaily);
+        addQuery(testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testRRuleFiveDays);
+        addQuery(testAlarmHour,
+                 testAlarmMinute,
                  testMusicTone,
                  testEnabled,
-                 testSnoozeDuration);
-        addQuery(testName2,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testRRuleFiveDays,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        addQuery(testName3,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 "FREQ=DAILY;UNTIL=20200115T150000Z",
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        getQuery(1,
-                 testName1,
-                 testEventStart,
-                 TIME_POINT_MAX,
-                 testDuration,
-                 testIsAllDay,
-                 testRRuleDaily,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        getQuery(2,
-                 testName2,
-                 testEventStart,
-                 TimePointFromString("2020-01-15 13:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testRRuleFiveDays,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
+                 testSnoozeDuration,
+                 "FREQ=DAILY;UNTIL=20200115T150000Z");
+
+        getQuery(1, testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testRRuleDaily);
+        getQuery(2, testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testRRuleFiveDays);
         getQuery(3,
-                 testName3,
-                 testEventStart,
-                 TimePointFromString("2020-01-15 13:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 "FREQ=DAILY;UNTIL=20200115T150000Z",
+                 testAlarmHour,
+                 testAlarmMinute,
                  testMusicTone,
                  testEnabled,
-                 testSnoozeDuration);
+                 testSnoozeDuration,
+                 "FREQ=DAILY;UNTIL=20200115T150000Z");
     }
 
     SECTION("Add, Remove, Get nonexisting")
     {
-        addQuery(testName1,
-                 TimePointFromString("2020-11-11 09:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
+        addQuery(9h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
 
         const auto queryRemove  = std::make_shared<db::query::alarmEvents::Remove>(1);
         const auto retRemove    = alarmEventRecordInterface.runQuery(queryRemove);
@@ -332,277 +194,67 @@ TEST_CASE("AlarmEventRecord tests")
 
     SECTION("Add and Update")
     {
-        addQuery("TestAlarmName",
-                 TimePointFromString("2020-11-11 09:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        auto alarmEvent = getQuery(1,
-                                   "TestAlarmName",
-                                   TimePointFromString("2020-11-11 09:00:00"),
-                                   TimePointFromString("2020-11-11 10:00:00"),
-                                   testDuration,
-                                   testIsAllDay,
-                                   testEmptyRRuleText,
-                                   testMusicTone,
-                                   testEnabled,
-                                   testSnoozeDuration);
+        addQuery(9h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
+        auto alarmEvent = getQuery(1, 9h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
 
-        alarmEvent.name      = "NewName";
         alarmEvent.musicTone = "NewMusic.wav";
         updateQuery(alarmEvent);
 
-        getQuery(1,
-                 "NewName",
-                 TimePointFromString("2020-11-11 09:00:00"),
-                 TimePointFromString("2020-11-11 10:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 "NewMusic.wav",
-                 testEnabled,
-                 testSnoozeDuration);
+        getQuery(1, 9h, 0min, alarmEvent.musicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
     }
 
     SECTION("Get limit offset")
     {
-        addQuery(testName1,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        addQuery(testName2,
-                 TimePointFromString("2020-06-11 19:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 false,
-                 testSnoozeDuration);
-        addQuery(testName3,
-                 TimePointFromString("2020-09-11 23:00:00"),
-                 30,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
+        addQuery(testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
+        addQuery(19h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
+        addQuery(23h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
 
-        auto retAlarmEvents = getLimitedQuery(0, 3);
+        auto retAlarmEvents = getInRangeQuery(0, 3);
         REQUIRE(retAlarmEvents.size() == 3);
 
-        retAlarmEvents = getLimitedQuery(1, 3);
+        retAlarmEvents = getInRangeQuery(1, 3);
         REQUIRE(retAlarmEvents.size() == 2);
         REQUIRE(retAlarmEvents[0].ID == 2);
         REQUIRE(retAlarmEvents[1].ID == 3);
 
-        retAlarmEvents = getLimitedQuery(2, 10);
+        retAlarmEvents = getInRangeQuery(2, 10);
         REQUIRE(retAlarmEvents.size() == 1);
         REQUIRE(retAlarmEvents[0].ID == 3);
     }
 
-    SECTION("Get limit offset between dates")
+    SECTION("Get Enabled")
     {
-        addQuery(testName1,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        addQuery(testName2,
-                 TimePointFromString("2020-06-11 19:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 false,
-                 testSnoozeDuration);
-        addQuery(testName3,
-                 TimePointFromString("2020-09-11 23:00:00"),
-                 30,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
+        addQuery(testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
+        addQuery(19h, 0min, testMusicTone, false, testSnoozeDuration, testEmptyRRuleText);
+        addQuery(23h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
 
-        auto retAlarmEvents = getBetweenDatesQuery(
-            TimePointFromString("2020-01-01 00:00:00"), TimePointFromString("2020-02-01 00:00:00"), 0, 10);
-        REQUIRE(retAlarmEvents.first.size() == 1);
-        REQUIRE(retAlarmEvents.first[0].ID == 1);
-
-        retAlarmEvents = getBetweenDatesQuery(
-            TimePointFromString("2020-05-01 00:00:00"), TimePointFromString("2020-10-01 00:00:00"), 0, 10);
-        REQUIRE(retAlarmEvents.first.size() == 2);
-        REQUIRE(retAlarmEvents.first[0].ID == 2);
-        REQUIRE(retAlarmEvents.first[1].ID == 3);
-
-        retAlarmEvents = getBetweenDatesQuery(
-            TimePointFromString("2020-05-01 00:00:00"), TimePointFromString("2020-10-01 00:00:00"), 1, 10);
-        REQUIRE(retAlarmEvents.first.size() == 1);
-        REQUIRE(retAlarmEvents.first[0].ID == 3);
-
-        REQUIRE(retAlarmEvents.second == 3);
-    }
-
-    SECTION("Get Next")
-    {
-        addQuery(testName1,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        addQuery(testName2,
-                 TimePointFromString("2020-01-11 12:30:00"),
-                 30,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-
-        auto retAlarmEvents = getNextQuery(TimePointFromString("2020-01-01 00:00:00"), 0, 10);
-        REQUIRE(retAlarmEvents.size() == 1);
-        REQUIRE(retAlarmEvents[0].ID == 1);
-
-        addQuery(testName3,
-                 TimePointFromString("2020-01-10 12:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        retAlarmEvents = getNextQuery(TimePointFromString("2020-01-01 00:00:00"), 0, 10);
-        REQUIRE(retAlarmEvents.size() == 1);
-        REQUIRE(retAlarmEvents[0].ID == 3);
-
-        addQuery("TestAlarmName4",
-                 TimePointFromString("2020-01-10 12:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-
-        retAlarmEvents =
-            getBetweenDatesQuery(
-                TimePointFromString("2020-05-01 00:00:00"), TimePointFromString("2020-10-01 00:00:00"), 1, 10)
-                .first;
-        retAlarmEvents = getNextQuery(TimePointFromString("2020-01-01 00:00:00"), 0, 10);
+        auto retAlarmEvents = getEnabledQuery();
         REQUIRE(retAlarmEvents.size() == 2);
-        REQUIRE((((retAlarmEvents[0].ID == 3) && (retAlarmEvents[1].ID == 4)) ||
-                 ((retAlarmEvents[0].ID == 4) && (retAlarmEvents[1].ID == 3))));
-    }
-
-    SECTION("Get Recurring Between Dates")
-    {
-        addQuery(testName1,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testRRuleDaily,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        addQuery(testName2,
-                 TimePointFromString("2020-01-11 15:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 testRRuleFiveDays,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        addQuery(testName3,
-                 TimePointFromString("2020-01-11 17:00:00"),
-                 testDuration,
-                 testIsAllDay,
-                 "FREQ=DAILY;UNTIL=20200115T170000Z",
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        addQuery("TestAlarmName4",
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 testEnabled,
-                 testSnoozeDuration);
-        auto alarms = getRecurringBetweenDatesQuery(
-            TimePointFromString("2020-01-01 12:00:00"), TimePointFromString("2020-01-11 11:00:00"), 0, 100);
-        REQUIRE(alarms.size() == 0);
-        alarms = getRecurringBetweenDatesQuery(TimePointFromString("2020-01-01 12:00:00"), testEventStart, 0, 100);
-        REQUIRE(alarms.size() == 1);
-        alarms = getRecurringBetweenDatesQuery(
-            TimePointFromString("2020-01-01 12:00:00"), TimePointFromString("2020-01-11 17:00:00"), 0, 100);
-        REQUIRE(alarms.size() == 3);
-        alarms = getRecurringBetweenDatesQuery(
-            TimePointFromString("2020-02-01 12:00:00"), TimePointFromString("2020-02-11 13:00:00"), 0, 100);
-        REQUIRE(alarms.size() == 1);
-        REQUIRE(alarms[0].ID == 1);
-        alarms = getRecurringBetweenDatesQuery(
-            TimePointFromString("2020-01-14 12:00:00"), TimePointFromString("2020-01-14 12:00:01"), 0, 100);
-        REQUIRE(alarms.size() == 3);
-        alarms = getRecurringBetweenDatesQuery(
-            TimePointFromString("2020-01-15 17:30:00"), TimePointFromString("2020-01-15 17:30:01"), 0, 100);
-        REQUIRE(alarms.size() == 2);
+        REQUIRE(retAlarmEvents[0].ID == 1);
+        REQUIRE(retAlarmEvents[1].ID == 3);
     }
 
     SECTION("ToggleAll Alarms")
     {
-        addQuery(testName1,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 true,
-                 testSnoozeDuration);
-        addQuery(testName2,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 false,
-                 testSnoozeDuration);
-        addQuery(testName3,
-                 testEventStart,
-                 testDuration,
-                 testIsAllDay,
-                 testEmptyRRuleText,
-                 testMusicTone,
-                 true,
-                 testSnoozeDuration);
+        addQuery(testAlarmHour, testAlarmMinute, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
+        addQuery(19h, 0min, testMusicTone, false, testSnoozeDuration, testEmptyRRuleText);
+        addQuery(23h, 0min, testMusicTone, testEnabled, testSnoozeDuration, testEmptyRRuleText);
 
-        auto retAlarmEvents = getLimitedQuery(0, 3);
+        auto retAlarmEvents = getInRangeQuery(0, 3);
         REQUIRE(retAlarmEvents.size() == 3);
         REQUIRE(retAlarmEvents[0].enabled);
         REQUIRE(!retAlarmEvents[1].enabled);
         REQUIRE(retAlarmEvents[2].enabled);
 
         toggleAll(false);
-        retAlarmEvents = getLimitedQuery(0, 3);
+        retAlarmEvents = getInRangeQuery(0, 3);
         REQUIRE(retAlarmEvents.size() == 3);
         REQUIRE(!retAlarmEvents[0].enabled);
         REQUIRE(!retAlarmEvents[1].enabled);
         REQUIRE(!retAlarmEvents[2].enabled);
 
         toggleAll(true);
-        retAlarmEvents = getLimitedQuery(0, 3);
+        retAlarmEvents = getInRangeQuery(0, 3);
         REQUIRE(retAlarmEvents.size() == 3);
         REQUIRE(retAlarmEvents[0].enabled);
         REQUIRE(retAlarmEvents[1].enabled);
@@ -610,4 +262,67 @@ TEST_CASE("AlarmEventRecord tests")
     }
 
     Database::deinitialize();
+}
+
+TEST_CASE("AlarmEventRecord recurrence generation tests")
+{
+    const auto testEventTime = AlarmTime{12h, 0min};
+    const auto alarmTime     = TimePointFromString("2000-01-01 12:00:00");
+
+    const auto fromTimeT  = std::chrono::system_clock::to_time_t(alarmTime);
+    const auto fromLocal  = std::localtime(&fromTimeT);
+    fromLocal->tm_hour    = 12;
+    fromLocal->tm_min     = 0;
+    auto time             = TimePointFloorMinutes(std::chrono::system_clock::from_time_t(std::mktime(fromLocal)));
+    auto currentTimeShift = alarmTime - time;
+
+    constexpr auto testTone    = "tone";
+    constexpr auto testEnabled = true;
+    constexpr auto testSnooze  = 60;
+
+    SECTION("Generate next event daily")
+    {
+        AlarmEventRecord eventRecord(1, testEventTime, testTone, testEnabled, testSnooze, "FREQ=DAILY");
+
+        auto event = eventRecord.getNextSingleEvent(TimePointFromString("2000-01-01 00:00:00"));
+        REQUIRE(event.startDate == alarmTime - currentTimeShift);
+        REQUIRE(event.parent != nullptr);
+        REQUIRE(event.parent->ID == eventRecord.ID);
+
+        event = eventRecord.getNextSingleEvent(time);
+        REQUIRE(event.startDate == time + date::days{1});
+
+        event = eventRecord.getNextSingleEvent(TimePointFromString("2020-02-27 17:00:00"));
+
+        REQUIRE(event.startDate == TimePointFromString("2020-02-28 12:00:00") - currentTimeShift);
+    }
+
+    SECTION("Generate next event daily - leap year")
+    {
+        AlarmEventRecord eventRecord(1, testEventTime, testTone, testEnabled, testSnooze, "FREQ=DAILY");
+
+        auto event = eventRecord.getNextSingleEvent(TimePointFromString("2020-02-28 17:00:00"));
+
+        REQUIRE(event.startDate == TimePointFromString("2020-02-29 12:00:00") - currentTimeShift);
+        REQUIRE(event.endDate == TIME_POINT_MAX);
+
+        event = eventRecord.getNextSingleEvent(TimePointFromString("2021-02-28 17:00:00"));
+        REQUIRE(event.startDate == TimePointFromString("2021-03-01 12:00:00") - currentTimeShift);
+        REQUIRE(event.endDate == TIME_POINT_MAX);
+    }
+
+    SECTION("Generate next AlarmEvent daily")
+    {
+        AlarmEventRecord eventRecord(1, testEventTime, testTone, testEnabled, testSnooze, "FREQ=DAILY");
+
+        auto event = eventRecord.getNextSingleEvent(TimePointFromString("2000-01-01 00:00:00"));
+        REQUIRE(event.startDate == alarmTime - currentTimeShift);
+        REQUIRE(event.endDate == TIME_POINT_MAX);
+        REQUIRE(event.parent != nullptr);
+        auto parent = std::dynamic_pointer_cast<AlarmEventRecord>(event.parent);
+        REQUIRE(parent->ID == eventRecord.ID);
+        REQUIRE(parent->musicTone == eventRecord.musicTone);
+        REQUIRE(parent->enabled == eventRecord.enabled);
+        REQUIRE(parent->snoozeDuration == eventRecord.snoozeDuration);
+    }
 }

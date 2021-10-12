@@ -19,11 +19,8 @@ namespace alarms
         explicit AlarmEventsDBRepository(sys::Service *service);
 
         auto getAlarmEvent(const std::uint32_t alarmId, const OnGetAlarmEventCallback &callback) -> void override;
-        auto getAlarmEvents(std::uint32_t offset, std::uint32_t limit, const OnGetAlarmEventsCallback &callback)
-            -> void override;
-        auto getAlarmEventsInRange(TimePoint start,
-                                   TimePoint end,
-                                   std::uint32_t offset,
+        auto getAlarmEnabledEvents(const OnGetAlarmEventsCallback &callback) -> void override;
+        auto getAlarmEventsInRange(std::uint32_t offset,
                                    std::uint32_t limit,
                                    const OnGetAlarmEventsInRangeCallback &callback) -> void override;
         auto addAlarmEvent(const AlarmEventRecord &alarmEvent, const OnAddAlarmEventCallback &callback)
@@ -31,13 +28,6 @@ namespace alarms
         auto updateAlarmEvent(const AlarmEventRecord &alarmEvent, const OnUpdateAlarmEventCallback &callback)
             -> void override;
         auto removeAlarmEvent(const std::uint32_t id, const OnRemoveAlarmEventCallback &callback) -> void override;
-        auto getNext(TimePoint start, std::uint32_t offset, std::uint32_t limit, const OnGetNextCallback &callback)
-            -> void override;
-        auto getAlarmEventsRecurringInRange(TimePoint start,
-                                            TimePoint end,
-                                            std::uint32_t offset,
-                                            std::uint32_t limit,
-                                            const OnGetAlarmEventsRecurringInRange &callback) -> void override;
         auto toggleAll(bool toggle, const OnToggleAll &callback) -> void override;
 
       private:

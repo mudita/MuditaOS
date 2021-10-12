@@ -115,6 +115,7 @@ namespace gui
         onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> record) {
             using namespace utils::time;
             validateHour();
+
             const auto now     = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
             const auto newTime = std::localtime(&now);
 
@@ -128,9 +129,7 @@ namespace gui
             }
             newTime->tm_min = utils::toNumeric(minuteInput->getText());
 
-            auto alarmTime    = TimePointFloorMinutes(std::chrono::system_clock::from_time_t(std::mktime(newTime)));
-            record->startDate = GetFollowingDayTime(alarmTime, std::chrono::system_clock::now());
-            record->endDate   = TIME_POINT_MAX;
+            record->alarmTime = AlarmTime{std::chrono::hours{newTime->tm_hour}, std::chrono::minutes{newTime->tm_min}};
         };
 
         onInputCallback(*hourInput);
@@ -200,15 +199,12 @@ namespace gui
             minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
-                auto readTime  = Clock::to_time_t(alarm->startDate);
-                auto alarmTime = std::localtime(&readTime);
-
-                const auto hours   = std::chrono::hours{alarmTime->tm_hour};
+                const auto hours   = alarm->alarmTime.hourOfDay;
                 const auto time12H = date::make12(hours);
                 const auto isPM    = date::is_pm(hours);
 
                 hourInput->setText(std::to_string(time12H.count()));
-                minuteInput->setText(std::to_string(alarmTime->tm_min));
+                minuteInput->setText(std::to_string(alarm->alarmTime.minuteOfHour.count()));
 
                 isPM ? mode12hInput->setText(utils::translate(utils::time::Locale::getPM()))
                      : mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
@@ -220,11 +216,8 @@ namespace gui
             minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
-                auto readTime  = Clock::to_time_t(alarm->startDate);
-                auto alarmTime = std::localtime(&readTime);
-
-                hourInput->setText(std::to_string(alarmTime->tm_hour));
-                minuteInput->setText(std::to_string(alarmTime->tm_min));
+                hourInput->setText(std::to_string(alarm->alarmTime.hourOfDay.count()));
+                minuteInput->setText(std::to_string(alarm->alarmTime.minuteOfHour.count()));
             };
         }
     }

@@ -59,7 +59,9 @@ namespace app
         if (!alarmEventPtr) {
             return;
         }
-        alarmEventPtr->startDate = TimePointFloorMinutes(Clock::from_time_t(time));
+        auto clockTime = std::localtime(&time);
+        alarmEventPtr->alarmTime =
+            AlarmTime{std::chrono::hours{clockTime->tm_hour}, std::chrono::minutes{clockTime->tm_min}};
 
         updateAlarm(*alarmEventPtr);
     }
@@ -140,16 +142,9 @@ namespace app
 
     AlarmEventRecord AlarmModel::generateDefaultAlarm() const
     {
-        constexpr std::string_view defaultAlarmTime{"07:00:00"};
-
-        auto defaultAlarmTimePoint = TimePointToString(TimePointNow());
-        defaultAlarmTimePoint.replace(
-            defaultAlarmTimePoint.end() - defaultAlarmTime.size(), defaultAlarmTimePoint.end(), defaultAlarmTime);
-
         auto defaultAlarm      = AlarmEventRecord{};
-        defaultAlarm.startDate = TimePointFromString(defaultAlarmTimePoint.c_str());
+        defaultAlarm.alarmTime = AlarmTime{7h, 0min};
         defaultAlarm.rruleText = "FREQ=DAILY";
-        defaultAlarm.endDate   = TIME_POINT_MAX;
         defaultAlarm.enabled   = true;
         return defaultAlarm;
     }

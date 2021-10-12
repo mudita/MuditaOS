@@ -24,7 +24,7 @@ namespace alarms
 
     void AlarmOperationsCommon::updateEventsCache(TimePoint now)
     {
-        OnGetNextSingleProcessed callback = [&](std::vector<SingleEventRecord> singleEvents) {
+        OnGetAlarmsProcessed callback = [&](std::vector<SingleEventRecord> singleEvents) {
             nextSingleEvents.clear();
             nextSingleEvents.reserve(singleEvents.size());
             for (auto &ev : singleEvents) {
@@ -86,37 +86,21 @@ namespace alarms
         alarmEventsRepo->removeAlarmEvent(alarmId, repoCallback);
     }
 
-    void AlarmOperationsCommon::getAlarmsInRange(
-        TimePoint start, TimePoint end, std::uint32_t offset, std::uint32_t limit, OnGetAlarmsInRangeProcessed callback)
+    void AlarmOperationsCommon::getAlarmsInRange(std::uint32_t offset,
+                                                 std::uint32_t limit,
+                                                 OnGetAlarmsInRangeProcessed callback)
     {
         OnGetAlarmEventsInRangeCallback repoCallback = [callback](auto vals) { callback(std::move(vals)); };
-        alarmEventsRepo->getAlarmEventsInRange(start, end, offset, limit, repoCallback);
+        alarmEventsRepo->getAlarmEventsInRange(offset, limit, repoCallback);
     }
 
-    void AlarmOperationsCommon::getFirstNextSingleEvent(TimePoint start, OnGetFirstNextSingleProcessed callback)
+    void AlarmOperationsCommon::getNextSingleEvents(TimePoint start, OnGetAlarmsProcessed callback)
     {
-        OnGetNextCallback repoGetFirstNextCallback = [&, callback, start](std::vector<AlarmEventRecord> records) {
-            onRepoGetFirstNextSingeResponse(callback, start, records);
+        OnGetAlarmEventsCallback repoGetAlarmsCallback = [&, callback, start](std::vector<AlarmEventRecord> records) {
+            onRepoGetAlarmsResponse(start, records, callback);
         };
 
-        alarmEventsRepo->getNext(start, getNextSingleEventsOffset, getNextSingleEventsLimit, repoGetFirstNextCallback);
-    }
-
-    void AlarmOperationsCommon::getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback)
-    {
-        auto nextEvents = std::make_shared<std::vector<AlarmEventRecord>>();
-
-        OnGetAlarmEventsRecurringInRange repoGetRecurringCallback =
-            [&, callback, nextEvents, start](std::vector<AlarmEventRecord> records) {
-                onRepoGetRecurringInRangeResponse(callback, nextEvents, start, records);
-            };
-
-        OnGetNextCallback repoGetNextCallback =
-            [&, callback, nextEvents, start, repoGetRecurringCallback](std::vector<AlarmEventRecord> records) {
-                onRepoGetNextResponse(nextEvents, start, repoGetRecurringCallback, records);
-            };
-
-        alarmEventsRepo->getNext(start, getNextSingleEventsOffset, getNextSingleEventsLimit, repoGetNextCallback);
+        alarmEventsRepo->getAlarmEnabledEvents(repoGetAlarmsCallback);
     }
 
     void AlarmOperationsCommon::turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)
@@ -231,50 +215,26 @@ namespace alarms
         }
     }
 
-    void AlarmOperationsCommon::onRepoGetNextResponse(std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
-                                                      TimePoint start,
-                                                      OnGetAlarmEventsRecurringInRange recurringCallback,
-                                                      std::vector<AlarmEventRecord> records)
-    {
-        if (records.empty()) {
-            alarmEventsRepo->getAlarmEventsRecurringInRange(
-                start, TIME_POINT_MAX, getNextSingleEventsOffset, getNextSingleEventsLimit, recurringCallback);
-        }
-        else {
-            *nextEvents              = std::move(records);
-            auto firstEventTimePoint = (*nextEvents)[0].startDate;
-            nextEvents->erase(std::remove_if(nextEvents->begin(),
-                                             nextEvents->end(),
-                                             [](AlarmEventRecord rec) { return !rec.rruleText.empty(); }),
-                              nextEvents->end());
-            alarmEventsRepo->getAlarmEventsRecurringInRange(
-                start, firstEventTimePoint, getNextSingleEventsOffset, getNextSingleEventsLimit, recurringCallback);
-        }
-    }
-
-    void AlarmOperationsCommon::onRepoGetRecurringInRangeResponse(
-        OnGetNextSingleProcessed handledCallback,
-        std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
-        TimePoint start,
-        std::vector<AlarmEventRecord> records)
+    void AlarmOperationsCommon::onRepoGetAlarmsResponse(TimePoint start,
+                                                        std::vector<AlarmEventRecord> records,
+                                                        OnGetAlarmsProcessed handledCallback)
     {
         std::vector<SingleEventRecord> outEvents;
-        if (!records.empty()) {
-            (*nextEvents)
-                .insert(nextEvents->end(),
-                        std::make_move_iterator(records.begin()),
-                        std::make_move_iterator(records.end()));
-        }
-        TimePoint nearestTimePoint = TIME_POINT_MAX;
-        for (auto &event : (*nextEvents)) {
-            auto newSingle = event.getNextSingleEvent(start);
-            if (newSingle.startDate == nearestTimePoint) {
-                outEvents.push_back(newSingle);
+        for (auto &record : records) {
+            if (outEvents.empty()) {
+                outEvents.push_back(record.getNextSingleEvent(start));
             }
-            else if (newSingle.startDate < nearestTimePoint && newSingle.startDate != TIME_POINT_INVALID) {
-                nearestTimePoint = newSingle.startDate;
-                outEvents.clear();
-                outEvents.push_back(newSingle);
+            else {
+                auto event = record.getNextSingleEvent(start);
+                if (event.startDate != TIME_POINT_INVALID) {
+                    if (event.startDate < outEvents.front().startDate) {
+                        outEvents.clear();
+                        outEvents.push_back(event);
+                    }
+                    else if (event.startDate == outEvents.front().startDate) {
+                        outEvents.push_back(event);
+                    }
+                }
             }
         }
         handledCallback(outEvents);

@@ -12,23 +12,23 @@
 
 struct AlarmEventRecord;
 
-struct AlarmEventsTableRow : public EventsTableRow
+struct AlarmEventsTableRow : public Record
 {
+    uint32_t hourOfDay{0};
+    uint32_t minuteOfHour{0};
     std::string musicTone{""};
     bool enabled{false};
     uint32_t snoozeDuration{0};
+    std::string rruleText{""};
 
     AlarmEventsTableRow() = default;
     AlarmEventsTableRow(uint32_t id,
-                        const UTF8 &name,
-                        TimePoint startDate,
-                        TimePoint endDate,
-                        uint32_t duration,
-                        bool isAllDay,
-                        const std::string &rrule,
+                        uint32_t hourOfDay,
+                        uint32_t minuteOfHour,
                         const std::string &musicTone,
                         bool enabled,
-                        uint32_t snoozeDuration);
+                        uint32_t snoozeDuration,
+                        const std::string &rruleText);
     explicit AlarmEventsTableRow(const AlarmEventRecord &rec);
     explicit AlarmEventsTableRow(const QueryResult &result);
 
@@ -37,15 +37,12 @@ struct AlarmEventsTableRow : public EventsTableRow
 
 enum class AlarmEventsTableFields
 {
-    Name,
-    StartDate,
-    EndDate,
-    Duration,
-    IsAllDay,
-    Rrule,
+    AlarmTimeHour,
+    AlarmTimeMinute,
     MusicTone,
     Enabled,
     SnoozeDuration,
+    Rrule,
 };
 
 class AlarmEventsTable : public Table<AlarmEventsTableRow, AlarmEventsTableFields>
@@ -62,11 +59,7 @@ class AlarmEventsTable : public Table<AlarmEventsTableRow, AlarmEventsTableField
     auto getLimitOffset(uint32_t offset, uint32_t limit) -> std::vector<AlarmEventsTableRow> override;
     auto getLimitOffsetByField(uint32_t offset, uint32_t limit, AlarmEventsTableFields field, const char *str)
         -> std::vector<AlarmEventsTableRow> override;
-    auto getBetweenDates(TimePoint startDate, TimePoint endDate, std::uint32_t offset, std::uint32_t limit)
-        -> std::vector<AlarmEventsTableRow>;
-    auto getRecurringBetweenDates(TimePoint startDate, TimePoint endDate, uint32_t offset, uint32_t limit)
-        -> std::vector<AlarmEventsTableRow>;
-    auto getNext(TimePoint start, uint32_t offset, uint32_t limit) -> std::vector<AlarmEventsTableRow>;
+    auto getEnabled() -> std::vector<AlarmEventsTableRow>;
     auto toggleAll(bool toggle) -> bool;
 
     auto count() -> uint32_t override;

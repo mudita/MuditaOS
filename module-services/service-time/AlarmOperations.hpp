@@ -23,7 +23,7 @@ namespace alarms
         using OnUpdateAlarmProcessed        = std::function<void(bool)>;
         using OnRemoveAlarmProcessed        = std::function<void(bool)>;
         using OnGetFirstNextSingleProcessed = std::function<void(SingleEventRecord)>;
-        using OnGetNextSingleProcessed      = std::function<void(std::vector<SingleEventRecord>)>;
+        using OnGetAlarmsProcessed          = std::function<void(std::vector<SingleEventRecord>)>;
         using OnSnoozeRingingAlarm          = std::function<void(bool)>;
         using OnTurnOffRingingAlarm         = std::function<void(bool)>;
         using OnGetSnoozedAlarms            = std::function<void(std::vector<SingleEventRecord>)>;
@@ -41,13 +41,10 @@ namespace alarms
         virtual void addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback)                  = 0;
         virtual void updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback)            = 0;
         virtual void removeAlarm(const std::uint32_t alarmId, OnRemoveAlarmProcessed callback)        = 0;
-        virtual void getAlarmsInRange(TimePoint start,
-                                      TimePoint end,
-                                      std::uint32_t offset,
+        virtual void getAlarmsInRange(std::uint32_t offset,
                                       std::uint32_t limit,
                                       OnGetAlarmsInRangeProcessed callback)                           = 0;
-        virtual void getFirstNextSingleEvent(TimePoint start, OnGetFirstNextSingleProcessed callback) = 0;
-        virtual void getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback)          = 0;
+        virtual void getNextSingleEvents(TimePoint start, OnGetAlarmsProcessed callback)              = 0;
         virtual void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)      = 0;
         virtual void turnOffSnoozedAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)      = 0;
         virtual void snoozeRingingAlarm(const std::uint32_t id,
@@ -89,13 +86,8 @@ namespace alarms
         void addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback) override;
         void updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback) override;
         void removeAlarm(const std::uint32_t alarmId, OnRemoveAlarmProcessed callback) override;
-        void getAlarmsInRange(TimePoint start,
-                              TimePoint end,
-                              std::uint32_t offset,
-                              std::uint32_t limit,
-                              OnGetAlarmsInRangeProcessed callback) override;
-        void getFirstNextSingleEvent(TimePoint start, OnGetFirstNextSingleProcessed callback) override;
-        void getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback) override;
+        void getAlarmsInRange(std::uint32_t offset, std::uint32_t limit, OnGetAlarmsInRangeProcessed callback) override;
+        void getNextSingleEvents(TimePoint start, OnGetAlarmsProcessed callback) override;
         void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback) override;
         void turnOffSnoozedAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback) override;
         void snoozeRingingAlarm(const std::uint32_t id,
@@ -139,15 +131,9 @@ namespace alarms
         void onRepoGetFirstNextSingeResponse(OnGetFirstNextSingleProcessed handledCallback,
                                              TimePoint start,
                                              std::vector<AlarmEventRecord> records);
-        void onRepoGetNextResponse(std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
-                                   TimePoint start,
-                                   OnGetAlarmEventsRecurringInRange recurringCallback,
-                                   std::vector<AlarmEventRecord> records);
-        void onRepoGetRecurringInRangeResponse(OnGetNextSingleProcessed handledCallback,
-                                               std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
-                                               TimePoint start,
-                                               std::vector<AlarmEventRecord> records);
-
+        void onRepoGetAlarmsResponse(TimePoint start,
+                                     std::vector<AlarmEventRecord> records,
+                                     OnGetAlarmsProcessed handledCallback);
         void checkAndUpdateCache(AlarmEventRecord record);
         void switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn);
         void processEvents(TimePoint now);
