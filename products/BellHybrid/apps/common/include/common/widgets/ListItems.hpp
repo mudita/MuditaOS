@@ -60,7 +60,6 @@ namespace gui
 
       private:
         NumWithStringSpinner *spinner{};
-        TextFixedSize *bottomText{};
         const UTF8 offStr;
         const UTF8 minStr;
 

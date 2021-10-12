@@ -54,13 +54,9 @@ namespace gui
 
     void PowerNapListItem::createBottomDescription()
     {
-        bottomDescription = new Label(body->lastBox);
-        bottomDescription->setMaximumSize(style::bell_base_layout::outer_layouts_w,
-                                          style::bell_base_layout::outer_layouts_h);
-        bottomDescription->setFont(powerNapStyle::descriptionFont);
-        bottomDescription->setEdges(RectangleEdge::None);
-        bottomDescription->activeItem = false;
-        bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        setupBottomDescription("");
+        bottomText->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
     }
 
     void PowerNapListItem::registerCallbacks()
@@ -83,7 +79,7 @@ namespace gui
 
         inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
             if (body->onInput(inputEvent)) {
-                bottomDescription->setText(getTimeUnitName(spinner->getCurrentValue()));
+                setBottomDescribtionText(getTimeUnitName(spinner->getCurrentValue()));
                 return true;
             }
             return false;
@@ -98,7 +94,7 @@ namespace gui
     void PowerNapListItem::setSpinnerValue(int value)
     {
         spinner->setCurrentValue(value);
-        bottomDescription->setText(getTimeUnitName(spinner->getCurrentValue()));
+        setBottomDescribtionText(getTimeUnitName(spinner->getCurrentValue()));
     }
 
 } // namespace gui

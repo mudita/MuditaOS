@@ -34,10 +34,25 @@ namespace app::bell_settings
         constexpr auto snoozeLengthStep = 1U;
         constexpr auto snoozeLengthMin  = 1U;
         constexpr auto snoozeLengthMax  = 30U;
-        internalData.emplace_back(
-            new NumListItem(model.getSnoozeLength(),
-                            UIntegerSpinner::Range{snoozeLengthMin, snoozeLengthMax, snoozeLengthStep},
-                            utils::translate("app_bell_settings_alarm_settings_snooze_length")));
+
+        auto chimeLengthBottomDescription = model.getSnoozeLength().getValue() > 1
+                                                ? utils::translate("common_minutes_lower")
+                                                : utils::translate("common_minute_lower");
+        auto chimeLength                  = new NumListItem(model.getSnoozeLength(),
+                                           UIntegerSpinner::Range{snoozeLengthMin, snoozeLengthMax, snoozeLengthStep},
+                                           utils::translate("app_bell_settings_alarm_settings_snooze_length"),
+                                           chimeLengthBottomDescription);
+
+        chimeLength->setOnValueChanged([chimeLength](const std::uint32_t &val) {
+            if (val == 1) {
+                chimeLength->setBottomDescribtionText(utils::translate("common_minute_lower"));
+            }
+            else {
+                chimeLength->setBottomDescribtionText(utils::translate("common_minutes_lower"));
+            }
+        });
+
+        internalData.emplace_back(chimeLength);
 
         const UTF8 minStr = utils::translate("common_minute_short");
         const auto range  = NumWithStringListItem::NumWithStringSpinner::Range{
