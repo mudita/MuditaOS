@@ -18,6 +18,8 @@ export declare ignore_paths=(
     '.*/lib/'
     'build'
     'board/rt1051/xip/'
+    'board/rt1051/gthr.h'
+    'board/rt1051/newlib/cxx_guards.cpp'
     'board/rt1051/newlib/dir-common.h'
     'board/rt1051/newlib/include/'
     'host-tools/littlefs-fuse/lfsfuse/'

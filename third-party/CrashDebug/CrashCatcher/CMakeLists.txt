@@ -20,9 +20,9 @@ target_sources(
         include/CrashCatcher/CrashCatcher.h
 )
 
-set_source_files_properties(
-        CrashCatcher_armv7m.S
-    PROPERTIES LANGUAGE C
+set_property(
+	SOURCE CrashCatcher_armv7m.S
+	APPEND PROPERTY COMPILE_OPTIONS "-x" "assembler-with-cpp"
 )
 
 target_include_directories(
