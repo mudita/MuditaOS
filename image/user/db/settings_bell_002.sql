@@ -25,7 +25,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('off_calls_from_favorites', '0'),
     ('\EventManager\\br_state', '0'),
     ('\EventManager\\br_auto_mode', '0'),
-    ('\EventManager\\br_level', '50.0f'),
+    ('br_level', '50.0f'),
     ('keypad_light_state', '0'),
     ('gs_current_timezone_name', ''),
     ('gs_current_timezone_rules', ''),

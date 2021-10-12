@@ -32,6 +32,7 @@ target_sources(application-bell-common
         src/options/BellShortOptionWindow.cpp
         src/options/OptionBellMenu.cpp
     PUBLIC
+        include/common/SettingsHelper.hpp
         include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp
         include/common/windows/BellFinishedWindow.hpp

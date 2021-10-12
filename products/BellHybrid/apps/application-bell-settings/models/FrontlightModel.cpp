@@ -4,6 +4,8 @@
 #include "FrontlightModel.hpp"
 #include "BellSettingsStyle.hpp"
 
+#include <common/SettingsHelper.hpp>
+
 #include <gui/widgets/ListViewEngine.hpp>
 #include <gui/widgets/Style.hpp>
 #include <gui/widgets/Text.hpp>
@@ -14,10 +16,11 @@
 
 namespace
 {
-    constexpr auto fmtSpinnerMin   = 1U;
-    constexpr auto fmtSpinnerMax   = 10U;
-    constexpr auto fmtSpinnerStep  = 1U;
-    constexpr auto brightnessLevel = settings::Brightness::brightnessLevel;
+    constexpr auto brightnessLevelDefaultValue = 50.0;
+    constexpr auto fmtSpinnerMin               = 1U;
+    constexpr auto fmtSpinnerMax               = 10U;
+    constexpr auto fmtSpinnerStep              = 1U;
+    constexpr auto brightnessLevel             = settings::Brightness::brightnessLevel;
 } // namespace
 
 namespace app::bell_settings
@@ -61,7 +64,6 @@ namespace app::bell_settings
     void FrontlightModel::saveData()
     {
         const int value = frontlightSetSpinner->getCurrentValue() * 10;
-        LOG_DEBUG("Storing frontlight value %i", value);
         screenLightSettings->setBrightness(static_cast<float>(value));
         settings.setValue(
             brightnessLevel, std::to_string(static_cast<std::int32_t>(value)), settings::SettingsScope::Global);
@@ -69,14 +71,9 @@ namespace app::bell_settings
 
     void FrontlightModel::loadData()
     {
-        bsp::eink_frontlight::BrightnessPercentage brightnessValue =
-            utils::getNumericValue<float>(settings.getValue(brightnessLevel, settings::SettingsScope::Global));
-        LOG_DEBUG("Reading frontlight value %0.1f", brightnessValue);
-        // prevent showing spinner value less than minimum when database empty
-        if (static_cast<unsigned int>(brightnessValue) < fmtSpinnerMin) {
-            brightnessValue = static_cast<bsp::eink_frontlight::BrightnessPercentage>(fmtSpinnerMin);
-        }
-        frontlightSetSpinner->setCurrentValue(static_cast<int>(brightnessValue / 10));
+        const auto brightnessValue = common::getSettingsValue<float>(settings, brightnessLevel);
+        frontlightSetSpinner->setCurrentValue(
+            static_cast<int>(brightnessValue.value_or(brightnessLevelDefaultValue) / 10));
     }
 
     void FrontlightModel::setLiveBrightness(const int value)
