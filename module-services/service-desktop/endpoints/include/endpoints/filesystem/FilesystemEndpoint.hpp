@@ -4,6 +4,7 @@
 #pragma once
 
 #include <endpoints/Endpoint.hpp>
+#include "FS_Helper.hpp"
 #include <Service/Service.hpp>
 #include "FileOperations.hpp"
 
@@ -12,6 +13,8 @@ namespace sdesktop::endpoints
 
     class FilesystemEndpoint : public Endpoint
     {
+        const std::unique_ptr<FS_Helper> helper;
+
       public:
         static auto createInstance(sys::Service *ownerServicePtr) -> std::unique_ptr<Endpoint>
         {
@@ -19,24 +22,10 @@ namespace sdesktop::endpoints
         }
 
         explicit FilesystemEndpoint(sys::Service *ownerServicePtr, FileOperations &fileOps)
-            : Endpoint(ownerServicePtr), fileOps(fileOps)
+            : Endpoint(ownerServicePtr), helper(std::make_unique<FS_Helper>(ownerServicePtr, fileOps))
         {}
+
         auto handle(Context &context) -> void override;
-        auto runGet(Context &context) -> sys::ReturnCodes;
-        auto runPost(Context &context) -> sys::ReturnCodes;
-        auto runPut(Context &context) -> sys::ReturnCodes;
-        auto getUpdates(Context &context) -> sys::ReturnCodes;
-
-      private:
-        auto startGetFile(Context &context) const -> sys::ReturnCodes;
-        auto getFileChunk(Context &context) const -> sys::ReturnCodes;
-
-        auto startSendFile(Context &context) const -> sys::ReturnCodes;
-        auto sendFileChunk(Context &context) const -> sys::ReturnCodes;
-
-        auto requestLogsFlush() const -> void;
-
-        FileOperations &fileOps;
     };
 
 } // namespace sdesktop::endpoints
