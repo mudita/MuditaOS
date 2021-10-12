@@ -17,6 +17,7 @@ target_sources(board
         memwrap.c
         newlib/fs_dir.cc
         newlib/io_syscalls.cpp
+        newlib/cxx_guards.cpp
         xip/evkbimxrt1050_flexspi_nor_config.c
         xip/evkbimxrt1050_sdram_ini_dcd.c
         xip/fsl_flexspi_nor_boot.c

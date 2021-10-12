@@ -38,6 +38,8 @@ string(TOLOWER "${PROJECT_TARGET_NAME}" PROJECT_TARGET_NAME)
 message("Project target name: ${PROJECT_TARGET_NAME}")
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set(ENABLE_TESTS ON)
+else()
+    add_compile_options(-include ${CMAKE_SOURCE_DIR}/board/rt1051/gthr.h)
 endif()
 
 if (${ENABLE_TESTS})
