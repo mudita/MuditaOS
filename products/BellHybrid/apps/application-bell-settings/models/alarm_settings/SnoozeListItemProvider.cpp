@@ -46,10 +46,11 @@ namespace app::bell_settings
             NumWithStringListItem::Value{2, minStr},
             NumWithStringListItem::Value{3, minStr},
             NumWithStringListItem::Value{5, minStr}};
-        auto chimeInterval =
-            new NumWithStringListItem(model.getSnoozeChimeInterval(),
-                                      range,
-                                      utils::translate("app_bell_settings_alarm_settings_snooze_chime_interval"));
+        auto chimeInterval = new NumWithStringListItem(
+            model.getSnoozeChimeInterval(),
+            range,
+            utils::translate("app_bell_settings_alarm_settings_snooze_chime_interval"),
+            utils::translate("app_bell_settings_alarm_settings_snooze_chime_interval_bot_desc"));
         chimeInterval->onExit = [chimeInterval, this] {
             if (chimeInterval->isOff()) {
                 this->onExit();
