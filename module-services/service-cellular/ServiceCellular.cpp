@@ -586,6 +586,7 @@ bool ServiceCellular::resetCellularModule(ResetType type)
     switch (type) {
     case ResetType::SoftReset:
         if (auto response = channel->cmd(at::AT::CFUN_RESET); response.code == at::Result::Code::OK) {
+            isAfterForceReboot = true;
             return true;
         }
         LOG_ERROR("Cellular modem reset failed.");
@@ -820,11 +821,13 @@ bool ServiceCellular::handle_power_down_waiting()
 bool ServiceCellular::handle_power_down()
 {
     LOG_DEBUG("Powered Down");
-    isAfterForceReboot = true;
 
     cmux.reset();
     cmux = std::make_unique<CellularMux>(PortSpeed_e::PS460800, this);
 
+    if (isAfterForceReboot) {
+        priv->state->set(State::ST::PowerUpInProgress);
+    }
     return true;
 }
 
@@ -884,7 +887,11 @@ bool ServiceCellular::handle_audio_conf_procedure()
                 return false;
             }
 
-            priv->tetheringHandler->configure();
+            if (!priv->tetheringHandler->configure()) {
+                resetCellularModule(ResetType::SoftReset);
+                priv->state->set(State::ST::Idle);
+                return true;
+            }
 
             priv->state->set(State::ST::APNConfProcedure);
             return true;
