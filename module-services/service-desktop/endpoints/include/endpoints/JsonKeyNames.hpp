@@ -24,9 +24,7 @@ namespace sdesktop::endpoints::json
     inline constexpr auto networkStatus       = "networkStatus";
     inline constexpr auto networkOperatorName = "networkOperatorName";
     inline constexpr auto accessTechnology    = "accessTechnology";
-    inline constexpr auto fileName            = "fileName";
-    inline constexpr auto fileSize            = "fileSize";
-    inline constexpr auto fileCrc32           = "fileCrc32";
+
     inline constexpr auto update              = "update";
     inline constexpr auto updateInfo          = "updateInfo";
     inline constexpr auto updateError         = "updateError";
@@ -51,29 +49,6 @@ namespace sdesktop::endpoints::json
     inline constexpr auto fileList            = "fileList";
     inline constexpr auto files               = "files";
     inline constexpr auto backupLocation      = "backupLocation";
-
-    namespace filesystem
-    {
-        inline constexpr auto command   = "command";
-        inline constexpr auto chunkSize = "chunkSize";
-        inline constexpr auto chunkNo   = "chunkNo";
-        inline constexpr auto data      = "data";
-        inline constexpr auto rxID      = "rxID";
-        inline constexpr auto txID      = "txID";
-
-        namespace commands
-        {
-            inline constexpr auto upload    = "upload";
-            inline constexpr auto rm        = "rm";
-            inline constexpr auto download  = "download";
-            inline constexpr auto checkFile = "checkFile";
-        } // namespace commands
-
-        namespace reasons
-        {
-            inline constexpr auto fileDoesNotExist = "file does not exist";
-        }
-    } // namespace filesystem
 
     namespace updateprocess
     {
