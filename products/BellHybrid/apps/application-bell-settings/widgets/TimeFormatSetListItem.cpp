@@ -33,15 +33,7 @@ namespace gui
         timeFormat->setFocusEdges(RectangleEdge::None);
 
         body->getCenterBox()->addWidget(timeFormat);
-
-        bottomDescription = new Label(body->lastBox);
-        bottomDescription->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
-        bottomDescription->setFont(style::bell_sidelist_item::description_font);
-        bottomDescription->setEdges(RectangleEdge::None);
-        bottomDescription->activeItem = false;
-        bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        bottomDescription->setText(botDesc);
-
+        setupBottomDescription(botDesc);
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
             body->setArea({0, 0, newDim.w, newDim.h});
             return true;
