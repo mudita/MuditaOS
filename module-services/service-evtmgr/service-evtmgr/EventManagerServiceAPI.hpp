@@ -25,21 +25,26 @@ namespace EventManagerServiceAPI
     /*
      * @brief Call single vibra pulse
      */
-    void vibraPulseOnce(sys::Service *serv);
+    void vibrationPulseOnce(sys::Service *serv);
 
     /*
      * @brief Call vibra to stop
      */
-    void vibraStop(sys::Service *serv);
+    void vibrationStop(sys::Service *serv);
 
     /*
      * @brief Call repetitive vibra pulses for given time [ms]
      */
-    void vibraPulseRepeat(sys::Service *serv, std::chrono::milliseconds time);
+    void vibrationPulseRepeat(sys::Service *serv, std::chrono::milliseconds time);
 
     /*
      * @brief Call repetitive vibra pulses until stop message is sent
      */
-    void vibraPulseRepeatUntilStop(sys::Service *serv);
+    void vibrationPulseRepeatUntilStop(sys::Service *serv);
+
+    /*
+     * @brief Set vibration level
+     */
+    void setVibrationLevel(sys::Service *serv, unsigned int vibrationLevel);
 
 } // namespace EventManagerServiceAPI

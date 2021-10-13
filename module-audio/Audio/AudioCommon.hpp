@@ -43,6 +43,7 @@ namespace audio
         Volume,
         Gain,
         EnableVibration,
+        VibrationLevel,
         EnableSound,
         Sound,
         IsSystemSound

@@ -36,34 +36,43 @@ bsp::Board EventManagerServiceAPI::GetBoard(sys::Service *serv)
 }
 
 /*
- * @brief Call single vibra pulse
+ * @brief Call single vibration pulse
  */
-void EventManagerServiceAPI::vibraPulseOnce(sys::Service *serv)
+void EventManagerServiceAPI::vibrationPulseOnce(sys::Service *serv)
 {
-    serv->bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::pulse),
+    serv->bus.sendUnicast(std::make_shared<sevm::VibratorMessage>(bsp::vibrator::Action::pulse),
                           service::name::evt_manager);
 }
 /*
- * @brief Call vibra to stop
+ * @brief Call vibration to stop
  */
-void EventManagerServiceAPI::vibraStop(sys::Service *serv)
+void EventManagerServiceAPI::vibrationStop(sys::Service *serv)
 {
-    serv->bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::stop),
+    serv->bus.sendUnicast(std::make_shared<sevm::VibratorMessage>(bsp::vibrator::Action::stop),
                           service::name::evt_manager);
 }
 /*
- * @brief Call repetitive vibra pulses for given time [ms]
+ * @brief Call repetitive vibration pulses for given time [ms]
  */
-void EventManagerServiceAPI::vibraPulseRepeat(sys::Service *serv, std::chrono::milliseconds time)
+void EventManagerServiceAPI::vibrationPulseRepeat(sys::Service *serv, std::chrono::milliseconds time)
 {
-    serv->bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::pulseRepeat, time),
+    serv->bus.sendUnicast(std::make_shared<sevm::VibratorMessage>(bsp::vibrator::Action::pulseRepeat, time),
                           service::name::evt_manager);
 }
 /*
- * @brief Call repetitive vibra pulses until stop message is sent
+ * @brief Call repetitive vibration pulses until stop message is sent
  */
-void EventManagerServiceAPI::vibraPulseRepeatUntilStop(sys::Service *serv)
+void EventManagerServiceAPI::vibrationPulseRepeatUntilStop(sys::Service *serv)
 {
-    serv->bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::pulseRepeatInfinite),
+    serv->bus.sendUnicast(std::make_shared<sevm::VibratorMessage>(bsp::vibrator::Action::pulseRepeatInfinite),
                           service::name::evt_manager);
+}
+
+/*
+ * @brief Set vibration level
+ */
+void EventManagerServiceAPI::setVibrationLevel(sys::Service *serv, unsigned int vibrationLevel)
+{
+    LOG_ERROR("Message sie wysyla tak ?");
+    serv->bus.sendUnicast(std::make_shared<sevm::VibratorLevelMessage>(vibrationLevel), service::name::evt_manager);
 }

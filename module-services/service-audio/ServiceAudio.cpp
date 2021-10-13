@@ -90,6 +90,8 @@ static constexpr std::initializer_list<std::pair<audio::DbPathElement, const cha
     {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle}, defaultFalse},
     {DbPathElement{Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle}, defaultTrue},
 
+    {DbPathElement{Setting::VibrationLevel, PlaybackType::System, Profile::Type::Idle}, "5"},
+
     {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle}, defaultTrue},
     {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle}, defaultTrue},
     {DbPathElement{Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle}, defaultTrue},
@@ -301,6 +303,10 @@ ServiceAudio::VibrationType ServiceAudio::GetVibrationType(const audio::Playback
 
 void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optional<AudioMux::Input *> input)
 {
+    auto vibrationLevel = utils::getNumericValue<audio::VibrationLevel>(
+        getSetting(Setting::VibrationLevel, Profile::Type::Idle, PlaybackType::System));
+    EventManagerServiceAPI::setVibrationLevel(this, vibrationLevel);
+
     switch (const auto curVibrationType = GetVibrationType(type); curVibrationType) {
     case VibrationType::None:
         DisableVibration(input);
@@ -317,7 +323,7 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
 void ServiceAudio::DisableVibration(std::optional<audio::AudioMux::Input *> input)
 {
     if (IsVibrationMotorOn()) {
-        EventManagerServiceAPI::vibraStop(this);
+        EventManagerServiceAPI::vibrationStop(this);
         vibrationMotorStatus = AudioMux::VibrationStatus::Off;
     }
     if (input) {
@@ -328,7 +334,7 @@ void ServiceAudio::DisableVibration(std::optional<audio::AudioMux::Input *> inpu
 void ServiceAudio::EnableOneShotVibration()
 {
     if (!IsVibrationMotorOn()) {
-        EventManagerServiceAPI::vibraPulseOnce(this);
+        EventManagerServiceAPI::vibrationPulseOnce(this);
     }
 }
 
@@ -343,7 +349,7 @@ void ServiceAudio::EnableContinuousVibration(std::optional<audio::AudioMux::Inpu
         return i.GetVibrationStatus() == AudioMux::VibrationStatus::On;
     });
     if (anyOfInputsOn && !IsVibrationMotorOn()) {
-        EventManagerServiceAPI::vibraPulseRepeatUntilStop(this);
+        EventManagerServiceAPI::vibrationPulseRepeatUntilStop(this);
         vibrationMotorStatus = AudioMux::VibrationStatus::On;
     }
 }
@@ -717,6 +723,7 @@ std::string ServiceAudio::getSetting(const Setting &setting,
 
     switch (setting) {
     case Setting::EnableVibration:
+    case Setting::VibrationLevel:
     case Setting::EnableSound:
     case Setting::Sound:
     case Setting::IsSystemSound:
@@ -790,6 +797,7 @@ void ServiceAudio::setSetting(const Setting &setting,
         }
     } break;
     case Setting::EnableVibration:
+    case Setting::VibrationLevel:
     case Setting::EnableSound:
     case Setting::Sound:
     case Setting::IsSystemSound: {
