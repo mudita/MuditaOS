@@ -3,6 +3,9 @@
 
 #pragma once
 #include "Application.hpp"
+#include <apps-common/audio/SoundsPlayer.hpp>
+
+class AudioStopNotification;
 
 namespace app
 {
@@ -29,6 +32,10 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
+
+      private:
+        sys::MessagePointer handleAudioStop(AudioStopNotification *notification);
+        std::shared_ptr<SoundsPlayer> soundsPlayer;
     };
 
     template <> struct ManifestTraits<ApplicationAlarmClock>

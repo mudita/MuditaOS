@@ -7,6 +7,7 @@
 #include <application-alarm-clock/models/AlarmsRepository.hpp>
 #include <application-alarm-clock/data/AlarmsData.hpp>
 #include <application-alarm-clock/presenter/AlarmRRulePresenter.hpp>
+#include <apps-common/audio/SoundsPlayer.hpp>
 
 #include <Application.hpp>
 #include <InternalModel.hpp>
@@ -30,11 +31,13 @@ namespace app::alarmClock
     {
         app::ApplicationCommon *application = nullptr;
         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository;
+        std::shared_ptr<SoundsPlayer> soundsPlayer = nullptr;
         std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter;
         gui::AlarmInternalListItem *repeatOption = nullptr;
 
       public:
         NewEditAlarmModel(app::ApplicationCommon *app,
+                          std::shared_ptr<SoundsPlayer> player,
                           std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter,
                           std::shared_ptr<AbstractAlarmsRepository> alarmsRepository);
 

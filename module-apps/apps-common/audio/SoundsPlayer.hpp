@@ -9,8 +9,9 @@ class SoundsPlayer : public AbstractSoundsPlayer
 {
   public:
     explicit SoundsPlayer(app::ApplicationCommon *app);
+    virtual ~SoundsPlayer() = default;
 
-    bool play(const std::string &path) override;
+    bool play(const std::string &path, AudioEofCallback cb = nullptr) override;
     bool pause() override;
     bool resume() override;
     bool stop() override;
@@ -20,8 +21,9 @@ class SoundsPlayer : public AbstractSoundsPlayer
 
   private:
     std::unique_ptr<app::AbstractAudioOperations> audioOperations;
-
     State currentState = State::Stopped;
     audio::Token currentToken;
     std::string currentPath;
+
+    AudioEofCallback eofCallback{nullptr};
 };

@@ -6,7 +6,7 @@
 #include <Application.hpp>
 
 #include <application-settings/windows/WindowNames.hpp>
-#include <application-settings/models/apps/SoundsPlayer.hpp>
+#include <apps-common/audio/SoundsPlayer.hpp>
 #include <bsp/common.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
