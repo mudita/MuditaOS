@@ -77,4 +77,9 @@ namespace sys::phone_modes
     {
         return tetheringMode == Tethering::On;
     }
+
+    bool Subject::isTetheringPossible() const noexcept
+    {
+        return phoneMode != PhoneMode::Offline;
+    }
 } // namespace sys::phone_modes

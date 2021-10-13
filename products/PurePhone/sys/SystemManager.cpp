@@ -106,7 +106,9 @@ namespace sys
         }
 
         if (const auto requestedState = request->getTetheringState(); requestedState == phone_modes::Tethering::On) {
-            bus.sendUnicast(std::make_shared<TetheringQuestionRequest>(), service::name::appmgr);
+            if (phoneModeSubject->isTetheringPossible()) {
+                bus.sendUnicast(std::make_shared<TetheringQuestionRequest>(), service::name::appmgr);
+            }
         }
         else {
             if (const auto tetheringChanged = phoneModeSubject->setTetheringMode(phone_modes::Tethering::Off);
