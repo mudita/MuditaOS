@@ -16,6 +16,8 @@
 #include <sys/SystemManager.hpp>
 #include <sys/messages/PhoneModeRequest.hpp>
 
+#include "log/log.hpp"
+
 namespace
 {
     constexpr std::array sliderKeyCodes = {
@@ -26,25 +28,6 @@ namespace
         return std::find(std::begin(sliderKeyCodes), std::end(sliderKeyCodes), code) != std::end(sliderKeyCodes);
     }
 } // namespace
-
-bool EventManager::processVibraRequest(bsp::vibrator::Action act, std::chrono::milliseconds RepetitionTime)
-{
-    switch (act) {
-    case bsp::vibrator::Action::pulse:
-        Vibra->Pulse();
-        break;
-    case bsp::vibrator::Action::pulseRepeat:
-        Vibra->PulseRepeat(RepetitionTime);
-        break;
-    case bsp::vibrator::Action::pulseRepeatInfinite:
-        Vibra->PulseRepeat();
-        break;
-    case bsp::vibrator::Action::stop:
-        Vibra->PulseRepeatStop();
-        break;
-    }
-    return true;
-}
 
 auto EventManager::createEventWorker() -> std::unique_ptr<WorkerEventCommon>
 {
@@ -87,9 +70,15 @@ void EventManager::initProductEvents()
         return msg;
     });
 
-    connect(sevm::VibraMessage(bsp::vibrator::Action::stop), [&](sys::Message *msgl) {
-        auto request = static_cast<sevm::VibraMessage *>(msgl);
-        processVibraRequest(request->action, request->repetitionTime);
+    connect(sevm::VibratorMessage(bsp::vibrator::Action::stop), [&](sys::Message *msgl) {
+        auto request = static_cast<sevm::VibratorMessage *>(msgl);
+        processVibratorRequest(request->action, request->repetitionTime);
+        return sys::msgHandled();
+    });
+
+    connect(sevm::VibratorLevelMessage(0), [&](sys::Message *msgl) {
+        auto request = static_cast<sevm::VibratorLevelMessage *>(msgl);
+        processVibratorLevel(request->vibrationLevel);
         return sys::msgHandled();
     });
 
@@ -204,4 +193,28 @@ void EventManager::handleKeyMoveEvent(RawKey key)
         const auto mode = sys::SystemManager::translateSliderState(key);
         bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
     }
+}
+
+void EventManager::processVibratorRequest(bsp::vibrator::Action act, std::chrono::milliseconds RepetitionTime)
+{
+    switch (act) {
+    case bsp::vibrator::Action::pulse:
+        vibrator->Pulse();
+        break;
+    case bsp::vibrator::Action::pulseRepeat:
+        vibrator->PulseRepeat(RepetitionTime);
+        break;
+    case bsp::vibrator::Action::pulseRepeatInfinite:
+        vibrator->PulseRepeat();
+        break;
+    case bsp::vibrator::Action::stop:
+        vibrator->PulseRepeatStop();
+        break;
+    }
+}
+
+void EventManager::processVibratorLevel(unsigned int vibrationLevel)
+{
+    LOG_ERROR("Odbieram poziom vibracji %d", vibrationLevel);
+    vibrator->SetVibrationLevel(vibrationLevel);
 }

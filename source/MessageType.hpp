@@ -154,8 +154,9 @@ enum class MessageType
     ScreenLightControlParameters,
     ScreenLightControlParametersResponse,
 
-    // Vibra messages
-    VibraPulseMessage,
+    // Vibrator messages
+    VibratorPulseMessage,
+    VibratorLevelMessage,
 
     // Quotes messages
     Quotes,
