@@ -5,7 +5,6 @@
 
 #include "DialogMetadata.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
-#include "application-phonebook/data/PhonebookUtils.hpp"
 
 #include <Dialog.hpp>
 #include <service-db/DBServiceAPI.hpp>
@@ -199,21 +198,27 @@ namespace gui
         auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber);
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
 
-        std::string duplicatedNumberPhrase = utils::translate("app_phonebook_duplicate_numbers");
-        phonebookUtils::fillContactData(duplicatedNumberPhrase, oldContactRecord);
-
-        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-            duplicatedNumber.getFormatted(), "info_big_circle_W_G", duplicatedNumberPhrase, "", [=]() -> bool {
-                if (contactAction == ContactAction::Add) {
-                    contact->ID = oldContactRecord.ID;
-                }
-                if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                    LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
-                    return false;
-                }
-                application->switchWindow(gui::name::window::main_window);
-                return true;
-            }});
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{duplicatedNumber.getFormatted(),
+                                "info_big_circle_W_G",
+                                text::RichTextParser()
+                                    .parse(utils::translate("app_phonebook_duplicate_numbers"),
+                                           nullptr,
+                                           gui::text::RichTextParser::TokenMap(
+                                               {{"$CONTACT_FORMATTED_NAME$", oldContactRecord.getFormattedName()}}))
+                                    ->getText(),
+                                "",
+                                [=]() -> bool {
+                                    if (contactAction == ContactAction::Add) {
+                                        contact->ID = oldContactRecord.ID;
+                                    }
+                                    if (!DBServiceAPI::ContactUpdate(application, *contact)) {
+                                        LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
+                                        return false;
+                                    }
+                                    application->switchWindow(gui::name::window::main_window);
+                                    return true;
+                                }});
         application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
     }
 
@@ -226,24 +231,29 @@ namespace gui
             contact->ID = oldContactRecord.ID;
         }
 
-        std::string duplicatedSpeedDialPhrase = utils::translate("app_phonebook_duplicate_numbers");
-        phonebookUtils::fillContactData(duplicatedSpeedDialPhrase, oldContactRecord);
-        std::string duplicatedSpeedDialTitle = utils::translate("app_phonebook_duplicate_speed_dial_title");
-        phonebookUtils::fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
-
-        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-            gui::DialogMetadata{duplicatedSpeedDialTitle,
-                                "phonebook_empty_grey_circle_speed_dial",
-                                duplicatedSpeedDialPhrase,
-                                contact->speeddial,
-                                [=]() -> bool {
-                                    if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                                        LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
-                                        return false;
-                                    }
-                                    application->switchWindow(gui::name::window::main_window);
-                                    return true;
-                                }});
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+            text::RichTextParser()
+                .parse(utils::translate("app_phonebook_duplicate_speed_dial_title"),
+                       nullptr,
+                       gui::text::RichTextParser::TokenMap(
+                           {{"$CONTACT_SPEED_DIAL$", oldContactRecord.speeddial},
+                            {"$CONTACT_FORMATTED_NAME$", oldContactRecord.getFormattedName()}}))
+                ->getText(),
+            "phonebook_empty_grey_circle_speed_dial",
+            text::RichTextParser()
+                .parse(utils::translate("app_phonebook_duplicate_speed_dial"),
+                       nullptr,
+                       gui::text::RichTextParser::TokenMap({{"$CONTACT_SPEED_DIAL$", oldContactRecord.speeddial}}))
+                ->getText(),
+            contact->speeddial,
+            [=]() -> bool {
+                if (!DBServiceAPI::ContactUpdate(application, *contact)) {
+                    LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
+                    return false;
+                }
+                application->switchWindow(gui::name::window::main_window);
+                return true;
+            }});
         application->switchWindow(gui::window::name::dialog_yes_no_icon_txt, std::move(metaData));
     }
 
