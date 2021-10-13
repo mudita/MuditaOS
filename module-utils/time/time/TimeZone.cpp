@@ -54,6 +54,8 @@ namespace utils::time
     [[nodiscard]] auto getAvailableTimeZonesWithOffset() -> std::vector<std::string>
     {
         std::vector<std::string> timeZonesNames;
+        timeZonesNames.reserve(NUM_ZONE_NAMES);
+
         char zoneToDisplay[maxZoneToDisplayLength];
         auto zonePointer = reinterpret_cast<const char *>(zone_names);
         uzone_t zoneOut;
