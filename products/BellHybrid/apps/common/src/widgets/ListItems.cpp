@@ -54,6 +54,15 @@ namespace gui
 
         getValue = [&model, this]() { model.setValue(spinner->getCurrentValue()); };
         setValue = [&model, this]() { spinner->setCurrentValue(model.getValue()); };
+
+        setValue();
+        setArrowsVisibility(range);
+
+        inputCallback = [&, range](Item &item, const InputEvent &event) {
+            auto ret = body->onInput(event);
+            setArrowsVisibility(range);
+            return ret;
+        };
     }
     void NumListItem::setOnValueChanged(std::function<void(const UIntegerSpinner::Type &)> &&cb)
     {
@@ -62,6 +71,12 @@ namespace gui
     UIntegerSpinner::Type NumListItem::getCurrentValue()
     {
         return spinner->getCurrentValue();
+    }
+
+    void NumListItem::setArrowsVisibility(UIntegerSpinner::Range range)
+    {
+        const auto selectedVal = spinner->getCurrentValue();
+        body->setMinMaxArrowsVisibility(selectedVal == range.min, selectedVal == range.max);
     }
 
     NumWithStringListItem::NumWithStringListItem(AbstractSettingsModel<std::uint8_t> &model,
@@ -87,9 +102,10 @@ namespace gui
         bottomText->setText(bottomDescription);
         bottomText->drawUnderline(false);
 
-        inputCallback = [&](Item &item, const InputEvent &event) {
+        inputCallback = [&, range](Item &item, const InputEvent &event) {
             const auto result = body->onInput(event);
             bottomText->setVisible(spinner->getCurrentValue().getValue().has_value());
+            setArrowsVisibility(range);
             return result;
         };
 
@@ -112,11 +128,20 @@ namespace gui
                 spinner->setCurrentValue(Value{minStr});
             }
         };
+
+        setValue();
+        setArrowsVisibility(range);
     }
 
     bool NumWithStringListItem::isOff() const
     {
         return not spinner->getCurrentValue().getValue().has_value();
+    }
+
+    void NumWithStringListItem::setArrowsVisibility(const NumWithStringSpinner::Range &range)
+    {
+        const auto selectedVal = spinner->getCurrentValue();
+        body->setMinMaxArrowsVisibility(selectedVal == range.front(), selectedVal == range.back());
     }
 
     UTF8ListItem::UTF8ListItem(AbstractSettingsModel<UTF8> &model,
