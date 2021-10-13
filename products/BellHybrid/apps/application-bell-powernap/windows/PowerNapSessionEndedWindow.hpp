@@ -10,6 +10,8 @@ namespace gui
 {
     class PowerNapSessionEndedWindow : public WindowWithTimer, public app::powernap::PowerNapSessionEndedContract::View
     {
+        static constexpr auto image_top_margin    = 112U;
+        static constexpr auto image_bottom_margin = 30U;
         std::shared_ptr<app::powernap::PowerNapSessionEndedContract::Presenter> presenter;
         void buildInterface() override;
         void buildLayout();

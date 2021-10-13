@@ -10,8 +10,8 @@
 #include <apps-common/widgets/ProgressTimer.hpp>
 #include <apps-common/GuiTimer.hpp>
 #include <Text.hpp>
+#include <keymap/KeyMap.hpp>
 
-#include <time/dateCommon.hpp>
 namespace
 {
     void decorateProgressItem(gui::Rect *item, gui::Alignment::Vertical alignment)
@@ -106,10 +106,16 @@ namespace gui
     auto PowerNapProgressWindow::onInput(const InputEvent &inputEvent) -> bool
     {
         if (inputEvent.isShortRelease()) {
-            if (inputEvent.is(KeyCode::KEY_RF) || inputEvent.is(KeyCode::KEY_ENTER)) {
+            const auto key = mapKey(inputEvent.getKeyCode());
+            if (presenter->isNapFinished() && key == KeyMap::LightPress) {
                 presenter->endNap();
                 return true;
             }
+            else if (not presenter->isNapFinished() && key == KeyMap::Back) {
+                application->returnToPreviousWindow();
+                return true;
+            }
+            return false;
         }
         return AppWindow::onInput(inputEvent);
     }

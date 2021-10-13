@@ -26,6 +26,7 @@ namespace settings
         using ValueChangedCallback         = std::function<void(const std::string &)>;
         using ValueChangedCallbackWithName = std::function<void(const std::string &, const std::string &value)>;
 
+        explicit Settings(const service::ServiceProxy &interface);
         Settings() = default;
         virtual ~Settings();
 

@@ -19,7 +19,6 @@ target_sources(application-bell-powernap
         presenter/PowerNapMainWindowPresenter.cpp
         presenter/PowerNapProgressPresenter.cpp
         presenter/PowerNapSessionEndedPresenter.cpp
-        widgets/PowerNapAlarm.cpp
         windows/PowerNapMainWindow.cpp
         windows/PowerNapProgressWindow.cpp
         windows/PowerNapSessionEndedWindow.cpp
@@ -29,7 +28,6 @@ target_sources(application-bell-powernap
         presenter/PowerNapMainWindowPresenter.hpp
         presenter/PowerNapProgressPresenter.hpp
         presenter/PowerNapSessionEndedPresenter.hpp
-        widgets/PowerNapAlarm.hpp
         windows/PowerNapMainWindow.hpp
         windows/PowerNapProgressWindow.hpp
         windows/PowerNapSessionEndedWindow.hpp
@@ -47,6 +45,9 @@ target_link_libraries(application-bell-powernap
         app
         bell::app-common
         bell::app-main
+        bell::keymap
+        bell::alarms
+        bell::db
 
     PUBLIC
         module-gui

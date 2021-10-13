@@ -112,5 +112,9 @@ namespace settings
     {
         return SettingsCache::getInstance();
     }
+    Settings::Settings(const service::ServiceProxy &interface)
+    {
+        init(interface);
+    }
 
 } // namespace settings
