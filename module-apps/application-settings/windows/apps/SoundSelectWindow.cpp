@@ -28,7 +28,6 @@ namespace gui
     void SoundSelectWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::play_pause));
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
