@@ -28,7 +28,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('gs_os_current_version', '0.00.0'),
     ('\ServiceBluetooth\\bt_state', '0'),
     ('\ServiceBluetooth\\bt_device_visibility', '0'),
-    ('\ServiceBluetooth\\bt_device_name', 'PurePhone'),
+    ('\ServiceBluetooth\\bt_device_name', 'Mudita Pure'),
     ('\ServiceBluetooth\\bt_bonded_devices', ''),
     ('battery_critical_level', '10'),
     ('cl_offline_mode', '1'),
