@@ -4,11 +4,7 @@
 #include "PowerNapSessionEndedWindow.hpp"
 #include "data/PowerNapStyle.hpp"
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
-#include <RichTextParser.hpp>
-#include <BoxLayout.hpp>
-#include <Image.hpp>
-#include <Text.hpp>
-#include <gui/core/FontManager.hpp>
+#include <gui/widgets/Icon.hpp>
 
 namespace gui
 {
@@ -32,15 +28,16 @@ namespace gui
         auto body = new VBox(this, 0, 0, style::window_width, style::window_height);
         body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        new Image(body, "big_namaste_W_G");
-
-        auto text = new Text(body, 0, 0, body->getWidth(), powerNapStyle::sessionEnd::textH);
-        TextFormat format(FontManager::getInstance().getFont(powerNapStyle::descriptionFont));
-        text::RichTextParser parser;
-        auto textParsed = parser.parse(utils::translate("app_bell_powernap_session_ended_message"), &format);
-        text->setText(std::move(textParsed));
-        text->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        text->setVisible(true);
+        auto icon = new Icon(this,
+                             0,
+                             0,
+                             style::window_width,
+                             style::window_height,
+                             "big_namaste_W_G",
+                             utils::translate("app_bell_powernap_session_ended_message"));
+        icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        icon->image->setMargins({0, image_top_margin, 0, image_bottom_margin});
+        icon->text->setFont(style::window::font::verybiglight);
     }
 
     void PowerNapSessionEndedWindow::registerCallbacks()

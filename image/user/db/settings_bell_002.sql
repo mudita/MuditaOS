@@ -43,4 +43,6 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('alarm_tone','Atumnal Sea'),
     ('alarm_volume','5'),
     ('alarm_light_active','1'),
-    ('alarm_duration','10000');
+    ('alarm_duration','10000'),
+    ('bedtime_tone','Evening Horizon'),
+    ('bedtime_duration','5');
