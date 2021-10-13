@@ -4,7 +4,7 @@
 #pragma once
 
 #include <application-settings/models/apps/AbstractSoundsModel.hpp>
-#include <application-settings/models/apps/AbstractSoundsPlayer.hpp>
+#include <apps-common/audio/AbstractSoundsPlayer.hpp>
 #include <AppWindow.hpp>
 
 namespace gui

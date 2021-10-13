@@ -7,9 +7,10 @@ SoundsPlayer::SoundsPlayer(app::ApplicationCommon *app)
     : audioOperations{std::make_unique<app::AsyncAudioOperations>(app)}
 {}
 
-bool SoundsPlayer::play(const std::string &path)
+bool SoundsPlayer::play(const std::string &path, AudioEofCallback cb)
 {
-    return audioOperations->play(path, [this, path](audio::RetCode retCode, audio::Token token) {
+    eofCallback = nullptr;
+    return audioOperations->play(path, [this, path, cb](audio::RetCode retCode, audio::Token token) {
         if (retCode != audio::RetCode::Success || !token.IsValid()) {
             LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
                       str(retCode).c_str(),
@@ -19,6 +20,7 @@ bool SoundsPlayer::play(const std::string &path)
         currentState = State::Playing;
         currentToken = token;
         currentPath  = path;
+        eofCallback  = cb;
     });
 }
 
@@ -60,6 +62,8 @@ bool SoundsPlayer::resume()
 
 bool SoundsPlayer::stop()
 {
+    eofCallback = nullptr;
+
     if (currentToken.IsValid()) {
         return audioOperations->stop(currentToken,
                                      [this](audio::RetCode, audio::Token) { currentState = State::Stopped; });
@@ -71,6 +75,9 @@ bool SoundsPlayer::stop(audio::Token token)
 {
     if (currentToken.IsValid() && currentToken == token) {
         currentState = State::Stopped;
+        if (eofCallback != nullptr) {
+            eofCallback();
+        }
         return true;
     }
     return false;

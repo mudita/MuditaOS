@@ -14,6 +14,7 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 
 namespace app
 {
@@ -23,9 +24,11 @@ namespace app
                                                  StatusIndicators statusIndicators,
                                                  uint32_t stackDepth,
                                                  sys::ServicePriority priority)
-        : Application(name, parent, statusIndicators, false, stackDepth, priority)
+        : Application(name, parent, statusIndicators, false, stackDepth, priority),
+          soundsPlayer{std::make_shared<SoundsPlayer>(this)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
     }
 
     sys::MessagePointer ApplicationAlarmClock::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -57,6 +60,16 @@ namespace app
             return ret;
         }
 
+        connect(typeid(AudioStopNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioStopNotification *>(msg);
+            return handleAudioStop(notification);
+        });
+
+        connect(typeid(AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioStopNotification *>(msg);
+            return handleAudioStop(notification);
+        });
+
         createUserInterface();
         return ret;
     }
@@ -73,10 +86,10 @@ namespace app
         auto rRulePresenter = std::make_shared<alarmClock::AlarmRRulePresenter>();
 
         windowsFactory.attach(style::alarmClock::window::name::newEditAlarm,
-                              [rRulePresenter](ApplicationCommon *app, const std::string &name) {
+                              [this, rRulePresenter](ApplicationCommon *app, const std::string &name) {
                                   auto alarmsRepository = std::make_unique<alarmClock::AlarmsDBRepository>(app);
                                   auto alarmsProvider   = std::make_shared<alarmClock::NewEditAlarmModel>(
-                                      app, rRulePresenter, std::move(alarmsRepository));
+                                      app, soundsPlayer, rRulePresenter, std::move(alarmsRepository));
                                   auto presenter =
                                       std::make_unique<alarmClock::AlarmClockEditWindowPresenter>(alarmsProvider);
                                   return std::make_unique<alarmClock::NewEditAlarmWindow>(app, std::move(presenter));
@@ -108,5 +121,11 @@ namespace app
 
     void ApplicationAlarmClock::destroyUserInterface()
     {}
+
+    sys::MessagePointer ApplicationAlarmClock::handleAudioStop(AudioStopNotification *notification)
+    {
+        soundsPlayer->stop(notification->token);
+        return sys::MessageNone{};
+    }
 
 } /* namespace app */

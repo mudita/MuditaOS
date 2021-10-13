@@ -139,12 +139,21 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
                 else if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                     if (!soundsPlayer->previouslyPlayed(fileRelativePath) ||
                         soundsPlayer->isInState(AbstractSoundsPlayer::State::Stopped)) {
-                        return soundsPlayer->play(fileRelativePath);
+                        app->getCurrentWindow()->bottomBarTemporaryMode(
+                            utils::translate(style::strings::common::pause), gui::BottomBar::Side::LEFT, false);
+                        return soundsPlayer->play(fileRelativePath, [=]() {
+                            app->getCurrentWindow()->bottomBarTemporaryMode(
+                                utils::translate(style::strings::common::play), gui::BottomBar::Side::LEFT, false);
+                        });
                     }
                     else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
+                        app->getCurrentWindow()->bottomBarTemporaryMode(
+                            utils::translate(style::strings::common::play), gui::BottomBar::Side::LEFT, false);
                         return soundsPlayer->pause();
                     }
                     else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Paused)) {
+                        app->getCurrentWindow()->bottomBarTemporaryMode(
+                            utils::translate(style::strings::common::pause), gui::BottomBar::Side::LEFT, false);
                         return soundsPlayer->resume();
                     }
                 }
@@ -152,6 +161,33 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
                 return false;
             };
 
+            item->focusChangedCallback = [=](gui::Item &item) {
+                if (!item.focus) {
+                    app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode();
+                    return true;
+                }
+
+                auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
+                if (!soundsPlayer->previouslyPlayed(fileRelativePath)) {
+                    app->getCurrentWindow()->bottomBarTemporaryMode(
+                        utils::translate(style::strings::common::play), gui::BottomBar::Side::LEFT, false);
+                    return true;
+                }
+
+                if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
+                    app->getCurrentWindow()->bottomBarTemporaryMode(
+                        utils::translate(style::strings::common::pause), gui::BottomBar::Side::LEFT, false);
+                    return true;
+                }
+
+                else {
+                    app->getCurrentWindow()->bottomBarTemporaryMode(
+                        utils::translate(style::strings::common::play), gui::BottomBar::Side::LEFT, false);
+                    return true;
+                }
+
+                return false;
+            };
             break;
 
         default:

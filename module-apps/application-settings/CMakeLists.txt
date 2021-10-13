@@ -15,7 +15,6 @@ target_sources(application-settings
         models/apps/AudioSettingsModel.cpp
         models/apps/SoundsModel.cpp
         models/apps/SoundsModel.cpp
-        models/apps/SoundsPlayer.cpp
         models/bluetooth/BluetoothSettingsModel.cpp
         models/display-keypad/CategoriesModel.cpp
         models/display-keypad/CategoriesModel.cpp
