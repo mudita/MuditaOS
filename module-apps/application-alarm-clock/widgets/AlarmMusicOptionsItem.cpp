@@ -10,15 +10,13 @@ namespace gui
 {
     AlarmMusicOptionsItem::AlarmMusicOptionsItem(app::ApplicationCommon *app,
                                                  const std::string &description,
+                                                 std::shared_ptr<SoundsPlayer> player,
                                                  std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
                                                  std::function<void()> bottomBarRestoreFromTemporaryMode)
         : AlarmOptionsItem(description), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
         assert(app != nullptr);
-
-        // create audioOperations to allow sounds preview
-        audioOperations = std::make_unique<app::AsyncAudioOperations>(app);
 
         alarmSoundList = getMusicFilesList();
         std::vector<UTF8> printOptions;
@@ -27,51 +25,65 @@ namespace gui
         }
         optionSpinner->setData({printOptions});
 
-        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
+        inputCallback = [=](gui::Item &item, const gui::InputEvent &event) {
             if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
-                if (getFilePath(optionSpinner->getCurrentValue()) != currentlyPreviewedPath) {
-                    playAudioPreview(getFilePath(optionSpinner->getCurrentValue()));
+                if (!player->previouslyPlayed(getFilePath(optionSpinner->getCurrentValue())) ||
+                    player->isInState(SoundsPlayer::State::Stopped)) {
+                    player->play(getFilePath(optionSpinner->getCurrentValue()), [=]() {
+                        this->bottomBarTemporaryMode(utils::translate(style::strings::common::play));
+                    });
+                    this->bottomBarTemporaryMode(utils::translate(style::strings::common::pause));
                 }
-                else if (musicStatus == MusicStatus::Stop) {
-                    resumeAudioPreview();
+                else if (player->isInState(SoundsPlayer::State::Paused)) {
+                    player->resume();
+                    this->bottomBarTemporaryMode(utils::translate(style::strings::common::pause));
                 }
                 else {
-                    pauseAudioPreview();
+                    player->pause();
+                    this->bottomBarTemporaryMode(utils::translate(style::strings::common::play));
                 }
             }
 
             // stop preview playback when we go back
-            if (musicStatus == MusicStatus::Play && event.isShortRelease(gui::KeyCode::KEY_RF)) {
-                stopAudioPreview();
+            if (player->isInState(SoundsPlayer::State::Playing) && event.isShortRelease(gui::KeyCode::KEY_RF)) {
+                player->stop();
+            }
+            auto res = optionSpinner->onInput(event);
+
+            if (res && player->previouslyPlayed(getFilePath(optionSpinner->getCurrentValue())) &&
+                player->isInState(SoundsPlayer::State::Playing)) {
+                this->bottomBarTemporaryMode(utils::translate(style::strings::common::pause));
+            }
+            else if (res) {
+                this->bottomBarTemporaryMode(utils::translate(style::strings::common::play));
             }
 
-            return optionSpinner->onInput(event);
+            return res;
         };
 
-        focusChangedCallback = [&](Item &item) {
+        focusChangedCallback = [=](Item &item) {
             setFocusItem(focus ? optionSpinner : nullptr);
 
             if (focus) {
-                this->bottomBarTemporaryMode(utils::translate(style::strings::common::play_pause));
+                this->bottomBarTemporaryMode(utils::translate(style::strings::common::play));
             }
             else {
                 this->bottomBarRestoreFromTemporaryMode();
             }
 
             // stop preview playback when we loose focus
-            if (musicStatus != MusicStatus::Stop) {
-                stopAudioPreview();
+            if (!player->isInState(SoundsPlayer::State::Stopped)) {
+                player->stop();
             }
 
             return true;
         };
 
-        onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
+        onSaveCallback = [=](std::shared_ptr<AlarmEventRecord> alarm) {
             // stop preview playback if it is played
-            if (musicStatus != MusicStatus::Stop) {
-                stopAudioPreview();
+            if (!player->isInState(SoundsPlayer::State::Stopped)) {
+                player->stop();
             }
-
             alarm->musicTone = getFilePath(optionSpinner->getCurrentValue());
         };
 
@@ -95,66 +107,6 @@ namespace gui
         }
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
         return musicFiles;
-    }
-
-    bool AlarmMusicOptionsItem::playAudioPreview(const std::string &path)
-    {
-        return audioOperations->play(path, [this, path](audio::RetCode retCode, audio::Token token) {
-            if (retCode != audio::RetCode::Success || !token.IsValid()) {
-                LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
-                          str(retCode).c_str(),
-                          token.IsValid());
-                return;
-            }
-            musicStatus             = MusicStatus::Play;
-            currentlyPreviewedToken = token;
-            currentlyPreviewedPath  = path;
-        });
-    }
-
-    bool AlarmMusicOptionsItem::pauseAudioPreview()
-    {
-        return audioOperations->pause(currentlyPreviewedToken, [this](audio::RetCode retCode, audio::Token token) {
-            if (token != currentlyPreviewedToken) {
-                LOG_ERROR("Audio preview pause failed: wrong token");
-                return;
-            }
-            if (retCode != audio::RetCode::Success || !token.IsValid()) {
-                LOG_ERROR("Audio preview pause failed with retcode = %s. Token validity: %d",
-                          str(retCode).c_str(),
-                          token.IsValid());
-                return;
-            }
-            musicStatus = MusicStatus::Pause;
-        });
-    }
-
-    bool AlarmMusicOptionsItem::resumeAudioPreview()
-    {
-        return audioOperations->resume(currentlyPreviewedToken, [this](audio::RetCode retCode, audio::Token token) {
-            if (token != currentlyPreviewedToken) {
-                LOG_ERROR("Audio preview resume failed: wrong token");
-                return;
-            }
-
-            if (retCode != audio::RetCode::Success || !token.IsValid()) {
-                LOG_ERROR("Audio preview pause failed with retcode = %s. Token validity: %d",
-                          str(retCode).c_str(),
-                          token.IsValid());
-                return;
-            }
-            musicStatus = MusicStatus::Play;
-        });
-    }
-
-    bool AlarmMusicOptionsItem::stopAudioPreview()
-    {
-        if (currentlyPreviewedToken.IsValid()) {
-            musicStatus            = MusicStatus::Stop;
-            currentlyPreviewedPath = "";
-            return audioOperations->stop(currentlyPreviewedToken, [](audio::RetCode, audio::Token) {});
-        }
-        return false;
     }
 
     std::string AlarmMusicOptionsItem::getTitle(const std::string &filePath)

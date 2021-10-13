@@ -4,7 +4,7 @@
 #pragma once
 
 #include "AbstractSoundsModel.hpp"
-#include "AbstractSoundsPlayer.hpp"
+#include <apps-common/audio/AbstractSoundsPlayer.hpp>
 
 #include <apps-common/AudioOperations.hpp>
 #include <Audio/decoder/Decoder.hpp>
