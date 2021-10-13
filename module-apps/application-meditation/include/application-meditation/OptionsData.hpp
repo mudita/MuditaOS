@@ -18,6 +18,6 @@ namespace gui
         {}
 
         std::chrono::seconds preparationTime{5};
-        bool showCounter = false;
+        bool showCounter = true;
     };
 } // namespace gui
