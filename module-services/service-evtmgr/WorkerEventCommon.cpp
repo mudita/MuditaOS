@@ -218,4 +218,5 @@ void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code
 void WorkerEventCommon::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
 {
     bsp::eink_frontlight::updateClockFrequency(newFrequency);
+    bsp::vibrator::updateClockFrequency(newFrequency);
 }

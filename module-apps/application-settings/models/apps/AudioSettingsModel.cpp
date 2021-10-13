@@ -48,6 +48,20 @@ namespace audio_settings
         AudioServiceAPI::SetVibrationSetting(application, audio::SettingState::Disabled, playbackType);
     }
 
+    void AudioSettingsModel::setVibrationLevel(audio::VibrationLevel vol)
+    {
+        AudioServiceAPI::SetVibrationLevelSetting(application, vol);
+    }
+
+    audio::VibrationLevel AudioSettingsModel::getVibrationLevel()
+    {
+        auto volume = AudioServiceAPI::GetVibrationLevelSetting(application);
+        if (!volume) {
+            LOG_ERROR("Cannot read vibration level");
+        }
+        return volume.value_or(0);
+    }
+
     bool AudioSettingsModel::isSystemSoundEnabled()
     {
         auto settingState = AudioServiceAPI::GetSystemSoundSetting(application, playbackType);

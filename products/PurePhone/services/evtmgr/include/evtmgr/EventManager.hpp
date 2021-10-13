@@ -13,7 +13,8 @@ class EventManager : public EventManagerCommon
 {
   public:
     explicit EventManager(const std::string &name = service::name::evt_manager)
-        : EventManagerCommon(name), Vibra(std::make_unique<vibra_handle::Vibra>(this)), backlightHandler(settings, this)
+        : EventManagerCommon(name), vibrator(std::make_unique<vibra_handle::Vibra>(this)),
+          backlightHandler(settings, this)
     {}
 
   private:
@@ -24,12 +25,14 @@ class EventManager : public EventManagerCommon
     void handleKeyEvent(sys::Message *msg) override;
     void handleKeyMoveEvent(RawKey key);
 
-    bool processVibraRequest(bsp::vibrator::Action act,
-                             std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
+    void processVibratorRequest(bsp::vibrator::Action act,
+                                std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
+    void processVibratorLevel(unsigned int vibrationLevel);
+
     void initProductEvents() final;
     auto createEventWorker() -> std::unique_ptr<WorkerEventCommon> final;
 
-    std::unique_ptr<vibra_handle::Vibra> Vibra;
+    std::unique_ptr<vibra_handle::Vibra> vibrator;
     backlight::Handler backlightHandler;
 };
 

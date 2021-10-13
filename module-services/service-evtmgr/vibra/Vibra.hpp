@@ -28,6 +28,7 @@ namespace vibra_handle
         void PulseRepeat(std::chrono::milliseconds time);
         void PulseRepeat(); /// infinite repeat ... until stop summoned
         void PulseRepeatStop();
+        void SetVibrationLevel(unsigned int vibrationLevel);
 
       private:
         sys::TimerHandle vibratorTimer;
