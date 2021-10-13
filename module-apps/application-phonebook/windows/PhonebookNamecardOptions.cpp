@@ -5,7 +5,6 @@
 #include "PhonebookNamecardOptions.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
-#include "application-phonebook/data/PhonebookUtils.hpp"
 #include "application-messages/data/SMSdata.hpp"
 
 namespace gui
