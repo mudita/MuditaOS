@@ -198,7 +198,6 @@ namespace style
             inline constexpr auto replace        = "common_replace";
             inline constexpr auto abort          = "common_abort";
             inline constexpr auto adjust         = "common_adjust";
-            inline constexpr auto play_pause     = "common_play_pause";
             // days
             inline constexpr auto Monday    = "common_monday";
             inline constexpr auto Tuesday   = "common_tuesday";

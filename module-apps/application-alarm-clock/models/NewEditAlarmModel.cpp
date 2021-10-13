@@ -15,9 +15,11 @@
 namespace app::alarmClock
 {
     NewEditAlarmModel::NewEditAlarmModel(app::ApplicationCommon *app,
+                                         std::shared_ptr<SoundsPlayer> player,
                                          std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter,
                                          std::shared_ptr<AbstractAlarmsRepository> alarmsRepository)
-        : application(app), alarmsRepository{std::move(alarmsRepository)}, rRulePresenter(rRulePresenter)
+        : application(app), alarmsRepository{std::move(alarmsRepository)}, soundsPlayer(player),
+          rRulePresenter(rRulePresenter)
     {}
 
     unsigned int NewEditAlarmModel::requestRecordsCount()
@@ -53,6 +55,7 @@ namespace app::alarmClock
         internalData.push_back(new gui::AlarmMusicOptionsItem(
             application,
             utils::translate("app_alarm_clock_sound"),
+            soundsPlayer,
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
             [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
