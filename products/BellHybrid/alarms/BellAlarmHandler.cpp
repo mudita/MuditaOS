@@ -38,7 +38,7 @@ namespace alarms
     auto BellAlarmClockHandler::getActions(sys::Service *service) -> Actions
     {
         Actions actions;
-        actions.emplace_back(std::make_unique<PlayToneAction>(*service));
+        actions.emplace_back(factory::createAlarmToneAction(*service));
         actions.emplace_back(std::make_unique<NotifyGUIAction>(*service));
         actions.emplace_back(std::make_unique<FrontlightAction>(*service, FrontlightAction::Mode::Manual));
         return actions;
@@ -50,7 +50,7 @@ namespace alarms
     auto PreWakeUpChimeHandler::getActions(sys::Service *service) -> Actions
     {
         Actions actions;
-        actions.emplace_back(createPreWakeUpChimeAction(*service));
+        actions.emplace_back(factory::createPreWakeUpChimeAction(*service));
         return actions;
     }
 
@@ -71,7 +71,7 @@ namespace alarms
     auto SnoozeChimeHandler::getActions(sys::Service *service) -> Actions
     {
         Actions actions;
-        actions.emplace_back(createSnoozeChimeAction(*service));
+        actions.emplace_back(factory::createSnoozeChimeAction(*service));
         return actions;
     }
 
@@ -81,7 +81,7 @@ namespace alarms
     auto BedtimeReminderHandler::getActions(sys::Service *service) -> Actions
     {
         Actions actions;
-        actions.emplace_back(createBedtimeChimeAction(*service));
+        actions.emplace_back(factory::createBedtimeChimeAction(*service));
         actions.emplace_back(std::make_unique<NotifyGUIBedtimeReminderAction>(*service));
         return actions;
     }

@@ -21,8 +21,6 @@ namespace app
 
     class ApplicationBellPowerNap : public Application
     {
-        std::unique_ptr<powernap::PowerNapAlarmImpl> alarm;
-
       public:
         ApplicationBellPowerNap(std::string name                    = applicationBellPowerNapName,
                                 std::string parent                  = "",

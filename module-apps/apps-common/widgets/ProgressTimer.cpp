@@ -6,7 +6,6 @@
 #include <ProgressBar.hpp>
 #include <ApplicationCommon.hpp>
 #include <apps-common/GuiTimer.hpp>
-#include <time/time_conversion.hpp>
 #include <gsl/assert>
 
 namespace
@@ -20,8 +19,10 @@ namespace app
                                  gui::Item &parent,
                                  std::string timerName,
                                  std::chrono::milliseconds baseTick,
-                                 ProgressCountdownMode countdownMode)
-        : app{app}, parent{parent}, name{std::move(timerName)}, baseTickInterval{baseTick}, countdownMode{countdownMode}
+                                 ProgressCountdownMode countdownMode,
+                                 utils::time::Duration::DisplayedFormat displayFormat)
+        : app{app}, parent{parent}, name{std::move(timerName)}, baseTickInterval{baseTick},
+          countdownMode{countdownMode}, displayFormat{displayFormat}
     {}
 
     void ProgressTimer::resetProgress()
@@ -50,7 +51,7 @@ namespace app
         if (countdownMode == ProgressCountdownMode::Increasing && secondsRemaining != std::chrono::seconds::zero()) {
             timerText += increasingModePrefix;
         }
-        timerText += remainingDuration.str(Duration::DisplayedFormat::Fixed0M0S);
+        timerText += remainingDuration.str(displayFormat);
         text->setText(std::move(timerText));
     }
 
