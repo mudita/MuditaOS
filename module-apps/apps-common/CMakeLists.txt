@@ -14,6 +14,7 @@ target_sources(apps-common
         GuiTimer.cpp
         StatusBarManager.cpp
         WindowsFactory.cpp
+        audio/SoundsPlayer.cpp
         notifications/NotificationData.cpp
         notifications/NotificationListItem.cpp
         notifications/NotificationProvider.cpp
