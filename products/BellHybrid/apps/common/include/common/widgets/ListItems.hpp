@@ -41,6 +41,8 @@ namespace gui
 
       private:
         UIntegerSpinner *spinner{};
+
+        void setArrowsVisibility(UIntegerSpinner::Range range);
     };
 
     class NumWithStringListItem : public BellSideListItemWithCallbacks
@@ -61,6 +63,8 @@ namespace gui
         TextFixedSize *bottomText{};
         const UTF8 offStr;
         const UTF8 minStr;
+
+        void setArrowsVisibility(const NumWithStringSpinner::Range &range);
     };
 
     class UTF8ListItem : public BellSideListItemWithCallbacks
