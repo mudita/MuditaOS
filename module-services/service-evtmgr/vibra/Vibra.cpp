@@ -76,4 +76,9 @@ namespace vibra_handle
         vibratorTimer.stop();
     }
 
+    void Vibra::SetVibrationLevel(unsigned int vibrationLevel)
+    {
+        bsp::vibrator::setVibrationLevel(vibrationLevel);
+    }
+
 } // namespace vibra_handle

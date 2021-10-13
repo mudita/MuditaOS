@@ -21,5 +21,9 @@ namespace bsp
         {}
         void deinit()
         {}
+        void updateClockFrequency(CpuFrequencyHz newFrequency)
+        {}
+        void setVibrationLevel(unsigned int vibrationLevel)
+        {}
     } // namespace vibrator
 } // namespace bsp

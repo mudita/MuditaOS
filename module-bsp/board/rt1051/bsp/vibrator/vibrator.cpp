@@ -5,33 +5,27 @@
 
 #include <board/BoardDefinitions.hpp>
 #include <drivers/gpio/DriverGPIO.hpp>
-
-static std::shared_ptr<drivers::DriverGPIO> port;
+#include <drivers/pwm/DriverPWM.hpp>
 
 namespace bsp
 {
     namespace vibrator
     {
-
         using namespace drivers;
 
-        void enable()
-        {
-            port->WritePin(static_cast<uint32_t>(BoardDefinitions::VIBRATOR_EN), 1);
-        }
-        void disable()
-        {
-            port->WritePin(static_cast<uint32_t>(BoardDefinitions::VIBRATOR_EN), 0);
-        }
+        std::shared_ptr<drivers::DriverPWM> pwm;
+        constexpr inline auto PWM_FREQUENCY_HZ = 20000;
 
         void init(std::chrono::milliseconds pulse)
         {
-            port = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::VIBRATOR_GPIO), DriverGPIOParams{});
-            port->ConfPin(DriverGPIOPinParams{.dir = DriverGPIOPinParams::Direction::Output,
-                                              .irqMode = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                              .defLogic = 0,
-                                              .pin = static_cast<uint32_t>(BoardDefinitions::VIBRATOR_EN)});
+            drivers::DriverPWMParams pwmParams;
+            pwmParams.channel   = static_cast<drivers::PWMChannel>(BoardDefinitions::VIBRATOR_PWM_CHANNEL);
+            pwmParams.frequency = PWM_FREQUENCY_HZ;
 
+            pwm =
+                drivers::DriverPWM::Create(static_cast<drivers::PWMInstances>(BoardDefinitions::VIBRATOR_PWM_INSTANCE),
+                                           static_cast<drivers::PWMModules>(BoardDefinitions::VIBRATOR_PWM_MODULE),
+                                           pwmParams);
             disable();
         }
 
@@ -40,5 +34,24 @@ namespace bsp
             disable();
         }
 
+        void enable()
+        {
+            pwm->Start();
+        }
+
+        void disable()
+        {
+            pwm->Stop();
+        }
+
+        void updateClockFrequency(CpuFrequencyHz newFrequency)
+        {
+            pwm->UpdateClockFrequency(static_cast<std::uint32_t>(newFrequency));
+        }
+
+        void setVibrationLevel(unsigned int vibrationLevel)
+        {
+            pwm->SetDutyCycle(vibrationLevel * 10);
+        }
     } // namespace vibrator
 } // namespace bsp
