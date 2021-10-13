@@ -5,11 +5,11 @@
 #include "presenter/PowerNapMainWindowPresenter.hpp"
 #include "presenter/PowerNapProgressPresenter.hpp"
 #include "presenter/PowerNapSessionEndedPresenter.hpp"
-#include "widgets/PowerNapAlarm.hpp"
 #include "windows/PowerNapMainWindow.hpp"
 #include "windows/PowerNapProgressWindow.hpp"
 #include "windows/PowerNapSessionEndedWindow.hpp"
 #include <common/models/TimeModel.hpp>
+#include <AlarmSoundPaths.hpp>
 #include <service-audio/AudioMessage.hpp>
 
 namespace app
@@ -18,8 +18,7 @@ namespace app
                                                      std::string parent,
                                                      StatusIndicators statusIndicators,
                                                      StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground),
-          alarm{std::make_unique<powernap::PowerNapAlarmImpl>(this)}
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground)
     {}
 
     ApplicationBellPowerNap::~ApplicationBellPowerNap() = default;
@@ -40,13 +39,15 @@ namespace app
             auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>(app, settings.get());
             return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::window::name::powernapProgress,
-                              [this](ApplicationCommon *app, const std::string &name) {
-                                  auto timeModel = std::make_unique<app::TimeModel>();
-                                  auto presenter = std::make_unique<powernap::PowerNapProgressPresenter>(
-                                      app, settings.get(), *alarm, std::move(timeModel));
-                                  return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
-                              });
+        windowsFactory.attach(
+            gui::window::name::powernapProgress, [this](ApplicationCommon *app, const std::string &name) {
+                auto timeModel        = std::make_unique<app::TimeModel>();
+                auto audioModel       = std::make_unique<AudioModel>(app);
+                auto soundsRepository = std::make_unique<SoundsRepository>(alarms::paths::getAlarmDir());
+                auto presenter        = std::make_unique<powernap::PowerNapProgressPresenter>(
+                    app, settings.get(), std::move(soundsRepository), std::move(audioModel), std::move(timeModel));
+                return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
+            });
         windowsFactory.attach(gui::window::name::powernapSessionEnded,
                               [](ApplicationCommon *app, const std::string &name) {
                                   auto presenter = std::make_unique<powernap::PowerNapSessionEndPresenter>(app);
@@ -66,11 +67,6 @@ namespace app
         if (auto response = dynamic_cast<sys::ResponseMessage *>(retMsg.get());
             response != nullptr && response->retCode == sys::ReturnCodes::Success) {
             return retMsg;
-        }
-
-        if ((resp != nullptr) && typeid(*resp) == typeid(AudioStartPlaybackResponse)) {
-            auto *msg = static_cast<AudioStartPlaybackResponse *>(resp);
-            alarm->registerAudioStream(msg->token);
         }
 
         return handleAsyncResponse(resp);

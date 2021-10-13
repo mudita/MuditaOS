@@ -4,6 +4,7 @@
 
 #include "TimerWithCallbacks.hpp"
 #include <Timers/TimerHandle.hpp>
+#include <time/time_conversion.hpp>
 #include <atomic>
 #include <chrono>
 #include <string>
@@ -56,6 +57,7 @@ namespace app
         std::function<void()> onFinishedCallback = nullptr;
         std::function<void()> onIntervalCallback = nullptr;
         ProgressCountdownMode countdownMode;
+        utils::time::Duration::DisplayedFormat displayFormat;
 
         void startTimer();
         void update();
@@ -67,11 +69,13 @@ namespace app
         [[nodiscard]] auto intervalReached() const noexcept -> bool;
 
       public:
-        ProgressTimer(app::ApplicationCommon *app,
-                      gui::Item &parent,
-                      std::string timerName,
-                      std::chrono::milliseconds baseTick,
-                      ProgressCountdownMode countdownMode = ProgressCountdownMode::Decreasing);
+        ProgressTimer(
+            app::ApplicationCommon *app,
+            gui::Item &parent,
+            std::string timerName,
+            std::chrono::milliseconds baseTick,
+            ProgressCountdownMode countdownMode                    = ProgressCountdownMode::Decreasing,
+            utils::time::Duration::DisplayedFormat displayedFormat = utils::time::Duration::DisplayedFormat::AutoM);
         void reset(std::chrono::seconds _duration,
                    std::chrono::seconds _interval = std::chrono::seconds::zero()) override;
         void start() override;

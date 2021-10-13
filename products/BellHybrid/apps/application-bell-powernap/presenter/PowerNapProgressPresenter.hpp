@@ -5,6 +5,8 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
+#include <common/models/AudioModel.hpp>
+#include <common/SoundsRepository.hpp>
 #include <time/time_locale.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <memory>
@@ -24,14 +26,13 @@ namespace settings
 
 namespace app::powernap
 {
-    class PowerNapAlarm;
     class PowerNapProgressContract
     {
       public:
         class View
         {
           public:
-            ~View() = default;
+            ~View()                                                         = default;
             virtual void napEnded()                                         = 0;
             virtual void setTime(std::time_t newTime)                       = 0;
             virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
@@ -44,22 +45,27 @@ namespace app::powernap
             virtual void endNap()                                                   = 0;
             virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
             virtual void handleUpdateTimeEvent()                                    = 0;
+            virtual bool isNapFinished()                                            = 0;
         };
     };
 
     class PowerNapProgressPresenter : public PowerNapProgressContract::Presenter
     {
-        app::ApplicationCommon *app  = nullptr;
-        settings::Settings *settings = nullptr;
-        PowerNapAlarm &alarm;
+        app::ApplicationCommon *app{};
+        settings::Settings *settings{};
+        std::unique_ptr<AbstractSoundsRepository> soundsRepository;
+        std::unique_ptr<AbstractAudioModel> audioModel;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
         sys::TimerHandle napAlarmTimer;
+        audio::Token currentToken;
+        bool napFinished{false};
 
         void activate() override;
         void endNap() override;
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void handleUpdateTimeEvent() override;
+        bool isNapFinished() override;
 
         void onNapFinished();
         void onNapAlarmFinished();
@@ -67,7 +73,8 @@ namespace app::powernap
       public:
         PowerNapProgressPresenter(app::ApplicationCommon *app,
                                   settings::Settings *settings,
-                                  PowerNapAlarm &alarm,
+                                  std::unique_ptr<AbstractSoundsRepository> soundsRepository,
+                                  std::unique_ptr<AbstractAudioModel> audioModel,
                                   std::unique_ptr<AbstractTimeModel> timeModel);
     };
 } // namespace app::powernap
