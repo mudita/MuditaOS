@@ -20,7 +20,7 @@ namespace gui
         topMessage->setEdges(gui::RectangleEdge::None);
         topMessage->activeItem = false;
         topMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        topMessage->setText(description);
+        topMessage->setRichText(description);
         topMessage->drawUnderline(false);
     }
 

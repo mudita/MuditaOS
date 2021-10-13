@@ -52,7 +52,7 @@ namespace gui
 
         if (auto metadata = dynamic_cast<BellFinishedCallbackWindowSwitchData *>(data)) {
             icon->image->set(metadata->icon);
-            icon->text->setText(metadata->text);
+            icon->text->setRichText(metadata->text);
             finishCallback = metadata->finishCallback;
         }
     }
