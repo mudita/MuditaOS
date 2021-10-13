@@ -11,13 +11,35 @@
 #include <service-time/service-time/TimeMessage.hpp>
 #include <time/TimeZone.hpp>
 
+#include <algorithm>
+
 namespace gui
 {
+    namespace
+    {
+        constexpr auto NegativeOffsetPrefix = "UTC-";
+    } // namespace
+
     ChangeTimeZone::ChangeTimeZone(app::ApplicationCommon *app)
-        : BaseSettingsWindow(app, window::name::change_date_and_time),
-          timeZonesList(utils::time::getAvailableTimeZonesWithOffset())
+        : BaseSettingsWindow(app, window::name::change_date_and_time), timeZonesList(sortTimeZones(getTimeZones()))
     {
         setTitle(utils::translate("app_settings_date_and_time_time_zone"));
+    }
+
+    auto ChangeTimeZone::getTimeZones() -> std::vector<std::string>
+    {
+        return utils::time::getAvailableTimeZonesWithOffset();
+    }
+
+    auto ChangeTimeZone::sortTimeZones(std::vector<std::string> &&timeZones) -> std::vector<std::string>
+    {
+        std::vector<std::string> zones = std::move(timeZones);
+        auto pivot                     = std::partition(zones.begin(), zones.end(), [](const auto &tz) {
+            return tz.rfind(NegativeOffsetPrefix, 0) == 0; // starts with NegativeOffsetPrefix
+        });
+        std::sort(zones.begin(), pivot, std::greater<std::string>{});
+        std::sort(pivot, zones.end());
+        return zones;
     }
 
     void ChangeTimeZone::onBeforeShow(ShowMode mode, SwitchData *data)
