@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /*
  * The Clear BSD License
  * Copyright 2017-2018 NXP
@@ -210,7 +213,7 @@ extern "C"
 #define PINMUX_POWER_HOLD IOMUXC_GPIO_B0_07_GPIO2_IO07
     void PINMUX_InitPowerSW(void);
 
-#define PINMUX_VIBRATOR_EN_PIN IOMUXC_GPIO_AD_B0_00_GPIO1_IO00
+#define PINMUX_VIBRATOR_PWM IOMUXC_GPIO_AD_B0_00_FLEXPWM2_PWMA03
     void PINMUX_InitVibrator(void);
 
 #define PINMUX_TORCH_EN_PIN IOMUXC_GPIO_AD_B1_05_GPIO1_IO21

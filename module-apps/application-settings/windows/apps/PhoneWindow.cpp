@@ -5,6 +5,7 @@
 
 #include <application-settings/data/SoundSelectData.hpp>
 #include <application-settings/windows/WindowNames.hpp>
+#include <widgets/SpinBoxOptionSettings.hpp>
 
 namespace gui
 {
@@ -24,6 +25,22 @@ namespace gui
         mWidgetMaker.addSwitchOption(optionList, utils::translate("app_settings_vibration"), mVibrationsEnabled, [&]() {
             switchVibrationState();
         });
+
+        if (mVibrationsEnabled) {
+            optionList.emplace_back(std::make_unique<gui::SpinBoxOptionSettings>(
+                utils::translate("app_settings_volume"),
+                mAudioModel->getVibrationLevel(),
+                std::ceil(10.0),
+                [&](uint8_t value) {
+                    mAudioModel->setVibrationLevel(value);
+                    return true;
+                },
+                [&](const UTF8 &text) {
+                    application->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
+                },
+                [&]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+                true));
+        }
 
         mWidgetMaker.addSwitchOption(
             optionList, utils::translate("app_settings_sound"), mSoundEnabled, [&]() { switchSoundState(); });

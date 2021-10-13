@@ -122,17 +122,27 @@ namespace sevm
         bool success;
     };
 
-    class VibraMessage : public sys::DataMessage
+    class VibratorMessage : public sys::DataMessage
     {
       public:
-        explicit VibraMessage(
+        explicit VibratorMessage(
             bsp::vibrator::Action act,
             std::chrono::milliseconds rptTime = std::chrono::milliseconds{bsp::vibrator::defaultVibraPauseMs})
-            : DataMessage(MessageType::VibraPulseMessage), action(act), repetitionTime(rptTime)
+            : DataMessage(MessageType::VibratorPulseMessage), action(act), repetitionTime(rptTime)
         {}
 
         bsp::vibrator::Action action;
         std::chrono::milliseconds repetitionTime;
+    };
+
+    class VibratorLevelMessage : public sys::DataMessage
+    {
+      public:
+        explicit VibratorLevelMessage(unsigned int vibrationLevel)
+            : DataMessage(MessageType::VibratorLevelMessage), vibrationLevel(vibrationLevel)
+        {}
+
+        unsigned int vibrationLevel;
     };
 
     class FlushLogsRequest : public sys::DataMessage

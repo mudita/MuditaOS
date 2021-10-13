@@ -142,6 +142,21 @@ namespace AudioServiceAPI
      */
     std::optional<audio::SettingState> GetVibrationSetting(sys::Service *serv, audio::PlaybackType playbackType);
 
+    /** @brief Sets vibrations level setting state
+     *
+     * @param serv - requesting service.
+     * @param vibrationLevel - vibration level to be set.
+     * @return Standard service-api return code. Success if suitable.
+     */
+    audio::RetCode SetVibrationLevelSetting(sys::Service *serv, audio::VibrationLevel vibrationLeve);
+
+    /** @brief Gets vibrations level setting state
+     *
+     * @param serv - requesting service.
+     * @return Requested setting vibration level on success. std::nullopt on failure
+     */
+    std::optional<audio::VibrationLevel> GetVibrationLevelSetting(sys::Service *serv);
+
     /** @brief Sets system sound setting state
      *
      * @param serv - requesting service.

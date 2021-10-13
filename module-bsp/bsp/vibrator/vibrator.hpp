@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Utils.hpp>
+#include <bsp/common.hpp>
 
 #include <chrono>
 #include <memory>
@@ -20,9 +21,12 @@ namespace bsp
             stop,
         };
 
-        void enable();
-        void disable();
         void init(std::chrono::milliseconds pulse = std::chrono::milliseconds{defaultVibraPulseMs});
         void deinit();
+        void enable();
+        void disable();
+        void updateClockFrequency(CpuFrequencyHz newFrequency);
+        void setVibrationLevel(unsigned int vibrationLevel);
+
     } // namespace vibrator
 } // namespace bsp
