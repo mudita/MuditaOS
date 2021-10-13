@@ -143,8 +143,7 @@ namespace gui
         case TextType::Title: {
             header->setTitleVisibility(true);
             if (!tokens.empty()) {
-                TextFormat format(FontManager::getInstance().getFont(style::window::font::medium));
-                setTitle(text::RichTextParser().parse(utils::translate(value), &format, std::move(tokens))->getText());
+                setTitle(text::RichTextParser().parse(utils::translate(value), nullptr, std::move(tokens))->getText());
             }
             else {
                 setTitle(utils::translate(value));
