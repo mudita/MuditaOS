@@ -14,7 +14,6 @@ target_include_directories(application-phonebook
 target_sources(application-phonebook
     PRIVATE
         ApplicationPhonebook.cpp
-        data/PhonebookUtils.cpp
         models/ContactDetailsModel.cpp
         models/NewContactModel.cpp
         models/PhonebookModel.cpp

@@ -523,13 +523,13 @@ namespace gui::text
         -> std::unique_ptr<TextDocument>
     {
         log_parser("parsing: %s", text.c_str());
-        if (text.empty() || base_style == nullptr) {
-            log_parser("no: %s", text.empty() ? "text" : "base style");
+        if (text.empty()) {
+            log_parser("no: %s", "text");
             return nullptr;
         }
 
         pugi::xml_document doc;
-        walker walker(*base_style, std::move(tokenMap));
+        walker walker(base_style == nullptr ? nullptr : *base_style, std::move(tokenMap));
 
         doc.load_string(text.c_str());
         doc.traverse(walker);
