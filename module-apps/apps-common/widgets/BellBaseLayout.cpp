@@ -123,5 +123,7 @@ namespace gui
     {
         setArrowVisible(BellBaseLayout::Arrow::Left, !minCondition);
         setArrowVisible(BellBaseLayout::Arrow::Right, !maxCondition);
+        centerThreeBox->firstBox->resizeItems();
+        centerThreeBox->lastBox->resizeItems();
     }
 } // namespace gui
