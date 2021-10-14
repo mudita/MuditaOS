@@ -178,7 +178,7 @@ namespace gui
     {
         battery->update(batteryContext);
         if (!battery->visible) {
-            bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+            bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         }
         else {
             bottomText->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
