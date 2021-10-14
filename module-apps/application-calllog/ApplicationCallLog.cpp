@@ -17,6 +17,7 @@
 #include <MessageType.hpp>
 #include <module-db/queries/calllog/QueryCalllogSetAllRead.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
+#include <utility>
 
 using namespace calllog;
 
@@ -26,7 +27,7 @@ namespace app
                                            std::string parent,
                                            StatusIndicators statusIndicators,
                                            StartInBackground startInBackground)
-        : Application(name, parent, statusIndicators, startInBackground, 4096)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, 4096)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
@@ -64,8 +65,9 @@ namespace app
     sys::ReturnCodes ApplicationCallLog::InitHandler()
     {
         auto ret = Application::InitHandler();
-        if (ret != sys::ReturnCodes::Success)
+        if (ret != sys::ReturnCodes::Success) {
             return ret;
+        }
 
         createUserInterface();
 
@@ -87,7 +89,7 @@ namespace app
         windowsFactory.attach(calllog::settings::DetailsWindowStr, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::CallLogDetailsWindow>(app);
         });
-        windowsFactory.attach(utils::translate("app_phonebook_options_title"),
+        windowsFactory.attach(utils::translate("common_options_title"),
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::OptionWindow>(app, name);
                               });

@@ -149,7 +149,7 @@ namespace app::notes
             }
             if (inputEvent.is(gui::KeyCode::KEY_LF)) {
                 application->switchWindow(
-                    utils::translate("app_phonebook_options_title"),
+                    utils::translate("common_options_title"),
                     std::make_unique<gui::OptionsWindowOptions>(noteEditOptions(application, *notesRecord, edit)));
             }
         }
