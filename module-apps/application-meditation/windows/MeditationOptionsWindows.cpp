@@ -17,7 +17,7 @@ namespace
 
     std::string toString(std::chrono::seconds duration)
     {
-        if (duration.count() > 60) {
+        if (duration.count() >= 60) {
             return std::to_string(static_cast<int>((duration.count()) / 60)) + " m";
         }
         return std::to_string(static_cast<int>(duration.count())) + " s";
