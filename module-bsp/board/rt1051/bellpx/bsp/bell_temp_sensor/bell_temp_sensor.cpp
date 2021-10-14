@@ -96,13 +96,20 @@ namespace bsp::bell_temp_sensor
         uint16_t reg16 =
             (static_cast<uint16_t>(reg[0]) << 8) | (static_cast<uint16_t>(reg[1]) & 0xFFE0); // 0.25 C resolution
 
-        uint16_t integer    = (reg16 & 0x7FFF) >> 7; // remove sign bit and shift to lower byte
-        uint16_t fractional = ((reg16 >> 5) & 0x3) *
-                              25; // shift fractional part to correct decimal position and limit resolution to 0.25 C
+        uint16_t integer    = 0;
+        uint16_t fractional = 0;
 
-        temp = static_cast<float>(integer) + static_cast<float>(fractional) / 100.0;
-        if (reg16 & 0x8000) // sign bit present
-            temp *= -1.0;
+        if (reg16 & 0x8000) {                                                 // sign bit present
+            integer    = static_cast<uint16_t>(((~reg16 + 1) & 0x7FFF) >> 7); // remove sign bit and shift to lower byte
+            fractional = static_cast<uint16_t>(((~reg16 + 1) & 0x7F) * 0.78125);
+            temp       = -1 * (static_cast<float>(integer) + (static_cast<float>(fractional) / 100.0));
+        }
+        else {
+            integer    = static_cast<uint16_t>((reg16 & 0x7FFF) >> 7); // remove sign bit and shift to lower byte
+            fractional = static_cast<uint16_t>((reg16 & 0x7F) * 0.78125);
+            temp       = static_cast<float>(integer) + (static_cast<float>(fractional) / 100.0);
+        }
+
         if (isFahrenheit)
             temp = (temp * 1.8) + 32.00;
 

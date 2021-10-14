@@ -51,7 +51,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::ShowAlarm}};
+            return {{manager::actions::Launch, manager::actions::ShowAlarm, manager::actions::DisplayLogoAtExit}};
         }
     };
 } // namespace app

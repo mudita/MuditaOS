@@ -20,10 +20,18 @@
 
 namespace service::eink
 {
+    enum ExitAction
+    {
+        None,
+        WipeOut
+    };
+
     class ServiceEink : public sys::Service
     {
       public:
-        explicit ServiceEink(const std::string &name = service::name::eink, std::string parent = {});
+        explicit ServiceEink(ExitAction exitAction   = WipeOut,
+                             const std::string &name = service::name::eink,
+                             std::string parent      = {});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *response) override;
         sys::ReturnCodes InitHandler() override;
@@ -60,6 +68,7 @@ namespace service::eink
         sys::MessagePointer handleImageMessage(sys::Message *message);
         sys::MessagePointer handlePrepareEarlyRequest(sys::Message *message);
 
+        ExitAction exitAction;
         EinkDisplay display;
         State currentState;
         sys::TimerHandle displayPowerOffTimer;
