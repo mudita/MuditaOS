@@ -118,6 +118,7 @@ namespace app::home_screen
                 view.setAlarmEdit(false);
                 view.setAlarmActive(false);
                 view.setAlarmVisible(false);
+                view.setAlarmTimeVisible(false);
                 view.setTemperature(temperatureModel.getTemperature());
             };
         } // namespace Deactivated
@@ -129,6 +130,7 @@ namespace app::home_screen
                 presenter.spawnTimer();
                 view.setBottomDescription(utils::translate("app_bell_alarm_deactivated"));
                 view.setAlarmActive(false);
+                view.setAlarmTimeVisible(false);
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
         } // namespace DeactivatedWait
@@ -180,6 +182,7 @@ namespace app::home_screen
                     utils::time::calculateMinutesDifference(view.getAlarmTime(), timeModel.getCurrentTime())));
                 view.setAlarmActive(true);
                 view.setAlarmVisible(true);
+                view.setAlarmTimeVisible(true);
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
         } // namespace ActivatedWait
@@ -191,6 +194,7 @@ namespace app::home_screen
                     view.setTemperature(temperatureModel.getTemperature());
                     view.setAlarmActive(true);
                     view.setAlarmVisible(true);
+                    view.setAlarmTimeVisible(true);
                     view.setAlarmTime(alarmModel.getAlarmTime());
                 };
         } // namespace Activated
