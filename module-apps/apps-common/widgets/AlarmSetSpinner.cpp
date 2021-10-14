@@ -133,6 +133,7 @@ namespace gui
     {
         timeSpinner->setVisible(value);
         timeSpinner->setFocusItem(nullptr);
+        resizeItems();
     }
 
     auto AlarmSetSpinner::setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void
