@@ -13,7 +13,7 @@ using namespace gui;
 namespace
 {
     using namespace std::chrono_literals;
-    constexpr std::array<std::chrono::seconds, 9> preparationTimes{5s, 10s, 30s, 1min, 2min, 5min, 10min, 15min, 30min};
+    constexpr std::array<std::chrono::seconds, 9> preparationTimes{5s, 10s, 30s, 1min, 2min, 5min, 10min};
 
     std::string toString(std::chrono::seconds duration)
     {
