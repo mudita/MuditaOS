@@ -98,7 +98,7 @@ namespace gui
         alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
         alarm->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        time = new TimeSetFmtSpinner(body->centerBox, TimeSetSpinner::Size::BIG);
+        time = new TimeSetFmtSpinner(body->centerBox);
         time->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         time->setFont(bellMainStyle::mainWindow::time::font);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));

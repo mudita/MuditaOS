@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "Rect.hpp"
-#include "spinners/Spinners.hpp"
+#include <widgets/spinners/Spinners.hpp>
 #include <gui/widgets/Style.hpp>
 #include <gui/widgets/TextConstants.hpp>
 
@@ -16,15 +15,9 @@ namespace style::time_set_spinner
     {
         inline constexpr auto size = 6U;
     } // namespace focus
-    namespace colonIconSize
-    {
-        inline constexpr auto smallW  = 4U;
-        inline constexpr auto smallH  = 21U;
-        inline constexpr auto mediumW = 7U;
-        inline constexpr auto mediumH = 26U;
-        inline constexpr auto bigW    = 24U;
-        inline constexpr auto bigH    = 84U;
-    } // namespace colonIconSize
+
+    inline constexpr auto small_margin = 6U;
+    inline constexpr auto big_margin   = 6U;
 } // namespace style::time_set_spinner
 
 namespace gui
@@ -34,21 +27,7 @@ namespace gui
     class TimeSetSpinner : public HBox
     {
       public:
-        enum class Size
-        {
-            SMALL,
-            MEDIUM,
-            BIG
-        };
-
-        struct ColonIconData
-        {
-            std::string iconName;
-            Length w;
-            Length h;
-        };
-
-        TimeSetSpinner(Item *parent, Size size, Length x, Length y, Length w, Length h);
+        TimeSetSpinner(Item *parent, Length x, Length y, Length w, Length h);
 
         auto setHour(int value) noexcept -> void;
         auto setMinute(int value) noexcept -> void;
@@ -59,11 +38,24 @@ namespace gui
         auto setHourRange(std::uint32_t min, std::uint32_t max) -> void;
         [[nodiscard]] auto getHour() const noexcept -> int;
         [[nodiscard]] auto getMinute() const noexcept -> int;
+        auto applySizeRestrictions() -> void;
 
       private:
-        UIntegerSpinner *hour = nullptr;
-        ImageBox *colon       = nullptr;
-        const ColonIconData colonIconData{};
+        std::map<std::string, std::string> colonFontMap = {
+            {style::window::font::largelight, "alarm_colon_W_M"},
+            {style::window::font::supersizemelight, "alarm_colon_select_W_M"},
+            {style::window::font::huge, "alarm_colon_clock_W_M"}};
+
+        std::map<std::string, Margins> colonMarginsMap = {
+            {style::window::font::largelight,
+             {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},
+            {style::window::font::supersizemelight,
+             {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
+            {style::window::font::huge,
+             {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}}};
+
+        UIntegerSpinner *hour        = nullptr;
+        ImageBox *colon              = nullptr;
         UIntegerSpinnerFixed *minute = nullptr;
         EditMode editMode            = EditMode::Edit;
         Item *lastFocus              = nullptr;
@@ -75,7 +67,7 @@ namespace gui
         auto handleRightFunctionKey() -> bool;
         auto onInput(const InputEvent &inputEvent) -> bool override;
         [[nodiscard]] auto getFontHeight(const std::string &fontName) const noexcept -> uint16_t;
-        [[nodiscard]] auto getWidestDigitWidth(const std::string &fontName) const noexcept -> uint32_t;
-        [[nodiscard]] auto getColonIconData(Size size) const noexcept -> ColonIconData;
+        [[nodiscard]] auto getColonImage(const std::string &colonFont) const noexcept -> std::string;
+        [[nodiscard]] auto getColonMargins(const std::string &colonFont) const noexcept -> Margins;
     };
 } /* namespace gui */

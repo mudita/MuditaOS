@@ -18,25 +18,23 @@ namespace gui
 
         leftArrow = new ImageBox(this, 0, 0, 0, 0, new Image("bell_arrow_left_W_M"));
         leftArrow->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        leftArrow->setMargins(Margins(0, 0, 0, 0));
-        leftArrow->setMinimumSize(style::alarm_set_spinner::arrow::w, style::alarm_set_spinner::arrow::h);
+        leftArrow->setMinimumSizeToFitImage();
 
         alarmImg = new ImageBox(this, 0, 0, 0, 0, new Image("bell_alarm_deactivated_W_M"));
         alarmImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        alarmImg->setMargins(Margins(0, 0, 0, 0));
-        alarmImg->setMinimumSize(style::alarm_set_spinner::image_default::w,
-                                 style::alarm_set_spinner::image_default::h);
+        alarmImg->setMargins(Margins(style::alarm_set_spinner::margin, 0, style::alarm_set_spinner::margin, 0));
+        alarmImg->setMinimumSizeToFitImage();
 
-        timeSpinner = new TimeSetFmtSpinner(this, TimeSetSpinner::Size::SMALL);
+        timeSpinner = new TimeSetFmtSpinner(this);
         timeSpinner->setFont(style::window::font::largelight);
         timeSpinner->setEditMode(EditMode::Browse);
         timeSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        timeSpinner->setMargins(Margins(0, 0, 0, 0));
+        timeSpinner->setMargins(Margins(0, 0, style::alarm_set_spinner::margin, 0));
+        timeSpinner->setEdges(RectangleEdge::None);
 
         rightArrow = new ImageBox(this, 0, 0, 0, 0, new Image("bell_arrow_right_W_M"));
         rightArrow->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        rightArrow->setMargins(Margins(0, 0, 0, 0));
-        rightArrow->setMinimumSize(style::alarm_set_spinner::arrow::w, style::alarm_set_spinner::arrow::h);
+        rightArrow->setMinimumSizeToFitImage();
 
         resizeItems();
 
@@ -94,15 +92,7 @@ namespace gui
     auto AlarmSetSpinner::setAlarmStatus(Status status) noexcept -> void
     {
         alarmStatus = status;
-
-        if (alarmStatus == Status::RINGING) {
-            alarmImg->setMinimumSize(style::alarm_set_spinner::image_alarm_ringing::w,
-                                     style::alarm_set_spinner::image_alarm_ringing::h);
-        }
-        else {
-            alarmImg->setMinimumSize(style::alarm_set_spinner::image_default::w,
-                                     style::alarm_set_spinner::image_default::h);
-        }
+        alarmImg->setMinimumSizeToFitImage();
 
         switch (alarmStatus) {
         case Status::ACTIVATED:
@@ -139,7 +129,6 @@ namespace gui
     auto AlarmSetSpinner::setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void
     {
         timeSpinner->setTimeFormat(fmt);
-        resizeItems();
     }
 
     auto AlarmSetSpinner::getAlarmStatus() const noexcept -> Status
