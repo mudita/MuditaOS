@@ -14,7 +14,7 @@ namespace gui
         : BellSideListItem(std::move(description))
     {
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
-        timeSetFmtSpinner = new TimeSetFmtSpinner(body->getCenterBox(), TimeSetSpinner::Size::MEDIUM);
+        timeSetFmtSpinner = new TimeSetFmtSpinner(body->getCenterBox());
         timeSetFmtSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         timeSetFmtSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setFocusItem(body);

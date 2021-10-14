@@ -8,14 +8,9 @@
 namespace gui
 {
 
-    BellStatusClock::BellStatusClock(Item *parent,
-                                     TimeSetSpinner::Size size,
-                                     uint32_t x,
-                                     uint32_t y,
-                                     uint32_t w,
-                                     uint32_t h,
-                                     utils::time::Locale::TimeFormat timeFormat)
-        : TimeSetFmtSpinner{parent, size, x, y, w, h, timeFormat}
+    BellStatusClock::BellStatusClock(
+        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, utils::time::Locale::TimeFormat timeFormat)
+        : TimeSetFmtSpinner{parent, x, y, w, h, timeFormat}
     {
         setFont(bell_style::statusClockFont);
         setEditMode(EditMode::Browse);
