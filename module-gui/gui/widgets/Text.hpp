@@ -156,6 +156,7 @@ namespace gui
         virtual UTF8 getText() const;
         void setFont(const UTF8 &fontName);
         void setFont(RawFont *font);
+        void setMinimumWidthToFitText();
         void setMinimumWidthToFitText(const UTF8 &text);
         void setMinimumHeightToFitText(unsigned int linesCount = 1);
 

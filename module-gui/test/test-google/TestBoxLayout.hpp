@@ -22,6 +22,7 @@ class TestBoxLayout : public gui::BoxLayout
     FRIEND_TEST(BoxLayoutTesting, Box_Widgets_Alignment_Test);
     FRIEND_TEST(BoxLayoutTesting, Box_Widgets_Alignment_Magrin_Test);
     FRIEND_TEST(BoxLayoutTesting, Box_Margins_Test);
+    FRIEND_TEST(BoxLayoutTesting, Box_Content_Change_Test);
 
     TestBoxLayout(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : BoxLayout(parent, x, y, w, h){};
     ~TestBoxLayout() = default;

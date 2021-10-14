@@ -284,6 +284,13 @@ namespace gui
         /// @return bool requested size granted {w,h}
         virtual auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
 
+        /// flag informing that content has changed
+        bool contentChanged = false;
+        /// inform parent that child content has changed.
+        void informContentChanged();
+        /// handle child content change request.
+        virtual void handleContentChanged();
+
         virtual void setSize(Length w, Length h);
         void setSize(Length val, Axis axis);
         virtual void setBoundingBox(const BoundingBox &new_box);
