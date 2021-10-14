@@ -11,13 +11,8 @@
 namespace gui
 {
 
-    TimeSetFmtSpinner::TimeSetFmtSpinner(Item *parent,
-                                         TimeSetSpinner::Size size,
-                                         uint32_t x,
-                                         uint32_t y,
-                                         uint32_t w,
-                                         uint32_t h,
-                                         utils::time::Locale::TimeFormat timeFormat)
+    TimeSetFmtSpinner::TimeSetFmtSpinner(
+        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, utils::time::Locale::TimeFormat timeFormat)
         : HBox{parent, x, y, w, h}
     {
         using namespace utils;
@@ -25,15 +20,15 @@ namespace gui
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        timeSetSpinner = new TimeSetSpinner(this, size, 0, 0, 0, 0);
+        timeSetSpinner = new TimeSetSpinner(this, 0, 0, 0, 0);
         timeSetSpinner->setFont(focusFontName, noFocusFontName);
         timeSetSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        timeSetSpinner->setMargins(Margins(0, 0, 0, 0));
 
         auto textRange = UTF8Spinner::Range{time::Locale::getAM(), time::Locale::getPM()};
         fmt            = new UTF8Spinner(textRange, Boundaries::Continuous);
         updateFmtFont(noFocusFontName);
         fmt->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        fmt->setMargins(getFmtMargins(noFocusFontName));
         fmt->setEdges(RectangleEdge::None);
         fmt->setVisible(false);
         fmt->setPenFocusWidth(style::time_set_spinner::focus::size);
@@ -103,7 +98,7 @@ namespace gui
         }
 
         timeFormat = newFormat;
-        resizeItems();
+        handleContentChanged();
     }
 
     auto TimeSetFmtSpinner::setMinute(int value) noexcept -> void
@@ -133,11 +128,9 @@ namespace gui
         return timeSetSpinner->getMinute();
     }
 
-    auto TimeSetFmtSpinner::getMinimumFmtWidth(const std::string &fontName) const noexcept -> Length
+    auto TimeSetFmtSpinner::getFmtMargins(const std::string &fmtFont) const noexcept -> Margins
     {
-        constexpr auto spacer = 5U; // space between two chars
-        const auto font       = FontManager::getInstance().getFont(fontName);
-        return font->getPixelWidth(utils::time::Locale::getAM()) + spacer;
+        return fmtMarginsMap.find(fmtFont)->second;
     }
 
     auto TimeSetFmtSpinner::setHour(int value) noexcept -> void
@@ -158,7 +151,8 @@ namespace gui
         timeSetSpinner->setFont(focusFontName, noFocusFontName);
         updateFmtFont(noFocusFontName);
 
-        setMinimumSize(timeSetSpinner->widgetMinimumArea.w + fmt->widgetMinimumArea.w,
+        setMinimumSize(timeSetSpinner->widgetMinimumArea.w + fmt->widgetMinimumArea.w +
+                           fmt->margins.getSumInAxis(Axis::X),
                        timeSetSpinner->widgetMinimumArea.h);
         resizeItems();
     }
@@ -166,8 +160,9 @@ namespace gui
     auto TimeSetFmtSpinner::updateFmtFont(const std::string &fontName) noexcept -> void
     {
         fmt->setFont(fontName);
-        fmt->setMinimumWidth(getMinimumFmtWidth(fontName));
+        fmt->setMinimumWidthToFitText();
         fmt->setMinimumHeightToFitText();
+        fmt->setMargins(getFmtMargins(fontName));
         fmt->setText(fmt->getText());
     }
 
@@ -238,6 +233,8 @@ namespace gui
             timeSetSpinner->setMinute(t->tm_min);
             fmt->setCurrentValue(isPM ? utils::time::Locale::getPM() : utils::time::Locale::getAM());
         }
+
+        timeSetSpinner->applySizeRestrictions();
     }
 
     auto TimeSetFmtSpinner::setTimeFormatSpinnerVisibility(bool visibility) noexcept -> void
@@ -261,4 +258,20 @@ namespace gui
 
         return std::mktime(newTime);
     }
+
+    void TimeSetFmtSpinner::handleContentChanged()
+    {
+        fmt->setMinimumWidthToFitText();
+        fmt->setMargins(getFmtMargins(noFocusFontName));
+
+        auto widthToSet = fmt->visible ? timeSetSpinner->widgetMinimumArea.w + fmt->widgetMinimumArea.w +
+                                             fmt->margins.getSumInAxis(Axis::X)
+                                       : timeSetSpinner->widgetMinimumArea.w;
+
+        setMinimumWidth(widthToSet);
+        setMaximumWidth(widgetMinimumArea.w);
+
+        HBox::handleContentChanged();
+    }
+
 } // namespace gui

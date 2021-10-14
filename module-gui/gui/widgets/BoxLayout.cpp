@@ -572,6 +572,19 @@ namespace gui
         return Item::onDimensionChanged(oldDim, newDim);
     }
 
+    void BoxLayout::handleContentChanged()
+    {
+        // Check if there is parent and it is Layout
+        if (parent != nullptr && (dynamic_cast<gui::BoxLayout *>(parent) != nullptr)) {
+            // If so invalidate content and request Content change to parent
+            contentChanged = true;
+            Item::informContentChanged();
+        }
+        else {
+            resizeItems();
+        }
+    }
+
     HBox::HBox() : BoxLayout()
     {
         type = ItemType::HBOX;
@@ -623,4 +636,5 @@ namespace gui
     {
         return BoxLayout::handleRequestResize<Axis::Y>(child, request_w, request_h);
     }
+
 } /* namespace gui */

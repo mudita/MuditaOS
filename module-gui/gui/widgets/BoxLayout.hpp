@@ -121,6 +121,7 @@ namespace gui
         void setFocusOnLastElement();
         template <Axis axis> auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
+        void handleContentChanged() override;
         /// Get primary sizes used in axis dominant layouts
         Length getPrimarySizeLeft();
         Length getPrimarySize();

@@ -11,6 +11,12 @@
 
 #include <string>
 
+namespace style::time_set_fmt_spinner
+{
+    inline constexpr auto small_margin = 5U;
+    inline constexpr auto big_margin   = 20U;
+} // namespace style::time_set_fmt_spinner
+
 namespace gui
 {
     /// Time set spinner widget class with option for dynamic switching between 24/12-hour format
@@ -26,7 +32,6 @@ namespace gui
       public:
         explicit TimeSetFmtSpinner(
             Item *parent                               = nullptr,
-            TimeSetSpinner::Size size                  = TimeSetSpinner::Size::SMALL,
             uint32_t x                                 = 0U,
             uint32_t y                                 = 0U,
             uint32_t w                                 = 0U,
@@ -56,11 +61,16 @@ namespace gui
             Right
         };
 
-        [[nodiscard]] auto getMinimumFmtWidth(const std::string &fontName) const noexcept -> Length;
+        std::map<std::string, Margins> fmtMarginsMap = {
+            {style::window::font::largelight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
+            {style::window::font::supersizemelight, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}},
+            {style::window::font::huge, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}}};
+        [[nodiscard]] auto getFmtMargins(const std::string &fmtFont) const noexcept -> Margins;
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
         auto handleEnterKey() -> bool;
         auto handleRightFunctionKey() -> bool;
+        void handleContentChanged() override;
 
         TimeSetSpinner *timeSetSpinner = nullptr;
         UTF8Spinner *fmt               = nullptr;
