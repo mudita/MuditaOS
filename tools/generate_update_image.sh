@@ -26,14 +26,10 @@ function setVars() {
     SOURCE_TARGET=${1}
     VERSION=${2}
     PLATFORM=${3}
-    STAGEING_DIR="${SOURCE_TARGET}-${VERSION}-${PLATFORM}-Update"
-    PACKAGE_FILE="${STAGEING_DIR}.tar"
+    STAGING_DIR=update-package
+    PACKAGE_FILE="${SOURCE_TARGET}-${VERSION}-${PLATFORM}-Update.tar"
     DEPS=(
-        "sysroot/sys/current/assets"
-        "sysroot/sys/user"
         "sysroot/sys/current/${SOURCE_TARGET}-boot.bin"
-        "sysroot/sys/current/country-codes.db"
-        "sysroot/sys/current/Luts.bin"
         "version.json"
         "ecoboot.bin"
         "updater.bin"
@@ -55,35 +51,23 @@ function checkForDeps() {
     echo "Deps-OK"
 }
 
-function cleanStagingDir(){
-    local STAGEING_DIR=${1}
-    if [[ -d ${STAGEING_DIR} ]]; then
-        rm -Rf ${STAGEING_DIR}
-    fi
-    mkdir ${STAGEING_DIR} -v
-}
-
 function linkInStageing(){
-    pushd ${STAGEING_DIR} 1> /dev/null
-    ln -s ../sysroot/sys/current/assets
-    ln -s ../sysroot/sys/user
-    ln -s ../sysroot/sys/current/${SOURCE_TARGET}-boot.bin boot.bin
-    ln -s ../sysroot/sys/current/country-codes.db
-    ln -s ../sysroot/sys/current/Luts.bin
-    ln -s ../ecoboot.bin
-    ln -s ../updater.bin
-    ln -s ../${SOURCE_TARGET}-version.json version.json
+    pushd ${STAGING_DIR} 1> /dev/null
+    ln -sf ../sysroot/sys/current/${SOURCE_TARGET}-boot.bin boot.bin
+    ln -sf ../ecoboot.bin
+    ln -sf ../updater.bin
+    ln -sf ../${SOURCE_TARGET}-version.json version.json
     popd 1> /dev/null
 }
 
 function addChecksums() {
-    pushd ${STAGEING_DIR} 1> /dev/null
+    pushd ${STAGING_DIR} 1> /dev/null
     rhash -u checksums.txt -r .
     popd 1> /dev/null
 }
 
 function compress() {
-    tar chf ${PACKAGE_FILE} -C ${STAGEING_DIR} .
+    tar chf ${PACKAGE_FILE} -C ${STAGING_DIR} .
 }
 
 if [[ $# -ne 3 ]]; then
@@ -93,7 +77,6 @@ fi
 
 setVars "${1}" "${2}" "${3}"
 checkForDeps ${DEPS}
-cleanStagingDir ${STAGEING_DIR}
 linkInStageing
 addChecksums
 compress

@@ -62,7 +62,7 @@ function(add_image)
             ${SCRIPT_PATH}
             ${DISK_IMAGE_NAME}
             ${IMAGE_PARTITIONS}
-            ${CMAKE_BINARY_DIR}/${_ARG_SYSROOT}
+            ${_ARG_SYSROOT}
             "${VERSION_FILE_PATH}"
             "${BIN_FILE_PATH}"
             "${UPDATER_FILE_PATH}"

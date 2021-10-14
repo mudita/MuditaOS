@@ -88,12 +88,32 @@ strip_executable(PurePhone)
 
 message_serial_status()
 
+set(SYSROOT ${CMAKE_BINARY_DIR}/sysroot)
+set(ASSETS_DEST_DIR ${SYSROOT}/sys)
+
+include(Assets)
+add_assets_target(
+    TARGET assets-standalone
+    SOURCE_DIR ${ASSETS_SOURCE_DIR}
+    DEST_DIR ${ASSETS_DEST_DIR}
+    DEVEL ${WITH_DEVELOPMENT_FEATURES}
+    DEFINITION ${CMAKE_CURRENT_SOURCE_DIR}/assets-standalone.json
+)
+
+add_assets_target(
+    TARGET assets-update
+    SOURCE_DIR ${ASSETS_SOURCE_DIR}
+    DEST_DIR ${CMAKE_BINARY_DIR}/update-package
+    DEVEL ${WITH_DEVELOPMENT_FEATURES}
+    DEFINITION ${CMAKE_CURRENT_SOURCE_DIR}/assets-update.json
+)
+
 include(AddBootBin)
 add_boot_bin(PurePhone)
 add_image(
     PRODUCT PurePhone
-    SYSROOT sysroot
-    ASSETS  assets
+    SYSROOT ${SYSROOT}
+    ASSETS  assets-standalone
 )
 
 include(AddHexTarget)

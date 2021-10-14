@@ -29,11 +29,12 @@ add_assets_target(
     SOURCE_DIR ${ASSETS_SOURCE_DIR}
     DEST_DIR ${TEST_ASSETS_DEST_DIR}
     DEVEL ON
+    DEFINITION ${CMAKE_CURRENT_SOURCE_DIR}/assets-test.json
 )
 
 add_image(
     PRODUCT Test
-    SYSROOT test-sysroot
+    SYSROOT ${CMAKE_BINARY_DIR}/test-sysroot
     ASSETS  test-assets
     IMAGE_PARTITIONS ${CMAKE_SOURCE_DIR}/config/products/PurePhone/image_partitions.map
 )

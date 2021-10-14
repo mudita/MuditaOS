@@ -4,32 +4,31 @@ function(add_assets_target)
     cmake_parse_arguments(
         _ASSETS
         ""
-        "TARGET;SOURCE_DIR;DEST_DIR;DEVEL"
+        "TARGET;SOURCE_DIR;DEST_DIR;DEVEL;DEFINITION"
         ""
         ${ARGN}
     )
 
-    if(NOT ${_ASSETS_DEVEL})
-        set(EXCLUDED --exclude \"*-devel*\")
+    set(ASSET_COPY_TOOL ${CMAKE_SOURCE_DIR}/tools/copy-assets.py)
+
+    if(${_ASSETS_DEVEL})
+        set(COPY_DEVEL "--devel")
     endif()
 
     add_custom_target(
         ${_ASSETS_TARGET}
-        COMMAND mkdir -p ${_ASSETS_DEST_DIR}
-        COMMAND rsync -qravu --delete
-            ${_ASSETS_SOURCE_DIR}/.boot.json*
-            ${_ASSETS_SOURCE_DIR}/personalization.json
+        DEPENDS ${ASSET_COPY_TOOL}
+        DEPENDS ${_ASSETS_DEFINITION}
+        COMMAND ${ASSET_COPY_TOOL}
+            ${COPY_DEVEL}
+            ${_ASSETS_SOURCE_DIR}
             ${_ASSETS_DEST_DIR}
-        COMMAND rsync -qravu --delete
-            ${_ASSETS_SOURCE_DIR}/assets
-            ${_ASSETS_SOURCE_DIR}/Luts.bin
-            ${_ASSETS_SOURCE_DIR}/country-codes.db
-            ${_ASSETS_DEST_DIR}/current
-        COMMAND rsync -qravu --delete ${EXCLUDED}
-            ${_ASSETS_SOURCE_DIR}/user
-            ${_ASSETS_DEST_DIR}
-        COMMAND find ${_ASSETS_DEST_DIR} -name "*-devel*" | sed "\"s,\\(.*\\)-devel\\(.*\\),& \\1\\2,\"" | xargs --no-run-if-empty -L1 mv
-        COMMENT
-            "Copying assets.. (${_ASSETS_TARGET})"
+            ${_ASSETS_DEFINITION}
+        COMMENT "Copying assets..."
+    )
+
+    set_target_properties(
+        ${_ASSETS_TARGET}
+        PROPERTIES ADDITIONAL_CLEAN_FILES ${_ASSETS_DEST_DIR}
     )
 endfunction()

@@ -17,7 +17,7 @@ macro(set_cpack_vars)
     set(CPACK_GENERATOR "External")
     set(CPACK_COMPONENTS_GROUPING IGNORE)
     set(CPACK_EXTERNAL_ENABLE_STAGING TRUE)
-    set(PACKAGE_COMMON_NAME ${CPACK_PACKAGE_NAME}-${CMAKE_PROJECT_VERSION}-${CPACK_TOPLEVEL_TAG})
+    set(PACKAGE_COMMON_NAME ${CPACK_PACKAGE_NAME}-${PROJECT_VERSION}-${CPACK_TOPLEVEL_TAG})
     set(CPACK_PACKAGE_FILE_NAME ${PACKAGE_COMMON_NAME})
     set(PACKAGE_STAGING_DIRECTORY ${CMAKE_BINARY_DIR}/_CPack_Packages/${CPACK_TOPLEVEL_TAG}/${CPACK_GENERATOR}/${CPACK_PACKAGE_FILE_NAME})
 
@@ -36,7 +36,7 @@ function(add_standalone_image SOURCE_TARGET)
     set(PACKAGE_STANDALONE_MIME "application/x-xz" PARENT_SCOPE)
 
     add_custom_target(${PACKAGE_COMMON_NAME}-package-standalone
-        COMMAND tar -ScJf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
+        COMMAND tar -cfS -I "xz -T0" ${STANDALONE_PKG} ${SOURCE_TARGET}.img
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         DEPENDS ${BIN_FILE}
         DEPENDS ecoboot.bin-target
@@ -57,7 +57,7 @@ function(add_update_package SOURCE_TARGET)
     endif()
     set(CPACK_PACKAGE_NAME ${SOURCE_TARGET})
     set_cpack_vars()
-    set(UPDATE_PKG "${SOURCE_TARGET}-${CMAKE_PROJECT_VERSION}-${CPACK_SYSTEM_NAME}-Update.tar")
+    set(UPDATE_PKG "${SOURCE_TARGET}-${PROJECT_VERSION}-${CPACK_SYSTEM_NAME}-Update.tar")
 
     set(PACKAGE_UPDATE_FILE_NAME ${UPDATE_PKG} PARENT_SCOPE)
     set(PACKAGE_UPDATE_MIME "application/x-tar" PARENT_SCOPE)
@@ -69,8 +69,8 @@ function(add_update_package SOURCE_TARGET)
         DEPENDS ${SOURCE_TARGET}-version.json-target
         DEPENDS ecoboot.bin-target
         DEPENDS updater.bin-target
-        DEPENDS assets
-        COMMAND ${CMAKE_SOURCE_DIR}/tools/generate_update_image.sh ${SOURCE_TARGET} ${CMAKE_PROJECT_VERSION} ${CPACK_SYSTEM_NAME}
+        DEPENDS assets-update
+        COMMAND ${CMAKE_SOURCE_DIR}/tools/generate_update_image.sh ${SOURCE_TARGET} ${PROJECT_VERSION} ${CPACK_SYSTEM_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating update image"
     )

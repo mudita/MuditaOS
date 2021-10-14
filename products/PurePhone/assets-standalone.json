@@ -1,0 +1,15 @@
+{
+  "assets": {
+      ".": [
+        ".boot.json",
+        ".boot.json.crc32",
+        "personalization.json",
+        "user"
+      ],
+      "current": [
+        "assets",
+        "Luts.bin",
+        "country-codes.db"
+      ]
+  }
+}

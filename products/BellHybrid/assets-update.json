@@ -1,0 +1,10 @@
+{
+  "assets": {
+      ".": [
+        "assets",
+        "user",
+        "Luts.bin",
+        "country-codes.db"
+      ]
+  }
+}

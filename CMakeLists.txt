@@ -131,7 +131,6 @@ add_subdirectory(module-audio)
 add_subdirectory(module-services)
 add_subdirectory(module-apps)
 add_subdirectory(module-bluetooth)
-add_subdirectory(image)
 add_subdirectory(host-tools)
 
 include(tools/clang-tidy.cmake)
