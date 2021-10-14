@@ -71,8 +71,7 @@ namespace gui
         switch (newFormat) {
         case utils::time::Locale::TimeFormat::FormatTime12H: {
             fmt->setVisible(true);
-            timeSetSpinner->setHourMax(time::Locale::max_hour_12H_mode);
-            timeSetSpinner->setHourMin(time::Locale::min_hour_12H_mode);
+            timeSetSpinner->setHourRange(time::Locale::min_hour_12H_mode, time::Locale::max_hour_12H_mode);
 
             if (timeFormat != newFormat) {
                 auto hours = std::chrono::hours(timeSetSpinner->getHour());
@@ -88,8 +87,7 @@ namespace gui
         } break;
         case utils::time::Locale::TimeFormat::FormatTime24H: {
             fmt->setVisible(false);
-            timeSetSpinner->setHourMax(time::Locale::max_hour_24H_mode);
-            timeSetSpinner->setHourMin(time::Locale::min_hour_24H_mode);
+            timeSetSpinner->setHourRange(time::Locale::min_hour_24H_mode, time::Locale::max_hour_24H_mode);
 
             if (newFormat != timeFormat) {
                 auto hours = std::chrono::hours(timeSetSpinner->getHour());
