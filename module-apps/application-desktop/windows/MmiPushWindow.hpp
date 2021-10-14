@@ -6,17 +6,16 @@
 #include <AppWindow.hpp>
 #include <DialogMetadata.hpp>
 #include <Text.hpp>
+#include <Icon.hpp>
 
 #include <functional>
 
 namespace gui
 {
-    class Image;
     class MmiPushWindow : public AppWindow
     {
       protected:
-        Text *text  = nullptr;
-        Image *icon = nullptr;
+        Icon *icon = nullptr;
 
       public:
         MmiPushWindow(app::ApplicationCommon *app, const std::string &name);
