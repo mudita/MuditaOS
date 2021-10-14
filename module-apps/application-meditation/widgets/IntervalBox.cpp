@@ -15,7 +15,7 @@ using namespace gui;
 namespace
 {
     using minutes = std::chrono::minutes;
-    const static std::vector<minutes> chimeIntervals{
+    const std::vector<minutes> chimeIntervals{
         minutes{0}, minutes{2}, minutes{5}, minutes{10}, minutes{15}, minutes{30}};
 } // namespace
 
@@ -37,7 +37,7 @@ void IntervalBox::build()
                               boxStyle::topLabel::Height,
                               utils::translate("app_meditation_interval_chime"));
     topLabel->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
-    topLabel->setFont(style::window::font::verysmall);
+    topLabel->setFont(style::window::font::small);
     topLabel->setEdges(RectangleEdge::None);
 
     bottomLabel = new Label(this,
@@ -62,7 +62,6 @@ void IntervalBox::build()
                                       boxStyle::arrow::Width,
                                       boxStyle::arrow::Height,
                                       "right_label_arrow");
-
 
     updateIntervals(ChimeIntervalList::Direction::Next);
     leftSwitchArrow->setVisible(false);
