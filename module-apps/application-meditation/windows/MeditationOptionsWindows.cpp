@@ -13,7 +13,7 @@ using namespace gui;
 namespace
 {
     using namespace std::chrono_literals;
-    constexpr std::array<std::chrono::seconds, 9> preparationTimes{5s, 10s, 30s, 1min, 2min, 5min, 10min};
+    constexpr std::array<std::chrono::seconds, 7> preparationTimes{5s, 10s, 30s, 1min, 2min, 5min, 10min};
 
     std::string toString(std::chrono::seconds duration)
     {
@@ -28,7 +28,6 @@ MeditationOptionsWindow::MeditationOptionsWindow(app::ApplicationCommon *app)
     : OptionWindow(app, app::window::name::meditation_options)
 {
     setTitle(utils::translate("common_options_title"));
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
     addOptions(buildOptionsList());
 }
 
@@ -50,7 +49,12 @@ void MeditationOptionsWindow::addCounterOption(std::list<Option> &options)
             refreshOptions(buildOptionsList());
             return true;
         },
-        nullptr,
+        [=](gui::Item &item) {
+            if (item.focus) {
+                setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
+            }
+            return true;
+        },
         nullptr,
         app->state->showCounter ? option::SettingRightItem::On : option::SettingRightItem::Off));
 }
@@ -63,7 +67,12 @@ void MeditationOptionsWindow::addPreparationTimeOption(std::list<Option> &option
             application->switchWindow(app::window::name::meditation_preparation);
             return true;
         },
-        nullptr,
+        [=](gui::Item &item) {
+            if (item.focus) {
+                setBottomBarText(utils::translate(style::strings::common::select), BottomBar::Side::CENTER);
+            }
+            return true;
+        },
         nullptr,
         option::SettingRightItem::ArrowBlack));
 }
