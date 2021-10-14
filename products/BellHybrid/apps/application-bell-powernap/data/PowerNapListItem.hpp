@@ -19,6 +19,7 @@ namespace gui
         void registerCallbacks();
 
         void onValueChanged(std::uint32_t currentValue);
+
       public:
         PowerNapListItem();
 
