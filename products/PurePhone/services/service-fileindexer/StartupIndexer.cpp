@@ -1,6 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "Common.hpp"
 #include <service-fileindexer/StartupIndexer.hpp>
 #include <service-fileindexer/Constants.hpp>
 
@@ -13,13 +14,10 @@
 
 namespace service::detail
 {
-
     namespace fs = std::filesystem;
     namespace
     {
         using namespace std::string_literals;
-        // File extensions indexing allow list
-        static constexpr const char *allowed_exts[]{".wav", ".mp3", ".flac"};
 
         // List of initial dirs for scan
         const std::vector<std::string> start_dirs{purefs::dir::getUserDiskPath() / "music"};
@@ -37,16 +35,19 @@ namespace service::detail
     {
         using namespace std::string_view_literals;
         if (fs::is_regular_file(entry)) {
-            for (const auto &ext : allowed_exts) {
-                if (fs::path(entry).extension() == ext) {
-                    const auto abspath    = fs::absolute(entry).string();
-                    const auto inotifyMsg = std::make_shared<purefs::fs::message::inotify>(
-                        purefs::fs::inotify_flags::close_write, abspath, ""sv);
-                    svc->bus.sendUnicast(inotifyMsg, std::string(service::name::file_indexer));
-                }
+            auto ext = fs::path(entry).extension();
+            if (!isExtSupported(ext)) {
+                LOG_WARN("Not supported ext - %s", ext.c_str());
+                return;
             }
+
+            const auto abspath = fs::absolute(entry).string();
+            const auto inotifyMsg =
+                std::make_shared<purefs::fs::message::inotify>(purefs::fs::inotify_flags::close_write, abspath, ""sv);
+            svc->bus.sendUnicast(inotifyMsg, std::string(service::name::file_indexer));
         }
     }
+
     // On timer timeout
     auto StartupIndexer::onTimerTimeout(std::shared_ptr<sys::Service> svc) -> void
     {
