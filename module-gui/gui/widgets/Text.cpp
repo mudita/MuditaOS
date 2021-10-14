@@ -207,6 +207,11 @@ namespace gui
         buildCursor();
     }
 
+    void Text::setMinimumWidthToFitText()
+    {
+        setMinimumWidthToFitText(getText());
+    }
+
     void Text::setMinimumWidthToFitText(const UTF8 &text)
     {
         if (!text.empty()) {

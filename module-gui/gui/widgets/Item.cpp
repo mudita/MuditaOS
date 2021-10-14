@@ -137,6 +137,7 @@ namespace gui
         BoundingBox oldArea = widgetArea;
         widgetArea          = area;
         widgetMaximumArea.sum(widgetArea);
+        contentChanged = false;
         updateDrawArea();
         onDimensionChanged(oldArea, widgetArea);
     }
@@ -171,6 +172,22 @@ namespace gui
             return {0, 0};
         }
         return {it->getWidth(), it->getHeight()};
+    }
+
+    void Item::informContentChanged()
+    {
+        // check if item has been initialized to prevent looping
+        if (parent != nullptr && widgetArea != BoundingBox()) {
+            contentChanged = true;
+            parent->handleContentChanged();
+        }
+    }
+
+    void Item::handleContentChanged()
+    {
+        if (parent != nullptr) {
+            informContentChanged();
+        }
     }
 
     void Item::setSize(Length w, Length h)
@@ -208,15 +225,17 @@ namespace gui
 
             auto box = BoundingBox(posOnAxis, posOnOrthogonalAxis, sizeOnAxis, sizeOnOrthogonalAxis);
 
-            if (widgetArea != box)
+            if (widgetArea != box || contentChanged) {
                 setArea(box);
+            }
         }
         else {
 
             auto box = BoundingBox(posOnOrthogonalAxis, posOnAxis, sizeOnOrthogonalAxis, sizeOnAxis);
 
-            if (widgetArea != box)
+            if (widgetArea != box || contentChanged) {
                 setArea(box);
+            }
         }
     }
 

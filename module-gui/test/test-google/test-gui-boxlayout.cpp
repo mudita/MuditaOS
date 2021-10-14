@@ -565,3 +565,43 @@ TEST_F(BoxLayoutTesting, Box_Margins_Test)
               getNItem(testHBoxLayout, 1)->widgetArea.x)
         << "Second element y pos should be 91";
 }
+
+TEST_F(BoxLayoutTesting, Box_Content_Change_Test)
+{
+    auto thirdBox  = new gui::HBox(nullptr, testStyle::box_x, testStyle::box_y, testStyle::HBox_w, testStyle::HBox_h);
+    auto secondBox = new gui::HBox(thirdBox, testStyle::box_x, testStyle::box_y, testStyle::HBox_w, testStyle::HBox_h);
+    auto firstBox  = new gui::HBox(secondBox, testStyle::box_x, testStyle::box_y, testStyle::HBox_w, testStyle::HBox_h);
+
+    // Fill first box with data
+    addNItems(firstBox, fillHBoxPage, testStyle::HBox_item_w, testStyle::HBox_item_h);
+
+    // Check Boxes content
+    ASSERT_EQ(firstBox->children.size(), 4) << "First box element size should be 4";
+    ASSERT_TRUE(getNItem(firstBox, 0)->visible) << "First box element 0 should be visible";
+    ASSERT_TRUE(getNItem(firstBox, 1)->visible) << "First box element 1 should be visible";
+    ASSERT_TRUE(getNItem(firstBox, 2)->visible) << "First box element 2 should be visible";
+    ASSERT_TRUE(getNItem(firstBox, 3)->visible) << "First box element 3 should be visible";
+
+    // Change first box, first element min/max size to parent size.
+    getNItem(firstBox, 0)->setMinimumSize(testStyle::HBox_w, testStyle::HBox_h);
+    getNItem(firstBox, 0)->setMaximumSize(testStyle::HBox_w, testStyle::HBox_h);
+
+    // Box contents should not change as no automatic recalculate procedure has been called
+    ASSERT_EQ(firstBox->children.size(), 4) << "First box element size should be 4";
+    ASSERT_TRUE(getNItem(firstBox, 0)->visible) << "First box element 0 should be visible";
+    ASSERT_TRUE(getNItem(firstBox, 1)->visible) << "First box element 1 should be visible";
+    ASSERT_TRUE(getNItem(firstBox, 2)->visible) << "First box element 2 should be visible";
+    ASSERT_TRUE(getNItem(firstBox, 3)->visible) << "First box element 3 should be visible";
+
+    // Call content change method on firstBox
+    firstBox->informContentChanged();
+
+    // Box contents should have changed and only one element should be visible
+    ASSERT_EQ(firstBox->children.size(), 4) << "First box element size should be 4";
+    ASSERT_TRUE(getNItem(firstBox, 0)->visible) << "First box element 0 should be visible";
+    ASSERT_FALSE(getNItem(firstBox, 1)->visible) << "First box element 1 should not be visible";
+    ASSERT_FALSE(getNItem(firstBox, 2)->visible) << "First box element 2 should not be visible";
+    ASSERT_FALSE(getNItem(firstBox, 3)->visible) << "First box element 3 should not be visible";
+
+    delete thirdBox;
+}
