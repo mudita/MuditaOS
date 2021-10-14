@@ -21,8 +21,8 @@ void MmiInternalMsgWindow::onBeforeShow(ShowMode mode, SwitchData *data)
             mmi::MMIMessageVisitor customMMIvisitor;
             std::string displayMessage;
             metadata->getCustomData()->accept(customMMIvisitor, displayMessage);
-            text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-            text->setText(displayMessage);
+            icon->text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
+            icon->text->setText(displayMessage);
         }
         else {
             handleInternalMessages(metadata);
@@ -32,18 +32,19 @@ void MmiInternalMsgWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 
 void MmiInternalMsgWindow::handleInternalMessages(mmiactions::MMIResultParams *metadata)
 {
+    icon->text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+
     std::string displayMessage;
-    text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
     auto result = metadata->getData();
     switch (result) {
     case mmiactions::MMIResultParams::MMIResult::Success:
-        text->setText(displayMessage + utils::translate("app_desktop_info_mmi_result_success"));
+        icon->text->setText(displayMessage + utils::translate("app_desktop_info_mmi_result_success"));
         break;
     case mmiactions::MMIResultParams::MMIResult::Failed:
-        text->setText(displayMessage + utils::translate("app_desktop_info_mmi_result_failed"));
+        icon->text->setText(displayMessage + utils::translate("app_desktop_info_mmi_result_failed"));
         break;
     default:
-        text->clear();
+        icon->text->clear();
         break;
     }
 }
