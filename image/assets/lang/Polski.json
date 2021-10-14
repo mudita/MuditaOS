@@ -533,7 +533,7 @@
   "app_phonebook_uncheck": "ODZNACZ",
   "app_meditation_title_main": "Medytacja",
   "app_meditation_preparation_time": "Czas przygotowania",
-  "app_meditation_put_down_phone_and_wait": "<text>Odłóż telefon i zaczekaj na<br>gong.</text>",
+  "app_meditation_put_down_phone_and_wait": "<text>Odłóż telefon<br>i zaczekaj na gong.</text>",
   "app_meditation_thank_you_for_session": "<text>Dziękujemy za tę<br>sesję medytacyjną.</text>",
   "app_meditation_option_show_counter": "Pokaż licznik medytacji",
   "app_meditation_interval_chime": "Cykliczny dźwięk",

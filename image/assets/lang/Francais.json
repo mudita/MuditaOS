@@ -487,7 +487,7 @@
   "app_phonebook_uncheck": "DÉCOCHER",
   "app_meditation_title_main": "Minuterie de méditation",
   "app_meditation_preparation_time": "Temps de préparation",
-  "app_meditation_put_down_phone_and_wait": "<text>Posez le téléphone et attendez<br>le son du gong.</text>",
+  "app_meditation_put_down_phone_and_wait": "<text>Posez le téléphone<br>et attendez le son du gong.</text>",
   "app_meditation_thank_you_for_session": "<text>Merci pour cette<br>séance de méditation.</text>",
   "app_meditation_option_show_counter": "Afficher le compteur de méditation",
   "app_meditation_interval_chime": "Carillon d'intervalle",

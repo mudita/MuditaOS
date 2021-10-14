@@ -518,7 +518,7 @@
   "app_phonebook_uncheck": "DESMARCAR",
   "app_meditation_title_main": "Temporizador de meditación",
   "app_meditation_preparation_time": "Tiempo de preparación",
-  "app_meditation_put_down_phone_and_wait": "<text>Deja a un lado el teléfono y espera<br>a que suene el gong.</text>",
+  "app_meditation_put_down_phone_and_wait": "<text>Deja a un lado el teléfono<br>y espera a que suene el gong.</text>",
   "app_meditation_thank_you_for_session": "<text>Gracias por esta<br>sesión de meditación.</text>",
   "app_meditation_option_show_counter": "Mostrar temporizador de meditación",
   "app_meditation_interval_chime": "Campanilla de intervalo",
