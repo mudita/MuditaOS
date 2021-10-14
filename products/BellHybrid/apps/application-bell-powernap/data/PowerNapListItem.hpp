@@ -3,21 +3,22 @@
 
 #pragma once
 #include <apps-common/widgets/BellSideListItem.hpp>
+#include <apps-common/widgets/spinners/Spinners.hpp>
 
 namespace gui
 {
-    class Spinner;
     class Label;
 
     class PowerNapListItem : public BellSideListItem
     {
-        Spinner *spinner         = nullptr;
-        Label *bottomDescription = nullptr;
+        gui::UIntegerSpinner *spinner{};
+        Label *bottomDescription{};
 
         void createSpinner();
         void createBottomDescription();
         void registerCallbacks();
 
+        void onValueChanged(std::uint32_t currentValue);
       public:
         PowerNapListItem();
 

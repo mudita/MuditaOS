@@ -24,11 +24,10 @@ namespace gui
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        hour = new Spinner(hourMin, hourMax, hourStep, Boundaries::Continuous);
+        hour = new UIntegerSpinner(UIntegerSpinner::Range{hourMin, hourMax, hourStep}, Boundaries::Continuous);
         updateFont(hour, noFocusFontName);
 
         hour->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        hour->setFixedFieldWidth(noOfDigits);
         hour->setEdges(RectangleEdge::None);
         hour->setPenFocusWidth(style::time_set_spinner::focus::size);
         hour->setCurrentValue(0);
@@ -40,12 +39,12 @@ namespace gui
         colon->setEdges(RectangleEdge::None);
         colon->activeItem = false;
 
-        minute = new Spinner(minuteMin, minuteMax, minuteStep, Boundaries::Continuous);
+        minute = new UIntegerSpinnerFixed(UIntegerSpinnerFixed::Range{minuteMin, minuteMax, minuteStep},
+                                          Boundaries::Continuous);
         updateFont(minute, noFocusFontName);
         minute->setPenFocusWidth(style::time_set_spinner::focus::size);
 
         minute->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        minute->setFixedFieldWidth(noOfDigits);
         minute->setEdges(RectangleEdge::None);
         minute->setCurrentValue(0);
         addWidget(minute);
@@ -185,16 +184,6 @@ namespace gui
         return minute->getCurrentValue();
     }
 
-    auto TimeSetSpinner::setHourMax(std::uint32_t newMax) noexcept -> void
-    {
-        hour->setMaxValue(newMax);
-    }
-
-    auto TimeSetSpinner::setHourMin(std::uint32_t newMin) noexcept -> void
-    {
-        hour->setMinValue(newMin);
-    }
-
     void TimeSetSpinner::updateFocus(Item *newFocus)
     {
         if (focus) {
@@ -215,6 +204,10 @@ namespace gui
             updateFont(minute, noFocusFontName);
             setFocusItem(nullptr);
         }
+    }
+    auto TimeSetSpinner::setHourRange(std::uint32_t min, std::uint32_t max) -> void
+    {
+        hour->setRange(UIntegerSpinner::Range{min, max, hourStep});
     }
 
     auto TimeSetSpinner::getColonIconData(Size size) const noexcept -> ColonIconData
