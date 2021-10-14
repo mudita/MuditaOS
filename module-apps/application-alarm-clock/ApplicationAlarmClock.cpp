@@ -89,7 +89,7 @@ namespace app
                                       std::make_unique<alarmClock::CustomRepeatWindowPresenter>(alarmsProvider);
                                   return std::make_unique<alarmClock::CustomRepeatWindow>(app, std::move(presenter));
                               });
-        windowsFactory.attach(utils::translate("app_alarm_clock_options_title"),
+        windowsFactory.attach(utils::translate("common_options_title"),
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::OptionWindow>(app, name);
                               });

@@ -16,7 +16,7 @@ namespace gui
     QuotesOptionsWindow::QuotesOptionsWindow(app::ApplicationCommon *app)
         : BaseSettingsWindow(app, gui::window::name::quotes), quotesModel(std::make_shared<Quotes::QuotesModel>(app))
     {
-        setTitle(utils::translate("app_settings_display_wallpaper_quotes_options"));
+        setTitle(utils::translate("common_options_title"));
     }
 
     auto QuotesOptionsWindow::buildOptionsList() -> std::list<gui::Option>

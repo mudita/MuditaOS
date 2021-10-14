@@ -122,7 +122,7 @@ namespace app
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::DialogYesNo>(app, name);
                               });
-        windowsFactory.attach(utils::translate("app_phonebook_options_title"),
+        windowsFactory.attach(utils::translate("common_options_title"),
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::OptionWindow>(app, name);
                               });

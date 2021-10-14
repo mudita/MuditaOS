@@ -27,7 +27,7 @@ namespace
 MeditationOptionsWindow::MeditationOptionsWindow(app::ApplicationCommon *app)
     : OptionWindow(app, app::window::name::meditation_options)
 {
-    setTitle(utils::translate("common_options"));
+    setTitle(utils::translate("common_options_title"));
     bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
     addOptions(buildOptionsList());
 }
