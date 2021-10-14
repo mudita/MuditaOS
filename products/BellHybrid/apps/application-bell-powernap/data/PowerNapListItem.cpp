@@ -2,9 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapListItem.hpp"
-#include <Utils.hpp>
 #include <i18n/i18n.hpp>
-#include <gui/widgets/Spinner.hpp>
 #include "data/PowerNapStyle.hpp"
 
 namespace
@@ -36,20 +34,15 @@ namespace gui
 
     void PowerNapListItem::createSpinner()
     {
-        auto onUpdate = [this](int currentValue) {
-            const auto isMin = currentValue == spinnerMin;
-            const auto isMax = currentValue == spinnerMax;
-            body->setArrowVisible(BellBaseLayout::Arrow::Left, not isMin);
-            body->setArrowVisible(BellBaseLayout::Arrow::Right, not isMax);
-        };
-
-        spinner = new Spinner(spinnerMin, spinnerMax, spinnerStep, Boundaries::Fixed, std::move(onUpdate));
+        spinner = new UIntegerSpinner(UIntegerSpinner ::Range{spinnerMin, spinnerMax, spinnerStep}, Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(powerNapStyle::napPeriodFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setEdges(RectangleEdge::None);
         spinner->setFocusEdges(RectangleEdge::None);
         body->getCenterBox()->addWidget(spinner);
+
+        spinner->onValueChanged = [this](const auto val) { this->onValueChanged(val); };
     }
 
     void PowerNapListItem::createBottomDescription()
@@ -95,6 +88,15 @@ namespace gui
     {
         spinner->setCurrentValue(value);
         setBottomDescribtionText(getTimeUnitName(spinner->getCurrentValue()));
+        onValueChanged(value);
+    }
+
+    void PowerNapListItem::onValueChanged(const std::uint32_t currentValue)
+    {
+        const auto isMin = currentValue == spinnerMin;
+        const auto isMax = currentValue == spinnerMax;
+        body->setArrowVisible(BellBaseLayout::Arrow::Left, not isMin);
+        body->setArrowVisible(BellBaseLayout::Arrow::Right, not isMax);
     }
 
 } // namespace gui
