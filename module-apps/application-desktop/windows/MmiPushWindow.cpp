@@ -33,22 +33,22 @@ MmiPushWindow::MmiPushWindow(app::ApplicationCommon *app, const std::string &nam
 {
     AppWindow::buildInterface();
     bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
-    icon = new Image(this, style::desktop::image::x, style::desktop::image::y, "");
-    icon->set("info_big_circle_W_G");
-    text = new Text(
-        this, style::desktop::text::x, style::desktop::text::y, style::desktop::text::w, style::desktop::text::h);
-    text->setTextType(TextType::MultiLine);
-    text->setEditMode(EditMode::Browse);
-    text->setEdges(RectangleEdge::None);
-    text->setFont(style::window::font::medium);
-    text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+    icon = new Icon(this,
+                    style::window::default_left_margin,
+                    style::window::default_vertical_pos,
+                    style::window::default_body_width,
+                    style::window::default_body_height,
+                    "info_big_circle_W_G",
+                    "");
+    icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+    icon->image->setMargins(Margins(0, icon::image_top_margin, 0, icon::image_bottom_margin));
     setTitle(utils::translate("app_desktop_info"));
 }
 
 void MmiPushWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     if (auto metadata = dynamic_cast<app::manager::actions::MMIParams *>(data); metadata != nullptr) {
-        text->setText(mmi::removePhrase(metadata->getData(), "\r"));
+        icon->text->setText(mmi::removePhrase(metadata->getData(), "\r"));
     }
 }
 
