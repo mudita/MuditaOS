@@ -523,7 +523,7 @@
   "app_phonebook_uncheck": "UNCHECK",
   "app_meditation_title_main": "Meditation timer",
   "app_meditation_preparation_time": "Preparation time",
-  "app_meditation_put_down_phone_and_wait": "<text>Put down the phone and wait for<br>the gong.</text>",
+  "app_meditation_put_down_phone_and_wait": "<text>Put down the phone<br>and wait for the gong.</text>",
   "app_meditation_thank_you_for_session": "<text>Thank you for this<br>meditation session.</text>",
   "app_meditation_option_show_counter": "Show meditation counter",
   "app_meditation_interval_chime": "Interval chime",
