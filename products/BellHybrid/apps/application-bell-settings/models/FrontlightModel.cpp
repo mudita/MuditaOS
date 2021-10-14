@@ -6,7 +6,6 @@
 
 #include <gui/widgets/ListViewEngine.hpp>
 #include <gui/widgets/Style.hpp>
-#include <gui/widgets/Text.hpp>
 #include <service-time/Constants.hpp>
 #include <widgets/BellBaseLayout.hpp>
 #include <service-db/Settings.hpp>
@@ -32,7 +31,7 @@ namespace app::bell_settings
     FrontlightModel::~FrontlightModel()
     {}
 
-    auto FrontlightModel::getSpinner() -> gui::Spinner *
+    auto FrontlightModel::getSpinner() -> gui::UIntegerSpinner *
     {
         if (frontlightSetSpinner != nullptr) {
             return frontlightSetSpinner;
@@ -45,16 +44,15 @@ namespace app::bell_settings
 
     void FrontlightModel::createData()
     {
-        frontlightSetSpinner = new gui::Spinner(fmtSpinnerMin, fmtSpinnerMax, fmtSpinnerStep, gui::Boundaries::Fixed);
+        frontlightSetSpinner = new gui::UIntegerSpinner(
+            gui::UIntegerSpinner::Range{fmtSpinnerMin, fmtSpinnerMax, fmtSpinnerStep}, gui::Boundaries::Fixed);
         frontlightSetSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         frontlightSetSpinner->setFont(gui::bell_settings_style::time_fmt_set_list_item::font);
 
         frontlightSetSpinner->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        frontlightSetSpinner->setFixedFieldWidth(2);
         frontlightSetSpinner->setEdges(gui::RectangleEdge::None);
         frontlightSetSpinner->setCurrentValue(fmtSpinnerMin);
-        frontlightSetSpinner->setFixedFieldWidth(0);
         frontlightSetSpinner->setFocusEdges(gui::RectangleEdge::None);
     }
 
