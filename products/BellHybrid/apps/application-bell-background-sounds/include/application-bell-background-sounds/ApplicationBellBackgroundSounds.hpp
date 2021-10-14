@@ -27,7 +27,8 @@ namespace app
         ApplicationBellBackgroundSounds(std::string name                    = applicationBellBackgroundSoundsName,
                                         std::string parent                  = "",
                                         StatusIndicators statusIndicators   = StatusIndicators{},
-                                        StartInBackground startInBackground = {false});
+                                        StartInBackground startInBackground = {false},
+                                        uint32_t stackDepth                 = 4096 * 2);
         ~ApplicationBellBackgroundSounds();
         sys::ReturnCodes InitHandler() override;
 
