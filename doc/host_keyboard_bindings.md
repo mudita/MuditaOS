@@ -54,12 +54,12 @@
  - Charging Downstream Port (CDP) - key [ `;` ]
  - Dedicated Charging Port  (DCP) - key [ `'` ]
 
-## Keyboard binding on Linux Bell simulator
+## Keyboard binding on Linux Harmony simulator
 
-- Back            - key [ `E` ]
-- Deep Press Up   - key [ `W` ]
-- Deep Press Down - key [ `X` ]
-- Rotate left     - key [ `A` ]
-- Rotate right    - key [ `D` ]
-- Light Click     - key [ `S` ]
-- Frontlight      - key [ `T` ]
+ - Back            - key [ `E` ]
+ - Deep Press Up   - key [ `A` ]
+ - Deep Press Down - key [ `D` ]
+ - Rotate left     - key [ `W` ]
+ - Rotate right    - key [ `X` ]
+ - Light Click     - key [ `S` ]
+ - Frontlight      - key [ `Q` ]

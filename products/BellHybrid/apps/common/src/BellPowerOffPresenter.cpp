@@ -15,7 +15,6 @@ namespace gui
 
     void BellPowerOffPresenter::powerOff()
     {
-        application->switchWindow(BellWelcomeWindow::defaultName);
         auto msg = std::make_shared<app::UserPowerDownRequest>();
         application->bus.sendUnicast(std::move(msg), service::name::system_manager);
     }

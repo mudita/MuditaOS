@@ -13,6 +13,7 @@
 #include <apps-common/messages/AppMessage.hpp>
 #include <common/models/AlarmModel.hpp>
 #include <common/models/TimeModel.hpp>
+#include <common/windows/BellWelcomeWindow.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
 #include <service-audio/AudioMessage.hpp>
@@ -30,6 +31,12 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
+            return actionHandled();
+        });
+
+        addActionReceiver(app::manager::actions::DisplayLogoAtExit, [this](auto &&data) {
+            setSystemCloseInProgress();
+            switchWindow(gui::BellWelcomeWindow::defaultName);
             return actionHandled();
         });
     }
@@ -92,6 +99,7 @@ namespace app
             }
             return sys::msgHandled();
         }
+
         return handleAsyncResponse(resp);
     }
 
