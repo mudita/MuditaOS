@@ -3,6 +3,8 @@
 
 #include <service-fileindexer/InotifyHandler.hpp>
 
+#include "Common.hpp"
+
 #include <filesystem>
 #include <log/log.hpp>
 #include <module-db/queries/multimedia_files/QueryMultimediaFilesAdd.hpp>
@@ -145,6 +147,12 @@ namespace service::detail
             return;
         }
 
+        auto ext = fs::path(path).extension();
+        if (!isExtSupported(ext)) {
+            LOG_WARN("Not supported ext - %s", ext.c_str());
+            return;
+        }
+
         auto record = CreateMultimediaFilesRecord(path);
         if (record.has_value()) {
             auto query = std::make_unique<db::multimedia_files::query::Add>(record.value());
@@ -161,6 +169,12 @@ namespace service::detail
         LOG_DEBUG("onRemove path: %s", std::string(path).c_str());
         if (svc == nullptr) {
             LOG_ERROR("svc is nullptr");
+            return;
+        }
+
+        auto ext = fs::path(path).extension();
+        if (!isExtSupported(ext)) {
+            LOG_WARN("Not supported ext - %s", ext.c_str());
             return;
         }
 

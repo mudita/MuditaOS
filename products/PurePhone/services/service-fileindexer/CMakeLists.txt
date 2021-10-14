@@ -2,9 +2,10 @@ add_library( service-fileindexer STATIC )
 
 target_sources( service-fileindexer
 	PRIVATE
+        Common.hpp
+        InotifyHandler.cpp
         ServiceFileIndexer.cpp
         StartupIndexer.cpp
-        InotifyHandler.cpp
     PUBLIC
         include/service-fileindexer/Constants.hpp
         include/service-fileindexer/InotifyHandler.hpp
