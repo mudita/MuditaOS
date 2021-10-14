@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Rect.hpp"
-#include <gui/widgets/Spinner.hpp>
+#include "spinners/Spinners.hpp"
 #include <gui/widgets/Style.hpp>
 #include <gui/widgets/TextConstants.hpp>
 
@@ -56,20 +56,19 @@ namespace gui
         auto setFont(std::string newFocusFontName, std::string newNoFocusFontName) noexcept -> void;
         auto updateFont(TextFixedSize *elem, const std::string &fontName) noexcept -> void;
         auto setEditMode(EditMode editMode) noexcept -> void;
-        auto setHourMax(std::uint32_t newMax) noexcept -> void;
-        auto setHourMin(std::uint32_t newMin) noexcept -> void;
+        auto setHourRange(std::uint32_t min, std::uint32_t max) -> void;
         [[nodiscard]] auto getHour() const noexcept -> int;
         [[nodiscard]] auto getMinute() const noexcept -> int;
 
       private:
-        Spinner *hour   = nullptr;
-        ImageBox *colon = nullptr;
+        UIntegerSpinner *hour = nullptr;
+        ImageBox *colon       = nullptr;
         const ColonIconData colonIconData{};
-        Spinner *minute             = nullptr;
-        EditMode editMode           = EditMode::Edit;
-        Item *lastFocus             = nullptr;
-        std::string focusFontName   = style::window::font::supersizeme;
-        std::string noFocusFontName = style::window::font::supersizemelight;
+        UIntegerSpinnerFixed *minute = nullptr;
+        EditMode editMode            = EditMode::Edit;
+        Item *lastFocus              = nullptr;
+        std::string focusFontName    = style::window::font::supersizeme;
+        std::string noFocusFontName  = style::window::font::supersizemelight;
 
         void updateFocus(Item *newFocus);
         auto handleEnterKey() -> bool;
