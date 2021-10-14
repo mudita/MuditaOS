@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <iomanip>
 #include <utf8/UTF8.hpp>
 
 namespace gui
@@ -95,16 +96,42 @@ namespace gui
         const Boundaries boundaries{};
     };
 
-    template <typename ValType> class NumericPolicy
+    template <typename ValType> class DefaultNumericFormatter
     {
       public:
-        using Range = struct
+        std::string operator()(const ValType val) const
+        {
+            return std::to_string(val);
+        }
+    };
+
+    template <typename ValType, int Width> class FixedSizeFormatter
+    {
+      public:
+        std::string operator()(const ValType val) const
+        {
+            std::stringstream outStream;
+            outStream << std::setw(Width) << std::setfill('0') << val;
+            return outStream.str();
+        }
+    };
+
+    template <typename ValType, typename Formatter = DefaultNumericFormatter<ValType>> class NumericPolicy
+    {
+        struct RangeImpl
         {
             ValType min;
             ValType max;
             ValType step;
+            bool operator!=(const RangeImpl &oth) const
+            {
+                return min != oth.min || max != oth.max || step != oth.step;
+            }
         };
-        using Type = ValType;
+
+      public:
+        using Range = RangeImpl;
+        using Type  = ValType;
 
         NumericPolicy(Range range, Boundaries boundaries) : range{range}, boundaries{boundaries}
         {}
@@ -116,7 +143,7 @@ namespace gui
 
         UTF8 str() const
         {
-            return std::to_string(currentValue);
+            return Formatter{}(currentValue);
         }
 
         void set(ValType val)

@@ -5,7 +5,7 @@
 
 #include <apps-common/InternalModel.hpp>
 #include <ApplicationBellSettings.hpp>
-#include <widgets/Spinner.hpp>
+#include <widgets/spinners/Spinners.hpp>
 #include <service-db/Settings.hpp>
 
 class ApplicationCommon;
@@ -23,13 +23,13 @@ namespace app::bell_settings
         auto loadData() -> void;
         auto createData() -> void;
 
-        [[nodiscard]] auto getSpinner() -> gui::Spinner *;
+        [[nodiscard]] auto getSpinner() -> gui::UIntegerSpinner *;
         auto setLiveBrightness(const int value) -> void;
 
       private:
-        app::ApplicationCommon *application                                  = nullptr;
-        app::settingsInterface::BellScreenLightSettings *screenLightSettings = nullptr;
-        gui::Spinner *frontlightSetSpinner                                   = nullptr;
+        app::ApplicationCommon *application{};
+        app::settingsInterface::BellScreenLightSettings *screenLightSettings{};
+        gui::UIntegerSpinner *frontlightSetSpinner{};
         mutable settings::Settings settings;
     };
 } // namespace app::bell_settings
