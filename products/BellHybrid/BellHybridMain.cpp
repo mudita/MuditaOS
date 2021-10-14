@@ -20,11 +20,11 @@
 #include <appmgr/ApplicationManager.hpp>
 #include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
-#include <module-services/service-eink/ServiceEink.hpp>
 #include <Service/ServiceCreator.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
+#include <service-eink/ServiceEink.hpp>
 #include <service-gui/ServiceGUI.hpp>
 #include <service-time/ServiceTime.hpp>
 
@@ -70,7 +70,7 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
-    systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
+    systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>(service::eink::ExitAction::None));
     systemServices.emplace_back(sys::CreatorFor<service::gui::ServiceGUI>());
 
     auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));

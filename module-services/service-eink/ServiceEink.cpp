@@ -28,8 +28,8 @@ namespace service::eink
         constexpr std::chrono::milliseconds displayPowerOffTimeout{3800};
     } // namespace
 
-    ServiceEink::ServiceEink(const std::string &name, std::string parent)
-        : sys::Service(name, std::move(parent), ServceEinkStackDepth),
+    ServiceEink::ServiceEink(ExitAction exitAction, const std::string &name, std::string parent)
+        : sys::Service(name, std::move(parent), ServceEinkStackDepth), exitAction{exitAction},
           display{{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}}, currentState{State::Running}
     {
         displayPowerOffTimer = sys::TimerFactory::createSingleShotTimer(
@@ -75,7 +75,9 @@ namespace service::eink
 
     sys::ReturnCodes ServiceEink::DeinitHandler()
     {
-        display.wipeOut();
+        if (exitAction == ExitAction::WipeOut) {
+            display.wipeOut();
+        }
         display.shutdown();
         return sys::ReturnCodes::Success;
     }
