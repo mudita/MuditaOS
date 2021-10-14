@@ -33,6 +33,7 @@
 
 #include <cassert>
 #include <ctime>
+#include <utility>
 
 namespace app
 {
@@ -42,8 +43,8 @@ namespace app
                                              std::string parent,
                                              StatusIndicators statusIndicators,
                                              StartInBackground startInBackground)
-        : Application(name, parent, statusIndicators, startInBackground, messagesStackDepth), AsyncCallbackReceiver{
-                                                                                                  this}
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, messagesStackDepth),
+          AsyncCallbackReceiver{this}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
@@ -125,7 +126,7 @@ namespace app
         windowsFactory.attach(gui::name::window::new_sms, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::NewMessageWindow>(app);
         });
-        windowsFactory.attach(utils::translate("app_phonebook_options_title"),
+        windowsFactory.attach(utils::translate("common_options_title"),
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::OptionWindow>(app, name);
                               });
@@ -305,7 +306,7 @@ namespace app
         gui::DialogMetadata meta;
         meta.icon                              = "info_big_circle_W_G";
         meta.text                              = notification;
-        meta.action                            = action;
+        meta.action                            = std::move(action);
         auto switchData                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         switchData->ignoreCurrentWindowOnStack = ignoreCurrentWindowOnStack;
         switchWindow(gui::name::window::dialog_confirm, std::move(switchData));
@@ -352,7 +353,7 @@ namespace app
 
     bool ApplicationMessages::sendSms(const utils::PhoneNumber::View &number, const UTF8 &body)
     {
-        if (number.getEntered().size() == 0 || body.length() == 0) {
+        if (number.getEntered().empty() || body.length() == 0) {
             LOG_WARN("Number or sms body is empty");
             return false;
         }
@@ -383,18 +384,14 @@ namespace app
 
     bool ApplicationMessages::handleSendSmsFromThread(const utils::PhoneNumber::View &number, const UTF8 &body)
     {
-        if (!sendSms(number, body)) {
-            return false;
-        }
-
-        return true;
+        return sendSms(number, body);
     }
 
     bool ApplicationMessages::newMessageOptions(const std::string &requestingWindow, gui::Text *text)
     {
         LOG_INFO("New message options for %s", requestingWindow.c_str());
         auto opts = std::make_unique<gui::OptionsWindowOptions>(newMessageWindowOptions(this, requestingWindow, text));
-        switchWindow(utils::translate("app_phonebook_options_title"), std::move(opts));
+        switchWindow(utils::translate("common_options_title"), std::move(opts));
         return true;
     }
 

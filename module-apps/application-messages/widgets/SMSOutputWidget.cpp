@@ -87,7 +87,7 @@ namespace gui
                 LOG_INFO("Message activated!");
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                app->switchWindow(utils::translate("app_phonebook_options_title"),
+                app->switchWindow(utils::translate("common_options_title"),
                                   std::make_unique<gui::OptionsWindowOptions>(smsWindowOptions(app, *record)));
                 return true;
             }

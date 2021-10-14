@@ -53,7 +53,7 @@ namespace app::alarmClock
         };
         item->inputCallback = [this, record = record.get()](gui::Item &, const gui::InputEvent &event) {
             if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
-                application->switchWindow(utils::translate("app_alarm_clock_options_title"),
+                application->switchWindow(utils::translate("common_options_title"),
                                           std::make_unique<gui::OptionsWindowOptions>(
                                               alarmsListOptions(application, *record, *alarmsRepository)));
             }
