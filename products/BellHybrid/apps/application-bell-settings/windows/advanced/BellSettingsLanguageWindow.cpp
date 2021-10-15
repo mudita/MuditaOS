@@ -53,8 +53,8 @@ namespace gui
         if (spinner->onInput(inputEvent)) {
             auto selectedLanguage = spinner->getCurrentValue();
 
-            body->setMinMaxArrowsVisibility(selectedLanguage == presenter->getLanguages().back(),
-                                            selectedLanguage == presenter->getLanguages().front());
+            body->setMinMaxArrowsVisibility(selectedLanguage == presenter->getLanguages().front(),
+                                            selectedLanguage == presenter->getLanguages().back());
             return true;
         }
         else if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {

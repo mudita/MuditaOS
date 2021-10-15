@@ -21,6 +21,7 @@ namespace gui
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
+        void onClose(CloseReason reason) override;
         void rebuild() override;
         void exit() override;
 

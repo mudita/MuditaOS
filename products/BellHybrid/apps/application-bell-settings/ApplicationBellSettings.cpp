@@ -2,9 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellSettings.hpp"
-#include "FrontlightPresenter.hpp"
 #include "presenter/TimeUnitsPresenter.hpp"
-#include "models/FrontlightModel.hpp"
 #include "models/TemperatureUnitModel.hpp"
 #include "models/advanced/AboutYourBellModel.hpp"
 #include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
@@ -17,16 +15,17 @@
 #include "presenter/BedtimeSettingsPresenter.hpp"
 #include "presenter/advanced/AboutYourBellWindowPresenter.hpp"
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
+#include "presenter/advanced/FrontlightPresenter.hpp"
 #include "windows/advanced/AboutYourBellWindow.hpp"
 #include "windows/advanced/BellSettingsAdvancedWindow.hpp"
 #include "windows/advanced/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/advanced/BellSettingsLanguageWindow.hpp"
+#include "windows/advanced/BellSettingsFrontlightWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
 #include "windows/alarm_settings/BellSettingsPrewakeUpWindow.hpp"
 #include "windows/BellSettingsBedtimeToneWindow.hpp"
-#include "windows/BellSettingsFrontlight.hpp"
 #include "windows/BellSettingsHomeViewWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
 #include "widgets/DialogYesNo.hpp"
@@ -38,9 +37,7 @@
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/models/AudioModel.hpp>
-#include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
-#include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 
 namespace app
@@ -105,10 +102,11 @@ namespace app
             });
 
         windowsFactory.attach(
-            gui::window::name::bellSettingsFrontlight, [](ApplicationCommon *app, const std::string &name) {
-                auto model =
-                    std::make_shared<bell_settings::FrontlightModel>(app, static_cast<ApplicationBellSettings *>(app));
-                auto presenter = std::make_unique<bell_settings::FrontlightWindowPresenter>(std::move(model));
+            gui::BellSettingsFrontlightWindow::name, [](ApplicationCommon *app, const std::string &name) {
+                auto model    = std::make_unique<bell_settings::FrontlightModel>(app);
+                auto provider = std::make_shared<bell_settings::FrontlightListItemProvider>(*model);
+                auto presenter =
+                    std::make_unique<bell_settings::FrontlightPresenter>(std::move(provider), std::move(model));
                 return std::make_unique<gui::BellSettingsFrontlightWindow>(app, std::move(presenter));
             });
 
@@ -241,27 +239,5 @@ namespace app
             return sys::msgHandled();
         }
         return handleAsyncResponse(resp);
-    }
-
-    void ApplicationBellSettings::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
-    {
-        screen_light_control::ManualModeParameters parameters{value};
-        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetManualModeParams>(parameters), service::name::evt_manager);
-    }
-
-    void ApplicationBellSettings::setMode(bool isAutoLightSwitchOn)
-    {
-        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
-                            isAutoLightSwitchOn ? screen_light_control::Action::enableAutomaticMode
-                                                : screen_light_control::Action::disableAutomaticMode),
-                        service::name::evt_manager);
-    }
-
-    void ApplicationBellSettings::setStatus(bool isDisplayLightSwitchOn)
-    {
-        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(isDisplayLightSwitchOn
-                                                                              ? screen_light_control::Action::turnOn
-                                                                              : screen_light_control::Action::turnOff),
-                        service::name::evt_manager);
     }
 } // namespace app

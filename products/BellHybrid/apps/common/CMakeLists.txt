@@ -15,6 +15,7 @@ target_sources(application-bell-common
         src/AudioModel.cpp
         src/TimeModel.cpp
         src/SoundsRepository.cpp
+        src/BellListItemProvider.cpp
         src/windows/BellFinishedWindow.cpp
         src/windows/BellFinishedCallbackWindow.cpp
         src/windows/BellTurnOffWindow.cpp
@@ -38,6 +39,7 @@ target_sources(application-bell-common
         src/options/BellShortOptionWindow.cpp
         src/options/OptionBellMenu.cpp
     PUBLIC
+        include/common/BellListItemProvider.hpp
         include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp
         include/common/windows/BellFinishedWindow.hpp
