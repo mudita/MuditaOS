@@ -43,6 +43,7 @@ namespace bell::screen_light_control
             break;
         case Action::disableAutomaticMode:
             disableAutomaticMode();
+            setManualBrightnessLevel(brightnessValue);
             break;
         case Action::setManualModeBrightness:
             if (params.hasManualModeParams()) {
@@ -162,7 +163,6 @@ namespace bell::screen_light_control
         disableTimers();
         automaticMode = ScreenLightMode::Manual;
         automaticModeFunctions.clear();
-        setManualBrightnessLevel(brightnessValue);
     }
 
     void ScreenLightController::turnOn(const std::optional<ManualModeParameters> &params)
@@ -191,5 +191,7 @@ namespace bell::screen_light_control
         bsp::eink_frontlight::turnOff();
         disableAutomaticMode();
         lightOn = false;
+
+        setManualBrightnessLevel(brightnessValue);
     }
 } // namespace screen_light_control
