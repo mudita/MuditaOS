@@ -11,11 +11,12 @@ namespace bell::settings
     } // namespace Temperature
     namespace Snooze
     {
-        constexpr inline auto active   = "snooze_active";
-        constexpr inline auto length   = "snooze_length";
-        constexpr inline auto interval = "snooze_interval";
-        constexpr inline auto tone     = "snooze_tone";
-        constexpr inline auto volume   = "snooze_volume";
+        constexpr inline auto active        = "snooze_active";
+        constexpr inline auto length        = "snooze_length";
+        constexpr inline auto interval      = "snooze_interval";
+        constexpr inline auto tone          = "snooze_tone";
+        constexpr inline auto tone_duration = "snooze_tone_duration";
+        constexpr inline auto volume        = "snooze_volume";
     } // namespace Snooze
     namespace PrewakeUp
     {

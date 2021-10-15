@@ -74,7 +74,7 @@ namespace alarms
             return std::make_unique<PlayAudioAction>(service,
                                                      paths::getSnoozeChimesDir(),
                                                      bell::settings::Snooze::tone,
-                                                     bell::settings::Snooze::length,
+                                                     bell::settings::Snooze::tone_duration,
                                                      audio::PlaybackType::Multimedia);
         }
         std::unique_ptr<PlayAudioAction> createAlarmToneAction(sys::Service &service)

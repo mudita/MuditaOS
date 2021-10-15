@@ -36,6 +36,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('snooze_interval','1'),
     ('snooze_tone','Gentle Chime'),
     ('snooze_volume','5'),
+    ('snooze_tone_duration','300'),
     ('prewake_up_duration', '10'),
     ('prewake_up_tone','Joyful Awakening'),
     ('prewake_up_volume','5'),
