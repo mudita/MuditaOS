@@ -90,6 +90,7 @@ namespace app
         request->execute(app, this, responseCallback);
 
         cachedRecord = alarm.getNextSingleEvent(TimePointNow());
+        snoozeCount  = 0;
     }
     void AlarmModel::disableSnooze(AlarmEventRecord &alarm)
     {
