@@ -34,6 +34,7 @@ static constexpr auto defaultVolumeLow               = "5";
 static constexpr auto defaultVolumeMuted             = "0";
 static constexpr auto defaultTrue                    = "1";
 static constexpr auto defaultFalse                   = "0";
+static constexpr auto defaultVibrationLevel          = "5";
 static constexpr auto defaultCallRingtonePath        = "assets/audio/ringtone/ringtone_drum_2.mp3";
 static constexpr auto defaultTextMessageRingtonePath = "assets/audio/sms/sms_drum_2.mp3";
 static constexpr auto defaultNotificationsPath       = "assets/audio/alarm/alarm_hang_drum.mp3";
@@ -90,7 +91,7 @@ static constexpr std::initializer_list<std::pair<audio::DbPathElement, const cha
     {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle}, defaultFalse},
     {DbPathElement{Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle}, defaultTrue},
 
-    {DbPathElement{Setting::VibrationLevel, PlaybackType::System, Profile::Type::Idle}, "5"},
+    {DbPathElement{Setting::VibrationLevel, PlaybackType::System, Profile::Type::Idle}, defaultVibrationLevel},
 
     {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle}, defaultTrue},
     {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle}, defaultTrue},

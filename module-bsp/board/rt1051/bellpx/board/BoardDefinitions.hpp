@@ -107,8 +107,9 @@ enum class BoardDefinitions
 
     AUDIO_PLL = static_cast<int>(drivers::PLLInstances::PLL4_Audio),
 
-    VIBRATOR_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
-    VIBRATOR_EN   = 0, // GPIO_AD_B0_00
+    VIBRATOR_PWM_INSTANCE = 2, // GPIO_AD_B0_00 = FLEXPWM2_PWM3_A
+    VIBRATOR_PWM_MODULE   = 3,
+    VIBRATOR_PWM_CHANNEL  = 0, // A
 
     MAGNETOMETER_I2C          = AUDIOCODEC_I2C,
     MAGNETOMETER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,

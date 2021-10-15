@@ -16,35 +16,22 @@ namespace sys
 
 namespace EventManagerServiceAPI
 {
-    /*
-     * @brief Gets board version.
-     * @return board type
-     */
+    /// Gets board version
     bsp::Board GetBoard(sys::Service *serv);
 
-    /*
-     * @brief Call single vibra pulse
-     */
+    /// Call single vibrator pulse
     void vibrationPulseOnce(sys::Service *serv);
 
-    /*
-     * @brief Call vibra to stop
-     */
+    /// Call vibrator to stop
     void vibrationStop(sys::Service *serv);
 
-    /*
-     * @brief Call repetitive vibra pulses for given time [ms]
-     */
+    /// Call repetitive vibrator pulses for given time [ms]
     void vibrationPulseRepeat(sys::Service *serv, std::chrono::milliseconds time);
 
-    /*
-     * @brief Call repetitive vibra pulses until stop message is sent
-     */
+    /// Call repetitive vibrator pulses until stop message is sent
     void vibrationPulseRepeatUntilStop(sys::Service *serv);
 
-    /*
-     * @brief Set vibration level
-     */
+    /// Set vibrator level
     void setVibrationLevel(sys::Service *serv, unsigned int vibrationLevel);
 
 } // namespace EventManagerServiceAPI

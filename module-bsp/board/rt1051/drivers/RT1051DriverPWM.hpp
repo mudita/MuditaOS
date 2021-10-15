@@ -5,11 +5,13 @@
 
 #include "drivers/pwm/DriverPWM.hpp"
 
-#include "../fsl_drivers/fsl_common.h"
-#include "../fsl_drivers/fsl_pwm.h"
+#include "fsl_common.h"
+#include "fsl_pwm.h"
 
-#include "mutex.hpp"
+#include <mutex.hpp>
 
+#include <vector>
+#include <map>
 namespace drivers
 {
     class RT1051DriverPWM : public DriverPWM
@@ -19,11 +21,13 @@ namespace drivers
 
         ~RT1051DriverPWM() final;
 
-        void SetDutyCycle(std::uint8_t dutyCyclePercent) final;
+        void InitNextChannel(const DriverPWMParams &params) final;
 
-        void Start() final;
+        void SetDutyCycle(std::uint8_t dutyCyclePercent, PWMChannel channel) final;
 
-        void Stop() final;
+        void Start(PWMChannel channel) final;
+
+        void Stop(PWMChannel channel) final;
 
         void UpdateClockFrequency(std::uint32_t newFrequency) final;
 
@@ -38,25 +42,39 @@ namespace drivers
 
         void SetupPWMChannel(PWMChannel channel);
 
-        void SetupPWMInstance(std::uint32_t clockFrequency);
+        void SetupPWMInstance(pwm_signal_param_t *config, unsigned numOfChannels, std::uint32_t clockFrequency);
 
-        void ForceLowOutput();
+        void ForceLowOutput(PWMChannel channel);
 
-        void RestorePwmOutput();
+        void RestorePwmOutput(PWMChannel channel);
+
+        pwm_channels_t getChannelMask(PWMChannel channel);
+
+        bool channelNotEnabled(PWMChannel channel);
+
+        bool otherChannelRunning(PWMChannel channel);
+
+        void stopAll();
+
+        void startAll();
+
+        void restoreDutyCycle();
 
         PWM_Type *base = nullptr;
 
         pwm_submodule_t pwmModule = kPWM_Module_0;
 
-        pwm_signal_param_t pwmSignalConfig = {.pwmChannel       = kPWM_PwmB,
-                                              .dutyCyclePercent = 0,
-                                              .level            = kPWM_HighTrue,
-                                              .deadtimeValue    = 0,
-                                              .faultState       = kPWM_PwmFaultState0};
-
         std::uint8_t lastDutyCycle = 0;
 
+        std::array<pwm_signal_param_t, 2> pwmSignalsConfig;
+
+        std::vector<PWMChannel> enabledChannels;
+        std::map<PWMChannel, PwmState> pwmChannelState = {
+            {PWMChannel::A, PwmState::Off}, {PWMChannel::B, PwmState::Off}, {PWMChannel::X, PwmState::Off}};
+
         cpp_freertos::MutexStandard frequencyChangeMutex;
+
+        std::uint32_t clockFrequency = 0;
     };
 
 } // namespace drivers
