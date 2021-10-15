@@ -1,6 +1,3 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
 /*
  * The Clear BSD License
  * Copyright 2017-2018 NXP

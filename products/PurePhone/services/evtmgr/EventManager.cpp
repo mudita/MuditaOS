@@ -16,8 +16,6 @@
 #include <sys/SystemManager.hpp>
 #include <sys/messages/PhoneModeRequest.hpp>
 
-#include "log/log.hpp"
-
 namespace
 {
     constexpr std::array sliderKeyCodes = {
@@ -70,13 +68,13 @@ void EventManager::initProductEvents()
         return msg;
     });
 
-    connect(sevm::VibratorMessage(bsp::vibrator::Action::stop), [&](sys::Message *msgl) {
+    connect(typeid(sevm::VibratorMessage), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::VibratorMessage *>(msgl);
         processVibratorRequest(request->action, request->repetitionTime);
         return sys::msgHandled();
     });
 
-    connect(sevm::VibratorLevelMessage(0), [&](sys::Message *msgl) {
+    connect(typeid(sevm::VibratorLevelMessage), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::VibratorLevelMessage *>(msgl);
         processVibratorLevel(request->vibrationLevel);
         return sys::msgHandled();
@@ -215,6 +213,5 @@ void EventManager::processVibratorRequest(bsp::vibrator::Action act, std::chrono
 
 void EventManager::processVibratorLevel(unsigned int vibrationLevel)
 {
-    LOG_ERROR("Odbieram poziom vibracji %d", vibrationLevel);
     vibrator->SetVibrationLevel(vibrationLevel);
 }
