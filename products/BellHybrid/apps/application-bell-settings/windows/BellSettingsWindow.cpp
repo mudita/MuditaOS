@@ -42,7 +42,6 @@ namespace gui
                 this));
         };
 
-        addWinSettings(utils::translate("app_bell_settings_home_view"), window::name::bellSettingsHomeView);
         addWinSettings(utils::translate("app_bell_settings_alarm_settings"), BellSettingsAlarmSettingsMenuWindow::name);
         addWinSettings(utils::translate("app_bell_settings_bedtime_tone"), window::name::bellSettingsBedtimeTone);
         addWinSettings(utils::translate("app_bell_settings_advanced"), window::name::bellSettingsAdvanced);

@@ -68,4 +68,8 @@ namespace gui
                                       utils::translate("app_bell_settings_alarm_settings_snooze_finished"),
                                       BellSettingsAlarmSettingsMenuWindow::name));
     }
+    void BellSettingsAlarmSettingsSnoozeWindow::onClose(Window::CloseReason)
+    {
+        presenter->eraseProviderData();
+    }
 } // namespace gui

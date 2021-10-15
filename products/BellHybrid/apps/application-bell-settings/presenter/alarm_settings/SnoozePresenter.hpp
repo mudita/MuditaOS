@@ -32,6 +32,7 @@ namespace app::bell_settings
         virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
         virtual void saveData()                                                         = 0;
         virtual void loadData()                                                         = 0;
+        virtual void eraseProviderData()                                                = 0;
     };
 
     class SnoozePresenter : public AbstractSnoozePresenter
@@ -44,6 +45,7 @@ namespace app::bell_settings
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         void saveData() override;
         void loadData() override;
+        void eraseProviderData() override;
 
       private:
         void stopSound();
