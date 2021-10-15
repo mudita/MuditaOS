@@ -35,7 +35,9 @@ namespace bluetooth
                                    std::shared_ptr<bluetooth::AbstractDriver> driver)
         : service{service}, settings{std::move(settings)}, profileManager{std::move(profileManager)}, driver{std::move(
                                                                                                           driver)}
-    {}
+    {
+        this->driver->registerPowerOnCallback([profilePtr = this->profileManager]() { profilePtr->init(); });
+    }
 
     Error::Code CommandHandler::handle(Command command)
     {
@@ -115,7 +117,6 @@ namespace bluetooth
 
     Error::Code CommandHandler::establishAudioConnection(const Devicei &device)
     {
-        profileManager->init();
         LOG_INFO("Connecting audio");
         profileManager->connect(device);
         return Error::Success;

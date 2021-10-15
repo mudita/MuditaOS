@@ -9,11 +9,13 @@
 
 namespace bluetooth
 {
+    using PowerOnCallback = std::function<void()>;
+
     class AbstractDriver
     {
       public:
-        using ErrorCallback                = std::function<void(uint8_t)>;
         virtual ~AbstractDriver() noexcept = default;
+        using ErrorCallback                = std::function<void(uint8_t)>;
 
         [[nodiscard]] virtual auto init() -> Error::Code                     = 0;
         [[nodiscard]] virtual auto run() -> Error::Code                      = 0;
@@ -24,6 +26,7 @@ namespace bluetooth
         [[nodiscard]] virtual auto pair(Devicei device, std::uint8_t protectionLevel = 0) -> bool = 0;
         [[nodiscard]] virtual auto unpair(Devicei device) -> bool                                 = 0;
 
-        virtual void registerErrorCallback(const ErrorCallback &newCallback) = 0;
+        virtual void registerErrorCallback(const ErrorCallback &newCallback)     = 0;
+        virtual void registerPowerOnCallback(const PowerOnCallback &newCallback) = 0;
     };
 } // namespace bluetooth
