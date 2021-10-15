@@ -35,6 +35,7 @@ extern "C"
 namespace bluetooth
 {
     hci_transport_config_uart_t Driver::config;
+    PowerOnCallback Driver::powerOnCallback = nullptr;
 
 #ifdef TARGET_RT1051
     [[maybe_unused]] auto Driver::runLoopInitTarget(const btstack_run_loop *loop) -> const btstack_uart_block_t *
@@ -103,6 +104,9 @@ namespace bluetooth
             LOG_INFO("BTstack up and running");
             bluetooth::KeyStorage::settings->setValue(bluetooth::Settings::State,
                                                       static_cast<int>(BluetoothStatus::State::On));
+            if (powerOnCallback) {
+                powerOnCallback();
+            }
             break;
         case HCI_EVENT_COMMAND_COMPLETE:
             if (HCI_EVENT_IS_COMMAND_COMPLETE(packet, hci_read_local_name)) {
@@ -184,6 +188,12 @@ namespace bluetooth
             }
         });
     }
+
+    void Driver::registerPowerOnCallback(const PowerOnCallback &newCallback)
+    {
+        powerOnCallback = newCallback;
+    }
+
     auto Driver::stop() -> Error::Code
     {
         auto ret = hci_power_control(HCI_POWER_OFF);
