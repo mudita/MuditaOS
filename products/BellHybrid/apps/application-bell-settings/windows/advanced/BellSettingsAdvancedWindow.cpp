@@ -4,10 +4,10 @@
 #include "application-bell-settings/ApplicationBellSettings.hpp"
 #include "BellSettingsAdvancedWindow.hpp"
 #include "BellSettingsStyle.hpp"
+#include "BellSettingsFrontlightWindow.hpp"
 
 #include <common/options/OptionBellMenu.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
-#include <apps-common/windows/Dialog.hpp>
 #include <windows/advanced/AboutYourBellWindow.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 
@@ -73,7 +73,7 @@ namespace gui
                   gui::window::name::bellSettingsLanguage,
                   defaultCallback);
         addOption(utils::translate("app_bell_settings_advanced_frontlight"),
-                  gui::window::name::bellSettingsFrontlight,
+                  gui::BellSettingsFrontlightWindow::name,
                   defaultCallback);
         addOption(
             utils::translate("app_bell_settings_advanced_about"), gui::AboutYourBellWindow::name, defaultCallback);

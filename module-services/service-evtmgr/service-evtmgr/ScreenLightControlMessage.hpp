@@ -87,7 +87,7 @@ namespace sevm
         {}
     };
 
-    class ScreenLightControlParametersResponse : public sys::DataMessage
+    class ScreenLightControlParametersResponse : public sys::ResponseMessage
     {
         bool lightOn;
         screen_light_control::ScreenLightMode mode;
@@ -97,8 +97,7 @@ namespace sevm
         ScreenLightControlParametersResponse(bool lightOn,
                                              screen_light_control::ScreenLightMode mode,
                                              screen_light_control::ManualModeParameters params)
-            : sys::DataMessage(MessageType::ScreenLightControlParametersResponse), lightOn(lightOn), mode(mode),
-              parameters(params)
+            : lightOn(lightOn), mode(mode), parameters(params)
         {}
 
         [[nodiscard]] bool isLightOn() const noexcept
