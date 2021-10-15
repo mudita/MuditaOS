@@ -20,13 +20,14 @@ namespace bsp::eink_frontlight
             std::clamp(brightness, 0.0f, 100.0f);
             return static_cast<std::uint8_t>(100 * std::pow((brightness / 100.0f), gammaFactor));
         }
+        constexpr auto pwmChannel = static_cast<drivers::PWMChannel>(BoardDefinitions::EINK_FRONTLIGHT_PWM_CHANNEL);
 
     } // namespace
 
     void init()
     {
         drivers::DriverPWMParams pwmParams;
-        pwmParams.channel   = static_cast<drivers::PWMChannel>(BoardDefinitions::EINK_FRONTLIGHT_PWM_CHANNEL);
+        pwmParams.channel   = pwmChannel;
         pwmParams.frequency = PWM_FREQUENCY_HZ;
 
         pwm = drivers::DriverPWM::Create(
@@ -43,18 +44,18 @@ namespace bsp::eink_frontlight
     void setBrightness(BrightnessPercentage brightness)
     {
         if (pwm) {
-            pwm->SetDutyCycle(gammaCorrection(brightness));
+            pwm->SetDutyCycle(gammaCorrection(brightness), pwmChannel);
         }
     }
 
     void turnOn()
     {
-        pwm->Start();
+        pwm->Start(pwmChannel);
     }
 
     void turnOff()
     {
-        pwm->Stop();
+        pwm->Stop(pwmChannel);
     }
 
     void setGammaFactor(float gamma)

@@ -50,12 +50,14 @@ namespace drivers
 
         virtual ~DriverPWM() = default;
 
+        virtual void InitNextChannel(const DriverPWMParams &params) = 0;
+
         // Duty cycle in percent: 0 - 100
-        virtual void SetDutyCycle(std::uint8_t duty_cycle) = 0;
+        virtual void SetDutyCycle(std::uint8_t duty_cycle, PWMChannel channel) = 0;
 
-        virtual void Start() = 0;
+        virtual void Start(PWMChannel channel) = 0;
 
-        virtual void Stop() = 0;
+        virtual void Stop(PWMChannel channel) = 0;
 
         virtual void UpdateClockFrequency(std::uint32_t) = 0;
 

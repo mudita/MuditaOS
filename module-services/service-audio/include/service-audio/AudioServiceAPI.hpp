@@ -148,7 +148,7 @@ namespace AudioServiceAPI
      * @param vibrationLevel - vibration level to be set.
      * @return Standard service-api return code. Success if suitable.
      */
-    audio::RetCode SetVibrationLevelSetting(sys::Service *serv, audio::VibrationLevel vibrationLeve);
+    audio::RetCode SetVibrationLevelSetting(sys::Service *serv, audio::VibrationLevel vibrationLevel);
 
     /** @brief Gets vibrations level setting state
      *
