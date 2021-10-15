@@ -67,4 +67,8 @@ namespace app::bell_settings
     {
         audioModel->stop(currentToken, nullptr);
     }
+    void SnoozePresenter::eraseProviderData()
+    {
+        provider->clearData();
+    }
 } // namespace app::bell_settings
