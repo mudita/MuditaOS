@@ -216,6 +216,8 @@ namespace app::home_screen
             auto entry = [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractPresenter &presenter) {
                 presenter.spawnTimer();
                 alarmModel.turnOff();
+                alarmModel.activate(false);
+                view.setAlarmTimeVisible(false);
                 view.setBottomDescription(Helpers::getGreeting());
                 view.setAlarmActive(false);
             };
