@@ -14,6 +14,11 @@
 #include <application-bell-alarm/ApplicationBellAlarmNames.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 
+namespace
+{
+    constexpr unsigned int y_position = 22U;
+} // namespace
+
 namespace gui
 {
     AlarmActivatedWindow::AlarmActivatedWindow(app::ApplicationCommon *app,
@@ -42,7 +47,7 @@ namespace gui
         header->setTitleVisibility(false);
         bottomBar->setVisible(false);
 
-        icon = new Icon(this, 0, 0, style::window_width, style::window_height, "big_alarm_W_G", {});
+        icon = new Icon(this, 0, y_position, style::window_width, style::window_height, "big_alarm_W_G", {});
         icon->text->setFont(style::window::font::verybiglight);
     }
 
