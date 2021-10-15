@@ -12,11 +12,11 @@
 
 namespace audio
 {
-    using Volume         = uint32_t;
-    using Gain           = uint32_t;
+    using Volume         = std::uint32_t;
+    using Gain           = std::uint32_t;
     using Position       = float;
     using Vibrate        = bool;
-    using VibrationLevel = uint32_t;
+    using VibrationLevel = std::uint32_t;
     using EnableSound    = bool;
     using IsSystemSound  = bool;
 
