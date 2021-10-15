@@ -24,26 +24,7 @@ namespace app
 {
     inline constexpr auto applicationBellSettingsName = "ApplicationBellSettings";
 
-    namespace settingsInterface
-    {
-        class BellScreenLightSettings
-        {
-          public:
-            struct Values
-            {
-                bool lightOn;
-                screen_light_control::ScreenLightMode mode;
-                screen_light_control::ManualModeParameters parameters;
-            };
-
-            virtual ~BellScreenLightSettings()                  = default;
-            virtual void setBrightness(float brightnessValue)   = 0;
-            virtual void setMode(bool isAutoLightSwitchOn)      = 0;
-            virtual void setStatus(bool isDisplayLightSwitchOn) = 0;
-        };
-    }; // namespace settingsInterface
-
-    class ApplicationBellSettings : public Application, public settingsInterface::BellScreenLightSettings
+    class ApplicationBellSettings : public Application
     {
       public:
         ApplicationBellSettings(std::string name                    = applicationBellSettingsName,
@@ -63,10 +44,6 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
-
-        void setBrightness(float brightnessValue) override;
-        void setMode(bool isAutoLightSwitchOn) override;
-        void setStatus(bool isDisplayLightSwitchOn) override;
     };
 
     template <> struct ManifestTraits<ApplicationBellSettings>

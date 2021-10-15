@@ -4,28 +4,28 @@
 #pragma once
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
-#include "presenter/FrontlightPresenter.hpp"
+#include "presenter/advanced/FrontlightPresenter.hpp"
 #include <apps-common/windows/AppWindow.hpp>
 
 namespace gui
 {
-    class BellBaseLayout;
+    class SideListView;
 
     class BellSettingsFrontlightWindow : public AppWindow, public app::bell_settings::FrontlightWindowContract::View
     {
       public:
+        static constexpr auto name = "BellSettingsAdvancedFrontlight";
         explicit BellSettingsFrontlightWindow(
-            app::ApplicationCommon *app,
-            std::unique_ptr<app::bell_settings::FrontlightWindowContract::Presenter> &&windowPresenter,
-            std::string name = window::name::bellSettingsFrontlight);
+            app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::FrontlightPresenter> &&windowPresenter);
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
+        void onClose(CloseReason reason) override;
         void rebuild() override;
+        void exit() override;
 
       private:
-        BellBaseLayout *body{nullptr};
-        Label *topText{nullptr};
-        std::unique_ptr<app::bell_settings::FrontlightWindowContract::Presenter> presenter;
+        SideListView *listView{};
+        std::unique_ptr<app::bell_settings::FrontlightPresenter> presenter;
     };
 } /* namespace gui */

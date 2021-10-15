@@ -22,10 +22,11 @@ target_include_directories(application-bell-settings
 target_sources(application-bell-settings
     PRIVATE
         ApplicationBellSettings.cpp
-        models/FrontlightModel.cpp
         models/TemperatureUnitModel.cpp
         models/TimeUnitsModel.cpp
         models/advanced/AboutYourBellModel.cpp
+        models/advanced/FrontlightListItemProvider.cpp
+        models/advanced/FrontlightModel.cpp
         models/alarm_settings/AlarmSettingsListItemProvider.cpp
         models/alarm_settings/AlarmSettingsModel.cpp
         models/alarm_settings/PrewakeUpListItemProvider.cpp
@@ -34,8 +35,8 @@ target_sources(application-bell-settings
         models/alarm_settings/SnoozeSettingsModel.cpp
         models/alarm_settings/SettingsListItemProvider.cpp
 
-        presenter/FrontlightPresenter.cpp
         presenter/TimeUnitsPresenter.cpp
+        presenter/advanced/FrontlightPresenter.cpp
         presenter/advanced/AboutYourBellWindowPresenter.cpp
         presenter/advanced/LanguageWindowPresenter.cpp
         presenter/alarm_settings/AlarmSettingsPresenter.cpp
@@ -49,19 +50,21 @@ target_sources(application-bell-settings
         widgets/DialogYesNo.cpp
 
         windows/BellSettingsBedtimeToneWindow.cpp
-        windows/BellSettingsFrontlight.cpp
         windows/BellSettingsHomeViewWindow.cpp
         windows/BellSettingsWindow.cpp
         windows/advanced/AboutYourBellWindow.cpp
         windows/advanced/BellSettingsAdvancedWindow.cpp
         windows/advanced/BellSettingsLanguageWindow.cpp
         windows/advanced/BellSettingsTimeUnitsWindow.cpp
+        windows/advanced/BellSettingsFrontlightWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.cpp
         windows/alarm_settings/BellSettingsPrewakeUpWindow.cpp
 
         models/advanced/AboutYourBellModel.hpp
+        models/advanced/FrontlightListItemProvider.hpp
+        models/advanced/FrontlightModel.hpp
         models/alarm_settings/AbstractAlarmSettingsModel.hpp
         models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp
         models/alarm_settings/AbstractSnoozeSettingsModel.hpp
@@ -73,7 +76,7 @@ target_sources(application-bell-settings
         models/alarm_settings/SnoozeSettingsModel.hpp
         models/alarm_settings/SettingsListItemProvider.hpp
 
-        presenter/FrontlightPresenter.hpp
+        presenter/advanced/FrontlightPresenter.hpp
         presenter/advanced/AboutYourBellWindowPresenter.hpp
         presenter/advanced/LanguageWindowPresenter.hpp
         presenter/alarm_settings/AlarmSettingsPresenter.hpp
@@ -90,12 +93,12 @@ target_sources(application-bell-settings
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp
         windows/advanced/BellSettingsAdvancedWindow.hpp
         windows/BellSettingsBedtimeToneWindow.hpp
-        windows/BellSettingsFrontlight.hpp
         windows/BellSettingsHomeViewWindow.hpp
         windows/BellSettingsWindow.hpp
         windows/advanced/AboutYourBellWindow.hpp
         windows/advanced/BellSettingsLanguageWindow.hpp
         windows/advanced/BellSettingsAdvancedWindow.hpp
+        windows/advanced/BellSettingsFrontlightWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp

@@ -23,6 +23,8 @@ namespace gui
         bool isActive() const;
 
       private:
+        void setArrowsVisibility();
+
         const UTF8 onStr;
         const UTF8 offStr;
         UTF8Spinner *spinner{};
@@ -77,6 +79,8 @@ namespace gui
         UTF8Spinner::Type getCurrentValue();
 
       private:
+        void setArrowsVisibility(const UTF8Spinner::Range &range);
+
         UTF8Spinner *spinner{};
     };
 

@@ -21,14 +21,7 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
-            if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-                if (onProceed) {
-                    onProceed();
-                }
-            }
-            return body->onInput(inputEvent);
-        };
+        inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool { return OnInputCallback(inputEvent); };
     }
 
     void BellSideListItemWithCallbacks::OnFocusChangedCallback()
@@ -45,5 +38,14 @@ namespace gui
                 onExit();
             }
         }
+    }
+    bool BellSideListItemWithCallbacks::OnInputCallback(const InputEvent &inputEvent)
+    {
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+            if (onProceed) {
+                onProceed();
+            }
+        }
+        return body->onInput(inputEvent);
     }
 } // namespace gui

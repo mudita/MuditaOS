@@ -23,6 +23,7 @@ namespace gui
 
       protected:
         void OnFocusChangedCallback();
+        bool OnInputCallback(const InputEvent &inputEvent);
     };
 
 } // namespace gui
