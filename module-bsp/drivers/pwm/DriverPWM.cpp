@@ -39,6 +39,9 @@ namespace drivers
 
                 pwmDrivers[static_cast<std::uint32_t>(instance)][static_cast<std::uint32_t>(module)] = inst;
             }
+            else {
+                inst->InitNextChannel(params);
+            }
 
             cpp_freertos::CriticalSection::Exit();
 

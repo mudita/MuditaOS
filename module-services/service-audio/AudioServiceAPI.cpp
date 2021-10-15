@@ -176,9 +176,9 @@ namespace AudioServiceAPI
         return GetSettingState(serv, audio::Setting::EnableVibration, playbackType);
     }
 
-    audio::RetCode SetVibrationLevelSetting(sys::Service *serv, const audio::VibrationLevel vol)
+    audio::RetCode SetVibrationLevelSetting(sys::Service *serv, const audio::VibrationLevel vibrationLevel)
     {
-        return SetSetting(serv, audio::Setting::VibrationLevel, std::to_string(vol), PlaybackType::System);
+        return SetSetting(serv, audio::Setting::VibrationLevel, std::to_string(vibrationLevel), PlaybackType::System);
     }
 
     std::optional<audio::VibrationLevel> GetVibrationLevelSetting(sys::Service *serv)
@@ -188,7 +188,7 @@ namespace AudioServiceAPI
             return static_cast<audio::VibrationLevel>(
                 std::stoi(GetSetting(serv, audio::Setting::VibrationLevel, PlaybackType::System)));
         }
-        catch (const std::exception &e) {
+        catch (const std::logic_error &e) {
             LOG_ERROR("exception %s", e.what());
             return std::nullopt;
         }
@@ -225,7 +225,7 @@ namespace AudioServiceAPI
         try {
             return static_cast<audio::Volume>(std::stoi(GetSetting(serv, audio::Setting::Volume, playbackType)));
         }
-        catch (const std::exception &e) {
+        catch (const std::logic_error &e) {
             LOG_ERROR("exception %s", e.what());
             return std::nullopt;
         }

@@ -26,11 +26,12 @@ namespace gui
             switchVibrationState();
         });
 
+#if DEVELOPER_SETTINGS_OPTIONS == 1
         if (mVibrationsEnabled) {
             optionList.emplace_back(std::make_unique<gui::SpinBoxOptionSettings>(
                 utils::translate("app_settings_volume"),
                 mAudioModel->getVibrationLevel(),
-                std::ceil(10.0),
+                10,
                 [&](uint8_t value) {
                     mAudioModel->setVibrationLevel(value);
                     return true;
@@ -41,6 +42,7 @@ namespace gui
                 [&]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
                 true));
         }
+#endif // DEVELOPER_SETTINGS_OPTIONS
 
         mWidgetMaker.addSwitchOption(
             optionList, utils::translate("app_settings_sound"), mSoundEnabled, [&]() { switchSoundState(); });

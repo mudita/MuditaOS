@@ -142,7 +142,7 @@ namespace sevm
             : DataMessage(MessageType::VibratorLevelMessage), vibrationLevel(vibrationLevel)
         {}
 
-        unsigned int vibrationLevel;
+        const unsigned int vibrationLevel;
     };
 
     class FlushLogsRequest : public sys::DataMessage

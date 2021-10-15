@@ -3,7 +3,7 @@
 
 #include "bsp/vibrator/vibrator.hpp"
 
-#include <board/BoardDefinitions.hpp>
+#include "board/BoardDefinitions.hpp"
 #include <drivers/gpio/DriverGPIO.hpp>
 #include <drivers/pwm/DriverPWM.hpp>
 
@@ -15,11 +15,13 @@ namespace bsp
 
         std::shared_ptr<drivers::DriverPWM> pwm;
         constexpr inline auto PWM_FREQUENCY_HZ = 20000;
+        constexpr inline auto levelMultiplier  = 10;
+        constexpr auto pwmChannel = static_cast<drivers::PWMChannel>(BoardDefinitions::VIBRATOR_PWM_CHANNEL);
 
         void init(std::chrono::milliseconds pulse)
         {
             drivers::DriverPWMParams pwmParams;
-            pwmParams.channel   = static_cast<drivers::PWMChannel>(BoardDefinitions::VIBRATOR_PWM_CHANNEL);
+            pwmParams.channel   = pwmChannel;
             pwmParams.frequency = PWM_FREQUENCY_HZ;
 
             pwm =
@@ -36,12 +38,12 @@ namespace bsp
 
         void enable()
         {
-            pwm->Start();
+            pwm->Start(pwmChannel);
         }
 
         void disable()
         {
-            pwm->Stop();
+            pwm->Stop(pwmChannel);
         }
 
         void updateClockFrequency(CpuFrequencyHz newFrequency)
@@ -51,7 +53,9 @@ namespace bsp
 
         void setVibrationLevel(unsigned int vibrationLevel)
         {
-            pwm->SetDutyCycle(vibrationLevel * 10);
+            if (pwm) {
+                pwm->SetDutyCycle(vibrationLevel * levelMultiplier, pwmChannel);
+            }
         }
     } // namespace vibrator
 } // namespace bsp
