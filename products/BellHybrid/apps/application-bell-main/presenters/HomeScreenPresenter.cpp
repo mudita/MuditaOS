@@ -64,8 +64,7 @@ namespace app::home_screen
             auto callback = [this](sys::Timer &) { stateController->handleTimerEvent(); };
             timer         = sys::TimerFactory::createSingleShotTimer(app, timerName, timeout, callback);
         }
-        timer.stop();
-        timer.start();
+        timer.restart(timeout);
     }
 
     void HomeScreenPresenter::detachTimer()
