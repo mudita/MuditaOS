@@ -22,6 +22,8 @@ namespace bluetooth
         const btstack_run_loop *runLoop;
         btstack_packet_callback_registration_t hci_event_callback_registration;
         std::unique_ptr<bluetooth::GAP> gap;
+        static PowerOnCallback powerOnCallback;
+
         static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size);
         static void local_version_information_handler(uint8_t *packet);
 #ifdef TARGET_RT1051
@@ -37,6 +39,8 @@ namespace bluetooth
         [[nodiscard]] auto run() -> Error::Code override;
         [[nodiscard]] auto stop() -> Error::Code override;
         void registerErrorCallback(const ErrorCallback &newCallback) override;
+        void registerPowerOnCallback(const PowerOnCallback &newCallback) override;
+
         auto scan() -> Error override;
         void stopScan() override;
         void setVisibility(bool visibility) override;

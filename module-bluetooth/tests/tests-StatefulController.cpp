@@ -40,6 +40,8 @@ class DriverMock : public AbstractDriver
     }
     void registerErrorCallback(const ErrorCallback &) override
     {}
+    void registerPowerOnCallback(const PowerOnCallback &) override
+    {}
 
     Error::Code initReturnCode = Error::Success;
     Error::Code runReturnCode  = Error::Success;
