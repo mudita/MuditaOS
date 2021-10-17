@@ -29,6 +29,7 @@ namespace app::bell_bedtime
             if (not onOff->isActive()) {
                 this->onExit(false);
             }
+            return true;
         };
         internalData.emplace_back(onOff);
         internalData.emplace_back(new TimeListItem(model.get()->getBedtimeTime(),

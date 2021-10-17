@@ -19,10 +19,12 @@ namespace gui
         std::function<void()> onEnter;
         std::function<void()> onExit;
 
-        std::function<void()> onProceed;
+        std::function<bool()> onProceed;
+        std::function<bool()> onReturn;
 
       protected:
         void OnFocusChangedCallback();
+        bool OnInputCallback(const InputEvent &inputEvent);
     };
 
 } // namespace gui
