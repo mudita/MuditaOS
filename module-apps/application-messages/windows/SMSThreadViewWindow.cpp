@@ -91,6 +91,13 @@ namespace gui
 
     bool SMSThreadViewWindow::onInput(const InputEvent &inputEvent)
     {
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) &&
+            bottomBar->getText(BottomBar::Side::CENTER) !=
+                utils::translate(utils::translate(style::strings::common::send))) {
+
+            smsList->rebuildList();
+            return true;
+        }
         return AppWindow::onInput(inputEvent);
     }
 

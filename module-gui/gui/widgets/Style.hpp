@@ -166,6 +166,7 @@ namespace style
             inline constexpr auto open           = "common_open";
             inline constexpr auto call           = "common_call";
             inline constexpr auto send           = "common_send";
+            inline constexpr auto reply          = "common_reply";
             inline constexpr auto save           = "common_save";
             inline constexpr auto edit           = "common_edit";
             inline constexpr auto import         = "common_import";
