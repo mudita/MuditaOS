@@ -88,7 +88,7 @@ namespace gui
         setupBottomDescription(bottomDescription);
 
         inputCallback = [&, range](Item &item, const InputEvent &event) {
-            const auto result = body->onInput(event);
+            const auto result = OnInputCallback(event);
             bottomText->setVisible(spinner->getCurrentValue().getValue().has_value());
             setArrowsVisibility(range);
             return result;

@@ -34,12 +34,16 @@ namespace app::bell_settings
             chimeDurationRange,
             utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_top_description"),
             utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_bottom_description"));
-        chimeDuration->onExit = [chimeDuration, this] {
+
+        chimeDuration->onProceed = [chimeDuration, this]() {
             if (chimeDuration->isOff()) {
                 constexpr auto lightDurationListIndex = 3U;
                 list->rebuildList(gui::listview::RebuildType::OnOffset, lightDurationListIndex);
+                return true;
             }
+            return false;
         };
+
         internalData.emplace_back(chimeDuration);
 
         auto chimeTone = new UTF8ListItem(model.getChimeTone(),
@@ -97,11 +101,15 @@ namespace app::bell_settings
             lightDurationRange,
             utils::translate("app_bell_settings_alarm_settings_prewake_up_light_top_description"),
             utils::translate("app_bell_settings_alarm_settings_prewake_up_light_bottom_description"));
-        lightDuration->onExit = [lightDuration, this] {
-            if (lightDuration->isOff()) {
-                this->onExit();
+
+        lightDuration->onReturn = [chimeDuration, this]() {
+            if (chimeDuration->isOff()) {
+                list->rebuildList(gui::listview::RebuildType::OnOffset, 0);
+                return true;
             }
+            return false;
         };
+
         internalData.emplace_back(lightDuration);
 
         for (auto item : internalData) {
