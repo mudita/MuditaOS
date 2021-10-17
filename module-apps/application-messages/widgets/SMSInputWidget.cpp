@@ -75,7 +75,8 @@ namespace gui
             if (inputText->focus) {
 
                 application->getWindow(gui::name::window::thread_view)
-                    ->setBottomBarText(utils::translate("sms_reply"), BottomBar::Side::CENTER);
+                    ->setBottomBarText(utils::translate(utils::translate(style::strings::common::send)),
+                                       BottomBar::Side::CENTER);
 
                 if (inputText->getText() == utils::translate("sms_temp_reply")) {
                     inputText->clear();
@@ -92,7 +93,8 @@ namespace gui
                     }
                 }
 
-                application->getWindow(gui::name::window::thread_view)->clearBottomBarText(BottomBar::Side::CENTER);
+                application->getWindow(gui::name::window::thread_view)
+                    ->setBottomBarText(utils::translate(style::strings::common::reply), BottomBar::Side::CENTER);
             }
 
             return true;
