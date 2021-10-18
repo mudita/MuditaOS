@@ -41,6 +41,7 @@ namespace stm
     {
         LOG_INFO("[ServiceTime] Initializing");
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
     }
 
     ServiceTime::~ServiceTime()
@@ -95,6 +96,10 @@ namespace stm
         }
         if (msgl->messageType == MessageType::EVMMinuteUpdated) {
             alarmMessageHandler->handleMinuteUpdated();
+            return std::make_shared<sys::ResponseMessage>();
+        }
+        else if (msgl->messageType == MessageType::EVMTimeUpdated) {
+            alarmMessageHandler->handleTimeUpdate(TimePointNow());
             return std::make_shared<sys::ResponseMessage>();
         }
         else {
