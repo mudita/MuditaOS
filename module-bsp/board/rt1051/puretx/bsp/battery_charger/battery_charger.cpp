@@ -35,6 +35,7 @@ namespace bsp::battery_charger
         constexpr std::uint16_t nominalCapacitymAh = 1600;
 
         constexpr std::uint16_t fullyChargedSOC = 100;
+        constexpr std::uint16_t percentLevelDelta = 5;
 
         constexpr std::uint16_t maxVoltagemV = 4400;
         constexpr std::uint16_t minVoltagemV = 3600;
@@ -603,6 +604,17 @@ namespace bsp::battery_charger
         gpio.reset();
     }
 
+    void evaluateBatteryLevelChange(const std::uint16_t currentLevel, const std::uint16_t updatedLevel)
+    {
+        if (currentLevel == updatedLevel) {
+            return;
+        }
+
+        if ((updatedLevel % percentLevelDelta) == 0) {
+            storeConfiguration();
+        }
+    }
+
     StateOfCharge getBatteryLevel()
     {
         auto readout = fuelGaugeRead(Registers::RepSOC_REG);
@@ -610,7 +622,11 @@ namespace bsp::battery_charger
             LOG_ERROR("failed to get battery percent");
         }
         StateOfCharge levelPercent     = (readout.second & 0xff00) >> 8;
+        const auto currentPercent      = Store::Battery::get().level;
         Store::Battery::modify().level = levelPercent;
+
+        evaluateBatteryLevelChange(currentPercent, levelPercent);
+
         return levelPercent;
     }
 
