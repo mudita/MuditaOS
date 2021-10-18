@@ -27,6 +27,8 @@ namespace cellular::service
             return "BaudDetect";
         case ST::AudioConfigurationProcedure:
             return "AudioConfigurationProcedure";
+        case ST::CellularPrivInit:
+            return "CellularPrivInit";
         case ST::APNConfProcedure:
             return "APNConfProcedure";
         case ST::ModemOn:

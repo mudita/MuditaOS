@@ -180,7 +180,7 @@ namespace app
         std::shared_ptr<SoundsPlayer> soundsPlayer;
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
         std::string selectedSimNumber = {};
-        bsp::Board board              = bsp::Board::none;
+
         bool operatorsOn              = false;
         bool voLteStateOn             = false;
         bool notificationsWhenLocked  = true;

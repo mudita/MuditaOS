@@ -16,9 +16,6 @@ namespace sys
 
 namespace EventManagerServiceAPI
 {
-    /// Gets board version
-    bsp::Board GetBoard(sys::Service *serv);
-
     /// Call single vibrator pulse
     void vibrationPulseOnce(sys::Service *serv);
 

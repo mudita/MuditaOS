@@ -24,8 +24,6 @@ namespace bsp
 
         bool isPresent(void);
 
-        bsp::Board GetBoard(void);
-
         /// unit: 4 LSB/Gauss
         struct Measurements
         {

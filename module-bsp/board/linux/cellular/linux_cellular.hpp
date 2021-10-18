@@ -50,6 +50,8 @@ namespace bsp
         void selectAntenna(bsp::cellular::antenna antenna) override final;
         bsp::cellular::antenna getAntenna() override final;
 
+        bsp::Board getBoard() final;
+
       private:
         static constexpr speed_t baud_bits[] = {0,
                                                 B9600,

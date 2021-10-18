@@ -211,6 +211,10 @@ namespace bsp
     {
         return bsp::cellular::antenna::lowBand;
     }
+    bsp::Board LinuxCellular::getBoard()
+    {
+        return bsp::Board::Linux;
+    }
 
     namespace cellular
     {

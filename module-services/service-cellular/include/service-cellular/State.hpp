@@ -24,10 +24,11 @@ namespace cellular::service
             BaudDetect,                  /// baud detection procedure
             CellularConfProcedure,       /// configuration procedure
             AudioConfigurationProcedure, /// audio configuration for modem (could be in ModemConfiguration)
+            CellularPrivInit,            /// init cellular internal modules
             APNConfProcedure,            /// Configure APN set by user, check if modem have similar
             SanityCheck,                 /// prior to ModemOn last sanity checks for one time configurations etc
-            ModemOn,   /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
-            URCReady,  /// State indicates that URC handling is enabled
+            ModemOn,  /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
+            URCReady, /// State indicates that URC handling is enabled
             ModemFatalFailure, /// modem full shutdown need
             Failed,
             Ready,            /// Service is fully initialized

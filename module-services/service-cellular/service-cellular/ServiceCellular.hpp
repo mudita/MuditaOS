@@ -141,15 +141,6 @@ class ServiceCellular : public sys::Service
 
     ussd::State ussdState = ussd::State::none;
 
-    enum class ResetType
-    {
-        SoftReset,  //<! AT CFUN reset
-        PowerCycle, //<! PWRKEY pin toggle
-        HardReset   //<! RESET_N pin
-    };
-
-    bool resetCellularModule(ResetType type);
-    bool isAfterForceReboot           = false;
     bool nextPowerStateChangeAwaiting = false;
 
     /// one point of state change handling
@@ -181,6 +172,8 @@ class ServiceCellular : public sys::Service
     bool handle_start_conf_procedure();
     /// configure modem audio parameters
     bool handle_audio_conf_procedure();
+    /// init cellular internal modules
+    bool handle_cellular_priv_init();
     /// modem on event is used in desktop to follow up sim selection
     bool handle_modem_on();
     /// URCReady event is set when serwice is ready to handle URC notifications
