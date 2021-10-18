@@ -103,22 +103,22 @@ pipeline {
                 echo "./configure.sh pure rt1051 Release -G Ninja"
                 ./configure.sh pure rt1051 Release -G Ninja
 
-                pushd build-purephone-rt1051-Release
+                pushd build-PurePhone-rt1051-Release
                 ninja -j ${JOBS} PurePhone-boot.bin
                 popd
-                rm -r build-purephone-rt1051-Release
+                rm -r build-PurePhone-rt1051-Release
 
                 echo "./configure.sh bell rt1051 Release -G Ninja"
                 ./configure.sh bell rt1051 Release -G Ninja
 
-                pushd build-bell-rt1051-Release
+                pushd build-BellHybrid-rt1051-Release
                 ninja -j ${JOBS} BellHybrid-boot.bin
                 popd
 
                 echo "disk usage before removal:"
                 du -h --max-depth=1 .
 
-                rm -r build-bell-rt1051-Release
+                rm -r build-BellHybrid-rt1051-Release
 
                 echo "disk usage after removal:"
                 du -h --max-depth=1 .
@@ -172,7 +172,7 @@ pipeline {
                 echo "JOBS=${JOBS}"
                 pushd "${WORKSPACE}"
 
-                pushd build-purephone-linux-Debug
+                pushd build-PurePhone-linux-Debug
                 ninja -j ${JOBS} PurePhone-boot.bin
                 popd
                 popd'''
@@ -180,7 +180,7 @@ pipeline {
                 echo "Build Unit Tests"
                 sh '''#!/bin/bash -e
                 pushd "${WORKSPACE}"
-                pushd build-purephone-linux-Debug
+                pushd build-PurePhone-linux-Debug
                 ninja -j ${JOBS} unittests
                 popd'''
 
@@ -192,7 +192,7 @@ pipeline {
                 echo "Check for Statics"
                 sh '''#!/bin/bash -e
                 pushd "${WORKSPACE}"
-                ./tools/find_global_data.py build-purephone-linux-Debug/PurePhone.elf
+                ./tools/find_global_data.py build-PurePhone-linux-Debug/PurePhone.elf
                 popd'''
 
                 echo "Run Unit Tests"
@@ -201,14 +201,14 @@ pipeline {
                 echo "JOBS=${JOBS}"
 
                 pushd "${WORKSPACE}"
-                pushd build-purephone-linux-Debug
+                pushd build-PurePhone-linux-Debug
                 ninja check -j ${JOBS}
                 popd
 
                 echo "disk usage before removal:"
                 du -h --max-depth=1 .
 
-                rm -r build-purephone-linux-Debug
+                rm -r build-PurePhone-linux-Debug
 
                 echo "disk usage after removal:"
                 du -h --max-depth=1 .
@@ -257,7 +257,7 @@ pipeline {
                 echo "JOBS=${JOBS}"
                 pushd "${WORKSPACE}"
 
-                pushd build-bell-linux-Debug
+                pushd build-BellHybrid-linux-Debug
                 ninja -j ${JOBS} BellHybrid-boot.bin
                 popd
 
@@ -268,7 +268,7 @@ pipeline {
                 pushd "${WORKSPACE}"
 
                 pushd "${WORKSPACE}"
-                pushd build-bell-linux-Debug
+                pushd build-BellHybrid-linux-Debug
                 ninja -j ${JOBS} unittests
                 popd
                 popd'''
@@ -281,7 +281,7 @@ pipeline {
                 echo "Check for Statics"
                 sh '''#!/bin/bash -e
                 pushd "${WORKSPACE}"
-                ./tools/find_global_data.py build-bell-linux-Debug/BellHybrid.elf
+                ./tools/find_global_data.py build-BellHybrid-linux-Debug/BellHybrid.elf
                 popd'''
 
                 echo "Run Unit Tests"
@@ -290,14 +290,14 @@ pipeline {
                 echo "JOBS=${JOBS}"
                 pushd "${WORKSPACE}"
 
-                pushd build-bell-linux-Debug
+                pushd build-BellHybrid-linux-Debug
                 ninja check -j ${JOBS}
                 popd
 
                 echo "disk usage before removal:"
                 du -h --max-depth=1 .
 
-                rm -r build-bell-linux-Debug
+                rm -r build-BellHybrid-linux-Debug
 
                 echo "disk usage after removal:"
                 du -h --max-depth=1 .
