@@ -150,16 +150,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
         handled = true;
     }
-    else if (msgl->messageType == MessageType::EVMGetBoard) {
-        using namespace bsp;
-
-        auto msg   = std::make_shared<sevm::EVMBoardResponseMessage>(true);
-        auto board = magnetometer::GetBoard();
-        msg->board = board;
-        LOG_INFO("Board discovered: %s", c_str(board));
-
-        return msg;
-    }
 
     if (handled) {
         return std::make_shared<sys::ResponseMessage>();

@@ -323,8 +323,6 @@ at::Result::Code NetworkSettings::setVoLTEState(VoLTEState state)
         qmbn.setAutoSelect(at::response::qmbncfg::MBNAutoSelect::On);
     }
     LOG_DEBUG("Modem soft reboot");
-    cellularService.resetCellularModule(ServiceCellular::ResetType::SoftReset);
-
     return at::Result::Code::OK;
 }
 

@@ -1,6 +1,8 @@
 #ifndef PUREPHONE_BSP_CELLULAR_HPP
 #define PUREPHONE_BSP_CELLULAR_HPP
 
+#include <bsp/common.hpp>
+
 #include <optional>
 #include <stdint.h>
 #include <stddef.h>
@@ -20,6 +22,7 @@ namespace bsp
             lowBand,
             highBand
         };
+
     }
     class Cellular
     {
@@ -58,6 +61,8 @@ namespace bsp
 
         virtual void selectAntenna(bsp::cellular::antenna antenna) = 0;
         virtual bsp::cellular::antenna getAntenna()                = 0;
+
+        virtual bsp::Board getBoard() = 0;
 
         [[nodiscard]] auto getCellularDevice() const noexcept -> std::shared_ptr<devices::Device>;
         [[nodiscard]] auto getLastCommunicationTimestamp() const noexcept -> TickType_t;
