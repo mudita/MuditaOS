@@ -26,11 +26,14 @@ namespace gui
         setEdges(RectangleEdge::None);
         setFocusItem(body);
 
-        timeFormat = new UTF8Spinner({fmtSpinner12H, fmtSpinner24H}, Boundaries::Continuous);
+        timeFormat = new UTF8Spinner({fmtSpinner12H, fmtSpinner24H}, Boundaries::Fixed);
         timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         timeFormat->setFont(bell_settings_style::time_fmt_set_list_item::font);
         timeFormat->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeFormat->setFocusEdges(RectangleEdge::None);
+        timeFormat->onValueChanged = [this](const auto &) {
+            body->setMinMaxArrowsVisibility(timeFormat->isAtMin(), timeFormat->isAtMax());
+        };
 
         body->getCenterBox()->addWidget(timeFormat);
         setupBottomDescription(botDesc);
@@ -53,7 +56,10 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool { return body->onInput(inputEvent); };
+        inputCallback = [this](Item &, const InputEvent &inputEvent) -> bool {
+            const auto ret = body->onInput(inputEvent);
+            return ret;
+        };
     }
 
     auto TimeFormatSetListItem::getTimeFmt() const noexcept -> utils::time::Locale::TimeFormat
@@ -71,5 +77,6 @@ namespace gui
         else if (fmt == Locale::TimeFormat::FormatTime24H) {
             timeFormat->setCurrentValue(fmtSpinner24H);
         }
+        body->setMinMaxArrowsVisibility(timeFormat->isAtMin(), timeFormat->isAtMax());
     }
 } // namespace gui
