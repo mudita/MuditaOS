@@ -23,8 +23,9 @@ namespace gui
     {
         AppWindow::buildInterface();
 
+        statusBar->setVisible(false);
         auto body = new gui::VBox(this, 0, 0, style::window_width, style::window_height);
-        body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
 
         new gui::Image(body, "big_pause_W_G");
 
