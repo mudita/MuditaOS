@@ -72,6 +72,8 @@ namespace bsp::battery_charger
 
     StateOfCharge getBatteryLevel();
 
+    void evaluateBatteryLevelChange(const std::uint16_t currentLevel, const std::uint16_t updatedLevel);
+
     bool getChargeStatus();
 
     void clearAllChargerIRQs();
