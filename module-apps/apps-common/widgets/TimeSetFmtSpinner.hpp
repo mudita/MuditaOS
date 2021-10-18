@@ -62,6 +62,7 @@ namespace gui
         };
 
         std::map<std::string, Margins> fmtMarginsMap = {
+            {style::window::font::verybiglight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
             {style::window::font::largelight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
             {style::window::font::supersizemelight, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}},
             {style::window::font::huge, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}}};
