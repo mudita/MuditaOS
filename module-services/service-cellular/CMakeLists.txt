@@ -12,6 +12,7 @@ set(SOURCES
     src/SMSSendHandler.cpp
     src/ImeiGetHandler.cpp
     src/TerhetingHandler.cpp
+    src/ModemResetHandler.cpp
 
     CellularCall.cpp
     CellularServiceAPI.cpp

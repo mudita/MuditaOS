@@ -657,6 +657,10 @@ namespace bsp
         LOG_PRINTF("}\n");
 #endif
     }
+    bsp::Board RT1051Cellular::getBoard()
+    {
+        return bsp::Board::RT1051;
+    }
 
     namespace cellular
     {

@@ -145,8 +145,6 @@ namespace app
     // Invoked during initialization
     auto ApplicationSettings::InitHandler() -> sys::ReturnCodes
     {
-        board = EventManagerServiceAPI::GetBoard(this);
-
         auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success) {
             return ret;

@@ -50,6 +50,8 @@ namespace bsp
         void selectAntenna(bsp::cellular::antenna antenna) override final;
         bsp::cellular::antenna getAntenna() override final;
 
+        bsp::Board getBoard() final;
+
         static MessageBufferHandle_t uartRxBuffer;
         static lpuart_edma_handle_t uartDmaHandle;
         static bool RestartReceivingManually;

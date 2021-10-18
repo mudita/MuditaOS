@@ -338,6 +338,8 @@ class CellularMux
     void selectAntenna(bsp::cellular::antenna antenna);
     [[nodiscard]] bsp::cellular::antenna getAntenna();
 
+    bsp::Board getBoard();
+
     void informModemHostWakeup();
     bool isModemActive();
     void turnOnModem();
