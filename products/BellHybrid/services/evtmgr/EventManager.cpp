@@ -53,7 +53,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
         return;
     }
 
-    if (kbdMessage->key.state == RawKey::State::Pressed) {
+    if (kbdMessage->key.state == RawKey::State::Pressed || kbdMessage->key.state == RawKey::State::Moved) {
         backlightHandler.handleKeyPressed(static_cast<int>(mapKey(static_cast<gui::KeyCode>(kbdMessage->key.keyCode))));
     }
 
