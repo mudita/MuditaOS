@@ -85,6 +85,15 @@ namespace gui
             }
         }
 
+        [[nodiscard]] bool isAtMin() const
+        {
+            return pos == 0;
+        }
+        [[nodiscard]] bool isAtMax() const
+        {
+            return pos == upRange();
+        }
+
       private:
         std::uint32_t upRange() const
         {
@@ -195,6 +204,15 @@ namespace gui
             }
         }
 
+        [[nodiscard]] bool isAtMin() const
+        {
+            return currentValue == range.min;
+        }
+        [[nodiscard]] bool isAtMax() const
+        {
+            return currentValue == range.max;
+        }
+
       private:
         Range range;
         ValType currentValue{};
@@ -272,6 +290,15 @@ namespace gui
                 range = newRange;
                 pos   = 0;
             }
+        }
+
+        [[nodiscard]] bool isAtMin() const
+        {
+            return pos == 0;
+        }
+        [[nodiscard]] bool isAtMax() const
+        {
+            return pos == upRange();
         }
 
       private:

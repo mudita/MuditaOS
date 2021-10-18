@@ -27,6 +27,8 @@ namespace gui
         void setFocusEdges(RectangleEdge edges);
         bool onInput(const InputEvent &inputEvent) override;
         bool onFocus(bool state) override;
+        [[nodiscard]] bool isAtMin() const;
+        [[nodiscard]] bool isAtMax() const;
 
         OnValueChanged onValueChanged;
 
@@ -141,5 +143,13 @@ namespace gui
         if (onValueChanged) {
             onValueChanged(getCurrentValue());
         }
+    }
+    template <typename Policy> bool GenericSpinner<Policy>::isAtMin() const
+    {
+        return policy.isAtMin();
+    }
+    template <typename Policy> bool GenericSpinner<Policy>::isAtMax() const
+    {
+        return policy.isAtMax();
     }
 } // namespace gui

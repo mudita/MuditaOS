@@ -16,7 +16,7 @@ namespace
 
     const std::string &getOffValueText()
     {
-        static const std::string offValueText = utils::translate("app_bell_background_sounds_timer_off");
+        static const std::string offValueText = utils::translate("app_settings_toggle_off");
         return offValueText;
     }
 
@@ -85,7 +85,7 @@ namespace gui
     {
         auto range = presenter->getTimerValuesRange();
 
-        spinner = new UTF8Spinner(toUTF8Range(range));
+        spinner = new UTF8Spinner(toUTF8Range(range), Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(bgSoundsStyle::timerValueFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -93,7 +93,11 @@ namespace gui
         spinner->setFocusEdges(RectangleEdge::None);
         auto currentValue = timerValueToUTF8(presenter->getCurrentTimerValue());
         spinner->setCurrentValue(std::move(currentValue));
+        spinner->onValueChanged = [this](const auto &) {
+            body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
+        };
         body->getCenterBox()->addWidget(spinner);
+        body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
     }
 
     void BGSoundsTimerSelectWindow::createBottomDescription()
