@@ -4,6 +4,20 @@
 #include "BellBattery.hpp"
 #include <Image.hpp>
 
+namespace
+{
+    constexpr unsigned int minVal   = 80;
+    constexpr unsigned int oldMax   = 95;
+    constexpr unsigned int newMax   = 100;
+    constexpr unsigned int oldRange = oldMax - minVal;
+    constexpr unsigned int newRange = newMax - minVal;
+
+    unsigned int translateBatteryLevel(unsigned int percentage)
+    {
+        return (((percentage - minVal) * newRange) / oldRange) + minVal;
+    }
+} // namespace
+
 namespace gui
 {
     BellBattery::BellBattery(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : HBox(parent, x, y, w, h)
@@ -28,8 +42,14 @@ namespace gui
         // Fuel gauge and charger are different hw elements
         // Charger sometimes stops charging before FG shows 100%
         auto level = batteryContext.level;
+
         if (level > 95) {
             level = 100;
+        }
+
+        // Translate 80-95% range to 80-100% range for display
+        if ((level > 80) && (level <= 95)) {
+            level = translateBatteryLevel(level);
         }
 
         if (batteryContext.state == Store::Battery::State::Charging) {
