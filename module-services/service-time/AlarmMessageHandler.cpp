@@ -16,6 +16,11 @@ namespace alarms
                                              std::unique_ptr<IAlarmOperations> &&alarmOperations)
         : service{service}, alarmOperations{std::move(alarmOperations)} {};
 
+    auto AlarmMessageHandler::handleTimeUpdate(TimePoint time) -> void
+    {
+        alarmOperations->updateEventsCache(time);
+    }
+
     auto AlarmMessageHandler::handleGetAlarm(AlarmGetRequestMessage *request)
         -> std::shared_ptr<AlarmGetResponseMessage>
     {
