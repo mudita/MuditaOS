@@ -39,6 +39,6 @@ product:
         PRODUCT: PurePhone
     bell:
       short: BellHybrid
-      product: bell
+      product: bellhybrid
       settings:
         PRODUCT: BellHybrid
