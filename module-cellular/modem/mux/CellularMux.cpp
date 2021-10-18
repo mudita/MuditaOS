@@ -298,8 +298,7 @@ CellularMux::ConfState CellularMux::audioConfProcedure()
             return ConfState::Failure;
         }
         else {
-            cellular->restart();
-            LOG_DEBUG("GSM module first run, performing reset...");
+            LOG_DEBUG("GSM module first run, performing reboot.");
             return ConfState::ModemNeedsReset;
         }
     }
@@ -838,4 +837,9 @@ const std::unique_ptr<ATParser> &CellularMux::getParser() const
 bool CellularMux::checkATCommandPrompt(const std::vector<std::string> &response, logger_level level)
 {
     return searchATCommandResponse(response, ">", 0, level);
+}
+
+bsp::Board CellularMux::getBoard()
+{
+    return cellular->getBoard();
 }

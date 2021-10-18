@@ -29,12 +29,14 @@ namespace cellular::internal
     ServiceCellularPriv::ServiceCellularPriv(ServiceCellular *owner)
         : owner{owner}, simCard{std::make_unique<SimCard>()}, state{std::make_unique<State>(owner)},
           networkTime{std::make_unique<NetworkTime>()}, simContacts{std::make_unique<SimContacts>()},
-          imeiGetHandler{std::make_unique<service::ImeiGetHandler>()}, tetheringHandler{
-                                                                           std::make_unique<TetheringHandler>()}
+          imeiGetHandler{std::make_unique<service::ImeiGetHandler>()},
+          tetheringHandler{std::make_unique<TetheringHandler>()}, modemResetHandler{
+                                                                      std::make_unique<ModemResetHandler>()}
     {
         initSimCard();
         initSMSSendHandler();
         initTetheringHandler();
+        initModemResetHandler();
     }
 
     void ServiceCellularPriv::initSimCard()
@@ -361,4 +363,26 @@ namespace cellular::internal
         tetheringHandler->onReadMessages = [this]() -> bool { return owner->receiveAllMessages(); };
     }
 
+    void ServiceCellularPriv::initModemResetHandler()
+    {
+        modemResetHandler->onCellularStateSet = [this](cellular::service::State::ST newState) { state->set(newState); };
+
+        modemResetHandler->onTurnModemOn = [this]() { owner->cmux->turnOnModem(); };
+
+        modemResetHandler->onTurnModemOff = [this]() { owner->cmux->turnOffModem(); };
+
+        modemResetHandler->onHardReset = [this]() { owner->cmux->resetModem(); };
+
+        modemResetHandler->onSoftReset = [this]() -> bool {
+            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+            if (channel == nullptr) {
+                return false;
+            }
+            auto response = channel->cmd(at::AT::CFUN_RESET);
+            if (response) {
+                return true;
+            }
+            return false;
+        };
+    }
 } // namespace cellular::internal

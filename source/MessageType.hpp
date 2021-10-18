@@ -98,7 +98,6 @@ enum class MessageType
     EVMTimeUpdated,   ///< This message is send on every time update.
 
     // cellular messages
-    EVMGetBoard,
     EVMModemStatus,
     EVMRingIndicator,
 

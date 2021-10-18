@@ -79,20 +79,6 @@ namespace sevm
         uint32_t dbID                  = 0;
     };
 
-    class EVMBoardResponseMessage : public sys::ResponseMessage
-    {
-      public:
-        EVMBoardResponseMessage(bool retCode,
-                                std::string retdata    = std::string(),
-                                MessageType responseTo = MessageType::MessageTypeUninitialized)
-            : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
-        EVMBoardResponseMessage(bool retCode, MessageType responseTo)
-            : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
-
-        bool retCode;
-        bsp::Board board = bsp::Board::none;
-    };
-
     class StatusStateMessage : public sys::DataMessage
     {
       public:

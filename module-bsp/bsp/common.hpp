@@ -25,8 +25,7 @@ namespace bsp
     };
 
     enum class Board{
-    	T3,
-    	T4,
+        RT1051,
     	Linux,
     	none
     };

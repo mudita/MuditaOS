@@ -78,12 +78,6 @@ namespace app
             switchWindow(app::window::name::logo_window, std::move(data));
             return actionHandled();
         });
-
-        connect(typeid(cellular::msg::notification::ModemStateChanged), [this](sys::Message *request) {
-            auto msg = static_cast<cellular::msg::notification::ModemStateChanged *>(request);
-            handle(msg);
-            return sys::MessageNone{};
-        });
     }
 
     // Invoked upon receiving data message
@@ -126,14 +120,6 @@ namespace app
         }
     }
 
-    void ApplicationDesktop::handle(cellular::msg::notification::ModemStateChanged *msg)
-    {
-        assert(msg);
-        if (msg->state == cellular::api::ModemState::Fatal) {
-            switchWindow(app::window::name::desktop_reboot);
-        }
-    }
-
     // Invoked during initialization
     sys::ReturnCodes ApplicationDesktop::InitHandler()
     {
@@ -172,10 +158,6 @@ namespace app
         });
         windowsFactory.attach(charging_battery, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::ChargingBatteryWindow>(app);
-        });
-        windowsFactory.attach(desktop_reboot, [](ApplicationCommon *app, const std::string newname) {
-            auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
-            return std::make_unique<gui::RebootWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(desktop_mmi_pull, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::MmiPullWindow>(app, desktop_mmi_pull);

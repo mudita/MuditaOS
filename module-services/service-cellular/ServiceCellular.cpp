@@ -218,7 +218,7 @@ void ServiceCellular::CallStateTimerHandler()
 
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
-    board = EventManagerServiceAPI::GetBoard(this);
+    board = cmux->getBoard();
 
     settings = std::make_unique<settings::Settings>();
     settings->init(::service::ServiceProxy(shared_from_this()));
@@ -365,11 +365,15 @@ void ServiceCellular::registerMessageHandlers()
         auto vstate = networkSettings.getVoLTEConfigurationState();
         if ((vstate != VoLTEState::On) && volteOn) {
             LOG_DEBUG("VoLTE On");
-            networkSettings.setVoLTEState(VoLTEState::On);
+            if (networkSettings.setVoLTEState(VoLTEState::On) == at::Result::Code::OK) {
+                priv->modemResetHandler->performSoftReset();
+            }
         }
         else if (!volteOn) {
             LOG_DEBUG("VoLTE Off");
-            networkSettings.setVoLTEState(VoLTEState::Off);
+            if (networkSettings.setVoLTEState(VoLTEState::Off) == at::Result::Code::OK) {
+                priv->modemResetHandler->performSoftReset();
+            }
         }
         return std::make_shared<CellularResponseMessage>(true);
     });
@@ -573,37 +577,6 @@ void ServiceCellular::registerMessageHandlers()
     handle_CellularGetChannelMessage();
 }
 
-bool ServiceCellular::resetCellularModule(ResetType type)
-{
-    LOG_DEBUG("Cellular modem reset. Type %d", static_cast<int>(type));
-
-    auto channel = cmux->get(CellularMux::Channel::Commands);
-    if (!channel) {
-        LOG_ERROR("Bad channel");
-        return false;
-    }
-
-    switch (type) {
-    case ResetType::SoftReset:
-        if (auto response = channel->cmd(at::AT::CFUN_RESET); response.code == at::Result::Code::OK) {
-            isAfterForceReboot = true;
-            return true;
-        }
-        LOG_ERROR("Cellular modem reset failed.");
-        return false;
-    case ResetType::PowerCycle:
-        cmux->turnOffModem();
-        cmux->turnOnModem();
-        isAfterForceReboot = true;
-        return true;
-    case ResetType::HardReset:
-        cmux->resetModem();
-        isAfterForceReboot = true;
-        return true;
-    }
-    return false;
-}
-
 void ServiceCellular::change_state(cellular::StateChange *msg)
 {
     assert(msg);
@@ -636,6 +609,9 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
         break;
     case State::ST::AudioConfigurationProcedure:
         handle_audio_conf_procedure();
+        break;
+    case State::ST::CellularPrivInit:
+        handle_cellular_priv_init();
         break;
     case State::ST::CellularConfProcedure:
         handle_start_conf_procedure();
@@ -694,11 +670,8 @@ bool ServiceCellular::handle_power_up_request()
 {
     cmux->selectAntenna(bsp::cellular::antenna::lowBand);
     switch (board) {
-    case bsp::Board::T4:
+    case bsp::Board::RT1051:
         priv->state->set(State::ST::StatusCheck);
-        break;
-    case bsp::Board::T3:
-        priv->state->set(State::ST::PowerUpProcedure);
         break;
     case bsp::Board::Linux:
         priv->state->set(State::ST::PowerUpProcedure);
@@ -713,33 +686,13 @@ bool ServiceCellular::handle_power_up_request()
 bool ServiceCellular::handle_power_up_procedure()
 {
     switch (board) {
-    case bsp::Board::T4: {
-        LOG_DEBUG("T4 - cold start");
+    case bsp::Board::RT1051: {
+        LOG_DEBUG("RT1051 - cold start");
         cmux->turnOnModem();
         // wait for status pin change to change state
         break;
     }
-    case bsp::Board::T3: {
-        // check baud once to determine if it's already turned on
-        auto ret = cmux->baudDetectOnce();
-        if (ret == CellularMux::ConfState::Success) {
-            // it's on aka hot start.
-            LOG_DEBUG("T3 - hot start");
-            priv->state->set(State::ST::CellularConfProcedure);
-            break;
-        }
-        else {
-            // it's off aka cold start
-            LOG_DEBUG("T3 - cold start");
-            cmux->turnOnModem();
-            // if it's T3, then wait for status pin to become active, to align its starting position with T4
-            vTaskDelay(pdMS_TO_TICKS(8000));
-            priv->state->set(State::ST::PowerUpInProgress);
-            break;
-        }
-    }
     case bsp::Board::Linux: {
-        // it is basically the same as T3
         // check baud once to determine if it's already turned on
         auto ret = cmux->baudDetectOnce();
         if (ret == CellularMux::ConfState::Success) {
@@ -753,7 +706,7 @@ bool ServiceCellular::handle_power_up_procedure()
             LOG_DEBUG("Linux - cold start");
             LOG_WARN("Press PWR_KEY for 2 sec on modem eval board!");
             vTaskDelay(pdMS_TO_TICKS(2000)); // give some 2 secs more for user input
-            // if it's Linux (T3), then wait for status pin to become active, to align its starting position with T4
+            // if it's Linux, then wait for status pin to become active, to align its starting position with RT1051
             vTaskDelay(pdMS_TO_TICKS(8000));
             priv->state->set(State::ST::PowerUpInProgress);
             break;
@@ -770,10 +723,9 @@ bool ServiceCellular::handle_power_up_procedure()
 
 bool ServiceCellular::handle_power_up_in_progress_procedure(void)
 {
-    if (isAfterForceReboot) {
+    if (priv->modemResetHandler->isResetInProgress()) {
         constexpr auto msModemUartInitTime = 12000;
         vTaskDelay(pdMS_TO_TICKS(msModemUartInitTime));
-        isAfterForceReboot = false;
     }
 
     priv->state->set(State::ST::BaudDetect);
@@ -802,12 +754,11 @@ bool ServiceCellular::handle_power_down_started()
 bool ServiceCellular::handle_power_down_waiting()
 {
     switch (board) {
-    case bsp::Board::T4:
+    case bsp::Board::RT1051:
         // wait for pin status become inactive (handled elsewhere)
         break;
     case bsp::Board::Linux:
-    case bsp::Board::T3:
-        // if it's T3, then wait for status pin to become inactive, to align with T4
+        // if it's Linux, then wait for status pin to become inactive, to align with RT1051
         vTaskDelay(pdMS_TO_TICKS(17000)); // according to docs this shouldn't be needed, but better be safe than Quectel
         priv->state->set(State::ST::PowerDown);
         break;
@@ -821,12 +772,11 @@ bool ServiceCellular::handle_power_down_waiting()
 bool ServiceCellular::handle_power_down()
 {
     LOG_DEBUG("Powered Down");
-
+    cmux->closeChannels();
     cmux.reset();
     cmux = std::make_unique<CellularMux>(PortSpeed_e::PS460800, this);
-
-    if (isAfterForceReboot) {
-        priv->state->set(State::ST::PowerUpInProgress);
+    if (priv->modemResetHandler->isResetInProgress()) {
+        priv->state->set(State::ST::Idle);
     }
     return true;
 }
@@ -846,6 +796,11 @@ bool ServiceCellular::handle_start_conf_procedure()
 bool ServiceCellular::handle_audio_conf_procedure()
 {
     auto audioRet = cmux->audioConfProcedure();
+    if (audioRet == CellularMux::ConfState::ModemNeedsReset) {
+        priv->modemResetHandler->performReboot();
+        return false;
+    }
+
     if (audioRet == CellularMux::ConfState::Success) {
         auto cmd = at::factory(at::AT::IPR) + std::to_string(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
         LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
@@ -860,40 +815,14 @@ bool ServiceCellular::handle_audio_conf_procedure()
         if (cmux->startMultiplexer() == CellularMux::ConfState::Success) {
 
             LOG_DEBUG("[ServiceCellular] Modem is fully operational");
-
-            priv->simCard->setChannel(cmux->get(CellularMux::Channel::Commands));
-            priv->networkTime->setChannel(cmux->get(CellularMux::Channel::Commands));
-            priv->simContacts->setChannel(cmux->get(CellularMux::Channel::Commands));
-            priv->imeiGetHandler->setChannel(cmux->get(CellularMux::Channel::Commands));
             // open channel - notifications
             DLCChannel *notificationsChannel = cmux->get(CellularMux::Channel::Notifications);
             if (notificationsChannel != nullptr) {
                 LOG_DEBUG("Setting up notifications callback");
                 notificationsChannel->setCallback(notificationCallback);
             }
-            auto flightMode =
-                settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global) == "1" ? true
-                                                                                                            : false;
-            connectionManager->setFlightMode(flightMode);
-            auto interval = 0;
-            if (utils::toNumeric(
-                    settings->getValue(settings::Offline::connectionFrequency, settings::SettingsScope::Global),
-                    interval)) {
-                connectionManager->setInterval(std::chrono::minutes{interval});
-            }
-            if (!connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode())) {
-                priv->state->set(State::ST::Failed);
-                LOG_ERROR("Failed to handle phone mode");
-                return false;
-            }
 
-            if (!priv->tetheringHandler->configure()) {
-                resetCellularModule(ResetType::SoftReset);
-                priv->state->set(State::ST::Idle);
-                return true;
-            }
-
-            priv->state->set(State::ST::APNConfProcedure);
+            priv->state->set(State::ST::CellularPrivInit);
             return true;
         }
         else {
@@ -911,6 +840,35 @@ bool ServiceCellular::handle_audio_conf_procedure()
     return true;
 }
 
+bool ServiceCellular::handle_cellular_priv_init()
+{
+    auto channel = cmux->get(CellularMux::Channel::Commands);
+    priv->simCard->setChannel(channel);
+    priv->networkTime->setChannel(channel);
+    priv->simContacts->setChannel(channel);
+    priv->imeiGetHandler->setChannel(channel);
+
+    if (!priv->tetheringHandler->configure()) {
+        priv->modemResetHandler->performHardReset();
+        return true;
+    }
+
+    auto flightMode =
+        settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global) == "1" ? true : false;
+    connectionManager->setFlightMode(flightMode);
+    auto interval = 0;
+    if (utils::toNumeric(settings->getValue(settings::Offline::connectionFrequency, settings::SettingsScope::Global),
+                         interval)) {
+        connectionManager->setInterval(std::chrono::minutes{interval});
+    }
+    if (!connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode())) {
+        priv->state->set(State::ST::Failed);
+        LOG_ERROR("Failed to handle phone mode");
+        return false;
+    }
+    priv->state->set(State::ST::APNConfProcedure);
+    return true;
+}
 auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
 {
     if (response->getResults().empty()) {
@@ -1271,8 +1229,8 @@ bool ServiceCellular::handle_sim_sanity_check()
         priv->state->set(State::ST::ModemOn);
     }
     else {
-        LOG_ERROR("Sanity check failure - user will be promped about full shutdown");
-        priv->state->set(State::ST::ModemFatalFailure);
+        LOG_ERROR("Sanity check failure - modem has to be rebooted");
+        priv->modemResetHandler->performHardReset();
     }
     return ret;
 }
@@ -1409,6 +1367,7 @@ bool ServiceCellular::handle_fatal_failure()
 
 bool ServiceCellular::handle_ready()
 {
+
     LOG_DEBUG("%s", priv->state->c_str());
     sleepTimer.start();
     return true;
@@ -1483,7 +1442,7 @@ bool ServiceCellular::handle_status_check(void)
     if (modemActive) {
         // modem is already turned on, call configutarion procedure
         LOG_INFO("Modem is already turned on.");
-        LOG_DEBUG("T4 - hot start");
+        LOG_DEBUG("RT1051 - hot start");
         priv->state->set(State::ST::PowerUpInProgress);
     }
     else {
@@ -2002,23 +1961,21 @@ auto ServiceCellular::handleEVMStatusMessage(sys::Message *msg) -> std::shared_p
 {
     using namespace bsp::cellular::status;
     auto message = static_cast<sevm::StatusStateMessage *>(msg);
-    if (board == bsp::Board::T4) {
         auto status_pin = message->state;
+        if (priv->modemResetHandler->handleStatusPinEvent(status_pin == value::ACTIVE)) {
+            return std::make_shared<CellularResponseMessage>(true);
+        }
+
         if (status_pin == value::ACTIVE) {
             if (priv->state->get() == State::ST::PowerUpProcedure) {
                 priv->state->set(State::ST::PowerUpInProgress); // and go to baud detect as usual
             }
-            else {
-                // asynchronous power toggle should fall back to PowerDown regardless the state
+        }
+        if (status_pin == value::INACTIVE) {
+            if (priv->state->get() == State::ST::PowerDownWaiting) {
                 priv->state->set(State::ST::PowerDown);
             }
         }
-        else if (status_pin == value::INACTIVE) {
-            if (isAfterForceReboot == true || priv->state->get() == State::ST::PowerDownWaiting) {
-                priv->state->set(State::ST::PowerDown);
-            }
-        }
-    }
     return std::make_shared<CellularResponseMessage>(true);
 }
 
@@ -2113,7 +2070,7 @@ auto ServiceCellular::handleCallAbortedNotification(sys::Message *msg) -> std::s
 auto ServiceCellular::handlePowerUpProcedureCompleteNotification(sys::Message *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
-    if (board == bsp::Board::T3 || board == bsp::Board::Linux) {
+    if (board == bsp::Board::Linux) {
         priv->state->set(State::ST::CellularConfProcedure);
     }
     return std::make_shared<CellularResponseMessage>(true);

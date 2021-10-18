@@ -349,14 +349,6 @@ namespace bsp
             return xHigherPriorityTaskWoken;
         }
 
-        bsp::Board GetBoard(void)
-        {
-            if (isPresent()) {
-                return bsp::Board::T4;
-            }
-            return bsp::Board::T3;
-        }
-
         void enableIRQ()
         {
             gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ));
