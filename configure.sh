@@ -30,7 +30,7 @@ function help() {
 function validate_product_selection() {
     case ${PRODUCT,,} in
         pure | purephone)
-            PRODUCT_SHORTNAME="purephone"
+            PRODUCT_SHORTNAME="pure"
             PRODUCT="PurePhone"
             return 0 ;;
         bell | bellhybrid)
@@ -105,7 +105,7 @@ BUILD_TYPE=$3
 
 if validate_product_selection && check_target && check_build_type ; then
     shift 3
-    BUILD_DIR="build-${PRODUCT_SHORTNAME}-${TARGET,,}-${CMAKE_BUILD_TYPE}"
+    BUILD_DIR="build-${PRODUCT}-${TARGET,,}-${CMAKE_BUILD_TYPE}"
     echo -e "build dir:\e[34m\n\t${BUILD_DIR}\e[0m"
     SRC_DIR=`pwd`
     if [ -d ${BUILD_DIR} ]; then
