@@ -110,11 +110,11 @@ namespace gui
         itemState = state;
         switch (state) {
         case ItemState::Paused:
-            playedSong->set("mp_now_playing_icon_pause_list", musicPlayerStyle::common::imageType);
+            playedSong->set("mp_nowplaying_paused_list", ImageTypeSpecifier::W_M);
             playedSong->setVisible(true);
             break;
         case ItemState::Playing:
-            playedSong->set("mp_now_playing_icon_list", musicPlayerStyle::common::imageType);
+            playedSong->set("mp_nowplaying_play_list", ImageTypeSpecifier::W_M);
             playedSong->setVisible(true);
             break;
         case ItemState::None:
