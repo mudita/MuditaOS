@@ -103,10 +103,9 @@ void SMSThreadModel::addReturnNumber()
         auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
         assert(smsInput->number != nullptr);
-        if (app->handleSendSmsFromThread(*smsInput->number, smsInput->inputText->getText())) {
+        if (!app->handleSendSmsFromThread(*smsInput->number, smsInput->inputText->getText())) {
             LOG_ERROR("handleSendSmsFromThread failed");
         }
-        smsInput->inputText->clear();
         smsInput->clearDraftMessage();
         return true;
     };

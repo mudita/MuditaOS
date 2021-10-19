@@ -55,7 +55,9 @@ namespace app
                               bool ignoreCurrentWindowOnStack = false);
         bool handleSendSmsFromThread(const utils::PhoneNumber::View &number, const UTF8 &body);
 
-        std::pair<SMSRecord, bool> createDraft(const utils::PhoneNumber::View &number, const UTF8 &body);
+        void createDraft(const utils::PhoneNumber::View &number,
+                         const UTF8 &body,
+                         std::function<void(const SMSRecord &)> onSuccess = {});
         bool updateDraft(SMSRecord &record, const UTF8 &body);
         bool removeDraft(const SMSRecord &record);
 
