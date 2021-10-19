@@ -98,10 +98,6 @@ namespace phonebookStyle
         inline constexpr uint32_t input_box_h           = h;
         inline constexpr int32_t input_box_right_margin = 20;
 
-        inline constexpr uint32_t description_label_w           = 280;
-        inline constexpr uint32_t description_label_h           = 33;
-        inline constexpr int32_t description_label_right_margin = 40;
-
         inline constexpr int32_t tick_image_left_margin  = -64;
         inline constexpr int32_t tick_image_right_margin = 32;
 

@@ -176,6 +176,7 @@ namespace style
             inline constexpr auto ok             = "common_ok";
             inline constexpr auto back           = "common_back";
             inline constexpr auto skip           = "common_skip";
+            inline constexpr auto contacts       = "common_contacts";
             inline constexpr auto set            = "common_set";
             inline constexpr auto show           = "common_show";
             inline constexpr auto yes            = "common_yes";
