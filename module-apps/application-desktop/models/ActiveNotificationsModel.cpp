@@ -13,7 +13,6 @@
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
-#include <service-appmgr/messages/SwitchRequest.hpp>
 #include <service-time/include/service-time/AlarmServiceAPI.hpp>
 #include <service-time/AlarmMessage.hpp>
 #include <service-time/Constants.hpp>
