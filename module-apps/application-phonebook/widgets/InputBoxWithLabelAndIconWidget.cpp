@@ -50,10 +50,8 @@ namespace gui
         tickImage->activeItem = false;
 
         descriptionLabel = new gui::Label(hBox, 0, 0, 0, 0);
-        descriptionLabel->setMaximumSize(phonebookStyle::inputBoxWithLabelAndIconIWidget::description_label_w,
-                                         phonebookStyle::inputBoxWithLabelAndIconIWidget::description_label_h);
-        descriptionLabel->setMargins(
-            gui::Margins(0, 0, phonebookStyle::inputBoxWithLabelAndIconIWidget::description_label_right_margin, 0));
+        descriptionLabel->setMaximumSize(phonebookStyle::inputBoxWithLabelAndIconIWidget::w,
+                                         phonebookStyle::inputBoxWithLabelAndIconIWidget::h);
         descriptionLabel->setEdges(gui::RectangleEdge::None);
         descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         descriptionLabel->setFont(style::window::font::medium);

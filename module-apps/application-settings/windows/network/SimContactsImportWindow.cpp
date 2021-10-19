@@ -163,7 +163,7 @@ namespace gui
         emptyListIcon->image->set("success_icon_W_G");
         bottomBar->setActive(BottomBar::Side::RIGHT, false);
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::ok));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate("app_desktop_menu_contacts"));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::contacts));
 
         onLFInputCallback = [&]() {
             app::manager::Controller::sendAction(application, app::manager::actions::ShowContacts);
