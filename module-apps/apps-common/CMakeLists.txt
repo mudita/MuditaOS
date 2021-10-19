@@ -36,6 +36,7 @@ target_sources(apps-common
         widgets/ButtonOnOff.cpp
         widgets/BellBaseLayout.cpp
         widgets/BellSideListItem.cpp
+        widgets/ClockDateWidget.cpp
         widgets/DateWidget.cpp
         widgets/InputBox.cpp
         widgets/ModesBox.cpp

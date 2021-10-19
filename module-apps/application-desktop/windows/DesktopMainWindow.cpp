@@ -4,7 +4,6 @@
 #include "ApplicationDesktop.hpp"
 #include "DesktopData.hpp"
 #include "DesktopMainWindow.hpp"
-#include "DesktopStyle.hpp"
 
 #include <application-call/data/CallSwitchData.hpp>
 #include <log/log.hpp>
@@ -27,20 +26,8 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
 
-        namespace timeLabel = style::desktop::timeLabel;
-        namespace dayLabel  = style::desktop::dayLabel;
-
-        time = new gui::Label(this, timeLabel::X, timeLabel::Y, timeLabel::Width, timeLabel::Height);
-        time->setFilled(false);
-        time->setBorderColor(gui::ColorNoColor);
-        time->setFont(style::window::font::supersizemelight);
-        time->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-
-        dayText = new gui::Label(this, dayLabel::X, dayLabel::Y, dayLabel::Width, dayLabel::Height);
-        dayText->setFilled(false);
-        dayText->setBorderColor(gui::ColorNoColor);
-        dayText->setFont(style::window::font::biglight);
-        dayText->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        clockDate = new ClockDateWidget(
+            this, 0, style::window::default_vertical_pos, style::window_width, clock_date_widget::h);
 
         activatedCallback = [this]([[maybe_unused]] Item &item) {
             if (notificationsModel->isTetheringOn()) {
@@ -75,13 +62,6 @@ namespace gui
     void DesktopMainWindow::destroyInterface()
     {
         erase();
-        invalidate();
-    }
-
-    void DesktopMainWindow::invalidate() noexcept
-    {
-        time    = nullptr;
-        dayText = nullptr;
     }
 
     status_bar::Configuration DesktopMainWindow::configureStatusBar(status_bar::Configuration appConfiguration)
@@ -233,16 +213,8 @@ namespace gui
 
     bool DesktopMainWindow::updateTime()
     {
-        using namespace utils::time;
-        auto ret   = AppWindow::updateTime();
-        auto clock = TimestampFactory().createTimestamp(TimestampType::Clock, std::time(nullptr));
-        auto date  = TimestampFactory().createTimestamp(TimestampType::DateText, std::time(nullptr));
-        if (time != nullptr) {
-            time->setText(clock->str());
-        }
-        if (dayText != nullptr) {
-            dayText->setText(date->str());
-        }
+        auto ret = AppWindow::updateTime();
+        clockDate->setTime(std::time(nullptr));
         return ret;
     }
 

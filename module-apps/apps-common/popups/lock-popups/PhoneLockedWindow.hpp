@@ -4,8 +4,7 @@
 #pragma once
 
 #include <AppWindow.hpp>
-#include <gui/widgets/Label.hpp>
-#include <Translator.hpp>
+#include <widgets/ClockDateWidget.hpp>
 #include <notifications/NotificationsModel.hpp>
 #include <ListView.hpp>
 
@@ -19,8 +18,7 @@ namespace gui
     class PhoneLockedWindow : public AppWindow
     {
       protected:
-        gui::Label *time                                            = nullptr;
-        gui::Label *dayText                                         = nullptr;
+        gui::ClockDateWidget *clockDate                             = nullptr;
         gui::ListView *notificationsList                            = nullptr;
         std::shared_ptr<gui::NotificationsModel> notificationsModel = nullptr;
         bool refreshedOnPhoneLockTimeLock                           = false;
