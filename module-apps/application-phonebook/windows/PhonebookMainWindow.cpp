@@ -99,6 +99,10 @@ namespace gui
                     std::make_unique<app::manager::SwitchBackRequest>(application->GetName(), std::move(data)));
             };
 
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::add));
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+
             header->navigationIndicatorRemove(gui::header::BoxSelection::Left);
             header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
         }
@@ -181,10 +185,13 @@ namespace gui
 
     void PhonebookMainWindow::onListFilled()
     {
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+        if (!isSearchRequested()) {
+            bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
+            bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+            header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
+        }
+
         emptyListIcon->setVisible(false);
-        header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
         application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
     }
 } /* namespace gui */
