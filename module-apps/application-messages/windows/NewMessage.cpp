@@ -170,7 +170,7 @@ namespace gui
         if (getFocusItem() == recipient) {
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             if (recipient->getText().empty()) {
-                bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+                bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::contacts));
                 return;
             }
             bottomBar->setActive(BottomBar::Side::CENTER, false);
