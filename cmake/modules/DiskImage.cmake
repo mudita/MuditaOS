@@ -30,11 +30,6 @@ function(add_image)
         set(BIN_FILE_PATH "")
     endif()
 
-    if(HAS_VERSION)
-        set(VERSION_FILE_PATH ${CMAKE_BINARY_DIR}/${_ARG_PRODUCT}-version.json)
-    else()
-        set(VERSION_FILE_PATH "")
-    endif()
 
     if(HAS_UPDATER)
         set(UPDATER_FILE_PATH ${CMAKE_BINARY_DIR}/updater.bin)
@@ -55,6 +50,13 @@ function(add_image)
         list(APPEND COMMAND_DEPENDS updater.bin-target)
     endif()
 
+    if(HAS_VERSION)
+        set(VERSION_FILE_PATH ${CMAKE_BINARY_DIR}/${_ARG_PRODUCT}-version.json)
+        list(APPEND COMMAND_DEPENDS ${_ARG_PRODUCT}-version.json-target)
+    else()
+        set(VERSION_FILE_PATH "")
+    endif()
+
     add_custom_command(
         OUTPUT ${DISK_IMAGE_NAME}
         DEPENDS ${COMMAND_DEPENDS}
@@ -73,7 +75,7 @@ function(add_image)
     message("Adding disk image target: ${DISK_IMAGE_NAME}")
 
     add_custom_target(${_ARG_PRODUCT}-disk-img
-        DEPENDS ${DISK_IMAGE_NAME} ${VERSION_FILE_PATH})
+        DEPENDS ${DISK_IMAGE_NAME})
 
 endfunction()
 
