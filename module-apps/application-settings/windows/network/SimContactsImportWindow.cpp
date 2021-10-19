@@ -43,6 +43,7 @@ namespace gui
                                       "info_icon_W_G",
                                       utils::translate("app_settings_network_import_contacts_from_sim_card_reading"));
         emptyListIcon->setAlignment(Alignment::Horizontal::Center);
+        emptyListIcon->setVisible(false);
 
         list->emptyListCallback    = [this]() { emptyListIcon->setVisible(true); };
         list->notEmptyListCallback = [this]() { emptyListIcon->setVisible(false); };
