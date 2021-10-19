@@ -25,6 +25,9 @@ namespace db::query
         explicit SMSAddResult(const SMSRecord &_record, bool _result);
 
         [[nodiscard]] std::string debugInfo() const override;
+
+        [[nodiscard]] bool succeed() const noexcept;
+
         SMSRecord record;
         bool result;
     };

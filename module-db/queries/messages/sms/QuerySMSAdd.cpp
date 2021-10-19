@@ -22,4 +22,9 @@ namespace db::query
     {
         return "SMSAddResult"s;
     }
+
+    bool SMSAddResult::succeed() const noexcept
+    {
+        return result;
+    }
 } // namespace db::query
