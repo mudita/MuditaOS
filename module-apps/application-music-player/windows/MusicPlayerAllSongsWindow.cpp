@@ -52,6 +52,7 @@ namespace gui
                                       "mp_note",
                                       utils::translate("app_music_player_music_empty_window_notification"),
                                       musicPlayerStyle::common::imageType);
+        emptyListIcon->setVisible(false);
 
         emptyListIcon->setAlignment(Alignment::Horizontal::Center);
         songsList->emptyListCallback    = [this]() { emptyListIcon->setVisible(true); };

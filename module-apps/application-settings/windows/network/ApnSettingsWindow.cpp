@@ -31,6 +31,7 @@ namespace gui
                                  style::window_height - style::window::default_vertical_pos - style::footer::height,
                                  "empty_list_add_W_G",
                                  utils::translate("app_settings_apn_settings_no_apns"));
+        emptyListIcon->setVisible(false);
 
         bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
 
