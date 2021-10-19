@@ -62,6 +62,7 @@ namespace app::alarmClock
                           style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
                           "empty_list_add_W_G",
                           utils::translate("app_alarm_clock_no_alarms_information"));
+        emptyListIcon->setVisible(false);
 
         alarmsList->emptyListCallback    = [this]() { onEmptyList(); };
         alarmsList->notEmptyListCallback = [this]() { onListFilled(); };
