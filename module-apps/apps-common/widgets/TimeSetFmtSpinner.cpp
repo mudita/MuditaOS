@@ -220,21 +220,16 @@ namespace gui
     {
         using namespace utils::time;
         if (timeFormat == Locale::TimeFormat::FormatTime24H) {
-            const auto t = std::localtime(&time);
-            timeSetSpinner->setHour(t->tm_hour);
-            timeSetSpinner->setMinute(t->tm_min);
+            timeSetSpinner->setTime(time);
         }
         else {
             const auto t       = std::localtime(&time);
             const auto hours   = std::chrono::hours{t->tm_hour};
             const auto time12H = date::make12(hours);
             const auto isPM    = date::is_pm(hours);
-            timeSetSpinner->setHour(time12H.count());
-            timeSetSpinner->setMinute(t->tm_min);
             fmt->setCurrentValue(isPM ? utils::time::Locale::getPM() : utils::time::Locale::getAM());
+            timeSetSpinner->setTime(time12H.count(), t->tm_min);
         }
-
-        timeSetSpinner->applySizeRestrictions();
     }
 
     auto TimeSetFmtSpinner::setTimeFormatSpinnerVisibility(bool visibility) noexcept -> void

@@ -27,8 +27,11 @@ namespace gui
     class TimeSetSpinner : public HBox
     {
       public:
+        explicit TimeSetSpinner(Item *parent);
         TimeSetSpinner(Item *parent, Length x, Length y, Length w, Length h);
 
+        auto setTime(std::time_t time) noexcept -> void;
+        auto setTime(int hourValue, int minuteValue) noexcept -> void;
         auto setHour(int value) noexcept -> void;
         auto setMinute(int value) noexcept -> void;
         auto setFont(const std::string &newFontName) noexcept -> void;
@@ -38,7 +41,6 @@ namespace gui
         auto setHourRange(std::uint32_t min, std::uint32_t max) -> void;
         [[nodiscard]] auto getHour() const noexcept -> int;
         [[nodiscard]] auto getMinute() const noexcept -> int;
-        auto applySizeRestrictions() -> void;
 
       private:
         std::map<std::string, std::string> colonFontMap = {
@@ -68,6 +70,7 @@ namespace gui
         void updateFocus(Item *newFocus);
         auto handleEnterKey() -> bool;
         auto handleRightFunctionKey() -> bool;
+        auto applySizeRestrictions() -> void;
         auto onInput(const InputEvent &inputEvent) -> bool override;
         [[nodiscard]] auto getFontHeight(const std::string &fontName) const noexcept -> uint16_t;
         [[nodiscard]] auto getColonImage(const std::string &colonFont) const noexcept -> std::string;
