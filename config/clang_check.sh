@@ -49,7 +49,7 @@ get_compile_commands()
 
 main()
 {
-    if [[ $# -ne 0 ]]; then
+    if [[ $# -ne 1 ]]; then
         help
         exit 0
     fi
