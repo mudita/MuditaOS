@@ -161,10 +161,7 @@ namespace gui
             app->updateDraft(draft.value(), inputText);
         }
         else {
-            const auto &[draft, success] = app->createDraft(*number, inputText);
-            if (success) {
-                this->draft = draft;
-            }
+            app->createDraft(*number, inputText, [this](const SMSRecord &record) { draft = record; });
         }
     }
 
