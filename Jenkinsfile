@@ -164,7 +164,7 @@ pipeline {
                 /* requires compilation database - must be run after configuration */
                 sh '''#!/bin/bash -e
                 pushd ${WORKSPACE}
-                ./config/clang_check.sh
+                ./config/clang_check.sh PurePhone
                 popd'''
 
                 echo "Build"
@@ -249,7 +249,7 @@ pipeline {
                 /* requires compilation database - must be run after configuration */
                 sh '''#!/bin/bash -e
                 pushd ${WORKSPACE}
-                ./config/clang_check.sh
+                ./config/clang_check.sh BellHybrid
                 popd'''
 
                 echo "Build"
