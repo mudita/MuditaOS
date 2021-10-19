@@ -3,12 +3,15 @@
 
 #include "popups/BellTurnOffOptionWindow.hpp"
 
+#include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <common/data/StyleCommon.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <i18n/i18n.hpp>
 #include <options/OptionBellMenu.hpp>
+#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/messages/SwitchRequest.hpp>
 
 namespace gui
 {
@@ -32,7 +35,9 @@ namespace gui
             return true;
         });
         addWinSettings(yesStr, [this](auto &) {
-            application->switchWindow(BellTurnOffWindow::name);
+            auto switchRequest = std::make_unique<app::manager::SwitchRequest>(
+                service::name::appmgr, app::applicationBellName, gui::BellTurnOffWindow::name, nullptr);
+            application->bus.sendUnicast(std::move(switchRequest), service::name::appmgr);
             return true;
         });
 
