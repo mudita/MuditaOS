@@ -19,6 +19,9 @@ namespace bsp::battery_charger
 
         xQueueHandle IRQQueueHandle = nullptr;
 
+        volatile int chgok_event_cntr = 0;
+        auto constexpr CHARGER_ERROR_EVENT_TRESHOLD = 10;
+
     } // namespace
 
     int init(xQueueHandle irqQueueHandle)
@@ -87,6 +90,17 @@ namespace bsp::battery_charger
         uint8_t acok  = gpio->ReadPin(static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_ACOK_PIN));
         uint8_t chgok = gpio_int->ReadPin(static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_CHGOK_PIN));
 
+        if (chgok_event_cntr >= CHARGER_ERROR_EVENT_TRESHOLD)
+        {
+            gpio_int->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_CHGOK_PIN));
+            gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_ACOK_PIN));
+            disableCharging();
+
+            setChargerError();
+            Store::Battery::modify().state = Store::Battery::State::PluggedNotCharging;
+            LOG_ERROR("Battery charging error !");
+        }
+
         LOG_DEBUG("Charger status ACOK[%u], CHGOK[%u]", acok, chgok);
 
         if (acok != 0) {
@@ -116,6 +130,13 @@ namespace bsp::battery_charger
 
     void enableCharging()
     {
+        if (chgok_event_cntr >= CHARGER_ERROR_EVENT_TRESHOLD)
+        {
+            chgok_event_cntr = 0;   //reset event counter to avoid error with multiple USB plug/unplug
+            //reenable interrupts
+            gpio_int->EnableInterrupt(1U << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_CHGOK_PIN));
+            gpio->EnableInterrupt(1U << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_ACOK_PIN));
+        }
         LOG_INFO("Enable charging");
         gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_CHGEN_PIN), 0);
     }
@@ -133,6 +154,7 @@ namespace bsp::battery_charger
         if (IRQQueueHandle) {
             xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
         }
+        chgok_event_cntr++;
         return xHigherPriorityTaskWoken;
     }
 } // namespace bsp::battery_charger
