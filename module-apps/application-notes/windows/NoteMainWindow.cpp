@@ -78,6 +78,7 @@ namespace app::notes
                           ::style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
                           "empty_list_add_W_G",
                           utils::translate("app_notes_no_notes"));
+        emptyListIcon->setVisible(false);
 
         list->emptyListCallback    = [this]() { onEmptyList(); };
         list->notEmptyListCallback = [this]() { onListFilled(); };

@@ -67,6 +67,7 @@ namespace gui
                           ::style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
                           "info_icon_W_G",
                           utils::translate("app_calllog_no_calls"));
+        emptyListIcon->setVisible(false);
 
         list->emptyListCallback    = [this]() { onEmptyList(); };
         list->notEmptyListCallback = [this]() { onListFilled(); };
