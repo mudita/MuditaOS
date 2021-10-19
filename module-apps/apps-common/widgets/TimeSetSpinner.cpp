@@ -18,6 +18,9 @@ static constexpr auto minuteStep      = 1;
 
 namespace gui
 {
+    TimeSetSpinner::TimeSetSpinner(Item *parent) : TimeSetSpinner(parent, 0, 0, 0, 0)
+    {}
+
     TimeSetSpinner::TimeSetSpinner(Item *parent, Length x, Length y, Length w, Length h) : HBox(parent, x, y, w, h)
     {
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -110,6 +113,21 @@ namespace gui
             return true;
         }
         return false;
+    }
+
+    auto TimeSetSpinner::setTime(std::time_t time) noexcept -> void
+    {
+        const auto t = std::localtime(&time);
+        setHour(t->tm_hour);
+        setMinute(t->tm_min);
+        applySizeRestrictions();
+    }
+
+    auto TimeSetSpinner::setTime(int hourValue, int minuteValue) noexcept -> void
+    {
+        setHour(hourValue);
+        setMinute(minuteValue);
+        applySizeRestrictions();
     }
 
     auto TimeSetSpinner::setHour(int value) noexcept -> void
