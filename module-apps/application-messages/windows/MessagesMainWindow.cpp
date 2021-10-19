@@ -76,6 +76,7 @@ namespace gui
                                  style::window_height - style::window::default_vertical_pos - style::footer::height,
                                  "empty_list_add_W_G",
                                  utils::translate("app_messages_no_messages"));
+        emptyListIcon->setVisible(false);
 
         list->setVisible(true);
         list->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
