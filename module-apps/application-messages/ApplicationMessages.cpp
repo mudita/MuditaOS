@@ -326,8 +326,9 @@ namespace app
         return succeed;
     }
 
-    std::pair<SMSRecord, bool> ApplicationMessages::createDraft(const utils::PhoneNumber::View &number,
-                                                                const UTF8 &body)
+    void ApplicationMessages::createDraft(const utils::PhoneNumber::View &number,
+                                          const UTF8 &body,
+                                          std::function<void(const SMSRecord &)> onSuccess)
     {
         assert(!body.empty()); // precondition check.
 
@@ -338,14 +339,30 @@ namespace app
         record.date   = std::time(nullptr);
 
         using db::query::SMSAdd;
-        const auto [success, _] =
-            DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<SMSAdd>(record));
-        return std::make_pair(record, success);
+        auto query = std::make_unique<db::query::SMSAdd>(record);
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
+        task->setCallback([onSuccess](auto response) {
+            using db::query::SMSAddResult;
+            if (auto result = static_cast<SMSAddResult *>(response); result->succeed()) {
+                if (onSuccess) {
+                    onSuccess(result->record);
+                }
+                return true;
+            }
+
+            LOG_ERROR("Failed to add an SMS record to the DB.");
+            return false;
+        });
+        task->execute(this, this);
     }
 
     bool ApplicationMessages::removeDraft(const SMSRecord &record)
     {
         using db::query::SMSRemove;
+        if (!record.isValid()) {
+            LOG_ERROR("Draft SMS is invalid.");
+            return false;
+        }
         const auto [succeed, _] =
             DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<SMSRemove>(record.ID));
         return succeed;
