@@ -49,7 +49,7 @@ get_compile_commands()
 
 main()
 {
-    if [[ $# -ne 0 ]]; then
+    if [[ $# -ne 1 ]]; then
         help
         exit 0
     fi
@@ -71,9 +71,9 @@ main()
 
     # get the stage
     verify_clang_format_version
-    get_compile_commands purephone
+    get_compile_commands "$1"
     # run tidy
     git diff -U0 --no-color remotes/origin/${CHANGE_TARGET}...HEAD $files_to_check | ${tool[*]} -p 1 -path=/tmp/
 }
 
-main
+main "$1"
