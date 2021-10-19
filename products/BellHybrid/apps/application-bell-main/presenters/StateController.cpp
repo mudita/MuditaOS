@@ -338,7 +338,8 @@ namespace app::home_screen
                                              "AlarmSnoozed"_s + sml::on_entry<_> / AlarmSnoozed::entry,
                                              "AlarmSnoozed"_s + sml::on_entry<_> / AlarmSnoozed::exit,
                                              "AlarmSnoozed"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
-                                             "AlarmSnoozed"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s
+                                             "AlarmSnoozed"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s,
+                                             "AlarmSnoozed"_s + event<Events::LightPress>/Helpers::switchToMenu
                     );
                 // clang-format on
             }
