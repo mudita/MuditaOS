@@ -5,10 +5,7 @@
 #include "PhoneLockedInfoData.hpp"
 
 #include <locks/input/PhoneLockedKeysWhitelist.hpp>
-#include <application-desktop/data/DesktopStyle.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <time/time_conversion_factory.hpp>
-#include <service-time/ServiceTime.hpp>
 
 namespace gui
 {
@@ -25,19 +22,8 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        using namespace style::desktop;
-
-        time = new gui::Label(this, timeLabel::X, timeLabel::Y, timeLabel::Width, timeLabel::Height);
-        time->setFilled(false);
-        time->setBorderColor(gui::ColorNoColor);
-        time->setFont(style::window::font::supersizemelight);
-        time->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-
-        dayText = new gui::Label(this, dayLabel::X, dayLabel::Y, dayLabel::Width, dayLabel::Height);
-        dayText->setFilled(false);
-        dayText->setBorderColor(gui::ColorNoColor);
-        dayText->setFont(style::window::font::biglight);
-        dayText->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        clockDate = new ClockDateWidget(
+            this, 0, style::window::default_vertical_pos, style::window_width, clock_date_widget::h);
 
         notificationsList = new ListView(this,
                                          style::notifications::model::x,
@@ -131,16 +117,8 @@ namespace gui
 
     bool PhoneLockedWindow::updateTime()
     {
-        using namespace utils::time;
-        auto ret   = AppWindow::updateTime();
-        auto clock = TimestampFactory().createTimestamp(TimestampType::Clock, std::time(nullptr));
-        auto date  = TimestampFactory().createTimestamp(TimestampType::DateText, std::time(nullptr));
-        if (time != nullptr) {
-            time->setText(clock->str());
-        }
-        if (dayText != nullptr) {
-            dayText->setText(date->str());
-        }
+        auto ret = AppWindow::updateTime();
+        clockDate->setTime(std::time(nullptr));
         return ret;
     }
 } /* namespace gui */

@@ -20,7 +20,6 @@ target_sources(application-desktop
 	PRIVATE
 		ApplicationDesktop.cpp
 		data/DesktopData.hpp
-		data/DesktopStyle.hpp
 		data/Mmi.hpp
 		models/ActiveNotificationsModel.cpp
 		models/ActiveNotificationsModel.hpp

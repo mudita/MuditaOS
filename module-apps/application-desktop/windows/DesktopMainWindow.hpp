@@ -3,12 +3,11 @@
 
 #pragma once
 
-#include "ActiveNotificationsModel.hpp"
+#include <application-desktop/models/ActiveNotificationsModel.hpp>
 
 #include <AppWindow.hpp>
-#include <gui/widgets/Label.hpp>
 #include <ListView.hpp>
-#include <Translator.hpp>
+#include <widgets/ClockDateWidget.hpp>
 
 namespace app
 {
@@ -22,9 +21,7 @@ namespace gui
     class DesktopMainWindow : public AppWindow
     {
       protected:
-        gui::Label *time    = nullptr;
-        gui::Label *dayText = nullptr;
-
+        gui::ClockDateWidget *clockDate                                   = nullptr;
         gui::ListView *notificationsList                                  = nullptr;
         std::shared_ptr<gui::ActiveNotificationsModel> notificationsModel = nullptr;
 
@@ -52,7 +49,6 @@ namespace gui
       private:
         bool resolveDialAction(const std::string &number);
         bool showInformationPopup(std::function<bool()> action, const std::string &notification);
-        void invalidate() noexcept;
 
         gui::KeyInputMappedTranslation translator;
     };
