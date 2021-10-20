@@ -123,6 +123,7 @@ target_link_libraries(application-bell-settings
         bellgui
         bell::db
         bell::alarms
+        bell::app-main
         service-appmgr
         apps-common
     PUBLIC

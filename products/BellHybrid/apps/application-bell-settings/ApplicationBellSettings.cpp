@@ -32,8 +32,10 @@
 
 #include <AlarmSoundPaths.hpp>
 #include <apps-common/windows/Dialog.hpp>
+#include <common/BellPowerOffPresenter.hpp>
 #include <common/models/BedtimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
+#include <common/windows/BellFinishedCallbackWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/models/AudioModel.hpp>
@@ -115,6 +117,11 @@ namespace app
                                   return std::make_unique<gui::BellFinishedWindow>(app);
                               });
 
+        windowsFactory.attach(gui::BellFinishedCallbackWindow::defaultName,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellFinishedCallbackWindow>(app);
+                              });
+
         windowsFactory.attach(gui::window::name::bellSettingsHomeView,
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellSettingsHomeViewWindow>(app);
@@ -139,7 +146,7 @@ namespace app
                               });
 
         windowsFactory.attach(gui::BellTurnOffWindow::name, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::BellTurnOffWindow>(app, std::make_unique<gui::PowerOffPresenter>(app));
+            return std::make_unique<gui::BellTurnOffWindow>(app, std::make_unique<gui::BellPowerOffPresenter>(app));
         });
 
         windowsFactory.attach(

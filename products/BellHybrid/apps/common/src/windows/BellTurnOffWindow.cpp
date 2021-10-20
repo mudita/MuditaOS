@@ -7,6 +7,8 @@
 #include <i18n/i18n.hpp>
 #include <Application.hpp>
 
+#include <system/Common.hpp>
+
 namespace gui
 {
     BellTurnOffWindow::BellTurnOffWindow(app::ApplicationCommon *app,

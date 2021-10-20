@@ -11,9 +11,11 @@
 #include "windows/BellMainMenuWindow.hpp"
 
 #include <apps-common/messages/AppMessage.hpp>
+#include <common/BellPowerOffPresenter.hpp>
 #include <common/models/AlarmModel.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
+#include <common/windows/BellFactoryReset.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
 #include <service-audio/AudioMessage.hpp>
@@ -72,6 +74,9 @@ namespace app
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellBatteryShutdownWindow>(app);
                               });
+        windowsFactory.attach(gui::BellFactoryReset::name, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::BellFactoryReset>(app, std::make_unique<gui::BellPowerOffPresenter>(app));
+        });
 
         // for demo only - to be removed
         windowsFactory.attach(
