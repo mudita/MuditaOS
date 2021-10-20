@@ -7,9 +7,9 @@
 #include <application-bell-background-sounds/ApplicationBellBackgroundSounds.hpp>
 #include <application-bell-bedtime/ApplicationBellBedtime.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
+#include <application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
-#include <application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp>
 #include <data/BellMainStyle.hpp>
 
 #include <Dialog.hpp>
@@ -29,7 +29,7 @@ namespace gui
     {
         std::list<gui::Option> menuOptionList;
 
-        auto addWinMenu = [&](const UTF8 &name, const std::string &window) {
+        /*auto addWinMenu = [&](const UTF8 &name, const std::string &window) {
             menuOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
                 name,
                 [=](gui::Item &item) {
@@ -47,7 +47,7 @@ namespace gui
                     return true;
                 },
                 this));
-        };
+        };*/
 
         auto addAppMenu = [&](const UTF8 &name, const std::string &appName) {
             menuOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
@@ -70,11 +70,14 @@ namespace gui
         addAppMenu(utils::translate("app_bellmain_alarm"), app::applicationBellAlarmName);
         addAppMenu(utils::translate("app_bellmain_power_nap"), app::applicationBellPowerNapName);
         addAppMenu(utils::translate("app_bellmain_background_sounds"), app::applicationBellBackgroundSoundsName);
+        // for demo only - to be replaced by call o final window
+        addAppMenu(utils::translate("app_bellmain_meditation_timer"), app::applicationBellMeditationTimerName);
         addAppMenu(utils::translate("app_bellmain_bedtime"), app::applicationBellBedtimeName);
-        addWinMenu(utils::translate("app_bellmain_meditation_timer"), app::applicationBellMeditationTimerName);
+
         addAppMenu(utils::translate("app_bellmain_settings"), app::applicationBellSettingsName);
 
         return menuOptionList;
     }
 
 } // namespace gui
+
