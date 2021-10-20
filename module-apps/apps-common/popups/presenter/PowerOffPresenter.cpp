@@ -10,7 +10,7 @@ namespace gui
     PowerOffPresenter::PowerOffPresenter(app::ApplicationCommon *app) : application(app)
     {}
 
-    void PowerOffPresenter::powerOff()
+    void PowerOffPresenter::powerOff(sys::CloseReason reason)
     {
         auto msg = std::make_shared<app::UserPowerDownRequest>();
         application->bus.sendUnicast(std::move(msg), service::name::system_manager);

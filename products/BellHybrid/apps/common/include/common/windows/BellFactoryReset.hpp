@@ -3,19 +3,19 @@
 
 #pragma once
 
-#include <common/BellPowerOffPresenter.hpp>
+#include <apps-common/popups/presenter/PowerOffPresenter.hpp>
 #include <apps-common/popups/WindowWithTimer.hpp>
 
 namespace gui
 {
     class Icon;
 
-    class BellTurnOffWindow : public WindowWithTimer
+    class BellFactoryReset : public WindowWithTimer
     {
       public:
-        static constexpr auto name = "BellTurnOffWindow";
+        static constexpr auto name = "BellFactoryResetWindow";
 
-        BellTurnOffWindow(app::ApplicationCommon *app, std::unique_ptr<AbstractPowerOffPresenter> presenter);
+        BellFactoryReset(app::ApplicationCommon *app, std::unique_ptr<AbstractPowerOffPresenter> presenter);
 
       private:
         void buildInterface() override;
