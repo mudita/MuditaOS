@@ -149,7 +149,7 @@ namespace purefs::fs::drivers
     namespace
     {
         template <typename T, typename... Args>
-        auto invoke_lfs(filesystem_littlefs::fsfile zfil, T lfs_fun, Args &&...args)
+        auto invoke_lfs(filesystem_littlefs::fsfile zfil, T lfs_fun, Args &&... args)
             -> decltype(lfs_fun(nullptr, nullptr, std::forward<Args>(args)...))
         {
             auto vfile = std::dynamic_pointer_cast<file_handle_littlefs>(zfil);
@@ -166,7 +166,7 @@ namespace purefs::fs::drivers
             return lfs_to_errno(lerr);
         }
         template <typename T, typename... Args>
-        auto invoke_lfs(filesystem_littlefs::fsdir zdir, T lfs_fun, Args &&...args)
+        auto invoke_lfs(filesystem_littlefs::fsdir zdir, T lfs_fun, Args &&... args)
             -> decltype(lfs_fun(nullptr, nullptr, std::forward<Args>(args)...))
         {
             auto vdir = std::dynamic_pointer_cast<directory_handle_littlefs>(zdir);
@@ -184,7 +184,7 @@ namespace purefs::fs::drivers
         }
 
         template <typename T, typename... Args>
-        auto invoke_lfs(filesystem_littlefs::fsmount fmnt, T lfs_fun, Args &&...args)
+        auto invoke_lfs(filesystem_littlefs::fsmount fmnt, T lfs_fun, Args &&... args)
             -> decltype(lfs_fun(nullptr, std::forward<Args>(args)...))
         {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(fmnt);
@@ -197,7 +197,7 @@ namespace purefs::fs::drivers
         }
 
         template <typename T, typename... Args>
-        auto invoke_lfs(filesystem_littlefs::fsmount fmnt, std::string_view path, T lfs_fun, Args &&...args)
+        auto invoke_lfs(filesystem_littlefs::fsmount fmnt, std::string_view path, T lfs_fun, Args &&... args)
             -> decltype(lfs_fun(nullptr, "", std::forward<Args>(args)...))
         {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(fmnt);

@@ -7,9 +7,9 @@
 
 namespace gui::window::name
 {
-    inline constexpr auto powernapProgress = "PowerNapProgressWindow";
+    inline constexpr auto powernapProgress     = "PowerNapProgressWindow";
     inline constexpr auto powernapSessionEnded = "PowerNapSessionEndedWindow";
-}
+} // namespace gui::window::name
 namespace app
 {
     namespace powernap

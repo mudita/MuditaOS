@@ -18,7 +18,7 @@ namespace app
     {
       protected:
         ApplicationCommon *application = nullptr;
-        unsigned int recordsCount = std::numeric_limits<unsigned int>::max();
+        unsigned int recordsCount      = std::numeric_limits<unsigned int>::max();
         int modelIndex            = 0;
         std::vector<std::shared_ptr<T>> records;
 

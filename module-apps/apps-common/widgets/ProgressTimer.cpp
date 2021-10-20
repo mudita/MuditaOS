@@ -64,7 +64,9 @@ namespace app
         }
     }
 
-    void ProgressTimer::reset(std::chrono::seconds _duration, std::chrono::seconds _interval)
+    void ProgressTimer::reset(std::chrono::seconds _duration,
+                              std::chrono::seconds _interval,
+                              std::chrono::seconds _elapsed)
     {
         Expects(_duration != std::chrono::seconds::zero());
 
@@ -152,6 +154,11 @@ namespace app
     void ProgressTimer::registerOnIntervalCallback(std::function<void()> cb)
     {
         onIntervalCallback = std::move(cb);
+    }
+
+    void ProgressTimer::registerOnBaseTickCallback(std::function<void()> cb)
+    {
+        onBaseTickCallback = std::move(cb);
     }
 
     void ProgressTimer::attach(gui::Progress *_progress)

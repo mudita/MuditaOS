@@ -45,7 +45,7 @@ namespace sys
       public:
         using BaseServiceCreator::BaseServiceCreator;
 
-        explicit ServiceCreator(ServiceManifest &&manifest, Args &&...args)
+        explicit ServiceCreator(ServiceManifest &&manifest, Args &&... args)
             : BaseServiceCreator(std::move(manifest)), savedArgs(std::make_tuple<Args...>(std::forward<Args>(args)...))
         {}
 
@@ -65,7 +65,7 @@ namespace sys
      * @param args      Parameter pack that is to be forwarded to the service constructor.
      * @return ServiceCreator for Service T.
      */
-    template <typename T, typename... Args> std::unique_ptr<BaseServiceCreator> CreatorFor(Args &&...args) noexcept
+    template <typename T, typename... Args> std::unique_ptr<BaseServiceCreator> CreatorFor(Args &&... args) noexcept
     {
         return std::make_unique<ServiceCreator<T, Args...>>(ManifestOf<T>(), std::forward<Args>(args)...);
     }

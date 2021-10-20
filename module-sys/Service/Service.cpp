@@ -43,10 +43,9 @@ void debug_msg(sys::Service *srvc, const sys::Message *ptr)
               srvc ? srvc->GetName().c_str() : "",
               status == 0 ? demangled ? demangled : realname : realname,
               std::string(*ptr).c_str(),
-              status != 0 ? status == -1   ? "!mem fail!"
-                            : status == -2 ? "name ABI fail"
-                            : status == -3 ? "arg invalid"
-                                           : "other failure!"
+              status != 0 ? status == -1
+                                ? "!mem fail!"
+                                : status == -2 ? "name ABI fail" : status == -3 ? "arg invalid" : "other failure!"
                           : "");
 
     free(demangled);

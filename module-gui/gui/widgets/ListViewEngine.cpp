@@ -436,7 +436,7 @@ namespace gui
             unsigned int diff = currentPageSize < body->getVisibleChildrenCount()
                                     ? 0
                                     : currentPageSize - body->getVisibleChildrenCount();
-            currentPageSize   = body->getVisibleChildrenCount();
+            currentPageSize = body->getVisibleChildrenCount();
 
             if (direction == listview::Direction::Top) {
                 startIndex += diff;

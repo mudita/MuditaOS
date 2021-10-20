@@ -102,6 +102,8 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationBellBedtime>(app::applicationBellBedtimeName));
             applications.push_back(app::CreateLauncher<app::ApplicationBellPowerNap>(app::applicationBellPowerNapName));
             applications.push_back(
+                app::CreateLauncher<app::ApplicationBellMeditationTimer>(app::applicationBellMeditationTimerName));
+            applications.push_back(
                 app::CreateLauncher<app::ApplicationBellOnBoarding>(app::applicationBellOnBoardingName));
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellBackgroundSounds>(app::applicationBellBackgroundSoundsName));

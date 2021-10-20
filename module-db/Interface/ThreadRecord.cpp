@@ -260,7 +260,7 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadGetByIDQuery(const
 
     const auto ret = GetByID(localQuery->id);
     auto response  = std::make_unique<db::query::ThreadGetByIDResult>(ret.isValid() ? std::optional<ThreadRecord>{ret}
-                                                                                    : std::nullopt);
+                                                                                   : std::nullopt);
     response->setRequestQuery(query);
     return response;
 }

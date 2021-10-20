@@ -72,12 +72,12 @@ namespace utils
         return base;
     }
 
-    template <typename T> [[nodiscard]] std::string to_string(T t)
+    template <typename T>[[nodiscard]] std::string to_string(T t)
     {
         return std::to_string(t);
     }
 
-    template <> [[nodiscard]] inline std::string to_string<long double>(long double t)
+    template <>[[nodiscard]] inline std::string to_string<long double>(long double t)
     {
         uint32_t precision = 6;
         int base           = static_cast<int>(t);
@@ -113,31 +113,31 @@ namespace utils
         return baseAsStr + "." + fractionalAsStr;
     }
 
-    template <> [[nodiscard]] inline std::string to_string<float>(float t)
+    template <>[[nodiscard]] inline std::string to_string<float>(float t)
     {
         return to_string(static_cast<long double>(t));
     }
 
-    template <> [[nodiscard]] inline std::string to_string<double>(double t)
+    template <>[[nodiscard]] inline std::string to_string<double>(double t)
     {
         return to_string(static_cast<long double>(t));
     }
 
-    template <> [[nodiscard]] inline std::string to_string<std::int64_t>(std::int64_t value)
+    template <>[[nodiscard]] inline std::string to_string<std::int64_t>(std::int64_t value)
     {
         std::ostringstream ss;
         ss << value;
         return ss.str();
     }
 
-    template <> [[nodiscard]] inline std::string to_string<std::uint64_t>(std::uint64_t value)
+    template <>[[nodiscard]] inline std::string to_string<std::uint64_t>(std::uint64_t value)
     {
         std::ostringstream ss;
         ss << value;
         return ss.str();
     }
 
-    template <typename T> [[nodiscard]] const std::string enumToString(const T &t)
+    template <typename T>[[nodiscard]] const std::string enumToString(const T &t)
     {
         static_assert(std::is_enum_v<T>);
         return std::string(magic_enum::enum_name(t));
@@ -147,7 +147,7 @@ namespace utils
     ///
     /// @param value to be converted
     /// @return Value casted to type T
-    template <typename T> [[nodiscard]] T getNumericValue(const std::string &value)
+    template <typename T>[[nodiscard]] T getNumericValue(const std::string &value)
     {
         static_assert(std::is_arithmetic_v<T>);
         if (value.empty()) {

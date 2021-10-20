@@ -92,8 +92,8 @@ namespace sdesktop::endpoints
             try {
                 auto msg = std::make_shared<locks::ExternalUnLockPhone>(passCodeArrayToVecOfInts(passCode));
                 status   = owner->bus.sendUnicast(std::move(msg), service::name::appmgr)
-                               ? http::Code::NoContent
-                               : http::Code::InternalServerError;
+                             ? http::Code::NoContent
+                             : http::Code::InternalServerError;
             }
             catch (const std::exception &e) {
                 LOG_ERROR("Passcode decoding exception");

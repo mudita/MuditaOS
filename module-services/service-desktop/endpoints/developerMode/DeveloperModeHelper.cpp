@@ -86,7 +86,7 @@ namespace sdesktop::endpoints
             path.scope    = settings::SettingsScope::Global;
             auto msg      = std::make_shared<settings::Messages::SetVariable>(std::move(path), std::move(value));
             code          = owner->bus.sendUnicast(std::move(msg), service::name::db) ? http::Code::NoContent
-                                                                                      : http::Code::InternalServerError;
+                                                                             : http::Code::InternalServerError;
 
             return {sent::no, ResponseContext{.status = code}};
         }
@@ -99,7 +99,7 @@ namespace sdesktop::endpoints
         else if (body[json::developerMode::changeCellularStateCmd].is_number()) {
             int cellularState = body[json::developerMode::changeCellularStateCmd].int_value();
             code              = requestCellularPowerStateChange(cellularState) ? http::Code::NoContent
-                                                                               : http::Code::InternalServerError;
+                                                                  : http::Code::InternalServerError;
 
             return {sent::no, ResponseContext{.status = code}};
         }
@@ -124,7 +124,7 @@ namespace sdesktop::endpoints
             auto phoneLockState = body[json::developerMode::phoneLockCodeEnabled].bool_value();
             auto msg            = std::make_shared<locks::ExternalPhoneLockAvailabilityChange>(phoneLockState);
             code                = owner->bus.sendUnicast(std::move(msg), "ApplicationManager") ? http::Code::NoContent
-                                                                                               : http::Code::InternalServerError;
+                                                                                : http::Code::InternalServerError;
         }
         else if (auto switchData = body[json::developerMode::switchApplication].object_items(); !switchData.empty()) {
             auto msg = std::make_shared<app::manager::SwitchRequest>(

@@ -12,7 +12,7 @@
 #include <time/dateCommon.hpp>
 namespace
 {
-    inline constexpr auto bgSoundsTimerName     = "BGSoundsProgressTimer";
+    inline constexpr auto bgSoundsTimerName = "BGSoundsProgressTimer";
     inline constexpr std::chrono::seconds timerTick{1};
 
     void decorateProgressItem(gui::Rect *item, gui::Alignment::Vertical alignment)

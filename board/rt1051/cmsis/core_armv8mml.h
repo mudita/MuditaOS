@@ -2203,9 +2203,8 @@ extern "C"
     __STATIC_INLINE uint32_t __NVIC_GetEnableIRQ(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(((NVIC->ISER[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
-                                   ? 1UL
-                                   : 0UL));
+            return ((uint32_t)(
+                ((NVIC->ISER[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
         }
         else {
             return (0U);
@@ -2238,9 +2237,8 @@ extern "C"
     __STATIC_INLINE uint32_t __NVIC_GetPendingIRQ(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(((NVIC->ISPR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
-                                   ? 1UL
-                                   : 0UL));
+            return ((uint32_t)(
+                ((NVIC->ISPR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
         }
         else {
             return (0U);
@@ -2284,9 +2282,8 @@ extern "C"
     __STATIC_INLINE uint32_t __NVIC_GetActive(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(((NVIC->IABR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
-                                   ? 1UL
-                                   : 0UL));
+            return ((uint32_t)(
+                ((NVIC->IABR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
         }
         else {
             return (0U);
@@ -2304,9 +2301,8 @@ extern "C"
     __STATIC_INLINE uint32_t NVIC_GetTargetState(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
-                                   ? 1UL
-                                   : 0UL));
+            return ((uint32_t)(
+                ((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
         }
         else {
             return (0U);
@@ -2323,9 +2319,8 @@ extern "C"
     {
         if ((int32_t)(IRQn) >= 0) {
             NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] |= ((uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL)));
-            return ((uint32_t)(((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
-                                   ? 1UL
-                                   : 0UL));
+            return ((uint32_t)(
+                ((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
         }
         else {
             return (0U);
@@ -2342,9 +2337,8 @@ extern "C"
     {
         if ((int32_t)(IRQn) >= 0) {
             NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] &= ~((uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL)));
-            return ((uint32_t)(((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
-                                   ? 1UL
-                                   : 0UL));
+            return ((uint32_t)(
+                ((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
         }
         else {
             return (0U);
@@ -2412,9 +2406,9 @@ extern "C"
         PreemptPriorityBits = ((7UL - PriorityGroupTmp) > (uint32_t)(__NVIC_PRIO_BITS))
                                   ? (uint32_t)(__NVIC_PRIO_BITS)
                                   : (uint32_t)(7UL - PriorityGroupTmp);
-        SubPriorityBits     = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL)
-                                  ? (uint32_t)0UL
-                                  : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
+        SubPriorityBits = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL)
+                              ? (uint32_t)0UL
+                              : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
 
         return (((PreemptPriority & (uint32_t)((1UL << (PreemptPriorityBits)) - 1UL)) << SubPriorityBits) |
                 ((SubPriority & (uint32_t)((1UL << (SubPriorityBits)) - 1UL))));
@@ -2443,9 +2437,9 @@ extern "C"
         PreemptPriorityBits = ((7UL - PriorityGroupTmp) > (uint32_t)(__NVIC_PRIO_BITS))
                                   ? (uint32_t)(__NVIC_PRIO_BITS)
                                   : (uint32_t)(7UL - PriorityGroupTmp);
-        SubPriorityBits     = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL)
-                                  ? (uint32_t)0UL
-                                  : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
+        SubPriorityBits = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL)
+                              ? (uint32_t)0UL
+                              : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
 
         *pPreemptPriority = (Priority >> SubPriorityBits) & (uint32_t)((1UL << (PreemptPriorityBits)) - 1UL);
         *pSubPriority     = (Priority) & (uint32_t)((1UL << (SubPriorityBits)) - 1UL);
@@ -2552,10 +2546,9 @@ extern "C"
     __STATIC_INLINE uint32_t TZ_NVIC_GetEnableIRQ_NS(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return (
-                (uint32_t)(((NVIC_NS->ISER[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
-                               ? 1UL
-                               : 0UL));
+            return ((uint32_t)(
+                ((NVIC_NS->ISER[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL
+                                                                                                           : 0UL));
         }
         else {
             return (0U);
@@ -2585,10 +2578,9 @@ extern "C"
     __STATIC_INLINE uint32_t TZ_NVIC_GetPendingIRQ_NS(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return (
-                (uint32_t)(((NVIC_NS->ISPR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
-                               ? 1UL
-                               : 0UL));
+            return ((uint32_t)(
+                ((NVIC_NS->ISPR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL
+                                                                                                           : 0UL));
         }
         else {
             return (0U);
@@ -2629,10 +2621,9 @@ extern "C"
     __STATIC_INLINE uint32_t TZ_NVIC_GetActive_NS(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return (
-                (uint32_t)(((NVIC_NS->IABR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
-                               ? 1UL
-                               : 0UL));
+            return ((uint32_t)(
+                ((NVIC_NS->IABR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL
+                                                                                                           : 0UL));
         }
         else {
             return (0U);
