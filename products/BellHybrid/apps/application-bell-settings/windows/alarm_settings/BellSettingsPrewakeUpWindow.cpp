@@ -61,11 +61,9 @@ namespace gui
     void BellSettingsPrewakeUpWindow::exit()
     {
         presenter->saveData();
-        application->switchWindow(window::bell_finished::defaultName,
-                                  BellFinishedWindowData::Factory::create(
-                                      "big_check_W_G",
-                                      utils::translate("app_bell_settings_alarm_settings_prewake_up_finished"),
-                                      BellSettingsAlarmSettingsMenuWindow::name));
+        application->switchWindow(
+            window::bell_finished::defaultName,
+            BellFinishedWindowData::Factory::create("circle_success_big", BellSettingsAlarmSettingsMenuWindow::name));
     }
 
     void BellSettingsPrewakeUpWindow::onClose(CloseReason reason)
