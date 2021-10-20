@@ -12,8 +12,6 @@ namespace gui
     namespace window::bell_finished
     {
         constexpr inline auto defaultName         = "BellFinishedWindow";
-        constexpr inline auto image_top_margin    = 112U;
-        constexpr inline auto image_bottom_margin = 30U;
     } // namespace window::bell_finished
 
     class Icon;

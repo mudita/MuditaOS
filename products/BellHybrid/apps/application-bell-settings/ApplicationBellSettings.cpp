@@ -63,10 +63,8 @@ namespace app
             if (gui::window::name::bellSettingsLanguage == getCurrentWindow()->getName()) {
 
                 switchWindow(gui::window::bell_finished::defaultName,
-                             gui::BellFinishedWindowData::Factory::create(
-                                 "big_check_W_G",
-                                 utils::translate("app_bell_settings_advanced_language_set"),
-                                 gui::window::name::bellSettingsAdvanced));
+                             gui::BellFinishedWindowData::Factory::create("circle_success_big",
+                                                                          gui::window::name::bellSettingsAdvanced));
 
                 return sys::msgHandled();
             }

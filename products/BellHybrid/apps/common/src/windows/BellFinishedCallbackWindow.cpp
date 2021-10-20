@@ -32,7 +32,7 @@ namespace gui
         bottomBar->setVisible(false);
 
         icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
-        icon->text->setFont(style::window::font::verybiglight);
+        icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
     }
 
     bool BellFinishedCallbackWindow::onInput(const InputEvent &inputEvent)
@@ -52,7 +52,6 @@ namespace gui
 
         if (auto metadata = dynamic_cast<BellFinishedCallbackWindowSwitchData *>(data)) {
             icon->image->set(metadata->icon);
-            icon->text->setRichText(metadata->text);
             finishCallback = metadata->finishCallback;
         }
     }
