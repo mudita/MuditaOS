@@ -1,6 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationBellMeditationTimer.hpp"
+#include "MeditationStyle.hpp"
 #include "SessionPausedWindow.hpp"
 
 #include <i18n/i18n.hpp>
@@ -9,9 +11,10 @@
 namespace gui
 {
     SessionPausedWindow::SessionPausedWindow(app::ApplicationCommon *app)
-        : IconTextWindow(
-              app, gui::name::window::session_paused, std::make_unique<app::meditation::MeditationBasePresenter>(app))
-    {}
+        : AppWindow(app, gui::name::window::sessionPaused)
+    {
+        buildInterface();
+    }
 
     bool SessionPausedWindow::onInput(const gui::InputEvent &inputEvent)
     {
@@ -20,24 +23,26 @@ namespace gui
             return true;
         }
 
-        return WithTimerWindow::onInput(inputEvent);
+        return AppWindow::onInput(inputEvent);
     }
 
-    void SessionPausedWindow::onTimeout()
-    {}
-
-    std::string SessionPausedWindow::getText()
+    void SessionPausedWindow::buildInterface()
     {
-        return utils::translate("app_meditation_bell_paused");
-    }
+        AppWindow::buildInterface();
 
-    std::string SessionPausedWindow::getImageName()
-    {
-        return spStyle::icon::imageSource;
-    }
+        statusBar->setVisible(false);
+        header->setTitleVisibility(false);
+        bottomBar->setVisible(false);
 
-    std::chrono::seconds SessionPausedWindow::getTimeout() const
-    {
-        return std::chrono::seconds::zero();
+        if (icon == nullptr) {
+            using namespace app::meditationStyle;
+
+            icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
+            icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+            icon->image->setMargins({0, itStyle::icon::imageTopMargin, 0, itStyle::icon::imageBottomMargin});
+            icon->image->set("big_pause", ImageTypeSpecifier::W_G);
+            icon->text->setFont(itStyle::text::font);
+            icon->text->setRichText(utils::translate("app_meditation_bell_paused"));
+        }
     }
 } // namespace gui

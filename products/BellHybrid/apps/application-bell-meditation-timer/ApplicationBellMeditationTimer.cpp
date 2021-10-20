@@ -1,13 +1,15 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellMeditationTimer.hpp"
-#include "windows/MeditationTimerWindow.hpp"
 #include "windows/IntervalChimeWindow.hpp"
-#include "windows/ReadyGoingWindow.hpp"
 #include "windows/MeditationRunningWindow.hpp"
-#include "windows/SessionPausedWindow.hpp"
+#include "windows/MeditationTimerWindow.hpp"
+#include "windows/ReadyGoingWindow.hpp"
 #include "windows/SessionEndWindow.hpp"
+#include "windows/SessionPausedWindow.hpp"
+
+#include <common/models/TimeModel.hpp>
 
 namespace app
 {
@@ -38,33 +40,50 @@ namespace app
             auto presenter = std::make_unique<app::meditation::MeditationTimerPresenter>(app, settings.get());
             return std::make_unique<gui::MeditationTimerWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::name::window::interval_chime, [](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<app::meditation::IntervalChimePresenter>(app);
-            return std::make_unique<gui::IntervalChimeWindow>(app, std::move(presenter));
-        });
-        windowsFactory.attach(gui::name::window::ready_going, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::ReadyGoingWindow>(app);
-        });
         windowsFactory.attach(
-            gui::name::window::meditation_running, [this](ApplicationCommon *app, const std::string &name) {
-                auto presenter = std::make_unique<app::meditation::MeditationProgressPresenter>(app, settings.get());
-                return std::make_unique<gui::MeditationRunningWindow>(app, std::move(presenter));
+            gui::name::window::intervalChime, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<app::meditation::IntervalChimePresenter>(app, settings.get());
+                return std::make_unique<gui::IntervalChimeWindow>(app, std::move(presenter));
             });
-        windowsFactory.attach(gui::name::window::session_paused, [](ApplicationCommon *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::readyGoing, [](ApplicationCommon *app, const std::string &name) {
+            auto presenter = std::make_unique<app::meditation::ReadyGoingPresenter>(app);
+            return std::make_unique<gui::ReadyGoingWindow>(app, std::move(presenter));
+        });
+        windowsFactory.attach(gui::name::window::meditationProgress,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  auto timeModel = std::make_unique<app::TimeModel>();
+                                  auto presenter = std::make_unique<app::meditation::MeditationProgressPresenter>(
+                                      app, settings.get(), std::move(timeModel));
+                                  return std::make_unique<gui::MeditationRunningWindow>(app, std::move(presenter));
+                              });
+        windowsFactory.attach(gui::name::window::sessionPaused, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SessionPausedWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::session_end, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::SessionEndWindow>(app);
+        windowsFactory.attach(gui::name::window::sessionEnded, [](ApplicationCommon *app, const std::string &name) {
+            auto presenter = std::make_unique<app::meditation::SessionEndedPresenter>(app);
+            return std::make_unique<gui::SessionEndWindow>(app, std::move(presenter));
         });
+
+        attachPopups({gui::popup::ID::AlarmActivated,
+                      gui::popup::ID::AlarmDeactivated,
+                      gui::popup::ID::PowerOff,
+                      gui::popup::ID::Reboot,
+                      gui::popup::ID::BedtimeNotification});
     }
 
     sys::MessagePointer ApplicationBellMeditationTimer::DataReceivedHandler(sys::DataMessage *msgl,
                                                                             sys::ResponseMessage *resp)
     {
         auto retMsg = Application::DataReceivedHandler(msgl);
-        if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
+        if (auto response = dynamic_cast<sys::ResponseMessage *>(retMsg.get());
+            response != nullptr && response->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
+
         return handleAsyncResponse(resp);
     }
+
+    // Empty: do not start idleTimer on application run
+    void ApplicationBellMeditationTimer::onStart()
+    {}
 } // namespace app

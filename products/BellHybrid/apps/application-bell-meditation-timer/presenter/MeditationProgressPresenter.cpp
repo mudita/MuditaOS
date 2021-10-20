@@ -1,50 +1,53 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "MeditationProgressPresenter.hpp"
+#include "ApplicationBellMeditationTimer.hpp"
 #include "MeditationCommon.hpp"
+#include "MeditationProgressPresenter.hpp"
 
+#include <common/models/TimeModel.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
 
 #include <log/log.hpp>
 #include <gsl/assert>
 
+namespace
+{
+    constexpr std::chrono::minutes emptyValue{0};
+} // namespace
+
 namespace app::meditation
 {
-    MeditationProgressPresenter ::MeditationProgressPresenter(app::ApplicationCommon *app, settings::Settings *settings)
-        : app{app}, settings{settings}, model{std::make_shared<MeditationProgressModel>()}
+    MeditationProgressPresenter ::MeditationProgressPresenter(app::ApplicationCommon *app,
+                                                              settings::Settings *settings,
+                                                              std::unique_ptr<AbstractTimeModel> timeModel)
+        : app{app}, settings{settings}, timeModel{std::move(timeModel)}
     {
-        model->createData();
-    }
-
-    void MeditationProgressPresenter::set(MeditationItem &item)
-    {
-        model->setData(item);
-
-        settings->setValue(
-            meditationDBRecordName, utils::to_string(item.getTimer().count()), settings::SettingsScope::AppLocal);
-    }
-
-    void MeditationProgressPresenter::get(MeditationItem &item)
-    {
-        MeditationItem *p = model->getData();
-        if (p != nullptr) {
-            item.copyFrom(p);
-        }
+        duration = std::chrono::minutes{
+            utils::getNumericValue<int>(settings->getValue(meditationDBRecordName, settings::SettingsScope::AppLocal))};
+        interval = std::chrono::minutes{
+            utils::getNumericValue<int>(settings->getValue(intervalDBRecordName, settings::SettingsScope::AppLocal))};
     }
 
     void MeditationProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
     {
         timer = std::move(_timer);
         timer->registerOnFinishedCallback([this]() { onProgressFinished(); });
-        timer->registerOnIntervalCallback([this]() { onIntervalReached(); });
-        timer->registerOnBaseTickCallback([this]() { onBaseTickReached(); });
+        if (interval != emptyValue) {
+            timer->registerOnIntervalCallback([this]() { onIntervalReached(); });
+        }
+    }
+
+    void MeditationProgressPresenter::handleUpdateTimeEvent()
+    {
+        getView()->setTime(timeModel->getCurrentTime());
     }
 
     void MeditationProgressPresenter::start()
     {
-        timer->reset(model->getDuration(), model->getInterval());
+        timer->reset(std::chrono::seconds(duration), std::chrono::seconds(interval));
         timer->start();
     }
 
@@ -56,12 +59,27 @@ namespace app::meditation
     void MeditationProgressPresenter::pause()
     {
         timer->stop();
+        app->switchWindow(gui::name::window::sessionPaused);
     }
 
     void MeditationProgressPresenter::resume()
     {
-        timer->reset(model->getDuration(), model->getInterval(), model->getElapsed());
         timer->start();
+    }
+
+    void MeditationProgressPresenter::abandon()
+    {
+        timer->stop();
+        app::manager::Controller::sendAction(
+            app,
+            app::manager::actions::Launch,
+            std::make_unique<app::ApplicationLaunchData>(app::applicationBellMeditationTimerName));
+    }
+
+    void MeditationProgressPresenter::finish()
+    {
+        timer->stop();
+        app->switchWindow(gui::name::window::sessionEnded);
     }
 
     void MeditationProgressPresenter::onProgressFinished()
@@ -71,14 +89,8 @@ namespace app::meditation
 
     void MeditationProgressPresenter::onIntervalReached()
     {
-        if (model->getInterval().count() > 0) {
+        if (interval != emptyValue) {
             getView()->intervalReached();
         }
-    }
-
-    void MeditationProgressPresenter::onBaseTickReached()
-    {
-        model->onElapsed();
-        getView()->baseTickReached();
     }
 } // namespace app::meditation

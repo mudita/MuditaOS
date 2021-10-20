@@ -3,27 +3,24 @@
 
 #pragma once
 
-#include "IconTextWindow.hpp"
+#include "SessionEndedPresenter.hpp"
+
+#include <common/windows/BellFinishedWindow.hpp>
+#include <gui/widgets/Icon.hpp>
 
 namespace gui
 {
-    namespace name::window
+    class SessionEndWindow : public BellFinishedWindow
     {
-        inline constexpr auto session_end = "Session end";
-    }
+      private:
+        std::shared_ptr<app::meditation::SessionEndedPresenterContract::Presenter> presenter;
 
-    class SessionEndWindow : public IconTextWindow
-    {
       public:
-        explicit SessionEndWindow(app::ApplicationCommon *app);
+        SessionEndWindow(app::ApplicationCommon *app,
+                         std::shared_ptr<app::meditation::SessionEndedPresenterContract::Presenter> winPresenter);
 
         // virtual methods
-        void onTimeout() override;
-        std::string getText() override;
-        std::string getImageName() override;
-        std::chrono::seconds getTimeout() const override;
-
-      private:
-        static constexpr std::chrono::seconds timeout = std::chrono::seconds{3};
+        bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 } // namespace gui

@@ -6,4 +6,5 @@
 namespace app::meditation
 {
     constexpr auto meditationDBRecordName = "MeditationTimer";
+    constexpr auto intervalDBRecordName   = "IntervalChime";
 }

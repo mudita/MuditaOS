@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "MeditationBaseModel.hpp"
 #include "IntervalChimeListItem.hpp"
 
 #include <ListItemProvider.hpp>
@@ -11,9 +10,7 @@
 
 namespace app::meditation
 {
-    class IntervalChimeModel : public MeditationBaseModel,
-                               public app::InternalModel<gui::ListItem *>,
-                               public gui::ListItemProvider
+    class IntervalChimeModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
     {
       private:
         enum class IntervalType
@@ -24,17 +21,16 @@ namespace app::meditation
             Interval_5,
             Interval_10,
             Interval_15,
+            Interval_30,
             IntervalTotal
         };
 
         gui::IntervalChimeListItem *item = nullptr;
 
-        IntervalType secsToInterval(std::chrono::seconds secs) const noexcept;
-        std::chrono::seconds intervalToSecs(IntervalType interval) const noexcept;
+        IntervalType timeToInterval(std::chrono::minutes minutes) const noexcept;
+        std::chrono::minutes intervalToTime(IntervalType interval) const noexcept;
 
       public:
-        auto createData() -> void;
-        auto setData(MeditationItem &item) -> void;
         [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
         [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
@@ -42,5 +38,6 @@ namespace app::meditation
 
         [[nodiscard]] std::chrono::minutes getValue() const noexcept;
         void setValue(std::chrono::minutes value);
+        auto createData() -> void;
     };
 } // namespace app::meditation

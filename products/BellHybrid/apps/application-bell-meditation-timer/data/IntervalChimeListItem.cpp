@@ -7,34 +7,42 @@
 #include <Utils.hpp>
 #include <i18n/i18n.hpp>
 
+namespace
+{
+    std::string getTimeUnitName(int currentSpinnerValue)
+    {
+        using namespace app::meditationStyle::icStyle::list;
+
+        if (currentSpinnerValue == 0) {
+            return "";
+        }
+        const auto isSingular = currentSpinnerValue == 1;
+        return utils::translate(isSingular ? timeUnitSingular : timeUnitPlural);
+    }
+} // namespace
+
 namespace gui
 {
-    IntervalChimeListItem::IntervalChimeListItem(int size, ScroolSpinner::OnGetTitleCallback getTitleCB)
-        : BellSideListItem(utils::translate("app_meditation_interval_chime"))
+    IntervalChimeListItem::IntervalChimeListItem(std::vector<std::string> titles)
+        : BellSideListItem(utils::translate("app_meditation_interval_chime")), titles{std::move(titles)}
     {
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
         setEdges(RectangleEdge::None);
         setFocusItem(body);
 
-        createSpinner(size, std::move(getTitleCB));
+        createSpinner();
         createBottomDescription();
         registerCallbacks();
     }
 
-    void IntervalChimeListItem::createSpinner(int size, ScroolSpinner::OnGetTitleCallback getTitleCB)
+    void IntervalChimeListItem::createSpinner()
     {
-        auto onUpdate = [this](int currentIndex) {
-            if (onIndexChangedCallback != nullptr) {
-                onIndexChangedCallback(currentIndex);
-            }
-        };
-
-        spinner = new ScroolSpinner(size, Boundaries::Fixed, std::move(getTitleCB), std::move(onUpdate));
+        spinner = new UTF8Spinner({titles.begin(), titles.end()}, Boundaries::Continuous);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(app::meditationStyle::icStyle::text::font);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        spinner->setEdges(RectangleEdge::None);
         spinner->setFocusEdges(RectangleEdge::None);
+
         body->getCenterBox()->addWidget(spinner);
     }
 
@@ -69,25 +77,29 @@ namespace gui
 
         inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
             if (body->onInput(inputEvent)) {
+                bottomDescription->setText(getTimeUnitName(getSpinnerIndex()));
                 return true;
             }
             return false;
         };
     }
 
-    auto IntervalChimeListItem::setOnIndexChanged(std::function<void(int)> cb) -> void
+    int IntervalChimeListItem::getSpinnerIndex() const
     {
-        onIndexChangedCallback = cb;
+        std::string value = spinner->getCurrentValue();
+        int len           = titles.size();
+        for (int i = 0; i < len; i++) {
+            if (titles.at(i) == value) {
+                return i;
+            }
+        }
+        return -1;
     }
 
-    int IntervalChimeListItem::getSpinnerIndex() const noexcept
+    void IntervalChimeListItem::setSpinnerIndex(int index)
     {
-        return spinner->getCurrentIndex();
-    }
-
-    void IntervalChimeListItem::setSpinnerIndex(int Index)
-    {
-        spinner->setCurrentIndex(Index);
+        spinner->setCurrentValue(titles[index]);
+        bottomDescription->setText(getTimeUnitName(index));
     }
 
 } // namespace gui

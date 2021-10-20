@@ -4,25 +4,20 @@
 #pragma once
 
 #include <Application.hpp>
+#include <AppWindow.hpp>
 #include <InputEvent.hpp>
-#include <Label.hpp>
 #include <Text.hpp>
+#include <apps-common/widgets/BarGraph.hpp>
+#include <common/widgets/BellStatusClock.hpp>
 
-#include "UnityProgressBar.hpp"
-#include "WithTimerWindow.hpp"
 #include "MeditationProgressPresenter.hpp"
 
 namespace gui
 {
-    namespace name::window
-    {
-        inline constexpr auto meditation_running = "Meditation progress";
-    } // namespace name::window
-
-    class MeditationRunningWindow : public MeditationWindow, public app::meditation::MeditationProgressContract::View
+    class MeditationRunningWindow : public AppWindow, public app::meditation::MeditationProgressContract::View
     {
       public:
-        explicit MeditationRunningWindow(
+        MeditationRunningWindow(
             app::ApplicationCommon *app,
             std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> &&windowPresenter);
 
@@ -32,21 +27,20 @@ namespace gui
         void buildInterface() override;
         void pregressFinished() override;
         void intervalReached() override;
-        void baseTickReached() override;
-        void buildMeditationItem(MeditationItem &item) override;
-        void onMeditationItemAvailable(MeditationItem *item) override;
 
       private:
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> presenter;
-        gui::Label *datetime            = nullptr;
-        gui::Text *timer                = nullptr;
-        gui::UnityProgressBar *progress = nullptr;
+        gui::HBarGraph *progress   = nullptr;
+        gui::Text *timer           = nullptr;
+        gui::BellStatusClock *time = nullptr;
 
+        void setTime(std::time_t newTime) override;
+        void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
+        bool updateTime() override;
+
+        void buildLayout();
         void configureTimer();
-        void updateDateTime();
-        void start();
-        void pause();
-        void resume();
+
         void endSession();
         void intervalTimeout();
         void playGong();

@@ -6,7 +6,6 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
 
-#include "MeditationItem.hpp"
 #include "IntervalChimeModel.hpp"
 
 #include <memory>
@@ -31,23 +30,24 @@ namespace app::meditation
         {
           public:
             virtual ~Presenter() noexcept                                        = default;
-            virtual void set(MeditationItem &item)                               = 0;
-            virtual void get(MeditationItem &item)                               = 0;
             virtual auto getProvider() -> std::shared_ptr<gui::ListItemProvider> = 0;
+            virtual void loadIntervalList()                                      = 0;
+            virtual void activate()                                              = 0;
         };
     };
 
     class IntervalChimePresenter : public IntervalChimeContract::Presenter
     {
       public:
-        explicit IntervalChimePresenter(app::ApplicationCommon *app);
+        IntervalChimePresenter(app::ApplicationCommon *app, settings::Settings *settings);
 
-        void set(MeditationItem &item) override;
-        void get(MeditationItem &item) override;
         auto getProvider() -> std::shared_ptr<gui::ListItemProvider> override;
+        void loadIntervalList() override;
+        void activate() override;
 
       private:
-        app::ApplicationCommon *app = nullptr;
+        app::ApplicationCommon *app  = nullptr;
+        settings::Settings *settings = nullptr;
         std::shared_ptr<IntervalChimeModel> model;
     };
 } // namespace app::meditation

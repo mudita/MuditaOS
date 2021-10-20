@@ -1,33 +1,51 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationBellMeditationTimer.hpp"
+#include "MeditationStyle.hpp"
 #include "ReadyGoingWindow.hpp"
-#include "MeditationRunningWindow.hpp"
+
+namespace
+{
+    constexpr inline auto defaultTimeout = std::chrono::seconds{5};
+}
 
 namespace gui
 {
-    ReadyGoingWindow::ReadyGoingWindow(app::ApplicationCommon *app)
-        : IconTextWindow(
-              app, gui::name::window::ready_going, std::make_unique<app::meditation::MeditationBasePresenter>(app))
-    {}
-
-    void ReadyGoingWindow::onTimeout()
+    ReadyGoingWindow::ReadyGoingWindow(
+        app::ApplicationCommon *app,
+        std::shared_ptr<app::meditation::ReadyGoingPresenterContract::Presenter> winPresenter)
+        : WindowWithTimer(app, gui::name::window::readyGoing, defaultTimeout), presenter{std::move(winPresenter)}
     {
-        gotoWindow(gui::name::window::meditation_running);
+        buildInterface();
+
+        timerCallback = [this](Item &, sys::Timer &) {
+            presenter->activate();
+            return true;
+        };
     }
 
-    std::string ReadyGoingWindow::getText()
+    void ReadyGoingWindow::buildInterface()
     {
-        return utils::translate("app_meditation_bell_put_down_and_wait");
+        WindowWithTimer::buildInterface();
+
+        statusBar->setVisible(false);
+        header->setTitleVisibility(false);
+        bottomBar->setVisible(false);
+
+        if (icon == nullptr) {
+            using namespace app::meditationStyle;
+            icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
+            icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+            icon->image->setMargins({0, itStyle::icon::imageTopMargin, 0, itStyle::icon::imageBottomMargin});
+            icon->image->set("bell_big_logo", ImageTypeSpecifier::W_G);
+            icon->text->setFont(itStyle::text::font);
+            icon->text->setRichText(utils::translate("app_meditation_bell_put_down_and_wait"));
+        }
     }
 
-    std::string ReadyGoingWindow::getImageName()
+    bool ReadyGoingWindow::onInput(const InputEvent &inputEvent)
     {
-        return itStyle::icon::imageSource;
-    }
-
-    std::chrono::seconds ReadyGoingWindow::getTimeout() const
-    {
-        return timeout;
+        return true;
     }
 } // namespace gui

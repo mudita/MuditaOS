@@ -4,6 +4,7 @@
 #pragma once
 
 #include <apps-common/widgets/BellSideListItem.hpp>
+#include <apps-common/widgets/spinners/Spinners.hpp>
 
 namespace gui
 {
@@ -12,18 +13,18 @@ namespace gui
 
     class MeditationTimerListItem : public BellSideListItem
     {
-        std::function<void(int)> onValueChangedCallback{nullptr};
-        Spinner *spinner         = nullptr;
-        Label *bottomDescription = nullptr;
+        UIntegerSpinner *spinner{};
+        Label *bottomDescription{};
 
         void createSpinner();
         void createBottomDescription();
         void registerCallbacks();
 
+        void onValueChanged(std::uint32_t currentValue);
+
       public:
         MeditationTimerListItem();
 
-        auto setOnValueChanged(std::function<void(int)> cb) -> void;
         [[nodiscard]] int getSpinnerValue() const noexcept;
         void setSpinnerValue(int value);
     };

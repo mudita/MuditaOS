@@ -6,13 +6,14 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
-
-#include "MeditationProgressModel.hpp"
+#include <time/time_locale.hpp>
+#include <Timers/TimerHandle.hpp>
 
 #include <memory>
 
 namespace app
 {
+    class AbstractTimeModel;
     class ApplicationCommon;
 }
 
@@ -37,18 +38,20 @@ namespace app::meditation
             virtual ~View()                 = default;
             virtual void pregressFinished() = 0;
             virtual void intervalReached()  = 0;
-            virtual void baseTickReached()  = 0;
+            virtual void setTime(std::time_t newTime)                       = 0;
+            virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
         };
         class Presenter : public BasePresenter<MeditationProgressContract::View>
         {
           public:
-            virtual void set(MeditationItem &item)                                  = 0;
-            virtual void get(MeditationItem &item)                                  = 0;
             virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
+            virtual void handleUpdateTimeEvent()                                    = 0;
             virtual void start()                                                    = 0;
             virtual void stop()                                                     = 0;
             virtual void pause()                                                    = 0;
             virtual void resume()                                                   = 0;
+            virtual void abandon()                                                  = 0;
+            virtual void finish()                                                   = 0;
         };
     };
 
@@ -58,21 +61,25 @@ namespace app::meditation
         app::ApplicationCommon *app  = nullptr;
         settings::Settings *settings = nullptr;
         std::unique_ptr<app::TimerWithCallbacks> timer;
-        std::shared_ptr<MeditationProgressModel> model;
+        std::unique_ptr<AbstractTimeModel> timeModel;
+        std::chrono::minutes duration;
+        std::chrono::minutes interval;
 
         void onProgressFinished();
         void onIntervalReached();
-        void onBaseTickReached();
 
       public:
-        explicit MeditationProgressPresenter(app::ApplicationCommon *app, settings::Settings *settings);
+        MeditationProgressPresenter(app::ApplicationCommon *app,
+                                    settings::Settings *settings,
+                                    std::unique_ptr<AbstractTimeModel> timeModel);
 
-        void set(MeditationItem &item) override;
-        void get(MeditationItem &item) override;
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
+        void handleUpdateTimeEvent() override;
         void start() override;
         void stop() override;
         void pause() override;
         void resume() override;
+        void abandon() override;
+        void finish() override;
     };
 } // namespace app::meditation

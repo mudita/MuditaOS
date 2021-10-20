@@ -22,24 +22,18 @@ target_sources(application-bell-meditation-timer
         data/IntervalChimeListItem.cpp
         data/MeditationTimerListItem.cpp
         models/IntervalChimeModel.cpp
-        models/MeditationBaseModel.cpp
-        models/MeditationProgressModel.cpp
         models/MeditationTimerModel.cpp
         presenter/IntervalChimePresenter.cpp
-        presenter/MeditationBasePresenter.cpp
         presenter/MeditationProgressPresenter.cpp
         presenter/MeditationTimerPresenter.cpp
-        widgets/ScroolSpinner.cpp
-        widgets/UnityProgressBar.cpp
-        windows/IconTextWindow.cpp
+        presenter/ReadyGoingPresenter.cpp
+        presenter/SessionEndedPresenter.cpp 
         windows/IntervalChimeWindow.cpp
         windows/MeditationRunningWindow.cpp
         windows/MeditationTimerWindow.cpp
-        windows/MeditationWindow.cpp
         windows/ReadyGoingWindow.cpp
         windows/SessionEndWindow.cpp
         windows/SessionPausedWindow.cpp
-        windows/WithTimerWindow.cpp
     PUBLIC
         include/application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp
 )

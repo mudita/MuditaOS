@@ -3,27 +3,27 @@
 
 #pragma once
 
-#include "IconTextWindow.hpp"
+#include "ReadyGoingPresenter.hpp"
+
+#include <apps-common/popups/WindowWithTimer.hpp>
+#include <gui/widgets/Icon.hpp>
 
 namespace gui
 {
-    namespace name::window
+    class ReadyGoingWindow : public WindowWithTimer
     {
-        inline constexpr auto ready_going = "Ready going";
-    }
+      private:
+        std::shared_ptr<app::meditation::ReadyGoingPresenterContract::Presenter> presenter;
 
-    class ReadyGoingWindow : public IconTextWindow
-    {
       public:
-        explicit ReadyGoingWindow(app::ApplicationCommon *app);
+        ReadyGoingWindow(app::ApplicationCommon *app,
+                         std::shared_ptr<app::meditation::ReadyGoingPresenterContract::Presenter> winPresenter);
 
         // virtual methods
-        void onTimeout() override;
-        std::string getText() override;
-        std::string getImageName() override;
-        std::chrono::seconds getTimeout() const override;
+        void buildInterface() override;
+        bool onInput(const InputEvent &inputEvent) override;
 
       private:
-        static constexpr std::chrono::seconds timeout = std::chrono::seconds{5};
+        Icon *icon{};
     };
 } // namespace gui

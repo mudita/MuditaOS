@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "MeditationBaseModel.hpp"
 #include "MeditationTimerListItem.hpp"
 
 #include <ListItemProvider.hpp>
@@ -11,16 +10,12 @@
 
 namespace app::meditation
 {
-    class MeditationTimerModel : public MeditationBaseModel,
-                                 public app::InternalModel<gui::ListItem *>,
-                                 public gui::ListItemProvider
+    class MeditationTimerModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
     {
       private:
         gui::MeditationTimerListItem *item = nullptr;
 
       public:
-        auto createData() -> void;
-        auto setData(MeditationItem &item) -> void;
         [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
         [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
@@ -28,5 +23,6 @@ namespace app::meditation
 
         [[nodiscard]] std::chrono::minutes getValue() const noexcept;
         void setValue(std::chrono::minutes value);
+        auto createData() -> void;
     };
 } // namespace app::meditation

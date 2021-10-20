@@ -1,34 +1,34 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationBellMeditationTimer.hpp"
 #include "SessionEndWindow.hpp"
 
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
-    SessionEndWindow::SessionEndWindow(app::ApplicationCommon *app)
-        : IconTextWindow(
-              app, gui::name::window::session_end, std::make_unique<app::meditation::MeditationBasePresenter>(app))
-    {}
-
-    void SessionEndWindow::onTimeout()
+    SessionEndWindow::SessionEndWindow(
+        app::ApplicationCommon *app,
+        std::shared_ptr<app::meditation::SessionEndedPresenterContract::Presenter> winPresenter)
+        : BellFinishedWindow(app, gui::name::window::sessionEnded), presenter{std::move(winPresenter)}
     {
-        app::manager::Controller::sendAction(application, app::manager::actions::Home);
+        timerCallback = [this](Item &, sys::Timer &) {
+            presenter->activate();
+            return true;
+        };
     }
 
-    std::string SessionEndWindow::getText()
+    bool SessionEndWindow::onInput(const InputEvent &inputEvent)
     {
-        return utils::translate("app_meditation_bell_thank_you_for_session");
+        return true;
     }
 
-    std::string SessionEndWindow::getImageName()
+    void SessionEndWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        return itStyle::icon::imageSource;
-    }
+        BellFinishedWindow::onBeforeShow(mode, data);
 
-    std::chrono::seconds SessionEndWindow::getTimeout() const
-    {
-        return timeout;
+        icon->image->set("big_namaste", ImageTypeSpecifier::W_G);
+        icon->text->setRichText(utils::translate("app_meditation_bell_thank_you_for_session"));
     }
 } // namespace gui

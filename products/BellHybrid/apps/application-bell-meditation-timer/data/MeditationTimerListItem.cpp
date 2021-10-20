@@ -4,8 +4,7 @@
 #include "MeditationTimerListItem.hpp"
 #include "MeditationStyle.hpp"
 
-#include <gui/widgets/Spinner.hpp>
-
+#include <log/log.hpp>
 #include <Utils.hpp>
 #include <i18n/i18n.hpp>
 
@@ -14,6 +13,13 @@ namespace
     inline constexpr auto spinnerMax  = 180U;
     inline constexpr auto spinnerMin  = 1U;
     inline constexpr auto spinnerStep = 1U;
+
+    std::string getTimeUnitName(int currentSpinnerValue)
+    {
+        using namespace app::meditationStyle::mtStyle::list;
+        const auto isSingular = currentSpinnerValue == 1;
+        return utils::translate(isSingular ? timeUnitSingular : timeUnitPlural);
+    }
 } // namespace
 
 namespace gui
@@ -31,29 +37,15 @@ namespace gui
 
     void MeditationTimerListItem::createSpinner()
     {
-        auto onUpdate = [this](int currentValue) {
-            if (app::meditationStyle::mtStyle::config::arrow) {
-                const auto isMin = currentValue == spinnerMin;
-                const auto isMax = currentValue == spinnerMax;
-                body->setArrowVisible(BellBaseLayout::Arrow::Left, not isMin);
-                body->setArrowVisible(BellBaseLayout::Arrow::Right, not isMax);
-            }
-            if (onValueChangedCallback != nullptr) {
-                onValueChangedCallback(currentValue);
-            }
-        };
-
-        spinner = new Spinner(spinnerMin, spinnerMax, spinnerStep, Boundaries::Fixed, std::move(onUpdate));
+        spinner = new UIntegerSpinner(UIntegerSpinner ::Range{spinnerMin, spinnerMax, spinnerStep}, Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(app::meditationStyle::mtStyle::text::font);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setEdges(RectangleEdge::None);
         spinner->setFocusEdges(RectangleEdge::None);
         body->getCenterBox()->addWidget(spinner);
-        if (!app::meditationStyle::mtStyle::config::arrow) {
-            body->setArrowVisible(BellBaseLayout::Arrow::Left, false);
-            body->setArrowVisible(BellBaseLayout::Arrow::Right, false);
-        }
+
+        spinner->onValueChanged = [this](const auto val) { this->onValueChanged(val); };
     }
 
     void MeditationTimerListItem::createBottomDescription()
@@ -87,15 +79,11 @@ namespace gui
 
         inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
             if (body->onInput(inputEvent)) {
+                bottomDescription->setText(getTimeUnitName(spinner->getCurrentValue()));
                 return true;
             }
             return false;
         };
-    }
-
-    auto MeditationTimerListItem::setOnValueChanged(std::function<void(int)> cb) -> void
-    {
-        onValueChangedCallback = cb;
     }
 
     int MeditationTimerListItem::getSpinnerValue() const noexcept
@@ -106,6 +94,14 @@ namespace gui
     void MeditationTimerListItem::setSpinnerValue(int value)
     {
         spinner->setCurrentValue(value);
+        bottomDescription->setText(getTimeUnitName(value));
     }
 
+    void MeditationTimerListItem::onValueChanged(const std::uint32_t currentValue)
+    {
+        const auto isMin = currentValue == spinnerMin;
+        const auto isMax = currentValue == spinnerMax;
+        body->setArrowVisible(BellBaseLayout::Arrow::Left, not isMin);
+        body->setArrowVisible(BellBaseLayout::Arrow::Right, not isMax);
+    }
 } // namespace gui

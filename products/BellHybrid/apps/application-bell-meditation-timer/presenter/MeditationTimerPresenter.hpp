@@ -6,7 +6,6 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
 
-#include "MeditationItem.hpp"
 #include "MeditationTimerModel.hpp"
 
 #include <memory>
@@ -36,20 +35,20 @@ namespace app::meditation
         {
           public:
             virtual ~Presenter() noexcept                                        = default;
-            virtual void set(MeditationItem &item)                               = 0;
-            virtual void get(MeditationItem &item)                               = 0;
             virtual auto getProvider() -> std::shared_ptr<gui::ListItemProvider> = 0;
+            virtual void loadTimerList()                                         = 0;
+            virtual void activate()                                              = 0;
         };
     };
 
     class MeditationTimerPresenter : public MeditationTimerContract::Presenter
     {
       public:
-        explicit MeditationTimerPresenter(app::ApplicationCommon *app, settings::Settings *settings);
+        MeditationTimerPresenter(app::ApplicationCommon *app, settings::Settings *settings);
 
-        void set(MeditationItem &item) override;
-        void get(MeditationItem &item) override;
         auto getProvider() -> std::shared_ptr<gui::ListItemProvider>;
+        void loadTimerList() override;
+        void activate() override;
 
       private:
         app::ApplicationCommon *app  = nullptr;

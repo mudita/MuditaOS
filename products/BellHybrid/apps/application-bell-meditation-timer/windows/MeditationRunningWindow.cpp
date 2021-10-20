@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationBellMeditationTimer.hpp"
 #include "MeditationRunningWindow.hpp"
-#include "SessionEndWindow.hpp"
-#include "SessionPausedWindow.hpp"
+#include "MeditationStyle.hpp"
 
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimer.hpp>
@@ -19,21 +19,16 @@ namespace
 {
     inline constexpr auto meditationProgressTimerName = "MeditationProgressTimer";
     inline constexpr std::chrono::seconds baseTick{1};
-    inline constexpr auto meditationProgressMode = app::ProgressCountdownMode::Decreasing;
+    inline constexpr auto meditationProgressMode = app::ProgressCountdownMode::Increasing;
+    inline constexpr auto meditationAudioPath    = "assets/audio/bell/meditation/Meditation_Gong.mp3";
+
+    using namespace app::meditationStyle;
 
     void decorateProgressItem(gui::Rect *item, gui::Alignment::Vertical alignment)
     {
         item->setEdges(gui::RectangleEdge::None);
         item->activeItem = false;
         item->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, alignment));
-    }
-
-    gui::Label *createDatetime(gui::Item *parent)
-    {
-        auto datetime = new gui::Label(parent, 0, 0, parent->getWidth(), parent->getHeight());
-        datetime->setFont(mrStyle::datetime::font);
-        decorateProgressItem(datetime, gui::Alignment::Vertical::Center);
-        return datetime;
     }
 
     gui::Label *createTitle(gui::VBox *parent)
@@ -45,19 +40,25 @@ namespace
         return title;
     }
 
-    gui::UnityProgressBar *createProgress(gui::VBox *parent)
+    gui::HBarGraph *createProgress(gui::VBox *parent)
     {
-        auto progress = new gui::UnityProgressBar(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
-        progress->setDisplaySize(mrStyle::progress::w, mrStyle::progress::h);
-        progress->setMaximum(100);
-        decorateProgressItem(progress, gui::Alignment::Vertical::Center);
-        return progress;
+        auto progressBox = new gui::HBox(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
+        decorateProgressItem(progressBox, gui::Alignment::Vertical::Bottom);
+        auto progressBar =
+            new gui::HBarGraph(progressBox, 0, 0, mrStyle::progress::boxesCount, gui::BarGraphStyle::Heavy);
+        decorateProgressItem(progressBar, gui::Alignment::Vertical::Center);
+        return progressBar;
     }
 
     gui::Text *createTimer(gui::Item *parent)
     {
-        auto timer = new gui::Text(parent, 0, 0, style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
+        auto timer = new gui::Text(parent,
+                                   0,
+                                   0,
+                                   style::bell_base_layout::w,
+                                   style::bell_base_layout::outer_layouts_h - mrStyle::timer::timerMarginBottom);
         timer->setFont(mrStyle::timer::font);
+        timer->setMargins(gui::Margins(0, mrStyle::timer::timerMarginBottom, 0, 0));
         decorateProgressItem(timer, gui::Alignment::Vertical::Top);
         return timer;
     }
@@ -68,51 +69,71 @@ namespace gui
     MeditationRunningWindow::MeditationRunningWindow(
         app::ApplicationCommon *app,
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> &&windowPresenter)
-        : MeditationWindow(app, gui::name::window::meditation_running), presenter{std::move(windowPresenter)}
+        : AppWindow(app, gui::name::window::meditationProgress), presenter{std::move(windowPresenter)}
     {
-        buildInterface();
-        configureTimer();
         presenter->attach(this);
+        buildInterface();
     }
 
     void MeditationRunningWindow::buildInterface()
     {
-        MeditationWindow::buildInterface();
+        AppWindow::buildInterface();
 
+        statusBar->setVisible(false);
+        header->setTitleVisibility(false);
+        bottomBar->setVisible(false);
+
+        buildLayout();
+        configureTimer();
+    }
+
+    void MeditationRunningWindow::buildLayout()
+    {
         auto body = new gui::BellBaseLayout(this, 0, 0, style::bell_base_layout::w, style::bell_base_layout::h, false);
         auto vBox =
             new VBox(body->getCenterBox(), 0, 0, style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
 
         decorateProgressItem(vBox, gui::Alignment::Vertical::Top);
-        datetime = createDatetime(body->firstBox);
         createTitle(vBox);
         progress = createProgress(vBox);
         timer    = createTimer(body->lastBox);
+
+        time = new BellStatusClock(body->firstBox);
+        time->setMaximumSize(body->firstBox->getWidth(), body->firstBox->getHeight());
+        time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        body->firstBox->resizeItems();
+
+        dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
+            body->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void MeditationRunningWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        MeditationWindow::onBeforeShow(mode, data);
+        AppWindow::onBeforeShow(mode, data);
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
-            start();
+            playGong();
+            presenter->start();
         }
         else {
-            resume();
+            presenter->resume();
         }
     }
 
     bool MeditationRunningWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
-            pause();
+            presenter->pause();
             return true;
         }
-        if (inputEvent.is(gui::KeyCode::KEY_RF)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
+            presenter->abandon();
             return true;
         }
 
-        return MeditationWindow::onInput(inputEvent);
+        return AppWindow::onInput(inputEvent);
     }
 
     void MeditationRunningWindow::pregressFinished()
@@ -125,24 +146,6 @@ namespace gui
         intervalTimeout();
     }
 
-    void MeditationRunningWindow::baseTickReached()
-    {
-        updateDateTime();
-    }
-
-    void MeditationRunningWindow::buildMeditationItem(MeditationItem &item)
-    {
-        presenter->get(item);
-    }
-
-    void MeditationRunningWindow::onMeditationItemAvailable(MeditationItem *item)
-    {
-        if (item != nullptr) {
-            presenter->set(*item);
-        }
-        updateDateTime();
-    }
-
     void MeditationRunningWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimer>(
@@ -152,57 +155,39 @@ namespace gui
         presenter->setTimer(std::move(progressTimer));
     }
 
-    void MeditationRunningWindow::updateDateTime()
+    void MeditationRunningWindow::setTime(std::time_t newTime)
     {
-        using namespace utils::time;
-        auto timestamp = utils::time::getCurrentTimestamp();
-        if (datetime != nullptr) {
-            auto fmt = Locale::format(stm::api::timeFormat());
-            /*utils::dateAndTimeSettings.isTimeFormat12()
-                        ? Locale::format(Locale::TimeFormat::FormatTime12H)
-                        : Locale::format(Locale::TimeFormat::FormatTime24H);*/
-            datetime->setText(timestamp.str(fmt));
+        time->setTime(newTime);
+        time->setTimeFormatSpinnerVisibility(true);
+    }
+
+    void MeditationRunningWindow::setTimeFormat(utils::time::Locale::TimeFormat fmt)
+    {
+        time->setTimeFormat(fmt);
+    }
+
+    bool MeditationRunningWindow::updateTime()
+    {
+        if (presenter != nullptr) {
+            presenter->handleUpdateTimeEvent();
         }
-    }
-
-    void MeditationRunningWindow::start()
-    {
-        LOG_DEBUG("start");
-        presenter->start();
-        playGong();
-    }
-
-    void MeditationRunningWindow::pause()
-    {
-        LOG_DEBUG("pause");
-        presenter->pause();
-        gotoWindow(gui::name::window::session_paused);
-    }
-
-    void MeditationRunningWindow::resume()
-    {
-        LOG_DEBUG("resume");
-        presenter->resume();
+        return true;
     }
 
     void MeditationRunningWindow::intervalTimeout()
     {
-        LOG_DEBUG("intervalTimeout");
         playGong();
     }
 
     void MeditationRunningWindow::endSession()
     {
-        LOG_DEBUG("endSession");
         playGong();
-        gotoWindow(gui::name::window::session_end);
+        presenter->finish();
     }
 
     void MeditationRunningWindow::playGong()
     {
-        LOG_DEBUG("playGong");
-        AudioServiceAPI::PlaybackStart(application,
-                                       audio::PlaybackType::Meditation,
-                                       purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
+        AudioServiceAPI::PlaybackStart(
+            application, audio::PlaybackType::Meditation, purefs::dir::getCurrentOSPath() / meditationAudioPath);
     }
 } // namespace gui

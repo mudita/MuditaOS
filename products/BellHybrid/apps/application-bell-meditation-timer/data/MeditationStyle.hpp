@@ -16,6 +16,8 @@ namespace app::meditationStyle
             constexpr inline auto x           = (style::window_width - w) / 2;
             constexpr inline auto y           = style::window_height / 2 - h;
             constexpr inline auto imageSource = "logo_no_text";
+            constexpr inline auto imageTopMargin    = 112;
+            constexpr inline auto imageBottomMargin = 30;
         } // namespace icon
 
         namespace text
@@ -31,26 +33,6 @@ namespace app::meditationStyle
 
     namespace icStyle
     {
-        namespace arrow
-        {
-            inline constexpr auto w = 64;
-            inline constexpr auto h = 64;
-        } // namespace arrow
-
-        namespace left_arrow
-        {
-            constexpr inline auto x           = 0;
-            constexpr inline auto y           = (style::window_height - arrow::h) / 2;
-            constexpr inline auto imageSource = "bell_arrow_left";
-        } // namespace left_arrow
-
-        namespace right_arrow
-        {
-            constexpr inline auto x           = style::window_width - arrow::w;
-            constexpr inline auto y           = (style::window_height - arrow::h) / 2;
-            constexpr inline auto imageSource = "bell_arrow_right";
-        } // namespace right_arrow
-
         namespace title
         {
             constexpr inline auto w    = style::window_width;
@@ -77,6 +59,12 @@ namespace app::meditationStyle
             constexpr inline auto y    = style::window_height - h;
             constexpr inline auto font = style::window::font::largelight;
         } // namespace minute
+
+        namespace list
+        {
+            constexpr inline auto timeUnitSingular = "common_minute_lower";
+            constexpr inline auto timeUnitPlural   = "common_minutes_lower";
+        } // namespace list
     }     // namespace icStyle
 
     namespace mrStyle
@@ -104,19 +92,15 @@ namespace app::meditationStyle
             constexpr inline auto progressMarginTop  = 40;
             constexpr inline auto progressMarginLeft = 60;
             constexpr inline auto w                  = style::window_width - progressMarginLeft * 2;
-            constexpr inline auto h = 24;
+            constexpr inline auto h                  = 24;
             constexpr inline auto x                  = progressMarginLeft;
             constexpr inline auto y                  = title::y + title::h + progressMarginTop;
-
-            constexpr inline auto Radius               = 100;
-            constexpr inline auto BorderColor          = gui::ColorGrey;
-            constexpr inline auto BorderColorOnFocused = gui::ColorFullBlack;
-            constexpr inline auto PenWidth             = 3;
+            constexpr inline auto boxesCount         = 16;
         } // namespace progress
 
         namespace timer
         {
-            constexpr inline auto timerMarginBottom = 60;
+            constexpr inline auto timerMarginBottom = 20;
             constexpr inline auto w                 = style::window_width;
             constexpr inline auto h                 = 60;
             constexpr inline auto x                 = 0;
@@ -154,17 +138,18 @@ namespace app::meditationStyle
             constexpr inline auto font = style::window::font::largelight;
         } // namespace minute
 
-        namespace config
+        namespace list
         {
-            constexpr inline auto arrow = false;
-        } // namespace config
+            constexpr inline auto timeUnitSingular = "common_minute_lower";
+            constexpr inline auto timeUnitPlural   = "common_minutes_lower";
+        } // namespace list
     }     // namespace mtStyle
 
     namespace spStyle
     {
         namespace icon
         {
-            constexpr inline auto imageSource = "big_pause";
+            constexpr inline auto imageSource = "big_pause_W_G";
         } // namespace icon
     }     // namespace spStyle
 } // namespace meditationStyle

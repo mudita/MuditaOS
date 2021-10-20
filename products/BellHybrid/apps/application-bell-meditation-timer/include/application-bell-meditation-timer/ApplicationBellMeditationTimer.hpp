@@ -5,6 +5,16 @@
 
 #include <Application.hpp>
 
+namespace gui::name::window
+{
+    inline constexpr auto intervalChime      = "IntervalChimeWindow";
+    inline constexpr auto meditationProgress = "MeditationProgressWindow";
+    inline constexpr auto meditationTimer    = "MeditationTimerWindow";
+    inline constexpr auto readyGoing         = "ReadyGoingWindow";
+    inline constexpr auto sessionEnded       = "SessionEndedWindow";
+    inline constexpr auto sessionPaused      = "SensionPausedWindow";
+} // namespace gui::name::window
+
 namespace app
 {
     inline constexpr auto applicationBellMeditationTimerName = "ApplicationBellMeditationTimer";
@@ -30,6 +40,9 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
+
+      private:
+        void onStart() override;
     };
 
     template <> struct ManifestTraits<ApplicationBellMeditationTimer>

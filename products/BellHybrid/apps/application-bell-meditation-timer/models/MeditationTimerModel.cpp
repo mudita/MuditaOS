@@ -14,25 +14,6 @@ namespace
 
 namespace app::meditation
 {
-    auto MeditationTimerModel::createData() -> void
-    {
-        MeditationBaseModel::createData();
-
-        item = new gui::MeditationTimerListItem();
-        internalData.push_back(item);
-        item->deleteByList = false;
-        item->setOnValueChanged([this](int value) {
-            meditationItem->setTimer(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::minutes{value}));
-        });
-    }
-
-    auto MeditationTimerModel::setData(MeditationItem &item) -> void
-    {
-        MeditationBaseModel::setData(item);
-
-        setValue(std::chrono::duration_cast<std::chrono::minutes>(item.getTimer()));
-    }
-
     auto MeditationTimerModel::getItem(gui::Order order) -> gui::ListItem *
     {
         return getRecord(order);
@@ -74,5 +55,13 @@ namespace app::meditation
         if (list != nullptr) {
             list->rebuildList(gui::listview::RebuildType::Full);
         }
+    }
+
+    auto MeditationTimerModel::createData() -> void
+    {
+        item = new gui::MeditationTimerListItem();
+        internalData.push_back(item);
+        item->deleteByList = false;
+        setValue(spinnerDefaultValue);
     }
 } // namespace app::meditation

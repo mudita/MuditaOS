@@ -4,8 +4,7 @@
 #pragma once
 
 #include <apps-common/widgets/BellSideListItem.hpp>
-
-#include "ScroolSpinner.hpp"
+#include <apps-common/widgets/spinners/Spinners.hpp>
 
 namespace gui
 {
@@ -13,19 +12,18 @@ namespace gui
 
     class IntervalChimeListItem : public BellSideListItem
     {
-        std::function<void(int)> onIndexChangedCallback{nullptr};
-        ScroolSpinner *spinner   = nullptr;
+        UTF8Spinner *spinner     = nullptr;
         Label *bottomDescription = nullptr;
+        std::vector<std::string> titles;
 
-        void createSpinner(int size, ScroolSpinner::OnGetTitleCallback getTitleCB);
+        void createSpinner();
         void createBottomDescription();
         void registerCallbacks();
 
       public:
-        IntervalChimeListItem(int size, ScroolSpinner::OnGetTitleCallback getTitleCB);
+        IntervalChimeListItem(std::vector<std::string> titles);
 
-        auto setOnIndexChanged(std::function<void(int)> cb) -> void;
-        [[nodiscard]] int getSpinnerIndex() const noexcept;
+        [[nodiscard]] int getSpinnerIndex() const;
         void setSpinnerIndex(int index);
     };
 } // namespace gui

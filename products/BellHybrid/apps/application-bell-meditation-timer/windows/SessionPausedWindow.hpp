@@ -3,26 +3,23 @@
 
 #pragma once
 
+#include <gui/widgets/Icon.hpp>
+#include <Application.hpp>
+#include <AppWindow.hpp>
 #include <InputEvent.hpp>
-#include "IconTextWindow.hpp"
 
 namespace gui
 {
-    namespace name::window
-    {
-        inline constexpr auto session_paused = "Sension paused";
-    }
-
-    class SessionPausedWindow : public IconTextWindow
+    class SessionPausedWindow : public AppWindow
     {
       public:
-        explicit SessionPausedWindow(app::ApplicationCommon *app);
+        SessionPausedWindow(app::ApplicationCommon *app);
 
         // virtual methods
+        void buildInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
-        void onTimeout() override;
-        std::string getText() override;
-        std::string getImageName() override;
-        std::chrono::seconds getTimeout() const override;
+
+      private:
+        Icon *icon{};
     };
 } // namespace gui
