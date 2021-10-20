@@ -9,7 +9,7 @@
 #include "fsl_common.h"
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
-#include <hal/battery_charger/AbstractBatteryCharger.hpp>
+#include <board/rt1051/puretx/hal/battery_charger/BatteryCharger.hpp>
 #include <hal/key_input/KeyInput.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/headset/headset.hpp"
@@ -113,13 +113,14 @@ namespace bsp
                 xHigherPriorityTaskWoken |= hal::key_input::rightFunctionalIRQHandler();
             }
 
-            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {}
+            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {
+                xHigherPriorityTaskWoken |= hal::battery::INOKBHandlerIRQ();
+            }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INTB_PIN)) {
-                xHigherPriorityTaskWoken |=
-                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::Any);
+                xHigherPriorityTaskWoken |= hal::battery::INTBHandlerIRQ();
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_TRAY_INSERTED_PIN)) {
