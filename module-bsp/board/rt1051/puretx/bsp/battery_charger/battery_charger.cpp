@@ -457,7 +457,15 @@ namespace bsp::battery_charger
             INTBPinConfig.pin      = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN);
             gpio->ConfPin(INTBPinConfig);
 
+            drivers::DriverGPIOPinParams INOKBPinConfig;
+            INOKBPinConfig.dir      = drivers::DriverGPIOPinParams::Direction::Input;
+            INOKBPinConfig.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge;
+            INOKBPinConfig.defLogic = 0;
+            INOKBPinConfig.pin      = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN);
+            gpio->ConfPin(INOKBPinConfig);
+
             gpio->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
+            gpio->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
         }
 
         int getCellTemperature()
@@ -586,6 +594,7 @@ namespace bsp::battery_charger
         storeConfiguration();
 
         gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
+        gpio->DisableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
 
         IRQQueueHandle = nullptr;
         DCDQueueHandle = nullptr;
@@ -765,6 +774,16 @@ namespace bsp::battery_charger
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         if (IRQQueueHandle != nullptr) {
             std::uint8_t val = static_cast<std::uint8_t>(batteryIRQSource::INTB);
+            xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
+        }
+        return xHigherPriorityTaskWoken;
+    }
+
+    BaseType_t INOKB_IRQHandler()
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        if (IRQQueueHandle != nullptr) {
+            std::uint8_t val = static_cast<std::uint8_t>(batteryIRQSource::INOKB);
             xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
         }
         return xHigherPriorityTaskWoken;

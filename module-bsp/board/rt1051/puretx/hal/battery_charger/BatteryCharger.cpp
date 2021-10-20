@@ -24,7 +24,8 @@ namespace hal::battery
 
     void BatteryCharger::processStateChangeNotification(std::uint8_t notification)
     {
-        if (notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INTB)) {
+        if (notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INTB) ||
+            notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INOKB)) {
             checkBatteryChargerInterrupts();
         }
     }
@@ -98,9 +99,14 @@ namespace hal::battery
         }
     }
 
-    BaseType_t IRQHandler([[maybe_unused]] AbstractBatteryCharger::IRQSource source)
+    BaseType_t INTBHandlerIRQ()
     {
         return bsp::battery_charger::INTB_IRQHandler();
+    }
+
+    BaseType_t INOKBHandlerIRQ()
+    {
+        return bsp::battery_charger::INOKB_IRQHandler();
     }
 
     extern "C"
