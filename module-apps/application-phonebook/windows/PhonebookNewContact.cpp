@@ -176,20 +176,16 @@ namespace gui
             }
         }
         else if (contactAction == ContactAction::Edit || contactAction == ContactAction::EditTemporary) {
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            data->ignoreCurrentWindowOnStack      = true;
-
             contact->groups.erase(ContactsDB::temporaryGroupId());
-
             if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return false;
             }
-            application->switchWindow(gui::window::name::contact, std::move(data));
-            return true;
         }
 
-        application->switchWindow(gui::name::window::main_window);
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+        data->ignoreCurrentWindowOnStack      = true;
+        application->switchWindow(gui::window::name::contact, std::move(data));
         return true;
     } // namespace gui
 
