@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <system/Common.hpp>
+
 namespace app
 {
     class ApplicationCommon;
@@ -14,7 +16,7 @@ namespace gui
     {
       public:
         virtual ~AbstractPowerOffPresenter() = default;
-        virtual void powerOff()              = 0;
+        virtual void powerOff(sys::CloseReason reason = sys::CloseReason::RegularPowerDown) = 0;
         virtual void reboot()                = 0;
     };
 
@@ -22,7 +24,7 @@ namespace gui
     {
       public:
         PowerOffPresenter(app::ApplicationCommon *app);
-        void powerOff() override;
+        void powerOff(sys::CloseReason reason = sys::CloseReason::RegularPowerDown) override;
         void reboot() override;
 
       private:
