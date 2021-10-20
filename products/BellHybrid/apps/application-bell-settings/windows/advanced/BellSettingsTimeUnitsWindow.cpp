@@ -22,11 +22,9 @@ namespace gui
         buildInterface();
 
         finishedCallback = [this]() {
-            application->switchWindow(window::bell_finished::defaultName,
-                                      BellFinishedWindowData::Factory::create(
-                                          "big_check_W_G",
-                                          utils::translate("app_bell_settings_time_units_finished_message"),
-                                          gui::window::name::bellSettingsAdvanced));
+            application->switchWindow(
+                window::bell_finished::defaultName,
+                BellFinishedWindowData::Factory::create("circle_success_big", gui::window::name::bellSettingsAdvanced));
         };
     }
 

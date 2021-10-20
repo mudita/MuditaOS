@@ -60,9 +60,7 @@ namespace gui
         presenter->saveData();
         application->switchWindow(
             window::bell_finished::defaultName,
-            BellFinishedWindowData::Factory::create("circle_success",
-                                                    utils::translate("app_bell_settings_bedtime_tone_finished"),
-                                                    gui::name::window::main_window));
+            BellFinishedWindowData::Factory::create("circle_success_big", gui::name::window::main_window));
     }
 
     void BellSettingsBedtimeToneWindow::onClose(CloseReason reason)
