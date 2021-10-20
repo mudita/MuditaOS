@@ -23,8 +23,8 @@ namespace gui
         AppWindow::buildInterface();
 
         statusBar->setVisible(false);
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
+        header->setTitleVisibility(false);
+        bottomBar->setVisible(false);
 
         list = new ListView(this,
                             style::window::default_left_margin,
