@@ -13,10 +13,17 @@ namespace gui
     BellPowerOffPresenter::BellPowerOffPresenter(app::ApplicationCommon *app) : application(app)
     {}
 
-    void BellPowerOffPresenter::powerOff()
+    void BellPowerOffPresenter::powerOff(sys::CloseReason reason)
     {
-        auto msg = std::make_shared<app::UserPowerDownRequest>();
-        application->bus.sendUnicast(std::move(msg), service::name::system_manager);
+        switch (reason) {
+        case sys::CloseReason::FactoryReset:
+            sys::SystemManagerCommon::FactoryReset(application);
+            break;
+        default:
+            auto msg = std::make_shared<app::UserPowerDownRequest>();
+            application->bus.sendUnicast(std::move(msg), service::name::system_manager);
+            break;
+        }
     }
     void BellPowerOffPresenter::reboot()
     {

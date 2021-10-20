@@ -6,10 +6,17 @@
 #include "BellSettingsStyle.hpp"
 #include "BellSettingsFrontlightWindow.hpp"
 
-#include <common/options/OptionBellMenu.hpp>
+#include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
+#include <apps-common/windows/Dialog.hpp>
+#include <common/options/OptionBellMenu.hpp>
+#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/messages/UserPowerDownRequest.hpp>
+#include <service-appmgr/messages/SwitchRequest.hpp>
 #include <windows/advanced/AboutYourBellWindow.hpp>
-#include <common/windows/BellFinishedWindow.hpp>
+#include <common/windows/BellFactoryReset.hpp>
+#include <common/windows/BellFinishedCallbackWindow.hpp>
+#include <common/windows/BellTurnOffWindow.hpp>
 
 namespace gui
 {
@@ -40,12 +47,9 @@ namespace gui
 
         auto factoryResetCallback = [this](const std::string &window) {
             auto actionCallback = [this]() {
-                if (sys::SystemManagerCommon::FactoryReset(application)) {
-                    application->switchWindow(
-                        window::bell_finished::defaultName,
-                        BellFinishedWindowData::Factory::create(
-                            "big_check_W_M", utils::translate("app_bell_settings_factory_reset_finished"), ""));
-                }
+                auto switchRequest = std::make_unique<app::manager::SwitchRequest>(
+                    service::name::appmgr, app::applicationBellName, gui::BellFactoryReset::name, nullptr);
+                application->bus.sendUnicast(std::move(switchRequest), service::name::appmgr);
                 return true;
             };
 
