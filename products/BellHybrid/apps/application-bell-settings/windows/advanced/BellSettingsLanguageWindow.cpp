@@ -42,7 +42,11 @@ namespace gui
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setFocusEdges(RectangleEdge::None);
         spinner->setCurrentValue(presenter->getSelectedLanguage());
+        spinner->onValueChanged = [this](const auto &) {
+            body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
+        };
         body->getCenterBox()->addWidget(spinner);
+        body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
 
         setFocusItem(spinner);
         body->resize();
@@ -51,10 +55,6 @@ namespace gui
     bool BellSettingsLanguageWindow::onInput(const InputEvent &inputEvent)
     {
         if (spinner->onInput(inputEvent)) {
-            auto selectedLanguage = spinner->getCurrentValue();
-
-            body->setMinMaxArrowsVisibility(selectedLanguage == presenter->getLanguages().front(),
-                                            selectedLanguage == presenter->getLanguages().back());
             return true;
         }
         else if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
