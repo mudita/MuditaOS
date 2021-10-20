@@ -6,6 +6,7 @@
 #include <ProgressBar.hpp>
 #include <ApplicationCommon.hpp>
 #include <apps-common/GuiTimer.hpp>
+#include <time/time_conversion.hpp>
 #include <gsl/assert>
 
 namespace
@@ -19,10 +20,8 @@ namespace app
                                  gui::Item &parent,
                                  std::string timerName,
                                  std::chrono::milliseconds baseTick,
-                                 ProgressCountdownMode countdownMode,
-                                 utils::time::Duration::DisplayedFormat displayFormat)
-        : app{app}, parent{parent}, name{std::move(timerName)}, baseTickInterval{baseTick},
-          countdownMode{countdownMode}, displayFormat{displayFormat}
+                                 ProgressCountdownMode countdownMode)
+        : app{app}, parent{parent}, name{std::move(timerName)}, baseTickInterval{baseTick}, countdownMode{countdownMode}
     {}
 
     void ProgressTimer::resetProgress()
@@ -51,7 +50,7 @@ namespace app
         if (countdownMode == ProgressCountdownMode::Increasing && secondsRemaining != std::chrono::seconds::zero()) {
             timerText += increasingModePrefix;
         }
-        timerText += remainingDuration.str(displayFormat);
+        timerText += remainingDuration.str(Duration::DisplayedFormat::Fixed0M0S);
         text->setText(std::move(timerText));
     }
 
@@ -64,35 +63,23 @@ namespace app
         }
     }
 
-    void ProgressTimer::reset(std::chrono::seconds _duration,
-                              std::chrono::seconds _interval,
-                              std::chrono::seconds _elapsed)
+    void ProgressTimer::reset(std::chrono::seconds _duration, std::chrono::seconds _interval)
     {
         Expects(_duration != std::chrono::seconds::zero());
 
         duration    = _duration;
-        elapsed     = _elapsed;
+        elapsed     = std::chrono::seconds::zero();
         interval    = _interval;
         hasInterval = _interval != std::chrono::seconds::zero();
 
         updateText();
-        if (_interval != std::chrono::seconds::zero()) {
-            updateProgress();
-        }
-        else {
-            resetProgress();
-        }
+        resetProgress();
     }
 
     void ProgressTimer::start()
     {
-        if (isStarted) {
-            isRunning = true;
-            return;
-        }
         startTimer();
         isRunning = true;
-        isStarted = true;
     }
 
     void ProgressTimer::startTimer()
@@ -107,8 +94,6 @@ namespace app
     {
         if (isStopped() || isFinished()) {
             task.stop();
-            isStarted = false;
-            isRunning = false;
             if (isFinished() && onFinishedCallback != nullptr) {
                 onFinishedCallback();
             }
@@ -118,9 +103,6 @@ namespace app
         ++elapsed;
         if ((intervalReached() || isFinished()) && onIntervalCallback != nullptr) {
             onIntervalCallback();
-        }
-        if (onBaseTickCallback != nullptr) {
-            onBaseTickCallback();
         }
         update();
         return true;
@@ -156,11 +138,6 @@ namespace app
         onIntervalCallback = std::move(cb);
     }
 
-    void ProgressTimer::registerOnBaseTickCallback(std::function<void()> cb)
-    {
-        onBaseTickCallback = std::move(cb);
-    }
-
     void ProgressTimer::attach(gui::Progress *_progress)
     {
         Expects(_progress != nullptr);
@@ -173,3 +150,4 @@ namespace app
         text = _text;
     }
 } // namespace app
+

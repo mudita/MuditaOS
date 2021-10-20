@@ -4,7 +4,6 @@
 
 #include "TimerWithCallbacks.hpp"
 #include <Timers/TimerHandle.hpp>
-#include <time/time_conversion.hpp>
 #include <atomic>
 #include <chrono>
 #include <string>
@@ -46,7 +45,6 @@ namespace app
         const std::string name;
 
         std::atomic_bool isRunning{false};
-        std::atomic_bool isStarted{false};
         std::chrono::seconds duration{std::chrono::seconds::zero()};
         std::chrono::seconds elapsed{std::chrono::seconds::zero()};
         std::chrono::seconds interval{std::chrono::seconds::zero()};
@@ -57,9 +55,7 @@ namespace app
 
         std::function<void()> onFinishedCallback = nullptr;
         std::function<void()> onIntervalCallback = nullptr;
-        std::function<void()> onBaseTickCallback = nullptr;
         ProgressCountdownMode countdownMode;
-        utils::time::Duration::DisplayedFormat displayFormat;
 
         void startTimer();
         void update();
@@ -71,21 +67,17 @@ namespace app
         [[nodiscard]] auto intervalReached() const noexcept -> bool;
 
       public:
-        ProgressTimer(
-            app::ApplicationCommon *app,
-            gui::Item &parent,
-            std::string timerName,
-            std::chrono::milliseconds baseTick,
-            ProgressCountdownMode countdownMode                    = ProgressCountdownMode::Decreasing,
-            utils::time::Duration::DisplayedFormat displayedFormat = utils::time::Duration::DisplayedFormat::AutoM);
+        ProgressTimer(app::ApplicationCommon *app,
+                      gui::Item &parent,
+                      std::string timerName,
+                      std::chrono::milliseconds baseTick,
+                      ProgressCountdownMode countdownMode = ProgressCountdownMode::Decreasing);
         void reset(std::chrono::seconds _duration,
-                   std::chrono::seconds _interval = std::chrono::seconds::zero(),
-                   std::chrono::seconds elapsed   = std::chrono::seconds::zero()) override;
+                   std::chrono::seconds _interval = std::chrono::seconds::zero()) override;
         void start() override;
         void stop() override;
         void registerOnFinishedCallback(std::function<void()> cb) override;
         void registerOnIntervalCallback(std::function<void()> cb) override;
-        void registerOnBaseTickCallback(std::function<void()> cb) override;
         [[nodiscard]] auto isStopped() const noexcept -> bool override;
 
         void attach(gui::Progress *_progress);
@@ -93,3 +85,4 @@ namespace app
     };
 
 } // namespace app
+

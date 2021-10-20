@@ -12,16 +12,15 @@ namespace app
     class TimerWithCallbacks
     {
       public:
-        virtual ~TimerWithCallbacks()                                                   = default;
-        [[nodiscard]] virtual auto isStopped() const noexcept -> bool                   = 0;
+        virtual ~TimerWithCallbacks()                                                    = default;
+        [[nodiscard]] virtual auto isStopped() const noexcept -> bool                    = 0;
         virtual void reset(std::chrono::seconds duration,
-                           std::chrono::seconds interval = std::chrono::seconds::zero(),
-                           std::chrono::seconds elapsed  = std::chrono::seconds::zero()) = 0;
-        virtual void start()                                                            = 0;
-        virtual void stop()                                                             = 0;
-        virtual void registerOnFinishedCallback(std::function<void()> cb)               = 0;
-        virtual void registerOnIntervalCallback(std::function<void()> cb)               = 0;
-        virtual void registerOnBaseTickCallback(std::function<void()> cb)               = 0;
+                           std::chrono::seconds interval = std::chrono::seconds::zero()) = 0;
+        virtual void start()                                                             = 0;
+        virtual void stop()                                                              = 0;
+        virtual void registerOnFinishedCallback(std::function<void()> cb)                = 0;
+        virtual void registerOnIntervalCallback(std::function<void()> cb)                = 0;
     };
 
 } // namespace app
+
