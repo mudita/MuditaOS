@@ -11,7 +11,9 @@ namespace app::OnBoarding
 
     std::vector<std::string> OnBoardingLanguageWindowPresenter::getLanguages()
     {
-        return loader.getAvailableDisplayLanguages();
+        auto languages = loader.getAvailableDisplayLanguages();
+        std::sort(languages.begin(), languages.end());
+        return languages;
     }
 
     unsigned OnBoardingLanguageWindowPresenter::getSelectedLanguageIndex()
