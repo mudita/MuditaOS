@@ -22,4 +22,7 @@ namespace hal::battery
 
         AbstractBatteryCharger::BatteryChargerEvents &eventsHandler;
     };
+
+    BaseType_t INTBHandlerIRQ();
+    BaseType_t INOKBHandlerIRQ();
 } // namespace hal::battery
