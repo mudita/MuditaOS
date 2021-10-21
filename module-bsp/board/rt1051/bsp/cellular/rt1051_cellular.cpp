@@ -150,7 +150,6 @@ namespace bsp
         }
 
         disableRx();
-        disableTx();
 
         NVIC_DisableIRQ(LPUART1_IRQn);
         LPUART_DisableInterrupts(CELLULAR_UART_BASE,
@@ -158,7 +157,11 @@ namespace bsp
         LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
         NVIC_ClearPendingIRQ(LPUART1_IRQn);
 
+        // Needed for the last flush in LPUART_Deinit
+        enableTx();
+
         LPUART_Deinit(CELLULAR_UART_BASE);
+        disableTx();
 
         MSPDeinit();
         DMADeinit();
