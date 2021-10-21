@@ -16,7 +16,7 @@ namespace gui
     class BGSoundsVolumeWindow : public WindowWithTimer, public app::bgSounds::BGSoundsVolumeContract::View
     {
         std::unique_ptr<app::bgSounds::BGSoundsVolumeContract::Presenter> presenter;
-        audio::Volume volume = 0;
+        audio::Volume volume = 1;
         audio::Context audioContext;
 
         BellBaseLayout *body{};
