@@ -48,7 +48,9 @@ namespace bsp
 
         void updateClockFrequency(CpuFrequencyHz newFrequency)
         {
-            pwm->UpdateClockFrequency(static_cast<std::uint32_t>(newFrequency));
+            if (pwm) {
+                pwm->UpdateClockFrequency(static_cast<std::uint32_t>(newFrequency));
+            }
         }
 
         void setVibrationLevel(unsigned int vibrationLevel)
