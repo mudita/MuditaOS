@@ -7,7 +7,7 @@ ARM_GCC_SOURCE_LINK="https://developer.arm.com/-/media/Files/downloads/gnu-rm/10
 ARM_GCC_PATH_VAR="${ARM_GCC//-/_}"
 ARM_GCC_MD5="8312c4c91799885f222f663fc81f9a31"
 
-CMAKE_VERSION="3.19.5"
+CMAKE_VERSION="3.21.3"
 CMAKE_NAME="cmake-${CMAKE_VERSION}-Linux-x86_64"
 CMAKE_SOURCE_LINK="https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_NAME}.tar.gz"
 CMAKE_PKG="${CMAKE_SOURCE_LINK##*/}"
