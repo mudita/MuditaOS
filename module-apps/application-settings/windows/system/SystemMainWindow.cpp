@@ -13,7 +13,9 @@
 namespace gui
 {
     SystemMainWindow::SystemMainWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, window::name::system)
-    {}
+    {
+        setTitle(utils::translate("app_settings_system"));
+    }
 
     auto SystemMainWindow::buildOptionsList() -> std::list<Option>
     {

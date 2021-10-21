@@ -13,7 +13,9 @@ namespace gui
     NetworkWindow::NetworkWindow(app::ApplicationCommon *app,
                                  app::settingsInterface::OperatorsSettings *operatorsSettings)
         : BaseSettingsWindow(app, gui::window::name::network), operatorsSettings(operatorsSettings)
-    {}
+    {
+        setTitle(utils::translate("app_settings_net"));
+    }
 
     void NetworkWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
