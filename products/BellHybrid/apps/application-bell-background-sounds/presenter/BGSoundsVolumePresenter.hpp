@@ -8,6 +8,7 @@
 
 namespace app::bgSounds
 {
+    constexpr audio::Volume minVolume = 1u;
     using VolumeData = struct VolumeData
     {
         audio::Volume min;
@@ -35,7 +36,7 @@ namespace app::bgSounds
     {
         constexpr static struct VolumeData volumeData
         {
-            audio::minVolume, audio::maxVolume, audio::defaultVolumeStep
+            bgSounds::minVolume, audio::maxVolume, audio::defaultVolumeStep
         };
 
         VolumeData getVolumeData() override;
