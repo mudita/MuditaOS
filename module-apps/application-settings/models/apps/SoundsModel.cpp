@@ -185,8 +185,6 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
                         utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
                     return true;
                 }
-
-                return false;
             };
             break;
 
