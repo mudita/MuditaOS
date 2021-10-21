@@ -28,6 +28,7 @@ pipeline {
     }
     environment {
         JOBS=15
+        PATH="/usr/local/cmake-3.21.3-linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
     }
     stages {
         stage('Check for previous running builds') {
@@ -78,6 +79,10 @@ pipeline {
                 }
             }
         stage('Build RT1051') {
+            environment {
+                CCACHE_DIR="/ccache/RT1051"
+                XDG_CACHE_HOME="/clang-cache"
+            }
             steps {
                 echo "Check if branch needs rebasing"
                 sh '''#!/bin/bash -e
@@ -91,11 +96,11 @@ pipeline {
                 popd'''
 
                 sh '''#!/bin/bash -e
-                PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
                 export JOBS=${JOBS:-6}
                 export CCACHE_DIR=/ccache/RT1051
 
                 echo "JOBS=${JOBS}"
+                echo "cmake path=$(which cmake)"
                 echo "\'workspace dir:${WORKSPACE}\'"
 
                 pushd "${WORKSPACE}"
@@ -133,7 +138,6 @@ pipeline {
 
         stage('Build Linux - Pure') {
             environment {
-                PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
                 CCACHE_DIR="/ccache/Linux"
                 XDG_CACHE_HOME="/clang-cache"
 
@@ -219,7 +223,6 @@ pipeline {
 
         stage('Build Linux - Bell') {
             environment {
-                PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
                 CCACHE_DIR="/ccache/Linux"
                 XDG_CACHE_HOME="/clang-cache"
             }
