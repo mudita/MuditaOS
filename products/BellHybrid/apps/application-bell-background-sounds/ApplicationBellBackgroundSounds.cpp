@@ -13,6 +13,7 @@
 #include "windows/BGSoundsTimerSelectWindow.hpp"
 #include "windows/BGSoundsVolumeWindow.hpp"
 #include "widgets/BGSoundsPlayer.hpp"
+#include <apps-common/messages/AppMessage.hpp>
 #include <common/models/TimeModel.hpp>
 #include <service-audio/AudioMessage.hpp>
 
@@ -92,5 +93,20 @@ namespace app
         }
 
         return handleAsyncResponse(resp);
+    }
+
+    sys::MessagePointer ApplicationBellBackgroundSounds::handleSwitchWindow(sys::Message *msgl)
+    {
+        if (auto msg = dynamic_cast<AppSwitchWindowMessage *>(msgl); msg) {
+            const auto newWindowName = msg->getWindowName();
+            if (newWindowName == gui::window::name::bgSoundsProgress ||
+                newWindowName == gui::window::name::bgSoundsPaused) {
+                stopIdleTimer();
+            }
+            else {
+                startIdleTimer();
+            }
+        }
+        return ApplicationCommon::handleSwitchWindow(msgl);
     }
 } // namespace app

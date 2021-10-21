@@ -23,6 +23,8 @@ namespace app
     {
         std::unique_ptr<bgSounds::BGSoundsPlayer> player;
 
+        sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
+
       public:
         ApplicationBellBackgroundSounds(std::string name                    = applicationBellBackgroundSoundsName,
                                         std::string parent                  = "",
