@@ -4,14 +4,16 @@
 #include "bsp/bell_temp_sensor/bell_temp_sensor.hpp"
 #include "CT7117.hpp"
 #include <board/BoardDefinitions.hpp>
-#include "drivers/i2c/DriverI2C.hpp"
-#include "drivers/gpio/DriverGPIO.hpp"
+#include <drivers/i2c/DriverI2C.hpp>
+#include <drivers/gpio/DriverGPIO.hpp>
 
 #include "fsl_common.h"
 #include <log/log.hpp>
 
 namespace bsp::bell_temp_sensor
 {
+    using namespace drivers;
+
     bool isFahrenheit = false;
 
     namespace
@@ -42,6 +44,9 @@ namespace bsp::bell_temp_sensor
             return i2c->Read(addr, reinterpret_cast<uint8_t *>(readout), 2);
         }
 
+        auto gpio_pwren = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::BELL_TEMP_SENSOR_PWR_GPIO),
+                                             DriverGPIOParams{});
+
     } // namespace
 
     std::int32_t init(bool Fahrenheit)
@@ -49,6 +54,13 @@ namespace bsp::bell_temp_sensor
         isFahrenheit = Fahrenheit;
 
         LOG_DEBUG("Initializing Bell temperature sensor");
+
+        gpio_pwren->ConfPin(
+            DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
+                                .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                .defLogic = 1,
+                                .pin      = static_cast<uint32_t>(BoardDefinitions::BELL_TEMP_SENSOR_PWR_PIN)});
+        gpio_pwren->WritePin(static_cast<uint32_t>(BoardDefinitions::BELL_TEMP_SENSOR_PWR_PIN), 1); // enable power
 
         if (isInitiated) {
             return isPresent() ? kStatus_Success : kStatus_Fail;
@@ -69,6 +81,8 @@ namespace bsp::bell_temp_sensor
     void deinit()
     {
         standby();
+
+        gpio_pwren->WritePin(static_cast<uint32_t>(BoardDefinitions::BELL_TEMP_SENSOR_PWR_PIN), 0); // disable power
     }
 
     bool standby()
