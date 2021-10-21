@@ -6,14 +6,18 @@
 
 namespace gui
 {
-    OptionWindow::OptionWindow(app::ApplicationCommon *app, const std::string &name)
-        : AppWindow(app, name), OptionsList(std::make_shared<OptionsModel>(app))
+    OptionWindow::OptionWindow(app::ApplicationCommon *app, const std::string &name, const std::string &windowTitle)
+        : AppWindow(app, name), OptionsList(std::make_shared<OptionsModel>(app)), windowTitle(windowTitle)
     {
         buildInterface();
     }
 
-    OptionWindow::OptionWindow(app::ApplicationCommon *app, const std::string &name, std::list<Option> options)
-        : AppWindow(app, name), OptionsList(std::make_shared<OptionsModel>(app), std::move(options))
+    OptionWindow::OptionWindow(app::ApplicationCommon *app,
+                               const std::string &name,
+                               std::list<Option> options,
+                               const std::string &windowTitle)
+        : AppWindow(app, name), OptionsList(std::make_shared<OptionsModel>(app), std::move(options)),
+          windowTitle(windowTitle)
     {
         buildInterface();
     }
@@ -30,8 +34,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-
-        setTitle(name);
+        setTitle(windowTitle.empty() ? utils::translate("common_options_title") : windowTitle);
 
         optionsList = new gui::ListView(this,
                                         option::window::optionsListX,

@@ -126,10 +126,9 @@ namespace app
         windowsFactory.attach(gui::name::window::new_sms, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::NewMessageWindow>(app);
         });
-        windowsFactory.attach(utils::translate("common_options_title"),
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::OptionWindow>(app, name);
-                              });
+        windowsFactory.attach(window::name::option_window, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::OptionWindow>(app, name);
+        });
         windowsFactory.attach(gui::name::window::dialog, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
         });
@@ -408,7 +407,7 @@ namespace app
     {
         LOG_INFO("New message options for %s", requestingWindow.c_str());
         auto opts = std::make_unique<gui::OptionsWindowOptions>(newMessageWindowOptions(this, requestingWindow, text));
-        switchWindow(utils::translate("common_options_title"), std::move(opts));
+        switchWindow(window::name::option_window, std::move(opts));
         return true;
     }
 

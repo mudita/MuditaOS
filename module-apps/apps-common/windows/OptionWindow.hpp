@@ -6,6 +6,7 @@
 #include "ApplicationCommon.hpp"
 #include "AppWindow.hpp"
 #include "OptionsList.hpp"
+#include "OptionWindowName.hpp"
 
 namespace gui
 {
@@ -16,9 +17,15 @@ namespace gui
 
     class OptionWindow : public AppWindow, protected OptionsList<ListView>
     {
+      private:
+        const std::string windowTitle;
+
       public:
-        OptionWindow(app::ApplicationCommon *app, const std::string &name);
-        OptionWindow(app::ApplicationCommon *app, const std::string &name, std::list<Option> options);
+        OptionWindow(app::ApplicationCommon *app, const std::string &name, const std::string &windowTitle = "");
+        OptionWindow(app::ApplicationCommon *app,
+                     const std::string &name,
+                     std::list<Option> options,
+                     const std::string &windowTitle = "");
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void onClose(CloseReason reason) override;

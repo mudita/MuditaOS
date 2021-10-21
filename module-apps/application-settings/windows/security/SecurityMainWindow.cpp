@@ -11,7 +11,9 @@ namespace gui
 {
     SecurityMainWindow::SecurityMainWindow(app::ApplicationCommon *app)
         : BaseSettingsWindow(app, window::name::security)
-    {}
+    {
+        setTitle(utils::translate("app_settings_security"));
+    }
 
     void SecurityMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {

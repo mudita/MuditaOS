@@ -8,6 +8,7 @@
 #include <module-apps/application-notes/style/NotePreviewStyle.hpp>
 #include <module-apps/application-notes/windows/NotesOptions.hpp>
 #include <apps-common/messages/OptionsWindow.hpp>
+#include <apps-common/options/OptionWindowName.hpp>
 
 #include <i18n/i18n.hpp>
 #include <time/time_conversion_factory.hpp>
@@ -131,7 +132,7 @@ namespace app::notes
                 application->switchWindow(gui::name::window::note_edit, std::make_unique<NoteSwitchData>(notesRecord));
             }
             else if (inputEvent.is(gui::KeyCode::KEY_LF)) {
-                application->switchWindow(utils::translate("common_options_title"),
+                application->switchWindow(window::name::option_window,
                                           std::make_unique<gui::OptionsWindowOptions>(notePreviewOptions(
                                               application, *notesRecord, presenter->getRepository(), note)));
             }
