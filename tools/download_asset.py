@@ -14,13 +14,41 @@ import json
 import os
 import requests
 import sys
+from semver import VersionInfo
 
 from tqdm import tqdm
 import time
 
+minimalRequiredRelease = { 'ecoboot': '1.0.16',
+                           'PureUpdater': '1.1.1' }
+
+
+assetRepoToEnvVar = {'ecoboot': 'PURE_ECOBOOT_MIN_VER',
+                     'PureUpdater': 'PURE_UPDATER_MIN_VER'}
+
+
+def minRequiredRelease(assetName :str):
+    '''Get minimum allowed release'''
+
+    if assetRepoToEnvVar[assetName] in os.environ:
+        minRelease = os.environ[assetRepoToEnvVar[assetName]]
+    else:
+        minRelease = minimalRequiredRelease[assetName]
+
+    return VersionInfo.parse(minRelease)
+
+def checkAssetRelease(assetName :str, assetTag: str):
+    '''Check whether requested release is allowed'''
+
+    requestedRelease = VersionInfo.parse(assetTag)
+    minimalRelease = minRequiredRelease(assetName)
+
+    if  requestedRelease < minimalRelease:
+        print(f'Selected release ({requestedRelease}) is older than minimal required: {minimalRelease}')
+        sys.exit(1)
 
 class Getter(object):
-    '''Download latest ecooboot.bin/updater.bin images'''
+    '''Download latest ecoboot/PureUpdater images'''
 
     def __init__(self):
         self.host = 'https://api.github.com/repos'
@@ -136,7 +164,11 @@ class Getter(object):
                     break
         if release is None:
             print("No release with tag:", args.tag)
-        print("release:", release['tag_name'])
+            sys.exit(2)
+
+        print("Selected release:", release['tag_name'])
+        checkAssetRelease(args.repository, release['tag_name'])
+
         assets = release['assets']
 
         for asset in assets:

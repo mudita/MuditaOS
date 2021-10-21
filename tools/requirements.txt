@@ -7,3 +7,4 @@ requests==2.26.0
 smmap==4.0.0
 tqdm==4.62.2
 urllib3==1.26.6
+semver==2.13.0
