@@ -165,4 +165,7 @@ enum class BoardDefinitions
     BELL_FUELGAUGE_I2C          = static_cast<int>(drivers::I2CInstances ::I2C4),
     BELL_FUELGAUGE_ALRT_GPIO    = static_cast<int>(drivers::GPIOInstances ::GPIO_1),
     BELL_FUELGAUGE_ALRT_PIN     = 3,
+
+    BELL_TEMP_SENSOR_PWR_GPIO = static_cast<int>(drivers::GPIOInstances ::GPIO_1),
+    BELL_TEMP_SENSOR_PWR_PIN  = 27,
 };

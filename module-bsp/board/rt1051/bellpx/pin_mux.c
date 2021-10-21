@@ -308,6 +308,7 @@ void PINMUX_InitBootPins(void)
     PINMUX_WDOG_B_Init();
     PINMUX_InitI2C4();
     PINMUX_InitFuelGauge();
+    PINMUX_InitTempSensorPwr();
 }
 
 /*
@@ -1248,6 +1249,17 @@ void PINMUX_InitFuelGauge(void)
 
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
                             PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
+}
+
+void PINMUX_InitTempSensorPwr(void)
+{
+    IOMUXC_SetPinMux(PINUMX_TEMP_SENSOR_PWR_ENABLE,
+                     0U); /* Software Input On Field: Input Path is determined by functionality */
+
+    IOMUXC_SetPinConfig(PINUMX_TEMP_SENSOR_PWR_ENABLE,
+
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
+                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_DOWN_100kOhm);
 }
 
 /***********************************************************************************************************************
