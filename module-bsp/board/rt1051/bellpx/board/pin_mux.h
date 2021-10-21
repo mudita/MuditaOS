@@ -188,6 +188,13 @@ extern "C"
 
     void PINMUX_InitFuelGauge(void);
 
+/**
+ * Temperature sensor power supply enable
+ */
+#define PINUMX_TEMP_SENSOR_PWR_ENABLE IOMUXC_GPIO_AD_B1_11_GPIO1_IO27
+
+    void PINMUX_InitTempSensorPwr(void);
+
 #if defined(__cplusplus)
 }
 #endif
