@@ -12,6 +12,7 @@
 #include <module-apps/application-notes/data/NoteSwitchData.hpp>
 #include <module-apps/application-notes/style/NoteEditStyle.hpp>
 #include <apps-common/messages/OptionsWindow.hpp>
+#include <apps-common/options/OptionWindowName.hpp>
 
 #include <i18n/i18n.hpp>
 
@@ -149,7 +150,7 @@ namespace app::notes
             }
             if (inputEvent.is(gui::KeyCode::KEY_LF)) {
                 application->switchWindow(
-                    utils::translate("common_options_title"),
+                    window::name::option_window,
                     std::make_unique<gui::OptionsWindowOptions>(noteEditOptions(application, *notesRecord, edit)));
             }
         }

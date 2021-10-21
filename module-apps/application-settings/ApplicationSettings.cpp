@@ -360,13 +360,13 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(
-                app, utils::translate("app_settings_title_main"), mainWindowOptionsNew(app));
+                app, name, mainWindowOptionsNew(app), utils::translate("app_settings_title_main"));
         });
 
         // Advanced
         windowsFactory.attach(gui::window::name::advanced, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(
-                app, utils::translate("app_settings_advanced"), advancedOptions(app));
+                app, name, advancedOptions(app), utils::translate("app_settings_advanced"));
         });
         windowsFactory.attach(gui::window::name::information, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::InformationWindow>(app);

@@ -89,10 +89,9 @@ namespace app
         windowsFactory.attach(calllog::settings::DetailsWindowStr, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::CallLogDetailsWindow>(app);
         });
-        windowsFactory.attach(utils::translate("common_options_title"),
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::OptionWindow>(app, name);
-                              });
+        windowsFactory.attach(window::name::option_window, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::OptionWindow>(app, name);
+        });
         windowsFactory.attach(calllog::settings::DialogYesNoStr, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
         });

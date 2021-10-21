@@ -6,6 +6,7 @@
 #include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
 #include "application-alarm-clock/windows/AlarmClockOptions.hpp"
 #include "messages/OptionsWindow.hpp"
+#include <OptionWindowName.hpp>
 #include <ListView.hpp>
 #include <InputEvent.hpp>
 
@@ -52,7 +53,7 @@ namespace app::alarmClock
         };
         item->inputCallback = [this, record = record.get()](gui::Item &, const gui::InputEvent &event) {
             if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
-                application->switchWindow(utils::translate("common_options_title"),
+                application->switchWindow(window::name::option_window,
                                           std::make_unique<gui::OptionsWindowOptions>(
                                               alarmsListOptions(application, *record, *alarmsRepository)));
             }

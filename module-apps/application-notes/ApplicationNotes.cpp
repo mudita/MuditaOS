@@ -122,10 +122,9 @@ namespace app
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::DialogYesNo>(app, name);
                               });
-        windowsFactory.attach(utils::translate("common_options_title"),
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::OptionWindow>(app, name);
-                              });
+        windowsFactory.attach(window::name::option_window, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::OptionWindow>(app, name);
+        });
 
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
