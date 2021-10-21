@@ -42,7 +42,9 @@ namespace gui
         } state;
 
         Circle *circle       = nullptr;
+        VBox *centerBody     = nullptr;
         Label *timeLabel     = nullptr;
+        Rect *divRect        = nullptr;
         Label *timeUnitLabel = nullptr;
 
         void build();
