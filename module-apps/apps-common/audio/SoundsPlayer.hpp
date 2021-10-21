@@ -11,7 +11,7 @@ class SoundsPlayer : public AbstractSoundsPlayer
     explicit SoundsPlayer(app::ApplicationCommon *app);
     virtual ~SoundsPlayer() = default;
 
-    bool play(const std::string &path, AudioEofCallback cb = nullptr) override;
+    bool play(const std::string &path, AudioStoppedCallback cb = nullptr) override;
     bool pause() override;
     bool resume() override;
     bool stop() override;
@@ -25,5 +25,5 @@ class SoundsPlayer : public AbstractSoundsPlayer
     audio::Token currentToken;
     std::string currentPath;
 
-    AudioEofCallback eofCallback{nullptr};
+    AudioStoppedCallback audioStoppedCallback{nullptr};
 };
