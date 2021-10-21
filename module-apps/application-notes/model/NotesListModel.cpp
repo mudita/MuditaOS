@@ -8,7 +8,7 @@
 #include "module-apps/application-notes/windows/NotesOptions.hpp"
 #include "module-apps/application-notes/data/NoteSwitchData.hpp"
 #include <apps-common/messages/OptionsWindow.hpp>
-
+#include <apps-common/options/OptionWindowName.hpp>
 #include <module-gui/gui/widgets/ListView.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 
@@ -54,7 +54,7 @@ namespace app::notes
         item->inputCallback = [this, note = note.get()](gui::Item &, const gui::InputEvent &event) {
             if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 application->switchWindow(
-                    utils::translate("common_options_title"),
+                    window::name::option_window,
                     std::make_unique<gui::OptionsWindowOptions>(noteListOptions(application, *note, *notesRepository)));
             }
             return false;

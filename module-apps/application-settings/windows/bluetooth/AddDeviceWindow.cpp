@@ -16,6 +16,7 @@ namespace gui
                                      std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel)
         : BaseSettingsWindow(app, window::name::add_device), bluetoothSettingsModel(bluetoothSettingsModel)
     {
+        setTitle(utils::translate("app_settings_bluetooth_add_device"));
     }
 
     void AddDeviceWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)

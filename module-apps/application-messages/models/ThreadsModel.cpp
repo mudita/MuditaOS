@@ -56,7 +56,7 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
         }
         if (event.is(gui::KeyCode::KEY_LF)) {
             application->switchWindow(
-                utils::translate("common_options_title"),
+                window::name::option_window,
                 std::make_unique<gui::OptionsWindowOptions>(threadWindowOptions(app, item->getThreadItem().get())));
         }
         return false;

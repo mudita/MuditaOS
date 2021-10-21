@@ -102,10 +102,9 @@ namespace app
                                       std::make_unique<alarmClock::CustomRepeatWindowPresenter>(alarmsProvider);
                                   return std::make_unique<alarmClock::CustomRepeatWindow>(app, std::move(presenter));
                               });
-        windowsFactory.attach(utils::translate("common_options_title"),
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::OptionWindow>(app, name);
-                              });
+        windowsFactory.attach(window::name::option_window, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::OptionWindow>(app, name);
+        });
 
         windowsFactory.attach(style::alarmClock::window::name::dialogYesNo,
                               [](ApplicationCommon *app, const std::string &name) {
