@@ -64,7 +64,6 @@ namespace app::music_player
         }
 
         item->activatedCallback = [this, song](gui::Item &) {
-            LOG_ERROR("activatedCallback for %s", song->fileInfo.path.c_str());
             if (shortReleaseCallback != nullptr) {
                 activatedRecord = *song;
                 shortReleaseCallback(song->fileInfo.path);
