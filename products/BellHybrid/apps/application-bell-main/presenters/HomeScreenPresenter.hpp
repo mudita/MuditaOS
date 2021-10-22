@@ -98,6 +98,7 @@ namespace app::home_screen
         virtual void restartSnoozeTimer(std::chrono::seconds snoozeDuration)                     = 0;
         virtual std::uint32_t getBatteryLvl() const                                              = 0;
         virtual bool isBatteryCharging() const                                                   = 0;
+        virtual bool isStartupDeepPress()                                                        = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -135,6 +136,7 @@ namespace app::home_screen
         void restartSnoozeTimer(std::chrono::seconds snoozeDuration);
         std::uint32_t getBatteryLvl() const override;
         bool isBatteryCharging() const override;
+        bool isStartupDeepPress() override;
 
       private:
         ApplicationCommon *app;
@@ -145,6 +147,7 @@ namespace app::home_screen
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::shared_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
+        bool latchPressed = false;
 
         static constexpr auto timerName = "HS_timer";
         static constexpr auto snoozeTick = std::chrono::seconds(1);
