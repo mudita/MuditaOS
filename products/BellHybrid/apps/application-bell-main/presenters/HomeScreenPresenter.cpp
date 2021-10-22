@@ -12,6 +12,8 @@
 #include <Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <switches/LatchStatusRequest.hpp>
 
 namespace app::home_screen
 {
@@ -22,7 +24,23 @@ namespace app::home_screen
                                              std::unique_ptr<AbstractTimeModel> timeModel)
         : app{app}, alarmModel{std::move(alarmModel)}, batteryModel{std::move(batteryModel)},
           temperatureModel{std::move(temperatureModel)}, timeModel{std::move(timeModel)}
-    {}
+    {
+        constexpr int timeout = pdMS_TO_TICKS(1500);
+
+        auto response =
+            app->bus.sendUnicastSync(std::make_shared<sevm::LatchStatusRequest>(), service::name::evt_manager, timeout);
+
+        if (response.first == sys::ReturnCodes::Success) {
+            auto msgState = dynamic_cast<sevm::LatchStatusResponse *>(response.second.get());
+            if (msgState == nullptr) {
+                return;
+            }
+
+            if (msgState->getStatus() == sevm::LatchStatus::PRESSED) {
+                latchPressed = true;
+            }
+        }
+    }
 
     void HomeScreenPresenter::handleUpdateTimeEvent()
     {
@@ -121,5 +139,10 @@ namespace app::home_screen
     bool HomeScreenPresenter::isBatteryCharging() const
     {
         return batteryModel->getLevelState().state == Store::Battery::State::Charging;
+    }
+
+    bool HomeScreenPresenter::isStartupDeepPress()
+    {
+        return latchPressed;
     }
 } // namespace app::home_screen
