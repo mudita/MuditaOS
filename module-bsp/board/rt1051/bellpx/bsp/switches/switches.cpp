@@ -12,6 +12,7 @@
 #include <board/BoardDefinitions.hpp>
 #include <board.h>
 #include <fsl_common.h>
+#include <switches/LatchState.hpp>
 
 #include <chrono>
 #include <stdio.h>
@@ -250,6 +251,13 @@ namespace bsp::bell_switches
         addDebounceTimer(DebounceTimerState{
             DebounceTimerId::wakeup, NotificationSource::wakeupEvent, gpio_wakeup, BoardDefinitions::BELL_WAKEUP});
 
+        if (getLatchState() == KeyEvents::Pressed) {
+            latchEventFlag.setPressed();
+            auto timerState = static_cast<DebounceTimerState *>(
+                pvTimerGetTimerID(debounceTimers[DebounceTimerId::latchSwitch].timer));
+            timerState->lastState = KeyEvents::Released;
+        }
+
         enableIRQ();
 
         return kStatus_Success;
@@ -402,6 +410,11 @@ namespace bsp::bell_switches
             break;
         }
         return out;
+    }
+
+    bool isLatchPressed()
+    {
+        return latchEventFlag.isPressed();
     }
 
 } // namespace bsp::bell_switches

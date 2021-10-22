@@ -20,6 +20,8 @@
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/WorkerEventCommon.hpp>
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
+#include <switches/LatchStatusRequest.hpp>
+#include <switches/LatchState.hpp>
 
 namespace
 {
@@ -98,6 +100,13 @@ void EventManager::initProductEvents()
         screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
         auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
+        return msg;
+    });
+
+    connect(sevm::LatchStatusRequest(), [&](sys::Message *msgl) {
+        sevm::LatchStatus state =
+            bsp::bell_switches::isLatchPressed() ? sevm::LatchStatus::PRESSED : sevm::LatchStatus::RELEASED;
+        auto msg = std::make_shared<sevm::LatchStatusResponse>(state);
         return msg;
     });
 }
