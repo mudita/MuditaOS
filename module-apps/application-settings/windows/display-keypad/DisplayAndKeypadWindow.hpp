@@ -5,14 +5,22 @@
 
 #include <OptionWindow.hpp>
 
+#include <application-settings/models/display-keypad/DisplayModeModel.hpp>
+
+#include <memory>
+
 namespace gui
 {
     class DisplayAndKeypadWindow : public OptionWindow
     {
       public:
-        explicit DisplayAndKeypadWindow(app::ApplicationCommon *app);
+        DisplayAndKeypadWindow(app::ApplicationCommon *app,
+                               std::unique_ptr<display_mode::DisplayModeModel> &&displayMode);
 
       private:
-        std::list<Option> displayAndKeypadOptionsList();
+        void switchDisplayMode();
+        std::list<Option> displayAndKeypadOptionsList(bool isDarkModeEnabled);
+
+        std::unique_ptr<display_mode::DisplayModeModel> displayMode;
     };
 } // namespace gui
