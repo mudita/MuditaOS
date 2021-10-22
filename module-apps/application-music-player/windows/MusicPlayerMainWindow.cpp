@@ -387,11 +387,18 @@ namespace gui
                 currentArtist = utils::translate("app_music_player_uknown_artist");
 
             currentTotalTime = record->audioProperties.songLength;
+            if (myViewMode == ViewMode::START) {
+                changeCurrentMode(ViewMode::TRACK);
+            }
         }
         else {
             currentTitle     = "";
             currentArtist    = "";
             currentTotalTime = 0;
+
+            if (myViewMode == ViewMode::TRACK) {
+                changeCurrentMode(ViewMode::START);
+            }
         }
 
         updateVisibleTrackData(state);
