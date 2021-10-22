@@ -9,8 +9,9 @@
 
 namespace gui
 {
-    DisplayAndKeypadWindow::DisplayAndKeypadWindow(app::ApplicationCommon *app)
-        : OptionWindow(app, gui::window::name::display_and_keypad)
+    DisplayAndKeypadWindow::DisplayAndKeypadWindow(app::ApplicationCommon *app,
+                                                   std::unique_ptr<dark_mode::DarkModeModel> &&darkMode)
+        : OptionWindow(app, gui::window::name::display_and_keypad), darkMode{std::move(darkMode)}
     {
         addOptions(displayAndKeypadOptionsList());
         setTitle(utils::translate("app_settings_disp_key"));
@@ -42,16 +43,42 @@ namespace gui
                 gui::option::SettingRightItem::ArrowWhite));
         };
 
-        addMenu(utils::translate("app_settings_display_display_light"), gui::window::name::display_light);
+        auto addOnOffOption = [&](const UTF8 &text, std::function<bool(gui::Item &)> onActivated) {
+            optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+                text,
+                [=](gui::Item &item) mutable { return onActivated(item); },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(utils::translate(style::strings::common::Switch),
+                                               BottomBar::Side::CENTER);
+                    }
+                    return true;
+                },
+                this,
+                darkMode->isEnabled() ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
+        };
 
+        addMenu(utils::translate("app_settings_display_display_light"), gui::window::name::display_light);
 #if DISABLED_SETTINGS_OPTIONS == 1
         addMenu(utils::translate("app_settings_display_font_size"), gui::window::name::font_size);
         addMenu(utils::translate("app_settings_display_wallpaper"), gui::window::name::wallpaper);
 #endif // DISABLED_SETTINGS_OPTIONS
-
         addMenu(utils::translate("app_settings_display_keypad_light"), gui::window::name::keypad_light);
         addMenu(utils::translate("app_settings_display_input_language"), gui::window::name::input_language);
-
+        addOnOffOption(utils::translate("app_settings_display_dark_mode"), [this](gui::Item & /*item*/) {
+            switchDisplayMode();
+            return true;
+        });
         return optionList;
+    }
+
+    void DisplayAndKeypadWindow::switchDisplayMode()
+    {
+        if (darkMode->isEnabled()) {
+            darkMode->disable([this]() { refreshOptions(displayAndKeypadOptionsList()); });
+        }
+        else {
+            darkMode->enable([this]() { refreshOptions(displayAndKeypadOptionsList()); });
+        }
     }
 } // namespace gui

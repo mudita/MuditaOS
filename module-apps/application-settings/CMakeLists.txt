@@ -12,14 +12,11 @@ target_sources(application-settings
         ApplicationSettings.cpp
         models/advanced/ColorTestModel.cpp
         models/apps/AudioSettingsModel.cpp
-        models/apps/AudioSettingsModel.cpp
-        models/apps/SoundsModel.cpp
         models/apps/SoundsModel.cpp
         models/bluetooth/BluetoothSettingsModel.cpp
         models/display-keypad/CategoriesModel.cpp
-        models/display-keypad/CategoriesModel.cpp
         models/display-keypad/QuotesModel.cpp
-        models/display-keypad/QuotesModel.cpp
+        models/display-keypad/DarkModeModel.cpp
         models/network/ApnSettingsModel.cpp
         models/network/NewApnModel.cpp
         models/network/SimContactsImportModel.cpp
@@ -50,7 +47,6 @@ target_sources(application-settings
         windows/SettingsMainWindow.cpp
         windows/advanced/AdvancedOptionsWindow.cpp
         windows/advanced/ColorTestWindow.cpp
-        windows/advanced/EinkModeWindow.cpp
         windows/advanced/InformationWindow.cpp
         windows/advanced/UITestWindow.cpp
         windows/advanced/StatusBarImageTypeWindow.cpp
@@ -109,7 +105,6 @@ target_sources(application-settings
         windows/WindowNames.hpp
         windows/advanced/AdvancedOptionsWindow.hpp
         windows/advanced/ColorTestWindow.hpp
-        windows/advanced/EinkModeWindow.hpp
         windows/advanced/InformationWindow.hpp
         windows/advanced/UITestWindow.hpp
         windows/advanced/StatusBarImageTypeWindow.hpp

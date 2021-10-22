@@ -7,7 +7,6 @@
 #include <application-settings/windows/advanced/AdvancedOptionsWindow.hpp>
 #include <application-settings/windows/advanced/InformationWindow.hpp>
 #include <application-settings/windows/advanced/UITestWindow.hpp>
-#include <application-settings/windows/advanced/EinkModeWindow.hpp>
 #include <application-settings/windows/advanced/ColorTestWindow.hpp>
 #include <application-settings/windows/advanced/StatusBarImageTypeWindow.hpp>
 #include <application-settings/windows/bluetooth/BluetoothWindow.hpp>
@@ -122,7 +121,7 @@ namespace app
     {}
 
     // Invoked upon receiving data message
-    auto ApplicationSettings::DataReceivedHandler(sys::DataMessage *msgl, [[maybe_unused]] sys::ResponseMessage *resp)
+    auto ApplicationSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
         -> sys::MessagePointer
     {
         auto retMsg = Application::DataReceivedHandler(msgl);
@@ -374,9 +373,6 @@ namespace app
         windowsFactory.attach(gui::window::name::ui_test, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::UiTestWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::eink_mode, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::EinkModeWindow>(app);
-        });
         windowsFactory.attach(gui::window::name::color_test_window,
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::ColorTestWindow>(app);
@@ -434,7 +430,8 @@ namespace app
         // Display and keypad
         windowsFactory.attach(gui::window::name::display_and_keypad,
                               [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::DisplayAndKeypadWindow>(app);
+                                  auto model = std::make_unique<dark_mode::DarkModeModel>(app);
+                                  return std::make_unique<gui::DisplayAndKeypadWindow>(app, std::move(model));
                               });
         windowsFactory.attach(gui::window::name::display_light, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DisplayLightWindow>(app, static_cast<ApplicationSettings *>(app));

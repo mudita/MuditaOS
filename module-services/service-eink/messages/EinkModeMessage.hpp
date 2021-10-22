@@ -27,4 +27,9 @@ namespace service::eink
       private:
         Mode mode = Mode::Normal;
     };
+
+    class EinkModeResponse : public sys::ResponseMessage
+    {
+        using sys::ResponseMessage::ResponseMessage;
+    };
 } // namespace seink

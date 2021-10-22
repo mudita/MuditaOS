@@ -12,11 +12,13 @@
 #include "EinkDisplay.hpp"
 
 #include <service-db/DBServiceName.hpp>
+#include <service-db/Settings.hpp>
 #include <service-gui/Common.hpp>
 
 #include <chrono>
 #include <cstdint>
 #include <string>
+#include <module-services/service-eink/messages/EinkModeMessage.hpp>
 
 namespace service::eink
 {
@@ -63,16 +65,20 @@ namespace service::eink
         EinkStatus_e prepareDisplay(::gui::RefreshModes refreshMode, WaveformTemperature behaviour);
         EinkStatus_e refreshDisplay(::gui::RefreshModes refreshMode);
         EinkStatus_e updateDisplay(uint8_t *frameBuffer, ::gui::RefreshModes refreshMode);
+        void setDisplayMode(EinkModeMessage::Mode mode);
 
         sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);
         sys::MessagePointer handleImageMessage(sys::Message *message);
         sys::MessagePointer handlePrepareEarlyRequest(sys::Message *message);
+
+        void initStaticData();
 
         ExitAction exitAction;
         EinkDisplay display;
         State currentState;
         sys::TimerHandle displayPowerOffTimer;
         std::shared_ptr<EinkSentinel> eInkSentinel;
+        std::unique_ptr<settings::Settings> settings;
     };
 } // namespace service::eink
 
