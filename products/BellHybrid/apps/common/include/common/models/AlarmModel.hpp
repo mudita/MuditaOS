@@ -26,12 +26,14 @@ namespace app
         explicit AlarmModel(ApplicationCommon *app);
 
         bool isActive() const override;
+        void setDefaultAlarmTime() override;
         void setAlarmTime(time_t time) override;
         time_t getAlarmTime() const override;
         void activate(bool value) override;
         void update(AlarmModelReadyHandler callback) override;
         std::uint32_t getSnoozeDuration() override;
         bool isSnoozeAllowed() override;
+        bool isSnoozeActive() override;
         void turnOff() override;
         void snooze() override;
 
@@ -47,6 +49,7 @@ namespace app
         AlarmEventRecord generateDefaultAlarm() const;
         std::shared_ptr<AlarmEventRecord> getAlarmPtr() const;
         void disableSnooze(AlarmEventRecord &alarm);
+        void updateCache(const SingleEventRecord &record);
 
         ApplicationCommon *app{};
         State state{State::Invalid};

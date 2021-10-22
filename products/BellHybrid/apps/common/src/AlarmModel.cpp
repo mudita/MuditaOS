@@ -5,7 +5,6 @@
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <db/SystemSettings.hpp>
-#include <module-db/Interface/AlarmEventRecord.hpp>
 #include <time/dateCommon.hpp>
 #include <service-time/AlarmServiceAPI.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
@@ -26,10 +25,8 @@ namespace app
             const auto resp = dynamic_cast<alarms::AlarmGetResponseMessage *>(response);
             if (resp) {
                 if (resp->alarm.isValid()) {
-                    auto alarm   = resp->alarm;
-                    cachedRecord = alarm.getNextSingleEvent(TimePointNow());
-                    state        = State::Valid;
-                    snoozeCount  = 0;
+                    auto alarm = resp->alarm;
+                    updateCache(alarm.getNextSingleEvent(TimePointNow()));
                     if (callback) {
                         callback();
                     }
@@ -65,6 +62,7 @@ namespace app
 
         updateAlarm(*alarmEventPtr);
     }
+
     time_t AlarmModel::getAlarmTime() const
     {
         return Clock::to_time_t(cachedRecord.startDate);
@@ -119,8 +117,7 @@ namespace app
     {
         const auto snoozeActiveStr = settings.getValue(bell::settings::Snooze::active, settings::SettingsScope::Global);
         const auto snoozeActive    = utils::getNumericValue<bool>(snoozeActiveStr);
-
-        return (snoozeActive && snoozeCount < maxSnoozeCount);
+        return snoozeActive;
     }
     void AlarmModel::turnOff()
     {
@@ -161,5 +158,27 @@ namespace app
             return nullptr;
         }
         return alarmEventPtr;
+    }
+    bool AlarmModel::isSnoozeActive()
+    {
+        return snoozeCount > 0;
+    }
+    void AlarmModel::updateCache(const SingleEventRecord &record)
+    {
+        if (record.startDate != cachedRecord.startDate) {
+            snoozeCount  = 0;
+            cachedRecord = record;
+        }
+        state = State::Valid;
+    }
+    void AlarmModel::setDefaultAlarmTime()
+    {
+        auto alarmEventPtr = getAlarmPtr();
+        if (!alarmEventPtr) {
+            return;
+        }
+        alarmEventPtr->alarmTime = AlarmTime{7h, 00min};
+
+        updateAlarm(*alarmEventPtr);
     }
 } // namespace app
