@@ -25,7 +25,6 @@ std::list<gui::Option> advancedOptions(app::ApplicationCommon *app)
 
     addMenu("Information", gui::window::name::information);
     addMenu("UI Test", gui::window::name::ui_test);
-    addMenu("Eink Mode", gui::window::name::eink_mode);
     addMenu("Color Test", gui::window::name::color_test_window);
     addMenu("Statusbar Image Test", gui::window::name::status_bar_img_type);
 

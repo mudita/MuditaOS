@@ -100,8 +100,6 @@ namespace app
 
         AsyncRequest(std::unique_ptr<sys::DataMessage> &&message, std::string serviceName) noexcept;
 
-        void setCallback(std::function<bool> &&callback) noexcept;
-
       private:
         [[nodiscard]] auto onExecute(ApplicationCommon *application) -> RequestId override;
 
