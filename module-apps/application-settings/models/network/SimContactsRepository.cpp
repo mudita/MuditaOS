@@ -145,7 +145,8 @@ void SimContactsRepository::updateImportedRecords(const std::vector<cellular::Si
 void SimContactsRepository::printRecordsData(const std::string &name, const std::vector<ContactRecord> &data)
 {
     for (auto record : data) {
-        LOG_SENSITIVE("%s: %s %s, Number: %s",
+        LOG_SENSITIVE(LOGDEBUG,
+                      "%s: %s %s, Number: %s",
                       name.c_str(),
                       record.primaryName.c_str(),
                       record.alternativeName.c_str(),
