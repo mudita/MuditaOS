@@ -186,11 +186,9 @@ namespace gui
                                const std::string &topDescription)
         : BellSideListItemWithCallbacks(topDescription)
     {
-        auto centerBox = dynamic_cast<HBox *>(body->getCenterBox());
-        spinner        = new TimeSetFmtSpinner(centerBox);
+        spinner = new TimeSetFmtSpinner(body->getCenterBox(), 0, 0, 0, 0, timeFormat);
         spinner->setMaximumSize(::style::bell_base_layout::w, ::style::bell_base_layout::h);
         spinner->setFont(focusFont, noFocusFont);
-        spinner->setTimeFormat(timeFormat);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         getValue = [&model, this]() { model.setValue(spinner->getTime()); };
