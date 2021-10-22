@@ -4,6 +4,8 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 set(SOURCES
     ServiceEink.cpp
     EinkDisplay.cpp
+    api/ServiceEinkApi.cpp
+    internal/StaticData.cpp
     messages/ImageMessage.cpp
     messages/PrepareDisplayEarlyRequest.cpp
 )
