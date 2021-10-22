@@ -246,7 +246,7 @@ namespace bluetooth
             }
             else {
                 SSPname = reinterpret_cast<const char *>(&packet[9]);
-                LOG_SENSITIVE("Name: %s", SSPname.c_str());
+                LOG_SENSITIVE(LOGDEBUG, "Name: %s", SSPname.c_str());
                 Devicei newDevice(SSPname);
                 newDevice.setAddress(&SSPaddress);
                 devices.push_back(newDevice);
