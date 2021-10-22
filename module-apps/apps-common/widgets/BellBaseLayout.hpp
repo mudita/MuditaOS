@@ -12,10 +12,10 @@ namespace style::bell_base_layout
     constexpr inline auto h                   = style::window_height;
     constexpr inline auto first_layout_min_h  = 30U;
     constexpr inline auto outer_layouts_w     = 390U;
-    constexpr inline auto outer_layouts_h     = 102U;
-    constexpr inline auto outer_layout_margin = 39U;
+    constexpr inline auto outer_layouts_h     = 153U;
+    constexpr inline auto outer_layout_margin = 17U;
     constexpr inline auto center_layout_w     = 504U;
-    constexpr inline auto center_layout_h     = h - 2 * outer_layout_margin - 2 * outer_layouts_h;
+    constexpr inline auto center_layout_h     = h - 2 * outer_layout_margin - outer_layouts_h - outer_layouts_h;
 
     enum class ParentType
     {
