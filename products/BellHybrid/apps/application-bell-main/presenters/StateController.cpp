@@ -43,15 +43,17 @@ namespace app::home_screen
                     view.setTemperature(temperatureModel.getTemperature());
                     view.setBatteryLevelState(batteryModel.getLevelState());
                 };
-            auto setNewAlarmTime =
-                [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractPresenter &presenter) {
-                    alarmModel.setAlarmTime(view.getAlarmTime());
-                    detachTimer(presenter);
-                };
+            auto setNewAlarmTime = [](AbstractView &view, AbstractAlarmModel &alarmModel) {
+                alarmModel.setAlarmTime(view.getAlarmTime());
+            };
 
             auto isAlarmActive   = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isActive(); };
-            auto isSnoozeAllowed = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isSnoozeAllowed(); };
-            auto getRand         = [](const std::uint32_t lo, const std::uint32_t hi) -> std::uint32_t {
+            auto isSnoozeAllowed = [](AbstractAlarmModel &alarmModel, AbstractController &controller) -> bool {
+                return alarmModel.isSnoozeAllowed() && controller.isSnoozeAllowed();
+            };
+            auto isSnoozeActive = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isSnoozeActive(); };
+            auto snooze         = [](AbstractController &controller) { controller.snooze(true); };
+            auto getRand        = [](const std::uint32_t lo, const std::uint32_t hi) -> std::uint32_t {
                 std::random_device dev;
                 std::mt19937 rng(dev());
                 std::uniform_int_distribution<std::mt19937::result_type> dist(lo, hi);
@@ -64,6 +66,11 @@ namespace app::home_screen
                     return "app_bell_greeting_msg";
                 }
                 return greetingCollection[Helpers::getRand(0, greetingCollection.size() - 1)];
+            };
+            auto setDefaultAlarmTime = [](AbstractAlarmModel &alarmModel, AbstractView &view) {
+                alarmModel.turnOff();
+                alarmModel.setDefaultAlarmTime();
+                view.setAlarmTime(alarmModel.getAlarmTime());
             };
         } // namespace Helpers
 
@@ -111,10 +118,12 @@ namespace app::home_screen
 
         namespace Deactivated
         {
-            auto entry = [](AbstractView &view,
+            auto entry = [](AbstractController &controller,
+                            AbstractView &view,
                             AbstractTemperatureModel &temperatureModel,
                             AbstractAlarmModel &alarmModel,
                             AbstractTimeModel &timeModel) {
+                controller.snooze(false);
                 view.setAlarmEdit(false);
                 view.setAlarmActive(false);
                 view.setAlarmVisible(false);
@@ -138,12 +147,14 @@ namespace app::home_screen
         namespace AlarmEdit
         {
             auto entry = [](AbstractView &view, AbstractPresenter &presenter) {
-                presenter.spawnTimer();
                 view.setAlarmEdit(true);
                 view.setAlarmTimeVisible(true);
                 view.setAlarmVisible(true);
             };
-            auto exit = [](AbstractView &view) { view.setAlarmEdit(false); };
+            auto exit = [](AbstractView &view, AbstractPresenter &presenter) {
+                view.setAlarmEdit(false);
+                presenter.detachTimer();
+            };
 
             auto processRotateLeft = [](AbstractView &view, AbstractPresenter &presenter) {
                 presenter.spawnTimer();
@@ -189,14 +200,17 @@ namespace app::home_screen
 
         namespace Activated
         {
-            auto entry =
-                [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractTemperatureModel &temperatureModel) {
-                    view.setTemperature(temperatureModel.getTemperature());
-                    view.setAlarmActive(true);
-                    view.setAlarmVisible(true);
-                    view.setAlarmTimeVisible(true);
-                    view.setAlarmTime(alarmModel.getAlarmTime());
-                };
+            auto entry = [](AbstractController &controller,
+                            AbstractView &view,
+                            AbstractAlarmModel &alarmModel,
+                            AbstractTemperatureModel &temperatureModel) {
+                controller.snooze(false);
+                view.setTemperature(temperatureModel.getTemperature());
+                view.setAlarmActive(true);
+                view.setAlarmVisible(true);
+                view.setAlarmTimeVisible(true);
+                view.setAlarmTime(alarmModel.getAlarmTime());
+            };
         } // namespace Activated
 
         namespace AlarmRinging
@@ -242,12 +256,11 @@ namespace app::home_screen
         {
             auto entry =
                 [](AbstractView &view, AbstractPresenter &presenter, AbstractTemperatureModel &temperatureModel) {
-                    presenter.spawnTimer();
                     view.setAlarmTimeVisible(false);
                     view.setAlarmSnoozed();
                     view.setTemperature(temperatureModel.getTemperature());
                 };
-            auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
+            auto exit = [](AbstractPresenter &presenter) {};
         } // namespace AlarmSnoozed
 
         class StateMachine
@@ -262,7 +275,7 @@ namespace app::home_screen
 
                                              "Deactivated"_s + sml::on_entry<_> / Deactivated::entry,
                                              "Deactivated"_s [Helpers::isAlarmActive] = "Activated"_s,
-                                             "Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
+                                             "Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu,
                                              "Deactivated"_s + event<Events::RotateLeftPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::DeepUpPress> / Helpers::showAlarmTime = "ActivatedWait"_s,
@@ -272,15 +285,17 @@ namespace app::home_screen
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
                                              "DeactivatedWait"_s + event<Events::Timer> = "Deactivated"_s,
                                              "DeactivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
-                                             "DeactivatedWait"_s + event<Events::DeepUpPress> / Helpers::detachTimer = "ActivatedWait"_s,
+                                             "DeactivatedWait"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
+                                             "DeactivatedWait"_s + event<Events::RotateLeftPress> = "DeactivatedEdit"_s,
+                                             "DeactivatedWait"_s + event<Events::RotateRightPress> = "DeactivatedEdit"_s,
+                                             "DeactivatedWait"_s + event<Events::BackPress> = "Deactivated"_s,
 
                                              "DeactivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "DeactivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
                                              "DeactivatedEdit"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
                                              "DeactivatedEdit"_s + event<Events::RotateLeftPress> / AlarmEdit::processRotateLeft,
                                              "DeactivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
-                                             "DeactivatedEdit"_s + event<Events::DeepUpPress> / Helpers::detachTimer = "ActivatedWait"_s,
-                                             "DeactivatedEdit"_s + event<Events::Timer> / Helpers::setNewAlarmTime = "WaitForConfirmation"_s,
+                                             "DeactivatedEdit"_s + event<Events::DeepUpPress> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
                                              "DeactivatedEdit"_s + event<Events::LightPress> / Helpers::setNewAlarmTime = "WaitForConfirmation"_s,
                                              "DeactivatedEdit"_s + event<Events::BackPress> = "Deactivated"_s,
 
@@ -288,12 +303,19 @@ namespace app::home_screen
                                              "WaitForConfirmation"_s + sml::on_exit<_> / WaitForConfirmation::exit,
                                              "WaitForConfirmation"_s + event<Events::Timer> / Helpers::makeAlarmNonEditable = "Deactivated"_s,
                                              "WaitForConfirmation"_s + event<Events::DeepUpPress> / WaitForConfirmation::action = "ActivatedWait"_s,
+                                             "WaitForConfirmation"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
+                                             "WaitForConfirmation"_s + event<Events::BackPress> = "Deactivated"_s,
+                                             "WaitForConfirmation"_s + event<Events::RotateLeftPress> = "DeactivatedEdit"_s,
+                                             "WaitForConfirmation"_s + event<Events::RotateRightPress> = "DeactivatedEdit"_s,
 
                                              "ActivatedWait"_s + sml::on_entry<_> / ActivatedWait::entry,
                                              "ActivatedWait"_s + sml::on_exit<_> / ActivatedWait::exit,
                                              "ActivatedWait"_s + event<Events::Timer> / Helpers::makeAlarmNonEditable = "Activated"_s,
                                              "ActivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Activated"_s,
-                                             "ActivatedWait"_s + event<Events::DeepDownPress>/ Helpers::detachTimer = "DeactivatedWait"_s,
+                                             "ActivatedWait"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s,
+                                             "ActivatedWait"_s + event<Events::BackPress> = "Activated"_s,
+                                             "ActivatedWait"_s + event<Events::RotateLeftPress> = "ActivatedEdit"_s,
+                                             "ActivatedWait"_s + event<Events::RotateRightPress> = "ActivatedEdit"_s,
 
                                              "Activated"_s + sml::on_entry<_> / Activated::entry,
                                              "Activated"_s [not Helpers::isAlarmActive] = "Deactivated"_s,
@@ -309,37 +331,42 @@ namespace app::home_screen
                                              "ActivatedEdit"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
                                              "ActivatedEdit"_s + event<Events::RotateLeftPress> / AlarmEdit::processRotateLeft,
                                              "ActivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
-                                             "ActivatedEdit"_s + event<Events::Timer> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
                                              "ActivatedEdit"_s + event<Events::LightPress> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
                                              "ActivatedEdit"_s + event<Events::BackPress> = "Activated"_s,
+                                             "ActivatedEdit"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s,
 
                                              "AlarmRinging"_s + sml::on_entry<_> / AlarmRinging::entry,
                                              "AlarmRinging"_s + sml::on_exit<_> / AlarmRinging::exit,
-                                             "AlarmRinging"_s + event<Events::Timer> [Helpers::isSnoozeAllowed] = "AlarmSnoozedWait"_s,
-                                             "AlarmRinging"_s + event<Events::Timer> [!Helpers::isSnoozeAllowed] = "AlarmRingingDeactivatedWait"_s,
-                                             "AlarmRinging"_s + event<Events::LightPress> [Helpers::isSnoozeAllowed] = "AlarmSnoozedWait"_s,
-                                             "AlarmRinging"_s + event<Events::LightPress> [!Helpers::isSnoozeAllowed] = "AlarmRingingDeactivatedWait"_s,
-                                             "AlarmRinging"_s + event<Events::RotateLeftPress> [Helpers::isSnoozeAllowed] = "AlarmSnoozedWait"_s,
-                                             "AlarmRinging"_s + event<Events::RotateLeftPress> [!Helpers::isSnoozeAllowed] = "AlarmRingingDeactivatedWait"_s,
-                                             "AlarmRinging"_s + event<Events::RotateRightPress> [Helpers::isSnoozeAllowed] = "AlarmSnoozedWait"_s,
-                                             "AlarmRinging"_s + event<Events::RotateRightPress> [!Helpers::isSnoozeAllowed] = "AlarmRingingDeactivatedWait"_s,
+                                             "AlarmRinging"_s + event<Events::Timer> [Helpers::isSnoozeAllowed] / Helpers::snooze = "AlarmSnoozedWait"_s,
+                                             "AlarmRinging"_s + event<Events::Timer> [!Helpers::isSnoozeAllowed] / Helpers::setDefaultAlarmTime  = "ActivatedWait"_s,
+                                             "AlarmRinging"_s + event<Events::LightPress> = "AlarmSnoozedWait"_s,
+                                             "AlarmRinging"_s + event<Events::RotateLeftPress> = "AlarmSnoozedWait"_s,
+                                             "AlarmRinging"_s + event<Events::RotateRightPress> = "AlarmSnoozedWait"_s,
                                              "AlarmRinging"_s + event<Events::DeepDownPress> = "AlarmRingingDeactivatedWait"_s,
 
                                              "AlarmRingingDeactivatedWait"_s + sml::on_entry<_> / AlarmRingingDeactivatedWait::entry,
                                              "AlarmRingingDeactivatedWait"_s + sml::on_exit<_> / AlarmRingingDeactivatedWait::exit,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::Timer> = "Deactivated"_s,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s,
+                                             "AlarmRingingDeactivatedWait"_s + event<Events::BackPress> = "Deactivated"_s,
+                                             "AlarmRingingDeactivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
+                                             "AlarmRingingDeactivatedWait"_s + event<Events::RotateLeftPress> = "DeactivatedEdit"_s,
+                                             "AlarmRingingDeactivatedWait"_s + event<Events::RotateRightPress> = "DeactivatedEdit"_s,
 
                                              "AlarmSnoozedWait"_s + sml::on_entry<_> / AlarmSnoozedWait::entry,
                                              "AlarmSnoozedWait"_s + sml::on_exit<_> / AlarmSnoozedWait::exit,
                                              "AlarmSnoozedWait"_s + event<Events::Timer> = "AlarmSnoozed"_s,
                                              "AlarmSnoozedWait"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s,
+                                             "AlarmSnoozedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "AlarmSnoozed"_s,
+                                             "AlarmSnoozedWait"_s + event<Events::BackPress> = "AlarmSnoozed"_s,
 
                                              "AlarmSnoozed"_s + sml::on_entry<_> / AlarmSnoozed::entry,
                                              "AlarmSnoozed"_s + sml::on_entry<_> / AlarmSnoozed::exit,
+                                             "AlarmSnoozed"_s + event<Events::ModelReady> [not Helpers::isSnoozeActive] = "Activated"_s,
                                              "AlarmSnoozed"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
                                              "AlarmSnoozed"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s,
-                                             "AlarmSnoozed"_s + event<Events::LightPress>/Helpers::switchToMenu
+                                             "AlarmSnoozed"_s + event<Events::LightPress>/Helpers::switchToMenu,
+                                             "AlarmSnoozed"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats
                     );
                 // clang-format on
             }
@@ -349,7 +376,8 @@ namespace app::home_screen
     class StateController::Impl
     {
       public:
-        Impl(AbstractView &view,
+        Impl(AbstractController &controller,
+             AbstractView &view,
              AbstractPresenter &presenter,
              AbstractBatteryModel &batteryModel,
              AbstractTemperatureModel &temperatureModel,
@@ -359,6 +387,7 @@ namespace app::home_screen
 #ifdef DEBUG_STATE_MACHINE
                   smLogger,
 #endif
+                  controller,
                   view,
                   presenter,
                   batteryModel,
@@ -373,6 +402,8 @@ namespace app::home_screen
         using SM = sml::sm<StateMachine>;
 #endif
         SM sm;
+        std::uint32_t snoozeCount;
+        static constexpr auto maxSnoozeCount = 3U;
     };
 
     StateController::StateController(AbstractView &view,
@@ -382,7 +413,7 @@ namespace app::home_screen
                                      AbstractAlarmModel &alarmModel,
                                      AbstractTimeModel &timeModel)
         : pimpl{std::make_unique<StateController::Impl>(
-              view, presenter, batteryModel, temperatureModel, alarmModel, timeModel)},
+              *this, view, presenter, batteryModel, temperatureModel, alarmModel, timeModel)},
           presenter{presenter}
     {}
 
@@ -442,4 +473,18 @@ namespace app::home_screen
         pimpl->sm.process_event(Events::ModelReady{});
         return true;
     }
+    bool StateController::isSnoozeAllowed()
+    {
+        return pimpl->snoozeCount < pimpl->maxSnoozeCount;
+    }
+    void StateController::snooze(bool ctrl)
+    {
+        if (ctrl) {
+            pimpl->snoozeCount++;
+        }
+        else {
+            pimpl->snoozeCount = 0;
+        }
+    }
+
 } // namespace app::home_screen
