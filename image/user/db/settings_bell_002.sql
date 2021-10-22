@@ -48,6 +48,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('bedtime_time','21:00'),
     ('bedtime_tone','Evening Horizon'),
     ('bedtime_duration','5'),
-    ('bedtime_volume','1');
+    ('bedtime_volume','1'),
+    ('\ServiceEink\\display_inverted_mode', '0');
 
 

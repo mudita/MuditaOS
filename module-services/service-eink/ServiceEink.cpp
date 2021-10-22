@@ -3,6 +3,7 @@
 
 #include <board.h>
 #include "ServiceEink.hpp"
+#include "internal/StaticData.hpp"
 #include "messages/EinkModeMessage.hpp"
 #include "messages/PrepareDisplayEarlyRequest.hpp"
 #include <service-gui/messages/EinkInitialized.hpp>
@@ -15,10 +16,12 @@
 #include <system/messages/DeviceRegistrationMessage.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 #include <system/Constants.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 #include <cstring>
 #include <memory>
 #include <gsl/util>
+#include "Utils.hpp"
 
 namespace service::eink
 {
@@ -26,11 +29,20 @@ namespace service::eink
     {
         constexpr auto ServceEinkStackDepth = 4096U;
         constexpr std::chrono::milliseconds displayPowerOffTimeout{3800};
+
+        std::string toSettingString(EinkModeMessage::Mode mode)
+        {
+            if (mode == EinkModeMessage::Mode::Normal) {
+                return "0";
+            }
+            return "1";
+        }
     } // namespace
 
     ServiceEink::ServiceEink(ExitAction exitAction, const std::string &name, std::string parent)
-        : sys::Service(name, std::move(parent), ServceEinkStackDepth), exitAction{exitAction},
-          display{{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}}, currentState{State::Running}
+        : sys::Service(name, std::move(parent), ServceEinkStackDepth),
+          exitAction{exitAction}, display{{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}},
+          currentState{State::Running}, settings{std::make_unique<settings::Settings>()}
     {
         displayPowerOffTimer = sys::TimerFactory::createSingleShotTimer(
             this, "einkDisplayPowerOff", displayPowerOffTimeout, [this](sys::Timer &) { display.powerOff(); });
@@ -60,6 +72,9 @@ namespace service::eink
             return sys::ReturnCodes::Failure;
         }
 
+        settings->init(service::ServiceProxy(shared_from_this()));
+        initStaticData();
+
         auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display.getDevice());
         bus.sendUnicast(deviceRegistrationMsg, service::name::system_manager);
 
@@ -73,12 +88,21 @@ namespace service::eink
         return sys::ReturnCodes::Success;
     }
 
+    void ServiceEink::initStaticData()
+    {
+        const auto invertedModeSetting   = settings->getValue(settings::Display::invertedMode);
+        const auto isInvertedModeEnabled = utils::toNumeric(invertedModeSetting);
+        const auto mode = isInvertedModeEnabled == 0 ? EinkModeMessage::Mode::Normal : EinkModeMessage::Mode::Invert;
+        setDisplayMode(mode);
+    }
+
     sys::ReturnCodes ServiceEink::DeinitHandler()
     {
         if (exitAction == ExitAction::WipeOut) {
             display.wipeOut();
         }
         display.shutdown();
+        settings->deinit();
         return sys::ReturnCodes::Success;
     }
 
@@ -122,12 +146,23 @@ namespace service::eink
 
     sys::MessagePointer ServiceEink::handleEinkModeChangedMessage(sys::Message *message)
     {
-        const auto msg         = static_cast<service::eink::EinkModeMessage *>(message);
-        const auto displayMode = msg->getMode() == service::eink::EinkModeMessage::Mode::Normal
-                                     ? EinkDisplayColorMode_e::EinkDisplayColorModeStandard
-                                     : EinkDisplayColorMode_e::EinkDisplayColorModeInverted;
-        display.setMode(displayMode);
-        return sys::MessageNone{};
+        const auto msg  = static_cast<EinkModeMessage *>(message);
+        const auto mode = msg->getMode();
+        setDisplayMode(mode);
+        settings->setValue(settings::Display::invertedMode, toSettingString(mode));
+        return std::make_shared<EinkModeResponse>();
+    }
+
+    void ServiceEink::setDisplayMode(EinkModeMessage::Mode mode)
+    {
+        auto invertedModeRequested = mode == EinkModeMessage::Mode::Invert;
+        if (invertedModeRequested) {
+            display.setMode(EinkDisplayColorMode_e::EinkDisplayColorModeInverted);
+        }
+        else {
+            display.setMode(EinkDisplayColorMode_e::EinkDisplayColorModeStandard);
+        }
+        internal::StaticData::get().setInvertedMode(invertedModeRequested);
     }
 
     sys::MessagePointer ServiceEink::handleImageMessage(sys::Message *request)

@@ -326,6 +326,7 @@
   "app_settings_net": "Network",
   "app_settings_disp_key": "Display and keypad",
   "app_settings_display_display_light": "Display light",
+  "app_settings_display_dark_mode": "Dark mode (experimental)",
   "app_settings_display_light_main": "Frontlight",
   "app_settings_display_light_auto": "Automatic",
   "app_settings_display_light_brightness": "Brightness",

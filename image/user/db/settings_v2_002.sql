@@ -42,7 +42,8 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('keypad_light_state', '0'),
     ('gs_current_timezone_name', ''),
     ('gs_current_timezone_rules', ''),
-    ('\ServiceTime\\gs_automatic_date_and_time_is_on', '1');
+    ('\ServiceTime\\gs_automatic_date_and_time_is_on', '1'),
+    ('\ServiceEink\\display_inverted_mode', '0');
 
 
 
