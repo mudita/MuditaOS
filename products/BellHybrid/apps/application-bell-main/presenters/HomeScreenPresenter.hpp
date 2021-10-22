@@ -95,6 +95,7 @@ namespace app::home_screen
         virtual void startSnoozeTimer(std::chrono::seconds snoozeDuration)                       = 0;
         virtual void stopSnoozeTimer()                                                           = 0;
         virtual void restartSnoozeTimer(std::chrono::seconds snoozeDuration)                     = 0;
+        virtual bool isStartupDeepPress()                                                        = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -132,6 +133,8 @@ namespace app::home_screen
         void stopSnoozeTimer();
         void restartSnoozeTimer(std::chrono::seconds snoozeDuration);
 
+        bool isStartupDeepPress() override;
+
       private:
         ApplicationCommon *app;
         sys::TimerHandle timer;
@@ -141,6 +144,7 @@ namespace app::home_screen
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::shared_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
+        bool latchPressed = false;
 
         static constexpr auto timerName = "HS_timer";
         static constexpr auto snoozeTick = std::chrono::seconds(1);

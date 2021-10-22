@@ -69,6 +69,7 @@ namespace app::home_screen
                 alarmModel.setDefaultAlarmTime();
                 view.setAlarmTime(alarmModel.getAlarmTime());
             };
+            auto isDeepPress = [](AbstractPresenter &presenter) -> bool { return presenter.isStartupDeepPress(); };
         } // namespace Helpers
 
         namespace Events
@@ -268,6 +269,7 @@ namespace app::home_screen
                                              "Init"_s + event<Events::ModelReady> = "Deactivated"_s,
 
                                              "Deactivated"_s + sml::on_entry<_> / Deactivated::entry,
+                                             "Deactivated"_s [Helpers::isDeepPress] = "DeactivatedWait"_s,
                                              "Deactivated"_s [Helpers::isAlarmActive] = "Activated"_s,
                                              "Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu,
                                              "Deactivated"_s + event<Events::RotateLeftPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,

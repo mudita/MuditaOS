@@ -161,6 +161,8 @@ enum class MessageType
     Quotes,
 
     // Alarm messages
-    AlarmMessage
+    AlarmMessage,
 
+    // Bell Latch state message
+    LatchStateMessage
 };

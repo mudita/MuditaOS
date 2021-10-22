@@ -36,4 +36,5 @@ target_sources(
         board/pin_mux.h
         board/clock_config.h
         board/irq_gpio.hpp
+        bsp/switches/LatchStatusRequest.hpp
 )
