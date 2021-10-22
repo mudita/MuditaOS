@@ -33,6 +33,8 @@ namespace gui
             }
         };
 
+        inputCallback = [&](Item &item, const InputEvent &event) { return body->onInput(event); };
+
         focusChangedCallback = [this]([[maybe_unused]] Item &item) -> bool {
             if (focus) {
                 setFocus();
@@ -211,11 +213,6 @@ namespace gui
         body->setSize(body->getWidth(), newDim.h);
 
         return true;
-    }
-
-    bool ListViewWithArrows::onInput(const InputEvent &inputEvent)
-    {
-        return body->onInput(inputEvent);
     }
 
 } /* namespace gui */

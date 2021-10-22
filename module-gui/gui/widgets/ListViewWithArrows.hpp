@@ -36,7 +36,6 @@ namespace gui
         void applySizeRestrictions(unsigned int w, unsigned int h, unsigned int outerLayoutsH, int outerLayoutsMargin);
 
         void setAlignment(const Alignment &value) override;
-        bool onInput(const InputEvent &inputEvent) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 

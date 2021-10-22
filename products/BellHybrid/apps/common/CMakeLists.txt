@@ -38,6 +38,7 @@ target_sources(application-bell-common
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
         src/options/OptionBellMenu.cpp
+        src/options/BellOptionsNavigation.cpp
     PUBLIC
         include/common/BellListItemProvider.hpp
         include/common/SoundsRepository.hpp
