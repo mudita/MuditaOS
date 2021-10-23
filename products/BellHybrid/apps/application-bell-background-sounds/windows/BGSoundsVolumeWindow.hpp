@@ -26,6 +26,8 @@ namespace gui
         bool onInput(const gui::InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data);
 
+        audio::Volume getCurrentVolume() const noexcept override;
+
       public:
         BGSoundsVolumeWindow(app::ApplicationCommon *app,
                              std::unique_ptr<app::bgSounds::BGSoundsVolumeContract::Presenter> &&windowPresenter);

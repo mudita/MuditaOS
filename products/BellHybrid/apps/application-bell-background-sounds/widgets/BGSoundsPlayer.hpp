@@ -28,6 +28,7 @@ namespace app::bgSounds
         virtual void stop(OnStateChangeCallback callback)                                                  = 0;
         virtual void pause(OnStateChangeCallback callback)                                                 = 0;
         virtual void resume(OnStateChangeCallback callback)                                                = 0;
+        virtual PlaybackMode getCurrentMode() const noexcept                                               = 0;
     };
 
     class BGSoundsPlayer : public AbstractBGSoundsPlayer, public app::AsyncCallbackReceiver
@@ -41,6 +42,7 @@ namespace app::bgSounds
         void stop(OnStateChangeCallback callback) override;
         void pause(OnStateChangeCallback callback) override;
         void resume(OnStateChangeCallback callback) override;
+        PlaybackMode getCurrentMode() const noexcept override;
 
       public:
         explicit BGSoundsPlayer(app::ApplicationCommon *app);

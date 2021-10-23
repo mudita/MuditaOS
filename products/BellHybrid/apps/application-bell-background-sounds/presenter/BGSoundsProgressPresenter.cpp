@@ -55,6 +55,11 @@ namespace app::bgSounds
     }
     void BGSoundsProgressPresenter::onFinished()
     {
+        if (player.getCurrentMode() == AbstractBGSoundsPlayer::PlaybackMode::SingleShot) {
+            getView()->onFinished();
+            return;
+        }
+
         auto onStopCallback = [this](audio::RetCode retCode) {
             if (retCode == audio::RetCode::Success) {
                 getView()->onFinished();
