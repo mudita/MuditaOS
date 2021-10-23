@@ -98,4 +98,8 @@ namespace app::bgSounds
         }
         return sys::msgHandled();
     }
+    AbstractBGSoundsPlayer::PlaybackMode BGSoundsPlayer::getCurrentMode() const noexcept
+    {
+        return playbackMode;
+    }
 } // namespace app::bgSounds
