@@ -57,11 +57,11 @@ namespace gui
         resetTimer();
 
         if (inputEvent.isShortRelease(KeyCode::KEY_DOWN)) {
-            application->decreaseCurrentVolume();
+            presenter->decreaseVolume();
             return true;
         }
         else if (inputEvent.isShortRelease(KeyCode::KEY_UP)) {
-            application->increaseCurrentVolume();
+            presenter->increaseVolume();
             return true;
         }
         return WindowWithTimer::onInput(inputEvent);
@@ -82,5 +82,10 @@ namespace gui
             body->setArrowVisible(BellBaseLayout::Arrow::Left, not isMin);
             body->setArrowVisible(BellBaseLayout::Arrow::Right, not isMax);
         }
+    }
+
+    audio::Volume BGSoundsVolumeWindow::getCurrentVolume() const noexcept
+    {
+        return spinner->getCurrentValue();
     }
 } // namespace gui
