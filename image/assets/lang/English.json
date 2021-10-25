@@ -634,7 +634,7 @@
   "app_bell_settings_alarm_settings_snooze_finished": "Snooze is set",
   "app_bell_settings_alarm_settings_snooze_length": "Snooze length",
   "app_bell_settings_alarm_settings_snooze_chime_interval": "Snooze chime interval",
-  "app_bell_settings_alarm_settings_snooze_chime_interval_bot_desc": "<text>recurring during<br />snooze</text>",
+  "app_bell_settings_alarm_settings_snooze_chime_interval_bot_desc": "recurring during snooze",
   "app_bell_settings_alarm_settings_snooze_chime_tone": "Snooze chime tone",
   "app_bell_settings_alarm_settings_snooze_chime_volume": "Snooze chime volume",
   "app_bellmain_home_screen_bottom_desc": "Next alarm will ring",
