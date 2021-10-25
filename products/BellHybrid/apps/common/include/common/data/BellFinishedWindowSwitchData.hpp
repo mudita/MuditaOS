@@ -15,21 +15,27 @@ namespace gui
         {
             static std::unique_ptr<BellFinishedWindowData> create(const UTF8 &icon,
                                                                   const std::string &windowToReturn,
-                                                                  const UTF8 &text = "")
+                                                                  const UTF8 &text      = "",
+                                                                  bool closeApplication = false)
             {
-                return std::unique_ptr<BellFinishedWindowData>(new BellFinishedWindowData(icon, windowToReturn, text));
+                return std::unique_ptr<BellFinishedWindowData>(
+                    new BellFinishedWindowData(icon, windowToReturn, text, closeApplication));
             }
         };
 
         UTF8 icon{};
         std::string windowToReturn;
         UTF8 text{};
+        bool closeApplication;
 
       private:
         BellFinishedWindowData() = default;
 
-        BellFinishedWindowData(const UTF8 &icon, const std::string &windowToReturn, const UTF8 &text = "")
-            : icon{icon}, windowToReturn{windowToReturn}, text{text}
+        BellFinishedWindowData(const UTF8 &icon,
+                               const std::string &windowToReturn,
+                               const UTF8 &text      = "",
+                               bool closeApplication = false)
+            : icon{icon}, windowToReturn{windowToReturn}, text{text}, closeApplication{closeApplication}
         {}
     };
 } // namespace gui
