@@ -5,9 +5,9 @@
 #include "presenter/BellBedtimeWindowPresenter.hpp"
 #include "windows/BellBedtimeWindow.hpp"
 #include "common/models/BedtimeModel.hpp"
+#include <common/windows/BellFinishedWindow.hpp>
 #include "models/BedtimeListItemProvider.hpp"
 
-#include <common/windows/BellFinishedCallbackWindow.hpp>
 namespace app
 {
     ApplicationBellBedtime::ApplicationBellBedtime(std::string name,
@@ -38,9 +38,9 @@ namespace app
             return std::make_unique<gui::BellBedtimeWindow>(app, std::move(presenter));
         });
 
-        windowsFactory.attach(gui::BellFinishedCallbackWindow::defaultName,
+        windowsFactory.attach(gui::window::bell_finished::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellFinishedCallbackWindow>(app);
+                                  return std::make_unique<gui::BellFinishedWindow>(app);
                               });
 
         attachPopups({gui::popup::ID::AlarmActivated,
