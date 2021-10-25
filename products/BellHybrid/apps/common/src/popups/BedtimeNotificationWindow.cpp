@@ -39,6 +39,7 @@ namespace gui
 
         icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         icon->image->setMargins(Margins(0, icon::image_top_margin, 0, icon::image_bottom_margin));
+        icon->text->setFont(style::window::font::verybiglight);
     }
     void BedtimeNotificationWindow::onBeforeShow(ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
