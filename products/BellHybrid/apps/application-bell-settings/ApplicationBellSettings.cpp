@@ -35,7 +35,6 @@
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/models/BedtimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
-#include <common/windows/BellFinishedCallbackWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/models/AudioModel.hpp>
@@ -113,11 +112,6 @@ namespace app
         windowsFactory.attach(gui::window::bell_finished::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellFinishedWindow>(app);
-                              });
-
-        windowsFactory.attach(gui::BellFinishedCallbackWindow::defaultName,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellFinishedCallbackWindow>(app);
                               });
 
         windowsFactory.attach(gui::window::name::bellSettingsHomeView,

@@ -11,7 +11,7 @@ namespace gui
 {
     namespace window::bell_finished
     {
-        constexpr inline auto defaultName         = "BellFinishedWindow";
+        constexpr inline auto defaultName = "BellFinishedWindow";
     } // namespace window::bell_finished
 
     class Icon;
@@ -24,11 +24,13 @@ namespace gui
 
       protected:
         void buildInterface() override;
+        void exit();
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         Icon *icon{};
         std::string windowToReturn;
+        bool closeApplication; // is close application is true windowToReturn variable is ignored
     };
 
 } // namespace gui
