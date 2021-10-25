@@ -197,10 +197,25 @@ namespace app
         return false;
     }
 
+    bool ApplicationDesktop::isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const
+    {
+        if (blockAllPopups) {
+            return false;
+        }
+        return true;
+    }
+
     void ApplicationDesktop::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
     {
         auto lowBatteryState = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
+        auto currentWindow   = getCurrentWindow();
+        if (currentWindow->getName() == app::window::name::dead_battery ||
+            currentWindow->getName() == app::window::name::charging_battery) {
+            data->ignoreCurrentWindowOnStack = true;
+        }
+
         if (lowBatteryState->isActive()) {
+            blockAllPopups = true;
             if (lowBatteryState->isCharging()) {
                 switchWindow(app::window::name::charging_battery, std::move(data));
             }
@@ -209,10 +224,10 @@ namespace app
             }
         }
         else {
-            auto currentWindow = getCurrentWindow();
+            blockAllPopups = false;
             if (currentWindow->getName() == app::window::name::dead_battery ||
                 currentWindow->getName() == app::window::name::charging_battery) {
-                app::manager::Controller::sendAction(this, app::manager::actions::Home);
+                app::manager::Controller::sendAction(this, app::manager::actions::Home, std::move(data));
             }
         }
     }

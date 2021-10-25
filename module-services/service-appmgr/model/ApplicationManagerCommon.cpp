@@ -449,7 +449,8 @@ namespace app::manager
     {
         action.setTargetApplication(resolveHomeApplication());
 
-        SwitchRequest switchRequest(service::name::appmgr, resolveHomeApplication(), resolveHomeWindow(), nullptr);
+        SwitchRequest switchRequest(
+            service::name::appmgr, resolveHomeApplication(), resolveHomeWindow(), std::move(action.params));
         return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 
