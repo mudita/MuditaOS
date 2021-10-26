@@ -64,7 +64,7 @@ namespace gui
                           0,
                           ::style::window::default_vertical_pos,
                           ::style::window_width,
-                          ::style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
+                          ::style::window_height - ::style::window::default_vertical_pos - ::style::nav_bar::height,
                           "info_icon_W_G",
                           utils::translate("app_calllog_no_calls"));
         emptyListIcon->setVisible(false);

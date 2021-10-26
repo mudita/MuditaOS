@@ -44,7 +44,7 @@ namespace gui
 
         offsetFromTop = style::window::default_vertical_pos + style::window::calendar::month_year_height;
         monthWidth    = style::window::default_body_width;
-        monthHeight   = style::window_height - style::window::default_vertical_pos - style::footer::height;
+        monthHeight   = style::window_height - style::window::default_vertical_pos - style::nav_bar::height;
         dayWidth      = style::window::calendar::day_cell_width;
         dayHeight     = style::window::calendar::day_cell_height;
 

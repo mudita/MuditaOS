@@ -14,7 +14,7 @@ namespace callLogStyle
     // DETAILS WINDOW
     namespace detailsWindow
     {
-        constexpr inline auto x = style::window::navBar::leftMargin;
+        constexpr inline auto x = style::nav_bar::left_margin;
         constexpr inline auto y = style::window::default_vertical_pos;
         constexpr inline auto w = style::window_width - 2 * x;
         constexpr inline auto h = style::window::default_body_height;
@@ -45,7 +45,7 @@ namespace callLogStyle
         constexpr inline uint32_t x = style::window::default_left_margin;
         constexpr inline uint32_t y = style::window::default_vertical_pos;
         constexpr inline uint32_t w = style::listview::body_width_with_scroll;
-        constexpr inline uint32_t h = style::window_height - y - style::footer::height;
+        constexpr inline uint32_t h = style::window_height - y - style::nav_bar::height;
     } // namespace mainWindow
 
 } // namespace callLogStyle
