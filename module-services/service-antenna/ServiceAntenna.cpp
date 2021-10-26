@@ -240,7 +240,9 @@ bool ServiceAntenna::initStateHandler(void)
     LOG_INFO("State Init");
     bsp::cellular::antenna antenna;
     if (phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
-        AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+        auto message =
+            std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService, antenna::lockState::locked);
+        bus.sendUnicast(std::move(message), service::name::antenna);
         return true;
     }
 
