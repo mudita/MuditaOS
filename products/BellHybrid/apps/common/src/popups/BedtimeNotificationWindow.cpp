@@ -26,7 +26,7 @@ namespace gui
     void BedtimeNotificationWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
         setTitle("");
 
         icon = new Icon(this,
@@ -48,7 +48,7 @@ namespace gui
         icon->resizeItems();
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
-        bottomBar->setActive(BottomBar::Side::RIGHT, false);
+        navBar->setActive(nav_bar::Side::Right, false);
     }
 
     void BedtimeNotificationWindow::returnToPreviousWindow()

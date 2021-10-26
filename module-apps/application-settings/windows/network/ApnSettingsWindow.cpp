@@ -33,7 +33,7 @@ namespace gui
                                  utils::translate("app_settings_apn_settings_no_apns"));
         emptyListIcon->setVisible(false);
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::options));
 
         activeApn        = std::make_shared<packet_data::APN::Config>();
         apnSettingsModel = std::make_shared<ApnSettingsModel>(application);
@@ -64,8 +64,8 @@ namespace gui
     void ApnSettingsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         clearOptions();
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+        navBar->setActive(gui::nav_bar::Side::Left, false);
+        navBar->setActive(gui::nav_bar::Side::Center, false);
         emptyListIcon->setVisible(false);
 
         if (apns.empty()) {
@@ -78,8 +78,8 @@ namespace gui
             apnSettingsModel->requestAPNList();
         }
 
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+        navBar->setActive(gui::nav_bar::Side::Left, true);
+        navBar->setActive(gui::nav_bar::Side::Center, true);
     }
 
     auto ApnSettingsWindow::onInput(const InputEvent &inputEvent) -> bool

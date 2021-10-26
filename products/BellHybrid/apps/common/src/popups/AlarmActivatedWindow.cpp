@@ -45,7 +45,7 @@ namespace gui
 
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
 
         icon = new Icon(this, 0, y_position, style::window_width, style::window_height, "big_alarm_W_G", {});
         icon->text->setFont(style::window::font::verybiglight);

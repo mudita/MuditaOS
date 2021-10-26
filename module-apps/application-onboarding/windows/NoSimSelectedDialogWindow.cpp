@@ -13,8 +13,8 @@ namespace app::onBoarding
     NoSimSelectedDialogWindow::NoSimSelectedDialogWindow(app::ApplicationCommon *app)
         : gui::Dialog(app, gui::window::name::onBoarding_no_sim_selected)
     {
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::ok));
+        navBar->setActive(gui::nav_bar::Side::Right, true);
 
         applyToStatusBar([](gui::status_bar::Configuration configuration) {
             configuration.setIndicator(gui::status_bar::Indicator::SimCard, false);

@@ -32,12 +32,12 @@ namespace gui
         AppWindow::buildInterface();
         setTitle(utils::translate("app_meditation_title_main"));
 
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::start));
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Left, true);
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::options));
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::start));
 
         timeSetter = new TimerProperty(this,
                                        style::meditation::timer::X,
@@ -70,11 +70,11 @@ namespace gui
     auto MeditationWindow::onInput(const InputEvent &inputEvent) -> bool
     {
         if (inputEvent.isShortRelease()) {
-            if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
+            if (inputEvent.is(KeyCode::KEY_LF) && navBar->isActive(nav_bar::Side::Left)) {
                 application->switchWindow(app::window::name::meditation_options);
                 return true;
             }
-            else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
+            else if (inputEvent.is(KeyCode::KEY_ENTER) && navBar->isActive(nav_bar::Side::Center)) {
                 auto app = dynamic_cast<app::ApplicationMeditation *>(application);
                 assert(app);
 

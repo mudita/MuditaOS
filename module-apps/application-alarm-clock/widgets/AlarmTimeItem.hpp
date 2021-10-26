@@ -17,8 +17,8 @@ namespace gui
         gui::Label *mode12hInput = nullptr;
         bool mode24H             = false;
 
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
 
         void applyItemSpecificProperties(gui::Text *item);
         void applyInputCallbacks();
@@ -28,8 +28,8 @@ namespace gui
         void validateHour();
 
       public:
-        AlarmTimeItem(std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                      std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
+        AlarmTimeItem(std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                      std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
     };
 
 } /* namespace gui */

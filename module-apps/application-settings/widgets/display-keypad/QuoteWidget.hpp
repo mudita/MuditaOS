@@ -16,8 +16,8 @@ namespace gui
       public:
         QuoteWidget(const Quotes::QuoteRecord &quoteRecord,
                     std::function<void(bool)> enableQuoteCallback,
-                    std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                    std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
+                    std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                    std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
 
         [[nodiscard]] auto getQuoteData() const -> Quotes::QuoteRecord
         {
@@ -31,8 +31,8 @@ namespace gui
 
         Quotes::QuoteRecord quote;
         std::function<void(bool)> enableQuote                        = nullptr;
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode    = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode         = nullptr;
     };
 
 } /* namespace gui */

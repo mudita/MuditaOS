@@ -154,10 +154,10 @@ namespace gui
     void MenuWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         mainMenu = new MenuPage(
             this,
@@ -283,12 +283,12 @@ namespace gui
 
         using namespace style::window;
         mainMenu->setSize(this->area().w - default_left_margin - default_right_margin,
-                          bottomBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
+                          navBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
         mainMenu->setPosition(default_left_margin, default_vertical_pos + style::design::grid_offset);
         mainMenu->setVisible(false);
 
         toolsMenu->setSize(this->area().w - default_left_margin - default_right_margin,
-                           bottomBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
+                           navBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
         toolsMenu->setPosition(default_left_margin, default_vertical_pos + style::design::grid_offset);
         toolsMenu->setVisible(false);
 

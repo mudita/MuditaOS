@@ -22,7 +22,7 @@ namespace gui
         AppWindow::buildInterface();
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
 
         body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, false);
 

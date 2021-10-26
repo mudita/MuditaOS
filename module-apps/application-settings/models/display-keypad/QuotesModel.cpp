@@ -86,9 +86,9 @@ namespace Quotes
                 task->execute(app, this);
             },
             [app = app](const UTF8 &text) {
-                app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::CENTER, false);
+                app->getCurrentWindow()->navBarTemporaryMode(text, gui::nav_bar::Side::Center, false);
             },
-            [app = app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+            [app = app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); });
 
         item->inputCallback = [app = app, item](gui::Item &, const gui::InputEvent &event) {
             if (event.isShortRelease(gui::KeyCode::KEY_LF)) {

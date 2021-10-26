@@ -38,7 +38,7 @@ namespace gui
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
                 text,
                 activatedCallback,
-                [=](Item &item) { return bottomBarCallback(item); },
+                [=](Item &item) { return navBarCallback(item); },
                 nullptr,
                 rightItem,
                 false,
@@ -101,13 +101,13 @@ namespace gui
         return optionList;
     }
 
-    bool DateAndTimeMainWindow::bottomBarCallback(Item &item)
+    bool DateAndTimeMainWindow::navBarCallback(Item &item)
     {
         if (item.focus) {
-            setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
+            setNavBarText(utils::translate(style::strings::common::Switch), nav_bar::Side::Center);
         }
         else {
-            setBottomBarText(utils::translate(style::strings::common::select), BottomBar::Side::CENTER);
+            setNavBarText(utils::translate(style::strings::common::select), nav_bar::Side::Center);
         }
         return true;
     }

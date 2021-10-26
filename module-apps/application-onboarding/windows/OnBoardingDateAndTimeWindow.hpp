@@ -14,7 +14,7 @@ namespace app::onBoarding
         ~OnBoardingDateAndTimeWindow();
 
       protected:
-        bool bottomBarCallback(Item &item) override;
+        bool navBarCallback(Item &item) override;
 
       private:
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;

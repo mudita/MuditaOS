@@ -15,10 +15,10 @@ namespace gui
     EinkModeWindow::EinkModeWindow(app::ApplicationCommon *app) : AppWindow(app, window::name::eink_mode)
     {
         AppWindow::buildInterface();
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         setTitle(window::name::eink_mode);
         auto label               = new Label(this, 100, 200, 300, 50, "Change mode on click");

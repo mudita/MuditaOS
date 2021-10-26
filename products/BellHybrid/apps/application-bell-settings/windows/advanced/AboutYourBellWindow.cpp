@@ -24,7 +24,7 @@ namespace gui
 
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
 
         list = new ListView(this,
                             style::window::default_left_margin,

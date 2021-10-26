@@ -36,9 +36,9 @@ namespace gui
                                                       searchResultsModel);
         setFocusItem(searchResultList);
 
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         setTitle(utils::translate("common_results_prefix"));
     }
@@ -74,14 +74,14 @@ namespace gui
         searchResultList->setProvider(searchResultsModel);
 
         if (searchResultsModel->messagesSelectCallback) {
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
-            bottomBar->setText(BottomBar::Side::LEFT, "");
-            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+            navBar->setActive(nav_bar::Side::Left, false);
+            navBar->setText(nav_bar::Side::Left, "");
+            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
         }
         else {
-            bottomBar->setActive(BottomBar::Side::LEFT, true);
-            bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
-            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+            navBar->setActive(nav_bar::Side::Left, true);
+            navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
+            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
         }
 
         return true;

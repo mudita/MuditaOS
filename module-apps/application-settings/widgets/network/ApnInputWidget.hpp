@@ -17,11 +17,11 @@ namespace gui
 
       public:
         ApnInputWidget(settingsInternals::ListItemName listItemName,
-                       std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                       std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
-                       std::function<void()> selectSpecialCharacter                 = nullptr,
-                       std::function<void(const std::string &text)> contentChanged  = nullptr,
-                       unsigned int lines                                           = 1);
+                       std::function<void(const UTF8 &text)> navBarTemporaryMode   = nullptr,
+                       std::function<void()> navBarRestoreFromTemporaryMode        = nullptr,
+                       std::function<void()> selectSpecialCharacter                = nullptr,
+                       std::function<void(const std::string &text)> contentChanged = nullptr,
+                       unsigned int lines                                          = 1);
 
       private:
         VBox *vBox                                                    = nullptr;

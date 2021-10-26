@@ -16,8 +16,8 @@ namespace gui
     class AlarmMusicOptionsItem : public AlarmOptionsItem
     {
       private:
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
 
         /// pointer to audio operations which allows to make audio preview
         std::vector<tags::fetcher::Tags> alarmSoundList;
@@ -27,8 +27,8 @@ namespace gui
         explicit AlarmMusicOptionsItem(app::ApplicationCommon *app,
                                        const std::string &description,
                                        std::shared_ptr<SoundsPlayer> player,
-                                       std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                                       std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
+                                       std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                                       std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
 
       private:
         [[nodiscard]] std::string getTitle(const std::string &filePath);

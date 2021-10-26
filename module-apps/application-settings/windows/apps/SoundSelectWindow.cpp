@@ -28,8 +28,8 @@ namespace gui
     void SoundSelectWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         mSoundsList = new gui::ListView(this,
                                         style::window::default_left_margin,

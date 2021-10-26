@@ -22,7 +22,7 @@ namespace gui
         buildInfoTexts();
         buildPinBody();
         buildIceBox();
-        buildBottomBar();
+        buildNavBar();
 
         body->resizeItems();
     }
@@ -63,12 +63,12 @@ namespace gui
         secondaryText->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
     }
 
-    void LockInputWindow::buildBottomBar()
+    void LockInputWindow::buildNavBar()
     {
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::skip));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::confirm));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-        setBottomBarWidgetsActive(false, false, false);
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::skip));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::confirm));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
+        setNavBarWidgetsActive(false, false, false);
     }
 
     void LockInputWindow::buildIceBox()
@@ -130,11 +130,11 @@ namespace gui
         infoImage->showImage(true);
     }
 
-    void LockInputWindow::setBottomBarWidgetsActive(bool left, bool center, bool right)
+    void LockInputWindow::setNavBarWidgetsActive(bool left, bool center, bool right)
     {
-        bottomBar->setActive(BottomBar::Side::LEFT, left);
-        bottomBar->setActive(BottomBar::Side::CENTER, center);
-        bottomBar->setActive(BottomBar::Side::RIGHT, right);
+        navBar->setActive(nav_bar::Side::Left, left);
+        navBar->setActive(nav_bar::Side::Center, center);
+        navBar->setActive(nav_bar::Side::Right, right);
     }
 
     void LockInputWindow::setText(const std::string &value, TextType type, text::RichTextParser::TokenMap tokens)

@@ -51,12 +51,12 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(strings::message));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(strings::message));
 
         // top circle image
         imageCircleTop = new gui::Image(this, imageCircleTop::x, imageCircleTop::y, 0, 0, imageCircleTop::name);
@@ -79,7 +79,7 @@ namespace gui
         speakerIcon                       = new SpeakerIcon(this, speakerIcon::x, speakerIcon::y);
         speakerIcon->focusChangedCallback = [=](gui::Item &item) {
             LOG_DEBUG("speakerIcon get/lost focus");
-            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch), false);
+            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch), false);
             return true;
         };
         speakerIcon->activatedCallback = [=](gui::Item &item) {
@@ -107,7 +107,7 @@ namespace gui
         microphoneIcon                       = new MicrophoneIcon(this, microphoneIcon::x, microphoneIcon::y);
         microphoneIcon->focusChangedCallback = [=](gui::Item &item) {
             LOG_DEBUG("microphoneIcon get/lost focus");
-            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch), false);
+            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch), false);
             return true;
         };
         microphoneIcon->activatedCallback = [=](gui::Item &item) {
@@ -124,8 +124,7 @@ namespace gui
         sendSmsIcon                       = new gui::SendSmsIcon(this, sendMessageIcon::x, sendMessageIcon::y);
         sendSmsIcon->focusChangedCallback = [=](gui::Item &item) {
             LOG_DEBUG("Send message get/lost focus");
-            bottomBar->setText(
-                gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::send), item.focus);
+            navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::send), item.focus);
             return true;
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
@@ -168,19 +167,19 @@ namespace gui
 
         switch (state) {
         case State::INCOMING_CALL: {
-            bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(strings::answer), true);
-            bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(strings::reject), true);
+            navBar->setText(gui::nav_bar::Side::Left, utils::translate(strings::answer), true);
+            navBar->setText(gui::nav_bar::Side::Right, utils::translate(strings::reject), true);
             durationLabel->setText(utils::translate(strings::iscalling));
             durationLabel->setVisible(true);
             speakerIcon->setVisible(false);
             microphoneIcon->setVisible(false);
             if (phoneNumber.getFormatted().empty()) {
-                bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+                navBar->setActive(gui::nav_bar::Side::Center, false);
                 sendSmsIcon->setVisible(false);
                 setFocusItem(nullptr);
             }
             else {
-                bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+                navBar->setActive(gui::nav_bar::Side::Center, true);
                 sendSmsIcon->setVisible(true);
                 setFocusItem(sendSmsIcon);
             }
@@ -188,9 +187,9 @@ namespace gui
         case State::CALL_ENDED: {
             interface->stopAudio();
             stopCallTimer();
-            bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
-            bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
-            bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
+            navBar->setActive(gui::nav_bar::Side::Left, false);
+            navBar->setActive(gui::nav_bar::Side::Center, false);
+            navBar->setActive(gui::nav_bar::Side::Right, false);
             durationLabel->setVisible(true);
             setCallEndMessage();
             sendSmsIcon->setVisible(false);
@@ -206,9 +205,9 @@ namespace gui
                 interface->startAudioRouting();
             }
             runCallTimer();
-            bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
-            bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
-            bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(strings::endcall), true);
+            navBar->setActive(gui::nav_bar::Side::Left, false);
+            navBar->setActive(gui::nav_bar::Side::Center, false);
+            navBar->setText(gui::nav_bar::Side::Right, utils::translate(strings::endcall), true);
             durationLabel->setVisible(true);
             sendSmsIcon->setVisible(false);
             speakerIcon->setVisible(true);
@@ -220,9 +219,9 @@ namespace gui
         } break;
         case State::OUTGOING_CALL: {
             interface->startAudioRouting();
-            bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
-            bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
-            bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(strings::endcall), true);
+            navBar->setActive(gui::nav_bar::Side::Left, false);
+            navBar->setActive(gui::nav_bar::Side::Center, false);
+            navBar->setText(gui::nav_bar::Side::Right, utils::translate(strings::endcall), true);
             durationLabel->setText(utils::translate(strings::calling));
             durationLabel->setVisible(true);
             sendSmsIcon->setVisible(false);
@@ -235,9 +234,9 @@ namespace gui
             [[fallthrough]];
         default:
             numberLabel->clear();
-            bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
-            bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
-            bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
+            navBar->setActive(gui::nav_bar::Side::Left, false);
+            navBar->setActive(gui::nav_bar::Side::Center, false);
+            navBar->setActive(gui::nav_bar::Side::Right, false);
             durationLabel->setVisible(false);
             sendSmsIcon->setVisible(false);
             speakerIcon->setVisible(false);

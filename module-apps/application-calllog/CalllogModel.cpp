@@ -91,11 +91,11 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
             auto &callLogItem = dynamic_cast<gui::CalllogItem &>(item);
             if (callLogItem.getCall().presentation == PresentationType::PR_UNKNOWN) {
                 // disable call button since the number is unknown
-                application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::LEFT, false);
+                application->getCurrentWindow()->setNavBarActive(gui::nav_bar::Side::Left, false);
                 item.inputCallback = nullptr;
             }
             else {
-                application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::LEFT, true);
+                application->getCurrentWindow()->setNavBarActive(gui::nav_bar::Side::Left, true);
                 item.inputCallback = callCallback;
             }
         }

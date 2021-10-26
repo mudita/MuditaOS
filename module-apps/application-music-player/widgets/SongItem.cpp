@@ -14,7 +14,7 @@ namespace gui
                        const std::string &duration,
                        std::function<void(const UTF8 &)> setBtBarCallback,
                        std::function<void()> restoreBtBarCallback)
-        : bottomBarTemporaryMode(setBtBarCallback), bottomBarRestoreFromTemporaryMode(restoreBtBarCallback)
+        : navBarTemporaryMode(setBtBarCallback), navBarRestoreFromTemporaryMode(restoreBtBarCallback)
     {
         setMinimumSize(songItem::w, songItem::h);
         setMargins(Margins(0, style::margins::small, 0, style::margins::small));
@@ -90,14 +90,14 @@ namespace gui
                     bottorBarText = utils::translate("common_play");
                     break;
                 }
-                if (bottomBarTemporaryMode != nullptr) {
-                    bottomBarTemporaryMode(bottorBarText);
+                if (navBarTemporaryMode != nullptr) {
+                    navBarTemporaryMode(bottorBarText);
                 }
             }
             else {
                 setFocusItem(nullptr);
-                if (bottomBarRestoreFromTemporaryMode != nullptr) {
-                    bottomBarRestoreFromTemporaryMode();
+                if (navBarRestoreFromTemporaryMode != nullptr) {
+                    navBarRestoreFromTemporaryMode();
                 }
             }
             setState(itemState);

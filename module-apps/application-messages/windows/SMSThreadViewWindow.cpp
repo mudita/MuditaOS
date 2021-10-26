@@ -27,8 +27,8 @@ namespace gui
     {
         AppWindow::buildInterface();
         setTitle(utils::translate("app_messages_title_main"));
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::options));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         smsList = new gui::ListView(this,
                                     style::messages::smsList::x,
@@ -92,7 +92,7 @@ namespace gui
     bool SMSThreadViewWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) &&
-            bottomBar->getText(BottomBar::Side::CENTER) !=
+            navBar->getText(nav_bar::Side::Center) !=
                 utils::translate(utils::translate(style::strings::common::send))) {
 
             smsList->rebuildList();

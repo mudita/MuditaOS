@@ -16,8 +16,8 @@ namespace app::onBoarding
                                            std::unique_ptr<OnBoardingFinalizeContract::Presenter> &&windowPresenter)
         : gui::Dialog(app, gui::window::name::onBoarding_update), presenter(std::move(windowPresenter))
     {
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::ok));
+        navBar->setActive(gui::nav_bar::Side::Right, false);
         presenter->attach(this);
     }
 

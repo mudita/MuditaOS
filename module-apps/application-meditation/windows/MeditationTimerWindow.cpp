@@ -102,12 +102,12 @@ auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
             application->switchWindow(app::window::name::meditation_main_window);
             return true;
         }
-        if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
+        if (inputEvent.is(KeyCode::KEY_RF) && navBar->isActive(nav_bar::Side::Right)) {
             timer->getTimer().stop();
             setVisibleMeditationEnd();
             return true;
         }
-        if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
+        if (inputEvent.is(KeyCode::KEY_ENTER) && navBar->isActive(nav_bar::Side::Center)) {
             if (timer->getTimer().isStopped()) {
                 timer->getTimer().start();
                 setVisibleRunning();
@@ -131,22 +131,22 @@ void MeditationTimerWindow::setWidgetVisible(bool sBar, bool bBar, bool counter)
     });
 
     header->setTitleVisibility(sBar);
-    bottomBar->setActive(BottomBar::Side::CENTER, bBar);
-    bottomBar->setActive(BottomBar::Side::LEFT, bBar);
+    navBar->setActive(nav_bar::Side::Center, bBar);
+    navBar->setActive(nav_bar::Side::Left, bBar);
     timer->setVisible(counter);
 }
 void MeditationTimerWindow::setVisibleRunning()
 {
     setWidgetVisible(false, true, true);
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::pause));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::stop));
+    navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::pause));
+    navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::stop));
     meditationInfo->setVisible(false);
 }
 void MeditationTimerWindow::setVisiblePaused()
 {
     setWidgetVisible(true, true, true);
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::resume));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::stop));
+    navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::resume));
+    navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::stop));
 }
 void MeditationTimerWindow::setVisiblePreparation()
 {
@@ -158,7 +158,7 @@ void MeditationTimerWindow::setVisiblePreparation()
     meditationInfo->setVisible(true);
 
     finished = false;
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+    navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 }
 
 void MeditationTimerWindow::setVisibleMeditationEnd()
@@ -170,7 +170,7 @@ void MeditationTimerWindow::setVisibleMeditationEnd()
     finished        = true;
     meditationInfo->setText(std::move(textParsed));
     meditationInfo->setVisible(true);
-    bottomBar->setVisible(false);
+    navBar->setVisible(false);
     endScreenTimeout.start();
 }
 

@@ -88,7 +88,7 @@ namespace gui
             }
             else {
                 savedFocusItem = getFocusItem();
-                app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode();
+                app->getCurrentWindow()->navBarRestoreFromTemporaryMode();
             }
             return true;
         };

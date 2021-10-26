@@ -16,7 +16,7 @@ namespace gui
 
       protected:
         auto buildOptionsList() -> std::list<Option> override;
-        virtual bool bottomBarCallback(Item &item);
+        virtual bool navBarCallback(Item &item);
 
         bool automaticDateAndTimeIsOn = false;
 

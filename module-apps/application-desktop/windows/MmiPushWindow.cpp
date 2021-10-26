@@ -32,7 +32,7 @@ namespace style::desktop
 MmiPushWindow::MmiPushWindow(app::ApplicationCommon *app, const std::string &name) : gui::AppWindow(app, name)
 {
     AppWindow::buildInterface();
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
+    navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::ok));
     icon = new Icon(this,
                     style::window::default_left_margin,
                     style::window::default_vertical_pos,
