@@ -7,7 +7,7 @@
 #include "data/PowerNapSwitchData.hpp"
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
-#include <apps-common/widgets/ProgressTimer.hpp>
+#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 #include <apps-common/GuiTimer.hpp>
 #include <Text.hpp>
 #include <keymap/KeyMap.hpp>
@@ -96,7 +96,7 @@ namespace gui
     }
     void PowerNapProgressWindow::configureTimer()
     {
-        auto timer = std::make_unique<app::ProgressTimer>(
+        auto timer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
             application, *this, powernapTimerName, timerTick, app::ProgressCountdownMode::Increasing);
         timer->attach(progressBar);
         timer->attach(timerText);

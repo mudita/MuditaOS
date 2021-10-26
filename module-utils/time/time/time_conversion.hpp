@@ -212,6 +212,11 @@ namespace utils
                 return duration;
             }
 
+            time_t getSeconds() const
+            {
+                return seconds;
+            }
+
             time_t getMinutes() const
             {
                 return minutes;
