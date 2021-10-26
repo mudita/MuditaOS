@@ -31,6 +31,7 @@ namespace gui
     class TextFixedSize;
     class AlarmSetSpinner;
     class TimeSetFmtSpinner;
+    class SnoozeTimer;
 
     class BellHomeScreenWindow : public AppWindow, public app::home_screen::AbstractView
     {
@@ -46,11 +47,9 @@ namespace gui
         bool onDatabaseMessage(sys::Message *msg) override;
 
         void setAlarmTriggered() override;
-        void setAlarmSnoozed() override;
         void setAlarmActive(bool val) override;
         void setAlarmEdit(bool val) override;
-        void setAlarmVisible(bool val) override;
-        void setAlarmTimeVisible(bool val) override;
+        void setHeaderViewMode(app::home_screen::HeaderViewMode mode) override;
         std::time_t getAlarmTime() const override;
         void setAlarmTime(std::time_t newTime) override;
         void incAlarmMinute() override;
@@ -71,6 +70,7 @@ namespace gui
         BellBattery *battery{};
         TextFixedSize *bottomText{};
         AlarmSetSpinner *alarm{};
+        SnoozeTimer *snoozeTimer{};
 
         std::unique_ptr<app::home_screen::AbstractPresenter> presenter;
 

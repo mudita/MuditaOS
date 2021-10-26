@@ -6,7 +6,7 @@
 #include "data/BGSoundsStyle.hpp"
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
-#include <apps-common/widgets/ProgressTimer.hpp>
+#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 #include <apps-common/GuiTimer.hpp>
 #include <TextFixedSize.hpp>
 #include <time/dateCommon.hpp>
@@ -115,7 +115,7 @@ namespace gui
     }
     void BGSoundsProgressWindow::configureTimer()
     {
-        auto timer = std::make_unique<app::ProgressTimer>(
+        auto timer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
             application, *this, bgSoundsTimerName, timerTick, app::ProgressCountdownMode::Increasing);
         timer->attach(progressBar);
         timer->attach(timerText);

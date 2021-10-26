@@ -5,7 +5,7 @@
 #include "data/BGSoundsCommon.hpp"
 #include "widgets/BGSoundsPlayer.hpp"
 #include <ApplicationBellBackgroundSounds.hpp>
-#include <apps-common/widgets/ProgressTimer.hpp>
+#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 #include <common/models/TimeModel.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
