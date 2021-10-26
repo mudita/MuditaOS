@@ -29,8 +29,8 @@ namespace gui
         auto msg       = std::make_unique<DialogMetadataMessage>(std::move(metadata));
         DialogYesNo::onBeforeShow(mode, msg.get());
 
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
-        bottomBar->setActive(BottomBar::Side::RIGHT, false);
+        navBar->setActive(nav_bar::Side::Center, false);
+        navBar->setActive(nav_bar::Side::Right, false);
     }
 
 } /* namespace gui */

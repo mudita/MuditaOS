@@ -67,8 +67,8 @@ namespace gui
             (dndSettings->getCallsFromFavourite()) ? gui::option::SettingRightItem::On
                                                    : gui::option::SettingRightItem::Off));
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch));
         return optList;
     }
 } // namespace gui

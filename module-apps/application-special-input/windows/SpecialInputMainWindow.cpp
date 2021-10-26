@@ -32,9 +32,9 @@ void SpecialInputMainWindow::buildInterface()
 {
     AppWindow::buildInterface();
 
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-    bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::emoji));
+    navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
+    navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
+    navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::emoji));
 
     charList = new gui::ListView(this,
                                  specialInputStyle::specialInputListView::x,
@@ -74,13 +74,13 @@ void SpecialInputMainWindow::switchPage()
     if (actualWindow == specialInputStyle::CharactersType::Emoji) {
         model->createData(specialInputStyle::CharactersType::SpecialCharacters);
         actualWindow = specialInputStyle::CharactersType::SpecialCharacters;
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::emoji));
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::emoji));
         setTitle(utils::translate("app_special_input_window"));
     }
     else if (actualWindow == specialInputStyle::CharactersType::SpecialCharacters) {
         model->createData(specialInputStyle::CharactersType::Emoji);
         actualWindow = specialInputStyle::CharactersType::Emoji;
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::special_chars));
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::special_chars));
         setTitle(utils::translate("app_emoji_input_window"));
     }
 }

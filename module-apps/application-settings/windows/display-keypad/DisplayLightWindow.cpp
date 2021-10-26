@@ -65,8 +65,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translate(style::strings::common::Switch),
-                                               BottomBar::Side::CENTER);
+                        this->setNavBarText(utils::translate(style::strings::common::Switch), nav_bar::Side::Center);
                     }
                     return true;
                 },
@@ -114,9 +113,9 @@ namespace gui
             std::ceil(screen_light_control::ManualModeParameters::MAX_BRIGHTNESS / brightnessStep),
             setBrightness,
             [&](const UTF8 &text) {
-                application->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
+                application->getCurrentWindow()->navBarTemporaryMode(text, nav_bar::Side::Center, false);
             },
-            [&]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+            [&]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); });
 
         return spinner;
     }

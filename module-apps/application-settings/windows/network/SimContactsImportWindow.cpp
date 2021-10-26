@@ -24,8 +24,8 @@ namespace gui
 
         setTitle(utils::translate("app_settings_network_import_contacts"));
 
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::import));
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::import));
 
         list = new ListView(this,
                             style::window::default_left_margin,
@@ -56,9 +56,9 @@ namespace gui
         emptyListIcon->text->setRichText(
             utils::translate("app_settings_network_import_contacts_from_sim_card_reading"));
         emptyListIcon->image->set("update_icon_W_G");
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setActive(nav_bar::Side::Center, false);
+        navBar->setActive(nav_bar::Side::Left, false);
 
         presenter->requestSimContacts();
     }
@@ -72,15 +72,15 @@ namespace gui
 
     bool SimContactsImportWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_LF) && !bottomBar->isActive(BottomBar::Side::LEFT)) {
+        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_LF) && !navBar->isActive(nav_bar::Side::Left)) {
             return false;
         }
 
-        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER) && !bottomBar->isActive(BottomBar::Side::CENTER)) {
+        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER) && !navBar->isActive(nav_bar::Side::Center)) {
             return false;
         }
 
-        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RF) && !bottomBar->isActive(BottomBar::Side::RIGHT)) {
+        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RF) && !navBar->isActive(nav_bar::Side::Right)) {
             return false;
         }
 
@@ -100,11 +100,11 @@ namespace gui
 
     void SimContactsImportWindow::contactsReady() noexcept
     {
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
+        navBar->setActive(nav_bar::Side::Center, true);
         list->rebuildList();
 
         if (list->isEmpty()) {
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            navBar->setActive(nav_bar::Side::Center, false);
             emptyListIcon->text->setRichText(
                 utils::translate("app_settings_network_import_contacts_from_sim_card_no_contacts"));
             emptyListIcon->image->set("info_icon_W_G");
@@ -127,9 +127,9 @@ namespace gui
             utils::translate("app_settings_network_import_contacts_from_sim_card_duplicates"),
             {{"$DUPLICATES", std::to_string(duplicatesCount)}});
         emptyListIcon->image->set("info_icon_W_G");
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::show));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::show));
+        navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::skip));
 
         onLFInputCallback = [&]() {
             displayProgressInfo();
@@ -140,11 +140,11 @@ namespace gui
 
     void SimContactsImportWindow::displayDuplicates() noexcept
     {
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::replace));
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::replace));
         list->rebuildList();
 
         setTitle(utils::translate("app_settings_network_import_contacts_duplicates"));
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
+        navBar->setActive(nav_bar::Side::Right, true);
 
         onLFInputCallback    = nullptr;
         onEnterInputCallback = [&]() {
@@ -161,9 +161,9 @@ namespace gui
         emptyListIcon->text->setRichText(
             utils::translate("app_settings_network_import_contacts_from_sim_card_success"));
         emptyListIcon->image->set("success_icon_W_G");
-        bottomBar->setActive(BottomBar::Side::RIGHT, false);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::ok));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::contacts));
+        navBar->setActive(nav_bar::Side::Right, false);
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::ok));
+        navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::contacts));
 
         onLFInputCallback = [&]() {
             app::manager::Controller::sendAction(application, app::manager::actions::ShowContacts);
@@ -178,8 +178,8 @@ namespace gui
         emptyListIcon->text->setRichText(
             utils::translate("app_settings_network_import_contacts_from_sim_card_reading"));
         emptyListIcon->image->set("update_icon_W_G");
-        bottomBar->setActive(BottomBar::Side::RIGHT, false);
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
+        navBar->setActive(nav_bar::Side::Right, false);
+        navBar->setActive(nav_bar::Side::Center, false);
+        navBar->setActive(nav_bar::Side::Left, false);
     }
 } // namespace gui

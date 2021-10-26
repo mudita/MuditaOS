@@ -42,8 +42,8 @@ namespace app::alarmClock
             internalData.push_back(new gui::CustomCheckBoxWithLabel(
                 utils::translate(day),
                 selected,
-                [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-                [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+                [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text, false); },
+                [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); }));
         }
 
         for (auto &item : internalData) {

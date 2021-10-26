@@ -29,11 +29,11 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Left, true);
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         setTitle(utils::translate("app_desktop_tools_antenna"));
 
@@ -48,7 +48,7 @@ namespace gui
         modeButtonParams.insert(std::pair<uint32_t, std::string>(scanModes::CDMA_and_HDR_only, "CDMA and HDR only"));
 
         uint32_t w = this->getWidth() - style::window::default_left_margin * 2;
-        uint32_t h = this->getHeight() - style::window::default_vertical_pos - bottomBar->getHeight();
+        uint32_t h = this->getHeight() - style::window::default_vertical_pos - navBar->getHeight();
 
         modesBox = new gui::VBox(this, style::window::default_left_margin, style::window::default_vertical_pos, w, h);
         modesBox->setPenWidth(0);

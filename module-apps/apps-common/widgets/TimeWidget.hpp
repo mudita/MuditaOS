@@ -29,8 +29,8 @@ namespace gui
         TimeWidget(Item *parent,
                    const std::string &description,
                    Type type,
-                   std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                   std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
+                   std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                   std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
         void loadData(const std::chrono::hours &hoursFrom,
                       const std::chrono::minutes &minutesFrom,
                       const std::chrono::hours &hoursTill,
@@ -54,8 +54,8 @@ namespace gui
         DateWidget *dateItem    = nullptr;
 
         Type type;
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
 
         void applyInputCallbacks();
         void prepareForTimeMode();

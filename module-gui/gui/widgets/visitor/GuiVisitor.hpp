@@ -10,12 +10,16 @@ namespace gui
     class Text;
     class Window;
     class Label;
-    class BottomBar;
     class ListItem;
 
     namespace status_bar
     {
         class StatusBar;
+    }
+
+    namespace nav_bar
+    {
+        class NavBar;
     }
 
     /// The general purpose abstract interface for enabling Double-Dispatch behavior throughout `gui::Item`'s
@@ -28,7 +32,7 @@ namespace gui
         virtual void visit(gui::Text &item)                  = 0;
         virtual void visit(gui::Window &item)                = 0;
         virtual void visit(gui::Label &item)                 = 0;
-        virtual void visit(gui::BottomBar &item)             = 0;
+        virtual void visit(gui::nav_bar::NavBar &item)       = 0;
         virtual void visit(gui::status_bar::StatusBar &item) = 0;
         virtual void visit(gui::ListItem &item)              = 0;
         virtual ~GuiVisitor()                                = default;

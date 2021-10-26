@@ -25,12 +25,12 @@ namespace gui
         setTitle(utils::translate("app_settings_bluetooth_phone_name"));
 
         inputField = inputBox(this, utils::translate("app_settings_bluetooth_phone_name"));
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
+        navBar->setActive(nav_bar::Side::Left, false);
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::save));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         setFocusItem(inputField);
     }

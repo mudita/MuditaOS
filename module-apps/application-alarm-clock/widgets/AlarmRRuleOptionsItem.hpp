@@ -15,8 +15,8 @@ namespace gui
     {
       private:
         app::ApplicationCommon *app                                  = nullptr;
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode    = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode         = nullptr;
 
         using RRule                                             = app::alarmClock::AlarmRRulePresenter::RRuleOptions;
         std::vector<std::pair<RRule, std::string>> rRuleOptions = {
@@ -33,7 +33,7 @@ namespace gui
         explicit AlarmRRuleOptionsItem(app::ApplicationCommon *app,
                                        const std::string &description,
                                        std::shared_ptr<app::alarmClock::AlarmRRulePresenter> presenter,
-                                       std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                                       std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
+                                       std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                                       std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
     };
 } /* namespace gui */

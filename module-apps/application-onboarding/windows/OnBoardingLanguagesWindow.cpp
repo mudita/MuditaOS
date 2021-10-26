@@ -22,7 +22,7 @@ namespace app::onBoarding
     void OnBoardingLanguagesWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
+        navBar->setActive(gui::nav_bar::Side::Right, false);
 
         LanguagesWindow::onBeforeShow(mode, data);
     }

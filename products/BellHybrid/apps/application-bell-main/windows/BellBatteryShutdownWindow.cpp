@@ -20,7 +20,7 @@ namespace gui
         AppWindow::buildInterface();
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
 
         auto icon =
             new Icon(this, 0, 0, style::window_width, style::window_height, "bell_battery_status_empty_W_M", {});

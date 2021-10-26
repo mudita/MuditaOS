@@ -14,11 +14,11 @@ namespace gui
                        const uint32_t &y,
                        const uint32_t &w,
                        const uint32_t &h,
-                       const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode,
-                       const std::function<void()> &bottomBarRestoreFromTemporaryMode,
-                       BottomBar::Side bottomBarSide)
-        : HBox(parent, x, y, w, h), bottomBarTemporaryMode(bottomBarTemporaryMode),
-          bottomBarRestoreFromTemporaryMode(bottomBarRestoreFromTemporaryMode), bottomBarSide(bottomBarSide)
+                       const std::function<void(const UTF8 &text)> &navBarTemporaryMode,
+                       const std::function<void()> &navBarRestoreFromTemporaryMode,
+                       nav_bar::Side navBarSide)
+        : HBox(parent, x, y, w, h), navBarTemporaryMode(navBarTemporaryMode),
+          navBarRestoreFromTemporaryMode(navBarRestoreFromTemporaryMode), navBarSide(navBarSide)
 
     {
         setEdges(RectangleEdge::Bottom);
@@ -35,20 +35,20 @@ namespace gui
         focusChangedCallback = [&](Item &item) {
             if (focus) {
                 if (isChecked()) {
-                    if (bottomBarTemporaryMode) {
-                        bottomBarTemporaryMode(utils::translate("common_uncheck"));
+                    if (navBarTemporaryMode) {
+                        navBarTemporaryMode(utils::translate("common_uncheck"));
                     }
                 }
                 else {
-                    if (bottomBarTemporaryMode) {
-                        bottomBarTemporaryMode(utils::translate("common_check"));
+                    if (navBarTemporaryMode) {
+                        navBarTemporaryMode(utils::translate("common_check"));
                     }
                 }
             }
             else {
                 setFocusItem(nullptr);
-                if (bottomBarRestoreFromTemporaryMode) {
-                    bottomBarRestoreFromTemporaryMode();
+                if (navBarRestoreFromTemporaryMode) {
+                    navBarRestoreFromTemporaryMode();
                 }
             }
             return true;
@@ -58,17 +58,17 @@ namespace gui
             if (!event.isShortRelease()) {
                 return false;
             }
-            if ((bottomBarSide == BottomBar::Side::LEFT && event.is(gui::KeyCode::KEY_LF)) ||
-                (bottomBarSide == BottomBar::Side::CENTER && event.is(gui::KeyCode::KEY_ENTER))) {
+            if ((navBarSide == nav_bar::Side::Left && event.is(gui::KeyCode::KEY_LF)) ||
+                (navBarSide == nav_bar::Side::Center && event.is(gui::KeyCode::KEY_ENTER))) {
                 setCheck(!isChecked());
                 if (isChecked()) {
-                    if (bottomBarTemporaryMode) {
-                        bottomBarTemporaryMode(utils::translate("common_uncheck"));
+                    if (navBarTemporaryMode) {
+                        navBarTemporaryMode(utils::translate("common_uncheck"));
                     }
                 }
                 else {
-                    if (bottomBarTemporaryMode) {
-                        bottomBarTemporaryMode(utils::translate("common_check"));
+                    if (navBarTemporaryMode) {
+                        navBarTemporaryMode(utils::translate("common_check"));
                     }
                 }
                 return true;

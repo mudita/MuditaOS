@@ -35,7 +35,7 @@ namespace gui
 
         statusBar->setVisible(false);
         header->setTitleVisibility(true);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
 
         listView = new SideListView(
             this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider(), PageBarType::None);

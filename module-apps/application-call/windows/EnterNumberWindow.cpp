@@ -32,8 +32,8 @@ namespace gui
         using namespace callAppStyle::enterNumberWindow;
         NumberWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("common_add"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_call_clear"));
+        navBar->setText(nav_bar::Side::Center, utils::translate("common_add"));
+        navBar->setText(nav_bar::Side::Right, utils::translate("app_call_clear"));
 
         newContactIcon                    = new gui::AddContactIcon(this, newContactIcon::x, newContactIcon::y);
         newContactIcon->activatedCallback = [=](gui::Item &item) { return addNewContact(); };

@@ -14,7 +14,7 @@ namespace callLogStyle
     // DETAILS WINDOW
     namespace detailsWindow
     {
-        constexpr inline auto x = style::window::bottomBar::leftMargin;
+        constexpr inline auto x = style::window::navBar::leftMargin;
         constexpr inline auto y = style::window::default_vertical_pos;
         constexpr inline auto w = style::window_width - 2 * x;
         constexpr inline auto h = style::window::default_body_height;

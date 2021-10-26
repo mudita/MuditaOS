@@ -20,8 +20,8 @@ namespace app::music_player
 
         void createData(OnShortReleaseCallback shortReleaseCallback,
                         OnLongPressCallback longPressCallback,
-                        OnSetBottomBarTemporaryCallback bottomBarTemporaryMode,
-                        OnRestoreBottomBarTemporaryCallback bottomBarRestoreFromTemporaryMode) override;
+                        OnSetNavBarTemporaryCallback navBarTemporaryMode,
+                        OnRestoreNavBarTemporaryCallback navBarRestoreFromTemporaryMode) override;
 
         [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
 
@@ -56,8 +56,8 @@ namespace app::music_player
 
         OnShortReleaseCallback shortReleaseCallback{nullptr};
         OnLongPressCallback longPressCallback{nullptr};
-        OnSetBottomBarTemporaryCallback bottomBarTemporaryMode{nullptr};
-        OnRestoreBottomBarTemporaryCallback bottomBarRestoreFromTemporaryMode{nullptr};
+        OnSetNavBarTemporaryCallback navBarTemporaryMode{nullptr};
+        OnRestoreNavBarTemporaryCallback navBarRestoreFromTemporaryMode{nullptr};
 
         std::shared_ptr<AbstractSongsRepository> songsRepository;
     };

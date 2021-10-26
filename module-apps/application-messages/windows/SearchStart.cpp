@@ -16,18 +16,18 @@ namespace gui
     {
         buildInterface();
         setTitle(utils::translate("app_messages_title_main"));
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::search));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::search));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
         body = new gui::Item();
         body->setBoundingBox(bodySize());
         addWidget(body);
         auto text = inputBox(this, utils::translate("common_search_uc"), "search");
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
-            [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &Text) { application->getCurrentWindow()->navBarTemporaryMode(Text); },
+            [=]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
             [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
 
         inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {

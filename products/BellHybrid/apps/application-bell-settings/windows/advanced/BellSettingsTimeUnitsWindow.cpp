@@ -39,7 +39,7 @@ namespace gui
         AppWindow::buildInterface();
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
 
         presenter->createData();
 

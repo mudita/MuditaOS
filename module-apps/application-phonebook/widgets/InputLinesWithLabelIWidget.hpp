@@ -19,11 +19,11 @@ namespace gui
 
       public:
         InputLinesWithLabelIWidget(phonebookInternals::ListItemName listItemName,
-                                   std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                                   std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
-                                   std::function<void()> selectSpecialCharacter                 = nullptr,
-                                   std::function<void()> contentChanged                         = nullptr,
-                                   unsigned int lines                                           = 1);
+                                   std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                                   std::function<void()> navBarRestoreFromTemporaryMode      = nullptr,
+                                   std::function<void()> selectSpecialCharacter              = nullptr,
+                                   std::function<void()> contentChanged                      = nullptr,
+                                   unsigned int lines                                        = 1);
 
         ~InputLinesWithLabelIWidget() override = default;
         VBox *vBox               = nullptr;

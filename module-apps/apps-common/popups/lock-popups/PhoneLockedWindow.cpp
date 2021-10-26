@@ -57,9 +57,9 @@ namespace gui
         }
         else if (!notificationsModel->isPhoneTimeLock()) {
             app::manager::Controller::requestNotifications(application);
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
-            bottomBar->setActive(BottomBar::Side::RIGHT, false);
+            navBar->setActive(nav_bar::Side::Left, false);
+            navBar->setActive(nav_bar::Side::Center, false);
+            navBar->setActive(nav_bar::Side::Right, false);
             return;
         }
 
@@ -69,14 +69,14 @@ namespace gui
                 refreshedOnPhoneLockTimeLock = true;
             }
 
-            bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_emergency"));
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
-            bottomBar->setActive(BottomBar::Side::RIGHT, false);
+            navBar->setText(nav_bar::Side::Left, utils::translate("app_desktop_emergency"));
+            navBar->setActive(nav_bar::Side::Center, false);
+            navBar->setActive(nav_bar::Side::Right, false);
         }
         else {
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
-            bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
-            bottomBar->setActive(BottomBar::Side::RIGHT, false);
+            navBar->setActive(nav_bar::Side::Left, false);
+            navBar->setText(nav_bar::Side::Center, utils::translate("app_desktop_unlock"));
+            navBar->setActive(nav_bar::Side::Right, false);
         }
     }
 
@@ -99,14 +99,14 @@ namespace gui
         if (inputEvent.isLongRelease()) {
             return processLongReleaseEvent(inputEvent);
         }
-        else if (inputEvent.isShortRelease() && bottomBar->isActive(BottomBar::Side::CENTER)) {
+        else if (inputEvent.isShortRelease() && navBar->isActive(nav_bar::Side::Center)) {
             const auto requiredStage = (inputEvent.is(KeyCode::KEY_ENTER)) ? PhoneLockedInfoData::Stage::Waiting
                                                                            : PhoneLockedInfoData::Stage::Idle;
             application->switchWindow(gui::popup::window::phone_lock_info_window,
                                       std::make_unique<PhoneLockedInfoData>(requiredStage));
             return true;
         }
-        else if (inputEvent.isShortRelease(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
+        else if (inputEvent.isShortRelease(KeyCode::KEY_LF) && navBar->isActive(nav_bar::Side::Left)) {
             app::manager::Controller::sendAction(application,
                                                  app::manager::actions::EmergencyDial,
                                                  std::make_unique<SwitchData>(),

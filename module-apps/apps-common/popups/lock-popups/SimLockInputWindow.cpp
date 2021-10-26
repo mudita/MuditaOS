@@ -80,7 +80,7 @@ namespace gui
         if (!inputEvent.isShortRelease()) {
             return AppWindow::onInput(inputEvent);
         }
-        else if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
+        else if (inputEvent.is(KeyCode::KEY_RF) && navBar->isActive(nav_bar::Side::Right)) {
             if (isInInputState()) {
                 lock->clearAttempt();
             }
@@ -94,7 +94,7 @@ namespace gui
             if (isInInputState()) {
                 lock->popChar();
                 lockBox->popChar(lock->getCharCount());
-                bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
+                navBar->setActive(nav_bar::Side::Center, lock->canVerify());
                 return true;
             }
         }
@@ -103,11 +103,11 @@ namespace gui
                 lockBox->putChar(lock->getCharCount());
                 lock->putNextChar(inputEvent.numericValue());
 
-                bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
+                navBar->setActive(nav_bar::Side::Center, lock->canVerify());
                 return true;
             }
         }
-        else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
+        else if (inputEvent.is(KeyCode::KEY_ENTER) && navBar->isActive(nav_bar::Side::Center)) {
             if (isInInputState()) {
                 application->getSimLockSubject().verifyInput(lock->getInput());
             }

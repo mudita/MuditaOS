@@ -17,11 +17,11 @@ namespace gui
     TimeWidget::TimeWidget(Item *parent,
                            const std::string &description,
                            Type type,
-                           std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
-                           std::function<void()> bottomBarRestoreFromTemporaryMode)
+                           std::function<void(const UTF8 &text)> navBarTemporaryMode,
+                           std::function<void()> navBarRestoreFromTemporaryMode)
         : VBox(parent), mode24H{!stm::api::isTimeFormat12h()}, type{type},
-          bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+          navBarTemporaryMode(std::move(navBarTemporaryMode)),
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode))
     {
         setMinimumSize(style::window::default_body_width, date_and_time::height);
         setEdges(RectangleEdge::None);
@@ -187,10 +187,10 @@ namespace gui
         };
         mode12hInput->focusChangedCallback = [&](Item &item) {
             if (item.focus) {
-                bottomBarTemporaryMode(utils::translate("common_switch"));
+                navBarTemporaryMode(utils::translate("common_switch"));
             }
             else {
-                bottomBarRestoreFromTemporaryMode();
+                navBarRestoreFromTemporaryMode();
             }
             return true;
         };

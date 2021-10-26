@@ -28,7 +28,7 @@ namespace gui
 
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
 
         icon = new Icon(this,
                         0,

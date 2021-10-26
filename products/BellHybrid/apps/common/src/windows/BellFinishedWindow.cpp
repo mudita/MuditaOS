@@ -26,7 +26,7 @@ namespace gui
 
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
         if (icon == nullptr) {
             icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
             icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));

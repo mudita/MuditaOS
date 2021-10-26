@@ -63,7 +63,7 @@ auto OptionWithActiveIcons::build() const -> ListItem *
         }
         else {
             item.setFocusItem(nullptr);
-            app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode();
+            app->getCurrentWindow()->navBarRestoreFromTemporaryMode();
         }
         return true;
     };

@@ -84,9 +84,9 @@ namespace Quotes
                 task->execute(app, this);
             },
             [app = app](const UTF8 &text) {
-                app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::CENTER, false);
+                app->getCurrentWindow()->navBarTemporaryMode(text, gui::nav_bar::Side::Center, false);
             },
-            [app = app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+            [app = app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); });
 
         return item;
     }

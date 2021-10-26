@@ -28,8 +28,8 @@ namespace app::music_player
     {
         songsModelInterface->createData([this](const std::string &fileName) { return requestAudioOperation(fileName); },
                                         [this]() { stop(); },
-                                        [this](const UTF8 &text) { setViewBottomBarTemporaryMode(text); },
-                                        [this]() { restoreViewBottomBarFromTemporaryMode(); });
+                                        [this](const UTF8 &text) { setViewNavBarTemporaryMode(text); },
+                                        [this]() { restoreViewNavBarFromTemporaryMode(); });
         updateViewSongState();
     }
 
@@ -282,17 +282,17 @@ namespace app::music_player
         return play(filePath);
     }
 
-    void SongsPresenter::setViewBottomBarTemporaryMode(const std::string &text)
+    void SongsPresenter::setViewNavBarTemporaryMode(const std::string &text)
     {
         if (auto view = getView(); view != nullptr) {
-            view->setBottomBarTemporaryMode(text);
+            view->setNavBarTemporaryMode(text);
         }
     }
 
-    void SongsPresenter::restoreViewBottomBarFromTemporaryMode()
+    void SongsPresenter::restoreViewNavBarFromTemporaryMode()
     {
         if (auto view = getView(); view != nullptr) {
-            view->restoreFromBottomBarTemporaryMode();
+            view->restoreFromNavBarTemporaryMode();
         }
     }
 

@@ -68,14 +68,14 @@ namespace app::notes
         note->setEditMode(gui::EditMode::Scroll);
         note->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::options));
+        navBar->setActive(gui::nav_bar::Side::Left, true);
+        navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::options));
 
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate("app_notes_edit"));
+        navBar->setActive(gui::nav_bar::Side::Center, true);
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate("app_notes_edit"));
 
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
+        navBar->setActive(gui::nav_bar::Side::Right, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
 
         setFocusItem(note);
     }

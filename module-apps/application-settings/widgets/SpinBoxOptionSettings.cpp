@@ -11,18 +11,18 @@ namespace gui
                                                  std::uint8_t value,
                                                  std::uint8_t maxValue,
                                                  std::function<bool(uint8_t)> updateCallback,
-                                                 std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
-                                                 std::function<void()> bottomBarRestoreFromTemporaryMode,
+                                                 std::function<void(const UTF8 &text)> navBarTemporaryMode,
+                                                 std::function<void()> navBarRestoreFromTemporaryMode,
                                                  bool indent)
-        : updateCallback(std::move(updateCallback)), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode)), maxValue(maxValue),
-          value(value), text(text), indent(indent)
+        : updateCallback(std::move(updateCallback)), navBarTemporaryMode(std::move(navBarTemporaryMode)),
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode)), maxValue(maxValue), value(value),
+          text(text), indent(indent)
     {}
 
     auto SpinBoxOptionSettings::build() const -> ListItem *
     {
         auto spinBox = new SpinBox(
-            nullptr, text, updateCallback, maxValue, value, bottomBarTemporaryMode, bottomBarRestoreFromTemporaryMode);
+            nullptr, text, updateCallback, maxValue, value, navBarTemporaryMode, navBarRestoreFromTemporaryMode);
 
         auto optionItem = new gui::ListItem();
         optionItem->setMinimumSize(style::window::default_body_width, style::window::label::big_h);

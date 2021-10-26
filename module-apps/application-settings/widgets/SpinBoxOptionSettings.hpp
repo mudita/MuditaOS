@@ -14,16 +14,16 @@ namespace gui
                               uint8_t value,
                               uint8_t maxValue,
                               std::function<bool(uint8_t)> updateCallback,
-                              std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
-                              std::function<void()> bottomBarRestoreFromTemporaryMode,
+                              std::function<void(const UTF8 &text)> navBarTemporaryMode,
+                              std::function<void()> navBarRestoreFromTemporaryMode,
                               bool indent = false);
 
         [[nodiscard]] auto build() const -> ListItem * override;
 
       private:
         std::function<bool(uint8_t)> updateCallback;
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
         std::uint8_t maxValue;
         std::uint8_t value;
         UTF8 text;

@@ -5,7 +5,7 @@
 
 #include <gui/widgets/StatusBar.hpp>
 #include <gui/widgets/header/Header.hpp>
-#include <gui/widgets/BottomBar.hpp>
+#include <gui/widgets/NavBar.hpp>
 #include <gui/widgets/Window.hpp>
 #include <Service/Service.hpp>
 #include <Service/Message.hpp>
@@ -43,7 +43,7 @@ namespace gui
         /**
          * Information bar for the buttons on the bottom of the page.
          */
-        gui::BottomBar *bottomBar = nullptr;
+        gui::nav_bar::NavBar *navBar = nullptr;
         /**
          * Pointer to the application object that owns the window.
          */
@@ -106,15 +106,16 @@ namespace gui
         [[nodiscard]] UTF8 getTitle();
 
         /// Setting bottom bar temporary text
-        /// @param text - bottomBar text
-        /// @param overwriteOthers - set or not other bottomBar texts to "" (default true)
-        void bottomBarTemporaryMode(const UTF8 &text, bool emptyOthers = true);
-        void bottomBarTemporaryMode(const UTF8 &text, BottomBar::Side side, bool emptyOthers = true);
-        void bottomBarRestoreFromTemporaryMode();
-        void setBottomBarText(const UTF8 &text, BottomBar::Side side);
-        void clearBottomBarText(BottomBar::Side side);
+        /// @param text - navBar text
+        /// @param overwriteOthers - set or not other navBar texts to "" (default true)
+        void navBarTemporaryMode(const UTF8 &text, bool emptyOthers = true);
+        void navBarTemporaryMode(const UTF8 &text, nav_bar::Side side, bool emptyOthers = true);
+        void navBarRestoreFromTemporaryMode();
+        void setNavBarText(const UTF8 &text, nav_bar::Side side);
+        void setNavBarActive(nav_bar::Side side, bool value);
+        void clearNavBarText(nav_bar::Side side);
+
         bool selectSpecialCharacter();
-        void setBottomBarActive(BottomBar::Side side, bool value);
 
         /// get BoundingBox size of Window "body" area
         /// @note it would be much better to just have "body item" instead

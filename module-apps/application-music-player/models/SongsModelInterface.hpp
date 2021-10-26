@@ -19,15 +19,15 @@ namespace app::music_player
       public:
         using OnShortReleaseCallback              = std::function<bool(const std::string &fileName)>;
         using OnLongPressCallback                 = std::function<void()>;
-        using OnSetBottomBarTemporaryCallback     = std::function<void(const UTF8 &)>;
-        using OnRestoreBottomBarTemporaryCallback = std::function<void()>;
+        using OnSetNavBarTemporaryCallback        = std::function<void(const UTF8 &)>;
+        using OnRestoreNavBarTemporaryCallback    = std::function<void()>;
         explicit SongsListItemProvider(app::ApplicationCommon *app);
         virtual ~SongsListItemProvider() noexcept = default;
 
         virtual void createData(OnShortReleaseCallback shortReleaseCallback,
                                 OnLongPressCallback longPressCallback,
-                                OnSetBottomBarTemporaryCallback bottomBarTemporaryMode,
-                                OnRestoreBottomBarTemporaryCallback bottomBarRestoreFromTemporaryMode) = 0;
+                                OnSetNavBarTemporaryCallback navBarTemporaryMode,
+                                OnRestoreNavBarTemporaryCallback navBarRestoreFromTemporaryMode)       = 0;
         virtual void clearData()                                                                       = 0;
     };
 

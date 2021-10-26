@@ -56,12 +56,12 @@ namespace gui
         list->setScrollTopMargin(style::margins::small);
         list->rebuildList();
 
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Left, true);
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::options));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         setTitle(utils::translate("app_messages_title_main"));
         header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
@@ -80,22 +80,22 @@ namespace gui
 
         list->setVisible(true);
         list->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
-            bottomBar->setActive(BottomBar::Side::LEFT, true);
-            bottomBar->setActive(BottomBar::Side::CENTER, true);
+            navBar->setActive(nav_bar::Side::Left, true);
+            navBar->setActive(nav_bar::Side::Center, true);
             return true;
         };
 
         list->emptyListCallback = [this]() {
             emptyListIcon->setVisible(true);
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            navBar->setActive(nav_bar::Side::Left, false);
+            navBar->setActive(nav_bar::Side::Center, false);
             application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         };
 
         list->notEmptyListCallback = [this]() {
             emptyListIcon->setVisible(false);
-            bottomBar->setActive(BottomBar::Side::LEFT, true);
-            bottomBar->setActive(BottomBar::Side::CENTER, true);
+            navBar->setActive(nav_bar::Side::Left, true);
+            navBar->setActive(nav_bar::Side::Center, true);
             application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         };
 

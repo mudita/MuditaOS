@@ -21,8 +21,8 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         auto vBox = new gui::VBox(this,
                                   style::window::default_left_margin,

@@ -34,7 +34,7 @@ namespace gui
         AppWindow::buildInterface();
 
         setTitle(utils::translate("app_music_player_music_library_window_name"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         songsList = new gui::ListView(this,
                                       musicPlayerStyle::allSongsWindow::x,
@@ -86,14 +86,14 @@ namespace gui
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
-    void MusicPlayerAllSongsWindow::setBottomBarTemporaryMode(const std::string &text)
+    void MusicPlayerAllSongsWindow::setNavBarTemporaryMode(const std::string &text)
     {
-        bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
+        navBarTemporaryMode(text, nav_bar::Side::Center, false);
     }
 
-    void MusicPlayerAllSongsWindow::restoreFromBottomBarTemporaryMode()
+    void MusicPlayerAllSongsWindow::restoreFromNavBarTemporaryMode()
     {
-        bottomBarRestoreFromTemporaryMode();
+        navBarRestoreFromTemporaryMode();
     }
 
     bool MusicPlayerAllSongsWindow::onInput(const InputEvent &inputEvent)

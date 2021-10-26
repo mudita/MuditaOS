@@ -17,8 +17,8 @@ namespace gui
       public:
         CategoryWidget(const Quotes::CategoryRecord &categoryRecord,
                        std::function<void(bool)> enableCategory,
-                       std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                       std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
+                       std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                       std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
 
       private:
         gui::HBox *hBox              = nullptr;
@@ -28,8 +28,8 @@ namespace gui
 
         Quotes::CategoryRecord category;
         std::function<void(bool)> enableCategory                     = nullptr;
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode    = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode         = nullptr;
     };
 
 } /* namespace gui */

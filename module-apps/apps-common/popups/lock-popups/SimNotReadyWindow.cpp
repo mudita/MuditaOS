@@ -34,7 +34,7 @@ void SimNotReadyWindow::buildInterface()
 
     setTitle(utils::translate("app_settings_net"));
 
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("common_back"));
+    navBar->setText(nav_bar::Side::Right, utils::translate("common_back"));
 
     infoIcon = new gui::Icon(this,
                              style::window::default_left_margin,

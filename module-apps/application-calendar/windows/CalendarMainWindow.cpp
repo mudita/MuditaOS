@@ -151,8 +151,8 @@ namespace gui
         this->buildMonth(monthModel);
         this->buildDateLabel(monthModel->getMonthYearText());
 
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(gui::nav_bar::Side::Right, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
     }
 
     void CalendarMainWindow::destroyInterface()

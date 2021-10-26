@@ -19,7 +19,7 @@ namespace gui
             LockWindow->setTitleBar(false, false);
             textForInputRequired = "phone_lock_unlock";
             textForInvalidInput  = "phone_lock_unlock_invalid";
-            leftBottomBarState   = false;
+            leftNavBarState      = false;
             break;
         case locks::PhoneLockInputTypeAction::Enable:
         case locks::PhoneLockInputTypeAction::Disable:
@@ -32,7 +32,7 @@ namespace gui
             textForInvalidInput    = "phone_lock_invalid";
             textForProvideNewInput = "phone_lock_enter_new";
             textForConfirmNewInput = "phone_lock_confirm_new";
-            leftBottomBarState     = false;
+            leftNavBarState        = false;
             break;
         case locks::PhoneLockInputTypeAction::Set:
             LockWindow->setTitleBar(true, true);
@@ -42,7 +42,7 @@ namespace gui
             textForInvalidInput    = "phone_lock_invalid_retry";
             textForProvideNewInput = "phone_lock_set";
             textForConfirmNewInput = "phone_lock_confirm";
-            leftBottomBarState     = true;
+            leftNavBarState        = true;
             break;
         default:
             break;
@@ -55,8 +55,8 @@ namespace gui
                             LockInputWindow::TextType::Primary,
                             {{LockWindow->getToken(LockInputWindow::Token::Time), formattedTime}});
         LockWindow->setImage("error_W_G");
-        LockWindow->setBottomBarWidgetsActive(false, true, false);
-        LockWindow->setBottomBarText(utils::translate(style::strings::common::ok), BottomBar::Side::CENTER);
+        LockWindow->setNavBarWidgetsActive(false, true, false);
+        LockWindow->setNavBarText(utils::translate(style::strings::common::ok), nav_bar::Side::Center);
     }
 
     void PhoneLockBox::setVisibleStateError(unsigned int errorCode)
@@ -83,7 +83,7 @@ namespace gui
         }
 
         LockWindow->setImage("unlock_icon_W_G");
-        LockWindow->setBottomBarWidgetsActive(leftBottomBarState, false, true);
+        LockWindow->setNavBarWidgetsActive(leftNavBarState, false, true);
     }
 
     void PhoneLockBox::setVisibleStateInputInvalid(InputErrorType type, unsigned int value)
@@ -104,7 +104,7 @@ namespace gui
             break;
         }
         LockWindow->setImage("info_icon_W_G");
-        LockWindow->setBottomBarWidgetsActive(false, true, false);
-        LockWindow->setBottomBarText(utils::translate(style::strings::common::ok), BottomBar::Side::CENTER);
+        LockWindow->setNavBarWidgetsActive(false, true, false);
+        LockWindow->setNavBarText(utils::translate(style::strings::common::ok), nav_bar::Side::Center);
     }
 } // namespace gui

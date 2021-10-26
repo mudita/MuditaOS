@@ -25,10 +25,10 @@ namespace gui
     {
         erase(statusBar);
         erase(header);
-        erase(bottomBar);
+        erase(navBar);
         statusBar = nullptr;
         header    = nullptr;
-        bottomBar = nullptr;
+        navBar    = nullptr;
     }
 
     void AppWindow::rebuild()
@@ -51,10 +51,10 @@ namespace gui
                                          style::header::width,
                                          style::header::height);
 
-        bottomBar = new gui::BottomBar(this, 0, style::window_height - 51, style::window_width, 50);
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
-        bottomBar->setActive(BottomBar::Side::RIGHT, false);
+        navBar = new gui::nav_bar::NavBar(this, 0, style::window_height - 51, style::window_width, 50);
+        navBar->setActive(nav_bar::Side::Left, false);
+        navBar->setActive(nav_bar::Side::Center, false);
+        navBar->setActive(nav_bar::Side::Right, false);
     }
 
     status_bar::Configuration AppWindow::configureStatusBar(status_bar::Configuration appConfiguration)
@@ -211,57 +211,57 @@ namespace gui
         return false;
     }
 
-    void AppWindow::bottomBarTemporaryMode(const UTF8 &text, bool emptyOthers)
+    void AppWindow::navBarTemporaryMode(const UTF8 &text, bool emptyOthers)
     {
-        bottomBarTemporaryMode(text, BottomBar::Side::LEFT, emptyOthers);
+        navBarTemporaryMode(text, nav_bar::Side::Left, emptyOthers);
     }
 
-    void AppWindow::bottomBarTemporaryMode(const UTF8 &text, BottomBar::Side side, bool emptyOthers)
+    void AppWindow::navBarTemporaryMode(const UTF8 &text, nav_bar::Side side, bool emptyOthers)
     {
-        if (bottomBar == nullptr) {
+        if (navBar == nullptr) {
             return;
         }
 
-        bottomBar->store();
+        navBar->store();
 
         if (emptyOthers) {
-            bottomBar->setText(BottomBar::Side::LEFT, "");
-            bottomBar->setText(BottomBar::Side::CENTER, "");
-            bottomBar->setText(BottomBar::Side::RIGHT, "");
+            navBar->setText(nav_bar::Side::Left, "");
+            navBar->setText(nav_bar::Side::Center, "");
+            navBar->setText(nav_bar::Side::Right, "");
         }
 
         switch (side) {
-        case BottomBar::Side::LEFT:
-            bottomBar->setText(BottomBar::Side::LEFT, text);
+        case nav_bar::Side::Left:
+            navBar->setText(nav_bar::Side::Left, text);
             break;
-        case BottomBar::Side::CENTER:
-            bottomBar->setText(BottomBar::Side::CENTER, text);
+        case nav_bar::Side::Center:
+            navBar->setText(nav_bar::Side::Center, text);
             break;
-        case BottomBar::Side::RIGHT:
-            bottomBar->setText(BottomBar::Side::RIGHT, text);
+        case nav_bar::Side::Right:
+            navBar->setText(nav_bar::Side::Right, text);
             break;
         }
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
-    void AppWindow::bottomBarRestoreFromTemporaryMode()
+    void AppWindow::navBarRestoreFromTemporaryMode()
     {
-        if (bottomBar == nullptr) {
+        if (navBar == nullptr) {
             return;
         }
 
-        bottomBar->restore();
+        navBar->restore();
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
-    void AppWindow::setBottomBarText(const UTF8 &text, BottomBar::Side side)
+    void AppWindow::setNavBarText(const UTF8 &text, nav_bar::Side side)
     {
-        bottomBar->setText(side, text);
+        navBar->setText(side, text);
     }
 
-    void AppWindow::clearBottomBarText(BottomBar::Side side)
+    void AppWindow::clearNavBarText(nav_bar::Side side)
     {
-        bottomBar->setText(side, "");
+        navBar->setText(side, "");
     }
 
     bool AppWindow::selectSpecialCharacter()
@@ -279,12 +279,12 @@ namespace gui
         return {0,
                 header->offset_h(),
                 this->getWidth(),
-                this->getHeight() - this->header->offset_h() - bottomBar->getHeight()};
+                this->getHeight() - this->header->offset_h() - navBar->getHeight()};
     }
 
-    void AppWindow::setBottomBarActive(BottomBar::Side side, bool value)
+    void AppWindow::setNavBarActive(nav_bar::Side side, bool value)
     {
-        bottomBar->setActive(side, value);
+        navBar->setActive(side, value);
     }
 
     void AppWindow::accept(GuiVisitor &visitor)

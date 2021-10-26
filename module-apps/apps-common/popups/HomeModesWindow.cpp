@@ -20,7 +20,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
         statusBar->setVisible(false);
 
         modesBox = new ModesBox(this, 0, style::window::modes::top_offset);

@@ -20,8 +20,8 @@ namespace gui
         using namespace callAppStyle;
         NumberWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_phonebook_ice_contacts_title"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate("app_phonebook_ice_contacts_title"));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         numberDescriptionLabel->setText(utils::translate("app_call_emergency_text"));
     }

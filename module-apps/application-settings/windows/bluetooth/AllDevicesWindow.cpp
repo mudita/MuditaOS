@@ -68,8 +68,8 @@ namespace gui
             return true;
         }
         if (inputEvent.is(KeyCode::KEY_LF)) {
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            navBar->setActive(nav_bar::Side::Left, false);
+            navBar->setActive(nav_bar::Side::Center, false);
             auto selectedDevice = bluetoothSettingsModel->getSelectedDevice();
             if (selectedDevice.has_value()) {
                 bluetoothSettingsModel->requestDeviceUnpair(selectedDevice.value().get());
@@ -82,7 +82,7 @@ namespace gui
 
     auto AllDevicesWindow::buildOptionsList() -> std::list<Option>
     {
-        bottomBar->setActive(BottomBar::Side::CENTER, !bluetoothSettingsModel->getDevices().empty());
+        navBar->setActive(nav_bar::Side::Center, !bluetoothSettingsModel->getDevices().empty());
         std::list<gui::Option> optionsList;
 
         for (const auto &device : bluetoothSettingsModel->getDevices()) {
@@ -95,10 +95,10 @@ namespace gui
                 [=](gui::Item & /*item*/) { return handleDeviceAction(device); },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(textOnCenter, BottomBar::Side::CENTER);
+                        this->setNavBarText(textOnCenter, nav_bar::Side::Center);
                         if (device.deviceState != DeviceState::Pairing) {
-                            this->setBottomBarText(utils::translate("common_forget"), BottomBar::Side::LEFT);
-                            this->bottomBar->setActive(BottomBar::Side::LEFT, true);
+                            this->setNavBarText(utils::translate("common_forget"), nav_bar::Side::Left);
+                            this->navBar->setActive(nav_bar::Side::Left, true);
                         }
                         bluetoothSettingsModel->setSelectedDevice(device);
                     }

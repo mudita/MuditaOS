@@ -45,9 +45,9 @@ namespace gui
 
         setTitle(utils::translate("app_calllog_title_main"));
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         list = new gui::ListView(this,
                                  mainWindow::x,
@@ -102,16 +102,16 @@ namespace gui
 
     void CallLogMainWindow::onEmptyList()
     {
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+        navBar->setActive(gui::nav_bar::Side::Left, false);
+        navBar->setActive(gui::nav_bar::Side::Center, false);
         emptyListIcon->setVisible(true);
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void CallLogMainWindow::onListFilled()
     {
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+        navBar->setActive(gui::nav_bar::Side::Left, true);
+        navBar->setActive(gui::nav_bar::Side::Center, true);
         emptyListIcon->setVisible(false);
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }

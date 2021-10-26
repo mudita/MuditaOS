@@ -61,8 +61,8 @@ namespace gui
 
     void AlarmPopup::addWindowElements()
     {
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::stop));
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::stop));
 
         addAlarmLabels();
         if (getPresenter()->isSnoozeAble()) {
@@ -163,15 +163,15 @@ namespace gui
             snoozeLabel->setMaximumWidth(style::window::default_body_width);
             snoozeLabel->setMinimumHeightToFitText();
 
-            bottomBar->setActive(BottomBar::Side::LEFT, true);
-            bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::skip));
+            navBar->setActive(nav_bar::Side::Left, true);
+            navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::skip));
         }
     }
 
     void AlarmPopup::showSnoozeButton()
     {
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
 
         addSnoozeLabel();
 
