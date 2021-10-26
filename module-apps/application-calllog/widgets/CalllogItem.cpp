@@ -25,7 +25,7 @@ namespace gui
         hBox->setPenWidth(style::window::default_border_rect_no_focus);
 
         auto newImg = [=](const UTF8 imageName) -> gui::Image * {
-            auto img = new gui::Image(hBox, imageName);
+            auto img = new gui::Image(hBox, imageName, gui::ImageTypeSpecifier::W_M);
             img->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center});
             img->setMargins(Margins(clItemStyle::left_right_margin, 0, clItemStyle::left_right_margin, 0));
             img->setVisible(false);
