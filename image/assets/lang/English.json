@@ -155,7 +155,7 @@
   "app_calllog_rejected_call": "Rejected call",
   "app_calllog_date": "Date",
   "app_calllog_options_delete_call": "Delete call",
-  "app_calllog_delete_call_confirmation": "Do you really want to delete this call from the list?",
+  "app_calllog_delete_call_confirmation": "Delete this call from the list?",
   "app_desktop_unlock": "UNLOCK",
   "app_desktop_menu": "MENU",
   "app_desktop_emergency": "SOS",
