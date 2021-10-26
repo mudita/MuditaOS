@@ -32,7 +32,7 @@ namespace gui
         bottomText->setEdges(RectangleEdge::None);
         bottomText->activeItem = false;
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        bottomText->setText(description);
+        bottomText->setRichText(description);
         bottomText->drawUnderline(false);
     }
 
