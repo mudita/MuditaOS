@@ -5,7 +5,7 @@
 #include "application-bell-powernap/ApplicationBellPowerNap.hpp"
 #include "data/PowerNapCommon.hpp"
 
-#include <apps-common/widgets/ProgressTimer.hpp>
+#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 #include <common/models/TimeModel.hpp>
 #include <db/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
