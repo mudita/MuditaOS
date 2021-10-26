@@ -53,7 +53,6 @@ namespace gui
 
         auto instructionText = new TextFixedSize(informationBody);
         instructionText->setMargins(Margins(0, sun_logo_margin_top, 0, 0));
-        instructionText->setFont(style::window::font::largelight);
         instructionText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         instructionText->drawUnderline(false);
         instructionText->setFont(style::window::font::verybiglight);
