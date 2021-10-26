@@ -79,7 +79,7 @@ namespace gui
         speakerIcon                       = new SpeakerIcon(this, speakerIcon::x, speakerIcon::y);
         speakerIcon->focusChangedCallback = [=](gui::Item &item) {
             LOG_DEBUG("speakerIcon get/lost focus");
-            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch), false);
+            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch), item.focus);
             return true;
         };
         speakerIcon->activatedCallback = [=](gui::Item &item) {
@@ -107,7 +107,7 @@ namespace gui
         microphoneIcon                       = new MicrophoneIcon(this, microphoneIcon::x, microphoneIcon::y);
         microphoneIcon->focusChangedCallback = [=](gui::Item &item) {
             LOG_DEBUG("microphoneIcon get/lost focus");
-            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch), false);
+            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch), item.focus);
             return true;
         };
         microphoneIcon->activatedCallback = [=](gui::Item &item) {
