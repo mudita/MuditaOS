@@ -28,6 +28,7 @@ void BluetoothDevicesModel::insertDevice(const Devicei &device)
 auto BluetoothDevicesModel::getDeviceByAddress(const std::string &address)
     -> std::optional<std::reference_wrapper<Devicei>>
 {
+
     auto deviceIt = std::find_if(std::begin(devices), std::end(devices), [address](const Devicei &device) {
         return bd_addr_to_str(device.address) == address;
     });
