@@ -16,7 +16,8 @@ namespace gui
     {
         std::shared_ptr<CalllogModel> calllogModel = nullptr;
         gui::ListView *list                        = nullptr;
-        gui::Icon *emptyListIcon                   = nullptr;
+
+        gui::VBox *emptyLayout = nullptr;
 
       public:
         explicit CallLogMainWindow(app::ApplicationCommon *app);
@@ -29,6 +30,8 @@ namespace gui
         void destroyInterface() override;
 
       private:
+        void buildInterfaceForEmptyState();
+
         bool onDatabaseMessage(sys::Message *msg) override;
         void onEmptyList();
         void onListFilled();
