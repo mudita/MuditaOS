@@ -36,6 +36,7 @@ namespace app
         bool isSnoozeActive() override;
         void turnOff() override;
         void snooze() override;
+        std::chrono::seconds getTimeToNextSnooze() override;
 
       private:
         enum class State
@@ -55,6 +56,7 @@ namespace app
         State state{State::Invalid};
         SingleEventRecord cachedRecord;
         std::uint32_t snoozeCount = 0;
+        TimePoint nextSnoozeTime  = TIME_POINT_INVALID;
 
         std::function<bool(sys::ResponseMessage *)> responseCallback;
 
