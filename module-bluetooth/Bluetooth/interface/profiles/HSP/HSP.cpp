@@ -215,6 +215,7 @@ namespace bluetooth
             LOG_DEBUG("Audio connection released.\n\n");
             scoHandle    = HCI_CON_HANDLE_INVALID;
             callAnswered = false;
+            sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
             break;
         case HSP_SUBEVENT_MICROPHONE_GAIN_CHANGED:
             LOG_DEBUG("Received microphone gain change %d\n", hsp_subevent_microphone_gain_changed_get_gain(event));
