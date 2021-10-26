@@ -349,6 +349,7 @@
   "app_settings_net": "Sieć",
   "app_settings_disp_key": "Ekran i klawiatura",
   "app_settings_display_display_light": "Podświetlenie ekranu",
+  "app_settings_display_dark_mode": "Tryb nocny (Beta)",
   "app_settings_display_light_main": "Podświetlenie",
   "app_settings_display_light_auto": "Automatyczne",
   "app_settings_display_light_brightness": "Jasność",

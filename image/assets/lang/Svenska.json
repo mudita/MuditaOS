@@ -271,6 +271,7 @@
   "app_settings_net": "Nätverk",
   "app_settings_disp_key": "Skärm och knappar",
   "app_settings_display_display_light": "Skärmbelysning",
+  "app_settings_display_dark_mode": "Mörkt läge (Beta)",
   "app_settings_display_light_main": "Skärmbelysning",
   "app_settings_display_light_auto": "Automatisk",
   "app_settings_display_light_brightness": "Ljusstyrka",
