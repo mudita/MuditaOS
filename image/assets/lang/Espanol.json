@@ -346,6 +346,7 @@
   "app_settings_net": "Red",
   "app_settings_disp_key": "Pantalla y teclado numérico",
   "app_settings_display_display_light": "Luz de pantalla",
+  "app_settings_display_dark_mode": "Modo oscuro (Beta)",
   "app_settings_display_light_main": "Luz frontal",
   "app_settings_display_light_auto": "Automática",
   "app_settings_display_light_brightness": "Brillo",

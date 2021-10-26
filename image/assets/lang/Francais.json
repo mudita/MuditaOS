@@ -316,6 +316,7 @@
   "app_settings_net": "Réseau",
   "app_settings_disp_key": "Affichage et clavier",
   "app_settings_display_display_light": "Lumière d'affichage",
+  "app_settings_display_dark_mode": "Mode sombre (Beta)",
   "app_settings_display_light_main": "Lumière de devant",
   "app_settings_display_light_auto": "Automatique",
   "app_settings_display_light_brightness": "Luminosité",
