@@ -25,9 +25,6 @@ namespace bluetooth
         static btstack_packet_callback_registration_t cb_handler;
         static constexpr auto inquiryIntervalSeconds = 5;
         static ScanState state;
-        static bd_addr_t SSPaddress;
-        static bool legacyPairing;
-        static std::string SSPname;
         static void sendDevices();
         static auto startScan() -> int;
         static auto remoteNameToFetch() -> bool;
@@ -44,7 +41,6 @@ namespace bluetooth
         static void processInquiryComplete();
         static void processNameRequestComplete(std::uint8_t *packet, bd_addr_t &addr);
         static void processDedicatedBondingCompleted(std::uint8_t *packet, bd_addr_t &addr);
-        static void processSimplePairingCompleted(std::uint8_t *packet, bd_addr_t &addr);
         static void initStateHandler(std::uint8_t eventType, std::uint8_t *packet);
         static auto getDeviceIndexForAddress(const std::vector<Devicei> &devs, const bd_addr_t addr) -> int;
 

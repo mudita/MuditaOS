@@ -230,7 +230,6 @@ auto ServiceBluetooth::handle(BluetoothPairMessage *msg) -> std::shared_ptr<sys:
 auto ServiceBluetooth::handle(BluetoothPairResultMessage *msg) -> std::shared_ptr<sys::Message>
 {
     auto device = msg->getDevice();
-    bluetoothDevicesModel->mergeDevicesList(bluetooth::GAP::getDevicesList());
     if (msg->isSucceed()) {
         bluetoothDevicesModel->setInternalDeviceState(device, DeviceState::Paired);
     }
