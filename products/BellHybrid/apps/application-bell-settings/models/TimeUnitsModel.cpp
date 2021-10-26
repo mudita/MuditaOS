@@ -18,7 +18,8 @@
 
 namespace app::bell_settings
 {
-    TimeUnitsModel::TimeUnitsModel(app::ApplicationCommon *app) : application(app)
+    TimeUnitsModel::TimeUnitsModel(app::ApplicationCommon *app, bool loadFactoryResetValues)
+        : application(app), loadFactoryResetValues(loadFactoryResetValues)
     {}
 
     TimeUnitsModel::~TimeUnitsModel()
@@ -87,9 +88,17 @@ namespace app::bell_settings
 
     void TimeUnitsModel::loadData()
     {
-        const auto now        = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        const auto time       = std::localtime(&now);
-        const auto timeFormat = stm::api::timeFormat();
+        time_t now;
+        utils::time::Locale::TimeFormat timeFormat;
+        if (loadFactoryResetValues) {
+            now        = factoryRestTime;
+            timeFormat = factoryRestTimeFmt;
+        }
+        else {
+            now        = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            timeFormat = stm::api::timeFormat();
+        }
+        const auto time = std::localtime(&now);
         timeSetListItem->timeSetFmtSpinner->setHour(time->tm_hour);
         timeSetListItem->timeSetFmtSpinner->setMinute(time->tm_min);
         timeSetListItem->timeSetFmtSpinner->setTimeFormat(timeFormat);

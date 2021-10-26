@@ -19,10 +19,14 @@ namespace gui
 
 namespace app::bell_settings
 {
+    constexpr time_t factoryRestTime  = 0;
+    constexpr auto factoryRestTimeFmt = utils::time::Locale::TimeFormat::FormatTime12H;
+    constexpr auto useFactoryResetSettings = true;
+
     class TimeUnitsModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
     {
       public:
-        explicit TimeUnitsModel(app::ApplicationCommon *app);
+        explicit TimeUnitsModel(app::ApplicationCommon *app, bool loadFactoryResetValues = false);
 
         ~TimeUnitsModel();
 
@@ -50,6 +54,7 @@ namespace app::bell_settings
         gui::TimeSetListItem *timeSetListItem{};
         gui::TimeFormatSetListItem *timeFmtSetListItem{};
         gui::TemperatureUnitListItem *temperatureUnitListItem{};
+        bool loadFactoryResetValues;
 
         void sendRtcUpdateTimeMessage(time_t newTime);
 
