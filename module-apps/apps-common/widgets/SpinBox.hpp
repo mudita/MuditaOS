@@ -19,8 +19,8 @@ namespace gui
                 UpdateCallback updateCallback,
                 std::uint8_t maxValue,
                 std::uint8_t startValue,
-                std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
-                std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
+                std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
 
       private:
         auto addArrow(Item *parent, const std::string &arrowName, Alignment::Horizontal aligment, bool visible)
@@ -33,7 +33,7 @@ namespace gui
         Image *leftArrow;
         Image *rightArrow;
         UpdateCallback updateBarCallback;
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
     };
 } // namespace gui

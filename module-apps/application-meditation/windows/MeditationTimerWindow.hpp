@@ -22,7 +22,7 @@ namespace gui
         std::chrono::seconds meditationIntervalPeriod{0};
         sys::TimerHandle endScreenTimeout;
 
-        void setWidgetVisible(bool sBar, bool bottomBar, bool counter);
+        void setWidgetVisible(bool sBar, bool navBar, bool counter);
         void setVisibleRunning();
         void setVisiblePaused();
         void setVisiblePreparation();

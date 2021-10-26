@@ -30,10 +30,10 @@ namespace gui
 
         setTitle(utils::translate("app_settings_bt"));
 
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::confirm));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::confirm));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         image = new Image(this, passkey_style::image::x, passkey_style::image::y, 0, 0, "bluetooth_W_G");
 

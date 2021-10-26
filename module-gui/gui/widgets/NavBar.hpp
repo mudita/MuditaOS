@@ -1,22 +1,20 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * BottomBar.hpp
- *
- *  Created on: 13 mar 2019
- *      Author: robert
- */
+#pragma once
 
-#ifndef MIDDLEWARES_GUI_WIDGETS_BOTTOMBAR_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_BOTTOMBAR_HPP_
+#include <ThreeBox.hpp>
+#include <Label.hpp>
+#include <utf8/UTF8.hpp>
 
-#include "Rect.hpp"
-#include "Label.hpp"
-#include "utf8/UTF8.hpp"
-
-namespace gui
+namespace gui::nav_bar
 {
+    enum class Side
+    {
+        Left,
+        Center,
+        Right
+    };
 
     /// Footer for most design windows
     ///
@@ -25,16 +23,8 @@ namespace gui
     /// left is left action key, center describes center (enter) key, and right right action key
     /// depending on screen selected elements will be visible
     /// @note when in Text widget it will show input mode if enabled in [ left ] area
-    class BottomBar : public Rect
+    class NavBar : public Rect
     {
-      public:
-        enum class Side
-        {
-            LEFT = 0x01,
-            CENTER,
-            RIGHT
-        };
-
       protected:
         struct Cache
         {
@@ -50,11 +40,11 @@ namespace gui
             auto get(Side side) -> auto &
             {
                 switch (side) {
-                case Side::LEFT:
+                case Side::Left:
                     return left;
-                case Side::RIGHT:
+                case Side::Right:
                     return right;
-                case Side::CENTER:
+                case Side::Center:
                     return center;
                 }
                 return left;
@@ -64,17 +54,18 @@ namespace gui
         Label *left   = nullptr;
         Label *center = nullptr;
         Label *right  = nullptr;
-        gui::Label *prepareLabel(BottomBar::Side side);
-        Label *getSide(BottomBar::Side side);
-      public:
-        BottomBar();
-        BottomBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-        virtual ~BottomBar();
+        gui::Label *prepareLabel(nav_bar::Side side);
+        Label *getSide(nav_bar::Side side);
 
-        void setActive(BottomBar::Side side, bool active);
-        bool isActive(BottomBar::Side side);
-        void setText(BottomBar::Side side, const UTF8 &str, bool active = true);
-        UTF8 getText(BottomBar::Side side);
+      public:
+        NavBar();
+        NavBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        virtual ~NavBar();
+
+        void setActive(nav_bar::Side side, bool active);
+        bool isActive(nav_bar::Side side);
+        void setText(nav_bar::Side side, const UTF8 &str, bool active = true);
+        UTF8 getText(nav_bar::Side side);
 
         void store();
         void store(Side side);
@@ -87,6 +78,4 @@ namespace gui
         void accept(GuiVisitor &visitor) override;
     };
 
-} /* namespace gui */
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_BOTTOMBAR_HPP_ */
+} // namespace gui::nav_bar

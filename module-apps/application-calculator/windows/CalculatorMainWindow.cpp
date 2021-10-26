@@ -19,13 +19,13 @@ namespace gui
 
         setTitle(utils::translate("app_calculator_title_main"));
 
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, calc::symbols::strings::equals_str());
-        bottomBar->setText(gui::BottomBar::Side::LEFT, calc::symbols::strings::decimal_separator_str());
-        bottomBar->setFont(BottomBar::Side::LEFT, style::window::font::largelight);
+        navBar->setActive(gui::nav_bar::Side::Center, true);
+        navBar->setActive(gui::nav_bar::Side::Right, true);
+        navBar->setActive(gui::nav_bar::Side::Left, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
+        navBar->setText(gui::nav_bar::Side::Center, calc::symbols::strings::equals_str());
+        navBar->setText(gui::nav_bar::Side::Left, calc::symbols::strings::decimal_separator_str());
+        navBar->setFont(nav_bar::Side::Left, style::window::font::largelight);
 
         mathOperationInput = new gui::Text(this,
                                            style::calculator::window::input_margin,

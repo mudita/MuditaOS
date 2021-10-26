@@ -27,8 +27,7 @@ namespace
     {
         item->focusChangedCallback = [model](gui::Item &_item) {
             if (_item.focus) {
-                model->setParentBottomBar(
-                    {}, utils::translate("app_desktop_show"), utils::translate("app_desktop_clear"));
+                model->setParentNavBar({}, utils::translate("app_desktop_show"), utils::translate("app_desktop_clear"));
                 return true;
             }
             return false;
@@ -101,9 +100,9 @@ namespace
     {
         item->focusChangedCallback = [model, canCall = provider->hasRecord()](gui::Item &_item) {
             if (_item.focus) {
-                UTF8 bottomBarLeftText = canCall ? UTF8{utils::translate("common_call")} : UTF8{};
-                model->setParentBottomBar(
-                    bottomBarLeftText, utils::translate("app_desktop_show"), utils::translate("app_desktop_clear"));
+                UTF8 navBarLeftText = canCall ? UTF8{utils::translate("common_call")} : UTF8{};
+                model->setParentNavBar(
+                    navBarLeftText, utils::translate("app_desktop_show"), utils::translate("app_desktop_clear"));
             }
             return true;
         };
@@ -177,7 +176,7 @@ namespace
     {
         item->focusChangedCallback = [model](gui::Item &_item) {
             if (_item.focus) {
-                model->setParentBottomBar({}, utils::translate("common_disconnect"), {});
+                model->setParentNavBar({}, utils::translate("common_disconnect"), {});
                 return true;
             }
             return false;
@@ -188,7 +187,7 @@ namespace
     {
         item->focusChangedCallback = [model](gui::Item &_item) {
             if (_item.focus) {
-                model->setParentBottomBar({}, utils::translate("app_desktop_show"), utils::translate("common_stop"));
+                model->setParentNavBar({}, utils::translate("app_desktop_show"), utils::translate("common_stop"));
             }
             return true;
         };
@@ -240,11 +239,11 @@ ActiveNotificationsModel::ActiveNotificationsModel(AppWindow *parent)
     : AsyncCallbackReceiver(parent->getApplication()), parent(parent)
 {}
 
-void ActiveNotificationsModel::setParentBottomBar(const UTF8 &left, const UTF8 &center, const UTF8 &right)
+void ActiveNotificationsModel::setParentNavBar(const UTF8 &left, const UTF8 &center, const UTF8 &right)
 {
-    parent->setBottomBarText(left, BottomBar::Side::LEFT);
-    parent->setBottomBarText(center, BottomBar::Side::CENTER);
-    parent->setBottomBarText(right, BottomBar::Side::RIGHT);
+    parent->setNavBarText(left, nav_bar::Side::Left);
+    parent->setNavBarText(center, nav_bar::Side::Center);
+    parent->setNavBarText(right, nav_bar::Side::Right);
 }
 
 auto ActiveNotificationsModel::create(const notifications::NotSeenSMSNotification *notification)

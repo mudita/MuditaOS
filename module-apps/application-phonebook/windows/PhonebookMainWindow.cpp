@@ -36,9 +36,9 @@ namespace gui
         header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
         header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         contactsList = new gui::PhonebookListView(this,
                                                   phonebookStyle::mainWindow::contactsList::x,
@@ -67,8 +67,8 @@ namespace gui
         auto app  = application;
         inputMode = std::make_unique<InputMode>(
             std::list<InputMode::Mode>{InputMode::ABC, InputMode::abc},
-            [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
-            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+            [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+            [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
             [app]() { app->getCurrentWindow()->selectSpecialCharacter(); });
     }
 
@@ -99,9 +99,9 @@ namespace gui
                     std::make_unique<app::manager::SwitchBackRequest>(application->GetName(), std::move(data)));
             };
 
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
-            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::add));
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+            navBar->setActive(nav_bar::Side::Left, false);
+            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::add));
+            navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
             header->navigationIndicatorRemove(gui::header::BoxSelection::Left);
             header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
@@ -176,8 +176,8 @@ namespace gui
 
     void PhonebookMainWindow::onEmptyList()
     {
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+        navBar->setActive(gui::nav_bar::Side::Left, false);
+        navBar->setActive(gui::nav_bar::Side::Center, false);
         emptyListIcon->setVisible(true);
         header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
         application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
@@ -186,8 +186,8 @@ namespace gui
     void PhonebookMainWindow::onListFilled()
     {
         if (!isSearchRequested()) {
-            bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-            bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+            navBar->setActive(gui::nav_bar::Side::Left, true);
+            navBar->setActive(gui::nav_bar::Side::Center, true);
             header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
         }
 

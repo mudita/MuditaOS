@@ -39,8 +39,8 @@ namespace gui
 
         setTitle(utils::translate("app_messages_templates"));
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::use));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::use));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         namespace style = style::messages::templates::list;
 

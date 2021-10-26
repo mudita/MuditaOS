@@ -27,8 +27,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translate(style::strings::common::Switch),
-                                               BottomBar::Side::CENTER);
+                        this->setNavBarText(utils::translate(style::strings::common::Switch), nav_bar::Side::Center);
                     }
                     return true;
                 },
@@ -48,8 +47,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translate(style::strings::common::select),
-                                               BottomBar::Side::CENTER);
+                        this->setNavBarText(utils::translate(style::strings::common::select), nav_bar::Side::Center);
                     }
                     return true;
                 },
@@ -68,8 +66,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translate(style::strings::common::select),
-                                               BottomBar::Side::CENTER);
+                        this->setNavBarText(utils::translate(style::strings::common::select), nav_bar::Side::Center);
                     }
                     return true;
                 },

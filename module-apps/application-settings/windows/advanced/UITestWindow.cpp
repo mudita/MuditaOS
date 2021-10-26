@@ -16,10 +16,10 @@ namespace gui
         AppWindow::buildInterface();
         buildInterface();
         // prebuild
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
         setTitle("UI TEST");
         text = new gui::Text(this,
                              style::window::default_left_margin,
@@ -55,8 +55,8 @@ namespace gui
         text->addText(TextBlock("special chars too", Font(27).raw(), TextBlock::End::None));
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
-            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &text) { navBarTemporaryMode(text); },
+            [=]() { navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         text->setPenFocusWidth(0);
         setFocusItem(text);

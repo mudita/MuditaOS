@@ -23,7 +23,7 @@ namespace gui
     void LogoWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
         statusBar->setVisible(false);
         new gui::Image(this, 0, 0, 0, 0, "logo");
     }

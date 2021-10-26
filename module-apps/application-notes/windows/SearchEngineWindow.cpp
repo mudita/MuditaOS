@@ -29,10 +29,10 @@ namespace app::notes
         AppWindow::buildInterface();
         setTitle(utils::translate("app_notes_title_main"));
 
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::search));
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(gui::nav_bar::Side::Center, true);
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::search));
+        navBar->setActive(gui::nav_bar::Side::Right, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         input = gui::inputBox(this, utils::translate("common_search_uc"), "search");
         setFocusItem(input);

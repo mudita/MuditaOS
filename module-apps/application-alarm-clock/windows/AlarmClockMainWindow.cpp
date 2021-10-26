@@ -32,10 +32,10 @@ namespace app::alarmClock
     {
         AppWindow::buildInterface();
 
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        navBar->setActive(gui::nav_bar::Side::Right, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::Switch));
+        navBar->setText(gui::nav_bar::Side::Left, utils::translate(style::strings::common::options));
 
         setTitle(utils::translate("app_alarm_clock_title_main"));
         header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
@@ -117,16 +117,16 @@ namespace app::alarmClock
     void AlarmClockMainWindow::onEmptyList()
     {
         emptyListIcon->setVisible(true);
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+        navBar->setActive(gui::nav_bar::Side::Left, false);
+        navBar->setActive(gui::nav_bar::Side::Center, false);
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void AlarmClockMainWindow::onListFilled()
     {
         emptyListIcon->setVisible(false);
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+        navBar->setActive(gui::nav_bar::Side::Left, true);
+        navBar->setActive(gui::nav_bar::Side::Center, true);
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 } // namespace app::alarmClock

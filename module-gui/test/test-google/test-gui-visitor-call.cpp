@@ -10,7 +10,7 @@
 #include "Rect.hpp"
 #include "Label.hpp"
 #include "Window.hpp"
-#include "BottomBar.hpp"
+#include "NavBar.hpp"
 #include "StatusBar.hpp"
 #include "ListItem.hpp"
 
@@ -25,7 +25,7 @@ class VisitorMock : public gui::GuiVisitor
     MOCK_METHOD1(visit, void(gui::Text &item));
     MOCK_METHOD1(visit, void(gui::Window &item));
     MOCK_METHOD1(visit, void(gui::Label &item));
-    MOCK_METHOD1(visit, void(gui::BottomBar &item));
+    MOCK_METHOD1(visit, void(gui::nav_bar::NavBar &item));
     MOCK_METHOD1(visit, void(gui::status_bar::StatusBar &item));
     MOCK_METHOD1(visit, void(gui::ListItem &item));
 };

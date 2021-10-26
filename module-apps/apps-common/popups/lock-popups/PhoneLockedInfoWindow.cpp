@@ -24,15 +24,15 @@ void PhoneLockedInfoWindow::onBeforeShow([[maybe_unused]] ShowMode mode, SwitchD
                                                                                : PhoneLockedInfoData::Stage::Idle;
 
     if (mStage == PhoneLockedInfoData::Stage::Waiting) {
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
+        navBar->setActive(nav_bar::Side::Left, true);
+        navBar->setActive(nav_bar::Side::Center, false);
+        navBar->setActive(nav_bar::Side::Right, true);
         infoIcon->text->setRichText(utils::translate("app_desktop_press_to_complete_unlock"));
     }
     else {
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
+        navBar->setActive(nav_bar::Side::Left, true);
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
         infoIcon->text->setRichText(utils::translate("app_desktop_press_to_unlock"));
     }
 
@@ -54,7 +54,7 @@ bool PhoneLockedInfoWindow::onInput(const InputEvent &inputEvent)
     }
 
     // Left key = SOS call, it should work all the time
-    else if (inputEvent.isShortRelease(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
+    else if (inputEvent.isShortRelease(KeyCode::KEY_LF) && navBar->isActive(nav_bar::Side::Left)) {
         app::manager::Controller::sendAction(application,
                                              app::manager::actions::EmergencyDial,
                                              std::make_unique<SwitchData>(),
@@ -72,7 +72,7 @@ bool PhoneLockedInfoWindow::onInput(const InputEvent &inputEvent)
     // Enter key = start unlocking if we are in STARTING stage
     else if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) && mStage == PhoneLockedInfoData::Stage::Idle) {
         mStage = PhoneLockedInfoData::Stage::Waiting;
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
+        navBar->setActive(nav_bar::Side::Center, false);
         infoIcon->text->setRichText(utils::translate("app_desktop_press_to_complete_unlock"));
         resetTimer();
         return true;
@@ -81,7 +81,7 @@ bool PhoneLockedInfoWindow::onInput(const InputEvent &inputEvent)
     // Any other key - reset timers and go to STARTING stage
     else if (inputEvent.isShortRelease() && mStage == PhoneLockedInfoData::Stage::Waiting) {
         mStage = PhoneLockedInfoData::Stage::Idle;
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
+        navBar->setActive(nav_bar::Side::Center, true);
         infoIcon->text->setRichText(utils::translate("app_desktop_press_to_unlock"));
         resetTimer();
         return true;
@@ -108,9 +108,9 @@ void PhoneLockedInfoWindow::buildInterface()
 {
     WindowWithTimer::buildInterface();
 
-    bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_emergency"));
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("common_back"));
+    navBar->setText(nav_bar::Side::Left, utils::translate("app_desktop_emergency"));
+    navBar->setText(nav_bar::Side::Center, utils::translate("app_desktop_unlock"));
+    navBar->setText(nav_bar::Side::Right, utils::translate("common_back"));
 
     infoIcon = new gui::Icon(this,
                              style::window::default_left_margin,

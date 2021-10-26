@@ -1,29 +1,22 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * BottomBar.cpp
- *
- *  Created on: 13 mar 2019
- *      Author: robert
- */
-#include "BottomBar.hpp"
+#include "NavBar.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
 #include <log/log.hpp>
 
-namespace gui
+namespace gui::nav_bar
 {
-
-    BottomBar::BottomBar()
+    NavBar::NavBar()
     {
 
-        Padding margins{style::window::bottomBar::leftMargin, 0, style::window::bottomBar::rightMargin, 0};
-        left   = prepareLabel(Side::LEFT);
-        center = prepareLabel(Side::CENTER);
-        right  = prepareLabel(Side::RIGHT);
+        Padding margins{style::window::navBar::leftMargin, 0, style::window::navBar::rightMargin, 0};
+        left   = prepareLabel(Side::Left);
+        center = prepareLabel(Side::Center);
+        right  = prepareLabel(Side::Right);
 
         left->setPadding(margins);
         center->setPadding(margins);
@@ -36,15 +29,15 @@ namespace gui
         setFillColor(ColorFullWhite);
         setBorderColor(ColorNoColor);
         setFilled(true);
-        setSize(style::window::bottomBar::w, style::window::bottomBar::h);
+        setSize(style::window::navBar::w, style::window::navBar::h);
     }
-    BottomBar::BottomBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
+    NavBar::NavBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
     {
 
-        Padding margins{style::window::bottomBar::leftMargin, 0, style::window::bottomBar::rightMargin, 0};
-        left   = prepareLabel(Side::LEFT);
-        center = prepareLabel(Side::CENTER);
-        right  = prepareLabel(Side::RIGHT);
+        Padding margins{style::window::navBar::leftMargin, 0, style::window::navBar::rightMargin, 0};
+        left   = prepareLabel(Side::Left);
+        center = prepareLabel(Side::Center);
+        right  = prepareLabel(Side::Right);
 
         left->setPadding(margins);
         center->setPadding(margins);
@@ -57,26 +50,26 @@ namespace gui
         setFillColor(ColorFullWhite);
         setBorderColor(ColorNoColor);
         setFilled(true);
-        setSize(style::window::bottomBar::w, style::window::bottomBar::h);
+        setSize(style::window::navBar::w, style::window::navBar::h);
         updateDrawArea();
     }
-    BottomBar::~BottomBar()
+    NavBar::~NavBar()
     {}
 
-    gui::Label *BottomBar::prepareLabel(BottomBar::Side side)
+    gui::Label *NavBar::prepareLabel(nav_bar::Side side)
     {
         Label *label = new Label(this, 0, 0, 0, 0);
         label->setBorderColor(Color{15, 15});
         switch (side) {
-        case Side::LEFT:
+        case Side::Left:
             label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
             label->setFont(style::footer::font::medium);
             break;
-        case Side::CENTER:
+        case Side::Center:
             label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             label->setFont(style::footer::font::bold);
             break;
-        case Side::RIGHT:
+        case Side::Right:
             label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
             label->setFont(style::footer::font::medium);
             break;
@@ -87,41 +80,41 @@ namespace gui
         return label;
     }
 
-    Label *BottomBar::getSide(BottomBar::Side side)
+    Label *NavBar::getSide(nav_bar::Side side)
     {
         switch (side) {
-        case Side::LEFT:
+        case Side::Left:
             return left;
-        case Side::CENTER:
+        case Side::Center:
             return center;
-        case Side::RIGHT:
+        case Side::Right:
             return right;
         };
         return nullptr;
     }
 
-    void BottomBar::setActive(BottomBar::Side side, bool active)
+    void NavBar::setActive(nav_bar::Side side, bool active)
     {
         getSide(side)->setVisible(active);
     }
 
-    bool BottomBar::isActive(BottomBar::Side side)
+    bool NavBar::isActive(nav_bar::Side side)
     {
         return getSide(side)->visible;
     }
 
-    void BottomBar::setText(BottomBar::Side side, const UTF8 &str, bool active)
+    void NavBar::setText(nav_bar::Side side, const UTF8 &str, bool active)
     {
         getSide(side)->setText(str);
         setActive(side, active);
     }
 
-    UTF8 BottomBar::getText(BottomBar::Side side)
+    UTF8 NavBar::getText(nav_bar::Side side)
     {
         return getSide(side)->getText();
     }
 
-    bool BottomBar::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    bool NavBar::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);
         left->setSize(newDim.w, newDim.h);
@@ -130,14 +123,14 @@ namespace gui
         return true;
     }
 
-    void BottomBar::store()
+    void NavBar::store()
     {
-        store(Side::LEFT);
-        store(Side::CENTER);
-        store(Side::RIGHT);
+        store(Side::Left);
+        store(Side::Center);
+        store(Side::Right);
     }
 
-    void BottomBar::store(Side side)
+    void NavBar::store(Side side)
     {
         auto &el = cache.get(side);
         if (!el.stored) {
@@ -147,14 +140,14 @@ namespace gui
         }
     }
 
-    void BottomBar::restore()
+    void NavBar::restore()
     {
-        restore(Side::LEFT);
-        restore(Side::CENTER);
-        restore(Side::RIGHT);
+        restore(Side::Left);
+        restore(Side::Center);
+        restore(Side::Right);
     }
 
-    void BottomBar::restore(BottomBar::Side side)
+    void NavBar::restore(nav_bar::Side side)
     {
         auto &el = cache.get(side);
         if (el.stored) {
@@ -163,24 +156,24 @@ namespace gui
         }
     }
 
-    void BottomBar::setFont(Side side, const UTF8 &fontName)
+    void NavBar::setFont(Side side, const UTF8 &fontName)
     {
         switch (side) {
-        case Side::LEFT:
+        case Side::Left:
             left->setFont(fontName);
             break;
-        case Side::CENTER:
+        case Side::Center:
             center->setFont(fontName);
             break;
-        case Side::RIGHT:
+        case Side::Right:
             right->setFont(fontName);
             break;
         }
     }
 
-    void BottomBar::accept(GuiVisitor &visitor)
+    void NavBar::accept(GuiVisitor &visitor)
     {
         visitor.visit(*this);
     }
 
-} /* namespace gui */
+} // namespace gui::nav_bar

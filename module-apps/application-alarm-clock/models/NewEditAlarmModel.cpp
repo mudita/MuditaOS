@@ -49,15 +49,15 @@ namespace app::alarmClock
         assert(app != nullptr);
 
         internalData.push_back(new gui::AlarmTimeItem(
-            [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+            [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text, false); },
+            [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); }));
 
         internalData.push_back(new gui::AlarmMusicOptionsItem(
             application,
             utils::translate("app_alarm_clock_sound"),
             soundsPlayer,
-            [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+            [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text, false); },
+            [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); }));
 
         internalData.push_back(new gui::AlarmSnoozeOptionsItem(utils::translate("app_alarm_clock_snooze")));
 
@@ -65,8 +65,8 @@ namespace app::alarmClock
             application,
             utils::translate("app_alarm_clock_repeat"),
             rRulePresenter,
-            [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+            [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text, false); },
+            [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); }));
 
         for (auto &item : internalData) {
             item->deleteByList = false;

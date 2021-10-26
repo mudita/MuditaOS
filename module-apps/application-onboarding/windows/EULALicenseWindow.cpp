@@ -53,13 +53,13 @@ namespace app::onBoarding
         eulaText->setEditMode(gui::EditMode::Scroll);
         eulaText->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
+        navBar->setActive(gui::nav_bar::Side::Left, true);
 
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::accept));
+        navBar->setActive(gui::nav_bar::Side::Center, true);
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::accept));
 
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
+        navBar->setActive(gui::nav_bar::Side::Right, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
 
         setFocusItem(eulaText);
     }

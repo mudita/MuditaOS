@@ -18,8 +18,8 @@ namespace app::onBoarding
         : gui::Dialog(app, gui::window::name::onBoarding_no_configuration)
     {
         header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::start));
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::start));
+        navBar->setActive(gui::nav_bar::Side::Right, false);
     }
 
     bool NoConfigurationDialogWindow::onInput(const gui::InputEvent &inputEvent)

@@ -37,10 +37,10 @@ namespace gui
 
         setFocusItem(contactsListIce);
 
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Left, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
     }
 
     void PhonebookIceContacts::destroyInterface()

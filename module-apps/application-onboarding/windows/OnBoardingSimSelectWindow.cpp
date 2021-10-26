@@ -23,9 +23,9 @@ namespace app::onBoarding
     {
         setTitle(utils::translate("app_onboarding_select_sim"));
         header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::select));
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::select));
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
+        navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::skip));
 
         descriptionText = new gui::Text(this,
                                         style::window::default_left_margin,

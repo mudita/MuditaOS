@@ -37,8 +37,8 @@ MmiPullWindow::MmiPullWindow(app::ApplicationCommon *app, const std::string &nam
 {
     AppWindow::buildInterface();
 
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_replay"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+    navBar->setText(nav_bar::Side::Center, utils::translate("app_desktop_replay"));
+    navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
     text = new Text(
         this, style::desktop::text::x, style::desktop::text::y, style::desktop::text::w, style::desktop::text::h);
     text->setTextType(TextType::MultiLine);
@@ -57,8 +57,8 @@ MmiPullWindow::MmiPullWindow(app::ApplicationCommon *app, const std::string &nam
 
     InputBox->inputText->setInputMode(new InputMode(
         {InputMode::digit},
-        [=](const UTF8 &text1) { bottomBarTemporaryMode(text1); },
-        [=]() { bottomBarRestoreFromTemporaryMode(); },
+        [=](const UTF8 &text1) { navBarTemporaryMode(text1); },
+        [=]() { navBarRestoreFromTemporaryMode(); },
         [=]() { selectSpecialCharacter(); }));
 
     addWidget(InputBox);

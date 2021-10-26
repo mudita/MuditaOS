@@ -13,7 +13,7 @@ namespace gui::visitor
         Label,
         Text,
         StatusBar,
-        BottomBar,
+        NavBar,
         Window,
         Children,
         ListItem

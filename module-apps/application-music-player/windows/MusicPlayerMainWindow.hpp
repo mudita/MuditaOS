@@ -47,8 +47,8 @@ namespace gui
                               RecordState state) override;
         void updateSongProgress(float progress) override;
         void refreshWindow() override;
-        void setBottomBarTemporaryMode(const std::string &text) override;
-        void restoreFromBottomBarTemporaryMode() override;
+        void setNavBarTemporaryMode(const std::string &text) override;
+        void restoreFromNavBarTemporaryMode() override;
 
         void changeCurrentMode(ViewMode m);
 

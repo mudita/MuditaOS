@@ -42,7 +42,7 @@ namespace gui
                      text::RichTextParser::TokenMap tokens = text::RichTextParser::TokenMap{});
         void setTitleBar(bool titleVisible, bool iceVisible);
         void setImage(const UTF8 &imageName);
-        void setBottomBarWidgetsActive(bool left, bool center, bool right);
+        void setNavBarWidgetsActive(bool left, bool center, bool right);
 
         [[nodiscard]] auto getToken(Token token) const -> std::string;
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
@@ -74,7 +74,7 @@ namespace gui
         void buildImage();
         void buildInfoTexts();
         void buildPinBody();
-        void buildBottomBar();
+        void buildNavBar();
         void buildIceBox();
     };
 } // namespace gui

@@ -33,7 +33,7 @@ namespace gui
 
         statusBar->setVisible(false);
         header->setTitleVisibility(true);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
 
         body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height);
 

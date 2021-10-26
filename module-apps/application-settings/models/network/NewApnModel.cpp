@@ -39,45 +39,45 @@ void NewApnModel::createData()
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::Name,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
         [this](const std::string &text) { this->apnNameChanged(text); }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::APN,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::Username,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::Password,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::AuthType,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::ApnType,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::ApnProtocol,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
 
     for (auto item : internalData) {
@@ -118,5 +118,5 @@ void NewApnModel::apnNameChanged(const std::string &newName)
 {
     LOG_DEBUG("New APN name: %s", newName.c_str());
     const bool showSaveButton = !newName.empty();
-    application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::CENTER, showSaveButton);
+    application->getCurrentWindow()->setNavBarActive(gui::nav_bar::Side::Center, showSaveButton);
 }

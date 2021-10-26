@@ -28,7 +28,7 @@ namespace gui
         void visit(gui::Text &item) override;
         void visit(gui::Window &item) override;
         void visit(gui::Label &item) override;
-        void visit(gui::BottomBar &item) override;
+        void visit(gui::nav_bar::NavBar &item) override;
         void visit(gui::status_bar::StatusBar &item) override;
         void visit(gui::ListItem &item) override;
 

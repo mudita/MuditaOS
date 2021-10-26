@@ -82,10 +82,10 @@ namespace gui
 
         mainBox->resizeItems();
 
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
-        bottomBar->setActive(BottomBar::Side::CENTER, false);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_music_player_quit"));
+        navBar->setActive(nav_bar::Side::Left, false);
+        navBar->setActive(nav_bar::Side::Center, false);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Right, utils::translate("app_music_player_quit"));
     }
 
     void MusicPlayerMainWindow::buildInterfaceTrackMode()
@@ -122,10 +122,10 @@ namespace gui
 
         mainBox->resizeItems();
 
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_music_player_quit"));
+        navBar->setActive(nav_bar::Side::Left, false);
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Right, utils::translate("app_music_player_quit"));
     }
 
     void MusicPlayerMainWindow::buildInterfaceLibraryMode()
@@ -163,10 +163,10 @@ namespace gui
                     }
                     isPermissionToChangeViewMode = permissionToChangeViewMode;
                     if (window.empty()) {
-                        clearBottomBarText(BottomBar::Side::CENTER);
+                        clearNavBarText(nav_bar::Side::Center);
                     }
                     else {
-                        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("common_select"));
+                        navBar->setText(nav_bar::Side::Center, utils::translate("common_select"));
                     }
                     return true;
                 },
@@ -193,11 +193,11 @@ namespace gui
 
         mainBox->resizeItems();
 
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("common_select"));
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_music_player_quit"));
+        navBar->setActive(nav_bar::Side::Left, false);
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate("common_select"));
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Right, utils::translate("app_music_player_quit"));
     }
 
     void MusicPlayerMainWindow::buildPlayButtonsInterface(VBox *parent)
@@ -422,14 +422,14 @@ namespace gui
         application->refreshWindow(mode);
     }
 
-    void MusicPlayerMainWindow::setBottomBarTemporaryMode(const std::string &text)
+    void MusicPlayerMainWindow::setNavBarTemporaryMode(const std::string &text)
     {
-        bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
+        navBarTemporaryMode(text, nav_bar::Side::Center, false);
     }
 
-    void MusicPlayerMainWindow::restoreFromBottomBarTemporaryMode()
+    void MusicPlayerMainWindow::restoreFromNavBarTemporaryMode()
     {
-        bottomBarRestoreFromTemporaryMode();
+        navBarRestoreFromTemporaryMode();
     }
 
     void MusicPlayerMainWindow::changeCurrentMode(ViewMode m)
@@ -485,8 +485,8 @@ namespace gui
         }
 
         if (myViewMode == ViewMode::TRACK) {
-            bottomBar->setText(BottomBar::Side::CENTER,
-                               isPlaying ? utils::translate("common_pause") : utils::translate("common_resume"));
+            navBar->setText(nav_bar::Side::Center,
+                            isPlaying ? utils::translate("common_pause") : utils::translate("common_resume"));
         }
     }
 

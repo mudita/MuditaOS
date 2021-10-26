@@ -5,7 +5,7 @@
 
 #include "CheckBox.hpp"
 #include "Label.hpp"
-#include "BottomBar.hpp"
+#include "NavBar.hpp"
 
 namespace gui
 {
@@ -22,9 +22,9 @@ namespace gui
                           uint32_t w,
                           uint32_t h,
                           const UTF8 &description,
-                          const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode = nullptr,
-                          const std::function<void()> &bottomBarRestoreFromTemporaryMode      = nullptr,
-                          BottomBar::Side bottomBarSide                                       = BottomBar::Side::LEFT);
+                          const std::function<void(const UTF8 &text)> &navBarTemporaryMode = nullptr,
+                          const std::function<void()> &navBarRestoreFromTemporaryMode      = nullptr,
+                          nav_bar::Side navBarSide                                         = nav_bar::Side::Left);
 
         void setChecked(bool state);
         auto isChecked() const -> bool;

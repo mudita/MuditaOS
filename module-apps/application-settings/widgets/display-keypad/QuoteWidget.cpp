@@ -32,11 +32,11 @@ namespace gui
 
     QuoteWidget::QuoteWidget(const Quotes::QuoteRecord &quoteRecord,
                              std::function<void(bool)> enableQuoteCallback,
-                             std::function<void(const UTF8 &)> bottomBarTemporaryMode,
-                             std::function<void()> bottomBarRestoreFromTemporaryMode)
+                             std::function<void(const UTF8 &)> navBarTemporaryMode,
+                             std::function<void()> navBarRestoreFromTemporaryMode)
         : quote(quoteRecord), enableQuote(std::move(enableQuoteCallback)),
-          bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+          navBarTemporaryMode(std::move(navBarTemporaryMode)),
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode))
     {
 
         setMinimumSize(style::quotes::widget::w, style::quotes::widget::h);
@@ -69,12 +69,12 @@ namespace gui
                 descriptionLabel->setFont(style::window::font::mediumbold);
                 auto bottorBarText =
                     quote.enabled ? utils::translate("common_uncheck") : utils::translate("common_check");
-                this->bottomBarTemporaryMode(bottorBarText);
+                this->navBarTemporaryMode(bottorBarText);
             }
             else {
                 descriptionLabel->setFont(style::window::font::medium);
                 setFocusItem(nullptr);
-                this->bottomBarRestoreFromTemporaryMode();
+                this->navBarRestoreFromTemporaryMode();
             }
             return true;
         };
@@ -84,7 +84,7 @@ namespace gui
             enableQuote(quote.enabled);
             tickImage->showImage(quote.enabled);
             auto bottorBarText = quote.enabled ? utils::translate("common_uncheck") : utils::translate("common_check");
-            this->bottomBarTemporaryMode(bottorBarText);
+            this->navBarTemporaryMode(bottorBarText);
             hBox->resizeItems();
             return true;
         };

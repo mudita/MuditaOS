@@ -26,8 +26,8 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::options));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         contactFlagsWidget = new ContactFlagsWidget(this);
 

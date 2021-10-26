@@ -139,21 +139,21 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
                 else if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                     if (!soundsPlayer->previouslyPlayed(fileRelativePath) ||
                         soundsPlayer->isInState(AbstractSoundsPlayer::State::Stopped)) {
-                        app->getCurrentWindow()->bottomBarTemporaryMode(
-                            utils::translate(style::strings::common::pause), gui::BottomBar::Side::LEFT, false);
+                        app->getCurrentWindow()->navBarTemporaryMode(
+                            utils::translate(style::strings::common::pause), gui::nav_bar::Side::Left, false);
                         return soundsPlayer->play(fileRelativePath, [=]() {
-                            app->getCurrentWindow()->bottomBarTemporaryMode(
-                                utils::translate(style::strings::common::play), gui::BottomBar::Side::LEFT, false);
+                            app->getCurrentWindow()->navBarTemporaryMode(
+                                utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
                         });
                     }
                     else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
-                        app->getCurrentWindow()->bottomBarTemporaryMode(
-                            utils::translate(style::strings::common::play), gui::BottomBar::Side::LEFT, false);
+                        app->getCurrentWindow()->navBarTemporaryMode(
+                            utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
                         return soundsPlayer->pause();
                     }
                     else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Paused)) {
-                        app->getCurrentWindow()->bottomBarTemporaryMode(
-                            utils::translate(style::strings::common::pause), gui::BottomBar::Side::LEFT, false);
+                        app->getCurrentWindow()->navBarTemporaryMode(
+                            utils::translate(style::strings::common::pause), gui::nav_bar::Side::Left, false);
                         return soundsPlayer->resume();
                     }
                 }
@@ -163,26 +163,26 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
 
             item->focusChangedCallback = [=](gui::Item &item) {
                 if (!item.focus) {
-                    app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode();
+                    app->getCurrentWindow()->navBarRestoreFromTemporaryMode();
                     return true;
                 }
 
                 auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
                 if (!soundsPlayer->previouslyPlayed(fileRelativePath)) {
-                    app->getCurrentWindow()->bottomBarTemporaryMode(
-                        utils::translate(style::strings::common::play), gui::BottomBar::Side::LEFT, false);
+                    app->getCurrentWindow()->navBarTemporaryMode(
+                        utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
                     return true;
                 }
 
                 if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
-                    app->getCurrentWindow()->bottomBarTemporaryMode(
-                        utils::translate(style::strings::common::pause), gui::BottomBar::Side::LEFT, false);
+                    app->getCurrentWindow()->navBarTemporaryMode(
+                        utils::translate(style::strings::common::pause), gui::nav_bar::Side::Left, false);
                     return true;
                 }
 
                 else {
-                    app->getCurrentWindow()->bottomBarTemporaryMode(
-                        utils::translate(style::strings::common::play), gui::BottomBar::Side::LEFT, false);
+                    app->getCurrentWindow()->navBarTemporaryMode(
+                        utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
                     return true;
                 }
 

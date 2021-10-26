@@ -5,7 +5,7 @@
 
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
-#include <BottomBar.hpp>
+#include <NavBar.hpp>
 #include <i18n/i18n.hpp>
 
 #include <utility>
@@ -14,10 +14,10 @@ namespace gui
 {
     InputBoxWithLabelAndIconWidget::InputBoxWithLabelAndIconWidget(
         phonebookInternals::ListItemName listItemName,
-        std::function<void(const UTF8 &)> bottomBarTemporaryMode,
-        std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : listItemName(listItemName), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+        std::function<void(const UTF8 &)> navBarTemporaryMode,
+        std::function<void()> navBarRestoreFromTemporaryMode)
+        : listItemName(listItemName), navBarTemporaryMode(std::move(navBarTemporaryMode)),
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode))
     {
         setMinimumSize(phonebookStyle::inputBoxWithLabelAndIconIWidget::w,
                        phonebookStyle::inputBoxWithLabelAndIconIWidget::h);
@@ -139,16 +139,16 @@ namespace gui
                 setFocusItem(inputBoxLabel);
                 descriptionLabel->setFont(style::window::font::mediumbold);
                 if (tickImage->visible) {
-                    bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
+                    navBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::translate("app_phonebook_check"));
+                    navBarTemporaryMode(utils::translate("app_phonebook_check"));
                 }
             }
             else {
                 setFocusItem(nullptr);
                 descriptionLabel->setFont(style::window::font::medium);
-                bottomBarRestoreFromTemporaryMode();
+                navBarRestoreFromTemporaryMode();
             }
             return true;
         };
@@ -157,10 +157,10 @@ namespace gui
             if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 tickImage->setVisible(!tickImage->visible);
                 if (tickImage->visible) {
-                    bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
+                    navBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::translate("app_phonebook_check"));
+                    navBarTemporaryMode(utils::translate("app_phonebook_check"));
                 }
                 hBox->resizeItems();
                 return true;
@@ -184,16 +184,16 @@ namespace gui
                 setFocusItem(inputBoxLabel);
                 descriptionLabel->setFont(style::window::font::mediumbold);
                 if (tickImage->visible) {
-                    bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
+                    navBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::translate("app_phonebook_check"));
+                    navBarTemporaryMode(utils::translate("app_phonebook_check"));
                 }
             }
             else {
                 setFocusItem(nullptr);
                 descriptionLabel->setFont(style::window::font::medium);
-                bottomBarRestoreFromTemporaryMode();
+                navBarRestoreFromTemporaryMode();
             }
             return true;
         };
@@ -202,10 +202,10 @@ namespace gui
             if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 tickImage->setVisible(!tickImage->visible);
                 if (tickImage->visible) {
-                    bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
+                    navBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::translate("app_phonebook_check"));
+                    navBarTemporaryMode(utils::translate("app_phonebook_check"));
                 }
                 hBox->resizeItems();
                 return true;

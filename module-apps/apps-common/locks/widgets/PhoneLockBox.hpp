@@ -33,6 +33,6 @@ namespace gui
         std::string textForInvalidInput;
         std::string textForProvideNewInput;
         std::string textForConfirmNewInput;
-        bool leftBottomBarState = false;
+        bool leftNavBarState = false;
     };
 } // namespace gui

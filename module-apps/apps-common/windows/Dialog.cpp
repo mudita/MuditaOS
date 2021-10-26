@@ -12,7 +12,7 @@ using namespace gui;
 Dialog::Dialog(app::ApplicationCommon *app, const std::string &name) : gui::AppWindow(app, name)
 {
     AppWindow::buildInterface();
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+    navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
     setTitle("");
 
     icon = new Icon(this,
@@ -39,8 +39,8 @@ void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 
 DialogConfirm::DialogConfirm(app::ApplicationCommon *app, const std::string &name) : Dialog(app, name)
 {
-    bottomBar->setActive(BottomBar::Side::RIGHT, false);
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
+    navBar->setActive(nav_bar::Side::Right, false);
+    navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::ok));
     setFocusItem(icon);
     icon->inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
@@ -75,7 +75,7 @@ DialogYesNo::DialogYesNo(app::ApplicationCommon *app, const std::string &name) :
     no  = createYesNoOption(hBox, gui::dialog::Option::NO);
     yes = createYesNoOption(hBox, gui::dialog::Option::YES);
 
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate("common_confirm"));
+    navBar->setText(nav_bar::Side::Center, utils::translate("common_confirm"));
 }
 
 Label *DialogYesNo::createYesNoOption(Item *parent, const gui::dialog::Option &optionName)
@@ -145,8 +145,8 @@ void DialogYesNoIconTxt::onBeforeShow(ShowMode mode, SwitchData *data)
 
 DialogRetry::DialogRetry(app::ApplicationCommon *app, const std::string &name) : Dialog(app, name)
 {
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::retry));
-    setFocusItem(bottomBar);
+    navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::retry));
+    setFocusItem(navBar);
 }
 
 void DialogRetry::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -154,6 +154,6 @@ void DialogRetry::onBeforeShow(ShowMode mode, SwitchData *data)
     if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
         Dialog::onBeforeShow(mode, metadata);
         auto foo                     = metadata->get().action;
-        bottomBar->activatedCallback = [foo](Item &) -> bool { return foo(); };
+        navBar->activatedCallback    = [foo](Item &) -> bool { return foo(); };
     }
 }

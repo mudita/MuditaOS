@@ -13,10 +13,10 @@ namespace gui
 {
     namespace timeItem = style::alarmClock::window::item::time;
 
-    AlarmTimeItem::AlarmTimeItem(std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
-                                 std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : mode24H(!stm::api::isTimeFormat12h()), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+    AlarmTimeItem::AlarmTimeItem(std::function<void(const UTF8 &text)> navBarTemporaryMode,
+                                 std::function<void()> navBarRestoreFromTemporaryMode)
+        : mode24H(!stm::api::isTimeFormat12h()), navBarTemporaryMode(std::move(navBarTemporaryMode)),
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode))
     {
         setMinimumSize(timeItem::width, timeItem::height);
 
@@ -184,10 +184,10 @@ namespace gui
             };
             mode12hInput->focusChangedCallback = [&](Item &item) {
                 if (item.focus) {
-                    bottomBarTemporaryMode(utils::translate("common_switch"));
+                    navBarTemporaryMode(utils::translate("common_switch"));
                 }
                 else {
-                    bottomBarRestoreFromTemporaryMode();
+                    navBarRestoreFromTemporaryMode();
                 }
                 return true;
             };

@@ -21,8 +21,8 @@ namespace gui
 
         setTitle(utils::translate("app_settings_display_wallpaper_quotes_categories"));
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::check));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::check));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         list = new gui::ListView(this,
                                  style::quotes::categories::list::X,

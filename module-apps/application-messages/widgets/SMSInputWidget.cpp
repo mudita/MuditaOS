@@ -55,8 +55,8 @@ namespace gui
 
         inputText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
-            [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &Text) { application->getCurrentWindow()->navBarTemporaryMode(Text); },
+            [=]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
             [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
 
         inputText->inputCallback = [this, application]([[maybe_unused]] Item &, const InputEvent &event) {
@@ -75,8 +75,8 @@ namespace gui
             if (inputText->focus) {
 
                 application->getWindow(gui::name::window::thread_view)
-                    ->setBottomBarText(utils::translate(utils::translate(style::strings::common::send)),
-                                       BottomBar::Side::CENTER);
+                    ->setNavBarText(utils::translate(utils::translate(style::strings::common::send)),
+                                    nav_bar::Side::Center);
 
                 if (inputText->getText() == utils::translate("sms_temp_reply")) {
                     inputText->clear();
@@ -94,7 +94,7 @@ namespace gui
                 }
 
                 application->getWindow(gui::name::window::thread_view)
-                    ->setBottomBarText(utils::translate(style::strings::common::reply), BottomBar::Side::CENTER);
+                    ->setNavBarText(utils::translate(style::strings::common::reply), nav_bar::Side::Center);
             }
 
             return true;

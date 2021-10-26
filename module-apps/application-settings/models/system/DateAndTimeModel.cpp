@@ -65,8 +65,8 @@ void DateAndTimeModel::createData()
     timeItem = new gui::SettingsTimeItem(
         utils::translate("app_settings_title_time"),
         gui::TimeWidget::Type::Start,
-        [&](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-        [&]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+        [&](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text, false); },
+        [&]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); });
 
     timeItem->setConnectionToDateItem(dateItem);
 

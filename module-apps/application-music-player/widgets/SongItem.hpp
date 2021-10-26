@@ -19,8 +19,8 @@ namespace gui
         SongItem(const std::string &authorName,
                  const std::string &songName,
                  const std::string &duration,
-                 std::function<void(const UTF8 &)> bottomBarTemporaryMode,
-                 std::function<void()> bottomBarRestoreFromTemporaryMode);
+                 std::function<void(const UTF8 &)> navBarTemporaryMode,
+                 std::function<void()> navBarRestoreFromTemporaryMode);
 
         enum class ItemState
         {
@@ -39,8 +39,8 @@ namespace gui
         TextFixedSize *durationText                                  = nullptr;
         Image *playedSong                                            = nullptr;
         ItemState itemState                                          = ItemState::None;
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode    = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode         = nullptr;
     };
 
 } /* namespace gui */
