@@ -30,7 +30,10 @@ namespace utils::time
         const auto duration = Duration{timestamp};
         const auto timeText = [](time_t hours, time_t minutes) -> std::string {
             if (hours == 0) {
-                if (minutes == 1) {
+                if (minutes == 0) {
+                    return "24 h";
+                }
+                else if (minutes == 1) {
                     return translate("app_bellmain_home_screen_bottom_desc_less_than") + " 1 min";
                 }
                 else {
