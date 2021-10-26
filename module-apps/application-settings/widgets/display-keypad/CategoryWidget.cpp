@@ -32,11 +32,11 @@ namespace gui
 
     CategoryWidget::CategoryWidget(const Quotes::CategoryRecord &categoryRecord,
                                    std::function<void(bool)> enableCategoryCallback,
-                                   std::function<void(const UTF8 &)> bottomBarTemporaryMode,
-                                   std::function<void()> bottomBarRestoreFromTemporaryMode)
+                                   std::function<void(const UTF8 &)> navBarTemporaryMode,
+                                   std::function<void()> navBarRestoreFromTemporaryMode)
         : category(categoryRecord), enableCategory(std::move(enableCategoryCallback)),
-          bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+          navBarTemporaryMode(std::move(navBarTemporaryMode)),
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode))
     {
         setMinimumSize(style::quotes::widget::w, style::quotes::widget::h);
 
@@ -82,12 +82,12 @@ namespace gui
                 setFocusItem(inputBoxLabel);
                 auto bottorBarText =
                     category.enabled ? utils::translate("common_uncheck") : utils::translate("common_check");
-                this->bottomBarTemporaryMode(bottorBarText);
+                this->navBarTemporaryMode(bottorBarText);
             }
             else {
                 descriptionLabel->setFont(style::window::font::medium);
                 setFocusItem(nullptr);
-                this->bottomBarRestoreFromTemporaryMode();
+                this->navBarRestoreFromTemporaryMode();
             }
             return true;
         };
@@ -98,7 +98,7 @@ namespace gui
             tickImage->setVisible(category.enabled);
             auto bottorBarText =
                 category.enabled ? utils::translate("common_uncheck") : utils::translate("common_check");
-            this->bottomBarTemporaryMode(bottorBarText);
+            this->navBarTemporaryMode(bottorBarText);
             hBox->resizeItems();
             return true;
         };

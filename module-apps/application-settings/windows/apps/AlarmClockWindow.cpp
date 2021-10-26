@@ -40,9 +40,9 @@ namespace gui
                     return true;
                 },
                 [&](const UTF8 &text) {
-                    application->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
+                    application->getCurrentWindow()->navBarTemporaryMode(text, nav_bar::Side::Center, false);
                 },
-                [&]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+                [&]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
                 true));
         }
 

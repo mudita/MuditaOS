@@ -98,7 +98,7 @@ namespace gui
             message->setText(sendRequest->textData);
         }
 
-        updateBottomBar();
+        updateNavBar();
     }
 
     bool NewMessageWindow::selectContact()
@@ -165,15 +165,15 @@ namespace gui
         return true;
     }
 
-    void NewMessageWindow::updateBottomBar()
+    void NewMessageWindow::updateNavBar()
     {
         if (getFocusItem() == recipient) {
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
+            navBar->setActive(nav_bar::Side::Left, false);
             if (recipient->getText().empty()) {
-                bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::contacts));
+                navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::contacts));
                 return;
             }
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            navBar->setActive(nav_bar::Side::Center, false);
         }
     }
 
@@ -181,13 +181,13 @@ namespace gui
     {
         namespace msgStyle = style::messages::newMessage;
         AppWindow::buildInterface();
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::options));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         setTitle(utils::translate("sms_title_message"));
 
         const uint32_t w = this->getWidth() - style::window::default_left_margin - style::window::default_right_margin;
-        const uint32_t h = this->getHeight() - style::window::default_vertical_pos - bottomBar->getHeight();
+        const uint32_t h = this->getHeight() - style::window::default_vertical_pos - navBar->getHeight();
         body = new gui::VBox(this, style::window::default_left_margin, style::window::default_vertical_pos, w, h);
 
         auto recipientLabel = new Label(body, 0, 0, body->getWidth(), msgStyle::recipientLabel::h);
@@ -211,7 +211,7 @@ namespace gui
         recipient->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         recipient->activatedCallback    = [=](Item &) -> bool { return selectContact(); };
         recipient->focusChangedCallback = [=](Item &) -> bool {
-            updateBottomBar();
+            updateNavBar();
             return true;
         };
         recipient->inputCallback = [this]([[maybe_unused]] Item &, const InputEvent &inputEvent) -> bool {
@@ -231,7 +231,7 @@ namespace gui
                 contact = nullptr;
                 phoneNumber.clear();
             }
-            updateBottomBar();
+            updateNavBar();
         });
 
         auto img        = new gui::Image(recipientHBox, 0, 0, 0, 0, "phonebook_small");
@@ -250,8 +250,8 @@ namespace gui
         message->setEdges(gui::RectangleEdge::Bottom);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
-            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &text) { navBarTemporaryMode(text); },
+            [=]() { navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         message->setPenFocusWidth(style::window::default_border_focus_w);
         message->setPenWidth(style::window::default_border_rect_no_focus);
@@ -264,8 +264,8 @@ namespace gui
             return true;
         };
         message->focusChangedCallback = [=](Item &) -> bool {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::send));
-            bottomBar->setActive(BottomBar::Side::LEFT, true);
+            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::send));
+            navBar->setActive(nav_bar::Side::Left, true);
             return true;
         };
         message->inputCallback = [=](Item &, const InputEvent &event) {

@@ -28,9 +28,9 @@ namespace app::onBoarding
         AppWindow::buildInterface();
 
         header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::start));
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::start));
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
+        navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::skip));
 
         new gui::Icon(this,
                       0,

@@ -51,8 +51,8 @@ namespace app::music_player
         auto item = new gui::SongItem(song->tags.album.artist,
                                       song->tags.title,
                                       utils::time::Duration(song->audioProperties.songLength).str(),
-                                      bottomBarTemporaryMode,
-                                      bottomBarRestoreFromTemporaryMode);
+                                      navBarTemporaryMode,
+                                      navBarRestoreFromTemporaryMode);
 
         if (songContext.filePath == song->fileInfo.path) {
             item->setState(songContext.isPlaying() ? gui::SongItem::ItemState::Playing
@@ -87,13 +87,13 @@ namespace app::music_player
 
     void SongsModel::createData(OnShortReleaseCallback shortReleaseCallback,
                                 OnLongPressCallback longPressCallback,
-                                OnSetBottomBarTemporaryCallback bottomBarTemporaryMode,
-                                OnRestoreBottomBarTemporaryCallback bottomBarRestoreFromTemporaryMode)
+                                OnSetNavBarTemporaryCallback navBarTemporaryMode,
+                                OnRestoreNavBarTemporaryCallback navBarRestoreFromTemporaryMode)
     {
         this->shortReleaseCallback              = shortReleaseCallback;
         this->longPressCallback                 = longPressCallback;
-        this->bottomBarTemporaryMode            = bottomBarTemporaryMode;
-        this->bottomBarRestoreFromTemporaryMode = bottomBarRestoreFromTemporaryMode;
+        this->navBarTemporaryMode               = navBarTemporaryMode;
+        this->navBarRestoreFromTemporaryMode    = navBarRestoreFromTemporaryMode;
 
         songsRepository->initCache();
     }

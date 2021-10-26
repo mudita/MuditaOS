@@ -39,8 +39,8 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::save));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         auto vBox = new VBox(this,
                              style::window::default_left_margin,
@@ -76,8 +76,8 @@ namespace gui
         authorText->setFont(::style::window::font::medium);
         authorText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
-            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &text) { navBarTemporaryMode(text); },
+            [=]() { navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         authorText->setTextLimitType(gui::TextLimitType::MaxSignsCount, maxAuthorCharactersCount);
 
@@ -105,8 +105,8 @@ namespace gui
         quoteText->setFont(::style::window::font::medium);
         quoteText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
-            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &text) { navBarTemporaryMode(text); },
+            [=]() { navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         quoteText->setTextLimitType(gui::TextLimitType::MaxSignsCount, maxQuoteCharactersCount);
         quoteText->setTextChangedCallback([this](Item &, const UTF8 &text) { setQuoteCharactersCount(text.length()); });

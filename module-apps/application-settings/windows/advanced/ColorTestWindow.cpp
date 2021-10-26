@@ -35,12 +35,12 @@ namespace gui
 
         colorListView->rebuildList();
 
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_settings_toolbar_reset"));
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Left, true);
+        navBar->setText(nav_bar::Side::Left, utils::translate("app_settings_toolbar_reset"));
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::save));
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         applyInputCallback();
 

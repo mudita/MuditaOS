@@ -11,15 +11,14 @@ namespace gui
                                          uint32_t w,
                                          uint32_t h,
                                          const UTF8 &description,
-                                         const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode,
-                                         const std::function<void()> &bottomBarRestoreFromTemporaryMode,
-                                         gui::BottomBar::Side textSide)
+                                         const std::function<void(const UTF8 &text)> &navBarTemporaryMode,
+                                         const std::function<void()> &navBarRestoreFromTemporaryMode,
+                                         gui::nav_bar::Side textSide)
         : HBox{parent, x, y, w, h}
     {
         setEdges(gui::RectangleEdge::None);
 
-        check =
-            new gui::CheckBox(this, 0, 0, 0, 0, bottomBarTemporaryMode, bottomBarRestoreFromTemporaryMode, textSide);
+        check = new gui::CheckBox(this, 0, 0, 0, 0, navBarTemporaryMode, navBarRestoreFromTemporaryMode, textSide);
         check->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         check->setMinimumSize(60, style::window::label::big_h);
         setChecked(true);

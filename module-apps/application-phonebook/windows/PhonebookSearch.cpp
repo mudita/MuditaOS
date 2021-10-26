@@ -22,16 +22,16 @@ namespace gui
         inputField = inputBox(this, utils::translate("common_search_uc"), "search");
         inputField->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
-            [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &Text) { application->getCurrentWindow()->navBarTemporaryMode(Text); },
+            [=]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
             [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
 
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
+        navBar->setActive(nav_bar::Side::Left, false);
+        navBar->setActive(nav_bar::Side::Center, true);
+        navBar->setActive(nav_bar::Side::Right, true);
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::search));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::search));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         setFocusItem(inputField);
     }

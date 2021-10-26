@@ -21,12 +21,10 @@ namespace gui
             },
             [=](Item &item) {
                 if (item.focus) {
-                    mWindow->setBottomBarText(utils::translate(style::strings::common::Switch),
-                                              BottomBar::Side::CENTER);
+                    mWindow->setNavBarText(utils::translate(style::strings::common::Switch), nav_bar::Side::Center);
                 }
                 else {
-                    mWindow->setBottomBarText(utils::translate(style::strings::common::select),
-                                              BottomBar::Side::CENTER);
+                    mWindow->setNavBarText(utils::translate(style::strings::common::select), nav_bar::Side::Center);
                 }
                 return true;
             },

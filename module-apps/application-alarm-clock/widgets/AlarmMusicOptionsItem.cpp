@@ -11,10 +11,10 @@ namespace gui
     AlarmMusicOptionsItem::AlarmMusicOptionsItem(app::ApplicationCommon *app,
                                                  const std::string &description,
                                                  std::shared_ptr<SoundsPlayer> player,
-                                                 std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
-                                                 std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : AlarmOptionsItem(description), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+                                                 std::function<void(const UTF8 &text)> navBarTemporaryMode,
+                                                 std::function<void()> navBarRestoreFromTemporaryMode)
+        : AlarmOptionsItem(description), navBarTemporaryMode(std::move(navBarTemporaryMode)),
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode))
     {
         assert(app != nullptr);
 
@@ -29,18 +29,17 @@ namespace gui
             if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 if (!player->previouslyPlayed(getFilePath(optionSpinner->getCurrentValue())) ||
                     player->isInState(SoundsPlayer::State::Stopped)) {
-                    player->play(getFilePath(optionSpinner->getCurrentValue()), [=]() {
-                        this->bottomBarTemporaryMode(utils::translate(style::strings::common::play));
-                    });
-                    this->bottomBarTemporaryMode(utils::translate(style::strings::common::pause));
+                    player->play(getFilePath(optionSpinner->getCurrentValue()),
+                                 [=]() { this->navBarTemporaryMode(utils::translate(style::strings::common::play)); });
+                    this->navBarTemporaryMode(utils::translate(style::strings::common::pause));
                 }
                 else if (player->isInState(SoundsPlayer::State::Paused)) {
                     player->resume();
-                    this->bottomBarTemporaryMode(utils::translate(style::strings::common::pause));
+                    this->navBarTemporaryMode(utils::translate(style::strings::common::pause));
                 }
                 else {
                     player->pause();
-                    this->bottomBarTemporaryMode(utils::translate(style::strings::common::play));
+                    this->navBarTemporaryMode(utils::translate(style::strings::common::play));
                 }
             }
 
@@ -52,10 +51,10 @@ namespace gui
 
             if (res && player->previouslyPlayed(getFilePath(optionSpinner->getCurrentValue())) &&
                 player->isInState(SoundsPlayer::State::Playing)) {
-                this->bottomBarTemporaryMode(utils::translate(style::strings::common::pause));
+                this->navBarTemporaryMode(utils::translate(style::strings::common::pause));
             }
             else if (res) {
-                this->bottomBarTemporaryMode(utils::translate(style::strings::common::play));
+                this->navBarTemporaryMode(utils::translate(style::strings::common::play));
             }
 
             return res;
@@ -65,10 +64,10 @@ namespace gui
             setFocusItem(focus ? optionSpinner : nullptr);
 
             if (focus) {
-                this->bottomBarTemporaryMode(utils::translate(style::strings::common::play));
+                this->navBarTemporaryMode(utils::translate(style::strings::common::play));
             }
             else {
-                this->bottomBarRestoreFromTemporaryMode();
+                this->navBarRestoreFromTemporaryMode();
             }
 
             // stop preview playback when we loose focus

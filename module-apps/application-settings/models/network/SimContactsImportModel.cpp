@@ -54,8 +54,8 @@ void SimContactsImportModel::createData(const std::vector<ContactRecord> &import
     for (const auto &record : importedRecords) {
         internalData.push_back(new gui::SimContactImportSelectWidget(
             record.primaryName + " " + record.alternativeName,
-            [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+            [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text, false); },
+            [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); }));
     }
 
     for (auto item : internalData) {

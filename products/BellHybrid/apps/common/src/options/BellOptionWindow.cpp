@@ -27,7 +27,7 @@ namespace gui
 
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
 
         optionsList = new gui::ListViewWithArrows(this, 0, 0, style::window_width, style::window_height, optionsModel);
         optionsList->applySizeRestrictions(style::bell_options_list::w,

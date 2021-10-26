@@ -5,7 +5,7 @@
 
 #include "BoxLayout.hpp"
 #include "Image.hpp"
-#include "BottomBar.hpp"
+#include "NavBar.hpp"
 
 namespace gui
 {
@@ -13,9 +13,9 @@ namespace gui
     {
         bool checkState                                              = false;
         Image *image                                                 = nullptr;
-        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
-        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
-        BottomBar::Side bottomBarSide                                = BottomBar::Side::LEFT;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode    = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode         = nullptr;
+        nav_bar::Side navBarSide                                     = nav_bar::Side::Left;
 
         void applyCallbacks();
 
@@ -25,9 +25,9 @@ namespace gui
                  const uint32_t &y,
                  const uint32_t &w,
                  const uint32_t &h,
-                 const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode = nullptr,
-                 const std::function<void()> &bottomBarRestoreFromTemporaryMode      = nullptr,
-                 BottomBar::Side bottomBarSide                                       = BottomBar::Side::LEFT);
+                 const std::function<void(const UTF8 &text)> &navBarTemporaryMode = nullptr,
+                 const std::function<void()> &navBarRestoreFromTemporaryMode      = nullptr,
+                 nav_bar::Side navBarSide                                         = nav_bar::Side::Left);
 
         void setCheck(bool state);
         bool isChecked();

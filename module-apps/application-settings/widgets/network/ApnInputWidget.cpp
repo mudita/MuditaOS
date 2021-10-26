@@ -10,8 +10,8 @@
 namespace gui
 {
     ApnInputWidget::ApnInputWidget(settingsInternals::ListItemName listItemName,
-                                   std::function<void(const UTF8 &)> bottomBarTemporaryMode,
-                                   std::function<void()> bottomBarRestoreFromTemporaryMode,
+                                   std::function<void(const UTF8 &)> navBarTemporaryMode,
+                                   std::function<void()> navBarRestoreFromTemporaryMode,
                                    std::function<void()> selectSpecialCharacter,
                                    std::function<void(const std::string &text)> contentChanged,
                                    unsigned int lines)
@@ -46,8 +46,8 @@ namespace gui
         inputText->setFont(style::window::font::medium);
         inputText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
-            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &text) { navBarTemporaryMode(text); },
+            [=]() { navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         inputText->setPenFocusWidth(style::window::default_border_focus_w);
         inputText->setPenWidth(style::window::default_border_no_focus_w);

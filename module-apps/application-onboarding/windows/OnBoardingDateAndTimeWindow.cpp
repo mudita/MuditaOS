@@ -29,9 +29,9 @@ namespace app::onBoarding
         DateAndTimeMainWindow::onBeforeShow(mode, data);
         header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
 
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::Switch));
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::save));
+        navBar->setText(gui::nav_bar::Side::Left, utils::translate(style::strings::common::Switch));
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
     }
 
     bool OnBoardingDateAndTimeWindow::onInput(const gui::InputEvent &inputEvent)
@@ -63,15 +63,15 @@ namespace app::onBoarding
         }
     }
 
-    bool OnBoardingDateAndTimeWindow::bottomBarCallback(gui::Item &item)
+    bool OnBoardingDateAndTimeWindow::navBarCallback(gui::Item &item)
     {
-        setBottomBarText(utils::translate(style::strings::common::save), gui::BottomBar::Side::CENTER);
+        setNavBarText(utils::translate(style::strings::common::save), gui::nav_bar::Side::Center);
 
         if (item.focus) {
-            setBottomBarText(utils::translate(style::strings::common::Switch), gui::BottomBar::Side::LEFT);
+            setNavBarText(utils::translate(style::strings::common::Switch), gui::nav_bar::Side::Left);
         }
         else {
-            setBottomBarText(utils::translate(style::strings::common::select), gui::BottomBar::Side::LEFT);
+            setNavBarText(utils::translate(style::strings::common::select), gui::nav_bar::Side::Left);
         }
         return true;
     }

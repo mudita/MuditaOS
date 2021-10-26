@@ -18,7 +18,7 @@ namespace gui
 
         [[nodiscard]] auto makeCustomIcon(const UTF8 &image,
                                           std::function<bool(Item &)> onActivated,
-                                          std::string bottomBarActivatedName) -> ImageBox *;
+                                          std::string navBarActivatedName) -> ImageBox *;
         [[nodiscard]] auto makeSMSIcon(const utils::PhoneNumber::View &number) -> ImageBox *;
         [[nodiscard]] auto makeCallIcon(const utils::PhoneNumber::View &number) -> ImageBox *;
         [[nodiscard]] auto makeAddContactIcon(const std::shared_ptr<ContactRecord> &contact) -> ImageBox *;

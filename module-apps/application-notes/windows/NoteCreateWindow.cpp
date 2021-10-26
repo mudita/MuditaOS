@@ -15,7 +15,7 @@ namespace app::notes
     bool NoteCreateWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
-            if (!bottomBar->isActive(gui::BottomBar::Side::CENTER)) {
+            if (!navBar->isActive(gui::nav_bar::Side::Center)) {
                 return false;
             }
         }
@@ -25,6 +25,6 @@ namespace app::notes
     void NoteCreateWindow::onCharactersCountChanged(std::uint32_t count)
     {
         NoteEditWindow::onCharactersCountChanged(count);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, count != 0U);
+        navBar->setActive(gui::nav_bar::Side::Center, count != 0U);
     }
 } // namespace app::notes

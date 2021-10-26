@@ -69,8 +69,8 @@ namespace gui
                 gui::option::SettingRightItem::ArrowWhite));
         }
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         return optList;
     }

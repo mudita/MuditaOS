@@ -22,10 +22,10 @@ namespace gui
         AppWindow::buildInterface();
         setTitle(utils::translate("app_settings_date_and_time"));
 
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
+        navBar->setActive(gui::nav_bar::Side::Right, true);
+        navBar->setActive(gui::nav_bar::Side::Center, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::save));
 
         list = new gui::ListView(this,
                                  style::window::date_and_time::listView_x,

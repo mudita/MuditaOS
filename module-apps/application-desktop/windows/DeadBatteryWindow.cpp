@@ -33,7 +33,7 @@ namespace gui
     void DeadBatteryWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
         statusBar->setVisible(false);
         new gui::Image(this, imgPositionX, imgPositionY, 0, 0, "dead_battery_W_G");
     }

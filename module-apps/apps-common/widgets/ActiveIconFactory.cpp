@@ -19,16 +19,15 @@ ActiveIconFactory::ActiveIconFactory(app::ApplicationCommon *app) : app{app}
 
 auto ActiveIconFactory::makeCustomIcon(const UTF8 &image,
                                        std::function<bool(Item &)> onActivated,
-                                       std::string bottomBarActivatedName) -> ImageBox *
+                                       std::string navBarActivatedName) -> ImageBox *
 {
     auto icon = new ImageBox(nullptr, 0, 0, style::widgets::iconsSize, style::widgets::iconsSize, new Image(image));
     icon->activeItem           = onActivated.operator bool();
     icon->activatedCallback    = std::move(onActivated);
-    icon->focusChangedCallback = [icon, application = app, name = std::move(bottomBarActivatedName)](Item &item) {
+    icon->focusChangedCallback = [icon, application = app, name = std::move(navBarActivatedName)](Item &item) {
         if (icon->focus) {
             icon->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
-            application->getCurrentWindow()->bottomBarTemporaryMode(
-                utils::translate(name), BottomBar::Side::CENTER, false);
+            application->getCurrentWindow()->navBarTemporaryMode(utils::translate(name), nav_bar::Side::Center, false);
         }
         else {
             icon->setEdges(RectangleEdge::None);

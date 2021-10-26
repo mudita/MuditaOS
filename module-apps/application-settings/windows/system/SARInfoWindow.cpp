@@ -35,8 +35,8 @@ namespace gui
         sarInfoText->setEditMode(gui::EditMode::Scroll);
         sarInfoText->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
+        navBar->setActive(gui::nav_bar::Side::Right, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
 
         setFocusItem(sarInfoText);
     }

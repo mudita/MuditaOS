@@ -19,8 +19,8 @@ namespace gui
     void InformationWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Right, true);
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         setTitle(gui::window::name::information);
 

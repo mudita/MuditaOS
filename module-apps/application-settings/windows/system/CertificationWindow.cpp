@@ -22,7 +22,7 @@ namespace gui
 
         setTitle(utils::translate("app_settings_certification"));
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         auto body = new VBox(this,
                              style::window::default_left_margin,

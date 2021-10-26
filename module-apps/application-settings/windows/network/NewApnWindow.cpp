@@ -26,8 +26,8 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::save));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         setTitle(utils::translate("app_settings_new_edit_apn"));
 
@@ -88,7 +88,7 @@ namespace gui
 
     void NewApnWindow::setSaveButtonVisible(bool visible)
     {
-        bottomBar->setActive(BottomBar::Side::CENTER, visible);
+        navBar->setActive(nav_bar::Side::Center, visible);
     }
 
     auto NewApnWindow::onInput(const InputEvent &inputEvent) -> bool

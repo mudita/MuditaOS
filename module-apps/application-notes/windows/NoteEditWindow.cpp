@@ -75,8 +75,8 @@ namespace app::notes
         edit->setFont(::style::window::font::medium);
         edit->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
-            [=]() { bottomBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &text) { navBarTemporaryMode(text); },
+            [=]() { navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         edit->setTextChangedCallback([this](Item &, const UTF8 &text) {
             const auto count = text.length();
@@ -85,14 +85,14 @@ namespace app::notes
         });
         edit->setTextLimitType(gui::TextLimitType::MaxSignsCount, MaxCharactersCount);
 
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::options));
+        navBar->setActive(gui::nav_bar::Side::Left, true);
+        navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::options));
 
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::save));
+        navBar->setActive(gui::nav_bar::Side::Center, true);
+        navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::save));
 
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
+        navBar->setActive(gui::nav_bar::Side::Right, true);
+        navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
 
         setFocusItem(edit);
     }

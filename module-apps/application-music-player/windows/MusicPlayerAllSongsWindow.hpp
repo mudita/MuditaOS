@@ -29,8 +29,8 @@ namespace gui
         void updateSongProgress(float progres) override
         {}
         void refreshWindow() override;
-        void setBottomBarTemporaryMode(const std::string &text) override;
-        void restoreFromBottomBarTemporaryMode() override;
+        void setNavBarTemporaryMode(const std::string &text) override;
+        void restoreFromNavBarTemporaryMode() override;
 
       private:
         std::shared_ptr<app::music_player::SongsContract::Presenter> presenter;

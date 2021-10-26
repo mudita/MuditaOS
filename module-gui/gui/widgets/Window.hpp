@@ -14,8 +14,10 @@ namespace gui
     ///
     /// It consists of:
     /// 1. StatusBar
-    /// 2. BottomBar
-    /// 3. Body defined per window between StatusBar and BottomBar
+    /// 2. Header
+    /// 3. Body
+    /// 4. NavBar
+    /// More in WINDOW.md
     ///
     /// All window switches are done based on Window::name and SwitchData
     /// All windows are statically build at start of application, and removed on application end

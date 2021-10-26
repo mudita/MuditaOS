@@ -24,7 +24,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
+        navBar->setActive(nav_bar::Side::Center, true);
 
         clockDate = new ClockDateWidget(
             this, 0, style::window::default_vertical_pos, style::window_width, clock_date_widget::h);
@@ -179,12 +179,11 @@ namespace gui
         if (focusItem != nullptr) {
             return;
         }
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_menu"));
+        navBar->setText(nav_bar::Side::Center, utils::translate("app_desktop_menu"));
         const auto tetheringNotActive = !notificationsModel->isTetheringOn();
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_calls"), tetheringNotActive);
+        navBar->setText(nav_bar::Side::Left, utils::translate("app_desktop_calls"), tetheringNotActive);
         const auto hasDismissibleNotification = notificationsModel->hasDismissibleNotification();
-        bottomBar->setText(
-            BottomBar::Side::RIGHT, utils::translate("app_desktop_clear_all"), hasDismissibleNotification);
+        navBar->setText(nav_bar::Side::Right, utils::translate("app_desktop_clear_all"), hasDismissibleNotification);
 
         inputCallback = [this, hasDismissibleNotification, tetheringNotActive]([[maybe_unused]] Item &item,
                                                                                const InputEvent &inputEvent) -> bool {

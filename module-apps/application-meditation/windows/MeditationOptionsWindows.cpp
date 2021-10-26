@@ -51,7 +51,7 @@ void MeditationOptionsWindow::addCounterOption(std::list<Option> &options)
         },
         [=](gui::Item &item) {
             if (item.focus) {
-                setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
+                setNavBarText(utils::translate(style::strings::common::Switch), nav_bar::Side::Center);
             }
             return true;
         },
@@ -69,7 +69,7 @@ void MeditationOptionsWindow::addPreparationTimeOption(std::list<Option> &option
         },
         [=](gui::Item &item) {
             if (item.focus) {
-                setBottomBarText(utils::translate(style::strings::common::select), BottomBar::Side::CENTER);
+                setNavBarText(utils::translate(style::strings::common::select), nav_bar::Side::Center);
             }
             return true;
         },
@@ -81,8 +81,8 @@ PreparationTimeWindow::PreparationTimeWindow(app::ApplicationCommon *app)
     : OptionWindow(app, app::window::name::meditation_preparation)
 {
     setTitle(utils::translate("app_meditation_preparation_time"));
-    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+    navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
+    navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
     addOptions(buildOptionsList());
 }
 

@@ -14,8 +14,8 @@ namespace gui
       public:
         SettingsTimeItem(const std::string &description,
                          TimeWidget::Type type,
-                         const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode,
-                         const std::function<void()> &bottomBarRestoreFromTemporaryMode);
+                         const std::function<void(const UTF8 &text)> &navBarTemporaryMode,
+                         const std::function<void()> &navBarRestoreFromTemporaryMode);
 
         void setConnectionToSecondItem(SettingsTimeItem *item);
         void setConnectionToDateItem(SettingsDateItem *item);

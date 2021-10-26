@@ -29,7 +29,7 @@ namespace gui
         bool selectContact();
         bool sendSms();
         bool switchToThreadWindow(const utils::PhoneNumber::View &number);
-        void updateBottomBar();
+        void updateNavBar();
         auto getPhoneNumber() const -> utils::PhoneNumber;
         auto handleMessageText() -> bool;
         auto addDraft(const utils::PhoneNumber &number) -> bool;

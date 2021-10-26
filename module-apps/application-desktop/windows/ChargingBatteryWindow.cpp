@@ -33,7 +33,7 @@ namespace gui
     void ChargingBatteryWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setVisible(false);
+        navBar->setVisible(false);
         statusBar->setVisible(false);
         new gui::Image(this, imgPositionX, imgPositionY, 0, 0, "charging_battery_W_G");
     }

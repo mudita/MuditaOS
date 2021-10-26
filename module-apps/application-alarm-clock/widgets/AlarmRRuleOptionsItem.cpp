@@ -10,11 +10,11 @@ namespace gui
     AlarmRRuleOptionsItem::AlarmRRuleOptionsItem(app::ApplicationCommon *app,
                                                  const std::string &description,
                                                  std::shared_ptr<app::alarmClock::AlarmRRulePresenter> presenter,
-                                                 std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
-                                                 std::function<void()> bottomBarRestoreFromTemporaryMode)
+                                                 std::function<void(const UTF8 &text)> navBarTemporaryMode,
+                                                 std::function<void()> navBarRestoreFromTemporaryMode)
         : AlarmOptionsItem(description), AlarmRRuleItem(std::move(presenter)), app(app),
-          bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+          navBarTemporaryMode(std::move(navBarTemporaryMode)),
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode))
     {
         printOptions();
 
@@ -22,13 +22,13 @@ namespace gui
             auto ret = optionSpinner->onInput(event);
 
             if (getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom) {
-                this->bottomBarTemporaryMode(utils::translate(style::strings::common::edit));
+                this->navBarTemporaryMode(utils::translate(style::strings::common::edit));
                 if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                     this->app->switchWindow(style::alarmClock::window::name::customRepeat);
                 }
             }
             else {
-                this->bottomBarRestoreFromTemporaryMode();
+                this->navBarRestoreFromTemporaryMode();
             }
 
             return ret;
@@ -38,10 +38,10 @@ namespace gui
             setFocusItem(focus ? optionSpinner : nullptr);
 
             if (getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom) {
-                this->bottomBarTemporaryMode(utils::translate(style::strings::common::edit));
+                this->navBarTemporaryMode(utils::translate(style::strings::common::edit));
             }
             else {
-                this->bottomBarRestoreFromTemporaryMode();
+                this->navBarRestoreFromTemporaryMode();
             }
 
             return true;

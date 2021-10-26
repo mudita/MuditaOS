@@ -17,11 +17,11 @@ namespace gui
                      UpdateCallback updateCallback,
                      uint8_t maxValue,
                      uint8_t startValue,
-                     std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
-                     std::function<void()> bottomBarRestoreFromTemporaryMode)
+                     std::function<void(const UTF8 &text)> navBarTemporaryMode,
+                     std::function<void()> navBarRestoreFromTemporaryMode)
         : HBox(parent, style::window::default_left_margin), updateBarCallback(std::move(updateCallback)),
-          bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
+          navBarTemporaryMode(std::move(navBarTemporaryMode)),
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode))
     {
         setMinimumSize(style::window::default_body_width, style::window::label::big_h);
         setPenWidth(style::window::default_border_no_focus_w);
@@ -39,13 +39,13 @@ namespace gui
             resizeItems();
 
             if (item.focus) {
-                if (this->bottomBarTemporaryMode) {
-                    this->bottomBarTemporaryMode("");
+                if (this->navBarTemporaryMode) {
+                    this->navBarTemporaryMode("");
                 }
             }
             else {
-                if (this->bottomBarRestoreFromTemporaryMode) {
-                    this->bottomBarRestoreFromTemporaryMode();
+                if (this->navBarRestoreFromTemporaryMode) {
+                    this->navBarRestoreFromTemporaryMode();
                 }
             }
             return true;

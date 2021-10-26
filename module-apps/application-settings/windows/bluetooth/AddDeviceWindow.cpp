@@ -50,7 +50,7 @@ namespace gui
                 gui::option::SettingRightItem::Bt));
         }
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::add));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::add));
 
         return optionsList;
     }

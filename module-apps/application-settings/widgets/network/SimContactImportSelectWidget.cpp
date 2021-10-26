@@ -7,22 +7,15 @@ namespace gui
 {
     SimContactImportSelectWidget::SimContactImportSelectWidget(
         const std::string &contactName,
-        const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode,
-        const std::function<void()> &bottomBarRestoreFromTemporaryMode)
+        const std::function<void(const UTF8 &text)> &navBarTemporaryMode,
+        const std::function<void()> &navBarRestoreFromTemporaryMode)
     {
         setEdges(RectangleEdge::None);
         setMinimumSize(style::window::default_body_width, style::window::label::big_h);
         setMargins(gui::Margins(style::widgets::leftMargin, style::margins::big, 0, 0));
 
-        checkBoxWithLabel = new gui::CheckBoxWithLabel(this,
-                                                       0,
-                                                       0,
-                                                       0,
-                                                       0,
-                                                       contactName,
-                                                       bottomBarTemporaryMode,
-                                                       bottomBarRestoreFromTemporaryMode,
-                                                       BottomBar::Side::LEFT);
+        checkBoxWithLabel = new gui::CheckBoxWithLabel(
+            this, 0, 0, 0, 0, contactName, navBarTemporaryMode, navBarRestoreFromTemporaryMode, nav_bar::Side::Left);
 
         inputCallback = [&]([[maybe_unused]] Item &item, const InputEvent &event) {
             return checkBoxWithLabel->onInput(event);

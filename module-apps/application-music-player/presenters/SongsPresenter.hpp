@@ -28,8 +28,8 @@ namespace app::music_player
                                           RecordState state)                = 0;
             virtual void updateSongProgress(float progress)                 = 0;
             virtual void refreshWindow()                                    = 0;
-            virtual void setBottomBarTemporaryMode(const std::string &text) = 0;
-            virtual void restoreFromBottomBarTemporaryMode()                = 0;
+            virtual void setNavBarTemporaryMode(const std::string &text)    = 0;
+            virtual void restoreFromNavBarTemporaryMode()                   = 0;
         };
 
         class Presenter : public BasePresenter<SongsContract::View>
@@ -98,8 +98,8 @@ namespace app::music_player
 
         /// Request state dependant audio operation
         bool requestAudioOperation(const std::string &filePath = "");
-        void setViewBottomBarTemporaryMode(const std::string &text);
-        void restoreViewBottomBarFromTemporaryMode();
+        void setViewNavBarTemporaryMode(const std::string &text);
+        void restoreViewNavBarFromTemporaryMode();
         std::shared_ptr<SongsModelInterface> songsModelInterface;
         std::unique_ptr<AbstractAudioOperations> audioOperations;
         std::function<void(SongState)> changePlayingStateCallback = nullptr;

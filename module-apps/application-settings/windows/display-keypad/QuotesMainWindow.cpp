@@ -35,9 +35,9 @@ namespace gui
         setTitle(utils::translate("app_settings_display_wallpaper_quotes"));
         header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::check));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::check));
+        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
+        navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::options));
 
         list = new gui::ListView(this,
                                  style::quotes::list::X,

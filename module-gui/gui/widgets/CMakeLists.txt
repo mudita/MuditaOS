@@ -3,7 +3,7 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Arc.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/BottomBar.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/NavBar.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/CheckBox.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Circle.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Icon.cpp"
@@ -66,7 +66,7 @@ target_sources( ${PROJECT_NAME}
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Arc.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/BottomBar.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/NavBar.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Circle.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Image.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/ImageBox.hpp"
