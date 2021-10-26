@@ -13,7 +13,7 @@ namespace
         case Type::Alarm:
             return audio::PlaybackType::Alarm;
         case Type::Chime:
-            return audio::PlaybackType::Alarm;
+            return audio::PlaybackType::Multimedia;
         case Type::PreWakeup:
             return audio::PlaybackType::Alarm;
         case Type::Bedtime:
