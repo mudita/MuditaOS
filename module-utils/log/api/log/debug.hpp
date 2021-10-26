@@ -18,3 +18,4 @@
 #define DEBUG_TIMER                  0 /// debug timers system utility
 #define DEBUG_SETTINGS_DB            0 /// show extensive settings logs for all applications
 #define DEBUG_SERVICE_CELLULAR       0 /// show various logs in cellular service
+#define DEBUG_MISSING_ASSETS         1 /// show debug concerning missing assets
