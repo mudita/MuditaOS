@@ -30,7 +30,7 @@ namespace app::bell_settings
 
         auto saveData() -> void;
 
-        auto loadData() -> void;
+        virtual auto loadData() -> void;
 
         auto createData() -> void;
 
@@ -45,7 +45,7 @@ namespace app::bell_settings
         [[nodiscard]] auto getTemperatureUnit() const -> utils::temperature::Temperature::Unit;
         auto setTemperatureUnit(utils::temperature::Temperature::Unit unit) -> void;
 
-      private:
+      protected:
         app::ApplicationCommon *application{};
         gui::TimeSetListItem *timeSetListItem{};
         gui::TimeFormatSetListItem *timeFmtSetListItem{};
@@ -54,5 +54,16 @@ namespace app::bell_settings
         void sendRtcUpdateTimeMessage(time_t newTime);
 
         void sendTimeFmtUpdateMessage(utils::time::Locale::TimeFormat newFmt);
+    };
+
+    class TimeUnitsModelFactoryResetValues : public TimeUnitsModel
+    {
+      public:
+        using TimeUnitsModel::TimeUnitsModel;
+        auto loadData() -> void override;
+
+      private:
+        static constexpr int factoryResetTime    = 60 * 60 * 12; // noon
+        static constexpr auto factoryRestTimeFmt = utils::time::Locale::TimeFormat::FormatTime12H;
     };
 } // namespace app::bell_settings

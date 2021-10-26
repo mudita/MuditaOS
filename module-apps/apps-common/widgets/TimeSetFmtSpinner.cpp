@@ -66,10 +66,10 @@ namespace gui
         switch (newFormat) {
         case utils::time::Locale::TimeFormat::FormatTime12H: {
             fmt->setVisible(true);
+            auto hours = std::chrono::hours(timeSetSpinner->getHour());
             timeSetSpinner->setHourRange(time::Locale::min_hour_12H_mode, time::Locale::max_hour_12H_mode);
 
             if (timeFormat != newFormat) {
-                auto hours = std::chrono::hours(timeSetSpinner->getHour());
                 timeSetSpinner->setHour(date::make12(hours).count());
                 if (date::is_pm(hours)) {
                     fmt->setCurrentValue(time::Locale::getPM());
@@ -82,10 +82,10 @@ namespace gui
         } break;
         case utils::time::Locale::TimeFormat::FormatTime24H: {
             fmt->setVisible(false);
+            auto hours = std::chrono::hours(timeSetSpinner->getHour());
             timeSetSpinner->setHourRange(time::Locale::min_hour_24H_mode, time::Locale::max_hour_24H_mode);
 
             if (newFormat != timeFormat) {
-                auto hours = std::chrono::hours(timeSetSpinner->getHour());
                 timeSetSpinner->setHour(date::make24(hours, isPM()).count());
 
                 if (focusItem == fmt) {
