@@ -63,7 +63,7 @@ namespace gui
             textHBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
 
             const auto font  = style::window::font::medium;
-            auto imageWidget = new gui::Image(image, gui::ImageTypeSpecifier::W_M);
+            auto imageWidget = new gui::Image(image, ImageTypeSpecifier::W_M);
             imageWidget->setMargins(margins);
             textHBox->addWidget(imageWidget);
             textHBox->addWidget(createText(text, font));

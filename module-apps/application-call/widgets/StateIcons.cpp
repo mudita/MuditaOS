@@ -10,14 +10,14 @@ namespace gui
     {
         constexpr auto crossImg      = "cross";
         constexpr auto addContactStr = "app_call_contact";
-        constexpr auto messageImg    = "mail";
+        constexpr auto messageImg    = "call_message";
         constexpr auto sendSmstStr   = "app_call_message";
-        constexpr auto muteImg       = "microphone_on";
-        constexpr auto mutedImg      = "microphone_off";
+        constexpr auto muteImg       = "call_mute";
+        constexpr auto mutedImg      = "call_mute_on";
         constexpr auto muteStr       = "app_call_mute";
         constexpr auto mutedStr      = "app_call_muted";
-        constexpr auto speakerImg    = "speaker_off";
-        constexpr auto speakerOnImg  = "speaker_on";
+        constexpr auto speakerImg    = "call_speaker";
+        constexpr auto speakerOnImg  = "call_speaker_on";
         constexpr auto speakerStr    = "app_call_speaker";
         constexpr auto speakerOnStr  = "app_call_speaker_on";
 

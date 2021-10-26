@@ -37,6 +37,21 @@ namespace callLogStyle
             constexpr inline auto rows = 2;
             constexpr inline auto h    = rows * widget::smallH;
         } // namespace date
+
+        namespace noCalls
+        {
+            constexpr inline auto infoHeight                = 33;
+            constexpr inline auto infoTopMargin             = 195;
+            constexpr inline auto divLineTopMargin          = 90;
+            constexpr inline auto bottomBoxWidth            = 332;
+            constexpr inline auto bottomBoxHeight           = 132;
+            constexpr inline auto bottomBoxMargin           = 72;
+            constexpr inline auto infoIconMargin            = 2;
+            constexpr inline auto descriptionSize           = 32;
+            constexpr inline auto descriptionLeftMargin     = 55;
+            constexpr inline auto descriptionInternalMargin = 5;
+            constexpr inline auto descriptionTextWidth      = 105;
+        } // namespace noCalls
     }     // namespace detailsWindow
 
     // MAIN WINDOW
