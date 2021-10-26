@@ -346,6 +346,7 @@
   "app_settings_net": "Netzwerk",
   "app_settings_disp_key": "Display und Tastenfeld",
   "app_settings_display_display_light": "Displaylicht",
+  "app_settings_display_dark_mode": "Dunkelmodus (Beta)",
   "app_settings_display_light_main": "Frontlicht",
   "app_settings_display_light_auto": "Automatisch",
   "app_settings_display_light_brightness": "Helligkeit",
