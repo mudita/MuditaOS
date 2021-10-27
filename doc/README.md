@@ -31,7 +31,7 @@ firefox build/doc/html/index.html
     - [Running MuditaOS on a phone](running_on_phone.md)
     - [Windows and macOS - flashing Pure with image](flashing_win_macos.md)
     - [Test harness](../test/README.md)
-    - [Tethering](../tethering.md)
+    - [Tethering](tethering.md)
 
 - Developer Guides
     - [Coding Guidelines](./MuditaCppCodingGuidelines.md)
@@ -39,7 +39,7 @@ firefox build/doc/html/index.html
     - Modules
         - Applications
             - [Desktop](../module-apps/application-desktop/doc/README.md)
-            - [Notifications](../module-apps/notifications/README.md)
+            - [Notifications](../module-apps/apps-common/notifications/README.md)
         - [Audio](../module-audio/README.md)
         - [Bluetooth](../module-bluetooth/README.md)
         - Database
