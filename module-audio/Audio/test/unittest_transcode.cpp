@@ -347,9 +347,11 @@ TEST(Transform, BasicInterpolator)
 
     std::uint16_t inputBuffer[8]          = {1, 2, 3, 4, 0, 0, 0, 0};
     static const uint16_t expectBuffer[8] = {1, 2, 1, 2, 3, 4, 3, 4};
-    auto inputSpan  = ::audio::AbstractStream::Span{.data     = reinterpret_cast<uint8_t *>(inputBuffer),
+    auto inputSpan      = ::audio::AbstractStream::Span{.data     = reinterpret_cast<uint8_t *>(inputBuffer),
                                                    .dataSize = 4 * sizeof(std::uint16_t)};
-    auto outputSpan = interp2.transform(inputSpan, inputSpan);
+    auto transformSpace = ::audio::AbstractStream::Span{.data     = reinterpret_cast<uint8_t *>(inputBuffer),
+                                                        .dataSize = 8 * sizeof(std::uint16_t)};
+    auto outputSpan     = interp2.transform(inputSpan, transformSpace);
 
     EXPECT_EQ(outputSpan.dataSize, sizeof(uint16_t) * 8);
     EXPECT_EQ(memcmp(outputSpan.data, expectBuffer, outputSpan.dataSize), 0);
