@@ -9,6 +9,7 @@
 
 #include <type_traits>
 
+#include <cassert>
 #include <cstdint>
 
 namespace audio::transcode
@@ -33,8 +34,9 @@ namespace audio::transcode
         /**
          * @brief Integer type to be used to read and write data from/to a buffer.
          */
-        using IntegerType = typename decltype(
-            utils::integer::getIntegerType<sizeof(SampleType) * utils::integer::BitsInByte * Channels>())::type;
+        using IntegerType =
+            typename decltype(utils::integer::getIntegerType<sizeof(SampleType) * utils::integer::BitsInByte *
+                                                             Channels>())::type;
 
       public:
         auto transformBlockSize(std::size_t blockSize) const noexcept -> std::size_t override
@@ -63,6 +65,8 @@ namespace audio::transcode
             auto outputSpan     = Span{.data = transformSpace.data, .dataSize = transformBlockSize(inputSpan.dataSize)};
             IntegerType *input  = reinterpret_cast<IntegerType *>(inputSpan.data);
             IntegerType *output = reinterpret_cast<IntegerType *>(outputSpan.data);
+
+            assert(outputSpan.dataSize <= transformSpace.dataSize);
 
             for (unsigned i = inputSpan.dataSize / sizeof(IntegerType); i > 0; i--) {
                 for (unsigned j = 1; j <= Ratio; j++) {
