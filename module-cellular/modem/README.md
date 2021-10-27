@@ -1,13 +1,12 @@
 # Cellular Multiplexer
 
 ## Table of contents
-1. [History](#history)
-2. [Modes](#modes)
-3. [Single command data flow](#singlecmd)
-5. [Cellular result structures](#result)
-6. [Error codes](#errors)
+1. [Modes](#modes)
+2. [Single command data flow](#single-command-data-flow)
+3. [Cellular result structures](#result-structs)
+4. [Error codes](#error-codes)
 
-## Modes <a name="modes"></a>
+## Modes
 Cellular operates in three modes:
  - AT,
  - CMUX setup,
@@ -26,7 +25,7 @@ Data flow for both CMUX and CMUX setup in current implementation is identical.
 
 For more details, see [channel implementation](./doc/ATStream.md).
 
-## Single command data flow <a name="singlecmd"></a>
+## Single command data flow
 ![alt text](./doc/Images/single_cmd_transmission.png "Single command sequence")
 
 A single command sequence starts with a call from the Service and can end in one of three ways:
@@ -34,7 +33,7 @@ A single command sequence starts with a call from the Service and can end in one
  - Service receives an error in result and handles it accordingly. 
  - Command response is successfully parsed before timeout and passed to service layer.
 
-## Result structs <a name="result"></a>
+## Result structs
 
 Currently, there are two types of structs used to pass data between contexts.
 
@@ -48,7 +47,7 @@ result code. This struct has variable size.
 
 ![alt text](./doc/Images/cellular_result_struct.png "Cellular result struct")
 
-## Error codes <a name="errors"></a>
+## Error codes
 
 
 ![alt text](./doc/Images/class_channel.png "Class diagram for channel")

@@ -4,7 +4,7 @@
 - [Setting up in Eclipse](#setting-up-in-eclipse)
 - [Setting up in CLion](#setting-up-in -clion)
 - [Additional info](#additional-info)
-    + [Prevent Git from suggesting commits](#prevent-git-from-suggesting- commits)
+    + [Prevent Git from suggesting commits](#prevent-git-from-suggesting-commits)
     + [Seperate build folders](#separate-build-folders)
 
 ### Setting up in Eclipse
@@ -29,7 +29,7 @@ To run the project in Eclipse:
 2. Go to `Build, Execution, Deployment` -> `Toolchain`
 3. Add new toolchains for Linux and RT1051 (ALT+Ins) of `System` type
     - Name: Linux
-        - CMake should be autodetected - if not, run `which cmake`   
+        - CMake should be autodetected - if not, run `which cmake`
         - Select appropriate `gdb`
         - for x86 it's usually `/usr/bin/gdb`
 
@@ -120,7 +120,7 @@ To build separately for each architecture you need to:
 - Select `Linux`
 - Add a variable to `Environment`: `PROJECT_BUILD_DIRECTORY=build-linux`
 - Change `Generation Path` to: `build-linux`
-    
+
 and 
 
 - Open settings (CTRL+ALT+S)
@@ -156,7 +156,7 @@ To enable it, set the environmental variable `SEPARATE_BUILDS` to any value (e.g
 
 By default `./rebuild.sh rt1051` builds into `build`
 
-You can build only the Linux build inside its separate folder, and leave RT1051 in place, thus maintain compatibility with `./run.sh`. 
+You can build only the Linux build inside its separate folder, and leave RT1051 in place, thus maintain compatibility with `./run.sh`.
 
 ```
 > env SEPARATE_BUILDS=1 ./rebuild.sh linux
@@ -174,7 +174,7 @@ Guide for CLion has a dedicated section entitled ["Separate build folders in CLi
 By default `./rebuild.sh` copies assets and generates CMakes to generic `build`.
 `SEPARATE_BUILDS=1` overrides it.
 
-Then comes CMake. CMake uses persistent (CACHED) variable `PROJECT_BUILD_DIRECTORY` to build every module. 
+Then comes CMake. CMake uses persistent (CACHED) variable `PROJECT_BUILD_DIRECTORY` to build every module.
 You can set it either in `cmake-gui` or by passing environmental variable to `cmake`.
 
 This works like a toggle. You don't have to specify it every time. The new build path gets embedded into every `CMakeCache.txt`, so any following `make` command doesn't require any extra arguments.
