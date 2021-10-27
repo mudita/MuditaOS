@@ -7,9 +7,9 @@ Due to RT1051 architecture, the executable can be run from SDRAM, DRAM or extern
 ## Adding assets
 
 No matter which way you want to run the executable, you need to have all the necessary assets.
-Everything from `$BUILD_FOLDER/sys/` needs to be [copied onto the eMMC](#eMMC-(permanent)).
+Everything from `$BUILD_FOLDER/sys/` needs to be [copied onto the eMMC](#emmc-permanent).
 
-Some assets can be omitted though e.g. for fonts the default fallback font will be used.  
+Some assets can be omitted though e.g. for fonts the default fallback font will be used. 
 
 ## SDRAM (temporary)
 

@@ -6,29 +6,29 @@
 1. [History](#history)
 2. [Scope](#scope)
 3. [Introduction](#introduction)
-4. [Current implementation](#currentimpl)
-5. [Implementation manual select](#manualsimpl)
-6. [Debug command](#debug)
+4. [Current implementation](#current-implementation)
+5. [Implementation manual select](#implementation-with-manual-select)
+6. [Debug command](#debug-command)
 
 
-## History <a name="history"></a>
+## History
 
 | Authors           | Change description        | Status | Modification date |
 | ----------------- | ------------------------- | ------ | ----------------- |
 | Bartosz Reichel | Initial version           | Draft  | 2021.01.29        |
 
 
-## Scope <a name="scope"></a>
+## Scope
 This document defines how VoLTE is run on modem
 
 
-### Introduction <a name="introduction"></a>
+### Introduction
 
 Considerations on implementing / running VoLTE in the context of various operators will be included here. 
 The mechanisms available in Quectel modems will be described.
 
 
-## Current implementation <a name="currentimpl"></a>
+## Current implementation
 
 ### VoLTE On flow
 
@@ -36,7 +36,7 @@ The current implementation only puts voice call in PS (Packet Switch) mode. Auto
 
 ![alt text](./Images/current_volte_on.png "Current VoLTE")
 
-## Implementation with manual select <a name="manualsimpl"></a>
+## Implementation with manual select
 
 ### VoLTE on flow
 
@@ -47,7 +47,7 @@ In this case, the restart is only performed when the MBN is changed (currently i
 
 ![alt text](./Images/volte_on.png "Current VoLTE")
 
-## Debug command <a name="debug"></a>
+## Debug command
 
 Command *AT+QVOLTEDBG* is not full documented but propably return all parameters needed by Quectel modem to setup for VoLTE.
 Here example of return (@ could be treat as AT+)
