@@ -32,9 +32,10 @@ namespace app::home_screen
     {
         namespace Helpers
         {
-            auto switchToMenu         = [](AbstractView &view) { view.switchToMenu(); };
-            auto makeAlarmEditable    = [](AbstractView &view) { view.setAlarmEdit(true); };
-            auto makeAlarmNonEditable = [](AbstractView &view) { view.setAlarmEdit(false); };
+            auto switchToMenu          = [](AbstractView &view) { view.switchToMenu(); };
+            auto switchToBatteryStatus = [](AbstractView &view) { view.switchToBatteryStatus(); };
+            auto makeAlarmEditable     = [](AbstractView &view) { view.setAlarmEdit(true); };
+            auto makeAlarmNonEditable  = [](AbstractView &view) { view.setAlarmEdit(false); };
             auto updateBottomStats =
                 [](AbstractView &view, AbstractBatteryModel &batteryModel, AbstractTemperatureModel &temperatureModel) {
                     view.setTemperature(temperatureModel.getTemperature());
@@ -274,6 +275,7 @@ namespace app::home_screen
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
+                                             "Deactivated"_s + event<Events::BackPress>  / Helpers::switchToBatteryStatus,
 
                                              "DeactivatedWait"_s + sml::on_entry<_> / DeactivatedWait::entry,
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
@@ -320,6 +322,7 @@ namespace app::home_screen
                                              "Activated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
                                              "Activated"_s + event<Events::DeepDownPress>  = "DeactivatedWait"_s,
                                              "Activated"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
+                                             "Activated"_s + event<Events::BackPress>  / Helpers::switchToBatteryStatus,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,

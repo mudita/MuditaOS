@@ -4,6 +4,7 @@
 #include "BellHomeScreenWindow.hpp"
 #include "data/BellMainStyle.hpp"
 #include "widgets/SnoozeTimer.hpp"
+#include "BellBatteryStatusWindow.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
@@ -308,4 +309,11 @@ namespace gui
         }
         return false;
     }
+    void BellHomeScreenWindow::switchToBatteryStatus()
+    {
+        application->switchWindow(gui::BellBatteryStatusWindow::name,
+                                  std::make_unique<gui::BellBatteryStatusWindow::Data>(presenter->getBatteryLvl(),
+                                                                                       presenter->isBatteryCharging()));
+    }
+
 } // namespace gui
