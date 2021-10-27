@@ -8,40 +8,31 @@
 namespace style::meditation
 {
     constexpr auto VerticalWidgetGap = 20;
-    namespace body
-    {
-        constexpr auto Width  = style::window_width;
-        constexpr auto Height = style::window_height - style::window::default_vertical_pos - style::footer::height - 1;
-        constexpr auto X      = 1;
-        constexpr auto Y      = style::window::default_vertical_pos;
-    } // namespace body
 
     namespace timer
     {
-        constexpr auto Radius = 150;
-        constexpr auto X      = body::X + (body::Width / 2) - Radius;
-        constexpr auto Y      = body::Y + 20;
-        constexpr auto Width  = 2 * Radius;
-        constexpr auto Height = Width;
+        constexpr auto Radius = 142;
+        constexpr auto X      = style::window_width / 2 - Radius;
+        constexpr auto Y      = style::window::default_vertical_pos + 18;
 
-        constexpr auto BorderColor = gui::ColorGrey;
-        constexpr auto BorderColorOnFocused = gui::ColorFullBlack;
-        constexpr auto PenWidth    = 3;
+        constexpr auto BorderColor   = gui::ColorFullBlack;
+        constexpr auto PenWidth      = 1;
+        constexpr auto FocusPenWidth = 3;
 
         namespace setterValueLabel
         {
-            constexpr auto X      = 100;
-            constexpr auto Y      = 100;
-            constexpr auto Width  = timer::Width - 2 * X;
-            constexpr auto Height = timer::Height - 2 * Y;
+            constexpr auto Width           = 140;
+            constexpr auto Height          = 96;
+            constexpr auto TopMargin       = 80;
+            constexpr auto BottomLineWidth = 100;
+            constexpr auto BottomLinePen   = 2;
         } // namespace setterValueLabel
 
         namespace setterUnitLabel
         {
-            constexpr auto X      = 0;
-            constexpr auto Y      = setterValueLabel::Y + setterValueLabel::Height;
-            constexpr auto Width  = timer::Width;
-            constexpr auto Height = 40;
+            constexpr auto Width     = 220;
+            constexpr auto Height    = 20;
+            constexpr auto TopMargin = 15;
         } // namespace setterUnitLabel
 
         namespace infoText
@@ -57,7 +48,7 @@ namespace style::meditation
     namespace intervalBox
     {
         constexpr auto X      = style::window::default_left_margin;
-        constexpr auto Y      = style::meditation::timer::Y + style::meditation::timer::Height + VerticalWidgetGap;
+        constexpr auto Y      = style::meditation::timer::Y + 2 * style::meditation::timer::Radius + VerticalWidgetGap;
         constexpr auto Width  = style::window::default_body_width;
         constexpr auto Height = 60;
 

@@ -42,8 +42,8 @@ namespace gui
         timeSetter = new TimerProperty(this,
                                        style::meditation::timer::X,
                                        style::meditation::timer::Y,
-                                       style::meditation::timer::Width,
-                                       style::meditation::timer::Height);
+                                       2 * style::meditation::timer::Radius,
+                                       2 * style::meditation::timer::Radius);
         timeSetter->setEdges(RectangleEdge::None);
         setFocusItem(timeSetter);
 

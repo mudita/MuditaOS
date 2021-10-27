@@ -118,6 +118,11 @@ sys::MessagePointer EventManagerCommon::DataReceivedHandler(sys::DataMessage *ms
                 bluetooth::AudioProfile::HSP, (event->getDeviceState() == audio::Event::DeviceState::Connected));
             bus.sendUnicast(message, app::name_settings);
         } break;
+        case audio::EventType::BlutoothHFPDeviceState: {
+            auto message = std::make_shared<message::bluetooth::ProfileStatus>(
+                bluetooth::AudioProfile::HFP, (event->getDeviceState() == audio::Event::DeviceState::Connected));
+            bus.sendUnicast(message, app::name_settings);
+        } break;
         default:
             break;
         }
