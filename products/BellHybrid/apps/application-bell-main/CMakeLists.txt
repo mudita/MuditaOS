@@ -10,6 +10,7 @@ target_sources(application-bell-main
         windows/BellBatteryShutdownWindow.cpp
         windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
+        windows/BellBatteryStatusWindow.cpp
 
         models/BatteryModel.cpp
         models/TemperatureModel.cpp
@@ -24,6 +25,8 @@ target_sources(application-bell-main
         windows/BellBatteryShutdownWindow.hpp
         windows/BellHomeScreenWindow.hpp
         windows/BellMainMenuWindow.hpp
+        windows/BellBatteryStatusWindow.hpp
+        data/BatteryUtils.hpp
 
         models/BatteryModel.cpp
         models/TemperatureModel.hpp

@@ -114,4 +114,12 @@ namespace app::home_screen
         snoozeTimer->reset(snoozeDuration, snoozeTick);
     }
 
+    std::uint32_t HomeScreenPresenter::getBatteryLvl() const
+    {
+        return batteryModel->getLevelState().level;
+    }
+    bool HomeScreenPresenter::isBatteryCharging() const
+    {
+        return batteryModel->getLevelState().state == Store::Battery::State::Charging;
+    }
 } // namespace app::home_screen
