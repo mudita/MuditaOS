@@ -240,7 +240,9 @@ namespace gui
     ImageMap *ImageManager::getImageMap(uint32_t id)
     {
         if (id >= imageMaps.size()) {
+#if DEBUG_MISSING_ASSETS == 1
             LOG_ERROR("Unable to find an image by id: %" PRIu32, id);
+#endif
             return imageMaps[fallbackImageId];
         }
         return imageMaps[id];
@@ -254,7 +256,9 @@ namespace gui
                 return i;
             }
         }
+#if DEBUG_MISSING_ASSETS == 1
         LOG_ERROR("Unable to find an image: %s , using deafult fallback image instead.", name.c_str());
+#endif
         return fallbackImageId;
     }
 

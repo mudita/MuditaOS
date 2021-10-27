@@ -135,7 +135,7 @@ namespace app
     {
         auto [icon, text] = getDisplayDataFromState();
         switchWindow(gui::window::name::informationOnBoardingWindow,
-                     gui::BellFinishedWindowData::Factory::create(icon, windowToReturn));
+                     gui::BellFinishedWindowData::Factory::create(icon, windowToReturn, utils::translate(text)));
     }
 
     OnBoarding::InformationDisplay ApplicationBellOnBoarding::getDisplayDataFromState()

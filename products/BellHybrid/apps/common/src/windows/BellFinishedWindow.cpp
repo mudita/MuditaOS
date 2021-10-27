@@ -30,6 +30,7 @@ namespace gui
         if (icon == nullptr) {
             icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
             icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+            icon->text->setFont(style::window::font::verybiglight);
         }
     }
 
@@ -48,6 +49,7 @@ namespace gui
 
         if (auto metadata = dynamic_cast<BellFinishedWindowData *>(data)) {
             icon->image->set(metadata->icon);
+            icon->text->setRichText(metadata->text);
             icon->resizeItems();
             windowToReturn = metadata->windowToReturn;
         }
