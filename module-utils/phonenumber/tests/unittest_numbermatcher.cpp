@@ -26,6 +26,8 @@ class DummyHolder
     }
 };
 
+static constexpr auto DefaultPageSize = 1; // so the paging mechanism is checked.
+
 const static std::string NumberAPlNational = "600123456";
 const static std::string NumberAPlE164     = "+48600123456";
 const static PhoneNumber NumberAPlValid(NumberAPlE164, country::Id::UNKNOWN);
@@ -64,45 +66,61 @@ auto make_test_vector(std::initializer_list<PhoneNumber> lnumber)
     return v;
 }
 
+auto retrieve_numbers(const std::vector<DummyHolder> &holders, unsigned int offset, unsigned int limit)
+{
+    const auto size = holders.size();
+    if (offset > size - 1) {
+        return std::vector<DummyHolder>{};
+    }
+    auto lastIndex = std::clamp<unsigned int>(offset + limit, offset, size);
+    return std::vector<DummyHolder>(holders.begin() + offset, holders.begin() + lastIndex);
+}
+
 TEST_CASE("Number matcher - basics")
 {
     std::vector<DummyHolder> numberHolders = {DummyHolder(PhoneNumber("500123456")),
                                               DummyHolder(PhoneNumber("600123456"))};
+    auto provider = [&numberHolders]([[maybe_unused]] const utils::PhoneNumber &number, auto offset, auto limit) {
+        return retrieve_numbers(numberHolders, offset, limit);
+    };
+    NumberHolderMatcher<std::vector, DummyHolder> matcher{std::move(provider), DefaultPageSize};
 
-    NumberHolderMatcher<std::vector, DummyHolder> matcher(std::cbegin(numberHolders), std::cend(numberHolders));
     auto match = matcher.bestMatch(PhoneNumber("600123456"));
-    REQUIRE(match != std::cend(numberHolders));
+    REQUIRE(match.has_value());
     REQUIRE(match->getNumber().get() == "600123456");
 
     // match again to see if search is started at the beginning again
-    auto newmatch = matcher.bestMatch(PhoneNumber("600123456"));
-    REQUIRE(newmatch != std::cend(numberHolders));
-    REQUIRE(newmatch->getNumber().get() == "600123456");
+    auto newMatch = matcher.bestMatch(PhoneNumber("600123456"));
+    REQUIRE(newMatch.has_value());
+    REQUIRE(newMatch->getNumber().get() == "600123456");
 }
 
 TEST_CASE("Number matcher - match incoming (full list)")
 {
     auto dummyHolders = make_test_vector(all_test_numbers);
-    auto matcher = NumberHolderMatcher<std::vector, DummyHolder>(std::cbegin(dummyHolders), std::cend(dummyHolders));
+    auto provider     = [&dummyHolders]([[maybe_unused]] const utils::PhoneNumber &number, auto offset, auto limit) {
+        return retrieve_numbers(dummyHolders, offset, limit);
+    };
+    NumberHolderMatcher<std::vector, DummyHolder> matcher{std::move(provider), DefaultPageSize};
 
     SECTION("Incoming e164")
     {
         auto match = matcher.bestMatch(PhoneNumber("+48600123456"));
-        REQUIRE(match != matcher.END);
+        REQUIRE(match.has_value());
         REQUIRE(match->getNumber().get() == NumberAPlE164);
     }
 
     SECTION("Incoming national")
     {
         auto match = matcher.bestMatch(PhoneNumber("600123456", country::Id::UNKNOWN));
-        REQUIRE(match != matcher.END);
+        REQUIRE(match.has_value());
         REQUIRE(match->getNumber().get() == NumberAPlNational);
     }
 
     SECTION("Incoming valid national")
     {
         auto match = matcher.bestMatch(PhoneNumber("600123456", country::Id::POLAND));
-        REQUIRE(match != matcher.END);
+        REQUIRE(match.has_value());
         REQUIRE(match->getNumber().get() == NumberAPlE164);
     }
 }
@@ -110,12 +128,15 @@ TEST_CASE("Number matcher - match incoming (full list)")
 TEST_CASE("Number matcher - match incoming (loose)")
 {
     auto dummyHolders = make_test_vector({NumberAPlInvalid, NumberBPlInvalid, NumberCPlInvalid});
-    auto matcher = NumberHolderMatcher<std::vector, DummyHolder>(std::cbegin(dummyHolders), std::cend(dummyHolders));
+    auto provider     = [&dummyHolders]([[maybe_unused]] const utils::PhoneNumber &number, auto offset, auto limit) {
+        return retrieve_numbers(dummyHolders, offset, limit);
+    };
+    NumberHolderMatcher<std::vector, DummyHolder> matcher{std::move(provider), DefaultPageSize};
 
     auto match = matcher.bestMatch(PhoneNumber("+48500123456"));
-    REQUIRE(match == matcher.END);
+    REQUIRE(!match.has_value());
 
     match = matcher.bestMatch(PhoneNumber("+48500123456"), PhoneNumber::Match::POSSIBLE);
-    REQUIRE(match != matcher.END);
+    REQUIRE(match.has_value());
     REQUIRE(match->getNumber().get() == NumberBPlNational);
 }

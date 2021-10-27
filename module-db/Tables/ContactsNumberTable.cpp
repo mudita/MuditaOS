@@ -81,7 +81,7 @@ std::vector<ContactsNumberTableRow> ContactsNumberTable::getByContactId(uint32_t
 
 std::vector<ContactsNumberTableRow> ContactsNumberTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * from contact_number ORDER BY number_user LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from contact_number LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsNumberTableRow>();
@@ -99,6 +99,32 @@ std::vector<ContactsNumberTableRow> ContactsNumberTable::getLimitOffset(uint32_t
         });
     } while (retQuery->nextRow());
 
+    return ret;
+}
+
+std::vector<ContactsNumberTableRow> ContactsNumberTable::getLimitOffset(const std::string &number,
+                                                                        uint32_t offset,
+                                                                        uint32_t limit)
+{
+    const char lastCharacter = number.back();
+    auto retQuery = db->query("SELECT * from contact_number WHERE number_user like '%%%c' LIMIT %lu OFFSET %lu;",
+                              lastCharacter,
+                              limit,
+                              offset);
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return std::vector<ContactsNumberTableRow>();
+    }
+
+    std::vector<ContactsNumberTableRow> ret;
+    do {
+        ret.push_back(ContactsNumberTableRow{
+            (*retQuery)[0].getUInt32(),                                 // ID
+            (*retQuery)[1].getUInt32(),                                 // contactID
+            (*retQuery)[2].getString(),                                 // numberUser
+            (*retQuery)[3].getString(),                                 // numbere164
+            static_cast<ContactNumberType>((*retQuery)[4].getUInt32()), // type
+        });
+    } while (retQuery->nextRow());
     return ret;
 }
 
