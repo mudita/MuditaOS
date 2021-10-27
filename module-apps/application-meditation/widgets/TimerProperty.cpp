@@ -17,49 +17,55 @@ TimerProperty::TimerProperty(Item *parent, const uint32_t x, const uint32_t y, c
 
 void TimerProperty::build()
 {
-    const Point boxCenter(getX() + (getWidth() / 2), getY() + (getHeight() / 2));
-
     namespace timerStyle = style::meditation::timer;
+
+    const Point boxCenter(getX() + (getWidth() / 2), getY() + (getHeight() / 2));
     Circle::ShapeParams params;
     params.setCenterPoint(boxCenter)
         .setRadius(timerStyle::Radius)
         .setBorderColor(timerStyle::BorderColor)
-        .setFocusBorderColor(timerStyle::BorderColorOnFocused)
+        .setFocusBorderColor(timerStyle::BorderColor)
         .setPenWidth(timerStyle::PenWidth)
-        .setFocusPenWidth(timerStyle::PenWidth);
+        .setFocusPenWidth(timerStyle::FocusPenWidth);
     circle = new Circle(this, params);
 
-    namespace timerStyle = style::meditation::timer;
-    timeLabel            = new Label(this,
-                          timerStyle::setterValueLabel::X,
-                          timerStyle::setterValueLabel::Y,
-                          timerStyle::setterValueLabel::Width,
-                          timerStyle::setterValueLabel::Height);
+    centerBody = new VBox(this, 0, 0, 2 * timerStyle::Radius, 2 * timerStyle::Radius);
+    centerBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+    centerBody->setMinimumSize(2 * timerStyle::Radius, 2 * timerStyle::Radius);
+    centerBody->setEdges(RectangleEdge::None);
+    centerBody->activeItem = false;
+
+    timeLabel = new Label(centerBody);
+    timeLabel->setMargins(gui::Margins(0, timerStyle::setterValueLabel::TopMargin, 0, 0));
     timeLabel->setEdges(RectangleEdge::None);
+    timeLabel->setMinimumSize(timerStyle::setterValueLabel::Width, timerStyle::setterValueLabel::Height);
     timeLabel->setFont(style::window::font::supersizemelight);
     timeLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     timeLabel->setPenWidth(timerStyle::PenWidth);
     timeLabel->setText(std::to_string(static_cast<int>(state.getTime().count())));
 
-    timeUnitLabel = new Label(this,
-                              timerStyle::setterUnitLabel::X,
-                              timerStyle::setterUnitLabel::Y,
-                              timerStyle::setterUnitLabel::Width,
-                              timerStyle::setterUnitLabel::Height);
+    divRect = new Rect(centerBody, 0, 0, timerStyle::setterValueLabel::BottomLineWidth, 1);
+    divRect->setPenWidth(timerStyle::setterValueLabel::BottomLinePen);
+
+    timeUnitLabel = new Label(centerBody);
+    timeUnitLabel->setMinimumSize(timerStyle::setterUnitLabel::Width, timerStyle::setterUnitLabel::Height);
+    timeUnitLabel->setMargins(gui::Margins(0, timerStyle::setterUnitLabel::TopMargin, 0, 0));
     timeUnitLabel->setFont(style::window::font::verysmall);
     timeUnitLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     timeUnitLabel->setEdges(RectangleEdge::None);
     timeUnitLabel->setText(utils::translate("app_meditation_minutes"));
+
+    centerBody->resizeItems();
 }
 
 bool TimerProperty::onFocus(bool isFocused)
 {
     circle->setFocus(isFocused);
     if (isFocused) {
-        timeLabel->setEdges(RectangleEdge::Bottom);
+        divRect->setEdges(RectangleEdge::Top);
     }
     else {
-        timeLabel->setEdges(RectangleEdge::None);
+        divRect->setEdges(RectangleEdge::None);
     }
     state.onFocus();
     return true;
