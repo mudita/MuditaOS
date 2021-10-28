@@ -127,10 +127,7 @@ auto SCO::SCOImpl::audioInitialize(int sampleRate) -> Error
     metadata.channels        = 1;
     metadata.samplesPerFrame = audioSamplesPerPacket;
 
-    if (sourceQueue != nullptr && sinkQueue != nullptr) {
-        sendEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Connected);
-    }
-    else {
+    if (sourceQueue == nullptr || sinkQueue == nullptr) {
         LOG_ERROR("failed to create queue!");
         return Error(Error::SystemError);
     }

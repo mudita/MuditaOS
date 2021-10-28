@@ -142,7 +142,9 @@ namespace gui
         auto font = find(name);
         // default return first font
         if (font == nullptr && fonts.size() > 0) {
+#if DEBUG_MISSING_ASSETS == 1
             LOG_ERROR("=> font not found: %s using default", name.data());
+#endif
             return fonts[0];
         }
         return font;

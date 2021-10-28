@@ -14,20 +14,22 @@ namespace gui
         struct Factory
         {
             static std::unique_ptr<BellFinishedWindowData> create(const UTF8 &icon,
-                                                                  const std::string &windowToReturn)
+                                                                  const std::string &windowToReturn,
+                                                                  const UTF8 &text = "")
             {
-                return std::unique_ptr<BellFinishedWindowData>(new BellFinishedWindowData(icon, windowToReturn));
+                return std::unique_ptr<BellFinishedWindowData>(new BellFinishedWindowData(icon, windowToReturn, text));
             }
         };
 
         UTF8 icon{};
         std::string windowToReturn;
+        UTF8 text{};
 
       private:
         BellFinishedWindowData() = default;
 
-        BellFinishedWindowData(const UTF8 &icon, const std::string &windowToReturn)
-            : icon{icon}, windowToReturn{windowToReturn}
+        BellFinishedWindowData(const UTF8 &icon, const std::string &windowToReturn, const UTF8 &text = "")
+            : icon{icon}, windowToReturn{windowToReturn}, text{text}
         {}
     };
 } // namespace gui
