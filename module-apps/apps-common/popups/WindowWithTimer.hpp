@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    inline constexpr auto defautTimeout = std::chrono::seconds{3};
+    inline constexpr auto defautTimeout = std::chrono::milliseconds{3000};
     class WindowWithTimer : public gui::AppWindow
     {
       private:
