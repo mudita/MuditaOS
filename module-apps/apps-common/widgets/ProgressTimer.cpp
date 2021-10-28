@@ -8,10 +8,6 @@
 #include <apps-common/GuiTimer.hpp>
 #include <gsl/assert>
 
-namespace
-{
-    inline constexpr auto increasingModePrefix = "-";
-}
 namespace app
 {
 
@@ -25,43 +21,9 @@ namespace app
           countdownMode{countdownMode}, displayFormat{displayFormat}
     {}
 
-    void ProgressTimer::resetProgress()
-    {
-        if (progress != nullptr) {
-            progress->setValue(0);
-        }
-    }
-
     void ProgressTimer::update()
     {
-        updateText();
-        updateProgress();
         app->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-    }
-
-    void ProgressTimer::updateText()
-    {
-        using utils::time::Duration;
-        if (text == nullptr) {
-            return;
-        }
-        const auto secondsRemaining = duration - elapsed;
-        const Duration remainingDuration{std::time_t{secondsRemaining.count()}};
-        UTF8 timerText;
-        if (countdownMode == ProgressCountdownMode::Increasing && secondsRemaining != std::chrono::seconds::zero()) {
-            timerText += increasingModePrefix;
-        }
-        timerText += remainingDuration.str(displayFormat);
-        text->setText(std::move(timerText));
-    }
-
-    void ProgressTimer::updateProgress()
-    {
-        if (progress != nullptr) {
-            const auto percentage  = static_cast<float>(elapsed.count()) / duration.count();
-            const auto currentStep = percentage * progress->getMaximum();
-            progress->setValue(std::ceil(currentStep));
-        }
     }
 
     void ProgressTimer::reset(std::chrono::seconds _duration, std::chrono::seconds _interval)
@@ -73,8 +35,7 @@ namespace app
         interval    = _interval;
         hasInterval = _interval != std::chrono::seconds::zero();
 
-        updateText();
-        resetProgress();
+        update();
     }
 
     void ProgressTimer::start()
@@ -137,17 +98,5 @@ namespace app
     void ProgressTimer::registerOnIntervalCallback(std::function<void()> cb)
     {
         onIntervalCallback = std::move(cb);
-    }
-
-    void ProgressTimer::attach(gui::Progress *_progress)
-    {
-        Expects(_progress != nullptr);
-        progress = _progress;
-    }
-
-    void ProgressTimer::attach(gui::Text *_text)
-    {
-        Expects(_text != nullptr);
-        text = _text;
     }
 } // namespace app

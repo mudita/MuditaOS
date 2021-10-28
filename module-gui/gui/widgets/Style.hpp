@@ -27,32 +27,22 @@ namespace style
         inline constexpr auto default_horizontal_pos  = 20U;
         inline constexpr auto default_vertical_pos    = 0U;
         inline constexpr unsigned status_bar_margin_w = default_horizontal_pos * 2;
-        inline constexpr auto height                  = 46U;
         inline constexpr auto width                   = window_width - status_bar_margin_w;
+        inline constexpr auto height                  = 46U;
     } // namespace status_bar
 
     namespace header
     {
         inline constexpr auto default_horizontal_pos = 0U;
         inline constexpr auto default_vertical_pos   = status_bar::height;
-        inline constexpr auto height                 = 59U;
         inline constexpr auto width                  = window_width;
+        inline constexpr auto height                 = 59U;
 
         namespace font
         {
             inline constexpr auto title = "gt_pressura_bold_30";
         } // namespace font
     }     // namespace header
-
-    namespace footer
-    {
-        inline constexpr auto height = 54U;
-        namespace font
-        {
-            inline constexpr auto bold   = "gt_pressura_bold_24";
-            inline constexpr auto medium = "gt_pressura_regular_24";
-        }; // namespace font
-    };     // namespace footer
 
     namespace window
     {
@@ -61,8 +51,7 @@ namespace style
         inline constexpr auto default_right_margin = 20U;
         inline constexpr auto default_body_width =
             style::window_width - style::window::default_right_margin - style::window::default_left_margin;
-        inline constexpr auto default_body_height =
-            style::window_height - style::window::default_vertical_pos - style::footer::height;
+        inline constexpr auto default_body_height          = 441U;
         inline constexpr auto default_border_focus_w       = 2U;
         inline constexpr auto default_border_rect_no_focus = 1U;
         inline constexpr auto default_border_no_focus_w    = 0U;
@@ -103,15 +92,6 @@ namespace style
         /// minimal label decoration for Option
         void decorateOption(gui::Label *el);
 
-        namespace navBar
-        {
-            inline constexpr auto leftMargin  = 30U;
-            inline constexpr auto rightMargin = 30U;
-
-            inline constexpr auto h = 54U;
-            inline constexpr auto w = window_width;
-        } // namespace navBar
-
         namespace progressBar
         {
             inline constexpr auto x     = style::window::default_left_margin;
@@ -121,6 +101,25 @@ namespace style
             inline constexpr auto range = 10U;
         }; // namespace progressBar
     };     // namespace window
+
+    namespace nav_bar
+    {
+        inline constexpr auto default_horizontal_pos = 0U;
+        inline constexpr auto default_vertical_pos   = window::default_vertical_pos + window::default_body_width;
+        inline constexpr auto width                  = window_width;
+        inline constexpr auto height                 = 54U;
+
+        inline constexpr auto bottom_padding = 16U;
+        inline constexpr auto left_margin    = 30U;
+        inline constexpr auto right_margin   = 30U;
+
+        namespace font
+        {
+            inline constexpr auto bold   = "gt_pressura_bold_24";
+            inline constexpr auto medium = "gt_pressura_regular_24";
+        }; // namespace font
+
+    } // namespace nav_bar
 
     namespace settings
     {

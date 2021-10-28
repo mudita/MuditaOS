@@ -18,7 +18,7 @@ namespace style
             inline constexpr uint32_t ListPositionY = style::window::default_vertical_pos - 1;
             // Bottom margin need to be added to fit all elements.
             inline constexpr uint32_t listHeight =
-                style::window_height - ListPositionY - style::footer::height + style::margins::small;
+                style::window_height - ListPositionY - style::nav_bar::height + style::margins::small;
             inline constexpr uint32_t listWidth = style::listview::body_width_with_scroll;
         } // namespace threads
 
@@ -111,7 +111,7 @@ namespace style
             {
                 inline constexpr uint32_t x = style::window::default_left_margin;
                 inline constexpr uint32_t y = style::window::default_vertical_pos;
-                inline constexpr uint32_t h = style::window_height - y - style::footer::height;
+                inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
                 inline constexpr uint32_t w = style::listview::body_width_with_scroll;
 
             } // namespace list

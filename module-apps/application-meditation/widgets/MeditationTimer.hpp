@@ -12,7 +12,7 @@
 
 namespace app
 {
-    class ProgressTimer;
+    class ProgressTimerWithBarGraphAndCounter;
 }
 
 namespace gui
@@ -40,6 +40,6 @@ namespace gui
         app::ApplicationMeditation *application = nullptr;
         CircularProgressBar *progressBar        = nullptr;
         Text *text                              = nullptr;
-        std::unique_ptr<app::ProgressTimer> timer;
+        std::unique_ptr<app::ProgressTimerWithBarGraphAndCounter> timer;
     };
 } // namespace gui

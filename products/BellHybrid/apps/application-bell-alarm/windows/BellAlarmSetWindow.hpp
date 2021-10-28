@@ -24,6 +24,7 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
       private:
+        constexpr static auto alarmSummaryDisplayDuration = std::chrono::seconds{5};
         std::shared_ptr<app::bell_alarm::BellAlarmSetContract::Presenter> presenter;
         Icon *icon{};
     };

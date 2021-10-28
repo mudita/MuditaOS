@@ -3,6 +3,7 @@
 
 #include "BellHomeScreenWindow.hpp"
 #include "data/BellMainStyle.hpp"
+#include "widgets/SnoozeTimer.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
@@ -66,6 +67,8 @@ namespace
             tm.tm_min--;
         }
     }
+    inline constexpr auto snoozeTimerName = "SnoozeTimer";
+    inline constexpr std::chrono::seconds timerTick{1};
 } // namespace
 
 namespace gui
@@ -98,6 +101,10 @@ namespace gui
         alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
         alarm->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
+        snoozeTimer = new SnoozeTimer(body->firstBox);
+        snoozeTimer->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        snoozeTimer->setVisible(false);
+
         time = new TimeSetFmtSpinner(body->centerBox);
         time->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         time->setFont(bellMainStyle::mainWindow::time::font);
@@ -125,16 +132,16 @@ namespace gui
         bottomText->drawUnderline(false);
 
         body->resize();
+
+        auto timer = std::make_unique<app::ProgressTimerWithSnoozeTimer>(
+            application, *this, snoozeTimerName, timerTick, app::ProgressCountdownMode::Increasing);
+        timer->attach(snoozeTimer);
+        presenter->setSnoozeTimer(std::move(timer));
     }
 
     void BellHomeScreenWindow::setAlarmTriggered()
     {
         alarm->setAlarmStatus(AlarmSetSpinner::Status::RINGING);
-    }
-
-    void BellHomeScreenWindow::setAlarmSnoozed()
-    {
-        alarm->setAlarmStatus(AlarmSetSpinner::Status::SNOOZE);
     }
 
     void BellHomeScreenWindow::setAlarmActive(bool val)
@@ -147,14 +154,34 @@ namespace gui
         }
     }
 
-    void BellHomeScreenWindow::setAlarmVisible(bool val)
+    void BellHomeScreenWindow::setHeaderViewMode(app::home_screen::HeaderViewMode mode)
     {
-        alarm->setVisible(val);
-    }
-
-    void BellHomeScreenWindow::setAlarmTimeVisible(bool val)
-    {
-        alarm->setAlarmTimeVisible(val);
+        switch (mode) {
+        case app::home_screen::HeaderViewMode::Empty:
+            alarm->setVisible(false);
+            alarm->setAlarmTimeVisible(false);
+            snoozeTimer->setVisible(false);
+            alarm->informContentChanged();
+            break;
+        case app::home_screen::HeaderViewMode::AlarmIconAndTime:
+            alarm->setVisible(true);
+            alarm->setAlarmTimeVisible(true);
+            snoozeTimer->setVisible(false);
+            alarm->informContentChanged();
+            break;
+        case app::home_screen::HeaderViewMode::AlarmIcon:
+            alarm->setVisible(true);
+            alarm->setAlarmTimeVisible(false);
+            snoozeTimer->setVisible(false);
+            alarm->informContentChanged();
+            break;
+        case app::home_screen::HeaderViewMode::SnoozeCountdown:
+            alarm->setVisible(false);
+            alarm->setAlarmTimeVisible(false);
+            snoozeTimer->setVisible(true);
+            snoozeTimer->informContentChanged();
+            break;
+        }
     }
 
     void BellHomeScreenWindow::setTemperature(utils::temperature::Temperature newTemp)
