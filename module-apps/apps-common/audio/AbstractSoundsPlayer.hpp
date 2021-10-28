@@ -17,9 +17,9 @@ class AbstractSoundsPlayer
         Stopped
     };
 
-    using AudioEofCallback = std::function<void()>;
+    using AudioStoppedCallback = std::function<void()>;
 
-    virtual bool play(const std::string &path, AudioEofCallback cb = nullptr) = 0;
+    virtual bool play(const std::string &path, AudioStoppedCallback cb = nullptr) = 0;
     virtual bool pause()                                                      = 0;
     virtual bool resume()                                                     = 0;
     virtual bool stop()                                                       = 0;

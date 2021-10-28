@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include "ReleaseSequence.hpp"
+#include "MovedSequence.hpp"
 
-class AlarmDeactivateSequence : public ReleaseSequence
+class AlarmDeactivateSequence : public MovedSequence
 {
   public:
-    AlarmDeactivateSequence() : ReleaseSequence(KeyMap::DeepPressDown)
+    AlarmDeactivateSequence() : MovedSequence(KeyMap::DeepPressDown)
     {}
 };

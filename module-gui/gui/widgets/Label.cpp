@@ -271,12 +271,13 @@ namespace gui
         textColor = color;
     }
 
-    uint32_t Label::getTextNeedSpace() const noexcept
+    uint32_t Label::getTextNeedSpace(const UTF8 &_text) const noexcept
     {
         if (font == nullptr) {
             return 0;
         }
-        return font->getPixelWidth(text);
+
+        return _text.empty() ? font->getPixelWidth(text) : font->getPixelWidth(_text);
     }
 
     uint32_t Label::getTextHeight() const noexcept

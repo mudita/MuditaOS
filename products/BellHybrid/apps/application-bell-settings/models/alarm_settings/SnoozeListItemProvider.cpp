@@ -25,11 +25,7 @@ namespace app::bell_settings
 
         auto onOff =
             new OnOffListItem(model.getSnoozeOnOff(), utils::translate("app_bell_settings_alarm_settings_snooze"));
-        onOff->onExit = [onOff, this]() {
-            if (not onOff->isActive()) {
-                this->onExit();
-            }
-        };
+
         internalData.emplace_back(onOff);
         constexpr auto snoozeLengthStep = 1U;
         constexpr auto snoozeLengthMin  = 1U;
@@ -51,6 +47,11 @@ namespace app::bell_settings
                 chimeLength->setBottomDescribtionText(utils::translate("common_minutes_lower"));
             }
         });
+        chimeLength->onEnter = [onOff, this]() {
+            if (not onOff->isActive()) {
+                this->onExit();
+            }
+        };
 
         internalData.emplace_back(chimeLength);
 
@@ -66,11 +67,6 @@ namespace app::bell_settings
             range,
             utils::translate("app_bell_settings_alarm_settings_snooze_chime_interval"),
             utils::translate("app_bell_settings_alarm_settings_snooze_chime_interval_bot_desc"));
-        chimeInterval->onExit = [chimeInterval, this] {
-            if (chimeInterval->isOff()) {
-                this->onExit();
-            }
-        };
         internalData.emplace_back(chimeInterval);
 
         auto snoozeChimeTone = new UTF8ListItem(model.getSnoozeChimeTone(),
@@ -81,7 +77,11 @@ namespace app::bell_settings
                 onToneChange(val);
             }
         });
-        snoozeChimeTone->onEnter = [this, snoozeChimeTone]() {
+        snoozeChimeTone->onEnter = [this, snoozeChimeTone, chimeInterval]() {
+            if (chimeInterval->isOff()) {
+                this->onExit();
+                return;
+            }
             if (onToneEnter) {
                 onToneEnter(snoozeChimeTone->getCurrentValue());
             }

@@ -10,74 +10,62 @@
 
 namespace gui::nav_bar
 {
-    NavBar::NavBar()
+    NavBar::NavBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+        : HThreeBox<HBox, HBox, HBox>(parent, x, y, w, h)
     {
+        setEdges(RectangleEdge::None);
 
-        Padding margins{style::window::navBar::leftMargin, 0, style::window::navBar::rightMargin, 0};
-        left   = prepareLabel(Side::Left);
-        center = prepareLabel(Side::Center);
-        right  = prepareLabel(Side::Right);
+        firstBox = new HBox(this);
+        firstBox->setMinimumHeight(h);
+        firstBox->setAlignment(Alignment(Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        firstBox->setMargins({style::nav_bar::left_margin, 0, 0, 0});
+        firstBox->setEdges(RectangleEdge::None);
 
-        left->setPadding(margins);
-        center->setPadding(margins);
-        right->setPadding(margins);
+        centerBox = new HBox(this);
+        centerBox->setEdges(RectangleEdge::None);
+        centerBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        centerBox->setMaximumSize(w, h);
 
-        addWidget(left);
-        addWidget(center);
-        addWidget(right);
+        lastBox = new HBox(this);
+        lastBox->setMinimumHeight(h);
+        lastBox->setAlignment(Alignment(Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        lastBox->setMargins({0, 0, style::nav_bar::right_margin, 0});
+        lastBox->setEdges(RectangleEdge::None);
 
-        setFillColor(ColorFullWhite);
-        setBorderColor(ColorNoColor);
-        setFilled(true);
-        setSize(style::window::navBar::w, style::window::navBar::h);
+        createLabels();
+
+        resizeItems();
     }
-    NavBar::NavBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
+
+    void NavBar::createLabels()
     {
+        left = new Label(firstBox);
+        left->setAlignment(Alignment(Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
+        left->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
+        left->setMinimumHeight(widgetArea.h);
+        left->setFont(style::nav_bar::font::medium);
+        left->setEllipsis(Ellipsis::Right);
+        left->setVisible(true);
+        left->setEdges(RectangleEdge::None);
 
-        Padding margins{style::window::navBar::leftMargin, 0, style::window::navBar::rightMargin, 0};
-        left   = prepareLabel(Side::Left);
-        center = prepareLabel(Side::Center);
-        right  = prepareLabel(Side::Right);
+        center = new Label(centerBox);
+        center->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        center->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
+        center->setMinimumHeight(widgetArea.h);
+        center->setMaximumWidth(widgetArea.w);
+        center->setFont(style::nav_bar::font::bold);
+        center->setEllipsis(Ellipsis::Right);
+        center->setVisible(true);
+        center->setEdges(RectangleEdge::None);
 
-        left->setPadding(margins);
-        center->setPadding(margins);
-        right->setPadding(margins);
-
-        addWidget(left);
-        addWidget(center);
-        addWidget(right);
-
-        setFillColor(ColorFullWhite);
-        setBorderColor(ColorNoColor);
-        setFilled(true);
-        setSize(style::window::navBar::w, style::window::navBar::h);
-        updateDrawArea();
-    }
-    NavBar::~NavBar()
-    {}
-
-    gui::Label *NavBar::prepareLabel(nav_bar::Side side)
-    {
-        Label *label = new Label(this, 0, 0, 0, 0);
-        label->setBorderColor(Color{15, 15});
-        switch (side) {
-        case Side::Left:
-            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-            label->setFont(style::footer::font::medium);
-            break;
-        case Side::Center:
-            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-            label->setFont(style::footer::font::bold);
-            break;
-        case Side::Right:
-            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
-            label->setFont(style::footer::font::medium);
-            break;
-        };
-
-        label->setFilled(false);
-
-        return label;
+        right = new Label(lastBox);
+        right->setAlignment(Alignment(Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        right->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
+        right->setMinimumHeight(widgetArea.h);
+        right->setFont(style::nav_bar::font::medium);
+        right->setEllipsis(Ellipsis::Right);
+        right->setVisible(true);
+        right->setEdges(RectangleEdge::None);
     }
 
     Label *NavBar::getSide(nav_bar::Side side)
@@ -93,9 +81,78 @@ namespace gui::nav_bar
         return nullptr;
     }
 
+    bool NavBar::checkSideOccupied(nav_bar::Side side)
+    {
+        return getSide(side)->visible && !getSide(side)->getText().empty();
+    }
+
+    Length NavBar::outerSideUsedWidth(nav_bar::Side side)
+    {
+        return getSide(side)->visible ? getSide(side)->getTextNeedSpace() : 0;
+    }
+
+    void NavBar::setLeftSideWidth(Length width)
+    {
+        left->setMinimumWidth(width);
+        firstBox->setMinimumWidth(width);
+        firstBox->setMaximumWidth(width);
+    }
+
+    void NavBar::setRightSideWidth(Length width)
+    {
+        right->setMinimumWidth(width);
+        lastBox->setMinimumWidth(width);
+        lastBox->setMaximumWidth(width);
+    }
+
+    void NavBar::applyOuterSidesWidth(nav_bar::Side side, const UTF8 &str)
+    {
+        Length widthToSet = 0U;
+        if (side == Side::Left) {
+            widthToSet = std::max(outerSideUsedWidth(Side::Right), left->visible ? left->getTextNeedSpace(str) : 0);
+        }
+        else if (side == Side::Right) {
+            widthToSet = std::max(outerSideUsedWidth(Side::Left), right->visible ? right->getTextNeedSpace(str) : 0);
+        }
+        else {
+            widthToSet = std::max(outerSideUsedWidth(Side::Left), outerSideUsedWidth(Side::Right));
+        }
+
+        // If other side active set maximum for side to print into
+        auto widthReduced = false;
+        if ((side == Side::Left && !str.empty() &&
+             (checkSideOccupied(Side::Right) || checkSideOccupied(Side::Center))) ||
+            (side == Side::Right && !str.empty() &&
+             (checkSideOccupied(Side::Left) || checkSideOccupied(Side::Center))) ||
+            (side == Side::Center && !str.empty() &&
+             (checkSideOccupied(Side::Left) || checkSideOccupied(Side::Right)))) {
+
+            widthReduced = true;
+            widthToSet =
+                std::min(widthToSet, (widgetArea.w - (style::nav_bar::left_margin + style::nav_bar::right_margin)) / 3);
+        }
+
+        if (widthReduced) {
+            setLeftSideWidth(widthToSet);
+            setRightSideWidth(widthToSet);
+        }
+        else if (side == Side::Left && !str.empty()) {
+            setLeftSideWidth(widthToSet);
+            setRightSideWidth(0);
+        }
+        else if (side == Side::Right && !str.empty()) {
+            setRightSideWidth(widthToSet);
+            setLeftSideWidth(0);
+        }
+    }
+
     void NavBar::setActive(nav_bar::Side side, bool active)
     {
-        getSide(side)->setVisible(active);
+        auto selectedSide = getSide(side);
+
+        selectedSide->setVisible(active);
+        applyOuterSidesWidth(side, selectedSide->getText());
+        selectedSide->informContentChanged();
     }
 
     bool NavBar::isActive(nav_bar::Side side)
@@ -105,22 +162,17 @@ namespace gui::nav_bar
 
     void NavBar::setText(nav_bar::Side side, const UTF8 &str, bool active)
     {
-        getSide(side)->setText(str);
-        setActive(side, active);
+        auto selectedSide = getSide(side);
+        selectedSide->setVisible(active);
+
+        applyOuterSidesWidth(side, str);
+        selectedSide->setText(str);
+        selectedSide->informContentChanged();
     }
 
     UTF8 NavBar::getText(nav_bar::Side side)
     {
         return getSide(side)->getText();
-    }
-
-    bool NavBar::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        Rect::onDimensionChanged(oldDim, newDim);
-        left->setSize(newDim.w, newDim.h);
-        center->setSize(newDim.w, newDim.h);
-        right->setSize(newDim.w, newDim.h);
-        return true;
     }
 
     void NavBar::store()

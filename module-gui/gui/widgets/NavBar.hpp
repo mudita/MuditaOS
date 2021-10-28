@@ -23,7 +23,7 @@ namespace gui::nav_bar
     /// left is left action key, center describes center (enter) key, and right right action key
     /// depending on screen selected elements will be visible
     /// @note when in Text widget it will show input mode if enabled in [ left ] area
-    class NavBar : public Rect
+    class NavBar : public HThreeBox<HBox, HBox, HBox>
     {
       protected:
         struct Cache
@@ -54,27 +54,29 @@ namespace gui::nav_bar
         Label *left   = nullptr;
         Label *center = nullptr;
         Label *right  = nullptr;
-        gui::Label *prepareLabel(nav_bar::Side side);
+        void createLabels();
+
+        void setLeftSideWidth(Length width);
+        void setRightSideWidth(Length width);
+        bool checkSideOccupied(nav_bar::Side side);
+        Length outerSideUsedWidth(nav_bar::Side side);
+        void applyOuterSidesWidth(nav_bar::Side side, const UTF8 &str);
         Label *getSide(nav_bar::Side side);
 
       public:
-        NavBar();
         NavBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-        virtual ~NavBar();
 
         void setActive(nav_bar::Side side, bool active);
         bool isActive(nav_bar::Side side);
         void setText(nav_bar::Side side, const UTF8 &str, bool active = true);
         UTF8 getText(nav_bar::Side side);
+        void setFont(Side side, const UTF8 &fontName);
 
         void store();
         void store(Side side);
         void restore();
         void restore(Side side);
 
-        void setFont(Side side, const UTF8 &fontName);
-
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         void accept(GuiVisitor &visitor) override;
     };
 
