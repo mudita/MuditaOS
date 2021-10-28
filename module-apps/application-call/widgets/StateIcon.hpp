@@ -75,7 +75,7 @@ namespace gui
         virtual void set(const T &state)
         {
             this->state = state;
-            img->set(data.at(state).first);
+            img->set(data.at(state).first, ImageTypeSpecifier::W_M);
             label->setText(utils::translate(data.at(state).second));
             using namespace style::window;
             label->setFont(data.find(state) != data.begin() ? font::verysmallbold : font::verysmall);

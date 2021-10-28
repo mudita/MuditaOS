@@ -4,6 +4,7 @@
 #pragma once
 
 #include "models/TemperatureModel.hpp"
+#include "widgets/ProgressTimerWithSnoozeTimer.hpp"
 
 #include <apps-common/BasePresenter.hpp>
 #include <common/models/AbstractAlarmModel.hpp>
@@ -39,6 +40,14 @@ namespace app::home_screen
     class AbstractBatteryModel;
     class AbstractTemperatureModel;
 
+    enum class HeaderViewMode
+    {
+        Empty,
+        AlarmIcon,
+        AlarmIconAndTime,
+        SnoozeCountdown
+    };
+
     class AbstractView
     {
       public:
@@ -46,11 +55,9 @@ namespace app::home_screen
 
         /// Alarm widget related API
         virtual void setAlarmTriggered()                                     = 0;
-        virtual void setAlarmSnoozed()                                       = 0;
         virtual void setAlarmActive(bool)                                    = 0;
         virtual void setAlarmEdit(bool)                                      = 0;
-        virtual void setAlarmVisible(bool)                                   = 0;
-        virtual void setAlarmTimeVisible(bool)                               = 0;
+        virtual void setHeaderViewMode(HeaderViewMode mode)                  = 0;
         virtual std::time_t getAlarmTime() const                             = 0;
         virtual void setAlarmTime(std::time_t time)                          = 0;
         virtual void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
@@ -84,6 +91,10 @@ namespace app::home_screen
         virtual void detachTimer()                                                  = 0;
         virtual void handleAlarmRingingEvent()                                      = 0;
         virtual void handleAlarmModelReady()                                        = 0;
+        virtual void setSnoozeTimer(std::unique_ptr<app::ProgressTimerWithSnoozeTimer> &&_timer) = 0;
+        virtual void startSnoozeTimer(std::chrono::seconds snoozeDuration)                       = 0;
+        virtual void stopSnoozeTimer()                                                           = 0;
+        virtual void restartSnoozeTimer(std::chrono::seconds snoozeDuration)                     = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -115,6 +126,12 @@ namespace app::home_screen
         void handleAlarmRingingEvent() override;
         void handleAlarmModelReady() override;
 
+        void setSnoozeTimer(std::unique_ptr<app::ProgressTimerWithSnoozeTimer> &&_timer) override;
+
+        void startSnoozeTimer(std::chrono::seconds snoozeDuration);
+        void stopSnoozeTimer();
+        void restartSnoozeTimer(std::chrono::seconds snoozeDuration);
+
       private:
         ApplicationCommon *app;
         sys::TimerHandle timer;
@@ -123,7 +140,9 @@ namespace app::home_screen
         std::unique_ptr<AbstractTemperatureModel> temperatureModel;
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::shared_ptr<AbstractController> stateController;
+        std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
 
         static constexpr auto timerName = "HS_timer";
+        static constexpr auto snoozeTick = std::chrono::seconds(1);
     };
 } // namespace app::home_screen

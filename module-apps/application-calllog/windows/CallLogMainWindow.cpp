@@ -59,18 +59,90 @@ namespace gui
 
         setFocusItem(list);
 
-        emptyListIcon =
-            new gui::Icon(this,
-                          0,
-                          ::style::window::default_vertical_pos,
-                          ::style::window_width,
-                          ::style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
-                          "info_icon_W_G",
-                          utils::translate("app_calllog_no_calls"));
-        emptyListIcon->setVisible(false);
+        buildInterfaceForEmptyState();
 
         list->emptyListCallback    = [this]() { onEmptyList(); };
         list->notEmptyListCallback = [this]() { onListFilled(); };
+    }
+
+    void CallLogMainWindow::buildInterfaceForEmptyState()
+    {
+        namespace MyStyle = callLogStyle::detailsWindow::noCalls;
+        emptyLayout       = new VBox(this, 0, 0, style::window_width, style::window_height);
+        emptyLayout->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+
+        Text *noCallsInfo = new Text(emptyLayout, 0, 0, 0, 0);
+        noCallsInfo->setMinimumSize(mainWindow::w, MyStyle::infoHeight);
+        noCallsInfo->setTextType(TextType::SingleLine);
+        noCallsInfo->setEditMode(EditMode::Browse);
+        noCallsInfo->setEdges(RectangleEdge::None);
+        noCallsInfo->setFont(style::window::font::medium);
+        noCallsInfo->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        noCallsInfo->setRichText(utils::translate("app_calllog_no_calls"));
+        noCallsInfo->setMargins(gui::Margins(0, MyStyle::infoTopMargin, 0, 0));
+
+        Rect *divLine = new Rect(emptyLayout, 0, 0, style::window_width, 1);
+        divLine->setBorderColor(ColorGrey);
+        divLine->setEdges(RectangleEdge::Top);
+        divLine->setMargins(gui::Margins(0, MyStyle::divLineTopMargin, 0, 0));
+
+        HBox *noCallsBottom = new HBox(emptyLayout);
+        noCallsBottom->setMinimumSize(MyStyle::bottomBoxWidth, MyStyle::bottomBoxHeight);
+        noCallsBottom->setEdges(RectangleEdge::None);
+        noCallsBottom->setMargins(gui::Margins(0, MyStyle::bottomBoxMargin, 0, 0));
+        noCallsBottom->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+
+        ImageBox *noCallsImg = new ImageBox(noCallsBottom, new Image("callog_empty_W_G"));
+        noCallsImg->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        noCallsImg->setMinimumSizeToFitImage();
+        noCallsImg->setMargins(Margins(MyStyle::infoIconMargin, 0, 0, 0));
+
+        VThreeBox<VBox, VBox, VBox> *noCallsIcons = new VThreeBox<VBox, VBox, VBox>(noCallsBottom);
+        noCallsIcons->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        noCallsIcons->setEdges(RectangleEdge::None);
+        noCallsIcons->setMinimumSize(MyStyle::descriptionSize, MyStyle::bottomBoxHeight);
+        noCallsIcons->setMargins(Margins(MyStyle::descriptionLeftMargin, 0, 0, 0));
+        auto imgLambda = [&](const UTF8 imageName) {
+            VBox *box = new VBox(noCallsIcons);
+            box->setEdges(RectangleEdge::None);
+            box->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+            box->setMinimumSize(MyStyle::descriptionSize, MyStyle::descriptionSize);
+            box->setMargins(Margins(0, MyStyle::descriptionInternalMargin, 0, MyStyle::descriptionInternalMargin));
+
+            ImageBox *image = new ImageBox(box, new Image(imageName, gui::ImageTypeSpecifier::W_G));
+            image->setMinimumSizeToFitImage();
+            return box;
+        };
+        noCallsIcons->firstBox  = imgLambda("calllog_arrow_in");
+        noCallsIcons->centerBox = imgLambda("calllog_arrow_out");
+        noCallsIcons->lastBox   = imgLambda("calllog_arrow_den");
+
+        VThreeBox<VBox, VBox, VBox> *noCallsDescriptions = new VThreeBox<VBox, VBox, VBox>(noCallsBottom);
+        noCallsDescriptions->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        noCallsDescriptions->setEdges(RectangleEdge::None);
+        noCallsDescriptions->setMinimumSize(MyStyle::descriptionTextWidth, MyStyle::bottomBoxHeight);
+        auto descLambda = [&](const UTF8 descText) {
+            VBox *box = new VBox(noCallsDescriptions);
+            box->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+            box->setEdges(RectangleEdge::None);
+            box->setMinimumSize(MyStyle::descriptionTextWidth, MyStyle::descriptionSize);
+            box->setMargins(Margins(0, MyStyle::descriptionInternalMargin, 0, MyStyle::descriptionInternalMargin));
+
+            Text *desc = new Text(box, 0, 0, 0, 0);
+            desc->setMaximumSize(MyStyle::descriptionTextWidth, MyStyle::descriptionSize);
+            desc->setEditMode(EditMode::Browse);
+            desc->setEdges(RectangleEdge::None);
+            desc->setFont(style::window::font::small);
+            desc->setRichText(descText);
+
+            return box;
+        };
+        noCallsDescriptions->firstBox  = descLambda(utils::translate("app_calllog_empty_incoming"));
+        noCallsDescriptions->centerBox = descLambda(utils::translate("app_calllog_empty_outgoing"));
+        noCallsDescriptions->lastBox   = descLambda(utils::translate("app_calllog_empty_missed"));
+
+        emptyLayout->setVisible(false);
+        emptyLayout->resizeItems();
     }
 
     void CallLogMainWindow::destroyInterface()
@@ -104,7 +176,7 @@ namespace gui
     {
         navBar->setActive(gui::nav_bar::Side::Left, false);
         navBar->setActive(gui::nav_bar::Side::Center, false);
-        emptyListIcon->setVisible(true);
+        emptyLayout->setVisible(true);
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
@@ -112,7 +184,7 @@ namespace gui
     {
         navBar->setActive(gui::nav_bar::Side::Left, true);
         navBar->setActive(gui::nav_bar::Side::Center, true);
-        emptyListIcon->setVisible(false);
+        emptyLayout->setVisible(false);
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 } /* namespace gui */

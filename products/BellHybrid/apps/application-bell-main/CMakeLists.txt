@@ -5,6 +5,8 @@ target_sources(application-bell-main
     PRIVATE
         ApplicationBellMain.cpp
         widgets/BellBattery.cpp
+        widgets/ProgressTimerWithSnoozeTimer.cpp
+        widgets/SnoozeTimer.cpp
         windows/BellBatteryShutdownWindow.cpp
         windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
@@ -16,6 +18,8 @@ target_sources(application-bell-main
         presenters/StateController.cpp
 
         widgets/BellBattery.hpp
+        widgets/ProgressTimerWithSnoozeTimer.hpp
+        widgets/SnoozeTimer.hpp
 
         windows/BellBatteryShutdownWindow.hpp
         windows/BellHomeScreenWindow.hpp
