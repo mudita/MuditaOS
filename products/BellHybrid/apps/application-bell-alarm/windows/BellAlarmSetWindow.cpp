@@ -14,7 +14,8 @@ namespace gui
 {
     BellAlarmSetWindow::BellAlarmSetWindow(app::ApplicationCommon *app,
                                            std::shared_ptr<app::bell_alarm::BellAlarmSetContract::Presenter> presenter)
-        : WindowWithTimer(app, gui::window::name::bellAlarmSet), presenter{std::move(presenter)}
+        : WindowWithTimer(app, gui::window::name::bellAlarmSet, alarmSummaryDisplayDuration), presenter{
+                                                                                                  std::move(presenter)}
     {
         buildInterface();
     }

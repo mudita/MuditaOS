@@ -51,7 +51,11 @@ namespace gui
                                          style::header::width,
                                          style::header::height);
 
-        navBar = new gui::nav_bar::NavBar(this, 0, style::window_height - 51, style::window_width, 50);
+        navBar = new gui::nav_bar::NavBar(this,
+                                          style::nav_bar::default_horizontal_pos,
+                                          style::nav_bar::default_vertical_pos,
+                                          style::nav_bar::width,
+                                          style::nav_bar::height);
         navBar->setActive(nav_bar::Side::Left, false);
         navBar->setActive(nav_bar::Side::Center, false);
         navBar->setActive(nav_bar::Side::Right, false);

@@ -18,7 +18,7 @@ namespace phonebookStyle
             inline constexpr uint32_t x = style::window::default_left_margin;
             inline constexpr uint32_t y = style::window::default_vertical_pos;
             inline constexpr uint32_t w = style::listview::body_width_with_scroll;
-            inline constexpr uint32_t h = style::window_height - y - style::footer::height;
+            inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
         } // namespace contactsList
     }     // namespace mainWindow
 
@@ -29,7 +29,7 @@ namespace phonebookStyle
             inline constexpr uint32_t x = style::window::default_left_margin;
             inline constexpr uint32_t y = style::window::default_vertical_pos;
             inline constexpr uint32_t w = style::listview::body_width_with_scroll;
-            inline constexpr uint32_t h = style::window_height - y - style::footer::height;
+            inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
         } // namespace newContactsList
     }     // namespace newContactWindow
 
@@ -40,14 +40,14 @@ namespace phonebookStyle
             inline constexpr uint32_t x = style::window::default_left_margin;
             inline constexpr uint32_t y = style::window::default_vertical_pos + 74;
             inline constexpr uint32_t w = style::listview::body_width_with_scroll;
-            inline constexpr uint32_t h = style::window_height - y - style::footer::height;
+            inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
         } // namespace contactDetailsList
         namespace contactDetailsListNoFlags
         {
             inline constexpr uint32_t x = style::window::default_left_margin;
             inline constexpr uint32_t y = style::window::default_vertical_pos;
             inline constexpr uint32_t w = style::listview::body_width_with_scroll;
-            inline constexpr uint32_t h = style::window_height - y - style::footer::height;
+            inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
         } // namespace contactDetailsListNoFlags
 
     } // namespace contactDetailsWindow
@@ -59,7 +59,7 @@ namespace phonebookStyle
             inline constexpr uint32_t x = style::window::default_left_margin;
             inline constexpr uint32_t y = style::window::default_vertical_pos;
             inline constexpr uint32_t w = style::listview::body_width_with_scroll;
-            inline constexpr uint32_t h = style::window_height - y - style::footer::height;
+            inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
         } // namespace searchResultList
     }     // namespace searchResultsWindow
 
@@ -70,7 +70,7 @@ namespace phonebookStyle
             inline constexpr uint32_t x = style::window::default_left_margin;
             inline constexpr uint32_t y = style::window::default_vertical_pos;
             inline constexpr uint32_t w = style::listview::body_width_with_scroll;
-            inline constexpr uint32_t h = style::window_height - y - style::footer::height;
+            inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
         } // namespace contactsListIce
     }     // namespace iceContactsWindow
 

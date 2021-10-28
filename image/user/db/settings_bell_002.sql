@@ -40,7 +40,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('prewake_up_tone','Joyful Awakening'),
     ('prewake_up_volume','5'),
     ('prewake_up_light_duration','10'),
-    ('alarm_tone','Atumnal Sea'),
+    ('alarm_tone','Autumnal Sea'),
     ('alarm_volume','5'),
     ('alarm_light_active','1'),
     ('alarm_duration','10000'),
