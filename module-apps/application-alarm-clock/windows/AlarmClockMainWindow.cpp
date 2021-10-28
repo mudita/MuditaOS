@@ -59,7 +59,7 @@ namespace app::alarmClock
                           0,
                           style::window::default_vertical_pos,
                           style::window_width,
-                          style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
+                          style::window_height - ::style::window::default_vertical_pos - ::style::nav_bar::height,
                           "empty_list_add_W_G",
                           utils::translate("app_alarm_clock_no_alarms_information"));
         emptyListIcon->setVisible(false);

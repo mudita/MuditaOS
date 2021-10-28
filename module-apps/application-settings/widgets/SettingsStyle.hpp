@@ -47,7 +47,7 @@ namespace style
                 inline constexpr uint32_t x = style::window::default_left_margin;
                 inline constexpr uint32_t y = style::window::default_vertical_pos;
                 inline constexpr uint32_t w = style::listview::body_width_with_scroll;
-                inline constexpr uint32_t h = style::window_height - y - style::footer::height;
+                inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
             } // namespace newApn
 
             namespace bluetooth
@@ -115,7 +115,7 @@ namespace style
             inline constexpr auto X      = style::window::default_left_margin;
             inline constexpr auto Y      = style::window::default_vertical_pos;
             inline constexpr auto Width  = style::listview::body_width_with_scroll;
-            inline constexpr auto Height = style::window_height - Y - style::footer::height;
+            inline constexpr auto Height = style::window_height - Y - style::nav_bar::height;
         } // namespace list
 
     } // namespace quotes::categories

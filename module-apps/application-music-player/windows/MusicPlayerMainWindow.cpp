@@ -520,16 +520,18 @@ namespace gui
 
         snprintf(timeToDisplay,
                  maxTimeToDisplaySize,
-                 "%d:%02d",
-                 static_cast<int>(currentTotalTime) / utils::time::secondsInMinute,
+                 "%d:%02d:%02d",
+                 static_cast<int>(currentTotalTime) / utils::time::secondsInHour,
+                 static_cast<int>((currentTotalTime) % utils::time::secondsInHour) / 60,
                  static_cast<int>(currentTotalTime) % utils::time::secondsInMinute);
         currentTotalTimeString = timeToDisplay;
 
-        auto elapsedTime = currentTotalTime * currentProgress;
+        auto elapsedTime = static_cast<uint32_t>(currentTotalTime * currentProgress);
         snprintf(timeToDisplay,
                  maxTimeToDisplaySize,
-                 "%d:%02d",
-                 static_cast<int>(elapsedTime) / utils::time::secondsInMinute,
+                 "%d:%02d:%02d",
+                 static_cast<int>(elapsedTime) / utils::time::secondsInHour,
+                 static_cast<int>((elapsedTime) % utils::time::secondsInHour) / 60,
                  static_cast<int>(elapsedTime) % utils::time::secondsInMinute);
         currentTimeString = timeToDisplay;
 

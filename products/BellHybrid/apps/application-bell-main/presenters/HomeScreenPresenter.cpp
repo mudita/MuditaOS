@@ -92,4 +92,26 @@ namespace app::home_screen
         getView()->setAlarmTime(alarmModel->getAlarmTime());
         stateController->handleAlarmModelReady();
     }
+
+    void HomeScreenPresenter::setSnoozeTimer(std::unique_ptr<app::ProgressTimerWithSnoozeTimer> &&_timer)
+    {
+        snoozeTimer = std::move(_timer);
+    }
+
+    void HomeScreenPresenter::startSnoozeTimer(std::chrono::seconds snoozeDuration)
+    {
+        snoozeTimer->reset(snoozeDuration, snoozeTick);
+        snoozeTimer->start();
+    }
+
+    void HomeScreenPresenter::stopSnoozeTimer()
+    {
+        snoozeTimer->start();
+    }
+
+    void HomeScreenPresenter::restartSnoozeTimer(std::chrono::seconds snoozeDuration)
+    {
+        snoozeTimer->reset(snoozeDuration, snoozeTick);
+    }
+
 } // namespace app::home_screen

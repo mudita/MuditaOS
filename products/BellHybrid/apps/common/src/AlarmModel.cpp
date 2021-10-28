@@ -92,6 +92,7 @@ namespace app
         auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::TurnOffSnoozeRequestMessage>(alarm.ID),
                                                        service::name::service_time);
         request->execute(app, this, responseCallback);
+        nextSnoozeTime = TIME_POINT_INVALID;
     }
     bool AlarmModel::isActive() const
     {
@@ -122,6 +123,7 @@ namespace app
     void AlarmModel::turnOff()
     {
         snoozeCount = 0;
+        nextSnoozeTime = TIME_POINT_INVALID;
         alarms::AlarmServiceAPI::requestTurnOffRingingAlarm(app, cachedRecord.parent->ID);
     }
 
@@ -132,9 +134,14 @@ namespace app
         const auto snoozeDuration = utils::getNumericValue<std::uint32_t>(snoozeDurationStr);
 
         snoozeCount++;
-        auto newAlarmTime =
+        nextSnoozeTime =
             std::chrono::floor<std::chrono::minutes>(TimePointNow()) + std::chrono::minutes(snoozeDuration);
-        alarms::AlarmServiceAPI::requestSnoozeRingingAlarm(app, cachedRecord.parent->ID, newAlarmTime);
+        alarms::AlarmServiceAPI::requestSnoozeRingingAlarm(app, cachedRecord.parent->ID, nextSnoozeTime);
+    }
+
+    std::chrono::seconds AlarmModel::getTimeToNextSnooze()
+    {
+        return std::chrono::duration_cast<std::chrono::seconds>(nextSnoozeTime - TimePointNow());
     }
 
     AlarmEventRecord AlarmModel::generateDefaultAlarm() const
