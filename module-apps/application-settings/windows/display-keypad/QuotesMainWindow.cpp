@@ -16,7 +16,7 @@ namespace style::quotes
         constexpr auto X      = style::window::default_left_margin;
         constexpr auto Y      = style::window::default_vertical_pos;
         constexpr auto Width  = style::listview::body_width_with_scroll;
-        constexpr auto Height = style::window_height - Y - style::footer::height;
+        constexpr auto Height = style::window_height - Y - style::nav_bar::height;
     } // namespace list
 } // namespace style::quotes
 

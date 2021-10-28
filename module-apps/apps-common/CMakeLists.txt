@@ -50,6 +50,7 @@ target_sources(apps-common
         widgets/TimeWidget.cpp
         widgets/WidgetsUtils.cpp
         widgets/ProgressTimer.cpp
+        widgets/ProgressTimerWithBarGraphAndCounter.cpp
         windows/AppWindow.cpp
         windows/BrightnessWindow.cpp
         windows/Dialog.cpp

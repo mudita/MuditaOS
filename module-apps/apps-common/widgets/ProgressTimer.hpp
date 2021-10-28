@@ -15,8 +15,6 @@ namespace
 namespace gui
 {
     class Item;
-    class Text;
-    class Progress;
 } // namespace gui
 
 namespace app
@@ -41,10 +39,9 @@ namespace app
     {
         app::ApplicationCommon *app = nullptr;
         gui::Item &parent;
-        gui::Text *text         = nullptr;
-        gui::Progress *progress = nullptr;
         const std::string name;
 
+      protected:
         std::atomic_bool isRunning{false};
         std::chrono::seconds duration{std::chrono::seconds::zero()};
         std::chrono::seconds elapsed{std::chrono::seconds::zero()};
@@ -60,13 +57,12 @@ namespace app
         utils::time::Duration::DisplayedFormat displayFormat;
 
         void startTimer();
-        void update();
-        void updateText();
-        void updateProgress();
-        void resetProgress();
+
         [[nodiscard]] auto onTimerTimeout(sys::Timer &timerTask) -> bool;
         [[nodiscard]] auto isFinished() const noexcept -> bool;
         [[nodiscard]] auto intervalReached() const noexcept -> bool;
+
+        virtual void update();
 
       public:
         ProgressTimer(
@@ -83,9 +79,6 @@ namespace app
         void registerOnFinishedCallback(std::function<void()> cb) override;
         void registerOnIntervalCallback(std::function<void()> cb) override;
         [[nodiscard]] auto isStopped() const noexcept -> bool override;
-
-        void attach(gui::Progress *_progress);
-        void attach(gui::Text *_text);
     };
 
 } // namespace app

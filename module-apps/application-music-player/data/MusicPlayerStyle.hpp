@@ -87,7 +87,7 @@ namespace musicPlayerStyle
         constexpr uint32_t y = style::window::default_vertical_pos - 1;
         constexpr uint32_t w = style::listview::body_width_with_scroll;
         // Bottom margin need to be added to fit all elements.
-        constexpr uint32_t h = style::window_height - y - style::footer::height + style::margins::small;
+        constexpr uint32_t h = style::window_height - y - style::nav_bar::height + style::margins::small;
     } // namespace allSongsWindow
 
     namespace songItem
