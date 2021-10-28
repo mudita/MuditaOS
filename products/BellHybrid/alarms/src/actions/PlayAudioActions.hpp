@@ -28,9 +28,9 @@ namespace alarms
                                  audio::PlaybackType = audio::PlaybackType::Alarm);
 
       private:
-        static constexpr auto InfiniteDuration = std::chrono::seconds::max();
-        bool play(const std::filesystem::path &path, std::chrono::seconds duration = InfiniteDuration);
-        void spawnTimer(std::chrono::seconds timeout);
+        static constexpr auto InfiniteDuration = std::chrono::minutes::max();
+        bool play(const std::filesystem::path &path, std::chrono::minutes duration = InfiniteDuration);
+        void spawnTimer(std::chrono::minutes timeout);
         void detachTimer();
 
         sys::Service &service;
