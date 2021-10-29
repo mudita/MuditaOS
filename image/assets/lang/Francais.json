@@ -577,6 +577,7 @@
   "app_bellmain_power_nap": "Sieste éclair",
   "app_bellmain_home_screen_bottom_desc": "La prochaine alarme sonnera",
   "app_bellmain_home_screen_bottom_desc_in": "dans",
+  "app_bellmain_home_screen_bottom_desc_and": "&",
   "app_bell_alarm_deactivated": "Alarme désactivée",
   "app_bell_turn_off_question": "Éteindre l'appareil ?",
   "app_bell_goodbye": "Au revoir",
