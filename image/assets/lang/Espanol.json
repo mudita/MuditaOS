@@ -602,6 +602,7 @@
   "tethering_menu_access_decline": "<text>El anclaje de red está activado.<br /><br />Para acceder al menú,<br />desactiva el tethering.</text>",
   "app_bellmain_home_screen_bottom_desc": "La siguiente alarma sonará",
   "app_bellmain_home_screen_bottom_desc_in": "en",
+  "app_bellmain_home_screen_bottom_desc_and": "&",
   "app_bell_alarm_deactivated": "Alarma desactivada",
   "app_bell_turn_off_question": "¿Apagar Mudita Harmony?",
   "app_bell_goodbye": "Adiós",
