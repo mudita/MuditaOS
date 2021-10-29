@@ -646,6 +646,8 @@
   "app_bell_settings_alarm_settings_snooze_chime_volume": "Głośność",
   "app_bellmain_home_screen_bottom_desc": "Następny alarm zadzwoni",
   "app_bellmain_home_screen_bottom_desc_in": "za",
+  "app_bellmain_home_screen_bottom_desc_less_than": "mniej niż",
+  "app_bellmain_home_screen_bottom_desc_and": "i",
   "app_bellmain_home_screen_bottom_desc_dp": "Naciśnij głęboko, aby aktywować",
   "app_bell_alarm_deactivated": "Alarm wyłączony",
   "app_bell_settings_advanced_frontlight": "Podświetlenie",

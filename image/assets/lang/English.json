@@ -644,6 +644,7 @@
   "app_bell_settings_alarm_settings_snooze_chime_volume": "Snooze chime volume",
   "app_bellmain_home_screen_bottom_desc": "Next alarm will ring",
   "app_bellmain_home_screen_bottom_desc_in": "in",
+  "app_bellmain_home_screen_bottom_desc_and": "&",
   "app_bellmain_home_screen_bottom_desc_less_than": "less than",
   "app_bellmain_home_screen_bottom_desc_dp": "Deep press to activate",
   "app_bell_alarm_deactivated": "<text>Alarm deactivated</text>",
