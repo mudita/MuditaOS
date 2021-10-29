@@ -11,9 +11,6 @@
 
 class ServiceDBCommon : public sys::Service
 {
-  private:
-    void factoryReset() const;
-
   protected:
     virtual db::Interface *getInterface(db::Interface::Name interface);
     std::set<std::unique_ptr<DatabaseAgent>> databaseAgents;

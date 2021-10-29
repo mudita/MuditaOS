@@ -10,12 +10,20 @@ namespace gui
     PowerOffPresenter::PowerOffPresenter(app::ApplicationCommon *app) : application(app)
     {}
 
-    void PowerOffPresenter::powerOff(sys::CloseReason reason)
+    void PowerOffPresenter::powerOff()
     {
         auto msg = std::make_shared<app::UserPowerDownRequest>();
         application->bus.sendUnicast(std::move(msg), service::name::system_manager);
     }
+
+    void PowerOffPresenter::factoryReset()
+    {
+        LOG_WARN("Empty impl");
+    }
+
     void PowerOffPresenter::reboot()
-    {}
+    {
+        LOG_WARN("Empty impl");
+    }
 
 } // namespace gui

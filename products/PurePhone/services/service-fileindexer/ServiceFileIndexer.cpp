@@ -53,4 +53,9 @@ namespace service
         LOG_DEBUG("Switch to power Mode %s", c_str(mode));
         return sys::ReturnCodes::Success;
     }
+
+    void ServiceFileIndexer::ProcessCloseReason(sys::CloseReason closeReason)
+    {
+        sendCloseReadyMessage(this);
+    }
 } // namespace service

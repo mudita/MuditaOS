@@ -202,5 +202,6 @@ int main()
     LOG_PRINTF("commit: %s version: %s branch: %s\n", GIT_REV, VERSION, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
 
+    LOG_PRINTF("!! Main exit !!\n");
     return 0;
 }

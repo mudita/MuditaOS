@@ -16,7 +16,7 @@ namespace gui
         buildInterface();
 
         timerCallback = [this](Item &, sys::Timer &) {
-            this->presenter->powerOff(sys::CloseReason::FactoryReset);
+            this->presenter->factoryReset();
             return true;
         };
     }

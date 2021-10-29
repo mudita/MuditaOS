@@ -48,7 +48,6 @@ namespace sys
     {
         RegularPowerDown,
         Reboot,
-        FactoryReset,
         SystemBrownout,
         LowBattery
     };

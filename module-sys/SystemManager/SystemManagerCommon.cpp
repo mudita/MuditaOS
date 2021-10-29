@@ -147,12 +147,10 @@ namespace sys
             LOG_INFO("  --->  REBOOT <--- ");
             powerManager->Reboot();
             break;
-        case State::ShutdownReady: {
+        case State::ShutdownReady:
             LOG_INFO("  ---> SHUTDOWN <--- ");
             powerManager->PowerOff();
-        }
-
-        break;
+            break;
         case State::RebootToUpdate:
             LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
             powerManager->RebootToUpdate(updateReason);
@@ -240,7 +238,7 @@ namespace sys
 
     bool SystemManagerCommon::FactoryReset(Service *s)
     {
-        return s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::FactoryReset, CloseReason::FactoryReset),
+        return s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::FactoryReset),
                                   service::name::system_manager);
     }
 
@@ -490,7 +488,7 @@ namespace sys
                     RebootHandler(State::RebootToUpdate, data->updateReason);
                     break;
                 case Code::FactoryReset:
-                    CloseSystemHandler(CloseReason::FactoryReset);
+                    RebootHandler(State::RebootToUpdate, UpdateReason::FactoryReset);
                     break;
                 case Code::None:
                     break;

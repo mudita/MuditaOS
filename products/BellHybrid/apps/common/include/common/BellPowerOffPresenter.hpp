@@ -11,7 +11,9 @@ namespace gui
     {
       public:
         explicit BellPowerOffPresenter(app::ApplicationCommon *app);
-        void powerOff(sys::CloseReason reason = sys::CloseReason::RegularPowerDown) override;
+
+        void powerOff() override;
+        void factoryReset() override;
         void reboot() override;
 
       private:

@@ -163,8 +163,6 @@ namespace app::manager
         case sys::CloseReason::RegularPowerDown:
             [[fallthrough]];
         case sys::CloseReason::Reboot:
-            [[fallthrough]];
-        case sys::CloseReason::FactoryReset:
             break;
         }
         handleActionRequest(&act);
