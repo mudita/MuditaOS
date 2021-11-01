@@ -35,11 +35,6 @@
 namespace app
 {
     class ApplicationLauncher;
-    namespace manager
-    {
-        class GetAutoLockTimeoutRequest;
-        class SetAutoLockTimeoutRequest;
-    } // namespace manager
 } // namespace app
 
 namespace app::manager

@@ -10,6 +10,10 @@ target_sources(
         module-bsp
 
     PRIVATE
+        hal/battery_charger/BatteryCharger.cpp
+        hal/key_input/KeyInput.cpp
+        hal/temperature_source/TemperatureSource.cpp
+
         bsp/audio/AW8898driver.cpp
         bsp/audio/CodecAW8898.cpp
         bsp/battery-charger/battery-charger.cpp
@@ -19,10 +23,6 @@ target_sources(
         bsp/lpm/PowerProfile.cpp
         bsp/rotary_encoder/rotary_encoder.cpp
         bsp/switches/switches.cpp
-
-        hal/battery_charger/BatteryCharger.cpp
-        hal/key_input/KeyInput.cpp
-        hal/temperature_source/TemperatureSource.cpp
 
         audio.cpp
         clock_config.cpp

@@ -206,10 +206,6 @@ namespace app::manager
             notificationProvider.handle(req);
             return sys::msgHandled();
         });
-        connect(typeid(GetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
-            auto req = static_cast<GetAutoLockTimeoutRequest *>(request);
-            return handleAutoLockGetRequest(req);
-        });
         connect(typeid(SetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
             auto req = static_cast<SetAutoLockTimeoutRequest *>(request);
             return handleAutoLockSetRequest(req);
@@ -429,15 +425,6 @@ namespace app::manager
     void ApplicationManager::handleSnoozeCountChange(unsigned snoozeCount)
     {
         notificationProvider.handleSnooze(snoozeCount);
-    }
-
-    auto ApplicationManager::handleAutoLockGetRequest([[maybe_unused]] GetAutoLockTimeoutRequest *request)
-        -> std::shared_ptr<sys::ResponseMessage>
-    {
-        auto intervalValue =
-            settings->getValue(settings::SystemProperties::autoLockTimeInSec, settings::SettingsScope::Global);
-        const auto interval = std::chrono::seconds{utils::getNumericValue<unsigned int>(intervalValue)};
-        return std::make_shared<GetAutoLockTimeoutResponse>(interval);
     }
 
     auto ApplicationManager::handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request)
