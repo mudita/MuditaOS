@@ -27,7 +27,7 @@ namespace gui
         auto newImg = [=](const UTF8 imageName) -> gui::Image * {
             auto img = new gui::Image(hBox, imageName, gui::ImageTypeSpecifier::W_M);
             img->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center});
-            img->setMargins(Margins(clItemStyle::left_right_margin, 0, clItemStyle::left_right_margin, 0));
+            img->setMargins(Margins(0, 0, clItemStyle::internal_margin, 0));
             img->setVisible(false);
             return img;
         };
@@ -44,7 +44,7 @@ namespace gui
         text->setEllipsis(Ellipsis::Right);
 
         timestamp = new gui::Label(hBox, 0, 0, 0, 0);
-        timestamp->setMargins(Margins(0, 0, clItemStyle::left_right_margin, 0));
+        timestamp->setMargins(Margins(0, 0, clItemStyle::right_margin, 0));
         timestamp->setMinimumHeight(clItemStyle::h);
         timestamp->setMinimumWidth(clItemStyle::timestamp::min_w);
         timestamp->setEdges(gui::RectangleEdge::None);
