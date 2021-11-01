@@ -118,8 +118,16 @@ namespace app::bell_settings
     {
         return *utils::temperature::strToUnit(temperatureUnitListItem->getUnitAsStr());
     }
+
     auto TimeUnitsModel::setTemperatureUnit(const utils::temperature::Temperature::Unit unit) -> void
     {
         temperatureUnitListItem->setUnit(unit);
+    }
+
+    void TimeUnitsModelFactoryResetValues::loadData()
+    {
+        timeSetListItem->timeSetFmtSpinner->setTimeFormat(factoryRestTimeFmt);
+        timeSetListItem->timeSetFmtSpinner->setTime(factoryResetTime);
+        timeFmtSetListItem->setTimeFmt(factoryRestTimeFmt);
     }
 } // namespace app::bell_settings
