@@ -17,7 +17,8 @@ namespace gui
     {
         inline constexpr auto w                 = style::window::default_body_width;
         inline constexpr auto h                 = style::window::label::big_h;
-        inline constexpr auto left_right_margin = 10;
+        inline constexpr auto internal_margin   = 4;
+        inline constexpr auto right_margin      = 10;
 
         namespace timestamp
         {

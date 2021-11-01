@@ -4,6 +4,7 @@
 #pragma once
 
 #include <PhoneNumber.hpp>
+#include <time/ScopedTime.hpp>
 
 namespace utils
 {
@@ -16,28 +17,36 @@ namespace utils
      */
     template <template <class, class> class C, class THolder> class NumberHolderMatcher
     {
+      public:
+        using NumbersProvider =
+            std::function<std::vector<THolder>(const PhoneNumber &number, unsigned int offset, unsigned int limit)>;
+
       private:
         using TContainer = C<THolder, std::allocator<THolder>>;
         using TIter      = typename TContainer::const_iterator;
-        using MatchMap   = std::map<PhoneNumber::Match, std::vector<THolder>>;
         using OwnType    = NumberHolderMatcher<C, THolder>;
-        TIter startIterator;
+
+        TContainer numbers;
+        NumbersProvider numbersProvider;
+        unsigned int currentOffset;
+        unsigned int limit;
+
+        auto next(const PhoneNumber &number) -> bool
+        {
+            currentOffset += limit;
+            numbers = numbersProvider(number, currentOffset, limit);
+            return !numbers.empty();
+        }
+
+        void restartFor(const PhoneNumber &number)
+        {
+            currentOffset = 0U;
+            numbers       = numbersProvider(number, currentOffset, limit);
+        }
 
       public:
-        /**
-         * @brief Default constructor (null object constructor)
-         *
-         */
-        NumberHolderMatcher()
-        {}
-
-        /**
-         * @brief NumberHolderMatcher range constructor
-         *
-         * @param cont_begin - start iterator of a container with NumberHolders
-         * @param cont_end - end iterator
-         */
-        NumberHolderMatcher(TIter cont_begin, TIter cont_end) : startIterator(cont_begin), END(cont_end)
+        NumberHolderMatcher(NumbersProvider &&provider, unsigned int pageSize)
+            : numbers{}, numbersProvider{std::move(provider)}, currentOffset{0U}, limit{pageSize}
         {}
 
         OwnType &operator=(const OwnType &) = delete;
@@ -48,29 +57,25 @@ namespace utils
          *
          * @param other - number to match with
          * @param level - minimum acceptable match level
-         * @return TIter - an iterator instance pointing to best matched element in a container or an end iterator if
-         * none could be matched
+         * @return Best match for the other phone number
          */
-        TIter bestMatch(const PhoneNumber &other, PhoneNumber::Match level = PhoneNumber::Match::EXACT) const
+        std::optional<THolder> bestMatch(const PhoneNumber &phoneNumber,
+                                         PhoneNumber::Match level = PhoneNumber::Match::EXACT)
         {
-            TIter i = startIterator;
-
-            while (i != END) {
-                auto match = other.match(i->getNumber());
-                if (match >= level) {
-                    return i;
+            utils::time::Scoped t{"bestMatch()"};
+            restartFor(phoneNumber);
+            do {
+                const auto it =
+                    std::find_if(numbers.cbegin(), numbers.cend(), [&phoneNumber, level](const auto &number) {
+                        return phoneNumber.match(number.getNumber()) >= level;
+                    });
+                if (it != numbers.cend()) {
+                    return *it;
                 }
-                i++;
-            }
+            } while (next(phoneNumber));
 
-            return END;
+            return std::nullopt;
         }
-
-        /**
-         * @brief end iterator for convienience
-         *
-         */
-        TIter END;
     };
 
 }; // namespace utils

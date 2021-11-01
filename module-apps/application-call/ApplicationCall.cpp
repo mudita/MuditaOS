@@ -130,7 +130,7 @@ namespace app
         if (response->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
-        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        return handleAsyncResponse(resp);
     } // namespace app
 
     // Invoked during initialization
