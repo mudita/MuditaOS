@@ -30,8 +30,9 @@ namespace gui
         new gui::Image(body, "big_pause_W_G");
 
         auto text = new gui::Text(body, 0, 0, body->getWidth(), bgSoundsStyle::pause::textH);
+        text->setFont(bgSoundsStyle::descriptionFont);
         text->setText(utils::translate("common_paused"));
-        text->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        text->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         text->setVisible(true);
     }
 

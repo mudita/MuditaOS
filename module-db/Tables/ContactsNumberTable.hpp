@@ -44,7 +44,24 @@ class ContactsNumberTable : public Table<ContactsNumberTableRow, ContactNumberTa
 
     std::vector<ContactsNumberTableRow> getByContactId(uint32_t id);
 
+    /**
+     * Retrieves a subset of contact numbers from the DB.
+     * @param offset    Starting position
+     * @param limit     The number of rows to be retrieved
+     * @return Contact numbers retrieved from the DB.
+     */
     std::vector<ContactsNumberTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
+
+    /**
+     * Retrieves a subset of contact numbers from the DB.
+     * The contact numbers are filtered by the last character of the "number" parameter.
+     * Thanks to the filtering, statistically ~90% of numbers are ignored.
+     * @param number    The phone number used to filter out the contact numbers by its last character.
+     * @param offset    Starting position
+     * @param limit     The number of rows to be retrieved
+     * @return Contact numbers retrieved from the DB.
+     */
+    std::vector<ContactsNumberTableRow> getLimitOffset(const std::string &number, uint32_t offset, uint32_t limit);
 
     std::vector<ContactsNumberTableRow> getLimitOffsetByField(uint32_t offset,
                                                               uint32_t limit,

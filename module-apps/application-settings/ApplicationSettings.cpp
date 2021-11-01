@@ -309,13 +309,6 @@ namespace app
             return sys::MessageNone{};
         });
 
-        connect(typeid(manager::GetAutoLockTimeoutResponse), [&](sys::Message *msg) {
-            auto response = static_cast<manager::GetAutoLockTimeoutResponse *>(msg);
-            auto data     = std::make_unique<gui::AutoLockData>(response->getValue());
-            updateCurrentWindow(std::move(data));
-            return sys::MessageNone{};
-        });
-
         connect(typeid(AudioStopNotification), [&](sys::Message *msg) -> sys::MessagePointer {
             auto notification = static_cast<AudioStopNotification *>(msg);
             return handleAudioStop(notification);
@@ -736,9 +729,11 @@ namespace app
         CellularServiceAPI::SetConnectionFrequency(this, val);
     }
 
-    void ApplicationSettings::getAutoLockTime()
+    auto ApplicationSettings::getAutoLockTime() -> std::chrono::seconds
     {
-        bus.sendUnicast(std::make_shared<app::manager::GetAutoLockTimeoutRequest>(), service::name::appmgr);
+        auto intervalValue =
+            settings->getValue(::settings::SystemProperties::autoLockTimeInSec, ::settings::SettingsScope::Global);
+        return std::chrono::seconds{utils::getNumericValue<unsigned int>(intervalValue)};
     }
 
     auto ApplicationSettings::getCurrentPhoneMode() const noexcept -> sys::phone_modes::PhoneMode

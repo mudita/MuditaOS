@@ -104,7 +104,6 @@ namespace gui
             navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
             header->navigationIndicatorRemove(gui::header::BoxSelection::Left);
-            header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
         }
     }
 

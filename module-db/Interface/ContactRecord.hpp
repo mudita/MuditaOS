@@ -143,15 +143,14 @@ enum class ContactRecordField
 class ContactNumberHolder
 {
   private:
-    ContactsNumberTableRow row;
-    utils::PhoneNumber number;
+    ContactsNumberTableRow numberRow;
 
   public:
-    explicit ContactNumberHolder(ContactsNumberTableRow numberRow);
+    ContactNumberHolder(ContactsNumberTableRow &&numberRow);
 
-    auto getNumber() const -> const utils::PhoneNumber &;
-    auto getContactID() const -> std::uint32_t;
-    auto getNumberID() const -> std::uint32_t;
+    auto getNumber() const noexcept -> utils::PhoneNumber;
+    auto getContactID() const noexcept -> std::uint32_t;
+    auto getNumberID() const noexcept -> std::uint32_t;
 };
 
 class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField>
@@ -263,7 +262,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto getByIdCommon(ContactsTableRow &contact) -> ContactRecord;
     auto getContactByNumber(const UTF8 &number) -> const std::unique_ptr<std::vector<ContactRecord>>;
     auto getAllNumbers() -> const std::vector<ContactsNumberTableRow>;
-    auto buildNumberMatcher(std::vector<ContactNumberHolder> &contactNumberHolders)
+    auto buildNumberMatcher(unsigned int maxPageSize = std::numeric_limits<unsigned int>::max())
         -> utils::NumberHolderMatcher<std::vector, ContactNumberHolder>;
     auto splitNumberIDs(const std::string &numberIDs) -> const std::vector<std::uint32_t>;
     auto joinNumberIDs(const std::vector<std::uint32_t> &numberIDs) -> std::string;
