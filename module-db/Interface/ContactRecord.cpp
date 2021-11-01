@@ -24,6 +24,11 @@
 #include <utility>
 #include <vector>
 
+namespace
+{
+    constexpr auto NumberMatcherPageSize = 100;
+} // namespace
+
 ContactRecordInterface::ContactRecordInterface(ContactsDB *db)
     : contactDB(db), favouritesGroupId(db->groups.favouritesId())
 {}
@@ -186,12 +191,11 @@ auto ContactRecordInterface::getNumbersIDs(std::uint32_t contactID, const Contac
 {
     std::vector<std::uint32_t> ret;
 
-    std::vector<ContactNumberHolder> contactNumberHolders;
-    auto numberMatcher = buildNumberMatcher(contactNumberHolders);
+    auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
     for (const auto &number : contact.numbers) {
         auto numberMatch =
             numberMatcher.bestMatch(utils::PhoneNumber(number.number), utils::PhoneNumber::Match::POSSIBLE);
-        if (numberMatch == numberMatcher.END) {
+        if (!numberMatch.has_value()) {
             // number does not exist in the DB yet. Let's add it.
             if (!contactDB->number.add(ContactsNumberTableRow{Record(DB_ID_NONE),
                                                               .contactID  = contactID,
@@ -233,12 +237,11 @@ auto ContactRecordInterface::addNumbers(std::uint32_t contactID, const std::vect
     -> std::pair<bool, std::string>
 {
     std::string numbersIDs;
-    std::vector<ContactNumberHolder> contactNumberHolders;
-    auto numberMatcher = buildNumberMatcher(contactNumberHolders);
+    auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
     for (const auto &number : numbers) {
         auto numberMatch =
             numberMatcher.bestMatch(utils::PhoneNumber(number.number), utils::PhoneNumber::Match::POSSIBLE);
-        if (numberMatch == numberMatcher.END) {
+        if (!numberMatch.has_value()) {
             auto ret = contactDB->number.add(ContactsNumberTableRow{Record(DB_ID_NONE),
                                                                     .contactID  = contactID,
                                                                     .numberUser = number.number.getEntered(),
@@ -1155,24 +1158,19 @@ auto ContactRecordInterface::addTemporaryContactForNumber(const ContactRecord::N
     return {true, tmp};
 }
 
-auto ContactRecordInterface::buildNumberMatcher(std::vector<ContactNumberHolder> &contactNumberHolders)
+auto ContactRecordInterface::buildNumberMatcher(unsigned int maxPageSize)
     -> utils::NumberHolderMatcher<std::vector, ContactNumberHolder>
 {
-    auto numbers = getAllNumbers();
-
-    for (const auto &number : numbers) {
-        try {
-            contactNumberHolders.emplace_back(number);
-        }
-        catch (const utils::PhoneNumber::Error &e) {
-            debug_db_data(
-                "Skipping invalid phone number pair: (%s, %s)", number.numberUser.c_str(), number.numbere164.c_str());
-            continue;
-        }
-    }
-
-    return utils::NumberHolderMatcher<std::vector, ContactNumberHolder>(std::cbegin(contactNumberHolders),
-                                                                        std::cend(contactNumberHolders));
+    return utils::NumberHolderMatcher<std::vector, ContactNumberHolder>(
+        [this](const utils::PhoneNumber &number, auto offset, auto limit) {
+            std::vector<ContactNumberHolder> contactNumberHolders;
+            contactNumberHolders.reserve(limit);
+            auto numbers = number.isValid() ? contactDB->number.getLimitOffset(number.get(), offset, limit)
+                                            : contactDB->number.getLimitOffset(offset, limit);
+            std::move(numbers.begin(), numbers.end(), std::back_inserter(contactNumberHolders));
+            return contactNumberHolders;
+        },
+        maxPageSize);
 }
 
 auto ContactRecordInterface::MatchByNumber(const utils::PhoneNumber::View &numberView,
@@ -1180,12 +1178,9 @@ auto ContactRecordInterface::MatchByNumber(const utils::PhoneNumber::View &numbe
                                            utils::PhoneNumber::Match matchLevel)
     -> std::optional<ContactRecordInterface::ContactNumberMatch>
 {
-    std::vector<ContactNumberHolder> contactNumberHolders;
-    auto numberMatcher = buildNumberMatcher(contactNumberHolders);
-
+    auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
     auto matchedNumber = numberMatcher.bestMatch(utils::PhoneNumber(numberView), matchLevel);
-
-    if (matchedNumber == numberMatcher.END) {
+    if (!matchedNumber.has_value()) {
         if (createTempContact != CreateTempContact::True) {
             return std::nullopt;
         }
@@ -1277,24 +1272,31 @@ auto ContactRecordInterface::getAllNumbers() -> const std::vector<ContactsNumber
     return v;
 }
 
-ContactNumberHolder::ContactNumberHolder(ContactsNumberTableRow numberRow)
-    : row(std::move(numberRow)), number(row.numbere164.empty() ? utils::PhoneNumber(row.numberUser)
-                                                               : utils::PhoneNumber(row.numberUser, row.numbere164))
+ContactNumberHolder::ContactNumberHolder(ContactsNumberTableRow &&numberRow) : numberRow(std::move(numberRow))
 {}
 
-auto ContactNumberHolder::getNumber() const -> const utils::PhoneNumber &
+auto ContactNumberHolder::getNumber() const noexcept -> utils::PhoneNumber
 {
-    return number;
+    try {
+        return utils::PhoneNumber{numberRow.numbere164.empty()
+                                      ? utils::PhoneNumber(numberRow.numberUser)
+                                      : utils::PhoneNumber(numberRow.numberUser, numberRow.numbere164)};
+    }
+    catch (const utils::PhoneNumber::Error &) {
+        debug_db_data(
+            "Skipping invalid phone number pair: (%s, %s)", numberRow.numberUser.c_str(), numberRow.numbere164.c_str());
+        return utils::PhoneNumber{};
+    }
 }
 
-auto ContactNumberHolder::getContactID() const -> std::uint32_t
+auto ContactNumberHolder::getContactID() const noexcept -> std::uint32_t
 {
-    return row.contactID;
+    return numberRow.contactID;
 }
 
-auto ContactNumberHolder::getNumberID() const -> std::uint32_t
+auto ContactNumberHolder::getNumberID() const noexcept -> std::uint32_t
 {
-    return row.ID;
+    return numberRow.ID;
 }
 
 void ContactRecord::addToFavourites(bool add)
@@ -1388,8 +1390,7 @@ auto ContactRecordInterface::GetNumbersIdsByContact(std::uint32_t contactId) -> 
 
 auto ContactRecordInterface::MergeContactsList(std::vector<ContactRecord> &contacts) -> bool
 {
-    std::vector<ContactNumberHolder> contactNumberHolders;
-    auto numberMatcher = buildNumberMatcher(contactNumberHolders);
+    auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
 
     for (auto &contact : contacts) {
         // Important: Comparing only single number contacts
@@ -1398,7 +1399,7 @@ auto ContactRecordInterface::MergeContactsList(std::vector<ContactRecord> &conta
         }
         auto matchedNumber = numberMatcher.bestMatch(contact.numbers[0].number, utils::PhoneNumber::Match::POSSIBLE);
 
-        if (matchedNumber == numberMatcher.END) {
+        if (!matchedNumber.has_value()) {
             if (!Add(contact)) {
                 LOG_ERROR("Contacts list merge fail when adding the contact.");
                 return false;
@@ -1409,7 +1410,7 @@ auto ContactRecordInterface::MergeContactsList(std::vector<ContactRecord> &conta
             contact.ID = matchedNumber->getContactID();
             Update(contact);
             // Rebuild number matcher
-            numberMatcher = buildNumberMatcher(contactNumberHolders);
+            numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
         }
     }
     return true;
@@ -1420,8 +1421,7 @@ auto ContactRecordInterface::CheckContactsListDuplicates(std::vector<ContactReco
 {
     std::vector<ContactRecord> unique;
     std::vector<ContactRecord> duplicates;
-    std::vector<ContactNumberHolder> contactNumberHolders;
-    auto numberMatcher = buildNumberMatcher(contactNumberHolders);
+    auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
 
     for (auto &contact : contacts) {
         // Important: Comparing only single number contacts
@@ -1429,7 +1429,7 @@ auto ContactRecordInterface::CheckContactsListDuplicates(std::vector<ContactReco
             LOG_WARN("Contact with multiple numbers detected - ignoring all numbers except first");
         }
         auto matchedNumber = numberMatcher.bestMatch(contact.numbers[0].number, utils::PhoneNumber::Match::POSSIBLE);
-        if (matchedNumber != numberMatcher.END) {
+        if (matchedNumber.has_value()) {
             duplicates.push_back(contact);
         }
         else {

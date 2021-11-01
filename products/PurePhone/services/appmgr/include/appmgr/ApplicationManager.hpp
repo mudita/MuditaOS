@@ -11,6 +11,8 @@
 
 namespace app::manager
 {
+    class SetAutoLockTimeoutRequest;
+
     class ApplicationManager : public ApplicationManagerCommon
     {
       public:
@@ -22,7 +24,6 @@ namespace app::manager
         auto InitHandler() -> sys::ReturnCodes override;
         void changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app);
         void handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode);
-        auto handleBluetoothModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
         void handleBluetoothModeChanged(sys::bluetooth::BluetoothMode mode);
         void handleAlarmClockStatusChanged(bool status);
         void changeBluetoothMode(const ApplicationHandle *app);
@@ -32,7 +33,6 @@ namespace app::manager
         void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
         void registerMessageHandlers() override;
         void startBackgroundApplications();
-        auto handleAutoLockGetRequest(GetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer override;
         void lockTimeChanged(std::string value);
