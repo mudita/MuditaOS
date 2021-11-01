@@ -72,7 +72,7 @@ namespace app
         windowsFactory.attach(
             gui::window::name::onBoardingSettingsWindow, [](ApplicationCommon *app, const std::string &name) {
                 auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
-                auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModel>(app);
+                auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModelFactoryResetValues>(app);
                 auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(
                     timeUnitsProvider, std::move(temperatureUnitModel));
                 return std::make_unique<gui::OnBoardingSettingsWindow>(app, std::move(presenter), name);
