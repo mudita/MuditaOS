@@ -67,6 +67,14 @@ void SettingsAgent::registerMessages()
                            std::bind(&SettingsAgent::handleUnregisterOnVariableChange, this, _1));
 }
 
+void SettingsAgent::unRegisterMessages()
+{
+    parentService->disconnect(typeid(settings::Messages::GetVariable));
+    parentService->disconnect(typeid(settings::Messages::SetVariable));
+    parentService->disconnect(typeid(settings::Messages::RegisterOnVariableChange));
+    parentService->disconnect(typeid(settings::Messages::UnregisterOnVariableChange));
+}
+
 auto SettingsAgent::getDbInitString() -> const std::string
 {
     return {};
