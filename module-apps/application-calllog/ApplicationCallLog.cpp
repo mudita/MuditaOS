@@ -27,7 +27,7 @@ namespace app
                                            std::string parent,
                                            StatusIndicators statusIndicators,
                                            StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, 4096)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, 5120)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {

@@ -170,10 +170,12 @@ namespace gui
 
         // perform actual add/update operation
         if (contactAction == ContactAction::Add) {
-            if (!DBServiceAPI::ContactAdd(application, *contact)) {
+            auto returnedContact = DBServiceAPI::ContactAdd(application, *contact);
+            if (!returnedContact.has_value()) {
                 LOG_ERROR("verifyAndSave failed to ADD contact");
                 return false;
             }
+            *contact = returnedContact.value();
         }
         else if (contactAction == ContactAction::Edit || contactAction == ContactAction::EditTemporary) {
             contact->groups.erase(ContactsDB::temporaryGroupId());
@@ -193,8 +195,7 @@ namespace gui
     {
         auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber);
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
-
-        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+        auto metaData         = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{duplicatedNumber.getFormatted(),
                                 "info_big_circle_W_G",
                                 text::RichTextParser()
