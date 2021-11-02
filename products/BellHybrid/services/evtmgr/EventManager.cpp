@@ -20,8 +20,8 @@
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/WorkerEventCommon.hpp>
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
-#include <bsp/switches/LatchStatusRequest.hpp>
-#include <bsp/switches/switches.hpp>
+#include <switches/LatchStatusRequest.hpp>
+#include <switches/LatchState.hpp>
 
 namespace
 {

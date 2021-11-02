@@ -13,7 +13,7 @@
 #include <time/time_constants.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <bsp/switches/LatchStatusRequest.hpp>
+#include <switches/LatchStatusRequest.hpp>
 
 namespace app::home_screen
 {

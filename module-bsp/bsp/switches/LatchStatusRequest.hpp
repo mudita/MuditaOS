@@ -22,7 +22,7 @@ namespace sevm
 
     class LatchStatusResponse : public sys::ResponseMessage
     {
-        LatchStatus status;
+        LatchStatus status = LatchStatus::RELEASED;
 
       public:
         LatchStatusResponse(LatchStatus status) : status(status)

@@ -12,6 +12,7 @@
 #include <board/BoardDefinitions.hpp>
 #include <board.h>
 #include <fsl_common.h>
+#include <switches/LatchState.hpp>
 
 #include <chrono>
 #include <stdio.h>
