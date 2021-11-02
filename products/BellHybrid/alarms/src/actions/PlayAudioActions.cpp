@@ -19,7 +19,7 @@ namespace alarms
           playbackType{playbackType}, settings{service::ServiceProxy{service.weak_from_this()}}
     {}
 
-    bool PlayAudioAction::play(const std::filesystem::path &path, std::chrono::seconds duration)
+    bool PlayAudioAction::play(const std::filesystem::path &path, std::chrono::minutes duration)
     {
         if (duration != InfiniteDuration) {
             spawnTimer(duration);
@@ -38,7 +38,7 @@ namespace alarms
         const auto tone        = settings.getValue(toneSetting, settings::SettingsScope::Global);
         const auto durationStr = settings.getValue(durationSetting, settings::SettingsScope::Global);
         const auto durationVal = utils::getNumericValue<int>(durationStr);
-        return play(soundsRepository.titleToPath(tone).value_or(""), std::chrono::seconds{durationVal});
+        return play(soundsRepository.titleToPath(tone).value_or(""), std::chrono::minutes{durationVal});
     }
 
     void PlayAudioAction::detachTimer()
@@ -48,7 +48,7 @@ namespace alarms
             timer.reset();
         }
     }
-    void PlayAudioAction::spawnTimer(std::chrono::seconds timeout)
+    void PlayAudioAction::spawnTimer(std::chrono::minutes timeout)
     {
         constexpr auto timerName = "playDurationTimer";
         if (not timer.isValid()) {
@@ -65,13 +65,17 @@ namespace alarms
             return std::make_unique<PlayAudioAction>(service,
                                                      paths::getPreWakeUpChimesDir(),
                                                      bell::settings::PrewakeUp::tone,
-                                                     bell::settings::PrewakeUp::duration);
+                                                     bell::settings::PrewakeUp::duration,
+                                                     audio::PlaybackType::Multimedia);
         }
 
         std::unique_ptr<PlayAudioAction> createSnoozeChimeAction(sys::Service &service)
         {
-            return std::make_unique<PlayAudioAction>(
-                service, paths::getSnoozeChimesDir(), bell::settings::Snooze::tone, bell::settings::Snooze::length);
+            return std::make_unique<PlayAudioAction>(service,
+                                                     paths::getSnoozeChimesDir(),
+                                                     bell::settings::Snooze::tone,
+                                                     bell::settings::Snooze::length,
+                                                     audio::PlaybackType::Multimedia);
         }
         std::unique_ptr<PlayAudioAction> createAlarmToneAction(sys::Service &service)
         {
@@ -83,7 +87,8 @@ namespace alarms
             return std::make_unique<PlayAudioAction>(service,
                                                      paths::getBedtimeReminderChimesDir(),
                                                      bell::settings::Bedtime::tone,
-                                                     bell::settings::Bedtime::duration);
+                                                     bell::settings::Bedtime::duration,
+                                                     audio::PlaybackType::Multimedia);
         }
     } // namespace factory
 } // namespace alarms

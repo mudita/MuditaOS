@@ -18,6 +18,7 @@ namespace service::detail
         StartupIndexer(const StartupIndexer &) = delete;
         StartupIndexer &operator=(StartupIndexer) = delete;
         auto start(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void;
+        void reset();
 
       private:
         // Process single entry
@@ -31,11 +32,14 @@ namespace service::detail
         static auto createLockFile() -> bool;
         //  Check if lock file exists
         static auto hasLockFile() -> bool;
+        //  remove lock file exists
+        static auto removeLockFile() -> bool;
 
       private:
         std::vector<std::string>::const_iterator mTopDirIterator;
         std::filesystem::recursive_directory_iterator mSubDirIterator;
         sys::TimerHandle mIdxTimer;
         bool mStarted{};
+        bool mForceStop{};
     };
 } // namespace service::detail
