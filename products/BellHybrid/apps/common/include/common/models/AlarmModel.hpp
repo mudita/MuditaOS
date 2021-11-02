@@ -4,6 +4,7 @@
 #pragma once
 
 #include "AbstractAlarmModel.hpp"
+#include <service-time/AlarmStatus.hpp>
 
 #include <apps-common/AsyncTask.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
@@ -37,6 +38,7 @@ namespace app
         void turnOff() override;
         void snooze() override;
         std::chrono::seconds getTimeToNextSnooze() override;
+        alarms::AlarmStatus getAlarmStatus() override;
 
       private:
         enum class State
@@ -50,10 +52,11 @@ namespace app
         AlarmEventRecord generateDefaultAlarm() const;
         std::shared_ptr<AlarmEventRecord> getAlarmPtr() const;
         void disableSnooze(AlarmEventRecord &alarm);
-        void updateCache(const SingleEventRecord &record);
+        void updateCache(const SingleEventRecord &record, alarms::AlarmStatus status);
 
         ApplicationCommon *app{};
         State state{State::Invalid};
+        alarms::AlarmStatus alarmStatus{alarms::AlarmStatus::Invalid};
         SingleEventRecord cachedRecord;
         std::uint32_t snoozeCount = 0;
         TimePoint nextSnoozeTime  = TIME_POINT_INVALID;

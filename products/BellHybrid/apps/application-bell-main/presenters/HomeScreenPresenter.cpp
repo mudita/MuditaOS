@@ -65,7 +65,7 @@ namespace app::home_screen
 
     void HomeScreenPresenter::onBeforeShow()
     {
-        alarmModel->update([&]() { handleAlarmModelReady(); });
+        stateController->resetStateMachine();
         getView()->setTimeFormat(timeModel->getTimeFormat());
         getView()->setTime(timeModel->getCurrentTime());
         getView()->setAlarmTimeFormat(timeModel->getTimeFormat());
