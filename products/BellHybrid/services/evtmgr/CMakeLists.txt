@@ -12,6 +12,7 @@ target_sources(evtmgr
         internal/StaticData.hpp
         screen-light-control/ScreenLightControl.cpp
         backlight-handler/BacklightHandler.cpp
+        user-activity-handler/UserActivityHandler.cpp
 
         internal/key_sequences/AbstractKeySequence.hpp
         internal/key_sequences/KeySequenceMgr.hpp
@@ -26,6 +27,7 @@ target_sources(evtmgr
         include/evtmgr/EventManager.hpp
         include/evtmgr/api/TemperatureApi.hpp
         include/evtmgr/backlight-handler/BacklightHandler.hpp
+        include/evtmgr/user-activity-handler/UserActivityHandler.hpp
 )
 
 target_include_directories(evtmgr
