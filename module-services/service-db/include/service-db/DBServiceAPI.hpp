@@ -100,7 +100,7 @@ class DBServiceAPI
         -> std::unique_ptr<ContactRecord>;
     [[deprecated]] static auto NumberByID(sys::Service *serv, std::uint32_t numberID) -> utils::PhoneNumber::View;
 
-    [[deprecated]] static auto ContactAdd(sys::Service *serv, const ContactRecord &rec) -> bool;
+    [[deprecated]] static auto ContactAdd(sys::Service *serv, const ContactRecord &rec) -> std::optional<ContactRecord>;
     [[deprecated]] static auto ContactRemove(sys::Service *serv, uint32_t id) -> bool;
     [[deprecated]] static auto ContactUpdate(sys::Service *serv, const ContactRecord &rec) -> bool;
 
