@@ -138,6 +138,10 @@ namespace stm
         connect(typeid(alarms::AlarmGetRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
             return alarmMessageHandler->handleGetAlarm(static_cast<alarms::AlarmGetRequestMessage *>(request));
         });
+        connect(typeid(alarms::AlarmGetWithStatusRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleGetAlarmWithStatus(
+                static_cast<alarms::AlarmGetWithStatusRequestMessage *>(request));
+        });
         connect(typeid(alarms::AlarmAddRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
             return alarmMessageHandler->handleAddAlarm(static_cast<alarms::AlarmAddRequestMessage *>(request));
         });
