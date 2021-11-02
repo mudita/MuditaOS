@@ -86,7 +86,10 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         auto time             = utils::time::Scoped("DBContactAdd");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret              = contactRecordInterface->Add(msg->record);
-        responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        auto record           = std::make_unique<std::vector<ContactRecord>>();
+        record->push_back(msg->record);
+        LOG_DEBUG("Last ID %" PRIu32, msg->record.ID);
+        responseMsg = std::make_shared<DBContactResponseMessage>(std::move(record), ret);
         sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Create);
     } break;
 
