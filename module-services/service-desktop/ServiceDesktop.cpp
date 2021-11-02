@@ -228,6 +228,7 @@ sys::ReturnCodes ServiceDesktop::DeinitHandler()
     if (initialized) {
         settings->deinit();
         desktopWorker->deinit();
+        initialized = false;
     }
     return sys::ReturnCodes::Success;
 }
