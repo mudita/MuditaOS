@@ -51,6 +51,9 @@ namespace service::detail
     // On timer timeout
     auto StartupIndexer::onTimerTimeout(std::shared_ptr<sys::Service> svc) -> void
     {
+        if (mForceStop) {
+            return;
+        }
         if (!mStarted) {
             mIdxTimer.restart(std::chrono::milliseconds{timer_indexing_delay});
             mStarted = true;
@@ -89,23 +92,42 @@ namespace service::detail
             LOG_INFO("Initial startup indexer - Started...");
             mTopDirIterator = std::begin(start_dirs);
             setupTimers(svc, svc_name);
+            mForceStop = false;
         }
         else {
             LOG_INFO("Initial startup indexer - Not needed...");
         }
     }
 
-    // Create lock file
+    void StartupIndexer::reset()
+    {
+        mForceStop = true;
+        mIdxTimer.stop();
+        removeLockFile();
+    }
+
     auto StartupIndexer::createLockFile() -> bool
     {
         std::ofstream ofs(lock_file_name);
         ofs << time(nullptr);
         return ofs.good();
     }
-    //  Check if lock file exists
+
     auto StartupIndexer::hasLockFile() -> bool
     {
         std::error_code ec;
         return fs::is_regular_file(lock_file_name, ec);
+    }
+
+    auto StartupIndexer::removeLockFile() -> bool
+    {
+        if (hasLockFile()) {
+            std::error_code ec;
+            if (!remove(lock_file_name, ec)) {
+                LOG_ERROR("Failed to remove lock file, error: %d", ec.value());
+                return false;
+            }
+        }
+        return true;
     }
 } // namespace service::detail

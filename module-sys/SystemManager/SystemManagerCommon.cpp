@@ -147,12 +147,10 @@ namespace sys
             LOG_INFO("  --->  REBOOT <--- ");
             powerManager->Reboot();
             break;
-        case State::ShutdownReady: {
+        case State::ShutdownReady:
             LOG_INFO("  ---> SHUTDOWN <--- ");
             powerManager->PowerOff();
-        }
-
-        break;
+            break;
         case State::RebootToUpdate:
             LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
             powerManager->RebootToUpdate(updateReason);
