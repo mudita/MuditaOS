@@ -30,7 +30,7 @@ namespace stm
     class ServiceTime : public sys::Service
     {
       private:
-        static constexpr auto StackDepth = 2048 * 4;
+        static constexpr auto StackDepth = 2048 * 6;
 
         std::unique_ptr<TimeManager> timeManager;
 

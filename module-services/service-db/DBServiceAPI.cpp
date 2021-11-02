@@ -160,7 +160,7 @@ auto DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec)
     return ContactVerificationResult::success;
 }
 
-auto DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) -> bool
+auto DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) -> std::optional<ContactRecord>
 {
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactAdd, rec);
 
@@ -168,12 +168,15 @@ auto DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) -> b
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
-        return false;
+        return std::nullopt;
     }
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode != 0)) {
-        return true;
+        auto records = *contactResponse->records;
+        if (!records.empty()) {
+            return records[0];
+        }
     }
-    return false;
+    return std::nullopt;
 }
 
 auto DBServiceAPI::ContactRemove(sys::Service *serv, uint32_t id) -> bool
