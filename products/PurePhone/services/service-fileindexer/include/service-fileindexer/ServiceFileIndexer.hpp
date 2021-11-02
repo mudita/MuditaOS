@@ -23,6 +23,7 @@ namespace service
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
+        void ProcessCloseReason(sys::CloseReason closeReason) override;
 
       private:
         detail::InotifyHandler mInotifyHandler;
