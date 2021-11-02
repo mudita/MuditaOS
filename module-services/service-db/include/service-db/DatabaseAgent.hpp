@@ -24,6 +24,7 @@ class DatabaseAgent
     virtual void initDb()                                          = 0;
     virtual void deinitDb()                                        = 0;
     virtual void registerMessages()                                = 0;
+    virtual void unRegisterMessages()                              = 0;
     [[nodiscard]] virtual auto getAgentName() -> const std::string = 0;
     bool storeIntoFile(const std::filesystem::path &file)
     {

@@ -67,6 +67,9 @@ sys::ReturnCodes ServiceDBCommon::DeinitHandler()
 void ServiceDBCommon::ProcessCloseReason(sys::CloseReason closeReason)
 {
     if (closeReason == sys::CloseReason::FactoryReset) {
+        for (auto &dbAgent : databaseAgents) {
+            dbAgent->unRegisterMessages();
+        }
         factoryReset();
     }
     sendCloseReadyMessage(this);
