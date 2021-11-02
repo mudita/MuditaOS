@@ -10,6 +10,8 @@
 
 namespace app::meditation
 {
+    constexpr auto intervalsList = {1, 2, 5, 10, 15, 30};
+
     IntervalChimePresenter::IntervalChimePresenter(app::ApplicationCommon *app, settings::Settings *settings)
         : app{app}, settings{settings}
     {
@@ -68,12 +70,20 @@ namespace app::meditation
     void IntervalChimePresenter::initIntervalOptions()
     {
         intervalOptions.push_back({std::chrono::minutes{0}, utils::translate("app_bell_meditation_interval_none")});
-        intervalOptions.push_back({std::chrono::minutes{1}, getIntervalString(1)});
-        intervalOptions.push_back({std::chrono::minutes{2}, getIntervalString(2)});
-        intervalOptions.push_back({std::chrono::minutes{5}, getIntervalString(5)});
-        intervalOptions.push_back({std::chrono::minutes{10}, getIntervalString(10)});
-        intervalOptions.push_back({std::chrono::minutes{15}, getIntervalString(15)});
-        intervalOptions.push_back({std::chrono::minutes{30}, getIntervalString(30)});
+
+        const auto duration =
+            utils::getNumericValue<int>(settings->getValue(meditationDBRecordName, settings::SettingsScope::AppLocal));
+        if (duration == 1) {
+            settings->setValue(intervalDBRecordName, utils::to_string(0), settings::SettingsScope::AppLocal);
+            app->switchWindow(gui::name::window::readyGoing);
+            return;
+        }
+
+        for (const auto &interval : intervalsList) {
+            if (interval < duration) {
+                intervalOptions.push_back({std::chrono::minutes{interval}, getIntervalString(interval)});
+            }
+        }
     }
 
     std::string IntervalChimePresenter::getIntervalString(std::uint32_t value)
