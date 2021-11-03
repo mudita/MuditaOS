@@ -35,11 +35,14 @@ namespace app::music_player
 
     bool SongsPresenter::play(const std::string &filePath)
     {
+        waitingToPlay = true;
         return audioOperations->play(filePath, [this, filePath](audio::RetCode retCode, audio::Token token) {
+            waitingToPlay = false;
             if (retCode != audio::RetCode::Success || !token.IsValid()) {
                 LOG_ERROR("Playback audio operation failed, retcode = %s, token validity = %d",
                           str(retCode).c_str(),
                           token.IsValid());
+                refreshView();
                 return;
             }
 
@@ -170,8 +173,10 @@ namespace app::music_player
             if (changePlayingStateCallback != nullptr) {
                 changePlayingStateCallback(SongState::NotPlaying);
             }
-            updateViewSongState();
-            refreshView();
+            if (!waitingToPlay) {
+                updateViewSongState();
+                refreshView();
+            }
             return true;
         }
         return false;
@@ -186,11 +191,13 @@ namespace app::music_player
             if (changePlayingStateCallback != nullptr) {
                 changePlayingStateCallback(SongState::NotPlaying);
             }
-            updateViewSongState();
-            refreshView();
             auto nextSongToPlay = songsModelInterface->getNextFilePath(currentSongContext.filePath);
             if (!nextSongToPlay.empty()) {
                 requestAudioOperation(nextSongToPlay);
+            }
+            else {
+                updateViewSongState();
+                refreshView();
             }
             return true;
         }
