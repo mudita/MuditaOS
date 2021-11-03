@@ -21,6 +21,7 @@ target_sources(
         bsp/eink/eink_pin_config.cpp
         bsp/fuel_gauge/fuel_gauge.cpp
         bsp/lpm/PowerProfile.cpp
+        bsp/lpm/RT1051LPM.cpp
         bsp/rotary_encoder/rotary_encoder.cpp
         bsp/switches/switches.cpp
 

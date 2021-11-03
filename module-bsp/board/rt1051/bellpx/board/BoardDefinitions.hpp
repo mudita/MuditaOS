@@ -145,15 +145,15 @@ enum class BoardDefinitions
     BELL_TEMP_SENSOR_I2C          = static_cast<int>(drivers::I2CInstances ::I2C4),
     BELL_TEMP_SENSOR_I2C_BAUDRATE = I2C_STD_BAUDRATE,
 
-    BELL_SWITCHES_GPIO   = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
-    BELL_SWITCHES_CENTER = 16, // GPIO_B1_00
-    BELL_SWITCHES_RIGHT  = 24, // GPIO_B1_08
-    BELL_SWITCHES_LEFT   = 25, // GPIO_B1_09
-    BELL_SWITCHES_LATCH  = 26, // GPIO_B1_10
-    BELL_SWITCHES_DOME   = 27, // GPIO_B1_11
+    BELL_SWITCHES_GPIO  = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
+    BELL_SWITCHES_RIGHT = 24, // GPIO_B1_08
+    BELL_SWITCHES_LEFT  = 25, // GPIO_B1_09
+    BELL_SWITCHES_LATCH = 26, // GPIO_B1_10
 
-    BELL_WAKEUP_GPIO = static_cast<int>(drivers::GPIOInstances ::GPIO_5),
-    BELL_WAKEUP      = 0, // SNVS_WAKEUP_GPIO5_IO00
+    BELL_WAKEUP_GPIO        = static_cast<int>(drivers::GPIOInstances ::GPIO_5),
+    BELL_WAKEUP             = 0, // SNVS_WAKEUP_GPIO5_IO00
+    BELL_CENTER_SWITCH_GPIO = BELL_WAKEUP_GPIO,
+    BELL_CENTER_SWITCH      = BELL_WAKEUP,
 
     BELL_BATTERY_CHARGER_GPIO       = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
     BELL_BATTERY_CHARGER_CHGEN_PIN  = 23,
