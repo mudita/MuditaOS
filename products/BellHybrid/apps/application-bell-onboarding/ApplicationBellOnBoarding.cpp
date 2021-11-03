@@ -7,6 +7,7 @@
 #include <windows/OnBoardingLanguageWindow.hpp>
 #include <windows/OnBoardingFinalizeWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
+#include <windows/OnBoardingWelcomeWindow.hpp>
 #include <windows/OnBoardingInstructionPromptWindow.hpp>
 
 #include <service-appmgr/Constants.hpp>
@@ -60,8 +61,13 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellWelcomeWindow>(
-                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingLanguageWindow); });
+                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingWelcomeWindow); });
         });
+
+        windowsFactory.attach(gui::window::name::onBoardingWelcomeWindow,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::OnBoardingWelcomeWindow>(app, name);
+                              });
 
         windowsFactory.attach(
             gui::window::name::onBoardingLanguageWindow, [this](ApplicationCommon *app, const std::string &name) {
@@ -158,6 +164,7 @@ namespace app
         auto currentWindow = getCurrentWindow()->getName();
         return (currentWindow != gui::name::window::main_window &&
                 currentWindow != gui::window::name::finalizeOnBoardingWindow &&
+                currentWindow != gui::window::name::onBoardingWelcomeWindow &&
                 (currentWindow != gui::window::name::informationOnBoardingWindow ||
                  informationState == OnBoarding::InformationStates::DeepClickWarningInfo));
     }

@@ -606,6 +606,7 @@
   "app_bell_onboarding_info_deep_click_warning": "<text font='gt_pressura' weight='light' size='38'>You've </text><text font='gt_pressura' weight='regular' size='38'>deep pressed</text>",
   "app_bell_onboarding_info_deep_click_correction": "<text font='gt_pressura' weight='light' size='38'>Be more gentle,<br></br>try </text><text font='gt_pressura' weight='regular' size='38'>light click </text><text font='gt_pressura' weight='light' size='38'>this time</text>",
   "app_bell_onboarding_finalize": "Well done!",
+  "app_bell_onboarding_welcome": "Welcome",
   "app_bell_settings_advanced": "Advanced",
   "app_bell_settings_time_units": "Time & units",
   "app_bell_settings_advanced_temp_scale": "Temperature scale",
