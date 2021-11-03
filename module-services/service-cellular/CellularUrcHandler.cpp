@@ -43,7 +43,13 @@ void CellularUrcHandler::Handle(Creg &urc)
                  utils::enumToString(status).c_str(),
                  utils::enumToString(accessTechnology).c_str());
 
-        CellularServiceAPI::RequestCurrentOperatorName(&cellularService);
+        if (status == Store::Network::Status::RegisteredHomeNetwork ||
+            status == Store::Network::Status::RegisteredRoaming) {
+            CellularServiceAPI::RequestCurrentOperatorName(&cellularService);
+        }
+        else {
+            Store::GSM::get()->setNetworkOperatorName("");
+        }
 
         Store::Network network{status, accessTechnology};
         if (Store::GSM::get()->getNetwork() != network) {
