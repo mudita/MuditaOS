@@ -28,6 +28,7 @@ namespace app::home_screen
     {
         getView()->setTime(timeModel->getCurrentTime());
         stateController->handleTimeUpdateEvent();
+        handleCyclicDeepRerfesh(CyclicDeepRefreshIntervalMinutes);
     }
 
     void HomeScreenPresenter::handleAlarmRingingEvent()
@@ -118,8 +119,21 @@ namespace app::home_screen
     {
         return batteryModel->getLevelState().level;
     }
+
     bool HomeScreenPresenter::isBatteryCharging() const
     {
         return batteryModel->getLevelState().state == Store::Battery::State::Charging;
+    }
+
+    void HomeScreenPresenter::handleCyclicDeepRerfesh(const int interval) 
+    {
+        auto currTime = timeModel->getCurrentTime();
+        auto currStructTime = std::localtime(&currTime);
+
+        if (((currStructTime->tm_min % interval) == 0) && (currStructTime->tm_sec == 0))   //true only when interval criteria on minutes (eg. every 30 min) met
+        {
+            app->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+            vTaskDelay(pdMS_TO_TICKS(CyclicDeepRefreshHaltAfterRefreshMsec));
+        }
     }
 } // namespace app::home_screen

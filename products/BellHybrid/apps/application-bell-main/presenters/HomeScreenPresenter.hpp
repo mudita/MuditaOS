@@ -146,6 +146,10 @@ namespace app::home_screen
         std::shared_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
 
+        static constexpr auto CyclicDeepRefreshIntervalMinutes = 30;
+        static constexpr auto CyclicDeepRefreshHaltAfterRefreshMsec = 500;
+        void handleCyclicDeepRerfesh(const int interval);
+
         static constexpr auto timerName = "HS_timer";
         static constexpr auto snoozeTick = std::chrono::seconds(1);
     };
