@@ -7,7 +7,7 @@
 
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/ProgressBar.hpp>
-#include <gui/widgets/Text.hpp>
+#include <gui/widgets/text/Text.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
 
 namespace app

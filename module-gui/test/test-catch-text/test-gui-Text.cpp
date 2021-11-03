@@ -1,24 +1,18 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BoundingBox.hpp"
-#include "BoxLayout.hpp"
-#include "Common.hpp"
 #include "InitializedFontManager.hpp"
-#include "TextParse.hpp"
-#include <i18n/i18n.hpp>
-#include "mock/InitializedFontManager.hpp"
-#include <catch2/catch.hpp>
-#include <limits>
 
-#include <module-gui/gui/widgets/Text.hpp>
+#include <widgets/text/parsers/TextParse.hpp>
+#include <widgets/text/parsers/RichTextParser.hpp>
+#include <widgets/text/Text.hpp>
+#include <widgets/text/TextFixedSize.hpp>
+
 #include <mock/multi-line-string.hpp>
-#include <algorithm>
-#include <mock/BlockFactory.hpp>
-#include <RawFont.hpp>
-#include "Font.hpp"
-#include "RichTextParser.hpp"
-#include "TextFixedSize.hpp"
+#include <i18n/i18n.hpp>
+#include <Font.hpp>
+
+#include <catch2/catch.hpp>
 
 TEST_CASE("Text ctor")
 {

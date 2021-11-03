@@ -9,7 +9,7 @@
 #include <module-apps/application-notes/presenter/SearchEngineWindowPresenter.hpp>
 
 #include <module-gui/gui/input/InputEvent.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
+#include <module-gui/gui/widgets/text/Text.hpp>
 
 namespace app::notes
 {

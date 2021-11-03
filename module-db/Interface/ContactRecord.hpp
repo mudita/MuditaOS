@@ -14,7 +14,7 @@
 
 #include <PhoneNumber.hpp>
 #include <NumberHolderMatcher.hpp>
-#include "module-gui/gui/widgets/TextConstants.hpp"
+#include "module-gui/gui/widgets/text/TextConstants.hpp"
 #include <module-apps/application-phonebook/data/ContactsMap.hpp>
 
 #include <memory>

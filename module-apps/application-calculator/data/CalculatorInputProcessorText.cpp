@@ -4,7 +4,7 @@
 #include "CalculatorInputProcessorText.hpp"
 #include "CalculatorUtility.hpp"
 #include <module-gui/gui/input/InputEvent.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
+#include <module-gui/gui/widgets/text/Text.hpp>
 #include <i18n/i18n.hpp>
 #include <gsl/assert>
 

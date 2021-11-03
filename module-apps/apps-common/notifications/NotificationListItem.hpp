@@ -6,7 +6,6 @@
 #include <ListItem.hpp>
 #include <BoxLayout.hpp>
 #include <Text.hpp>
-#include <RichTextParser.hpp>
 #include <widgets/ButtonOnOff.hpp>
 
 #include "NotificationData.hpp"

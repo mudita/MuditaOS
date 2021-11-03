@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-
-#include <module-gui/gui/widgets/TextFixedSize.hpp>
+#include <widgets/text/TextFixedSize.hpp>
 #include <module-gui/test/mock/InitializedFontManager.hpp>
+
+#include <catch2/catch.hpp>
 
 namespace gui
 {

@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "mock/InitializedFontManager.hpp"
-#include <module-gui/gui/widgets/TextBlock.hpp>
-#include <list>
+#include <widgets/text/core/TextBlock.hpp>
+
+#include <mock/InitializedFontManager.hpp>
 #include <map>
 
 namespace mockup

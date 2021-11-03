@@ -8,7 +8,7 @@
 #include <module-apps/application-onboarding/presenter/EULALicenseWindowPresenter.hpp>
 
 #include <module-gui/gui/widgets/Label.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
+#include <module-gui/gui/widgets/text/Text.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 
 namespace app::onBoarding

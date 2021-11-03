@@ -10,7 +10,7 @@
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/input/InputEvent.hpp>
-#include <gui/widgets/TextFixedSize.hpp>
+#include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
 #include <i18n/i18n.hpp>
 #include <service-db/DBNotificationMessage.hpp>
