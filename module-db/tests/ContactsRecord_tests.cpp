@@ -380,20 +380,24 @@ TEST_CASE("Contact record numbers update")
         REQUIRE(contactDB.number.count() == 4);
 
         auto validationRecord = records.GetByIdWithTemporary(1);
-        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
 
         validationRecord = records.GetByIdWithTemporary(2);
         REQUIRE(validationRecord.ID != DB_ID_NONE);
-        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[0]);
+        // numbers[3] was previously assigned to it, but it's re-assigned to recordID=2 above.
+        REQUIRE(validationRecord.numbers.empty());
 
+        // A temporary contact for number[0] (which was previously assigned to recordID=1) has been created.
         validationRecord = records.GetByIdWithTemporary(3);
         REQUIRE(validationRecord.ID != DB_ID_NONE);
-        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[1]);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[0]);
 
-        validationRecord = records.GetByID(4);
-        REQUIRE(validationRecord.numbers.size() == 2);
-        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
-        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
+        // A temporary contact for number[1] (which was previously assigned to recordID=1) has been created.
+        validationRecord = records.GetByIdWithTemporary(4);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[1]);
     }
 
     Database::deinitialize();
