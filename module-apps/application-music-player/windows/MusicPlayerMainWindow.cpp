@@ -518,22 +518,27 @@ namespace gui
             }
         }
 
-        snprintf(timeToDisplay,
-                 maxTimeToDisplaySize,
-                 "%d:%02d:%02d",
-                 static_cast<int>(currentTotalTime) / utils::time::secondsInHour,
-                 static_cast<int>((currentTotalTime) % utils::time::secondsInHour) / 60,
-                 static_cast<int>(currentTotalTime) % utils::time::secondsInMinute);
-        currentTotalTimeString = timeToDisplay;
+        auto secsToStr = [&](int secs) {
+            if (secs < 3600) {
+                snprintf(timeToDisplay,
+                         maxTimeToDisplaySize,
+                         "%d:%02d",
+                         static_cast<int>(secs / utils::time::secondsInMinute),
+                         static_cast<int>(secs) % utils::time::secondsInMinute);
+            }
+            else {
+                snprintf(timeToDisplay,
+                         maxTimeToDisplaySize,
+                         "%d:%02d:%02d",
+                         static_cast<int>(secs) / utils::time::secondsInHour,
+                         static_cast<int>((secs) % utils::time::secondsInHour) / utils::time::secondsInMinute,
+                         static_cast<int>(secs) % utils::time::secondsInMinute);
+            }
+            return timeToDisplay;
+        };
 
-        auto elapsedTime = static_cast<uint32_t>(currentTotalTime * currentProgress);
-        snprintf(timeToDisplay,
-                 maxTimeToDisplaySize,
-                 "%d:%02d:%02d",
-                 static_cast<int>(elapsedTime) / utils::time::secondsInHour,
-                 static_cast<int>((elapsedTime) % utils::time::secondsInHour) / 60,
-                 static_cast<int>(elapsedTime) % utils::time::secondsInMinute);
-        currentTimeString = timeToDisplay;
+        currentTotalTimeString = secsToStr(currentTotalTime);
+        currentTimeString      = secsToStr(static_cast<uint32_t>(currentTotalTime * currentProgress));
 
         if (totalTimeText != nullptr)
             totalTimeText->setRichText(currentTotalTimeString);
