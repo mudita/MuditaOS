@@ -30,6 +30,18 @@ namespace alarms
             });
     }
 
+    auto AlarmMessageHandler::handleGetAlarmWithStatus(AlarmGetWithStatusRequestMessage *request)
+        -> std::shared_ptr<AlarmGetWithStatusResponseMessage>
+    {
+        return handleWithCallback<AlarmGetWithStatusRequestMessage,
+                                  AlarmGetWithStatusResponseMessage,
+                                  std::pair<AlarmEventRecord, AlarmStatus>>(
+            request,
+            [&](AlarmGetWithStatusRequestMessage *request, IAlarmOperations::OnGetAlarmWithStatusProcessed callback) {
+                alarmOperations->getAlarmWithStatus(request->id, callback);
+            });
+    }
+
     auto AlarmMessageHandler::handleAddAlarm(AlarmAddRequestMessage *request)
         -> std::shared_ptr<AlarmAddResponseMessage>
     {

@@ -23,6 +23,8 @@ namespace alarms
 
         auto handleTimeUpdate(TimePoint time) -> void;
         auto handleGetAlarm(AlarmGetRequestMessage *request) -> std::shared_ptr<AlarmGetResponseMessage>;
+        auto handleGetAlarmWithStatus(AlarmGetWithStatusRequestMessage *request)
+            -> std::shared_ptr<AlarmGetWithStatusResponseMessage>;
         auto handleAddAlarm(AlarmAddRequestMessage *request) -> std::shared_ptr<AlarmAddResponseMessage>;
         auto handleUpdateAlarm(AlarmUpdateRequestMessage *request) -> std::shared_ptr<AlarmUpdateResponseMessage>;
         auto handleRemoveAlarm(AlarmRemoveRequestMessage *request) -> std::shared_ptr<AlarmRemoveResponseMessage>;

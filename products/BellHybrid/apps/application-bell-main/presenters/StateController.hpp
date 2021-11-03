@@ -28,6 +28,7 @@ namespace app::home_screen
       public:
         virtual ~AbstractController() noexcept = default;
 
+        virtual void resetStateMachine()                                 = 0;
         virtual bool handleInputEvent(const gui::InputEvent &inputEvent) = 0;
         virtual bool handleTimerEvent()                                  = 0;
         virtual bool handleTimeUpdateEvent()                             = 0;
@@ -47,6 +48,8 @@ namespace app::home_screen
                         AbstractAlarmModel &alarmModel,
                         AbstractTimeModel &timeModel);
         ~StateController();
+
+        void resetStateMachine() override;
         bool handleInputEvent(const gui::InputEvent &inputEvent) override;
         bool handleTimerEvent() override;
         bool handleTimeUpdateEvent() override;

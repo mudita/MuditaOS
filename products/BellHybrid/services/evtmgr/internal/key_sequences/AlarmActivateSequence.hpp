@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include "MovedSequence.hpp"
+#include "PlatformAgnosticSequences.hpp"
 
-class AlarmActivateSequence : public MovedSequence
+class AlarmActivateSequence : public AlarmChangeSequence
 {
   public:
-    AlarmActivateSequence() : MovedSequence(KeyMap::DeepPressUp)
+    AlarmActivateSequence() : AlarmChangeSequence(KeyMap::DeepPressUp)
     {}
 };
