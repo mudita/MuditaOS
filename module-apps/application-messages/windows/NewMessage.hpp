@@ -9,7 +9,7 @@
 #include <AsyncTask.hpp>
 #include <AppWindow.hpp>
 #include <PhoneNumber.hpp>
-#include <widgets/Text.hpp>
+#include <widgets/text/Text.hpp>
 #include <module-db/Interface/SMSRecord.hpp>
 #include <module-db/Interface/ContactRecord.hpp>
 

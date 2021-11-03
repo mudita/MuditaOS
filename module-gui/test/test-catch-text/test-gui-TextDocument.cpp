@@ -1,13 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "TextParse.hpp"
-#include <catch2/catch.hpp>
-#include <limits>
-#include <module-gui/gui/widgets/TextDocument.hpp>
-#include <sstream>
+#include <widgets/text/parsers/TextParse.hpp>
+#include <widgets/text/core/TextDocument.hpp>
+
 #include <mock/multi-line-string.hpp>
 #include <mock/buildTextDocument.hpp>
+
+#include <catch2/catch.hpp>
 
 TEST_CASE("TextDocument ctor")
 {

@@ -7,7 +7,7 @@
 #include <widgets/MathOperationsBox.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/windows/AppWindow.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
+#include <module-gui/gui/widgets/text/Text.hpp>
 
 namespace gui
 {

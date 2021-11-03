@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "TextDocument.hpp"
+#include <widgets/text/core/TextDocument.hpp>
 
 namespace mockup
 {

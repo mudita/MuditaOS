@@ -8,7 +8,7 @@
 
 #include <gui/widgets/ListViewEngine.hpp>
 #include <gui/widgets/Style.hpp>
-#include <gui/widgets/Text.hpp>
+#include <gui/widgets/text/Text.hpp>
 #include <service-time/Constants.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
 #include <service-time/service-time/TimeMessage.hpp>

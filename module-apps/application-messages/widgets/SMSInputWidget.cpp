@@ -10,7 +10,7 @@
 #include <service-cellular/service-cellular/MessageConstants.hpp>
 #include <SMSInputWidget.hpp>
 #include <Style.hpp>
-#include <TextParse.hpp>
+#include <parsers/TextParse.hpp>
 
 #include <algorithm>
 #include <utility>

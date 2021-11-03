@@ -6,7 +6,7 @@
 #include <gui/widgets/Circle.hpp>
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Rect.hpp>
-#include <gui/widgets/Text.hpp>
+#include <gui/widgets/BoxLayout.hpp>
 
 #include <chrono>
 

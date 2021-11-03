@@ -4,6 +4,7 @@
 #include "AlarmTimeItem.hpp"
 #include "AlarmClockStyle.hpp"
 #include <ListView.hpp>
+#include <Label.hpp>
 #include <Style.hpp>
 #include <time/time_constants.hpp>
 #include <time/time_date_validation.hpp>

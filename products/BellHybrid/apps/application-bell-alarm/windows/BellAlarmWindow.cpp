@@ -9,7 +9,7 @@
 #include <data/BellAlarmStyle.hpp>
 
 #include <module-gui/gui/input/InputEvent.hpp>
-#include <module-gui/gui/widgets/TextFixedSize.hpp>
+#include <module-gui/gui/widgets/text/TextFixedSize.hpp>
 #include <module-gui/gui/widgets/ThreeBox.hpp>
 
 #include <common/windows/BellFinishedWindow.hpp>
