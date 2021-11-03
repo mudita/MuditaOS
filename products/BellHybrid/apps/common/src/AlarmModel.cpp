@@ -22,11 +22,11 @@ namespace app
     void AlarmModel::update(AlarmModelReadyHandler callback)
     {
         responseCallback = [this, callback](const auto response) -> bool {
-            const auto resp = dynamic_cast<alarms::AlarmGetResponseMessage *>(response);
+            const auto resp = dynamic_cast<alarms::AlarmGetWithStatusResponseMessage *>(response);
             if (resp) {
                 if (resp->alarm.isValid()) {
                     auto alarm = resp->alarm;
-                    updateCache(alarm.getNextSingleEvent(TimePointNow()));
+                    updateCache(alarm.getNextSingleEvent(TimePointNow()), resp->status);
                     if (callback) {
                         callback();
                     }
@@ -46,7 +46,7 @@ namespace app
             return true;
         };
 
-        auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::AlarmGetRequestMessage>(),
+        auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::AlarmGetWithStatusRequestMessage>(),
                                                        service::name::service_time);
         request->execute(app, this, responseCallback);
     }
@@ -75,7 +75,11 @@ namespace app
         }
         alarmEventPtr->enabled = value;
         updateAlarm(*alarmEventPtr);
-        if (!value) {
+        if (value) {
+            alarmStatus = alarms::AlarmStatus::Activated;
+        }
+        else {
+            alarmStatus = alarms::AlarmStatus::Deactivated;
             disableSnooze(*alarmEventPtr);
         }
     }
@@ -137,6 +141,7 @@ namespace app
         nextSnoozeTime =
             std::chrono::floor<std::chrono::minutes>(TimePointNow()) + std::chrono::minutes(snoozeDuration);
         alarms::AlarmServiceAPI::requestSnoozeRingingAlarm(app, cachedRecord.parent->ID, nextSnoozeTime);
+        alarmStatus = alarms::AlarmStatus::Snoozed;
     }
 
     std::chrono::seconds AlarmModel::getTimeToNextSnooze()
@@ -170,12 +175,13 @@ namespace app
     {
         return snoozeCount > 0;
     }
-    void AlarmModel::updateCache(const SingleEventRecord &record)
+    void AlarmModel::updateCache(const SingleEventRecord &record, alarms::AlarmStatus status)
     {
         if (record.startDate != cachedRecord.startDate) {
             snoozeCount  = 0;
-            cachedRecord = record;
         }
+        cachedRecord = record;
+        alarmStatus  = status;
         state = State::Valid;
     }
     void AlarmModel::setDefaultAlarmTime()
@@ -187,5 +193,10 @@ namespace app
         alarmEventPtr->alarmTime = AlarmTime{7h, 00min};
 
         updateAlarm(*alarmEventPtr);
+    }
+
+    alarms::AlarmStatus AlarmModel::getAlarmStatus()
+    {
+        return alarmStatus;
     }
 } // namespace app

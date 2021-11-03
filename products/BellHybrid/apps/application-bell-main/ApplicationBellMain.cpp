@@ -9,6 +9,7 @@
 #include "windows/BellBatteryShutdownWindow.hpp"
 #include "windows/BellHomeScreenWindow.hpp"
 #include "windows/BellMainMenuWindow.hpp"
+#include "windows/BellBatteryStatusWindow.hpp"
 
 #include <apps-common/messages/AppMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
@@ -78,7 +79,10 @@ namespace app
             return std::make_unique<gui::BellFactoryReset>(app, std::make_unique<gui::BellPowerOffPresenter>(app));
         });
 
-        // for demo only - to be removed
+        windowsFactory.attach(gui::BellBatteryStatusWindow::name, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::BellBatteryStatusWindow>(app);
+        });
+
         windowsFactory.attach(
             gui::window::name::bell_main_menu_dialog,
             [](ApplicationCommon *app, const std::string &name) { return std::make_unique<gui::Dialog>(app, name); });

@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "AlarmStatus.hpp"
+
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/EventRecord.hpp>
 #include <MessageType.hpp>
@@ -38,6 +40,21 @@ namespace alarms
         const AlarmEventRecord alarm;
     };
 
+    class AlarmGetWithStatusRequestMessage : public AlarmMessage
+    {
+      public:
+        explicit AlarmGetWithStatusRequestMessage(const unsigned int id = 1) : id(id){};
+        const unsigned int id;
+    };
+
+    class AlarmGetWithStatusResponseMessage : public AlarmResponse
+    {
+      public:
+        AlarmGetWithStatusResponseMessage(const std::pair<AlarmEventRecord, AlarmStatus> p)
+            : alarm(std::move(p.first)), status(p.second){};
+        const AlarmEventRecord alarm;
+        const AlarmStatus status;
+    };
     class AlarmAddRequestMessage : public AlarmMessage
     {
       public:

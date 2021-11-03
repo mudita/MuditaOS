@@ -60,6 +60,7 @@ target_include_directories(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/bsp/headset
             ${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio
             ${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c
+            ${CMAKE_CURRENT_SOURCE_DIR}/bsp
         >
 )
 
