@@ -1,10 +1,15 @@
 # Download Assets
 
-Building update packages requires some external assets.
-For now we need only `ecoboot.bin` and `PureUpdater_RT.bin`.
-The files may be downloaded manually from [ecoboot](https://github.com/mudita/ecoboot/releases) and [PureUpdater](https://github.com/mudita/PureUpdater/releases) release pages, respectively, from the "Assets" section.
-This requires the user to log in to GitHub and click inside the web browser, which is a "no go" for automated builds.
-To automate this process we have introduced a tool `tools/download_asset.py`.
+Building update packages requires external assets located on external repositories releases pages, in specific versions for specified products. The tool automates downloading such assets.
+
+## How to use `download_asset.py`
+
+The tool can be used to:
+- list releases from the repository from the Mudita organization
+- download selected assets from the repository from the Mudita organization
+
+The tool uses `argparse` to provide CLI and the best user experience.
+Please see `download_asset.py --help` for up to date parameters use and documentation
 
 ## GitHub API token
 
@@ -17,6 +22,8 @@ For downloading assets, we need a ":repo" scope with all sub-scopes.
 
 **Note:** Tokens are displayed only during their creation, so this is the only moment you can copy them.
 If you forget to do this, you will have to generate a new token.
+
+**Note:** With token added please double check it's working before issuing not working toolkit as most of the problems lies with no, or improper configuration.
 
 ## Storing settings
 The `download_assets.py` file can have `login` and `password` passed through parameters,
@@ -37,49 +44,26 @@ Checking the values:
 git config user.githublogin
 git config user.apitoken
 ```
+## Testing for proper asset download configuration
 
-## How to use `download_asset.py`
+0. check if you have token configured
 
-```bash
-$./tools/download_asset.py --help
-usage: download_asset.py [-h] [-w WORKDIR] [-t TOKEN] [-l LOGIN] repository {list,ll,download,dw} ...
+```
+git config user.apitoken
 ```
 
-To work properly, `download_asset.py` requires <Login> and <Token>. If they are stored in repo config these
-parameters are not required, otherwise, our tool will protest if parameters are not set.
-If parameters are set in `.git/config` and You still add these values, they will override the ones in the config.
+**if not**  please add token ( see doc: [documentation](../doc/download_asset.md)
 
-This tool downloads assets only from our "mudita" organisation in GitHub, but we can change the repository,
-this is `repository` parameter, the second required parameter is a task to be completed:
-Tasks:
-* `list` or `ll`     - list releases, first column is a tag, which may be used in download command.
-* `download` or `dw` - downloads first asset in release (if no tag is added, the latest release is used).
+1. check if you have access to the PureUpdater repository in read mode
 
-## Usage example
+```
+curl -o /dev/null -H "Authorization: token $(git config user.apitoken)" "https://api.github.com/repos/mudita/PureUpdater"
+```
+**if not** Then please either fix your token access or request access to the PureUpdater
 
-List releases:
-```bash
-./tools/download_asset.py ecoboot ll
- tag | name | date | pre-release
---------------------------------
-1.0.4 | Bug fixes for checksum handling | 2020-08-27T13:26:11Z | True
-1.0.1 |  | 2020-08-12T09:45:53Z | False
-1.0.3 | 1.0.3 JSON to ini migration | 2020-07-28T13:29:56Z | False
-0.1 | Support for 2 partitions and boot.ini | 2020-07-07T14:48:18Z | False
-05_07_2019 | Working with PurePhone | 2019-07-05T11:36:51Z | True
+2. Check if you can list releases on repository:
+```
+python3 ./tools/download_asset.py --repository PureUpdater list
 ```
 
-Download latest `ecoboot.bin`
-```bash
-./tools/download_asset.py ecoboot dw
-```
-
-Download `ecoboot.bin` for tag `1.0.3`
-```bash
-./tools/download_asset.py ecoboot dw 1.0.3
-```
-
-Download the latest MuditaOS package to the `packages` directory with a custom login and API token
-```bash
-./tools/download_asset.py -w packages -l someUser -t secreetToken123123123 MuditaOs dw
-```
+**if not** Then fix your token, or request access to PureUpdater

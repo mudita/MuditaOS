@@ -3,7 +3,7 @@
 Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-Download ecooboot.bin from repository
+Download any file from releases from Mudita repository
 
 @package globalFinder
 """
@@ -20,7 +20,7 @@ import time
 
 
 class Getter(object):
-    '''Download latest ecooboot.bin/updater.bin images'''
+    ''' Class to list and download assets in release '''
 
     def __init__(self):
         self.host = 'https://api.github.com/repos'
@@ -199,7 +199,7 @@ def main():
 
     getter = Getter()
 
-    parser = argparse.ArgumentParser(description="Download ecooboot")
+    parser = argparse.ArgumentParser(description="Download asset from github release pages")
     parser.add_argument('--workdir', help="Directory where package is build", default="update")
     parser.add_argument('-t', '--token',
                         help="GitHub security token "
@@ -225,12 +225,12 @@ def main():
     listReleases_args.set_defaults(func=getter.listReleases)
 
     getReleases_args = subparsers.add_parser('download', aliases=['dw'],
-                                             description="Download Release based on tag or the latest")
+                                             description="Download release based on it's product and version")
     getReleases_args.set_defaults(func=getter.downloadRelease)
-    getReleases_args.add_argument('--assetRepoName', help="Asset name in repository", required=True)
-    getReleases_args.add_argument('--assetOutName', help="Asset output name", required=True)
-    getReleases_args.add_argument('--version', help="Asset version", required=True)
-    getReleases_args.add_argument('--product', help="Asset product", required=True)
+    getReleases_args.add_argument('--assetRepoName', help="The name of asset to download from release package in repository", required=True)
+    getReleases_args.add_argument('--assetOutName', help="The output name to assign to downloaded asset after download", required=True)
+    getReleases_args.add_argument('--version', required=True, help="Asset version to download")
+    getReleases_args.add_argument('--product', required=True, help='Asset product to download, has to match any product we support at the moment')
 
     args = parser.parse_args()
     getter.repo = args.repository
