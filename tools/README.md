@@ -23,26 +23,7 @@ python3 -m pip install -r requirements.txt
 pip freeze > requirements.txt
 ```
 
-# Testing for proper asset download configuration:
+# Downloading assets
 
-0. check if you have token configured
-
-```
-git config user.apitoken
-```
-
-**if not**  please add token ( see doc: [documentation](../doc/download_asset.md)
-
-1. check if you have access to PureUpdater repository in read mode
-
-```
-curl -o /dev/null -H "Authorization: token $(git config user.apitoken)" "https://api.github.com/repos/mudita/PureUpdater"
-```
-**if not** Then please either fix your token access, or request access to PureUpdater
-
-2. Check if you can list releases on repository:
-```
-python3 ./tools/download_asset.py -w ./ --repository PureUpdater list                                                                                                                                             21s[cbe063dc6]
-```
-
-**if not** Then fix your token, or request access to PureUpdater
+To download assets required to build release we have `download_asset.py` tool which is documented here:
+[doc/download_assets.md](../doc/download_assets.md)
