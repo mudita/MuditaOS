@@ -13,7 +13,10 @@ namespace hal::key_input
         void init(xQueueHandle) final;
         void deinit() final;
         std::vector<bsp::KeyEvent> getKeyEvents(KeyNotificationSource) final;
-
-        BaseType_t wakeupIRQHandler();
     };
+
+    BaseType_t EncoderIRQHandler();
+    BaseType_t GPIO2SwitchesIRQHandler(std::uint32_t irqMask);
+    BaseType_t GPIO5SwitchesIRQHandler(std::uint32_t irqMask);
+
 } // namespace hal::key_input

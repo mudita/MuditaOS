@@ -21,9 +21,9 @@ namespace bsp::bell_switches
 
     void disableIRQ();
 
-    BaseType_t IRQHandler(uint32_t mask);
+    BaseType_t GPIO2SwitchesIRQHandler(std::uint32_t mask);
 
-    BaseType_t wakeupIRQHandler();
+    BaseType_t GPIO5SwitchesIRQHandler(std::uint32_t mask);
 
     void clearStartupLatchInterrupt();
 
