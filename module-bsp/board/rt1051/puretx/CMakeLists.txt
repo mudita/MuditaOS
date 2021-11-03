@@ -16,6 +16,7 @@ target_sources(
         bsp/eink/eink_pin_config.cpp
         bsp/keyboard/keyboard.cpp
         bsp/lpm/PowerProfile.cpp
+        bsp/lpm/RT1051LPM.cpp
 
         audio.cpp
         pin_mux.c

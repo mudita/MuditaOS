@@ -17,7 +17,7 @@ namespace bsp
         void init(xQueueHandle qHandle);
         void deinit();
         std::vector<KeyEvent> getKeyEvents();
-        BaseType_t IRQHandler(uint32_t mask);
+        BaseType_t IRQHandler();
     } // namespace rotary_encoder
 
 } // namespace bsp

@@ -39,19 +39,19 @@ namespace hal::key_input
         }
     }
 
-    BaseType_t generalIRQHandler(std::uint32_t irqMask)
+    BaseType_t EncoderIRQHandler()
     {
-        constexpr std::uint32_t encoderMask{99};
-        if (irqMask == encoderMask) {
-            return bsp::rotary_encoder::IRQHandler(irqMask);
-        }
-        else {
-            return bsp::bell_switches::IRQHandler(irqMask);
-        }
+        return bsp::rotary_encoder::IRQHandler();
     }
 
-    BaseType_t wakeupIRQHandler()
+    BaseType_t GPIO2SwitchesIRQHandler(std::uint32_t irqMask)
     {
-        return bsp::bell_switches::wakeupIRQHandler();
+        return bsp::bell_switches::GPIO2SwitchesIRQHandler(irqMask);
     }
+
+    BaseType_t GPIO5SwitchesIRQHandler(std::uint32_t irqMask)
+    {
+        return bsp::bell_switches::GPIO5SwitchesIRQHandler(irqMask);
+    }
+
 } // namespace hal::key_input

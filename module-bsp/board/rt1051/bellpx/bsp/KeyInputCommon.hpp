@@ -15,8 +15,6 @@ namespace bsp
         lightCenterKeyRelease,
         latchKeyPress,
         latchKeyRelease,
-        wakeupEvent,
-        wakeupEventRelease,
         rotaryEncoder,
         Invalid = 0xFF
     };
