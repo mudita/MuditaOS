@@ -151,6 +151,8 @@ namespace app::home_screen
 
         void setStartupAlarmState();
 
+        void handleCyclicDeepRefresh();
+
         static constexpr auto timerName = "HS_timer";
         static constexpr auto snoozeTick = std::chrono::seconds(1);
     };
