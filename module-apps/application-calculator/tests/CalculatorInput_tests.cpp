@@ -4,7 +4,7 @@
 #include <data/CalculatorInputProcessorText.hpp>
 #include <catch2/catch.hpp>
 #include <i18n/i18n.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
+#include <module-gui/gui/widgets/text/Text.hpp>
 #include <cstring>
 
 SCENARIO("Input Processor tests")

@@ -5,7 +5,7 @@
 
 #include <widgets/spinners/Spinners.hpp>
 #include <gui/widgets/Style.hpp>
-#include <gui/widgets/TextConstants.hpp>
+#include <gui/widgets/text/TextConstants.hpp>
 
 #include <string>
 

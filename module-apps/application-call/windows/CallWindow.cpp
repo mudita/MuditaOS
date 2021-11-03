@@ -12,7 +12,7 @@
 #include <GuiTimer.hpp>
 #include <i18n/i18n.hpp>
 #include <InputEvent.hpp>
-#include <InputMode.hpp>
+#include <text/modes/InputMode.hpp>
 #include <Label.hpp>
 #include <log/log.hpp>
 #include <magic_enum.hpp>

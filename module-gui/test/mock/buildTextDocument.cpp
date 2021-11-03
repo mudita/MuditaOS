@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "buildTextDocument.hpp"
-#include "TextDocument.hpp"
-#include "multi-line-string.hpp"
-#include <module-gui/gui/widgets/TextParse.hpp>
 #include "InitializedFontManager.hpp"
+#include "multi-line-string.hpp"
+
+#include <widgets/text/parsers/TextParse.hpp>
 
 namespace mockup
 {

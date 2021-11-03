@@ -3,10 +3,10 @@
 
 #include "NotificationListItem.hpp"
 
-#include "TextFixedSize.hpp"
-#include "RichTextParser.hpp"
-#include "FontManager.hpp"
-#include "Image.hpp"
+#include <TextFixedSize.hpp>
+#include <parsers/RichTextParser.hpp>
+#include <FontManager.hpp>
+#include <Image.hpp>
 
 #include <widgets/Style.hpp>
 #include <map>

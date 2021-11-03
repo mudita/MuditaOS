@@ -5,8 +5,8 @@
 
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Style.hpp>
-#include <gui/widgets/TextFixedSize.hpp>
-#include <gui/widgets/TextConstants.hpp>
+#include <gui/widgets/text/TextFixedSize.hpp>
+#include <gui/widgets/text/TextConstants.hpp>
 #include <time/time_locale.hpp>
 #include <string>
 

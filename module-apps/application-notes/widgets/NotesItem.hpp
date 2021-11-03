@@ -5,7 +5,7 @@
 
 #include <module-gui/gui/widgets/Label.hpp>
 #include <module-gui/gui/widgets/ListItem.hpp>
-#include <module-gui/gui/widgets/TextFixedSize.hpp>
+#include <module-gui/gui/widgets/text/TextFixedSize.hpp>
 
 #include <module-db/Interface/NotesRecord.hpp>
 

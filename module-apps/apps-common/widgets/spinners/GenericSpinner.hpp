@@ -4,7 +4,7 @@
 #pragma once
 
 #include "SpinnerPolicies.hpp"
-#include <widgets/TextFixedSize.hpp>
+#include <widgets/text/TextFixedSize.hpp>
 
 namespace gui
 {

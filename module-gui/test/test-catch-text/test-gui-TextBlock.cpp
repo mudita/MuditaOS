@@ -1,10 +1,10 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-#include <limits>
-#include <module-gui/gui/widgets/TextBlock.hpp>
 #include "InitializedFontManager.hpp"
+#include <widgets/text/core/TextBlock.hpp>
+
+#include <catch2/catch.hpp>
 
 TEST_CASE("TextBlock Ctor/Dtor ")
 {

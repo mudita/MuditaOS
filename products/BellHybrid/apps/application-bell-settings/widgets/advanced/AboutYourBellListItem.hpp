@@ -4,7 +4,7 @@
 #pragma once
 
 #include <ListItem.hpp>
-#include <module-gui/gui/widgets/RichTextParser.hpp>
+#include <module-gui/gui/widgets/text/parsers/RichTextParser.hpp>
 
 namespace gui
 {

@@ -4,6 +4,7 @@
 #include "Style.hpp"
 #include "TimerProperty.hpp"
 
+#include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
 #include <Utils.hpp>
 

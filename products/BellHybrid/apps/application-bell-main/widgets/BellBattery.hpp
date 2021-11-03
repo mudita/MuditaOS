@@ -6,7 +6,7 @@
 #include "BoxLayout.hpp"
 #include <EventStore.hpp>
 #include <gui/widgets/Image.hpp>
-#include <gui/widgets/TextFixedSize.hpp>
+#include <gui/widgets/text/TextFixedSize.hpp>
 
 namespace gui
 {

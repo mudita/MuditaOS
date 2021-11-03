@@ -11,7 +11,7 @@
 
 #include <i18n/i18n.hpp>
 
-#include <module-gui/gui/widgets/Text.hpp>
+#include <module-gui/gui/widgets/text/Text.hpp>
 
 namespace app::notes
 {

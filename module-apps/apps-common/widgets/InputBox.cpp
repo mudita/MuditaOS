@@ -4,6 +4,7 @@
 #include "InputBox.hpp"
 
 #include <BoxLayout.hpp>
+#include <Label.hpp>
 #include <Image.hpp>
 
 namespace gui
