@@ -77,11 +77,11 @@ target_link_libraries(application-bell-common
     PUBLIC
         apps-common
         service-db
+        service-time
 
     PRIVATE
         bell::app-main
         bell::app-alarm
         module-gui
-        service-time
         bell::db
         )

@@ -21,6 +21,7 @@ target_sources(evtmgr
         internal/key_sequences/ReleaseSequence.hpp
         internal/key_sequences/ResetSequence.hpp
         internal/key_sequences/GenericLongPressSequence.hpp
+        internal/key_sequences/PlatformAgnosticSequences.hpp
     PUBLIC
         include/evtmgr/EventManager.hpp
         include/evtmgr/api/TemperatureApi.hpp
