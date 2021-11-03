@@ -8,3 +8,11 @@ namespace bsp
         // dummy
     }
 } // namespace bsp
+
+namespace bsp::bell_switches
+{
+    bool isLatchPressed()
+    {
+        return false;
+    }
+} // namespace bsp::bell_switches

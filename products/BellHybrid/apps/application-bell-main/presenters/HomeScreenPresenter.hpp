@@ -74,7 +74,8 @@ namespace app::home_screen
         virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
 
         /// Various
-        virtual void switchToMenu() = 0;
+        virtual void switchToMenu()          = 0;
+        virtual void switchToBatteryStatus() = 0;
     };
 
     class AbstractPresenter : public BasePresenter<AbstractView>
@@ -95,6 +96,9 @@ namespace app::home_screen
         virtual void startSnoozeTimer(std::chrono::seconds snoozeDuration)                       = 0;
         virtual void stopSnoozeTimer()                                                           = 0;
         virtual void restartSnoozeTimer(std::chrono::seconds snoozeDuration)                     = 0;
+        virtual std::uint32_t getBatteryLvl() const                                              = 0;
+        virtual bool isBatteryCharging() const                                                   = 0;
+        virtual bool isStartupDeepPress()                                                        = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -127,10 +131,12 @@ namespace app::home_screen
         void handleAlarmModelReady() override;
 
         void setSnoozeTimer(std::unique_ptr<app::ProgressTimerWithSnoozeTimer> &&_timer) override;
-
         void startSnoozeTimer(std::chrono::seconds snoozeDuration);
         void stopSnoozeTimer();
         void restartSnoozeTimer(std::chrono::seconds snoozeDuration);
+        std::uint32_t getBatteryLvl() const override;
+        bool isBatteryCharging() const override;
+        bool isStartupDeepPress() override;
 
       private:
         ApplicationCommon *app;
@@ -141,6 +147,7 @@ namespace app::home_screen
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::shared_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
+        bool latchPressed = false;
 
         static constexpr auto timerName = "HS_timer";
         static constexpr auto snoozeTick = std::chrono::seconds(1);
