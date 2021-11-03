@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <service-time/AlarmStatus.hpp>
+
 #include <chrono>
 #include <ctime>
 #include <cstdint>
@@ -28,6 +30,7 @@ namespace app
         virtual void turnOff()                    = 0;
         virtual void snooze()                     = 0;
         virtual std::chrono::seconds getTimeToNextSnooze() = 0;
+        virtual alarms::AlarmStatus getAlarmStatus()       = 0;
         /// Command model to update its internal data
         virtual void update(AlarmModelReadyHandler callback = AlarmModelReadyHandler()) = 0;
     };

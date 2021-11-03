@@ -17,6 +17,7 @@ set(SOURCES
     include/service-time/AlarmHandlerFactory.hpp
     include/service-time/AlarmMessage.hpp
     include/service-time/AlarmServiceAPI.hpp
+    include/service-time/AlarmStatus.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

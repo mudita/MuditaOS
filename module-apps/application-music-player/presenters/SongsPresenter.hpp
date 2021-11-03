@@ -108,5 +108,6 @@ namespace app::music_player
         std::chrono::time_point<std::chrono::system_clock> songProgressTimestamp;
         std::chrono::milliseconds songMillisecondsElapsed{0};
         float currentProgressRatio = 0.0;
+        bool waitingToPlay         = false;
     };
 } // namespace app::music_player

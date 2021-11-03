@@ -62,6 +62,7 @@ namespace gui
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
         void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) override;
         void switchToMenu() override;
+        void switchToBatteryStatus() override;
 
         BellBaseLayout *body{};
 
