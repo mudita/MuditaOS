@@ -8,27 +8,18 @@ function(add_boot_bin SOURCE_TARGET)
     )
 
     if (ENABLE_SECURE_BOOT)
-        set (SREC_FILE ${CMAKE_PROJECT_NAME}.srec)
-        # .srec file required by elftosb
-        add_custom_command(
-            COMMENT "Generate ${CMAKE_PROJECT_NAME}.srec"
-            OUTPUT ${CMAKE_BINARY_DIR}/${SREC_FILE}
-            DEPENDS ${SOURCE_TARGET}
-            COMMAND ${CMAKE_OBJCOPY} -Osrec $<TARGET_FILE:${SOURCE_TARGET}> ${SREC_FILE}
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
-
-        add_custom_command(
-            COMMENT "Generate signed boot.bin (Secure Boot)"
-            OUTPUT ${BIN_FILE}
-            DEPENDS ${CMAKE_BINARY_DIR}/${SREC_FILE}
-            COMMAND ${CMAKE_SOURCE_DIR}/config/elftosb_wrapper.sh "${ELFTOSB_PATH}" "${CST_PATH}" -f imx -V
-            -c ${CMAKE_BINARY_DIR}/imx_authenticated_hab.bd
-            -o ${BIN_FILE}
-            ${CMAKE_BINARY_DIR}/${SREC_FILE}
-            VERBATIM
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
+        IF(EXISTS ${SIGN_CLIENT_PATH}/signclient.py)
+            add_custom_command(
+                COMMENT "Generate signed boot.bin (Secure Boot)"
+                OUTPUT ${BIN_FILE}
+                DEPENDS ${SOURCE_TARGET}
+                COMMAND python3 ${SIGN_CLIENT_PATH}/signclient.py --in_file $<TARGET_FILE:${SOURCE_TARGET}> --out_file=${BIN_FILE} --keystore ${KEYSTORE} --keyslot ${KEYSLOT} --server ${SERVER} --login ${LOGIN}
+                VERBATIM
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                )
+        else()
+            message( FATAL_ERROR "signclient.py not found in ${SIGN_CLIENT_PATH}" )
+        endif()
     else ()
         add_custom_command(
             COMMENT "Generate ${SOURCE_TARGET}-boot.bin"
