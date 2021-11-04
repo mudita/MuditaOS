@@ -49,7 +49,7 @@ namespace gui::nav_bar
         left->setEdges(RectangleEdge::None);
 
         center = new Label(centerBox);
-        center->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        center->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         center->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
         center->setMinimumHeight(widgetArea.h);
         center->setMaximumWidth(widgetArea.w);
@@ -59,7 +59,7 @@ namespace gui::nav_bar
         center->setEdges(RectangleEdge::None);
 
         right = new Label(lastBox);
-        right->setAlignment(Alignment(Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        right->setAlignment(Alignment(Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
         right->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
         right->setMinimumHeight(widgetArea.h);
         right->setFont(style::nav_bar::font::medium);
