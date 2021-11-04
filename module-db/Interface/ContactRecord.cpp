@@ -170,7 +170,7 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
     bool ret          = false;
     bool recordExists = [&]() {
         auto record = contactDB->contacts.getById(contact.ID);
-        return record.ID != DB_ID_NONE;
+        return record.isValid();
     }();
     if (recordExists) {
         ret = contactDB->contacts.update(row);
@@ -651,10 +651,13 @@ auto ContactRecordInterface::splitNumberIDs(const std::string &numberIDs) -> con
 
 auto ContactRecordInterface::joinNumberIDs(const std::vector<std::uint32_t> &numberIDs) -> std::string
 {
+    if (numberIDs.empty()) {
+        return {};
+    }
+
     std::ostringstream outStream;
     std::ostream_iterator<std::uint32_t> outIterator(outStream, " ");
     std::copy(std::begin(numberIDs), std::end(numberIDs), outIterator);
-
     return outStream.str();
 }
 
@@ -678,9 +681,6 @@ auto ContactRecordInterface::unbindNumber(std::uint32_t contactId, std::uint32_t
     // unbind number from contact
     auto numberIDs = splitNumberIDs(contactRecord.numbersID);
     numberIDs.erase(std::remove(std::begin(numberIDs), std::end(numberIDs), numberId), std::end(numberIDs));
-    if (numberIDs.empty()) {
-        return contactDB->contacts.removeById(contactId);
-    }
     contactRecord.numbersID = joinNumberIDs(numberIDs);
     return contactDB->contacts.update(contactRecord);
 }

@@ -343,7 +343,7 @@ namespace gui
         descriptionText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         descriptionText->setTextType(TextType::SingleLine);
         descriptionText->setEditMode(EditMode::Browse);
-        descriptionText->setFont(style::window::font::verysmall);
+        descriptionText->setFont(style::window::font::small);
     }
 
     void MusicPlayerMainWindow::destroyInterface()
@@ -519,7 +519,7 @@ namespace gui
         }
 
         auto secsToStr = [&](int secs) {
-            if (secs < 3600) {
+            if (secs < utils::time::secondsInHour) {
                 snprintf(timeToDisplay,
                          maxTimeToDisplaySize,
                          "%d:%02d",
