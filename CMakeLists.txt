@@ -105,7 +105,9 @@ if (GENERATE_STACK_USAGE)
     add_compile_options (-fstack-usage)
 endif ()
 
-include(SecureBoot)
+option (ENABLE_SECURE_BOOT "Build signed binary for Secure Boot" OFF)
+set(SIGN_CLIENT_PATH "${CMAKE_SOURCE_DIR}/../sign_server/key_client" CACHE PATH "signclient.py path")
+set(SERVER "https://172.17.0.1:4430" CACHE STRING "sign server address")
 
 if (NOT ENABLE_SECURE_BOOT)
     # Only enable the build-time boot header in a non-secure configuration,
