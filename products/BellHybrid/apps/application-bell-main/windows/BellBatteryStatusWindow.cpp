@@ -93,7 +93,6 @@ namespace gui
     void BellBatteryStatusWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (data != nullptr) {
-            WindowWithTimer::onBeforeShow(mode, data);
             const auto &switchData = static_cast<Data &>(*data);
             const auto entry       = battery_utils::getScaledBatteryLevel(batteryEntries, switchData.chargeLevel);
             if (entry) {
@@ -104,8 +103,6 @@ namespace gui
                 body->resize();
             }
         }
-        else {
-            LOG_ERROR("BellBatteryStatusWindow must be invoked with a valid SwitchData");
-        }
+        WindowWithTimer::onBeforeShow(mode, data);
     }
 } // namespace gui
