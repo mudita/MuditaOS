@@ -35,47 +35,17 @@
 #include <log/log.hpp>
 #include <task.h>
 #include <macros.h>
-// ----------------------------------------------------------------------------
 
-// Forward declaration
-
-void _exit(int code);
-
-// ----------------------------------------------------------------------------
-
-void __reset_hardware(void)
+void __attribute__((noreturn, used)) _exit(int code)
 {
-    // Let watchdog reset system
-    while (1)
-        ;
-}
-
-// On Release, call the hardware reset procedure.
-// On Debug we just enter an infinite loop, to be used as landmark when halting
-// the debugger.
-//
-// It can be redefined in the application, if more functionality
-// is required.
-
-void __attribute__((weak)) _exit(int code)
-{
-    LOG_FATAL("_exit %d", code);
+    LOG_INFO("_exit %d", code);
     haltIfDebugging();
     vTaskEndScheduler();
-#ifdef DEBUG
-    while (1) {};
+    NVIC_SystemReset();
+    // waiting for system reset
+    while (1) {
+#ifndef DEBUG
+        __asm volatile("wfi\n");
 #endif
+    };
 }
-
-// ----------------------------------------------------------------------------
-
-#if 0
-void
-__attribute__((weak))
-abort(void)
-{
-
-}
-#endif
-
-// ----------------------------------------------------------------------------
