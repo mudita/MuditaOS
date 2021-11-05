@@ -225,7 +225,6 @@ namespace app
             window->updateSim();
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
-            window->updateTime();
             window->updatePhoneMode(statusIndicators.phoneMode);
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
