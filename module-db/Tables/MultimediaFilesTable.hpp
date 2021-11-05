@@ -101,6 +101,7 @@ namespace db::multimedia_files
         auto getLimitOffset(const Album &album, uint32_t offset, uint32_t limit) -> std::vector<TableRow>;
         auto count(const Album &album) -> uint32_t;
 
+        auto getLimitOffsetByPath(const std::string &path, uint32_t offset, uint32_t limit) -> std::vector<TableRow>;
         TableRow getByPath(std::string path);
 
         /// @note entry.ID is skipped

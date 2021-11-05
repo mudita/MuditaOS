@@ -15,6 +15,8 @@ target_sources(apps-common
         StatusBarManager.cpp
         WindowsFactory.cpp
         audio/SoundsPlayer.cpp
+        models/SongContext.cpp
+        models/SongsRepository.cpp
         notifications/NotificationData.cpp
         notifications/NotificationListItem.cpp
         notifications/NotificationProvider.cpp
@@ -61,6 +63,10 @@ target_sources(apps-common
         widgets/TimeSetFmtSpinner.hpp
         actions/AlarmRingingData.hpp
         actions/AlarmTriggeredAction.hpp
+
+        models/SongContext.hpp
+        models/SongsRepository.hpp
+        models/SongsModelInterface.hpp
 
         widgets/spinners/GenericSpinner.hpp
         widgets/spinners/SpinnerPolicies.hpp

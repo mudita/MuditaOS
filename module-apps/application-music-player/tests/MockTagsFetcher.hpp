@@ -10,11 +10,11 @@
 
 #include <optional>
 
-namespace testing::app::music_player
+namespace testing::app::music
 {
-    class MockTagsFetcher : public ::app::music_player::AbstractTagsFetcher
+    class MockTagsFetcher : public ::app::music::AbstractTagsFetcher
     {
       public:
         MOCK_METHOD(std::optional<tags::fetcher::Tags>, getFileTags, (const std::string &filePath), (const override));
     };
-}; // namespace testing::app::music_player
+}; // namespace testing::app::music

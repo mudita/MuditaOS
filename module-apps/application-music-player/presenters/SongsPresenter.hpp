@@ -6,7 +6,7 @@
 #include <apps-common/AudioOperations.hpp>
 #include <apps-common/BasePresenter.hpp>
 
-#include <module-apps/application-music-player/models/SongsModelInterface.hpp>
+#include <apps-common/models/SongsModelInterface.hpp>
 
 namespace app::music_player
 {
@@ -23,24 +23,24 @@ namespace app::music_player
                 Stopped
             };
 
-            virtual ~View() noexcept                                        = default;
+            virtual ~View() noexcept                                     = default;
             virtual void updateSongsState(std::optional<db::multimedia_files::MultimediaFilesRecord> record,
-                                          RecordState state)                = 0;
-            virtual void updateSongProgress(float progress)                 = 0;
-            virtual void refreshWindow()                                    = 0;
-            virtual void setNavBarTemporaryMode(const std::string &text)    = 0;
-            virtual void restoreFromNavBarTemporaryMode()                   = 0;
+                                          RecordState state)             = 0;
+            virtual void updateSongProgress(float progress)              = 0;
+            virtual void refreshWindow()                                 = 0;
+            virtual void setNavBarTemporaryMode(const std::string &text) = 0;
+            virtual void restoreFromNavBarTemporaryMode()                = 0;
         };
 
         class Presenter : public BasePresenter<SongsContract::View>
         {
           public:
-            using OnPlayingStateChangeCallback = std::function<void(SongState)>;
+            using OnPlayingStateChangeCallback = std::function<void(app::music::SongState)>;
 
             virtual ~Presenter() noexcept = default;
 
-            virtual std::shared_ptr<SongsModelInterface> getMusicPlayerModelInterface() const = 0;
-            virtual void createData()                                                         = 0;
+            virtual std::shared_ptr<app::music::SongsModelInterface> getMusicPlayerModelInterface() const = 0;
+            virtual void createData()                                                                     = 0;
 
             virtual bool play(const std::string &filePath) = 0;
             virtual bool pause()                           = 0;
@@ -63,10 +63,10 @@ namespace app::music_player
     {
       public:
         explicit SongsPresenter(app::ApplicationCommon *app,
-                                std::shared_ptr<SongsModelInterface> songsListItemProvider,
+                                std::shared_ptr<app::music::SongsModelInterface> songsListItemProvider,
                                 std::unique_ptr<AbstractAudioOperations> &&audioOperations);
 
-        std::shared_ptr<SongsModelInterface> getMusicPlayerModelInterface() const override;
+        std::shared_ptr<app::music::SongsModelInterface> getMusicPlayerModelInterface() const override;
 
         void createData() override;
 
@@ -78,7 +78,7 @@ namespace app::music_player
         bool playPrevious() override;
 
         void songsStateRequest() override;
-        void setPlayingStateCallback(std::function<void(SongState)> cb) override;
+        void setPlayingStateCallback(std::function<void(app::music::SongState)> cb) override;
         bool handleAudioStopNotifiaction(audio::Token token) override;
         bool handleAudioEofNotification(audio::Token token) override;
         bool handleAudioPausedNotification(audio::Token token) override;
@@ -100,9 +100,9 @@ namespace app::music_player
         bool requestAudioOperation(const std::string &filePath = "");
         void setViewNavBarTemporaryMode(const std::string &text);
         void restoreViewNavBarFromTemporaryMode();
-        std::shared_ptr<SongsModelInterface> songsModelInterface;
+        std::shared_ptr<app::music::SongsModelInterface> songsModelInterface;
         std::unique_ptr<AbstractAudioOperations> audioOperations;
-        std::function<void(SongState)> changePlayingStateCallback = nullptr;
+        std::function<void(app::music::SongState)> changePlayingStateCallback = nullptr;
 
         sys::TimerHandle songProgressTimer;
         std::chrono::time_point<std::chrono::system_clock> songProgressTimestamp;

@@ -330,4 +330,13 @@ namespace db::multimedia_files
 
         return (*queryRet)[0].getUInt32();
     }
+
+    auto MultimediaFilesTable::getLimitOffsetByPath(const std::string &path, uint32_t offset, uint32_t limit)
+        -> std::vector<TableRow>
+    {
+        std::string query = "SELECT * FROM files WHERE path LIKE '" + path + "%%' ORDER BY title ASC LIMIT " +
+                            std::to_string(limit) + " OFFSET " + std::to_string(offset) + ";";
+        std::unique_ptr<QueryResult> retQuery = db->query(query.c_str());
+        return retQueryUnpack(std::move(retQuery));
+    }
 } // namespace db::multimedia_files

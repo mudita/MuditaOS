@@ -19,9 +19,10 @@ namespace
 namespace service
 {
 
-    ServiceFileIndexer::ServiceFileIndexer(const std::string_view name) : sys::Service(std::string(name))
+    ServiceFileIndexer::ServiceFileIndexer(const std::vector<std::string> &paths)
+        : sys::Service{service::name::file_indexer}, mStartupIndexer{paths}
     {
-        LOG_DEBUG("[%s] Initializing", std::string(name).c_str());
+        LOG_DEBUG("[%s] Initializing", service::name::file_indexer);
     }
 
     sys::MessagePointer ServiceFileIndexer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

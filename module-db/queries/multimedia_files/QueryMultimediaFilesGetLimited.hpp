@@ -100,4 +100,15 @@ namespace db::multimedia_files::query
         [[nodiscard]] auto getCount() const noexcept -> unsigned int;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
+
+    class GetLimitedByPath : public Query
+    {
+      public:
+        GetLimitedByPath(std::string path, uint32_t offset, uint32_t limit);
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+
+        const std::string path;
+        const uint32_t offset = 0;
+        const uint32_t limit  = 0;
+    };
 } // namespace db::multimedia_files::query

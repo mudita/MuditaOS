@@ -10,6 +10,11 @@ class AlarmEventRecordInterface;
 class EventsDB;
 
 class ThreadRecordInterface;
+namespace db::multimedia_files
+{
+    class MultimediaFilesDB;
+    class MultimediaFilesRecordInterface;
+} // namespace db::multimedia_files
 
 class ServiceDB : public ServiceDBCommon
 {
@@ -20,7 +25,10 @@ class ServiceDB : public ServiceDBCommon
 
   private:
     std::unique_ptr<EventsDB> eventsDB;
+    std::unique_ptr<db::multimedia_files::MultimediaFilesDB> multimediaFilesDB;
+
     std::unique_ptr<AlarmEventRecordInterface> alarmEventRecordInterface;
+    std::unique_ptr<db::multimedia_files::MultimediaFilesRecordInterface> multimediaFilesRecordInterface;
 
     db::Interface *getInterface(db::Interface::Name interface) override;
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;

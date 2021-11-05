@@ -13,7 +13,6 @@ target_include_directories(application-bell-background-sounds
 target_sources(application-bell-background-sounds
     PRIVATE
         ApplicationBellBackgroundSounds.cpp
-        models/BGSoundsRepository.cpp
         presenter/BGSoundsMainWindowPresenter.cpp
         presenter/BGSoundsProgressPresenter.cpp
         presenter/BGSoundsTimerSelectPresenter.cpp
@@ -28,7 +27,6 @@ target_sources(application-bell-background-sounds
         data/BGSoundsCommon.hpp
         data/BGSoundsStyle.hpp
         data/BGSoundsAudioData.hpp
-        models/BGSoundsRepository.hpp
         widgets/BGSoundsPlayer.hpp
         windows/BGSoundsMainWindow.hpp
         presenter/BGSoundsMainWindowPresenter.hpp
