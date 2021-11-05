@@ -7,6 +7,11 @@
 
 namespace style::onboarding
 {
+    namespace start_configuration
+    {
+        inline constexpr auto image_top_margin = 15U;
+    } // namespace start_configuration
+
     namespace sim_select
     {
         inline constexpr auto description_y           = 400;
