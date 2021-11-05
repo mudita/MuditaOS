@@ -1865,7 +1865,11 @@ static status_t MMC_Write(
     }
 
     /* Wait for the card's buffer to be not full to write to improve the write performance. */
-    while ((GET_SDMMCHOST_STATUS(card->host.base) & CARD_DATA0_STATUS_MASK) != CARD_DATA0_NOT_BUSY) {}
+    error = MMC_PollingCardStatusBusy(card);
+    if(kStatus_Success != error)
+    {
+        return error;
+    }
 
     /* Wait for the card write process complete */
     if (kStatus_Success != MMC_WaitWriteComplete(card)) {
@@ -2264,7 +2268,11 @@ status_t MMC_EraseGroups(mmc_card_t *card, uint32_t startGroup, uint32_t endGrou
     }
 
     /* Wait for the card's buffer to be not full to write to improve the write performance. */
-    while ((GET_SDMMCHOST_STATUS(card->host.base) & CARD_DATA0_STATUS_MASK) != CARD_DATA0_NOT_BUSY) {}
+    status_t error = MMC_PollingCardStatusBusy(card);
+    if(kStatus_Success != error)
+    {
+        return error;
+    }
 
     if (kStatus_Success != MMC_WaitWriteComplete(card)) {
         return kStatus_SDMMC_WaitWriteCompleteFailed;
@@ -2630,4 +2638,19 @@ status_t MMC_StopBoot(mmc_card_t *card, uint32_t bootMode)
     SDMMCHOST_ENABLE_MMC_BOOT(card->host.base, false);
 
     return kStatus_Success;
+}
+
+status_t MMC_PollingCardStatusBusy(mmc_card_t *card)
+{
+    int retries = 0;
+    const int maxRetries = 10000;
+    do {
+        if ((GET_SDMMCHOST_STATUS(card->host.base) & CARD_DATA0_STATUS_MASK) == CARD_DATA0_NOT_BUSY) {
+            return kStatus_Success;
+        }
+        // yeld 
+        SDMMCHOST_Delay(0);
+    } while (retries++ < maxRetries);
+    
+    return kStatus_SDMMC_PollingCardIdleFailed;
 }
