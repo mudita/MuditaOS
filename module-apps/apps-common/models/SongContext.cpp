@@ -4,7 +4,7 @@
 #include "SongContext.hpp"
 #include <optional>
 
-namespace app::music_player
+namespace app::music
 {
     void SongContext::clear()
     {
@@ -28,4 +28,4 @@ namespace app::music_player
     {
         return isValid() && currentSongState == SongState::NotPlaying;
     }
-} // namespace app::music_player
+} // namespace app::music

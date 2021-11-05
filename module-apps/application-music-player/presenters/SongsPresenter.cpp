@@ -10,7 +10,7 @@
 namespace app::music_player
 {
     SongsPresenter::SongsPresenter(app::ApplicationCommon *app,
-                                   std::shared_ptr<app::music_player::SongsModelInterface> songsModelInterface,
+                                   std::shared_ptr<app::music::SongsModelInterface> songsModelInterface,
                                    std::unique_ptr<AbstractAudioOperations> &&audioOperations)
         : songsModelInterface{std::move(songsModelInterface)}, audioOperations{std::move(audioOperations)}
     {
@@ -19,7 +19,7 @@ namespace app::music_player
             app, "MP Song Progres", tick, [this]([[maybe_unused]] sys::Timer &) { handleTrackProgressTick(); });
     }
 
-    std::shared_ptr<app::music_player::SongsModelInterface> SongsPresenter::getMusicPlayerModelInterface() const
+    std::shared_ptr<app::music::SongsModelInterface> SongsPresenter::getMusicPlayerModelInterface() const
     {
         return songsModelInterface;
     }
@@ -46,11 +46,12 @@ namespace app::music_player
                 return;
             }
 
-            SongContext songContext{SongState::Playing, token, filePath, SongContext::StartPos};
+            app::music::SongContext songContext{
+                app::music::SongState::Playing, token, filePath, app::music::SongContext::StartPos};
             songsModelInterface->setCurrentSongContext(songContext);
 
             if (changePlayingStateCallback != nullptr) {
-                changePlayingStateCallback(SongState::Playing);
+                changePlayingStateCallback(app::music::SongState::Playing);
             }
             updateViewSongState();
             songsModelInterface->updateRepository(filePath);
@@ -76,9 +77,9 @@ namespace app::music_player
                     LOG_ERROR("Pause audio operation failed, wrong token");
                     return;
                 }
-                songsModelInterface->setCurrentSongState(SongState::NotPlaying);
+                songsModelInterface->setCurrentSongState(app::music::SongState::NotPlaying);
                 if (changePlayingStateCallback != nullptr) {
-                    changePlayingStateCallback(SongState::NotPlaying);
+                    changePlayingStateCallback(app::music::SongState::NotPlaying);
                 }
                 updateViewSongState();
                 songProgressTimer.stop();
@@ -106,9 +107,9 @@ namespace app::music_player
                         LOG_ERROR("Resume audio operation failed, wrong token");
                         return;
                     }
-                    songsModelInterface->setCurrentSongState(SongState::Playing);
+                    songsModelInterface->setCurrentSongState(app::music::SongState::Playing);
                     if (changePlayingStateCallback != nullptr) {
-                        changePlayingStateCallback(SongState::Playing);
+                        changePlayingStateCallback(app::music::SongState::Playing);
                     }
                     updateViewSongState();
                     songProgressTimestamp = std::chrono::system_clock::now();
@@ -161,7 +162,7 @@ namespace app::music_player
         updateViewSongState();
     }
 
-    void SongsPresenter::setPlayingStateCallback(std::function<void(SongState)> cb)
+    void SongsPresenter::setPlayingStateCallback(std::function<void(app::music::SongState)> cb)
     {
         changePlayingStateCallback = std::move(cb);
     }
@@ -171,7 +172,7 @@ namespace app::music_player
         if (token == songsModelInterface->getCurrentFileToken()) {
             songsModelInterface->clearCurrentSongContext();
             if (changePlayingStateCallback != nullptr) {
-                changePlayingStateCallback(SongState::NotPlaying);
+                changePlayingStateCallback(app::music::SongState::NotPlaying);
             }
             if (!waitingToPlay) {
                 updateViewSongState();
@@ -189,7 +190,7 @@ namespace app::music_player
         if (token == currentSongContext.currentFileToken) {
             songsModelInterface->clearCurrentSongContext();
             if (changePlayingStateCallback != nullptr) {
-                changePlayingStateCallback(SongState::NotPlaying);
+                changePlayingStateCallback(app::music::SongState::NotPlaying);
             }
             auto nextSongToPlay = songsModelInterface->getNextFilePath(currentSongContext.filePath);
             if (!nextSongToPlay.empty()) {
@@ -207,9 +208,9 @@ namespace app::music_player
     bool SongsPresenter::handleAudioPausedNotification(audio::Token token)
     {
         if (token == songsModelInterface->getCurrentFileToken()) {
-            songsModelInterface->setCurrentSongState(SongState::NotPlaying);
+            songsModelInterface->setCurrentSongState(app::music::SongState::NotPlaying);
             if (changePlayingStateCallback != nullptr) {
-                changePlayingStateCallback(SongState::NotPlaying);
+                changePlayingStateCallback(app::music::SongState::NotPlaying);
             }
             updateViewSongState();
             return true;
@@ -220,9 +221,9 @@ namespace app::music_player
     bool SongsPresenter::handleAudioResumedNotification(audio::Token token)
     {
         if (token == songsModelInterface->getCurrentFileToken()) {
-            songsModelInterface->setCurrentSongState(SongState::Playing);
+            songsModelInterface->setCurrentSongState(app::music::SongState::Playing);
             if (changePlayingStateCallback != nullptr) {
-                changePlayingStateCallback(SongState::Playing);
+                changePlayingStateCallback(app::music::SongState::Playing);
             }
             updateViewSongState();
             return true;

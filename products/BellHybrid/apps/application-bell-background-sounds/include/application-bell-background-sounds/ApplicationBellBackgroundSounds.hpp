@@ -5,6 +5,7 @@
 
 #include <Application.hpp>
 #include <common/models/AbstractAudioModel.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 namespace gui::window::name
 {

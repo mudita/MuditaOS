@@ -14,6 +14,7 @@ add_subdirectory( service-db )
 add_subdirectory( service-desktop )
 add_subdirectory( service-eink )
 add_subdirectory( service-evtmgr )
+add_subdirectory( service-fileindexer )
 add_subdirectory( service-gui )
 add_subdirectory( service-time )
 

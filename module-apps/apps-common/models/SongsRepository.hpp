@@ -14,7 +14,7 @@
 
 #include <cstddef>
 
-namespace app::music_player
+namespace app::music
 {
     struct FilesCache
     {
@@ -54,22 +54,22 @@ namespace app::music_player
         virtual void getMusicFilesList(std::uint32_t offset,
                                        std::uint32_t limit,
                                        const OnGetMusicFilesListCallback &callback) = 0;
-        virtual std::string getNextFilePath(const std::string &filePath) const     = 0;
-        virtual std::string getPreviousFilePath(const std::string &filePath) const = 0;
+        virtual std::string getNextFilePath(const std::string &filePath) const      = 0;
+        virtual std::string getPreviousFilePath(const std::string &filePath) const  = 0;
         virtual std::optional<db::multimedia_files::MultimediaFilesRecord> getRecord(
-            const std::string &filePath) const                                      = 0;
-        virtual void updateRepository(const std::string &filePath)                  = 0;
+            const std::string &filePath) const                     = 0;
+        virtual void updateRepository(const std::string &filePath) = 0;
     };
 
     class SongsRepository : public AbstractSongsRepository, public app::AsyncCallbackReceiver
     {
       public:
-        explicit SongsRepository(ApplicationCommon *application, std::unique_ptr<AbstractTagsFetcher> tagsFetcher);
+        explicit SongsRepository(ApplicationCommon *application,
+                                 std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
+                                 std::string pathPrefix);
 
         void initCache();
-        void getMusicFilesList(std::uint32_t offset,
-                               std::uint32_t limit,
-                               const OnGetMusicFilesListCallback &callback) override;
+        void getMusicFilesList(std::uint32_t offset, std::uint32_t limit, const OnGetMusicFilesListCallback &callback);
         std::string getNextFilePath(const std::string &filePath) const override;
         std::string getPreviousFilePath(const std::string &filePath) const override;
         std::optional<db::multimedia_files::MultimediaFilesRecord> getRecord(
@@ -87,6 +87,8 @@ namespace app::music_player
         ApplicationCommon *application;
 
         std::unique_ptr<AbstractTagsFetcher> tagsFetcher;
+
+        std::string pathPrefix;
 
         /// collection of music files displayed in the list view
         FilesCache musicFilesViewCache;
@@ -119,4 +121,4 @@ namespace app::music_player
                                   unsigned int repoRecordsCount,
                                   std::uint32_t offset);
     };
-} // namespace app::music_player
+} // namespace app::music

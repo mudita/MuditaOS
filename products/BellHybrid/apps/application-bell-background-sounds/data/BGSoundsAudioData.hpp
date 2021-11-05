@@ -3,6 +3,7 @@
 
 #pragma once
 #include <SwitchData.hpp>
+#include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <tags_fetcher/TagsFetcher.hpp>
 
 #include <chrono>
@@ -13,14 +14,14 @@ namespace gui
 {
     class BGSoundsAudioContext
     {
-        tags::fetcher::Tags tags;
+        db::multimedia_files::MultimediaFilesRecord sound;
 
       public:
-        explicit BGSoundsAudioContext(const tags::fetcher::Tags &tags) : tags{tags}
+        explicit BGSoundsAudioContext(const db::multimedia_files::MultimediaFilesRecord &sound) : sound{sound}
         {}
-        [[nodiscard]] const tags::fetcher::Tags &getTags() const noexcept
+        [[nodiscard]] const db::multimedia_files::MultimediaFilesRecord &getSound() const noexcept
         {
-            return tags;
+            return sound;
         }
     };
 

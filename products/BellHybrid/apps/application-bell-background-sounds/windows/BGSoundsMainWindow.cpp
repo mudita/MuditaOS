@@ -19,21 +19,21 @@ namespace gui
         buildInterface();
         setListTitle(utils::translate("app_bellmain_background_sounds"));
     }
-    void BGSoundsMainWindow::setSoundsList(std::vector<tags::fetcher::Tags> soundsTags)
+    void BGSoundsMainWindow::setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> sounds)
     {
         std::list<gui::Option> menuOptionList;
-        auto addRecord = [&](const tags::fetcher::Tags &soundTags) {
+        auto addRecord = [&](const db::multimedia_files::MultimediaFilesRecord &sound) {
             menuOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
-                soundTags.title,
+                sound.tags.title,
                 [=](gui::Item &item) {
-                    onActivated(soundTags);
+                    onActivated(sound);
                     return true;
                 },
                 [=](gui::Item &item) { return true; },
                 this));
         };
-        for (const auto &tag : soundsTags) {
-            addRecord(tag);
+        for (const auto &sound : sounds) {
+            addRecord(sound);
         }
 
         addOptions(std::move(menuOptionList));
@@ -44,9 +44,9 @@ namespace gui
         presenter->loadAudioRecords();
     }
 
-    void BGSoundsMainWindow::onActivated(const tags::fetcher::Tags &selectedSoundTags)
+    void BGSoundsMainWindow::onActivated(const db::multimedia_files::MultimediaFilesRecord &selectedSound)
     {
-        auto audioContext = std::make_unique<BGSoundsAudioContext>(selectedSoundTags);
+        auto audioContext = std::make_unique<BGSoundsAudioContext>(selectedSound);
         auto switchData   = std::make_unique<BGSoundsSwitchData>(std::move(audioContext));
         application->switchWindow(gui::window::name::bgSoundsTimerSelect, std::move(switchData));
     }

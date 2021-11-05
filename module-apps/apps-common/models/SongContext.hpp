@@ -4,7 +4,7 @@
 
 #include <Audio/decoder/Decoder.hpp>
 
-namespace app::music_player
+namespace app::music
 {
 
     enum class SongState
@@ -16,7 +16,7 @@ namespace app::music_player
     struct SongContext
     {
         static constexpr uint32_t StartPos = 0;
-        SongState currentSongState = SongState::NotPlaying;
+        SongState currentSongState         = SongState::NotPlaying;
         std::optional<audio::Token> currentFileToken;
         std::string filePath;
         uint32_t currentPos = StartPos;
@@ -28,4 +28,4 @@ namespace app::music_player
         bool isValid() const;
     };
 
-} // namespace app::music_player
+} // namespace app::music
