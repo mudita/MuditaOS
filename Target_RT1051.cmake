@@ -57,6 +57,12 @@ add_compile_options(
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
 )
 
+set(TARGET_SOURCES
+
+        ${CMAKE_CURRENT_LIST_DIR}/module-os/board/rt1051/_exit.c
+        CACHE INTERNAL ""
+)
+
 # where is the target environment
 SET(CMAKE_FIND_ROOT_PATH  ${TOOLCHAIN_PATH}/${TOOLCHAIN_PREFIX})
 # search for programs in the build host directories
