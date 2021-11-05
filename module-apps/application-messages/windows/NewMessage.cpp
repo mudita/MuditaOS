@@ -258,13 +258,21 @@ namespace gui
         message->setFont(style::window::font::medium);
         message->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         message->activatedCallback = [=](Item &) -> bool {
+            if (recipient->getText().empty() || message->getText().empty()) {
+                return false;
+            }
             if (!sendSms()) {
                 LOG_ERROR("sendSms failed");
             }
             return true;
         };
         message->focusChangedCallback = [=](Item &) -> bool {
-            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::send));
+            if (recipient->getText().empty()) {
+                navBar->setActive(nav_bar::Side::Center, false);
+            }
+            else {
+                navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::send));
+            }
             navBar->setActive(nav_bar::Side::Left, true);
             return true;
         };
