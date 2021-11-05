@@ -5,6 +5,7 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
+#include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <tags_fetcher/TagsFetcher.hpp>
 #include <time/time_locale.hpp>
 #include <memory>
@@ -40,14 +41,14 @@ namespace app::bgSounds
         class Presenter : public BasePresenter<BGSoundsProgressContract::View>
         {
           public:
-            virtual void activate(const tags::fetcher::Tags &tags)                  = 0;
-            virtual void stop()                                                     = 0;
-            virtual void pause()                                                    = 0;
-            virtual void resume()                                                   = 0;
-            virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
-            virtual void handleUpdateTimeEvent()                                    = 0;
-            virtual bool isPaused()                                                 = 0;
-            virtual void onBeforeShow()                                             = 0;
+            virtual void activate(const db::multimedia_files::MultimediaFilesRecord &tags) = 0;
+            virtual void stop()                                                            = 0;
+            virtual void pause()                                                           = 0;
+            virtual void resume()                                                          = 0;
+            virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer)        = 0;
+            virtual void handleUpdateTimeEvent()                                           = 0;
+            virtual bool isPaused()                                                        = 0;
+            virtual void onBeforeShow()                                                    = 0;
         };
     };
 
@@ -60,7 +61,7 @@ namespace app::bgSounds
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
 
-        void activate(const tags::fetcher::Tags &tags) override;
+        void activate(const db::multimedia_files::MultimediaFilesRecord &tags) override;
         void stop() override;
         void pause() override;
         void resume() override;

@@ -27,7 +27,7 @@ namespace app
         class MusicPlayerPriv
         {
           public:
-            std::shared_ptr<app::music_player::SongsModelInterface> songsModel;
+            std::shared_ptr<app::music::SongsModelInterface> songsModel;
             std::shared_ptr<app::music_player::SongsContract::Presenter> songsPresenter;
         };
     } // namespace music_player::internal
@@ -46,15 +46,19 @@ namespace app
 
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 
-        auto tagsFetcher     = std::make_unique<app::music_player::ServiceAudioTagsFetcher>(this);
-        auto songsRepository = std::make_unique<app::music_player::SongsRepository>(this, std::move(tagsFetcher));
-        priv->songsModel     = std::make_unique<app::music_player::SongsModel>(this, std::move(songsRepository));
+        auto tagsFetcher = std::make_unique<app::music::ServiceAudioTagsFetcher>(this);
+
+        const auto musicPlayerFilesPath = purefs::createPath(purefs::dir::getUserDiskPath(), "music").string();
+        auto songsRepository =
+            std::make_unique<app::music::SongsRepository>(this, std::move(tagsFetcher), musicPlayerFilesPath);
+
+        priv->songsModel     = std::make_unique<app::music::SongsModel>(this, std::move(songsRepository));
         auto audioOperations = std::make_unique<app::AsyncAudioOperations>(this);
         priv->songsPresenter =
             std::make_unique<app::music_player::SongsPresenter>(this, priv->songsModel, std::move(audioOperations));
 
         // callback used when playing state is changed
-        using SongState                                 = app::music_player::SongState;
+        using SongState                                 = app::music::SongState;
         std::function<void(SongState)> autolockCallback = [this](SongState isPlaying) {
             if (isPlaying == SongState::Playing) {
                 LOG_DEBUG("Preventing autolock while playing track.");

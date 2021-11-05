@@ -345,6 +345,15 @@ TEST_CASE("Multimedia DB tests")
             return record;
         };
 
+        auto getLimitedByPathQuery = [&](const std::string &pathPrefix, const uint32_t offset, const uint32_t limit) {
+            auto query  = std::make_shared<db::multimedia_files::query::GetLimitedByPath>(pathPrefix, offset, limit);
+            auto ret    = multimediaFilesRecordInterface.runQuery(query);
+            auto result = dynamic_cast<db::multimedia_files::query::GetLimitedResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            auto record = result->getResult();
+            return record;
+        };
+
         auto updateQuery = [&](const MultimediaFilesRecord &record) {
             const auto query  = std::make_shared<db::multimedia_files::query::Edit>(record);
             const auto ret    = multimediaFilesRecordInterface.runQuery(query);
@@ -562,6 +571,21 @@ TEST_CASE("Multimedia DB tests")
             auto size = records.size();
             REQUIRE(getLimitedQuery(0, size - 3).size() == size - 3);
             REQUIRE(getLimitedQuery(size - 3, size).size() == 3);
+        }
+
+        SECTION("getLimitOffsetByPath")
+        {
+            auto rootPrefix   = "user/";
+            auto musicPrefix  = "user/music/";
+            auto falsePrefix1 = "user/music1/";
+            auto flasePrefix2 = "user/music2";
+            auto falsePrefix3 = "abc/";
+            auto size         = records.size();
+            REQUIRE(getLimitedByPathQuery(rootPrefix, 0, size).size() == size);
+            REQUIRE(getLimitedByPathQuery(musicPrefix, 0, size).size() == (size - 3));
+            REQUIRE(getLimitedByPathQuery(falsePrefix1, 0, size).size() == 0);
+            REQUIRE(getLimitedByPathQuery(flasePrefix2, 0, size).size() == 0);
+            REQUIRE(getLimitedByPathQuery(falsePrefix3, 0, size).size() == 0);
         }
 
         SECTION("Artists")

@@ -10,9 +10,9 @@
 #include <memory>
 #include <optional>
 
-using ::app::music_player::SongsModel;
+using ::app::music::SongsModel;
 using ::testing::Return;
-using ::testing::app::music_player::MockSongsRepository;
+using ::testing::app::music::MockSongsRepository;
 
 TEST(SongsModel, Init)
 {
@@ -31,5 +31,5 @@ TEST(SongsModel, EmptyContext)
 
     EXPECT_EQ(ctx.currentFileToken, std::nullopt);
     EXPECT_TRUE(ctx.filePath.empty());
-    EXPECT_EQ(ctx.currentSongState, app::music_player::SongState::NotPlaying);
+    EXPECT_EQ(ctx.currentSongState, app::music::SongState::NotPlaying);
 }

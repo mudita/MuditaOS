@@ -10,6 +10,7 @@
 #include <time/ScopedTime.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <module-db/queries/multimedia_files/QueryMultimediaFilesGetLimited.hpp>
+#include <module-db/queries/multimedia_files/QueryMultimediaFilesGet.hpp>
 
 #include <filesystem>
 
@@ -19,7 +20,7 @@ namespace constants
     inline constexpr auto cacheThreshold{10};
 } // namespace constants
 
-namespace app::music_player
+namespace app::music
 {
     ServiceAudioTagsFetcher::ServiceAudioTagsFetcher(ApplicationCommon *application) : application(application)
     {}
@@ -29,8 +30,11 @@ namespace app::music_player
         return tags::fetcher::fetchTags(filePath);
     }
 
-    SongsRepository::SongsRepository(ApplicationCommon *application, std::unique_ptr<AbstractTagsFetcher> tagsFetcher)
-        : app::AsyncCallbackReceiver{application}, application{application}, tagsFetcher(std::move(tagsFetcher))
+    SongsRepository::SongsRepository(ApplicationCommon *application,
+                                     std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
+                                     std::string pathPrefix)
+        : app::AsyncCallbackReceiver{application}, application{application},
+          tagsFetcher(std::move(tagsFetcher)), pathPrefix{pathPrefix}
     {}
 
     void SongsRepository::initCache()
@@ -55,7 +59,7 @@ namespace app::music_player
                                             std::uint32_t limit,
                                             const OnGetMusicFilesListCallback &callback)
     {
-        auto query = std::make_unique<db::multimedia_files::query::GetLimited>(offset, limit);
+        auto query = std::make_unique<db::multimedia_files::query::GetLimitedByPath>(pathPrefix, offset, limit);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::MultimediaFiles);
 
         task->setCallback([this, callback, offset](auto response) {
@@ -252,4 +256,4 @@ namespace app::music_player
         return musicFilesModelCache.records[index];
     }
 
-} // namespace app::music_player
+} // namespace app::music
