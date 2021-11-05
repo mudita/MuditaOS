@@ -25,7 +25,8 @@ namespace app
         ApplicationBellMeditationTimer(std::string name                    = applicationBellMeditationTimerName,
                                        std::string parent                  = "",
                                        StatusIndicators statusIndicators   = StatusIndicators{},
-                                       StartInBackground startInBackground = {false});
+                                       StartInBackground startInBackground = {false},
+                                       uint32_t stackDepth                 = 4096 * 2);
         ~ApplicationBellMeditationTimer();
 
         sys::ReturnCodes InitHandler() override;

@@ -22,7 +22,8 @@ namespace app
         explicit ApplicationBellBedtime(std::string name                    = applicationBellBedtimeName,
                                         std::string parent                  = "",
                                         StatusIndicators statusIndicators   = StatusIndicators{},
-                                        StartInBackground startInBackground = {false});
+                                        StartInBackground startInBackground = {false},
+                                        uint32_t stackDepth                 = 4096 * 2);
 
         auto InitHandler() -> sys::ReturnCodes override;
 
