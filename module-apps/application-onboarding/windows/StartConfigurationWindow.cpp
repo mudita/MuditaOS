@@ -5,6 +5,7 @@
 
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingSwitchData.hpp>
+#include <application-onboarding/style/OnBoardingStyle.hpp>
 
 #include <apps-common/windows/DialogMetadata.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
@@ -32,13 +33,15 @@ namespace app::onBoarding
         navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
         navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::skip));
 
-        new gui::Icon(this,
-                      0,
-                      0,
-                      style::window_width,
-                      style::window::default_body_height,
-                      "logo_no_text",
-                      utils::translate("app_onboarding_start_configuration"));
+        auto icon = new gui::Icon(this,
+                                  style::window::default_left_margin,
+                                  style::window::default_vertical_pos,
+                                  style::window::default_body_width,
+                                  style::window::default_body_height,
+                                  "logo_no_text",
+                                  utils::translate("app_onboarding_start_configuration"));
+        icon->image->setMargins({0, style::onboarding::start_configuration::image_top_margin, 0, 0});
+        icon->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
     }
 
     gui::status_bar::Configuration StartConfigurationWindow::configureStatusBar(
