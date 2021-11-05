@@ -1,7 +1,6 @@
 target_sources(
         module-os
     PRIVATE
-        _exit.c
         fsl_tickless_gpt.c
         fsl_tickless_systick.c
         fsl_runtimestat_gpt.c
