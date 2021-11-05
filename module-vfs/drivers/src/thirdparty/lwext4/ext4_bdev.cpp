@@ -69,7 +69,7 @@ namespace purefs::fs::drivers::ext4::internal
                 }
                 const auto err = diskmm->read(ctx->disk_h, buf, blk_id, blk_cnt);
                 if (err) {
-                    LOG_ERROR("Sector write error errno: %i", err);
+                    LOG_ERROR("Sector read error errno: %i", err);
                 }
                 return -err;
             }
