@@ -5,6 +5,7 @@
 
 #include <common/models/AlarmModel.hpp>
 
+#include <audio/AudioMessage.hpp>
 #include <appmgr/messages/IdleTimerMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/popups/presenter/AlarmActivatedPresenter.hpp>
@@ -116,6 +117,13 @@ namespace app
     void Application::onStop()
     {
         stopIdleTimer();
+        stopAllAudio();
+    }
+
+    void Application::stopAllAudio()
+    {
+        auto msg = std::make_shared<service::AudioStopRequest>();
+        this->bus.sendUnicast(msg, service::audioServiceName);
     }
 
     void Application::startIdleTimer()
