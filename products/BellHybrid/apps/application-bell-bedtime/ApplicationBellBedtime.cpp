@@ -13,8 +13,9 @@ namespace app
     ApplicationBellBedtime::ApplicationBellBedtime(std::string name,
                                                    std::string parent,
                                                    StatusIndicators statusIndicators,
-                                                   StartInBackground startInBackground)
-        : Application(name, parent, statusIndicators, startInBackground)
+                                                   StartInBackground startInBackground,
+                                                   uint32_t stackDepth)
+        : Application(name, parent, statusIndicators, startInBackground, stackDepth)
     {}
 
     sys::ReturnCodes ApplicationBellBedtime::InitHandler()
