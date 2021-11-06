@@ -10,7 +10,7 @@
 
 GROUP (
   "libgcc.a"
-  "libc_nano.a"
+  "libc.a"
   "libstdc++.a"
   "libm.a"
   "libnosys.a"

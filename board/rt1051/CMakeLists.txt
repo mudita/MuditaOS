@@ -11,6 +11,7 @@ set (CMAKE_EXE_LINKER_FLAGS "-nostdlib -Xlinker --gc-sections -Xlinker --sort-se
 
 target_sources(board
     PRIVATE
+        memcpy-armv7m.S
         crashdump/consoledump.cpp
         crashdump/crashcatcher_impl.cpp
         crashdump/crashdumpwriter_vfs.cpp
