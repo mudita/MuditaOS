@@ -45,9 +45,9 @@ namespace app::home_screen
                 return alarmModel.getAlarmStatus() == alarms::AlarmStatus::Ringing;
             };
 
-            auto switchToMenu         = [](AbstractView &view) { view.switchToMenu(); };
-            auto makeAlarmEditable    = [](AbstractView &view) { view.setAlarmEdit(true); };
-            auto makeAlarmNonEditable = [](AbstractView &view) { view.setAlarmEdit(false); };
+            auto switchToMenu          = [](AbstractView &view) { view.switchToMenu(); };
+            auto makeAlarmEditable     = [](AbstractView &view) { view.setAlarmEdit(true); };
+            auto makeAlarmNonEditable  = [](AbstractView &view) { view.setAlarmEdit(false); };
             auto switchToBatteryStatus = [](AbstractView &view) { view.switchToBatteryStatus(); };
             auto updateBottomStats =
                 [](AbstractView &view, AbstractBatteryModel &batteryModel, AbstractTemperatureModel &temperatureModel) {
@@ -363,7 +363,7 @@ namespace app::home_screen
                                              "AlarmRinging"_s + sml::on_exit<_> / AlarmRinging::exit,
                                              "AlarmRinging"_s + event<Events::Reset> = "Init"_s,
                                              "AlarmRinging"_s + event<Events::Timer> [Helpers::isSnoozeAllowed] / Helpers::snooze = "AlarmSnoozedWait"_s,
-                                             "AlarmRinging"_s + event<Events::Timer> [!Helpers::isSnoozeAllowed] / Helpers::setDefaultAlarmTime  = "ActivatedWait"_s,
+                                             "AlarmRinging"_s + event<Events::Timer> [!Helpers::isSnoozeAllowed] = "ActivatedWait"_s,
                                              "AlarmRinging"_s + event<Events::LightPress> = "AlarmSnoozedWait"_s,
                                              "AlarmRinging"_s + event<Events::RotateLeftPress> = "AlarmSnoozedWait"_s,
                                              "AlarmRinging"_s + event<Events::RotateRightPress> = "AlarmSnoozedWait"_s,
