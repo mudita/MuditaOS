@@ -126,7 +126,7 @@ namespace bsp::bell_switches
                     latchEventFlag.setPressed();
                 }
                 auto val = static_cast<std::uint16_t>(timerState->notificationSource);
-                xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
+                xQueueSend(qHandleIrq, &val, 0);
                 timerState->lastState = KeyEvents::Released;
             }
             else {
@@ -153,7 +153,7 @@ namespace bsp::bell_switches
                 default:
                     break;
                 }
-                xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
+                xQueueSend(qHandleIrq, &val, 0);
                 timerState->lastState = KeyEvents::Pressed;
             }
         }
@@ -173,7 +173,7 @@ namespace bsp::bell_switches
             }
             else {
                 auto val = static_cast<std::uint16_t>(timerState->notificationSource);
-                xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
+                xQueueSend(qHandleIrq, &val, 0);
             }
         }
 
