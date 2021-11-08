@@ -77,15 +77,21 @@ void BluetoothDevicesModel::setInternalDeviceState(const Devicei &device, const 
 }
 void BluetoothDevicesModel::mergeInternalDeviceState(const Devicei &device)
 {
-    auto deviceInModel = getDeviceByAddress(device.address).value().get();
+    try {
+        auto deviceInModel = getDeviceByAddress(device.address).value().get();
 
-    if ((deviceInModel.deviceState == DeviceState::ConnectedVoice &&
-         device.deviceState == DeviceState::ConnectedAudio) ||
-        (device.deviceState == DeviceState::ConnectedVoice &&
-         deviceInModel.deviceState == DeviceState::ConnectedAudio)) {
-        setInternalDeviceState(device, DeviceState::ConnectedBoth);
+        if ((deviceInModel.deviceState == DeviceState::ConnectedVoice &&
+             device.deviceState == DeviceState::ConnectedAudio) ||
+            (device.deviceState == DeviceState::ConnectedVoice &&
+             deviceInModel.deviceState == DeviceState::ConnectedAudio)) {
+            setInternalDeviceState(device, DeviceState::ConnectedBoth);
+        }
+        else {
+            setInternalDeviceState(device, device.deviceState);
+        }
     }
-    else {
+    catch (std::bad_optional_access &e) {
+        LOG_ERROR("Can't get device by address! Unable to update device state. %s", e.what());
         setInternalDeviceState(device, device.deviceState);
     }
 }

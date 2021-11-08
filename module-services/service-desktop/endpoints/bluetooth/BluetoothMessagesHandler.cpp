@@ -27,7 +27,7 @@ namespace
 {
     json11::Json::object device2json(const Devicei &device)
     {
-        LOG_DEBUG("Device: name=%s, address=%s", device.name.c_str(), bd_addr_to_str(device.address));
+        LOG_DEBUG("Device: name=%s, address=%s", device.name.data(), bd_addr_to_str(device.address));
         return json11::Json::object{{btConstants::devicesValues::address, std::string(bd_addr_to_str(device.address))},
                                     {btConstants::devicesValues::name, device.name}};
     }

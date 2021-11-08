@@ -215,7 +215,7 @@ namespace bluetooth
     }
     auto Driver::pair(Devicei device, std::uint8_t protectionLevel) -> bool
     {
-        LOG_INFO("Device: %s, addr: %s", device.name.c_str(), device.address_str());
+        LOG_INFO("Device: %s, addr: %s", device.name.data(), device.address_str());
         return gap->pair(device, protectionLevel);
     }
     auto Driver::unpair(Devicei device) -> bool

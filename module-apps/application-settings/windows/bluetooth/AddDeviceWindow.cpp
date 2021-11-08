@@ -39,7 +39,7 @@ namespace gui
 
         for (auto &device : devices) {
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                device.name,
+                device.name.data(),
                 [&](gui::Item & /*unused*/) {
                     bluetoothSettingsModel->requestDevicePair(device);
                     application->switchWindow(gui::window::name::all_devices);
