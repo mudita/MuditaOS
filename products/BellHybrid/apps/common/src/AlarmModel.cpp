@@ -126,7 +126,7 @@ namespace app
     }
     void AlarmModel::turnOff()
     {
-        snoozeCount = 0;
+        snoozeCount    = 0;
         nextSnoozeTime = TIME_POINT_INVALID;
         alarms::AlarmServiceAPI::requestTurnOffRingingAlarm(app, cachedRecord.parent->ID);
     }
@@ -139,7 +139,7 @@ namespace app
 
         snoozeCount++;
         nextSnoozeTime =
-            std::chrono::floor<std::chrono::minutes>(TimePointNow()) + std::chrono::minutes(snoozeDuration);
+            std::chrono::floor<std::chrono::seconds>(TimePointNow()) + std::chrono::minutes(snoozeDuration);
         alarms::AlarmServiceAPI::requestSnoozeRingingAlarm(app, cachedRecord.parent->ID, nextSnoozeTime);
         alarmStatus = alarms::AlarmStatus::Snoozed;
     }
@@ -178,11 +178,11 @@ namespace app
     void AlarmModel::updateCache(const SingleEventRecord &record, alarms::AlarmStatus status)
     {
         if (record.startDate != cachedRecord.startDate) {
-            snoozeCount  = 0;
+            snoozeCount = 0;
         }
         cachedRecord = record;
         alarmStatus  = status;
-        state = State::Valid;
+        state        = State::Valid;
     }
     void AlarmModel::setDefaultAlarmTime()
     {
