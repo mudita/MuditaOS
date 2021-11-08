@@ -50,10 +50,8 @@ namespace gui
         addAppMenu(utils::translate("app_bellmain_alarm"), app::applicationBellAlarmName);
         addAppMenu(utils::translate("app_bellmain_power_nap"), app::applicationBellPowerNapName);
         addAppMenu(utils::translate("app_bellmain_background_sounds"), app::applicationBellBackgroundSoundsName);
-        // for demo only - to be replaced by call o final window
         addAppMenu(utils::translate("app_bellmain_meditation_timer"), app::applicationBellMeditationTimerName);
         addAppMenu(utils::translate("app_bellmain_bedtime"), app::applicationBellBedtimeName);
-
         addAppMenu(utils::translate("app_bellmain_settings"), app::applicationBellSettingsName);
 
         return menuOptionList;

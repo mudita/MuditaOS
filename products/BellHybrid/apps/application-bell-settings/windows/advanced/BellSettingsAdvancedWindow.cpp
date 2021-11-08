@@ -15,7 +15,6 @@
 #include <service-appmgr/messages/SwitchRequest.hpp>
 #include <windows/advanced/AboutYourBellWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
-#include <common/windows/BellFinishedCallbackWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 
 namespace gui

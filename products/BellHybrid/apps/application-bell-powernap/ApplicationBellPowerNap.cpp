@@ -17,8 +17,9 @@ namespace app
     ApplicationBellPowerNap::ApplicationBellPowerNap(std::string name,
                                                      std::string parent,
                                                      StatusIndicators statusIndicators,
-                                                     StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground)
+                                                     StartInBackground startInBackground,
+                                                     uint32_t stackDepth)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth)
     {}
 
     ApplicationBellPowerNap::~ApplicationBellPowerNap() = default;

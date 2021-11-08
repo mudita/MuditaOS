@@ -35,7 +35,6 @@
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/models/BedtimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
-#include <common/windows/BellFinishedCallbackWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/models/AudioModel.hpp>
@@ -47,8 +46,9 @@ namespace app
     ApplicationBellSettings::ApplicationBellSettings(std::string name,
                                                      std::string parent,
                                                      StatusIndicators statusIndicators,
-                                                     StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground)
+                                                     StartInBackground startInBackground,
+                                                     uint32_t stackDepth)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth)
     {}
 
     sys::ReturnCodes ApplicationBellSettings::InitHandler()
@@ -113,11 +113,6 @@ namespace app
         windowsFactory.attach(gui::window::bell_finished::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellFinishedWindow>(app);
-                              });
-
-        windowsFactory.attach(gui::BellFinishedCallbackWindow::defaultName,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellFinishedCallbackWindow>(app);
                               });
 
         windowsFactory.attach(gui::window::name::bellSettingsHomeView,
@@ -217,16 +212,16 @@ namespace app
                 return std::make_unique<gui::AboutYourBellWindow>(app, std::move(aboutYourBellPresenter));
             });
 
+        windowsFactory.attach(gui::window::name::bellSettingsFactoryReset,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellDialogYesNo>(app, name);
+                              });
+
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
                       gui::popup::ID::PowerOff,
                       gui::popup::ID::Reboot,
                       gui::popup::ID::BedtimeNotification});
-
-        windowsFactory.attach(gui::window::name::bellSettingsFactoryReset,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellDialogYesNo>(app, name);
-                              });
     }
 
     sys::MessagePointer ApplicationBellSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
