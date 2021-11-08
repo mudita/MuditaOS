@@ -5,5 +5,5 @@ if( NOT DEFINED ECOBOOT_BIN_VERSION)
 endif()
 
 if (NOT DEFINED UPDATER_BIN_VERSION)
-    set(UPDATER_BIN_VERSION 1.3.0 CACHE STRING "updater binary version to download from updater release page")
+    set(UPDATER_BIN_VERSION 1.4.0 CACHE STRING "updater binary version to download from updater release page")
 endif()
