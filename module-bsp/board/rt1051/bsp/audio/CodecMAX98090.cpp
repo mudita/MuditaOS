@@ -175,8 +175,8 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
             i2c->Write(i2cAddr, (uint8_t *)&outputenable, 1);
 
-            constexpr uint8_t coarse = 1;
-            constexpr uint8_t fine   = 0;
+            constexpr uint8_t coarse = 0;
+            constexpr uint8_t fine   = 5;
             SetPlaybackPath(coarse, fine);
             SetFilterMode(FilterMode::Voice);
         } break;
