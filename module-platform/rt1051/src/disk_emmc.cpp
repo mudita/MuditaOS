@@ -105,8 +105,9 @@ namespace purefs::blkdev
             return statusBlkDevFail;
         }
         // Wait for the card's buffer to become empty
-        while ((GET_SDMMCHOST_STATUS(mmcCard->host.base) & CARD_DATA0_STATUS_MASK) != CARD_DATA0_NOT_BUSY) {
-            taskYIELD();
+        auto error = MMC_PollingCardStatusBusy(mmcCard.get());
+        if (kStatus_Success != error) {
+            return error;
         }
         if (pmState == pm_state::suspend) {
             driverUSDHC->Enable();

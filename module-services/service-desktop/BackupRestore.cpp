@@ -451,6 +451,7 @@ std::string BackupRestore::ReadVersionFromJsonFile(const std::filesystem::path &
 
 bool BackupRestore::CheckBackupVersion(const std::filesystem::path &extractedBackup)
 {
+    auto versionOK           = true;
     const auto backupVersion = ReadVersionFromJsonFile(extractedBackup / bkp::backupInfo);
 
     if (backupVersion.empty()) {
@@ -465,17 +466,28 @@ bool BackupRestore::CheckBackupVersion(const std::filesystem::path &extractedBac
         return false;
     }
 
+    LOG_DEBUG("Current OS version %s, backup version %s", (currentVersion).c_str(), (backupVersion).c_str());
+
     auto const currentVersionTokens = utils::split(currentVersion, ".");
     auto const backupVersionTokens  = utils::split(backupVersion, ".");
 
-    if (currentVersionTokens[0] < backupVersionTokens[0] || //  major version
-        currentVersionTokens[1] < backupVersionTokens[1]) { //  minor version
-        LOG_ERROR(
-            "Current OS version %s older than backup version %s", (currentVersion).c_str(), (backupVersion).c_str());
-        return false;
+    if (currentVersionTokens[0] < backupVersionTokens[0]) { //  major version
+        versionOK = false;
+    }
+    else if (currentVersionTokens[0] == backupVersionTokens[0] && //  major version
+             currentVersionTokens[1] < backupVersionTokens[1]) {  //  minor version
+        versionOK = false;
     }
 
-    return true;
+    if (!versionOK) {
+        LOG_ERROR(
+            "Current OS version %s older than backup version %s", (currentVersion).c_str(), (backupVersion).c_str());
+    }
+    else {
+        LOG_DEBUG("OK to restore backup version %s", (backupVersion).c_str());
+    }
+
+    return versionOK;
 }
 
 bool BackupRestore::CanRestoreFromBackup(const std::filesystem::path &extractedBackup)
