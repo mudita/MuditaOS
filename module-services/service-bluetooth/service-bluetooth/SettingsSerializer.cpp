@@ -16,8 +16,8 @@ auto SettingsSerializer::toString(const std::vector<Devicei> &devices) -> std::s
 {
     json11::Json::array devicesJson;
     for (auto &device : devices) {
-        auto deviceEntry =
-            json11::Json::object{{strings::addr, bd_addr_to_str(device.address)}, {strings::name, device.name}};
+        auto deviceEntry = json11::Json::object{{strings::addr, bd_addr_to_str(device.address)},
+                                                {strings::name, std::string{device.name.data()}}};
         devicesJson.emplace_back(deviceEntry);
     }
     json11::Json finalJson = json11::Json::object{{strings::devices, devicesJson}};
@@ -40,7 +40,7 @@ auto SettingsSerializer::fromString(const std::string &jsonStr) -> std::vector<D
     for (auto &device : devicesArray) {
         Devicei temp;
         sscanf_bd_addr(device[strings::addr].string_value().c_str(), temp.address);
-        temp.name        = device[strings::name].string_value();
+        strcpy(temp.name.data(), device[strings::name].string_value().c_str());
         temp.deviceState = DeviceState::Paired;
         devicesVector.emplace_back(temp);
     }

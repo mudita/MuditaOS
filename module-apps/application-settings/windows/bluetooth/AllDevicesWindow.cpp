@@ -91,7 +91,7 @@ namespace gui
             UTF8 textOnRight                   = getTextOnRight(device.deviceState);
 
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                device.name,
+                device.name.data(),
                 [=](gui::Item & /*item*/) { return handleDeviceAction(device); },
                 [=](gui::Item &item) {
                     if (item.focus) {

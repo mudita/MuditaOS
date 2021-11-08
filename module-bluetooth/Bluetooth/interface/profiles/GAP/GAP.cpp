@@ -58,13 +58,13 @@ namespace bluetooth
         LOG_INFO("Visibility: %s", visibility ? "true" : "false");
     }
 
-    auto GAP::pair(const Devicei &device, std::uint8_t protectionLevel) -> bool
+    auto GAP::pair(Devicei device, std::uint8_t protectionLevel) -> bool
     {
         if (hci_get_state() == HCI_STATE_WORKING) {
             auto devIndex            = getDeviceIndexForAddress(devices, device.address);
             currentlyProccesedDevice = devices.at(devIndex);
 
-            return gap_dedicated_bonding(const_cast<uint8_t *>(device.address), protectionLevel) == 0;
+            return gap_dedicated_bonding(device.address, protectionLevel) == 0;
         }
         return false;
     }
@@ -130,7 +130,7 @@ namespace bluetooth
         if (index >= 0) {
             if (packet[2] == 0) {
                 devices[index].state = REMOTE_NAME_FETCHED;
-                devices[index].name  = std::string{reinterpret_cast<const char *>(&packet[9])};
+                strcpy(devices[index].name.data(), reinterpret_cast<const char *>(&packet[9]));
                 return true;
             }
             else {
@@ -156,13 +156,19 @@ namespace bluetooth
             LOG_INFO(", rssi %d dBm", static_cast<int8_t>(gap_event_inquiry_result_get_rssi(packet)));
         }
         if (gap_event_inquiry_result_get_name_available(packet) != 0u) {
-            auto name    = gap_event_inquiry_result_get_name(packet);
-            device.name  = std::string{reinterpret_cast<const char *>(name)};
+            if (const auto nameLen = gap_event_inquiry_result_get_name_len(packet); nameLen > Device::NameBufferSize) {
+                LOG_ERROR("Can't add new device - name length is too large.");
+                return;
+            }
+            auto name = gap_event_inquiry_result_get_name(packet);
+            strcpy(device.name.data(), reinterpret_cast<const char *>(name));
             device.state = REMOTE_NAME_FETCHED;
         }
         else {
+            bd_addr_t devAddr;
+            gap_event_inquiry_result_get_bd_addr(packet, devAddr);
             device.state = REMOTE_NAME_REQUEST;
-            device.name  = std::string{};
+            strcpy(device.name.data(), bd_addr_to_str(devAddr));
         }
 
         devices.emplace_back(std::move(device));
@@ -284,10 +290,10 @@ namespace bluetooth
     {
         return devices;
     }
-    auto GAP::unpair(const Devicei &device) -> bool
+    auto GAP::unpair(Devicei device) -> bool
     {
         LOG_INFO("Unpairing device");
-        gap_drop_link_key_for_bd_addr(const_cast<uint8_t *>(device.address));
+        gap_drop_link_key_for_bd_addr(device.address);
 
         LOG_INFO("Device unpaired");
         ownerService->bus.sendMulticast(std::make_shared<message::bluetooth::UnpairResult>(device, true),
