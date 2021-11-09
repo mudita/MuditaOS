@@ -17,29 +17,6 @@ extern "C"
 class CodecParamsAW8898 : public CodecParams
 {
   public:
-    enum class Cmd
-    {
-        SetOutVolume,
-        SetInGain,
-        SetMute,
-        SetOutput,
-        SetInput,
-        Reset,
-        MicBiasCtrl,
-        None
-    };
-
-    enum class SampleRate
-    {
-        Rate8KHz   = 8000,
-        Rate16KHz  = 16000,
-        Rate44K1Hz = 44100,
-        Rate48KHz  = 48000,
-        Rate32KHz  = 32000,
-        Rate96KHz  = 96000,
-        Invalid
-    };
-
     enum class MonoStereo
     {
         Left,
@@ -97,10 +74,7 @@ class CodecParamsAW8898 : public CodecParams
         }
     }
 
-    Cmd opCmd             = Cmd::None;
-    float outVolume       = 0;
     MonoStereo monoStereo = MonoStereo::Mono;
-    SampleRate sampleRate = SampleRate ::Rate44K1Hz;
 };
 
 class CodecAW8898 : public Codec

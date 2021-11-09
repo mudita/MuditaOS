@@ -58,7 +58,6 @@ namespace app::powernap
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
         sys::TimerHandle napAlarmTimer;
-        audio::Token currentToken;
         bool napFinished{false};
 
         void activate() override;

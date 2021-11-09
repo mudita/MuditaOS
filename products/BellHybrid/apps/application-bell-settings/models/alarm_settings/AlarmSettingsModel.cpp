@@ -21,13 +21,20 @@ namespace app::bell_settings
     void AlarmVolumeModel::setValue(std::uint8_t value)
     {
         const auto valStr = std::to_string(value);
-        settings.setValue(bell::settings::Alarm::volume, valStr, settings::SettingsScope::Global);
+        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Alarm, {});
     }
 
     std::uint8_t AlarmVolumeModel::getValue() const
     {
-        const auto str = settings.getValue(bell::settings::Alarm::volume, settings::SettingsScope::Global);
-        return std::stoi(str);
+        return defaultValue;
+    }
+    void AlarmVolumeModel::restoreDefault()
+    {
+        setValue(defaultValue);
+    }
+    AlarmVolumeModel::AlarmVolumeModel(AbstractAudioModel &audioModel) : audioModel{audioModel}
+    {
+        defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Alarm).value_or(0);
     }
 
     void AlarmLightOnOffModel::setValue(bool value)

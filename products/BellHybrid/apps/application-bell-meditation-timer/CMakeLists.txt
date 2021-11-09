@@ -37,6 +37,7 @@ target_sources(application-bell-meditation-timer
 target_link_libraries(application-bell-meditation-timer
     PRIVATE
         app
+        bell::audio
         bell::app-common
         bell::app-main
         bellgui

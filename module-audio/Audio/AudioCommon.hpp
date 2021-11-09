@@ -66,7 +66,10 @@ namespace audio
         TextMessageRingtone,
         Meditation,
         Alarm,
-        Last = Alarm,
+        PreWakeUp,
+        Snooze,
+        Bedtime,
+        Last = Bedtime,
     };
 
     /// Used to describe audio operations
@@ -174,7 +177,7 @@ namespace audio
         std::bitset<magic_enum::enum_count<EventType>()> audioSinkState;
     };
 
-    enum class RetCode
+    enum class RetCode : std::uint8_t
     {
         Success = 0,
         InvokedInIncorrectState,
