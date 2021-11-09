@@ -34,8 +34,8 @@ namespace gui
         VBox *vBox                                                   = nullptr;
         HBox *firstHBox                                              = nullptr;
         HBox *secondHBox                                             = nullptr;
-        TextFixedSize *authorText                                    = nullptr;
-        TextFixedSize *songText                                      = nullptr;
+        Label *authorText                                            = nullptr;
+        Label *songText                                              = nullptr;
         TextFixedSize *durationText                                  = nullptr;
         Image *playedSong                                            = nullptr;
         ItemState itemState                                          = ItemState::None;
