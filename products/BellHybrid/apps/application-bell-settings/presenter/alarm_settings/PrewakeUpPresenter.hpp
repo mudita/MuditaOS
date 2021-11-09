@@ -37,6 +37,7 @@ namespace app::bell_settings
             virtual auto saveData() -> void                                                 = 0;
             virtual auto loadData() -> void                                                 = 0;
             virtual auto eraseProviderData() -> void                                        = 0;
+            virtual void exitWithoutSave()                                                  = 0;
         };
     };
 
@@ -52,6 +53,7 @@ namespace app::bell_settings
         auto saveData() -> void override;
         auto loadData() -> void override;
         auto eraseProviderData() -> void override;
+        void exitWithoutSave() override;
 
       private:
         void stopSound();
@@ -60,7 +62,6 @@ namespace app::bell_settings
         std::unique_ptr<AbstractPrewakeUpSettingsModel> model;
         std::unique_ptr<AbstractAudioModel> audioModel;
         std::unique_ptr<AbstractSoundsRepository> soundsRepository;
-        audio::Token currentToken;
         UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

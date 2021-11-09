@@ -4,9 +4,8 @@
 #pragma once
 
 #include "AbstractAlarmAction.hpp"
+#include <audio/AudioMessage.hpp>
 #include <common/SoundsRepository.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
-#include <module-audio/Audio/AudioCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <Service/Service.hpp>

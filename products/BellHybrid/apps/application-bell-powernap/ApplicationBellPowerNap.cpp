@@ -10,7 +10,6 @@
 #include "windows/PowerNapSessionEndedWindow.hpp"
 #include <common/models/TimeModel.hpp>
 #include <AlarmSoundPaths.hpp>
-#include <service-audio/AudioMessage.hpp>
 
 namespace app
 {

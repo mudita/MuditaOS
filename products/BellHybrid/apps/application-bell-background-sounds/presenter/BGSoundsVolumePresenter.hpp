@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include <apps-common/BasePresenter.hpp>
-#include <module-audio/Audio/AudioCommon.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 
 namespace app
 {
@@ -12,47 +11,37 @@ namespace app
 }
 namespace app::bgSounds
 {
-    constexpr audio::Volume minVolume = 1u;
     using VolumeData = struct VolumeData
     {
-        audio::Volume min;
-        audio::Volume max;
-        audio::Volume step;
+        AbstractAudioModel::Volume min;
+        AbstractAudioModel::Volume max;
+        AbstractAudioModel::Volume step;
     };
 
-    class BGSoundsVolumeContract
+    class AbstractBGSoundsVolumePresenter
     {
       public:
-        class View
-        {
-          public:
-            virtual ~View() = default;
-            virtual audio::Volume getCurrentVolume() const noexcept = 0;
-        };
-        class Presenter : public BasePresenter<BGSoundsVolumeContract::View>
-        {
-          public:
-            virtual VolumeData getVolumeData()       = 0;
-            virtual audio::Volume getDefaultVolume() = 0;
-            virtual void increaseVolume()            = 0;
-            virtual void decreaseVolume()            = 0;
-        };
+        virtual ~AbstractBGSoundsVolumePresenter()                = default;
+        virtual VolumeData getVolumeData()                        = 0;
+        virtual void setVolume(AbstractAudioModel::Volume volume) = 0;
+        virtual AbstractAudioModel::Volume getVolume()            = 0;
     };
 
-    class BGSoundsVolumePresenter : public BGSoundsVolumeContract::Presenter
+    class BGSoundsVolumePresenter : public AbstractBGSoundsVolumePresenter
     {
-        app::ApplicationCommon &app;
         constexpr static struct VolumeData volumeData
         {
-            bgSounds::minVolume, audio::maxVolume, audio::defaultVolumeStep
+            AbstractAudioModel::minVolume, AbstractAudioModel::maxVolume, 1
         };
+        static constexpr AbstractAudioModel::Volume defaultVolume = 5;
+
+        AbstractAudioModel &audioModel;
 
         VolumeData getVolumeData() override;
-        audio::Volume getDefaultVolume() override;
-        void increaseVolume() override;
-        void decreaseVolume() override;
+        void setVolume(AbstractAudioModel::Volume volume) override;
+        AbstractAudioModel::Volume getVolume() override;
 
       public:
-        explicit BGSoundsVolumePresenter(app::ApplicationCommon &app);
+        explicit BGSoundsVolumePresenter(AbstractAudioModel &audioModel);
     };
 } // namespace app::bgSounds
