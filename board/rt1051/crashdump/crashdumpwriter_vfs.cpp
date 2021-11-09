@@ -3,12 +3,15 @@
 
 #include "crashdumpwriter_vfs.hpp"
 
+#include <cstdio>
 #include <log/log.hpp>
 #include <fcntl.h>
 #include "purefs/vfs_subsystem.hpp"
 #include <purefs/filesystem_paths.hpp>
 
 #include <filesystem>
+#include <stdint.h>
+#include <unistd.h>
 
 namespace crashdump
 {
@@ -16,47 +19,49 @@ namespace crashdump
 
     void CrashDumpWriterVFS::openDump()
     {
-        vfs                          = purefs::subsystem::vfs_core();
         const auto crashDumpFilePath = purefs::dir::getCrashDumpsPath() / crashDumpFileName;
-
+        LOG_INFO("Crash dump %s preparing ...", crashDumpFilePath.c_str());
         if (!rotator.rotateFile(crashDumpFilePath)) {
-            LOG_FATAL("Failed to rotate crash dumps.");
+            LOG_FATAL("Failed to rotate crash dumps errno: %i", errno);
+            std::abort();
         }
-        dumpFd = vfs->open(crashDumpFilePath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
-
-        if (dumpFd < 0) {
-            LOG_FATAL("Failed to open crash dump file. Won't be able to save crash info.");
+        file = std::fopen(crashDumpFilePath.c_str(), "w");
+        if (!file) {
+            LOG_FATAL("Failed to open crash dump file errno %i", errno);
+            std::abort();
         }
     }
 
     void CrashDumpWriterVFS::saveDump()
     {
-        vfs->close(dumpFd);
+        LOG_INFO("Crash dump create finished.");
+        fflush(file);
+        fsync(fileno(file));
+        std::fclose(file);
     }
 
     void CrashDumpWriterVFS::writeBytes(const uint8_t *buff, std::size_t size)
     {
-        vfs->write(dumpFd, reinterpret_cast<const char *>(buff), size);
+        if (std::fwrite(buff, sizeof(*buff), size, file) != size) {
+            LOG_FATAL("Unable to write crash dump errno: %i", errno);
+            std::abort();
+        }
     }
 
     void CrashDumpWriterVFS::writeHalfWords(const uint16_t *buff, std::size_t size)
     {
-        for (std::size_t n = 0; n < size; ++n) {
-            writeBytes(reinterpret_cast<const uint8_t *>(buff + n), sizeof(uint16_t));
+        if (std::fwrite(buff, sizeof(*buff), size, file) != size) {
+            LOG_FATAL("Unable to write crash dump");
+            std::abort();
         }
     }
 
     void CrashDumpWriterVFS::writeWords(const uint32_t *buff, std::size_t size)
     {
-        for (std::size_t n = 0; n < size; ++n) {
-            writeBytes(reinterpret_cast<const uint8_t *>(buff + n), sizeof(uint32_t));
+        if (std::fwrite(buff, sizeof(*buff), size, file) != size) {
+            LOG_FATAL("Unable to write crash dump");
+            std::abort();
         }
-    }
-
-    CrashDumpWriter &CrashDumpWriter::instance()
-    {
-        static CrashDumpWriterVFS writer;
-        return writer;
     }
 
 } // namespace crashdump

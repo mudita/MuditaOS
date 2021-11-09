@@ -14,21 +14,11 @@ namespace app::bell_settings
         : provider{provider}, snoozeSettingsModel{std::move(snoozeSettingsModel)}, audioModel{std::move(audioModel)},
           soundsRepository{std::move(soundsRepository)}
     {
-        auto playResponseCb = [this](audio::RetCode retCode, audio::Token token) {
-            if (retCode != audio::RetCode::Success || !token.IsValid()) {
-                LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
-                          str(retCode).c_str(),
-                          token.IsValid());
-                return;
-            }
-            this->currentToken = token;
-        };
-
-        auto playSound = [this, playResponseCb](const UTF8 &val) {
+        auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
             this->audioModel->play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
-                                   playResponseCb,
-                                   AbstractAudioModel::PlaybackType::Chime);
+                                   AbstractAudioModel::PlaybackType::Snooze,
+                                   {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
@@ -38,8 +28,9 @@ namespace app::bell_settings
         this->provider->onToneChange = playSound;
 
         this->provider->onVolumeEnter  = playSound;
+        this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::Chime);
+            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::Snooze, {});
             playSound(currentSoundPath);
         };
     }
@@ -65,10 +56,14 @@ namespace app::bell_settings
     }
     void SnoozePresenter::stopSound()
     {
-        audioModel->stop(currentToken, nullptr);
+        audioModel->stop({});
     }
     void SnoozePresenter::eraseProviderData()
     {
         provider->clearData();
+    }
+    void SnoozePresenter::exitWithoutSave()
+    {
+        snoozeSettingsModel->getSnoozeChimeVolume().restoreDefault();
     }
 } // namespace app::bell_settings

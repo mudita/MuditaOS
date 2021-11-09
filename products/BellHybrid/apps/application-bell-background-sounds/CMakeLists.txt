@@ -47,8 +47,8 @@ target_sources(application-bell-background-sounds
 
 target_link_libraries(application-bell-background-sounds
     PRIVATE
-        app
         apps-common
+        bell::audio
 
     PUBLIC
         module-gui

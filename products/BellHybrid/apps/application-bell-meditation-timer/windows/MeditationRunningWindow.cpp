@@ -5,10 +5,10 @@
 #include "MeditationRunningWindow.hpp"
 #include "MeditationStyle.hpp"
 
+#include <audio/AudioMessage.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
 
 namespace
 {
@@ -182,7 +182,8 @@ namespace gui
 
     void MeditationRunningWindow::playGong()
     {
-        AudioServiceAPI::PlaybackStart(
-            application, audio::PlaybackType::Meditation, purefs::dir::getCurrentOSPath() / meditationAudioPath);
+        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(
+            purefs::dir::getCurrentOSPath() / meditationAudioPath, audio::PlaybackType::Meditation);
+        application->bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 } // namespace gui

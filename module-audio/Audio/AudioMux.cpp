@@ -163,20 +163,17 @@ namespace audio
     {
         switch (type) {
         case PlaybackType::None:
-            [[fallthrough]];
         case PlaybackType::Notifications:
-            [[fallthrough]];
         case PlaybackType::KeypadSound:
-            [[fallthrough]];
         case PlaybackType::TextMessageRingtone:
             return true;
         case PlaybackType::CallRingtone:
-            [[fallthrough]];
         case PlaybackType::Meditation:
-            [[fallthrough]];
         case PlaybackType::Alarm:
-            [[fallthrough]];
         case PlaybackType::Multimedia:
+        case PlaybackType::Bedtime:
+        case PlaybackType::PreWakeUp:
+        case PlaybackType::Snooze:
             return false;
         }
         return false;

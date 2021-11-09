@@ -38,7 +38,7 @@ namespace
 
 EventManager::EventManager(const std::string &name)
     : EventManagerCommon(name), temperatureSource{hal::temperature::AbstractTemperatureSource::Factory::create()},
-      backlightHandler(settings, this)
+      backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
 {
     buildKeySequences();
     updateTemperature(*temperatureSource);
@@ -56,6 +56,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     }
 
     if (kbdMessage->key.state == RawKey::State::Pressed || kbdMessage->key.state == RawKey::State::Moved) {
+        userActivityHandler.handleUserInput();
         backlightHandler.handleKeyPressed(static_cast<int>(mapKey(static_cast<gui::KeyCode>(kbdMessage->key.keyCode))));
     }
 

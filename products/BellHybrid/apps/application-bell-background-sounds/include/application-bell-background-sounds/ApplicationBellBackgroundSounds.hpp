@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Application.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 
 namespace gui::window::name
 {
@@ -21,6 +22,7 @@ namespace app
 
     class ApplicationBellBackgroundSounds : public Application
     {
+        std::unique_ptr<AbstractAudioModel> audioModel;
         std::unique_ptr<bgSounds::BGSoundsPlayer> player;
 
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;

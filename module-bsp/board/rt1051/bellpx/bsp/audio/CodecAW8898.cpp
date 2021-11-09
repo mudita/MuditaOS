@@ -21,10 +21,23 @@ using namespace bsp::audio;
 
 namespace
 {
-    constexpr auto ReadStatusRetries  = 5;
-    constexpr auto OneByteAddressing  = 1;
-    constexpr auto PositiveLogic      = 0;
-    constexpr auto defaultVolumeLevel = 3.0f;
+    constexpr auto ReadStatusRetries = 5;
+    constexpr auto OneByteAddressing = 1;
+    constexpr auto PositiveLogic     = 0;
+    constexpr auto maxInVolume       = 10;
+    constexpr auto minInVolume       = 0;
+
+    /// Higher layers operate using 0-10 range. Here we are transforming it into more usable one.
+    /// Anything above 9 is going to distort the speaker and values below 5 are too quiet.
+    constexpr float transformVolumeLvl(float value)
+    {
+        constexpr auto maxOutVolume = 9;
+        constexpr auto minOutVolume = 5;
+        constexpr auto inputRange   = std::make_pair(minInVolume, maxInVolume);
+        constexpr auto outputRange  = std::make_pair(minOutVolume, maxOutVolume);
+        constexpr float slope = 1.0 * (outputRange.second - outputRange.first) / (inputRange.second - inputRange.first);
+        return outputRange.first + slope * (value - inputRange.first);
+    }
 } // namespace
 
 CodecAW8898::CodecAW8898()
@@ -83,10 +96,7 @@ CodecRetCode CodecAW8898::Start(const CodecParams &param)
     // Store param configuration
     currentParams = params;
 
-    auto currVol = currentParams.outVolume;
-    // remove this once volume control in application is working
-    currVol = defaultVolumeLevel;
-    SetOutputVolume(currVol);
+    SetOutputVolume(currentParams.outVolume);
 
     AW8898::ReadAllReg();
 
@@ -115,10 +125,8 @@ CodecRetCode CodecAW8898::Stop()
 
 CodecRetCode CodecAW8898::Ioctrl(const CodecParams &param)
 {
-
     const CodecParamsAW8898 &params = static_cast<const CodecParamsAW8898 &>(param);
-
-    CodecRetCode ret = CodecRetCode::Success;
+    CodecRetCode ret                = CodecRetCode::Success;
 
     switch (params.opCmd) {
     case CodecParamsAW8898::Cmd::SetOutVolume:
@@ -152,14 +160,13 @@ CodecRetCode CodecAW8898::Ioctrl(const CodecParams &param)
 
 std::uint8_t CodecAW8898::VolumeTo8Bit(const float vol)
 {
-    static constexpr auto maxVolumeLevel  = 10.0f;
-    static constexpr auto conversionRatio = static_cast<float>(UINT8_MAX) / maxVolumeLevel;
+    static constexpr auto conversionRatio = static_cast<float>(UINT8_MAX) / maxInVolume;
 
     if (vol < 0) {
         return 0;
     }
 
-    if (vol > maxVolumeLevel) {
+    if (vol > maxInVolume) {
         return UINT8_MAX;
     }
 
@@ -168,12 +175,10 @@ std::uint8_t CodecAW8898::VolumeTo8Bit(const float vol)
 
 CodecRetCode CodecAW8898::SetOutputVolume(const float vol)
 {
-    uint8_t mute = 0;
-
     // If volume set to 0 then mute output
     AW8898::RunMute(vol == 0); //(PWMCTRL.HMUTE=0) - disable mute
-
-    AW8898::SetVolume(VolumeTo8Bit(vol));
+    // AW8898 has "negative" gain control - higher the absolute value, lower the volume
+    AW8898::SetVolume(UINT8_MAX - VolumeTo8Bit(transformVolumeLvl(vol)));
     currentParams.outVolume = vol;
     return CodecRetCode::Success;
 }
