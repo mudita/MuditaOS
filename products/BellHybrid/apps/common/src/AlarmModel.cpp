@@ -138,8 +138,7 @@ namespace app
         const auto snoozeDuration = utils::getNumericValue<std::uint32_t>(snoozeDurationStr);
 
         snoozeCount++;
-        nextSnoozeTime =
-            std::chrono::floor<std::chrono::seconds>(TimePointNow()) + std::chrono::minutes(snoozeDuration);
+        nextSnoozeTime = std::chrono::ceil<std::chrono::minutes>(TimePointNow()) + std::chrono::minutes(snoozeDuration);
         alarms::AlarmServiceAPI::requestSnoozeRingingAlarm(app, cachedRecord.parent->ID, nextSnoozeTime);
         alarmStatus = alarms::AlarmStatus::Snoozed;
     }
