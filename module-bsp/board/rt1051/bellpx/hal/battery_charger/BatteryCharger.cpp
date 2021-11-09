@@ -16,8 +16,8 @@ namespace hal::battery
 
     void BatteryCharger::init(xQueueHandle queueBatteryHandle, xQueueHandle)
     {
-        bsp::battery_charger::init(queueBatteryHandle);
         bsp::fuel_gauge::init(queueBatteryHandle);
+        bsp::battery_charger::init(queueBatteryHandle);
 
         Store::Battery::modify().state = Store::Battery::State::Discharging;
         Store::Battery::modify().level = static_cast<unsigned int>(bsp::fuel_gauge::getBatteryLevel());
