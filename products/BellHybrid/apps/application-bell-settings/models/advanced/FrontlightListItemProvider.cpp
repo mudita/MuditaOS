@@ -34,10 +34,10 @@ namespace app::bell_settings
         auto mode = new gui::UTF8ListItem(model.getModeModel(),
                                           gui::UTF8Spinner::Range{modeOnDemandsStr, modeAutoStr},
                                           utils::translate("app_bell_settings_frontlight_mode_top_message"));
-        mode->setOnValueChanged([this, modeAutoStr](const auto &val) {
-            model.setMode(val == modeAutoStr ? screen_light_control::ScreenLightMode::Automatic
-                                             : screen_light_control::ScreenLightMode::Manual);
-        });
+        mode->onExit = [this, mode, modeAutoStr]() {
+            model.setMode(mode->getCurrentValue() == modeAutoStr ? screen_light_control::ScreenLightMode::Automatic
+                                                                 : screen_light_control::ScreenLightMode::Manual);
+        };
         internalData.emplace_back(mode);
     }
     FrontlightListItemProvider::FrontlightListItemProvider(AbstractFrontlightModel &model) : model{model}

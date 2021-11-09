@@ -22,6 +22,7 @@ namespace backlight
       public:
         Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
 
+        void init() override;
         void handleKeyPressed(int key = 0);
         /// Process request of the keypad light control
         /// @keypad_backlight::action an action to perform
@@ -32,7 +33,6 @@ namespace backlight
                                   const screen_light_control::Parameters &params) override;
 
       private:
-        std::shared_ptr<settings::Settings> settings;
         /// Timer that keeps key backlight on for a certain time if there was key pressed
         sys::TimerHandle keypadLightTimer;
         /// Timer that keeps screen backlight on for a certain time if there was key pressed

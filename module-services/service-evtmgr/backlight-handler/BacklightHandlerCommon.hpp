@@ -21,10 +21,11 @@ namespace backlight
       public:
         HandlerCommon(std::shared_ptr<settings::Settings> settings,
                       std::shared_ptr<screen_light_control::ScreenLightController> screenLightController,
-                      sys::Service *parent);
+                      sys::Service *parent,
+                      sys::timer::TimerCallback &&screenLightTimerCallback);
 
         /// initialise in InitHandler when Service is ready
-        void init();
+        virtual void init() = 0;
 
         /// Process request of the screen light control
         /// @screen_light_control::Action an action to perform
@@ -39,6 +40,7 @@ namespace backlight
       private:
         virtual void onScreenLightTurnedOn() = 0;
 
+      protected:
         std::shared_ptr<settings::Settings> settings;
         std::shared_ptr<screen_light_control::ScreenLightController> screenLightController;
 
@@ -51,8 +53,8 @@ namespace backlight
         {
             return screenLightController;
         }
-        void handleScreenLightSettings(screen_light_control::Action action,
-                                       const screen_light_control::Parameters &params);
+        virtual void handleScreenLightSettings(screen_light_control::Action action,
+                                               const screen_light_control::Parameters &params);
         void handleScreenLightRefresh();
 
       protected:

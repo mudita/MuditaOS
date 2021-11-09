@@ -60,6 +60,9 @@ namespace screen_light_control::functions
                     rampTargetReached = true;
                 }
             }
+            else {
+                rampTargetReached = true;
+            }
         }
 
         return rampState;

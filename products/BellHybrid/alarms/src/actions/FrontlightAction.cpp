@@ -73,10 +73,6 @@ namespace alarms
 
     bool ManualFrontlightAction::execute()
     {
-        service.bus.sendUnicast(
-            std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::disableAutomaticMode),
-            service::name::evt_manager);
-
         auto params = prepareParameters();
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
                                     screen_light_control::Action::turnOn, screen_light_control::Parameters{params}),
@@ -107,9 +103,6 @@ namespace alarms
         const auto params = prepareParameters();
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightSetAutoProgressiveModeParams>(params),
                                 service::name::evt_manager);
-        service.bus.sendUnicast(
-            std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::enableAutomaticMode),
-            service::name::evt_manager);
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::turnOn),
                                 service::name::evt_manager);
         return true;

@@ -18,13 +18,44 @@ namespace backlight
     } // namespace timers
 
     Handler::Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
-        : HandlerCommon(
-              std::move(settings), std::make_shared<pure::screen_light_control::ScreenLightController>(parent), parent),
+        : HandlerCommon(std::move(settings),
+                        std::make_shared<pure::screen_light_control::ScreenLightController>(parent),
+                        parent,
+                        [this](sys::Timer &t) {
+                            if (getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic &&
+                                this->screenLightController->isLightOn()) {
+                                this->screenLightController->processRequest(screen_light_control::Action::turnOff);
+                            }
+                        }),
           keypadLightTimer{sys::TimerFactory::createSingleShotTimer(
               parent, timers::keypadLightTimerName, timers::keypadLightTimerTimeout, [this](sys::Timer &) {
                   bsp::keypad_backlight::shutdown();
               })}
     {}
+
+    void Handler::init()
+    {
+        using namespace screen_light_control;
+
+        settings->registerValueChange(settings::Brightness::brightnessLevel, [&](const std::string &value) {
+            ManualModeParameters params{utils::getNumericValue<float>(value)};
+            screenLightController->processRequest(Action::setManualModeBrightness, Parameters(params));
+        });
+
+        settings->registerValueChange(settings::Brightness::autoMode, [&]([[maybe_unused]] const std::string &value) {
+            const auto action = getScreenAutoModeState() == ScreenLightMode::Automatic ? Action::enableAutomaticMode
+                                                                                       : Action::disableAutomaticMode;
+            screenLightController->processRequest(action);
+        });
+
+        settings->registerValueChange(settings::Brightness::state, [&]([[maybe_unused]] const std::string &value) {
+            const auto action = getScreenLightState() ? Action::turnOn : Action::turnOff;
+            if (action == Action::turnOn) {
+                onScreenLightTurnedOn();
+            }
+            screenLightController->processRequest(action);
+        });
+    }
 
     void Handler::handleKeyPressed([[maybe_unused]] int key)
     {
