@@ -144,7 +144,7 @@
   "app_music_player_uknown_title": "Okänd titel",
   "app_music_player_uknown_artist": "Okänd artist",
   "app_music_player_music_library_window_name": "Musikbibliotek",
-  "app_music_player_empty_track_notification": "<text color='5'>Välj en låt från biblioteket</text>",
+  "app_music_player_empty_track_notification": "Välj en låt från biblioteket",
   "app_music_player_start_window_notification": "<text color='5'>Tryck på <b>nedåtpil</b> för att välja<br></br> en låt från biblioteket</text>",
   "app_desktop_unlock": "LÅS UPP",
   "app_desktop_menu": "MENY",
