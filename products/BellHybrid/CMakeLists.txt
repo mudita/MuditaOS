@@ -48,12 +48,12 @@ target_link_libraries(BellHybrid
         bell::app-powernap
         bell::app-settings
         bell::db
-        evtmgr
+        bell::audio
+        bell::evtmgr
         log
         messagetype
         module-bsp
         module-vfs
-        service-audio
         service-desktop
         service-time
         sys

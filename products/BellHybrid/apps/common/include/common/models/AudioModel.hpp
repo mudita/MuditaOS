@@ -4,28 +4,24 @@
 #pragma once
 
 #include "AbstractAudioModel.hpp"
-#include <apps-common/AudioOperations.hpp>
+#include <apps-common/AsyncTask.hpp>
 
 namespace app
 {
-    class ApplicationCommon;
-}
-
-namespace app
-{
-    class AudioModel : public AbstractAudioModel
+    class AudioModel : public AbstractAudioModel, public app::AsyncCallbackReceiver
     {
       public:
         explicit AudioModel(ApplicationCommon *app);
 
-        void setVolume(Volume volume, PlaybackType playbackType) override;
-        bool play(const std::string &filePath, const OnPlayCallback &callback, PlaybackType type) override;
-        bool pause(const audio::Token &token, const OnPauseCallback &callback) override;
-        bool resume(const audio::Token &token, const OnResumeCallback &callback) override;
-        bool stop(const audio::Token &token, const OnStopCallback &callback) override;
+        void setVolume(Volume volume, PlaybackType playbackType, OnStateChangeCallback &&callback) override;
+        std::optional<Volume> getVolume(PlaybackType playbackType) override;
+        void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback) override;
+        void play(const std::string &filePath, PlaybackType type, OnStateChangeCallback &&callback) override;
+        void stop(OnStateChangeCallback &&callback) override;
+        void pause(OnStateChangeCallback &&callback) override;
+        void resume(OnStateChangeCallback &&callback) override;
 
       private:
         ApplicationCommon *app{};
-        AsyncAudioOperations asyncAudioOperations;
     };
 } // namespace app

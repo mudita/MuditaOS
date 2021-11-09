@@ -54,6 +54,9 @@ namespace gui
             exit();
             return true;
         }
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            presenter->exitWithoutSave();
+        }
 
         return AppWindow::onInput(inputEvent);
     }

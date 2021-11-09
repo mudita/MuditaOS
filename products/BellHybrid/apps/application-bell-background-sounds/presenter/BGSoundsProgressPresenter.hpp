@@ -30,9 +30,9 @@ namespace app::bgSounds
         class View
         {
           public:
-            ~View()                   = default;
-            virtual void onFinished() = 0;
-            virtual void onPaused()   = 0;
+            virtual ~View()                                                 = default;
+            virtual void onFinished()                                       = 0;
+            virtual void onPaused()                                         = 0;
             virtual void setTime(std::time_t newTime)                       = 0;
             virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
         };
@@ -46,6 +46,7 @@ namespace app::bgSounds
             virtual void resume()                                                   = 0;
             virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
             virtual void handleUpdateTimeEvent()                                    = 0;
+            virtual bool isPaused()                                                 = 0;
         };
     };
 
@@ -64,6 +65,7 @@ namespace app::bgSounds
         void resume() override;
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void handleUpdateTimeEvent() override;
+        bool isPaused() override;
 
         void onFinished();
 
@@ -71,6 +73,5 @@ namespace app::bgSounds
         BGSoundsProgressPresenter(settings::Settings *settings,
                                   AbstractBGSoundsPlayer &player,
                                   std::unique_ptr<AbstractTimeModel> timeModel);
-        ~BGSoundsProgressPresenter();
     };
 } // namespace app::bgSounds

@@ -19,11 +19,11 @@
 
 // services
 #include <appmgr/ApplicationManager.hpp>
+#include <audio/ServiceAudio.hpp>
 #include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
 #include <Service/ServiceCreator.hpp>
 #include <service-appmgr/Constants.hpp>
-#include <service-audio/ServiceAudio.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-gui/ServiceGUI.hpp>
@@ -68,7 +68,7 @@ int main()
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
     systemServices.emplace_back(sys::CreatorFor<EventManager>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
+    systemServices.emplace_back(sys::CreatorFor<service::Audio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>(service::eink::ExitAction::None));
