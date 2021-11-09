@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "module-apps/application-music-player/widgets/SongItem.hpp"
+#include <gui/widgets/Label.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui
@@ -45,30 +46,26 @@ namespace gui
         durationText->setEditMode(EditMode::Browse);
         durationText->setText(duration);
 
-        songText = new TextFixedSize(firstHBox, 0, 0, 0, 0);
+        songText = new Label(firstHBox, 0, 0, 0, 0);
         songText->setMinimumHeight(songItem::bold_text_h);
         songText->setMaximumWidth(songItem::w);
         songText->setMargins(Margins(songItem::leftMargin, 0, 0, 0));
         songText->setEdges(RectangleEdge::None);
-        songText->drawUnderline(false);
         songText->setFont(style::window::font::bigbold);
         songText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        songText->setEditMode(EditMode::Browse);
         songText->setText(songName);
 
         playedSong = new Image(secondHBox, 0, 0, "");
         playedSong->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         playedSong->setVisible(false);
 
-        authorText = new TextFixedSize(secondHBox, 0, 0, 0, 0);
+        authorText = new Label(secondHBox, 0, 0, 0, 0);
         authorText->setMinimumHeight(songItem::text_h);
         authorText->setMaximumWidth(songItem::w);
         authorText->setMargins(Margins(songItem::leftMargin, 0, 0, 0));
         authorText->setEdges(RectangleEdge::None);
-        authorText->drawUnderline(false);
         authorText->setFont(style::window::font::medium);
         authorText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        authorText->setEditMode(EditMode::Browse);
         authorText->setText(authorName);
 
         dimensionChangedCallback = [&]([[maybe_unused]] gui::Item &item, const BoundingBox &newDim) -> bool {

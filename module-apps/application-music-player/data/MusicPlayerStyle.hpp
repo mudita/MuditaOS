@@ -29,6 +29,7 @@ namespace musicPlayerStyle
         namespace trackInfoScreen
         {
             constexpr uint32_t topMargin      = 110;
+            constexpr uint32_t titleWidth     = 400;
             constexpr uint32_t titleHeight    = 40;
             constexpr uint32_t internalMargin = 16;
             constexpr uint32_t artistHeight   = 30;

@@ -95,21 +95,19 @@ namespace gui
         auto mainBox = new VBox(this, 0, 0, style::window_width, style::window_height);
         mainBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
-        titleText = new Text(mainBox, 0, 0, style::window_width, trackInfoScreen::titleHeight);
+        titleText = new Label(mainBox, 0, 0, trackInfoScreen::titleWidth, trackInfoScreen::titleHeight);
         titleText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        titleText->setTextType(TextType::SingleLine);
-        titleText->setEditMode(EditMode::Browse);
         titleText->setFont(style::window::font::mediumbigbold);
-        titleText->setRichText(currentTitle);
+        titleText->setText(currentTitle);
         titleText->setMargins(Margins(0, trackInfoScreen::topMargin, 0, 0));
+        titleText->setEdges(RectangleEdge::None);
 
-        artistText = new Text(mainBox, 0, 0, style::window_width, trackInfoScreen::artistHeight);
+        artistText = new Label(mainBox, 0, 0, trackInfoScreen::titleWidth, trackInfoScreen::artistHeight);
         artistText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        artistText->setTextType(TextType::SingleLine);
-        artistText->setEditMode(EditMode::Browse);
         artistText->setFont(style::window::font::medium);
-        artistText->setRichText(currentArtist);
+        artistText->setText(currentArtist);
         artistText->setMargins(Margins(0, trackInfoScreen::internalMargin, 0, 0));
+        artistText->setEdges(RectangleEdge::None);
 
         buildTrackProgressInterface(mainBox);
         buildPlayButtonsInterface(mainBox);
@@ -337,13 +335,12 @@ namespace gui
         textBox->setMinimumSize(trackInfo::width - trackInfo::internalMargin - trackInfo::height, trackInfo::height);
         textBox->setEdges(RectangleEdge::None);
         textBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-        descriptionText = new Text(textBox, 0, 0, 0, 0);
+        descriptionText = new Label(textBox, 0, 0, 0, 0);
         descriptionText->setMinimumSize(trackInfo::width - trackInfo::height - trackInfo::internalMargin,
                                         trackInfo::height);
         descriptionText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-        descriptionText->setTextType(TextType::SingleLine);
-        descriptionText->setEditMode(EditMode::Browse);
         descriptionText->setFont(style::window::font::small);
+        descriptionText->setEdges(RectangleEdge::None);
     }
 
     void MusicPlayerMainWindow::destroyInterface()
@@ -451,9 +448,9 @@ namespace gui
         auto isPaused  = state == RecordState::Paused;
 
         if (titleText != nullptr)
-            titleText->setRichText(currentTitle);
+            titleText->setText(currentTitle);
         if (artistText != nullptr)
-            artistText->setRichText(currentArtist);
+            artistText->setText(currentArtist);
 
         if (totalTimeText != nullptr)
             totalTimeText->setRichText(currentTotalTimeString);
@@ -477,11 +474,13 @@ namespace gui
             std::string trackDescription;
             if (!isPaused && !isPlaying) {
                 trackDescription = utils::translate("app_music_player_empty_track_notification");
+                descriptionText->setTextColor(gui::ColorGrey);
             }
             else {
                 trackDescription = currentTitle + " - " + currentArtist;
+                descriptionText->setTextColor(gui::ColorFullBlack);
             }
-            descriptionText->setRichText(trackDescription);
+            descriptionText->setText(trackDescription);
         }
 
         if (myViewMode == ViewMode::TRACK) {
