@@ -8,7 +8,8 @@
 namespace
 {
     constexpr auto entries =
-        std::array<battery_utils::BatteryLevelEntry, 6>{{{{5, 10}, {1, 5}, "bell_battery_empty"},
+        std::array<battery_utils::BatteryLevelEntry, 7>{{{{0, 5}, {1, 1}, "bell_battery_empty"},
+                                                         {{5, 10}, {1, 5}, "bell_battery_empty"},
                                                          {{11, 30}, {6, 29}, "bell_battery_lvl1"},
                                                          {{31, 50}, {30, 53}, "bell_battery_lvl2"},
                                                          {{51, 70}, {54, 77}, "bell_battery_lvl3"},

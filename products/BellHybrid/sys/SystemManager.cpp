@@ -4,6 +4,8 @@
 #include <sys/SystemManager.hpp>
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
 
+#include <system/messages/SystemManagerMessage.hpp>
+
 #include <appmgr/messages/AlarmMessage.hpp>
 #include <appmgr/messages/BatteryShutdown.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
@@ -47,5 +49,12 @@ namespace sys
         auto msg = std::make_shared<BatteryShutdown>();
         bus.sendUnicast(msg, service::name::appmgr);
         SystemManagerCommon::batteryShutdownLevelAction();
+    }
+
+    void SystemManager::batteryCriticalLevelAction(bool charging)
+    {
+        SystemManagerCommon::batteryCriticalLevelAction(charging);
+        auto msg = std::make_shared<CriticalBatteryLevelNotification>(true, charging);
+        bus.sendUnicast(std::move(msg), service::name::appmgr);
     }
 } // namespace sys
