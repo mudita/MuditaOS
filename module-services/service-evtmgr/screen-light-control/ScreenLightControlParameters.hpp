@@ -60,11 +60,17 @@ namespace screen_light_control
         float brightnessHysteresis = 0.0f;
     };
 
+    struct ConstLinearProgressModeParameters
+    {
+        float targetBrightness = 0.0f;
+    };
+
     class Parameters
     {
         std::optional<ManualModeParameters> manualModeParams;
         std::optional<AutomaticModeParameters> autoModeParams;
         std::optional<LinearProgressModeParameters> linearProgressModeParams;
+        std::optional<ConstLinearProgressModeParameters> constLinearProgressModeParams;
 
       public:
         Parameters() = default;
@@ -76,6 +82,9 @@ namespace screen_light_control
 
         explicit Parameters(const LinearProgressModeParameters &autoModeParams)
             : linearProgressModeParams{autoModeParams}
+        {}
+        explicit Parameters(const ConstLinearProgressModeParameters &autoModeParams)
+            : constLinearProgressModeParams{autoModeParams}
         {}
 
         [[nodiscard]] bool hasManualModeParams() const noexcept
@@ -98,5 +107,13 @@ namespace screen_light_control
         }
 
         [[nodiscard]] auto getLinearProgressModeParams() const noexcept -> const LinearProgressModeParameters &;
+
+        [[nodiscard]] bool hasConstLinearProgressModeParams() const noexcept
+        {
+            return constLinearProgressModeParams.has_value();
+        }
+
+        [[nodiscard]] auto getConstLinearProgressModeParams() const noexcept
+            -> const ConstLinearProgressModeParameters &;
     };
 } // namespace screen_light_control
