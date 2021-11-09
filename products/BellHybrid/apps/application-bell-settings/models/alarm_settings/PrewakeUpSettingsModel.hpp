@@ -5,6 +5,7 @@
 
 #include "AbstractPrewakeUpSettingsModel.hpp"
 #include <common/models/SettingsModel.hpp>
+#include <common/models/AudioModel.hpp>
 
 namespace app::bell_settings
 {
@@ -26,13 +27,17 @@ namespace app::bell_settings
         UTF8 getValue() const override;
     };
 
-    class PrewakeUpChimeVolumeModel : public gui::SettingsModel<std::uint8_t>
+    class PrewakeUpChimeVolumeModel : public gui::AbstractSettingsModel<std::uint8_t>
     {
       public:
-        using SettingsModel::SettingsModel;
-
+        explicit PrewakeUpChimeVolumeModel(AbstractAudioModel &audioModel);
         void setValue(std::uint8_t value) override;
         std::uint8_t getValue() const override;
+        void restoreDefault() override;
+
+      private:
+        AbstractAudioModel &audioModel;
+        std::uint8_t defaultValue;
     };
 
     class PrewakeUpLightDurationModel : public gui::SettingsModel<std::uint8_t>

@@ -2,7 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/AudioModel.hpp"
-#include <service-audio/AudioServiceAPI.hpp>
+
+#include <ApplicationCommon.hpp>
+#include <audio/AudioMessage.hpp>
 
 namespace
 {
@@ -10,45 +12,168 @@ namespace
     {
         using Type = app::AbstractAudioModel::PlaybackType;
         switch (type) {
+        case Type::Multimedia:
+            return audio::PlaybackType::Multimedia;
         case Type::Alarm:
             return audio::PlaybackType::Alarm;
-        case Type::Chime:
-            return audio::PlaybackType::Alarm;
+        case Type::Snooze:
+            return audio::PlaybackType::Snooze;
         case Type::PreWakeup:
-            return audio::PlaybackType::Alarm;
+            return audio::PlaybackType::PreWakeUp;
         case Type::Bedtime:
-            return audio::PlaybackType::Alarm;
+            return audio::PlaybackType::Bedtime;
         default:
             return audio::PlaybackType::Alarm;
         }
     }
+
+    void reportError(const char *prefix, audio::RetCode code)
+    {
+        if (code != audio::RetCode::Success) {
+            LOG_ERROR("%s request error: %s", prefix, magic_enum::enum_name(code).data());
+        }
+    }
+
+    auto SendAudioRequest(sys::Service *serv, std::shared_ptr<service::AudioMessage> msg)
+    {
+        auto msgType = static_cast<int>(msg->type);
+        auto ret     = serv->bus.sendUnicastSync(msg, service::audioServiceName, sys::BusProxy::defaultTimeout);
+        if (ret.first == sys::ReturnCodes::Success) {
+            if (auto resp = std::dynamic_pointer_cast<service::AudioResponseMessage>(ret.second)) {
+                return resp;
+            }
+            LOG_ERROR("msgType %d - not AudioResponseMessage", msgType);
+            return std::make_shared<service::AudioResponseMessage>(audio::RetCode::Failed);
+        }
+        LOG_ERROR("Command %d Failed with %d error", msgType, static_cast<int>(ret.first));
+        return std::make_shared<service::AudioResponseMessage>(audio::RetCode::Failed);
+    }
+
 } // namespace
 
 namespace app
 {
 
-    AudioModel::AudioModel(ApplicationCommon *app) : app{app}, asyncAudioOperations{app}
+    AudioModel::AudioModel(ApplicationCommon *app) : app::AsyncCallbackReceiver{app}, app{app}
     {}
-    void AudioModel::setVolume(AbstractAudioModel::Volume volume, PlaybackType playbackType)
+    void AudioModel::play(const std::string &filePath, PlaybackType type, OnStateChangeCallback &&callback)
     {
-        AudioServiceAPI::SetVolume(app, volume, convertPlaybackType(playbackType));
+        auto msg  = std::make_unique<service::AudioStartPlaybackRequest>(filePath, convertPlaybackType(type));
+        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
+        auto cb   = [_callback = callback](auto response) {
+            auto result = dynamic_cast<service::AudioStartPlaybackResponse *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            if (_callback) {
+                _callback(result->retCode);
+            }
+            reportError("play", result->retCode);
+
+            return true;
+        };
+        task->execute(app, this, std::move(cb));
     }
-    bool AudioModel::play(const std::string &filePath,
-                          const AbstractAudioOperations::OnPlayCallback &callback,
-                          PlaybackType type)
+
+    void AudioModel::stop(OnStateChangeCallback &&callback)
     {
-        return asyncAudioOperations.play(filePath, callback, convertPlaybackType(type));
+        auto msg  = std::make_unique<service::AudioStopRequest>();
+        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
+        auto cb   = [_callback = callback](auto response) {
+            auto result = dynamic_cast<service::AudioStopResponse *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            if (_callback) {
+                _callback(result->retCode);
+            }
+            reportError("stop", result->retCode);
+            return true;
+        };
+        task->execute(app, this, std::move(cb));
     }
-    bool AudioModel::pause(const audio::Token &token, const AbstractAudioOperations::OnPauseCallback &callback)
+
+    void AudioModel::setVolume(AbstractAudioModel::Volume volume,
+                               PlaybackType playbackType,
+                               OnStateChangeCallback &&callback)
     {
-        return asyncAudioOperations.pause(token, callback);
+        auto msg = std::make_unique<service::AudioSetVolume>(convertPlaybackType(playbackType), std::to_string(volume));
+        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
+        auto cb   = [_callback = callback](auto response) {
+            auto result = dynamic_cast<service::AudioResponseMessage *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            if (_callback) {
+                _callback(result->retCode);
+            }
+            reportError("setVolume", result->retCode);
+            return true;
+        };
+        task->execute(app, this, std::move(cb));
     }
-    bool AudioModel::resume(const audio::Token &token, const AbstractAudioOperations::OnResumeCallback &callback)
+    void AudioModel::pause(OnStateChangeCallback &&callback)
     {
-        return asyncAudioOperations.resume(token, callback);
+        auto msg  = std::make_unique<service::AudioPauseRequest>();
+        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
+        auto cb   = [_callback = callback](auto response) {
+            auto result = dynamic_cast<service::AudioResponseMessage *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            if (_callback) {
+                _callback(result->retCode);
+            }
+
+            reportError("pause", result->retCode);
+            return true;
+        };
+        task->execute(app, this, std::move(cb));
     }
-    bool AudioModel::stop(const audio::Token &token, const AbstractAudioOperations::OnStopCallback &callback)
+    void AudioModel::resume(OnStateChangeCallback &&callback)
     {
-        return asyncAudioOperations.stop(token, callback);
+        auto msg  = std::make_unique<service::AudioResumeRequest>();
+        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
+        auto cb   = [_callback = callback](auto response) {
+            auto result = dynamic_cast<service::AudioResponseMessage *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            if (_callback) {
+                _callback(result->retCode);
+            }
+            reportError("resume", result->retCode);
+            return true;
+        };
+        task->execute(app, this, std::move(cb));
+    }
+    void AudioModel::getVolume(AbstractAudioModel::PlaybackType playbackType,
+                               AbstractAudioModel::OnGetValueCallback &&callback)
+    {
+        auto msg  = std::make_unique<service::AudioGetVolume>(convertPlaybackType(playbackType));
+        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
+        auto cb   = [_callback = callback](auto response) {
+            auto result = dynamic_cast<service::AudioResponseMessage *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            if (_callback) {
+                _callback(result->retCode, utils::getNumericValue<AbstractAudioModel::Volume>(result->val));
+            }
+
+            reportError("getVolume", result->retCode);
+            return true;
+        };
+        task->execute(app, this, std::move(cb));
+    }
+    std::optional<AbstractAudioModel::Volume> AudioModel::getVolume(AbstractAudioModel::PlaybackType playbackType)
+    {
+        auto msg       = std::make_shared<service::AudioGetVolume>(convertPlaybackType(playbackType));
+        const auto ret = SendAudioRequest(app, msg);
+        if (ret) {
+            return utils::getNumericValue<audio::Volume>(ret->val);
+        }
+
+        return {};
     }
 } // namespace app

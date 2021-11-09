@@ -10,15 +10,23 @@
 
 namespace
 {
-    constexpr auto multiplier = 10U;
+    constexpr auto minPercent                       = 0.0f;
+    constexpr auto maxPercent                       = 100.0f;
+    constexpr auto minimumLightOnPercentOffsetValue = 16.0f;
+    constexpr auto minBrightness                    = 1U;
+    constexpr auto maxBrightness                    = 10U;
+    constexpr float multiplier                      = (maxPercent - minimumLightOnPercentOffsetValue) / maxBrightness;
+
     float fixedValToPercentage(app::bell_settings::AbstractFrontlightModel::Brightness value)
     {
-        return value * multiplier;
+        float scaled = minimumLightOnPercentOffsetValue + (value - minBrightness) * multiplier;
+        return std::min(maxPercent, std::max(minPercent, scaled));
     }
 
-    app::bell_settings::AbstractFrontlightModel::Brightness percentageToFixedVal(float value)
+    app::bell_settings::AbstractFrontlightModel::Brightness percentageToFixedVal(float percent)
     {
-        return value / multiplier;
+        auto value = (percent - minimumLightOnPercentOffsetValue) / multiplier;
+        return std::round(value + minBrightness);
     }
 } // namespace
 

@@ -2,11 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BGSoundsVolumePresenter.hpp"
-#include <Application.hpp>
 
 namespace app::bgSounds
 {
-    BGSoundsVolumePresenter::BGSoundsVolumePresenter(app::ApplicationCommon &app) : app{app}
+    BGSoundsVolumePresenter::BGSoundsVolumePresenter(AbstractAudioModel &audioModel) : audioModel{audioModel}
     {}
 
     VolumeData BGSoundsVolumePresenter::getVolumeData()
@@ -14,20 +13,12 @@ namespace app::bgSounds
         return volumeData;
     }
 
-    audio::Volume BGSoundsVolumePresenter::getDefaultVolume()
+    void BGSoundsVolumePresenter::setVolume(AbstractAudioModel::Volume volume)
     {
-        return audio::defaultVolume;
+        audioModel.setVolume(volume, AbstractAudioModel::PlaybackType::Multimedia, {});
     }
-
-    void BGSoundsVolumePresenter::increaseVolume()
+    AbstractAudioModel::Volume BGSoundsVolumePresenter::getVolume()
     {
-        app.increaseCurrentVolume();
-    }
-
-    void BGSoundsVolumePresenter::decreaseVolume()
-    {
-        if (getView()->getCurrentVolume() != minVolume) {
-            app.decreaseCurrentVolume();
-        }
+        return audioModel.getVolume(AbstractAudioModel::PlaybackType::Multimedia).value_or(defaultVolume);
     }
 } // namespace app::bgSounds

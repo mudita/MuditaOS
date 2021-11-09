@@ -469,7 +469,7 @@ namespace bsp::audio::AW8898
         return res;
     }
 
-    status_t GetVolume(std::uint8_t *gian)
+    status_t GetVolume(std::uint8_t *gain)
     {
         status_t res      = kStatus_Success;
         std::uint16_t reg = 0;
@@ -480,7 +480,7 @@ namespace bsp::audio::AW8898
             return res;
         }
 
-        *gian = reg >> 8;
+        *gain = reg >> 8;
         return res;
     }
 

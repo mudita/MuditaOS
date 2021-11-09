@@ -13,22 +13,11 @@ namespace app::bell_settings
         : provider(std::move(provider)),
           model(std::move(model)), audioModel{std::move(audioModel)}, soundsRepository{std::move(soundsRepository)}
     {
-
-        auto playResponseCb = [this](audio::RetCode retCode, audio::Token token) {
-            if (retCode != audio::RetCode::Success || !token.IsValid()) {
-                LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
-                          str(retCode).c_str(),
-                          token.IsValid());
-                return;
-            }
-            this->currentToken = token;
-        };
-
-        auto playSound = [this, playResponseCb](const UTF8 &val) {
+        auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
             this->audioModel->play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
-                                   playResponseCb,
-                                   AbstractAudioModel::PlaybackType::PreWakeup);
+                                   AbstractAudioModel::PlaybackType::PreWakeup,
+                                   {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
@@ -38,9 +27,9 @@ namespace app::bell_settings
         this->provider->onToneChange = playSound;
 
         this->provider->onVolumeEnter  = playSound;
-        this->provider->onVolumeExit   = [this](const auto &) { this->audioModel->stop(currentToken, nullptr); };
+        this->provider->onVolumeExit   = [this](const auto &) { this->stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::PreWakeup);
+            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::PreWakeup, {});
             playSound(currentSoundPath);
         };
     }
@@ -70,6 +59,10 @@ namespace app::bell_settings
     }
     void PrewakeUpWindowPresenter::stopSound()
     {
-        this->audioModel->stop(currentToken, nullptr);
+        this->audioModel->stop({});
+    }
+    void PrewakeUpWindowPresenter::exitWithoutSave()
+    {
+        model->getChimeVolume().restoreDefault();
     }
 } // namespace app::bell_settings

@@ -79,6 +79,7 @@ target_link_libraries(application-bell-common
     PRIVATE
         bell::app-main
         bell::app-alarm
+        bell::audio
         module-gui
         bell::db
         )

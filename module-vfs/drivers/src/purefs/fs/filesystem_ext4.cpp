@@ -130,8 +130,12 @@ namespace purefs::fs::drivers
             LOG_ERROR("Unable to append volume err: %i", err);
             return err;
         }
-        // Test only
-        ext4_dmask_set(DEBUG_ALL);
+        /** If verbosed lwext4 debug is required please uncomment
+         * this line. It may cause to print a lot of messages
+         * especially when the ext4 journal is recovered
+         * on the log output device so it is disabled by default
+         */
+        // ext4_dmask_set(DEBUG_ALL);
         err = ext4_device_register(bd, disk->name().c_str());
         if (err) {
             LOG_ERROR("Unable to register device with err: %i", err);
