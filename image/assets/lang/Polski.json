@@ -191,7 +191,7 @@
   "app_music_player_uknown_title": "Nieznany tytuł",
   "app_music_player_uknown_artist": "Nieznany artysta",
   "app_music_player_music_library_window_name": "Biblioteka muzyki",
-  "app_music_player_empty_track_notification": "<text color='5'>Proszę wybrać utwór z biblioteki</text>",
+  "app_music_player_empty_track_notification": "Proszę wybrać utwór z biblioteki",
   "app_music_player_start_window_notification": "<text color='5'>Naciśnij <b>strzałkę w dół</b>, aby wybrać<br></br> utwór z biblioteki</text>",
   "app_desktop_unlock": "ODBLOKUJ",
   "app_desktop_menu": "MENU",

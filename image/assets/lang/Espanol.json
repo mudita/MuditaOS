@@ -190,7 +190,7 @@
   "app_music_player_uknown_title": "Título desconocido",
   "app_music_player_uknown_artist": "Artista desconocido",
   "app_music_player_music_library_window_name": "Biblioteca de música",
-  "app_music_player_empty_track_notification": "<text color = '5'> Elige una canción de la biblioteca </text>",
+  "app_music_player_empty_track_notification": "Elige una canción de la biblioteca",
   "app_music_player_start_window_notification": "<text color = '5'> Presiona la <b>abajo</b> para elegir <br> </br> una canción </text>",
   "app_desktop_unlock": "DESBLOQUEAR",
   "app_desktop_menu": "MENÚ",

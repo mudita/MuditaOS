@@ -70,15 +70,15 @@ namespace gui
         ViewMode myViewMode = ViewMode::START;
 
         std::shared_ptr<app::music_player::SongsContract::Presenter> presenter;
-        Text *titleText                          = nullptr;
-        Text *artistText                         = nullptr;
+        Label *titleText                         = nullptr;
+        Label *artistText                        = nullptr;
         Text *currentTimeText                    = nullptr;
         Text *totalTimeText                      = nullptr;
         ImageBox *rewImageBox                    = nullptr;
         ImageBox *pauseImageBox                  = nullptr;
         ImageBox *ffImageBox                     = nullptr;
         ImageBox *stateImageBox                  = nullptr;
-        Text *descriptionText                    = nullptr;
+        Label *descriptionText                   = nullptr;
         Image *progressBarItems[progressBarSize] = {nullptr};
 
         float currentProgress            = 0.f;

@@ -546,7 +546,7 @@
   "app_music_player_music_library_window_name": "Music Library",
   "app_music_player_music_library": "MUSIC LIBRARY",
   "app_music_player_quit": "QUIT",
-  "app_music_player_empty_track_notification": "<text color='5'>Please choose a song from library</text>",
+  "app_music_player_empty_track_notification": "Please choose a song from library",
   "app_music_player_start_window_notification": "<text color='5'>Press <b>down arrow</b> to choose<br></br> a song from the library</text>",
   "app_music_player_music_empty_window_notification": "<text color='5'>No songs yet</text>",
   "app_special_input_window": "Special characters",
