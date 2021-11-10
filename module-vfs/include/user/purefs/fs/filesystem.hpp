@@ -282,6 +282,8 @@ namespace purefs::fs
                 }
             }
         }
+        auto cleanup_opened_files(std::string_view mount_point) -> void;
+
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;

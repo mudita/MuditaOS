@@ -21,6 +21,7 @@ namespace purefs::fs::internal
         void remove(std::size_t index)
         {
             unused.push_back(index);
+            data[index] = {};
         }
         bool exists(std::size_t index) const
         {
