@@ -148,6 +148,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             usbSuspendTimer.stop();
             ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConnected>(),
                                           service::name::service_desktop);
+            usbStatus = bsp::USBDeviceStatus::Connected;
         }
         else if (notification == bsp::USBDeviceStatus::Configured) {
             cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_4);
@@ -161,14 +162,18 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
                                                   sdesktop::usb::USBConfigurationType::reconfiguration),
                                               service::name::service_desktop);
             }
+            usbStatus = bsp::USBDeviceStatus::Configured;
         }
         else if (notification == bsp::USBDeviceStatus::Disconnected) {
             usbSuspendTimer.start();
             cpuSentinel->ReleaseMinimumFrequency();
             ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBDisconnected>(),
                                           service::name::service_desktop);
+            usbStatus = bsp::USBDeviceStatus::Disconnected;
         }
-        usbStatus = notification;
+        else if (notification == bsp::USBDeviceStatus::DataReceived) {
+            bsp::usbHandleDataReceived();
+        }
     }
     else {
         LOG_INFO("handeMessage got message on an unhandled queue");
