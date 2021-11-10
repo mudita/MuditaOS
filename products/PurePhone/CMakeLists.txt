@@ -102,6 +102,8 @@ add_hex_target(PurePhone)
 
 include(BinaryAssetsVersions.cmake)
 include(DownloadAsset)
+include(DownloadAsset2)
+download_asset2(${CMAKE_CURRENT_SOURCE_DIR}/assets.json ${PROJECT_SOURCE_DIR} ${MUDITA_CACHE_DIR})
 download_asset(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION})
 download_asset(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION})
 
