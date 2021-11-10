@@ -33,6 +33,7 @@
 #include <FreeRTOS.h>
 #include <MIMXRT1051.h>
 #include <log/log.hpp>
+#include <logdump/logdump.h>
 #include <task.h>
 #include <macros.h>
 #include <stdbool.h>
@@ -43,6 +44,10 @@
 
 static void __attribute__((noreturn)) stop_system(void)
 {
+    if (dumpLogs() != 1) {
+        LOG_ERROR("Cannot dump logs");
+    }
+    
     const auto err = purefs::subsystem::unmount_all();
     if(err) {
         LOG_WARN("Unable unmount all filesystems with error: %i.", err);
@@ -50,7 +55,6 @@ static void __attribute__((noreturn)) stop_system(void)
         LOG_INFO("Filesystems unmounted successfully...");
     }
     LOG_INFO("Restarting the system...");
-    haltIfDebugging();
     vTaskEndScheduler();
     NVIC_SystemReset();
     // waiting for system reset

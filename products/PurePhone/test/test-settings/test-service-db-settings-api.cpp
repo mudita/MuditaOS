@@ -57,8 +57,7 @@ TEST_CASE("SettingsApi")
                 testStart = std::make_shared<std::mutex>();
                 testStart->lock();
                 std::cout << "start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
-                auto ret = sys::SystemManagerCommon::RunSystemService(
-                    std::make_shared<EventManager>(service::name::evt_manager), manager.get());
+                auto ret = sys::SystemManagerCommon::RunSystemService(std::make_shared<EventManager>(), manager.get());
                 ret &= sys::SystemManagerCommon::RunSystemService(std::make_shared<ServiceDB>(), manager.get());
 
                 varWritter = std::make_shared<settings::MyService>("writterVar");

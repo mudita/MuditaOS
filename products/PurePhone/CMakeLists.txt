@@ -63,6 +63,7 @@ target_link_libraries(PurePhone
         db
         evtmgr
         log
+        logdump
         messagetype
         module-apps
         module-bsp
