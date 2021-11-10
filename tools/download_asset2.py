@@ -172,7 +172,7 @@ class GitOps:
                 output.parent.mkdir(parents=True, exist_ok=True)
                 self.copy_file(cached, output)
             except HTTP404NotFoundError as ex:
-                raise RuntimeError(f'file not found with: {data} err: {ex}')
+                raise RuntimeError(f'file not found with: {data} err: {ex}  on path: {Path(".").absolute()} with cache dir: {self.cache.absolute()} for {val["name"]}')
             except HTTP403ForbiddenError as ex:
                 # gh is messed up - if you get persistent error on this file, try renaming
                 raise RuntimeError(f'something is wrong with: {data} err: {ex}')
