@@ -15,6 +15,8 @@ namespace gui::name::window
     inline constexpr auto dialog            = "Dialog";
     inline constexpr auto new_sms           = "NewSMS";
     inline constexpr auto thread_sms_search = "SMSSearch";
+    inline constexpr auto thread_options    = "ThreadOptions";
+    inline constexpr auto sms_options       = "SMSOptions";
     inline constexpr auto sms_templates     = "SMSTemplates";
     inline constexpr auto thread_view       = "ThreadViewWindow";
 

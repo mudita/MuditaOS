@@ -14,55 +14,92 @@
 
 #include <memory>
 
-std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
+namespace gui
 {
-    auto contact = DBServiceAPI::MatchContactByPhoneNumber(app, record.number);
-    if (contact == nullptr) {
-        return {};
-    }
-    const auto isTempContact = contact->isTemporary();
 
-    std::list<gui::Option> options;
-    if (record.type == SMSType::FAILED) {
-        options.emplace_back(utils::translate("sms_resend_failed"), [=, &record](gui::Item &item) {
-            app->resendSms(record);
+    SmsWindowOptions::SmsWindowOptions(app::ApplicationCommon *app, std::string windowName)
+        : OptionWindow(app, windowName)
+    {}
+
+    void SmsWindowOptions::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
+        if (auto message = dynamic_cast<SMSSwitchData *>(data)) {
+            record = message->getRecord();
+        }
+
+        auto currentRecordValid = getRecordValid();
+
+        if (recordValidCode == gui::option::OptionRecordValidity::Uninitialized ||
+            recordValidCode == currentRecordValid) {
+            options = smsWindowOptions(dynamic_cast<app::ApplicationMessages *>(application), record);
+            optionsList->rebuildList(listview::RebuildType::InPlace);
+        }
+        else {
+            application->switchWindow(gui::name::window::main_window);
+        }
+
+        recordValidCode = currentRecordValid;
+    }
+
+    gui::option::OptionRecordValidity SmsWindowOptions::getRecordValid()
+    {
+        auto contact = DBServiceAPI::MatchContactByPhoneNumber(application, record.number);
+        return contact == nullptr ? gui::option::OptionRecordValidity::Invalid
+                                  : (contact->isTemporary() ? gui::option::OptionRecordValidity::Invalid
+                                                            : gui::option::OptionRecordValidity::Valid);
+    }
+
+    std::list<Option> SmsWindowOptions::smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
+    {
+        auto contact = DBServiceAPI::MatchContactByPhoneNumber(app, record.number);
+        if (contact == nullptr) {
+            return {};
+        }
+        const auto isTempContact = contact->isTemporary();
+
+        std::list<gui::Option> options;
+        if (record.type == SMSType::FAILED) {
+            options.emplace_back(utils::translate("sms_resend_failed"), [=, &record](gui::Item &item) {
+                app->resendSms(record);
+                app->returnToPreviousWindow();
+                return true;
+            });
+        }
+
+        if (isTempContact) {
+            options.emplace_back(
+                gui::Option{std::make_unique<gui::option::Call>(app, record.number.getFormatted(), record.number)});
+            ContactRecord newContact;
+            newContact.numbers.emplace_back(record.number);
+            options.emplace_back(gui::Option{
+                std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Add, newContact)});
+        }
+        else {
+            options.emplace_back(
+                gui::Option{std::make_unique<gui::option::Call>(app, contact->getFormattedName(), record.number)});
+            options.emplace_back(gui::Option{
+                std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Details, *contact)});
+        }
+
+        options.emplace_back(UTF8(utils::translate("sms_forward_message")), [=](gui::Item &item) {
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);
+            app->switchWindow(gui::name::window::new_sms, std::move(data));
+            return true;
+        });
+
+        options.emplace_back(UTF8(utils::translate("sms_copy")), [=](gui::Item &item) {
+            Clipboard::getInstance().copy(record.body);
             app->returnToPreviousWindow();
             return true;
         });
+
+        options.emplace_back(UTF8(utils::translate("sms_delete_message")),
+                             [=](gui::Item &item) { return app->removeSms(record); });
+
+        return options;
     }
 
-    if (isTempContact) {
-        options.emplace_back(
-            gui::Option{std::make_unique<gui::option::Call>(app, record.number.getFormatted(), record.number)});
-        ContactRecord newContact;
-        newContact.numbers.emplace_back(record.number);
-        options.emplace_back(
-            gui::Option{std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Add, newContact)});
-    }
-    else {
-        options.emplace_back(
-            gui::Option{std::make_unique<gui::option::Call>(app, contact->getFormattedName(), record.number)});
-        options.emplace_back(
-            gui::Option{std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Details, *contact)});
-    }
-
-    options.emplace_back(UTF8(utils::translate("sms_forward_message")), [=](gui::Item &item) {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);
-        app->switchWindow(gui::name::window::new_sms, std::move(data));
-        return true;
-    });
-
-    options.emplace_back(UTF8(utils::translate("sms_copy")), [=](gui::Item &item) {
-        Clipboard::getInstance().copy(record.body);
-        app->returnToPreviousWindow();
-        return true;
-    });
-
-    options.emplace_back(UTF8(utils::translate("sms_delete_message")),
-                         [=](gui::Item &item) { return app->removeSms(record); });
-
-    return options;
-}
+} // namespace gui
 
 std::list<gui::Option> newMessageWindowOptions(app::ApplicationMessages *app,
                                                const std::string &requestingWindow,

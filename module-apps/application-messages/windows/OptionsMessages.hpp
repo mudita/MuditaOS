@@ -5,10 +5,28 @@
 
 #include "ApplicationMessages.hpp"
 
+#include <OptionWindow.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Option.hpp>
 
-std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);
+namespace gui
+{
+
+    class SmsWindowOptions : public OptionWindow
+    {
+      public:
+        explicit SmsWindowOptions(app::ApplicationCommon *app, std::string windowName);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
+      private:
+        SMSRecord record;
+        gui::option::OptionRecordValidity recordValidCode{gui::option::OptionRecordValidity::Uninitialized};
+
+        std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);
+        gui::option::OptionRecordValidity getRecordValid();
+    };
+
+} // namespace gui
 
 /// @brief options for New Message Window
 ///
