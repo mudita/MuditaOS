@@ -24,4 +24,6 @@ echo "=== check copyright ==="
 ./config/license_header_check.sh --hook
 echo "=== check style ==="
 ./config/style_check_hook.sh
+echo "=== binary blobs check ==="
+./config/bin_blob_check.sh
 popd
