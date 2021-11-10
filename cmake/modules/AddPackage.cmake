@@ -39,6 +39,7 @@ function(add_standalone_image SOURCE_TARGET)
         COMMAND tar -ScJf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         DEPENDS ${BIN_FILE}
+        DEPENDS json-target
         DEPENDS ecoboot.bin-target
         DEPENDS updater.bin-target
         DEPENDS ${SOURCE_TARGET}-version.json-target
@@ -64,6 +65,7 @@ function(add_update_package SOURCE_TARGET)
 
     add_custom_command(
         OUTPUT ${UPDATE_PKG}
+        DEPENDS json-target
         DEPENDS ${SOURCE_TARGET}
         DEPENDS ${SOURCE_TARGET}-boot.bin
         DEPENDS ${SOURCE_TARGET}-version.json-target
