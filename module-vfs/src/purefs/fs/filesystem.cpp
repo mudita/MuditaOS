@@ -19,6 +19,19 @@ namespace purefs::fs
     {
         constexpr std::pair<short, std::string_view> part_types_to_vfs[] = {
             {0x0b, "vfat"}, {0x9e, "littlefs"}, {0x83, "ext4"}};
+
+        auto compare_mount_points(std::string_view path1, std::string_view path2)
+        {
+            std::string spath1{path1};
+            std::string spath2{path2};
+            if (spath1.back() == '/') {
+                spath1.pop_back();
+            }
+            if (spath2.back() == '/') {
+                spath2.pop_back();
+            }
+            return spath1 == spath2;
+        }
     }
     filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm)
         : m_diskmm(diskmm), m_lock(std::make_unique<cpp_freertos::MutexRecursive>()),
@@ -159,6 +172,9 @@ namespace purefs::fs
             LOG_ERROR("Unable to lock filesystem operation");
             return -EIO;
         }
+
+        cleanup_opened_files(mount_point);
+
         const auto diskh    = mnti->second->disk();
         const auto umnt_ret = fsops->umount(mnti->second);
         if (umnt_ret) {
@@ -313,6 +329,23 @@ namespace purefs::fs
     auto filesystem::inotify_create(std::shared_ptr<sys::Service> svc) -> std::shared_ptr<inotify>
     {
         return std::make_shared<inotify>(svc, m_notifier);
+    }
+
+    auto filesystem::cleanup_opened_files(std::string_view mount_point) -> void
+    {
+        LOG_INFO("Closing opened files on mntpoint: %s before umount.", std::string(mount_point).c_str());
+        for (auto fd = 0U; fd < m_fds.size(); ++fd) {
+            const auto filp = m_fds[fd];
+            if (!filp)
+                continue;
+            const auto mp = filp->mntpoint();
+            if (!mp)
+                continue;
+            if (compare_mount_points(mp->mount_path(), mount_point)) {
+                const auto err = close(fd + first_file_descriptor);
+                LOG_WARN("Emergency closing: %s result: %i.", filp->open_path().c_str(), err);
+            }
+        }
     }
 
 } // namespace purefs::fs
