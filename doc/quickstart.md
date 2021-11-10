@@ -37,11 +37,11 @@ git submodule update --init --recursive
 ```bash
 git pull --recurse-submodules
 ```
-3. Build the project
+3. Build the project for proper product:
 
 ```bash
-./configure.sh [rt1051|linux] [release|debug|relwithdebinfo]
-cd build-[rt1051|linux]-[release|debug|relwithdebinfo]
+./configure.sh [PurePhone|BellHybrid] [rt1051|linux] [release|debug|relwithdebinfo]
+cd build-[PurePhone|BellHybrid]-[rt1051|linux]-[release|debug|relwithdebinfo]
 make
 ```
 ### CMake options
@@ -70,12 +70,12 @@ By using `ENABLE_APP_X` (where `X` is the name of the application) you can enabl
 Here's the bare minimum that will enable you to bootstrap the environment on Linux.
 
 ```bash
-git submodule update --init --recursive                        # initialize submodules
-cd ./config/ && ./bootstrap.sh 0- && cd ../                    # bootstrap requirements
-./configure.sh rt1051|linux Debug|Release|RelWithDebInfo       # configure build
-cd <build-dir>                                                 # build dir depends on configuration
-make Pure                                               # build
-./PurePhone.elf                                                # run PurePhone - simulator screen will pop up (on the Linux filesystem)
+git submodule update --init --recursive                                             # initialize submodules
+cd ./config/ && ./bootstrap.sh 0- && cd ../                                         # bootstrap requirements
+./configure.sh PurePhone|BellHybrid rt1051|linux Debug|Release|RelWithDebInfo       # configure build
+cd <build-dir>                                                                      # build dir depends on configuration
+make Pure                                                                           # build
+./PurePhone.elf                                                                     # run PurePhone - simulator screen will pop up (on the Linux filesystem)
 ```
 
 If you want to run the simulator with image and our VFS implementation
@@ -89,7 +89,7 @@ you need to run the image through the script:
 After going through the Super dirty quickstart on Linux, run the following commands to build and run all unit tests:
 
 ```bash
-./configure.sh linux debug
+./configure.sh PurePhone|BellHybrid linux debug
 cd <build-dir>
 make check
 ```
@@ -103,8 +103,8 @@ make check
 cp ./env.cmake.sample ./env.cmake && sed -i "s:<HOME>:$HOME:" env.cmake
 git submodule update --init --recursive
 cd ./config/ && ./bootstrap.sh 0- && cd ../
-./configure.sh rt1051 RelWithDebInfo
-cd build-arm-RelWithDebInfo
+./configure.sh PurePhone|BellHybrid rt1051 RelWithDebInfo
+cd build-PurePhone|BellHybrid-rt1051-RelWithDebInfo
 make Pure
 
 ```
@@ -112,7 +112,7 @@ make Pure
 3. Please take the following steps in three parallel consoles/sessions:
 
  - Start J-Link server: `./StartJLinkServer.sh`
- - Load app with GDB via J-Link connected to Mudita Pure: `./run.sh <build folder>`
+ - Load app with GDB via J-Link connected to Mudita Pure: `./run.sh <build folder> --product PurePhone`
  - Catch logs from Mudita Pure from J-Link RTT and write them to `/tmp/log.txt`: `JLinkRTTClient | tee /tmp/log.txt`
 
 #### Catching logs using UART
@@ -221,32 +221,32 @@ you will see the list of groups your user is assigned to.
 
 2. Configure for Linux Debug: 
 ```bash
-./in_docker.sh config linux Debug
+./in_docker.sh config PurePhone|BellHybrid linux Debug
 ```
 
 3. Build linux Debug:
 ```bash
-./in_docker.sh make build-linux-Debug
+./in_docker.sh make build-PurePhone|BellHybrid-linux-Debug
 ```
 
 4. Build RT1051 Release
 ```bash
-./in_docker.sh config rt1051 Release
-./in_docker.sh make build-rt1051-Release
+./in_docker.sh config PurePhone|BellHybrid rt1051 Release
+./in_docker.sh make build-PurePhone|BellHybrid-rt1051-Release
 ```
 5. Build and run tests (Linux only)
 
 ```bash
-./in_docker.sh make build-linux-Debug
-./in_docker.sh make build-linux-Debug check
+./in_docker.sh make build-PurePhone|BellHybrid-linux-Debug
+./in_docker.sh make build-PurePhone|BellHybrid-linux-Debug check
 ```
 To build selected test manually in the working directory of attached Docker image run:
 ```bash
-cd ./build-linux-Debug ; make <test_name>; ./<test_name>
+cd ./build-PurePhone|BellHybrid-linux-Debug ; make <test_name>; ./<test_name>
 ```
 i.e.:
 ```bash
-cd ./build-linux-Debug ; make unittest_gui && ./unittest_gui
+cd ./build-PurePhone|BellHybrid-linux-Debug ; make unittest_gui && ./unittest_gui
 ```
 Running tests checks memory leaks too - this might be helpful in creation of new widgets.
 
