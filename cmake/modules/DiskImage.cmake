@@ -60,6 +60,7 @@ function(add_image)
     add_custom_command(
         OUTPUT ${DISK_IMAGE_NAME}
         DEPENDS ${COMMAND_DEPENDS}
+        DEPENDS json-target
         COMMAND
             ${SCRIPT_PATH}
             ${DISK_IMAGE_NAME}
