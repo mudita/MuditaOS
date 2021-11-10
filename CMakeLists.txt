@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+set(MUDITA_CACHE_DIR "~/.mudita/" CACHE STRING "cache directory for our downloaded assets")
 project(PureOS)
 enable_language(C CXX ASM)
 
