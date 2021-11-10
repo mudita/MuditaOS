@@ -49,6 +49,10 @@ pipeline {
                 GITHUB_HEAD_REF="${pullRequest.headRef}"
             }
             steps {
+                echo "install additional python dependencies"
+                sh '''#!/bin/bash -e
+                python3 -m pip install ghapi
+                '''
                 echo "Check if branch needs rebasing"
                 sh '''#!/bin/bash -e
                 pushd ${WORKSPACE}
