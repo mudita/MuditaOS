@@ -1,6 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <memory>
 #include <purefs/fs/drivers/filesystem_ext4.hpp>
 #include <purefs/fs/drivers/mount_point_ext4.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
@@ -45,7 +46,7 @@ namespace purefs::fs::drivers
         template <typename T>
         auto invoke_efs(filesystem_ext4::fsmount mnt, T efs_fun, std::string_view oldpath, std::string_view newpath)
         {
-            auto mntp = std::static_pointer_cast<mount_point_ext4>(mnt);
+            auto mntp = std::dynamic_pointer_cast<mount_point_ext4>(mnt);
             if (!mntp) {
                 LOG_ERROR("Non ext4 mount point");
                 return -EBADF;
@@ -59,7 +60,7 @@ namespace purefs::fs::drivers
         template <typename T, typename... Args>
         auto invoke_efs(filesystem_ext4::fsmount fmnt, T efs_fun, std::string_view path, Args &&...args)
         {
-            auto mntp = std::static_pointer_cast<mount_point_ext4>(fmnt);
+            auto mntp = std::dynamic_pointer_cast<mount_point_ext4>(fmnt);
             if (!mntp) {
                 LOG_ERROR("Non ext4 mount point");
                 return -EBADF;
