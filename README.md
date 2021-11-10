@@ -28,7 +28,7 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
 - system manager that restores the system after switching on the device or performs the initial start-up
 - application manager for managing application lifecycle 
 - SQLite database for storing contacts and notes
-- VFS (Virtual File System) + file storage based on `littlefs` (little fail-safe file system)
+- VFS (Virtual File System) + file storage based on `lwext4`
 - MTP (Media Transfer Protocol) support
 
 ## Table of contents
