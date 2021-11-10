@@ -62,6 +62,10 @@ namespace gui
             bodyList->rebuildList();
         }
 
+        if (auto message = dynamic_cast<PhonebookItemData *>(data); message != nullptr) {
+            requestType = message->getRequestType();
+        }
+
         setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));
 
         if (contact->speeddial.length() != 0u) {
@@ -123,7 +127,7 @@ namespace gui
         }
 
         if (inputEvent.isShortRelease(KeyCode::KEY_LF)) {
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact, requestType);
             application->switchWindow(
                 gui::window::name::contact_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
 

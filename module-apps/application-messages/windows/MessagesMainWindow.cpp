@@ -131,6 +131,8 @@ namespace gui
         DBServiceAPI::GetQuery(application,
                                db::Interface::Name::Notifications,
                                std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
+
+        list->rebuildList();
     }
 
     bool MessagesMainWindow::onInput(const InputEvent &inputEvent)

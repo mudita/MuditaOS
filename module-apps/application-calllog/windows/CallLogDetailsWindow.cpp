@@ -225,8 +225,8 @@ namespace gui
         if (inputEvent.isShortRelease(KeyCode::KEY_LF)) {
             auto app = dynamic_cast<app::ApplicationCallLog *>(application);
             assert(app != nullptr);
-            app->switchWindow(window::name::option_window,
-                              std::make_unique<gui::OptionsWindowOptions>(calllogWindowOptions(app, record)));
+            app->switchWindow(calllog::settings::CallLogOptionsStr,
+                              std::make_unique<calllog::CallLogSwitchData>(record));
 
             return true;
         }
