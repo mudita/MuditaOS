@@ -49,6 +49,15 @@ pipeline {
                 GITHUB_HEAD_REF="${pullRequest.headRef}"
             }
             steps {
+                withCredentials([string(credentialsId: 'f412733a-851c-4f87-ad24-7da2139a98ca', variable: 'TOKEN')]) {
+                    sh ''' #!/bin/bash -e
+                    git config --add --global user.apitoken ${TOKEN}
+                    '''
+                }
+                echo "install additional python dependencies"
+                sh '''#!/bin/bash -e
+                python3 -m pip install ghapi
+                '''
                 echo "Check if branch needs rebasing"
                 sh '''#!/bin/bash -e
                 pushd ${WORKSPACE}
