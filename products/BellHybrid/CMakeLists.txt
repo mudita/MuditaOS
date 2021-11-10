@@ -52,6 +52,7 @@ target_link_libraries(BellHybrid
         bell::audio
         bell::evtmgr
         log
+        logdump
         messagetype
         module-bsp
         module-vfs

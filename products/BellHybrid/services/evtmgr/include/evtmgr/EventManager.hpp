@@ -18,7 +18,8 @@ namespace hal::temperature
 class EventManager : public EventManagerCommon
 {
   public:
-    explicit EventManager(const std::string &name = service::name::evt_manager);
+    explicit EventManager(LogDumpFunction logDumpFunction = nullptr,
+                          const std::string &name         = service::name::evt_manager);
 
   private:
     void handleKeyEvent(sys::Message *msg) override;

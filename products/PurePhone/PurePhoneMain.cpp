@@ -60,12 +60,13 @@
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
 #include <log/log.hpp>
+#include <logdump/logdump.h>
 #include <Logger.hpp>
 #include <product/version.hpp>
 #include <sys/SystemManager.hpp>
-#include <time/AlarmOperations.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
+#include <time/AlarmOperations.hpp>
 
 #include <memory>
 #include <vector>
@@ -94,7 +95,7 @@ int main()
     }
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
-    systemServices.emplace_back(sys::CreatorFor<EventManager>());
+    systemServices.emplace_back(sys::CreatorFor<EventManager>([]() { return dumpLogs(); }));
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
 #if ENABLE_GSM == 0
@@ -189,6 +190,9 @@ int main()
         [&platform] {
             try {
                 LOG_DEBUG("System deinit");
+                if (dumpLogs() != 1) {
+                    LOG_ERROR("Cannot dump logs");
+                }
                 platform->deinit();
             }
             catch (const std::runtime_error &e) {

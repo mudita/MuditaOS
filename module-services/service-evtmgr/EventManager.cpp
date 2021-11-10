@@ -62,13 +62,13 @@ EventManagerSentinel::~EventManagerSentinel()
     cpuSentinel->ReleaseMinimumFrequency();
 }
 
-EventManagerCommon::EventManagerCommon(const std::string &name)
+EventManagerCommon::EventManagerCommon(LogDumpFunction logDumpFunction, const std::string &name)
     : sys::Service(name, "", stackDepth), loggerTimer{sys::TimerFactory::createPeriodicTimer(
                                               this,
                                               loggerTimerName,
                                               std::chrono::milliseconds{loggerDelayMs},
                                               [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
-      settings(std::make_shared<settings::Settings>())
+      logDumpFunction(logDumpFunction), settings(std::make_shared<settings::Settings>())
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -301,12 +301,11 @@ void EventManagerCommon::handleKeyEvent(sys::Message *msg)
 
 int EventManagerCommon::dumpLogsToFile()
 {
-    const auto logPath = purefs::dir::getLogsPath() / LOG_FILE_NAME;
-    const auto ts      = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
+    if (logDumpFunction) {
+        return logDumpFunction();
+    }
 
-    LOG_DEBUG("Log flush timestamp: %d", static_cast<unsigned>(ts));
-
-    return Log::Logger::get().dumpToFile(std::move(logPath));
+    return 0;
 }
 
 void EventManagerCommon::handleMinuteUpdate(time_t timestamp)

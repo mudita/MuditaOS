@@ -36,8 +36,9 @@ namespace
     };
 }
 
-EventManager::EventManager(const std::string &name)
-    : EventManagerCommon(name), temperatureSource{hal::temperature::AbstractTemperatureSource::Factory::create()},
+EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &name)
+    : EventManagerCommon(logDumpFunction, name),
+      temperatureSource{hal::temperature::AbstractTemperatureSource::Factory::create()},
       backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
 {
     buildKeySequences();
@@ -73,7 +74,7 @@ void EventManager::initProductEvents()
     backlightHandler.init();
 
     connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
-        auto *m = static_cast<sevm::ScreenLightControlMessage *>(msgl);
+        auto *m           = static_cast<sevm::ScreenLightControlMessage *>(msgl);
         const auto params = m->getParams();
         backlightHandler.processScreenRequest(m->getAction(), params.value_or(screen_light_control::Parameters()));
         return sys::msgHandled();

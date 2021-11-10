@@ -196,7 +196,7 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::markAsReadQuery(const st
     auto ret              = false;
 
     if (record.isValid()) {
-        LOG_FATAL("query-read %d", static_cast<int>(localQuery->read));
+        LOG_DEBUG("query-read %d", static_cast<int>(localQuery->read));
         record.unreadMsgCount = localQuery->read == db::query::MarkAsRead::Read::True ? 0 : 1;
         ret                   = Update(record);
     }

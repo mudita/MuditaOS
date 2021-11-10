@@ -101,6 +101,47 @@ namespace sys
         LOG_DEBUG("%s", (GetName() + ":destructor").c_str());
     }
 
+    void SystemManagerCommon::LogPowerOffReason()
+    {
+        // Power off system
+        switch (state) {
+        case SystemManagerCommon::State::Reboot:
+            LOG_INFO("  --->  REBOOT <--- ");
+            break;
+        case SystemManagerCommon::State::ShutdownReady:
+            LOG_INFO("  ---> SHUTDOWN <--- ");
+            break;
+        case SystemManagerCommon::State::RebootToUpdate:
+            LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
+            break;
+        case SystemManagerCommon::State::Running:
+        case SystemManagerCommon::State::Suspend:
+        case SystemManagerCommon::State::Shutdown:
+            LOG_FATAL("State changed after reset/shutdown was requested to: %s! this is terrible failure!",
+                      c_str(state));
+            break;
+        }
+    }
+
+    void SystemManagerCommon::PowerOff()
+    {
+        switch (state) {
+        case State::Reboot:
+            powerManager->Reboot();
+            break;
+        case State::ShutdownReady:
+            powerManager->PowerOff();
+            break;
+        case State::RebootToUpdate:
+            powerManager->RebootToUpdate(updateReason);
+            break;
+        case SystemManagerCommon::State::Running:
+        case SystemManagerCommon::State::Suspend:
+        case SystemManagerCommon::State::Shutdown:
+            exit(1);
+        }
+    }
+
     void SystemManagerCommon::Run()
     {
         initialize();
@@ -132,34 +173,19 @@ namespace sys
         }
 
         DestroySystemService(service::name::evt_manager, this);
-
         CloseService();
 
-        EndScheduler();
+        // it should be called before systemDeinit to make sure this log is dumped to the file
+        LogPowerOffReason();
 
         if (systemDeinit) {
             systemDeinit();
         }
 
+        EndScheduler();
+
         // Power off system
-        switch (state) {
-        case State::Reboot:
-            LOG_INFO("  --->  REBOOT <--- ");
-            powerManager->Reboot();
-            break;
-        case State::ShutdownReady:
-            LOG_INFO("  ---> SHUTDOWN <--- ");
-            powerManager->PowerOff();
-            break;
-        case State::RebootToUpdate:
-            LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
-            powerManager->RebootToUpdate(updateReason);
-            break;
-        default:
-            LOG_FATAL("State changed after reset/shutdown was requested to: %s! this is terrible failure!",
-                      c_str(state));
-            exit(1);
-        }
+        PowerOff();
     }
 
     void SystemManagerCommon::initialize()
@@ -323,11 +349,12 @@ namespace sys
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if (ret.first != ReturnCodes::Success) {
-            LOG_ERROR("Service to close: %s did not respond", name.c_str());
+            LOG_ERROR("Service to close: %s did not respond, error code %d", name.c_str(), static_cast<int>(ret.first));
             return false;
         }
         else if (resp->retCode != ReturnCodes::Success) {
-            LOG_ERROR("Service %s noticed failure at close", name.c_str());
+            LOG_ERROR(
+                "Service %s noticed failure at close, error code %d", name.c_str(), static_cast<int>(resp->retCode));
             return false;
         }
         return true;
