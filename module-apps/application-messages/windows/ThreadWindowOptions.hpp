@@ -5,11 +5,30 @@
 
 #include "ApplicationMessages.hpp"
 
+#include <OptionWindow.hpp>
 #include <Interface/ThreadRecord.hpp>
 
 namespace gui
 {
-    class Option;
-}
 
-std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *appl, const ThreadRecord *record);
+    class ThreadWindowOptions : public OptionWindow
+    {
+      public:
+        explicit ThreadWindowOptions(app::ApplicationCommon *app, std::string windowName);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
+      private:
+        enum class ValidCodes
+        {
+            Uninitialized,
+            Invalid,
+            Valid
+        };
+        std::shared_ptr<ThreadRecord> thread;
+        ValidCodes threadValidCode{ValidCodes::Uninitialized};
+
+        std::list<Option> threadWindowOptions(app::ApplicationMessages *app, const ThreadRecord *record);
+        ValidCodes getThreadValid();
+    };
+
+} // namespace gui

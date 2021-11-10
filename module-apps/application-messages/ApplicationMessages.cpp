@@ -10,6 +10,7 @@
 #include "SMSTemplatesWindow.hpp"
 #include "SMSTextToSearch.hpp"
 #include "SMSThreadViewWindow.hpp"
+#include "ThreadWindowOptions.hpp"
 
 #include <Dialog.hpp>
 #include <DialogMetadata.hpp>
@@ -128,6 +129,12 @@ namespace app
         });
         windowsFactory.attach(window::name::option_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(app, name);
+        });
+        windowsFactory.attach(gui::name::window::thread_options, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::ThreadWindowOptions>(app, name);
+        });
+        windowsFactory.attach(gui::name::window::sms_options, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::SmsWindowOptions>(app, name);
         });
         windowsFactory.attach(gui::name::window::dialog, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);

@@ -17,6 +17,7 @@ namespace gui
         auto handleSwitchData(SwitchData *data) -> bool override;
 
       private:
+        bool externalRequest = false;
         enum class NotificationType
         {
             Block,

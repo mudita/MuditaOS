@@ -12,22 +12,22 @@
 
 class PhonebookItemData : public gui::SwitchData
 {
-    std::string text;
+    bool externalRequest                   = false;
     std::shared_ptr<ContactRecord> contact = nullptr;
 
   public:
     PhonebookItemData() = default;
-    explicit PhonebookItemData(std::shared_ptr<ContactRecord> contact, const std::string &text = "")
-        : text(text), contact(std::move(contact)){};
+    explicit PhonebookItemData(std::shared_ptr<ContactRecord> contact, bool externalRequest = false)
+        : externalRequest(externalRequest), contact(std::move(contact)){};
 
     std::shared_ptr<ContactRecord> getContact() const
     {
         return contact;
     }
 
-    const std::string &getText() const noexcept
+    bool getExternalRequest() const noexcept
     {
-        return text;
+        return externalRequest;
     }
 };
 

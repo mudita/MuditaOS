@@ -49,15 +49,12 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
     };
 
     item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
-        auto app = dynamic_cast<app::ApplicationMessages *>(application);
-        assert(app);
         if (!event.isShortRelease()) {
             return false;
         }
         if (event.is(gui::KeyCode::KEY_LF)) {
-            application->switchWindow(
-                window::name::option_window,
-                std::make_unique<gui::OptionsWindowOptions>(threadWindowOptions(app, item->getThreadItem().get())));
+            application->switchWindow(gui::name::window::thread_options,
+                                      std::make_unique<SMSThreadData>(item->getThreadItem()));
         }
         return false;
     };

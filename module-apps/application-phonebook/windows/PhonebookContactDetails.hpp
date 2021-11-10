@@ -28,6 +28,7 @@ namespace gui
         void destroyInterface() override;
 
       private:
+        bool externalRequest                                     = false;
         std::shared_ptr<ContactRecord> contact                   = nullptr;
         ContactFlagsWidget *contactFlagsWidget                   = nullptr;
         std::shared_ptr<ContactDetailsModel> contactDetailsModel = nullptr;

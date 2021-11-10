@@ -42,7 +42,7 @@ namespace gui::option
                                        ContactOperation contactOperation,
                                        const ContactRecord &contactRecord)
     {
-        auto data = std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contactRecord));
+        auto data = std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contactRecord), true);
 
         switch (contactOperation) {
         case ContactOperation::Add: {

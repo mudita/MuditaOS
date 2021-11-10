@@ -7,6 +7,7 @@
 #include <SMSTemplateRecord.hpp>
 #include <ContactRecord.hpp>
 #include <ThreadRecord.hpp>
+#include <SMSRecord.hpp>
 #include <Database/Database.hpp>
 #include <memory>
 #include <string>
@@ -21,6 +22,23 @@ class SMSThreadData : public gui::SwitchData
     SMSThreadData(std::shared_ptr<ThreadRecord> _thread, std::optional<UTF8> _threadName = std::nullopt)
         : thread(std::move(_thread)), threadName{std::move(_threadName)}
     {}
+};
+
+class SMSSwitchData : public gui::SwitchData
+{
+  protected:
+    SMSRecord record;
+
+  public:
+    SMSSwitchData() = delete;
+    explicit SMSSwitchData(SMSRecord record) : record(std::move(record))
+    {}
+    ~SMSSwitchData() override = default;
+
+    [[nodiscard]] auto getRecord() const noexcept -> const SMSRecord &
+    {
+        return record;
+    };
 };
 
 class SMSRequest : public gui::SwitchData
