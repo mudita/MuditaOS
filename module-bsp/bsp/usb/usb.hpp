@@ -26,7 +26,8 @@ namespace bsp
     {
         Disconnected,
         Connected,
-        Configured
+        Configured,
+        DataReceived,
     };
 
     struct usbInitParams
@@ -43,5 +44,6 @@ namespace bsp
     void usbDeinit();
     void usbReinit(const char *mtpRoot);
     void usbSuspend();
+    void usbHandleDataReceived();
 
 } // namespace bsp
