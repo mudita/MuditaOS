@@ -39,7 +39,7 @@ namespace gui
             icon->image->setMargins({0, itStyle::icon::imageTopMargin, 0, itStyle::icon::imageBottomMargin});
             icon->image->set(app::meditationStyle::itStyle::icon::imagePause, ImageTypeSpecifier::W_G);
             icon->text->setFont(itStyle::text::font);
-            icon->text->setRichText(utils::translate("app_bell_meditation_paused"));
+            icon->text->setRichText(utils::translate("common_paused"));
         }
     }
 } // namespace gui
