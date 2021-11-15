@@ -3,14 +3,12 @@
 
 #include "NewContactModel.hpp"
 
-#include "AppWindow.hpp"
 #include "application-phonebook/widgets/ContactListItem.hpp"
 #include "application-phonebook/widgets/InputBoxWithLabelAndIconWidget.hpp"
-#include "application-phonebook/widgets/InputLinesWithLabelIWidget.hpp"
+#include "application-phonebook/widgets/InputLinesWithLabelWidget.hpp"
+#include "application-phonebook/ApplicationPhonebook.hpp"
 
-#include <ListView.hpp>
-#include <time/ScopedTime.hpp>
-#include <NavBar.hpp>
+#include <messages/DialogMetadataMessage.hpp>
 
 NewContactModel::NewContactModel(app::ApplicationCommon *app) : application(app)
 {}
@@ -40,40 +38,40 @@ void NewContactModel::createData()
 {
     auto app = application;
 
-    internalData.push_back(new gui::InputLinesWithLabelIWidget(
+    internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::FirstName,
-        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        [this]() { this->ContactDataChanged(); }));
+        [&](gui::Text *text) { openTextOptions(text); }));
 
-    internalData.push_back(new gui::InputLinesWithLabelIWidget(
+    internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::SecondName,
-        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        [this]() { this->ContactDataChanged(); }));
+        [&](gui::Text *text) { openTextOptions(text); }));
 
-    internalData.push_back(new gui::InputLinesWithLabelIWidget(
+    internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::Number,
-        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        [this]() { this->ContactDataChanged(); }));
+        [&](gui::Text *text) { openTextOptions(text); }));
 
-    internalData.push_back(new gui::InputLinesWithLabelIWidget(
+    internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::SecondNumber,
-        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        [this]() { this->ContactDataChanged(); }));
+        [&](gui::Text *text) { openTextOptions(text); }));
 
-    internalData.push_back(new gui::InputLinesWithLabelIWidget(
+    internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::Email,
-        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
+        [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        [this]() { this->ContactDataChanged(); }));
+        [&](gui::Text *text) { openTextOptions(text); }));
 
     internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(
         phonebookInternals::ListItemName::AddToFavourites,
@@ -90,20 +88,20 @@ void NewContactModel::createData()
     internalData.back()->setMargins(
         gui::Margins(style::widgets::leftMargin, style::margins::big, 0, style::margins::very_small));
 
-    internalData.push_back(new gui::InputLinesWithLabelIWidget(
+    internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::Address,
-        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text, false); },
+        [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        nullptr,
+        [&](gui::Text *text) { openTextOptions(text); },
         2));
 
-    internalData.push_back(new gui::InputLinesWithLabelIWidget(
+    internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::Note,
-        [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text, false); },
+        [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
-        nullptr,
+        [&](gui::Text *text) { openTextOptions(text); },
         2));
 
     for (auto item : internalData) {
@@ -120,6 +118,31 @@ void NewContactModel::clearData()
     createData();
 
     list->rebuildList();
+}
+
+bool NewContactModel::verifyData()
+{
+    for (auto item : internalData) {
+        if (item->onVerifyCallback) {
+            std::string errorMessage;
+            if (!item->onVerifyCallback(errorMessage)) {
+                auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+                    gui::DialogMetadata{errorMessage,
+                                        "error_W_G",
+                                        utils::translate("app_phonebook_new_contact_invalid_number"),
+                                        "",
+                                        [=]() -> bool {
+                                            application->returnToPreviousWindow();
+                                            return true;
+                                        }});
+
+                application->switchWindow(gui::window::name::dialog, std::move(metaData));
+
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)
@@ -140,16 +163,20 @@ void NewContactModel::loadData(std::shared_ptr<ContactRecord> contactRecord)
     }
 }
 
-void NewContactModel::ContactDataChanged()
+bool NewContactModel::emptyData()
 {
     for (auto item : internalData) {
         if (item->onEmptyCallback) {
             if (!item->onEmptyCallback()) {
-                application->getCurrentWindow()->setNavBarActive(gui::nav_bar::Side::Center, true); // SAVE button
-                return;
+                return false;
             }
         }
     }
-    application->getCurrentWindow()->setNavBarActive(gui::nav_bar::Side::Center, false); // SAVE button
-    return;
+    return true;
+}
+
+void NewContactModel::openTextOptions(gui::Text *text)
+{
+    std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookInputOptionData>(text);
+    application->switchWindow(gui::window::name::input_options, std::move(data));
 }

@@ -68,4 +68,10 @@ namespace gui
         CantAdd
     };
 
+    enum class AdditionType
+    {
+        perChar,
+        perBlock
+    };
+
 } // namespace gui

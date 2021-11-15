@@ -121,12 +121,21 @@ namespace gui
         textChangedCallback = std::move(callback);
     }
 
-    void Text::addText(const UTF8 &text)
+    void Text::addText(const UTF8 &text, AdditionType additionType)
     {
         if (text.length() == 0) {
             return;
         }
-        *cursor << text;
+
+        if (additionType == AdditionType::perChar) {
+            *cursor << text;
+        }
+        else if (additionType == AdditionType::perBlock) {
+            for (const auto &block : textToTextBlocks(text, format)) {
+                *cursor << block;
+            }
+        }
+
         onTextChanged();
         drawLines();
     }

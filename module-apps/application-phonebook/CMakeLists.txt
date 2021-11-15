@@ -21,13 +21,14 @@ target_sources(application-phonebook
         widgets/ContactFlagsWidget.cpp
         widgets/InformationWidget.cpp
         widgets/InputBoxWithLabelAndIconWidget.cpp
-        widgets/InputLinesWithLabelIWidget.cpp
+        widgets/InputLinesWithLabelWidget.cpp
         widgets/OutputLinesTextWithLabelWidget.cpp
         widgets/PhonebookItem.cpp
         widgets/PhonebookListView.cpp
         windows/PhonebookContactDetails.cpp
         windows/PhonebookContactOptions.cpp
         windows/PhonebookIceContacts.cpp
+        windows/PhonebookInputOptions.cpp
         windows/PhonebookMainWindow.cpp
         windows/PhonebookNamecardOptions.cpp
         windows/PhonebookNewContact.cpp
@@ -41,7 +42,7 @@ target_sources(application-phonebook
         widgets/ContactListItem.hpp
         widgets/InformationWidget.hpp
         widgets/InputBoxWithLabelAndIconWidget.hpp
-        widgets/InputLinesWithLabelIWidget.hpp
+        widgets/InputLinesWithLabelWidget.hpp
         widgets/OutputLinesTextWithLabelWidget.hpp
         widgets/PhonebookItem.hpp
         widgets/PhonebookListView.hpp
