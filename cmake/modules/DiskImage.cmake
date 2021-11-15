@@ -2,7 +2,7 @@ function(add_image)
     cmake_parse_arguments(
         _ARG
         ""
-        "PRODUCT;SYSROOT;ASSETS;IMAGE_PARTITIONS"
+        "PRODUCT;SYSROOT;ASSETS;IMAGE_PARTITIONS;DEPENDS"
         ""
         ${ARGN}
     )
@@ -59,8 +59,7 @@ function(add_image)
 
     add_custom_command(
         OUTPUT ${DISK_IMAGE_NAME}
-        DEPENDS ${COMMAND_DEPENDS}
-        DEPENDS json-target
+        DEPENDS ${COMMAND_DEPENDS} ${_ARG_DEPENDS}
         COMMAND
             ${SCRIPT_PATH}
             ${DISK_IMAGE_NAME}

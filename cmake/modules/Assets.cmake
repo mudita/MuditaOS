@@ -15,6 +15,7 @@ function(add_assets_target)
 
     add_custom_target(
         ${_ASSETS_TARGET}
+        DEPENDS json-target
         COMMAND mkdir -p ${_ASSETS_DEST_DIR}
         COMMAND rsync -qravu --delete
             ${_ASSETS_SOURCE_DIR}/.boot.json*
@@ -24,6 +25,7 @@ function(add_assets_target)
             ${_ASSETS_SOURCE_DIR}/assets
             ${_ASSETS_SOURCE_DIR}/Luts.bin
             ${_ASSETS_SOURCE_DIR}/country-codes.db
+            ${_ASSETS_SOURCE_DIR}/Luts.bin
             ${_ASSETS_DEST_DIR}/current
         COMMAND rsync -qravu --delete ${EXCLUDED}
             ${_ASSETS_SOURCE_DIR}/user
