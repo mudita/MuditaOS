@@ -5,6 +5,7 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
+#include "service-appmgr/Controller.hpp"
 
 namespace gui
 {
@@ -13,11 +14,20 @@ namespace gui
         : WindowWithTimer(app, name)
     {
         buildInterface();
-
         timerCallback = [this](Item &, sys::Timer &) {
-            application->switchWindow(windowToReturn);
+            exit();
             return true;
         };
+    }
+
+    void BellFinishedWindow::exit()
+    {
+        if (closeApplication) {
+            app::manager::Controller::switchBack(application);
+        }
+        else {
+            application->switchWindow(windowToReturn);
+        }
     }
 
     void BellFinishedWindow::buildInterface()
@@ -37,7 +47,7 @@ namespace gui
     bool BellFinishedWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            application->switchWindow(windowToReturn);
+            exit();
             return true;
         }
         return false;
@@ -51,7 +61,8 @@ namespace gui
             icon->image->set(metadata->icon);
             icon->text->setRichText(metadata->text);
             icon->resizeItems();
-            windowToReturn = metadata->windowToReturn;
+            windowToReturn   = metadata->windowToReturn;
+            closeApplication = metadata->closeApplication;
         }
     }
 

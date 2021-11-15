@@ -28,7 +28,6 @@ target_sources(application-bell-meditation-timer
         windows/MeditationRunningWindow.cpp
         windows/MeditationTimerWindow.cpp
         windows/ReadyGoingWindow.cpp
-        windows/SessionEndWindow.cpp
         windows/SessionPausedWindow.cpp
     PUBLIC
         include/application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp
@@ -37,6 +36,7 @@ target_sources(application-bell-meditation-timer
 target_link_libraries(application-bell-meditation-timer
     PRIVATE
         app
+        bell::audio
         bell::app-common
         bell::app-main
         bellgui

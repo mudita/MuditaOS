@@ -4,7 +4,6 @@
 #include "WorkerEvent.hpp"
 
 #include <bsp/eink_frontlight/eink_frontlight.hpp>
-#include <service-audio/AudioMessage.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 
 namespace bell

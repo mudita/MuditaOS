@@ -23,6 +23,7 @@ target_compile_options(PurePhone
 
 target_sources(PurePhone
     PRIVATE
+        ${TARGET_SOURCES}
         PurePhoneMain.cpp
         PlatformFactory.cpp
         EinkSentinelPure.cpp

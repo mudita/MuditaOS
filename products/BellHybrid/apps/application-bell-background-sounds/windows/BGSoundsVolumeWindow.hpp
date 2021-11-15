@@ -7,29 +7,22 @@
 
 #include <apps-common/popups/WindowWithTimer.hpp>
 #include <apps-common/widgets/spinners/Spinners.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 
-#include <module-audio/Audio/AudioCommon.hpp>
-#include <module-audio/Audio/Profiles/Profile.hpp>
 namespace gui
 {
     class BellBaseLayout;
-    class BGSoundsVolumeWindow : public WindowWithTimer, public app::bgSounds::BGSoundsVolumeContract::View
+    class BGSoundsVolumeWindow : public WindowWithTimer
     {
-        std::unique_ptr<app::bgSounds::BGSoundsVolumeContract::Presenter> presenter;
-        audio::Volume volume = 1;
-        audio::Context audioContext;
-
+        std::unique_ptr<app::bgSounds::AbstractBGSoundsVolumePresenter> presenter;
         BellBaseLayout *body{};
         UIntegerSpinner *spinner = nullptr;
 
         void buildInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
-        void onBeforeShow(ShowMode mode, SwitchData *data);
-
-        audio::Volume getCurrentVolume() const noexcept override;
 
       public:
         BGSoundsVolumeWindow(app::ApplicationCommon *app,
-                             std::unique_ptr<app::bgSounds::BGSoundsVolumeContract::Presenter> &&windowPresenter);
+                             std::unique_ptr<app::bgSounds::AbstractBGSoundsVolumePresenter> &&windowPresenter);
     };
 } // namespace gui

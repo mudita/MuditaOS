@@ -15,7 +15,8 @@
 #include "widgets/BGSoundsPlayer.hpp"
 #include <apps-common/messages/AppMessage.hpp>
 #include <common/models/TimeModel.hpp>
-#include <service-audio/AudioMessage.hpp>
+#include <common/models/AudioModel.hpp>
+#include <audio/AudioMessage.hpp>
 
 #include <log/log.hpp>
 namespace app
@@ -26,11 +27,12 @@ namespace app
                                                                      StartInBackground startInBackground,
                                                                      uint32_t stackDepth)
         : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth),
-          player{std::make_unique<bgSounds::BGSoundsPlayer>(this)}
+          audioModel{std::make_unique<AudioModel>(this)}, player{
+                                                              std::make_unique<bgSounds::BGSoundsPlayer>(*audioModel)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
-        connect(typeid(AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
-            auto notification = static_cast<AudioEOFNotification *>(msg);
+        connect(typeid(service::AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<service::AudioEOFNotification *>(msg);
             return player->handle(notification);
         });
     }
@@ -71,10 +73,11 @@ namespace app
             return std::make_unique<gui::BGSoundsPausedWindow>(app);
         });
 
-        windowsFactory.attach(gui::popup::window::volume_window, [](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<bgSounds::BGSoundsVolumePresenter>(*app);
-            return std::make_unique<gui::BGSoundsVolumeWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(gui::popup::window::volume_window,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  auto presenter = std::make_unique<bgSounds::BGSoundsVolumePresenter>(*audioModel);
+                                  return std::make_unique<gui::BGSoundsVolumeWindow>(app, std::move(presenter));
+                              });
 
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,

@@ -13,20 +13,10 @@ namespace app::bell_settings
         : provider(provider),
           model(std::move(model)), audioModel{std::move(audioModel)}, soundsRepository{std::move(soundsRepository)}
     {
-        auto playResponseCb = [this](audio::RetCode retCode, audio::Token token) {
-            if (retCode != audio::RetCode::Success || !token.IsValid()) {
-                LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
-                          str(retCode).c_str(),
-                          token.IsValid());
-                return;
-            }
-            this->currentToken = token;
-        };
 
-        auto playSound = [this, playResponseCb](const UTF8 &val) {
-            this->audioModel->play(this->soundsRepository->titleToPath(val).value_or(""),
-                                   playResponseCb,
-                                   AbstractAudioModel::PlaybackType::Alarm);
+        auto playSound = [this](const UTF8 &val) {
+            this->audioModel->play(
+                this->soundsRepository->titleToPath(val).value_or(""), AbstractAudioModel::PlaybackType::Alarm, {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
@@ -38,7 +28,7 @@ namespace app::bell_settings
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this](const auto &val) {
-            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::Alarm);
+            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::Alarm, {});
         };
     }
 
@@ -67,6 +57,10 @@ namespace app::bell_settings
     }
     void AlarmSettingsPresenter::stopSound()
     {
-        this->audioModel->stop(currentToken, nullptr);
+        this->audioModel->stop({});
+    }
+    void AlarmSettingsPresenter::exitWithoutSave()
+    {
+        model->getAlarmVolume().restoreDefault();
     }
 } // namespace app::bell_settings

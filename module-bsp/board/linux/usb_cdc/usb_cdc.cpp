@@ -220,4 +220,7 @@ namespace bsp
 
         return 0;
     }
+
+    void usbHandleDataReceived()
+    {}
 } // namespace bsp

@@ -11,7 +11,7 @@ namespace app::OnBoarding
     /// Image name, Prompt info text
     using InformationDisplay = std::pair<std::string, std::string>;
 
-    constexpr auto informationPromptTimeout = std::chrono::seconds{5};
+    constexpr auto informationPromptTimeout = std::chrono::seconds{15};
     constexpr auto informationTimerName     = "OnBoardingInformationTimer";
 
     enum class InformationStates

@@ -3,7 +3,6 @@
 
 #include "BellPxAudioCodec.hpp"
 #include "board.h"
-#include "dma_config.h"
 #include <log/log.hpp>
 
 #include "board/BoardDefinitions.hpp"
@@ -104,7 +103,7 @@ namespace audio
     AudioDevice::RetCode BellPxAudioCodec::setOutputVolume(float vol)
     {
         currentFormat.outputVolume = vol;
-        CodecParams params;
+        CodecParamsAW8898 params;
         params.outVolume = vol;
         params.opCmd     = CodecParams::Cmd::SetOutVolume;
         codec.Ioctrl(params);
@@ -114,7 +113,7 @@ namespace audio
     AudioDevice::RetCode BellPxAudioCodec::setInputGain(float gain)
     {
         currentFormat.inputGain = gain;
-        CodecParams params;
+        CodecParamsAW8898 params;
         params.inGain = gain;
         params.opCmd  = CodecParams::Cmd::SetInGain;
         codec.Ioctrl(params);

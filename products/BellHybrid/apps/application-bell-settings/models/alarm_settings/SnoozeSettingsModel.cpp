@@ -74,11 +74,19 @@ namespace app::bell_settings
     void SnoozeChimeVolumeModel::setValue(std::uint8_t value)
     {
         const auto valStr = std::to_string(value);
-        settings.setValue(bell::settings::Snooze::volume, valStr, settings::SettingsScope::Global);
+        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Snooze, {});
     }
 
     std::uint8_t SnoozeChimeVolumeModel::getValue() const
     {
-        return get_helper<std::uint8_t>(settings, bell::settings::Snooze::volume).value_or(0);
+        return defaultValue;
+    }
+    SnoozeChimeVolumeModel::SnoozeChimeVolumeModel(AbstractAudioModel &audioModel) : audioModel{audioModel}
+    {
+        defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Snooze).value_or(0);
+    }
+    void SnoozeChimeVolumeModel::restoreDefault()
+    {
+        setValue(defaultValue);
     }
 } // namespace app::bell_settings

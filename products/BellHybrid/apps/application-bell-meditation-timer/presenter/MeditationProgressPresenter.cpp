@@ -6,6 +6,7 @@
 #include "MeditationProgressPresenter.hpp"
 
 #include <common/models/TimeModel.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/Settings.hpp>
 
@@ -75,7 +76,8 @@ namespace app::meditation
     void MeditationProgressPresenter::finish()
     {
         timer->stop();
-        app->switchWindow(gui::name::window::sessionEnded);
+        app->switchWindow(gui::window::bell_finished::defaultName,
+                          gui::BellFinishedWindowData::Factory::create("big_namaste_W_G", "", "", true));
     }
 
     void MeditationProgressPresenter::onProgressFinished()

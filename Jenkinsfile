@@ -30,6 +30,7 @@ pipeline {
         JOBS=15
         PATH="/usr/local/cmake-3.21.3-linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
     }
+
     stages {
         stage('Check for previous running builds') {
             steps {
@@ -151,7 +152,11 @@ pipeline {
                 XDG_CACHE_HOME="/clang-cache"
 
             }
-
+            when {
+                expression {
+                 return !(env.CHANGE_TARGET ==~ /release\/[0-9]+\.[0-9]+\.[0-9]+-bell/)
+                 }
+            }
             steps {
                 echo "Check if branch needs rebasing"
                 sh '''#!/bin/bash -e
@@ -235,7 +240,11 @@ pipeline {
                 CCACHE_DIR="/ccache/Linux"
                 XDG_CACHE_HOME="/clang-cache"
             }
-
+            when {
+                expression {
+                 return !(env.CHANGE_TARGET ==~ /release\/[0-9]+\.[0-9]+\.[0-9]+-pure/)
+                 }
+            }
             steps {
                 echo "Check if branch needs rebasing"
                 sh '''#!/bin/bash -e

@@ -17,7 +17,7 @@ namespace app
 namespace app::home_screen
 {
 
-    inline constexpr auto defaultAlarmRingingTime = std::chrono::seconds(30);
+    inline constexpr auto defaultAlarmRingingTime = std::chrono::minutes(5);
 
     class AbstractView;
     class AbstractPresenter;

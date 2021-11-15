@@ -5,6 +5,7 @@
 #include <ext4_config.h>
 #include <ext4_blockdev.h>
 #include <ext4_errno.h>
+#include <stdint.h>
 #include <unordered_map>
 #include <log/log.hpp>
 #include <mutex.hpp>
@@ -47,29 +48,34 @@ namespace purefs::fs::drivers::ext4::internal
                 if (!ctx) {
                     return -EIO;
                 }
+                cpp_freertos::LockGuard _lck(ctx->mutex);
                 auto diskmm = ctx->disk.lock();
                 if (!diskmm) {
                     return -EIO;
                 }
                 const auto err = diskmm->write(ctx->disk_h, buf, blk_id, blk_cnt);
                 if (err) {
-                    LOG_ERROR("Sector write error errno: %i", err);
+                    LOG_ERROR(
+                        "Sector write error errno: %i on block: %u cnt: %u", err, unsigned(blk_id), unsigned(blk_cnt));
                 }
                 return -err;
             }
+
             int read(struct ext4_blockdev *bdev, void *buf, uint64_t blk_id, uint32_t blk_cnt)
             {
                 auto ctx = reinterpret_cast<context *>(bdev->bdif->p_user);
                 if (!ctx) {
                     return -EIO;
                 }
+                cpp_freertos::LockGuard _lck(ctx->mutex);
                 auto diskmm = ctx->disk.lock();
                 if (!diskmm) {
                     return -EIO;
                 }
                 const auto err = diskmm->read(ctx->disk_h, buf, blk_id, blk_cnt);
                 if (err) {
-                    LOG_ERROR("Sector write error errno: %i", err);
+                    LOG_ERROR(
+                        "Sector read error errno: %i on block: %u cnt: %u", err, unsigned(blk_id), unsigned(blk_cnt));
                 }
                 return -err;
             }
@@ -78,6 +84,7 @@ namespace purefs::fs::drivers::ext4::internal
             {
                 return 0;
             }
+
             int close(struct ext4_blockdev *bdev)
             {
                 return 0;

@@ -35,20 +35,16 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('snooze_length','10'),
     ('snooze_interval','1'),
     ('snooze_tone','Gentle Chime'),
-    ('snooze_volume','10'),
     ('prewake_up_duration', '10'),
     ('prewake_up_tone','Joyful Awakening'),
-    ('prewake_up_volume','5'),
     ('prewake_up_light_duration','10'),
     ('alarm_tone','Gentle Daybreak'),
-    ('alarm_volume','5'),
     ('alarm_light_active','1'),
     ('alarm_duration','10000'),
     ('bedtime_active','0'),
     ('bedtime_time','21:00'),
     ('bedtime_tone','Evening Horizon'),
     ('bedtime_duration','5'),
-    ('bedtime_volume','1'),
     ('\ServiceEink\\display_inverted_mode', '0');
 
 

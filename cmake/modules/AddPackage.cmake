@@ -80,7 +80,7 @@ function(add_update_package SOURCE_TARGET)
     add_custom_command(
         OUTPUT ${UPDATE_PKG}.sig
         DEPENDS ${UPDATE_PKG}
-        COMMAND ${CMAKE_SOURCE_DIR}/tools/secureboot_sign_package.sh ${CST_PATH} ${ELFTOSB_PATH} ${SRK_TABLE} ${CSF_KEY} ${IMG_KEY} ${UPDATE_PKG}
+        COMMAND python3 ${SIGN_CLIENT_PATH}/signclient.py --sha256 ${UPDATE_PKG} --out_file ${UPDATE_PKG}.sig --keystore ${KEYSTORE} --keyslot ${KEYSLOT} --server ${SERVER} --login ${LOGIN}
         COMMENT "Generating update signature"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )

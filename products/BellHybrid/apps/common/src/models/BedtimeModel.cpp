@@ -78,18 +78,20 @@ namespace app::bell_bedtime
     void BedtimeVolumeModel::setValue(std::uint8_t value)
     {
         const auto valStr = std::to_string(value);
-        settings.setValue(bell::settings::Bedtime::volume, valStr, settings::SettingsScope::Global);
+        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Bedtime, {});
     }
 
     auto BedtimeVolumeModel::getValue() const -> std::uint8_t
     {
-        const auto str = settings.getValue(bell::settings::Bedtime::volume, settings::SettingsScope::Global);
-        try {
-            return std::stoi(str);
-        }
-        catch (const std::invalid_argument &) {
-            return DEFAULT_BEDTIME_VOLUME;
-        }
+        return defaultValue;
+    }
+    BedtimeVolumeModel::BedtimeVolumeModel(AbstractAudioModel &audioModel) : audioModel{audioModel}
+    {
+        defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Bedtime).value_or(0);
+    }
+    void BedtimeVolumeModel::restoreDefault()
+    {
+        setValue(defaultValue);
     }
 
 } // namespace app::bell_bedtime

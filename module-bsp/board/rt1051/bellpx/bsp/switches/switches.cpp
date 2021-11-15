@@ -67,22 +67,22 @@ namespace bsp::bell_switches
       private:
         static constexpr std::chrono::milliseconds latchPressEventTimeout = 1000ms;
         cpp_freertos::MutexStandard latchFlagMutex;
-        std::chrono::time_point<std::chrono::system_clock> timeOfLastLatchEvent = std::chrono::system_clock::now();
-        bool pressed                                                            = false;
+        bool pressed    = false;
+        bool changeFlag = false;
 
       public:
         void setPressed()
         {
             cpp_freertos::LockGuard lock(latchFlagMutex);
-            pressed              = true;
-            timeOfLastLatchEvent = std::chrono::system_clock::now();
+            pressed    = true;
+            changeFlag = true;
         }
 
         void setReleased()
         {
             cpp_freertos::LockGuard lock(latchFlagMutex);
-            pressed              = false;
-            timeOfLastLatchEvent = std::chrono::system_clock::now();
+            pressed    = false;
+            changeFlag = true;
         }
 
         bool isPressed()
@@ -91,12 +91,16 @@ namespace bsp::bell_switches
             return pressed;
         }
 
-        bool wasJustPressed()
+        bool wasMarkedChanged()
         {
             cpp_freertos::LockGuard lock(latchFlagMutex);
-            auto ret = ((std::chrono::duration_cast<std::chrono::milliseconds>(
-                            std::chrono::system_clock::now() - timeOfLastLatchEvent)) <= latchPressEventTimeout);
-            return ret;
+            return changeFlag;
+        }
+
+        void clearChangedMark()
+        {
+            cpp_freertos::LockGuard lock(latchFlagMutex);
+            changeFlag = false;
         }
 
     } latchEventFlag;
@@ -122,7 +126,7 @@ namespace bsp::bell_switches
                     latchEventFlag.setPressed();
                 }
                 auto val = static_cast<std::uint16_t>(timerState->notificationSource);
-                xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
+                xQueueSend(qHandleIrq, &val, 0);
                 timerState->lastState = KeyEvents::Released;
             }
             else {
@@ -149,7 +153,7 @@ namespace bsp::bell_switches
                 default:
                     break;
                 }
-                xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
+                xQueueSend(qHandleIrq, &val, 0);
                 timerState->lastState = KeyEvents::Pressed;
             }
         }
@@ -163,9 +167,14 @@ namespace bsp::bell_switches
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         xTimerStop(timerState->timer, 0);
 
-        if (!latchEventFlag.wasJustPressed() && qHandleIrq != nullptr) {
-            auto val = static_cast<std::uint16_t>(timerState->notificationSource);
-            xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
+        if (qHandleIrq != nullptr) {
+            if (latchEventFlag.wasMarkedChanged()) {
+                latchEventFlag.clearChangedMark();
+            }
+            else {
+                auto val = static_cast<std::uint16_t>(timerState->notificationSource);
+                xQueueSend(qHandleIrq, &val, 0);
+            }
         }
 
         timerState->gpio->ClearPortInterrupts(1U << static_cast<uint32_t>(timerState->pin));
