@@ -136,7 +136,13 @@ namespace Log
     /// @return:   1 - log flush successflul
     auto Logger::dumpToFile(std::filesystem::path logPath) -> int
     {
-        auto firstDump = !std::filesystem::exists(logPath);
+        std::error_code errorCode;
+        auto firstDump = !std::filesystem::exists(logPath, errorCode);
+        if (errorCode) {
+            LOG_ERROR("Failed to check if file %s exists, error: %d", logPath.c_str(), errorCode.value());
+            return -EIO;
+        }
+
         if (const bool maxSizeExceeded = !firstDump && std::filesystem::file_size(logPath) > maxFileSize;
             maxSizeExceeded) {
             LOG_DEBUG("Max log file size exceeded. Rotating log files...");
