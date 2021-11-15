@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <application-bell-settings/windows/advanced/BellSettingsTimeUnitsWindow.hpp>
+#include <application-bell-settings/windows/BellSettingsTimeUnitsWindow.hpp>
 
 namespace gui
 {

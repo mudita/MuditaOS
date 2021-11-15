@@ -44,6 +44,7 @@ namespace gui
 
         addWinSettings(utils::translate("app_bell_settings_alarm_settings"), BellSettingsAlarmSettingsMenuWindow::name);
         addWinSettings(utils::translate("app_bell_settings_bedtime_tone"), window::name::bellSettingsBedtimeTone);
+        addWinSettings(utils::translate("app_bell_settings_time_units"), window::name::bellSettingsTimeUnits);
         addWinSettings(utils::translate("app_bell_settings_advanced"), window::name::bellSettingsAdvanced);
         addWinSettings(utils::translate("app_bell_settings_turn_off"), BellTurnOffOptionWindow::defaultName);
 
