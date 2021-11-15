@@ -219,14 +219,7 @@ namespace app
         // send drawing commands only when if application is in active and visible.
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
-            window->updateBatteryStatus();
-            window->updateBluetooth(statusIndicators.bluetoothMode);
-            window->updateAlarmClock(statusIndicators.alarmClockStatus);
-            window->updateSim();
-            window->updateSignalStrength();
-            window->updateNetworkAccessTechnology();
-            window->updateTime();
-            window->updatePhoneMode(statusIndicators.phoneMode);
+            updateStatuses(window);
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
 
@@ -243,6 +236,9 @@ namespace app
         if (suspendInProgress)
             suspendInProgress = false;
     }
+
+    void ApplicationCommon::updateStatuses(gui::AppWindow *window) const
+    {}
 
     void ApplicationCommon::updateCurrentWindow(std::unique_ptr<gui::SwitchData> data,
                                                 gui::ShowMode command,

@@ -179,6 +179,7 @@ namespace app
         virtual sys::MessagePointer handleAppClose(sys::Message *msgl);
         virtual sys::MessagePointer handleSwitchWindow(sys::Message *msgl);
         virtual sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
+        virtual void updateStatuses(gui::AppWindow *window) const;
 
       private:
         std::string default_window;
