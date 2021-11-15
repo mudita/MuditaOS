@@ -36,6 +36,7 @@ add_image(
     SYSROOT test-sysroot
     ASSETS  test-assets
     IMAGE_PARTITIONS ${CMAKE_SOURCE_DIR}/config/products/PurePhone/image_partitions.map
+    DEPENDS test-assets
 )
 
 macro(enable_test_filesystem)
