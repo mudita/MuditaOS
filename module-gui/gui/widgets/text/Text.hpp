@@ -138,7 +138,7 @@ namespace gui
 
         void setTextChangedCallback(TextChangedCallback &&callback);
 
-        void addText(const UTF8 &text);
+        void addText(const UTF8 &text, AdditionType additionType = AdditionType::perChar);
         void addText(TextBlock text);
         /// @defgroup richtext can be virtualized by parametrized RichTextParser virtual api ( as second param )
         /// @{

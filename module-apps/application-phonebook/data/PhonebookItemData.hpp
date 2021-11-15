@@ -60,3 +60,18 @@ class PhonebookSearchRequest : public gui::SwitchData
     PhonebookSearchRequest()              = default;
     std::shared_ptr<ContactRecord> result = nullptr;
 };
+
+class PhonebookInputOptionData : public gui::SwitchData
+{
+  private:
+    gui::Text *inputText;
+
+  public:
+    explicit PhonebookInputOptionData(gui::Text *inputText) : inputText(inputText)
+    {}
+
+    gui::Text *getInputText()
+    {
+        return inputText;
+    }
+};

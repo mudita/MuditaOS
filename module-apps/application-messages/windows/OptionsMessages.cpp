@@ -78,7 +78,7 @@ std::list<gui::Option> newMessageWindowOptions(app::ApplicationMessages *app,
 
     if (Clipboard::getInstance().gotData()) {
         options.emplace_back(utils::translate("sms_paste"), [=](gui::Item &item) {
-            text->addText(Clipboard::getInstance().paste());
+            text->addText(Clipboard::getInstance().paste(), gui::AdditionType::perBlock);
             app->returnToPreviousWindow();
             return true;
         });

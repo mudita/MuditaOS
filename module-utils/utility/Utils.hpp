@@ -45,6 +45,11 @@ namespace utils
         return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
     }
 
+    static inline bool is_phone_number(const std::string &s)
+    {
+        return s.find_first_not_of(" +#0123456789") == std::string::npos;
+    }
+
     static inline std::string ltrim(const std::string &s)
     {
         size_t start = s.find_first_not_of(WHITESPACE);

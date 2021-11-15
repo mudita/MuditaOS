@@ -1,24 +1,24 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "InputLinesWithLabelIWidget.hpp"
-
-#include <Span.hpp>
+#include "InputLinesWithLabelWidget.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
 #include <ContactRecord.hpp>
+#include <Clipboard.hpp>
 #include <i18n/i18n.hpp>
-#include <utility>
 
 namespace gui
 {
-    InputLinesWithLabelIWidget::InputLinesWithLabelIWidget(phonebookInternals::ListItemName listItemName,
-                                                           std::function<void(const UTF8 &)> navBarTemporaryMode,
-                                                           std::function<void()> navBarRestoreFromTemporaryMode,
-                                                           std::function<void()> selectSpecialCharacter,
-                                                           std::function<void()> contentChanged,
-                                                           unsigned int lines)
-        : listItemName(listItemName), checkTextContent(std::move(contentChanged))
+    InputLinesWithLabelWidget::InputLinesWithLabelWidget(
+        phonebookInternals::ListItemName listItemName,
+        const std::function<void(const UTF8 &text, bool emptyOthers)> &navBarTemporaryMode,
+        const std::function<void()> &navBarRestoreFromTemporaryMode,
+        const std::function<void()> &selectSpecialCharacter,
+        const std::function<void(Text *text)> &inputOptions,
+        unsigned int lines)
+        : listItemName(listItemName), navBarTemporaryMode(navBarTemporaryMode),
+          navBarRestoreFromTemporaryMode(navBarRestoreFromTemporaryMode), inputOptions(inputOptions)
     {
         setMinimumSize(phonebookStyle::inputLinesWithLabelWidget::w,
                        phonebookStyle::inputLinesWithLabelWidget::title_label_h +
@@ -52,8 +52,8 @@ namespace gui
         inputText->setFont(style::window::font::medium);
         inputText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { navBarTemporaryMode(text); },
-            [=]() { navBarRestoreFromTemporaryMode(); },
+            [=](const UTF8 &text) { this->navBarTemporaryMode(text, true); },
+            [=]() { this->navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         inputText->setPenFocusWidth(style::window::default_border_focus_w);
         inputText->setPenWidth(style::window::default_border_no_focus_w);
@@ -68,20 +68,36 @@ namespace gui
                 inputText->setCursorStartPosition(CursorStartPosition::DocumentEnd);
                 inputText->setUnderlineThickness(style::window::default_border_focus_w);
                 inputText->setFont(style::window::font::mediumbold);
+
+                if (!inputText->isEmpty() || Clipboard::getInstance().gotData()) {
+                    this->navBarTemporaryMode(utils::translate(style::strings::common::options), false);
+                }
             }
             else {
                 inputText->setCursorStartPosition(CursorStartPosition::DocumentBegin);
                 inputText->setUnderlineThickness(style::window::default_border_rect_no_focus);
                 inputText->setFont(style::window::font::medium);
+
+                this->navBarRestoreFromTemporaryMode();
             }
             return true;
         };
 
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto result = inputText->onInput(event);
-            if (checkTextContent != nullptr) {
-                checkTextContent();
+
+            if (!event.isShortRelease(gui::KeyCode::KEY_AST) &&
+                (!inputText->isEmpty() || Clipboard::getInstance().gotData())) {
+                this->navBarTemporaryMode(utils::translate(style::strings::common::options), false);
             }
+
+            if (event.isShortRelease(gui::KeyCode::KEY_LF) &&
+                (!inputText->isEmpty() || Clipboard::getInstance().gotData())) {
+                if (this->inputOptions) {
+                    this->inputOptions(inputText);
+                }
+            }
+
             return result;
         };
 
@@ -93,7 +109,7 @@ namespace gui
         setEdges(RectangleEdge::None);
     }
 
-    void InputLinesWithLabelIWidget::applyItemNameSpecificSettings()
+    void InputLinesWithLabelWidget::applyItemNameSpecificSettings()
     {
         switch (listItemName) {
         case phonebookInternals::ListItemName::FirstName:
@@ -129,19 +145,23 @@ namespace gui
             break;
         }
     }
-    void InputLinesWithLabelIWidget::firstNameHandler()
+    void InputLinesWithLabelWidget::firstNameHandler()
     {
         titleLabel->setText(utils::translate("app_phonebook_new_contact_first_name"));
         inputText->setTextType(TextType::SingleLine);
+        inputText->setTextLimitType(TextLimitType::MaxSignsCount,
+                                    phonebookStyle::inputLinesWithLabelWidget::minimum_signs_limit);
 
         onSaveCallback  = [&](std::shared_ptr<ContactRecord> contact) { contact->primaryName = inputText->getText(); };
         onLoadCallback  = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
-    void InputLinesWithLabelIWidget::secondNameHandler()
+    void InputLinesWithLabelWidget::secondNameHandler()
     {
         titleLabel->setText(utils::translate("app_phonebook_new_contact_last_name"));
         inputText->setTextType(TextType::SingleLine);
+        inputText->setTextLimitType(TextLimitType::MaxSignsCount,
+                                    phonebookStyle::inputLinesWithLabelWidget::minimum_signs_limit);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
             contact->alternativeName = inputText->getText();
@@ -149,11 +169,13 @@ namespace gui
         onLoadCallback  = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->alternativeName); };
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
-    void InputLinesWithLabelIWidget::numberHandler()
+    void InputLinesWithLabelWidget::numberHandler()
     {
         titleLabel->setText(utils::translate("app_phonebook_new_contact_number"));
         inputText->setTextType(TextType::SingleLine);
         inputText->setInputMode(new InputMode({InputMode::phone}));
+        inputText->setTextLimitType(TextLimitType::MaxSignsCount,
+                                    phonebookStyle::inputLinesWithLabelWidget::medium_signs_limit);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
             if (inputText->getText().length() > 0) {
@@ -166,13 +188,26 @@ namespace gui
                 inputText->setText(contact->numbers[0].number.getEntered());
             }
         };
+
+        onVerifyCallback = [&](std::string &errorMessage) {
+            if (utils::is_phone_number(inputText->getText())) {
+                return true;
+            }
+            else {
+                errorMessage = inputText->getText();
+                return false;
+            }
+        };
+
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
-    void InputLinesWithLabelIWidget::secondNumberHandler()
+    void InputLinesWithLabelWidget::secondNumberHandler()
     {
         titleLabel->setText(utils::translate("app_phonebook_new_contact_second_number"));
         inputText->setTextType(TextType::SingleLine);
         inputText->setInputMode(new InputMode({InputMode::phone}));
+        inputText->setTextLimitType(TextLimitType::MaxSignsCount,
+                                    phonebookStyle::inputLinesWithLabelWidget::medium_signs_limit);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
             if (inputText->getText().length() > 0) {
@@ -180,34 +215,52 @@ namespace gui
                     ContactRecord::Number(utils::PhoneNumber(inputText->getText()).getView()));
             }
         };
+
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
             if (contact->numbers.size() > 1) {
                 inputText->setText(contact->numbers[1].number.getEntered());
             }
         };
+
+        onVerifyCallback = [&](std::string &errorMessage) {
+            if (utils::is_phone_number(inputText->getText())) {
+                return true;
+            }
+            else {
+                errorMessage = inputText->getText();
+                return false;
+            }
+        };
+
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
-    void InputLinesWithLabelIWidget::emailHandler()
+    void InputLinesWithLabelWidget::emailHandler()
     {
         titleLabel->setText(utils::translate("app_phonebook_new_contact_email"));
         inputText->setTextType(TextType::SingleLine);
+        inputText->setTextLimitType(TextLimitType::MaxSignsCount,
+                                    phonebookStyle::inputLinesWithLabelWidget::max_signs_limit);
 
         onSaveCallback  = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
         onLoadCallback  = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->mail); };
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
     }
-    void InputLinesWithLabelIWidget::addressHandler()
+    void InputLinesWithLabelWidget::addressHandler()
     {
         titleLabel->setText(utils::translate("app_phonebook_new_contact_address"));
         inputText->setTextType(TextType::SingleLine);
+        inputText->setTextLimitType(TextLimitType::MaxSignsCount,
+                                    phonebookStyle::inputLinesWithLabelWidget::max_signs_limit);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
     }
-    void InputLinesWithLabelIWidget::noteHandler()
+    void InputLinesWithLabelWidget::noteHandler()
     {
         titleLabel->setText(utils::translate("app_phonebook_new_contact_note"));
         inputText->setTextType(TextType::SingleLine);
+        inputText->setTextLimitType(TextLimitType::MaxSignsCount,
+                                    phonebookStyle::inputLinesWithLabelWidget::max_signs_limit);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->note); };

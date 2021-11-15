@@ -112,6 +112,10 @@ namespace phonebookStyle
         inline constexpr uint32_t span_size        = 8;
         inline constexpr uint32_t line_spacing     = 15;
         inline constexpr int32_t underline_padding = 4;
+
+        inline constexpr auto minimum_signs_limit = 31U;
+        inline constexpr auto medium_signs_limit  = 40U;
+        inline constexpr auto max_signs_limit     = 200U;
     } // namespace inputLinesWithLabelWidget
 
     namespace outputLinesTextWithLabelWidget
