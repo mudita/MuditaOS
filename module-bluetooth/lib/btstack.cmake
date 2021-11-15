@@ -126,7 +126,7 @@ set(TARGET_LIBRARIES_INCLUDES
 
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-message("Linux specyfic includes")
+message("Linux specific includes")
 message("-----------------------")
     list(APPEND TARGET_LIBRARIES_INCLUDES
         ${BT_STACK_ROOT}/platform/posix/
