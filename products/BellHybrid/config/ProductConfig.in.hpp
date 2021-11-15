@@ -3,4 +3,4 @@
 
 #pragma once
 
-#define ENABLE_GSM (0)
+#cmakedefine01 CONFIG_ENABLE_TEMP
