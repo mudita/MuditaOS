@@ -5,10 +5,10 @@
 #include "widgets/TimeFormatSetListItem.hpp"
 #include "widgets/TimeSetListItem.hpp"
 #include "widgets/TemperatureUnitListItem.hpp"
+#include "ProductConfig.hpp"
 
 #include <gui/widgets/ListViewEngine.hpp>
 #include <gui/widgets/Style.hpp>
-#include <gui/widgets/Text.hpp>
 #include <service-time/Constants.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
@@ -56,9 +56,11 @@ namespace app::bell_settings
             timeSetListItem->timeSetFmtSpinner->setTimeFormat(timeFmtSetListItem->getTimeFmt());
         };
 
+#if CONFIG_ENABLE_TEMP == 1
         temperatureUnitListItem =
             new gui::TemperatureUnitListItem(utils::translate("app_bell_settings_advanced_temp_scale"));
         internalData.push_back(temperatureUnitListItem);
+#endif
 
         for (auto item : internalData) {
             item->deleteByList = false;
@@ -116,12 +118,18 @@ namespace app::bell_settings
 
     auto TimeUnitsModel::getTemperatureUnit() const -> utils::temperature::Temperature::Unit
     {
+#if CONFIG_ENABLE_TEMP == 1
         return *utils::temperature::strToUnit(temperatureUnitListItem->getUnitAsStr());
+#else
+        return utils::temperature::Temperature::Unit::Celsius;
+#endif
     }
 
     auto TimeUnitsModel::setTemperatureUnit(const utils::temperature::Temperature::Unit unit) -> void
     {
+#if CONFIG_ENABLE_TEMP == 1
         temperatureUnitListItem->setUnit(unit);
+#endif
     }
 
     void TimeUnitsModelFactoryResetValues::loadData()
