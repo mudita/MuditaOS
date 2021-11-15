@@ -35,10 +35,13 @@
 #include <log/log.hpp>
 #include <task.h>
 #include <macros.h>
+#include <stdbool.h>
+#include <string.h>
+#include <exit_backtrace.h>
 
-void __attribute__((noreturn, used)) _exit(int code)
+
+static void __attribute__((noreturn)) stop_system(void)
 {
-    LOG_INFO("_exit %d", code);
     haltIfDebugging();
     vTaskEndScheduler();
     NVIC_SystemReset();
@@ -48,4 +51,19 @@ void __attribute__((noreturn, used)) _exit(int code)
         __asm volatile("wfi\n");
 #endif
     };
+}
+
+void __attribute__((noreturn, used)) _exit_backtrace(int code, bool bt_dump)
+{
+    LOG_INFO("_exit %d", code);
+    if( bt_dump ) {
+        _StackTrace_Dump_And_Abort();
+    }
+    stop_system();
+};
+
+
+void __attribute__((noreturn, used)) _exit(int code)
+{
+     _exit_backtrace(code, code!=0);
 }

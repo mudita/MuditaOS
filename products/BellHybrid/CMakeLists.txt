@@ -17,6 +17,7 @@ target_compile_options(BellHybrid
 
 target_sources(BellHybrid
     PRIVATE
+        ${TARGET_SOURCES}
         BellHybridMain.cpp
         PlatformFactory.cpp
         EinkSentinelBell.cpp

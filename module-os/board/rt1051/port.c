@@ -192,7 +192,16 @@ volatile uint32_t ulDummy = 0;
 void vPortSVCHandler( void )
 {
 	__asm volatile (
-					"	ldr	r3, pxCurrentTCBConst2		\n" /* Restore the context. */
+                    "   tst lr, #0x04                   \n" /* Extract SVC number from the opcode */
+                    "   ite eq                          \n"
+                    "   mrseq r0, MSP                   \n"
+                    "   mrsne r0, PSP                   \n"
+                    "   ldr r0, [r0, #24]               \n"
+                    "   sub r0, r0, #2                  \n"
+                    "   ldrb r0, [r0]                   \n"
+                    "   cmp r0, #0                      \n" /* Check if SVC #0 */
+                    "   bne _StackTrace_Dump_svc_1       \n" /* Nono zero value go to the dump backtrace */
+					"	ldr	r3, pxCurrentTCBConst2		\n" /* On SVC #0 Restore the context and start OS. */
 					"	ldr r1, [r3]					\n" /* Use pxCurrentTCBConst to get the pxCurrentTCB address. */
 					"	ldr r0, [r1]					\n" /* The first item in pxCurrentTCB is the task top of stack. */
 					"	ldmia r0!, {r4-r11, r14}		\n" /* Pop the registers that are not automatically saved on exception entry and the critical nesting count. */
