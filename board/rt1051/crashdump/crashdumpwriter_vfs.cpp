@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include "purefs/vfs_subsystem.hpp"
 #include <purefs/filesystem_paths.hpp>
+#include <exit_backtrace.h>
 
 #include <filesystem>
 #include <stdint.h>
@@ -23,12 +24,12 @@ namespace crashdump
         LOG_INFO("Crash dump %s preparing ...", crashDumpFilePath.c_str());
         if (!rotator.rotateFile(crashDumpFilePath)) {
             LOG_FATAL("Failed to rotate crash dumps errno: %i", errno);
-            std::abort();
+            _exit_backtrace(-1, false);
         }
         file = std::fopen(crashDumpFilePath.c_str(), "w");
         if (!file) {
             LOG_FATAL("Failed to open crash dump file errno %i", errno);
-            std::abort();
+            _exit_backtrace(-1, false);
         }
     }
 
@@ -44,23 +45,23 @@ namespace crashdump
     {
         if (std::fwrite(buff, sizeof(*buff), size, file) != size) {
             LOG_FATAL("Unable to write crash dump errno: %i", errno);
-            std::abort();
+            _exit_backtrace(-1, false);
         }
     }
 
     void CrashDumpWriterVFS::writeHalfWords(const uint16_t *buff, std::size_t size)
     {
         if (std::fwrite(buff, sizeof(*buff), size, file) != size) {
-            LOG_FATAL("Unable to write crash dump");
-            std::abort();
+            LOG_FATAL("Unable to write crash dump errno: %i", errno);
+            _exit_backtrace(-1, false);
         }
     }
 
     void CrashDumpWriterVFS::writeWords(const uint32_t *buff, std::size_t size)
     {
         if (std::fwrite(buff, sizeof(*buff), size, file) != size) {
-            LOG_FATAL("Unable to write crash dump");
-            std::abort();
+            LOG_FATAL("Unable to write crash dump errno: %i", errno);
+            _exit_backtrace(-1, false);
         }
     }
 
