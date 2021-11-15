@@ -33,7 +33,8 @@ namespace app
     void ApplicationBellBedtime::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &) {
-            auto bedtimeModel = std::make_unique<bell_bedtime::BedtimeModel>(app);
+            auto audioModel   = std::make_unique<AudioModel>(app);
+            auto bedtimeModel = std::make_unique<bell_bedtime::BedtimeModel>(app, std::move(audioModel));
             auto provider     = std::make_shared<bell_bedtime::BedtimeListItemProvider>(std::move(bedtimeModel));
             auto presenter    = std::make_unique<bell_bedtime::BellBedtimeWindowPresenter>(provider);
             return std::make_unique<gui::BellBedtimeWindow>(app, std::move(presenter));
