@@ -122,8 +122,8 @@ namespace app
 
         windowsFactory.attach(
             gui::window::name::bellSettingsBedtimeTone, [this](ApplicationCommon *app, const std::string &name) {
-                auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app);
-                auto audioModel   = std::make_unique<AudioModel>(this);
+                auto audioModel   = std::make_unique<AudioModel>(app);
+                auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app, std::move(audioModel));
                 auto soundsRepository =
                     std::make_unique<SoundsRepository>(alarms::paths::getBedtimeReminderChimesDir());
                 auto provider = std::make_shared<bell_settings::BedtimeSettingsListItemProvider>(
