@@ -25,6 +25,7 @@ namespace app
         sys::MessagePointer handleApplicationSwitch(sys::Message *msgl) override;
         sys::MessagePointer handleAppClose(sys::Message *msgl) override;
         sys::MessagePointer handleAppFocusLost(sys::Message *msgl) override;
+        void updateStatuses(gui::AppWindow *window) const override;
 
         virtual void onKeyPressed();
         virtual void onStart();
