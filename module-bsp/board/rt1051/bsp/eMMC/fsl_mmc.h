@@ -356,18 +356,6 @@ extern "C"
      */
     status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card);
 
-    /*!
-     * @brief Polling card idle status.
-     *
-     * This function can be used to poll the status from busy to idle.
-     *
-     * @param card Card descriptor.
-     *
-     * @retval kStatus_SDMMC_TransferFailed Command tranfer failed.
-     * @retval kStatus_Success Operate successfully.
-     */
-    status_t MMC_PollingCardStatusBusy(mmc_card_t *card);
-
 /* @} */
 #if defined(__cplusplus)
 }
