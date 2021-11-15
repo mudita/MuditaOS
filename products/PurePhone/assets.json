@@ -68,7 +68,7 @@
         },
         {
             "name": "./image/Luts.bin",
-            "output": "Luts.bin"
+            "output": "./image/Luts.bin"
         }
     ]
 }
