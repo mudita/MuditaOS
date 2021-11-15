@@ -124,7 +124,6 @@ enum _sdmmc_status
     kStatus_SDMMC_CardDetectFailed         = MAKE_STATUS(kStatusGroup_SDMMC, 39U), /*!<  card detect failed */
     kStatus_SDMMC_PartitioningFailed       = MAKE_STATUS(kStatusGroup_SDMMC, 40U), /*!<  Partitioning failed */
     kStatus_SDMMC_PartitioningNotSupported = MAKE_STATUS(kStatusGroup_SDMMC, 41U), /*!<  Partitioning not supported */
-    kStatus_SDMMC_PollingCardIdleFailed    = MAKE_STATUS(kStatusGroup_SDMMC, 42U), /*!< polling card idle status failed */
 };
 
 /*! @brief card operation voltage */
