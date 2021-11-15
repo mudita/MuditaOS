@@ -36,18 +36,9 @@ namespace app::manager
         return rootApplicationName;
     }
 
-    auto ApplicationManager::handleDisplayLowBatteryScreen(ActionEntry &action) -> ActionProcessStatus
-    {
-        SwitchRequest switchRequest(
-            service::name::appmgr, resolveHomeApplication(), gui::window::name::bell_battery_shutdown, nullptr);
-        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
-    }
-
     ActionProcessStatus ApplicationManager::handleAction(ActionEntry &action)
     {
         switch (action.actionId) {
-        case actions::DisplayLowBatteryScreen:
-            return handleDisplayLowBatteryScreen(action);
         default:
             return ApplicationManagerCommon::handleAction(action);
         }

@@ -17,7 +17,7 @@ namespace gui
         : BellOptionWindow(app, name)
     {
         addOptions(alarmSettingsOptionsList());
-        setListTitle(utils::translate("app_bell_settings_alarm_settings"));
+        setListTitle(utils::translate("app_bell_settings_alarm_settings_title"));
     }
 
     std::list<Option> BellSettingsAlarmSettingsMenuWindow::alarmSettingsOptionsList()

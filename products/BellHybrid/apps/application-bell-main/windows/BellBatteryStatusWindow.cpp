@@ -15,7 +15,8 @@ namespace
 {
     constexpr auto imageType = gui::ImageTypeSpecifier::W_G;
     constexpr auto batteryEntries =
-        std::array<battery_utils::BatteryLevelEntry, 6>{{{{5, 10}, {1, 5}, "bell_status_battery_lvl0"},
+        std::array<battery_utils::BatteryLevelEntry, 7>{{{{0, 5}, {1, 1}, "bell_status_battery_lvl0"},
+                                                         {{5, 10}, {1, 5}, "bell_status_battery_lvl0"},
                                                          {{11, 30}, {6, 29}, "bell_status_battery_lvl1"},
                                                          {{31, 50}, {30, 53}, "bell_status_battery_lvl2"},
                                                          {{51, 70}, {54, 77}, "bell_status_battery_lvl3"},

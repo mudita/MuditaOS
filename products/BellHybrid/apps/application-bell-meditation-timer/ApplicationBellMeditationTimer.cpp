@@ -6,10 +6,10 @@
 #include "windows/MeditationRunningWindow.hpp"
 #include "windows/MeditationTimerWindow.hpp"
 #include "windows/ReadyGoingWindow.hpp"
-#include "windows/SessionEndWindow.hpp"
 #include "windows/SessionPausedWindow.hpp"
 
 #include <common/models/TimeModel.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 
 namespace app
 {
@@ -60,10 +60,10 @@ namespace app
         windowsFactory.attach(gui::name::window::sessionPaused, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SessionPausedWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::sessionEnded, [](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<app::meditation::SessionEndedPresenter>(app);
-            return std::make_unique<gui::SessionEndWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(gui::window::bell_finished::defaultName,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellFinishedWindow>(app);
+                              });
 
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
