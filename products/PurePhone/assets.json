@@ -67,8 +67,9 @@
             "output": "image/assets/fonts/gt_pressura_light_90.mpf"
         },
         {
-            "name": "./image/Luts.bin",
-            "output": "./image/Luts.bin"
+            "name": "image/Luts.bin.tgz",
+            "output": "./image/Luts.bin",
+            "unpack": true
         }
     ]
 }
