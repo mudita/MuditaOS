@@ -33,13 +33,28 @@
 #include <FreeRTOS.h>
 #include <MIMXRT1051.h>
 #include <log/log.hpp>
+#include <logdump/logdump.h>
 #include <task.h>
 #include <macros.h>
+#include <stdbool.h>
+#include <string.h>
+#include <exit_backtrace.h>
+#include <purefs/vfs_subsystem.hpp>
 
-void __attribute__((noreturn, used)) _exit(int code)
+
+static void __attribute__((noreturn)) stop_system(void)
 {
-    LOG_INFO("_exit %d", code);
-    haltIfDebugging();
+    if (dumpLogs() != 1) {
+        LOG_ERROR("Cannot dump logs");
+    }
+    
+    const auto err = purefs::subsystem::unmount_all();
+    if(err) {
+        LOG_WARN("Unable unmount all filesystems with error: %i.", err);
+    } else {
+        LOG_INFO("Filesystems unmounted successfully...");
+    }
+    LOG_INFO("Restarting the system...");
     vTaskEndScheduler();
     NVIC_SystemReset();
     // waiting for system reset
@@ -48,4 +63,19 @@ void __attribute__((noreturn, used)) _exit(int code)
         __asm volatile("wfi\n");
 #endif
     };
+}
+
+void __attribute__((noreturn, used)) _exit_backtrace(int code, bool bt_dump)
+{
+    LOG_INFO("_exit %d", code);
+    if( bt_dump ) {
+        _StackTrace_Dump_And_Abort();
+    }
+    stop_system();
+};
+
+
+void __attribute__((noreturn, used)) _exit(int code)
+{
+     _exit_backtrace(code, code!=0);
 }

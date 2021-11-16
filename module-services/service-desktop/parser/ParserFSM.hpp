@@ -5,8 +5,10 @@
 
 #include "MessageHandler.hpp"
 
-#include <json11.hpp>
+#include <Timers/TimerHandle.hpp>
 
+#include <json11.hpp>
+#include <magic_enum.hpp>
 #include <string>
 
 namespace sdesktop::endpoints
@@ -44,8 +46,11 @@ namespace sdesktop::endpoints
         unsigned long payloadLength   = 0;
         sys::Service *OwnerServicePtr = nullptr;
         std::unique_ptr<MessageHandler> messageHandler;
+        sys::TimerHandle parserTimer;
 
         void parseHeader();
+        void resetParser();
+        void restartTimer();
         void parsePartialHeader();
         void parseNewMessage();
         void parsePartialMessage();

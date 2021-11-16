@@ -18,6 +18,7 @@ namespace app
         void startIdleTimer();
         void restartIdleTimer();
         void stopIdleTimer();
+        void stopAllAudio();
 
       private:
         sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl) override;

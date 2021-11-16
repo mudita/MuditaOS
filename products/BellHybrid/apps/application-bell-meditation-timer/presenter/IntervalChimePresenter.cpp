@@ -29,12 +29,13 @@ namespace app::meditation
 
     std::string IntervalChimePresenter::getCurrentInterval() const
     {
-        // Always set interval as none
+        const auto value = settings->getValue(intervalDBRecordName, settings::SettingsScope::AppLocal);
         for (auto const &option : intervalOptions) {
-            if (option.first == std::chrono::minutes{0}) {
+            if (utils::to_string(option.first.count()) == value) {
                 return option.second;
             }
         }
+        // If not found, return "None"
         return intervalOptions.at(0).second;
     }
 

@@ -65,9 +65,8 @@ namespace app::bell_bedtime
       public:
         BedtimeModel() = delete;
 
-        explicit BedtimeModel(sys::Service *app)
+        explicit BedtimeModel(ApplicationCommon *app, std::unique_ptr<AudioModel> &&audioModel)
         {
-            audioModel    = std::make_unique<AudioModel>(static_cast<ApplicationCommon *>(app));
             bedtimeOnOff  = std::make_unique<bell_bedtime::BedtimeOnOffModel>(app);
             bedtimeTime   = std::make_unique<bell_bedtime::BedtimeTimeModel>(app);
             bedtimeTone   = std::make_unique<bell_bedtime::AlarmToneModel>(app);

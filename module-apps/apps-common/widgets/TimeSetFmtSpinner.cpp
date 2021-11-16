@@ -36,13 +36,15 @@ namespace gui
         fmt->setEdges(RectangleEdge::Bottom);
 
         focusChangedCallback = [&](Item &) {
-            if (focus && editMode != EditMode::Browse) {
-                setFocusItem(timeSetSpinner);
+            if (focus) {
+                setTimeFormat(this->timeFormat);
+                if (editMode != EditMode::Browse) {
+                    setFocusItem(timeSetSpinner);
+                }
             }
             else {
                 setFocusItem(nullptr);
             }
-            setTimeFormat(this->timeFormat);
             return true;
         };
 

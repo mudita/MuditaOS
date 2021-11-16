@@ -42,7 +42,7 @@ HardFault_Handler:
         r11
         exceptionLR */
     // Prevent double fault
-    ldr r0, = crash_orig_stack
+    ldr r0, =crash_orig_stack
     ldr r0, [r0]
     cmp r0, #0
     bne .
@@ -53,7 +53,6 @@ HardFault_Handler:
     mrs     r1, msp
     ldr     sp, =(g_crashCatcherStack + 4 * CRASH_CATCHER_STACK_WORD_COUNT)
     push.w  {r1-r11,lr}
-
     // Call original console dump
     ldr r0,=crash_orig_stack
     str sp, [r0]
@@ -127,6 +126,52 @@ CrashCatcher_CopyUpperFloatingPointRegisters:
     .size   CrashCatcher_CopyUpperFloatingPointRegisters, .-CrashCatcher_CopyUpperFloatingPointRegisters
 
 
+	/*
+		This function is called by the SVC #1 syscall
+		and then collect stack data for the crash dump
+		which will be run in the second stage
+		It also changes stack to the static internal
+		due to possibility of corruption of the oryginal
+		stack frame
+		extern "C" void _StackTrace_Dump_svc_1(void);
+    */
+    .global _StackTrace_Dump_svc_1
+    .type _StackTrace_Dump_svc_1 , %function
+    .thumb_func
+_StackTrace_Dump_svc_1:
+    mrs     r3, xpsr
+    mrs     r2, psp
+    mrs     r1, msp
+    ldr     sp, =(g_crashCatcherStack + 4 * CRASH_CATCHER_STACK_WORD_COUNT)
+    push.w  {r1-r11,lr}
+
+	ldr     r0, =crash_orig_stack
+    str    	sp, [r0]
+
+    mov     sp, r1
+    bx      lr
+    .pool
+    .size   _StackTrace_Dump_svc_1, .-_StackTrace_Dump_svc_1
+
+
+	/* This function is the second stage of the crash dump
+	   crash orig stack should contain valid stack from
+	   the exception and now crash catcher should be able
+	   to read stack frame pointer and dump data in the
+	   user mode from the second part of the exit function
+	   In our model crash newer return to the caller so
+	   we can use simply branch without care about unstacking
+      extern "C" void _StackTrace_Dump_stage_2(void);
+	*/
+    .global _StackTrace_Dump_stage_2
+    .type _StackTrace_Dump_stage_2 , %function
+    .thumb_func
+_StackTrace_Dump_stage_2:
+	 ldr	 r0, =crash_orig_stack
+	 ldr     r0, [r0]
+     b      CrashCatcher_Entry
+    .pool
+    .size   _StackTrace_Dump_stage_2, .-_StackTrace_Dump_stage_2
 
     .data
     crash_orig_stack: .long 0

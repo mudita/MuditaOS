@@ -18,7 +18,6 @@
 #include "presenter/advanced/FrontlightPresenter.hpp"
 #include "windows/advanced/AboutYourBellWindow.hpp"
 #include "windows/advanced/BellSettingsAdvancedWindow.hpp"
-#include "windows/advanced/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/advanced/BellSettingsLanguageWindow.hpp"
 #include "windows/advanced/BellSettingsFrontlightWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
@@ -27,6 +26,7 @@
 #include "windows/alarm_settings/BellSettingsPrewakeUpWindow.hpp"
 #include "windows/BellSettingsBedtimeToneWindow.hpp"
 #include "windows/BellSettingsHomeViewWindow.hpp"
+#include "windows/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
 #include "widgets/DialogYesNo.hpp"
 
@@ -87,15 +87,6 @@ namespace app
                               });
 
         windowsFactory.attach(
-            gui::window::name::bellSettingsTimeUnits, [](ApplicationCommon *app, const std::string &name) {
-                auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
-                auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModel>(app);
-                auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(
-                    timeUnitsProvider, std::move(temperatureUnitModel));
-                return std::make_unique<gui::BellSettingsTimeUnitsWindow>(app, std::move(presenter));
-            });
-
-        windowsFactory.attach(
             gui::window::name::bellSettingsLanguage, [&](ApplicationCommon *app, const std::string &name) {
                 auto presenter = std::make_unique<bell_settings::LanguageWindowPresenter>(this);
                 return std::make_unique<gui::BellSettingsLanguageWindow>(app, std::move(presenter), name);
@@ -122,8 +113,8 @@ namespace app
 
         windowsFactory.attach(
             gui::window::name::bellSettingsBedtimeTone, [this](ApplicationCommon *app, const std::string &name) {
-                auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app);
-                auto audioModel   = std::make_unique<AudioModel>(this);
+                auto audioModel   = std::make_unique<AudioModel>(app);
+                auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app, std::move(audioModel));
                 auto soundsRepository =
                     std::make_unique<SoundsRepository>(alarms::paths::getBedtimeReminderChimesDir());
                 auto provider = std::make_shared<bell_settings::BedtimeSettingsListItemProvider>(
@@ -131,6 +122,15 @@ namespace app
                 auto presenter = std::make_unique<bell_settings::BedtimeSettingsPresenter>(
                     provider, bedtimeModel, std::move(audioModel), std::move(soundsRepository));
                 return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app, std::move(presenter));
+            });
+
+        windowsFactory.attach(
+            gui::window::name::bellSettingsTimeUnits, [](ApplicationCommon *app, const std::string &name) {
+                auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
+                auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModel>(app);
+                auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(
+                    timeUnitsProvider, std::move(temperatureUnitModel));
+                return std::make_unique<gui::BellSettingsTimeUnitsWindow>(app, std::move(presenter));
             });
 
         windowsFactory.attach(gui::BellTurnOffOptionWindow::defaultName,

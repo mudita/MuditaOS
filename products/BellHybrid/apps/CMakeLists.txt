@@ -18,6 +18,7 @@ target_link_libraries(app
         bell::app-common
         bell::appmgr
         bell::alarms
+        bell::audio
 )
 
 add_subdirectory(application-bell-main)

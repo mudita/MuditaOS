@@ -19,7 +19,6 @@ class FileContext
     explicit FileContext(const std::filesystem::path &path,
                          std::size_t size,
                          std::size_t chunkSize,
-                         const std::string &openMode,
                          std::size_t offset = 0);
 
     virtual ~FileContext();
@@ -40,8 +39,6 @@ class FileContext
 
   protected:
     std::filesystem::path path{};
-    std::FILE *file{};
-    std::unique_ptr<char[]> streamBuffer;
     std::size_t size{};
     std::size_t offset{};
     std::size_t chunkSize{};

@@ -7,6 +7,7 @@
 
 #include <log/log.hpp>
 #include <date/date.h>
+#include <exit_backtrace.h>
 #include "crashdumpwriter_vfs.hpp"
 #include "consoledump.hpp"
 
@@ -23,9 +24,11 @@ const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions(void)
      */
     static const CrashCatcherMemoryRegion regions[] = {
         // SRAM_OC
-        {0x20200000, 0x20210000, CRASH_CATCHER_BYTE},
+        {0x20200000, 0x20210000, CRASH_CATCHER_WORD},
         // SRAM_DTC
-        {0x20000000, 0x20070000, CRASH_CATCHER_BYTE},
+        {0x20000000, 0x20070000, CRASH_CATCHER_WORD},
+        // intentionally skip text section
+        // intentionally skip the heap section
         // end tag
         {0xFFFFFFFF, 0xFFFFFFFF, CRASH_CATCHER_BYTE},
     };
@@ -57,6 +60,6 @@ void CrashCatcher_DumpMemory(const void *pvMemory, CrashCatcherElementSizes elem
 CrashCatcherReturnCodes CrashCatcher_DumpEnd(void)
 {
     cwrite.saveDump();
-    abort();
+    _exit_backtrace(-1, false);
     return CRASH_CATCHER_EXIT;
 }

@@ -3,6 +3,7 @@
 
 #include "common/options/BellOptionWindow.hpp"
 #include "common/options/OptionBellMenu.hpp"
+#include "common/options/BellOptionsNavigation.hpp"
 
 #include <messages/OptionsWindow.hpp>
 #include <TextFixedSize.hpp>
@@ -37,6 +38,11 @@ namespace gui
 
         optionsList->prepareRebuildCallback = [this]() { recreateOptions(); };
         optionsModel->createData(options);
+
+        auto storedCallback        = optionsList->inputCallback;
+        optionsList->inputCallback = [&, storedCallback](Item &item, const InputEvent &event) {
+            return storedCallback(item, invertNavigationDirection(event));
+        };
 
         setFocusItem(optionsList);
     }

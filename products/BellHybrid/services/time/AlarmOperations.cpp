@@ -9,6 +9,8 @@
 #include <db/SystemSettings.hpp>
 #include <time/dateCommon.hpp>
 
+#include <string>
+
 namespace alarms
 {
     namespace
@@ -55,19 +57,30 @@ namespace alarms
         {
           public:
             explicit BedtimeSettingsProviderImpl(sys::Service *service)
-                : bedtimeModel{std::make_unique<app::bell_bedtime::BedtimeModel>(service)}
-            {}
+                : bedtimeTimeModel{std::make_unique<app::bell_bedtime::BedtimeTimeModel>(service)}
+            {
+                settings.init(service::ServiceProxy{service->weak_from_this()});
+            }
             auto isBedtimeEnabled() -> bool override
             {
-                return bedtimeModel.get()->getBedtimeOnOff().getValue();
+                bool enabled = false;
+                try {
+                    enabled =
+                        std::stoi(settings.getValue(bell::settings::Bedtime::active, settings::SettingsScope::Global));
+                }
+                catch (const std::exception &e) {
+                    LOG_ERROR("BedtimeSettingsProviderImpl active db record not valid! err: %s", e.what());
+                }
+                return enabled;
             }
             auto getBedtimeTime() -> time_t override
             {
-                return bedtimeModel.get()->getBedtimeTime().getValue();
+                return bedtimeTimeModel->getValue();
             }
 
           private:
-            std::unique_ptr<app::bell_bedtime::BedtimeModel> bedtimeModel;
+            std::unique_ptr<app::bell_bedtime::BedtimeTimeModel> bedtimeTimeModel;
+            settings::Settings settings;
         };
     } // namespace
 

@@ -12,8 +12,9 @@
 class EventManager : public EventManagerCommon
 {
   public:
-    explicit EventManager(const std::string &name = service::name::evt_manager)
-        : EventManagerCommon(name), vibrator(std::make_unique<vibra_handle::Vibra>(this)),
+    explicit EventManager(LogDumpFunction logDumpFunction = nullptr,
+                          const std::string &name         = service::name::evt_manager)
+        : EventManagerCommon(logDumpFunction, name), vibrator(std::make_unique<vibra_handle::Vibra>(this)),
           backlightHandler(settings, this)
     {}
 

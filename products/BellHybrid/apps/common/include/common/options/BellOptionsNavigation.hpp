@@ -3,4 +3,9 @@
 
 #pragma once
 
-#define ENABLE_GSM (0)
+#include <InputEvent.hpp>
+
+namespace gui
+{
+    InputEvent invertNavigationDirection(const InputEvent &inputEvent);
+}; // namespace gui

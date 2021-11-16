@@ -107,6 +107,7 @@ namespace app::home_screen
     }
     void HomeScreenPresenter::handleAlarmModelReady()
     {
+        setStartupAlarmState();
         getView()->setAlarmTime(alarmModel->getAlarmTime());
         stateController->handleAlarmModelReady();
     }
@@ -144,5 +145,14 @@ namespace app::home_screen
     bool HomeScreenPresenter::isStartupDeepPress()
     {
         return latchPressed;
+    }
+
+    void HomeScreenPresenter::setStartupAlarmState()
+    {
+        static auto isStartup = true;
+        if (isStartup) {
+            alarmModel->activate(!latchPressed);
+            isStartup = false;
+        }
     }
 } // namespace app::home_screen
