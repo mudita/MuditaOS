@@ -149,6 +149,8 @@ namespace app::home_screen
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
         bool latchPressed = false;
 
+        void setStartupAlarmState();
+
         static constexpr auto timerName = "HS_timer";
         static constexpr auto snoozeTick = std::chrono::seconds(1);
     };
