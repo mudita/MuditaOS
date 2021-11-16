@@ -259,7 +259,7 @@ namespace gui
 
     bool BellHomeScreenWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease()) {
+        if (inputEvent.isShortRelease() || inputEvent.isLongRelease()) {
             return presenter->handleInputEvent(inputEvent);
         }
         return false;
