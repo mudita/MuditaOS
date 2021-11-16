@@ -170,7 +170,12 @@ class GitOps:
                     log.debug("prepend install dir")
                     output = Path(self.install_dir) / output
                 output.parent.mkdir(parents=True, exist_ok=True)
-                self.copy_file(cached, output)
+                if 'unpack' in val:
+                    import tarfile
+                    with tarfile.open(cached) as tar:
+                        tar.extract(output.name, path=output.parent)
+                else:
+                    self.copy_file(cached, output)
             except HTTP404NotFoundError as ex:
                 raise RuntimeError(f'file not found with: {data} err: {ex}')
             except HTTP403ForbiddenError as ex:
