@@ -19,7 +19,7 @@ namespace gui
 
         namespace time_fmt_set_list_item
         {
-            inline constexpr auto font = style::window::font::supersizemelight;
+            inline constexpr auto font = style::window::font::supersizeme;
         } // namespace time_fmt_set_list_item
 
         namespace top_text
