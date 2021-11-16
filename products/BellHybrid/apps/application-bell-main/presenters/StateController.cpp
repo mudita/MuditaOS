@@ -89,6 +89,8 @@ namespace app::home_screen
         {
             struct BackPress
             {};
+            struct LongBackPress
+            {};
             struct LightPress
             {};
             struct RotateRightPress
@@ -293,7 +295,7 @@ namespace app::home_screen
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
-                                             "Deactivated"_s + event<Events::BackPress>  / Helpers::switchToBatteryStatus,
+                                             "Deactivated"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus,
 
                                              "DeactivatedWait"_s + sml::on_entry<_> / DeactivatedWait::entry,
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
@@ -346,7 +348,7 @@ namespace app::home_screen
                                              "Activated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
                                              "Activated"_s + event<Events::DeepDownPress>  = "DeactivatedWait"_s,
                                              "Activated"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
-                                             "Activated"_s + event<Events::BackPress>  / Helpers::switchToBatteryStatus,
+                                             "Activated"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
@@ -453,7 +455,12 @@ namespace app::home_screen
         const auto key = mapKey(inputEvent.getKeyCode());
         switch (key) {
         case KeyMap::Back:
-            pimpl->sm.process_event(Events::BackPress{});
+            if (inputEvent.getState() == gui::InputEvent::State::keyReleasedLong) {
+                pimpl->sm.process_event(Events::LongBackPress{});
+            }
+            else {
+                pimpl->sm.process_event(Events::BackPress{});
+            }
             break;
         case KeyMap::LightPress:
             pimpl->sm.process_event(Events::LightPress{});
