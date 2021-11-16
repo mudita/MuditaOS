@@ -2,73 +2,74 @@
     "assets": [
         {
             "name": "./fonts/pure/dejavu_sans_bold_27.mpf",
-            "output":"assets/fonts/dejavu_sans_bold_27.mpf"
+            "output":"image/assets/fonts/dejavu_sans_bold_27.mpf"
         },
         {
             "name": "./fonts/pure/gt_pressura_regular_20.mpf",
-            "output":"assets/fonts/gt_pressura_regular_20.mpf"
+            "output":"image/assets/fonts/gt_pressura_regular_20.mpf"
         },
         {
             "name": "./fonts/pure/gt_pressura_bold_20.mpf",
-            "output":"assets/fonts/gt_pressura_bold_20.mpf"
+            "output":"image/assets/fonts/gt_pressura_bold_20.mpf"
         },
         {
             "name": "./fonts/pure/gt_pressura_regular_24.mpf",
-            "output":"assets/fonts/gt_pressura_regular_24.mpf"
+            "output":"image/assets/fonts/gt_pressura_regular_24.mpf"
         },
         {
             "name": "./fonts/pure/gt_pressura_bold_24.mpf",
-            "output":"assets/fonts/gt_pressura_bold_24.mpf"
+            "output":"image/assets/fonts/gt_pressura_bold_24.mpf"
         },
         {
             "name": "./fonts/pure/gt_pressura_light_27.mpf",
-            "output":"assets/fonts/gt_pressura_light_27.mpf"
+            "output":"image/assets/fonts/gt_pressura_light_27.mpf"
         },
         {
             "name": "./fonts/pure/gt_pressura_regular_27.mpf",
-            "output":"assets/fonts/gt_pressura_regular_27.mpf"
+            "output":"image/assets/fonts/gt_pressura_regular_27.mpf"
         },
         {
             "name": "./fonts/pure/gt_pressura_bold_27.mpf",
-            "output":"assets/fonts/gt_pressura_bold_27.mpf"
+            "output":"image/assets/fonts/gt_pressura_bold_27.mpf"
         },
         {
             "name": "./fonts/pure/gt_pressura_bold_32.mpf",
-            "output":"assets/fonts/gt_pressura_bold_32.mpf"
+            "output":"image/assets/fonts/gt_pressura_bold_32.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_light_30.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
-            "output": "assets/fonts/gt_pressura_light_30.mpf"
+            "output": "image/assets/fonts/gt_pressura_light_30.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_regular_30.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
-            "output": "assets/fonts/gt_pressura_regular_30.mpf"
+            "output": "image/assets/fonts/gt_pressura_regular_30.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_bold_30.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
-            "output": "assets/fonts/gt_pressura_bold_30.mpf"
+            "output": "image/assets/fonts/gt_pressura_bold_30.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_regular_46.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
-            "output": "assets/fonts/gt_pressura_regular_46.mpf"
+            "output": "image/assets/fonts/gt_pressura_regular_46.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_light_46.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
-            "output": "assets/fonts/gt_pressura_light_46.mpf"
+            "output": "image/assets/fonts/gt_pressura_light_46.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_light_90.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
-            "output": "assets/fonts/gt_pressura_light_90.mpf"
+            "output": "image/assets/fonts/gt_pressura_light_90.mpf"
         },
         {
-            "name": "./image/Luts.bin",
-            "output": "Luts.bin"
+            "name": "image/Luts.bin.tgz",
+            "output": "./image/Luts.bin",
+            "unpack": true
         }
     ]
 }
