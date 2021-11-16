@@ -10,10 +10,10 @@ namespace bsp
         PowerProfile bellPowerProfile;
 
         bellPowerProfile.frequencyShiftLowerThreshold      = 50;
-        bellPowerProfile.frequencyShiftUpperThreshold      = 90;
-        bellPowerProfile.maxBelowThresholdCount            = 10;
-        bellPowerProfile.maxBelowThresholdInRowCount       = 5;
-        bellPowerProfile.maxAboveThresholdCount            = 3;
+        bellPowerProfile.frequencyShiftUpperThreshold      = 80;
+        bellPowerProfile.maxBelowThresholdCount            = 5;
+        bellPowerProfile.maxBelowThresholdInRowCount       = 1;
+        bellPowerProfile.maxAboveThresholdCount            = 2;
         bellPowerProfile.minimalFrequency                  = CpuFrequencyHz::Level_0;
         bellPowerProfile.frequencyIncreaseIntermediateStep = true;
 

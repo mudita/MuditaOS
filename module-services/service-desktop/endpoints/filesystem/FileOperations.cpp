@@ -14,7 +14,7 @@ FileOperations &FileOperations::instance()
 auto FileOperations::createReceiveIDForFile(const std::filesystem::path &file) -> std::pair<transfer_id, std::size_t>
 {
     cancelTimedOutReadTransfer();
-    const auto rxID = ++runningXfrId;
+    const auto rxID = ++runningRxId;
     const auto size = std::filesystem::file_size(file);
 
     if (size == 0) {
@@ -31,11 +31,11 @@ auto FileOperations::createReceiveIDForFile(const std::filesystem::path &file) -
 
 void FileOperations::cancelTimedOutReadTransfer()
 {
-    if (!runningXfrId) {
+    if (runningRxId == 0) {
         return;
     }
 
-    auto timedOutXfer       = runningXfrId - 1;
+    auto timedOutXfer       = runningRxId.load();
     const auto fileCtxEntry = readTransfers.find(timedOutXfer);
 
     if (fileCtxEntry == readTransfers.end()) {
@@ -43,23 +43,29 @@ void FileOperations::cancelTimedOutReadTransfer()
         return;
     }
 
+    fileCtxEntry->second.reset();
+
     LOG_DEBUG("Canceling timed out rxID %u", static_cast<unsigned>(timedOutXfer));
     readTransfers.erase(timedOutXfer);
 }
 
 void FileOperations::cancelTimedOutWriteTransfer()
 {
-    if (!runningXfrId) {
+    if (runningTxId == 0) {
         return;
     }
 
-    auto timedOutXfer       = runningXfrId - 1;
+    auto timedOutXfer       = runningTxId.load();
     const auto fileCtxEntry = writeTransfers.find(timedOutXfer);
 
     if (fileCtxEntry == writeTransfers.end()) {
         LOG_DEBUG("No timed out transfers");
         return;
     }
+
+    fileCtxEntry->second->removeFile();
+
+    fileCtxEntry->second.reset();
 
     LOG_DEBUG("Canceling timed out rxID %u", static_cast<unsigned>(timedOutXfer));
     writeTransfers.erase(timedOutXfer);
@@ -165,7 +171,7 @@ auto FileOperations::createTransmitIDForFile(const std::filesystem::path &file,
                                              const std::string &Crc32) -> transfer_id
 {
     cancelTimedOutWriteTransfer();
-    const auto txID = ++runningXfrId;
+    const auto txID = ++runningTxId;
 
     LOG_DEBUG("Creating txID %u", static_cast<unsigned>(txID));
 

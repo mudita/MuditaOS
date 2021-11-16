@@ -55,7 +55,6 @@ namespace gui
         void setAlignment(const Alignment &value) override;
 
         // virtual methods from Item
-        bool onInput(const InputEvent &inputEvent) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
     };

@@ -4,11 +4,11 @@
 #include <endpoints/filesystem/FileContext.hpp>
 #include <log/log.hpp>
 #include <utility>
+#include <fstream>
 
 FileContext::FileContext(const std::filesystem::path &path,
                          std::size_t size,
                          std::size_t chunkSize,
-                         const std::string &openMode,
                          std::size_t offset)
     : path(path), size(size), offset(offset), chunkSize(chunkSize)
 {
@@ -16,28 +16,18 @@ FileContext::FileContext(const std::filesystem::path &path,
         throw std::invalid_argument("Invalid FileContext arguments");
     }
 
-    file = std::fopen(path.c_str(), openMode.c_str());
-    if (!file) {
-        throw std::runtime_error("File open error");
-    }
-
-    constexpr size_t streamBufferSize = 64 * 1024;
-    streamBuffer                      = std::make_unique<char[]>(streamBufferSize);
-    setvbuf(file, streamBuffer.get(), _IOFBF, streamBufferSize);
-
     runningCrc32Digest.reset();
 }
 
 FileContext::~FileContext()
 {
-    std::fclose(file);
 }
 
 FileReadContext::FileReadContext(const std::filesystem::path &path,
                                  std::size_t size,
                                  std::size_t chunkSize,
                                  std::size_t offset)
-    : FileContext(path, size, chunkSize, "rb", offset)
+    : FileContext(path, size, chunkSize, offset)
 {}
 
 FileReadContext::~FileReadContext()
@@ -48,7 +38,7 @@ FileWriteContext::FileWriteContext(const std::filesystem::path &path,
                                    std::size_t chunkSize,
                                    std::string crc32Digest,
                                    std::size_t offset)
-    : FileContext(path, size, chunkSize, "wb", offset), crc32Digest(std::move(crc32Digest))
+    : FileContext(path, size, chunkSize, offset), crc32Digest(std::move(crc32Digest))
 {}
 
 FileWriteContext::~FileWriteContext()
@@ -93,23 +83,30 @@ auto FileReadContext::read() -> std::vector<std::uint8_t>
 {
     LOG_DEBUG("Getting file data");
 
-    std::fseek(file, offset, SEEK_SET);
+    std::ifstream file(path, std::ios::binary);
+
+    if (!file.is_open() || file.fail()) {
+        LOG_ERROR("File %s open error", path.c_str());
+        throw std::runtime_error("File open error");
+    }
+
+    file.seekg(offset);
 
     auto dataLeft = std::min(static_cast<std::size_t>(chunkSize), (size - offset));
 
     std::vector<std::uint8_t> buffer(dataLeft);
 
-    auto dataRead = std::fread(buffer.data(), sizeof(int8_t), dataLeft, file);
+    file.read(reinterpret_cast<char *>(buffer.data()), dataLeft);
 
-    if (dataRead != dataLeft) {
+    if (file.bad()) {
         LOG_ERROR("File %s read error", path.c_str());
         throw std::runtime_error("File read error");
     }
 
-    runningCrc32Digest.add(buffer.data(), dataRead);
+    runningCrc32Digest.add(buffer.data(), dataLeft);
 
-    LOG_DEBUG("Read %u bytes", static_cast<unsigned int>(dataRead));
-    advanceFileOffset(dataRead);
+    LOG_DEBUG("Read %u bytes", static_cast<unsigned int>(dataLeft));
+    advanceFileOffset(dataLeft);
 
     if (reachedEOF()) {
         LOG_INFO("Reached EOF");
@@ -122,22 +119,30 @@ auto FileWriteContext::write(const std::vector<std::uint8_t> &data) -> void
 {
     LOG_DEBUG("Sending file data");
 
-    std::fseek(file, offset, SEEK_SET);
+    std::ofstream file(path, std::ios::binary | std::ios::app);
+
+    if (!file.is_open() || file.fail()) {
+        LOG_ERROR("File %s open error", path.c_str());
+        throw std::runtime_error("File open error");
+    }
+
+    file.seekp(offset);
 
     auto dataLeft = std::min(static_cast<std::size_t>(chunkSize), (size - offset));
 
-    auto dataWritten = std::fwrite(reinterpret_cast<const char *>(data.data()), sizeof(int8_t), dataLeft, file);
+    file.write(reinterpret_cast<const char *>(data.data()), dataLeft);
+    file.flush();
 
-    if (dataWritten != dataLeft) {
+    if (file.bad()) {
         LOG_ERROR("File %s write error", path.c_str());
         throw std::runtime_error("File write error");
     }
 
-    runningCrc32Digest.add(data.data(), dataWritten);
+    runningCrc32Digest.add(data.data(), dataLeft);
 
-    LOG_DEBUG("Written %u bytes", static_cast<unsigned int>(dataWritten));
+    LOG_DEBUG("Written %u bytes", static_cast<unsigned int>(dataLeft));
 
-    advanceFileOffset(dataWritten);
+    advanceFileOffset(dataLeft);
 
     if (reachedEOF()) {
         LOG_INFO("Reached EOF of %s", path.c_str());
@@ -152,5 +157,6 @@ auto FileWriteContext::crc32Matches() const -> bool
 
 auto FileWriteContext::removeFile() -> void
 {
-    std::filesystem::remove(path);
+    std::error_code ec;
+    std::filesystem::remove(path, ec);
 }

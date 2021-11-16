@@ -17,6 +17,7 @@ target_compile_options(BellHybrid
 
 target_sources(BellHybrid
     PRIVATE
+        ${TARGET_SOURCES}
         BellHybridMain.cpp
         PlatformFactory.cpp
         EinkSentinelBell.cpp
@@ -51,6 +52,7 @@ target_link_libraries(BellHybrid
         bell::audio
         bell::evtmgr
         log
+        logdump
         messagetype
         module-bsp
         module-vfs
@@ -101,3 +103,6 @@ add_subdirectory(apps)
 add_subdirectory(keymap)
 add_subdirectory(services)
 add_subdirectory(sys)
+
+option(CONFIG_ENABLE_TEMP "Enable displaying temperature" OFF)
+configure_file(config/ProductConfig.in.hpp ${CMAKE_BINARY_DIR}/ProductConfig.hpp  @ONLY)

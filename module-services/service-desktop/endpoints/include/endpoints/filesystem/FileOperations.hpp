@@ -23,7 +23,8 @@ class FileOperations
     std::map<transfer_id, std::unique_ptr<FileReadContext>> readTransfers;
     std::map<transfer_id, std::unique_ptr<FileWriteContext>> writeTransfers;
 
-    std::atomic<transfer_id> runningXfrId{0};
+    std::atomic<transfer_id> runningRxId{0};
+    std::atomic<transfer_id> runningTxId{0};
 
     auto createFileReadContextFor(const std::filesystem::path &file, std::size_t fileSize, transfer_id xfrId) -> void;
 

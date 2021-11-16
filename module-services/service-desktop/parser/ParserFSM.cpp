@@ -7,19 +7,32 @@
 #include <memory>
 #include <string>
 
+#include <Timers/TimerFactory.hpp>
 #include "MessageHandler.hpp"
 #include <endpoints/EndpointFactory.hpp>
 #include <endpoints/message/Common.hpp>
 
+namespace
+{
+    constexpr auto receiveMsgTimerDelayMs = std::chrono::milliseconds{1000 * 5};
+    constexpr auto parserTimerName        = "parserTimer";
+
+} // namespace
+
 namespace sdesktop::endpoints
 {
 
-    StateMachine::StateMachine(sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
+    StateMachine::StateMachine(sys::Service *OwnerService)
+        : OwnerServicePtr(OwnerService),
+          parserTimer{sys::TimerFactory::createSingleShotTimer(
+              OwnerService, parserTimerName, receiveMsgTimerDelayMs, [this](sys::Timer & /*timer*/) { resetParser(); })}
     {}
 
     void StateMachine::processMessage(std::string &&msg)
     {
         receivedMsg = std::move(msg);
+
+        restartTimer();
 
         switch (state) {
         case State::NoMsg:
@@ -37,6 +50,21 @@ namespace sdesktop::endpoints
         }
     }
 
+    void StateMachine::resetParser()
+    {
+        payload.clear();
+        header.clear();
+        payloadLength = 0;
+
+        setState(State::NoMsg);
+        LOG_DEBUG("Parser state reset");
+    }
+
+    void StateMachine::restartTimer()
+    {
+        parserTimer.restart(receiveMsgTimerDelayMs);
+    }
+
     void StateMachine::parseHeader()
     {
         payload.clear();
@@ -51,7 +79,7 @@ namespace sdesktop::endpoints
 
         if (receivedMsg.size() < message::size_header) // header divided in few parts
         {
-            state = State::ReceivedPartialHeader;
+            setState(State::ReceivedPartialHeader);
             header.append(receivedMsg); // append to whole header string
             return;
         }
@@ -61,7 +89,7 @@ namespace sdesktop::endpoints
         if (payloadLength == 0) // failed to obtain payload length from msg
         {
             LOG_ERROR("Damaged header!");
-            state = State::NoMsg;
+            setState(State::NoMsg);
             return;
         }
 
@@ -109,7 +137,7 @@ namespace sdesktop::endpoints
         else // message divided in 2 or more packets
         {
             payload = receivedMsg.substr(0, std::string::npos); // take rest of the message
-            state   = State::ReceivedPartialPayload;
+            setState(State::ReceivedPartialPayload);
         }
     }
 
@@ -139,20 +167,21 @@ namespace sdesktop::endpoints
     {
         if (payload.empty()) {
             LOG_ERROR("Empty payload!");
-            state = State::NoMsg;
+            setState(State::NoMsg);
             return;
         }
 
         messageHandler->parseMessage(payload);
 
         if (!messageHandler->isValid() || messageHandler->isJSONNull()) {
-            LOG_DEBUG("Error parsing JSON");
-            state = State::NoMsg;
+            LOG_ERROR("Error parsing JSON");
+            setState(State::NoMsg);
             return;
         }
 
         messageHandler->processMessage();
-        state = State::NoMsg;
+        setState(State::NoMsg);
+        parserTimer.stop();
     }
 
     void StateMachine::setMessageHandler(std::unique_ptr<MessageHandler> handler)

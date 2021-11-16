@@ -3,7 +3,7 @@
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
 #include "BellSettingsStyle.hpp"
-#include "windows/advanced/BellSettingsTimeUnitsWindow.hpp"
+#include "windows/BellSettingsTimeUnitsWindow.hpp"
 
 #include <gui/input/InputEvent.hpp>
 #include <apps-common/options/OptionStyle.hpp>
@@ -24,7 +24,7 @@ namespace gui
         finishedCallback = [this]() {
             application->switchWindow(
                 window::bell_finished::defaultName,
-                BellFinishedWindowData::Factory::create("circle_success_big", gui::window::name::bellSettingsAdvanced));
+                BellFinishedWindowData::Factory::create("circle_success_big", gui::name::window::main_window));
         };
     }
 
