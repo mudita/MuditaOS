@@ -34,7 +34,7 @@ namespace bsp::bell_switches
     constexpr std::chrono::milliseconds contactOscillationTimeout{30ms};
     constexpr std::chrono::milliseconds centerKeyPressValidationTimeout{30ms};
 
-    enum class DebounceTimerId : unsigned int
+    enum class KeyId : unsigned int
     {
         leftSideSwitch = 0,
         rightSideSwitch,
@@ -48,11 +48,10 @@ namespace bsp::bell_switches
 
     struct DebounceTimerState
     {
-        const DebounceTimerId id{DebounceTimerId::Invalid};
-        const NotificationSource notificationSource{NotificationSource::Invalid};
+        const KeyId id{KeyId::Invalid};
         const std::shared_ptr<drivers::DriverGPIO> gpio;
         const BoardDefinitions pin{-1};
-        KeyEvents lastState{KeyEvents::Pressed};
+        volatile KeyEvents lastState{KeyEvents::Pressed};
         TimerHandle_t timer{nullptr};
 
         void createTimer(TimerCallback callback, const std::chrono::milliseconds timeout)
@@ -71,18 +70,19 @@ namespace bsp::bell_switches
         bool changeFlag = false;
 
       public:
-        void setPressed()
+        static constexpr bool NO_STATE_CHANGE_INDICATION{false};
+        void setPressed(bool changed = true)
         {
             cpp_freertos::LockGuard lock(latchFlagMutex);
             pressed    = true;
-            changeFlag = true;
+            changeFlag = changed;
         }
 
-        void setReleased()
+        void setReleased(bool changed = true)
         {
             cpp_freertos::LockGuard lock(latchFlagMutex);
             pressed    = false;
-            changeFlag = true;
+            changeFlag = changed;
         }
 
         bool isPressed()
@@ -105,11 +105,59 @@ namespace bsp::bell_switches
 
     } latchEventFlag;
 
-    static std::map<DebounceTimerId, DebounceTimerState> debounceTimers;
+    static std::map<KeyId, DebounceTimerState> debounceTimers;
 
     static xQueueHandle qHandleIrq{};
     std::shared_ptr<DriverGPIO> gpio_sw;
     std::shared_ptr<DriverGPIO> gpio_wakeup;
+
+    NotificationSource getNotificationSource(KeyId keyId, KeyEvents state)
+    {
+        auto val = NotificationSource::Invalid;
+        if (state == KeyEvents::Released) {
+            switch (keyId) {
+            case KeyId::leftSideSwitch:
+                val = NotificationSource::leftSideKeyRelease;
+                break;
+            case KeyId::rightSideSwitch:
+                val = NotificationSource::rightSideKeyRelease;
+                break;
+            case KeyId::lightCenterSwitch:
+                val = NotificationSource::lightCenterKeyRelease;
+                break;
+            case KeyId::latchSwitch:
+                val = NotificationSource::latchKeyRelease;
+                break;
+            case KeyId::wakeup:
+                val = NotificationSource::wakeupEventRelease;
+                break;
+            default:
+                break;
+            }
+        }
+        else {
+            switch (keyId) {
+            case KeyId::leftSideSwitch:
+                val = NotificationSource::leftSideKeyPress;
+                break;
+            case KeyId::rightSideSwitch:
+                val = NotificationSource::rightSideKeyPress;
+                break;
+            case KeyId::lightCenterSwitch:
+                val = NotificationSource::lightCenterKeyPress;
+                break;
+            case KeyId::latchSwitch:
+                val = NotificationSource::latchKeyPress;
+                break;
+            case KeyId::wakeup:
+                val = NotificationSource::wakeupEvent;
+                break;
+            default:
+                break;
+            }
+        }
+        return val;
+    }
 
     void debounceTimerCallback(TimerHandle_t timerHandle)
     {
@@ -119,43 +167,17 @@ namespace bsp::bell_switches
 
         auto currentState = timerState->gpio->ReadPin(static_cast<uint32_t>(timerState->pin)) ? KeyEvents::Released
                                                                                               : KeyEvents::Pressed;
-
         if (currentState == timerState->lastState && qHandleIrq != nullptr) {
-            if (currentState == KeyEvents::Pressed) {
-                if (timerState->notificationSource == NotificationSource::latchKeyPress) {
+            if (timerState->id == KeyId::latchSwitch) {
+                if (currentState == KeyEvents::Pressed) {
                     latchEventFlag.setPressed();
                 }
-                auto val = static_cast<std::uint16_t>(timerState->notificationSource);
-                xQueueSend(qHandleIrq, &val, 0);
-                timerState->lastState = KeyEvents::Released;
-            }
-            else {
-                if (timerState->notificationSource == NotificationSource::latchKeyPress) {
+                else {
                     latchEventFlag.setReleased();
                 }
-                auto val = NotificationSource::Invalid;
-                switch (timerState->notificationSource) {
-                case NotificationSource::leftSideKeyPress:
-                    val = NotificationSource::leftSideKeyRelease;
-                    break;
-                case NotificationSource::rightSideKeyPress:
-                    val = NotificationSource::rightSideKeyRelease;
-                    break;
-                case NotificationSource::lightCenterKeyPress:
-                    val = NotificationSource::lightCenterKeyRelease;
-                    break;
-                case NotificationSource::latchKeyPress:
-                    val = NotificationSource::latchKeyRelease;
-                    break;
-                case NotificationSource::wakeupEvent:
-                    val = NotificationSource::wakeupEventRelease;
-                    break;
-                default:
-                    break;
-                }
-                xQueueSend(qHandleIrq, &val, 0);
-                timerState->lastState = KeyEvents::Pressed;
             }
+            auto val = static_cast<std::uint16_t>(getNotificationSource(timerState->id, currentState));
+            xQueueSend(qHandleIrq, &val, 0);
         }
 
         timerState->gpio->EnableInterrupt(1U << static_cast<uint32_t>(timerState->pin));
@@ -172,7 +194,7 @@ namespace bsp::bell_switches
                 latchEventFlag.clearChangedMark();
             }
             else {
-                auto val = static_cast<std::uint16_t>(timerState->notificationSource);
+                auto val = static_cast<std::uint16_t>(getNotificationSource(timerState->id, KeyEvents::Released));
                 xQueueSend(qHandleIrq, &val, 0);
             }
         }
@@ -192,21 +214,26 @@ namespace bsp::bell_switches
         debounceTimers.insert({timerState.id, timerState});
         DebounceTimerState &state = debounceTimers.find(timerState.id)->second;
 
-        if (timerState.notificationSource == NotificationSource::lightCenterKeyPress) {
+        if (timerState.id == KeyId::lightCenterSwitch) {
             state.createTimer(debounceTimerCenterClickCallback, centerKeyPressValidationTimeout);
-        }
-        else if (timerState.notificationSource == NotificationSource::latchKeyPress) {
-            state.createTimer(debounceTimerCallback, contactOscillationTimeout);
-            state.lastState = getLatchState();
-            if (state.lastState == KeyEvents::Released) {
-                latchEventFlag.setReleased();
-            }
-            else {
-                latchEventFlag.setPressed();
-            }
         }
         else {
             state.createTimer(debounceTimerCallback, contactOscillationTimeout);
+        }
+    }
+
+    void addLatchDebounceTimer(DebounceTimerState timerState)
+    {
+        debounceTimers.insert({timerState.id, timerState});
+        DebounceTimerState &state = debounceTimers.find(timerState.id)->second;
+
+        state.createTimer(debounceTimerCallback, contactOscillationTimeout);
+        state.lastState = getLatchState();
+        if (state.lastState == KeyEvents::Released) {
+            latchEventFlag.setReleased(LatchEventFlag::NO_STATE_CHANGE_INDICATION);
+        }
+        else {
+            latchEventFlag.setPressed(LatchEventFlag::NO_STATE_CHANGE_INDICATION);
         }
     }
 
@@ -240,33 +267,20 @@ namespace bsp::bell_switches
         configureSwitch(BoardDefinitions::BELL_SWITCHES_CENTER, DriverGPIOPinParams::InterruptMode::IntRisingEdge);
         configureSwitch(BoardDefinitions::BELL_WAKEUP, DriverGPIOPinParams::InterruptMode::IntFallingEdge);
 
-        addDebounceTimer(DebounceTimerState{DebounceTimerId::leftSideSwitch,
-                                            NotificationSource::leftSideKeyPress,
-                                            gpio_sw,
-                                            BoardDefinitions::BELL_SWITCHES_LEFT});
-        addDebounceTimer(DebounceTimerState{DebounceTimerId::rightSideSwitch,
-                                            NotificationSource::rightSideKeyPress,
-                                            gpio_sw,
-                                            BoardDefinitions::BELL_SWITCHES_RIGHT});
-        addDebounceTimer(DebounceTimerState{DebounceTimerId::lightCenterSwitch,
-                                            NotificationSource::lightCenterKeyPress,
-                                            gpio_sw,
-                                            BoardDefinitions::BELL_SWITCHES_CENTER});
-        addDebounceTimer(DebounceTimerState{DebounceTimerId::latchSwitch,
-                                            NotificationSource::latchKeyPress,
-                                            gpio_sw,
-                                            BoardDefinitions::BELL_SWITCHES_LATCH,
-                                            KeyEvents::Released});
-        addDebounceTimer(DebounceTimerState{
-            DebounceTimerId::wakeup, NotificationSource::wakeupEvent, gpio_wakeup, BoardDefinitions::BELL_WAKEUP});
+        addDebounceTimer(DebounceTimerState{KeyId::leftSideSwitch, gpio_sw, BoardDefinitions::BELL_SWITCHES_LEFT});
+        addDebounceTimer(DebounceTimerState{KeyId::rightSideSwitch, gpio_sw, BoardDefinitions::BELL_SWITCHES_RIGHT});
+        addDebounceTimer(DebounceTimerState{KeyId::lightCenterSwitch, gpio_sw, BoardDefinitions::BELL_SWITCHES_CENTER});
+        addLatchDebounceTimer(DebounceTimerState{
+            KeyId::latchSwitch, gpio_sw, BoardDefinitions::BELL_SWITCHES_LATCH, KeyEvents::Released});
+        addDebounceTimer(DebounceTimerState{KeyId::wakeup, gpio_wakeup, BoardDefinitions::BELL_WAKEUP});
 
         if (getLatchState() == KeyEvents::Pressed) {
-            latchEventFlag.setPressed();
-            auto timerState = static_cast<DebounceTimerState *>(
-                pvTimerGetTimerID(debounceTimers[DebounceTimerId::latchSwitch].timer));
+            latchEventFlag.setPressed(LatchEventFlag::NO_STATE_CHANGE_INDICATION);
+            auto timerState =
+                static_cast<DebounceTimerState *>(pvTimerGetTimerID(debounceTimers[KeyId::latchSwitch].timer));
             timerState->lastState = KeyEvents::Released;
         }
-
+        clearStartupLatchInterrupt();
         enableIRQ();
 
         return kStatus_Success;
@@ -288,13 +302,14 @@ namespace bsp::bell_switches
         return kStatus_Success;
     }
 
-    void getDebounceTimer(BaseType_t xHigherPriorityTaskWoken, DebounceTimerId timerId)
+    void getDebounceTimer(BaseType_t xHigherPriorityTaskWoken, KeyId timerId)
     {
         if (debounceTimers.find(timerId) == debounceTimers.end()) {
             LOG_ERROR("Could not find debouncer timer for: %s", magic_enum::enum_name(timerId).data());
             return;
         }
-        auto debounceTimerState = debounceTimers.at(timerId);
+        DebounceTimerState &debounceTimerState = debounceTimers.at(timerId);
+        auto temp                              = &debounceTimerState;
         debounceTimerState.gpio->DisableInterrupt(1U << static_cast<uint32_t>(debounceTimerState.pin));
         debounceTimerState.lastState = debounceTimerState.gpio->ReadPin(static_cast<uint32_t>(debounceTimerState.pin))
                                            ? KeyEvents::Released
@@ -307,21 +322,21 @@ namespace bsp::bell_switches
     BaseType_t IRQHandler(uint32_t mask)
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        auto timerId                        = DebounceTimerId::Invalid;
+        auto timerId                        = KeyId::Invalid;
 
         gpio_sw->ClearPortInterrupts(1U << mask);
 
         if (mask & (1 << magic_enum::enum_integer(BoardDefinitions::BELL_SWITCHES_LEFT))) {
-            timerId = DebounceTimerId::leftSideSwitch;
+            timerId = KeyId::leftSideSwitch;
         }
         else if (mask & (1 << magic_enum::enum_integer(BoardDefinitions::BELL_SWITCHES_RIGHT))) {
-            timerId = DebounceTimerId::rightSideSwitch;
+            timerId = KeyId::rightSideSwitch;
         }
         else if (mask & (1 << magic_enum::enum_integer(BoardDefinitions::BELL_SWITCHES_CENTER))) {
-            timerId = DebounceTimerId::lightCenterSwitch;
+            timerId = KeyId::lightCenterSwitch;
         }
         else if (mask & (1 << magic_enum::enum_integer(BoardDefinitions::BELL_SWITCHES_LATCH))) {
-            timerId = DebounceTimerId::latchSwitch;
+            timerId = KeyId::latchSwitch;
         }
 
         getDebounceTimer(xHigherPriorityTaskWoken, timerId);
@@ -334,7 +349,7 @@ namespace bsp::bell_switches
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         gpio_wakeup->ClearPortInterrupts(1U << static_cast<uint32_t>(BoardDefinitions::BELL_WAKEUP));
 
-        getDebounceTimer(xHigherPriorityTaskWoken, DebounceTimerId::wakeup);
+        getDebounceTimer(xHigherPriorityTaskWoken, KeyId::wakeup);
 
         return xHigherPriorityTaskWoken;
     }
@@ -424,6 +439,12 @@ namespace bsp::bell_switches
     bool isLatchPressed()
     {
         return latchEventFlag.isPressed();
+    }
+
+    void clearStartupLatchInterrupt()
+    {
+        // Knob sets up interrupt on startup because of hw design
+        gpio_sw->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
     }
 
 } // namespace bsp::bell_switches
