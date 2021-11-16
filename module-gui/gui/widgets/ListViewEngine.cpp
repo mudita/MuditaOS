@@ -279,7 +279,7 @@ namespace gui
         // Orientations.
         if (orientation == listview::Orientation::TopBottom && direction == listview::Direction::Top &&
             startIndex == 0) {
-            if (body->getPrimarySizeLeft() > provider->getMinimalItemSpaceRequired()) {
+            if (body->getPrimarySizeLeft() >= provider->getMinimalItemSpaceRequired()) {
                 focusOnLastItem = true;
 
                 if (checkFullRenderRequirementCallback) {
@@ -291,7 +291,7 @@ namespace gui
 
         if (orientation == listview::Orientation::BottomTop && direction == listview::Direction::Bottom &&
             startIndex + currentPageSize == elementsCount) {
-            if (body->getPrimarySizeLeft() > provider->getMinimalItemSpaceRequired()) {
+            if (body->getPrimarySizeLeft() >= provider->getMinimalItemSpaceRequired()) {
                 focusOnLastItem = true;
 
                 if (checkFullRenderRequirementCallback) {

@@ -22,12 +22,6 @@ namespace gui
         buildInterface();
     }
 
-    void MusicPlayerAllSongsWindow::rebuild()
-    {
-        destroyInterface();
-        buildInterface();
-    }
-
     void MusicPlayerAllSongsWindow::buildInterface()
     {
         presenter->attach(this);
@@ -63,16 +57,10 @@ namespace gui
         setFocusItem(songsList);
     }
 
-    void MusicPlayerAllSongsWindow::destroyInterface()
-    {
-        erase();
-    }
-
     void MusicPlayerAllSongsWindow::onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
         presenter->attach(this);
         presenter->createData();
-        songsList->rebuildList(listview::RebuildType::OnPageElement);
     }
 
     void MusicPlayerAllSongsWindow::updateSongsState(std::optional<db::multimedia_files::MultimediaFilesRecord> record,
