@@ -27,7 +27,7 @@ pipeline {
         parallelsAlwaysFailFast()
     }
     environment {
-        JOBS=15
+        JOBS=30
         PATH="/usr/local/cmake-3.21.3-linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
     }
 
@@ -90,7 +90,7 @@ pipeline {
             }
         stage('Build RT1051') {
             environment {
-                CCACHE_DIR="/ccache/RT1051"
+                CCACHE_DIR="/ccache/"
                 XDG_CACHE_HOME="/clang-cache"
             }
             steps {
@@ -106,10 +106,10 @@ pipeline {
                 popd'''
 
                 sh '''#!/bin/bash -e
-                export JOBS=${JOBS:-6}
-                export CCACHE_DIR=/ccache/RT1051
-
+                export JOBS=${JOBS}
+                export CCACHE_DIR=/ccache/
                 echo "JOBS=${JOBS}"
+
                 echo "cmake path=$(which cmake)"
                 echo "\'workspace dir:${WORKSPACE}\'"
 
@@ -141,14 +141,14 @@ pipeline {
                 popd'''
                 echo "CCache stats"
                 sh '''#!/bin/bash
-                export CCACHE_DIR=/ccache/RT1051
+                export CCACHE_DIR=/ccache/
                 ccache --show-stats'''
                 }
         }
 
         stage('Build Linux - Pure') {
             environment {
-                CCACHE_DIR="/ccache/Linux"
+                CCACHE_DIR="/ccache/"
                 XDG_CACHE_HOME="/clang-cache"
 
             }
@@ -204,7 +204,7 @@ pipeline {
 
                 echo "CCache stats"
                 sh '''#!/bin/bash
-                export CCACHE_DIR=/ccache/Linux
+                export CCACHE_DIR=/ccache/
                 ccache --show-stats'''
 
                 echo "Check for Statics"
@@ -215,7 +215,7 @@ pipeline {
 
                 echo "Run Unit Tests"
                 sh '''#!/bin/bash -e
-                export JOBS=${JOBS:-6}
+                export JOBS=${JOBS}
                 echo "JOBS=${JOBS}"
 
                 pushd "${WORKSPACE}"
@@ -237,7 +237,7 @@ pipeline {
 
         stage('Build Linux - Bell') {
             environment {
-                CCACHE_DIR="/ccache/Linux"
+                CCACHE_DIR="/ccache/"
                 XDG_CACHE_HOME="/clang-cache"
             }
             when {
@@ -296,7 +296,7 @@ pipeline {
 
                 echo "CCache stats"
                 sh '''#!/bin/bash
-                export CCACHE_DIR=/ccache/Linux
+                export CCACHE_DIR=/ccache/
                 ccache --show-stats'''
 
                 echo "Check for Statics"
@@ -307,7 +307,7 @@ pipeline {
 
                 echo "Run Unit Tests"
                 sh '''#!/bin/bash -e
-                export JOBS=${JOBS:-6}
+                export JOBS=${JOBS}
                 echo "JOBS=${JOBS}"
                 pushd "${WORKSPACE}"
 
