@@ -74,27 +74,23 @@ namespace app::bell_settings
 
     void TimeUnitsModel::saveData()
     {
-        const auto now     = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        const auto newTime = std::localtime(&now);
-        newTime->tm_hour   = timeSetListItem->timeSetFmtSpinner->getHour();
-        newTime->tm_min    = timeSetListItem->timeSetFmtSpinner->getMinute();
+        const auto newTime = timeSetListItem->timeSetFmtSpinner->getTime();
+        const auto time_tm = std::localtime(&newTime);
         const auto newFmt  = timeFmtSetListItem->getTimeFmt();
         LOG_INFO("Setting new time: %d:%d fmt: %s",
-                 newTime->tm_hour,
-                 newTime->tm_min,
+                 time_tm->tm_hour,
+                 time_tm->tm_min,
                  utils::time::Locale::format(newFmt).c_str());
-        sendRtcUpdateTimeMessage(std::mktime(newTime));
+        sendRtcUpdateTimeMessage(newTime);
         sendTimeFmtUpdateMessage(newFmt);
     }
 
     void TimeUnitsModel::loadData()
     {
         const auto now        = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        const auto time       = std::localtime(&now);
         const auto timeFormat = stm::api::timeFormat();
-        timeSetListItem->timeSetFmtSpinner->setHour(time->tm_hour);
-        timeSetListItem->timeSetFmtSpinner->setMinute(time->tm_min);
         timeSetListItem->timeSetFmtSpinner->setTimeFormat(timeFormat);
+        timeSetListItem->timeSetFmtSpinner->setTime(now);
         timeFmtSetListItem->setTimeFmt(timeFormat);
     }
 
