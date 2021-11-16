@@ -172,6 +172,8 @@ namespace app
     {
         auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
 
+        informationPromptTimer.stop();
+
         auto selectedWindowCondition =
             getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow &&
             msg->getWindowName() == getPrevWindow() &&
@@ -181,6 +183,10 @@ namespace app
 
             informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
             displayInformation(msg->getWindowName());
+            informationState = OnBoarding::InformationStates::RotateInfo;
+        }
+
+        if (msg->getSenderWindowName() != gui::window::name::informationOnBoardingWindow) {
             informationState = OnBoarding::InformationStates::RotateInfo;
         }
     }
