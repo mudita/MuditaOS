@@ -18,6 +18,14 @@ extern "C" {
 void __attribute__((noreturn, used)) _exit_backtrace(int code, bool bt_dump);
 
 
+/** This is a standard function @see exit which stop the system
+ * and optionaly takes a backtrace
+ * @param[in] code Standard terminate exit code
+ * @note Function never returns and dump backtrace when code is not equal EXIT_SUCCESS
+ */
+void __attribute__((noreturn, used)) _exit(int code);
+
+
 /** This is internal backtrce function
  * @note In never shouldn't to be called directly in the user code
  */

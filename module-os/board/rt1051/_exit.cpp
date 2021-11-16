@@ -38,10 +38,18 @@
 #include <stdbool.h>
 #include <string.h>
 #include <exit_backtrace.h>
+#include <purefs/vfs_subsystem.hpp>
 
 
 static void __attribute__((noreturn)) stop_system(void)
 {
+    const auto err = purefs::subsystem::unmount_all();
+    if(err) {
+        LOG_WARN("Unable unmount all filesystems with error: %i.", err);
+    } else {
+        LOG_INFO("Filesystems unmounted successfully...");
+    }
+    LOG_INFO("Restarting the system...");
     haltIfDebugging();
     vTaskEndScheduler();
     NVIC_SystemReset();
