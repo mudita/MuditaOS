@@ -19,9 +19,7 @@ namespace gui
 
         void onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data) override;
 
-        void rebuild() override;
         void buildInterface() override;
-        void destroyInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
 
         void updateSongsState(std::optional<db::multimedia_files::MultimediaFilesRecord> record,
