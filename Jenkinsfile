@@ -19,7 +19,7 @@ pipeline {
     agent {
         node {
         label 'jenkins-slave-ccache-ram'
-        customWorkspace "/home/jenkins/workspace/${JOB_NAME}/${BUILD_NUMBER}"
+        customWorkspace "/home/jenkins/workspace/MuditaOS"
         }
     }
     options{
