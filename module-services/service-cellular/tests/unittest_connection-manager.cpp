@@ -20,6 +20,7 @@ class MockCellular : public ConnectionManagerCellularCommandsInterface
     MOCK_METHOD(bool, isConnectionTimerActive, (), (override));
     MOCK_METHOD(void, startConnectionTimer, (), (override));
     MOCK_METHOD(void, stopConnectionTimer, (), (override));
+    MOCK_METHOD(void, holdMinimumCpuFrequency, (), (override));
 };
 
 TEST(ConnectionManager, onPhoneModeChange)

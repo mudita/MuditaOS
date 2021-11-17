@@ -316,6 +316,7 @@ class ServiceCellular : public sys::Service
   private:
     std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;
     cellular::internal::SimpleCallManager callManager;
+    TaskHandle_t getTaskHandle();
 };
 
 namespace sys
