@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Application.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 
 namespace gui::window::name
@@ -26,6 +27,9 @@ namespace app
 
     class ApplicationBellSettings : public Application
     {
+      private:
+        std::unique_ptr<AbstractAudioModel> audioModel;
+
       public:
         ApplicationBellSettings(std::string name                    = applicationBellSettingsName,
                                 std::string parent                  = "",

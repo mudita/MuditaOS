@@ -25,10 +25,10 @@ namespace app::powernap
     PowerNapProgressPresenter::PowerNapProgressPresenter(app::ApplicationCommon *app,
                                                          settings::Settings *settings,
                                                          std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                                                         std::unique_ptr<AbstractAudioModel> audioModel,
+                                                         AbstractAudioModel &audioModel,
                                                          std::unique_ptr<AbstractTimeModel> timeModel)
         : app{app}, settings{settings}, soundsRepository{std::move(soundsRepository)},
-          audioModel{std::move(audioModel)}, timeModel{std::move(timeModel)},
+          audioModel{audioModel}, timeModel{std::move(timeModel)},
           napAlarmTimer{sys::TimerFactory::createSingleShotTimer(
               app, powernapAlarmTimerName, powernapAlarmTimeout, [this](sys::Timer &) { onNapAlarmFinished(); })}
 
@@ -60,13 +60,13 @@ namespace app::powernap
         const auto filePath = soundsRepository->titleToPath(
             settings->getValue(bell::settings::Alarm::tone, settings::SettingsScope::Global));
 
-        audioModel->play(filePath.value_or(""), AbstractAudioModel::PlaybackType::Alarm, {});
+        audioModel.play(filePath.value_or(""), AbstractAudioModel::PlaybackType::Alarm, {});
         napAlarmTimer.start();
         napFinished = true;
     }
     void PowerNapProgressPresenter::onNapAlarmFinished()
     {
-        audioModel->stop({});
+        audioModel.stop({});
         getView()->napEnded();
     }
 

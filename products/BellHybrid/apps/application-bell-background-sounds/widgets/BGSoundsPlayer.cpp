@@ -6,13 +6,6 @@
 
 namespace app::bgSounds
 {
-    auto BGSoundsPlayer::handle(service::AudioEOFNotification *msg) -> std::shared_ptr<sys::Message>
-    {
-        if (playbackMode == PlaybackMode::Looped) {
-            audioModel.play(recentFilePath, AbstractAudioModel::PlaybackType::Multimedia, {});
-        }
-        return sys::msgHandled();
-    }
     AbstractBGSoundsPlayer::PlaybackMode BGSoundsPlayer::getCurrentMode() const noexcept
     {
         return playbackMode;
@@ -26,6 +19,11 @@ namespace app::bgSounds
         recentFilePath = filePath;
         playbackMode   = mode;
         audioModel.play(filePath, AbstractAudioModel::PlaybackType::Multimedia, std::move(callback));
+        audioModel.setPlaybackFinishedCb([&]() {
+            if (playbackMode == PlaybackMode::Looped) {
+                audioModel.play(recentFilePath, AbstractAudioModel::PlaybackType::Multimedia, {});
+            }
+        });
     }
     void BGSoundsPlayer::stop(AbstractAudioModel::OnStateChangeCallback &&callback)
     {

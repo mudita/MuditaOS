@@ -55,9 +55,25 @@ namespace app
 {
 
     AudioModel::AudioModel(ApplicationCommon *app) : app::AsyncCallbackReceiver{app}, app{app}
-    {}
+    {
+        app->connect(typeid(service::AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            playbackFinishedFlag = true;
+            if (playbackFinishedCallback) {
+                playbackFinishedCallback();
+            }
+
+            return sys::msgHandled();
+        });
+    }
+
+    AudioModel::~AudioModel()
+    {
+        app->disconnect(typeid(service::AudioEOFNotification));
+    }
+
     void AudioModel::play(const std::string &filePath, PlaybackType type, OnStateChangeCallback &&callback)
     {
+        playbackFinishedFlag = false;
         auto msg  = std::make_unique<service::AudioStartPlaybackRequest>(filePath, convertPlaybackType(type));
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
         auto cb   = [_callback = callback](auto response) {
@@ -176,4 +192,15 @@ namespace app
 
         return {};
     }
+
+    void AudioModel::setPlaybackFinishedCb(OnPlaybackFinishedCallback &&callback)
+    {
+        playbackFinishedCallback = callback;
+    }
+
+    bool AudioModel::hasPlaybackFinished()
+    {
+        return playbackFinishedFlag;
+    }
+
 } // namespace app

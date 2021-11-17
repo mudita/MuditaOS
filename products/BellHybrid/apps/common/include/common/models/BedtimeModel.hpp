@@ -65,12 +65,12 @@ namespace app::bell_bedtime
       public:
         BedtimeModel() = delete;
 
-        explicit BedtimeModel(ApplicationCommon *app, std::unique_ptr<AudioModel> &&audioModel)
+        explicit BedtimeModel(ApplicationCommon *app, AbstractAudioModel &audioModel)
         {
             bedtimeOnOff  = std::make_unique<bell_bedtime::BedtimeOnOffModel>(app);
             bedtimeTime   = std::make_unique<bell_bedtime::BedtimeTimeModel>(app);
             bedtimeTone   = std::make_unique<bell_bedtime::AlarmToneModel>(app);
-            bedtimeVolume = std::make_unique<bell_bedtime::BedtimeVolumeModel>(*audioModel);
+            bedtimeVolume = std::make_unique<bell_bedtime::BedtimeVolumeModel>(audioModel);
         }
         gui::AbstractSettingsModel<bool> &getBedtimeOnOff() override
         {
@@ -92,7 +92,6 @@ namespace app::bell_bedtime
         }
 
       private:
-        std::unique_ptr<AudioModel> audioModel;
         std::unique_ptr<gui::AbstractSettingsModel<bool>> bedtimeOnOff;
         std::unique_ptr<gui::AbstractSettingsModel<time_t>> bedtimeTime;
         std::unique_ptr<gui::AbstractSettingsModel<UTF8>> bedtimeTone;

@@ -27,14 +27,10 @@ namespace app
                                                                      StartInBackground startInBackground,
                                                                      uint32_t stackDepth)
         : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth),
-          audioModel{std::make_unique<AudioModel>(this)}, player{
-                                                              std::make_unique<bgSounds::BGSoundsPlayer>(*audioModel)}
+          audioModel{std::make_unique<AudioModel>(this)}
     {
+        player = std::make_unique<bgSounds::BGSoundsPlayer>(*audioModel);
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
-        connect(typeid(service::AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
-            auto notification = static_cast<service::AudioEOFNotification *>(msg);
-            return player->handle(notification);
-        });
     }
     ApplicationBellBackgroundSounds::~ApplicationBellBackgroundSounds() = default;
 

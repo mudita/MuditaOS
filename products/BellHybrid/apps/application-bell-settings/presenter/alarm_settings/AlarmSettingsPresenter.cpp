@@ -8,14 +8,14 @@ namespace app::bell_settings
 {
     AlarmSettingsPresenter::AlarmSettingsPresenter(std::shared_ptr<AlarmSettingsListItemProvider> provider,
                                                    std::unique_ptr<AbstractAlarmSettingsModel> model,
-                                                   std::unique_ptr<AbstractAudioModel> audioModel,
+                                                   AbstractAudioModel &audioModel,
                                                    std::unique_ptr<AbstractSoundsRepository> soundsRepository)
         : provider(provider),
-          model(std::move(model)), audioModel{std::move(audioModel)}, soundsRepository{std::move(soundsRepository)}
+          model(std::move(model)), audioModel{audioModel}, soundsRepository{std::move(soundsRepository)}
     {
 
         auto playSound = [this](const UTF8 &val) {
-            this->audioModel->play(
+            this->audioModel.play(
                 this->soundsRepository->titleToPath(val).value_or(""), AbstractAudioModel::PlaybackType::Alarm, {});
         };
 
@@ -28,7 +28,7 @@ namespace app::bell_settings
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this](const auto &val) {
-            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::Alarm, {});
+            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Alarm, {});
         };
     }
 
@@ -57,7 +57,7 @@ namespace app::bell_settings
     }
     void AlarmSettingsPresenter::stopSound()
     {
-        this->audioModel->stop({});
+        this->audioModel.stop({});
     }
     void AlarmSettingsPresenter::exitWithoutSave()
     {
