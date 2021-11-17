@@ -51,6 +51,9 @@ namespace app::alarmClock
             }
             presenter->loadData(alarmRecord);
         }
+        else {
+            presenter->loadCustomRepeat();
+        }
     }
 
     bool NewEditAlarmWindow::onInput(const gui::InputEvent &inputEvent)
