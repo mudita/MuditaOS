@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Application.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 
 namespace gui::window::name
 {
@@ -21,6 +22,9 @@ namespace app
 
     class ApplicationBellPowerNap : public Application
     {
+      private:
+        std::unique_ptr<AbstractAudioModel> audioModel;
+
       public:
         ApplicationBellPowerNap(std::string name                    = applicationBellPowerNapName,
                                 std::string parent                  = "",
