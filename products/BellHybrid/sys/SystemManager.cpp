@@ -51,6 +51,13 @@ namespace sys
         SystemManagerCommon::batteryShutdownLevelAction();
     }
 
+    void SystemManager::batteryNormalLevelAction()
+    {
+        SystemManagerCommon::batteryNormalLevelAction();
+        auto battNormalMsg = std::make_shared<CriticalBatteryLevelNotification>(false);
+        bus.sendUnicast(std::move(battNormalMsg), service::name::appmgr);
+    }
+
     void SystemManager::batteryCriticalLevelAction(bool charging)
     {
         SystemManagerCommon::batteryCriticalLevelAction(charging);
