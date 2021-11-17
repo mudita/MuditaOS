@@ -27,10 +27,7 @@ namespace gui
 
     bool OnBoardingInstructionPromptWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-            application->switchWindow(windowToReturn);
-            return true;
-        }
+        // Inputs are handled on Application level
         return false;
     }
 } // namespace gui

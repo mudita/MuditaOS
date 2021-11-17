@@ -624,7 +624,7 @@
   "app_bell_onboarding_info_rotate": "<text font='gt_pressura' weight='regular' size='38'>Obróć, </text><text font='gt_pressura' weight='light' size='38'>aby wybrać</text>",
   "app_bell_onboarding_info_light_click": "<text font='gt_pressura' weight='regular' size='38'>Kliknij lekko, </text><text font='gt_pressura' weight='light' size='38'>aby kontynuować</text>",
   "app_bell_onboarding_info_deep_click_warning": "<text font='gt_pressura' weight='light' size='38'>Głęboko </text><text font='gt_pressura' weight='regular' size='38'>wciśnięty</text>",
-  "app_bell_onboarding_info_deep_click_correction": "<text font='gt_pressura' weight='light' size='38'>Bądź bardziej delikatny, <br></br>spróbuj </text><text font='gt_pressura' weight='regular' size='38'>tym razem </text><text font='gt_pressura' weight='light' size='38'>lekko kliknąć</text>",
+  "app_bell_onboarding_info_deep_click_correction": "<text font='gt_pressura' weight='light' size='38'>Bądź bardziej delikatny,<br></br>spróbuj </text><text font='gt_pressura' weight='regular' size='38'>tym razem<br></br></text><text font='gt_pressura' weight='light' size='38'>lekko kliknąć</text>",
   "app_bell_settings_advanced": "Zaawansowane",
   "app_bell_settings_time_units": "Czas i jednostki",
   "app_bell_settings_advanced_temp_scale": "Skala temperatury",
