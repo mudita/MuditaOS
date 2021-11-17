@@ -179,7 +179,7 @@ namespace app
             data->ignoreCurrentWindowOnStack = true;
         }
 
-        if (lowBatteryState->isActive()) {
+        if (lowBatteryState->isActive() && !lowBatteryState->isCharging()) {
             blockAllPopups = true;
             switchWindow(gui::window::name::bell_battery_shutdown, std::move(data));
         }

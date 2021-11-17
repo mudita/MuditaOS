@@ -24,5 +24,6 @@ namespace app::manager
         auto startApplication(ApplicationHandle &app) -> bool override;
         auto resolveHomeApplication() -> std::string override;
         auto registerMessageHandlers() -> void override;
+        void handleStart(StartAllowedMessage *msg) override;
     };
 } // namespace app::manager

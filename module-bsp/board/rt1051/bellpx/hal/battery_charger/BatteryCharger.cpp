@@ -19,7 +19,6 @@ namespace hal::battery
         bsp::fuel_gauge::init(queueBatteryHandle);
         bsp::battery_charger::init(queueBatteryHandle);
 
-        Store::Battery::modify().state = Store::Battery::State::Discharging;
         Store::Battery::modify().level = static_cast<unsigned int>(bsp::fuel_gauge::getBatteryLevel());
     }
 
@@ -36,9 +35,6 @@ namespace hal::battery
     {
         bsp::battery_charger::getChargeStatus();
 
-        if (notification == bsp::fuel_gauge::FuelGaugeAlert) {
-            Store::Battery::modify().levelState = Store::Battery::LevelState::CriticalNotCharging;
-        }
 
         if (notification == bsp::fuel_gauge::FuelGaugeUpdate) {
             Store::Battery::modify().level = bsp::fuel_gauge::getBatteryLevel();
