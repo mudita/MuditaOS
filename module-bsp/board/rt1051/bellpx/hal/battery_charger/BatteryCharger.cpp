@@ -19,13 +19,14 @@ namespace hal::battery
         bsp::fuel_gauge::init(queueBatteryHandle);
         bsp::battery_charger::init(queueBatteryHandle);
 
-        Store::Battery::modify().level = static_cast<unsigned int>(bsp::fuel_gauge::getBatteryLevel());
+        Store::Battery::modify().state = Store::Battery::State::Discharging;
+        lastSOC                        = bsp::fuel_gauge::getBatteryLevel();
+        Store::Battery::modify().level = static_cast<unsigned int>(lastSOC);
     }
 
     int BatteryCharger::getBatteryVoltage()
     {
-        constexpr auto dummyBatteryLevel = 100;
-        return dummyBatteryLevel;
+        return bsp::fuel_gauge::getVoltageFilteredMeasurement();
     }
 
     void BatteryCharger::BatteryCharger::deinit()
@@ -37,13 +38,30 @@ namespace hal::battery
 
 
         if (notification == bsp::fuel_gauge::FuelGaugeUpdate) {
-            Store::Battery::modify().level = bsp::fuel_gauge::getBatteryLevel();
+            Store::Battery::modify().level = filterSOC();
         }
         eventsHandler.onStatusChanged();
     }
 
     void BatteryCharger::setChargingCurrentLimit(std::uint8_t)
     {}
+
+    bsp::fuel_gauge::StateOfCharge BatteryCharger::filterSOC()
+    {
+        const auto currentSOC = bsp::fuel_gauge::getBatteryLevel();
+
+        /** Due to unknown reasons, fuel gauge sometimes reports SOC raising even if charger is unplugged.
+            In order to not confuse the user, SOC reported by fuel gage is filtered based on the last valid SOC
+            value. This is not the ideal solution to the problem, but rather a quick&dirty solution which absolutely
+           does not fixes the root cause.
+        **/
+        if (Store::Battery::get().state == Store::Battery::State::Discharging && currentSOC > lastSOC) {
+            return lastSOC;
+        }
+        else {
+            return currentSOC;
+        }
+    }
 
     BaseType_t IRQHandler(AbstractBatteryCharger::IRQSource source)
     {
