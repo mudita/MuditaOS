@@ -158,7 +158,8 @@ namespace app
         auto currentWindow = getCurrentWindow()->getName();
         return (currentWindow != gui::name::window::main_window &&
                 currentWindow != gui::window::name::finalizeOnBoardingWindow &&
-                currentWindow != gui::window::name::informationOnBoardingWindow);
+                (currentWindow != gui::window::name::informationOnBoardingWindow ||
+                 informationState == OnBoarding::InformationStates::DeepClickWarningInfo));
     }
 
     void ApplicationBellOnBoarding::startTimerOnWindows()
@@ -183,6 +184,8 @@ namespace app
 
             informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
             displayInformation(msg->getWindowName());
+        }
+        if (selectedWindowCondition && informationState == OnBoarding::InformationStates::DeepClickCorrectionInfo) {
             informationState = OnBoarding::InformationStates::RotateInfo;
         }
 
@@ -201,29 +204,57 @@ namespace app
         auto inputEvent = static_cast<AppInputEventMessage *>(msgl)->getEvent();
 
         if (isInformationPromptPermittedOnCurrentWindow()) {
-            startTimerOnWindows();
-
             if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) || inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN)) {
                 informationState = OnBoarding::InformationStates::LightClickInfo;
             }
-            else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RIGHT)) {
+            else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RIGHT) ||
+                     inputEvent.isKeyRelease(gui::KeyCode::KEY_LEFT)) {
                 informationState = OnBoarding::InformationStates::DeepClickWarningInfo;
-                displayInformation(getCurrentWindow()->getName());
+                if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
+                    displayInformation(getPrevWindow());
+                }
+                else {
+                    displayInformation(getCurrentWindow()->getName());
+                }
             }
             else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                informationState = OnBoarding::InformationStates::RotateInfo;
+                if (informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
+                    informationPromptTimer.stop();
+                    informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
+                    displayInformation(getPrevWindow());
+                }
+                else {
+                    informationState = OnBoarding::InformationStates::RotateInfo;
+                }
             }
-
-            return false;
         }
-
-        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER) &&
-            informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
-            informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
-
-            displayInformation(getPrevWindow());
-            informationState = OnBoarding::InformationStates::RotateInfo;
-            return true;
+        else {
+            if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
+                switch (informationState) {
+                case OnBoarding::InformationStates::DeepClickCorrectionInfo:
+                    if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
+                        switchWindow(getPrevWindow());
+                        return true;
+                    }
+                    break;
+                case OnBoarding::InformationStates::LightClickInfo:
+                    if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
+                        switchWindow(getPrevWindow());
+                        return true;
+                    }
+                    break;
+                case OnBoarding::InformationStates::RotateInfo:
+                    if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) ||
+                        inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN) ||
+                        inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
+                        switchWindow(getPrevWindow());
+                        return true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
         }
 
         return false;
