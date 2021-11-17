@@ -41,8 +41,6 @@ namespace app::bgSounds
       public:
         explicit BGSoundsPlayer(AbstractAudioModel &audioModel);
 
-        auto handle(service::AudioEOFNotification *msg) -> std::shared_ptr<sys::Message>;
-
       private:
         void start(const std::string &filePath,
                    PlaybackMode mode,

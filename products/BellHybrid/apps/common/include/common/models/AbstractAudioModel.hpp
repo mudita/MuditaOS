@@ -15,11 +15,12 @@ namespace app
     {
       public:
         /// 0-10 range
-        static constexpr auto minVolume = 1;
-        static constexpr auto maxVolume = 10;
-        using Volume                    = std::uint32_t;
-        using OnStateChangeCallback     = std::function<void(const audio::RetCode code)>;
-        using OnGetValueCallback        = std::function<void(const audio::RetCode, Volume)>;
+        static constexpr auto minVolume  = 1;
+        static constexpr auto maxVolume  = 10;
+        using Volume                     = std::uint32_t;
+        using OnStateChangeCallback      = std::function<void(const audio::RetCode code)>;
+        using OnGetValueCallback         = std::function<void(const audio::RetCode, Volume)>;
+        using OnPlaybackFinishedCallback = std::function<void()>;
 
         enum class PlaybackType
         {
@@ -38,6 +39,8 @@ namespace app
         virtual void stop(OnStateChangeCallback &&callback)                                                 = 0;
         virtual void pause(OnStateChangeCallback &&callback)                                                = 0;
         virtual void resume(OnStateChangeCallback &&callback)                                               = 0;
+        virtual void setPlaybackFinishedCb(OnPlaybackFinishedCallback &&callback)                           = 0;
+        virtual bool hasPlaybackFinished()                                                                  = 0;
     };
 
 } // namespace app
