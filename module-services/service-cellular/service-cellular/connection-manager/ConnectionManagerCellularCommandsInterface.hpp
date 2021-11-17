@@ -49,4 +49,8 @@ class ConnectionManagerCellularCommandsInterface
      * @brief Stops connectionTimer
      */
     virtual void stopConnectionTimer() = 0;
+    /**
+     * @brief Holds minimum cpu frequency
+     */
+    virtual void holdMinimumCpuFrequency() = 0;
 };

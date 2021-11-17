@@ -8,6 +8,7 @@
 
 #include <string>
 #include <functional>
+#include <atomic>
 
 namespace sys
 {
@@ -26,18 +27,24 @@ namespace sys
 
         [[nodiscard]] auto GetName() const noexcept -> std::string;
         void HoldMinimumFrequency(bsp::CpuFrequencyHz frequencyToHold);
+        bool HoldMinimumFrequencyAndWait(bsp::CpuFrequencyHz frequencyToHold,
+                                         TaskHandle_t taskToNotify,
+                                         uint32_t timeout);
         void ReleaseMinimumFrequency();
         void CpuFrequencyHasChanged(bsp::CpuFrequencyHz newFrequency);
 
       protected:
         const std::string name;
         bsp::CpuFrequencyHz currentFrequencyToHold{bsp::CpuFrequencyHz::Level_0};
+        std::atomic<bsp::CpuFrequencyHz> currentFrequency{bsp::CpuFrequencyHz::Level_0};
         sys::Service *owner{nullptr};
 
         /// function called from the PowerManager context
         /// to update resources immediately
         /// critical section or mutex support necessary
         std::function<void(bsp::CpuFrequencyHz)> callback;
+
+        TaskHandle_t taskHandle = nullptr;
     };
 
 } // namespace sys

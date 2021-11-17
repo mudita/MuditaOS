@@ -38,9 +38,27 @@ namespace sys
 
     void CpuSentinel::CpuFrequencyHasChanged(bsp::CpuFrequencyHz newFrequency)
     {
+        currentFrequency = newFrequency;
         if (callback) {
             callback(newFrequency);
         }
+        if (taskHandle != nullptr && newFrequency >= currentFrequencyToHold) {
+            xTaskNotifyGive(taskHandle);
+            taskHandle = nullptr;
+        }
     }
 
+    bool CpuSentinel::HoldMinimumFrequencyAndWait(bsp::CpuFrequencyHz frequencyToHold,
+                                                  TaskHandle_t taskToNotify,
+                                                  uint32_t timeout)
+    {
+        HoldMinimumFrequency(frequencyToHold);
+
+        if (currentFrequencyToHold < frequencyToHold) {
+            taskHandle = taskToNotify;
+            return ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(timeout)) == 0;
+        }
+
+        return true;
+    }
 } // namespace sys

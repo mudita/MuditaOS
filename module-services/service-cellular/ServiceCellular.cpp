@@ -2277,3 +2277,7 @@ auto ServiceCellular::logTetheringCalls() -> void
         tetheringCalllog.clear();
     }
 }
+TaskHandle_t ServiceCellular::getTaskHandle()
+{
+    return xTaskGetCurrentTaskHandle();
+}
