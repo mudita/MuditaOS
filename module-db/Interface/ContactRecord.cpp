@@ -579,11 +579,7 @@ auto ContactRecordInterface::addQuery(const std::shared_ptr<db::Query> &query) -
     auto result = false;
 
     auto duplicateCheckResult = verifyDuplicate(addQuery->rec);
-    if (auto temporaryCheckResult = verifyTemporary(addQuery->rec); temporaryCheckResult) {
-        addQuery->rec.removeFromGroup(ContactsDB::temporaryGroupId());
-        result = ContactRecordInterface::Update(addQuery->rec);
-    }
-    else if (!duplicateCheckResult) {
+    if (!duplicateCheckResult) {
         result = ContactRecordInterface::Add(addQuery->rec);
     }
 
