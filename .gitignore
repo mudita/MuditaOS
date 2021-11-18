@@ -62,3 +62,5 @@ update/*
 /null.d
 
 test/test_env
+image/Luts.bin
+image/assets/fonts/*
