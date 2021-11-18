@@ -47,4 +47,7 @@ namespace locks
     class DisableSimPin : public sys::DataMessage
     {};
 
+    class ResetSimLockState : public sys::DataMessage
+    {};
+
 } // namespace locks

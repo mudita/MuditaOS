@@ -87,6 +87,7 @@ namespace gui
             else if (lock->isState(locks::Lock::LockState::InputInvalid)) {
                 lock->consumeState();
             }
+            application->getSimLockSubject().resetSimLockState();
             application->returnToPreviousWindow();
             return true;
         }
