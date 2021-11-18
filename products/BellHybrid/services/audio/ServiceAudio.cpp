@@ -144,6 +144,7 @@ namespace service
         };
         auto input = audioMux.GetPlaybackInput(playbackType);
         AudioStart(input);
+        manageCpuSentinel();
 
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
     }
@@ -182,6 +183,7 @@ namespace service
         }
         bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceAudioNotifications);
         audioMux.ResetInput(input);
+        manageCpuSentinel();
         return retCode;
     }
     constexpr auto Audio::shouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool
@@ -275,6 +277,7 @@ namespace service
                 retCode = audio::RetCode::UnsupportedEvent;
             }
         }
+        manageCpuSentinel();
         return std::make_unique<AudioResponseMessage>(retCode);
     }
     auto Audio::handleResume() -> std::unique_ptr<AudioResponseMessage>
@@ -284,6 +287,7 @@ namespace service
             activeInput && activeInput.value()->audio->GetCurrentOperationState() == audio::Operation::State::Paused) {
             retCode = activeInput.value()->audio->Resume();
         }
+        manageCpuSentinel();
         return std::make_unique<AudioResponseMessage>(retCode);
     }
     constexpr auto Audio::isResumable(audio::PlaybackType type) const -> bool
