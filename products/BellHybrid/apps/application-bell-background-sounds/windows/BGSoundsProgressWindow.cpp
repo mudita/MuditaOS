@@ -75,6 +75,8 @@ namespace gui
 
     void BGSoundsProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        presenter->onBeforeShow();
+
         if (mode == ShowMode::GUI_SHOW_RETURN && presenter->isPaused()) {
             presenter->resume();
             return;
