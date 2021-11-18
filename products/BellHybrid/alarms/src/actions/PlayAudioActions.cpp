@@ -21,7 +21,7 @@ namespace alarms
 
     bool PlayAudioAction::play(const std::filesystem::path &path, std::chrono::minutes duration)
     {
-        if (duration != InfiniteDuration) {
+        if (duration != InfiniteDuration && duration != NoDuration) {
             spawnTimer(duration);
         }
         return service.bus.sendUnicast(std::make_shared<service::AudioStartPlaybackRequest>(path, playbackType),
@@ -67,7 +67,7 @@ namespace alarms
             return std::make_unique<PlayAudioAction>(service,
                                                      paths::getPreWakeUpChimesDir(),
                                                      bell::settings::PrewakeUp::tone,
-                                                     bell::settings::PrewakeUp::duration,
+                                                     NoPlaybackTimeout,
                                                      audio::PlaybackType::PreWakeUp);
         }
 
