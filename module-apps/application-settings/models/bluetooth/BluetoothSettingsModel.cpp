@@ -144,3 +144,7 @@ auto BluetoothSettingsModel::getStatus() const -> const BluetoothStatus
 {
     return status;
 }
+auto BluetoothSettingsModel::isDeviceListEmpty() const -> bool
+{
+    return devices.empty();
+}
