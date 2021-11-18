@@ -140,4 +140,7 @@ namespace app
     {
         bus.sendUnicast(std::make_shared<StopIdleTimerMessage>(), service::name::appmgr);
     }
+
+    void Application::updateStatuses(gui::AppWindow *window) const
+    {}
 } // namespace app
