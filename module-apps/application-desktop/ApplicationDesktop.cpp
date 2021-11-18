@@ -6,7 +6,7 @@
 #include "DeadBatteryWindow.hpp"
 #include "DesktopData.hpp"
 #include "DesktopMainWindow.hpp"
-#include "LogoWindow.hpp"
+#include "ClosingWindow.hpp"
 #include "MenuWindow.hpp"
 #include "MmiInternalMsgWindow.hpp"
 #include "MmiPullWindow.hpp"
@@ -74,8 +74,8 @@ namespace app
         });
 
         addActionReceiver(app::manager::actions::DisplayLogoAtExit, [this](auto &&data) {
+            switchWindow(app::window::name::closing_window, std::move(data));
             setSystemCloseInProgress();
-            switchWindow(app::window::name::logo_window, std::move(data));
             return actionHandled();
         });
     }
@@ -153,8 +153,8 @@ namespace app
         windowsFactory.attach(dead_battery, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::DeadBatteryWindow>(app);
         });
-        windowsFactory.attach(logo_window, [](ApplicationCommon *app, const std::string newname) {
-            return std::make_unique<gui::LogoWindow>(app);
+        windowsFactory.attach(closing_window, [](ApplicationCommon *app, const std::string newname) {
+            return std::make_unique<gui::ClosingWindow>(app);
         });
         windowsFactory.attach(charging_battery, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::ChargingBatteryWindow>(app);

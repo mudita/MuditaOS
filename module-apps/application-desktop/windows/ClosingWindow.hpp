@@ -7,13 +7,10 @@
 
 namespace gui
 {
-    class LogoWindow : public AppWindow
+    class ClosingWindow : public AppWindow
     {
       public:
-        explicit LogoWindow(app::ApplicationCommon *app);
-        void rebuild() override;
+        explicit ClosingWindow(app::ApplicationCommon *app);
         void buildInterface() override;
-        void destroyInterface() override;
     };
-
 } /* namespace gui */
