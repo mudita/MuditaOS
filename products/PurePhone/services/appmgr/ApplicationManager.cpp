@@ -109,9 +109,6 @@ namespace app::manager
     {
         auto action = bsp::keypad_backlight::Action::turnOff;
         switch (keypadLightState) {
-        case bsp::keypad_backlight::State::on:
-            action = bsp::keypad_backlight::Action::turnOn;
-            break;
         case bsp::keypad_backlight::State::activeMode:
             action = bsp::keypad_backlight::Action::turnOnActiveMode;
             break;

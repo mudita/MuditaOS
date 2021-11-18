@@ -10,7 +10,6 @@ namespace bsp::keypad_backlight
     {
         turnOff,
         turnOnActiveMode,
-        turnOn,
         turnOnCallMode,
         turnOffCallMode,
         checkState,
@@ -19,8 +18,7 @@ namespace bsp::keypad_backlight
     enum class State
     {
         off,
-        activeMode,
-        on
+        activeMode
     };
 
     using DiodeIntensity = float;

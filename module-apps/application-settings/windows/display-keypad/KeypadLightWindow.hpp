@@ -14,15 +14,10 @@ namespace gui
         KeypadLightWindow(app::ApplicationCommon *app, app::settingsInterface::KeypdBacklightSettings *settings);
 
       private:
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
         app::settingsInterface::KeypdBacklightSettings *keypadLightSettings;
         void switchHandler(bool &onOffSwitch);
         std::list<Option> buildOptionsList() override;
 
-        unsigned int selectedOptionIndex = 0;
-        bool isAlwaysOnSwitchOn          = false;
         bool isActiveSwitchOn            = false;
-        bool isOffSwitchOn               = false;
     };
 } // namespace gui
