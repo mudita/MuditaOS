@@ -67,7 +67,7 @@ namespace gui
                                           utils::translate("app_settings_bluetooth_searching_devices")}));
             return true;
         }
-        if (inputEvent.is(KeyCode::KEY_LF)) {
+        if (inputEvent.is(KeyCode::KEY_LF) && !bluetoothSettingsModel->isDeviceListEmpty()) {
             navBar->setActive(nav_bar::Side::Left, false);
             navBar->setActive(nav_bar::Side::Center, false);
             auto selectedDevice = bluetoothSettingsModel->getSelectedDevice();
@@ -84,6 +84,11 @@ namespace gui
     {
         navBar->setActive(nav_bar::Side::Center, !bluetoothSettingsModel->getDevices().empty());
         std::list<gui::Option> optionsList;
+
+        if (bluetoothSettingsModel->isDeviceListEmpty()) {
+            this->navBar->setActive(nav_bar::Side::Left, false);
+            return optionsList;
+        }
 
         for (const auto &device : bluetoothSettingsModel->getDevices()) {
             UTF8 textOnCenter                  = getTextOnCenter(device.deviceState);

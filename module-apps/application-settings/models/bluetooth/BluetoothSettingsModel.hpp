@@ -39,6 +39,7 @@ class BluetoothSettingsModel
     auto getDevices() -> std::vector<Devicei> &;
     auto isDeviceConnecting() -> bool;
     auto getStatus() const -> const BluetoothStatus;
+    auto isDeviceListEmpty() const -> bool;
 
   private:
     std::vector<Devicei> devices{};
