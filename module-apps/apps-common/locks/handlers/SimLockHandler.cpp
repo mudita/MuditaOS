@@ -229,6 +229,13 @@ namespace locks
         return sys::msgHandled();
     }
 
+    sys::MessagePointer SimLockHandler::handleResetSimLockStateRequest()
+    {
+        lock.lockState = Lock::LockState::Unlocked;
+
+        return sys::msgHandled();
+    }
+
     sys::MessagePointer SimLockHandler::handleSimBlockedRequest()
     {
         setSimInputTypeAction(SimInputTypeAction::Blocked);

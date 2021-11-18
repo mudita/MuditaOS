@@ -239,6 +239,9 @@ namespace app::manager
             auto msg = static_cast<locks::UnLockSimInput *>(request);
             return simLockHandler.verifySimLockInput(msg->getInputData());
         });
+        connect(typeid(locks::ResetSimLockState), [&](sys::Message *request) -> sys::MessagePointer {
+            return simLockHandler.handleResetSimLockStateRequest();
+        });
         connect(typeid(cellular::msg::notification::SimNeedPuk), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<cellular::msg::notification::SimNeedPuk *>(request);
             if (phoneLockHandler.isPhoneLocked()) {

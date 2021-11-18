@@ -19,6 +19,7 @@ namespace locks
         explicit SimLockSubject(sys::Service *owner);
 
         void setSim(cellular::api::SimSlot simSlot);
+        void resetSimLockState();
         void changeSimPin();
         void enableSimPin();
         void disableSimPin();
