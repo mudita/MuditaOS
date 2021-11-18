@@ -264,12 +264,12 @@ namespace alarms
         }
     }
 
-    auto AlarmOperationsCommon::minuteUpdated(TimePoint now) -> void
+    auto AlarmOperationsCommon::minuteUpdated(TimePoint now) -> bool
     {
-        processEvents(now);
+        return processEvents(now);
     }
 
-    void AlarmOperationsCommon::processEvents(TimePoint now)
+    bool AlarmOperationsCommon::processEvents(TimePoint now)
     {
         const auto isHandlingInProgress = !ongoingSingleEvents.empty();
         if (!nextSingleEvents.empty()) {
@@ -284,7 +284,9 @@ namespace alarms
             switchAlarmExecution(*(ongoingSingleEvents.front()), true);
             handleActiveAlarmsCountChange();
             handleSnoozedAlarmsCountChange();
+            return true;
         }
+        return false;
     }
 
     void AlarmOperationsCommon::addAlarmExecutionHandler(const alarms::AlarmType type,

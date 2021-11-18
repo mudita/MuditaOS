@@ -92,4 +92,8 @@ namespace app::bgSounds
     {
         return player.isPaused();
     }
+    void BGSoundsProgressPresenter::onBeforeShow()
+    {
+        getView()->setTimeFormat(timeModel->getTimeFormat());
+    }
 } // namespace app::bgSounds
