@@ -32,8 +32,8 @@ target_sources(application-desktop
 		windows/DeadBatteryWindow.hpp
 		windows/DesktopMainWindow.cpp
 		windows/DesktopMainWindow.hpp
-		windows/LogoWindow.cpp
-		windows/LogoWindow.hpp
+		windows/ClosingWindow.cpp
+		windows/ClosingWindow.hpp
 		windows/MenuWindow.cpp
 		windows/MenuWindow.hpp
 		windows/MmiInternalMsgWindow.cpp
