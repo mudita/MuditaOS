@@ -44,7 +44,8 @@ namespace battery_level_check
             bool operator()() const
             {
                 return Store::Battery::get().level < batteryLevelCritical &&
-                       Store::Battery::get().state != Store::Battery::State::Charging;
+                       Store::Battery::get().state != Store::Battery::State::Charging &&
+                       Store::Battery::get().state != Store::Battery::State::ChargingDone;
             }
         } isCriticalNotCharging;
         struct isCriticalCharging
@@ -52,7 +53,8 @@ namespace battery_level_check
             bool operator()() const
             {
                 return Store::Battery::get().level < batteryLevelCritical &&
-                       Store::Battery::get().state == Store::Battery::State::Charging;
+                       (Store::Battery::get().state == Store::Battery::State::Charging ||
+                        Store::Battery::get().state == Store::Battery::State::ChargingDone);
             }
         } isCriticalCharging;
         struct isShutdown
