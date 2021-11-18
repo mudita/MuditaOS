@@ -112,6 +112,7 @@ namespace gui
                 return true;
             }
             else if (not presenter->isNapFinished() && key == KeyMap::Back) {
+                presenter->endNap();
                 application->returnToPreviousWindow();
                 return true;
             }
