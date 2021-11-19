@@ -327,5 +327,9 @@ namespace gui
                                   std::make_unique<gui::BellBatteryStatusWindow::Data>(presenter->getBatteryLvl(),
                                                                                        presenter->isBatteryCharging()));
     }
+    void BellHomeScreenWindow::setSnoozeTime(std::time_t newTime)
+    {
+        snoozeTimer->setTime(newTime);
+    }
 
 } // namespace gui

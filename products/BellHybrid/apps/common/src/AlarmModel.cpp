@@ -198,4 +198,12 @@ namespace app
     {
         return alarmStatus;
     }
+    std::time_t AlarmModel::getTimeOfNextSnooze()
+    {
+        const auto snoozeDurationStr =
+            settings.getValue(bell::settings::Snooze::length, settings::SettingsScope::Global);
+        const auto snoozeDuration = utils::getNumericValue<std::uint32_t>(snoozeDurationStr);
+        return Clock::to_time_t(std::chrono::floor<std::chrono::minutes>(TimePointNow()) +
+                                std::chrono::minutes(snoozeDuration));
+    }
 } // namespace app

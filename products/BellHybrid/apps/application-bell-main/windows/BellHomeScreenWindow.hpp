@@ -52,6 +52,7 @@ namespace gui
         void setHeaderViewMode(app::home_screen::HeaderViewMode mode) override;
         std::time_t getAlarmTime() const override;
         void setAlarmTime(std::time_t newTime) override;
+        void setSnoozeTime(std::time_t newTime) override;
         void incAlarmMinute() override;
         void decAlarmMinute() override;
 
