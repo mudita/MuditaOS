@@ -47,19 +47,10 @@ namespace gui
         informationBody->setEdges(RectangleEdge::None);
         informationBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
-        auto sunLogo = new ImageBox(informationBody, new Image("button_icon_sun", ImageTypeSpecifier::W_G));
-        sunLogo->setMinimumSizeToFitImage();
-        sunLogo->setMargins(Margins(0, sun_logo_margin_top, sun_logo_margin_right, 0));
-
-        auto instructionText = new TextFixedSize(informationBody);
-        instructionText->setMargins(Margins(0, sun_logo_margin_top, 0, 0));
-        instructionText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-        instructionText->drawUnderline(false);
-        instructionText->setFont(style::window::font::verybiglight);
-        // non localized string by purpose
-        instructionText->setText(": ON");
-        instructionText->setMinimumWidthToFitText(instructionText->getText());
-        instructionText->setMinimumHeight(sunLogo->widgetMinimumArea.h);
+        auto bottomLogo = new ImageBox(informationBody, new Image("bell_off_bottom", ImageTypeSpecifier::W_G));
+        bottomLogo->setMinimumSizeToFitImage();
+        bottomLogo->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        bottomLogo->setMargins(Margins(0, 0, 0, 0));
 
         body->resize();
     }
