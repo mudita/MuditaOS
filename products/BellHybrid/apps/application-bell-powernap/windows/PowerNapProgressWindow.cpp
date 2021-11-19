@@ -62,16 +62,12 @@ namespace gui
         buildInterface();
     }
 
-    void PowerNapProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        presenter->activate();
-    }
-
     void PowerNapProgressWindow::buildInterface()
     {
         AppWindow::buildInterface();
         buildLayout();
         configureTimer();
+        presenter->activate();
     }
     void PowerNapProgressWindow::buildLayout()
     {
