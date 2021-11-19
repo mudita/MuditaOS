@@ -369,6 +369,7 @@ namespace app::home_screen
                                              "AlarmRinging"_s + event<Events::LightPress> = "AlarmSnoozedWait"_s,
                                              "AlarmRinging"_s + event<Events::RotateLeftPress> = "AlarmSnoozedWait"_s,
                                              "AlarmRinging"_s + event<Events::RotateRightPress> = "AlarmSnoozedWait"_s,
+                                             "AlarmRinging"_s + event<Events::BackPress> = "AlarmSnoozedWait"_s,
                                              "AlarmRinging"_s + event<Events::DeepDownPress> = "AlarmRingingDeactivatedWait"_s,
 
                                              "AlarmRingingDeactivatedWait"_s + sml::on_entry<_> / AlarmRingingDeactivatedWait::entry,
