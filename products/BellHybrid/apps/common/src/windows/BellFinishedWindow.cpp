@@ -63,6 +63,9 @@ namespace gui
             icon->resizeItems();
             windowToReturn   = metadata->windowToReturn;
             closeApplication = metadata->closeApplication;
+            if (metadata->timeout != std::chrono::seconds::zero()) {
+                resetTimer(metadata->timeout);
+            }
         }
     }
 
