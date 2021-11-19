@@ -72,6 +72,8 @@ namespace gui
 
     void BellSettingsAlarmSettingsWindow::onClose(CloseReason reason)
     {
-        presenter->eraseProviderData();
+        if (reason != CloseReason::Popup) {
+            presenter->eraseProviderData();
+        }
     }
 } /* namespace gui */

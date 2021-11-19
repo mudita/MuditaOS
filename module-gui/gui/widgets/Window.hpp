@@ -39,7 +39,8 @@ namespace gui
         {
             ApplicationClose,
             WindowSwitch,
-            PhoneLock
+            PhoneLock,
+            Popup
         };
 
         Window() = delete;
