@@ -100,7 +100,7 @@ namespace gui
         }
 
         timeFormat = newFormat;
-        handleContentChanged();
+        fmt->handleContentChanged();
     }
 
     auto TimeSetFmtSpinner::setMinute(int value) noexcept -> void
@@ -261,9 +261,10 @@ namespace gui
         fmt->setMinimumWidthToFitText();
         fmt->setMargins(getFmtMargins(noFocusFontName));
 
-        auto widthToSet = fmt->visible ? timeSetSpinner->widgetMinimumArea.w + fmt->widgetMinimumArea.w +
-                                             fmt->margins.getSumInAxis(Axis::X)
-                                       : timeSetSpinner->widgetMinimumArea.w;
+        auto widthToSet =
+            timeFormat == utils::time::Locale::TimeFormat::FormatTime12H
+                ? timeSetSpinner->widgetMinimumArea.w + fmt->widgetMinimumArea.w + fmt->margins.getSumInAxis(Axis::X)
+                : timeSetSpinner->widgetMinimumArea.w;
 
         setMinimumWidth(widthToSet);
         setMaximumWidth(widgetMinimumArea.w);
