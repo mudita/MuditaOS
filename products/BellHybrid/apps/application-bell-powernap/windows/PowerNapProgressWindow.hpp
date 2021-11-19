@@ -19,7 +19,6 @@ namespace gui
         gui::BellStatusClock *time  = nullptr;
 
         void buildInterface() override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto onInput(const InputEvent &inputEvent) -> bool override;
 
         void setTime(std::time_t newTime);
