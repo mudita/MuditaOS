@@ -81,7 +81,8 @@ namespace app
     enum class SwitchReason
     {
         SwitchRequest,
-        PhoneLock
+        PhoneLock,
+        Popup
     };
 
     struct StartInBackground
