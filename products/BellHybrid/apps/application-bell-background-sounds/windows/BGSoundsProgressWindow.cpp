@@ -105,6 +105,7 @@ namespace gui
         progressBar = createProgress(vBox);
         timerText   = createTimer(body->lastBox);
         time        = createClock(body->firstBox);
+        updateTime();
         body->firstBox->resizeItems();
         vBox->resizeItems();
 
