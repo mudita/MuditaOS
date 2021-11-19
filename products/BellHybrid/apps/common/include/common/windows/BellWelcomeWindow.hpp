@@ -13,11 +13,9 @@ namespace gui
 
     class BellWelcomeWindow : public AppWindow
     {
-        static constexpr auto midline_correction    = 40U;
-        static constexpr auto midline_w             = 480U;
-        static constexpr auto midline_h             = 1U;
-        static constexpr auto sun_logo_margin_top   = 10U;
-        static constexpr auto sun_logo_margin_right = 25U;
+        static constexpr auto midline_correction = 40U;
+        static constexpr auto midline_w          = 480U;
+        static constexpr auto midline_h          = 1U;
 
       public:
         using Callback                    = std::function<void()>;
