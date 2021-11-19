@@ -38,6 +38,7 @@ namespace app
         void turnOff() override;
         void snooze() override;
         std::chrono::seconds getTimeToNextSnooze() override;
+        std::time_t getTimeOfNextSnooze() override;
         alarms::AlarmStatus getAlarmStatus() override;
 
       private:
