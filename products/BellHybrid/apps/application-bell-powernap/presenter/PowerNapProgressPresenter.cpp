@@ -43,7 +43,6 @@ namespace app::powernap
     void PowerNapProgressPresenter::activate()
     {
         Expects(timer != nullptr);
-        getView()->setTimeFormat(timeModel->getTimeFormat());
         const auto value = settings->getValue(powernapDBRecordName);
         timer->reset(std::chrono::minutes{utils::getNumericValue<int>(value)});
         timer->start();
