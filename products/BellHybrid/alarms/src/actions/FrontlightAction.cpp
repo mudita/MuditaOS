@@ -55,11 +55,17 @@ namespace alarms
     } // namespace
 
     FrontlightAction::FrontlightAction(sys::Service &service, Mode mode)
-        : pimpl{createFrontlightImplementation(service, mode)}
+        : pimpl{createFrontlightImplementation(service, mode)}, settings{
+                                                                    service::ServiceProxy{service.weak_from_this()}}
     {}
 
     bool FrontlightAction::execute()
     {
+        const std::string flontlightEnabled =
+            settings.getValue(bell::settings::Alarm::lightActive, settings::SettingsScope::Global);
+        if (flontlightEnabled == std::string(frontlightOFF)) {
+            return true;
+        }
         return pimpl->execute();
     }
 
