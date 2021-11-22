@@ -75,6 +75,7 @@
   "common_accept": "AKCEPTUJ",
   "common_minute_lower": "minuta",
   "common_minutes_lower": "minuty",
+  "common_minutes_lower_genitive": "minut",
   "common_minute_short": "min",
   "common_paused": "Pauza",
   "locale_12hour_min": "%I:%M %p",

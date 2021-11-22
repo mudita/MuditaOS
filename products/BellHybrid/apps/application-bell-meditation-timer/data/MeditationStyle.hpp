@@ -35,12 +35,7 @@ namespace app::meditationStyle
             constexpr inline auto font = style::window::font::largelight;
         } // namespace minute
 
-        namespace list
-        {
-            constexpr inline auto timeUnitSingular = "common_minute_lower";
-            constexpr inline auto timeUnitPlural   = "common_minutes_lower";
-        } // namespace list
-    }     // namespace icStyle
+    } // namespace icStyle
 
     namespace mrStyle
     {

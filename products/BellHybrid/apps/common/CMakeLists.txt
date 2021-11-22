@@ -13,6 +13,7 @@ target_sources(application-bell-common
         src/BellPowerOffPresenter.cpp
         src/AlarmModel.cpp
         src/AudioModel.cpp
+        src/LanguageUtils.cpp
         src/TimeModel.cpp
         src/SoundsRepository.cpp
         src/BellListItemProvider.cpp
@@ -42,6 +43,7 @@ target_sources(application-bell-common
     PUBLIC
         include/common/Languages.hpp
         include/common/BellListItemProvider.hpp
+        include/common/LanguageUtils.hpp
         include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp
         include/common/windows/BellFactoryReset.hpp

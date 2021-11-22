@@ -3,6 +3,7 @@
 
 #include "SnoozeListItemProvider.hpp"
 #include <common/widgets/ListItems.hpp>
+#include <common/LanguageUtils.hpp>
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <utility>
@@ -72,21 +73,16 @@ namespace app::bell_settings
         constexpr auto snoozeLengthMin  = 1U;
         constexpr auto snoozeLengthMax  = 30U;
 
-        auto chimeLengthBottomDescription = model.getSnoozeLength().getValue() > 1
-                                                ? utils::translate("common_minutes_lower")
-                                                : utils::translate("common_minute_lower");
-        auto chimeLength                  = new NumListItem(model.getSnoozeLength(),
+        auto chimeLengthBottomDescription =
+            utils::language::getCorrectMinutesNumeralForm(model.getSnoozeLength().getValue());
+        ;
+        auto chimeLength = new NumListItem(model.getSnoozeLength(),
                                            UIntegerSpinner::Range{snoozeLengthMin, snoozeLengthMax, snoozeLengthStep},
                                            utils::translate("app_bell_settings_alarm_settings_snooze_length"),
                                            chimeLengthBottomDescription);
 
         chimeLength->setOnValueChanged([chimeLength](const std::uint32_t &val) {
-            if (val == 1) {
-                chimeLength->setBottomDescribtionText(utils::translate("common_minute_lower"));
-            }
-            else {
-                chimeLength->setBottomDescribtionText(utils::translate("common_minutes_lower"));
-            }
+            chimeLength->setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(val));
         });
 
         chimeLength->onEnter = [onOff, this]() {
