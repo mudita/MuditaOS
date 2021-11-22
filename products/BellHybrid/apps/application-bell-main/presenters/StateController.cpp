@@ -83,11 +83,14 @@ namespace app::home_screen
                 alarmModel.setDefaultAlarmTime();
                 view.setAlarmTime(alarmModel.getAlarmTime());
             };
+            auto turnOffRingingAlarm = [](AbstractAlarmModel &alarmModel) { alarmModel.turnOff(); };
         } // namespace Helpers
 
         namespace Events
         {
             struct BackPress
+            {};
+            struct LongBackPress
             {};
             struct LightPress
             {};
@@ -255,7 +258,7 @@ namespace app::home_screen
                 view.setHeaderViewMode(HeaderViewMode::SnoozeCountdown);
 
                 const auto snoozeDuration = alarmModel.getTimeToNextSnooze();
-                presenter.startSnoozeTimer(snoozeDuration);
+                view.setSnoozeTime(alarmModel.getTimeOfNextSnooze());
                 const auto bottomDescription = utils::translate("app_bellmain_home_screen_bottom_desc") + " " +
                                                std::to_string(alarmModel.getSnoozeDuration()) + " min";
                 view.setBottomDescription(bottomDescription);
@@ -293,7 +296,7 @@ namespace app::home_screen
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
-                                             "Deactivated"_s + event<Events::BackPress>  / Helpers::switchToBatteryStatus,
+                                             "Deactivated"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus,
 
                                              "DeactivatedWait"_s + sml::on_entry<_> / DeactivatedWait::entry,
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
@@ -309,6 +312,7 @@ namespace app::home_screen
                                              "DeactivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
                                              "DeactivatedEdit"_s + event<Events::Reset> = "Init"_s,
                                              "DeactivatedEdit"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
+                                             "DeactivatedEdit"_s + event<Events::Timer> = "Deactivated"_s,
                                              "DeactivatedEdit"_s + event<Events::RotateLeftPress> / AlarmEdit::processRotateLeft,
                                              "DeactivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
                                              "DeactivatedEdit"_s + event<Events::DeepUpPress> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
@@ -345,12 +349,13 @@ namespace app::home_screen
                                              "Activated"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
                                              "Activated"_s + event<Events::DeepDownPress>  = "DeactivatedWait"_s,
                                              "Activated"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
-                                             "Activated"_s + event<Events::BackPress>  / Helpers::switchToBatteryStatus,
+                                             "Activated"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
                                              "ActivatedEdit"_s + event<Events::Reset> = "Init"_s,
                                              "ActivatedEdit"_s + event<Events::TimeUpdate> / Helpers::updateBottomStats,
+                                             "ActivatedEdit"_s + event<Events::Timer> = "Activated"_s,
                                              "ActivatedEdit"_s + event<Events::RotateLeftPress> / AlarmEdit::processRotateLeft,
                                              "ActivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
                                              "ActivatedEdit"_s + event<Events::LightPress> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
@@ -361,10 +366,15 @@ namespace app::home_screen
                                              "AlarmRinging"_s + sml::on_exit<_> / AlarmRinging::exit,
                                              "AlarmRinging"_s + event<Events::Reset> = "Init"_s,
                                              "AlarmRinging"_s + event<Events::Timer> [Helpers::isSnoozeAllowed] / Helpers::snooze = "AlarmSnoozedWait"_s,
-                                             "AlarmRinging"_s + event<Events::Timer> [!Helpers::isSnoozeAllowed] = "ActivatedWait"_s,
-                                             "AlarmRinging"_s + event<Events::LightPress> = "AlarmSnoozedWait"_s,
-                                             "AlarmRinging"_s + event<Events::RotateLeftPress> = "AlarmSnoozedWait"_s,
-                                             "AlarmRinging"_s + event<Events::RotateRightPress> = "AlarmSnoozedWait"_s,
+                                             "AlarmRinging"_s + event<Events::Timer> [not Helpers::isSnoozeAllowed] / Helpers::turnOffRingingAlarm = "ActivatedWait"_s,
+                                             "AlarmRinging"_s + event<Events::LightPress> [Helpers::isSnoozeAllowed] = "AlarmSnoozedWait"_s,
+                                             "AlarmRinging"_s + event<Events::LightPress> [not Helpers::isSnoozeAllowed] / Helpers::turnOffRingingAlarm  = "ActivatedWait"_s,
+                                             "AlarmRinging"_s + event<Events::RotateLeftPress> [Helpers::isSnoozeAllowed] = "AlarmSnoozedWait"_s,
+                                             "AlarmRinging"_s + event<Events::RotateLeftPress> [not Helpers::isSnoozeAllowed] / Helpers::turnOffRingingAlarm  = "ActivatedWait"_s,
+                                             "AlarmRinging"_s + event<Events::RotateRightPress> [Helpers::isSnoozeAllowed] = "AlarmSnoozedWait"_s,
+                                             "AlarmRinging"_s + event<Events::RotateRightPress> [not Helpers::isSnoozeAllowed] / Helpers::turnOffRingingAlarm  = "ActivatedWait"_s,
+                                             "AlarmRinging"_s + event<Events::BackPress> [Helpers::isSnoozeAllowed] = "AlarmSnoozedWait"_s,
+                                             "AlarmRinging"_s + event<Events::BackPress> [not Helpers::isSnoozeAllowed] / Helpers::turnOffRingingAlarm  = "ActivatedWait"_s,
                                              "AlarmRinging"_s + event<Events::DeepDownPress> = "AlarmRingingDeactivatedWait"_s,
 
                                              "AlarmRingingDeactivatedWait"_s + sml::on_entry<_> / AlarmRingingDeactivatedWait::entry,
@@ -451,7 +461,12 @@ namespace app::home_screen
         const auto key = mapKey(inputEvent.getKeyCode());
         switch (key) {
         case KeyMap::Back:
-            pimpl->sm.process_event(Events::BackPress{});
+            if (inputEvent.getState() == gui::InputEvent::State::keyReleasedLong) {
+                pimpl->sm.process_event(Events::LongBackPress{});
+            }
+            else {
+                pimpl->sm.process_event(Events::BackPress{});
+            }
             break;
         case KeyMap::LightPress:
             pimpl->sm.process_event(Events::LightPress{});

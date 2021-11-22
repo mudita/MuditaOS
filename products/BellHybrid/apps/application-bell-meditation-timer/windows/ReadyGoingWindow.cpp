@@ -7,7 +7,7 @@
 
 namespace
 {
-    constexpr inline auto defaultTimeout = std::chrono::seconds{5};
+    constexpr inline auto defaultTimeout = std::chrono::seconds{10};
 }
 
 namespace gui

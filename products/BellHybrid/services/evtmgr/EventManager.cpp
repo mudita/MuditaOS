@@ -98,6 +98,12 @@ void EventManager::initProductEvents()
         return sys::msgHandled();
     });
 
+    connect(typeid(sevm::ScreenLightSetConstLinearModeParams), [&](sys::Message *msgl) {
+        auto *m = static_cast<sevm::ScreenLightSetConstLinearModeParams *>(msgl);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
+        return sys::msgHandled();
+    });
+
     connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
         screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
         auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(

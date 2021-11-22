@@ -42,6 +42,7 @@ target_link_libraries(evtmgr
         keymap
         module-bsp
         module-utils
+        module-sys
         service-evtmgr
         bell::appmgr
         sys

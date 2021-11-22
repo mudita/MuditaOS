@@ -94,15 +94,15 @@ namespace alarms
                         std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider,
                         std::unique_ptr<AbstractBedtimeSettingsProvider> &&BedtimeModel);
 
-        void minuteUpdated(TimePoint now) override;
+      private:
+        bool minuteUpdated(TimePoint now) override;
         void stopAllSnoozedAlarms() override;
-        void processPreWakeUp(TimePoint now);
-        void processSnoozeChime(TimePoint now);
+        bool processPreWakeUp(TimePoint now);
+        bool processSnoozeChime(TimePoint now);
         void stopAllSnoozeChimes();
 
-      private:
         SingleEventRecord getNextPreWakeUpEvent();
-        void handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
+        bool handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
         void handleSnoozeChime(const SingleEventRecord &event, bool newStateOn);
         void handleBedtime(const SingleEventRecord &event, bool decision);
         void processBedtime(TimePoint now);

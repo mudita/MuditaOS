@@ -62,16 +62,13 @@ namespace gui
         buildInterface();
     }
 
-    void PowerNapProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        presenter->activate();
-    }
-
     void PowerNapProgressWindow::buildInterface()
     {
         AppWindow::buildInterface();
+
         buildLayout();
         configureTimer();
+        presenter->activate();
     }
     void PowerNapProgressWindow::buildLayout()
     {
@@ -87,6 +84,7 @@ namespace gui
         time = new BellStatusClock(body->firstBox);
         time->setMaximumSize(body->firstBox->getWidth(), body->firstBox->getHeight());
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        updateTime();
         body->firstBox->resizeItems();
 
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {

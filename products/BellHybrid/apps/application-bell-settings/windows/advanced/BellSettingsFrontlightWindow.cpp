@@ -64,8 +64,10 @@ namespace gui
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", window::name::bellSettingsAdvanced));
     }
-    void BellSettingsFrontlightWindow::onClose(Window::CloseReason)
+    void BellSettingsFrontlightWindow::onClose(Window::CloseReason reason)
     {
-        presenter->eraseProviderData();
+        if (reason != CloseReason::Popup) {
+            presenter->eraseProviderData();
+        }
     }
 } /* namespace gui */

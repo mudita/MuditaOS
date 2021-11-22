@@ -46,6 +46,7 @@ namespace app::home_screen
     {
         getView()->setTime(timeModel->getCurrentTime());
         stateController->handleTimeUpdateEvent();
+        handleCyclicDeepRefresh();
     }
 
     void HomeScreenPresenter::handleAlarmRingingEvent()
@@ -137,6 +138,7 @@ namespace app::home_screen
     {
         return batteryModel->getLevelState().level;
     }
+
     bool HomeScreenPresenter::isBatteryCharging() const
     {
         return batteryModel->getLevelState().state == Store::Battery::State::Charging;
@@ -154,5 +156,17 @@ namespace app::home_screen
             alarmModel->activate(!latchPressed);
             isStartup = false;
         }
+    }
+
+    void HomeScreenPresenter::handleCyclicDeepRefresh()
+    {
+        constexpr auto deepRefreshPeriod = 30;
+        static auto refreshCount         = 0;
+
+        if (refreshCount >= deepRefreshPeriod) {
+            app->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+            refreshCount = 0;
+        }
+        refreshCount++;
     }
 } // namespace app::home_screen

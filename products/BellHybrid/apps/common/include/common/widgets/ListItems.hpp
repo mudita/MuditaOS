@@ -59,13 +59,16 @@ namespace gui
                                        const std::string &bottomDescription = "");
 
         bool isOff() const;
+        NumWithStringSpinner *getSpinner()
+        {
+            return spinner;
+        }
+        void setArrowsVisibility(const NumWithStringSpinner::Range &range);
 
       private:
         NumWithStringSpinner *spinner{};
         const UTF8 offStr;
         const UTF8 minStr;
-
-        void setArrowsVisibility(const NumWithStringSpinner::Range &range);
     };
 
     class UTF8ListItem : public BellSideListItemWithCallbacks

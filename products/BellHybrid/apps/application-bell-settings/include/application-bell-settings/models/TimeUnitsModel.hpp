@@ -63,7 +63,7 @@ namespace app::bell_settings
         auto loadData() -> void override;
 
       private:
-        static constexpr int factoryResetTime    = 60 * 60 * 12; // noon
+        static constexpr int factoryResetTime    = 12; // noon
         static constexpr auto factoryRestTimeFmt = utils::time::Locale::TimeFormat::FormatTime12H;
     };
 } // namespace app::bell_settings

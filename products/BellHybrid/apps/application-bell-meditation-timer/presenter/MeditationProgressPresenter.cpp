@@ -76,8 +76,9 @@ namespace app::meditation
     void MeditationProgressPresenter::finish()
     {
         timer->stop();
-        app->switchWindow(gui::window::bell_finished::defaultName,
-                          gui::BellFinishedWindowData::Factory::create("big_namaste_W_G", "", "", true));
+        app->switchWindow(
+            gui::window::bell_finished::defaultName,
+            gui::BellFinishedWindowData::Factory::create("big_namaste_W_G", "", "", true, endWindowTimeout));
     }
 
     void MeditationProgressPresenter::onProgressFinished()

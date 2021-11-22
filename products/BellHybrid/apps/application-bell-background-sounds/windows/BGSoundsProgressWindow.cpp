@@ -75,6 +75,8 @@ namespace gui
 
     void BGSoundsProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        presenter->onBeforeShow();
+
         if (mode == ShowMode::GUI_SHOW_RETURN && presenter->isPaused()) {
             presenter->resume();
             return;
@@ -105,6 +107,7 @@ namespace gui
         progressBar = createProgress(vBox);
         timerText   = createTimer(body->lastBox);
         time        = createClock(body->firstBox);
+        updateTime();
         body->firstBox->resizeItems();
         vBox->resizeItems();
 

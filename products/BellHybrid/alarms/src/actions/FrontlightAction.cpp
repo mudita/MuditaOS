@@ -55,11 +55,17 @@ namespace alarms
     } // namespace
 
     FrontlightAction::FrontlightAction(sys::Service &service, Mode mode)
-        : pimpl{createFrontlightImplementation(service, mode)}
+        : pimpl{createFrontlightImplementation(service, mode)}, settings{
+                                                                    service::ServiceProxy{service.weak_from_this()}}
     {}
 
     bool FrontlightAction::execute()
     {
+        const std::string flontlightEnabled =
+            settings.getValue(bell::settings::Alarm::lightActive, settings::SettingsScope::Global);
+        if (flontlightEnabled == std::string(frontlightOFF)) {
+            return true;
+        }
         return pimpl->execute();
     }
 
@@ -73,10 +79,6 @@ namespace alarms
 
     bool ManualFrontlightAction::execute()
     {
-        service.bus.sendUnicast(
-            std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::disableAutomaticMode),
-            service::name::evt_manager);
-
         auto params = prepareParameters();
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
                                     screen_light_control::Action::turnOn, screen_light_control::Parameters{params}),
@@ -107,9 +109,6 @@ namespace alarms
         const auto params = prepareParameters();
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightSetAutoProgressiveModeParams>(params),
                                 service::name::evt_manager);
-        service.bus.sendUnicast(
-            std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::enableAutomaticMode),
-            service::name::evt_manager);
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::turnOn),
                                 service::name::evt_manager);
         return true;

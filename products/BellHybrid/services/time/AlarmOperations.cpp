@@ -152,12 +152,26 @@ namespace alarms
           bedtime(std::move(bedtimeSettingsProvider))
     {}
 
-    void AlarmOperations::minuteUpdated(TimePoint now)
+    bool AlarmOperations::minuteUpdated(TimePoint now)
     {
-        AlarmOperationsCommon::minuteUpdated(now);
-        processPreWakeUp(now);
-        processSnoozeChime(now);
-        processBedtime(now);
+        /**
+         * A very simple alarm priority:
+         * 1. Main alarm
+         * 2. Pre wake up
+         * 3. Snooze
+         * 4. Bedtime
+         * By design, there is no possibility to have both the main alarm, pre wakeup, and snooze alarm set for the same
+         * timestamp hence it is safe to process these three in the one go.
+         */
+        auto wasAlarmConsumed = AlarmOperationsCommon::minuteUpdated(now);
+        wasAlarmConsumed |= processPreWakeUp(now);
+        wasAlarmConsumed |= processSnoozeChime(now);
+
+        if (not wasAlarmConsumed) {
+            processBedtime(now);
+        }
+
+        return false;
     }
 
     void AlarmOperations::stopAllSnoozedAlarms()
@@ -166,22 +180,22 @@ namespace alarms
         AlarmOperationsCommon::stopAllSnoozedAlarms();
     }
 
-    void AlarmOperations::processPreWakeUp(TimePoint now)
+    bool AlarmOperations::processPreWakeUp(TimePoint now)
     {
         if (nextSingleEvents.empty()) {
-            return;
+            return false;
         }
 
         auto nextEvent = getNextPreWakeUpEvent();
         if (!nextEvent.isValid()) {
-            return;
+            return false;
         }
 
         const auto decision = preWakeUp.decide(now, nextEvent);
         if (!decision.timeForChime && !decision.timeForFrontlight) {
-            return;
+            return false;
         }
-        handlePreWakeUp(nextEvent, decision);
+        return handlePreWakeUp(nextEvent, decision);
     }
 
     void AlarmOperations::processBedtime(TimePoint now)
@@ -210,27 +224,30 @@ namespace alarms
         return event;
     }
 
-    void AlarmOperations::handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision)
+    bool AlarmOperations::handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision)
     {
         if (auto alarmEventPtr = std::dynamic_pointer_cast<AlarmEventRecord>(event.parent); alarmEventPtr) {
             if (decision.timeForChime) {
                 handleAlarmEvent(alarmEventPtr, alarms::AlarmType::PreWakeUpChime, true);
+                return true;
             }
             if (decision.timeForFrontlight) {
                 handleAlarmEvent(alarmEventPtr, alarms::AlarmType::PreWakeUpFrontlight, true);
+                return true;
             }
         }
+        return false;
     }
 
-    void AlarmOperations::processSnoozeChime(TimePoint now)
+    bool AlarmOperations::processSnoozeChime(TimePoint now)
     {
         if (!ongoingSingleEvents.empty()) {
-            return;
+            return false;
         }
 
         auto settings = snoozeChimeSettings->getSettings();
         if (!settings.enabled) {
-            return;
+            return false;
         }
 
         for (auto &snoozedEvent : snoozedSingleEvents) {
@@ -239,8 +256,10 @@ namespace alarms
             const auto isTimeForChime = (minuteDelta % settings.chimeInterval.count()) == 0;
             if (isTimeForChime) {
                 handleSnoozeChime(*snoozedEvent, true);
+                return true;
             }
         }
+        return false;
     }
 
     void AlarmOperations::handleSnoozeChime(const SingleEventRecord &event, bool newStateOn)

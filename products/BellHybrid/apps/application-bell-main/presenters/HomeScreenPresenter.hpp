@@ -74,24 +74,25 @@ namespace app::home_screen
         virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
 
         /// Various
-        virtual void switchToMenu()          = 0;
-        virtual void switchToBatteryStatus() = 0;
+        virtual void switchToMenu()                  = 0;
+        virtual void switchToBatteryStatus()         = 0;
+        virtual void setSnoozeTime(std::time_t time) = 0;
     };
 
     class AbstractPresenter : public BasePresenter<AbstractView>
     {
       public:
-        virtual ~AbstractPresenter() noexcept                                       = default;
-        virtual void createData()                                                   = 0;
-        virtual void handleUpdateTimeEvent()                                        = 0;
-        virtual bool handleInputEvent(const gui::InputEvent &inputEvent)            = 0;
-        virtual void onBeforeShow()                                                 = 0;
-        virtual void onDatabaseMessage(db::NotificationMessage *msg)                = 0;
-        virtual void refreshWindow()                                                = 0;
-        virtual void spawnTimer(std::chrono::milliseconds timeout = defaultTimeout) = 0;
-        virtual void detachTimer()                                                  = 0;
-        virtual void handleAlarmRingingEvent()                                      = 0;
-        virtual void handleAlarmModelReady()                                        = 0;
+        virtual ~AbstractPresenter() noexcept                                                    = default;
+        virtual void createData()                                                                = 0;
+        virtual void handleUpdateTimeEvent()                                                     = 0;
+        virtual bool handleInputEvent(const gui::InputEvent &inputEvent)                         = 0;
+        virtual void onBeforeShow()                                                              = 0;
+        virtual void onDatabaseMessage(db::NotificationMessage *msg)                             = 0;
+        virtual void refreshWindow()                                                             = 0;
+        virtual void spawnTimer(std::chrono::milliseconds timeout = defaultTimeout)              = 0;
+        virtual void detachTimer()                                                               = 0;
+        virtual void handleAlarmRingingEvent()                                                   = 0;
+        virtual void handleAlarmModelReady()                                                     = 0;
         virtual void setSnoozeTimer(std::unique_ptr<app::ProgressTimerWithSnoozeTimer> &&_timer) = 0;
         virtual void startSnoozeTimer(std::chrono::seconds snoozeDuration)                       = 0;
         virtual void stopSnoozeTimer()                                                           = 0;
@@ -151,7 +152,9 @@ namespace app::home_screen
 
         void setStartupAlarmState();
 
-        static constexpr auto timerName = "HS_timer";
+        void handleCyclicDeepRefresh();
+
+        static constexpr auto timerName  = "HS_timer";
         static constexpr auto snoozeTick = std::chrono::seconds(1);
     };
 } // namespace app::home_screen

@@ -540,9 +540,17 @@ namespace app
             }
             if (!isCurrentWindow(msg->getWindowName())) {
                 if (!windowsStack.isEmpty()) {
-                    const auto closeReason = msg->getReason() == SwitchReason::PhoneLock
-                                                 ? gui::Window::CloseReason::PhoneLock
-                                                 : gui::Window::CloseReason::WindowSwitch;
+                    auto closeReason = gui::Window::CloseReason::WindowSwitch;
+                    switch (msg->getReason()) {
+                    case SwitchReason::PhoneLock:
+                        closeReason = gui::Window::CloseReason::PhoneLock;
+                        break;
+                    case SwitchReason::Popup:
+                        closeReason = gui::Window::CloseReason::Popup;
+                        break;
+                    default:
+                        break;
+                    }
                     getCurrentWindow()->onClose(closeReason);
                 }
                 setActiveWindow(msg->getWindowName());
@@ -919,7 +927,7 @@ namespace app
                          std::make_unique<gui::AlarmPopupRequestParams>(popupParams));
         }
         else {
-            switchWindow(gui::popup::resolveWindowName(id));
+            switchWindow(gui::popup::resolveWindowName(id), gui::ShowMode::GUI_SHOW_INIT, nullptr, SwitchReason::Popup);
         }
     }
 
