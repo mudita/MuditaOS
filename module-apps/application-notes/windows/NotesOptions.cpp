@@ -11,7 +11,7 @@
 
 #include <i18n/i18n.hpp>
 
-#include <module-gui/gui/widgets/Text.hpp>
+#include <module-gui/gui/widgets/text/Text.hpp>
 
 namespace app::notes
 {
@@ -66,7 +66,7 @@ namespace app::notes
     {
         std::list<gui::Option> options;
         addOption(
-            {"app_notes_copy_text"},
+            {"common_text_copy"},
             [application, textWidget](gui::Item &item) {
                 if (textWidget != nullptr) {
                     Clipboard::getInstance().copy(textWidget->getText());
@@ -91,7 +91,7 @@ namespace app::notes
     {
         std::list<gui::Option> options;
         addOption(
-            {"app_notes_copy_text"},
+            {"common_text_copy"},
             [application, textWidget](gui::Item &item) {
                 if (textWidget != nullptr) {
                     Clipboard::getInstance().copy(textWidget->getText());
@@ -101,10 +101,10 @@ namespace app::notes
             },
             options);
         addOption(
-            {"app_notes_copy_paste"},
+            {"common_text_paste"},
             [application, textWidget](gui::Item &item) {
                 if (textWidget != nullptr) {
-                    textWidget->addText(Clipboard::getInstance().paste());
+                    textWidget->addText(Clipboard::getInstance().paste(), gui::AdditionType::perBlock);
                 }
                 application->returnToPreviousWindow();
                 return true;

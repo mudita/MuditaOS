@@ -9,6 +9,7 @@
 
 #include <type_traits>
 
+#include <cassert>
 #include <cstdint>
 
 namespace audio::transcode
@@ -63,6 +64,8 @@ namespace audio::transcode
             auto outputSpan     = Span{.data = transformSpace.data, .dataSize = transformBlockSize(inputSpan.dataSize)};
             IntegerType *input  = reinterpret_cast<IntegerType *>(inputSpan.data);
             IntegerType *output = reinterpret_cast<IntegerType *>(outputSpan.data);
+
+            assert(outputSpan.dataSize <= transformSpace.dataSize);
 
             for (unsigned i = inputSpan.dataSize / sizeof(IntegerType); i > 0; i--) {
                 for (unsigned j = 1; j <= Ratio; j++) {

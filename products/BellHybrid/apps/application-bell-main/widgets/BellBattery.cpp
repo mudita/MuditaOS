@@ -2,21 +2,20 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellBattery.hpp"
+#include "data/BatteryUtils.hpp"
 #include <Image.hpp>
 
 namespace
 {
-    constexpr unsigned int minVal   = 80;
-    constexpr unsigned int oldMax   = 95;
-    constexpr unsigned int newMax   = 100;
-    constexpr unsigned int oldRange = oldMax - minVal;
-    constexpr unsigned int newRange = newMax - minVal;
-
-    unsigned int translateBatteryLevel(unsigned int percentage)
-    {
-        return (((percentage - minVal) * newRange) / oldRange) + minVal;
-    }
-} // namespace
+    constexpr auto entries =
+        std::array<battery_utils::BatteryLevelEntry, 7>{{{{0, 5}, {1, 1}, "bell_battery_empty"},
+                                                         {{5, 10}, {1, 5}, "bell_battery_empty"},
+                                                         {{11, 30}, {6, 29}, "bell_battery_lvl1"},
+                                                         {{31, 50}, {30, 53}, "bell_battery_lvl2"},
+                                                         {{51, 70}, {54, 77}, "bell_battery_lvl3"},
+                                                         {{71, 95}, {78, 99}, "bell_battery_lvl4"},
+                                                         {{96, 100}, {100, 100}, "bell_battery_lvl5"}}};
+}
 
 namespace gui
 {
@@ -37,21 +36,12 @@ namespace gui
 
     void BellBattery::update(const Store::Battery &batteryContext)
     {
-        (void)batteryContext;
-
-        // Fuel gauge and charger are different hw elements
-        // Charger sometimes stops charging before FG shows 100%
-        auto level = batteryContext.level;
-
-        if (level > 95) {
-            level = 100;
+        const auto result = battery_utils::getScaledBatteryLevel(entries, batteryContext.level);
+        if (not result) {
+            return;
         }
 
-        // Translate 80-95% range to 80-100% range for display
-        if ((level > 80) && (level <= 95)) {
-            level = translateBatteryLevel(level);
-        }
-
+        const auto level = result->level;
         if (batteryContext.state == Store::Battery::State::Charging) {
             img->set(battery::battery_charging, gui::ImageTypeSpecifier::W_M);
 

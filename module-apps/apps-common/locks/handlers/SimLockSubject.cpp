@@ -21,6 +21,11 @@ namespace locks
         owner->bus.sendUnicast(std::make_shared<locks::SetSim>(simSlot), service::name::appmgr);
     }
 
+    void SimLockSubject::resetSimLockState()
+    {
+        owner->bus.sendUnicast(std::make_shared<locks::ResetSimLockState>(), service::name::appmgr);
+    }
+
     void SimLockSubject::changeSimPin()
     {
         owner->bus.sendUnicast(std::make_shared<locks::ChangeSimPin>(), service::name::appmgr);

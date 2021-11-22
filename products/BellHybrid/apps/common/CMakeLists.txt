@@ -18,7 +18,6 @@ target_sources(application-bell-common
         src/BellListItemProvider.cpp
         src/windows/BellFactoryReset.cpp
         src/windows/BellFinishedWindow.cpp
-        src/windows/BellFinishedCallbackWindow.cpp
         src/windows/BellTurnOffWindow.cpp
         src/windows/BellWelcomeWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
@@ -39,17 +38,16 @@ target_sources(application-bell-common
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
         src/options/OptionBellMenu.cpp
+        src/options/BellOptionsNavigation.cpp
     PUBLIC
         include/common/BellListItemProvider.hpp
         include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp
         include/common/windows/BellFactoryReset.hpp
         include/common/windows/BellFinishedWindow.hpp
-        include/common/windows/BellFinishedCallbackWindow.hpp
         include/common/windows/BellTurnOffWindow.hpp
         include/common/windows/BellWelcomeWindow.hpp
         include/common/TimeUtils.hpp
-        include/common/data/BellFinishedCallbackWindowSwitchData.hpp
         include/common/models/AbstractAlarmModel.hpp
         include/common/models/AbstractBedtimeModel.hpp
         include/common/models/AbstractSettingsModel.hpp
@@ -77,11 +75,12 @@ target_link_libraries(application-bell-common
     PUBLIC
         apps-common
         service-db
+        service-time
 
     PRIVATE
         bell::app-main
         bell::app-alarm
+        bell::audio
         module-gui
-        service-time
         bell::db
         )

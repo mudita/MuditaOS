@@ -119,7 +119,7 @@ TEST_CASE("Device handling")
 
     SECTION("Get device with correct address")
     {
-        REQUIRE(devicesModel.getDeviceByAddress(addr2Str).value().get().name == "Dev2");
+        REQUIRE(strcmp(devicesModel.getDeviceByAddress(addr2Str).value().get().name.data(), "Dev2") == 0);
     }
 
     SECTION("Remove device from the list")

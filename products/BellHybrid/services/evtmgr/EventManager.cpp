@@ -20,6 +20,8 @@
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/WorkerEventCommon.hpp>
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
+#include <switches/LatchStatusRequest.hpp>
+#include <switches/LatchState.hpp>
 
 namespace
 {
@@ -34,9 +36,10 @@ namespace
     };
 }
 
-EventManager::EventManager(const std::string &name)
-    : EventManagerCommon(name), temperatureSource{hal::temperature::AbstractTemperatureSource::Factory::create()},
-      backlightHandler(settings, this)
+EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &name)
+    : EventManagerCommon(logDumpFunction, name),
+      temperatureSource{hal::temperature::AbstractTemperatureSource::Factory::create()},
+      backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
 {
     buildKeySequences();
     updateTemperature(*temperatureSource);
@@ -54,6 +57,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     }
 
     if (kbdMessage->key.state == RawKey::State::Pressed || kbdMessage->key.state == RawKey::State::Moved) {
+        userActivityHandler.handleUserInput();
         backlightHandler.handleKeyPressed(static_cast<int>(mapKey(static_cast<gui::KeyCode>(kbdMessage->key.keyCode))));
     }
 
@@ -70,7 +74,7 @@ void EventManager::initProductEvents()
     backlightHandler.init();
 
     connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
-        auto *m = static_cast<sevm::ScreenLightControlMessage *>(msgl);
+        auto *m           = static_cast<sevm::ScreenLightControlMessage *>(msgl);
         const auto params = m->getParams();
         backlightHandler.processScreenRequest(m->getAction(), params.value_or(screen_light_control::Parameters()));
         return sys::msgHandled();
@@ -94,10 +98,23 @@ void EventManager::initProductEvents()
         return sys::msgHandled();
     });
 
+    connect(typeid(sevm::ScreenLightSetConstLinearModeParams), [&](sys::Message *msgl) {
+        auto *m = static_cast<sevm::ScreenLightSetConstLinearModeParams *>(msgl);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
+        return sys::msgHandled();
+    });
+
     connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
         screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
         auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
+        return msg;
+    });
+
+    connect(sevm::LatchStatusRequest(), [&](sys::Message *msgl) {
+        sevm::LatchStatus state =
+            bsp::bell_switches::isLatchPressed() ? sevm::LatchStatus::PRESSED : sevm::LatchStatus::RELEASED;
+        auto msg = std::make_shared<sevm::LatchStatusResponse>(state);
         return msg;
     });
 }

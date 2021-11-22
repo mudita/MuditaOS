@@ -3,6 +3,7 @@
 
 #include "common/options/BellShortOptionWindow.hpp"
 #include "common/options/OptionBellMenu.hpp"
+#include "common/options/BellOptionsNavigation.hpp"
 
 #include <messages/OptionsWindow.hpp>
 #include <TextFixedSize.hpp>
@@ -14,6 +15,11 @@ namespace gui
                                     app, style::bell_options::h + 2 * style::bell_options::option_margin))
     {
         buildInterface();
+
+        auto storedCallback        = optionsList->inputCallback;
+        optionsList->inputCallback = [&, storedCallback](Item &item, const InputEvent &event) {
+            return storedCallback(item, invertNavigationDirection(event));
+        };
     }
 
     void BellShortOptionWindow::rebuild()
@@ -72,4 +78,5 @@ namespace gui
 
         optionsList->rebuildList(listview::RebuildType::InPlace);
     }
+
 } /* namespace gui */

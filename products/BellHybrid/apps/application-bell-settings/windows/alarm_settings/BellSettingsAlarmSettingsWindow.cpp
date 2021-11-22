@@ -55,6 +55,9 @@ namespace gui
             exit();
             return true;
         }
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            presenter->exitWithoutSave();
+        }
 
         return AppWindow::onInput(inputEvent);
     }
@@ -69,6 +72,8 @@ namespace gui
 
     void BellSettingsAlarmSettingsWindow::onClose(CloseReason reason)
     {
-        presenter->eraseProviderData();
+        if (reason != CloseReason::Popup) {
+            presenter->eraseProviderData();
+        }
     }
 } /* namespace gui */

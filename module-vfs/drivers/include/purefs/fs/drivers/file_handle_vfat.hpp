@@ -20,7 +20,7 @@ namespace purefs::fs::drivers
         {
             return &m_fil;
         }
-        auto open_path() const noexcept -> const std::string &
+        auto open_path() const noexcept -> std::string override
         {
             return m_path;
         }

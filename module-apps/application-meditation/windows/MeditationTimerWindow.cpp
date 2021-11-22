@@ -8,7 +8,6 @@
 #include "Style.hpp"
 
 #include <gui/core/FontManager.hpp>
-#include <gui/widgets/RichTextParser.hpp>
 #include <i18n/i18n.hpp>
 #include <Timers/TimerFactory.hpp>
 

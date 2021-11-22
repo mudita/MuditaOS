@@ -19,7 +19,7 @@ pipeline {
     agent {
         node {
         label 'jenkins-slave-ccache-ram'
-        customWorkspace "/home/jenkins/workspace/${JOB_NAME}/${BUILD_NUMBER}"
+        customWorkspace "/home/jenkins/workspace/MuditaOS"
         }
     }
     options{
@@ -27,9 +27,10 @@ pipeline {
         parallelsAlwaysFailFast()
     }
     environment {
-        JOBS=15
+        JOBS=30
         PATH="/usr/local/cmake-3.21.3-linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
     }
+
     stages {
         stage('Check for previous running builds') {
             steps {
@@ -89,7 +90,7 @@ pipeline {
             }
         stage('Build RT1051') {
             environment {
-                CCACHE_DIR="/ccache/RT1051"
+                CCACHE_DIR="/ccache/"
                 XDG_CACHE_HOME="/clang-cache"
             }
             steps {
@@ -105,10 +106,10 @@ pipeline {
                 popd'''
 
                 sh '''#!/bin/bash -e
-                export JOBS=${JOBS:-6}
-                export CCACHE_DIR=/ccache/RT1051
-
+                export JOBS=${JOBS}
+                export CCACHE_DIR=/ccache/
                 echo "JOBS=${JOBS}"
+
                 echo "cmake path=$(which cmake)"
                 echo "\'workspace dir:${WORKSPACE}\'"
 
@@ -140,18 +141,22 @@ pipeline {
                 popd'''
                 echo "CCache stats"
                 sh '''#!/bin/bash
-                export CCACHE_DIR=/ccache/RT1051
+                export CCACHE_DIR=/ccache/
                 ccache --show-stats'''
                 }
         }
 
         stage('Build Linux - Pure') {
             environment {
-                CCACHE_DIR="/ccache/Linux"
+                CCACHE_DIR="/ccache/"
                 XDG_CACHE_HOME="/clang-cache"
 
             }
-
+            when {
+                expression {
+                 return !(env.CHANGE_TARGET ==~ /release\/[0-9]+\.[0-9]+\.[0-9]+-bell/)
+                 }
+            }
             steps {
                 echo "Check if branch needs rebasing"
                 sh '''#!/bin/bash -e
@@ -199,7 +204,7 @@ pipeline {
 
                 echo "CCache stats"
                 sh '''#!/bin/bash
-                export CCACHE_DIR=/ccache/Linux
+                export CCACHE_DIR=/ccache/
                 ccache --show-stats'''
 
                 echo "Check for Statics"
@@ -210,7 +215,7 @@ pipeline {
 
                 echo "Run Unit Tests"
                 sh '''#!/bin/bash -e
-                export JOBS=${JOBS:-6}
+                export JOBS=${JOBS}
                 echo "JOBS=${JOBS}"
 
                 pushd "${WORKSPACE}"
@@ -232,10 +237,14 @@ pipeline {
 
         stage('Build Linux - Bell') {
             environment {
-                CCACHE_DIR="/ccache/Linux"
+                CCACHE_DIR="/ccache/"
                 XDG_CACHE_HOME="/clang-cache"
             }
-
+            when {
+                expression {
+                 return !(env.CHANGE_TARGET ==~ /release\/[0-9]+\.[0-9]+\.[0-9]+-pure/)
+                 }
+            }
             steps {
                 echo "Check if branch needs rebasing"
                 sh '''#!/bin/bash -e
@@ -287,7 +296,7 @@ pipeline {
 
                 echo "CCache stats"
                 sh '''#!/bin/bash
-                export CCACHE_DIR=/ccache/Linux
+                export CCACHE_DIR=/ccache/
                 ccache --show-stats'''
 
                 echo "Check for Statics"
@@ -298,7 +307,7 @@ pipeline {
 
                 echo "Run Unit Tests"
                 sh '''#!/bin/bash -e
-                export JOBS=${JOBS:-6}
+                export JOBS=${JOBS}
                 echo "JOBS=${JOBS}"
                 pushd "${WORKSPACE}"
 

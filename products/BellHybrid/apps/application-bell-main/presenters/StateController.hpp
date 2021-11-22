@@ -17,7 +17,7 @@ namespace app
 namespace app::home_screen
 {
 
-    inline constexpr auto defaultAlarmRingingTime = std::chrono::seconds(30);
+    inline constexpr auto defaultAlarmRingingTime = std::chrono::minutes(5);
 
     class AbstractView;
     class AbstractPresenter;
@@ -28,6 +28,7 @@ namespace app::home_screen
       public:
         virtual ~AbstractController() noexcept = default;
 
+        virtual void resetStateMachine()                                 = 0;
         virtual bool handleInputEvent(const gui::InputEvent &inputEvent) = 0;
         virtual bool handleTimerEvent()                                  = 0;
         virtual bool handleTimeUpdateEvent()                             = 0;
@@ -47,6 +48,8 @@ namespace app::home_screen
                         AbstractAlarmModel &alarmModel,
                         AbstractTimeModel &timeModel);
         ~StateController();
+
+        void resetStateMachine() override;
         bool handleInputEvent(const gui::InputEvent &inputEvent) override;
         bool handleTimerEvent() override;
         bool handleTimeUpdateEvent() override;

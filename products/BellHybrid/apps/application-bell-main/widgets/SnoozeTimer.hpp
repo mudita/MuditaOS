@@ -5,8 +5,8 @@
 
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Style.hpp>
-#include <gui/widgets/TextFixedSize.hpp>
-#include <gui/widgets/TextConstants.hpp>
+#include <gui/widgets/text/TextFixedSize.hpp>
+#include <gui/widgets/text/TextConstants.hpp>
 #include <time/time_locale.hpp>
 #include <string>
 
@@ -31,10 +31,10 @@ namespace gui
 
         auto setFont(std::string newFontName) noexcept -> void;
         auto setTime(std::uint8_t mins, std::uint8_t secs) noexcept -> void;
+        auto setTime(std::time_t time) noexcept -> void;
 
       private:
         TimeSetSpinner *timeSpinner = nullptr;
-        TextFixedSize *minusText    = nullptr;
 
         Status alarmStatus   = Status::DEACTIVATED;
         std::string fontName = style::window::font::largelight;

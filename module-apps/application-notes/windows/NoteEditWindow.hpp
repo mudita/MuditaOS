@@ -10,7 +10,7 @@
 #include <module-db/Interface/NotesRecord.hpp>
 
 #include "gui/widgets/Label.hpp"
-#include "gui/widgets/Text.hpp"
+#include "gui/widgets/text/Text.hpp"
 #include "gui/input/InputEvent.hpp"
 
 #include <module-apps/application-notes/presenter/NoteEditWindowPresenter.hpp>

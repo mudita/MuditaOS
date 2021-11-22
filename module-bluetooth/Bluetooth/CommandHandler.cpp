@@ -152,9 +152,6 @@ namespace bluetooth
     Error::Code CommandHandler::unpair(const Devicei &device)
     {
         LOG_INFO("Unpairing...");
-        if (profileManager->isAddressActuallyUsed(device.address)) {
-            profileManager->disconnect();
-        }
         const auto error_code = driver->unpair(device) ? Error::Success : Error::LibraryError;
         LOG_INFO("Unpairing result: %s", magic_enum::enum_name(error_code).data());
         return error_code;

@@ -9,6 +9,7 @@
 #include "windows/BellBatteryShutdownWindow.hpp"
 #include "windows/BellHomeScreenWindow.hpp"
 #include "windows/BellMainMenuWindow.hpp"
+#include "windows/BellBatteryStatusWindow.hpp"
 
 #include <apps-common/messages/AppMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
@@ -18,7 +19,8 @@
 #include <common/windows/BellFactoryReset.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
-#include <service-audio/AudioMessage.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <system/messages/SystemManagerMessage.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
 
 namespace app
@@ -39,6 +41,17 @@ namespace app
         addActionReceiver(app::manager::actions::DisplayLogoAtExit, [this](auto &&data) {
             setSystemCloseInProgress();
             switchWindow(gui::BellWelcomeWindow::defaultName);
+            return actionHandled();
+        });
+
+        addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
+            setSystemCloseInProgress();
+            switchWindow(gui::window::name::bell_battery_shutdown, std::move(data));
+            return actionHandled();
+        });
+
+        addActionReceiver(app::manager::actions::DisplayLowBatteryScreen, [this](auto &&data) {
+            handleLowBatteryNotification(std::move(data));
             return actionHandled();
         });
     }
@@ -70,15 +83,20 @@ namespace app
         windowsFactory.attach(gui::window::name::bell_main_menu, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellMainMenuWindow>(app);
         });
+
         windowsFactory.attach(gui::window::name::bell_battery_shutdown,
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellBatteryShutdownWindow>(app);
                               });
+
         windowsFactory.attach(gui::BellFactoryReset::name, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellFactoryReset>(app, std::make_unique<gui::BellPowerOffPresenter>(app));
         });
 
-        // for demo only - to be removed
+        windowsFactory.attach(gui::BellBatteryStatusWindow::name, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::BellBatteryStatusWindow>(app);
+        });
+
         windowsFactory.attach(
             gui::window::name::bell_main_menu_dialog,
             [](ApplicationCommon *app, const std::string &name) { return std::make_unique<gui::Dialog>(app, name); });
@@ -143,5 +161,33 @@ namespace app
             }
         }
         return ApplicationCommon::handleSwitchWindow(msgl);
+    }
+
+    bool ApplicationBellMain::isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const
+    {
+        if (blockAllPopups) {
+            return false;
+        }
+        return true;
+    }
+
+    void ApplicationBellMain::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
+    {
+        auto lowBatteryState = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
+        auto currentWindow   = getCurrentWindow();
+        if (currentWindow->getName() == gui::window::name::bell_battery_shutdown) {
+            data->ignoreCurrentWindowOnStack = true;
+        }
+
+        if (lowBatteryState->isActive() && !lowBatteryState->isCharging()) {
+            blockAllPopups = true;
+            switchWindow(gui::window::name::bell_battery_shutdown, std::move(data));
+        }
+        else {
+            blockAllPopups = false;
+            if (currentWindow->getName() == gui::window::name::bell_battery_shutdown) {
+                app::manager::Controller::sendAction(this, app::manager::actions::Home, std::move(data));
+            }
+        }
     }
 } // namespace app

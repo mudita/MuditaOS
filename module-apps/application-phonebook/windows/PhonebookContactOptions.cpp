@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <service-db/DBServiceAPI.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
@@ -25,7 +26,8 @@ namespace gui
             LOG_WARN("Received null pointer");
             return false;
         }
-        contact = item->getContact();
+        contact     = item->getContact();
+        requestType = item->getRequestType();
         clearOptions();
         addOptions(contactOptionsList());
 
@@ -104,17 +106,23 @@ namespace gui
             break;
         }
 
-        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-            gui::DialogMetadata{contact->getFormattedName(ContactRecord::NameFormatType::Title),
-                                "info_big_circle_W_G",
-                                dialogText,
-                                "",
-                                [=]() -> bool {
-                                    auto data                        = std::make_unique<SwitchData>();
-                                    data->ignoreCurrentWindowOnStack = true;
-                                    this->application->switchWindow(gui::name::window::main_window, std::move(data));
-                                    return true;
-                                }});
+        auto metaData                        = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+            contact->getFormattedName(ContactRecord::NameFormatType::Title),
+            "info_big_circle_W_G",
+            dialogText,
+            "",
+            [=]() -> bool {
+                if (requestType == PhonebookItemData::RequestType::External) {
+                    app::manager::Controller::switchBack(application);
+                }
+                else {
+                    auto data                        = std::make_unique<SwitchData>();
+                    data->ignoreCurrentWindowOnStack = true;
+                    this->application->switchWindow(gui::name::window::main_window, std::move(data));
+                }
+
+                return true;
+            }});
         metaData->ignoreCurrentWindowOnStack = true;
         application->switchWindow(gui::window::name::dialog_confirm, std::move(metaData));
         return true;

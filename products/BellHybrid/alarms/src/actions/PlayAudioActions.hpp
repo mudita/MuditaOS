@@ -4,9 +4,8 @@
 #pragma once
 
 #include "AbstractAlarmAction.hpp"
+#include <audio/AudioMessage.hpp>
 #include <common/SoundsRepository.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
-#include <module-audio/Audio/AudioCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <Service/Service.hpp>
@@ -29,6 +28,8 @@ namespace alarms
 
       private:
         static constexpr auto InfiniteDuration = std::chrono::minutes::max();
+        static constexpr auto NoDuration       = std::chrono::minutes::zero();
+
         bool play(const std::filesystem::path &path, std::chrono::minutes duration = InfiniteDuration);
         void spawnTimer(std::chrono::minutes timeout);
         void detachTimer();
@@ -44,6 +45,7 @@ namespace alarms
 
     namespace factory
     {
+        static constexpr auto NoPlaybackTimeout = "0";
         std::unique_ptr<PlayAudioAction> createAlarmToneAction(sys::Service &service);
         std::unique_ptr<PlayAudioAction> createPreWakeUpChimeAction(sys::Service &service);
         std::unique_ptr<PlayAudioAction> createSnoozeChimeAction(sys::Service &service);

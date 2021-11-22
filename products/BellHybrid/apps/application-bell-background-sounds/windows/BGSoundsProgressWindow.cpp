@@ -12,7 +12,7 @@
 #include <time/dateCommon.hpp>
 namespace
 {
-    inline constexpr auto bgSoundsTimerName     = "BGSoundsProgressTimer";
+    inline constexpr auto bgSoundsTimerName = "BGSoundsProgressTimer";
     inline constexpr std::chrono::seconds timerTick{1};
 
     void decorateProgressItem(gui::Rect *item, gui::Alignment::Vertical alignment)
@@ -75,7 +75,9 @@ namespace gui
 
     void BGSoundsProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (mode == ShowMode::GUI_SHOW_RETURN) {
+        presenter->onBeforeShow();
+
+        if (mode == ShowMode::GUI_SHOW_RETURN && presenter->isPaused()) {
             presenter->resume();
             return;
         }
@@ -105,6 +107,7 @@ namespace gui
         progressBar = createProgress(vBox);
         timerText   = createTimer(body->lastBox);
         time        = createClock(body->firstBox);
+        updateTime();
         body->firstBox->resizeItems();
         vBox->resizeItems();
 
@@ -133,12 +136,8 @@ namespace gui
                 presenter->pause();
                 return true;
             }
-            else if (inputEvent.is(KeyCode::KEY_DOWN)) {
-                application->decreaseCurrentVolume();
-                return true;
-            }
-            else if (inputEvent.is(KeyCode::KEY_UP)) {
-                application->increaseCurrentVolume();
+            else if (inputEvent.is(KeyCode::KEY_DOWN) || inputEvent.is(KeyCode::KEY_UP)) {
+                application->switchWindow(gui::popup::window::volume_window);
                 return true;
             }
         }

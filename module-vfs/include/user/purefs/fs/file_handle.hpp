@@ -4,6 +4,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 namespace purefs::fs::internal
 {
@@ -32,6 +33,10 @@ namespace purefs::fs::internal
         [[nodiscard]] auto mntpoint() const noexcept
         {
             return m_mount_point.lock();
+        }
+        [[nodiscard]] virtual auto open_path() const noexcept -> std::string
+        {
+            return {};
         }
 
       private:

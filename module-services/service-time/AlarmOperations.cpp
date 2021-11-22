@@ -41,6 +41,38 @@ namespace alarms
         alarmEventsRepo->getAlarmEvent(alarmId, repoCallback);
     }
 
+    void AlarmOperationsCommon::getAlarmWithStatus(const std::uint32_t alarmId, OnGetAlarmWithStatusProcessed callback)
+    {
+        OnGetAlarmEventCallback repoCallback = [this, callback](AlarmEventRecord record) {
+            // Check if snoozed
+            auto foundSnoozed = findSnoozedEventById(snoozedSingleEvents, record.ID);
+            if (foundSnoozed != snoozedSingleEvents.end()) {
+                callback(std::pair<AlarmEventRecord, AlarmStatus>(record, AlarmStatus::Snoozed));
+                return;
+            }
+
+            // Check if ringing or queued
+            auto foundOngoing = findSingleEventById(ongoingSingleEvents, record.ID);
+            if (foundOngoing != ongoingSingleEvents.end()) {
+                if (foundOngoing == ongoingSingleEvents.begin()) {
+                    callback(std::pair<AlarmEventRecord, AlarmStatus>(record, AlarmStatus::Ringing));
+                }
+                else {
+                    callback(std::pair<AlarmEventRecord, AlarmStatus>(record, AlarmStatus::Queued));
+                }
+                return;
+            }
+
+            if (record.enabled) {
+                callback(std::pair<AlarmEventRecord, AlarmStatus>(record, AlarmStatus::Activated));
+            }
+            else {
+                callback(std::pair<AlarmEventRecord, AlarmStatus>(record, AlarmStatus::Deactivated));
+            }
+        };
+        alarmEventsRepo->getAlarmEvent(alarmId, repoCallback);
+    }
+
     void AlarmOperationsCommon::addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback)
     {
         OnAddAlarmEventCallback repoCallback = [&, callback, record](bool success) mutable {
@@ -53,12 +85,7 @@ namespace alarms
     void AlarmOperationsCommon::updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback)
     {
         OnUpdateAlarmEventCallback repoCallback = [&, callback, record](bool success) mutable {
-            auto found = std::find_if(nextSingleEvents.begin(),
-                                      nextSingleEvents.end(),
-                                      [recordId = record.ID](const std::unique_ptr<SingleEventRecord> &e) {
-                                          return e->parent->ID == recordId;
-                                      });
-
+            auto found = findSingleEventById(nextSingleEvents, record.ID);
             if (found != std::end(nextSingleEvents)) {
                 updateEventsCache(getCurrentTime());
             }
@@ -73,11 +100,7 @@ namespace alarms
     void AlarmOperationsCommon::removeAlarm(const std::uint32_t alarmId, OnRemoveAlarmProcessed callback)
     {
         OnRemoveAlarmEventCallback repoCallback = [&, callback, alarmId](bool success) {
-            auto found = std::find_if(
-                nextSingleEvents.begin(),
-                nextSingleEvents.end(),
-                [alarmId](const std::unique_ptr<SingleEventRecord> &e) { return e->parent->ID == alarmId; });
-
+            auto found = findSingleEventById(nextSingleEvents, alarmId);
             if (found != std::end(nextSingleEvents) && nextSingleEvents.size() == 1) {
                 updateEventsCache(getCurrentTime());
             }
@@ -105,10 +128,7 @@ namespace alarms
 
     void AlarmOperationsCommon::turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)
     {
-        auto found =
-            std::find_if(ongoingSingleEvents.begin(),
-                         ongoingSingleEvents.end(),
-                         [id](const std::unique_ptr<SingleEventRecord> &event) { return id == event->parent->ID; });
+        auto found = findSingleEventById(ongoingSingleEvents, id);
         if (found == ongoingSingleEvents.end()) {
             LOG_ERROR("Trying to turn off nonexisting event");
             callback(false);
@@ -122,10 +142,7 @@ namespace alarms
 
     void AlarmOperationsCommon::turnOffSnoozedAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)
     {
-        auto found = std::find_if(
-            snoozedSingleEvents.begin(),
-            snoozedSingleEvents.end(),
-            [id](const std::unique_ptr<SnoozedAlarmEventRecord> &event) { return id == event->parent->ID; });
+        auto found = findSnoozedEventById(snoozedSingleEvents, id);
         if (found == snoozedSingleEvents.end()) {
             LOG_ERROR("Trying to turn off nonexisting event");
             callback(false);
@@ -141,10 +158,7 @@ namespace alarms
                                                    const TimePoint nextAlarmTime,
                                                    OnSnoozeRingingAlarm callback)
     {
-        auto found =
-            std::find_if(ongoingSingleEvents.begin(),
-                         ongoingSingleEvents.end(),
-                         [id](const std::unique_ptr<SingleEventRecord> &event) { return id == event->parent->ID; });
+        auto found = findSingleEventById(ongoingSingleEvents, id);
         if (found == ongoingSingleEvents.end()) {
             LOG_ERROR("Trying to snooze nonexisting event");
             callback(false);
@@ -189,10 +203,7 @@ namespace alarms
                                                const TimePoint nextAlarmTime,
                                                OnSnoozeRingingAlarm callback)
     {
-        auto found = std::find_if(
-            snoozedSingleEvents.begin(),
-            snoozedSingleEvents.end(),
-            [id](const std::unique_ptr<SnoozedAlarmEventRecord> &event) { return id == event->parent->ID; });
+        auto found = findSnoozedEventById(snoozedSingleEvents, id);
         if (found == snoozedSingleEvents.end()) {
             LOG_ERROR("Trying to postpone nonexisting snooze");
             callback(false);
@@ -253,12 +264,12 @@ namespace alarms
         }
     }
 
-    auto AlarmOperationsCommon::minuteUpdated(TimePoint now) -> void
+    auto AlarmOperationsCommon::minuteUpdated(TimePoint now) -> bool
     {
-        processEvents(now);
+        return processEvents(now);
     }
 
-    void AlarmOperationsCommon::processEvents(TimePoint now)
+    bool AlarmOperationsCommon::processEvents(TimePoint now)
     {
         const auto isHandlingInProgress = !ongoingSingleEvents.empty();
         if (!nextSingleEvents.empty()) {
@@ -273,7 +284,9 @@ namespace alarms
             switchAlarmExecution(*(ongoingSingleEvents.front()), true);
             handleActiveAlarmsCountChange();
             handleSnoozedAlarmsCountChange();
+            return true;
         }
+        return false;
     }
 
     void AlarmOperationsCommon::addAlarmExecutionHandler(const alarms::AlarmType type,
@@ -408,5 +421,20 @@ namespace alarms
             std::sort(snoozedEvents.begin(), snoozedEvents.end(), isEarlier);
         }
         callback(std::move(snoozedEvents));
+    }
+
+    auto findSingleEventById(std::vector<std::unique_ptr<SingleEventRecord>> &events, const std::uint32_t id)
+        -> std::vector<std::unique_ptr<SingleEventRecord>>::iterator
+    {
+        return std::find_if(events.begin(), events.end(), [id](const std::unique_ptr<SingleEventRecord> &event) {
+            return id == event->parent->ID;
+        });
+    }
+    auto findSnoozedEventById(std::vector<std::unique_ptr<SnoozedAlarmEventRecord>> &events, const std::uint32_t id)
+        -> std::vector<std::unique_ptr<SnoozedAlarmEventRecord>>::iterator
+    {
+        return std::find_if(events.begin(), events.end(), [id](const std::unique_ptr<SnoozedAlarmEventRecord> &event) {
+            return id == event->parent->ID;
+        });
     }
 } // namespace alarms

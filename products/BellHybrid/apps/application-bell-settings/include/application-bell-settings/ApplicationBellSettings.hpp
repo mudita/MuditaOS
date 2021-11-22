@@ -4,19 +4,20 @@
 #pragma once
 
 #include <Application.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 
 namespace gui::window::name
 {
-    inline constexpr auto bellSettings            = "BellSettings";
-    inline constexpr auto bellSettingsAdvanced    = "BellSettingsAdvanced";
-    inline constexpr auto bellSettingsTimeUnits   = "BellSettingsTimeUnits";
-    inline constexpr auto bellSettingsDialog      = "BellSettingsDialog";
-    inline constexpr auto bellSettingsFinished    = "BellSettingsFinished";
-    inline constexpr auto bellSettingsFrontlight  = "BellSettingsFrontlight";
-    inline constexpr auto bellSettingsHomeView    = "BellSettingsHomeView";
-    inline constexpr auto bellSettingsLanguage    = "BellSettingsLanguage";
-    inline constexpr auto bellSettingsBedtimeTone = "BellSettingsBedtimeTone";
+    inline constexpr auto bellSettings             = "BellSettings";
+    inline constexpr auto bellSettingsAdvanced     = "BellSettingsAdvanced";
+    inline constexpr auto bellSettingsTimeUnits    = "BellSettingsTimeUnits";
+    inline constexpr auto bellSettingsDialog       = "BellSettingsDialog";
+    inline constexpr auto bellSettingsFinished     = "BellSettingsFinished";
+    inline constexpr auto bellSettingsFrontlight   = "BellSettingsFrontlight";
+    inline constexpr auto bellSettingsHomeView     = "BellSettingsHomeView";
+    inline constexpr auto bellSettingsLanguage     = "BellSettingsLanguage";
+    inline constexpr auto bellSettingsBedtimeTone  = "BellSettingsBedtimeTone";
     inline constexpr auto bellSettingsFactoryReset = "BellSettingsFactoryReset";
 } // namespace gui::window::name
 
@@ -26,11 +27,15 @@ namespace app
 
     class ApplicationBellSettings : public Application
     {
+      private:
+        std::unique_ptr<AbstractAudioModel> audioModel;
+
       public:
         ApplicationBellSettings(std::string name                    = applicationBellSettingsName,
                                 std::string parent                  = "",
                                 StatusIndicators statusIndicators   = StatusIndicators{},
-                                StartInBackground startInBackground = {false});
+                                StartInBackground startInBackground = {false},
+                                uint32_t stackDepth                 = 4096 * 2);
 
         sys::ReturnCodes InitHandler() override;
 

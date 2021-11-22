@@ -11,7 +11,6 @@ namespace gui::window::name
     inline constexpr auto bell_main_menu        = "BellMainMenu";
     inline constexpr auto bell_main_menu_dialog = "BellMainMenuDialog";
     inline constexpr auto bell_battery_shutdown = "BellBatteryShutdown";
-
 } // namespace gui::window::name
 
 namespace app
@@ -25,7 +24,7 @@ namespace app
                                      std::string parent                  = "",
                                      StatusIndicators statusIndicators   = StatusIndicators{},
                                      StartInBackground startInBackground = {false},
-                                     std::uint32_t stackDepth            = 8192);
+                                     std::uint32_t stackDepth            = 10240);
 
         sys::ReturnCodes InitHandler() override;
 
@@ -41,17 +40,25 @@ namespace app
         }
 
       private:
+        bool blockAllPopups = false;
+
+        bool isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const;
         void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params) override;
         auto isHomeScreenFocused() -> bool;
         void onStart() override;
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
+        void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
     };
 
     template <> struct ManifestTraits<ApplicationBellMain>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::ShowAlarm, manager::actions::DisplayLogoAtExit}};
+            return {{manager::actions::Launch,
+                     manager::actions::ShowAlarm,
+                     manager::actions::DisplayLogoAtExit,
+                     manager::actions::DisplayLowBatteryScreen,
+                     manager::actions::SystemBrownout}};
         }
     };
 } // namespace app

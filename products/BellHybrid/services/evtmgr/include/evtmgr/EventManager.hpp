@@ -6,6 +6,7 @@
 #include <service-evtmgr/EventManagerCommon.hpp>
 
 #include "backlight-handler/BacklightHandler.hpp"
+#include "user-activity-handler/UserActivityHandler.hpp"
 
 class KeySequenceMgr;
 
@@ -17,7 +18,8 @@ namespace hal::temperature
 class EventManager : public EventManagerCommon
 {
   public:
-    explicit EventManager(const std::string &name = service::name::evt_manager);
+    explicit EventManager(LogDumpFunction logDumpFunction = nullptr,
+                          const std::string &name         = service::name::evt_manager);
 
   private:
     void handleKeyEvent(sys::Message *msg) override;
@@ -27,6 +29,7 @@ class EventManager : public EventManagerCommon
     void buildKeySequences();
     std::shared_ptr<hal::temperature::AbstractTemperatureSource> temperatureSource;
     backlight::Handler backlightHandler;
+    evm::UserActivityHandler userActivityHandler;
 
     std::shared_ptr<KeySequenceMgr> keySequenceMgr;
 };

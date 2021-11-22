@@ -36,18 +36,9 @@ namespace app::manager
         return rootApplicationName;
     }
 
-    auto ApplicationManager::handleDisplayLowBatteryScreen(ActionEntry &action) -> ActionProcessStatus
-    {
-        SwitchRequest switchRequest(
-            service::name::appmgr, resolveHomeApplication(), gui::window::name::bell_battery_shutdown, nullptr);
-        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
-    }
-
     ActionProcessStatus ApplicationManager::handleAction(ActionEntry &action)
     {
         switch (action.actionId) {
-        case actions::DisplayLowBatteryScreen:
-            return handleDisplayLowBatteryScreen(action);
         default:
             return ApplicationManagerCommon::handleAction(action);
         }
@@ -74,5 +65,22 @@ namespace app::manager
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
         connect(typeid(BatteryShutdown), convertibleToActionHandler);
         connect(typeid(BedtimeNotification), convertibleToActionHandler);
+    }
+
+    void ApplicationManager::handleStart(StartAllowedMessage *msg)
+    {
+        switch (msg->getStartupType()) {
+        case StartupType::Regular:
+            [[fallthrough]];
+        case StartupType::LowBatteryCharging:
+            ApplicationManagerCommon::handleStart(msg);
+            break;
+        case StartupType::LowBattery:
+            handleSwitchApplication(
+                std::make_unique<SwitchRequest>(
+                    service::name::appmgr, app::applicationBellName, gui::window::name::bell_battery_shutdown, nullptr)
+                    .get());
+            break;
+        }
     }
 } // namespace app::manager

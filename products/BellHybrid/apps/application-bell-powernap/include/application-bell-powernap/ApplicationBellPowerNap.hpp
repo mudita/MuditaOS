@@ -4,12 +4,13 @@
 #pragma once
 
 #include <Application.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 
 namespace gui::window::name
 {
-    inline constexpr auto powernapProgress = "PowerNapProgressWindow";
+    inline constexpr auto powernapProgress     = "PowerNapProgressWindow";
     inline constexpr auto powernapSessionEnded = "PowerNapSessionEndedWindow";
-}
+} // namespace gui::window::name
 namespace app
 {
     namespace powernap
@@ -21,11 +22,15 @@ namespace app
 
     class ApplicationBellPowerNap : public Application
     {
+      private:
+        std::unique_ptr<AbstractAudioModel> audioModel;
+
       public:
         ApplicationBellPowerNap(std::string name                    = applicationBellPowerNapName,
                                 std::string parent                  = "",
                                 StatusIndicators statusIndicators   = StatusIndicators{},
-                                StartInBackground startInBackground = {false});
+                                StartInBackground startInBackground = {false},
+                                uint32_t stackDepth                 = 4096 * 2);
         ~ApplicationBellPowerNap();
         sys::ReturnCodes InitHandler() override;
 

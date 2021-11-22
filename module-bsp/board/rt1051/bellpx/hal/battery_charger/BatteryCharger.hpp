@@ -4,6 +4,7 @@
 #pragma once
 
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
+#include <bsp/fuel_gauge/fuel_gauge.hpp>
 
 namespace hal::battery
 {
@@ -18,6 +19,9 @@ namespace hal::battery
         int getBatteryVoltage() final;
 
       private:
+        bsp::fuel_gauge::StateOfCharge filterSOC();
+
         AbstractBatteryCharger::BatteryChargerEvents &eventsHandler;
+        bsp::fuel_gauge::StateOfCharge lastSOC;
     };
 } // namespace hal::battery

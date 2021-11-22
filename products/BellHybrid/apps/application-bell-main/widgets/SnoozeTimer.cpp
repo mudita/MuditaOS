@@ -20,17 +20,6 @@ namespace gui
         alarmImg->setMargins(Margins(10U, 0, 10U, 0));
         alarmImg->setMinimumSizeToFitImage();
 
-        minusText = new TextFixedSize(this, 0, 0, 0, 0);
-        minusText->setText("-");
-        minusText->setFont(style::window::font::largelight);
-        minusText->setMargins(Margins(0, 0, 0, 0));
-        minusText->setMinimumHeightToFitText();
-        minusText->setMinimumWidthToFitText();
-        minusText->drawUnderline(false);
-        minusText->setEditMode(EditMode::Browse);
-        minusText->activeItem = false;
-        minusText->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
-
         timeSpinner = new TimeSetSpinner(this);
         timeSpinner->setFont(style::window::font::largelight);
         timeSpinner->setEditMode(EditMode::Browse);
@@ -44,13 +33,16 @@ namespace gui
     auto SnoozeTimer::setFont(std::string newFontName) noexcept -> void
     {
         fontName = std::move(newFontName);
-        minusText->setFont(fontName);
         timeSpinner->setFont(fontName);
     }
 
     auto SnoozeTimer::setTime(std::uint8_t mins, std::uint8_t secs) noexcept -> void
     {
         timeSpinner->setTime(mins, secs);
+    }
+    auto SnoozeTimer::setTime(std::time_t time) noexcept -> void
+    {
+        timeSpinner->setTime(time);
     }
 
 } /* namespace gui */

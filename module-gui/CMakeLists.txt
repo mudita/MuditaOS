@@ -7,6 +7,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 include(gui/CMakeLists.txt)
 include(gui/core/CMakeLists.txt)
 include(gui/widgets/CMakeLists.txt)
+include(gui/widgets/text/CMakeLists.txt)
 include(gui/input/CMakeLists.txt)
 include(gui/dom/CMakeLists.txt)
 
@@ -15,19 +16,15 @@ include_directories( ../module-utils )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         ${TARGET_LIBRARIES}
-        module-bsp
-        eventstore
         utils-math
         module-utils
         sys-phonemodes
         sys-service
-        sys-watchdog
         service-bluetooth
         utf8
     PRIVATE
         i18n
         json::json
-        Microsoft.GSL::GSL
         pugixml::pugixml
         utils-time
 )

@@ -4,12 +4,14 @@
 #include "BellHomeScreenWindow.hpp"
 #include "data/BellMainStyle.hpp"
 #include "widgets/SnoozeTimer.hpp"
+#include "BellBatteryStatusWindow.hpp"
+#include "ProductConfig.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/input/InputEvent.hpp>
-#include <gui/widgets/TextFixedSize.hpp>
+#include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
 #include <i18n/i18n.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -17,7 +19,6 @@
 #include <time/time_constants.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/TimeSetFmtSpinner.hpp>
-#include <widgets/TimeSetSpinner.hpp>
 
 #include <chrono>
 
@@ -116,11 +117,12 @@ namespace gui
         bottomBox = new HBox(body->lastBox, 0, 0, 0, 0);
         bottomBox->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
         bottomBox->setEdges(RectangleEdge::None);
+        bottomBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         battery = new BellBattery(bottomBox, 0, 0, 0, 0);
         battery->setMinimumSize(battery::battery_widget_w, battery::battery_widget_h);
         battery->setEdges(RectangleEdge::None);
-        battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        battery->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         battery->setVisible(false);
 
         bottomText = new TextFixedSize(bottomBox, 0, 0, 0, 0);
@@ -186,19 +188,25 @@ namespace gui
 
     void BellHomeScreenWindow::setTemperature(utils::temperature::Temperature newTemp)
     {
+#if CONFIG_ENABLE_TEMP == 1
         bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_normal);
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         bottomText->setText(utils::temperature::tempToStrDec(newTemp));
         bottomBox->resizeItems();
+#else
+        bottomText->setVisible(false);
+        bottomBox->resizeItems();
+#endif
     }
 
     void BellHomeScreenWindow::setBottomDescription(const UTF8 &desc)
     {
         battery->setVisible(false);
-        bottomBox->resizeItems();
+        bottomText->setVisible(true);
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_small);
         bottomText->setRichText(desc);
+        bottomBox->resizeItems();
     }
 
     void BellHomeScreenWindow::setBatteryLevelState(const Store::Battery &batteryContext)
@@ -208,7 +216,12 @@ namespace gui
             bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         }
         else {
+#if CONFIG_ENABLE_TEMP == 1
             bottomText->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
+            battery->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+#else
+            battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+#endif
         }
         bottomBox->resizeItems();
     }
@@ -246,7 +259,7 @@ namespace gui
 
     bool BellHomeScreenWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease()) {
+        if (inputEvent.isShortRelease() || inputEvent.isLongRelease()) {
             return presenter->handleInputEvent(inputEvent);
         }
         return false;
@@ -308,4 +321,15 @@ namespace gui
         }
         return false;
     }
+    void BellHomeScreenWindow::switchToBatteryStatus()
+    {
+        application->switchWindow(gui::BellBatteryStatusWindow::name,
+                                  std::make_unique<gui::BellBatteryStatusWindow::Data>(presenter->getBatteryLvl(),
+                                                                                       presenter->isBatteryCharging()));
+    }
+    void BellHomeScreenWindow::setSnoozeTime(std::time_t newTime)
+    {
+        snoozeTimer->setTime(newTime);
+    }
+
 } // namespace gui

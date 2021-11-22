@@ -4,6 +4,8 @@ MuditaOS is an Open Source project and we're more than happy to receive contribu
 
 Before contributing please read and accept our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
+**Note:** You will be able to test your contributions only on [Mudita Pure Simulator](./doc/howto_simulator.md). You won't be able to produce a build for Mudita Pure yourself, since the operating system contains a piece of proporietary software from E Ink Holdings Inc., namely `luts.bin` - a small program the E Ink display executes each time you refresh it.
+
 ## Reporting bugs
 
 If you think you found a bug or a security issue in MuditaOS, we'd love to hear from you. Before you create a relevant GitHub issue please:

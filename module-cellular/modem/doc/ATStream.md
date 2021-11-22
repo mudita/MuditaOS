@@ -3,22 +3,22 @@
 ## Table of contents
 1. [History](#history)
 2. [Scope](#scope)
-3. [Current implementation](#currentimpl)
+3. [Current implementation](#current-implementation)
 
 
-## History <a name="history"></a>
+## History
 
 | Authors           | Change description        | Status | Modification date |
 | ----------------- | ------------------------- | ------ | ----------------- |
 | Bartosz Reichel | Initial version           | Draft  | 2021.02.10        |
 
 
-## Scope <a name="scope"></a>
+## Scope
 Description of dependencies for channel and ATStream usage 
 
 
 
-## Current implementation <a name="currentimpl"></a>
+## Current implementation
 
 
 ![alt text](./Images/class_channel.png "Class diagram for channel")

@@ -24,6 +24,7 @@ namespace gui
         alarmImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         alarmImg->setMargins(Margins(style::alarm_set_spinner::margin, 0, style::alarm_set_spinner::margin, 0));
         alarmImg->setMinimumSizeToFitImage();
+        alarmImg->activeItem = false;
 
         timeSpinner = new TimeSetFmtSpinner(this);
         timeSpinner->setFont(style::window::font::largelight);
@@ -92,7 +93,6 @@ namespace gui
     auto AlarmSetSpinner::setAlarmStatus(Status status) noexcept -> void
     {
         alarmStatus = status;
-        alarmImg->setMinimumSizeToFitImage();
 
         switch (alarmStatus) {
         case Status::ACTIVATED:
@@ -116,7 +116,10 @@ namespace gui
             break;
         }
 
-        resizeItems();
+        alarmImg->setMinimumSizeToFitImage();
+        alarmImg->setMaximumSize(alarmImg->widgetMinimumArea.w, alarmImg->widgetMinimumArea.h);
+
+        alarmImg->informContentChanged();
     }
 
     auto AlarmSetSpinner::setAlarmTimeVisible(bool value) noexcept -> void

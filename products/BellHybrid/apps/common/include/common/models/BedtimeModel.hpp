@@ -6,13 +6,14 @@
 #include "AbstractBedtimeModel.hpp"
 #include "SettingsModel.hpp"
 #include <Service/Service.hpp>
+#include <common/models/AudioModel.hpp>
+#include <ApplicationCommon.hpp>
 #include <ctime>
 
 namespace app::bell_bedtime
 {
-    inline constexpr auto DEFAULT_BEDTIME_TIME   = "21:00";
-    inline constexpr auto DEFAULT_BEDTIME_TONE   = "Evening Horizon";
-    inline constexpr auto DEFAULT_BEDTIME_VOLUME = 1;
+    inline constexpr auto DEFAULT_BEDTIME_TIME = "21:00";
+    inline constexpr auto DEFAULT_BEDTIME_TONE = "Evening Horizon";
 
     class BedtimeOnOffModel : public gui::SettingsModel<bool>
     {
@@ -36,13 +37,18 @@ namespace app::bell_bedtime
         auto getValue() const -> time_t override;
     };
 
-    class BedtimeVolumeModel : public gui::SettingsModel<std::uint8_t>
+    class BedtimeVolumeModel : public gui::AbstractSettingsModel<std::uint8_t>
     {
       public:
-        using SettingsModel::SettingsModel;
+        explicit BedtimeVolumeModel(AbstractAudioModel &audioModel);
 
         void setValue(std::uint8_t value) override;
         std::uint8_t getValue() const override;
+        void restoreDefault() override;
+
+      private:
+        AbstractAudioModel &audioModel;
+        std::uint8_t defaultValue;
     };
 
     class AlarmToneModel : public gui::SettingsModel<UTF8>
@@ -59,12 +65,12 @@ namespace app::bell_bedtime
       public:
         BedtimeModel() = delete;
 
-        explicit BedtimeModel(sys::Service *app)
+        explicit BedtimeModel(ApplicationCommon *app, AbstractAudioModel &audioModel)
         {
             bedtimeOnOff  = std::make_unique<bell_bedtime::BedtimeOnOffModel>(app);
             bedtimeTime   = std::make_unique<bell_bedtime::BedtimeTimeModel>(app);
             bedtimeTone   = std::make_unique<bell_bedtime::AlarmToneModel>(app);
-            bedtimeVolume = std::make_unique<bell_bedtime::BedtimeVolumeModel>(app);
+            bedtimeVolume = std::make_unique<bell_bedtime::BedtimeVolumeModel>(audioModel);
         }
         gui::AbstractSettingsModel<bool> &getBedtimeOnOff() override
         {

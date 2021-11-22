@@ -20,6 +20,7 @@ class ConnectionManagerCellularCommands : public ConnectionManagerCellularComman
     auto isConnectionTimerActive() -> bool final;
     void startConnectionTimer() final;
     void stopConnectionTimer() final;
+    void holdMinimumCpuFrequency() final;
 
   private:
     ServiceCellular &cellular;

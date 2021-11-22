@@ -12,6 +12,7 @@ namespace gui::window::name
     inline constexpr auto contact                = "Contact";
     inline constexpr auto contact_options        = "Options";
     inline constexpr auto namecard_options       = "Namecard Options";
+    inline constexpr auto input_options          = "Input Options";
     inline constexpr auto new_contact            = "New";
     inline constexpr auto search                 = "Search";
     inline constexpr auto search_results         = "SearchResults";

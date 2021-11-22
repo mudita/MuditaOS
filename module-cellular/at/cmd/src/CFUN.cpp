@@ -13,7 +13,7 @@ namespace at
     namespace cmd
     {
         using namespace std::chrono_literals;
-        CFUN::CFUN(at::cmd::Modifier mod) noexcept : Cmd("AT+CFUN", mod, 150s)
+        CFUN::CFUN(at::cmd::Modifier mod) noexcept : Cmd("AT+CFUN", mod, 17s)
         {}
 
         CFUN::CFUN() noexcept : CFUN(at::cmd::Modifier::None)

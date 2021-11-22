@@ -20,7 +20,6 @@ namespace app::bgSounds
                                                          std::unique_ptr<AbstractTimeModel> timeModel)
         : settings{settings}, player{player}, timeModel{std::move(timeModel)}
     {}
-    BGSoundsProgressPresenter::~BGSoundsProgressPresenter() = default;
 
     void BGSoundsProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
     {
@@ -88,5 +87,13 @@ namespace app::bgSounds
     void BGSoundsProgressPresenter::handleUpdateTimeEvent()
     {
         getView()->setTime(timeModel->getCurrentTime());
+    }
+    bool BGSoundsProgressPresenter::isPaused()
+    {
+        return player.isPaused();
+    }
+    void BGSoundsProgressPresenter::onBeforeShow()
+    {
+        getView()->setTimeFormat(timeModel->getTimeFormat());
     }
 } // namespace app::bgSounds

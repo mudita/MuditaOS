@@ -37,6 +37,7 @@ namespace app::bell_settings
             virtual auto saveData() -> void                                                 = 0;
             virtual auto loadData() -> void                                                 = 0;
             virtual auto eraseProviderData() -> void                                        = 0;
+            virtual void exitWithoutSave()                                                  = 0;
         };
     };
 
@@ -45,21 +46,21 @@ namespace app::bell_settings
       public:
         AlarmSettingsPresenter(std::shared_ptr<AlarmSettingsListItemProvider> provider,
                                std::unique_ptr<AbstractAlarmSettingsModel> model,
-                               std::unique_ptr<AbstractAudioModel> audioModel,
+                               AbstractAudioModel &audioModel,
                                std::unique_ptr<AbstractSoundsRepository> soundsRepository);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto saveData() -> void override;
         auto loadData() -> void override;
         auto eraseProviderData() -> void override;
+        void exitWithoutSave() override;
 
       private:
         void stopSound();
 
         std::shared_ptr<AlarmSettingsListItemProvider> provider;
         std::unique_ptr<AbstractAlarmSettingsModel> model;
-        std::unique_ptr<AbstractAudioModel> audioModel;
+        AbstractAudioModel &audioModel;
         std::unique_ptr<AbstractSoundsRepository> soundsRepository;
-        audio::Token currentToken;
     };
 } // namespace app::bell_settings

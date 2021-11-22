@@ -33,13 +33,20 @@ namespace app::bell_settings
     void PrewakeUpChimeVolumeModel::setValue(std::uint8_t value)
     {
         const auto valStr = std::to_string(value);
-        settings.setValue(bell::settings::PrewakeUp::volume, valStr, settings::SettingsScope::Global);
+        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::PreWakeup, {});
     }
 
     std::uint8_t PrewakeUpChimeVolumeModel::getValue() const
     {
-        const auto str = settings.getValue(bell::settings::PrewakeUp::volume, settings::SettingsScope::Global);
-        return std::stoi(str);
+        return defaultValue;
+    }
+    PrewakeUpChimeVolumeModel::PrewakeUpChimeVolumeModel(AbstractAudioModel &audioModel) : audioModel{audioModel}
+    {
+        defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::PreWakeup).value_or(0);
+    }
+    void PrewakeUpChimeVolumeModel::restoreDefault()
+    {
+        setValue(defaultValue);
     }
 
     void PrewakeUpLightDurationModel::setValue(std::uint8_t value)

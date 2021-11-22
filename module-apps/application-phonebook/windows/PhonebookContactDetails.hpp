@@ -28,6 +28,7 @@ namespace gui
         void destroyInterface() override;
 
       private:
+        PhonebookItemData::RequestType requestType               = PhonebookItemData::RequestType::Internal;
         std::shared_ptr<ContactRecord> contact                   = nullptr;
         ContactFlagsWidget *contactFlagsWidget                   = nullptr;
         std::shared_ptr<ContactDetailsModel> contactDetailsModel = nullptr;

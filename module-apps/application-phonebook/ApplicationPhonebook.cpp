@@ -13,6 +13,7 @@
 #include "windows/PhonebookSearch.hpp"
 #include "windows/PhonebookSearchResults.hpp"
 #include "windows/PhonebookIceContacts.hpp"
+#include "windows/PhonebookInputOptions.hpp"
 #include <service-appmgr/Controller.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -129,7 +130,9 @@ namespace app
         windowsFactory.attach(gui::window::name::ice_contacts, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookIceContacts>(app);
         });
-
+        windowsFactory.attach(gui::window::name::input_options, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::PhonebookInputOptions>(app, name);
+        });
         windowsFactory.attach(gui::window::name::new_contact, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookNewContact>(app);
         });

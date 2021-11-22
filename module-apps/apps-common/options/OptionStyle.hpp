@@ -35,6 +35,13 @@ namespace gui::option
         Text
     };
 
+    enum class OptionRecordValidity
+    {
+        Uninitialized,
+        Invalid,
+        Valid
+    };
+
     namespace window
     {
         inline constexpr gui::Length option_left_margin       = 10;

@@ -6,7 +6,6 @@
 #include <locks/widgets/LockBox.hpp>
 
 #include <AppWindow.hpp>
-#include <RichTextParser.hpp>
 #include <Text.hpp>
 #include <ImageBox.hpp>
 

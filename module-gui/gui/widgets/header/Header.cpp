@@ -34,7 +34,7 @@ namespace gui::header
     Item *Header::createTitle(const UTF8 &text)
     {
         title = new gui::Label(nullptr, 0, 0, 0, 0);
-        title->setMaximumSize(getWidth(), getHeight());
+        title->setMaximumSize(getWidth() - 2 * style::header::title::margins, getHeight());
         title->setFont(style::header::font::title);
         title->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
         title->setPadding(gui::Padding(0, style::header::title::top_padding, 0, 0));

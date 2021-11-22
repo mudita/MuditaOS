@@ -7,6 +7,7 @@
 #include <windows/OnBoardingLanguageWindow.hpp>
 #include <windows/OnBoardingFinalizeWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
+#include <windows/OnBoardingWelcomeWindow.hpp>
 #include <windows/OnBoardingInstructionPromptWindow.hpp>
 
 #include <service-appmgr/Constants.hpp>
@@ -60,8 +61,13 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellWelcomeWindow>(
-                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingLanguageWindow); });
+                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingWelcomeWindow); });
         });
+
+        windowsFactory.attach(gui::window::name::onBoardingWelcomeWindow,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::OnBoardingWelcomeWindow>(app, name);
+                              });
 
         windowsFactory.attach(
             gui::window::name::onBoardingLanguageWindow, [this](ApplicationCommon *app, const std::string &name) {
@@ -158,7 +164,9 @@ namespace app
         auto currentWindow = getCurrentWindow()->getName();
         return (currentWindow != gui::name::window::main_window &&
                 currentWindow != gui::window::name::finalizeOnBoardingWindow &&
-                currentWindow != gui::window::name::informationOnBoardingWindow);
+                currentWindow != gui::window::name::onBoardingWelcomeWindow &&
+                (currentWindow != gui::window::name::informationOnBoardingWindow ||
+                 informationState == OnBoarding::InformationStates::DeepClickWarningInfo));
     }
 
     void ApplicationBellOnBoarding::startTimerOnWindows()
@@ -172,6 +180,8 @@ namespace app
     {
         auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
 
+        informationPromptTimer.stop();
+
         auto selectedWindowCondition =
             getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow &&
             msg->getWindowName() == getPrevWindow() &&
@@ -181,6 +191,12 @@ namespace app
 
             informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
             displayInformation(msg->getWindowName());
+        }
+        if (selectedWindowCondition && informationState == OnBoarding::InformationStates::DeepClickCorrectionInfo) {
+            informationState = OnBoarding::InformationStates::RotateInfo;
+        }
+
+        if (msg->getSenderWindowName() != gui::window::name::informationOnBoardingWindow) {
             informationState = OnBoarding::InformationStates::RotateInfo;
         }
     }
@@ -195,29 +211,57 @@ namespace app
         auto inputEvent = static_cast<AppInputEventMessage *>(msgl)->getEvent();
 
         if (isInformationPromptPermittedOnCurrentWindow()) {
-            startTimerOnWindows();
-
             if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) || inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN)) {
                 informationState = OnBoarding::InformationStates::LightClickInfo;
             }
-            else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RIGHT)) {
+            else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RIGHT) ||
+                     inputEvent.isKeyRelease(gui::KeyCode::KEY_LEFT)) {
                 informationState = OnBoarding::InformationStates::DeepClickWarningInfo;
-                displayInformation(getCurrentWindow()->getName());
+                if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
+                    displayInformation(getPrevWindow());
+                }
+                else {
+                    displayInformation(getCurrentWindow()->getName());
+                }
             }
             else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                informationState = OnBoarding::InformationStates::RotateInfo;
+                if (informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
+                    informationPromptTimer.stop();
+                    informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
+                    displayInformation(getPrevWindow());
+                }
+                else {
+                    informationState = OnBoarding::InformationStates::RotateInfo;
+                }
             }
-
-            return false;
         }
-
-        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER) &&
-            informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
-            informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
-
-            displayInformation(getPrevWindow());
-            informationState = OnBoarding::InformationStates::RotateInfo;
-            return true;
+        else {
+            if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
+                switch (informationState) {
+                case OnBoarding::InformationStates::DeepClickCorrectionInfo:
+                    if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
+                        switchWindow(getPrevWindow());
+                        return true;
+                    }
+                    break;
+                case OnBoarding::InformationStates::LightClickInfo:
+                    if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
+                        switchWindow(getPrevWindow());
+                        return true;
+                    }
+                    break;
+                case OnBoarding::InformationStates::RotateInfo:
+                    if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) ||
+                        inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN) ||
+                        inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
+                        switchWindow(getPrevWindow());
+                        return true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
         }
 
         return false;

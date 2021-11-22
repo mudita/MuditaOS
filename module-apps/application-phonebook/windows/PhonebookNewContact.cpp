@@ -53,6 +53,7 @@ namespace gui
     {
         if (mode != ShowMode::GUI_SHOW_RETURN) {
             newContactModel->clearData();
+            newContactModel->loadData(contact);
         }
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
@@ -71,7 +72,7 @@ namespace gui
             break;
         }
 
-        newContactModel->loadData(contact);
+        !newContactModel->emptyData() ? setSaveButtonVisible(true) : setSaveButtonVisible(false);
     }
 
     auto PhonebookNewContact::handleSwitchData(SwitchData *data) -> bool
@@ -89,20 +90,17 @@ namespace gui
         if (contact == nullptr) {
             contactAction = ContactAction::Add;
             contact       = std::make_shared<ContactRecord>();
-            setSaveButtonVisible(false);
             return true;
         }
 
         if (contact->ID == DB_ID_NONE) {
             contactAction = ContactAction::Add;
-            setSaveButtonVisible(false);
         }
         else if (contact->isTemporary()) {
             contactAction = ContactAction::EditTemporary;
         }
         else {
             contactAction = ContactAction::Edit;
-            setSaveButtonVisible(true);
         }
 
         return true;
@@ -115,15 +113,12 @@ namespace gui
 
     auto PhonebookNewContact::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (AppWindow::onInput(inputEvent)) {
-            return true;
-        }
+        auto ret = AppWindow::onInput(inputEvent);
 
-        if (!inputEvent.isShortRelease()) {
-            return false;
-        }
+        !newContactModel->emptyData() ? setSaveButtonVisible(true) : setSaveButtonVisible(false);
 
-        if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER) && !newContactModel->emptyData() &&
+            newContactModel->verifyData()) {
             auto tmpId  = contact->ID;
             contact     = std::make_shared<ContactRecord>();
             contact->ID = tmpId;
@@ -134,9 +129,7 @@ namespace gui
             return true;
         }
 
-        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-
-        return false;
+        return ret;
     }
 
     auto PhonebookNewContact::verifyAndSave() -> bool

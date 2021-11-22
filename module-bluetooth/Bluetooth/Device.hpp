@@ -9,13 +9,21 @@
 #include <string>
 #include <utility>
 
+#include <stdexcept>
+
 struct Device
 {
   public:
-    explicit Device(std::string name = "") : name(std::move(name))
-    {}
+    static constexpr auto NameBufferSize = 240;
+    explicit Device(std::string name = "")
+    {
+        if (name.size() > NameBufferSize) {
+            throw std::runtime_error("Requested name is bigger than buffer size");
+        }
+        strcpy(this->name.data(), name.c_str());
+    }
     virtual ~Device() = default;
-    std::string name;
+    std::array<char, NameBufferSize> name;
 };
 
 enum DEVICE_STATE
@@ -107,12 +115,12 @@ struct Devicei : public Device
 
     inline bool operator==(const Devicei &cmpDevice) const
     {
-        return (cmpDevice.name == name) && (bd_addr_cmp(cmpDevice.address, address) == 0);
+        return (strcmp(cmpDevice.name.data(), name.data()) == 0) && (bd_addr_cmp(cmpDevice.address, address) == 0);
     }
 
     inline bool operator!=(const Devicei &cmpDevice) const
     {
-        return (cmpDevice.name != name) || (bd_addr_cmp(cmpDevice.address, address) != 0);
+        return (strcmp(cmpDevice.name.data(), name.data()) != 0) || (bd_addr_cmp(cmpDevice.address, address) != 0);
     }
 
     auto address_str() const -> const char *

@@ -20,7 +20,16 @@ InputTranscodeProxy::InputTranscodeProxy(std::shared_ptr<AbstractStream> wrapped
 
 bool InputTranscodeProxy::push(const Span &span)
 {
-    return getWrappedStream().push(transform->transform(span, transcodingSpaceSpan));
+    Span outputSpan;
+
+    if (!getWrappedStream().reserve(outputSpan)) {
+        return false;
+    }
+
+    transform->transform(span, outputSpan);
+    getWrappedStream().commit();
+
+    return true;
 }
 
 bool InputTranscodeProxy::push(void *data, std::size_t dataSize)
@@ -38,13 +47,16 @@ void InputTranscodeProxy::commit()
     }
 }
 
-bool InputTranscodeProxy::reserve(Span &span)
+bool InputTranscodeProxy::reserve(Span &inputSpan)
 {
+    Span span;
     auto result = getWrappedStream().reserve(span);
 
-    reservedSpan = span;
-    span         = transcodingSpaceSpan;
-    isReserved   = true;
+    if (result) {
+        reservedSpan = span;
+        inputSpan    = transcodingSpaceSpan;
+        isReserved   = true;
+    }
 
     return result;
 }

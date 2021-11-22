@@ -5,6 +5,7 @@
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <common/popups/AlarmActivatedWindow.hpp>
 #include <common/TimeUtils.hpp>
+#include <common/data/StyleCommon.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <popups/Popups.hpp>
@@ -47,7 +48,9 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        icon = new Icon(this, 0, y_position, style::window_width, style::window_height, "big_alarm_W_G", {});
+        icon = new Icon(this, 0, 0, style::window_width, style::window_height, "big_alarm_W_G", {});
+        icon->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        icon->image->setMargins({0, bell_style::popup_icon_top_margin, 0, bell_style::popup_icon_bottom_margin});
         icon->text->setFont(style::window::font::verybiglight);
     }
 
@@ -63,7 +66,7 @@ namespace gui
             app::manager::actions::AbortPopup,
             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::AlarmDeactivated));
 
-        if (application->getPrevWindow() == gui::window::name::bellAlarmSet) {
+        if (application->getPrevWindow() == popup::window::alarm_deactivated_window) {
             app::manager::Controller::sendAction(
                 application,
                 app::manager::actions::Launch,

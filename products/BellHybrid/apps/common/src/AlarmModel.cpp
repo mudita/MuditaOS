@@ -22,11 +22,11 @@ namespace app
     void AlarmModel::update(AlarmModelReadyHandler callback)
     {
         responseCallback = [this, callback](const auto response) -> bool {
-            const auto resp = dynamic_cast<alarms::AlarmGetResponseMessage *>(response);
+            const auto resp = dynamic_cast<alarms::AlarmGetWithStatusResponseMessage *>(response);
             if (resp) {
                 if (resp->alarm.isValid()) {
                     auto alarm = resp->alarm;
-                    updateCache(alarm.getNextSingleEvent(TimePointNow()));
+                    updateCache(alarm.getNextSingleEvent(TimePointNow()), resp->status);
                     if (callback) {
                         callback();
                     }
@@ -46,7 +46,7 @@ namespace app
             return true;
         };
 
-        auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::AlarmGetRequestMessage>(),
+        auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::AlarmGetWithStatusRequestMessage>(),
                                                        service::name::service_time);
         request->execute(app, this, responseCallback);
     }
@@ -75,7 +75,11 @@ namespace app
         }
         alarmEventPtr->enabled = value;
         updateAlarm(*alarmEventPtr);
-        if (!value) {
+        if (value) {
+            alarmStatus = alarms::AlarmStatus::Activated;
+        }
+        else {
+            alarmStatus = alarms::AlarmStatus::Deactivated;
             disableSnooze(*alarmEventPtr);
         }
     }
@@ -122,7 +126,7 @@ namespace app
     }
     void AlarmModel::turnOff()
     {
-        snoozeCount = 0;
+        snoozeCount    = 0;
         nextSnoozeTime = TIME_POINT_INVALID;
         alarms::AlarmServiceAPI::requestTurnOffRingingAlarm(app, cachedRecord.parent->ID);
     }
@@ -134,9 +138,9 @@ namespace app
         const auto snoozeDuration = utils::getNumericValue<std::uint32_t>(snoozeDurationStr);
 
         snoozeCount++;
-        nextSnoozeTime =
-            std::chrono::floor<std::chrono::minutes>(TimePointNow()) + std::chrono::minutes(snoozeDuration);
+        nextSnoozeTime = std::chrono::ceil<std::chrono::minutes>(TimePointNow()) + std::chrono::minutes(snoozeDuration);
         alarms::AlarmServiceAPI::requestSnoozeRingingAlarm(app, cachedRecord.parent->ID, nextSnoozeTime);
+        alarmStatus = alarms::AlarmStatus::Snoozed;
     }
 
     std::chrono::seconds AlarmModel::getTimeToNextSnooze()
@@ -170,13 +174,14 @@ namespace app
     {
         return snoozeCount > 0;
     }
-    void AlarmModel::updateCache(const SingleEventRecord &record)
+    void AlarmModel::updateCache(const SingleEventRecord &record, alarms::AlarmStatus status)
     {
         if (record.startDate != cachedRecord.startDate) {
-            snoozeCount  = 0;
-            cachedRecord = record;
+            snoozeCount = 0;
         }
-        state = State::Valid;
+        cachedRecord = record;
+        alarmStatus  = status;
+        state        = State::Valid;
     }
     void AlarmModel::setDefaultAlarmTime()
     {
@@ -187,5 +192,18 @@ namespace app
         alarmEventPtr->alarmTime = AlarmTime{7h, 00min};
 
         updateAlarm(*alarmEventPtr);
+    }
+
+    alarms::AlarmStatus AlarmModel::getAlarmStatus()
+    {
+        return alarmStatus;
+    }
+    std::time_t AlarmModel::getTimeOfNextSnooze()
+    {
+        const auto snoozeDurationStr =
+            settings.getValue(bell::settings::Snooze::length, settings::SettingsScope::Global);
+        const auto snoozeDuration = utils::getNumericValue<std::uint32_t>(snoozeDurationStr);
+        return Clock::to_time_t(std::chrono::floor<std::chrono::minutes>(TimePointNow()) +
+                                std::chrono::minutes(snoozeDuration));
     }
 } // namespace app

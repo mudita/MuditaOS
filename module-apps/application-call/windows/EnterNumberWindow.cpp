@@ -8,7 +8,7 @@
 #include <ContactRecord.hpp>
 #include <country.hpp>
 #include <i18n/i18n.hpp>
-#include <InputMode.hpp>
+#include <text/modes/InputMode.hpp>
 #include <phonenumbers/asyoutypeformatter.h>
 #include <phonenumbers/phonenumberutil.h>
 #include <service-appmgr/Controller.hpp>

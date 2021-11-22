@@ -18,6 +18,7 @@ target_link_libraries(app
         bell::app-common
         bell::appmgr
         bell::alarms
+        bell::audio
 )
 
 add_subdirectory(application-bell-main)
@@ -25,6 +26,7 @@ add_subdirectory(application-bell-onboarding)
 add_subdirectory(application-bell-background-sounds)
 add_subdirectory(application-bell-alarm)
 add_subdirectory(application-bell-bedtime)
+add_subdirectory(application-bell-meditation-timer)
 add_subdirectory(application-bell-settings)
 add_subdirectory(application-bell-powernap)
 add_subdirectory(common)

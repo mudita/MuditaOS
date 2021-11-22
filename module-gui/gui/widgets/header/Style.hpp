@@ -10,6 +10,7 @@ namespace style::header
     namespace title
     {
         inline constexpr auto top_padding = 6u;
+        inline constexpr auto margins     = 30u;
     }; // namespace title
 
     namespace navigation_indicator

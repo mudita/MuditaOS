@@ -6,6 +6,7 @@
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControlParameters.hpp>
 
+#include <SystemManager/CpuSentinel.hpp>
 #include <Timers/TimerHandle.hpp>
 
 #include <memory>
@@ -19,15 +20,18 @@ namespace sys
 /// Processing of ambient light sensor input to screen brightness output.
 namespace bell::screen_light_control
 {
+    constexpr auto screenLightControlName = "ScreenLightControl";
+
     /// Control screen light and keeps it's current state
     class ScreenLightController : public ::screen_light_control::ScreenLightController
     {
       public:
-        using Action                       = ::screen_light_control::Action;
-        using Parameters                   = ::screen_light_control::Parameters;
-        using ScreenLightMode              = ::screen_light_control::ScreenLightMode;
-        using ManualModeParameters         = ::screen_light_control::ManualModeParameters;
-        using LinearProgressModeParameters = ::screen_light_control::LinearProgressModeParameters;
+        using Action                            = ::screen_light_control::Action;
+        using Parameters                        = ::screen_light_control::Parameters;
+        using ScreenLightMode                   = ::screen_light_control::ScreenLightMode;
+        using ManualModeParameters              = ::screen_light_control::ManualModeParameters;
+        using LinearProgressModeParameters      = ::screen_light_control::LinearProgressModeParameters;
+        using ConstLinearProgressModeParameters = ::screen_light_control::ConstLinearProgressModeParameters;
 
         explicit ScreenLightController(sys::Service *parent);
         ~ScreenLightController() override;
@@ -46,8 +50,8 @@ namespace bell::screen_light_control
         void disableTimers();
 
         void setParameters(const LinearProgressModeParameters &params);
-        void setParameters(ManualModeParameters params);
-        void setManualBrightnessLevel(bsp::eink_frontlight::BrightnessPercentage brightness);
+        void setParameters(const ConstLinearProgressModeParameters &params);
+        void setBrightnessInstant(bsp::eink_frontlight::BrightnessPercentage brightness);
 
         void setAutomaticModeFunctions(const LinearProgressModeParameters::LinearFunctions &functions);
         ::screen_light_control::functions::LinearProgressFunction getNextAutomaticFunction();
@@ -57,15 +61,21 @@ namespace bell::screen_light_control
         void turnOff();
         void turnOn(const std::optional<ManualModeParameters> &params = std::nullopt);
 
-        void enableAutomaticMode();
-        void disableAutomaticMode();
+        void cpuSentinelKeepOn();
+        void cpuSentinelRelease();
+
+        bsp::eink_frontlight::BrightnessPercentage getStandarizedRampTarget(
+            bsp::eink_frontlight::BrightnessPercentage target);
 
         static constexpr inline auto CONTROL_TIMER_MS = 25;
+        static constexpr inline auto RAMP_STEP_PER_MS = 0.1;
+        static constexpr inline auto MINIMAL_TARGET   = 15;
 
         sys::TimerHandle controlTimer;
-        bool lightOn                                               = false;
-        ScreenLightMode automaticMode                              = ScreenLightMode::Manual;
-        bsp::eink_frontlight::BrightnessPercentage brightnessValue = 0.0;
+        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+        bool lightOn                                                = false;
+        ScreenLightMode automaticMode                               = ScreenLightMode::Manual;
+        bsp::eink_frontlight::BrightnessPercentage brightnessWhenOn = MINIMAL_TARGET;
         LinearProgressModeParameters::LinearFunctions automaticModeFunctions;
     };
 } // namespace bell::screen_light_control

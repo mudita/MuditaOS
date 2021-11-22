@@ -25,4 +25,9 @@ namespace app::alarmClock
         alarmFieldsProvider->saveData(std::move(record), action);
     }
 
+    void AlarmClockEditWindowPresenter::loadCustomRepeat()
+    {
+        alarmFieldsProvider->loadCustomRepeat();
+    }
+
 } // namespace app::alarmClock

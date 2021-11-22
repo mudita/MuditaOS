@@ -6,5 +6,4 @@
 namespace app::bgSounds
 {
     constexpr auto timerValueDBRecordName = "BGSoundsTimerValue";
-    constexpr auto soundsVolumeDBRecordName = "BGSoundsVolume";
 }

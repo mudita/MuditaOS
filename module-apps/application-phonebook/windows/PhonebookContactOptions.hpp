@@ -4,6 +4,7 @@
 #pragma once
 
 #include "OptionWindow.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
 
 #include <ContactRecord.hpp>
 
@@ -17,6 +18,7 @@ namespace gui
         auto handleSwitchData(SwitchData *data) -> bool override;
 
       private:
+        PhonebookItemData::RequestType requestType = PhonebookItemData::RequestType::Internal;
         enum class NotificationType
         {
             Block,

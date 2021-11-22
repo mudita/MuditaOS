@@ -97,3 +97,12 @@ void ConnectionManagerCellularCommands::stopConnectionTimer()
 {
     cellular.connectionTimer.stop();
 }
+
+void ConnectionManagerCellularCommands::holdMinimumCpuFrequency()
+{
+    auto handle = cellular.getTaskHandle();
+    if (cellular.cpuSentinel) {
+        cellular.cpuSentinel->HoldMinimumFrequencyAndWait(bsp::CpuFrequencyHz::Level_4, handle, 2000);
+    }
+    return;
+}

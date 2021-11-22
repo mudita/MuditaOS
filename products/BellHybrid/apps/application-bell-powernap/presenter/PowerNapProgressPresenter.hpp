@@ -54,11 +54,10 @@ namespace app::powernap
         app::ApplicationCommon *app{};
         settings::Settings *settings{};
         std::unique_ptr<AbstractSoundsRepository> soundsRepository;
-        std::unique_ptr<AbstractAudioModel> audioModel;
+        AbstractAudioModel &audioModel;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
         sys::TimerHandle napAlarmTimer;
-        audio::Token currentToken;
         bool napFinished{false};
 
         void activate() override;
@@ -74,7 +73,7 @@ namespace app::powernap
         PowerNapProgressPresenter(app::ApplicationCommon *app,
                                   settings::Settings *settings,
                                   std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                                  std::unique_ptr<AbstractAudioModel> audioModel,
+                                  AbstractAudioModel &audioModel,
                                   std::unique_ptr<AbstractTimeModel> timeModel);
     };
 } // namespace app::powernap

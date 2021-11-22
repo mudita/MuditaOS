@@ -12,23 +12,30 @@
 
 class PhonebookItemData : public gui::SwitchData
 {
-    std::string text;
-    std::shared_ptr<ContactRecord> contact = nullptr;
-
   public:
+    enum class RequestType
+    {
+        Internal,
+        External
+    };
+
     PhonebookItemData() = default;
-    explicit PhonebookItemData(std::shared_ptr<ContactRecord> contact, const std::string &text = "")
-        : text(text), contact(std::move(contact)){};
+    explicit PhonebookItemData(std::shared_ptr<ContactRecord> contact, RequestType requestType = RequestType::Internal)
+        : requestType(requestType), contact(std::move(contact)){};
 
     std::shared_ptr<ContactRecord> getContact() const
     {
         return contact;
     }
 
-    const std::string &getText() const noexcept
+    RequestType getRequestType() const noexcept
     {
-        return text;
+        return requestType;
     }
+
+  private:
+    RequestType requestType                = RequestType::Internal;
+    std::shared_ptr<ContactRecord> contact = nullptr;
 };
 
 class PhonebookSearchResultsData : public gui::SwitchData
@@ -59,4 +66,19 @@ class PhonebookSearchRequest : public gui::SwitchData
     {}
     PhonebookSearchRequest()              = default;
     std::shared_ptr<ContactRecord> result = nullptr;
+};
+
+class PhonebookInputOptionData : public gui::SwitchData
+{
+  private:
+    gui::Text *inputText;
+
+  public:
+    explicit PhonebookInputOptionData(gui::Text *inputText) : inputText(inputText)
+    {}
+
+    gui::Text *getInputText()
+    {
+        return inputText;
+    }
 };

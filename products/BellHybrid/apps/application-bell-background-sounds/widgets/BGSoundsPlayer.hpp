@@ -2,14 +2,18 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <module-audio/Audio/AudioCommon.hpp>
-#include <AsyncTask.hpp>
+
+#include <common/models/AbstractAudioModel.hpp>
 
 namespace app
 {
     class ApplicationCommon;
 }
-class AudioEOFNotification;
+namespace service
+{
+    class AudioEOFNotification;
+}
+
 namespace app::bgSounds
 {
     class AbstractBGSoundsPlayer
@@ -21,32 +25,35 @@ namespace app::bgSounds
             SingleShot
         };
 
-        virtual ~AbstractBGSoundsPlayer() = default;
-
-        using OnStateChangeCallback = std::function<void(audio::RetCode retCode)>;
-        virtual void start(const std::string &filePath, PlaybackMode mode, OnStateChangeCallback callback) = 0;
-        virtual void stop(OnStateChangeCallback callback)                                                  = 0;
-        virtual void pause(OnStateChangeCallback callback)                                                 = 0;
-        virtual void resume(OnStateChangeCallback callback)                                                = 0;
-        virtual PlaybackMode getCurrentMode() const noexcept                                               = 0;
+        virtual ~AbstractBGSoundsPlayer()                                         = default;
+        virtual void start(const std::string &filePath,
+                           PlaybackMode mode,
+                           AbstractAudioModel::OnStateChangeCallback &&callback)  = 0;
+        virtual void stop(AbstractAudioModel::OnStateChangeCallback &&callback)   = 0;
+        virtual void pause(AbstractAudioModel::OnStateChangeCallback &&callback)  = 0;
+        virtual void resume(AbstractAudioModel::OnStateChangeCallback &&callback) = 0;
+        virtual PlaybackMode getCurrentMode() const noexcept                      = 0;
+        virtual bool isPaused()                                                   = 0;
     };
 
-    class BGSoundsPlayer : public AbstractBGSoundsPlayer, public app::AsyncCallbackReceiver
+    class BGSoundsPlayer : public AbstractBGSoundsPlayer
     {
-        app::ApplicationCommon *app{};
-        audio::Token token;
+      public:
+        explicit BGSoundsPlayer(AbstractAudioModel &audioModel);
+
+      private:
+        void start(const std::string &filePath,
+                   PlaybackMode mode,
+                   AbstractAudioModel::OnStateChangeCallback &&callback) override;
+        void stop(AbstractAudioModel::OnStateChangeCallback &&callback) override;
+        void pause(AbstractAudioModel::OnStateChangeCallback &&callback) override;
+        void resume(AbstractAudioModel::OnStateChangeCallback &&callback) override;
+        PlaybackMode getCurrentMode() const noexcept override;
+        bool isPaused() override;
+
+        AbstractAudioModel &audioModel;
         std::string recentFilePath;
         PlaybackMode playbackMode = PlaybackMode::SingleShot;
-
-        void start(const std::string &filePath, PlaybackMode mode, OnStateChangeCallback callback) override;
-        void stop(OnStateChangeCallback callback) override;
-        void pause(OnStateChangeCallback callback) override;
-        void resume(OnStateChangeCallback callback) override;
-        PlaybackMode getCurrentMode() const noexcept override;
-
-      public:
-        explicit BGSoundsPlayer(app::ApplicationCommon *app);
-
-        auto handle(AudioEOFNotification *msg) -> std::shared_ptr<sys::Message>;
+        bool paused{false};
     };
 } // namespace app::bgSounds

@@ -1,13 +1,14 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <audio/AudioMessage.hpp>
 #include <apps-common/popups/Popups.hpp>
+#include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <i18n/i18n.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
@@ -39,6 +40,7 @@ namespace gui
 
         icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         icon->image->setMargins(Margins(0, icon::image_top_margin, 0, icon::image_bottom_margin));
+        icon->text->setFont(style::window::font::verybiglight);
     }
     void BedtimeNotificationWindow::onBeforeShow(ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
@@ -71,8 +73,7 @@ namespace gui
 
     void BedtimeNotificationWindow::onClose(CloseReason reason)
     {
-        auto stopPlaybackVec = std::vector<audio::PlaybackType>({audio::PlaybackType::Multimedia});
-        AudioServiceAPI::Stop(app, stopPlaybackVec);
+        application->bus.sendUnicast(std::make_shared<service::AudioStopRequest>(), service::audioServiceName);
     }
 
 } /* namespace gui */

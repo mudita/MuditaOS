@@ -266,7 +266,7 @@ auto A2DPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
 
 auto CVSDAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
 {
-    return Traits{.usesDMA = false, .blockSizeConstraint = 32U, .timeConstraint = 16ms};
+    return Traits{.usesDMA = false, .blockSizeConstraint = 128U, .timeConstraint = 16ms};
 }
 
 auto A2DPAudioDevice::getSourceFormat() -> ::audio::AudioFormat

@@ -3,8 +3,25 @@
 
 #pragma once
 
-#include "ApplicationCallLog.hpp"
-#include "Interface/CalllogRecord.hpp"
-#include "OptionWindow.hpp"
+#include <ApplicationCallLog.hpp>
+#include <Interface/CalllogRecord.hpp>
+#include <OptionWindow.hpp>
 
-std::list<gui::Option> calllogWindowOptions(app::ApplicationCallLog *appl, const CalllogRecord &record);
+namespace gui
+{
+
+    class CalllogWindowOptions : public OptionWindow
+    {
+      public:
+        explicit CalllogWindowOptions(app::ApplicationCommon *app, std::string windowName);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
+      private:
+        CalllogRecord record;
+        gui::option::OptionRecordValidity recordValidCode{gui::option::OptionRecordValidity::Uninitialized};
+
+        std::list<Option> calllogWindowOptions(app::ApplicationCallLog *app, const CalllogRecord &record);
+        gui::option::OptionRecordValidity getRecordValid();
+    };
+
+} // namespace gui

@@ -7,6 +7,8 @@
 
 auto ConnectionManager::onPhoneModeChange(sys::phone_modes::PhoneMode mode) -> bool
 {
+    cellular->holdMinimumCpuFrequency();
+
     if (mode == sys::phone_modes::PhoneMode::Offline) {
         forceDismissCallsFlag = true;
         return handleModeChangeToCommonOffline();
@@ -24,8 +26,8 @@ void ConnectionManager::onTimerTick()
     minutesOfflineElapsed++;
     if (minutesOfflineElapsed.count() >= connectionInterval.count()) {
         minutesOfflineElapsed = static_cast<std::chrono::minutes>(0);
-        ;
         onlinePeriod = true;
+        cellular->holdMinimumCpuFrequency();
         cellular->connectToNetwork();
         return;
     }
@@ -34,6 +36,7 @@ void ConnectionManager::onTimerTick()
         if (minutesOnlineElapsed.count() >= connectedPeriod.count()) {
             minutesOnlineElapsed = static_cast<std::chrono::minutes>(0);
             onlinePeriod         = false;
+            cellular->holdMinimumCpuFrequency();
             cellular->disconnectFromNetwork();
         }
     }
@@ -43,9 +46,7 @@ void ConnectionManager::setInterval(const std::chrono::minutes interval)
 {
     connectionInterval   = interval;
     minutesOnlineElapsed = static_cast<std::chrono::minutes>(0);
-    ;
     minutesOfflineElapsed = static_cast<std::chrono::minutes>(0);
-    ;
 }
 
 void ConnectionManager::setFlightMode(const bool mode)
@@ -67,9 +68,7 @@ auto ConnectionManager::handleModeChangeToCommonOffline() -> bool
     }
 
     minutesOfflineElapsed = static_cast<std::chrono::minutes>(0);
-    ;
     minutesOnlineElapsed = static_cast<std::chrono::minutes>(0);
-    ;
 
     if (isMessagesOnlyMode()) {
         handleModeChangeToMessageOnlyMode();

@@ -21,9 +21,10 @@ namespace gui
     template <class T> class ListItemWithCallbacks : public ListItem
     {
       public:
-        std::function<bool()> onEmptyCallback                         = nullptr;
-        std::function<bool()> onContentChangedCallback                = nullptr;
-        std::function<void(std::shared_ptr<T> record)> onSaveCallback = nullptr;
-        std::function<void(std::shared_ptr<T> record)> onLoadCallback = nullptr;
+        std::function<bool()> onEmptyCallback                           = nullptr;
+        std::function<bool()> onContentChangedCallback                  = nullptr;
+        std::function<bool(std::string &errorMessage)> onVerifyCallback = nullptr;
+        std::function<void(std::shared_ptr<T> record)> onSaveCallback   = nullptr;
+        std::function<void(std::shared_ptr<T> record)> onLoadCallback   = nullptr;
     };
 } /* namespace gui */

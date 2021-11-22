@@ -84,7 +84,7 @@ auto StreamFactory::makeStream(Source &source, Sink &sink, AudioFormat streamFor
 auto StreamFactory::makeInputTranscodingStream(Source &source,
                                                Sink &sink,
                                                AudioFormat streamFormat,
-                                               std::shared_ptr<Transform>(transform))
+                                               std::shared_ptr<Transform> transform)
     -> std::unique_ptr<InputTranscodeProxy>
 {
     auto sourceTraits = source.getTraits();

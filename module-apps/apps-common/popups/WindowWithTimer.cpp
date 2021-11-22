@@ -25,13 +25,13 @@ namespace gui
         };
     }
 
-    void WindowWithTimer::resetTimer()
+    void WindowWithTimer::resetTimer(const std::chrono::seconds newTimeout)
     {
+        timeout = newTimeout;
         if (!popupTimer.isValid()) {
-            popupTimer = app::GuiTimerFactory::createSingleShotTimer(application, this, popup::timerName, timeout);
+            popupTimer = app::GuiTimerFactory::createSingleShotTimer(application, this, popup::timerName, newTimeout);
         }
-        popupTimer.stop();
-        popupTimer.start();
+        popupTimer.restart(newTimeout);
     }
 
     void WindowWithTimer::detachTimerIfExists()

@@ -10,16 +10,19 @@
 #include "windows/PowerNapSessionEndedWindow.hpp"
 #include <common/models/TimeModel.hpp>
 #include <AlarmSoundPaths.hpp>
-#include <service-audio/AudioMessage.hpp>
 
 namespace app
 {
     ApplicationBellPowerNap::ApplicationBellPowerNap(std::string name,
                                                      std::string parent,
                                                      StatusIndicators statusIndicators,
-                                                     StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground)
-    {}
+                                                     StartInBackground startInBackground,
+                                                     uint32_t stackDepth)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth),
+          audioModel{std::make_unique<AudioModel>(this)}
+    {
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+    }
 
     ApplicationBellPowerNap::~ApplicationBellPowerNap() = default;
     sys::ReturnCodes ApplicationBellPowerNap::InitHandler()
@@ -42,10 +45,9 @@ namespace app
         windowsFactory.attach(
             gui::window::name::powernapProgress, [this](ApplicationCommon *app, const std::string &name) {
                 auto timeModel        = std::make_unique<app::TimeModel>();
-                auto audioModel       = std::make_unique<AudioModel>(app);
                 auto soundsRepository = std::make_unique<SoundsRepository>(alarms::paths::getAlarmDir());
                 auto presenter        = std::make_unique<powernap::PowerNapProgressPresenter>(
-                    app, settings.get(), std::move(soundsRepository), std::move(audioModel), std::move(timeModel));
+                    app, settings.get(), std::move(soundsRepository), *audioModel, std::move(timeModel));
                 return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(gui::window::name::powernapSessionEnded,

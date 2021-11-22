@@ -17,39 +17,15 @@ namespace backlight
 
     HandlerCommon::HandlerCommon(std::shared_ptr<settings::Settings> settings,
                                  std::shared_ptr<screen_light_control::ScreenLightController> screenLightController,
-                                 sys::Service *parent)
+                                 sys::Service *parent,
+                                 sys::timer::TimerCallback &&screenLightTimerCallback)
         : settings{std::move(settings)}, screenLightController{std::move(screenLightController)},
-          screenLightTimer{std::make_shared<sys::TimerHandle>(sys::TimerFactory::createSingleShotTimer(
-              parent, timers::screenLightTimerName, timers::screenLightTimerTimeout, [this](sys::Timer &t) {
-                  if (getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic &&
-                      this->screenLightController->isLightOn()) {
-                      this->screenLightController->processRequest(screen_light_control::Action::turnOff);
-                  }
-              }))}
+          screenLightTimer{std::make_shared<sys::TimerHandle>(
+              sys::TimerFactory::createSingleShotTimer(parent,
+                                                       timers::screenLightTimerName,
+                                                       timers::screenLightTimerTimeout,
+                                                       std::move(screenLightTimerCallback)))}
     {}
-
-    void HandlerCommon::init()
-    {
-        using namespace screen_light_control;
-        settings->registerValueChange(settings::Brightness::brightnessLevel, [&](const std::string &value) {
-            ManualModeParameters params{utils::getNumericValue<float>(value)};
-            screenLightController->processRequest(Action::setManualModeBrightness, Parameters(params));
-        });
-
-        settings->registerValueChange(settings::Brightness::autoMode, [&]([[maybe_unused]] const std::string &value) {
-            const auto action = getScreenAutoModeState() == ScreenLightMode::Automatic ? Action::enableAutomaticMode
-                                                                                       : Action::disableAutomaticMode;
-            screenLightController->processRequest(action);
-        });
-
-        settings->registerValueChange(settings::Brightness::state, [&]([[maybe_unused]] const std::string &value) {
-            const auto action = getScreenLightState() ? Action::turnOn : Action::turnOff;
-            if (action == Action::turnOn) {
-                onScreenLightTurnedOn();
-            }
-            screenLightController->processRequest(action);
-        });
-    }
 
     auto HandlerCommon::getValue(const std::string &path) const -> std::string
     {

@@ -61,12 +61,13 @@ namespace app::alarmClock
 
         internalData.push_back(new gui::AlarmSnoozeOptionsItem(utils::translate("app_alarm_clock_snooze")));
 
-        internalData.push_back(new gui::AlarmRRuleOptionsItem(
+        repeatOption = new gui::AlarmRRuleOptionsItem(
             application,
             utils::translate("app_alarm_clock_repeat"),
             rRulePresenter,
             [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text, false); },
-            [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); }));
+            [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); });
+        internalData.push_back(repeatOption);
 
         for (auto &item : internalData) {
             item->deleteByList = false;
@@ -90,10 +91,10 @@ namespace app::alarmClock
         list->rebuildList();
     }
 
-    void NewEditAlarmModel::loadRepeat(std::shared_ptr<AlarmEventRecord> record)
+    void NewEditAlarmModel::loadCustomRepeat()
     {
         if (repeatOption->onLoadCallback) {
-            repeatOption->onLoadCallback(std::move(record));
+            repeatOption->onLoadCallback(rRulePresenter->getAlarm());
         }
     }
 

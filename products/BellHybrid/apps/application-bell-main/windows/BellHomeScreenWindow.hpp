@@ -52,6 +52,7 @@ namespace gui
         void setHeaderViewMode(app::home_screen::HeaderViewMode mode) override;
         std::time_t getAlarmTime() const override;
         void setAlarmTime(std::time_t newTime) override;
+        void setSnoozeTime(std::time_t newTime) override;
         void incAlarmMinute() override;
         void decAlarmMinute() override;
 
@@ -62,6 +63,7 @@ namespace gui
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
         void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) override;
         void switchToMenu() override;
+        void switchToBatteryStatus() override;
 
         BellBaseLayout *body{};
 

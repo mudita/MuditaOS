@@ -31,9 +31,14 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        icon =
-            new Icon(this, 0, 0, style::window_width, style::window_height, {}, utils::translate("app_bell_goodbye"));
-        icon->image->setVisible(false);
+        icon = new Icon(this,
+                        0,
+                        0,
+                        style::window_width,
+                        style::window_height,
+                        "bell_very_big_logo_W_G",
+                        utils::translate("app_bell_goodbye"));
+        icon->image->setVisible(true);
         icon->text->setFont(style::window::font::verybiglight);
     }
     bool BellTurnOffWindow::onInput(const InputEvent &)

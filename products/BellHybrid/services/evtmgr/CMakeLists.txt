@@ -12,6 +12,7 @@ target_sources(evtmgr
         internal/StaticData.hpp
         screen-light-control/ScreenLightControl.cpp
         backlight-handler/BacklightHandler.cpp
+        user-activity-handler/UserActivityHandler.cpp
 
         internal/key_sequences/AbstractKeySequence.hpp
         internal/key_sequences/KeySequenceMgr.hpp
@@ -21,10 +22,12 @@ target_sources(evtmgr
         internal/key_sequences/ReleaseSequence.hpp
         internal/key_sequences/ResetSequence.hpp
         internal/key_sequences/GenericLongPressSequence.hpp
+        internal/key_sequences/PlatformAgnosticSequences.hpp
     PUBLIC
         include/evtmgr/EventManager.hpp
         include/evtmgr/api/TemperatureApi.hpp
         include/evtmgr/backlight-handler/BacklightHandler.hpp
+        include/evtmgr/user-activity-handler/UserActivityHandler.hpp
 )
 
 target_include_directories(evtmgr
@@ -39,6 +42,7 @@ target_link_libraries(evtmgr
         keymap
         module-bsp
         module-utils
+        module-sys
         service-evtmgr
         bell::appmgr
         sys

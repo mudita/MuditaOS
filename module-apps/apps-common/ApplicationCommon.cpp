@@ -219,14 +219,7 @@ namespace app
         // send drawing commands only when if application is in active and visible.
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
-            window->updateBatteryStatus();
-            window->updateBluetooth(statusIndicators.bluetoothMode);
-            window->updateAlarmClock(statusIndicators.alarmClockStatus);
-            window->updateSim();
-            window->updateSignalStrength();
-            window->updateNetworkAccessTechnology();
-            window->updateTime();
-            window->updatePhoneMode(statusIndicators.phoneMode);
+            updateStatuses(window);
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
 
@@ -243,6 +236,9 @@ namespace app
         if (suspendInProgress)
             suspendInProgress = false;
     }
+
+    void ApplicationCommon::updateStatuses(gui::AppWindow *window) const
+    {}
 
     void ApplicationCommon::updateCurrentWindow(std::unique_ptr<gui::SwitchData> data,
                                                 gui::ShowMode command,
@@ -544,9 +540,17 @@ namespace app
             }
             if (!isCurrentWindow(msg->getWindowName())) {
                 if (!windowsStack.isEmpty()) {
-                    const auto closeReason = msg->getReason() == SwitchReason::PhoneLock
-                                                 ? gui::Window::CloseReason::PhoneLock
-                                                 : gui::Window::CloseReason::WindowSwitch;
+                    auto closeReason = gui::Window::CloseReason::WindowSwitch;
+                    switch (msg->getReason()) {
+                    case SwitchReason::PhoneLock:
+                        closeReason = gui::Window::CloseReason::PhoneLock;
+                        break;
+                    case SwitchReason::Popup:
+                        closeReason = gui::Window::CloseReason::Popup;
+                        break;
+                    default:
+                        break;
+                    }
                     getCurrentWindow()->onClose(closeReason);
                 }
                 setActiveWindow(msg->getWindowName());
@@ -923,7 +927,7 @@ namespace app
                          std::make_unique<gui::AlarmPopupRequestParams>(popupParams));
         }
         else {
-            switchWindow(gui::popup::resolveWindowName(id));
+            switchWindow(gui::popup::resolveWindowName(id), gui::ShowMode::GUI_SHOW_INIT, nullptr, SwitchReason::Popup);
         }
     }
 

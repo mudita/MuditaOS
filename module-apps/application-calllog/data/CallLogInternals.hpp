@@ -37,6 +37,7 @@ namespace calllog
         inline constexpr auto MainWindowStr    = gui::name::window::main_window;
         inline constexpr auto DetailsWindowStr = "DetailsWindow";
         inline constexpr auto DialogYesNoStr   = "DialogYesNo";
+        inline constexpr auto CallLogOptionsStr = "CallLogOptions";
 
     } // namespace settings
 } // namespace calllog

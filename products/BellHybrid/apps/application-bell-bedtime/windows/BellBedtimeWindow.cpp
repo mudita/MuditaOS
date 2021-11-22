@@ -9,12 +9,12 @@
 #include <data/BellBedtimeStyle.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 
-#include <module-gui/gui/widgets/TextFixedSize.hpp>
+#include <module-gui/gui/widgets/text/TextFixedSize.hpp>
 #include <module-gui/gui/widgets/ThreeBox.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
 
 #include <widgets/SideListView.hpp>
-#include <common/windows/BellFinishedCallbackWindow.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include "service-appmgr/Controller.hpp" // for Controller
 
 namespace gui
@@ -70,11 +70,8 @@ namespace gui
     {
         presenter->saveData();
         if (showSuccessWindow) {
-            application->switchWindow(BellFinishedCallbackWindow::defaultName,
-                                      BellFinishedCallbackWindowSwitchData::Factory::create(
-                                          "circle_success",
-                                          utils::translate("app_bell_bedtime_set_finished"),
-                                          [this]() { app::manager::Controller::switchBack(application); }));
+            application->switchWindow(gui::window::bell_finished::defaultName,
+                                      BellFinishedWindowData::Factory::create("circle_success_big", "", "", true));
         }
         else {
             application->returnToPreviousWindow();

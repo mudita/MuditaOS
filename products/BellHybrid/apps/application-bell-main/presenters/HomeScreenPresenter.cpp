@@ -12,6 +12,8 @@
 #include <Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <switches/LatchStatusRequest.hpp>
 
 namespace app::home_screen
 {
@@ -22,12 +24,29 @@ namespace app::home_screen
                                              std::unique_ptr<AbstractTimeModel> timeModel)
         : app{app}, alarmModel{std::move(alarmModel)}, batteryModel{std::move(batteryModel)},
           temperatureModel{std::move(temperatureModel)}, timeModel{std::move(timeModel)}
-    {}
+    {
+        constexpr int timeout = pdMS_TO_TICKS(1500);
+
+        auto response =
+            app->bus.sendUnicastSync(std::make_shared<sevm::LatchStatusRequest>(), service::name::evt_manager, timeout);
+
+        if (response.first == sys::ReturnCodes::Success) {
+            auto msgState = dynamic_cast<sevm::LatchStatusResponse *>(response.second.get());
+            if (msgState == nullptr) {
+                return;
+            }
+
+            if (msgState->getStatus() == sevm::LatchStatus::PRESSED) {
+                latchPressed = true;
+            }
+        }
+    }
 
     void HomeScreenPresenter::handleUpdateTimeEvent()
     {
         getView()->setTime(timeModel->getCurrentTime());
         stateController->handleTimeUpdateEvent();
+        handleCyclicDeepRefresh();
     }
 
     void HomeScreenPresenter::handleAlarmRingingEvent()
@@ -65,7 +84,7 @@ namespace app::home_screen
 
     void HomeScreenPresenter::onBeforeShow()
     {
-        alarmModel->update([&]() { handleAlarmModelReady(); });
+        stateController->resetStateMachine();
         getView()->setTimeFormat(timeModel->getTimeFormat());
         getView()->setTime(timeModel->getCurrentTime());
         getView()->setAlarmTimeFormat(timeModel->getTimeFormat());
@@ -89,6 +108,7 @@ namespace app::home_screen
     }
     void HomeScreenPresenter::handleAlarmModelReady()
     {
+        setStartupAlarmState();
         getView()->setAlarmTime(alarmModel->getAlarmTime());
         stateController->handleAlarmModelReady();
     }
@@ -114,4 +134,39 @@ namespace app::home_screen
         snoozeTimer->reset(snoozeDuration, snoozeTick);
     }
 
+    std::uint32_t HomeScreenPresenter::getBatteryLvl() const
+    {
+        return batteryModel->getLevelState().level;
+    }
+
+    bool HomeScreenPresenter::isBatteryCharging() const
+    {
+        return batteryModel->getLevelState().state == Store::Battery::State::Charging;
+    }
+
+    bool HomeScreenPresenter::isStartupDeepPress()
+    {
+        return latchPressed;
+    }
+
+    void HomeScreenPresenter::setStartupAlarmState()
+    {
+        static auto isStartup = true;
+        if (isStartup) {
+            alarmModel->activate(!latchPressed);
+            isStartup = false;
+        }
+    }
+
+    void HomeScreenPresenter::handleCyclicDeepRefresh()
+    {
+        constexpr auto deepRefreshPeriod = 30;
+        static auto refreshCount         = 0;
+
+        if (refreshCount >= deepRefreshPeriod) {
+            app->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+            refreshCount = 0;
+        }
+        refreshCount++;
+    }
 } // namespace app::home_screen

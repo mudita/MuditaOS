@@ -5,13 +5,13 @@
 2. [Scope](#scope)
 3. [Abbreviations](#abbreviations)
 4. [Introduction](#introduction)
-5. [Design considerations](#considerations)
-6. [Database tables](#tables)
-7. [Database triggeers](#triggers)
-8. [SMtask service & DBUS communication](#smtask)
+5. [Design considerations](#design)
+6. [Database tables](#database-tables)
+7. [Database triggers](#database-triggers)
+8. [SMtask service & DBUS communication](#smtask-service--dbus-communication)
 9. [References](#references)
 
-## History <a name="history"></a>
+## History
 
 | Authors           | Change description        | Status | Modification date |
 | ----------------- | ------------------------- | ------ | ----------------- |
@@ -20,14 +20,14 @@
 | Robert Borzęcki | Review comments           | Draft  | 04.10.2018        |
 | Robert Borzęcki | templates and settings tables          | Draft  | 10.01.2019        |
 | Robert Borzęcki | alarms         | Draft  | 05.03.2019        |
-| Kuba Kleczkowski | Added date_format in settings.db         | Draft  | 04.02.2020  
+| Kuba Kleczkowski | Added date_format in settings.db         | Draft  | 04.02.2020 |
 | Alek Rudnik | calllog | Draft | 28.02.2020 |
 | Paweł Olejniczak | Contact address | Draft | 07.05.2020 |
 
-## Scope <a name="scope"></a>
+## Scope
 This document is defines how SMS and contacts databases are constructed.
 
-## Abbreviations <a name="abbreviations"></a>
+## Abbreviations
 
 Abbreviation | Detailed explanation of abbreviation
 ------------|------------------------------------
@@ -37,7 +37,7 @@ Abbreviation | Detailed explanation of abbreviation
 (r) | reference (other DB table relation)
 <type> | In SQL queries <type> has to be replaced with proper data
 
-### Introduction <a name="introduction"></a>
+### Introduction
 This document describes details of different user information database tables:
 
 | table name | description |
@@ -54,7 +54,7 @@ This document describes details of different user information database tables:
 | contact_match_group | Joining table for connecting users with groups. |
 
 
-### Design <a name="tables"></a>
+### Design
 #### Database tables
 
 #### 1. Contacts joining table
@@ -83,7 +83,7 @@ Name: contact_names
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique number assigned to the contact's name information. |
 | contact_id | (um) | INTEGER FOREIGN KEY(**contacts**)| Unique ID of the joining record in the contacts table.  |
-| name_primary | (m) | TEXT | Name  | 
+| name_primary | (m) | TEXT | Name  |
 | name_alternative | (m) | TEXT | Alternative name for user. |
 
 #### 3. Contacts number table
@@ -93,7 +93,7 @@ Name: contact_numbers
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique number assigned to the contact's number information. |
 | contact_id | (um) | INTEGER FOREIGN KEY(**contacts**)| Unique ID of the joining record in the contacts table.  |
-| number_user | (m) | TEXT | Phone number entered by the user | 
+| number_user | (m) | TEXT | Phone number entered by the user |
 | number_e164 | (m) | TEXT | Phone number in the E164 format created from the number entered by the user . |
 | type | (m) | INTEGER | Type of the number provided by the user. Default value is 0 (CELL). |
 
@@ -115,7 +115,7 @@ Name: contact_rings
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique number assigned to the contact's name information. |
 | contact_id | (um) | INTEGER FOREIGN KEY(**contacts**) | Unique ID of the joining record in the contacts table.  |
-| asset_path | (m) | TEXT | UTF8 encoded path on the device's memory card to the audio asset that should be played when given contact is calling | 
+| asset_path | (m) | TEXT | UTF8 encoded path on the device's memory card to the audio asset that should be played when given contact is calling |
 
 #### 5. Contacts address table
 Name: contact_address
@@ -143,18 +143,18 @@ Name: sms
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID of the message. |
 | thread_id | (um) | INTEGER FOREIGN KEY(**threads**)| Unique ID of the thread that this message bellongs to.  |
-| contact_id | (m) | INTEGER | Unique ID of the record from the **contacts** table from *contacts** database where details about sender/recipient of the message are located. | 
-| date | (m) | INTEGER | Date when message was received | 
-| date_sent | (m) | INTEGER | Date when message was sent to recipients | 
+| contact_id | (m) | INTEGER | Unique ID of the record from the **contacts** table from *contacts** database where details about sender/recipient of the message are located. |
+| date | (m) | INTEGER | Date when message was received |
+| date_sent | (m) | INTEGER | Date when message was sent to recipients |
 | error_code | (m) | INTEGER | ID of the error code for this message |
 | body | (m) | TEXT | Text of the message that was provided by the user. This is UTF8 encoded text. |
-| type | (m) | INTEGER | Defines what is the type of the message | 
+| type | (m) | INTEGER | Defines what is the type of the message |
 
 Possible values of the type field
 
 | Name | Value |  Description |
 | -------- | ------- | -------------------|
-| DRAFT| 0x01| Defines unfinished message that should be loaded in editor for a given thread and may be later scheduled for sending. | 
+| DRAFT| 0x01| Defines unfinished message that should be loaded in editor for a given thread and may be later scheduled for sending. |
 | FAILED| 0x02| Defines message that was queued for sending but this process for some reasons failed |
 | INBOX| 0x04| Defines incoming message.|
 | OUTBOX | 0x08| Defines outgoing message. |
@@ -373,7 +373,7 @@ Name: settings_v2
 | path | (um) | TEXT | Path of setting. |
 | value | (m) | TEXT | Value of setting. |
 
-## Database Triggers <a name="triggers"></a>
+## Database Triggers
 
 This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count column with _id equal to 1 in the threads_count table is incremented by 1.
 ```
@@ -385,7 +385,7 @@ This trigger is responsible for taking action when thread is removed from thread
 CREATE TRIGGER on_thread_remove AFTER DELETE ON threads BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END;
 ```
 
-## SMtask service & DBUS communication <a name="smtask"></a>
+## SMtask service & DBUS communication
 
 Database related task is created by ```Database_Service_Init()``` function. This function is responsible for all database initialisation & task creation.
 
@@ -433,7 +433,7 @@ All structures & data types are described in ```db.h``` file.
 ##### Database open & close
 If client wants to access SMS or Contacts database ```DB_OPEN_SMS_DB``` or ```    DB_OPEN_CONTACTS_DB``` command has to be sent first. When database transaction is finished, database has to be closed in order to flush it's internal buffers & commit all transactions. This can be done by sending ```DB_CLOSE_SMS_DB``` & ```DB_CLOSE_CONTACTS_DB``` commands to database service.
 
-## Database Triggers <a name="triggers"></a>
+## Database Triggers
 
 This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count column with _id equal to 1 in the threads_count table is incremented by 1.
 ```
@@ -445,7 +445,7 @@ This trigger is responsible for taking action when thread is removedf rom thread
 CREATE TRIGGER on_thread_remove AFTER DELETE ON threads BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END;
 ```
 
-## References <a name="references"></a>
+## References
 
 Reference | File
 --------- | --------

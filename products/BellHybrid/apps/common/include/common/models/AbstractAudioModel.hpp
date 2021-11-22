@@ -3,40 +3,44 @@
 
 #pragma once
 
-#include <Audio/AudioCommon.hpp>
+#include <module-audio/Audio/AudioCommon.hpp>
 
 #include <string>
 #include <functional>
+#include <optional>
 
 namespace app
 {
-    using AlarmModelReadyHandler = std::function<void()>;
-
     class AbstractAudioModel
     {
       public:
         /// 0-10 range
-        using Volume = std::uint8_t;
-
-        using OnPlayCallback   = std::function<void(audio::RetCode retCode, audio::Token token)>;
-        using OnStopCallback   = OnPlayCallback;
-        using OnPauseCallback  = OnPlayCallback;
-        using OnResumeCallback = OnPlayCallback;
+        static constexpr auto minVolume  = 1;
+        static constexpr auto maxVolume  = 10;
+        using Volume                     = std::uint32_t;
+        using OnStateChangeCallback      = std::function<void(const audio::RetCode code)>;
+        using OnGetValueCallback         = std::function<void(const audio::RetCode, Volume)>;
+        using OnPlaybackFinishedCallback = std::function<void()>;
 
         enum class PlaybackType
         {
-            Chime,
+            Multimedia,
+            Snooze,
             Alarm,
             PreWakeup,
             Bedtime
         };
 
-        virtual ~AbstractAudioModel() noexcept                                                            = default;
-        virtual void setVolume(Volume volume, PlaybackType playbackType)                                  = 0;
-        virtual bool play(const std::string &filePath, const OnPlayCallback &callback, PlaybackType type) = 0;
-        virtual bool pause(const audio::Token &token, const OnPauseCallback &callback)                    = 0;
-        virtual bool resume(const audio::Token &token, const OnResumeCallback &callback)                  = 0;
-        virtual bool stop(const audio::Token &token, const OnStopCallback &callback)                      = 0;
+        virtual ~AbstractAudioModel() noexcept                                                              = default;
+        virtual void setVolume(Volume volume, PlaybackType playbackType, OnStateChangeCallback &&callback)  = 0;
+        virtual std::optional<Volume> getVolume(PlaybackType playbackType)                                  = 0;
+        virtual void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback)                    = 0;
+        virtual void play(const std::string &filePath, PlaybackType type, OnStateChangeCallback &&callback) = 0;
+        virtual void stop(OnStateChangeCallback &&callback)                                                 = 0;
+        virtual void pause(OnStateChangeCallback &&callback)                                                = 0;
+        virtual void resume(OnStateChangeCallback &&callback)                                               = 0;
+        virtual void setPlaybackFinishedCb(OnPlaybackFinishedCallback &&callback)                           = 0;
+        virtual bool hasPlaybackFinished()                                                                  = 0;
     };
 
 } // namespace app

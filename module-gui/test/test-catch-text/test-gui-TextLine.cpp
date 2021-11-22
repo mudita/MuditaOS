@@ -2,18 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InitializedFontManager.hpp"
-#include <catch2/catch.hpp>
-#include <limits>
-#include <memory>
-#include <sstream>
-#include <limits>
-#include <module-gui/gui/widgets/TextLine.hpp>
+
+#include <widgets/text/Text.hpp>
+#include <widgets/text/core/lines/TextLine.hpp>
 
 #include <mock/buildTextDocument.hpp>
 #include <mock/multi-line-string.hpp>
 #include <mock/BlockFactory.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
-#include <Text.hpp>
+
+#include <catch2/catch.hpp>
 
 const auto maxWidth = std::numeric_limits<unsigned int>().max();
 

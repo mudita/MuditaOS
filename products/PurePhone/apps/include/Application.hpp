@@ -9,6 +9,9 @@ namespace app
 {
     class Application : public ApplicationCommon
     {
+      protected:
+        void updateStatuses(gui::AppWindow *window) const override;
+
       public:
         using ApplicationCommon::ApplicationCommon;
     };

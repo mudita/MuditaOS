@@ -9,6 +9,7 @@
 #include <application-bell-background-sounds/ApplicationBellBackgroundSounds.hpp>
 #include <application-bell-bedtime/ApplicationBellBedtime.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
+#include <application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
 
@@ -18,11 +19,11 @@
 
 // services
 #include <appmgr/ApplicationManager.hpp>
+#include <audio/ServiceAudio.hpp>
 #include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
 #include <Service/ServiceCreator.hpp>
 #include <service-appmgr/Constants.hpp>
-#include <service-audio/ServiceAudio.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-gui/ServiceGUI.hpp>
@@ -30,13 +31,14 @@
 
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
-#include <Logger.hpp>
 #include <log/log.hpp>
+#include <logdump/logdump.h>
+#include <Logger.hpp>
 #include <product/version.hpp>
 #include <sys/SystemManager.hpp>
-#include <time/AlarmOperations.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
+#include <time/AlarmOperations.hpp>
 
 #include <memory>
 #include <vector>
@@ -65,9 +67,9 @@ int main()
     }
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
-    systemServices.emplace_back(sys::CreatorFor<EventManager>());
+    systemServices.emplace_back(sys::CreatorFor<EventManager>([]() { return dumpLogs(); }));
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
+    systemServices.emplace_back(sys::CreatorFor<service::Audio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>(service::eink::ExitAction::None));
@@ -104,6 +106,8 @@ int main()
                 app::CreateLauncher<app::ApplicationBellOnBoarding>(app::applicationBellOnBoardingName));
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellBackgroundSounds>(app::applicationBellBackgroundSoundsName));
+            applications.push_back(
+                app::CreateLauncher<app::ApplicationBellMeditationTimer>(app::applicationBellMeditationTimerName));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(
@@ -113,6 +117,9 @@ int main()
         [&platform] {
             try {
                 LOG_DEBUG("System deinit");
+                if (dumpLogs() != 1) {
+                    LOG_ERROR("Cannot dump logs");
+                }
                 platform->deinit();
             }
             catch (const std::runtime_error &e) {

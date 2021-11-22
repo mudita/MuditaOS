@@ -52,12 +52,12 @@ target_sources(application-bell-settings
         widgets/DialogYesNo.cpp
 
         windows/BellSettingsBedtimeToneWindow.cpp
+        windows/BellSettingsTimeUnitsWindow.cpp
         windows/BellSettingsHomeViewWindow.cpp
         windows/BellSettingsWindow.cpp
         windows/advanced/AboutYourBellWindow.cpp
         windows/advanced/BellSettingsAdvancedWindow.cpp
         windows/advanced/BellSettingsLanguageWindow.cpp
-        windows/advanced/BellSettingsTimeUnitsWindow.cpp
         windows/advanced/BellSettingsFrontlightWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.cpp
@@ -113,13 +113,14 @@ target_sources(application-bell-settings
     PUBLIC
         include/application-bell-settings/models/TimeUnitsModel.hpp
         include/application-bell-settings/presenter/TimeUnitsPresenter.hpp
-        include/application-bell-settings/windows/advanced/BellSettingsTimeUnitsWindow.hpp
+        include/application-bell-settings/windows/BellSettingsTimeUnitsWindow.hpp
         include/application-bell-settings/ApplicationBellSettings.hpp
 )
 
 target_link_libraries(application-bell-settings
     PRIVATE
         app
+        bell::audio
         bellgui
         bell::db
         bell::alarms

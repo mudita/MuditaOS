@@ -54,7 +54,7 @@ Before submitting a Pull Request please go through some basic checks:
 - test your changes on both Linux and RT1051 platforms (please pay special attention to the things you might break unintentionally, e.g. when working on calling, check call log too,
 - run unit tests (`make check`),
 - [run static analysis](static_analysis.md)
-- check if your code formatting complies with [`.clang-format`](../clang-format),
+- check if your code formatting complies with [`.clang-format`](../.clang-format),
 - whenever you add third-party software to MuditaOS source code, please make sure that the software component is added to a dedicated [section in `LICENSE.md` file on MuditaOS GitHub repository](../LICENSE.md) with a link to the text of the license where applicable.
 
 As a part of our continuous integration process we will be soon introducing our own [test harness](../test/README.md).

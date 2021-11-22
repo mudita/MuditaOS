@@ -7,6 +7,7 @@
 #include "SnoozedAlarmEventRecord.hpp"
 
 #include <service-time/AlarmHandlerFactory.hpp>
+#include <service-time/AlarmStatus.hpp>
 
 #include <module-db/Interface/AlarmEventRecord.hpp>
 
@@ -18,6 +19,7 @@ namespace alarms
     {
       public:
         using OnGetAlarmProcessed           = std::function<void(AlarmEventRecord)>;
+        using OnGetAlarmWithStatusProcessed = std::function<void(std::pair<AlarmEventRecord, AlarmStatus>)>;
         using OnGetAlarmsInRangeProcessed   = std::function<void(std::pair<std::vector<AlarmEventRecord>, uint32_t>)>;
         using OnAddAlarmProcessed           = std::function<void(bool)>;
         using OnUpdateAlarmProcessed        = std::function<void(bool)>;
@@ -38,6 +40,7 @@ namespace alarms
         virtual void updateEventsCache(TimePoint now) = 0;
 
         virtual void getAlarm(const std::uint32_t alarmId, OnGetAlarmProcessed callback)              = 0;
+        virtual void getAlarmWithStatus(const std::uint32_t alarmId, OnGetAlarmWithStatusProcessed callback) = 0;
         virtual void addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback)                  = 0;
         virtual void updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback)            = 0;
         virtual void removeAlarm(const std::uint32_t alarmId, OnRemoveAlarmProcessed callback)        = 0;
@@ -53,7 +56,7 @@ namespace alarms
         virtual void postponeSnooze(const std::uint32_t id,
                                     const TimePoint nextAlarmTime,
                                     OnSnoozeRingingAlarm callback)                                    = 0;
-        virtual void minuteUpdated(TimePoint now)                                                     = 0;
+        virtual bool minuteUpdated(TimePoint now)                                                            = 0;
         virtual void addAlarmExecutionHandler(const alarms::AlarmType type,
                                               const std::shared_ptr<alarms::AlarmHandler> handler)    = 0;
         virtual void stopAllSnoozedAlarms()                                                           = 0;
@@ -83,6 +86,7 @@ namespace alarms
         void updateEventsCache(TimePoint now) override;
 
         void getAlarm(const std::uint32_t alarmId, OnGetAlarmProcessed callback) override;
+        void getAlarmWithStatus(const std::uint32_t alarmId, OnGetAlarmWithStatusProcessed callback) override;
         void addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback) override;
         void updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback) override;
         void removeAlarm(const std::uint32_t alarmId, OnRemoveAlarmProcessed callback) override;
@@ -96,7 +100,7 @@ namespace alarms
         void postponeSnooze(const std::uint32_t id,
                             const TimePoint nextAlarmTime,
                             OnSnoozeRingingAlarm callback) override;
-        void minuteUpdated(TimePoint now) override;
+        bool minuteUpdated(TimePoint now) override;
         void addAlarmExecutionHandler(const alarms::AlarmType type,
                                       const std::shared_ptr<alarms::AlarmHandler> handler) override;
         void stopAllSnoozedAlarms() override;
@@ -136,7 +140,7 @@ namespace alarms
                                      OnGetAlarmsProcessed handledCallback);
         void checkAndUpdateCache(AlarmEventRecord record);
         void switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn);
-        void processEvents(TimePoint now);
+        bool processEvents(TimePoint now);
         void processNextEventsQueue(const TimePoint now);
         void processSnoozedEventsQueue(const TimePoint now);
         virtual void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType);
@@ -154,4 +158,9 @@ namespace alarms
             std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
             IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const override;
     };
+
+    auto findSingleEventById(std::vector<std::unique_ptr<SingleEventRecord>> &events, const std::uint32_t id)
+        -> std::vector<std::unique_ptr<SingleEventRecord>>::iterator;
+    auto findSnoozedEventById(std::vector<std::unique_ptr<SnoozedAlarmEventRecord>> &events, const std::uint32_t id)
+        -> std::vector<std::unique_ptr<SnoozedAlarmEventRecord>>::iterator;
 } // namespace alarms

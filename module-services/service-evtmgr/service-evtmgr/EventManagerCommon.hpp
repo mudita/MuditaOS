@@ -35,6 +35,29 @@ class EventManagerSentinel
 
 class EventManagerCommon : public sys::Service
 {
+  public:
+    using LogDumpFunction = std::function<int()>;
+
+    explicit EventManagerCommon(LogDumpFunction logDumpFunction, const std::string &name = service::name::evt_manager);
+    ~EventManagerCommon() override;
+
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+
+    // Invoked during initialization
+    sys::ReturnCodes InitHandler() final;
+
+    sys::ReturnCodes DeinitHandler() override;
+
+    void ProcessCloseReason(sys::CloseReason closeReason) override;
+
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
+
+    /**
+     * @brief Sends request to application manager to switch from current application to specific window in application
+     * with specified name .
+     */
+    static bool messageSetApplication(sys::Service *sender, const std::string &applicationName);
+
   private:
     static constexpr auto stackDepth = 4096;
     void handleMinuteUpdate(time_t timestamp);
@@ -44,6 +67,13 @@ class EventManagerCommon : public sys::Service
     void processTimezoneRequest(const std::string &timezone);
 
     sys::TimerHandle loggerTimer;
+
+    LogDumpFunction logDumpFunction;
+
+    /// @return: < 0 - error occured during log flush
+    /// @return:   0 - log flush did not happen
+    /// @return:   1 - log flush successflul
+    int dumpLogsToFile();
 
   protected:
     std::function<void(const time_t)> onMinuteTick;
@@ -61,30 +91,4 @@ class EventManagerCommon : public sys::Service
     uint32_t alarmTimestamp;
     // ID of alarm waiting to trigger
     uint32_t alarmID;
-
-  public:
-    explicit EventManagerCommon(const std::string &name = service::name::evt_manager);
-    ~EventManagerCommon();
-
-    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
-
-    // Invoked during initialization
-    sys::ReturnCodes InitHandler() final;
-
-    sys::ReturnCodes DeinitHandler() override;
-
-    void ProcessCloseReason(sys::CloseReason closeReason) override;
-
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
-
-    /// @return: < 0 - An error occurred during log flush
-    /// @return:   0 - Log file reached max size
-    /// @return:   1 - Logs flushed successflully
-    int dumpLogsToFile();
-
-    /**
-     * @brief Sends request to application manager to switch from current application to specific window in application
-     * with specified name .
-     */
-    static bool messageSetApplication(sys::Service *sender, const std::string &applicationName);
 };

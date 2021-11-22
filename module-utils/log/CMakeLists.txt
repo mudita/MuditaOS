@@ -2,6 +2,7 @@ add_library(log STATIC)
 
 add_subdirectory(api)
 add_subdirectory(board)
+add_subdirectory(logdump)
 
 target_sources(log
     PRIVATE
@@ -16,7 +17,6 @@ target_include_directories(log PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(log
     PRIVATE
         utility
-        purefs-paths
     PUBLIC
         module-os
         log-api

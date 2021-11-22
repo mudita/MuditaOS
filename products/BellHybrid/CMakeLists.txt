@@ -17,6 +17,7 @@ target_compile_options(BellHybrid
 
 target_sources(BellHybrid
     PRIVATE
+        ${TARGET_SOURCES}
         BellHybridMain.cpp
         PlatformFactory.cpp
         EinkSentinelBell.cpp
@@ -44,15 +45,17 @@ target_link_libraries(BellHybrid
         bell::app-bedtime
         bell::app-common
         bell::app-main
+        bell::app-meditation-timer
         bell::app-powernap
         bell::app-settings
         bell::db
-        evtmgr
+        bell::audio
+        bell::evtmgr
         log
+        logdump
         messagetype
         module-bsp
         module-vfs
-        service-audio
         service-desktop
         service-time
         sys
@@ -84,10 +87,9 @@ add_hex_target(BellHybrid)
 
 include(BinaryAssetsVersions.cmake)
 include(DownloadAsset)
-include(DownloadAsset2)
-download_asset2(${CMAKE_CURRENT_SOURCE_DIR}/assets.json ${PROJECT_SOURCE_DIR} ${MUDITA_CACHE_DIR})
-download_asset(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION})
-download_asset(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION})
+download_asset_json(${CMAKE_CURRENT_SOURCE_DIR}/assets.json ${PROJECT_SOURCE_DIR} ${MUDITA_CACHE_DIR})
+download_asset_release(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION})
+download_asset_release(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION})
 
 include(AddVersionJson)
 add_version_json(BellHybrid)
@@ -100,3 +102,6 @@ add_subdirectory(apps)
 add_subdirectory(keymap)
 add_subdirectory(services)
 add_subdirectory(sys)
+
+option(CONFIG_ENABLE_TEMP "Enable displaying temperature" OFF)
+configure_file(config/ProductConfig.in.hpp ${CMAKE_BINARY_DIR}/ProductConfig.hpp  @ONLY)

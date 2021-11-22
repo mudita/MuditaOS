@@ -38,7 +38,7 @@ namespace gui
     {
         BellFinishedWindow::onBeforeShow(mode, data);
 
-        icon->image->set("bell_big_logo", ImageTypeSpecifier::W_G);
+        icon->image->set("bell_very_big_logo", ImageTypeSpecifier::W_G);
         icon->text->setFont(style::window::font::verybiglight);
         icon->text->setText(utils::translate("app_bell_onboarding_finalize"));
     }

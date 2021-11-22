@@ -4,6 +4,7 @@
 #pragma once
 
 #include "AbstractAlarmAction.hpp"
+#include <service-db/Settings.hpp>
 
 #include <Service/Service.hpp>
 
@@ -23,6 +24,9 @@ namespace alarms
         bool turnOff() override;
 
       private:
+        static constexpr auto frontlightOFF = "0";
+
         std::unique_ptr<AbstractAlarmAction> pimpl;
+        settings::Settings settings;
     };
 } // namespace alarms

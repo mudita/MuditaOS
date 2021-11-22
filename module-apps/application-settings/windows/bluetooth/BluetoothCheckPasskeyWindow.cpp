@@ -6,7 +6,7 @@
 #include <application-settings/widgets/SettingsStyle.hpp>
 #include <application-settings/windows/WindowNames.hpp>
 
-#include <widgets/Text.hpp>
+#include <widgets/text/Text.hpp>
 
 namespace gui
 {

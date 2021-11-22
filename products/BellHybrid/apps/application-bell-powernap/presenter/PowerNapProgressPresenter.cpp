@@ -25,10 +25,10 @@ namespace app::powernap
     PowerNapProgressPresenter::PowerNapProgressPresenter(app::ApplicationCommon *app,
                                                          settings::Settings *settings,
                                                          std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                                                         std::unique_ptr<AbstractAudioModel> audioModel,
+                                                         AbstractAudioModel &audioModel,
                                                          std::unique_ptr<AbstractTimeModel> timeModel)
         : app{app}, settings{settings}, soundsRepository{std::move(soundsRepository)},
-          audioModel{std::move(audioModel)}, timeModel{std::move(timeModel)},
+          audioModel{audioModel}, timeModel{std::move(timeModel)},
           napAlarmTimer{sys::TimerFactory::createSingleShotTimer(
               app, powernapAlarmTimerName, powernapAlarmTimeout, [this](sys::Timer &) { onNapAlarmFinished(); })}
 
@@ -43,7 +43,6 @@ namespace app::powernap
     void PowerNapProgressPresenter::activate()
     {
         Expects(timer != nullptr);
-        getView()->setTimeFormat(timeModel->getTimeFormat());
         const auto value = settings->getValue(powernapDBRecordName);
         timer->reset(std::chrono::minutes{utils::getNumericValue<int>(value)});
         timer->start();
@@ -59,22 +58,14 @@ namespace app::powernap
     {
         const auto filePath = soundsRepository->titleToPath(
             settings->getValue(bell::settings::Alarm::tone, settings::SettingsScope::Global));
-        auto playResponseCb = [this](audio::RetCode retCode, audio::Token token) {
-            if (retCode != audio::RetCode::Success || !token.IsValid()) {
-                LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
-                          str(retCode).c_str(),
-                          token.IsValid());
-                return;
-            }
-            this->currentToken = token;
-        };
-        audioModel->play(filePath.value_or(""), playResponseCb, AbstractAudioModel::PlaybackType::Alarm);
+
+        audioModel.play(filePath.value_or(""), AbstractAudioModel::PlaybackType::Alarm, {});
         napAlarmTimer.start();
         napFinished = true;
     }
     void PowerNapProgressPresenter::onNapAlarmFinished()
     {
-        audioModel->stop(currentToken, nullptr);
+        audioModel.stop({});
         getView()->napEnded();
     }
 

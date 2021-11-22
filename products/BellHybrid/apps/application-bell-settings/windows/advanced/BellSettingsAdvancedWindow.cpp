@@ -15,7 +15,6 @@
 #include <service-appmgr/messages/SwitchRequest.hpp>
 #include <windows/advanced/AboutYourBellWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
-#include <common/windows/BellFinishedCallbackWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 
 namespace gui
@@ -70,9 +69,6 @@ namespace gui
                 std::make_unique<gui::option::OptionBellMenu>(name, callback(window), nullptr, this));
         };
 
-        addOption(utils::translate("app_bell_settings_advanced_time_units"),
-                  gui::window::name::bellSettingsTimeUnits,
-                  defaultCallback);
         addOption(utils::translate("app_bell_settings_advanced_language"),
                   gui::window::name::bellSettingsLanguage,
                   defaultCallback);

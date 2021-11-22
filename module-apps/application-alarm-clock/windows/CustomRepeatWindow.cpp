@@ -59,7 +59,7 @@ namespace app::alarmClock
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             presenter->saveData();
-            application->switchWindow(style::alarmClock::window::name::newEditAlarm);
+            application->switchWindow(style::alarmClock::window::name::newEditAlarm, gui::ShowMode::GUI_SHOW_RETURN);
             return true;
         }
         return false;

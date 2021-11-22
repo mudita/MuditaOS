@@ -33,12 +33,12 @@ target_include_directories(alarms
 
 target_link_libraries(alarms
    PRIVATE
-        module-audio
         module-vfs
         bell::db
         bell::appmgr
         bell::app-common
         bell::evtmgr
+        bell::audio
         apps-common
    PUBLIC
         module-db

@@ -7,26 +7,16 @@ namespace app::bell_settings
 {
     BedtimeSettingsPresenter::BedtimeSettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
                                                        std::shared_ptr<AbstractBedtimeModel> model,
-                                                       std::unique_ptr<AbstractAudioModel> audioModel,
+                                                       AbstractAudioModel &audioModel,
                                                        std::unique_ptr<AbstractSoundsRepository> soundsRepository)
         : provider(std::move(provider)),
-          model(std::move(model)), audioModel{std::move(audioModel)}, soundsRepository{std::move(soundsRepository)}
+          model(std::move(model)), audioModel{audioModel}, soundsRepository{std::move(soundsRepository)}
     {
-        auto playResponseCb = [this](audio::RetCode retCode, audio::Token token) {
-            if (retCode != audio::RetCode::Success || !token.IsValid()) {
-                LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
-                          str(retCode).c_str(),
-                          token.IsValid());
-                return;
-            }
-            this->currentToken = token;
-        };
-
-        auto playSound = [this, playResponseCb](const UTF8 &val) {
+        auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
-            this->audioModel->play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
-                                   playResponseCb,
-                                   AbstractAudioModel::PlaybackType::Bedtime);
+            this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
+                                  AbstractAudioModel::PlaybackType::Bedtime,
+                                  {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
@@ -36,10 +26,12 @@ namespace app::bell_settings
         this->provider->onToneChange = playSound;
 
         this->provider->onVolumeEnter  = playSound;
-        this->provider->onVolumeExit   = [this](const auto &) { this->audioModel->stop(currentToken, nullptr); };
+        this->provider->onVolumeExit   = [this](const auto &) { this->stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::Bedtime);
-            playSound(currentSoundPath);
+            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Bedtime, {});
+            if (this->audioModel.hasPlaybackFinished()) {
+                playSound(currentSoundPath);
+            }
         };
     }
 
@@ -69,6 +61,10 @@ namespace app::bell_settings
 
     void BedtimeSettingsPresenter::stopSound()
     {
-        this->audioModel->stop(currentToken, nullptr);
+        this->audioModel.stop({});
+    }
+    void BedtimeSettingsPresenter::exitWithoutSave()
+    {
+        model->getBedtimeVolume().restoreDefault();
     }
 } // namespace app::bell_settings

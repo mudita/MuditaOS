@@ -50,6 +50,11 @@ namespace gui
             exit();
             return true;
         }
+
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            presenter->exitWithoutSave();
+        }
+
         return AppWindow::onInput(inputEvent);
     }
 
@@ -66,8 +71,10 @@ namespace gui
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", BellSettingsAlarmSettingsMenuWindow::name));
     }
-    void BellSettingsAlarmSettingsSnoozeWindow::onClose(Window::CloseReason)
+    void BellSettingsAlarmSettingsSnoozeWindow::onClose(Window::CloseReason reason)
     {
-        presenter->eraseProviderData();
+        if (reason != CloseReason::Popup) {
+            presenter->eraseProviderData();
+        }
     }
 } // namespace gui

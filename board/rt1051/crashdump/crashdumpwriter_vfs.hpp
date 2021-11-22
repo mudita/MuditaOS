@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include "crashdumpwriter.hpp"
 #include <rotator/Rotator.hpp>
 
 #include <array>
 #include <ctime>
 #include <memory>
+#include <cstdio>
 
 namespace purefs::fs
 {
@@ -18,23 +18,21 @@ namespace purefs::fs
 namespace crashdump
 {
     constexpr inline auto maxRotationFilesCount = 5;
-    class CrashDumpWriterVFS : public CrashDumpWriter
+    class CrashDumpWriterVFS
     {
       public:
         CrashDumpWriterVFS() : rotator{".hex"}
         {}
-        void openDump() override;
-        void saveDump() override;
+        void openDump();
+        void saveDump();
 
-        void writeBytes(const std::uint8_t *buff, std::size_t size) override;
-        void writeHalfWords(const std::uint16_t *buff, std::size_t size) override;
-        void writeWords(const std::uint32_t *buff, std::size_t size) override;
+        void writeBytes(const std::uint8_t *buff, std::size_t size);
+        void writeHalfWords(const std::uint16_t *buff, std::size_t size);
+        void writeWords(const std::uint32_t *buff, std::size_t size);
 
       private:
         utils::Rotator<maxRotationFilesCount> rotator;
-        int dumpFd{-1};
-
-        std::shared_ptr<purefs::fs::filesystem> vfs;
+        std::FILE *file{};
     };
 
 } // namespace crashdump

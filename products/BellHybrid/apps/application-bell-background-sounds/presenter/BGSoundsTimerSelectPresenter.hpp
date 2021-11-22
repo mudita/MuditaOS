@@ -30,12 +30,13 @@ namespace app::bgSounds
         class View
         {
           public:
-            ~View() = default;
+            virtual ~View() = default;
         };
 
         class Presenter : public BasePresenter<BGSoundsTimerSelectContract::View>
         {
           public:
+            virtual ~Presenter()                                      = default;
             virtual const Range &getTimerValuesRange() const noexcept = 0;
             virtual std::chrono::minutes getCurrentTimerValue() const = 0;
             virtual void setTimerValue(std::chrono::minutes)          = 0;
