@@ -80,6 +80,21 @@ namespace sevm
         }
     };
 
+    class ScreenLightSetConstLinearModeParams : public ScreenLightControlMessage
+    {
+        screen_light_control::ConstLinearProgressModeParameters params;
+
+      public:
+        explicit ScreenLightSetConstLinearModeParams(screen_light_control::ConstLinearProgressModeParameters params)
+            : ScreenLightControlMessage(screen_light_control::Action::setAutomaticModeParameters), params{params}
+        {}
+
+        [[nodiscard]] auto getParams() const noexcept -> screen_light_control::ConstLinearProgressModeParameters
+        {
+            return params;
+        }
+    };
+
     class ScreenLightControlRequestParameters : public sys::DataMessage
     {
       public:

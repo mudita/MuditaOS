@@ -8,16 +8,16 @@ namespace app::bell_settings
 {
     PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(std::shared_ptr<PrewakeUpListItemProvider> provider,
                                                        std::unique_ptr<AbstractPrewakeUpSettingsModel> model,
-                                                       std::unique_ptr<AbstractAudioModel> audioModel,
+                                                       AbstractAudioModel &audioModel,
                                                        std::unique_ptr<AbstractSoundsRepository> soundsRepository)
         : provider(std::move(provider)),
-          model(std::move(model)), audioModel{std::move(audioModel)}, soundsRepository{std::move(soundsRepository)}
+          model(std::move(model)), audioModel{audioModel}, soundsRepository{std::move(soundsRepository)}
     {
         auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
-            this->audioModel->play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
-                                   AbstractAudioModel::PlaybackType::PreWakeup,
-                                   {});
+            this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
+                                  AbstractAudioModel::PlaybackType::PreWakeup,
+                                  {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
@@ -29,8 +29,10 @@ namespace app::bell_settings
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { this->stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::PreWakeup, {});
-            playSound(currentSoundPath);
+            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::PreWakeup, {});
+            if (this->audioModel.hasPlaybackFinished()) {
+                playSound(currentSoundPath);
+            }
         };
     }
 
@@ -59,7 +61,7 @@ namespace app::bell_settings
     }
     void PrewakeUpWindowPresenter::stopSound()
     {
-        this->audioModel->stop({});
+        this->audioModel.stop({});
     }
     void PrewakeUpWindowPresenter::exitWithoutSave()
     {

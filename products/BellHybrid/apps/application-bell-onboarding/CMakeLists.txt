@@ -17,6 +17,7 @@ target_sources(application-bell-onboarding
         windows/OnBoardingSettingsWindow.cpp
         windows/OnBoardingFinalizeWindow.cpp
         windows/OnBoardingInstructionPromptWindow.cpp
+        windows/OnBoardingWelcomeWindow.cpp
         presenter/OnBoardingLanguageWindowPresenter.cpp
         presenter/OnBoardingFinalizeWindowPresenter.cpp
 
@@ -25,6 +26,7 @@ target_sources(application-bell-onboarding
         windows/OnBoardingLanguageWindow.hpp
         windows/OnBoardingSettingsWindow.hpp
         windows/OnBoardingInstructionPromptWindow.hpp
+        windows/OnBoardingWelcomeWindow.hpp
 
     PUBLIC
         include/application-bell-onboarding/ApplicationBellOnBoarding.hpp

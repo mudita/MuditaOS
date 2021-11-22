@@ -48,8 +48,11 @@ namespace app
                                                      StatusIndicators statusIndicators,
                                                      StartInBackground startInBackground,
                                                      uint32_t stackDepth)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth)
-    {}
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth),
+          audioModel{std::make_unique<AudioModel>(this)}
+    {
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+    }
 
     sys::ReturnCodes ApplicationBellSettings::InitHandler()
     {
@@ -113,14 +116,13 @@ namespace app
 
         windowsFactory.attach(
             gui::window::name::bellSettingsBedtimeTone, [this](ApplicationCommon *app, const std::string &name) {
-                auto audioModel   = std::make_unique<AudioModel>(app);
-                auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app, std::move(audioModel));
+                auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app, *audioModel);
                 auto soundsRepository =
                     std::make_unique<SoundsRepository>(alarms::paths::getBedtimeReminderChimesDir());
                 auto provider = std::make_shared<bell_settings::BedtimeSettingsListItemProvider>(
                     bedtimeModel, soundsRepository->getSongTitles());
                 auto presenter = std::make_unique<bell_settings::BedtimeSettingsPresenter>(
-                    provider, bedtimeModel, std::move(audioModel), std::move(soundsRepository));
+                    provider, bedtimeModel, *audioModel, std::move(soundsRepository));
                 return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app, std::move(presenter));
             });
 
@@ -144,7 +146,6 @@ namespace app
 
         windowsFactory.attach(
             gui::BellSettingsPrewakeUpWindow::name, [this](ApplicationCommon *app, const std::string &name) {
-                auto audioModel         = std::make_unique<AudioModel>(this);
                 auto chimeDurationModel = std::make_unique<bell_settings::PrewakeUpChimeDurationModel>(this);
                 auto chimeToneModel     = std::make_unique<bell_settings::PrewakeUpChimeToneModel>(this);
                 auto chimeVolumeModel   = std::make_unique<bell_settings::PrewakeUpChimeVolumeModel>(*audioModel);
@@ -158,7 +159,7 @@ namespace app
                 auto provider         = std::make_shared<bell_settings::PrewakeUpListItemProvider>(
                     *prewakeUpSettingsModel, soundsRepository->getSongTitles());
                 auto presenter = std::make_unique<bell_settings::PrewakeUpWindowPresenter>(
-                    provider, std::move(prewakeUpSettingsModel), std::move(audioModel), std::move(soundsRepository));
+                    provider, std::move(prewakeUpSettingsModel), *audioModel, std::move(soundsRepository));
                 return std::make_unique<gui::BellSettingsPrewakeUpWindow>(app, std::move(presenter));
             });
 
@@ -169,7 +170,6 @@ namespace app
                               });
         windowsFactory.attach(
             gui::BellSettingsAlarmSettingsSnoozeWindow::name, [this](ApplicationCommon *app, const std::string &) {
-                auto audioModel               = std::make_unique<AudioModel>(this);
                 auto snoozeOnOffModel         = std::make_unique<bell_settings::SnoozeOnOffModel>(this);
                 auto snoozeLengthModel        = std::make_unique<bell_settings::SnoozeLengthModel>(this);
                 auto snoozeChimeIntervalModel = std::make_unique<bell_settings::SnoozeChimeIntervalModel>(this);
@@ -185,12 +185,11 @@ namespace app
                 auto provider         = std::make_shared<bell_settings::SnoozeListItemProvider>(
                     *snoozeSettingsModel, soundsRepository->getSongTitles());
                 auto presenter = std::make_unique<bell_settings::SnoozePresenter>(
-                    provider, std::move(snoozeSettingsModel), std::move(audioModel), std::move(soundsRepository));
+                    provider, std::move(snoozeSettingsModel), *audioModel, std::move(soundsRepository));
                 return std::make_unique<gui::BellSettingsAlarmSettingsSnoozeWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(
             gui::BellSettingsAlarmSettingsWindow::name, [this](ApplicationCommon *app, const std::string &) {
-                auto audioModel           = std::make_unique<AudioModel>(this);
                 auto alarmToneModel       = std::make_unique<bell_settings::AlarmToneModel>(this);
                 auto alarmVolumeModel     = std::make_unique<bell_settings::AlarmVolumeModel>(*audioModel);
                 auto alarmLightOnOffModel = std::make_unique<bell_settings::AlarmLightOnOffModel>(this);
@@ -200,7 +199,7 @@ namespace app
                 auto provider         = std::make_shared<bell_settings::AlarmSettingsListItemProvider>(
                     *alarmSettingsModel, soundsRepository->getSongTitles());
                 auto presenter = std::make_unique<bell_settings::AlarmSettingsPresenter>(
-                    provider, std::move(alarmSettingsModel), std::move(audioModel), std::move(soundsRepository));
+                    provider, std::move(alarmSettingsModel), *audioModel, std::move(soundsRepository));
                 return std::make_unique<gui::BellSettingsAlarmSettingsWindow>(app, std::move(presenter));
             });
 

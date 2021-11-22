@@ -24,4 +24,7 @@ namespace bsp::bell_switches
     BaseType_t IRQHandler(uint32_t mask);
 
     BaseType_t wakeupIRQHandler();
+
+    void clearStartupLatchInterrupt();
+
 } // namespace bsp::bell_switches

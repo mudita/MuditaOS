@@ -71,6 +71,8 @@ namespace gui
 
     void BellSettingsPrewakeUpWindow::onClose(CloseReason reason)
     {
-        presenter->eraseProviderData();
+        if (reason != CloseReason::Popup) {
+            presenter->eraseProviderData();
+        }
     }
 } /* namespace gui */

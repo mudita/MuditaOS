@@ -615,6 +615,7 @@
   "app_bell_onboarding_info_light_click": "<text font='gt_pressura' weight='regular' size='38'>Presiona ligeramente </text><text font='gt_pressura' weight='light' size='38'>para continuar</text>",
   "app_bell_onboarding_info_deep_click_warning": "<text font='gt_pressura' weight='light' size='38'>Has presionado </text><text font='gt_pressura' weight='regular' size='38'>a fondo</text>",
   "app_bell_onboarding_info_deep_click_correction": "<text font='gt_pressura' weight='light' size='38'>Sé más suave, <br></br>intenta </text><text font='gt_pressura' weight='regular' size='38'>presionar ligeramente </text><text font='gt_pressura' weight='light' size='38'>esta vez</text>",
+  "app_bell_onboarding_welcome": "Bienvenido",
   "app_bellmain_home_screen_bottom_desc_dp": "Presionar a fondo para activar",
   "app_bellmain_alarm": "Alarma",
   "app_bellmain_power_nap": "Siesta",

@@ -13,7 +13,7 @@ namespace gui
     {
       private:
         sys::TimerHandle popupTimer;
-        const std::chrono::milliseconds timeout;
+        std::chrono::milliseconds timeout;
 
       public:
         explicit WindowWithTimer(app::ApplicationCommon *app,
@@ -27,6 +27,6 @@ namespace gui
 
       protected:
         void detachTimerIfExists();
-        void resetTimer();
+        void resetTimer(const std::chrono::seconds newTimeout = defautTimeout);
     };
 } // namespace gui

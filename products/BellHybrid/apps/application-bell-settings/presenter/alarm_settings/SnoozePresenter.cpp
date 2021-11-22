@@ -9,16 +9,16 @@ namespace app::bell_settings
 
     SnoozePresenter::SnoozePresenter(std::shared_ptr<SnoozeListItemProvider> provider,
                                      std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel,
-                                     std::unique_ptr<AbstractAudioModel> audioModel,
+                                     AbstractAudioModel &audioModel,
                                      std::unique_ptr<AbstractSoundsRepository> soundsRepository)
-        : provider{provider}, snoozeSettingsModel{std::move(snoozeSettingsModel)}, audioModel{std::move(audioModel)},
+        : provider{provider}, snoozeSettingsModel{std::move(snoozeSettingsModel)}, audioModel{audioModel},
           soundsRepository{std::move(soundsRepository)}
     {
         auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
-            this->audioModel->play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
-                                   AbstractAudioModel::PlaybackType::Snooze,
-                                   {});
+            this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
+                                  AbstractAudioModel::PlaybackType::Snooze,
+                                  {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
@@ -30,8 +30,10 @@ namespace app::bell_settings
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::Snooze, {});
-            playSound(currentSoundPath);
+            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Snooze, {});
+            if (this->audioModel.hasPlaybackFinished()) {
+                playSound(currentSoundPath);
+            }
         };
     }
 
@@ -56,7 +58,7 @@ namespace app::bell_settings
     }
     void SnoozePresenter::stopSound()
     {
-        audioModel->stop({});
+        audioModel.stop({});
     }
     void SnoozePresenter::eraseProviderData()
     {

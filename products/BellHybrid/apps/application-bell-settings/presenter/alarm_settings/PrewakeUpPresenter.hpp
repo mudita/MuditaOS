@@ -46,7 +46,7 @@ namespace app::bell_settings
       public:
         PrewakeUpWindowPresenter(std::shared_ptr<PrewakeUpListItemProvider> provider,
                                  std::unique_ptr<AbstractPrewakeUpSettingsModel> model,
-                                 std::unique_ptr<AbstractAudioModel> audioModel,
+                                 AbstractAudioModel &audioModel,
                                  std::unique_ptr<AbstractSoundsRepository> soundsRepository);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
@@ -60,7 +60,7 @@ namespace app::bell_settings
 
         std::shared_ptr<PrewakeUpListItemProvider> provider;
         std::unique_ptr<AbstractPrewakeUpSettingsModel> model;
-        std::unique_ptr<AbstractAudioModel> audioModel;
+        AbstractAudioModel &audioModel;
         std::unique_ptr<AbstractSoundsRepository> soundsRepository;
         UTF8 currentSoundPath;
     };

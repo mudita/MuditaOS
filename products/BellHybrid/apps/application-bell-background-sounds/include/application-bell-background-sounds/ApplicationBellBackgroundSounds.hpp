@@ -22,6 +22,7 @@ namespace app
 
     class ApplicationBellBackgroundSounds : public Application
     {
+      private:
         std::unique_ptr<AbstractAudioModel> audioModel;
         std::unique_ptr<bgSounds::BGSoundsPlayer> player;
 

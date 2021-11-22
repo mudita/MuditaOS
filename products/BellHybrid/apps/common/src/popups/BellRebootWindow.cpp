@@ -35,7 +35,7 @@ namespace gui
                         0,
                         style::window_width,
                         style::window_height,
-                        "bell_mudita_logo_W_G",
+                        "bell_very_big_logo_W_G",
                         utils::translate("app_bell_reset_message"));
         icon->text->setFont(style::window::font::verybiglight);
     }

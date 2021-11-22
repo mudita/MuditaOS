@@ -64,6 +64,8 @@ namespace app::meditation
         std::chrono::minutes duration;
         std::chrono::minutes interval;
 
+        static constexpr auto endWindowTimeout = std::chrono::seconds{5};
+
         void onProgressFinished();
         void onIntervalReached();
 

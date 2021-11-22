@@ -68,8 +68,8 @@ namespace app::bell_settings
     }
     void FrontlightModel::setBrightness(Brightness value)
     {
-        screen_light_control::ManualModeParameters parameters{fixedValToPercentage(value)};
-        app->bus.sendUnicast(std::make_shared<sevm::ScreenLightSetManualModeParams>(parameters),
+        screen_light_control::ConstLinearProgressModeParameters parameters{fixedValToPercentage(value)};
+        app->bus.sendUnicast(std::make_shared<sevm::ScreenLightSetConstLinearModeParams>(parameters),
                              service::name::evt_manager);
     }
     gui::AbstractSettingsModel<std::uint8_t> &FrontlightModel::getBrightnessModel()

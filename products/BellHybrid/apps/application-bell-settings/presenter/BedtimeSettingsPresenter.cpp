@@ -7,16 +7,16 @@ namespace app::bell_settings
 {
     BedtimeSettingsPresenter::BedtimeSettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
                                                        std::shared_ptr<AbstractBedtimeModel> model,
-                                                       std::unique_ptr<AbstractAudioModel> audioModel,
+                                                       AbstractAudioModel &audioModel,
                                                        std::unique_ptr<AbstractSoundsRepository> soundsRepository)
         : provider(std::move(provider)),
-          model(std::move(model)), audioModel{std::move(audioModel)}, soundsRepository{std::move(soundsRepository)}
+          model(std::move(model)), audioModel{audioModel}, soundsRepository{std::move(soundsRepository)}
     {
         auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
-            this->audioModel->play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
-                                   AbstractAudioModel::PlaybackType::Bedtime,
-                                   {});
+            this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
+                                  AbstractAudioModel::PlaybackType::Bedtime,
+                                  {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
@@ -28,8 +28,10 @@ namespace app::bell_settings
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { this->stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel->setVolume(val, AbstractAudioModel::PlaybackType::Bedtime, {});
-            playSound(currentSoundPath);
+            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Bedtime, {});
+            if (this->audioModel.hasPlaybackFinished()) {
+                playSound(currentSoundPath);
+            }
         };
     }
 
@@ -59,7 +61,7 @@ namespace app::bell_settings
 
     void BedtimeSettingsPresenter::stopSound()
     {
-        this->audioModel->stop({});
+        this->audioModel.stop({});
     }
     void BedtimeSettingsPresenter::exitWithoutSave()
     {
