@@ -16,7 +16,7 @@ namespace gui
 
         auto topMessage = new TextFixedSize(body->firstBox);
         topMessage->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
-        topMessage->setFont(style::bell_sidelist_item::description_font);
+        topMessage->setFont(style::bell_sidelist_item::title_font);
         topMessage->setEdges(gui::RectangleEdge::None);
         topMessage->activeItem = false;
         topMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
