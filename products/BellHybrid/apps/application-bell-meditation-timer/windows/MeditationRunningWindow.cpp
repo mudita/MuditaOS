@@ -108,7 +108,7 @@ namespace gui
     void MeditationRunningWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         AppWindow::onBeforeShow(mode, data);
-
+        presenter->onBeforeShow();
         if (mode == ShowMode::GUI_SHOW_INIT) {
             playGong();
             presenter->start();
