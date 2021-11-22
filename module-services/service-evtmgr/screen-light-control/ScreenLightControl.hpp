@@ -31,5 +31,6 @@ namespace screen_light_control
         [[nodiscard]] virtual auto isAutoModeOn() const noexcept -> bool     = 0;
         [[nodiscard]] virtual auto getBrightnessValue() const noexcept
             -> bsp::eink_frontlight::BrightnessPercentage = 0;
+        [[nodiscard]] virtual auto isFadeOutOngoing() -> bool = 0;
     };
 } // namespace screen_light_control

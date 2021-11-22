@@ -42,6 +42,7 @@ namespace bell::screen_light_control
         [[nodiscard]] auto isLightOn() const noexcept -> bool override;
         [[nodiscard]] bool isAutoModeOn() const noexcept override;
         [[nodiscard]] auto getBrightnessValue() const noexcept -> bsp::eink_frontlight::BrightnessPercentage override;
+        [[nodiscard]] auto isFadeOutOngoing() -> bool override;
 
       private:
         void controlTimerCallback();
