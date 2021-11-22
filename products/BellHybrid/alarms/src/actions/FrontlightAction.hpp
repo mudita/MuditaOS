@@ -19,13 +19,24 @@ namespace alarms
             LinearProgress
         };
 
-        FrontlightAction(sys::Service &service, Mode mode);
+        enum class SettingsDependency
+        {
+            None,
+            AlarmClock,
+            Prewakeup
+        };
+
+        FrontlightAction(sys::Service &service,
+                         Mode mode,
+                         SettingsDependency settingsDependency = SettingsDependency::None);
         bool execute() override;
         bool turnOff() override;
 
       private:
-        static constexpr auto frontlightOFF = "0";
+        static constexpr std::string_view alarmFrontlightOFF     = "0";
+        static constexpr std::string_view prewakeupFrontlightOFF = "0";
 
+        SettingsDependency settingsDependency;
         std::unique_ptr<AbstractAlarmAction> pimpl;
         settings::Settings settings;
     };
