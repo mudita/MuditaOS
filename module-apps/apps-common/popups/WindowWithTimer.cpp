@@ -27,11 +27,13 @@ namespace gui
 
     void WindowWithTimer::resetTimer(const std::chrono::seconds newTimeout)
     {
-        timeout = newTimeout;
-        if (!popupTimer.isValid()) {
-            popupTimer = app::GuiTimerFactory::createSingleShotTimer(application, this, popup::timerName, newTimeout);
+        if (newTimeout != noTimeoutChange) {
+            timeout = newTimeout;
         }
-        popupTimer.restart(newTimeout);
+        if (!popupTimer.isValid()) {
+            popupTimer = app::GuiTimerFactory::createSingleShotTimer(application, this, popup::timerName, timeout);
+        }
+        popupTimer.restart(timeout);
     }
 
     void WindowWithTimer::detachTimerIfExists()
