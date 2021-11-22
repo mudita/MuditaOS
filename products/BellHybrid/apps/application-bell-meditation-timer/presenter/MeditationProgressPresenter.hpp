@@ -51,6 +51,7 @@ namespace app::meditation
             virtual void resume()                                                   = 0;
             virtual void abandon()                                                  = 0;
             virtual void finish()                                                   = 0;
+            virtual void onBeforeShow()                                             = 0;
         };
     };
 
@@ -82,5 +83,6 @@ namespace app::meditation
         void resume() override;
         void abandon() override;
         void finish() override;
+        void onBeforeShow() override;
     };
 } // namespace app::meditation

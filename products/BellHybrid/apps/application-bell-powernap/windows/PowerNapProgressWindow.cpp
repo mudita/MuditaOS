@@ -141,4 +141,9 @@ namespace gui
         }
         return true;
     }
+
+    void PowerNapProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        presenter->onBeforeShow();
+    }
 } // namespace gui
