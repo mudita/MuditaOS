@@ -109,6 +109,9 @@ namespace alarms
         void handleBedtime(const SingleEventRecord &event, bool decision);
         void processBedtime(TimePoint now);
         void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType) override;
+        void handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
+                              alarms::AlarmType alarmType,
+                              bool newStateOn) override;
 
         bool isBedtimeAllowed() const;
 

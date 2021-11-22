@@ -284,6 +284,17 @@ namespace alarms
         return ongoingSingleEvents.empty() && not preWakeUp.isActive();
     }
 
+    void AlarmOperations::handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
+                                           alarms::AlarmType alarmType,
+                                           bool newStateOn)
+    {
+        if (newStateOn && alarmType == alarms::AlarmType::Clock) {
+            AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
+            AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
+        }
+        AlarmOperationsCommon::handleAlarmEvent(event, alarmType, newStateOn);
+    }
+
     PreWakeUp::PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider)
         : settingsProvider{std::move(settingsProvider)}
     {}
