@@ -136,6 +136,9 @@ namespace alarms
         }
         switchAlarmExecution(*(*found), false);
         ongoingSingleEvents.erase(found);
+
+        processOngoingEvents();
+
         handleActiveAlarmsCountChange();
         callback(true);
     }
@@ -192,6 +195,8 @@ namespace alarms
 
         switchAlarmExecution(*(*found), false);
         ongoingSingleEvents.erase(found);
+
+        processOngoingEvents();
 
         handleSnoozedAlarmsCountChange();
         handleActiveAlarmsCountChange();
@@ -280,13 +285,20 @@ namespace alarms
             processSnoozedEventsQueue(now);
         }
 
-        if (!isHandlingInProgress && !ongoingSingleEvents.empty()) {
-            switchAlarmExecution(*(ongoingSingleEvents.front()), true);
-            handleActiveAlarmsCountChange();
-            handleSnoozedAlarmsCountChange();
+        if (!isHandlingInProgress) {
+            processOngoingEvents();
             return true;
         }
         return false;
+    }
+
+    void AlarmOperationsCommon::processOngoingEvents()
+    {
+        if (!ongoingSingleEvents.empty()) {
+            switchAlarmExecution(*(ongoingSingleEvents.front()), true);
+            handleActiveAlarmsCountChange();
+            handleSnoozedAlarmsCountChange();
+        }
     }
 
     void AlarmOperationsCommon::addAlarmExecutionHandler(const alarms::AlarmType type,

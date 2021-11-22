@@ -40,8 +40,9 @@ namespace app::popup
 
     template <typename requestType, typename responseType> void AlarmPopupContract::AlarmModel::snoozeAlarm()
     {
-        auto request =
-            std::make_unique<requestType>(record->ID, TimePointNow() + std::chrono::minutes(record->snoozeDuration));
+        auto request = std::make_unique<requestType>(record->ID,
+                                                     std::chrono::floor<std::chrono::minutes>(TimePointNow()) +
+                                                         std::chrono::minutes(record->snoozeDuration));
         auto task = async(std::move(request), service::name::service_time);
         auto cb   = [&](auto response) {
             auto result = dynamic_cast<responseType *>(response);

@@ -608,3 +608,43 @@ TEST_F(AlarmOperationsFixture, recurrentAlarmEnablingDisabling)
     alarmOperations->updateAlarm(alarmRecord, universalBoolCallback);
     EXPECT_FALSE(alarmActive);
 }
+
+TEST_F(AlarmOperationsFixture, handleMultipleConcurrentAlarms)
+{
+    auto alarmRepoMock         = std::make_unique<MockAlarmEventsRepository>();
+    const auto alarmTime       = TimePointFromStringWithShift("2022-11-11 11:00:00");
+    const auto alarmTimeSnooze = TimePointFromStringWithShift("2022-11-11 11:10:00");
+    alarmRepoMock->nextRecords.push_back(
+        AlarmEventRecord(1, AlarmTime{11h, 0min}, defMusic, defEnabled, defSnooze, defRRule));
+    alarmRepoMock->nextRecords.push_back(
+        AlarmEventRecord(2, AlarmTime{11h, 0min}, defMusic, defEnabled, defSnooze, defRRule));
+    alarmRepoMock->nextRecords.push_back(
+        AlarmEventRecord(3, AlarmTime{11h, 0min}, defMusic, defEnabled, defSnooze, defRRule));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    auto handler         = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(6);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+
+    int snoozedCount   = 0;
+    auto countcallback = [&](unsigned count) { snoozedCount = count; };
+    alarmOperations->addSnoozedAlarmsCountChangeCallback(countcallback);
+    bool alarmActive    = false;
+    auto activeCallback = [&](bool isAnyActive) { alarmActive = isAnyActive; };
+    alarmOperations->addActiveAlarmCountChangeCallback(activeCallback);
+
+    alarmOperations->updateEventsCache(TimePointFromStringWithShift("2022-11-11 08:59:00"));
+
+    alarmOperations->minuteUpdated(alarmTime);
+    alarmOperations->snoozeRingingAlarm(1, alarmTimeSnooze, universalBoolCallback);
+    alarmOperations->snoozeRingingAlarm(2, alarmTimeSnooze, universalBoolCallback);
+    alarmOperations->snoozeRingingAlarm(3, alarmTimeSnooze, universalBoolCallback);
+    EXPECT_EQ(snoozedCount, 3);
+    EXPECT_TRUE(alarmActive);
+
+    alarmOperations->minuteUpdated(alarmTimeSnooze);
+    EXPECT_EQ(snoozedCount, 0);
+    alarmOperations->turnOffRingingAlarm(1, universalBoolCallback);
+    alarmOperations->turnOffRingingAlarm(2, universalBoolCallback);
+    alarmOperations->turnOffRingingAlarm(3, universalBoolCallback);
+}
