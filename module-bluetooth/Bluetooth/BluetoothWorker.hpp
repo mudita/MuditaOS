@@ -80,6 +80,8 @@ class BluetoothWorker : private sys::Worker
     void onLinkKeyAdded(const std::string &deviceAddress);
     void initDevicesList();
     void removeFromBoundDevices(uint8_t *addr);
+    auto isAddressConnected(const bd_addr_t addr) -> bool;
+    void handleUnpairDisconnect(const Devicei &device);
 
   public:
     enum Error

@@ -157,6 +157,7 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
     case bluetooth::Command::Unpair:
         controller->processCommand(command);
         removeFromBoundDevices(command.getDevice().address);
+        handleUnpairDisconnect(command.getDevice());
         break;
     case bluetooth::Command::None:
         break;
@@ -283,4 +284,17 @@ void BluetoothWorker::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDe
 {
     cpp_freertos::LockGuard lock(loopMutex);
     profileManager->setAudioDevice(std::move(device));
+}
+auto BluetoothWorker::isAddressConnected(const uint8_t *addr) -> bool
+{
+    auto deviceAddr =
+        std::visit(bluetooth::StringVisitor(), this->settings->getValue(bluetooth::Settings::ConnectedDevice));
+    return static_cast<bool>(deviceAddr == bd_addr_to_str(addr));
+}
+void BluetoothWorker::handleUnpairDisconnect(const Devicei &device)
+{
+    if (isAddressConnected(device.address)) {
+        auto disconnectCmd = bluetooth::Command(bluetooth::Command::DisconnectAudio, device);
+        controller->processCommand(disconnectCmd);
+    }
 }

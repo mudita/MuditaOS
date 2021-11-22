@@ -294,8 +294,6 @@ auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::sh
 {
     if (msg->isSucceed()) {
         auto device        = msg->getDevice();
-        auto deviceInModel = bluetoothDevicesModel->getDeviceByAddress(device.address)->get();
-
         bluetoothDevicesModel->mergeInternalDeviceState(device);
 
         settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, bd_addr_to_str(device.address));

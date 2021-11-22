@@ -47,7 +47,6 @@ namespace bluetooth
                 ptr->connect();
             }
         }
-
         return Error::Success;
     }
 
@@ -115,10 +114,6 @@ namespace bluetooth
 
         profilesList[profileType]->setAudioDevice(device);
         return switchProfile(profileType);
-    }
-    auto ProfileManager::isAddressActuallyUsed(const bd_addr_t address) -> bool
-    {
-        return !static_cast<bool>(bd_addr_cmp(address, remoteAddr));
     }
     auto ProfileManager::callAnswered() -> Error::Code
     {
