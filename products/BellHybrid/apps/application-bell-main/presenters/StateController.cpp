@@ -171,12 +171,12 @@ namespace app::home_screen
             };
 
             auto processRotateLeft = [](AbstractView &view, AbstractPresenter &presenter) {
-                presenter.spawnTimer();
+                presenter.spawnTimer(defaultAlarmSetTime);
                 view.decAlarmMinute();
             };
 
             auto processRotateRight = [](AbstractView &view, AbstractPresenter &presenter) {
-                presenter.spawnTimer();
+                presenter.spawnTimer(defaultAlarmSetTime);
                 view.incAlarmMinute();
             };
         } // namespace AlarmEdit
