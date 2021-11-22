@@ -226,17 +226,18 @@ namespace alarms
 
     bool AlarmOperations::handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision)
     {
+        auto ret = false;
         if (auto alarmEventPtr = std::dynamic_pointer_cast<AlarmEventRecord>(event.parent); alarmEventPtr) {
             if (decision.timeForChime) {
                 handleAlarmEvent(alarmEventPtr, alarms::AlarmType::PreWakeUpChime, true);
-                return true;
+                ret = true;
             }
             if (decision.timeForFrontlight) {
                 handleAlarmEvent(alarmEventPtr, alarms::AlarmType::PreWakeUpFrontlight, true);
-                return true;
+                ret = true;
             }
         }
-        return false;
+        return ret;
     }
 
     bool AlarmOperations::processSnoozeChime(TimePoint now)
