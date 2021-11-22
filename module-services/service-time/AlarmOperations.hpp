@@ -119,9 +119,9 @@ namespace alarms
         std::vector<std::unique_ptr<SnoozedAlarmEventRecord>> snoozedSingleEvents;
 
         alarms::AlarmType getAlarmEventType(const SingleEventRecord &event);
-        void handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
-                              alarms::AlarmType alarmType,
-                              bool newStateOn);
+        virtual void handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
+                                      alarms::AlarmType alarmType,
+                                      bool newStateOn);
 
       private:
         GetCurrentTime getCurrentTimeCallback;
