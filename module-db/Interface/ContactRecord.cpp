@@ -1159,10 +1159,11 @@ auto ContactRecordInterface::buildNumberMatcher(unsigned int maxPageSize)
 {
     return utils::NumberHolderMatcher<std::vector, ContactNumberHolder>(
         [this](const utils::PhoneNumber &number, auto offset, auto limit) {
+            auto numbers = !number.get().empty() ? contactDB->number.getLimitOffset(number.get(), offset, limit)
+                                                 : contactDB->number.getLimitOffset(offset, limit);
+
             std::vector<ContactNumberHolder> contactNumberHolders;
-            contactNumberHolders.reserve(limit);
-            auto numbers = number.isValid() ? contactDB->number.getLimitOffset(number.get(), offset, limit)
-                                            : contactDB->number.getLimitOffset(offset, limit);
+            contactNumberHolders.reserve(numbers.size());
             std::move(numbers.begin(), numbers.end(), std::back_inserter(contactNumberHolders));
             return contactNumberHolders;
         },
