@@ -54,17 +54,31 @@ namespace alarms
         }
     } // namespace
 
-    FrontlightAction::FrontlightAction(sys::Service &service, Mode mode)
-        : pimpl{createFrontlightImplementation(service, mode)}, settings{
-                                                                    service::ServiceProxy{service.weak_from_this()}}
+    FrontlightAction::FrontlightAction(sys::Service &service, Mode mode, SettingsDependency settingsDependency)
+        : settingsDependency{settingsDependency}, pimpl{createFrontlightImplementation(service, mode)},
+          settings{service::ServiceProxy{service.weak_from_this()}}
     {}
 
     bool FrontlightAction::execute()
     {
-        const std::string flontlightEnabled =
-            settings.getValue(bell::settings::Alarm::lightActive, settings::SettingsScope::Global);
-        if (flontlightEnabled == std::string(frontlightOFF)) {
-            return true;
+        std::string settingString;
+
+        switch (settingsDependency) {
+        case SettingsDependency::AlarmClock:
+            settingString = settings.getValue(bell::settings::Alarm::lightActive, settings::SettingsScope::Global);
+            if (settingString == std::string(alarmFrontlightOFF)) {
+                return true;
+            }
+            break;
+        case SettingsDependency::Prewakeup:
+            settingString =
+                settings.getValue(bell::settings::PrewakeUp::lightDuration, settings::SettingsScope::Global);
+            if (settingString == std::string(prewakeupFrontlightOFF)) {
+                return true;
+            }
+            break;
+        case SettingsDependency::None:
+            break;
         }
         return pimpl->execute();
     }
