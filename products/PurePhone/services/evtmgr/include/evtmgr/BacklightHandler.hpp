@@ -48,5 +48,6 @@ namespace backlight
         void handleKeypadLightRefresh();
         void handleScreenLightRefresh(int key = 0);
         void onScreenLightTurnedOn() override;
+        void handleScreenLightTimeout();
     };
 } // namespace backlight

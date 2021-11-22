@@ -18,12 +18,13 @@ namespace screen_light_control
     /// Set of actions to control the screen light
     enum class Action
     {
-        turnOff,                   ///< Turn off screen frontlight
-        turnOn,                    ///< Turn on screen frontlight
-        enableAutomaticMode,       ///< Enable automatic mode of screen frontlight
-        disableAutomaticMode,      ///< Disable automatic mode of screen frontlight
-        setManualModeBrightness,   ///< Set screen brightness in manual mode control
-        setAutomaticModeParameters ///< Set parameters for automatic mode of screen frontlight
+        turnOff,                    ///< Turn off screen frontlight
+        turnOn,                     ///< Turn on screen frontlight
+        enableAutomaticMode,        ///< Enable automatic mode of screen frontlight
+        disableAutomaticMode,       ///< Disable automatic mode of screen frontlight
+        setManualModeBrightness,    ///< Set screen brightness in manual mode control
+        setAutomaticModeParameters, ///< Set parameters for automatic mode of screen frontlight
+        fadeOut                     ///< Set light fade out in automatic mode
     };
 
     struct ManualModeParameters
@@ -37,8 +38,8 @@ namespace screen_light_control
     {
         /// Vector of points for screen brightness [%] in relation to ambient light [Lux] function. Points have to be in
         /// ascending order of ambient light values.
-        functions::BrightnessFunction functionPoints =
-            functions::BrightnessFunction({{0.0f, 70.0f}, {250.0f, 70.0f}, {450.0f, 40.0f}, {500.0f, 0.0f}});
+        functions::BrightnessFunction functionPoints = functions::BrightnessFunction(
+            {{0.0f, 35.0f}, {10.0f, 75.0f}, {85.0f, 100.0f}, {500.0f, 100.0f}, {520.0f, 0.0f}});
         /// Ramp time of screen brightness in milliseconds per 0-100% change
         unsigned int rampTimeMS = 1500;
         /// Hysteresis value of screen brightness control
