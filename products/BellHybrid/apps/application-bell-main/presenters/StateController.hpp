@@ -18,6 +18,7 @@ namespace app::home_screen
 {
 
     inline constexpr auto defaultAlarmRingingTime = std::chrono::minutes(5);
+    inline constexpr auto defaultAlarmSetTime     = std::chrono::seconds{10};
 
     class AbstractView;
     class AbstractPresenter;
