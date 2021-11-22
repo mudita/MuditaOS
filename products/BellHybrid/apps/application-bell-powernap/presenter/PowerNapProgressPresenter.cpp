@@ -78,4 +78,9 @@ namespace app::powernap
         return napFinished;
     }
 
+    void PowerNapProgressPresenter::onBeforeShow()
+    {
+        getView()->setTimeFormat(timeModel->getTimeFormat());
+    }
+
 } // namespace app::powernap

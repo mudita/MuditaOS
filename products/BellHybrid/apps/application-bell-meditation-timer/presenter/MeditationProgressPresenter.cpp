@@ -92,4 +92,9 @@ namespace app::meditation
             getView()->intervalReached();
         }
     }
+
+    void MeditationProgressPresenter::onBeforeShow()
+    {
+        getView()->setTimeFormat(timeModel->getTimeFormat());
+    }
 } // namespace app::meditation

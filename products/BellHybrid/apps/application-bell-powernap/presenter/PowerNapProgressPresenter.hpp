@@ -46,6 +46,7 @@ namespace app::powernap
             virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
             virtual void handleUpdateTimeEvent()                                    = 0;
             virtual bool isNapFinished()                                            = 0;
+            virtual void onBeforeShow()                                             = 0;
         };
     };
 
@@ -68,6 +69,7 @@ namespace app::powernap
 
         void onNapFinished();
         void onNapAlarmFinished();
+        void onBeforeShow() override;
 
       public:
         PowerNapProgressPresenter(app::ApplicationCommon *app,
