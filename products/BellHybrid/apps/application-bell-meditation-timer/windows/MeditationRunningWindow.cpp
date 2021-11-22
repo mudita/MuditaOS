@@ -96,7 +96,6 @@ namespace gui
         time = new BellStatusClock(body->firstBox);
         time->setMaximumSize(body->firstBox->getWidth(), body->firstBox->getHeight());
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        updateTime();
         body->firstBox->resizeItems();
 
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
@@ -109,6 +108,8 @@ namespace gui
     {
         AppWindow::onBeforeShow(mode, data);
         presenter->onBeforeShow();
+        updateTime();
+
         if (mode == ShowMode::GUI_SHOW_INIT) {
             playGong();
             presenter->start();
