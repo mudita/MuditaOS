@@ -40,7 +40,7 @@ TEST_CASE("Factory Settings")
     }
 }
 
-TEST_CASE("Factory Settings Init")
+TEST_CASE("Factory Settings Init", "[.]")
 {
     Database::initialize();
 
