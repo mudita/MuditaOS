@@ -387,9 +387,8 @@ void *userrealloc(void *pv, size_t xWantedSize) {
         }
         return NULL;
     }
-    else
-    {
-    	mtCOVERAGE_TEST_MARKER();
+    else {
+        return usermalloc(xWantedSize);
     }
     return NULL;
 }
