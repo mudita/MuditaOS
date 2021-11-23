@@ -19,5 +19,11 @@ namespace gui
         {
             inline constexpr auto font = style::window::font::largelight;
         }
+
+        namespace icon
+        {
+            constexpr inline auto imageTopMargin    = 112;
+            constexpr inline auto imageBottomMargin = 30;
+        } // namespace icon
     } // namespace bell_alarm_style
 } // namespace gui

@@ -34,6 +34,9 @@ namespace gui
         navBar->setVisible(false);
 
         icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
+        icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        icon->image->setMargins(
+            {0, bell_alarm_style::icon::imageTopMargin, 0, bell_alarm_style::icon::imageBottomMargin});
         icon->text->setFont(style::window::font::verybiglight);
     }
 
