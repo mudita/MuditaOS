@@ -10,12 +10,12 @@
 
 using namespace Quotes;
 
-constexpr auto totalNumOfCategoriesInDb = 6;
-constexpr auto totalNumOfQuotesInDb     = 48;
+constexpr auto totalNumOfCategoriesInDb            = 6;
+constexpr auto totalNumOfQuotesInDb                = 48;
 constexpr auto numOfQuotesFromCustomCategory       = 6;
 constexpr auto numOfQuotesWithCategoryIdEqualToOne = 9;
 
-TEST_CASE("Quotes")
+TEST_CASE("Quotes", "[.]")
 {
     Database::initialize();
     auto database = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").string().c_str());
