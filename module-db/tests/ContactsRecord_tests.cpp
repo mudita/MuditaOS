@@ -8,7 +8,7 @@
 #include <filesystem>
 #include <i18n/i18n.hpp>
 
-TEST_CASE("Contact Record db tests")
+TEST_CASE("Contact Record db tests", "[!mayfail]")
 {
     Database::initialize();
 
@@ -252,7 +252,7 @@ TEST_CASE("Test converting contact data to string")
     REQUIRE(contactDataStr == contactDataSingleField);
 }
 
-TEST_CASE("Contact record numbers update")
+TEST_CASE("Contact record numbers update", "[!mayfail]")
 {
     Database::initialize();
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
@@ -403,7 +403,7 @@ TEST_CASE("Contact record numbers update")
     Database::deinitialize();
 }
 
-TEST_CASE("Contacts list merge")
+TEST_CASE("Contacts list merge", "[!mayfail]")
 {
     Database::initialize();
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
@@ -503,7 +503,7 @@ TEST_CASE("Contacts list merge")
     Database::deinitialize();
 }
 
-TEST_CASE("Contacts list merge - advanced cases")
+TEST_CASE("Contacts list merge - advanced cases", "[!mayfail]")
 {
     Database::initialize();
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
@@ -544,7 +544,7 @@ TEST_CASE("Contacts list merge - advanced cases")
     }
 }
 
-TEST_CASE("Contacts list duplicates search")
+TEST_CASE("Contacts list duplicates search", "[!mayfail]")
 {
     Database::initialize();
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
@@ -598,7 +598,7 @@ TEST_CASE("Contacts list duplicates search")
     Database::deinitialize();
 }
 
-TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
+TEST_CASE("Check if new contact record can be recognised as a duplicate in DB", "[!mayfail]")
 {
     Database::initialize();
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
@@ -647,7 +647,7 @@ TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
     Database::deinitialize();
 }
 
-TEST_CASE("Check if new contact record exists in DB as a temporary contact")
+TEST_CASE("Check if new contact record exists in DB as a temporary contact", "[!mayfail]")
 {
     Database::initialize();
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");

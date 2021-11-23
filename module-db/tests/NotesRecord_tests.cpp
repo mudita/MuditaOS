@@ -13,7 +13,7 @@
 #include "Database/Database.hpp"
 #include "Databases/NotesDB.hpp"
 
-TEST_CASE("Notes Record tests")
+TEST_CASE("Notes Record tests", "[!mayfail]")
 {
     Database::initialize();
 

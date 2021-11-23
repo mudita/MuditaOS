@@ -76,7 +76,7 @@ const std::vector<TableRow> records = {
      .tags            = {.title = song3, .album = albums[6], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}}};
 
-TEST_CASE("Multimedia DB tests")
+TEST_CASE("Multimedia DB tests", "[!mayfail]")
 {
     REQUIRE(Database::initialize());
 

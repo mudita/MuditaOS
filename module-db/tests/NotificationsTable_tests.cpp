@@ -15,7 +15,7 @@
 #include <iostream>
 #include <filesystem>
 
-TEST_CASE("Notifications Table tests")
+TEST_CASE("Notifications Table tests", "[!mayfail]")
 {
     Database::initialize();
     const auto notificationsPath = (std::filesystem::path{"sys/user"} / "notifications.db");
@@ -23,7 +23,7 @@ TEST_CASE("Notifications Table tests")
     NotificationsDB notificationsDb{notificationsPath.c_str()};
     REQUIRE(notificationsDb.isInitialized());
 
-    auto &notificationsTbl = notificationsDb.notifications;
+    auto &notificationsTbl        = notificationsDb.notifications;
     const auto notificationsCount = notificationsTbl.count() + 1;
     // clear notifications table
     for (std::size_t id = 1; id <= notificationsCount; id++) {
