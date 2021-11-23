@@ -1,0 +1,9 @@
+{
+    "assets": [
+        {
+            "name": "/tmp/lol.txt",
+            "output": "./image/Luts.bin",
+            "copy": true
+        }
+    ]
+}
