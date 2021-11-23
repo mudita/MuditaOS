@@ -8,6 +8,7 @@
 #include <Timers/TimerHandle.hpp>
 #include <Service/ServiceProxy.hpp>
 #include <backlight-handler/BacklightHandlerCommon.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 
 namespace settings
 {
@@ -23,7 +24,7 @@ namespace backlight
         Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
 
         void init() override;
-        void handleKeyPressed(int key = 0);
+        void handleKeyPressed(bsp::KeyCodes key = bsp::KeyCodes::Undefined);
         /// Process request of the keypad light control
         /// @keypad_backlight::action an action to perform
         /// @return True if request was processed successfully, false otherwise
