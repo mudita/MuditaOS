@@ -13,7 +13,7 @@ which is super simple as it uses json file for description
         {
             "name": "./fonts/bell/gt_pressura_regular_38.mpf",      <-- name of our file to download in repo
             "output": "fonts/gt_pressura_regular_38.mpf",           <-- output: where should be and how shall be called the file
-            "ref": "fd168040c5d1216d457e6cf223e8ea9bb76bf7b"        <-- from what ref shall we download the file
+            "ref": "fd168040c5d1216d457e6cf223e8ea9bb76bf7b",       <-- from what ref shall we download the file ignored for local files
         },
     ...
 }
@@ -86,7 +86,18 @@ def verify_config(j):
             raise(RuntimeError(f"value '{val}' not found in config!"))
 
 
-class GitOps:
+class BaseOps:
+    def copy_file(self, what: Path, where: Path):
+        '''
+        if there is no path to `where` create -> then copy `what`
+        '''
+        import shutil
+        where.parent.mkdir(exist_ok=True, parents=True)
+        log.info(f'{what} -> {where}')
+        shutil.copy(what, where)
+
+
+class GitOps(BaseOps):
     '''
     Simplest github download wrapper based on ghapi (passed by api)
     please see reference here: https://ghapi.fast.ai/fullapi.html
@@ -163,15 +174,6 @@ class GitOps:
             # restore headers
             self.api.headers['Accept'] = oldheaders
         self.copy_file(cached, where)
-
-    def copy_file(self, what: Path, where: Path):
-        '''
-        if there is no path to `where` create -> then copy `what`
-        '''
-        import shutil
-        where.parent.mkdir(exist_ok=True, parents=True)
-        log.info(f'{what} -> {where}')
-        shutil.copy(what, where)
 
     @lru_cache(maxsize=None)
     def _api_list_branches(self):
@@ -277,6 +279,34 @@ class GitOps:
         print(tabulate(table, headers, tablefmt="github"))
 
 
+class LocalOps(BaseOps):
+    '''
+    quick and dirty local copy class
+    '''
+    def __init__(self, install_dir):
+        self.install_dir = Path(install_dir)
+        if not self.install_dir.exists():
+            raise RuntimeError(f"install dir doesn't exist: {install_dir}")
+
+    def copy_files(self, j={}):
+        if 'assets' not in j:
+            raise RuntimeError("json description file has to have assets dict, see download_asset.py module docs")
+        for val in j['assets']:
+            if 'name' not in val:
+                raise RuntimeError("assets row has to have name field")
+            if 'output' not in val:
+                raise RuntimeError("assets row has to have output field")
+            if 'copy' not in val:
+                raise RuntimeError("assets row for copy has to have copy marker")
+            in_file, out_file = Path(val['name']), Path(val['output'])
+            if not in_file.exists():
+                raise RuntimeError(f"Input file doesn't exist: {str(in_file)}")
+            if not out_file.parent.exists():
+                log.warning(f"Output file catalog doesn't exist: {str(out_file)} creating...")
+                out_file.mkdir(parents=True)
+            self.copy_file(in_file, out_file if out_file.is_absolute() else self.install_dir / out_file)
+
+
 def arguments():
     import argparse
     parser = argparse.ArgumentParser(description="download assets from repo, requires valid token in git config")
@@ -286,19 +316,23 @@ def arguments():
     cmd_git.add_argument('--repository', help='repository to take assets from', default='MuditaOSAssets')
     cmd_git.add_argument('--cache_dir', help='cache dir to store downloaded files', default='~/.mudita/')
     cmd_git.add_argument('--install_dir', help='optional install dir for path, default - relative to script', default=None)
+
     subparsers_git = cmd_git.add_subparsers(title='github cmd', description="util to run with github", dest='cmd_github')
     cmd_git_json = subparsers_git.add_parser('json', description="download assets by json file")
+
     cmd_git_json.add_argument('--json', help="json file with description what shall we load", required=True)
+
     cmd_git_list = subparsers_git.add_parser('list', description="list releases from github")
+
     cmd_git_release_download = subparsers_git.add_parser('download', description="download assets from github release")
     cmd_git_release_download.add_argument('--name_in', required=True, help="The name of asset to download from release package in repository")
     cmd_git_release_download.add_argument('--name_out', required=True, help="The output name to assign to downloaded asset after download")
     cmd_git_release_download.add_argument('--version', required=True, help="Asset version to download")
     cmd_git_release_download.add_argument('--product', required=True, help='Asset product to download, has to match any product we support at the moment')
 
-
-    # cmd_git_list =
-    subparsers.add_parser('local', description="local files copy")
+    local_parser = subparsers.add_parser('local', description="local files copy")
+    local_parser.add_argument('--json', help="json file with description what shall we load", required=True)
+    local_parser.add_argument('--install_dir', help='optional install dir for path, default - relative to script', default=None)
     return parser.parse_args()
 
 
@@ -331,7 +365,13 @@ if __name__ == "__main__":
                 downloader.download_release(args.repository, args.name_in, args.name_out, args.version, args.product)
                 log.info('downloader success')
         elif args.cmd == 'local':
-            raise RuntimeError('Not implemented')
+            j = get_assets_json(args.json)
+            log.debug('verify config...')
+            verify_config(j)
+            if args.install_dir is None:
+                args.install_dir = Path('./')
+            downloader = LocalOps(args.install_dir)
+            downloader.copy_files(j)
         else:
             raise RuntimeError('Not implemented')
     except RuntimeError as ex:
