@@ -120,6 +120,10 @@ namespace gui
     {
 
         auto file = std::fopen(filename.c_str(), "rb");
+        if (!file) {
+            LOG_ERROR(" Unable to open file %s", filename.c_str());
+            return nullptr;
+        }
 
         auto fileSize = std::filesystem::file_size(filename);
 
