@@ -12,6 +12,16 @@ import re
 def get_pull_request_commits():
   github_base_ref = os.environ['GITHUB_BASE_REF']
   github_head_ref = os.environ['GITHUB_HEAD_REF']
+  try:
+    is_fork = ("true" in os.environ['fork'])
+  except:
+    is_fork = False
+
+  if is_fork:
+    print("Checking fork against original repo!")
+    pr_from_sha = os.environ['pr_from_sha']
+    pr_to_sha = os.environ['pr_to_sha']
+    return Repo('.').iter_commits(rev=f'{pr_to_sha}..{pr_from_sha}')
 
   return Repo('.').iter_commits(rev=f'origin/{github_base_ref}..origin/{github_head_ref}')
 
