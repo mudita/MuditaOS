@@ -7,7 +7,7 @@
 #include <module-gui/gui/widgets/Text.hpp>
 #include <cstring>
 
-SCENARIO("Input Processor tests")
+SCENARIO("Input Processor tests", "[!mayfail]")
 {
     using bsp::KeyCodes;
 

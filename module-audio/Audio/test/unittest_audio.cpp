@@ -576,7 +576,7 @@ SCENARIO("Profile playback priorities tests")
     }
 }
 
-SCENARIO("Router playback priorities tests")
+SCENARIO("Router playback priorities tests", "[.]")
 {
     GIVEN("Router operation instance")
     {

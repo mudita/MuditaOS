@@ -14,7 +14,7 @@
 #include <cstdio>
 #include <cstring>
 
-TEST_CASE("Threads Table tests")
+TEST_CASE("Threads Table tests", "[!mayfail]")
 {
     Database::initialize();
 
