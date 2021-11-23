@@ -23,7 +23,7 @@ namespace gui
         bool isActive() const;
 
       private:
-        void setArrowsVisibility();
+        void updateArrowsVisibility();
 
         const UTF8 onStr;
         const UTF8 offStr;
@@ -44,7 +44,7 @@ namespace gui
       private:
         UIntegerSpinner *spinner{};
 
-        void setArrowsVisibility(UIntegerSpinner::Range range);
+        void updateArrowsVisibility();
     };
 
     class NumWithStringListItem : public BellSideListItemWithCallbacks
@@ -63,7 +63,7 @@ namespace gui
         {
             return spinner;
         }
-        void setArrowsVisibility(const NumWithStringSpinner::Range &range);
+        void updateArrowsVisibility();
 
       private:
         NumWithStringSpinner *spinner{};
@@ -82,7 +82,7 @@ namespace gui
         UTF8Spinner::Type getCurrentValue();
 
       private:
-        void setArrowsVisibility(const UTF8Spinner::Range &range);
+        void updateArrowsVisibility();
 
         UTF8Spinner *spinner{};
     };

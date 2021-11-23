@@ -23,11 +23,11 @@ namespace gui
         getValue = [&model, this]() { model.setValue(isActive()); };
         setValue = [&model, this]() {
             spinner->setCurrentValue(model.getValue() ? onStr : offStr);
-            setArrowsVisibility();
+            updateArrowsVisibility();
         };
         inputCallback = [this](Item &, const InputEvent &event) {
             const auto result = OnInputCallback(event);
-            setArrowsVisibility();
+            updateArrowsVisibility();
             return result;
         };
     }
@@ -36,10 +36,9 @@ namespace gui
     {
         return spinner->getCurrentValue() == onStr;
     }
-    void OnOffListItem::setArrowsVisibility()
+    void OnOffListItem::updateArrowsVisibility()
     {
-        const auto selectedVal = spinner->getCurrentValue();
-        body->setMinMaxArrowsVisibility(selectedVal == offStr, selectedVal == onStr);
+        body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
     }
 
     NumListItem::NumListItem(AbstractSettingsModel<std::uint8_t> &model,
@@ -58,14 +57,14 @@ namespace gui
         setupBottomDescription(bottomDescription);
 
         getValue = [&model, this]() { model.setValue(spinner->getCurrentValue()); };
-        setValue = [&model, this, range]() {
+        setValue = [&model, this]() {
             spinner->setCurrentValue(model.getValue());
-            setArrowsVisibility(range);
+            updateArrowsVisibility();
         };
 
-        inputCallback = [&, range](Item &item, const InputEvent &event) {
+        inputCallback = [&](Item &item, const InputEvent &event) {
             const auto result = OnInputCallback(event);
-            setArrowsVisibility(range);
+            updateArrowsVisibility();
             return result;
         };
     }
@@ -78,10 +77,9 @@ namespace gui
         return spinner->getCurrentValue();
     }
 
-    void NumListItem::setArrowsVisibility(UIntegerSpinner::Range range)
+    void NumListItem::updateArrowsVisibility()
     {
-        const auto selectedVal = spinner->getCurrentValue();
-        body->setMinMaxArrowsVisibility(selectedVal == range.min, selectedVal == range.max);
+        body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
     }
 
     NumWithStringListItem::NumWithStringListItem(AbstractSettingsModel<std::uint8_t> &model,
@@ -100,10 +98,10 @@ namespace gui
 
         setupBottomDescription(bottomDescription);
 
-        inputCallback = [&, range](Item &item, const InputEvent &event) {
+        inputCallback = [&](Item &item, const InputEvent &event) {
             const auto result = OnInputCallback(event);
             bottomText->setVisible(spinner->getCurrentValue().getValue().has_value());
-            setArrowsVisibility(range);
+            updateArrowsVisibility();
             return result;
         };
 
@@ -117,7 +115,7 @@ namespace gui
             const auto val = spinner->getCurrentValue().getValue();
             model.setValue(not val ? 0 : *val);
         };
-        setValue = [&model, this, range]() {
+        setValue = [&model, this]() {
             const auto modelValue = model.getValue();
             if (modelValue > 0) {
                 spinner->setCurrentValue(Value{modelValue, minStr});
@@ -125,7 +123,7 @@ namespace gui
             else {
                 spinner->setCurrentValue(Value{minStr});
             }
-            setArrowsVisibility(range);
+            updateArrowsVisibility();
         };
     }
 
@@ -134,10 +132,9 @@ namespace gui
         return not spinner->getCurrentValue().getValue().has_value();
     }
 
-    void NumWithStringListItem::setArrowsVisibility(const NumWithStringSpinner::Range &range)
+    void NumWithStringListItem::updateArrowsVisibility()
     {
-        const auto selectedVal = spinner->getCurrentValue();
-        body->setMinMaxArrowsVisibility(selectedVal == range.front(), selectedVal == range.back());
+        body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
     }
 
     UTF8ListItem::UTF8ListItem(AbstractSettingsModel<UTF8> &model,
@@ -153,13 +150,13 @@ namespace gui
         body->getCenterBox()->addWidget(spinner);
 
         getValue = [&model, this]() { model.setValue(spinner->getCurrentValue()); };
-        setValue = [&model, this, range]() {
+        setValue = [&model, this]() {
             spinner->setCurrentValue(model.getValue());
-            setArrowsVisibility(range);
+            updateArrowsVisibility();
         };
-        inputCallback = [&, range](Item &item, const InputEvent &event) {
+        inputCallback = [&](Item &item, const InputEvent &event) {
             const auto result = OnInputCallback(event);
-            setArrowsVisibility(range);
+            updateArrowsVisibility();
             return result;
         };
     }
@@ -173,10 +170,9 @@ namespace gui
     {
         return spinner->getCurrentValue();
     }
-    void UTF8ListItem::setArrowsVisibility(const UTF8Spinner::Range &range)
+    void UTF8ListItem::updateArrowsVisibility()
     {
-        const auto selectedVal = spinner->getCurrentValue();
-        body->setMinMaxArrowsVisibility(selectedVal == range.front(), selectedVal == range.back());
+        body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
     }
 
     TimeListItem::TimeListItem(AbstractSettingsModel<time_t> &model,

@@ -11,15 +11,7 @@ namespace app::bell_settings
 {
     using namespace gui;
 
-    enum Intervals
-    {
-        Interval_1  = 1,
-        Interval_2  = 2,
-        Interval_5  = 5,
-        Interval_10 = 10,
-        Interval_15 = 15,
-        Interval_30 = 30
-    };
+    const std::set<unsigned int> allowedIntervals{1, 2, 5, 10, 15, 30};
 
     SnoozeListItemProvider::SnoozeListItemProvider(AbstractSnoozeSettingsModel &model,
                                                    std::vector<UTF8> chimeTonesRange)
@@ -83,16 +75,11 @@ namespace app::bell_settings
                 NumWithStringListItem::NumWithStringSpinner::Range chimeRange;
                 const UTF8 minStr = utils::translate("common_minute_short");
                 chimeRange.push_back(NumWithStringListItem::Value{utils::translate("app_alarm_clock_no_snooze")});
-                for (unsigned int i = 1; i <= val; i++) {
-                    if ((i != Intervals::Interval_1) && (i != Intervals::Interval_2) && (i != Intervals::Interval_5) &&
-                        (i != Intervals::Interval_10) && (i != Intervals::Interval_15) &&
-                        (i != Intervals::Interval_30)) {
-                        continue;
-                    }
-                    chimeRange.push_back(NumWithStringListItem::Value{i, minStr});
-                }
+                std::for_each(allowedIntervals.begin(), allowedIntervals.lower_bound(val), [&](auto val) {
+                    chimeRange.push_back(NumWithStringListItem::Value{val, minStr});
+                });
                 chimeInterval->getSpinner()->setRange(chimeRange);
-                chimeInterval->setArrowsVisibility(chimeRange);
+                chimeInterval->updateArrowsVisibility();
             }
             return false;
         };
