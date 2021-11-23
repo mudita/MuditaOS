@@ -18,6 +18,21 @@ namespace backlight
         constexpr auto lightFadeoutTimerTimeout = std::chrono::seconds(10);
     } // namespace timers
 
+    namespace
+    {
+        constexpr std::array exclusions = {bsp::KeyCodes::Torch};
+
+        [[nodiscard]] bool isKeyOnExclusionList(bsp::KeyCodes key)
+        {
+            for (const auto &exclusion : exclusions) {
+                if (key == exclusion) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    } // namespace
+
     Handler::Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
         : HandlerCommon(std::move(settings),
                         std::make_shared<pure::screen_light_control::ScreenLightController>(parent),
@@ -53,10 +68,12 @@ namespace backlight
         });
     }
 
-    void Handler::handleKeyPressed([[maybe_unused]] int key)
+    void Handler::handleKeyPressed(bsp::KeyCodes key)
     {
-        handleKeypadLightRefresh();
-        handleScreenLightRefresh();
+        if (!isKeyOnExclusionList(key)) {
+            handleKeypadLightRefresh();
+            handleScreenLightRefresh();
+        }
     }
 
     void Handler::processScreenRequest(screen_light_control::Action action,
