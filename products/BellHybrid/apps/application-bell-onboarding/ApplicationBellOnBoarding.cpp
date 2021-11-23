@@ -192,11 +192,8 @@ namespace app
             informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
             displayInformation(msg->getWindowName());
         }
-        if (selectedWindowCondition && informationState == OnBoarding::InformationStates::DeepClickCorrectionInfo) {
-            informationState = OnBoarding::InformationStates::RotateInfo;
-        }
-
-        if (msg->getSenderWindowName() != gui::window::name::informationOnBoardingWindow) {
+        else if (selectedWindowCondition &&
+                 informationState == OnBoarding::InformationStates::DeepClickCorrectionInfo) {
             informationState = OnBoarding::InformationStates::RotateInfo;
         }
     }
