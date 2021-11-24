@@ -5,7 +5,7 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/ApplicationCommon.hpp>
-#include <i18n/i18n.hpp>
+#include <common/Languages.hpp>
 
 #include <vector>
 #include <string>
@@ -33,7 +33,7 @@ namespace app::OnBoarding
     class OnBoardingLanguageWindowPresenter : public OnBoardingLanguageWindowContract::Presenter
     {
       private:
-        utils::LangLoader loader;
+        common::Languages languages;
         app::ApplicationCommon *app;
 
       public:

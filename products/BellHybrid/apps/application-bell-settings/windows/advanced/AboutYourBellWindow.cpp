@@ -28,11 +28,12 @@ namespace gui
 
         list = new ListView(this,
                             style::window::default_left_margin,
-                            style::window::default_vertical_pos,
-                            style::listview::body_width_with_scroll,
-                            style::window::default_body_height,
+                            top_margin,
+                            width,
+                            height,
                             presenter->getPagesProvider(),
                             listview::ScrollBarType::Fixed);
+        list->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         setFocusItem(list);
         list->rebuildList();

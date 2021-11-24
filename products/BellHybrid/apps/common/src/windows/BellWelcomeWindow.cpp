@@ -57,7 +57,7 @@ namespace gui
 
     bool BellWelcomeWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isKeyRelease(KeyCode::KEY_LF)) {
+        if (inputEvent.isKeyRelease(KeyCode::KEY_ENTER)) {
             if (onAction) {
                 onAction();
             }
