@@ -276,7 +276,7 @@ namespace bluetooth
             scoHandle = HCI_CON_HANDLE_INVALID;
             isAudioRouted                = false;
             isAudioConnectionEstablished = false;
-            sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
+            audioDevice.reset();
             break;
         case HFP_SUBEVENT_START_RINGING:
             LOG_DEBUG("Start Ringing\n");
