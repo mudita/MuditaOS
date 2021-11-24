@@ -122,7 +122,7 @@ namespace gui
         battery = new BellBattery(bottomBox, 0, 0, 0, 0);
         battery->setMinimumSize(battery::battery_widget_w, battery::battery_widget_h);
         battery->setEdges(RectangleEdge::None);
-        battery->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+        battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         battery->setVisible(false);
 
         bottomText = new TextFixedSize(bottomBox, 0, 0, 0, 0);
