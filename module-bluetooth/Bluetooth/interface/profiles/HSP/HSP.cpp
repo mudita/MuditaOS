@@ -200,9 +200,9 @@ namespace bluetooth
             if (hsp_subevent_audio_connection_complete_get_status(event) != 0u) {
                 LOG_DEBUG("Audio connection establishment failed with status %u\n",
                           hsp_subevent_audio_connection_complete_get_status(event));
-                sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
                 isConnected  = false;
                 callAnswered = false;
+                audioDevice.reset();
             }
             else {
                 scoHandle = hsp_subevent_audio_connection_complete_get_handle(event);
