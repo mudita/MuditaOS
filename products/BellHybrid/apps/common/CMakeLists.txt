@@ -40,6 +40,7 @@ target_sources(application-bell-common
         src/options/OptionBellMenu.cpp
         src/options/BellOptionsNavigation.cpp
     PUBLIC
+        include/common/Languages.hpp
         include/common/BellListItemProvider.hpp
         include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp

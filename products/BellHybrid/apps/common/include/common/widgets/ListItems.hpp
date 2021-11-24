@@ -63,7 +63,8 @@ namespace gui
         {
             return spinner;
         }
-        void setArrowsVisibility(const NumWithStringSpinner::Range &range);
+        NumWithStringSpinner::Type getCurrentValue();
+        void setArrowsVisibility();
 
       private:
         NumWithStringSpinner *spinner{};

@@ -105,4 +105,5 @@ add_subdirectory(services)
 add_subdirectory(sys)
 
 option(CONFIG_ENABLE_TEMP "Enable displaying temperature" OFF)
+option(CONFIG_SHOW_MEMORY_INFO "Enable displaying memory info" OFF)
 configure_file(config/ProductConfig.in.hpp ${CMAKE_BINARY_DIR}/ProductConfig.hpp  @ONLY)
