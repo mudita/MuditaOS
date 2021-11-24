@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include "Application.hpp"
 #include <windows/AppWindow.hpp>
-#include <apps-common/ApplicationCommon.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 
@@ -38,11 +38,10 @@ namespace app
         uint32_t lastFreq = 0;
 
       public:
-        ApplicationAntenna(std::string name                            = name_antenna,
-                           std::string parent                          = {},
-                           sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-                           sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                           StartInBackground startInBackground         = {false});
+        ApplicationAntenna(std::string name                    = name_antenna,
+                           std::string parent                  = {},
+                           StatusIndicators statusIndicators   = StatusIndicators{},
+                           StartInBackground startInBackground = {false});
         virtual ~ApplicationAntenna();
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
