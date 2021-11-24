@@ -54,7 +54,7 @@ namespace
             auto settingsName = std::get<std::string>(settings->getValue(bluetooth::Settings::DeviceName));
             if (settingsName.empty()) {
                 LOG_WARN("Settings name is empty!");
-                constexpr auto name = "PurePhone";
+                constexpr auto name = "Mudita Pure";
                 settings->setValue(bluetooth::Settings::DeviceName, name);
                 settingsName = name;
             }

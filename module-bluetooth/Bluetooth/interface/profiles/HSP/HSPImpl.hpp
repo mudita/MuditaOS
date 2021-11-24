@@ -36,7 +36,7 @@ namespace bluetooth
         static void establishAudioConnection();
         static std::array<uint8_t, serviceBufferLength> serviceBuffer;
         static constexpr uint8_t rfcommChannelNr = 1;
-        static std::string agServiceName;
+        static const std::string_view agServiceName;
         static uint16_t scoHandle;
         static std::unique_ptr<SCO> sco;
         static std::unique_ptr<CellularInterface> cellularInterface;

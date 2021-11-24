@@ -106,7 +106,7 @@ namespace bluetooth
     std::unique_ptr<CellularInterface> HSP::HSPImpl::cellularInterface = nullptr;
     std::unique_ptr<AudioInterface> HSP::HSPImpl::audioInterface       = nullptr;
     const sys::Service *HSP::HSPImpl::ownerService;
-    std::string HSP::HSPImpl::agServiceName = "PurePhone HSP";
+    const std::string_view HSP::HSPImpl::agServiceName = "Mudita Pure HSP";
     bool HSP::HSPImpl::isConnected          = false;
     bool HSP::HSPImpl::callAnswered         = false;
     bool HSP::HSPImpl::isRinging            = false;
@@ -288,7 +288,7 @@ namespace bluetooth
 
         serviceBuffer.fill(0);
         constexpr uint32_t hspSdpRecordHandle = 0x10004;
-        hsp_ag_create_sdp_record(serviceBuffer.data(), hspSdpRecordHandle, rfcommChannelNr, agServiceName.c_str());
+        hsp_ag_create_sdp_record(serviceBuffer.data(), hspSdpRecordHandle, rfcommChannelNr, agServiceName.data());
 
         if (const auto status = sdp_register_service(serviceBuffer.data()); status != ERROR_CODE_SUCCESS) {
             LOG_ERROR("Can't register service. Status %x", status);
