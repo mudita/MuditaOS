@@ -40,7 +40,7 @@ namespace bluetooth
         static void dump_supported_codecs(void);
         static std::array<uint8_t, serviceBufferLength> serviceBuffer;
         static constexpr uint8_t rfcommChannelNr = 1;
-        static std::string agServiceName;
+        static const std::string_view agServiceName;
         static hci_con_handle_t scoHandle;
         static hci_con_handle_t aclHandle;
         static std::unique_ptr<SCO> sco;
