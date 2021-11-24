@@ -68,10 +68,7 @@ namespace app::meditation
     void MeditationProgressPresenter::abandon()
     {
         timer->stop();
-        app::manager::Controller::sendAction(
-            app,
-            app::manager::actions::Launch,
-            std::make_unique<app::ApplicationLaunchData>(app::applicationBellMeditationTimerName));
+        app->switchWindow(gui::name::window::main_window);
     }
 
     void MeditationProgressPresenter::finish()
