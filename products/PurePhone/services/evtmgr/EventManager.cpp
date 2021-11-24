@@ -92,6 +92,8 @@ void EventManager::initProductEvents()
 
     connect(sevm::ToggleTorchColorMessage(), [&]([[maybe_unused]] sys::Message *msg) {
         toggleTorchColor();
+        // Handle only torch short press. Done here as workaround since only app can recognize press length.
+        backlightHandler.handleKeyPressed();
         return sys::MessageNone{};
     });
 
@@ -166,7 +168,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     auto kbdMessage = dynamic_cast<sevm::KbdMessage *>(msg);
 
     if (kbdMessage->key.state == RawKey::State::Pressed) {
-        backlightHandler.handleKeyPressed();
+        backlightHandler.handleKeyPressed(kbdMessage->key.keyCode);
     }
     else if (kbdMessage->key.state == RawKey::State::Moved) {
         handleKeyMoveEvent(kbdMessage->key);

@@ -8,6 +8,10 @@
 
 namespace pure::screen_light_control
 {
+    namespace
+    {
+        constexpr bsp::eink_frontlight::BrightnessPercentage fadeOutBrigthnessMax = 35.0f;
+    }
 
     ScreenLightController::ScreenLightController(sys::Service *parent)
     {
@@ -58,6 +62,9 @@ namespace pure::screen_light_control
                 setParameters(params.getAutoModeParams());
             }
             break;
+        case Action::fadeOut:
+            handleFadeOut();
+            break;
         }
     }
 
@@ -68,7 +75,9 @@ namespace pure::screen_light_control
 
     void ScreenLightController::readoutTimerCallback()
     {
-        ::screen_light_control::functions::calculateBrightness(bsp::light_sensor::readout());
+        if (!fadeOut) {
+            ::screen_light_control::functions::calculateBrightness(bsp::light_sensor::readout());
+        }
     }
 
     auto ScreenLightController::isLightOn() const noexcept -> bool
@@ -137,9 +146,21 @@ namespace pure::screen_light_control
 
     void ScreenLightController::turnOn()
     {
+        fadeOut = false;
+
         bsp::eink_frontlight::turnOn();
         bsp::light_sensor::wakeup();
+
         if (automaticMode == ScreenLightMode::Automatic) {
+            if (lightOn) {
+                ::screen_light_control::functions::calculateBrightness(bsp::light_sensor::readout());
+            }
+            else {
+                // It takes some time to get initial readout -> using last saved measurement
+                ::screen_light_control::functions::calculateBrightness(stashedReadout);
+            }
+            ::screen_light_control::functions::resetRampToTarget();
+            bsp::eink_frontlight::setBrightness(::screen_light_control::functions::getRampState());
             enableTimers();
         }
         lightOn = true;
@@ -153,9 +174,27 @@ namespace pure::screen_light_control
     void ScreenLightController::turnOff()
     {
         bsp::eink_frontlight::turnOff();
+        stashedReadout = bsp::light_sensor::readout();
         bsp::light_sensor::standby();
         disableTimers();
         lightOn = false;
+        fadeOut = false;
+    }
+
+    void ScreenLightController::handleFadeOut()
+    {
+        if (automaticMode == ScreenLightMode::Automatic) {
+            fadeOut = true;
+            // Set fadeout brightess as maximum or current ramp state if lower
+            auto rampState         = ::screen_light_control::functions::getRampState();
+            auto fadeOutBrigthness = std::clamp(rampState, 0.0f, fadeOutBrigthnessMax);
+            ::screen_light_control::functions::setRampTarget(fadeOutBrigthness);
+        }
+    }
+
+    bool ScreenLightController::isFadeOutOngoing()
+    {
+        return fadeOut;
     }
 
 } // namespace screen_light_control

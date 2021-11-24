@@ -14,21 +14,32 @@ namespace backlight
     namespace timers
     {
         constexpr auto keypadLightTimerName    = "KeypadLightTimer";
-        constexpr auto keypadLightTimerTimeout = std::chrono::seconds(5);
+        constexpr auto lightTimerTimeout        = std::chrono::seconds(20);
+        constexpr auto lightFadeoutTimerTimeout = std::chrono::seconds(10);
     } // namespace timers
+
+    namespace
+    {
+        constexpr std::array exclusions = {bsp::KeyCodes::Torch};
+
+        [[nodiscard]] bool isKeyOnExclusionList(bsp::KeyCodes key)
+        {
+            for (const auto &exclusion : exclusions) {
+                if (key == exclusion) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    } // namespace
 
     Handler::Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
         : HandlerCommon(std::move(settings),
                         std::make_shared<pure::screen_light_control::ScreenLightController>(parent),
                         parent,
-                        [this](sys::Timer &t) {
-                            if (getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic &&
-                                this->screenLightController->isLightOn()) {
-                                this->screenLightController->processRequest(screen_light_control::Action::turnOff);
-                            }
-                        }),
+                        [this](sys::Timer &t) { handleScreenLightTimeout(); }),
           keypadLightTimer{sys::TimerFactory::createSingleShotTimer(
-              parent, timers::keypadLightTimerName, timers::keypadLightTimerTimeout, [this](sys::Timer &) {
+              parent, timers::keypadLightTimerName, timers::lightTimerTimeout, [this](sys::Timer &) {
                   bsp::keypad_backlight::shutdown();
               })}
     {}
@@ -57,17 +68,19 @@ namespace backlight
         });
     }
 
-    void Handler::handleKeyPressed([[maybe_unused]] int key)
+    void Handler::handleKeyPressed(bsp::KeyCodes key)
     {
-        handleKeypadLightRefresh();
-        handleScreenLightRefresh();
+        if (!isKeyOnExclusionList(key)) {
+            handleKeypadLightRefresh();
+            handleScreenLightRefresh();
+        }
     }
 
     void Handler::processScreenRequest(screen_light_control::Action action,
                                        const screen_light_control::Parameters &params)
     {
         if (action == screen_light_control::Action::enableAutomaticMode) {
-            startScreenLightTimer();
+            getScreenLightTimer()->restart(timers::lightTimerTimeout);
         }
         handleScreenLightSettings(action, params);
         getScreenLightControl()->processRequest(action, params);
@@ -157,16 +170,37 @@ namespace backlight
 
     void Handler::handleScreenLightRefresh([[maybe_unused]] const int key)
     {
-        if (getScreenLightState() && getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic) {
-            if (!getScreenLightControl()->isLightOn()) {
+        if (getScreenLightState()) {
+            if (!getScreenLightControl()->isLightOn() || getScreenLightControl()->isFadeOutOngoing()) {
                 getScreenLightControl()->processRequest(screen_light_control::Action::turnOn);
             }
-            startScreenLightTimer();
+            getScreenLightTimer()->restart(timers::lightTimerTimeout);
+        }
+    }
+
+    void Handler::handleScreenLightTimeout()
+    {
+        if (getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic) {
+            if (screenLightController->isLightOn()) {
+                if (screenLightController->isFadeOutOngoing()) {
+                    screenLightController->processRequest(screen_light_control::Action::turnOff);
+                }
+                else {
+                    screenLightController->processRequest(screen_light_control::Action::fadeOut);
+                    getScreenLightTimer()->restart(timers::lightFadeoutTimerTimeout);
+                }
+            }
+        }
+        else if (getScreenAutoModeState() == screen_light_control::ScreenLightMode::Manual) {
+            if (screenLightController->isLightOn()) {
+                screenLightController->processRequest(screen_light_control::Action::turnOff);
+            }
         }
     }
 
     void Handler::onScreenLightTurnedOn()
     {
-        startScreenLightTimer();
+        getScreenLightTimer()->restart(timers::lightTimerTimeout);
     }
+
 } // namespace backlight

@@ -239,7 +239,7 @@ TEST_CASE("ext4: Directory tests")
     REQUIRE(fs_core->umount("/sys") == 0);
 }
 
-TEST_CASE("littlefs: Remount RO->RW->RW")
+TEST_CASE("ext4: Remount RO->RW->RW")
 {
     using namespace purefs;
     static constexpr auto filename = "/sys/remount_test.txt";
@@ -274,5 +274,68 @@ TEST_CASE("littlefs: Remount RO->RW->RW")
         REQUIRE(fs_core->unlink(filename) == 0);
     }
 
+    REQUIRE(fs_core->umount("/sys") == 0);
+}
+
+TEST_CASE("ext4: stat extended")
+{
+    using namespace purefs;
+    auto [fs_core, dm] = prepare_filesystem("emmc0");
+    REQUIRE(fs_core);
+    REQUIRE(fs_core->mount("emmc0part0", "/sys", "ext4") == 0);
+    // Check if it is a directory
+    struct stat st;
+    REQUIRE(fs_core->stat("/sys", st) == 0);
+    REQUIRE(S_ISDIR(st.st_mode));
+    REQUIRE(fs_core->stat("/sys/", st) == 0);
+    REQUIRE(S_ISDIR(st.st_mode));
+    // Check for dir and subdir
+    const auto dir = "/sys/advdirx";
+    const auto fil = "/sys/advdirx/advfile";
+    // Create directory and truncated file
+    REQUIRE(fs_core->mkdir(dir, 0755) == 0);
+    auto fd = fs_core->open(fil, O_CREAT | O_RDWR, 0);
+    REQUIRE(fd >= 3);
+    REQUIRE(fs_core->ftruncate(fd, 124567) == 0);
+    REQUIRE(fs_core->close(fd) == 0);
+    fd = -1;
+
+    // Now check for stat for directories and sub dirs
+    // Root dir
+    REQUIRE(fs_core->stat("/sys", st) == 0);
+    REQUIRE(S_ISFIFO(st.st_mode) == 0);
+    REQUIRE(S_ISCHR(st.st_mode) == 0);
+    REQUIRE(S_ISDIR(st.st_mode));
+    REQUIRE(S_ISBLK(st.st_mode) == 0);
+    REQUIRE(S_ISLNK(st.st_mode) == 0);
+    REQUIRE(S_ISSOCK(st.st_mode) == 0);
+    REQUIRE(S_ISREG(st.st_mode) == 0);
+
+    // Sub dir
+    REQUIRE(fs_core->stat(dir, st) == 0);
+    REQUIRE(S_ISFIFO(st.st_mode) == 0);
+    REQUIRE(S_ISCHR(st.st_mode) == 0);
+    REQUIRE(S_ISDIR(st.st_mode));
+    REQUIRE(S_ISBLK(st.st_mode) == 0);
+    REQUIRE(S_ISLNK(st.st_mode) == 0);
+    REQUIRE(S_ISSOCK(st.st_mode) == 0);
+    REQUIRE(S_ISREG(st.st_mode) == 0);
+
+    // Check for file
+    REQUIRE(0 == fs_core->stat(fil, st));
+    REQUIRE(124567 == st.st_size);
+    REQUIRE(S_ISFIFO(st.st_mode) == 0);
+    REQUIRE(S_ISCHR(st.st_mode) == 0);
+    REQUIRE(S_ISDIR(st.st_mode) == 0);
+    REQUIRE(S_ISBLK(st.st_mode) == 0);
+    REQUIRE(S_ISLNK(st.st_mode) == 0);
+    REQUIRE(S_ISSOCK(st.st_mode) == 0);
+    REQUIRE(S_ISREG(st.st_mode));
+
+    // Final cleanup
+    REQUIRE(0 == fs_core->unlink(fil));
+    REQUIRE(0 == fs_core->rmdir(dir));
+
+    // Final umount
     REQUIRE(fs_core->umount("/sys") == 0);
 }

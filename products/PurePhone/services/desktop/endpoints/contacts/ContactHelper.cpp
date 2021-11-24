@@ -156,14 +156,7 @@ namespace sdesktop::endpoints
     auto ContactHelper::createDBEntry(Context &context) -> sys::ReturnCodes
     {
         auto newRecord = from_json(context.getBody());
-        if (newRecord.numbers.empty()) {
-            LOG_ERROR("Empty number, not added!");
-            context.setResponseStatus(http::Code::NotAcceptable);
-            putToSendQueue(context.createSimpleResponse());
-            return sys::ReturnCodes::Failure;
-        }
-
-        auto query = std::make_unique<db::query::ContactAdd>(newRecord);
+        auto query     = std::make_unique<db::query::ContactAdd>(newRecord);
 
         auto listener = std::make_unique<db::EndpointListener>(
             [](db::QueryResult *result, Context context) {

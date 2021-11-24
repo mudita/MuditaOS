@@ -127,18 +127,48 @@ namespace purefs::fs::drivers
             st.st_rdev  = 0;
             st.st_size  = fs.fsize;
 
-            // TODO: Block FF_MIN_SS != FF_MAX_SS
 #if FF_MAX_SS != FF_MIN_SS
             st.st_blksize = fatfs->ssize;
 #else
             st.st_blksize = FF_MIN_SS;
 #endif
-            // TODO: Time is currently not supported
             st.st_blocks = fs.fsize / st.st_blksize;
             st.st_atime  = 0;
             st.st_mtime  = 0;
             st.st_ctime  = 0;
         }
+
+        int internal_stat_rootdir(const char *translated_path, bool ro, struct stat *entry)
+        {
+            FATFS *fs;
+            DWORD bfree;
+            FRESULT res = f_getfree(translated_path, &bfree, &fs);
+            if (res != FR_OK) {
+                return -EIO;
+            }
+            entry->st_dev  = 0;
+            entry->st_ino  = 0;
+            entry->st_mode = (S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH | S_IRUSR | S_IRGRP | S_IROTH);
+            if (!ro) {
+                entry->st_mode |= S_IWUSR | S_IWGRP | S_IWOTH;
+            }
+            entry->st_nlink = 1;
+            entry->st_uid   = 0;
+            entry->st_gid   = 0;
+            entry->st_rdev  = 0;
+            entry->st_size  = 0;
+#if FF_MAX_SS != FF_MIN_SS
+            entry->st_blksize = fatfs->ssize;
+#else
+            entry->st_blksize = FF_MIN_SS;
+#endif
+            entry->st_blocks = fs->fsize / entry->st_blksize;
+            entry->st_atime  = 0;
+            entry->st_mtime  = 0;
+            entry->st_ctime  = 0;
+            return 0;
+        }
+
     } // namespace
 
     auto filesystem_vfat::mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh,
@@ -360,11 +390,19 @@ namespace purefs::fs::drivers
         }
         FILINFO finfo;
         const auto fspath = vmnt->native_path(file);
-        const int fres    = f_stat(fspath.c_str(), &finfo);
-        if (fres == FR_OK) {
-            translate_filinfo_to_stat(finfo, nullptr, vmnt->is_ro(), st);
+        static constexpr auto slash_pos       = 2U;
+        static constexpr auto root_size       = 3U;
+        static constexpr auto empty_root_size = 2U;
+        if ((fspath[slash_pos] == '/' && fspath.size() == root_size) || fspath.size() == empty_root_size) {
+            return internal_stat_rootdir(fspath.c_str(), vmnt->is_ro(), &st);
         }
-        return translate_error(fres);
+        else {
+            const int fres = f_stat(fspath.c_str(), &finfo);
+            if (fres == FR_OK) {
+                translate_filinfo_to_stat(finfo, nullptr, vmnt->is_ro(), st);
+            }
+            return translate_error(fres);
+        }
     }
 
     auto filesystem_vfat::unlink(fsmount mnt, std::string_view name) noexcept -> int
@@ -486,7 +524,11 @@ namespace purefs::fs::drivers
             LOG_ERROR("Non fat filesystem pointer");
             return -EBADF;
         }
-        const int fres = f_truncate(vfile->ff_filp());
+        int fres = f_lseek(vfile->ff_filp(), len);
+        if (fres != FR_OK) {
+            return translate_error(fres);
+        }
+        fres = f_truncate(vfile->ff_filp());
         return translate_error(fres);
     }
 
