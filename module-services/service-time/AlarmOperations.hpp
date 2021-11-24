@@ -141,6 +141,7 @@ namespace alarms
         void checkAndUpdateCache(AlarmEventRecord record);
         void switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn);
         bool processEvents(TimePoint now);
+        void processOngoingEvents();
         void processNextEventsQueue(const TimePoint now);
         void processSnoozedEventsQueue(const TimePoint now);
         virtual void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType);

@@ -29,6 +29,8 @@ namespace screen_light_control::functions
 
     void setRampStep(float step);
 
+    void resetRampToTarget();
+
     void setHysteresis(float hyst);
 
     void setFunctionFromPoints(const BrightnessFunction &points);

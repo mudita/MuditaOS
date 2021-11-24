@@ -196,4 +196,10 @@ namespace bell::screen_light_control
     {
         return std::max<bsp::eink_frontlight::BrightnessPercentage>(target, MINIMAL_TARGET);
     }
+
+    bool ScreenLightController::isFadeOutOngoing()
+    {
+        return false;
+    }
+
 } // namespace bell::screen_light_control

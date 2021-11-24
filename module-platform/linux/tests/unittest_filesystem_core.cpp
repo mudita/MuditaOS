@@ -366,3 +366,74 @@ TEST_CASE("Corefs: Autodetect filesystems")
     REQUIRE(fscore->mount("emmc0part0", "/sys", "auto") == 0);
     REQUIRE(fscore->umount("/sys") == 0);
 }
+
+TEST_CASE("Corefs: stat extended")
+{
+    using namespace purefs;
+    auto dm   = std::make_shared<blkdev::disk_manager>();
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
+    REQUIRE(disk);
+    REQUIRE(dm->register_device(disk, "emmc0") == 0);
+    purefs::fs::filesystem fs_core(dm);
+    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
+    REQUIRE(vfs_vfat->mount_count() == 0);
+    auto ret = fs_core.register_filesystem("vfat", vfs_vfat);
+    REQUIRE(ret == 0);
+    REQUIRE(fs_core.mount("emmc0part0", "/sys", "vfat") == 0);
+
+    // Check if it is a directory
+    struct stat st;
+    REQUIRE(fs_core.stat("/sys", st) == 0);
+    REQUIRE(S_ISDIR(st.st_mode));
+    REQUIRE(fs_core.stat("/sys/", st) == 0);
+    REQUIRE(S_ISDIR(st.st_mode));
+    // Check for dir and subdir
+    const auto dir = "/sys/advdirx";
+    const auto fil = "/sys/advdirx/advfile";
+    // Create directory and truncated file
+    REQUIRE(fs_core.mkdir(dir, 0755) == 0);
+    auto fd = fs_core.open(fil, O_CREAT | O_RDWR, 0);
+    REQUIRE(fd >= 3);
+    REQUIRE(fs_core.ftruncate(fd, 124567) == 0);
+    REQUIRE(fs_core.close(fd) == 0);
+    fd = -1;
+
+    // Now check for stat for directories and sub dirs
+    // Root dir
+    REQUIRE(fs_core.stat("/sys", st) == 0);
+    REQUIRE(S_ISFIFO(st.st_mode) == 0);
+    REQUIRE(S_ISCHR(st.st_mode) == 0);
+    REQUIRE(S_ISDIR(st.st_mode));
+    REQUIRE(S_ISBLK(st.st_mode) == 0);
+    REQUIRE(S_ISLNK(st.st_mode) == 0);
+    REQUIRE(S_ISSOCK(st.st_mode) == 0);
+    REQUIRE(S_ISREG(st.st_mode) == 0);
+
+    // Sub dir
+    REQUIRE(fs_core.stat(dir, st) == 0);
+    REQUIRE(S_ISFIFO(st.st_mode) == 0);
+    REQUIRE(S_ISCHR(st.st_mode) == 0);
+    REQUIRE(S_ISDIR(st.st_mode));
+    REQUIRE(S_ISBLK(st.st_mode) == 0);
+    REQUIRE(S_ISLNK(st.st_mode) == 0);
+    REQUIRE(S_ISSOCK(st.st_mode) == 0);
+    REQUIRE(S_ISREG(st.st_mode) == 0);
+
+    // Check for file
+    REQUIRE(0 == fs_core.stat(fil, st));
+    REQUIRE(124567 == st.st_size);
+    REQUIRE(S_ISFIFO(st.st_mode) == 0);
+    REQUIRE(S_ISCHR(st.st_mode) == 0);
+    REQUIRE(S_ISDIR(st.st_mode) == 0);
+    REQUIRE(S_ISBLK(st.st_mode) == 0);
+    REQUIRE(S_ISLNK(st.st_mode) == 0);
+    REQUIRE(S_ISSOCK(st.st_mode) == 0);
+    REQUIRE(S_ISREG(st.st_mode));
+
+    // Final cleanup
+    REQUIRE(0 == fs_core.unlink(fil));
+    REQUIRE(0 == fs_core.rmdir(dir));
+
+    // Final umount
+    REQUIRE(fs_core.umount("/sys") == 0);
+}

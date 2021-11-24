@@ -108,6 +108,11 @@ namespace screen_light_control::functions
         rampTarget = value;
     }
 
+    void resetRampToTarget()
+    {
+        rampState = rampTarget;
+    }
+
     bool isRampTargetReached()
     {
         return rampTargetReached;

@@ -40,6 +40,8 @@ namespace pure::screen_light_control
         [[nodiscard]] bool isAutoModeOn() const noexcept override;
         [[nodiscard]] auto getBrightnessValue() const noexcept -> bsp::eink_frontlight::BrightnessPercentage override;
 
+        [[nodiscard]] auto isFadeOutOngoing() -> bool override;
+
       private:
         void controlTimerCallback();
         void readoutTimerCallback();
@@ -57,6 +59,8 @@ namespace pure::screen_light_control
         void enableAutomaticMode();
         void disableAutomaticMode();
 
+        void handleFadeOut();
+
         static constexpr inline auto CONTROL_TIMER_MS = 25;
         static constexpr inline auto READOUT_TIMER_MS = 500;
 
@@ -65,6 +69,8 @@ namespace pure::screen_light_control
 
         bool lightOn                                               = false;
         ScreenLightMode automaticMode                              = ScreenLightMode::Manual;
-        bsp::eink_frontlight::BrightnessPercentage brightnessValue = 0.0;
+        bsp::eink_frontlight::BrightnessPercentage brightnessValue = 0.0f;
+        bool fadeOut                                               = false;
+        bsp::light_sensor::IlluminanceLux stashedReadout           = 0.0f;
     };
 } // namespace pure::screen_light_control
