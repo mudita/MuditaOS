@@ -18,6 +18,10 @@ namespace gui
                             std::shared_ptr<app::bell_settings::AboutYourBellWindowContract::Presenter> presenter);
 
       private:
+        static constexpr auto height     = 400;
+        static constexpr auto width      = 380;
+        static constexpr auto top_margin = 41;
+
         void buildInterface() override;
 
         ListView *list{};

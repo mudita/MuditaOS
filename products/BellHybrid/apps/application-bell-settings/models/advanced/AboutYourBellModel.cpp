@@ -5,6 +5,7 @@
 
 #include <BellSettingsStyle.hpp>
 #include <widgets/advanced/AboutYourBellListItem.hpp>
+#include <ProductConfig.hpp>
 
 #include <ListView.hpp>
 #include <product/version.hpp>
@@ -46,6 +47,7 @@ namespace app::bell_settings
                                            utils::translate("app_bell_settings_advanced_about_version"),
                                            gui::AboutYourBellListItem::TokenMap({{"$VERSION", std::string(VERSION)}})));
 
+#if CONFIG_SHOW_MEMORY_INFO == 1
         struct statvfs stat;
         const auto result = statvfs(purefs::dir::getRootDiskPath().c_str(), &stat);
         if (result < 0) {
@@ -60,6 +62,7 @@ namespace app::bell_settings
             utils::translate("app_bell_settings_advanced_about_storage_text"),
             gui::AboutYourBellListItem::TokenMap(
                 {{"$USED_MEMORY", std::to_string(usedMB)}, {"$TOTAL_MEMORY", std::to_string(totalMB)}})));
+#endif
 
         internalData.push_back(
             new gui::AboutYourBellListItem(utils::translate("app_bell_settings_advanced_about_info_title"),

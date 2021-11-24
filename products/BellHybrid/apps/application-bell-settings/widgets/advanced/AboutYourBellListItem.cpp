@@ -14,7 +14,7 @@ namespace gui
     {
         setMinimumSize(bell_settings_style::about_your_bell_window::list_item::width,
                        bell_settings_style::about_your_bell_window::list_item::height);
-        setMargins(Margins(0, style::margins::big, 0, style::margins::big));
+        setMargins(Margins(0, style::margins::big, 0, style::margins::huge));
         activeItem = false;
 
         body = new VBox(this, 0, 0, 0, 0);
