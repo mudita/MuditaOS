@@ -20,8 +20,6 @@ namespace app::bell_settings
             new gui::NumListItem(model.getBrightnessModel(),
                                  gui::UIntegerSpinner::Range{brightnessMin, brightnessMax, brightnessStep},
                                  utils::translate("app_bell_settings_frontlight_top_message"));
-        brightness->onEnter = [this]() { model.setStatus(true); };
-        brightness->onExit  = [this]() { model.setStatus(false); };
         brightness->setOnValueChanged([this](const auto val) {
             model.setStatus(true);
             model.setBrightness(val);
