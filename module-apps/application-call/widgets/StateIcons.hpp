@@ -18,7 +18,7 @@ namespace gui
     {
       public:
         AddContactIcon() = delete;
-        AddContactIcon(Item *parent, std::uint32_t x, std::uint32_t y);
+        AddContactIcon(Item *parent);
     };
 
     enum class SendSmsIconState
@@ -29,7 +29,7 @@ namespace gui
     {
       public:
         SendSmsIcon() = delete;
-        SendSmsIcon(Item *parent, std::uint32_t x, std::uint32_t y);
+        SendSmsIcon(Item *parent);
     };
 
     enum class MicrophoneIconState
@@ -42,7 +42,7 @@ namespace gui
     {
       public:
         MicrophoneIcon() = delete;
-        MicrophoneIcon(Item *parent, std::uint32_t x, std::uint32_t y);
+        MicrophoneIcon(Item *parent);
     };
 
     enum class SpeakerIconState
@@ -55,6 +55,6 @@ namespace gui
     {
       public:
         SpeakerIcon() = delete;
-        SpeakerIcon(Item *parent, std::uint32_t x, std::uint32_t y);
+        SpeakerIcon(Item *parent);
     };
 } // namespace gui

@@ -190,7 +190,7 @@ namespace gui
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
         auto metaData         = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{duplicatedNumber.getFormatted(),
-                                "info_big_circle_W_G",
+                                "info_128px_W_G",
                                 text::RichTextParser()
                                     .parse(utils::translate("app_phonebook_duplicate_numbers"),
                                            nullptr,

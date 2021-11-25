@@ -37,7 +37,7 @@ namespace gui
         };
         metadata.title = utils::translate("tethering");
         metadata.text  = utils::translate("tethering_turn_off_question");
-        metadata.icon  = "tethering_icon";
+        metadata.icon  = "tethering_128px_W_G";
         auto msg       = std::make_unique<DialogMetadataMessage>(std::move(metadata));
         DialogYesNo::onBeforeShow(mode, msg.get());
     }

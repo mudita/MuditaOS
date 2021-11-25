@@ -24,7 +24,7 @@ namespace app::onBoarding
     void UpdateDialogWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         setTitle(utils::translate("app_onboarding_title_update_info"));
-        icon->image->set("update_icon_W_G");
+        icon->image->set("progress_128px_W_G");
         icon->text->setRichText(utils::translate("app_onboarding_update_info"), {{"$VERSION", std::string(VERSION)}});
     }
 

@@ -268,7 +268,7 @@ namespace app
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
                              gui::DialogMetadata{utils::translate("app_settings_bt"),
-                                                 "error_W_G",
+                                                 "fail_128px_W_G",
                                                  utils::translate("app_settings_bluetooth_init_error_message"),
                                                  "",
                                                  [=]() -> bool {
@@ -753,7 +753,7 @@ namespace app
                      gui::ShowMode::GUI_SHOW_INIT,
                      std::make_unique<gui::DialogMetadataMessage>(
                          gui::DialogMetadata{utils::translate("app_settings_bt"),
-                                             "error_W_G",
+                                             "fail_128px_W_G",
                                              utils::translate(errorMsg),
                                              "",
                                              [this, message{std::move(msg)}]() -> bool {

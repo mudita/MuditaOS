@@ -112,7 +112,7 @@ namespace bluetooth
     std::unique_ptr<CellularInterface> HFP::HFPImpl::cellularInterface = nullptr;
     std::unique_ptr<AudioInterface> HFP::HFPImpl::audioInterface       = nullptr;
     const sys::Service *HFP::HFPImpl::ownerService;
-    std::string HFP::HFPImpl::agServiceName = "PurePhone HFP";
+    const std::string_view HFP::HFPImpl::agServiceName = "Mudita Pure HFP";
     SCOCodec HFP::HFPImpl::codec            = SCOCodec::CVSD;
     std::shared_ptr<CVSDAudioDevice> HFP::HFPImpl::audioDevice;
 
@@ -276,7 +276,7 @@ namespace bluetooth
             scoHandle = HCI_CON_HANDLE_INVALID;
             isAudioRouted                = false;
             isAudioConnectionEstablished = false;
-            sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
+            audioDevice.reset();
             break;
         case HFP_SUBEVENT_START_RINGING:
             LOG_DEBUG("Start Ringing\n");
@@ -356,7 +356,7 @@ namespace bluetooth
         hfp_ag_create_sdp_record(serviceBuffer.data(),
                                  hspSdpRecordHandle,
                                  rfcommChannelNr,
-                                 agServiceName.c_str(),
+                                 agServiceName.data(),
                                  0,
                                  supported_features,
                                  wide_band_speech);

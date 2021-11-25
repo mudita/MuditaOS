@@ -78,7 +78,7 @@ namespace gui
     void PhonebookItem::markBlocked(bool val)
     {
         if (val) {
-            auto blockedIcon = new Image(hBox, 0, 0, "block");
+            auto blockedIcon = new Image(hBox, 0, 0, "phonebook_blocked_32px_W_G");
             blockedIcon->setAlignment(Alignment(gui::Alignment::Vertical::Center));
             blockedIcon->setMargins(Margins(0, 0, phonebookStyle::contactItem::blocked_right_margin, 0));
         }

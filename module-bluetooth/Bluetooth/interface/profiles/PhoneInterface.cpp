@@ -9,12 +9,17 @@ namespace bluetooth
 {
     bool CellularInterfaceImpl::answerIncomingCall(sys::Service *service)
     {
+        callActive = true;
         return CellularServiceAPI::AnswerIncomingCall(service);
     }
 
     bool CellularInterfaceImpl::hangupCall(sys::Service *service)
     {
-        return CellularServiceAPI::HangupCall(service);
+        if (callActive) {
+            callActive = false;
+            return CellularServiceAPI::HangupCall(service);
+        }
+        return true;
     }
 
     bool AudioInterfaceImpl::startAudioRouting(sys::Service *service)

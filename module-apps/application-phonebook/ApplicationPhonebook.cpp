@@ -181,7 +181,7 @@ namespace app
     bool ApplicationPhonebook::searchEmpty(const std::string &query)
     {
         gui::DialogMetadata meta;
-        meta.icon                        = "search_big";
+        meta.icon                        = "search_128px_W_G";
         meta.text                        = utils::translate("app_phonebook_search_no_results");
         meta.title                       = utils::translate("common_results_prefix") + "\"" + query + "\"";
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);

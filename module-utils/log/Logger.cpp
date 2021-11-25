@@ -13,8 +13,10 @@
 namespace Log
 {
     std::map<std::string, logger_level> Logger::filtered = {{"ApplicationManager", logger_level::LOGINFO},
+#if (!LOG_SENSITIVE_DATA_ENABLED)
                                                             {"CellularMux", logger_level::LOGINFO},
                                                             {"ServiceCellular", logger_level::LOGINFO},
+#endif
                                                             {"ServiceAntenna", logger_level::LOGERROR},
                                                             {"ServiceAudio", logger_level::LOGINFO},
                                                             {"ServiceBluetooth", logger_level::LOGINFO},

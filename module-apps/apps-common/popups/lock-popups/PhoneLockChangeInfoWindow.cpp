@@ -45,7 +45,7 @@ void PhoneLockChangeInfoWindow::buildInterface()
                              style::window::default_vertical_pos,
                              style::window::default_body_width,
                              style::window::default_body_height,
-                             "success_icon_W_G",
+                             "success_128px_W_G",
                              "");
     infoIcon->setAlignment(Alignment::Horizontal::Center);
 }

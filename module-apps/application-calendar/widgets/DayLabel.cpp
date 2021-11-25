@@ -34,7 +34,7 @@ namespace gui
         this->dayNumber->setMargins(gui::Margins(0, 11, 0, 0));
         this->dayNumber->activeItem = false;
 
-        this->dotImage = new gui::Image(this, width / 2 - 3, height - 12, 0, 0, "event_dot");
+        this->dotImage = new gui::Image(this, width / 2 - 3, height - 12, 0, 0, "calendar_event_dot");
         this->dotImage->setMinimumSize(11, 11);
         this->dotImage->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));

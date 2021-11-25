@@ -63,7 +63,7 @@ namespace gui
                                       gui::ShowMode::GUI_SHOW_INIT,
                                       std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
                                           utils::translate("app_settings_bluetooth_add_device"),
-                                          "search_big",
+                                          "search_128px_W_G",
                                           utils::translate("app_settings_bluetooth_searching_devices")}));
             return true;
         }

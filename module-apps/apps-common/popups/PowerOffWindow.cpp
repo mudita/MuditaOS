@@ -25,7 +25,7 @@ namespace gui
         };
         metadata.title = utils::translate("app_desktop_poweroff_title");
         metadata.text  = utils::translate("app_desktop_poweroff_question");
-        metadata.icon  = "turn_off_W_G";
+        metadata.icon  = "turn_off_128px_W_G";
         auto msg       = std::make_unique<DialogMetadataMessage>(std::move(metadata));
         DialogYesNo::onBeforeShow(mode, msg.get());
     }

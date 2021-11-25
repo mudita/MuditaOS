@@ -54,11 +54,11 @@ namespace callAppStyle
     // ENTER NUMBER WINDOW
     namespace enterNumberWindow
     {
-        namespace newContactIcon
+        namespace iconsBox
         {
-            inline constexpr auto x = 190U - icon::x_margin;
             inline constexpr auto y = 411U;
-        } // namespace newContactIcon
+            inline constexpr auto h = 100U;
+        } // namespace iconsBox
     }     // namespace enterNumberWindow
 
     // CALL WINDOW
@@ -83,20 +83,10 @@ namespace callAppStyle
             inline constexpr auto w = 240U;
             inline constexpr auto h = 20U;
         } // namespace durationLabel
-        namespace speakerIcon
+        namespace iconsBox
         {
-            inline constexpr auto x = 260U - icon::x_margin;
             inline constexpr auto y = 411U;
-        } // namespace speakerIcon
-        namespace microphoneIcon
-        {
-            inline constexpr auto x = 120U - icon::x_margin;
-            inline constexpr auto y = 411U;
-        } // namespace microphoneIcon
-        namespace sendMessageIcon
-        {
-            inline constexpr auto x = 190U - icon::x_margin;
-            inline constexpr auto y = 411U;
-        } // namespace sendMessageIcon
+            inline constexpr auto h = 100U;
+        } // namespace iconsBox
     }     // namespace callWindow
 } // namespace callAppStyle

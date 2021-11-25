@@ -76,15 +76,25 @@ namespace gui
         numberLabel->setFont(style::window::font::largelight);
         numberLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
-        speakerIcon                       = new SpeakerIcon(this, speakerIcon::x, speakerIcon::y);
-        speakerIcon->focusChangedCallback = [=](gui::Item &item) {
-            LOG_DEBUG("speakerIcon get/lost focus");
-            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch), item.focus);
+        iconsBox = new HBox(
+            this, style::window::default_left_margin, iconsBox::y, style::window::default_body_width, iconsBox::h);
+        iconsBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        iconsBox->setEdges(RectangleEdge::None);
+
+        microphoneIcon                    = new MicrophoneIcon(iconsBox);
+        microphoneIcon->activatedCallback = [=](gui::Item &item) {
+            microphoneIcon->setNext();
+            LOG_INFO("Mic activated %d", static_cast<int>(microphoneIcon->get()));
+
+            microphoneIcon->get() == MicrophoneIconState::MUTED ? interface->sendAudioEvent(AudioEvent::Mute)
+                                                                : interface->sendAudioEvent(AudioEvent::Unmute);
+
             return true;
         };
+
+        speakerIcon                    = new SpeakerIcon(iconsBox);
         speakerIcon->activatedCallback = [=](gui::Item &item) {
             speakerIcon->setNext();
-            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             LOG_INFO("Speaker activated %d", static_cast<int>(speakerIcon->get()));
 
             switch (speakerIcon->get()) {
@@ -104,29 +114,7 @@ namespace gui
             return true;
         };
 
-        microphoneIcon                       = new MicrophoneIcon(this, microphoneIcon::x, microphoneIcon::y);
-        microphoneIcon->focusChangedCallback = [=](gui::Item &item) {
-            LOG_DEBUG("microphoneIcon get/lost focus");
-            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::Switch), item.focus);
-            return true;
-        };
-        microphoneIcon->activatedCallback = [=](gui::Item &item) {
-            microphoneIcon->setNext();
-            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-            LOG_INFO("Mic activated %d", static_cast<int>(microphoneIcon->get()));
-
-            microphoneIcon->get() == MicrophoneIconState::MUTED ? interface->sendAudioEvent(AudioEvent::Mute)
-                                                                : interface->sendAudioEvent(AudioEvent::Unmute);
-
-            return true;
-        };
-
-        sendSmsIcon                       = new gui::SendSmsIcon(this, sendMessageIcon::x, sendMessageIcon::y);
-        sendSmsIcon->focusChangedCallback = [=](gui::Item &item) {
-            LOG_DEBUG("Send message get/lost focus");
-            navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::send), item.focus);
-            return true;
-        };
+        sendSmsIcon                    = new gui::SendSmsIcon(iconsBox);
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("Send message template and reject the call");
             constexpr auto preventAutoLock  = true;
@@ -180,6 +168,7 @@ namespace gui
             }
             else {
                 navBar->setActive(gui::nav_bar::Side::Center, true);
+                navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::send), true);
                 sendSmsIcon->setVisible(true);
                 setFocusItem(sendSmsIcon);
             }
@@ -208,20 +197,19 @@ namespace gui
             navBar->setActive(gui::nav_bar::Side::Left, false);
             navBar->setActive(gui::nav_bar::Side::Center, false);
             navBar->setText(gui::nav_bar::Side::Right, utils::translate(strings::endcall), true);
+            navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::Switch), true);
             durationLabel->setVisible(true);
             sendSmsIcon->setVisible(false);
             speakerIcon->setVisible(true);
             microphoneIcon->setVisible(true);
-            auto focusItem = getFocusItem();
-            if (focusItem != microphoneIcon || focusItem != speakerIcon) {
-                setFocusItem(microphoneIcon);
-            }
+            setFocusItem(microphoneIcon);
         } break;
         case State::OUTGOING_CALL: {
             interface->startAudioRouting();
             navBar->setActive(gui::nav_bar::Side::Left, false);
             navBar->setActive(gui::nav_bar::Side::Center, false);
             navBar->setText(gui::nav_bar::Side::Right, utils::translate(strings::endcall), true);
+            navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::Switch), true);
             durationLabel->setText(utils::translate(strings::calling));
             durationLabel->setVisible(true);
             sendSmsIcon->setVisible(false);
@@ -244,6 +232,7 @@ namespace gui
             setFocusItem(nullptr);
             break;
         };
+        iconsBox->resizeItems();
     }
 
     auto CallWindow::getState() const noexcept -> State

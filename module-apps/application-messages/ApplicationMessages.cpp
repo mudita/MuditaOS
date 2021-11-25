@@ -202,7 +202,7 @@ namespace app
                 const auto &contact = result->getResult();
                 auto metaData       = std::make_unique<gui::DialogMetadataMessage>(
                     gui::DialogMetadata{contact.getFormattedName(),
-                                        "phonebook_contact_delete_trashcan",
+                                        "delete_128px_W_G",
                                         utils::translate("app_messages_thread_delete_confirmation"),
                                         "",
                                         [this, record]() { return onRemoveSmsThreadConfirmed(*record); }});
@@ -240,7 +240,7 @@ namespace app
         LOG_DEBUG("Removing sms: %" PRIu32, record.ID);
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{record.body,
-                                "phonebook_contact_delete_trashcan",
+                                "delete_128px_W_G",
                                 utils::translate("app_messages_message_delete_confirmation"),
                                 "",
                                 [this, record] { return onRemoveSmsConfirmed(record); }});
@@ -289,7 +289,7 @@ namespace app
     bool ApplicationMessages::searchEmpty(const std::string &query)
     {
         gui::DialogMetadata meta;
-        meta.icon                        = "search_big";
+        meta.icon                        = "search_128px_W_G";
         meta.text                        = utils::translate("app_messages_thread_no_result");
         meta.title                       = utils::translate("common_results_prefix") + query;
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
@@ -310,7 +310,7 @@ namespace app
                                                bool ignoreCurrentWindowOnStack)
     {
         gui::DialogMetadata meta;
-        meta.icon                              = "info_big_circle_W_G";
+        meta.icon                              = "info_128px_W_G";
         meta.text                              = notification;
         meta.action                            = std::move(action);
         auto switchData                        = std::make_unique<gui::DialogMetadataMessage>(meta);

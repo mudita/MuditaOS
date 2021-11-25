@@ -1,3 +1,5 @@
 set(CONFIG_SIMULATOR_DISPLAY_RES_X 480)
 set(CONFIG_SIMULATOR_DISPLAY_RES_Y 600)
 
+# Enable/disable USB MTP
+option(ENABLE_USB_TASK "Enables usage of USB Task" ON)

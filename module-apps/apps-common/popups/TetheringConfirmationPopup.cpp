@@ -19,7 +19,7 @@ namespace gui
         DialogMetadata metadata;
         metadata.title  = utils::translate("tethering");
         metadata.text   = utils::translate("tethering_enable_question");
-        metadata.icon   = "tethering_icon";
+        metadata.icon   = "tethering_128px_W_G";
         metadata.action = [this]() {
             application->bus.sendUnicast(std::make_shared<sys::TetheringEnabledResponse>(),
                                          service::name::system_manager);
