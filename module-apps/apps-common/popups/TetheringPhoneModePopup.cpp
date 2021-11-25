@@ -18,7 +18,7 @@ namespace gui
         DialogMetadata metadata;
         metadata.title  = "";
         metadata.text   = utils::translate("tethering_phone_mode_change_prohibited");
-        metadata.icon   = "info_big_circle_W_G";
+        metadata.icon   = "info_128px_W_G";
         metadata.action = [this]() {
             auto params = std::make_unique<gui::PopupRequestParams>(gui::popup::ID::TetheringPhoneModeChangeProhibited);
             app::manager::Controller::sendAction(application, app::manager::actions::AbortPopup, std::move(params));

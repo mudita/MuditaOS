@@ -63,7 +63,7 @@ namespace app::notes
     void SearchResultsWindow::onNothingFound(const std::string &searchText)
     {
         gui::DialogMetadata meta{utils::translate("common_results_prefix") + searchText,
-                                 "search_big",
+                                 "search_128px_W_G",
                                  utils::translate("app_notes_search_no_results")};
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;

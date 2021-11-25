@@ -117,7 +117,7 @@ void PhoneLockedInfoWindow::buildInterface()
                              style::window::default_vertical_pos,
                              style::window::default_body_width,
                              style::window::default_body_height,
-                             "unlock_icon_W_G",
+                             "lock_128px_W_G",
                              utils::translate("app_desktop_press_to_unlock"));
 
     infoIcon->setAlignment(Alignment::Horizontal::Center);

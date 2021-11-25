@@ -73,13 +73,13 @@ namespace app::onBoarding
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF)) {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
                 utils::translate("app_onboarding_title"),
-                "info_icon_W_G",
+                "info_128px_W_G",
                 utils::translate("app_onboarding_skip_confirm"),
                 "",
                 [=]() -> bool {
                     auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                         gui::DialogMetadata{utils::translate("app_onboarding_no_sim_selected_title"),
-                                            "sim_card_W_G",
+                                            "sim_128px_W_G",
                                             utils::translate("app_onboarding_no_sim_selected_description"),
                                             "",
                                             [=]() -> bool { return true; }});

@@ -24,7 +24,7 @@ namespace gui
         setEdges(RectangleEdge::Bottom);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
-        image = new Image(this, "small_tick_W_M");
+        image = new Image(this, "small_tick_32px_W_M");
         image->setVisible(false);
 
         applyCallbacks();

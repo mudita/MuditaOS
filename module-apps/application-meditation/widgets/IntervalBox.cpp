@@ -55,13 +55,13 @@ void IntervalBox::build()
                                      boxStyle::arrow::Y,
                                      boxStyle::arrow::Width,
                                      boxStyle::arrow::Height,
-                                     "left_label_arrow");
+                                     "arrow_left_20px_W_M");
     rightSwitchArrow = new gui::Image(bottomLabel,
                                       boxStyle::arrow::RightX,
                                       boxStyle::arrow::Y,
                                       boxStyle::arrow::Width,
                                       boxStyle::arrow::Height,
-                                      "right_label_arrow");
+                                      "arrow_right_20px_W_M");
 
     updateIntervals(ChimeIntervalList::Direction::Next);
     leftSwitchArrow->setVisible(false);

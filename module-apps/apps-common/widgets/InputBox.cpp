@@ -25,7 +25,7 @@ namespace gui
         constexpr uint32_t x        = style::window::default_left_margin;
         constexpr uint32_t y        = 153;
         constexpr uint32_t w        = default_w;
-        constexpr uint32_t h        = 33;
+        constexpr uint32_t h        = 34;
         constexpr uint32_t penWidth = 2;
         namespace searchTop
         {

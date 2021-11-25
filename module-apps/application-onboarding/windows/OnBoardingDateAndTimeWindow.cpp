@@ -42,7 +42,7 @@ namespace app::onBoarding
         else if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                 gui::DialogMetadata{utils::translate("app_onboarding_title_configuration"),
-                                    "success_icon_W_G",
+                                    "success_128px_W_G",
                                     utils::translate("app_onboarding_configuration_successful"),
                                     "",
                                     [=]() -> bool { return true; }});

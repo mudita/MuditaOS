@@ -48,8 +48,8 @@ namespace gui
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
         hBox->setPenWidth(style::window::default_border_rect_no_focus);
 
-        tickImage =
-            new ImageBox(hBox, 0, 0, style::widgets::iconsSize, style::widgets::iconsSize, new Image("small_tick_W_M"));
+        tickImage = new ImageBox(
+            hBox, 0, 0, style::widgets::iconsSize, style::widgets::iconsSize, new Image("small_tick_32px_W_M"));
         tickImage->setVisible(true);
         tickImage->showImage(quote.enabled);
         tickImage->setEdges(RectangleEdge::Bottom);

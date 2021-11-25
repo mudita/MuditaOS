@@ -8,7 +8,7 @@ namespace gui
 {
     namespace
     {
-        constexpr auto crossImg      = "cross";
+        constexpr auto crossImg      = "call_add";
         constexpr auto addContactStr = "app_call_contact";
         constexpr auto messageImg    = "call_message";
         constexpr auto sendSmstStr   = "app_call_message";

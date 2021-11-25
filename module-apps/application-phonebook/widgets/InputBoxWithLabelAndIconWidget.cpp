@@ -95,7 +95,7 @@ namespace gui
     void InputBoxWithLabelAndIconWidget::speedDialKeyHandler()
     {
         descriptionLabel->setText(utils::translate("app_phonebook_new_speed_dial_key"));
-        iconImage->set("speed_dial_empty_W_M");
+        iconImage->set("phonebook_speed_dial_32px_W_G");
 
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
@@ -131,8 +131,8 @@ namespace gui
     void InputBoxWithLabelAndIconWidget::addToFavouritesHandler()
     {
         descriptionLabel->setText(utils::translate("app_phonebook_new_add_to_fav"));
-        iconImage->set("small_heart_W_M");
-        tickImage->set("small_tick_W_M");
+        iconImage->set("phonebook_heart_32px_W_M");
+        tickImage->set("small_tick_32px_W_M");
 
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
@@ -176,8 +176,8 @@ namespace gui
     void InputBoxWithLabelAndIconWidget::addToICEHandler()
     {
         descriptionLabel->setText(utils::translate("app_phonebook_new_add_to_ice"));
-        iconImage->set("ice");
-        tickImage->set("small_tick_W_M");
+        iconImage->set("ice_32px_W_G");
+        tickImage->set("small_tick_32px_W_M");
 
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
