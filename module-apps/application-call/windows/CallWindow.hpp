@@ -44,6 +44,7 @@ namespace gui
         // used to inform user about call state of call and display duration of call
         gui::Label *durationLabel = nullptr;
 
+        gui::HBox *iconsBox                 = nullptr;
         gui::SendSmsIcon *sendSmsIcon       = nullptr;
         gui::MicrophoneIcon *microphoneIcon = nullptr;
         gui::SpeakerIcon *speakerIcon       = nullptr;

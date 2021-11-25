@@ -19,7 +19,7 @@ namespace gui
         constexpr auto speakerImg    = "call_speaker";
         constexpr auto speakerOnImg  = "call_speaker_on";
         constexpr auto speakerStr    = "app_call_speaker";
-        constexpr auto speakerOnStr  = "app_call_speaker_on";
+        constexpr auto speakerOnStr  = "app_call_speaker";
 
         const StateIcon<AddContactIconState>::IconMap contactIconMap = {
             {AddContactIconState::ADD_CONTACT, {crossImg, addContactStr}}};
@@ -32,20 +32,16 @@ namespace gui
             {SpeakerIconState::SPEAKERON, {speakerOnImg, speakerOnStr}}};
     } // namespace
 
-    AddContactIcon::AddContactIcon(Item *parent, std::uint32_t x, std::uint32_t y)
-        : StateIcon(parent, x, y, callAppStyle::icon::x_margin, AddContactIconState::ADD_CONTACT, contactIconMap)
+    AddContactIcon::AddContactIcon(Item *parent) : StateIcon(parent, AddContactIconState::ADD_CONTACT, contactIconMap)
     {}
 
-    SendSmsIcon::SendSmsIcon(Item *parent, std::uint32_t x, std::uint32_t y)
-        : StateIcon(parent, x, y, callAppStyle::icon::x_margin, SendSmsIconState::SEND_SMS, smsIconMap)
+    SendSmsIcon::SendSmsIcon(Item *parent) : StateIcon(parent, SendSmsIconState::SEND_SMS, smsIconMap)
     {}
 
-    MicrophoneIcon::MicrophoneIcon(Item *parent, std::uint32_t x, std::uint32_t y)
-        : StateIcon(parent, x, y, callAppStyle::icon::x_margin, MicrophoneIconState::MUTE, microphoneIconMap)
+    MicrophoneIcon::MicrophoneIcon(Item *parent) : StateIcon(parent, MicrophoneIconState::MUTE, microphoneIconMap)
     {}
 
-    SpeakerIcon::SpeakerIcon(Item *parent, std::uint32_t x, std::uint32_t y)
-        : StateIcon(parent, x, y, callAppStyle::icon::x_margin, SpeakerIconState::SPEAKER, speakerIconMap)
+    SpeakerIcon::SpeakerIcon(Item *parent) : StateIcon(parent, SpeakerIconState::SPEAKER, speakerIconMap)
     {}
 
 } // namespace gui

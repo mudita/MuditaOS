@@ -12,8 +12,10 @@ namespace gui
     namespace imageBoxWithText
     {
         inline constexpr auto wh          = 100;
-        inline constexpr auto text_margin = 5;
+        inline constexpr auto text_margin_top    = 11;
+        inline constexpr auto text_margin_bottom = 5;
         inline constexpr auto font        = style::window::font::verysmall;
+        inline constexpr auto fontBold           = style::window::font::verysmallbold;
     } // namespace imageBoxWithText
 
     class ImageBoxWithText : public ImageBox
