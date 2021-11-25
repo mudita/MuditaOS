@@ -41,7 +41,7 @@ namespace gui
         inputText->setPenWidth(style::window::default_border_focus_w);
         inputText->setEdges(gui::RectangleEdge::None);
 
-        replyImage = new Image(body, 0, 0, "messages_reply");
+        replyImage = new Image(body, 0, 0, "messages_reply_32px_W_M");
         replyImage->setAlignment(Alignment(gui::Alignment::Vertical::Bottom));
         replyImage->setMargins(Margins(0, 0, 0, style::messages::smsInput::reply_bottom_margin));
         replyImage->activeItem = false;

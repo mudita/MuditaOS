@@ -63,7 +63,7 @@ namespace gui
             break;
         }
 
-        LockWindow->setImage("sim_card_W_G");
+        LockWindow->setImage("sim_128px_W_G");
         LockWindow->setNavBarWidgetsActive(false, false, true);
     }
 
@@ -86,14 +86,14 @@ namespace gui
             LockWindow->setText("sim_wrong_pin_confirmation", LockInputWindow::TextType::Primary);
             break;
         }
-        LockWindow->setImage("info_icon_W_G");
+        LockWindow->setImage("info_128px_W_G");
         LockWindow->setNavBarWidgetsActive(false, true, true);
     }
 
     void SimLockBox::setVisibleStateBlocked(const std::string &formattedTime)
     {
         LockWindow->setText("sim_puk_blocked", LockInputWindow::TextType::Primary);
-        LockWindow->setImage("sim_card_W_G");
+        LockWindow->setImage("sim_128px_W_G");
         LockWindow->setNavBarWidgetsActive(false, false, true);
     }
 
@@ -102,7 +102,7 @@ namespace gui
         LockWindow->setText("sim_cme_error",
                             LockInputWindow::TextType::Primary,
                             {{LockWindow->getToken(LockInputWindow::Token::CmeCode), static_cast<int>(errorCode)}});
-        LockWindow->setImage("info_icon_W_G");
+        LockWindow->setImage("info_128px_W_G");
         LockWindow->setNavBarWidgetsActive(false, false, true);
     }
 } // namespace gui

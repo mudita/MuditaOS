@@ -50,7 +50,7 @@ void SimInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
             setTitle(utils::translate("app_settings_net"));
             infoIcon->text->setRichText(utils::translate("sim_card_cant_connect"),
                                         {{"$SIM", infoData->getLock().getLockName()}});
-            infoIcon->image->set("sim_card_W_G");
+            infoIcon->image->set("sim_128px_W_G");
             break;
         default:
             break;
@@ -69,7 +69,7 @@ void SimInfoWindow::buildInterface()
                              style::window::default_vertical_pos,
                              style::window::default_body_width,
                              style::window::default_body_height,
-                             "success_icon_W_G",
+                             "success_128px_W_G",
                              utils::translate("sim_pin_changed_successfully"));
     infoIcon->setAlignment(Alignment::Horizontal::Center);
 }

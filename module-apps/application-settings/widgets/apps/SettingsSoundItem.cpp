@@ -27,7 +27,7 @@ namespace gui
         soundTitle->setText(soundName); // setRichText??
 
         if (selected) {
-            mIsSelected = new gui::Image(mMainBox, 0, 0, 0, 0, "small_tick_W_M");
+            mIsSelected = new gui::Image(mMainBox, 0, 0, 0, 0, "small_tick_32px_W_M");
             mIsSelected->setMargins(Margins(style::margins::big, 0, 0, 0));
         }
 

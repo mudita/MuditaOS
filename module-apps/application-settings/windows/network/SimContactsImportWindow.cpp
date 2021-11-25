@@ -40,7 +40,7 @@ namespace gui
                                       ::style::window::default_vertical_pos,
                                       ::style::window::default_body_width,
                                       ::style::window::default_body_height,
-                                      "info_icon_W_G",
+                                      "info_128px_W_G",
                                       utils::translate("app_settings_network_import_contacts_from_sim_card_reading"));
         emptyListIcon->setAlignment(Alignment::Horizontal::Center);
         emptyListIcon->setVisible(false);
@@ -55,7 +55,7 @@ namespace gui
     {
         emptyListIcon->text->setRichText(
             utils::translate("app_settings_network_import_contacts_from_sim_card_reading"));
-        emptyListIcon->image->set("update_icon_W_G");
+        emptyListIcon->image->set("progress_128px_W_G");
         navBar->setActive(nav_bar::Side::Right, true);
         navBar->setActive(nav_bar::Side::Center, false);
         navBar->setActive(nav_bar::Side::Left, false);
@@ -107,7 +107,7 @@ namespace gui
             navBar->setActive(nav_bar::Side::Center, false);
             emptyListIcon->text->setRichText(
                 utils::translate("app_settings_network_import_contacts_from_sim_card_no_contacts"));
-            emptyListIcon->image->set("info_icon_W_G");
+            emptyListIcon->image->set("info_128px_W_G");
         }
         else {
             setTitle(utils::translate("app_settings_network_import_contacts_from_sim_card"));
@@ -126,7 +126,7 @@ namespace gui
         emptyListIcon->text->setRichText(
             utils::translate("app_settings_network_import_contacts_from_sim_card_duplicates"),
             {{"$DUPLICATES", std::to_string(duplicatesCount)}});
-        emptyListIcon->image->set("info_icon_W_G");
+        emptyListIcon->image->set("info_128px_W_G");
         navBar->setActive(nav_bar::Side::Right, true);
         navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::show));
         navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::skip));
@@ -160,7 +160,7 @@ namespace gui
         setTitle(utils::translate("app_settings_network_import_contacts_from_sim_card"));
         emptyListIcon->text->setRichText(
             utils::translate("app_settings_network_import_contacts_from_sim_card_success"));
-        emptyListIcon->image->set("success_icon_W_G");
+        emptyListIcon->image->set("success_128px_W_G");
         navBar->setActive(nav_bar::Side::Right, false);
         navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::ok));
         navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::contacts));
@@ -177,7 +177,7 @@ namespace gui
         list->emptyListCallback();
         emptyListIcon->text->setRichText(
             utils::translate("app_settings_network_import_contacts_from_sim_card_reading"));
-        emptyListIcon->image->set("update_icon_W_G");
+        emptyListIcon->image->set("progress_128px_W_G");
         navBar->setActive(nav_bar::Side::Right, false);
         navBar->setActive(nav_bar::Side::Center, false);
         navBar->setActive(nav_bar::Side::Left, false);

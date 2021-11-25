@@ -234,7 +234,7 @@ namespace gui
             updateNavBar();
         });
 
-        auto img        = new gui::Image(recipientHBox, 0, 0, 0, 0, "phonebook_small");
+        auto img        = new gui::Image(recipientHBox, 0, 0, 0, 0, "phonebook_32px_W_G");
         img->activeItem = false;
 
         auto labelMessage = new Label(body, 0, 0, body->getWidth(), msgStyle::messageLabel::h);

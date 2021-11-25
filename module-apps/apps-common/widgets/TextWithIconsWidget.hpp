@@ -28,7 +28,7 @@ namespace gui
 
     class TextWithSnippet : public HBox
     {
-        constexpr static auto defaultSnippet = "Rectangle";
+        constexpr static auto defaultSnippet = "label_rectangle_W_M";
 
       public:
         TextWithSnippet(const std::string &text, const UTF8 &font, const UTF8 &snippet = defaultSnippet);

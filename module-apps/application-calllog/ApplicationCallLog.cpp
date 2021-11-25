@@ -115,7 +115,7 @@ namespace app
         LOG_DEBUG("Removing CalllogRecord: %" PRIu32, record.ID);
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{record.name,
-                                "phonebook_contact_delete_trashcan",
+                                "delete_128px_W_G",
                                 utils::translate("app_calllog_delete_call_confirmation"),
                                 "",
                                 [=]() -> bool {

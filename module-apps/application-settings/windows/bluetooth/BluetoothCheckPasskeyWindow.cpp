@@ -35,7 +35,7 @@ namespace gui
         navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::confirm));
         navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
-        image = new Image(this, passkey_style::image::x, passkey_style::image::y, 0, 0, "bluetooth_W_G");
+        image = new Image(this, passkey_style::image::x, passkey_style::image::y, 0, 0, "bluetooth_128px_W_G");
 
         label = new Label(this,
                           passkey_style::label::x,

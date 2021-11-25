@@ -128,7 +128,7 @@ bool NewContactModel::verifyData()
             if (!item->onVerifyCallback(errorMessage)) {
                 auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                     gui::DialogMetadata{errorMessage,
-                                        "error_W_G",
+                                        "fail_128px_W_G",
                                         utils::translate("app_phonebook_new_contact_invalid_number"),
                                         "",
                                         [=]() -> bool {

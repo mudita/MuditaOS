@@ -74,13 +74,13 @@ namespace app::onBoarding
 
                 auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
                     utils::translate("app_onboarding_title"),
-                    "info_icon_W_G",
+                    "info_128px_W_G",
                     utils::translate("app_onboarding_skip_confirm"),
                     "",
                     [=]() -> bool {
                         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                             gui::DialogMetadata{utils::translate("app_onboarding_title_configuration"),
-                                                "info_icon_W_G",
+                                                "info_128px_W_G",
                                                 utils::translate("app_onboarding_no_configuration"),
                                                 "",
                                                 [=]() -> bool { return true; }});

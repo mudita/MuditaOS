@@ -10,9 +10,9 @@ namespace gui
         : HBox(parent, x, y, style::window::brightness::title::width, style::window::brightness::title::height)
     {
         setEdges(RectangleEdge::None);
-        addArrow("arrow_left", Alignment::Horizontal::Left);
+        addArrow("arrow_left_20px_W_M", Alignment::Horizontal::Left);
         addBrightnessTitle(this, utils::translate(style::window::brightness::title_key));
-        addArrow("arrow_right", Alignment::Horizontal::Right);
+        addArrow("arrow_right_20px_W_M", Alignment::Horizontal::Right);
 
         resizeItems();
     }

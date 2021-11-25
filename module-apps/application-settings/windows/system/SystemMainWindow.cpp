@@ -39,7 +39,7 @@ namespace gui
                 [=](Item &item) {
                     auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                         gui::DialogMetadata{utils::translate("app_settings_factory_reset"),
-                                            "info_big_circle_W_G",
+                                            "info_128px_W_G",
                                             utils::translate("app_settings_display_factory_reset_confirmation"),
                                             "",
                                             [this]() {

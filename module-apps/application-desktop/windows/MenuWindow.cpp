@@ -180,8 +180,7 @@ namespace gui
                                               std::make_unique<app::ApplicationLaunchData>("ApplicationAlarmClock"));
                                       }),
 #else
-                createDisabledApplicationTile("alarm_icon_disabled",
-                                              "app_desktop_menu_alarm"),
+                createDisabledApplicationTile("menu_alarm_disabled_W_G", "app_desktop_menu_alarm"),
 #endif
                 createApplicationTile("menu_calendar_W_G",
                                       "app_desktop_menu_calendar",

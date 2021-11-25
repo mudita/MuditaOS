@@ -40,7 +40,7 @@ auto ActiveIconFactory::makeCustomIcon(const UTF8 &image,
 auto ActiveIconFactory::makeSMSIcon(const utils::PhoneNumber::View &number) -> ImageBox *
 {
     return makeCustomIcon(
-        "messages_notification_icon",
+        "messages_32px_W_G",
         [application = app, number](gui::Item &item) {
             auto data                        = std::make_unique<SMSSendRequest>(number, std::string{});
             data->ignoreCurrentWindowOnStack = true;
@@ -55,7 +55,7 @@ auto ActiveIconFactory::makeSMSIcon(const utils::PhoneNumber::View &number) -> I
 auto ActiveIconFactory::makeCallIcon(const utils::PhoneNumber::View &number) -> ImageBox *
 {
     return makeCustomIcon(
-        "phonebook_phone_ringing",
+        "call_32px_W_G",
         [application = app, number](gui::Item &item) {
             return app::manager::Controller::sendAction(application,
                                                         app::manager::actions::Call,
@@ -68,7 +68,7 @@ auto ActiveIconFactory::makeCallIcon(const utils::PhoneNumber::View &number) -> 
 auto ActiveIconFactory::makeAddContactIcon(const std::shared_ptr<ContactRecord> &contact) -> ImageBox *
 {
     return makeCustomIcon(
-        "cross",
+        "plus_32px_W_G",
         [application = app, contact](gui::Item &item) {
             return app::manager::Controller::sendAction(application,
                                                         app::manager::actions::EditContact,

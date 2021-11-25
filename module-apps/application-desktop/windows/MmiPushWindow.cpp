@@ -38,7 +38,7 @@ MmiPushWindow::MmiPushWindow(app::ApplicationCommon *app, const std::string &nam
                     style::window::default_vertical_pos,
                     style::window::default_body_width,
                     style::window::default_body_height,
-                    "info_big_circle_W_G",
+                    "info_128px_W_G",
                     "");
     icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
     icon->image->setMargins(Margins(0, icon::image_top_margin, 0, icon::image_bottom_margin));

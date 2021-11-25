@@ -136,7 +136,7 @@ namespace gui
 
     void SMSOutputWidget::errorIconBuild()
     {
-        errorIcon = new gui::Image("messages_error_W_M");
+        errorIcon = new gui::Image("messages_error_32px_W_M");
         errorIcon->setAlignment(Alignment(Alignment::Vertical::Center));
         errorIcon->activeItem = false;
         errorIcon->setMargins(Margins(style::messages::smsOutput::sms_error_icon_left_margin,

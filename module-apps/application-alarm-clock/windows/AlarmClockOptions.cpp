@@ -25,7 +25,7 @@ namespace app::alarmClock
         {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                 gui::DialogMetadata{utils::translate("app_alarm_clock_title_main"),
-                                    "phonebook_contact_delete_trashcan",
+                                    "delete_128px_W_G",
                                     utils::translate("app_alarm_clock_delete_confirmation"),
                                     "",
                                     [record, application, &alarmsRepository] {

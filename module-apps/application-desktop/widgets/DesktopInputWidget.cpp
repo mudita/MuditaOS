@@ -71,7 +71,7 @@ namespace gui
             return true;
         };
 
-        replyImage = new Image(body, 0, 0, "messages_reply");
+        replyImage = new Image(body, 0, 0, "messages_reply_32px_W_M");
         replyImage->setAlignment(Alignment(gui::Alignment::Vertical::Center));
         replyImage->setMargins(Margins(0, 0, 0, 0));
         replyImage->activeItem = false;

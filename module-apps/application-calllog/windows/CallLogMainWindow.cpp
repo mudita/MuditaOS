@@ -92,7 +92,7 @@ namespace gui
         noCallsBottom->setMargins(gui::Margins(0, MyStyle::bottomBoxMargin, 0, 0));
         noCallsBottom->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
 
-        ImageBox *noCallsImg = new ImageBox(noCallsBottom, new Image("callog_empty_W_G"));
+        ImageBox *noCallsImg = new ImageBox(noCallsBottom, new Image("calllog_empty_128px_W_G"));
         noCallsImg->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         noCallsImg->setMinimumSizeToFitImage();
         noCallsImg->setMargins(Margins(MyStyle::infoIconMargin, 0, 0, 0));

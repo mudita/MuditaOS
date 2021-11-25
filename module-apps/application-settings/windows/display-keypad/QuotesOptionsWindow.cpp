@@ -43,7 +43,7 @@ namespace gui
             [=](gui::Item &item) {
                 auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                     gui::DialogMetadata{quote.quote,
-                                        "phonebook_contact_delete_trashcan",
+                                        "delete_128px_W_G",
                                         utils::translate("app_settings_display_wallpaper_quotes_delete_confirmation"),
                                         "",
                                         [this]() {

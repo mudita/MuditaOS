@@ -54,7 +54,7 @@ namespace app
                 returnToPreviousWindow();
                 return true;
             };
-            constexpr auto iconNoEmergency = "error_W_G";
+            constexpr auto iconNoEmergency = "fail_128px_W_G";
             auto textNoEmergency           = utils::translate("app_call_wrong_emergency");
             utils::findAndReplaceAll(textNoEmergency, "$NUMBER", data->getDescription());
             showNotification(buttonAction, iconNoEmergency, textNoEmergency);
@@ -65,7 +65,7 @@ namespace app
                 returnToPreviousWindow();
                 return true;
             };
-            constexpr auto iconNoSim = "info_big_circle_W_G";
+            constexpr auto iconNoSim = "info_128px_W_G";
             const auto textNoSim     = utils::translate("app_call_no_sim");
             showNotification(buttonAction, iconNoSim, textNoSim);
             return actionHandled();
@@ -75,7 +75,7 @@ namespace app
                 app::manager::Controller::switchBack(this);
                 return true;
             };
-            constexpr auto icon    = "info_big_circle_W_G";
+            constexpr auto icon    = "info_128px_W_G";
             const auto textOffline = utils::translate("app_call_offline");
             showNotification(buttonAction, icon, textOffline);
             return actionHandled();

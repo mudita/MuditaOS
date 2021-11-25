@@ -30,10 +30,10 @@ namespace gui
                     if (window.empty()) {
                         return false;
                     }
-                    application->switchWindow(
-                        window,
-                        gui::ShowMode::GUI_SHOW_INIT,
-                        std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{name, "search_big", " "}));
+                    application->switchWindow(window,
+                                              gui::ShowMode::GUI_SHOW_INIT,
+                                              std::make_unique<gui::DialogMetadataMessage>(
+                                                  gui::DialogMetadata{name, "search_128px_W_G", " "}));
                     return true;
                 },
                 [=](gui::Item &item) { return true; },

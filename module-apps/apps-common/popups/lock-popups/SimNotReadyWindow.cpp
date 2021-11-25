@@ -41,7 +41,7 @@ void SimNotReadyWindow::buildInterface()
                              style::window::default_vertical_pos,
                              style::window::default_body_width,
                              style::window::default_body_height,
-                             "sim_card_W_G",
+                             "sim_128px_W_G",
                              utils::translate("sim_card_not_ready"));
     infoIcon->setAlignment(Alignment::Horizontal::Center);
 }
