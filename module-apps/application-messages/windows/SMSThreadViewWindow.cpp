@@ -80,6 +80,9 @@ namespace gui
                 smsModel->smsThreadID = pdata->thread->ID;
                 smsList->rebuildList();
             }
+            else if (smsModel->numberID != DB_ID_NONE) {
+                requestContact(smsModel->numberID);
+            }
         }
         if (auto pdata = dynamic_cast<SMSTextData *>(data)) {
             auto txt = pdata->text;
