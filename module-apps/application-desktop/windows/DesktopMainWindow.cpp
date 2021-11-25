@@ -220,7 +220,7 @@ namespace gui
     bool DesktopMainWindow::showInformationPopup(std::function<bool()> action, const std::string &notification)
     {
         DialogMetadata meta;
-        meta.icon       = "info_big_circle_W_G";
+        meta.icon       = "info_128px_W_G";
         meta.text       = notification;
         meta.action     = std::move(action);
         auto switchData = std::make_unique<DialogMetadataMessage>(std::move(meta));

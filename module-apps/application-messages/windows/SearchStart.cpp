@@ -23,7 +23,7 @@ namespace gui
         body = new gui::Item();
         body->setBoundingBox(bodySize());
         addWidget(body);
-        auto text = inputBox(this, utils::translate("common_search_uc"), "search");
+        auto text = inputBox(this, utils::translate("common_search_uc"), "search_32px_W_G");
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &Text) { application->getCurrentWindow()->navBarTemporaryMode(Text); },

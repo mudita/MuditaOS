@@ -573,6 +573,9 @@ namespace bsp::battery_charger
         configureTemperatureMeasurement();
 
         checkTemperatureRange();
+
+        // Short time to synchronize after configuration
+        vTaskDelay(pdMS_TO_TICKS(100));
         StateOfCharge level = getBatteryLevel();
         bool charging       = getChargeStatus();
         LOG_INFO("Phone battery start state: %d %d", level, charging);

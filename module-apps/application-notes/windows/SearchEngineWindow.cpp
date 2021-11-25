@@ -34,7 +34,7 @@ namespace app::notes
         navBar->setActive(gui::nav_bar::Side::Right, true);
         navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
-        input = gui::inputBox(this, utils::translate("common_search_uc"), "search");
+        input = gui::inputBox(this, utils::translate("common_search_uc"), "search_32px_W_G");
         setFocusItem(input);
     }
 

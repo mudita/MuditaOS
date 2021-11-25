@@ -30,7 +30,7 @@ namespace app::notes
         {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                 gui::DialogMetadata{record.snippet,
-                                    "phonebook_contact_delete_trashcan",
+                                    "delete_128px_W_G",
                                     utils::translate("app_notes_note_delete_confirmation"),
                                     "",
                                     [record, application, &notesRepository] {

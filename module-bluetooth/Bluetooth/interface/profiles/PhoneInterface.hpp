@@ -20,6 +20,9 @@ namespace bluetooth
       public:
         bool answerIncomingCall(sys::Service *service) override;
         bool hangupCall(sys::Service *service) override;
+
+      private:
+        bool callActive = false;
     };
 
     class AudioInterface

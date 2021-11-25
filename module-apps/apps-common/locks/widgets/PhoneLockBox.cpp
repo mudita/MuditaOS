@@ -54,7 +54,7 @@ namespace gui
         LockWindow->setText("phone_lock_blocked_information",
                             LockInputWindow::TextType::Primary,
                             {{LockWindow->getToken(LockInputWindow::Token::Time), formattedTime}});
-        LockWindow->setImage("error_W_G");
+        LockWindow->setImage("fail_128px_W_G");
         LockWindow->setNavBarWidgetsActive(false, true, false);
         LockWindow->setNavBarText(utils::translate(style::strings::common::ok), nav_bar::Side::Center);
     }
@@ -82,7 +82,7 @@ namespace gui
             break;
         }
 
-        LockWindow->setImage("unlock_icon_W_G");
+        LockWindow->setImage("lock_128px_W_G");
         LockWindow->setNavBarWidgetsActive(leftNavBarState, false, true);
     }
 
@@ -103,7 +103,7 @@ namespace gui
                                 {{LockWindow->getToken(LockInputWindow::Token::Attempts), static_cast<int>(value)}});
             break;
         }
-        LockWindow->setImage("info_icon_W_G");
+        LockWindow->setImage("info_128px_W_G");
         LockWindow->setNavBarWidgetsActive(false, true, false);
         LockWindow->setNavBarText(utils::translate(style::strings::common::ok), nav_bar::Side::Center);
     }

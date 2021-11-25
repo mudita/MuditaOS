@@ -37,16 +37,18 @@ void ImageBoxWithText::setText(const UTF8 &description)
 {
     text = new TextFixedSize(this);
     text->drawUnderline(false);
-    text->setMargins(Margins(0, imageBoxWithText::text_margin, 0, imageBoxWithText::text_margin));
+    text->setMargins(Margins(0, imageBoxWithText::text_margin_top, 0, imageBoxWithText::text_margin_bottom));
     text->setFont(imageBoxWithText::font);
     text->setText(description);
     text->setMinimumWidthToFitText(description);
     text->setMinimumHeightToFitText();
+    text->setAlignment(Alignment::Horizontal::Center);
+    text->activeItem = false;
 }
 
 void ImageBoxWithText::setMinimumSizeToFitImage()
 {
     auto minW = std::max(image->getWidth(), text->widgetMinimumArea.w);
-    auto minH = image->getHeight() + imageBoxWithText::text_margin + text->widgetMinimumArea.h;
+    auto minH = image->getHeight() + imageBoxWithText::text_margin_top + text->widgetMinimumArea.h;
     setMinimumSize(minW, minH);
 }

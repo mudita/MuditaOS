@@ -61,7 +61,7 @@ namespace gui
         // Not ideal -> best solution would be to create separate widget with image inside box.
         tickImage->setMargins(gui::Margins(
             style::quotes::widget::tick_image_left_margin, 0, style::quotes::widget::tick_image_right_margin, 0));
-        tickImage->set("small_tick_W_M");
+        tickImage->set("small_tick_32px_W_M");
         tickImage->setVisible(category.enabled);
         tickImage->activeItem = false;
 

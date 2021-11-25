@@ -51,16 +51,16 @@ namespace gui::option
             button = new ButtonOnOff(optionBodyHBox, ButtonState::Off);
             break;
         case SettingRightItem::Bt:
-            imageName = "Bluetooth_small";
+            imageName = "bluetooth_32px_W_M";
             break;
         case SettingRightItem::Checked:
-            imageName = "small_tick_W_M";
+            imageName = "small_tick_32px_W_M";
             break;
         case SettingRightItem::SIM1:
-            imageName = "sim1_option";
+            imageName = "sim1_option_32px_W_G";
             break;
         case SettingRightItem::SIM2:
-            imageName = "sim2_option";
+            imageName = "sim2_option_32px_W_G";
             break;
         case SettingRightItem::Text: {
             auto optionTextRight = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);

@@ -65,12 +65,13 @@ namespace gui
 
     void ContactFlagsWidget::initGUIIcons()
     {
-        favouritesIcon =
-            new ContactFlagIconWidget("small_heart_W_M", utils::translate("app_phonebook_contact_flag_fav"), this);
+        favouritesIcon = new ContactFlagIconWidget(
+            "phonebook_heart_32px_W_M", utils::translate("app_phonebook_contact_flag_fav"), this);
         speedDialIcon =
             new ContactFlagIconWidget(speedDialPos, utils::translate("app_phonebook_contact_flag_speed_dial"), this);
-        iceIcon     = new ContactFlagIconWidget("ice", utils::translate("app_phonebook_contact_flag_ice"), this);
-        blockedIcon = new ContactFlagIconWidget("block", utils::translate("app_phonebook_contact_flag_blocked"), this);
+        iceIcon = new ContactFlagIconWidget("ice_32px_W_G", utils::translate("app_phonebook_contact_flag_ice"), this);
+        blockedIcon = new ContactFlagIconWidget(
+            "phonebook_blocked_32px_W_G", utils::translate("app_phonebook_contact_flag_blocked"), this);
     }
 
     void ContactFlagsWidget::buildWidget()
@@ -106,7 +107,6 @@ namespace gui
             if (speedDial) {
                 speedDialIcon->setVisible(true);
             }
-
         }
         hideIfNoFlags();
         mainBox->resizeItems();

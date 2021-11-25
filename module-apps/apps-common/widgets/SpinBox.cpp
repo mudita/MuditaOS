@@ -29,8 +29,8 @@ namespace gui
         setEdges(gui::RectangleEdge::Top | gui::RectangleEdge::Bottom);
 
         titleLabel = addTitle(this, title);
-        leftArrow  = addArrow(this, "arrow_left", Alignment::Horizontal::Left, false);
-        rightArrow = addArrow(this, "arrow_right", Alignment::Horizontal::Right, false);
+        leftArrow  = addArrow(this, "arrow_left_20px_W_M", Alignment::Horizontal::Left, false);
+        rightArrow = addArrow(this, "arrow_right_20px_W_M", Alignment::Horizontal::Right, false);
         bar        = addBarGraph(this, maxValue, startValue);
 
         focusChangedCallback = [this](Item &item) {

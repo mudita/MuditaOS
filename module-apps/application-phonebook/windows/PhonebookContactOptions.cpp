@@ -74,7 +74,7 @@ namespace gui
 
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{cont.getFormattedName(),
-                                "phonebook_contact_delete_trashcan",
+                                "delete_128px_W_G",
                                 utils::translate("app_phonebook_options_delete_confirm"),
                                 "",
                                 [=]() -> bool {
@@ -108,7 +108,7 @@ namespace gui
 
         auto metaData                        = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
             contact->getFormattedName(ContactRecord::NameFormatType::Title),
-            "info_big_circle_W_G",
+            "info_128px_W_G",
             dialogText,
             "",
             [=]() -> bool {
