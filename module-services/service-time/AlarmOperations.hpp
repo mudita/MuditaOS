@@ -39,31 +39,31 @@ namespace alarms
 
         virtual void updateEventsCache(TimePoint now) = 0;
 
-        virtual void getAlarm(const std::uint32_t alarmId, OnGetAlarmProcessed callback)              = 0;
+        virtual void getAlarm(const std::uint32_t alarmId, OnGetAlarmProcessed callback)                     = 0;
         virtual void getAlarmWithStatus(const std::uint32_t alarmId, OnGetAlarmWithStatusProcessed callback) = 0;
-        virtual void addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback)                  = 0;
-        virtual void updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback)            = 0;
-        virtual void removeAlarm(const std::uint32_t alarmId, OnRemoveAlarmProcessed callback)        = 0;
+        virtual void addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback)                         = 0;
+        virtual void updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback)                   = 0;
+        virtual void removeAlarm(const std::uint32_t alarmId, OnRemoveAlarmProcessed callback)               = 0;
         virtual void getAlarmsInRange(std::uint32_t offset,
                                       std::uint32_t limit,
-                                      OnGetAlarmsInRangeProcessed callback)                           = 0;
-        virtual void getNextSingleEvents(TimePoint start, OnGetAlarmsProcessed callback)              = 0;
-        virtual void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)      = 0;
-        virtual void turnOffSnoozedAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)      = 0;
+                                      OnGetAlarmsInRangeProcessed callback)                                  = 0;
+        virtual void getNextSingleEvents(TimePoint start, OnGetAlarmsProcessed callback)                     = 0;
+        virtual void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)             = 0;
+        virtual void turnOffSnoozedAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)             = 0;
         virtual void snoozeRingingAlarm(const std::uint32_t id,
                                         const TimePoint nextAlarmTime,
-                                        OnSnoozeRingingAlarm callback)                                = 0;
+                                        OnSnoozeRingingAlarm callback)                                       = 0;
         virtual void postponeSnooze(const std::uint32_t id,
                                     const TimePoint nextAlarmTime,
-                                    OnSnoozeRingingAlarm callback)                                    = 0;
-        virtual bool minuteUpdated(TimePoint now)                                                            = 0;
+                                    OnSnoozeRingingAlarm callback)                                           = 0;
+        virtual void minuteUpdated(TimePoint now)                                                            = 0;
         virtual void addAlarmExecutionHandler(const alarms::AlarmType type,
-                                              const std::shared_ptr<alarms::AlarmHandler> handler)    = 0;
-        virtual void stopAllSnoozedAlarms()                                                           = 0;
-        virtual void addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange)                  = 0;
-        virtual void addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange)                      = 0;
-        virtual void toggleAll(bool toggle, OnToggleAll callback)                                     = 0;
-        virtual void getSnoozedAlarms(OnGetSnoozedAlarms callback)                                    = 0;
+                                              const std::shared_ptr<alarms::AlarmHandler> handler)           = 0;
+        virtual void stopAllSnoozedAlarms()                                                                  = 0;
+        virtual void addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange)                         = 0;
+        virtual void addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange)                             = 0;
+        virtual void toggleAll(bool toggle, OnToggleAll callback)                                            = 0;
+        virtual void getSnoozedAlarms(OnGetSnoozedAlarms callback)                                           = 0;
     };
 
     class IAlarmOperationsFactory
@@ -100,7 +100,7 @@ namespace alarms
         void postponeSnooze(const std::uint32_t id,
                             const TimePoint nextAlarmTime,
                             OnSnoozeRingingAlarm callback) override;
-        bool minuteUpdated(TimePoint now) override;
+        void minuteUpdated(TimePoint now) override;
         void addAlarmExecutionHandler(const alarms::AlarmType type,
                                       const std::shared_ptr<alarms::AlarmHandler> handler) override;
         void stopAllSnoozedAlarms() override;
@@ -140,7 +140,7 @@ namespace alarms
                                      OnGetAlarmsProcessed handledCallback);
         void checkAndUpdateCache(AlarmEventRecord record);
         void switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn);
-        bool processEvents(TimePoint now);
+        void processEvents(TimePoint now);
         void processOngoingEvents();
         void processNextEventsQueue(const TimePoint now);
         void processSnoozedEventsQueue(const TimePoint now);

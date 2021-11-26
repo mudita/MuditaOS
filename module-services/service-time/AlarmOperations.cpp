@@ -269,12 +269,12 @@ namespace alarms
         }
     }
 
-    auto AlarmOperationsCommon::minuteUpdated(TimePoint now) -> bool
+    auto AlarmOperationsCommon::minuteUpdated(TimePoint now) -> void
     {
-        return processEvents(now);
+        processEvents(now);
     }
 
-    bool AlarmOperationsCommon::processEvents(TimePoint now)
+    void AlarmOperationsCommon::processEvents(TimePoint now)
     {
         const auto isHandlingInProgress = !ongoingSingleEvents.empty();
         if (!nextSingleEvents.empty()) {
@@ -287,9 +287,7 @@ namespace alarms
 
         if (!isHandlingInProgress) {
             processOngoingEvents();
-            return true;
         }
-        return false;
     }
 
     void AlarmOperationsCommon::processOngoingEvents()

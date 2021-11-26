@@ -64,6 +64,7 @@ namespace alarms
 
         explicit PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider);
         auto decide(TimePoint now, const SingleEventRecord &event) -> Decision;
+        auto isActive() const -> bool;
 
       private:
         auto isTimeForPreWakeUp(TimePoint now,
@@ -71,6 +72,7 @@ namespace alarms
                                 PreWakeUpSettingsProvider::Settings settings) -> bool;
 
         std::unique_ptr<PreWakeUpSettingsProvider> settingsProvider;
+        bool active{false};
     };
 
     class Bedtime
@@ -95,18 +97,20 @@ namespace alarms
                         std::unique_ptr<AbstractBedtimeSettingsProvider> &&BedtimeModel);
 
       private:
-        bool minuteUpdated(TimePoint now) override;
+        void minuteUpdated(TimePoint now) override;
         void stopAllSnoozedAlarms() override;
-        bool processPreWakeUp(TimePoint now);
+        void processPreWakeUp(TimePoint now);
         bool processSnoozeChime(TimePoint now);
         void stopAllSnoozeChimes();
 
         SingleEventRecord getNextPreWakeUpEvent();
-        bool handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
+        void handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
         void handleSnoozeChime(const SingleEventRecord &event, bool newStateOn);
         void handleBedtime(const SingleEventRecord &event, bool decision);
         void processBedtime(TimePoint now);
         void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType) override;
+
+        bool isBedtimeAllowed() const;
 
         PreWakeUp preWakeUp;
         std::unique_ptr<SnoozeChimeSettingsProvider> snoozeChimeSettings;
