@@ -22,7 +22,7 @@ namespace alarms
         AlarmOperations(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
                         GetCurrentTime getCurrentTimeCallback);
 
-        bool minuteUpdated(TimePoint now) override;
+        void minuteUpdated(TimePoint now) override;
 
       private:
     };
