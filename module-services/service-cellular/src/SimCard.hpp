@@ -162,6 +162,10 @@ namespace cellular::service
         void handleSimInsertionNotification(at::SimInsertedStatus status);
 
         /**
+         * Handles post sim selection actions
+         */
+        void handleSimCardSelected();
+        /**
          * Notification events
          */
         std::function<void()> onSimReady;
@@ -171,6 +175,7 @@ namespace cellular::service
         std::function<void()> onSimEvent;
         std::function<void(unsigned int code)> onUnhandledCME;
         std::function<void()> onSimNotPresent;
+        std::function<void()> onSimSelected;
 
       private:
         /** SIM card initialization sequence
@@ -242,6 +247,7 @@ namespace cellular::service
         std::optional<api::SimSlot> sim = std::nullopt;
         std::optional<at::SimInsertedStatus> simInserted = std::nullopt;
         bool simSelectInProgress                         = false;
+        bool isSimSelected                               = false;
     };
 
 } // namespace cellular::service
