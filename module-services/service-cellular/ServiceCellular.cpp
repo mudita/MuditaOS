@@ -861,11 +861,6 @@ bool ServiceCellular::handle_cellular_priv_init()
                          interval)) {
         connectionManager->setInterval(std::chrono::minutes{interval});
     }
-    if (!connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode())) {
-        priv->state->set(State::ST::Failed);
-        LOG_ERROR("Failed to handle phone mode");
-        return false;
-    }
     priv->state->set(State::ST::APNConfProcedure);
     return true;
 }
@@ -1251,8 +1246,6 @@ bool ServiceCellular::handle_URCReady()
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
     bool ret     = true;
-
-    priv->requestNetworkTimeSettings();
 
     ret = ret && channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
 

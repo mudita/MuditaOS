@@ -269,6 +269,10 @@ CellularMux::ConfState CellularMux::confProcedure()
         }
     }
 
+    if (!parser->cmd(at::AT::CFUN_DISABLE_TRANSMITTING)) {
+        return ConfState::Failure;
+    }
+
     return ConfState ::Success;
 }
 
