@@ -58,6 +58,10 @@ namespace cellular::internal
             owner->bus.sendMulticast<notification::UnhandledCME>(code);
         };
         simCard->onSimNotPresent = [this]() { owner->bus.sendMulticast<notification::SimNotInserted>(); };
+        simCard->onSimSelected   = [this]() {
+            owner->connectionManager->onPhoneModeChange(owner->phoneModeObserver->getCurrentPhoneMode());
+            requestNetworkTimeSettings();
+        };
     }
 
     void ServiceCellularPriv::connectSimCard()
@@ -70,6 +74,7 @@ namespace cellular::internal
             auto msg = static_cast<request::sim::SetActiveSim *>(request);
             auto result = simCard->handleSetActiveSim(msg->sim);
             owner->simTimer.start();
+            simCard->handleSimCardSelected();
             return std::make_shared<request::sim::SetActiveSim::Response>(result);
         });
         owner->connect(typeid(request::sim::GetLockState), [&](sys::Message *) -> sys::MessagePointer {

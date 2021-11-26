@@ -352,5 +352,17 @@ namespace cellular
                 }
             }
         }
+        void SimCard::handleSimCardSelected()
+        {
+            if (!isSimSelected) {
+                isSimSelected = true;
+                if (onSimSelected) {
+                    onSimSelected();
+                }
+                else {
+                    LOG_ERROR("onSimSelected callback is missing");
+                }
+            }
+        }
     } // namespace service
 } // namespace cellular
