@@ -83,8 +83,4 @@ namespace app
 
         return handleAsyncResponse(resp);
     }
-
-    // Empty: do not start idleTimer on application run
-    void ApplicationBellMeditationTimer::onStart()
-    {}
 } // namespace app

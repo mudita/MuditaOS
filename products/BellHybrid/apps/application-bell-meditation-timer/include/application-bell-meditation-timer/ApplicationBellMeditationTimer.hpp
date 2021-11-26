@@ -41,9 +41,6 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
-
-      private:
-        void onStart() override;
     };
 
     template <> struct ManifestTraits<ApplicationBellMeditationTimer>
