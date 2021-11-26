@@ -62,6 +62,7 @@ namespace app::meditation
             if (option.second == value) {
                 settings->setValue(
                     intervalDBRecordName, utils::to_string(option.first.count()), settings::SettingsScope::AppLocal);
+                reinterpret_cast<app::Application *>(app)->suspendIdleTimer();
                 app->switchWindow(gui::name::window::readyGoing);
                 break;
             }
@@ -76,6 +77,7 @@ namespace app::meditation
             utils::getNumericValue<int>(settings->getValue(meditationDBRecordName, settings::SettingsScope::AppLocal));
         if (duration == 1) {
             settings->setValue(intervalDBRecordName, utils::to_string(0), settings::SettingsScope::AppLocal);
+            reinterpret_cast<app::Application *>(app)->suspendIdleTimer();
             app->switchWindow(gui::name::window::readyGoing);
             return;
         }

@@ -44,6 +44,7 @@ namespace app::meditation
 
     void MeditationProgressPresenter::start()
     {
+        reinterpret_cast<app::Application *>(app)->suspendIdleTimer();
         timer->reset(std::chrono::seconds(duration), std::chrono::seconds(interval));
         timer->start();
     }

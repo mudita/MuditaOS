@@ -133,7 +133,9 @@ namespace app
 
     void Application::restartIdleTimer()
     {
-        bus.sendUnicast(std::make_shared<RestartIdleTimerMessage>(), service::name::appmgr);
+        if (idleTimerActiveFlag) {
+            bus.sendUnicast(std::make_shared<RestartIdleTimerMessage>(), service::name::appmgr);
+        }
     }
 
     void Application::stopIdleTimer()
@@ -143,4 +145,15 @@ namespace app
 
     void Application::updateStatuses(gui::AppWindow *window) const
     {}
+
+    void Application::resumeIdleTimer()
+    {
+        startIdleTimer();
+        idleTimerActiveFlag = true;
+    }
+    void Application::suspendIdleTimer()
+    {
+        stopIdleTimer();
+        idleTimerActiveFlag = false;
+    }
 } // namespace app
