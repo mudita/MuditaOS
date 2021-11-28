@@ -40,6 +40,7 @@ namespace gui
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onDatabaseMessage(sys::Message *msgl) override;
 
         void rebuild() override;
         void buildInterface() override;

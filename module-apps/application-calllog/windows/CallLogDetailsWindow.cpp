@@ -12,6 +12,7 @@
 #include "windows/CallLogOptionsWindow.hpp"
 #include <widgets/TextWithIconsWidget.hpp>
 #include <widgets/ActiveIconFactory.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 #include <gsl/assert>
 #include <i18n/i18n.hpp>
@@ -232,6 +233,27 @@ namespace gui
         }
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
+    }
+
+    bool CallLogDetailsWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        auto msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msgNotification != nullptr) {
+            if (msgNotification->interface == db::Interface::Name::Contact) {
+                if (msgNotification->dataModified()) {
+                    if (auto contact = DBServiceAPI::MatchContactByPhoneNumber(application, record.phoneNumber);
+                        contact && !contact->isTemporary()) {
+                        record.name = contact->getFormattedName();
+                    }
+                    else {
+                        record.name = UTF8(record.phoneNumber.getFormatted());
+                    }
+                    setTitle(record.name);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 } /* namespace gui */
