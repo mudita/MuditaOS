@@ -48,6 +48,7 @@ target_sources(application-settings
         windows/advanced/AdvancedOptionsWindow.cpp
         windows/advanced/ColorTestWindow.cpp
         windows/advanced/InformationWindow.cpp
+        windows/advanced/TextImageColorWindow.cpp
         windows/advanced/UITestWindow.cpp
         windows/advanced/StatusBarImageTypeWindow.cpp
         windows/apps/AlarmClockWindow.cpp

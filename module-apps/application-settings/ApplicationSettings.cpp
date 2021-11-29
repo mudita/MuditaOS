@@ -6,6 +6,7 @@
 #include <application-settings/windows/SettingsMainWindow.hpp>
 #include <application-settings/windows/advanced/AdvancedOptionsWindow.hpp>
 #include <application-settings/windows/advanced/InformationWindow.hpp>
+#include <application-settings/windows/advanced/TextImageColorWindow.hpp>
 #include <application-settings/windows/advanced/UITestWindow.hpp>
 #include <application-settings/windows/advanced/ColorTestWindow.hpp>
 #include <application-settings/windows/advanced/StatusBarImageTypeWindow.hpp>
@@ -375,7 +376,9 @@ namespace app
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::StatusBarImageTypeWindow>(app);
                               });
-
+        windowsFactory.attach(gui::window::name::text_image_color, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::TextImageColorWindow>(app);
+        });
         // Bluetooth
         windowsFactory.attach(gui::window::name::bluetooth, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BluetoothWindow>(app);
