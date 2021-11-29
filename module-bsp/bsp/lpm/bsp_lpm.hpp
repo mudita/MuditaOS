@@ -34,9 +34,9 @@ namespace bsp
         virtual int32_t PowerOff()                = 0;
         virtual int32_t Reboot(RebootType reason) = 0;
 
-        virtual void SetCpuFrequency(CpuFrequencyHz freq) = 0;
+        virtual void SetCpuFrequency(CpuFrequencyMHz freq) = 0;
         virtual void SetHighestCoreVoltage() = 0;
-        [[nodiscard]] CpuFrequencyHz GetCurrentFrequencyLevel() const noexcept;
+        [[nodiscard]] CpuFrequencyMHz GetCurrentFrequencyLevel() const noexcept;
         [[nodiscard]] virtual uint32_t GetCpuFrequency() const noexcept = 0;
 
         virtual void SwitchOscillatorSource(OscillatorSource source) = 0;
@@ -52,6 +52,6 @@ namespace bsp
         virtual void SwitchToLowPowerModeLDO() = 0;
 
       protected:
-        CpuFrequencyHz currentFrequency = CpuFrequencyHz::Level_6;
+        CpuFrequencyMHz currentFrequency = CpuFrequencyMHz::Level_6;
     };
 } // namespace bsp

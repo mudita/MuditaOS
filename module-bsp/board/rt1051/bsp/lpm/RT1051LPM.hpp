@@ -16,7 +16,7 @@ namespace bsp
         RT1051LPM();
         int32_t PowerOff() override final;
         int32_t Reboot(RebootType reason) override final;
-        void SetCpuFrequency(CpuFrequencyHz freq) final;
+        void SetCpuFrequency(CpuFrequencyMHz freq) final;
         void SetHighestCoreVoltage() final;
         [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;

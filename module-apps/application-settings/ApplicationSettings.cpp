@@ -8,6 +8,7 @@
 #include <application-settings/windows/advanced/InformationWindow.hpp>
 #include <application-settings/windows/advanced/TextImageColorWindow.hpp>
 #include <application-settings/windows/advanced/UITestWindow.hpp>
+#include <application-settings/windows/advanced/CPUModeTestWindow.hpp>
 #include <application-settings/windows/advanced/ColorTestWindow.hpp>
 #include <application-settings/windows/advanced/StatusBarImageTypeWindow.hpp>
 #include <application-settings/windows/bluetooth/BluetoothWindow.hpp>
@@ -367,6 +368,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::ui_test, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::UiTestWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::cpu_test_window, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::CPUModeTestWindow>(app);
         });
         windowsFactory.attach(gui::window::name::color_test_window,
                               [](ApplicationCommon *app, const std::string &name) {

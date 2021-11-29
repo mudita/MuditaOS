@@ -20,7 +20,7 @@ namespace bsp
         return 0;
     }
 
-    void LinuxLPM::SetCpuFrequency(bsp::CpuFrequencyHz freq)
+    void LinuxLPM::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
     {
         currentFrequency = freq;
     }

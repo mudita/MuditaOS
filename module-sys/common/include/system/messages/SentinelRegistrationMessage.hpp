@@ -11,8 +11,8 @@ namespace sys
     class SentinelRegistrationMessage : public sys::DataMessage
     {
       public:
-        SentinelRegistrationMessage(std::shared_ptr<CpuSentinel> sentinelPtr)
-            : sys::DataMessage(MessageType::SystemManagerRegistration), sentinel(sentinelPtr)
+        explicit SentinelRegistrationMessage(std::shared_ptr<CpuSentinel> sentinelPtr)
+            : sys::DataMessage(MessageType::SystemManagerSentinelRegistration), sentinel(sentinelPtr)
         {}
 
         [[nodiscard]] auto getSentinel() const noexcept -> std::shared_ptr<CpuSentinel>
@@ -22,5 +22,21 @@ namespace sys
 
       private:
         std::shared_ptr<CpuSentinel> sentinel;
+    };
+
+    class SentinelRemovalMessage : public sys::DataMessage
+    {
+      public:
+        explicit SentinelRemovalMessage(std::string sentinelName)
+            : sys::DataMessage(MessageType::SystemManagerSentinelRemoval), sentinelName(std::move(sentinelName))
+        {}
+
+        [[nodiscard]] auto getSentinelName() const noexcept -> std::string
+        {
+            return sentinelName;
+        };
+
+      private:
+        std::string sentinelName;
     };
 } // namespace sys

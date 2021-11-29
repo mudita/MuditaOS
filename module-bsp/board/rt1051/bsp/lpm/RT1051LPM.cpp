@@ -68,29 +68,29 @@ namespace bsp
         return 0;
     }
 
-    void RT1051LPM::SetCpuFrequency(bsp::CpuFrequencyHz freq)
+    void RT1051LPM::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
     {
         currentFrequency = freq;
         switch (freq) {
-        case bsp::CpuFrequencyHz::Level_0:
+        case bsp::CpuFrequencyMHz::Level_0:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_4_Mhz);
             break;
-        case bsp::CpuFrequencyHz::Level_1:
+        case bsp::CpuFrequencyMHz::Level_1:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_12_Mhz);
             break;
-        case bsp::CpuFrequencyHz::Level_2:
+        case bsp::CpuFrequencyMHz::Level_2:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_24_Mhz);
             break;
-        case bsp::CpuFrequencyHz::Level_3:
+        case bsp::CpuFrequencyMHz::Level_3:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_66_Mhz);
             break;
-        case bsp::CpuFrequencyHz::Level_4:
+        case bsp::CpuFrequencyMHz::Level_4:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_132_Mhz);
             break;
-        case bsp::CpuFrequencyHz::Level_5:
+        case bsp::CpuFrequencyMHz::Level_5:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_264_Mhz);
             break;
-        case bsp::CpuFrequencyHz::Level_6:
+        case bsp::CpuFrequencyMHz::Level_6:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_528_Mhz);
             break;
         }

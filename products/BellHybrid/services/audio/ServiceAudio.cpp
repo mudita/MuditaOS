@@ -303,7 +303,7 @@ namespace service
     }
     void Audio::manageCpuSentinel()
     {
-        isBusy() ? cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6)
+        isBusy() ? cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6)
                  : cpuSentinel->ReleaseMinimumFrequency();
     }
     void Audio::initializeDatabase()

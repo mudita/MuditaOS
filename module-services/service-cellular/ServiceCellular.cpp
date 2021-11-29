@@ -2116,7 +2116,7 @@ auto ServiceCellular::handleNetworkStatusUpdateNotification(sys::Message *msg) -
 auto ServiceCellular::handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     // when handling URC, the CPU frequency does not go below a certain level
-    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_4);
+    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
     cmux->exitSleepMode();
     return std::make_shared<CellularResponseMessage>(true);
 }

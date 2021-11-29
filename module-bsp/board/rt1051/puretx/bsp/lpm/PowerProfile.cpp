@@ -14,7 +14,7 @@ namespace bsp
         purePowerProfile.maxBelowThresholdCount            = 30;
         purePowerProfile.maxBelowThresholdInRowCount       = 10;
         purePowerProfile.maxAboveThresholdCount            = 3;
-        purePowerProfile.minimalFrequency                  = CpuFrequencyHz::Level_1;
+        purePowerProfile.minimalFrequency                  = CpuFrequencyMHz::Level_1;
         purePowerProfile.frequencyIncreaseIntermediateStep = false;
 
         return purePowerProfile;

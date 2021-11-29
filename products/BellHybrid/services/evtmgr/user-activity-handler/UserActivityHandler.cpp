@@ -9,7 +9,7 @@ namespace evm
     namespace
     {
         constexpr auto userActivityTimerTime = std::chrono::seconds(10);
-        constexpr auto userActivityCPULevel  = bsp::CpuFrequencyHz::Level_5;
+        constexpr auto userActivityCPULevel  = bsp::CpuFrequencyMHz::Level_5;
     } // namespace
 
     UserActivityHandler::UserActivityHandler(std::shared_ptr<sys::CpuSentinel> cpuSentinel, sys::Service *parent)

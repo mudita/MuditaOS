@@ -183,7 +183,7 @@ namespace sys
         void CpuStatisticsTimerHandler();
 
         /// used for power management control for the filesystem
-        void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
+        void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency);
 
         bool cpuStatisticsTimerInit{false};
 

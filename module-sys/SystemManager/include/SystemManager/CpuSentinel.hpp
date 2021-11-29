@@ -12,6 +12,12 @@
 
 namespace sys
 {
+    struct PermanentFrequencyToHold
+    {
+        bool isActive;
+        bsp::CpuFrequencyMHz frequencyToHold;
+    };
+
     /// Each sentinel manages the requests, i.e. when it is needed it sends messages to CpuGovernor with the required
     /// minimum CPU frequency to perform the task (e.g. screen redraw). Furthermore, every sentinel is informed
     /// immediately after changing the frequency. This allows it to invoke a callback to the service to update their
@@ -22,27 +28,35 @@ namespace sys
       public:
         explicit CpuSentinel(std::string name,
                              sys::Service *service,
-                             std::function<void(bsp::CpuFrequencyHz)> callback = nullptr);
+                             std::function<void(bsp::CpuFrequencyMHz)> callback = nullptr);
         ~CpuSentinel() = default;
 
         [[nodiscard]] auto GetName() const noexcept -> std::string;
-        void HoldMinimumFrequency(bsp::CpuFrequencyHz frequencyToHold);
-        bool HoldMinimumFrequencyAndWait(bsp::CpuFrequencyHz frequencyToHold,
+        void HoldMinimumFrequency(bsp::CpuFrequencyMHz frequencyToHold);
+        bool HoldMinimumFrequencyAndWait(bsp::CpuFrequencyMHz frequencyToHold,
                                          TaskHandle_t taskToNotify,
                                          uint32_t timeout);
         void ReleaseMinimumFrequency();
-        void CpuFrequencyHasChanged(bsp::CpuFrequencyHz newFrequency);
+
+        void HoldFrequencyPermanently(bsp::CpuFrequencyMHz frequencyToHold);
+        [[nodiscard]] auto GetFrequency() const noexcept -> bsp::CpuFrequencyMHz;
+        void ReleasePermanentFrequency();
+        [[nodiscard]] bool isPermanentFrequencyActive();
+
+        void CpuFrequencyHasChanged(bsp::CpuFrequencyMHz newFrequency);
+        void ReadRegistrationData(bsp::CpuFrequencyMHz frequencyHz, bool permanentFrequency);
 
       protected:
         const std::string name;
-        bsp::CpuFrequencyHz currentFrequencyToHold{bsp::CpuFrequencyHz::Level_0};
-        std::atomic<bsp::CpuFrequencyHz> currentFrequency{bsp::CpuFrequencyHz::Level_0};
+        bsp::CpuFrequencyMHz currentFrequencyToHold{bsp::CpuFrequencyMHz::Level_0};
+        PermanentFrequencyToHold permanentFrequencyToHold{false, bsp::CpuFrequencyMHz::Level_0};
+        std::atomic<bsp::CpuFrequencyMHz> currentFrequency{bsp::CpuFrequencyMHz::Level_0};
         sys::Service *owner{nullptr};
 
         /// function called from the PowerManager context
         /// to update resources immediately
         /// critical section or mutex support necessary
-        std::function<void(bsp::CpuFrequencyHz)> callback;
+        std::function<void(bsp::CpuFrequencyMHz)> callback;
 
         TaskHandle_t taskHandle = nullptr;
     };

@@ -91,7 +91,8 @@ enum class MessageType
 
     // System manager
     SystemManagerCpuFrequency,
-    SystemManagerRegistration,
+    SystemManagerSentinelRegistration,
+    SystemManagerSentinelRemoval,
 
     // rtc messages
     EVMMinuteUpdated, ///< This message is send to current focused application on every minute time change.
