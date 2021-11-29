@@ -3,7 +3,7 @@
 
 #include "OnBoardingFinalizeWindow.hpp"
 
-#include <Icon.hpp>
+#include <gui/widgets/Icon.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui
@@ -38,8 +38,7 @@ namespace gui
     {
         BellFinishedWindow::onBeforeShow(mode, data);
 
-        icon->image->set("bell_very_big_logo", ImageTypeSpecifier::W_G);
-        icon->text->setFont(style::window::font::verybiglight);
-        icon->text->setText(utils::translate("app_bell_onboarding_finalize"));
+        icon->image->set("circle_success_big");
+        icon->setY(0);
     }
 } // namespace gui
