@@ -1,4 +1,4 @@
-FROM wearemudita/mudita_os_builder:1.12
+FROM wearemudita/mudita_os_builder:latest
 
 MAINTAINER ops@mudita.com
 # Docker runner for MuditaOS builds
@@ -28,11 +28,12 @@ RUN sed -i /etc/ssh/sshd_config \
 
 RUN mkdir -p /var/run/sshd
 
-RUN adduser --quiet --gecos '' --disabled-password jenkins 
+RUN adduser --quiet --gecos '' --disabled-password --uid 6666 jenkins
 
 COPY .ssh/authorized_keys /home/jenkins/.ssh/authorized_keys
 COPY start-sshd /usr/local/bin/start-sshd
 RUN chown -R jenkins:jenkins /home/jenkins/.ssh
+RUN cat /etc/profile.d/setup_path.sh >> /home/jenkins/.bashrc
 
 #RUN chmod -x /cmd.sh && \
 #    chmod -x /entrypoint.sh

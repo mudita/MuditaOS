@@ -31,12 +31,10 @@ ADD assets/@ARM_GCC_PKG@ /usr/local/
 # CMake
 ADD assets/@CMAKE_PKG@ /usr/local/
 
-ADD assets/@GH_RUNNER_PKG@ /home/runner/app
-
 ENV CMAKE_NAME="/usr/local/@CMAKE_NAME@"
 ENV ARM_GCC="/usr/local/@ARM_GCC@"
 
-ENV PATH="/user/local/actions-runner:/usr/local/@CMAKE_NAME@/bin:/usr/local/@ARM_GCC@/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ENV PATH="/user/local/actions-runner:/usr/local/@CMAKE_NAME@/bin:/usr/local/@ARM_GCC@/bin:$PATH"
 ENV TERM="xterm-256color"
 
 ADD assets/.bashrc /home/docker/
@@ -45,6 +43,8 @@ COPY assets/cmd.sh /cmd.sh
 COPY assets/entrypoint.sh /entrypoint.sh
 COPY ci_actions.sh /ci_actions.sh
 
+RUN echo "export PATH="/user/local/actions-runner:/usr/local/@CMAKE_NAME@/bin:/usr/local/@ARM_GCC@/bin:$PATH"" > /etc/profile.d/setup_path.sh
+RUN chmod +x /etc/profile.d/setup_path.sh
 RUN chmod +x /cmd.sh && \
     chmod +x /entrypoint.sh && \
     groupadd -r runner && \
