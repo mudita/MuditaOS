@@ -3,7 +3,7 @@ SCRIPT=$(readlink -f $0)
 SCRIPT_DIR="$(dirname ${SCRIPT})"
 SRC_ROOT=$(readlink -f ${SCRIPT_DIR}/..)
 
-source ${SRC_ROOT}/config/common_scripsts_lib
+source ${SRC_ROOT}/config/common_scripts_lib
 source ${SRC_ROOT}/config/bootstrap_config
 
 DOCKER_DIR=${SRC_ROOT}/docker
@@ -17,7 +17,6 @@ INSTALL_PACKAGES=$( echo "${INSTALL_PACKAGES}" | tr "\n" " "| tr -s " ")
 function prepareDockerFile() {
     sed -e "s#@ARM_GCC_PKG@#${ARM_GCC_PKG}#g" \
         -e "s#@CMAKE_PKG@#${CMAKE_PKG}#g" \
-        -e "s#@GH_RUNNER_PKG@#${GH_RUNNER_PKG}#g" \
         -e "s#@CMAKE_NAME@#${CMAKE_NAME}#g" \
         -e "s#@ARM_GCC@#${ARM_GCC}#g;" \
         -e "s#@DOCKER_TIMEZONE@#${DOCKER_TIMEZONE}#g;" \

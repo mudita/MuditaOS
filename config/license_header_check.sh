@@ -9,7 +9,7 @@ SCRIPT_DIR="$(dirname ${SCRIPT})"
 REPO_ROOT="${SCRIPT_DIR%/*}"
 
 #. ${SCRIPT_DIR}/bootstrap_config
-. ${SCRIPT_DIR}/common_scripsts_lib
+. ${SCRIPT_DIR}/common_scripts_lib
 . ${SCRIPT_DIR}/format-config.sh
 
 #printVar SCRIPT
