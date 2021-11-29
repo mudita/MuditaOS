@@ -151,7 +151,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             usbStatus = bsp::USBDeviceStatus::Connected;
         }
         else if (notification == bsp::USBDeviceStatus::Configured) {
-            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_4);
+            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
             if (usbStatus == bsp::USBDeviceStatus::Connected) {
                 ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConfigured>(
                                                   sdesktop::usb::USBConfigurationType::firstConfiguration),

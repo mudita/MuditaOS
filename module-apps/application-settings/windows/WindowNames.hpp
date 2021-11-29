@@ -9,6 +9,7 @@ namespace gui::window::name
     inline constexpr auto information         = "Information";
     inline constexpr auto ui_test             = "UI Test";
     inline constexpr auto color_test_window   = "Color Test";
+    inline constexpr auto cpu_test_window     = "CPUModeTest";
     inline constexpr auto status_bar_img_type = "StatusBarImgType";
     inline constexpr auto text_image_color    = "TextImageColor";
 

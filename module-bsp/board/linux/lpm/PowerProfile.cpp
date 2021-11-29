@@ -14,7 +14,7 @@ namespace bsp
         linuxPowerProfile.maxBelowThresholdCount            = 30;
         linuxPowerProfile.maxBelowThresholdInRowCount       = 10;
         linuxPowerProfile.maxAboveThresholdCount            = 3;
-        linuxPowerProfile.minimalFrequency                  = CpuFrequencyHz::Level_1;
+        linuxPowerProfile.minimalFrequency                  = CpuFrequencyMHz::Level_1;
         linuxPowerProfile.frequencyIncreaseIntermediateStep = false;
 
         return linuxPowerProfile;

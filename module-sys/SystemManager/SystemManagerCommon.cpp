@@ -570,6 +570,13 @@ namespace sys
             return sys::MessageNone{};
         });
 
+        connect(typeid(sys::SentinelRemovalMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::SentinelRemovalMessage *>(message);
+            powerManager->RemoveSentinel(msg->getSentinelName());
+
+            return sys::MessageNone{};
+        });
+
         connect(typeid(sys::HoldCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::HoldCpuFrequencyMessage *>(message);
             powerManager->SetCpuFrequencyRequest(msg->getName(), msg->getRequest());
@@ -581,6 +588,19 @@ namespace sys
             auto msg = static_cast<sys::ReleaseCpuFrequencyMessage *>(message);
             powerManager->ResetCpuFrequencyRequest(msg->getName());
 
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(sys::HoldCpuFrequencyPermanentlyMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::HoldCpuFrequencyPermanentlyMessage *>(message);
+            powerManager->SetCpuFrequencyRequest(msg->getName(), msg->getRequest(), true);
+
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(sys::ReleaseCpuPermanentFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::ReleaseCpuPermanentFrequencyMessage *>(message);
+            powerManager->ResetCpuFrequencyRequest(msg->getName(), true);
             return sys::MessageNone{};
         });
 
@@ -612,7 +632,7 @@ namespace sys
         deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
 
         cpuSentinel = std::make_shared<sys::CpuSentinel>(
-            service::name::system_manager, this, [this](bsp::CpuFrequencyHz newFrequency) {
+            service::name::system_manager, this, [this](bsp::CpuFrequencyMHz newFrequency) {
                 UpdateResourcesAfterCpuFrequencyChange(newFrequency);
             });
         powerManager->RegisterNewSentinel(cpuSentinel);
@@ -699,9 +719,9 @@ namespace sys
         powerManager->UpdateCpuFrequency(cpuStatistics->GetPercentageCpuLoad());
     }
 
-    void SystemManagerCommon::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
+    void SystemManagerCommon::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency)
     {
-        if (newFrequency <= bsp::CpuFrequencyHz::Level_1) {
+        if (newFrequency <= bsp::CpuFrequencyMHz::Level_1) {
             purefs::subsystem::disk_mgr()->pm_control(purefs::blkdev::pm_state::suspend);
         }
         else {

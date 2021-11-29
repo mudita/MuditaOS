@@ -51,7 +51,7 @@ namespace
 } // namespace
 
 EventManagerSentinel::EventManagerSentinel(std::shared_ptr<sys::CpuSentinel> cpuSentinel,
-                                           bsp::CpuFrequencyHz frequencyToHold)
+                                           bsp::CpuFrequencyMHz frequencyToHold)
     : cpuSentinel(cpuSentinel)
 {
     cpuSentinel->HoldMinimumFrequency(frequencyToHold);

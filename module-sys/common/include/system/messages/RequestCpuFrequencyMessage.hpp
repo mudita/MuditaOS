@@ -12,7 +12,7 @@ namespace sys
     class HoldCpuFrequencyMessage : public sys::DataMessage
     {
       public:
-        HoldCpuFrequencyMessage(std::string sentinelName, bsp::CpuFrequencyHz request)
+        HoldCpuFrequencyMessage(std::string sentinelName, bsp::CpuFrequencyMHz request)
             : sys::DataMessage(MessageType::SystemManagerCpuFrequency), sentinelName(std::move(sentinelName)),
               frequencyRequested(request)
         {}
@@ -29,7 +29,7 @@ namespace sys
 
       private:
         std::string sentinelName;
-        bsp::CpuFrequencyHz frequencyRequested = bsp::CpuFrequencyHz::Level_0;
+        bsp::CpuFrequencyMHz frequencyRequested = bsp::CpuFrequencyMHz::Level_0;
     };
 
     class ReleaseCpuFrequencyMessage : public sys::DataMessage
@@ -46,6 +46,21 @@ namespace sys
 
       private:
         std::string sentinelName;
+    };
+
+    class HoldCpuFrequencyPermanentlyMessage : public HoldCpuFrequencyMessage
+    {
+      public:
+        HoldCpuFrequencyPermanentlyMessage(std::string sentinelName, bsp::CpuFrequencyMHz request)
+            : HoldCpuFrequencyMessage(sentinelName, request)
+        {}
+    };
+
+    class ReleaseCpuPermanentFrequencyMessage : public ReleaseCpuFrequencyMessage
+    {
+      public:
+        ReleaseCpuPermanentFrequencyMessage(std::string sentinelName) : ReleaseCpuFrequencyMessage(sentinelName)
+        {}
     };
 
 } // namespace sys

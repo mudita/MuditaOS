@@ -183,7 +183,7 @@ namespace bell::screen_light_control
 
     void ScreenLightController::cpuSentinelKeepOn()
     {
-        cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6);
+        cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
     }
 
     void ScreenLightController::cpuSentinelRelease()

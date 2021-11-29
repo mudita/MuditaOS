@@ -15,7 +15,7 @@ namespace bsp
         std::uint32_t maxBelowThresholdCount;
         std::uint32_t maxBelowThresholdInRowCount;
         std::uint32_t maxAboveThresholdCount;
-        CpuFrequencyHz minimalFrequency;
+        CpuFrequencyMHz minimalFrequency;
         bool frequencyIncreaseIntermediateStep;
     };
 

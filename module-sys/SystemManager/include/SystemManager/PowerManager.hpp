@@ -51,23 +51,26 @@ namespace sys
         [[nodiscard]] auto getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>;
 
         void RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel) const;
-        void SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request);
-        void ResetCpuFrequencyRequest(std::string sentinelName);
+        void RemoveSentinel(std::string sentinelName) const;
+        void SetCpuFrequencyRequest(std::string sentinelName,
+                                    bsp::CpuFrequencyMHz request,
+                                    bool permanentBlock = false);
+        void ResetCpuFrequencyRequest(std::string sentinelName, bool permanentBlock = false);
         void LogPowerManagerEfficiency();
         void SetBootSuccess();
 
       private:
         /// called when the CPU frequency needs to be increased
-        void IncreaseCpuFrequency(bsp::CpuFrequencyHz newFrequency);
+        void IncreaseCpuFrequency(bsp::CpuFrequencyMHz newFrequency);
 
         /// called when the CPU frequency needs to be reduced
         /// @note the frequency is always reduced by one step
         void DecreaseCpuFrequency();
 
         void ResetFrequencyShiftCounter();
-        void SetCpuFrequency(bsp::CpuFrequencyHz freq);
+        void SetCpuFrequency(bsp::CpuFrequencyMHz freq);
 
-        void UpdateCpuFrequencyMonitor(bsp::CpuFrequencyHz currentFreq);
+        void UpdateCpuFrequencyMonitor(bsp::CpuFrequencyMHz currentFreq);
 
         uint32_t belowThresholdCounter{0};
         uint32_t aboveThresholdCounter{0};

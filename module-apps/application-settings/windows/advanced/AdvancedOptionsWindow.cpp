@@ -28,6 +28,7 @@ std::list<gui::Option> advancedOptions(app::ApplicationCommon *app)
     addMenu("Color Test", gui::window::name::color_test_window);
     addMenu("Statusbar Image Test", gui::window::name::status_bar_img_type);
     addMenu("Text Image Color test", gui::window::name::text_image_color);
+    addMenu("CPU Mode Test", gui::window::name::cpu_test_window);
 
     return l;
 }

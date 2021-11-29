@@ -147,7 +147,7 @@ bool WorkerEventCommon::initCommonHardwareComponents()
     bsp::rtc::getCurrentTimestamp(&timestamp);
     bsp::rtc::setMinuteAlarm(timestamp);
 
-    cpuSentinel = std::make_shared<sys::CpuSentinel>("WorkerEvent", service, [this](bsp::CpuFrequencyHz newFrequency) {
+    cpuSentinel = std::make_shared<sys::CpuSentinel>("WorkerEvent", service, [this](bsp::CpuFrequencyMHz newFrequency) {
         updateResourcesAfterCpuFrequencyChange(newFrequency);
     });
 
@@ -215,7 +215,7 @@ void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code
     service->bus.sendUnicast(message, service::name::evt_manager);
 }
 
-void WorkerEventCommon::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
+void WorkerEventCommon::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency)
 {
     bsp::eink_frontlight::updateClockFrequency(newFrequency);
     bsp::vibrator::updateClockFrequency(newFrequency);

@@ -69,7 +69,7 @@ class WorkerEventCommon : public sys::Worker
      * @param code key code
      * @note It sends message to service if event is processed successfully.
      */
-    void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
+    void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency);
     bool initEventQueues();
     bool initCommonHardwareComponents();
 

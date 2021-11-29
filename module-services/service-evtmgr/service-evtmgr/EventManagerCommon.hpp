@@ -26,7 +26,7 @@ class WorkerEventCommon;
 class EventManagerSentinel
 {
   public:
-    explicit EventManagerSentinel(std::shared_ptr<sys::CpuSentinel> cpuSentinel, bsp::CpuFrequencyHz frequencyToHold);
+    explicit EventManagerSentinel(std::shared_ptr<sys::CpuSentinel> cpuSentinel, bsp::CpuFrequencyMHz frequencyToHold);
     ~EventManagerSentinel();
 
   private:

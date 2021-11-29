@@ -29,7 +29,7 @@ namespace bsp{
         return inst;
     }
 
-    CpuFrequencyHz LowPowerMode::GetCurrentFrequencyLevel() const noexcept
+    CpuFrequencyMHz LowPowerMode::GetCurrentFrequencyLevel() const noexcept
     {
     	return currentFrequency;
     }

@@ -10,8 +10,8 @@ namespace service::eink
 {
     namespace
     {
-        constexpr auto RedrawLockedEinkCpuFrequency   = bsp::CpuFrequencyHz::Level_4;
-        constexpr auto RedrawUnlockedEinkCpuFrequency = bsp::CpuFrequencyHz::Level_6;
+        constexpr auto RedrawLockedEinkCpuFrequency   = bsp::CpuFrequencyMHz::Level_4;
+        constexpr auto RedrawUnlockedEinkCpuFrequency = bsp::CpuFrequencyMHz::Level_6;
     } // namespace
 
     EinkSentinel::EinkSentinel(std::string name, sys::Service *service) : sys::CpuSentinel(name, service)

@@ -73,10 +73,26 @@ namespace sys
 
     void PowerManager::UpdateCpuFrequency(uint32_t cpuLoad)
     {
-        const auto currentCpuFreq        = lowPowerControl->GetCurrentFrequencyLevel();
-        const auto minFrequencyRequested = cpuGovernor->GetMinimumFrequencyRequested();
+        const auto currentCpuFreq           = lowPowerControl->GetCurrentFrequencyLevel();
+        const auto minFrequencyRequested    = cpuGovernor->GetMinimumFrequencyRequested();
+        const auto permanentFrequencyToHold = cpuGovernor->GetPermanentFrequencyRequested();
 
-        if (cpuLoad > powerProfile.frequencyShiftUpperThreshold && currentCpuFreq < bsp::CpuFrequencyHz::Level_6) {
+        if (permanentFrequencyToHold.isActive) {
+            auto frequencyToHold = std::max(permanentFrequencyToHold.frequencyToHold, powerProfile.minimalFrequency);
+
+            if (currentCpuFreq < frequencyToHold) {
+                IncreaseCpuFrequency(frequencyToHold);
+            }
+            else if (currentCpuFreq > frequencyToHold) {
+                do {
+                    DecreaseCpuFrequency();
+                } while (lowPowerControl->GetCurrentFrequencyLevel() > frequencyToHold);
+            }
+            ResetFrequencyShiftCounter();
+            return;
+        }
+
+        if (cpuLoad > powerProfile.frequencyShiftUpperThreshold && currentCpuFreq < bsp::CpuFrequencyMHz::Level_6) {
             aboveThresholdCounter++;
             belowThresholdCounter = 0;
         }
@@ -98,13 +114,13 @@ namespace sys
             IncreaseCpuFrequency(minFrequencyRequested);
         }
         else if (aboveThresholdCounter >= powerProfile.maxAboveThresholdCount) {
-            if (powerProfile.frequencyIncreaseIntermediateStep && currentCpuFreq < bsp::CpuFrequencyHz::Level_4) {
+            if (powerProfile.frequencyIncreaseIntermediateStep && currentCpuFreq < bsp::CpuFrequencyMHz::Level_4) {
                 ResetFrequencyShiftCounter();
-                IncreaseCpuFrequency(bsp::CpuFrequencyHz::Level_4);
+                IncreaseCpuFrequency(bsp::CpuFrequencyMHz::Level_4);
             }
             else {
                 ResetFrequencyShiftCounter();
-                IncreaseCpuFrequency(bsp::CpuFrequencyHz::Level_6);
+                IncreaseCpuFrequency(bsp::CpuFrequencyMHz::Level_6);
             }
         }
         else {
@@ -117,11 +133,11 @@ namespace sys
         }
     }
 
-    void PowerManager::IncreaseCpuFrequency(bsp::CpuFrequencyHz newFrequency)
+    void PowerManager::IncreaseCpuFrequency(bsp::CpuFrequencyMHz newFrequency)
     {
         const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
 
-        if ((freq <= bsp::CpuFrequencyHz::Level_1) && (newFrequency > bsp::CpuFrequencyHz::Level_1)) {
+        if ((freq <= bsp::CpuFrequencyMHz::Level_1) && (newFrequency > bsp::CpuFrequencyMHz::Level_1)) {
             // connect internal the load resistor
             lowPowerControl->ConnectInternalLoadResistor();
             // turn off power save mode for DCDC inverter
@@ -137,8 +153,8 @@ namespace sys
                 driverSEMC->SwitchToPLL2ClockSource();
             }
             // Add intermediate step in frequency
-            if (newFrequency > bsp::CpuFrequencyHz::Level_4)
-                SetCpuFrequency(bsp::CpuFrequencyHz::Level_4);
+            if (newFrequency > bsp::CpuFrequencyMHz::Level_4)
+                SetCpuFrequency(bsp::CpuFrequencyMHz::Level_4);
         }
 
         // and increase frequency
@@ -153,24 +169,24 @@ namespace sys
         auto level      = powerProfile.minimalFrequency;
 
         switch (freq) {
-        case bsp::CpuFrequencyHz::Level_6:
-            level = bsp::CpuFrequencyHz::Level_5;
+        case bsp::CpuFrequencyMHz::Level_6:
+            level = bsp::CpuFrequencyMHz::Level_5;
             break;
-        case bsp::CpuFrequencyHz::Level_5:
-            level = bsp::CpuFrequencyHz::Level_4;
+        case bsp::CpuFrequencyMHz::Level_5:
+            level = bsp::CpuFrequencyMHz::Level_4;
             break;
-        case bsp::CpuFrequencyHz::Level_4:
-            level = bsp::CpuFrequencyHz::Level_3;
+        case bsp::CpuFrequencyMHz::Level_4:
+            level = bsp::CpuFrequencyMHz::Level_3;
             break;
-        case bsp::CpuFrequencyHz::Level_3:
-            level = bsp::CpuFrequencyHz::Level_2;
+        case bsp::CpuFrequencyMHz::Level_3:
+            level = bsp::CpuFrequencyMHz::Level_2;
             break;
-        case bsp::CpuFrequencyHz::Level_2:
+        case bsp::CpuFrequencyMHz::Level_2:
             level = powerProfile.minimalFrequency;
             break;
-        case bsp::CpuFrequencyHz::Level_1:
+        case bsp::CpuFrequencyMHz::Level_1:
             [[fallthrough]];
-        case bsp::CpuFrequencyHz::Level_0:
+        case bsp::CpuFrequencyMHz::Level_0:
             break;
         }
 
@@ -179,7 +195,7 @@ namespace sys
             SetCpuFrequency(level);
         }
 
-        if (level <= bsp::CpuFrequencyHz::Level_1) {
+        if (level <= bsp::CpuFrequencyMHz::Level_1) {
             // Enable weak 2P5 and 1P1 LDO and Turn off regular 2P5 and 1P1 LDO
             lowPowerControl->SwitchToLowPowerModeLDO();
 
@@ -203,20 +219,30 @@ namespace sys
 
     void PowerManager::RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel) const
     {
-        cpuGovernor->RegisterNewSentinel(newSentinel);
+        if (cpuGovernor->RegisterNewSentinel(newSentinel)) {
+            newSentinel->ReadRegistrationData(lowPowerControl->GetCurrentFrequencyLevel(),
+                                              cpuGovernor->GetPermanentFrequencyRequested().isActive);
+        }
     }
 
-    void PowerManager::SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request)
+    void PowerManager::RemoveSentinel(std::string sentinelName) const
     {
-        cpuGovernor->SetCpuFrequencyRequest(std::move(sentinelName), request);
+        cpuGovernor->RemoveSentinel(sentinelName);
     }
 
-    void PowerManager::ResetCpuFrequencyRequest(std::string sentinelName)
+    void PowerManager::SetCpuFrequencyRequest(std::string sentinelName,
+                                              bsp::CpuFrequencyMHz request,
+                                              bool permanentBlock)
     {
-        cpuGovernor->ResetCpuFrequencyRequest(std::move(sentinelName));
+        cpuGovernor->SetCpuFrequencyRequest(std::move(sentinelName), request, permanentBlock);
     }
 
-    void PowerManager::SetCpuFrequency(bsp::CpuFrequencyHz freq)
+    void PowerManager::ResetCpuFrequencyRequest(std::string sentinelName, bool permanentBlock)
+    {
+        cpuGovernor->ResetCpuFrequencyRequest(std::move(sentinelName), permanentBlock);
+    }
+
+    void PowerManager::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
     {
         UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
         lowPowerControl->SetCpuFrequency(freq);
@@ -234,12 +260,12 @@ namespace sys
         return driverSEMC;
     }
 
-    void PowerManager::UpdateCpuFrequencyMonitor(bsp::CpuFrequencyHz currentFreq)
+    void PowerManager::UpdateCpuFrequencyMonitor(bsp::CpuFrequencyMHz currentFreq)
     {
         auto ticks     = xTaskGetTickCount();
         auto levelName = currentFreq == powerProfile.minimalFrequency
                              ? lowestLevelName
-                             : (currentFreq == bsp::CpuFrequencyHz::Level_6 ? highestLevelName : middleLevelName);
+                             : (currentFreq == bsp::CpuFrequencyMHz::Level_6 ? highestLevelName : middleLevelName);
 
         for (auto &level : cpuFrequencyMonitor) {
             if (level.GetName() == levelName) {
@@ -266,5 +292,4 @@ namespace sys
     {
         lowPowerControl->SetBootSuccess();
     }
-
 } // namespace sys

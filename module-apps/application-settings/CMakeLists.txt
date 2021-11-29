@@ -47,6 +47,7 @@ target_sources(application-settings
         windows/SettingsMainWindow.cpp
         windows/advanced/AdvancedOptionsWindow.cpp
         windows/advanced/ColorTestWindow.cpp
+        windows/advanced/CPUModeTestWindow.cpp
         windows/advanced/InformationWindow.cpp
         windows/advanced/TextImageColorWindow.cpp
         windows/advanced/UITestWindow.cpp

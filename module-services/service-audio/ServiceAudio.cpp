@@ -683,7 +683,7 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     }
 
     if (const auto curIsBusy = IsBusy(); isBusy != curIsBusy) {
-        curIsBusy ? cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6)
+        curIsBusy ? cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6)
                   : cpuSentinel->ReleaseMinimumFrequency();
     }
 

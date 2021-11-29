@@ -28,7 +28,7 @@ namespace CellularCall
         }
 
         if (cpuSentinel) {
-            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6);
+            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
         }
 
         clear();

@@ -13,15 +13,15 @@ namespace bsp
 
     /// CPU frequency is dependent on the clock settings.
     /// Only a few thresholds are available in the current configuration
-    enum class CpuFrequencyHz
+    enum class CpuFrequencyMHz
     {
-        Level_0 = 4000000,
-        Level_1 = 12000000,
-        Level_2 = 24000000,
-        Level_3 = 66000000,
-        Level_4 = 132000000,
-        Level_5 = 264000000,
-        Level_6 = 528000000
+        Level_0 = 4,
+        Level_1 = 12,
+        Level_2 = 24,
+        Level_3 = 66,
+        Level_4 = 132,
+        Level_5 = 264,
+        Level_6 = 528
     };
 
     enum class Board{
