@@ -8,19 +8,12 @@ ARM_GCC_PATH_VAR="${ARM_GCC//-/_}"
 ARM_GCC_MD5="8312c4c91799885f222f663fc81f9a31"
 
 CMAKE_VERSION="3.21.3"
-CMAKE_NAME="cmake-${CMAKE_VERSION}-Linux-x86_64"
+CMAKE_NAME="cmake-${CMAKE_VERSION}-linux-x86_64"
 CMAKE_SOURCE_LINK="https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_NAME}.tar.gz"
 CMAKE_PKG="${CMAKE_SOURCE_LINK##*/}"
 CMAKE_PATH_VAR=${CMAKE_NAME//[-.]/_}
 CMAKE_SHA_LINK="https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-SHA-256.txt"
 CMAKE_SHA_FILE="${CMAKE_SHA_LINK##*/}"
-
-
-GH_RUNNER_VERSION="2.277.1"
-GH_RUNNER_NAME="actions-runner-linux-x64-${GH_RUNNER_VERSION}"
-GH_RUNNER_LINK="https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/${GH_RUNNER_NAME}.tar.gz"
-GH_RUNNER_PKG="${GH_RUNNER_LINK##*/}"
-GH_RUNNER_PATH_VAR=${GH_RUNNER_NAME//[-.]/_}
 
 INSTALL_PACKAGES=" 
         apt-utils \
