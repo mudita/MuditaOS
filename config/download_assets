@@ -9,7 +9,7 @@ DEST_DIR="${SRC_ROOT}/docker/assets"
 DEST_PYREQ_TMP="${DEST_DIR}/requirements.txt.tmp"
 DEST_PYREQ="${DEST_DIR}/requirements.txt"
 
-. ${SRC_ROOT}/config/common_scripsts_lib
+. ${SRC_ROOT}/config/common_scripts_lib
 . ${SRC_ROOT}/config/bootstrap_config
 
 printVar SCRIPT
@@ -34,11 +34,6 @@ function get_cmake() {
     sha256sum -c ${CMAKE_SHA_FILE}
 }
 
-function get_gh_runner() {
-    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
-    wget --no-verbose --show-progress -c -O ${GH_RUNNER_PKG} ${GH_RUNNER_LINK}
-}
-
 function getPythonReq() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     cat ${SRC_ROOT}/test/requirements.txt > ${DEST_PYREQ_TMP}
@@ -48,7 +43,6 @@ function getPythonReq() {
 
 get_arm_toolchain
 get_cmake
-get_gh_runner
 getPythonReq
 
 
