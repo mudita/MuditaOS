@@ -65,6 +65,8 @@ namespace gui
         void switchToMenu() override;
         void switchToBatteryStatus() override;
 
+        bool updateBatteryStatus() override;
+
         BellBaseLayout *body{};
 
         TimeSetFmtSpinner *time{};

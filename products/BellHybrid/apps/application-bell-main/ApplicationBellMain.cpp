@@ -165,10 +165,7 @@ namespace app
 
     bool ApplicationBellMain::isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const
     {
-        if (blockAllPopups) {
-            return false;
-        }
-        return true;
+        return !blockAllPopups;
     }
 
     void ApplicationBellMain::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
