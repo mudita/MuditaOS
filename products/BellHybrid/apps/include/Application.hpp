@@ -21,6 +21,7 @@ namespace app
         void restartIdleTimer();
         void stopIdleTimer();
         void stopAllAudio();
+        virtual void onStop();
 
       private:
         sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl) override;
@@ -31,7 +32,6 @@ namespace app
 
         virtual void onKeyPressed();
         virtual void onStart();
-        virtual void onStop();
         bool idleTimerActiveFlag = true;
     };
 } // namespace app

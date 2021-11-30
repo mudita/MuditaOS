@@ -117,7 +117,6 @@ namespace app
     void Application::onStop()
     {
         stopIdleTimer();
-        stopAllAudio();
     }
 
     void Application::stopAllAudio()
