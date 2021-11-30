@@ -11,11 +11,6 @@ namespace gui::powerNapStyle
     inline constexpr auto napTimerFont    = style::window::font::verybig;
     inline constexpr auto napPeriodFont   = style::window::font::supersizeme;
     inline constexpr auto clockFont       = style::window::font::verybiglight;
-    namespace listItem
-    {
-        inline constexpr auto timeUnitSingular = "common_minute_lower";
-        inline constexpr auto timeUnitPlural   = "common_minutes_lower";
-    } // namespace listItem
 
     namespace progress
     {

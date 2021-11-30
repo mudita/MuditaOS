@@ -84,7 +84,6 @@ namespace gui
         time = new BellStatusClock(body->firstBox);
         time->setMaximumSize(body->firstBox->getWidth(), body->firstBox->getHeight());
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        updateTime();
         body->firstBox->resizeItems();
 
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
@@ -140,5 +139,11 @@ namespace gui
             presenter->handleUpdateTimeEvent();
         }
         return true;
+    }
+
+    void PowerNapProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        presenter->onBeforeShow();
+        updateTime();
     }
 } // namespace gui

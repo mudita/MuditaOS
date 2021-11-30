@@ -3,5 +3,9 @@
 
 #pragma once
 
-#cmakedefine01 CONFIG_ENABLE_TEMP
-#cmakedefine01 CONFIG_SHOW_MEMORY_INFO
+#include <string>
+
+namespace utils::language
+{
+    auto getCorrectMinutesNumeralForm(int val) -> std::string;
+} // namespace utils::language

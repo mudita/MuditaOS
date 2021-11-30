@@ -8,7 +8,8 @@
 
 namespace gui
 {
-    inline constexpr auto defautTimeout = std::chrono::seconds{3};
+    inline constexpr auto defautTimeout   = std::chrono::seconds{3};
+    inline constexpr auto noTimeoutChange = std::chrono::seconds::zero();
     class WindowWithTimer : public gui::AppWindow
     {
       private:
@@ -27,6 +28,6 @@ namespace gui
 
       protected:
         void detachTimerIfExists();
-        void resetTimer(const std::chrono::seconds newTimeout = defautTimeout);
+        void resetTimer(const std::chrono::seconds newTimeout = noTimeoutChange);
     };
 } // namespace gui

@@ -5,19 +5,12 @@
 #include <i18n/i18n.hpp>
 #include "data/PowerNapStyle.hpp"
 
+#include <common/LanguageUtils.hpp>
 namespace
 {
     inline constexpr auto spinnerMax  = 180U;
     inline constexpr auto spinnerMin  = 1U;
     inline constexpr auto spinnerStep = 1U;
-
-    std::string getTimeUnitName(int currentSpinnerValue)
-    {
-        using namespace gui::powerNapStyle::listItem;
-        const auto isSingular = currentSpinnerValue == 1;
-        return utils::translate(isSingular ? timeUnitSingular : timeUnitPlural);
-    }
-
 } // namespace
 namespace gui
 {
@@ -72,7 +65,7 @@ namespace gui
 
         inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
             if (body->onInput(inputEvent)) {
-                setBottomDescribtionText(getTimeUnitName(spinner->getCurrentValue()));
+                setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(spinner->getCurrentValue()));
                 return true;
             }
             return false;
@@ -87,7 +80,7 @@ namespace gui
     void PowerNapListItem::setSpinnerValue(int value)
     {
         spinner->setCurrentValue(value);
-        setBottomDescribtionText(getTimeUnitName(spinner->getCurrentValue()));
+        setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(spinner->getCurrentValue()));
         onValueChanged(value);
     }
 

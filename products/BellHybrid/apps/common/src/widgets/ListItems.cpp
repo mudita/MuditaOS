@@ -103,7 +103,7 @@ namespace gui
         inputCallback = [&, range](Item &item, const InputEvent &event) {
             const auto result = OnInputCallback(event);
             bottomText->setVisible(spinner->getCurrentValue().getValue().has_value());
-            setArrowsVisibility(range);
+            setArrowsVisibility();
             return result;
         };
 
@@ -117,7 +117,7 @@ namespace gui
             const auto val = spinner->getCurrentValue().getValue();
             model.setValue(not val ? 0 : *val);
         };
-        setValue = [&model, this, range]() {
+        setValue = [&model, this]() {
             const auto modelValue = model.getValue();
             if (modelValue > 0) {
                 spinner->setCurrentValue(Value{modelValue, minStr});
@@ -125,7 +125,7 @@ namespace gui
             else {
                 spinner->setCurrentValue(Value{minStr});
             }
-            setArrowsVisibility(range);
+            setArrowsVisibility();
         };
     }
 
@@ -134,10 +134,13 @@ namespace gui
         return not spinner->getCurrentValue().getValue().has_value();
     }
 
-    void NumWithStringListItem::setArrowsVisibility(const NumWithStringSpinner::Range &range)
+    void NumWithStringListItem::setArrowsVisibility()
     {
-        const auto selectedVal = spinner->getCurrentValue();
-        body->setMinMaxArrowsVisibility(selectedVal == range.front(), selectedVal == range.back());
+        body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
+    }
+    NumWithString<uint32_t, UTF8> NumWithStringListItem::getCurrentValue()
+    {
+        return spinner->getCurrentValue();
     }
 
     UTF8ListItem::UTF8ListItem(AbstractSettingsModel<UTF8> &model,

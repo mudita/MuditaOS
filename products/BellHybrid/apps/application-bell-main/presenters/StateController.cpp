@@ -171,12 +171,12 @@ namespace app::home_screen
             };
 
             auto processRotateLeft = [](AbstractView &view, AbstractPresenter &presenter) {
-                presenter.spawnTimer();
+                presenter.spawnTimer(defaultAlarmSetTime);
                 view.decAlarmMinute();
             };
 
             auto processRotateRight = [](AbstractView &view, AbstractPresenter &presenter) {
-                presenter.spawnTimer();
+                presenter.spawnTimer(defaultAlarmSetTime);
                 view.incAlarmMinute();
             };
         } // namespace AlarmEdit
@@ -381,7 +381,7 @@ namespace app::home_screen
                                              "AlarmRingingDeactivatedWait"_s + sml::on_exit<_> / AlarmRingingDeactivatedWait::exit,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::Reset> = "Init"_s,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::Timer> = "Deactivated"_s,
-                                             "AlarmRingingDeactivatedWait"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s,
+                                             "AlarmRingingDeactivatedWait"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::BackPress> = "Deactivated"_s,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::RotateLeftPress> = "DeactivatedEdit"_s,

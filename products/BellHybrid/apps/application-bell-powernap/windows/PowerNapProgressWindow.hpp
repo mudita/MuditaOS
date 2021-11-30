@@ -30,6 +30,8 @@ namespace gui
 
         void napEnded() override;
 
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
       public:
         PowerNapProgressWindow(app::ApplicationCommon *app,
                                std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter);

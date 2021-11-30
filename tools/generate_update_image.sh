@@ -65,7 +65,14 @@ function cleanStagingDir(){
 
 function linkInStageing(){
     pushd ${STAGEING_DIR} 1> /dev/null
-    ln -s ../sysroot/sys/current/assets
+
+    mkdir assets
+    pushd assets 1> /dev/null
+    ln -s ../../sysroot/sys/current/assets/fonts
+    ln -s ../../sysroot/sys/current/assets/images
+    ln -s ../../sysroot/sys/current/assets/lang
+    popd 1> /dev/null
+
     ln -s ../sysroot/sys/user
     ln -s ../sysroot/sys/current/${SOURCE_TARGET}-boot.bin boot.bin
     ln -s ../sysroot/sys/current/country-codes.db
