@@ -53,12 +53,7 @@ namespace gui
                 setVisible(false);
             }
             else {
-                if (level > 10) {
-                    img->set(battery::battery_low, gui::ImageTypeSpecifier::W_M);
-                }
-                else {
-                    img->set(battery::battery_critical, gui::ImageTypeSpecifier::W_M);
-                }
+                img->set(result->image, gui::ImageTypeSpecifier::W_M);
                 percentText->setText(std::to_string(level) + "%");
                 setVisible(true);
             }
