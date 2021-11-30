@@ -28,7 +28,7 @@ namespace app::bgSounds
     void BGSoundsPlayer::stop(AbstractAudioModel::OnStateChangeCallback &&callback)
     {
         paused = false;
-        audioModel.stop(std::move(callback));
+        audioModel.stopPlayedByThis(std::move(callback));
     }
     void BGSoundsPlayer::pause(AbstractAudioModel::OnStateChangeCallback &&callback)
     {

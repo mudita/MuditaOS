@@ -157,7 +157,12 @@ namespace service
 
         for (auto &input : audioMux.GetAllInputs()) {
             auto t = input.token;
-            retCodes.emplace_back(t, stopInput(&input));
+            if (token.IsValid() && t == token) {
+                retCodes.emplace_back(t, stopInput(&input));
+            }
+            if (token.IsUninitialized()) {
+                retCodes.emplace_back(t, stopInput(&input));
+            }
         }
 
         // on failure return first false code

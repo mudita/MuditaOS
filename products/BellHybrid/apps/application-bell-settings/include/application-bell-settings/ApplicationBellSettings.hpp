@@ -29,6 +29,7 @@ namespace app
     {
       private:
         std::unique_ptr<AbstractAudioModel> audioModel;
+        void onStop() override;
 
       public:
         ApplicationBellSettings(std::string name                    = applicationBellSettingsName,

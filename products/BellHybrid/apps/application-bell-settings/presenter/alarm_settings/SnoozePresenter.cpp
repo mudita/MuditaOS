@@ -58,7 +58,7 @@ namespace app::bell_settings
     }
     void SnoozePresenter::stopSound()
     {
-        audioModel.stop({});
+        audioModel.stopPlayedByThis({});
     }
     void SnoozePresenter::eraseProviderData()
     {

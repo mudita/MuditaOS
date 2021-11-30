@@ -57,7 +57,7 @@ namespace app::bell_settings
     }
     void AlarmSettingsPresenter::stopSound()
     {
-        this->audioModel.stop({});
+        this->audioModel.stopPlayedByThis({});
     }
     void AlarmSettingsPresenter::exitWithoutSave()
     {

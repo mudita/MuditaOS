@@ -18,13 +18,16 @@ namespace app
         std::optional<Volume> getVolume(PlaybackType playbackType) override;
         void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback) override;
         void play(const std::string &filePath, PlaybackType type, OnStateChangeCallback &&callback) override;
-        void stop(OnStateChangeCallback &&callback) override;
+        void stopAny(OnStateChangeCallback &&callback) override;
+        void stopPlayedByThis(OnStateChangeCallback &&callback) override;
         void pause(OnStateChangeCallback &&callback) override;
         void resume(OnStateChangeCallback &&callback) override;
         void setPlaybackFinishedCb(OnPlaybackFinishedCallback &&callback) override;
         bool hasPlaybackFinished() override;
 
       private:
+        audio::Token lastPlayedToken = audio::Token::MakeBadToken();
+        void stop(audio::Token token, OnStateChangeCallback &&callback);
         std::function<void()> playbackFinishedCallback{nullptr};
         bool playbackFinishedFlag{false};
         ApplicationCommon *app{};

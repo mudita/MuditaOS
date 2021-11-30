@@ -36,7 +36,8 @@ namespace app
         virtual std::optional<Volume> getVolume(PlaybackType playbackType)                                  = 0;
         virtual void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback)                    = 0;
         virtual void play(const std::string &filePath, PlaybackType type, OnStateChangeCallback &&callback) = 0;
-        virtual void stop(OnStateChangeCallback &&callback)                                                 = 0;
+        virtual void stopAny(OnStateChangeCallback &&callback)                                              = 0;
+        virtual void stopPlayedByThis(OnStateChangeCallback &&callback)                                     = 0;
         virtual void pause(OnStateChangeCallback &&callback)                                                = 0;
         virtual void resume(OnStateChangeCallback &&callback)                                               = 0;
         virtual void setPlaybackFinishedCb(OnPlaybackFinishedCallback &&callback)                           = 0;

@@ -239,4 +239,10 @@ namespace app
         }
         return handleAsyncResponse(resp);
     }
+
+    void ApplicationBellSettings::onStop()
+    {
+        Application::onStop();
+        audioModel->stopPlayedByThis({});
+    }
 } // namespace app

@@ -73,4 +73,10 @@ namespace app
 
         return handleAsyncResponse(resp);
     }
+
+    void ApplicationBellPowerNap::onStop()
+    {
+        Application::onStop();
+        audioModel->stopPlayedByThis({});
+    }
 } // namespace app

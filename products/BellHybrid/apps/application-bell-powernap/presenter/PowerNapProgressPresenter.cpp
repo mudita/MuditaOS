@@ -65,7 +65,7 @@ namespace app::powernap
     }
     void PowerNapProgressPresenter::onNapAlarmFinished()
     {
-        audioModel.stop({});
+        audioModel.stopPlayedByThis({});
         getView()->napEnded();
     }
 
