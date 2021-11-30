@@ -93,13 +93,14 @@ namespace app::home_screen
         virtual void detachTimer()                                                               = 0;
         virtual void handleAlarmRingingEvent()                                                   = 0;
         virtual void handleAlarmModelReady()                                                     = 0;
+        virtual void handleBatteryStatus()                                                       = 0;
         virtual void setSnoozeTimer(std::unique_ptr<app::ProgressTimerWithSnoozeTimer> &&_timer) = 0;
         virtual void startSnoozeTimer(std::chrono::seconds snoozeDuration)                       = 0;
         virtual void stopSnoozeTimer()                                                           = 0;
         virtual void restartSnoozeTimer(std::chrono::seconds snoozeDuration)                     = 0;
         virtual std::uint32_t getBatteryLvl() const                                              = 0;
         virtual bool isBatteryCharging() const                                                   = 0;
-        virtual bool isStartupDeepPress()                                                        = 0;
+        virtual bool isAlarmActivatedByLatch() const                                             = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -130,14 +131,15 @@ namespace app::home_screen
         void detachTimer() override;
         void handleAlarmRingingEvent() override;
         void handleAlarmModelReady() override;
+        void handleBatteryStatus() override;
 
         void setSnoozeTimer(std::unique_ptr<app::ProgressTimerWithSnoozeTimer> &&_timer) override;
-        void startSnoozeTimer(std::chrono::seconds snoozeDuration);
-        void stopSnoozeTimer();
-        void restartSnoozeTimer(std::chrono::seconds snoozeDuration);
+        void startSnoozeTimer(std::chrono::seconds snoozeDuration) override;
+        void stopSnoozeTimer() override;
+        void restartSnoozeTimer(std::chrono::seconds snoozeDuration) override;
         std::uint32_t getBatteryLvl() const override;
         bool isBatteryCharging() const override;
-        bool isStartupDeepPress() override;
+        bool isAlarmActivatedByLatch() const override;
 
       private:
         ApplicationCommon *app;
@@ -148,9 +150,6 @@ namespace app::home_screen
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::shared_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
-        bool latchPressed = false;
-
-        void setStartupAlarmState();
 
         void handleCyclicDeepRefresh();
 

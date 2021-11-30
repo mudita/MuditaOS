@@ -20,7 +20,6 @@
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/WorkerEventCommon.hpp>
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
-#include <switches/LatchStatusRequest.hpp>
 #include <switches/LatchState.hpp>
 
 namespace
@@ -41,6 +40,7 @@ EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &n
       temperatureSource{hal::temperature::AbstractTemperatureSource::Factory::create()},
       backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
 {
+    latchStatus = bsp::bell_switches::isLatchPressed() ? sevm::LatchStatus::PRESSED : sevm::LatchStatus::RELEASED;
     buildKeySequences();
     updateTemperature(*temperatureSource);
 
@@ -116,9 +116,7 @@ void EventManager::initProductEvents()
     });
 
     connect(sevm::LatchStatusRequest(), [&](sys::Message *msgl) {
-        sevm::LatchStatus state =
-            bsp::bell_switches::isLatchPressed() ? sevm::LatchStatus::PRESSED : sevm::LatchStatus::RELEASED;
-        auto msg = std::make_shared<sevm::LatchStatusResponse>(state);
+        auto msg = std::make_shared<sevm::LatchStatusResponse>(latchStatus);
         return msg;
     });
 }
@@ -155,6 +153,7 @@ void EventManager::buildKeySequences()
 
     auto alarmActivateSeq      = std::make_unique<AlarmActivateSequence>();
     alarmActivateSeq->onAction = [this]() {
+        latchStatus = sevm::LatchStatus::RELEASED;
         bus.sendUnicast(
             std::make_shared<sys::AlarmActivationStatusChangeRequest>(sys::AlarmActivationStatus::ACTIVATED),
             service::name::system_manager);
@@ -163,6 +162,7 @@ void EventManager::buildKeySequences()
 
     auto alarmDeactivateSeq      = std::make_unique<AlarmDeactivateSequence>();
     alarmDeactivateSeq->onAction = [this]() {
+        latchStatus = sevm::LatchStatus::PRESSED;
         bus.sendUnicast(
             std::make_shared<sys::AlarmActivationStatusChangeRequest>(sys::AlarmActivationStatus::DEACTIVATED),
             service::name::system_manager);
