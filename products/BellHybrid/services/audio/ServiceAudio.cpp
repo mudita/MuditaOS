@@ -12,6 +12,8 @@ namespace
 {
     constexpr auto stackSize            = 1024 * 4;
     constexpr auto defaultVolume        = "5";
+    constexpr auto defaultSnoozeVolume  = "4";
+    constexpr auto defaultBedtimeVolume = "6";
     constexpr audio::Volume maxInVolume = 10;
     constexpr audio::Volume minVolume   = 0;
     constexpr auto profileType          = audio::Profile::Type::PlaybackLoudspeaker;
@@ -23,9 +25,9 @@ namespace
             {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackLoudspeaker},defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker},defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker}, defaultVolume},
-            {DbPathElement{Setting::Volume, PlaybackType::Bedtime, Profile::Type::PlaybackLoudspeaker}, defaultVolume},
-            {DbPathElement{Setting::Volume, PlaybackType::PreWakeUp, Profile::Type::PlaybackLoudspeaker},defaultVolume},
-            {DbPathElement{Setting::Volume, PlaybackType::Snooze, Profile::Type::PlaybackLoudspeaker}, defaultVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::Bedtime, Profile::Type::PlaybackLoudspeaker}, defaultBedtimeVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::PreWakeUp, Profile::Type::PlaybackLoudspeaker},defaultSnoozeVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::Snooze, Profile::Type::PlaybackLoudspeaker}, defaultSnoozeVolume},
 
             /// Profiles below are not used but unfortunately, must exist in order to satisfy audio module requirements
             {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackHeadphones},defaultVolume},
