@@ -13,6 +13,8 @@ namespace bsp
         void EnableDcdcPowerSaveMode() final;
         void DisableDcdcPowerSaveMode() final;
 
+        static void WatchdogIRQHandler();
+
       private:
         std::shared_ptr<drivers::DriverGPIO> gpio_wakeup;
     };

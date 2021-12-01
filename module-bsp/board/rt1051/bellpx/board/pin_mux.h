@@ -172,7 +172,7 @@ extern "C"
 /**
  * BELL WDOG_B
  */
-#define PINMUX_WDOG_B IOMUXC_GPIO_B1_13_GPIO2_IO29
+#define PINMUX_WDOG_B IOMUXC_GPIO_B1_13_WDOG1_B
     void PINMUX_WDOG_B_Init(void);
 
 /**

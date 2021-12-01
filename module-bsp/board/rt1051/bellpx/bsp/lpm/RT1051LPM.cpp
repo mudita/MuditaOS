@@ -27,6 +27,13 @@ namespace bsp
         return 0;
     }
 
+    void RT1051LPM::WatchdogIRQHandler()
+    {
+        // Asserting WDOG_B pin to provide power reset of whole board
+        // Way to do it is via WDOG1 built-in assertion, RTWDOG does not provide it
+        WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
+    }
+
     void RT1051LPM::EnableDcdcPowerSaveMode()
     {}
 
