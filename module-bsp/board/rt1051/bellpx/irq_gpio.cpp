@@ -18,6 +18,7 @@
 #include "bsp/light_sensor/light_sensor.hpp"
 #include <hal/battery_charger/BatteryCharger.hpp>
 #include <bsp/fuel_gauge/fuel_gauge.hpp>
+#include <bsp/lpm/RT1051LPM.hpp>
 
 namespace bsp
 {
@@ -31,6 +32,7 @@ namespace bsp
         DisableIRQ(GPIO3_Combined_16_31_IRQn);
         DisableIRQ(GPIO5_Combined_0_15_IRQn);
         DisableIRQ(TMR3_IRQn);
+        DisableIRQ(RTWDOG_IRQn);
 
         GPIO_PortDisableInterrupts(GPIO1, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO2, UINT32_MAX);
@@ -68,6 +70,9 @@ namespace bsp
 
         EnableIRQ(TMR3_IRQn);
         NVIC_SetPriority(TMR3_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
+
+        NVIC_ClearPendingIRQ(RTWDOG_IRQn);
+        EnableIRQ(RTWDOG_IRQn);
     }
 
     extern "C"
@@ -187,6 +192,11 @@ namespace bsp
                                   kQTMR_CompareFlag | kQTMR_Compare1Flag | kQTMR_Compare2Flag | kQTMR_OverflowFlag |
                                       kQTMR_EdgeFlag);
             hal::key_input::EncoderIRQHandler();
+        }
+
+        void RTWDOG_IRQHandler(void)
+        {
+            RT1051LPM::WatchdogIRQHandler();
         }
     }
 } // namespace bsp
