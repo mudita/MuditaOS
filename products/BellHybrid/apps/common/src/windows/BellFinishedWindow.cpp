@@ -5,6 +5,7 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
+#include <common/data/StyleCommon.hpp>
 #include "service-appmgr/Controller.hpp"
 
 namespace gui
@@ -41,6 +42,7 @@ namespace gui
             icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
             icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
             icon->text->setFont(style::window::font::verybiglight);
+            icon->setY(bell_style::popup_icon_y_alignment);
         }
     }
 
