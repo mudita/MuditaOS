@@ -61,7 +61,7 @@ namespace app::bell_settings
 
     void BedtimeSettingsPresenter::stopSound()
     {
-        this->audioModel.stop({});
+        this->audioModel.stopPlayedByThis({});
     }
     void BedtimeSettingsPresenter::exitWithoutSave()
     {

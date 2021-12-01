@@ -28,11 +28,12 @@ namespace app::bell_settings
     {
         auto chimeIntervals = getDefaultChimeIntervalRange();
 
-        chimeIntervals.erase(
-            std::remove_if(chimeIntervals.begin() + 1,
-                           chimeIntervals.end(),
-                           [chimeLength](const auto &e) { return e.getValue().value() >= chimeLength; }),
-            chimeIntervals.end());
+        chimeIntervals.erase(std::remove_if(chimeIntervals.begin(),
+                                            chimeIntervals.end(),
+                                            [chimeLength](const auto &e) {
+                                                return e.getValue() && (e.getValue().value() >= chimeLength);
+                                            }),
+                             chimeIntervals.end());
 
         return chimeIntervals;
     }

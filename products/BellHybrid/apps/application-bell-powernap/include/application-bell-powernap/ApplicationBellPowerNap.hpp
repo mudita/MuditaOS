@@ -24,6 +24,7 @@ namespace app
     {
       private:
         std::unique_ptr<AbstractAudioModel> audioModel;
+        void onStop() override;
 
       public:
         ApplicationBellPowerNap(std::string name                    = applicationBellPowerNapName,
@@ -44,9 +45,6 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
-
-      private:
-        void onStart() override;
     };
 
     template <> struct ManifestTraits<ApplicationBellPowerNap>

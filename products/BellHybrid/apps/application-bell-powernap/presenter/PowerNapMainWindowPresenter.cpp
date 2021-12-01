@@ -32,6 +32,7 @@ namespace app::powernap
         const auto currentValue = model->getCurrentValue();
         settings->setValue(
             powernapDBRecordName, utils::to_string(currentValue.count()), settings::SettingsScope::AppLocal);
+        reinterpret_cast<app::Application *>(app)->suspendIdleTimer();
         app->switchWindow(gui::window::name::powernapProgress);
     }
 } // namespace app::powernap

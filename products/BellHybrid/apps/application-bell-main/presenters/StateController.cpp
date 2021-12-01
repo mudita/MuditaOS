@@ -161,10 +161,12 @@ namespace app::home_screen
 
         namespace AlarmEdit
         {
-            auto entry = [](AbstractView &view, AbstractPresenter &presenter) {
-                view.setAlarmEdit(true);
-                view.setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
-            };
+            auto entry =
+                [](AbstractView &view, AbstractPresenter &presenter, AbstractTemperatureModel &temperatureModel) {
+                    view.setAlarmEdit(true);
+                    view.setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+                    view.setTemperature(temperatureModel.getTemperature());
+                };
             auto exit = [](AbstractView &view, AbstractPresenter &presenter) {
                 view.setAlarmEdit(false);
                 presenter.detachTimer();
@@ -256,8 +258,6 @@ namespace app::home_screen
                 presenter.spawnTimer();
                 alarmModel.snooze();
                 view.setHeaderViewMode(HeaderViewMode::SnoozeCountdown);
-
-                const auto snoozeDuration = alarmModel.getTimeToNextSnooze();
                 view.setSnoozeTime(alarmModel.getTimeOfNextSnooze());
                 const auto bottomDescription = utils::translate("app_bellmain_home_screen_bottom_desc") + " " +
                                                std::to_string(alarmModel.getSnoozeDuration()) + " min";
@@ -269,9 +269,10 @@ namespace app::home_screen
         namespace AlarmSnoozed
         {
             auto entry =
-                [](AbstractView &view, AbstractPresenter &presenter, AbstractTemperatureModel &temperatureModel) {
+                [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractTemperatureModel &temperatureModel) {
                     view.setHeaderViewMode(HeaderViewMode::SnoozeCountdown);
                     view.setTemperature(temperatureModel.getTemperature());
+                    view.setSnoozeTime(alarmModel.getTimeOfNextSnooze());
                 };
             auto exit = [](AbstractPresenter &presenter) { presenter.stopSnoozeTimer(); };
         } // namespace AlarmSnoozed

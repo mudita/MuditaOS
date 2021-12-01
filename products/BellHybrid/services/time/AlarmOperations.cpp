@@ -152,7 +152,7 @@ namespace alarms
           bedtime(std::move(bedtimeSettingsProvider))
     {}
 
-    bool AlarmOperations::minuteUpdated(TimePoint now)
+    void AlarmOperations::minuteUpdated(TimePoint now)
     {
         /**
          * A very simple alarm priority:
@@ -163,15 +163,11 @@ namespace alarms
          * By design, there is no possibility to have both the main alarm, pre wakeup, and snooze alarm set for the same
          * timestamp hence it is safe to process these three in the one go.
          */
-        auto wasAlarmConsumed = AlarmOperationsCommon::minuteUpdated(now);
-        wasAlarmConsumed |= processPreWakeUp(now);
-        wasAlarmConsumed |= processSnoozeChime(now);
-
-        if (not wasAlarmConsumed) {
+        AlarmOperationsCommon::minuteUpdated(now);
+        processPreWakeUp(now);
+        if (isBedtimeAllowed()) {
             processBedtime(now);
         }
-
-        return false;
     }
 
     void AlarmOperations::stopAllSnoozedAlarms()
@@ -180,22 +176,22 @@ namespace alarms
         AlarmOperationsCommon::stopAllSnoozedAlarms();
     }
 
-    bool AlarmOperations::processPreWakeUp(TimePoint now)
+    void AlarmOperations::processPreWakeUp(TimePoint now)
     {
         if (nextSingleEvents.empty()) {
-            return false;
+            return;
         }
 
         auto nextEvent = getNextPreWakeUpEvent();
         if (!nextEvent.isValid()) {
-            return false;
+            return;
         }
 
         const auto decision = preWakeUp.decide(now, nextEvent);
         if (!decision.timeForChime && !decision.timeForFrontlight) {
-            return false;
+            return;
         }
-        return handlePreWakeUp(nextEvent, decision);
+        handlePreWakeUp(nextEvent, decision);
     }
 
     void AlarmOperations::processBedtime(TimePoint now)
@@ -224,20 +220,16 @@ namespace alarms
         return event;
     }
 
-    bool AlarmOperations::handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision)
+    void AlarmOperations::handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision)
     {
-        auto ret = false;
         if (auto alarmEventPtr = std::dynamic_pointer_cast<AlarmEventRecord>(event.parent); alarmEventPtr) {
             if (decision.timeForChime) {
                 handleAlarmEvent(alarmEventPtr, alarms::AlarmType::PreWakeUpChime, true);
-                ret = true;
             }
             if (decision.timeForFrontlight) {
                 handleAlarmEvent(alarmEventPtr, alarms::AlarmType::PreWakeUpFrontlight, true);
-                ret = true;
             }
         }
-        return ret;
     }
 
     bool AlarmOperations::processSnoozeChime(TimePoint now)
@@ -287,6 +279,10 @@ namespace alarms
         handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
         handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
     }
+    bool AlarmOperations::isBedtimeAllowed() const
+    {
+        return ongoingSingleEvents.empty() && not preWakeUp.isActive();
+    }
 
     PreWakeUp::PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider)
         : settingsProvider{std::move(settingsProvider)}
@@ -298,6 +294,7 @@ namespace alarms
         const auto frontlightSettings  = settingsProvider->getFrontlightSettings();
         const auto isTimeForChime      = isTimeForPreWakeUp(now, event, chimeSettings);
         const auto isTimeForFrontlight = isTimeForPreWakeUp(now, event, frontlightSettings);
+        active                         = isTimeForChime || isTimeForFrontlight;
         return {isTimeForChime, isTimeForFrontlight};
     }
 
@@ -307,6 +304,10 @@ namespace alarms
     {
         const auto expectedAlarmStart = std::chrono::floor<std::chrono::minutes>(now) + settings.timeBeforeAlarm;
         return settings.enabled && std::chrono::floor<std::chrono::minutes>(event.startDate) == expectedAlarmStart;
+    }
+    auto PreWakeUp::isActive() const -> bool
+    {
+        return active;
     }
 
     Bedtime::Bedtime(std::unique_ptr<AbstractBedtimeSettingsProvider> &&settingsProvider)

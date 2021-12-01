@@ -108,4 +108,10 @@ namespace app
         }
         return ApplicationCommon::handleSwitchWindow(msgl);
     }
+
+    void ApplicationBellBackgroundSounds::onStop()
+    {
+        Application::onStop();
+        audioModel->stopPlayedByThis({});
+    }
 } // namespace app

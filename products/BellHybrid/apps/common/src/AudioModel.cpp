@@ -76,8 +76,9 @@ namespace app
         playbackFinishedFlag = false;
         auto msg  = std::make_unique<service::AudioStartPlaybackRequest>(filePath, convertPlaybackType(type));
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
-        auto cb   = [_callback = callback](auto response) {
-            auto result = dynamic_cast<service::AudioStartPlaybackResponse *>(response);
+        auto cb              = [_callback = callback, this](auto response) {
+            auto result     = dynamic_cast<service::AudioStartPlaybackResponse *>(response);
+            lastPlayedToken = result->token;
             if (result == nullptr) {
                 return false;
             }
@@ -91,9 +92,14 @@ namespace app
         task->execute(app, this, std::move(cb));
     }
 
-    void AudioModel::stop(OnStateChangeCallback &&callback)
+    void AudioModel::stopAny(OnStateChangeCallback &&callback)
     {
-        auto msg  = std::make_unique<service::AudioStopRequest>();
+        stop(audio::Token(), std::move(callback));
+    }
+
+    void AudioModel::stop(audio::Token token, OnStateChangeCallback &&callback)
+    {
+        auto msg  = std::make_unique<service::AudioStopRequest>(token);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
         auto cb   = [_callback = callback](auto response) {
             auto result = dynamic_cast<service::AudioStopResponse *>(response);
@@ -107,6 +113,11 @@ namespace app
             return true;
         };
         task->execute(app, this, std::move(cb));
+    }
+
+    void AudioModel::stopPlayedByThis(OnStateChangeCallback &&callback)
+    {
+        stop(lastPlayedToken, std::move(callback));
     }
 
     void AudioModel::setVolume(AbstractAudioModel::Volume volume,
