@@ -166,6 +166,12 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     EventManagerCommon::handleKeyEvent(msg);
 
     auto kbdMessage = dynamic_cast<sevm::KbdMessage *>(msg);
+    if (kbdMessage->key.state == RawKey::State::Pressed) {
+        if (kbdMessage->key.keyCode == bsp::KeyCodes::FnRight) {
+            // Power key notification
+            bus.sendUnicast(std::make_shared<sevm::KbdMessage>(), service::name::system_manager);
+        }
+    }
 
     if (kbdMessage->key.state == RawKey::State::Pressed) {
         backlightHandler.handleKeyPressed(kbdMessage->key.keyCode);
