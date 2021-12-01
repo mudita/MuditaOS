@@ -5,6 +5,7 @@
 
 #include <gui/widgets/Icon.hpp>
 #include <i18n/i18n.hpp>
+#include <common/data/StyleCommon.hpp>
 
 namespace gui
 {
@@ -39,6 +40,6 @@ namespace gui
         BellFinishedWindow::onBeforeShow(mode, data);
 
         icon->image->set("circle_success_big");
-        icon->setY(0);
+        icon->setY(gui::bell_style::popup_icon_y_alignment);
     }
 } // namespace gui
