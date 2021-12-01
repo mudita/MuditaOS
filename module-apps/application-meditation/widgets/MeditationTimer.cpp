@@ -59,12 +59,7 @@ namespace gui
             application, *this, meditationTimerName, timerTick);
         timer->attach(progressBar);
         timer->attach(text);
-        auto intervalCallback = [app = application] {
-            AudioServiceAPI::PlaybackStart(app,
-                                           audio::PlaybackType::Meditation,
-                                           purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
-        };
-        timer->registerOnIntervalCallback(std::move(intervalCallback));
+        timer->registerOnIntervalCallback(std::bind(&MeditationTimer::playSound, this));
     }
 
     auto MeditationTimer::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
@@ -88,5 +83,11 @@ namespace gui
     {
         Expects(progressBar != nullptr);
         return *progressBar;
+    }
+    void MeditationTimer::playSound()
+    {
+        AudioServiceAPI::PlaybackStart(application,
+                                       audio::PlaybackType::Meditation,
+                                       purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
     }
 } // namespace gui

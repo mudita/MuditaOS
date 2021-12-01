@@ -78,11 +78,13 @@ void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
             auto onMeditationEnd = [&]() -> void {
                 setVisibleMeditationEnd();
                 application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
+                timer->playSound();
             };
             timer->getTimer().registerOnFinishedCallback(onMeditationEnd);
             timer->getTimer().reset(meditationTime, meditationIntervalPeriod);
             timer->getTimer().start();
             timer->getProgress().setMaximum(meditationTime.count());
+            timer->playSound();
             application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
         };
         timer->getTimer().registerOnFinishedCallback(onPreparation);
