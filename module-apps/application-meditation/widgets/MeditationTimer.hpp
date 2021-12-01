@@ -33,6 +33,7 @@ namespace gui
         void setCounterVisible(bool isVisible) noexcept;
         [[nodiscard]] app::TimerWithCallbacks &getTimer() noexcept;
         [[nodiscard]] gui::Progress &getProgress() noexcept;
+        void playSound();
 
       private:
         void build();
