@@ -55,6 +55,10 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     if (kbdMessage == nullptr) {
         return;
     }
+    if (kbdMessage->key.keyCode == bsp::KeyCodes::JoystickEnter) {
+        // Power key notification
+        bus.sendUnicast(std::make_shared<sevm::KbdMessage>(), service::name::system_manager);
+    }
 
     if (kbdMessage->key.state == RawKey::State::Pressed || kbdMessage->key.state == RawKey::State::Moved) {
         userActivityHandler.handleUserInput();

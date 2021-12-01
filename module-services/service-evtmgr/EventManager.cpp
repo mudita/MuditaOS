@@ -284,13 +284,6 @@ void EventManagerCommon::handleKeyEvent(sys::Message *msg)
     auto message    = std::make_shared<sevm::KbdMessage>();
     message->key    = kbdMessage->key;
 
-    if (message->key.state == RawKey::State::Pressed) {
-        const auto code = message->key.keyCode;
-        if (code == bsp::KeyCodes::FnRight) {
-            bus.sendUnicast(message, service::name::system_manager);
-        }
-    }
-
     // send key to focused application
     if (!targetApplication.empty()) {
         bus.sendUnicast(message, targetApplication);
