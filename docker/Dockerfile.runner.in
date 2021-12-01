@@ -5,7 +5,8 @@ MAINTAINER ops@mudita.com
 
 RUN ln -fs /usr/share/zoneinfo/@DOCKER_TIMEZONE@ /etc/localtime
 RUN export DEBIAN_FRONTEND=noninteractive 
-RUN apt-get update 
+RUN apt-get update
+
 RUN apt-get full-upgrade -y 
 RUN apt-get install -y \
         @INSTALL_PACKAGES@
@@ -20,6 +21,11 @@ RUN locale-gen pl_PL.UTF-8 \
 RUN mkdir -p /home/runner/app/settings
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 1000 --slave /usr/bin/g++ g++ /usr/bin/g++-10
+
+RUN apt-get install software-properties-common -y
+RUN add-apt-repository ppa:git-core/ppa -y
+RUN apt-get update
+RUN apt-get install git -y
 
 #add python packages
 ADD assets/requirements.txt /home/docker/requirements.txt
