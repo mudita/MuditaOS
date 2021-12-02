@@ -40,6 +40,7 @@ namespace backlight
         sys::TimerHandle screenLightTimer;
         bsp::keypad_backlight::State keypadLightState = bsp::keypad_backlight::State::off;
         bool isKeypadLightInCallMode                  = false;
+        bool isPhoneLocked                            = false;
 
         void startKeypadLightTimer();
         void stopKeypadTimer();
@@ -50,5 +51,7 @@ namespace backlight
         void handleScreenLightRefresh(int key = 0);
         void onScreenLightTurnedOn() override;
         void handleScreenLightTimeout();
+        std::chrono::seconds determineTimeoutTime();
+        void handleTimersOnPhoneLock();
     };
 } // namespace backlight

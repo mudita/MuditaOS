@@ -8,13 +8,16 @@
 #include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <Utils.hpp>
+#include <apps-common/locks/data/PhoneLockMessages.hpp>
+#include <Service/Service.hpp>
 
 namespace backlight
 {
     namespace timers
     {
         constexpr auto keypadLightTimerName    = "KeypadLightTimer";
-        constexpr auto lightTimerTimeout        = std::chrono::seconds(20);
+        constexpr auto lightTimerTimeoutUnlocked = std::chrono::seconds(20);
+        constexpr auto lightTimerTimeoutLocked   = std::chrono::seconds(5);
         constexpr auto lightFadeoutTimerTimeout = std::chrono::seconds(10);
     } // namespace timers
 
@@ -39,10 +42,24 @@ namespace backlight
                         parent,
                         [this](sys::Timer &t) { handleScreenLightTimeout(); }),
           keypadLightTimer{sys::TimerFactory::createSingleShotTimer(
-              parent, timers::keypadLightTimerName, timers::lightTimerTimeout, [this](sys::Timer &) {
+              parent, timers::keypadLightTimerName, timers::lightTimerTimeoutUnlocked, [this](sys::Timer &) {
                   bsp::keypad_backlight::shutdown();
               })}
-    {}
+    {
+        parent->bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
+
+        parent->connect(typeid(locks::UnlockedPhone), [&](sys::Message *msg) {
+            isPhoneLocked = false;
+            handleTimersOnPhoneLock();
+            return sys::MessageNone{};
+        });
+
+        parent->connect(typeid(locks::LockedPhone), [&](sys::Message *msg) {
+            isPhoneLocked = true;
+            handleTimersOnPhoneLock();
+            return sys::MessageNone{};
+        });
+    }
 
     void Handler::init()
     {
@@ -80,7 +97,7 @@ namespace backlight
                                        const screen_light_control::Parameters &params)
     {
         if (action == screen_light_control::Action::enableAutomaticMode) {
-            getScreenLightTimer()->restart(timers::lightTimerTimeout);
+            getScreenLightTimer()->restart(determineTimeoutTime());
         }
         handleScreenLightSettings(action, params);
         getScreenLightControl()->processRequest(action, params);
@@ -149,7 +166,7 @@ namespace backlight
 
     void Handler::startKeypadLightTimer()
     {
-        keypadLightTimer.start();
+        keypadLightTimer.restart(determineTimeoutTime());
     }
 
     void Handler::handleKeypadLightRefresh()
@@ -166,7 +183,7 @@ namespace backlight
             if (!getScreenLightControl()->isLightOn() || getScreenLightControl()->isFadeOutOngoing()) {
                 getScreenLightControl()->processRequest(screen_light_control::Action::turnOn);
             }
-            getScreenLightTimer()->restart(timers::lightTimerTimeout);
+            getScreenLightTimer()->restart(determineTimeoutTime());
         }
     }
 
@@ -174,7 +191,7 @@ namespace backlight
     {
         if (getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic) {
             if (screenLightController->isLightOn()) {
-                if (screenLightController->isFadeOutOngoing()) {
+                if (screenLightController->isFadeOutOngoing() || isPhoneLocked) {
                     screenLightController->processRequest(screen_light_control::Action::turnOff);
                 }
                 else {
@@ -192,7 +209,23 @@ namespace backlight
 
     void Handler::onScreenLightTurnedOn()
     {
-        getScreenLightTimer()->restart(timers::lightTimerTimeout);
+        getScreenLightTimer()->restart(determineTimeoutTime());
+    }
+
+    std::chrono::seconds Handler::determineTimeoutTime()
+    {
+        return isPhoneLocked ? timers::lightTimerTimeoutLocked : timers::lightTimerTimeoutUnlocked;
+    }
+
+    void Handler::handleTimersOnPhoneLock()
+    {
+        if (keypadLightTimer.isActive()) {
+            keypadLightTimer.restart(determineTimeoutTime());
+        }
+
+        if (getScreenLightTimer()->isActive() && (!screenLightController->isFadeOutOngoing())) {
+            getScreenLightTimer()->restart(determineTimeoutTime());
+        }
     }
 
 } // namespace backlight
