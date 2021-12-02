@@ -12,7 +12,7 @@
 
 namespace sys::phone_modes
 {
-    Subject::Subject(Service *owner) : owner{owner}
+    Subject::Subject(Service *owner, std::function<bool()> simSelect) : owner{owner}, simSelected{simSelect}
     {
         if (owner == nullptr) {
             throw std::invalid_argument{"Subject's owner is invalid"};
@@ -80,6 +80,6 @@ namespace sys::phone_modes
 
     bool Subject::isTetheringPossible() const noexcept
     {
-        return phoneMode != PhoneMode::Offline;
+        return (phoneMode != PhoneMode::Offline) && (simSelected && simSelected());
     }
 } // namespace sys::phone_modes
