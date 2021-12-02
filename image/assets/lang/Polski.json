@@ -272,7 +272,7 @@
   "sim_card_not_ready": "<text>Oczekiwanie na uruchomienie modemu.<br></br>To może chwilę potrwać.</text>",
   "app_desktop_press_to_unlock": "<text font='gt_pressura' size='27'>Wciśnij <b>Odblokuj</b>, a następnie <b>#</b></text>",
   "app_desktop_press_to_complete_unlock": "<text font='gt_pressura' size='27'>Naciśnij <b>#</b> by odblokować</text>",
-  "app_desktop_unread_messages": "<text>Nieprzeczytane <b>wiadomości</b></text>",
+  "app_desktop_unread_messages": "<text>Nowe <b>wiadomości</b></text>",
   "app_desktop_missed_calls": "<text>Nieodebrane <b>połączenia</b></text>",
   "app_desktop_menu_phone": "POŁĄCZENIA",
   "app_desktop_menu_contacts": "KONTAKTY",
