@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Common.hpp"
+#include <functional>
 
 namespace sys
 {
@@ -15,7 +16,7 @@ namespace sys::phone_modes
     class Subject
     {
       public:
-        explicit Subject(Service *owner);
+        Subject(Service *owner, std::function<bool()> simSelect);
 
         /**
          * Sets phone and tethering modes
@@ -52,5 +53,6 @@ namespace sys::phone_modes
         Service *owner;
         PhoneMode phoneMode     = PhoneMode::Connected;
         Tethering tetheringMode = Tethering::Off;
+        const std::function<bool()> simSelected;
     };
 } // namespace sys::phone_modes
