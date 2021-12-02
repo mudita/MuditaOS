@@ -7,6 +7,8 @@
 #include <service-cellular/connection-manager/ConnectionManager.hpp>
 #include <service-cellular/connection-manager/ConnectionManagerCellularCommandsInterface.hpp>
 
+#include <optional>
+
 using namespace testing;
 
 class MockCellular : public ConnectionManagerCellularCommandsInterface
@@ -14,13 +16,14 @@ class MockCellular : public ConnectionManagerCellularCommandsInterface
   public:
     MOCK_METHOD(bool, disconnectFromNetwork, (), (override));
     MOCK_METHOD(bool, connectToNetwork, (), (override));
-    MOCK_METHOD(bool, isConnectedToNetwork, (), (override));
+    MOCK_METHOD(std::optional<bool>, isConnectedToNetwork, (), (override));
     MOCK_METHOD(bool, clearNetworkIndicator, (), (override));
     MOCK_METHOD(bool, hangUpOngoingCall, (), (override));
     MOCK_METHOD(bool, isConnectionTimerActive, (), (override));
     MOCK_METHOD(void, startConnectionTimer, (), (override));
     MOCK_METHOD(void, stopConnectionTimer, (), (override));
     MOCK_METHOD(void, holdMinimumCpuFrequency, (), (override));
+    MOCK_METHOD(void, retryPhoneModeChange, (), (override));
 };
 
 TEST(ConnectionManager, onPhoneModeChange)

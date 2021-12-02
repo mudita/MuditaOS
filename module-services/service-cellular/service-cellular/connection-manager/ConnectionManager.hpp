@@ -10,7 +10,7 @@
 
 // connection timer period is 1 minute, connect to network for 5 minutes
 constexpr std::chrono::minutes connectedPeriod{5};
-
+constexpr auto maxFailRetries = 5;
 /**
  * @brief Intended for GSM network connection management depending on the selected phone mode.
  * Switching modes takes place at Phone Modes Observer event.
@@ -63,6 +63,7 @@ class ConnectionManager
     std::chrono::minutes minutesOnlineElapsed{0};
     std::shared_ptr<ConnectionManagerCellularCommandsInterface> cellular;
     bool onlinePeriod = false;
+    int failRetries   = 0;
 
     /// Flag determining if we should always dismiss incoming calls - even when
     /// we are in offline mode (messages only) and we connect to network to poll
@@ -94,4 +95,8 @@ class ConnectionManager
      * @return true on success, false on fail
      */
     auto handleModeChangeToConnected() -> bool;
+    /**
+     * Request retry if phone mode changing fails
+     */
+    void retryOnFail();
 };

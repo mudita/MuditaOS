@@ -976,4 +976,9 @@ namespace cellular
         at::SimInsertedStatus insertedStatus;
     };
 
+    class RetryPhoneModeChangeRequest : public sys::DataMessage
+    {
+      public:
+        RetryPhoneModeChangeRequest() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
 } // namespace cellular

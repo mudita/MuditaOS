@@ -166,6 +166,14 @@ namespace cellular::service
          */
         void handleSimCardSelected();
         /**
+         * Get Sim selected state
+         * @return true when Sim is selected, fail when not
+         */
+        bool isSimCardSelected()
+        {
+            return isSimSelected;
+        }
+        /**
          * Notification events
          */
         std::function<void()> onSimReady;
