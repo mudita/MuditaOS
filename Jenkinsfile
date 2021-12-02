@@ -22,6 +22,7 @@ pipeline {
         stage('Check for previous running builds') {
             steps {
                 script {
+                    common.setBuildStatus(env.GIT_COMMIT,"This commit is being built", "PENDING")
                     common.cancelPreviousBuilds()
                 }
             }
@@ -100,6 +101,16 @@ pipeline {
         }
     }
     post {
+        success {
+            script{
+                common.setBuildStatus(env.GIT_COMMIT,"Build succeeded", "SUCCESS");
+            }
+        }
+        failure {
+            script{
+                common.setBuildStatus(env.GIT_COMMIT,"Build failed: $env.currentStep", "FAILURE");
+            }
+        }
         cleanup {
             script{
                 common.cleanup("false")
