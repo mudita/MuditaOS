@@ -82,6 +82,9 @@ namespace bluetooth
         hci_set_link_key_db(bluetooth::KeyStorage::getKeyStorage());
         hci_event_callback_registration.callback = &hci_packet_handler;
         hci_add_event_handler(&hci_event_callback_registration);
+
+        gap_ssp_set_io_capability(SSP_IO_CAPABILITY_KEYBOARD_ONLY);
+        gap_ssp_set_auto_accept(false);
         LOG_DEBUG("BT worker run success");
         return Error::Success;
     }

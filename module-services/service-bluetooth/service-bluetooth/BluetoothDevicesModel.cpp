@@ -70,11 +70,17 @@ void BluetoothDevicesModel::syncDevicesWithApp()
                                    sys::BusChannel::BluetoothNotifications);
     }
 }
+
 void BluetoothDevicesModel::setInternalDeviceState(const Devicei &device, const DeviceState &state)
 {
     auto dev                      = getDeviceByAddress(device.address);
+    if (not dev) {
+        LOG_ERROR("no such device - ignored");
+        return;
+    }
     dev.value().get().deviceState = state;
 }
+
 void BluetoothDevicesModel::mergeInternalDeviceState(const Devicei &device)
 {
     try {

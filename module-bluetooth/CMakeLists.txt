@@ -10,12 +10,16 @@ module_is_test_entity()
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/audio/BluetoothAudioDevice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BluetoothWorker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/error_bluetooth.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/WorkerController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/CommandHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/Device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/glucode/BluetoothRunLoop.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/BluetoothDriverImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BtKeysStorage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/GAP/GAP.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/GAP/Devices.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/GAP/used_events.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/A2DP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVRCP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVDTP.cpp

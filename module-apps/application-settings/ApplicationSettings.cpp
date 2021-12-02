@@ -226,6 +226,8 @@ namespace app
         });
 
         connect(typeid(::message::bluetooth::RequestPasskey), [&](sys::Message *msg) {
+            auto m                               = dynamic_cast<::message::bluetooth::RequestPasskey *>(msg);
+            bluetoothSettingsModel->pinRequestor = m->getDevice();
             switchWindow(gui::window::name::bluetooth_check_passkey);
             return sys::MessageNone{};
         });
@@ -396,10 +398,10 @@ namespace app
         windowsFactory.attach(gui::window::name::phone_name, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhoneNameWindow>(app, bluetoothSettingsModel);
         });
-        windowsFactory.attach(gui::window::name::bluetooth_check_passkey,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BluetoothCheckPasskeyWindow>(app);
-                              });
+        windowsFactory.attach(
+            gui::window::name::bluetooth_check_passkey, [this](ApplicationCommon *app, const std::string &name) {
+                return std::make_unique<gui::BluetoothCheckPasskeyWindow>(app, bluetoothSettingsModel);
+            });
 
         // Network
         windowsFactory.attach(gui::window::name::network, [](ApplicationCommon *app, const std::string &name) {

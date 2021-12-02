@@ -40,6 +40,7 @@ class BluetoothSettingsModel
     auto isDeviceConnecting() -> bool;
     auto getStatus() const -> const BluetoothStatus;
     auto isDeviceListEmpty() const -> bool;
+    Devicei pinRequestor;
 
   private:
     std::vector<Devicei> devices{};

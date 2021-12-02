@@ -349,7 +349,7 @@ auto ServiceBluetooth::handle(message::bluetooth::DisconnectResult *msg) -> std:
 auto ServiceBluetooth::handle(message::bluetooth::ResponsePasskey *msg) -> std::shared_ptr<sys::Message>
 {
     auto passKey = msg->getPasskey();
-    bluetooth::GAP::respondPinCode(passKey);
+    bluetooth::GAP::respondPinCode(passKey, msg->getDevice());
     return sys::MessageNone{};
 }
 

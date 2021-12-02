@@ -8,16 +8,35 @@
 namespace message::bluetooth
 {
     class RequestPasskey : public BluetoothMessage
-    {};
+    {
+        Devicei device;
+
+      public:
+        explicit RequestPasskey(const Devicei &dev) : device(dev)
+        {}
+
+        [[nodiscard]] auto getDevice()
+        {
+            return device;
+        }
+    };
 
     class ResponsePasskey : public BluetoothMessage
     {
+        Devicei device;
+
       public:
-        explicit ResponsePasskey(std::string passkey) : passkey(std::move(passkey))
+        ResponsePasskey(std::string passkey, const Devicei &dev) : device(dev), passkey(std::move(passkey))
         {}
+
         [[nodiscard]] auto getPasskey() const -> std::string
         {
             return passkey;
+        }
+
+        [[nodiscard]] auto getDevice()
+        {
+            return device;
         }
 
       private:

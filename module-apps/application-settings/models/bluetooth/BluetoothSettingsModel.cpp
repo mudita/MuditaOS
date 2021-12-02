@@ -70,7 +70,8 @@ void BluetoothSettingsModel::requestDeviceUnpair(const Devicei &device)
 
 void BluetoothSettingsModel::responsePasskey(const std::string &passkey)
 {
-    service->bus.sendUnicast(std::make_shared<message::bluetooth::ResponsePasskey>(passkey), service::name::bluetooth);
+    service->bus.sendUnicast(std::make_shared<message::bluetooth::ResponsePasskey>(passkey, pinRequestor),
+                             service::name::bluetooth);
 }
 
 void BluetoothSettingsModel::requestConnection(const Devicei &device)
