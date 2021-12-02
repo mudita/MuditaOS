@@ -313,6 +313,8 @@
   "app_call_speaker_on": "LAUTSPRECHER AN",
   "app_call_bluetooth": "BLUETOOTH",
   "app_call_no_sim": "Keine SIM-Karte.\n\nZum Anrufen\nSIM-Karte einsetzen.",
+  "app_call_no_network_connection": "Keine Netzwerkverbindung.",
+  "app_call_call_request_failed": "Etwas ist schief gelaufen.",
   "app_call_offline": "Offline-Modus.\n\nZum Anrufen\n in Online-Modus wechseln.",
   "app_sms_offline": "Offline-Modus.\n\nZum Senden einer SMS\n in Online-Modus wechseln.",
   "app_call_emergency_text": "Notruf",

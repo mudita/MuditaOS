@@ -313,6 +313,8 @@
   "app_call_speaker_on": "ALTAVOZ ACTIVADO",
   "app_call_bluetooth": "BLUETOOTH",
   "app_call_no_sim": "No hay SIM.\n\nPara hacer una llamada,\ndebes insertar una tarjeta SIM.",
+  "app_call_no_network_connection": "No hay conexión de red.",
+  "app_call_call_request_failed": "Algo salió mal.",
   "app_call_offline": "No tienes conexión.\n\nPara hacer una llamada,\n cambia al modo Conectado.",
   "app_sms_offline": "No tienes conexión.\n\nPara enviar un SMS,\n cambia al modo Conectado.",
   "app_call_emergency_text": "Llamada de emergencia",

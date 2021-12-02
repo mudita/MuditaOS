@@ -545,6 +545,43 @@ class CellularNotAnEmergencyNotification : public CellularResponseMessage,
     }
 };
 
+class CellularNoNetworkConenctionNotification : public CellularResponseMessage,
+                                                public app::manager::actions::ConvertibleToAction
+{
+  public:
+    CellularNoNetworkConenctionNotification() : CellularResponseMessage(false)
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(sender,
+                                                             app::manager::actions::NoNetworkConnectionNotification,
+                                                             std::make_unique<app::manager::actions::ActionParams>());
+    }
+};
+
+class CellularCallRequestGeneralError : public CellularResponseMessage,
+                                        public app::manager::actions::ConvertibleToAction
+{
+  public:
+    using Error     = app::manager::actions::CallRequestGeneralErrorParams::Error;
+    using ErrorType = app::manager::actions::CallRequestGeneralErrorParams::Error::Type;
+
+    CellularCallRequestGeneralError(ErrorType errorType) : CellularResponseMessage(false), error{errorType}
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender,
+            app::manager::actions::CallRequestGeneralErrorNotification,
+            std::make_unique<app::manager::actions::CallRequestGeneralErrorParams>(error));
+    }
+
+  private:
+    Error error;
+};
+
 class CellularNewIncomingSMSMessage : public CellularMessage
 {
   public:

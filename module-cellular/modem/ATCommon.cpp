@@ -65,12 +65,18 @@ std::string Channel::formatCommand(const std::string &cmd) const
 Result Channel::cmd(const std::string &cmd, std::chrono::milliseconds timeout, size_t rxCount)
 {
     Result result;
+    if (cmd.empty()) {
+        LOG_INFO("Skip empty command");
+        result.code = Result::Code::OK;
+        return result;
+    }
     ATStream atStream(rxCount);
 
     awaitingResponseFlag.set();
 
     cmdInit();
     std::string cmdFixed = formatCommand(cmd);
+    LOG_DEBUG("start of %s", cmdFixed.c_str());
     cmdSend(cmdFixed);
 
     auto startTime = std::chrono::steady_clock::now();

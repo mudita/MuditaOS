@@ -65,7 +65,7 @@ namespace at
         {AT::GET_SCANMODE, {"AT+QCFG=\"nwscanmode\""}},
         {AT::QGMR, {"AT+QGMR"}},
         {AT::STORE_SETTINGS_ATW, {"AT&W"}},
-        {AT::CEER, {"AT+CEER"}},
+        {AT::CEER, {"AT+CEER", 1s}},
         {AT::QIGETERROR, {"AT+QIGETERROR"}},
         {AT::VTS, {"AT+VTS=", default_long_timeout}},
         {AT::QLDTMF, {"AT+QLDTMF=1,"}},

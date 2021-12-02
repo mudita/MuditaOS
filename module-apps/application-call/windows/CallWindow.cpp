@@ -440,7 +440,6 @@ namespace gui
     {
         switch (callEndType) {
         case CallEndType::None:
-            [[fallthrough]];
         case CallEndType::Ended:
             durationLabel->setText(utils::translate(strings::callended));
             break;

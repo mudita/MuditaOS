@@ -257,6 +257,8 @@
   "app_call_speaker_on": "HÖGT.PÅ",
   "app_call_bluetooth": "BLUETOOTH",
   "app_call_no_sim": "För att ringa,,\nsätt i ett SIM-kort.",
+  "app_call_no_network_connection": "Ingen nätverksanslutning.",
+  "app_call_call_request_failed": "Något gick fel.",
   "app_call_offline": "Du är frånkopplad.\n\nByt till \"ansluten\"\nför att ringa.",
   "app_call_emergency_text": "Nödsamtal",
   "app_call_wrong_emergency": "Kan inte ringa..\n$NUMBER är inte ett nödnummer.",

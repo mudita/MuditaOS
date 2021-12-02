@@ -32,6 +32,8 @@ namespace app::manager
             HandleCallerId,
             NotAnEmergencyNotification,
             NoSimNotification,
+            NoNetworkConnectionNotification,
+            CallRequestGeneralErrorNotification,
             Dial,
             EmergencyDial,
             ShowCallLog,

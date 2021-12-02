@@ -30,6 +30,7 @@ namespace cellular
       private:
         void registerRequest(std::string regex, CreateCallback);
         std::unique_ptr<IRequest> emergencyCheck();
+        bool isConnectedToNetwork();
 
         std::string request;
         std::vector<std::pair<std::string, CreateCallback>> requestMap;

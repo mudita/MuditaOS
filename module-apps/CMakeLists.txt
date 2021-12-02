@@ -10,7 +10,7 @@ add_library(${PROJECT_NAME} STATIC)
 
 add_subdirectory(apps-common)
 
-option(ENABLE_APP_ANTENNA "Enable application antenna" OFF)
+option(ENABLE_APP_ANTENNA "Enable application antenna" OFF) 
 
 set(APPLICATIONS
     alarm-clock

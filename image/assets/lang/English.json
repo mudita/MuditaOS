@@ -283,6 +283,8 @@
   "app_call_speaker_on": "SPEAKER ON",
   "app_call_bluetooth": "BLUETOOTH",
   "app_call_no_sim": "No SIM.\n\nTo make a call,\nplease insert a SIM card.",
+  "app_call_no_network_connection": "No Network Connection.",
+  "app_call_call_request_failed": "Something went wrong.",
   "app_call_offline": "You're Offline.\n\nTo make a call,\n switch the mode.",
   "app_sms_offline": "You're Offline.\n\nTo send message,\n switch the mode.",
   "app_call_emergency_text": "Emergency call",

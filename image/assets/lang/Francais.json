@@ -282,6 +282,8 @@
   "app_call_speaker_on": "HAUT-PARLEUR ACTIVÉ",
   "app_call_bluetooth": "BLUETOOTH",
   "app_call_no_sim": "Pas de carte SIM.\n\nPour faire un appel,\nveuillez insérer une carte SIM.",
+  "app_call_no_network_connection": "Pas de connexion réseau.",
+  "app_call_call_request_failed": "Quelque chose s'est mal passé.",
   "app_call_offline": "Tu es hors ligne.\n\nPour faire un appel,\npassez en mode Connecté.",
   "app_sms_offline": "Vous êtes hors ligne.\n\nPour envoyer un SMS,\npassez en mode Connecté.",
   "app_call_emergency_text": "Appel d'urgence",

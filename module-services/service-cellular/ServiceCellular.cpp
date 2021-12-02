@@ -1745,22 +1745,63 @@ auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *m
     return std::make_shared<CellularResponseMessage>(ret);
 }
 
+namespace
+{
+    constexpr auto translate(at::Result::Code code) -> CellularCallRequestGeneralError::ErrorType
+    {
+        switch (code) {
+        case at::Result::Code::ERROR:
+        case at::Result::Code::CME_ERROR:
+        case at::Result::Code::CMS_ERROR:
+            return CellularCallRequestGeneralError::ErrorType::Error;
+        case at::Result::Code::TIMEOUT:
+            return CellularCallRequestGeneralError::ErrorType::ModemTimeout;
+        case at::Result::Code::TOKENS:
+        case at::Result::Code::PARSING_ERROR:
+        case at::Result::Code::FULL_MSG_BUFFER:
+        case at::Result::Code::TRANSMISSION_NOT_STARTED:
+        case at::Result::Code::RECEIVING_NOT_STARTED:
+        case at::Result::Code::DATA_NOT_USED:
+        case at::Result::Code::CMUX_FRAME_ERROR:
+            return CellularCallRequestGeneralError::ErrorType::TransmissionError;
+        case at::Result::Code::OK:
+        case at::Result::Code::NONE:
+        case at::Result::Code::UNDEFINED:
+            return CellularCallRequestGeneralError::ErrorType::UndefinedError;
+        }
+        return CellularCallRequestGeneralError::ErrorType::UndefinedError;
+    }
+} // namespace
+
 auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessage *msg)
     -> std::shared_ptr<CellularResponseMessage>
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
     auto channel = cmux->get(CellularMux::Channel::Commands);
     if (channel == nullptr) {
+        LOG_WARN("commands channel not ready");
+        auto message = std::make_shared<CellularCallRequestGeneralError>(
+            CellularCallRequestGeneralError::ErrorType::ChannelNotReadyError);
+        bus.sendUnicast(message, ::service::name::appmgr);
         return std::make_shared<CellularResponseMessage>(false);
     }
     cellular::RequestFactory factory(
         msg->number.getEntered(), *channel, msg->callMode, Store::GSM::get()->simCardInserted());
 
     auto request = factory.create();
-
     CellularRequestHandler handler(*this);
     auto result = channel->cmd(request->command());
     request->handle(handler, result);
+    if (!result) {
+        log_last_AT_error(channel);
+    }
+    LOG_INFO("isHandled %d, %s", static_cast<int>(request->isHandled()), utils::enumToString(result.code).c_str());
+    if (!request->isHandled()) {
+        CellularCallRequestGeneralError::ErrorType errorType = translate(result.code);
+        auto message = std::make_shared<CellularCallRequestGeneralError>(errorType);
+        bus.sendUnicast(message, ::service::name::appmgr);
+    }
+
     return std::make_shared<CellularResponseMessage>(request->isHandled());
 }
 
@@ -1961,22 +2002,22 @@ auto ServiceCellular::handleCellularGetFirmwareVersionMessage(sys::Message *msg)
 auto ServiceCellular::handleEVMStatusMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     using namespace bsp::cellular::status;
-    auto message = static_cast<sevm::StatusStateMessage *>(msg);
-        auto status_pin = message->state;
-        if (priv->modemResetHandler->handleStatusPinEvent(status_pin == value::ACTIVE)) {
-            return std::make_shared<CellularResponseMessage>(true);
-        }
+    auto message    = static_cast<sevm::StatusStateMessage *>(msg);
+    auto status_pin = message->state;
+    if (priv->modemResetHandler->handleStatusPinEvent(status_pin == value::ACTIVE)) {
+        return std::make_shared<CellularResponseMessage>(true);
+    }
 
-        if (status_pin == value::ACTIVE) {
-            if (priv->state->get() == State::ST::PowerUpProcedure) {
-                priv->state->set(State::ST::PowerUpInProgress); // and go to baud detect as usual
-            }
+    if (status_pin == value::ACTIVE) {
+        if (priv->state->get() == State::ST::PowerUpProcedure) {
+            priv->state->set(State::ST::PowerUpInProgress); // and go to baud detect as usual
         }
-        if (status_pin == value::INACTIVE) {
-            if (priv->state->get() == State::ST::PowerDownWaiting) {
-                priv->state->set(State::ST::PowerDown);
-            }
+    }
+    if (status_pin == value::INACTIVE) {
+        if (priv->state->get() == State::ST::PowerDownWaiting) {
+            priv->state->set(State::ST::PowerDown);
         }
+    }
     return std::make_shared<CellularResponseMessage>(true);
 }
 

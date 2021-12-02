@@ -56,20 +56,20 @@ namespace app
     class EnterNumberWindowInterface
     {
       public:
-        virtual ~EnterNumberWindowInterface() noexcept                   = default;
-        virtual void handleCallEvent(const std::string &number)          = 0;
-        virtual void handleEmergencyCallEvent(const std::string &number) = 0;
-        virtual void handleAddContactEvent(const std::string &number)    = 0;
+        virtual ~EnterNumberWindowInterface() noexcept = default;
+        enum class ExternalRequest
+        {
+            True,
+            False
+        };
+        virtual void handleCallEvent(const std::string &number,
+                                     ExternalRequest isExternalRequest = ExternalRequest::False) = 0;
+        virtual void handleEmergencyCallEvent(const std::string &number)                         = 0;
+        virtual void handleAddContactEvent(const std::string &number)                            = 0;
     };
 
     class ApplicationCall : public Application, public CallWindowInterface, public EnterNumberWindowInterface
     {
-      private:
-        sys::TimerHandle callerIdTimer;
-
-      protected:
-        call::State callState = call::State::IDLE;
-
       public:
         explicit ApplicationCall(std::string name                    = name_call,
                                  std::string parent                  = {},
@@ -90,10 +90,16 @@ namespace app
         void handleIncomingCall();
         void handleCallerId(const app::manager::actions::CallParams *params);
         void handleEmergencyCallEvent(const std::string &number) override;
-        void handleCallEvent(const std::string &number) override;
+        void handleCallEvent(const std::string &number, ExternalRequest isExternalRequest) override;
         void handleAddContactEvent(const std::string &number) override;
 
         auto showNotification(std::function<bool()> action, const std::string &icon, const std::string &text) -> bool;
+        enum class NotificationType
+        {
+            Info,
+            Failure
+        };
+        auto showNotificationAndRestartCallFlow(NotificationType type, const std::string &text) -> bool;
 
         [[nodiscard]] auto getCallState() const noexcept -> call::State override
         {
@@ -121,6 +127,15 @@ namespace app
         void transmitDtmfTone(uint32_t digit) override;
         void hangupCall() override;
         void answerIncomingCall() override;
+
+      private:
+        sys::TimerHandle callerIdTimer;
+
+      protected:
+        call::State callState           = call::State::IDLE;
+        ExternalRequest externalRequest = ExternalRequest::False;
+
+        bool conditionalReturnToPreviousView();
     };
 
     template <> struct ManifestTraits<ApplicationCall>
@@ -133,6 +148,8 @@ namespace app
                      manager::actions::EmergencyDial,
                      manager::actions::NotAnEmergencyNotification,
                      manager::actions::NoSimNotification,
+                     manager::actions::NoNetworkConnectionNotification,
+                     manager::actions::CallRequestGeneralErrorNotification,
                      manager::actions::CallRejectedByOfflineNotification,
                      manager::actions::PhoneModeChanged,
                      manager::actions::ActivateCall,

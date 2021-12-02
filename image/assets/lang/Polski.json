@@ -317,6 +317,8 @@
   "app_call_speaker_on": "GŁOŚNIK",
   "app_call_bluetooth": "BLUETOOTH",
   "app_call_no_sim": "Brak SIM.\n\nAby wykonać połączenie,\nwłóż kartę SIM.",
+  "app_call_no_network_connection": "Brak połączenia sieciowego.",
+  "app_call_call_request_failed": "Coś poszło nie tak.",
   "app_call_offline": "Jesteś w trybie offline.\n\nAby wykonać połączenie,\n przejdź w tryb Połączony.",
   "app_sms_offline": "Jesteś w trybie offline.\n\nAby wysłać SMS,\n przejdź w tryb Połączony.",
   "app_call_emergency_text": "Połączenie alarmowe",

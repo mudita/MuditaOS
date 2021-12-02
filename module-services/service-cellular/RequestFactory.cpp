@@ -16,6 +16,7 @@
 #include "service-cellular/requests/UssdRequest.hpp"
 #include "service-cellular/requests/RejectRequest.hpp"
 
+#include <at/ATFactory.hpp>
 #include <EventStore.hpp>
 #include <cmd/QECCNUM.hpp>
 
@@ -67,9 +68,21 @@ namespace cellular
         return nullptr;
     }
 
+    bool RequestFactory::isConnectedToNetwork()
+    {
+        at::Cmd buildCmd = at::factory(at::AT::COPS) + "?";
+        auto resp        = channel.cmd(buildCmd);
+        at::response::cops::CurrentOperatorInfo ret;
+        if ((resp.code == at::Result::Code::OK) && (at::response::parseCOPS(resp, ret))) {
+            return ret.getOperator().has_value();
+        }
+        return false;
+    }
+
     std::unique_ptr<IRequest> RequestFactory::create()
     {
-        if (auto req = emergencyCheck(); req) {
+        auto isRegisteredToNetwork = isConnectedToNetwork();
+        if (auto req = emergencyCheck(); req && isRegisteredToNetwork) {
             return req;
         }
 
@@ -118,6 +131,9 @@ namespace cellular
 
         if (!simInserted) {
             return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
+        }
+        if (!isRegisteredToNetwork) {
+            return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoNetworkConnection, request);
         }
         return std::make_unique<CallRequest>(request);
     }

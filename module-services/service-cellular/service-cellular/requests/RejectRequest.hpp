@@ -17,7 +17,8 @@ namespace cellular
         enum class RejectReason
         {
             NoSim,
-            NotAnEmergencyNumber
+            NotAnEmergencyNumber,
+            NoNetworkConnection
         };
 
         RejectRequest(RejectReason rejectReason, const std::string &number)

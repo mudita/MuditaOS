@@ -34,6 +34,8 @@ TEST_CASE("Emergency handling")
         bool isNumberEmergencyNoSim;
         // mock that sim is inserted
         bool insertSim;
+        // mock that phone is connected to network
+        bool isConnectedToNetwork;
         // reject reason if applicable
         std::optional<RejectRequest::RejectReason> rejectReason;
         // expected typeid name of created request
@@ -49,42 +51,59 @@ TEST_CASE("Emergency handling")
         ////// normal request
 
         // no SIM and SIM emergency number / sim inserted
-        {false, true, true, true, std::nullopt, typeid(CallRequest).name()},
+        {false, true, true, true, true, std::nullopt, typeid(CallRequest).name()},
+        // no SIM and SIM emergency number / sim inserted / no network connection
+        {false,
+         true,
+         true,
+         true,
+         false,
+         RejectRequest::RejectReason::NoNetworkConnection,
+         typeid(RejectRequest).name(),
+         ""},
         // no SIM emergency number / sim inserted
-        {false, false, true, true, std::nullopt, typeid(CallRequest).name()},
+        {false, false, true, true, true, std::nullopt, typeid(CallRequest).name()},
         // SIM emergency number / sim inserted
-        {false, true, false, true, std::nullopt, typeid(CallRequest).name()},
+        {false, true, false, true, true, std::nullopt, typeid(CallRequest).name()},
         // no SIM and SIM emergency number / no sim inserted
-        {false, true, true, false, std::nullopt, typeid(CallRequest).name()},
+        {false, true, true, false, true, std::nullopt, typeid(CallRequest).name()},
         // no SIM emergency number / no sim inserted
-        {false, false, true, false, std::nullopt, typeid(CallRequest).name()},
+        {false, false, true, false, true, std::nullopt, typeid(CallRequest).name()},
         // SIM emergency number / no sim inserted
-        {false, true, false, false, RejectRequest::RejectReason::NoSim, typeid(RejectRequest).name(), ""},
+        {false, true, false, false, true, RejectRequest::RejectReason::NoSim, typeid(RejectRequest).name(), ""},
         // normal number / sim inserted
-        {false, false, false, true, std::nullopt, typeid(CallRequest).name()},
+        {false, false, false, true, true, std::nullopt, typeid(CallRequest).name()},
         // normal number / no sim inserted
-        {false, false, false, false, RejectRequest::RejectReason::NoSim, typeid(RejectRequest).name(), ""},
+        {false, false, false, false, true, RejectRequest::RejectReason::NoSim, typeid(RejectRequest).name(), ""},
 
         ////// emergency request
         // no SIM and SIM emergency number / sim inserted
-        {true, true, true, true, std::nullopt, typeid(CallRequest).name()},
+        {true, true, true, true, true, std::nullopt, typeid(CallRequest).name()},
         // no SIM emergency number / sim inserted
-        {true, false, true, true, std::nullopt, typeid(CallRequest).name()},
+        {true, false, true, true, true, std::nullopt, typeid(CallRequest).name()},
         // SIM emergency number / sim inserted
-        {true, true, false, true, std::nullopt, typeid(CallRequest).name()},
+        {true, true, false, true, true, std::nullopt, typeid(CallRequest).name()},
         // no SIM and SIM emergency number / no sim inserted
-        {true, true, true, false, std::nullopt, typeid(CallRequest).name()},
+        {true, true, true, false, true, std::nullopt, typeid(CallRequest).name()},
         // no SIM emergency number / no sim inserted
-        {true, false, true, false, std::nullopt, typeid(CallRequest).name()},
+        {true, false, true, false, true, std::nullopt, typeid(CallRequest).name()},
         // SIM emergency number / no sim inserted
-        {true, true, false, false, RejectRequest::RejectReason::NoSim, typeid(RejectRequest).name(), ""},
+        {true, true, false, false, true, RejectRequest::RejectReason::NoSim, typeid(RejectRequest).name(), ""},
         // normal number / sim inserted
-        {true, false, false, true, RejectRequest::RejectReason::NotAnEmergencyNumber, typeid(RejectRequest).name(), ""},
+        {true,
+         false,
+         false,
+         true,
+         true,
+         RejectRequest::RejectReason::NotAnEmergencyNumber,
+         typeid(RejectRequest).name(),
+         ""},
         // normal number / no sim inserted
         {true,
          false,
          false,
          false,
+         true,
          RejectRequest::RejectReason::NotAnEmergencyNumber,
          typeid(RejectRequest).name(),
          ""},
@@ -105,6 +124,9 @@ TEST_CASE("Emergency handling")
         }
         if (test.isNumberEmergencySim) {
             channelMockResponse.emplace_back("+QECCNUM: 1,\"" + test.number + "\"");
+        }
+        if (test.isConnectedToNetwork) {
+            channelMockResponse.emplace_back("+COPS: 0,0,\"PLAY\",7");
         }
 
         auto dummyChannel = at::GenericChannel(at::Result::Code::OK, channelMockResponse);
@@ -443,7 +465,11 @@ TEST_CASE("MMI requests")
     };
 
     for (auto &testCase : testCases) {
-        auto mockChannel = at::GenericChannel(at::Result::Code::OK, {});
+        std::vector<std::string> channelMockResponse;
+        // connected to network
+        channelMockResponse.emplace_back("+COPS: 0,0,\"PLAY\",7");
+
+        auto mockChannel = at::GenericChannel(at::Result::Code::OK, channelMockResponse);
         RequestFactory requestFactory(testCase.requestString, mockChannel, cellular::api::CallMode::Regular, true);
         auto request        = requestFactory.create();
         auto requestCommand = request->command();
