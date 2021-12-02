@@ -19,4 +19,33 @@ namespace app::manager::actions
       private:
         utils::PhoneNumber::View number;
     };
+
+    class CallRequestGeneralErrorParams : public app::manager::actions::ActionParams
+    {
+      public:
+        struct Error
+        {
+            enum class Type
+            {
+                Error,
+                CmeError,
+                CmsError,
+                ModemTimeout,
+                UndefinedError,
+                TransmissionError,
+                ChannelNotReadyError
+            } type;
+        };
+
+        explicit CallRequestGeneralErrorParams(Error error) : error{error}
+        {}
+
+        [[nodiscard]] auto getError() const noexcept
+        {
+            return error;
+        }
+
+      private:
+        Error error;
+    };
 } // namespace app::manager::actions

@@ -36,7 +36,7 @@ namespace app
             {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
             if (auto msg = dynamic_cast<app::CallSwitchData *>(data.get()); msg != nullptr) {
-                handleCallEvent(msg->getPhoneNumber().getEntered());
+                handleCallEvent(msg->getPhoneNumber().getEntered(), ExternalRequest::True);
                 return actionHandled();
             }
             return actionNotHandled();
@@ -50,34 +50,29 @@ namespace app
             return actionHandled();
         });
         addActionReceiver(manager::actions::NotAnEmergencyNotification, [this](auto &&data) {
-            auto buttonAction = [=]() -> bool {
-                returnToPreviousWindow();
-                return true;
-            };
-            constexpr auto iconNoEmergency = "fail_128px_W_G";
-            auto textNoEmergency           = utils::translate("app_call_wrong_emergency");
+            auto textNoEmergency = utils::translate("app_call_wrong_emergency");
             utils::findAndReplaceAll(textNoEmergency, "$NUMBER", data->getDescription());
-            showNotification(buttonAction, iconNoEmergency, textNoEmergency);
+            showNotificationAndRestartCallFlow(NotificationType::Info, textNoEmergency);
             return actionHandled();
         });
+
         addActionReceiver(manager::actions::NoSimNotification, [this](auto &&data) {
-            auto buttonAction = [=]() -> bool {
-                returnToPreviousWindow();
-                return true;
-            };
-            constexpr auto iconNoSim = "info_128px_W_G";
-            const auto textNoSim     = utils::translate("app_call_no_sim");
-            showNotification(buttonAction, iconNoSim, textNoSim);
+            showNotificationAndRestartCallFlow(NotificationType::Info,
+                                               utils::translate("app_app_call_no_simcall_offline"));
+            return actionHandled();
+        });
+        addActionReceiver(manager::actions::NoNetworkConnectionNotification, [this](auto &&data) {
+            showNotificationAndRestartCallFlow(NotificationType::Info,
+                                               utils::translate("app_call_no_network_connection"));
+            return actionHandled();
+        });
+        addActionReceiver(manager::actions::CallRequestGeneralErrorNotification, [this](auto &&data) {
+            showNotificationAndRestartCallFlow(NotificationType::Failure,
+                                               utils::translate("app_call_call_request_failed"));
             return actionHandled();
         });
         addActionReceiver(manager::actions::CallRejectedByOfflineNotification, [this](auto &&data) {
-            auto buttonAction = [=]() -> bool {
-                app::manager::Controller::switchBack(this);
-                return true;
-            };
-            constexpr auto icon    = "info_128px_W_G";
-            const auto textOffline = utils::translate("app_call_offline");
-            showNotification(buttonAction, icon, textOffline);
+            showNotificationAndRestartCallFlow(NotificationType::Info, utils::translate("app_call_offline"));
             return actionHandled();
         });
         addActionReceiver(manager::actions::AbortCall, [this](auto &&data) {
@@ -110,6 +105,17 @@ namespace app
             handleCallerId(callParams);
             return actionHandled();
         });
+    }
+
+    bool ApplicationCall::conditionalReturnToPreviousView()
+    {
+        // if external request simply return to previous app
+        if (externalRequest == ExternalRequest::True) {
+            app::manager::Controller::switchBack(this);
+            return true;
+        }
+        returnToPreviousWindow();
+        return true;
     }
 
     bool ApplicationCall::isPopupPermitted(gui::popup::ID popupId) const
@@ -174,6 +180,14 @@ namespace app
         return true;
     }
 
+    auto ApplicationCall::showNotificationAndRestartCallFlow(NotificationType type, const std::string &text) -> bool
+    {
+        auto buttonAction = [=]() -> bool { return conditionalReturnToPreviousView(); };
+        auto icon         = type == NotificationType::Info ? "info_128px_W_G" : "fail_128px_W_G";
+        setCallState(call::State::IDLE);
+        return showNotification(buttonAction, icon, text);
+    }
+
     void ApplicationCall::destroyUserInterface()
     {}
 
@@ -206,12 +220,24 @@ namespace app
 
     void ApplicationCall::handleEmergencyCallEvent(const std::string &number)
     {
+        auto state = getCallState();
+        if (state != call::State::IDLE) {
+            LOG_WARN("Cannot call in %s state", c_str(state));
+            return;
+        }
         CellularServiceAPI::DialEmergencyNumber(this, utils::PhoneNumber(number));
     }
 
-    void ApplicationCall::handleCallEvent(const std::string &number)
+    void ApplicationCall::handleCallEvent(const std::string &number, ExternalRequest isExternalRequest)
     {
+        auto state = getCallState();
+        if (state != call::State::IDLE) {
+            LOG_WARN("Cannot call in %s state", c_str(state));
+            return;
+        }
         CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
+        setCallState(call::State::OUTGOING_CALL);
+        externalRequest = isExternalRequest;
     }
 
     void ApplicationCall::handleAddContactEvent(const std::string &number)

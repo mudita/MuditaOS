@@ -279,7 +279,7 @@ namespace bsp
         }
 
         RXfer.resultCode = reason;
-        logUARTdebug("[RX reason] %s", c_str(reason));
+        logUARTdebug("[RX reason] %s", ::c_str(reason));
 
         xMessageBufferSendFromISR(uartRxBuffer, (void *)&RXfer, RXfer.getSize(), &xHigherPriorityTaskWoken);
 

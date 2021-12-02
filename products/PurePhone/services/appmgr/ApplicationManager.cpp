@@ -358,6 +358,8 @@ namespace app::manager
         connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
         connect(typeid(CellularNoSimNotification), convertibleToActionHandler);
         connect(typeid(CellularNotAnEmergencyNotification), convertibleToActionHandler);
+        connect(typeid(CellularNoNetworkConenctionNotification), convertibleToActionHandler);
+        connect(typeid(CellularCallRequestGeneralError), convertibleToActionHandler);
         connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
         connect(typeid(CellularSMSRejectedByOfflineNotification), convertibleToActionHandler);
         connect(typeid(CellularCallRejectedByOfflineNotification), convertibleToActionHandler);
