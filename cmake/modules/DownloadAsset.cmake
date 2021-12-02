@@ -23,9 +23,7 @@ function(download_asset_release asset_name_in asset_name_out asset_repo asset_ve
 endfunction()
 
 function(download_asset_json json install_path cache_dir type)
-    # if (NOT IS_ABSOLUTE ${json} AND NOT STRLESS_EQUAL ${CMAKE_SOURCE_DIR})
     set(json ${CMAKE_SOURCE_DIR}/${json})
-    # endif()
     add_custom_target(json-target
         COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/download_asset.py
             ${type}
