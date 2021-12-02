@@ -49,9 +49,8 @@ namespace bluetooth
         case bluetooth::Command::getDevicesAvailable:
             return availableDevices();
         case bluetooth::Command::StopScan:
-            return stopScan();
-        case bluetooth::Command::Pair:
-            return pair(command.getDevice());
+            return stopScan() 
+	    case bluetooth::Command::Pair : return pair(command.getDevice());
         case bluetooth::Command::Unpair:
             return unpair(command.getDevice());
         case bluetooth::Command::VisibilityOn:
