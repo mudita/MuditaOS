@@ -290,8 +290,11 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
 void ServiceCellular::registerMessageHandlers()
 {
     phoneModeObserver->connect(this);
-    phoneModeObserver->subscribe(
-        [this](sys::phone_modes::PhoneMode mode) { connectionManager->onPhoneModeChange(mode); });
+    phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode mode) {
+        if (priv->simCard->isSimCardSelected()) {
+            connectionManager->onPhoneModeChange(mode);
+        }
+    });
     phoneModeObserver->subscribe([&](sys::phone_modes::Tethering tethering) {
         if (tethering == sys::phone_modes::Tethering::On) {
             priv->tetheringHandler->enable();
@@ -572,6 +575,11 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularSetConnectionFrequencyMessage), [&](sys::Message *request) -> sys::MessagePointer {
         return handleCellularSetConnectionFrequencyMessage(request);
+    });
+
+    connect(typeid(RetryPhoneModeChangeRequest), [&](sys::Message *request) -> sys::MessagePointer {
+        connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode());
+        return sys::MessageNone{};
     });
 
     handle_CellularGetChannelMessage();

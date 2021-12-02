@@ -61,12 +61,23 @@ auto ConnectionManager::isMessagesOnlyMode() -> bool
 
 auto ConnectionManager::handleModeChangeToCommonOffline() -> bool
 {
-    if (cellular->isConnectedToNetwork()) {
+    auto isConnected = cellular->isConnectedToNetwork();
+
+    if (not isConnected.has_value()) {
+        retryOnFail();
+        return false;
+    }
+
+    if (isConnected.value()) {
         cellular->hangUpOngoingCall();
-        cellular->disconnectFromNetwork();
+        if (!cellular->disconnectFromNetwork()) {
+            retryOnFail();
+            return false;
+        }
         cellular->clearNetworkIndicator();
     }
 
+    failRetries           = 0;
     minutesOfflineElapsed = static_cast<std::chrono::minutes>(0);
     minutesOnlineElapsed = static_cast<std::chrono::minutes>(0);
 
@@ -101,13 +112,34 @@ auto ConnectionManager::handleModeChangeToConnected() -> bool
         cellular->stopConnectionTimer();
         onlinePeriod = false;
     }
-    if (!cellular->isConnectedToNetwork()) {
-        cellular->connectToNetwork();
+
+    auto isConnected = cellular->isConnectedToNetwork();
+    if (not isConnected.has_value()) {
+        retryOnFail();
+        return false;
     }
+
+    if (not isConnected.value()) {
+        if (!cellular->connectToNetwork()) {
+            retryOnFail();
+            return false;
+        }
+    }
+    failRetries = 0;
     return true;
 }
 
 auto ConnectionManager::forceDismissCalls() -> bool
 {
     return forceDismissCallsFlag;
+}
+void ConnectionManager::retryOnFail()
+{
+    if (failRetries < maxFailRetries) {
+        cellular->retryPhoneModeChange();
+        failRetries++;
+        return;
+    }
+    LOG_FATAL("Not able to handle phone mode change!!");
+    failRetries = 0;
 }

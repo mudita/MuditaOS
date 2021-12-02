@@ -14,13 +14,14 @@ class ConnectionManagerCellularCommands : public ConnectionManagerCellularComman
     {}
     auto disconnectFromNetwork() -> bool final;
     auto connectToNetwork() -> bool final;
-    auto isConnectedToNetwork() -> bool final;
+    auto isConnectedToNetwork() -> std::optional<bool> final;
     auto clearNetworkIndicator() -> bool final;
     auto hangUpOngoingCall() -> bool final;
     auto isConnectionTimerActive() -> bool final;
     void startConnectionTimer() final;
     void stopConnectionTimer() final;
     void holdMinimumCpuFrequency() final;
+    void retryPhoneModeChange() final;
 
   private:
     ServiceCellular &cellular;

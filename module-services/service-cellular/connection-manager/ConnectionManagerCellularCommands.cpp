@@ -33,7 +33,7 @@ auto ConnectionManagerCellularCommands::connectToNetwork() -> bool
     return false;
 }
 
-auto ConnectionManagerCellularCommands::isConnectedToNetwork() -> bool
+auto ConnectionManagerCellularCommands::isConnectedToNetwork() -> std::optional<bool>
 {
 
     using at::cfun::Functionality;
@@ -48,7 +48,7 @@ auto ConnectionManagerCellularCommands::isConnectedToNetwork() -> bool
             }
         }
     }
-    return false;
+    return std::nullopt;
 }
 
 auto ConnectionManagerCellularCommands::clearNetworkIndicator() -> bool
@@ -105,4 +105,8 @@ void ConnectionManagerCellularCommands::holdMinimumCpuFrequency()
         cellular.cpuSentinel->HoldMinimumFrequencyAndWait(bsp::CpuFrequencyHz::Level_4, handle, 2000);
     }
     return;
+}
+void ConnectionManagerCellularCommands::retryPhoneModeChange()
+{
+    cellular.bus.sendUnicast(std::make_shared<cellular::RetryPhoneModeChangeRequest>(), cellular.serviceName);
 }

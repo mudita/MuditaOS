@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+#include <optional>
 
 class ConnectionManagerCellularCommandsInterface
 {
@@ -25,7 +26,7 @@ class ConnectionManagerCellularCommandsInterface
      * * Checks current state of modem radio module
      * @return true when modem radio module is enabled, false when modem radio module is disabled
      */
-    virtual auto isConnectedToNetwork() -> bool = 0;
+    virtual auto isConnectedToNetwork() -> std::optional<bool> = 0;
     /**
      * * It's disabling modem radio module, so it can't connect to the GSM network
      * @return true on success, false on fail
@@ -53,4 +54,8 @@ class ConnectionManagerCellularCommandsInterface
      * @brief Holds minimum cpu frequency
      */
     virtual void holdMinimumCpuFrequency() = 0;
+    /**
+     * Request retry if phone mode changing fails
+     */
+    virtual void retryPhoneModeChange() = 0;
 };
