@@ -5,7 +5,6 @@
 #include <array>
 #include <cstring>
 #include <module-bluetooth/lib/btstack/src/bluetooth.h>
-#include <btstack_util.h>
 #include <string>
 #include <utility>
 
@@ -17,20 +16,25 @@ struct Device
     static constexpr auto NameBufferSize = 240;
     explicit Device(std::string name = "")
     {
+        setName(name);
+    }
+    virtual ~Device() = default;
+    std::array<char, NameBufferSize> name;
+    void setName(const std::string &name)
+    {
         if (name.size() > NameBufferSize) {
             throw std::runtime_error("Requested name is bigger than buffer size");
         }
         strcpy(this->name.data(), name.c_str());
     }
-    virtual ~Device() = default;
-    std::array<char, NameBufferSize> name;
 };
 
 enum DEVICE_STATE
 {
     REMOTE_NAME_REQUEST,
     REMOTE_NAME_INQUIRED,
-    REMOTE_NAME_FETCHED
+    REMOTE_NAME_FETCHED,
+    REMOTE_NAME_FAILURE,
 };
 
 namespace TYPE_OF_SERVICE
@@ -96,37 +100,25 @@ enum class DeviceState
 struct Devicei : public Device
 {
   public:
-    bd_addr_t address;
-    uint8_t pageScanRepetitionMode;
-    uint16_t clockOffset;
-    uint32_t classOfDevice; ///> Class of Device/Service
+    mutable bd_addr_t address{};
+    uint8_t pageScanRepetitionMode{};
+    uint16_t clockOffset{};
+    uint32_t classOfDevice{}; ///> Class of Device/Service
     DEVICE_STATE state;
     DeviceState deviceState;
+    bool isPairingSSP = false;
 
-    explicit Devicei(std::string name = "") : Device(std::move(name))
-    {
-        memset(address, 0, sizeof(address));
-    }
+    explicit Devicei(std::string name = "");
+    explicit Devicei(bd_addr_t &address);
+    Devicei &operator=(const Devicei &d);
+    Devicei(const Devicei &d);
+    Devicei &operator=(Devicei &&d) noexcept;
+    Devicei(Devicei &&d) noexcept;
     ~Devicei() override = default;
-    void setAddress(bd_addr_t *addr)
-    {
-        memcpy(&address, addr, sizeof address);
-    }
-
-    inline bool operator==(const Devicei &cmpDevice) const
-    {
-        return (strcmp(cmpDevice.name.data(), name.data()) == 0) && (bd_addr_cmp(cmpDevice.address, address) == 0);
-    }
-
-    inline bool operator!=(const Devicei &cmpDevice) const
-    {
-        return (strcmp(cmpDevice.name.data(), name.data()) != 0) || (bd_addr_cmp(cmpDevice.address, address) != 0);
-    }
-
-    auto address_str() const -> const char *
-    {
-        return bd_addr_to_str(address);
-    }
+    void setAddress(bd_addr_t *addr);
+    bool operator==(const Devicei &cmpDevice) const;
+    bool operator!=(const Devicei &cmpDevice) const;
+    auto address_str() const -> const char *;
 };
 
 struct DeviceMetadata_t

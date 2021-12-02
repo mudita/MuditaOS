@@ -4,6 +4,7 @@
 #include <catch2/catch.hpp>
 #include "Device.hpp"
 #include "service-bluetooth/BluetoothDevicesModel.hpp"
+
 TEST_CASE("Devicei comparison")
 {
     Devicei device1{"Dev1"};

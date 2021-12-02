@@ -59,7 +59,6 @@ namespace bluetooth
         }
 
         keys = std::move(keysJson[strings::keys].array_items());
-        LOG_INFO("Imported keys: %d", static_cast<unsigned int>(keys.size()));
     }
 
     void KeyStorage::closeStorage()

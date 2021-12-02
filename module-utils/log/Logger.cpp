@@ -20,6 +20,7 @@ namespace Log
                                                             {"ServiceAntenna", logger_level::LOGERROR},
                                                             {"ServiceAudio", logger_level::LOGINFO},
                                                             {"ServiceBluetooth", logger_level::LOGINFO},
+                                                            {"ServiceBluetooth_w1", logger_level::LOGINFO},
                                                             {"ServiceFota", logger_level::LOGINFO},
                                                             {"ServiceEink", logger_level::LOGINFO},
                                                             {"ServiceDB", logger_level::LOGINFO},

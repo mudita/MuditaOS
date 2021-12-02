@@ -6,6 +6,7 @@
 #include <application-settings/widgets/SettingsStyle.hpp>
 #include <application-settings/windows/WindowNames.hpp>
 
+#include <utility>
 #include <widgets/text/Text.hpp>
 
 namespace gui
@@ -17,10 +18,11 @@ namespace gui
     } // namespace
     namespace passkey_style = style::settings::window::bluetooth::passkey;
 
-    BluetoothCheckPasskeyWindow::BluetoothCheckPasskeyWindow(app::ApplicationCommon *app)
-        : AppWindow(app, window::name::bluetooth_check_passkey)
+    BluetoothCheckPasskeyWindow::BluetoothCheckPasskeyWindow(
+        app::ApplicationCommon *app, std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel)
+        : AppWindow(app, window::name::bluetooth_check_passkey),
+          bluetoothSettingsModel(std::move(bluetoothSettingsModel))
     {
-        bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);
         buildInterface();
     }
 

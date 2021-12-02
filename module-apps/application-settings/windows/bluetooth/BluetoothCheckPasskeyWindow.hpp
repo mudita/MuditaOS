@@ -13,7 +13,8 @@ namespace gui
     class BluetoothCheckPasskeyWindow : public AppWindow
     {
       public:
-        explicit BluetoothCheckPasskeyWindow(app::ApplicationCommon *app);
+        BluetoothCheckPasskeyWindow(app::ApplicationCommon *app,
+                                    std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel);
 
       private:
         void buildInterface() override;
@@ -22,6 +23,6 @@ namespace gui
         Image *image = nullptr;
         Label *label = nullptr;
         Text *text   = nullptr;
-        std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
+        std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
     };
 } // namespace gui

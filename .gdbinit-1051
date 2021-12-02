@@ -13,4 +13,4 @@ info threads
 thread 2
 tb main
 b HardFault_Handler
-
+b _exit
