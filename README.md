@@ -6,7 +6,7 @@
 
   ![MuditaOS interface screenshots](./MuditaOS-screens.png)
 
-## Key features
+##    Key features
 
 - 3 modes (offline, do not disturb, connected) with magnetometer support
 - approved contacts list
