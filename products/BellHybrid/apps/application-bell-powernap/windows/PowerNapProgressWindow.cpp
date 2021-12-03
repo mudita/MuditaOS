@@ -68,7 +68,7 @@ namespace gui
 
         buildLayout();
         configureTimer();
-        presenter->activate();
+        // presenter->activate();
     }
     void PowerNapProgressWindow::buildLayout()
     {
@@ -106,6 +106,10 @@ namespace gui
             const auto key = mapKey(inputEvent.getKeyCode());
             if (presenter->isNapFinished() && key == KeyMap::LightPress) {
                 presenter->endNap();
+                return true;
+            }
+            else if (not presenter->isNapFinished() && key == KeyMap::LightPress) {
+                presenter->pause();
                 return true;
             }
             else if (not presenter->isNapFinished() && key == KeyMap::Back) {
@@ -146,5 +150,12 @@ namespace gui
     {
         presenter->onBeforeShow();
         updateTime();
+
+        if (mode == ShowMode::GUI_SHOW_INIT) {
+            presenter->activate();
+        }
+        else {
+            presenter->resume();
+        }
     }
 } // namespace gui

@@ -21,6 +21,7 @@ target_sources(application-bell-common
         src/windows/BellFinishedWindow.cpp
         src/windows/BellTurnOffWindow.cpp
         src/windows/BellWelcomeWindow.cpp
+        src/windows/SessionPausedWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
         src/TimeUtils.cpp
@@ -50,6 +51,7 @@ target_sources(application-bell-common
         include/common/windows/BellFinishedWindow.hpp
         include/common/windows/BellTurnOffWindow.hpp
         include/common/windows/BellWelcomeWindow.hpp
+        include/common/windows/SessionPausedWindow.hpp
         include/common/TimeUtils.hpp
         include/common/models/AbstractAlarmModel.hpp
         include/common/models/AbstractBedtimeModel.hpp
