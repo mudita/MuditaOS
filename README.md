@@ -4,7 +4,7 @@
 
   MuditaOS is a mobile operating system optimized for E Ink displays. Built on FreeRTOS™ with Mudita Pure minimalist phone in mind.
 
-![MuditaOS interface screenshots](./MuditaOS-screens.png)
+  ![MuditaOS interface screenshots](./MuditaOS-screens.png)
 
 ## Key features
 
