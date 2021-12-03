@@ -6,22 +6,20 @@ from harness import log
 from harness.api.device_info import GetDiagnosticFilesList, DiagnosticsFileList
 from harness.request import TransactionError
 
+class DiagnosticsError(RuntimeError):
+    pass
+
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
 def test_device_list_logs(harness):
     ret = GetDiagnosticFilesList(DiagnosticsFileList.LOGS).run(harness)
 
     if not ret.files:
-        log.info("No log files")
-        assert True
-        return
+        raise DiagnosticsError("No log files")
 
+    log.info("Available log files:")
     for file in ret.files:
-        print(file)
-        assert True
-        return
-
-    assert False
+        log.info(file)
 
 
 @pytest.mark.service_desktop_test
@@ -30,16 +28,13 @@ def test_device_list_crash_dumps(harness):
     ret = GetDiagnosticFilesList(DiagnosticsFileList.CRASH_DUMPS).run(harness)
 
     if not ret.files:
-        log.info("No crash dump files")
-        assert True
+        log.warning("No crash dump files")
         return
 
+    log.info("Available crash dump files:")
     for file in ret.files:
-        print(file)
-        assert True
-        return
+        log.info(file)
 
-    assert False
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
