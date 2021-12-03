@@ -18,3 +18,19 @@ namespace gui::bell_style
     inline constexpr auto popup_icon_y_alignment   = 22;
 
 } // namespace gui::bell_style
+
+namespace itStyle
+{
+    namespace icon
+    {
+        constexpr inline auto imageLogo         = "bell_big_logo";
+        constexpr inline auto imagePause        = "big_pause";
+        constexpr inline auto imageTopMargin    = 112;
+        constexpr inline auto imageBottomMargin = 30;
+    } // namespace icon
+
+    namespace text
+    {
+        constexpr inline auto font = style::window::font::verybiglight;
+    } // namespace text
+} // namespace itStyle

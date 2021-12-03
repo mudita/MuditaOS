@@ -12,7 +12,6 @@ namespace gui::name::window
     inline constexpr auto meditationTimer    = "MeditationTimerWindow";
     inline constexpr auto readyGoing         = "ReadyGoingWindow";
     inline constexpr auto sessionEnded       = "SessionEndedWindow";
-    inline constexpr auto sessionPaused      = "SensionPausedWindow";
 } // namespace gui::name::window
 
 namespace app

@@ -43,6 +43,8 @@ namespace app::powernap
           public:
             virtual void activate()                                                 = 0;
             virtual void endNap()                                                   = 0;
+            virtual void pause()                                                    = 0;
+            virtual void resume()                                                   = 0;
             virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
             virtual void handleUpdateTimeEvent()                                    = 0;
             virtual bool isNapFinished()                                            = 0;
@@ -63,6 +65,8 @@ namespace app::powernap
 
         void activate() override;
         void endNap() override;
+        void pause() override;
+        void resume() override;
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void handleUpdateTimeEvent() override;
         bool isNapFinished() override;
