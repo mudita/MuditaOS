@@ -10,6 +10,7 @@
 #include "windows/PowerNapSessionEndedWindow.hpp"
 #include <common/models/TimeModel.hpp>
 #include <AlarmSoundPaths.hpp>
+#include <common/windows/SessionPausedWindow.hpp>
 
 namespace app
 {
@@ -50,6 +51,10 @@ namespace app
                     app, settings.get(), std::move(soundsRepository), *audioModel, std::move(timeModel));
                 return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
             });
+        windowsFactory.attach(gui::window::session_paused::sessionPaused,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::SessionPausedWindow>(app);
+                              });
         windowsFactory.attach(gui::window::name::powernapSessionEnded,
                               [](ApplicationCommon *app, const std::string &name) {
                                   auto presenter = std::make_unique<powernap::PowerNapSessionEndPresenter>(app);

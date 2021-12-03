@@ -10,6 +10,12 @@
 
 namespace gui
 {
+
+    namespace window::session_paused
+    {
+        inline constexpr auto sessionPaused = "SessionPausedWindow";
+    } // namespace window::session_paused
+
     class SessionPausedWindow : public AppWindow
     {
       public:

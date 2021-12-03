@@ -11,6 +11,7 @@
 #include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <Utils.hpp>
+#include <common/windows/SessionPausedWindow.hpp>
 
 #include <gsl/assert>
 
@@ -44,9 +45,11 @@ namespace app::powernap
     {
         Expects(timer != nullptr);
         const auto value = settings->getValue(powernapDBRecordName);
+        reinterpret_cast<app::Application *>(app)->suspendIdleTimer();
         timer->reset(std::chrono::minutes{utils::getNumericValue<int>(value)});
         timer->start();
     }
+
     void PowerNapProgressPresenter::endNap()
     {
         napFinished = false;
@@ -54,6 +57,18 @@ namespace app::powernap
         napAlarmTimer.stop();
         onNapAlarmFinished();
     }
+
+    void PowerNapProgressPresenter::pause()
+    {
+        timer->stop();
+        app->switchWindow(gui::window::session_paused::sessionPaused);
+    }
+
+    void PowerNapProgressPresenter::resume()
+    {
+        timer->start();
+    }
+
     void PowerNapProgressPresenter::onNapFinished()
     {
         const auto filePath = soundsRepository->titleToPath(
@@ -63,6 +78,7 @@ namespace app::powernap
         napAlarmTimer.start();
         napFinished = true;
     }
+
     void PowerNapProgressPresenter::onNapAlarmFinished()
     {
         audioModel.stopPlayedByThis({});

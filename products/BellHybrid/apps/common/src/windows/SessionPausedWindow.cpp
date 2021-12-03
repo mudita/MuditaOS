@@ -1,14 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationBellMeditationTimer.hpp"
-#include "MeditationStyle.hpp"
-#include "SessionPausedWindow.hpp"
+#include <common/data/StyleCommon.hpp>
+#include "windows/SessionPausedWindow.hpp"
 
 namespace gui
 {
     SessionPausedWindow::SessionPausedWindow(app::ApplicationCommon *app)
-        : AppWindow(app, gui::name::window::sessionPaused)
+        : AppWindow(app, gui::window::session_paused::sessionPaused)
     {
         buildInterface();
     }
@@ -32,12 +31,11 @@ namespace gui
         navBar->setVisible(false);
 
         if (icon == nullptr) {
-            using namespace app::meditationStyle;
 
             icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
             icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
             icon->image->setMargins({0, itStyle::icon::imageTopMargin, 0, itStyle::icon::imageBottomMargin});
-            icon->image->set(app::meditationStyle::itStyle::icon::imagePause, ImageTypeSpecifier::W_G);
+            icon->image->set(itStyle::icon::imagePause, ImageTypeSpecifier::W_G);
             icon->text->setFont(itStyle::text::font);
             icon->text->setRichText(utils::translate("common_paused"));
         }
