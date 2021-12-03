@@ -517,7 +517,7 @@ namespace app::manager
     {
         const auto actionHandlers = applications.findByAction(action.actionId);
         if (actionHandlers.empty()) {
-            LOG_ERROR("No applications handling action #%d.", action.actionId);
+            LOG_INFO("No applications handling action #%d.", action.actionId);
             return ActionProcessStatus::Dropped;
         }
         if (actionHandlers.size() > 1) {
