@@ -62,6 +62,12 @@
 #include <popups/data/BluetoothModeParams.hpp>
 #include <locks/data/LockData.hpp>
 
+#if DEBUG_INPUT_EVENTS == 1
+#define debug_input_events(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define debug_input_events(...)
+#endif
+
 namespace gui
 {
     class DrawCommand;
@@ -201,6 +207,12 @@ namespace app
             messageInputEventApplication(this, this->GetName(), iev);
             keyTranslator->resetPreviousKeyPress();
             longPressTimer.stop();
+
+            debug_input_events("AppInput -> K:|%s|, S:|%s|, App:|%s|, W:|%s|",
+                               magic_enum::enum_name(iev.getKeyCode()).data(),
+                               magic_enum::enum_name(iev.getState()).data(),
+                               GetName().c_str(),
+                               getCurrentWindow()->getName().c_str());
         }
     }
 
@@ -412,6 +424,13 @@ namespace app
         if (!iev.is(gui::KeyCode::KEY_UNDEFINED)) {
             messageInputEventApplication(this, this->GetName(), iev);
         }
+
+        debug_input_events("AppInput -> K:|%s|, S:|%s|, App:|%s|, W:|%s|",
+                           magic_enum::enum_name(iev.getKeyCode()).data(),
+                           magic_enum::enum_name(iev.getState()).data(),
+                           GetName().c_str(),
+                           getCurrentWindow()->getName().c_str());
+
         return sys::msgHandled();
     }
 

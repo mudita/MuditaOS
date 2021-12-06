@@ -44,6 +44,12 @@
 #include <purefs/filesystem_paths.hpp>
 #include <Constants.hpp>
 
+#if DEBUG_INPUT_EVENTS == 1
+#define debug_input_events(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define debug_input_events(...)
+#endif
+
 namespace
 {
     constexpr auto loggerDelayMs   = 1000 * 60 * 5;
@@ -284,9 +290,19 @@ void EventManagerCommon::handleKeyEvent(sys::Message *msg)
     auto message    = std::make_shared<sevm::KbdMessage>();
     message->key    = kbdMessage->key;
 
+    debug_input_events("EVInput -> K:|%s|, S:|%s|, TP:|%d|, TR:|%d|, App:|%s|",
+                       magic_enum::enum_name(message->key.keyCode).data(),
+                       magic_enum::enum_name(message->key.state).data(),
+                       message->key.timePress,
+                       message->key.timeRelease,
+                       targetApplication.c_str());
+
     // send key to focused application
     if (!targetApplication.empty()) {
         bus.sendUnicast(message, targetApplication);
+    }
+    else {
+        debug_input_events("EventManagerInput -> No target Application!");
     }
     // notify application manager to prevent screen locking
     app::manager::Controller::preventBlockingDevice(this);
