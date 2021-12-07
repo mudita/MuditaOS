@@ -66,12 +66,9 @@ target_sources(application-bell-settings
 
         models/advanced/AboutYourBellModel.hpp
         models/advanced/FrontlightListItemProvider.hpp
-        models/advanced/FrontlightModel.hpp
-        models/alarm_settings/AbstractAlarmSettingsModel.hpp
         models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp
         models/alarm_settings/AbstractSnoozeSettingsModel.hpp
         models/alarm_settings/AlarmSettingsListItemProvider.hpp
-        models/alarm_settings/AlarmSettingsModel.hpp
         models/alarm_settings/BedtimeSettingsListItemProvider.cpp
         models/alarm_settings/PrewakeUpListItemProvider.hpp
         models/alarm_settings/PrewakeUpSettingsModel.hpp

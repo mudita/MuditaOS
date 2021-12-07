@@ -10,11 +10,20 @@
 #include <time/time_locale.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <memory>
+#include <common/models/FrontlightModel.hpp>
+#include <common/models/AlarmSettingsModel.hpp>
+
 namespace app
 {
     class AbstractTimeModel;
     class ApplicationCommon;
 } // namespace app
+
+namespace app::bell_settings
+{
+    class AbstractFrontlightModel;
+    class AlarmLightOnOffModel;
+} // namespace app::bell_settings
 namespace gui
 {
     class Item;
@@ -58,8 +67,10 @@ namespace app::powernap
         settings::Settings *settings{};
         std::unique_ptr<AbstractSoundsRepository> soundsRepository;
         AbstractAudioModel &audioModel;
+        app::bell_settings::AbstractFrontlightModel &frontLightModel;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
+        std::unique_ptr<app::bell_settings::AlarmLightOnOffModel> alarmLightOnOffModel;
         sys::TimerHandle napAlarmTimer;
         bool napFinished{false};
 
@@ -80,6 +91,8 @@ namespace app::powernap
                                   settings::Settings *settings,
                                   std::unique_ptr<AbstractSoundsRepository> soundsRepository,
                                   AbstractAudioModel &audioModel,
-                                  std::unique_ptr<AbstractTimeModel> timeModel);
+                                  app::bell_settings::AbstractFrontlightModel &frontLightModel,
+                                  std::unique_ptr<AbstractTimeModel> timeModel,
+                                  std::unique_ptr<app::bell_settings::AlarmLightOnOffModel> alarmLightOnOffModel);
     };
 } // namespace app::powernap
