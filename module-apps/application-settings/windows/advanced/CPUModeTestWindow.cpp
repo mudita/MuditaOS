@@ -77,6 +77,8 @@ namespace gui
         currentFreqValue->setMaximumWidth(currentFreqValue->widgetMinimumArea.w);
         currentFreqValue->informContentChanged();
         currentFreqValue->setText(freqToPrint);
+
+        currentFreqSpinner->setCurrentValue(freqToPrint);
     }
 
     void CPUModeTestWindow::createCurrentFreqBox()

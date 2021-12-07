@@ -24,6 +24,8 @@ namespace bsp
         Level_6 = 528
     };
 
+    constexpr auto MHz_frequency_multiplier = 1000000U;
+
     enum class Board{
         RT1051,
     	Linux,

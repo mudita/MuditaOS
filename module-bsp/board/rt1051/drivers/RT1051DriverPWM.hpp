@@ -29,7 +29,7 @@ namespace drivers
 
         void Stop(PWMChannel channel) final;
 
-        void UpdateClockFrequency(std::uint32_t newFrequency) final;
+        void UpdateClockFrequency(bsp::CpuFrequencyMHz newFrequency) final;
 
         enum class PwmState
         {

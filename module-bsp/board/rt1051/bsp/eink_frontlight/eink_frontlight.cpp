@@ -65,7 +65,7 @@ namespace bsp::eink_frontlight
 
     void updateClockFrequency(CpuFrequencyMHz newFrequency)
     {
-        pwm->UpdateClockFrequency(static_cast<std::uint32_t>(newFrequency));
+        pwm->UpdateClockFrequency(newFrequency);
     }
 
 } // namespace bsp::eink_frontlight
