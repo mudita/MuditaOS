@@ -49,7 +49,7 @@ namespace bsp
         void updateClockFrequency(CpuFrequencyMHz newFrequency)
         {
             if (pwm) {
-                pwm->UpdateClockFrequency(static_cast<std::uint32_t>(newFrequency));
+                pwm->UpdateClockFrequency(newFrequency);
             }
         }
 

@@ -171,18 +171,19 @@ namespace drivers
         base->SM[pwmModule].CTRL2 |= PWM_CTRL2_FORCE(1U);
     }
 
-    void RT1051DriverPWM::UpdateClockFrequency(std::uint32_t newFrequency)
+    void RT1051DriverPWM::UpdateClockFrequency(bsp::CpuFrequencyMHz newFrequency)
     {
         cpp_freertos::LockGuard lock(frequencyChangeMutex);
+        std::uint32_t convertedFrequency = static_cast<std::uint32_t>(newFrequency) * bsp::MHz_frequency_multiplier;
 
-        if (clockFrequency != newFrequency) {
-            SetupPWMInstance(pwmSignalsConfig.data(), enabledChannels.size(), newFrequency);
+        if (clockFrequency != convertedFrequency) {
+            SetupPWMInstance(pwmSignalsConfig.data(), enabledChannels.size(), convertedFrequency);
             if (GetPwmState() == PwmState::On) {
                 stopAll();
                 restoreDutyCycle();
                 startAll();
             }
-            clockFrequency = newFrequency;
+            clockFrequency = convertedFrequency;
         }
     }
 

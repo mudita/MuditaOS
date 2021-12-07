@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <cstdint>
+#include <bsp/common.hpp>
 
 namespace drivers
 {
@@ -59,7 +60,7 @@ namespace drivers
 
         virtual void Stop(PWMChannel channel) = 0;
 
-        virtual void UpdateClockFrequency(std::uint32_t) = 0;
+        virtual void UpdateClockFrequency(bsp::CpuFrequencyMHz newFrequency) = 0;
 
       protected:
         PWMInstances instance;
