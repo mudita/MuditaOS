@@ -105,4 +105,13 @@ namespace db::multimedia_files::query
     {
         return std::string{"GetAlbumsLimitedResult"};
     }
+
+    GetLimitedByPath::GetLimitedByPath(std::string path, uint32_t offset, uint32_t limit)
+        : Query(Query::Type::Read), path{path}, offset(offset), limit(limit)
+    {}
+
+    auto GetLimitedByPath::debugInfo() const -> std::string
+    {
+        return std::string{"GetLimitedByPath"};
+    }
 } // namespace db::multimedia_files::query

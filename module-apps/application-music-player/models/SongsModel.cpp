@@ -9,7 +9,7 @@
 #include <service-audio/AudioServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 
-namespace app::music_player
+namespace app::music
 {
 
     SongsListItemProvider::SongsListItemProvider(ApplicationCommon *app) : DatabaseModel(app)
@@ -90,10 +90,10 @@ namespace app::music_player
                                 OnSetNavBarTemporaryCallback navBarTemporaryMode,
                                 OnRestoreNavBarTemporaryCallback navBarRestoreFromTemporaryMode)
     {
-        this->shortReleaseCallback              = shortReleaseCallback;
-        this->longPressCallback                 = longPressCallback;
-        this->navBarTemporaryMode               = navBarTemporaryMode;
-        this->navBarRestoreFromTemporaryMode    = navBarRestoreFromTemporaryMode;
+        this->shortReleaseCallback           = shortReleaseCallback;
+        this->longPressCallback              = longPressCallback;
+        this->navBarTemporaryMode            = navBarTemporaryMode;
+        this->navBarRestoreFromTemporaryMode = navBarRestoreFromTemporaryMode;
 
         songsRepository->initCache();
     }
@@ -135,7 +135,7 @@ namespace app::music_player
 
     void SongsModel::setCurrentSongContext(SongContext context)
     {
-        songContext = context;
+        songContext     = context;
         activatedRecord = songsRepository->getRecord(context.filePath);
     }
 
@@ -175,4 +175,4 @@ namespace app::music_player
         songsRepository->updateRepository(filePath);
     }
 
-} // namespace app::music_player
+} // namespace app::music

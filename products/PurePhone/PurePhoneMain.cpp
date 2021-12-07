@@ -75,6 +75,8 @@ int main()
 {
     constexpr auto ApplicationName = "PurePhone";
 
+    const std::vector<std::string> fileIndexerAudioPaths = {{purefs::dir::getUserDiskPath() / "music"}};
+
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_DisableEvents(SYSVIEW_EVTMASK_ISR_ENTER);
@@ -96,7 +98,7 @@ int main()
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
     systemServices.emplace_back(sys::CreatorFor<EventManager>([]() { return dumpLogs(); }));
-    systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
+    systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>(std::move(fileIndexerAudioPaths)));
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
 #if ENABLE_GSM == 0
     // For now disable permanently Service cellular when there is no GSM configured

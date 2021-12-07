@@ -2,18 +2,32 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BGSoundsMainWindowPresenter.hpp"
-#include "models/BGSoundsRepository.hpp"
-#include <application-music-player/models/SongsRepository.hpp>
+#include <apps-common/models/SongsRepository.hpp>
+#include <purefs/filesystem_paths.hpp>
+
+namespace
+{
+    constexpr auto soundsRepoOffset = 0;
+    constexpr auto soundsRepoLimit  = 100;
+} // namespace
 
 namespace app::bgSounds
 {
-    BGSoundsMainWindowPresenter::BGSoundsMainWindowPresenter(std::shared_ptr<AbstractSoundsRepository> soundsRepository)
+    auto bgSoundsPath = purefs::dir::getCurrentOSPath() / "assets" / "audio" / "bell" / "bg_sounds";
+
+    BGSoundsMainWindowPresenter::BGSoundsMainWindowPresenter(
+        std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository)
         : soundsRepository{std::move(soundsRepository)}
-    {
-        this->soundsRepository->scanMusicFilesList();
-    }
+    {}
     void BGSoundsMainWindowPresenter::loadAudioRecords()
     {
-        getView()->setSoundsList(soundsRepository->getMusicFilesList());
+        soundsRepository->getMusicFilesList(
+            soundsRepoOffset,
+            soundsRepoLimit,
+            [this](const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
+                   unsigned int repoRecordsCount) {
+                getView()->setSoundsList(records);
+                return true;
+            });
     }
 } // namespace app::bgSounds

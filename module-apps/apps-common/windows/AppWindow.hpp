@@ -76,7 +76,7 @@ namespace gui
         bool updateBluetooth(sys::bluetooth::BluetoothMode mode);
         bool updateAlarmClock(bool status);
         bool updateSim();
-        bool updateBatteryStatus();
+        virtual bool updateBatteryStatus();
         bool updateSignalStrength();
         bool updateNetworkAccessTechnology();
         void updatePhoneMode(sys::phone_modes::PhoneMode mode);

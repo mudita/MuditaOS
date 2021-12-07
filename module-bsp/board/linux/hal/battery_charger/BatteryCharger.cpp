@@ -110,6 +110,8 @@ namespace hal::battery
 
         xTaskCreate(batteryWorker, "battery", 512, nullptr, 0, &batteryWorkerHandle);
         Store::Battery::modify().level = batteryLevel;
+        Store::Battery::modify().state =
+            isPlugged ? Store::Battery::State::Charging : Store::Battery::State::Discharging;
     }
 
     void BatteryCharger::deinit()

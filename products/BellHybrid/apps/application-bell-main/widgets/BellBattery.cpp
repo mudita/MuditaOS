@@ -45,6 +45,19 @@ namespace gui
         if (batteryContext.state == Store::Battery::State::Charging) {
             img->set(battery::battery_charging, gui::ImageTypeSpecifier::W_M);
 
+            if (level == 100) {
+                img->setMargins(gui::Margins(0, 0, battery::image_right_margin, 0));
+                img->informContentChanged();
+            }
+            else if (level < 10) {
+                img->setMargins(gui::Margins(battery::image_left_margin_big, 0, battery::image_right_margin, 0));
+                img->informContentChanged();
+            }
+            else {
+                img->setMargins(gui::Margins(battery::image_left_margin, 0, battery::image_right_margin, 0));
+                img->informContentChanged();
+            }
+
             percentText->setText(std::to_string(level) + "%");
             setVisible(true);
         }
@@ -53,12 +66,15 @@ namespace gui
                 setVisible(false);
             }
             else {
-                if (level > 10) {
-                    img->set(battery::battery_low, gui::ImageTypeSpecifier::W_M);
+                if (level < 10) {
+                    img->setMargins(gui::Margins(battery::image_left_margin_big, 0, battery::image_right_margin, 0));
+                    img->informContentChanged();
                 }
                 else {
-                    img->set(battery::battery_critical, gui::ImageTypeSpecifier::W_M);
+                    img->setMargins(gui::Margins(battery::image_left_margin, 0, battery::image_right_margin, 0));
+                    img->informContentChanged();
                 }
+                img->set(result->image, gui::ImageTypeSpecifier::W_M);
                 percentText->setText(std::to_string(level) + "%");
                 setVisible(true);
             }

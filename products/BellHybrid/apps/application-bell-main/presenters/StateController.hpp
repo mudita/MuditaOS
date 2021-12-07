@@ -35,6 +35,7 @@ namespace app::home_screen
         virtual bool handleTimeUpdateEvent()                             = 0;
         virtual bool handleAlarmRingingEvent()                           = 0;
         virtual bool handleAlarmModelReady()                             = 0;
+        virtual bool handleBatteryStatus()                               = 0;
         virtual bool isSnoozeAllowed()                                   = 0;
         virtual void snooze(bool ctrl)                                   = 0;
     };
@@ -56,6 +57,7 @@ namespace app::home_screen
         bool handleTimeUpdateEvent() override;
         bool handleAlarmRingingEvent() override;
         bool handleAlarmModelReady() override;
+        bool handleBatteryStatus() override;
         bool isSnoozeAllowed() override;
         void snooze(bool ctrl) override;
 

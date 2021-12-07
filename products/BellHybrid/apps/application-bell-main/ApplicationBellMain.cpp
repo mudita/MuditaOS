@@ -51,7 +51,12 @@ namespace app
         });
 
         addActionReceiver(app::manager::actions::DisplayLowBatteryScreen, [this](auto &&data) {
-            handleLowBatteryNotification(std::move(data));
+            /**
+             * Due to the way of handling shutdown sequence by GUI renderer and applications it is required to leave
+             * this handler defined but not implemented even if it's not used at all.
+             * Without it, the renderer won't render the last frame properly.
+             * This issue will be addressed in future PRs.
+             */
             return actionHandled();
         });
     }
@@ -161,33 +166,5 @@ namespace app
             }
         }
         return ApplicationCommon::handleSwitchWindow(msgl);
-    }
-
-    bool ApplicationBellMain::isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const
-    {
-        if (blockAllPopups) {
-            return false;
-        }
-        return true;
-    }
-
-    void ApplicationBellMain::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
-    {
-        auto lowBatteryState = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
-        auto currentWindow   = getCurrentWindow();
-        if (currentWindow->getName() == gui::window::name::bell_battery_shutdown) {
-            data->ignoreCurrentWindowOnStack = true;
-        }
-
-        if (lowBatteryState->isActive() && !lowBatteryState->isCharging()) {
-            blockAllPopups = true;
-            switchWindow(gui::window::name::bell_battery_shutdown, std::move(data));
-        }
-        else {
-            blockAllPopups = false;
-            if (currentWindow->getName() == gui::window::name::bell_battery_shutdown) {
-                app::manager::Controller::sendAction(this, app::manager::actions::Home, std::move(data));
-            }
-        }
     }
 } // namespace app

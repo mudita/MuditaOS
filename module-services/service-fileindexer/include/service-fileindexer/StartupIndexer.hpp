@@ -13,7 +13,7 @@ namespace service::detail
     {
 
       public:
-        StartupIndexer()                       = default;
+        explicit StartupIndexer(const std::vector<std::string> &paths);
         ~StartupIndexer()                      = default;
         StartupIndexer(const StartupIndexer &) = delete;
         StartupIndexer &operator=(StartupIndexer) = delete;
@@ -41,5 +41,8 @@ namespace service::detail
         sys::TimerHandle mIdxTimer;
         bool mStarted{};
         bool mForceStop{};
+
+        // List of initial dirs for scan
+        const std::vector<std::string> start_dirs;
     };
 } // namespace service::detail

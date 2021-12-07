@@ -4,6 +4,7 @@
 #include "windows/BellFactoryReset.hpp"
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
+#include <common/data/StyleCommon.hpp>
 #include <i18n/i18n.hpp>
 #include <Application.hpp>
 
@@ -32,6 +33,7 @@ namespace gui
         if (icon == nullptr) {
             icon = new Icon(this, 0, 0, style::window_width, style::window_height, "circle_success_big", {});
             icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+            icon->setY(bell_style::popup_icon_y_alignment);
         }
     }
     bool BellFactoryReset::onInput(const InputEvent &)

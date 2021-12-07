@@ -8,7 +8,9 @@
 
 namespace style::bell_sidelist_item
 {
-    inline constexpr auto description_font = style::window::font::largelight;
+    inline constexpr auto title_font       = style::window::font::largelight;
+    inline constexpr auto description_font = style::window::font::verybiglight;
+
 } // namespace style::bell_sidelist_item
 
 namespace gui

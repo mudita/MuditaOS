@@ -58,6 +58,7 @@ target_link_libraries(BellHybrid
         module-vfs
         service-desktop
         service-time
+        service-fileindexer
         sys
         bell::time
         platform

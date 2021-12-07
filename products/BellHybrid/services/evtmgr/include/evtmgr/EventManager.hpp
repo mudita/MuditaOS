@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <bsp/switches/LatchStatusRequest.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 
 #include "backlight-handler/BacklightHandler.hpp"
@@ -32,6 +33,8 @@ class EventManager : public EventManagerCommon
     evm::UserActivityHandler userActivityHandler;
 
     std::shared_ptr<KeySequenceMgr> keySequenceMgr;
+
+    sevm::LatchStatus latchStatus{};
 };
 
 namespace sys

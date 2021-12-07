@@ -24,23 +24,7 @@ namespace app::home_screen
                                              std::unique_ptr<AbstractTimeModel> timeModel)
         : app{app}, alarmModel{std::move(alarmModel)}, batteryModel{std::move(batteryModel)},
           temperatureModel{std::move(temperatureModel)}, timeModel{std::move(timeModel)}
-    {
-        constexpr int timeout = pdMS_TO_TICKS(1500);
-
-        auto response =
-            app->bus.sendUnicastSync(std::make_shared<sevm::LatchStatusRequest>(), service::name::evt_manager, timeout);
-
-        if (response.first == sys::ReturnCodes::Success) {
-            auto msgState = dynamic_cast<sevm::LatchStatusResponse *>(response.second.get());
-            if (msgState == nullptr) {
-                return;
-            }
-
-            if (msgState->getStatus() == sevm::LatchStatus::PRESSED) {
-                latchPressed = true;
-            }
-        }
-    }
+    {}
 
     void HomeScreenPresenter::handleUpdateTimeEvent()
     {
@@ -108,7 +92,6 @@ namespace app::home_screen
     }
     void HomeScreenPresenter::handleAlarmModelReady()
     {
-        setStartupAlarmState();
         getView()->setAlarmTime(alarmModel->getAlarmTime());
         stateController->handleAlarmModelReady();
     }
@@ -144,18 +127,22 @@ namespace app::home_screen
         return batteryModel->getLevelState().state == Store::Battery::State::Charging;
     }
 
-    bool HomeScreenPresenter::isStartupDeepPress()
+    bool HomeScreenPresenter::isAlarmActivatedByLatch() const
     {
-        return latchPressed;
-    }
+        constexpr auto timeout = pdMS_TO_TICKS(1500);
 
-    void HomeScreenPresenter::setStartupAlarmState()
-    {
-        static auto isStartup = true;
-        if (isStartup) {
-            alarmModel->activate(!latchPressed);
-            isStartup = false;
+        auto response =
+            app->bus.sendUnicastSync(std::make_shared<sevm::LatchStatusRequest>(), service::name::evt_manager, timeout);
+
+        if (response.first == sys::ReturnCodes::Success) {
+            auto msgState = dynamic_cast<sevm::LatchStatusResponse *>(response.second.get());
+            if (msgState != nullptr) {
+                return msgState->getStatus() != sevm::LatchStatus::PRESSED;
+            }
         }
+
+        LOG_FATAL("Couldn't fetch latch state");
+        return false;
     }
 
     void HomeScreenPresenter::handleCyclicDeepRefresh()
@@ -168,5 +155,9 @@ namespace app::home_screen
             refreshCount = 0;
         }
         refreshCount++;
+    }
+    void HomeScreenPresenter::handleBatteryStatus()
+    {
+        stateController->handleBatteryStatus();
     }
 } // namespace app::home_screen
