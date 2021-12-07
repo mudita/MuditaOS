@@ -138,4 +138,18 @@ namespace service
         AudioResumeRequest() : AudioMessage()
         {}
     };
+
+    class AudioPlaybackStartNotification : public sys::DataMessage
+    {
+      public:
+        AudioPlaybackStartNotification() : sys::DataMessage(MessageType::AudioMessage)
+        {}
+    };
+
+    class AudioPlaybackStopNotification : public sys::DataMessage
+    {
+      public:
+        AudioPlaybackStopNotification() : sys::DataMessage(MessageType::AudioMessage)
+        {}
+    };
 } // namespace service

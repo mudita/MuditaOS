@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerEvent.hpp"
+#include "evtmgr/temperature-compensation/TemperatureProvider.hpp"
 #include "internal/StaticData.hpp"
 #include "internal/key_sequences/KeySequenceMgr.hpp"
 #include "internal/key_sequences/PowerOffSequence.hpp"
@@ -22,18 +23,7 @@
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
 #include <switches/LatchState.hpp>
 
-namespace
-{
-    auto updateTemperature = [](hal::temperature::AbstractTemperatureSource &source) {
-        const auto temp = source.read();
-        if (not temp) {
-            LOG_FATAL("Error during reading from temperature source");
-        }
-        else {
-            evtmgr::internal::StaticData::get().setCurrentTemperature(*temp);
-        };
-    };
-}
+#include <audio/AudioMessage.hpp>
 
 EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &name)
     : EventManagerCommon(logDumpFunction, name),
@@ -42,9 +32,8 @@ EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &n
 {
     latchStatus = bsp::bell_switches::isLatchPressed() ? sevm::LatchStatus::PRESSED : sevm::LatchStatus::RELEASED;
     buildKeySequences();
-    updateTemperature(*temperatureSource);
-
-    onMinuteTick = [this](const time_t) { updateTemperature(*temperatureSource); };
+    temperatureProvider.updateTemperature(*temperatureSource);
+    onMinuteTick = [this](const time_t) { temperatureProvider.updateTemperature(*temperatureSource); };
 }
 
 void EventManager::handleKeyEvent(sys::Message *msg)
@@ -118,6 +107,16 @@ void EventManager::initProductEvents()
     connect(sevm::LatchStatusRequest(), [&](sys::Message *msgl) {
         auto msg = std::make_shared<sevm::LatchStatusResponse>(latchStatus);
         return msg;
+    });
+
+    connect(service::AudioPlaybackStartNotification(), [&](sys::Message *msgl) {
+        temperatureProvider.audioStarted();
+        return sys::msgHandled();
+    });
+
+    connect(service::AudioPlaybackStopNotification(), [&](sys::Message *msgl) {
+        temperatureProvider.audioStoped();
+        return sys::msgHandled();
     });
 }
 

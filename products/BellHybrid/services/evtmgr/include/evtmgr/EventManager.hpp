@@ -7,6 +7,7 @@
 #include <service-evtmgr/EventManagerCommon.hpp>
 
 #include "backlight-handler/BacklightHandler.hpp"
+#include "temperature-compensation/TemperatureProvider.hpp"
 #include "user-activity-handler/UserActivityHandler.hpp"
 
 class KeySequenceMgr;
@@ -35,6 +36,7 @@ class EventManager : public EventManagerCommon
     std::shared_ptr<KeySequenceMgr> keySequenceMgr;
 
     sevm::LatchStatus latchStatus{};
+    TemperatureProvider temperatureProvider;
 };
 
 namespace sys

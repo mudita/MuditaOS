@@ -13,6 +13,7 @@ target_sources(evtmgr
         screen-light-control/ScreenLightControl.cpp
         backlight-handler/BacklightHandler.cpp
         user-activity-handler/UserActivityHandler.cpp
+        temperature-compensation/TemperatureProvider.cpp
 
         internal/key_sequences/AbstractKeySequence.hpp
         internal/key_sequences/KeySequenceMgr.hpp
@@ -28,6 +29,7 @@ target_sources(evtmgr
         include/evtmgr/api/TemperatureApi.hpp
         include/evtmgr/backlight-handler/BacklightHandler.hpp
         include/evtmgr/user-activity-handler/UserActivityHandler.hpp
+        include/evtmgr/temperature-compensation/TemperatureProvider.hpp
 )
 
 target_include_directories(evtmgr
@@ -45,6 +47,7 @@ target_link_libraries(evtmgr
         module-sys
         service-evtmgr
         bell::appmgr
+        bell::audio
         sys
 )
 

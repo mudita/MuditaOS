@@ -7,6 +7,7 @@
 #include <audio/AudioMessage.hpp>
 #include <service-db/Settings.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
+#include <service-evtmgr/service-evtmgr/Constants.hpp>
 
 namespace
 {
@@ -148,6 +149,7 @@ namespace service
         AudioStart(input);
         manageCpuSentinel();
 
+        bus.sendUnicast(std::make_shared<service::AudioPlaybackStartNotification>(), service::name::evt_manager);
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
     }
     auto Audio::handleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
@@ -171,7 +173,7 @@ namespace service
         if (it != retCodes.end()) {
             return std::make_unique<AudioStopResponse>(it->second, it->first);
         }
-
+        bus.sendUnicast(std::make_shared<service::AudioPlaybackStopNotification>(), service::name::evt_manager);
         return std::make_unique<AudioStopResponse>(audio::RetCode::Success, token);
     }
     auto Audio::stopInput(audio::AudioMux::Input *input, Audio::StopReason stopReason) -> audio::RetCode
@@ -217,6 +219,7 @@ namespace service
                 stopInput(*input, StopReason::Eof);
             }
         }
+        bus.sendUnicast(std::make_shared<service::AudioPlaybackStopNotification>(), service::name::evt_manager);
     }
     auto Audio::AudioServicesCallback(const sys::Message *msg) -> std::optional<std::string>
     {
@@ -285,6 +288,7 @@ namespace service
             }
         }
         manageCpuSentinel();
+        bus.sendUnicast(std::make_shared<service::AudioPlaybackStopNotification>(), service::name::evt_manager);
         return std::make_unique<AudioResponseMessage>(retCode);
     }
     auto Audio::handleResume() -> std::unique_ptr<AudioResponseMessage>
@@ -295,6 +299,7 @@ namespace service
             retCode = activeInput.value()->audio->Resume();
         }
         manageCpuSentinel();
+        bus.sendUnicast(std::make_shared<service::AudioPlaybackStartNotification>(), service::name::evt_manager);
         return std::make_unique<AudioResponseMessage>(retCode);
     }
     constexpr auto Audio::isResumable(audio::PlaybackType type) const -> bool
