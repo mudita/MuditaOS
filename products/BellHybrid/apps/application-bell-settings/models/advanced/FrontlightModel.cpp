@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "FrontlightModel.hpp"
+#include <common/models/FrontlightModel.hpp>
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
@@ -44,7 +44,9 @@ namespace app::bell_settings
                 this->brightnessAdapter->update(percentageToFixedVal(resp->getParams().manualModeBrightness));
                 this->modeAdapter->update(
                     resp->getMode() == screen_light_control::ScreenLightMode::Automatic ? autoStr : onDemandStr);
-                this->onReady();
+                if (this->onReady) {
+                    this->onReady();
+                }
             }
             return true;
         };

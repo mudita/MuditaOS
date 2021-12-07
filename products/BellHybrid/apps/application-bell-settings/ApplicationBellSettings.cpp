@@ -6,7 +6,6 @@
 #include "models/TemperatureUnitModel.hpp"
 #include "models/advanced/AboutYourBellModel.hpp"
 #include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
-#include "models/alarm_settings/AlarmSettingsModel.hpp"
 #include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
 #include "models/alarm_settings/BedtimeSettingsListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpSettingsModel.hpp"
@@ -38,6 +37,7 @@
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/models/AudioModel.hpp>
+#include <common/models/AlarmSettingsModel.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 

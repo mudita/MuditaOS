@@ -4,7 +4,7 @@
 #pragma once
 
 #include "SettingsListItemProvider.hpp"
-#include "AbstractAlarmSettingsModel.hpp"
+#include <common/models/AbstractAlarmSettingsModel.hpp>
 
 namespace app::bell_settings
 {

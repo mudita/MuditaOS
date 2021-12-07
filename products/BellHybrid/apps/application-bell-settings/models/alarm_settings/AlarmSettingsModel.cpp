@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <models/alarm_settings/AlarmSettingsModel.hpp>
+#include <common/models/AlarmSettingsModel.hpp>
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <db/SystemSettings.hpp>
