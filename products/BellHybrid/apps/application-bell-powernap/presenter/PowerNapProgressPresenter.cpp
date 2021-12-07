@@ -23,13 +23,17 @@ namespace
 
 namespace app::powernap
 {
-    PowerNapProgressPresenter::PowerNapProgressPresenter(app::ApplicationCommon *app,
-                                                         settings::Settings *settings,
-                                                         std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                                                         AbstractAudioModel &audioModel,
-                                                         std::unique_ptr<AbstractTimeModel> timeModel)
-        : app{app}, settings{settings}, soundsRepository{std::move(soundsRepository)},
-          audioModel{audioModel}, timeModel{std::move(timeModel)},
+    PowerNapProgressPresenter::PowerNapProgressPresenter(
+        app::ApplicationCommon *app,
+        settings::Settings *settings,
+        std::unique_ptr<AbstractSoundsRepository> soundsRepository,
+        AbstractAudioModel &audioModel,
+        app::bell_settings::AbstractFrontlightModel &frontLightModel,
+        std::unique_ptr<AbstractTimeModel> timeModel,
+        std::unique_ptr<app::bell_settings::AlarmLightOnOffModel> alarmLightOnOffModel)
+        : app{app}, settings{settings}, soundsRepository{std::move(soundsRepository)}, audioModel{audioModel},
+          frontLightModel{frontLightModel}, timeModel{std::move(timeModel)}, alarmLightOnOffModel{std::move(
+                                                                                 alarmLightOnOffModel)},
           napAlarmTimer{sys::TimerFactory::createSingleShotTimer(
               app, powernapAlarmTimerName, powernapAlarmTimeout, [this](sys::Timer &) { onNapAlarmFinished(); })}
 
@@ -71,6 +75,11 @@ namespace app::powernap
 
     void PowerNapProgressPresenter::onNapFinished()
     {
+        if (alarmLightOnOffModel->getValue()) {
+            frontLightModel.restorePreviousState();
+            frontLightModel.setStatus(true);
+        }
+
         const auto filePath = soundsRepository->titleToPath(
             settings->getValue(bell::settings::Alarm::tone, settings::SettingsScope::Global));
 

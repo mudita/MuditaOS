@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FrontlightListItemProvider.hpp"
-#include "FrontlightModel.hpp"
+#include <common/models/FrontlightModel.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
 #include <common/widgets/ListItems.hpp>
 

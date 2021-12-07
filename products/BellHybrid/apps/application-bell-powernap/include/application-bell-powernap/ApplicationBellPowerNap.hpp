@@ -5,6 +5,8 @@
 
 #include <Application.hpp>
 #include <common/models/AbstractAudioModel.hpp>
+#include <common/models/FrontlightModel.hpp>
+#include <common/models/AlarmSettingsModel.hpp>
 
 namespace gui::window::name
 {
@@ -24,6 +26,7 @@ namespace app
     {
       private:
         std::unique_ptr<AbstractAudioModel> audioModel;
+        std::unique_ptr<app::bell_settings::AbstractFrontlightModel> frontLightModel;
         void onStop() override;
 
       public:
