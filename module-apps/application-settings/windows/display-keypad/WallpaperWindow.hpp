@@ -4,6 +4,7 @@
 #pragma once
 
 #include <application-settings/windows/BaseSettingsWindow.hpp>
+#include <application-settings/models/display-keypad/WallpaperOptionModel.hpp>
 
 namespace gui
 {
@@ -12,16 +13,13 @@ namespace gui
     class WallpaperWindow : public BaseSettingsWindow
     {
       public:
-        explicit WallpaperWindow(app::ApplicationCommon *app);
+        explicit WallpaperWindow(app::ApplicationCommon *app, app::settingsInterface::WallpaperSettings *settings);
 
       private:
-        void switchHandler(bool &onOffSwitch);
         auto buildOptionsList() -> std::list<Option> override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-        bool isWallpaperLogoSwitchOn   = false;
-        bool isWallpaperClockSwitchOn  = false;
-        bool isWallpaperQuotesSwitchOn = false;
-
+        std::unique_ptr<WallpaperOptionModel> optionModel;
         Item *quotes;
     };
 } // namespace gui

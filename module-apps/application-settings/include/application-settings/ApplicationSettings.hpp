@@ -12,6 +12,7 @@
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <EventStore.hpp>
 #include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
+#include <application-settings/data/WallpaperOption.hpp>
 
 class AudioStopNotification; // Forward declaration
 
@@ -64,6 +65,14 @@ namespace app
             virtual void setKeypadBacklightState(bsp::keypad_backlight::State state) = 0;
         };
 
+        class WallpaperSettings
+        {
+          public:
+            virtual ~WallpaperSettings()                                 = default;
+            virtual auto getWallpaperOption() -> gui::WallpaperOption    = 0;
+            virtual void setWallpaperOption(gui::WallpaperOption option) = 0;
+        };
+
         class DndSettings
         {
           public:
@@ -111,6 +120,7 @@ namespace app
                                 public settingsInterface::OperatorsSettings,
                                 public settingsInterface::ScreenLightSettings,
                                 public settingsInterface::KeypdBacklightSettings,
+                                public settingsInterface::WallpaperSettings,
                                 public settingsInterface::DndSettings,
                                 public settingsInterface::OfflineSettings,
                                 public settingsInterface::ConnectionSettings,
@@ -154,6 +164,9 @@ namespace app
 
         auto getKeypadBacklightState() -> bsp::keypad_backlight::State override;
         void setKeypadBacklightState(bsp::keypad_backlight::State keypadLightState) override;
+
+        auto getWallpaperOption() -> gui::WallpaperOption override;
+        void setWallpaperOption(gui::WallpaperOption option) override;
 
         auto getNotificationsWhenLocked() const noexcept -> bool override;
         void setNotificationsWhenLocked(bool on) noexcept override;

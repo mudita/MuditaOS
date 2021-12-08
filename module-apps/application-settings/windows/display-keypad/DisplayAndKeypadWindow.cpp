@@ -59,8 +59,8 @@ namespace gui
         addMenu(utils::translate("app_settings_display_display_light"), gui::window::name::display_light);
 #if DISABLED_SETTINGS_OPTIONS == 1
         addMenu(utils::translate("app_settings_display_font_size"), gui::window::name::font_size);
-        addMenu(utils::translate("app_settings_display_wallpaper"), gui::window::name::wallpaper);
 #endif // DISABLED_SETTINGS_OPTIONS
+        addMenu(utils::translate("app_settings_display_wallpaper"), gui::window::name::wallpaper);
         addMenu(utils::translate("app_settings_display_keypad_light"), gui::window::name::keypad_light);
         addMenu(utils::translate("app_settings_display_input_language"), gui::window::name::input_language);
         addOnOffOption(utils::translate("app_settings_display_dark_mode"), [this](gui::Item & /*item*/) {

@@ -9,7 +9,18 @@
 
 namespace gui
 {
-    WallpaperWindow::WallpaperWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, window::name::wallpaper)
+
+    namespace
+    {
+        const std::vector<std::pair<std::string, WallpaperOption>> wallpaperOptions = {
+            {"app_settings_display_wallpaper_logo", WallpaperOption::Logo},
+            {"app_settings_display_wallpaper_clock", WallpaperOption::Clock},
+            {"app_settings_display_wallpaper_quotes", WallpaperOption::Quote}};
+    } // namespace
+
+    WallpaperWindow::WallpaperWindow(app::ApplicationCommon *app, app::settingsInterface::WallpaperSettings *settings)
+        : BaseSettingsWindow(app, window::name::wallpaper), optionModel{
+                                                                std::make_unique<WallpaperOptionModel>(settings)}
     {
         setTitle(utils::translate("app_settings_display_wallpaper"));
     }
@@ -18,11 +29,12 @@ namespace gui
     {
         std::list<gui::Option> optionsList;
 
-        auto addCheckOption = [&](UTF8 text, bool &Switch) {
+        for (const auto &[text, option] : wallpaperOptions) {
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                text,
+                utils::translate(text),
                 [&](gui::Item &item) mutable {
-                    switchHandler(Switch);
+                    optionModel->saveValue(option);
+                    refreshOptionsList();
                     return true;
                 },
                 [=](gui::Item &item) {
@@ -32,14 +44,11 @@ namespace gui
                     return true;
                 },
                 this,
-                Switch ? gui::option::SettingRightItem::Checked : gui::option::SettingRightItem::Disabled));
-        };
+                optionModel->isCurrentOption(option) ? gui::option::SettingRightItem::Checked
+                                                     : gui::option::SettingRightItem::Disabled));
+        }
 
-        addCheckOption(utils::translate("app_settings_display_wallpaper_logo"), isWallpaperLogoSwitchOn);
-        addCheckOption(utils::translate("app_settings_display_wallpaper_clock"), isWallpaperClockSwitchOn);
-        addCheckOption(utils::translate("app_settings_display_wallpaper_quotes"), isWallpaperQuotesSwitchOn);
-
-        if (isWallpaperQuotesSwitchOn) {
+        if (optionModel->isQuoteOptionSelected()) {
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translate("app_settings_display_wallpaper_edit_quotes"),
                 [=](gui::Item &item) {
@@ -59,14 +68,9 @@ namespace gui
         return optionsList;
     }
 
-    void WallpaperWindow::switchHandler(bool &optionSwitch)
+    void WallpaperWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        isWallpaperQuotesSwitchOn = false;
-        isWallpaperClockSwitchOn  = false;
-        isWallpaperLogoSwitchOn   = false;
-
-        optionSwitch = !optionSwitch;
+        optionModel->update();
         refreshOptionsList();
     }
-
 } // namespace gui

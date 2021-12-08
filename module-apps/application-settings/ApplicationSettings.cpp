@@ -441,7 +441,7 @@ namespace app
             return std::make_unique<gui::FontSizeWindow>(app);
         });
         windowsFactory.attach(gui::window::name::wallpaper, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::WallpaperWindow>(app);
+            return std::make_unique<gui::WallpaperWindow>(app, static_cast<ApplicationSettings *>(app));
         });
         windowsFactory.attach(gui::window::name::quotes, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::QuotesMainWindow>(app);
@@ -690,6 +690,18 @@ namespace app
         settings->setValue(::settings::KeypadLight::state,
                            std::to_string(static_cast<int>(keypadLightState)),
                            ::settings::SettingsScope::Global);
+    }
+
+    auto ApplicationSettings::getWallpaperOption() -> gui::WallpaperOption
+    {
+        return static_cast<gui::WallpaperOption>(utils::getNumericValue<int>(
+            settings->getValue(::settings::Wallpaper::option, ::settings::SettingsScope::Global)));
+    }
+
+    void ApplicationSettings::setWallpaperOption(gui::WallpaperOption option)
+    {
+        settings->setValue(
+            ::settings::Wallpaper::option, std::to_string(static_cast<int>(option)), ::settings::SettingsScope::Global);
     }
 
     auto ApplicationSettings::getNotificationsWhenLocked() const noexcept -> bool
