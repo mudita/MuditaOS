@@ -99,3 +99,6 @@
 	path = third-party/lwext4/lwext4
 	url = ../lwext4.git
 	branch = mudita
+[submodule "third-party/dr_libs/src"]
+	path = third-party/dr_libs/src
+	url = https://github.com/mudita/dr_libs.git
