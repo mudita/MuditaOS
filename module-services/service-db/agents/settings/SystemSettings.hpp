@@ -68,6 +68,11 @@ namespace settings
         constexpr inline auto state = "keypad_light_state";
     } // namespace KeypadLight
 
+    namespace Wallpaper
+    {
+        constexpr inline auto option = "wallpaper_option";
+    } // namespace Wallpaper
+
     namespace Display
     {
         constexpr inline auto invertedMode = "display_inverted_mode";
