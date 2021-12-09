@@ -4,6 +4,7 @@
 #include "LinuxAudioDevice.hpp"
 #include <Audio/Stream.hpp>
 #include <log/log.hpp>
+#include <cmath>
 
 namespace audio
 {
@@ -82,10 +83,10 @@ namespace audio
 
     auto LinuxAudioDevice::setOutputVolume(float vol) -> RetCode
     {
-        constexpr auto minVolume = .0f;
-        constexpr auto maxVolume = 10.0f;
-        vol                      = std::clamp(vol, minVolume, maxVolume);
-        volumeFactor             = 1.0f * (vol / maxVolume);
+        vol = std::clamp(vol, minVolume, maxVolume);
+        /// Using y=x^4 function as an approximation seems very natural and sufficient
+        /// For more info check: https://www.dr-lex.be/info-stuff/volumecontrols.html
+        volumeFactor = std::pow(1.0f * (vol / maxVolume), 4);
         return RetCode::Success;
     }
 

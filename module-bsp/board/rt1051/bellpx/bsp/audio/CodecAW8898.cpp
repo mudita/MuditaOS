@@ -95,7 +95,6 @@ CodecRetCode CodecAW8898::Start(const CodecParams &param)
 
     // Store param configuration
     currentParams = params;
-
     SetOutputVolume(currentParams.outVolume);
 
     AW8898::ReadAllReg();
