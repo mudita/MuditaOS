@@ -40,7 +40,7 @@ namespace audio
         auto disablePlayback() -> bool;
 
       private:
-        static constexpr std::size_t stackDepth = 2 * 1024;
+        static constexpr std::size_t stackDepth = 6 * 1024;
 
         virtual auto handleMessage(uint32_t queueID) -> bool override;
         void pushAudioData();
