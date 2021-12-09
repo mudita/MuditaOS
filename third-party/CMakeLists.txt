@@ -23,7 +23,7 @@ add_subdirectory(sml)
 add_subdirectory(taglib)
 add_subdirectory(tinyexpr)
 add_subdirectory(utz)
-#add_subdirectory(dr_libs)
+add_subdirectory(dr_libs)
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     add_subdirectory(CrashDebug)

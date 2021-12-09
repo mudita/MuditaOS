@@ -2,88 +2,75 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "decoderWAV.hpp"
-
+#include <log/log.hpp>
+#include <memory>
 #include "Audio/AudioCommon.hpp"
 
-#include "riff/wav/wavfile.h"
+#define DR_WAV_IMPLEMENTATION
+#include <src/dr_wav.h>
 
 namespace audio
 {
-
-    decoderWAV::decoderWAV(const char *fileName) : Decoder(fileName)
+    namespace internal
     {
+        struct wavContext
+        {
+            drwav wav;
+        };
+    } // namespace internal
 
-        if (fileSize == 0) {
+    decoderWAV::decoderWAV(const char *fileName)
+        : Decoder(fileName), decoderContext(std::make_unique<internal::wavContext>())
+    {
+        auto dwav = &decoderContext->wav;
+        if (!drwav_init_file(dwav, fileName, NULL)) {
+            LOG_ERROR("Unable to init wav decoder");
             return;
         }
-
-        if (fd == NULL) {
-            return;
-        }
-
-        if (std::fread(&waveHeader, 1, sizeof(waveHeader), fd) != sizeof(WAVE_FormatTypeDef)) {
-            return;
-        }
-
-        // TODO:M.P; implement support for sample size different than 16bit
-        // pcmsamplesbuffer.reserve(1024);
-
-        sampleRate    = waveHeader.SampleRate;
-        bitsPerSample = waveHeader.BitPerSample;
-        chanNumber    = waveHeader.NbrChannels;
-
+        sampleRate = dwav->sampleRate;
+        // NOTE: Always convert to S16LE as internal format
+        bitsPerSample = 16;
+        // Number of channels
+        chanNumber    = dwav->channels;
         isInitialized = true;
+    }
+
+    decoderWAV::~decoderWAV()
+    {
+        if (isInitialized) {
+            auto dwav = &decoderContext->wav;
+            drwav_uninit(dwav);
+        }
     }
 
     uint32_t decoderWAV::decode(uint32_t samplesToRead, int16_t *pcmData)
     {
-        uint32_t samples_read = 0;
-
-        /* TODO:M.P; implement support for sample size different than 16bit
-            if(samplesToRead > pcmsamplesbuffer.max_size()){
-                pcmsamplesbuffer.resize(samplesToRead);
-            }*/
-
-        switch (bitsPerSample) {
-        case 8:
-            // TODO:M.P not supported
-            break;
-
-        case 16:
-            samples_read = std::fread(pcmData, sizeof(int16_t), samplesToRead, fd);
-            break;
-
-        case 24:
-            // TODO:M.P not supported
-            break;
-
-        case 32:
-            // TODO:M.P not supported
-            break;
+        if (!isInitialized) {
+            LOG_ERROR("Wav decoder not initialized");
+            return 0;
         }
-
+        auto dwav               = &decoderContext->wav;
+        const auto samples_read = drwav_read_pcm_frames_s16(dwav, samplesToRead / chanNumber, pcmData);
         if (samples_read) {
             /* Calculate frame duration in seconds */
-            position +=
-                (float)((float)(chanNumber == 2 ? samplesToRead / chanNumber : samplesToRead) / (float)(sampleRate));
+            position += float(samplesToRead) / float(sampleRate);
         }
-
-        return samples_read;
+        return samples_read * chanNumber;
     }
 
     void decoderWAV::setPosition(float pos)
     {
-
-        std::fseek(fd, (fileSize * pos) + sizeof(WAVE_FormatTypeDef), SEEK_SET);
-        // Calculate new position
-        position = (float)((float)(std::ftell(fd) / sizeof(int16_t) / chanNumber) / (float)(sampleRate));
+        if (!isInitialized) {
+            LOG_ERROR("Wav decoder not initialized");
+            return;
+        }
+        auto dwav = &decoderContext->wav;
+        drwav_seek_to_pcm_frame(dwav, dwav->totalPCMFrameCount * pos);
     }
 
     auto decoderWAV::getBitWidth() -> unsigned int
     {
-        TagLib::RIFF::WAV::File wavFile(filePath.c_str());
-        auto properties = wavFile.audioProperties();
-        return properties->bitsPerSample();
+        return bitsPerSample;
     }
 
 } // namespace audio

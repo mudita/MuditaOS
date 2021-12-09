@@ -73,6 +73,7 @@ target_link_libraries(${PROJECT_NAME}
         PRIVATE
                 utils-math
                 tagsfetcher
+                dr_libs
 )
 
 add_subdirectory(tags_fetcher)
