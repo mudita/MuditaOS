@@ -25,7 +25,7 @@ namespace audio
     BellPxAudioCodec::~BellPxAudioCodec()
     {
         Stop();
-        DeinitBsp();
+        bsp::audio::deinit();
     }
 
     AudioDevice::RetCode BellPxAudioCodec::Start()
@@ -40,7 +40,7 @@ namespace audio
             return AudioDevice::RetCode::Failure;
         };
 
-        InitBsp();
+        bsp::audio::init(currentFormat.sampleRate_Hz);
 
         saiInFormat.bitWidth      = currentFormat.bitWidth;
         saiInFormat.sampleRate_Hz = currentFormat.sampleRate_Hz;
@@ -71,8 +71,10 @@ namespace audio
         }
 
         codecParams.sampleRate = sampleRate;
-        codecParams.outVolume  = currentFormat.outputVolume;
-        codecParams.inGain     = currentFormat.inputGain;
+        /// Set the output volume to max possible value. Volume control is implemented
+        /// using software scaling instead of hardware gain control.
+        codecParams.outVolume = maxVolume;
+        codecParams.inGain    = currentFormat.inputGain;
 
         txEnabled = true;
         initiateTxTransfer();
@@ -100,16 +102,6 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode BellPxAudioCodec::setOutputVolume(float vol)
-    {
-        currentFormat.outputVolume = vol;
-        CodecParamsAW8898 params;
-        params.outVolume = vol;
-        params.opCmd     = CodecParams::Cmd::SetOutVolume;
-        codec.Ioctrl(params);
-        return AudioDevice::RetCode::Success;
-    }
-
     AudioDevice::RetCode BellPxAudioCodec::setInputGain(float gain)
     {
         currentFormat.inputGain = gain;
@@ -118,16 +110,6 @@ namespace audio
         params.opCmd  = CodecParams::Cmd::SetInGain;
         codec.Ioctrl(params);
         return AudioDevice::RetCode::Success;
-    }
-
-    void BellPxAudioCodec::InitBsp()
-    {
-        bsp::audio::init();
-    }
-
-    void BellPxAudioCodec::DeinitBsp()
-    {
-        bsp::audio::deinit();
     }
 
     void BellPxAudioCodec::InStart()

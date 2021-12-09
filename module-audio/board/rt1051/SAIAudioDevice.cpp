@@ -5,6 +5,8 @@
 
 #include <Audio/Stream.hpp>
 
+#include <cmath>
+
 using namespace audio;
 
 SAIAudioDevice::SAIAudioDevice(I2S_Type *base, sai_edma_handle_t *rxHandle, sai_edma_handle_t *txHandle)
@@ -41,6 +43,7 @@ void SAIAudioDevice::onDataSend()
     /// pop previous read and peek next
     Sink::_stream->consume();
     Sink::_stream->peek(dataSpan);
+    scaleOutputVolume(dataSpan);
 
     sai_transfer_t xfer{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
     SAI_TransferSendEDMA(_base, tx, &xfer);
@@ -96,4 +99,20 @@ void SAIAudioDevice::disableInput()
 void SAIAudioDevice::disableOutput()
 {
     txEnabled = false;
+}
+AudioDevice::RetCode SAIAudioDevice::setOutputVolume(float vol)
+{
+    vol = std::clamp(vol, minVolume, maxVolume);
+    /// Using y=x^4 function as an approximation seems very natural and sufficient
+    /// For more info check: https://www.dr-lex.be/info-stuff/volumecontrols.html
+    volumeFactor = std::pow(1.0f * (vol / maxVolume), 4);
+    return AudioDevice::RetCode::Success;
+}
+void SAIAudioDevice::scaleOutputVolume(audio::Stream::Span &span)
+{
+    if (volumeFactor < 1.0) {
+        const auto samples      = reinterpret_cast<std::int16_t *>(span.data);
+        const auto samplesCount = samples + span.dataSize / 2;
+        std::for_each(samples, samplesCount, [this](auto &sample) { sample *= volumeFactor; });
+    }
 }

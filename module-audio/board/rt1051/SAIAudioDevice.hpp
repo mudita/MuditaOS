@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Audio/AudioDevice.hpp>
+#include <Audio/Stream.hpp>
 
 #include "fsl_sai_edma.h"
 
@@ -25,11 +26,18 @@ namespace audio
       protected:
         void initiateRxTransfer();
         void initiateTxTransfer();
+        RetCode setOutputVolume(float vol) override;
+
         I2S_Type *_base;
         sai_edma_handle_t *rx = nullptr;
         sai_edma_handle_t *tx = nullptr;
         bool txEnabled        = false;
         bool rxEnabled        = false;
+
+      private:
+        void scaleOutputVolume(audio::Stream::Span &span);
+
+        float volumeFactor{1.0};
     };
 
 } // namespace audio

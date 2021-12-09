@@ -14,7 +14,7 @@
 
 namespace bsp::audio
 {
-    void init();
+    void init(std::uint32_t sampleRate);
     void deinit();
 
     struct AudioConfig
