@@ -175,7 +175,7 @@ namespace audio
 
     void PureTxAudioCodec::InitBsp()
     {
-        bsp::audio::init();
+        bsp::audio::init(currentFormat.sampleRate_Hz);
     }
 
     void PureTxAudioCodec::DeinitBsp()

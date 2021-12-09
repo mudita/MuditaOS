@@ -7,8 +7,6 @@
 #if defined(TARGET_RT1051)
 #include "board/rt1051/drivers/RT1051DriverPLL.hpp"
 #elif defined(TARGET_Linux)
-
-//#include ""
 #else
 #error "Unsupported target"
 #endif
