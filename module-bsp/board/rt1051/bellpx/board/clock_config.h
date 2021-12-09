@@ -125,7 +125,7 @@ extern "C"
     void clkPLL3_PFD2setup(uint8_t enabled);
     void clkPLL3_PFD3setup(uint8_t enabled);
 
-    void clkPLL4setup(uint8_t enabled);
+    void clkPLL4setup(uint8_t enabled, const clock_audio_pll_config_t conf);
 
     void clkPLL5setup(uint8_t enabled);
 

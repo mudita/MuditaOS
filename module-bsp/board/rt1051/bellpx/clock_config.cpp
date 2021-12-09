@@ -393,7 +393,7 @@ void BOARD_BootClockRUN(void)
      */
 
     /* DeInit Audio PLL */
-    clkPLL4setup(CLK_DISABLE);
+    clkPLL4setup(CLK_DISABLE, {});
     CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllAudio, 1);
 
     /*
@@ -966,17 +966,10 @@ void clkPLL3_PFD3setup(uint8_t enabled)
     }
 }
 
-void clkPLL4setup(uint8_t enabled)
+void clkPLL4setup(uint8_t enabled, const clock_audio_pll_config_t conf)
 {
-    const clock_audio_pll_config_t audioPllConfig_BOARD_BootClockRUN = {
-        .loopDivider = 32,  /* PLL loop divider. Valid range for DIV_SELECT divider value: 27~54. */
-        .postDivider = 1,   /* Divider after the PLL, should only be 1, 2, 4, 8, 16. */
-        .numerator   = 77,  /* 30 bit numerator of fractional loop divider. */
-        .denominator = 100, /* 30 bit denominator of fractional loop divider */
-        .src         = 0,
-    };
     if (enabled) {
-        CLOCK_InitAudioPll(&audioPllConfig_BOARD_BootClockRUN);
+        CLOCK_InitAudioPll(&conf);
     }
     else {
         /* DeInit Audio PLL */
