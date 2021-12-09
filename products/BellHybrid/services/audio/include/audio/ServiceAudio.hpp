@@ -10,8 +10,10 @@
 #include <service-db/DBServiceName.hpp>
 #include <Service/Service.hpp>
 #include <SystemManager/CpuSentinel.hpp>
+#include <Timers/TimerFactory.hpp>
 
 #include <functional>
+#include <chrono>
 
 namespace settings
 {
@@ -37,6 +39,7 @@ namespace service
             Eof,
             Other
         };
+        static constexpr auto volumeRampStepTime = std::chrono::seconds{3};
 
         auto handleStart(audio::Operation::Type opType,
                          const std::string &fileName             = {},
@@ -54,6 +57,11 @@ namespace service
 
         void handleEOF(const audio::Token &token);
 
+        auto setVolume(audio::Volume volume) -> audio::RetCode;
+        auto getVolume(const audio::PlaybackType &playbackType) -> audio::Volume;
+        auto stopVolumeRamp();
+        void startVolumeRamp(const audio::PlaybackType &playbackType);
+
         auto AudioServicesCallback(const sys::Message *msg) -> std::optional<std::string>;
 
         auto stopInput(audio::AudioMux::Input *input, StopReason stopReason = StopReason::Other) -> audio::RetCode;
@@ -68,6 +76,8 @@ namespace service
         mutable audio::AudioMux audioMux;
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
         std::unique_ptr<settings::Settings> settingsProvider;
+        unsigned int volumeRampCounter = 1;
+        sys::TimerHandle volumeRampTimerHandle;
     };
 
 } // namespace service

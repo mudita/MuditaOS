@@ -148,8 +148,34 @@ namespace service
         AudioStart(input);
         manageCpuSentinel();
 
+        if (playbackType == audio::PlaybackType::Alarm) {
+            startVolumeRamp(playbackType);
+        }
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
     }
+
+    auto Audio::stopVolumeRamp()
+    {
+        if (volumeRampTimerHandle.isValid()) {
+            volumeRampTimerHandle.stop();
+        }
+    }
+
+    void Audio::startVolumeRamp(const audio::PlaybackType &playbackType)
+    {
+        setVolume(minVolume);
+        volumeRampCounter     = minVolume;
+        volumeRampTimerHandle = sys::TimerFactory::createPeriodicTimer(
+            this, "VolumeRampTimer", volumeRampStepTime, [this, playbackType]([[maybe_unused]] sys::Timer &timer) {
+                auto maxVolume = getVolume(playbackType);
+                setVolume(++volumeRampCounter);
+                if (volumeRampCounter == maxVolume) {
+                    timer.stop();
+                }
+            });
+        volumeRampTimerHandle.start();
+    }
+
     auto Audio::handleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
         -> std::unique_ptr<AudioResponseMessage>
     {
@@ -171,7 +197,7 @@ namespace service
         if (it != retCodes.end()) {
             return std::make_unique<AudioStopResponse>(it->second, it->first);
         }
-
+        stopVolumeRamp();
         return std::make_unique<AudioStopResponse>(audio::RetCode::Success, token);
     }
     auto Audio::stopInput(audio::AudioMux::Input *input, Audio::StopReason stopReason) -> audio::RetCode
@@ -243,20 +269,38 @@ namespace service
         -> std::unique_ptr<AudioResponseMessage>
     {
         constexpr auto setting  = audio::Setting::Volume;
-        auto retCode            = audio::RetCode::Success;
         const auto clampedValue = std::clamp(utils::getNumericValue<audio::Volume>(value), minVolume, maxInVolume);
 
-        if (const auto activeInput = audioMux.GetActiveInput(); activeInput) {
-            if (activeInput) {
-                retCode = activeInput.value()->audio->SetOutputVolume(clampedValue);
-            }
-        }
+        auto retCode = setVolume(clampedValue);
 
         if (retCode == audio::RetCode::Success) {
             settingsProvider->setValue(dbPath(setting, playbackType, profileType), std::to_string(clampedValue));
         }
         return std::make_unique<AudioResponseMessage>(retCode);
     }
+
+    auto Audio::setVolume(audio::Volume volume) -> audio::RetCode
+    {
+        auto retCode = audio::RetCode::Failed;
+        if (const auto activeInput = audioMux.GetActiveInput(); activeInput) {
+            if (activeInput) {
+                retCode = activeInput.value()->audio->SetOutputVolume(volume);
+            }
+        }
+        return retCode;
+    }
+
+    auto Audio::getVolume(const audio::PlaybackType &playbackType) -> audio::Volume
+    {
+        constexpr auto setting = audio::Setting::Volume;
+        const auto path        = dbPath(setting, playbackType, profileType);
+        const auto value       = settingsProvider->getValue(path);
+        if (value.empty()) {
+            return utils::getNumericValue<audio::Volume>(defaultVolume);
+        }
+        return utils::getNumericValue<audio::Volume>(value);
+    }
+
     auto Audio::handleGetVolume(const audio::PlaybackType &playbackType) -> std::unique_ptr<AudioResponseMessage>
     {
         constexpr auto setting = audio::Setting::Volume;
