@@ -5,13 +5,13 @@
 
 #include "module-apps/application-music-player/data/MusicPlayerStyle.hpp"
 
-#include "SongContext.hpp"
-#include "SongsRepository.hpp"
-#include "SongsModelInterface.hpp"
+#include <apps-common/models/SongsRepository.hpp>
+#include <apps-common/models/SongsModelInterface.hpp>
 
+#include <apps-common/models/SongContext.hpp>
 #include <Audio/decoder/Decoder.hpp>
 
-namespace app::music_player
+namespace app::music
 {
     class SongsModel : public SongsModelInterface
     {
@@ -61,4 +61,4 @@ namespace app::music_player
 
         std::shared_ptr<AbstractSongsRepository> songsRepository;
     };
-} // namespace app::music_player
+} // namespace app::music

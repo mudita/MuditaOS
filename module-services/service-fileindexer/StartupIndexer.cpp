@@ -18,9 +18,6 @@ namespace service::detail
     namespace
     {
         using namespace std::string_literals;
-
-        // List of initial dirs for scan
-        const std::vector<std::string> start_dirs{purefs::dir::getUserDiskPath() / "music"};
         // Lock file name
         const auto lock_file_name = purefs::dir::getUserDiskPath() / ".directory_is_indexed";
         // Time for indexing first unit
@@ -28,6 +25,9 @@ namespace service::detail
         // Time for initial delay after start
         constexpr auto timer_run_delay = 10000;
     } // namespace
+
+    StartupIndexer::StartupIndexer(const std::vector<std::string> &paths) : start_dirs{paths}
+    {}
 
     // Process single entry
     auto StartupIndexer::processEntry(std::shared_ptr<sys::Service> svc,

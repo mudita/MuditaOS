@@ -16,6 +16,13 @@
 
 namespace app::bgSounds
 {
+    struct FilesCache
+    {
+        std::vector<db::multimedia_files::MultimediaFilesRecord> records{};
+        std::uint32_t recordsOffset{0};
+        std::uint32_t recordsCount{0};
+    };
+
     class AbstractTagsFetcher
     {
       public:
@@ -40,25 +47,28 @@ namespace app::bgSounds
       public:
         virtual ~AbstractSoundsRepository() noexcept = default;
 
-        virtual void scanMusicFilesList()                                  = 0;
         virtual std::vector<tags::fetcher::Tags> getMusicFilesList() const = 0;
     };
 
-    class BGSoundsRepository : public AbstractSoundsRepository
+    class BGSoundsRepository : public AbstractSoundsRepository, public app::AsyncCallbackReceiver
     {
         static constexpr auto bgsoundsSubfolderPath = "assets/audio/bell/bg_sounds";
 
       public:
-        explicit BGSoundsRepository(std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
-                                    std::string musicFolderName = purefs::dir::getCurrentOSPath() /
-                                                                  bgsoundsSubfolderPath);
+        using OnGetMusicFilesListCallback =
+            std::function<bool(const std::vector<db::multimedia_files::MultimediaFilesRecord> &, unsigned int)>;
 
-        void scanMusicFilesList() override;
-        std::vector<tags::fetcher::Tags> getMusicFilesList() const override;
+        BGSoundsRepository(ApplicationCommon *application,
+                           std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
+                           std::string musicFolderName = purefs::dir::getCurrentOSPath() / bgsoundsSubfolderPath);
+
+        void getMusicFilesList(std::uint32_t offset, std::uint32_t limit, const OnGetMusicFilesListCallback &callback);
 
       private:
+        ApplicationCommon *application = nullptr;
         std::unique_ptr<AbstractTagsFetcher> tagsFetcher;
         std::string musicFolderName;
+        FilesCache musicFilesViewCache;
         std::vector<tags::fetcher::Tags> musicFiles;
     };
 } // namespace app::bgSounds

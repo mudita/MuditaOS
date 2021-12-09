@@ -12,9 +12,9 @@
 #include <string>
 #include <vector>
 
-namespace testing::app::music_player
+namespace testing::app::music
 {
-    class MockSongsRepository : public ::app::music_player::AbstractSongsRepository
+    class MockSongsRepository : public ::app::music::AbstractSongsRepository
     {
       public:
         MOCK_METHOD(void,
@@ -31,4 +31,4 @@ namespace testing::app::music_player
                     (const override));
         MOCK_METHOD(void, updateRepository, (const std::string &filePath), (override));
     };
-}; // namespace testing::app::music_player
+}; // namespace testing::app::music

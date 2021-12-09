@@ -86,8 +86,8 @@ namespace gui
         if (data && typeid(*data) == typeid(BGSoundsSwitchData)) {
             auto *audioSwitchData = static_cast<BGSoundsSwitchData *>(data);
             audioContext          = audioSwitchData->getAudioContext();
-            title->setText(audioContext->getTags().title);
-            presenter->activate(audioContext->getTags());
+            title->setText(audioContext->getSound().tags.title);
+            presenter->activate(audioContext->getSound());
         }
     }
 

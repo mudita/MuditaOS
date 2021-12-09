@@ -27,7 +27,7 @@ namespace app::bgSounds
         timer->registerOnFinishedCallback([this]() { onFinished(); });
     }
 
-    void BGSoundsProgressPresenter::activate(const tags::fetcher::Tags &tags)
+    void BGSoundsProgressPresenter::activate(const db::multimedia_files::MultimediaFilesRecord &song)
     {
         Expects(timer != nullptr);
         AbstractBGSoundsPlayer::PlaybackMode mode;
@@ -37,7 +37,7 @@ namespace app::bgSounds
             mode = AbstractBGSoundsPlayer::PlaybackMode::Looped;
         }
         else {
-            timer->reset(std::chrono::seconds{tags.total_duration_s});
+            timer->reset(std::chrono::seconds{song.audioProperties.songLength});
             mode = AbstractBGSoundsPlayer::PlaybackMode::SingleShot;
         }
         auto onStartCallback = [this](audio::RetCode retCode) {
@@ -45,7 +45,7 @@ namespace app::bgSounds
                 timer->start();
             }
         };
-        player.start(tags.filePath, mode, std::move(onStartCallback));
+        player.start(song.fileInfo.path, mode, std::move(onStartCallback));
     }
     void BGSoundsProgressPresenter::stop()
     {
