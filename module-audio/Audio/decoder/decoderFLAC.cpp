@@ -10,8 +10,7 @@
 #define DR_FLAC_NO_OGG
 #define DR_FLAC_NO_CRC
 #define DR_FLAC_NO_SIMD
-
-#include "dr_flac.h"
+#include <src/dr_flac.h>
 
 namespace audio
 {
@@ -23,11 +22,15 @@ namespace audio
             return;
         }
 
-        flac = drflac_open(drflac_read, drflac_seek, this);
+        flac = drflac_open(drflac_read, drflac_seek, this, NULL);
         if (flac == NULL) {
             return;
         }
 
+        chanNumber = flac->channels;
+        sampleRate = flac->sampleRate;
+        // NOTE: Always convert to S16LE as internal format
+        bitsPerSample = 16;
         isInitialized = true;
     }
 
@@ -41,24 +44,25 @@ namespace audio
 
         uint32_t samples_read = 0;
 
-        samples_read = drflac_read_s16(flac, samplesToRead, (drflac_int16 *)pcmData);
-
+        samples_read = drflac_read_pcm_frames_s16(flac, samplesToRead / chanNumber, (drflac_int16 *)pcmData);
         if (samples_read) {
             /* Calculate frame duration in seconds */
-            position +=
-                (float)((float)(chanNumber == 2 ? samplesToRead / chanNumber : samplesToRead) / (float)sampleRate);
+            position += float(samples_read) / float(sampleRate);
         }
 
-        return samples_read;
+        return samples_read * chanNumber;
     }
 
     void decoderFLAC::setPosition(float pos)
     {
-
-        drflac_seek_to_sample(flac, totalSamplesCount * pos);
+        if (!isInitialized) {
+            LOG_ERROR("Wav decoder not initialized");
+            return;
+        }
+        drflac_seek_to_pcm_frame(flac, flac->totalPCMFrameCount * pos);
 
         // Calculate new position
-        position = (float)((float)(totalSamplesCount * pos) / chanNumber / (float)(sampleRate));
+        position = float(flac->totalPCMFrameCount) * pos / float(sampleRate);
     }
 
     /* Data encoded in UTF-8 */
@@ -80,13 +84,6 @@ namespace audio
     {
         decoderFLAC *userdata = (decoderFLAC *)pUserData;
         return !std::fseek(userdata->fd, offset, origin == drflac_seek_origin_start ? SEEK_SET : SEEK_CUR);
-    }
-
-    auto decoderFLAC::getBitWidth() -> unsigned int
-    {
-        TagLib::FLAC::File flacFile(filePath.c_str());
-        auto properties = flacFile.audioProperties();
-        return properties->bitsPerSample();
     }
 
 } // namespace audio

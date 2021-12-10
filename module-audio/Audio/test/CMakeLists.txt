@@ -7,6 +7,7 @@ add_catch2_executable(
         unittest_audio.cpp
     LIBS
         module-audio
+        dr_libs::dr_libs
 )
 
 add_gtest_executable(
