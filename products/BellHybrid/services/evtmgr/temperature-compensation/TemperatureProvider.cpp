@@ -6,6 +6,7 @@
 
 #include <log/log.hpp>
 #include <hal/temperature_source/TemperatureSource.hpp>
+#include <board/rt1051/puretx/hal/battery_charger/BatteryCharger.hpp>
 
 #include <cmath>
 
@@ -16,33 +17,58 @@ void TemperatureProvider::updateTemperature(hal::temperature::AbstractTemperatur
         LOG_FATAL("Error during reading from temperature source");
     }
     else {
-        updateCompensation();
-        float rawReadout  = *temp;
-        float temperature = rawReadout - staticTemperatureOffset - currentCompensationValue;
-        LOG_INFO("---------->>>>>>> Temps %d %d", int(rawReadout * 100), int(currentCompensationValue * 100));
+        float currentCompensationValue = getCompensationValue();
+        float rawReadout               = *temp;
+        float temperature              = rawReadout - currentCompensationValue;
+        LOG_INFO("Temperature compensation: raw- %d audio %d charging %d",
+                 int(rawReadout * 100),
+                 int(audioCompensationValue * 100),
+                 int(chargingCompensationValue * 100));
         evtmgr::internal::StaticData::get().setCurrentTemperature(temperature);
     }
 }
 
-void TemperatureProvider::updateCompensation()
+float TemperatureProvider::getCompensationValue()
+{
+    updateAudioCompensation();
+    updateChargingCompensation();
+    return staticTemperatureOffset + audioCompensationValue + chargingCompensationValue;
+}
+
+void TemperatureProvider::updateAudioCompensation()
 {
     auto diff =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - audioLastTimeStateChange);
     auto secondsElapsed = diff.count();
     auto decay          = std::exp(-secondsElapsed / audioCompensationTimeCoefficient);
     if (audioPlaying) {
-        currentCompensationValue += (audioCompensationAmplitude - currentCompensationValue) * (1 - decay);
+        audioCompensationValue += (audioCompensationAmplitude - audioCompensationValue) * (1 - decay);
     }
     else {
-        currentCompensationValue = (currentCompensationValue)*decay;
+        audioCompensationValue = (audioCompensationValue)*decay;
     }
     audioLastTimeStateChange = std::chrono::system_clock::now();
+}
+
+void TemperatureProvider::updateChargingCompensation()
+{
+    auto diff           = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() -
+                                                                 chargingLastTimeStateChange);
+    auto secondsElapsed = diff.count();
+    auto decay          = std::exp(-secondsElapsed / chargingCompensationTimeCoefficient);
+    if (battery.get().state == Store::Battery::State::Charging) {
+        chargingCompensationValue += (chargingCompensationAmplitude - chargingCompensationValue) * (1 - decay);
+    }
+    else {
+        chargingCompensationValue = (chargingCompensationValue)*decay;
+    }
+    chargingLastTimeStateChange = std::chrono::system_clock::now();
 }
 
 void TemperatureProvider::audioStarted()
 {
     if (audioPlaying == false) {
-        updateCompensation();
+        updateAudioCompensation();
         audioPlaying = true;
     }
 }
@@ -50,7 +76,7 @@ void TemperatureProvider::audioStarted()
 void TemperatureProvider::audioStoped()
 {
     if (audioPlaying == true) {
-        updateCompensation();
+        updateAudioCompensation();
         audioPlaying = false;
     }
 }
