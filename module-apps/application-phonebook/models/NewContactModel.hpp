@@ -9,11 +9,13 @@
 #include "Application.hpp"
 
 #include <ListItemProvider.hpp>
+#include <SwitchData.hpp>
 
 class NewContactModel : public app::InternalModel<gui::ContactListItem *>, public gui::ListItemProvider
 {
   private:
     app::ApplicationCommon *application = nullptr;
+    PhonebookItemData::RequestType requestType = PhonebookItemData::RequestType::Internal;
 
     void openTextOptions(gui::Text *text);
 
@@ -22,10 +24,11 @@ class NewContactModel : public app::InternalModel<gui::ContactListItem *>, publi
 
     void clearData();
     void saveData(std::shared_ptr<ContactRecord> contactRecord);
-    void loadData(std::shared_ptr<ContactRecord> contactRecord);
+    void loadData(std::shared_ptr<ContactRecord> contactRecord, gui::SwitchData *data);
     void createData();
     bool verifyData();
     bool emptyData();
+    [[nodiscard]] auto getRequestType() -> PhonebookItemData::RequestType;
 
     [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
     [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;

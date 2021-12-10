@@ -53,7 +53,7 @@ namespace gui
     {
         if (mode != ShowMode::GUI_SHOW_RETURN) {
             newContactModel->clearData();
-            newContactModel->loadData(contact);
+            newContactModel->loadData(contact, data);
         }
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
@@ -178,7 +178,8 @@ namespace gui
             }
         }
 
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+        std::unique_ptr<gui::SwitchData> data =
+            std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
         data->ignoreCurrentWindowOnStack      = true;
         application->switchWindow(gui::window::name::contact, std::move(data));
         return true;

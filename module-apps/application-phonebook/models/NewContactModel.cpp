@@ -154,12 +154,16 @@ void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)
     }
 }
 
-void NewContactModel::loadData(std::shared_ptr<ContactRecord> contactRecord)
+void NewContactModel::loadData(std::shared_ptr<ContactRecord> contactRecord, gui::SwitchData *data)
 {
     for (auto item : internalData) {
         if (item->onLoadCallback) {
             item->onLoadCallback(contactRecord);
         }
+    }
+
+    if (auto message = dynamic_cast<PhonebookItemData *>(data); message != nullptr) {
+        requestType = message->getRequestType();
     }
 }
 
@@ -173,6 +177,11 @@ bool NewContactModel::emptyData()
         }
     }
     return true;
+}
+
+[[nodiscard]] auto NewContactModel::getRequestType() -> PhonebookItemData::RequestType
+{
+    return requestType;
 }
 
 void NewContactModel::openTextOptions(gui::Text *text)
