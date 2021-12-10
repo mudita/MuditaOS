@@ -71,7 +71,10 @@ namespace audio
         static std::unique_ptr<Decoder> Create(const char *file);
 
       protected:
-        virtual auto getBitWidth() -> unsigned int = 0;
+        virtual auto getBitWidth() -> unsigned int
+        {
+            return bitsPerSample;
+        }
         virtual std::unique_ptr<tags::fetcher::Tags> fetchTags();
 
         void convertmono2stereo(int16_t *pcm, uint32_t samplecount);
@@ -81,10 +84,11 @@ namespace audio
 
         uint32_t sampleRate = 0;
         uint32_t chanNumber = 0;
-        float position      = 0;
-        std::FILE *fd       = nullptr;
+        uint32_t bitsPerSample;
+        float position = 0;
+        std::FILE *fd  = nullptr;
         std::unique_ptr<char[]> streamBuffer;
-        uint32_t fileSize   = 0;
+        uint32_t fileSize = 0;
         std::string filePath;
 
         // Worker buffer used for converting mono stream to stereo

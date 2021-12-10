@@ -14,7 +14,6 @@ namespace audio
     }
     class decoderWAV : public Decoder
     {
-
       public:
         explicit decoderWAV(const char *fileName);
         virtual ~decoderWAV();
@@ -24,12 +23,8 @@ namespace audio
         void setPosition(float pos) override;
 
       private:
-        auto getBitWidth() -> unsigned int override;
-
-
         std::vector<int32_t> pcmsamplesbuffer;
         std::unique_ptr<internal::wavContext> decoderContext;
-        uint32_t bitsPerSample;
     };
 
 } // namespace audio

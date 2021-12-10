@@ -66,11 +66,8 @@ namespace audio
         }
         auto dwav = &decoderContext->wav;
         drwav_seek_to_pcm_frame(dwav, dwav->totalPCMFrameCount * pos);
-    }
 
-    auto decoderWAV::getBitWidth() -> unsigned int
-    {
-        return bitsPerSample;
+        // Calculate new position
+        position = float(dwav->totalPCMFrameCount) * pos / float(sampleRate);
     }
-
 } // namespace audio

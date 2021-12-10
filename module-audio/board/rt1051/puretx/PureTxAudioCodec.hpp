@@ -52,7 +52,7 @@ namespace audio
         constexpr static TickType_t codecSettleTime                               = 20 * portTICK_PERIOD_MS;
         constexpr static std::initializer_list<unsigned int> supportedSampleRates = {
             8000, 16000, 32000, 44100, 48000, 96000};
-        constexpr static std::initializer_list<unsigned int> supportedBitWidths    = {16, 24};
+        constexpr static std::initializer_list<unsigned int> supportedBitWidths    = {16};
         constexpr static std::initializer_list<unsigned int> supportedChannelModes = {1, 2};
 
         enum class State

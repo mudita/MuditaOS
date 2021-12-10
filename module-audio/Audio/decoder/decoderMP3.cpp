@@ -28,6 +28,8 @@ namespace audio
             return;
         }
 
+        // NOTE: Always convert to S16LE as internal format
+        bitsPerSample = 16;
         isInitialized = true;
     }
 
@@ -253,12 +255,6 @@ namespace audio
         position += (float)((float)(chanNumber == 2 ? samplesToRead / chanNumber : samplesToRead) / (float)sampleRate);
 
         return samplesToRead;
-    }
-
-    auto decoderMP3::getBitWidth() -> unsigned int
-    {
-        static constexpr auto mp3bitWidth = 16U;
-        return mp3bitWidth;
     }
 
 } // namespace audio
