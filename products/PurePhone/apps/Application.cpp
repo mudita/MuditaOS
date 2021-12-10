@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Application.hpp>
@@ -9,6 +9,7 @@
 #include <popups/TetheringConfirmationPopup.hpp>
 #include <popups/PowerOffWindow.hpp>
 #include <popups/presenter/PowerOffPresenter.hpp>
+#include <popups/presenter/WallpaperPresenter.hpp>
 #include <popups/lock-popups/PhoneLockedWindow.hpp>
 #include <popups/lock-popups/PhoneLockedInfoWindow.hpp>
 #include <popups/lock-popups/PhoneLockInputWindow.hpp>
@@ -66,7 +67,9 @@ namespace app
             case ID::PhoneLockInfo:
             case ID::PhoneLockChangeInfo:
                 windowsFactory.attach(window::phone_lock_window, [](ApplicationCommon *app, const std::string &name) {
-                    return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window);
+                    auto presenter = std::make_unique<gui::WallpaperPresenter>(app);
+                    return std::make_unique<gui::PhoneLockedWindow>(
+                        app, window::phone_lock_window, std::move(presenter));
                 });
                 windowsFactory.attach(
                     window::phone_lock_info_window, [](ApplicationCommon *app, const std::string &name) {

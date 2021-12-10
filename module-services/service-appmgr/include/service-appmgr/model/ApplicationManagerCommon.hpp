@@ -105,6 +105,7 @@ namespace app::manager
         virtual void registerMessageHandlers();
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         virtual void handleStart(StartAllowedMessage *msg);
+        virtual auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
 
         ApplicationName rootApplicationName;
         ActionsRegistry actionsRegistry;
@@ -123,7 +124,6 @@ namespace app::manager
         auto handleHomeAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleOnBoardingFinalize() -> sys::MessagePointer;
         auto handleLaunchAction(ActionEntry &action) -> ActionProcessStatus;
-        auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomActionOnBackgroundApp(ApplicationHandle *app, ActionEntry &action) -> ActionProcessStatus;
         void handleFinalizingClose(FinalizingClose *msg);

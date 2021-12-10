@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <appmgr/ApplicationManager.hpp>
@@ -16,6 +16,7 @@
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/AutoLockRequests.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
+#include <service-appmgr/messages/GetWallpaperOptionRequest.hpp>
 #include <service-bluetooth/messages/BluetoothModeChanged.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -78,6 +79,9 @@ namespace app::manager
         phoneLockHandler.setNoLockTimeAttemptsLeft(utils::getNumericValue<unsigned int>(
             settings->getValue(settings::SystemProperties::noLockTimeAttemptsLeft, settings::SettingsScope::Global)));
 
+        wallpaperModel.setWallpaper(static_cast<gui::WallpaperOption>(utils::getNumericValue<unsigned int>(
+            settings->getValue(settings::Wallpaper::option, settings::SettingsScope::Global))));
+
         settings->registerValueChange(
             settings::SystemProperties::lockScreenPasscodeIsOn,
             [this](const std::string &value) { phoneLockHandler.enablePhoneLock(utils::getNumericValue<bool>(value)); },
@@ -100,6 +104,14 @@ namespace app::manager
         settings->registerValueChange(
             settings::SystemProperties::autoLockTimeInSec,
             [this](std::string value) { lockTimeChanged(std::move(value)); },
+            settings::SettingsScope::Global);
+
+        settings->registerValueChange(
+            settings::Wallpaper::option,
+            [this](std::string value) {
+                wallpaperModel.setWallpaper(
+                    static_cast<gui::WallpaperOption>(utils::getNumericValue<unsigned int>(value)));
+            },
             settings::SettingsScope::Global);
 
         return sys::ReturnCodes::Success;
@@ -158,6 +170,9 @@ namespace app::manager
             notificationProvider.requestNotSeenNotifications();
             notificationProvider.send();
             return sys::msgHandled();
+        });
+        connect(typeid(GetWallpaperOptionRequest), [&](sys::Message *request) {
+            return std::make_shared<app::manager::GetWallpaperOptionResponse>(wallpaperModel.getWallpaper());
         });
         connect(typeid(db::NotificationMessage), [&](sys::Message *msg) {
             auto msgl = static_cast<db::NotificationMessage *>(msg);
