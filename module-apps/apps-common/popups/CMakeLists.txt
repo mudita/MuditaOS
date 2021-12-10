@@ -24,10 +24,15 @@ target_sources(apps-common
 		lock-popups/SimLockInputWindow.cpp
 		lock-popups/SimInfoWindow.cpp
 		lock-popups/SimNotReadyWindow.cpp
+		lock-popups/phone-lock-wallpapers/WallpaperBase.cpp
+		lock-popups/phone-lock-wallpapers/WallpaperClock.cpp
+		lock-popups/phone-lock-wallpapers/WallpaperQuote.cpp
+		lock-popups/phone-lock-wallpapers/WallpaperLogo.cpp
 		presenter/PowerOffPresenter.cpp
 		presenter/AlarmPresenter.cpp
 		data/PopupRequestParamsBase.cpp
-
+		presenter/QuotesPresenter.cpp
+		presenter/WallpaperPresenter.cpp
 	PRIVATE
 		HomeModesWindow.hpp
 		Popups.hpp
@@ -47,6 +52,12 @@ target_sources(apps-common
 		lock-popups/SimLockInputWindow.hpp
 		lock-popups/SimInfoWindow.hpp
 		lock-popups/SimNotReadyWindow.hpp
+		lock-popups/phone-lock-wallpapers/WallpaperBase.hpp
+		lock-popups/phone-lock-wallpapers/WallpaperClock.hpp
+		lock-popups/phone-lock-wallpapers/WallpaperQuote.hpp
+		lock-popups/phone-lock-wallpapers/WallpaperLogo.hpp
 		presenter/PowerOffPresenter.hpp
+		presenter/QuotesPresenter.hpp
+		presenter/WallpaperPresenter.hpp
 
 )

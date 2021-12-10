@@ -3,6 +3,8 @@ add_library(appmgr STATIC)
 target_sources(appmgr
     PRIVATE
         ApplicationManager.cpp
+        models/WallpaperDisplayModel.cpp
+        include/appmgr/models/WallpaperDisplayModel.hpp
     PUBLIC
         include/appmgr/ApplicationManager.hpp
 )

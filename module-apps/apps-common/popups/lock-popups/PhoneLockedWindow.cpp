@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneLockedWindow.hpp"
@@ -6,13 +6,21 @@
 
 #include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <popups/data/PopupData.hpp>
 
 namespace gui
 {
-    PhoneLockedWindow::PhoneLockedWindow(app::ApplicationCommon *app, const std::string &name)
+    PhoneLockedWindow::PhoneLockedWindow(app::ApplicationCommon *app,
+                                         const std::string &name,
+                                         std::unique_ptr<WallpaperPresenter> &&presenter)
         : AppWindow(app, name),
-          notificationsModel(std::make_shared<NotificationsModel>(NotificationsListPlacement::LockedScreen))
+          notificationsModel(std::make_shared<NotificationsModel>(NotificationsListPlacement::LockedScreen)),
+          clockWallpaper(std::make_shared<WallpaperClock>(this, notificationsModel)),
+          wallpaperPresenter(std::move(presenter))
     {
+        wallpaperPresenter->attachWallpapers(
+            clockWallpaper, std::make_shared<WallpaperQuote>(app, this), std::make_shared<WallpaperLogo>(this));
+
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
@@ -21,32 +29,7 @@ namespace gui
     void PhoneLockedWindow::buildInterface()
     {
         AppWindow::buildInterface();
-
-        clockDate = new ClockDateWidget(
-            this, 0, style::window::default_vertical_pos, style::window_width, clock_date_widget::h);
-
-        notificationsList = new ListView(this,
-                                         style::notifications::model::x,
-                                         style::notifications::model::y,
-                                         style::notifications::model::w,
-                                         style::notifications::model::h,
-                                         notificationsModel,
-                                         listview::ScrollBarType::None);
-    }
-
-    status_bar::Configuration PhoneLockedWindow::configureStatusBar(status_bar::Configuration appConfiguration)
-    {
-        appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
-        appConfiguration.disable(status_bar::Indicator::Time);
-        appConfiguration.enable(status_bar::Indicator::PhoneMode);
-        appConfiguration.enable(status_bar::Indicator::Lock);
-        appConfiguration.enable(status_bar::Indicator::Battery);
-        appConfiguration.enable(status_bar::Indicator::Signal);
-        appConfiguration.enable(status_bar::Indicator::SimCard);
-        appConfiguration.enable(status_bar::Indicator::Bluetooth);
-        appConfiguration.enable(status_bar::Indicator::AlarmClock);
-
-        return appConfiguration;
+        wallpaperPresenter->setupWallpaper();
     }
 
     void PhoneLockedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -78,6 +61,13 @@ namespace gui
             navBar->setText(nav_bar::Side::Center, utils::translate("app_desktop_unlock"));
             navBar->setActive(nav_bar::Side::Right, false);
         }
+    }
+
+    bool PhoneLockedWindow::updateTime()
+    {
+        auto ret = AppWindow::updateTime();
+        clockWallpaper->updateTime();
+        return ret;
     }
 
     bool PhoneLockedWindow::processLongReleaseEvent(const InputEvent &inputEvent)
@@ -115,10 +105,18 @@ namespace gui
         return true;
     }
 
-    bool PhoneLockedWindow::updateTime()
+    status_bar::Configuration PhoneLockedWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        auto ret = AppWindow::updateTime();
-        clockDate->setTime(std::time(nullptr));
-        return ret;
+        appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.disable(status_bar::Indicator::Time);
+        appConfiguration.enable(status_bar::Indicator::PhoneMode);
+        appConfiguration.enable(status_bar::Indicator::Lock);
+        appConfiguration.enable(status_bar::Indicator::Battery);
+        appConfiguration.enable(status_bar::Indicator::Signal);
+        appConfiguration.enable(status_bar::Indicator::SimCard);
+        appConfiguration.enable(status_bar::Indicator::Bluetooth);
+        appConfiguration.enable(status_bar::Indicator::AlarmClock);
+
+        return appConfiguration;
     }
 } /* namespace gui */

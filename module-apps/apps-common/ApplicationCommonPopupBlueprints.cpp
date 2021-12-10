@@ -59,7 +59,7 @@ namespace app
             });
         popupBlueprint.registerBlueprint(
             ID::PhoneLock, [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> & /*params*/) {
-                switchWindowPopup(gui::popup::resolveWindowName(id),
+                switchWindowPopup(resolveWindowName(id),
                                   gui::popup::popupDisposition(id, gui::popup::Disposition::Priority::Normal),
                                   nullptr,
                                   SwitchReason::PhoneLock);
