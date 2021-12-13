@@ -20,7 +20,6 @@ namespace utils
     class LangLoader
     {
       public:
-        virtual ~LangLoader() = default;
         std::vector<Language> getAvailableDisplayLanguages() const;
         std::vector<Language> getAvailableInputLanguages() const;
     };

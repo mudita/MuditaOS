@@ -4,8 +4,11 @@
 #include "i18nImpl.hpp"
 #include <log/log.hpp>
 #include <algorithm>
+#include <optional>
 #include <cstdio>
 #include <purefs/filesystem_paths.hpp>
+#include <i18n/i18n.hpp>
+#include <utility>
 
 namespace utils
 {
@@ -15,6 +18,57 @@ namespace utils
         {
             return str.empty() ? ret : str;
         }
+
+        std::optional<json11::Json> loadJSONData(const std::filesystem::path &path)
+        {
+            auto fd = std::fopen(path.c_str(), "r");
+            if (fd == nullptr) {
+                LOG_FATAL("Error during opening file %s", path.c_str());
+                return {};
+            }
+
+            const auto fsize = std::filesystem::file_size(path);
+
+            auto stream = std::make_unique<char[]>(fsize + 1); // +1 for NULL terminator
+
+            std::fread(stream.get(), 1, fsize, fd);
+
+            std::string err;
+            json11::Json js = json11::Json::parse(stream.get(), err);
+
+            std::fclose(fd);
+
+            // Error
+            if (err.length() != 0) {
+                LOG_FATAL("%s", err.c_str());
+                return {};
+            }
+            else {
+                return js;
+            }
+        }
+
+        struct LanguageMetadata
+        {
+            static std::optional<LanguageMetadata> get(const std::filesystem::path &path)
+            {
+                const auto contents = loadJSONData(path);
+                if (not contents) {
+                    return {};
+                }
+                const auto contentsValue = *contents;
+                if (contentsValue[metadataKey].is_null() || contentsValue[metadataKey][metadataDisplayKey].is_null()) {
+                    return {};
+                }
+
+                return LanguageMetadata{.displayName = contentsValue[metadataKey][metadataDisplayKey].string_value()};
+            }
+            const std::string displayName;
+
+          private:
+            static constexpr auto metadataKey        = "metadata";
+            static constexpr auto metadataDisplayKey = "display_name";
+        };
     } // namespace
 
     namespace
@@ -65,42 +119,22 @@ namespace utils
 
     i18nPrivateInterface localize;
 
-    json11::Json LangLoaderImpl::createJson(const std::string &filename)
-    {
-        const auto path = localize.getDisplayLanguagePath() / (filename + utils::files::jsonExtension);
-        auto fd         = std::fopen(path.c_str(), "r");
-        if (fd == nullptr) {
-            LOG_FATAL("Error during opening file %s", path.c_str());
-            return json11::Json();
-        }
-
-        uint32_t fsize = std::filesystem::file_size(path);
-
-        auto stream = std::make_unique<char[]>(fsize + 1); // +1 for NULL terminator
-
-        std::fread(stream.get(), 1, fsize, fd);
-
-        std::string err;
-        json11::Json js = json11::Json::parse(stream.get(), err);
-
-        std::fclose(fd);
-
-        // Error
-        if (err.length() != 0) {
-            LOG_FATAL("%s", err.c_str());
-            return json11::Json();
-        }
-        else {
-            return js;
-        }
-    }
-
     std::vector<Language> LangLoader::getAvailableDisplayLanguages() const
     {
         std::vector<std::string> languageNames;
         for (const auto &entry : std::filesystem::directory_iterator(getDisplayLanguagePath())) {
-            languageNames.push_back(std::filesystem::path(entry.path()).stem());
+            const auto metadata = LanguageMetadata::get(entry.path());
+            if (metadata) {
+                languageNames.push_back(metadata->displayName);
+            }
+            else {
+                /// If metadata is not valid use file name string as a display language
+                languageNames.push_back(std::filesystem::path(entry).stem());
+            }
         }
+
+        std::sort(languageNames.begin(), languageNames.end());
+
         return languageNames;
     }
 
@@ -151,10 +185,11 @@ namespace utils
 
             return false;
         }
-        else if (json11::Json pack = loader.createJson(lang); pack != json11::Json()) {
+        else if (const auto pack =
+                     loadJSONData(localize.getDisplayLanguagePath() / (lang + utils::files::jsonExtension))) {
 
             currentDisplayLanguage = lang;
-            changeDisplayLanguage(pack);
+            changeDisplayLanguage(pack.value());
 
             return true;
         }
@@ -171,7 +206,9 @@ namespace utils
     {
         cpp_freertos::LockGuard lock(mutex);
         currentDisplayLanguage = fallbackLanguageName;
-        fallbackLanguage       = loader.createJson(fallbackLanguageName);
+        fallbackLanguage =
+            loadJSONData(localize.getDisplayLanguagePath() / (fallbackLanguageName + utils::files::jsonExtension))
+                .value();
     }
 
     const std::string &translate(const std::string &text)
