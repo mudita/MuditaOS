@@ -9,20 +9,13 @@ add_assets_target(
     SOURCE_DIR ${ASSETS_SOURCE_DIR}
     DEST_DIR ${ASSETS_DEST_DIR}
     DEVEL ${WITH_DEVELOPMENT_FEATURES}
+    DEPENDS json-target json-images-target
 )
 
 multicomp_install(
     FILES
         ${ASSETS_DEST_DIR}/.boot.json
         ${ASSETS_DEST_DIR}/.boot.json.crc32
-    DESTINATION ./
-    COMPONENTS Standalone Update
-)
-
-multicomp_install(
-    DIRECTORY
-        ${ASSETS_DEST_DIR}/current/
-        ${ASSETS_DEST_DIR}/user
     DESTINATION ./
     COMPONENTS Standalone Update
 )

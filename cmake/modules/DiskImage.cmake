@@ -2,8 +2,8 @@ function(add_image)
     cmake_parse_arguments(
         _ARG
         ""
-        "PRODUCT;SYSROOT;ASSETS;IMAGE_PARTITIONS;DEPENDS"
-        ""
+        "PRODUCT;SYSROOT;IMAGE_PARTITIONS;LUTS"
+        "DEPENDS"
         ${ARGN}
     )
 
@@ -37,39 +37,28 @@ function(add_image)
         set(UPDATER_FILE_PATH "")
     endif()
 
-    set(COMMAND_DEPENDS "genlittlefs")
-    list(APPEND COMMAND_DEPENDS ${SCRIPT_PATH})
-    if(_ARG_ASSETS)
-        list(APPEND COMMAND_DEPENDS ${_ARG_ASSETS})
-    endif()
-    if(HAS_BOOTFILE)
-        list(APPEND COMMAND_DEPENDS ${BIN_FILE_TARGET})
-    endif()
-
-    if(HAS_UPDATER)
-        list(APPEND COMMAND_DEPENDS updater.bin-target)
-    endif()
+    # set(COMMAND_DEPENDS "genlittlefs")
 
     if(HAS_VERSION)
         set(VERSION_FILE_PATH ${CMAKE_BINARY_DIR}/${_ARG_PRODUCT}-version.json)
-        list(APPEND COMMAND_DEPENDS ${_ARG_PRODUCT}-version.json-target)
     else()
         set(VERSION_FILE_PATH "")
     endif()
 
     add_custom_command(
         OUTPUT ${DISK_IMAGE_NAME}
-        DEPENDS ${COMMAND_DEPENDS} ${_ARG_DEPENDS}
+        DEPENDS ${SCRIPT_PATH} ${_ARG_DEPENDS}
         COMMAND
             ${SCRIPT_PATH}
             ${DISK_IMAGE_NAME}
             ${IMAGE_PARTITIONS}
             ${CMAKE_BINARY_DIR}/${_ARG_SYSROOT}
+            "${_ARG_LUTS}"
             "${VERSION_FILE_PATH}"
             "${BIN_FILE_PATH}"
             "${UPDATER_FILE_PATH}"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        COMMENT "Generate ${DISK_IMAGE_NAME}"
+        COMMENT "Generate ${DISK_IMAGE_NAME} with: add_image: ${_ARG_PRODUCT} : ${_ARG_DEPENDS}"
     )
 
     message("Adding disk image target: ${DISK_IMAGE_NAME}")

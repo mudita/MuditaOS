@@ -14,8 +14,8 @@ Usage: $(basename $0) image_path image_partitions build_dir [version.json_file] 
 ==usage
 }
 
-if [[ ( $# -ne 3 ) && ( $# -ne 6 ) ]]; then
-	echo "Error! Invalid argument count"
+if [[ ( $# -lt 3 )  || ( $# -gt 8 ) ]]; then
+	echo "Error! Invalid argument count $# args: $*"
 	usage
 	exit -1
 fi
@@ -25,9 +25,10 @@ PRODUCT_NAME=$(basename -s .img $1)
 IMAGE_PARTITIONS=$(realpath $2)
 
 SYSROOT=$(realpath $3)
-VERSION_FILE=$4
-BIN_FILE=$5
-UPDATER_FILE=$6
+LUTS=$4
+VERSION_FILE=$5
+BIN_FILE=$6
+UPDATER_FILE=$7
 
 if [ ! -d "$SYSROOT" ]; then
 	echo "Error! ${SYSROOT} is not a directory"
@@ -55,12 +56,6 @@ MTOOLS_OK=$(mtools --version | awk "${_AWK_SCRIPT}")
 if [ ! $MTOOLS_OK ]; then
 	echo "Invalid mtools version, please upgrade mtools to >= 4.0.24"
 	exit -1
-fi
-
-GENLFS=$(realpath $(find $BUILDDIR -type f -iname genlittlefs -executable -print -quit))
-if [ -z ${GENLFS} ]; then
-    echo "Error: Unable to find genlilttlefs..."
-    exit -1
 fi
 
 source ${IMAGE_PARTITIONS}
@@ -101,7 +96,7 @@ fi
 cd "${SYSROOT}/sys"
 
 #Copy FAT data
-CURRENT_DATA="assets country-codes.db Luts.bin"
+CURRENT_DATA="assets country-codes.db ${LUTS}"
 
 mmd -i "$PART1" ::/current
 mmd -i "$PART1" ::/current/sys
@@ -112,7 +107,7 @@ for i in $CURRENT_DATA; do
 	if [ -f "$f" -o -d "$f" ]; then
 		mcopy -s -i "$PART1" $f ::/current/
 	else
-		echo "Error! Unable to copy item: $f"
+        echo "Error! partition: $PART Unable to copy item: $(pwd)/$f"
 		exit 1
 	fi
 done
@@ -157,8 +152,7 @@ mke2fs \
   -r 1 \
   -t ext4 \
   "$IMAGE_NAME" \
-  $((($PART2_SIZE*$DEVICE_BLK_SIZE)/1024)) \
-;
+  $((($PART2_SIZE*$DEVICE_BLK_SIZE)/1024))  > /dev/null
 
 # EXT4 user partition
 mke2fs \
@@ -173,8 +167,7 @@ mke2fs \
   -m 0 \
   -r 1 \
   -t ext4 \
-  "$IMAGE_NAME" \
-;
+  "$IMAGE_NAME" > /dev/null
 
 # back to previous dir
 cd -

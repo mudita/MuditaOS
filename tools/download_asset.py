@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 '''
@@ -13,7 +13,7 @@ which is super simple as it uses json file for description
         {
             "name": "./fonts/bell/gt_pressura_regular_38.mpf",      <-- name of our file to download in repo
             "output": "fonts/gt_pressura_regular_38.mpf",           <-- output: where should be and how shall be called the file
-            "ref": "fd168040c5d1216d457e6cf223e8ea9bb76bf7b"        <-- from what ref shall we download the file
+            "ref": "fd168040c5d1216d457e6cf223e8ea9bb76bf7b",       <-- from what ref shall we download the file ignored for local files
         },
     ...
 }
@@ -30,7 +30,10 @@ from ghapi.all import GhApi
 from pathlib import Path
 from fastcore.net import HTTP404NotFoundError, HTTP403ForbiddenError
 from base64 import b64decode
+from dataclasses import dataclass
+from typing import Union, Callable, Any, Generator, IO
 import logging
+from typing import List  # for ancient python3 support
 
 
 log = logging.getLogger(__name__)
@@ -73,105 +76,254 @@ def getToken():
 def get_assets_json(name):
     with open(name) as f:
         j = json.load(f)
-    return j
+        return j
 
 
 def verify_config(j):
     '''
     checks for required fields for json description file
     '''
+    if type(j) is not dict:
+        RuntimeError(f"config not in dict form - {type(j)}")
     required = ['assets']
     for val in required:
         if val not in j:
-            raise(RuntimeError(f"value '{val}' not found in config!"))
+            raise RuntimeError(f"value '{val}' not found in config! {j}")
 
 
-class GitOps:
+@dataclass
+class Verse:
+    '''
+    json file dict field in use here
+
+    Args:
+        name of file remotely
+        tarfile - optional
+        output path to file where wa want to have it
+        ref reference of file, used as cache version
+        unpack information if we shall unpack the file to get output
+        sha_gen generator for sha if is missing just in case
+    '''
+    name: str
+    output: Path = Path()
+    tarfile: str = ""
+    ref: str = ""
+    unpack: bool = False
+    copy: bool = False
+    sha_gen: Callable[['Verse'], str] = lambda _: "none"
+
+    def __post_init__(self):
+        '''
+            val - file to take, remove `./` if required - http paths doesn't have ./
+            ref - git sha to use for download
+        '''
+        if './' == self.name[0:2]:
+            self.name = self.name[2:]
+        if self.ref == "":
+            self.ref = self.sha_gen(self)
+        if self.output == Path():
+            self.output = Path(self.name)
+        if self.tarfile != "":
+            self.unpack = True
+            if './' == self.tarfile[0:2]:
+                self.tarfile = self.tarfile[2:]
+        if not self.unpack:
+            self.copy = True
+        elif self.tarfile == "":
+            raise RuntimeError(f"Wrong verse! it's unpack target but have no `tarfile` set {self}")
+
+
+@dataclass
+class Release:
+    name: str
+    id: int
+    assets: List[Any]
+
+
+class FileCache:
+    '''
+    file cache utility, right now - file cache is in cache dir
+    if any improvement was to be made we should just take any ready
+    library (i.e. DiskCache)
+    '''
+
+    def __init__(self, where: str):
+        self.cache = Path(where)
+        self.cache.expanduser().mkdir(exist_ok=True)
+
+    def _key_gen(self, name, sha_gen=Callable[[], str]) -> Path:
+        '''
+        cache key generator to access cached file
+        '''
+        return (self.cache / sha_gen() / name).expanduser()
+
+    def _get_by_verse(self, verse: Verse) -> Path:
+        '''
+        get path to cache
+
+        Args
+            file_name - file to download as
+            any_id - ideal git sha, `ref` by ghapi v3, if sha is not provided `master` is taken for repo access, id for release
+        '''
+        if verse.name is None or verse.name == '':
+            raise RuntimeError(f'verse.name has to be set properly! {verse}')
+        where = self._key_gen(verse.name, lambda: verse.ref)
+        existed = where.parent.exists()
+        if not existed:
+            where.parent.mkdir(parents=True)
+        return where
+
+    def _get_by_gen(self, what, sha_gen: Callable[[], str]) -> Path:
+        if what is None or what == '':
+            raise RuntimeError(f'input filename has to be set properly! none file passed! {what}')
+        return self._key_gen(what, sha_gen)
+
+    def get(self, *args) -> Path:
+        ret = None
+        if len(args) == 1:
+            ret = self._get_by_verse(*args)
+        else:
+            ret = self._get_by_gen(*args)
+        if ret is None:
+            raise RuntimeError("cache get failure")
+        return ret
+
+    def open(self, what: str, sha_gen: Callable[[], str], mode='rwb') -> Generator[IO, None, None]:
+        '''
+        return opened cache file
+        '''
+        with self.get(what, sha_gen).open(mode) as f:
+            yield f
+
+
+class BaseOps:
+    def __init__(self, cache_dir, install_dir: Union[str, None]):
+        self.cache = FileCache(cache_dir)
+
+        dir = Path(install_dir) if install_dir is not None else Path('./')
+        if dir.exists():
+            self.install_dir = dir
+        else:
+            log.warning(f"install dir: {dir} doesn't exist - using {Path('./')} as install dir instead")
+            self.install_dir = Path('./')
+
+    def install(self, val: Verse):
+        cached = self.cache.get(val)
+        # check if file in cache - if not, then populate
+        if not cached:
+            log.error('no file cached - use {val.name} as {cached}')
+            self.copy_file(Path(val.name), cached)
+
+        # get path to install the file
+        if Path(val.output).parent.is_absolute():
+            raise RuntimeError('do not use absolute paths, use install dir instead')
+        install_path = self.install_dir / val.output
+
+        # select proper installation method
+        if val.unpack:
+            self.unpack(cached, val.tarfile, install_path, val.ref)
+        elif val.copy:
+            self.copy_file(cached, install_path)
+        else:
+            raise RuntimeError('no option selected for install, required either unpack or copy')
+
+    def copy_file(self, what: Path, where: Path) -> None:
+        log.debug(f'{what} -> {where}')
+        self._copy_file(what, where)
+
+    def _copy_file(self, what: Path, where: Path) -> None:
+        '''
+        if there is no path to `where` create -> then copy `what`
+        '''
+        import shutil
+        self._assert_parent_dir(where)
+        shutil.copy(what, where)
+
+    def unpack(self, file_name: Path, what: str, where: Path, id) -> None:
+        import tarfile
+        self._assert_parent_dir(where)
+        cached = self.cache.get(what, lambda: id)
+        in_cache = cached.exists()
+        if not in_cache:
+            try:
+                with tarfile.open(file_name) as tar:
+                    tar.extract(what, path=cached.parent)
+                    (cached.parent / what).rename(cached)
+            except KeyError:
+                raise RuntimeError(f"file {what} not found in tar: {file_name}")
+            except tarfile.ReadError:
+                raise RuntimeError(f"cant read tar: {file_name}, cant unpack: {what}")
+        self._copy_file(cached, where)
+        log.debug(f'{"cached" if cached else "unpack"}: {file_name}[{what}] -> {where}')
+
+    def _assert_parent_dir(self, where: Path):
+        if not where.parent.exists():
+            log.debug(f"Output file catalog doesn't exist: {str(where.parent)} creating...")
+            where.parent.mkdir(parents=True)
+
+
+class GitOps(BaseOps):
     '''
     Simplest github download wrapper based on ghapi (passed by api)
     please see reference here: https://ghapi.fast.ai/fullapi.html
     '''
     def __init__(self, api: GhApi, cache_dir: str, install_dir, j: dict):
+        BaseOps.__init__(self, cache_dir, install_dir)
         self.api = api
         self.j = j
-        self.cache = Path(cache_dir)
-        self.cache.expanduser().mkdir(exist_ok=True)
         self.install_dir = Path(install_dir if install_dir is not None else '.')
 
-    def get_cached(self, file_name, any_id):
+    def _download_file_from_git(self, where, data):
         '''
-        create catalog in downloads for file
-            file_name - file to download as
-            any_id - ideal git sha, `ref` by ghapi v3, if sha is not provided `master` is taken for repo access, id for release
-        '''
-        where = (self.cache / any_id / file_name).expanduser()
-        if not where.parent.exists():
-            where.parent.mkdir(parents=True)
-        return where
-
-    def create_download_data(self, val, ref):
-        '''
-        generate 'data' required for github api to download via get_content
-        essentially:
-            val - file to take, remove `./` if required - http paths doesn't have ./
-            ref - git sha to use for download
-        '''
-        file_name = val['name']
-        if './' == file_name[0:2]:
-            file_name = file_name[2:]
-        data = {"path": file_name, "ref": ref}
-        return data
-
-    def download_file_from_git(self, where, data):
-        '''
-        use ghapi to download
+        use ghapi to download file straight from git
             where - where to download file to (please remember to download to cache)
             data - what to download
         '''
-        path = self.api.repos.get_content(**data)
+        try:
+            path = self.api.repos.get_content(**data)
+        except HTTP404NotFoundError:
+            raise RuntimeError(f'file {data["path"]} under id {data["ref"]} not found')
         with where.open("wb") as f:
-            # TODO in generall - content says what encoding is used, this is simplification
+            # NOTE in general - content says what encoding is used, this is a simplification
             data = b64decode(path["content"])
             f.write(data)
 
-    def download_file_from_release(self, id, name_out):
+    def _download_file_from_release(self, val):
         '''
-        This function:
-            - gets file data via github api v3
-            - then downloads it from the same link with forward by header:
-                'application/octet-stream'
+        use ghapi to download file straight from gh release
+        there is hack to change headers to accept octet-stream : otherwise we wont get file, but it's metadata instead
+        see `self.api.headers['Accept']
+            val    - verse to download ref is `id` for request
         '''
-        cached = self.get_cached(name_out, str(id))
-        where = self.install_dir / name_out
-        if not cached.exists():
-            oldheaders = self.api.headers['Accept']
-            log.info(f"downloading {cached.absolute()}")
-            data = self.api.repos.get_release_asset(id)
-            # set headers to accept octet stream instead of ghapi
-            self.api.headers['Accept'] = 'application/octet-stream'
-            import requests
-            response = requests.get(data['url'],
-                                    headers={**self.api.headers},
-                                    stream=True)
-            if response.status_code != requests.codes.ok:
-                raise RuntimeError(f"download error: {response.status_code} {response.content}")
-            with cached.open('wb') as fd:
-                with tqdm(total=data['size'], unit='kb', unit_scale=True) as p_bar:
-                    for chunk in response.iter_content(chunk_size=1024):
-                        fd.write(chunk)
-                        p_bar.update(len(chunk))
-            # restore headers
-            self.api.headers['Accept'] = oldheaders
-        self.copy_file(cached, where)
+        where = self.cache.get(val)
+        log.info(f"downloading {val.name} to cache: {where}")
+        oldheaders = self.api.headers['Accept']
+        # get data for file to 
+        data = self.api.repos.get_release_asset(val.ref)
+        self.api.headers['Accept'] = 'application/octet-stream'
+        import requests
+        response = requests.get(data['url'],
+                                headers={**self.api.headers},
+                                stream=True)
+        if response.status_code != requests.codes.ok:
+            raise RuntimeError(f"download error: {response.status_code} {response.content}")
 
-    def copy_file(self, what: Path, where: Path):
-        '''
-        if there is no path to `where` create -> then copy `what`
-        '''
-        import shutil
-        where.parent.mkdir(exist_ok=True, parents=True)
-        log.info(f'{what} -> {where}')
-        shutil.copy(what, where)
+        # save file to cache my friend
+        with where.open('wb') as fd:
+            with tqdm(total=data['size'], unit='kb', unit_scale=True) as p_bar:
+                for chunk in response.iter_content(chunk_size=1024):
+                    fd.write(chunk)
+                    p_bar.update(len(chunk))
+
+        # restore headers
+        self.api.headers['Accept'] = oldheaders
+
+    def download_file_from_release(self, val: Verse):
+        # cache after the release id not after the file id - to not download the release multiple times
+        cached = self.cache.get(val)
+        if not cached.exists():
+            self._download_file_from_release(val)
+        self.install(val)
 
     @lru_cache(maxsize=None)
     def _api_list_branches(self):
@@ -197,36 +349,27 @@ class GitOps:
         -> check if file for sha exists -> if not: download -> copy where needed
         '''
         for idx, val in enumerate(tqdm(self.j['assets'])):
-            data = None
-            if 'name' not in val:
-                raise RuntimeError(f'there is no name in json->assets on position {idx}')
             try:
-                git_sha = val['ref'] if 'ref' in val else self.fallback_ref()
-                data = self.create_download_data(val, git_sha)
-                cached = self.get_cached(data['path'], git_sha)
+                val = Verse(**val, sha_gen=lambda _: self.fallback_ref())
+                cached = self.cache.get(val)
                 if not cached.exists():
+                    data = {"path": val.name, "ref": val.ref}
                     log.info(f"downloading: {data} to: {str(cached)}")
-                    self.download_file_from_git(cached, data)
-                output = Path(val['output']) if 'output' in val else Path(val['name'])
+                    self._download_file_from_git(cached, data)
+                output = Path(val.output)
                 if output.is_absolute() and self.install_dir is not None:
                     raise RuntimeError("cant have absolute output with install dir...")
-                if not output.is_absolute() and self.install_dir is not None:
-                    log.debug("prepend install dir")
-                    output = Path(self.install_dir) / output
-                output.parent.mkdir(parents=True, exist_ok=True)
-                if 'unpack' in val:
-                    import tarfile
-                    with tarfile.open(cached) as tar:
-                        tar.extract(output.name, path=output.parent)
-                        log.info(f'{cached}[{output.name}] -[untar]-> {output.parent / output.name}')
-                else:
-                    self.copy_file(cached, output)
+                self.install(val)
+            except TypeError as ex:
+                log.error(ex)
+                raise RuntimeError(f'there is no name in json->assets on position {idx}')
             except HTTP404NotFoundError as ex:
                 raise RuntimeError(f'file not found with: {data} err: {ex}')
             except HTTP403ForbiddenError as ex:
                 # gh is messed up - if you get persistent error on this file, try renaming
                 raise RuntimeError(f'something is wrong with: {data} err: {ex}')
 
+    @lru_cache(maxsize=None)
     def _get_product_by_name(self, repository: str, product: str, version: str) -> str:
         '''
         We have naming convetion of releases:
@@ -240,13 +383,15 @@ class GitOps:
         elif "pure" in product.lower():
             product = "pure"
         else:
-            log.error("we require short version in this script - either pure or bell")
-            sys.exit(2)
+            log.error(f"we require short version in this script - either pure or bell, we got: repository: {repository} product: {product} version: {version}")
+            exit(1)
 
         return f"{repository} {version}-{product}"
 
-
-    def download_release(self, repo, name_in, name_out, version, product):
+    def _get_lousy_match_release(self, repo, product, version) -> Release:
+        '''
+        releases have to be named in format: `RepoName product version`
+        '''
         release_requested = self._get_product_by_name(repo, product, version)
         release = None
         for rel in self._api_list_releases():
@@ -257,14 +402,31 @@ class GitOps:
         if release is None:
             raise RuntimeError(f"Can't get release by release name: {release_requested} with args: {args}")
         log.info(f"Trying to download release from {args.repository} under name: {release_requested}")
-        assets = release['assets']
-        found = False
+
+        return Release(release['id'], release['name'], release['assets'])
+
+    def _get_file_in_release(self, assets, name: str):
         for asset in assets:
-            if asset['name'] == name_in:
-                self.download_file_from_release(asset['id'], name_out)
-                found = True
-        if not found:
-            raise(RuntimeError(f"asset not found {args.assetRepoName} and cant be saved as {args.assetOutName}"))
+            if asset['name'] == name:
+                return str(asset['id'])
+        raise RuntimeError(f"asset not found {name} not found in {assets}")
+
+    def download_release_file(self, repo, name_in, name_out, version, product):
+        '''
+        Downloads file named `name_in` from release matching `version` and `product`
+        then installs it under `name_out`
+        '''
+        release = self._get_lousy_match_release(repo, product, version)
+        var = Verse(name_in, name_out, sha_gen=lambda x: self._get_file_in_release(release.assets, x.name))
+        self.download_file_from_release(var)
+
+    def download_release_json(self, repo, j, version, product):
+        '''
+        Downloads file to cache if not exists then copy where needed
+        '''
+        release = self._get_lousy_match_release(repo, product, version)
+        for el in [Verse(**val, sha_gen=lambda x: self._get_file_in_release(release.assets, x.name)) for val in j['assets']]:
+            self.download_file_from_release(el)
 
     def list_releases(self):
         '''
@@ -277,28 +439,52 @@ class GitOps:
         print(tabulate(table, headers, tablefmt="github"))
 
 
+class LocalOps(BaseOps):
+    '''
+    quick and dirty local copy class
+    '''
+    def __init__(self, install_dir, cache_dir):
+        BaseOps.__init__(self, cache_dir, install_dir)
+
+    def copy_files(self, j={}):
+        if 'assets' not in j:
+            raise RuntimeError("json description file has to have assets dict, see download_asset.py module docs")
+        for val in [Verse(**val) for val in j['assets']]:
+            if not val.copy:
+                raise RuntimeError("assets row for copy has to have copy marker")
+            val.output = val.output if val.output.is_absolute() else self.install_dir / val.output
+            self.install(val)
+
+
 def arguments():
     import argparse
     parser = argparse.ArgumentParser(description="download assets from repo, requires valid token in git config")
+    parser.add_argument('--cache_dir', help='cache dir to store downloaded files', default='~/.mudita/')
     subparsers = parser.add_subparsers(title='cmd', description="command to run", required=True, dest='cmd')
     cmd_git = subparsers.add_parser('github', description="download assets from github")
     cmd_git.add_argument('--owner', help="owner to take data from, in our case Mudita", default="mudita")
     cmd_git.add_argument('--repository', help='repository to take assets from', default='MuditaOSAssets')
-    cmd_git.add_argument('--cache_dir', help='cache dir to store downloaded files', default='~/.mudita/')
     cmd_git.add_argument('--install_dir', help='optional install dir for path, default - relative to script', default=None)
+
     subparsers_git = cmd_git.add_subparsers(title='github cmd', description="util to run with github", dest='cmd_github')
     cmd_git_json = subparsers_git.add_parser('json', description="download assets by json file")
+
     cmd_git_json.add_argument('--json', help="json file with description what shall we load", required=True)
+
     cmd_git_list = subparsers_git.add_parser('list', description="list releases from github")
+
     cmd_git_release_download = subparsers_git.add_parser('download', description="download assets from github release")
-    cmd_git_release_download.add_argument('--name_in', required=True, help="The name of asset to download from release package in repository")
-    cmd_git_release_download.add_argument('--name_out', required=True, help="The output name to assign to downloaded asset after download")
+
+    cmd_git_release_download.add_argument('--json', help="json file with description what shall we load")
+    cmd_git_release_download.add_argument('--name_in',help="The name of asset to download from release package in repository")
+    cmd_git_release_download.add_argument('--name_out', help="The output name to assign to downloaded asset after download")
+
     cmd_git_release_download.add_argument('--version', required=True, help="Asset version to download")
     cmd_git_release_download.add_argument('--product', required=True, help='Asset product to download, has to match any product we support at the moment')
 
-
-    # cmd_git_list =
-    subparsers.add_parser('local', description="local files copy")
+    local_parser = subparsers.add_parser('local', description="local files copy")
+    local_parser.add_argument('--json', help="json file with description what shall we load", required=True)
+    local_parser.add_argument('--install_dir', help='optional install dir for path, default - relative to script', default=None)
     return parser.parse_args()
 
 
@@ -317,21 +503,32 @@ if __name__ == "__main__":
                 api = GhApi(owner=args.owner, token=token, repo=args.repository)
                 downloader = GitOps(api, args.cache_dir, args.install_dir, j)
                 downloader.download_json()
-                log.info('downloader success')
             if args.cmd_github == 'list':
                 api = GhApi(owner=args.owner, token=token, repo=args.repository)
                 downloader = GitOps(api, args.cache_dir, args.install_dir, {})
                 downloader.list_releases()
-                log.info('downloader success')
             if args.cmd_github == 'download':
-                if args.install_dir is None:
-                    args.install_dir = Path('./')
+                has_json = args.json is not None
+                has_names = args.name_in is not None and args.name_out is not None
+                if (not has_json and not has_names) or (has_json and has_names):
+                    raise RuntimeError(f'script requires either json or name_in and name_out parameters to download from release {"have json file selected" if has_json else ""} {"have names selected" if has_names else ""}')
                 api = GhApi(owner=args.owner, token=token, repo=args.repository)
                 downloader = GitOps(api, args.cache_dir, args.install_dir, {})
-                downloader.download_release(args.repository, args.name_in, args.name_out, args.version, args.product)
-                log.info('downloader success')
+                if has_json:
+                    log.debug('download release from json')
+                    j = get_assets_json(args.json)
+                    log.debug('verify config...')
+                    verify_config(j)
+                    downloader.download_release_json(args.repository, j, args.version, args.product)
+                else:
+                    log.debug('download release file')
+                    downloader.download_release_file(args.repository, args.name_in, args.name_out, args.version, args.product)
         elif args.cmd == 'local':
-            raise RuntimeError('Not implemented')
+            j = get_assets_json(args.json)
+            log.debug('verify config...')
+            verify_config(j)
+            downloader = LocalOps(args.install_dir, args.cache_dir)
+            downloader.copy_files(j)
         else:
             raise RuntimeError('Not implemented')
     except RuntimeError as ex:
