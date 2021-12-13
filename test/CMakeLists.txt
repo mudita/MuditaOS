@@ -24,11 +24,20 @@ set(ROOT_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
 set(TEST_ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/sys)
 set(TEST_ASSETS_DEST_DIR ${TEST_ASSETS_DEST_DIR} PARENT_SCOPE)
 
+include(DownloadAsset)
+download_asset_json( json-test-target
+                     ${CMAKE_CURRENT_SOURCE_DIR}/assets.json
+                     ${TEST_ASSETS_DEST_DIR}/current/
+                     MuditaOSAssets
+                     ${MUDITA_CACHE_DIR}
+    )
+
 add_assets_target(
     TARGET test-assets
     SOURCE_DIR ${ASSETS_SOURCE_DIR}
     DEST_DIR ${TEST_ASSETS_DEST_DIR}
     DEVEL ON
+    DEPENDS json-test-target
 )
 
 add_image(

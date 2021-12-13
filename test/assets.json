@@ -1,6 +1,10 @@
 {
     "assets": [
         {
+            "name" : "./fonts/pure/gt_pressura_regular_38.mpf",
+            "output":"assets/fonts/gt_pressura_regular_38.mpf"
+        },
+        {
             "name": "./fonts/pure/dejavu_sans_bold_27.mpf",
             "output":"assets/fonts/dejavu_sans_bold_27.mpf"
         },
@@ -38,39 +42,27 @@
         },
         {
             "name": "./fonts/common/gt_pressura_light_30.mpf",
-            "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura_light_30.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_regular_30.mpf",
-            "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura_regular_30.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_bold_30.mpf",
-            "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura_bold_30.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_regular_46.mpf",
-            "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura_regular_46.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_light_46.mpf",
-            "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura_light_46.mpf"
         },
         {
             "name": "./fonts/common/gt_pressura_light_90.mpf",
-            "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura_light_90.mpf"
-        },
-        {
-            "name": "image/Luts.bin.tgz",
-            "tarfile" : "Luts.bin",
-            "output": "Luts.bin",
-            "unpack": true
         }
     ]
 }

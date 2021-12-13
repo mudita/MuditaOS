@@ -77,10 +77,12 @@ strip_executable(BellHybrid)
 
 include(AddBootBin)
 add_boot_bin(BellHybrid)
+
 add_image(
     PRODUCT BellHybrid
     SYSROOT sysroot
-    ASSETS  assets
+    LUTS Luts.bin
+    DEPENDS assets updater.bin-target ecoboot.bin-target BellHybrid-boot.bin BellHybrid-version.json-target
 )
 
 include(AddHexTarget)
@@ -88,9 +90,23 @@ add_hex_target(BellHybrid)
 
 include(BinaryAssetsVersions.cmake)
 include(DownloadAsset)
-download_asset_json(${CMAKE_CURRENT_SOURCE_DIR}/assets.json ${PROJECT_SOURCE_DIR} ${MUDITA_CACHE_DIR})
-download_asset_release(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION})
-download_asset_release(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION})
+# copy all assets required to build catalog under current folder as in json recipe
+download_asset_json( json-target
+                     ${CMAKE_CURRENT_SOURCE_DIR}/assets.json
+                     ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                     MuditaOSAssets
+                     ${MUDITA_CACHE_DIR}
+    )
+# copy all assets required to build catalog under current folder as in json recipe
+download_asset_release_json(    json-images-target
+                                ${CMAKE_CURRENT_SOURCE_DIR}/assets_images.json
+                                ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                                MuditaOSPublicAssets
+                                0.0.1
+                                ${MUDITA_CACHE_DIR}
+                           )
+download_asset_release(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION}  ${MUDITA_CACHE_DIR})
+download_asset_release(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION}  ${MUDITA_CACHE_DIR})
 
 include(AddVersionJson)
 add_version_json(BellHybrid)
