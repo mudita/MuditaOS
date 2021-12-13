@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Lines.hpp"
+#include "MultiTextLine.hpp"
 #include <text/Text.hpp>
 
 #if DEBUG_GUI_TEXT_LINES == 1
@@ -33,13 +34,26 @@ namespace gui
         }
     }
 
-    auto Lines::draw(BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition)
+    auto Lines::draw(
+        BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition, TextType drawType)
         -> void
+    {
+        drawMultiLine(drawCursor, w, h, lineYPosition, lineXPosition);
+    }
+
+    auto Lines::drawSingleLine(
+        BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition) -> void
+    {
+        // TODO in EGD-3411
+    }
+
+    auto Lines::drawMultiLine(
+        BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition) -> void
     {
         Position initialTopPadding = lineYPosition;
 
         while (true) {
-            auto textLine = gui::TextLine(drawCursor, w);
+            auto textLine = gui::MultiTextLine(drawCursor, w);
 
             if (textLine.length() == 0 && textLine.getLineEnd()) {
                 debug_text_lines("cant show more text from this document");
@@ -72,13 +86,24 @@ namespace gui
                      Length h,
                      Position lineYPosition,
                      Position lineXPosition,
-                     unsigned int linesCount) -> void
+                     unsigned int linesCount,
+                     TextType drawType) -> void
+    {
+        drawMultiLine(drawCursor, w, h, lineYPosition, lineXPosition, linesCount);
+    }
+
+    auto Lines::drawMultiLine(BlockCursor &drawCursor,
+                              Length w,
+                              Length h,
+                              Position lineYPosition,
+                              Position lineXPosition,
+                              unsigned int linesCount) -> void
     {
         Position initialTopPadding = lineYPosition;
         Length initHeight          = text->getTextFormat().getFont()->info.line_height;
 
         while (true) {
-            auto textLine = gui::TextLine(drawCursor, w, initHeight, underLineProperties);
+            auto textLine = gui::MultiTextLine(drawCursor, w, initHeight, underLineProperties);
 
             if ((textLine.height() > 0) && initHeight != textLine.height()) {
                 initHeight = textLine.height();

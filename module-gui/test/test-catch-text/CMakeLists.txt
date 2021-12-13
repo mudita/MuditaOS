@@ -12,7 +12,7 @@ add_catch2_executable(
                 test-gui-TextBlock.cpp
                 test-gui-TextBlockCursor.cpp
                 test-gui-TextDocument.cpp
-                test-gui-TextLine.cpp
+                test-gui-MultiTextLine.cpp
                 test-gui-TextParse.cpp
                 test-gui-Font.cpp
                 test-gui-TextLineCursor.cpp

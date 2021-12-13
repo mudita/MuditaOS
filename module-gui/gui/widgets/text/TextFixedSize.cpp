@@ -58,7 +58,8 @@ namespace gui
                     getSizeMinusPadding(Axis::Y, Area::Normal),
                     padding.top,
                     padding.left,
-                    linesCount);
+                    linesCount,
+                    textType);
 
         lines->linesHAlign(getSizeMinusPadding(Axis::X, Area::Normal));
         lines->linesVAlign(getSizeMinusPadding(Axis::Y, Area::Normal));

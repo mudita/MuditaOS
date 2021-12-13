@@ -4,7 +4,7 @@
 #include "InitializedFontManager.hpp"
 
 #include <widgets/text/Text.hpp>
-#include <widgets/text/core/lines/TextLine.hpp>
+#include <widgets/text/core/lines/MultiTextLine.hpp>
 
 #include <mock/buildTextDocument.hpp>
 #include <mock/multi-line-string.hpp>
@@ -22,7 +22,7 @@ TEST_CASE("TextLine - ctor")
     {
         Text text;
         auto cursor = new TextCursor(&text);
-        auto line   = TextLine(*cursor, maxWidth);
+        auto line   = MultiTextLine(*cursor, maxWidth);
         REQUIRE(line.length() == 0);
     }
 
@@ -32,7 +32,7 @@ TEST_CASE("TextLine - ctor")
         auto [document, font] = mockup::buildMultilineTestDocument(texts);
 
         auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, font);
-        auto line   = gui::TextLine(*cursor, maxWidth);
+        auto line   = gui::MultiTextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() > 0);
         REQUIRE(line.length() == texts.front().length());
@@ -44,14 +44,14 @@ TEST_CASE("TextLine - ctor")
         auto [document, font] = mockup::buildOnelineTestDocument(test_text);
 
         auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, font);
-        auto line   = gui::TextLine(*cursor, maxWidth);
+        auto line   = gui::MultiTextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() > 0);
         REQUIRE(line.length() == test_text.length());
     }
 }
 
-TEST_CASE("TextLine - non fitting text")
+TEST_CASE("MultiTextLine - non fitting text")
 {
     using namespace gui;
 
@@ -61,14 +61,14 @@ TEST_CASE("TextLine - non fitting text")
         auto [document, font] = mockup::buildOnelineTestDocument(test_text);
 
         auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, font);
-        auto line   = gui::TextLine(*cursor, maxWidth);
+        auto line   = gui::MultiTextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() != 0);
         REQUIRE(line.length() <= test_text.length());
     }
 }
 
-TEST_CASE("TextLine - multiple styles text")
+TEST_CASE("MultiTextLine - multiple styles text")
 {
     using namespace gui;
     mockup::fontManager();
@@ -87,7 +87,7 @@ TEST_CASE("TextLine - multiple styles text")
         auto document  = TextDocument(testblock);
 
         auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
-        auto line   = gui::TextLine(*cursor, maxWidth);
+        auto line   = gui::MultiTextLine(*cursor, maxWidth);
 
         REQUIRE(line.width() > 0);
         REQUIRE(line.length() == getTextLen(testblock));
@@ -103,7 +103,7 @@ TEST_CASE("TextLine - multiple styles text")
         auto document = TextDocument(testblock);
 
         auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
-        auto line   = gui::TextLine(*cursor, maxWidth);
+        auto line   = gui::MultiTextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == getTextLen(block0));
     }
@@ -119,7 +119,7 @@ TEST_CASE("TextLine - multiple styles text")
         auto document = TextDocument(testblock);
 
         auto cursor = std::make_unique<BlockCursor>(&document, 0, block0.size(), nullptr);
-        auto line   = gui::TextLine(*cursor, maxWidth);
+        auto line   = gui::MultiTextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == getTextLen(block1));
     }
@@ -130,7 +130,7 @@ TEST_CASE("TextLine - multiple styles text")
         auto document  = TextDocument(testblock);
 
         auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
-        auto line   = gui::TextLine(*cursor, maxWidth);
+        auto line   = gui::MultiTextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == 0);
         REQUIRE(line.width() == 0);
@@ -142,14 +142,14 @@ TEST_CASE("TextLine - multiple styles text")
         auto document  = TextDocument(testblock);
 
         auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
-        auto line   = gui::TextLine(*cursor, maxWidth);
+        auto line   = gui::MultiTextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == 0);
         REQUIRE(line.width() == 0);
     }
 }
 
-TEST_CASE("TextLine - elements sizes checkup")
+TEST_CASE("MultiTextLine - elements sizes checkup")
 {
     using namespace gui;
 
@@ -157,7 +157,7 @@ TEST_CASE("TextLine - elements sizes checkup")
     auto document  = TextDocument(testblock);
 
     auto cursor    = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
-    auto text_line = TextLine(*cursor, maxWidth);
+    auto text_line = MultiTextLine(*cursor, maxWidth);
 
     REQUIRE(text_line.length() > 0);
     const Item *it = nullptr;

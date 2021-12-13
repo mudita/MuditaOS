@@ -48,7 +48,7 @@ namespace gui
       protected:
         // holds list of labels for displaying currently visible text lines.
 
-        TextLineCursor *cursor                  = nullptr;
+        TextCursor *cursor                      = nullptr;
         CursorStartPosition cursorStartPosition = CursorStartPosition::DocumentEnd;
         std::unique_ptr<TextDocument> document  = std::make_unique<TextDocument>(std::list<TextBlock>());
         InputMode *mode                         = nullptr;
@@ -57,6 +57,8 @@ namespace gui
         void buildDocument(const UTF8 &text);
         void buildDocument(std::unique_ptr<TextDocument> &&document);
         void buildCursor();
+        TextCursor *createCursor();
+
         /// show cursor if cursor should be visible
         void showCursor(bool focus);
 

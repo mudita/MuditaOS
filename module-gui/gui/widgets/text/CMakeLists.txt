@@ -5,6 +5,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/core/cursors/TextLineCursor.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/core/lines/Lines.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/core/lines/TextLine.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/core/lines/MultiTextLine.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/core/RawText.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/core/TextBlock.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/core/TextDocument.cpp"
