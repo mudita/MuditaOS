@@ -225,6 +225,15 @@ namespace gui
         return pos + BlockCursor::getPosition();
     }
 
+    bool TextCursor::handleNextLine()
+    {
+        return false;
+    }
+    bool TextCursor::handlePreviousLine()
+    {
+        return false;
+    }
+
 } // namespace gui
 
 const char *c_str(enum gui::TextCursor::Move what)

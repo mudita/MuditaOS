@@ -7,147 +7,10 @@ namespace gui
 {
 
     /// helper function to get our text representation
-    RawText *buildUITextPart(const UTF8 &text, const TextFormat *format)
+    RawText *TextLine::buildUITextPart(const UTF8 &text, const TextFormat *format)
     {
         auto item = new gui::RawText(text, format->getFont(), format->getColor());
         return item;
-    }
-
-    /// Note - line breaking could be done here with different TextLines to return
-    /// or via different block types (i.e. numeric block tyle could be not "breakable"
-    TextLine::TextLine(BlockCursor &localCursor, unsigned int maxWidth) : maxWidth(maxWidth)
-    {
-        do {
-            if (!localCursor) { // cursor is faulty
-                lineEnd = true;
-                return;
-            }
-
-            if (localCursor.atEnd() && !localCursor.checkLastNewLine()) {
-                lineEnd = true;
-                return;
-            }
-
-            // take text we want to show
-            auto text = localCursor.getUTF8Text();
-
-            if (text.length() == 0 && localCursor.checkCurrentBlockNoNewLine() && !localCursor.atEnd()) {
-                setLineStartConditions(localCursor.getBlockNumber(), localCursor.getPosition());
-                localCursor.goToNextBlock();
-                continue;
-            }
-
-            auto textFormat = localCursor->getFormat();
-            if (textFormat->getFont() == nullptr) {
-                lineEnd = true;
-                return;
-            }
-
-            // check if max provided width is enough to enter one char at least
-            if (maxWidth < textFormat->getFont()->getCharPixelWidth(text[0])) {
-                lineEnd = true;
-                return;
-            }
-
-            auto signsCountToShow = calculateSignsToShow(localCursor, text, maxWidth - widthUsed);
-
-            // we can show nothing - this is the end of this line
-            if (signsCountToShow == 0) {
-                auto item  = buildUITextPart("", textFormat);
-                widthUsed  = item->widgetArea.w;
-                heightUsed = std::max(heightUsed, item->widgetArea.h);
-                lineContent.emplace_back(item);
-                end = TextBlock::End::None;
-
-                setLineStartConditions(localCursor.getBlockNumber(), localCursor.getPosition());
-
-                return;
-            }
-
-            // create item for show and update Line data
-            auto item = buildUITextPart(textToPrint(signsCountToShow, text), textFormat);
-            shownLetterCount += signsCountToShow;
-            widthUsed += item->widgetArea.w;
-            heightUsed = std::max(heightUsed, item->widgetArea.h);
-            lineContent.emplace_back(item);
-
-            setLineStartConditions(localCursor.getBlockNumber(), localCursor.getPosition());
-
-            localCursor += signsCountToShow;
-
-            if (removeTrailingSpace) {
-                end = TextBlock::End::Newline;
-                return;
-            }
-
-            if (localCursor.checkAndInvalidateBlockChanged() && localCursor.checkPreviousBlockNewLine()) {
-                end = TextBlock::End::Newline;
-                return;
-            }
-
-            // not whole text shown, try again for next line if you want
-            if (signsCountToShow < text.length()) {
-                end = TextBlock::End::None;
-                return;
-            }
-
-        } while (true);
-    }
-
-    unsigned int TextLine::calculateSignsToShow(BlockCursor &localCursor, UTF8 &text, unsigned int space)
-    {
-        auto signsCountToShow = localCursor->getFormat()->getFont()->getCharCountInSpace(text, space);
-
-        // additional one sign to detect potential space as last character in line
-        auto searchSubstring = text.substr(0, signsCountToShow + 1);
-
-        auto newlinePos = searchSubstring.findLast("\n", signsCountToShow);
-        auto spacePos   = searchSubstring.findLast(" ", signsCountToShow);
-
-        // check if space or newline in word detection range
-        if (spacePos <= signsCountToShow - text::word_detection_range) {
-            spacePos = UTF8::npos;
-        }
-
-        if (newlinePos <= signsCountToShow - text::word_detection_range) {
-            newlinePos = UTF8::npos;
-        }
-
-        // check if space found and no newline at end
-        if (spacePos != UTF8::npos && newlinePos == UTF8::npos) {
-            // if line ends on space remove it when drawing
-            if (spacePos >= signsCountToShow) {
-                removeTrailingSpace = true;
-            }
-
-            // add one to include space in the line
-            signsCountToShow = spacePos + 1;
-
-            breakLineDashAddition = false;
-        }
-        // if sings still left in text add dash sign
-        else if (signsCountToShow != 0 && signsCountToShow < text.length()) {
-            // decrease character shown count by one to fit dash
-            signsCountToShow      = signsCountToShow - 1;
-            breakLineDashAddition = true;
-        }
-
-        return signsCountToShow;
-    }
-
-    UTF8 TextLine::textToPrint(unsigned int signsCountToShow, UTF8 &text)
-    {
-        auto textToPrint = text.substr(0, signsCountToShow);
-
-        if (removeTrailingSpace) {
-            textToPrint = text.substr(0, signsCountToShow - 1);
-        }
-
-        if (breakLineDashAddition) {
-            textToPrint = textToPrint + "-";
-        }
-
-        return textToPrint;
     }
 
     TextLine::TextLine(TextLine &&from) noexcept
@@ -161,8 +24,6 @@ namespace gui
         lineEnd                = from.lineEnd;
         end                    = from.end;
         maxWidth               = from.maxWidth;
-        breakLineDashAddition  = from.breakLineDashAddition;
-        removeTrailingSpace    = from.removeTrailingSpace;
         lineStartBlockNumber   = from.lineStartBlockNumber;
         lineStartBlockPosition = from.lineStartBlockPosition;
         lineVisible            = from.lineVisible;
@@ -180,28 +41,6 @@ namespace gui
             delete underline;
         }
     }
-
-    /// class to disown Item temporary to ignore callback
-    class ScopedParentDisown
-    {
-        Item *parent = nullptr;
-        Item *item   = nullptr;
-
-      public:
-        ScopedParentDisown(Item *it) : item(it)
-        {
-            if (item != nullptr) {
-                parent = item->parent;
-            }
-        }
-
-        ~ScopedParentDisown()
-        {
-            if (item != nullptr) {
-                item->parent = parent;
-            }
-        }
-    };
 
     void TextLine::setPosition(const short &x, const short &y)
     {

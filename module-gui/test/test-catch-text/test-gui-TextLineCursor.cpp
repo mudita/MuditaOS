@@ -27,7 +27,7 @@ namespace gui
 
         auto moveCursor(NavigationDirection direction, unsigned int n)
         {
-            cursor->TextLineCursor::moveCursor(direction, n);
+            cursor->moveCursor(direction, n);
         }
 
         auto removeNChars(unsigned int n)

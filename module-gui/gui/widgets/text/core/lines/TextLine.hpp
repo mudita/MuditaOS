@@ -12,6 +12,8 @@
 #include <numeric>
 #include <list>
 
+#include "ScopedParentDisown.hpp"
+
 namespace gui
 {
     enum class UnderlineDrawMode
@@ -32,6 +34,7 @@ namespace gui
     /// interface element for TextDocument->getLine() <-- Text
     class TextLine
     {
+      protected:
         unsigned int shownLetterCount = 0;
         Length widthUsed              = 0;
         Length heightUsed             = 0;
@@ -43,33 +46,19 @@ namespace gui
         Position storedYOffset              = 0;
         bool lineEnd                        = false;
         bool lineVisible                    = true;
-        bool breakLineDashAddition          = false;
-        bool removeTrailingSpace            = false;
         unsigned int lineStartBlockNumber   = text::npos;
         unsigned int lineStartBlockPosition = text::npos;
 
-        unsigned int calculateSignsToShow(BlockCursor &localCursor, UTF8 &text, unsigned int space);
-        UTF8 textToPrint(unsigned int signsCountToShow, UTF8 &text);
-        void createUnderline(unsigned int max_w, unsigned int max_height);
+        void createUnderline(unsigned int maxWidth, unsigned int maxHeight);
         void updateUnderline(const short &x, const short &y);
         void setLineStartConditions(unsigned int startBlockNumber, unsigned int startBlockPosition);
+        RawText *buildUITextPart(const UTF8 &text, const TextFormat *format);
+
+        explicit TextLine(Length maxWidth) : maxWidth(maxWidth){};
 
       public:
-        /// creates TextLine with data from text based on TextCursor position filling max_width
-        TextLine(BlockCursor &, unsigned int max_width);
         TextLine(TextLine &) = delete;
         TextLine(TextLine &&) noexcept;
-
-        TextLine(BlockCursor &cursor,
-                 unsigned int max_width,
-                 unsigned int init_height,
-                 UnderLineProperties underLineProperties)
-            : TextLine(cursor, max_width)
-        {
-            this->underLineProperties                 = underLineProperties;
-            this->underLineProperties.underlineHeight = init_height;
-        }
-
         ~TextLine();
 
         /// number of letters in Whole TextLines

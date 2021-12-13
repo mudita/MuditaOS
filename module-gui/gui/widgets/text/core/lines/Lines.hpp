@@ -12,12 +12,24 @@ namespace gui
 
     class Lines
     {
+      private:
         Text *text = nullptr;
         std::list<TextLine> lines;
         UnderLineProperties underLineProperties;
         unsigned int linesSpacing = 0;
 
         void addToInvisibleLines(TextLine line);
+
+        auto drawMultiLine(BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition)
+            -> void;
+        auto drawMultiLine(BlockCursor &drawCursor,
+                           Length w,
+                           Length h,
+                           Position lineYPosition,
+                           Position lineXPosition,
+                           unsigned int linesCount) -> void;
+        auto drawSingleLine(BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition)
+            -> void;
 
       public:
         explicit Lines(Text *text) : text(text)
@@ -136,13 +148,19 @@ namespace gui
             linesSpacing = val;
         }
 
-        auto draw(BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition) -> void;
         auto draw(BlockCursor &drawCursor,
                   Length w,
                   Length h,
                   Position lineYPosition,
                   Position lineXPosition,
-                  unsigned int linesCount) -> void;
+                  TextType drawType) -> void;
+        auto draw(BlockCursor &drawCursor,
+                  Length w,
+                  Length h,
+                  Position lineYPosition,
+                  Position lineXPosition,
+                  unsigned int linesCount,
+                  TextType drawType) -> void;
 
         auto linesHAlign(Length parentSize) -> void;
         auto linesVAlign(Length parentSize) -> void;

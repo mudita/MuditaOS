@@ -108,6 +108,15 @@ namespace gui
         return false;
     }
 
+    bool TextLineCursor::handleNextLine()
+    {
+        return displayNextLine();
+    }
+    bool TextLineCursor::handlePreviousLine()
+    {
+        return displayPreviousLine();
+    }
+
     auto TextLineCursor::moveCursor(gui::NavigationDirection direction) -> gui::TextCursor::Move
     {
         debug_text_cursor("Before move cursor: screen pos: %d block: %d pos: %d %s",
