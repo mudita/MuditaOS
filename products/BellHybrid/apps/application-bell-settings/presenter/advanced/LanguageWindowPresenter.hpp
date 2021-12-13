@@ -5,7 +5,6 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/ApplicationCommon.hpp>
-#include <common/Languages.hpp>
 
 #include <vector>
 #include <string>
@@ -33,7 +32,7 @@ namespace app::bell_settings
     class LanguageWindowPresenter : public LanguageWindowContract::Presenter
     {
       private:
-        common::Languages languages;
+        utils::LangLoader languages;
         app::ApplicationCommon *app{};
 
       public:
