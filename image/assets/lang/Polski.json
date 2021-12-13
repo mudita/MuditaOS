@@ -653,7 +653,6 @@
   "app_bell_settings_frontlight_mode_top_message": "Tryb podświetlenia",
   "app_bell_settings_frontlight_mode_auto": "automatyczny",
   "app_bell_settings_frontlight_mode_on_demand": "manualny",
-  "app_bell_powernap_session_ended_message": "Dzień dobry!",
   "app_bell_greeting_msg": [
     "<text>Dzień dobry!<br />Pobudka</text>"
   ],

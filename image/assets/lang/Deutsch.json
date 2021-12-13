@@ -619,7 +619,6 @@
   "app_bellmain_settings": "Einstellungen",
   "app_bell_bedtime_notification": "Schlafenszeit",
   "app_bell_alarm_set_not_active": "<text>Alarm eingestellt.<br />Tief drücken, um zu aktivieren.</text>",
-  "app_bell_powernap_session_ended_message": "<text>Guten morgen!<br>Zeit zum aufstehen</text>",
   "app_bell_background_sounds_timer_title": "Timer",
   "app_bell_background_sounds_timer_off": "AUS",
   "app_bell_onboarding_welcome_message": "Mudita Harmony",
