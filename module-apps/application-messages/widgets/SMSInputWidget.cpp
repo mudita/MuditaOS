@@ -86,11 +86,8 @@ namespace gui
 
                 if (inputText->isEmpty()) {
 
-                    // Temporary solution to be fixed when proper Text Color handling will be added.
-                    auto format = TextFormat(Font(27).raw(), Color(7, 0));
-                    for (auto &el : textToTextBlocks(utils::translate("sms_temp_reply"), format)) {
-                        inputText->addText(el);
-                    }
+                    inputText->setColor(Color(7, 0));
+                    inputText->setText(utils::translate("sms_temp_reply"));
                 }
 
                 application->getWindow(gui::name::window::thread_view)
