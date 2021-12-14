@@ -93,7 +93,6 @@ void audio::DecoderWorker::pushAudioData()
 
     while (!audioStreamOut->isFull() && playbackEnabled) {
         auto buffer = decoderBuffer.get();
-
         samplesRead = decoder->decode(bufferSize / readScale, buffer);
 
         if (samplesRead == 0) {
