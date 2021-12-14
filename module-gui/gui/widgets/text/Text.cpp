@@ -293,6 +293,13 @@ namespace gui
             padding.right = value;
     }
 
+    void Text::setColor(Color color)
+    {
+        if (format.getColor() != color) {
+            format.setColor(color);
+        }
+    }
+
     void Text::setPadding(const Padding &value)
     {
         if (padding != value) {

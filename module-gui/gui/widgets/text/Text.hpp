@@ -155,6 +155,7 @@ namespace gui
         void setMinimumWidthToFitText();
         void setMinimumWidthToFitText(const UTF8 &text);
         void setMinimumHeightToFitText(unsigned int linesCount = 1);
+        void setColor(Color color);
 
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;
