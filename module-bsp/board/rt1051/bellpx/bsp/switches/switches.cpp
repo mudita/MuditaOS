@@ -32,7 +32,7 @@ namespace bsp::bell_switches
     using TimerCallback = void (*)(TimerHandle_t timerHandle);
 
     constexpr std::chrono::milliseconds contactOscillationTimeout{30ms};
-    constexpr std::chrono::milliseconds centerKeyPressValidationTimeout{30ms};
+    constexpr std::chrono::milliseconds centerKeyPressValidationTimeout{500ms};
 
     enum class KeyId : unsigned int
     {
