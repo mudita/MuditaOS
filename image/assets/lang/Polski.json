@@ -685,7 +685,7 @@
   "app_bell_meditation_interval_chime": "Dzwonek interwału",
   "app_bell_meditation_progress": "Medytacja",
   "app_bell_meditation_interval_none": "Brak",
-  "app_bell_meditation_interval_every_x_minutes": "co %0 minuty",
+  "app_bell_meditation_interval_every_x_minutes": "co %0",
   "app_bell_meditation_put_down_and_wait": "<text>Odłóż Mudita Harmony<br>i czekaj na gong</text>",
   "app_bell_meditation_thank_you_for_session": "<text>Dziękujemy<br>za sesję</text>"
 }
