@@ -139,6 +139,16 @@ namespace app
 
     void ApplicationBellOnBoarding::displayInformation(const std::string &windowToReturn)
     {
+        // If user is during language selection, pick new language for hint popup
+        if (windowToReturn == gui::window::name::onBoardingLanguageWindow) {
+            auto languageSelectWindow = dynamic_cast<gui::OnBoardingLanguageWindow *>(getWindow(windowToReturn));
+            auto selectedLang         = languageSelectWindow->getSelectedLanguage();
+
+            if (utils::getDisplayLanguage() != selectedLang) {
+                utils::setDisplayLanguage(selectedLang);
+            }
+        }
+
         auto [icon, text] = getDisplayDataFromState();
         switchWindow(gui::window::name::informationOnBoardingWindow,
                      gui::BellFinishedWindowData::Factory::create(icon, windowToReturn, utils::translate(text)));
