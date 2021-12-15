@@ -17,10 +17,13 @@ namespace gui
             app::ApplicationCommon *app,
             std::unique_ptr<app::OnBoarding::OnBoardingLanguageWindowPresenter::Presenter> &&presenter,
             const std::string &name = gui::window::name::onBoardingLanguageWindow);
+        std::string getSelectedLanguage();
 
       private:
         std::unique_ptr<app::OnBoarding::OnBoardingLanguageWindowPresenter::Presenter> presenter;
 
         std::list<Option> languageOptionsList();
+
+        std::string selectedLang = "";
     };
 } // namespace gui
