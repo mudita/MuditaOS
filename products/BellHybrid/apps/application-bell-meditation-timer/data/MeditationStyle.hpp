@@ -74,6 +74,7 @@ namespace app::meditationStyle
         {
             constexpr inline auto timeUnitSingular = "common_minute_lower";
             constexpr inline auto timeUnitPlural   = "common_minutes_lower";
+            constexpr inline auto timeUnitGenitive = "common_minutes_lower_genitive";
         } // namespace list
     }     // namespace mtStyle
 } // namespace app::meditationStyle

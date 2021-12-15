@@ -51,7 +51,15 @@ namespace app::meditation
     std::string MeditationTimerPresenter::getTimeUnitName(std::uint32_t value)
     {
         using namespace app::meditationStyle::mtStyle::list;
-        return utils::translate(value == 1 ? timeUnitSingular : timeUnitPlural);
+        if (value == 1) {
+            return utils::translate(timeUnitSingular);
+        }
+        else if (value > 4) {
+            return utils::translate(timeUnitGenitive);
+        }
+        else {
+            return utils::translate(timeUnitPlural);
+        }
     }
 
     void MeditationTimerPresenter::activate(std::uint32_t value)

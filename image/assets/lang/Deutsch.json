@@ -78,6 +78,7 @@
   "common_accept": "ANNEHMEN",
   "common_minute_lower": "minute",
   "common_minutes_lower": "minuten",
+  "common_minutes_lower_genitive": "minuten",
   "common_minute_short": "min",
   "common_paused": "Pausiert",
   "common_text_copy": "Text kopieren",

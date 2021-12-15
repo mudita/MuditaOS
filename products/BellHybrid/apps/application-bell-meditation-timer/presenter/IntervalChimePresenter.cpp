@@ -47,10 +47,15 @@ namespace app::meditation
                 if (option.first == std::chrono::minutes{0}) {
                     return "";
                 }
-                if (option.first == std::chrono::minutes{1}) {
+                else if (option.first == std::chrono::minutes{1}) {
                     return utils::translate(timeUnitSingular);
                 }
-                return utils::translate(timeUnitPlural);
+                else if (option.first == std::chrono::minutes{2}) {
+                    return utils::translate(timeUnitPlural);
+                }
+                else {
+                    return utils::translate(timeUnitGenitive);
+                }
             }
         }
         return "";
