@@ -67,8 +67,8 @@ void SoundsModel::createData(app::ApplicationCommon *app, audio_settings::Abstra
 
 void SoundsModel::clearData()
 {
-    list->clear();
-    list->rebuildList();
+    list->reset();
+    eraseInternalData();
 }
 
 std::filesystem::path SoundsModel::getSoundPath(audio_settings::AbstractAudioSettingsModel *model)

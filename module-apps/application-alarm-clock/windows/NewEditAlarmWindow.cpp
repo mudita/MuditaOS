@@ -56,6 +56,13 @@ namespace app::alarmClock
         }
     }
 
+    void NewEditAlarmWindow::onClose(gui::Window::CloseReason reason)
+    {
+        if (reason == Window::CloseReason::ApplicationClose) {
+            presenter->clearData();
+        }
+    }
+
     bool NewEditAlarmWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (AppWindow::onInput(inputEvent)) {

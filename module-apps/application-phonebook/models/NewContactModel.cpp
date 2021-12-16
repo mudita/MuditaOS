@@ -112,11 +112,13 @@ void NewContactModel::createData()
 void NewContactModel::clearData()
 {
     list->reset();
-
     eraseInternalData();
+}
 
+void NewContactModel::recreateData()
+{
+    clearData();
     createData();
-
     list->rebuildList();
 }
 
