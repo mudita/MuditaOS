@@ -74,10 +74,15 @@ namespace app::alarmClock
         }
     }
 
-    void NewEditAlarmModel::loadData(std::shared_ptr<AlarmEventRecord> record)
+    void NewEditAlarmModel::clearData()
     {
         list->reset();
         eraseInternalData();
+    }
+
+    void NewEditAlarmModel::loadData(std::shared_ptr<AlarmEventRecord> record)
+    {
+        clearData();
 
         rRulePresenter->loadRecord(record);
         createData();
@@ -114,7 +119,7 @@ namespace app::alarmClock
             alarm->enabled = true;
             alarmsRepository->add(*alarm, [this](bool) { application->returnToPreviousWindow(); });
         }
-        list->reset();
-        eraseInternalData();
+
+        clearData();
     }
 } // namespace app::alarmClock

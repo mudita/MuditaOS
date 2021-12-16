@@ -59,4 +59,11 @@ namespace gui
         setTitle(info->get().windowTitle);
         mSoundsModel->createData(application, info->get().audioModel);
     }
+
+    void SoundSelectWindow::onClose(Window::CloseReason reason)
+    {
+        if (reason == Window::CloseReason::ApplicationClose) {
+            mSoundsModel->clearData();
+        }
+    }
 } // namespace gui

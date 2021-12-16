@@ -24,6 +24,7 @@ namespace app::alarmClock
 
         virtual void loadData(std::shared_ptr<AlarmEventRecord> record)                     = 0;
         virtual void saveData(std::shared_ptr<AlarmEventRecord> record, AlarmAction action) = 0;
+        virtual void clearData()                                                            = 0;
         virtual void loadCustomRepeat()                                                     = 0;
     };
 
@@ -44,6 +45,7 @@ namespace app::alarmClock
         void loadData(std::shared_ptr<AlarmEventRecord> record) override;
         void saveData(std::shared_ptr<AlarmEventRecord> alarm, AlarmAction action) override;
         void loadCustomRepeat() override;
+        void clearData() override;
         void createData();
 
         [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;

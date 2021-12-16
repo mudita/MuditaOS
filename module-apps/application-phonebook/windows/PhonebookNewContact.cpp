@@ -52,7 +52,7 @@ namespace gui
     void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (mode != ShowMode::GUI_SHOW_RETURN) {
-            newContactModel->clearData();
+            newContactModel->recreateData();
             newContactModel->loadData(contact, data);
         }
 
@@ -73,6 +73,13 @@ namespace gui
         }
 
         !newContactModel->emptyData() ? setSaveButtonVisible(true) : setSaveButtonVisible(false);
+    }
+
+    void PhonebookNewContact::onClose(Window::CloseReason reason)
+    {
+        if (reason == Window::CloseReason::ApplicationClose) {
+            newContactModel->clearData();
+        }
     }
 
     auto PhonebookNewContact::handleSwitchData(SwitchData *data) -> bool
@@ -247,5 +254,4 @@ namespace gui
             }});
         application->switchWindow(gui::window::name::dialog_yes_no_icon_txt, std::move(metaData));
     }
-
 } // namespace gui

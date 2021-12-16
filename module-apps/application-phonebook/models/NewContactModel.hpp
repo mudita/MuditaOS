@@ -23,6 +23,7 @@ class NewContactModel : public app::InternalModel<gui::ContactListItem *>, publi
     explicit NewContactModel(app::ApplicationCommon *app);
 
     void clearData();
+    void recreateData();
     void saveData(std::shared_ptr<ContactRecord> contactRecord);
     void loadData(std::shared_ptr<ContactRecord> contactRecord, gui::SwitchData *data);
     void createData();

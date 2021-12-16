@@ -30,4 +30,9 @@ namespace app::alarmClock
         alarmFieldsProvider->loadCustomRepeat();
     }
 
+    void AlarmClockEditWindowPresenter::clearData()
+    {
+        alarmFieldsProvider->clearData();
+    }
+
 } // namespace app::alarmClock

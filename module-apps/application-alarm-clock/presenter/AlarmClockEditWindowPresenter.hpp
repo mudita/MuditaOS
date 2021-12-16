@@ -25,6 +25,7 @@ namespace app::alarmClock
             [[nodiscard]] virtual std::shared_ptr<gui::ListItemProvider> getAlarmsItemProvider() const = 0;
             virtual void loadData(std::shared_ptr<AlarmEventRecord> record)                            = 0;
             virtual void saveData(std::shared_ptr<AlarmEventRecord> record, AlarmAction action)        = 0;
+            virtual void clearData()                                                                   = 0;
             virtual void loadCustomRepeat()                                                            = 0;
         };
     };
@@ -37,6 +38,7 @@ namespace app::alarmClock
         [[nodiscard]] std::shared_ptr<gui::ListItemProvider> getAlarmsItemProvider() const override;
         void loadData(std::shared_ptr<AlarmEventRecord> record) override;
         void saveData(std::shared_ptr<AlarmEventRecord> record, AlarmAction action) override;
+        void clearData() override;
         void loadCustomRepeat() override;
 
       private:

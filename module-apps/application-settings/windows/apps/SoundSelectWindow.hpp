@@ -26,6 +26,7 @@ namespace gui
         ///  @param mode show mode
         ///  @param data user switch data
         void onBeforeShow([[maybe_unused]] ShowMode mode, SwitchData *data) override;
+        void onClose(CloseReason reason) override;
 
         void rebuild() override;
         void buildInterface() override;
