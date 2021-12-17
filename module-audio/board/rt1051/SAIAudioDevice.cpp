@@ -103,9 +103,9 @@ void SAIAudioDevice::disableOutput()
 AudioDevice::RetCode SAIAudioDevice::setOutputVolume(float vol)
 {
     vol = std::clamp(vol, minVolume, maxVolume);
-    /// Using y=x^4 function as an approximation seems very natural and sufficient
+    /// Using y=x^2 function as an approximation seems very natural and has the most useful range
     /// For more info check: https://www.dr-lex.be/info-stuff/volumecontrols.html
-    volumeFactor = std::pow(1.0f * (vol / maxVolume), 4);
+    volumeFactor = std::pow(1.0f * (vol / maxVolume), 2);
     return AudioDevice::RetCode::Success;
 }
 void SAIAudioDevice::scaleOutputVolume(audio::Stream::Span &span)
