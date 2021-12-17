@@ -1,33 +1,82 @@
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+import logging
 
 import pytest
 import time
 
 from harness.interface.defs import status
+from harness.api.developermode import PhoneModeLock
+from harness.api.security import GetPhoneLockStatus, GetPhoneLockTime, SetPhoneLockOff
+from harness.request import TransactionError
+
+
+class SecurityTester:
+    def __init__(self, harness):
+        self.harness = harness
+
+    def confirm_phone_is_unlocked(self):
+        try:
+            GetPhoneLockStatus().run(self.harness)
+        except TransactionError:
+            return False
+        else:
+            return True
+
+    def confirm_phone_is_locked(self):
+        try:
+            GetPhoneLockStatus().run(self.harness)
+        except TransactionError as error:
+            return error.status == status["Forbidden"]
+        else:
+            return False
+
+    def check_if_passcode_format_validation_works(self, passcode: list):
+        try:
+            SetPhoneLockOff(passcode).run(self.harness)
+        except TransactionError as error:
+            return error.status == status["BadRequest"]
+        else:
+            return False
+
+    def confirm_no_time_lock(self):
+        try:
+            GetPhoneLockTime().run(self.harness)
+        except TransactionError as error:
+            return error.status == status["UnprocessableEntity"]
+        else:
+            return False
+
+    def unlock_phone(self, passcode: list = None):
+        try:
+            SetPhoneLockOff(passcode).run(self.harness)
+            time.sleep(0.1)
+        except TransactionError:
+            return False
+        else:
+            return True
 
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
 def test_security_phone_unlocked(harness):
-    body = {"category": "phoneLockStatus"}
-
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["NoContent"]
+    security_tester = SecurityTester(harness)
+    assert security_tester.confirm_phone_is_unlocked(), "Phone is locked, but should be unlocked!"
 
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_locked")
 def test_security_phone_locked_with_code(harness):
-    body = {"category": "phoneLockStatus"}
-
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
+    security_tester = SecurityTester(harness)
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_locked")
 def test_all_other_endpoints_phone_locked_with_code(harness):
+    security_tester = SecurityTester(harness)
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
+
     body = {}
     endpoints_list = ["deviceInfo",
                       "update",
@@ -41,7 +90,6 @@ def test_all_other_endpoints_phone_locked_with_code(harness):
                       "events",
                       "bluetooth"]
     for endpoint_name in endpoints_list:
-        print(endpoint_name)
         ret = harness.endpoint_request(endpoint_name, "get", body)
         assert ret["status"] == status["Forbidden"]
 
@@ -62,172 +110,94 @@ def test_all_other_endpoints_phone_locked_with_code(harness):
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_locked")
 def test_security_phone_locked_without_code(harness):
+    security_tester = SecurityTester(harness)
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
-    body = {"phoneLockCodeEnabled": False}
-    ret = harness.endpoint_request("developerMode", "put", body)
-    assert ret["status"] == status["NoContent"]
+    PhoneModeLock(False).run(harness)
+    assert not harness.phone_mode_lock
 
-    time.sleep(.1)
+    assert security_tester.confirm_phone_is_unlocked(), "Phone is locked, but should be unlocked!"
 
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["NoContent"]
+    PhoneModeLock(True).run(harness)
+    assert harness.phone_mode_lock
 
-    body = {"phoneLockCodeEnabled": True}
-    ret = harness.endpoint_request("developerMode", "put", body)
-    assert ret["status"] == status["NoContent"]
-
-    harness.lock_phone()
-    time.sleep(.1)
-
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_locked")
 def test_security_unlock_phone(harness):
-
     """
     Attempt unlocking with wrong passcode: 1111
     Assuming 1111 is not the actual passcode :-)
     """
-    body = {"phoneLockCode": [1, 1, 1, 1]}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["NoContent"]
+    passcode = [1, 1, 1, 1]
+    security_tester = SecurityTester(harness)
+    assert security_tester.unlock_phone(passcode), "Failed to unlock the phone!"
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
-    time.sleep(.1)
-
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    time.sleep(.1)
-
-    body = {"phoneLockCode": ['a', 'a', 'a', 'a']}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["BadRequest"]
-
-    time.sleep(.1)
-
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    time.sleep(.1)
+    passcode = ['a', 'a', 'a', 'a']
+    assert security_tester.check_if_passcode_format_validation_works(
+        passcode), "Passcode with incorrect format was accepted!"
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
     """
     Attempt unlocking with too short passcode: 1
     """
-    body = {"phoneLockCode": [1]}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["BadRequest"]
-
-    time.sleep(.1)
-
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    time.sleep(.1)
+    passcode = [1]
+    assert security_tester.check_if_passcode_format_validation_works(
+        passcode), "Passcode with incorrect format was accepted!"
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
     """
-    Attempt unlocking with correct passcode: 3333
-    Assuming 3333 is the actual passcode :-)
+    Attempt unlocking with the default passcode.
+    Assuming the default passcode is the actual passcode :-)
     """
-    body = {"phoneLockCode": [3, 3, 3, 3]}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["NoContent"]
+    assert security_tester.unlock_phone(), "Failed to unlock the phone!"
+    assert security_tester.confirm_phone_is_unlocked(), "Phone is locked, but should be unlocked!"
 
-    time.sleep(.1)
-
-    body = {}
-    ret = harness.endpoint_request("deviceInfo", "get", body)
-    assert ret["status"] == status["OK"]
+    harness.lock_phone()
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_locked")
 def test_security_time_lock(harness):
-    harness.lock_phone()
-
     """
     First attempt unlocking with wrong passcode: 1111
     """
-    body = {"phoneLockCode": [1, 1, 1, 1]}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["NoContent"]
+    security_tester = SecurityTester(harness)
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
-    time.sleep(.1)
+    passcode = [1, 1, 1, 1]
+    assert security_tester.unlock_phone(passcode), "Failed to unlock the phone!"
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    time.sleep(.1)
-
-    body = {"category": "phoneLockTime"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["UnprocessableEntity"]
-
-    time.sleep(.1)
+    assert security_tester.confirm_no_time_lock(), "Phone is time locked unexpectedly!"
 
     """
     Second attempt unlocking with wrong passcode: 1111
     """
-    body = {"phoneLockCode": [1, 1, 1, 1]}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["NoContent"]
+    passcode = [1, 1, 1, 1]
+    assert security_tester.unlock_phone(passcode), "Failed to unlock the phone!"
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
-    time.sleep(.1)
-
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    time.sleep(.1)
-
-    body = {"category": "phoneLockTime"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["UnprocessableEntity"]
-
-    time.sleep(.1)
+    assert security_tester.confirm_no_time_lock(), "Phone is time locked unexpectedly!"
 
     """
     Third attempt unlocking with wrong passcode: 1111
     """
-    body = {"phoneLockCode": [1, 1, 1, 1]}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["NoContent"]
+    passcode = [1, 1, 1, 1]
+    assert security_tester.unlock_phone(passcode), "Failed to unlock the phone!"
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
-    time.sleep(.1)
-
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    time.sleep(.1)
-
-    body = {"category": "phoneLockTime"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["OK"]
-    assert time.time() < ret["body"]["phoneLockTime"] <= time.time() + 30
-
-    time.sleep(.1)
+    assert time.time() < GetPhoneLockTime().run(harness).phoneLockTime <= time.time() + 30
 
     """
-    Attempt unlocking with correct passcode while phone is time locked
+    Attempt unlocking with default (correct) passcode while phone is time locked
     """
-    body = {"phoneLockCode": [3, 3, 3, 3]}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["NoContent"]
-
-    time.sleep(.1)
-
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
+    assert security_tester.unlock_phone(), "Failed to unlock the phone!"
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
     """
     Waiting 16 seconds to make sure time lock is no longer active
@@ -237,31 +207,16 @@ def test_security_time_lock(harness):
     """
     Check if time lock is no longer active
     """
-    body = {"category": "phoneLockTime"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["UnprocessableEntity"]
-
-    time.sleep(.1)
+    assert security_tester.confirm_no_time_lock(), "Phone is time locked unexpectedly!"
 
     """
     Fourth attempt unlocking with wrong passcode: 1111
     """
-    body = {"phoneLockCode": [1, 1, 1, 1]}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["NoContent"]
+    passcode = [1, 1, 1, 1]
+    assert security_tester.unlock_phone(passcode), "Failed to unlock the phone!"
+    assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
-    time.sleep(.1)
-
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    time.sleep(.1)
-
-    body = {"category": "phoneLockTime"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["OK"]
-    assert time.time() < ret["body"]["phoneLockTime"] <= time.time() + 30
+    assert time.time() < GetPhoneLockTime().run(harness).phoneLockTime <= time.time() + 30
 
     """
     Waiting 31 seconds to make sure time lock is no longer active
@@ -271,19 +226,10 @@ def test_security_time_lock(harness):
     """
     Check if time lock is no longer active
     """
-    body = {"category": "phoneLockTime"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["UnprocessableEntity"]
+    assert security_tester.confirm_no_time_lock(), "Phone is time locked unexpectedly!"
 
     """
     Attempt unlocking when time lock is no longer active
     """
-    body = {"phoneLockCode": [3, 3, 3, 3]}
-    ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["NoContent"]
-
-    time.sleep(.1)
-
-    body = {"category": "phoneLockStatus"}
-    ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["NoContent"]
+    assert security_tester.unlock_phone(), "Failed to unlock the phone!"
+    assert security_tester.confirm_phone_is_unlocked(), "Phone is locked, but should be unlocked!"
