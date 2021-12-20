@@ -67,15 +67,5 @@ namespace gui
         app::manager::Controller::sendAction(application,
                                              app::manager::actions::AbortPopup,
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::AlarmActivated));
-
-        if (application->getPrevWindow() == popup::window::alarm_activated_window) {
-            app::manager::Controller::sendAction(
-                application,
-                app::manager::actions::Launch,
-                std::make_unique<app::ApplicationLaunchData>(app::applicationBellName));
-        }
-        else {
-            application->returnToPreviousWindow();
-        }
     }
 } /* namespace gui */
