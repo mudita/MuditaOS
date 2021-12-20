@@ -34,6 +34,8 @@
 
 #if configUSE_TICKLESS_IDLE == 1
 #include "fsl_gpt.h"
+#else
+#include "fsl_common.h"
 #endif
 
 extern uint32_t SystemCoreClock; /* in Kinetis SDK, this contains the system core clock speed */
@@ -260,7 +262,6 @@ void vPortSetupTimerInterrupt( void )
         ulLPTimerCountsForOneTick = configGPT_CLOCK_HZ / configTICK_RATE_HZ;
         xMaximumPossibleSuppressedTicks = portMAX_32_BIT_NUMBER / ulLPTimerCountsForOneTick;
         NVIC_EnableIRQ(vPortGetGptIrqn());
-        
         GPC_EnableIRQ(GPC, vPortGetGptIrqn());
 
     #endif /* configUSE_TICKLESS_IDLE */
@@ -270,3 +271,17 @@ void vPortSetupTimerInterrupt( void )
     portNVIC_SYSTICK_CURRENT_VALUE_REG = 0UL;
     portNVIC_SYSTICK_CTRL_REG = ( portNVIC_SYSTICK_CLK_BIT | portNVIC_SYSTICK_INT_BIT | portNVIC_SYSTICK_ENABLE_BIT );
 }
+
+void vPortStopTimerInterrupt( void )
+{
+    #if configUSE_TICKLESS_IDLE == 1
+        NVIC_DisableIRQ(vPortGetGptIrqn());
+        NVIC_ClearPendingIRQ(vPortGetGptIrqn());
+        GPC_DisableIRQ(GPC, vPortGetGptIrqn());
+        GPC_Deinit(vPortGetGptBase());
+    #endif
+    portNVIC_SYSTICK_CTRL_REG = 0;
+    NVIC_DisableIRQ(SysTick_IRQn);
+    NVIC_ClearPendingIRQ(SysTick_IRQn);
+}
+
