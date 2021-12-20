@@ -1,146 +1,357 @@
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
 from harness.interface.defs import status
+from harness.request import TransactionError
+from harness.api.contacts import GetContactsCount, GetContactsWithOffsetAndLimit, GetContactById, AddContact, \
+    UpdateContact, DeleteContactById
+
+
+class ContactsTester:
+    def __init__(self, harness):
+        self.harness = harness
+
+    def get_contacts_count(self):
+        try:
+            count = GetContactsCount().run(self.harness).count
+        except TransactionError:
+            return False
+        else:
+            return True, count
+
+    def get_contacts_with_offset_and_limit(self, offset, limit):
+        try:
+            result = GetContactsWithOffsetAndLimit(offset, limit).run(self.harness)
+        except TransactionError:
+            return False
+        else:
+            return True, result.entries, result.totalCount
+
+    def get_contact_by_id(self, contact_record_id):
+        try:
+            result = GetContactById(contact_record_id).run(self.harness)
+        except TransactionError:
+            return False
+        else:
+            return True, result.entry
+
+    def add_contact(self, contact_record):
+        try:
+            contact_id = AddContact(contact_record).run(self.harness).id
+        except TransactionError:
+            return False
+        else:
+            return True, contact_id
+
+    def detect_adding_duplicated_contact(self, contact_record):
+        try:
+            AddContact(contact_record).run(self.harness)
+        except TransactionError as error:
+            if error.status == status["Conflict"]:
+                return True
+        else:
+            return False
+
+    def update_contact(self, contact_record):
+        try:
+            UpdateContact(contact_record).run(self.harness)
+        except TransactionError:
+            return False
+        else:
+            return True
+
+    def delete_contact_by_id(self, contact_record_id):
+        try:
+            DeleteContactById(contact_record_id).run(self.harness)
+        except TransactionError:
+            return False
+        else:
+            return True
 
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
-def test_contacts(harness):
-    # getting the contacts count
-    body = {"count": True}
-    ret = harness.endpoint_request("contacts", "get", body)
-    assert ret["status"] == status["OK"]
+def test_add_single_contact(harness):
+    # Check initial state
+    contacts_tester = ContactsTester(harness)
+    result, initial_number_of_contact_records = contacts_tester.get_contacts_count()
+    assert result, "Failed to get contacts count!"
 
-    count = ret["body"]["count"]
-    if count == 0:
-        pytest.skip("No contacts entries, skipping")
+    # Add contact
+    contact_record = {
+        "address": "6 Czeczota St.\n02600 Warsaw",
+        "altName": "Smith",
+        "email": "john.smith@mudita.com",
+        "blocked": False,
+        "favourite": False,
+        "ice": False,
+        "numbers": [
+            "123456789"
+        ],
+        "speedDial": "1",
+        "priName": "John",
+        "note": "Some note"
+    }
 
-    # getting all contacts
-    batch_size = 10
-    divider = int(count / batch_size)
-    reminder = count % batch_size
-    contacts = []
-    for i in range(divider):
-        body = {"limit": batch_size, "offset": batch_size*i}
-        ret = harness.endpoint_request("contacts", "get", body)
-        assert ret["status"] == status["OK"]
-        contacts = contacts + ret["body"]["entries"]
+    result, contact_id = contacts_tester.add_contact(contact_record)
+    assert result, "Failed to add contact!"
+    result, retrieved_contact_record = contacts_tester.get_contact_by_id(contact_id)
+    assert result, "Failed to get contact by ID!"
+    del retrieved_contact_record["id"]
+    assert contact_record == retrieved_contact_record, "Received contact record is different than expected!"
 
-    if reminder != 0:
-        body = {"limit": reminder, "offset": count-reminder}
-        ret = harness.endpoint_request("contacts", "get", body)
-        assert ret["status"] == status["OK"]
-        contacts = contacts + ret["body"]["entries"]
+    # Clean up
+    assert contacts_tester.delete_contact_by_id(contact_id), "Failed to delete a contact!"
+    result, received_contact_records_count = contacts_tester.get_contacts_count()
+    assert result, "Failed to get contacts count!"
+    assert initial_number_of_contact_records == received_contact_records_count, "Incorrect contact records number!"
 
-    contacts_length = len(contacts)
-    assert contacts_length
-    assert contacts_length == count
 
-    # try to get more than available
-    batch_size = 10
-    divider = int((count+10) / batch_size)
-    reminder = (count+10) % batch_size
-    contacts = []
-    for i in range(divider):
-        body = {"limit": batch_size, "offset": batch_size * i}
-        ret = harness.endpoint_request("contacts", "get", body)
-        assert ret["status"] == status["OK"]
-        contacts = contacts + ret["body"]["entries"]
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_unlocked")
+def test_add_duplicated_contact(harness):
+    # Check initial state
+    contacts_tester = ContactsTester(harness)
+    result, initial_number_of_contact_records = contacts_tester.get_contacts_count()
+    assert result, "Failed to get contacts count!"
 
-    if reminder !=0:
-        body = {"limit": reminder, "offset": (count+10)-reminder}
-    else:
-        body = {"limit": 10, "offset": count}
-    ret = harness.endpoint_request("contacts", "get", body)
-    assert ret["status"] == status["OK"]
-    contacts = contacts + ret["body"]["entries"]
+    # Add first contact
+    contact_record = {
+        "address": "6 Czeczota St.\n02600 Warsaw",
+        "altName": "Smith",
+        "email": "john.smith@mudita.com",
+        "blocked": False,
+        "favourite": False,
+        "ice": False,
+        "numbers": [
+            "123456789"
+        ],
+        "speedDial": "1",
+        "priName": "John",
+        "note": "Some note"
+    }
 
-    contacts_length = len(contacts)
-    assert contacts_length
-    assert contacts_length == count
+    result, contact_id = contacts_tester.add_contact(contact_record)
+    assert result, "Failed to add contact!"
 
-    # adding new contact
-    body = {"address": "6 Czeczota St.\n02600 Warsaw",
-            "altName": "Testowy",
-            "email": "testowy.2@example.com",
-            "blocked": True,
-            "favourite": True,
-            "ice": False,
-            "numbers": ["547623521"],
-            "priName": "Test"}
-    ret = harness.endpoint_request("contacts", "post", body)
-    assert ret["status"] == status["OK"]
-    contact_id_to_update = ret["body"]["id"]
-    assert contact_id_to_update
+    # Attempt to add duplicate contact
+    assert contacts_tester.detect_adding_duplicated_contact(contact_record), "Failed to detect duplicate!"
 
-    # try to add duplicate
-    body = {"address": "6 Czeczota St.\n02600 Warsaw",
-            "altName": "Testowy",
-            "blocked": True,
-            "favourite": True,
-            "numbers": ["547623521"],
-            "priName": "Test"}
-    ret = harness.endpoint_request("contacts", "post", body)
-    assert ret["status"] == status["Conflict"]
-    contact_id_of_detected_duplicate = ret["body"]["id"]
-    assert contact_id_of_detected_duplicate == contact_id_to_update
+    # Clean up
+    assert contacts_tester.delete_contact_by_id(contact_id), "Failed to delete a contact!"
+    result, received_contact_records_count = contacts_tester.get_contacts_count()
+    assert result, "Failed to get contacts count!"
+    assert initial_number_of_contact_records == received_contact_records_count, "Incorrect contact records number!"
 
-    # adding new contact without number - should fail with 406
-    body = {"address": "6 Czeczota St.\n02600 Warsaw",
-            "altName": "Testowy",
-            "blocked": True,
-            "favourite": True,
-            "numbers": [],
-            "priName": "Test"}
-    ret = harness.endpoint_request("contacts", "post", body)
-    assert ret["status"] == status["NotAcceptable"]
 
-    # checking count after adding
-    body = {"count": True}
-    ret = harness.endpoint_request("contacts", "get", body)
-    assert ret["status"] == status["OK"]
-    assert ret["body"]["count"] == count + 1
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_unlocked")
+def test_edit_contact(harness):
+    # Check initial state
+    contacts_tester = ContactsTester(harness)
+    result, initial_number_of_contact_records = contacts_tester.get_contacts_count()
+    assert result, "Failed to get contacts count!"
 
-    # updating existing contact
-    body = {"address": "6 Czeczota St.\n02600 Warsaw",
-            "altName": "Testowy2",
-            "email": "testowy.2@example.com",
-            "blocked": False,
-            "favourite": True,
-            "ice": True,
-            "numbers": ["547623521"],
-            "speedDial": "7",
-            "priName": "Test2",
-            "note": "this is a really cool guy",
-            "id": contact_id_to_update}
-    ret = harness.endpoint_request("contacts", "put", body)
-    assert ret["status"] == status["NoContent"]
+    # Add contact
+    contact_record = {
+        "address": "6 Czeczota St.\n02600 Warsaw",
+        "altName": "Smith",
+        "email": "john.smith@mudita.com",
+        "blocked": False,
+        "favourite": False,
+        "ice": False,
+        "numbers": [
+            "123456789"
+        ],
+        "speedDial": "1",
+        "priName": "John",
+        "note": "Some note"
+    }
 
-    # gathering updated contact
-    body = {"id": contact_id_to_update}
-    ret = harness.endpoint_request("contacts", "get", body)
-    contact = {"address": "6 Czeczota St.\n02600 Warsaw",
-               "altName": "Testowy2",
-               "email": "testowy.2@example.com",
-               "blocked": False,
-               "favourite": True,
-               "ice": True,
-               "numbers": ["547623521"],
-               "speedDial": "7",
-               "priName": "Test2",
-               "note": "this is a really cool guy",
-               "id": contact_id_to_update}
-    assert ret["body"] == contact
+    result, contact_id = contacts_tester.add_contact(contact_record)
+    assert result, "Failed to add contact!"
 
-    # removing added contact
-    body = {"id": contact_id_to_update}
-    ret = harness.endpoint_request("contacts", "del", body)
-    assert ret["status"] == status["NoContent"]
+    # Edit contact
+    edited_contact_record = {
+        "id": contact_id,
+        "address": "6 Czeczota St.\n02600 Warsaw",
+        "altName": "Davies",
+        "email": "john.davies@mudita.com",
+        "blocked": False,
+        "favourite": False,
+        "ice": False,
+        "numbers": [
+            "123456799"
+        ],
+        "speedDial": "1",
+        "priName": "John",
+        "note": "Some note"
+    }
+    assert contacts_tester.update_contact(edited_contact_record), "Failed to update contact!"
+    result, retrieved_contact_record = contacts_tester.get_contact_by_id(contact_id)
+    assert result, "Failed to get contact by ID!"
+    assert retrieved_contact_record == edited_contact_record
 
-    # verifying count
-    body = {"count": True}
-    ret = harness.endpoint_request("contacts", "get", body)
-    assert ret["status"] == status["OK"]
+    # Clean up
+    assert contacts_tester.delete_contact_by_id(contact_id), "Failed to delete a contact!"
+    result, received_contact_records_count = contacts_tester.get_contacts_count()
+    assert result, "Failed to get contacts count!"
+    assert initial_number_of_contact_records == received_contact_records_count, "Incorrect contact records number!"
 
-    assert ret["body"]["count"] == count
+
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_unlocked")
+def test_add_and_get_multiple_contacts(harness):
+    # Check initial state
+    contacts_tester = ContactsTester(harness)
+    result, received_contact_records_count = contacts_tester.get_contacts_count()
+    assert result, "Failed to get contacts count!"
+    initial_number_of_contact_records = received_contact_records_count
+
+    # Add contacts
+    first_contact_record = {
+        "address": "6 Czeczota St.\n02600 Warsaw",
+        "altName": "Smith",
+        "email": "john.smith@mudita.com",
+        "blocked": False,
+        "favourite": False,
+        "ice": False,
+        "numbers": [
+            "123456789"
+        ],
+        "speedDial": "1",
+        "priName": "John",
+        "note": "Some note"
+    }
+
+    result, first_contact_id = contacts_tester.add_contact(first_contact_record)
+    assert result, "Failed to add contact!"
+    result, retrieved_contact_record = contacts_tester.get_contact_by_id(first_contact_id)
+    assert result, "Failed to get contact by ID!"
+    del retrieved_contact_record["id"]
+    assert first_contact_record == retrieved_contact_record, "Received contact record is different than expected!"
+    current_number_of_contact_records = initial_number_of_contact_records + 1
+
+    second_contact_record = {
+        "address": "6 Czeczota St.\n02600 Warsaw",
+        "altName": "Johns",
+        "email": "john.johns@mudita.com",
+        "blocked": False,
+        "favourite": False,
+        "ice": False,
+        "numbers": [
+            "223456789"
+        ],
+        "speedDial": "2",
+        "priName": "John",
+        "note": "Some note"
+    }
+
+    result, second_contact_id = contacts_tester.add_contact(second_contact_record)
+    assert result, "Failed to add contact!"
+    result, retrieved_contact_record = contacts_tester.get_contact_by_id(second_contact_id)
+    assert result, "Failed to get contact by ID!"
+    del retrieved_contact_record["id"]
+    assert second_contact_record == retrieved_contact_record, "Received contact record is different than expected!"
+    current_number_of_contact_records += 1
+
+    third_contact_record = {
+        "address": "6 Czeczota St.\n02600 Warsaw",
+        "altName": "Williams",
+        "email": "george.williams@mudita.com",
+        "blocked": False,
+        "favourite": False,
+        "ice": False,
+        "numbers": [
+            "323456789"
+        ],
+        "speedDial": "3",
+        "priName": "George",
+        "note": "Some note"
+    }
+
+    result, third_contact_id = contacts_tester.add_contact(third_contact_record)
+    assert result, "Failed to add contact!"
+    result, retrieved_contact_record = contacts_tester.get_contact_by_id(third_contact_id)
+    assert result, "Failed to get contact by ID!"
+    del retrieved_contact_record["id"]
+    assert third_contact_record == retrieved_contact_record, "Received contact record is different than expected!"
+    current_number_of_contact_records += 1
+
+    fourth_contact_record = {
+        "address": "6 Czeczota St.\n02600 Warsaw",
+        "altName": "Brown",
+        "email": "olivia.brown@mudita.com",
+        "blocked": False,
+        "favourite": False,
+        "ice": False,
+        "numbers": [
+            "423456789"
+        ],
+        "speedDial": "4",
+        "priName": "Olivia",
+        "note": "Some note"
+    }
+
+    result, fourth_contact_id = contacts_tester.add_contact(fourth_contact_record)
+    assert result, "Failed to add contact!"
+    result, retrieved_contact_record = contacts_tester.get_contact_by_id(fourth_contact_id)
+    assert result, "Failed to get contact by ID!"
+    del retrieved_contact_record["id"]
+    assert fourth_contact_record == retrieved_contact_record, "Received contact record is different than expected!"
+    current_number_of_contact_records += 1
+
+    # Check contacts counter
+    result, received_contact_records_count = contacts_tester.get_contacts_count()
+    assert result, "Failed to get contacts count!"
+    assert current_number_of_contact_records == received_contact_records_count, "Incorrect contact records number!"
+
+    # Get all previously added contacts
+    result, returned_contacts, total_count = contacts_tester.get_contacts_with_offset_and_limit(
+        initial_number_of_contact_records, current_number_of_contact_records - initial_number_of_contact_records)
+    assert result, "Failed to get contacts with offset and limit!"
+
+    for record in returned_contacts:
+        print(record)
+        del record["id"]
+    # Returned contacts are sorted by altName
+    assert returned_contacts[0] == fourth_contact_record, "Received contact record is different than expected!"
+    assert returned_contacts[1] == second_contact_record, "Received contact record is different than expected!"
+    assert returned_contacts[2] == first_contact_record, "Received contact record is different than expected!"
+    assert returned_contacts[3] == third_contact_record, "Received contact record is different than expected!"
+    assert current_number_of_contact_records == total_count, "Incorrect contact records number!"
+
+    # Get previously added contacts without 2 of them (test offset)
+    result, returned_contacts, total_count = contacts_tester.get_contacts_with_offset_and_limit(
+        initial_number_of_contact_records + 2, current_number_of_contact_records - initial_number_of_contact_records)
+    assert result, "Failed to get contacts with offset and limit!"
+
+    for record in returned_contacts:
+        print(record)
+        del record["id"]
+    # Returned contacts are sorted by altName
+    assert returned_contacts[0] == first_contact_record, "Received contact record is different than expected!"
+    assert returned_contacts[1] == third_contact_record, "Received contact record is different than expected!"
+    assert current_number_of_contact_records == total_count, "Incorrect contact records number!"
+
+    # Get two of previously added contacts (test limit)
+    result, returned_contacts, total_count = contacts_tester.get_contacts_with_offset_and_limit(
+        initial_number_of_contact_records, 2)
+    assert result, "Failed to get contacts with offset and limit!"
+
+    for record in returned_contacts:
+        print(record)
+        del record["id"]
+    # Returned contacts are sorted by altName
+    assert returned_contacts[0] == fourth_contact_record, "Received contact record is different than expected!"
+    assert returned_contacts[1] == second_contact_record, "Received contact record is different than expected!"
+    assert current_number_of_contact_records == total_count, "Incorrect contact records number!"
+
+    # Clean up
+    assert contacts_tester.delete_contact_by_id(first_contact_id), "Failed to delete a contact!"
+    assert contacts_tester.delete_contact_by_id(second_contact_id), "Failed to delete a contact!"
+    assert contacts_tester.delete_contact_by_id(third_contact_id), "Failed to delete a contact!"
+    assert contacts_tester.delete_contact_by_id(fourth_contact_id), "Failed to delete a contact!"
+    result, received_contact_records_count = contacts_tester.get_contacts_count()
+    assert result, "Failed to get contacts count!"
+    assert initial_number_of_contact_records == received_contact_records_count, "Incorrect contact records number!"
