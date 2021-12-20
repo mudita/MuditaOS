@@ -186,6 +186,14 @@ namespace app
         }
     }
 
+    void ApplicationBellOnBoarding::restartTimerOnWindows()
+    {
+        if (isInformationPromptPermittedOnCurrentWindow()) {
+            informationPromptTimer.stop();
+            informationPromptTimer.start();
+        }
+    }
+
     void ApplicationBellOnBoarding::handleInformationBeforeSwitchWindow(sys::DataMessage *msgl)
     {
         auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
@@ -216,6 +224,7 @@ namespace app
     bool ApplicationBellOnBoarding::handleInformationOnInputEvent(sys::DataMessage *msgl)
     {
         auto inputEvent = static_cast<AppInputEventMessage *>(msgl)->getEvent();
+        restartTimerOnWindows();
 
         if (isInformationPromptPermittedOnCurrentWindow()) {
             if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) || inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN)) {
