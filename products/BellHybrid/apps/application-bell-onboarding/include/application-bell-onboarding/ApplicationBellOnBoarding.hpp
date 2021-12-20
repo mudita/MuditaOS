@@ -35,6 +35,7 @@ namespace app
         void displayInformation(const std::string &windowToReturn);
         bool isInformationPromptPermittedOnCurrentWindow();
         void startTimerOnWindows();
+        void restartTimerOnWindows();
         bool handleInformationOnInputEvent(sys::DataMessage *msgl);
         void handleInformationBeforeSwitchWindow(sys::DataMessage *msgl);
         void handleInformationAfterSwitchWindow();
