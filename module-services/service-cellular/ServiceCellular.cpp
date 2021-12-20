@@ -202,7 +202,7 @@ void ServiceCellular::SleepTimerHandler()
                                           ? currentTime - lastCommunicationTimestamp
                                           : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
 
-    if (!ongoingCall.isValid() && priv->state->get() == State::ST::Ready &&
+    if (!ongoingCall.isValid() && priv->state->get() >= State::ST::URCReady &&
         timeOfInactivity >= constants::enterSleepModeTime.count()) {
         cmux->enterSleepMode();
         cpuSentinel->ReleaseMinimumFrequency();
@@ -1258,6 +1258,7 @@ bool ServiceCellular::handle_URCReady()
     ret = ret && channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
 
     bus.sendMulticast<cellular::msg::notification::ModemStateChanged>(cellular::api::ModemState::Ready);
+    sleepTimer.start();
 
     LOG_DEBUG("%s", priv->state->c_str());
     return ret;
@@ -1370,7 +1371,6 @@ bool ServiceCellular::handle_ready()
 {
 
     LOG_DEBUG("%s", priv->state->c_str());
-    sleepTimer.start();
     return true;
 }
 
