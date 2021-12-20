@@ -207,6 +207,6 @@ int main()
     LOG_PRINTF("Launching %s \n", ApplicationName);
     LOG_PRINTF("commit: %s version: %s branch: %s\n", GIT_REV, VERSION, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
-
+    LOG_PRINTF("Scheduler is terminated properly\n");
     return 0;
 }
