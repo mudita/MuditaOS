@@ -67,6 +67,5 @@ namespace gui
         app::manager::Controller::sendAction(application,
                                              app::manager::actions::AbortPopup,
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::AlarmActivated));
-        application->returnToPreviousWindow();       
     }
 } /* namespace gui */
