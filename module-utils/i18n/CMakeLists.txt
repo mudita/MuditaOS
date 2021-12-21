@@ -1,9 +1,12 @@
 add_library(i18n STATIC)
+add_library(utils::i18n ALIAS i18n)
 
 target_sources(i18n
     PRIVATE
         i18n.cpp
         i18nImpl.hpp
+        Metadata.hpp
+        JSONLoader.hpp
     PUBLIC
         include/i18n/i18n.hpp
 )

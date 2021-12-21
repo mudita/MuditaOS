@@ -32,7 +32,6 @@ namespace app::bell_settings
     class LanguageWindowPresenter : public LanguageWindowContract::Presenter
     {
       private:
-        utils::LangLoader languages;
         app::ApplicationCommon *app{};
 
       public:

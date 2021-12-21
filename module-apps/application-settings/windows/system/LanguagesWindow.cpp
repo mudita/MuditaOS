@@ -9,7 +9,7 @@
 namespace gui
 {
     LanguagesWindow::LanguagesWindow(app::ApplicationCommon *app, std::string name)
-        : BaseSettingsWindow(app, std::move(name)), langList(loader.getAvailableDisplayLanguages())
+        : BaseSettingsWindow(app, std::move(name)), langList(utils::getAvailableDisplayLanguages())
     {
         setTitle(utils::translate("app_settings_title_languages"));
     }

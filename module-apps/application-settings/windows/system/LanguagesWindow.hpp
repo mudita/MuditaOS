@@ -18,7 +18,6 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void setLanguageIndex();
 
-        utils::LangLoader loader;
         const std::vector<Language> langList;
         Language selectedLanguage;
         unsigned int selectedLanguageIndex{0};
