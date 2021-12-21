@@ -2,10 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "i18nImpl.hpp"
-#include <log/log.hpp>
-#include <algorithm>
-#include <cstdio>
+#include "Metadata.hpp"
+
 #include <purefs/filesystem_paths.hpp>
+#include <i18n/i18n.hpp>
+#include <algorithm>
+#include <optional>
 
 namespace utils
 {
@@ -15,24 +17,12 @@ namespace utils
         {
             return str.empty() ? ret : str;
         }
-    } // namespace
 
-    namespace
-    {
         class i18nPrivateInterface : public i18n
         {
           public:
             const std::string &get(const std::string &str);
             const std::vector<std::string> get_array(const std::string &str);
-            using i18n::getDisplayLanguage;
-            using i18n::getDisplayLanguagePath;
-            using i18n::getInputLanguage;
-            using i18n::getInputLanguageFilename;
-            using i18n::getInputLanguagePath;
-            using i18n::resetAssetsPath;
-            using i18n::resetDisplayLanguages;
-            using i18n::setDisplayLanguage;
-            using i18n::setInputLanguage;
         };
 
         const std::string &i18nPrivateInterface::get(const std::string &str)
@@ -61,59 +51,9 @@ namespace utils
             return out;
         }
 
+        i18nPrivateInterface localize;
+
     } // namespace
-
-    i18nPrivateInterface localize;
-
-    json11::Json LangLoaderImpl::createJson(const std::string &filename)
-    {
-        const auto path = localize.getDisplayLanguagePath() / (filename + utils::files::jsonExtension);
-        auto fd         = std::fopen(path.c_str(), "r");
-        if (fd == nullptr) {
-            LOG_FATAL("Error during opening file %s", path.c_str());
-            return json11::Json();
-        }
-
-        uint32_t fsize = std::filesystem::file_size(path);
-
-        auto stream = std::make_unique<char[]>(fsize + 1); // +1 for NULL terminator
-
-        std::fread(stream.get(), 1, fsize, fd);
-
-        std::string err;
-        json11::Json js = json11::Json::parse(stream.get(), err);
-
-        std::fclose(fd);
-
-        // Error
-        if (err.length() != 0) {
-            LOG_FATAL("%s", err.c_str());
-            return json11::Json();
-        }
-        else {
-            return js;
-        }
-    }
-
-    std::vector<Language> LangLoader::getAvailableDisplayLanguages() const
-    {
-        std::vector<std::string> languageNames;
-        for (const auto &entry : std::filesystem::directory_iterator(getDisplayLanguagePath())) {
-            languageNames.push_back(std::filesystem::path(entry.path()).stem());
-        }
-        std::sort(languageNames.begin(), languageNames.end());
-        return languageNames;
-    }
-
-    std::vector<Language> LangLoader::getAvailableInputLanguages() const
-    {
-        std::vector<std::string> languageNames;
-        for (const auto &entry : std::filesystem::directory_iterator(getInputLanguagePath())) {
-            languageNames.push_back(std::filesystem::path(entry.path()).stem());
-        }
-        std::sort(languageNames.begin(), languageNames.end());
-        return languageNames;
-    }
 
     void i18n::resetAssetsPath(const std::filesystem::path &assets)
     {
@@ -123,6 +63,7 @@ namespace utils
 
     bool i18n::setInputLanguage(const Language &lang)
     {
+        cpp_freertos::LockGuard lock(mutex);
         if (lang.empty() || lang == inputLanguage) {
             return false;
         }
@@ -145,35 +86,37 @@ namespace utils
 
     bool i18n::setDisplayLanguage(const Language &lang)
     {
-        if (fallbackLanguage == json11::Json()) {
+        cpp_freertos::LockGuard lock(mutex);
+        if (fallbackLanguage.is_null()) {
             loadFallbackLanguage();
+            loadMetadata();
         }
 
         if ((lang.empty() || lang == currentDisplayLanguage) && !currentDisplayLanguage.empty()) {
-
             return false;
         }
-        else if (json11::Json pack = loader.createJson(lang); pack != json11::Json()) {
-
+        else if (const auto result = getMetadata(lang)) {
             currentDisplayLanguage = lang;
-            changeDisplayLanguage(pack);
-
+            displayLanguage        = loader(result->path).value();
             return true;
         }
         return false;
     }
 
-    void i18n::changeDisplayLanguage(const json11::Json &lang)
-    {
-        cpp_freertos::LockGuard lock(mutex);
-        displayLanguage = lang;
-    }
-
     void i18n::loadFallbackLanguage()
     {
-        cpp_freertos::LockGuard lock(mutex);
         currentDisplayLanguage = fallbackLanguageName;
-        fallbackLanguage       = loader.createJson(fallbackLanguageName);
+        fallbackLanguage =
+            loader(localize.getDisplayLanguagePath() / (fallbackLanguageName + utils::files::jsonExtension)).value();
+    }
+
+    void i18n::loadMetadata()
+    {
+        for (const auto &entry : std::filesystem::directory_iterator(getDisplayLanguagePath())) {
+            if (const auto data = fetchMetadata(entry.path())) {
+                metadata.push_back(*data);
+            }
+        }
     }
 
     const std::string &translate(const std::string &text)
@@ -228,6 +171,42 @@ namespace utils
         fallbackLanguage = json11::Json();
     }
 
+    std::optional<LanguageMetadata> i18n::getMetadata(const Language &lang) const
+    {
+        const auto result =
+            std::find_if(metadata.begin(), metadata.end(), [&lang](const auto &e) { return e.displayName == lang; });
+        if (result != metadata.end()) {
+            return *result;
+        }
+        else {
+            return {};
+        }
+    }
+    std::optional<LanguageMetadata> i18n::fetchMetadata(const std::filesystem::path &path) const
+    {
+        if (const auto jsonData = loader(path)) {
+            return LanguageMetadata::get(path, jsonData.value());
+        }
+        return {};
+    }
+    std::vector<Language> i18n::getAvailableDisplayLanguages() const
+    {
+        std::vector<Language> languages{metadata.size()};
+        std::transform(
+            metadata.cbegin(), metadata.cend(), languages.begin(), [](const auto &meta) { return meta.displayName; });
+
+        std::sort(languages.begin(), languages.end());
+        return languages;
+    }
+    std::vector<Language> i18n::getAvailableInputLanguages() const
+    {
+        std::vector<Language> languageNames;
+        for (const auto &entry : std::filesystem::directory_iterator(getInputLanguagePath())) {
+            languageNames.push_back(std::filesystem::path(entry.path()).stem());
+        }
+        return languageNames;
+    }
+
     void resetDisplayLanguages()
     {
         return localize.resetDisplayLanguages();
@@ -237,5 +216,10 @@ namespace utils
     {
         return localize.resetAssetsPath(p);
     }
+    std::vector<Language> getAvailableDisplayLanguages()
+    {
+        return localize.getAvailableDisplayLanguages();
+    }
 
 } // namespace utils
+

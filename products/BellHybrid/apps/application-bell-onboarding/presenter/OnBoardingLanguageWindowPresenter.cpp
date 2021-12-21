@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingLanguageWindowPresenter.hpp"
@@ -11,7 +11,7 @@ namespace app::OnBoarding
 
     std::vector<std::string> OnBoardingLanguageWindowPresenter::getLanguages()
     {
-        return languages.getSupportedLanguages();
+        return utils::getAvailableDisplayLanguages();
     }
 
     unsigned OnBoardingLanguageWindowPresenter::getSelectedLanguageIndex()
@@ -33,3 +33,4 @@ namespace app::OnBoarding
         app::manager::Controller::changeDisplayLanguage(app, selectedLanguage);
     }
 } // namespace app::OnBoarding
+

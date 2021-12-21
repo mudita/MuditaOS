@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,6 +6,7 @@
 #include <string>
 #include <filesystem>
 #include <vector>
+#include <functional>
 
 using Language = std::string;
 
@@ -17,19 +18,14 @@ namespace utils
         constexpr auto breakSign     = "_";
     } // namespace files
 
-    class LangLoader
-    {
-      public:
-        virtual ~LangLoader() = default;
-        std::vector<Language> getAvailableDisplayLanguages() const;
-        std::vector<Language> getAvailableInputLanguages() const;
-    };
-
     const std::string &translate(const std::string &text);
     const std::vector<std::string> translate_array(const std::string &text);
     const std::string &getDisplayLanguage();
     const std::string &getInputLanguage();
     const std::string &getInputLanguageFilename(const std::string &inputMode);
+
+    std::vector<Language> getAvailableDisplayLanguages();
+    std::vector<Language> getAvailableInputLanguages();
 
     bool setInputLanguage(const Language &lang);
     bool setDisplayLanguage(const Language &lang);
