@@ -62,7 +62,7 @@ namespace gui
     {
         application->switchWindow(
             window::bell_finished::defaultName,
-            BellFinishedWindowData::Factory::create("circle_success_big", window::name::bellSettingsAdvanced));
+            BellFinishedWindowData::Factory::create("circle_success_big", window::name::bellSettings));
     }
     void BellSettingsFrontlightWindow::onClose(Window::CloseReason reason)
     {

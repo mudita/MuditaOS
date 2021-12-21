@@ -5,7 +5,7 @@
 #pragma once
 
 #include <common/models/FrontlightModel.hpp>
-#include "models/advanced/FrontlightListItemProvider.hpp"
+#include "models/FrontlightListItemProvider.hpp"
 #include <apps-common/BasePresenter.hpp>
 #include <memory>
 

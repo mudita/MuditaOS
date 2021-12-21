@@ -4,7 +4,7 @@
 #pragma once
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
-#include "presenter/advanced/FrontlightPresenter.hpp"
+#include "presenter/FrontlightPresenter.hpp"
 #include <apps-common/windows/AppWindow.hpp>
 
 namespace gui
@@ -14,7 +14,7 @@ namespace gui
     class BellSettingsFrontlightWindow : public AppWindow, public app::bell_settings::FrontlightWindowContract::View
     {
       public:
-        static constexpr auto name = "BellSettingsAdvancedFrontlight";
+        static constexpr auto name = "BellSettingsFrontlight";
         explicit BellSettingsFrontlightWindow(
             app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::FrontlightPresenter> &&windowPresenter);
 

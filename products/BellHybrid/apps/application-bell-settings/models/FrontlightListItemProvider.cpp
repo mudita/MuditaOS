@@ -29,7 +29,7 @@ namespace app::bell_settings
         const auto modeAutoStr      = utils::translate("app_bell_settings_frontlight_mode_auto");
         const auto modeOnDemandsStr = utils::translate("app_bell_settings_frontlight_mode_on_demand");
 
-        auto mode = new gui::UTF8ListItem(model.getModeModel(),
+        auto mode    = new gui::UTF8ListItem(model.getModeModel(),
                                           gui::UTF8Spinner::Range{modeOnDemandsStr, modeAutoStr},
                                           utils::translate("app_bell_settings_frontlight_mode_top_message"));
         mode->onExit = [this, mode, modeAutoStr]() {
