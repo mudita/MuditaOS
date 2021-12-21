@@ -17,7 +17,6 @@ namespace gui
         UTF8 textToPrint(unsigned int signsCountToShow, UTF8 &text);
 
       public:
-        /// creates TextLine with data from text based on TextCursor position filling max_width
         MultiTextLine(BlockCursor &, unsigned int maxWidth);
         MultiTextLine(MultiTextLine &) = delete;
         MultiTextLine(MultiTextLine &&) noexcept;

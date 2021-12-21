@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,6 +16,11 @@
 
 namespace gui
 {
+    namespace text
+    {
+        constexpr auto ellipsis_signs = "...";
+    }
+
     enum class UnderlineDrawMode
     {
         WholeLine,
@@ -48,6 +53,7 @@ namespace gui
         bool lineVisible                    = true;
         unsigned int lineStartBlockNumber   = text::npos;
         unsigned int lineStartBlockPosition = text::npos;
+        TextEllipsis drawnEllipsis          = TextEllipsis::None;
 
         void createUnderline(unsigned int maxWidth, unsigned int maxHeight);
         void updateUnderline(const short &x, const short &y);

@@ -15,8 +15,9 @@ add_catch2_executable(
                 test-gui-MultiTextLine.cpp
                 test-gui-TextParse.cpp
                 test-gui-Font.cpp
-                test-gui-TextLineCursor.cpp
-        INCLUDE
+                test-gui-TextLinesCursor.cpp
+		        test-gui-TextInLineCursor.cpp
+		INCLUDE
                 ..
                 ../mock/
         LIBS

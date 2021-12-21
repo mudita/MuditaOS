@@ -1,20 +1,23 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "TextLineCursor.hpp"
+#include "TextLinesCursor.hpp"
 #include <Text.hpp>
 #include <log/log.hpp>
 
+#if DEBUG_GUI_TEXT_CURSOR == 1
+#define debug_text_cursor(...) LOG_DEBUG(__VA_ARGS__)
+#else
 #define debug_text_cursor(...)
-// #define debug_text_cursor(...) LOG_DEBUG(__VA_ARGS__)
+#endif
 
 namespace gui
 {
-    TextLineCursor::TextLineCursor(gui::Text *parent, unsigned int pos, unsigned int block)
+    TextLinesCursor::TextLinesCursor(gui::Text *parent, unsigned int pos, unsigned int block)
         : TextCursor(parent, pos, block)
     {}
 
-    auto TextLineCursor::checkNextLineDocumentEnd(unsigned int selectedLineNumber) -> bool
+    auto TextLinesCursor::checkNextLineDocumentEnd(unsigned int selectedLineNumber) -> bool
     {
         auto nextLine     = text->lines->getLine(selectedLineNumber + 1);
         auto selectedLine = text->lines->getLine(selectedLineNumber);
@@ -22,7 +25,7 @@ namespace gui
         return nextLine->length() == 0 && selectedLine->getEnd() != TextBlock::End::Newline;
     }
 
-    void TextLineCursor::handleDownNavigation(unsigned int selectedLineNumber, unsigned int selectedLineCursorPosition)
+    void TextLinesCursor::handleDownNavigation(unsigned int selectedLineNumber, unsigned int selectedLineCursorPosition)
     {
         auto selectedLine        = text->lines->getLine(selectedLineNumber);
         auto nextLine            = text->lines->getLine(selectedLineNumber + 1);
@@ -42,7 +45,7 @@ namespace gui
         moveCursor(NavigationDirection::RIGHT, moveCount);
     }
 
-    void TextLineCursor::handleUpNavigation(unsigned int selectedLineNumber, unsigned int selectedLineCursorPosition)
+    void TextLinesCursor::handleUpNavigation(unsigned int selectedLineNumber, unsigned int selectedLineCursorPosition)
     {
         auto previousLine            = text->lines->getLine(selectedLineNumber - 1);
         auto previousLineEndAddition = previousLine->getEnd() == TextBlock::End::Newline ? 1 : 0;
@@ -64,7 +67,7 @@ namespace gui
         moveCursor(NavigationDirection::LEFT, moveCount);
     }
 
-    auto TextLineCursor::displayPreviousLine() -> bool
+    auto TextLinesCursor::displayPreviousLine() -> bool
     {
         if (!text->lines->previousLinesStart.empty()) {
 
@@ -85,7 +88,7 @@ namespace gui
         return false;
     }
 
-    auto TextLineCursor::displayNextLine() -> bool
+    auto TextLinesCursor::displayNextLine() -> bool
     {
         if (text->lines->stopCondition != LinesDrawStop::OutOfText) {
 
@@ -108,16 +111,16 @@ namespace gui
         return false;
     }
 
-    bool TextLineCursor::handleNextLine()
+    bool TextLinesCursor::handleNextLine()
     {
         return displayNextLine();
     }
-    bool TextLineCursor::handlePreviousLine()
+    bool TextLinesCursor::handlePreviousLine()
     {
         return displayPreviousLine();
     }
 
-    auto TextLineCursor::moveCursor(gui::NavigationDirection direction) -> gui::TextCursor::Move
+    auto TextLinesCursor::moveCursor(gui::NavigationDirection direction) -> gui::TextCursor::Move
     {
         debug_text_cursor("Before move cursor: screen pos: %d block: %d pos: %d %s",
                           onScreenPosition,
@@ -251,12 +254,12 @@ namespace gui
         return TextCursor::moveCursor(direction);
     }
 
-    TextCursor::Move TextLineCursor::moveCursor(NavigationDirection direction, unsigned int n)
+    TextCursor::Move TextLinesCursor::moveCursor(NavigationDirection direction, unsigned int n)
     {
         auto ret = TextCursor::Move::Start;
 
         for (unsigned int i = 0; i < n; i++) {
-            ret = TextLineCursor::moveCursor(direction);
+            ret = TextLinesCursor::moveCursor(direction);
 
             if (ret == Move::Start || ret == Move::End || ret == Move::Error) {
                 break;
@@ -265,7 +268,7 @@ namespace gui
         return ret;
     }
 
-    bool TextLineCursor::removeChar()
+    bool TextLinesCursor::removeChar()
     {
         auto linesSize = text->lines->size();
 

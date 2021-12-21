@@ -10,7 +10,7 @@ namespace gui
     class Text;
     class TextDocument;
 
-    class TextLineCursor : public TextCursor
+    class TextLinesCursor : public TextCursor
     {
       protected:
         auto checkNextLineDocumentEnd(unsigned int selectedLineNumber) -> bool;
@@ -21,8 +21,8 @@ namespace gui
         [[nodiscard]] bool handlePreviousLine() override;
 
       public:
-        explicit TextLineCursor(gui::Text *parent, unsigned int pos = text::npos, unsigned int block = text::npos);
-        TextLineCursor() = delete;
+        explicit TextLinesCursor(gui::Text *parent, unsigned int pos = text::npos, unsigned int block = text::npos);
+        TextLinesCursor() = delete;
 
         auto displayPreviousLine() -> bool;
         auto displayNextLine() -> bool;

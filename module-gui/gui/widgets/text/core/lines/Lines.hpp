@@ -168,7 +168,7 @@ namespace gui
         auto addToPreviousLinesStartList(unsigned int lineStartBlockNumber, unsigned int lineStartBlockPosition)
             -> void;
 
-        TextLine *getLine(unsigned int lineNr);
+        TextLine *getLine(unsigned int lineNr = 0);
     };
 
 } // namespace gui

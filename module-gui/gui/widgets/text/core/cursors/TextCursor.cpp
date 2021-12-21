@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextCursor.hpp"
@@ -6,8 +6,11 @@
 
 #include <log/log.hpp>
 
+#if DEBUG_GUI_TEXT_CURSOR == 1
+#define debug_text_cursor(...) LOG_DEBUG(__VA_ARGS__)
+#else
 #define debug_text_cursor(...)
-// #define debug_text_cursor(...) LOG_DEBUG(__VA_ARGS__)
+#endif
 
 namespace gui
 {
