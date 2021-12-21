@@ -57,8 +57,7 @@ namespace app::bell_settings
         };
 
 #if CONFIG_ENABLE_TEMP == 1
-        temperatureUnitListItem =
-            new gui::TemperatureUnitListItem(utils::translate("app_bell_settings_advanced_temp_scale"));
+        temperatureUnitListItem = new gui::TemperatureUnitListItem(utils::translate("app_bell_settings_temp_scale"));
         internalData.push_back(temperatureUnitListItem);
 #endif
 

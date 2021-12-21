@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <presenter/advanced/AboutYourBellWindowPresenter.hpp>
+#include <presenter/AboutYourBellWindowPresenter.hpp>
 
 #include <apps-common/windows/AppWindow.hpp>
 #include <ListView.hpp>

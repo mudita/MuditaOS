@@ -4,7 +4,7 @@
 #include "AboutYourBellModel.hpp"
 
 #include <BellSettingsStyle.hpp>
-#include <widgets/advanced/AboutYourBellListItem.hpp>
+#include <widgets/AboutYourBellListItem.hpp>
 #include <ProductConfig.hpp>
 
 #include <ListView.hpp>
@@ -43,8 +43,8 @@ namespace app::bell_settings
     void AboutYourBellModel::createData()
     {
         internalData.push_back(
-            new gui::AboutYourBellListItem(utils::translate("app_bell_settings_advanced_about_product"),
-                                           utils::translate("app_bell_settings_advanced_about_version"),
+            new gui::AboutYourBellListItem(utils::translate("app_bell_settings_about_product"),
+                                           utils::translate("app_bell_settings_about_version"),
                                            gui::AboutYourBellListItem::TokenMap({{"$VERSION", std::string(VERSION)}})));
 
 #if CONFIG_SHOW_MEMORY_INFO == 1
@@ -58,15 +58,14 @@ namespace app::bell_settings
         const auto totalMB = (stat.f_frsize * stat.f_blocks) / 1024LLU / 1024LLU;
         const auto usedMB  = totalMB - (stat.f_bfree * stat.f_bsize) / 1024LLU / 1024LLU;
         internalData.push_back(new gui::AboutYourBellListItem(
-            utils::translate("app_bell_settings_advanced_about_storage_title"),
-            utils::translate("app_bell_settings_advanced_about_storage_text"),
+            utils::translate("app_bell_settings_about_storage_title"),
+            utils::translate("app_bell_settings_about_storage_text"),
             gui::AboutYourBellListItem::TokenMap(
                 {{"$USED_MEMORY", std::to_string(usedMB)}, {"$TOTAL_MEMORY", std::to_string(totalMB)}})));
 #endif
 
-        internalData.push_back(
-            new gui::AboutYourBellListItem(utils::translate("app_bell_settings_advanced_about_info_title"),
-                                           utils::translate("app_bell_settings_advanced_about_info_text")));
+        internalData.push_back(new gui::AboutYourBellListItem(utils::translate("app_bell_settings_about_info_title"),
+                                                              utils::translate("app_bell_settings_about_info_text")));
 
         for (auto item : internalData) {
             item->deleteByList = false;

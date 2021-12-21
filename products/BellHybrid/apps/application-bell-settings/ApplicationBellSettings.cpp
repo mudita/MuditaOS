@@ -4,7 +4,7 @@
 #include "ApplicationBellSettings.hpp"
 #include "presenter/TimeUnitsPresenter.hpp"
 #include "models/TemperatureUnitModel.hpp"
-#include "models/advanced/AboutYourBellModel.hpp"
+#include "models/AboutYourBellModel.hpp"
 #include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
 #include "models/alarm_settings/BedtimeSettingsListItemProvider.hpp"
@@ -12,13 +12,12 @@
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
 #include "models/alarm_settings/SnoozeSettingsModel.hpp"
 #include "presenter/BedtimeSettingsPresenter.hpp"
-#include "presenter/advanced/AboutYourBellWindowPresenter.hpp"
+#include "presenter/AboutYourBellWindowPresenter.hpp"
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
-#include "presenter/advanced/FrontlightPresenter.hpp"
-#include "windows/advanced/AboutYourBellWindow.hpp"
-#include "windows/advanced/BellSettingsAdvancedWindow.hpp"
-#include "windows/advanced/BellSettingsLanguageWindow.hpp"
-#include "windows/advanced/BellSettingsFrontlightWindow.hpp"
+#include "presenter/FrontlightPresenter.hpp"
+#include "windows/AboutYourBellWindow.hpp"
+#include "windows/BellSettingsLanguageWindow.hpp"
+#include "windows/BellSettingsFrontlightWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
@@ -67,7 +66,7 @@ namespace app
 
                 switchWindow(gui::window::bell_finished::defaultName,
                              gui::BellFinishedWindowData::Factory::create("circle_success_big",
-                                                                          gui::window::name::bellSettingsAdvanced));
+                                                                          gui::window::name::bellSettings));
 
                 return sys::msgHandled();
             }
@@ -82,12 +81,6 @@ namespace app
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellSettingsWindow>(app);
         });
-
-        // Advanced
-        windowsFactory.attach(gui::window::name::bellSettingsAdvanced,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellSettingsAdvancedWindow>(app);
-                              });
 
         windowsFactory.attach(
             gui::window::name::bellSettingsLanguage, [&](ApplicationCommon *app, const std::string &name) {

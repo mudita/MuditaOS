@@ -5,7 +5,7 @@
 
 #include <application-settings/windows/WindowNames.hpp>
 #include <i18n/i18n.hpp>
-#include <models/advanced/AboutYourBellModel.hpp>
+#include <models/AboutYourBellModel.hpp>
 
 namespace gui
 {

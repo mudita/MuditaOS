@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AboutYourBellWindowPresenter.hpp"
-#include <models/advanced/AboutYourBellModel.hpp>
+#include <models/AboutYourBellModel.hpp>
 
 namespace app::bell_settings
 {

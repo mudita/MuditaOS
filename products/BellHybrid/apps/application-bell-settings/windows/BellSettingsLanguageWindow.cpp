@@ -32,7 +32,7 @@ namespace gui
         topMessage->setEdges(gui::RectangleEdge::None);
         topMessage->activeItem = false;
         topMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        topMessage->setText(utils::translate("app_bell_settings_advanced_language"));
+        topMessage->setText(utils::translate("app_bell_settings_language"));
         topMessage->drawUnderline(false);
 
         auto data = presenter->getLanguages();
