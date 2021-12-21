@@ -273,6 +273,8 @@ namespace app
         /// Find and pop window from stack by window name
         void popWindow(const std::string &window);
 
+        void registerOnPopCallback(std::function<void(WindowsStack &)> callback);
+
         /// Pops the current window from the windows stack
         void popCurrentWindow();
 

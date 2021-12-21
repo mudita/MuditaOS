@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WindowsStack.hpp"
+
+#include <utility>
 #include "WindowsFactory.hpp"
 #include "windows/AppWindow.hpp"
 
@@ -67,6 +69,9 @@ namespace app
         auto ret = findInStack(window);
         if (ret != stack.end()) {
             stack.erase(std::next(ret), stack.end());
+            if (onPopCallback) {
+                onPopCallback(*this);
+            }
             return true;
         }
         return false;
@@ -111,6 +116,24 @@ namespace app
     decltype(WindowsStack::stack)::iterator WindowsStack::findInStack(const std::string &window)
     {
         return std::find_if(stack.begin(), stack.end(), [&](auto &el) { return el.name == window; });
+    }
+    void WindowsStack::registerOnPopCallback(std::function<void(WindowsStack &)> callback)
+    {
+        onPopCallback = std::move(callback);
+    }
+    void WindowsStack::dropPendingPopups()
+    {
+        auto it = stack.rbegin();
+        while (it != stack.rend()) {
+            LOG_DEBUG("Current window on stack: %s, type: %s",
+                      it->name.c_str(),
+                      magic_enum::enum_name(it->disposition.windowtype).data());
+            if (it->disposition.windowtype == gui::popup::Disposition::WindowType::Popup) {
+                LOG_DEBUG("Erasing: %s", it->name.c_str());
+                stack.erase(std::next(it).base());
+            }
+            std::advance(it, 1);
+        }
     }
 
 } // namespace app

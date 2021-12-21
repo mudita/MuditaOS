@@ -836,6 +836,11 @@ namespace app
             LOG_ERROR("no blueprint to handle %s popup - fallback", std::string(magic_enum::enum_name(id)).c_str());
             blueprint = popupBlueprintFallback(id);
         }
+        if (data->getDisposition().windowtype != gui::popup::Disposition::WindowType::Popup) {
+            LOG_ERROR("setting popup window type to popup - fallback");
+            data->setDisposition(gui::popup::Disposition{
+                gui::popup::Disposition::Priority::Normal, gui::popup::Disposition::WindowType::Popup, id});
+        }
         auto request = gui::popup::Request(id, std::move(data), *blueprint);
         windowsPopupQueue->pushRequest(std::move(request));
         tryShowPopup();
@@ -857,8 +862,8 @@ namespace app
             if (not retval) {
                 LOG_ERROR("Popup %s handling failure, please check registered blueprint!", popup.c_str());
             }
-            return retval;
             LOG_ERROR("no blueprint for popup: %s", popup.c_str());
+            return retval;
         }
         return false;
     }
@@ -867,8 +872,12 @@ namespace app
     {
         const auto popupName = gui::popup::resolveWindowName(id);
         LOG_INFO("abort popup: %s from window %s", popupName.c_str(), getCurrentWindow()->getName().c_str());
-        windowsStack().pop(popupName);
-        returnToPreviousWindow();
+        if (not windowsStack().pop(popupName)) {
+            return;
+        }
+        if (popupName == getCurrentWindow()->getName()) {
+            returnToPreviousWindow();
+        }
     }
 
     bool ApplicationCommon::userInterfaceDBNotification([[maybe_unused]] sys::Message *msg,
@@ -987,5 +996,9 @@ namespace app
     auto ApplicationCommon::getSimLockSubject() noexcept -> locks::SimLockSubject &
     {
         return simLockSubject;
+    }
+    void ApplicationCommon::registerOnPopCallback(std::function<void(WindowsStack &)> callback)
+    {
+        windowsStack().registerOnPopCallback(std::move(callback));
     }
 } /* namespace app */
