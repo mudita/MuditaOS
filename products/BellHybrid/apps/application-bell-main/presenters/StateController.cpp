@@ -276,8 +276,7 @@ namespace app::home_screen
                 alarmModel.snooze();
                 view.setHeaderViewMode(HeaderViewMode::SnoozeCountdown);
                 view.setSnoozeTime(alarmModel.getTimeOfNextSnooze());
-                const auto bottomDescription = utils::translate("app_bellmain_home_screen_bottom_desc") + " " +
-                                               std::to_string(alarmModel.getSnoozeDuration()) + " min";
+                const auto bottomDescription = utils::time::getBottomDescription(alarmModel.getSnoozeDuration());
                 view.setBottomDescription(bottomDescription);
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
