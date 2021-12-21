@@ -6,7 +6,6 @@
 #include <RawFont.hpp>
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/ImageBox.hpp>
-#include <apps-common/widgets/TimeSetSpinner.hpp>
 
 namespace gui
 {
@@ -20,7 +19,7 @@ namespace gui
         alarmImg->setMargins(Margins(10U, 0, 10U, 0));
         alarmImg->setMinimumSizeToFitImage();
 
-        timeSpinner = new TimeSetSpinner(this);
+        timeSpinner = new TimeSetFmtSpinner(this);
         timeSpinner->setFont(style::window::font::largelight);
         timeSpinner->setEditMode(EditMode::Browse);
         timeSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -38,11 +37,17 @@ namespace gui
 
     auto SnoozeTimer::setTime(std::uint8_t mins, std::uint8_t secs) noexcept -> void
     {
-        timeSpinner->setTime(mins, secs);
+        timeSpinner->setHour(mins);
+        timeSpinner->setMinute(secs);
     }
     auto SnoozeTimer::setTime(std::time_t time) noexcept -> void
     {
         timeSpinner->setTime(time);
+    }
+
+    auto SnoozeTimer::setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void
+    {
+        timeSpinner->setTimeFormat(fmt);
     }
 
 } /* namespace gui */

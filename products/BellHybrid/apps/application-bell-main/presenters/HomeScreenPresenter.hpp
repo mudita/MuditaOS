@@ -61,6 +61,7 @@ namespace app::home_screen
         virtual std::time_t getAlarmTime() const                             = 0;
         virtual void setAlarmTime(std::time_t time)                          = 0;
         virtual void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
+        virtual void setSnoozeFormat(utils::time::Locale::TimeFormat fmt)    = 0;
         virtual void incAlarmMinute()                                        = 0;
         virtual void decAlarmMinute()                                        = 0;
 

@@ -72,6 +72,7 @@ namespace app::home_screen
         getView()->setTimeFormat(timeModel->getTimeFormat());
         getView()->setTime(timeModel->getCurrentTime());
         getView()->setAlarmTimeFormat(timeModel->getTimeFormat());
+        getView()->setSnoozeFormat(timeModel->getTimeFormat());
         getView()->setTemperature(temperatureModel->getTemperature());
     }
     void HomeScreenPresenter::createData()

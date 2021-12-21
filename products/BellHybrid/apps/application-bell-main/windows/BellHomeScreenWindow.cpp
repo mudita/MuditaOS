@@ -242,6 +242,11 @@ namespace gui
         alarm->setTimeFormat(fmt);
     }
 
+    void BellHomeScreenWindow::setSnoozeFormat(utils::time::Locale::TimeFormat fmt)
+    {
+        snoozeTimer->setTimeFormat(fmt);
+    }
+
     void BellHomeScreenWindow::setAlarmEdit(bool val)
     {
         if (not val) {
