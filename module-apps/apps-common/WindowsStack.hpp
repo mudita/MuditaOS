@@ -40,8 +40,9 @@ namespace app
 
     class WindowsStack
     {
-        std::vector<WindowData> stack;
+        std::function<void(WindowsStack &)> onPopCallback = nullptr;
         std::map<std::string, std::unique_ptr<gui::AppWindow>> windows{};
+        std::vector<WindowData> stack;
         decltype(stack)::iterator findInStack(const std::string &);
 
       public:
@@ -70,8 +71,11 @@ namespace app
         bool pop(const std::string &window);
         bool popLastWindow();
         bool drop(const std::string &window);
+        void dropPendingPopups();
         void clear();
 
         bool rebuildWindows(app::WindowsFactory &windowsFactory, ApplicationCommon *app);
+        void registerOnPopCallback(std::function<void(WindowsStack &)> callback);
     };
+
 } // namespace app

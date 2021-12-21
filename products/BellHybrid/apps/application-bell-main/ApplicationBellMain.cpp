@@ -24,6 +24,7 @@
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
+#include <WindowsStack.hpp>
 
 namespace app
 {
@@ -34,23 +35,23 @@ namespace app
                                              std::uint32_t stackDepth)
         : Application(name, parent, statusIndicators, startInBackground, stackDepth)
     {
-
-        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
-            auto val = ((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
-                        (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
-                        (isCurrentWindow(gui::BellTurnOffWindow::name)));
-            if (val) {
-                LOG_INFO("popup blocked");
-                return !val;
-            }
-            if (not(((popupParams.getPopupId() == gui::popup::ID::AlarmActivated ||
-                      popupParams.getPopupId() == gui::popup::ID::AlarmDeactivated)) and
-                    (not isHomeScreenFocused()))) {
-                LOG_INFO("popup blocked");
-                return false;
-            }
-            return true;
-        });
+        registerOnPopCallback([](WindowsStack &windowsStack) { windowsStack.dropPendingPopups(); });
+        //        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
+        //            auto val = ((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
+        //                        (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
+        //                        (isCurrentWindow(gui::BellTurnOffWindow::name)));
+        //            if (val) {
+        //                LOG_INFO("popup blocked");
+        //                return !val;
+        //            }
+        //            if (not(((popupParams.getPopupId() == gui::popup::ID::AlarmActivated ||
+        //                      popupParams.getPopupId() == gui::popup::ID::AlarmDeactivated)) and
+        //                    (not isHomeScreenFocused()))) {
+        //                LOG_INFO("popup blocked");
+        //                return false;
+        //            }
+        //            return true;
+        //        });
 
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
