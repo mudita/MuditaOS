@@ -62,6 +62,7 @@ namespace gui
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
         void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) override;
+        void setSnoozeFormat(utils::time::Locale::TimeFormat fmt) override;
         void switchToMenu() override;
         void switchToBatteryStatus() override;
 
