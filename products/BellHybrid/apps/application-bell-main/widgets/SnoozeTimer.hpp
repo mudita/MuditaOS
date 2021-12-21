@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Style.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
@@ -32,9 +33,10 @@ namespace gui
         auto setFont(std::string newFontName) noexcept -> void;
         auto setTime(std::uint8_t mins, std::uint8_t secs) noexcept -> void;
         auto setTime(std::time_t time) noexcept -> void;
+        auto setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void;
 
       private:
-        TimeSetSpinner *timeSpinner = nullptr;
+        TimeSetFmtSpinner *timeSpinner = nullptr;
 
         Status alarmStatus   = Status::DEACTIVATED;
         std::string fontName = style::window::font::largelight;
