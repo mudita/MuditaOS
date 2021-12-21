@@ -71,10 +71,13 @@ namespace audio
         }
 
         codecParams.sampleRate = sampleRate;
-        /// Set the output volume to max possible value. Volume control is implemented
+        /// Set the codec output volume to max possible value. Volume control is implemented
         /// using software scaling instead of hardware gain control.
         codecParams.outVolume = maxVolume;
         codecParams.inGain    = currentFormat.inputGain;
+
+        /// Set the initial volume used by the software volume control
+        setOutputVolume(currentFormat.outputVolume);
 
         txEnabled = true;
         initiateTxTransfer();
