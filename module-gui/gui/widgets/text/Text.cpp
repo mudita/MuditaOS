@@ -82,6 +82,19 @@ namespace gui
         }
     }
 
+    void Text::setTextEllipsisType(TextEllipsis type)
+    {
+        if (ellipsisType != type) {
+            ellipsisType = type;
+            drawLines();
+        }
+    }
+
+    TextEllipsis Text::getTextEllipsisType()
+    {
+        return ellipsisType;
+    }
+
     void Text::setTextLimitType(TextLimitType limitType, unsigned int val)
     {
         auto it = std::find_if(limitsList.begin(), limitsList.end(), [&limitType](const TextLimit &limitOnList) {
@@ -463,7 +476,12 @@ namespace gui
 
     TextCursor *Text::createCursor()
     {
-        return new TextLineCursor(this);
+        if (textType == TextType::MultiLine) {
+            return new TextLinesCursor(this);
+        }
+        else {
+            return new TextInLineCursor(this);
+        }
     }
 
     void Text::buildCursor()
@@ -558,7 +576,7 @@ namespace gui
         if (!isMode(EditMode::Edit)) {
             return false;
         }
-        if (inputEvent.isShortRelease(key_signs_remove)) {
+        if (inputEvent.isShortRelease(removeKey)) {
 
             setCursorStartPosition(CursorStartPosition::Offset);
 
@@ -575,7 +593,7 @@ namespace gui
         if (!isMode(EditMode::Edit)) {
             return false;
         }
-        if (inputEvent.isLongRelease(key_signs_remove)) {
+        if (inputEvent.isLongRelease(removeKey)) {
             if (!document->isEmpty()) {
                 clear();
                 return true;
@@ -983,4 +1001,5 @@ namespace gui
     {
         visitor.visit(*this);
     }
+
 } /* namespace gui */

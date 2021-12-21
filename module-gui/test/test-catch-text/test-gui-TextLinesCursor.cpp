@@ -2,9 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <widgets/text/Text.hpp>
-#include <widgets/text/core/TextBlock.hpp>
-#include <mock/buildTextDocument.hpp>
-#include <mock/multi-line-string.hpp>
 #include "Font.hpp"
 #include "InitializedFontManager.hpp"
 
@@ -44,7 +41,7 @@ namespace gui
     };
 } // namespace gui
 
-TEST_CASE("TextLineCursor - navigation without scroll")
+TEST_CASE("TextLinesCursor - navigation without scroll")
 {
     using namespace gui;
 
@@ -210,7 +207,7 @@ TEST_CASE("TextLineCursor - navigation without scroll")
     }
 }
 
-TEST_CASE("TextLineCursor - navigation with scroll")
+TEST_CASE("TextLinesCursor - navigation with scroll")
 {
     using namespace gui;
 
@@ -523,7 +520,7 @@ TEST_CASE("TextLineCursor - navigation with scroll")
     }
 }
 
-TEST_CASE("TextLineCursor - addition and deletion with scroll")
+TEST_CASE("TextLinesCursor - addition and deletion with scroll")
 {
     using namespace gui;
 

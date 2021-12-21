@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextLine.hpp"
 
 namespace gui
 {
-
     /// helper function to get our text representation
     RawText *TextLine::buildUITextPart(const UTF8 &text, const TextFormat *format)
     {
@@ -26,6 +25,7 @@ namespace gui
         maxWidth               = from.maxWidth;
         lineStartBlockNumber   = from.lineStartBlockNumber;
         lineStartBlockPosition = from.lineStartBlockPosition;
+        drawnEllipsis          = from.drawnEllipsis;
         lineVisible            = from.lineVisible;
     }
 
@@ -97,15 +97,29 @@ namespace gui
             if (el->getFont() == nullptr) {
                 continue;
             }
-            if (currentPos + el->getTextLength() > pos) {
-                width += el->getFont()->getPixelWidth(el->getText(), 0, pos - currentPos);
+
+            auto printedTextLength       = el->getTextLength();
+            auto printedText             = el->getText();
+            auto ellipsisWidthCorrection = 0;
+
+            if (drawnEllipsis == TextEllipsis::Left || drawnEllipsis == TextEllipsis::Both) {
+                ellipsisWidthCorrection = el->getFont()->getPixelWidth(text::ellipsis_signs);
+                width                   = ellipsisWidthCorrection;
+                printedTextLength       = printedTextLength - UTF8(text::ellipsis_signs).length();
+                printedText             = printedText.substr(UTF8(text::ellipsis_signs).length(), printedTextLength);
+            }
+
+            if (currentPos + printedTextLength > pos) {
+                width += el->getFont()->getPixelWidth(printedText, 0, pos - currentPos);
+
                 return width;
             }
             else {
-                width += el->getWidth();
+                width += el->getWidth() - ellipsisWidthCorrection;
             }
-            currentPos += el->getTextLength();
+            currentPos += printedTextLength;
         }
+
         return width;
     }
 

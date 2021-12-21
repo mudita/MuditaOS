@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Lines.hpp"
 #include "MultiTextLine.hpp"
+#include "SingleTextLine.hpp"
 #include <text/Text.hpp>
 
 #if DEBUG_GUI_TEXT_LINES == 1
@@ -38,19 +39,29 @@ namespace gui
         BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition, TextType drawType)
         -> void
     {
-        drawMultiLine(drawCursor, w, h, lineYPosition, lineXPosition);
+        drawType == TextType::MultiLine ? drawMultiLine(drawCursor, w, h, lineYPosition, lineXPosition)
+                                        : drawSingleLine(drawCursor, w, h, lineYPosition, lineXPosition);
     }
 
     auto Lines::drawSingleLine(
         BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition) -> void
     {
-        // TODO in EGD-3411
+        const Length initHeight = text->getTextFormat().getFont()->info.line_height;
+
+        auto textLine =
+            gui::SingleTextLine(drawCursor, w, initHeight, underLineProperties, text->getTextEllipsisType());
+
+        emplace(std::move(textLine));
+        auto &line = last();
+
+        line.setParent(text);
+        line.setPosition(lineXPosition, lineYPosition);
     }
 
     auto Lines::drawMultiLine(
         BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition) -> void
     {
-        Position initialTopPadding = lineYPosition;
+        const Position initialTopPadding = lineYPosition;
 
         while (true) {
             auto textLine = gui::MultiTextLine(drawCursor, w);
@@ -89,7 +100,8 @@ namespace gui
                      unsigned int linesCount,
                      TextType drawType) -> void
     {
-        drawMultiLine(drawCursor, w, h, lineYPosition, lineXPosition, linesCount);
+        drawType == TextType::MultiLine ? drawMultiLine(drawCursor, w, h, lineYPosition, lineXPosition, linesCount)
+                                        : drawSingleLine(drawCursor, w, h, lineYPosition, lineXPosition);
     }
 
     auto Lines::drawMultiLine(BlockCursor &drawCursor,
@@ -99,7 +111,7 @@ namespace gui
                               Position lineXPosition,
                               unsigned int linesCount) -> void
     {
-        Position initialTopPadding = lineYPosition;
+        const Position initialTopPadding = lineYPosition;
         Length initHeight          = text->getTextFormat().getFont()->info.line_height;
 
         while (true) {

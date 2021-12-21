@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,7 +10,8 @@
 #include "utf8/UTF8.hpp"
 
 #include <core/cursors/TextCursor.hpp>
-#include <core/cursors/TextLineCursor.hpp>
+#include <core/cursors/TextInLineCursor.hpp>
+#include <core/cursors/TextLinesCursor.hpp>
 #include <core/lines/Lines.hpp>
 #include <modes/InputMode.hpp>
 #include <core/TextDocument.hpp>
@@ -28,6 +29,8 @@ namespace gui
         unsigned int cursorPos;
     };
 
+    constexpr KeyCode removeKey = KeyCode::KEY_PND;
+
     ///  @brief Widget that holds multiple lines of text.
     ///
     ///  Can expand horizontally to it's max size if it needs to fit more text in line
@@ -43,7 +46,8 @@ namespace gui
     class Text : public Rect
     {
         friend TextCursor;
-        friend TextLineCursor;
+        friend TextInLineCursor;
+        friend TextLinesCursor;
 
       protected:
         // holds list of labels for displaying currently visible text lines.
@@ -65,7 +69,6 @@ namespace gui
       public:
         ExpandMode expandMode    = ExpandMode::None;
         EditMode editMode        = EditMode::Edit;
-        KeyCode key_signs_remove = KeyCode::KEY_PND;
 
         [[nodiscard]] bool isMode(EditMode edit) const
         {
@@ -74,6 +77,7 @@ namespace gui
 
       protected:
         TextType textType = TextType::MultiLine;
+        TextEllipsis ellipsisType = TextEllipsis::None;
         std::list<TextLimit> limitsList;
 
         /// points to default text font to use
@@ -112,11 +116,6 @@ namespace gui
         auto drawCursor() -> void;
 
       public:
-        /// Callback when text changed
-        /// @param `this` item
-        /// @param new text
-        using TextChangedCallback = std::function<void(Item &, const UTF8 &)>;
-
         Text();
         Text(Item *parent,
              const uint32_t &x,
@@ -129,17 +128,17 @@ namespace gui
 
         void setEditMode(EditMode mode);
         void setTextType(TextType type);
+        void setTextEllipsisType(TextEllipsis type);
+        TextEllipsis getTextEllipsisType();
         void setTextLimitType(TextLimitType limitType, unsigned int val = 0);
         void clearTextLimits();
         void drawUnderline(bool val);
-        virtual void setText(const UTF8 &text);
-        void setText(std::unique_ptr<TextDocument> &&document);
 
         TextBackup backupText() const;
         void restoreFrom(const TextBackup &backup);
 
-        void setTextChangedCallback(TextChangedCallback &&callback);
-
+        virtual void setText(const UTF8 &text);
+        void setText(std::unique_ptr<TextDocument> &&document);
         void addText(const UTF8 &text, AdditionType additionType = AdditionType::perChar);
         void addText(TextBlock text);
         /// @defgroup richtext can be virtualized by parametrized RichTextParser virtual api ( as second param )
@@ -152,6 +151,7 @@ namespace gui
         virtual void clear();
         bool isEmpty();
         virtual UTF8 getText() const;
+
         void setFont(const UTF8 &fontName);
         void setFont(RawFont *font);
         void setMinimumWidthToFitText();
@@ -185,6 +185,11 @@ namespace gui
         gui::KeyInputMappedTranslation translator;
 
       public:
+        /// Callback when text changed
+        /// @param `this` item
+        /// @param new text
+        using TextChangedCallback = std::function<void(Item &, const UTF8 &)>;
+
         TextChangedCallback textChangedCallback;
 
         auto checkAdditionBounds(uint32_t utfVal) -> AdditionBound;
@@ -195,6 +200,7 @@ namespace gui
         bool addChar(uint32_t utf8);
         bool removeChar();
         void onTextChanged();
+        void setTextChangedCallback(TextChangedCallback &&callback);
     };
 
     char intToAscii(int val);
