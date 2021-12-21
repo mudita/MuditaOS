@@ -11,7 +11,7 @@ namespace app::bell_settings
 
     std::vector<std::string> LanguageWindowPresenter::getLanguages() const
     {
-        return languages.getAvailableDisplayLanguages();
+        return utils::getAvailableDisplayLanguages();
     }
 
     std::string LanguageWindowPresenter::getSelectedLanguage() const

@@ -6,6 +6,7 @@
 #include <string>
 #include <filesystem>
 #include <vector>
+#include <functional>
 
 using Language = std::string;
 
@@ -17,18 +18,14 @@ namespace utils
         constexpr auto breakSign     = "_";
     } // namespace files
 
-    class LangLoader
-    {
-      public:
-        std::vector<Language> getAvailableDisplayLanguages() const;
-        std::vector<Language> getAvailableInputLanguages() const;
-    };
-
     const std::string &translate(const std::string &text);
     const std::vector<std::string> translate_array(const std::string &text);
     const std::string &getDisplayLanguage();
     const std::string &getInputLanguage();
     const std::string &getInputLanguageFilename(const std::string &inputMode);
+
+    std::vector<Language> getAvailableDisplayLanguages();
+    std::vector<Language> getAvailableInputLanguages();
 
     bool setInputLanguage(const Language &lang);
     bool setDisplayLanguage(const Language &lang);

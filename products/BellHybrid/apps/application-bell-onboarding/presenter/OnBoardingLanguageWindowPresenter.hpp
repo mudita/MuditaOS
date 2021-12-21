@@ -32,7 +32,6 @@ namespace app::OnBoarding
     class OnBoardingLanguageWindowPresenter : public OnBoardingLanguageWindowContract::Presenter
     {
       private:
-        utils::LangLoader languages;
         app::ApplicationCommon *app;
 
       public:
