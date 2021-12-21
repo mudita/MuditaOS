@@ -25,6 +25,9 @@
 #include <appmgr/messages/ChangeHomescreenLayoutParams.hpp>
 #include <system/messages/SystemManagerMessage.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
+#include <apps-common/WindowsPopupFilter.hpp>
+#include <common/windows/BellTurnOffWindow.hpp>
+#include <WindowsStack.hpp>
 
 namespace app
 {

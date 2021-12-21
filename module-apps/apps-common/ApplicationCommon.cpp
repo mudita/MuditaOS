@@ -819,6 +819,14 @@ namespace app
         else {
             switchWindow(popupName, std::make_unique<gui::ModesPopupData>(mode, flightMode));
         }
+        if (data->getDisposition().windowtype != gui::popup::Disposition::WindowType::Popup) {
+            LOG_ERROR("setting popup window type to popup - fallback");
+            data->setDisposition(gui::popup::Disposition{
+                gui::popup::Disposition::Priority::Normal, gui::popup::Disposition::WindowType::Popup, id});
+        }
+        auto request = gui::popup::Request(id, std::move(data), *blueprint);
+        windowsPopupQueue->pushRequest(std::move(request));
+        tryShowPopup();
     }
 
     void ApplicationCommon::handleVolumeChanged(audio::Volume volume, audio::Context context)
@@ -910,6 +918,8 @@ namespace app
             default:
                 break;
             }
+            LOG_ERROR("no blueprint for popup: %s", popup.c_str());
+            return retval;
         }
     }
 
@@ -960,12 +970,12 @@ namespace app
     void ApplicationCommon::abortPopup(gui::popup::ID id)
     {
         const auto popupName = gui::popup::resolveWindowName(id);
-
-        if (getCurrentWindow()->getName() == popupName) {
-            returnToPreviousWindow();
+        LOG_INFO("abort popup: %s from window %s", popupName.c_str(), getCurrentWindow()->getName().c_str());
+        if (not windowsStack().pop(popupName)) {
+            return;
         }
-        else {
-            popWindow(popupName);
+        if (popupName == getCurrentWindow()->getName()) {
+            returnToPreviousWindow();
         }
     }
 
@@ -1111,5 +1121,9 @@ namespace app
     auto ApplicationCommon::getSimLockSubject() noexcept -> locks::SimLockSubject &
     {
         return simLockSubject;
+    }
+    void ApplicationCommon::registerOnPopCallback(std::function<void(WindowsStack &)> callback)
+    {
+        windowsStack().registerOnPopCallback(std::move(callback));
     }
 } /* namespace app */
