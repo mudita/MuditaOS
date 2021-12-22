@@ -3,9 +3,14 @@
 
 namespace bsp
 {
-
+    //! Board hardware init
     void BoardInit();
 
+    // Board cuttoff power
+    void BoardPowerOff();
+
+    // Board system reset
+    void BoardReboot();
 }
 
 

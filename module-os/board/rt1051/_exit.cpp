@@ -40,6 +40,7 @@
 #include <string.h>
 #include <exit_backtrace.h>
 #include <purefs/vfs_subsystem.hpp>
+#include <bsp/bsp.hpp>
 
 
 static void __attribute__((noreturn)) stop_system(void)
@@ -57,8 +58,8 @@ static void __attribute__((noreturn)) stop_system(void)
     }
     LOG_INFO("Restarting the system...");
     haltIfDebugging();
+    bsp::BoardReboot();
     vTaskEndScheduler();
-    NVIC_SystemReset();
     // waiting for system reset
     while (1) {
 #ifndef DEBUG

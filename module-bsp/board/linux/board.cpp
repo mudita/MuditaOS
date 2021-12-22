@@ -7,6 +7,17 @@ namespace bsp
     {
         // dummy
     }
+
+    void BoardPowerOff()
+    {
+        // dummy
+    }
+
+    void BoardReboot()
+    {
+        // dummy
+    }
+
 } // namespace bsp
 
 namespace bsp::bell_switches

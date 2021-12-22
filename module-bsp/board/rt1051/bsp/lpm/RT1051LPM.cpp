@@ -10,6 +10,7 @@
 #include "bsp/watchdog/watchdog.hpp"
 #include <board/clock_config.h>
 #include <fsl_clock.h>
+#include <bsp/bsp.hpp>
 #include "ClockState.hpp"
 #include "Oscillator.hpp"
 #include "critical.hpp"
@@ -44,7 +45,7 @@ namespace bsp
 
     int32_t RT1051LPM::PowerOff()
     {
-        gpio_1->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 0);
+        bsp::BoardPowerOff();
         return 0;
     }
 
@@ -64,7 +65,7 @@ namespace bsp
             SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
             break;
         }
-        NVIC_SystemReset();
+        BoardReboot();
         return 0;
     }
 
