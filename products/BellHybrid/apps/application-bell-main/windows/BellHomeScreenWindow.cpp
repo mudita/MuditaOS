@@ -81,7 +81,6 @@ namespace gui
         buildInterface();
         this->presenter->attach(this);
         this->presenter->createData();
-        this->presenter->onBeforeShow();
     }
 
     void BellHomeScreenWindow::buildInterface()

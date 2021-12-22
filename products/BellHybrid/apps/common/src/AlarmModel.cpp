@@ -87,7 +87,10 @@ namespace app
     {
         auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::AlarmUpdateRequestMessage>(alarm),
                                                        service::name::service_time);
-        request->execute(app, this, responseCallback);
+        request->execute(app, this, [this](sys::ResponseMessage *) {
+            update(nullptr);
+            return true;
+        });
 
         cachedRecord = alarm.getNextSingleEvent(TimePointNow());
     }
@@ -95,7 +98,10 @@ namespace app
     {
         auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::TurnOffSnoozeRequestMessage>(alarm.ID),
                                                        service::name::service_time);
-        request->execute(app, this, responseCallback);
+        request->execute(app, this, [this](sys::ResponseMessage *) {
+            update(nullptr);
+            return true;
+        });
         nextSnoozeTime = TIME_POINT_INVALID;
     }
     bool AlarmModel::isActive() const

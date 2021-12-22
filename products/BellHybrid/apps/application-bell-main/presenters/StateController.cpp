@@ -570,7 +570,11 @@ namespace app::home_screen
 
     void StateController::resetStateMachine()
     {
-        pimpl->resetSM();
+        using namespace sml;
+
+        if (not pimpl->sm->is("Init"_s)) {
+            pimpl->resetSM();
+        }
     }
     bool StateController::handleBatteryStatus()
     {
