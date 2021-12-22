@@ -1,5 +1,7 @@
 
 #include "board.h"
+#include "fsl_gpio.h"
+#include <stdint.h>
 extern "C"
 {
 #include "fsl_common.h"
@@ -24,6 +26,15 @@ extern std::uint32_t __sdram_cached_start[];
 
 namespace bsp
 {
+
+    namespace {
+        enum class rebootState : uintptr_t {
+            none,
+            poweroff,
+            reboot
+        };
+        volatile rebootState rebootProgress {rebootState::none};
+    }
 
     /* MPU configuration. */
     static void BOARD_ConfigMPU(void)
@@ -163,6 +174,37 @@ namespace bsp
 
         PrintSystemClocks();
         clearAndPrintBootReason();
+    }
+
+    //! Board PowerOff function by cutdown power
+    void BoardPowerOff()
+    {
+        rebootProgress = rebootState::poweroff;
+    }
+
+    //! Board reboot by the SVNC code
+    void BoardReboot()
+    {
+        rebootProgress = rebootState::reboot;
+    }
+
+    extern "C" {
+        void _platform_exit(void)
+        {
+            static constexpr auto POWER_SWITCH_PIN = 7;
+            static const auto POWER_SWITCH_PORT = GPIO2;
+            switch(rebootProgress)
+            {
+                case rebootState::none:
+                    break;
+                case rebootState::poweroff:
+                    GPIO_PinWrite(POWER_SWITCH_PORT, POWER_SWITCH_PIN, 0);
+                    break;
+                case rebootState::reboot:
+                    NVIC_SystemReset();
+                    break;
+            }
+        }
     }
 
 } // namespace bsp

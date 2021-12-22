@@ -182,10 +182,12 @@ namespace sys
             systemDeinit();
         }
 
+        // Power off request (pending)
+        PowerOff();
+
+        //  End of scheduler and back to the main and poweroff
         EndScheduler();
 
-        // Power off system
-        PowerOff();
     }
 
     void SystemManagerCommon::initialize()

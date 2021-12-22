@@ -71,7 +71,11 @@ extern "C"
 extern "C"
 {
 #endif
-
+    /* Platform exit function it is a last function called after system
+     * deinitalization. It should be used to cutoff power
+     */
+    WEAK void _platform_exit(void)
+    {}
     //*****************************************************************************
     // Variable to store CRP value in. Will be placed automatically
     // by the linker when "Enable Code Read Protect" selected.
@@ -746,7 +750,7 @@ __attribute__((section(".after_vectors.reset"))) void ResetISR(void)
 #else
     main();
 #endif
-
+    _platform_exit();
     //
     // main() shouldn't return, but if it does, we'll just enter an infinite loop
     //
