@@ -1960,22 +1960,22 @@ auto ServiceCellular::handleCellularGetFirmwareVersionMessage(sys::Message *msg)
 auto ServiceCellular::handleEVMStatusMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     using namespace bsp::cellular::status;
-    auto message = static_cast<sevm::StatusStateMessage *>(msg);
-        auto status_pin = message->state;
-        if (priv->modemResetHandler->handleStatusPinEvent(status_pin == value::ACTIVE)) {
-            return std::make_shared<CellularResponseMessage>(true);
-        }
+    auto message    = static_cast<sevm::StatusStateMessage *>(msg);
+    auto status_pin = message->state;
+    if (priv->modemResetHandler->handleStatusPinEvent(status_pin == value::ACTIVE)) {
+        return std::make_shared<CellularResponseMessage>(true);
+    }
 
-        if (status_pin == value::ACTIVE) {
-            if (priv->state->get() == State::ST::PowerUpProcedure) {
-                priv->state->set(State::ST::PowerUpInProgress); // and go to baud detect as usual
-            }
+    if (status_pin == value::ACTIVE) {
+        if (priv->state->get() == State::ST::PowerUpProcedure) {
+            priv->state->set(State::ST::PowerUpInProgress); // and go to baud detect as usual
         }
-        if (status_pin == value::INACTIVE) {
-            if (priv->state->get() == State::ST::PowerDownWaiting) {
-                priv->state->set(State::ST::PowerDown);
-            }
+    }
+    if (status_pin == value::INACTIVE) {
+        if (priv->state->get() == State::ST::PowerDownWaiting) {
+            priv->state->set(State::ST::PowerDown);
         }
+    }
     return std::make_shared<CellularResponseMessage>(true);
 }
 
