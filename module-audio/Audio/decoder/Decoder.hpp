@@ -84,7 +84,7 @@ namespace audio
         float position      = 0;
         std::FILE *fd       = nullptr;
         std::unique_ptr<char[]> streamBuffer;
-        uint32_t fileSize   = 0;
+        uint32_t fileSize = 0;
         std::string filePath;
 
         // Worker buffer used for converting mono stream to stereo
