@@ -70,6 +70,7 @@ namespace app::bell_settings
     }
     void FrontlightModel::setBrightness(Brightness value)
     {
+        hasUnsavedChanges = true;
         screen_light_control::ConstLinearProgressModeParameters parameters{fixedValToPercentage(value)};
         app->bus.sendUnicast(std::make_shared<sevm::ScreenLightSetConstLinearModeParams>(parameters),
                              service::name::evt_manager);
@@ -83,11 +84,19 @@ namespace app::bell_settings
         return *modeAdapter;
     }
 
-    void FrontlightModel::restorePreviousState()
+    void FrontlightModel::revertUnsavedChanges()
     {
         setStatus(false);
+        if (!hasUnsavedChanges) {
+            return;
+        }
         setMode(modeAdapter->getValue() == autoStr ? screen_light_control::ScreenLightMode::Automatic
                                                    : screen_light_control::ScreenLightMode::Manual);
         setBrightness(brightnessAdapter->getValue());
+    }
+
+    void FrontlightModel::setChangesSaved()
+    {
+        hasUnsavedChanges = false;
     }
 } // namespace app::bell_settings

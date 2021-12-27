@@ -16,6 +16,11 @@ namespace app::bell_settings
         };
     }
 
+    FrontlightPresenter::~FrontlightPresenter()
+    {
+        revertUnsavedChanges();
+    }
+
     auto FrontlightPresenter::getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider>
     {
         return provider;
@@ -25,8 +30,14 @@ namespace app::bell_settings
     {
         provider->clearData();
     }
-    void FrontlightPresenter::exitWithoutSave()
+
+    void FrontlightPresenter::saveChanges()
     {
-        frontlightModel->restorePreviousState();
+        frontlightModel->setChangesSaved();
+    }
+
+    void FrontlightPresenter::revertUnsavedChanges()
+    {
+        frontlightModel->revertUnsavedChanges();
     }
 } // namespace app::bell_settings

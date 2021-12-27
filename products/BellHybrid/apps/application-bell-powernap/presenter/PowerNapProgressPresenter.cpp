@@ -76,7 +76,7 @@ namespace app::powernap
     void PowerNapProgressPresenter::onNapFinished()
     {
         if (alarmLightOnOffModel->getValue()) {
-            frontLightModel.restorePreviousState();
+            frontLightModel.revertUnsavedChanges();
             frontLightModel.setStatus(true);
         }
 
