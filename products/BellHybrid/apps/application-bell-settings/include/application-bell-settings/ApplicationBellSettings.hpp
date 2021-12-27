@@ -4,12 +4,13 @@
 #pragma once
 
 #include <Application.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 #include <common/models/AbstractAudioModel.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 
 namespace gui::window::name
 {
-    inline constexpr auto bellSettings             = "BellSettings";
+    inline constexpr auto bellSettings             = gui::name::window::main_window;
     inline constexpr auto bellSettingsTimeUnits    = "BellSettingsTimeUnits";
     inline constexpr auto bellSettingsDialog       = "BellSettingsDialog";
     inline constexpr auto bellSettingsFinished     = "BellSettingsFinished";
