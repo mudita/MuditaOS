@@ -32,7 +32,8 @@ namespace app::bell_settings
         virtual ~AbstractFrontlightPresenter()                                          = default;
         virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
         virtual void eraseProviderData()                                                = 0;
-        virtual void exitWithoutSave()                                                  = 0;
+        virtual void saveChanges()                                                      = 0;
+        virtual void revertUnsavedChanges()                                             = 0;
     };
 
     class FrontlightPresenter : public AbstractFrontlightPresenter
@@ -40,10 +41,12 @@ namespace app::bell_settings
       public:
         FrontlightPresenter(std::shared_ptr<FrontlightListItemProvider> &&provider,
                             std::unique_ptr<AbstractFrontlightModel> &&frontlightModel);
+        ~FrontlightPresenter();
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         void eraseProviderData() override;
-        void exitWithoutSave() override;
+        void saveChanges() override;
+        void revertUnsavedChanges() override;
 
       private:
         std::shared_ptr<FrontlightListItemProvider> provider;

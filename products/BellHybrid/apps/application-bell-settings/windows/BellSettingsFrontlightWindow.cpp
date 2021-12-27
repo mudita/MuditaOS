@@ -53,13 +53,14 @@ namespace gui
         }
 
         if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            presenter->exitWithoutSave();
+            presenter->revertUnsavedChanges();
         }
 
         return AppWindow::onInput(inputEvent);
     }
     void BellSettingsFrontlightWindow::exit()
     {
+        presenter->saveChanges();
         application->switchWindow(
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", window::name::bellSettings));

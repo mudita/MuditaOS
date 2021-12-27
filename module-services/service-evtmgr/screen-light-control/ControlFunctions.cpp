@@ -50,6 +50,7 @@ namespace screen_light_control::functions
             if (rampState < rampTarget) {
                 rampState += rampStep;
                 if (rampState >= rampTarget) {
+                    rampState         = rampTarget;
                     rampTargetReached = true;
                 }
             }

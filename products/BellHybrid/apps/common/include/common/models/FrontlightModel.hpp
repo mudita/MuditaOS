@@ -23,7 +23,8 @@ namespace app::bell_settings
         virtual void setBrightness(Brightness value)                     = 0;
         virtual void setMode(screen_light_control::ScreenLightMode mode) = 0;
         virtual void setStatus(bool onOff)                               = 0;
-        virtual void restorePreviousState()                              = 0;
+        virtual void revertUnsavedChanges()                              = 0;
+        virtual void setChangesSaved()                                   = 0;
 
         virtual gui::AbstractSettingsModel<std::uint8_t> &getBrightnessModel() = 0;
         virtual gui::AbstractSettingsModel<UTF8> &getModeModel()               = 0;
@@ -42,7 +43,8 @@ namespace app::bell_settings
         void setBrightness(Brightness value) override;
         void setMode(screen_light_control::ScreenLightMode mode) override;
         void setStatus(bool onOff) override;
-        void restorePreviousState() override;
+        void revertUnsavedChanges() override;
+        void setChangesSaved() override;
 
       private:
         template <typename ValueT> class Adapter : public gui::AbstractSettingsModel<ValueT>
@@ -68,6 +70,7 @@ namespace app::bell_settings
         std::unique_ptr<BrightnessAdapter> brightnessAdapter;
         std::unique_ptr<ModeAdapter> modeAdapter;
         ApplicationCommon *app{};
+        bool hasUnsavedChanges{false};
         const std::string autoStr;
         const std::string onDemandStr;
     };
