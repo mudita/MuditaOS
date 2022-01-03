@@ -629,7 +629,7 @@
   "app_bell_onboarding_info_deep_click_correction": "<text font='gt_pressura' weight='light' size='38'>Bądź bardziej delikatny,<br></br>spróbuj </text><text font='gt_pressura' weight='regular' size='38'>tym razem<br></br></text><text font='gt_pressura' weight='light' size='38'>lekko kliknąć</text>",
   "app_bell_onboarding_welcome": "Witamy",
   "app_bell_settings_advanced": "Zaawansowane",
-  "app_bell_settings_time_units": "Czas i jednostki",
+  "app_bell_settings_time_units": "Czas",
   "app_bell_settings_temp_scale": "Skala temperatury",
   "app_bell_settings_alarm_settings": "Alarm",
   "app_bell_settings_alarm_settings_title": "Ustawienia alarmu",
