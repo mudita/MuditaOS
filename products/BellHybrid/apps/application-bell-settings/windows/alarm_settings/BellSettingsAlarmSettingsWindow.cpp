@@ -64,7 +64,7 @@ namespace gui
 
     void BellSettingsAlarmSettingsWindow::exit()
     {
-        presenter->saveData();
+        isSaveNeeded = true;
         application->switchWindow(
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", BellSettingsAlarmSettingsMenuWindow::name));
@@ -74,6 +74,15 @@ namespace gui
     {
         if (reason != CloseReason::Popup) {
             presenter->eraseProviderData();
+        }
+    }
+    BellSettingsAlarmSettingsWindow::~BellSettingsAlarmSettingsWindow()
+    {
+        if (isSaveNeeded) {
+            presenter->saveData();
+        }
+        else {
+            presenter->exitWithoutSave();
         }
     }
 } /* namespace gui */
