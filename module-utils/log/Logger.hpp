@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,11 +34,8 @@ namespace Log
     {
       public:
         void enableColors(bool enable);
-        [[nodiscard]] static Logger &get()
-        {
-            static Logger logger;
-            return logger;
-        }
+        [[nodiscard]] static Logger &get();
+        static void destroyInstance();
         auto getLogs() -> std::string;
         void init(Application app, size_t fileSize = MAX_LOG_FILE_SIZE);
         auto log(Device device, const char *fmt, va_list args) -> int;
@@ -89,7 +86,8 @@ namespace Log
         static constexpr size_t circularBufferSize = 1000;
 
         static const char *levelNames[];
-        static std::map<std::string, logger_level> filtered;
+        std::map<std::string, logger_level> filtered;
+        static Logger *_logger;
     };
 
     const char *getTaskDesc();

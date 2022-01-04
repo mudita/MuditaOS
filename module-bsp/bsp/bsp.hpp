@@ -11,6 +11,9 @@ namespace bsp
 
     // Board system reset
     void BoardReboot();
+
+    // Register platform exit functions
+    int RegisterPlatformExitFunction(void (*func)());
 }
 
 

@@ -24,6 +24,9 @@ EXTERN(image_vector_table);
 EXTERN(boot_data);
 EXTERN(hyperflash_config);
 
+/* Ensure that newlib runs the finalizers.  */
+__libc_fini = _fini;
+
 SECTIONS
 {
     /* Image Vector Table and Boot Data for booting from external flash */
@@ -123,8 +126,15 @@ SECTIONS
         KEEP (*(.init_array))
         __init_array_end = .;
 
-        KEEP(*(.fini));
+        . = ALIGN(4);
+        KEEP(*(.fini))
 
+        . = ALIGN(4);
+        __fini_array_start = .;
+        KEEP (*(.fini_array))
+        KEEP (*(SORT(.fini_array.*)))
+        __fini_array_end = .;
+        
         . = ALIGN(4);
         KEEP (*crtbegin.o(.ctors))
         KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))

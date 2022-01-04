@@ -24,6 +24,7 @@ void __attribute__((noreturn, used)) _exit_backtrace(int code, bool bt_dump);
  * @note Function never returns and dump backtrace when code is not equal EXIT_SUCCESS
  */
 void __attribute__((noreturn, used)) _exit(int code);
+void __attribute__((noreturn, used)) exit(int code);
 
 
 /** This is internal backtrce function
@@ -52,5 +53,3 @@ static inline void __attribute__((always_inline)) _StackTrace_Dump_And_Abort(voi
 #ifdef __cplusplus
 }
 #endif
-
-
