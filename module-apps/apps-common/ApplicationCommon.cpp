@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCommon.hpp"
@@ -689,8 +689,6 @@ namespace app
                       windowsStack().isEmpty() ? "none" : getCurrentWindow()->getName().c_str());
             return sys::msgNotHandled();
         }
-        LOG_DEBUG("rendering! %s", msg->getWindowName().c_str());
-
         render(msg->getMode());
         return sys::msgHandled();
     }

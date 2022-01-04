@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AppWindow.hpp"
@@ -66,7 +66,6 @@ namespace app
                 return true;
             });
         auto phoneLockBlueprint = [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
-            LOG_ERROR("HANDLE LOCK BLUEPRINT");
             auto popupParams = dynamic_cast<gui::PhoneUnlockInputRequestParams *>(params.get());
             if (popupParams == nullptr) {
                 LOG_ERROR("this is most probably due to wrong unique_ptr handling - please check");
