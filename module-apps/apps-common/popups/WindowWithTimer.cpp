@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WindowWithTimer.hpp"
@@ -18,10 +18,16 @@ namespace gui
         : AppWindow{app, name}, timeout{timeout}
     {
         popupTimer    = app::GuiTimerFactory::createSingleShotTimer(application, this, popup::timerName, timeout);
-        timerCallback = [this](Item &, sys::Timer &timer) {
-            LOG_DEBUG("Delayed exit timer callback");
-            application->returnToPreviousWindow();
-            return true;
+        timerCallback = [this, name](Item &, sys::Timer &timer) {
+            if (application->getCurrentWindow()->getName() == name) {
+                LOG_DEBUG("Delayed exit timer callback from: %s", name.c_str());
+                application->returnToPreviousWindow();
+                return true;
+            }
+            else {
+                LOG_DEBUG("Delayed exit from: %s not succeeded, different window displayed already", name.c_str());
+                return false;
+            }
         };
     }
 
