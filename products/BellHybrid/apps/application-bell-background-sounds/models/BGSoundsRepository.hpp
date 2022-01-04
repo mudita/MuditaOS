@@ -52,7 +52,7 @@ namespace app::bgSounds
 
     class BGSoundsRepository : public AbstractSoundsRepository, public app::AsyncCallbackReceiver
     {
-        static constexpr auto bgsoundsSubfolderPath = "assets/audio/bell/bg_sounds";
+        static constexpr auto bgsoundsSubfolderPath = "assets/audio/bg_sounds";
 
       public:
         using OnGetMusicFilesListCallback =

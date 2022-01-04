@@ -23,7 +23,7 @@
 namespace
 {
     const auto backgroundSoundsFilesPath =
-        purefs::createPath(purefs::dir::getCurrentOSPath(), "assets/audio/bell/bg_sounds").string();
+        purefs::createPath(purefs::dir::getCurrentOSPath(), "assets/audio/bg_sounds").string();
 }
 
 namespace app
