@@ -15,7 +15,7 @@ namespace
     inline constexpr auto meditationProgressTimerName = "MeditationProgressTimer";
     inline constexpr std::chrono::seconds baseTick{1};
     inline constexpr auto meditationProgressMode = app::ProgressCountdownMode::Increasing;
-    inline constexpr auto meditationAudioPath    = "assets/audio/bell/meditation/Meditation_Gong.mp3";
+    inline constexpr auto meditationAudioPath    = "assets/audio/meditation/Meditation_Gong.mp3";
 
     using namespace app::meditationStyle;
 

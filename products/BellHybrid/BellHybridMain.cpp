@@ -51,7 +51,7 @@ int main()
     constexpr auto ApplicationName = "BellHybrid";
 
     const std::vector<std::string> fileIndexerAudioPaths = {
-        {purefs::dir::getCurrentOSPath() / "assets/audio/bell/bg_sounds"}};
+        {purefs::dir::getCurrentOSPath() / "assets/audio/bg_sounds"}};
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
