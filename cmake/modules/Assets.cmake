@@ -25,7 +25,7 @@ function(add_assets_target)
             ${_ASSETS_SOURCE_DIR}/assets
             ${_ASSETS_SOURCE_DIR}/country-codes.db
             ${_ASSETS_DEST_DIR}/current
-        COMMAND rsync -qravu --delete ${EXCLUDED}
+        COMMAND rsync -qravu ${EXCLUDED}
             ${_ASSETS_SOURCE_DIR}/user
             ${_ASSETS_DEST_DIR}
         COMMAND find ${_ASSETS_DEST_DIR} -name "*-devel*" | sed "\"s,\\(.*\\)-devel\\(.*\\),& \\1\\2,\"" | xargs --no-run-if-empty -L1 mv
