@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
@@ -36,23 +36,6 @@ namespace app
         : Application(name, parent, statusIndicators, startInBackground, stackDepth)
     {
         registerOnPopCallback([](WindowsStack &windowsStack) { windowsStack.dropPendingPopups(); });
-        //        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
-        //            auto val = ((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
-        //                        (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
-        //                        (isCurrentWindow(gui::BellTurnOffWindow::name)));
-        //            if (val) {
-        //                LOG_INFO("popup blocked");
-        //                return !val;
-        //            }
-        //            if (not(((popupParams.getPopupId() == gui::popup::ID::AlarmActivated ||
-        //                      popupParams.getPopupId() == gui::popup::ID::AlarmDeactivated)) and
-        //                    (not isHomeScreenFocused()))) {
-        //                LOG_INFO("popup blocked");
-        //                return false;
-        //            }
-        //            return true;
-        //        });
-
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
