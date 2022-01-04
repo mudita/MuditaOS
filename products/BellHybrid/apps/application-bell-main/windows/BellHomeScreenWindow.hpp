@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "layouts/BaseHomeScreenLayout.hpp"
 #include "models/TemperatureModel.hpp"
 #include "presenters/HomeScreenPresenter.hpp"
 #include "widgets/BellBattery.hpp"
@@ -27,20 +28,16 @@ namespace style::bell_home_screen
 
 namespace gui
 {
-    class BellBaseLayout;
-    class TextFixedSize;
-    class AlarmSetSpinner;
-    class TimeSetFmtSpinner;
-    class SnoozeTimer;
-
     class BellHomeScreenWindow : public AppWindow, public app::home_screen::AbstractView
     {
       public:
         BellHomeScreenWindow(app::ApplicationCommon *app,
-                             std::unique_ptr<app::home_screen::AbstractPresenter> presenter);
+                             std::unique_ptr<app::home_screen::AbstractPresenter> presenter,
+                             std::vector<std::shared_ptr<BaseHomeScreenLayout>> layouts);
 
       private:
         void buildInterface() override;
+        void setLayout(std::string layoutName) override;
         bool updateTime() override;
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -49,7 +46,7 @@ namespace gui
         void setAlarmTriggered() override;
         void setAlarmActive(bool val) override;
         void setAlarmEdit(bool val) override;
-        void setHeaderViewMode(app::home_screen::HeaderViewMode mode) override;
+        void setViewState(app::home_screen::ViewState state) override;
         std::time_t getAlarmTime() const override;
         void setAlarmTime(std::time_t newTime) override;
         void setSnoozeTime(std::time_t newTime) override;
@@ -58,6 +55,7 @@ namespace gui
 
         void setTemperature(utils::temperature::Temperature newTemp) override;
         void setBottomDescription(const UTF8 &desc) override;
+        void removeBottomDescription() override;
         void setBatteryLevelState(const Store::Battery &batteryContext) override;
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
@@ -68,16 +66,10 @@ namespace gui
 
         bool updateBatteryStatus() override;
 
-        BellBaseLayout *body{};
-
-        TimeSetFmtSpinner *time{};
-        HBox *bottomBox{};
-        BellBattery *battery{};
-        TextFixedSize *bottomText{};
-        AlarmSetSpinner *alarm{};
-        SnoozeTimer *snoozeTimer{};
-
         std::unique_ptr<app::home_screen::AbstractPresenter> presenter;
+        std::vector<std::shared_ptr<BaseHomeScreenLayout>> layouts;
+
+        std::shared_ptr<BaseHomeScreenLayout> currentLayout;
 
         static constexpr auto timerName = "HS_timer";
     };

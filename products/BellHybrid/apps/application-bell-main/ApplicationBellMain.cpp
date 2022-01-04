@@ -2,6 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
+#include "layouts/BaseHomeScreenLayout.hpp"
+#include "layouts/HomeScreenLayoutClassic.hpp"
+#include "layouts/HomeScreenLayoutClassicWithAmPm.hpp"
+#include "layouts/HomeScreenLayoutClassicWithBattery.hpp"
 #include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
 #include "presenters/HomeScreenPresenter.hpp"
@@ -82,7 +86,11 @@ namespace app
             auto alarmModel       = std::make_unique<app::AlarmModel>(app);
             auto presenter        = std::make_unique<app::home_screen::HomeScreenPresenter>(
                 app, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
-            return std::make_unique<gui::BellHomeScreenWindow>(app, std::move(presenter));
+            std::vector<std::shared_ptr<gui::BaseHomeScreenLayout>> layouts;
+            layouts.push_back(std::make_shared<gui::HomeScreenLayoutClassic>("Classic"));
+            layouts.push_back(std::make_shared<gui::HomeScreenLayoutClassicWithAmPm>("ClassicWithAmPm"));
+            layouts.push_back(std::make_shared<gui::HomeScreenLayoutClassicWithBattery>("ClassicWithBattery"));
+            return std::make_unique<gui::BellHomeScreenWindow>(app, std::move(presenter), layouts);
         });
 
         windowsFactory.attach(gui::window::name::bell_main_menu, [](ApplicationCommon *app, const std::string &name) {

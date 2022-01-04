@@ -4,9 +4,16 @@ add_library(bell::app-main ALIAS application-bell-main)
 target_sources(application-bell-main
     PRIVATE
         ApplicationBellMain.cpp
+
+        layouts/HomeScreenLayoutClassic.cpp
+        layouts/HomeScreenLayoutClassicWithAmPm.cpp
+        layouts/HomeScreenLayoutClassicWithBattery.cpp
+
         widgets/BellBattery.cpp
         widgets/ProgressTimerWithSnoozeTimer.cpp
         widgets/SnoozeTimer.cpp
+        widgets/StatusBox.cpp
+
         windows/BellBatteryShutdownWindow.cpp
         windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
@@ -18,9 +25,15 @@ target_sources(application-bell-main
         presenters/HomeScreenPresenter.cpp
         presenters/StateController.cpp
 
+        layouts/BaseHomeScreenLayout.hpp
+        layouts/HomeScreenLayoutClassic.hpp
+        layouts/HomeScreenLayoutClassicWithAmPm.hpp
+        layouts/HomeScreenLayoutClassicWithBattery.hpp
+
         widgets/BellBattery.hpp
         widgets/ProgressTimerWithSnoozeTimer.hpp
         widgets/SnoozeTimer.hpp
+        widgets/StatusBox.hpp
 
         windows/BellBatteryShutdownWindow.hpp
         windows/BellHomeScreenWindow.hpp

@@ -40,12 +40,18 @@ namespace app::home_screen
     class AbstractBatteryModel;
     class AbstractTemperatureModel;
 
-    enum class HeaderViewMode
+    enum class ViewState
     {
-        Empty,
-        AlarmIcon,
-        AlarmIconAndTime,
-        SnoozeCountdown
+        Deactivated,
+        DeactivatedWait,
+        WaitForConfirmation,
+        AlarmEdit,
+        ActivatedWait,
+        Activated,
+        AlarmRinging,
+        AlarmRingingDeactivatedWait,
+        AlarmSnoozedWait,
+        AlarmSnoozed
     };
 
     class AbstractView
@@ -57,7 +63,7 @@ namespace app::home_screen
         virtual void setAlarmTriggered()                                     = 0;
         virtual void setAlarmActive(bool)                                    = 0;
         virtual void setAlarmEdit(bool)                                      = 0;
-        virtual void setHeaderViewMode(HeaderViewMode mode)                  = 0;
+        virtual void setViewState(ViewState state)                           = 0;
         virtual std::time_t getAlarmTime() const                             = 0;
         virtual void setAlarmTime(std::time_t time)                          = 0;
         virtual void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
@@ -72,12 +78,14 @@ namespace app::home_screen
         /// Bottom box related API(descriptionn battery or time)
         virtual void setTemperature(utils::temperature::Temperature newTemp)    = 0;
         virtual void setBottomDescription(const UTF8 &desc)                     = 0;
+        virtual void removeBottomDescription()                                  = 0;
         virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
 
         /// Various
-        virtual void switchToMenu()                  = 0;
-        virtual void switchToBatteryStatus()         = 0;
-        virtual void setSnoozeTime(std::time_t time) = 0;
+        virtual void setLayout(std::string layoutName) = 0;
+        virtual void switchToMenu()                    = 0;
+        virtual void switchToBatteryStatus()           = 0;
+        virtual void setSnoozeTime(std::time_t time)   = 0;
     };
 
     class AbstractPresenter : public BasePresenter<AbstractView>

@@ -57,27 +57,41 @@ namespace gui
                 img->setMargins(gui::Margins(battery::image_left_margin, 0, battery::image_right_margin, 0));
                 img->informContentChanged();
             }
-
-            percentText->setText(std::to_string(level) + "%");
-            setVisible(true);
         }
         else {
-            if (level > 20) {
-                setVisible(false);
-            }
-            else {
+            LOG_DEBUG("Setting: %s", result->image.c_str());
+            img->set(result->image, gui::ImageTypeSpecifier::W_M);
+            if (level <= 20) {
                 if (level < 10) {
                     img->setMargins(gui::Margins(battery::image_left_margin_big, 0, battery::image_right_margin, 0));
-                    img->informContentChanged();
                 }
                 else {
                     img->setMargins(gui::Margins(battery::image_left_margin, 0, battery::image_right_margin, 0));
-                    img->informContentChanged();
                 }
-                img->set(result->image, gui::ImageTypeSpecifier::W_M);
-                percentText->setText(std::to_string(level) + "%");
-                setVisible(true);
             }
+            img->informContentChanged();
         }
+
+        if (batteryPercentMode == BatteryPercentMode::Static || level < 10 ||
+            batteryContext.state == Store::Battery::State::Charging) {
+            percentText->setText(std::to_string(level) + "%");
+            percentText->setVisible(true);
+        }
+        else {
+            percentText->setVisible(false);
+        }
+        percentText->informContentChanged();
+    }
+
+    void BellBattery::setBatteryPercentMode(BatteryPercentMode mode)
+    {
+        batteryPercentMode = mode;
+    }
+
+    std::uint32_t BellBattery::getLevel()
+    {
+        auto percentTextStr  = std::string(percentText->getText().c_str());
+        auto batteryLevelStr = percentTextStr.substr(0, percentTextStr.size() - 1);
+        return std::stoi(batteryLevelStr);
     }
 } // namespace gui

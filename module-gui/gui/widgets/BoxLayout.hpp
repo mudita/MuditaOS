@@ -141,12 +141,12 @@ namespace gui
     class VBox : public BoxLayout
     {
       public:
-        void resizeItems() override;
+        virtual void resizeItems() override;
         VBox();
         VBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
-        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
+        virtual auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
     };
 
 } /* namespace gui */
