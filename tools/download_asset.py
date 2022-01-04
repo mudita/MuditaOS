@@ -125,8 +125,6 @@ class Verse:
             self.output = Path(self.name)
         if self.tarfile != "":
             self.unpack = True
-            if './' == self.tarfile[0:2]:
-                self.tarfile = self.tarfile[2:]
         if not self.unpack:
             self.copy = True
         elif self.tarfile == "":
@@ -247,7 +245,10 @@ class BaseOps:
         if not in_cache:
             try:
                 with tarfile.open(file_name) as tar:
-                    tar.extract(what, path=cached.parent)
+                    extract = next(filter(lambda x: Path(x.name) == Path(what), tar.getmembers()), None)
+                    if extract is None:
+                        raise RuntimeError(f"file {what} not found in tar: {file_name}")
+                    tar.extract(extract, path=cached.parent)
                     (cached.parent / what).rename(cached)
             except KeyError:
                 raise RuntimeError(f"file {what} not found in tar: {file_name}")
