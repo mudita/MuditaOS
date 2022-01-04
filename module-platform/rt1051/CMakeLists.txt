@@ -28,5 +28,5 @@ target_link_libraries(
         platform
 
     PRIVATE
-        module-vfs
+        module-vfs log
 )

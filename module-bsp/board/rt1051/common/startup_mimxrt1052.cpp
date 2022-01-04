@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 //*****************************************************************************
@@ -58,6 +58,7 @@
 extern "C"
 {
     extern void __libc_init_array(void);
+    extern void __call_exitprocs(int code, void *d);
 }
 #endif
 #endif
@@ -750,6 +751,8 @@ __attribute__((section(".after_vectors.reset"))) void ResetISR(void)
 #else
     main();
 #endif
+    // call global destructors and functions registered using atexit
+    __call_exitprocs(0, 0);
     _platform_exit();
     //
     // main() shouldn't return, but if it does, we'll just enter an infinite loop

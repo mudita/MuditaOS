@@ -60,6 +60,8 @@ add_compile_options(
 set(TARGET_SOURCES
 
         ${CMAKE_CURRENT_LIST_DIR}/module-os/board/rt1051/_exit.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/module-os/board/rt1051/__atexit.c
+        ${CMAKE_CURRENT_LIST_DIR}/module-os/board/rt1051/__call_atexit.c
         CACHE INTERNAL ""
 )
 

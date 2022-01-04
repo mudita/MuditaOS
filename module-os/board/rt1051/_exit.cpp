@@ -40,26 +40,25 @@
 #include <string.h>
 #include <exit_backtrace.h>
 #include <purefs/vfs_subsystem.hpp>
-#include <bsp/bsp.hpp>
-
 
 static void __attribute__((noreturn)) stop_system(void)
 {
-    if(!isIRQ()) {
+    if (!isIRQ()) {
         if (dumpLogs() != 1) {
             LOG_ERROR("Cannot dump logs");
         }
         const auto err = purefs::subsystem::unmount_all();
-        if(err) {
+        if (err) {
             LOG_WARN("Unable unmount all filesystems with error: %i.", err);
-        } else {
+        }
+        else {
             LOG_INFO("Filesystems unmounted successfully...");
         }
     }
-    LOG_INFO("Restarting the system...");
+    vTaskSuspendAll();
     haltIfDebugging();
-    bsp::BoardReboot();
-    vTaskEndScheduler();
+    LOG_INFO("Restarting the system...");
+    NVIC_SystemReset();
     // waiting for system reset
     while (1) {
 #ifndef DEBUG
@@ -81,4 +80,10 @@ void __attribute__((noreturn, used)) _exit_backtrace(int code, bool bt_dump)
 void __attribute__((noreturn, used)) _exit(int code)
 {
      _exit_backtrace(code, code!=0);
+}
+
+void __attribute__((noreturn, used)) exit(int code)
+{
+    // do not call global destructors and atexit registered functions
+    _exit(code);
 }

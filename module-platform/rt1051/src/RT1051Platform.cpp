@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <platform/rt1051/RT1051Platform.hpp>
@@ -8,6 +8,7 @@
 #include <bsp/bsp.hpp>
 #include <purefs/vfs_subsystem.hpp>
 #include <exception>
+#include <Logger.hpp>
 
 using platform::rt1051::BlockDeviceFactory;
 using platform::rt1051::RT1051Platform;
@@ -15,6 +16,7 @@ using platform::rt1051::RT1051Platform;
 RT1051Platform::RT1051Platform()
 {
     bsp::BoardInit();
+    bsp::RegisterPlatformExitFunction(Log::Logger::destroyInstance);
 }
 
 void RT1051Platform::init()

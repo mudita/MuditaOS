@@ -188,9 +188,36 @@ namespace bsp
         rebootProgress = rebootState::reboot;
     }
 
+    struct PlatformExitObject
+    {
+        void (*func)();
+    };
+    static unsigned short iObject = 0;
+    constexpr auto MAX_PLATFORM_EXIT_OBJECTS = 16u;
+
+    static PlatformExitObject objects[MAX_PLATFORM_EXIT_OBJECTS];
+
+    int RegisterPlatformExitFunction(void (*func)())
+    {
+        if (iObject >= sizeof(objects))
+            return -1;
+        objects[iObject].func = func;
+        ++iObject;
+        return 0;
+    }
+
+    void CallPlatformExitFunctions()
+    {
+        while (iObject > 0) {
+            objects[--iObject].func();
+        }
+    }
+
     extern "C" {
         void _platform_exit(void)
         {
+            CallPlatformExitFunctions();
+
             static constexpr auto POWER_SWITCH_PIN = 7;
             static const auto POWER_SWITCH_PORT = GPIO2;
             switch(rebootProgress)

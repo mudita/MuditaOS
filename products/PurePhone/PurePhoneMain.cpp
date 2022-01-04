@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "config.h"
@@ -70,6 +70,24 @@
 
 #include <memory>
 #include <vector>
+#include <cstdlib>
+
+void atexit_cleanup_handler()
+{
+    LOG_INFO("Starting clean up");
+}
+
+class Cleanup
+{
+  public:
+    ~Cleanup()
+    {
+        const int result_2 = std::atexit(atexit_cleanup_handler);
+        if (result_2 != 0) {
+            LOG_FATAL("at exit failed");
+        }
+    }
+};
 
 int main()
 {
@@ -204,9 +222,11 @@ int main()
             return true;
         });
 
-    LOG_PRINTF("Launching %s \n", ApplicationName);
-    LOG_PRINTF("commit: %s version: %s branch: %s\n", GIT_REV, VERSION, GIT_BRANCH);
+    LOG_INFO("Launching %s ", ApplicationName);
+    LOG_INFO("commit: %s version: %s branch: %s", GIT_REV, VERSION, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
-    LOG_PRINTF("Scheduler is terminated properly\n");
+    LOG_INFO("Scheduler is terminated properly");
+    Cleanup cleanup;
+
     return 0;
 }

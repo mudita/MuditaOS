@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "critical.hpp"
@@ -12,25 +12,8 @@
 
 namespace Log
 {
-    std::map<std::string, logger_level> Logger::filtered = {{"ApplicationManager", logger_level::LOGINFO},
-#if (!LOG_SENSITIVE_DATA_ENABLED)
-                                                            {"CellularMux", logger_level::LOGINFO},
-                                                            {"ServiceCellular", logger_level::LOGINFO},
-#endif
-                                                            {"ServiceAntenna", logger_level::LOGERROR},
-                                                            {"ServiceAudio", logger_level::LOGINFO},
-                                                            {"ServiceBluetooth", logger_level::LOGINFO},
-                                                            {"ServiceBluetooth_w1", logger_level::LOGINFO},
-                                                            {"ServiceFota", logger_level::LOGINFO},
-                                                            {"ServiceEink", logger_level::LOGINFO},
-                                                            {"ServiceDB", logger_level::LOGINFO},
-                                                            {CRIT_STR, logger_level::LOGTRACE},
-                                                            {IRQ_STR, logger_level::LOGTRACE},
-                                                            {"FileIndexer", logger_level::LOGINFO},
-                                                            {"ServiceAudio", logger_level::LOGERROR},
-                                                            {"EventManager", logger_level::LOGINFO}};
-
-    const char *Logger::levelNames[]                     = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+    const char *Logger::levelNames[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+    Logger *Logger::_logger          = nullptr;
 
     std::ostream &operator<<(std::ostream &stream, const Application &application)
     {
@@ -40,7 +23,27 @@ namespace Log
     }
 
     Logger::Logger() : circularBuffer{circularBufferSize}, rotator{".log"}
-    {}
+    {
+        filtered = {
+            {"ApplicationManager", logger_level::LOGINFO},
+#if (!LOG_SENSITIVE_DATA_ENABLED)
+            {"CellularMux", logger_level::LOGINFO},
+            {"ServiceCellular", logger_level::LOGINFO},
+#endif
+            {"ServiceAntenna", logger_level::LOGERROR},
+            {"ServiceAudio", logger_level::LOGINFO},
+            {"ServiceBluetooth", logger_level::LOGINFO},
+            {"ServiceBluetooth_w1", logger_level::LOGINFO},
+            {"ServiceFota", logger_level::LOGINFO},
+            {"ServiceEink", logger_level::LOGINFO},
+            {"ServiceDB", logger_level::LOGINFO},
+            {CRIT_STR, logger_level::LOGTRACE},
+            {IRQ_STR, logger_level::LOGTRACE},
+            {"FileIndexer", logger_level::LOGINFO},
+            {"ServiceAudio", logger_level::LOGERROR},
+            {"EventManager", logger_level::LOGINFO}
+        };
+    }
 
     void Logger::enableColors(bool enable)
     {
@@ -52,6 +55,19 @@ namespace Log
         else {
             logColors = &logColorsOff;
         }
+    }
+
+    void Logger::destroyInstance()
+    {
+        delete _logger;
+        _logger = nullptr;
+    }
+
+    Logger &Logger::get()
+    {
+        static auto *logger = new Logger;
+        _logger             = logger;
+        return *logger;
     }
 
     auto Logger::getLogLevel(const std::string &name) -> logger_level
