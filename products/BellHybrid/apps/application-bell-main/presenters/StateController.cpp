@@ -276,7 +276,8 @@ namespace app::home_screen
                 alarmModel.snooze();
                 view.setHeaderViewMode(HeaderViewMode::SnoozeCountdown);
                 view.setSnoozeTime(alarmModel.getTimeOfNextSnooze());
-                const auto bottomDescription = utils::time::getBottomDescription(alarmModel.getSnoozeDuration());
+                const auto bottomDescription =
+                    utils::time::getBottomDescription(alarmModel.getSnoozeDuration().count());
                 view.setBottomDescription(bottomDescription);
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };

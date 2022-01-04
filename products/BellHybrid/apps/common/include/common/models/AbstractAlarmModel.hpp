@@ -19,19 +19,19 @@ namespace app
       public:
         virtual ~AbstractAlarmModel() noexcept = default;
 
-        virtual bool isActive() const                      = 0;
-        virtual void setDefaultAlarmTime()                 = 0;
-        virtual void setAlarmTime(time_t time)             = 0;
-        virtual time_t getAlarmTime() const                = 0;
-        virtual void activate(bool value)                  = 0;
-        virtual std::uint32_t getSnoozeDuration()          = 0;
-        virtual bool isSnoozeAllowed()                     = 0;
-        virtual bool isSnoozeActive()                      = 0;
-        virtual void turnOff()                             = 0;
-        virtual void snooze()                              = 0;
-        virtual std::chrono::seconds getTimeToNextSnooze() = 0;
-        virtual std::time_t getTimeOfNextSnooze()          = 0;
-        virtual alarms::AlarmStatus getAlarmStatus()       = 0;
+        virtual bool isActive() const                          = 0;
+        virtual void setDefaultAlarmTime()                     = 0;
+        virtual void setAlarmTime(time_t time)                 = 0;
+        virtual time_t getAlarmTime() const                    = 0;
+        virtual void activate(bool value)                      = 0;
+        virtual std::chrono::seconds getSnoozeDuration() const = 0;
+        virtual bool isSnoozeAllowed()                         = 0;
+        virtual bool isSnoozeActive()                          = 0;
+        virtual void turnOff()                                 = 0;
+        virtual void snooze()                                  = 0;
+        virtual std::chrono::seconds getTimeToNextSnooze()     = 0;
+        virtual std::time_t getTimeOfNextSnooze()              = 0;
+        virtual alarms::AlarmStatus getAlarmStatus()           = 0;
         /// Command model to update its internal data
         virtual void update(AlarmModelReadyHandler callback = AlarmModelReadyHandler()) = 0;
     };

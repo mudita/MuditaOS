@@ -32,7 +32,7 @@ namespace app
         time_t getAlarmTime() const override;
         void activate(bool value) override;
         void update(AlarmModelReadyHandler callback) override;
-        std::uint32_t getSnoozeDuration() override;
+        std::chrono::seconds getSnoozeDuration() const override;
         bool isSnoozeAllowed() override;
         bool isSnoozeActive() override;
         void turnOff() override;

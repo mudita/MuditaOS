@@ -110,13 +110,13 @@ namespace app
         }
         return alarmEventPtr->enabled;
     }
-    std::uint32_t AlarmModel::getSnoozeDuration()
+    std::chrono::seconds AlarmModel::getSnoozeDuration() const
     {
         const auto snoozeDurationStr =
             settings.getValue(bell::settings::Snooze::length, settings::SettingsScope::Global);
         const auto snoozeDuration = utils::getNumericValue<std::uint32_t>(snoozeDurationStr);
 
-        return snoozeDuration;
+        return std::chrono::minutes{snoozeDuration};
     }
     bool AlarmModel::isSnoozeAllowed()
     {
