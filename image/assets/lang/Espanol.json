@@ -676,7 +676,7 @@
   "app_bell_meditation_interval_chime": "Intervalo",
   "app_bell_meditation_progress": "Meditación",
   "app_bell_meditation_interval_none": "Ninguno",
-  "app_bell_meditation_interval_every_x_minutes": "cada %0 minutos",
+  "app_bell_meditation_interval_every_x_minutes": "cada %0",
   "app_bell_meditation_put_down_and_wait": "<text>Posicione Mudita Harmony<br>y espere el gong</text>",
   "app_bell_meditation_thank_you_for_session": "<text>Gracias<br>por la sesión</text>"
 }
