@@ -36,6 +36,7 @@ namespace app
                                              std::uint32_t stackDepth)
         : Application(name, parent, statusIndicators, startInBackground, stackDepth)
     {
+        registerOnPopCallback([](WindowsStack &windowsStack) { windowsStack.dropPendingPopups(); });
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
