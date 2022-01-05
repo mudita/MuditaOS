@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellHomeScreenWindow.hpp"
@@ -188,6 +188,7 @@ namespace gui
     void BellHomeScreenWindow::setTemperature(utils::temperature::Temperature newTemp)
     {
 #if CONFIG_ENABLE_TEMP == 1
+        bottomText->setVisible(true);
         bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_normal);
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         bottomText->setText(utils::temperature::tempToStrDec(newTemp));
@@ -201,6 +202,7 @@ namespace gui
     void BellHomeScreenWindow::setBottomDescription(const UTF8 &desc)
     {
         battery->setVisible(false);
+        battery->informContentChanged();
         bottomText->setVisible(true);
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_small);
