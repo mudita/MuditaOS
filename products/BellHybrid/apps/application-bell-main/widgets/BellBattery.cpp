@@ -59,7 +59,6 @@ namespace gui
             }
         }
         else {
-            LOG_DEBUG("Setting: %s", result->image.c_str());
             img->set(result->image, gui::ImageTypeSpecifier::W_M);
             if (level <= 20) {
                 if (level < 10) {
