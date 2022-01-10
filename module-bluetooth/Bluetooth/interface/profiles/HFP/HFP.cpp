@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "HFPImpl.hpp"
@@ -469,10 +469,11 @@ namespace bluetooth
     {}
     auto HFP::HFPImpl::callAnswered() const noexcept -> Error::Code
     {
+        LOG_DEBUG("Call answered!");
+        hfp_ag_answer_incoming_call();
+        establishAudioConnection();
         if (!isAudioRouted) {
-            LOG_DEBUG("Call answered!");
-            hfp_ag_answer_incoming_call();
-            establishAudioConnection();
+            LOG_DEBUG("Routing unrouted audio after answering call");
             audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
             isAudioRouted = true;
         }
