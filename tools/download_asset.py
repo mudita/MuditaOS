@@ -3,19 +3,34 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 '''
-class to download assets listed in json file
-additional classes can be added to i.e. just copy files from some other location
-which is super simple as it uses json file for description
+utility to download assets listed in json file with specializations:
+    - straight files copy via LocalOps class
+    - GitHub API based download via GitOps
+
+base json file for description
 
 {
     "comment": "This is kiss structure - asset path & sha",         <-- random comment in file if you wish
     "assets": [
         {
-            "name": "./fonts/bell/gt_pressura_regular_38.mpf",      <-- name of our file to download in repo
+            "name": "./fonts/bell/gt_pressura_regular_38.mpf",      <-- name of our file to download from repo
             "output": "fonts/gt_pressura_regular_38.mpf",           <-- output: where should be and how shall be called the file
             "ref": "fd168040c5d1216d457e6cf223e8ea9bb76bf7b",       <-- from what ref shall we download the file ignored for local files
         },
     ...
+        {
+            "name": "./file.tar",                               <-- name of our file to download from repo
+            "tarfile": "./catalog/filename_in_tar.mpf",         <-- name of file to extract from tar in `name` field
+            "output": "fonts/gt_pressura_regular_38.mpf",       <-- output: where should be and how shall be called the file
+        },
+    ...
+        {
+            "name": "./some.file",       <-- name of our file to copy
+            "output": "somewhere.file",  <-- output: where should be and how shall be called the file
+            "copy": True                 <-- do not download, just copy file from `name` path provided
+        },
+    ...
+    ]
 }
 
 Github downloader essentially:
@@ -133,6 +148,9 @@ class Verse:
 
 @dataclass
 class Release:
+    '''
+    GitHub API release convenience dataclass
+    '''
     name: str
     id: int
     assets: List[Any]
@@ -143,9 +161,21 @@ class FileCache:
     file cache utility, right now - file cache is in cache dir
     if any improvement was to be made we should just take any ready
     library (i.e. DiskCache)
+
+    caching mechanism is very simple - it uses a cache directory where elements are stored after unpacking after download
+    therefore any downloaded file is under:
+        <cache_dir>/<ID>/name
+    where:
+        <cache_dir> is user provided directory
+        <ID> is element ID retrieved by function _get_by_gen (or provided with Verse parameter)
+        <name> name of element stored
+
     '''
 
     def __init__(self, where: str):
+        '''
+        sets cache path to use
+        '''
         self.cache = Path(where)
         self.cache.expanduser().mkdir(exist_ok=True)
 
@@ -177,6 +207,9 @@ class FileCache:
         return self._key_gen(what, sha_gen)
 
     def get(self, *args) -> Path:
+        '''
+        get path to element in cache
+        '''
         ret = None
         if len(args) == 1:
             ret = self._get_by_verse(*args)
@@ -195,6 +228,15 @@ class FileCache:
 
 
 class BaseOps:
+    '''
+    Base operations for downloader
+    Provides:
+        - cache for elements
+        - install unpack and copy_file common methods for all derived operations
+
+    Meant to be an class for all common operations so that derived class would only implement it's own
+    specific actions (i.e. downloading from github)
+    '''
     def __init__(self, cache_dir, install_dir: Union[str, None]):
         self.cache = FileCache(cache_dir)
 
@@ -206,6 +248,9 @@ class BaseOps:
             self.install_dir = Path('./')
 
     def install(self, val: Verse):
+        '''
+        base operation that copies element in verse, via it's ID using cache
+        '''
         cached = self.cache.get(val)
         # check if file in cache - if not, then populate
         if not cached:
@@ -226,6 +271,9 @@ class BaseOps:
             raise RuntimeError('no option selected for install, required either unpack or copy')
 
     def copy_file(self, what: Path, where: Path) -> None:
+        '''
+        base operation that copies element ignoring cache
+        '''
         log.debug(f'{what} -> {where}')
         self._copy_file(what, where)
 
@@ -238,6 +286,9 @@ class BaseOps:
         shutil.copy(what, where)
 
     def unpack(self, file_name: Path, what: str, where: Path, id) -> None:
+        '''
+        base operation that unpacks element by ID (using both - element and tar ID) with cache
+        '''
         import tarfile
         self._assert_parent_dir(where)
         cached = self.cache.get(what, lambda: id)
@@ -267,6 +318,17 @@ class GitOps(BaseOps):
     '''
     Simplest github download wrapper based on ghapi (passed by api)
     please see reference here: https://ghapi.fast.ai/fullapi.html
+
+    It can either:
+        - load release file and unpack files one by one
+        - load files straight from the repository
+
+    *WARNING* please mind that the current limit for filesize to download via API from the repository (not the release)
+    if limited to 1MB (server-side).
+    *WARNING* please mind that GitHub API has timing limits, therefore too many requests to the API might block your
+    access to API temporarily. Curently we do not perform any agressive pollings and are safe, though one should have
+    in mind that thousands of polls per second won't be a good idea. FastAPI tracks requests count, uses it accordingly.
+    It's possible to inspect it.
     '''
     def __init__(self, api: GhApi, cache_dir: str, install_dir, j: dict):
         BaseOps.__init__(self, cache_dir, install_dir)
@@ -320,6 +382,9 @@ class GitOps(BaseOps):
         self.api.headers['Accept'] = oldheaders
 
     def download_file_from_release(self, val: Verse):
+        '''
+        download single file from release using Verse
+        '''
         # cache after the release id not after the file id - to not download the release multiple times
         cached = self.cache.get(val)
         if not cached.exists():
@@ -328,10 +393,17 @@ class GitOps(BaseOps):
 
     @lru_cache(maxsize=None)
     def _api_list_branches(self):
+        '''
+        branches listing. used to take `master` sha
+        cached to not perform needless checks (waste of time and resources)
+        '''
         return self.api.repos.list_branches()
 
     @lru_cache(maxsize=None)
     def _api_list_releases(self):
+        '''
+        releases list, cached to not perform needless checks (waste of time and resources)
+        '''
         return self.api.repos.list_releases()
 
     def fallback_ref(self):
