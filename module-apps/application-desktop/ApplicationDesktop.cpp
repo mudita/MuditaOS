@@ -221,10 +221,7 @@ namespace app
         }
         else {
             blockAllPopups = false;
-            if (currentWindow->getName() == app::window::name::dead_battery ||
-                currentWindow->getName() == app::window::name::charging_battery) {
-                app::manager::Controller::sendAction(this, app::manager::actions::Home, std::move(data));
-            }
+            app::manager::Controller::sendAction(this, app::manager::actions::Home, std::move(data));
         }
     }
 } // namespace app
