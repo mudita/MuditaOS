@@ -927,8 +927,8 @@ namespace app
 
     bool ApplicationCommon::isCurrentWindow(const std::string &windowName) const noexcept
     {
-        if (const auto &window = windowsStack().get(windowName); window != nullptr) {
-            return window->getName() == windowName;
+        if (const auto &window = windowsStack().get(topWindow); window != std::nullopt) {
+            return window == windowName;
         }
         LOG_ERROR("no window: %s", windowName.c_str());
         return false;

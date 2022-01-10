@@ -26,6 +26,7 @@ namespace gui
 
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void onClose(CloseReason reason) override;
         void buildInterface() override;
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
@@ -40,6 +41,10 @@ namespace gui
         bool processLongReleaseEvent(const InputEvent &inputEvent);
 
       private:
+        static constexpr auto refreshTimerName = "PhoneLockRefreshTimer";
+        static constexpr auto refreshTimeout   = std::chrono::hours(4);
+        sys::TimerHandle screenRefreshTimer;
+
         std::shared_ptr<WallpaperClock> clockWallpaper;
         std::unique_ptr<WallpaperPresenter> wallpaperPresenter;
     };

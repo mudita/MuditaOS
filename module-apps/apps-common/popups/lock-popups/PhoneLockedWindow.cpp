@@ -3,6 +3,7 @@
 
 #include "PhoneLockedWindow.hpp"
 #include "PhoneLockedInfoData.hpp"
+#include "Timers/TimerFactory.hpp"
 
 #include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -24,6 +25,12 @@ namespace gui
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
+
+        screenRefreshTimer =
+            sys::TimerFactory::createPeriodicTimer(application, refreshTimerName, refreshTimeout, [this](sys::Timer &) {
+                application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
+                return;
+            });
     }
 
     void PhoneLockedWindow::buildInterface()
@@ -61,6 +68,7 @@ namespace gui
             navBar->setText(nav_bar::Side::Center, utils::translate("app_desktop_unlock"));
             navBar->setActive(nav_bar::Side::Right, false);
         }
+        screenRefreshTimer.start();
     }
 
     bool PhoneLockedWindow::updateTime()
@@ -103,6 +111,11 @@ namespace gui
                                                  app::manager::OnSwitchBehaviour::RunInBackground);
         }
         return true;
+    }
+
+    void PhoneLockedWindow::onClose(Window::CloseReason reason)
+    {
+        screenRefreshTimer.stop();
     }
 
     status_bar::Configuration PhoneLockedWindow::configureStatusBar(status_bar::Configuration appConfiguration)
