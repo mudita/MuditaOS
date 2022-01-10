@@ -40,22 +40,23 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
    * [Internationalization](#Internationalization)
    * [Development workflow](#Development-workflow)
 * [Documentation](#documentation)
-   * [How to generate documentation using Doxygen](#How-to-generate-documentation-using-Doxygen)    
+   * [How to generate documentation using Doxygen](#How-to-generate-documentation-using-Doxygen)
+   * [Build targets supported by MuditaOS](./doc/build_targets.md)
 * [License](#license)
 
 ## Quickstart
 
 You can quickstart the project by going through one of the following guides:
 
-- [Quickstart using Docker](./doc/quickstart.md#quickstart-using-docker)
-- [Building your own Docker image](./doc/quickstart.md#building-your-own-docker-image)
-- [Quickstart in your local environment](./doc/quickstart.md#quickstart-in-your-local-environment)
-- [Longstart](./doc/quickstart.md#longstart)
-- [Super dirty quickstart on Linux](./doc/quickstart.md#super-dirty-quickstart-on-linux)
-- [Super dirty quickstart with unit tests](./doc/quickstart.md#super-dirty-quickstart-with-unit-tests)
-- [Super dirty quickstart on the phone](./doc/quickstart.md#super-dirty-quickstart-on-the-phone)
-- [Preparing packages](./doc/quickstart.md#preparing-packages)
-- [Logging engine](./module-utils/log/doc/logging_engine.md)
+- [Quickstart](./doc/quickstart.md#Quickstart)
+    - [Quickstart using Docker](./doc/quickstart.md#quickstart-using-docker)
+    - [Building your own Docker image](./doc/quickstart.md#building-your-own-docker-image)
+    - [Quickstart in your local environment](./doc/quickstart.md#quickstart-in-your-local-environment)
+    - [Super dirty quickstart on Linux](./doc/quickstart.md#super-dirty-quickstart-on-linux)
+    - [Super dirty quickstart with unit tests](./doc/quickstart.md#super-dirty-quickstart-with-unit-tests)
+    - [Super dirty quickstart on the phone](./doc/quickstart.md#super-dirty-quickstart-on-the-phone)
+    - [Preparing packages](./doc/quickstart.md#preparing-packages)
+- [How to use Logging engine](./module-utils/log/doc/logging_engine.md)
 
 ## Contributing
 

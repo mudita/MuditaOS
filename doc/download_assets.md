@@ -6,7 +6,8 @@ Building update packages requires external assets located on external repositori
 
 The tool can be used to:
 - list releases from the repository from the Mudita organization
-- download selected assets from the repository from the Mudita organization
+- download selected assets from the repositories from the Mudita organization via GitHub API
+- download selected asset release from the repositories to get asset files via GitHub API and tar library
 
 The tool uses `argparse` to provide CLI and the best user experience.
 Please see `download_asset.py --help` for up to date parameters use and documentation
@@ -52,7 +53,7 @@ git config user.apitoken
 git config user.apitoken
 ```
 
-**if not**  please add token ( see doc: [documentation](../doc/download_asset.md)
+**if not**  please add the token ( see doc: [documentation](./doc/download_assets.md#github-api-token)
 
 1. check if you have access to the PureUpdater repository in read mode
 
