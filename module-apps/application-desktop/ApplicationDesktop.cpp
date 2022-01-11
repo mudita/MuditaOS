@@ -208,14 +208,14 @@ namespace app
     void ApplicationDesktop::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
     {
         auto lowBatteryState = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
+        blockAllPopups       = lowBatteryState->isActive();
         auto currentWindow   = getCurrentWindow();
         if (currentWindow->getName() == app::window::name::dead_battery ||
             currentWindow->getName() == app::window::name::charging_battery) {
             data->ignoreCurrentWindowOnStack = true;
         }
 
-        if (lowBatteryState->isActive()) {
-            blockAllPopups = true;
+        if (blockAllPopups) {
             if (lowBatteryState->isCharging()) {
                 switchWindow(app::window::name::charging_battery, std::move(data));
             }
@@ -224,7 +224,6 @@ namespace app
             }
         }
         else {
-            blockAllPopups = false;
             app::manager::Controller::sendAction(this, app::manager::actions::Home, std::move(data));
         }
     }
