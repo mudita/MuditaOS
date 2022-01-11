@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryCharger.hpp"
@@ -6,10 +6,25 @@
 #include <bsp/battery_charger/battery_charger.hpp>
 #include <hal/GenericFactory.hpp>
 
+namespace
+{
+    constexpr uint16_t clearStatusTickTime_MS = 10000;
+
+    void clearIrqStatusHandler(TimerHandle_t xTimer)
+    {
+        if (bsp::battery_charger::getStatusRegister()) {
+            bsp::battery_charger::clearFuelGuageIRQ(
+                static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::all));
+        }
+    }
+} // namespace
+
 namespace hal::battery
 {
     BatteryCharger::BatteryCharger(AbstractBatteryCharger::BatteryChargerEvents &eventsHandler)
-        : eventsHandler(eventsHandler)
+        : eventsHandler(eventsHandler),
+          timerHandle{xTimerCreate(
+              "clearIrqStatusTimer", pdMS_TO_TICKS(clearStatusTickTime_MS), false, nullptr, clearIrqStatusHandler)}
     {}
 
     void BatteryCharger::init(xQueueHandle queueBatteryHandle, xQueueHandle queueChargerDetect)
@@ -73,7 +88,15 @@ namespace hal::battery
                 bsp::battery_charger::clearFuelGuageIRQ(
                     static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert));
 
-                eventsHandler.onBrownout();
+                if (bsp::battery_charger::getChargeStatus()) {
+                    if (xTimerIsTimerActive(timerHandle) == pdFALSE) {
+                        xTimerStart(timerHandle, 0);
+                        LOG_DEBUG("Battery Brownout detected while charging");
+                    }
+                }
+                else {
+                    eventsHandler.onBrownout();
+                }
             }
             if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange)) {
                 bsp::battery_charger::printFuelGaugeInfo();
