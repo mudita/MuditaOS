@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemWatchdog/SystemWatchdog.hpp>
@@ -34,6 +34,7 @@ namespace sys
         }
         bsp::watchdog::refresh();
 
+        enableRunLoop = true;
         if (!Start()) {
             return false;
         }
@@ -54,8 +55,8 @@ namespace sys
 
     void SystemWatchdog::Run()
     {
-        while (true) {
-            vTaskDelay(checkPeriod);
+        while (enableRunLoop) {
+            Delay(checkPeriod);
 
             if (timeout_occurred) {
                 continue;
@@ -71,5 +72,19 @@ namespace sys
                 bsp::watchdog::refresh();
             }
         }
+
+        // notify caller of deinit()
+        taskEndedSem.Give();
+    }
+
+    void SystemWatchdog::deinit()
+    {
+#ifndef DISABLE_WATCHDOG
+        enableRunLoop = false;
+        xTaskAbortDelay(GetHandle());
+        if (!taskEndedSem.Take(closurePeriod)) {
+            LOG_ERROR("Watchdog thread was not gently closed, killing");
+        }
+#endif
     }
 } // namespace sys

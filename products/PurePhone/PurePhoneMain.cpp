@@ -219,6 +219,7 @@ int main()
                 LOG_FATAL("%s", e.what());
                 abort();
             }
+            sys::SystemWatchdog::getInstance().deinit();
             return true;
         });
 
