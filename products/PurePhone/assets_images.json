@@ -122,6 +122,8 @@
         {"name":"release.tgz", "tarfile": "./image/assets/images/call/call_add_W_M.vpi", "output": "assets/images/call/call_add_W_M.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/call/call_message_W_M.vpi", "output": "assets/images/call/call_message_W_M.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/call/call_speaker_on_W_M.vpi", "output": "assets/images/call/call_speaker_on_W_M.vpi" },
+        {"name":"release.tgz", "tarfile": "./image/assets/images/call/circle_top.mpi", "output": "assets/images/call/circle_top.mpi" },
+        {"name":"release.tgz", "tarfile": "./image/assets/images/call/circle_bottom.mpi", "output": "assets/images/call/circle_bottom.mpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/calendar_event_dot.vpi", "output": "assets/images/calendar_event_dot.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/dead_battery_W_G.vpi", "output": "assets/images/dead_battery_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/messages/messages_error_32px_W_M.vpi", "output": "assets/images/messages/messages_error_32px_W_M.vpi" },
@@ -166,6 +168,7 @@
         {"name":"release.tgz", "tarfile": "./image/assets/images/ice_32px_W_G.vpi", "output": "assets/images/ice_32px_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/logo_W_G.vpi", "output": "assets/images/logo_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/quote_W_G.vpi", "output": "assets/images/quote_W_G.vpi" },
+        {"name":"release.tgz", "tarfile" :"./image/assets/images/common/alarm_colon_select_W_M.vpi", "output": "assets/images/alarm_colon_select_W_M.vpi"},
 
         {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/meditation/gong.mp3", "output": "assets/audio/meditation/gong.mp3"},
         {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/sms/sms_drum.mp3", "output": "assets/audio/sms/sms_drum.mp3"},
