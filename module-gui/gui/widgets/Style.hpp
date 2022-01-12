@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -310,5 +310,20 @@ namespace style
             inline constexpr auto h                       = itemHeight * maxNotificationsPerPage;
         } // namespace model
     }     // namespace notifications
+
+    namespace wallpaper
+    {
+        namespace wallpaperBox
+        {
+            constexpr auto y = 110;
+            constexpr auto h = 534;
+        } // namespace wallpaperBox
+
+        namespace notificationTiles
+        {
+            constexpr inline auto tileIconHeight  = 45;
+            constexpr inline auto tileIconMarigin = 15;
+        } // namespace notificationTiles
+    }     // namespace wallpaper
 
 }; // namespace style

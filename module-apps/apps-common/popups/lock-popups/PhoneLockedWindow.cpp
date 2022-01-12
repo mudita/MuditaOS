@@ -8,20 +8,15 @@
 #include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <popups/data/PopupData.hpp>
+#include <notifications/NotificationsModel.hpp>
 
 namespace gui
 {
     PhoneLockedWindow::PhoneLockedWindow(app::ApplicationCommon *app,
                                          const std::string &name,
                                          std::unique_ptr<WallpaperPresenter> &&presenter)
-        : AppWindow(app, name),
-          notificationsModel(std::make_shared<NotificationsModel>(NotificationsListPlacement::LockedScreen)),
-          clockWallpaper(std::make_shared<WallpaperClock>(this, notificationsModel)),
-          wallpaperPresenter(std::move(presenter))
+        : AppWindow(app, name), wallpaperPresenter(std::move(presenter))
     {
-        wallpaperPresenter->attachWallpapers(
-            clockWallpaper, std::make_shared<WallpaperQuote>(app, this), std::make_shared<WallpaperLogo>(this));
-
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
@@ -36,11 +31,12 @@ namespace gui
     void PhoneLockedWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        wallpaperPresenter->setupWallpaper();
+        wallpaperPresenter->setupWallpaper(this);
     }
 
     void PhoneLockedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        auto notificationsModel = wallpaperPresenter->getNotificationsModel();
         auto notificationData = dynamic_cast<app::manager::actions::NotificationsChangedParams *>(data);
         if (notificationData) {
             notificationsModel->updateData(notificationData);
@@ -54,6 +50,9 @@ namespace gui
         }
 
         if (notificationsModel->isPhoneTimeLock()) {
+            wallpaperPresenter->forceClockWallpaper();
+            notificationsModel->updateData(notificationData);
+
             if (!refreshedOnPhoneLockTimeLock) {
                 application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
                 refreshedOnPhoneLockTimeLock = true;
@@ -64,6 +63,9 @@ namespace gui
             navBar->setActive(nav_bar::Side::Right, false);
         }
         else {
+            if (wallpaperPresenter->switchBackWallpaper()) {
+                notificationsModel->updateData(notificationData);
+            }
             navBar->setActive(nav_bar::Side::Left, false);
             navBar->setText(nav_bar::Side::Center, utils::translate("app_desktop_unlock"));
             navBar->setActive(nav_bar::Side::Right, false);
@@ -74,7 +76,7 @@ namespace gui
     bool PhoneLockedWindow::updateTime()
     {
         auto ret = AppWindow::updateTime();
-        clockWallpaper->updateTime();
+        wallpaperPresenter->updateTime();
         return ret;
     }
 

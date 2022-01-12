@@ -6,11 +6,8 @@
 
 namespace gui
 {
-    WallpaperClock::WallpaperClock(Item *parent, std::shared_ptr<NotificationsModel> notificationsModel)
-        : WallpaperBase(parent), notificationsModel(notificationsModel)
-    {}
-
-    void WallpaperClock::build()
+    WallpaperClock::WallpaperClock(Item *parent)
+        : WallpaperBase(parent), notificationsListPresenter(std::make_shared<NotificationsListPresenter>())
     {
         clockDate = new ClockDateWidget(
             parent, 0, style::window::default_vertical_pos, style::window_width, clock_date_widget::h);
@@ -20,7 +17,7 @@ namespace gui
                                          style::notifications::model::y,
                                          style::notifications::model::w,
                                          style::notifications::model::h,
-                                         notificationsModel,
+                                         notificationsListPresenter,
                                          listview::ScrollBarType::None);
         hide();
     }
@@ -35,6 +32,11 @@ namespace gui
     {
         clockDate->setVisible(false);
         notificationsList->setVisible(false);
+    }
+
+    std::shared_ptr<NotificationsPresenter> WallpaperClock::getNotificationsPresenter()
+    {
+        return notificationsListPresenter;
     }
 
     void WallpaperClock::updateTime()

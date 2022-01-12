@@ -1,11 +1,12 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "WallpaperBase.hpp"
 
-#include <ImageBox.hpp>
+#include <BoxLayout.hpp>
+#include <notifications/NotificationTilesBox.hpp>
 
 namespace gui
 {
@@ -13,20 +14,22 @@ namespace gui
     {
         namespace logo
         {
-            constexpr auto y = 163;
+            constexpr inline auto logoTopMarigin    = 53;
+            constexpr inline auto logoBottomMarigin = 70;
         } // namespace logo
 
     } // namespace style
     class WallpaperLogo : public WallpaperBase
     {
       private:
-        ImageBox *logoImage = nullptr;
+        std::shared_ptr<NotificationTilesPresenter> notificationsPresenter;
+        VBox *wallpaperBox = nullptr;
 
       public:
         WallpaperLogo(gui::Item *parent);
-        void build() override;
         void show() override;
         void hide() override;
+        std::shared_ptr<NotificationsPresenter> getNotificationsPresenter() override;
     };
 
 } /* namespace gui */

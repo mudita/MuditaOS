@@ -4,36 +4,46 @@
 #include "WallpaperLogo.hpp"
 #include <service-appmgr/Controller.hpp>
 #include <Style.hpp>
+#include <ImageBox.hpp>
 #include <Image.hpp>
 
 namespace gui
 {
-    WallpaperLogo::WallpaperLogo(Item *parent) : WallpaperBase(parent)
-    {}
-
-    void WallpaperLogo::build()
+    WallpaperLogo::WallpaperLogo(Item *parent)
+        : WallpaperBase(parent), notificationsPresenter(std::make_shared<NotificationTilesPresenter>())
     {
-        logoImage = new ImageBox(parent,
-                                 0,
-                                 style::logo::y,
-                                 ::style::window_width,
-                                 ::style::window::default_body_height - style::logo::y,
-                                 new Image("logo", ImageTypeSpecifier::W_G));
+        wallpaperBox = new VBox(parent,
+                                ::style::window::default_left_margin,
+                                ::style::wallpaper::wallpaperBox::y,
+                                ::style::window::default_body_width,
+                                ::style::wallpaper::wallpaperBox::h);
+        wallpaperBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        wallpaperBox->setEdges(RectangleEdge::None);
+
+        auto logoImage = new ImageBox(wallpaperBox, new Image("logo", ImageTypeSpecifier::W_G));
         logoImage->setMinimumSizeToFitImage();
         logoImage->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        logoImage->setMargins(Margins(0, style::logo::logoTopMarigin, 0, style::logo::logoBottomMarigin));
+
+        new NotificationTilesBox(wallpaperBox, notificationsPresenter);
         hide();
     }
 
     void WallpaperLogo::show()
     {
-        logoImage->setVisible(true);
-        logoImage->resizeItems();
+        wallpaperBox->setVisible(true);
+        wallpaperBox->resizeItems();
     }
 
     void WallpaperLogo::hide()
     {
-        logoImage->setVisible(false);
-        logoImage->resizeItems();
+        wallpaperBox->setVisible(false);
+        wallpaperBox->resizeItems();
+    }
+
+    std::shared_ptr<NotificationsPresenter> WallpaperLogo::getNotificationsPresenter()
+    {
+        return notificationsPresenter;
     }
 
 } /* namespace gui */

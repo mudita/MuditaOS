@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <application-desktop/models/ActiveNotificationsModel.hpp>
+#include <notifications/NotificationsModel.hpp>
+#include <application-desktop/models/ActiveNotificationsListPresenter.hpp>
 
 #include <AppWindow.hpp>
 #include <ListView.hpp>
@@ -23,7 +24,8 @@ namespace gui
       protected:
         gui::ClockDateWidget *clockDate                                   = nullptr;
         gui::ListView *notificationsList                                  = nullptr;
-        std::shared_ptr<gui::ActiveNotificationsModel> notificationsModel = nullptr;
+        std::shared_ptr<gui::ActiveNotificationsListPresenter> notificationsListPresenter;
+        std::shared_ptr<gui::NotificationsModel> notificationsModel;
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationDesktop.hpp"
@@ -49,7 +49,7 @@ namespace gui
                                          style::notifications::model::y,
                                          style::notifications::model::w,
                                          style::notifications::model::h,
-                                         notificationsModel,
+                                         notificationsListPresenter,
                                          listview::ScrollBarType::Fixed);
         notificationsList->emptyListCallback = [this]() {
             setFocusItem(nullptr);
@@ -79,7 +79,8 @@ namespace gui
 
     DesktopMainWindow::DesktopMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, app::window::name::desktop_main_window),
-          notificationsModel(std::make_shared<ActiveNotificationsModel>(this))
+          notificationsListPresenter(std::make_shared<ActiveNotificationsListPresenter>(this)),
+          notificationsModel(std::make_shared<NotificationsModel>(notificationsListPresenter))
     {
         buildInterface();
 

@@ -24,8 +24,11 @@ target_sources(apps-common
         notifications/NotificationListItem.cpp
         notifications/NotificationProvider.cpp
         notifications/NotificationsModel.cpp
+        notifications/NotificationsListPresenter.cpp
+        notifications/NotificationTilesPresenter.cpp
         notifications/NotificationsHandler.cpp
         notifications/NotificationsConfiguration.cpp
+        notifications/NotificationTilesBox.cpp
         notifications/policies/CallNotificationPolicy.cpp
         notifications/policies/SMSNotificationPolicy.cpp
         notifications/policies/NotificationsListPolicy.cpp

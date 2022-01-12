@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,23 +6,19 @@
 #include "WallpaperBase.hpp"
 #include <apps-common/popups/presenter/QuotesPresenter.hpp>
 #include <TextFixedSize.hpp>
+#include <notifications/NotificationTilesBox.hpp>
 
 namespace gui
 {
     namespace style
     {
-        namespace textBox
-        {
-            constexpr auto y = 110;
-            constexpr auto h = 340;
-        } // namespace textBox
-
         namespace text
         {
-            constexpr auto h             = 225;
-            constexpr auto topMarigin    = 20;
-            constexpr auto bottomMarigin = 30;
-            constexpr auto interline     = 12;
+            constexpr inline auto h                   = 225;
+            constexpr inline auto topMarigin          = 20;
+            constexpr inline auto bottomMarigin       = 30;
+            constexpr inline auto interline           = 12;
+            constexpr inline auto authorBottomMarigin = 42;
 
         } // namespace text
 
@@ -32,15 +28,16 @@ namespace gui
     {
       private:
         std::unique_ptr<QuotesPresenter> quotesPresenter;
-        VBox *textBox            = nullptr;
+        std::shared_ptr<NotificationTilesPresenter> notificationsPresenter;
+        VBox *wallpaperBox       = nullptr;
         TextFixedSize *quoteText = nullptr;
         Text *authorText         = nullptr;
 
       public:
         WallpaperQuote(app::ApplicationCommon *app, Item *parent);
-        void build() override;
         void show() override;
         void hide() override;
+        std::shared_ptr<NotificationsPresenter> getNotificationsPresenter() override;
     };
 
 } /* namespace gui */
