@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -36,6 +36,9 @@ namespace sys
 
         void refresh() override;
 
+        // It doesn't disable watchdog, but it simply close the petting thread
+        void deinit();
+
       private:
         SystemWatchdog();
 
@@ -45,11 +48,15 @@ namespace sys
         static constexpr TickType_t watchdogTimeoutPeriod = pdMS_TO_TICKS(16000);
         // Period of actual watchdog refresh
         static constexpr TickType_t checkPeriod = pdMS_TO_TICKS(8000);
+        // Timeout period for watchdog thread closure
+        static constexpr TickType_t closurePeriod = pdMS_TO_TICKS(2000);
 
         void Run() final;
 
-        TickType_t lastRefreshTimestamp = 0;
-        bool timeout_occurred           = false;
+        TickType_t lastRefreshTimestamp{0};
+        bool timeout_occurred{false};
+        bool enableRunLoop{false};
+        cpp_freertos::BinarySemaphore taskEndedSem{false};
 
         static_assert(sizeof(lastRefreshTimestamp) == 4 && alignof(decltype(lastRefreshTimestamp)) == 4,
                       "SystemWatchdog::lastRefreshTimestamp must be 32-bit long and properly aligned otherwise data "
