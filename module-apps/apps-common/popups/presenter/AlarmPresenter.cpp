@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmPresenter.hpp"
@@ -163,6 +163,11 @@ namespace app::popup
     bool AlarmPopupPresenter::isSnoozed()
     {
         return this->getModel()->isSnoozedAlarm;
+    }
+
+    bool AlarmPopupPresenter::haveSnoozedSkip()
+    {
+        return isSnoozed() && snoozedTill().empty();
     }
 
     std::string AlarmPopupPresenter::snoozedTill()

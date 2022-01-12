@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -115,6 +115,7 @@ namespace app::popup
             virtual void handleAlarmSnoozed()     = 0;
             virtual void handleAlarmTurnedOff()   = 0;
             virtual bool isSnoozed()              = 0;
+            virtual bool haveSnoozedSkip()        = 0;
             virtual std::string startedAt()       = 0;
             virtual std::string snoozedTill()     = 0;
         };
@@ -131,22 +132,24 @@ namespace app::popup
         virtual std::uint32_t getSnoozeTime() override;
         /// returns if alarm has snooze time available
         /// determines if we can snooze the alarm at all
-        virtual bool isSnoozeAble() override;
+        bool isSnoozeAble() override;
         /// action on when user hit snooze button
-        virtual void snoozeHit() override;
+        void snoozeHit() override;
         /// action to stop alarm ringing
-        virtual void stopAlarm() override;
+        void stopAlarm() override;
         /// action to skip to next snooze
-        virtual void skipToNextSnooze() override;
+        void skipToNextSnooze() override;
         /// action to call when we processed snoozing the alarm
-        virtual void handleAlarmSnoozed() override;
+        void handleAlarmSnoozed() override;
         /// action to call when we turned off alarm successfully
-        virtual void handleAlarmTurnedOff() override;
+        void handleAlarmTurnedOff() override;
         /// option to determine if alarm was snoozed previously and is recurring
-        virtual bool isSnoozed() override;
+        bool isSnoozed() override;
+        /// check if curent view should have option to skip alarm notification
+        bool haveSnoozedSkip() override;
         /// value for UI to show time when alarm started
-        virtual std::string startedAt() override;
+        std::string startedAt() override;
         /// value for UI to show if alarm `isSnoozed` till what hour it's snoozed exactly
-        virtual std::string snoozedTill() override;
+        std::string snoozedTill() override;
     };
 } // namespace app::popup
