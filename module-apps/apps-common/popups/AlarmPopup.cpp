@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmPopup.hpp"
@@ -90,7 +90,7 @@ namespace gui
                 getPresenter()->stopAlarm();
                 return true;
             }
-            else if (inputEvent.is(KeyCode::KEY_LF)) {
+            else if (inputEvent.is(KeyCode::KEY_LF) && getPresenter()->haveSnoozedSkip()) {
                 getPresenter()->skipToNextSnooze();
                 return true;
             }
@@ -152,7 +152,7 @@ namespace gui
         snoozeLabelBox->setMargins(Margins(0, style::popup::alarm::SnoozeLabel::top_margin, 0, 0));
         snoozeLabelBox->setEdges(RectangleEdge::None);
 
-        if (getPresenter()->isSnoozed() && !getPresenter()->snoozedTill().empty()) {
+        if (getPresenter()->haveSnoozedSkip()) {
             snoozeLabel = new gui::TextFixedSize(snoozeLabelBox);
             snoozeLabel->drawUnderline(false);
             snoozeLabel->setFont(style::window::font::mediumlight);
