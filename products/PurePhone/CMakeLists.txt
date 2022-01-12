@@ -117,7 +117,7 @@ download_asset_release_json(    json-images-target
                                 ${CMAKE_CURRENT_SOURCE_DIR}/assets_images.json
                                 ${CMAKE_BINARY_DIR}/sysroot/sys/current/
                                 MuditaOSPublicAssets
-                                0.0.2
+                                0.0.4
                                 ${MUDITA_CACHE_DIR}
                             )
 download_asset_release(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION} ${MUDITA_CACHE_DIR})
