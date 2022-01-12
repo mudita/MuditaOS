@@ -3,16 +3,17 @@
 
 #pragma once
 
-#include <notifications/NotificationsModel.hpp>
+#include <notifications/NotificationsListPresenter.hpp>
 
 namespace gui
 {
-    class ActiveNotificationsModel : public gui::NotificationsModel, public app::AsyncCallbackReceiver
+    class ActiveNotificationsListPresenter : public gui::NotificationsListPresenter, public app::AsyncCallbackReceiver
     {
       private:
         AppWindow *parent = nullptr;
+
       public:
-        explicit ActiveNotificationsModel(AppWindow *parent);
+        explicit ActiveNotificationsListPresenter(AppWindow *parent);
         void setParentNavBar(const UTF8 &left, const UTF8 &center, const UTF8 &right);
         auto create(const notifications::NotSeenSMSNotification *notification) -> NotificationListItem * override;
         auto create(const notifications::NotSeenCallNotification *notification) -> NotificationListItem * override;

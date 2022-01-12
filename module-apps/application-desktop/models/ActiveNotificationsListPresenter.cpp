@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ActiveNotificationsModel.hpp"
+#include "ActiveNotificationsListPresenter.hpp"
 #include "ApplicationDesktop.hpp"
 
 #include <application-call/data/CallSwitchData.hpp>
@@ -23,11 +23,12 @@ using namespace gui;
 namespace
 {
     using Notification = const notifications::NotificationWithContact *;
-    void setSMSFocusChangedCallback(NotificationListItem *item, ActiveNotificationsModel *model)
+    void setSMSFocusChangedCallback(NotificationListItem *item, ActiveNotificationsListPresenter *presenter)
     {
-        item->focusChangedCallback = [model](gui::Item &_item) {
+        item->focusChangedCallback = [presenter](gui::Item &_item) {
             if (_item.focus) {
-                model->setParentNavBar({}, utils::translate("app_desktop_show"), utils::translate("app_desktop_clear"));
+                presenter->setParentNavBar(
+                    {}, utils::translate("app_desktop_show"), utils::translate("app_desktop_clear"));
                 return true;
             }
             return false;
@@ -96,12 +97,14 @@ namespace
         item->dismissCallback = [app]() { clearSMSNotifications(app); };
     }
 
-    void setCallFocusChangedCallback(NotificationListItem *item, Notification provider, ActiveNotificationsModel *model)
+    void setCallFocusChangedCallback(NotificationListItem *item,
+                                     Notification provider,
+                                     ActiveNotificationsListPresenter *presenter)
     {
-        item->focusChangedCallback = [model, canCall = provider->hasRecord()](gui::Item &_item) {
+        item->focusChangedCallback = [presenter, canCall = provider->hasRecord()](gui::Item &_item) {
             if (_item.focus) {
                 UTF8 navBarLeftText = canCall ? UTF8{utils::translate("common_call")} : UTF8{};
-                model->setParentNavBar(
+                presenter->setParentNavBar(
                     navBarLeftText, utils::translate("app_desktop_show"), utils::translate("app_desktop_clear"));
             }
             return true;
@@ -172,32 +175,32 @@ namespace
         };
     }
 
-    void setTetheringFocusChangedCallback(NotificationListItem *item, ActiveNotificationsModel *model)
+    void setTetheringFocusChangedCallback(NotificationListItem *item, ActiveNotificationsListPresenter *presenter)
     {
-        item->focusChangedCallback = [model](gui::Item &_item) {
+        item->focusChangedCallback = [presenter](gui::Item &_item) {
             if (_item.focus) {
-                model->setParentNavBar({}, utils::translate("common_disconnect"), {});
+                presenter->setParentNavBar({}, utils::translate("common_disconnect"), {});
                 return true;
             }
             return false;
         };
     }
 
-    void setSnoozeFocusChangedCallback(NotificationListItem *item, ActiveNotificationsModel *model)
+    void setSnoozeFocusChangedCallback(NotificationListItem *item, ActiveNotificationsListPresenter *presenter)
     {
-        item->focusChangedCallback = [model](gui::Item &_item) {
+        item->focusChangedCallback = [presenter](gui::Item &_item) {
             if (_item.focus) {
-                model->setParentNavBar({}, utils::translate("app_desktop_show"), utils::translate("common_stop"));
+                presenter->setParentNavBar({}, utils::translate("app_desktop_show"), utils::translate("common_stop"));
             }
             return true;
         };
     }
 
     void setSnoozeActivatedCallback(NotificationListItem *item,
-                                    ActiveNotificationsModel *model,
+                                    ActiveNotificationsListPresenter *presenter,
                                     app::ApplicationCommon *app)
     {
-        item->activatedCallback = [model, app]([[maybe_unused]] gui::Item &_item) {
+        item->activatedCallback = [presenter, app]([[maybe_unused]] gui::Item &_item) {
             auto request = std::make_unique<alarms::GetSnoozedAlarmsRequestMessage>();
             auto task    = app::AsyncRequest::createFromMessage(std::move(request), service::name::service_time);
             auto cb      = [&](auto response) {
@@ -213,7 +216,7 @@ namespace
                                                                    std::move(result->snoozedAlarms)));
                 return true;
             };
-            task->execute(app, model, cb);
+            task->execute(app, presenter, cb);
             return true;
         };
     }
@@ -235,21 +238,21 @@ namespace
     }
 } // namespace
 
-ActiveNotificationsModel::ActiveNotificationsModel(AppWindow *parent)
+ActiveNotificationsListPresenter::ActiveNotificationsListPresenter(AppWindow *parent)
     : AsyncCallbackReceiver(parent->getApplication()), parent(parent)
 {}
 
-void ActiveNotificationsModel::setParentNavBar(const UTF8 &left, const UTF8 &center, const UTF8 &right)
+void ActiveNotificationsListPresenter::setParentNavBar(const UTF8 &left, const UTF8 &center, const UTF8 &right)
 {
     parent->setNavBarText(left, nav_bar::Side::Left);
     parent->setNavBarText(center, nav_bar::Side::Center);
     parent->setNavBarText(right, nav_bar::Side::Right);
 }
 
-auto ActiveNotificationsModel::create(const notifications::NotSeenSMSNotification *notification)
+auto ActiveNotificationsListPresenter::create(const notifications::NotSeenSMSNotification *notification)
     -> NotificationListItem *
 {
-    auto item                  = NotificationsModel::create(notification);
+    auto item = NotificationsListPresenter::create(notification);
     setSMSFocusChangedCallback(item, this);
     setSMSActivatedCallback(item, notification, parent->getApplication());
     setSMSOnInputCallback(item, parent->getApplication());
@@ -257,10 +260,10 @@ auto ActiveNotificationsModel::create(const notifications::NotSeenSMSNotificatio
     item->setDismissible(true);
     return item;
 }
-auto ActiveNotificationsModel::create(const notifications::NotSeenCallNotification *notification)
+auto ActiveNotificationsListPresenter::create(const notifications::NotSeenCallNotification *notification)
     -> NotificationListItem *
 {
-    auto item = NotificationsModel::create(notification);
+    auto item = NotificationsListPresenter::create(notification);
     setCallFocusChangedCallback(item, notification, this);
     setCallActivatedCallback(item, parent->getApplication());
     setCallOnInputCallback(item, notification, parent->getApplication());
@@ -269,19 +272,19 @@ auto ActiveNotificationsModel::create(const notifications::NotSeenCallNotificati
     return item;
 }
 
-auto ActiveNotificationsModel::create(const notifications::TetheringNotification *notification)
+auto ActiveNotificationsListPresenter::create(const notifications::TetheringNotification *notification)
     -> NotificationListItem *
 {
-    auto item               = NotificationsModel::create(notification);
+    auto item = NotificationsListPresenter::create(notification);
     setTetheringActivatedCallback(item, parent->getApplication());
     setTetheringFocusChangedCallback(item, this);
     return item;
 }
 
-auto ActiveNotificationsModel::create(const notifications::AlarmSnoozeNotification *notification)
+auto ActiveNotificationsListPresenter::create(const notifications::AlarmSnoozeNotification *notification)
     -> NotificationListItem *
 {
-    auto item = NotificationsModel::create(notification);
+    auto item = NotificationsListPresenter::create(notification);
     setSnoozeFocusChangedCallback(item, this);
     setSnoozeActivatedCallback(item, this, parent->getApplication());
     setSnoozeOnInputCallback(item, parent->getApplication());

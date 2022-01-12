@@ -21,8 +21,8 @@ target_sources(application-desktop
 		ApplicationDesktop.cpp
 		data/DesktopData.hpp
 		data/Mmi.hpp
-		models/ActiveNotificationsModel.cpp
-		models/ActiveNotificationsModel.hpp
+		models/ActiveNotificationsListPresenter.cpp
+		models/ActiveNotificationsListPresenter.hpp
 		widgets/DBNotificationsHandler.cpp
 		widgets/DesktopInputWidget.cpp
 		widgets/DesktopInputWidget.hpp

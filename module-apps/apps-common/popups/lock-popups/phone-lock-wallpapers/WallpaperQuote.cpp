@@ -6,11 +6,12 @@
 #include <ImageBox.hpp>
 #include <Text.hpp>
 #include <Style.hpp>
-
+#include <notifications/NotificationTilesBox.hpp>
 namespace gui
 {
     WallpaperQuote::WallpaperQuote(app::ApplicationCommon *app, Item *parent)
-        : WallpaperBase(parent), quotesPresenter{std::make_unique<QuotesPresenter>(app)}
+        : WallpaperBase(parent), quotesPresenter{std::make_unique<QuotesPresenter>(app)},
+          notificationsPresenter(std::make_shared<NotificationTilesPresenter>())
     {
         quotesPresenter->setQuoteDisplayCallback([&](std::string quote, std::string author) {
             quoteText->setText(quote);
@@ -19,26 +20,23 @@ namespace gui
             authorText->setText(std::string("- ") + author);
             authorText->setMinimumWidthToFitText();
             authorText->setMinimumHeightToFitText();
-            textBox->resizeItems();
+            wallpaperBox->resizeItems();
         });
-    }
 
-    void WallpaperQuote::build()
-    {
-        textBox = new VBox(parent,
-                           ::style::window::default_left_margin,
-                           style::textBox::y,
-                           ::style::window::default_body_width,
-                           style::textBox::h);
-        textBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        textBox->setEdges(RectangleEdge::None);
+        wallpaperBox = new VBox(parent,
+                                ::style::window::default_left_margin,
+                                ::style::wallpaper::wallpaperBox::y,
+                                ::style::window::default_body_width,
+                                ::style::wallpaper::wallpaperBox::h);
+        wallpaperBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        wallpaperBox->setEdges(RectangleEdge::None);
 
-        auto quoteImage = new ImageBox(textBox, new Image("quote", ImageTypeSpecifier::W_G));
+        auto quoteImage = new ImageBox(wallpaperBox, new Image("quote", ImageTypeSpecifier::W_G));
         quoteImage->setMinimumSizeToFitImage();
         quoteImage->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         quoteImage->setMargins(Margins(0, 0, 0, 0));
 
-        quoteText = new TextFixedSize(textBox, 0, 0, 0, 0);
+        quoteText = new TextFixedSize(wallpaperBox, 0, 0, 0, 0);
         quoteText->setMaximumSize(::style::window::default_body_width, style::text::h);
         quoteText->setMargins(Margins(0, style::text::topMarigin, 0, style::text::bottomMarigin));
         quoteText->setFont(::style::window::font::biglight);
@@ -47,10 +45,12 @@ namespace gui
         quoteText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         quoteText->drawUnderline(false);
 
-        authorText = new Text(textBox, 0, 0, 0, 0);
-        authorText->setMargins(Margins(0, 0, 0, 0));
+        authorText = new Text(wallpaperBox, 0, 0, 0, 0);
+        authorText->setMargins(Margins(0, 0, 0, style::text::authorBottomMarigin));
         authorText->setFont(::style::window::font::small);
         authorText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
+        new NotificationTilesBox(wallpaperBox, notificationsPresenter);
 
         hide();
     }
@@ -58,14 +58,18 @@ namespace gui
     void WallpaperQuote::show()
     {
         quotesPresenter->requestQuote();
-        textBox->setVisible(true);
-        textBox->resizeItems();
+        wallpaperBox->setVisible(true);
+        wallpaperBox->resizeItems();
     }
 
     void WallpaperQuote::hide()
     {
-        textBox->setVisible(false);
-        textBox->resizeItems();
+        wallpaperBox->setVisible(false);
+        wallpaperBox->resizeItems();
     }
 
+    std::shared_ptr<NotificationsPresenter> WallpaperQuote::getNotificationsPresenter()
+    {
+        return notificationsPresenter;
+    }
 } /* namespace gui */

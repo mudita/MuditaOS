@@ -2,58 +2,91 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WallpaperPresenter.hpp"
-#include <service-appmgr/messages/GetWallpaperOptionRequest.hpp>
 #include <service-appmgr/Constants.hpp>
 
 namespace gui
 {
-    WallpaperPresenter::WallpaperPresenter(app::ApplicationCommon *app) : AsyncCallbackReceiver(app), application(app)
+    WallpaperPresenter::WallpaperPresenter(app::ApplicationCommon *app)
+        : AsyncCallbackReceiver(app), application(app),
+          notificationsModel(std::make_shared<NotificationsModel>(NotificationsListPlacement::LockedScreen))
     {}
 
-    void WallpaperPresenter::attachWallpapers(std::shared_ptr<WallpaperBase> clockWallpaper,
-                                              std::shared_ptr<WallpaperBase> quoteWallpaper,
-                                              std::shared_ptr<WallpaperBase> logoWallpaper)
+    void WallpaperPresenter::setupWallpaper(Item *parent)
     {
-        this->clockWallpaper = clockWallpaper;
-        this->quoteWallpaper = quoteWallpaper;
-        this->logoWallpaper  = logoWallpaper;
-    }
-
-    void WallpaperPresenter::setupWallpaper()
-    {
-        buildWallpapers();
+        buildWallpapers(parent);
 
         auto request = std::make_unique<app::manager::GetWallpaperOptionRequest>();
         auto task    = app::AsyncRequest::createFromMessage(std::move(request), service::name::appmgr);
         auto cb      = [&](auto response) {
             auto result = dynamic_cast<app::manager::GetWallpaperOptionResponse *>(response);
-            switch (result->getWallpaperOption()) {
-            case WallpaperOption::Clock:
-                clockWallpaper->show();
-                quoteWallpaper->hide();
-                logoWallpaper->hide();
-                break;
-            case WallpaperOption::Quote:
-                clockWallpaper->hide();
-                quoteWallpaper->show();
-                logoWallpaper->hide();
-                break;
-            case WallpaperOption::Logo:
-                clockWallpaper->hide();
-                quoteWallpaper->hide();
-                logoWallpaper->show();
-                break;
+            if (!clockWallpaperForced) {
+                switchWallpaper(result->getWallpaperOption());
             }
+            selectedOption = result->getWallpaperOption();
             return true;
         };
         task->execute(application, this, cb);
     }
 
-    void WallpaperPresenter::buildWallpapers()
+    void WallpaperPresenter::switchWallpaper(WallpaperOption option)
     {
-        clockWallpaper->build();
-        quoteWallpaper->build();
-        logoWallpaper->build();
+        switch (option) {
+        case WallpaperOption::Clock:
+            notificationsModel->attachPresenter(clockWallpaper->getNotificationsPresenter());
+            clockWallpaper->show();
+            quoteWallpaper->hide();
+            logoWallpaper->hide();
+            break;
+        case WallpaperOption::Quote:
+            notificationsModel->attachPresenter(quoteWallpaper->getNotificationsPresenter());
+            clockWallpaper->hide();
+            quoteWallpaper->show();
+            logoWallpaper->hide();
+            break;
+        case WallpaperOption::Logo:
+            notificationsModel->attachPresenter(logoWallpaper->getNotificationsPresenter());
+            clockWallpaper->hide();
+            quoteWallpaper->hide();
+            logoWallpaper->show();
+            break;
+        }
+    }
+
+    void WallpaperPresenter::buildWallpapers(Item *parent)
+    {
+        clockWallpaper = std::make_shared<WallpaperClock>(parent);
+        quoteWallpaper = std::make_shared<WallpaperQuote>(application, parent);
+        logoWallpaper  = std::make_shared<WallpaperLogo>(parent);
+    }
+
+    std::shared_ptr<gui::NotificationsModel> WallpaperPresenter::getNotificationsModel()
+    {
+        return notificationsModel;
+    }
+
+    void WallpaperPresenter::updateTime()
+    {
+        if (clockWallpaper) {
+            clockWallpaper->updateTime();
+        }
+    }
+
+    void WallpaperPresenter::forceClockWallpaper()
+    {
+        switchWallpaper(WallpaperOption::Clock);
+        clockWallpaperForced = true;
+    }
+
+    bool WallpaperPresenter::switchBackWallpaper()
+    {
+        if (clockWallpaperForced) {
+            clockWallpaperForced = false;
+            switchWallpaper(selectedOption);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
 } // namespace gui

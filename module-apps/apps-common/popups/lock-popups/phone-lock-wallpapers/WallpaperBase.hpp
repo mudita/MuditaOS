@@ -4,6 +4,7 @@
 #pragma once
 
 #include <AppWindow.hpp>
+#include <notifications/NotificationsPresenter.hpp>
 
 namespace gui
 {
@@ -14,9 +15,9 @@ namespace gui
 
       public:
         explicit WallpaperBase(Item *parent);
-        virtual void build() = 0;
         virtual void show()  = 0;
         virtual void hide()  = 0;
+        virtual std::shared_ptr<NotificationsPresenter> getNotificationsPresenter() = 0;
     };
 
 } /* namespace gui */
