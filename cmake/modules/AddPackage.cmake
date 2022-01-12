@@ -36,7 +36,10 @@ function(add_standalone_image SOURCE_TARGET)
     set(PACKAGE_STANDALONE_MIME "application/x-xz" PARENT_SCOPE)
 
     add_custom_target(${PACKAGE_COMMON_NAME}-package-standalone
-        COMMAND tar -ScJf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
+        # please do not:
+        # 1. change compression to -9 (or higher) as i will have detrimental effects on compression times with not much gain
+        # 2. change -T parameter to explicit thread count - xz with T0 will adjust thread count to your machine capatibilies
+        COMMAND tar -I 'xz -T0' -Scf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         DEPENDS ${BIN_FILE}
         DEPENDS json-target
