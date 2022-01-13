@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "i18nImpl.hpp"
@@ -101,6 +101,7 @@ namespace utils
         for (const auto &entry : std::filesystem::directory_iterator(getDisplayLanguagePath())) {
             languageNames.push_back(std::filesystem::path(entry.path()).stem());
         }
+        std::sort(languageNames.begin(), languageNames.end());
         return languageNames;
     }
 
@@ -110,6 +111,7 @@ namespace utils
         for (const auto &entry : std::filesystem::directory_iterator(getInputLanguagePath())) {
             languageNames.push_back(std::filesystem::path(entry.path()).stem());
         }
+        std::sort(languageNames.begin(), languageNames.end());
         return languageNames;
     }
 
