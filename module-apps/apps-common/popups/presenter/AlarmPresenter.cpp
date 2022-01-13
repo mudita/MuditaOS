@@ -167,7 +167,7 @@ namespace app::popup
 
     bool AlarmPopupPresenter::haveSnoozedSkip()
     {
-        return isSnoozed() && snoozedTill().empty();
+        return isSnoozed() && !snoozedTill().empty();
     }
 
     std::string AlarmPopupPresenter::snoozedTill()
