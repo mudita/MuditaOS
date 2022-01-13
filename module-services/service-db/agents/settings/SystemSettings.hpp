@@ -58,7 +58,7 @@ namespace settings
 
     namespace Offline
     {
-        constexpr inline auto connectionFrequency     = "off_connection_frequency";
+        constexpr inline auto connectionFrequency     = "msg_only_mode_connection_frequency";
         constexpr inline auto notificationsWhenLocked = "off_notifications_when_locked";
         constexpr inline auto callsFromFavorites      = "off_calls_from_favorites";
     } // namespace Offline

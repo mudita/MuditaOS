@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ConnectionFrequencyWindow.hpp"
@@ -28,9 +28,6 @@ namespace gui
         std::list<gui::Option> optList;
 
         auto intervalText = [](uint8_t value) {
-            if (value == 0) {
-                return utils::translate("app_alarm_clock_repeat_never");
-            }
             const std::string toReplace = "%0";
             std::string temp            = utils::translate("app_meditation_interval_every_x_minutes");
             temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(value));

@@ -19,7 +19,7 @@ namespace gui
         void rebuild() override;
         app::settingsInterface::ConnectionSettings *connectionSettings;
         void updateInterval(uint8_t value);
-        std::vector<uint8_t> frequency{0, 15, 30, 45, 60};
+        std::vector<uint8_t> frequency{15, 30, 45, 60};
         OptionWindowDestroyer destroyer = OptionWindowDestroyer(*this);
 
       public:
