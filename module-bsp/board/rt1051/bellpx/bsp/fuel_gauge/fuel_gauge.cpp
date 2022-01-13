@@ -123,16 +123,6 @@ namespace bsp::fuel_gauge
 
             /* reset */
             ResetVal                    = static_cast<uint8_t>(MODE::NORMAL);
-            RegVal                      = static_cast<uint8_t>(MODE::POR);
-            fuelGaugeAddress.subAddress = static_cast<std::uint32_t>(Registers::MODE);
-            ret                         = i2c->Write(fuelGaugeAddress, &RegVal, sizeof(uint8_t));
-            if (ret != 1) {
-                LOG_ERROR("Failed to reset charger");
-                return static_cast<uint8_t>(CW201xRetCode::Error);
-            }
-
-            vTaskDelay(10); // delay 10ms
-
             fuelGaugeAddress.subAddress = static_cast<std::uint32_t>(Registers::MODE);
             ret                         = i2c->Write(fuelGaugeAddress, &ResetVal, sizeof(uint8_t));
             if (ret != 1) {
