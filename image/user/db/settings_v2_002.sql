@@ -1,4 +1,4 @@
--- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 -- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 -- ----------- insert default values ----------------------
@@ -33,7 +33,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('battery_critical_level', '10'),
     ('cl_offline_mode', '1'),
     ('cl_current_uid', '0'),
-    ('off_connection_frequency', '0'),
+    ('msg_only_mode_connection_frequency', '15'),
     ('off_notifications_when_locked', '0'),
     ('off_calls_from_favorites', '0'),
     ('\EventManager\\br_state', '0'),
