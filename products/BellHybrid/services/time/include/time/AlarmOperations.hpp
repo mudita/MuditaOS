@@ -99,7 +99,7 @@ namespace alarms
       private:
         void minuteUpdated(TimePoint now) override;
         void stopAllSnoozedAlarms() override;
-        void processPreWakeUp(TimePoint now);
+        bool processPreWakeUp(TimePoint now);
         bool processSnoozeChime(TimePoint now);
         void stopAllSnoozeChimes();
 
