@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationOnBoarding.hpp"
@@ -15,6 +15,7 @@
 #include "windows/SkipDialogWindow.hpp"
 #include "windows/OnBoardingDateAndTimeWindow.hpp"
 #include "windows/OnBoardingChangeDateAndTimeWindow.hpp"
+#include "WindowsPopupFilter.hpp"
 
 #include <application-settings/windows/system/ChangeTimeZone.hpp>
 #include <apps-common/locks/data/PhoneLockMessages.hpp>
@@ -42,6 +43,10 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+
+        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams & /*popupParams*/) {
+            return gui::name::window::main_window != getCurrentWindow()->getName();
+        });
     }
 
     // Invoked upon receiving data message
