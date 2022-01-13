@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,7 +13,7 @@ namespace style
         {
             const uint32_t iconsSize   = 35;
             const uint32_t height      = 74;
-            const uint32_t itemWidth   = 110;
+            const uint32_t itemWidth   = 125;
             const uint32_t itemHeight  = 55;
             const uint32_t labelHeight = 20;
         } // namespace ContactFlag
