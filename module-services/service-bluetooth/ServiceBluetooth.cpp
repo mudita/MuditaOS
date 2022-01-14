@@ -123,7 +123,8 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 sys::ReturnCodes ServiceBluetooth::DeinitHandler()
 {
     settingsHolder->deinit();
-    worker->deinit();
+    worker->closeWorker();
+    worker.reset();
     return sys::ReturnCodes::Success;
 }
 

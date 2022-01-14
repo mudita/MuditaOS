@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,7 +29,7 @@ class WorkerDesktop : public sys::Worker
                   const std::string serialNumber);
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
-    virtual bool deinit() override;
+    void closeWorker();
     bool reinit(const std::filesystem::path &path);
 
     bool handleMessage(uint32_t queueID) override final;

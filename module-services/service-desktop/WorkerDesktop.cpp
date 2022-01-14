@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-desktop/ServiceDesktop.hpp"
@@ -54,10 +54,10 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     return initialized;
 }
 
-bool WorkerDesktop::deinit(void)
+void WorkerDesktop::closeWorker(void)
 {
     if (!initialized) {
-        return false;
+        return;
     }
 
     unsigned int maxcount = 10;
@@ -71,12 +71,10 @@ bool WorkerDesktop::deinit(void)
 
     bsp::usbDeinit();
 
-    Worker::deinit();
+    this->close();
 
     LOG_DEBUG("deinit end");
     initialized = false;
-
-    return true;
 }
 
 bool WorkerDesktop::reinit(const std::filesystem::path &path)

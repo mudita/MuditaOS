@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-bluetooth/ServiceBluetooth.hpp>
@@ -258,10 +258,10 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
     return true;
 }
 
-auto BluetoothWorker::deinit() -> bool
+void BluetoothWorker::closeWorker()
 {
     controller->turnOff();
-    return Worker::deinit();
+    this->close();
 }
 void BluetoothWorker::initDevicesList()
 {

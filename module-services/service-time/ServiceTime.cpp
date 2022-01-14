@@ -68,6 +68,7 @@ namespace stm
 
     sys::ReturnCodes ServiceTime::DeinitHandler()
     {
+        settings->deinit();
         return sys::ReturnCodes::Success;
     }
 

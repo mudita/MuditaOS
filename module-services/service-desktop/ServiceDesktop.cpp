@@ -227,16 +227,11 @@ sys::ReturnCodes ServiceDesktop::DeinitHandler()
     LOG_DEBUG(".. deinit ..");
     if (initialized) {
         settings->deinit();
-        desktopWorker->deinit();
+        desktopWorker->closeWorker();
+        desktopWorker.reset();
         initialized = false;
     }
     return sys::ReturnCodes::Success;
-}
-
-void ServiceDesktop::ProcessCloseReason(sys::CloseReason closeReason)
-{
-    LOG_DEBUG(".. close with reason ..");
-    DeinitHandler();
 }
 
 sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
