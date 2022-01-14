@@ -25,6 +25,7 @@ namespace gui
         timeSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeSpinner->setMargins(Margins(0, 0, 10U, 0));
         timeSpinner->setEdges(RectangleEdge::None);
+        timeSpinner->setFocusItem(nullptr);
 
         resizeItems();
     }
@@ -48,6 +49,13 @@ namespace gui
     auto SnoozeTimer::setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void
     {
         timeSpinner->setTimeFormat(fmt);
+    }
+
+    auto SnoozeTimer::setTimerVisible(bool visible) noexcept -> void
+    {
+        timeSpinner->setVisible(visible);
+        timeSpinner->setFocusItem(nullptr);
+        timeSpinner->informContentChanged();
     }
 
 } /* namespace gui */

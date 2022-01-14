@@ -14,6 +14,7 @@
 #include <boost/sml.hpp>
 #include <time/time_conversion.hpp>
 
+#include <chrono>
 #include <random>
 
 /// Uncomment to print state machine debug logs
@@ -274,8 +275,7 @@ namespace app::home_screen
             auto entry = [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractPresenter &presenter) {
                 presenter.spawnTimer();
                 alarmModel.snooze();
-                view.setHeaderViewMode(HeaderViewMode::SnoozeCountdown);
-                view.setSnoozeTime(alarmModel.getTimeOfNextSnooze());
+                view.setHeaderViewMode(HeaderViewMode::SnoozeIcon);
                 const auto bottomDescription =
                     utils::time::getBottomDescription(alarmModel.getSnoozeDuration().count());
                 view.setBottomDescription(bottomDescription);
@@ -289,9 +289,9 @@ namespace app::home_screen
                             AbstractAlarmModel &alarmModel,
                             AbstractTemperatureModel &temperatureModel,
                             AbstractBatteryModel &batteryModel) {
-                view.setHeaderViewMode(HeaderViewMode::SnoozeCountdown);
+                view.setHeaderViewMode(HeaderViewMode::SnoozeIconAndTime);
+                view.setSnoozeTime(Clock::to_time_t(alarmModel.getTimeOfNextSnooze()));
                 view.setTemperature(temperatureModel.getTemperature());
-                view.setSnoozeTime(alarmModel.getTimeOfNextSnooze());
                 view.setBatteryLevelState(batteryModel.getLevelState());
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.stopSnoozeTimer(); };
