@@ -185,12 +185,18 @@ namespace sys
             systemDeinit();
         }
 
+        // We disable all uninitialized devices
+        deviceManager->DisableAllDevices();
+
         // Power off request (pending)
         PowerOff();
 
+        powerManager.reset();
+        cpuStatistics.reset();
+        deviceManager.reset();
+
         //  End of scheduler and back to the main and poweroff
         EndScheduler();
-
     }
 
     void SystemManagerCommon::initialize()
@@ -656,6 +662,10 @@ namespace sys
 
         // In case if other power down request arrive in the meantime
         lowBatteryShutdownDelay.stop();
+
+        // We stop the timers
+        cpuStatisticsTimer.stop();
+        powerManagerEfficiencyTimer.stop();
 
         // We are going to remove services in reversed order of creation
         CriticalSection::Enter();
