@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -53,8 +53,8 @@ namespace gui
                                  msgThreadStyle::listHeight,
                                  threadsModel,
                                  listview::ScrollBarType::Fixed);
+        list->setBoundaries(Boundaries::Continuous);
         list->setScrollTopMargin(style::margins::small);
-        list->rebuildList();
 
         navBar->setActive(nav_bar::Side::Left, true);
         navBar->setActive(nav_bar::Side::Center, true);
@@ -112,7 +112,7 @@ namespace gui
                 using db::query::ThreadGetByNumberResult;
                 auto primaryNumber = pdata->result->numbers[0].number;
                 auto query         = std::make_unique<ThreadGetByNumber>(primaryNumber);
-                auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+                auto task          = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
                 task->setCallback([app = application](auto response) {
                     if (const auto result = dynamic_cast<ThreadGetByNumberResult *>(response); result != nullptr) {
                         if (auto thread = result->getThread(); thread.isValid()) {
@@ -132,7 +132,7 @@ namespace gui
                                db::Interface::Name::Notifications,
                                std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
 
-        list->rebuildList();
+        list->rebuildList(listview::RebuildType::InPlace);
     }
 
     bool MessagesMainWindow::onInput(const InputEvent &inputEvent)

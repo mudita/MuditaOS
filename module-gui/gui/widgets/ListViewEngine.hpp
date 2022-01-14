@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,6 +40,13 @@ namespace gui
             PreRendered   ///< PreRendered - scroll bar size calculated based on pre rendered pages on whole list. Use
                           ///< when elements are not equal heights but there are few of them as its renders whole
                           ///< context and can be time consuming.
+        };
+
+        /// Possible page fill types
+        enum class FetchType
+        {
+            Filled, ///< Filled - list always fetch object from provider as long it has space.
+            Fixed   ///< Fixed - lists fetches objects from provider accordinly to fixed pages sizes.
         };
 
         enum class Orientation
@@ -150,6 +157,8 @@ namespace gui
         listview::Direction direction = listview::Direction::Bottom;
         /// List orientation (from which end element will start to load)
         listview::Orientation orientation = listview::Orientation::TopBottom;
+        /// List fill type
+        listview::FetchType fetchType = listview::FetchType::Filled;
 
         /// Flag to indicate full data request completed
         bool requestCompleteData = false;

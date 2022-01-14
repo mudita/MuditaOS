@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmClockMainWindow.hpp"
@@ -47,6 +47,7 @@ namespace app::alarmClock
                                        style::alarmClock::window::listView_h,
                                        presenter->getAlarmsItemProvider(),
                                        gui::listview::ScrollBarType::Fixed);
+        alarmsList->setBoundaries(gui::Boundaries::Continuous);
 
         alarmsList->focusChangedCallback = [this](gui::Item &) {
             onListFilled();

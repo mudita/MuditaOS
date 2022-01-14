@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ListView.hpp"
@@ -179,7 +179,7 @@ namespace gui
                                         style::listview::scroll::h,
                                         scrollBarType);
         }
-
+        determineFetchType(scrollBarType);
         applyScrollCallbacks();
 
         type = gui::ItemType::LIST;
@@ -207,6 +207,20 @@ namespace gui
                 body->setSize(style::window::default_body_width, body->getHeight());
             }
         };
+    }
+
+    void ListView::determineFetchType(listview::ScrollBarType scrollType)
+    {
+        switch (scrollType) {
+        case listview::ScrollBarType::None:
+        case listview::ScrollBarType::Fixed:
+            fetchType = listview::FetchType::Fixed;
+            break;
+        case listview::ScrollBarType::Proportional:
+        case listview::ScrollBarType::PreRendered:
+            fetchType = listview::FetchType::Filled;
+            break;
+        }
     }
 
     void ListView::clear()
@@ -262,5 +276,4 @@ namespace gui
     {
         return Size(request_w, request_h);
     }
-
 } /* namespace gui */
