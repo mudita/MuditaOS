@@ -38,7 +38,7 @@ namespace app
         void turnOff() override;
         void snooze() override;
         std::chrono::seconds getTimeToNextSnooze() override;
-        std::time_t getTimeOfNextSnooze() override;
+        TimePoint getTimeOfNextSnooze() override;
         alarms::AlarmStatus getAlarmStatus() override;
 
       private:
@@ -54,6 +54,9 @@ namespace app
         std::shared_ptr<AlarmEventRecord> getAlarmPtr() const;
         void disableSnooze(AlarmEventRecord &alarm);
         void updateCache(const SingleEventRecord &record, alarms::AlarmStatus status);
+
+        // Adjust snooze time basing on current time. If less than 15 sec - round down, if higher - round up
+        TimePoint calculateNextSnoozeTime(std::uint32_t desiredSnoozeTime);
 
         ApplicationCommon *app{};
         State state{State::Invalid};

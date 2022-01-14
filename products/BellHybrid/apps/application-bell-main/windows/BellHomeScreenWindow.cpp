@@ -104,6 +104,7 @@ namespace gui
         snoozeTimer = new SnoozeTimer(body->firstBox);
         snoozeTimer->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
         snoozeTimer->setVisible(false);
+        snoozeTimer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         time = new TimeSetFmtSpinner(body->centerBox);
         time->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
@@ -176,11 +177,19 @@ namespace gui
             snoozeTimer->setVisible(false);
             alarm->informContentChanged();
             break;
-        case app::home_screen::HeaderViewMode::SnoozeCountdown:
+        case app::home_screen::HeaderViewMode::SnoozeIconAndTime:
+            alarm->setVisible(false);
+            alarm->setAlarmTimeVisible(false);
+            snoozeTimer->setVisible(true);
+            snoozeTimer->setTimerVisible(true);
+            snoozeTimer->informContentChanged();
+            break;
+        case app::home_screen::HeaderViewMode::SnoozeIcon:
             alarm->setVisible(false);
             alarm->setAlarmTimeVisible(false);
             snoozeTimer->setVisible(true);
             snoozeTimer->informContentChanged();
+            snoozeTimer->setTimerVisible(false);
             break;
         }
     }

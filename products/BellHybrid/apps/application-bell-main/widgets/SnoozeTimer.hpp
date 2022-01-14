@@ -34,6 +34,7 @@ namespace gui
         auto setTime(std::uint8_t mins, std::uint8_t secs) noexcept -> void;
         auto setTime(std::time_t time) noexcept -> void;
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void;
+        auto setTimerVisible(bool visible) noexcept -> void;
 
       private:
         TimeSetFmtSpinner *timeSpinner = nullptr;

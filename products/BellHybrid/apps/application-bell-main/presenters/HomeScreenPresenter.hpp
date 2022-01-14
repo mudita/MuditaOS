@@ -45,7 +45,8 @@ namespace app::home_screen
         Empty,
         AlarmIcon,
         AlarmIconAndTime,
-        SnoozeCountdown
+        SnoozeIcon,
+        SnoozeIconAndTime
     };
 
     class AbstractView
