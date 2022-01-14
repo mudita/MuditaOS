@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookSearchResults.hpp"
@@ -34,6 +34,7 @@ namespace gui
                                                       phonebookStyle::searchResultsWindow::searchResultList::w,
                                                       phonebookStyle::searchResultsWindow::searchResultList::h,
                                                       searchResultsModel);
+        searchResultList->setBoundaries(Boundaries::Continuous);
         setFocusItem(searchResultList);
 
         navBar->setActive(nav_bar::Side::Center, true);

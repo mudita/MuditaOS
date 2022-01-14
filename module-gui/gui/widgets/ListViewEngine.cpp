@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ListViewEngine.hpp"
@@ -275,7 +275,7 @@ namespace gui
 
     void ListViewEngine::fillFirstPage()
     {
-        // Check if first page is filled with items. If not reload page to be filed with items. Check for both
+        // Check if first page is filled with items. If not reload page to be filled with items. Check for both
         // Orientations.
         if (orientation == listview::Orientation::TopBottom && direction == listview::Direction::Top &&
             startIndex == 0) {
@@ -465,10 +465,12 @@ namespace gui
     {
         auto minLimit =
             (2 * currentPageSize > calculateMaxItemsOnPage() ? 2 * currentPageSize : calculateMaxItemsOnPage());
-        if (value == listview::Direction::Bottom)
+        if (value == listview::Direction::Bottom) {
             return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
-        else
+        }
+        else {
             return minLimit < startIndex ? minLimit : startIndex;
+        }
     }
 
     bool ListViewEngine::requestNextPage()
@@ -503,9 +505,18 @@ namespace gui
 
         if (startIndex == 0 && boundaries == Boundaries::Continuous) {
 
-            startIndex    = elementsCount;
-            topFetchIndex = elementsCount - calculateLimit(listview::Direction::Top);
-            limit         = calculateLimit(listview::Direction::Top);
+            startIndex = elementsCount;
+            if (elementsCount > currentPageSize && fetchType == listview::FetchType::Fixed) {
+
+                auto calculateFixedFill =
+                    elementsCount % currentPageSize != 0 ? elementsCount % currentPageSize : currentPageSize;
+                topFetchIndex = elementsCount - calculateFixedFill;
+            }
+            else {
+                topFetchIndex = elementsCount - calculateLimit(listview::Direction::Top);
+            }
+
+            limit = calculateLimit(listview::Direction::Top);
         }
         else if (startIndex == 0 && boundaries == Boundaries::Fixed) {
 
@@ -523,6 +534,7 @@ namespace gui
         body->setReverseOrder(true);
         pageLoaded       = false;
         storedFocusIndex = listview::nPos;
+
         provider->requestRecords(topFetchIndex, limit);
 
         return true;

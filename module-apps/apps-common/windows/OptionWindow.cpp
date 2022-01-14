@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OptionWindow.hpp"
@@ -43,7 +43,7 @@ namespace gui
                                         option::window::optionsListH,
                                         optionsModel,
                                         listview::ScrollBarType::None);
-
+        optionsList->setBoundaries(Boundaries::Continuous);
         optionsList->prepareRebuildCallback = [this]() { recreateOptions(); };
 
         optionsModel->createData(options);

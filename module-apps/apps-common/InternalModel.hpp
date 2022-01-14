@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -42,8 +42,11 @@ namespace app
         {
             auto index = 0;
             if (order == gui::Order::Previous) {
-                index = internalOffset + internalLimit - 1 + modelIndex;
+                auto calculatedIndex = internalOffset + internalLimit >= internalData.size()
+                                           ? internalData.size()
+                                           : internalOffset + internalLimit;
 
+                index = calculatedIndex - 1 + modelIndex;
                 modelIndex--;
             }
             if (order == gui::Order::Next) {
@@ -57,7 +60,9 @@ namespace app
 
         [[nodiscard]] bool isIndexValid(unsigned int index, gui::Order order) const noexcept
         {
-            return (index < internalData.size()) || (order == gui::Order::Previous && index < internalOffset);
+            return (order == gui::Order::Next && index < internalData.size()) ||
+                   (order == gui::Order::Previous && static_cast<int>(index) >= 0 && index < internalData.size() &&
+                    index >= internalOffset);
         }
 
         void clearItemProperties(T Item)

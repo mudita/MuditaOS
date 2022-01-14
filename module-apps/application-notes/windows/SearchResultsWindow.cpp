@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SearchResultsWindow.hpp"
@@ -41,6 +41,7 @@ namespace app::notes
                                  style::list::Height,
                                  presenter->getNotesItemProvider(),
                                  gui::listview::ScrollBarType::Fixed);
+        list->setBoundaries(gui::Boundaries::Continuous);
         list->setScrollTopMargin(::style::margins::small);
         list->emptyListCallback = [&]() { onNothingFound(presenter->getSearchText()); };
         setFocusItem(list);
