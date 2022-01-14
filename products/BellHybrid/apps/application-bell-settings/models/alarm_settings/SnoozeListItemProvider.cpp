@@ -103,8 +103,8 @@ namespace app::bell_settings
 
         internalData.emplace_back(chimeInterval);
 
-        chimeLength->onProceed = [chimeInterval, chimeLength, this]() {
-            if (chimeInterval != nullptr) {
+        chimeInterval->onEnter = [chimeInterval, chimeLength, this]() {
+            if (chimeLength != nullptr) {
                 const auto currentChimeLength   = chimeLength->getCurrentValue();
                 const auto currentChimeInterval = chimeInterval->getCurrentValue();
                 const auto calculatedRange      = transformChimeIntervalsRange(currentChimeLength);
