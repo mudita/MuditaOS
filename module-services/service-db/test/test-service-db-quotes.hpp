@@ -1,17 +1,19 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <service-db/QuotesMessages.hpp>
 #include <service-db/agents/quotes/QuotesAgent.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace Quotes
 {
     class QuotesAgentTester : public QuotesAgent
     {
       public:
-        QuotesAgentTester(Database *quotesDB) : QuotesAgent(quotesDB){};
+        QuotesAgentTester(Database *quotesDB, std::unique_ptr<settings::Settings> settings)
+            : QuotesAgent(quotesDB, std::move(settings)){};
         ~QuotesAgentTester() = default;
 
         auto handleCategoryList(std::shared_ptr<Messages::GetCategoryListRequest> query)
@@ -91,6 +93,11 @@ namespace Quotes
             auto request = std::make_shared<Messages::ReadQuoteRequest>(quoteId);
             return handleReadQuote(request);
         }
+        auto readRandomizedQuote() -> std::unique_ptr<db::QueryResult>
+        {
+            auto request = std::make_shared<Messages::ReadRandomizedQuoteRequest>();
+            return handleReadRandomizedQuote(request);
+        }
 
         auto writeQuote(unsigned int quoteId, unsigned int langId, std::string quote, std::string author, bool enabled)
             -> bool
@@ -110,4 +117,39 @@ namespace Quotes
             return response->success;
         }
     };
+
+    class SettingsMock : public settings::Settings
+    {
+      public:
+        SettingsMock(std::string &quotesStr, std::string &timestampStr)
+            : quotesString(quotesStr), timestampString(timestampStr)
+        {}
+        void setValue(const std::string &variableName,
+                      const std::string &variableValue,
+                      settings::SettingsScope scope = settings::SettingsScope::AppLocal)
+        {
+            if (variableName == settings::Quotes::randomQuotesList) {
+                quotesString = variableValue;
+            }
+            else if (variableName == settings::Quotes::randomQuoteIDUpdateTime) {
+                timestampString = variableValue;
+            }
+        }
+        std::string getValue(const std::string &variableName,
+                             settings::SettingsScope scope = settings::SettingsScope::AppLocal)
+        {
+            if (variableName == settings::Quotes::randomQuotesList) {
+                return quotesString;
+            }
+            else if (variableName == settings::Quotes::randomQuoteIDUpdateTime) {
+                return timestampString;
+            }
+            else {
+                return std::string();
+            }
+        }
+        std::string &quotesString;
+        std::string &timestampString;
+    };
+
 } // namespace Quotes

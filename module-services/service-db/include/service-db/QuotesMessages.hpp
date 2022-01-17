@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -384,6 +384,37 @@ namespace Quotes
             auto debugInfo() const -> std::string
             {
                 return "ReadQuoteResponse";
+            }
+        };
+
+        class ReadRandomizedQuoteRequest : public db::Query
+        {
+          public:
+            ReadRandomizedQuoteRequest() : Query(Query::Type::Read)
+            {}
+
+            auto debugInfo() const -> std::string
+            {
+                return "ReadRandomizedQuoteRequest";
+            }
+        };
+
+        class ReadRandomizedQuoteResponse : public db::QueryResult
+        {
+          public:
+            explicit ReadRandomizedQuoteResponse(
+                unsigned int quoteId, unsigned int langId, std::string quote, std::string author, bool enabled)
+                : quoteId(quoteId), langId(langId), quote(std::move(quote)), author(std::move(author)), enabled(enabled)
+            {}
+            const unsigned int quoteId;
+            const unsigned int langId;
+            const std::string quote;
+            const std::string author;
+            const bool enabled;
+
+            auto debugInfo() const -> std::string
+            {
+                return "ReadRandomizedQuoteResponse";
             }
         };
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <db/ServiceDB.hpp>
@@ -245,16 +245,19 @@ sys::ReturnCodes ServiceDB::InitHandler()
     countryCodeRecordInterface = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
     notificationsRecordInterface =
         std::make_unique<NotificationsRecordInterface>(notificationsDB.get(), contactRecordInterface.get());
-    quotesRecordInterface = std::make_unique<Quotes::QuotesAgent>(quotesDB.get());
     multimediaFilesRecordInterface =
         std::make_unique<db::multimedia_files::MultimediaFilesRecordInterface>(multimediaFilesDB.get());
-
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_v2.db"));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->initDb();
         dbAgent->registerMessages();
     }
+
+    auto settings = std::make_unique<settings::Settings>();
+    settings->init(service::ServiceProxy(shared_from_this()));
+
+    quotesRecordInterface = std::make_unique<Quotes::QuotesAgent>(quotesDB.get(), std::move(settings));
 
     return sys::ReturnCodes::Success;
 }
