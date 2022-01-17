@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Style.hpp"
@@ -125,6 +125,9 @@ void TimerProperty::State::putNumericValue(int digit) noexcept
     if (resetValueOnNumeric) {
         timeInMinutes       = 0;
         resetValueOnNumeric = false;
+    }
+    if (timeInMinutes == 0 && digit == 0) {
+        digit = minimalValue;
     }
     timeInMinutes = 10 * timeInMinutes + digit;
     if (timeInMinutes >= 10 * (counterMaxDigits - 1)) {
