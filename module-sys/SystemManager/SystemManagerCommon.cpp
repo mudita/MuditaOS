@@ -20,6 +20,7 @@
 #include <service-desktop/Constants.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <service-cellular/Constans.hpp>
 #include <system/messages/DeviceRegistrationMessage.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 #include <system/messages/RequestCpuFrequencyMessage.hpp>
@@ -51,7 +52,8 @@ namespace sys
                                                      service::name::gui,
                                                      service::name::db,
                                                      service::name::eink,
-                                                     service::name::appmgr};
+                                                     service::name::appmgr,
+                                                     service::name::cellular};
         }
 
         namespace restore
@@ -60,12 +62,13 @@ namespace sys
                                                      service::name::evt_manager,
                                                      service::name::gui,
                                                      service::name::eink,
-                                                     service::name::appmgr};
+                                                     service::name::appmgr,
+                                                     service::name::cellular};
         }
 
         namespace regularClose
         {
-            static constexpr std::array whitelist = {service::name::evt_manager};
+            static constexpr std::array whitelist = {service::name::evt_manager, service::name::cellular};
         }
 
         template <typename T> static bool isOnWhitelist(const T &list, const std::string &serviceName)
