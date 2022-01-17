@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -72,6 +72,12 @@ namespace settings
     {
         constexpr inline auto option = "wallpaper_option";
     } // namespace Wallpaper
+
+    namespace Quotes
+    {
+        constexpr inline auto randomQuotesList        = "quotes_random_list";
+        constexpr inline auto randomQuoteIDUpdateTime = "quotes_random_id_update_time";
+    } // namespace Quotes
 
     namespace Display
     {

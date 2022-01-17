@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesPresenter.hpp"
@@ -15,9 +15,7 @@ namespace gui
 
     void QuotesPresenter::requestQuote()
     {
-        // TODO: get quote: only enabled, from currently selected language
-        constexpr auto quoteID = 1;
-        auto query             = std::make_unique<Quotes::Messages::ReadQuoteRequest>(quoteID);
+        auto query             = std::make_unique<Quotes::Messages::ReadRandomizedQuoteRequest>();
         auto task              = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->setCallback([this](auto response) { return onQuoteRetreived(response); });
         task->execute(application, this);
@@ -25,7 +23,7 @@ namespace gui
 
     bool QuotesPresenter::onQuoteRetreived(db::QueryResult *queryResult)
     {
-        auto msgResponse = dynamic_cast<Quotes::Messages::ReadQuoteResponse *>(queryResult);
+        auto msgResponse = dynamic_cast<Quotes::Messages::ReadRandomizedQuoteResponse *>(queryResult);
         assert(msgResponse != nullptr);
 
         if (quoteDisplayCallback) {

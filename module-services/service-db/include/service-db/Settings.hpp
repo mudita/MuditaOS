@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -33,9 +33,9 @@ namespace settings
         void init(const service::ServiceProxy &interface);
         void deinit();
 
-        void setValue(const std::string &variableName,
-                      const std::string &variableValue,
-                      SettingsScope scope = SettingsScope::AppLocal);
+        virtual void setValue(const std::string &variableName,
+                              const std::string &variableValue,
+                              SettingsScope scope = SettingsScope::AppLocal);
         void registerValueChange(const std::string &variableName,
                                  ValueChangedCallback cb,
                                  SettingsScope scope = SettingsScope::AppLocal);
@@ -44,7 +44,7 @@ namespace settings
                                  SettingsScope scope = SettingsScope::AppLocal);
         void unregisterValueChange(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
         /// unregisters all registered variables (both global and local)
-        std::string getValue(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
+        virtual std::string getValue(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
 
         SettingsCache *getCache();
 

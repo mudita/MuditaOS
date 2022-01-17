@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesAgent.hpp"
@@ -9,8 +9,11 @@
 
 namespace Quotes
 {
-    QuotesAgent::QuotesAgent(Database *quotesDB) : database(quotesDB)
+    QuotesAgent::QuotesAgent(Database *quotesDB, std::unique_ptr<settings::Settings> settings)
+        : database(quotesDB), randomizedQuoteModel(std::move(settings), quotesDB)
     {
+        constexpr auto forced = false;
+        randomizedQuoteModel.updateList(forced);
     }
 
     auto QuotesAgent::runQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
@@ -42,6 +45,9 @@ namespace Quotes
         else if (typeid(*query) == typeid(Messages::ReadQuoteRequest)) {
             return handleReadQuote(query);
         }
+        else if (typeid(*query) == typeid(Messages::ReadRandomizedQuoteRequest)) {
+            return handleReadRandomizedQuote(query);
+        }
         else if (typeid(*query) == typeid(Messages::WriteQuoteRequest)) {
             return handleWriteQuote(query);
         }
@@ -66,6 +72,8 @@ namespace Quotes
         auto req         = std::dynamic_pointer_cast<Messages::EnableCategoryByIdRequest>(query);
         auto queryResult = database->execute(Queries::enableCategory, req->enable, req->categoryId);
         auto response    = std::make_unique<Messages::EnableCategoryByIdResponse>(std::move(queryResult));
+        constexpr auto forced = true;
+        randomizedQuoteModel.updateList(forced);
         response->setRequestQuery(query);
         return response;
     }
@@ -116,6 +124,8 @@ namespace Quotes
         auto req         = std::dynamic_pointer_cast<Messages::EnableQuoteByIdRequest>(query);
         auto queryResult = database->execute(Queries::enableQuote, req->enable, req->quoteId);
         auto response    = std::make_unique<Messages::EnableQuoteByIdResponse>(queryResult);
+        constexpr auto forced = true;
+        randomizedQuoteModel.updateList(forced);
         response->setRequestQuery(query);
         return response;
     }
@@ -133,6 +143,10 @@ namespace Quotes
         CategoryRecord categoryRecord(queryResult.get());
 
         auto success = database->execute(Queries::addQuoteToQuoteCategoryMapTable, categoryRecord.category_id, quoteId);
+        if (success) {
+            constexpr auto forced = true;
+            randomizedQuoteModel.updateList(forced);
+        }
 
         auto response = std::make_unique<Messages::AddQuoteResponse>(success, quoteId);
         response->setRequestQuery(query);
@@ -150,11 +164,26 @@ namespace Quotes
         return response;
     }
 
+    auto QuotesAgent::handleReadRandomizedQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req          = std::dynamic_pointer_cast<Messages::ReadRandomizedQuoteRequest>(query);
+        auto randomizedId = randomizedQuoteModel.getId();
+        LOG_DEBUG("Randomized id: %d", randomizedId);
+        auto queryResult = database->query(Queries::readQuote, randomizedId);
+        QuoteRecord quoteRecord(queryResult.get());
+        auto response = std::make_unique<Messages::ReadRandomizedQuoteResponse>(
+            quoteRecord.quote_id, quoteRecord.lang_id, quoteRecord.quote, quoteRecord.author, quoteRecord.enabled);
+        response->setRequestQuery(query);
+        return response;
+    }
+
     auto QuotesAgent::handleWriteQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {
         auto req         = std::dynamic_pointer_cast<Messages::WriteQuoteRequest>(query);
         auto queryResult = database->execute(
             Queries::writeQuote, req->langId, req->quote.c_str(), req->author.c_str(), req->enabled, req->quoteId);
+        constexpr auto forced = true;
+        randomizedQuoteModel.updateList(forced);
         auto response = std::make_unique<Messages::WriteQuoteResponse>(queryResult);
         response->setRequestQuery(query);
         return response;
@@ -164,11 +193,12 @@ namespace Quotes
     {
         auto req = std::dynamic_pointer_cast<Messages::DeleteQuoteRequest>(query);
         database->execute(Queries::deleteQuoteFromQuoteCategoryMapTable, req->quoteId);
-
         auto queryResult = database->execute(Queries::deleteQuoteFromQuoteTable, req->quoteId);
-
+        constexpr auto forced = true;
+        randomizedQuoteModel.updateList(forced);
         auto response = std::make_unique<Messages::DeleteQuoteResponse>(queryResult);
         response->setRequestQuery(query);
         return response;
     }
+
 } // namespace Quotes

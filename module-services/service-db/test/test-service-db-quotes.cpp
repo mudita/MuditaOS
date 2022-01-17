@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
 
 #include "test-service-db-quotes.hpp"
-
 #include <purefs/filesystem_paths.hpp>
 #include <iostream>
 
@@ -19,7 +18,10 @@ TEST_CASE("Quotes")
 {
     Database::initialize();
     auto database = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").string().c_str());
-    auto tester   = std::make_unique<QuotesAgentTester>(database.get());
+    std::string timestampString{};
+    std::string quotesString{};
+    auto settings = std::make_unique<Quotes::SettingsMock>(quotesString, timestampString);
+    auto tester   = std::make_unique<QuotesAgentTester>(database.get(), std::move(settings));
 
     SECTION("Get categories with limit and offset")
     {
@@ -60,12 +62,23 @@ TEST_CASE("Quotes")
         bool enable                   = false;
         const unsigned int categoryId = 1;
 
+        // Get current random quote
+        auto queryResult   = tester->readRandomizedQuote();
+        auto randomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
+        REQUIRE(randomQuoteId != 0);
+
         auto success = tester->enableCategory(categoryId, enable);
         REQUIRE(success);
 
         // Quotes in category one should be disabled
         auto quotes = tester->getQuotesByCategoryId(categoryId);
         REQUIRE(quotes.size() == 0);
+
+        // verify rerandomizing the quotes list
+        queryResult           = tester->readRandomizedQuote();
+        auto newRandomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
+        REQUIRE(newRandomQuoteId != 0);
+        REQUIRE(randomQuoteId != newRandomQuoteId);
 
         enable = true;
 
@@ -82,12 +95,23 @@ TEST_CASE("Quotes")
         bool enable                = false;
         const unsigned int quoteId = 1;
 
+        // Get current random quote
+        auto queryResult   = tester->readRandomizedQuote();
+        auto randomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
+        REQUIRE(randomQuoteId != 0);
+
         auto success = tester->enableQuote(quoteId, enable);
         REQUIRE(success);
 
         // All quotes except quote with id=1 should be enabled
         auto quotes = tester->getEnabledQuotes();
         REQUIRE(quotes.size() == totalNumOfQuotesInDb - 1);
+
+        // verify rerandomizing the quotes list
+        queryResult           = tester->readRandomizedQuote();
+        auto newRandomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
+        REQUIRE(newRandomQuoteId != 0);
+        REQUIRE(randomQuoteId != newRandomQuoteId);
 
         enable = true;
 
@@ -106,6 +130,11 @@ TEST_CASE("Quotes")
         std::string author  = "TEST AUTHOR";
         bool enabled        = true;
 
+        // Get current random quote
+        auto queryResult   = tester->readRandomizedQuote();
+        auto randomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
+        REQUIRE(randomQuoteId != 0);
+
         // Add a new quote
         auto quoteId = tester->addQuote(langId, quote, author, enabled);
 
@@ -114,8 +143,14 @@ TEST_CASE("Quotes")
 
         REQUIRE(quotes.size() == totalNumOfQuotesInDb + 1);
 
+        // verify rerandomizing the quotes list
+        queryResult           = tester->readRandomizedQuote();
+        auto newRandomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
+        REQUIRE(newRandomQuoteId != 0);
+        REQUIRE(randomQuoteId != newRandomQuoteId);
+
         // Read added quote
-        auto queryResult       = tester->readQuote(quoteId);
+        queryResult            = tester->readQuote(quoteId);
         auto readQuoteResponse = dynamic_cast<Messages::ReadQuoteResponse *>(queryResult.get());
 
         REQUIRE(readQuoteResponse->quoteId == quoteId);
@@ -146,5 +181,121 @@ TEST_CASE("Quotes")
         REQUIRE(quotes.size() == totalNumOfQuotesInDb);
     }
 
+    SECTION("Randomizer test - double request")
+    {
+
+        auto queryResult = tester->readRandomizedQuote();
+        auto response    = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get());
+
+        REQUIRE(response);
+        auto quoteId = response->quoteId;
+
+        queryResult = tester->readRandomizedQuote();
+        response    = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get());
+        REQUIRE(response);
+        auto newQuoteId = response->quoteId;
+
+        REQUIRE(quoteId == newQuoteId);
+    }
+    SECTION("Randomizer test - time shift correct")
+    {
+        constexpr auto timeshift24h = 24 * 3600;
+
+        auto queryResult = tester->readRandomizedQuote();
+        auto response    = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get());
+        REQUIRE(response);
+        auto quoteId = response->quoteId;
+
+        timestampString = std::to_string(std::time(nullptr) - timeshift24h);
+        queryResult     = tester->readRandomizedQuote();
+        response        = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get());
+        REQUIRE(response);
+        auto newQuoteId = response->quoteId;
+
+        REQUIRE(quoteId != newQuoteId);
+    }
+    SECTION("Randomizer test - time shift wrong")
+    {
+        constexpr auto timeshift23h = 23 * 3600;
+
+        auto queryResult = tester->readRandomizedQuote();
+        auto response    = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get());
+        REQUIRE(response);
+        auto quoteId = response->quoteId;
+
+        timestampString = std::to_string(std::time(nullptr) - timeshift23h);
+        queryResult     = tester->readRandomizedQuote();
+        response        = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get());
+        REQUIRE(response);
+        auto newQuoteId = response->quoteId;
+
+        REQUIRE(quoteId == newQuoteId);
+    }
+
     Database::deinitialize();
+}
+
+TEST_CASE("Serializer test")
+{
+
+    QuotesSettingsSerializer serializer;
+
+    SECTION("Serialize - correct input")
+    {
+        IdList list{1, 2, 3, 4};
+        auto result = serializer.serialize(list);
+        REQUIRE(result == "1,2,3,4,");
+
+        IdList list2{1};
+        result = serializer.serialize(list2);
+        REQUIRE(result == "1,");
+    }
+
+    SECTION("Serialize - wrong input")
+    {
+        IdList list{};
+        auto result = serializer.serialize(list);
+        REQUIRE(result.empty());
+    }
+
+    SECTION("Deserialize - correct input")
+    {
+        std::string serializedData = "1,2,3,4,";
+        auto result                = serializer.deserialize(serializedData);
+        REQUIRE(result.size() == 4);
+        REQUIRE(result.front() == 1);
+        REQUIRE(result.back() == 4);
+    }
+
+    SECTION("Deserialize - empty input")
+    {
+        std::string serializedData = " ";
+        IdList result;
+        REQUIRE_NOTHROW(result = serializer.deserialize(serializedData));
+        REQUIRE(result.empty());
+    }
+
+    SECTION("Deserialize - wrong input 1/3")
+    {
+        std::string serializedData = "abc";
+        IdList result;
+        REQUIRE_NOTHROW(result = serializer.deserialize(serializedData));
+        REQUIRE(result.empty());
+    }
+
+    SECTION("Deserialize - wrong input 2/3")
+    {
+        std::string serializedData = "a,b,c";
+        IdList result;
+        REQUIRE_NOTHROW(result = serializer.deserialize(serializedData));
+        REQUIRE(result.empty());
+    }
+
+    SECTION("Deserialize - wrong input 3/3")
+    {
+        std::string serializedData = ",1,2,3,4";
+        IdList result;
+        REQUIRE_NOTHROW(result = serializer.deserialize(serializedData));
+        REQUIRE(result.empty());
+    }
 }

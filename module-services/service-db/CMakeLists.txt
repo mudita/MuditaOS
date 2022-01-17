@@ -19,7 +19,9 @@ set(SOURCES
     agents/settings/SettingsCache.cpp
     agents/settings/FactorySettings.cpp
     agents/quotes/QuotesAgent.cpp
-)
+    agents/quotes/RandomizedQuoteModel.cpp
+    agents/quotes/QuotesSettingsSerializer.cpp
+    )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
