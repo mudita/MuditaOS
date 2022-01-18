@@ -26,6 +26,7 @@ namespace gui
     {
         erase();
         buildInterface();
+        isSaveNeeded = false;
     }
 
     void BellSettingsAlarmSettingsWindow::buildInterface()
@@ -52,11 +53,9 @@ namespace gui
             return true;
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+            isSaveNeeded = true;
             exit();
             return true;
-        }
-        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            presenter->exitWithoutSave();
         }
 
         return AppWindow::onInput(inputEvent);
@@ -64,7 +63,6 @@ namespace gui
 
     void BellSettingsAlarmSettingsWindow::exit()
     {
-        isSaveNeeded = true;
         application->switchWindow(
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", BellSettingsAlarmSettingsMenuWindow::name));
@@ -73,16 +71,13 @@ namespace gui
     void BellSettingsAlarmSettingsWindow::onClose(CloseReason reason)
     {
         if (reason != CloseReason::Popup) {
-            presenter->eraseProviderData();
+            if (isSaveNeeded) {
+                presenter->exitWithSave();
+            }
+            else {
+                presenter->exitWithRollback();
+            }
         }
     }
-    BellSettingsAlarmSettingsWindow::~BellSettingsAlarmSettingsWindow()
-    {
-        if (isSaveNeeded) {
-            presenter->saveData();
-        }
-        else {
-            presenter->exitWithoutSave();
-        }
-    }
+
 } /* namespace gui */
