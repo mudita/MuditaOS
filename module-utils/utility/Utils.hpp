@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -47,7 +47,7 @@ namespace utils
 
     static inline bool is_phone_number(const std::string &s)
     {
-        return s.find_first_not_of(" +#0123456789") == std::string::npos;
+        return s.find_first_not_of(" +-.#()0123456789") == std::string::npos;
     }
 
     static inline std::string ltrim(const std::string &s)
