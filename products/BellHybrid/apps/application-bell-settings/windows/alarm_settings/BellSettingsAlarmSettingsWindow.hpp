@@ -21,8 +21,6 @@ namespace gui
             app::ApplicationCommon *app,
             std::unique_ptr<app::bell_settings::AlarmSettingsWindowContract::Presenter> presenter);
 
-        ~BellSettingsAlarmSettingsWindow();
-
         void buildInterface() override;
         void onClose(CloseReason reason) override;
         bool onInput(const InputEvent &inputEvent) override;

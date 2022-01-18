@@ -59,8 +59,15 @@ namespace app::bell_settings
     {
         this->audioModel.stopPlayedByThis({});
     }
-    void AlarmSettingsPresenter::exitWithoutSave()
+    void AlarmSettingsPresenter::exitWithSave()
+    {
+        saveData();
+        eraseProviderData();
+    }
+
+    void AlarmSettingsPresenter::exitWithRollback()
     {
         model->getAlarmVolume().restoreDefault();
+        eraseProviderData();
     }
 } // namespace app::bell_settings
