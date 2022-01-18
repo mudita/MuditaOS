@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Service/Service.hpp>
@@ -207,6 +207,14 @@ namespace sys
 
     auto Service::ProcessCloseReason(CloseReason closeReason) -> void{};
 
+    auto Service::ProcessCloseReasonHandler(CloseReason closeReason) -> void
+    {
+        ProcessCloseReason(closeReason);
+        // to reject all messages except system ones
+        isReady = false;
+        sendCloseReadyMessage(this);
+    };
+
     auto Service::TimerHandle(SystemMessage &message) -> ReturnCodes
     {
         auto timer_message = dynamic_cast<sys::TimerMessage *>(&message);
@@ -292,7 +300,7 @@ namespace sys
             }
             break;
         case SystemMessageType::ServiceCloseReason:
-            service->ProcessCloseReason(static_cast<ServiceCloseReasonMessage *>(message)->getCloseReason());
+            service->ProcessCloseReasonHandler(static_cast<ServiceCloseReasonMessage *>(message)->getCloseReason());
             break;
         }
         return std::make_shared<ResponseMessage>(ret);

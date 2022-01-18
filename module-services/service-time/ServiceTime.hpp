@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -57,7 +57,6 @@ namespace stm
 
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
-        void ProcessCloseReason(sys::CloseReason closeReason) override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmMessageHandler.hpp"
@@ -69,11 +69,6 @@ namespace stm
     sys::ReturnCodes ServiceTime::DeinitHandler()
     {
         return sys::ReturnCodes::Success;
-    }
-
-    void ServiceTime::ProcessCloseReason(sys::CloseReason closeReason)
-    {
-        sendCloseReadyMessage(this);
     }
 
     sys::ReturnCodes ServiceTime::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <evtmgr/EventManager.hpp>
@@ -125,7 +125,6 @@ void EventManager::toggleTorchColor()
 void EventManager::ProcessCloseReason(sys::CloseReason closeReason)
 {
     bsp::torch::turn(bsp::torch::State::off);
-    EventManagerCommon::ProcessCloseReason(closeReason);
 }
 
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
