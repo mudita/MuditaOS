@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,6 +19,7 @@ namespace service::detail
         StartupIndexer &operator=(StartupIndexer) = delete;
         auto start(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void;
         void reset();
+        void stop();
 
       private:
         // Process single entry

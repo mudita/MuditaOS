@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
@@ -258,8 +258,9 @@ sys::ReturnCodes EventManagerCommon::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-void EventManagerCommon::ProcessCloseReason(sys::CloseReason closeReason)
+void EventManagerCommon::ProcessCloseReasonHandler(sys::CloseReason closeReason)
 {
+    ProcessCloseReason(closeReason);
     sendCloseReadyMessage(this);
 }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AudioMessage.hpp>
@@ -165,7 +165,6 @@ void ServiceAudio::ProcessCloseReason(sys::CloseReason closeReason)
         const auto activeInput = activeInputOpt.value();
         activeInput->audio->Stop();
     }
-    sendCloseReadyMessage(this);
 }
 
 std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Message *msg)

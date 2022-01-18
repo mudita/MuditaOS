@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceAudio.hpp"
@@ -120,7 +120,6 @@ namespace service
             const auto activeInput = activeInputOpt.value();
             activeInput->audio->Stop();
         }
-        sendCloseReadyMessage(this);
     }
     auto Audio::handleStart(const audio::Operation::Type opType,
                             const std::string &fileName,

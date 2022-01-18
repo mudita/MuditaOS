@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -55,7 +55,22 @@ namespace sys
          */
         virtual ReturnCodes DeinitHandler() = 0;
 
+        /**
+         * @brief Pre close clean up service specific procedure.
+         * Should be implemented in derived class. Empty by default.
+         *
+         * Should not be called directly - part of strategy pattern
+         */
         virtual auto ProcessCloseReason(CloseReason closeReason) -> void;
+
+        /**
+         * @brief Pre close clean up procedure.
+         * It calls ProcessCloseReason and disable all messages handling
+         * except system ones.
+         *
+         * Should be requested before full service closure.
+         */
+        virtual auto ProcessCloseReasonHandler(CloseReason closeReason) -> void;
 
         virtual ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) = 0;
 

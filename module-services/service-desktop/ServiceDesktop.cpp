@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/messages/DOMRequest.hpp>
@@ -237,7 +237,6 @@ void ServiceDesktop::ProcessCloseReason(sys::CloseReason closeReason)
 {
     LOG_DEBUG(".. close with reason ..");
     DeinitHandler();
-    sendCloseReadyMessage(this);
 }
 
 sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

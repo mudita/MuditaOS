@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-db/DBNotificationMessage.hpp>
@@ -72,7 +72,6 @@ void ServiceDBCommon::ProcessCloseReason(sys::CloseReason closeReason)
         }
         factoryReset();
     }
-    sendCloseReadyMessage(this);
 }
 
 void ServiceDBCommon::factoryReset() const

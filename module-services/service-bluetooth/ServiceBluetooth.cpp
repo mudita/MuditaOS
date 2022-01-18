@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-bluetooth/ServiceBluetooth.hpp"
@@ -129,7 +129,8 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler()
 
 void ServiceBluetooth::ProcessCloseReason(sys::CloseReason closeReason)
 {
-    sendCloseReadyMessage(this);
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::DisconnectAudio));
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOff));
 }
 
 sys::MessagePointer ServiceBluetooth::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msg,
