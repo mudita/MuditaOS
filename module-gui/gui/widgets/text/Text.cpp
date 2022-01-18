@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Text.hpp"
@@ -229,8 +229,11 @@ namespace gui
     auto Text::setCursorStartPosition(CursorStartPosition val) -> void
     {
         // As we destroy cursors starting position information need to be stored in both places
-        cursorStartPosition = val;
-        cursor->setCursorStartPosition(cursorStartPosition);
+        if (cursorStartPosition != val) {
+            cursorStartPosition = val;
+            cursor->setCursorStartPosition(cursorStartPosition);
+            buildDocument(std::make_unique<TextDocument>(document->getBlocks()));
+        }
     }
 
     bool Text::onInput(const InputEvent &evt)
