@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RawFont.hpp"
@@ -209,56 +209,6 @@ namespace gui
     {
         FontGlyph *glyph = getGlyph(charCode);
         return glyph->height;
-    }
-
-    UTF8 RawFont::getTextWithElipsis(const UTF8 &text, uint32_t width, Ellipsis ellipsis) const
-    {
-        std::string result;
-        auto w_dot        = getCharPixelWidth('.');
-        auto text_fit_len = getCharCountInSpace(text, width);
-        if (width < w_dot) // none will fit
-        {
-            return result;
-        }
-        if (text_fit_len == text.length()) // all will fit
-        {
-            return text;
-        }
-        if (ellipsis != Ellipsis::None) {
-            auto char_offset = 0;
-            if (ellipsis == Ellipsis::Left) {
-                char_offset = text.length() - text_fit_len;
-            }
-            result = text.substr(char_offset, text_fit_len);
-            setEllipsis(result, ellipsis);
-        }
-        else {
-            result = text.substr(0, text_fit_len);
-        }
-        return result;
-    }
-
-    void RawFont::setEllipsis(std::string &text, Ellipsis ellipsis) const
-    {
-        auto set_dot = [&](auto begin, auto end) {
-            auto dots_in_elipsis = 3;
-            for (auto el = begin; el != end; ++el) {
-                *el = '.';
-                if (--dots_in_elipsis == 0) {
-                    break;
-                }
-            }
-        };
-        switch (ellipsis) {
-        case Ellipsis::Right:
-            set_dot(text.rbegin(), text.rend());
-            break;
-        case Ellipsis::Left:
-            set_dot(text.begin(), text.end());
-            break;
-        case Ellipsis::None:
-            break;
-        }
     }
 
     void RawFont::createGlyphUnsupported()

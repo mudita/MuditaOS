@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OutputLinesTextWithLabelWidget.hpp"
@@ -21,13 +21,11 @@ namespace gui
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdge::None);
 
-        titleLabel = new Label(vBox);
+        titleLabel = new TextWithSnippet(vBox, style::window::font::verysmall);
         titleLabel->setMinimumSize(phonebookStyle::outputLinesTextWithLabelWidget::w,
                                    phonebookStyle::outputLinesTextWithLabelWidget::title_label_h);
         titleLabel->setEdges(RectangleEdge::None);
         titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        titleLabel->setFont(style::window::font::verysmall);
-        titleLabel->setLineMode(true);
         titleLabel->activeItem = false;
 
         multilineText = new Text(vBox, 0, 0, 0, 0);
@@ -74,14 +72,14 @@ namespace gui
 
     void OutputLinesTextWithLabelWidget::addressHandler()
     {
-        titleLabel->setText(utils::translate("app_phonebook_new_contact_address"));
+        titleLabel->textWidget->setText(utils::translate("app_phonebook_new_contact_address"));
 
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { multilineText->setText(contact->address); };
     }
 
     void OutputLinesTextWithLabelWidget::noteHandler()
     {
-        titleLabel->setText(utils::translate("app_phonebook_new_contact_note"));
+        titleLabel->textWidget->setText(utils::translate("app_phonebook_new_contact_note"));
 
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { multilineText->setText(contact->note); };
     }

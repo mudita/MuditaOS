@@ -249,7 +249,7 @@ namespace gui
     void InputLinesWithLabelWidget::addressHandler()
     {
         titleLabel->setText(utils::translate("app_phonebook_new_contact_address"));
-        inputText->setTextType(TextType::SingleLine);
+        inputText->setTextType(TextType::MultiLine);
         inputText->setTextLimitType(TextLimitType::MaxSignsCount,
                                     phonebookStyle::inputLinesWithLabelWidget::max_signs_limit);
 
@@ -259,7 +259,7 @@ namespace gui
     void InputLinesWithLabelWidget::noteHandler()
     {
         titleLabel->setText(utils::translate("app_phonebook_new_contact_note"));
-        inputText->setTextType(TextType::SingleLine);
+        inputText->setTextType(TextType::MultiLine);
         inputText->setTextLimitType(TextLimitType::MaxSignsCount,
                                     phonebookStyle::inputLinesWithLabelWidget::max_signs_limit);
 

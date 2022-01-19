@@ -1,87 +1,68 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputBox.hpp"
 
 #include <BoxLayout.hpp>
 #include <Label.hpp>
-#include <Image.hpp>
+#include <ImageBox.hpp>
 
 namespace gui
 {
-    constexpr uint32_t default_x = style::window::default_left_margin;
-    constexpr uint32_t default_w =
-        style::window_width - style::window::default_left_margin - style::window::default_right_margin;
-    namespace inputHeader
+    namespace input_Box
     {
-        constexpr uint32_t x = style::window::default_left_margin;
-        constexpr uint32_t y = 127;
-        constexpr uint32_t w = default_w;
-        constexpr uint32_t h = 20;
-    } // namespace inputHeader
+        constexpr auto label_h = 30;
+        constexpr auto text_h  = 33;
+        constexpr auto h_box_h = text_h + 3;
+        constexpr auto h       = label_h + style::margins::big + h_box_h;
+    } // namespace input_Box
 
-    namespace horizontalBox
-    {
-        constexpr uint32_t x        = style::window::default_left_margin;
-        constexpr uint32_t y        = 153;
-        constexpr uint32_t w        = default_w;
-        constexpr uint32_t h        = 34;
-        constexpr uint32_t penWidth = 2;
-        namespace searchTop
-        {
-            constexpr uint32_t x = default_w;
-            constexpr uint32_t y = 1;
-            constexpr uint32_t w = 32;
-            constexpr uint32_t h = 32;
-        } // namespace searchTop
-        namespace inputField
-        {
-            constexpr uint32_t x = 1;
-            constexpr uint32_t y = 1;
-            constexpr uint32_t w = default_w - searchTop::w;
-            constexpr uint32_t h = 33;
-        } // namespace inputField
-    }     // namespace horizontalBox
 } // namespace gui
 
 namespace gui
 {
-
     auto inputBox(gui::Item *parent, const std::string &header, const std::string &icon) -> gui::Text *
     {
-        auto inputField = new Text(nullptr,
-                                   horizontalBox::inputField::x,
-                                   horizontalBox::inputField::y,
-                                   horizontalBox::inputField::w,
-                                   horizontalBox::inputField::h);
+        auto verticalBox = new VBox(parent,
+                                    style::window::default_left_margin,
+                                    style::window::default_vertical_pos,
+                                    style::window::default_body_width,
+                                    input_Box::h);
+        verticalBox->setEdges(RectangleEdge::None);
+
+        auto l = new Label(verticalBox);
+        l->setMinimumHeight(input_Box::label_h);
+        l->setMaximumWidth(style::window::default_body_width);
+        l->setFont(style::window::font::small);
+        l->setEdges(RectangleEdge::None);
+        l->setText(header);
+        l->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
+
+        auto horizontalBox = new HBox(verticalBox);
+        horizontalBox->setAlignment({gui::Alignment::Vertical::Top});
+        horizontalBox->setMargins({0, style::margins::big, 0, 0});
+        horizontalBox->setMinimumHeight(input_Box::h_box_h);
+        horizontalBox->setMinimumWidth(style::window::default_body_width);
+        horizontalBox->setPenWidth(style::window::default_border_rect_no_focus);
+        horizontalBox->setEdges(RectangleEdge::Bottom);
+
+        auto inputField = new TextFixedSize(horizontalBox);
+        inputField->drawUnderline(false);
+        inputField->setMinimumHeight(input_Box::text_h);
+        inputField->setMaximumWidth(style::window::default_body_width);
         inputField->setTextType(TextType::SingleLine);
+        inputField->setTextEllipsisType(TextEllipsis::Both);
         inputField->setEditMode(EditMode::Edit);
         inputField->setEdges(RectangleEdge::None);
         inputField->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
         inputField->setFont(style::window::font::mediumbold);
 
-        auto horizontalBox = new HBox(parent, horizontalBox::x, horizontalBox::y, horizontalBox::w, horizontalBox::h);
-        horizontalBox->addWidget(inputField);
         if (!icon.empty()) {
-            horizontalBox->addWidget(new Image(nullptr,
-                                               horizontalBox::searchTop::x,
-                                               horizontalBox::searchTop::y,
-                                               horizontalBox::searchTop::w,
-                                               horizontalBox::searchTop::h,
-                                               icon));
+            auto imageBox = new ImageBox(horizontalBox, new Image(icon));
+            imageBox->setMinimumSizeToFitImage();
         }
 
-        horizontalBox->setPenWidth(horizontalBox::penWidth);
-        horizontalBox->setEdges(RectangleEdge::Bottom);
-
-        const RectangleEdge edges = RectangleEdge::None;
-        const Alignment alignment = Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom);
-        auto l                    = new Label(parent, inputHeader::x, inputHeader::y, inputHeader::w, inputHeader::h);
-
-        l->setFont(style::window::font::small);
-        l->setEdges(edges);
-        l->setText(header);
-        l->setAlignment(alignment);
+        verticalBox->resizeItems();
 
         return inputField;
     }

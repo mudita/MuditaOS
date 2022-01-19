@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SnoozeTimer.hpp"
 #include <FontManager.hpp>
 #include <RawFont.hpp>
-#include <gui/widgets/Label.hpp>
+#include <gui/widgets/text/Label.hpp>
 #include <gui/widgets/ImageBox.hpp>
 #include <apps-common/widgets/TimeSetSpinner.hpp>
 

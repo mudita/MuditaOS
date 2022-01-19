@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MusicPlayerMainWindow.hpp"
@@ -474,11 +474,11 @@ namespace gui
             std::string trackDescription;
             if (!isPaused && !isPlaying) {
                 trackDescription = utils::translate("app_music_player_empty_track_notification");
-                descriptionText->setTextColor(gui::ColorGrey);
+                descriptionText->setColor(gui::ColorGrey);
             }
             else {
                 trackDescription = currentTitle + " - " + currentArtist;
-                descriptionText->setTextColor(gui::ColorFullBlack);
+                descriptionText->setColor(gui::ColorFullBlack);
             }
             descriptionText->setText(trackDescription);
         }

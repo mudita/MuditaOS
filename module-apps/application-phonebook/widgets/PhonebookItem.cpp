@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookItem.hpp"
@@ -46,17 +46,9 @@ namespace gui
         markBlocked(contact->isOnBlocked());
     }
 
-    void PhonebookItem::setMarkerItem(UTF8 text)
-    {
-        contactName->setText(text);
-        contactName->setLineMode(true);
-        activeItem = false;
-        setEdges(RectangleEdge::None);
-    }
-
     UTF8 PhonebookItem::getLabelMarker()
     {
-        if (favourite && (labeMarkerDisplayMode == LabelMarkerDisplayMode::IncludeFavourites)) {
+        if (favourite && (labelMarkerDisplayMode == LabelMarkerDisplayMode::IncludeFavourites)) {
             // If contact is favorite return proper UTF string
             return utils::translate("app_phonebook_favourite_contacts_title");
         }
@@ -86,7 +78,28 @@ namespace gui
 
     void PhonebookItem::setLabelMarkerDisplayMode(LabelMarkerDisplayMode mode)
     {
-        labeMarkerDisplayMode = mode;
+        labelMarkerDisplayMode = mode;
     }
 
+    PhonebookMarkItem::PhonebookMarkItem(const UTF8 &markText)
+    {
+        setMargins(Margins(0, style::margins::big, 0, 0));
+        setMinimumSize(phonebookStyle::contactItem::w, phonebookStyle::contactItem::h);
+
+        setEdges(RectangleEdge::None);
+        activeItem = false;
+
+        markLabel = new TextWithSnippet(this, style::window::font::small);
+        markLabel->setPadding(Padding(style::padding::default_left_text_padding, 0, 0, 0));
+        markLabel->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        markLabel->setMinimumHeight(phonebookStyle::contactItem::h);
+        markLabel->setMaximumWidth(phonebookStyle::contactItem::w);
+        markLabel->textWidget->setText(markText);
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            markLabel->setArea({0, 0, newDim.w, newDim.h});
+            markLabel->resizeItems();
+            return true;
+        };
+    }
 } /* namespace gui */

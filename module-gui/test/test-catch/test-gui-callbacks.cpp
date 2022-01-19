@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -39,7 +39,8 @@ TEST_CASE("gui::Item on input flow test")
     }
 }
 
-#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/text/Label.hpp>
+#include "mock/InitializedFontManager.hpp"
 
 TEST_CASE("gui::Window on input flow test")
 {
@@ -65,6 +66,7 @@ TEST_CASE("gui::Window on input flow test")
         REQUIRE(success == false);
     }
 
+    mockup::fontManager();
     auto l1 = new gui::Label(&win, 0, 0, 0, 0, "Test 1");
     auto l2 = new gui::Label(&win, 0, 0, 0, 0, "Test 2");
 

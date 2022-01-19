@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookListView.hpp"
@@ -17,11 +17,7 @@ namespace gui
             if (!(labelMark == (item)->getLabelMarker())) {
 
                 labelMark = (item)->getLabelMarker();
-
-                gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
-                phonebookLabel->setMarkerItem(labelMark);
-
-                body->addWidget(phonebookLabel);
+                body->addWidget(new PhonebookMarkItem(labelMark));
             }
         }
         if (direction == listview::Direction::Top) {
@@ -35,11 +31,8 @@ namespace gui
                 previousLabelMark = labelMark;
                 labelMark         = (item)->getLabelMarker();
 
-                gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
-                phonebookLabel->setMarkerItem(previousLabelMark);
-
                 body->removeWidget(item);
-                body->addWidget(phonebookLabel);
+                body->addWidget(new PhonebookMarkItem(labelMark));
                 body->addWidget(item);
 
                 previousItemIsLabel = true;
@@ -79,11 +72,7 @@ namespace gui
                         body->erase(item);
                         body->erase(previousListItem);
 
-                        gui::PhonebookItem *phonebookLabel = new gui::PhonebookItem();
-
-                        phonebookLabel->setMarkerItem(labelMark);
-
-                        body->addWidget(phonebookLabel);
+                        body->addWidget(new PhonebookMarkItem(labelMark));
                         currentPageSize--;
                     }
                 }
@@ -105,9 +94,7 @@ namespace gui
 
         // Add element on top for first page purpose
         if (startIndex == 0 && direction == listview::Direction::Top) {
-            auto *phonebookLabel = new gui::PhonebookItem();
-            phonebookLabel->setMarkerItem(labelMark);
-            body->addWidget(phonebookLabel);
+            body->addWidget(new PhonebookMarkItem(labelMark));
         }
     }
 

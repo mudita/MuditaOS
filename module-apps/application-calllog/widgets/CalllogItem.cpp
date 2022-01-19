@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogItem.hpp"
@@ -41,7 +41,7 @@ namespace gui
         text->setEdges(gui::RectangleEdge::None);
         text->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         text->setFont(style::window::font::big);
-        text->setEllipsis(Ellipsis::Right);
+        text->setTextEllipsisType(TextEllipsis::Right);
 
         timestamp = new gui::Label(hBox, 0, 0, 0, 0);
         timestamp->setMargins(Margins(0, 0, clItemStyle::right_margin, 0));

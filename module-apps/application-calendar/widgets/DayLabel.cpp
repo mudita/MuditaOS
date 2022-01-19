@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayLabel.hpp"
@@ -9,7 +9,7 @@
 
 #include <gui/widgets/Image.hpp>
 #include <time/time_conversion.hpp>
-#include <gui/widgets/Label.hpp>
+#include <gui/widgets/text/Label.hpp>
 
 namespace gui
 {

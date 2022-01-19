@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Header.hpp"
@@ -39,7 +39,7 @@ namespace gui::header
         title->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
         title->setPadding(gui::Padding(0, style::header::title::top_padding, 0, 0));
         title->setEdges(RectangleEdge::None);
-        title->setEllipsis(Ellipsis::Right);
+        title->setTextEllipsisType(TextEllipsis::Right);
         title->setVisible(true);
         title->setText(text);
         return title;

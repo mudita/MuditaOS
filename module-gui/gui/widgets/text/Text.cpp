@@ -230,7 +230,7 @@ namespace gui
                                  ? text::RichTextParser().parse(text, &format)->getText()
                                  : text;
 
-            setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + TextCursor::defaultWidth);
+            setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + getCursorDrawSpace());
         }
     }
 
@@ -387,7 +387,7 @@ namespace gui
         debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 
         lines->draw(drawCursor,
-                    getSizeMinusPadding(Axis::X, Area::Max) - TextCursor::defaultWidth,
+                    getSizeMinusPadding(Axis::X, Area::Max) - getCursorDrawSpace(),
                     getSizeMinusPadding(Axis::Y, Area::Max),
                     padding.top,
                     padding.left,
@@ -415,7 +415,7 @@ namespace gui
                 if (format.getFont() != nullptr &&
                     padding.top + lines->linesHeight() < format.getFont()->info.line_height) {
                     hUsed = format.getFont()->info.line_height;
-                    wUsed = TextCursor::defaultWidth;
+                    wUsed = getCursorDrawSpace();
                     debug_text("empty line height: %d", hUsed);
                 }
             }
@@ -497,6 +497,11 @@ namespace gui
     void Text::showCursor(bool focus)
     {
         cursor->setVisible(focus && isMode(EditMode::Edit));
+    }
+
+    unsigned int Text::getCursorDrawSpace()
+    {
+        return editMode == EditMode::Edit ? TextCursor::defaultWidth : 0;
     }
 
     auto Text::handleRotateInputMode(const InputEvent &inputEvent) -> bool

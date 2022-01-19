@@ -6,7 +6,7 @@
 #include <FontManager.hpp>
 #include <RawFont.hpp>
 #include <gui/widgets/ImageBox.hpp>
-#include <gui/widgets/Label.hpp>
+#include <gui/widgets/text/Label.hpp>
 
 static constexpr auto hourMin         = 0;
 static constexpr auto hourMax         = 23;

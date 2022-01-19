@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlgoParamsWindow.hpp"
@@ -6,7 +6,7 @@
 #include <application-antenna/ApplicationAntenna.hpp>
 #include <module-gui/gui/widgets/BoxLayout.hpp>
 #include <module-gui/gui/widgets/Item.hpp>
-#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/text/Label.hpp>
 #include <module-gui/gui/widgets/Style.hpp>
 #include <module-gui/gui/widgets/Window.hpp>
 #include <i18n/i18n.hpp>

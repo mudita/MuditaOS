@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextWithIconsWidget.hpp"
@@ -63,5 +63,12 @@ TextWithSnippet::TextWithSnippet(const std::string &text, const UTF8 &font, cons
     setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
 
     addWidget(createSnippet(snippet));
-    addWidget(createText(text, font));
+    textWidget = createText(text, font);
+    addWidget(textWidget);
+}
+
+TextWithSnippet::TextWithSnippet(Item *parent, const UTF8 &font, const UTF8 &snippet)
+    : TextWithSnippet("", font, snippet)
+{
+    parent->addWidget(this);
 }
