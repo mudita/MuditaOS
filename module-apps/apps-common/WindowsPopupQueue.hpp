@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -31,7 +31,7 @@ namespace app
 
         /// append element to stack
         /// returns success/fail
-        bool pushRequest(gui::popup::Request &&r);
+        void pushRequest(gui::popup::Request &&r);
 
       private:
         /// set of requests to handle if there are more than one
@@ -40,6 +40,6 @@ namespace app
         /// this behaviour can be easily changed - just change:
         /// - gui::popup::Disposition class to hold more data
         /// - change comparison algorithm in Request (please use std::set then)
-        std::set<gui::popup::Request> requests{};
+        std::multiset<gui::popup::Request> requests{};
     };
 } // namespace app

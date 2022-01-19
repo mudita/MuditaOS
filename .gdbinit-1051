@@ -1,6 +1,7 @@
 source .gdb_macros
 
 set pagination off
+set python print-stack full
 target remote localhost:2331
 source tools/gdb_crash_extend.py
 source tools/misc/puregdb/puregdb.py

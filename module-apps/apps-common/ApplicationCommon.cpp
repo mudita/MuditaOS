@@ -839,9 +839,9 @@ namespace app
             data->setDisposition(gui::popup::Disposition{
                 gui::popup::Disposition::Priority::Normal, gui::popup::Disposition::WindowType::Popup, id});
         }
-        auto request = gui::popup::Request(id, std::move(data), *blueprint);
-        windowsPopupQueue->pushRequest(std::move(request));
-        tryShowPopup();
+        windowsPopupQueue->pushRequest(gui::popup::Request(id, std::move(data), *blueprint));
+        auto result = tryShowPopup();
+        LOG_INFO("tryShowPopup %s status: %s", magic_enum::enum_name(id).data(), result ? "shown" : "ignored");
     }
 
     gui::popup::Filter &ApplicationCommon::getPopupFilter() const
@@ -860,7 +860,6 @@ namespace app
             if (not retval) {
                 LOG_ERROR("Popup %s handling failure, please check registered blueprint!", popup.c_str());
             }
-            LOG_ERROR("no blueprint for popup: %s", popup.c_str());
             return retval;
         }
         return false;
