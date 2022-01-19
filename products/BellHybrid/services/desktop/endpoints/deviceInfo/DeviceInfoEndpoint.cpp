@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/deviceInfo/DeviceInfoEndpoint.hpp>
@@ -37,25 +37,68 @@ namespace sdesktop::endpoints
         return dynamic_cast<ServiceDesktop *>(ownerServicePtr)->getSerialNumber();
     }
 
+    auto DeviceInfoEndpoint::getStorageStats(const std::string &path) -> std::tuple<long, long>
+    {
+        std::unique_ptr<struct statvfs> vfstat = std::make_unique<struct statvfs>();
+        if (statvfs(path.c_str(), vfstat.get()) < 0) {
+            return {-1, -1};
+        }
+
+        unsigned long totalMbytes = (uint64_t(vfstat->f_blocks) * uint64_t(vfstat->f_bsize)) / (1024LLU * 1024LLU);
+        unsigned long freeMbytes  = (uint64_t(vfstat->f_bfree) * uint64_t(vfstat->f_bsize)) / (1024LLU * 1024LLU);
+
+        return {totalMbytes, freeMbytes};
+    }
+
     auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
     {
         if (ownerServicePtr == nullptr) {
-            return false;
-        }
-        std::unique_ptr<struct statvfs> vfstat = std::make_unique<struct statvfs>();
-        if ((*statvfs)(purefs::dir::getRootDiskPath().c_str(), vfstat.get()) < 0) {
+            context.setResponseStatus(http::Code::InternalServerError);
             return false;
         }
 
-        unsigned long totalMbytes = (vfstat->f_frsize * vfstat->f_blocks) / 1024LLU / 1024LLU;
-        unsigned long freeMbytes  = (vfstat->f_bfree * vfstat->f_bsize) / 1024LLU / 1024LLU;
-        unsigned long freePercent = (freeMbytes * 100) / totalMbytes;
+        const std::array<std::filesystem::path, 2> storagePaths{purefs::dir::getRootDiskPath(),
+                                                                purefs::dir::getPreviousOSPath()};
+
+        unsigned long totalMbytes    = 0;
+        unsigned long freeUserMbytes = 0;
+        unsigned long freePercent    = 0;
+
+        for (const auto &p : storagePaths) {
+            auto [totalSpace, freeSpace] = getStorageStats(p);
+
+            if (totalSpace < 0 || freeSpace < 0) {
+                LOG_ERROR("Failed to get stats for %s", p.c_str());
+                continue;
+            }
+
+            totalMbytes += totalSpace;
+        }
+
+        // User partition stats
+        const auto storagePath       = purefs::dir::getUserDiskPath();
+        auto [totalSpace, freeSpace] = getStorageStats(storagePath);
+
+        if (totalSpace < 0 || freeSpace < 0) {
+            LOG_ERROR("Failed to get stats for %s", storagePath.c_str());
+        }
+        else {
+            totalMbytes += totalSpace;
+            freeUserMbytes = freeSpace;
+
+            // Deduct 1024 MB reserved for OS data on User partition
+            freeUserMbytes -= OS_RESERVED_SPACE_IN_MB;
+        }
+
+        if (totalMbytes) {
+            freePercent = (freeUserMbytes * 100) / totalMbytes;
+        }
 
         context.setResponseBody(
             json11::Json::object({{json::batteryLevel, std::to_string(Store::Battery::get().level)},
                                   {json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
                                   {json::fsTotal, std::to_string(totalMbytes)},
-                                  {json::fsFree, std::to_string(freeMbytes)},
+                                  {json::fsFree, std::to_string(freeUserMbytes)},
                                   {json::fsFreePercent, std::to_string(freePercent)},
                                   {json::gitRevision, (std::string)(GIT_REV)},
                                   {json::gitBranch, (std::string)GIT_BRANCH},
