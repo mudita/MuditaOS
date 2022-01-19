@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneMode.hpp"
@@ -16,6 +16,7 @@ namespace gui::status_bar
     {
         setEdges(RectangleEdge::None);
         setFont(style::status_bar::nat::font);
+        setTextEllipsisType(TextEllipsis::Right);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
     }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,7 +22,7 @@ namespace style::meditation
         namespace setterValueLabel
         {
             constexpr auto Width           = 140;
-            constexpr auto Height          = 96;
+            constexpr auto Height          = 100;
             constexpr auto TopMargin       = 80;
             constexpr auto BottomLineWidth = 100;
             constexpr auto BottomLinePen   = 2;
@@ -31,7 +31,7 @@ namespace style::meditation
         namespace setterUnitLabel
         {
             constexpr auto Width     = 220;
-            constexpr auto Height    = 20;
+            constexpr auto Height    = 23;
             constexpr auto TopMargin = 15;
         } // namespace setterUnitLabel
 

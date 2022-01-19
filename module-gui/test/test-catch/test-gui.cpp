@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /// These are random tests what could be salvaged from old tests
@@ -22,7 +22,7 @@
 
 #include <module-gui/gui/core/ImageManager.hpp>
 #include <module-gui/gui/core/BoundingBox.hpp>
-#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/text/Label.hpp>
 #include <module-gui/gui/widgets/BoxLayout.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
 
@@ -81,7 +81,7 @@ TEST_CASE("Draw window with labels")
     label = new gui::Label(win, 20, 480, 440, 120, "BOTTOM RIGHT");
     label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
     label->setRadius(15);
-    label->setEllipsis(gui::Ellipsis::Right);
+    label->setTextEllipsisType(gui::TextEllipsis::Right);
     label->setFont("gt_pressura_bold_65");
 
     // vector with draw commands
@@ -93,6 +93,7 @@ TEST_CASE("Draw window with labels")
 
 TEST_CASE("Draw window with box layouts")
 {
+    mockup::fontManager();
     auto win_unique = make_unique<gui::TestWindow>("MAIN"); // make root gui element used unique to auto clean it
     auto win        = win_unique.get();                     // get pointer to root element for ctros sake
     win->setSize(480, 600);
@@ -104,9 +105,9 @@ TEST_CASE("Draw window with box layouts")
     maxW1->setFilled(true);
     maxW1->setMaximumSize(50, 300);
 
-    gui::Label *maxW4 = new gui::Label();
+    gui::Label *maxW4 = new gui::Label(nullptr);
     maxW4->setText("Top Left corner");
-    maxW4->setEllipsis(gui::Ellipsis::Right);
+    maxW4->setTextEllipsisType(gui::TextEllipsis::Right);
     maxW4->setMaximumSize(275, 60);
 
     gui::Rect *maxW2 = new gui::Rect();
@@ -134,7 +135,7 @@ TEST_CASE("Draw window with box layouts")
     gui::Rect *maxH3 = new gui::Rect();
     maxH3->setMaximumSize(30, 300);
 
-    gui::Label *maxH4 = new gui::Label();
+    gui::Label *maxH4 = new gui::Label(nullptr);
     maxH4->setText("Hello Mudita");
     maxH4->setRadius(20);
     maxH4->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));

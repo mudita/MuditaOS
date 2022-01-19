@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ColorTestListItem.hpp"
@@ -25,10 +25,10 @@ namespace gui
         colorLabel->setText(std::to_string(color.intensity) + " ");
 
         if (color.intensity > ColorGrey.intensity) {
-            colorLabel->setTextColor(ColorFullBlack);
+            colorLabel->setColor(ColorFullBlack);
         }
         else {
-            colorLabel->setTextColor(ColorFullWhite);
+            colorLabel->setColor(ColorFullWhite);
         }
 
         dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {

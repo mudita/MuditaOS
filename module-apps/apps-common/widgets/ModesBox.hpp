@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,7 +15,7 @@ namespace sys::phone_modes
 namespace style::window::modes
 {
     constexpr inline auto top_offset        = 182;
-    constexpr inline auto bottom_offset     = 235;
+    constexpr inline auto bottom_offset     = 210;
     constexpr inline auto height            = style::window_height - top_offset - bottom_offset;
     constexpr inline auto width             = style::window_width;
     constexpr inline auto number_of_entries = 4;

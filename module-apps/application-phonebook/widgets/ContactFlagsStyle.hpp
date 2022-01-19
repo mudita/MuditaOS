@@ -14,8 +14,7 @@ namespace style
             const uint32_t iconsSize   = 35;
             const uint32_t height      = 74;
             const uint32_t itemWidth   = 125;
-            const uint32_t itemHeight  = 55;
-            const uint32_t labelHeight = 20;
+            const uint32_t itemHeight  = 64;
         } // namespace ContactFlag
     }     // namespace widget
 } // namespace style

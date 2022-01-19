@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/text/Label.hpp>
 #include <module-gui/gui/widgets/ListItem.hpp>
 #include <module-gui/gui/widgets/text/TextFixedSize.hpp>
 

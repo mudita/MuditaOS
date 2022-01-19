@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
@@ -8,7 +8,7 @@
 
 #include <ContactRecord.hpp>
 #include <gui/widgets/Image.hpp>
-#include <gui/widgets/Label.hpp>
+#include <gui/widgets/text/Label.hpp>
 #include <gui/widgets/Window.hpp>
 #include <i18n/i18n.hpp>
 #include <text/modes/InputMode.hpp>
@@ -58,7 +58,8 @@ namespace gui
         numberLabel->setFont(style::window::font::largelight);
         numberLabel->setEdges(RectangleEdge::Bottom);
         numberLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        numberLabel->setEllipsis(Ellipsis::Left);
+        numberLabel->setTextEllipsisType(TextEllipsis::Left);
+        numberLabel->setCursorStartPosition(CursorStartPosition::DocumentEnd);
 
         numberDescriptionLabel = new gui::Label(this,
                                                 numberDescriptionLabel::x,

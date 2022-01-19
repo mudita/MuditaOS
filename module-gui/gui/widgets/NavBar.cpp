@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NavBar.hpp"
@@ -44,7 +44,7 @@ namespace gui::nav_bar
         left->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
         left->setMinimumHeight(widgetArea.h);
         left->setFont(style::nav_bar::font::medium);
-        left->setEllipsis(Ellipsis::Right);
+        left->setTextEllipsisType(TextEllipsis::Right);
         left->setVisible(true);
         left->setEdges(RectangleEdge::None);
 
@@ -54,7 +54,7 @@ namespace gui::nav_bar
         center->setMinimumHeight(widgetArea.h);
         center->setMaximumWidth(widgetArea.w);
         center->setFont(style::nav_bar::font::bold);
-        center->setEllipsis(Ellipsis::Right);
+        center->setTextEllipsisType(TextEllipsis::Right);
         center->setVisible(true);
         center->setEdges(RectangleEdge::None);
 
@@ -63,7 +63,7 @@ namespace gui::nav_bar
         right->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
         right->setMinimumHeight(widgetArea.h);
         right->setFont(style::nav_bar::font::medium);
-        right->setEllipsis(Ellipsis::Right);
+        right->setTextEllipsisType(TextEllipsis::Right);
         right->setVisible(true);
         right->setEdges(RectangleEdge::None);
     }

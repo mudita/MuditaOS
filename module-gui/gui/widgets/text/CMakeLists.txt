@@ -15,6 +15,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/modes/InputMode.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/parsers/RichTextParser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/parsers/TextParse.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/Label.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Text.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TextBubble.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TextFixedSize.cpp"

@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "../Common.hpp"
-#include "Ellipsis.hpp"
 #include "FontInfo.hpp"
 #include "utf8/UTF8.hpp"
 #include <cstdint>
@@ -90,14 +89,6 @@ namespace gui
         {
             return info.face;
         }
-
-        /// get elipsis text in selected width from input text
-        /// this essentially means:
-        /// return test with "..." if needed in text begin / end if needed
-        UTF8 getTextWithElipsis(const UTF8 &text, uint32_t width, Ellipsis ellipsis) const;
-        /**
-         * @brief Sets a font used as a glyphs collection of a "second chance"
-         */
         void setFallbackFont(RawFont *font);
 
       private:
@@ -108,14 +99,6 @@ namespace gui
         /// the glyph used when requested glyph is unsupported in the font (and the fallback font if one is set)
         std::unique_ptr<FontGlyph> unsupported = nullptr;
 
-        /// set ellipsis on text in first parameter
-        /// @note our UTF8 doesn't provide way to replace single character
-        ///
-        /// this is lazy done implementation - we just try to replace first/last 3 characters that would fit
-        void setEllipsis(std::string &text, Ellipsis ellipsis) const;
-        /**
-         * @brief creates the glyph to be used in case of a requested glyph could not be found in a font
-         */
         void createGlyphUnsupported();
 
         /// return glyph for selected code

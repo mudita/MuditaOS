@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InformationWidget.hpp"
@@ -23,14 +23,13 @@ namespace gui
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdge::None);
 
-        titleLabel = new Label(vBox, 0, 0, 0, 0, utils::translate("app_phonebook_contact_information"));
+        titleLabel = new TextWithSnippet(vBox, style::window::font::verysmall);
         titleLabel->setMinimumSize(phonebookStyle::informationWidget::w,
                                    phonebookStyle::informationWidget::title_label_h);
         titleLabel->setEdges(RectangleEdge::None);
         titleLabel->setMargins(Margins(0, 0, 0, style::margins::very_big));
-        titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-        titleLabel->setFont(style::window::font::verysmall);
-        titleLabel->setLineMode(true);
+        titleLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        titleLabel->textWidget->setText(utils::translate("app_phonebook_contact_information"));
         titleLabel->activeItem = false;
 
         onLoadCallback = [=](std::shared_ptr<ContactRecord> contact) {

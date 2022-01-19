@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BaseThreadItem.hpp"
@@ -26,7 +26,7 @@ namespace gui
 
         contact = createEmptyLabel(this);
         contact->setFont(style::window::font::bigbold);
-        contact->setEllipsis(Ellipsis::Right);
+        contact->setTextEllipsisType(TextEllipsis::Right);
         contact->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
         numberImportance = createEmptyLabel(this);
@@ -36,7 +36,7 @@ namespace gui
 
         timestamp = createEmptyLabel(this);
         timestamp->setFont(style::window::font::small);
-        timestamp->setEllipsis(Ellipsis::Right);
+        timestamp->setTextEllipsisType(TextEllipsis::Right);
         timestamp->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center});
 
         snippetPrefix = createEmptyLabel(this);
@@ -45,7 +45,7 @@ namespace gui
 
         snippet = createEmptyLabel(this);
         snippet->setFont(style::window::font::medium);
-        snippet->setEllipsis(Ellipsis::Right);
+        snippet->setTextEllipsisType(TextEllipsis::Right);
         snippet->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
     }
 
@@ -69,9 +69,8 @@ namespace gui
         const auto isNumberImportanceSet = !numberImportance->getText().empty();
         if (isNumberImportanceSet) {
             contact->setSize(contact->getWidth() - msgStyle::numberImportanceWidth, Axis::X);
-            numberImportance->setPosition(msgStyle::leftMargin + contact->getTextWidth() +
-                                              msgStyle::numberImportanceLeftMargin,
-                                          msgStyle::topMargin);
+            numberImportance->setPosition(
+                msgStyle::leftMargin + contact->getWidth() + msgStyle::numberImportanceLeftMargin, msgStyle::topMargin);
             numberImportance->setSize(msgStyle::numberImportanceWidth, newDim.h / 2 - msgStyle::topMargin);
         }
 
@@ -93,7 +92,7 @@ namespace gui
             snippetPrefix->setPosition(leftMargin, dimensions.h / 2);
             snippetPrefix->setSize(snippetPrefix->getTextNeedSpace(), dimensions.h / 2 - msgStyle::bottomMargin);
 
-            const auto prefixSpace = snippetPrefix->getTextWidth() + msgStyle::snippetLeftMargin;
+            const auto prefixSpace = snippetPrefix->getWidth() + msgStyle::snippetLeftMargin;
             snippet->setPosition(leftMargin + prefixSpace, dimensions.h / 2);
             snippet->setSize(dimensions.w - msgStyle::previewWidthOffset - prefixSpace - leftOffset,
                              dimensions.h / 2 - msgStyle::bottomMargin);

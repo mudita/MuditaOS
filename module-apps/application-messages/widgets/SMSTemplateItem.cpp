@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplateItem.hpp"
@@ -16,7 +16,7 @@ namespace gui
 
         text = new gui::Label(this, 0, 0, 0, 0);
         style::window::decorateOption(text);
-        text->setEllipsis(gui::Ellipsis::Right);
+        text->setTextEllipsisType(gui::TextEllipsis::Right);
 
         dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
             text->setArea({0, 0, newDim.w, newDim.h});

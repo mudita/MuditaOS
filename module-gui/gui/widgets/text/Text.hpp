@@ -65,6 +65,7 @@ namespace gui
 
         /// show cursor if cursor should be visible
         void showCursor(bool focus);
+        unsigned int getCursorDrawSpace();
 
       public:
         ExpandMode expandMode    = ExpandMode::None;

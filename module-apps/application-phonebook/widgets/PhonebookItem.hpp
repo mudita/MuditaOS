@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,6 +9,7 @@
 #include "ListItem.hpp"
 #include <BoxLayout.hpp>
 #include <TextFixedSize.hpp>
+#include <apps-common/widgets/TextWithIconsWidget.hpp>
 
 namespace gui
 {
@@ -21,7 +22,7 @@ namespace gui
         bool favourite = false;
         void markFavourite(bool val);
         void markBlocked(bool val);
-        LabelMarkerDisplayMode labeMarkerDisplayMode = LabelMarkerDisplayMode::IncludeFavourites;
+        LabelMarkerDisplayMode labelMarkerDisplayMode = LabelMarkerDisplayMode::IncludeFavourites;
 
       public:
         std::shared_ptr<ContactRecord> contact = nullptr;
@@ -31,10 +32,18 @@ namespace gui
 
         // sets copy of contact
         void setContact(std::shared_ptr<ContactRecord> note);
-        void setMarkerItem(UTF8 text);
         UTF8 getLabelMarker();
 
         void setLabelMarkerDisplayMode(LabelMarkerDisplayMode mode);
+    };
+
+    class PhonebookMarkItem : public ListItem
+    {
+      private:
+        TextWithSnippet *markLabel = nullptr;
+
+      public:
+        explicit PhonebookMarkItem(const UTF8 &markText);
     };
 
 } /* namespace gui */

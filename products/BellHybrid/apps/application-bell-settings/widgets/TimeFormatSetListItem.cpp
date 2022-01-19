@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeFormatSetListItem.hpp"
@@ -6,7 +6,7 @@
 
 #include <gui/core/FontManager.hpp>
 #include <gui/core/RawFont.hpp>
-#include <gui/widgets/Label.hpp>
+#include <gui/widgets/text/Label.hpp>
 
 #include <widgets/TimeSetFmtSpinner.hpp>
 

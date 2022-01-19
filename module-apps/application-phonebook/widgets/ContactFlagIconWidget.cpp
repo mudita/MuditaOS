@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactFlagIconWidget.hpp"
@@ -54,11 +54,13 @@ namespace gui
     {
         setEdges(RectangleEdge::None);
 
-        label = new Label(this, 0, 0, style::widget::ContactFlag::itemWidth, style::widget::ContactFlag::labelHeight);
+        label = new Label(this);
         label->setFilled(false);
         label->setFont(style::window::font::verysmall);
         label->setText(itemText);
-        label->setEllipsis(gui::Ellipsis::None);
+        label->setMinimumWidthToFitText();
+        label->setMinimumHeightToFitText();
+        label->setTextEllipsisType(gui::TextEllipsis::None);
         label->setEdges(RectangleEdge::None);
         label->setAlignment(Alignment(Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
@@ -72,6 +74,7 @@ namespace gui
             mainBox->addWidget(icon);
         }
         mainBox->addWidget(label);
+        mainBox->resizeItems();
     }
 
 } // namespace gui

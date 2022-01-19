@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,7 @@
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/widgets/ContactListItem.hpp"
 
+#include <apps-common/widgets/TextWithIconsWidget.hpp>
 #include <ListItem.hpp>
 #include <Text.hpp>
 
@@ -21,7 +22,7 @@ namespace gui
 
         ~OutputLinesTextWithLabelWidget() override = default;
         VBox *vBox                                 = nullptr;
-        Label *titleLabel                          = nullptr;
+        TextWithSnippet *titleLabel                = nullptr;
         Text *multilineText                        = nullptr;
 
         auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;

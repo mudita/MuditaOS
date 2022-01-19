@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DBNotificationsHandler.hpp"
@@ -102,7 +102,7 @@ namespace gui
                                std::function<bool()> hasNotificationsCallback)
         : Tile{std::move(icon), std::move(title), std::move(activatedCallback), std::move(hasNotificationsCallback)}
     {
-        description->setTextColor(gui::ColorGrey);
+        description->setColor(gui::ColorGrey);
     }
 
     MenuPage::MenuPage(gui::Item *parent, UTF8 title, std::vector<Tile *> tiles) : title(std::move(title))
