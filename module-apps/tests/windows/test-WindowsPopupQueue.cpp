@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WindowsPopupFilter.hpp"
@@ -20,18 +20,32 @@ TEST_CASE("WindowsPopupQueue push")
     using namespace gui::popup;
     auto wp = app::WindowsPopupQueue();
     Blueprint blueprint;
-    Request request(gui::popup::ID::Alarm, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::Alarm), blueprint);
+    SECTION("single")
     {
-        auto r = wp.pushRequest(std::move(request));
-        REQUIRE(r);
-    }
-    {
-        auto r = wp.popRequest(filter);
-        REQUIRE(r);
-    }
-    {
+        Request request(
+            gui::popup::ID::Alarm, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::Alarm), blueprint);
+        wp.pushRequest(std::move(request));
+        wp.popRequest(filter);
         auto r = wp.popRequest(filter);
         REQUIRE(not r);
+    }
+
+    /// we should be able to have multiple same requests stored on the popups queue
+    SECTION("multiple")
+    {
+        const auto count = 3;
+        auto request_gen = [blueprint]() {
+            return Request(
+                gui::popup::ID::Alarm, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::Alarm), blueprint);
+        };
+        Request request[count] = {request_gen(), request_gen(), request_gen()};
+        for (auto &val : request) {
+            wp.pushRequest(std::move(val));
+        }
+        for (auto i = count; i != 0; --i) {
+            auto r = wp.popRequest(filter);
+            REQUIRE(r);
+        }
     }
 }
 
@@ -50,10 +64,7 @@ TEST_CASE("WindowsPopupQueue filter")
     Blueprint blueprint;
     auto noneFilter = NoneFilter();
     Request request(gui::popup::ID::Alarm, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::Alarm), blueprint);
-    {
-        auto r = wp.pushRequest(std::move(request));
-        REQUIRE(r);
-    }
+    wp.pushRequest(std::move(request));
     {
         auto r = wp.popRequest(noneFilter);
         REQUIRE(not r);
