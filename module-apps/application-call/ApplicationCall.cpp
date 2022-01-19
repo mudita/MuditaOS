@@ -65,8 +65,7 @@ namespace app
         });
 
         addActionReceiver(manager::actions::NoSimNotification, [this](auto &&data) {
-            showNotificationAndRestartCallFlow(NotificationType::Info,
-                                               utils::translate("app_app_call_no_simcall_offline"));
+            showNotificationAndRestartCallFlow(NotificationType::Info, utils::translate("app_call_no_sim"));
             return actionHandled();
         });
         addActionReceiver(manager::actions::NoNetworkConnectionNotification, [this](auto &&data) {
