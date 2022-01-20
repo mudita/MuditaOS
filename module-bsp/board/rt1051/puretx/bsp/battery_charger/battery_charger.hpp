@@ -6,14 +6,6 @@
 #include "MAX77818.hpp"
 
 #include <cstdint>
-extern "C"
-{
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-}
-
-#include <array>
 
 namespace bsp::battery_charger
 {
@@ -34,7 +26,8 @@ namespace bsp::battery_charger
         OK,
         ChargerError,
         ChargerNotCharging,
-        ChargerCharging
+        ChargerCharging,
+        ChargingDone
     };
 
     enum class batteryIRQSource
@@ -66,7 +59,7 @@ namespace bsp::battery_charger
         unsigned maxMilliVolt{0};
     };
 
-    int init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle);
+    int init();
 
     void deinit();
 
@@ -74,7 +67,7 @@ namespace bsp::battery_charger
 
     void evaluateBatteryLevelChange(const std::uint16_t currentLevel, const std::uint16_t updatedLevel);
 
-    bool getChargeStatus();
+    batteryRetval getChargeStatus();
 
     void clearAllChargerIRQs();
 
@@ -88,8 +81,6 @@ namespace bsp::battery_charger
 
     void setMaxBusCurrent(USBCurrentLimit limit);
 
-    void actionIfChargerUnplugged();
-
     int getVoltageFilteredMeasurement();
 
     int getAvgCurrent();
@@ -97,11 +88,5 @@ namespace bsp::battery_charger
     MaxMinVolt getMaxMinVolt();
 
     void printFuelGaugeInfo();
-
-    BaseType_t INTB_IRQHandler();
-
-    BaseType_t INOKB_IRQHandler();
-
-    void USBChargerDetectedHandler(std::uint8_t detectedType);
 
 } // namespace bsp::battery_charger

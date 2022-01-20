@@ -1,120 +1,201 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BatteryCharger.hpp"
+#include "BatteryChargerIRQ.hpp"
+#include "common/WorkerQueue.hpp"
 
+#include <hal/battery_charger/AbstractBatteryCharger.hpp>
 #include <bsp/battery_charger/battery_charger.hpp>
-#include <hal/GenericFactory.hpp>
 
-namespace hal::battery
+#include <magic_enum.hpp>
+
+namespace
 {
-    BatteryCharger::BatteryCharger(AbstractBatteryCharger::BatteryChargerEvents &eventsHandler)
-        : eventsHandler(eventsHandler)
-    {}
-
-    void BatteryCharger::init(xQueueHandle queueBatteryHandle, xQueueHandle queueChargerDetect)
+    hal::battery::AbstractBatteryCharger::ChargingStatus transformChargingState(
+        bsp::battery_charger::batteryRetval status)
     {
-        bsp::battery_charger::init(queueBatteryHandle, queueChargerDetect);
-    }
-
-    void BatteryCharger::BatteryCharger::deinit()
-    {
-        bsp::battery_charger::deinit();
-    }
-
-    void BatteryCharger::processStateChangeNotification(std::uint8_t notification)
-    {
-        if (notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INTB) ||
-            notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INOKB)) {
-            checkBatteryChargerInterrupts();
+        using Status   = bsp::battery_charger::batteryRetval;
+        using NewState = hal::battery::AbstractBatteryCharger::ChargingStatus;
+        switch (status) {
+        case Status::ChargerCharging:
+            return NewState::Charging;
+        case Status::ChargingDone:
+            return NewState::ChargingDone;
+        case Status::ChargerNotCharging:
+            return NewState ::Discharging;
+        default:
+            return NewState::PluggedNotCharging;
         }
     }
 
-    int BatteryCharger::getBatteryVoltage()
-    {
-        return bsp::battery_charger::getVoltageFilteredMeasurement();
-    }
+    /// A few constants to make code readability better
+    constexpr auto int_b_soc_change =
+        static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange);
+    constexpr auto int_b_max_temp = static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::maxTemp);
+    constexpr auto int_b_min_temp = static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minTemp);
+    constexpr auto int_b_all      = static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::all);
+    constexpr auto int_b_miv_v    = static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert);
 
-    void BatteryCharger::setChargingCurrentLimit(std::uint8_t chargerType)
+    constexpr auto int_source_charger =
+        static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::CHGR_INT);
+
+    constexpr auto int_source_fuel_gauge =
+        static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::FG_INT);
+
+} // namespace
+
+namespace hal::battery
+{
+    class PureBatteryCharger : public AbstractBatteryCharger
+    {
+      public:
+        struct IrqEvents
+        {
+            enum class Type
+            {
+                Controller,
+                USBChargerAttached
+            };
+            Type type;
+            std::uint8_t chargerType{};
+        };
+        using BatteryWorkerQueue = WorkerQueue<IrqEvents>;
+
+        explicit PureBatteryCharger(xQueueHandle irqQueueHandle);
+        ~PureBatteryCharger();
+
+        Voltage getBatteryVoltage() const final;
+        SOC getSOC() const final;
+        ChargingStatus getChargingStatus() const final;
+
+        static BatteryWorkerQueue &getWorkerQueueHandle();
+
+      private:
+        static constexpr auto workerStackSize = 1024;
+        void setChargingCurrentLimit(std::uint8_t usbType);
+        void sendNotification(AbstractBatteryCharger::Events event);
+        void checkControllerInterrupts();
+
+        QueueHandle_t notificationChannel;
+        inline static std::unique_ptr<BatteryWorkerQueue> workerQueue;
+    };
+
+    PureBatteryCharger::PureBatteryCharger(QueueHandle_t irqQueueHandle) : notificationChannel{irqQueueHandle}
+    {
+        workerQueue = std::make_unique<BatteryWorkerQueue>(
+            "battery_charger",
+            [this](const auto &msg) {
+                switch (msg.type) {
+                case IrqEvents::Type::Controller: {
+                    checkControllerInterrupts();
+                } break;
+
+                case IrqEvents::Type::USBChargerAttached: {
+                    setChargingCurrentLimit(msg.chargerType);
+                } break;
+                }
+            },
+            workerStackSize);
+
+        bsp::battery_charger::init();
+        bsp::battery_charger::printFuelGaugeInfo();
+    }
+    PureBatteryCharger::~PureBatteryCharger()
+    {
+        bsp::battery_charger::deinit();
+    }
+    void PureBatteryCharger::setChargingCurrentLimit(std::uint8_t usbType)
     {
         using namespace bsp::battery_charger;
-        switch (static_cast<batteryChargerType>(chargerType)) {
+        switch (static_cast<batteryChargerType>(usbType)) {
         case batteryChargerType::DcdTimeOut:
-            [[fallthrough]];
         case batteryChargerType::DcdUnknownType:
-            [[fallthrough]];
         case batteryChargerType::DcdError:
-            [[fallthrough]];
         case batteryChargerType::DcdSDP:
+            LOG_INFO("USB current limit set to 500mA");
             setMaxBusCurrent(USBCurrentLimit::lim500mA);
             break;
         case batteryChargerType::DcdCDP:
-            [[fallthrough]];
         case batteryChargerType::DcdDCP:
             LOG_INFO("USB current limit set to 1000mA");
             setMaxBusCurrent(USBCurrentLimit::lim1000mA);
             break;
         }
     }
-
-    void BatteryCharger::checkBatteryChargerInterrupts()
+    AbstractBatteryCharger::Voltage PureBatteryCharger::getBatteryVoltage() const
     {
-        auto topINT = bsp::battery_charger::getTopControllerINTSource();
-        if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::CHGR_INT)) {
-            bsp::battery_charger::getChargeStatus();
-            bsp::battery_charger::actionIfChargerUnplugged();
+        return bsp::battery_charger::getVoltageFilteredMeasurement();
+    }
+    AbstractBatteryCharger::SOC PureBatteryCharger::getSOC() const
+    {
+        return bsp::battery_charger::getBatteryLevel();
+    }
+    AbstractBatteryCharger::ChargingStatus PureBatteryCharger::getChargingStatus() const
+    {
+        return transformChargingState(bsp::battery_charger::getChargeStatus());
+    }
+    PureBatteryCharger::BatteryWorkerQueue &PureBatteryCharger::getWorkerQueueHandle()
+    {
+        return *workerQueue;
+    }
+    void PureBatteryCharger::checkControllerInterrupts()
+    {
+        std::array<std::optional<Events>, 4> events;
+
+        const auto topINT = bsp::battery_charger::getTopControllerINTSource();
+        if (topINT & int_source_charger) {
             bsp::battery_charger::clearAllChargerIRQs();
-
-            eventsHandler.onStatusChanged();
+            events[magic_enum::enum_integer(Events::Charger)] = Events::Charger;
         }
-        if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::FG_INT)) {
+        if (topINT & int_source_fuel_gauge) {
             const auto status = bsp::battery_charger::getStatusRegister();
-            if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert)) {
-                bsp::battery_charger::clearFuelGuageIRQ(
-                    static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert));
-
-                eventsHandler.onBrownout();
+            if (status & int_b_miv_v) {
+                bsp::battery_charger::clearFuelGuageIRQ(int_b_miv_v);
+                events[magic_enum::enum_integer(Events::Brownout)] = Events::Brownout;
             }
-            if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange)) {
-                bsp::battery_charger::printFuelGaugeInfo();
-                bsp::battery_charger::clearFuelGuageIRQ(
-                    static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange));
-                bsp::battery_charger::getBatteryLevel();
-
-                eventsHandler.onStatusChanged();
+            if (status & int_b_soc_change) {
+                bsp::battery_charger::clearFuelGuageIRQ(int_b_soc_change);
+                events[magic_enum::enum_integer(Events::SOC)] = Events::SOC;
             }
-            if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::maxTemp) ||
-                status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minTemp)) {
-                bsp::battery_charger::clearFuelGuageIRQ(
-                    static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::maxTemp) |
-                    static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minTemp));
+            if (status & int_b_min_temp || status & int_b_max_temp) {
+                bsp::battery_charger::clearFuelGuageIRQ(int_b_min_temp | int_b_max_temp);
                 bsp::battery_charger::checkTemperatureRange();
-                bsp::battery_charger::getChargeStatus();
-
-                eventsHandler.onStatusChanged();
             }
-            // Clear other unsupported IRQ sources just in case
-            bsp::battery_charger::clearFuelGuageIRQ(
-                static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::all));
+            /// Clear other unsupported IRQ sources just in case
+            bsp::battery_charger::clearFuelGuageIRQ(int_b_all);
         }
+
+        /// Send notifications
+        for (const auto &event : events) {
+            if (event) {
+                sendNotification(*event);
+            }
+        }
+    }
+    void PureBatteryCharger::sendNotification(AbstractBatteryCharger::Events event)
+    {
+        xQueueSend(notificationChannel, &event, pdMS_TO_TICKS(100));
+    }
+
+    std::unique_ptr<AbstractBatteryCharger> AbstractBatteryCharger::Factory::create(xQueueHandle irqQueueHandle)
+    {
+        return std::make_unique<PureBatteryCharger>(irqQueueHandle);
+    }
+
+    extern "C" void USB_ChargerDetectedCB(std::uint8_t detectedType)
+    {
+        PureBatteryCharger::getWorkerQueueHandle().post(
+            {PureBatteryCharger::IrqEvents::Type::USBChargerAttached, detectedType});
     }
 
     BaseType_t INTBHandlerIRQ()
     {
-        return bsp::battery_charger::INTB_IRQHandler();
+        return PureBatteryCharger::getWorkerQueueHandle().post({PureBatteryCharger::IrqEvents::Type::Controller});
     }
 
     BaseType_t INOKBHandlerIRQ()
     {
-        return bsp::battery_charger::INOKB_IRQHandler();
-    }
-
-    extern "C"
-    {
-        void USB_ChargerDetectedCB(std::uint8_t detectedType)
-        {
-            bsp::battery_charger::USBChargerDetectedHandler(detectedType);
-        }
+        return PureBatteryCharger::getWorkerQueueHandle().post({PureBatteryCharger::IrqEvents::Type::Controller});
     }
 
 } // namespace hal::battery

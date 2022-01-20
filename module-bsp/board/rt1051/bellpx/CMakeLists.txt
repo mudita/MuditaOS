@@ -16,10 +16,9 @@ target_sources(
 
         bsp/audio/AW8898driver.cpp
         bsp/audio/CodecAW8898.cpp
-        bsp/battery-charger/battery-charger.cpp
+
         bsp/bell_temp_sensor/bell_temp_sensor.cpp
         bsp/eink/eink_pin_config.cpp
-        bsp/fuel_gauge/fuel_gauge.cpp
         bsp/lpm/PowerProfile.cpp
         bsp/rotary_encoder/rotary_encoder.cpp
         bsp/switches/switches.cpp

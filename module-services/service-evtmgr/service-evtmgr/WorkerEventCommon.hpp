@@ -34,8 +34,7 @@ enum class WorkerEventQueues
     queueService = 0,
     queueControl = 1,
     queueKeyboardIRQ,
-    queueBattery,
-    queueChargerDetect,
+    queueBatteryController,
     queueRTC,
 };
 
@@ -54,8 +53,7 @@ class WorkerEventCommon : public sys::Worker
     static constexpr auto stackDepthBytes = 3072;
 
     static constexpr auto keyboardQueueName = "qIrq";
-    static constexpr auto batteryQueueName  = "qBattery";
-    static constexpr auto chargerQueueName  = "qCharger";
+    static constexpr auto batteryQueueName  = "qBatteryCtrl";
     static constexpr auto rtcQueueName      = "qRTC";
 
     static constexpr auto keyboardQueueSize = 10;
