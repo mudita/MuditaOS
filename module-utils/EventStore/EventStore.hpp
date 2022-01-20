@@ -24,7 +24,7 @@ namespace Store
 {
     struct Battery
     {
-        enum class LevelState
+        enum class LevelState : std::uint8_t
         {
             Normal,
             Shutdown,
@@ -32,7 +32,7 @@ namespace Store
             CriticalNotCharging
         } levelState = LevelState::Normal;
 
-        enum class State
+        enum class State : std::uint8_t
         {
             Discharging,
             Charging,

@@ -15,13 +15,10 @@ namespace
     constexpr auto brownoutLevelVoltage    = 3600; // mV
 } // namespace
 
-BatteryBrownoutDetector::BatteryBrownoutDetector(sys::Service *service,
-                                                 std::shared_ptr<hal::battery::AbstractBatteryCharger> charger)
-    : parentService(service),
-      charger(std::move(charger)), measurementTick{sys::TimerFactory::createSingleShotTimer(
-                                       service, measurementTickName, measurementTickTime, [this](sys::Timer &) {
-                                           checkBrownout();
-                                       })}
+BatteryBrownoutDetector::BatteryBrownoutDetector(sys::Service *service, hal::battery::AbstractBatteryCharger &charger)
+    : parentService(service), charger{charger},
+      measurementTick{sys::TimerFactory::createSingleShotTimer(
+          service, measurementTickName, measurementTickTime, [this](sys::Timer &) { checkBrownout(); })}
 {}
 
 void BatteryBrownoutDetector::startDetection()
@@ -37,7 +34,7 @@ void BatteryBrownoutDetector::startDetection()
 
 void BatteryBrownoutDetector::checkBrownout()
 {
-    if (charger->getBatteryVoltage() < brownoutLevelVoltage) {
+    if (charger.getBatteryVoltage() < brownoutLevelVoltage) {
         LOG_DEBUG("Battery Brownout detected");
 
         auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();

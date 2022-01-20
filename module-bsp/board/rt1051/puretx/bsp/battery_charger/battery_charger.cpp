@@ -5,8 +5,10 @@
 #include "battery_charger_utils.hpp"
 
 #include <fsl_common.h>
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include <board/BoardDefinitions.hpp>
-#include <EventStore.hpp>
 #include <drivers/gpio/DriverGPIO.hpp>
 #include <drivers/i2c/DriverI2C.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -14,6 +16,7 @@
 #include <utility>
 #include <fstream>
 #include <map>
+#include <log/log.hpp>
 
 namespace bsp::battery_charger
 {
@@ -34,7 +37,7 @@ namespace bsp::battery_charger
 
         constexpr std::uint16_t nominalCapacitymAh = 1600;
 
-        constexpr std::uint16_t fullyChargedSOC = 100;
+        constexpr std::uint16_t fullyChargedSOC   = 100;
         constexpr std::uint16_t percentLevelDelta = 5;
 
         constexpr std::uint16_t maxVoltagemV = 4400;
@@ -117,9 +120,6 @@ namespace bsp::battery_charger
         drivers::I2CAddress fuelGaugeAddress      = {FUEL_GAUGE_I2C_ADDR, 0, i2cSubaddresSize};
         drivers::I2CAddress batteryChargerAddress = {BATTERY_CHARGER_I2C_ADDR, 0, i2cSubaddresSize};
         drivers::I2CAddress topControllerAddress  = {TOP_CONTROLLER_I2C_ADDR, 0, i2cSubaddresSize};
-
-        xQueueHandle IRQQueueHandle = nullptr;
-        xQueueHandle DCDQueueHandle = nullptr;
 
         int fuelGaugeWrite(Registers registerAddress, std::uint16_t value)
         {
@@ -318,12 +318,10 @@ namespace bsp::battery_charger
                 auto regVal = fuelGaugeRead(static_cast<Registers>(i));
                 if (regVal.first != kStatus_Success) {
                     LOG_ERROR("Reading register 0x%x failed.", i);
-                    file.close();
                     return batteryRetval::ChargerError;
                 }
                 file.write(reinterpret_cast<const char *>(&regVal.second), sizeof(std::uint16_t));
             }
-            file.close();
 
             return batteryRetval::OK;
         }
@@ -506,7 +504,6 @@ namespace bsp::battery_charger
         void chargingFinishedAction()
         {
             LOG_DEBUG("Charging finished.");
-            storeConfiguration();
         }
 
         void processTemperatureRange(TemperatureRanges temperatureRange)
@@ -546,15 +543,12 @@ namespace bsp::battery_charger
 
     } // namespace
 
-    int init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle)
+    int init()
     {
         drivers::DriverI2CParams i2cParams;
         i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_I2C_BAUDRATE);
         i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::BATTERY_CHARGER_I2C),
                                          i2cParams);
-
-        IRQQueueHandle = irqQueueHandle;
-        DCDQueueHandle = dcdQueueHandle;
 
         configureBatteryCharger();
 
@@ -577,17 +571,12 @@ namespace bsp::battery_charger
         // Short time to synchronize after configuration
         vTaskDelay(pdMS_TO_TICKS(100));
         StateOfCharge level = getBatteryLevel();
-        bool charging       = getChargeStatus();
-        LOG_INFO("Phone battery start state: %d %d", level, charging);
 
         clearAllChargerIRQs();
         clearFuelGuageIRQ(static_cast<std::uint16_t>(batteryINTBSource::all));
         enableTopIRQs();
         enableChargerIRQs();
         IRQPinsInit();
-
-        // Check IRQ status register
-        INTB_IRQHandler();
 
         return 0;
     }
@@ -599,9 +588,6 @@ namespace bsp::battery_charger
 
         gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
         gpio->DisableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
-
-        IRQQueueHandle = nullptr;
-        DCDQueueHandle = nullptr;
 
         i2c.reset();
         gpio.reset();
@@ -624,17 +610,15 @@ namespace bsp::battery_charger
         if (readout.first != kStatus_Success) {
             LOG_ERROR("failed to get battery percent");
         }
-        StateOfCharge levelPercent     = (readout.second & 0xff00) >> 8;
-        const auto currentPercent      = Store::Battery::get().level;
-        Store::Battery::modify().level = levelPercent;
 
-        evaluateBatteryLevelChange(currentPercent, levelPercent);
-
-        return levelPercent;
+        /// 16 bit result. The high byte indicates 1% per LSB. The low byte reports fractional percent. We don't care
+        /// about fractional part.
+        return (readout.second & 0xff00) >> 8;
     }
 
-    bool getChargeStatus()
+    batteryRetval getChargeStatus()
     {
+        batteryRetval retVal{};
         // read clears state
         auto IRQSource = chargerRead(Registers::CHG_INT_REG);
         if (IRQSource.first != kStatus_Success) {
@@ -648,39 +632,35 @@ namespace bsp::battery_charger
         auto chargingSetup  = chargerRead(Registers::CHG_CNFG_00);
 
         if (summary.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I)) {
-            Store::Battery::modify().state = Store::Battery::State::Charging;
+            retVal = batteryRetval::ChargerCharging;
         }
         else {
-            Store::Battery::modify().state = Store::Battery::State::Discharging;
+            retVal = batteryRetval::ChargerNotCharging;
         }
 
         switch (static_cast<CHG_DETAILS_01>(chargerDetails)) {
         case CHG_DETAILS_01::CHARGER_DONE:
-            Store::Battery::modify().state = Store::Battery::State::ChargingDone;
+            retVal = batteryRetval::ChargingDone;
             chargingFinishedAction();
             break;
         case CHG_DETAILS_01::CHARGER_OFF:
             if (chargingSetup.second != CHG_ON_OTG_OFF_BUCK_ON) {
-                Store::Battery::modify().state = Store::Battery::State::PluggedNotCharging;
+                retVal = batteryRetval::ChargerNotCharging;
             }
             break;
         case CHG_DETAILS_01::CHARGER_PREQUALIFICATION:
-            [[fallthrough]];
         case CHG_DETAILS_01::CHARGER_CC:
-            [[fallthrough]];
         case CHG_DETAILS_01::CHARGER_CV:
-            [[fallthrough]];
         case CHG_DETAILS_01::CHARGER_TOPOFF:
-            Store::Battery::modify().state = Store::Battery::State::Charging;
+            retVal = batteryRetval::ChargerCharging;
             break;
         case CHG_DETAILS_01::CHARGER_TIMER_FAULT:
-            [[fallthrough]];
         case CHG_DETAILS_01::CHARGER_BATTERY_DETECT:
+            retVal = batteryRetval::ChargerError;
             break;
         }
 
-        return (Store::Battery::get().state == Store::Battery::State::ChargingDone ||
-                Store::Battery::get().state == Store::Battery::State::Charging);
+        return retVal;
     }
 
     std::uint16_t getStatusRegister()
@@ -733,13 +713,6 @@ namespace bsp::battery_charger
         }
     }
 
-    void actionIfChargerUnplugged()
-    {
-        if (Store::Battery::get().state == Store::Battery::State::Discharging) {
-            resetUSBCurrrentLimit();
-        }
-    }
-
     int getVoltageFilteredMeasurement()
     {
         const auto [_, value] = fuelGaugeRead(Registers::AvgVCELL_REG);
@@ -786,33 +759,5 @@ namespace bsp::battery_charger
         LOG_INFO("\tMinVolt: %dmV", maxMinVolt.minMilliVolt);
         LOG_INFO("\tAvgCurrent: %dmA", getAvgCurrent());
         LOG_INFO("\tLevel: %d%%", getBatteryLevel());
-    }
-
-    BaseType_t INTB_IRQHandler()
-    {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        if (IRQQueueHandle != nullptr) {
-            std::uint8_t val = static_cast<std::uint8_t>(batteryIRQSource::INTB);
-            xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
-        }
-        return xHigherPriorityTaskWoken;
-    }
-
-    BaseType_t INOKB_IRQHandler()
-    {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        if (IRQQueueHandle != nullptr) {
-            std::uint8_t val = static_cast<std::uint8_t>(batteryIRQSource::INOKB);
-            xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
-        }
-        return xHigherPriorityTaskWoken;
-    }
-
-    void USBChargerDetectedHandler(std::uint8_t detectedType)
-    {
-        if (DCDQueueHandle != nullptr) {
-            std::uint8_t val = static_cast<std::uint8_t>(detectedType);
-            xQueueSend(DCDQueueHandle, &val, portMAX_DELAY);
-        }
     }
 } // namespace bsp::battery_charger

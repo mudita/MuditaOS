@@ -13,6 +13,8 @@ target_sources(
         bsp/common.cpp
         bsp/lpm/bsp_lpm.cpp
         devices/Device.cpp
+        devices/power/CW2015.cpp
+        devices/power/MP2639B.cpp
         drivers/dma/DriverDMA.cpp
         drivers/dmamux/DriverDMAMux.cpp
         drivers/gpio/DriverGPIO.cpp

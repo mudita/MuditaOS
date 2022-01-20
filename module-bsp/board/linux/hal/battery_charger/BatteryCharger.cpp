@@ -1,36 +1,23 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BatteryCharger.hpp"
+#include <hal/battery_charger/AbstractBatteryCharger.hpp>
 
-#include <EventStore.hpp>
-#include <hal/GenericFactory.hpp>
 #include <magic_enum.hpp>
-
-#include <algorithm>
 
 #include <sys/stat.h>
 #include <fcntl.h>
 
 namespace hal::battery
 {
-
     namespace
     {
-        enum class USBSourceType
-        {
-            DcdSDP,
-            DcdCDP,
-            DcdDCP,
-        };
-
         constexpr auto batteryFIFO          = "/tmp/fifoBattKeys";
         constexpr auto fifoFileAccessRights = 0666;
         constexpr auto fifoBuffSize         = 10;
         constexpr auto queueTimeoutTicks    = 100;
         constexpr auto taskDelay            = 50;
 
-        constexpr auto fullBattery              = 100U;
         constexpr auto dummyBatteryVoltageLevel = 3700;
 
         constexpr auto chargerPlugStateChange = 'p';
@@ -40,116 +27,117 @@ namespace hal::battery
         constexpr auto chargerTypeDcdCDP      = ';';
         constexpr auto chargerTypeDcdDCP      = '\'';
 
-        xQueueHandle IRQQueueHandle      = nullptr;
-        xQueueHandle DCDQueueHandle      = nullptr;
+    } // namespace
+
+    class BatteryCharger : public AbstractBatteryCharger
+    {
+      public:
+        explicit BatteryCharger(xQueueHandle irqQueueHandle);
+        ~BatteryCharger();
+
+        Voltage getBatteryVoltage() const final;
+        SOC getSOC() const final;
+        ChargingStatus getChargingStatus() const final;
+
+      private:
+        void worker();
+
+        xQueueHandle notificationChannel = nullptr;
         TaskHandle_t batteryWorkerHandle = nullptr;
         unsigned batteryLevel            = 100;
         bool isPlugged                   = false;
         bool shouldRun                   = true;
+    };
 
-        void batteryWorker(void *parameters)
-        {
-            mkfifo(batteryFIFO, fifoFileAccessRights);
-
-            // Open FIFO for write only
-            int fd = open(batteryFIFO, O_RDONLY | O_NONBLOCK);
-
-            xQueueHandle targetQueueHandle = nullptr;
-
-            while (shouldRun) {
-                std::uint8_t buff[fifoBuffSize];
-                std::int32_t readBytes = read(fd, buff, fifoBuffSize);
-
-                if (readBytes > 0) {
-                    std::uint8_t notification = 0;
-                    switch (static_cast<char>(buff[0])) {
-                    case chargerPlugStateChange:
-                        isPlugged         = !isPlugged;
-                        targetQueueHandle = IRQQueueHandle;
-                        break;
-                    case batteryLevelUp:
-                        batteryLevel++;
-                        targetQueueHandle = IRQQueueHandle;
-                        break;
-                    case batteryLevelDown:
-                        batteryLevel--;
-                        targetQueueHandle = IRQQueueHandle;
-                        break;
-                    case chargerTypeDcdSDP:
-                        notification      = static_cast<std::uint8_t>(USBSourceType::DcdSDP);
-                        targetQueueHandle = DCDQueueHandle;
-                        break;
-                    case chargerTypeDcdCDP:
-                        notification      = static_cast<std::uint8_t>(USBSourceType::DcdCDP);
-                        targetQueueHandle = DCDQueueHandle;
-                        break;
-                    case chargerTypeDcdDCP:
-                        notification      = static_cast<std::uint8_t>(USBSourceType::DcdDCP);
-                        targetQueueHandle = DCDQueueHandle;
-                        break;
-                    default:
-                        continue;
-                    }
-                    xQueueSend(targetQueueHandle, &notification, queueTimeoutTicks);
-                }
-                vTaskDelay(taskDelay);
-            }
-            close(fd);
-            vTaskDelete(nullptr);
-        }
-    } // namespace
-
-    BatteryCharger::BatteryCharger(AbstractBatteryCharger::BatteryChargerEvents &eventsHandler)
-        : eventsHandler(eventsHandler)
-    {}
-
-    void BatteryCharger::init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle)
+    BatteryCharger::BatteryCharger(xQueueHandle irqQueueHandle)
     {
-        IRQQueueHandle = irqQueueHandle;
-        DCDQueueHandle = dcdQueueHandle;
+        notificationChannel = irqQueueHandle;
 
-        xTaskCreate(batteryWorker, "battery", 512, nullptr, 0, &batteryWorkerHandle);
-        Store::Battery::modify().level = batteryLevel;
-        Store::Battery::modify().state =
-            isPlugged ? Store::Battery::State::Charging : Store::Battery::State::Discharging;
+        xTaskCreate(
+            [](void *pvp) {
+                BatteryCharger *inst = static_cast<BatteryCharger *>(pvp);
+                inst->worker();
+            },
+            "battery",
+            512,
+            this,
+            0,
+            &batteryWorkerHandle);
     }
 
-    void BatteryCharger::deinit()
+    BatteryCharger::~BatteryCharger()
     {
-        shouldRun      = false;
-        IRQQueueHandle = nullptr;
-        DCDQueueHandle = nullptr;
+        shouldRun           = false;
+        notificationChannel = nullptr;
     }
 
-    void BatteryCharger::processStateChangeNotification(std::uint8_t notification)
-    {
-        if (isPlugged) {
-            if (batteryLevel > fullBattery) {
-                if (isPlugged && Store::Battery::get().level == fullBattery) {
-                    Store::Battery::modify().state = Store::Battery::State::ChargingDone;
-                }
-            }
-            else {
-                Store::Battery::modify().state = Store::Battery::State::Charging;
-            }
-        }
-        else {
-            Store::Battery::modify().state = Store::Battery::State::Discharging;
-        }
-        batteryLevel                   = std::clamp(batteryLevel, unsigned{0}, fullBattery);
-        Store::Battery::modify().level = batteryLevel;
-        eventsHandler.onStatusChanged();
-    }
-
-    int BatteryCharger::getBatteryVoltage()
+    AbstractBatteryCharger::Voltage BatteryCharger::getBatteryVoltage() const
     {
         return dummyBatteryVoltageLevel;
     }
 
-    void BatteryCharger::setChargingCurrentLimit(std::uint8_t usbType)
+    AbstractBatteryCharger::SOC BatteryCharger::getSOC() const
     {
-        auto usbTypeStr = magic_enum::enum_name(static_cast<USBSourceType>(usbType));
-        LOG_INFO("Setup charging current for usb source type: %s", usbTypeStr.data());
+        return batteryLevel;
+    }
+    AbstractBatteryCharger::ChargingStatus BatteryCharger::getChargingStatus() const
+    {
+        if (isPlugged && batteryLevel >= 100) {
+            return ChargingStatus::ChargingDone;
+        }
+        else if (isPlugged && batteryLevel < 100) {
+            return ChargingStatus::Charging;
+        }
+        else {
+            return ChargingStatus::Discharging;
+        }
+    }
+
+    void BatteryCharger::worker()
+    {
+        mkfifo(batteryFIFO, fifoFileAccessRights);
+
+        // Open FIFO for write only
+        int fd = open(batteryFIFO, O_RDONLY | O_NONBLOCK);
+
+        while (shouldRun) {
+            std::uint8_t buff[fifoBuffSize];
+            std::int32_t readBytes = read(fd, buff, fifoBuffSize);
+
+            if (readBytes > 0) {
+                Events evt{};
+                switch (static_cast<char>(buff[0])) {
+                case chargerPlugStateChange:
+                    isPlugged = !isPlugged;
+                    evt       = Events::Charger;
+                    break;
+                case batteryLevelUp:
+                    batteryLevel++;
+                    evt = Events::SOC;
+                    break;
+                case batteryLevelDown:
+                    batteryLevel--;
+                    evt = Events::SOC;
+                    break;
+                case chargerTypeDcdSDP:
+                case chargerTypeDcdCDP:
+                case chargerTypeDcdDCP:
+                    evt = Events::Charger;
+                    break;
+                default:
+                    continue;
+                }
+                xQueueSend(notificationChannel, &evt, queueTimeoutTicks);
+            }
+            vTaskDelay(taskDelay);
+        }
+        close(fd);
+        vTaskDelete(nullptr);
+    }
+
+    std::unique_ptr<AbstractBatteryCharger> AbstractBatteryCharger::Factory::create(xQueueHandle irqQueueHandle)
+    {
+        return std::make_unique<BatteryCharger>(irqQueueHandle);
     }
 
 } // namespace hal::battery
