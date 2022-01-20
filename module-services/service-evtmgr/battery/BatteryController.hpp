@@ -1,36 +1,36 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <hal/battery_charger/BatteryCharger.hpp>
-#include <battery-brownout-detector/BatteryBrownoutDetector.hpp>
-#include <Service/Service.hpp>
+#include <hal/battery_charger/AbstractBatteryCharger.hpp>
+#include "BatteryBrownoutDetector.hpp"
+#include "BatteryState.hpp"
+
 #include <queue.hpp>
-
 #include <memory>
-
 #include <cstdint>
 
 namespace sevm::battery
 {
-    class BatteryController : public hal::battery::AbstractBatteryCharger::BatteryChargerEvents,
-                              public std::enable_shared_from_this<BatteryController>
+    /// Battery controller class that glues various submodules together. It does not perform any logic by itself but
+    /// just routes notifications and messages received from corresponding submodules.
+    class BatteryController
     {
       public:
-        explicit BatteryController(sys::Service *service);
+        using Events = hal::battery::AbstractBatteryCharger::Events;
+        explicit BatteryController(sys::Service *service, xQueueHandle notificationChannel);
 
-        void onBrownout() final;
-        void onStatusChanged() final;
+        void poll();
 
-        void init(xQueueHandle queueBatteryHandle, xQueueHandle queueChargerDetect);
-        void deinit();
-        void handleChargerNotification(std::uint8_t notification);
-        void handleBatteryNotification(std::uint8_t notification);
+        /// Handler for incoming async notifications from the back-end
+        void handleNotification(Events);
 
       private:
-        sys::Service *service = nullptr;
-        std::shared_ptr<hal::battery::AbstractBatteryCharger> charger;
+        void printCurrentState();
+        sys::Service *service{nullptr};
+        std::unique_ptr<hal::battery::AbstractBatteryCharger> charger;
         BatteryBrownoutDetector brownoutDetector;
+        BatteryState batteryState;
     };
 }; // namespace sevm::battery

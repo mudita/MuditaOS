@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "board/irq_gpio.hpp"
@@ -12,12 +12,10 @@
 #include <fsl_gpc.h>
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
-#include <hal/battery_charger/AbstractBatteryCharger.hpp>
 #include <hal/key_input/KeyInput.hpp>
+#include <hal/battery_charger/BatteryChargerIRQ.hpp>
 #include "board/BoardDefinitions.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
-#include <hal/battery_charger/BatteryCharger.hpp>
-#include <bsp/fuel_gauge/fuel_gauge.hpp>
 #include <bsp/lpm/RT1051LPM.hpp>
 
 namespace bsp
@@ -84,12 +82,10 @@ namespace bsp
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO1);
 
             if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_CHGOK_PIN))) {
-                xHigherPriorityTaskWoken |=
-                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::Charger);
+                xHigherPriorityTaskWoken |= hal::battery::charger_irq();
             }
             if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_FUELGAUGE_ALRT_PIN))) {
-                xHigherPriorityTaskWoken |=
-                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::FuelGauge);
+                xHigherPriorityTaskWoken |= hal::battery::fuel_gauge_irq();
             }
 
             // Clear all IRQs
@@ -121,8 +117,7 @@ namespace bsp
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INTB_PIN)) {
-                xHigherPriorityTaskWoken |=
-                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::Charger);
+                xHigherPriorityTaskWoken |= hal::battery::charger_irq();
             }
 
             // Clear all IRQs
@@ -144,8 +139,7 @@ namespace bsp
             }
 
             if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_ACOK_PIN))) {
-                xHigherPriorityTaskWoken |=
-                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::Charger);
+                xHigherPriorityTaskWoken |= hal::battery::charger_irq();
             }
 
             // Clear all IRQs

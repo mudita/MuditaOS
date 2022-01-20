@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
@@ -7,8 +7,6 @@
 #include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EventManagerCommon.hpp"
 #include "service-evtmgr/WorkerEventCommon.hpp"
-
-#include "battery-level-check/BatteryLevelCheck.hpp"
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
@@ -172,18 +170,8 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sevm::BatterySetCriticalLevel(0), [&](sys::Message *msgl) {
-        auto request = static_cast<sevm::BatterySetCriticalLevel *>(msgl);
-        battery_level_check::setBatteryCriticalLevel(request->criticalLevel);
-        return sys::msgHandled();
-    });
-
     connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *msgl) {
         if (msgl->sender == this->GetName()) {
-            LOG_INFO("Battery level: %d , charging: %d",
-                     Store::Battery::get().level,
-                     Store::Battery::get().state == Store::Battery::State::Charging);
-
             if (Store::Battery::get().state == Store::Battery::State::Discharging) {
                 bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::system_manager);
             }
