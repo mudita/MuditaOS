@@ -35,7 +35,7 @@ namespace gui
         welcomeText->setFont(style::window::font::largelight);
         welcomeText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         welcomeText->drawUnderline(false);
-        welcomeText->setText(utils::translate("app_bell_onboarding_welcome_message"));
+        welcomeText->setRichText(utils::translate("app_bell_onboarding_welcome_message"));
 
         auto midLine = new Rect(body->centerBox, 0, 0, 0, 0);
         midLine->setMinimumSize(midline_w, midline_h);
