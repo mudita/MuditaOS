@@ -15,11 +15,6 @@ namespace gui
         : BaseSettingsWindow(app, gui::window::name::sim_cards), simParams(simParams)
     {}
 
-    SimCardsWindow::~SimCardsWindow()
-    {
-        destroyForTheFuture();
-    }
-
     void SimCardsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         setTitle(utils::translate("app_settings_network_sim_cards"));

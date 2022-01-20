@@ -23,11 +23,6 @@ namespace gui
         changeDateAndTimeWindow  = window::name::change_date_and_time;
     }
 
-    DateAndTimeMainWindow::~DateAndTimeMainWindow()
-    {
-        destroyForTheFuture();
-    }
-
     auto DateAndTimeMainWindow::buildOptionsList() -> std::list<Option>
     {
         std::list<Option> optionList;

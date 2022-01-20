@@ -66,7 +66,6 @@ target_sources(application-settings
         windows/display-keypad/DisplayAndKeypadWindow.cpp
         windows/display-keypad/DisplayLightWindow.cpp
         windows/display-keypad/EditQuotesWindow.cpp
-        windows/display-keypad/FontSizeWindow.cpp
         windows/display-keypad/InputLanguageWindow.cpp
         windows/display-keypad/KeypadLightWindow.cpp
         windows/display-keypad/QuoteCategoriesWindow.cpp
@@ -116,7 +115,6 @@ target_sources(application-settings
         windows/display-keypad/DisplayAndKeypadWindow.hpp
         windows/display-keypad/DisplayLightWindow.hpp
         windows/display-keypad/EditQuotesWindow.hpp
-        windows/display-keypad/FontSizeWindow.hpp
         windows/display-keypad/InputLanguageWindow.hpp
         windows/display-keypad/KeypadLightWindow.hpp
         windows/display-keypad/QuoteCategoriesWindow.hpp
