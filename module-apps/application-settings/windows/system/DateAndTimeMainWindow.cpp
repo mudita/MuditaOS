@@ -23,6 +23,11 @@ namespace gui
         changeDateAndTimeWindow  = window::name::change_date_and_time;
     }
 
+    DateAndTimeMainWindow::~DateAndTimeMainWindow()
+    {
+        destroyForTheFuture();
+    }
+
     auto DateAndTimeMainWindow::buildOptionsList() -> std::list<Option>
     {
         std::list<Option> optionList;
@@ -38,7 +43,7 @@ namespace gui
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
                 text,
                 activatedCallback,
-                [=](Item &item) { return navBarCallback(item); },
+                [this](Item &item) { return navBarCallback(item); },
                 nullptr,
                 rightItem,
                 false,

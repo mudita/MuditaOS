@@ -68,4 +68,10 @@ namespace gui
         optionsList->rebuildList(listview::RebuildType::InPlace);
     }
 
+    void OptionWindow::destroyForTheFuture()
+    {
+        erase(optionsList);
+        optionsList = nullptr;
+    }
+
 } /* namespace gui */

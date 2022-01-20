@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -31,5 +31,11 @@ namespace gui
         void onClose(CloseReason reason) override;
         void rebuild() override;
         void buildInterface() override;
+
+      protected:
+        /// this have to be called in inheriting window if someone passes callback to it
+        /// othervise destruction order will cause call to non existing parent element
+        /// this is because on how OptionWindows are designed
+        void destroyForTheFuture();
     };
 }; // namespace gui
