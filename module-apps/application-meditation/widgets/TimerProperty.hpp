@@ -32,6 +32,7 @@ namespace gui
             }
             void checkBounds() noexcept;
             void putNumericValue(int digit) noexcept;
+            void delNumericValue() noexcept;
             void increment() noexcept;
             void decrement() noexcept;
             void onFocus() noexcept
