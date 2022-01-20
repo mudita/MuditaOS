@@ -6,6 +6,7 @@
 #include <presenter/OnBoardingLanguageWindowPresenter.hpp>
 #include <windows/OnBoardingLanguageWindow.hpp>
 #include <windows/OnBoardingFinalizeWindow.hpp>
+#include <windows/OnBoardingOnOffWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
 #include <windows/OnBoardingWelcomeWindow.hpp>
 #include <windows/OnBoardingInstructionPromptWindow.hpp>
@@ -14,6 +15,7 @@
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 
 #include <apps-common/messages/OnBoardingMessages.hpp>
+#include <common/BellPowerOffPresenter.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 
@@ -61,13 +63,13 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellWelcomeWindow>(
-                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingWelcomeWindow); });
+                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingStartupWindow); });
         });
 
-        windowsFactory.attach(gui::window::name::onBoardingWelcomeWindow,
-                              [this](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::OnBoardingWelcomeWindow>(app, name);
-                              });
+        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
+            auto powerOffPresenter = std::make_unique<gui::BellPowerOffPresenter>(app);
+            return std::make_unique<gui::OnBoardingOnOffWindow>(app, std::move(powerOffPresenter), name);
+        });
 
         windowsFactory.attach(
             gui::window::name::onBoardingLanguageWindow, [this](ApplicationCommon *app, const std::string &name) {
@@ -174,7 +176,7 @@ namespace app
         auto currentWindow = getCurrentWindow()->getName();
         return (currentWindow != gui::name::window::main_window &&
                 currentWindow != gui::window::name::finalizeOnBoardingWindow &&
-                currentWindow != gui::window::name::onBoardingWelcomeWindow &&
+                currentWindow != gui::window::name::onBoardingStartupWindow &&
                 (currentWindow != gui::window::name::informationOnBoardingWindow ||
                  informationState == OnBoarding::InformationStates::DeepClickWarningInfo));
     }
