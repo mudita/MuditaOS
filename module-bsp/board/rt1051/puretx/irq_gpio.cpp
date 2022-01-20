@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "board/irq_gpio.hpp"
@@ -9,22 +9,14 @@
 #include "fsl_common.h"
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
-#include <board/rt1051/puretx/hal/battery_charger/BatteryCharger.hpp>
 #include <hal/key_input/KeyInput.hpp>
+#include <hal/battery_charger/BatteryChargerIRQ.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/headset/headset.hpp"
 #include "board/BoardDefinitions.hpp"
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
 
-#if 0 // TODO:M.P implement the rest of BSP drivers
-
-#include "bsp_cellular.h"
-
-#include "bsp_usbc.h"
-#include "log.h"
-
-#endif
 
 namespace bsp
 {

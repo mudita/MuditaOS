@@ -17,14 +17,14 @@ namespace sys
 class BatteryBrownoutDetector
 {
   public:
-    BatteryBrownoutDetector(sys::Service *service, std::shared_ptr<hal::battery::AbstractBatteryCharger> charger);
+    BatteryBrownoutDetector(sys::Service *service, hal::battery::AbstractBatteryCharger &charger);
     void startDetection();
 
   private:
     void checkBrownout();
 
     sys::Service *parentService;
-    std::shared_ptr<hal::battery::AbstractBatteryCharger> charger;
+    hal::battery::AbstractBatteryCharger &charger;
 
     bool detectionOngoing     = false;
     unsigned measurementCount = 0;

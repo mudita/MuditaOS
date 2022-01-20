@@ -1,7 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include "hal/Units.hpp"
 
 #include <FreeRTOS.h>
 #include <queue.h>
@@ -14,34 +16,35 @@ namespace hal::battery
     class AbstractBatteryCharger
     {
       public:
-        class BatteryChargerEvents
+        using SOC     = units::SOC;
+        using Voltage = units::Voltage;
+        enum class ChargingStatus
         {
-          public:
-            virtual ~BatteryChargerEvents() = default;
-
-            virtual void onBrownout()      = 0;
-            virtual void onStatusChanged() = 0;
+            Discharging,
+            Charging,
+            ChargingDone,
+            PluggedNotCharging
         };
 
-        enum class IRQSource
+        enum class Events : std::uint8_t
         {
             Charger,
-            FuelGauge,
-            Any
+            SOC,
+            Brownout
+        };
+
+        struct Factory
+        {
+            static std::unique_ptr<AbstractBatteryCharger> create(xQueueHandle);
         };
 
         virtual ~AbstractBatteryCharger() = default;
 
-        virtual void init(xQueueHandle, xQueueHandle)             = 0;
-        virtual void deinit()                                     = 0;
-        virtual void processStateChangeNotification(std::uint8_t) = 0;
-        virtual void setChargingCurrentLimit(std::uint8_t)        = 0;
-        virtual int getBatteryVoltage()                           = 0;
-    };
+        virtual Voltage getBatteryVoltage() const        = 0;
+        virtual SOC getSOC() const                       = 0;
+        virtual ChargingStatus getChargingStatus() const = 0;
 
-    BaseType_t IRQHandler(AbstractBatteryCharger::IRQSource source);
-    extern "C"
-    {
-        void USB_ChargerDetectedCB(std::uint8_t detectedType);
-    }
+        static_assert(sizeof(Events) == sizeof(std::uint8_t),
+                      "All events processed by event manager ought to have size of std::uint8_t");
+    };
 } // namespace hal::battery
