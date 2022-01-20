@@ -257,12 +257,12 @@ namespace purefs::fs::drivers
          * _MIN_SS holds the sector size. It is one of the configuration
          * constants used by the FS module
          */
-        stat.f_bsize = FF_MIN_SS;
 #if FF_MAX_SS != FF_MIN_SS
         stat.f_frsize = fatfs->csize * fatfs->ssize;
 #else
         stat.f_frsize = fatfs->csize * FF_MIN_SS;
 #endif
+        stat.f_bsize   = stat.f_frsize;
         stat.f_blocks  = (fatfs->n_fatent - 2);
         stat.f_bfree   = xfree;
         stat.f_bavail  = xfree;
