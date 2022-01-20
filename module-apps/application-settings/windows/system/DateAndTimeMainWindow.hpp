@@ -13,7 +13,6 @@ namespace gui
     {
       public:
         DateAndTimeMainWindow(app::ApplicationCommon *app, std::string name);
-        ~DateAndTimeMainWindow();
 
       protected:
         auto buildOptionsList() -> std::list<Option> override;
@@ -25,5 +24,6 @@ namespace gui
         utils::time::Locale::DateFormat dateFormat = utils::time::Locale::defaultDateFormat;
 
         std::string changeDateAndTimeWindow;
+        OptionWindowDestroyer rai_destroyer = OptionWindowDestroyer(*this);
     };
 } // namespace gui

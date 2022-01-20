@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-settings/ApplicationSettings.hpp>
@@ -25,7 +25,6 @@
 #include <application-settings/windows/network/ApnOptionsWindow.hpp>
 #include <application-settings/windows/display-keypad/DisplayAndKeypadWindow.hpp>
 #include <application-settings/windows/display-keypad/DisplayLightWindow.hpp>
-#include <application-settings/windows/display-keypad/FontSizeWindow.hpp>
 #include <application-settings/windows/display-keypad/WallpaperWindow.hpp>
 #include <application-settings/windows/display-keypad/QuotesMainWindow.hpp>
 #include <application-settings/windows/display-keypad/QuotesAddWindow.hpp>
@@ -438,9 +437,6 @@ namespace app
                               });
         windowsFactory.attach(gui::window::name::display_light, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DisplayLightWindow>(app, static_cast<ApplicationSettings *>(app));
-        });
-        windowsFactory.attach(gui::window::name::font_size, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::FontSizeWindow>(app);
         });
         windowsFactory.attach(gui::window::name::wallpaper, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::WallpaperWindow>(app, static_cast<ApplicationSettings *>(app));

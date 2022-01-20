@@ -10,6 +10,7 @@
 
 namespace gui
 {
+    class OptionWindowDestroyer;
     ///  @brief Options window generating various options based on provided Option list.
     ///
     ///  Options GUI window with ListView populated accordingly to provided options in window constructor.
@@ -32,10 +33,24 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
 
-      protected:
+      private:
+        friend OptionWindowDestroyer;
         /// this have to be called in inheriting window if someone passes callback to it
         /// othervise destruction order will cause call to non existing parent element
         /// this is because on how OptionWindows are designed
         void destroyForTheFuture();
+    };
+
+    class OptionWindowDestroyer
+    {
+        OptionWindow &w;
+
+      public:
+        OptionWindowDestroyer(OptionWindow &w) : w(w)
+        {}
+        ~OptionWindowDestroyer()
+        {
+            w.destroyForTheFuture();
+        }
     };
 }; // namespace gui

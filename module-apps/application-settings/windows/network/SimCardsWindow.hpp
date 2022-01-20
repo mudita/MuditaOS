@@ -20,8 +20,8 @@ namespace gui
 
       public:
         SimCardsWindow(app::ApplicationCommon *app, app::settingsInterface::SimParams *simParams);
-        ~SimCardsWindow();
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        OptionWindowDestroyer rai_destroyer = OptionWindowDestroyer(*this);
     };
 } // namespace gui
