@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimCardsWindow.hpp"
@@ -14,6 +14,11 @@ namespace gui
     SimCardsWindow::SimCardsWindow(app::ApplicationCommon *app, app::settingsInterface::SimParams *simParams)
         : BaseSettingsWindow(app, gui::window::name::sim_cards), simParams(simParams)
     {}
+
+    SimCardsWindow::~SimCardsWindow()
+    {
+        destroyForTheFuture();
+    }
 
     void SimCardsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {

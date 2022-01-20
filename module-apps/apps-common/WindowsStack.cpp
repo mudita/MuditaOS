@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WindowsStack.hpp"
@@ -23,6 +23,7 @@ namespace app
                             std::unique_ptr<gui::AppWindow> window,
                             const gui::popup::Disposition &disposition)
     {
+        /// Note: this is the place which will destroy old window if there was one
         windows[name] = std::move(window);
         stack.push_back(WindowData(name, disposition));
     }
