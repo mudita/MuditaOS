@@ -88,6 +88,10 @@ bool TimerProperty::onInput(const InputEvent &inputEvent)
             state.increment();
             handled = true;
         }
+        else if (inputEvent.is(KeyCode::KEY_PND)) {
+            state.delNumericValue();
+            handled = true;
+        }
         else {
             state.onFocus();
         }
@@ -132,6 +136,17 @@ void TimerProperty::State::putNumericValue(int digit) noexcept
     timeInMinutes = 10 * timeInMinutes + digit;
     if (timeInMinutes >= 10 * (counterMaxDigits - 1)) {
         resetValueOnNumeric = true;
+    }
+}
+void TimerProperty::State::delNumericValue() noexcept
+{
+    timeInMinutes = timeInMinutes / 10;
+    if (timeInMinutes < minimalValue) {
+        timeInMinutes       = minimalValue;
+        resetValueOnNumeric = true;
+    }
+    else {
+        resetValueOnNumeric = false;
     }
 }
 
