@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <utf8/UTF8.hpp>
+#include <Item.hpp>
 
 namespace gui
 {
@@ -29,6 +30,94 @@ namespace gui
         UTF8 str() const
         {
             return pos < range.size() ? range[pos] : UTF8{};
+        }
+
+        void set(ValType val)
+        {
+            for (auto i = 0U; i < range.size(); i++) {
+                if (range[i] == val) {
+                    pos = i;
+                    break;
+                }
+            }
+        }
+
+        bool next()
+        {
+            bool ret{true};
+            if (pos >= upRange()) {
+                if (boundaries == Boundaries::Continuous) {
+                    pos = 0;
+                }
+                else {
+                    pos = upRange();
+                    ret = false;
+                }
+            }
+            else {
+                pos++;
+            }
+            return ret;
+        }
+
+        bool previous()
+        {
+            bool ret{true};
+            if (pos <= 0) {
+                if (boundaries == Boundaries::Continuous) {
+                    pos = upRange();
+                }
+                else {
+                    pos = 0;
+                    ret = false;
+                }
+            }
+            else {
+                pos--;
+            }
+            return ret;
+        }
+
+        void updateRange(Range newRange)
+        {
+            if (range != newRange) {
+                range = newRange;
+                pos   = 0;
+            }
+        }
+
+        [[nodiscard]] bool isAtMin() const
+        {
+            return pos == 0;
+        }
+        [[nodiscard]] bool isAtMax() const
+        {
+            return pos == upRange();
+        }
+
+      private:
+        std::uint32_t upRange() const
+        {
+            return range.size() - 1;
+        }
+
+        Range range;
+        std::uint32_t pos{};
+        const Boundaries boundaries{};
+    };
+
+    template <typename ValType> class WidgetPolicy
+    {
+      public:
+        using Range = std::vector<ValType>;
+        using Type  = ValType;
+
+        WidgetPolicy(Range range, Boundaries boundaries) : range{range}, boundaries{boundaries}
+        {}
+
+        ValType get() const
+        {
+            return pos < range.size() ? range[pos] : ValType{};
         }
 
         void set(ValType val)
