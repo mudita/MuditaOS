@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <sys/SystemManager.hpp>
@@ -11,6 +11,7 @@
 #include <service-appmgr/messages/SwitchRequest.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 namespace sys
 {
@@ -63,5 +64,36 @@ namespace sys
         SystemManagerCommon::batteryCriticalLevelAction(charging);
         auto msg = std::make_shared<CriticalBatteryLevelNotification>(true, charging);
         bus.sendUnicast(std::move(msg), service::name::appmgr);
+    }
+
+    void SystemManager::Run()
+    {
+        initialize();
+
+        // in shutdown we need to wait till event manager tells us that it's ok to stfu
+        while (state == State::Running) {
+            if (auto msg = mailbox.pop(); msg) {
+                msg->Execute(this);
+            }
+        }
+
+        while (state == State::Shutdown) {
+            set(State::ShutdownReady);
+        }
+
+        DestroySystemService(service::name::evt_manager, this);
+        CloseService();
+
+        // it should be called before systemDeinit to make sure this log is dumped to the file
+        LogPowerOffReason();
+
+        if (systemDeinit) {
+            systemDeinit();
+        }
+
+        EndScheduler();
+
+        // Power off system
+        PowerOff();
     }
 } // namespace sys

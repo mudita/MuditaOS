@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -132,6 +132,10 @@ namespace sys
         virtual void batteryNormalLevelAction();
         virtual void batteryCriticalLevelAction(bool charging);
         virtual void batteryShutdownLevelAction();
+        void Run() override;
+        void LogPowerOffReason();
+        void PowerOff();
+        DeinitFunction systemDeinit;
 
       private:
         MessagePointer DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
@@ -145,12 +149,6 @@ namespace sys
         {
             return ReturnCodes::Success;
         }
-
-        void Run() override;
-
-        void LogPowerOffReason();
-
-        void PowerOff();
 
         void StartSystemServices();
 
@@ -195,7 +193,6 @@ namespace sys
         sys::TimerHandle powerManagerEfficiencyTimer;
         InitFunction userInit;
         InitFunction systemInit;
-        DeinitFunction systemDeinit;
         std::vector<std::string> readyForCloseRegister;
 
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
