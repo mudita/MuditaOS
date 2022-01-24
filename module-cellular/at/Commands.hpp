@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -145,4 +145,7 @@ namespace at
     };
 
     std::vector<AT> getCommadsSet(commadsSet set);
+
+    constexpr auto AtCmdMaxRetries   = 3;
+    constexpr auto AtCmdRetryDelayMS = 50;
 }; // namespace at

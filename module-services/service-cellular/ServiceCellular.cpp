@@ -912,8 +912,6 @@ std::optional<std::shared_ptr<sys::Message>> ServiceCellular::identifyNotificati
 
 auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
 {
-    constexpr auto ucscSetMaxRetries = 3;
-
     auto retVal = true;
 
     auto channel = cmux->get(CellularMux::Channel::Commands);
@@ -923,7 +921,7 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
     }
 
     auto ucscSetRetries = 0;
-    while (ucscSetRetries < ucscSetMaxRetries) {
+    while (ucscSetRetries < at::AtCmdMaxRetries) {
         if (!channel->cmd(at::AT::SMS_UCSC2)) {
             ++ucscSetRetries;
             LOG_ERROR("Could not set UCS2 charset mode for TE. Retry %d", ucscSetRetries);
@@ -948,8 +946,26 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
     std::string messageRawBody;
     UTF8 receivedNumber;
     const auto &cmd = at::factory(at::AT::QCMGR);
-    auto ret        = channel->cmd(cmd + messageNumber, cmd.getTimeout());
-    if (!ret) {
+    at::Result ret;
+    auto qcmgrRetries = 0;
+
+    while (qcmgrRetries < at::AtCmdMaxRetries) {
+        ret = channel->cmd(cmd + messageNumber, cmd.getTimeout());
+        if (!ret) {
+            ++qcmgrRetries;
+            LOG_ERROR("Could not read text message. Retry %d", qcmgrRetries);
+            // There are cases where +QCMGR command is issued to soon after +CMTI URC,
+            // and modem is still busy processing messages. This results with an error
+            // and some garbage frame. To work around this, we delay a bit and retry +QCMGR
+            // to get the message.
+            vTaskDelay(at::AtCmdRetryDelayMS);
+        }
+        else {
+            break;
+        }
+    }
+
+    if (!ret || qcmgrRetries == at::AtCmdMaxRetries) {
         LOG_ERROR("!!!! Could not read text message !!!!");
         retVal = false;
     }
