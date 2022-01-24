@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
@@ -207,7 +207,10 @@ namespace app
 
     void ApplicationCall::handleCallerId(const app::manager::actions::CallParams *params)
     {
-        if (getCallState() != call::State::IDLE) {
+        /// there is race condition in this code, we require `INCOMMING_CALL` state check due to it.
+        /// alternatively we would require rewritting this application state handling
+        if (getCallState() != call::State::IDLE && getCallState() != app::call::State::INCOMING_CALL) {
+            LOG_ERROR("call id not handled");
             return;
         }
         if (callerIdTimer.isValid()) {
