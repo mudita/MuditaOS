@@ -16,6 +16,7 @@ namespace gui
       private:
         std::list<Option> buildOptionsList() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool showDeleteNotification(std::string titleText);
 
         std::shared_ptr<Quotes::QuotesModel> quotesModel;
         Quotes::QuoteRecord quote;

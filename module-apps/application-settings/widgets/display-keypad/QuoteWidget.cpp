@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuoteWidget.hpp"
@@ -21,7 +21,7 @@ namespace style::quotes
         inline constexpr int32_t description_label_right_margin = 40;
 
         inline constexpr int32_t tick_image_left_margin  = -64;
-        inline constexpr int32_t tick_image_right_margin = 32;
+        inline constexpr int32_t tick_image_right_margin = 21;
 
     } // namespace widget
 
@@ -51,6 +51,7 @@ namespace gui
         tickImage = new ImageBox(
             hBox, 0, 0, style::widgets::iconsSize, style::widgets::iconsSize, new Image("small_tick_32px_W_M"));
         tickImage->setVisible(true);
+        tickImage->setMargins(gui::Margins(0, 0, style::quotes::widget::tick_image_right_margin, 0));
         tickImage->showImage(quote.enabled);
         tickImage->setEdges(RectangleEdge::Bottom);
 

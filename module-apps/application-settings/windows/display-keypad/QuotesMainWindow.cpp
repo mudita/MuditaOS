@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesMainWindow.hpp"
@@ -32,7 +32,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::translate("app_settings_display_wallpaper_quotes"));
+        setTitle(utils::translate("app_settings_display_wallpaper_edit_custom_quotes"));
         header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
         navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::check));

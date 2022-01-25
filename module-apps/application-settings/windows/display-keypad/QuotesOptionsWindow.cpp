@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesOptionsWindow.hpp"
@@ -7,8 +7,10 @@
 #include <application-settings/windows/WindowNames.hpp>
 
 #include <DialogMetadataMessage.hpp>
+#include <Dialog.hpp>
 #include <OptionSetting.hpp>
 #include <Text.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
@@ -41,15 +43,15 @@ namespace gui
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_display_wallpaper_quotes_delete"),
             [=](gui::Item &item) {
-                auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                    gui::DialogMetadata{quote.quote,
+                auto quoteText = quote.quote;
+                auto metaData  = std::make_unique<gui::DialogMetadataMessage>(
+                    gui::DialogMetadata{quoteText,
                                         "delete_128px_W_G",
                                         utils::translate("app_settings_display_wallpaper_quotes_delete_confirmation"),
                                         "",
-                                        [this]() {
+                                        [this, quoteText]() {
                                             quotesModel->remove(quote);
-                                            application->switchWindow(gui::name::window::main_window);
-                                            return true;
+                                            return showDeleteNotification(quoteText);
                                         }});
                 application->switchWindow(
                     gui::window::name::quotes_dialog_yes_no, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
@@ -74,5 +76,23 @@ namespace gui
         }
 
         BaseSettingsWindow::onBeforeShow(mode, data);
+    }
+
+    bool QuotesOptionsWindow::showDeleteNotification(std::string titleText)
+    {
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{titleText,
+                                "success_128px_W_G",
+                                utils::translate("app_settings_display_wallpaper_quotes_delete_success"),
+                                "",
+                                [=]() -> bool {
+                                    auto data                        = std::make_unique<SwitchData>();
+                                    data->ignoreCurrentWindowOnStack = true;
+                                    this->application->switchWindow(gui::window::name::quotes, std::move(data));
+                                    return true;
+                                }});
+        metaData->ignoreCurrentWindowOnStack = true;
+        application->switchWindow(gui::window::name::dialog_confirm, std::move(metaData));
+        return true;
     }
 } // namespace gui
