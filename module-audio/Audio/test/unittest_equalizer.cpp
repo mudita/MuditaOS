@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define CATCH_CONFIG_MAIN
@@ -14,7 +14,7 @@ SCENARIO("Calculate filter coeff")
 
     GIVEN("High pass filter")
     {
-        const auto filterHighPass = qfilter_CalculateCoeffs(FilterType::FilterHighPass, 300.9f, 44100, 0.701f, 0);
+        const auto filterHighPass = qfilter_CalculateCoeffs(FilterType::HighPass, 300.9f, 44100, 0.701f, 0);
         THEN("Registers 1,2,3 should match b0 setup")
         {
             const auto [byte1, byte2, byte3] = utils::floatingPointConverter(filterHighPass.b0);
@@ -53,7 +53,7 @@ SCENARIO("Calculate filter coeff")
     }
     GIVEN("High shelf filter")
     {
-        const auto filterHighShelf = qfilter_CalculateCoeffs(FilterType::FilterLowShelf, 401.f, 44100, 0.701f, -10);
+        const auto filterHighShelf = qfilter_CalculateCoeffs(FilterType::LowShelf, 401.f, 44100, 0.701f, -10);
         THEN("Registers 1,2 should match b0 setup")
         {
             const auto [byte1, byte2, _] = utils::floatingPointConverter(filterHighShelf.b0);
@@ -88,7 +88,7 @@ SCENARIO("Calculate filter coeff")
 
     GIVEN("Filter none")
     {
-        const auto filterNone = qfilter_CalculateCoeffs(FilterType::FilterNone, 0, 0, 0, 0);
+        const auto filterNone = qfilter_CalculateCoeffs(FilterType::None, 0, 0, 0, 0);
         THEN("Register 1 should be equal to 16. Registers 2,3 should be equal to 0")
         {
             const auto [byte1, byte2, byte3] = utils::floatingPointConverter(filterNone.b0);
@@ -132,7 +132,7 @@ SCENARIO("Calculate filter coeff")
         {
             THEN("Calculation of coefficients should throw")
             {
-                REQUIRE_THROWS_AS(qfilter_CalculateCoeffs(FilterType::FilterHighPass, 300.9f, 44100, -1.f, 0),
+                REQUIRE_THROWS_AS(qfilter_CalculateCoeffs(FilterType::HighPass, 300.9f, 44100, -1.f, 0),
                                   std::invalid_argument);
             }
         }
@@ -140,7 +140,7 @@ SCENARIO("Calculate filter coeff")
         {
             THEN("Calculation of coefficients should throw")
             {
-                REQUIRE_THROWS_AS(qfilter_CalculateCoeffs(FilterType::FilterHighPass, 300.9f, 44100, 100.f, 0),
+                REQUIRE_THROWS_AS(qfilter_CalculateCoeffs(FilterType::HighPass, 300.9f, 44100, 100.f, 0),
                                   std::invalid_argument);
             }
         }
@@ -150,7 +150,7 @@ SCENARIO("Calculate filter coeff")
     {
         THEN("Calculation of coefficients should throw")
         {
-            REQUIRE_THROWS_AS(qfilter_CalculateCoeffs(FilterType::FilterHighPass, -300.9f, 44100, 0.2f, 0),
+            REQUIRE_THROWS_AS(qfilter_CalculateCoeffs(FilterType::HighPass, -300.9f, 44100, 0.2f, 0),
                               std::invalid_argument);
         }
     }

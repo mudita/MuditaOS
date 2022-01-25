@@ -117,7 +117,9 @@ In order to store `Operation` configuration a concept of `Audio Profile` has bee
 Profiles configurations can be found in directory: [Profiles](./Audio/Profiles)  
 `Operations` may not implement support for all possible `Profile` parameters i.e. `inputGain` and `inputPath` will be ignored in playback `Operation`.
 
-**IMPORTANT:** For the time being profiles are not loaded and stored into database. This should be fixed.  
+~~**IMPORTANT:** For the time being profiles are not loaded and stored into database. This should be fixed.~~  
+**NOTE:** Currently some of the profiles are configurable via json files located [here](../image/user/data/equalizer). The json format explanation can be found [here](./Audio/Profiles/README.md).
+
 **IMPORTANT:** Callbacks mechanism is only experimental and should be considered as incomplete.
 
 # Audio class
