@@ -74,6 +74,10 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
         LOG_ERROR("Presenter not attached!");
         return;
     }
+    if (params == nullptr) {
+        LOG_ERROR("params is nullptr");
+        return;
+    }
 
     const auto showOnLocked =
         (listPlacement == NotificationsListPlacement::LockedScreen) && params->showNotificationsWhenLocked();
