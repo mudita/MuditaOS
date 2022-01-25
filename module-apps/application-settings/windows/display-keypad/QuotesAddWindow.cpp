@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesAddWindow.hpp"
@@ -17,8 +17,8 @@ namespace gui
 {
     namespace
     {
-        constexpr auto maxQuoteCharactersCount  = 150U;
-        constexpr auto maxQuoteLinesCount       = 4;
+        constexpr auto maxQuoteCharactersCount  = 170U;
+        constexpr auto maxQuoteLinesCount       = 8U;
         constexpr auto maxAuthorCharactersCount = 30U;
 
         auto formatCounterText(uint32_t counter, uint32_t maxValue) -> std::string
@@ -53,27 +53,27 @@ namespace gui
         vBox->setPenWidth(::style::window::default_border_rect_no_focus);
 
         auto authorHeader = new HBox(vBox, 0, 0, 0, 0);
-        authorHeader->setMinimumSize(style::window::default_body_width, style::window::label::default_h);
+        authorHeader->setMinimumSize(style::window::default_body_width, style::window::label::small_h);
         authorHeader->setEdges(gui::RectangleEdge::None);
         authorHeader->activeItem = false;
 
         auto authorLabel = new Label(authorHeader, 0, 0, 0, 0);
-        authorLabel->setMinimumSize(style::headerWidth, style::window::label::default_h);
+        authorLabel->setMinimumSize(style::headerWidth, style::window::label::small_h);
         authorLabel->setEdges(RectangleEdge::None);
         authorLabel->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left});
         authorLabel->setText(utils::translate("app_settings_display_wallpaper_quotes_author"));
         authorLabel->setPenFocusWidth(::style::window::default_border_focus_w);
-        authorLabel->setFont(::style::window::font::verysmall);
+        authorLabel->setFont(::style::window::font::small);
         authorLabel->setPadding(gui::Padding(0, 0, 0, 0));
         authorLabel->activeItem = false;
 
         authorText = new gui::Text(vBox, 0, 0, 0, 0);
-        authorText->setMinimumSize(style::window::default_body_width, style::window::label::default_h);
+        authorText->setMinimumSize(style::window::default_body_width, style::window::label::small_h);
         authorText->setAlignment(gui::Alignment{gui::Alignment::Vertical::Top});
         authorText->setPenFocusWidth(::style::window::default_border_focus_w);
         authorText->setPenWidth(::style::window::default_border_rect_no_focus);
         authorText->setEdges(gui::RectangleEdge::Bottom);
-        authorText->setFont(::style::window::font::medium);
+        authorText->setFont(::style::window::font::mediumbold);
         authorText->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { navBarTemporaryMode(text); },
@@ -82,23 +82,23 @@ namespace gui
         authorText->setTextLimitType(gui::TextLimitType::MaxSignsCount, maxAuthorCharactersCount);
 
         auto quoteHeader = new HBox(vBox, 0, 0, 0, 0);
-        quoteHeader->setMinimumSize(style::window::default_body_width, style::window::label::default_h);
+        quoteHeader->setMinimumSize(style::window::default_body_width, style::window::label::small_h);
         quoteHeader->activeItem = false;
         quoteHeader->setEdges(gui::RectangleEdge::None);
+        quoteHeader->setMargins({0, ::style::margins::huge, 0, 0});
 
         auto quoteLabel = new Label(quoteHeader, 0, 0, 0, 0);
-        quoteLabel->setMinimumSize(style::headerWidth, style::window::label::default_h);
+        quoteLabel->setMinimumSize(style::headerWidth, style::window::label::small_h);
         quoteLabel->setEdges(RectangleEdge::None);
         quoteLabel->setPenFocusWidth(::style::window::default_border_focus_w);
         quoteLabel->setText(utils::translate("app_settings_display_wallpaper_quotes_note"));
-        quoteLabel->setFont(::style::window::font::verysmall);
+        quoteLabel->setFont(::style::window::font::small);
         quoteLabel->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left});
         quoteLabel->activeItem = false;
 
         quoteText = new gui::Text(vBox, 0, 0, 0, 0);
         quoteText->setAlignment(gui::Alignment{gui::Alignment::Vertical::Top});
-        quoteText->setMinimumSize(style::window::default_body_width,
-                                  style::window::label::default_h * maxQuoteLinesCount);
+        quoteText->setMaximumSize(vBox->getWidth(), style::window::label::small_h * maxQuoteLinesCount);
         quoteText->setPenFocusWidth(::style::window::default_border_focus_w);
         quoteText->setPenWidth(::style::window::default_border_rect_no_focus);
         quoteText->setEdges(gui::RectangleEdge::Bottom);
@@ -119,7 +119,7 @@ namespace gui
 
         setTitle(utils::translate("app_settings_display_wallpaper_quotes_new"));
         vBox->resizeItems();
-        setFocusItem(quoteText);
+        setFocusItem(authorText);
     }
 
     void QuoteAddEditWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -151,6 +151,14 @@ namespace gui
             quoteData.quote  = quoteText->getText();
             quoteData.author = authorText->getText();
 
+            if (quoteData.quote.empty()) {
+                return true;
+            }
+
+            if (quoteData.author.empty()) {
+                quoteData.author = "Anonymous";
+            }
+
             if (quoteAction == QuoteAction::Add) {
                 quoteModel->add(quoteData);
             }
@@ -171,5 +179,4 @@ namespace gui
     {
         quoteCharCounter->setText(formatCounterText(count, maxQuoteCharactersCount));
     }
-
 } // namespace gui

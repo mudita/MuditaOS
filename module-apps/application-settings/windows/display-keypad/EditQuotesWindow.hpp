@@ -18,9 +18,6 @@ namespace gui
         void switchHandler(bool &optionSwitch);
         auto buildOptionsList() -> std::list<Option> override;
 
-        bool isOurFavouritesSwitchOn = false;
-        bool isCustomSwitchOn        = false;
-
         Item *quotes;
         OptionWindowDestroyer rai_destroyer = OptionWindowDestroyer(*this);
     };
