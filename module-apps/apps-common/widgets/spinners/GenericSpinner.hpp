@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,6 +27,7 @@ namespace gui
         void setFocusEdges(RectangleEdge edges);
         bool onInput(const InputEvent &inputEvent) override;
         bool onFocus(bool state) override;
+        [[nodiscard]] bool isSingle() const;
         [[nodiscard]] bool isAtMin() const;
         [[nodiscard]] bool isAtMax() const;
 
@@ -143,6 +144,10 @@ namespace gui
         if (onValueChanged) {
             onValueChanged(getCurrentValue());
         }
+    }
+    template <typename Policy> bool GenericSpinner<Policy>::isSingle() const
+    {
+        return policy.isSingle();
     }
     template <typename Policy> bool GenericSpinner<Policy>::isAtMin() const
     {

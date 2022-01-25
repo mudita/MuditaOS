@@ -6,6 +6,7 @@
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Image.hpp>
 #include <gui/widgets/text/Label.hpp>
+#include <apps-common/widgets/TextSpinnerBoxWithLabel.hpp>
 
 #include <list>
 #include <chrono>
@@ -14,52 +15,21 @@ namespace gui
 {
     class TimerProperty;
 
-    class IntervalBox : public BoxLayout
+    class IntervalBox : public HBox
     {
-        class ChimeIntervalList
-        {
-            std::vector<std::chrono::minutes> intervals;
-            std::vector<std::chrono::minutes>::const_iterator current;
-
-          public:
-            enum class Direction
-            {
-                Next,
-                Previous
-            };
-
-            ChimeIntervalList();
-
-            [[nodiscard]] std::chrono::minutes getCurrent() const noexcept
-            {
-                return *current;
-            }
-
-            bool moveToNext(Direction dir, std::chrono::minutes meditationTime) noexcept;
-            [[nodiscard]] bool hasNext(Direction dir, std::chrono::minutes meditationTime) const noexcept;
-
-            [[nodiscard]] static std::string toPrintableInterval(std::chrono::minutes time);
-        } chimeIntervals;
-
-        TimerProperty *timerSetter = nullptr;
-        Label *bottomLabel      = nullptr;
-        Image *leftSwitchArrow  = nullptr;
-        Image *rightSwitchArrow = nullptr;
-
-        std::chrono::minutes intervalValue{0};
+        TimerProperty *timerSetter            = nullptr;
+        TextSpinnerBoxWithLabel *chimeSpinner = nullptr;
 
         void build();
-        void updateIntervals(ChimeIntervalList::Direction dir);
+        void updateIntervals();
+        [[nodiscard]] std::string intervalToString(std::chrono::minutes time);
+        [[nodiscard]] std::chrono::minutes stringToInterval(const std::string &description);
+
         void rescaleIntervals();
 
       public:
         IntervalBox(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, TimerProperty *timerSetter);
 
-        bool onFocus(bool isFocused) final;
-        bool onInput(const InputEvent &inputEvent) final;
-        [[nodiscard]] std::chrono::seconds getIntervalValue() const noexcept
-        {
-            return std::chrono::seconds{intervalValue};
-        }
+        [[nodiscard]] std::chrono::seconds getIntervalValue() noexcept;
     };
 } // namespace gui

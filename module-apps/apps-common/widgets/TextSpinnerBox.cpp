@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextSpinnerBox.hpp"
@@ -27,9 +27,15 @@ namespace gui
         inputCallback = [&](Item &item, const InputEvent &event) { return spinner->onInput(event); };
 
         focusChangedCallback = [&](gui::Item &item) {
-            if (focus) {
+            if (focus && !spinner->isSingle()) {
                 leftArrow->setVisible(true);
                 rightArrow->setVisible(true);
+                spinner->setFont(style::window::font::mediumbold);
+                setPenWidth(style::window::default_border_focus_w);
+            }
+            else if (focus && spinner->isSingle()) {
+                leftArrow->setVisible(false);
+                rightArrow->setVisible(false);
                 spinner->setFont(style::window::font::mediumbold);
                 setPenWidth(style::window::default_border_focus_w);
             }

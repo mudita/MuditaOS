@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -43,7 +43,7 @@ namespace callAppStyle
         inline constexpr auto x = 60U;
         inline constexpr auto y = 254U;
         inline constexpr auto w = style::window_width - 2 * x;
-        inline constexpr auto h = 20U;
+        inline constexpr auto h = 40U;
     } // namespace numberDescriptionLabel
 
     namespace icon

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditAlarmModel.hpp"
@@ -30,7 +30,7 @@ namespace app::alarmClock
 
     unsigned int NewEditAlarmModel::getMinimalItemSpaceRequired() const
     {
-        return style::alarmClock::window::item::options::h;
+        return style::text_spinner_label::h;
     }
 
     void NewEditAlarmModel::requestRecords(uint32_t offset, uint32_t limit)

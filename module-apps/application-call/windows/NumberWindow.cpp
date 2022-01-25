@@ -68,7 +68,7 @@ namespace gui
                                                 numberDescriptionLabel::h);
         numberDescriptionLabel->setFont(style::window::font::mediumlight);
         numberDescriptionLabel->setAlignment(
-            gui::Alignment{gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center});
+            gui::Alignment{gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top});
         numberDescriptionLabel->setEdges(RectangleEdge::None);
     }
 
