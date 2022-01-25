@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,7 @@
 
 #include <Label.hpp>
 #include <BoxLayout.hpp>
-#include <widgets/TextSpinnerBox.hpp>
+#include <widgets/TextSpinnerBoxWithLabel.hpp>
 
 namespace gui
 {
@@ -17,11 +17,7 @@ namespace gui
         explicit AlarmOptionsItem(const std::string &description, const std::vector<UTF8> &options = {});
 
       protected:
-        gui::TextSpinnerBox *optionSpinner = nullptr;
-
-      private:
-        gui::VBox *vBox              = nullptr;
-        gui::Label *descriptionLabel = nullptr;
+        gui::TextSpinnerBoxWithLabel *optionSpinner = nullptr;
     };
 
 } /* namespace gui */

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMeditation.hpp"
@@ -51,7 +51,7 @@ namespace gui
                                       style::meditation::intervalBox::X,
                                       style::meditation::intervalBox::Y,
                                       style::meditation::intervalBox::Width,
-                                      style::meditation::intervalBox::Height,
+                                      style::text_spinner_label::h,
                                       timeSetter);
         intervalBox->setEdges(RectangleEdge::None);
 

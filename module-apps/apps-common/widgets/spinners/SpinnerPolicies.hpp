@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -85,6 +85,10 @@ namespace gui
             }
         }
 
+        [[nodiscard]] bool isSingle() const
+        {
+            return range.size() == 1;
+        }
         [[nodiscard]] bool isAtMin() const
         {
             return pos == 0;
@@ -291,7 +295,10 @@ namespace gui
                 pos   = 0;
             }
         }
-
+        [[nodiscard]] bool isSingle() const
+        {
+            return range.size() == 1;
+        }
         [[nodiscard]] bool isAtMin() const
         {
             return pos == 0;

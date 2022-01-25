@@ -50,33 +50,6 @@ namespace style::meditation
         constexpr auto X      = style::window::default_left_margin;
         constexpr auto Y      = style::meditation::timer::Y + 2 * style::meditation::timer::Radius + VerticalWidgetGap;
         constexpr auto Width  = style::window::default_body_width;
-        constexpr auto Height = 60;
-
-        namespace topLabel
-        {
-            constexpr auto X      = 0;
-            constexpr auto Y      = 0;
-            constexpr auto Width  = intervalBox::Width;
-            constexpr auto Height = intervalBox::Height / 2;
-        } // namespace topLabel
-
-        namespace bottomLabel
-        {
-            constexpr auto X      = 0;
-            constexpr auto Y      = topLabel::Y + topLabel::Height;
-            constexpr auto Width  = intervalBox::Width;
-            constexpr auto Height = intervalBox::Height / 2;
-        } // namespace bottomLabel
-
-        namespace arrow
-        {
-            constexpr auto Y      = 10;
-            constexpr auto Width  = 15;
-            constexpr auto Height = intervalBox::Height / 2;
-            constexpr auto LeftX  = 0;
-            constexpr auto RightX = intervalBox::Width - arrow::Width;
-        } // namespace arrow
-
     } // namespace intervalBox
 
     namespace itemList

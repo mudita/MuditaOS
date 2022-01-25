@@ -51,6 +51,7 @@ target_sources(apps-common
         widgets/ModesBox.cpp
         widgets/SpinBox.cpp
         widgets/TextSpinnerBox.cpp
+        widgets/TextSpinnerBoxWithLabel.cpp
         widgets/TextWithIconsWidget.cpp
         widgets/TimeSetSpinner.cpp
         widgets/AlarmSetSpinner.cpp

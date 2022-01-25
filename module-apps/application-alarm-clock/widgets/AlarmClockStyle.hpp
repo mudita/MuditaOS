@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,14 +40,6 @@ namespace style::alarmClock
                 inline constexpr auto marginBot    = 20;
                 inline constexpr auto separator    = 30;
             } // namespace time
-
-            namespace options
-            {
-                inline constexpr auto spinner_h = 40;
-                inline constexpr auto label_h   = 27;
-                inline constexpr auto h         = spinner_h + label_h;
-            } // namespace options
-
         } // namespace item
 
     } // namespace window
