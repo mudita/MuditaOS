@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,30 +25,33 @@ namespace sdesktop::endpoints::json
     inline constexpr auto networkOperatorName = "networkOperatorName";
     inline constexpr auto accessTechnology    = "accessTechnology";
 
-    inline constexpr auto update              = "update";
-    inline constexpr auto updateInfo          = "updateInfo";
-    inline constexpr auto updateError         = "updateError";
-    inline constexpr auto errorCode           = "errorCode";
-    inline constexpr auto statusCode          = "statusCode";
-    inline constexpr auto updateHistory       = "updateHistory";
-    inline constexpr auto versionString       = "string";
-    inline constexpr auto fileExists          = "fileExists";
-    inline constexpr auto boot                = "boot";
-    inline constexpr auto version             = "version";
-    inline constexpr auto taskId              = "id";
-    inline constexpr auto state               = "state";
-    inline constexpr auto success             = "success";
-    inline constexpr auto request             = "request";
-    inline constexpr auto restore             = "restore";
-    inline constexpr auto finished            = "finished";
-    inline constexpr auto pending             = "pending";
-    inline constexpr auto location            = "location";
-    inline constexpr auto reason              = "reason";
-    inline constexpr auto serialNumber        = "serialNumber";
-    inline constexpr auto caseColour          = "caseColour";
-    inline constexpr auto fileList            = "fileList";
-    inline constexpr auto files               = "files";
-    inline constexpr auto backupLocation      = "backupLocation";
+    inline constexpr auto update         = "update";
+    inline constexpr auto updateInfo     = "updateInfo";
+    inline constexpr auto updateError    = "updateError";
+    inline constexpr auto errorCode      = "errorCode";
+    inline constexpr auto statusCode     = "statusCode";
+    inline constexpr auto updateHistory  = "updateHistory";
+    inline constexpr auto usbMscMode     = "usbMscMode";
+    inline constexpr auto versionString  = "string";
+    inline constexpr auto fileExists     = "fileExists";
+    inline constexpr auto boot           = "boot";
+    inline constexpr auto version        = "version";
+    inline constexpr auto taskId         = "id";
+    inline constexpr auto state          = "state";
+    inline constexpr auto success        = "success";
+    inline constexpr auto reboot         = "reboot";
+    inline constexpr auto rebootMode     = "rebootMode";
+    inline constexpr auto request        = "request";
+    inline constexpr auto restore        = "restore";
+    inline constexpr auto finished       = "finished";
+    inline constexpr auto pending        = "pending";
+    inline constexpr auto location       = "location";
+    inline constexpr auto reason         = "reason";
+    inline constexpr auto serialNumber   = "serialNumber";
+    inline constexpr auto caseColour     = "caseColour";
+    inline constexpr auto fileList       = "fileList";
+    inline constexpr auto files          = "files";
+    inline constexpr auto backupLocation = "backupLocation";
 
     namespace updateprocess
     {

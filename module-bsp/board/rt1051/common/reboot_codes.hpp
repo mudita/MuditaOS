@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 // Copyright (c) 2021, Mudita Sp. z.o.o. All rights reserved.
@@ -16,6 +16,8 @@ namespace bsp
         rebootToUpdateCode     = std::uint32_t{0xdead0000},
         rebootToRecoveryCode   = std::uint32_t{0xdead0001},
         rebootToFactoryRstCode = std::uint32_t{0xdead0002},
+        // 0xdead0003 is reserved for eco_factory_pgm_keys
+        rebootToUsbMscModeCode = std::uint32_t{0x00000004},
         rebootFailedToBoot     = std::uint32_t{0xdeadFFFF}
     };
 } // namespace bsp

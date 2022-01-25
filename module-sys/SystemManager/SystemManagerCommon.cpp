@@ -114,6 +114,9 @@ namespace sys
         case SystemManagerCommon::State::ShutdownReady:
             LOG_INFO("  ---> SHUTDOWN <--- ");
             break;
+        case SystemManagerCommon::State::RebootToUsbMscMode:
+            LOG_INFO("  ---> REBOOT TO USB MSC Mode <--- ");
+            break;
         case SystemManagerCommon::State::RebootToUpdate:
             LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
             break;
@@ -134,6 +137,9 @@ namespace sys
             break;
         case State::ShutdownReady:
             powerManager->PowerOff();
+            break;
+        case State::RebootToUsbMscMode:
+            powerManager->RebootToUsbMscMode();
             break;
         case State::RebootToUpdate:
             powerManager->RebootToUpdate(updateReason);
@@ -282,6 +288,13 @@ namespace sys
     bool SystemManagerCommon::Reboot(Service *s)
     {
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot, CloseReason::Reboot),
+                           service::name::system_manager);
+        return true;
+    }
+
+    bool SystemManagerCommon::RebootToUsbMscMode(Service *s)
+    {
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::RebootToUsbMscMode, CloseReason::Reboot),
                            service::name::system_manager);
         return true;
     }
@@ -525,6 +538,9 @@ namespace sys
                 case Code::RebootToUpdate:
                     RebootHandler(State::RebootToUpdate, data->updateReason);
                     break;
+                case Code::RebootToUsbMscMode:
+                    RebootToUsbMscModeHandler(State::RebootToUsbMscMode);
+                    break;
                 case Code::FactoryReset:
                     CloseSystemHandler(CloseReason::FactoryReset);
                     break;
@@ -684,7 +700,6 @@ namespace sys
         readyForCloseRegister.clear();
 
         DestroyServices(sys::state::regularClose::whitelist);
-
         set(State::Shutdown);
     }
 
@@ -721,6 +736,12 @@ namespace sys
         if (updateReason) {
             this->updateReason = updateReason.value();
         }
+    }
+
+    void SystemManagerCommon::RebootToUsbMscModeHandler(State newState)
+    {
+        CloseSystemHandler(CloseReason::RebootToUsbMscMode);
+        set(newState);
     }
 
     void SystemManagerCommon::CpuStatisticsTimerHandler()

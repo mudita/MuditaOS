@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,6 @@
 
 namespace sdesktop::endpoints
 {
-
     class UpdateHelper : public BaseHelper
     {
       public:
@@ -15,7 +14,7 @@ namespace sdesktop::endpoints
         {}
 
         auto processPost(Context &context) -> ProcessResult final;
+        auto processPut(Context &context) -> ProcessResult final;
         void preProcess(http::Method method, Context &context) final;
     };
-
 } // namespace sdesktop::endpoints
