@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -43,6 +43,7 @@ namespace sys
         Restore,
         Reboot,
         RebootToUpdate,
+        RebootToUsbMscMode,
         FactoryReset,
         None,
     };
@@ -80,7 +81,8 @@ namespace sys
             Shutdown,
             ShutdownReady,
             Reboot,
-            RebootToUpdate
+            RebootToUpdate,
+            RebootToUsbMscMode
         } state = State::Running;
 
         explicit SystemManagerCommon(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
@@ -97,6 +99,8 @@ namespace sys
         static bool FactoryReset(Service *s);
 
         static bool Reboot(Service *s);
+
+        static bool RebootToUsbMscMode(Service *s);
 
         static bool RebootToUpdate(Service *s, UpdateReason updateReason);
 
@@ -179,6 +183,8 @@ namespace sys
 
         void RebootHandler(State state, std::optional<UpdateReason> updateReason = std::nullopt);
 
+        void RebootToUsbMscModeHandler(State newState);
+
         /// periodic update of cpu statistics
         void CpuStatisticsTimerHandler();
 
@@ -223,6 +229,9 @@ inline const char *c_str(sys::SystemManagerCommon::State state)
         return "Reboot";
     case sys::SystemManagerCommon::State::RebootToUpdate:
         return "RebootToUpdate";
+    case sys::SystemManagerCommon::State::RebootToUsbMscMode:
+        return "RebootToUsbMscModeUpdate";
+        break;
     case sys::SystemManagerCommon::State::ShutdownReady:
         return "ShutdownReady";
     }

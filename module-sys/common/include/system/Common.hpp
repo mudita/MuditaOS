@@ -48,6 +48,8 @@ namespace sys
     {
         RegularPowerDown,
         Reboot,
+        RebootToUpdate,
+        RebootToUsbMscMode,
         FactoryReset,
         SystemBrownout,
         LowBattery

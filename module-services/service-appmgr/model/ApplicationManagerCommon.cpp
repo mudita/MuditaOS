@@ -157,14 +157,13 @@ namespace app::manager
         ActionRequest act = ActionRequest{this->GetName(), app::manager::actions::DisplayLogoAtExit, nullptr};
         switch (closeReason) {
         case sys::CloseReason::SystemBrownout:
-            [[fallthrough]];
         case sys::CloseReason::LowBattery:
             act = ActionRequest{this->GetName(), app::manager::actions::SystemBrownout, nullptr};
             break;
         case sys::CloseReason::RegularPowerDown:
-            [[fallthrough]];
         case sys::CloseReason::Reboot:
-            [[fallthrough]];
+        case sys::CloseReason::RebootToUpdate:
+        case sys::CloseReason::RebootToUsbMscMode:
         case sys::CloseReason::FactoryReset:
             break;
         }

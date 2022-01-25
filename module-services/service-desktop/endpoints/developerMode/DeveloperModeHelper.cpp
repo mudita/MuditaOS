@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/developerMode/DeveloperModeHelper.hpp>
@@ -143,7 +143,6 @@ namespace sdesktop::endpoints
                        ? http::Code::NoContent
                        : http::Code::InternalServerError;
         }
-
         else {
             context.setResponseStatus(http::Code::BadRequest);
             putToSendQueue(context.createSimpleResponse());

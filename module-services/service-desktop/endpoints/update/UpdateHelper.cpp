@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <endpoints/update/UpdateHelper.hpp>
 #include <endpoints/Context.hpp>
+#include <endpoints/JsonKeyNames.hpp>
+#include <endpoints/update/UpdateHelper.hpp>
 #include <log/log.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -23,7 +24,7 @@ namespace sdesktop::endpoints
     {
         const auto &body = context.getBody();
 
-        if (!(body["update"] == true && body["reboot"] == true)) {
+        if (!(body[json::update] == true && body[json::reboot] == true)) {
             return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
         }
 
@@ -36,6 +37,18 @@ namespace sdesktop::endpoints
         }
 
         return {sent::no, ResponseContext{.status = http::Code::InternalServerError}};
+    }
+
+    auto UpdateHelper::processPut(Context &context) -> ProcessResult
+    {
+        const auto &body = context.getBody();
+        auto code        = http::Code::BadRequest;
+        if (body[json::rebootMode] == json::usbMscMode) {
+            code = sys::SystemManagerCommon::RebootToUsbMscMode(owner) ? http::Code::NoContent
+                                                                       : http::Code::InternalServerError;
+        }
+
+        return {sent::no, ResponseContext{.status = code}};
     }
 
 } // namespace sdesktop::endpoints

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_POWERMANAGER_HPP
@@ -37,6 +37,7 @@ namespace sys
 
         int32_t PowerOff();
         int32_t Reboot();
+        int32_t RebootToUsbMscMode();
         int32_t RebootToUpdate(UpdateReason reason);
 
         /// called periodically to calculate the CPU requirement
