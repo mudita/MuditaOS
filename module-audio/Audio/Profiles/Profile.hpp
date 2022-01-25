@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,6 +9,8 @@
 #include <memory>
 #include <functional>
 #include <string>
+#include <filesystem>
+#include <module-vfs/paths/include/purefs/filesystem_paths.hpp>
 
 namespace audio
 {
@@ -126,6 +128,12 @@ namespace audio
         Profile(const std::string &name,
                 const Type type,
                 const audio::codec::Configuration &fmt,
+                AudioDevice::Type devType);
+
+        Profile(const std::string &name,
+                const Type type,
+                const std::filesystem::path &configurationPath,
+                const audio::codec::Configuration &fallbackConfig,
                 AudioDevice::Type devType);
 
         audio::codec::Configuration audioConfiguration;

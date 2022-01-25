@@ -35,6 +35,7 @@ target_sources(
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/RecorderOperation.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/RouterOperation.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/Profiles/Profile.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/Profiles/ProfileConfigUtils.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/ServiceObserver.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/Stream.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamFactory.cpp

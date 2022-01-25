@@ -51,4 +51,14 @@ add_catch2_executable(
         module-utils
 )
 
+add_catch2_executable(
+    NAME
+        audio-config-utils
+    SRCS
+        unittest_config_utils.cpp
+    LIBS
+        module-audio
+        module-utils
+)
+
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" DESTINATION "${CMAKE_BINARY_DIR}")

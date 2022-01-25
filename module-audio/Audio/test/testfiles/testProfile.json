@@ -1,0 +1,46 @@
+{
+  "samplerate": 44100,
+  "bitWidth": 8,
+  "flags": 1,
+  "outputVolume": 1,
+  "inputGain": 2,
+  "inputPath": 2,
+  "outputPath": 3,
+  "filterParams": [
+    {
+      "filterType": "None",
+      "frequency": 1000.2,
+      "samplerate": 44100,
+      "Q": 0.7,
+      "gain": 10
+    },
+    {
+      "filterType": "HighPass",
+      "frequency": 2000.0,
+      "samplerate": 8000,
+      "Q": 1.7,
+      "gain": -10
+    },
+    {
+      "filterType": "LowPass",
+      "frequency": 10000,
+      "samplerate": 44100,
+      "Q": 0.75,
+      "gain": 2.5
+    },
+    {
+      "filterType": "Notch",
+      "frequency": 2500,
+      "samplerate": 44100,
+      "Q": 4.4,
+      "gain": 5.3
+    },
+    {
+      "filterType": "BandPass",
+      "frequency": 1000,
+      "samplerate": 44100,
+      "Q": 0.7,
+      "gain": 10
+    }
+  ]
+}

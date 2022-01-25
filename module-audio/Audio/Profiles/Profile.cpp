@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Profile.hpp"
@@ -21,6 +21,7 @@
 #include "ProfileRoutingBluetoothHFP.hpp"
 #include "ProfileRecordingBluetoothHFP.hpp"
 
+#include "ProfileConfigUtils.hpp"
 #include <Utils.hpp>
 
 namespace audio
@@ -94,6 +95,22 @@ namespace audio
         : audioConfiguration(fmt), audioDeviceType(devType), name(name), type(type)
     {}
 
+    Profile::Profile(const std::string &name,
+                     const Type type,
+                     const std::filesystem::path &configurationPath,
+                     const audio::codec::Configuration &fallbackConfig,
+                     AudioDevice::Type devType)
+        : audioDeviceType(devType), name(name), type(type)
+    {
+        try {
+            audioConfiguration = loadConfigurationFromFile(configurationPath);
+        }
+        catch (std::invalid_argument &e) {
+            LOG_ERROR("Failed loading the profile configuration from file, using fallback! Cause: %s", e.what());
+            audioConfiguration = fallbackConfig;
+        }
+    }
+
     void Profile::SetInputGain(Gain gain)
     {
         audioConfiguration.inputGain = gain;
@@ -131,4 +148,5 @@ namespace audio
         }
         return utils::enumToString(profileType);
     }
+
 } // namespace audio
