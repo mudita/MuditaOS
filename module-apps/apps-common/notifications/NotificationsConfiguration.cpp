@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsConfiguration.hpp"
@@ -18,11 +18,6 @@ void NotificationsConfiguration::updateCurrentCall(CallNotificationPolicy &polic
     policy.updateCurrentCall(phoneModeObserver->getCurrentPhoneMode());
 }
 
-void NotificationsConfiguration::callNumberCheck(CallNotificationPolicy &policy, bool contactInFavourites)
-{
-    policy.numberCheck(getDNDCallsFromFavourites(), contactInFavourites);
-}
-
 void NotificationsConfiguration::updateCurrentList(NotificationsListPolicy &policy)
 {
     policy.updateCurrentList(phoneModeObserver->getCurrentPhoneMode(),
@@ -39,10 +34,4 @@ auto NotificationsConfiguration::getDNDNotificationsOnLockedScreen() const noexc
 {
     return utils::getNumericValue<bool>(
         settings->getValue(settings::Offline::notificationsWhenLocked, settings::SettingsScope::Global));
-}
-
-auto NotificationsConfiguration::getDNDCallsFromFavourites() const noexcept -> bool
-{
-    return utils::getNumericValue<bool>(
-        settings->getValue(settings::Offline::callsFromFavorites, settings::SettingsScope::Global));
 }

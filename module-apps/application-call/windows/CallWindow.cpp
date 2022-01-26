@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
@@ -174,7 +174,6 @@ namespace gui
             }
         } break;
         case State::CALL_ENDED: {
-            interface->stopAudio();
             stopCallTimer();
             navBar->setActive(gui::nav_bar::Side::Left, false);
             navBar->setActive(gui::nav_bar::Side::Center, false);

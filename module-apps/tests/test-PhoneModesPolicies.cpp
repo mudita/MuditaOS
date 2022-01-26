@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -16,7 +16,6 @@ TEST_CASE("Connected Mode notifications - calls policy test")
     callPolicy.updateCurrentCall(sys::phone_modes::PhoneMode::Connected);
     REQUIRE(callPolicy.isPopupAllowed());
     REQUIRE(callPolicy.isRingtoneAllowed());
-    REQUIRE(!callPolicy.isNumberCheckRequired());
 }
 
 TEST_CASE("Connected Mode notifications - sms policy test")
@@ -63,7 +62,6 @@ TEST_CASE("DoNotDisturb Mode notifications  - calls policy test")
     callPolicy.updateCurrentCall(sys::phone_modes::PhoneMode::DoNotDisturb);
     REQUIRE(!callPolicy.isPopupAllowed());
     REQUIRE(!callPolicy.isRingtoneAllowed());
-    REQUIRE(callPolicy.isNumberCheckRequired());
     REQUIRE(callPolicy.isDismissedCallNotificationAllowed());
 
     SECTION("Number in/not in Favourites")
@@ -146,6 +144,5 @@ TEST_CASE("Offline Mode notifications - calls policy test")
     callPolicy.updateCurrentCall(sys::phone_modes::PhoneMode::Offline);
     REQUIRE(!callPolicy.isPopupAllowed());
     REQUIRE(!callPolicy.isRingtoneAllowed());
-    REQUIRE(!callPolicy.isNumberCheckRequired());
     REQUIRE(!callPolicy.isDismissedCallNotificationAllowed());
 }
