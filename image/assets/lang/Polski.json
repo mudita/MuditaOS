@@ -622,7 +622,7 @@
   "app_bellmain_background_sounds": "Relaks",
   "app_bellmain_settings": "Ustawienia",
   "app_bellmain_main_window_title": "Mudita Harmony",
-  "app_bell_onboarding_welcome_message": "<text>Mudita Harmony<br/>jest </text><text font='gt_pressura' weight='regular' size='46'>wyłączony</text>",
+  "app_bell_onboarding_welcome_message": "<text>Mudita Harmony<br/>jest wyłączony</text>",
   "app_bell_onboarding_info_rotate": "<text font='gt_pressura' weight='regular' size='38'>Obróć, </text><text font='gt_pressura' weight='light' size='38'>aby wybrać</text>",
   "app_bell_onboarding_info_light_click": "<text font='gt_pressura' weight='regular' size='38'>Kliknij lekko, </text><text font='gt_pressura' weight='light' size='38'>aby kontynuować</text>",
   "app_bell_onboarding_info_deep_click_warning": "<text font='gt_pressura' weight='light' size='38'>Głęboko </text><text font='gt_pressura' weight='regular' size='38'>wciśnięty</text>",
