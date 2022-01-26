@@ -20,6 +20,7 @@ target_sources(
         bsp/bell_temp_sensor/bell_temp_sensor.cpp
         bsp/eink/eink_pin_config.cpp
         bsp/lpm/PowerProfile.cpp
+        bsp/lpm/RT1051LPM.cpp
         bsp/rotary_encoder/rotary_encoder.cpp
         bsp/switches/switches.cpp
 

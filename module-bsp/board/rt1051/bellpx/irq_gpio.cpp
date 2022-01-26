@@ -9,12 +9,14 @@
 #include "queue.h"
 #include "fsl_common.h"
 #include <fsl_qtmr.h>
+#include <fsl_gpc.h>
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/key_input/KeyInput.hpp>
 #include <hal/battery_charger/BatteryChargerIRQ.hpp>
 #include "board/BoardDefinitions.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
+#include <bsp/lpm/RT1051LPM.hpp>
 
 namespace bsp
 {
@@ -28,11 +30,12 @@ namespace bsp
         DisableIRQ(GPIO3_Combined_16_31_IRQn);
         DisableIRQ(GPIO5_Combined_0_15_IRQn);
         DisableIRQ(TMR3_IRQn);
+        DisableIRQ(RTWDOG_IRQn);
 
         GPIO_PortDisableInterrupts(GPIO1, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO2, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO3, UINT32_MAX);
-        GPIO_PortClearInterruptFlags(GPIO5, UINT32_MAX);
+        GPIO_PortDisableInterrupts(GPIO5, UINT32_MAX);
 
         // Clear all IRQs
         GPIO_PortClearInterruptFlags(GPIO1, UINT32_MAX);
@@ -59,11 +62,15 @@ namespace bsp
         EnableIRQ(GPIO3_Combined_16_31_IRQn);
         NVIC_SetPriority(GPIO3_Combined_16_31_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
 
+        NVIC_ClearPendingIRQ(GPIO5_Combined_0_15_IRQn);
         EnableIRQ(GPIO5_Combined_0_15_IRQn);
-        NVIC_SetPriority(GPIO5_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
+        GPC_EnableIRQ(GPC, GPIO5_Combined_0_15_IRQn);
 
         EnableIRQ(TMR3_IRQn);
         NVIC_SetPriority(TMR3_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
+
+        NVIC_ClearPendingIRQ(RTWDOG_IRQn);
+        EnableIRQ(RTWDOG_IRQn);
     }
 
     extern "C"
@@ -125,11 +132,10 @@ namespace bsp
             BaseType_t xHigherPriorityTaskWoken = 0;
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO2);
 
-            if (irq_mask & ((1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_CENTER)) |
-                            (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT)) |
+            if (irq_mask & ((1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT)) |
                             (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT)) |
                             (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH)))) {
-                xHigherPriorityTaskWoken |= hal::key_input::generalIRQHandler(irq_mask);
+                xHigherPriorityTaskWoken |= hal::key_input::GPIO2SwitchesIRQHandler(irq_mask);
             }
 
             if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_ACOK_PIN))) {
@@ -162,14 +168,10 @@ namespace bsp
 
         void GPIO5_Combined_0_15_IRQHandler(void)
         {
-            BaseType_t xHigherPriorityTaskWoken = 0;
-            uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO5);
+            uint32_t irq_mask = GPIO_GetPinsInterruptFlags(GPIO5);
 
-            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_WAKEUP))) {
-
-                xHigherPriorityTaskWoken |= hal::key_input::wakeupIRQHandler();
-            }
-
+            BaseType_t xHigherPriorityTaskWoken = hal::key_input::GPIO5SwitchesIRQHandler(
+                1 << static_cast<uint32_t>(BoardDefinitions::BELL_CENTER_SWITCH));
             // Clear all IRQs on the GPIO5 port
             GPIO_PortClearInterruptFlags(GPIO5, irq_mask);
 
@@ -183,8 +185,12 @@ namespace bsp
                                   kQTMR_Channel_0,
                                   kQTMR_CompareFlag | kQTMR_Compare1Flag | kQTMR_Compare2Flag | kQTMR_OverflowFlag |
                                       kQTMR_EdgeFlag);
-            const uint8_t QTMR3_mask = 99;
-            hal::key_input::generalIRQHandler(QTMR3_mask);
+            hal::key_input::EncoderIRQHandler();
+        }
+
+        void RTWDOG_IRQHandler(void)
+        {
+            RT1051LPM::WatchdogIRQHandler();
         }
     }
 } // namespace bsp
