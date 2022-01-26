@@ -1,7 +1,10 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/CellularCall.hpp"
+#include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/CallRingGuard.hpp"
+#include "service-db/agents/settings/SystemSettings.hpp"
 
 #include <CalllogRecord.hpp>
 #include <PhoneNumber.hpp>
@@ -18,8 +21,26 @@
 
 namespace CellularCall
 {
+    CellularCall::CellularCall(ServiceCellular &owner) : owner(owner), audio(owner)
+    {
+        utils::PhoneNumber::View number = utils::PhoneNumber::View();
+        const CallType type             = CallType::CT_NONE;
+        const time_t date               = 0;
+        const time_t duration           = 0;
+
+        clear();
+
+        this->call.phoneNumber = number;
+        this->call.date        = date;
+        this->call.duration    = duration;
+        this->call.type        = type;
+        this->call.name        = number.getEntered(); // temporary set number as name
+    }
+
     bool CellularCall::startCall(const utils::PhoneNumber::View &number, const CallType type)
     {
+        callRingGuard(*this) ? audio.play() : void();
+
         LOG_INFO("starting call");
 
         if (isValid()) {
@@ -62,6 +83,7 @@ namespace CellularCall
 
     bool CellularCall::endCall(Forced forced)
     {
+        audio.stop();
         LOG_INFO("ending call");
         if (!isValid()) {
             LOG_ERROR("no call to end");
@@ -120,6 +142,16 @@ namespace CellularCall
     void CellularCall::setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel)
     {
         cpuSentinel = std::move(sentinel);
+    }
+
+    bool CellularCall::Operations::areCallsFromFavouritesEnabled()
+    {
+        return owner.owner.areCallsFromFavouritesEnabled();
+    }
+
+    bool CellularCall::Operations::isNumberInFavourites()
+    {
+        return DBServiceAPI::IsContactInFavourites(&owner.owner, owner.call.phoneNumber);
     }
 
 } // namespace CellularCall

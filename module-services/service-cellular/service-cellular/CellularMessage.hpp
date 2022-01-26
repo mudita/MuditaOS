@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -883,23 +883,8 @@ class CellularCallRejectedByOfflineNotification : public CellularResponseMessage
 class CellularRingNotification : public CellularNotificationMessage
 {
   public:
-    explicit CellularRingNotification(const utils::PhoneNumber::View &number)
-        : CellularNotificationMessage(CellularNotificationMessage::Content::Ring), number(number)
+    CellularRingNotification() : CellularNotificationMessage(CellularNotificationMessage::Content::Ring)
     {}
-    explicit CellularRingNotification(const utils::PhoneNumber &number)
-        : CellularNotificationMessage(CellularNotificationMessage::Content::Ring), number(number.getView())
-    {}
-    explicit CellularRingNotification(const std::string &e164number)
-        : CellularNotificationMessage(CellularNotificationMessage::Content::Ring),
-          number(utils::PhoneNumber::parse(e164number))
-    {}
-    auto getNubmer() const -> utils::PhoneNumber::View
-    {
-        return number;
-    }
-
-  private:
-    utils::PhoneNumber::View number;
 };
 
 class CellularCallerIdNotification : public CellularNotificationMessage

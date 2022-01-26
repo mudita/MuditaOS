@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -45,7 +45,6 @@ namespace app
             LoudspeakerOff
         };
 
-        virtual void stopAudio()                           = 0;
         virtual void startAudioRouting()                   = 0;
         virtual void sendAudioEvent(AudioEvent audioEvent) = 0;
 
@@ -120,7 +119,6 @@ namespace app
             this->callState = state;
         }
 
-        void stopAudio() override;
         void startAudioRouting() override;
         void sendAudioEvent(AudioEvent audioEvent) override;
 

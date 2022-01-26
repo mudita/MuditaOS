@@ -17,6 +17,8 @@ set(SOURCES
     src/CSQHandler.cpp
 
     CellularCall.cpp
+    CallAudio.cpp
+    CallRingGuard.cpp
     CellularServiceAPI.cpp
     CellularUrcHandler.cpp
     checkSmsCenter.cpp

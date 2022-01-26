@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallNotificationPolicy.hpp"
@@ -40,11 +40,6 @@ bool CallNotificationPolicy::isRingtoneAllowed() const noexcept
 bool CallNotificationPolicy::isDismissedCallNotificationAllowed() const noexcept
 {
     return dismissedCallNotification;
-}
-
-bool CallNotificationPolicy::isNumberCheckRequired() const noexcept
-{
-    return numberCheckNeeded;
 }
 
 void CallNotificationPolicy::numberCheck(bool callsFromFavouritesSetting, bool isNumberinFavourites)

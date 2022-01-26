@@ -1,9 +1,12 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include "CallAudio.hpp"
+#include "PhoneModes/PhoneMode.hpp"
 #include <Interface/CalllogRecord.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 #include <PhoneNumber.hpp>
 #include <Tables/CalllogTable.hpp>
 #include <time/time_conversion.hpp>
@@ -11,11 +14,13 @@
 #include <Utils.hpp>
 
 #include <cstdint>
+#include <memory>
 #include <functional>
 #include <iosfwd>
 #include <string>
 #include <sys/types.h>
-#include <SystemManager/CpuSentinel.hpp>
+
+class ServiceCellular;
 
 namespace CellularCall
 {
@@ -52,19 +57,17 @@ namespace CellularCall
             startActiveTime.set_time(0);
         }
 
+        ServiceCellular &owner;
+        CallRingAudio audio;
+
       public:
-        CellularCall(utils::PhoneNumber::View number = utils::PhoneNumber::View(),
-                     const CallType type             = CallType::CT_NONE,
-                     const time_t date               = 0,
-                     const time_t duration           = 0)
+        void setMode(sys::phone_modes::PhoneMode mode)
         {
-            clear();
-            this->call.phoneNumber = number;
-            this->call.date        = date;
-            this->call.duration    = duration;
-            this->call.type        = type;
-            this->call.name        = number.getEntered(); // temporary set number as name
+            this->mode = mode;
         }
+
+        mutable sys::phone_modes::PhoneMode mode;
+        CellularCall(ServiceCellular &owner);
 
         void setStartCallAction(const std::function<CalllogRecord(const CalllogRecord &rec)> callAction)
         {
@@ -98,5 +101,19 @@ namespace CellularCall
         }
 
         void setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel);
+
+        struct Operations
+        {
+            bool areCallsFromFavouritesEnabled();
+            bool isNumberInFavourites();
+
+          private:
+            friend CellularCall;
+            CellularCall &owner;
+            explicit Operations(CellularCall &owner) : owner(owner)
+            {}
+        };
+        Operations operations = Operations(*this);
+        friend Operations;
     };
 } // namespace CellularCall

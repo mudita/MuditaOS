@@ -103,6 +103,8 @@ class ServiceCellular : public sys::Service
     bool getIMSI(std::string &destination, bool fullNumber = false);
     std::vector<std::string> getNetworkInfo();
 
+    auto areCallsFromFavouritesEnabled() -> bool;
+
   private:
     at::ATURCStream atURCStream;
     std::unique_ptr<CellularMux> cmux = std::make_unique<CellularMux>(PortSpeed_e::PS115200, this);
@@ -138,7 +140,7 @@ class ServiceCellular : public sys::Service
 
     std::vector<std::string> messageParts;
 
-    CellularCall::CellularCall ongoingCall;
+    CellularCall::CellularCall ongoingCall = CellularCall::CellularCall(*this);
     std::vector<CalllogRecord> tetheringCalllog;
 
     ussd::State ussdState = ussd::State::none;
@@ -316,8 +318,6 @@ class ServiceCellular : public sys::Service
     auto tetheringTurnOffURC() -> bool;
     auto tetheringTurnOnURC() -> bool;
     auto logTetheringCalls() -> void;
-
-  private:
     std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;
     cellular::internal::SimpleCallManager callManager;
     TaskHandle_t getTaskHandle();

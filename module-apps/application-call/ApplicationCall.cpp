@@ -88,7 +88,6 @@ namespace app
                 switchWindow(window::name_call, std::make_unique<app::CallAbortData>());
             }
             else if (state == Application::State::ACTIVE_BACKGROUND) {
-                stopAudio();
                 setCallState(call::State::IDLE);
                 manager::Controller::finish(this);
             }
@@ -263,11 +262,6 @@ namespace app
             app::manager::Controller::sendAction(
                 this, manager::actions::AddContact, std::move(data), manager::OnSwitchBehaviour::RunInBackground);
         }
-    }
-
-    void ApplicationCall::stopAudio()
-    {
-        AudioServiceAPI::StopAll(this);
     }
 
     void ApplicationCall::startAudioRouting()

@@ -300,7 +300,9 @@ void ServiceCellular::registerMessageHandlers()
         if (priv->simCard->isSimCardSelected()) {
             connectionManager->onPhoneModeChange(mode);
         }
+        ongoingCall.setMode(mode);
     });
+    ongoingCall.setMode(phoneModeObserver->getCurrentPhoneMode());
     phoneModeObserver->subscribe([&](sys::phone_modes::Tethering tethering) {
         if (tethering == sys::phone_modes::Tethering::On) {
             priv->tetheringHandler->enable();
@@ -2206,9 +2208,9 @@ auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::
         return std::make_shared<CellularResponseMessage>(hangUpCall());
     }
 
+    /// NOTE: the code below should be investigated as there is something weird in this flow
     if (!callManager.isIncomingCallPropagated()) {
-        auto message = static_cast<CellularRingNotification *>(msg);
-        bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(message->getNubmer()),
+        bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(""),
                           sys::BusChannel::ServiceCellularNotifications);
         callManager.ring();
     }
@@ -2345,6 +2347,13 @@ auto ServiceCellular::logTetheringCalls() -> void
         tetheringCalllog.clear();
     }
 }
+
+bool ServiceCellular::areCallsFromFavouritesEnabled()
+{
+    return utils::getNumericValue<bool>(
+        settings->getValue(settings::Offline::callsFromFavorites, settings::SettingsScope::Global));
+}
+
 TaskHandle_t ServiceCellular::getTaskHandle()
 {
     return xTaskGetCurrentTaskHandle();
