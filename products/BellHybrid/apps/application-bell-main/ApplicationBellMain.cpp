@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
@@ -15,6 +15,7 @@
 #include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/models/AlarmModel.hpp>
 #include <common/models/TimeModel.hpp>
+#include <common/models/LayoutModel.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -91,9 +92,16 @@ namespace app
     void ApplicationBellMain::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            auto window = std::make_unique<gui::BellHomeScreenWindow>(app, homeScreenPresenter);
-            // TODO: To be replaced with settings db read
-            setHomeScreenLayout("ClassicWithTemp");
+            auto timeModel        = std::make_unique<app::TimeModel>();
+            auto batteryModel     = std::make_unique<app::home_screen::BatteryModel>(app);
+            auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(app);
+            auto alarmModel       = std::make_unique<app::AlarmModel>(app);
+            auto layoutModel      = std::make_unique<bell_settings::LayoutModel>(app);
+            homeScreenPresenter   = std::make_shared<app::home_screen::HomeScreenPresenter>(
+                app, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
+            auto window         = std::make_unique<gui::BellHomeScreenWindow>(app, homeScreenPresenter);
+            auto selectedLayout = layoutModel->getValue();
+            setHomeScreenLayout(selectedLayout);
             return window;
         });
 

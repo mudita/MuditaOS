@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -35,4 +35,8 @@ namespace bell::settings
         constexpr inline auto tone     = "bedtime_tone";
         constexpr inline auto duration = "bedtime_duration";
     } // namespace Bedtime
+    namespace Layout
+    {
+        constexpr inline auto layout = "layout";
+    } // namespace Layout
 };    // namespace bell::settings
