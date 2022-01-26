@@ -28,7 +28,7 @@ namespace style::onboarding
     namespace text
     {
         constexpr auto marginLeft   = 15;
-        constexpr auto minimumSizeX = 75;
+        constexpr auto minimumSizeX = 81;
         constexpr auto minimumSizeY = 62;
     } // namespace text
 };    // namespace style::onboarding
