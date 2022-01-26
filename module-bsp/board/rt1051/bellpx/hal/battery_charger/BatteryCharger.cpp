@@ -3,6 +3,7 @@
 
 #include "BatteryChargerIRQ.hpp"
 #include "common/WorkerQueue.hpp"
+#include "common/soc_scaler.hpp"
 
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -17,8 +18,8 @@ namespace
 {
     using namespace bsp::devices::power;
 
-    constexpr auto emergency_poll_time = pdMS_TO_TICKS(5 * 60 * 1000); /// 5min
-    constexpr auto default_timeout     = pdMS_TO_TICKS(100);
+    constexpr auto reinit_poll_time = pdMS_TO_TICKS(5 * 60 * 1000); /// 5min
+    constexpr auto default_timeout  = pdMS_TO_TICKS(100);
 
     constexpr auto i2c_baudrate = static_cast<std::uint32_t>(BoardDefinitions::BELL_FUELGAUGE_I2C_BAUDRATE);
     constexpr auto i2c_instance = static_cast<drivers::I2CInstances>(BoardDefinitions::BELL_FUELGAUGE_I2C);
@@ -94,7 +95,7 @@ namespace hal::battery
           fuel_gauge{CW2015{drivers::DriverI2C::Create(i2c_instance, i2c_params)}}
     {
 
-        reinit_timer = xTimerCreate("emg_timer", emergency_poll_time, pdFALSE, this, [](TimerHandle_t xTimer) {
+        reinit_timer = xTimerCreate("reinit_timer", reinit_poll_time, pdFALSE, this, [](TimerHandle_t xTimer) {
             BellBatteryCharger *inst = static_cast<BellBatteryCharger *>(pvTimerGetTimerID(xTimer));
             inst->pollFuelGauge();
         });
@@ -132,10 +133,10 @@ namespace hal::battery
     {
         /// Charger status fetched from MP2639B alone is not enough to be 100% sure what state we are currently in. For
         /// more info check the Table 2 (page 26) from the MP2639B datasheet. It is required to also take into account
-        /// the current state of SOC.configuration.notification(inst->get_charge_status());
+        /// the current state of SOC.
 
         const auto charger_status = charger.get_charge_status();
-        const auto current_soc    = fuel_gauge.get_battery_soc();
+        const auto current_soc    = fetchBatterySOC();
 
         if (charger_status == MP2639B::ChargingStatus::Complete && current_soc >= 100) {
             return ChargingStatus::ChargingDone;
@@ -150,7 +151,7 @@ namespace hal::battery
             return ChargingStatus::PluggedNotCharging;
         }
         else if (charger_status == MP2639B::ChargingStatus::Charging && current_soc >= 100) {
-            LOG_WARN("Reported SOC mismatch. The charger reports 'Charging state', but the battery SOC is 100");
+            LOG_WARN("The charger reports 'Charging state', but the battery SOC is 100");
             return ChargingStatus::ChargingDone;
         }
         else {
@@ -159,8 +160,8 @@ namespace hal::battery
     }
     AbstractBatteryCharger::SOC BellBatteryCharger::fetchBatterySOC() const
     {
-        if (const auto result = fuel_gauge.get_battery_soc(); result) {
-            return *result;
+        if (const auto soc = fuel_gauge.get_battery_soc(); const auto scaled_soc = scale_soc(*soc)) {
+            return *scaled_soc;
         }
         else {
             LOG_ERROR("Error during fetching battery level");
