@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AboutYourBellWindow.hpp"
@@ -75,6 +75,8 @@ namespace gui
                 this));
         };
 
+        addWinSettings(
+            utils::translate("app_bell_settings_layout"), gui::window::name::bellSettingsLayout, defaultCallback);
         addWinSettings(utils::translate("app_bell_settings_alarm_settings"),
                        BellSettingsAlarmSettingsMenuWindow::name,
                        defaultCallback);

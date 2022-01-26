@@ -612,6 +612,7 @@
   "app_bell_settings_time_units": "Time",
   "app_bell_settings_temp_scale": "Temperature scale",
   "app_bell_settings_language": "Language",
+  "app_bell_settings_layout": "Clock face",
   "app_bell_settings_about": "About",
   "app_bell_settings_about_product": "Mudita Harmony",
   "app_bell_settings_about_version": "<text>OS version: <token>$VERSION</token></text>",

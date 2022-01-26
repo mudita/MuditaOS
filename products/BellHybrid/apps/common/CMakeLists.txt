@@ -76,6 +76,7 @@ target_sources(application-bell-common
         include/common/models/FrontlightModel.hpp
         include/common/models/AlarmSettingsModel.hpp
         include/common/models/AbstractAlarmSettingsModel.hpp
+        include/common/models/LayoutModel.hpp
         include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp

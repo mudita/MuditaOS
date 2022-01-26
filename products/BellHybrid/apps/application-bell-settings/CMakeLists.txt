@@ -35,12 +35,14 @@ target_sources(application-bell-settings
         models/alarm_settings/SnoozeListItemProvider.cpp
         models/alarm_settings/SnoozeSettingsModel.cpp
         models/alarm_settings/SettingsListItemProvider.cpp
+        models/LayoutModel.cpp
 
         presenter/BedtimeSettingsPresenter.cpp
         presenter/TimeUnitsPresenter.cpp
         presenter/FrontlightPresenter.cpp
         presenter/AboutYourBellWindowPresenter.cpp
         presenter/LanguageWindowPresenter.cpp
+        presenter/LayoutWindowPresenter.cpp
         presenter/alarm_settings/AlarmSettingsPresenter.cpp
         presenter/alarm_settings/PrewakeUpPresenter.cpp
         presenter/alarm_settings/SnoozePresenter.cpp
@@ -57,6 +59,7 @@ target_sources(application-bell-settings
         windows/BellSettingsWindow.cpp
         windows/AboutYourBellWindow.cpp
         windows/BellSettingsLanguageWindow.cpp
+        windows/BellSettingsLayoutWindow.cpp
         windows/BellSettingsFrontlightWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.cpp
@@ -79,6 +82,7 @@ target_sources(application-bell-settings
         presenter/FrontlightPresenter.hpp
         presenter/AboutYourBellWindowPresenter.hpp
         presenter/LanguageWindowPresenter.hpp
+        presenter/LayoutWindowPresenter.hpp
         presenter/alarm_settings/AlarmSettingsPresenter.hpp
         presenter/alarm_settings/PrewakeUpPresenter.hpp
         presenter/alarm_settings/SnoozePresenter.hpp
@@ -96,6 +100,7 @@ target_sources(application-bell-settings
         windows/BellSettingsWindow.hpp
         windows/AboutYourBellWindow.hpp
         windows/BellSettingsLanguageWindow.hpp
+        windows/BellSettingsLayoutWindow.hpp
         windows/BellSettingsFrontlightWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp
@@ -119,6 +124,7 @@ target_link_libraries(application-bell-settings
         bell::db
         bell::alarms
         bell::app-main
+        bell::appmgr
         service-appmgr
         apps-common
     PUBLIC

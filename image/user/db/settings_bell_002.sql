@@ -1,4 +1,4 @@
--- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 -- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 -- ----------- insert default values ----------------------
@@ -45,6 +45,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('bedtime_time','21:00'),
     ('bedtime_tone','Evening Horizon'),
     ('bedtime_duration','5'),
+    ('layout','ClassicWithTemp'),
     ('\ServiceEink\\display_inverted_mode', '0');
 
 
