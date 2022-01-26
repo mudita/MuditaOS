@@ -1,4 +1,7 @@
 {
+  "metadata": {
+    "display_name": "Français"
+  },
   "common_add": "AJOUTER",
   "common_open": "OUVRIR",
   "common_call": "APPELER",
@@ -585,7 +588,7 @@
   "app_bell_settings_time_units_time_fmt_top_message": "Format de l'heure",
   "app_bell_settings_time_units_time_message": "Heure",
   "app_bell_settings_advanced_temp_scale": "Échelle de température",
-  "app_bell_onboarding_welcome_message": "Mudita Harmony",
+  "app_bell_onboarding_welcome_message": "<text>Mudita Harmony<br/>est </text><text font='gt_pressura' weight='regular' size='46'>désactivé</text>",
   "app_bell_onboarding_info_rotate": "<text font='gt_pressura' weight='regular' size='38'>Tourner </text><text font='gt_pressura' weight='light' size='38'>pour sélectionner</text>",
   "app_bell_onboarding_info_light_click": "<text font='gt_pressura' weight='regular' size='38'>Cliquer doucement </text><text font='gt_pressura' weight='light' size='38'>pour continuer</text>",
   "app_bell_onboarding_info_deep_click_warning": "<text font='gt_pressura' weight='light' size='38'>Vous avez </text><text font='gt_pressura' weight='regular' size='38'>appuyé fort</text>",
