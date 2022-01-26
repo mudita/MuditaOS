@@ -7,14 +7,12 @@
 
 namespace
 {
-    constexpr auto entries =
-        std::array<battery_utils::BatteryLevelEntry, 7>{{{{0, 5}, {1, 1}, "bell_battery_empty"},
-                                                         {{5, 10}, {1, 5}, "bell_battery_empty"},
-                                                         {{11, 30}, {6, 29}, "bell_battery_lvl1"},
-                                                         {{31, 50}, {30, 53}, "bell_battery_lvl2"},
-                                                         {{51, 70}, {54, 77}, "bell_battery_lvl3"},
-                                                         {{71, 95}, {78, 99}, "bell_battery_lvl4"},
-                                                         {{96, 100}, {100, 100}, "bell_battery_lvl5"}}};
+    constexpr auto entries = std::array<battery_utils::BatteryLevelEntry, 6>{{{{0, 9}, "bell_battery_empty"},
+                                                                              {{10, 19}, "bell_battery_lvl1"},
+                                                                              {{20, 39}, "bell_battery_lvl2"},
+                                                                              {{40, 69}, "bell_battery_lvl3"},
+                                                                              {{70, 95}, "bell_battery_lvl4"},
+                                                                              {{96, 100}, "bell_battery_lvl5"}}};
 }
 
 namespace gui
@@ -36,12 +34,12 @@ namespace gui
 
     void BellBattery::update(const Store::Battery &batteryContext)
     {
-        const auto result = battery_utils::getScaledBatteryLevel(entries, batteryContext.level);
-        if (not result) {
+        const auto image = battery_utils::getBatteryLevelImage(entries, batteryContext.level);
+        if (not image) {
             return;
         }
 
-        const auto level = result->level;
+        const auto level = batteryContext.level;
         if (batteryContext.state == Store::Battery::State::Charging) {
             img->set(battery::battery_charging, gui::ImageTypeSpecifier::W_M);
 
@@ -62,7 +60,7 @@ namespace gui
             setVisible(true);
         }
         else {
-            if (level > 20) {
+            if (level >= 20) {
                 setVisible(false);
             }
             else {
@@ -74,7 +72,7 @@ namespace gui
                     img->setMargins(gui::Margins(battery::image_left_margin, 0, battery::image_right_margin, 0));
                     img->informContentChanged();
                 }
-                img->set(result->image, gui::ImageTypeSpecifier::W_M);
+                img->set(image->data(), gui::ImageTypeSpecifier::W_M);
                 percentText->setText(std::to_string(level) + "%");
                 setVisible(true);
             }

@@ -35,6 +35,7 @@ target_sources(module-bsp
 		common/chip.cpp
 		common/startup_mimxrt1052.cpp
 		common/system_MIMXRT1051.c
+		common/soc_scaler.cpp
 		drivers/RT1051DriverDMA.cpp
 		drivers/RT1051DriverDMAMux.cpp
 		drivers/RT1051DriverGPIO.cpp

@@ -3,6 +3,7 @@
 
 #include "BatteryChargerIRQ.hpp"
 #include "common/WorkerQueue.hpp"
+#include "common/soc_scaler.hpp"
 
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
 #include <bsp/battery_charger/battery_charger.hpp>
@@ -128,7 +129,13 @@ namespace hal::battery
     }
     AbstractBatteryCharger::SOC PureBatteryCharger::getSOC() const
     {
-        return bsp::battery_charger::getBatteryLevel();
+        const auto soc        = bsp::battery_charger::getBatteryLevel();
+        const auto scaled_soc = scale_soc(soc);
+        if (not scaled_soc) {
+            LOG_ERROR("SOC is out of valid range.");
+            return 0;
+        }
+        return *scaled_soc;
     }
     AbstractBatteryCharger::ChargingStatus PureBatteryCharger::getChargingStatus() const
     {

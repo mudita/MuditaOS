@@ -16,3 +16,12 @@ add_catch2_executable(
         module-utils
 )
 
+add_catch2_executable(
+    NAME
+        utils-value-scaler
+    SRCS
+        value_scaler.cpp
+    LIBS
+        module-utils
+)
+

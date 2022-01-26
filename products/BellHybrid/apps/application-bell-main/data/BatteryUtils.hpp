@@ -7,39 +7,27 @@
 #include <algorithm>
 #include <optional>
 
+#include <Units.hpp>
+
 namespace battery_utils
 {
     struct BatteryLevelEntry
     {
-        using Range = std::pair<std::uint32_t, std::uint32_t>;
-        Range realLvl;
-        Range displayedLvl;
+        using Range = std::pair<units::SOC, units::SOC>;
+        const Range range;
         std::string_view image;
     };
 
-    struct ScaledBatteryLevel
-    {
-        std::uint32_t level;
-        std::string image;
-    };
-
     template <std::size_t N>
-    [[nodiscard]] std::optional<ScaledBatteryLevel> getScaledBatteryLevel(
-        const std::array<BatteryLevelEntry, N> &entries, const std::uint32_t val)
+    [[nodiscard]] std::optional<std::string_view> getBatteryLevelImage(const std::array<BatteryLevelEntry, N> &entries,
+                                                                       const units::SOC soc)
     {
-        auto result = std::find_if(entries.begin(), entries.end(), [val](const auto &e) {
-            return val >= e.realLvl.first && val <= e.realLvl.second;
+        auto result = std::find_if(entries.begin(), entries.end(), [soc](const auto &e) {
+            return soc >= e.range.first && soc <= e.range.second;
         });
 
         if (result != entries.end()) {
-            const auto outputStart = result->displayedLvl.first;
-            const auto outputEnd   = result->displayedLvl.second;
-            const auto inputStart  = result->realLvl.first;
-            const auto inputEnd    = result->realLvl.second;
-            float slope            = 1.0 * (outputEnd - outputStart) / (inputEnd - inputStart);
-            auto output            = outputStart + slope * (val - inputStart);
-
-            return ScaledBatteryLevel{static_cast<std::uint32_t>(std::floor(output)), result->image.data()};
+            return result->image;
         }
 
         return {};

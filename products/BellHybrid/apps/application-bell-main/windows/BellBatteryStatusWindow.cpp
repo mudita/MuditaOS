@@ -15,13 +15,12 @@ namespace
 {
     constexpr auto imageType = gui::ImageTypeSpecifier::W_G;
     constexpr auto batteryEntries =
-        std::array<battery_utils::BatteryLevelEntry, 7>{{{{0, 5}, {1, 1}, "bell_status_battery_lvl0"},
-                                                         {{5, 10}, {1, 5}, "bell_status_battery_lvl0"},
-                                                         {{11, 30}, {6, 29}, "bell_status_battery_lvl1"},
-                                                         {{31, 50}, {30, 53}, "bell_status_battery_lvl2"},
-                                                         {{51, 70}, {54, 77}, "bell_status_battery_lvl3"},
-                                                         {{71, 95}, {78, 99}, "bell_status_battery_lvl4"},
-                                                         {{96, 100}, {100, 100}, "bell_status_battery_lvl5"}}};
+        std::array<battery_utils::BatteryLevelEntry, 6>{{{{0, 9}, "bell_status_battery_lvl0"},
+                                                         {{10, 19}, "bell_status_battery_lvl1"},
+                                                         {{20, 39}, "bell_status_battery_lvl2"},
+                                                         {{40, 69}, "bell_status_battery_lvl3"},
+                                                         {{70, 95}, "bell_status_battery_lvl4"},
+                                                         {{96, 100}, "bell_status_battery_lvl5"}}};
 } // namespace
 
 namespace gui
@@ -95,10 +94,10 @@ namespace gui
     {
         if (data != nullptr) {
             const auto &switchData = static_cast<Data &>(*data);
-            const auto entry       = battery_utils::getScaledBatteryLevel(batteryEntries, switchData.chargeLevel);
-            if (entry) {
-                center->setImage(entry->image, imageType);
-                bottomDescription->setText(std::to_string(entry->level) + "%");
+            const auto image       = battery_utils::getBatteryLevelImage(batteryEntries, switchData.chargeLevel);
+            if (image) {
+                center->setImage(image->data(), imageType);
+                bottomDescription->setText(std::to_string(switchData.chargeLevel) + "%");
                 chargingIcon->setVisible(switchData.isCharging);
                 hbox->resizeItems();
                 body->resize();

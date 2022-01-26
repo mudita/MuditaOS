@@ -134,8 +134,6 @@ namespace sys
     {
         SystemManagerCommon::batteryNormalLevelAction();
         CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::On);
-        auto battNormalMsg = std::make_shared<CriticalBatteryLevelNotification>(false);
-        bus.sendUnicast(std::move(battNormalMsg), service::name::appmgr);
     }
 
     void SystemManager::batteryCriticalLevelAction(bool charging)
