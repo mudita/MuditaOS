@@ -82,7 +82,8 @@ namespace gui
         onArrow->setMargins({style::onboarding::arrow::marginLeft, 0, 0, 0});
 
         auto onText = new TextFixedSize(onHBox, 0, 0, 0, 0);
-        onText->setText(utils::translate("app_bell_onboarding_welcome_on"));
+        onText->setFont(style::window::font::large);
+        onText->setText(utils::translate("app_settings_toggle_on"));
         onText->setMinimumSize(style::onboarding::text::minimumSizeX, style::onboarding::text::minimumSizeY);
         onText->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center});
         onText->setEdges(RectangleEdge::None);
@@ -99,7 +100,8 @@ namespace gui
         offArrow->setMargins({style::onboarding::arrow::marginLeft, 0, 0, 0});
 
         auto offText = new TextFixedSize(offHBox, 0, 0, 0, 0);
-        offText->setText(utils::translate("app_bell_onboarding_welcome_off"));
+        offText->setFont(style::window::font::large);
+        offText->setText(utils::translate("app_settings_toggle_off"));
         offText->setMinimumSize(style::onboarding::text::minimumSizeX, style::onboarding::text::minimumSizeY);
         offText->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center});
         offText->setEdges(RectangleEdge::None);
