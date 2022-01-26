@@ -3,7 +3,6 @@ add_catch2_executable(
         NAME
                 gui-text
         SRCS
-                main.cpp
                 ../mock/buildTextDocument.cpp
                 ../mock/multi-line-string.cpp
                 ../mock/InitializedFontManager.cpp

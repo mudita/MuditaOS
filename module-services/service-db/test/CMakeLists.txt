@@ -3,7 +3,6 @@ add_catch2_executable(
         NAME
             service-db
         SRCS
-            main.cpp
             test-service-db-api.cpp
             test-service-db-settings-messages.cpp
             test-service-db-quotes.cpp
@@ -24,7 +23,6 @@ add_catch2_executable(
         NAME
             entry-path
         SRCS
-            main.cpp
             test-entry-path.cpp
             ${CMAKE_SOURCE_DIR}/module-services/service-db/EntryPath.cpp
         LIBS

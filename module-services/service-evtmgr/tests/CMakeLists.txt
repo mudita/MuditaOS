@@ -2,7 +2,6 @@
     NAME
         service-evtmgr
     SRCS
-        tests-main.cpp
         test-ScreenLightControlFunctions.cpp
     LIBS
         service-evtmgr

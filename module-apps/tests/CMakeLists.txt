@@ -2,7 +2,6 @@ add_catch2_executable(
     NAME
         apps-common
     SRCS
-        tests-main.cpp
         test-CallbackStorage.cpp
         test-PhoneModesPolicies.cpp
         tests-BluetoothSettingsModel.cpp
