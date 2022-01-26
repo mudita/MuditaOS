@@ -120,6 +120,12 @@ function(add_gtest_executable)
     set_tests_properties(${_TEST_LIST} PROPERTIES LABELS ${_TEST_LABELS})
 endfunction()
 
+# Compile Catch2 main entry point as a separate cmake target. This way, it is not needed to recompile the whole catch2
+# each time something changes inside specific test case.
+add_library(catch2_main STATIC catch2_main.cpp)
+add_library(Catch2::main ALIAS catch2_main)
+target_link_libraries(catch2_main PUBLIC Catch2::Catch2)
+
 function(add_catch2_executable)
     cmake_parse_arguments(
         _TEST_ARGS
@@ -158,7 +164,7 @@ function(add_catch2_executable)
         enable_test_filesystem()
     endif()
 
-    target_link_libraries(${_TESTNAME} PRIVATE Catch2::Catch2 log-api)
+    target_link_libraries(${_TESTNAME} PRIVATE Catch2::main log-api)
     foreach(lib ${_TEST_ARGS_LIBS})
         target_link_libraries(${_TESTNAME} PRIVATE ${lib})
     endforeach(lib)

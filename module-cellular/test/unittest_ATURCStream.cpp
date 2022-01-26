@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <string>
-#define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
 #include "modem/ATURCStream.hpp"

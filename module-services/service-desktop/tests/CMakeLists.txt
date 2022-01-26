@@ -17,7 +17,6 @@ add_catch2_executable(
         service-desktop
     SRCS
         unittest.cpp
-        tests-main.cpp
     LIBS
         service-desktop
         module-utils

@@ -4,7 +4,6 @@
 #include "PhoneNumber.hpp"
 #include "country.hpp"
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 #include <string>

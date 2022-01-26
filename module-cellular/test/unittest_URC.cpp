@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cstdint>
 #include <string>
-#define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
 #include <time/time_conversion.hpp>

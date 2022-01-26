@@ -3,7 +3,6 @@ add_catch2_executable(
         NAME
             settings-Settings
         SRCS
-            main.cpp
             test-settings-Interface.cpp
             test-settings-Settings.cpp
             ${CMAKE_SOURCE_DIR}/module-services/service-db/agents/settings/Settings.cpp
