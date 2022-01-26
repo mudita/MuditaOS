@@ -5,7 +5,7 @@
 
 
 #if defined(TARGET_RT1051)
-#include "board/rt1051/bsp/lpm/RT1051LPM.hpp"
+#include <bsp/lpm/RT1051LPM.hpp>
 #elif defined(TARGET_Linux)
 #include "board/linux/lpm/LinuxLPM.h"
 #else

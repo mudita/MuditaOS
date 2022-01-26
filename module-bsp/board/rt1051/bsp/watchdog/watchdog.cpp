@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/watchdog/watchdog.hpp"
@@ -29,7 +29,7 @@ namespace bsp::watchdog
         config.workMode.enableDebug = false; // If true, RTWDOG will run when target is halted
         config.testMode             = kRTWDOG_TestModeDisabled;
         config.enableUpdate         = true;
-        config.enableInterrupt      = false;
+        config.enableInterrupt      = true;
         config.enableWindowMode     = false;
         config.windowValue          = 0;
         config.timeoutValue         = static_cast<uint16_t>(timeoutValueTicks);

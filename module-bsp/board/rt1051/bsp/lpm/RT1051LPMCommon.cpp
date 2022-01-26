@@ -1,12 +1,11 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "RT1051LPM.hpp"
+#include "RT1051LPMCommon.hpp"
 
 #include "board.h"
 #include "reboot_codes.hpp"
 #include <log/log.hpp>
-#include "board/BoardDefinitions.hpp"
 #include "bsp/watchdog/watchdog.hpp"
 #include <board/clock_config.h>
 #include <fsl_clock.h>
@@ -21,37 +20,19 @@ namespace bsp
 
     using namespace drivers;
 
-    RT1051LPM::RT1051LPM()
+    RT1051LPMCommon::RT1051LPMCommon()
     {
         driverSEMC = drivers::DriverSEMC::Create(drivers::name::ExternalRAM);
-        gpio_1 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::POWER_SWITCH_HOLD_GPIO),
-                                    DriverGPIOParams{});
-        gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::DCDC_INVERTER_MODE_GPIO),
-                                    DriverGPIOParams{});
-
-        gpio_1->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
-                                            .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                            .defLogic = 1,
-                                            .pin = static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON)});
-
-        gpio_2->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
-                                            .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                            .defLogic = 0,
-                                            .pin = static_cast<uint32_t>(BoardDefinitions::DCDC_INVERTER_MODE_PIN)});
-
-        gpio_1->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 1);
-        DisableDcdcPowerSaveMode();
-
         CpuFreq = std::make_unique<CpuFreqLPM>();
     }
 
-    int32_t RT1051LPM::PowerOff()
+    int32_t RT1051LPMCommon::PowerOff()
     {
-        bsp::BoardPowerOff();
+        board_power_off();
         return 0;
     }
 
-    int32_t RT1051LPM::Reboot(RebootType reason)
+    int32_t RT1051LPMCommon::Reboot(RebootType reason)
     {
         switch (reason) {
         case RebootType::GoToUpdaterUpdate:
@@ -70,7 +51,7 @@ namespace bsp
             SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
             break;
         }
-        BoardReboot();
+        board_restart();
         return 0;
     }
 
@@ -80,7 +61,7 @@ namespace bsp
         Down
     };
 
-    CpuFrequencyMHz RT1051LPM::onChangeUp(CpuFrequencyMHz freq, bsp::CpuFrequencyMHz newFrequency)
+    CpuFrequencyMHz RT1051LPMCommon::onChangeUp(CpuFrequencyMHz freq, bsp::CpuFrequencyMHz newFrequency)
     {
         if ((freq <= CpuFrequencyMHz::Level_1) && (newFrequency > CpuFrequencyMHz::Level_1)) {
             // connect internal the load resistor
@@ -104,7 +85,7 @@ namespace bsp
         return newFrequency;
     }
 
-    void RT1051LPM::onChangeDown(CpuFrequencyMHz newFrequency)
+    void RT1051LPMCommon::onChangeDown(CpuFrequencyMHz newFrequency)
     {
         if (newFrequency <= bsp::CpuFrequencyMHz::Level_1) {
             // Enable weak 2P5 and 1P1 LDO and Turn off regular 2P5 and 1P1 LDO
@@ -123,7 +104,7 @@ namespace bsp
         }
     }
 
-    void RT1051LPM::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
+    void RT1051LPMCommon::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
     {
         if (currentFrequency == freq) {
             return;
@@ -163,17 +144,17 @@ namespace bsp
         currentFrequency = freq;
     }
 
-    void RT1051LPM::SetHighestCoreVoltage()
+    void RT1051LPMCommon::SetHighestCoreVoltage()
     {
         CpuFreq->SetHighestCoreVoltage();
     }
 
-    uint32_t RT1051LPM::GetCpuFrequency() const noexcept
+    uint32_t RT1051LPMCommon::GetCpuFrequency() const noexcept
     {
         return CLOCK_GetCpuClkFreq();
     }
 
-    void RT1051LPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
+    void RT1051LPMCommon::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
     {
         if (source == bsp::LowPowerMode::OscillatorSource::Internal) {
             cpp_freertos::CriticalSection::Enter();
@@ -187,32 +168,22 @@ namespace bsp
         }
     }
 
-    void RT1051LPM::SetBootSuccess()
+    void RT1051LPMCommon::SetBootSuccess()
     {
         SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
     }
 
-    void RT1051LPM::EnableDcdcPowerSaveMode()
-    {
-        gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::DCDC_INVERTER_MODE_PIN), 0);
-    }
-
-    void RT1051LPM::DisableDcdcPowerSaveMode()
-    {
-        gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::DCDC_INVERTER_MODE_PIN), 1);
-    }
-
-    void RT1051LPM::DisconnectInternalLoadResistor()
+    void RT1051LPMCommon::DisconnectInternalLoadResistor()
     {
         DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
     }
 
-    void RT1051LPM::ConnectInternalLoadResistor()
+    void RT1051LPMCommon::ConnectInternalLoadResistor()
     {
         DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
     }
 
-    void RT1051LPM::SwitchToRegularModeLDO()
+    void RT1051LPMCommon::SwitchToRegularModeLDO()
     {
         // Enable regular 2P5 and wait it stable
         PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_LINREG_MASK;
@@ -228,7 +199,7 @@ namespace bsp
         PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
     }
 
-    void RT1051LPM::SwitchToLowPowerModeLDO()
+    void RT1051LPMCommon::SwitchToLowPowerModeLDO()
     {
         // Enable weak 2P5 and turn off regular 2P5
         PMU->REG_2P5 |= PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;

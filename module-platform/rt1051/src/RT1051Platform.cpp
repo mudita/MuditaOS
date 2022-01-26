@@ -15,8 +15,8 @@ using platform::rt1051::RT1051Platform;
 
 RT1051Platform::RT1051Platform()
 {
-    bsp::BoardInit();
-    bsp::RegisterPlatformExitFunction(Log::Logger::destroyInstance);
+    bsp::board_init();
+    bsp::register_exit_functions(Log::Logger::destroyInstance);
 }
 
 void RT1051Platform::init()

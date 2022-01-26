@@ -1,19 +1,19 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 namespace bsp
 {
-    void BoardInit()
+    void board_init()
     {
         // dummy
     }
 
-    void BoardPowerOff()
+    void board_power_off()
     {
         // dummy
     }
 
-    void BoardReboot()
+    void board_restart()
     {
         // dummy
     }

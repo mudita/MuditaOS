@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "rotary_encoder.hpp"
@@ -86,7 +86,7 @@ namespace bsp::rotary_encoder
         return out;
     }
 
-    BaseType_t IRQHandler(uint32_t mask)
+    BaseType_t IRQHandler()
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         if (gHandleIrq != nullptr) {

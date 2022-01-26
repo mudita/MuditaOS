@@ -754,12 +754,7 @@ __attribute__((section(".after_vectors.reset"))) void ResetISR(void)
     // call global destructors and functions registered using atexit
     __call_exitprocs(0, 0);
     _platform_exit();
-    //
-    // main() shouldn't return, but if it does, we'll just enter an infinite loop
-    //
-    while (1) {
-        ;
-    }
+    while (true) {}
 }
 
 //*****************************************************************************

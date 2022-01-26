@@ -40,7 +40,6 @@ namespace bsp::bell_switches
         rightSideSwitch,
         lightCenterSwitch,
         latchSwitch,
-        wakeup,
         Invalid
     };
 
@@ -114,7 +113,7 @@ namespace bsp::bell_switches
 
     static xQueueHandle qHandleIrq{};
     std::shared_ptr<DriverGPIO> gpio_sw;
-    std::shared_ptr<DriverGPIO> gpio_wakeup;
+    std::shared_ptr<DriverGPIO> gpio_center;
 
     NotificationSource getNotificationSource(KeyId keyId, KeyEvents state)
     {
@@ -133,9 +132,6 @@ namespace bsp::bell_switches
             case KeyId::latchSwitch:
                 val = NotificationSource::latchKeyRelease;
                 break;
-            case KeyId::wakeup:
-                val = NotificationSource::wakeupEventRelease;
-                break;
             default:
                 break;
             }
@@ -153,9 +149,6 @@ namespace bsp::bell_switches
                 break;
             case KeyId::latchSwitch:
                 val = NotificationSource::latchKeyPress;
-                break;
-            case KeyId::wakeup:
-                val = NotificationSource::wakeupEvent;
                 break;
             default:
                 break;
@@ -250,14 +243,16 @@ namespace bsp::bell_switches
         }
     }
 
-    void configureSwitch(BoardDefinitions boardSwitch, DriverGPIOPinParams::InterruptMode mode)
+    void configureSwitch(BoardDefinitions boardSwitch,
+                         DriverGPIOPinParams::InterruptMode mode,
+                         std::shared_ptr<drivers::DriverGPIO> gpio)
     {
 
-        gpio_sw->ClearPortInterrupts(1 << magic_enum::enum_integer(boardSwitch));
-        gpio_sw->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
-                                             .irqMode  = mode,
-                                             .defLogic = 1,
-                                             .pin      = static_cast<uint32_t>(boardSwitch)});
+        gpio->ClearPortInterrupts(1 << magic_enum::enum_integer(boardSwitch));
+        gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
+                                          .irqMode  = mode,
+                                          .defLogic = 1,
+                                          .pin      = static_cast<uint32_t>(boardSwitch)});
     }
 
     int32_t init(xQueueHandle qHandle)
@@ -267,25 +262,25 @@ namespace bsp::bell_switches
         // Switches
         gpio_sw =
             DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::BELL_SWITCHES_GPIO), DriverGPIOParams{});
-        // wakeup
-        gpio_wakeup =
-            DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::BELL_WAKEUP_GPIO), DriverGPIOParams{});
 
-        configureSwitch(BoardDefinitions::BELL_SWITCHES_LATCH,
-                        DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge);
-        configureSwitch(BoardDefinitions::BELL_SWITCHES_LEFT,
-                        DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge);
-        configureSwitch(BoardDefinitions::BELL_SWITCHES_RIGHT,
-                        DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge);
-        configureSwitch(BoardDefinitions::BELL_SWITCHES_CENTER, DriverGPIOPinParams::InterruptMode::IntRisingEdge);
-        configureSwitch(BoardDefinitions::BELL_WAKEUP, DriverGPIOPinParams::InterruptMode::IntFallingEdge);
+        gpio_center = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::BELL_CENTER_SWITCH_GPIO),
+                                         DriverGPIOParams{});
+
+        configureSwitch(
+            BoardDefinitions::BELL_SWITCHES_LATCH, DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge, gpio_sw);
+        configureSwitch(
+            BoardDefinitions::BELL_SWITCHES_LEFT, DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge, gpio_sw);
+        configureSwitch(
+            BoardDefinitions::BELL_SWITCHES_RIGHT, DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge, gpio_sw);
+        configureSwitch(
+            BoardDefinitions::BELL_CENTER_SWITCH, DriverGPIOPinParams::InterruptMode::IntFallingEdge, gpio_center);
 
         addDebounceTimer(DebounceTimerState{KeyId::leftSideSwitch, gpio_sw, BoardDefinitions::BELL_SWITCHES_LEFT});
         addDebounceTimer(DebounceTimerState{KeyId::rightSideSwitch, gpio_sw, BoardDefinitions::BELL_SWITCHES_RIGHT});
-        addDebounceTimer(DebounceTimerState{KeyId::lightCenterSwitch, gpio_sw, BoardDefinitions::BELL_SWITCHES_CENTER});
+        addDebounceTimer(
+            DebounceTimerState{KeyId::lightCenterSwitch, gpio_center, BoardDefinitions::BELL_CENTER_SWITCH});
         addLatchDebounceTimer(DebounceTimerState{
             KeyId::latchSwitch, gpio_sw, BoardDefinitions::BELL_SWITCHES_LATCH, KeyEvents::Released});
-        addDebounceTimer(DebounceTimerState{KeyId::wakeup, gpio_wakeup, BoardDefinitions::BELL_WAKEUP});
 
         if (getLatchState() == KeyEvents::Pressed) {
             latchEventFlag.setPressed(LatchEventFlag::NO_STATE_CHANGE_INDICATION);
@@ -310,7 +305,7 @@ namespace bsp::bell_switches
         debounceTimers.clear();
 
         gpio_sw.reset();
-        gpio_wakeup.reset();
+        gpio_center.reset();
 
         return kStatus_Success;
     }
@@ -332,21 +327,16 @@ namespace bsp::bell_switches
         }
     }
 
-    BaseType_t IRQHandler(uint32_t mask)
+    BaseType_t GPIO2SwitchesIRQHandler(uint32_t mask)
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         auto timerId                        = KeyId::Invalid;
-
-        gpio_sw->ClearPortInterrupts(1U << mask);
 
         if (mask & (1 << magic_enum::enum_integer(BoardDefinitions::BELL_SWITCHES_LEFT))) {
             timerId = KeyId::leftSideSwitch;
         }
         else if (mask & (1 << magic_enum::enum_integer(BoardDefinitions::BELL_SWITCHES_RIGHT))) {
             timerId = KeyId::rightSideSwitch;
-        }
-        else if (mask & (1 << magic_enum::enum_integer(BoardDefinitions::BELL_SWITCHES_CENTER))) {
-            timerId = KeyId::lightCenterSwitch;
         }
         else if (mask & (1 << magic_enum::enum_integer(BoardDefinitions::BELL_SWITCHES_LATCH))) {
             timerId = KeyId::latchSwitch;
@@ -357,41 +347,34 @@ namespace bsp::bell_switches
         return xHigherPriorityTaskWoken;
     }
 
-    BaseType_t wakeupIRQHandler()
+    BaseType_t GPIO5SwitchesIRQHandler(uint32_t mask)
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        gpio_wakeup->ClearPortInterrupts(1U << static_cast<uint32_t>(BoardDefinitions::BELL_WAKEUP));
-
-        getDebounceTimer(xHigherPriorityTaskWoken, KeyId::wakeup);
+        auto keyID                          = KeyId::Invalid;
+        if (mask & (1 << magic_enum::enum_integer(BoardDefinitions::BELL_CENTER_SWITCH))) {
+            keyID = KeyId::lightCenterSwitch;
+        }
+        getDebounceTimer(xHigherPriorityTaskWoken, keyID);
 
         return xHigherPriorityTaskWoken;
     }
 
     void enableIRQ()
     {
-        gpio_sw->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_CENTER));
+        gpio_center->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_CENTER_SWITCH));
         gpio_sw->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT));
         gpio_sw->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT));
         gpio_sw->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
     }
 
-    void enableWakeupIRQ()
-    {
-        gpio_wakeup->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_WAKEUP));
-    }
-
     void disableIRQ()
     {
-        gpio_sw->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_CENTER));
+        gpio_center->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_CENTER_SWITCH));
         gpio_sw->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT));
         gpio_sw->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT));
         gpio_sw->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
     }
 
-    void disableWakeupIRQ()
-    {
-        gpio_wakeup->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_WAKEUP));
-    }
 
     std::vector<KeyEvent> getKeyEvents(NotificationSource notification)
     {
@@ -438,12 +421,6 @@ namespace bsp::bell_switches
             LOG_DEBUG("latchKeyRelease");
             keyEvent = {KeyCodes::JoystickLeft, KeyEvents::Moved};
             out.push_back(keyEvent);
-            break;
-        case NotificationSource::wakeupEvent:
-            /* Implement wakeup event */
-            break;
-        case NotificationSource::wakeupEventRelease:
-            /* Implement wakeup event */
             break;
         }
         return out;

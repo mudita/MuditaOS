@@ -67,8 +67,9 @@ namespace hal::battery
 
     BatteryCharger::~BatteryCharger()
     {
-        shouldRun           = false;
-        notificationChannel = nullptr;
+        shouldRun = false;
+        /// The worker operates in taskDelay intervals. Give it at least taskDelay to handle the close procedure.
+        vTaskDelay(taskDelay * 2);
     }
 
     AbstractBatteryCharger::Voltage BatteryCharger::getBatteryVoltage() const

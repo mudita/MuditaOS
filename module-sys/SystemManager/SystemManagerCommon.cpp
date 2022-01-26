@@ -180,7 +180,7 @@ namespace sys
         cpuStatistics.reset();
         deviceManager.reset();
 
-        //  End of scheduler and back to the main and poweroff
+        // End of scheduler and back to the main and poweroff
         EndScheduler();
     }
 

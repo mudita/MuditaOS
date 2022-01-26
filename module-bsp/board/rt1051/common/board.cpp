@@ -1,4 +1,5 @@
 
+#include "bsp.hpp"
 #include "board.h"
 #include "fsl_gpio.h"
 #include <stdint.h>
@@ -14,7 +15,6 @@ extern "C"
 #include "fsl_lpuart.h"
 #endif
 }
-#include "audio.hpp"
 #include "chip.hpp"
 #include "board/irq_gpio.hpp"
 #include "reboot_codes.hpp"
@@ -26,15 +26,10 @@ extern std::uint32_t __sdram_cached_start[];
 
 namespace bsp
 {
-
-    namespace {
-        enum class rebootState : uintptr_t {
-            none,
-            poweroff,
-            reboot
-        };
-        volatile rebootState rebootProgress {rebootState::none};
-    }
+    namespace
+    {
+        volatile rebootState rebootProgress{rebootState::none};
+    } // namespace
 
     /* MPU configuration. */
     static void BOARD_ConfigMPU(void)
@@ -51,28 +46,29 @@ namespace bsp
         ARM_MPU_Disable();
 
         /* MPU configure:
-         * Use ARM_MPU_RASR(DisableExec, AccessPermission, TypeExtField, IsShareable, IsCacheable, IsBufferable, SubRegionDisable, Size)
-         * API in core_cm7.h.
-         * param DisableExec       Instruction access (XN) disable bit,0=instruction fetches enabled, 1=instruction fetches disabled.
-         * param AccessPermission  Data access permissions, allows you to configure read/write access for User and Privileged mode.
-         *      Use MACROS defined in core_cm7.h: ARM_MPU_AP_NONE/ARM_MPU_AP_PRIV/ARM_MPU_AP_URO/ARM_MPU_AP_FULL/ARM_MPU_AP_PRO/ARM_MPU_AP_RO
+         * Use ARM_MPU_RASR(DisableExec, AccessPermission, TypeExtField, IsShareable, IsCacheable, IsBufferable,
+         * SubRegionDisable, Size) API in core_cm7.h. param DisableExec       Instruction access (XN) disable
+         * bit,0=instruction fetches enabled, 1=instruction fetches disabled. param AccessPermission  Data access
+         * permissions, allows you to configure read/write access for User and Privileged mode. Use MACROS defined in
+         * core_cm7.h: ARM_MPU_AP_NONE/ARM_MPU_AP_PRIV/ARM_MPU_AP_URO/ARM_MPU_AP_FULL/ARM_MPU_AP_PRO/ARM_MPU_AP_RO
          * Combine TypeExtField/IsShareable/IsCacheable/IsBufferable to configure MPU memory access attributes.
          *  TypeExtField  IsShareable  IsCacheable  IsBufferable   Memory Attribtue    Shareability        Cache
          *     0             x           0           0             Strongly Ordered    shareable
          *     0             x           0           1              Device             shareable
-         *     0             0           1           0              Normal             not shareable   Outer and inner write through no write allocate
-         *     0             0           1           1              Normal             not shareable   Outer and inner write back no write allocate
-         *     0             1           1           0              Normal             shareable       Outer and inner write through no write allocate
-         *     0             1           1           1              Normal             shareable       Outer and inner write back no write allocate
-         *     1             0           0           0              Normal             not shareable   outer and inner noncache
-         *     1             1           0           0              Normal             shareable       outer and inner noncache
-         *     1             0           1           1              Normal             not shareable   outer and inner write back write/read acllocate
-         *     1             1           1           1              Normal             shareable       outer and inner write back write/read acllocate
-         *     2             x           0           0              Device              not shareable
-         *  Above are normal use settings, if your want to see more details or want to config different inner/outter cache policy.
-         *  please refer to Table 4-55 /4-56 in arm cortex-M7 generic user guide <dui0646b_cortex_m7_dgug.pdf>
-         * param SubRegionDisable  Sub-region disable field. 0=sub-region is enabled, 1=sub-region is disabled.
-         * param Size              Region size of the region to be configured. use ARM_MPU_REGION_SIZE_xxx MACRO in core_cm7.h.
+         *     0             0           1           0              Normal             not shareable   Outer and inner
+         * write through no write allocate 0             0           1           1              Normal             not
+         * shareable   Outer and inner write back no write allocate 0             1           1           0 Normal
+         * shareable       Outer and inner write through no write allocate 0             1           1           1
+         * Normal             shareable       Outer and inner write back no write allocate 1             0           0
+         * 0              Normal             not shareable   outer and inner noncache 1             1           0 0
+         * Normal             shareable       outer and inner noncache 1             0           1           1 Normal
+         * not shareable   outer and inner write back write/read acllocate 1             1           1           1
+         * Normal             shareable       outer and inner write back write/read acllocate 2             x 0 0 Device
+         * not shareable Above are normal use settings, if your want to see more details or want to config different
+         * inner/outter cache policy. please refer to Table 4-55 /4-56 in arm cortex-M7 generic user guide
+         * <dui0646b_cortex_m7_dgug.pdf> param SubRegionDisable  Sub-region disable field. 0=sub-region is enabled,
+         * 1=sub-region is disabled. param Size              Region size of the region to be configured. use
+         * ARM_MPU_REGION_SIZE_xxx MACRO in core_cm7.h.
          */
 
         /* Region 0 setting: Memory with Device type, not shareable, non-cacheable. */
@@ -151,7 +147,7 @@ namespace bsp
         SCB_EnableICache();
     }
 
-    void BoardInit()
+    void board_init()
     {
         PINMUX_InitBootPins();
         BOARD_InitBootClocks();
@@ -177,13 +173,13 @@ namespace bsp
     }
 
     //! Board PowerOff function by cutdown power
-    void BoardPowerOff()
+    void board_power_off()
     {
         rebootProgress = rebootState::poweroff;
     }
 
     //! Board reboot by the SVNC code
-    void BoardReboot()
+    void board_restart()
     {
         rebootProgress = rebootState::reboot;
     }
@@ -192,12 +188,12 @@ namespace bsp
     {
         void (*func)();
     };
-    static unsigned short iObject = 0;
+    static unsigned short iObject            = 0;
     constexpr auto MAX_PLATFORM_EXIT_OBJECTS = 16u;
 
     static PlatformExitObject objects[MAX_PLATFORM_EXIT_OBJECTS];
 
-    int RegisterPlatformExitFunction(void (*func)())
+    int register_exit_functions(void (*func)())
     {
         if (iObject >= sizeof(objects))
             return -1;
@@ -213,25 +209,10 @@ namespace bsp
         }
     }
 
-    extern "C" {
-        void _platform_exit(void)
-        {
-            CallPlatformExitFunctions();
-
-            static constexpr auto POWER_SWITCH_PIN = 7;
-            static const auto POWER_SWITCH_PORT = GPIO2;
-            switch(rebootProgress)
-            {
-                case rebootState::none:
-                    break;
-                case rebootState::poweroff:
-                    GPIO_PinWrite(POWER_SWITCH_PORT, POWER_SWITCH_PIN, 0);
-                    break;
-                case rebootState::reboot:
-                    NVIC_SystemReset();
-                    break;
-            }
-        }
+    extern "C" void _platform_exit(void)
+    {
+        CallPlatformExitFunctions();
+        bsp::board_exit(rebootProgress);
     }
 
 } // namespace bsp

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,9 +21,9 @@ namespace bsp::bell_switches
 
     void disableIRQ();
 
-    BaseType_t IRQHandler(uint32_t mask);
+    BaseType_t GPIO2SwitchesIRQHandler(std::uint32_t mask);
 
-    BaseType_t wakeupIRQHandler();
+    BaseType_t GPIO5SwitchesIRQHandler(std::uint32_t mask);
 
     void clearStartupLatchInterrupt();
 

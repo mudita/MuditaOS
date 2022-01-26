@@ -70,8 +70,14 @@ WorkerQueue<Message>::WorkerQueue(const char *name, WorkerHandle workerHandle, c
 template <typename Message> WorkerQueue<Message>::~WorkerQueue()
 {
     if (queueHandle && taskHandle) {
-        InternalMessage killMsg{.kill = true};
+        const InternalMessage killMsg{.kill = true};
+        InternalMessage responseMsg;
         xQueueSend(queueHandle, &killMsg, pdMS_TO_TICKS(100));
+        /// Wait 500ms for a response from the worker. If it does not arrive, kill it.
+        if (const auto result = xQueueReceive(queueHandle, &responseMsg, pdMS_TO_TICKS(500)); result != pdTRUE) {
+            vTaskDelete(taskHandle);
+        }
+        vQueueDelete(queueHandle);
     }
 }
 template <typename Message> void WorkerQueue<Message>::worker()
@@ -81,6 +87,8 @@ template <typename Message> void WorkerQueue<Message>::worker()
         xQueueReceive(queueHandle, &msg, portMAX_DELAY);
 
         if (msg.kill) {
+            InternalMessage killMsg{.kill = true};
+            xQueueSend(queueHandle, &killMsg, pdMS_TO_TICKS(100));
             vTaskDelete(nullptr);
         }
         else {

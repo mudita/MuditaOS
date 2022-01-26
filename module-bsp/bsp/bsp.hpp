@@ -1,21 +1,25 @@
-#ifndef MODULE_BSP_BSP_HPP
-#define MODULE_BSP_BSP_HPP
+#pragma once
+
+#include <cstdint>
 
 namespace bsp
 {
-    //! Board hardware init
-    void BoardInit();
+    enum class rebootState : uintptr_t
+    {
+        none,
+        poweroff,
+        reboot
+    };
 
-    // Board cuttoff power
-    void BoardPowerOff();
+    void board_init();
 
-    // Board system reset
-    void BoardReboot();
+    void board_power_off();
 
-    // Register platform exit functions
-    int RegisterPlatformExitFunction(void (*func)());
-}
+    void board_restart();
 
+    /// Register platform exit functions
+    int register_exit_functions(void (*func)());
 
-
-#endif //MODULE_BSP_BSP_HPP
+    /// Board-specific exit/reset procedure. It is the main exit point from the system.
+    [[noreturn]] void board_exit(rebootState);
+} // namespace bsp

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <platform/linux/LinuxPlatform.hpp>
@@ -16,7 +16,7 @@ using platform::linux::LinuxPlatform;
 
 LinuxPlatform::LinuxPlatform(std::string imageName) : imageName(std::move(imageName))
 {
-    bsp::BoardInit();
+    bsp::board_init();
 }
 
 LinuxPlatform::~LinuxPlatform()
