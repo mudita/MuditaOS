@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -105,7 +105,7 @@ class ServiceCellular : public sys::Service
 
   private:
     at::ATURCStream atURCStream;
-    std::unique_ptr<CellularMux> cmux = std::make_unique<CellularMux>(PortSpeed_e::PS460800, this);
+    std::unique_ptr<CellularMux> cmux = std::make_unique<CellularMux>(PortSpeed_e::PS115200, this);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
     // used for polling for call state
