@@ -52,6 +52,7 @@ namespace app::powernap
         reinterpret_cast<app::Application *>(app)->suspendIdleTimer();
         timer->reset(std::chrono::minutes{utils::getNumericValue<int>(value)});
         timer->start();
+        napFinished = false;
     }
 
     void PowerNapProgressPresenter::endNap()
@@ -70,11 +71,17 @@ namespace app::powernap
 
     void PowerNapProgressPresenter::resume()
     {
+        if (napFinished) {
+            return;
+        }
         timer->start();
     }
 
     void PowerNapProgressPresenter::onNapFinished()
     {
+        if (napFinished) {
+            return;
+        }
         if (alarmLightOnOffModel->getValue()) {
             frontLightModel.revertUnsavedChanges();
             frontLightModel.setStatus(true);
