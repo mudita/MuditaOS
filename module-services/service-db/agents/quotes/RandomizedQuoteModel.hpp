@@ -19,17 +19,22 @@ namespace Quotes
       private:
         app::ApplicationCommon *app = nullptr;
         std::unique_ptr<settings::Settings> settings;
-        Database *quotesDB = nullptr;
-        void populateList(std::unique_ptr<QuotesList> quotesList, bool forcedUpdate = false);
+        Database *predefinedQuotesDB = nullptr;
+        Database *customQuotesDB     = nullptr;
+        void populateList(std::unique_ptr<QuotesList> predefinedQuotesList,
+                          std::unique_ptr<QuotesList> customQuotesList,
+                          bool forcedUpdate = false);
         void shiftIdList();
         auto isIdExpired() -> bool;
         void randomize(IdList &list);
         std::unique_ptr<QuotesSettingsSerializer> serializer;
 
       public:
-        RandomizedQuoteModel(std::unique_ptr<settings::Settings> settings, Database *quotesDB);
+        RandomizedQuoteModel(std::unique_ptr<settings::Settings> settings,
+                             Database *predefinedQuotesDB,
+                             Database *customQuotesDB);
         void updateList(bool forced);
-        [[nodiscard]] auto getId() -> int;
+        [[nodiscard]] auto getId() -> QuoteID;
     };
 
 } // namespace Quotes

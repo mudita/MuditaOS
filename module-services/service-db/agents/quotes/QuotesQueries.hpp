@@ -1,58 +1,42 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 namespace Quotes::Queries
 {
+    /// To predefined quotes table
+
     constexpr auto getAllCategories = R"sql(
-                        SELECT category_id, category_name, enabled
-                        FROM category_table;
-                        )sql";
-
-    constexpr auto getAllQuotes = R"sql(
-                        SELECT quote_id, lang_id, quote, author, enabled
-                        FROM quote_table;
-                        )sql";
-
-    constexpr auto getQuotesByCategoryId = R"sql(
-                        SELECT QT.quote_id, QT.lang_id, QT.quote, QT.author, QT.enabled
+                        SELECT CT.category_id, CT.category_name, CT.enabled
                         FROM 
-                            quote_table as QT,
-                            quote_category_map as QCM,
-                            category_table as CT
+                            category_table as CT,
+                            quote_languages as QL
                         WHERE
-                            QCM.quote_id = QT.quote_id
-                            and 
-                            QCM.category_id = CT.category_id
+                            QL.lang_name = '%q'
                             and
-                            QCM.category_id = '%lu'
-                            and
-                            CT.enabled = TRUE
+                            CT.lang_id = QL.lang_id 
                         )sql";
 
-    constexpr auto getQuotesFromCustomCategory = R"sql(
-                        SELECT QT.quote_id, QT.lang_id, QT.quote, QT.author, QT.enabled
+    constexpr auto getEnabledPredefinedQuotes = R"sql(
+                        SELECT QT.quote_id, QT.quote, QT.author, CT.enabled
                         FROM
                             quote_table as QT,
                             quote_category_map as QCM,
-                            category_table as CT
+                            category_table as CT,
+                            quote_languages as QL
                         WHERE
-                            QCM.quote_id = QT.quote_id
+                            QL.lang_name = '%q'
+                            and
+                            CT.lang_id = QL.lang_id
+                            and
+                            CT.enabled = TRUE
                             and 
                             QCM.category_id = CT.category_id
                             and
-                            CT.category_name = 'Custom'
-                            and
-                            CT.enabled = TRUE
-                        )sql";
-
-    constexpr auto getCustomCategoryId = R"sql(
-                        SELECT category_id, category_name, enabled
-                        FROM
-                            category_table
-                        WHERE
-                            category_name = 'Custom'
+                            QCM.quote_id = QT.quote_id
+                        GROUP BY
+                            QCM.quote_id   
                         )sql";
 
     constexpr auto enableCategory = R"sql(
@@ -60,55 +44,58 @@ namespace Quotes::Queries
                         WHERE category_id = '%lu';
                         )sql";
 
-    constexpr auto enableQuote = R"sql(
-                        UPDATE quote_table SET enabled = '%d'
-                        WHERE quote_id = '%lu';
-                        )sql";
-
-    constexpr auto getEnabledQuotes = R"sql(
-                        SELECT QT.quote_id, QT.lang_id, QT.quote, QT.author, QT.enabled
+    constexpr auto readPredefinedQuote = R"sql(
+                        SELECT QT.quote_id, QT.quote, QT.author, CT.enabled
                         FROM
                             quote_table as QT,
                             quote_category_map as QCM,
                             category_table as CT
                         WHERE
+                            QT.quote_id = '%lu'
+                            and
                             QCM.quote_id = QT.quote_id
-                            and
+                            and 
                             QCM.category_id = CT.category_id
-                            and
-                            QT.enabled = TRUE
-                            and
-                            CT.enabled = TRUE
                         )sql";
 
-    constexpr auto addQuoteToQuoteTable = R"sql(
-                        INSERT INTO quote_table (lang_id, quote, author, enabled)
-                        VALUES ('%lu', '%q' , '%q', '%d');
+    /// To custom quotes database
+
+    constexpr auto getAllCustomQuotes = R"sql(
+                    SELECT quote_id, quote, author, enabled
+                    FROM quote_table
+                    )sql";
+
+    constexpr auto getEnabledCustomQuotes = R"sql(
+                        SELECT quote_id, quote, author, enabled
+                        FROM
+                            quote_table
+                        WHERE
+                            enabled = TRUE
                         )sql";
 
-    constexpr auto addQuoteToQuoteCategoryMapTable = R"sql(
-                        INSERT INTO quote_category_map (category_id, quote_id)
-                        VALUES ('%lu', '%lu');
+    constexpr auto enableQuote = R"sql(
+                        UPDATE quote_table SET enabled = '%d'
+                        WHERE quote_id = '%lu';
                         )sql";
 
-    constexpr auto readQuote = R"sql(
-                        SELECT quote_id, lang_id, quote, author, enabled
+    constexpr auto addQuote = R"sql(
+                        INSERT INTO quote_table (quote, author, enabled)
+                        VALUES ('%q' , '%q', '%d');
+                        )sql";
+
+    constexpr auto readCustomQuote = R"sql(
+                        SELECT quote_id, quote, author, enabled
                         FROM quote_table
                         WHERE quote_id = '%lu';
                         )sql";
 
     constexpr auto writeQuote = R"sql(
                         UPDATE quote_table
-                        SET lang_id = '%lu', quote = '%q', author = '%q', enabled = '%d'
+                        SET quote = '%q', author = '%q', enabled = '%d'
                         WHERE quote_id = '%lu';
                         )sql";
 
-    constexpr auto deleteQuoteFromQuoteCategoryMapTable = R"sql(
-                        DELETE FROM quote_category_map
-                        WHERE quote_id = '%lu';
-                        )sql";
-
-    constexpr auto deleteQuoteFromQuoteTable = R"sql(
+    constexpr auto deleteQuote = R"sql(
                         DELETE FROM quote_table
                         WHERE quote_id = '%lu';
                         )sql";

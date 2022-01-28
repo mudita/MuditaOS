@@ -32,7 +32,8 @@ ServiceDB::~ServiceDB()
     notesDB.reset();
     countryCodesDB.reset();
     notificationsDB.reset();
-    quotesDB.reset();
+    predefinedQuotesDB.reset();
+    customQuotesDB.reset();
     multimediaFilesDB.reset();
 
     Database::deinitialize();
@@ -230,7 +231,8 @@ sys::ReturnCodes ServiceDB::InitHandler()
     calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getUserDiskPath() / "calllog.db").c_str());
     countryCodesDB  = std::make_unique<CountryCodesDB>("country-codes.db");
     notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getUserDiskPath() / "notifications.db").c_str());
-    quotesDB        = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").c_str());
+    predefinedQuotesDB = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "predefined_quotes.db").c_str());
+    customQuotesDB     = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "custom_quotes.db").c_str());
     multimediaFilesDB = std::make_unique<db::multimedia_files::MultimediaFilesDB>(
         (purefs::dir::getUserDiskPath() / "multimedia.db").c_str());
 
@@ -257,7 +259,8 @@ sys::ReturnCodes ServiceDB::InitHandler()
     auto settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
 
-    quotesRecordInterface = std::make_unique<Quotes::QuotesAgent>(quotesDB.get(), std::move(settings));
+    quotesRecordInterface =
+        std::make_unique<Quotes::QuotesAgent>(predefinedQuotesDB.get(), customQuotesDB.get(), std::move(settings));
 
     return sys::ReturnCodes::Success;
 }
@@ -289,8 +292,15 @@ bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
         return false;
     }
 
-    if (quotesDB->storeIntoFile(backupPath / std::filesystem::path(quotesDB->getName()).filename()) == false) {
-        LOG_ERROR("quotesDB backup failed");
+    if (customQuotesDB->storeIntoFile(backupPath / std::filesystem::path(predefinedQuotesDB->getName()).filename()) ==
+        false) {
+        LOG_ERROR("predefinedQuotesDB backup failed");
+        return false;
+    }
+
+    if (customQuotesDB->storeIntoFile(backupPath / std::filesystem::path(customQuotesDB->getName()).filename()) ==
+        false) {
+        LOG_ERROR("customQuotesDB backup failed");
         return false;
     }
 

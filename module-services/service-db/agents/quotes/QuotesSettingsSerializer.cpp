@@ -11,8 +11,9 @@ namespace Quotes
     auto QuotesSettingsSerializer::serialize(const IdList &list) -> std::string
     {
         std::string output;
-        for (const auto &item : list) {
-            output.append(utils::to_string(item) + ',');
+        for (const auto &[type, id] : list) {
+            output.append(utils::to_string(static_cast<int>(type)) + ',');
+            output.append(utils::to_string(id) + ',');
         }
         return output;
     }
@@ -20,8 +21,18 @@ namespace Quotes
     {
         std::stringstream ss(listString);
         IdList list;
+        QuoteID quoteID;
+        bool type = true;
         for (int i; ss >> i;) {
-            list.push_back(i);
+            if (type) {
+                quoteID.first = static_cast<QuoteType>(i);
+                type          = false;
+            }
+            else {
+                quoteID.second = i;
+                list.push_back(quoteID);
+                type = true;
+            }
             if (ss.peek() == ',' || ss.peek() == ' ') {
                 ss.ignore();
             }
