@@ -149,7 +149,10 @@ void closeCMux(std::unique_ptr<bsp::Cellular> &pv_cellular)
 {
     LOG_INFO("Closing mux mode");
     CellularMuxFrame::frame_t frame = createCMUXExitFrame();
-    pv_cellular->write(static_cast<void *>(frame.serialize().data()), frame.serialize().size());
+    const auto write = pv_cellular->write(static_cast<void *>(frame.serialize().data()), frame.serialize().size());
+    if (write < 0) {
+        LOG_ERROR("Unable to write to the usart");
+    }
     vTaskDelay(1000); // GSM module needs some time to close multiplexer
 }
 

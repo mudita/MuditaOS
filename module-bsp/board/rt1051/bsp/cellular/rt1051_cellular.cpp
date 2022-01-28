@@ -221,14 +221,19 @@ namespace bsp
             assert(false);
         }
 
-        constexpr auto maxTXCheckRetires = 5;
+        constexpr auto maxTXCheckRetries = 10;
+        int retries;
         if (LPUART_IsEDMATxBusy(&uartDmaHandle)) {
-            for (int i = 0; i < maxTXCheckRetires; ++i) {
-                LOG_INFO("Waiting for TX free %d", i);
+            for (retries = 0; retries < maxTXCheckRetries; ++retries) {
+                LOG_INFO("Waiting for TX free %d", retries);
                 ulTaskNotifyTake(pdFALSE, 100);
                 if (!LPUART_IsEDMATxBusy(&uartDmaHandle)) {
                     break;
                 }
+            }
+            if (retries >= maxTXCheckRetries) {
+                LOG_ERROR("Dma channel is still busy after %i retries", maxTXCheckRetries);
+                return -1;
             }
         }
 

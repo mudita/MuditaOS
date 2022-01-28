@@ -40,7 +40,7 @@ class ATParser : public at::Channel
     at::Result processNewData(sys::Service *service, const bsp::cellular::CellularResult &cellularResult);
 
     virtual void cmdInit() override final;
-    virtual void cmdSend(std::string cmd) override final;
+    virtual int cmdSend(std::string cmd) override final;
     virtual size_t cmdReceive(std::uint8_t *buffer, std::chrono::milliseconds timeout) override final;
     virtual void cmdPost() override final;
 
