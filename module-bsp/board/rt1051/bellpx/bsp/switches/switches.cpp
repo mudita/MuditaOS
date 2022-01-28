@@ -97,6 +97,11 @@ namespace bsp::bell_switches
             return changeFlag;
         }
 
+        void setChanged()
+        {
+            changeFlag = true;
+        }
+
         void clearChangedMark()
         {
             cpp_freertos::LockGuard lock(latchFlagMutex);
@@ -178,6 +183,14 @@ namespace bsp::bell_switches
             }
             auto val = static_cast<std::uint16_t>(getNotificationSource(timerState->id, currentState));
             xQueueSend(qHandleIrq, &val, 0);
+        }
+        else {
+            /** Even if we did not change the state of latch, the IRQ was called,
+             * so lets skip next light center click
+             */
+            if (timerState->id == KeyId::latchSwitch) {
+                latchEventFlag.setChanged();
+            }
         }
 
         timerState->gpio->EnableInterrupt(1U << static_cast<uint32_t>(timerState->pin));
