@@ -38,7 +38,7 @@ class DLCChannel : public at::Channel
     void sendData(std::vector<uint8_t> &data);
 
     virtual void cmdInit() override final;
-    virtual void cmdSend(std::string cmd) override final;
+    virtual int cmdSend(std::string cmd) override final;
     virtual size_t cmdReceive(std::uint8_t *result, std::chrono::milliseconds timeout) override final;
     virtual void cmdPost() override final;
 

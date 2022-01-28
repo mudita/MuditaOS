@@ -85,10 +85,11 @@ bool DLCChannel::establish()
 void DLCChannel::cmdInit()
 {}
 
-void DLCChannel::cmdSend(std::string cmd)
+int DLCChannel::cmdSend(std::string cmd)
 {
     std::vector<uint8_t> data(cmd.begin(), cmd.end());
     sendData(data);
+    return 0;
 }
 
 size_t DLCChannel::cmdReceive(uint8_t *result, std::chrono::milliseconds timeout)
