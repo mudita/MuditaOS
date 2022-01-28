@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesModel.hpp"
@@ -104,26 +104,21 @@ namespace Quotes
 
     void QuotesModel::add(const Quotes::QuoteRecord &record)
     {
-        LOG_DEBUG("Adding quote: lang_id = %u", static_cast<unsigned>(record.lang_id));
-        auto query = std::make_unique<Messages::AddQuoteRequest>(record.lang_id, record.quote, record.author, true);
+        auto query = std::make_unique<Messages::AddQuoteRequest>(record.quote, record.author, true);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->execute(app, this);
     }
 
     void QuotesModel::edit(const Quotes::QuoteRecord &record)
     {
-        LOG_DEBUG("Saving quote: lang_id = %u", static_cast<unsigned>(record.lang_id));
-
-        auto query = std::make_unique<Messages::WriteQuoteRequest>(
-            record.quote_id, record.lang_id, record.quote, record.author, record.enabled);
+        auto query =
+            std::make_unique<Messages::WriteQuoteRequest>(record.quote_id, record.quote, record.author, record.enabled);
         auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->execute(app, this);
     }
 
     void QuotesModel::remove(const Quotes::QuoteRecord &record)
     {
-        LOG_DEBUG("Removing quote: lang_id = %u", static_cast<unsigned>(record.lang_id));
-
         auto query = std::make_unique<Messages::DeleteQuoteRequest>(record.quote_id);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->execute(app, this);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -120,4 +120,6 @@ class DBServiceAPI
      * @return true if adding sms operation succeed, otherwise false
      */
     static bool AddSMS(sys::Service *serv, const SMSRecord &record, std::unique_ptr<db::QueryListener> &&listener);
+
+    static void InformLanguageChanged(sys::Service *serv);
 };

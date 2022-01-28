@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-db/DBServiceAPI.hpp"
@@ -6,6 +6,7 @@
 #include "service-db/DBCalllogMessage.hpp"
 #include "service-db/DBServiceMessage.hpp"
 #include "service-db/QueryMessage.hpp"
+#include "service-db/QuotesMessages.hpp"
 #include "service-db/DBServiceName.hpp"
 
 #include <CalllogRecord.hpp>
@@ -286,4 +287,10 @@ bool DBServiceAPI::AddSMS(sys::Service *serv, const SMSRecord &record, std::uniq
     query->setQueryListener(std::move(listener));
     const auto [succeed, _] = DBServiceAPI::GetQuery(serv, db::Interface::Name::SMS, std::move(query));
     return succeed;
+}
+
+void DBServiceAPI::InformLanguageChanged(sys::Service *serv)
+{
+    auto query = std::make_unique<Quotes::Messages::InformLanguageChangeRequest>();
+    DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
 }

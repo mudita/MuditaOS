@@ -40,7 +40,6 @@ namespace Quotes
     struct QuoteRecord
     {
         unsigned int quote_id;
-        unsigned int lang_id;
         std::string quote;
         std::string author;
         bool enabled;
@@ -50,10 +49,9 @@ namespace Quotes
         explicit QuoteRecord(QueryResult *query)
         {
             quote_id = (*query)[0].getInt32();
-            lang_id  = (*query)[1].getInt32();
-            quote    = (*query)[2].getString();
-            author   = (*query)[3].getString();
-            enabled  = (*query)[4].getBool();
+            quote    = (*query)[1].getString();
+            author   = (*query)[2].getString();
+            enabled  = (*query)[3].getBool();
         }
     };
 
@@ -103,21 +101,6 @@ namespace Quotes
             std::unique_ptr<CategoryList> categoryList;
         };
 
-        class GetQuotesListRequest : public db::Query
-        {
-          public:
-            explicit GetQuotesListRequest(unsigned int offset, unsigned int limit)
-                : Query(Query::Type::Read), offset(offset), limit(limit)
-            {}
-            const unsigned int offset;
-            const unsigned int limit;
-
-            auto debugInfo() const -> std::string
-            {
-                return "GetQuotesListRequest";
-            }
-        };
-
         class GetQuotesListResponse : public db::QueryResult
         {
           public:
@@ -141,22 +124,6 @@ namespace Quotes
 
           private:
             std::unique_ptr<QuotesList> quotesList;
-        };
-
-        class GetQuotesListByCategoryIdRequest : public db::Query
-        {
-          public:
-            explicit GetQuotesListByCategoryIdRequest(unsigned int offset, unsigned int limit, unsigned int categoryId)
-                : Query(Query::Type::Read), offset(offset), limit(limit), categoryId(categoryId)
-            {}
-            const unsigned int offset;
-            const unsigned int limit;
-            const unsigned int categoryId;
-
-            auto debugInfo() const -> std::string
-            {
-                return "GetQuotesListByCategoryIdRequest";
-            }
         };
 
         class GetQuotesListByCategoryIdResponse : public db::QueryResult
@@ -281,56 +248,12 @@ namespace Quotes
                 return "EnableQuoteByIdResponse";
             }
         };
-
-        class GetEnabledQuotesListRequest : public db::Query
-        {
-          public:
-            explicit GetEnabledQuotesListRequest(unsigned int offset, unsigned int limit)
-                : Query(Query::Type::Read), offset(offset), limit(limit)
-            {}
-            const unsigned int offset;
-            const unsigned int limit;
-
-            auto debugInfo() const -> std::string
-            {
-                return "GetEnabledQuotesListRequest";
-            }
-        };
-
-        class GetEnabledQuotesListResponse : public db::QueryResult
-        {
-          public:
-            explicit GetEnabledQuotesListResponse(std::unique_ptr<QuotesList> quotesList)
-                : quotesList(std::move(quotesList))
-            {}
-
-            [[nodiscard]] unsigned int getCount() const noexcept
-            {
-                return quotesList->count;
-            }
-
-            [[nodiscard]] auto getResults() const -> std::vector<QuoteRecord>
-            {
-                return quotesList->data;
-            }
-
-            auto debugInfo() const -> std::string
-            {
-                return "GetEnabledQuotesListResponse";
-            }
-
-          private:
-            std::unique_ptr<QuotesList> quotesList;
-        };
-
         class AddQuoteRequest : public db::Query
         {
           public:
-            explicit AddQuoteRequest(unsigned int langId, std::string quote, std::string author, bool enabled)
-                : Query(Query::Type::Create), langId(langId), quote(std::move(quote)), author(std::move(author)),
-                  enabled(enabled)
+            explicit AddQuoteRequest(std::string quote, std::string author, bool enabled)
+                : Query(Query::Type::Create), quote(std::move(quote)), author(std::move(author)), enabled(enabled)
             {}
-            const unsigned int langId;
             const std::string quote;
             const std::string author;
             const bool enabled;
@@ -355,38 +278,6 @@ namespace Quotes
             }
         };
 
-        class ReadQuoteRequest : public db::Query
-        {
-          public:
-            explicit ReadQuoteRequest(unsigned int quoteId) : Query(Query::Type::Read), quoteId(quoteId)
-            {}
-            const unsigned int quoteId;
-
-            auto debugInfo() const -> std::string
-            {
-                return "ReadQuoteRequest";
-            }
-        };
-
-        class ReadQuoteResponse : public db::QueryResult
-        {
-          public:
-            explicit ReadQuoteResponse(
-                unsigned int quoteId, unsigned int langId, std::string quote, std::string author, bool enabled)
-                : quoteId(quoteId), langId(langId), quote(std::move(quote)), author(std::move(author)), enabled(enabled)
-            {}
-            const unsigned int quoteId;
-            const unsigned int langId;
-            const std::string quote;
-            const std::string author;
-            const bool enabled;
-
-            auto debugInfo() const -> std::string
-            {
-                return "ReadQuoteResponse";
-            }
-        };
-
         class ReadRandomizedQuoteRequest : public db::Query
         {
           public:
@@ -402,15 +293,12 @@ namespace Quotes
         class ReadRandomizedQuoteResponse : public db::QueryResult
         {
           public:
-            explicit ReadRandomizedQuoteResponse(
-                unsigned int quoteId, unsigned int langId, std::string quote, std::string author, bool enabled)
-                : quoteId(quoteId), langId(langId), quote(std::move(quote)), author(std::move(author)), enabled(enabled)
+            explicit ReadRandomizedQuoteResponse(unsigned int quoteId, std::string quote, std::string author)
+                : quoteId(quoteId), quote(std::move(quote)), author(std::move(author))
             {}
             const unsigned int quoteId;
-            const unsigned int langId;
             const std::string quote;
             const std::string author;
-            const bool enabled;
 
             auto debugInfo() const -> std::string
             {
@@ -418,16 +306,26 @@ namespace Quotes
             }
         };
 
+        class InformLanguageChangeRequest : public db::Query
+        {
+          public:
+            InformLanguageChangeRequest() : Query(Query::Type::Read)
+            {}
+
+            auto debugInfo() const -> std::string
+            {
+                return "InformLanguageChangeRequest";
+            }
+        };
+
         class WriteQuoteRequest : public db::Query
         {
           public:
-            explicit WriteQuoteRequest(
-                unsigned int quoteId, unsigned int langId, std::string quote, std::string author, bool enabled)
-                : Query(Query::Type::Update), quoteId(quoteId), langId(langId), quote(std::move(quote)),
-                  author(std::move(author)), enabled(enabled)
+            explicit WriteQuoteRequest(unsigned int quoteId, std::string quote, std::string author, bool enabled)
+                : Query(Query::Type::Update), quoteId(quoteId), quote(std::move(quote)), author(std::move(author)),
+                  enabled(enabled)
             {}
             const unsigned int quoteId;
-            const unsigned int langId;
             const std::string quote;
             const std::string author;
             const bool enabled;

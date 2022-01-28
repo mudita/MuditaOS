@@ -7,7 +7,14 @@
 
 namespace Quotes
 {
-    using IdList = std::deque<int>;
+    enum class QuoteType
+    {
+        Predefined,
+        Custom
+    };
+
+    using QuoteID = std::pair<QuoteType, int>;
+    using IdList  = std::deque<QuoteID>;
 
     class QuotesSettingsSerializer
     {

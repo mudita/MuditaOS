@@ -25,6 +25,7 @@
 #include <service-eink/ServiceEink.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <AppWindowConstants.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
 #include <algorithm>
 #include <utility>
@@ -664,6 +665,7 @@ namespace app::manager
         settings->setValue(
             settings::SystemProperties::displayLanguage, requestedLanguage, settings::SettingsScope::Global);
         rebuildActiveApplications();
+        DBServiceAPI::InformLanguageChanged(this);
         return true;
     }
 

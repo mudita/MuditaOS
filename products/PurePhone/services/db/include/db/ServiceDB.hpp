@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -52,7 +52,8 @@ class ServiceDB : public ServiceDBCommon
     std::unique_ptr<CalllogDB> calllogDB;
     std::unique_ptr<CountryCodesDB> countryCodesDB;
     std::unique_ptr<NotificationsDB> notificationsDB;
-    std::unique_ptr<Database> quotesDB;
+    std::unique_ptr<Database> predefinedQuotesDB;
+    std::unique_ptr<Database> customQuotesDB;
     std::unique_ptr<db::multimedia_files::MultimediaFilesDB> multimediaFilesDB;
 
     std::unique_ptr<AlarmEventRecordInterface> alarmEventRecordInterface;

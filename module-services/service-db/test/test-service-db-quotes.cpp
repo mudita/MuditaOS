@@ -5,50 +5,33 @@
 
 #include "test-service-db-quotes.hpp"
 #include <purefs/filesystem_paths.hpp>
+#include <i18n/i18n.hpp>
+
 #include <iostream>
 
 using namespace Quotes;
 
-constexpr auto totalNumOfCategoriesInDb = 6;
-constexpr auto totalNumOfQuotesInDb     = 48;
-constexpr auto numOfQuotesFromCustomCategory       = 6;
-constexpr auto numOfQuotesWithCategoryIdEqualToOne = 9;
+constexpr auto totalNumOfCategories          = 3;
+constexpr auto totalNumOfQuotes              = 5;
+constexpr auto numOfQuotesFromCustomCategory = 5;
 
 TEST_CASE("Quotes")
 {
     Database::initialize();
-    auto database = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").string().c_str());
+    auto predefinedDB =
+        std::make_unique<Database>((purefs::dir::getUserDiskPath() / "predefined_quotes.db").string().c_str());
+    auto customDB = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "custom_quotes.db").string().c_str());
     std::string timestampString{};
     std::string quotesString{};
     auto settings = std::make_unique<Quotes::SettingsMock>(quotesString, timestampString);
-    auto tester   = std::make_unique<QuotesAgentTester>(database.get(), std::move(settings));
-
-    SECTION("Get categories with limit and offset")
-    {
-        unsigned int offset = 1;
-        unsigned int limit  = 2;
-
-        auto request     = std::make_shared<Messages::GetCategoryListRequest>(offset, limit);
-        auto queryResult = tester->handleCategoryList(request);
-        auto response    = dynamic_cast<Messages::GetCategoryListResponse *>(queryResult.get());
-
-        REQUIRE(response);
-        REQUIRE(response->getCount() == totalNumOfCategoriesInDb);
-        REQUIRE(response->getResults().size() == limit);
-    }
+    auto tester   = std::make_unique<QuotesAgentTester>(predefinedDB.get(), customDB.get(), std::move(settings));
 
     SECTION("Get all categories")
     {
-        unsigned int offset = 0;
-        unsigned int limit  = 0;
-
-        auto request     = std::make_shared<Messages::GetCategoryListRequest>(offset, limit);
-        auto queryResult = tester->handleCategoryList(request);
-        auto response    = dynamic_cast<Messages::GetCategoryListResponse *>(queryResult.get());
-
-        REQUIRE(response);
-        REQUIRE(response->getCount() == totalNumOfCategoriesInDb);
-        REQUIRE(response->getResults().size() == totalNumOfCategoriesInDb);
+        utils::setDisplayLanguage("English");
+        tester->informLanguageChange();
+        auto categories = tester->getCategoriesList();
+        REQUIRE(categories.size() == totalNumOfCategories);
     }
 
     SECTION("Get quotes from custom category")
@@ -60,7 +43,7 @@ TEST_CASE("Quotes")
     SECTION("Enable category by id")
     {
         bool enable                   = false;
-        const unsigned int categoryId = 1;
+        const unsigned int categoryId = 5;
 
         // Get current random quote
         auto queryResult   = tester->readRandomizedQuote();
@@ -69,10 +52,6 @@ TEST_CASE("Quotes")
 
         auto success = tester->enableCategory(categoryId, enable);
         REQUIRE(success);
-
-        // Quotes in category one should be disabled
-        auto quotes = tester->getQuotesByCategoryId(categoryId);
-        REQUIRE(quotes.size() == 0);
 
         // verify rerandomizing the quotes list
         queryResult           = tester->readRandomizedQuote();
@@ -84,10 +63,6 @@ TEST_CASE("Quotes")
 
         success = tester->enableCategory(categoryId, enable);
         REQUIRE(success);
-
-        // Quotes in category one should be enabled
-        quotes = tester->getQuotesByCategoryId(categoryId);
-        REQUIRE(quotes.size() == numOfQuotesWithCategoryIdEqualToOne);
     }
 
     SECTION("Enable quote by id")
@@ -103,10 +78,12 @@ TEST_CASE("Quotes")
         auto success = tester->enableQuote(quoteId, enable);
         REQUIRE(success);
 
-        // All quotes except quote with id=1 should be enabled
-        auto quotes = tester->getEnabledQuotes();
-        REQUIRE(quotes.size() == totalNumOfQuotesInDb - 1);
-
+        auto customQuotes = tester->getQuotesFromCustomCategory();
+        for (const auto &quote : customQuotes) {
+            if (quote.quote_id == quoteId) {
+                REQUIRE(!quote.enabled);
+            }
+        }
         // verify rerandomizing the quotes list
         queryResult           = tester->readRandomizedQuote();
         auto newRandomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
@@ -118,14 +95,16 @@ TEST_CASE("Quotes")
         success = tester->enableQuote(quoteId, enable);
         REQUIRE(success);
 
-        // All quotes should be enabled
-        quotes = tester->getEnabledQuotes();
-        REQUIRE(quotes.size() == totalNumOfQuotesInDb);
+        customQuotes = tester->getQuotesFromCustomCategory();
+        for (const auto &quote : customQuotes) {
+            if (quote.quote_id == quoteId) {
+                REQUIRE(quote.enabled);
+            }
+        }
     }
 
     SECTION("Add/Read/Write/Delete quote")
     {
-        unsigned int langId = 1;
         std::string quote   = "TEST QUOTE";
         std::string author  = "TEST AUTHOR";
         bool enabled        = true;
@@ -136,12 +115,11 @@ TEST_CASE("Quotes")
         REQUIRE(randomQuoteId != 0);
 
         // Add a new quote
-        auto quoteId = tester->addQuote(langId, quote, author, enabled);
+        auto quoteId = tester->addQuote(quote, author, enabled);
 
         // Check if quotes count has increased
-        auto quotes = tester->getAllQuotes();
-
-        REQUIRE(quotes.size() == totalNumOfQuotesInDb + 1);
+        auto customQuotes = tester->getQuotesFromCustomCategory();
+        REQUIRE(customQuotes.size() == numOfQuotesFromCustomCategory + 1);
 
         // verify rerandomizing the quotes list
         queryResult           = tester->readRandomizedQuote();
@@ -150,35 +128,36 @@ TEST_CASE("Quotes")
         REQUIRE(randomQuoteId != newRandomQuoteId);
 
         // Read added quote
-        queryResult            = tester->readQuote(quoteId);
-        auto readQuoteResponse = dynamic_cast<Messages::ReadQuoteResponse *>(queryResult.get());
-
-        REQUIRE(readQuoteResponse->quoteId == quoteId);
-        REQUIRE(readQuoteResponse->quote == quote);
-        REQUIRE(readQuoteResponse->author == author);
+        customQuotes = tester->getQuotesFromCustomCategory();
+        for (const auto &customQuote : customQuotes) {
+            if (customQuote.quote_id == quoteId) {
+                REQUIRE(customQuote.quote == quote);
+                REQUIRE(customQuote.author == author);
+            }
+        }
 
         // Change added quote (overwrite)
         quote        = "TEST QUOTE CHANGED";
         author       = "TEST AUTHOR CHANGED";
-        auto success = tester->writeQuote(quoteId, langId, quote, author, enabled);
+        auto success = tester->writeQuote(quoteId, quote, author, enabled);
         REQUIRE(success);
 
         // Read quote if values have been properly updated
-        queryResult       = tester->readQuote(quoteId);
-        readQuoteResponse = dynamic_cast<Messages::ReadQuoteResponse *>(queryResult.get());
-
-        REQUIRE(readQuoteResponse->quoteId == quoteId);
-        REQUIRE(readQuoteResponse->quote == quote);
-        REQUIRE(readQuoteResponse->author == author);
+        customQuotes = tester->getQuotesFromCustomCategory();
+        for (const auto &customQuote : customQuotes) {
+            if (customQuote.quote_id == quoteId) {
+                REQUIRE(customQuote.quote == quote);
+                REQUIRE(customQuote.author == author);
+            }
+        }
 
         // Delete added quote
         success = tester->deleteQuote(quoteId);
         REQUIRE(success);
 
         // Check if quotes count match count before added quote
-        quotes = tester->getAllQuotes();
-
-        REQUIRE(quotes.size() == totalNumOfQuotesInDb);
+        customQuotes = tester->getQuotesFromCustomCategory();
+        REQUIRE(customQuotes.size() == numOfQuotesFromCustomCategory);
     }
 
     SECTION("Randomizer test - double request")
@@ -242,13 +221,14 @@ TEST_CASE("Serializer test")
 
     SECTION("Serialize - correct input")
     {
-        IdList list{1, 2, 3, 4};
+        IdList list{
+            {QuoteType::Predefined, 1}, {QuoteType::Custom, 2}, {QuoteType::Predefined, 3}, {QuoteType::Custom, 4}};
         auto result = serializer.serialize(list);
-        REQUIRE(result == "1,2,3,4,");
+        REQUIRE(result == "0,1,1,2,0,3,1,4,");
 
-        IdList list2{1};
+        IdList list2{{QuoteType::Custom, 1}};
         result = serializer.serialize(list2);
-        REQUIRE(result == "1,");
+        REQUIRE(result == "1,1,");
     }
 
     SECTION("Serialize - wrong input")
@@ -260,11 +240,13 @@ TEST_CASE("Serializer test")
 
     SECTION("Deserialize - correct input")
     {
-        std::string serializedData = "1,2,3,4,";
+        std::string serializedData = "0,1,1,2,0,3,1,4,";
         auto result                = serializer.deserialize(serializedData);
         REQUIRE(result.size() == 4);
-        REQUIRE(result.front() == 1);
-        REQUIRE(result.back() == 4);
+        REQUIRE(result.front().first == QuoteType::Predefined);
+        REQUIRE(result.front().second == 1);
+        REQUIRE(result.back().first == QuoteType::Custom);
+        REQUIRE(result.back().second == 4);
     }
 
     SECTION("Deserialize - empty input")
