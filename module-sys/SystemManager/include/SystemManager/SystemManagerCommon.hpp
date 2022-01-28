@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -39,6 +39,7 @@ namespace sys
     enum class Code
     {
         CloseSystem,
+        Update,
         Restore,
         Reboot,
         RebootToUpdate,
@@ -172,11 +173,11 @@ namespace sys
 
         void readyToCloseHandler(Message *msg);
 
+        void UpdateSystemHandler();
+
         void RestoreSystemHandler();
 
-        void RebootHandler();
-
-        void RebootToUpdateHandler(UpdateReason updateReason);
+        void RebootHandler(State state, std::optional<UpdateReason> updateReason = std::nullopt);
 
         /// periodic update of cpu statistics
         void CpuStatisticsTimerHandler();
@@ -186,7 +187,6 @@ namespace sys
 
         bool cpuStatisticsTimerInit{false};
 
-        CloseReason closeReason{CloseReason::RegularPowerDown};
         UpdateReason updateReason{UpdateReason::Update};
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         sys::TimerHandle cpuStatisticsTimer;
