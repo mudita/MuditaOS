@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/magnetometer/magnetometer.hpp"
@@ -215,6 +215,14 @@ namespace bsp
             xTimerStart(timerHandle, 1000);
 
             return kStatus_Success;
+        }
+
+        void deinit()
+        {
+            gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ));
+            if (timerHandle != nullptr) {
+                xTimerStop(timerHandle, 0);
+            }
         }
 
         std::pair<bool, Measurements> getMeasurement()

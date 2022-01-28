@@ -21,6 +21,7 @@ namespace bsp
     {
 
         int32_t init(xQueueHandle qHandle);
+        void deinit();
 
         bool isPresent(void);
 
