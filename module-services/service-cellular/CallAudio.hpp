@@ -10,7 +10,9 @@ namespace sys
 
 class CallRingAudio
 {
+    struct CallMeta;
     sys::Service &owner;
+    CallMeta *meta;
 
   public:
     explicit CallRingAudio(sys::Service &);
