@@ -45,6 +45,17 @@ namespace sys
 
     namespace state
     {
+        namespace update
+        {
+            static constexpr std::array whitelist = {service::name::service_desktop,
+                                                     service::name::evt_manager,
+                                                     service::name::gui,
+                                                     service::name::db,
+                                                     service::name::eink,
+                                                     service::name::appmgr,
+                                                     service::name::cellular};
+        }
+
         namespace restore
         {
             static constexpr std::array whitelist = {service::name::service_desktop,
@@ -421,9 +432,6 @@ namespace sys
             readyForCloseRegister.push_back(service->GetName());
         }
 
-        // stored to be used later in CloseServices
-        this->closeReason = closeReason;
-
         servicesPreShutdownRoutineTimeout = sys::TimerFactory::createPeriodicTimer(
             this, "servicesPreShutdownRoutine", preShutdownRoutineTimeout, [this](sys::Timer &) { CloseServices(); });
         servicesPreShutdownRoutineTimeout.start();
@@ -505,14 +513,17 @@ namespace sys
                 case Code::CloseSystem:
                     CloseSystemHandler(data->closeReason);
                     break;
+                case Code::Update:
+                    UpdateSystemHandler();
+                    break;
                 case Code::Restore:
                     RestoreSystemHandler();
                     break;
                 case Code::Reboot:
-                    RebootHandler();
+                    RebootHandler(State::Reboot);
                     break;
                 case Code::RebootToUpdate:
-                    RebootToUpdateHandler(data->updateReason);
+                    RebootHandler(State::RebootToUpdate, data->updateReason);
                     break;
                 case Code::FactoryReset:
                     CloseSystemHandler(CloseReason::FactoryReset);
@@ -674,20 +685,7 @@ namespace sys
 
         DestroyServices(sys::state::regularClose::whitelist);
 
-        switch (closeReason) {
-        case CloseReason::RegularPowerDown:
-        case CloseReason::FactoryReset:
-        case CloseReason::SystemBrownout:
-        case CloseReason::LowBattery:
-            set(State::Shutdown);
-            break;
-        case CloseReason::Reboot:
-            set(State::Reboot);
-            break;
-        case CloseReason::RebootToUpdate:
-            set(State::RebootToUpdate);
-            break;
-        }
+        set(State::Shutdown);
     }
 
     void SystemManagerCommon::RestoreSystemHandler()
@@ -704,15 +702,25 @@ namespace sys
         LOG_INFO("entered restore state");
     }
 
-    void SystemManagerCommon::RebootHandler()
+    void SystemManagerCommon::UpdateSystemHandler()
     {
-        CloseSystemHandler(CloseReason::Reboot);
+        LOG_DEBUG("Starting system update procedure...");
+
+        // We are going to remove services in reversed order of creation
+        CriticalSection::Enter();
+        std::reverse(servicesList.begin(), servicesList.end());
+        CriticalSection::Exit();
+
+        DestroyServices(sys::state::update::whitelist);
     }
 
-    void SystemManagerCommon::RebootToUpdateHandler(UpdateReason updateReason)
+    void SystemManagerCommon::RebootHandler(State state, std::optional<UpdateReason> updateReason)
     {
-        CloseSystemHandler(CloseReason::RebootToUpdate);
-        this->updateReason = updateReason;
+        CloseSystemHandler(CloseReason::Reboot);
+        set(state);
+        if (updateReason) {
+            this->updateReason = updateReason.value();
+        }
     }
 
     void SystemManagerCommon::CpuStatisticsTimerHandler()
