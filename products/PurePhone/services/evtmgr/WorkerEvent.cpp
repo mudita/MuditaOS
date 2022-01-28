@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerEvent.hpp"
@@ -134,6 +134,7 @@ void WorkerEvent::deinitProductHardware()
     bsp::eink_frontlight::deinit();
     bsp::light_sensor::deinit();
     bsp::vibrator::deinit();
+    bsp::magnetometer::deinit();
 }
 
 void WorkerEvent::requestSliderPositionRead()
