@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <sys/SystemManager.hpp>
@@ -63,5 +63,10 @@ namespace sys
         SystemManagerCommon::batteryCriticalLevelAction(charging);
         auto msg = std::make_shared<CriticalBatteryLevelNotification>(true, charging);
         bus.sendUnicast(std::move(msg), service::name::appmgr);
+    }
+
+    void SystemManager::shutdownState()
+    {
+        set(State::ShutdownReady);
     }
 } // namespace sys

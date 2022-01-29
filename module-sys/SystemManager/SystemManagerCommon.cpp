@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/SystemManagerCommon.hpp>
@@ -154,22 +154,7 @@ namespace sys
         }
 
         while (state == State::Shutdown) {
-            // check if we are discharging - if so -> shutdown
-            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
-                set(State::ShutdownReady);
-            }
-            else {
-                // await from EvtManager for info that red key was pressed / timeout
-                auto msg = mailbox.pop();
-                if (!msg) {
-                    continue;
-                }
-                if (msg->sender != service::name::evt_manager) {
-                    LOG_ERROR("Ignored msg from: %s on shutdown", msg->sender.c_str());
-                    continue;
-                }
-                msg->Execute(this);
-            }
+            shutdownState();
         }
 
         DestroySystemService(service::name::evt_manager, this);
