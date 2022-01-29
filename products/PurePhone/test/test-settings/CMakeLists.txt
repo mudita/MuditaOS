@@ -7,6 +7,7 @@ add_catch2_executable(
         LIBS
             db
             evtmgr
+            sys
             module-audio
             module-cellular
             module-vfs

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <sys/SystemManager.hpp>
@@ -142,5 +142,25 @@ namespace sys
         CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::Off);
         auto msg = std::make_shared<CriticalBatteryLevelNotification>(true, charging);
         bus.sendUnicast(std::move(msg), service::name::appmgr);
+    }
+
+    void SystemManager::handleShutdown()
+    {
+        // check if we are discharging - if so -> shutdown
+        if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+            set(State::ShutdownReady);
+        }
+        else {
+            // await from EvtManager for info that red key was pressed / timeout
+            auto msg = mailbox.pop();
+            if (!msg) {
+                return;
+            }
+            if (msg->sender != service::name::evt_manager) {
+                LOG_ERROR("Ignored msg from: %s on shutdown", msg->sender.c_str());
+                return;
+            }
+            msg->Execute(this);
+        }
     }
 } // namespace sys

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <sys/SystemManager.hpp>
@@ -49,5 +49,10 @@ namespace sys
         auto msg = std::make_shared<BatteryShutdown>();
         bus.sendUnicast(msg, service::name::appmgr);
         SystemManagerCommon::batteryShutdownLevelAction();
+    }
+
+    void SystemManager::handleShutdown()
+    {
+        set(State::ShutdownReady);
     }
 } // namespace sys
