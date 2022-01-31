@@ -566,4 +566,55 @@ namespace at
             return result;
         }
     };
+
+    /// provides invalid QSIMSTAT response
+    class QSIMSTAT_tooFewTokens : public ChannelMock
+    {
+      public:
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QCFG: \"usbnet\",", "OK"};
+            return result;
+        }
+    };
+
+    /// provides proper CSQ response
+    class CSQ_successChannel : public ChannelMock
+    {
+      public:
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CSQ: 28,99", "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CSQ response
+    class CSQ_tooFewTokens : public ChannelMock
+    {
+      public:
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CSQ: 28", "OK"};
+            return result;
+        }
+    };
+    /// provides invalid CSQ response
+    class CSQ_toManyTokens : public ChannelMock
+    {
+      public:
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CSQ: 28,99,43", "OK"};
+            return result;
+        }
+    };
 } // namespace at
