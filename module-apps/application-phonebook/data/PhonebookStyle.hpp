@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -138,5 +138,10 @@ namespace phonebookStyle
         inline constexpr uint32_t phone_image_margin_right = 15;
         inline constexpr uint32_t number_text_h            = h;
     } // namespace numbersWithIconsWidget
+
+    namespace multipleNumbersWidget
+    {
+        inline constexpr auto height = 100U;
+    }
 
 } // namespace phonebookStyle

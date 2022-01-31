@@ -462,6 +462,8 @@
   "app_phonebook_new_add_to_ice": "Lägg till bland ICE (kontakter i fall av olycka)",
   "app_phonebook_check": "MARKERA",
   "app_phonebook_uncheck": "AVMARKERA",
+  "app_phonebook_multiple_numbers_first": "Nummer",
+  "app_phonebook_multiple_numbers_second": "Alternativnummer",
   "app_meditation_title_main": "Meditationsklocka",
   "app_meditation_preparation_time": "Förbered dig",
   "app_meditation_put_down_phone_and_wait": "<text>Sätt ner telefonen<br>och vänta på klockslaget.</text>",

@@ -562,6 +562,8 @@
   "app_phonebook_new_add_to_ice": "Dodaj do kontaktów ICE",
   "app_phonebook_check": "ZAZNACZ",
   "app_phonebook_uncheck": "ODZNACZ",
+  "app_phonebook_multiple_numbers_first": "Numer",
+  "app_phonebook_multiple_numbers_second": "Drugi numer",
   "app_meditation_title_main": "Medytacja",
   "app_meditation_preparation_time": "Czas przygotowania",
   "app_meditation_put_down_phone_and_wait": "<text>Odłóż telefon<br>i zaczekaj na gong.</text>",

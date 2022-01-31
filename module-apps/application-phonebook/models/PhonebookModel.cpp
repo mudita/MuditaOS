@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
@@ -120,7 +120,7 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
     item->setContact(contact);
     item->setLabelMarkerDisplayMode(getLabelMarkerDisplayMode(contact->contactPosOnList));
     item->activatedCallback = [this, item, contact](gui::Item &) {
-        if (messagesSelectCallback && messagesSelectCallback(item)) {
+        if (contactSelectCallback && contactSelectCallback(item)) {
             return true;
         }
 
@@ -131,7 +131,7 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
     };
 
     item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
-        if (messagesSelectCallback) {
+        if (contactSelectCallback) {
             return false;
         }
         if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
@@ -182,4 +182,26 @@ auto PhonebookModel::getLabelMarkerDisplayMode(uint32_t posOnList) -> LabelMarke
     else {
         return LabelMarkerDisplayMode::IgnoreFavourites;
     }
+}
+
+void PhonebookModel::activateContactSelectCallback()
+{
+    contactSelectCallback = [=](gui::PhonebookItem *item) {
+        if (item->contact->numbers.size() > 1) {
+            std::unique_ptr<PhonebookMultipleNumbersRequest> data =
+                std::make_unique<PhonebookMultipleNumbersRequest>("PhonebookMultipleNumbersRequest", item->contact);
+
+            application->switchWindow(gui::window::name::multiple_numbers_select, std::move(data));
+            return true;
+        }
+        else {
+            std::unique_ptr<PhonebookSearchRequest> data = std::make_unique<PhonebookSearchRequest>();
+            data->result                                 = item->contact;
+            data->setDescription("PhonebookSearchRequest");
+
+            return app::manager::Controller::switchBack(
+                application,
+                std::make_unique<app::manager::SwitchBackRequest>(application->GetName(), std::move(data)));
+        }
+    };
 }

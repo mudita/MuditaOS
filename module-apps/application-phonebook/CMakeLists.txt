@@ -16,12 +16,14 @@ target_sources(application-phonebook
         ApplicationPhonebook.cpp
         models/ContactDetailsModel.cpp
         models/NewContactModel.cpp
+        models/MultipleNumbersModel.cpp
         models/PhonebookModel.cpp
         widgets/ContactFlagIconWidget.cpp
         widgets/ContactFlagsWidget.cpp
         widgets/InformationWidget.cpp
         widgets/InputBoxWithLabelAndIconWidget.cpp
         widgets/InputLinesWithLabelWidget.cpp
+        widgets/MultipleNumbersWidget.cpp
         widgets/OutputLinesTextWithLabelWidget.cpp
         widgets/PhonebookItem.cpp
         widgets/PhonebookListView.cpp
@@ -32,6 +34,7 @@ target_sources(application-phonebook
         windows/PhonebookMainWindow.cpp
         windows/PhonebookNamecardOptions.cpp
         windows/PhonebookNewContact.cpp
+        windows/PhonebookMultipleNumbersSelect.cpp
         windows/PhonebookSearch.cpp
         windows/PhonebookSearchResults.cpp
     PRIVATE

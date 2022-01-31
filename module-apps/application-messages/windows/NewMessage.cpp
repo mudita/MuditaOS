@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -72,6 +72,7 @@ namespace gui
         if (auto searchRequest = dynamic_cast<PhonebookSearchRequest *>(data); searchRequest != nullptr) {
             LOG_INFO("Received search results");
             contact = searchRequest->result;
+            selectedNumber = searchRequest->selectedNumber;
             recipient->setText(contact->getFormattedName());
         }
         else if (auto textData = dynamic_cast<SMSTextData *>(data); textData != nullptr) {
@@ -131,7 +132,7 @@ namespace gui
     {
         if (phoneNumber.getEntered().empty()) {
             if (contact && !(contact->numbers.empty())) {
-                return contact->numbers.front().number;
+                return contact->numbers.at(selectedNumber).number;
             }
             return utils::PhoneNumber{recipient->getText()};
         }

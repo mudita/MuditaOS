@@ -91,14 +91,7 @@ namespace gui
         model->setRequested(contactRequest != nullptr);
         if (model->requestedSearch()) {
             enableNewContact                       = false;
-            phonebookModel->messagesSelectCallback = [=](gui::PhonebookItem *item) {
-                std::unique_ptr<PhonebookSearchRequest> data = std::make_unique<PhonebookSearchRequest>();
-                data->result                                 = item->contact;
-                data->setDescription("PhonebookSearchRequest");
-                return app::manager::Controller::switchBack(
-                    application,
-                    std::make_unique<app::manager::SwitchBackRequest>(application->GetName(), std::move(data)));
-            };
+            phonebookModel->activateContactSelectCallback();
 
             navBar->setActive(nav_bar::Side::Left, false);
             navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::add));
