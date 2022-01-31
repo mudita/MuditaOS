@@ -15,7 +15,7 @@
 #include <at/cmd/QNWINFO.hpp>
 #include <at/cmd/QSIMSTAT.hpp>
 #include <at/cmd/QCFGUsbnet.hpp>
-
+#include <at/cmd/CSQ.hpp>
 #include "mock/AtCommon_channel.hpp"
 #include "PhoneNumber.hpp"
 #include "Result.hpp"
@@ -811,6 +811,61 @@ TEST_CASE("QCFGUsbnet parser")
         at::QCFGUsbnet_invalidToken channel;
         auto base     = channel.cmd(cmd);
         auto response = cmd.parseQCFGUsbnet(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+}
+
+TEST_CASE("CSQ parser")
+{
+    SECTION("Empty data")
+    {
+        at::cmd::CSQ cmd;
+        at::Result result;
+        auto response = cmd.parseCSQ(result);
+        REQUIRE(!response);
+    }
+
+    SECTION("Failing channel")
+    {
+        at::cmd::CSQ cmd;
+        at::FailingChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseCSQ(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::ERROR);
+    }
+
+    SECTION("success")
+    {
+        constexpr uint32_t csq = 28;
+        constexpr uint32_t ber = 99;
+
+        at::cmd::CSQ cmd;
+        at::CSQ_successChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseCSQ(base);
+        REQUIRE(response);
+        REQUIRE(response.csq == csq);
+        REQUIRE(response.ber == ber);
+    }
+
+    SECTION("too few tokens")
+    {
+        at::cmd::CSQ cmd;
+        at::CSQ_tooFewTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseCSQ(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("Failed - too many tokens")
+    {
+        at::cmd::CSQ cmd;
+        at::CSQ_toManyTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseCSQ(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
     }

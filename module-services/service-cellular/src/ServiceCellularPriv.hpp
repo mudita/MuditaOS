@@ -13,9 +13,11 @@
 #include "ImeiGetHandler.hpp"
 #include "TetheringHandler.hpp"
 #include "ModemResetHandler.hpp"
+#include "CSQHandler.hpp"
 
 namespace cellular::internal
 {
+    using service::CSQHandler;
     using service::ModemResetHandler;
     using service::NetworkTime;
     using service::SimCard;
@@ -35,6 +37,8 @@ namespace cellular::internal
         std::unique_ptr<service::ImeiGetHandler> imeiGetHandler;
         std::unique_ptr<TetheringHandler> tetheringHandler;
         std::unique_ptr<ModemResetHandler> modemResetHandler;
+        std::unique_ptr<CSQHandler> csqHandler;
+
         State::PowerState nextPowerState = State::PowerState::Off;
         std::uint8_t multiPartSMSUID     = 0;
 
@@ -45,6 +49,7 @@ namespace cellular::internal
         void connectNetworkTime();
         void connectSimContacts();
         void connectImeiGetHandler();
+        void connectCSQHandler();
 
         void requestNetworkTimeSettings();
         void setInitialMultiPartSMSUID(std::uint8_t uid);
@@ -55,6 +60,8 @@ namespace cellular::internal
         void initSMSSendHandler();
         void initTetheringHandler();
         void initModemResetHandler();
+        void initCSQHandler();
+
         /** Send SMS action used by the SMSSendHandler
          * \param record SMS record to send
          */

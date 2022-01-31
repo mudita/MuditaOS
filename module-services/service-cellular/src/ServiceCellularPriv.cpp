@@ -6,6 +6,7 @@
 #include "SMSPartsHandler.hpp"
 
 #include <service-cellular-api>
+#include <service-cellular/Constans.hpp>
 
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -14,8 +15,11 @@
 #include <service-time/Constants.hpp>
 #include <queries/messages/sms/QuerySMSUpdate.hpp>
 
+#include <service-antenna/AntennaServiceAPI.hpp>
+
 #include <at/ATFactory.hpp>
 #include <at/cmd/QCFGUsbnet.hpp>
+#include <at/cmd/CSQ.hpp>
 #include <ucs2/UCS2.hpp>
 #include <service-appmgr/Constants.hpp>
 
@@ -30,8 +34,8 @@ namespace cellular::internal
         : owner{owner}, simCard{std::make_unique<SimCard>()}, state{std::make_unique<State>(owner)},
           networkTime{std::make_unique<NetworkTime>()}, simContacts{std::make_unique<SimContacts>()},
           imeiGetHandler{std::make_unique<service::ImeiGetHandler>()},
-          tetheringHandler{std::make_unique<TetheringHandler>()}, modemResetHandler{
-                                                                      std::make_unique<ModemResetHandler>()}
+          tetheringHandler{std::make_unique<TetheringHandler>()},
+          modemResetHandler{std::make_unique<ModemResetHandler>()}, csqHandler{std::make_unique<CSQHandler>()}
     {
         initSimCard();
         initSMSSendHandler();
@@ -389,5 +393,103 @@ namespace cellular::internal
             }
             return false;
         };
+    }
+
+    void ServiceCellularPriv::initCSQHandler()
+    {
+        csqHandler->onEnableCsqReporting = [this]() {
+            constexpr auto cpuSentinelTimeout = 2000;
+            auto handle                       = owner->getTaskHandle();
+            if (owner->cpuSentinel) {
+                owner->cpuSentinel->HoldMinimumFrequencyAndWait(
+                    bsp::CpuFrequencyMHz::Level_4, handle, cpuSentinelTimeout);
+            }
+
+            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+            if (channel) {
+                auto result = channel->cmd(at::AT::CSQ_URC_ON);
+                if (result) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        csqHandler->onDisableCsqReporting = [this]() {
+            constexpr auto cpuSentinelTimeout = 2000;
+            auto handle                       = owner->getTaskHandle();
+            if (owner->cpuSentinel) {
+                owner->cpuSentinel->HoldMinimumFrequencyAndWait(
+                    bsp::CpuFrequencyMHz::Level_4, handle, cpuSentinelTimeout);
+            }
+
+            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+            if (channel) {
+                auto result = channel->cmd(at::AT::CSQ_URC_OFF);
+                if (result) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        csqHandler->onGetCsq = [this]() -> std::optional<at::result::CSQ> {
+            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+            if (!channel) {
+                return std::nullopt;
+            }
+            auto command  = at::cmd::CSQ();
+            auto response = channel->cmd(command);
+            if (response.code == at::Result::Code::OK) {
+                auto result = command.parseCSQ(response);
+                if (result) {
+                    return result;
+                }
+            }
+            return std::nullopt;
+        };
+
+        csqHandler->onPropagateCSQ = [this](uint32_t csq) {
+            SignalStrength signalStrength(static_cast<int>(csq));
+            Store::GSM::get()->setSignalStrength(signalStrength.data);
+            auto message = std::make_shared<CellularSignalStrengthUpdateNotification>("");
+            owner->bus.sendMulticast(message, sys::BusChannel::ServiceCellularNotifications);
+        };
+
+        csqHandler->onInvalidCSQ = [this]() { AntennaServiceAPI::InvalidCSQNotification(owner); };
+
+        csqHandler->onRetrySwitchMode = [this](bool isSwitchToPollMode) {
+            owner->bus.sendUnicast(std::make_shared<RetrySwitchCSQMode>(isSwitchToPollMode), ::service::name::cellular);
+        };
+
+        csqHandler->onRetryGetCSQ = [this]() {
+            owner->bus.sendUnicast(std::make_shared<RetryGetCSQ>(), ::service::name::cellular);
+        };
+
+        owner->csqTimer.start();
+    }
+
+    void ServiceCellularPriv::connectCSQHandler()
+    {
+        owner->connect(typeid(URCCounterMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto message = dynamic_cast<cellular::URCCounterMessage *>(request);
+            csqHandler->handleURCCounterMessage(message->getCounter());
+            return sys::MessageNone{};
+        });
+
+        owner->connect(typeid(RetrySwitchCSQMode), [&](sys::Message *request) -> sys::MessagePointer {
+            auto message = dynamic_cast<cellular::RetrySwitchCSQMode *>(request);
+            if (message->isSwitchToPollMode()) {
+                csqHandler->switchToPollMode();
+                return sys::MessageNone{};
+            }
+            csqHandler->switchToReportMode();
+            return sys::MessageNone{};
+        });
+
+        owner->connect(typeid(RetryGetCSQ), [&](sys::Message *request) -> sys::MessagePointer {
+            csqHandler->getCSQ();
+            return sys::MessageNone{};
+        });
     }
 } // namespace cellular::internal

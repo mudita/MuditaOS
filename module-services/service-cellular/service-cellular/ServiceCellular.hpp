@@ -10,6 +10,7 @@
 #include "PacketDataCellularMessage.hpp"
 #include "src/CallManager.hpp"
 #include <service-cellular/connection-manager/ConnectionManager.hpp>
+#include "src/URCCounter.hpp"
 
 #include <modem/ATURCStream.hpp>
 #include <modem/mux/DLCChannel.h>
@@ -113,6 +114,7 @@ class ServiceCellular : public sys::Service
     sys::TimerHandle stateTimer;
     sys::TimerHandle ussdTimer;
     sys::TimerHandle simTimer;
+    sys::TimerHandle csqTimer;
 
     // used to enter modem sleep mode
     sys::TimerHandle sleepTimer;
@@ -140,6 +142,8 @@ class ServiceCellular : public sys::Service
     std::vector<CalllogRecord> tetheringCalllog;
 
     ussd::State ussdState = ussd::State::none;
+
+    cellular::service::URCCounter csqCounter;
 
     bool nextPowerStateChangeAwaiting = false;
 

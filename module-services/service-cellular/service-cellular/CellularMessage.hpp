@@ -1018,4 +1018,38 @@ namespace cellular
       public:
         RetryPhoneModeChangeRequest() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
     };
+
+    class URCCounterMessage : public sys::DataMessage
+    {
+      public:
+        explicit URCCounterMessage(const uint32_t urcCounter)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), urcCounter(urcCounter){};
+        auto getCounter()
+        {
+            return urcCounter;
+        }
+
+      private:
+        uint32_t urcCounter;
+    };
+
+    class RetrySwitchCSQMode : public sys::DataMessage
+    {
+      public:
+        explicit RetrySwitchCSQMode(bool switchToPollMode)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), switchToPollMode(switchToPollMode){};
+        auto isSwitchToPollMode()
+        {
+            return switchToPollMode;
+        };
+
+      private:
+        bool switchToPollMode = false;
+    };
+
+    class RetryGetCSQ : public sys::DataMessage
+    {
+      public:
+        RetryGetCSQ() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
 } // namespace cellular

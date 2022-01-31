@@ -40,6 +40,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/QNWINFO.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/QSIMSTAT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/QCFGUsbnet.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/CSQ.cpp
         )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

@@ -13,6 +13,8 @@ set(SOURCES
     src/ImeiGetHandler.cpp
     src/TerhetingHandler.cpp
     src/ModemResetHandler.cpp
+    src/URCCounter.cpp
+    src/CSQHandler.cpp
 
     CellularCall.cpp
     CellularServiceAPI.cpp
