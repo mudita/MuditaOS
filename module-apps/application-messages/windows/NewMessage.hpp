@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -42,6 +42,7 @@ namespace gui
         gui::VBox *body      = nullptr;
         std::shared_ptr<ContactRecord> contact;
         utils::PhoneNumber::View phoneNumber;
+        unsigned int selectedNumber = 0;
 
         /// MessageMemento class provides buffer-like functionality for message field of NewMessageWindow.
         /// MessageMemento shall be used whenever there is a need for temporary window switch in normal (uninterrupted)

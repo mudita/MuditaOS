@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -54,6 +54,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>,
     auto getLastRequestedOffset() -> std::uint32_t;
     auto getLabelMarkerDisplayMode(uint32_t posOnList) -> LabelMarkerDisplayMode;
 
+    void activateContactSelectCallback();
     // onClick callback to register
-    std::function<bool(gui::PhonebookItem *item)> messagesSelectCallback = nullptr;
+    std::function<bool(gui::PhonebookItem *item)> contactSelectCallback = nullptr;
 };

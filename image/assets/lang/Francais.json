@@ -521,6 +521,8 @@
   "app_phonebook_new_add_to_ice": "Ajouter aux contacts d'urgence",
   "app_phonebook_check": "COCHER",
   "app_phonebook_uncheck": "DÉCOCHER",
+  "app_phonebook_multiple_numbers_first": "Numéro",
+  "app_phonebook_multiple_numbers_second": "Second numéro",
   "app_meditation_title_main": "Minuterie de méditation",
   "app_meditation_preparation_time": "Temps de préparation",
   "app_meditation_put_down_phone_and_wait": "<text>Posez le téléphone<br>et attendez le son du gong.</text>",

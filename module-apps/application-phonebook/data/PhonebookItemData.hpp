@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -61,11 +61,24 @@ class PhonebookSearchRequest : public gui::SwitchData
   public:
     std::string request                                 = "";
     std::shared_ptr<std::vector<ContactRecord>> results = nullptr;
+    unsigned int selectedNumber                         = 0;
+
     PhonebookSearchRequest(std::string request, std::shared_ptr<std::vector<ContactRecord>> results)
         : request(std::move(request)), results(std::move(results))
     {}
     PhonebookSearchRequest()              = default;
     std::shared_ptr<ContactRecord> result = nullptr;
+};
+
+class PhonebookMultipleNumbersRequest : public gui::SwitchData
+{
+  public:
+    std::string request                   = "";
+    std::shared_ptr<ContactRecord> record = nullptr;
+
+    PhonebookMultipleNumbersRequest(std::string request, std::shared_ptr<ContactRecord> result)
+        : request(std::move(request)), record(std::move(result))
+    {}
 };
 
 class PhonebookInputOptionData : public gui::SwitchData

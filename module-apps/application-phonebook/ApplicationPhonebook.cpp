@@ -1,15 +1,17 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "models/PhonebookModel.hpp"
+#include "models/MultipleNumbersModel.hpp"
 #include "windows/PhonebookContactDetails.hpp"
 #include "windows/PhonebookContactOptions.hpp"
 #include "windows/PhonebookMainWindow.hpp"
 #include "windows/PhonebookNewContact.hpp"
 #include "windows/PhonebookNamecardOptions.hpp"
+#include "windows/PhonebookMultipleNumbersSelect.hpp"
 #include "windows/PhonebookSearch.hpp"
 #include "windows/PhonebookSearchResults.hpp"
 #include "windows/PhonebookIceContacts.hpp"
@@ -99,6 +101,11 @@ namespace app
         windowsFactory.attach(gui::window::name::contact, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookContactDetails>(app);
         });
+        windowsFactory.attach(
+            gui::window::name::multiple_numbers_select, [](ApplicationCommon *app, const std::string &name) {
+                auto numbersModel = std::make_shared<MultipleNumbersModel>(app);
+                return std::make_unique<gui::PhonebookMultipleNumbersSelect>(app, std::move(numbersModel));
+            });
         windowsFactory.attach(gui::window::name::search, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookSearch>(app);
         });
@@ -155,13 +162,7 @@ namespace app
         }
         if (phonebookModel->requestRecordsCount() > 0) {
             if (searchRequestModel->requestedSearch()) {
-                phonebookModel->messagesSelectCallback = [=](gui::PhonebookItem *item) {
-                    std::unique_ptr<PhonebookSearchRequest> data = std::make_unique<PhonebookSearchRequest>();
-                    data->result                                 = item->contact;
-                    data->setDescription("PhonebookSearchRequest");
-                    return app::manager::Controller::switchBack(
-                        this, std::make_unique<app::manager::SwitchBackRequest>(GetName(), std::move(data)));
-                };
+                phonebookModel->activateContactSelectCallback();
             }
             LOG_DEBUG("Switching to search results window.");
             auto data = std::make_unique<PhonebookSearchResultsData>(std::move(phonebookModel));

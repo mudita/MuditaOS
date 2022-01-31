@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,17 +10,18 @@
 
 namespace gui::window::name
 {
-    inline constexpr auto contact                = "Contact";
-    inline constexpr auto contact_options        = "Options";
-    inline constexpr auto namecard_options       = "Namecard Options";
-    inline constexpr auto input_options          = "Input Options";
-    inline constexpr auto new_contact            = "New";
-    inline constexpr auto search                 = "Search";
-    inline constexpr auto search_results         = "SearchResults";
-    inline constexpr auto dialog_yes_no          = "DialogYesNo";
-    inline constexpr auto dialog                 = "Dialog";
-    inline constexpr auto dialog_yes_no_icon_txt = "DialogYesNoIconTxt";
-    inline constexpr auto ice_contacts           = "IceContacts";
+    inline constexpr auto contact                 = "Contact";
+    inline constexpr auto contact_options         = "Options";
+    inline constexpr auto namecard_options        = "Namecard Options";
+    inline constexpr auto input_options           = "Input Options";
+    inline constexpr auto new_contact             = "New";
+    inline constexpr auto search                  = "Search";
+    inline constexpr auto multiple_numbers_select = "SelectNumber";
+    inline constexpr auto search_results          = "SearchResults";
+    inline constexpr auto dialog_yes_no           = "DialogYesNo";
+    inline constexpr auto dialog                  = "Dialog";
+    inline constexpr auto dialog_yes_no_icon_txt  = "DialogYesNoIconTxt";
+    inline constexpr auto ice_contacts            = "IceContacts";
 
 } // namespace gui::window::name
 

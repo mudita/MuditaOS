@@ -74,7 +74,7 @@ namespace gui
         setTitle(utils::translate("common_results_prefix") + "\"" + searchResultsModel->getFilter() + "\"");
         searchResultList->setProvider(searchResultsModel);
 
-        if (searchResultsModel->messagesSelectCallback) {
+        if (searchResultsModel->contactSelectCallback) {
             navBar->setActive(nav_bar::Side::Left, false);
             navBar->setText(nav_bar::Side::Left, "");
             navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
