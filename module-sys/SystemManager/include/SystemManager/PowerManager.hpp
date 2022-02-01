@@ -25,7 +25,7 @@ namespace sys
 
       private:
         std::string levelName;
-        TickType_t totalTicksCount{0};
+        std::uint64_t totalTicksCount{0};
     };
 
     class PowerManager
