@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/EVMessages.hpp"
@@ -169,8 +169,6 @@ void WorkerEventCommon::init(std::shared_ptr<settings::Settings> settings)
 bool WorkerEventCommon::deinit(void)
 {
     Worker::deinit();
-
-    deinitProductHardware();
 
     keyInput->deinit();
     batteryController->deinit();
