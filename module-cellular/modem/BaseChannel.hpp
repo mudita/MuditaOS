@@ -33,7 +33,7 @@ namespace at
         virtual void cmdLog(std::string cmd, const Result &result, std::chrono::milliseconds timeout)
         {}
         virtual void cmdInit()                                                               = 0;
-        virtual int cmdSend(std::string cmd)                                                 = 0;
+        virtual void cmdSend(std::string cmd)                                                = 0;
         virtual size_t cmdReceive(std::uint8_t *buffer, std::chrono::milliseconds timeoutMs) = 0;
         virtual void cmdPost()                                                               = 0;
         /// }
