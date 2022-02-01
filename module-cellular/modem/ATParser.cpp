@@ -111,9 +111,9 @@ void ATParser::cmdInit()
     urcBuffer.erase();
 }
 
-int ATParser::cmdSend(std::string cmd)
+void ATParser::cmdSend(std::string cmd)
 {
-    return cellular->write(const_cast<char *>(cmd.c_str()), cmd.size());
+    cellular->write(const_cast<char *>(cmd.c_str()), cmd.size());
 }
 
 size_t ATParser::cmdReceive(std::uint8_t *buffer, std::chrono::milliseconds timeout = 0ms)

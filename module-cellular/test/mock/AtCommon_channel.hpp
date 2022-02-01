@@ -35,10 +35,8 @@ namespace at
         void cmdInit() override
         {}
 
-        int cmdSend(std::string cmd) override
-        {
-            return -1;
-        }
+        void cmdSend(std::string cmd) override
+        {}
 
         void cmdPost() override
         {}
