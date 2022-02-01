@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -44,7 +44,6 @@ class WorkerEventCommon : public sys::Worker
   protected:
     virtual void addProductQueues(std::list<sys::WorkerQueueInfo> &queueList);
     virtual void initProductHardware();
-    virtual void deinitProductHardware();
 
     virtual void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code);
 
@@ -88,6 +87,7 @@ class WorkerEventCommon : public sys::Worker
     explicit WorkerEventCommon(sys::Service *service);
 
     void init(std::shared_ptr<settings::Settings> settings);
+    virtual void deinitProductHardware();
     virtual bool deinit() override;
 
     /**

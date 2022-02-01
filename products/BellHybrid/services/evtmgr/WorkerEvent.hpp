@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,11 +11,11 @@ namespace bell
     {
       public:
         explicit WorkerEvent(sys::Service *service);
+        void deinitProductHardware() final;
 
       private:
         void addProductQueues(std::list<sys::WorkerQueueInfo> &queuesList) final;
         void initProductHardware() final;
-        void deinitProductHardware() final;
         void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code) final;
         bool handleMessage(std::uint32_t queueID) override;
         static constexpr auto rotaryEncoderQueueSize = 64U;
