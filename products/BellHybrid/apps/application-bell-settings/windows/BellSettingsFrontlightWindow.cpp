@@ -38,7 +38,10 @@ namespace gui
         listView->setEdges(RectangleEdge::None);
 
         listView->rebuildList(listview::RebuildType::Full);
+    }
 
+    void BellSettingsFrontlightWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
         setFocusItem(listView);
     }
 

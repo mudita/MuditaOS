@@ -23,6 +23,7 @@ namespace gui
         static constexpr auto top_margin = 41;
 
         void buildInterface() override;
+        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
 
         ListView *list{};
         std::shared_ptr<app::bell_settings::AboutYourBellWindowContract::Presenter> presenter;

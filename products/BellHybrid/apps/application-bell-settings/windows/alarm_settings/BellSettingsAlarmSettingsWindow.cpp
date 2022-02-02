@@ -43,8 +43,6 @@ namespace gui
         sidelistview->rebuildList(listview::RebuildType::Full);
 
         presenter->loadData();
-
-        setFocusItem(sidelistview);
     }
 
     bool BellSettingsAlarmSettingsWindow::onInput(const gui::InputEvent &inputEvent)
@@ -78,6 +76,11 @@ namespace gui
                 presenter->exitWithRollback();
             }
         }
+    }
+
+    void BellSettingsAlarmSettingsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
+        setFocusItem(sidelistview);
     }
 
 } /* namespace gui */

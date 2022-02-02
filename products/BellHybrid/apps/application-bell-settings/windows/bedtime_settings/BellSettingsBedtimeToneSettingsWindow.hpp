@@ -22,6 +22,7 @@ namespace gui
             std::unique_ptr<app::bell_settings::AlarmSettingsWindowContract::Presenter> presenter);
 
         void buildInterface() override;
+        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         void onClose(CloseReason reason) override;
         bool onInput(const InputEvent &inputEvent) override;
         void rebuild() override;

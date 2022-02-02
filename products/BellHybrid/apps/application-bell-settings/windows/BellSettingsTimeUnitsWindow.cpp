@@ -50,7 +50,10 @@ namespace gui
         sidelistview->rebuildList(listview::RebuildType::Full);
 
         presenter->loadData();
+    }
 
+    void BellSettingsTimeUnitsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
         setFocusItem(sidelistview);
     }
 

@@ -45,6 +45,11 @@ namespace gui
         setFocusItem(sidelistview);
     }
 
+    void BellSettingsBedtimeToneSettingsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
+        setFocusItem(sidelistview);
+    }
+
     bool BellSettingsBedtimeToneSettingsWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (sidelistview->onInput(inputEvent)) {

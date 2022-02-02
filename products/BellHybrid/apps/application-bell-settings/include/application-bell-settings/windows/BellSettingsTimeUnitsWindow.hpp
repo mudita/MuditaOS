@@ -22,6 +22,7 @@ namespace gui
             std::string name = gui::window::name::bellSettingsTimeUnits);
 
         void buildInterface() override;
+        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void rebuild() override;
 

@@ -37,7 +37,10 @@ namespace gui
         listView->rebuildList(listview::RebuildType::Full);
 
         presenter->loadData();
+    }
 
+    void BellSettingsAlarmSettingsSnoozeWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
         setFocusItem(listView);
     }
 

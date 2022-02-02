@@ -48,8 +48,12 @@ namespace gui
         body->getCenterBox()->addWidget(spinner);
         body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
 
-        setFocusItem(spinner);
         body->resize();
+    }
+
+    void BellSettingsLanguageWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
+        setFocusItem(spinner);
     }
 
     bool BellSettingsLanguageWindow::onInput(const InputEvent &inputEvent)

@@ -35,7 +35,11 @@ namespace gui
                             listview::ScrollBarType::Fixed);
         list->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        setFocusItem(list);
         list->rebuildList();
+    }
+
+    void AboutYourBellWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
+        setFocusItem(list);
     }
 } // namespace gui
