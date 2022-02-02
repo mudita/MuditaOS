@@ -36,8 +36,12 @@ namespace gui
 
     void PhonebookMultipleNumbersSelect::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        if (data == nullptr) {
+            application->switchWindow(name::window::main_window);
+            return;
+        }
+
         auto numberSelectData = dynamic_cast<PhonebookMultipleNumbersRequest *>(data);
-        assert(numberSelectData);
 
         setTitle(numberSelectData->record->getFormattedName());
         numberModel->createData(numberSelectData->record);
