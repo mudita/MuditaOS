@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapProgressPresenter.hpp"
@@ -83,7 +83,11 @@ namespace app::powernap
             return;
         }
         if (alarmLightOnOffModel->getValue()) {
-            frontLightModel.revertUnsavedChanges();
+            const auto modeAutoStr = utils::translate("app_bell_settings_frontlight_mode_auto");
+            frontLightModel.setMode(frontLightModel.getModeModel().getValue() == modeAutoStr
+                                        ? screen_light_control::ScreenLightMode::Automatic
+                                        : screen_light_control::ScreenLightMode::Manual);
+            frontLightModel.setBrightness(frontLightModel.getBrightnessModel().getValue());
             frontLightModel.setStatus(true);
         }
 
