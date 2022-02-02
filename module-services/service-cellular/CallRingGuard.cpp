@@ -4,9 +4,12 @@
 #include "CallRingGuard.hpp"
 #include "service-cellular/CellularCall.hpp"
 
-bool callRingGuard(CellularCall::CellularCall &call)
+bool callRingGuard(CellularCall::Call &call)
 {
-    return call.mode == sys::phone_modes::PhoneMode::Connected ||
-           (call.mode == sys::phone_modes::PhoneMode::DoNotDisturb && call.operations.areCallsFromFavouritesEnabled() &&
-            call.operations.isNumberInFavourites());
+    return call.mode == sys::phone_modes::PhoneMode::Connected;
+}
+
+bool callClipGuard(CellularCall::Call &call)
+{
+    return call.mode == sys::phone_modes::PhoneMode::DoNotDisturb && call.operations.areCallsFromFavouritesEnabled() && call.operations.isNumberInFavourites();
 }

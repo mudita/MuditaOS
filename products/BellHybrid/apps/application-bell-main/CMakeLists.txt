@@ -33,7 +33,6 @@ target_sources(application-bell-main
 
         presenters/HomeScreenPresenter.hpp
         presenters/StateController.hpp
-        presenters/StateControllerLogger.hpp
 
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
@@ -68,4 +67,6 @@ target_link_libraries(application-bell-main
         ${TARGET_LIBRARIES}
     PUBLIC
         bell::app-common
+        sml::sml
+        sml::utils::logger
 )

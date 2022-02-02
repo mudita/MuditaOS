@@ -4,6 +4,7 @@
 #pragma once
 
 #include "CallAudio.hpp"
+#include "CallGUI.hpp"
 #include "PhoneModes/PhoneMode.hpp"
 #include <Interface/CalllogRecord.hpp>
 #include <SystemManager/CpuSentinel.hpp>
@@ -30,7 +31,7 @@ namespace CellularCall
         True
     };
 
-    class CellularCall
+    class Call
     {
         CalllogRecord call;
         bool isActiveCall = false;
@@ -59,6 +60,7 @@ namespace CellularCall
 
         ServiceCellular &owner;
         CallRingAudio audio;
+        CallGUI gui;
 
       public:
         void setMode(sys::phone_modes::PhoneMode mode)
@@ -67,13 +69,14 @@ namespace CellularCall
         }
 
         mutable sys::phone_modes::PhoneMode mode;
-        CellularCall(ServiceCellular &owner);
+        explicit Call(ServiceCellular &owner);
 
         void setStartCallAction(const std::function<CalllogRecord(const CalllogRecord &rec)> callAction)
         {
             startCallAction = callAction;
         }
 
+        void ongoingCallShowUI();
         void setEndCallAction(const std::function<bool(const CalllogRecord &rec)> callAction)
         {
             endCallAction = callAction;
@@ -81,7 +84,11 @@ namespace CellularCall
 
         bool setActive();
         void setNumber(const utils::PhoneNumber::View &number);
+        bool ringAudioOnClip();
 
+        bool startOutgoing(const utils::PhoneNumber::View &number);
+        bool handleRING();
+        bool handleCLIP(const utils::PhoneNumber::View &number);
         bool startCall(const utils::PhoneNumber::View &number, const CallType type);
         bool endCall(Forced forced = Forced::False);
 
@@ -108,9 +115,9 @@ namespace CellularCall
             bool isNumberInFavourites();
 
           private:
-            friend CellularCall;
-            CellularCall &owner;
-            explicit Operations(CellularCall &owner) : owner(owner)
+            friend Call;
+            Call &owner;
+            explicit Operations(Call &owner) : owner(owner)
             {}
         };
         Operations operations = Operations(*this);

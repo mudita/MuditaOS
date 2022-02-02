@@ -29,8 +29,9 @@ namespace sys
 
     class async_fail : public std::runtime_error
     {
-        public: 
-            async_fail() : runtime_error("async failure") {}
+      public:
+        async_fail() : runtime_error("async failure")
+        {}
     };
 
     template <typename Request, typename Response> struct Async // : public with_timer
@@ -48,18 +49,19 @@ namespace sys
             return m->state;
         }
 
-        Response& getResult()
+        Response &getResult()
         {
             return *m->result;
         }
 
-        Request& getRequest()
+        Request &getRequest()
         {
             return *m->request;
         }
 
         static_assert(std::is_base_of<sys::Message, Request>::value, "Request has to be based on system message");
-        static_assert(std::is_base_of<sys::ResponseMessage, Response>::value, "Response has to be based on system response message");
+        static_assert(std::is_base_of<sys::ResponseMessage, Response>::value,
+                      "Response has to be based on system response message");
         explicit operator bool()
         {
             return m->state == State::Done;
@@ -67,8 +69,12 @@ namespace sys
 
       private:
         friend sys::Service;
-        void setState(State state) { this->m->state=state;}
-        struct M {
+        void setState(State state)
+        {
+            this->m->state = state;
+        }
+        struct M
+        {
             State state = State::Pending;
             std::shared_ptr<Request> request;
             std::shared_ptr<Response> result;
@@ -149,18 +155,19 @@ namespace sys
         template <typename Request, typename Response, typename... Arg>
         Async<Request, Response> async_call(std::string whom, Arg... arg)
         {
-            static_assert(std::is_base_of<sys::ResponseMessage, Response>::value, "Response has to be based on system message");
-            Async<Request,Response> p;
+            static_assert(std::is_base_of<sys::ResponseMessage, Response>::value,
+                          "Response has to be based on system message");
+            Async<Request, Response> p;
             auto request = std::make_shared<Request>(arg...);
             if (isConnected(std::type_index(typeid(Response)))) {
-                p.setState(Async<Request,Response>::State::Error);
+                p.setState(Async<Request, Response>::State::Error);
                 throw async_fail();
             }
-            auto meta = p.m;
-            meta->request = request;
+            auto meta                                    = p.m;
+            meta->request                                = request;
             std::function<MessagePointer(Message *)> foo = [this, meta](Message *m) {
                 auto &response = dynamic_cast<Response &>(*m);
-                meta->state = Async<Request,Response>::State::Done;
+                meta->state    = Async<Request, Response>::State::Done;
                 // this is counter productive - but this is what needs to be done here
                 meta->result = std::make_shared<Response>(response);
                 disconnect(typeid(Response));
@@ -176,23 +183,24 @@ namespace sys
             return p;
         }
 
-        template <typename Request,typename Response>
-        void sync(Async<Request,Response> &p, std::uint32_t timeout=std::numeric_limits<std::uint32_t>::max())
+        template <typename Request, typename Response>
+        void sync(Async<Request, Response> &p, std::uint32_t timeout = std::numeric_limits<std::uint32_t>::max())
         {
-            static_assert(std::is_base_of<sys::ResponseMessage, Response>::value, "Response has to be based on system message");
+            static_assert(std::is_base_of<sys::ResponseMessage, Response>::value,
+                          "Response has to be based on system message");
             if (p.m->request == nullptr) {
                 throw async_fail();
             }
-            if (p.getState() !=  Async<Request,Response>::State::Pending) {
+            if (p.getState() != Async<Request, Response>::State::Pending) {
                 return;
             }
             auto val = bus.unicastSync(p.m->request, this, timeout);
             if (val.first != sys::ReturnCodes::Success) {
-                val.first == sys::ReturnCodes::Timeout ? p.setState(Async<Request,Response>::State::TimedOut):
-                                                         p.setState(Async<Request,Response>::State::Error);
+                val.first == sys::ReturnCodes::Timeout ? p.setState(Async<Request, Response>::State::TimedOut)
+                                                       : p.setState(Async<Request, Response>::State::Error);
                 return;
             }
-            this->HandleResponse(dynamic_cast<sys::ResponseMessage*>(val.second.get()));
+            this->HandleResponse(dynamic_cast<sys::ResponseMessage *>(val.second.get()));
         }
 
         void sendCloseReadyMessage(Service *service);

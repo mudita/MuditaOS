@@ -24,7 +24,7 @@ namespace sys
         return ret;
     }
 
-    SendResult BusProxy::unicastSync(std::shared_ptr<Message> message, sys::Service*whose,  std::uint32_t timeout)
+    SendResult BusProxy::unicastSync(std::shared_ptr<Message> message, sys::Service *whose, std::uint32_t timeout)
     {
         auto ret = busImpl->UnicastSync(message, whose, timeout);
         if (ret.first != ReturnCodes::Failure) {

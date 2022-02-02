@@ -43,7 +43,6 @@
 #include <Utility.hpp>
 #include <at/cmd/CLCC.hpp>
 #include <at/cmd/CFUN.hpp>
-#include <at/UrcClip.hpp>
 #include <at/UrcCmti.hpp>
 #include <at/UrcCreg.hpp>
 #include <at/UrcCtze.hpp>
@@ -1925,25 +1924,23 @@ auto ServiceCellular::handleDBNotificationMessage(db::NotificationMessage *msg) 
 auto ServiceCellular::handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
-    return std::make_shared<CellularResponseMessage>(ongoingCall.startCall(msg->number, CallType::CT_OUTGOING));
+    return std::make_shared<CellularResponseMessage>(ongoingCall.startOutgoing(msg->number));
 }
 
 auto ServiceCellular::handleCellularIncomingCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
     auto ret     = true;
-    auto message = static_cast<CellularIncominCallMessage *>(msg);
-
-    if (!ongoingCall.isValid()) {
-        ret = ongoingCall.startCall(message->number, CallType::CT_INCOMING);
-    }
     return std::make_shared<CellularResponseMessage>(ret);
 }
 
 auto ServiceCellular::handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto message = static_cast<CellularCallerIdMessage *>(msg);
-    ongoingCall.setNumber(message->number);
+    if ( not ongoingCall.handleCLIP(message->number) ) {
+        CellularServiceAPI::DismissCall(this, phoneModeObserver->getCurrentPhoneMode() == sys::phone_modes::PhoneMode::DoNotDisturb);
+    }
+
     return sys::MessageNone{};
 }
 
@@ -2207,6 +2204,7 @@ auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::
     if (phoneModeObserver->isTetheringOn() || connectionManager->forceDismissCalls()) {
         return std::make_shared<CellularResponseMessage>(hangUpCall());
     }
+    ongoingCall.handleRING();
 
     /// NOTE: the code below should be investigated as there is something weird in this flow
     if (!callManager.isIncomingCallPropagated()) {
@@ -2222,6 +2220,7 @@ auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> s
     if (connectionManager->forceDismissCalls()) {
         return std::make_shared<CellularResponseMessage>(hangUpCall());
     }
+
 
     auto message = static_cast<CellularCallerIdNotification *>(msg);
     if (phoneModeObserver->isTetheringOn()) {

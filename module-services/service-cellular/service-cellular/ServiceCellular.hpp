@@ -140,7 +140,7 @@ class ServiceCellular : public sys::Service
 
     std::vector<std::string> messageParts;
 
-    CellularCall::CellularCall ongoingCall = CellularCall::CellularCall(*this);
+    CellularCall::Call ongoingCall = CellularCall::Call(*this);
     std::vector<CalllogRecord> tetheringCalllog;
 
     ussd::State ussdState = ussd::State::none;

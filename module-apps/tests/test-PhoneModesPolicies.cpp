@@ -144,5 +144,4 @@ TEST_CASE("Offline Mode notifications - calls policy test")
     callPolicy.updateCurrentCall(sys::phone_modes::PhoneMode::Offline);
     REQUIRE(!callPolicy.isPopupAllowed());
     REQUIRE(!callPolicy.isRingtoneAllowed());
-    REQUIRE(!callPolicy.isDismissedCallNotificationAllowed());
 }
