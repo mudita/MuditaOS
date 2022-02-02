@@ -1,8 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "application-bell-main/presenters/HomeScreenPresenter.hpp"
+#include "models/TemperatureModel.hpp"
 #include "StateController.hpp"
-#include "HomeScreenPresenter.hpp"
 
 #include <common/TimeUtils.hpp>
 #include <common/models/TimeModel.hpp>
@@ -142,7 +143,6 @@ namespace app::home_screen
                 alarmModel.update([&]() { presenter.handleAlarmModelReady(); });
                 view.setAlarmEdit(false);
                 view.setAlarmActive(false);
-                view.setHeaderViewMode(HeaderViewMode::Empty);
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setBatteryLevelState(batteryModel.getLevelState());
             };
@@ -157,7 +157,7 @@ namespace app::home_screen
                 controller.snooze(false);
                 view.setAlarmEdit(false);
                 view.setAlarmActive(false);
-                view.setHeaderViewMode(HeaderViewMode::Empty);
+                view.setViewState(ViewState::Deactivated);
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setBatteryLevelState(batteryModel.getLevelState());
             };
@@ -170,9 +170,12 @@ namespace app::home_screen
                 presenter.spawnTimer();
                 view.setBottomDescription(utils::translate("app_bell_alarm_deactivated"));
                 view.setAlarmActive(false);
-                view.setHeaderViewMode(HeaderViewMode::AlarmIcon);
+                view.setViewState(ViewState::DeactivatedWait);
             };
-            auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
+            auto exit = [](AbstractView &view, AbstractPresenter &presenter) {
+                presenter.detachTimer();
+                view.removeBottomDescription();
+            };
         } // namespace DeactivatedWait
 
         namespace AlarmEdit
@@ -180,7 +183,7 @@ namespace app::home_screen
             auto entry =
                 [](AbstractView &view, AbstractPresenter &presenter, AbstractTemperatureModel &temperatureModel) {
                     view.setAlarmEdit(true);
-                    view.setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+                    view.setViewState(ViewState::AlarmEdit);
                     view.setTemperature(temperatureModel.getTemperature());
                 };
             auto exit = [](AbstractView &view, AbstractPresenter &presenter) {
@@ -204,12 +207,14 @@ namespace app::home_screen
             auto entry = [](AbstractView &view, AbstractPresenter &presenter) {
                 presenter.spawnTimer();
                 view.setBottomDescription(utils::translate("app_bellmain_home_screen_bottom_desc_dp"));
+                view.setViewState(ViewState::WaitForConfirmation);
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
 
             auto action = [](AbstractView &view) {
                 view.setAlarmEdit(false);
                 view.setAlarmActive(true);
+                view.removeBottomDescription();
             };
         } // namespace WaitForConfirmation
 
@@ -224,9 +229,12 @@ namespace app::home_screen
                 view.setBottomDescription(utils::time::getBottomDescription(
                     utils::time::calculateMinutesDifference(view.getAlarmTime(), timeModel.getCurrentTime())));
                 view.setAlarmActive(true);
-                view.setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+                view.setViewState(ViewState::ActivatedWait);
             };
-            auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
+            auto exit = [](AbstractView &view, AbstractPresenter &presenter) {
+                presenter.detachTimer();
+                view.removeBottomDescription();
+            };
         } // namespace ActivatedWait
 
         namespace Activated
@@ -239,7 +247,7 @@ namespace app::home_screen
                 controller.snooze(false);
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setAlarmActive(true);
-                view.setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+                view.setViewState(ViewState::Activated);
                 view.setAlarmTime(alarmModel.getAlarmTime());
                 view.setBatteryLevelState(batteryModel.getLevelState());
             };
@@ -250,7 +258,7 @@ namespace app::home_screen
             auto entry =
                 [](AbstractView &view, AbstractTemperatureModel &temperatureModel, AbstractPresenter &presenter) {
                     presenter.spawnTimer(defaultAlarmRingingTime);
-                    view.setHeaderViewMode(HeaderViewMode::AlarmIcon);
+                    view.setViewState(ViewState::AlarmRinging);
                     view.setAlarmTriggered();
                     view.setTemperature(temperatureModel.getTemperature());
                 };
@@ -263,11 +271,14 @@ namespace app::home_screen
                 presenter.spawnTimer();
                 alarmModel.turnOff();
                 alarmModel.activate(false);
-                view.setHeaderViewMode(HeaderViewMode::AlarmIcon);
+                view.setViewState(ViewState::AlarmRingingDeactivatedWait);
                 view.setBottomDescription(Helpers::getGreeting());
                 view.setAlarmActive(false);
             };
-            auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
+            auto exit = [](AbstractView &view, AbstractPresenter &presenter) {
+                presenter.detachTimer();
+                view.removeBottomDescription();
+            };
         } // namespace AlarmRingingDeactivatedWait
 
         namespace AlarmSnoozedWait
@@ -275,12 +286,15 @@ namespace app::home_screen
             auto entry = [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractPresenter &presenter) {
                 presenter.spawnTimer();
                 alarmModel.snooze();
-                view.setHeaderViewMode(HeaderViewMode::SnoozeIcon);
+                view.setViewState(ViewState::AlarmSnoozedWait);
                 const auto bottomDescription =
                     utils::time::getBottomDescription(alarmModel.getSnoozeDuration().count());
                 view.setBottomDescription(bottomDescription);
             };
-            auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
+            auto exit = [](AbstractView &view, AbstractPresenter &presenter) {
+                presenter.detachTimer();
+                view.removeBottomDescription();
+            };
         } // namespace AlarmSnoozedWait
 
         namespace AlarmSnoozed
@@ -289,7 +303,7 @@ namespace app::home_screen
                             AbstractAlarmModel &alarmModel,
                             AbstractTemperatureModel &temperatureModel,
                             AbstractBatteryModel &batteryModel) {
-                view.setHeaderViewMode(HeaderViewMode::SnoozeIconAndTime);
+                view.setViewState(ViewState::AlarmSnoozed);
                 view.setSnoozeTime(Clock::to_time_t(alarmModel.getTimeOfNextSnooze()));
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setBatteryLevelState(batteryModel.getLevelState());

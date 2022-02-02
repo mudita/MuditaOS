@@ -3,9 +3,6 @@
 
 #pragma once
 
-#include "models/TemperatureModel.hpp"
-#include "widgets/ProgressTimerWithSnoozeTimer.hpp"
-
 #include <apps-common/BasePresenter.hpp>
 #include <common/models/AbstractAlarmModel.hpp>
 #include <gui/input/InputEvent.hpp>
@@ -22,12 +19,15 @@ namespace app
 {
     class AbstractTimeModel;
     class ApplicationCommon;
+    class TemperatureModel;
+    class ProgressTimerWithSnoozeTimer;
 } // namespace app
 
 namespace gui
 {
     class AppWindow;
-}
+    class BaseHomeScreenLayoutProvider;
+} // namespace gui
 
 namespace db
 {
@@ -40,13 +40,18 @@ namespace app::home_screen
     class AbstractBatteryModel;
     class AbstractTemperatureModel;
 
-    enum class HeaderViewMode
+    enum class ViewState
     {
-        Empty,
-        AlarmIcon,
-        AlarmIconAndTime,
-        SnoozeIcon,
-        SnoozeIconAndTime
+        Deactivated,
+        DeactivatedWait,
+        WaitForConfirmation,
+        AlarmEdit,
+        ActivatedWait,
+        Activated,
+        AlarmRinging,
+        AlarmRingingDeactivatedWait,
+        AlarmSnoozedWait,
+        AlarmSnoozed
     };
 
     class AbstractView
@@ -58,7 +63,7 @@ namespace app::home_screen
         virtual void setAlarmTriggered()                                     = 0;
         virtual void setAlarmActive(bool)                                    = 0;
         virtual void setAlarmEdit(bool)                                      = 0;
-        virtual void setHeaderViewMode(HeaderViewMode mode)                  = 0;
+        virtual void setViewState(ViewState state)                           = 0;
         virtual std::time_t getAlarmTime() const                             = 0;
         virtual void setAlarmTime(std::time_t time)                          = 0;
         virtual void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
@@ -73,12 +78,14 @@ namespace app::home_screen
         /// Bottom box related API(descriptionn battery or time)
         virtual void setTemperature(utils::temperature::Temperature newTemp)    = 0;
         virtual void setBottomDescription(const UTF8 &desc)                     = 0;
+        virtual void removeBottomDescription()                                  = 0;
         virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
 
         /// Various
-        virtual void switchToMenu()                  = 0;
-        virtual void switchToBatteryStatus()         = 0;
-        virtual void setSnoozeTime(std::time_t time) = 0;
+        virtual void setLayout(std::unique_ptr<gui::BaseHomeScreenLayoutProvider> layout) = 0;
+        virtual void switchToMenu()                                                       = 0;
+        virtual void switchToBatteryStatus()                                              = 0;
+        virtual void setSnoozeTime(std::time_t time)                                      = 0;
     };
 
     class AbstractPresenter : public BasePresenter<AbstractView>
@@ -103,6 +110,7 @@ namespace app::home_screen
         virtual std::uint32_t getBatteryLvl() const                                              = 0;
         virtual bool isBatteryCharging() const                                                   = 0;
         virtual bool isAlarmActivatedByLatch() const                                             = 0;
+        virtual void setLayout(std::unique_ptr<gui::BaseHomeScreenLayoutProvider> layout)        = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -142,6 +150,8 @@ namespace app::home_screen
         std::uint32_t getBatteryLvl() const override;
         bool isBatteryCharging() const override;
         bool isAlarmActivatedByLatch() const override;
+
+        void setLayout(std::unique_ptr<gui::BaseHomeScreenLayoutProvider> layout) override;
 
       private:
         ApplicationCommon *app;

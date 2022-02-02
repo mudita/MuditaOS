@@ -2,9 +2,13 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
+#include "layouts/BaseHomeScreenLayoutProvider.hpp"
+#include "layouts/HomeScreenLayoutClassic.hpp"
+#include "layouts/HomeScreenLayoutClassicWithAmPm.hpp"
+#include "layouts/HomeScreenLayoutClassicWithBattery.hpp"
+#include "layouts/HomeScreenLayoutClassicWithTemp.hpp"
 #include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
-#include "presenters/HomeScreenPresenter.hpp"
 
 #include "windows/BellBatteryShutdownWindow.hpp"
 #include "windows/BellHomeScreenWindow.hpp"
@@ -13,6 +17,7 @@
 
 #include <apps-common/messages/AppMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
+#include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/models/AlarmModel.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
@@ -20,11 +25,14 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
+#include <appmgr/messages/ChangeHomescreenLayoutParams.hpp>
 #include <system/messages/SystemManagerMessage.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
 
 namespace app
 {
+
     ApplicationBellMain::ApplicationBellMain(std::string name,
                                              std::string parent,
                                              StatusIndicators statusIndicators,
@@ -33,6 +41,7 @@ namespace app
         : Application(name, parent, statusIndicators, startInBackground, stackDepth)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
             return actionHandled();
@@ -47,6 +56,12 @@ namespace app
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
             setSystemCloseInProgress();
             switchWindow(gui::window::name::bell_battery_shutdown, std::move(data));
+            return actionHandled();
+        });
+
+        addActionReceiver(manager::actions::ChangeHomescreenLayout, [this](auto &&data) {
+            auto msgLayout = dynamic_cast<gui::ChangeHomescreenLayoutParams *>(data.get());
+            setHomeScreenLayout(msgLayout->getNewHomescreenLayoutName());
             return actionHandled();
         });
 
@@ -75,14 +90,17 @@ namespace app
 
     void ApplicationBellMain::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             auto timeModel        = std::make_unique<app::TimeModel>();
             auto batteryModel     = std::make_unique<app::home_screen::BatteryModel>(app);
             auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(app);
             auto alarmModel       = std::make_unique<app::AlarmModel>(app);
-            auto presenter        = std::make_unique<app::home_screen::HomeScreenPresenter>(
+            homeScreenPresenter   = std::make_shared<app::home_screen::HomeScreenPresenter>(
                 app, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
-            return std::make_unique<gui::BellHomeScreenWindow>(app, std::move(presenter));
+            auto window = std::make_unique<gui::BellHomeScreenWindow>(app, homeScreenPresenter);
+            // TODO: To be replaced with settings db read
+            setHomeScreenLayout("ClassicWithTemp");
+            return window;
         });
 
         windowsFactory.attach(gui::window::name::bell_main_menu, [](ApplicationCommon *app, const std::string &name) {
@@ -166,5 +184,14 @@ namespace app
             }
         }
         return ApplicationCommon::handleSwitchWindow(msgl);
+    }
+
+    void ApplicationBellMain::setHomeScreenLayout(std::string layoutName)
+    {
+        if (gui::homeScreenLayouts.find(layoutName) == gui::homeScreenLayouts.end()) {
+            return;
+        }
+        auto layoutGenerator = gui::homeScreenLayouts.at(layoutName);
+        homeScreenPresenter->setLayout(layoutGenerator());
     }
 } // namespace app

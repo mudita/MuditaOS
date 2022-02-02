@@ -29,13 +29,22 @@ namespace gui
 
     } // namespace battery
 
+    enum class BatteryPercentMode
+    {
+        Dynamic,
+        Static,
+    };
+
     class BellBattery : public gui::HBox
     {
       public:
         BellBattery(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
         void update(const Store::Battery &batteryContext);
+        void setBatteryPercentMode(BatteryPercentMode mode);
+        std::uint32_t getLevel();
 
       private:
+        BatteryPercentMode batteryPercentMode = BatteryPercentMode::Dynamic;
         TextFixedSize *percentText;
         Image *img;
     };

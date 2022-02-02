@@ -1,10 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "HomeScreenPresenter.hpp"
+#include "application-bell-main/presenters/HomeScreenPresenter.hpp"
 #include "StateController.hpp"
+#include "layouts/BaseHomeScreenLayoutProvider.hpp"
 #include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
+#include "widgets/ProgressTimerWithSnoozeTimer.hpp"
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <common/models/TimeModel.hpp>
@@ -160,5 +162,10 @@ namespace app::home_screen
     void HomeScreenPresenter::handleBatteryStatus()
     {
         stateController->handleBatteryStatus();
+    }
+
+    void HomeScreenPresenter::setLayout(std::unique_ptr<gui::BaseHomeScreenLayoutProvider> layout)
+    {
+        getView()->setLayout(std::move(layout));
     }
 } // namespace app::home_screen
