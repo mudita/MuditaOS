@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -42,6 +42,9 @@ namespace sys
                                    const std::string &targetName,
                                    Service *sender,
                                    std::uint32_t timeout);
+
+        /// await for response on source message with timeout
+        SendResult UnicastSync(const std::shared_ptr<Message> &message, Service *sender, std::uint32_t timeout);
 
         /**
          * Sends a message to the specified channel.

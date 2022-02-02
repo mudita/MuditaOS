@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Service/BusProxy.hpp>
@@ -19,6 +19,15 @@ namespace sys
     {
         auto ret = busImpl->SendUnicast(std::move(message), targetName, owner);
         if (ret) {
+            watchdog.refresh();
+        }
+        return ret;
+    }
+
+    SendResult BusProxy::unicastSync(std::shared_ptr<Message> message, sys::Service*whose,  std::uint32_t timeout)
+    {
+        auto ret = busImpl->UnicastSync(message, whose, timeout);
+        if (ret.first != ReturnCodes::Failure) {
             watchdog.refresh();
         }
         return ret;

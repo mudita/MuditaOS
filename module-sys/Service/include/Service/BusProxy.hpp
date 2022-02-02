@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,6 +24,7 @@ namespace sys
         ~BusProxy() noexcept;
 
         bool sendUnicast(std::shared_ptr<Message> message, const std::string &targetName);
+        SendResult unicastSync(std::shared_ptr<Message> message, sys::Service *whose, std::uint32_t timeout);
         SendResult sendUnicastSync(std::shared_ptr<Message> message,
                                    const std::string &targetName,
                                    std::uint32_t timeout);
