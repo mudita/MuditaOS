@@ -41,11 +41,11 @@ namespace gui
         if (notificationData) {
             notificationsModel->updateData(notificationData);
         }
-        else if (!notificationsModel->isPhoneTimeLock()) {
-            app::manager::Controller::requestNotifications(application);
+        else {
             navBar->setActive(nav_bar::Side::Left, false);
             navBar->setActive(nav_bar::Side::Center, false);
             navBar->setActive(nav_bar::Side::Right, false);
+            app::manager::Controller::requestNotifications(application);
             return;
         }
 
