@@ -13,7 +13,6 @@ using namespace Quotes;
 
 constexpr auto totalNumOfCategories          = 3;
 constexpr auto totalNumOfQuotes              = 5;
-constexpr auto numOfQuotesFromCustomCategory = 5;
 
 TEST_CASE("Quotes")
 {
@@ -37,32 +36,47 @@ TEST_CASE("Quotes")
     SECTION("Get quotes from custom category")
     {
         auto quotes = tester->getQuotesFromCustomCategory();
-        REQUIRE(quotes.size() == numOfQuotesFromCustomCategory);
+        REQUIRE(quotes.size() > 0);
     }
 
     SECTION("Enable category by id")
     {
-        bool enable                   = false;
+        bool enable;
         const unsigned int categoryId = 5;
 
-        // Get current random quote
-        auto queryResult   = tester->readRandomizedQuote();
-        auto randomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
-        REQUIRE(randomQuoteId != 0);
+        // Initial conditions set
+        auto categories = tester->getCategoriesList();
+        for (const auto &category : categories) {
+            if (category.category_id == categoryId) {
+                enable = category.enabled;
+            }
+        }
 
-        auto success = tester->enableCategory(categoryId, enable);
+        // For quotes randomizer checks
+        auto oldRandomizedSequence = quotesString;
+
+        auto success = tester->enableCategory(categoryId, !enable);
         REQUIRE(success);
+        categories = tester->getCategoriesList();
+        for (const auto &category : categories) {
+            if (category.category_id == categoryId) {
+                REQUIRE(category.enabled != enable);
+            }
+        }
+        REQUIRE(oldRandomizedSequence != quotesString);
 
-        // verify rerandomizing the quotes list
-        queryResult           = tester->readRandomizedQuote();
-        auto newRandomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
-        REQUIRE(newRandomQuoteId != 0);
-        REQUIRE(randomQuoteId != newRandomQuoteId);
-
+        oldRandomizedSequence = quotesString;
         enable = true;
-
         success = tester->enableCategory(categoryId, enable);
         REQUIRE(success);
+        categories = tester->getCategoriesList();
+        for (const auto &category : categories) {
+            if (category.category_id == categoryId) {
+                REQUIRE(enable);
+            }
+        }
+
+        REQUIRE(oldRandomizedSequence != quotesString);
     }
 
     SECTION("Enable quote by id")
@@ -70,10 +84,8 @@ TEST_CASE("Quotes")
         bool enable                = false;
         const unsigned int quoteId = 1;
 
-        // Get current random quote
-        auto queryResult   = tester->readRandomizedQuote();
-        auto randomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
-        REQUIRE(randomQuoteId != 0);
+        // For quotes randomizer checks
+        auto oldRandomizedSequence = quotesString;
 
         auto success = tester->enableQuote(quoteId, enable);
         REQUIRE(success);
@@ -84,14 +96,10 @@ TEST_CASE("Quotes")
                 REQUIRE(!quote.enabled);
             }
         }
-        // verify rerandomizing the quotes list
-        queryResult           = tester->readRandomizedQuote();
-        auto newRandomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
-        REQUIRE(newRandomQuoteId != 0);
-        REQUIRE(randomQuoteId != newRandomQuoteId);
+        REQUIRE(oldRandomizedSequence != quotesString);
 
+        oldRandomizedSequence = quotesString;
         enable = true;
-
         success = tester->enableQuote(quoteId, enable);
         REQUIRE(success);
 
@@ -101,6 +109,7 @@ TEST_CASE("Quotes")
                 REQUIRE(quote.enabled);
             }
         }
+        REQUIRE(oldRandomizedSequence != quotesString);
     }
 
     SECTION("Add/Read/Write/Delete quote")
@@ -109,26 +118,22 @@ TEST_CASE("Quotes")
         std::string author  = "TEST AUTHOR";
         bool enabled        = true;
 
-        // Get current random quote
-        auto queryResult   = tester->readRandomizedQuote();
-        auto randomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
-        REQUIRE(randomQuoteId != 0);
+        // Initial conditions
+        auto customQuotes                  = tester->getQuotesFromCustomCategory();
+        auto numOfQuotesFromCustomCategory = customQuotes.size();
+
+        // For quotes randomizer checks
+        auto oldRandomizedSequence = quotesString;
 
         // Add a new quote
         auto quoteId = tester->addQuote(quote, author, enabled);
+        REQUIRE(oldRandomizedSequence != quotesString);
 
         // Check if quotes count has increased
-        auto customQuotes = tester->getQuotesFromCustomCategory();
+        customQuotes = tester->getQuotesFromCustomCategory();
         REQUIRE(customQuotes.size() == numOfQuotesFromCustomCategory + 1);
 
-        // verify rerandomizing the quotes list
-        queryResult           = tester->readRandomizedQuote();
-        auto newRandomQuoteId = dynamic_cast<Messages::ReadRandomizedQuoteResponse *>(queryResult.get())->quoteId;
-        REQUIRE(newRandomQuoteId != 0);
-        REQUIRE(randomQuoteId != newRandomQuoteId);
-
         // Read added quote
-        customQuotes = tester->getQuotesFromCustomCategory();
         for (const auto &customQuote : customQuotes) {
             if (customQuote.quote_id == quoteId) {
                 REQUIRE(customQuote.quote == quote);
@@ -151,9 +156,11 @@ TEST_CASE("Quotes")
             }
         }
 
+        oldRandomizedSequence = quotesString;
         // Delete added quote
         success = tester->deleteQuote(quoteId);
         REQUIRE(success);
+        REQUIRE(oldRandomizedSequence != quotesString);
 
         // Check if quotes count match count before added quote
         customQuotes = tester->getQuotesFromCustomCategory();
