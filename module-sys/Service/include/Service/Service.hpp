@@ -22,9 +22,60 @@
 #include <utility>                           // for pair
 #include <vector>                            // for vector<>::iterator, vector
 #include <typeinfo>                          // for connect by type
+#include <stdexcept>
 
 namespace sys
 {
+
+    class async_fail : public std::runtime_error
+    {
+        public: 
+            async_fail() : runtime_error("async failure") {}
+    };
+
+    template <typename Request, typename Response> struct Async // : public with_timer
+    {
+        enum class State
+        {
+            Pending,
+            TimedOut,
+            Error,
+            Done
+        };
+
+        State getState()
+        {
+            return m->state;
+        }
+
+        Response& getResult()
+        {
+            return *m->result;
+        }
+
+        Request& getRequest()
+        {
+            return *m->request;
+        }
+
+        static_assert(std::is_base_of<sys::Message, Request>::value, "Request has to be based on system message");
+        static_assert(std::is_base_of<sys::ResponseMessage, Response>::value, "Response has to be based on system response message");
+        explicit operator bool()
+        {
+            return m->state == State::Done;
+        }
+
+      private:
+        friend sys::Service;
+        void setState(State state) { this->m->state=state;}
+        struct M {
+            State state = State::Pending;
+            std::shared_ptr<Request> request;
+            std::shared_ptr<Response> result;
+        };
+        std::shared_ptr<M> m = std::make_shared<M>();
+    };
+
     class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
     {
       public:
@@ -87,17 +138,62 @@ namespace sys
 
         Watchdog &watchdog;
 
-        uint32_t pingTimestamp;
-
         bool isReady;
-
-        std::vector<std::pair<uint64_t, uint32_t>> staleUniqueMsg;
 
         /// connect: register message handler
         bool connect(const std::type_info &type, MessageHandler handler);
         bool connect(Message *msg, MessageHandler handler);
         bool connect(Message &&msg, MessageHandler handler);
         bool disconnect(const std::type_info &type);
+
+        template <typename Request, typename Response, typename... Arg>
+        Async<Request, Response> async_call(std::string whom, Arg... arg)
+        {
+            static_assert(std::is_base_of<sys::ResponseMessage, Response>::value, "Response has to be based on system message");
+            Async<Request,Response> p;
+            auto request = std::make_shared<Request>(arg...);
+            if (isConnected(std::type_index(typeid(Response)))) {
+                p.setState(Async<Request,Response>::State::Error);
+                throw async_fail();
+            }
+            auto meta = p.m;
+            meta->request = request;
+            std::function<MessagePointer(Message *)> foo = [this, meta](Message *m) {
+                auto &response = dynamic_cast<Response &>(*m);
+                meta->state = Async<Request,Response>::State::Done;
+                // this is counter productive - but this is what needs to be done here
+                meta->result = std::make_shared<Response>(response);
+                disconnect(typeid(Response));
+                return sys::msgHandled();
+            };
+
+            if (!connect(typeid(Response), foo)) {
+                throw async_fail();
+            }
+            if (!bus.sendUnicast(request, whom)) {
+                throw async_fail();
+            }
+            return p;
+        }
+
+        template <typename Request,typename Response>
+        void sync(Async<Request,Response> &p, std::uint32_t timeout=std::numeric_limits<std::uint32_t>::max())
+        {
+            static_assert(std::is_base_of<sys::ResponseMessage, Response>::value, "Response has to be based on system message");
+            if (p.m->request == nullptr) {
+                throw async_fail();
+            }
+            if (p.getState() !=  Async<Request,Response>::State::Pending) {
+                return;
+            }
+            auto val = bus.unicastSync(p.m->request, this, timeout);
+            if (val.first != sys::ReturnCodes::Success) {
+                val.first == sys::ReturnCodes::Timeout ? p.setState(Async<Request,Response>::State::TimedOut):
+                                                         p.setState(Async<Request,Response>::State::Error);
+                return;
+            }
+            this->HandleResponse(dynamic_cast<sys::ResponseMessage*>(val.second.get()));
+        }
 
         void sendCloseReadyMessage(Service *service);
         std::string getCurrentProcessing();
@@ -110,6 +206,7 @@ namespace sys
         std::map<std::type_index, MessageHandler> message_handlers;
 
       private:
+        bool isConnected(std::type_index idx);
         /// first point of enttry on messages - actually used method in run
         /// First calls message_handlers
         /// If not - fallback to DataReceivedHandler

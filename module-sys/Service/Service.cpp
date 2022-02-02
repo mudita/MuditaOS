@@ -21,35 +21,29 @@
 #include <typeinfo>                // for type_info
 #include <system/Constants.hpp>
 
-#if (DEBUG_SERVICE_MESSAGES > 0)
-#include <cxxabi.h>
-#endif
-
 // this could use Scoped() class from utils to print execution time too
 void debug_msg(sys::Service *srvc, const sys::Message *ptr)
 {
 #if (DEBUG_SERVICE_MESSAGES > 0)
 
-    int status           = -4; /// assign error number which is not  defined for __cxa_demangle
-    const char *realname = nullptr;
-    realname             = typeid(*ptr).name();
-    char *demangled      = abi::__cxa_demangle(realname, 0, 0, &status);
+    const char *realname = typeid(*ptr).name();
 
     assert(srvc);
     assert(ptr);
 
-    LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s %s",
-              ptr ? ptr->sender.c_str() : "",
-              srvc ? srvc->GetName().c_str() : "",
-              status == 0 ? demangled ? demangled : realname : realname,
-              std::string(*ptr).c_str(),
-              status != 0 ? status == -1   ? "!mem fail!"
-                            : status == -2 ? "name ABI fail"
-                            : status == -3 ? "arg invalid"
-                                           : "other failure!"
-                          : "");
+    if (xPortIsInsideInterrupt()){
+        throw std::runtime_error("message sent from irq");
+    }
+    if (xTaskGetCurrentTaskHandle() == nullptr) {
+        throw std::runtime_error("message sent from crit section");
+    }
 
-    free(demangled);
+    LOG_DEBUG("([%s] -> [%s] (%s) data: %s | %s",
+             ptr ? ptr->sender.c_str() : "",
+             srvc ? srvc->GetName().c_str() : "",
+             realname,
+             std::string(*ptr).c_str(),
+             ptr->to_string().c_str());
 #else
 #endif
 }
@@ -68,7 +62,7 @@ namespace sys
     Service::Service(
         std::string name, std::string parent, uint32_t stackDepth, ServicePriority priority, Watchdog &watchdog)
         : cpp_freertos::Thread(name, stackDepth / 4 /* Stack depth in bytes */, static_cast<UBaseType_t>(priority)),
-          parent(parent), bus(this, watchdog), mailbox(this), watchdog(watchdog), pingTimestamp(UINT32_MAX),
+          parent(parent), bus(this, watchdog), mailbox(this), watchdog(watchdog),
           isReady(false), enableRunLoop(false)
     {}
 
@@ -100,16 +94,6 @@ namespace sys
             if (!msg) {
                 continue;
             }
-
-            // Remove all staled messages
-            uint32_t timestamp = cpp_freertos::Ticks::GetTicks();
-            staleUniqueMsg.erase(std::remove_if(staleUniqueMsg.begin(),
-                                                staleUniqueMsg.end(),
-                                                [&](const auto &id) {
-                                                    return ((id.first == msg->uniID) ||
-                                                            ((timestamp - id.second) >= 15000));
-                                                }),
-                                 staleUniqueMsg.end());
 
             const bool respond = msg->type != Message::Type::Response && GetName() != msg->sender;
             currentlyProcessing = msg;
@@ -192,7 +176,7 @@ namespace sys
 
     bool Service::disconnect(const std::type_info &type)
     {
-        auto iter = message_handlers.find(type);
+        auto iter = message_handlers.find(type_index(type));
         if (iter == std::end(message_handlers)) {
             return false;
         }
@@ -286,9 +270,6 @@ namespace sys
     {
         auto ret = ReturnCodes::Success;
         switch (message->systemMessageType) {
-        case SystemMessageType::Ping:
-            service->pingTimestamp = cpp_freertos::Ticks::GetTicks();
-            break;
         case SystemMessageType::SwitchPowerMode:
             service->SwitchPowerModeHandler(message->powerMode);
             break;
@@ -312,4 +293,8 @@ namespace sys
         return std::make_shared<ResponseMessage>(ret);
     }
 
+    bool Service::isConnected(std::type_index idx)
+    {
+        return message_handlers.find(idx) != message_handlers.end();
+    }
 } // namespace sys

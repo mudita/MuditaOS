@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Bus.hpp"
@@ -101,16 +101,22 @@ namespace sys
         return false;
     }
 
+    namespace {
+        template <class W, class X>
+        void restoreMessagess(W &mailbox, X &tempMsg)
+        {
+                // Push messages collected during waiting for response to processing queue
+                for (const auto &w : tempMsg) {
+                    mailbox.push(w);
+                }
+        }
+    }
+
     SendResult Bus::SendUnicastSync(std::shared_ptr<Message> message,
                                     const std::string &targetName,
                                     Service *sender,
                                     std::uint32_t timeout)
     {
-        std::vector<std::shared_ptr<Message>> tempMsg;
-        tempMsg.reserve(4); // reserve space for 4 elements to avoid costly memory allocations
-
-        MessageUIDType unicastID = unicastMsgId.get();
-
         {
             cpp_freertos::CriticalSectionGuard guard;
             message->id    = uniqueMsgId.getNext();
@@ -132,6 +138,14 @@ namespace sys
             return std::make_pair(ReturnCodes::ServiceDoesntExist, nullptr);
         }
 
+        return UnicastSync(message, sender, timeout);
+    }
+
+    SendResult Bus::UnicastSync(const std::shared_ptr<Message> &message, Service *sender, std::uint32_t timeout)
+    {
+        std::vector<std::shared_ptr<Message>> tempMsg;
+        tempMsg.reserve(4); // reserve space for 4 elements to avoid costly memory allocations
+
         uint32_t currentTime   = cpp_freertos::Ticks::GetTicks();
         uint32_t timeoutNeeded = currentTime + timeout;
         uint32_t timeElapsed   = currentTime;
@@ -139,61 +153,26 @@ namespace sys
         while (1) {
             // timeout
             if (timeElapsed >= timeoutNeeded) {
-
-                // Push messages collected during waiting for response to processing queue
-                for (const auto &w : tempMsg) {
-                    sender->mailbox.push(w);
-                }
-
-                // Register that we didn't receive response. Even if it arrives it will be dropped
-                sender->staleUniqueMsg.push_back(std::make_pair(unicastID, cpp_freertos::Ticks::GetTicks()));
+                restoreMessagess(sender->mailbox, tempMsg);
                 return std::make_pair(ReturnCodes::Timeout, nullptr);
             }
 
             // Immediately block on rx queue
             auto rxmsg = sender->mailbox.pop(timeoutNeeded - timeElapsed);
-
             timeElapsed = cpp_freertos::Ticks::GetTicks();
 
             // check for timeout
             if (rxmsg == nullptr) {
-
-                // Push messages collected during waiting for response to processing queue
-                for (const auto &w : tempMsg) {
-                    sender->mailbox.push(w);
-                }
-
-                // Register that we didn't receive response. Even if it arrives it will be dropped
-                sender->staleUniqueMsg.push_back(std::make_pair(unicastID, cpp_freertos::Ticks::GetTicks()));
+                restoreMessagess(sender->mailbox, tempMsg);
                 return CreateSendResult(ReturnCodes::Timeout, nullptr);
             }
 
             // Received response
-            if ((rxmsg->uniID == unicastID) && (message->sender == sender->GetName())) {
-
-                // Push messages collected during waiting for response to processing queue
-                for (const auto &w : tempMsg) {
-                    sender->mailbox.push(w);
-                }
-
+            if ((rxmsg->uniID == message->uniID) && (message->sender == sender->GetName())) {
+                restoreMessagess(sender->mailbox, tempMsg);
                 return CreateSendResult(ReturnCodes::Success, rxmsg);
             }
-            // Check for system messages
-            else if (rxmsg->type == Message::Type::System) {
-
-                SystemMessage *sysmsg = static_cast<SystemMessage *>(rxmsg.get());
-
-                if (sysmsg->systemMessageType == SystemMessageType::Ping) {
-                    rxmsg->Execute(sender);
-                }
-                else {
-                    tempMsg.push_back(rxmsg);
-                }
-            }
-            // Plain data message, save it for later
-            else {
-                tempMsg.push_back(rxmsg);
-            }
+            tempMsg.push_back(rxmsg);
         }
     }
 

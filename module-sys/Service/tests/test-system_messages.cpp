@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -16,12 +16,12 @@ class MockedMessageUID : public sys::MessageUID
 TEST_CASE("Test basic messages constructors")
 {
     auto dataMsg     = sys::DataMessage();
-    auto systemMsg   = sys::SystemMessage(sys::SystemMessageType::Ping);
+    auto systemMsg   = sys::SystemMessage(sys::SystemMessageType::Start);
     auto responseMsg = sys::ResponseMessage();
 
     REQUIRE(dataMsg.type == sys::Message::Type::Data);
     REQUIRE(
-        (systemMsg.type == sys::Message::Type::System && systemMsg.systemMessageType == sys::SystemMessageType::Ping));
+        (systemMsg.type == sys::Message::Type::System && systemMsg.systemMessageType == sys::SystemMessageType::Start));
     REQUIRE(responseMsg.type == sys::Message::Type::Response);
 }
 
