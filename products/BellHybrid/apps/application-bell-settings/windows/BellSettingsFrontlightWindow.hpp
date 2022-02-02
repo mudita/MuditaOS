@@ -19,6 +19,7 @@ namespace gui
             app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::FrontlightPresenter> &&windowPresenter);
 
         void buildInterface() override;
+        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void onClose(CloseReason reason) override;
         void rebuild() override;
