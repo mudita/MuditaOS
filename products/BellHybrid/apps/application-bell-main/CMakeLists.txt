@@ -4,9 +4,17 @@ add_library(bell::app-main ALIAS application-bell-main)
 target_sources(application-bell-main
     PRIVATE
         ApplicationBellMain.cpp
+
+        layouts/HomeScreenLayoutClassic.cpp
+        layouts/HomeScreenLayoutClassicWithAmPm.cpp
+        layouts/HomeScreenLayoutClassicWithBattery.cpp
+        layouts/HomeScreenLayoutClassicWithTemp.cpp
+
         widgets/BellBattery.cpp
+        widgets/DuoHBox.cpp
         widgets/ProgressTimerWithSnoozeTimer.cpp
         widgets/SnoozeTimer.cpp
+
         windows/BellBatteryShutdownWindow.cpp
         windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
@@ -18,7 +26,14 @@ target_sources(application-bell-main
         presenters/HomeScreenPresenter.cpp
         presenters/StateController.cpp
 
+        layouts/BaseHomeScreenLayoutProvider.hpp
+        layouts/HomeScreenLayoutClassic.hpp
+        layouts/HomeScreenLayoutClassicWithAmPm.hpp
+        layouts/HomeScreenLayoutClassicWithBattery.hpp
+        layouts/HomeScreenLayoutClassicWithTemp.hpp
+
         widgets/BellBattery.hpp
+        widgets/DuoHBox.hpp
         widgets/ProgressTimerWithSnoozeTimer.hpp
         widgets/SnoozeTimer.hpp
 
@@ -31,12 +46,12 @@ target_sources(application-bell-main
         models/BatteryModel.cpp
         models/TemperatureModel.hpp
 
-        presenters/HomeScreenPresenter.hpp
         presenters/StateController.hpp
         presenters/StateControllerLogger.hpp
 
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
+        include/application-bell-main/presenters/HomeScreenPresenter.hpp
 )
 
 target_include_directories(application-bell-main
@@ -55,6 +70,7 @@ target_link_libraries(application-bell-main
         module-gui
         service-gui
         utils-time
+        bell::appmgr
         bell::db
         bell::evtmgr
         bell::app-alarm

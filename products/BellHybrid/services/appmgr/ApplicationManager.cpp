@@ -5,6 +5,7 @@
 #include <appmgr/messages/AlarmMessage.hpp>
 #include <appmgr/messages/BatteryShutdown.hpp>
 #include <appmgr/messages/IdleTimerMessage.hpp>
+#include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
 #include <service-appmgr/Constants.hpp>
@@ -65,5 +66,6 @@ namespace app::manager
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
         connect(typeid(BatteryShutdown), convertibleToActionHandler);
         connect(typeid(BedtimeNotification), convertibleToActionHandler);
+        connect(typeid(ChangeHomescreenLayoutMessage), convertibleToActionHandler);
     }
 } // namespace app::manager

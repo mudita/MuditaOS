@@ -4,12 +4,13 @@
 #include "BellHomeScreenWindow.hpp"
 #include "data/BellMainStyle.hpp"
 #include "widgets/SnoozeTimer.hpp"
+#include "widgets/ProgressTimerWithSnoozeTimer.hpp"
 #include "BellBatteryStatusWindow.hpp"
 #include "ProductConfig.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
-#include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/actions/AlarmRingingData.hpp>
+#include <apps-common/widgets/BellBaseLayout.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
@@ -21,7 +22,6 @@
 #include <widgets/TimeSetFmtSpinner.hpp>
 
 #include <chrono>
-
 namespace
 {
     using utils::time::Locale;
@@ -75,12 +75,19 @@ namespace
 namespace gui
 {
     BellHomeScreenWindow::BellHomeScreenWindow(app::ApplicationCommon *app,
-                                               std::unique_ptr<app::home_screen::AbstractPresenter> presenter)
-        : AppWindow(app, name::window::main_window), presenter{std::move(presenter)}
+                                               std::shared_ptr<app::home_screen::AbstractPresenter> presenter)
+        : AppWindow(app, name::window::main_window), presenter{presenter}
     {
         buildInterface();
         this->presenter->attach(this);
         this->presenter->createData();
+    }
+
+    BellHomeScreenWindow::~BellHomeScreenWindow()
+    {
+        if (currentLayout) {
+            removeWidget(currentLayout->getLayout());
+        }
     }
 
     void BellHomeScreenWindow::buildInterface()
@@ -91,180 +98,151 @@ namespace gui
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
         navBar->setVisible(false);
+    }
 
-        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, false);
+    void BellHomeScreenWindow::setLayout(std::unique_ptr<BaseHomeScreenLayoutProvider> layout)
+    {
+        if (currentLayout) {
+            removeWidget(currentLayout->getLayout());
+        }
+        currentLayout = std::move(layout);
+        addWidget(static_cast<BellBaseLayout *>(currentLayout->getLayout()));
+        presenter->onBeforeShow();
 
-        alarm = new AlarmSetSpinner(body->firstBox);
-        alarm->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
-        alarm->setFont(mainWindow::alarmSetSpinner::font);
-        alarm->setEditMode(EditMode::Browse);
-        alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
-        alarm->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-
-        snoozeTimer = new SnoozeTimer(body->firstBox);
-        snoozeTimer->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
-        snoozeTimer->setVisible(false);
-        snoozeTimer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-
-        time = new TimeSetFmtSpinner(body->centerBox);
-        time->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
-        time->setFont(bellMainStyle::mainWindow::time::font);
-        time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        time->setEditMode(EditMode::Browse);
-        time->setFont(mainWindow::time::font);
-        time->activeItem = false;
-
-        bottomBox = new HBox(body->lastBox, 0, 0, 0, 0);
-        bottomBox->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
-        bottomBox->setEdges(RectangleEdge::None);
-        bottomBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-
-        battery = new BellBattery(bottomBox, 0, 0, 0, 0);
-        battery->setMinimumSize(battery::battery_widget_w, battery::battery_widget_h);
-        battery->setEdges(RectangleEdge::None);
-        battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        battery->setVisible(false);
-
-        bottomText = new TextFixedSize(bottomBox, 0, 0, 0, 0);
-        bottomText->setMaximumSize(style::bell_home_screen::bottom_desc_w, style::bell_home_screen::bottom_desc_h);
-        bottomText->setFont(mainWindow::bottomDescription::font_small);
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Top));
-        bottomText->setEdges(RectangleEdge::None);
-        bottomText->activeItem = false;
-        bottomText->drawUnderline(false);
-
-        body->resize();
-
-        auto timer = std::make_unique<app::ProgressTimerWithSnoozeTimer>(
-            application, *this, snoozeTimerName, timerTick, app::ProgressCountdownMode::Increasing);
-        timer->attach(snoozeTimer);
-        presenter->setSnoozeTimer(std::move(timer));
+        if (auto snoozeTimer = currentLayout->getSnoozeTimer()) {
+            auto timer = std::make_unique<app::ProgressTimerWithSnoozeTimer>(
+                application, *this, snoozeTimerName, timerTick, app::ProgressCountdownMode::Increasing);
+            timer->attach(snoozeTimer);
+            presenter->setSnoozeTimer(std::move(timer));
+        }
     }
 
     void BellHomeScreenWindow::setAlarmTriggered()
     {
-        alarm->setAlarmStatus(AlarmSetSpinner::Status::RINGING);
+        if (currentLayout) {
+            currentLayout->setAlarmTriggered();
+        }
     }
 
     void BellHomeScreenWindow::setAlarmActive(bool val)
     {
-        if (val) {
-            alarm->setAlarmStatus(AlarmSetSpinner::Status::ACTIVATED);
-        }
-        else {
-            alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
+        if (currentLayout) {
+            currentLayout->setAlarmActive(val);
         }
     }
 
-    void BellHomeScreenWindow::setHeaderViewMode(app::home_screen::HeaderViewMode mode)
+    void BellHomeScreenWindow::setViewState(app::home_screen::ViewState state)
     {
-        switch (mode) {
-        case app::home_screen::HeaderViewMode::Empty:
-            alarm->setVisible(false);
-            alarm->setAlarmTimeVisible(false);
-            snoozeTimer->setVisible(false);
-            alarm->informContentChanged();
-            break;
-        case app::home_screen::HeaderViewMode::AlarmIconAndTime:
-            alarm->setVisible(true);
-            alarm->setAlarmTimeVisible(true);
-            snoozeTimer->setVisible(false);
-            alarm->informContentChanged();
-            break;
-        case app::home_screen::HeaderViewMode::AlarmIcon:
-            alarm->setVisible(true);
-            alarm->setAlarmTimeVisible(false);
-            snoozeTimer->setVisible(false);
-            alarm->informContentChanged();
-            break;
-        case app::home_screen::HeaderViewMode::SnoozeIconAndTime:
-            alarm->setVisible(false);
-            alarm->setAlarmTimeVisible(false);
-            snoozeTimer->setVisible(true);
-            snoozeTimer->setTimerVisible(true);
-            snoozeTimer->informContentChanged();
-            break;
-        case app::home_screen::HeaderViewMode::SnoozeIcon:
-            alarm->setVisible(false);
-            alarm->setAlarmTimeVisible(false);
-            snoozeTimer->setVisible(true);
-            snoozeTimer->informContentChanged();
-            snoozeTimer->setTimerVisible(false);
-            break;
+        if (currentLayout) {
+            currentLayout->setViewState(state);
         }
     }
 
     void BellHomeScreenWindow::setTemperature(utils::temperature::Temperature newTemp)
     {
-#if CONFIG_ENABLE_TEMP == 1
-        bottomText->setVisible(true);
-        bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_normal);
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        bottomText->setText(utils::temperature::tempToStrDec(newTemp));
-        bottomBox->resizeItems();
-#else
-        bottomText->setVisible(false);
-        bottomBox->resizeItems();
-#endif
+        if (currentLayout) {
+            currentLayout->setTemperature(newTemp);
+        }
     }
 
     void BellHomeScreenWindow::setBottomDescription(const UTF8 &desc)
     {
-        battery->setVisible(false);
-        battery->informContentChanged();
-        bottomText->setVisible(true);
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_small);
-        bottomText->setRichText(desc);
-        bottomBox->resizeItems();
+        if (currentLayout) {
+            currentLayout->setBottomDescription(desc);
+        }
+    }
+
+    void BellHomeScreenWindow::removeBottomDescription()
+    {
+        if (currentLayout) {
+            currentLayout->removeBottomDescription();
+        }
     }
 
     void BellHomeScreenWindow::setBatteryLevelState(const Store::Battery &batteryContext)
     {
-        battery->update(batteryContext);
-        if (!battery->visible) {
-            bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        if (currentLayout) {
+            currentLayout->setBatteryLevelState(batteryContext);
         }
-        else {
-#if CONFIG_ENABLE_TEMP == 1
-            bottomText->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
-            battery->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-#else
-            battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-#endif
-        }
-        bottomBox->resizeItems();
     }
 
     void BellHomeScreenWindow::setTime(std::time_t newTime)
     {
-        time->setTime(newTime);
-        time->setTimeFormatSpinnerVisibility(false);
+        if (currentLayout) {
+            currentLayout->setTime(newTime);
+        }
     }
 
     void BellHomeScreenWindow::setTimeFormat(utils::time::Locale::TimeFormat fmt)
     {
-        time->setTimeFormat(fmt);
+        if (currentLayout) {
+            currentLayout->setTimeFormat(fmt);
+        }
     }
 
     void BellHomeScreenWindow::setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt)
     {
-        alarm->setTimeFormat(fmt);
+        if (currentLayout) {
+            currentLayout->setAlarmTimeFormat(fmt);
+        }
     }
 
     void BellHomeScreenWindow::setSnoozeFormat(utils::time::Locale::TimeFormat fmt)
     {
-        snoozeTimer->setTimeFormat(fmt);
+        if (currentLayout) {
+            currentLayout->setSnoozeFormat(fmt);
+        }
     }
 
     void BellHomeScreenWindow::setAlarmEdit(bool val)
     {
-        if (not val) {
-            alarm->setEditMode(EditMode::Browse);
+        if (currentLayout) {
+            currentLayout->setAlarmEdit(val);
+        }
+    }
+
+    std::time_t BellHomeScreenWindow::getAlarmTime() const
+    {
+        if (currentLayout) {
+            return currentLayout->getAlarmTime();
         }
         else {
-            alarm->setEditMode(EditMode::Edit);
-        };
+            return {};
+        }
+    }
+
+    void BellHomeScreenWindow::setAlarmTime(std::time_t newTime)
+    {
+        if (currentLayout) {
+            currentLayout->setAlarmTime(newTime);
+        }
+    }
+
+    void BellHomeScreenWindow::incAlarmMinute()
+    {
+        if (currentLayout) {
+            const auto alarmTime = currentLayout->getAlarmTime();
+            auto newTime         = std::localtime(&alarmTime);
+            handleMinuteIncrease(*newTime);
+            currentLayout->setAlarmTime(std::mktime(newTime));
+        }
+    }
+
+    void BellHomeScreenWindow::decAlarmMinute()
+    {
+        if (currentLayout) {
+            const auto alarmTime = currentLayout->getAlarmTime();
+            auto newTime         = std::localtime(&alarmTime);
+            handleMinuteDecrease(*newTime);
+            currentLayout->setAlarmTime(std::mktime(newTime));
+        }
+    }
+
+    void BellHomeScreenWindow::setSnoozeTime(std::time_t newTime)
+    {
+        if (currentLayout) {
+            currentLayout->setSnoozeTime(newTime);
+        }
     }
 
     void BellHomeScreenWindow::switchToMenu()
@@ -290,22 +268,6 @@ namespace gui
             presenter->onBeforeShow();
         }
     }
-
-    std::time_t BellHomeScreenWindow::getAlarmTime() const
-    {
-        const auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        auto alarmTime = alarm->getTime();
-        if (alarmTime < now) {
-            alarmTime += utils::time::secondsInDay;
-        }
-        return alarmTime;
-    }
-
-    void BellHomeScreenWindow::setAlarmTime(std::time_t newTime)
-    {
-        alarm->setTime(newTime);
-    }
-
     bool BellHomeScreenWindow::updateTime()
     {
         if (presenter) {
@@ -313,22 +275,19 @@ namespace gui
         }
         return true;
     }
-
-    void BellHomeScreenWindow::incAlarmMinute()
+    void BellHomeScreenWindow::switchToBatteryStatus()
     {
-        const auto alarmTime = alarm->getTime();
-        auto newTime         = std::localtime(&alarmTime);
-        handleMinuteIncrease(*newTime);
-        alarm->setTime(std::mktime(newTime));
+        application->switchWindow(gui::BellBatteryStatusWindow::name,
+                                  std::make_unique<gui::BellBatteryStatusWindow::Data>(presenter->getBatteryLvl(),
+                                                                                       presenter->isBatteryCharging()));
     }
 
-    void BellHomeScreenWindow::decAlarmMinute()
+    bool BellHomeScreenWindow::updateBatteryStatus()
     {
-        const auto alarmTime = alarm->getTime();
-        auto newTime         = std::localtime(&alarmTime);
-        handleMinuteDecrease(*newTime);
-        alarm->setTime(std::mktime(newTime));
+        presenter->handleBatteryStatus();
+        return true;
     }
+
     bool BellHomeScreenWindow::onDatabaseMessage(sys::Message *msg)
     {
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msg);
@@ -337,21 +296,6 @@ namespace gui
             return true;
         }
         return false;
-    }
-    void BellHomeScreenWindow::switchToBatteryStatus()
-    {
-        application->switchWindow(gui::BellBatteryStatusWindow::name,
-                                  std::make_unique<gui::BellBatteryStatusWindow::Data>(presenter->getBatteryLvl(),
-                                                                                       presenter->isBatteryCharging()));
-    }
-    void BellHomeScreenWindow::setSnoozeTime(std::time_t newTime)
-    {
-        snoozeTimer->setTime(newTime);
-    }
-    bool BellHomeScreenWindow::updateBatteryStatus()
-    {
-        presenter->handleBatteryStatus();
-        return true;
     }
 
 } // namespace gui
