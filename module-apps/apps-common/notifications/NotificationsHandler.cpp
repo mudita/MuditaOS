@@ -17,47 +17,11 @@ NotificationsHandler::NotificationsHandler(sys::Service *parentService, Notifica
 
 void NotificationsHandler::registerMessageHandlers()
 {
-    parentService->connect(typeid(CellularIncominCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        incomingCallHandler(request);
-        return sys::msgHandled();
-    });
-
-    parentService->connect(typeid(CellularCallerIdMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        callerIdHandler(request);
-        return sys::msgHandled();
-    });
-
     parentService->connect(typeid(CellularIncomingSMSNotificationMessage),
                            [&](sys::Message *request) -> sys::MessagePointer {
                                incomingSMSHandler();
                                return sys::msgHandled();
                            });
-}
-
-void NotificationsHandler::incomingCallHandler(sys::Message *request)
-{
-    notifcationConfig.updateCurrentCall(currentCallPolicy);
-
-    if (currentCallPolicy.isPopupAllowed()) {
-        auto msg = static_cast<CellularIncominCallMessage *>(request);
-        app::manager::Controller::sendAction(parentService,
-                                             app::manager::actions::HandleIncomingCall,
-                                             std::make_unique<app::manager::actions::CallParams>(msg->number));
-    }
-}
-
-void NotificationsHandler::callerIdHandler(sys::Message *request)
-{
-    auto msg = static_cast<CellularCallerIdMessage *>(request);
-
-    if (currentCallPolicy.isPopupAllowed()) {
-        app::manager::Controller::sendAction(parentService,
-                                             app::manager::actions::HandleCallerId,
-                                             std::make_unique<app::manager::actions::CallParams>(msg->number));
-    }
-    else {
-        CellularServiceAPI::DismissCall(parentService, currentCallPolicy.isDismissedCallNotificationAllowed());
-    }
 }
 
 void NotificationsHandler::incomingSMSHandler()

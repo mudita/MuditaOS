@@ -3,22 +3,21 @@
 
 #pragma once
 
+#include <PhoneNumber.hpp>
+
 namespace sys
 {
     class Service;
 }
 
-class CallRingAudio
+class CallGUI
 {
     struct CallMeta;
     sys::Service &owner;
-    CallMeta *meta = nullptr;
-    bool started = false;
 
   public:
-    explicit CallRingAudio(sys::Service &);
-    ~CallRingAudio();
+    explicit CallGUI(sys::Service &);
 
-    void play();
-    void stop();
+    void notifyRING();
+    void notifyCLIP(const utils::PhoneNumber::View & number);
 };

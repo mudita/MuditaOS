@@ -20,7 +20,6 @@ namespace notifications
       private:
         bool popupOn;
         bool ringtoneOn;
-        bool dismissedCallNotification;
         bool numberCheckNeeded;
     };
 } // namespace notifications

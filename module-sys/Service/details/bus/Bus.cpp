@@ -101,16 +101,16 @@ namespace sys
         return false;
     }
 
-    namespace {
-        template <class W, class X>
-        void restoreMessagess(W &mailbox, X &tempMsg)
+    namespace
+    {
+        template <class W, class X> void restoreMessagess(W &mailbox, X &tempMsg)
         {
-                // Push messages collected during waiting for response to processing queue
-                for (const auto &w : tempMsg) {
-                    mailbox.push(w);
-                }
+            // Push messages collected during waiting for response to processing queue
+            for (const auto &w : tempMsg) {
+                mailbox.push(w);
+            }
         }
-    }
+    } // namespace
 
     SendResult Bus::SendUnicastSync(std::shared_ptr<Message> message,
                                     const std::string &targetName,

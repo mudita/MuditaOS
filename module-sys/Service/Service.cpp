@@ -31,7 +31,7 @@ void debug_msg(sys::Service *srvc, const sys::Message *ptr)
     assert(srvc);
     assert(ptr);
 
-    if (xPortIsInsideInterrupt()){
+    if (xPortIsInsideInterrupt()) {
         throw std::runtime_error("message sent from irq");
     }
     if (xTaskGetCurrentTaskHandle() == nullptr) {
@@ -39,11 +39,11 @@ void debug_msg(sys::Service *srvc, const sys::Message *ptr)
     }
 
     LOG_DEBUG("([%s] -> [%s] (%s) data: %s | %s",
-             ptr ? ptr->sender.c_str() : "",
-             srvc ? srvc->GetName().c_str() : "",
-             realname,
-             std::string(*ptr).c_str(),
-             ptr->to_string().c_str());
+              ptr ? ptr->sender.c_str() : "",
+              srvc ? srvc->GetName().c_str() : "",
+              realname,
+              std::string(*ptr).c_str(),
+              ptr->to_string().c_str());
 #else
 #endif
 }
@@ -62,8 +62,7 @@ namespace sys
     Service::Service(
         std::string name, std::string parent, uint32_t stackDepth, ServicePriority priority, Watchdog &watchdog)
         : cpp_freertos::Thread(name, stackDepth / 4 /* Stack depth in bytes */, static_cast<UBaseType_t>(priority)),
-          parent(parent), bus(this, watchdog), mailbox(this), watchdog(watchdog),
-          isReady(false), enableRunLoop(false)
+          parent(parent), bus(this, watchdog), mailbox(this), watchdog(watchdog), isReady(false), enableRunLoop(false)
     {}
 
     Service::~Service()

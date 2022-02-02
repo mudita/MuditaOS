@@ -21,7 +21,7 @@
 
 namespace CellularCall
 {
-    CellularCall::CellularCall(ServiceCellular &owner) : owner(owner), audio(owner)
+    Call::Call(ServiceCellular &owner) : owner(owner), audio(owner), gui(owner)
     {
         utils::PhoneNumber::View number = utils::PhoneNumber::View();
         const CallType type             = CallType::CT_NONE;
@@ -37,10 +37,39 @@ namespace CellularCall
         this->call.name        = number.getEntered(); // temporary set number as name
     }
 
-    bool CellularCall::startCall(const utils::PhoneNumber::View &number, const CallType type)
+    bool Call::handleRING()
     {
-        callRingGuard(*this) ? audio.play() : void();
+        if (callRingGuard(*this)) {
+            startCall(utils::PhoneNumber::View(), CallType::CT_INCOMING);
+            audio.play();
+            gui.notifyRING();
+            return true;
+        }
+        return false;
+    }
 
+    bool Call::handleCLIP(const utils::PhoneNumber::View &number)
+    {
+        setNumber(number);
+        if ( callClipGuard(*this)) {
+            startCall(number, CallType::CT_INCOMING);
+            audio.play();
+        }
+
+        if (callClipGuard(*this) || callRingGuard(*this)) {
+            gui.notifyCLIP(number);
+            return true;
+        }
+        return false;
+    }
+
+    bool Call::startOutgoing(const utils::PhoneNumber::View &number)
+    {
+        return startCall(number, CallType::CT_OUTGOING);
+    }
+
+    bool Call::startCall(const utils::PhoneNumber::View &number, const CallType type)
+    {
         LOG_INFO("starting call");
 
         if (isValid()) {
@@ -69,7 +98,7 @@ namespace CellularCall
         return true;
     }
 
-    bool CellularCall::setActive()
+    bool Call::setActive()
     {
         if (isValid()) {
             startActiveTime = utils::time::getCurrentTimestamp();
@@ -81,7 +110,7 @@ namespace CellularCall
         return false;
     }
 
-    bool CellularCall::endCall(Forced forced)
+    bool Call::endCall(Forced forced)
     {
         audio.stop();
         LOG_INFO("ending call");
@@ -133,23 +162,23 @@ namespace CellularCall
         return true;
     }
 
-    void CellularCall::setNumber(const utils::PhoneNumber::View &number)
+    void Call::setNumber(const utils::PhoneNumber::View &number)
     {
         call.presentation = number.getFormatted().empty() ? PresentationType::PR_UNKNOWN : PresentationType::PR_ALLOWED;
         call.phoneNumber  = number;
     }
 
-    void CellularCall::setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel)
+    void Call::setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel)
     {
         cpuSentinel = std::move(sentinel);
     }
 
-    bool CellularCall::Operations::areCallsFromFavouritesEnabled()
+    bool Call::Operations::areCallsFromFavouritesEnabled()
     {
         return owner.owner.areCallsFromFavouritesEnabled();
     }
 
-    bool CellularCall::Operations::isNumberInFavourites()
+    bool Call::Operations::isNumberInFavourites()
     {
         return DBServiceAPI::IsContactInFavourites(&owner.owner, owner.call.phoneNumber);
     }
