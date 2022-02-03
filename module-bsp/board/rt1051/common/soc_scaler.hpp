@@ -6,4 +6,6 @@
 #include <Units.hpp>
 #include <optional>
 
+constexpr inline auto battery_shutdown_threshold = 5; /// %
+
 std::optional<units::SOC> scale_soc(units::SOC soc);

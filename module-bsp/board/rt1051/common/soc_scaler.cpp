@@ -10,8 +10,8 @@ namespace
     /// Scale SOC <5% to 0%.
     // clang-format off
     constexpr auto entries = std::array<utils::Entry<std::uint8_t>, 3>{{
-            {{0, 4}, {0, 0}},
-            {{5, 99}, {1, 99}},
+            {{0, battery_shutdown_threshold-1}, {0, 0}},
+            {{battery_shutdown_threshold, 99}, {1, 99}},
             {{100, 100}, {100, 100}}
     }};
     // clang-format on

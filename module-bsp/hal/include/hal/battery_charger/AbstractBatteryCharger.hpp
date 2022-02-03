@@ -22,7 +22,7 @@ namespace hal::battery
             Discharging,
             Charging,
             ChargingDone,
-            PluggedNotCharging
+            PluggedNotCharging /// Charger plugged-in, input voltage valid but charging explicitly disabled
         };
 
         enum class Events : std::uint8_t
