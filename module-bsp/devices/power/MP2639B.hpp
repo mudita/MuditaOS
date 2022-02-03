@@ -18,12 +18,13 @@ namespace bsp::devices::power
     class MP2639B
     {
       public:
-        enum class ChargingStatus
+        enum class ChargingStatus : std::uint8_t
         {
             Discharging,
             Charging,
             Complete,
-            Error
+            PluggedNotCharging, /// Charger plugged-in, input voltage valid but charging explicitly disabled
+            Error,
         };
 
         struct Configuration
@@ -58,6 +59,9 @@ namespace bsp::devices::power
         void handle_irq();
 
       private:
+        bool is_charging() const;
+        bool is_valid_voltage() const;
+        bool is_charging_enabled() const;
         Configuration configuration;
         xTimerHandle irq_filter_timer;
     };

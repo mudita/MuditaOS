@@ -64,6 +64,7 @@ namespace hal::battery
         void sendNotification(Events event);
         SOC fetchBatterySOC() const;
         void pollFuelGauge();
+        bool tryEnableCharging();
 
         xTimerHandle reinit_timer;
         xQueueHandle notification_channel;
@@ -88,15 +89,25 @@ namespace hal::battery
                                                                                charger_gpio_chgok,
                                                                                charger_irq_pin_chgok,
                                                                                [this](const auto) {
-                                                                                   sendNotification(Events::Charger);
+                                                                                   /// Due to this layer performing
+                                                                                   /// charging control automatically,
+                                                                                   /// there is no need to notify higher
+                                                                                   /// layers about \ref
+                                                                                   /// MP2639B::ChargingStatus::PluggedNotCharging
+                                                                                   /// event.
+                                                                                   if (not tryEnableCharging()) {
+                                                                                       sendNotification(
+                                                                                           Events::Charger);
+                                                                                   }
                                                                                }}},
 
           fuel_gauge_gpio{drivers::DriverGPIO::Create(fuel_gauge_irq_gpio_instance, {})},
-          fuel_gauge{CW2015{drivers::DriverI2C::Create(i2c_instance, i2c_params)}}
+          fuel_gauge{CW2015{*drivers::DriverI2C::Create(i2c_instance, i2c_params), battery_shutdown_threshold}}
     {
 
         reinit_timer = xTimerCreate("reinit_timer", reinit_poll_time, pdFALSE, this, [](TimerHandle_t xTimer) {
             BellBatteryCharger *inst = static_cast<BellBatteryCharger *>(pvTimerGetTimerID(xTimer));
+            inst->fuel_gauge.reinit();
             inst->pollFuelGauge();
         });
 
@@ -113,6 +124,8 @@ namespace hal::battery
             }
         });
 
+        tryEnableCharging();
+
         pollFuelGauge();
 
         charger.enable_irq();
@@ -121,7 +134,13 @@ namespace hal::battery
 
     AbstractBatteryCharger::Voltage BellBatteryCharger::getBatteryVoltage() const
     {
-        return fuel_gauge.get_battery_voltage();
+        if (const auto result = fuel_gauge.get_battery_voltage()) {
+            return *result;
+        }
+        else {
+            LOG_ERROR("Error during fetching battery voltage");
+            return 0;
+        }
     }
 
     AbstractBatteryCharger::SOC BellBatteryCharger::getSOC() const
@@ -151,7 +170,7 @@ namespace hal::battery
             return ChargingStatus::PluggedNotCharging;
         }
         else if (charger_status == MP2639B::ChargingStatus::Charging && current_soc >= 100) {
-            LOG_WARN("The charger reports 'Charging state', but the battery SOC is 100");
+            LOG_INFO("The charger reports 'Charging state', but the battery SOC is 100");
             return ChargingStatus::ChargingDone;
         }
         else {
@@ -188,7 +207,7 @@ namespace hal::battery
     /// chip.
     void BellBatteryCharger::pollFuelGauge()
     {
-        if (fuel_gauge.poll() != 0) {
+        if (not fuel_gauge) {
             LOG_WARN("Battery completely depleted, starting the re-initialization procedure");
             xTimerStart(reinit_timer, default_timeout);
         }
@@ -196,6 +215,17 @@ namespace hal::battery
             LOG_INFO("Fuel gauge initialization success");
         }
     }
+
+    bool BellBatteryCharger::tryEnableCharging()
+    {
+        if (charger.get_charge_status() == MP2639B::ChargingStatus::PluggedNotCharging) {
+            charger.enable_charging(true);
+            return true;
+        }
+
+        return false;
+    }
+
     BaseType_t charger_irq()
     {
         return BellBatteryCharger::getWorkerQueueHandle().post(BellBatteryCharger::IrqEvents::Charger);
