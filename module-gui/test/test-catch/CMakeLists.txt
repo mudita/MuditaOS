@@ -19,3 +19,4 @@ add_catch2_executable(
                 module-gui
 	USE_FS
 )
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/plus_32px_W_M.vpi" DESTINATION "${CMAKE_BINARY_DIR}/images")
