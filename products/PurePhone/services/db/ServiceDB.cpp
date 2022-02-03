@@ -292,8 +292,8 @@ bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
         return false;
     }
 
-    if (customQuotesDB->storeIntoFile(backupPath / std::filesystem::path(predefinedQuotesDB->getName()).filename()) ==
-        false) {
+    if (predefinedQuotesDB->storeIntoFile(backupPath /
+                                          std::filesystem::path(predefinedQuotesDB->getName()).filename()) == false) {
         LOG_ERROR("predefinedQuotesDB backup failed");
         return false;
     }
