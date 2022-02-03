@@ -14,10 +14,11 @@ namespace gui
     {
         namespace text
         {
-            constexpr inline auto h                   = 225;
-            constexpr inline auto topMarigin          = 20;
-            constexpr inline auto bottomMarigin       = 30;
-            constexpr inline auto interline           = 12;
+            constexpr inline auto h                   = 240;
+            constexpr inline auto maxLineCount        = 6;
+            constexpr inline auto topMarigin          = 15;
+            constexpr inline auto bottomMarigin       = 15;
+            constexpr inline auto interline           = 8;
             constexpr inline auto authorBottomMarigin = 42;
 
         } // namespace text

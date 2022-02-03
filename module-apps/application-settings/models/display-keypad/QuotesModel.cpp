@@ -28,11 +28,9 @@ namespace Quotes
 
     bool QuotesModel::updateRecords(std::vector<QuoteRecord> records)
     {
-        if (DatabaseModel::updateRecords(std::move(records))) {
-            list->onProviderDataUpdate();
-            return true;
-        }
-        return false;
+        auto status = DatabaseModel::updateRecords(std::move(records));
+        list->onProviderDataUpdate();
+        return status;
     }
 
     auto QuotesModel::getMinimalItemSpaceRequired() const -> unsigned int
