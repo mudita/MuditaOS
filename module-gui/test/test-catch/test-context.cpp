@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 // Right now there are no asserts here, each test/section / test should have asserts
@@ -7,6 +7,10 @@
 #include <catch2/catch.hpp>
 #include <module-gui/gui/core/Context.hpp>
 #include <log/log.hpp>
+#include "ImageManager.hpp"
+#include "DrawCommand.hpp"
+#include <sstream>
+#include <memory>
 
 TEST_CASE("test context size and position")
 {
@@ -82,4 +86,73 @@ TEST_CASE("insertContextTest")
         delete dstCtx;
         delete insCtx;
     }
+}
+
+TEST_CASE("Draw vector image test")
+{
+
+    constexpr std::string_view properContextDump = "ffffffffffffffffffffffffffffffff\n"
+                                                   "ffffffffffffffffffffffffffffffff\n"
+                                                   "ffffffffffffffffffffffffffffffff\n"
+                                                   "ffffffffffffffffffffffffffffffff\n"
+                                                   "fffffffffffffff00fffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "fffff0000000000000000000000fffff\n"
+                                                   "ffff000000000000000000000000ffff\n"
+                                                   "ffff000000000000000000000000ffff\n"
+                                                   "fffff0000000000000000000000fffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "ffffffffffffff0000ffffffffffffff\n"
+                                                   "fffffffffffffff00fffffffffffffff\n"
+                                                   "ffffffffffffffffffffffffffffffff\n"
+                                                   "ffffffffffffffffffffffffffffffff\n"
+                                                   "ffffffffffffffffffffffffffffffff\n"
+                                                   "ffffffffffffffffffffffffffffffff\n";
+
+    auto context = std::make_unique<gui::Context>(static_cast<unsigned short>(32), static_cast<unsigned short>(32));
+
+    gui::ImageManager::getInstance().init(".");
+    auto id                 = gui::ImageManager::getInstance().getImageMapID("plus_32px_W_M");
+    gui::ImageMap *imageMap = gui::ImageManager::getInstance().getImageMap(id);
+    CAPTURE(id);
+
+    REQUIRE(imageMap != nullptr);
+    REQUIRE(imageMap->getType() == gui::ImageMap::Type::VECMAP);
+
+    auto drawCommand    = gui::DrawImage();
+    drawCommand.imageID = id;
+    drawCommand.areaH   = 32;
+    drawCommand.areaW   = 32;
+    drawCommand.draw(context.get());
+    std::string dump;
+
+    uint32_t offset = 0;
+    for (uint32_t y = 0; y < context->getH(); y++) {
+        for (uint32_t x = 0; x < context->getW(); x++) {
+            uint32_t value = *(context->getData() + offset);
+            std::stringstream stream;
+            stream << std::hex << value;
+            dump.append(stream.str());
+            offset++;
+        }
+        dump.append("\n");
+    }
+    CAPTURE(dump);
+    REQUIRE(dump.length() == properContextDump.length());
+    REQUIRE(dump == properContextDump);
 }
