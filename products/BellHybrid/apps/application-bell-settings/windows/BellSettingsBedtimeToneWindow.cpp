@@ -38,7 +38,10 @@ namespace gui
         sidelistview->rebuildList(listview::RebuildType::Full);
 
         presenter->loadData();
+    }
 
+    void BellSettingsBedtimeToneWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
         setFocusItem(sidelistview);
     }
 

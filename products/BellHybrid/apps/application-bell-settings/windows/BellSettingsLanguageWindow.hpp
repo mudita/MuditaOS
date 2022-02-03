@@ -21,6 +21,7 @@ namespace gui
                                    const std::string &name = gui::window::name::bellSettingsLanguage);
 
         void buildInterface() override;
+        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
       private:

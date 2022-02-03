@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -10,7 +10,7 @@
 
 #include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
-#include <SystemManager/SystemManagerCommon.hpp>
+#include <sys/SystemManager.hpp>
 
 #include <service-evtmgr/Constants.hpp>
 
@@ -41,8 +41,7 @@ TEST_CASE("SettingsApi")
 {
     SECTION("variable/profile/mode register/set/get/unregister")
     {
-        auto manager =
-            std::make_shared<sys::SystemManagerCommon>(std::vector<std::unique_ptr<sys::BaseServiceCreator>>{});
+        auto manager = std::make_shared<sys::SystemManager>(std::vector<std::unique_ptr<sys::BaseServiceCreator>>{});
         std::shared_ptr<settings::MyService> varWritter;
         std::shared_ptr<settings::MyService> varReader;
         std::shared_ptr<settings::AppTest> testVar;

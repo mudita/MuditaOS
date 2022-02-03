@@ -136,7 +136,7 @@ class BatteryState::Pimpl
     sml::sm<StateMachine, NotifyStateChangedCallback> sm{notifyCallback};
 
     static constexpr auto criticalThreshold = 10; // %
-    static constexpr auto shutdownThreshold = 5;  // %
+    static constexpr auto shutdownThreshold = 1;  // %
 };
 
 void BatteryState::check(const ChargingState state, const float soc)

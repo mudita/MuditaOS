@@ -91,21 +91,36 @@ BatteryController::BatteryController(sys::Service *service, xQueueHandle notific
 
 void sevm::battery::BatteryController::handleNotification(Events evt)
 {
-    const auto soc           = Store::Battery::get().level;
-    const auto chargingState = Store::Battery::get().state;
-
     LOG_INFO("Incoming event: %s", std::string{magic_enum::enum_name(evt)}.c_str());
     switch (evt) {
+    case Events::Charger:
     case Events::SOC:
-        Store::Battery::modify().level = charger->getSOC();
+        update();
         break;
     case Events::Brownout:
         brownoutDetector.startDetection();
         break;
-    case Events::Charger:
-        Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
-        break;
     }
+}
+
+void sevm::battery::BatteryController::poll()
+{
+    update();
+}
+void sevm::battery::BatteryController::printCurrentState()
+{
+    LOG_INFO("Charger state:%s", magic_enum::enum_name(Store::Battery::get().state).data());
+    LOG_INFO("Battery SOC:%d", Store::Battery::get().level);
+    LOG_INFO("Battery voltage:%" PRIu32 "mV", charger->getBatteryVoltage());
+    LOG_INFO("Battery state:%s", magic_enum::enum_name(Store::Battery::get().levelState).data());
+}
+void sevm::battery::BatteryController::update()
+{
+    const auto soc           = Store::Battery::get().level;
+    const auto chargingState = Store::Battery::get().state;
+
+    Store::Battery::modify().level = charger->getSOC();
+    Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
 
     /// Send BatteryStatusChangeMessage only when battery SOC or charger state has changed
     if (soc != Store::Battery::get().level || chargingState != Store::Battery::get().state) {
@@ -116,17 +131,4 @@ void sevm::battery::BatteryController::handleNotification(Events evt)
     batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
 
     printCurrentState();
-}
-
-void sevm::battery::BatteryController::poll()
-{
-    LOG_DEBUG("Manual poll");
-    handleNotification(Events::SOC);
-}
-void sevm::battery::BatteryController::printCurrentState()
-{
-    LOG_INFO("Charger state:%s", magic_enum::enum_name(Store::Battery::get().state).data());
-    LOG_INFO("Battery SOC:%d", Store::Battery::get().level);
-    LOG_INFO("Battery voltage:%" PRIu32 "mV", charger->getBatteryVoltage());
-    LOG_INFO("Battery state:%s", magic_enum::enum_name(Store::Battery::get().levelState).data());
 }

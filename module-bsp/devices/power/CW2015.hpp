@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include "hal/Units.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
+
+#include <Units.hpp>
 
 namespace bsp::devices::power
 {

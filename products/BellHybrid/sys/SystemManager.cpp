@@ -50,4 +50,9 @@ namespace sys
         bus.sendUnicast(msg, service::name::appmgr);
         SystemManagerCommon::batteryShutdownLevelAction();
     }
+
+    void SystemManager::handleShutdown()
+    {
+        set(State::ShutdownReady);
+    }
 } // namespace sys
