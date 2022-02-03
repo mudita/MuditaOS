@@ -30,7 +30,7 @@ namespace gui
     } // namespace
 
     QuoteAddEditWindow::QuoteAddEditWindow(app::ApplicationCommon *app)
-        : AppWindow(app, gui::window::name::quotes), quoteModel(std::make_shared<Quotes::QuotesModel>(app))
+        : AppWindow(app, gui::window::name::new_quote), quoteModel(std::make_shared<Quotes::QuotesModel>(app))
     {
         buildInterface();
     }
@@ -166,8 +166,8 @@ namespace gui
                 quoteModel->edit(quoteData);
             }
 
-            if (quoteAction != QuoteAction::Add) {
-                application->switchWindow(gui::name::window::main_window);
+            if (quoteAction == QuoteAction::Edit) {
+                application->popCurrentWindow();
             }
             application->returnToPreviousWindow();
         }

@@ -44,6 +44,7 @@ namespace gui
         quoteText->setEdges(RectangleEdge::None);
         quoteText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         quoteText->drawUnderline(false);
+        quoteText->setTextLimitType(TextLimitType::MaxLines, style::text::maxLineCount);
 
         authorText = new Text(wallpaperBox, 0, 0, 0, 0);
         authorText->setMargins(Margins(0, 0, 0, style::text::authorBottomMarigin));
