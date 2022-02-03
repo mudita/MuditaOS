@@ -75,7 +75,11 @@ namespace Quotes
     {
         auto list = serializer->deserialize(
             settings->getValue(settings::Quotes::randomQuotesList, settings::SettingsScope::Global));
-        list.pop_front();
+
+        if (!list.empty()) {
+            list.pop_front();
+        }
+
         if (list.empty()) {
             updateList(true);
         }
