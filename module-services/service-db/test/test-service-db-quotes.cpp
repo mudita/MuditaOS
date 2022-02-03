@@ -218,6 +218,25 @@ TEST_CASE("Quotes")
         REQUIRE(quoteId == newQuoteId);
     }
 
+    SECTION("Randomizer test - no enabled quotes")
+    {
+        timestampString = std::to_string(0);
+        auto categories = tester->getCategoriesList();
+
+        // disable all quotes
+        for (const auto &category : categories) {
+            tester->enableCategory(category.category_id, false);
+        }
+
+        auto customQuotes = tester->getQuotesFromCustomCategory();
+        for (const auto &quote : customQuotes) {
+            tester->enableQuote(quote.quote_id, false);
+        }
+
+        // No crash expected
+        REQUIRE_NOTHROW(tester->readRandomizedQuote());
+    }
+
     Database::deinitialize();
 }
 
