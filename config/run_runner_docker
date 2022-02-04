@@ -4,7 +4,7 @@ SCRIPT=$(readlink -f $0)
 SCRIPT_DIR="$(dirname ${SCRIPT})"
 SRC_ROOT=$(readlink -f ${SCRIPT_DIR}/..)
 
-. ${SRC_ROOT}/config/common_scripsts_lib
+. ${SRC_ROOT}/config/common_scripts_lib
 . ${SRC_ROOT}/config/bootstrap_config
 . ${SRC_ROOT}/config/runner_settings
 
