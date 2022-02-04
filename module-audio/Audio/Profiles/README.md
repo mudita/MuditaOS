@@ -22,13 +22,13 @@ In order to prevent audio issues, when no file is present or the JSON structure 
 | outputPath   | integer    | Defines the audio path for profile's output (see codec.hpp) |
 | filterParams | array      | Array of filter parameters (one per band)                   |
 
-###Filter parameters array
+### Filter parameters array
 
 The filter parameters array consists of a one JSON struct per filter in the codec. It means that adding next element in the array
 does not give any effect, but removing one of them will lead to wrong audio configuration! If you want to disable unused filter, select
 appropriate filter type - `None`.
 
-###Array element structure
+### Array element structure
 
 | Field      | Value type | Description                                                |
 |------------|------------|------------------------------------------------------------|
