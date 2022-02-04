@@ -16,7 +16,7 @@ namespace
 {
     using minutes = std::chrono::minutes;
     const std::vector<minutes> chimeIntervals{
-        minutes{0}, minutes{2}, minutes{5}, minutes{10}, minutes{15}, minutes{30}};
+        minutes{2}, minutes{5}, minutes{10}, minutes{15}, minutes{30}, minutes{0}};
 } // namespace
 
 IntervalBox::IntervalBox(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, TimerProperty *timerSetter)
