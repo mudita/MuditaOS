@@ -282,12 +282,11 @@ namespace gui
 
     void BellHomeScreenWindow::onBeforeShow(ShowMode, SwitchData *data)
     {
+        presenter->onBeforeShow();
+
         const auto alarmRingingSwitchData = dynamic_cast<app::actions::AlarmRingingData *>(data);
         if (alarmRingingSwitchData != nullptr) {
             presenter->handleAlarmRingingEvent();
-        }
-        else {
-            presenter->onBeforeShow();
         }
     }
 
