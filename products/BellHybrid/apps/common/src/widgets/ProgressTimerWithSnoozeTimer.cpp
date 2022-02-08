@@ -1,9 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ProgressTimerWithSnoozeTimer.hpp"
-#include "widgets/SnoozeTimer.hpp"
-
+#include <common/widgets/ProgressTimerWithSnoozeTimer.hpp>
+#include <common/widgets/SnoozeTimer.hpp>
 #include <Text.hpp>
 #include <ProgressBar.hpp>
 #include <ApplicationCommon.hpp>

@@ -1,8 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BellBattery.hpp"
-#include "data/BatteryUtils.hpp"
+#include <common/data/BatteryUtils.hpp>
+#include <common/widgets/BellBattery.hpp>
 #include <Image.hpp>
 
 namespace

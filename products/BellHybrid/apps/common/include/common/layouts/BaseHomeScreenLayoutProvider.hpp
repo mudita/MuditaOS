@@ -3,13 +3,33 @@
 
 #pragma once
 
-#include "application-bell-main/presenters/HomeScreenPresenter.hpp"
+#include <module-utils/EventStore/EventStore.hpp>
+#include <utf8/UTF8.hpp>
+#include <Temperature.hpp>
+#include <time/dateCommon.hpp>
 
-#include <apps-common/widgets/BellBaseLayout.hpp>
-#include <Rect.hpp>
+#include <chrono>
+
+namespace app::home_screen
+{
+    enum class ViewState
+    {
+        Deactivated,
+        DeactivatedWait,
+        WaitForConfirmation,
+        AlarmEdit,
+        ActivatedWait,
+        Activated,
+        AlarmRinging,
+        AlarmRingingDeactivatedWait,
+        AlarmSnoozedWait,
+        AlarmSnoozed
+    };
+};
 
 namespace gui
 {
+    class Item;
     class SnoozeTimer;
 
     class BaseHomeScreenLayoutProvider

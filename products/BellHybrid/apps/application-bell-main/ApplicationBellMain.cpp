@@ -2,11 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
-#include "layouts/BaseHomeScreenLayoutProvider.hpp"
-#include "layouts/HomeScreenLayoutClassic.hpp"
-#include "layouts/HomeScreenLayoutClassicWithAmPm.hpp"
-#include "layouts/HomeScreenLayoutClassicWithBattery.hpp"
-#include "layouts/HomeScreenLayoutClassicWithTemp.hpp"
 #include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
 
@@ -188,10 +183,11 @@ namespace app
 
     void ApplicationBellMain::setHomeScreenLayout(std::string layoutName)
     {
-        if (gui::homeScreenLayouts.find(layoutName) == gui::homeScreenLayouts.end()) {
+        auto homeScreenLayoutsList = gui::homeScreenLayouts();
+        if (homeScreenLayoutsList.find(layoutName) == homeScreenLayoutsList.end()) {
             return;
         }
-        auto layoutGenerator = gui::homeScreenLayouts.at(layoutName);
-        homeScreenPresenter->setLayout(layoutGenerator());
+        auto layoutGenerator = homeScreenLayoutsList.at(layoutName);
+        homeScreenPresenter->setLayout(layoutGenerator);
     }
 } // namespace app

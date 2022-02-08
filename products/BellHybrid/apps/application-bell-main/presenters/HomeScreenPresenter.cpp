@@ -3,13 +3,13 @@
 
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
 #include "StateController.hpp"
-#include "layouts/BaseHomeScreenLayoutProvider.hpp"
 #include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
-#include "widgets/ProgressTimerWithSnoozeTimer.hpp"
 
 #include <apps-common/ApplicationCommon.hpp>
+#include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <common/models/TimeModel.hpp>
+#include <common/widgets/ProgressTimerWithSnoozeTimer.hpp>
 #include <Timers/SystemTimer.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
@@ -164,8 +164,8 @@ namespace app::home_screen
         stateController->handleBatteryStatus();
     }
 
-    void HomeScreenPresenter::setLayout(std::unique_ptr<gui::BaseHomeScreenLayoutProvider> layout)
+    void HomeScreenPresenter::setLayout(gui::LayoutGenerator layoutGenerator)
     {
-        getView()->setLayout(std::move(layout));
+        getView()->setLayout(layoutGenerator);
     }
 } // namespace app::home_screen

@@ -3,7 +3,9 @@
 
 #pragma once
 
-#include "layouts/BaseHomeScreenLayoutProvider.hpp"
+#include "BaseHomeScreenLayoutProvider.hpp"
+
+#include <apps-common/widgets/BellBaseLayout.hpp>
 
 namespace style::homescreen_classic
 {

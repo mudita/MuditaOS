@@ -3,22 +3,15 @@
 
 #pragma once
 
-#include "layouts/HomeScreenLayoutClassicWithAmPm.hpp"
-#include "layouts/HomeScreenLayoutClassicWithBattery.hpp"
-#include "layouts/HomeScreenLayoutClassicWithTemp.hpp"
-
+#include <functional>
 #include <map>
 #include <string>
-#include <typeindex>
 
 namespace gui
 {
-    using LayoutGenerator = std::function<std::unique_ptr<gui::BaseHomeScreenLayoutProvider>()>;
+    class BaseHomeScreenLayoutProvider;
 
-    std::map<std::string, LayoutGenerator> homeScreenLayouts = {
-        {"ClassicWithTemp", []() { return std::make_unique<gui::HomeScreenLayoutClassicWithTemp>("ClassicWithTemp"); }},
-        {"ClassicWithAmPm", []() { return std::make_unique<gui::HomeScreenLayoutClassicWithAmPm>("ClassicWithAmPm"); }},
-        {"ClassicWithBattery",
-         []() { return std::make_unique<gui::HomeScreenLayoutClassicWithBattery>("ClassicWithBattery"); }},
-    };
+    using LayoutGenerator = std::function<BaseHomeScreenLayoutProvider *()>;
+
+    std::map<std::string, LayoutGenerator> homeScreenLayouts();
 }; // namespace gui

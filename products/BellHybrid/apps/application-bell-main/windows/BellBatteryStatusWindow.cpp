@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellBatteryStatusWindow.hpp"
-#include "data/BatteryUtils.hpp"
 
+#include <common/data/BatteryUtils.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/ImageBox.hpp>
 #include <gui/input/InputEvent.hpp>
