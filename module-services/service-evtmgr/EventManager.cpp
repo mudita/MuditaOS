@@ -56,18 +56,6 @@ namespace
     constexpr auto loggerTimerName = "Logger";
 } // namespace
 
-EventManagerSentinel::EventManagerSentinel(std::shared_ptr<sys::CpuSentinel> cpuSentinel,
-                                           bsp::CpuFrequencyMHz frequencyToHold)
-    : cpuSentinel(cpuSentinel)
-{
-    cpuSentinel->HoldMinimumFrequency(frequencyToHold);
-}
-
-EventManagerSentinel::~EventManagerSentinel()
-{
-    cpuSentinel->ReleaseMinimumFrequency();
-}
-
 EventManagerCommon::EventManagerCommon(LogDumpFunction logDumpFunction, const std::string &name)
     : sys::Service(name, "", stackDepth), loggerTimer{sys::TimerFactory::createPeriodicTimer(
                                               this,
@@ -232,7 +220,7 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
     EventWorker->init(settings);
     EventWorker->run();
 
-    cpuSentinel                  = std::make_shared<sys::CpuSentinel>(service::name::evt_manager, this);
+    cpuSentinel                  = std::make_shared<sys::TimedCpuSentinel>(service::name::evt_manager, this);
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
@@ -321,6 +309,10 @@ int EventManagerCommon::dumpLogsToFile()
 
 void EventManagerCommon::handleMinuteUpdate(time_t timestamp)
 {
+    // temporary frequency lock to handle time update event
+    if (cpuSentinel) {
+        cpuSentinel->HoldMinimumFrequencyForTime(bsp::CpuFrequencyMHz::Level_2, std::chrono::seconds(1));
+    }
     if (onMinuteTick) {
         onMinuteTick(timestamp);
     }

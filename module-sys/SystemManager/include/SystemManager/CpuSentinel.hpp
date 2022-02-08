@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,6 +9,7 @@
 #include <string>
 #include <functional>
 #include <atomic>
+#include <Timers/TimerHandle.hpp>
 
 namespace sys
 {
@@ -59,6 +60,18 @@ namespace sys
         std::function<void(bsp::CpuFrequencyMHz)> callback;
 
         TaskHandle_t taskHandle = nullptr;
+    };
+
+    /// Sentinel releases the frequency lock automatically after the time specified in the parameter - timeout
+    class TimedCpuSentinel : public CpuSentinel
+    {
+      public:
+        TimedCpuSentinel(std::string name, sys::Service *service);
+        ~TimedCpuSentinel();
+        void HoldMinimumFrequencyForTime(bsp::CpuFrequencyMHz frequencyToHold, std::chrono::milliseconds timeout);
+
+      private:
+        sys::TimerHandle timerHandle;
     };
 
 } // namespace sys
