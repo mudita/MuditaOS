@@ -311,7 +311,7 @@
   "app_onboarding_skip_confirm": "<text>La configuration de la carte SIM est requise pour la connexion réseau. Ignorer la configuration quand même? </text>",
   "app_onboarding_configuration_successful": "<text>Vous pouvez maintenant<br></br>utiliser votre Mudita Pure.</text>",
   "app_onboarding_no_configuration": "<text>Votre Mudita Pure n'a pas été<br></br>configuré. Vous pouvez le configurer<br></br>a partir des Options.</text>",
-  "app_onboarding_update_info": "<text>La version actuelle de MuditaOS est<br></br><token>$VERSION</token>. Des mises à jour avec de nouvelles fonctionnalités et correctifs<br></br>apparaissent souvent.<br></br>Pour mettre à jour votre téléphone, veuillez<br></br>visiter : </text><text font='gt_pressura' weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>et suivez les instructions.</text>",
+  "app_onboarding_update_info": "<text>La version actuelle de MuditaOS est<br></br><token>$VERSION</token>.<br></br>Des mises à jour avec de nouvelles fonctionnalités et correctifs apparaissent souvent. Pour mettre à jour votre téléphone, visite:<br></br></text><text font='gt_pressura' weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>et suivez les instructions.</text>",
   "app_settings_title_main": "Options",
   "app_settings_advanced": "Avancées",
   "app_settings_bt": "Bluetooth",
