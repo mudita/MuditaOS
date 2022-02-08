@@ -1,13 +1,18 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/CpuSentinel.hpp>
 #include "system/messages/RequestCpuFrequencyMessage.hpp"
 #include "system/Constants.hpp"
+#include <Timers/TimerFactory.hpp>
 #include <memory>
 
 namespace sys
 {
+    namespace
+    {
+        constexpr std::chrono::seconds defaultHoldFrequencyTime{1};
+    } // namespace
 
     CpuSentinel::CpuSentinel(std::string name,
                              sys::Service *service,
@@ -106,4 +111,28 @@ namespace sys
             permanentFrequencyToHold.frequencyToHold = currentFrequency;
         }
     }
+
+    TimedCpuSentinel::TimedCpuSentinel(std::string name, sys::Service *service)
+        : CpuSentinel(name, service), timerHandle{sys::TimerFactory::createSingleShotTimer(
+                                          owner, "holdFrequencyTimer", defaultHoldFrequencyTime, [this](sys::Timer &) {
+                                              ReleaseMinimumFrequency();
+                                          })}
+    {}
+
+    TimedCpuSentinel::~TimedCpuSentinel()
+    {
+        if (timerHandle.isActive()) {
+            timerHandle.stop();
+        }
+    }
+
+    void TimedCpuSentinel::HoldMinimumFrequencyForTime(bsp::CpuFrequencyMHz frequencyToHold,
+                                                       std::chrono::milliseconds timeout)
+    {
+        if (currentFrequencyToHold != frequencyToHold) {
+            HoldMinimumFrequency(frequencyToHold);
+            timerHandle.restart(timeout);
+        }
+    }
+
 } // namespace sys

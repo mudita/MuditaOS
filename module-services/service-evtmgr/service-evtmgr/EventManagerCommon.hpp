@@ -23,16 +23,6 @@
 
 class WorkerEventCommon;
 
-class EventManagerSentinel
-{
-  public:
-    explicit EventManagerSentinel(std::shared_ptr<sys::CpuSentinel> cpuSentinel, bsp::CpuFrequencyMHz frequencyToHold);
-    ~EventManagerSentinel();
-
-  private:
-    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
-};
-
 class EventManagerCommon : public sys::Service
 {
   public:
@@ -83,7 +73,7 @@ class EventManagerCommon : public sys::Service
 
     std::shared_ptr<settings::Settings> settings;
     std::unique_ptr<WorkerEventCommon> EventWorker;
-    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+    std::shared_ptr<sys::TimedCpuSentinel> cpuSentinel;
     // application where key events are sent. This is also only application that is allowed to change keyboard long
     // press settings.
     std::string targetApplication;

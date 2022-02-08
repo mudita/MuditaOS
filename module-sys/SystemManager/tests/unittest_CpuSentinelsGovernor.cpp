@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define CATCH_CONFIG_MAIN
@@ -7,13 +7,42 @@
 #include <SystemManager/CpuGovernor.hpp>
 #include <SystemManager/CpuSentinel.hpp>
 
+namespace sys
+{
+    class MockedService : public sys::Service
+    {
+      public:
+        MockedService(const std::string &name) : sys::Service(name)
+        {}
+
+        sys::ReturnCodes InitHandler() override
+        {
+            return sys::ReturnCodes::Success;
+        }
+        sys::ReturnCodes DeinitHandler() override
+        {
+            return sys::ReturnCodes::Success;
+        }
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override
+        {
+            return sys::ReturnCodes::Success;
+        }
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *req, sys::ResponseMessage *resp) override
+        {
+            return std::make_shared<sys::ResponseMessage>();
+        };
+    };
+
+} // namespace sys
+
 TEST_CASE("Power Manager CPU sentinels governor test")
 {
     using namespace sys;
+    auto mockedService                          = std::make_shared<MockedService>("TestService");
     std::shared_ptr<CpuSentinel> testSentinel_0 = nullptr;
-    auto testSentinel_1                         = std::make_shared<CpuSentinel>("testSentinel_1", nullptr);
-    auto testSentinel_2                         = std::make_shared<CpuSentinel>("testSentinel_2", nullptr);
-    auto testSentinel_3                         = std::make_shared<CpuSentinel>("testSentinel_1", nullptr);
+    auto testSentinel_1                         = std::make_shared<CpuSentinel>("testSentinel_1", mockedService.get());
+    auto testSentinel_2                         = std::make_shared<CpuSentinel>("testSentinel_2", mockedService.get());
+    auto testSentinel_3                         = std::make_shared<CpuSentinel>("testSentinel_1", mockedService.get());
 
     SECTION("Sentinel registration")
     {
