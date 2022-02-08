@@ -5,17 +5,13 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/WorkerDesktop.hpp>
-#include <service-cellular/CellularMessage.hpp>
 #include <service-desktop/BackupRestore.hpp>
 #include <endpoints/EndpointFactory.hpp>
 #include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
 
-#include <Common/Query.hpp>
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
-#include <json11.hpp>
 #include <log/log.hpp>
-#include <application-desktop/Constants.hpp>
 #include <locks/data/PhoneLockMessages.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-db/QueryMessage.hpp>
@@ -28,16 +24,18 @@
 #include <system/Constants.hpp>
 #include <system/messages/TetheringStateRequest.hpp>
 
-#include <sys/mount.h>
-#include <sys/statvfs.h>
-
 #include <ctime>
-#include <cinttypes>
 #include <filesystem>
+#include <functional>
 
 ServiceDesktop::ServiceDesktop()
     : sys::Service(service::name::service_desktop, "", sdesktop::service_stack),
-      btMsgHandler(std::make_unique<sdesktop::bluetooth::BluetoothMessagesHandler>(this))
+      btMsgHandler(std::make_unique<sdesktop::bluetooth::BluetoothMessagesHandler>(this)),
+      notificationsClearTimer{
+          sys::TimerFactory::createSingleShotTimer(this,
+                                                   sdesktop::notificationsClearTimerName,
+                                                   sdesktop::notificationsClearTimerDelayMs,
+                                                   [this](sys::Timer & /*timer*/) { notificationEntries.clear(); })}
 {
     LOG_INFO("[ServiceDesktop] Initializing");
     bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
@@ -66,7 +64,7 @@ auto ServiceDesktop::requestLogsFlush() -> void
 
     if (ret.first == sys::ReturnCodes::Success) {
         auto responseMsg = std::dynamic_pointer_cast<sevm::FlushLogsResponse>(ret.second);
-        if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
+        if ((responseMsg != nullptr) && responseMsg->retCode) {
             response = responseMsg->data;
 
             LOG_DEBUG("Respone data: %d", response);
@@ -88,7 +86,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
     LOG_DEBUG("Serial Number: %s", serialNumber.c_str());
 
-    desktopWorker = std::make_unique<WorkerDesktop>(this, *usbSecurityModel.get(), serialNumber);
+    desktopWorker = std::make_unique<WorkerDesktop>(
+        this, std::bind(&ServiceDesktop::restartNotificationsClearTimer, this), *usbSecurityModel, serialNumber);
 
     initialized =
         desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
@@ -285,4 +284,25 @@ void ServiceDesktop::prepareRestoreData(const std::filesystem::path &restoreLoca
     backupRestoreStatus.taskId    = restoreLocation.filename();
     backupRestoreStatus.state     = BackupRestore::OperationState::Stopped;
     backupRestoreStatus.location  = purefs::dir::getBackupOSPath() / backupRestoreStatus.taskId;
+}
+
+auto ServiceDesktop::getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>
+{
+    return notificationEntries;
+}
+
+void ServiceDesktop::removeNotificationEntries(const std::vector<int> &uidsOfNotificationsToBeRemoved)
+{
+    for (auto const &entryUid : uidsOfNotificationsToBeRemoved) {
+        notificationEntries.erase(
+            std::remove_if(notificationEntries.begin(),
+                           notificationEntries.end(),
+                           [&](const Outbox::NotificationEntry &entry) { return entry.uid == entryUid; }),
+            notificationEntries.end());
+    }
+}
+
+void ServiceDesktop::restartNotificationsClearTimer()
+{
+    notificationsClearTimer.restart(sdesktop::notificationsClearTimerDelayMs);
 }

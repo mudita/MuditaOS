@@ -14,6 +14,7 @@
 #include <crc32.h>
 
 #include <map>
+#include <utility>
 #include <vector>
 #include <filesystem>
 #include <service-desktop/DesktopMessages.hpp>
@@ -22,10 +23,12 @@
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr,
+                             std::function<void()> messageProcessedCallback,
                              const sdesktop::USBSecurityModel &securityModel,
-                             const std::string serialNumber)
+                             const std::string &serialNumber)
     : sys::Worker(ownerServicePtr, sdesktop::worker_stack), securityModel(securityModel), serialNumber(serialNumber),
-      ownerService(ownerServicePtr), parser(ownerServicePtr)
+      ownerService(ownerServicePtr), parser(ownerServicePtr),
+      messageProcessedCallback(std::move(messageProcessedCallback))
 {}
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
@@ -49,7 +52,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 
     bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber.c_str()};
 
-    initialized = (bsp::usbInit(initParams) < 0) ? false : true;
+    initialized = bsp::usbInit(initParams) >= 0;
 
     return initialized;
 }
@@ -101,7 +104,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
 
         using namespace sdesktop::endpoints;
         auto factory = EndpointFactory::create(securityModel.getEndpointSecurity());
-        auto handler = std::make_unique<MessageHandler>(ownerService, std::move(factory));
+        auto handler = std::make_unique<MessageHandler>(ownerService, messageProcessedCallback, std::move(factory));
 
         parser.setMessageHandler(std::move(handler));
         parser.processMessage(std::move(*receivedMsg));

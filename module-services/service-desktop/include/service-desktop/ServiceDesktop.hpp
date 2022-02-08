@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,6 +12,7 @@
 #include "Constants.hpp"
 #include "USBSecurityModel.hpp"
 #include <service-desktop/BackupRestore.hpp>
+#include <service-desktop/Outbox.hpp>
 #include <service-db/DBServiceName.hpp>
 
 #include <bsp/usb/usb.hpp>
@@ -34,6 +35,8 @@ namespace sdesktop
     inline constexpr auto cdc_queue_object_size     = 1024;
     inline constexpr auto irq_queue_object_size     = sizeof(bsp::USBDeviceStatus);
     inline constexpr auto file_transfer_timeout     = 5000;
+    constexpr auto notificationsClearTimerName      = "notificationsClearTimer";
+    constexpr auto notificationsClearTimerDelayMs   = std::chrono::milliseconds{1000 * 20};
     inline constexpr auto RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
     inline constexpr auto SEND_QUEUE_BUFFER_NAME    = "sendQueueBuffer";
     inline constexpr auto IRQ_QUEUE_BUFFER_NAME     = "irqQueueBuffer";
@@ -77,10 +80,16 @@ class ServiceDesktop : public sys::Service
     auto getSerialNumber() const -> std::string;
     auto getCaseColour() const -> std::string;
 
+    auto getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>;
+    void removeNotificationEntries(const std::vector<int> &);
+    void restartNotificationsClearTimer();
+
   private:
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
     std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;
+    sys::TimerHandle notificationsClearTimer;
+    std::vector<Outbox::NotificationEntry> notificationEntries;
 
     static constexpr unsigned int DefaultLogFlushTimeoutInMs = 1000U;
     bool initialized                                         = false;

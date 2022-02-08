@@ -96,6 +96,15 @@ namespace sdesktop::endpoints::json
         inline constexpr auto templateID         = "templateID";
     } // namespace messages
 
+    namespace outbox
+    {
+        inline constexpr auto entries   = "entries";
+        inline constexpr auto uid       = "uid";
+        inline constexpr auto type      = "type";
+        inline constexpr auto change    = "change";
+        inline constexpr auto record_id = "record_id";
+    } // namespace outbox
+
     namespace usb
     {
         inline constexpr auto config          = "config";

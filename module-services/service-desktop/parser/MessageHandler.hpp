@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,11 +15,11 @@ namespace sdesktop::endpoints
     {
         json11::Json messageJson;
         std::string JsonErrorMsg;
-        sys::Service *OwnerServicePtr = nullptr;
-        std::unique_ptr<EndpointFactory> endpointFactory;
 
       public:
-        MessageHandler(sys::Service *OwnerService, std::unique_ptr<EndpointFactory> endpointFactory);
+        MessageHandler(sys::Service *OwnerService,
+                       std::function<void()> messageProcessedCallback,
+                       std::unique_ptr<EndpointFactory> endpointFactory);
 
         [[nodiscard]] auto isJSONNull() const -> bool
         {
@@ -35,6 +35,11 @@ namespace sdesktop::endpoints
         };
         void parseMessage(const std::string &msg);
         void processMessage();
+
+      private:
+        std::function<void()> messageProcessedCallback;
+        sys::Service *OwnerServicePtr = nullptr;
+        std::unique_ptr<EndpointFactory> endpointFactory;
     };
 
 } // namespace sdesktop::endpoints
