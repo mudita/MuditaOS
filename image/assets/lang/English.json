@@ -312,7 +312,7 @@
   "app_onboarding_skip_confirm": "<text>SIM setup is required for network connection. Skip the setup anyway? </text>",
   "app_onboarding_configuration_successful": "<text>Your Mudita Pure<br></br>is ready to use.</text>",
   "app_onboarding_no_configuration": "<text>Your Mudita Pure has not been<br></br>configured. You can go to<br></br>Settings to set it up.</text>",
-  "app_onboarding_update_info": "<text>The current version of MuditaOS is <br></br> <token>$VERSION</token>. Updates with new <br></br> features and fixes appear often. <br></br>To update your Phone please <br></br> visit: </text><text font='gt_pressura' weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>and follow the instructions.</text>",
+  "app_onboarding_update_info": "<text>The current version of MuditaOS is<br></br><token>$VERSION</token><br></br> Updates with new features and fixes appear often.<br></br>To update your Phone please <br></br> visit: </text><text font='gt_pressura' weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>and follow the instructions.</text>",
   "app_settings_title_main": "Settings",
   "app_settings_advanced": "Advanced",
   "app_settings_bt": "Bluetooth",

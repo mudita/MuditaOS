@@ -342,7 +342,7 @@
   "app_onboarding_skip_confirm": "<text>Es necesario configurar la SIM para conectarse a la red. ¿Omitir la configuración? </text>",
   "app_onboarding_configuration_successful": "<text>Tu Mudita Pure<br></br>ya está listo.</text>",
   "app_onboarding_no_configuration": "<text>Tu Mudita Pure no está<br></br>configurado. Ve a<br></br>Ajustes para configurarlo.</text>",
-  "app_onboarding_update_info": "<text>La versión actual del SO de Mudita es la <br></br> <token>$VERSION</token>. Las frecuentes actualizaciones <br></br> incluyen nuevas funciones y correcciones. <br></br>Para actualizar tu teléfono, <br></br>visita: </text><text font='gt_pressura' weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>y sigue las instrucciones.</text>",
+  "app_onboarding_update_info": "<text>La versión actual del SO de Mudita es la<token>$VERSION</token><br></br>Las frecuentes actualizaciones incluyen nuevas funciones y correcciones.<br></br>Para actualizar tu teléfono,<br></br>visita: </text><text font='gt_pressura' weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>y sigue las instrucciones.</text>",
   "app_settings_title_main": "Ajustes",
   "app_settings_advanced": "Avanzados",
   "app_settings_bt": "Bluetooth",
