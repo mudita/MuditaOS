@@ -12,6 +12,8 @@ target_sources(
         deviceInfo/DeviceInfoEndpoint.cpp
         messages/MessageHelper.cpp
         messages/MessagesEndpoint.cpp
+        outbox/OutboxHelper.cpp
+        outbox/OutboxEndpoint.cpp
     PUBLIC
         include/endpoints/calllog/CalllogEndpoint.hpp
         include/endpoints/calllog/CalllogHelper.hpp
@@ -20,6 +22,8 @@ target_sources(
         include/endpoints/deviceInfo/DeviceInfoEndpoint.hpp
         include/endpoints/messages/MessageHelper.hpp
         include/endpoints/messages/MessagesEndpoint.hpp
+        include/endpoints/outbox/OutboxHelper.hpp
+        include/endpoints/outbox/OutboxEndpoint.hpp
 )
 
 target_include_directories(

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EndpointFactoryPure.hpp"
@@ -12,6 +12,7 @@
 #include <endpoints/factoryReset/FactoryResetEndpoint.hpp>
 #include <endpoints/filesystem/FilesystemEndpoint.hpp>
 #include <endpoints/messages/MessagesEndpoint.hpp>
+#include <endpoints/outbox/OutboxEndpoint.hpp>
 #include <endpoints/nullEndpoint/NullEndpoint.hpp>
 #include <endpoints/restore/RestoreEndpoint.hpp>
 #include <endpoints/security/SecurityEndpoint.hpp>
@@ -50,6 +51,8 @@ namespace sdesktop::endpoints
             return std::make_unique<BluetoothEndpoint>(ownerServicePtr);
         case EndpointType::usbSecurity:
             return std::make_unique<SecurityEndpoint>(ownerServicePtr);
+        case EndpointType::outbox:
+            return std::make_unique<OutboxEndpoint>(ownerServicePtr);
         default:
             return std::make_unique<NullEndpoint>(ownerServicePtr);
         }

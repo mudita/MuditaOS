@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHandler.hpp"
-
 #include <endpoints/EndpointFactory.hpp>
 
 #include <log/log.hpp>
@@ -12,8 +11,11 @@
 namespace sdesktop::endpoints
 {
 
-    MessageHandler::MessageHandler(sys::Service *OwnerService, std::unique_ptr<EndpointFactory> endpointFactory)
-        : OwnerServicePtr(OwnerService), endpointFactory(std::move(endpointFactory))
+    MessageHandler::MessageHandler(sys::Service *OwnerService,
+                                   std::function<void()> messageProcessedCallback,
+                                   std::unique_ptr<EndpointFactory> endpointFactory)
+        : messageProcessedCallback(std::move(messageProcessedCallback)), OwnerServicePtr(OwnerService),
+          endpointFactory(std::move(endpointFactory))
     {}
 
     void MessageHandler::parseMessage(const std::string &msg)
@@ -37,12 +39,12 @@ namespace sdesktop::endpoints
 
         auto handler = endpointFactory->create(*context, OwnerServicePtr);
 
-        if (handler != nullptr) {
-            handler->handle(*context);
-        }
-        else {
+        if (handler == nullptr) {
             LOG_ERROR("No way to handle!");
+            return;
         }
+        handler->handle(*context);
+        messageProcessedCallback();
     }
 
 } // namespace sdesktop::endpoints

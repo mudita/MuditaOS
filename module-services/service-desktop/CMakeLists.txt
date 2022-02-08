@@ -26,6 +26,7 @@ target_sources(
         include/service-desktop/DesktopEvent.hpp
         include/service-desktop/DesktopMessages.hpp
         include/service-desktop/DeveloperModeMessage.hpp
+        include/service-desktop/Outbox.hpp
         include/service-desktop/ServiceDesktop.hpp
         include/service-desktop/USBSecurityModel.hpp
 )
