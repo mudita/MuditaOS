@@ -250,9 +250,6 @@ namespace style
 
     namespace sidelistview
     {
-        inline auto arrow_left_image  = "arrow_left_24px_W_G";
-        inline auto arrow_right_image = "arrow_right_24px_W_G";
-
         namespace list_item
         {
             inline constexpr auto w = window_width;

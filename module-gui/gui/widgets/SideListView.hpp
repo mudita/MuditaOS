@@ -20,10 +20,8 @@ namespace gui
     {
       protected:
         HBarGraph *pageBar  = nullptr;
-        HBox *arrowsOverlay = nullptr;
         VBox *bodyOverlay   = nullptr;
 
-        auto createArrowsOverlay(unsigned int x, unsigned y, unsigned int w, unsigned int h) -> void;
         auto createPageBar() -> void;
         auto setFocus() -> void override;
         auto applyScrollCallbacks() -> void;
