@@ -2,15 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellHomeScreenWindow.hpp"
-#include "data/BellMainStyle.hpp"
-#include "widgets/SnoozeTimer.hpp"
-#include "widgets/ProgressTimerWithSnoozeTimer.hpp"
 #include "BellBatteryStatusWindow.hpp"
 #include "ProductConfig.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/actions/AlarmRingingData.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
+#include <common/layouts/HomeScreenLayouts.hpp>
+#include <common/widgets/SnoozeTimer.hpp>
+#include <common/widgets/ProgressTimerWithSnoozeTimer.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
@@ -83,16 +83,8 @@ namespace gui
         this->presenter->createData();
     }
 
-    BellHomeScreenWindow::~BellHomeScreenWindow()
-    {
-        if (currentLayout) {
-            removeWidget(currentLayout->getLayout());
-        }
-    }
-
     void BellHomeScreenWindow::buildInterface()
     {
-        using namespace bellMainStyle;
         AppWindow::buildInterface();
 
         statusBar->setVisible(false);
@@ -100,12 +92,12 @@ namespace gui
         navBar->setVisible(false);
     }
 
-    void BellHomeScreenWindow::setLayout(std::unique_ptr<BaseHomeScreenLayoutProvider> layout)
+    void BellHomeScreenWindow::setLayout(LayoutGenerator layoutGenerator)
     {
         if (currentLayout) {
             removeWidget(currentLayout->getLayout());
         }
-        currentLayout = std::move(layout);
+        currentLayout = layoutGenerator();
         addWidget(static_cast<BellBaseLayout *>(currentLayout->getLayout()));
         presenter->onBeforeShow();
 

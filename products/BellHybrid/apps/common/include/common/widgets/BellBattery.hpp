@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "BoxLayout.hpp"
 #include <EventStore.hpp>
+#include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Image.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 

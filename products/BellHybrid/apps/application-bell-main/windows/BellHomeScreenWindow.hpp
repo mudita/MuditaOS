@@ -4,12 +4,12 @@
 #pragma once
 
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
-#include "layouts/BaseHomeScreenLayoutProvider.hpp"
 #include "models/TemperatureModel.hpp"
-#include "widgets/BellBattery.hpp"
 
 #include <apps-common/GuiTimer.hpp>
 #include <apps-common/windows/AppWindow.hpp>
+#include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
+#include <common/widgets/BellBattery.hpp>
 
 namespace gui
 {
@@ -19,11 +19,9 @@ namespace gui
         BellHomeScreenWindow(app::ApplicationCommon *app,
                              std::shared_ptr<app::home_screen::AbstractPresenter> presenter);
 
-        ~BellHomeScreenWindow();
-
       private:
         void buildInterface() override;
-        void setLayout(std::unique_ptr<BaseHomeScreenLayoutProvider> layout) override;
+        void setLayout(LayoutGenerator layoutGenerator) override;
         bool updateTime() override;
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -54,7 +52,7 @@ namespace gui
 
         std::shared_ptr<app::home_screen::AbstractPresenter> presenter;
 
-        std::unique_ptr<BaseHomeScreenLayoutProvider> currentLayout;
+        BaseHomeScreenLayoutProvider *currentLayout{};
 
         static constexpr auto timerName = "HS_timer";
     };

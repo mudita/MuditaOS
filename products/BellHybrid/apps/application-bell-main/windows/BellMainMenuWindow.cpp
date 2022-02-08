@@ -10,7 +10,6 @@
 #include <application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
-#include <data/BellMainStyle.hpp>
 
 #include <Dialog.hpp>
 #include <DialogMetadataMessage.hpp>

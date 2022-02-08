@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "layouts/HomeScreenLayoutClassic.hpp"
+#include "HomeScreenLayoutClassic.hpp"
 
 namespace gui
 {

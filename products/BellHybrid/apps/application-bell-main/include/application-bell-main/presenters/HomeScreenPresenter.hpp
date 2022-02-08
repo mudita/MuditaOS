@@ -5,6 +5,8 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <common/models/AbstractAlarmModel.hpp>
+#include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
+#include <common/layouts/HomeScreenLayouts.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <module-utils/EventStore/EventStore.hpp>
 #include <Timers/TimerHandle.hpp>
@@ -40,20 +42,6 @@ namespace app::home_screen
     class AbstractBatteryModel;
     class AbstractTemperatureModel;
 
-    enum class ViewState
-    {
-        Deactivated,
-        DeactivatedWait,
-        WaitForConfirmation,
-        AlarmEdit,
-        ActivatedWait,
-        Activated,
-        AlarmRinging,
-        AlarmRingingDeactivatedWait,
-        AlarmSnoozedWait,
-        AlarmSnoozed
-    };
-
     class AbstractView
     {
       public:
@@ -82,10 +70,10 @@ namespace app::home_screen
         virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
 
         /// Various
-        virtual void setLayout(std::unique_ptr<gui::BaseHomeScreenLayoutProvider> layout) = 0;
-        virtual void switchToMenu()                                                       = 0;
-        virtual void switchToBatteryStatus()                                              = 0;
-        virtual void setSnoozeTime(std::time_t time)                                      = 0;
+        virtual void setLayout(gui::LayoutGenerator layoutGenerator) = 0;
+        virtual void switchToMenu()                                  = 0;
+        virtual void switchToBatteryStatus()                         = 0;
+        virtual void setSnoozeTime(std::time_t time)                 = 0;
     };
 
     class AbstractPresenter : public BasePresenter<AbstractView>
@@ -110,7 +98,7 @@ namespace app::home_screen
         virtual std::uint32_t getBatteryLvl() const                                              = 0;
         virtual bool isBatteryCharging() const                                                   = 0;
         virtual bool isAlarmActivatedByLatch() const                                             = 0;
-        virtual void setLayout(std::unique_ptr<gui::BaseHomeScreenLayoutProvider> layout)        = 0;
+        virtual void setLayout(gui::LayoutGenerator layoutGenerator)                             = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -151,7 +139,7 @@ namespace app::home_screen
         bool isBatteryCharging() const override;
         bool isAlarmActivatedByLatch() const override;
 
-        void setLayout(std::unique_ptr<gui::BaseHomeScreenLayoutProvider> layout) override;
+        void setLayout(gui::LayoutGenerator layoutGenerator) override;
 
       private:
         ApplicationCommon *app;

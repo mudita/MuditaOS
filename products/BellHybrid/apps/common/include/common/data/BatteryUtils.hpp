@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <optional>
+#include <string>
 
 #include <Units.hpp>
 
