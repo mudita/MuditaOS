@@ -395,7 +395,8 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleSignalStrengthUpdate(sys::Message *msgl)
     {
-        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
+        if ((state == State::ACTIVE_FORGROUND) && !isOnPhoneLockWindow() &&
+            getCurrentWindow()->updateSignalStrength()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -403,7 +404,8 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleNetworkAccessTechnologyUpdate(sys::Message *msgl)
     {
-        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateNetworkAccessTechnology()) {
+        if ((state == State::ACTIVE_FORGROUND) && !isOnPhoneLockWindow() &&
+            getCurrentWindow()->updateNetworkAccessTechnology()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -446,7 +448,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleBatteryStatusChange()
     {
-        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateBatteryStatus()) {
+        if ((state == State::ACTIVE_FORGROUND) && !isOnPhoneLockWindow() && getCurrentWindow()->updateBatteryStatus()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -455,6 +457,11 @@ namespace app
     sys::MessagePointer ApplicationCommon::handleMinuteUpdated(sys::Message *msgl)
     {
         if (state == State::ACTIVE_FORGROUND && getCurrentWindow()->updateTime()) {
+
+            if (isOnPhoneLockWindow()) {
+                updateStatusBarOnPhoneLockWindow();
+            }
+
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -619,7 +626,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleUpdateWindow(sys::Message *msgl)
     {
-        auto msg = static_cast<AppUpdateWindowMessage *>(msgl);
+        auto msg         = static_cast<AppUpdateWindowMessage *>(msgl);
         auto haveBuilder = windowsFactory.isRegistered(msg->getWindowName());
         auto window      = isCurrentWindow(msg->getWindowName());
         if (haveBuilder && window) {
@@ -723,7 +730,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleSimStateUpdateMessage(sys::Message *msgl)
     {
-        if (getCurrentWindow()->updateSim()) {
+        if (!isOnPhoneLockWindow() && getCurrentWindow()->updateSim()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -994,6 +1001,20 @@ namespace app
     {
         return simLockSubject;
     }
+
+    bool ApplicationCommon::isOnPhoneLockWindow()
+    {
+        return getCurrentWindow()->getName() == gui::popup::window::phone_lock_window;
+    }
+
+    void ApplicationCommon::updateStatusBarOnPhoneLockWindow()
+    {
+        getCurrentWindow()->updateSignalStrength();
+        getCurrentWindow()->updateNetworkAccessTechnology();
+        getCurrentWindow()->updateBatteryStatus();
+        getCurrentWindow()->updateSim();
+    }
+
     void ApplicationCommon::registerOnPopCallback(std::function<void(WindowsStack &)> callback)
     {
         windowsStack().registerOnPopCallback(std::move(callback));
