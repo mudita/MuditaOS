@@ -52,6 +52,7 @@ namespace sdesktop::endpoints::json
     inline constexpr auto fileList       = "fileList";
     inline constexpr auto files          = "files";
     inline constexpr auto backupLocation = "backupLocation";
+    inline constexpr auto deviceToken    = "deviceToken";
 
     namespace updateprocess
     {

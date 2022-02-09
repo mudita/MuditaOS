@@ -28,6 +28,7 @@ namespace sdesktop::endpoints
         auto fileListToJsonObject(const std::vector<std::string> &fileList) const -> json11::Json::object const;
         auto requestLogsFlush() const -> void;
         auto getStorageStats(const std::string &path) -> std::tuple<long, long>;
+        auto getDeviceToken() -> std::string;
 
         static constexpr auto OS_RESERVED_SPACE_IN_MB = (1024LU);
 
