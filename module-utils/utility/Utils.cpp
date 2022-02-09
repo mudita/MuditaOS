@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Utils.hpp"
@@ -30,24 +30,6 @@ namespace utils::filesystem
         }
 
         return digestCrc32.getHashValue();
-    }
-
-    std::string generateRandomId(std::size_t length) noexcept
-    {
-        const std::string CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-        std::random_device random_device;
-        std::mt19937 generator(random_device());
-        generator.seed(std::time(nullptr));
-        std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
-
-        std::string random_string;
-
-        for (std::size_t i = 0; i < length; ++i) {
-            random_string += CHARACTERS[distribution(generator)];
-        }
-
-        return random_string;
     }
 
     std::string getline(std::FILE *stream, uint32_t length) noexcept
@@ -97,6 +79,27 @@ namespace utils
         for (auto const &b : bytes)
             s << std::setw(2) << std::hex << (unsigned short)b;
         return s.str();
+    }
+
+    std::string generateRandomId(std::size_t length) noexcept
+    {
+        if (!length)
+            return {};
+
+        const std::string CHARACTERS("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+
+        auto random_device = std::make_unique<std::random_device>();
+        auto generator     = std::make_unique<std::mt19937>((*random_device)());
+        generator->seed(std::time(nullptr));
+        std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
+
+        std::string random_string(length, '\0');
+
+        for (std::size_t i = 0; i < length; ++i) {
+            random_string[i] = CHARACTERS[distribution(*generator)];
+        }
+
+        return random_string;
     }
 
 } // namespace utils

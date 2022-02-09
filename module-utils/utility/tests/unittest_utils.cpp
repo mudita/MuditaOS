@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstring>
@@ -423,5 +423,29 @@ TEST_CASE("Bytes to hex")
         std::vector<std::uint8_t> vb = {1, 2, 3, 4, 0xFF};
         auto ret                     = utils::bytesToHex(vb);
         REQUIRE((ret == "01020304ff"));
+    }
+}
+
+TEST_CASE("Generate random Id")
+{
+    SECTION("Random Id length of 0")
+    {
+        const auto expectedSize = 0;
+        auto ret                = utils::generateRandomId(expectedSize);
+        REQUIRE((ret.size() == expectedSize));
+    }
+
+    SECTION("Random Id length of 1")
+    {
+        const auto expectedSize = 1;
+        auto ret                = utils::generateRandomId(expectedSize);
+        REQUIRE((ret.size() == expectedSize));
+    }
+
+    SECTION("Random Id length of 16")
+    {
+        const auto expectedSize = 16;
+        auto ret                = utils::generateRandomId(expectedSize);
+        REQUIRE((ret.size() == expectedSize));
     }
 }
