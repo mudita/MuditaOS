@@ -257,10 +257,11 @@ namespace utils
 #endif
     }
 
+    [[nodiscard]] std::string generateRandomId(std::size_t length) noexcept;
+
     namespace filesystem
     {
         [[nodiscard]] unsigned long computeFileCRC32(std::FILE *file) noexcept;
-        [[nodiscard]] std::string generateRandomId(std::size_t length = 0) noexcept;
         [[nodiscard]] std::string getline(std::FILE *stream, uint32_t length = 1024) noexcept;
     } // namespace filesystem
 } // namespace utils
