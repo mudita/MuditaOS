@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #####################################################################
@@ -16,7 +16,7 @@ SCRIPT=$(readlink -f $0)
 SCRIPT_DIR="$(dirname ${SCRIPT})"
 
 . ${SCRIPT_DIR}/bootstrap_config
-. ${SCRIPT_DIR}/common_scripsts_lib
+. ${SCRIPT_DIR}/common_scripts_lib
 
 function test_if_run_as_root() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
