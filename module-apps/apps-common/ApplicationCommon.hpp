@@ -437,6 +437,9 @@ namespace app
         locks::LockPolicyHandler lockPolicyHandler;
         locks::SimLockSubject simLockSubject;
 
+        bool isOnPhoneLockWindow();
+        void updateStatusBarOnPhoneLockWindow();
+
       public:
         [[nodiscard]] auto getPhoneLockSubject() noexcept -> locks::PhoneLockSubject &;
         [[nodiscard]] auto getSimLockSubject() noexcept -> locks::SimLockSubject &;
