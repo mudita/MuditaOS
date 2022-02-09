@@ -21,11 +21,11 @@ def test_get_device_information(harness):
     assert 0 < int(ret.diag_info["fsTotal"]) < 16000
     assert 0 < int(ret.diag_info["fsFree"]) < 16000
     assert 0 < int(ret.diag_info["fsFreePercent"]) <= 100
-    assert re.match("^(\d|[a-z]){8}$", ret.diag_info["gitRevision"])
+    assert re.match(r"^(\d|[a-z]){8,40}$", ret.diag_info["gitRevision"])
     assert ret.diag_info["gitBranch"] is not None
     assert int(ret.diag_info["currentRTCTime"]) > 1641991996
-    assert re.match("^\d\.\d\.\d", ret.diag_info["version"])
-    assert re.match("^\d{14}$", ret.diag_info["serialNumber"])
+    assert re.match(r"^\d\.\d\.\d", ret.diag_info["version"])
+    assert re.match(r"^\d{3,14}$", ret.diag_info["serialNumber"])
     assert ret.diag_info["caseColour"] in ["gray", "black"]
     assert ret.diag_info["backupLocation"] == "/sys/user/backup"
 
