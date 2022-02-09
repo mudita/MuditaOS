@@ -51,6 +51,36 @@ auto ServiceDesktop::getSerialNumber() const -> std::string
     return settings->getValue(std::string("factory_data/serial"), settings::SettingsScope::Global);
 }
 
+auto ServiceDesktop::generateDeviceUniqueId() -> void
+{
+    const auto deviceUniqueId = utils::generateRandomId(sdesktop::DeviceUniqueIdLength);
+    LOG_SENSITIVE(LOGINFO, "Device unique id: %s", deviceUniqueId.c_str());
+    setDeviceUniqueId(deviceUniqueId);
+}
+
+auto ServiceDesktop::setDeviceUniqueId(const std::string &token) -> void
+{
+    return settings->setValue(sdesktop::DeviceUniqueIdName, token);
+}
+
+auto ServiceDesktop::getDeviceToken() -> std::string
+{
+    std::string tokenSeed = getDeviceUniqueId();
+
+    if (tokenSeed.empty()) {
+        LOG_DEBUG("Device unique id is empty, generating one...");
+        generateDeviceUniqueId();
+        tokenSeed = getDeviceUniqueId();
+    }
+
+    return (tokenSeed);
+}
+
+auto ServiceDesktop::getDeviceUniqueId() const -> std::string
+{
+    return settings->getValue(sdesktop::DeviceUniqueIdName);
+}
+
 auto ServiceDesktop::getCaseColour() const -> std::string
 {
     return settings->getValue(std::string("factory_data/case_colour"), settings::SettingsScope::Global);

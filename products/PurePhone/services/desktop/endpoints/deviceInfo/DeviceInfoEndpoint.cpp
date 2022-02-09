@@ -128,6 +128,11 @@ namespace sdesktop::endpoints
         return static_cast<ServiceDesktop *>(ownerServicePtr)->getCaseColour();
     }
 
+    auto DeviceInfoEndpoint::getDeviceToken() -> std::string
+    {
+        return static_cast<ServiceDesktop *>(ownerServicePtr)->getDeviceToken();
+    }
+
     auto DeviceInfoEndpoint::getStorageStats(const std::string &path) -> std::tuple<long, long>
     {
         std::unique_ptr<struct statvfs> vfstat = std::make_unique<struct statvfs>();
@@ -198,13 +203,14 @@ namespace sdesktop::endpoints
              {json::fsTotal, std::to_string(totalMbytes)},
              {json::fsFree, std::to_string(freeUserMbytes)},
              {json::fsFreePercent, std::to_string(freePercent)},
-             {json::gitRevision, (std::string)(GIT_REV)},
-             {json::gitBranch, (std::string)GIT_BRANCH},
+             {json::gitRevision, std::string(GIT_REV)},
+             {json::gitBranch, std::string(GIT_BRANCH)},
              {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
              {json::version, std::string(VERSION)},
              {json::serialNumber, getSerialNumber()},
              {json::caseColour, getCaseColour()},
-             {json::backupLocation, purefs::dir::getBackupOSPath().string()}}));
+             {json::backupLocation, purefs::dir::getBackupOSPath().string()},
+             {json::deviceToken, getDeviceToken()}}));
 
         context.setResponseStatus(http::Code::OK);
         return true;

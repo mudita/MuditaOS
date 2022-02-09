@@ -40,6 +40,8 @@ namespace sdesktop
     inline constexpr auto RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
     inline constexpr auto SEND_QUEUE_BUFFER_NAME    = "sendQueueBuffer";
     inline constexpr auto IRQ_QUEUE_BUFFER_NAME     = "irqQueueBuffer";
+    inline constexpr auto DeviceUniqueIdLength      = 32;
+    constexpr auto DeviceUniqueIdName               = "sd_device_unique_id";
 
 }; // namespace sdesktop
 
@@ -83,8 +85,14 @@ class ServiceDesktop : public sys::Service
     auto getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>;
     void removeNotificationEntries(const std::vector<int> &);
     void restartNotificationsClearTimer();
+    auto getDeviceToken() -> std::string;
 
   private:
+    auto getDeviceUniqueId() const -> std::string;
+
+    void generateDeviceUniqueId();
+    void setDeviceUniqueId(const std::string &token);
+
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
     std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;

@@ -28,6 +28,7 @@ def test_get_device_information(harness):
     assert re.match(r"^\d{3,14}$", ret.diag_info["serialNumber"])
     assert ret.diag_info["caseColour"] in ["gray", "black"]
     assert ret.diag_info["backupLocation"] == "/sys/user/backup"
+    assert re.match(r"^(\d|[a-zA-Z]){32}$", ret.diag_info["deviceToken"])
 
 
 @pytest.mark.service_desktop_test
