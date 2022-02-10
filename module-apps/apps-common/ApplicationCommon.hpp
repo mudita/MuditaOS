@@ -197,6 +197,7 @@ namespace app
         sys::MessagePointer handleUpdateWindow(sys::Message *msgl);
         sys::MessagePointer handleAppRebuild(sys::Message *msgl);
         sys::MessagePointer handleAppRefresh(sys::Message *msgl);
+        sys::MessagePointer handleAppShutdownRefresh(sys::Message *msgl);
         sys::MessagePointer handleGetDOM(sys::Message *msgl);
         sys::MessagePointer handleSimStateUpdateMessage(sys::Message *msgl);
 
@@ -300,12 +301,6 @@ namespace app
             suspendInProgress = val;
         };
 
-        // Latching close system in progress flag
-        virtual void setSystemCloseInProgress()
-        {
-            systemCloseInProgress = true;
-        }
-
         bool adjustCurrentVolume(const int step);
         bool increaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
         {
@@ -368,6 +363,8 @@ namespace app
         virtual void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params);
         void abortPopup(gui::popup::ID id);
 
+        void requestShutdownWindow(std::string windowName);
+
       public:
         /// @ingrup AppWindowStack
         /// get to the first time we entered this &window
@@ -405,7 +402,6 @@ namespace app
         /// services if last rendering mesage will be processed.
         bool suspendInProgress = false;
 
-        bool systemCloseInProgress = false;
         /// Storage for asynchronous tasks callbacks.
         std::unique_ptr<CallbackStorage> callbackStorage;
         void checkBlockingRequests();

@@ -39,14 +39,12 @@ namespace app
         });
 
         addActionReceiver(app::manager::actions::DisplayLogoAtExit, [this](auto &&data) {
-            setSystemCloseInProgress();
-            switchWindow(gui::BellWelcomeWindow::defaultName);
+            requestShutdownWindow(gui::BellWelcomeWindow::defaultName);
             return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
-            setSystemCloseInProgress();
-            switchWindow(gui::window::name::bell_battery_shutdown, std::move(data));
+            requestShutdownWindow(gui::window::name::bell_battery_shutdown);
             return actionHandled();
         });
 

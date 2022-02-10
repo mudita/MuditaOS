@@ -110,6 +110,13 @@ namespace app
         }
     };
 
+    class AppShutdownRefreshMessage : public AppRefreshMessage
+    {
+      public:
+        AppShutdownRefreshMessage(std::string window_name)
+            : AppRefreshMessage(gui::RefreshModes::GUI_REFRESH_DEEP, window_name){};
+    };
+
     class AppSwitchWindowMessage : public AppMessage
     {
       protected:
