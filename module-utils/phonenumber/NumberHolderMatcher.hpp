@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -63,6 +63,11 @@ namespace utils
                                          PhoneNumber::Match level = PhoneNumber::Match::EXACT)
         {
             utils::time::Scoped t{"bestMatch()"};
+            // if empty string, do not try to match, simply return
+            if (phoneNumber.get().empty()) {
+                return std::nullopt;
+            }
+
             restartFor(phoneNumber);
             do {
                 const auto it =

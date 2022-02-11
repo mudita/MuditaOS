@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCallLog.hpp"
@@ -133,9 +133,7 @@ namespace app
         DBServiceAPI::GetQuery(this,
                                db::Interface::Name::Notifications,
                                std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
-        const auto [succeed, _] = DBServiceAPI::GetQuery(
-            this, db::Interface::Name::Calllog, std::make_unique<db::query::calllog::SetAllRead>());
-        return succeed;
+        return true;
     }
 
 } /* namespace app */
