@@ -9,13 +9,13 @@ namespace bsp
     {
         PowerProfile purePowerProfile;
 
-        purePowerProfile.frequencyShiftLowerThreshold      = 40;
-        purePowerProfile.frequencyShiftUpperThreshold      = 60;
-        purePowerProfile.maxBelowThresholdCount            = 30;
-        purePowerProfile.maxBelowThresholdInRowCount       = 10;
-        purePowerProfile.maxAboveThresholdCount            = 3;
-        purePowerProfile.minimalFrequency                  = CpuFrequencyMHz::Level_1;
-        purePowerProfile.frequencyIncreaseIntermediateStep = false;
+        purePowerProfile.frequencyShiftLowerThreshold      = 50;
+        purePowerProfile.frequencyShiftUpperThreshold      = 80;
+        purePowerProfile.maxBelowThresholdCount            = 5;
+        purePowerProfile.maxBelowThresholdInRowCount       = 1;
+        purePowerProfile.maxAboveThresholdCount            = 2;
+        purePowerProfile.minimalFrequency                  = CpuFrequencyMHz::Level_0;
+        purePowerProfile.frequencyIncreaseIntermediateStep = true;
 
         return purePowerProfile;
     }

@@ -187,10 +187,11 @@ namespace sys
             level = bsp::CpuFrequencyMHz::Level_2;
             break;
         case bsp::CpuFrequencyMHz::Level_2:
-            level = powerProfile.minimalFrequency;
+            level = bsp::CpuFrequencyMHz::Level_1;
             break;
         case bsp::CpuFrequencyMHz::Level_1:
-            [[fallthrough]];
+            level = powerProfile.minimalFrequency;
+            break;
         case bsp::CpuFrequencyMHz::Level_0:
             break;
         }
