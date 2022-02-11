@@ -26,6 +26,7 @@
  */
 
 /* Standard includes. */
+#include "prof.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -2353,8 +2354,6 @@ TCB_t *pxTCB;
 	TCB_t *pxNextTCB, *pxFirstTCB, *pxReturn = NULL;
 	UBaseType_t x;
 	char cNextChar;
-	BaseType_t xBreakLoop;
-
 		/* This function is called with the scheduler suspended. */
 
 		if( listCURRENT_LIST_LENGTH( pxList ) > ( UBaseType_t ) 0 )
@@ -2412,6 +2411,32 @@ TCB_t *pxTCB;
 	}
 
 #endif /* INCLUDE_xTaskGetHandle */
+
+	static TCB_t *prvSearchForTCBNumberWithinSingleList( List_t *pxList,  UBaseType_t TCBNumber)
+	{
+	TCB_t *pxNextTCB, *pxFirstTCB, *pxReturn = NULL;
+		/* This function is called with the scheduler suspended. */
+		if( listCURRENT_LIST_LENGTH( pxList ) > ( UBaseType_t ) 0 )
+		{
+			listGET_OWNER_OF_NEXT_ENTRY( pxFirstTCB, pxList );  /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
+			do
+			{
+				listGET_OWNER_OF_NEXT_ENTRY( pxNextTCB, pxList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
+                if (pxNextTCB->uxTCBNumber == TCBNumber) {
+                    pxReturn = pxNextTCB;
+                    break;
+                }
+			} while( pxNextTCB != pxFirstTCB );
+		}
+		else
+		{
+			mtCOVERAGE_TEST_MARKER();
+		}
+
+		return pxReturn;
+	}
+
+
 /*-----------------------------------------------------------*/
 
 #if ( INCLUDE_xTaskGetHandle == 1 )
@@ -2475,8 +2500,64 @@ TCB_t *pxTCB;
 
 		return pxTCB;
 	}
-
 #endif /* INCLUDE_xTaskGetHandle */
+
+	TaskHandle_t xTaskGetByTCBNumber(UBaseType_t TCBNumber ) /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+	{
+	UBaseType_t uxQueue = configMAX_PRIORITIES;
+	TCB_t* pxTCB;
+
+		vTaskSuspendAll();
+		{
+			/* Search the ready lists. */
+			do
+			{
+				uxQueue--;
+				pxTCB = prvSearchForTCBNumberWithinSingleList( ( List_t * ) &( pxReadyTasksLists[ uxQueue ] ), TCBNumber);
+				if( pxTCB != NULL )
+				{
+					/* Found the handle. */
+					break;
+				}
+
+			} while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+
+			/* Search the delayed lists. */
+			if( pxTCB == NULL )
+			{
+				pxTCB = prvSearchForTCBNumberWithinSingleList( ( List_t * ) pxDelayedTaskList, TCBNumber );
+			}
+
+			if( pxTCB == NULL )
+			{
+				pxTCB = prvSearchForTCBNumberWithinSingleList( ( List_t * ) pxOverflowDelayedTaskList, TCBNumber );
+			}
+
+			#if ( INCLUDE_vTaskSuspend == 1 )
+			{
+				if( pxTCB == NULL )
+				{
+					/* Search the suspended list. */
+					pxTCB = prvSearchForTCBNumberWithinSingleList( &xSuspendedTaskList, TCBNumber );
+				}
+			}
+			#endif
+
+			#if( INCLUDE_vTaskDelete == 1 )
+			{
+				if( pxTCB == NULL )
+				{
+					/* Search the deleted list. */
+					pxTCB = prvSearchForTCBNumberWithinSingleList( &xTasksWaitingTermination, TCBNumber );
+				}
+			}
+			#endif
+		}
+		( void ) xTaskResumeAll();
+
+		return pxTCB;
+	}
+
 /*-----------------------------------------------------------*/
 
 #if ( configUSE_TRACE_FACILITY == 1 )
@@ -2978,6 +3059,7 @@ void vTaskSwitchContext( void )
 			if( ulTotalRunTime > ulTaskSwitchedInTime )
 			{
 				pxCurrentTCB->ulRunTimeCounter += ( ulTotalRunTime - ulTaskSwitchedInTime );
+                prof_pool_data_set(ulTotalRunTime - ulTaskSwitchedInTime, pxCurrentTCB->uxTCBNumber);
 			}
 			else
 			{
@@ -3304,6 +3386,25 @@ void vTaskMissedYield( void )
 
 		return uxReturn;
 	}
+
+	UBaseType_t uxTaskGetTCBNumber( TaskHandle_t xTask )
+	{
+	UBaseType_t uxReturn;
+	TCB_t const *pxTCB;
+
+		if( xTask != NULL )
+		{
+			pxTCB = xTask;
+			uxReturn = pxTCB->uxTCBNumber;
+		}
+		else
+		{
+			uxReturn = 0U;
+		}
+
+		return uxReturn;
+    }
+	
 
 #endif /* configUSE_TRACE_FACILITY */
 /*-----------------------------------------------------------*/
@@ -5215,3 +5316,8 @@ when performing module tests). */
 #endif
 
 
+
+int isOSRunning()
+{
+    return pdTRUE == xSchedulerRunning;
+}

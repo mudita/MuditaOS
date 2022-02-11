@@ -14,6 +14,8 @@ target_sources(sys-manager
         CpuGovernor.cpp
         CpuSentinel.cpp
         CpuStatistics.cpp
+        CpuLogPrinter.cpp
+        CpuPackPrinter.cpp
         data/SystemManagerActionsParams.hpp
         DependencyGraph.cpp
         DeviceManager.cpp
@@ -37,6 +39,7 @@ target_link_libraries(sys-manager
         sys-common
     PRIVATE
         service-desktop
+        msgpack11
 )
 
 if (${ENABLE_TESTS})

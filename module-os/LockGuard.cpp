@@ -8,6 +8,11 @@
 
 LockGuard::LockGuard(cpp_freertos::MutexStandard& mutex) : mutex(mutex)
 {
+
+    if (isOSRunning() == 0)
+    {
+        return;
+    }
     if (isIRQ()) {
         savedInterruptStatus = cpp_freertos::CriticalSection::EnterFromISR();
     }
@@ -18,6 +23,10 @@ LockGuard::LockGuard(cpp_freertos::MutexStandard& mutex) : mutex(mutex)
 
 LockGuard::~LockGuard()
 {
+    if (isOSRunning() == 0)
+    {
+        return;
+    }
     if (isIRQ()) {
         cpp_freertos::CriticalSection::ExitFromISR(savedInterruptStatus);
     }

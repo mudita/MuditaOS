@@ -71,3 +71,11 @@ static inline void haltIfDebugging()
         __asm("bkpt 1");
     }
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+    int isOSRunning();
+#ifdef __cplusplus
+};
+#endif

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,6 +9,23 @@
 
 namespace sys
 {
+
+    namespace sentinel
+    {
+        struct Data
+        {
+            UBaseType_t ownerTCBNumber = 0;
+            /// name of sentinel thread responsible for curent minimum load
+            std::string name;
+            /// curent minimum frequency set in sentinel
+            bsp::CpuFrequencyMHz frequency = bsp::CpuFrequencyMHz::Level_0;
+            /// please do not use this task handle to perform actions, it's just for reference sake
+            TaskHandle_t task;
+            /// textual information on what actually happens
+            std::string reason;
+        };
+    }; // namespace sentinel
+
     using SentinelPointer = std::weak_ptr<CpuSentinel>;
 
     class GovernorSentinel
@@ -43,7 +60,7 @@ namespace sys
                                     bool permanentBlock = false);
         void ResetCpuFrequencyRequest(std::string sentinelName, bool permanentBlock = false);
 
-        [[nodiscard]] auto GetMinimumFrequencyRequested() const noexcept -> bsp::CpuFrequencyMHz;
+        [[nodiscard]] auto GetMinimumFrequencyRequested() const noexcept -> sentinel::Data;
         void InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) const noexcept;
 
         [[nodiscard]] auto GetPermanentFrequencyRequested() const noexcept -> PermanentFrequencyToHold;
@@ -51,6 +68,7 @@ namespace sys
       private:
         static void PrintName(const GovernorSentinelPointer &element);
 
+        /// this could be set - set is sorted :)
         GovernorSentinelsVector sentinels;
         PermanentFrequencyToHold permanentFrequencyToHold{false, bsp::CpuFrequencyMHz::Level_0};
     };

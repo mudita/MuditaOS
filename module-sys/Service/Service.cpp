@@ -112,6 +112,7 @@ namespace sys
                                  staleUniqueMsg.end());
 
             const bool respond = msg->type != Message::Type::Response && GetName() != msg->sender;
+            currentlyProcessing = msg;
             auto response      = msg->Execute(this);
             if (response == nullptr || !respond) {
                 continue;
@@ -266,6 +267,11 @@ namespace sys
     {
         auto msg = std::make_shared<sys::ReadyToCloseMessage>();
         service->bus.sendUnicast(std::move(msg), service::name::system_manager);
+    }
+
+    std::string Service::getCurrentProcessing()
+    {
+        return currentlyProcessing ? std::string(typeid(*currentlyProcessing).name()) : "nothing in progress";
     }
 
     auto Proxy::handleMessage(Service *service, Message *message, ResponseMessage *response) -> MessagePointer

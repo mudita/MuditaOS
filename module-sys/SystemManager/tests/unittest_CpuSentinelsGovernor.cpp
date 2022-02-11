@@ -68,27 +68,27 @@ TEST_CASE("Power Manager CPU sentinels governor test")
         governor->RegisterNewSentinel(testSentinel_1);
         governor->RegisterNewSentinel(testSentinel_2);
 
-        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyMHz::Level_0);
+        REQUIRE(governor->GetMinimumFrequencyRequested().frequency == bsp::CpuFrequencyMHz::Level_0);
 
         governor->SetCpuFrequencyRequest("testSentinel_1", bsp::CpuFrequencyMHz::Level_4);
-        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyMHz::Level_4);
+        REQUIRE(governor->GetMinimumFrequencyRequested().frequency == bsp::CpuFrequencyMHz::Level_4);
 
         governor->SetCpuFrequencyRequest("testSentinel_2", bsp::CpuFrequencyMHz::Level_6);
-        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyMHz::Level_6);
+        REQUIRE(governor->GetMinimumFrequencyRequested().frequency == bsp::CpuFrequencyMHz::Level_6);
 
         governor->SetCpuFrequencyRequest("testSentinel_1", bsp::CpuFrequencyMHz::Level_2);
-        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyMHz::Level_6);
+        REQUIRE(governor->GetMinimumFrequencyRequested().frequency == bsp::CpuFrequencyMHz::Level_6);
 
         governor->ResetCpuFrequencyRequest("testSentinel_2");
-        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyMHz::Level_2);
+        REQUIRE(governor->GetMinimumFrequencyRequested().frequency == bsp::CpuFrequencyMHz::Level_2);
 
-        governor->SetCpuFrequencyRequest("bedNameSentinel", bsp::CpuFrequencyMHz::Level_6);
-        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyMHz::Level_2);
+        governor->SetCpuFrequencyRequest("badNameSentinel", bsp::CpuFrequencyMHz::Level_6);
+        REQUIRE(governor->GetMinimumFrequencyRequested().frequency == bsp::CpuFrequencyMHz::Level_2);
 
         governor->SetCpuFrequencyRequest("testSentinel_1", bsp::CpuFrequencyMHz::Level_1);
-        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyMHz::Level_1);
+        REQUIRE(governor->GetMinimumFrequencyRequested().frequency == bsp::CpuFrequencyMHz::Level_1);
 
         governor->ResetCpuFrequencyRequest("testSentinel_1");
-        REQUIRE(governor->GetMinimumFrequencyRequested() == bsp::CpuFrequencyMHz::Level_0);
+        REQUIRE(governor->GetMinimumFrequencyRequested().frequency == bsp::CpuFrequencyMHz::Level_0);
     }
 }

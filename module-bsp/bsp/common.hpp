@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 namespace bsp
 {
     enum class RetCode{
@@ -23,6 +24,8 @@ namespace bsp
         Level_5 = 264,
         Level_6 = 528
     };
+
+    uint8_t CpuMHZToLevel(enum CpuFrequencyMHz val);
 
     constexpr auto MHz_frequency_multiplier = 1000000U;
 

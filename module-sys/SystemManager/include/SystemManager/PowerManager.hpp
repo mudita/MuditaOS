@@ -8,6 +8,7 @@
 
 #include "bsp/lpm/bsp_lpm.hpp"
 #include "drivers/semc/DriverSEMC.hpp"
+#include "SysCpuUpdateResult.hpp"
 #include "CpuGovernor.hpp"
 #include <bsp/lpm/PowerProfile.hpp>
 #include <vector>
@@ -47,7 +48,7 @@ namespace sys
         /// periods the current CPU usage was below the lower limit (frequencyShiftLowerThreshold), CPU frequency is
         /// reduced frequency
         /// @param current cpu load
-        void UpdateCpuFrequency(uint32_t cpuLoad);
+        [[nodiscard]] cpu::UpdateResult UpdateCpuFrequency(uint32_t cpuLoad);
 
         [[nodiscard]] auto getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>;
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SCO.hpp"
@@ -153,7 +153,7 @@ void SCO::SCOImpl::writeToHostEndian(int16_t *buffer, uint8_t *packet, int lengt
 void SCO::SCOImpl::receiveCvsd(uint8_t *packet, uint16_t size)
 {
 
-    std::array<int16_t, AUDIO_BUFFER_LENGTH> audioFrameOut;
+    std::array<int16_t, AUDIO_BUFFER_LENGTH> audioFrameOut{};
 
     if (size > audioFrameOut.size()) {
         LOG_WARN("SCO packet larger than local output buffer - dropping data.");

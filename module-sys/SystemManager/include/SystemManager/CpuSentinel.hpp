@@ -46,6 +46,8 @@ namespace sys
 
         void CpuFrequencyHasChanged(bsp::CpuFrequencyMHz newFrequency);
         void ReadRegistrationData(bsp::CpuFrequencyMHz frequencyHz, bool permanentFrequency);
+        TaskHandle_t getTask();
+        std::string getReason();
 
       protected:
         const std::string name;
@@ -59,7 +61,8 @@ namespace sys
         /// critical section or mutex support necessary
         std::function<void(bsp::CpuFrequencyMHz)> callback;
 
-        TaskHandle_t taskHandle = nullptr;
+        TaskHandle_t taskWaitingForFrequency = nullptr;
+        std::string currentReason;
     };
 
     /// Sentinel releases the frequency lock automatically after the time specified in the parameter - timeout

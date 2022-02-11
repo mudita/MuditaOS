@@ -106,3 +106,6 @@
 	path = third-party/reedgefs/src
 	url = ../reliance-edge.git
     branch = mudita
+[submodule "third-party/msgpack11/msgpack11"]
+	path = third-party/msgpack11/msgpack11
+	url = https://github.com/ar90n/msgpack11.git

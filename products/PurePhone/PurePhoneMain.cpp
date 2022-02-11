@@ -71,6 +71,7 @@
 #include <memory>
 #include <vector>
 #include <cstdlib>
+#include "init_prof.hpp"
 
 void atexit_cleanup_handler()
 {
@@ -94,6 +95,8 @@ int main()
     constexpr auto ApplicationName = "PurePhone";
 
     const std::vector<std::string> fileIndexerAudioPaths = {{purefs::dir::getUserDiskPath() / "music"}};
+
+    prof::init();
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();

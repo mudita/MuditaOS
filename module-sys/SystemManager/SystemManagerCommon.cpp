@@ -256,12 +256,12 @@ namespace sys
         // Start System manager
         StartService();
 
-        cpuStatisticsTimer = sys::TimerFactory::createPeriodicTimer(
-            this, "cpuStatistics", constants::timerInitInterval, [this](sys::Timer &) { CpuStatisticsTimerHandler(); });
-        cpuStatisticsTimer.start();
+        freqTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "cpuTick", constants::timerInitInterval, [this](sys::Timer &) { FreqUpdateTick(); });
+        freqTimer.start();
 
         powerManagerEfficiencyTimer = sys::TimerFactory::createPeriodicTimer(
-            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [this](sys::Timer &) {
+            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [](sys::Timer &) {
                 powerManager->LogPowerManagerEfficiency();
             });
         powerManagerEfficiencyTimer.start();
@@ -435,6 +435,36 @@ namespace sys
             return true;
         }
         return false;
+    }
+
+    std::string SystemManagerCommon::ServiceProcessor(const uint32_t &t)
+    {
+        if (t == 0) {
+            return "Idle";
+        }
+
+        auto foo = [](auto &l, const uint32_t &t) {
+            auto found = std::find_if(l.begin(), l.end(), [&t](auto &r) {
+                auto right = uxTaskGetTCBNumber(r->GetHandle());
+                auto left  = t;
+                return left == right;
+            });
+            return found;
+        };
+
+        if (auto found = foo(applicationsList, t); found != std::end(applicationsList)) {
+            return (*found)->GetName() + "::" + (*found)->getCurrentProcessing();
+        }
+        if (auto found = foo(servicesList, t); found != std::end(servicesList)) {
+            return (*found)->GetName() + "::" + (*found)->getCurrentProcessing();
+        }
+
+        auto handle = xTaskGetByTCBNumber(t);
+        if (handle != nullptr) {
+            return pcTaskGetTaskName(handle);
+        }
+
+        return "none";
     }
 
     void SystemManagerCommon::preCloseRoutine(CloseReason closeReason)
@@ -678,9 +708,7 @@ namespace sys
 
         // In case if other power down request arrive in the meantime
         lowBatteryShutdownDelay.stop();
-
-        // We stop the timers
-        cpuStatisticsTimer.stop();
+        freqTimer.stop();
         powerManagerEfficiencyTimer.stop();
 
         // We are going to remove services in reversed order of creation
@@ -744,15 +772,16 @@ namespace sys
         set(newState);
     }
 
-    void SystemManagerCommon::CpuStatisticsTimerHandler()
+    void SystemManagerCommon::FreqUpdateTick()
     {
         if (!cpuStatisticsTimerInit) {
             cpuStatisticsTimerInit = true;
-            cpuStatisticsTimer.restart(constants::timerPeriodInterval);
+            freqTimer.restart(constants::timerPeriodInterval);
         }
 
-        cpuStatistics->Update();
-        powerManager->UpdateCpuFrequency(cpuStatistics->GetPercentageCpuLoad());
+        cpuStatistics->UpdatePercentageCpuLoad();
+        auto ret = powerManager->UpdateCpuFrequency(cpuStatistics->GetPercentageCpuLoad());
+        cpuStatistics->TrackChange(ret);
     }
 
     void SystemManagerCommon::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency)

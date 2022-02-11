@@ -1,6 +1,7 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <gsl/util>
 #include <log/log.hpp>
 
 #include <SystemManager/PowerManager.hpp>
@@ -76,14 +77,27 @@ namespace sys
         }
     }
 
-    void PowerManager::UpdateCpuFrequency(uint32_t cpuLoad)
+    [[nodiscard]] cpu::UpdateResult PowerManager::UpdateCpuFrequency(uint32_t cpuLoad)
     {
-        const auto currentCpuFreq           = lowPowerControl->GetCurrentFrequencyLevel();
-        const auto minFrequencyRequested    = cpuGovernor->GetMinimumFrequencyRequested();
-        const auto permanentFrequencyToHold = cpuGovernor->GetPermanentFrequencyRequested();
+        cpu::UpdateResult result;
 
-        if (permanentFrequencyToHold.isActive) {
-            auto frequencyToHold = std::max(permanentFrequencyToHold.frequencyToHold, powerProfile.minimalFrequency);
+        const auto currentCpuFreq           = lowPowerControl->GetCurrentFrequencyLevel();
+        const auto min                      = cpuGovernor->GetMinimumFrequencyRequested();
+        const auto permanent                = cpuGovernor->GetPermanentFrequencyRequested();
+
+        auto _ = gsl::finally([&result, this, &currentCpuFreq, min, permanent] {
+            result.frequencySet = lowPowerControl->GetCurrentFrequencyLevel();
+            result.changed      = result.frequencySet != currentCpuFreq;
+            if (not permanent.isActive) {
+                result.data = min;
+            }
+            else {
+                result.data.reason = "perm";
+            }
+        });
+
+        if (permanent.isActive) {
+            auto frequencyToHold = std::max(permanent.frequencyToHold, powerProfile.minimalFrequency);
 
             if (currentCpuFreq < frequencyToHold) {
                 IncreaseCpuFrequency(frequencyToHold);
@@ -94,7 +108,7 @@ namespace sys
                 } while (lowPowerControl->GetCurrentFrequencyLevel() > frequencyToHold);
             }
             ResetFrequencyShiftCounter();
-            return;
+            return result;
         }
 
         if (cpuLoad > powerProfile.frequencyShiftUpperThreshold && currentCpuFreq < bsp::CpuFrequencyMHz::Level_6) {
@@ -114,9 +128,9 @@ namespace sys
             isFrequencyLoweringInProgress = false;
         }
 
-        if (minFrequencyRequested > currentCpuFreq) {
+        if (min.frequency > currentCpuFreq) {
             ResetFrequencyShiftCounter();
-            IncreaseCpuFrequency(minFrequencyRequested);
+            IncreaseCpuFrequency(min.frequency);
         }
         else if (aboveThresholdCounter >= powerProfile.maxAboveThresholdCount) {
             if (powerProfile.frequencyIncreaseIntermediateStep && currentCpuFreq < bsp::CpuFrequencyMHz::Level_4) {
@@ -131,11 +145,12 @@ namespace sys
         else {
             if (belowThresholdCounter >= (isFrequencyLoweringInProgress ? powerProfile.maxBelowThresholdInRowCount
                                                                         : powerProfile.maxBelowThresholdCount) &&
-                currentCpuFreq > minFrequencyRequested) {
+                currentCpuFreq > min.frequency) {
                 ResetFrequencyShiftCounter();
                 DecreaseCpuFrequency();
             }
         }
+        return result;
     }
 
     void PowerManager::IncreaseCpuFrequency(bsp::CpuFrequencyMHz newFrequency)

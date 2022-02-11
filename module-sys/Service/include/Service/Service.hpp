@@ -100,6 +100,7 @@ namespace sys
         bool disconnect(const std::type_info &type);
 
         void sendCloseReadyMessage(Service *service);
+        std::string getCurrentProcessing();
 
       protected:
         bool enableRunLoop;
@@ -137,6 +138,8 @@ namespace sys
             void stop();
             [[nodiscard]] auto get(timer::SystemTimer *timer) noexcept -> timer::SystemTimer *;
         } timers;
+
+        MessagePointer currentlyProcessing = nullptr;
 
       public:
         auto getTimers() -> auto &
