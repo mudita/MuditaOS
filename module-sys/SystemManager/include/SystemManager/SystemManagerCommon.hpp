@@ -121,6 +121,8 @@ namespace sys
         /// Destroy existing application
         static bool DestroyApplication(const std::string &name, Service *caller);
 
+        static std::string ServiceProcessor(const uint32_t &t);
+
         /// Kill service
         /// @note - this is final, it straight takes service, calls it's close callback and it's gone
         /// please mind that services & apps not registered in SystemManager cant be killed - these should be handled by
@@ -185,8 +187,7 @@ namespace sys
 
         void RebootToUsbMscModeHandler(State newState);
 
-        /// periodic update of cpu statistics
-        void CpuStatisticsTimerHandler();
+        void FreqUpdateTick();
 
         /// used for power management control for the filesystem
         void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency);
@@ -195,7 +196,7 @@ namespace sys
 
         UpdateReason updateReason{UpdateReason::Update};
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
-        sys::TimerHandle cpuStatisticsTimer;
+        sys::TimerHandle freqTimer;
         sys::TimerHandle servicesPreShutdownRoutineTimeout;
         sys::TimerHandle lowBatteryShutdownDelay;
         sys::TimerHandle powerManagerEfficiencyTimer;

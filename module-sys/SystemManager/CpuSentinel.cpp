@@ -31,6 +31,8 @@ namespace sys
             auto msg = std::make_shared<sys::HoldCpuFrequencyMessage>(GetName(), frequencyToHold);
             owner->bus.sendUnicast(std::move(msg), service::name::system_manager);
             currentFrequencyToHold = frequencyToHold;
+            currentReason          = std::string("up: ") + owner->getCurrentProcessing() + std::string(" req: ") +
+                            std::to_string(int(frequencyToHold));
         }
     }
 
@@ -40,6 +42,7 @@ namespace sys
             auto msg = std::make_shared<sys::ReleaseCpuFrequencyMessage>(GetName());
             owner->bus.sendUnicast(std::move(msg), service::name::system_manager);
             currentFrequencyToHold = bsp::CpuFrequencyMHz::Level_0;
+            currentReason          = std::string("down: ") + owner->getCurrentProcessing();
         }
     }
 
@@ -82,9 +85,9 @@ namespace sys
         if (callback) {
             callback(newFrequency);
         }
-        if (taskHandle != nullptr && newFrequency >= currentFrequencyToHold) {
-            xTaskNotifyGive(taskHandle);
-            taskHandle = nullptr;
+        if (taskWaitingForFrequency != nullptr && newFrequency >= currentFrequencyToHold) {
+            xTaskNotifyGive(taskWaitingForFrequency);
+            taskWaitingForFrequency = nullptr;
         }
     }
 
@@ -92,10 +95,11 @@ namespace sys
                                                   TaskHandle_t taskToNotify,
                                                   uint32_t timeout)
     {
+        currentReason = std::string("h+w: ") + owner->getCurrentProcessing();
         HoldMinimumFrequency(frequencyToHold);
 
         if (currentFrequencyToHold < frequencyToHold) {
-            taskHandle = taskToNotify;
+            taskWaitingForFrequency = taskToNotify;
             return ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(timeout)) == 0;
         }
 
@@ -135,4 +139,13 @@ namespace sys
         }
     }
 
+    TaskHandle_t CpuSentinel::getTask()
+    {
+        return owner->GetHandle();
+    }
+
+    std::string CpuSentinel::getReason()
+    {
+        return currentReason;
+    }
 } // namespace sys

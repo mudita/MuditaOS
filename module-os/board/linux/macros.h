@@ -73,4 +73,12 @@ static inline bool isIRQ()
 }
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    int isOSRunning();
+#ifdef __cplusplus
+};
+#endif
+
 #endif /* MACROS_H_ */

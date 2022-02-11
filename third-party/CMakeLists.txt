@@ -25,6 +25,8 @@ add_subdirectory(taglib)
 add_subdirectory(tinyexpr)
 add_subdirectory(utz)
 add_subdirectory(dr_libs)
+add_subdirectory(msgpack11)
+
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     add_subdirectory(CrashDebug)

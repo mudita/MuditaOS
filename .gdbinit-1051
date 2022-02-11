@@ -15,3 +15,7 @@ thread 2
 tb main
 b HardFault_Handler
 b _exit
+b abort
+b WDOG1_IRQHandler
+b RTWDOG_IRQHandler
+b IntDefaultHandler

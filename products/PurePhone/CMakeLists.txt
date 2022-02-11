@@ -28,6 +28,7 @@ target_sources(PurePhone
         PurePhoneMain.cpp
         PlatformFactory.cpp
         EinkSentinelPure.cpp
+        init_prof.cpp
     )
 
 target_include_directories(PurePhone

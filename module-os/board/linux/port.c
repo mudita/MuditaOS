@@ -921,3 +921,8 @@ BaseType_t xPortIsInsideInterrupt(void)
 {
     return pdFALSE;
 }
+
+uint32_t CLOCK_GetFreq(int clock) {
+    (void)clock;
+    return 0;
+}

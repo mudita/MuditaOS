@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/CpuGovernor.hpp>
@@ -113,19 +113,33 @@ namespace sys
         SetCpuFrequencyRequest(sentinelName, bsp::CpuFrequencyMHz::Level_0);
     }
 
-    [[nodiscard]] auto CpuGovernor::GetMinimumFrequencyRequested() const noexcept -> bsp::CpuFrequencyMHz
+    [[nodiscard]] auto CpuGovernor::GetMinimumFrequencyRequested() const noexcept -> sentinel::Data
     {
-        bsp::CpuFrequencyMHz minFrequency = bsp::CpuFrequencyMHz::Level_0;
+        sentinel::Data d;
+        if (sentinels.empty()) {
+            d.reason = "empty";
+            return d;
+        }
 
-        for (auto &sentinel : sentinels) {
-            const auto sentinelFrequency = sentinel->GetRequestedFrequency();
+        auto minSentinel = sentinels.begin();
+        for (auto iter = sentinels.begin(); iter != std::end(sentinels); ++iter) {
+            const auto sentinelFrequency = (*iter)->GetRequestedFrequency();
 
-            if (sentinelFrequency > minFrequency) {
-                minFrequency = sentinelFrequency;
+            if (sentinelFrequency > (*minSentinel)->GetRequestedFrequency()) {
+                minSentinel = iter;
             }
         }
 
-        return minFrequency;
+        d.frequency = (*minSentinel)->GetRequestedFrequency();
+        if (auto p = (*minSentinel)->GetSentinel().lock()) {
+            d.name   = p->GetName();
+            d.task   = p->getTask();
+            d.reason = p->getReason();
+        }
+        else {
+            d.reason = "cant lock";
+        }
+        return d;
     }
 
     void CpuGovernor::InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) const noexcept

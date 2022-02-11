@@ -34,6 +34,9 @@ target_sources(module-os PRIVATE ${SOURCES})
 if(NOT ${SYSTEM_VIEW_ENABLED})
         target_sources(module-os PRIVATE FreeRTOS/tasks.c)
 endif()
+if(${PROF_ON})
+        target_sources(module-os PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/prof.c)
+endif()
 
 add_board_subdirectory(board)
 
@@ -80,3 +83,7 @@ if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
 endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC log-api board-config)
+
+if (${ENABLE_TESTS})
+    add_subdirectory(test)
+endif ()
