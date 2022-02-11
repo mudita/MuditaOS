@@ -2,7 +2,7 @@
 
 ## Table of contents
 - [Setting up in Eclipse](#setting-up-in-eclipse)
-- [Setting up in CLion](#setting-up-in -clion)
+- [Setting up in CLion](#setting-up-in-clion)
 - [Additional info](#additional-info)
     + [Prevent Git from suggesting commits](#prevent-git-from-suggesting-commits)
     + [Seperate build folders](#separate-build-folders)
