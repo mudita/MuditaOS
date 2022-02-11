@@ -2,7 +2,7 @@
 
 ## Unit test framework
 
-For writing test we are using (catch2)[https://github.com/catchorg/Catch2/blob/devel/docs/tutorial.md].
+For writing test we are using [catch2](https://github.com/catchorg/Catch2/blob/devel/docs/tutorial.md).
 There are few test written in `gtest` but we focus on using `catch2`
 
 ## adding unit test
