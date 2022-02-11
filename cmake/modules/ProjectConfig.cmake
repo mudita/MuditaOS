@@ -24,6 +24,9 @@ else()
     set (LOG_REDIRECT "RTT_JLINK" CACHE INTERNAL "")
 endif()
 
+# add CurrentMeasurement enable option
+option(CURRENT_MEASUREMENT "CURRENT_MEASUREMENT" OFF)
+
 # add USB-CDC echo test enable option
 option(USBCDC_ECHO "USBCDC_ECHO" OFF)
 if (${USBCDC_ECHO} STREQUAL "ON")

@@ -3,6 +3,10 @@
 
 #include "BatteryCharger.hpp"
 
+#if ENABLE_CURRENT_MEASUREMENT_SCOPE
+#include "CurrentMeasurementScope.hpp"
+#endif
+
 #include <bsp/battery_charger/battery_charger.hpp>
 #include <hal/GenericFactory.hpp>
 
@@ -25,7 +29,11 @@ namespace hal::battery
         : eventsHandler(eventsHandler),
           timerHandle{xTimerCreate(
               "clearIrqStatusTimer", pdMS_TO_TICKS(clearStatusTickTime_MS), false, nullptr, clearIrqStatusHandler)}
-    {}
+    {
+#if ENABLE_CURRENT_MEASUREMENT_SCOPE
+        CurrentMeasurementScope::start();
+#endif
+    }
 
     void BatteryCharger::init(xQueueHandle queueBatteryHandle, xQueueHandle queueChargerDetect)
     {
