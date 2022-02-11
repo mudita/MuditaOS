@@ -8,3 +8,5 @@ smmap==4.0.0
 tqdm==4.62.2
 urllib3==1.26.6
 ghapi
+pylink
+matplotlib

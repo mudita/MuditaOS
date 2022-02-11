@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "battery_charger.hpp"
@@ -55,7 +55,7 @@ namespace bsp::battery_charger
             /// Initial parameters for fuel gauge battery model
 
             constexpr std::uint16_t LearnCFG    = 0x2602;
-            constexpr std::uint16_t FilterCFG   = 0xCEA4;
+            constexpr std::uint16_t FilterCFG   = 0xCEA0; // Current filter Tc = 0.7s
             constexpr std::uint16_t MiscCFG     = 0x01D0;
             constexpr std::uint16_t RelaxCFG    = 0x2039;
             constexpr std::uint16_t RCOMP0      = 0x0070;
@@ -476,33 +476,7 @@ namespace bsp::battery_charger
             std::uint8_t temperatureInt = value.second >> 8;
             return utils::twosComplimentToInt(temperatureInt);
         }
-        /*
-        int getCurrentMeasurement()
-        {
-            auto value = fuelGaugeRead(Registers::Current_REG);
-            int current;
-            // 2's compliment into decimal
-            if (value.second & 0x8000) {
-                // negative numbers
-                std::bitset<16> currentBitset = std::bitset<16>(value.second - 1);
-                currentBitset.flip();
-                current =
-                    static_cast<int>((static_cast<std::uint16_t>(currentBitset.to_ulong()) * -1) * currentSenseGain);
-            }
-            else {
-                // positive numbers
-                current = static_cast<int>(value.second * currentSenseGain);
-            }
-            return current;
-        }
 
-        int getCellVoltage()
-        {
-            auto value  = fuelGaugeRead(Registers::VCELL_REG);
-            int voltage = value.second * voltageSenseGain;
-            return voltage;
-        }
-        */
         void chargingFinishedAction()
         {
             LOG_DEBUG("Charging finished.");
@@ -750,19 +724,13 @@ namespace bsp::battery_charger
     int getAvgCurrent()
     {
         const auto [_, value] = fuelGaugeRead(Registers::AvgCurrent_REG);
-        int current;
-        // 2's compliment into decimal
-        if (value & 0x8000) {
-            // negative numbers
-            std::bitset<16> currentBitset = std::bitset<16>(value - 1);
-            currentBitset.flip();
-            current = static_cast<int>((static_cast<std::uint16_t>(currentBitset.to_ulong()) * -1) * currentSenseGain);
-        }
-        else {
-            // positive numbers
-            current = static_cast<int>(value * currentSenseGain);
-        }
-        return current;
+        return static_cast<int>(utils::twosComplimentToInt(value) * currentSenseGain);
+    }
+
+    int getCurrentMeasurement()
+    {
+        auto [_, value] = fuelGaugeRead(Registers::Current_REG);
+        return static_cast<int>(utils::twosComplimentToInt(value) * currentSenseGain);
     }
 
     MaxMinVolt getMaxMinVolt()
