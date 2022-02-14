@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BedtimeListItemProvider.hpp"
@@ -27,7 +27,7 @@ namespace app::bell_bedtime
         auto onOff       = new OnOffListItem(model.get()->getBedtimeOnOff(), utils::translate("app_bellmain_bedtime"));
         onOff->onProceed = [onOff, this]() {
             if (not onOff->isActive()) {
-                this->onExit(false);
+                this->onExit();
                 return true;
             }
             return false;
