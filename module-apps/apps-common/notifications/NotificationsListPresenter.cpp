@@ -12,7 +12,7 @@ namespace
                              const notifications::NotificationWithContact *notification,
                              const std::string &text)
     {
-        if (notification->hasRecord()) {
+        if (notification->hasRecord() && !notification->getRecord().getFormattedName().empty()) {
             const auto &record = notification->getRecord();
             item->setName(record.getFormattedName());
         }
