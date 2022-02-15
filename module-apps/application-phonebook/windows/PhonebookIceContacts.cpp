@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookIceContacts.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
+#include "service-appmgr/Controller.hpp"
 
 #include <service-db/DBNotificationMessage.hpp>
 
@@ -56,6 +57,10 @@ namespace gui
     bool PhonebookIceContacts::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+            return true;
+        }
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            app::manager::Controller::switchBack(application);
             return true;
         }
         // check if any of the lower inheritance onInput methods catch the event
