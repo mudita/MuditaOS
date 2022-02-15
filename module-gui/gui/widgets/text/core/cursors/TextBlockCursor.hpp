@@ -145,6 +145,7 @@ namespace gui
 
         auto checkIfBlockFirstAndEmpty(std::list<TextBlock>::iterator block) -> bool;
         auto checkIfNextBlockEmpty(std::list<TextBlock>::iterator nextBlock) -> bool;
+        auto checkSentenceBeginning() const -> bool;
 
         auto operator+=(unsigned int) -> BlockCursor &;
         auto operator++() -> BlockCursor &;

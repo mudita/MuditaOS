@@ -54,7 +54,7 @@ namespace gui
         inputField->setTextEllipsisType(TextEllipsis::Both);
         inputField->setEditMode(EditMode::Edit);
         inputField->setEdges(RectangleEdge::None);
-        inputField->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
+        inputField->setInputMode(new InputMode({InputMode::Abc, InputMode::ABC, InputMode::abc}));
         inputField->setFont(style::window::font::mediumbold);
 
         if (!icon.empty()) {

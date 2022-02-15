@@ -54,7 +54,7 @@ namespace gui
         };
 
         inputText->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &Text) { application->getCurrentWindow()->navBarTemporaryMode(Text); },
             [=]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
             [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));

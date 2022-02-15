@@ -75,7 +75,7 @@ namespace gui
         authorText->setEdges(gui::RectangleEdge::Bottom);
         authorText->setFont(::style::window::font::mediumbold);
         authorText->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { navBarTemporaryMode(text); },
             [=]() { navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
@@ -104,7 +104,7 @@ namespace gui
         quoteText->setEdges(gui::RectangleEdge::Bottom);
         quoteText->setFont(::style::window::font::medium);
         quoteText->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { navBarTemporaryMode(text); },
             [=]() { navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
