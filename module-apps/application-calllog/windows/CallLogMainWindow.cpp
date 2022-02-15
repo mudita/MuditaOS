@@ -164,7 +164,8 @@ namespace gui
     {
         auto notification = dynamic_cast<db::NotificationMessage *>(msg);
         if (notification != nullptr) {
-            if (notification->interface == db::Interface::Name::Calllog && notification->dataModified()) {
+            if (notification->interface == db::Interface::Name::Calllog &&
+                notification->type == db::Query::Type::Create) {
                 rebuild();
                 return true;
             }
