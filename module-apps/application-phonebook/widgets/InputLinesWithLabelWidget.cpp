@@ -52,7 +52,7 @@ namespace gui
         inputText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         inputText->setFont(style::window::font::medium);
         inputText->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { this->navBarTemporaryMode(text, true); },
             [=]() { this->navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));

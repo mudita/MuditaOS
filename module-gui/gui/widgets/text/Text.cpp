@@ -62,8 +62,8 @@ namespace gui
 
     Text::~Text()
     {
-        if (mode != nullptr) {
-            delete mode;
+        if (inputMode != nullptr) {
+            delete inputMode;
         }
     }
 
@@ -338,6 +338,35 @@ namespace gui
         }
     }
 
+    void Text::setInputMode(InputMode *&&mode)
+    {
+        if (this->inputMode != nullptr) {
+            delete this->inputMode;
+        }
+        this->inputMode = mode;
+    }
+
+    std::string Text::getInputModeKeyMap()
+    {
+        if (inputMode != nullptr) {
+
+            if (inputMode->is(InputMode::Abc)) {
+                return inputMode->get(detectInputMode());
+            }
+            else {
+                return inputMode->get();
+            }
+        }
+        else {
+            return "";
+        }
+    }
+
+    InputMode::Mode Text::detectInputMode()
+    {
+        return cursor->checkSentenceBeginning() ? InputMode::ABC : InputMode::abc;
+    }
+
     bool Text::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);
@@ -506,8 +535,8 @@ namespace gui
 
     auto Text::handleRotateInputMode(const InputEvent &inputEvent) -> bool
     {
-        if (mode != nullptr && inputEvent.isShortRelease(gui::KeyCode::KEY_AST)) {
-            mode->next();
+        if (inputMode != nullptr && inputEvent.isShortRelease(gui::KeyCode::KEY_AST)) {
+            inputMode->next();
             return true;
         }
         return false;
@@ -515,16 +544,16 @@ namespace gui
 
     auto Text::handleRestoreInputModeUI(const InputEvent &inputEvent) -> bool
     {
-        if (mode != nullptr && inputEvent.isKeyRelease()) {
-            mode->show_restore();
+        if (inputMode != nullptr && inputEvent.isKeyRelease()) {
+            inputMode->show_restore();
         }
         return false;
     }
 
     auto Text::handleSelectSpecialChar(const InputEvent &inputEvent) -> bool
     {
-        if (mode != nullptr && inputEvent.isLongRelease() && inputEvent.is(gui::KeyCode::KEY_AST)) {
-            mode->select_special_char();
+        if (inputMode != nullptr && inputEvent.isLongRelease() && inputEvent.is(gui::KeyCode::KEY_AST)) {
+            inputMode->select_special_char();
             return true;
         }
         return false;
@@ -613,7 +642,7 @@ namespace gui
             return false;
         }
 
-        auto code = translator.handle(inputEvent.getRawKey(), mode ? mode->get() : "");
+        auto code = translator.handle(inputEvent.getRawKey(), getInputModeKeyMap());
 
         if (code != Profile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
 
@@ -622,7 +651,7 @@ namespace gui
             debug_text("handleAddChar %d -> Begin", code);
             debug_text("%s times: %" PRIu32, inputEvent.str().c_str(), translator.getTimes());
             /// if we have multi press in non digit mode - we need to replace char and put next char from translator
-            if (!(mode->is(InputMode::digit) || (mode->is(InputMode::phone))) && translator.getTimes() > 0) {
+            if (!(inputMode->is(InputMode::digit) || (inputMode->is(InputMode::phone))) && translator.getTimes() > 0) {
                 removeChar();
             }
             addChar(code);
@@ -650,7 +679,7 @@ namespace gui
         auto code = text::npos;
 
         // phone mode
-        if (mode->is(InputMode::phone) && inputEvent.is(KeyCode::KEY_0)) {
+        if (inputMode->is(InputMode::phone) && inputEvent.is(KeyCode::KEY_0)) {
             code = '+';
         }
         // all other modes only handle digits

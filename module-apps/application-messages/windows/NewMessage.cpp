@@ -250,7 +250,7 @@ namespace gui
         message->setTextLimitType(gui::TextLimitType::MaxSignsCount, msgConstants::maxConcatenatedLen);
         message->setEdges(gui::RectangleEdge::Bottom);
         message->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { navBarTemporaryMode(text); },
             [=]() { navBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));

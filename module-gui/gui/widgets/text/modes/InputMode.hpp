@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,6 +15,7 @@ class InputMode
     enum Mode
     {
         digit,
+        Abc,
         abc,
         ABC,
         phone,
@@ -45,6 +46,7 @@ class InputMode
     }
     void next();
     const std::string &get();
+    const std::string &get(Mode mode);
     void select_special_char();
     [[nodiscard]] bool is(Mode mode) const
     {

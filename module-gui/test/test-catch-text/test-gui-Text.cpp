@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InitializedFontManager.hpp"
@@ -75,7 +75,7 @@ namespace gui
 
         [[nodiscard]] auto *getInputMode()
         {
-            return mode;
+            return inputMode;
         }
 
         auto removeNCharacters(unsigned int n)
@@ -219,6 +219,118 @@ TEST_CASE("handle input mode ABC/abc/1234")
         text.onInput(key_2);
         str += "2";
         REQUIRE(str == text.getText());
+    }
+}
+
+TEST_CASE("handle input mode Abc/ABC/abc")
+{
+    mockup::fontManager();
+    using namespace gui;
+
+    std::string testString_Abc         = "Adg";
+    std::string testString_ABC         = "ADG";
+    std::string testString_abc         = "adg";
+    std::string testString_sentenceEnd = ". ";
+
+    auto addTestStringByOnInput = [](gui::Text &text) {
+        text.onInput(gui::InputEvent(
+            {
+                RawKey::State::Released,
+                bsp::KeyCodes::NumericKey2,
+            },
+            gui::InputEvent::State::keyReleasedShort));
+        text.onInput(gui::InputEvent(
+            {
+                RawKey::State::Released,
+                bsp::KeyCodes::NumericKey3,
+            },
+            gui::InputEvent::State::keyReleasedShort));
+        text.onInput(gui::InputEvent(
+            {
+                RawKey::State::Released,
+                bsp::KeyCodes::NumericKey4,
+            },
+            gui::InputEvent::State::keyReleasedShort));
+    };
+
+    auto addSentenceEndByOnInput = [](gui::Text &text) {
+        text.onInput(gui::InputEvent(
+            {
+                RawKey::State::Released,
+                bsp::KeyCodes::NumericKey1,
+            },
+            gui::InputEvent::State::keyReleasedShort));
+        text.onInput(gui::InputEvent(
+            {
+                RawKey::State::Released,
+                bsp::KeyCodes::NumericKey0,
+            },
+            gui::InputEvent::State::keyReleasedShort));
+    };
+
+    auto modes     = {InputMode::Abc, InputMode::ABC, InputMode::abc};
+    auto next_mode = gui::InputEvent({}, gui::InputEvent::State::keyReleasedShort, gui::KeyCode::KEY_AST);
+
+    SECTION("Abc mode check")
+    {
+        auto text = gui::TestText();
+        text.setInputMode(new InputMode(modes));
+
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+
+        addTestStringByOnInput(text);
+
+        REQUIRE(text.getText() == testString_Abc);
+    }
+
+    SECTION("ABC -> abc -> ABC")
+    {
+        auto text = gui::TestText();
+        text.setInputMode(new InputMode(modes));
+
+        text.onInput(next_mode);
+        REQUIRE(text.getInputMode()->is(InputMode::ABC));
+        addTestStringByOnInput(text);
+        REQUIRE(text.getText() == testString_ABC);
+        text.clear();
+
+        text.onInput(next_mode);
+        REQUIRE(text.getInputMode()->is(InputMode::abc));
+        addTestStringByOnInput(text);
+        REQUIRE(text.getText() == testString_abc);
+        text.clear();
+
+        text.onInput(next_mode);
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        addTestStringByOnInput(text);
+        REQUIRE(text.getText() == testString_Abc);
+        text.clear();
+    }
+
+    SECTION("Abc with sentence detection")
+    {
+        auto text = gui::TestText();
+        text.setInputMode(new InputMode(modes));
+
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        addTestStringByOnInput(text);
+        REQUIRE(text.getText() == testString_Abc);
+
+        text.onInput(next_mode);
+        REQUIRE(text.getInputMode()->is(InputMode::ABC));
+        addTestStringByOnInput(text);
+        REQUIRE(text.getText() == testString_Abc + testString_ABC);
+
+        text.onInput(next_mode);
+        text.onInput(next_mode);
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        addTestStringByOnInput(text);
+        REQUIRE(text.getText() == testString_Abc + testString_ABC + testString_abc);
+
+        addSentenceEndByOnInput(text);
+        addTestStringByOnInput(text);
+        REQUIRE(text.getText() ==
+                testString_Abc + testString_ABC + testString_abc + testString_sentenceEnd + testString_Abc);
     }
 }
 

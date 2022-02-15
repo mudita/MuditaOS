@@ -55,7 +55,7 @@ namespace gui
         TextCursor *cursor                      = nullptr;
         CursorStartPosition cursorStartPosition = CursorStartPosition::DocumentEnd;
         std::unique_ptr<TextDocument> document  = std::make_unique<TextDocument>(std::list<TextBlock>());
-        InputMode *mode                         = nullptr;
+        InputMode *inputMode                    = nullptr;
         std::unique_ptr<Lines> lines            = nullptr;
 
         void buildDocument(const UTF8 &text);
@@ -68,8 +68,8 @@ namespace gui
         unsigned int getCursorDrawSpace();
 
       public:
-        ExpandMode expandMode    = ExpandMode::None;
-        EditMode editMode        = EditMode::Edit;
+        ExpandMode expandMode = ExpandMode::None;
+        EditMode editMode     = EditMode::Edit;
 
         [[nodiscard]] bool isMode(EditMode edit) const
         {
@@ -77,7 +77,7 @@ namespace gui
         }
 
       protected:
-        TextType textType = TextType::MultiLine;
+        TextType textType         = TextType::MultiLine;
         TextEllipsis ellipsisType = TextEllipsis::None;
         std::list<TextLimit> limitsList;
 
@@ -160,16 +160,13 @@ namespace gui
         void setMinimumHeightToFitText(unsigned int linesCount = 1);
         void setColor(Color color);
 
+        /// move ownership of mode ptr to Text
+        void setInputMode(InputMode *&&mode);
+        std::string getInputModeKeyMap();
+        InputMode::Mode detectInputMode();
+
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;
-        /// move ownership of mode ptr to Text
-        void setInputMode(InputMode *&&mode)
-        {
-            if (this->mode != nullptr) {
-                delete this->mode;
-            }
-            this->mode = mode;
-        };
         bool onFocus(bool state) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         void setRadius(int value) override;

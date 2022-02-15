@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputMode.hpp"
@@ -19,6 +19,8 @@ static std::string getInputName(InputMode::Mode m)
     switch (m) {
     case InputMode::digit:
         return "123";
+    case InputMode::Abc:
+        return "Abc";
     case InputMode::ABC:
         return "ABC";
     case InputMode::abc:
@@ -67,6 +69,12 @@ const std::string &InputMode::get()
         return input_mode.at(modeNow());
     }
     return utils::getInputLanguageFilename(actualInputMode);
+}
+
+const std::string &InputMode::get(InputMode::Mode mode)
+{
+    auto selectedInputMode = input_mode.at(mode);
+    return utils::getInputLanguageFilename(selectedInputMode);
 }
 
 void InputMode::show_input_type()

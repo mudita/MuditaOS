@@ -301,6 +301,31 @@ namespace gui
         return nextBlock != blocksEnd() && nextBlock->isEmpty() && checkCurrentBlockNoNewLine();
     }
 
+    auto BlockCursor::checkSentenceBeginning() const -> bool
+    {
+        // If position npos or 0 -> block sentence beginning.
+        if (getPosition() == text::npos || getPosition() == 0) {
+            return true;
+        }
+        else {
+
+            unsigned int detectIndex = 1;
+            // Iterate through white space
+            while (currentBlock()->getText(getPosition() - detectIndex).substr(0, 1) == " ") {
+
+                // If dot with space found return true
+                if (currentBlock()->getText(getPosition() - detectIndex - 1).substr(0, 2) == ". ") {
+                    return true;
+                }
+                detectIndex++;
+            }
+
+            // If detect bigger than Position - white spaces on block beginning.
+            return detectIndex > getPosition();
+        }
+        return false;
+    }
+
     const TextBlock &BlockCursor::operator*()
     {
         return *currentBlock();

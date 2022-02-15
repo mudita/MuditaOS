@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <widgets/text/core/TextBlock.hpp>
@@ -476,4 +476,75 @@ TEST_CASE("operator* for TextBlock")
     auto cursor      = BlockCursor(&doc, 0, 0, nullptr);
 
     REQUIRE((*cursor).length() == doc.getText().length());
+}
+
+TEST_CASE("check sentence beginning")
+{
+    using namespace gui;
+    auto [doc, font] = mockup::buildTestDocument();
+    auto cursor      = BlockCursor(&doc, 0, 0, nullptr);
+
+    auto addStringToBlock = [](const std::string &input, gui::BlockCursor &cursor) {
+        for (unsigned int i = 0; i < input.length(); ++i) {
+            cursor.addChar(input[i]);
+            ++cursor;
+        }
+    };
+
+    auto removeNSignsInBlock = [](unsigned int n, gui::BlockCursor &cursor) {
+        for (unsigned int i = 0; i < n; ++i) {
+            cursor.removeChar();
+            --cursor;
+        }
+    };
+
+    // Empty document sentence beginning.
+    REQUIRE(cursor.checkSentenceBeginning());
+
+    // Add empty spaces at document beginning - still sentence beginning
+    addStringToBlock("  ", cursor);
+    REQUIRE(cursor.checkSentenceBeginning());
+
+    // Add one sign and check sentence beginning
+    addStringToBlock("P", cursor);
+    REQUIRE(!cursor.checkSentenceBeginning());
+
+    // Remove one sign to check sentence beginning
+    removeNSignsInBlock(1, cursor);
+    REQUIRE(cursor.checkSentenceBeginning());
+
+    // Add string ending with dot
+    addStringToBlock("Test.", cursor);
+    // No white space so not sentence beginning
+    REQUIRE(!cursor.checkSentenceBeginning());
+
+    // Add empty space. New sentence should be detected
+    addStringToBlock(" ", cursor);
+    REQUIRE(cursor.checkSentenceBeginning());
+
+    // Remove space.
+    removeNSignsInBlock(1, cursor);
+    REQUIRE(!cursor.checkSentenceBeginning());
+
+    // Add string ending with dot and white space
+    addStringToBlock("Test. ", cursor);
+    REQUIRE(cursor.checkSentenceBeginning());
+
+    // Add extra sign
+    addStringToBlock("P", cursor);
+    REQUIRE(!cursor.checkSentenceBeginning());
+
+    // Check number of blocks
+    REQUIRE(cursor.getBlockNumber() == 0);
+
+    // Add newline - new block and new sentence
+    addStringToBlock("\n", cursor);
+    // Check number of blocks
+    REQUIRE(cursor.getBlockNumber() == 1);
+    REQUIRE(cursor.checkSentenceBeginning());
+
+    // Add string ending with dot
+    addStringToBlock("Test.", cursor);
+    // No white space so not sentence beginning
+    REQUIRE(!cursor.checkSentenceBeginning());
 }

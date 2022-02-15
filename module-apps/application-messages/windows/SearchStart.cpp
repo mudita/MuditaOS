@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -25,7 +25,7 @@ namespace gui
         addWidget(body);
         auto text = inputBox(this, utils::translate("common_search_uc"), "search_32px_W_G");
         text->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &Text) { application->getCurrentWindow()->navBarTemporaryMode(Text); },
             [=]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
             [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
