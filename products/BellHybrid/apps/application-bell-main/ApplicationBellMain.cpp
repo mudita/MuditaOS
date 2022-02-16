@@ -76,6 +76,13 @@ namespace app
             return ret;
         }
 
+        auto timeModel        = std::make_unique<app::TimeModel>();
+        auto batteryModel     = std::make_unique<app::home_screen::BatteryModel>(this);
+        auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(this);
+        auto alarmModel       = std::make_unique<app::AlarmModel>(this);
+        homeScreenPresenter   = std::make_shared<app::home_screen::HomeScreenPresenter>(
+            this, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
+
         createUserInterface();
 
         return sys::ReturnCodes::Success;
@@ -84,12 +91,6 @@ namespace app
     void ApplicationBellMain::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            auto timeModel        = std::make_unique<app::TimeModel>();
-            auto batteryModel     = std::make_unique<app::home_screen::BatteryModel>(app);
-            auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(app);
-            auto alarmModel       = std::make_unique<app::AlarmModel>(app);
-            homeScreenPresenter   = std::make_shared<app::home_screen::HomeScreenPresenter>(
-                app, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
             auto window = std::make_unique<gui::BellHomeScreenWindow>(app, homeScreenPresenter);
             // TODO: To be replaced with settings db read
             setHomeScreenLayout("ClassicWithTemp");
