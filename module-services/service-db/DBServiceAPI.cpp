@@ -121,7 +121,7 @@ auto DBServiceAPI::IsContactInFavourites(sys::Service *serv, const utils::PhoneN
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
         return false;
     }
-    return contactResponse->contact->isOnFavourites();
+    return contactResponse->contact != nullptr && contactResponse->contact->isOnFavourites();
 }
 
 auto DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec)
