@@ -193,6 +193,8 @@ namespace app
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);
         sys::MessagePointer handleInputEvent(sys::Message *msgl);
         sys::MessagePointer handleBatteryStatusChange();
+        sys::MessagePointer handleUSBStatusChange();
+        sys::MessagePointer handleSimStateUpdateMessage(sys::Message *msgl);
         sys::MessagePointer handleMinuteUpdated(sys::Message *msgl);
         sys::MessagePointer handleAction(sys::Message *msgl);
         sys::MessagePointer handleApplicationSwitchLaunch(sys::Message *msgl);
@@ -206,7 +208,6 @@ namespace app
         sys::MessagePointer handleAppRebuild(sys::Message *msgl);
         sys::MessagePointer handleAppRefresh(sys::Message *msgl);
         sys::MessagePointer handleGetDOM(sys::Message *msgl);
-        sys::MessagePointer handleSimStateUpdateMessage(sys::Message *msgl);
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
         std::unordered_map<manager::actions::ActionId, OnActionReceived> receivers;

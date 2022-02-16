@@ -23,6 +23,7 @@
 #include "actions/AlarmClockStatusChangeParams.hpp"
 #include <service-cellular-api>
 #include <service-cellular/CellularMessage.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
@@ -117,6 +118,7 @@ namespace app
         statusBarManager->enableIndicators({gui::status_bar::Indicator::Time});
 
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+        bus.channels.push_back(sys::BusChannel::USBNotifications);
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
                                                                 "LongPress",
@@ -132,6 +134,10 @@ namespace app
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUpdateWindow(msg); });
         connect(typeid(cellular::msg::notification::SimStateUpdate),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleSimStateUpdateMessage(msg); });
+        connect(typeid(sdesktop::usb::USBConnected),
+                [&](sys::Message *msg) -> sys::MessagePointer { return handleUSBStatusChange(); });
+        connect(typeid(sdesktop::usb::USBDisconnected),
+                [&](sys::Message *msg) -> sys::MessagePointer { return handleUSBStatusChange(); });
 
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
@@ -449,6 +455,14 @@ namespace app
     sys::MessagePointer ApplicationCommon::handleBatteryStatusChange()
     {
         if ((state == State::ACTIVE_FORGROUND) && !isOnPhoneLockWindow() && getCurrentWindow()->updateBatteryStatus()) {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+        return sys::msgHandled();
+    }
+
+    sys::MessagePointer ApplicationCommon::handleUSBStatusChange()
+    {
+        if ((state == State::ACTIVE_FORGROUND) && isOnPhoneLockWindow() && getCurrentWindow()->updateBatteryStatus()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();

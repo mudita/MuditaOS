@@ -39,6 +39,7 @@ ServiceDesktop::ServiceDesktop()
 {
     LOG_INFO("[ServiceDesktop] Initializing");
     bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
+    bus.channels.push_back(sys::BusChannel::USBNotifications);
 }
 
 ServiceDesktop::~ServiceDesktop()

@@ -14,6 +14,7 @@ namespace sys
         System,
         SystemManagerRequests,
         PowerManagerRequests,
+        USBNotifications,
         ServiceCellularNotifications,
         Test2CustomBusChannel,
         ServiceDBNotifications,
@@ -106,6 +107,8 @@ inline const char *c_str(sys::BusChannel channel)
         return "SystemManagerRequests";
     case sys::BusChannel::PowerManagerRequests:
         return "PowerManagerRequests";
+    case sys::BusChannel::USBNotifications:
+        return "USBNotifications";
     case sys::BusChannel::ServiceCellularNotifications:
         return "ServiceCellularNotifications,";
     case sys::BusChannel::Test2CustomBusChannel:
