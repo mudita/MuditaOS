@@ -39,7 +39,6 @@ namespace sys
     enum class Code
     {
         CloseSystem,
-        Update,
         Restore,
         Reboot,
         RebootToUpdate,
@@ -179,11 +178,11 @@ namespace sys
 
         void readyToCloseHandler(Message *msg);
 
-        void UpdateSystemHandler();
-
         void RestoreSystemHandler();
 
-        void RebootHandler(State state, std::optional<UpdateReason> updateReason = std::nullopt);
+        void RebootHandler();
+
+        void RebootToUpdateHandler(UpdateReason updateReason);
 
         void RebootToUsbMscModeHandler(State newState);
 
@@ -194,6 +193,7 @@ namespace sys
 
         bool cpuStatisticsTimerInit{false};
 
+        CloseReason closeReason{CloseReason::RegularPowerDown};
         UpdateReason updateReason{UpdateReason::Update};
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         sys::TimerHandle freqTimer;
