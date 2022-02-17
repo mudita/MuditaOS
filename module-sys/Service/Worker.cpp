@@ -139,7 +139,7 @@ namespace sys
         auto setSize = SERVICE_QUEUE_LENGTH + CONTROL_QUEUE_LENGTH;
 
         // iterate over all entries in the list of queues and summarize queue sizes
-        for (auto wqi : queuesList) {
+        for (const auto &wqi : queuesList) {
             setSize += wqi.length;
         }
 
@@ -157,7 +157,7 @@ namespace sys
         controlQueueIndex = addQueue(getControlQueueName(), CONTROL_QUEUE_LENGTH, sizeof(std::uint8_t));
 
         // create and add all queues provided from service
-        for (auto wqi : queuesList) {
+        for (const auto &wqi : queuesList) {
             addQueue(wqi.name, wqi.length, wqi.elementSize);
         };
 
@@ -192,7 +192,7 @@ namespace sys
         queues.clear();
 
         // delete queues set
-        vQueueDelete((QueueHandle_t)queueSet);
+        vQueueDelete(static_cast<QueueHandle_t>(queueSet));
 
         vSemaphoreDelete(joinSemaphore);
         vSemaphoreDelete(stateMutex);
@@ -225,7 +225,7 @@ namespace sys
 
     bool Worker::stop()
     {
-        if (runnerTask) {
+        if (runnerTask != nullptr) {
             assert(xTaskGetCurrentTaskHandle() == runnerTask);
             assert(getState() == State::Running);
             return sendControlMessage(ControlMessage::Stop);
@@ -236,24 +236,12 @@ namespace sys
     bool Worker::sendControlMessage(ControlMessage message)
     {
         auto messageToSend = static_cast<std::uint8_t>(message);
-        return getControlQueue().Enqueue(&messageToSend, portMAX_DELAY);
+        return getControlQueue().Enqueue(&messageToSend, defaultTimeout);
     }
 
     bool Worker::sendCommand(WorkerCommand command)
     {
-        return getServiceQueue().Enqueue(&command);
-    }
-
-    bool Worker::send(uint32_t cmd, uint32_t *data)
-    {
-        assert(xTaskGetCurrentTaskHandle() == runnerTask);
-        assert(getState() == State::Running);
-
-        WorkerCommand workerCommand{cmd, data};
-        if (getServiceQueue().Enqueue(&workerCommand, portMAX_DELAY)) {
-            return true;
-        }
-        return false;
+        return getServiceQueue().Enqueue(&command, defaultTimeout);
     }
 
     xQueueHandle Worker::getQueueHandleByName(const std::string &qname) const
@@ -278,14 +266,13 @@ namespace sys
 
     bool Worker::join(TickType_t timeout)
     {
-        if (runnerTask) {
+        if (runnerTask != nullptr) {
             assert(xTaskGetCurrentTaskHandle() == runnerTask);
             assert(getState() == State::Running || getState() == State::Stopped);
 
             if (xSemaphoreTake(joinSemaphore, timeout) != pdTRUE) {
                 return false;
             }
-            while (eTaskGetState(taskHandle) != eDeleted) {}
         }
         return true;
     }
@@ -308,9 +295,9 @@ namespace sys
         return currentState;
     }
 
-    void Worker::close()
+    void Worker::close(TickType_t timeout)
     {
-        if (!stop() || !join()) {
+        if (not stop() or not join(timeout)) {
             kill();
         }
         deinit();
@@ -318,6 +305,7 @@ namespace sys
 
     void Worker::kill()
     {
+        LOG_ERROR("%s failed to exit gracefully, forcing quit", name.c_str());
         // do not check state - this is intentional, we want to be able to kill
         // a worker in case of unexpected failure without knowing its state.
         vTaskDelete(taskHandle);

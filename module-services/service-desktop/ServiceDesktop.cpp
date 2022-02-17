@@ -235,8 +235,6 @@ sys::ReturnCodes ServiceDesktop::DeinitHandler()
 
 void ServiceDesktop::ProcessCloseReason(sys::CloseReason closeReason)
 {
-    LOG_DEBUG(".. close with reason ..");
-    DeinitHandler();
     sendCloseReadyMessage(this);
 }
 

@@ -97,7 +97,18 @@ namespace service::gui
 
     sys::ReturnCodes ServiceGUI::DeinitHandler()
     {
-        worker->close();
+        /// TODO: Quick&dirty fix to bug happening during system shutdown. This is not the correct solution and should
+        /// never be committed into stable/master branch. Below is the description of what happens inside
+        /// worker->close(1000);
+        /// 1. stop() sends 'Exit' control message to the worker. It should not cause any problem even if the worker is
+        /// stuck as the control queue is of size = 4.
+        /// 2. If the worker is stuck, join() will timeout.
+        /// 3. kill() will destroy the underlying task handle without freeing any worker's resources.
+        /// 4. The trick is to have this whole procedure not take more than RequestServiceClose's default timeout,
+        /// which is 5s. By doing this RequestServiceClose will be tricked into thinking that the closing procedure
+        /// went correctly. If it takes longer than the specified timeout, it will trigger the SysMgr kill
+        /// procedure, which, unfortunately, will call Worker::close() once again. It is something we do not want.
+        worker->close(1000);
         return sys::ReturnCodes::Success;
     }
 

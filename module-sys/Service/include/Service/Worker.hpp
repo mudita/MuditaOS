@@ -98,13 +98,16 @@ namespace sys
         std::string getControlQueueName() const;
         size_t addQueue(const std::string &queueName, UBaseType_t maxItems, UBaseType_t itemSize);
 
+        void kill();
+        bool join(TickType_t timeout = defaultTimeout);
+
         std::optional<size_t> controlQueueIndex;
         std::optional<size_t> serviceQueueIndex;
         WorkerQueue &getControlQueue() const;
 
         static constexpr std::size_t controlMessagesCount = static_cast<std::size_t>(ControlMessage::MessageCount);
         static constexpr std::size_t defaultStackSize     = 8192;
-        static constexpr TickType_t defaultJoinTimeout    = portMAX_DELAY;
+        static constexpr TickType_t defaultTimeout        = pdMS_TO_TICKS(5000);
         static constexpr auto controlQueueNamePrefix      = "wctrl";
 
         xSemaphoreHandle joinSemaphore = nullptr;
@@ -141,7 +144,7 @@ namespace sys
         std::vector<std::shared_ptr<WorkerQueue>> queues;
 
       public:
-        Worker(sys::Service *service, std::uint16_t stackDepth = defaultStackSize);
+        explicit Worker(sys::Service *service, std::uint16_t stackDepth = defaultStackSize);
         Worker(std::string workerNamePrefix, const UBaseType_t priority, std::uint16_t stackDepth = defaultStackSize);
 
         virtual ~Worker();
@@ -164,24 +167,11 @@ namespace sys
          * @brief Sends stop command to worker.
          */
         virtual bool stop();
-        /**
-         * @brief Joins the thread
-         *
-         * @param timeout - ticks to wait for the thread to end
-         */
-        bool join(TickType_t timeout = defaultJoinTimeout);
-        /**
-         * @brief Sends command and pointer to data to worker
-         */
-        virtual bool send(uint32_t cmd, uint32_t *data);
+
         /**
          * @brief Closes worker by combining stop, join and deinit operations in a single call.
          * If it is not possible to close the worker gently it would kill it forcibly.
          */
-        void close();
-        /**
-         * @brief Kills the worker. Does not deinit it.
-         */
-        void kill();
+        void close(TickType_t timeout = defaultTimeout);
     };
 } /* namespace sys */
