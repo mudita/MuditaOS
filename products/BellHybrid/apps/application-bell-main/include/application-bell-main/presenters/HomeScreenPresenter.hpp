@@ -48,16 +48,11 @@ namespace app::home_screen
         virtual ~AbstractView() noexcept = default;
 
         /// Alarm widget related API
-        virtual void setAlarmTriggered()                                     = 0;
-        virtual void setAlarmActive(bool)                                    = 0;
-        virtual void setAlarmEdit(bool)                                      = 0;
         virtual void setViewState(ViewState state)                           = 0;
         virtual std::time_t getAlarmTime() const                             = 0;
         virtual void setAlarmTime(std::time_t time)                          = 0;
         virtual void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
         virtual void setSnoozeFormat(utils::time::Locale::TimeFormat fmt)    = 0;
-        virtual void incAlarmMinute()                                        = 0;
-        virtual void decAlarmMinute()                                        = 0;
 
         /// Time widget related API
         virtual void setTime(std::time_t time)                          = 0;
@@ -65,14 +60,11 @@ namespace app::home_screen
 
         /// Bottom box related API(descriptionn battery or time)
         virtual void setTemperature(utils::temperature::Temperature newTemp)    = 0;
-        virtual void setBottomDescription(const UTF8 &desc)                     = 0;
-        virtual void removeBottomDescription()                                  = 0;
+        virtual void setTextDescription(const UTF8 &desc)                       = 0;
         virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
 
         /// Various
         virtual void setLayout(gui::LayoutGenerator layoutGenerator) = 0;
-        virtual void switchToMenu()                                  = 0;
-        virtual void switchToBatteryStatus()                         = 0;
         virtual void setSnoozeTime(std::time_t time)                 = 0;
     };
 
@@ -99,6 +91,10 @@ namespace app::home_screen
         virtual bool isBatteryCharging() const                                                   = 0;
         virtual bool isAlarmActivatedByLatch() const                                             = 0;
         virtual void setLayout(gui::LayoutGenerator layoutGenerator)                             = 0;
+        virtual void incAlarmMinute()                                                            = 0;
+        virtual void decAlarmMinute()                                                            = 0;
+        virtual void switchToMenu()                                                              = 0;
+        virtual void switchToBatteryStatus()                                                     = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -138,6 +134,10 @@ namespace app::home_screen
         std::uint32_t getBatteryLvl() const override;
         bool isBatteryCharging() const override;
         bool isAlarmActivatedByLatch() const override;
+        void incAlarmMinute();
+        void decAlarmMinute();
+        void switchToMenu();
+        void switchToBatteryStatus();
 
         void setLayout(gui::LayoutGenerator layoutGenerator) override;
 

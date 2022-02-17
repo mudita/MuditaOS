@@ -59,7 +59,7 @@ namespace gui
         battery->setEdges(RectangleEdge::None);
         battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         battery->setVisible(true);
-        battery->setBatteryPercentMode(BatteryPercentMode::Static);
+        battery->setBatteryPercentMode(BatteryPercentMode::Show);
 
         statusBox->setItems(battery, nullptr);
 
@@ -80,61 +80,54 @@ namespace gui
         return snoozeTimer;
     }
 
-    void HomeScreenLayoutClassic::setAlarmTriggered()
-    {
-        alarm->setAlarmStatus(AlarmSetSpinner::Status::RINGING);
-    }
-
-    void HomeScreenLayoutClassic::setAlarmActive(bool val)
-    {
-        if (val) {
-            alarm->setAlarmStatus(AlarmSetSpinner::Status::ACTIVATED);
-        }
-        else {
-            alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
-        }
-    }
-
     void HomeScreenLayoutClassic::setViewState(app::home_screen::ViewState state)
     {
         switch (state) {
         case app::home_screen::ViewState::Deactivated:
-            setAlarmEdit(false);
-            setAlarmActive(false);
+            alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
             setHeaderViewMode(HeaderViewMode::Empty);
+            alarm->setEditMode(EditMode::Browse);
+            removeTextDescription();
             break;
         case app::home_screen::ViewState::DeactivatedWait:
-            setAlarmActive(false);
+            alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
             setHeaderViewMode(HeaderViewMode::AlarmIcon);
+            alarm->setEditMode(EditMode::Browse);
             break;
         case app::home_screen::ViewState::WaitForConfirmation:
-            setBottomDescription(utils::translate("app_bellmain_home_screen_bottom_desc_dp"));
+            setTextDescription(utils::translate("app_bellmain_home_screen_bottom_desc_dp"));
             break;
         case app::home_screen::ViewState::AlarmEdit:
-            setAlarmEdit(true);
+            alarm->setEditMode(EditMode::Edit);
             setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
             break;
         case app::home_screen::ViewState::ActivatedWait:
-            setAlarmActive(true);
+            alarm->setAlarmStatus(AlarmSetSpinner::Status::ACTIVATED);
             setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+            alarm->setEditMode(EditMode::Browse);
             break;
         case app::home_screen::ViewState::Activated:
-            setAlarmActive(true);
+            alarm->setAlarmStatus(AlarmSetSpinner::Status::ACTIVATED);
             setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+            alarm->setEditMode(EditMode::Browse);
+            removeTextDescription();
             break;
         case app::home_screen::ViewState::AlarmRinging:
-            setAlarmTriggered();
+            alarm->setAlarmStatus(AlarmSetSpinner::Status::RINGING);
             setHeaderViewMode(HeaderViewMode::AlarmIcon);
+            removeTextDescription();
             break;
         case app::home_screen::ViewState::AlarmRingingDeactivatedWait:
-            setAlarmActive(false);
+            alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
             setHeaderViewMode(HeaderViewMode::AlarmIcon);
             break;
         case app::home_screen::ViewState::AlarmSnoozedWait:
             setHeaderViewMode(HeaderViewMode::SnoozeIcon);
+            alarm->setEditMode(EditMode::Browse);
             break;
         case app::home_screen::ViewState::AlarmSnoozed:
             setHeaderViewMode(HeaderViewMode::SnoozeIconAndTime);
+            removeTextDescription();
             break;
         }
     }
@@ -177,10 +170,7 @@ namespace gui
         }
     }
 
-    void HomeScreenLayoutClassic::setTemperature(utils::temperature::Temperature newTemp)
-    {}
-
-    void HomeScreenLayoutClassic::setBottomDescription(const UTF8 &desc)
+    void HomeScreenLayoutClassic::setTextDescription(const UTF8 &desc)
     {
         statusBox->setVisible(false);
         bottomText->setVisible(true);
@@ -188,7 +178,7 @@ namespace gui
         bottomText->informContentChanged();
     }
 
-    void HomeScreenLayoutClassic::removeBottomDescription()
+    void HomeScreenLayoutClassic::removeTextDescription()
     {
         bottomText->setText("");
         statusBox->setVisible(true);
@@ -236,16 +226,6 @@ namespace gui
     void HomeScreenLayoutClassic::setSnoozeFormat(utils::time::Locale::TimeFormat fmt)
     {
         snoozeTimer->setTimeFormat(fmt);
-    }
-
-    void HomeScreenLayoutClassic::setAlarmEdit(bool val)
-    {
-        if (not val) {
-            alarm->setEditMode(EditMode::Browse);
-        }
-        else {
-            alarm->setEditMode(EditMode::Edit);
-        };
     }
 
     std::time_t HomeScreenLayoutClassic::getAlarmTime() const

@@ -24,50 +24,6 @@
 #include <chrono>
 namespace
 {
-    using utils::time::Locale;
-    void increaseHour(struct tm &tm)
-    {
-        if (tm.tm_hour >= Locale::max_hour_24H_mode) {
-            tm.tm_hour = 0;
-            tm.tm_min  = 0;
-        }
-        else {
-            tm.tm_hour++;
-            tm.tm_min = 0;
-        }
-    }
-
-    void decreaseHour(struct tm &tm)
-    {
-        if (tm.tm_hour <= Locale::min_hour_24H_mode) {
-            tm.tm_hour = Locale::max_hour_24H_mode;
-            tm.tm_min  = Locale::max_minutes;
-        }
-        else {
-            tm.tm_hour--;
-            tm.tm_min = utils::time::Locale::max_minutes;
-        }
-    }
-
-    void handleMinuteIncrease(struct tm &tm)
-    {
-        if (tm.tm_min >= Locale::max_minutes) {
-            increaseHour(tm);
-        }
-        else {
-            tm.tm_min++;
-        }
-    }
-
-    void handleMinuteDecrease(struct tm &tm)
-    {
-        if (tm.tm_min <= 0) {
-            decreaseHour(tm);
-        }
-        else {
-            tm.tm_min--;
-        }
-    }
     inline constexpr auto snoozeTimerName = "SnoozeTimer";
     inline constexpr std::chrono::seconds timerTick{1};
 } // namespace
@@ -108,20 +64,6 @@ namespace gui
         }
     }
 
-    void BellHomeScreenWindow::setAlarmTriggered()
-    {
-        if (currentLayout) {
-            currentLayout->setAlarmTriggered();
-        }
-    }
-
-    void BellHomeScreenWindow::setAlarmActive(bool val)
-    {
-        if (currentLayout) {
-            currentLayout->setAlarmActive(val);
-        }
-    }
-
     void BellHomeScreenWindow::setViewState(app::home_screen::ViewState state)
     {
         if (currentLayout) {
@@ -137,20 +79,12 @@ namespace gui
         }
     }
 
-    void BellHomeScreenWindow::setBottomDescription(const UTF8 &desc)
+    void BellHomeScreenWindow::setTextDescription(const UTF8 &desc)
     {
         if (currentLayout) {
-            currentLayout->setBottomDescription(desc);
+            currentLayout->setTextDescription(desc);
         }
     }
-
-    void BellHomeScreenWindow::removeBottomDescription()
-    {
-        if (currentLayout) {
-            currentLayout->removeBottomDescription();
-        }
-    }
-
     void BellHomeScreenWindow::setBatteryLevelState(const Store::Battery &batteryContext)
     {
         if (currentLayout) {
@@ -186,13 +120,6 @@ namespace gui
         }
     }
 
-    void BellHomeScreenWindow::setAlarmEdit(bool val)
-    {
-        if (currentLayout) {
-            currentLayout->setAlarmEdit(val);
-        }
-    }
-
     std::time_t BellHomeScreenWindow::getAlarmTime() const
     {
         if (currentLayout) {
@@ -210,36 +137,11 @@ namespace gui
         }
     }
 
-    void BellHomeScreenWindow::incAlarmMinute()
-    {
-        if (currentLayout) {
-            const auto alarmTime = currentLayout->getAlarmTime();
-            auto newTime         = std::localtime(&alarmTime);
-            handleMinuteIncrease(*newTime);
-            currentLayout->setAlarmTime(std::mktime(newTime));
-        }
-    }
-
-    void BellHomeScreenWindow::decAlarmMinute()
-    {
-        if (currentLayout) {
-            const auto alarmTime = currentLayout->getAlarmTime();
-            auto newTime         = std::localtime(&alarmTime);
-            handleMinuteDecrease(*newTime);
-            currentLayout->setAlarmTime(std::mktime(newTime));
-        }
-    }
-
     void BellHomeScreenWindow::setSnoozeTime(std::time_t newTime)
     {
         if (currentLayout) {
             currentLayout->setSnoozeTime(newTime);
         }
-    }
-
-    void BellHomeScreenWindow::switchToMenu()
-    {
-        application->switchWindow(window::name::bell_main_menu, nullptr);
     }
 
     bool BellHomeScreenWindow::onInput(const InputEvent &inputEvent)
@@ -268,12 +170,6 @@ namespace gui
             presenter->handleUpdateTimeEvent();
         }
         return true;
-    }
-    void BellHomeScreenWindow::switchToBatteryStatus()
-    {
-        application->switchWindow(gui::BellBatteryStatusWindow::name,
-                                  std::make_unique<gui::BellBatteryStatusWindow::Data>(presenter->getBatteryLvl(),
-                                                                                       presenter->isBatteryCharging()));
     }
 
     bool BellHomeScreenWindow::updateBatteryStatus()

@@ -3,19 +3,23 @@
 
 #pragma once
 
-#include <gui/widgets/BoxLayout.hpp>
+#include <widgets/spinners/Spinners.hpp>
+#include <gui/widgets/Style.hpp>
 #include <gui/widgets/text/TextConstants.hpp>
 #include <time/time_locale.hpp>
-#include <widgets/spinners/Spinners.hpp>
-#include "TimeSetSpinner.hpp"
 
 #include <string>
 
-namespace style::time_set_fmt_spinner
+namespace style::time_set_spinner_vertical
 {
-    inline constexpr auto small_margin = 5U;
-    inline constexpr auto big_margin   = 20U;
-} // namespace style::time_set_fmt_spinner
+    namespace focus
+    {
+        inline constexpr auto size = 6U;
+    } // namespace focus
+
+    inline constexpr auto small_margin = 6U;
+    inline constexpr auto big_margin   = 44U;
+} // namespace style::time_set_spinner_vertical
 
 namespace gui
 {
@@ -27,10 +31,10 @@ namespace gui
     /// Two time formats are supported:
     /// utils::time::Locale::TimeFormat::FormatTime12H
     /// utils::time::Locale::TimeFormat::FormatTime24H
-    class TimeSetFmtSpinner : public HBox
+    class TimeSetSpinnerVertical : public VBox
     {
       public:
-        explicit TimeSetFmtSpinner(
+        TimeSetSpinnerVertical(
             Item *parent                               = nullptr,
             uint32_t x                                 = 0U,
             uint32_t y                                 = 0U,
@@ -40,14 +44,11 @@ namespace gui
 
         /// Switches currently displayed time format
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void;
-        auto setTimeFormatSpinnerVisibility(bool visibility) noexcept -> void;
         auto setHour(int value) noexcept -> void;
         auto setMinute(int value) noexcept -> void;
         auto setTime(std::time_t time) noexcept -> void;
-        auto setEditMode(EditMode newEditMode) noexcept -> void;
-        auto setFont(std::string newFontName) noexcept -> void;
-        auto setFont(std::string newFocusFontName, std::string newNoFocusFontName) noexcept -> void;
-        auto updateFmtFont(const std::string &fontName) noexcept -> void;
+        auto setFont(const std::string &newFontName) noexcept -> void;
+        auto updateFont(TextFixedSize *elem, const std::string &fontName) noexcept -> void;
 
         [[nodiscard]] auto getTime() const noexcept -> std::time_t;
         [[nodiscard]] auto getHour() const noexcept -> int;
@@ -56,32 +57,21 @@ namespace gui
 
         auto getTimeFormat() const noexcept -> utils::time::Locale::TimeFormat;
 
+        auto getHourMargins(const std::string &font) const noexcept -> Margins;
+
       private:
-        enum class TraverseDir : bool
-        {
-            Left,
-            Right
-        };
+        std::map<std::string, Margins> spaceMarginsMap = {
+            {style::window::font::verybiglight, {0, 0, 0, style::time_set_spinner_vertical::small_margin}},
+            {style::window::font::largelight, {0, 0, 0, style::time_set_spinner_vertical::small_margin}},
+            {style::window::font::supersizemelight, {0, 0, 0, style::time_set_spinner_vertical::big_margin}},
+            {style::window::font::huge, {0, 0, 0, style::time_set_spinner_vertical::big_margin}}};
 
-        std::map<std::string, Margins> fmtMarginsMap = {
-            {style::window::font::verybiglight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
-            {style::window::font::largelight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
-            {style::window::font::supersizemelight, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}},
-            {style::window::font::huge, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}}};
-        [[nodiscard]] auto getFmtMargins(const std::string &fmtFont) const noexcept -> Margins;
-
-        auto onInput(const InputEvent &inputEvent) -> bool override;
-        auto handleEnterKey() -> bool;
-        auto handleRightFunctionKey() -> bool;
         void handleContentChanged() override;
 
-        TimeSetSpinner *timeSetSpinner = nullptr;
-        UTF8Spinner *fmt               = nullptr;
-        EditMode editMode              = EditMode::Edit;
-        std::string focusFontName      = style::window::font::supersizeme;
-        std::string noFocusFontName    = style::window::font::supersizemelight;
+        UIntegerSpinnerFixed *hour   = nullptr;
+        UIntegerSpinnerFixed *minute = nullptr;
+        std::string fontName         = style::window::font::supersizemelight;
 
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H;
     };
-
-} // namespace gui
+} /* namespace gui */

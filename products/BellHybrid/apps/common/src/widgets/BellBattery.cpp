@@ -33,6 +33,7 @@ namespace gui
         percentText->setEdges(RectangleEdge::None);
         percentText->activeItem = false;
         percentText->drawUnderline(false);
+        percentText->setVisible(false);
     }
 
     void BellBattery::update(const Store::Battery &batteryContext)
@@ -43,29 +44,30 @@ namespace gui
         }
 
         const auto level = batteryContext.level;
+        percentText->setText(std::to_string(level) + "%");
 
         if (batteryContext.state == Store::Battery::State::Charging) {
             img->set(battery::battery_charging, gui::ImageTypeSpecifier::W_M);
         }
         else {
             img->set(image->data(), gui::ImageTypeSpecifier::W_M);
-            img->informContentChanged();
         }
 
-        if (batteryPercentMode == BatteryPercentMode::Static || level < lowBatteryLimit ||
-            batteryContext.state == Store::Battery::State::Charging) {
-            percentText->setText(std::to_string(level) + "%");
+        if (batteryPercentMode == BatteryPercentMode::Show) {
             percentText->setVisible(true);
         }
         else {
             percentText->setVisible(false);
         }
-        percentText->informContentChanged();
+        img->informContentChanged();
     }
 
     void BellBattery::setBatteryPercentMode(BatteryPercentMode mode)
     {
         batteryPercentMode = mode;
+        if (batteryPercentMode == BatteryPercentMode::Hide) {
+            percentText->setVisible(false);
+        }
     }
 
     std::uint32_t BellBattery::getLevel()

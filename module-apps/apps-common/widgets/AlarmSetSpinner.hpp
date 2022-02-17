@@ -34,6 +34,7 @@ namespace gui
         explicit AlarmSetSpinner(
             Item *parent = nullptr, Position x = 0U, Position y = 0U, Length w = 0U, Length h = 0U);
 
+        auto setArrowsVisible(bool visible) noexcept -> void;
         auto setTime(std::time_t time) noexcept -> void;
         auto setFont(std::string newFontName) noexcept -> void;
         auto setEditMode(EditMode mode) noexcept -> void;

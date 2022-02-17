@@ -30,8 +30,8 @@ namespace gui
 
     enum class BatteryPercentMode
     {
-        Dynamic,
-        Static,
+        Show, // Show always
+        Hide  // Never show percentage
     };
 
     class BellBattery : public gui::HBox
@@ -43,7 +43,7 @@ namespace gui
         std::uint32_t getLevel();
 
       private:
-        BatteryPercentMode batteryPercentMode = BatteryPercentMode::Dynamic;
+        BatteryPercentMode batteryPercentMode = BatteryPercentMode::Show;
         TextFixedSize *percentText;
         Image *img;
     };

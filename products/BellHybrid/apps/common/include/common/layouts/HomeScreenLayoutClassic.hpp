@@ -51,17 +51,12 @@ namespace gui
         HomeScreenLayoutClassic(std::string name);
 
         virtual auto setViewState(app::home_screen::ViewState state) -> void override;
-        virtual auto setTemperature(utils::temperature::Temperature newTemp) -> void override;
         virtual auto setTime(std::time_t newTime) -> void override;
-        auto setAlarmTriggered() -> void override;
-        auto setAlarmActive(bool val) -> void override;
-        auto setBottomDescription(const UTF8 &desc) -> void override;
-        auto removeBottomDescription() -> void override;
+        auto setTextDescription(const UTF8 &desc) -> void override;
         auto setBatteryLevelState(const Store::Battery &batteryContext) -> void override;
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
         auto setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
         auto setSnoozeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
-        auto setAlarmEdit(bool val) -> void override;
         auto getAlarmTime() const -> std::time_t override;
         auto setAlarmTime(std::time_t newTime) -> void override;
         auto setSnoozeTime(std::time_t newTime) -> void override;
@@ -73,6 +68,7 @@ namespace gui
         auto setHeaderViewMode(HeaderViewMode mode) -> void;
         virtual auto buildInterface() -> void;
         virtual bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext);
+        auto removeTextDescription() -> void;
 
         TimeSetFmtSpinner *time{};
         DuoHBox *statusBox{};

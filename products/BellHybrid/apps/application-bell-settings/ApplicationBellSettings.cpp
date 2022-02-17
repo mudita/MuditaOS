@@ -134,11 +134,12 @@ namespace app
             });
 
         windowsFactory.attach(
-            gui::window::name::bellSettingsTimeUnits, [](ApplicationCommon *app, const std::string &name) {
+            gui::window::name::bellSettingsTimeUnits, [this](ApplicationCommon *app, const std::string &name) {
+                auto layoutModel          = std::make_unique<bell_settings::LayoutModel>(this);
                 auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
                 auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModel>(app);
                 auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(
-                    timeUnitsProvider, std::move(temperatureUnitModel));
+                    this, timeUnitsProvider, std::move(temperatureUnitModel), std::move(layoutModel));
                 return std::make_unique<gui::BellSettingsTimeUnitsWindow>(app, std::move(presenter));
             });
 

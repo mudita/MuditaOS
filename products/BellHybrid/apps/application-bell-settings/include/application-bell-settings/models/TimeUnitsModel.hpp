@@ -43,6 +43,9 @@ namespace app::bell_settings
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
 
         [[nodiscard]] auto getTemperatureUnit() const -> utils::temperature::Temperature::Unit;
+
+        [[nodiscard]] auto getTimeFormat() const -> utils::time::Locale::TimeFormat;
+
         auto setTemperatureUnit(utils::temperature::Temperature::Unit unit) -> void;
 
       protected:

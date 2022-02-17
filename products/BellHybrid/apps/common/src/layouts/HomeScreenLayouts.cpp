@@ -7,15 +7,33 @@
 #include <common/layouts/HomeScreenLayoutClassicWithAmPm.hpp>
 #include <common/layouts/HomeScreenLayoutClassicWithBattery.hpp>
 #include <common/layouts/HomeScreenLayoutClassicWithTemp.hpp>
+#include <common/layouts/HomeScreenLayoutVertical.hpp>
+#include <common/layouts/HomeScreenLayoutVerticalSimple.hpp>
+#include <common/layouts/HomeScreenLayoutVerticalWithAmPm.hpp>
 
-namespace gui
+namespace gui::factory
 {
-    std::map<std::string, LayoutGenerator> homeScreenLayouts()
+    std::map<std::string, LayoutGenerator> getLayoutsFormat24h()
     {
-        return {{"ClassicWithTemp", []() { return new HomeScreenLayoutClassicWithTemp("ClassicWithTemp"); }},
-                {"Classic", []() { return new HomeScreenLayoutClassic("Classic"); }},
-                {"ClassicWithAmPm", []() { return new HomeScreenLayoutClassicWithAmPm("ClassicWithAmPm"); }},
-                {"ClassicWithBattery", []() { return new HomeScreenLayoutClassicWithBattery("ClassicWithBattery"); }}};
+        return {{"Classic", []() { return new HomeScreenLayoutClassic("Classic"); }},
+                {"ClassicWithTemp", []() { return new HomeScreenLayoutClassicWithTemp("ClassicWithTemp"); }},
+                {"ClassicWithBattery", []() { return new HomeScreenLayoutClassicWithBattery("ClassicWithBattery"); }},
+                {"VerticalSimple", []() { return new HomeScreenLayoutVerticalSimple("VerticalSimple"); }}};
     };
 
-} // namespace gui
+    std::map<std::string, LayoutGenerator> getLayoutsFormat12h()
+    {
+        return {{"Classic", []() { return new HomeScreenLayoutClassic("Classic"); }},
+                {"ClassicWithTemp", []() { return new HomeScreenLayoutClassicWithTemp("ClassicWithTemp"); }},
+                {"ClassicWithAmPm", []() { return new HomeScreenLayoutClassicWithAmPm("ClassicWithAmPm"); }},
+                {"ClassicWithBattery", []() { return new HomeScreenLayoutClassicWithBattery("ClassicWithBattery"); }},
+                {"VerticalSimple", []() { return new HomeScreenLayoutVerticalSimple("VerticalSimple"); }},
+                {"VerticalWithAmPm", []() { return new HomeScreenLayoutVerticalWithAmPm("VerticalWithAmPm"); }}};
+    };
+
+    std::map<std::string, LayoutGenerator> getAllLayouts()
+    {
+        return getLayoutsFormat12h();
+    };
+
+} // namespace gui::factory

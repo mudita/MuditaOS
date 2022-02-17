@@ -120,6 +120,11 @@ namespace app::bell_settings
 #endif
     }
 
+    auto TimeUnitsModel::getTimeFormat() const -> utils::time::Locale::TimeFormat
+    {
+        return timeFmtSetListItem->getTimeFmt();
+    }
+
     auto TimeUnitsModel::setTemperatureUnit(const utils::temperature::Temperature::Unit unit) -> void
     {
 #if CONFIG_ENABLE_TEMP == 1
