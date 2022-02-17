@@ -10,8 +10,13 @@
 namespace gui
 {
     class BaseHomeScreenLayoutProvider;
-
     using LayoutGenerator = std::function<BaseHomeScreenLayoutProvider *()>;
 
-    std::map<std::string, LayoutGenerator> homeScreenLayouts();
-}; // namespace gui
+    namespace factory
+    {
+        std::map<std::string, LayoutGenerator> getLayoutsFormat24h();
+        std::map<std::string, LayoutGenerator> getLayoutsFormat12h();
+
+        std::map<std::string, LayoutGenerator> getAllLayouts();
+    } // namespace factory
+};    // namespace gui

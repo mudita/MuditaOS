@@ -218,6 +218,11 @@ namespace gui
         return fmt->getCurrentValue() == utils::time::Locale::getPM().c_str();
     }
 
+    auto TimeSetFmtSpinner::getTimeFormat() const noexcept -> utils::time::Locale::TimeFormat
+    {
+        return timeFormat;
+    }
+
     auto TimeSetFmtSpinner::setTime(std::time_t time) noexcept -> void
     {
         using namespace utils::time;

@@ -6,6 +6,9 @@
 #include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
 
+#include <windows/BellHomeScreenWindow.hpp>
+#include <windows/BellBatteryStatusWindow.hpp>
+#include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <common/models/TimeModel.hpp>
@@ -17,6 +20,53 @@
 #include <service-evtmgr/Constants.hpp>
 #include <switches/LatchStatusRequest.hpp>
 
+namespace
+{
+    using utils::time::Locale;
+    void increaseHour(struct tm &tm)
+    {
+        if (tm.tm_hour >= Locale::max_hour_24H_mode) {
+            tm.tm_hour = 0;
+            tm.tm_min  = 0;
+        }
+        else {
+            tm.tm_hour++;
+            tm.tm_min = 0;
+        }
+    }
+
+    void decreaseHour(struct tm &tm)
+    {
+        if (tm.tm_hour <= Locale::min_hour_24H_mode) {
+            tm.tm_hour = Locale::max_hour_24H_mode;
+            tm.tm_min  = Locale::max_minutes;
+        }
+        else {
+            tm.tm_hour--;
+            tm.tm_min = utils::time::Locale::max_minutes;
+        }
+    }
+
+    void handleMinuteIncrease(struct tm &tm)
+    {
+        if (tm.tm_min >= Locale::max_minutes) {
+            increaseHour(tm);
+        }
+        else {
+            tm.tm_min++;
+        }
+    }
+
+    void handleMinuteDecrease(struct tm &tm)
+    {
+        if (tm.tm_min <= 0) {
+            decreaseHour(tm);
+        }
+        else {
+            tm.tm_min--;
+        }
+    }
+}; // namespace
 namespace app::home_screen
 {
     HomeScreenPresenter::HomeScreenPresenter(ApplicationCommon *app,
@@ -167,5 +217,32 @@ namespace app::home_screen
     void HomeScreenPresenter::setLayout(gui::LayoutGenerator layoutGenerator)
     {
         getView()->setLayout(layoutGenerator);
+    }
+
+    void HomeScreenPresenter::incAlarmMinute()
+    {
+        const auto alarmTime = getView()->getAlarmTime();
+        auto newTime         = std::localtime(&alarmTime);
+        handleMinuteIncrease(*newTime);
+        getView()->setAlarmTime(std::mktime(newTime));
+    }
+
+    void HomeScreenPresenter::decAlarmMinute()
+    {
+        const auto alarmTime = getView()->getAlarmTime();
+        auto newTime         = std::localtime(&alarmTime);
+        handleMinuteDecrease(*newTime);
+        getView()->setAlarmTime(std::mktime(newTime));
+    }
+
+    void HomeScreenPresenter::switchToMenu()
+    {
+        app->switchWindow(gui::window::name::bell_main_menu, nullptr);
+    }
+
+    void HomeScreenPresenter::switchToBatteryStatus()
+    {
+        app->switchWindow(gui::BellBatteryStatusWindow::name,
+                          std::make_unique<gui::BellBatteryStatusWindow::Data>(getBatteryLvl(), isBatteryCharging()));
     }
 } // namespace app::home_screen

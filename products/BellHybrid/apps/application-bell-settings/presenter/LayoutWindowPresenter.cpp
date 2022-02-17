@@ -71,49 +71,20 @@ namespace app::bell_settings
 
     void LayoutWindowPresenter::initLayoutOptions()
     {
-        auto layoutsList = gui::homeScreenLayouts();
 
-        auto layoutClassicWithTemp = layoutsList.at("ClassicWithTemp")();
-        layoutClassicWithTemp->setAlarmEdit(false);
-        layoutClassicWithTemp->setAlarmActive(true);
-        layoutClassicWithTemp->setTime(clockTime);
-        // layoutClassicWithTemp->setTimeFormat(timeModel->getTimeFormat());
-        layoutClassicWithTemp->setAlarmTime(alarmTime);
-        layoutClassicWithTemp->setBatteryLevelState(batteryState);
-        layoutClassicWithTemp->setViewState(app::home_screen::ViewState::Activated);
-        layoutClassicWithTemp->setTemperature(temperature);
+        auto layoutsList = timeModel->getTimeFormat() == utils::time::Locale::TimeFormat::FormatTime24H
+                               ? gui::factory::getLayoutsFormat24h()
+                               : gui::factory::getLayoutsFormat12h();
 
-        auto layoutClassicWithBattery = layoutsList.at("ClassicWithBattery")();
-        layoutClassicWithBattery->setAlarmEdit(false);
-        layoutClassicWithBattery->setAlarmActive(true);
-        layoutClassicWithBattery->setTime(clockTime);
-        // Commented out to remove "AM"/"PM" from time spinner
-        // layoutClassicWithBattery->setTimeFormat(timeModel->getTimeFormat());
-        layoutClassicWithBattery->setAlarmTime(alarmTime);
-        layoutClassicWithBattery->setBatteryLevelState(batteryState);
-        layoutClassicWithBattery->setViewState(app::home_screen::ViewState::Activated);
-
-        auto layoutClassicWithAmPm = layoutsList.at("ClassicWithAmPm")();
-        layoutClassicWithAmPm->setAlarmEdit(false);
-        layoutClassicWithAmPm->setAlarmActive(true);
-        layoutClassicWithAmPm->setTime(clockTime);
-        // layoutClassicWithAmPm->setTimeFormat(timeModel->getTimeFormat());
-        layoutClassicWithAmPm->setAlarmTime(alarmTime);
-        layoutClassicWithAmPm->setBatteryLevelState(batteryState);
-        layoutClassicWithAmPm->setViewState(app::home_screen::ViewState::Activated);
-
-        auto layoutClassic = layoutsList.at("Classic")();
-        layoutClassic->setAlarmEdit(false);
-        layoutClassic->setAlarmActive(true);
-        layoutClassic->setTime(clockTime);
-        // layoutClassic->setTimeFormat(timeModel->getTimeFormat());
-        layoutClassic->setAlarmTime(alarmTime);
-        layoutClassic->setBatteryLevelState(batteryState);
-        layoutClassic->setViewState(app::home_screen::ViewState::Activated);
-
-        layoutOptions.push_back({layoutClassicWithTemp->getLayout(), "ClassicWithTemp"});
-        layoutOptions.push_back({layoutClassicWithBattery->getLayout(), "ClassicWithBattery"});
-        layoutOptions.push_back({layoutClassicWithAmPm->getLayout(), "ClassicWithAmPm"});
-        layoutOptions.push_back({layoutClassic->getLayout(), "Classic"});
+        for (auto &layoutEntry : layoutsList) {
+            auto layout = layoutEntry.second();
+            layout->setViewState(app::home_screen::ViewState::Activated);
+            layout->setTimeFormat(timeModel->getTimeFormat());
+            layout->setTime(clockTime);
+            layout->setAlarmTime(alarmTime);
+            layout->setBatteryLevelState(batteryState);
+            layout->setTemperature(temperature);
+            layoutOptions.push_back({layout->getLayout(), layoutEntry.first});
+        }
     }
 } // namespace app::bell_settings

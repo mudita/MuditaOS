@@ -10,6 +10,7 @@
 namespace app::bell_settings
 {
     class AbstractTemperatureUnitModel;
+    class AbstractLayoutModel;
 
     class TimeUnitsWindowContract
     {
@@ -35,8 +36,10 @@ namespace app::bell_settings
     class TimeUnitsWindowPresenter : public TimeUnitsWindowContract::Presenter
     {
       public:
-        explicit TimeUnitsWindowPresenter(std::shared_ptr<TimeUnitsModel> pagesProvider,
-                                          std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel);
+        explicit TimeUnitsWindowPresenter(app::ApplicationCommon *app,
+                                          std::shared_ptr<TimeUnitsModel> pagesProvider,
+                                          std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel,
+                                          std::unique_ptr<AbstractLayoutModel> layoutModel);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto clearData() -> void override;
@@ -45,7 +48,9 @@ namespace app::bell_settings
         auto createData() -> void override;
 
       private:
+        app::ApplicationCommon *app{};
         std::shared_ptr<TimeUnitsModel> pagesProvider;
         std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel;
+        std::unique_ptr<AbstractLayoutModel> layoutModel;
     };
 } // namespace app::bell_settings

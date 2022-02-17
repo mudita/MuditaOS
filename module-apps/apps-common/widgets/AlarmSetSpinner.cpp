@@ -59,6 +59,12 @@ namespace gui
         return this->focusItem->onInput(inputEvent);
     }
 
+    auto AlarmSetSpinner::setArrowsVisible(bool visible) noexcept -> void
+    {
+        leftArrow->setVisible(visible);
+        rightArrow->setVisible(visible);
+    }
+
     auto AlarmSetSpinner::setFont(std::string newFontName) noexcept -> void
     {
         fontName = std::move(newFontName);

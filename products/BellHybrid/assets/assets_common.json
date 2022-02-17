@@ -18,6 +18,7 @@
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_status_battery_lvl0_W_G.vpi", "output": "assets/images/bell/bell_status_battery_lvl0_W_G.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_alarm_activated_W_M.vpi", "output": "assets/images/bell/bell_alarm_activated_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/big_alarm_W_G.vpi", "output": "assets/images/bell/big_alarm_W_G.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/big_alarm_snoozed_W_M.vpi", "output": "assets/images/bell/big_alarm_snoozed_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_battery_lvl2_W_M.vpi", "output": "assets/images/bell/bell_battery_lvl2_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_mudita_logo_W_G.vpi", "output": "assets/images/bell/bell_mudita_logo_W_G.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_status_battery_lvl5_W_G.vpi", "output": "assets/images/bell/bell_status_battery_lvl5_W_G.vpi"},

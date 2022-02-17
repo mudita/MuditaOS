@@ -34,12 +34,15 @@ target_sources(application-bell-common
         src/popups/BellTurnOffOptionWindow.cpp
         src/popups/BellRebootWindow.cpp
         src/popups/presenter/AlarmActivatedPresenter.cpp
+        src/widgets/AlarmIcon.cpp
         src/widgets/ListItems.cpp
         src/widgets/BellBattery.cpp
         src/widgets/BellStatusClock.cpp
         src/widgets/DuoHBox.cpp
         src/widgets/ProgressTimerWithSnoozeTimer.cpp
         src/widgets/SnoozeTimer.cpp
+        src/widgets/LayoutVertical.cpp
+        src/widgets/TimeSetSpinnerVertical.cpp
 
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
@@ -51,6 +54,9 @@ target_sources(application-bell-common
         src/layouts/HomeScreenLayoutClassicWithAmPm.cpp
         src/layouts/HomeScreenLayoutClassicWithBattery.cpp
         src/layouts/HomeScreenLayoutClassicWithTemp.cpp
+        src/layouts/HomeScreenLayoutVertical.cpp
+        src/layouts/HomeScreenLayoutVerticalSimple.cpp
+        src/layouts/HomeScreenLayoutVerticalWithAmPm.cpp
 
     PUBLIC
         include/common/BellListItemProvider.hpp
@@ -83,6 +89,7 @@ target_sources(application-bell-common
         include/common/popups/BedtimeNotificationWindow.hpp
         include/common/popups/BellTurnOffOptionWindow.hpp
         include/common/popups/BellRebootWindow.hpp
+        include/common/widgets/AlarmIcon.hpp
         include/common/widgets/BellBattery.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
         include/common/widgets/BellStatusClock.hpp
@@ -90,6 +97,8 @@ target_sources(application-bell-common
         include/common/widgets/ProgressTimerWithSnoozeTimer.hpp
         include/common/widgets/SnoozeTimer.hpp
         include/common/widgets/ListItems.hpp
+        include/common/widgets/LayoutVertical.hpp
+        include/common/widgets/TimeSetSpinnerVertical.hpp
         include/common/options/BellOptionWindow.hpp
         include/common/options/BellShortOptionWindow.hpp
         include/common/options/OptionBellMenu.hpp
@@ -99,6 +108,9 @@ target_sources(application-bell-common
         include/common/layouts/HomeScreenLayoutClassicWithAmPm.hpp
         include/common/layouts/HomeScreenLayoutClassicWithBattery.hpp
         include/common/layouts/HomeScreenLayoutClassicWithTemp.hpp
+        include/common/layouts/HomeScreenLayoutVertical.hpp
+        include/common/layouts/HomeScreenLayoutVerticalSimple.hpp
+        include/common/layouts/HomeScreenLayoutVerticalWithAmPm.hpp
 )
 
 target_link_libraries(application-bell-common

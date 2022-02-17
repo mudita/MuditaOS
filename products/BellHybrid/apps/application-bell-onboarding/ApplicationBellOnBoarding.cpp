@@ -18,6 +18,7 @@
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
+#include <common/models/LayoutModel.hpp>
 
 #include <application-bell-settings/models/TemperatureUnitModel.hpp>
 #include <application-bell-settings/models/TimeUnitsModel.hpp>
@@ -74,11 +75,12 @@ namespace app
             });
 
         windowsFactory.attach(
-            gui::window::name::onBoardingSettingsWindow, [](ApplicationCommon *app, const std::string &name) {
+            gui::window::name::onBoardingSettingsWindow, [this](ApplicationCommon *app, const std::string &name) {
+                auto layoutModel          = std::make_unique<bell_settings::LayoutModel>(this);
                 auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
                 auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModelFactoryResetValues>(app);
                 auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(
-                    timeUnitsProvider, std::move(temperatureUnitModel));
+                    this, timeUnitsProvider, std::move(temperatureUnitModel), std::move(layoutModel));
                 return std::make_unique<gui::OnBoardingSettingsWindow>(app, std::move(presenter), name);
             });
 

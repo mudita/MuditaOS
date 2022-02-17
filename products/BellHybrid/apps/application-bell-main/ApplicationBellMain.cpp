@@ -177,7 +177,7 @@ namespace app
 
     void ApplicationBellMain::setHomeScreenLayout(std::string layoutName)
     {
-        auto homeScreenLayoutsList = gui::homeScreenLayouts();
+        auto homeScreenLayoutsList = gui::factory::getAllLayouts();
         if (homeScreenLayoutsList.find(layoutName) == homeScreenLayoutsList.end()) {
             return;
         }
