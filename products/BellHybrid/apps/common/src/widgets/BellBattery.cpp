@@ -16,7 +16,6 @@ namespace
 
     constexpr auto betteryFullLevel = 100;
     constexpr auto lowBatteryLimit  = 20;
-    constexpr auto singleDigitLimit = 10;
 } // namespace
 
 namespace gui
@@ -47,29 +46,8 @@ namespace gui
 
         if (batteryContext.state == Store::Battery::State::Charging) {
             img->set(battery::battery_charging, gui::ImageTypeSpecifier::W_M);
-
-            if (level == betteryFullLevel) {
-                img->setMargins(gui::Margins(0, 0, battery::image_right_margin, 0));
-                img->informContentChanged();
-            }
-            else if (level < singleDigitLimit) {
-                img->setMargins(gui::Margins(battery::image_left_margin_big, 0, battery::image_right_margin, 0));
-                img->informContentChanged();
-            }
-            else {
-                img->setMargins(gui::Margins(battery::image_left_margin, 0, battery::image_right_margin, 0));
-                img->informContentChanged();
-            }
         }
         else {
-            if (level <= lowBatteryLimit) {
-                if (level < singleDigitLimit) {
-                    img->setMargins(gui::Margins(battery::image_left_margin_big, 0, battery::image_right_margin, 0));
-                }
-                else {
-                    img->setMargins(gui::Margins(battery::image_left_margin, 0, battery::image_right_margin, 0));
-                }
-            }
             img->set(image->data(), gui::ImageTypeSpecifier::W_M);
             img->informContentChanged();
         }
