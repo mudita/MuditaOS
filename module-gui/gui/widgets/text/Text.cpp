@@ -615,6 +615,7 @@ namespace gui
             setCursorStartPosition(CursorStartPosition::Offset);
 
             if (!document->isEmpty() && removeChar()) {
+                translator.resetPreviousKeyPress();
                 onTextChanged();
             }
             return true;
@@ -653,6 +654,7 @@ namespace gui
             /// if we have multi press in non digit mode - we need to replace char and put next char from translator
             if (!(inputMode->is(InputMode::digit) || (inputMode->is(InputMode::phone))) && translator.getTimes() > 0) {
                 removeChar();
+                code = translator.handle(inputEvent.getRawKey(), getInputModeKeyMap(), false);
             }
             addChar(code);
             onTextChanged();

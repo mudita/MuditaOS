@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Translator.hpp"
@@ -194,7 +194,7 @@ namespace gui
         return InputEvent{key, InputEvent::State::keyReleasedLong, getKeyCode(key.keyCode)};
     }
 
-    uint32_t KeyInputMappedTranslation::handle(RawKey key, const std::string &keymap)
+    uint32_t KeyInputMappedTranslation::handle(RawKey key, const std::string &keymap, bool incrementTimes)
     {
         // get shortpress
         if (previousKeyPress.keyCode != key.keyCode) {
@@ -202,7 +202,7 @@ namespace gui
         }
         else if (key.state == RawKey::State::Released) {
             if (key.timeRelease - previousKeyPress.timeRelease < keyTimeCycleMs) {
-                ++times;
+                incrementTimes ? ++times : times;
             }
             else {
                 times = 0;
