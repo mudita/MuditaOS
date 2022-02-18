@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common.hpp"
@@ -11,6 +11,7 @@
 #include <Databases/ContactsDB.hpp>
 #include <queries/notifications/QueryNotificationsGet.hpp>
 #include <queries/notifications/QueryNotificationsIncrement.hpp>
+#include <queries/notifications/QueryNotificationsDecrement.hpp>
 #include <queries/notifications/QueryNotificationsClear.hpp>
 #include <queries/notifications/QueryNotificationsGetAll.hpp>
 
@@ -217,6 +218,14 @@ TEST_CASE("Notifications Record tests")
         REQUIRE(result->getResult());
     };
 
+    auto decrementByKey = [&](NotificationsRecord::Key key, size_t count = 1) {
+        auto query  = std::make_shared<db::query::notifications::Decrement>(key, count);
+        auto ret    = notificationsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::notifications::DecrementResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        REQUIRE(result->getResult());
+    };
+
     auto clearByKey = [&](NotificationsRecord::Key key) {
         auto query  = std::make_shared<db::query::notifications::Clear>(key);
         auto ret    = notificationsRecordInterface.runQuery(query);
@@ -359,6 +368,40 @@ TEST_CASE("Notifications Record tests")
 
             incrementByKey(NotificationsRecord::Key::Calls, someUnknownNumber);
             getByKey(NotificationsRecord::Key::Calls, 3, contactNotExpected);
+        }
+
+        SECTION("Clear SMS notifications from multiple known numbers")
+        {
+            const auto expectedNotificationPerContact = 3;
+            const auto expectedNotificationValue      = 2 * expectedNotificationPerContact;
+            for (int i = 0; i < expectedNotificationValue / 2; i++) {
+                incrementByKey(NotificationsRecord::Key::Sms, numberUserTest_1);
+                incrementByKey(NotificationsRecord::Key::Sms, numberUserTest_2);
+            }
+            getByKey(NotificationsRecord::Key::Sms, expectedNotificationValue, contactNotExpected);
+
+            decrementByKey(NotificationsRecord::Key::Sms, expectedNotificationPerContact);
+            getByKey(NotificationsRecord::Key::Sms, expectedNotificationPerContact, contactNotExpected);
+
+            decrementByKey(NotificationsRecord::Key::Sms, expectedNotificationPerContact);
+            getByKey(NotificationsRecord::Key::Sms, noNotificationExpected, contactNotExpected);
+        }
+
+        SECTION("Clear SMS notifications overflowing actual count")
+        {
+            const auto expectedNotificationPerContact = 3;
+            const auto expectedNotificationValue      = 2 * expectedNotificationPerContact;
+            for (int i = 0; i < expectedNotificationValue / 2; i++) {
+                incrementByKey(NotificationsRecord::Key::Sms, numberUserTest_1);
+                incrementByKey(NotificationsRecord::Key::Sms, numberUserTest_2);
+            }
+            getByKey(NotificationsRecord::Key::Sms, expectedNotificationValue, contactNotExpected);
+
+            decrementByKey(NotificationsRecord::Key::Sms, expectedNotificationPerContact + 1);
+            getByKey(NotificationsRecord::Key::Sms, 2, contactNotExpected);
+
+            decrementByKey(NotificationsRecord::Key::Sms, expectedNotificationPerContact);
+            getByKey(NotificationsRecord::Key::Sms, noNotificationExpected, contactNotExpected);
         }
     }
 

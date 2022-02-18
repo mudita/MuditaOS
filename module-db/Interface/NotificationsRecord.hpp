@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,9 +21,11 @@ namespace db::query::notifications
     class Get;
     class GetResult;
     class Increment;
+    class IncrementResult;
+    class Decrement;
+    class DecrementResult;
     class MultipleIncrement;
     class MultipleIncrementResult;
-    class IncrementResult;
     class Clear;
     class ClearResult;
     class GetAll;
@@ -87,6 +89,8 @@ class NotificationsRecordInterface : public RecordInterface<NotificationsRecord,
     std::unique_ptr<db::query::notifications::GetResult> runQueryImpl(const db::query::notifications::Get *query);
     std::unique_ptr<db::query::notifications::IncrementResult> runQueryImpl(
         const db::query::notifications::Increment *query);
+    std::unique_ptr<db::query::notifications::DecrementResult> runQueryImpl(
+        const db::query::notifications::Decrement *query);
     std::unique_ptr<db::query::notifications::MultipleIncrementResult> runQueryImpl(
         const db::query::notifications::MultipleIncrement *query);
     std::unique_ptr<db::query::notifications::ClearResult> runQueryImpl(const db::query::notifications::Clear *query);
@@ -94,4 +98,5 @@ class NotificationsRecordInterface : public RecordInterface<NotificationsRecord,
     [[nodiscard]] bool processIncrement(NotificationsRecord::Key key,
                                         std::optional<utils::PhoneNumber::View> &&number,
                                         size_t size);
+    [[nodiscard]] bool processDecrement(NotificationsRecord::Key key, size_t size);
 };

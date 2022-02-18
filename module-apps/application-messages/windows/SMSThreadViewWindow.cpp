@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -7,6 +7,7 @@
 #include "SMSThreadViewWindow.hpp"
 
 #include <log/log.hpp>
+#include <module-db/queries/notifications/QueryNotificationsDecrement.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByNumberID.hpp>
 #include <module-db/queries/phonebook/QueryNumberGetByID.hpp>
 #include <OptionsMessages.hpp>
@@ -62,29 +63,36 @@ namespace gui
 
     void SMSThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        {
-            auto pdata = dynamic_cast<SMSThreadData *>(data);
-            if (pdata) {
-                LOG_INFO("Thread data received: %" PRIu32, pdata->thread->ID);
-                requestContact(pdata->thread->numberID);
+        if (auto pdata = dynamic_cast<SMSThreadData *>(data); pdata) {
+            LOG_INFO("Thread data received: %" PRIu32, pdata->thread->ID);
+            requestContact(pdata->thread->numberID);
 
-                // Mark thread as Read
-                if (pdata->thread->isUnread()) {
-                    auto app = dynamic_cast<app::ApplicationMessages *>(application);
-                    assert(app != nullptr);
-                    if (application->getCurrentWindow() == this) {
-                        app->markSmsThreadAsRead(pdata->thread->ID);
-                    }
+            // Mark thread as Read
+            if (pdata->thread->isUnread()) {
+                auto app = dynamic_cast<app::ApplicationMessages *>(application);
+                assert(app != nullptr);
+                if (application->getCurrentWindow() == this) {
+                    app->markSmsThreadAsRead(pdata->thread->ID);
                 }
-                smsModel->numberID    = pdata->thread->numberID;
-                smsModel->smsThreadID = pdata->thread->ID;
-                smsList->rebuildList();
             }
-            else if (smsModel->numberID != DB_ID_NONE) {
-                requestContact(smsModel->numberID);
+            smsModel->numberID    = pdata->thread->numberID;
+            smsModel->smsThreadID = pdata->thread->ID;
+            smsList->rebuildList();
+
+            if (pdata->thread->unreadMsgCount) {
+                const auto countToClear = pdata->thread->unreadMsgCount;
+
+                DBServiceAPI::GetQuery(
+                    application,
+                    db::Interface::Name::Notifications,
+                    std::make_unique<db::query::notifications::Decrement>(NotificationsRecord::Key::Sms, countToClear));
             }
         }
-        if (auto pdata = dynamic_cast<SMSTextData *>(data)) {
+        else if (smsModel->numberID != DB_ID_NONE) {
+            requestContact(smsModel->numberID);
+        }
+
+        if (auto pdata = dynamic_cast<SMSTextData *>(data); pdata) {
             auto txt = pdata->text;
             LOG_INFO("received sms templates data");
             pdata->concatenate == SMSTextData::Concatenate::True ? smsModel->smsInput->inputText->addText(txt)

@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsRecord.hpp"
 #include "module-db/queries/notifications/QueryNotificationsGet.hpp"
 #include "module-db/queries/notifications/QueryNotificationsIncrement.hpp"
+#include "module-db/queries/notifications/QueryNotificationsDecrement.hpp"
 #include "module-db/queries/notifications/QueryNotificationsMultipleIncrement.hpp"
 #include "module-db/queries/notifications/QueryNotificationsClear.hpp"
 #include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
@@ -148,6 +149,9 @@ std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(std::sha
     if (const auto local_query = dynamic_cast<const db::query::notifications::Increment *>(query.get())) {
         return runQueryImpl(local_query);
     }
+    if (const auto local_query = dynamic_cast<const db::query::notifications::Decrement *>(query.get())) {
+        return runQueryImpl(local_query);
+    }
     if (const auto local_query = dynamic_cast<const db::query::notifications::MultipleIncrement *>(query.get())) {
         return runQueryImpl(local_query);
     }
@@ -173,6 +177,14 @@ std::unique_ptr<db::query::notifications::IncrementResult> NotificationsRecordIn
     auto ret = processIncrement(query->getKey(), query->getNumber(), 1);
 
     return std::make_unique<db::query::notifications::IncrementResult>(ret);
+}
+
+std::unique_ptr<db::query::notifications::DecrementResult> NotificationsRecordInterface::runQueryImpl(
+    const db::query::notifications::Decrement *query)
+{
+    auto ret = processDecrement(query->getKey(), query->getCount());
+
+    return std::make_unique<db::query::notifications::DecrementResult>(ret);
 }
 
 std::unique_ptr<db::query::notifications::MultipleIncrementResult> NotificationsRecordInterface::runQueryImpl(
@@ -238,6 +250,25 @@ bool NotificationsRecordInterface::processIncrement(NotificationsRecord::Key key
             currentContactRecord.reset();
         }
         record.value += size;
+        ret = Update(record);
+    }
+
+    return ret;
+}
+
+bool NotificationsRecordInterface::processDecrement(NotificationsRecord::Key key, size_t delta)
+{
+    auto ret = false;
+
+    if (auto record = GetByKey(key); record.isValid() && record.value > 0) {
+        if (delta >= record.value) {
+            record.contactRecord.reset();
+            record.value = 0;
+        }
+        else {
+            record.value -= delta;
+        }
+
         ret = Update(record);
     }
 

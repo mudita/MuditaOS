@@ -13,7 +13,6 @@
 #include <header/SearchAction.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
-#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByNumber.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/DBServiceAPI.hpp>
@@ -127,10 +126,6 @@ namespace gui
                 task->execute(application, this);
             }
         }
-
-        DBServiceAPI::GetQuery(application,
-                               db::Interface::Name::Notifications,
-                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
 
         list->rebuildList(listview::RebuildType::InPlace);
     }
