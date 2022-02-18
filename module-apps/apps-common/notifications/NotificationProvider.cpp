@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationProvider.hpp"
@@ -24,7 +24,7 @@ bool NotificationProvider::handleNotSeenWithCounter(NotificationsRecord &&record
             notifications.erase(type);
             return true;
         }
-        if (auto notification = static_cast<T *>(notifications[type].get()); value > notification->getValue()) {
+        else {
             notifications[type] = std::make_shared<T>(value, std::move(record.contactRecord));
             return true;
         }
