@@ -19,8 +19,7 @@ namespace gui
         constexpr auto font_small            = style::window::font::largelight;
         constexpr auto image_h               = 64;
         constexpr auto image_w               = 64U;
-        constexpr auto image_left_margin     = 24U;
-        constexpr auto image_left_margin_big = 48U;
+        constexpr auto image_left_margin     = 0U;
         constexpr auto image_right_margin    = 10U;
         constexpr auto percent_h             = 102U;
         constexpr auto percent_w             = 106U;
