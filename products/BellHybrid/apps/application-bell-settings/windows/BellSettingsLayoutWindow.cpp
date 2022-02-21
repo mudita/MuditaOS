@@ -6,6 +6,12 @@
 #include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 
+namespace
+{
+    inline constexpr auto arrowsWidth      = 580U;
+    inline constexpr auto arrowsLeftMargin = 10U;
+} // namespace
+
 namespace gui
 {
     BellSettingsLayoutWindow::BellSettingsLayoutWindow(
@@ -34,7 +40,7 @@ namespace gui
         auto selectedLayout = presenter->getSelectedLayout();
         spinner->setCurrentValue(selectedLayout);
 
-        createArrowsOverlay(0, 0, style::window_width, style::window_height);
+        createArrowsOverlay(0, 0, arrowsWidth, style::window_height);
         arrowLeft->setVisible(!spinner->isAtMin());
         arrowRight->setVisible(!spinner->isAtMax());
 
@@ -47,7 +53,7 @@ namespace gui
 
     void BellSettingsLayoutWindow::createArrowsOverlay(unsigned int x, unsigned y, unsigned int w, unsigned int h)
     {
-        auto arrowsOverlay = new HBox{this, x, y, w, h};
+        auto arrowsOverlay = new HBox{this, arrowsLeftMargin, y, w, h};
         arrowsOverlay->setEdges(gui::RectangleEdge::None);
         arrowLeft = new Image("bell_arrow_left_W_M");
         arrowLeft->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
