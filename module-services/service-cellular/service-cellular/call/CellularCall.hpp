@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "CallAudio.hpp"
-#include "CallGUI.hpp"
+#include "call/CallAudio.hpp"
+#include "call/CallGUI.hpp"
 #include "PhoneModes/PhoneMode.hpp"
 #include <Interface/CalllogRecord.hpp>
 #include <SystemManager/CpuSentinel.hpp>
@@ -58,6 +58,8 @@ namespace CellularCall
             startActiveTime.set_time(0);
         }
 
+        bool startCall(const utils::PhoneNumber::View &number, const CallType type);
+
         ServiceCellular &owner;
         CallRingAudio audio;
         CallGUI gui;
@@ -89,7 +91,6 @@ namespace CellularCall
         bool startOutgoing(const utils::PhoneNumber::View &number);
         bool handleRING();
         bool handleCLIP(const utils::PhoneNumber::View &number);
-        bool startCall(const utils::PhoneNumber::View &number, const CallType type);
         bool endCall(Forced forced = Forced::False);
 
         bool isValid() const
@@ -116,8 +117,8 @@ namespace CellularCall
 
           private:
             friend Call;
-            Call &owner;
-            explicit Operations(Call &owner) : owner(owner)
+            Call &call;
+            explicit Operations(Call &owner) : call(owner)
             {}
         };
         Operations operations = Operations(*this);

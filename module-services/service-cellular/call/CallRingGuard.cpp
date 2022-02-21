@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallRingGuard.hpp"
-#include "service-cellular/CellularCall.hpp"
+#include "service-cellular/call/CellularCall.hpp"
 
 bool callRingGuard(CellularCall::Call &call)
 {
@@ -11,5 +11,6 @@ bool callRingGuard(CellularCall::Call &call)
 
 bool callClipGuard(CellularCall::Call &call)
 {
-    return call.mode == sys::phone_modes::PhoneMode::DoNotDisturb && call.operations.areCallsFromFavouritesEnabled() && call.operations.isNumberInFavourites();
+    return call.mode == sys::phone_modes::PhoneMode::DoNotDisturb && call.operations.areCallsFromFavouritesEnabled() &&
+           call.operations.isNumberInFavourites();
 }

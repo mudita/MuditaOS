@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-cellular/CellularCall.hpp"
+#include "service-cellular/call/CellularCall.hpp"
+#include "service-cellular/call/CallRingGuard.hpp"
 #include "service-cellular/ServiceCellular.hpp"
-#include "service-cellular/CallRingGuard.hpp"
 #include "service-db/agents/settings/SystemSettings.hpp"
 
 #include <CalllogRecord.hpp>
@@ -51,7 +51,7 @@ namespace CellularCall
     bool Call::handleCLIP(const utils::PhoneNumber::View &number)
     {
         setNumber(number);
-        if ( callClipGuard(*this)) {
+        if (callClipGuard(*this)) {
             startCall(number, CallType::CT_INCOMING);
             audio.play();
         }
@@ -175,12 +175,12 @@ namespace CellularCall
 
     bool Call::Operations::areCallsFromFavouritesEnabled()
     {
-        return owner.owner.areCallsFromFavouritesEnabled();
+        return call.owner.areCallsFromFavouritesEnabled();
     }
 
     bool Call::Operations::isNumberInFavourites()
     {
-        return DBServiceAPI::IsContactInFavourites(&owner.owner, owner.call.phoneNumber);
+        return DBServiceAPI::IsContactInFavourites(&call.owner, call.call.phoneNumber);
     }
 
 } // namespace CellularCall

@@ -4,7 +4,7 @@
 #include "endpoints/developerMode/event/ATRequest.hpp"
 #include "handler/RawATHandler.hpp"
 #include "CellularUrcHandler.hpp"
-#include "service-cellular/CellularCall.hpp"
+#include "service-cellular/call/CellularCall.hpp"
 #include "service-cellular/CellularMessage.hpp"
 #include "service-cellular/CellularServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
@@ -485,9 +485,6 @@ void ServiceCellular::registerMessageHandlers()
         auto msg = static_cast<CellularRingingMessage *>(request);
         return handleCellularRingingMessage(msg);
     });
-
-    connect(typeid(CellularIncominCallMessage),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularIncomingCallMessage(request); });
 
     connect(typeid(CellularCallerIdMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularCallerIdMessage *>(request);
@@ -1927,18 +1924,12 @@ auto ServiceCellular::handleCellularRingingMessage(CellularRingingMessage *msg) 
     return std::make_shared<CellularResponseMessage>(ongoingCall.startOutgoing(msg->number));
 }
 
-auto ServiceCellular::handleCellularIncomingCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    LOG_INFO("%s", __PRETTY_FUNCTION__);
-    auto ret     = true;
-    return std::make_shared<CellularResponseMessage>(ret);
-}
-
 auto ServiceCellular::handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto message = static_cast<CellularCallerIdMessage *>(msg);
-    if ( not ongoingCall.handleCLIP(message->number) ) {
-        CellularServiceAPI::DismissCall(this, phoneModeObserver->getCurrentPhoneMode() == sys::phone_modes::PhoneMode::DoNotDisturb);
+    if (not ongoingCall.handleCLIP(message->number)) {
+        CellularServiceAPI::DismissCall(
+            this, phoneModeObserver->getCurrentPhoneMode() == sys::phone_modes::PhoneMode::DoNotDisturb);
     }
 
     return sys::MessageNone{};
@@ -2207,8 +2198,10 @@ auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::
     ongoingCall.handleRING();
 
     /// NOTE: the code below should be investigated as there is something weird in this flow
+    /// most probably should be done on not dropped clip/ring
+    /// please see that in this case we lock antena, which makes sense when call is in progress
     if (!callManager.isIncomingCallPropagated()) {
-        bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(""),
+        bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(),
                           sys::BusChannel::ServiceCellularNotifications);
         callManager.ring();
     }
@@ -2220,7 +2213,6 @@ auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> s
     if (connectionManager->forceDismissCalls()) {
         return std::make_shared<CellularResponseMessage>(hangUpCall());
     }
-
 
     auto message = static_cast<CellularCallerIdNotification *>(msg);
     if (phoneModeObserver->isTetheringOn()) {

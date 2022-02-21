@@ -12,7 +12,7 @@
 
 struct CallRingAudio::CallMeta
 {
-    sys::Async<AudioStartPlaybackRequest, AudioStartPlaybackResponse> p;
+    sys::Async<AudioStartPlaybackRequest, AudioStartPlaybackResponse> async;
 };
 
 CallRingAudio::CallRingAudio(sys::Service &s) : owner(s), meta(new CallRingAudio::CallMeta)
@@ -25,17 +25,17 @@ CallRingAudio::~CallRingAudio()
 
 void CallRingAudio::play()
 {
-    started = true;
+    started         = true;
     const auto file = AudioServiceAPI::GetSound(&owner, audio::PlaybackType::CallRingtone);
-    meta->p         = owner.async_call<AudioStartPlaybackRequest, AudioStartPlaybackResponse>(
+    meta->async     = owner.async_call<AudioStartPlaybackRequest, AudioStartPlaybackResponse>(
         service::name::audio, file, audio::PlaybackType::CallRingtone);
 }
 
 void CallRingAudio::stop()
 {
-    if ( not started ) {
+    if (not started) {
         return;
     }
-    owner.sync(meta->p);
-    AudioServiceAPI::Stop(&owner, meta->p.getResult().token);
+    owner.sync(meta->async);
+    AudioServiceAPI::Stop(&owner, meta->async.getResult().token);
 }
