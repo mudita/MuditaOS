@@ -92,7 +92,7 @@ namespace app
     void ApplicationBellMain::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            auto layoutModel      = std::make_unique<bell_settings::LayoutModel>(app);
+            auto layoutModel    = std::make_unique<bell_settings::LayoutModel>(app);
             auto window         = std::make_unique<gui::BellHomeScreenWindow>(app, homeScreenPresenter);
             auto selectedLayout = layoutModel->getValue();
             setHomeScreenLayout(selectedLayout);
