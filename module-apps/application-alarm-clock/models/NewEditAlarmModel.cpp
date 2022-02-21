@@ -19,8 +19,8 @@ namespace app::alarmClock
                                          std::shared_ptr<SoundsPlayer> player,
                                          std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter,
                                          std::shared_ptr<AbstractAlarmsRepository> alarmsRepository)
-        : application(app), alarmsRepository{std::move(alarmsRepository)}, soundsPlayer(player),
-          rRulePresenter(rRulePresenter)
+        : application(app), alarmsRepository{std::move(alarmsRepository)}, soundsPlayer(std::move(player)),
+          rRulePresenter(std::move(rRulePresenter))
     {}
 
     unsigned int NewEditAlarmModel::requestRecordsCount()

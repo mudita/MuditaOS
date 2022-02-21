@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmRRulePresenter.hpp"
@@ -6,7 +6,8 @@
 
 namespace app::alarmClock
 {
-    AlarmRRulePresenter::AlarmRRulePresenter(std::shared_ptr<AlarmEventRecord> recordToLoad) : alarm(recordToLoad)
+    AlarmRRulePresenter::AlarmRRulePresenter(std::shared_ptr<AlarmEventRecord> recordToLoad)
+        : alarm(std::move(recordToLoad))
     {}
 
     void AlarmRRulePresenter::loadRecord(std::shared_ptr<AlarmEventRecord> recordToLoad)
@@ -63,11 +64,11 @@ namespace app::alarmClock
             for (unsigned int i = 0; i < utl::num_days; ++i) {
                 if ((0x1 & (setDays >> i)) != 0) {
                     auto dayname = utils::time::Locale::get_short_day(i);
-                    retval += dayname + ",";
+                    retval += dayname + ", ";
                 }
             }
             if (retval.length() > 0) {
-                retval.removeChar(retval.length() - 1);
+                retval.removeChar(retval.length() - 2);
             }
         }
         return retval;
