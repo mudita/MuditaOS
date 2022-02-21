@@ -109,17 +109,8 @@ class CellularRingingMessage : public CellularMessage, public app::manager::acti
 class CellularIncominCallMessage : public CellularMessage
 {
   public:
-    CellularIncominCallMessage(const utils::PhoneNumber::View &number)
-        : CellularMessage(Type::IncomingCall), number(number)
+    CellularIncominCallMessage() : CellularMessage(Type::IncomingCall)
     {}
-    CellularIncominCallMessage(const utils::PhoneNumber &number)
-        : CellularMessage(Type::IncomingCall), number(number.getView())
-    {}
-    CellularIncominCallMessage(const std::string &e164number)
-        : CellularMessage(Type::IncomingCall), number(utils::PhoneNumber::parse(e164number))
-    {}
-
-    utils::PhoneNumber::View number;
 };
 
 class CellularCallerIdMessage : public CellularMessage

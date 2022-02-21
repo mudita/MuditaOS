@@ -13,7 +13,7 @@ class CallRingAudio
     struct CallMeta;
     sys::Service &owner;
     CallMeta *meta = nullptr;
-    bool started = false;
+    bool started   = false;
 
   public:
     explicit CallRingAudio(sys::Service &);

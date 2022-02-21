@@ -34,7 +34,7 @@ namespace sys
         {}
     };
 
-    template <typename Request, typename Response> struct Async // : public with_timer
+    template <typename Request, typename Response> struct Async
     {
         enum class State
         {
@@ -46,17 +46,17 @@ namespace sys
 
         State getState()
         {
-            return m->state;
+            return metadata->state;
         }
 
         Response &getResult()
         {
-            return *m->result;
+            return *metadata->result;
         }
 
         Request &getRequest()
         {
-            return *m->request;
+            return *metadata->request;
         }
 
         static_assert(std::is_base_of<sys::Message, Request>::value, "Request has to be based on system message");
@@ -64,22 +64,22 @@ namespace sys
                       "Response has to be based on system response message");
         explicit operator bool()
         {
-            return m->state == State::Done;
+            return metadata->state == State::Done;
         }
 
       private:
         friend sys::Service;
         void setState(State state)
         {
-            this->m->state = state;
+            this->metadata->state = state;
         }
-        struct M
+        struct Metadata
         {
             State state = State::Pending;
             std::shared_ptr<Request> request;
             std::shared_ptr<Response> result;
         };
-        std::shared_ptr<M> m = std::make_shared<M>();
+        std::shared_ptr<Metadata> metadata = std::make_shared<Metadata>();
     };
 
     class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
@@ -157,19 +157,18 @@ namespace sys
         {
             static_assert(std::is_base_of<sys::ResponseMessage, Response>::value,
                           "Response has to be based on system message");
-            Async<Request, Response> p;
+            Async<Request, Response> async;
             auto request = std::make_shared<Request>(arg...);
             if (isConnected(std::type_index(typeid(Response)))) {
-                p.setState(Async<Request, Response>::State::Error);
+                async.setState(Async<Request, Response>::State::Error);
                 throw async_fail();
             }
-            auto meta                                    = p.m;
+            auto meta                                    = async.metadata;
             meta->request                                = request;
-            std::function<MessagePointer(Message *)> foo = [this, meta](Message *m) {
-                auto &response = dynamic_cast<Response &>(*m);
+            std::function<MessagePointer(Message *)> foo = [this, meta](Message *message) {
+                auto &response = dynamic_cast<Response &>(*message);
                 meta->state    = Async<Request, Response>::State::Done;
-                // this is counter productive - but this is what needs to be done here
-                meta->result = std::make_shared<Response>(response);
+                meta->result   = std::make_shared<Response>(response);
                 disconnect(typeid(Response));
                 return sys::msgHandled();
             };
@@ -180,24 +179,24 @@ namespace sys
             if (!bus.sendUnicast(request, whom)) {
                 throw async_fail();
             }
-            return p;
+            return async;
         }
 
         template <typename Request, typename Response>
-        void sync(Async<Request, Response> &p, std::uint32_t timeout = std::numeric_limits<std::uint32_t>::max())
+        void sync(Async<Request, Response> &async, std::uint32_t timeout = std::numeric_limits<std::uint32_t>::max())
         {
             static_assert(std::is_base_of<sys::ResponseMessage, Response>::value,
                           "Response has to be based on system message");
-            if (p.m->request == nullptr) {
+            if (async.metadata->request == nullptr) {
                 throw async_fail();
             }
-            if (p.getState() != Async<Request, Response>::State::Pending) {
+            if (async.getState() != Async<Request, Response>::State::Pending) {
                 return;
             }
-            auto val = bus.unicastSync(p.m->request, this, timeout);
+            auto val = bus.unicastSync(async.metadata->request, this, timeout);
             if (val.first != sys::ReturnCodes::Success) {
-                val.first == sys::ReturnCodes::Timeout ? p.setState(Async<Request, Response>::State::TimedOut)
-                                                       : p.setState(Async<Request, Response>::State::Error);
+                val.first == sys::ReturnCodes::Timeout ? async.setState(Async<Request, Response>::State::TimedOut)
+                                                       : async.setState(Async<Request, Response>::State::Error);
                 return;
             }
             this->HandleResponse(dynamic_cast<sys::ResponseMessage *>(val.second.get()));

@@ -62,7 +62,6 @@ TEST_CASE("DoNotDisturb Mode notifications  - calls policy test")
     callPolicy.updateCurrentCall(sys::phone_modes::PhoneMode::DoNotDisturb);
     REQUIRE(!callPolicy.isPopupAllowed());
     REQUIRE(!callPolicy.isRingtoneAllowed());
-    REQUIRE(callPolicy.isDismissedCallNotificationAllowed());
 
     SECTION("Number in/not in Favourites")
     {

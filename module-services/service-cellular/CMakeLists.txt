@@ -16,10 +16,10 @@ set(SOURCES
     src/URCCounter.cpp
     src/CSQHandler.cpp
 
-    CellularCall.cpp
-    CallAudio.cpp
-    CallGUI.cpp
-    CallRingGuard.cpp
+    call/CellularCall.cpp
+    call/CallAudio.cpp
+    call/CallGUI.cpp
+    call/CallRingGuard.cpp
     CellularServiceAPI.cpp
     CellularUrcHandler.cpp
     checkSmsCenter.cpp

@@ -19,5 +19,5 @@ class CallGUI
     explicit CallGUI(sys::Service &);
 
     void notifyRING();
-    void notifyCLIP(const utils::PhoneNumber::View & number);
+    void notifyCLIP(const utils::PhoneNumber::View &number);
 };
