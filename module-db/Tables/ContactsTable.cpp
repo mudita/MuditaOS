@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsTable.hpp"
@@ -170,7 +170,11 @@ std::string ContactsTable::GetSortedByNameQueryString(ContactQuerySection sectio
                 " , UPPER(contact_name.name_alternative) ; ";
     }
     else if (section == ContactQuerySection::Mixed) {
-        query = " SELECT contacts._id, contact_name.name_alternative  FROM contacts "
+        query = " SELECT contacts._id, "
+                " CASE WHEN contact_name.name_alternative != ''"
+                " THEN contact_name.name_alternative ELSE contact_name.name_primary"
+                " END AS name_all"
+                " FROM contacts "
                 " INNER JOIN contact_name ON contact_name.contact_id == contacts._id "
                 " LEFT JOIN contact_match_groups ON contact_match_groups.contact_id == contacts._id AND "
                 " contact_match_groups.group_id = 1 "
@@ -179,8 +183,8 @@ std::string ContactsTable::GetSortedByNameQueryString(ContactQuerySection sectio
                 "    FROM contact_match_groups cmg, contact_groups cg "
                 "    WHERE cmg.group_id = cg._id "
                 "       AND cg.name = 'Temporary' ) "
-                " ORDER BY  (contact_name.name_alternative ='') ASC "
-                " , UPPER(contact_name.name_alternative) ; ";
+                " ORDER BY  (name_all ='') ASC "
+                " , UPPER(name_all) ; ";
     }
     return query;
 }
