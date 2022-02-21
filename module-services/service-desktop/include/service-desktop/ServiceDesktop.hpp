@@ -41,7 +41,7 @@ namespace sdesktop
     inline constexpr auto SEND_QUEUE_BUFFER_NAME    = "sendQueueBuffer";
     inline constexpr auto IRQ_QUEUE_BUFFER_NAME     = "irqQueueBuffer";
     inline constexpr auto DeviceUniqueIdLength      = 32;
-    constexpr auto DeviceUniqueIdName               = "sd_device_unique_id";
+    inline constexpr auto DeviceUniqueIdName        = "sd_device_unique_id";
 
 }; // namespace sdesktop
 

@@ -74,7 +74,7 @@ auto ServiceDesktop::getDeviceToken() -> std::string
         tokenSeed = getDeviceUniqueId();
     }
 
-    return (tokenSeed);
+    return tokenSeed;
 }
 
 auto ServiceDesktop::getDeviceUniqueId() const -> std::string
