@@ -52,9 +52,13 @@ namespace gui
             // If contact is favorite return proper UTF string
             return utils::translate("app_phonebook_favourite_contacts_title");
         }
-        else {
-            // else return first surname contact letter
+        else if (!contact->alternativeName.empty()) {
+            // else if return first surname contact letter
             return contact->alternativeName.substr(0, 1);
+        }
+        else {
+            // else return first firstname contact letter
+            return contact->primaryName.substr(0, 1);
         }
     }
 
