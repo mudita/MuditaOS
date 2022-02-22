@@ -20,12 +20,11 @@ namespace gui
         gui::HBox *hBox         = nullptr;
 
         bool favourite = false;
-        void markFavourite(bool val);
         void markBlocked(bool val);
         LabelMarkerDisplayMode labelMarkerDisplayMode = LabelMarkerDisplayMode::IncludeFavourites;
 
       public:
-        std::shared_ptr<ContactRecord> contact = nullptr;
+        std::shared_ptr<ContactRecord> contact;
 
         PhonebookItem();
         virtual ~PhonebookItem() = default;
