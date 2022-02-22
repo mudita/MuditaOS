@@ -66,8 +66,7 @@ namespace gui
             app::manager::actions::AbortPopup,
             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::AlarmDeactivated));
 
-        if ((application->getPrevWindow() == popup::window::alarm_deactivated_window) ||
-            (application->getPrevWindow() == gui::window::name::bellAlarmSet)) {
+        if (application->getPrevWindow() == gui::window::name::bellAlarmSet) {
             app::manager::Controller::sendAction(
                 application,
                 app::manager::actions::Launch,
