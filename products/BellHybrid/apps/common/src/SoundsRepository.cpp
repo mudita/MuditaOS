@@ -17,6 +17,9 @@ SoundsRepository::SoundsRepository(std::filesystem::path dirToScan)
     for (auto const &entry : std::filesystem::directory_iterator(dirToScan)) {
         processEntry(entry);
     }
+
+    /// Sort entries by track ID
+    std::sort(samples.begin(), samples.end(), [](const auto &a, const auto &b) { return a.track < b.track; });
 }
 std::optional<std::filesystem::path> SoundsRepository::titleToPath(const UTF8 &title) const
 {
