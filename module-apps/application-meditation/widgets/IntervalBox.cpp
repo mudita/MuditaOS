@@ -53,9 +53,6 @@ void IntervalBox::updateIntervals()
         if (chime < setTime) {
             chimeOptions.push_back(intervalToString(chime));
         }
-        else {
-            break;
-        }
     }
 
     auto currentInterval = chimeSpinner->getCurrentValue();
