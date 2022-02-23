@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_DRIVERDMAMUX_HPP
@@ -36,7 +36,7 @@ namespace drivers
         const DriverDMAMuxParams parameters;
 
       private:
-        static std::weak_ptr<DriverDMAMux> singleton[static_cast<uint32_t>(DMAMuxInstances ::COUNT)];
+        static std::weak_ptr<DriverDMAMux> singleton[static_cast<uint32_t>(DMAMuxInstances::COUNT)];
     };
 
 } // namespace drivers

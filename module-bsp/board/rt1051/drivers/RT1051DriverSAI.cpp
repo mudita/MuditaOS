@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverSAI.hpp"
@@ -18,19 +18,19 @@ namespace drivers
         : DriverSAI(params)
     {
         switch (instances) {
-        case SAIInstances ::SAI_1:
+        case SAIInstances::SAI_1:
             rxDMASource = kDmaRequestMuxSai1Rx;
             txDMASource = kDmaRequestMuxSai1Tx;
             base        = SAI1;
             IOMUXC_GPR->GPR1 |= IOMUXC_GPR_GPR1_SAI1_MCLK_DIR_MASK;
             break;
-        case SAIInstances ::SAI_2:
+        case SAIInstances::SAI_2:
             rxDMASource = kDmaRequestMuxSai2Rx;
             txDMASource = kDmaRequestMuxSai2Tx;
             base        = SAI2;
             IOMUXC_GPR->GPR1 |= IOMUXC_GPR_GPR1_SAI2_MCLK_DIR_MASK;
             break;
-        case SAIInstances ::SAI_3:
+        case SAIInstances::SAI_3:
             rxDMASource = kDmaRequestMuxSai3Rx;
             txDMASource = kDmaRequestMuxSai3Tx;
             base        = SAI3;
@@ -38,11 +38,11 @@ namespace drivers
             break;
         }
 
-        pll    = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances>(BoardDefinitions ::AUDIO_PLL),
+        pll    = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances>(BoardDefinitions::AUDIO_PLL),
                                                  DriverPLLParams{});
         dmamux = DriverInterface<DriverDMAMux>::Create(
-            static_cast<DMAMuxInstances>(BoardDefinitions ::AUDIOCODEC_DMAMUX), DriverDMAMuxParams{});
-        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances>(BoardDefinitions ::AUDIOCODEC_DMA),
+            static_cast<DMAMuxInstances>(BoardDefinitions::AUDIOCODEC_DMAMUX), DriverDMAMuxParams{});
+        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances>(BoardDefinitions::AUDIOCODEC_DMA),
                                                  DriverDMAParams{});
     }
 
@@ -63,8 +63,7 @@ namespace drivers
         // Initialize SAI Rx module
         SAI_RxGetDefaultConfig(&config);
 
-        config.masterSlave =
-            (parameters.masterslave == DriverSAIParams::MasterSlave ::Slave) ? kSAI_Slave : kSAI_Master;
+        config.masterSlave = (parameters.masterslave == DriverSAIParams::MasterSlave::Slave) ? kSAI_Slave : kSAI_Master;
         SAI_RxInit(base, &config);
 
         /* Configure the audio format */
@@ -118,8 +117,7 @@ namespace drivers
 
         // Initialize SAI Tx module
         SAI_TxGetDefaultConfig(&config);
-        config.masterSlave =
-            (parameters.masterslave == DriverSAIParams::MasterSlave ::Slave) ? kSAI_Slave : kSAI_Master;
+        config.masterSlave = (parameters.masterslave == DriverSAIParams::MasterSlave::Slave) ? kSAI_Slave : kSAI_Master;
         SAI_TxInit(base, &config);
 
         /* Configure the audio format */

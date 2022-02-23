@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DriverGPIO.hpp"
@@ -17,7 +17,7 @@
 namespace drivers
 {
 
-    std::weak_ptr<DriverGPIO> DriverGPIO::singleton[static_cast<uint32_t>(GPIOInstances ::COUNT)];
+    std::weak_ptr<DriverGPIO> DriverGPIO::singleton[static_cast<uint32_t>(GPIOInstances::COUNT)];
 
     std::shared_ptr<DriverGPIO> DriverGPIO::Create(const drivers::GPIOInstances instance,
                                                    const drivers::DriverGPIOParams &params)

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsNameTable.hpp"
@@ -87,10 +87,10 @@ std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffsetByField(uint3
     std::string fieldName;
 
     switch (field) {
-    case ContactNameTableFields ::NamePrimary:
+    case ContactNameTableFields::NamePrimary:
         fieldName = "name_primary";
         break;
-    case ContactNameTableFields ::NameAlternative:
+    case ContactNameTableFields::NameAlternative:
         fieldName = "name_alternative";
         break;
     default:

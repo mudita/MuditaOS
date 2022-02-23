@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/Endpoint.hpp>
@@ -174,7 +174,7 @@ TEST_CASE("DB Helpers test - json encoding (contacts)")
     contact->primaryName = "Baatek";
 
     utils::PhoneNumber phoneNumber("724842187");
-    auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType ::PAGER);
+    auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType::PAGER);
 
     contact->numbers.emplace_back(contactNum);
 
@@ -194,7 +194,7 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
     auto message = std::make_unique<SMSRecord>();
 
     utils::PhoneNumber phoneNumber("111222333");
-    auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType ::PAGER);
+    auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType::PAGER);
 
     message->body      = "test message";
     message->contactID = 1;

@@ -155,11 +155,11 @@ sys::ReturnCodes ServiceAntenna::SwitchPowerModeHandler(const sys::ServicePowerM
     suspended = true;
 
     switch (mode) {
-    case sys::ServicePowerMode ::Active:
+    case sys::ServicePowerMode::Active:
         suspended = false;
         break;
-    case sys::ServicePowerMode ::SuspendToRAM:
-    case sys::ServicePowerMode ::SuspendToNVM:
+    case sys::ServicePowerMode::SuspendToRAM:
+    case sys::ServicePowerMode::SuspendToNVM:
         break;
     }
 

@@ -280,11 +280,11 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
     LOG_INFO("[ServiceCellular] PowerModeHandler: %s", c_str(mode));
 
     switch (mode) {
-    case sys::ServicePowerMode ::Active:
+    case sys::ServicePowerMode::Active:
         cmux->exitSleepMode();
         break;
-    case sys::ServicePowerMode ::SuspendToRAM:
-    case sys::ServicePowerMode ::SuspendToNVM:
+    case sys::ServicePowerMode::SuspendToRAM:
+    case sys::ServicePowerMode::SuspendToNVM:
         cmux->enterSleepMode();
         break;
     }

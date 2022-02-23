@@ -281,13 +281,13 @@ namespace app::manager
         LOG_INFO("Power mode: %s", c_str(mode));
 
         switch (mode) {
-        case sys::ServicePowerMode ::Active:
+        case sys::ServicePowerMode::Active:
             sys::SystemManagerCommon::ResumeService(service::name::eink, this);
             sys::SystemManagerCommon::ResumeService(service::name::gui, this);
             break;
-        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode::SuspendToRAM:
             [[fallthrough]];
-        case sys::ServicePowerMode ::SuspendToNVM:
+        case sys::ServicePowerMode::SuspendToNVM:
             suspendSystemServices();
             break;
         }

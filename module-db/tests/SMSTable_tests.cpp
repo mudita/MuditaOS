@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -30,7 +30,7 @@ TEST_CASE("SMS Table tests")
                             .date      = 0,
                             .errorCode = 0,
                             .body      = "Test SMS message 1",
-                            .type      = SMSType ::INBOX
+                            .type      = SMSType::INBOX
 
     };
 
@@ -40,7 +40,7 @@ TEST_CASE("SMS Table tests")
                             .date      = 0,
                             .errorCode = 0,
                             .body      = "Test Draft SMS",
-                            .type      = SMSType ::DRAFT
+                            .type      = SMSType::DRAFT
 
     };
 
@@ -124,7 +124,7 @@ TEST_CASE("SMS Table tests")
         auto results = smsdb.sms.getByThreadIdWithoutDraftWithEmptyInput(0, 0, 10);
 
         REQUIRE(results.size() == 3);
-        REQUIRE(results.back().type == SMSType ::INPUT);
+        REQUIRE(results.back().type == SMSType::INPUT);
     }
 
     Database::deinitialize();

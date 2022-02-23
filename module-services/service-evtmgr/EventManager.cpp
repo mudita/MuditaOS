@@ -258,10 +258,10 @@ sys::ReturnCodes EventManagerCommon::SwitchPowerModeHandler(const sys::ServicePo
     LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %s", c_str(mode));
 
     switch (mode) {
-    case sys::ServicePowerMode ::Active:
+    case sys::ServicePowerMode::Active:
         break;
-    case sys::ServicePowerMode ::SuspendToRAM:
-    case sys::ServicePowerMode ::SuspendToNVM:
+    case sys::ServicePowerMode::SuspendToRAM:
+    case sys::ServicePowerMode::SuspendToNVM:
         break;
     }
 

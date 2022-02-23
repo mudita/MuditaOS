@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DriverDMAMux.hpp"
@@ -16,7 +16,7 @@
 namespace drivers
 {
 
-    std::weak_ptr<DriverDMAMux> DriverDMAMux::singleton[static_cast<uint32_t>(DMAMuxInstances ::COUNT)];
+    std::weak_ptr<DriverDMAMux> DriverDMAMux::singleton[static_cast<uint32_t>(DMAMuxInstances::COUNT)];
 
     std::shared_ptr<DriverDMAMux> DriverDMAMux::Create(const drivers::DMAMuxInstances instance,
                                                        const drivers::DriverDMAMuxParams &params)

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_DRIVERDMA_HPP
@@ -43,7 +43,7 @@ namespace drivers
         const DriverDMAParams parameters;
 
       private:
-        static std::weak_ptr<DriverDMA> singleton[static_cast<uint32_t>(DMAInstances ::COUNT)];
+        static std::weak_ptr<DriverDMA> singleton[static_cast<uint32_t>(DMAInstances::COUNT)];
     };
 
 } // namespace drivers

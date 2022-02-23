@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QueryContactGet.hpp"
@@ -60,7 +60,7 @@ ContactGetLetterMap::ContactGetLetterMap(std::size_t limit,
     : RecordQuery(limit, offset), TextFilter(filter), ContactGroupFilter(groupFilter), ContactDisplayMode(displayMode)
 {}
 
-ContactGetLetterMapResult ::ContactGetLetterMapResult(ContactsMapData &LetterMap) : LetterMapResult(LetterMap)
+ContactGetLetterMapResult::ContactGetLetterMapResult(ContactsMapData &LetterMap) : LetterMapResult(LetterMap)
 {}
 
 [[nodiscard]] auto ContactGet::debugInfo() const -> std::string

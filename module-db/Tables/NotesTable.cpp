@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesTable.hpp"
@@ -92,7 +92,7 @@ std::vector<NotesTableRow> NotesTable::getLimitOffsetByField(std::uint32_t offse
     case NotesTableFields::Date:
         fieldName = "date";
         break;
-    case NotesTableFields ::Snippet:
+    case NotesTableFields::Snippet:
         fieldName = "snippet";
         break;
     default:

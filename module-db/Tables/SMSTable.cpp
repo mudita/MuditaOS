@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTable.hpp"
@@ -33,15 +33,15 @@ bool SMSTable::removeByField(SMSTableFields field, const char *str)
     std::string fieldName;
 
     switch (field) {
-    case SMSTableFields ::ThreadID:
+    case SMSTableFields::ThreadID:
         fieldName = "thread_id";
         break;
 
-    case SMSTableFields ::ContactID:
+    case SMSTableFields::ContactID:
         fieldName = "contact_id";
         break;
 
-    case SMSTableFields ::Date:
+    case SMSTableFields::Date:
         fieldName = "date";
         break;
     default:
@@ -285,10 +285,10 @@ std::vector<SMSTableRow> SMSTable::getLimitOffsetByField(uint32_t offset,
     case SMSTableFields::Date:
         fieldName = "date";
         break;
-    case SMSTableFields ::ContactID:
+    case SMSTableFields::ContactID:
         fieldName = "contact_id";
         break;
-    case SMSTableFields ::ThreadID:
+    case SMSTableFields::ThreadID:
         fieldName = "thread_id";
         break;
     default:

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DriverPLL.hpp"
@@ -16,7 +16,7 @@
 namespace drivers
 {
 
-    std::weak_ptr<DriverPLL> DriverPLL::singleton[static_cast<uint32_t>(PLLInstances ::COUNT)];
+    std::weak_ptr<DriverPLL> DriverPLL::singleton[static_cast<uint32_t>(PLLInstances::COUNT)];
 
     std::shared_ptr<DriverPLL> DriverPLL::Create(const drivers::PLLInstances instance,
                                                  const drivers::DriverPLLParams &params)

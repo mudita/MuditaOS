@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_DRIVERI2C_HPP
@@ -54,7 +54,7 @@ namespace drivers
         const DriverI2CParams parameters;
 
       private:
-        static std::weak_ptr<DriverI2C> singleton[static_cast<uint32_t>(I2CInstances ::COUNT)];
+        static std::weak_ptr<DriverI2C> singleton[static_cast<uint32_t>(I2CInstances::COUNT)];
     };
 
 } // namespace drivers

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Audio.hpp"
@@ -86,7 +86,7 @@ namespace audio
             LOG_ERROR(
                 "Failed to create operation type %s, error message:\n%s", Operation::c_str(op), audioException.what());
             currentOperation = Operation::Create(Operation::Type::Idle);
-            currentState     = State ::Idle;
+            currentState     = State::Idle;
             return audioException.getErrorCode();
         }
 

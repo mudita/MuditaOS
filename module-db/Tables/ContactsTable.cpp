@@ -394,7 +394,7 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
 
     std::string fieldName;
     switch (field) {
-    case ContactTableFields ::SpeedDial:
+    case ContactTableFields::SpeedDial:
         fieldName = "speeddial";
         break;
     default:

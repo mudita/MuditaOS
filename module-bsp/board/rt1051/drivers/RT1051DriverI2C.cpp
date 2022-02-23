@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverI2C.hpp"
@@ -14,19 +14,19 @@ namespace drivers
         lpi2c_master_config_t lpi2cConfig = {};
 
         switch (instance) {
-        case I2CInstances ::I2C1:
+        case I2CInstances::I2C1:
             base = LPI2C1;
             LOG_DEBUG("Init: I2C1");
             break;
-        case I2CInstances ::I2C2:
+        case I2CInstances::I2C2:
             base = LPI2C2;
             LOG_DEBUG("Init: I2C2");
             break;
-        case I2CInstances ::I2C3:
+        case I2CInstances::I2C3:
             base = LPI2C3;
             LOG_DEBUG("Init: I2C3");
             break;
-        case I2CInstances ::I2C4:
+        case I2CInstances::I2C4:
             base = LPI2C4;
             LOG_DEBUG("Init: I2C4");
             break;
@@ -40,16 +40,16 @@ namespace drivers
     RT1051DriverI2C::~RT1051DriverI2C()
     {
         switch (instance) {
-        case I2CInstances ::I2C1:
+        case I2CInstances::I2C1:
             LOG_DEBUG("Deinit: I2C1");
             break;
-        case I2CInstances ::I2C2:
+        case I2CInstances::I2C2:
             LOG_DEBUG("Deinit: I2C2");
             break;
-        case I2CInstances ::I2C3:
+        case I2CInstances::I2C3:
             LOG_DEBUG("Deinit: I2C3");
             break;
-        case I2CInstances ::I2C4:
+        case I2CInstances::I2C4:
             LOG_DEBUG("Deinit: I2C4");
             break;
         default:

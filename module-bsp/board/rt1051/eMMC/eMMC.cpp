@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "eMMC.hpp"
@@ -24,7 +24,7 @@ namespace bsp
             "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));
 #if defined(TARGET_RT1051)
 
-        // pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::EMMC_PLL),DriverPLLParams{});
+        // pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions::EMMC_PLL),DriverPLLParams{});
 
         mmcCard.busWidth                   = kMMC_DataBusWidth8bit;
         mmcCard.busTiming                  = kMMC_HighSpeedTiming;

@@ -180,17 +180,17 @@ namespace service::eink
         auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer.start(); });
 
         if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
-            status != EinkStatus_e ::EinkOK) {
+            status != EinkStatus_e::EinkOK) {
             LOG_FATAL("Failed to prepare frame");
             return;
         }
 
-        if (const auto status = updateDisplay(frameBuffer, refreshMode); status != EinkStatus_e ::EinkOK) {
+        if (const auto status = updateDisplay(frameBuffer, refreshMode); status != EinkStatus_e::EinkOK) {
             LOG_FATAL("Failed to update frame");
             return;
         }
 
-        if (const auto status = refreshDisplay(refreshMode); status != EinkStatus_e ::EinkOK) {
+        if (const auto status = refreshDisplay(refreshMode); status != EinkStatus_e::EinkOK) {
             LOG_FATAL("Failed to refresh frame");
             return;
         }

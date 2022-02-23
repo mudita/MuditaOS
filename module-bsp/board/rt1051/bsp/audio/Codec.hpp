@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_CODEC_HPP
@@ -37,7 +37,7 @@ class CodecParams
     {
         switch (rate) {
         case 8000:
-            return SampleRate ::Rate8KHz;
+            return SampleRate::Rate8KHz;
         case 16000:
             return SampleRate::Rate16KHz;
         case 32000:
@@ -49,7 +49,7 @@ class CodecParams
         case 96000:
             return SampleRate::Rate96KHz;
         default:
-            return SampleRate ::Invalid;
+            return SampleRate::Invalid;
         }
     }
 
@@ -76,7 +76,7 @@ class CodecParams
     Cmd opCmd             = Cmd::None;
     float outVolume       = 0;
     float inGain          = 0;
-    SampleRate sampleRate = SampleRate ::Rate44K1Hz;
+    SampleRate sampleRate = SampleRate::Rate44K1Hz;
 };
 
 enum class CodecRetCode
