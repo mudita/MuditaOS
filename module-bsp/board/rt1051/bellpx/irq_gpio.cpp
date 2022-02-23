@@ -17,6 +17,7 @@
 #include "board/BoardDefinitions.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
 #include <bsp/lpm/RT1051LPM.hpp>
+
 namespace bsp
 {
 
