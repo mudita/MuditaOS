@@ -300,6 +300,12 @@ namespace app
         /// Called upon Application exit and/or termination request.
         sys::ReturnCodes DeinitHandler() override;
 
+        /// function to set active window for application
+        /// if none window is selected main window is used
+        /// if window name is "LastWindow" then previous window is selected
+        /// it modifies windows stack
+        void setActiveWindow(const std::string &windowName);
+
         /// see suspendInProgress documentation
         virtual void setSuspendFlag(bool val)
         {

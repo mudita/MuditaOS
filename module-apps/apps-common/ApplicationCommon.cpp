@@ -761,6 +761,11 @@ namespace app
         return sys::ReturnCodes::Success;
     }
 
+    void ApplicationCommon::setActiveWindow(const std::string &windowName)
+    {
+        pushWindow(windowName);
+    }
+
     bool ApplicationCommon::adjustCurrentVolume(const int step)
     {
         return AudioServiceAPI::KeyPressed(this, step);
@@ -843,6 +848,11 @@ namespace app
             LOG_ERROR("no blueprint to handle %s popup - fallback", std::string(magic_enum::enum_name(id)).c_str());
             blueprint = popupBlueprintFallback(id);
         }
+        if (data->getDisposition().windowtype != gui::popup::Disposition::WindowType::Popup) {
+            LOG_ERROR("setting popup window type to popup - fallback");
+            data->setDisposition(gui::popup::Disposition{
+                gui::popup::Disposition::Priority::Normal, gui::popup::Disposition::WindowType::Popup, id});
+        }
         auto request = gui::popup::Request(id, std::move(data), *blueprint);
         windowsPopupQueue->pushRequest(std::move(request));
         tryShowPopup();
@@ -882,11 +892,6 @@ namespace app
         }
     }
 
-    bool ApplicationCommon::isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const
-    {
-        return true;
-    }
-
     void ApplicationCommon::requestShutdownWindow(std::string windowName)
     {
 #if DEBUG_APPLICATION_MANAGEMENT == 1
@@ -896,12 +901,6 @@ namespace app
 #endif
         auto msg = std::make_shared<AppShutdownRefreshMessage>(windowName);
         bus.sendUnicast(msg, this->GetName());
-    }
-
-    bool ApplicationCommon::popToWindow(const std::string &window)
-    {
-        windowsStack().pop(popupName);
-        returnToPreviousWindow();
     }
 
     bool ApplicationCommon::userInterfaceDBNotification([[maybe_unused]] sys::Message *msg,

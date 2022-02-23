@@ -11,6 +11,8 @@ namespace gui
     {
       public:
         AlarmDeactivatedPopupRequestParams() : PopupRequestParams{gui::popup::ID::AlarmDeactivated}
-        {}
+        {
+          ignoreCurrentWindowOnStack = true;
+        }
     };
 } // namespace gui
