@@ -5,7 +5,6 @@ target_sources(application-bell-main
     PRIVATE
         ApplicationBellMain.cpp
 
-        windows/BellBatteryShutdownWindow.cpp
         windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
         windows/BellBatteryStatusWindow.cpp
@@ -16,7 +15,6 @@ target_sources(application-bell-main
         presenters/HomeScreenPresenter.cpp
         presenters/StateController.cpp
 
-        windows/BellBatteryShutdownWindow.hpp
         windows/BellHomeScreenWindow.hpp
         windows/BellMainMenuWindow.hpp
         windows/BellBatteryStatusWindow.hpp

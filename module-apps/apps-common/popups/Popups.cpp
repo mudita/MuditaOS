@@ -44,6 +44,8 @@ namespace gui::popup
             return gui::popup::window::reboot_window;
         case ID::BedtimeNotification:
             return gui::popup::window::bedtime_notification_window;
+        case ID::DeadBatteryWindow:
+            return gui::popup::window::dead_battery_window;
         }
 
         return {};

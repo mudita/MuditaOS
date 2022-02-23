@@ -5,7 +5,6 @@
 #include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
 
-#include "windows/BellBatteryShutdownWindow.hpp"
 #include "windows/BellHomeScreenWindow.hpp"
 #include "windows/BellMainMenuWindow.hpp"
 #include "windows/BellBatteryStatusWindow.hpp"
@@ -49,7 +48,7 @@ namespace app
         });
 
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
-            requestShutdownWindow(gui::window::name::bell_battery_shutdown);
+            requestShutdownWindow(gui::popup::window::dead_battery_window);
             return actionHandled();
         });
 
@@ -92,7 +91,7 @@ namespace app
     void ApplicationBellMain::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            auto layoutModel      = std::make_unique<bell_settings::LayoutModel>(app);
+            auto layoutModel    = std::make_unique<bell_settings::LayoutModel>(app);
             auto window         = std::make_unique<gui::BellHomeScreenWindow>(app, homeScreenPresenter);
             auto selectedLayout = layoutModel->getValue();
             setHomeScreenLayout(selectedLayout);
@@ -102,11 +101,6 @@ namespace app
         windowsFactory.attach(gui::window::name::bell_main_menu, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellMainMenuWindow>(app);
         });
-
-        windowsFactory.attach(gui::window::name::bell_battery_shutdown,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellBatteryShutdownWindow>(app);
-                              });
 
         windowsFactory.attach(gui::BellFactoryReset::name, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellFactoryReset>(app, std::make_unique<gui::BellPowerOffPresenter>(app));
@@ -120,11 +114,14 @@ namespace app
             gui::window::name::bell_main_menu_dialog,
             [](ApplicationCommon *app, const std::string &name) { return std::make_unique<gui::Dialog>(app, name); });
 
-        attachPopups({gui::popup::ID::AlarmActivated,
-                      gui::popup::ID::AlarmDeactivated,
-                      gui::popup::ID::PowerOff,
-                      gui::popup::ID::Reboot,
-                      gui::popup::ID::BedtimeNotification});
+        attachPopups({
+            gui::popup::ID::AlarmActivated,
+            gui::popup::ID::AlarmDeactivated,
+            gui::popup::ID::PowerOff,
+            gui::popup::ID::Reboot,
+            gui::popup::ID::BedtimeNotification,
+            gui::popup::ID::DeadBatteryWindow,
+        });
     }
 
     sys::MessagePointer ApplicationBellMain::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

@@ -13,6 +13,7 @@
 #include <common/popups/AlarmDeactivatedWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/popups/BellRebootWindow.hpp>
+#include <common/popups/DeadBatteryWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <service-appmgr/Constants.hpp>
@@ -65,6 +66,12 @@ namespace app
                 windowsFactory.attach(window::bedtime_notification_window,
                                       [](app::ApplicationCommon *app, const std::string &name) {
                                           return std::make_unique<gui::BedtimeNotificationWindow>(app);
+                                      });
+                break;
+            case ID::DeadBatteryWindow:
+                windowsFactory.attach(window::dead_battery_window,
+                                      [](app::ApplicationCommon *app, const std::string &name) {
+                                          return std::make_unique<gui::DeadBatteryWindow>(app);
                                       });
                 break;
             default:

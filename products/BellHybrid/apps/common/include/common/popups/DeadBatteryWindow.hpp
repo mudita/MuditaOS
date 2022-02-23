@@ -9,12 +9,12 @@ namespace gui
 {
     class Icon;
 
-    class BellBatteryShutdownWindow : public gui::AppWindow
+    class DeadBatteryWindow : public gui::AppWindow
     {
       public:
-        static constexpr auto defaultName = "BellBatteryShutdown";
+        static constexpr auto defaultName = "DeadBatteryWindow";
 
-        BellBatteryShutdownWindow(app::ApplicationCommon *app, const std::string &name = defaultName);
+        DeadBatteryWindow(app::ApplicationCommon *app, const std::string &name = defaultName);
 
       private:
         void buildInterface() override;

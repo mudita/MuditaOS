@@ -29,6 +29,7 @@ namespace gui
             PowerOff,
             Reboot,
             BedtimeNotification,
+            DeadBatteryWindow,
         };
 
         namespace window
@@ -52,6 +53,7 @@ namespace gui
             inline constexpr auto alarm_window                      = "AlarmPopup";
             inline constexpr auto reboot_window                     = "RebootPopup";
             inline constexpr auto bedtime_notification_window       = "BedtimeNotificationPopup";
+            inline constexpr auto dead_battery_window               = "DeadBatteryPopup";
         } // namespace window
 
         std::string resolveWindowName(ID id);

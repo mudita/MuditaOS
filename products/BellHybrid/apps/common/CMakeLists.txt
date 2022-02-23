@@ -33,6 +33,7 @@ target_sources(application-bell-common
         src/popups/AlarmDeactivatedWindow.cpp
         src/popups/BellTurnOffOptionWindow.cpp
         src/popups/BellRebootWindow.cpp
+        src/popups/DeadBatteryWindow.cpp
         src/popups/presenter/AlarmActivatedPresenter.cpp
         src/widgets/ListItems.cpp
         src/widgets/BellBattery.cpp
@@ -83,6 +84,7 @@ target_sources(application-bell-common
         include/common/popups/BedtimeNotificationWindow.hpp
         include/common/popups/BellTurnOffOptionWindow.hpp
         include/common/popups/BellRebootWindow.hpp
+        include/common/popups/DeadBatteryWindow.hpp
         include/common/widgets/BellBattery.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
         include/common/widgets/BellStatusClock.hpp

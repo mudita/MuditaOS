@@ -50,6 +50,11 @@ namespace app
             return sys::msgNotHandled();
         });
 
+        addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
+            requestShutdownWindow(gui::popup::window::dead_battery_window);
+            return actionHandled();
+        });
+
         informationPromptTimer = sys::TimerFactory::createSingleShotTimer(
             this,
             OnBoarding::informationTimerName,
@@ -97,6 +102,10 @@ namespace app
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::OnBoardingInstructionPromptWindow>(app, name);
                               });
+
+        attachPopups({
+            gui::popup::ID::DeadBatteryWindow,
+        });
     }
 
     void ApplicationBellOnBoarding::destroyUserInterface()
