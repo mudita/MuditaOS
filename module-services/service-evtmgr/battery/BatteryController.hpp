@@ -7,6 +7,7 @@
 #include "BatteryBrownoutDetector.hpp"
 #include "BatteryState.hpp"
 
+#include <Timers/TimerFactory.hpp>
 #include <queue.hpp>
 #include <memory>
 #include <cstdint>
@@ -33,5 +34,6 @@ namespace sevm::battery
         std::unique_ptr<hal::battery::AbstractBatteryCharger> charger;
         BatteryBrownoutDetector brownoutDetector;
         BatteryState batteryState;
+        sys::TimerHandle timer;
     };
 }; // namespace sevm::battery

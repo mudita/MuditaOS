@@ -15,6 +15,7 @@
 #include <magic_enum.hpp>
 
 using sevm::battery::BatteryController;
+using namespace std::chrono_literals;
 
 namespace
 {
@@ -83,9 +84,17 @@ BatteryController::BatteryController(sys::Service *service, xQueueHandle notific
                        this->service->bus.sendUnicast(std::move(stateChangeMessage), service::name::system_manager);
                    }}
 {
+    /// Quick&dirty fix:
+    /// If the system powers on with the battery level set to 0%, the current battery state is not processed correctly.
+    /// It results in battery critical window not showing at all. The solution to the problem is delaying sending system
+    /// notifications. This way, the application manager has enough time to properly init the main application, which is
+    /// responsible for displaying the correct window.
+    timer = sys::TimerFactory::createSingleShotTimer(this->service, "init_batt_state", 10000ms, [this](const auto &) {
+        batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
+    });
+    timer.start();
     Store::Battery::modify().level = charger->getSOC();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
-    batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
 
     LOG_INFO("Initial charger state:%s", magic_enum::enum_name(Store::Battery::get().state).data());
     LOG_INFO("Initial battery SOC:%d", Store::Battery::get().level);
