@@ -41,6 +41,7 @@ namespace gui
         [[nodiscard]] auto checkNpos() const -> bool;
         void resetNpos();
         [[nodiscard]] auto checkDocument() const -> bool;
+        [[nodiscard]] auto checkSentenceBeginningSigns(const std::string &textToCompare) const -> bool;
 
       public:
         /// gets cursor pointing in position in block

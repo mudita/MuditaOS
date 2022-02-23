@@ -526,13 +526,17 @@ TEST_CASE("check sentence beginning")
     removeNSignsInBlock(1, cursor);
     REQUIRE(!cursor.checkSentenceBeginning());
 
-    // Add string ending with dot and white space
-    addStringToBlock("Test. ", cursor);
+    // Add string ending with exclamation mark and white space
+    addStringToBlock("Test! ", cursor);
     REQUIRE(cursor.checkSentenceBeginning());
 
     // Add extra sign
     addStringToBlock("P", cursor);
     REQUIRE(!cursor.checkSentenceBeginning());
+
+    // Add string ending with question mark and white space
+    addStringToBlock("Test? ", cursor);
+    REQUIRE(cursor.checkSentenceBeginning());
 
     // Check number of blocks
     REQUIRE(cursor.getBlockNumber() == 0);

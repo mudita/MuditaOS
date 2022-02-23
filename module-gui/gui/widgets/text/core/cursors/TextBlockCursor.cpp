@@ -313,8 +313,9 @@ namespace gui
             // Iterate through white space
             while (currentBlock()->getText(getPosition() - detectIndex).substr(0, 1) == " ") {
 
-                // If dot with space found return true
-                if (currentBlock()->getText(getPosition() - detectIndex - 1).substr(0, 2) == ". ") {
+                // If sentence detect signs with space found return true
+                if (checkSentenceBeginningSigns(
+                        currentBlock()->getText(getPosition() - detectIndex - 1).substr(0, 2))) {
                     return true;
                 }
                 detectIndex++;
@@ -322,6 +323,18 @@ namespace gui
 
             // If detect bigger than Position - white spaces on block beginning.
             return detectIndex > getPosition();
+        }
+        return false;
+    }
+
+    auto BlockCursor::checkSentenceBeginningSigns(const std::string &textToCompare) const -> bool
+    {
+        auto sentenceDetectSigns = {". ", "? ", "! "};
+
+        for (auto sings : sentenceDetectSigns) {
+            if (textToCompare == sings) {
+                return true;
+            }
         }
         return false;
     }
@@ -361,4 +374,5 @@ namespace gui
     {
         return document->blocks.end();
     }
+
 } // namespace gui
