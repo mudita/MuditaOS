@@ -367,6 +367,10 @@ namespace app::manager
 
         auto currentlyFocusedApp = getFocusedApplication();
         if (currentlyFocusedApp == nullptr) {
+            if (app->state() != ApplicationCommon::State::NONE) {
+                LOG_INFO("No focused application at the moment, but requested app is starting already...");
+                return false;
+            }
             LOG_INFO("No focused application at the moment. Starting new application...");
             onApplicationSwitch(*app, std::move(msg->getData()), msg->getWindow());
             startApplication(*app);
@@ -713,6 +717,7 @@ namespace app::manager
             setState(State::Running);
             EventManagerCommon::messageSetApplication(this, app.name());
             onLaunchFinished(app);
+            actionsRegistry.process();
             return true;
         }
         if (getState() == State::AwaitingLostFocusConfirmation) {

@@ -54,6 +54,7 @@ namespace app::manager
 
         void enqueue(ActionEntry &&action);
         void finished();
+        void process();
 
         [[nodiscard]] auto hasPendingAction() const noexcept -> bool;
         [[nodiscard]] auto getPendingAction() noexcept -> ActionEntry *;

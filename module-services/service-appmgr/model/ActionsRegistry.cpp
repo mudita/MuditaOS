@@ -58,6 +58,13 @@ namespace app::manager
         }
     }
 
+    void ActionsRegistry::process()
+    {
+        if (!isCurrentlyProcessing()) {
+            notifyAboutNextAction();
+        }
+    }
+
     void ActionsRegistry::addAction(ActionEntry &&action)
     {
         actions.push_back(std::move(action));
