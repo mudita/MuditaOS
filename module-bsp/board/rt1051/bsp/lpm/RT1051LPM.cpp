@@ -14,6 +14,7 @@
 #include "ClockState.hpp"
 #include "Oscillator.hpp"
 #include "critical.hpp"
+#include "drivers/semc/DriverSEMC.hpp"
 
 namespace bsp
 {
@@ -22,6 +23,7 @@ namespace bsp
 
     RT1051LPM::RT1051LPM()
     {
+        driverSEMC      = drivers::DriverSEMC::Create(drivers::name::ExternalRAM);
         gpio_1 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::POWER_SWITCH_HOLD_GPIO),
                                     DriverGPIOParams{});
         gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::DCDC_INVERTER_MODE_GPIO),
@@ -72,9 +74,62 @@ namespace bsp
         return 0;
     }
 
+    enum class Change {
+        Up, Down
+    };
+
+    CpuFrequencyMHz RT1051LPM::onChangeUp(CpuFrequencyMHz freq, bsp::CpuFrequencyMHz newFrequency)
+    {
+        if ((freq <= CpuFrequencyMHz::Level_1) && (newFrequency > CpuFrequencyMHz::Level_1)) {
+            // connect internal the load resistor
+            ConnectInternalLoadResistor();
+            // turn off power save mode for DCDC inverter
+            DisableDcdcPowerSaveMode();
+            // Switch DCDC to full throttle during oscillator switch
+            SetHighestCoreVoltage();
+            // Enable regular 2P5 and 1P1 LDO and Turn off weak 2P5 and 1P1 LDO
+            SwitchToRegularModeLDO();
+            // switch oscillator source
+            SwitchOscillatorSource(LowPowerMode::OscillatorSource::External);
+            // then switch external RAM clock source
+            if (driverSEMC) {
+                driverSEMC->SwitchToPLL2ClockSource();
+            }
+            // Add intermediate step in frequency
+            if (newFrequency > CpuFrequencyMHz::Level_4)
+                return CpuFrequencyMHz::Level_4;
+        }
+        return newFrequency;
+    }
+
+    void RT1051LPM::onChangeDown(CpuFrequencyMHz newFrequency)
+    {
+        if (newFrequency <= bsp::CpuFrequencyMHz::Level_1) {
+            // Enable weak 2P5 and 1P1 LDO and Turn off regular 2P5 and 1P1 LDO
+            SwitchToLowPowerModeLDO();
+            // then switch osc source
+            SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
+            // and switch external RAM clock source
+            if (driverSEMC) {
+                driverSEMC->SwitchToPeripheralClockSource();
+            }
+            // turn on power save mode for DCDC inverter
+            EnableDcdcPowerSaveMode();
+
+            // disconnect internal the load resistor
+            DisconnectInternalLoadResistor();
+        }
+    }
+
     void RT1051LPM::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
     {
-        currentFrequency = freq;
+        if ( currentFrequency == freq ) {
+            return;
+        }
+        Change change = currentFrequency < freq ? Change::Up : Change::Down;
+        if (Change::Up == change) {
+            freq = onChangeUp(currentFrequency, freq);
+        }
         switch (freq) {
         case bsp::CpuFrequencyMHz::Level_0:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_4_Mhz);
@@ -98,7 +153,12 @@ namespace bsp
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_528_Mhz);
             break;
         }
+
+        if (Change::Down == change) {
+            onChangeDown(freq);
+        }
         LOG_INFO("CPU frequency changed to %lu", CLOCK_GetFreq(kCLOCK_CpuClk));
+        currentFrequency = freq;
     }
 
     void RT1051LPM::SetHighestCoreVoltage()

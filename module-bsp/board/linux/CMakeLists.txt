@@ -4,6 +4,7 @@ target_sources(module-bsp
         PRIVATE
                 board.cpp
 
+                battery_charger/battery_charger.cpp
                 bluetooth/Bluetooth.cpp
                 bluetooth/test/bsp_bt.cpp
                 cellular/linux_cellular.cpp

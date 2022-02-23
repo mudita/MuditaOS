@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceCellularPriv.hpp"
@@ -398,11 +398,8 @@ namespace cellular::internal
     void ServiceCellularPriv::initCSQHandler()
     {
         csqHandler->onEnableCsqReporting = [this]() {
-            constexpr auto cpuSentinelTimeout = 2000;
-            auto handle                       = owner->getTaskHandle();
             if (owner->cpuSentinel) {
-                owner->cpuSentinel->HoldMinimumFrequencyAndWait(
-                    bsp::CpuFrequencyMHz::Level_4, handle, cpuSentinelTimeout);
+                owner->cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
             }
 
             auto channel = owner->cmux->get(CellularMux::Channel::Commands);
@@ -416,11 +413,8 @@ namespace cellular::internal
         };
 
         csqHandler->onDisableCsqReporting = [this]() {
-            constexpr auto cpuSentinelTimeout = 2000;
-            auto handle                       = owner->getTaskHandle();
             if (owner->cpuSentinel) {
-                owner->cpuSentinel->HoldMinimumFrequencyAndWait(
-                    bsp::CpuFrequencyMHz::Level_4, handle, cpuSentinelTimeout);
+                owner->cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
             }
 
             auto channel = owner->cmux->get(CellularMux::Channel::Commands);
