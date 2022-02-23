@@ -7,6 +7,11 @@
 #include <memory>
 #include <bsp/common.hpp>
 
+namespace drivers
+{
+    class DriverSEMC;
+}
+
 namespace bsp
 {
 

@@ -1,10 +1,15 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "SystemManager/cpu/algorithm/FrequencyHold.hpp"
+#include "SystemManager/cpu/algorithm/ImmediateUpscale.hpp"
+#include "SystemManager/cpu/algorithm/FrequencyStepping.hpp"
+#include "cpu/AlgorithmFactory.hpp"
+#include "magic_enum.hpp"
+#include <SystemManager/CpuStatistics.hpp>
+#include <SystemManager/PowerManager.hpp>
 #include <gsl/util>
 #include <log/log.hpp>
-
-#include <SystemManager/PowerManager.hpp>
 
 namespace sys
 {
@@ -34,11 +39,17 @@ namespace sys
         totalTicksCount += ticks;
     }
 
-    PowerManager::PowerManager() : powerProfile{bsp::getPowerProfile()}
+
+    PowerManager::PowerManager(CpuStatistics &stats) : powerProfile{bsp::getPowerProfile()}, cpuStatistics(stats)
     {
+        driverSEMC      = drivers::DriverSEMC::Create(drivers::name::ExternalRAM);
         lowPowerControl = bsp::LowPowerMode::Create().value_or(nullptr);
-        driverSEMC      = drivers::DriverSEMC::Create("ExternalRAM");
         cpuGovernor     = std::make_unique<CpuGovernor>();
+
+        cpuAlgorithms = std::make_unique<cpu::AlgorithmFactory>();
+        cpuAlgorithms->emplace(sys::cpu::AlgoID::ImmediateUpscale, std::make_unique<sys::cpu::ImmediateUpscale>());
+        cpuAlgorithms->emplace(sys::cpu::AlgoID::FrequencyStepping,
+                               std::make_unique<sys::cpu::FrequencyStepping>(powerProfile, *cpuGovernor));
 
         cpuFrequencyMonitor.push_back(CpuFrequencyMonitor(lowestLevelName));
         cpuFrequencyMonitor.push_back(CpuFrequencyMonitor(middleLevelName));
@@ -77,171 +88,46 @@ namespace sys
         }
     }
 
-    [[nodiscard]] cpu::UpdateResult PowerManager::UpdateCpuFrequency(uint32_t cpuLoad)
+    [[nodiscard]] cpu::UpdateResult PowerManager::UpdateCpuFrequency()
     {
+        uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad(); 
         cpu::UpdateResult result;
+        cpu::AlgorithmData data {cpuLoad,lowPowerControl->GetCurrentFrequencyLevel(), cpuGovernor->GetMinimumFrequencyRequested()};
 
-        const auto currentCpuFreq           = lowPowerControl->GetCurrentFrequencyLevel();
-        const auto min                      = cpuGovernor->GetMinimumFrequencyRequested();
-        const auto permanent                = cpuGovernor->GetPermanentFrequencyRequested();
-
-        auto _ = gsl::finally([&result, this, &currentCpuFreq, min, permanent] {
+        auto _ = gsl::finally([&result, this, data] {
             result.frequencySet = lowPowerControl->GetCurrentFrequencyLevel();
-            result.changed      = result.frequencySet != currentCpuFreq;
-            if (not permanent.isActive) {
-                result.data = min;
-            }
-            else {
-                result.data.reason = "perm";
-            }
+            result.changed      = result.frequencySet > data.curentFrequency   ? sys::cpu::UpdateResult::Result::UpScaled
+                                  : result.frequencySet < data.curentFrequency ? sys::cpu::UpdateResult::Result::Downscaled
+                                                                         : sys::cpu::UpdateResult::Result::NoChange;
+            result.data = data.sentinel;
         });
 
-        if (permanent.isActive) {
-            auto frequencyToHold = std::max(permanent.frequencyToHold, powerProfile.minimalFrequency);
+        auto algorithms = {
+            sys::cpu::AlgoID::FrequencyHold, sys::cpu::AlgoID::ImmediateUpscale, sys::cpu::AlgoID::FrequencyStepping};
 
-            if (currentCpuFreq < frequencyToHold) {
-                IncreaseCpuFrequency(frequencyToHold);
+        for (auto id : algorithms) {
+            auto algo = cpuAlgorithms->get(id);
+            if (algo != nullptr) {
+                if (auto frequencyToSet = algo->calculate(data); frequencyToSet != data.curentFrequency) {
+                    result.id = id;
+                    SetCpuFrequency(frequencyToSet);
+                    for (auto again : algorithms) {
+                        if (auto al = cpuAlgorithms->get(again); al != nullptr) {
+                            al->reset();
+                        }
+                    }
+                    return result;
+                }
             }
-            else if (currentCpuFreq > frequencyToHold) {
-                do {
-                    DecreaseCpuFrequency();
-                } while (lowPowerControl->GetCurrentFrequencyLevel() > frequencyToHold);
-            }
-            ResetFrequencyShiftCounter();
-            return result;
-        }
-
-        if (cpuLoad > powerProfile.frequencyShiftUpperThreshold && currentCpuFreq < bsp::CpuFrequencyMHz::Level_6) {
-            aboveThresholdCounter++;
-            belowThresholdCounter = 0;
-        }
-        else if (cpuLoad < powerProfile.frequencyShiftLowerThreshold &&
-                 currentCpuFreq > powerProfile.minimalFrequency) {
-            belowThresholdCounter++;
-            aboveThresholdCounter = 0;
-        }
-        else {
-            ResetFrequencyShiftCounter();
         }
 
-        if (!belowThresholdCounter) {
-            isFrequencyLoweringInProgress = false;
-        }
-
-        if (min.frequency > currentCpuFreq) {
-            ResetFrequencyShiftCounter();
-            IncreaseCpuFrequency(min.frequency);
-        }
-        else if (aboveThresholdCounter >= powerProfile.maxAboveThresholdCount) {
-            if (powerProfile.frequencyIncreaseIntermediateStep && currentCpuFreq < bsp::CpuFrequencyMHz::Level_4) {
-                ResetFrequencyShiftCounter();
-                IncreaseCpuFrequency(bsp::CpuFrequencyMHz::Level_4);
-            }
-            else {
-                ResetFrequencyShiftCounter();
-                IncreaseCpuFrequency(bsp::CpuFrequencyMHz::Level_6);
-            }
-        }
-        else {
-            if (belowThresholdCounter >= (isFrequencyLoweringInProgress ? powerProfile.maxBelowThresholdInRowCount
-                                                                        : powerProfile.maxBelowThresholdCount) &&
-                currentCpuFreq > min.frequency) {
-                ResetFrequencyShiftCounter();
-                DecreaseCpuFrequency();
-            }
-        }
         return result;
-    }
-
-    void PowerManager::IncreaseCpuFrequency(bsp::CpuFrequencyMHz newFrequency)
-    {
-        const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
-
-        if ((freq <= bsp::CpuFrequencyMHz::Level_1) && (newFrequency > bsp::CpuFrequencyMHz::Level_1)) {
-            // connect internal the load resistor
-            lowPowerControl->ConnectInternalLoadResistor();
-            // turn off power save mode for DCDC inverter
-            lowPowerControl->DisableDcdcPowerSaveMode();
-            // Switch DCDC to full throttle during oscillator switch
-            lowPowerControl->SetHighestCoreVoltage();
-            // Enable regular 2P5 and 1P1 LDO and Turn off weak 2P5 and 1P1 LDO
-            lowPowerControl->SwitchToRegularModeLDO();
-            // switch oscillator source
-            lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
-            // then switch external RAM clock source
-            if (driverSEMC) {
-                driverSEMC->SwitchToPLL2ClockSource();
-            }
-            // Add intermediate step in frequency
-            if (newFrequency > bsp::CpuFrequencyMHz::Level_4)
-                SetCpuFrequency(bsp::CpuFrequencyMHz::Level_4);
-        }
-
-        // and increase frequency
-        if (freq < newFrequency) {
-            SetCpuFrequency(newFrequency);
-        }
-    }
-
-    void PowerManager::DecreaseCpuFrequency()
-    {
-        const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
-        auto level      = powerProfile.minimalFrequency;
-
-        switch (freq) {
-        case bsp::CpuFrequencyMHz::Level_6:
-            level = bsp::CpuFrequencyMHz::Level_5;
-            break;
-        case bsp::CpuFrequencyMHz::Level_5:
-            level = bsp::CpuFrequencyMHz::Level_4;
-            break;
-        case bsp::CpuFrequencyMHz::Level_4:
-            level = bsp::CpuFrequencyMHz::Level_3;
-            break;
-        case bsp::CpuFrequencyMHz::Level_3:
-            level = bsp::CpuFrequencyMHz::Level_2;
-            break;
-        case bsp::CpuFrequencyMHz::Level_2:
-            level = powerProfile.minimalFrequency;
-            break;
-        case bsp::CpuFrequencyMHz::Level_1:
-            [[fallthrough]];
-        case bsp::CpuFrequencyMHz::Level_0:
-            break;
-        }
-
-        // decrease frequency first
-        if (level != freq) {
-            SetCpuFrequency(level);
-        }
-
-        if (level <= bsp::CpuFrequencyMHz::Level_1) {
-            // Enable weak 2P5 and 1P1 LDO and Turn off regular 2P5 and 1P1 LDO
-            lowPowerControl->SwitchToLowPowerModeLDO();
-
-            // then switch osc source
-            lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
-
-            // and switch external RAM clock source
-            if (driverSEMC) {
-                driverSEMC->SwitchToPeripheralClockSource();
-            }
-
-            // turn on power save mode for DCDC inverter
-            lowPowerControl->EnableDcdcPowerSaveMode();
-
-            // disconnect internal the load resistor
-            lowPowerControl->DisconnectInternalLoadResistor();
-        }
-
-        isFrequencyLoweringInProgress = true;
     }
 
     void PowerManager::RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel) const
     {
         if (cpuGovernor->RegisterNewSentinel(newSentinel)) {
-            newSentinel->ReadRegistrationData(lowPowerControl->GetCurrentFrequencyLevel(),
-                                              cpuGovernor->GetPermanentFrequencyRequested().isActive);
+            newSentinel->ReadRegistrationData(lowPowerControl->GetCurrentFrequencyLevel());
         }
     }
 
@@ -250,29 +136,46 @@ namespace sys
         cpuGovernor->RemoveSentinel(sentinelName);
     }
 
-    void PowerManager::SetCpuFrequencyRequest(std::string sentinelName,
-                                              bsp::CpuFrequencyMHz request,
-                                              bool permanentBlock)
+    void PowerManager::SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request)
     {
-        cpuGovernor->SetCpuFrequencyRequest(std::move(sentinelName), request, permanentBlock);
+        cpuGovernor->SetCpuFrequencyRequest(sentinelName, request);
+        // TODO:
+        // - move other UpdateCpuFrequency usages too
+        // - if it's ok to trigger algorithms on leave?
+        auto ret = UpdateCpuFrequency();
+        cpuStatistics.TrackChange(ret);
     }
 
-    void PowerManager::ResetCpuFrequencyRequest(std::string sentinelName, bool permanentBlock)
+    void PowerManager::ResetCpuFrequencyRequest(const std::string &sentinelName)
     {
-        cpuGovernor->ResetCpuFrequencyRequest(std::move(sentinelName), permanentBlock);
+        cpuGovernor->ResetCpuFrequencyRequest(sentinelName);
+        //  TODO - same as above
+        auto ret = UpdateCpuFrequency();
+        cpuStatistics.TrackChange(ret);
+    }
+
+    bool PowerManager::IsCpuPernamentFrequency()
+    {
+        return cpuAlgorithms->get(sys::cpu::AlgoID::FrequencyHold) != nullptr;
+    }
+
+    void PowerManager::SetPernamentFrequency(bsp::CpuFrequencyMHz freq)
+    {
+        cpuAlgorithms->emplace(sys::cpu::AlgoID::FrequencyHold, std::make_unique<sys::cpu::FrequencyHold>(freq,powerProfile));
+    }
+
+    void PowerManager::ResetPernamentFrequency()
+    {
+        cpuAlgorithms->remove(sys::cpu::AlgoID::FrequencyHold);
     }
 
     void PowerManager::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
     {
-        UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
-        lowPowerControl->SetCpuFrequency(freq);
-        cpuGovernor->InformSentinelsAboutCpuFrequencyChange(freq);
-    }
-
-    void PowerManager::ResetFrequencyShiftCounter()
-    {
-        aboveThresholdCounter = 0;
-        belowThresholdCounter = 0;
+       UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
+        while ( lowPowerControl->GetCurrentFrequencyLevel() != freq ) {
+            lowPowerControl->SetCpuFrequency(freq);
+            cpuGovernor->InformSentinelsAboutCpuFrequencyChange(freq);
+        }
     }
 
     [[nodiscard]] auto PowerManager::getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_RT1051LPM_HPP
@@ -32,9 +32,12 @@ namespace bsp
         void SwitchToLowPowerModeLDO() final;
 
       private:
+        CpuFrequencyMHz onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency);
+        void onChangeDown(bsp::CpuFrequencyMHz freq);
         std::shared_ptr<drivers::DriverGPIO> gpio_1;
         std::shared_ptr<drivers::DriverGPIO> gpio_2;
         std::unique_ptr<bsp::CpuFreqLPM> CpuFreq;
+        std::shared_ptr<drivers::DriverSEMC> driverSEMC;
     };
 
 } // namespace bsp

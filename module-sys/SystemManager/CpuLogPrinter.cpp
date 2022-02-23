@@ -44,4 +44,7 @@ namespace sys::cpu::stats
                    int(ret.data.frequency),
                    CLOCK_GetFreq(0));
     }
+
+    void LogPrinter::printPowerConsumption()
+    {}
 } // namespace sys::cpu::stats

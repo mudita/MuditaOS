@@ -84,7 +84,7 @@ namespace sys
     }
 
     SystemManagerCommon::SystemManagerCommon(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators)
-        : Service(service::name::system_manager, "", systemManagerStack), systemServiceCreators{std::move(creators)}
+        : Service(service::name::system_manager, "", systemManagerStack, ServicePriority::Low), systemServiceCreators{std::move(creators)}
     {
         // Specify list of channels which System Manager is registered to
         bus.channels            = {BusChannel::SystemManagerRequests};
@@ -192,6 +192,7 @@ namespace sys
         // Power off request (pending)
         PowerOff();
 
+        // TODO these were globals = never cleared, is it needed now?
         powerManager.reset();
         cpuStatistics.reset();
         deviceManager.reset();
@@ -241,8 +242,8 @@ namespace sys
 
     void SystemManagerCommon::StartSystem(InitFunction sysInit, InitFunction appSpaceInit, DeinitFunction sysDeinit)
     {
-        powerManager  = std::make_unique<PowerManager>();
         cpuStatistics = std::make_unique<CpuStatistics>();
+        powerManager  = std::make_unique<PowerManager>(*cpuStatistics);
         deviceManager = std::make_unique<DeviceManager>();
 
         systemInit   = std::move(sysInit);
@@ -256,7 +257,7 @@ namespace sys
         freqTimer.start();
 
         powerManagerEfficiencyTimer = sys::TimerFactory::createPeriodicTimer(
-            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [](sys::Timer &) {
+            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [this](sys::Timer &) {
                 powerManager->LogPowerManagerEfficiency();
             });
         powerManagerEfficiencyTimer.start();
@@ -633,7 +634,9 @@ namespace sys
         connect(typeid(sys::HoldCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::HoldCpuFrequencyMessage *>(message);
             powerManager->SetCpuFrequencyRequest(msg->getName(), msg->getRequest());
-
+            if ( msg->getHandle() != nullptr ) {
+                xTaskNotifyGive(msg->getHandle());
+            }
             return sys::MessageNone{};
         });
 
@@ -644,17 +647,19 @@ namespace sys
             return sys::MessageNone{};
         });
 
+        connect(typeid(sys::IsCpuPernament), [this](sys::Message *message) -> sys::MessagePointer {
+            return std::make_shared<sys::IsCpuPernamentResponse>(powerManager->IsCpuPernamentFrequency());
+        });
+
         connect(typeid(sys::HoldCpuFrequencyPermanentlyMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::HoldCpuFrequencyPermanentlyMessage *>(message);
-            powerManager->SetCpuFrequencyRequest(msg->getName(), msg->getRequest(), true);
-
-            return sys::MessageNone{};
+            powerManager->SetPernamentFrequency(msg->request);
+            return std::make_shared<sys::HoldCpuFrequencyPermanentlyResponse>();
         });
 
         connect(typeid(sys::ReleaseCpuPermanentFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
-            auto msg = static_cast<sys::ReleaseCpuPermanentFrequencyMessage *>(message);
-            powerManager->ResetCpuFrequencyRequest(msg->getName(), true);
-            return sys::MessageNone{};
+            powerManager->ResetPernamentFrequency();
+            return std::make_shared<sys::HoldCpuFrequencyPermanentlyResponse>();
         });
 
         connect(typeid(app::manager::CheckIfStartAllowedMessage), [this](sys::Message *) -> sys::MessagePointer {
@@ -685,7 +690,8 @@ namespace sys
         deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
 
         cpuSentinel = std::make_shared<sys::CpuSentinel>(
-            service::name::system_manager, this, [this](bsp::CpuFrequencyMHz newFrequency) {
+            service::name::system_manager
+            , this, [this](bsp::CpuFrequencyMHz newFrequency) {
                 UpdateResourcesAfterCpuFrequencyChange(newFrequency);
             });
         powerManager->RegisterNewSentinel(cpuSentinel);
@@ -781,8 +787,7 @@ namespace sys
             freqTimer.restart(constants::timerPeriodInterval);
         }
 
-        cpuStatistics->UpdatePercentageCpuLoad();
-        auto ret = powerManager->UpdateCpuFrequency(cpuStatistics->GetPercentageCpuLoad());
+        auto ret = powerManager->UpdateCpuFrequency();
         cpuStatistics->TrackChange(ret);
     }
 
@@ -800,8 +805,4 @@ namespace sys
     std::vector<std::shared_ptr<app::ApplicationCommon>> SystemManagerCommon::applicationsList;
     cpp_freertos::MutexStandard SystemManagerCommon::serviceDestroyMutex;
     cpp_freertos::MutexStandard SystemManagerCommon::appDestroyMutex;
-    std::unique_ptr<PowerManager> SystemManagerCommon::powerManager;
-    std::unique_ptr<CpuStatistics> SystemManagerCommon::cpuStatistics;
-    std::unique_ptr<DeviceManager> SystemManagerCommon::deviceManager;
-
 } // namespace sys

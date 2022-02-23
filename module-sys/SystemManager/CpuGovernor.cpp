@@ -83,15 +83,8 @@ namespace sys
         std::for_each(std::begin(sentinels), std::end(sentinels), PrintName);
     }
 
-    void CpuGovernor::SetCpuFrequencyRequest(std::string sentinelName,
-                                             bsp::CpuFrequencyMHz request,
-                                             bool permanentBlock)
+    void CpuGovernor::SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request)
     {
-        if (permanentBlock) {
-            permanentFrequencyToHold.isActive        = true;
-            permanentFrequencyToHold.frequencyToHold = request;
-            return;
-        }
         for (auto &sentinel : sentinels) {
             auto sentinelWeakPointer = sentinel->GetSentinel();
             if (!sentinelWeakPointer.expired()) {
@@ -103,19 +96,14 @@ namespace sys
         }
     }
 
-    void CpuGovernor::ResetCpuFrequencyRequest(std::string sentinelName, bool permanentBlock)
+    void CpuGovernor::ResetCpuFrequencyRequest(const std::string &sentinelName)
     {
-        if (permanentBlock) {
-            permanentFrequencyToHold.isActive        = false;
-            permanentFrequencyToHold.frequencyToHold = bsp::CpuFrequencyMHz::Level_0;
-            return;
-        }
         SetCpuFrequencyRequest(sentinelName, bsp::CpuFrequencyMHz::Level_0);
     }
 
-    [[nodiscard]] auto CpuGovernor::GetMinimumFrequencyRequested() const noexcept -> sentinel::Data
+    [[nodiscard]] auto CpuGovernor::GetMinimumFrequencyRequested() const noexcept -> sentinel::View
     {
-        sentinel::Data d;
+        sentinel::View d;
         if (sentinels.empty()) {
             d.reason = "empty";
             return d;
@@ -133,7 +121,6 @@ namespace sys
         d.frequency = (*minSentinel)->GetRequestedFrequency();
         if (auto p = (*minSentinel)->GetSentinel().lock()) {
             d.name   = p->GetName();
-            d.task   = p->getTask();
             d.reason = p->getReason();
         }
         else {
@@ -161,10 +148,4 @@ namespace sys
             LOG_INFO("Sentinel %s", sharedResource->GetName().c_str());
         }
     }
-
-    [[nodiscard]] auto CpuGovernor::GetPermanentFrequencyRequested() const noexcept -> PermanentFrequencyToHold
-    {
-        return permanentFrequencyToHold;
-    }
-
 } // namespace sys

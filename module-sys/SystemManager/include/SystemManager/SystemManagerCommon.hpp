@@ -211,9 +211,9 @@ namespace sys
         static std::vector<std::shared_ptr<app::ApplicationCommon>> applicationsList;
         static cpp_freertos::MutexStandard serviceDestroyMutex;
         static cpp_freertos::MutexStandard appDestroyMutex;
-        static std::unique_ptr<PowerManager> powerManager;
-        static std::unique_ptr<CpuStatistics> cpuStatistics;
-        static std::unique_ptr<DeviceManager> deviceManager;
+        std::unique_ptr<CpuStatistics> cpuStatistics;
+        std::unique_ptr<PowerManager> powerManager;
+        std::unique_ptr<DeviceManager> deviceManager;
     };
 } // namespace sys
 

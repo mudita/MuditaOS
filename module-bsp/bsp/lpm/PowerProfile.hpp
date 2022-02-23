@@ -16,7 +16,6 @@ namespace bsp
         std::uint32_t maxBelowThresholdInRowCount;
         std::uint32_t maxAboveThresholdCount;
         CpuFrequencyMHz minimalFrequency;
-        bool frequencyIncreaseIntermediateStep;
     };
 
     const PowerProfile getPowerProfile();
