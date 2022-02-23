@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularMux.h"
@@ -100,7 +100,7 @@ void CellularMux::setStartParams(PortSpeed_e portSpeed)
 CellularMuxFrame::frame_t createCMUXExitFrame()
 {
     CellularMuxFrame::frame_t frame;
-    frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
+    frame.Address = 0 | static_cast<unsigned char>(MuxDefines::GSM0710_CR);
     frame.Control = TypeOfFrame_e::UIH;
     frame.data.push_back(static_cast<uint8_t>(MuxDefines::GSM0710_CONTROL_CLD) |
                          static_cast<uint8_t>(MuxDefines::GSM0710_EA) | static_cast<uint8_t>(MuxDefines::GSM0710_CR));
@@ -273,7 +273,7 @@ CellularMux::ConfState CellularMux::confProcedure()
         return ConfState::Failure;
     }
 
-    return ConfState ::Success;
+    return ConfState::Success;
 }
 
 CellularMux::ConfState CellularMux::audioConfProcedure()

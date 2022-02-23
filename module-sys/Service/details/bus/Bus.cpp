@@ -124,7 +124,7 @@ namespace sys
         }
 
         message->sender    = sender->GetName();
-        message->transType = Message::TransmissionType ::Unicast;
+        message->transType = Message::TransmissionType::Unicast;
 
         message->ValidateUnicastMessage();
 
@@ -201,7 +201,7 @@ namespace sys
             message->id = uniqueMsgId.getNext();
         }
 
-        message->transType = Message::TransmissionType ::Broadcast;
+        message->transType = Message::TransmissionType::Broadcast;
         message->sender    = sender->GetName();
 
         message->ValidateBroadcastMessage();

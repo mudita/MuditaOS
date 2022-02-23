@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellAlarmSetPresenter.hpp"
@@ -9,8 +9,8 @@
 
 namespace app::bell_alarm
 {
-    BellAlarmSetPresenter ::BellAlarmSetPresenter(app::ApplicationCommon *app,
-                                                  std::shared_ptr<AbstractAlarmModel> alarmModel)
+    BellAlarmSetPresenter::BellAlarmSetPresenter(app::ApplicationCommon *app,
+                                                 std::shared_ptr<AbstractAlarmModel> alarmModel)
         : app{app}, alarmModel{std::move(alarmModel)}
     {}
 

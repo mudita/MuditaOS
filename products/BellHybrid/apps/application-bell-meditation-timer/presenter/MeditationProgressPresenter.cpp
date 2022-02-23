@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellMeditationTimer.hpp"
@@ -17,9 +17,9 @@ namespace
 
 namespace app::meditation
 {
-    MeditationProgressPresenter ::MeditationProgressPresenter(app::ApplicationCommon *app,
-                                                              settings::Settings *settings,
-                                                              std::unique_ptr<AbstractTimeModel> timeModel)
+    MeditationProgressPresenter::MeditationProgressPresenter(app::ApplicationCommon *app,
+                                                             settings::Settings *settings,
+                                                             std::unique_ptr<AbstractTimeModel> timeModel)
         : app{app}, settings{settings}, timeModel{std::move(timeModel)}
     {
         duration = std::chrono::minutes{

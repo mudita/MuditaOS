@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DriverI2C.hpp"
@@ -17,7 +17,7 @@
 namespace drivers
 {
 
-    std::weak_ptr<DriverI2C> DriverI2C::singleton[static_cast<uint32_t>(I2CInstances ::COUNT)];
+    std::weak_ptr<DriverI2C> DriverI2C::singleton[static_cast<uint32_t>(I2CInstances::COUNT)];
 
     std::shared_ptr<DriverI2C> DriverI2C::Create(const drivers::I2CInstances instance,
                                                  const drivers::DriverI2CParams &params)

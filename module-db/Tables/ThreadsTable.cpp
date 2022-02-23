@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadsTable.hpp"
@@ -111,10 +111,10 @@ std::vector<ThreadsTableRow> ThreadsTable::getLimitOffsetByField(uint32_t offset
     case ThreadsTableFields::MsgCount:
         fieldName = "msg_count";
         break;
-    case ThreadsTableFields ::ContactID:
+    case ThreadsTableFields::ContactID:
         fieldName = "contact_id";
         break;
-    case ThreadsTableFields ::NumberID:
+    case ThreadsTableFields::NumberID:
         fieldName = "number_id";
         break;
     default:

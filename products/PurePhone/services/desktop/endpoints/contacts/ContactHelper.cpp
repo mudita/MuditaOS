@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/contacts/ContactHelper.hpp>
@@ -66,7 +66,7 @@ namespace sdesktop::endpoints
 
         for (const auto &num : contactJSON[json::contacts::numbers].array_items()) {
             utils::PhoneNumber phoneNumber(num.string_value());
-            auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType ::CELL);
+            auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType::CELL);
             newRecord.numbers.push_back(contactNum);
         }
 

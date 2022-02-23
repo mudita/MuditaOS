@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DriverDMA.hpp"
@@ -16,7 +16,7 @@
 namespace drivers
 {
 
-    std::weak_ptr<DriverDMA> DriverDMA::singleton[static_cast<uint32_t>(DMAInstances ::COUNT)];
+    std::weak_ptr<DriverDMA> DriverDMA::singleton[static_cast<uint32_t>(DMAInstances::COUNT)];
 
     std::shared_ptr<DriverDMA> DriverDMA::Create(const drivers::DMAInstances instance,
                                                  const drivers::DriverDMAParams &params)

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp_eink.h"
@@ -203,14 +203,14 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     // fsl_lpspi doesn't support configuring autopcs feature
     BSP_EINK_LPSPI_BASE->CFGR1 |= LPSPI_CFGR1_AUTOPCS(0);
 
-    dmamux = DriverDMAMux::Create(static_cast<DMAMuxInstances>(BoardDefinitions ::EINK_DMAMUX), DriverDMAMuxParams{});
-    dma    = DriverDMA::Create(static_cast<DMAInstances>(BoardDefinitions ::EINK_DMA), DriverDMAParams{});
+    dmamux = DriverDMAMux::Create(static_cast<DMAMuxInstances>(BoardDefinitions::EINK_DMAMUX), DriverDMAMuxParams{});
+    dma    = DriverDMA::Create(static_cast<DMAInstances>(BoardDefinitions::EINK_DMA), DriverDMAParams{});
 
-    txDMAHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
-    rxDMAHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
-    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions ::EINK_TX_DMA_CHANNEL),
+    txDMAHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::EINK_TX_DMA_CHANNEL));
+    rxDMAHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::EINK_RX_DMA_CHANNEL));
+    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::EINK_TX_DMA_CHANNEL),
                    BSP_EINK_LPSPI_DMA_TX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_TX_PERI_SEL
-    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions ::EINK_RX_DMA_CHANNEL),
+    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::EINK_RX_DMA_CHANNEL),
                    BSP_EINK_LPSPI_DMA_RX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_RX_PERI_SEL
 
     BSP_EINK_LPSPI_EdmaDriverState.edmaTxDataToTxRegHandle =
@@ -263,8 +263,8 @@ void BSP_EinkDeinit(void)
 
     pll.reset();
 
-    dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
-    dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
+    dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_TX_DMA_CHANNEL));
+    dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_RX_DMA_CHANNEL));
 
     dma.reset();
     dmamux.reset();

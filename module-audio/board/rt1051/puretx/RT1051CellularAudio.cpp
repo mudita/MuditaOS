@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051CellularAudio.hpp"
@@ -105,8 +105,8 @@ namespace audio
         memset(&config, 0, sizeof config);
         SAI_Deinit(BOARD_CELLULAR_AUDIO_SAIx);
         if (dmamux) {
-            dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::CELLULAR_AUDIO_TX_DMA_CHANNEL));
-            dmamux->Disable(static_cast<uint32_t>(BoardDefinitions ::CELLULAR_AUDIO_RX_DMA_CHANNEL));
+            dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL));
+            dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL));
         }
     }
 

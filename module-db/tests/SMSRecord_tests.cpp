@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common.hpp"
@@ -45,7 +45,7 @@ TEST_CASE("SMS Record tests")
     auto numberTest2             = utils::PhoneNumber("222333444", utils::country::Id::UNKNOWN).getView();
     const char *bodyTest         = "Test SMS Body";
     const char *bodyTest2        = "Test SMS Body2";
-    const SMSType typeTest       = SMSType ::DRAFT;
+    const SMSType typeTest       = SMSType::DRAFT;
 
     SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
 
@@ -208,7 +208,7 @@ TEST_CASE("SMS Record tests")
 
     SECTION("SMS Record Draft and Input test")
     {
-        recordIN.type = SMSType ::INBOX;
+        recordIN.type = SMSType::INBOX;
 
         // Add 3 INBOX Records
         REQUIRE(smsRecInterface.Add(recordIN));
@@ -216,7 +216,7 @@ TEST_CASE("SMS Record tests")
         REQUIRE(smsRecInterface.Add(recordIN));
 
         // Add 1 Draft Records
-        recordIN.type = SMSType ::DRAFT;
+        recordIN.type = SMSType::DRAFT;
         recordIN.body = "Draft Message";
         REQUIRE(smsRecInterface.Add(recordIN));
 

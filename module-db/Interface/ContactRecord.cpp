@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactRecord.hpp"
@@ -827,7 +827,7 @@ auto ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
     auto records = std::make_unique<std::vector<ContactRecord>>();
 
     switch (field) {
-    case ContactRecordField ::PrimaryName: {
+    case ContactRecordField::PrimaryName: {
         auto ret = contactDB->name.getLimitOffsetByField(offset, limit, ContactNameTableFields::NamePrimary, str);
 
         for (const auto &record : ret) {
@@ -866,7 +866,7 @@ auto ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
     } break;
 
     case ContactRecordField::NumberUser: {
-        auto ret = contactDB->number.getLimitOffsetByField(offset, limit, ContactNumberTableFields ::NumberUser, str);
+        auto ret = contactDB->number.getLimitOffsetByField(offset, limit, ContactNumberTableFields::NumberUser, str);
 
         for (const auto &record : ret) {
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSRecord.hpp"
@@ -170,7 +170,7 @@ bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
 
     // update thread details with the latest sms from given thread
 
-    auto latest_vec = GetLimitOffsetByField(0, 1, SMSRecordField ::ThreadID, std::to_string(thread.ID).c_str());
+    auto latest_vec = GetLimitOffsetByField(0, 1, SMSRecordField::ThreadID, std::to_string(thread.ID).c_str());
 
     if (latest_vec->size() == 0) {
         return false;
@@ -217,7 +217,7 @@ bool SMSRecordInterface::RemoveByID(uint32_t id)
     else {
         // update thread details if deleted SMS is the latest sms from the thread
 
-        auto twoLatest = GetLimitOffsetByField(0, 2, SMSRecordField ::ThreadID, std::to_string(threadRec.ID).c_str());
+        auto twoLatest = GetLimitOffsetByField(0, 2, SMSRecordField::ThreadID, std::to_string(threadRec.ID).c_str());
 
         if (twoLatest->size() == 0) {
             LOG_ERROR("Cannot fetch no SMSes even though thread's msgCount says so (id %lu)",

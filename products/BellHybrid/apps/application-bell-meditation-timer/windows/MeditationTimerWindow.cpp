@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellMeditationTimer.hpp"
@@ -36,7 +36,7 @@ namespace gui
         topMessage->drawUnderline(false);
 
         spinner = new UIntegerSpinner(
-            UIntegerSpinner ::Range{presenter->getMinValue(), presenter->getMaxValue(), presenter->getStepValue()},
+            UIntegerSpinner::Range{presenter->getMinValue(), presenter->getMaxValue(), presenter->getStepValue()},
             Boundaries::Fixed);
         spinner->onValueChanged = [this](const auto val) { this->onValueChanged(val); };
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);

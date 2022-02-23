@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common.hpp"
@@ -42,7 +42,7 @@ TEST_CASE("Thread Record tests")
     const uint32_t dateTest      = 123456789;
     const char *snippetTest      = "Test snippet";
     const char *snippetTest2     = "Test snippet2";
-    const SMSType typeTest       = SMSType ::UNKNOWN;
+    const SMSType typeTest       = SMSType::UNKNOWN;
 
     ThreadRecordInterface threadRecordInterface1(&smsDB, &contactsDB);
 
@@ -193,7 +193,7 @@ TEST_CASE("Thread Record tests")
         recordIN.errorCode = 0;
         recordIN.number    = phoneNumber.getView();
         recordIN.body      = "Ala";
-        recordIN.type      = SMSType ::DRAFT;
+        recordIN.type      = SMSType::DRAFT;
 
         REQUIRE(smsRecInterface.Add(recordIN));
 
@@ -247,7 +247,7 @@ TEST_CASE("Thread Record tests")
         recordIN.date      = 123456789;
         recordIN.errorCode = 0;
         recordIN.number    = phoneNumber.getView();
-        recordIN.type      = SMSType ::DRAFT;
+        recordIN.type      = SMSType::DRAFT;
 
         UTF8 snippetIncluded = "Good 😁IS GOOD";
         UTF8 snippetExcluded = "\nthis part should not be included in snippet";

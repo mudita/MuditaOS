@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common.hpp"
@@ -27,7 +27,7 @@ TEST_CASE("Contact Record db tests")
     const char *mailTest                          = "TestMail";
     const char *assetPath                         = "/Test/Path/To/Asset";
     const char *speeddialTest                     = "100";
-    const ContactNumberType contactNumberTypeTest = ContactNumberType ::PAGER;
+    const ContactNumberType contactNumberTypeTest = ContactNumberType::PAGER;
 
     ContactRecordInterface contRecInterface(&contactDB);
 
@@ -614,7 +614,7 @@ TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
     testContactRecord.primaryName     = "PrimaryNameTest";
     testContactRecord.alternativeName = "AlternativeNameTest";
     testContactRecord.numbers         = std::vector<ContactRecord::Number>({
-        ContactRecord::Number("600123456", "+48600123456", ContactNumberType ::HOME),
+        ContactRecord::Number("600123456", "+48600123456", ContactNumberType::HOME),
     });
 
     REQUIRE(records.Add(testContactRecord));
@@ -625,7 +625,7 @@ TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
         noDuplicateContactRecord.primaryName     = "PrimaryNameTest2";
         noDuplicateContactRecord.alternativeName = "AlternativeNameTest2";
         noDuplicateContactRecord.numbers         = std::vector<ContactRecord::Number>({
-            ContactRecord::Number("600123451", "+48600123451", ContactNumberType ::HOME),
+            ContactRecord::Number("600123451", "+48600123451", ContactNumberType::HOME),
         });
 
         REQUIRE(records.verifyDuplicate(noDuplicateContactRecord) == false);
@@ -638,7 +638,7 @@ TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
         duplicateContactRecord.primaryName     = "PrimaryNameDuplicate";
         duplicateContactRecord.alternativeName = "AlternativeNameDuplicate";
         duplicateContactRecord.numbers         = std::vector<ContactRecord::Number>({
-            ContactRecord::Number("600123456", "+48600123456", ContactNumberType ::HOME),
+            ContactRecord::Number("600123456", "+48600123456", ContactNumberType::HOME),
         });
 
         REQUIRE(records.verifyDuplicate(duplicateContactRecord) == true);
@@ -663,7 +663,7 @@ TEST_CASE("Check if new contact record exists in DB as a temporary contact")
     testContactRecord.primaryName     = "PrimaryNameTest";
     testContactRecord.alternativeName = "AlternativeNameTest";
     testContactRecord.numbers         = std::vector<ContactRecord::Number>({
-        ContactRecord::Number("600123456", "+48600123456", ContactNumberType ::HOME),
+        ContactRecord::Number("600123456", "+48600123456", ContactNumberType::HOME),
     });
 
     REQUIRE(records.Add(testContactRecord));
@@ -674,7 +674,7 @@ TEST_CASE("Check if new contact record exists in DB as a temporary contact")
         anotherTestContactRecord.primaryName     = "PrimaryNameTest2";
         anotherTestContactRecord.alternativeName = "AlternativeNameTest2";
         anotherTestContactRecord.numbers         = std::vector<ContactRecord::Number>({
-            ContactRecord::Number("600123451", "+48600123451", ContactNumberType ::HOME),
+            ContactRecord::Number("600123451", "+48600123451", ContactNumberType::HOME),
         });
 
         REQUIRE(records.verifyTemporary(anotherTestContactRecord) == false);
@@ -684,7 +684,7 @@ TEST_CASE("Check if new contact record exists in DB as a temporary contact")
     {
         ContactRecord temporaryContactRecord;
         temporaryContactRecord.numbers = std::vector<ContactRecord::Number>({
-            ContactRecord::Number("600123452", "+48600123452", ContactNumberType ::HOME),
+            ContactRecord::Number("600123452", "+48600123452", ContactNumberType::HOME),
         });
         temporaryContactRecord.addToGroup(ContactsDB::temporaryGroupId());
 
@@ -694,7 +694,7 @@ TEST_CASE("Check if new contact record exists in DB as a temporary contact")
         noTemporaryContactRecord.primaryName     = "PrimaryNameNoTemporary";
         noTemporaryContactRecord.alternativeName = "AlternativeNameNoTemporary";
         noTemporaryContactRecord.numbers         = std::vector<ContactRecord::Number>({
-            ContactRecord::Number("600123452", "+48600123452", ContactNumberType ::HOME),
+            ContactRecord::Number("600123452", "+48600123452", ContactNumberType::HOME),
         });
 
         REQUIRE(records.verifyTemporary(noTemporaryContactRecord) == true);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/popups/presenter/AlarmActivatedPresenter.hpp>
@@ -8,7 +8,7 @@
 
 namespace app::popup
 {
-    AlarmActivatedPresenter ::AlarmActivatedPresenter(std::shared_ptr<AbstractAlarmModel> alarmModel)
+    AlarmActivatedPresenter::AlarmActivatedPresenter(std::shared_ptr<AbstractAlarmModel> alarmModel)
         : alarmModel{std::move(alarmModel)}
     {}
 

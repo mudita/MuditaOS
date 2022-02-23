@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapListItem.hpp"
@@ -27,7 +27,7 @@ namespace gui
 
     void PowerNapListItem::createSpinner()
     {
-        spinner = new UIntegerSpinner(UIntegerSpinner ::Range{spinnerMin, spinnerMax, spinnerStep}, Boundaries::Fixed);
+        spinner = new UIntegerSpinner(UIntegerSpinner::Range{spinnerMin, spinnerMax, spinnerStep}, Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(powerNapStyle::napPeriodFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
