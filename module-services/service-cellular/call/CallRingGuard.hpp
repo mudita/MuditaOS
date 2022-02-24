@@ -24,3 +24,11 @@ bool callRingGuard(CellularCall::Call &call);
 /// - we have this somebody phone number via CLIP URC
 /// It wont be ever called for private numbers
 bool callClipGuard(CellularCall::Call &call);
+
+/// Guard to check if we should place missed call notification
+/// This flow is when:
+/// - We are in do not disturb mode
+/// - somebody calls
+/// - we have this somebody phone number via CLIP/RING URC
+/// It wont be ever called for private numbers
+bool callDNDGuard(CellularCall::Call &call);
