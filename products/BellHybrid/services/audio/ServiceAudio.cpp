@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceAudio.hpp"
@@ -11,7 +11,7 @@
 namespace
 {
     constexpr auto stackSize            = 1024 * 4;
-    constexpr auto defaultVolume        = "5";
+    constexpr auto defaultVolume        = "7";
     constexpr auto defaultSnoozeVolume  = "4";
     constexpr auto defaultBedtimeVolume = "6";
     constexpr audio::Volume maxInVolume = 10;
