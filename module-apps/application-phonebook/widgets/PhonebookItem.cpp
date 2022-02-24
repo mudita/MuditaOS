@@ -50,7 +50,7 @@ namespace gui
     {
         if (favourite && (labelMarkerDisplayMode == LabelMarkerDisplayMode::IncludeFavourites)) {
             // If contact is favorite return proper UTF string
-            return utils::translate("app_phonebook_favourite_contacts_title");
+            return utils::translate("app_phonebook_favorite_contacts_title");
         }
         else if (!contact->alternativeName.empty()) {
             // else if return first surname contact letter

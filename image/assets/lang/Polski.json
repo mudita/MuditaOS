@@ -535,7 +535,7 @@
   "app_phonebook_contact_flag_ice": "ICE",
   "app_phonebook_contact_flag_blocked": "ZABLOKOWANY",
   "app_phonebook_ice_contacts_title": "Kontakty ICE",
-  "app_phonebook_favourite_contacts_title": "Ulubione Kontakty",
+  "app_phonebook_favorite_contacts_title": "Ulubione",
   "app_phonebook_duplicate_numbers": "<text>Ten numer jest przypisany do \n <token>$CONTACT_FORMATTED_NAME$</token>. Zastąpić?</text>",
   "app_phonebook_duplicate_speed_dial": "<text>Numer <token>$CONTACT_SPEED_DIAL$</token> jest przypisany do \n <token>$CONTACT_FORMATTED_NAME$</token>. Zastąpić?</text>",
   "app_phonebook_duplicate_speed_dial_title": "<text>Klawisz szybkiego wybierania (<token>$CONTACT_SPEED_DIAL$</token>)</text>",
