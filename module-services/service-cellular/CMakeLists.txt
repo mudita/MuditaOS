@@ -19,6 +19,7 @@ set(SOURCES
     call/CellularCall.cpp
     call/CallAudio.cpp
     call/CallGUI.cpp
+    call/CallDB.cpp
     call/CallRingGuard.cpp
     CellularServiceAPI.cpp
     CellularUrcHandler.cpp

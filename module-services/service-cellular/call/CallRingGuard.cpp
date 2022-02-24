@@ -14,3 +14,8 @@ bool callClipGuard(CellularCall::Call &call)
     return call.mode == sys::phone_modes::PhoneMode::DoNotDisturb && call.operations.areCallsFromFavouritesEnabled() &&
            call.operations.isNumberInFavourites();
 }
+
+bool callDNDGuard(CellularCall::Call &call)
+{
+    return call.mode == sys::phone_modes::PhoneMode::DoNotDisturb;
+}
