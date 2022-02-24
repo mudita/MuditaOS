@@ -527,7 +527,7 @@
   "app_phonebook_contact_flag_ice": "EMERGENCIA",
   "app_phonebook_contact_flag_blocked": "OBSTRUIDO",
   "app_phonebook_ice_contacts_title": "Contactos de emergencia",
-  "app_phonebook_favourite_contacts_title": "Contactos favoritos",
+  "app_phonebook_favorite_contacts_title": "Favoritos",
   "app_phonebook_duplicate_speed_dial": "<text>El número <token>$CONTACT_SPEED_DIAL$</token> está asignado a \n <token>$CONTACT_FORMATTED_NAME$</token>. ¿Reemplazarlo?</text>",
   "app_phonebook_duplicate_speed_dial_title": "<text>Tecla de marcación rápida (<token>$CONTACT_SPEED_DIAL$</token>)</text>",
   "app_phonebook_options_edit": "Editar contacto",

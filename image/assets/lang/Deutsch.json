@@ -526,7 +526,7 @@
   "app_phonebook_contact_flag_ice": "NOTFALL",
   "app_phonebook_contact_flag_blocked": "VERSTOPFT",
   "app_phonebook_ice_contacts_title": "ICE-Kontakte",
-  "app_phonebook_favourite_contacts_title": "Favoriten Kontakte",
+  "app_phonebook_favorite_contacts_title": "Favoriten",
   "app_phonebook_duplicate_speed_dial": "<text>Die Nummer <token>$CONTACT_SPEED_DIAL$</token> wurde \n <token>$CONTACT_FORMATTED_NAME$</token>zugewiesen. Ersetzen?</text>",
   "app_phonebook_duplicate_speed_dial_title": "<text>Kurzwahltaste (<token>$CONTACT_SPEED_DIAL$</token>)</text>",
   "app_phonebook_options_edit": "Kontakte ändern",
