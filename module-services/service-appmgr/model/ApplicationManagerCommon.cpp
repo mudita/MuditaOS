@@ -717,7 +717,6 @@ namespace app::manager
             setState(State::Running);
             EventManagerCommon::messageSetApplication(this, app.name());
             onLaunchFinished(app);
-            actionsRegistry.process();
             return true;
         }
         if (getState() == State::AwaitingLostFocusConfirmation) {
@@ -738,8 +737,8 @@ namespace app::manager
     {
         // reset startupReason to default Launch
         app.startupReason = StartupReason::Launch;
-
         if (!actionsRegistry.hasPendingAction()) {
+            actionsRegistry.process();
             return;
         }
 
@@ -755,8 +754,9 @@ namespace app::manager
             actionsRegistry.finished();
             break;
         default: {
-            auto &params = action->params;
-            app::ApplicationCommon::requestAction(this, app.name(), action->actionId, std::move(params));
+            // IMO this is not neccessary! Commenting for now:
+            // auto &params = action->params;
+            // app::ApplicationCommon::requestAction(this, app.name(), action->actionId, std::move(params));
             break;
         }
         }
