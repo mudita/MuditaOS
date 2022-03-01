@@ -8,7 +8,7 @@ namespace gui
     Label::Label(Item *parent, Position x, Position y, Length w, Length h, const UTF8 &inputText)
         : TextFixedSize(parent, x, y, w, h)
     {
-        setEditMode(EditMode::Browse);
+        setEditMode(EditMode::Print);
         setCursorStartPosition(CursorStartPosition::DocumentBegin);
         setTextType(TextType::SingleLine);
         drawUnderline(false);
