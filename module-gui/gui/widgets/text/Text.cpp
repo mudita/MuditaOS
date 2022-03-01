@@ -570,6 +570,10 @@ namespace gui
             return false;
         }
 
+        if (isMode(EditMode::Print)) {
+            return false;
+        }
+
         if (isMode(EditMode::Scroll) && textType == TextType::MultiLine) {
 
             debug_text("Text in scroll mode ignores left/right navigation");

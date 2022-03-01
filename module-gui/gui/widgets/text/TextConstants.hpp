@@ -50,9 +50,10 @@ namespace gui
 
     enum class EditMode
     {
-        Browse,
-        Edit,
-        Scroll,
+        Print,  /// <- Text in only printed, no navigation, no scrolling, no cursor visible.
+        Browse, /// <- Text is printed with navigation enabled, without edit, scrolling and cursor not visible.
+        Scroll, /// <- Text is printed with navigation and scroll enabled, without edit and cursor not visible.
+        Edit,   /// <- Text is printed with navigation, scroll, cursor visible and edit.
     };
 
     enum class TextType
