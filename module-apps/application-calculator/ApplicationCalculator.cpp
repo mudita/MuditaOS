@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-calculator/ApplicationCalculator.hpp>
@@ -39,6 +39,7 @@ namespace app
 
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
+                      gui::popup::ID::BluetoothAuthenticate,
                       gui::popup::ID::PhoneModes,
                       gui::popup::ID::PhoneLock,
                       gui::popup::ID::Alarm});

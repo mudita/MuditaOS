@@ -15,7 +15,6 @@
 #include <application-settings/windows/bluetooth/AddDeviceWindow.hpp>
 #include <application-settings/windows/bluetooth/AllDevicesWindow.hpp>
 #include <application-settings/windows/bluetooth/PhoneNameWindow.hpp>
-#include <application-settings/windows/bluetooth/BluetoothCheckPasskeyWindow.hpp>
 #include <application-settings/windows/network/NetworkWindow.hpp>
 #include <application-settings/windows/network/SimPINSettingsWindow.hpp>
 #include <application-settings/windows/network/SimCardsWindow.hpp>
@@ -70,7 +69,6 @@
 #include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
 #include <service-bluetooth/messages/InitializationResult.hpp>
-#include <service-bluetooth/messages/Passkey.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
@@ -208,26 +206,6 @@ namespace app
                 }
                 switchWindow(gui::window::name::add_device, std::move(visibleDevicesData));
             }
-            return sys::MessageNone{};
-        });
-
-        connect(typeid(BluetoothPairResultMessage), [&](sys::Message *msg) {
-            auto bluetoothPairResultMsg = static_cast<BluetoothPairResultMessage *>(msg);
-            auto device                 = bluetoothPairResultMsg->getDevice();
-            if (bluetoothPairResultMsg->isSucceed()) {
-                return sys::MessageNone{};
-            }
-            auto message = std::make_shared<BluetoothPairMessage>(device);
-
-            switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_pairing_error_message");
-
-            return sys::MessageNone{};
-        });
-
-        connect(typeid(::message::bluetooth::RequestPasskey), [&](sys::Message *msg) {
-            auto m                               = dynamic_cast<::message::bluetooth::RequestPasskey *>(msg);
-            bluetoothSettingsModel->pinRequestor = m->getDevice();
-            switchWindow(gui::window::name::bluetooth_check_passkey);
             return sys::MessageNone{};
         });
 
@@ -397,10 +375,6 @@ namespace app
         windowsFactory.attach(gui::window::name::phone_name, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhoneNameWindow>(app, bluetoothSettingsModel);
         });
-        windowsFactory.attach(
-            gui::window::name::bluetooth_check_passkey, [this](ApplicationCommon *app, const std::string &name) {
-                return std::make_unique<gui::BluetoothCheckPasskeyWindow>(app, bluetoothSettingsModel);
-            });
 
         // Network
         windowsFactory.attach(gui::window::name::network, [](ApplicationCommon *app, const std::string &name) {
@@ -563,6 +537,7 @@ namespace app
 
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
+                      gui::popup::ID::BluetoothAuthenticate,
                       gui::popup::ID::PhoneModes,
                       gui::popup::ID::PhoneLock,
                       gui::popup::ID::SimLock,

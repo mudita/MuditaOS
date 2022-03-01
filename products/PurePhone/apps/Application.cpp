@@ -7,6 +7,8 @@
 #include <popups/HomeModesWindow.hpp>
 #include <popups/TetheringPhoneModePopup.hpp>
 #include <popups/TetheringConfirmationPopup.hpp>
+#include <popups/BluetoothAuthenticatePopup.hpp>
+#include <popups/BluetoothInfoPopup.hpp>
 #include <popups/PowerOffWindow.hpp>
 #include <popups/presenter/PowerOffPresenter.hpp>
 #include <popups/presenter/WallpaperPresenter.hpp>
@@ -58,6 +60,16 @@ namespace app
             case ID::PhoneModes:
                 windowsFactory.attach(window::phone_modes_window, [](ApplicationCommon *app, const std::string &name) {
                     return std::make_unique<gui::HomeModesWindow>(app, window::phone_modes_window);
+                });
+                break;
+            case ID::BluetoothAuthenticate:
+            case ID::BluetoothInfo:
+                windowsFactory.attach(
+                    window::bluetooth_authenticate, [](ApplicationCommon *app, const std::string &name) {
+                        return std::make_unique<gui::BluetoothAuthenticatePopup>(app, window::bluetooth_authenticate);
+                    });
+                windowsFactory.attach(window::bluetooth_info, [](ApplicationCommon *app, const std::string &name) {
+                    return std::make_unique<gui::BluetoothInfoPopup>(app, window::bluetooth_info);
                 });
                 break;
             case ID::Brightness:

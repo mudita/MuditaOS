@@ -8,6 +8,7 @@
 
 #include <PhoneModes/Common.hpp>
 #include <module-audio/Audio/AudioCommon.hpp>
+#include <service-bluetooth/messages/Authenticate.hpp>
 #include <locks/widgets/Lock.hpp>
 #include <locks/data/LockData.hpp>
 
@@ -83,6 +84,55 @@ namespace gui
 
       private:
         sys::phone_modes::PhoneMode phoneMode;
+    };
+
+    class BluetoothAuthenticateRequestParams : public PopupRequestParams
+    {
+      private:
+        Devicei device;
+        bluetooth::AuthenticateType type;
+
+      public:
+        explicit BluetoothAuthenticateRequestParams(const Devicei &dev, bluetooth::AuthenticateType type)
+            : PopupRequestParams{gui::popup::ID::BluetoothAuthenticate}, device{dev}, type{type}
+        {}
+
+        [[nodiscard]] auto getDevice() const noexcept
+        {
+            return device;
+        }
+
+        [[nodiscard]] auto getAuthenticateType() const noexcept
+        {
+            return type;
+        }
+    };
+
+    class BluetoothInfoParams : public PopupRequestParams
+    {
+      private:
+        Devicei device;
+        bool succeed;
+        std::string errorCode;
+
+      public:
+        explicit BluetoothInfoParams(const Devicei &dev, bool succeed, std::string errorCode = "")
+            : PopupRequestParams{gui::popup::ID::BluetoothInfo}, device{dev}, succeed{succeed}, errorCode{errorCode}
+        {}
+
+        [[nodiscard]] auto getDevice() const noexcept
+        {
+            return device;
+        }
+
+        [[nodiscard]] auto isSucceed() const noexcept -> bool
+        {
+            return succeed;
+        }
+        [[nodiscard]] auto getErrorCode() const noexcept -> std::string
+        {
+            return errorCode;
+        }
     };
 
     class VolumePopupRequestParams : public PopupRequestParams

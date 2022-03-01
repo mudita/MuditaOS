@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothSettingsModel.hpp"
@@ -10,7 +10,7 @@
 #include <service-bluetooth/messages/Disconnect.hpp>
 #include <service-bluetooth/messages/SetStatus.hpp>
 #include <service-bluetooth/messages/SetDeviceName.hpp>
-#include <service-bluetooth/messages/Passkey.hpp>
+#include <service-bluetooth/messages/Authenticate.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
 #include <service-bluetooth/messages/SyncDevices.hpp>
 
@@ -66,12 +66,6 @@ void BluetoothSettingsModel::requestDevicePair(const Devicei &device)
 void BluetoothSettingsModel::requestDeviceUnpair(const Devicei &device)
 {
     service->bus.sendUnicast(std::make_shared<message::bluetooth::Unpair>(device), service::name::bluetooth);
-}
-
-void BluetoothSettingsModel::responsePasskey(const std::string &passkey)
-{
-    service->bus.sendUnicast(std::make_shared<message::bluetooth::ResponsePasskey>(passkey, pinRequestor),
-                             service::name::bluetooth);
 }
 
 void BluetoothSettingsModel::requestConnection(const Devicei &device)

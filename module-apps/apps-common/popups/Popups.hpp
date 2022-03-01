@@ -16,6 +16,8 @@ namespace gui
             Brightness,
             Tethering,
             TetheringPhoneModeChangeProhibited,
+            BluetoothAuthenticate,
+            BluetoothInfo,
             PhoneLock,
             PhoneLockInput,
             PhoneLockInfo,
@@ -40,6 +42,8 @@ namespace gui
             inline constexpr auto tethering_confirmation_window     = "TetheringConfirmationPopup";
             inline constexpr auto tethering_phonemode_change_window = "TetheringPhoneModeChangeProhibitedPopup";
             inline constexpr auto tethering_off_window              = "TetheringOffPopup";
+            inline constexpr auto bluetooth_authenticate            = "BluetoothAuthenticatePopup";
+            inline constexpr auto bluetooth_info                    = "BluetoothInfoPopup";
             inline constexpr auto phone_lock_window                 = "PhoneLockPopup";
             inline constexpr auto phone_lock_info_window            = "PhoneLockInfoPopup";
             inline constexpr auto phone_lock_input_window           = "PhoneLockInputPopup";

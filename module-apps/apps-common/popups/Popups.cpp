@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Popups.hpp"
@@ -20,6 +20,10 @@ namespace gui::popup
             return gui::popup::window::tethering_confirmation_window;
         case ID::TetheringPhoneModeChangeProhibited:
             return gui::popup::window::tethering_phonemode_change_window;
+        case ID::BluetoothAuthenticate:
+            return gui::popup::window::bluetooth_authenticate;
+        case ID::BluetoothInfo:
+            return gui::popup::window::bluetooth_info;
         case ID::PhoneLock:
             return gui::popup::window::phone_lock_window;
         case ID::PhoneLockInput:

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,7 +17,6 @@ namespace gui::window::name
     inline constexpr auto all_devices             = "AllDevices";
     inline constexpr auto phone_name              = "PhoneName";
     inline constexpr auto add_device              = "AddDevice";
-    inline constexpr auto bluetooth_check_passkey = "BluetoothCheckPasskey";
 
     inline constexpr auto network          = "Network";
     inline constexpr auto sim_cards        = "SimCards";
