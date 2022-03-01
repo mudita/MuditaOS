@@ -18,6 +18,7 @@
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 #include <service-appmgr/messages/GetWallpaperOptionRequest.hpp>
 #include <service-bluetooth/messages/BluetoothModeChanged.hpp>
+#include <service-bluetooth/messages/Authenticate.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
@@ -351,6 +352,29 @@ namespace app::manager
             auto data = static_cast<sys::bluetooth::BluetoothModeChanged *>(request);
             handleBluetoothModeChanged(data->getBluetoothMode());
             return sys::msgHandled();
+        });
+        connect(typeid(message::bluetooth::RequestAuthenticate), [&](sys::Message *msg) {
+            auto m = dynamic_cast<::message::bluetooth::RequestAuthenticate *>(msg);
+
+            auto data =
+                std::make_unique<gui::BluetoothAuthenticateRequestParams>(m->getDevice(), m->getAuthenticateType());
+            data->setDisposition(gui::popup::Disposition{gui::popup::Disposition::Priority::High,
+                                                         gui::popup::Disposition::WindowType::Popup,
+                                                         gui::popup::ID::BluetoothAuthenticate});
+            actionsRegistry.enqueue(ActionEntry{actions::ShowPopup, std::move(data)});
+
+            return sys::MessageNone{};
+        });
+        connect(typeid(BluetoothPairResultMessage), [&](sys::Message *msg) {
+            auto m = dynamic_cast<BluetoothPairResultMessage *>(msg);
+
+            auto data = std::make_unique<gui::BluetoothInfoParams>(m->getDevice(), m->isSucceed(), m->getErrorCode());
+            data->setDisposition(gui::popup::Disposition{gui::popup::Disposition::Priority::High,
+                                                         gui::popup::Disposition::WindowType::Popup,
+                                                         gui::popup::ID::BluetoothInfo});
+            actionsRegistry.enqueue(ActionEntry{actions::ShowPopup, std::move(data)});
+
+            return sys::MessageNone{};
         });
 
         alarms::AlarmServiceAPI::requestRegisterSnoozedAlarmsCountChangeCallback(this);

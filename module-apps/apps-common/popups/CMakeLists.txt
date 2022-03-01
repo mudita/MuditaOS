@@ -15,6 +15,8 @@ target_sources(apps-common
 		TetheringNotificationPopup.cpp
 		TetheringPhoneModePopup.cpp
 		TetheringOffPopup.cpp
+		BluetoothAuthenticatePopup.cpp
+		BluetoothInfoPopup.cpp
 		VolumeWindow.cpp
 		WindowWithTimer.cpp
 		lock-popups/PhoneLockedInfoWindow.cpp
@@ -41,6 +43,8 @@ target_sources(apps-common
 		TetheringConfirmationPopup.hpp
 		TetheringNotificationPopup.hpp
 		TetheringPhoneModePopup.hpp
+		BluetoothAuthenticatePopup.hpp
+		BluetoothInfoPopup.hpp
 		VolumeWindow.hpp
 		WindowWithTimer.hpp
 		data/PopupData.hpp

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -50,8 +50,9 @@ class BluetoothMessage : public sys::DataMessage
 class BluetoothPairResultMessage : public sys::DataMessage
 {
   public:
-    explicit BluetoothPairResultMessage(const Devicei device, bool succeed)
-        : sys::DataMessage(MessageType::BluetoothPairResult), device(device), succeed(succeed)
+    explicit BluetoothPairResultMessage(const Devicei &device, bool succeed, std::string errorCode = "")
+        : sys::DataMessage(MessageType::BluetoothPairResult), device(device), succeed(succeed),
+          errorCode(std::move(errorCode))
     {}
     [[nodiscard]] auto getDevice() const -> Devicei
     {
@@ -61,10 +62,15 @@ class BluetoothPairResultMessage : public sys::DataMessage
     {
         return succeed;
     }
+    [[nodiscard]] auto getErrorCode() const noexcept -> std::string
+    {
+        return errorCode;
+    }
 
   private:
     Devicei device;
     bool succeed;
+    std::string errorCode;
 };
 
 class BluetoothAddrMessage : public sys::DataMessage
