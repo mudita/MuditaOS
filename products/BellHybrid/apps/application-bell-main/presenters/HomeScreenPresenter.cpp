@@ -112,7 +112,7 @@ namespace app::home_screen
 
     void HomeScreenPresenter::stopSnoozeTimer()
     {
-        snoozeTimer->start();
+        snoozeTimer->stop();
     }
 
     void HomeScreenPresenter::restartSnoozeTimer(std::chrono::seconds snoozeDuration)
