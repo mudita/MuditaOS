@@ -43,6 +43,11 @@ namespace app::music_player
                           str(retCode).c_str(),
                           token.IsValid());
                 refreshView();
+                auto nextSongToPlay = songsModelInterface->getNextFilePath(filePath);
+                if (nextSongToPlay.empty()) {
+                    return;
+                }
+                play(nextSongToPlay);
                 return;
             }
 
