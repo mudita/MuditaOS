@@ -4,6 +4,7 @@
 #pragma once
 
 #include <endpoints/Endpoint.hpp>
+#include <endpoints/deviceInfo/DeviceInfoEndpointCommon.hpp>
 
 #include <Service/Service.hpp>
 
@@ -12,33 +13,17 @@
 
 namespace sdesktop::endpoints
 {
-    class DeviceInfoEndpoint : public Endpoint
+    class DeviceInfoEndpoint : public DeviceInfoEndpointCommon
     {
       public:
-        enum class DiagnosticFileType
-        {
-            Logs,
-            CrashDumps
-        };
+        explicit DeviceInfoEndpoint(sys::Service *ownerServicePtr) : DeviceInfoEndpointCommon(ownerServicePtr)
+        {}
+
         auto getSerialNumber() -> std::string;
         auto getCaseColour() -> std::string;
-        auto handleGet(Context &context) -> void;
-        auto gatherListOfDiagnostics(Context &context, DiagnosticFileType diagDataType) -> void;
-        auto listDirectory(std::string path) -> std::vector<std::string>;
-        auto fileListToJsonObject(const std::vector<std::string> &fileList) const -> json11::Json::object const;
-        auto requestLogsFlush() const -> void;
-        auto getStorageStats(const std::string &path) -> std::tuple<long, long>;
         auto getDeviceToken() -> std::string;
 
-        static constexpr auto OS_RESERVED_SPACE_IN_MB = (1024LU);
-
-      public:
-        explicit DeviceInfoEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
-        {
-            debugName = "DeviceInfoEndpoint";
-        }
-        auto handle(Context &context) -> void override;
-        auto getDeviceInfo(Context &context) -> bool;
+        auto getDeviceInfo(Context &context) -> http::Code override;
     };
 
 } // namespace sdesktop::endpoints

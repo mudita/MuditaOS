@@ -4,28 +4,17 @@
 #pragma once
 
 #include <endpoints/Endpoint.hpp>
-
-#include <Service/Service.hpp>
-
-#include <string>
+#include <endpoints/deviceInfo/DeviceInfoEndpointCommon.hpp>
 
 namespace sdesktop::endpoints
 {
-
-    class DeviceInfoEndpoint : public Endpoint
+    class DeviceInfoEndpoint : public DeviceInfoEndpointCommon
     {
-        auto getSerialNumber() -> std::string;
-        auto getStorageStats(const std::string &path) -> std::tuple<long, long>;
-
-        static constexpr auto OS_RESERVED_SPACE_IN_MB = (1024LU);
-
       public:
-        explicit DeviceInfoEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
-        {
-            debugName = "DeviceInfoEndpoint";
-        }
-        auto handle(Context &context) -> void override;
-        auto getDeviceInfo(Context &context) -> bool;
+        explicit DeviceInfoEndpoint(sys::Service *ownerServicePtr) : DeviceInfoEndpointCommon(ownerServicePtr)
+        {}
+
+        auto getDeviceInfo(Context &context) -> http::Code override;
     };
 
 } // namespace sdesktop::endpoints

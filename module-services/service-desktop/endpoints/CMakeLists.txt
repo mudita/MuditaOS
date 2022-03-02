@@ -50,6 +50,7 @@ target_sources(
         developerMode/Mode/UI_Helper.cpp
         developerMode/event/ATRequest.cpp
         developerMode/event/DomRequest.cpp
+        deviceInfo/DeviceInfoEndpointCommon.cpp
         factoryReset/FactoryResetEndpoint.cpp
         filesystem/FileContext.cpp
         filesystem/FileOperations.cpp
@@ -74,6 +75,7 @@ target_sources(
         include/endpoints/developerMode/Mode/UI_Helper.hpp
         include/endpoints/developerMode/event/ATRequest.hpp
         include/endpoints/developerMode/event/DomRequest.hpp
+        include/endpoints/deviceInfo/DeviceInfoEndpointCommon.hpp
         include/endpoints/factoryReset/FactoryResetEndpoint.hpp
         include/endpoints/filesystem/FileContext.hpp
         include/endpoints/filesystem/FileOperations.hpp
