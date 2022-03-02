@@ -7,11 +7,21 @@ import os
 import atexit
 
 from harness.harness import Harness
+from harness.request import TransactionError
 from harness.interface.error import TestError, Error
+from harness.interface.defs import status
 from harness.api.developermode import PhoneModeLock
+from harness.api.security import GetPhoneLockStatus
 from harness.api.filesystem import get_log_file, get_log_file_with_path
 from harness.api.device_info import *
 
+def is_phone_locked(harness: Harness):
+    try:
+        GetPhoneLockStatus().run(harness)
+    except TransactionError as error:
+        return error.status == status["Forbidden"]
+    else:
+        return False
 
 def set_passcode(harness: Harness, flag: bool):
     '''
@@ -47,8 +57,10 @@ def main():
 
     harness = Harness.from_detect()
 
-    atexit.register(set_passcode, harness, True)
-    set_passcode(harness, False)
+    if is_phone_locked(harness):
+        atexit.register(set_passcode, harness, True)
+        set_passcode(harness, False)
+
     get_log_files(harness, DiagnosticsFileList.LOGS, log_save_dir)
     get_log_files(harness, DiagnosticsFileList.CRASH_DUMPS, log_save_dir)
     exit(0)
