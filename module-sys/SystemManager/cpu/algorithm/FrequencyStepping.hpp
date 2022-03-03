@@ -6,21 +6,24 @@
 #include "Algorithm.hpp"
 #include "lpm/PowerProfile.hpp"
 
-namespace sys {
+namespace sys
+{
     class CpuGovernor;
 }
 
 namespace sys::cpu
 {
-    class FrequencyStepping : public Algorithm {
-            const bsp::PowerProfile &powerProfile;
-            CpuGovernor &cpuGovernor;
-            unsigned int aboveThresholdCounter = 0;
-            unsigned int belowThresholdCounter = 0;
-            bool isFrequencyLoweringInProgress = true;
-        public:
-            FrequencyStepping(const bsp::PowerProfile&powerProfile, CpuGovernor &cpuGovernor);
-            [[nodiscard]] bsp::CpuFrequencyMHz calculateImplementation(const AlgorithmData&data) override;
-            void resetImplementation() override;
+    class FrequencyStepping : public Algorithm
+    {
+        const bsp::PowerProfile &powerProfile;
+        CpuGovernor &cpuGovernor;
+        unsigned int aboveThresholdCounter = 0;
+        unsigned int belowThresholdCounter = 0;
+        bool isFrequencyLoweringInProgress = true;
+
+      public:
+        FrequencyStepping(const bsp::PowerProfile &powerProfile, CpuGovernor &cpuGovernor);
+        [[nodiscard]] bsp::CpuFrequencyMHz calculateImplementation(const AlgorithmData &data) override;
+        void resetImplementation() override;
     };
-}
+} // namespace sys::cpu

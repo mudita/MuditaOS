@@ -23,7 +23,7 @@ namespace bsp
 
     RT1051LPM::RT1051LPM()
     {
-        driverSEMC      = drivers::DriverSEMC::Create(drivers::name::ExternalRAM);
+        driverSEMC = drivers::DriverSEMC::Create(drivers::name::ExternalRAM);
         gpio_1 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::POWER_SWITCH_HOLD_GPIO),
                                     DriverGPIOParams{});
         gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::DCDC_INVERTER_MODE_GPIO),
@@ -74,8 +74,10 @@ namespace bsp
         return 0;
     }
 
-    enum class Change {
-        Up, Down
+    enum class Change
+    {
+        Up,
+        Down
     };
 
     CpuFrequencyMHz RT1051LPM::onChangeUp(CpuFrequencyMHz freq, bsp::CpuFrequencyMHz newFrequency)
@@ -123,7 +125,7 @@ namespace bsp
 
     void RT1051LPM::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
     {
-        if ( currentFrequency == freq ) {
+        if (currentFrequency == freq) {
             return;
         }
         Change change = currentFrequency < freq ? Change::Up : Change::Down;

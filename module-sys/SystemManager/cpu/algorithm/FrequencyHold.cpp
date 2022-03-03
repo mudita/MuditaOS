@@ -10,8 +10,8 @@ namespace sys::cpu
         : toHold(toHold), profile(profile)
     {}
 
-    bsp::CpuFrequencyMHz FrequencyHold::calculateImplementation(const AlgorithmData&data)
+    bsp::CpuFrequencyMHz FrequencyHold::calculateImplementation(const AlgorithmData &data)
     {
         return std::max(toHold, profile.minimalFrequency);
     }
-};
+}; // namespace sys::cpu

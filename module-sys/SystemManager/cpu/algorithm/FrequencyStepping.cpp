@@ -32,18 +32,17 @@ namespace sys::cpu
         return freq;
     }
 
-    bsp::CpuFrequencyMHz  FrequencyStepping::calculateImplementation(const AlgorithmData&data)
+    bsp::CpuFrequencyMHz FrequencyStepping::calculateImplementation(const AlgorithmData &data)
     {
-        auto load           = data.CPUload;
-        auto startFrequency = data.curentFrequency;
-        const auto min      = cpuGovernor.GetMinimumFrequencyRequested();
+        const auto load           = data.CPUload;
+        const auto startFrequency = data.curentFrequency;
+        const auto min            = cpuGovernor.GetMinimumFrequencyRequested();
 
         if (load > powerProfile.frequencyShiftUpperThreshold && startFrequency < bsp::CpuFrequencyMHz::Level_6) {
             aboveThresholdCounter++;
             belowThresholdCounter = 0;
         }
-        else if (load < powerProfile.frequencyShiftLowerThreshold &&
-                 startFrequency > powerProfile.minimalFrequency) {
+        else if (load < powerProfile.frequencyShiftLowerThreshold && startFrequency > powerProfile.minimalFrequency) {
             belowThresholdCounter++;
             aboveThresholdCounter = 0;
         }
@@ -83,4 +82,4 @@ namespace sys::cpu
         aboveThresholdCounter = 0;
         belowThresholdCounter = 0;
     }
-}
+} // namespace sys::cpu

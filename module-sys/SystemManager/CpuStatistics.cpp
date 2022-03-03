@@ -21,11 +21,12 @@ namespace sys
 #if PROF_ON
         data_size = prof_pool_get_data().size;
         data      = new task_prof_data[data_size];
-#endif
+        printer   = std::make_unique<cpu::stats::PackPrinter>();
+#else
         // to change printer change assignment
         // printer = std::make_unique<cpu::stats::LogPrinter>();
-        printer = std::make_unique<cpu::stats::PackPrinter>();
-        // printer = std::make_unique<cpu::stats::NullPrinter>();
+        printer = std::make_unique<cpu::stats::NullPrinter>();
+#endif
     }
 
     CpuStatistics::~CpuStatistics()

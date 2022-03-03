@@ -17,7 +17,7 @@ namespace sys::cpu
           public:
             virtual void printSysUsage(struct task_prof_data *data, size_t size) = 0;
             virtual void printCPUChange(const cpu::UpdateResult &ret)            = 0;
-            virtual void printPowerConsumption()     = 0;
+            virtual void printPowerConsumption()                                 = 0;
         };
 
         class NullPrinter : public Printer
@@ -26,7 +26,8 @@ namespace sys::cpu
             {}
             void printCPUChange(const cpu::UpdateResult &ret)
             {}
-            void printPowerConsumption() {}
+            void printPowerConsumption()
+            {}
         };
 
         class LogPrinter : public Printer

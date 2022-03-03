@@ -8,11 +8,13 @@
 
 namespace sys::cpu
 {
-    class FrequencyHold : public Algorithm {
-            bsp::CpuFrequencyMHz toHold;
-            const bsp::PowerProfile &profile;
-            [[nodiscard]] bsp::CpuFrequencyMHz calculateImplementation(const AlgorithmData& data) override;
-        public:
-          explicit FrequencyHold(bsp::CpuFrequencyMHz toHold, const bsp::PowerProfile &profile);
+    class FrequencyHold : public Algorithm
+    {
+        bsp::CpuFrequencyMHz toHold;
+        const bsp::PowerProfile &profile;
+        [[nodiscard]] bsp::CpuFrequencyMHz calculateImplementation(const AlgorithmData &data) override;
+
+      public:
+        explicit FrequencyHold(bsp::CpuFrequencyMHz toHold, const bsp::PowerProfile &profile);
     };
-}
+} // namespace sys::cpu

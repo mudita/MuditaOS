@@ -39,7 +39,6 @@ namespace sys
         totalTicksCount += ticks;
     }
 
-
     PowerManager::PowerManager(CpuStatistics &stats) : powerProfile{bsp::getPowerProfile()}, cpuStatistics(stats)
     {
         driverSEMC      = drivers::DriverSEMC::Create(drivers::name::ExternalRAM);
@@ -90,16 +89,17 @@ namespace sys
 
     [[nodiscard]] cpu::UpdateResult PowerManager::UpdateCpuFrequency()
     {
-        uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad(); 
+        uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
         cpu::UpdateResult result;
-        cpu::AlgorithmData data {cpuLoad,lowPowerControl->GetCurrentFrequencyLevel(), cpuGovernor->GetMinimumFrequencyRequested()};
+        cpu::AlgorithmData data{
+            cpuLoad, lowPowerControl->GetCurrentFrequencyLevel(), cpuGovernor->GetMinimumFrequencyRequested()};
 
         auto _ = gsl::finally([&result, this, data] {
             result.frequencySet = lowPowerControl->GetCurrentFrequencyLevel();
-            result.changed      = result.frequencySet > data.curentFrequency   ? sys::cpu::UpdateResult::Result::UpScaled
+            result.changed      = result.frequencySet > data.curentFrequency ? sys::cpu::UpdateResult::Result::UpScaled
                                   : result.frequencySet < data.curentFrequency ? sys::cpu::UpdateResult::Result::Downscaled
-                                                                         : sys::cpu::UpdateResult::Result::NoChange;
-            result.data = data.sentinel;
+                                                                               : sys::cpu::UpdateResult::Result::NoChange;
+            result.data         = data.sentinel;
         });
 
         auto algorithms = {
@@ -139,9 +139,6 @@ namespace sys
     void PowerManager::SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request)
     {
         cpuGovernor->SetCpuFrequencyRequest(sentinelName, request);
-        // TODO:
-        // - move other UpdateCpuFrequency usages too
-        // - if it's ok to trigger algorithms on leave?
         auto ret = UpdateCpuFrequency();
         cpuStatistics.TrackChange(ret);
     }
@@ -149,7 +146,6 @@ namespace sys
     void PowerManager::ResetCpuFrequencyRequest(const std::string &sentinelName)
     {
         cpuGovernor->ResetCpuFrequencyRequest(sentinelName);
-        //  TODO - same as above
         auto ret = UpdateCpuFrequency();
         cpuStatistics.TrackChange(ret);
     }
@@ -161,7 +157,8 @@ namespace sys
 
     void PowerManager::SetPernamentFrequency(bsp::CpuFrequencyMHz freq)
     {
-        cpuAlgorithms->emplace(sys::cpu::AlgoID::FrequencyHold, std::make_unique<sys::cpu::FrequencyHold>(freq,powerProfile));
+        cpuAlgorithms->emplace(sys::cpu::AlgoID::FrequencyHold,
+                               std::make_unique<sys::cpu::FrequencyHold>(freq, powerProfile));
     }
 
     void PowerManager::ResetPernamentFrequency()
@@ -171,8 +168,8 @@ namespace sys
 
     void PowerManager::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
     {
-       UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
-        while ( lowPowerControl->GetCurrentFrequencyLevel() != freq ) {
+        UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
+        while (lowPowerControl->GetCurrentFrequencyLevel() != freq) {
             lowPowerControl->SetCpuFrequency(freq);
             cpuGovernor->InformSentinelsAboutCpuFrequencyChange(freq);
         }

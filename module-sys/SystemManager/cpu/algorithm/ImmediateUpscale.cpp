@@ -5,10 +5,10 @@
 
 namespace sys::cpu
 {
-    bsp::CpuFrequencyMHz ImmediateUpscale::calculateImplementation(const AlgorithmData&data)
+    bsp::CpuFrequencyMHz ImmediateUpscale::calculateImplementation(const AlgorithmData &data)
     {
-        auto now = data.sentinel.frequency;
-        auto was = data.curentFrequency; 
-        return std::max(now,was);
+        const auto now = data.sentinel.frequency;
+        const auto was = data.curentFrequency;
+        return std::max(now, was);
     }
 } // namespace sys::cpu

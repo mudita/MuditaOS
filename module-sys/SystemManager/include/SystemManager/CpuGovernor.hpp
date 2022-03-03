@@ -40,10 +40,8 @@ namespace sys
         [[nodiscard]] auto GetNumberOfRegisteredSentinels() const noexcept -> uint32_t;
         void PrintAllSentinels() const noexcept;
 
-        void SetCpuFrequencyRequest(const std::string& sentinelName,
-                                    bsp::CpuFrequencyMHz request
-                                    );
-        void ResetCpuFrequencyRequest(const std::string& sentinelName);
+        void SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request);
+        void ResetCpuFrequencyRequest(const std::string &sentinelName);
 
         [[nodiscard]] auto GetMinimumFrequencyRequested() const noexcept -> sentinel::View;
         void InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) const noexcept;
