@@ -29,8 +29,6 @@ namespace sys
         void HoldMinimumFrequency(bsp::CpuFrequencyMHz frequencyToHold);
         void ReleaseMinimumFrequency();
 
-        // TODO actually sentinel provides api here so i.e. in case of irq is useless
-        void HoldFrequencyPermanently(bsp::CpuFrequencyMHz frequencyToHold);
         [[nodiscard]] auto GetFrequency() const noexcept -> bsp::CpuFrequencyMHz;
 
         void CpuFrequencyHasChanged(bsp::CpuFrequencyMHz newFrequency);

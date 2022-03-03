@@ -22,19 +22,17 @@ namespace sys::cpu::stats
 
     void PackPrinter::printSysUsage(struct task_prof_data *data, size_t size)
     {
-        MsgPack procEnd = MsgPack::object({{"id",uint8_t(PackID::ProcEnd)}});
+        MsgPack procEnd = MsgPack::object({{"id", uint8_t(PackID::ProcEnd)}});
         vTaskSuspendAll();
         {
             for (size_t i = 0; i < size; ++i) {
                 if (data[i].exec_time == 0 && data[i].switches == 0) {
                     continue;
                 }
-                MsgPack obj = MsgPack::object{
-                    {"name", SystemManagerCommon::ServiceProcessor(i)},
-                    {"tcb", uint16_t(data[i].task_TCB_id)},
-                    {"time", data[i].exec_time},
-                    {"id", uint8_t(PackID::Proc)}
-                };
+                MsgPack obj = MsgPack::object{{"name", SystemManagerCommon::ServiceProcessor(i)},
+                                              {"tcb", uint16_t(data[i].task_TCB_id)},
+                                              {"time", data[i].exec_time},
+                                              {"id", uint8_t(PackID::Proc)}};
 
                 LOG_PRINTF("\n%c%s\n", 2, obj.dump().c_str());
             }
@@ -50,21 +48,18 @@ namespace sys::cpu::stats
                                       {"name", ret.data.name},
                                       {"reason", ret.data.reason},
                                       {"requested", uint32_t(ret.data.frequency)},
-                                      {"avgA" , int32_t(bsp::battery_charger::getAvgCurrent())},
-                                      {"nowA" , int32_t(bsp::battery_charger::getCurrentMeasurement())},
-                                      {"ts", static_cast<uint64_t>(utils::time::getCurrentTimestamp().getTime())}
-        };
-        LOG_PRINTF("\n%c%s\n",2, obj.dump().c_str());
+                                      {"avgA", int32_t(bsp::battery_charger::getAvgCurrent())},
+                                      {"nowA", int32_t(bsp::battery_charger::getCurrentMeasurement())},
+                                      {"ts", static_cast<uint64_t>(utils::time::getCurrentTimestamp().getTime())}};
+        LOG_PRINTF("\n%c%s\n", 2, obj.dump().c_str());
     }
-
 
     void PackPrinter::printPowerConsumption()
     {
         MsgPack obj = MsgPack::object{{"id", uint8_t(PackID::Power)},
-                                      {"avgA" , int32_t(bsp::battery_charger::getAvgCurrent())},
-                                      {"nowA" , int32_t(bsp::battery_charger::getCurrentMeasurement())},
-                                      {"ts", static_cast<uint64_t>(utils::time::getCurrentTimestamp().getTime())}
-        };
-        LOG_PRINTF("\n%c%s\n",2, obj.dump().c_str());
+                                      {"avgA", int32_t(bsp::battery_charger::getAvgCurrent())},
+                                      {"nowA", int32_t(bsp::battery_charger::getCurrentMeasurement())},
+                                      {"ts", static_cast<uint64_t>(utils::time::getCurrentTimestamp().getTime())}};
+        LOG_PRINTF("\n%c%s\n", 2, obj.dump().c_str());
     }
 } // namespace sys::cpu::stats

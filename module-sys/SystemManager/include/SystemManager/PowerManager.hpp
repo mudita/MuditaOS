@@ -39,7 +39,7 @@ namespace sys
     class PowerManager
     {
       public:
-        explicit PowerManager(CpuStatistics& stats);
+        explicit PowerManager(CpuStatistics &stats);
         ~PowerManager();
 
         int32_t PowerOff();
@@ -84,7 +84,7 @@ namespace sys
         const bsp::PowerProfile powerProfile;
 
         std::unique_ptr<sys::cpu::AlgorithmFactory> cpuAlgorithms;
-        CpuStatistics& cpuStatistics;
+        CpuStatistics &cpuStatistics;
     };
 
 } // namespace sys

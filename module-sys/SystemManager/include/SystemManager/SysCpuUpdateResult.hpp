@@ -10,12 +10,13 @@ namespace sys::cpu
 {
     struct UpdateResult
     {
-        enum class Result {
+        enum class Result
+        {
             UpScaled,   /// frequency risen
             Downscaled, /// frequency downscaled
             NoChange    /// nothing to do
         };
-        Result changed                      = Result::NoChange;
+        Result changed                    = Result::NoChange;
         bsp::CpuFrequencyMHz frequencySet = bsp::CpuFrequencyMHz::Level_0;
         sentinel::View data{};
         AlgoID id = AlgoID::None;

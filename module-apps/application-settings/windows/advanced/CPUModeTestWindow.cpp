@@ -132,23 +132,26 @@ namespace gui
 
         permanentFreqSpinner = new gui::TextSpinnerBox(permanentFreqBody, {"OFF", "ON"}, Boundaries::Continuous);
         permanentFreqSpinner->setMinimumSize(100, 30);
-        auto ret = application->async_call<sys::IsCpuPernament, sys::IsCpuPernamentResponse>(service::name::system_manager);
+        auto ret =
+            application->async_call<sys::IsCpuPernament, sys::IsCpuPernamentResponse>(service::name::system_manager);
         application->sync(ret);
-        permanentFreqSpinner->setCurrentValue( ret.getResult().pernament ? "ON" : "OFF");
+        permanentFreqSpinner->setCurrentValue(ret.getResult().pernament ? "ON" : "OFF");
 
         permanentFreqBody->inputCallback = [&](Item &item, const InputEvent &event) {
             auto ret = permanentFreqSpinner->onInput(event);
             if (ret) {
                 if (permanentFreqSpinner->getCurrentValue() == "ON") {
                     application->bus.sendUnicastSync(std::make_shared<sys::HoldCpuFrequencyPermanentlyMessage>(
-                                                     magic_enum::enum_cast<bsp::CpuFrequencyMHz>(
-                                                         std::stoi(currentFreqSpinner->getCurrentValue()))
-                                                         .value()),
-                                                 service::name::system_manager, 5000);
+                                                         magic_enum::enum_cast<bsp::CpuFrequencyMHz>(
+                                                             std::stoi(currentFreqSpinner->getCurrentValue()))
+                                                             .value()),
+                                                     service::name::system_manager,
+                                                     5000);
                 }
                 else {
                     application->bus.sendUnicastSync(std::make_shared<sys::ReleaseCpuPermanentFrequencyMessage>(),
-                                                 service::name::system_manager, 5000);
+                                                     service::name::system_manager,
+                                                     5000);
                 }
             }
 

@@ -5,22 +5,22 @@
 #include "SystemManager/cpu/algorithm/FrequencyHold.hpp"
 #include <memory>
 
-namespace sys::cpu {
+namespace sys::cpu
+{
 
-    AlgorithmFactory::PutResult AlgorithmFactory::emplace(sys::cpu::AlgoID id, std::unique_ptr<Algorithm>&&algorithm)
+    AlgorithmFactory::PutResult AlgorithmFactory::emplace(sys::cpu::AlgoID id, std::unique_ptr<Algorithm> &&algorithm)
     {
-        if ( algorithms.find(id) != std::end(algorithms)) {
+        if (algorithms.find(id) != std::end(algorithms)) {
             algorithms[id] = std::move(algorithm);
-            return  PutResult::Replaced;
-        } 
+            return PutResult::Replaced;
+        }
         algorithms.emplace(id, std::move(algorithm));
         return PutResult::Added;
     }
 
-
-    Algorithm* AlgorithmFactory::get(sys::cpu::AlgoID id)
+    Algorithm *AlgorithmFactory::get(sys::cpu::AlgoID id)
     {
-        if ( auto el = algorithms.find(id); el != std::end(algorithms)) {
+        if (auto el = algorithms.find(id); el != std::end(algorithms)) {
             return el->second.get();
         }
         return nullptr;

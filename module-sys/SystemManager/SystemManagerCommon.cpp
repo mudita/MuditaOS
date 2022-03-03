@@ -24,6 +24,7 @@
 #include <system/messages/DeviceRegistrationMessage.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 #include <system/messages/RequestCpuFrequencyMessage.hpp>
+#include <system/messages/HoldCpuFrequency.hpp>
 #include <time/ScopedTime.hpp>
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>
@@ -84,7 +85,8 @@ namespace sys
     }
 
     SystemManagerCommon::SystemManagerCommon(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators)
-        : Service(service::name::system_manager, "", systemManagerStack, ServicePriority::Low), systemServiceCreators{std::move(creators)}
+        : Service(service::name::system_manager, "", systemManagerStack, ServicePriority::Low), systemServiceCreators{
+                                                                                                    std::move(creators)}
     {
         // Specify list of channels which System Manager is registered to
         bus.channels            = {BusChannel::SystemManagerRequests};
@@ -190,7 +192,6 @@ namespace sys
         // Power off request (pending)
         PowerOff();
 
-        // TODO these were globals = never cleared, is it needed now?
         powerManager.reset();
         cpuStatistics.reset();
         deviceManager.reset();
@@ -632,7 +633,7 @@ namespace sys
         connect(typeid(sys::HoldCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::HoldCpuFrequencyMessage *>(message);
             powerManager->SetCpuFrequencyRequest(msg->getName(), msg->getRequest());
-            if ( msg->getHandle() != nullptr ) {
+            if (msg->getHandle() != nullptr) {
                 xTaskNotifyGive(msg->getHandle());
             }
             return sys::MessageNone{};
@@ -688,8 +689,7 @@ namespace sys
         deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
 
         cpuSentinel = std::make_shared<sys::CpuSentinel>(
-            service::name::system_manager
-            , this, [this](bsp::CpuFrequencyMHz newFrequency) {
+            service::name::system_manager, this, [this](bsp::CpuFrequencyMHz newFrequency) {
                 UpdateResourcesAfterCpuFrequencyChange(newFrequency);
             });
         powerManager->RegisterNewSentinel(cpuSentinel);

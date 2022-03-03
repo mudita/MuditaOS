@@ -10,8 +10,9 @@
 
 namespace sys::cpu
 {
-    class ImmediateUpscale : public Algorithm {
-        public:
-          bsp::CpuFrequencyMHz calculateImplementation(const AlgorithmData&data) override;
+    class ImmediateUpscale : public Algorithm
+    {
+      public:
+        bsp::CpuFrequencyMHz calculateImplementation(const AlgorithmData &data) override;
     };
-}
+} // namespace sys::cpu

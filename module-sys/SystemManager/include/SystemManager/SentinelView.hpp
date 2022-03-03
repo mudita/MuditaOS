@@ -24,5 +24,4 @@ namespace sys
             std::string reason;
         };
     }; // namespace sentinel
-}
-
+} // namespace sys

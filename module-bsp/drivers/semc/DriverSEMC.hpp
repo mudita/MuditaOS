@@ -8,8 +8,9 @@
 
 namespace drivers
 {
-    namespace name {
-        constexpr auto ExternalRAM =  "ExternalRAM";
+    namespace name
+    {
+        constexpr auto ExternalRAM = "ExternalRAM";
     }
 
     class DriverSEMC : public devices::Device

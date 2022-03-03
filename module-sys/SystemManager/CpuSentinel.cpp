@@ -3,6 +3,7 @@
 
 #include <SystemManager/CpuSentinel.hpp>
 #include "system/messages/RequestCpuFrequencyMessage.hpp"
+#include "system/messages/HoldCpuFrequency.hpp"
 #include "system/Constants.hpp"
 #include <Timers/TimerFactory.hpp>
 #include <memory>
@@ -28,7 +29,8 @@ namespace sys
     void CpuSentinel::HoldMinimumFrequency(bsp::CpuFrequencyMHz frequencyToHold)
     {
         if (currentFrequencyToHold != frequencyToHold) {
-            auto msg = std::make_shared<sys::HoldCpuFrequencyMessage>(GetName(), frequencyToHold, xTaskGetCurrentTaskHandle());
+            auto msg =
+                std::make_shared<sys::HoldCpuFrequencyMessage>(GetName(), frequencyToHold, xTaskGetCurrentTaskHandle());
             owner->bus.sendUnicast(std::move(msg), service::name::system_manager);
             currentFrequencyToHold = frequencyToHold;
             currentReason          = std::string("up: ") + owner->getCurrentProcessing() + std::string(" req: ") +
