@@ -152,9 +152,7 @@ namespace sys
 
         // in shutdown we need to wait till event manager tells us that it's ok to stfu
         while (state == State::Running) {
-            if (auto msg = mailbox.pop(); msg) {
-                msg->Execute(this);
-            }
+            processBus();
         }
 
         while (state == State::Shutdown) {

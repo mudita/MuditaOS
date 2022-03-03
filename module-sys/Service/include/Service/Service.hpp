@@ -30,7 +30,7 @@ namespace sys
     class async_fail : public std::runtime_error
     {
       public:
-        async_fail() : runtime_error("async failure")
+        explicit async_fail(const std::string &reason) : runtime_error(reason)
         {}
     };
 
@@ -161,7 +161,7 @@ namespace sys
             auto request = std::make_shared<Request>(arg...);
             if (isConnected(std::type_index(typeid(Response)))) {
                 async.setState(Async<Request, Response>::State::Error);
-                throw async_fail();
+                throw async_fail("connection failure");
             }
             auto meta                                    = async.metadata;
             meta->request                                = request;
@@ -174,10 +174,10 @@ namespace sys
             };
 
             if (!connect(typeid(Response), foo)) {
-                throw async_fail();
+                throw async_fail("cant connect");
             }
             if (!bus.sendUnicast(request, whom)) {
-                throw async_fail();
+                throw async_fail("cant send to " + whom);
             }
             return async;
         }
@@ -188,7 +188,7 @@ namespace sys
             static_assert(std::is_base_of<sys::ResponseMessage, Response>::value,
                           "Response has to be based on system message");
             if (async.metadata->request == nullptr) {
-                throw async_fail();
+                throw async_fail("there was no request");
             }
             if (async.getState() != Async<Request, Response>::State::Pending) {
                 return;
@@ -209,6 +209,10 @@ namespace sys
         bool enableRunLoop;
 
         void Run() override;
+        /// one and only buss processing function to run in the loop
+        /// please __always__ call it in Run() method in loop instead
+        /// creating different implementations in other services
+        virtual void processBus() final;
 
         std::map<std::type_index, MessageHandler> message_handlers;
 
