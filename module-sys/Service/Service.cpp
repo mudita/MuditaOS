@@ -89,22 +89,23 @@ namespace sys
     void Service::Run()
     {
         while (enableRunLoop) {
-            auto msg = mailbox.pop();
-            if (!msg) {
-                continue;
-            }
-
-            const bool respond = msg->type != Message::Type::Response && GetName() != msg->sender;
-            currentlyProcessing = msg;
-            auto response      = msg->Execute(this);
-            if (response == nullptr || !respond) {
-                continue;
-            }
-
-            bus.sendResponse(response, msg);
+            processBus();
         }
         CloseService();
     };
+
+    void Service::processBus()
+    {
+        if (auto msg = mailbox.pop(); msg) {
+            const bool respond  = msg->type != Message::Type::Response && GetName() != msg->sender;
+            currentlyProcessing = msg;
+            auto response       = msg->Execute(this);
+            if (response == nullptr || !respond) {
+                return;
+            }
+            bus.sendResponse(response, msg);
+        }
+    }
 
     auto Service::MessageEntry(Message *message, ResponseMessage *response) -> MessagePointer
     {
