@@ -146,9 +146,11 @@ namespace sys
         std::vector<std::shared_ptr<Message>> tempMsg;
         tempMsg.reserve(4); // reserve space for 4 elements to avoid costly memory allocations
 
-        uint32_t currentTime   = cpp_freertos::Ticks::GetTicks();
-        uint32_t timeoutNeeded = currentTime + timeout;
-        uint32_t timeElapsed   = currentTime;
+        // NOTE: please mind that timeout + curentTime might overflow 32b
+        // especially if we want to wait infinitely
+        uint64_t currentTime   = cpp_freertos::Ticks::GetTicks();
+        uint64_t timeoutNeeded = currentTime + timeout;
+        uint64_t timeElapsed   = currentTime;
 
         while (1) {
             // timeout
