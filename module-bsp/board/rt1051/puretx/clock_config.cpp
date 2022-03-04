@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -396,7 +396,7 @@ void BOARD_BootClockRUN(void)
      */
 
     /* DeInit Audio PLL */
-    clkPLL4setup(CLK_DISABLE);
+    clkPLL4setup(CLK_DISABLE, {});
     CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllAudio, 1);
 
     /*
@@ -965,8 +965,10 @@ void clkPLL3_PFD3setup(uint8_t enabled)
     }
 }
 
-void clkPLL4setup(uint8_t enabled)
+void clkPLL4setup(uint8_t enabled, [[maybe_unused]] const clock_audio_pll_config_t config)
 {
+    /// Due to used audio codec, fixed PLL configuration can be used. Audio codec's internal PLL can generate
+    /// all needed clocks using provided MCLK.
     const clock_audio_pll_config_t audioPllConfig_BOARD_BootClockRUN = {
         .loopDivider = 32,  /* PLL loop divider. Valid range for DIV_SELECT divider value: 27~54. */
         .postDivider = 1,   /* Divider after the PLL, should only be 1, 2, 4, 8, 16. */

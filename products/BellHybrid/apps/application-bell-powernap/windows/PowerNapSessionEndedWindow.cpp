@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapSessionEndedWindow.hpp"
@@ -28,13 +28,8 @@ namespace gui
         auto body = new VBox(this, 0, 0, style::window_width, style::window_height);
         body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        auto icon = new Icon(this,
-                             0,
-                             0,
-                             style::window_width,
-                             style::window_height,
-                             "big_namaste_W_G",
-                             utils::translate("app_bell_powernap_session_ended_message"));
+        auto icon =
+            new Icon(this, 0, 0, style::window_width, style::window_height, "big_namaste", "", ImageTypeSpecifier::W_G);
         icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         icon->image->setMargins({0, image_top_margin, 0, image_bottom_margin});
         icon->text->setFont(style::window::font::verybiglight);

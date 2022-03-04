@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -99,7 +99,7 @@ namespace alarms
       private:
         void minuteUpdated(TimePoint now) override;
         void stopAllSnoozedAlarms() override;
-        void processPreWakeUp(TimePoint now);
+        bool processPreWakeUp(TimePoint now);
         bool processSnoozeChime(TimePoint now);
         void stopAllSnoozeChimes();
 
@@ -109,6 +109,9 @@ namespace alarms
         void handleBedtime(const SingleEventRecord &event, bool decision);
         void processBedtime(TimePoint now);
         void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType) override;
+        void handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
+                              alarms::AlarmType alarmType,
+                              bool newStateOn) override;
 
         bool isBedtimeAllowed() const;
 

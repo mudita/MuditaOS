@@ -2,7 +2,6 @@
     NAME
         calculator
     SRCS
-        tests-main.cpp
         CalculatorInput_tests.cpp
         CalculatorUtility_tests.cpp
     LIBS

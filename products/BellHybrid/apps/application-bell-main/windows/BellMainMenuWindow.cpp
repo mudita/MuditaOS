@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellMainMenuWindow.hpp"
@@ -10,7 +10,6 @@
 #include <application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
-#include <data/BellMainStyle.hpp>
 
 #include <Dialog.hpp>
 #include <DialogMetadataMessage.hpp>

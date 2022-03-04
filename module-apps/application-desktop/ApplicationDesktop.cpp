@@ -72,14 +72,12 @@ namespace app
         });
 
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
-            setSystemCloseInProgress();
-            switchWindow(app::window::name::dead_battery, std::move(data));
+            requestShutdownWindow(app::window::name::dead_battery);
             return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::DisplayLogoAtExit, [this](auto &&data) {
-            switchWindow(app::window::name::closing_window, std::move(data));
-            setSystemCloseInProgress();
+            requestShutdownWindow(app::window::name::closing_window);
             return actionHandled();
         });
     }

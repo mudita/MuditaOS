@@ -34,7 +34,7 @@ class EventManagerCommon : public sys::Service
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     // Invoked during initialization
-    sys::ReturnCodes InitHandler() final;
+    sys::ReturnCodes InitHandler();
 
     sys::ReturnCodes DeinitHandler() override;
 

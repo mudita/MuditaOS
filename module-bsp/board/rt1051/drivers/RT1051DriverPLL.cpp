@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverPLL.hpp"
@@ -14,7 +14,12 @@ namespace drivers
 
         switch (instance) {
         case PLLInstances::PLL4_Audio: {
-            clkPLL4setup(CLK_ENABLE);
+            clkPLL4setup(CLK_ENABLE,
+                         clock_audio_pll_config_t{.loopDivider = static_cast<uint8_t>(params.loopDivider),
+                                                  .postDivider = static_cast<uint8_t>(params.postDivider),
+                                                  .numerator   = params.numerator,
+                                                  .denominator = params.denominator,
+                                                  .src         = static_cast<uint8_t>(params.src)});
             name = "PLL4_Audio";
         } break;
         case PLLInstances::PLL3: {
@@ -54,7 +59,7 @@ namespace drivers
     {
         switch (instance) {
         case PLLInstances::PLL4_Audio: {
-            clkPLL4setup(CLK_DISABLE);
+            clkPLL4setup(CLK_DISABLE, {});
         } break;
         case PLLInstances::PLL3: {
             clkPLL3setup(CLK_DISABLE);

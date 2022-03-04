@@ -21,6 +21,7 @@ target_sources(application-bell-common
         src/windows/BellFinishedWindow.cpp
         src/windows/BellTurnOffWindow.cpp
         src/windows/BellWelcomeWindow.cpp
+        src/windows/SessionPausedWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
         src/TimeUtils.cpp
@@ -34,14 +35,24 @@ target_sources(application-bell-common
         src/popups/BellRebootWindow.cpp
         src/popups/presenter/AlarmActivatedPresenter.cpp
         src/widgets/ListItems.cpp
+        src/widgets/BellBattery.cpp
         src/widgets/BellStatusClock.cpp
+        src/widgets/DuoHBox.cpp
+        src/widgets/ProgressTimerWithSnoozeTimer.cpp
+        src/widgets/SnoozeTimer.cpp
 
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
         src/options/OptionBellMenu.cpp
         src/options/BellOptionsNavigation.cpp
+
+        src/layouts/HomeScreenLayouts.cpp
+        src/layouts/HomeScreenLayoutClassic.cpp
+        src/layouts/HomeScreenLayoutClassicWithAmPm.cpp
+        src/layouts/HomeScreenLayoutClassicWithBattery.cpp
+        src/layouts/HomeScreenLayoutClassicWithTemp.cpp
+
     PUBLIC
-        include/common/Languages.hpp
         include/common/BellListItemProvider.hpp
         include/common/LanguageUtils.hpp
         include/common/SoundsRepository.hpp
@@ -50,7 +61,9 @@ target_sources(application-bell-common
         include/common/windows/BellFinishedWindow.hpp
         include/common/windows/BellTurnOffWindow.hpp
         include/common/windows/BellWelcomeWindow.hpp
+        include/common/windows/SessionPausedWindow.hpp
         include/common/TimeUtils.hpp
+        include/common/data/BatteryUtils.hpp
         include/common/models/AbstractAlarmModel.hpp
         include/common/models/AbstractBedtimeModel.hpp
         include/common/models/AbstractSettingsModel.hpp
@@ -60,18 +73,32 @@ target_sources(application-bell-common
         include/common/models/BedtimeModel.hpp
         include/common/models/TimeModel.hpp
         include/common/models/AudioModel.hpp
+        include/common/models/FrontlightModel.hpp
+        include/common/models/AlarmSettingsModel.hpp
+        include/common/models/AbstractAlarmSettingsModel.hpp
+        include/common/models/LayoutModel.hpp
         include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp
         include/common/popups/BedtimeNotificationWindow.hpp
         include/common/popups/BellTurnOffOptionWindow.hpp
         include/common/popups/BellRebootWindow.hpp
+        include/common/widgets/BellBattery.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
         include/common/widgets/BellStatusClock.hpp
+        include/common/widgets/DuoHBox.hpp
+        include/common/widgets/ProgressTimerWithSnoozeTimer.hpp
+        include/common/widgets/SnoozeTimer.hpp
         include/common/widgets/ListItems.hpp
         include/common/options/BellOptionWindow.hpp
         include/common/options/BellShortOptionWindow.hpp
         include/common/options/OptionBellMenu.hpp
+        include/common/layouts/HomeScreenLayouts.hpp
+        include/common/layouts/BaseHomeScreenLayoutProvider.hpp
+        include/common/layouts/HomeScreenLayoutClassic.hpp
+        include/common/layouts/HomeScreenLayoutClassicWithAmPm.hpp
+        include/common/layouts/HomeScreenLayoutClassicWithBattery.hpp
+        include/common/layouts/HomeScreenLayoutClassicWithTemp.hpp
 )
 
 target_link_libraries(application-bell-common

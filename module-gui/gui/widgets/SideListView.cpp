@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Image.hpp"
@@ -87,33 +87,6 @@ namespace gui
                 pageBar->setValue(currentPage);
             }
         };
-    }
-
-    auto SideListView::createArrowsOverlay(unsigned int x, unsigned y, unsigned int w, unsigned int h) -> void
-    {
-        arrowsOverlay = new HBox{this, x, y, w, h};
-        arrowsOverlay->setEdges(gui::RectangleEdge::None);
-        auto arrowLeft = new gui::Image(style::sidelistview::arrow_left_image);
-        arrowLeft->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        arrowLeft->activeItem = false;
-        arrowLeft->setEdges(RectangleEdge::None);
-        arrowsOverlay->addWidget(arrowLeft);
-
-        auto arrowRight = new Image(style::sidelistview::arrow_right_image);
-        arrowRight->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
-        arrowRight->activeItem = false;
-        arrowRight->setEdges(RectangleEdge::None);
-
-        auto rectFiller = new gui::Rect(arrowsOverlay,
-                                        0U,
-                                        0U,
-                                        arrowsOverlay->getWidth() - arrowLeft->getWidth() - arrowRight->getWidth(),
-                                        arrowsOverlay->getHeight());
-
-        rectFiller->setMaximumSize(arrowsOverlay->getWidth(), arrowsOverlay->getHeight());
-        rectFiller->setEdges(RectangleEdge::None);
-
-        arrowsOverlay->addWidget(arrowRight);
     }
 
     auto SideListView::setFocus() -> void

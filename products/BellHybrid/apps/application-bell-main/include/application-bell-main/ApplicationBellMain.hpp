@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include "presenters/HomeScreenPresenter.hpp"
 
 #include <Application.hpp>
 #include <common/models/BedtimeModel.hpp>
@@ -43,7 +45,9 @@ namespace app
         auto isHomeScreenFocused() -> bool;
         void onStart() override;
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
-        void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
+        void setHomeScreenLayout(std::string layoutName);
+
+        std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter{};
     };
 
     template <> struct ManifestTraits<ApplicationBellMain>
@@ -54,7 +58,8 @@ namespace app
                      manager::actions::ShowAlarm,
                      manager::actions::DisplayLogoAtExit,
                      manager::actions::DisplayLowBatteryScreen,
-                     manager::actions::SystemBrownout}};
+                     manager::actions::SystemBrownout,
+                     manager::actions::ChangeHomescreenLayout}};
         }
     };
 } // namespace app

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,10 +20,8 @@ namespace gui
     {
       protected:
         HBarGraph *pageBar  = nullptr;
-        HBox *arrowsOverlay = nullptr;
         VBox *bodyOverlay   = nullptr;
 
-        auto createArrowsOverlay(unsigned int x, unsigned y, unsigned int w, unsigned int h) -> void;
         auto createPageBar() -> void;
         auto setFocus() -> void override;
         auto applyScrollCallbacks() -> void;

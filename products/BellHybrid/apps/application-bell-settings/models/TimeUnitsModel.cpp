@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/TimeUnitsModel.hpp"
@@ -57,8 +57,7 @@ namespace app::bell_settings
         };
 
 #if CONFIG_ENABLE_TEMP == 1
-        temperatureUnitListItem =
-            new gui::TemperatureUnitListItem(utils::translate("app_bell_settings_advanced_temp_scale"));
+        temperatureUnitListItem = new gui::TemperatureUnitListItem(utils::translate("app_bell_settings_temp_scale"));
         internalData.push_back(temperatureUnitListItem);
 #endif
 

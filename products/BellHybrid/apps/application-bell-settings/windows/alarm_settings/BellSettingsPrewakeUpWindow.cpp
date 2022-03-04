@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
@@ -41,7 +41,10 @@ namespace gui
         sidelistview->rebuildList(listview::RebuildType::Full);
 
         presenter->loadData();
+    }
 
+    void BellSettingsPrewakeUpWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
         setFocusItem(sidelistview);
     }
 

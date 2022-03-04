@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BGSoundsTimerSelectWindow.hpp"
@@ -6,6 +6,7 @@
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <data/BGSoundsStyle.hpp>
 #include <gui/input/InputEvent.hpp>
+#include <common/LanguageUtils.hpp>
 #include <i18n/i18n.hpp>
 #include <SideListView.hpp>
 #include <Utils.hpp>
@@ -95,6 +96,7 @@ namespace gui
         spinner->setCurrentValue(std::move(currentValue));
         spinner->onValueChanged = [this](const auto &) {
             body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
+            updateBottomDescription();
         };
         body->getCenterBox()->addWidget(spinner);
         body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
@@ -115,7 +117,10 @@ namespace gui
     }
     void BGSoundsTimerSelectWindow::updateBottomDescription()
     {
-        const bool isDescriptionVisible = UTF8ToTimerValue(spinner->getCurrentValue()) != offValue;
+        const auto currentVal = spinner->getCurrentValue();
+        bottomDescription->setText(utils::language::getCorrectMinutesNumeralForm(UTF8ToTimerValue(currentVal).count()));
+
+        const bool isDescriptionVisible = UTF8ToTimerValue(currentVal) != offValue;
         bottomDescription->setVisible(isDescriptionVisible);
     }
 

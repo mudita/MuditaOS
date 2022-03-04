@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,6 +16,9 @@ namespace audio
     {
 
       public:
+        static constexpr auto minVolume = .0f;
+        static constexpr auto maxVolume = 10.0f;
+
         enum class RetCode
         {
             Success = 0,
@@ -62,11 +65,14 @@ namespace audio
         /// Set device input gain
         /// @param gain desired input gain from 0 to 100
         /// @return RetCode::Success if OK, or RetCode::Failure otherwise
-        virtual RetCode setInputGain(float gain)   = 0;
+        virtual RetCode setInputGain(float gain) = 0;
 
         auto getSinkFormat() -> AudioFormat override
         {
             return getSourceFormat();
         }
+
+      private:
+        static_assert(maxVolume > 0, "maxVolume needs to be bigger than 0");
     };
 } // namespace audio

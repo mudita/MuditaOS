@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -35,6 +35,7 @@ namespace app
         void displayInformation(const std::string &windowToReturn);
         bool isInformationPromptPermittedOnCurrentWindow();
         void startTimerOnWindows();
+        void restartTimerOnWindows();
         bool handleInformationOnInputEvent(sys::DataMessage *msgl);
         void handleInformationBeforeSwitchWindow(sys::DataMessage *msgl);
         void handleInformationAfterSwitchWindow();

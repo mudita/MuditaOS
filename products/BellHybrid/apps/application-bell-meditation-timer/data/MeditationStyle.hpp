@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -74,6 +74,7 @@ namespace app::meditationStyle
         {
             constexpr inline auto timeUnitSingular = "common_minute_lower";
             constexpr inline auto timeUnitPlural   = "common_minutes_lower";
+            constexpr inline auto timeUnitGenitive = "common_minutes_lower_genitive";
         } // namespace list
     }     // namespace mtStyle
 } // namespace app::meditationStyle

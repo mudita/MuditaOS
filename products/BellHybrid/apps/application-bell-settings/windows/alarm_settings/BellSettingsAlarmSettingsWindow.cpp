@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
@@ -26,6 +26,7 @@ namespace gui
     {
         erase();
         buildInterface();
+        isSaveNeeded = false;
     }
 
     void BellSettingsAlarmSettingsWindow::buildInterface()
@@ -42,8 +43,6 @@ namespace gui
         sidelistview->rebuildList(listview::RebuildType::Full);
 
         presenter->loadData();
-
-        setFocusItem(sidelistview);
     }
 
     bool BellSettingsAlarmSettingsWindow::onInput(const gui::InputEvent &inputEvent)
@@ -52,11 +51,9 @@ namespace gui
             return true;
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+            isSaveNeeded = true;
             exit();
             return true;
-        }
-        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            presenter->exitWithoutSave();
         }
 
         return AppWindow::onInput(inputEvent);
@@ -64,7 +61,6 @@ namespace gui
 
     void BellSettingsAlarmSettingsWindow::exit()
     {
-        presenter->saveData();
         application->switchWindow(
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", BellSettingsAlarmSettingsMenuWindow::name));
@@ -73,7 +69,18 @@ namespace gui
     void BellSettingsAlarmSettingsWindow::onClose(CloseReason reason)
     {
         if (reason != CloseReason::Popup) {
-            presenter->eraseProviderData();
+            if (isSaveNeeded) {
+                presenter->exitWithSave();
+            }
+            else {
+                presenter->exitWithRollback();
+            }
         }
     }
+
+    void BellSettingsAlarmSettingsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
+        setFocusItem(sidelistview);
+    }
+
 } /* namespace gui */

@@ -1,25 +1,25 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellSettings.hpp"
 #include "presenter/TimeUnitsPresenter.hpp"
+#include "presenter/LayoutWindowPresenter.hpp"
 #include "models/TemperatureUnitModel.hpp"
-#include "models/advanced/AboutYourBellModel.hpp"
+#include "models/AboutYourBellModel.hpp"
 #include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
-#include "models/alarm_settings/AlarmSettingsModel.hpp"
 #include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
 #include "models/alarm_settings/BedtimeSettingsListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpSettingsModel.hpp"
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
 #include "models/alarm_settings/SnoozeSettingsModel.hpp"
 #include "presenter/BedtimeSettingsPresenter.hpp"
-#include "presenter/advanced/AboutYourBellWindowPresenter.hpp"
+#include "presenter/AboutYourBellWindowPresenter.hpp"
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
-#include "presenter/advanced/FrontlightPresenter.hpp"
-#include "windows/advanced/AboutYourBellWindow.hpp"
-#include "windows/advanced/BellSettingsAdvancedWindow.hpp"
-#include "windows/advanced/BellSettingsLanguageWindow.hpp"
-#include "windows/advanced/BellSettingsFrontlightWindow.hpp"
+#include "presenter/FrontlightPresenter.hpp"
+#include "windows/AboutYourBellWindow.hpp"
+#include "windows/BellSettingsLanguageWindow.hpp"
+#include "windows/BellSettingsLayoutWindow.hpp"
+#include "windows/BellSettingsFrontlightWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
@@ -32,12 +32,16 @@
 
 #include <AlarmSoundPaths.hpp>
 #include <apps-common/windows/Dialog.hpp>
+#include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/models/BedtimeModel.hpp>
+#include <common/models/LayoutModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/models/AudioModel.hpp>
+#include <common/models/TimeModel.hpp>
+#include <common/models/AlarmSettingsModel.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 
@@ -67,7 +71,7 @@ namespace app
 
                 switchWindow(gui::window::bell_finished::defaultName,
                              gui::BellFinishedWindowData::Factory::create("circle_success_big",
-                                                                          gui::window::name::bellSettingsAdvanced));
+                                                                          gui::window::name::bellSettings));
 
                 return sys::msgHandled();
             }
@@ -83,16 +87,19 @@ namespace app
             return std::make_unique<gui::BellSettingsWindow>(app);
         });
 
-        // Advanced
-        windowsFactory.attach(gui::window::name::bellSettingsAdvanced,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellSettingsAdvancedWindow>(app);
-                              });
-
         windowsFactory.attach(
             gui::window::name::bellSettingsLanguage, [&](ApplicationCommon *app, const std::string &name) {
                 auto presenter = std::make_unique<bell_settings::LanguageWindowPresenter>(this);
                 return std::make_unique<gui::BellSettingsLanguageWindow>(app, std::move(presenter), name);
+            });
+
+        windowsFactory.attach(
+            gui::window::name::bellSettingsLayout, [this](ApplicationCommon *app, const std::string &name) {
+                auto layoutModel = std::make_unique<bell_settings::LayoutModel>(this);
+                auto timeModel   = std::make_unique<app::TimeModel>();
+                auto presenter   = std::make_unique<bell_settings::LayoutWindowPresenter>(
+                    this, std::move(layoutModel), std::move(timeModel));
+                return std::make_unique<gui::BellSettingsLayoutWindow>(app, std::move(presenter), name);
             });
 
         windowsFactory.attach(

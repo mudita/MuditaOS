@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerEvent.hpp"
@@ -40,7 +40,6 @@ EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &n
       temperatureSource{hal::temperature::AbstractTemperatureSource::Factory::create()},
       backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
 {
-    latchStatus = bsp::bell_switches::isLatchPressed() ? sevm::LatchStatus::PRESSED : sevm::LatchStatus::RELEASED;
     buildKeySequences();
     updateTemperature(*temperatureSource);
 
@@ -66,6 +65,13 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     }
 
     keySequenceMgr->process(kbdMessage->key);
+}
+
+sys::ReturnCodes EventManager::InitHandler()
+{
+    auto ret    = EventManagerCommon::InitHandler();
+    latchStatus = bsp::bell_switches::isLatchPressed() ? sevm::LatchStatus::PRESSED : sevm::LatchStatus::RELEASED;
+    return ret;
 }
 
 auto EventManager::createEventWorker() -> std::unique_ptr<WorkerEventCommon>

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ControlFunctions.hpp"
@@ -50,6 +50,7 @@ namespace screen_light_control::functions
             if (rampState < rampTarget) {
                 rampState += rampStep;
                 if (rampState >= rampTarget) {
+                    rampState         = rampTarget;
                     rampTargetReached = true;
                 }
             }

@@ -16,9 +16,45 @@ using namespace drivers;
 
 AudioConfig audioConfig;
 
-void bsp::audio::init()
+namespace
 {
-    audioConfig.pllAudio = DriverPLL::Create(static_cast<PLLInstances>(BoardDefinitions::AUDIO_PLL), DriverPLLParams{});
+    constexpr bool isDerivativeOf44100(const std::uint32_t sampleRate)
+    {
+        return sampleRate % 11025 == 0;
+    }
+
+    DriverPLLParams getPLLParams(const std::uint32_t sampleRate)
+    {
+        /// The basic formula for calculating PLL4:
+        /// (fsclk * (loopDivider + numerator/denominator)) / postDivider
+
+        if (isDerivativeOf44100(sampleRate)) {
+            /// PLL4 set to 722.5344MHz, later it will be divided by SAI to generate 11,2896MHz BCLK
+            return {
+                .loopDivider = 30,
+                .postDivider = 1,
+                .numerator   = 1056,
+                .denominator = 10000,
+                .src         = 0,
+            };
+        }
+        else {
+            /// PLL4 set to 786.48MHz, later it will be divided by SAI to generate 12,28875MHz BCLK
+            return {
+                .loopDivider = 32,
+                .postDivider = 1,
+                .numerator   = 77,
+                .denominator = 100,
+                .src         = 0,
+            };
+        }
+    }
+} // namespace
+
+void bsp::audio::init(const std::uint32_t sampleRate)
+{
+    audioConfig.pllAudio =
+        DriverPLL::Create(static_cast<PLLInstances>(BoardDefinitions::AUDIO_PLL), getPLLParams(sampleRate));
     audioConfig.dmamux =
         DriverDMAMux::Create(static_cast<DMAMuxInstances>(BoardDefinitions::AUDIOCODEC_DMAMUX), DriverDMAMuxParams{});
     audioConfig.dma = DriverDMA::Create(static_cast<DMAInstances>(BoardDefinitions::AUDIOCODEC_DMA), DriverDMAParams{});

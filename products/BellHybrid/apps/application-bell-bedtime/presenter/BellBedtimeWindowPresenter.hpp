@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -31,7 +31,7 @@ namespace app::bell_bedtime
     {
       public:
         virtual ~View() noexcept                  = default;
-        virtual void exit(bool showSuccessWindow) = 0;
+        virtual void exit()                       = 0;
     };
 
     class AbstractBedtimePresenter : public BasePresenter<View>

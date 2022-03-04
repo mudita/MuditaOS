@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellMeditationTimer.hpp"
@@ -6,10 +6,10 @@
 #include "windows/MeditationRunningWindow.hpp"
 #include "windows/MeditationTimerWindow.hpp"
 #include "windows/ReadyGoingWindow.hpp"
-#include "windows/SessionPausedWindow.hpp"
 
 #include <common/models/TimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
+#include <common/windows/SessionPausedWindow.hpp>
 
 namespace app
 {
@@ -57,9 +57,10 @@ namespace app
                                       app, settings.get(), std::move(timeModel));
                                   return std::make_unique<gui::MeditationRunningWindow>(app, std::move(presenter));
                               });
-        windowsFactory.attach(gui::name::window::sessionPaused, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::SessionPausedWindow>(app);
-        });
+        windowsFactory.attach(gui::window::session_paused::sessionPaused,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::SessionPausedWindow>(app);
+                              });
         windowsFactory.attach(gui::window::bell_finished::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellFinishedWindow>(app, name);

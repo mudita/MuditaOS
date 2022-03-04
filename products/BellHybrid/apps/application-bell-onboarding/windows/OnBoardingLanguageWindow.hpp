@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,10 +17,13 @@ namespace gui
             app::ApplicationCommon *app,
             std::unique_ptr<app::OnBoarding::OnBoardingLanguageWindowPresenter::Presenter> &&presenter,
             const std::string &name = gui::window::name::onBoardingLanguageWindow);
+        std::string getSelectedLanguage();
 
       private:
         std::unique_ptr<app::OnBoarding::OnBoardingLanguageWindowPresenter::Presenter> presenter;
 
         std::list<Option> languageOptionsList();
+
+        std::string selectedLang = "";
     };
 } // namespace gui

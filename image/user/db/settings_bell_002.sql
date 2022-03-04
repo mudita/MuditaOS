@@ -38,13 +38,14 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('prewake_up_duration', '0'),
     ('prewake_up_tone','Joyful Awakening'),
     ('prewake_up_light_duration','0'),
-    ('alarm_tone','Brand New Morning'),
+    ('alarm_tone','Morning Dew'),
     ('alarm_light_active','1'),
     ('alarm_duration','10000'),
     ('bedtime_active','0'),
     ('bedtime_time','21:00'),
     ('bedtime_tone','Evening Horizon'),
     ('bedtime_duration','5'),
+    ('layout','ClassicWithTemp'),
     ('\ServiceEink\\display_inverted_mode', '0');
 
 

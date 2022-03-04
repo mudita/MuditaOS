@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/AlarmModel.hpp"
@@ -87,7 +87,10 @@ namespace app
     {
         auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::AlarmUpdateRequestMessage>(alarm),
                                                        service::name::service_time);
-        request->execute(app, this, responseCallback);
+        request->execute(app, this, [this](sys::ResponseMessage *) {
+            update(nullptr);
+            return true;
+        });
 
         cachedRecord = alarm.getNextSingleEvent(TimePointNow());
     }
@@ -95,7 +98,10 @@ namespace app
     {
         auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::TurnOffSnoozeRequestMessage>(alarm.ID),
                                                        service::name::service_time);
-        request->execute(app, this, responseCallback);
+        request->execute(app, this, [this](sys::ResponseMessage *) {
+            update(nullptr);
+            return true;
+        });
         nextSnoozeTime = TIME_POINT_INVALID;
     }
     bool AlarmModel::isActive() const
@@ -110,14 +116,27 @@ namespace app
         }
         return alarmEventPtr->enabled;
     }
-    std::uint32_t AlarmModel::getSnoozeDuration()
+
+    TimePoint AlarmModel::calculateNextSnoozeTime(std::uint32_t desiredSnoozeTime)
+    {
+        const auto now     = TimePointNow();
+        const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+        if ((seconds % 60) <= 15) {
+            return std::chrono::floor<std::chrono::minutes>(now) + std::chrono::minutes(desiredSnoozeTime);
+        }
+        else {
+            return std::chrono::ceil<std::chrono::minutes>(now) + std::chrono::minutes(desiredSnoozeTime);
+        }
+    }
+
+    std::chrono::seconds AlarmModel::getSnoozeDuration() const
     {
         const auto snoozeDurationStr =
             settings.getValue(bell::settings::Snooze::length, settings::SettingsScope::Global);
         const auto snoozeDuration = utils::getNumericValue<std::uint32_t>(snoozeDurationStr);
-
-        return snoozeDuration;
+        return std::chrono::minutes{snoozeDuration};
     }
+
     bool AlarmModel::isSnoozeAllowed()
     {
         const auto snoozeActiveStr = settings.getValue(bell::settings::Snooze::active, settings::SettingsScope::Global);
@@ -133,12 +152,13 @@ namespace app
 
     void AlarmModel::snooze()
     {
+        snoozeCount++;
         const auto snoozeDurationStr =
             settings.getValue(bell::settings::Snooze::length, settings::SettingsScope::Global);
         const auto snoozeDuration = utils::getNumericValue<std::uint32_t>(snoozeDurationStr);
 
-        snoozeCount++;
-        nextSnoozeTime = std::chrono::ceil<std::chrono::minutes>(TimePointNow()) + std::chrono::minutes(snoozeDuration);
+        nextSnoozeTime = calculateNextSnoozeTime(snoozeDuration);
+
         alarms::AlarmServiceAPI::requestSnoozeRingingAlarm(app, cachedRecord.parent->ID, nextSnoozeTime);
         alarmStatus = alarms::AlarmStatus::Snoozed;
     }
@@ -198,12 +218,8 @@ namespace app
     {
         return alarmStatus;
     }
-    std::time_t AlarmModel::getTimeOfNextSnooze()
+    TimePoint AlarmModel::getTimeOfNextSnooze()
     {
-        const auto snoozeDurationStr =
-            settings.getValue(bell::settings::Snooze::length, settings::SettingsScope::Global);
-        const auto snoozeDuration = utils::getNumericValue<std::uint32_t>(snoozeDurationStr);
-        return Clock::to_time_t(std::chrono::floor<std::chrono::minutes>(TimePointNow()) +
-                                std::chrono::minutes(snoozeDuration));
+        return nextSnoozeTime;
     }
 } // namespace app

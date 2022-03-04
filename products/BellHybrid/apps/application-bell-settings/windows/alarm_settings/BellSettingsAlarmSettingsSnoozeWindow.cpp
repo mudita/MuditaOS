@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsAlarmSettingsSnoozeWindow.hpp"
@@ -37,7 +37,10 @@ namespace gui
         listView->rebuildList(listview::RebuildType::Full);
 
         presenter->loadData();
+    }
 
+    void BellSettingsAlarmSettingsSnoozeWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
         setFocusItem(listView);
     }
 

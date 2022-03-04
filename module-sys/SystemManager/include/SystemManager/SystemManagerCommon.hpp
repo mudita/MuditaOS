@@ -137,6 +137,7 @@ namespace sys
         virtual void batteryNormalLevelAction();
         virtual void batteryCriticalLevelAction(bool charging);
         virtual void batteryShutdownLevelAction();
+        virtual void handleShutdown() = 0;
 
       private:
         MessagePointer DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;

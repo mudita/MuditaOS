@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,10 +34,10 @@ namespace app::bell_settings
           public:
             virtual ~Presenter() noexcept                                                   = default;
             virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
-            virtual auto saveData() -> void                                                 = 0;
             virtual auto loadData() -> void                                                 = 0;
             virtual auto eraseProviderData() -> void                                        = 0;
-            virtual void exitWithoutSave()                                                  = 0;
+            virtual auto exitWithSave() -> void                                             = 0;
+            virtual auto exitWithRollback() -> void                                         = 0;
         };
     };
 
@@ -50,13 +50,14 @@ namespace app::bell_settings
                                std::unique_ptr<AbstractSoundsRepository> soundsRepository);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
-        auto saveData() -> void override;
         auto loadData() -> void override;
         auto eraseProviderData() -> void override;
-        void exitWithoutSave() override;
+        auto exitWithSave() -> void override;
+        auto exitWithRollback() -> void override;
 
       private:
-        void stopSound();
+        auto stopSound() -> void;
+        auto saveData() -> void;
 
         std::shared_ptr<AlarmSettingsListItemProvider> provider;
         std::unique_ptr<AbstractAlarmSettingsModel> model;

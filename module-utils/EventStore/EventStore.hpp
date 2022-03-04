@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,7 +24,7 @@ namespace Store
 {
     struct Battery
     {
-        enum class LevelState
+        enum class LevelState : std::uint8_t
         {
             Normal,
             Shutdown,
@@ -32,7 +32,7 @@ namespace Store
             CriticalNotCharging
         } levelState = LevelState::Normal;
 
-        enum class State
+        enum class State : std::uint8_t
         {
             Discharging,
             Charging,

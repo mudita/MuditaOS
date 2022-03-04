@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -128,7 +128,7 @@ extern "C"
     void clkPLL3_PFD2setup(uint8_t enabled);
     void clkPLL3_PFD3setup(uint8_t enabled);
 
-    void clkPLL4setup(uint8_t enabled);
+    void clkPLL4setup(uint8_t enabled, const clock_audio_pll_config_t config);
 
     void clkPLL5setup(uint8_t enabled);
 

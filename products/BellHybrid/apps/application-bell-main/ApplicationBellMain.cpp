@@ -4,7 +4,6 @@
 #include "include/application-bell-main/ApplicationBellMain.hpp"
 #include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
-#include "presenters/HomeScreenPresenter.hpp"
 
 #include "windows/BellBatteryShutdownWindow.hpp"
 #include "windows/BellHomeScreenWindow.hpp"
@@ -13,13 +12,17 @@
 
 #include <apps-common/messages/AppMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
+#include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/models/AlarmModel.hpp>
 #include <common/models/TimeModel.hpp>
+#include <common/models/LayoutModel.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
+#include <appmgr/messages/ChangeHomescreenLayoutParams.hpp>
 #include <system/messages/SystemManagerMessage.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
@@ -28,6 +31,7 @@
 
 namespace app
 {
+
     ApplicationBellMain::ApplicationBellMain(std::string name,
                                              std::string parent,
                                              StatusIndicators statusIndicators,
@@ -37,20 +41,25 @@ namespace app
     {
         registerOnPopCallback([](WindowsStack &windowsStack) { windowsStack.dropPendingPopups(); });
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
             return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::DisplayLogoAtExit, [this](auto &&data) {
-            setSystemCloseInProgress();
-            switchWindow(gui::BellWelcomeWindow::defaultName);
+            requestShutdownWindow(gui::BellWelcomeWindow::defaultName);
             return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
-            setSystemCloseInProgress();
-            switchWindow(gui::window::name::bell_battery_shutdown, std::move(data));
+            requestShutdownWindow(gui::window::name::bell_battery_shutdown);
+            return actionHandled();
+        });
+
+        addActionReceiver(manager::actions::ChangeHomescreenLayout, [this](auto &&data) {
+            auto msgLayout = dynamic_cast<gui::ChangeHomescreenLayoutParams *>(data.get());
+            setHomeScreenLayout(msgLayout->getNewHomescreenLayoutName());
             return actionHandled();
         });
 
@@ -72,6 +81,13 @@ namespace app
             return ret;
         }
 
+        auto timeModel        = std::make_unique<app::TimeModel>();
+        auto batteryModel     = std::make_unique<app::home_screen::BatteryModel>(this);
+        auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(this);
+        auto alarmModel       = std::make_unique<app::AlarmModel>(this);
+        homeScreenPresenter   = std::make_shared<app::home_screen::HomeScreenPresenter>(
+            this, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
+
         createUserInterface();
 
         return sys::ReturnCodes::Success;
@@ -79,14 +95,12 @@ namespace app
 
     void ApplicationBellMain::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            auto timeModel        = std::make_unique<app::TimeModel>();
-            auto batteryModel     = std::make_unique<app::home_screen::BatteryModel>(app);
-            auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(app);
-            auto alarmModel       = std::make_unique<app::AlarmModel>(app);
-            auto presenter        = std::make_unique<app::home_screen::HomeScreenPresenter>(
-                app, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
-            return std::make_unique<gui::BellHomeScreenWindow>(app, std::move(presenter));
+        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
+            auto layoutModel    = std::make_unique<bell_settings::LayoutModel>(app);
+            auto window         = std::make_unique<gui::BellHomeScreenWindow>(app, homeScreenPresenter);
+            auto selectedLayout = layoutModel->getValue();
+            setHomeScreenLayout(selectedLayout);
+            return window;
         });
 
         windowsFactory.attach(gui::window::name::bell_main_menu, [](ApplicationCommon *app, const std::string &name) {
@@ -155,5 +169,15 @@ namespace app
             }
         }
         return ApplicationCommon::handleSwitchWindow(msgl);
+    }
+
+    void ApplicationBellMain::setHomeScreenLayout(std::string layoutName)
+    {
+        auto homeScreenLayoutsList = gui::homeScreenLayouts();
+        if (homeScreenLayoutsList.find(layoutName) == homeScreenLayoutsList.end()) {
+            return;
+        }
+        auto layoutGenerator = homeScreenLayoutsList.at(layoutName);
+        homeScreenPresenter->setLayout(layoutGenerator);
     }
 } // namespace app

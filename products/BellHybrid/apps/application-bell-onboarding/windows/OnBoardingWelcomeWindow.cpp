@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingWelcomeWindow.hpp"
@@ -34,7 +34,7 @@ namespace gui
     void OnBoardingWelcomeWindow::registerCallbacks()
     {
         timerCallback = [this](Item &, sys::Timer &timer) {
-            application->switchWindow(gui::window::name::onBoardingLanguageWindow);
+            application->switchWindow(gui::window::name::onBoardingOnOffWindow);
             return true;
         };
     }
@@ -42,7 +42,7 @@ namespace gui
     bool OnBoardingWelcomeWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-            application->switchWindow(gui::window::name::onBoardingLanguageWindow);
+            application->switchWindow(gui::window::name::onBoardingOnOffWindow);
             return true;
         }
         return false;
@@ -54,6 +54,5 @@ namespace gui
 
         icon->image->set("bell_very_big_logo", ImageTypeSpecifier::W_G);
         icon->text->setFont(style::window::font::verybiglight);
-        icon->text->setText(utils::translate("app_bell_onboarding_welcome"));
     }
 } // namespace gui

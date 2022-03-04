@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,7 +10,7 @@ namespace gui
 {
     class PowerNapSessionEndedWindow : public WindowWithTimer, public app::powernap::PowerNapSessionEndedContract::View
     {
-        static constexpr auto image_top_margin    = 112U;
+        static constexpr auto image_top_margin    = 170U;
         static constexpr auto image_bottom_margin = 30U;
         std::shared_ptr<app::powernap::PowerNapSessionEndedContract::Presenter> presenter;
         void buildInterface() override;

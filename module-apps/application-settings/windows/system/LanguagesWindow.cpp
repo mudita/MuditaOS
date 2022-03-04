@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LanguagesWindow.hpp"
@@ -9,7 +9,7 @@
 namespace gui
 {
     LanguagesWindow::LanguagesWindow(app::ApplicationCommon *app, std::string name)
-        : BaseSettingsWindow(app, std::move(name)), langList(loader.getAvailableDisplayLanguages())
+        : BaseSettingsWindow(app, std::move(name)), langList(utils::getAvailableDisplayLanguages())
     {
         setTitle(utils::translate("app_settings_title_languages"));
     }

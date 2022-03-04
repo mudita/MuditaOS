@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellOnBoarding.hpp"
@@ -6,6 +6,7 @@
 #include <presenter/OnBoardingLanguageWindowPresenter.hpp>
 #include <windows/OnBoardingLanguageWindow.hpp>
 #include <windows/OnBoardingFinalizeWindow.hpp>
+#include <windows/OnBoardingOnOffWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
 #include <windows/OnBoardingWelcomeWindow.hpp>
 #include <windows/OnBoardingInstructionPromptWindow.hpp>
@@ -14,6 +15,7 @@
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 
 #include <apps-common/messages/OnBoardingMessages.hpp>
+#include <common/BellPowerOffPresenter.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 
@@ -61,13 +63,13 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellWelcomeWindow>(
-                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingWelcomeWindow); });
+                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingStartupWindow); });
         });
 
-        windowsFactory.attach(gui::window::name::onBoardingWelcomeWindow,
-                              [this](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::OnBoardingWelcomeWindow>(app, name);
-                              });
+        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
+            auto powerOffPresenter = std::make_unique<gui::BellPowerOffPresenter>(app);
+            return std::make_unique<gui::OnBoardingOnOffWindow>(app, std::move(powerOffPresenter), name);
+        });
 
         windowsFactory.attach(
             gui::window::name::onBoardingLanguageWindow, [this](ApplicationCommon *app, const std::string &name) {
@@ -139,6 +141,16 @@ namespace app
 
     void ApplicationBellOnBoarding::displayInformation(const std::string &windowToReturn)
     {
+        // If user is during language selection, pick new language for hint popup
+        if (windowToReturn == gui::window::name::onBoardingLanguageWindow) {
+            auto languageSelectWindow = dynamic_cast<gui::OnBoardingLanguageWindow *>(getWindow(windowToReturn));
+            auto selectedLang         = languageSelectWindow->getSelectedLanguage();
+
+            if (utils::getDisplayLanguage() != selectedLang) {
+                utils::setDisplayLanguage(selectedLang);
+            }
+        }
+
         auto [icon, text] = getDisplayDataFromState();
         switchWindow(gui::window::name::informationOnBoardingWindow,
                      gui::BellFinishedWindowData::Factory::create(icon, windowToReturn, utils::translate(text)));
@@ -164,7 +176,7 @@ namespace app
         auto currentWindow = getCurrentWindow()->getName();
         return (currentWindow != gui::name::window::main_window &&
                 currentWindow != gui::window::name::finalizeOnBoardingWindow &&
-                currentWindow != gui::window::name::onBoardingWelcomeWindow &&
+                currentWindow != gui::window::name::onBoardingStartupWindow &&
                 (currentWindow != gui::window::name::informationOnBoardingWindow ||
                  informationState == OnBoarding::InformationStates::DeepClickWarningInfo));
     }
@@ -172,6 +184,14 @@ namespace app
     void ApplicationBellOnBoarding::startTimerOnWindows()
     {
         if (isInformationPromptPermittedOnCurrentWindow()) {
+            informationPromptTimer.start();
+        }
+    }
+
+    void ApplicationBellOnBoarding::restartTimerOnWindows()
+    {
+        if (isInformationPromptPermittedOnCurrentWindow()) {
+            informationPromptTimer.stop();
             informationPromptTimer.start();
         }
     }
@@ -206,6 +226,7 @@ namespace app
     bool ApplicationBellOnBoarding::handleInformationOnInputEvent(sys::DataMessage *msgl)
     {
         auto inputEvent = static_cast<AppInputEventMessage *>(msgl)->getEvent();
+        restartTimerOnWindows();
 
         if (isInformationPromptPermittedOnCurrentWindow()) {
             if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) || inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN)) {

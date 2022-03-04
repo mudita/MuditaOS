@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp> // for byte conversion functions. it is included first because of magic enum define
@@ -32,7 +32,7 @@ namespace bsp::bell_switches
     using TimerCallback = void (*)(TimerHandle_t timerHandle);
 
     constexpr std::chrono::milliseconds contactOscillationTimeout{30ms};
-    constexpr std::chrono::milliseconds centerKeyPressValidationTimeout{30ms};
+    constexpr std::chrono::milliseconds centerKeyPressValidationTimeout{500ms};
 
     enum class KeyId : unsigned int
     {
@@ -95,6 +95,11 @@ namespace bsp::bell_switches
         {
             cpp_freertos::LockGuard lock(latchFlagMutex);
             return changeFlag;
+        }
+
+        void setChanged()
+        {
+            changeFlag = true;
         }
 
         void clearChangedMark()
@@ -178,6 +183,14 @@ namespace bsp::bell_switches
             }
             auto val = static_cast<std::uint16_t>(getNotificationSource(timerState->id, currentState));
             xQueueSend(qHandleIrq, &val, 0);
+        }
+        else {
+            /** Even if we did not change the state of latch, the IRQ was called,
+             * so lets skip next light center click
+             */
+            if (timerState->id == KeyId::latchSwitch) {
+                latchEventFlag.setChanged();
+            }
         }
 
         timerState->gpio->EnableInterrupt(1U << static_cast<uint32_t>(timerState->pin));

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SnoozeListItemProvider.hpp"
@@ -103,8 +103,8 @@ namespace app::bell_settings
 
         internalData.emplace_back(chimeInterval);
 
-        chimeLength->onProceed = [chimeInterval, chimeLength, this]() {
-            if (chimeInterval != nullptr) {
+        chimeInterval->onEnter = [chimeInterval, chimeLength, this]() {
+            if (chimeLength != nullptr) {
                 const auto currentChimeLength   = chimeLength->getCurrentValue();
                 const auto currentChimeInterval = chimeInterval->getCurrentValue();
                 const auto calculatedRange      = transformChimeIntervalsRange(currentChimeLength);

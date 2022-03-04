@@ -1,13 +1,15 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "HomeScreenPresenter.hpp"
+#include "application-bell-main/presenters/HomeScreenPresenter.hpp"
 #include "StateController.hpp"
 #include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
 
 #include <apps-common/ApplicationCommon.hpp>
+#include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <common/models/TimeModel.hpp>
+#include <common/widgets/ProgressTimerWithSnoozeTimer.hpp>
 #include <Timers/SystemTimer.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
@@ -72,6 +74,7 @@ namespace app::home_screen
         getView()->setTimeFormat(timeModel->getTimeFormat());
         getView()->setTime(timeModel->getCurrentTime());
         getView()->setAlarmTimeFormat(timeModel->getTimeFormat());
+        getView()->setSnoozeFormat(timeModel->getTimeFormat());
         getView()->setTemperature(temperatureModel->getTemperature());
     }
     void HomeScreenPresenter::createData()
@@ -159,5 +162,10 @@ namespace app::home_screen
     void HomeScreenPresenter::handleBatteryStatus()
     {
         stateController->handleBatteryStatus();
+    }
+
+    void HomeScreenPresenter::setLayout(gui::LayoutGenerator layoutGenerator)
+    {
+        getView()->setLayout(layoutGenerator);
     }
 } // namespace app::home_screen

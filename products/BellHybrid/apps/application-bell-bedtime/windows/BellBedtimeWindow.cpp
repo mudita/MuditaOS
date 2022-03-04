@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellBedtimeWindow.hpp"
@@ -54,7 +54,7 @@ namespace gui
             return true;
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-            exit(true);
+            exit();
             return true;
         }
         return AppWindow::onInput(inputEvent);
@@ -66,15 +66,10 @@ namespace gui
         buildInterface();
     }
 
-    void BellBedtimeWindow::exit(bool showSuccessWindow)
+    void BellBedtimeWindow::exit()
     {
         presenter->saveData();
-        if (showSuccessWindow) {
-            application->switchWindow(gui::window::bell_finished::defaultName,
-                                      BellFinishedWindowData::Factory::create("circle_success_big", "", "", true));
-        }
-        else {
-            application->returnToPreviousWindow();
-        }
+        application->switchWindow(gui::window::bell_finished::defaultName,
+                                  BellFinishedWindowData::Factory::create("circle_success_big", "", "", true));
     }
 } /* namespace gui */

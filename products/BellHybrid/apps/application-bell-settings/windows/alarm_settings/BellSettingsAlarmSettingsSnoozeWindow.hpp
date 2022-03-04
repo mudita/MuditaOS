@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,6 +20,7 @@ namespace gui
                                               std::unique_ptr<app::bell_settings::SnoozePresenter> presenter);
 
         void buildInterface() override;
+        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void onClose(CloseReason reason) override;
         void rebuild() override;

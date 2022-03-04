@@ -12,7 +12,6 @@ add_catch2_executable(
     NAME
         service-time-alarm-tests
     SRCS
-        tests-main.cpp
         tests-AlarmHandlerFactory.cpp
         MockAlarmHandler.hpp
     LIBS

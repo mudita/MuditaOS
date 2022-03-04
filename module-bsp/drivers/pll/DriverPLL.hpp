@@ -5,6 +5,7 @@
 #define PUREPHONE_DRIVERPLL_HPP
 
 #include <memory>
+#include <cstdint>
 
 namespace drivers
 {
@@ -23,17 +24,20 @@ namespace drivers
     };
 
     struct DriverPLLParams
-    {};
+    {
+        std::uint32_t loopDivider;
+        std::uint32_t postDivider;
+        std::uint32_t numerator;
+        std::uint32_t denominator;
+        std::uint32_t src;
+    };
 
     class DriverPLL
     {
       public:
-        static std::shared_ptr<DriverPLL> Create(const PLLInstances inst, const DriverPLLParams &params);
+        static std::shared_ptr<DriverPLL> Create(PLLInstances inst, const DriverPLLParams &params);
 
-        DriverPLL(const DriverPLLParams &params) : parameters(params)
-        {}
-
-        virtual ~DriverPLL()
+        explicit DriverPLL(const DriverPLLParams &params) : parameters(params)
         {}
 
       protected:

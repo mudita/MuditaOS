@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <time/AlarmOperations.hpp>
@@ -164,8 +164,11 @@ namespace alarms
          * timestamp hence it is safe to process these three in the one go.
          */
         AlarmOperationsCommon::minuteUpdated(now);
-        processPreWakeUp(now);
-        if (isBedtimeAllowed()) {
+        auto prewakeupStarted  = processPreWakeUp(now);
+        auto snoozeChimePlayed = processSnoozeChime(now);
+
+        // If we are during snooze or its prewakeup time, we decided to skip bedtime handling at all
+        if (!prewakeupStarted && !snoozeChimePlayed && isBedtimeAllowed()) {
             processBedtime(now);
         }
     }
@@ -176,22 +179,23 @@ namespace alarms
         AlarmOperationsCommon::stopAllSnoozedAlarms();
     }
 
-    void AlarmOperations::processPreWakeUp(TimePoint now)
+    bool AlarmOperations::processPreWakeUp(TimePoint now)
     {
         if (nextSingleEvents.empty()) {
-            return;
+            return false;
         }
 
         auto nextEvent = getNextPreWakeUpEvent();
         if (!nextEvent.isValid()) {
-            return;
+            return false;
         }
 
         const auto decision = preWakeUp.decide(now, nextEvent);
         if (!decision.timeForChime && !decision.timeForFrontlight) {
-            return;
+            return false;
         }
         handlePreWakeUp(nextEvent, decision);
+        return true;
     }
 
     void AlarmOperations::processBedtime(TimePoint now)
@@ -281,7 +285,18 @@ namespace alarms
     }
     bool AlarmOperations::isBedtimeAllowed() const
     {
-        return ongoingSingleEvents.empty() && not preWakeUp.isActive();
+        return ongoingSingleEvents.empty() && snoozedSingleEvents.empty() && not preWakeUp.isActive();
+    }
+
+    void AlarmOperations::handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
+                                           alarms::AlarmType alarmType,
+                                           bool newStateOn)
+    {
+        if (newStateOn && alarmType == alarms::AlarmType::Clock) {
+            AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
+            AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
+        }
+        AlarmOperationsCommon::handleAlarmEvent(event, alarmType, newStateOn);
     }
 
     PreWakeUp::PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider)

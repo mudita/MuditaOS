@@ -80,6 +80,7 @@ target_sources(apps-common
         models/SongsModelInterface.hpp
 
         widgets/spinners/GenericSpinner.hpp
+        widgets/spinners/ItemSpinner.hpp
         widgets/spinners/SpinnerPolicies.hpp
         widgets/spinners/Spinners.hpp
 )

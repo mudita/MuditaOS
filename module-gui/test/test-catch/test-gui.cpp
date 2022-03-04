@@ -4,7 +4,6 @@
 /// These are random tests what could be salvaged from old tests
 
 #include "mock/InitializedFontManager.hpp"
-#define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 
 #include <memory>
 #include <functional>

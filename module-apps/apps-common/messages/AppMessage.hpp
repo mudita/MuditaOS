@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -112,6 +112,13 @@ namespace app
         {
             return window_name;
         }
+    };
+
+    class AppShutdownRefreshMessage : public AppRefreshMessage
+    {
+      public:
+        AppShutdownRefreshMessage(std::string window_name)
+            : AppRefreshMessage(gui::RefreshModes::GUI_REFRESH_DEEP, window_name){};
     };
 
     class AppSwitchWindowMessage : public AppMessage

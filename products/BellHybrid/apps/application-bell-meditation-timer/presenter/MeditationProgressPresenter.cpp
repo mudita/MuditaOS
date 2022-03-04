@@ -7,6 +7,7 @@
 
 #include <common/models/TimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
+#include <common/windows/SessionPausedWindow.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/Settings.hpp>
 
@@ -57,7 +58,7 @@ namespace app::meditation
     void MeditationProgressPresenter::pause()
     {
         timer->stop();
-        app->switchWindow(gui::name::window::sessionPaused);
+        app->switchWindow(gui::window::session_paused::sessionPaused);
     }
 
     void MeditationProgressPresenter::resume()

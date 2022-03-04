@@ -3,11 +3,11 @@ add_catch2_executable(
         NAME
             service-db-settings
         SRCS
-            main.cpp
             test-service-db-settings-api.cpp
         LIBS
             db
             evtmgr
+            sys
             module-audio
             module-cellular
             module-vfs

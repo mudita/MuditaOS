@@ -25,7 +25,6 @@ add_catch2_executable(
         SMSTemplateTable_tests.cpp
         ThreadRecord_tests.cpp
         ThreadsTable_tests.cpp
-        tests-main.cpp
         common.cpp
         
     LIBS

@@ -127,6 +127,8 @@ namespace app
 
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
+        connect(typeid(AppShutdownRefreshMessage),
+                [this](sys::Message *msg) -> sys::MessagePointer { return handleAppShutdownRefresh(msg); });
         connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) { return handleBatteryStatusChange(); });
         connect(typeid(app::manager::DOMRequest),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleGetDOM(msg); });
@@ -141,14 +143,14 @@ namespace app
 
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
-                auto modeParams = static_cast<gui::PhoneModeParams *>(params.get());
+                auto modeParams                  = static_cast<gui::PhoneModeParams *>(params.get());
                 this->statusIndicators.phoneMode = modeParams->getPhoneMode();
             }
             return actionHandled();
         });
         addActionReceiver(app::manager::actions::BluetoothModeChanged, [this](auto &&params) {
             if (params != nullptr) {
-                auto modeParams     = static_cast<gui::BluetoothModeParams *>(params.get());
+                auto modeParams                      = static_cast<gui::BluetoothModeParams *>(params.get());
                 this->statusIndicators.bluetoothMode = modeParams->getBluetoothMode();
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
@@ -234,10 +236,7 @@ namespace app
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
 
-            if (systemCloseInProgress) {
-                message->setCommandType(service::gui::DrawMessage::Type::SHUTDOWN);
-            }
-            else if (suspendInProgress) {
+            if (suspendInProgress) {
                 message->setCommandType(service::gui::DrawMessage::Type::SUSPEND);
             }
 
@@ -714,6 +713,33 @@ namespace app
         return sys::msgHandled();
     }
 
+    sys::MessagePointer ApplicationCommon::handleAppShutdownRefresh(sys::Message *msgl)
+    {
+        auto *msg = static_cast<AppShutdownRefreshMessage *>(msgl);
+        assert(msg);
+
+        if (not windowsFactory.isRegistered(msg->getWindowName())) {
+            LOG_ERROR("Cannot find window %s windowsFactory in application: %s",
+                      msg->getWindowName().c_str(),
+                      GetName().c_str());
+            return sys::msgHandled();
+        }
+
+        pushWindow(msg->getWindowName());
+        auto window = getWindow(msg->getWindowName());
+
+        if (not window) {
+            LOG_ERROR("Cannot find window %s in application %s", msg->getWindowName().c_str(), GetName().c_str());
+            return sys::msgHandled();
+        }
+
+        auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), msg->getMode());
+        message->setCommandType(service::gui::DrawMessage::Type::SHUTDOWN);
+        bus.sendUnicast(std::move(message), service::name::gui);
+
+        return sys::msgHandled();
+    }
+
     sys::MessagePointer ApplicationCommon::handleGetDOM(sys::Message *msgl)
     {
         if (windowsStack().isEmpty()) {
@@ -896,6 +922,17 @@ namespace app
         if (popupName == getCurrentWindow()->getName()) {
             returnToPreviousWindow();
         }
+    }
+
+    void ApplicationCommon::requestShutdownWindow(std::string windowName)
+    {
+#if DEBUG_APPLICATION_MANAGEMENT == 1
+        LOG_INFO("switching [%s] to shutdown window: %s",
+                 GetName().c_str(),
+                 windowName.length() ? windowName.c_str() : default_window.c_str());
+#endif
+        auto msg = std::make_shared<AppShutdownRefreshMessage>(windowName);
+        bus.sendUnicast(msg, this->GetName());
     }
 
     bool ApplicationCommon::userInterfaceDBNotification([[maybe_unused]] sys::Message *msg,

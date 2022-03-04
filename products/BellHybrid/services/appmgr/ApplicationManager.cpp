@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <appmgr/ApplicationManager.hpp>
 #include <appmgr/messages/AlarmMessage.hpp>
 #include <appmgr/messages/BatteryShutdown.hpp>
 #include <appmgr/messages/IdleTimerMessage.hpp>
+#include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
 #include <service-appmgr/Constants.hpp>
@@ -65,22 +66,6 @@ namespace app::manager
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
         connect(typeid(BatteryShutdown), convertibleToActionHandler);
         connect(typeid(BedtimeNotification), convertibleToActionHandler);
-    }
-
-    void ApplicationManager::handleStart(StartAllowedMessage *msg)
-    {
-        switch (msg->getStartupType()) {
-        case StartupType::Regular:
-            [[fallthrough]];
-        case StartupType::LowBatteryCharging:
-            ApplicationManagerCommon::handleStart(msg);
-            break;
-        case StartupType::LowBattery:
-            handleSwitchApplication(
-                std::make_unique<SwitchRequest>(
-                    service::name::appmgr, app::applicationBellName, gui::window::name::bell_battery_shutdown, nullptr)
-                    .get());
-            break;
-        }
+        connect(typeid(ChangeHomescreenLayoutMessage), convertibleToActionHandler);
     }
 } // namespace app::manager

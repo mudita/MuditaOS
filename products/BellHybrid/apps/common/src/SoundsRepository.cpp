@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SoundsRepository.hpp"
@@ -17,6 +17,9 @@ SoundsRepository::SoundsRepository(std::filesystem::path dirToScan)
     for (auto const &entry : std::filesystem::directory_iterator(dirToScan)) {
         processEntry(entry);
     }
+
+    /// Sort entries by track ID
+    std::sort(samples.begin(), samples.end(), [](const auto &a, const auto &b) { return a.track < b.track; });
 }
 std::optional<std::filesystem::path> SoundsRepository::titleToPath(const UTF8 &title) const
 {

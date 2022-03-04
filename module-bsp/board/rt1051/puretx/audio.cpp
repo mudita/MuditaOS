@@ -16,7 +16,7 @@ using namespace drivers;
 
 bsp::audio::AudioConfig audioConfig;
 
-void bsp::audio::init()
+void bsp::audio::init([[maybe_unused]] const std::uint32_t sampleRate)
 {
     audioConfig.pllAudio = DriverPLL::Create(static_cast<PLLInstances>(BoardDefinitions::AUDIO_PLL), DriverPLLParams{});
     audioConfig.dmamux =

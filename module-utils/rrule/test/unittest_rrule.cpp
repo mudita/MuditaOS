@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <rrule/rrule.hpp>
@@ -10,8 +10,6 @@
 #include <unistd.h>
 #include <chrono>
 #include <regex>
-
-#define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 
 #include <catch2/catch.hpp>
 

@@ -1,5 +1,5 @@
 #!/bin/bash 
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 set -e
@@ -22,6 +22,8 @@ L_GIT_DIR=$(git rev-parse --show-toplevel)
 source $L_GIT_DIR/config/format-config.sh
 source $L_GIT_DIR/config/clang/colors.sh
 source $L_GIT_DIR/config/clang/clang-common.sh
+CHANGE_TARGET=${CHANGE_TARGET:-master}
+
 
 # if autoformatting was disabled by user - then ignore this commit hook
 if [ "$DISABLE_AUTO_FORMATTING" -eq 1 ]; then
@@ -47,14 +49,14 @@ check_file() {
         case ${last_commit} in
         "True")
             if [[ ${FIX,,} == "true" ]]; then
-                git diff -U0 --no-color remotes/origin/master...HEAD "${file}" | ${L_CLANG_DIFF_TOOL} -style file -p1 -i
+                git diff -U0 --no-color remotes/origin/"${CHANGE_TARGET}"...HEAD "${file}" | ${L_CLANG_DIFF_TOOL} -style file -p1 -i
                 STATUS=$(git status --short -- "${file}")
                 if [ -n "${STATUS}" ]; then
                     git add "${file}"
                     results["${file}"]="${FIXED}";
                 fi
             else
-                OUT=$(git diff -U0 --no-color remotes/origin/master...HEAD "${file}" | ${L_CLANG_DIFF_TOOL} -style file -p1 )
+                OUT=$(git diff -U0 --no-color remotes/origin/"${CHANGE_TARGET}"...HEAD "${file}" | ${L_CLANG_DIFF_TOOL} -style file -p1 )
                 if [ -n "${OUT}" ]; then
                     results["${file}"]="${ERROR}"
                     return 1
@@ -115,12 +117,12 @@ case "${1}" in
         exit 0
         ;;
     --last)
-        FILES=$(git diff --name-only remotes/origin/master...HEAD)
+        FILES=$(git diff --name-only remotes/origin/"${CHANGE_TARGET}"...HEAD)
         LAST="True"
         FIX="false"
         ;;
     --branch-fix)
-        FILES=$(git diff --name-only remotes/origin/master...HEAD)
+        FILES=$(git diff --name-only remotes/origin/"${CHANGE_TARGET}"...HEAD)
         LAST="True"
         FIX="true"
         ;;

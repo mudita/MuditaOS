@@ -1,22 +1,23 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Application.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 #include <common/models/AbstractAudioModel.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 
 namespace gui::window::name
 {
-    inline constexpr auto bellSettings             = "BellSettings";
-    inline constexpr auto bellSettingsAdvanced     = "BellSettingsAdvanced";
+    inline constexpr auto bellSettings             = gui::name::window::main_window;
     inline constexpr auto bellSettingsTimeUnits    = "BellSettingsTimeUnits";
     inline constexpr auto bellSettingsDialog       = "BellSettingsDialog";
     inline constexpr auto bellSettingsFinished     = "BellSettingsFinished";
     inline constexpr auto bellSettingsFrontlight   = "BellSettingsFrontlight";
     inline constexpr auto bellSettingsHomeView     = "BellSettingsHomeView";
     inline constexpr auto bellSettingsLanguage     = "BellSettingsLanguage";
+    inline constexpr auto bellSettingsLayout       = "BellSettingsLayout";
     inline constexpr auto bellSettingsBedtimeTone  = "BellSettingsBedtimeTone";
     inline constexpr auto bellSettingsFactoryReset = "BellSettingsFactoryReset";
 } // namespace gui::window::name

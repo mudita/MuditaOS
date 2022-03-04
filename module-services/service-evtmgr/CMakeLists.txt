@@ -8,8 +8,8 @@ set(SOURCES
         backlight-handler/BacklightHandlerCommon.cpp
         battery/BatteryController.cpp
         battery/BatteryController.hpp
-        battery-level-check/BatteryLevelCheck.cpp
-        battery-brownout-detector/BatteryBrownoutDetector.cpp
+        battery/BatteryState.cpp
+        battery/BatteryBrownoutDetector.cpp
         screen-light-control/ControlFunctions.cpp
         screen-light-control/ScreenLightControlParameters.cpp
         vibra/Vibra.cpp
