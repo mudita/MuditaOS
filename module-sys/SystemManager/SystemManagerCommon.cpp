@@ -85,8 +85,7 @@ namespace sys
     }
 
     SystemManagerCommon::SystemManagerCommon(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators)
-        : Service(service::name::system_manager, "", systemManagerStack, ServicePriority::Low), systemServiceCreators{
-                                                                                                    std::move(creators)}
+        : Service(service::name::system_manager, "", systemManagerStack), systemServiceCreators{std::move(creators)}
     {
         // Specify list of channels which System Manager is registered to
         bus.channels            = {BusChannel::SystemManagerRequests};
