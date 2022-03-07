@@ -33,7 +33,7 @@ namespace bsp::torch
     bool isPresent(void);
 
     bool turn(State state, ColourTemperature = ColourTemperature::noChange);
-    std::pair<bool, State> getState();
+    State getState();
     ColourTemperature getColorTemp();
     bool toggle();
     bool setCurrent(const unsigned short mA);

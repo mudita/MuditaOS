@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/torch/torch.hpp"
@@ -48,9 +48,9 @@ namespace bsp
             return true;
         }
 
-        std::pair<bool, State> getState()
+        State getState()
         {
-            return std::make_pair(true, state_simulated);
+            return state_simulated;
         }
 
         ColourTemperature getColorTemp()
@@ -60,7 +60,7 @@ namespace bsp
 
         bool toggle()
         {
-            return turn(getState().second == State::off ? State::on : State::off);
+            return turn(getState() == State::off ? State::on : State::off);
         };
 
         bool setCurrent(const unsigned short mA)
