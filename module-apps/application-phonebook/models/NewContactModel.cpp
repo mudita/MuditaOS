@@ -116,13 +116,6 @@ void NewContactModel::clearData()
     eraseInternalData();
 }
 
-void NewContactModel::recreateData()
-{
-    clearData();
-    createData();
-    list->rebuildList();
-}
-
 bool NewContactModel::verifyData()
 {
     for (auto item : internalData) {

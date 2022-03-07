@@ -42,6 +42,8 @@ namespace gui
                                  newContactModel,
                                  listview::ScrollBarType::PreRendered);
         list->setBoundaries(Boundaries::Continuous);
+        newContactModel->createData();
+
         setFocusItem(list);
     }
 
@@ -52,12 +54,8 @@ namespace gui
 
     void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (mode != ShowMode::GUI_SHOW_RETURN) {
-            newContactModel->recreateData();
+        if (mode == ShowMode::GUI_SHOW_INIT && data != nullptr) {
             newContactModel->loadData(contact, data);
-        }
-
-        if (mode == ShowMode::GUI_SHOW_INIT) {
             list->rebuildList();
         }
 
@@ -188,7 +186,7 @@ namespace gui
 
         std::unique_ptr<gui::SwitchData> data =
             std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
-        data->ignoreCurrentWindowOnStack      = true;
+        data->ignoreCurrentWindowOnStack = true;
         application->switchWindow(gui::window::name::contact, std::move(data));
         return true;
     } // namespace gui
