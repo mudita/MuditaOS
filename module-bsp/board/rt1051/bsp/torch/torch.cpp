@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/torch/torch.hpp"
@@ -47,12 +47,10 @@ namespace bsp
             gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::TORCH_DRIVER_EN), 1);
             vTaskDelay(pdMS_TO_TICKS(5));
 
-            if (isPresent()) {
-                turn(State::off);
-                setCurrent(max_current_mA);
-                return kStatus_Success;
-            }
-            return kStatus_Fail;
+            auto present = isPresent();
+            turn(State::off);
+
+            return present ? kStatus_Success : kStatus_Fail;
         }
 
         void deinit()
@@ -95,6 +93,11 @@ namespace bsp
         };
         bool turn(State state, ColourTemperature colourTemp)
         {
+            if (state == State::on) {
+                gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::TORCH_DRIVER_EN), 1);
+                setCurrent(max_current_mA);
+            }
+
             if (colourTemp != ColourTemperature::noChange) {
                 currentColourTemp = colourTemp;
             }
@@ -114,24 +117,21 @@ namespace bsp
                 .tx_pin_en     = 0,
             };
             auto wrote = i2c->Write(addr, (uint8_t *)(&en_reg), 1);
+
+            if (state == State::off) {
+                gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::TORCH_DRIVER_EN), 0);
+            }
+
             if (wrote != 1) {
                 return false;
             }
             return true;
         }
 
-        std::pair<bool, State> getState()
+        State getState()
         {
-            addr.subAddress = AL3644TT_ENABLE_REG;
-            al3644tt_enable_reg en_reg;
-            auto read = i2c->Read(addr, (uint8_t *)(&en_reg), 1);
-            if (read != 1) {
-                return std::make_pair(false, State::off); // invalid
-            }
-            return std::make_pair(true,
-                                  (en_reg.led1_en == AL3644TT_LED_ENABLED || en_reg.led2_en == AL3644TT_LED_ENABLED)
-                                      ? State::on
-                                      : State::off);
+            auto read = gpio->ReadPin(static_cast<uint32_t>(BoardDefinitions::TORCH_DRIVER_EN));
+            return read ? State::on : State::off;
         }
 
         ColourTemperature getColorTemp()
@@ -141,13 +141,8 @@ namespace bsp
 
         bool toggle()
         {
-            auto [success, state] = getState();
-            if (success == false) {
-                return false;
-            }
-            else {
-                return turn(state == State::off ? State::on : State::off);
-            }
+            auto state = getState();
+            return turn(state == State::off ? State::on : State::off);
         }
     } // namespace torch
 } // namespace bsp
