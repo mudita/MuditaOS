@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "SystemManager/cpu/algorithm/AlgorithmChange.hpp"
 #include "SystemManager/cpu/algorithm/AlgorithmID.hpp"
 #include "SystemManager/SentinelView.hpp"
 
@@ -10,13 +11,7 @@ namespace sys::cpu
 {
     struct UpdateResult
     {
-        enum class Result
-        {
-            UpScaled,   /// frequency risen
-            Downscaled, /// frequency downscaled
-            NoChange    /// nothing to do
-        };
-        Result changed                    = Result::NoChange;
+        algorithm::Change changed         = algorithm::Change::NoChange;
         bsp::CpuFrequencyMHz frequencySet = bsp::CpuFrequencyMHz::Level_0;
         sentinel::View data{};
         AlgoID id = AlgoID::None;

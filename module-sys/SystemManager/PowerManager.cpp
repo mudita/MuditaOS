@@ -90,38 +90,25 @@ namespace sys
     [[nodiscard]] cpu::UpdateResult PowerManager::UpdateCpuFrequency()
     {
         uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
-        cpu::UpdateResult result;
+        cpu::UpdateResult retval;
         cpu::AlgorithmData data{
             cpuLoad, lowPowerControl->GetCurrentFrequencyLevel(), cpuGovernor->GetMinimumFrequencyRequested()};
 
-        auto _ = gsl::finally([&result, this, data] {
-            result.frequencySet = lowPowerControl->GetCurrentFrequencyLevel();
-            result.changed      = result.frequencySet > data.curentFrequency ? sys::cpu::UpdateResult::Result::UpScaled
-                                  : result.frequencySet < data.curentFrequency ? sys::cpu::UpdateResult::Result::Downscaled
-                                                                               : sys::cpu::UpdateResult::Result::NoChange;
-            result.data         = data.sentinel;
+        auto _ = gsl::finally([&retval, this, data] {
+            retval.frequencySet = lowPowerControl->GetCurrentFrequencyLevel();
+            retval.data         = data.sentinel;
         });
 
         auto algorithms = {
             sys::cpu::AlgoID::FrequencyHold, sys::cpu::AlgoID::ImmediateUpscale, sys::cpu::AlgoID::FrequencyStepping};
 
-        for (auto id : algorithms) {
-            auto algo = cpuAlgorithms->get(id);
-            if (algo != nullptr) {
-                if (auto frequencyToSet = algo->calculate(data); frequencyToSet != data.curentFrequency) {
-                    result.id = id;
-                    SetCpuFrequency(frequencyToSet);
-                    for (auto again : algorithms) {
-                        if (auto al = cpuAlgorithms->get(again); al != nullptr) {
-                            al->reset();
-                        }
-                    }
-                    return result;
-                }
-            }
+        auto result = cpuAlgorithms->calculate(algorithms, data, &retval.id);
+        if (result.change == cpu::algorithm::Change::NoChange or result.change == cpu::algorithm::Change::Hold) {
+            return retval;
         }
-
-        return result;
+        SetCpuFrequency(result.value);
+        cpuAlgorithms->reset(algorithms);
+        return retval;
     }
 
     void PowerManager::RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel) const

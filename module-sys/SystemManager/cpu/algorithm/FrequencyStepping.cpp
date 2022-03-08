@@ -32,7 +32,7 @@ namespace sys::cpu
         return freq;
     }
 
-    bsp::CpuFrequencyMHz FrequencyStepping::calculateImplementation(const AlgorithmData &data)
+    AlgorithmResult FrequencyStepping::calculateImplementation(const AlgorithmData &data)
     {
         const auto load           = data.CPUload;
         const auto startFrequency = data.curentFrequency;
@@ -58,11 +58,11 @@ namespace sys::cpu
         else if (aboveThresholdCounter >= powerProfile.maxAboveThresholdCount) {
             if (startFrequency < bsp::CpuFrequencyMHz::Level_4) {
                 reset();
-                return bsp::CpuFrequencyMHz::Level_4;
+                return {algorithm::Change::UpScaled, bsp::CpuFrequencyMHz::Level_4};
             }
             else {
                 reset();
-                return bsp::CpuFrequencyMHz::Level_6;
+                return {algorithm::Change::UpScaled, bsp::CpuFrequencyMHz::Level_6};
             }
         }
         else {
@@ -70,11 +70,11 @@ namespace sys::cpu
                                                                         : powerProfile.maxBelowThresholdCount) &&
                 startFrequency > min.frequency) {
                 reset();
-                return stepDown(startFrequency, powerProfile);
+                return {algorithm::Change::Downscaled, stepDown(startFrequency, powerProfile)};
             }
         }
 
-        return startFrequency;
+        return {algorithm::Change::NoChange, startFrequency};
     }
 
     void FrequencyStepping::resetImplementation()

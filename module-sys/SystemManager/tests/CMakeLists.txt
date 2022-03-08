@@ -15,3 +15,12 @@ add_catch2_executable(
     LIBS
         module-sys
 )
+
+add_catch2_executable(
+    NAME
+        cpu-algorithms
+    SRCS
+        test-cpu-algorithms.cpp
+    LIBS
+        module-sys
+)

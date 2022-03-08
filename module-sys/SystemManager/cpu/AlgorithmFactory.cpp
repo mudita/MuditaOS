@@ -30,4 +30,31 @@ namespace sys::cpu
     {
         algorithms.erase(id);
     }
+
+    AlgorithmResult AlgorithmFactory::calculate(const std::list<sys::cpu::AlgoID> &algorithms,
+                                                cpu::AlgorithmData &data,
+                                                AlgoID *used)
+    {
+        for (auto id : algorithms) {
+            if (auto algo = get(id); algo != nullptr) {
+                if (auto result = algo->calculate(data); result.change != sys::cpu::algorithm::Change::NoChange) {
+                    if (used != nullptr) {
+                        *used = id;
+                    }
+                    return result;
+                }
+            }
+        }
+        return sys::cpu::AlgorithmResult{sys::cpu::algorithm::Change::NoChange, bsp::CpuFrequencyMHz::Level_6};
+    }
+
+    void AlgorithmFactory::reset(const std::list<sys::cpu::AlgoID> &algorithms)
+    {
+        for (auto again : algorithms) {
+            if (auto al = get(again); al != nullptr) {
+                al->reset();
+            }
+        }
+    }
+
 } // namespace sys::cpu
