@@ -182,20 +182,15 @@ namespace bluetooth
             }
             isConnected = true;
             break;
-        case HSP_SUBEVENT_RFCOMM_DISCONNECTION_COMPLETE:
-            if (hsp_subevent_rfcomm_disconnection_complete_get_status(event) != 0u) {
-                LOG_DEBUG("RFCOMM disconnection failed with status %u.\n",
-                          hsp_subevent_rfcomm_disconnection_complete_get_status(event));
-            }
-            else {
-                LOG_DEBUG("RFCOMM disconnected.\n");
-                sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
-                auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
-                busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device),
-                                     service::name::bluetooth);
-            }
+        case HSP_SUBEVENT_RFCOMM_DISCONNECTION_COMPLETE: {
+            LOG_DEBUG("RFCOMM disconnected.\n");
+            sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
+            auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device),
+                                 service::name::bluetooth);
+
             isConnected = false;
-            break;
+        } break;
         case HSP_SUBEVENT_AUDIO_CONNECTION_COMPLETE:
             if (hsp_subevent_audio_connection_complete_get_status(event) != 0u) {
                 LOG_DEBUG("Audio connection establishment failed with status %u\n",
@@ -205,7 +200,7 @@ namespace bluetooth
                 audioDevice.reset();
             }
             else {
-                scoHandle = hsp_subevent_audio_connection_complete_get_handle(event);
+                scoHandle = hsp_subevent_audio_connection_complete_get_sco_handle(event);
                 LOG_DEBUG("Audio connection established with SCO handle 0x%04x.\n", scoHandle);
                 callAnswered = true;
                 hci_request_sco_can_send_now_event();
