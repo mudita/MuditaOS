@@ -61,10 +61,6 @@ namespace app
 
     void ApplicationBellOnBoarding::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::BellWelcomeWindow>(
-                app, name, [app]() { app->switchWindow(gui::window::name::onBoardingStartupWindow); });
-        });
 
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             auto powerOffPresenter = std::make_unique<gui::BellPowerOffPresenter>(app);
@@ -176,7 +172,6 @@ namespace app
         auto currentWindow = getCurrentWindow()->getName();
         return (currentWindow != gui::name::window::main_window &&
                 currentWindow != gui::window::name::finalizeOnBoardingWindow &&
-                currentWindow != gui::window::name::onBoardingStartupWindow &&
                 (currentWindow != gui::window::name::informationOnBoardingWindow ||
                  informationState == OnBoarding::InformationStates::DeepClickWarningInfo));
     }

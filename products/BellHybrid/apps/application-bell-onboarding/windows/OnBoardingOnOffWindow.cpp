@@ -116,7 +116,7 @@ namespace gui
     void OnBoardingOnOffWindow::registerCallbacks()
     {
         timerCallback = [this](Item &, sys::Timer &timer) {
-            powerOff();
+            presenter->powerOff();
             return true;
         };
     }
@@ -128,15 +128,9 @@ namespace gui
             return true;
         }
         else if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            powerOff();
+            presenter->powerOff();
             return true;
         }
         return false;
-    }
-
-    void OnBoardingOnOffWindow::powerOff()
-    {
-        application->switchWindow(gui::window::name::onBoardingStartupWindow);
-        presenter->powerOff();
     }
 } // namespace gui
