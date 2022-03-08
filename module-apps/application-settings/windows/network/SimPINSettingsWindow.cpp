@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimPINSettingsWindow.hpp"
@@ -18,16 +18,25 @@ namespace gui
         app->bus.sendUnicast<cellular::msg::request::sim::GetLockState>();
     }
 
-    void SimPINSettingsWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)
+    void SimPINSettingsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (const auto pinSettingsSimData = dynamic_cast<PINSettingsSimData *>(data); pinSettingsSimData != nullptr) {
             setTitle(utils::translate("app_settings_network_pin_settings") + " (" + pinSettingsSimData->getSim() + ")");
         }
+        auto newPinLockStateRetrieved = false;
         if (const auto pinSettingsLockStateData = dynamic_cast<PINSettingsLockStateData *>(data);
             pinSettingsLockStateData != nullptr) {
-            pinIsOn = pinSettingsLockStateData->getSimCardPinLockState();
+            newPinLockStateRetrieved = pinIsOn != pinSettingsLockStateData->getSimCardPinLockState();
+            if (newPinLockStateRetrieved) {
+                pinIsOn = pinSettingsLockStateData->getSimCardPinLockState();
+            }
         }
-        refreshOptionsList();
+        if (mode == ShowMode::GUI_SHOW_RETURN) {
+            application->bus.sendUnicast<cellular::msg::request::sim::GetLockState>();
+        }
+        if (mode == ShowMode::GUI_SHOW_INIT || newPinLockStateRetrieved) {
+            refreshOptionsList();
+        }
     }
 
     auto SimPINSettingsWindow::buildOptionsList() -> std::list<Option>
@@ -70,7 +79,6 @@ namespace gui
     void SimPINSettingsWindow::changePinState(bool &currentState)
     {
         currentState = !currentState;
-        refreshOptionsList();
         if (!currentState) {
             application->getSimLockSubject().disableSimPin();
         }
