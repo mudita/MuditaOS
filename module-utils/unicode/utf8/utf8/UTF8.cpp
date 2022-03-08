@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cassert>
@@ -798,7 +798,8 @@ bool UTF8::isASCIICombination() const noexcept
     constexpr uint8_t secondCharacterFactor = 10;
     for (; i < len; i += 2) {
         int firstCharacter = 0;
-        if (data[i] == '1') {
+        if (len > 3 // Length check is just a workaround for a praticular case of '100' number
+            && data[i] == '1') {
             firstCharacter = static_cast<int>(data[i] - asciiZero) * firstCharacterFactor;
             ++i;
         }
@@ -824,7 +825,8 @@ std::optional<std::string> UTF8::toASCII() const noexcept
     std::size_t i                           = 0;
     for (; i < len; i += 2) {
         int firstCharacter = 0;
-        if (data[i] == '1') {
+        if (len > 3 && // Length check is just a workaround for a praticular case of '100' number
+            data[i] == '1') {
             firstCharacter = static_cast<int>(data[i] - asciiZero) * firstCharacterFactor;
             ++i;
         }
