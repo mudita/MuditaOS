@@ -42,6 +42,11 @@ namespace bluetooth
             AVRCP::mediaTracker.avrcp_cid = local_cid;
             avrcp_subevent_connection_established_get_bd_addr(packet, event_addr);
 
+            avrcp_target_support_event(AVRCP::mediaTracker.avrcp_cid, AVRCP_NOTIFICATION_EVENT_PLAYBACK_STATUS_CHANGED);
+            avrcp_target_support_event(AVRCP::mediaTracker.avrcp_cid, AVRCP_NOTIFICATION_EVENT_TRACK_CHANGED);
+            avrcp_target_support_event(AVRCP::mediaTracker.avrcp_cid,
+                                       AVRCP_NOTIFICATION_EVENT_NOW_PLAYING_CONTENT_CHANGED);
+
             avrcp_target_set_now_playing_info(
                 AVRCP::mediaTracker.avrcp_cid, NULL, sizeof(AVRCP::tracks) / sizeof(avrcp_track_t));
             avrcp_target_set_unit_info(AVRCP::mediaTracker.avrcp_cid, AVRCP_SUBUNIT_TYPE_AUDIO, AVRCP::companyId);
@@ -49,11 +54,6 @@ namespace bluetooth
                                           AVRCP_SUBUNIT_TYPE_AUDIO,
                                           (uint8_t *)AVRCP::subunitInfo,
                                           sizeof(AVRCP::subunitInfo));
-
-            avrcp_controller_get_supported_events(AVRCP::mediaTracker.avrcp_cid);
-
-            LOG_INFO("AVRCP: Channel successfully opened:  A2DP::mediaTracker.avrcp_cid 0x%02x\n",
-                     AVRCP::mediaTracker.avrcp_cid);
             return;
 
         case AVRCP_SUBEVENT_CONNECTION_RELEASED:
@@ -90,18 +90,6 @@ namespace bluetooth
             LOG_INFO("AVRCP Target: Volume set to %d%% (%d)\n",
                      AVRCP::mediaTracker.volume * 127 / 100,
                      AVRCP::mediaTracker.volume);
-            break;
-        case AVRCP_SUBEVENT_EVENT_IDS_QUERY:
-            status = avrcp_target_supported_events(AVRCP::mediaTracker.avrcp_cid,
-                                                   AVRCP::eventsNum,
-                                                   const_cast<uint8_t *>(AVRCP::events),
-                                                   sizeof(AVRCP::events));
-            break;
-        case AVRCP_SUBEVENT_COMPANY_IDS_QUERY:
-            status = avrcp_target_supported_companies(AVRCP::mediaTracker.avrcp_cid,
-                                                      AVRCP::companiesNum,
-                                                      const_cast<uint8_t *>(AVRCP::companies),
-                                                      sizeof(AVRCP::companies));
             break;
         case AVRCP_SUBEVENT_PLAY_STATUS_QUERY:
             status = avrcp_target_play_status(AVRCP::mediaTracker.avrcp_cid,
@@ -175,13 +163,15 @@ namespace bluetooth
             busProxy.sendUnicast(std::make_shared<message::bluetooth::A2DPVolume>(volume), service::name::bluetooth);
             LOG_INFO("AVRCP Controller: notification absolute volume changed %d %%\n", volume * 100 / 127);
         } break;
-        case AVRCP_SUBEVENT_GET_CAPABILITY_EVENT_ID:
-            LOG_INFO("Remote supports EVENT_ID 0x%02x\n", avrcp_subevent_get_capability_event_id_get_event_id(packet));
+        case AVRCP_SUBEVENT_NOTIFICATION_EVENT_BATT_STATUS_CHANGED:
+            // see avrcp_battery_status_t
+            LOG_INFO("AVRCP Controller: Notification Battery Status %d\n",
+                     avrcp_subevent_notification_event_batt_status_changed_get_battery_status(packet));
             break;
-        case AVRCP_SUBEVENT_GET_CAPABILITY_EVENT_ID_DONE:
-            LOG_INFO("automatically enable notifications\n");
-            avrcp_controller_enable_notification(AVRCP::mediaTracker.avrcp_cid,
-                                                 AVRCP_NOTIFICATION_EVENT_VOLUME_CHANGED);
+        case AVRCP_SUBEVENT_NOTIFICATION_STATE:
+            LOG_INFO("AVRCP Controller: Notification %s - %s\n",
+                     avrcp_event2str(avrcp_subevent_notification_state_get_event_id(packet)),
+                     avrcp_subevent_notification_state_get_enabled(packet) != 0 ? "enabled" : "disabled");
             break;
         default:
             break;
