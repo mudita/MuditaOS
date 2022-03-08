@@ -341,9 +341,26 @@ TEST_CASE("UTF8: insert whole string which doesn't work")
 
 TEST_CASE("UTF8: Convert to ascii if is ascii combination")
 {
-    UTF8 combination = "778568738465";
-    REQUIRE(combination.isASCIICombination());
-    REQUIRE(combination.toASCII() == std::string("MUDITA"));
+    SECTION("6 characters")
+    {
+        UTF8 combination = "778568738465";
+        REQUIRE(combination.isASCIICombination());
+        REQUIRE(combination.toASCII() == std::string("MUDITA"));
+    }
+
+    SECTION("4 characters")
+    {
+        UTF8 combination = "100101101112";
+        REQUIRE(combination.isASCIICombination());
+        REQUIRE(combination.toASCII() == std::string("deep"));
+    }
+
+    SECTION("2 characters")
+    {
+        UTF8 combination = "111107";
+        REQUIRE(combination.isASCIICombination());
+        REQUIRE(combination.toASCII() == std::string("ok"));
+    }
 }
 
 TEST_CASE("UTF8: Not ASCII combination")
@@ -351,6 +368,62 @@ TEST_CASE("UTF8: Not ASCII combination")
     SECTION("Pl number - 9 digits")
     {
         UTF8 combination = "600123456";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("5 digits")
+    {
+        UTF8 combination = "11115";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("4 digits")
+    {
+        UTF8 combination = "1111";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("4 digits")
+    {
+        UTF8 combination = "8411";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("Play PL info number - 3 digits")
+    {
+        UTF8 combination = "100";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("611 Carrier number - 3 digits")
+    {
+        UTF8 combination = "611";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("411 Carrier number - 3 digits")
+    {
+        UTF8 combination = "411";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("Too short number - 2 digits")
+    {
+        UTF8 combination = "20";
+        REQUIRE_FALSE(combination.isASCIICombination());
+        REQUIRE_FALSE(combination.toASCII().has_value());
+    }
+
+    SECTION("Too short number - 1 digit")
+    {
+        UTF8 combination = "1";
         REQUIRE_FALSE(combination.isASCIICombination());
         REQUIRE_FALSE(combination.toASCII().has_value());
     }
