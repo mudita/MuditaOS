@@ -5,7 +5,7 @@
 
 namespace sys::cpu
 {
-    bsp::CpuFrequencyMHz Algorithm::calculate(const AlgorithmData &data)
+    AlgorithmResult Algorithm::calculate(const AlgorithmData &data)
     {
         return calculateImplementation(data);
     }

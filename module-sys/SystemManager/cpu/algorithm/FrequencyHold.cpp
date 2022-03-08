@@ -3,6 +3,7 @@
 
 #include "FrequencyHold.hpp"
 #include <algorithm>
+#include <list>
 
 namespace sys::cpu
 {
@@ -10,8 +11,15 @@ namespace sys::cpu
         : toHold(toHold), profile(profile)
     {}
 
-    bsp::CpuFrequencyMHz FrequencyHold::calculateImplementation(const AlgorithmData &data)
+    AlgorithmResult FrequencyHold::calculateImplementation(const AlgorithmData &data)
     {
-        return std::max(toHold, profile.minimalFrequency);
+        const auto retval = std::max(toHold, profile.minimalFrequency);
+        if (toHold > data.curentFrequency) {
+            return {algorithm::Change::UpScaled, retval};
+        }
+        else if (toHold < data.curentFrequency) {
+            return {algorithm::Change::Downscaled, retval};
+        }
+        return {algorithm::Change::Hold, retval};
     }
 }; // namespace sys::cpu

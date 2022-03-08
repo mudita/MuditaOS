@@ -12,7 +12,7 @@ namespace sys::cpu
     {
         bsp::CpuFrequencyMHz toHold;
         const bsp::PowerProfile &profile;
-        [[nodiscard]] bsp::CpuFrequencyMHz calculateImplementation(const AlgorithmData &data) override;
+        [[nodiscard]] AlgorithmResult calculateImplementation(const AlgorithmData &data) override;
 
       public:
         explicit FrequencyHold(bsp::CpuFrequencyMHz toHold, const bsp::PowerProfile &profile);

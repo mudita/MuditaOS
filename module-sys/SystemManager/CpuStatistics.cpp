@@ -51,7 +51,7 @@ namespace sys
 
     void CpuStatistics::TrackChange(const cpu::UpdateResult &ret)
     {
-        if (ret.changed != sys::cpu::UpdateResult::Result::NoChange) {
+        if (ret.changed != sys::cpu::algorithm::Change::NoChange) {
             printer->printCPUChange(ret);
 #if PROF_ON
             printer->printSysUsage(data, data_size);

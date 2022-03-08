@@ -4,6 +4,7 @@
 #pragma once
 
 #include "AlgorithmID.hpp"
+#include "AlgorithmChange.hpp"
 #include "SystemManager/SentinelView.hpp"
 #include "common.hpp"
 
@@ -16,15 +17,23 @@ namespace sys::cpu
         sentinel::View sentinel;
     };
 
+    struct AlgorithmResult
+    {
+        /// is change required by algorithm
+        algorithm::Change change;
+        // value requested by algorithm
+        bsp::CpuFrequencyMHz value;
+    };
+
     class Algorithm
     {
       private:
-        [[nodiscard]] virtual bsp::CpuFrequencyMHz calculateImplementation(const AlgorithmData &) = 0;
+        [[nodiscard]] virtual AlgorithmResult calculateImplementation(const AlgorithmData &) = 0;
         virtual void resetImplementation()
         {}
 
       public:
-        [[nodiscard]] virtual bsp::CpuFrequencyMHz calculate(const AlgorithmData &) final;
+        [[nodiscard]] virtual AlgorithmResult calculate(const AlgorithmData &) final;
         virtual void reset() final;
 
         virtual ~Algorithm() = default;

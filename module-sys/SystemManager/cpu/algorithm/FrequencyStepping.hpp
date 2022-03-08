@@ -23,7 +23,7 @@ namespace sys::cpu
 
       public:
         FrequencyStepping(const bsp::PowerProfile &powerProfile, CpuGovernor &cpuGovernor);
-        [[nodiscard]] bsp::CpuFrequencyMHz calculateImplementation(const AlgorithmData &data) override;
+        [[nodiscard]] AlgorithmResult calculateImplementation(const AlgorithmData &data) override;
         void resetImplementation() override;
     };
 } // namespace sys::cpu
