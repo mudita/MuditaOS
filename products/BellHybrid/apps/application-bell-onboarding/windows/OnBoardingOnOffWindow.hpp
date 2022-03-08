@@ -23,7 +23,6 @@ namespace gui
         void buildInterface() override;
         void buildLayout();
         void registerCallbacks();
-        void powerOff();
 
         std::unique_ptr<AbstractPowerOffPresenter> presenter;
     };
