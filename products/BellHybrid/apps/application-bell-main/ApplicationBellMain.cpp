@@ -39,7 +39,10 @@ namespace app
                                              std::uint32_t stackDepth)
         : Application(name, parent, statusIndicators, startInBackground, stackDepth)
     {
-        registerOnPopCallback([](WindowsStack &windowsStack) { windowsStack.dropPendingPopups(); });
+        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &) {
+            return gui::name::window::main_window != getCurrentWindow()->getName();
+        });
+
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
@@ -166,6 +169,7 @@ namespace app
             else if (newWindowName == gui::window::name::bell_main_menu ||
                      newWindowName == gui::window::name::bell_main_menu_dialog) {
                 startIdleTimer();
+                clearPendingPopups();
             }
         }
         return ApplicationCommon::handleSwitchWindow(msgl);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,7 +40,6 @@ namespace app
 
     class WindowsStack
     {
-        std::function<void(WindowsStack &)> onPopCallback = nullptr;
         std::map<std::string, std::unique_ptr<gui::AppWindow>> windows{};
         std::vector<WindowData> stack;
         decltype(stack)::iterator findInStack(const std::string &);
@@ -75,7 +74,6 @@ namespace app
         void clear();
 
         bool rebuildWindows(app::WindowsFactory &windowsFactory, ApplicationCommon *app);
-        void registerOnPopCallback(std::function<void(WindowsStack &)> callback);
     };
 
 } // namespace app

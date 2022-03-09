@@ -185,7 +185,6 @@ namespace app
       private:
         std::unique_ptr<gui::popup::Filter> popupFilter;
         std::unique_ptr<WindowsStack> windowsStackImpl;
-        WindowsStack &windowsStack() const;
         std::string default_window;
         State state = State::DEACTIVATED;
 
@@ -220,6 +219,7 @@ namespace app
       public:
         sys::TimerHandle longPressTimer;
         void clearLongPressTimeout();
+        WindowsStack &windowsStack() const;
 
         explicit ApplicationCommon(std::string name,
                                    std::string parent                  = "",
@@ -274,8 +274,6 @@ namespace app
 
         /// Find and pop window from stack by window name
         void popWindow(const std::string &window);
-
-        void registerOnPopCallback(std::function<void(WindowsStack &)> callback);
 
         /// Pops the current window from the windows stack
         void popCurrentWindow();
@@ -362,13 +360,14 @@ namespace app
         /// Method used to attach popups windows to application
         virtual void attachPopups(const std::vector<gui::popup::ID> &popupsList) = 0;
         virtual void actionPopupPush(std::unique_ptr<gui::SwitchData> params);
+        virtual void clearPendingPopups();
         virtual bool tryShowPopup();
         void abortPopup(gui::popup::ID id);
 
         bool userInterfaceDBNotification(sys::Message *msg, const UiNotificationFilter &filter = nullptr);
         virtual gui::popup::Filter &getPopupFilter() const;
 
-	void requestShutdownWindow(std::string windowName);
+        void requestShutdownWindow(std::string windowName);
 
       public:
         /// push window to the top of windows stack

@@ -70,9 +70,6 @@ namespace app
         auto ret = findInStack(window);
         if (ret != stack.end()) {
             stack.erase(std::next(ret), stack.end());
-            if (onPopCallback) {
-                onPopCallback(*this);
-            }
             return true;
         }
         return false;
@@ -118,10 +115,7 @@ namespace app
     {
         return std::find_if(stack.begin(), stack.end(), [&](auto &el) { return el.name == window; });
     }
-    void WindowsStack::registerOnPopCallback(std::function<void(WindowsStack &)> callback)
-    {
-        onPopCallback = std::move(callback);
-    }
+
     void WindowsStack::dropPendingPopups()
     {
         auto it = stack.rbegin();

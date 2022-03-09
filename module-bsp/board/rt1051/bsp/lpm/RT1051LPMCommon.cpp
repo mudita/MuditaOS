@@ -23,7 +23,7 @@ namespace bsp
     RT1051LPMCommon::RT1051LPMCommon()
     {
         driverSEMC = drivers::DriverSEMC::Create(drivers::name::ExternalRAM);
-        CpuFreq = std::make_unique<CpuFreqLPM>();
+        CpuFreq    = std::make_unique<CpuFreqLPM>();
     }
 
     int32_t RT1051LPMCommon::PowerOff()

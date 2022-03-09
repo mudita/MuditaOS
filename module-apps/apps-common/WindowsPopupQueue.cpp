@@ -6,6 +6,11 @@
 
 namespace app
 {
+    void WindowsPopupQueue::clear()
+    {
+        requests.clear();
+    }
+
     std::optional<gui::popup::Request> WindowsPopupQueue::popRequest(const gui::popup::Filter &filter)
     {
         for (const auto &val : requests) {

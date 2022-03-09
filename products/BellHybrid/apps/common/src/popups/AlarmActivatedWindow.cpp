@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <ApplicationCommon.hpp>
@@ -14,6 +14,7 @@
 #include <service-time/Constants.hpp>
 #include <application-bell-alarm/ApplicationBellAlarmNames.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
+#include <WindowsStack.hpp>
 
 namespace
 {
@@ -65,6 +66,16 @@ namespace gui
             application,
             app::manager::actions::AbortPopup,
             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::AlarmDeactivated));
+
+        if (application->windowsStack().pop(gui::window::name::bellAlarmSet)) {
+            app::manager::Controller::sendAction(
+                application,
+                app::manager::actions::Launch,
+                std::make_unique<app::ApplicationLaunchData>(app::applicationBellName));
+        }
+        else {
+            application->returnToPreviousWindow();
+        }
     }
 
     bool AlarmActivatedWindow::onInput(const InputEvent &inputEvent)

@@ -24,6 +24,9 @@ namespace app
     class WindowsPopupQueue
     {
       public:
+        /// clears popup queue
+        void clear();
+
         /// pops next available popup we require to show
         /// * in order set by Disposition
         /// * limited by Filter passed to request

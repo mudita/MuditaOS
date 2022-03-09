@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCommon.hpp"
-#include "Common.hpp"              // for RefreshModes
-#include "GuiTimer.hpp"            // for GuiTimer
-#include "Item.hpp"                // for Item
-#include "MessageType.hpp"         // for MessageType
+#include "Common.hpp"      // for RefreshModes
+#include "GuiTimer.hpp"    // for GuiTimer
+#include "Item.hpp"        // for Item
+#include "MessageType.hpp" // for MessageType
 #include "Service/Message.hpp"
 #include "Timers/TimerFactory.hpp" // for Timer
 #include "StatusBar.hpp"
@@ -14,10 +14,10 @@
 #include "Translator.hpp" // for KeyInputSim...
 #include <EventStore.hpp> // for Battery
 #include <hal/key_input/RawKey.hpp>
-#include "gui/input/InputEvent.hpp"      // for InputEvent
-#include <log/debug.hpp>                 // for DEBUG_APPLI...
-#include <log/log.hpp>                   // for LOG_INFO
-#include "messages/AppMessage.hpp"       // for AppSwitchMe...
+#include "gui/input/InputEvent.hpp" // for InputEvent
+#include <log/debug.hpp>            // for DEBUG_APPLI...
+#include <log/log.hpp>              // for LOG_INFO
+#include "messages/AppMessage.hpp"  // for AppSwitchMe...
 #include "messages/AppSwitchWindowPopupMessage.hpp"
 #include "service-appmgr/Controller.hpp" // for Controller
 #include "actions/AlarmClockStatusChangeParams.hpp"
@@ -896,6 +896,11 @@ namespace app
         return *popupFilter;
     }
 
+    void ApplicationCommon::clearPendingPopups()
+    {
+        windowsPopupQueue->clear();
+    }
+
     bool ApplicationCommon::tryShowPopup()
     {
         auto request = windowsPopupQueue->popRequest(getPopupFilter());
@@ -1064,10 +1069,5 @@ namespace app
         getCurrentWindow()->updateNetworkAccessTechnology();
         getCurrentWindow()->updateBatteryStatus();
         getCurrentWindow()->updateSim();
-    }
-
-    void ApplicationCommon::registerOnPopCallback(std::function<void(WindowsStack &)> callback)
-    {
-        windowsStack().registerOnPopCallback(std::move(callback));
     }
 } /* namespace app */
