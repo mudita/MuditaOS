@@ -24,11 +24,11 @@ namespace sys
         /// stores system usage, should be called before any CPU frequency change
         /// this way we know what services were in use and for how long before it happened
         void StoreSysUsage();
-        [[nodiscard]] uint32_t GetPercentageCpuLoad() const noexcept;
-        void UpdatePercentageCpuLoad();
+        [[nodiscard]] uint32_t GetPercentageCpuLoad();
         void TrackChange(const cpu::UpdateResult &ret);
 
       private:
+        void UpdatePercentageCpuLoad();
         /// used to print stored data in CpuStatistics on change
         std::unique_ptr<cpu::stats::Printer> printer;
         uint32_t ComputeIncrease(uint32_t currentCount, uint32_t lastCount) const;

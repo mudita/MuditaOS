@@ -107,14 +107,14 @@ void EventManager::initProductEvents()
 void EventManager::toggleTorchOnOff()
 {
     auto state    = bsp::torch::getState();
-    auto newState = (state.second == bsp::torch::State::off) ? bsp::torch::State::on : bsp::torch::State::off;
+    auto newState = (state == bsp::torch::State::off) ? bsp::torch::State::on : bsp::torch::State::off;
     bsp::torch::turn(newState, bsp::torch::ColourTemperature::coldest);
 }
 
 void EventManager::toggleTorchColor()
 {
     auto state = bsp::torch::getState();
-    if (state.second == bsp::torch::State::on) {
+    if (state == bsp::torch::State::on) {
         auto color    = bsp::torch::getColorTemp();
         auto newColor = (color == bsp::torch::ColourTemperature::coldest) ? bsp::torch::ColourTemperature::warmest
                                                                           : bsp::torch::ColourTemperature::coldest;

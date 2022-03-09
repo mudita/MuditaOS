@@ -36,13 +36,12 @@ namespace gui
         };
     }
 
-    // sets copy of alarm's
-    void PhonebookItem::setContact(std::shared_ptr<ContactRecord> contact)
+    void PhonebookItem::setContact(std::shared_ptr<ContactRecord> contactRecord)
     {
-        this->contact = contact;
-        /* alternativeName is used as Surname or Second name */
+        contact = std::move(contactRecord);
         contactName->setText(contact->getFormattedName(ContactRecord::NameFormatType::List));
-        markFavourite(contact->isOnFavourites());
+        contactName->setFont(style::window::font::big);
+        favourite = contact->isOnFavourites();
         markBlocked(contact->isOnBlocked());
     }
 
@@ -60,15 +59,6 @@ namespace gui
             // else return first firstname contact letter
             return contact->primaryName.substr(0, 1);
         }
-    }
-
-    void PhonebookItem::markFavourite(bool val)
-    {
-        favourite = val;
-        if (val)
-            contactName->setFont(style::window::font::bigbold);
-        else
-            contactName->setFont(style::window::font::big);
     }
 
     void PhonebookItem::markBlocked(bool val)

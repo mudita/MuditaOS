@@ -83,10 +83,6 @@ namespace bsp::battery_charger
 
     int getVoltageFilteredMeasurement();
 
-    int getAvgCurrent();
-
-    int getCurrentMeasurement();
-
     MaxMinVolt getMaxMinVolt();
 
     void printFuelGaugeInfo();

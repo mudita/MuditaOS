@@ -3,6 +3,7 @@
 
 #include <SystemManager/CpuSentinel.hpp>
 #include "system/messages/RequestCpuFrequencyMessage.hpp"
+#include "system/messages/HoldCpuFrequency.hpp"
 #include "system/Constants.hpp"
 #include <Timers/TimerFactory.hpp>
 #include <memory>
@@ -28,11 +29,13 @@ namespace sys
     void CpuSentinel::HoldMinimumFrequency(bsp::CpuFrequencyMHz frequencyToHold)
     {
         if (currentFrequencyToHold != frequencyToHold) {
-            auto msg = std::make_shared<sys::HoldCpuFrequencyMessage>(GetName(), frequencyToHold);
+            auto msg =
+                std::make_shared<sys::HoldCpuFrequencyMessage>(GetName(), frequencyToHold, xTaskGetCurrentTaskHandle());
             owner->bus.sendUnicast(std::move(msg), service::name::system_manager);
             currentFrequencyToHold = frequencyToHold;
             currentReason          = std::string("up: ") + owner->getCurrentProcessing() + std::string(" req: ") +
                             std::to_string(int(frequencyToHold));
+            ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
         }
     }
 
@@ -46,37 +49,9 @@ namespace sys
         }
     }
 
-    void CpuSentinel::HoldFrequencyPermanently(bsp::CpuFrequencyMHz frequencyToHold)
-    {
-        permanentFrequencyToHold.isActive        = true;
-        permanentFrequencyToHold.frequencyToHold = frequencyToHold;
-        auto msg = std::make_shared<sys::HoldCpuFrequencyPermanentlyMessage>(GetName(), frequencyToHold);
-        owner->bus.sendUnicast(std::move(msg), service::name::system_manager);
-    }
-
     [[nodiscard]] auto CpuSentinel::GetFrequency() const noexcept -> bsp::CpuFrequencyMHz
     {
-        if (permanentFrequencyToHold.isActive) {
-            return permanentFrequencyToHold.frequencyToHold;
-        }
-        else {
             return currentFrequency;
-        }
-    }
-
-    void CpuSentinel::ReleasePermanentFrequency()
-    {
-        if (permanentFrequencyToHold.isActive) {
-            auto msg = std::make_shared<sys::ReleaseCpuPermanentFrequencyMessage>(GetName());
-            owner->bus.sendUnicast(std::move(msg), service::name::system_manager);
-            permanentFrequencyToHold.isActive        = false;
-            permanentFrequencyToHold.frequencyToHold = bsp::CpuFrequencyMHz::Level_0;
-        }
-    }
-
-    bool CpuSentinel::isPermanentFrequencyActive()
-    {
-        return permanentFrequencyToHold.isActive;
     }
 
     void CpuSentinel::CpuFrequencyHasChanged(bsp::CpuFrequencyMHz newFrequency)
@@ -85,35 +60,11 @@ namespace sys
         if (callback) {
             callback(newFrequency);
         }
-        if (taskWaitingForFrequency != nullptr && newFrequency >= currentFrequencyToHold) {
-            xTaskNotifyGive(taskWaitingForFrequency);
-            taskWaitingForFrequency = nullptr;
-        }
     }
 
-    bool CpuSentinel::HoldMinimumFrequencyAndWait(bsp::CpuFrequencyMHz frequencyToHold,
-                                                  TaskHandle_t taskToNotify,
-                                                  uint32_t timeout)
+    void CpuSentinel::ReadRegistrationData(bsp::CpuFrequencyMHz frequencyHz)
     {
-        currentReason = std::string("h+w: ") + owner->getCurrentProcessing();
-        HoldMinimumFrequency(frequencyToHold);
-
-        if (currentFrequencyToHold < frequencyToHold) {
-            taskWaitingForFrequency = taskToNotify;
-            return ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(timeout)) == 0;
-        }
-
-        return true;
-    }
-
-    void CpuSentinel::ReadRegistrationData(bsp::CpuFrequencyMHz frequencyHz, bool permanentFrequency)
-    {
-        currentFrequency                  = frequencyHz;
-        permanentFrequencyToHold.isActive = permanentFrequency;
-
-        if (permanentFrequencyToHold.isActive) {
-            permanentFrequencyToHold.frequencyToHold = currentFrequency;
-        }
+        currentFrequency = frequencyHz;
     }
 
     TimedCpuSentinel::TimedCpuSentinel(std::string name, sys::Service *service)

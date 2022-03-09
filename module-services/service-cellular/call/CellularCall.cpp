@@ -6,6 +6,7 @@
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-db/agents/settings/SystemSettings.hpp"
 
+#include <queries/notifications/QueryNotificationsIncrement.hpp>
 #include <CalllogRecord.hpp>
 #include <PhoneNumber.hpp>
 #include <Utils.hpp>
@@ -21,7 +22,7 @@
 
 namespace CellularCall
 {
-    Call::Call(ServiceCellular &owner) : owner(owner), audio(owner), gui(owner)
+    Call::Call(ServiceCellular &owner) : owner(owner), audio(owner), gui(owner), db(owner)
     {
         utils::PhoneNumber::View number = utils::PhoneNumber::View();
         const CallType type             = CallType::CT_NONE;
@@ -60,6 +61,11 @@ namespace CellularCall
             gui.notifyCLIP(number);
             return true;
         }
+
+        if (callDNDGuard(*this)) {
+            db.incrementNotAnsweredCallsNotification(number);
+        }
+
         return false;
     }
 

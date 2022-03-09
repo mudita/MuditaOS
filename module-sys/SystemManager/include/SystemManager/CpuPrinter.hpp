@@ -17,6 +17,7 @@ namespace sys::cpu
           public:
             virtual void printSysUsage(struct task_prof_data *data, size_t size) = 0;
             virtual void printCPUChange(const cpu::UpdateResult &ret)            = 0;
+            virtual void printPowerConsumption()                                 = 0;
         };
 
         class NullPrinter : public Printer
@@ -25,6 +26,8 @@ namespace sys::cpu
             {}
             void printCPUChange(const cpu::UpdateResult &ret)
             {}
+            void printPowerConsumption()
+            {}
         };
 
         class LogPrinter : public Printer
@@ -32,6 +35,7 @@ namespace sys::cpu
           public:
             void printSysUsage(struct task_prof_data *data, size_t size) override;
             void printCPUChange(const cpu::UpdateResult &ret) override;
+            void printPowerConsumption() override;
         };
 
         class PackPrinter : public Printer
@@ -39,6 +43,7 @@ namespace sys::cpu
           public:
             void printSysUsage(struct task_prof_data *data, size_t size) override;
             void printCPUChange(const cpu::UpdateResult &ret) override;
+            void printPowerConsumption() override;
         };
     }; // namespace stats
 };     // namespace sys::cpu

@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CPUModeTestWindow.hpp"
 
 #include <system/messages/SentinelRegistrationMessage.hpp>
+#include <system/messages/RequestCpuFrequencyMessage.hpp>
 #include <application-settings/windows/WindowNames.hpp>
 #include <Application.hpp>
 #include <TextFixedSize.hpp>
@@ -131,18 +132,26 @@ namespace gui
 
         permanentFreqSpinner = new gui::TextSpinnerBox(permanentFreqBody, {"OFF", "ON"}, Boundaries::Continuous);
         permanentFreqSpinner->setMinimumSize(100, 30);
-        permanentFreqSpinner->setCurrentValue(cpuModeTester->isPermanentFrequencyActive() ? "ON" : "OFF");
+        auto ret =
+            application->async_call<sys::IsCpuPernament, sys::IsCpuPernamentResponse>(service::name::system_manager);
+        application->sync(ret);
+        permanentFreqSpinner->setCurrentValue(ret.getResult().pernament ? "ON" : "OFF");
 
         permanentFreqBody->inputCallback = [&](Item &item, const InputEvent &event) {
             auto ret = permanentFreqSpinner->onInput(event);
             if (ret) {
                 if (permanentFreqSpinner->getCurrentValue() == "ON") {
-                    cpuModeTester->HoldFrequencyPermanently(
-                        magic_enum::enum_cast<bsp::CpuFrequencyMHz>(std::stoi(currentFreqSpinner->getCurrentValue()))
-                            .value());
+                    application->bus.sendUnicastSync(std::make_shared<sys::HoldCpuFrequencyPermanentlyMessage>(
+                                                         magic_enum::enum_cast<bsp::CpuFrequencyMHz>(
+                                                             std::stoi(currentFreqSpinner->getCurrentValue()))
+                                                             .value()),
+                                                     service::name::system_manager,
+                                                     5000);
                 }
                 else {
-                    cpuModeTester->ReleasePermanentFrequency();
+                    application->bus.sendUnicastSync(std::make_shared<sys::ReleaseCpuPermanentFrequencyMessage>(),
+                                                     service::name::system_manager,
+                                                     5000);
                 }
             }
 
@@ -183,10 +192,16 @@ namespace gui
         newFreqBody->inputCallback = [&](Item &item, const InputEvent &event) {
             auto ret = currentFreqSpinner->onInput(event);
 
-            if (cpuModeTester->isPermanentFrequencyActive()) {
-                cpuModeTester->HoldFrequencyPermanently(
-                    magic_enum::enum_cast<bsp::CpuFrequencyMHz>(std::stoi(currentFreqSpinner->getCurrentValue()))
-                        .value());
+            auto async = application->async_call<sys::IsCpuPernament, sys::IsCpuPernamentResponse>(
+                service::name::system_manager);
+            application->sync(async);
+            if (async.getResult().pernament) {
+                application->bus.sendUnicastSync(
+                    std::make_shared<sys::HoldCpuFrequencyPermanentlyMessage>(
+                        magic_enum::enum_cast<bsp::CpuFrequencyMHz>(std::stoi(currentFreqSpinner->getCurrentValue()))
+                            .value()),
+                    service::name::system_manager,
+                    5000);
             }
 
             return ret;

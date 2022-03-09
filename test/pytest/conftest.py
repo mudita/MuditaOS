@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import time
@@ -121,8 +121,8 @@ def harnesses():
     '''
     Automatically init at least two Pure phones
     '''
-    found_pures = serial.find_Pures()
-    harnesses = [Harness(pure) for pure in found_pures]
+    connected_devices = serial.find_Devices()
+    harnesses = [Harness(device) for device in connected_devices]
     if not len(harnesses) >= 2:
         pytest.skip("At least two phones are needed for this test")
     assert len(harnesses) >= 2

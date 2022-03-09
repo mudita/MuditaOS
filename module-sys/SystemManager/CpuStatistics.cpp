@@ -21,8 +21,12 @@ namespace sys
 #if PROF_ON
         data_size = prof_pool_get_data().size;
         data      = new task_prof_data[data_size];
+        printer   = std::make_unique<cpu::stats::PackPrinter>();
+#else
+        // to change printer change assignment
+        // printer = std::make_unique<cpu::stats::LogPrinter>();
+        printer = std::make_unique<cpu::stats::NullPrinter>();
 #endif
-        printer = std::make_unique<cpu::stats::LogPrinter>();
     }
 
     CpuStatistics::~CpuStatistics()
@@ -47,12 +51,13 @@ namespace sys
 
     void CpuStatistics::TrackChange(const cpu::UpdateResult &ret)
     {
-        if (ret.changed) {
+        if (ret.changed != sys::cpu::UpdateResult::Result::NoChange) {
             printer->printCPUChange(ret);
 #if PROF_ON
             printer->printSysUsage(data, data_size);
 #endif
         }
+        printer->printPowerConsumption();
         StoreSysUsage();
     }
 
@@ -72,8 +77,9 @@ namespace sys
         }
     }
 
-    uint32_t CpuStatistics::GetPercentageCpuLoad() const noexcept
+    uint32_t CpuStatistics::GetPercentageCpuLoad()
     {
+        UpdatePercentageCpuLoad();
         return cpuLoad;
     }
 

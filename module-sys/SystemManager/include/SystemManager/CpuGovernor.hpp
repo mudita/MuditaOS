@@ -6,25 +6,10 @@
 #include <memory>
 #include <vector>
 #include "SystemManager/CpuSentinel.hpp"
+#include "SentinelView.hpp"
 
 namespace sys
 {
-
-    namespace sentinel
-    {
-        struct Data
-        {
-            UBaseType_t ownerTCBNumber = 0;
-            /// name of sentinel thread responsible for curent minimum load
-            std::string name;
-            /// curent minimum frequency set in sentinel
-            bsp::CpuFrequencyMHz frequency = bsp::CpuFrequencyMHz::Level_0;
-            /// please do not use this task handle to perform actions, it's just for reference sake
-            TaskHandle_t task;
-            /// textual information on what actually happens
-            std::string reason;
-        };
-    }; // namespace sentinel
 
     using SentinelPointer = std::weak_ptr<CpuSentinel>;
 
@@ -55,22 +40,17 @@ namespace sys
         [[nodiscard]] auto GetNumberOfRegisteredSentinels() const noexcept -> uint32_t;
         void PrintAllSentinels() const noexcept;
 
-        void SetCpuFrequencyRequest(std::string sentinelName,
-                                    bsp::CpuFrequencyMHz request,
-                                    bool permanentBlock = false);
-        void ResetCpuFrequencyRequest(std::string sentinelName, bool permanentBlock = false);
+        void SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request);
+        void ResetCpuFrequencyRequest(const std::string &sentinelName);
 
-        [[nodiscard]] auto GetMinimumFrequencyRequested() const noexcept -> sentinel::Data;
+        [[nodiscard]] auto GetMinimumFrequencyRequested() const noexcept -> sentinel::View;
         void InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) const noexcept;
-
-        [[nodiscard]] auto GetPermanentFrequencyRequested() const noexcept -> PermanentFrequencyToHold;
 
       private:
         static void PrintName(const GovernorSentinelPointer &element);
 
         /// this could be set - set is sorted :)
         GovernorSentinelsVector sentinels;
-        PermanentFrequencyToHold permanentFrequencyToHold{false, bsp::CpuFrequencyMHz::Level_0};
     };
 
 } // namespace sys

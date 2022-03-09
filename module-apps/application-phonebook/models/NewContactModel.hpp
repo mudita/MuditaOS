@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,7 +23,6 @@ class NewContactModel : public app::InternalModel<gui::ContactListItem *>, publi
     explicit NewContactModel(app::ApplicationCommon *app);
 
     void clearData();
-    void recreateData();
     void saveData(std::shared_ptr<ContactRecord> contactRecord);
     void loadData(std::shared_ptr<ContactRecord> contactRecord, gui::SwitchData *data);
     void createData();

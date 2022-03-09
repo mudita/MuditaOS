@@ -23,6 +23,11 @@ target_sources(sys-manager
         graph/TopologicalSort.hpp
         PowerManager.cpp
         SystemManagerCommon.cpp
+        cpu/AlgorithmFactory.cpp
+        cpu/algorithm/Algorithm.cpp
+        cpu/algorithm/FrequencyHold.cpp
+        cpu/algorithm/ImmediateUpscale.cpp
+        cpu/algorithm/FrequencyStepping.cpp
 )
 
 target_include_directories(sys-manager

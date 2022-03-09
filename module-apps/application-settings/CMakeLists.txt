@@ -60,7 +60,6 @@ target_sources(application-settings
         windows/apps/SoundSelectWindow.cpp
         windows/bluetooth/AddDeviceWindow.cpp
         windows/bluetooth/AllDevicesWindow.cpp
-        windows/bluetooth/BluetoothCheckPasskeyWindow.cpp
         windows/bluetooth/BluetoothWindow.cpp
         windows/bluetooth/PhoneNameWindow.cpp
         windows/display-keypad/DisplayAndKeypadWindow.cpp

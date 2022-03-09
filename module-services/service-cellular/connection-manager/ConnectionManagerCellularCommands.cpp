@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-cellular/service-cellular/connection-manager/ConnectionManagerCellularCommands.hpp>
@@ -100,11 +100,9 @@ void ConnectionManagerCellularCommands::stopConnectionTimer()
 
 void ConnectionManagerCellularCommands::holdMinimumCpuFrequency()
 {
-    auto handle = cellular.getTaskHandle();
     if (cellular.cpuSentinel) {
-        cellular.cpuSentinel->HoldMinimumFrequencyAndWait(bsp::CpuFrequencyMHz::Level_4, handle, 2000);
+        cellular.cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
     }
-    return;
 }
 void ConnectionManagerCellularCommands::retryPhoneModeChange()
 {

@@ -183,7 +183,7 @@ git config commit.template .gitmessage
 ```
 
 This way each time you add a new commit you will see the template that will help
-you with the proper message format. More about that in (Development Workflow)[./doc/development_workflow.md#commit-changes]
+you with the proper message format. More about that in [Development Workflow](./doc/development_workflow.md#commit-changes)
 
 ### Commit message hook
 This hooks automatically converts your branch name to commit title
@@ -270,7 +270,7 @@ Please be aware that when building custom image you'll have to give it some tag 
 
 ## Preparing packages
 
-If you need a package, containing everything needed to run the application, please check (build_targests.md)[./doc/build_targests.md] document.
+If you need a package, containing everything needed to run the application, please check [build_targests.md](./doc/build_targests.md) document.
 
 ## Generating code coverage reports
 

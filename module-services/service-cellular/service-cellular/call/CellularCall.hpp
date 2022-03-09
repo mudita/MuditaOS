@@ -5,6 +5,7 @@
 
 #include "call/CallAudio.hpp"
 #include "call/CallGUI.hpp"
+#include "call/CallDB.hpp"
 #include "PhoneModes/PhoneMode.hpp"
 #include <Interface/CalllogRecord.hpp>
 #include <SystemManager/CpuSentinel.hpp>
@@ -63,6 +64,7 @@ namespace CellularCall
         ServiceCellular &owner;
         CallRingAudio audio;
         CallGUI gui;
+        CallDB db;
 
       public:
         void setMode(sys::phone_modes::PhoneMode mode)

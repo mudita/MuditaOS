@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -50,32 +50,6 @@ namespace style
                 inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
             } // namespace newApn
 
-            namespace bluetooth
-            {
-                namespace passkey
-                {
-                    namespace image
-                    {
-                        inline constexpr auto x = 176;
-                        inline constexpr auto y = 132;
-                    } // namespace image
-
-                    namespace label
-                    {
-                        inline constexpr auto x = 150U;
-                        inline constexpr auto y = 300U;
-                        inline constexpr auto w = 200U;
-                    } // namespace label
-
-                    namespace text
-                    {
-                        inline constexpr auto x = 40U;
-                        inline constexpr auto y = 370U;
-                        inline constexpr auto w = style::window_width - 2 * x;
-                        inline constexpr auto h = 52;
-                    } // namespace text
-                }     // namespace passkey
-            }         // namespace bluetooth
 
             namespace phone_modes
             {

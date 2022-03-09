@@ -13,6 +13,7 @@ namespace app
     void ApplicationCommon::registerPopupBlueprints()
     {
         using namespace gui::popup;
+
         popupBlueprint.registerBlueprint(
             ID::PhoneModes, [&](gui::popup::ID /*id*/, std::unique_ptr<gui::PopupRequestParams> &params) {
                 auto popupParams = dynamic_cast<gui::PhoneModePopupRequestParams *>(params.get());
@@ -35,6 +36,7 @@ namespace app
                 }
                 return true;
             });
+
         popupBlueprint.registerBlueprint(
             ID::Volume, [&](gui::popup::ID /*id*/, std::unique_ptr<gui::PopupRequestParams> &params) {
                 auto volumeParams = dynamic_cast<const gui::VolumePopupRequestParams *>(params.get());
@@ -57,6 +59,24 @@ namespace app
                 }
                 return true;
             });
+
+        popupBlueprint.registerBlueprint(
+            ID::BluetoothAuthenticate, [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
+                switchWindowPopup(resolveWindowName(id),
+                                  gui::popup::popupDisposition(id, gui::popup::Disposition::Priority::High),
+                                  std::move(params),
+                                  SwitchReason::Popup);
+                return true;
+            });
+        popupBlueprint.registerBlueprint(
+            ID::BluetoothInfo, [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
+                switchWindowPopup(resolveWindowName(id),
+                                  gui::popup::popupDisposition(id, gui::popup::Disposition::Priority::High),
+                                  std::move(params),
+                                  SwitchReason::Popup);
+                return true;
+            });
+
         popupBlueprint.registerBlueprint(
             ID::PhoneLock, [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> & /*params*/) {
                 switchWindowPopup(resolveWindowName(id),
@@ -83,6 +103,7 @@ namespace app
         };
         popupBlueprint.registerBlueprint(ID::PhoneLockInput, phoneLockBlueprint);
         popupBlueprint.registerBlueprint(ID::PhoneLockChangeInfo, phoneLockBlueprint);
+
         auto simLockBlueprint = [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
             auto popupParams = dynamic_cast<const gui::SimUnlockInputRequestParams *>(params.get());
             if (popupParams == nullptr) {

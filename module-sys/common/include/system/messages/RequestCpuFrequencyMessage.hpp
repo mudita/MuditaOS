@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,58 +9,34 @@
 namespace sys
 {
 
-    class HoldCpuFrequencyMessage : public sys::DataMessage
+    struct IsCpuPernament : public sys::DataMessage
     {
       public:
-        HoldCpuFrequencyMessage(std::string sentinelName, bsp::CpuFrequencyMHz request)
-            : sys::DataMessage(MessageType::SystemManagerCpuFrequency), sentinelName(std::move(sentinelName)),
-              frequencyRequested(request)
-        {}
-
-        [[nodiscard]] auto getRequest() const noexcept
-        {
-            return frequencyRequested;
-        };
-
-        [[nodiscard]] auto getName() const
-        {
-            return sentinelName;
-        };
-
-      private:
-        std::string sentinelName;
-        bsp::CpuFrequencyMHz frequencyRequested = bsp::CpuFrequencyMHz::Level_0;
-    };
-
-    class ReleaseCpuFrequencyMessage : public sys::DataMessage
-    {
-      public:
-        explicit ReleaseCpuFrequencyMessage(std::string sentinelName)
-            : sys::DataMessage(MessageType::SystemManagerCpuFrequency), sentinelName(std::move(sentinelName))
-        {}
-
-        [[nodiscard]] auto getName() const
-        {
-            return sentinelName;
-        };
-
-      private:
-        std::string sentinelName;
-    };
-
-    class HoldCpuFrequencyPermanentlyMessage : public HoldCpuFrequencyMessage
-    {
-      public:
-        HoldCpuFrequencyPermanentlyMessage(std::string sentinelName, bsp::CpuFrequencyMHz request)
-            : HoldCpuFrequencyMessage(sentinelName, request)
+        explicit IsCpuPernament()
         {}
     };
 
-    class ReleaseCpuPermanentFrequencyMessage : public ReleaseCpuFrequencyMessage
+    struct IsCpuPernamentResponse : public sys::ResponseMessage
     {
       public:
-        ReleaseCpuPermanentFrequencyMessage(std::string sentinelName) : ReleaseCpuFrequencyMessage(sentinelName)
+        explicit IsCpuPernamentResponse(bool pernament) : pernament(pernament)
         {}
+        const bool pernament = false;
     };
+
+    struct HoldCpuFrequencyPermanentlyMessage : public sys::DataMessage
+    {
+      public:
+        explicit HoldCpuFrequencyPermanentlyMessage(bsp::CpuFrequencyMHz request) : request(request)
+        {}
+        const bsp::CpuFrequencyMHz request;
+    };
+
+    class HoldCpuFrequencyPermanentlyResponse : public sys::ResponseMessage
+    {
+    };
+
+    class ReleaseCpuPermanentFrequencyMessage : public sys::DataMessage
+    {};
 
 } // namespace sys

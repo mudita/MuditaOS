@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "GAP.hpp"
@@ -9,7 +9,7 @@
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
-#include <service-bluetooth/messages/Passkey.hpp>
+#include <service-bluetooth/messages/Authenticate.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <log/log.hpp>
 #include <memory>
@@ -96,7 +96,6 @@ namespace bluetooth
         }
         return false;
     }
-
 
     void GAP::sendDevices()
     {
@@ -258,7 +257,9 @@ namespace bluetooth
             }
             it->isPairingSSP = false;
 
-            auto msg = std::make_shared<::message::bluetooth::RequestPasskey>(*it);
+            /// TODO additional authenticate types to be added in next PRs.
+            auto msg =
+                std::make_shared<::message::bluetooth::RequestAuthenticate>(*it, bluetooth::AuthenticateType::Passkey);
             ownerService->bus.sendMulticast(std::move(msg), sys::BusChannel::BluetoothNotifications);
         } break;
 
@@ -289,8 +290,11 @@ namespace bluetooth
                 it = devices().put(addr);
             }
             it->isPairingSSP = true;
-            ownerService->bus.sendMulticast(std::make_shared<::message::bluetooth::RequestPasskey>(*it),
-                                            sys::BusChannel::BluetoothNotifications);
+
+            /// TODO additional authenticate types to be added in next PRs.
+            ownerService->bus.sendMulticast(
+                std::make_shared<::message::bluetooth::RequestAuthenticate>(*it, bluetooth::AuthenticateType::Passkey),
+                sys::BusChannel::BluetoothNotifications);
         } break;
         case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE: {
             bd_addr_t addr;

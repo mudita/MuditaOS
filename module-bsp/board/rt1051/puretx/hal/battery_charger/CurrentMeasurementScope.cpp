@@ -8,7 +8,7 @@ extern "C"
 #include "FreeRTOS.h"
 }
 #include <timers.h>
-#include <bsp/battery_charger/battery_charger.hpp>
+#include <battery_charger/battery_charger.hpp>
 #include <ticks.hpp>
 
 #include <chrono>

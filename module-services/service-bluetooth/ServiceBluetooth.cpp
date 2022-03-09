@@ -37,7 +37,7 @@
 #include <BtKeysStorage.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <typeinfo>
-#include <service-bluetooth/messages/Passkey.hpp>
+#include <service-bluetooth/messages/Authenticate.hpp>
 #include <GAP/GAP.hpp>
 #include <service-cellular/CellularMessage.hpp>
 
@@ -106,7 +106,9 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::SetStatus>();
     connectHandler<message::bluetooth::Unpair>();
     connectHandler<sdesktop::developerMode::DeveloperModeRequest>();
-    connectHandler<message::bluetooth::ResponsePasskey>();
+    connectHandler<message::bluetooth::ResponseAuthenticatePin>();
+    connectHandler<message::bluetooth::ResponseAuthenticatePasskey>();
+    connectHandler<message::bluetooth::ResponseAuthenticatePairCancel>();
     connectHandler<CellularCallerIdMessage>();
     connectHandler<CellularCallActiveNotification>();
 
@@ -241,6 +243,7 @@ auto ServiceBluetooth::handle(BluetoothPairResultMessage *msg) -> std::shared_pt
 
     bluetoothDevicesModel->syncDevicesWithApp();
 
+    /// TODO error code handing added in next PRs
     bus.sendMulticast(std::make_shared<BluetoothPairResultMessage>(msg->getDevice(), msg->isSucceed()),
                       sys::BusChannel::BluetoothNotifications);
 
@@ -295,7 +298,7 @@ auto ServiceBluetooth::handle(message::bluetooth::Connect *msg) -> std::shared_p
 auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::shared_ptr<sys::Message>
 {
     if (msg->isSucceed()) {
-        auto device        = msg->getDevice();
+        auto device = msg->getDevice();
         bluetoothDevicesModel->mergeInternalDeviceState(device);
 
         settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, bd_addr_to_str(device.address));
@@ -348,10 +351,24 @@ auto ServiceBluetooth::handle(message::bluetooth::DisconnectResult *msg) -> std:
     return sys::MessageNone{};
 }
 
-auto ServiceBluetooth::handle(message::bluetooth::ResponsePasskey *msg) -> std::shared_ptr<sys::Message>
+auto ServiceBluetooth::handle(message::bluetooth::ResponseAuthenticatePin *msg) -> std::shared_ptr<sys::Message>
+{
+    /// TODO to be added in next PRs
+    auto pin = msg->getPin();
+    bluetooth::GAP::respondPinCode(pin, msg->getDevice());
+    return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(message::bluetooth::ResponseAuthenticatePasskey *msg) -> std::shared_ptr<sys::Message>
 {
     auto passKey = msg->getPasskey();
     bluetooth::GAP::respondPinCode(passKey, msg->getDevice());
+    return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(message::bluetooth::ResponseAuthenticatePairCancel *msg) -> std::shared_ptr<sys::Message>
+{
+    /// TODO to be added in next PRs
     return sys::MessageNone{};
 }
 
