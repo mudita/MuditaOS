@@ -99,7 +99,6 @@ namespace gui
         }
         currentLayout = layoutGenerator();
         addWidget(static_cast<BellBaseLayout *>(currentLayout->getLayout()));
-        presenter->onBeforeShow();
 
         if (auto snoozeTimer = currentLayout->getSnoozeTimer()) {
             auto timer = std::make_unique<app::ProgressTimerWithSnoozeTimer>(
@@ -127,6 +126,7 @@ namespace gui
     {
         if (currentLayout) {
             currentLayout->setViewState(state);
+            currentLayout->getLayout()->setVisible(true);
         }
     }
 
@@ -253,6 +253,9 @@ namespace gui
     void BellHomeScreenWindow::onBeforeShow(ShowMode, SwitchData *data)
     {
         presenter->onBeforeShow();
+        // Show the screen only on state change
+        // to avoid inital state homescreen display on powerup
+        currentLayout->getLayout()->setVisible(false);
 
         const auto alarmRingingSwitchData = dynamic_cast<app::actions::AlarmRingingData *>(data);
         if (alarmRingingSwitchData != nullptr) {
