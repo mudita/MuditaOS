@@ -37,5 +37,5 @@ void CallRingAudio::stop()
         return;
     }
     owner.sync(meta->async);
-    AudioServiceAPI::Stop(&owner, meta->async.getResult().token);
+    AudioServiceAPI::StopAll(&owner);
 }
