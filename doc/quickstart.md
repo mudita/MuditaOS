@@ -1,49 +1,185 @@
-# Quickstart
+# Development environment setup
 
-You can quickstart the project by going through one of the following guides:
+Table of Contents
+=================
 
-- [Introduction](#introduction)
-- [CMake options](#CMake-options)
-- [Quickstart on Linux](#quickstart-on-linux)
-- [Quickstart with unit tests](#quickstart-with-unit-tests)
-- [Quickstart on the phone](#quickstart-on-the-phone)
-- [More details on preparing your local environment](#more-details-on-preparing-your-local-environment)
-- [CI build using Docker](#ci-build-using-docker)
-- [Building your own Docker image](#building-your-own-docker-image)
-- [Preparing packages](#preparing-packages)
+* [Development environment setup](#development-environment-setup)
+   * [Introduction](#introduction)
+      * [Download repository and submodules](#download-repository-and-submodules)
+      * [Install dependencies](#install-dependencies)
+         * [bootstrap](#bootstrap)
+         * [JLink software](#jlink-software)
+         * [Add GitHub token](#add-github-token)
+         * [Project configuration](#project-configuration)
+         * [Project build](#project-build)
+         * [Project load and run](#project-load-and-run)
+            * [Running on linux](#running-on-linux)
+            * [Running on rt1051 from emmc](#running-on-rt1051-from-emmc)
+      * [checking commits](#checking-commits)
+      * [CMake options](#cmake-options)
+         * [Catching logs using UART](#catching-logs-using-uart)
+   * [More details on preparing your local environment](#more-details-on-preparing-your-local-environment)
+      * [Code style with git hooks](#code-style-with-git-hooks)
+      * [Commit message template](#commit-message-template)
+      * [Commit message hook](#commit-message-hook)
+         * [Adding a hook:](#adding-a-hook)
+         * [Using a hook:](#using-a-hook)
+   * [Build using Docker](#build-using-docker)
+      * [Building your own Docker image](#building-your-own-docker-image)
+   * [Preparing packages](#preparing-packages)
 
 ## Introduction
 
-Run the provisioning script `./config/bootstrap.sh` to install all dependencies. The script is written for Ubuntu and tested on 20.04.
+The project can be build:
+- on linux
+- on windows with [WSL](https://docs.microsoft.com/en-us/windows/wsl/)
+- with docker image
+- Mac native compilation **is not supported**
 
-To run the script execute the following command: `cd config && ./bootstrap.sh 0-`
-Note that this downloads a shellscript from `get.docker.com` and runs it with sudo for Docker installation.
+### Download repository and submodules
 
-This script also installs few required packages (`cat config/bootstrap_config`) which also require root privileges.
-
-Installation of `GCCv10` and `CMake` is done to `$HOME` directory.
-
-Running the script without parameters will display a list of steps.
-
-After running provisioning you are ready to checkout and build project for both linux and RT1051. Please follow these steps:
-
-1. Check out the project with submodules for the first time:
-
-```bash
+MuditaOS uses submodules, therefore for clone use:
+```
+git clone --recurse-submodules git@github.com:mudita/MuditaOS.git
+```
+if you didin't use `--recurse-submodules` or have to update submodules use:
+```
 git submodule update --init --recursive
 ```
-2. Update the repository with submodules
 
-```bash
-git pull --recurse-submodules
-```
-3. Build the project for proper product:
+### Install dependencies
 
-```bash
-./configure.sh [PurePhone|BellHybrid] [rt1051|linux] [release|debug|relwithdebinfo]
-cd build-[PurePhone|BellHybrid]-[rt1051|linux]-[release|debug|relwithdebinfo]
-make
+#### bootstrap
+
+To install all the basic depenencies run: 
 ```
+cd config && ./bootstrap.sh 0-
+```
+
+The script is written for Ubuntu and tested on 20.04.  
+
+**Note** that this:
+- the script require sudo to:
+    - downloads a shellscript from `get.docker.com` and runs it with sudo for Docker installation.
+    - instals few required packages (list them with: `cat config/bootstrap_config`) which also require root privileges.
+- installs `GCCv10` and `CMake` to `$HOME` directory.
+- it's needed to be run only once
+
+After running provisioning you are ready to checkout and build project for both platforms supported.
+
+You can see this `help` if you do not pass any param to `bootstrap.sh`:
+```
+[I] ⋊> ~/w/m/M/config on master ⨯ ./bootstrap.sh                                                                                                                                                                                                                                    09:00:01
+test_if_run_as_root
+Available build steps:
+	0 install_hooks
+	1 add_ignore_revs_for_blame
+	2 install_ubuntu_packages
+	3 setup_arm_toolchain
+	4 setup_cmake
+	5 setup_gcc_alternatives
+	6 add_to_path ARM_GCC /home/pholat/gcc-arm-none-eabi-10-2020-q4-major/bin
+	7 add_to_path CMAKE /home/pholat/cmake-3.21.3-linux-x86_64/bin
+	8 install_docker
+	9 add_to_docker_group
+call:
+./bootstrap.sh <build step no>[-]
+ex.:
+./bootstrap.sh 1       - build step 1 (add_ignore_revs_for_blame)
+./bootstrap.sh 3       - build step 3 (setup_arm_toolchain)
+./bootstrap.sh 3-      - build from step 3 to the end
+./bootstrap.sh 0-      - build everything
+```
+
+#### JLink software
+
+
+We are using J-Link driver in version J-Link v634f ([Ubuntu download](https://www.segger.com/downloads/jlink/JLink_Linux_V634f_x86_64.deb))  
+
+**NOTE:** This step is only required to load software and debug it via J-Link. It's not available for community - as it requires a programator board and soldered in programmator socket.
+
+**WARNING:** newer J-Link software revisions seem to work fine, but loading via them do not result in usable software on the hardware tharget.
+
+#### Add GitHub token
+
+We are storing assets on github pages and these are downloaded automatically before software images are built.
+Please follow github token configuration here: [download assets documentation](../doc/download_asset.py)
+
+#### Project configuration
+
+To configure project we have helper script: `./configure.sh` which essentially passes through basic cmake configuration for each product for each platform.
+We hihly advice to use `ninja` as it has proven better compilation times over make.
+
+which can be run with following parameters:
+```
+# command      # product              # platform     # build type
+./configure.sh [PurePhone|BellHybrid] [rt1051|linux] [release|debug|relwithdebinfo] [additional cmake parameters and options go here, i.e. -DENABLE_DEVELOPER_MODE_ENDPOINT=1 or "-G Ninja"]
+```
+
+__Examples:__
+
+1. building pure phone for rt1051 platform with ninja
+
+**NOTE** Due to software size we cant have full debug builds for rt1051 targets. Please use relwithdebinfo
+
+```
+./configure.sh pure rt1051 relWithDebInfo "-G Ninja"
+```
+
+2. building pure phone for linux platform with make
+
+```
+./configure.sh pure linux debug
+```
+
+3. building bell for linux platform with ninja
+
+```
+./configure.sh bell linux debug "-G Ninja"
+```
+
+#### Project build
+
+Each run of `configure.sh` created `build-{PRODUCT}-{PLATFORM}-{OPTMALIZAION}` folder, i.e.: `build-PurePhone-rt1051-RelWithDebInfo`
+1. enter your selected build catalog
+2. run `ninja` or `make` depending on your selection during configuration.
+3. This will compile your selected target and create image of it
+
+To know more about build targets please see: [build targets documentation](../doc/build_targets.md)
+
+**WARNING:** our source code is open source, but the project itself is in progress of fully embracing the community. Currently you can:
+1. build binaries from the software
+2. are not able to create images - due difficulties with separation of 3rd party propritetary assets
+
+**Note** You can install and use ccache to speed up compilations
+
+#### Project load and run
+
+Project load and run is platform dependent. Curently we suport only linux and rt1051 targets.
+
+**NOTE:** Addition of open source assets is in progress and should be done in following weeks. Till then Open source community cant build their own images - due to lack od fonts and luts. Support will be added step by step:
+- addition of open source fonts
+- addition of partial update packages (not signed) for Open Source contributors
+
+##### Running on linux
+
+Build default target and run `./PurePhone.elf` for phone target, or for BellHybrid: `./BellHybrid.elf`  
+
+##### Running on rt1051 from emmc
+
+Please follow: [running on rt1051 platform](./running_on_phone.md)
+
+### checking commits
+
+All commits have to compy with checks with:
+1. our pre commit hook
+    1.1 required code have to be copyrighted with Mudita licensing
+    1.2 required code have to comply to clang-format defined in repository
+    1.3 code is checked against addition of binary blobs polluting software
+2. pre merge CI job checking if commit is in acceptable format:
+
+See [development workflow](./development_workflow.md) for more information
+
 ### CMake options
 Before configuring the project with `./configure.sh` you can tune it by enabling/disabling options to suite your needs.
 This can be done manually, by editing the `.cmake` files (not recommended though) or by CLI/GUI tool like `ccmake`.
@@ -63,57 +199,10 @@ This can be done manually, by editing the `.cmake` files (not recommended though
 | `ENABLE_TEST_LOGS`            | Enable logs in unit tests                                                 | OFF           |
 | `GENERATE_STACK_USAGE`        | Generate stack usage report                                               | OFF           |
 | `BUILD_DOC_WITH_ALL`          | Build documentation with `all` target                                     | OFF           |
+| `SYSTEM_PROFILE`              | Add MuditaOS x FreeRTOS proifling capability                              | OFF           |
+| `WITH_DEVELOPMENT_FEATURES`   | Enable all development features like access to test harness via USB       | OFF           |
 
 By using `ENABLE_APP_X` (where `X` is the name of the application) you can enable/disable any application.
-### Quickstart on Linux
-
-Here's the bare minimum that will enable you to bootstrap the environment on Linux.
-
-```bash
-git submodule update --init --recursive                                             # initialize submodules
-cd ./config/ && ./bootstrap.sh 0- && cd ../                                         # bootstrap requirements
-./configure.sh PurePhone|BellHybrid rt1051|linux Debug|Release|RelWithDebInfo       # configure build
-cd <build-dir>                                                                      # build dir depends on configuration
-make Pure                                                                           # build
-./PurePhone.elf                                                                     # run PurePhone - simulator screen will pop up (on the Linux filesystem)
-```
-
-If you want to run the simulator with image and our VFS implementation
-you need to run the image through the script:
-```bash
-./run_simulator_on_filesystem_image.sh
-```
-
-### Quickstart with unit tests
-
-After going through the Super dirty quickstart on Linux, run the following commands to build and run all unit tests:
-
-```bash
-./configure.sh PurePhone|BellHybrid linux debug
-cd <build-dir>
-make check
-```
-### Quickstart on the phone
-
-1. First install J-Link driver. We suggest using J-Link driver in version J-Link v634f ([Ubuntu download](https://www.segger.com/downloads/jlink/JLink_Linux_V634f_x86_64.deb))
-
-2. Please run the following commands:
-
-```bash
-cp ./env.cmake.sample ./env.cmake && sed -i "s:<HOME>:$HOME:" env.cmake
-git submodule update --init --recursive
-cd ./config/ && ./bootstrap.sh 0- && cd ../
-./configure.sh PurePhone|BellHybrid rt1051 RelWithDebInfo
-cd build-PurePhone|BellHybrid-rt1051-RelWithDebInfo
-make Pure
-
-```
-
-3. Please take the following steps in three parallel consoles/sessions:
-
- - Start J-Link server: `./StartJLinkServer.sh`
- - Load app with GDB via J-Link connected to Mudita Pure: `./run.sh <build folder> --product PurePhone`
- - Catch logs from Mudita Pure from J-Link RTT and write them to `/tmp/log.txt`: `JLinkRTTClient | tee /tmp/log.txt`
 
 #### Catching logs using UART
 
@@ -127,31 +216,6 @@ Please mind that logs on UART are more costly, so these might cause timing issue
 
 ## More details on preparing your local environment
 
-The quickest way to set up your environment is running the following command:
-```bash
-cd config && ./bootstrap.sh 0-
-```
-The script is written for Ubuntu and tested on 20.04.
-
-* This script will require `sudo` (for `apt`)
-* It will install `cmake` and `gcc` by default in `${HOME}` directory - in case of other needs, please change the script
-* The script doesn't install `ccache`, but if `ccache` is on the system - its support is added to `env.cmake.sample`
-* The script needs to be run only once
-
-If the script is run after a fresh `git clone` you need to update your git config (step 0 and 1).
-
-### `bootstrap.sh` steps, line by line
-
-* `./config/bootstrap.sh 0`  - install style checking scripts to be automatically run on commit
-* `./config/bootstrap.sh 1`  - `git blame` will ignore style changing commit
-* `./config/bootstrap.sh 2`  - list packages required for setting up the environment *which are currently not installed*
-* `./config/bootstrap.sh 3`  - set up arm toolchain, download and install it in home directory
-* `./config/bootstrap.sh 4`  - set up `cmake`, download and install in home directory
-* `./config/bootstrap.sh 5`  - list of commands required for switching default gcc/g++ to version 9
-* `./config/bootstrap.sh 6`  - add paths for arm toolchain to your `PATH` environment variable - this is also used by `./env.cmake` *(this is required because `./env.cmake` uses environment variables set by this target)*
-* `./config/bootstrap.sh 7`  - add paths for `cmake` to your `PATH` environment variable
-* `./config/bootstrap.sh 8`  - install Docker
-
 ### Code style with git hooks
 
 The `bootstrap.sh` script installs git hooks for code style checking. `pre-commit.hook`automatically updates style during commit. If you haven't run `bootstrap.sh` and want to use git hooks, you have to copy (or link) `pre-commit.hook` to your git config directory `.git/config/hooks`: `ln -s `pwd`/config/pre-commit.hook .git/hooks/pre-commit`
@@ -159,7 +223,7 @@ The `bootstrap.sh` script installs git hooks for code style checking. `pre-commi
 By default commit hook only checks if your changes have the appropriate style, if you would like to fix the style automatically during `git commit` you have to configure your git, by adding new variable `user.fixinstage` and setting it to `true` by running
 `git config user.fixinstage true`
 
-If you prefer "notification than fix" workflow (so you can examine the changes), use the default hook behaviour (for notifications) and then call `./config/pre-commit.hook --fix`, this checks and fixes files in "stage", files that have status "changed" are not tested.
+If you prefer "notification then fix" workflow (so you can examine the changes), use the default hook behaviour (for notifications) and then call `./config/pre-commit.hook --fix`, this checks and fixes files in "stage", files that have status "changed" are not tested.
 
 ```bash
 git commit 
@@ -174,6 +238,8 @@ git commit
 To fix the style for Pull Request CI:
 `./config/pre-commit.hook --branch-fix`
 
+Code style is done by clang
+
 ### Commit message template
 
 To add a commit message template use this command:
@@ -183,7 +249,7 @@ git config commit.template .gitmessage
 ```
 
 This way each time you add a new commit you will see the template that will help
-you with the proper message format. More about that in [Development Workflow](./doc/development_workflow.md#commit-changes)
+you with the proper message format. More about that in [Development Workflow](development_workflow.md#commit-changes)
 
 ### Commit message hook
 This hooks automatically converts your branch name to commit title
@@ -211,7 +277,7 @@ Do your changes, and prepare commit
 git commit
 ```
 
-## CI build using Docker
+## Build using Docker
 You can build MuditaOS using a Docker container. To do that, follow these steps
 
 1. Get Docker by running `./config/bootstrap.sh 8` or [install it yourself](https://www.docker.com/get-started) (if was not installed previously with `./config/bootstrap.sh 0-`).
@@ -270,21 +336,4 @@ Please be aware that when building custom image you'll have to give it some tag 
 
 ## Preparing packages
 
-If you need a package, containing everything needed to run the application, please check [build_targests.md](./doc/build_targests.md) document.
-
-## Generating code coverage reports
-
-To generate code coverage reports for unit tests, you have to configure the project
-with `COVERAGE_ENABLE=ON`. Please note, that code coverage report generation
-works for the Linux/Debug configuration only.
-Code coverage reports are generated with the `gcovr` application. You can
-install it with:
-```
-pip3 install gcovr
-```
-
-Following targets related to coverage report generation are available:
-* `coverage-all-html` - run `ctest` and generate a detailed HTML report.
-* `coverage-html` - generate detailed HTML report based on the data collected during last execution of a unit test. The report
-will be generated in the `coverage-html` subdirectory of a build directory.
-* `coverage` - same as above, but generate an XML Cobertura report instead of an HTML.
+If you need a package, containing everything needed to run the application, please check [build_targests.md](build_targests.md) document.

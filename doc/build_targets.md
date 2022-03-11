@@ -23,6 +23,7 @@ For each product there are targets:
 
 | Arch | Name | Alias | Description |
 |------|------|-------|-------------|
+|common| doc                            |                                                   | Target to build doxygen documentation, [documentation](./generate_doxygen.md) |
 |common| \<Product\>                    |                                                   | Binary target for the product |
 |common| \<Product\>-disk-img           | \<Product\>.img                                   | Disk image for the product    |
 |RT1051| \<Product\>-StandaloneImage    | PurePhone-\<version\>-RT1051-package-standalone   | Creates image that can be `dd` or `pureflash` to the device|
@@ -48,6 +49,19 @@ Devices in the field have security keys burned, therefore an additional step - b
 Image of the software to be loaded onto the device memory. Has all necessary data to properly run the OS. 
 The disk image can be built with additional, development assets. Please look for `WITH_DEVELOPMENT_FEATURES` for more information in make.
 
+**All disk images can be inspected** to do so you can:
+1. use losetup to add loop device for created image i.e.:
+```
+sudo losetup --show --partscan -f /path/to/file
+```
+2. mount listed partitions as required
+3. remember to remove loop device after the use (where loopN is loop device created)
+```
+sudo losetup -d /dev/loopN
+```
+
+Or use `tools/mount_user_lfs_partition.py` which will do it for you.
+
 ## Update package
 
 Tar-file meant to update software with the updater utility. It has all the necessary update assets and metadata.
@@ -57,6 +71,23 @@ Currently, the update package has all of the base data that should be on the dev
 
 Builds and executes all of the unit tests in the repository for the selected product.
 Uses [download_assets](./download_assets.md) to download unit test's required assets (fonts)
+
+### Code coverage
+
+To generate code coverage reports for unit tests, you have to configure the project
+with `COVERAGE_ENABLE=ON`. Please note, that code coverage report generation
+works for the Linux/Debug configuration only.
+Code coverage reports are generated with the `gcovr` application. You can
+install it with:
+```
+pip3 install gcovr
+```
+
+Following targets related to coverage report generation are available:
+* `coverage-all-html` - run `ctest` and generate a detailed HTML report.
+* `coverage-html` - generate detailed HTML report based on the data collected during last execution of a unit test. The report
+will be generated in the `coverage-html` subdirectory of a build directory.
+* `coverage` - same as above, but generate an XML Cobertura report instead of an HTML.
 
 ## assets
 
@@ -78,3 +109,4 @@ OS bootloader, used to pre-init hardware and launch either OS or updater utility
 Downloads the updater with [download_assets](./download_assets.md).
 
 Updater is used to perform the firmware upgrade via update packages. 
+

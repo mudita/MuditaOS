@@ -15,12 +15,19 @@ Some assets can be omitted though e.g. for fonts the default fallback font will 
 
 An executable can be uploaded directly to the memory in an executable (image) form. J-Link GDB Server enables this. J-Link Server messages `"Download 15243 bytes…"` represent this way of running the executable. The binary is lost on reset and/or power loss. Booting from SDRAM doesn't involve bootloader.
 
-### Upload to SDRAM
+### Upload to SDRAM via J-Link
 
-You need to upload the `PurePhone.elf` file and then:
+You need to upload the `PurePhone.elf` file. To do so run in three parallel consoles/sessions:
 
-- Start J-Link Server with a script `./StartJLinkServer.sh` in a separate terminal/session.
-- Run the `./run.sh` script
+- Start J-Link server:
+    - For Mudita Pure: `./StartJLinkServer.sh`
+    - For BellHybrid:  `./StartJLinkServer.sh T6`
+- Load app with GDB via J-Link connected:
+    - to Mudita Pure: `./run.sh <build folder> --product PurePhone`
+    - to BellHybrid:  `./run.sh <build folder> --product BellHybrid`
+- Catch logs from Mudita Pure from J-Link RTT and write them to `/tmp/log.txt`: `JLinkRTTClient | tee /tmp/log.txt`
+
+**NOTE:** Running on phone is done via gdb, this way enables you to debug running target.
 
 ## eMMC (permanent)
 
@@ -35,21 +42,63 @@ Files required to boot from eMMC are:
 
 ### Uploading it to the eMMC
 
--  Use the `pureflash` command to burn image into the eMMC card `sudo pureflash <PurePhone.img> /dev/sdX` **Note:** Replace `/dev/sdX` with the disk name you found for your phone after connecting it to your computer.
+####  via bootloader
+
+On linux you can use:
+1. `pureflash`
+
+Fastest command to burn image into the eMMC card `sudo pureflash <PurePhone.img> /dev/sdX` **Note:** Replace `/dev/sdX` with the disk name you found for your phone after connecting it to your computer.
+
+2. `dd` or `etcher`
+
+You can use any raw memory copy tool such as `dd` or `etcher` which will transfer whole image built to the device memory. It will take much longer because it will copy whole 16GB memory.
+dd example:
+```
+sudo dd if=./PurePhone.img of=/dev/sdb bs=1M status=progress conv=fsync                                                                                                                                                                                                    13:48:22
+```
+
+On MacOS you can use script:
+- `./tools/macflash.sh`
+
+**NOTE:** Devices in the field have direct eMMC via bootloader locked.
+
+#### via uptader utility
+
+Every device is loaded with additional update software which is capable of updating any software package onto the device, while keeping last software backup.
+Updater utility is the only normal way to update devices running in field and is used by MuditaCenter.
+
+**NOTE:** Porviding a minimum viable update package and utility for Open Source community is on our backlog. It can be created by trimming additional developemnt api from:
+[updater feature tests](https://github.com/mudita/QAMuditaOS/tree/master/scenarios/updater). You can ask for development version of MuditaCentre with "update from file" capability enabled.
+
+Update packede is defined here: [build targets](./build_targets.md)
 
 ## How to mount Mudita Pure as a USB MSC
 
-There are two ways to mount the phone as a USB MSC - using a bootloader or Ozone debugger.
+**NOTE:** all phones in field have eMMC access locked with password, following documentation is only for development devices or ones with eMMC unlocked or bypassed.
+
+There are two ways to mount the phone as a USB MSC to access full access to the memory - using a bootloader or Ozone debugger.
 
 ### Mounting using a bootloader
 
-If you have a bootloader flashed and working use the following key combination, to mount Mudita Pure as MSC:
+**NOTE:** Devices in field have password blocked bootloaders. This is by design - normal users shouldn't ever require access to raw eMMC.
 
-- hold centre button (selection)
-- briefly press reset button (the one closest to the phone on the green breakout board)
-- wait while text scrolls from the bottom
+- hold center button (selection)
+- reset the device, either:
+    - briefly press reset button (the one closest to the phone on the green breakout board)
+    - detach USB and battery, then attach battery then USB
+- wait while text scrolls from the bottom - still holding the center button
 - release centre button
-- press key 4
+- depending on bootloader:
+    - with eMMC locked:
+        - press 9
+        - input passkey
+        - confirm with left functional
+    - with eMMC not locked:
+        - press key 4
 
-FAT partition can be mounted directly by the Linux kernel. LittleFS partition can be mounted via
-FUSE using the following command `lfsfuse /dev/sdX <mount_point> --block_size=32768`
+We can have 3 types of partitions:
+- FAT
+- EXT4
+- LittleFS
+
+Both fat and ext4 can be mointed nativelly on linux, ext4 needs additional drivers on MacOS.   To access LittleFS you need to mount it via FUSE using the following command `lfsfuse /dev/sdX <mount_point> --block_size=32768`
