@@ -8,8 +8,11 @@ with `service-desktop` service in the operating system and get data from the int
 Both `service-desktop` and functional tests are using [`pyTest`](https://github.com/pytest-dev/pytest/) -
  a testing framework written for Python. 
 Convenient usage of pre-defined fixtures and `harness` API enables quick development of further tests.
-## Update utility
-To be able to flash release package without Mudita Center app or entering the bootloader you can use the script provided in `firmware_utility_test` folder. [Here](firmware_update_test/README.md) is a short guide how to use it.
+
+# Please note that
+* active development of test harness is kept here: [MuditaOSHarness](https://github.com/mudita/QAMuditaHarness)
+* active tests development is kept here: [QAMuditaOS](https://github.com/mudita/QAMuditaHarness)
+
 ## Test harness API
 As a part of the test bundle, test harness is responsible for low-level communication with target or linux simulator.
 As for now, it consists of the following methods that can be used during writing tests:

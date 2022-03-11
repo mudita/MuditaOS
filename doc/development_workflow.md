@@ -77,9 +77,25 @@ Include screenshots and gifs/screencasts if applicable. The more information you
 
 During a PR review, team members will ask you questions regarding your solution. Please answer them by explaining the reasoning behind the suggested changes. Even if the feedback you receive regarding your PR is an obvious change, please answer with a simple OK to show that you haven't missed it.
 
+**NOTE:** do not close comments created by others without their clear approval. This makes reviewing PRs on github significanlty harder for reviewers.
+
 ## PR review - act on feedback
 
-Add changes to your PR that are requested by reviewers and push the feature branch once again. Update comments requesting changes with a simple `Done`. Don't resolve a discussion on your own, it's the reviewer's responsibility to do so.
+Add changes to your PR that are requested by reviewers and push the feature branch once again. Update comments requesting changes with a simple `Done`.
+
+**NOTE:** Again: don't resolve a discussion on your own. Wthout clear agreement or approval, it's the reviewer's responsibility to do so.
+
+## Pass the CI gate
+
+All PRs are checked against a series of checks on CI:
+- commit format
+- whole PR clang style check
+- compilations for every product in release with debug info or debug configurations for:
+    - rt1051
+    - linux targets
+    - linux unittests
+
+Passing the CI is required element to  be able to integrate the changes.
 
 ## Merge to `master` branch
 
