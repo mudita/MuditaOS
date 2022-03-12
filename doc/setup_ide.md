@@ -3,6 +3,7 @@
 ## Table of contents
 - [Setting up in Eclipse](#setting-up-in-eclipse)
 - [Setting up in CLion](#setting-up-in-clion)
+- [Setting up in QtCreator](#setting-up-in-qtcreator)
 - [Additional info](#additional-info)
     + [Prevent Git from suggesting commits](#prevent-git-from-suggesting-commits)
     + [Seperate build folders](#separate-build-folders)
@@ -132,6 +133,34 @@ and
 After the above steps: 
 - Change run/debug `Working directory` for Linux configuration. (`Edit configurations…` -> `PurePhone`)
 - Change `Working directory` from `…/PurePhone/build` to `…PurePhone/build-linux`
+
+### Setting up in QtCreator
+
+- Install `QtCreator` version `3.5` or later
+- Install `CMake` version `3.19.5` or later
+- It is highly recommended that you install `Ninja` as it will radically decrease rebuild times.
+- [Ensure `CMake` is setup in `QtCreator`](https://doc.qt.io/qtcreator/creator-project-cmake.html)
+
+#### Project configurations
+
+- Go to `File` -> `Open File or Project...` and select the `CMakeLists.txt` project file.
+- After selecting the kits you wish to use select the `Projects` button on the left bar.
+- Ensure `PureOS` is the active project.
+- Select `Build` under the name of the kit you wish to configure.
+- At the top of the `Build Settings` page, select the build configuration you want to modify.
+- In the `Initial CMake parameters:` field, _append_ one of the following:
+
+    **For Linux Target:**
+    ```
+    -DCMAKE_TOOLCHAIN_FILE:STRING=Target_Linux.cmake
+    -DPRODUCT:STRING=PurePhone
+    ```
+    **For RT1051 Target:**
+    ```
+    -DCMAKE_TOOLCHAIN_FILE:STRING=Target_RT1051.cmake
+    -DPRODUCT:STRING=PurePhone
+    ```
+- Build project normally.
 
 ### Additional info
 
