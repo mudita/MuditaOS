@@ -50,6 +50,7 @@ namespace sys
         {
             static constexpr std::array whitelist = {service::name::service_desktop,
                                                      service::name::evt_manager,
+                                                     service::name::eink,
                                                      service::name::appmgr,
                                                      service::name::cellular};
         }
