@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 //
@@ -329,7 +329,6 @@ namespace bluetooth
             a2dp_subevent_signaling_connection_established_get_bd_addr(packet, address);
             cid    = a2dp_subevent_signaling_connection_established_get_a2dp_cid(packet);
             status = a2dp_subevent_signaling_connection_established_get_status(packet);
-            std::string deviceAddress{bd_addr_to_str(address)};
             if (status != ERROR_CODE_SUCCESS) {
                 LOG_INFO("A2DP Source: Connection failed, status 0x%02x, cid 0x%02x, a2dp_cid 0x%02x \n",
                          status,
