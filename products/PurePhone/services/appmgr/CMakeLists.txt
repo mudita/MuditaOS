@@ -3,6 +3,7 @@ add_library(appmgr STATIC)
 target_sources(appmgr
     PRIVATE
         ApplicationManager.cpp
+        $<$<BOOL:${ENABLE_APP_SPECIAL_INPUT}>:RunAppsInBackground.cpp>
         models/WallpaperDisplayModel.cpp
         include/appmgr/models/WallpaperDisplayModel.hpp
     PUBLIC
@@ -17,7 +18,7 @@ target_include_directories(appmgr
 target_link_libraries(appmgr
     PRIVATE
         application-desktop
-        application-special-input
+        $<$<BOOL:${ENABLE_APP_SPECIAL_INPUT}>:application-special-input>
         apps-common
         module-apps
         module-db

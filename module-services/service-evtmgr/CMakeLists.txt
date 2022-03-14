@@ -1,6 +1,9 @@
 ﻿project(service-evtmgr)
 
-set(SOURCES
+add_library(service-evtmgr STATIC)
+
+target_sources(service-evtmgr PRIVATE
+        AppSettingsNotify.cpp
         EventManager.cpp
         WorkerEventCommon.cpp
         api/EventManagerServiceAPI.cpp
@@ -14,10 +17,6 @@ set(SOURCES
         screen-light-control/ScreenLightControlParameters.cpp
         vibra/Vibra.cpp
 )
-
-add_library(service-evtmgr STATIC)
-
-target_sources(service-evtmgr PRIVATE ${SOURCES})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

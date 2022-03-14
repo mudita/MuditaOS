@@ -6,7 +6,6 @@
 #include <apps-common/popups/data/BluetoothModeParams.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
-#include <application-special-input/ApplicationSpecialInput.hpp>
 #include <apps-common/popups/data/PhoneModeParams.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <apps-common/actions/AlarmClockStatusChangeParams.hpp>
@@ -134,15 +133,7 @@ namespace app::manager
 
     void ApplicationManager::startBackgroundApplications()
     {
-        for (const auto &name : std::vector<ApplicationName>{app::special_input}) {
-            if (auto app = getApplication(name); app != nullptr) {
-                StatusIndicators statusIndicators;
-                statusIndicators.phoneMode        = phoneModeObserver->getCurrentPhoneMode();
-                statusIndicators.bluetoothMode    = bluetoothMode;
-                statusIndicators.alarmClockStatus = alarmClockStatus;
-                app->runInBackground(statusIndicators, this);
-            }
-        }
+        runAppsInBackground();
     }
 
     void ApplicationManager::registerMessageHandlers()

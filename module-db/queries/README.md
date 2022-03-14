@@ -1,6 +1,7 @@
 Virtual database query interface.
+================================
 
-Instead manually creating switch cases for each possible query logic, create one 
+Instead, manually creating switch cases for each possible query logic, create one 
 virtual `query` interface and push `querying` logic to db (where it's implemented)
 
 * db::service accepts `GetByQuery(service, database, query)`

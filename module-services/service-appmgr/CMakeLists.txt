@@ -72,7 +72,7 @@ target_sources(service-appmgr
 
 target_link_libraries(service-appmgr
     PRIVATE
-        application-special-input
+        $<$<BOOL:${ENABLE_APP_SPECIAL_INPUT}>:application-special-input>
         json::json
         module-audio
         service-cellular

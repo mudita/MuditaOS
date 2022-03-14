@@ -90,6 +90,7 @@ add_subdirectory(locks)
 
 target_link_libraries(apps-common
     PRIVATE
+        app
         date::date
         eventstore
         Microsoft.GSL::GSL

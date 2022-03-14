@@ -11,19 +11,45 @@
 #ifdef ENABLE_APP_ALARM_CLOCK
 #include <application-alarm-clock/ApplicationAlarmClock.hpp>
 #endif
+#ifdef ENABLE_APP_CALL
 #include <application-call/ApplicationCall.hpp>
+#endif
+#ifdef ENABLE_APP_CALLLOG
 #include <application-calllog/ApplicationCallLog.hpp>
+#endif
+#ifdef ENABLE_APP_DESKTOP
 #include <application-desktop/ApplicationDesktop.hpp>
+#endif
+#ifdef ENABLE_APP_MESSAGES
 #include <application-messages/ApplicationMessages.hpp>
+#endif
+#ifdef ENABLE_APP_NOTES
 #include <application-notes/ApplicationNotes.hpp>
+#endif
+#ifdef ENABLE_APP_PHONEBOOK
 #include <application-phonebook/ApplicationPhonebook.hpp>
+#endif
+#ifdef ENABLE_APP_SETTINGS
 #include <application-settings/ApplicationSettings.hpp>
+#endif
+#ifdef ENABLE_APP_SPECIAL_INPUT
 #include <application-special-input/ApplicationSpecialInput.hpp>
+#endif
+#ifdef ENABLE_APP_CALENDAR
 #include <application-calendar/ApplicationCalendar.hpp>
+#endif
+#ifdef ENABLE_APP_MUSIC_PLAYER
 #include <application-music-player/ApplicationMusicPlayer.hpp>
+#endif
+#ifdef ENABLE_APP_MEDITATION
 #include <application-meditation/ApplicationMeditation.hpp>
+#endif
+#ifdef ENABLE_APP_CALCULATOR
 #include <application-calculator/ApplicationCalculator.hpp>
+#endif
+#ifdef ENABLE_APP_ONBOARDING
 #include <application-onboarding/ApplicationOnBoarding.hpp>
+#endif
 
 // modules
 #include <module-db/Databases/CountryCodesDB.hpp>
@@ -49,12 +75,18 @@
 #include <service-gui/ServiceGUI.hpp>
 #include <service-gui/Common.hpp>
 #include <module-services/service-eink/ServiceEink.hpp>
+#if ENABLE_SERVICE_FILEINDEXER
 #include <service-fileindexer/ServiceFileIndexer.hpp>
+#endif
 #include <service-desktop/ServiceDesktop.hpp>
 
 #if ENABLE_GSM == 1
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-antenna/ServiceAntenna.hpp>
+#endif
+
+#if ENABLE_SERVICE_TEST
+#include <service-test/ServiceTest.hpp>
 #endif
 
 #include <Application.hpp>
@@ -118,22 +150,49 @@ int main()
     }
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
+#ifdef ENABLE_SERVICE_EVTMGR
     systemServices.emplace_back(sys::CreatorFor<EventManager>([]() { return dumpLogs(); }));
+#endif
+#ifdef ENABLE_SERVICE_FILEINDEXER
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>(std::move(fileIndexerAudioPaths)));
+#endif
+#ifdef ENABLE_SERVICE_DB
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
+#endif
 #if ENABLE_GSM == 0
     // For now disable permanently Service cellular when there is no GSM configured
     LOG_INFO("ServiceCellular (GSM) - Disabled");
 #else
+
+#ifdef ENABLE_SERVICE_ANTENNA
     systemServices.emplace_back(sys::CreatorFor<ServiceAntenna>());
+#endif
+#ifdef ENABLE_SERVICE_CELLULAR
     systemServices.emplace_back(sys::CreatorFor<ServiceCellular>());
 #endif
+#endif
+
+#ifdef ENABLE_SERVICE_AUDIO
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
+#endif
+#ifdef ENABLE_SERVICE_BLUETOOTH
     systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
+#endif
+#ifdef ENABLE_SERVICE_DESKTOP
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
+#endif
+#ifdef ENABLE_SERVICE_TIME
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
+#endif
+#ifdef ENABLE_SERVICE_EINK
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
+#endif
+#ifdef ENABLE_SERVICE_GUI
     systemServices.emplace_back(sys::CreatorFor<service::gui::ServiceGUI>());
+#endif
+#if ENABLE_SERVICE_TEST
+    systemServices.emplace_back(sys::CreatorFor<service::test::ServiceTest>());
+#endif
 
     auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));
     sysmgr->StartSystem(

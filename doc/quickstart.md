@@ -110,7 +110,7 @@ Please follow github token configuration here: [download assets documentation](.
 To configure project we have helper script: `./configure.sh` which essentially passes through basic cmake configuration for each product for each platform.
 We highly advise using `ninja` as it has proven better compilation times over make.
 
-which can be run with the following parameters:
+The script can be run with the following parameters:
 ```
 # command      # product              # platform     # build type
 ./configure.sh [PurePhone|BellHybrid] [rt1051|linux] [release|debug|relwithdebinfo] [additional cmake parameters and options go here, i.e. -DENABLE_DEVELOPER_MODE_ENDPOINT=1 or "-G Ninja"]
@@ -147,7 +147,7 @@ Each run of `configure.sh` creates `build-{PRODUCT}-{PLATFORM}-{OPTMALIZAION}` f
 
 To know more about build targets please see: [build targets documentation](../doc/build_targets.md)
 
-**WARNING:** our source code is open source, but the project itself is in the progress of fully embracing the community. Currently you:
+**WARNING:** our source code is open source, but the project itself is in the progress of fully embracing the community. Currently, you:
 1. can build binaries from the software
 2. are not able to create images - due to difficulties with separation of 3rd party proprietary assets
 
@@ -204,6 +204,8 @@ This can be done manually, by editing the `.cmake` files (not recommended though
 
 By using `ENABLE_APP_X` (where `X` is the name of the application) you can enable/disable any application.
 
+CMake-wide system config documentation is here: [Project config](ProjectConfig.md)
+
 #### Catching logs using UART
 
 If you want to catch logs from Mudita Pure from UART please follow these steps:
@@ -220,7 +222,7 @@ Please mind that logs on UART are more costly, so these might cause timing issue
 
 The `bootstrap.sh` script installs git hooks for code style checking. `pre-commit.hook`automatically updates style during commit. If you haven't run `bootstrap.sh` and want to use git hooks, you have to copy (or link) `pre-commit.hook` to your git config directory `.git/config/hooks`: `ln -s `pwd`/config/pre-commit.hook .git/hooks/pre-commit`
 
-By default commit hook only checks if your changes have the appropriate style, if you would like to fix the style automatically during `git commit` you have to configure your git, by adding new variable `user.fixinstage` and setting it to `true` by running
+By default, commit hook only checks if your changes have the appropriate style, if you would like to fix the style automatically during `git commit` you have to configure your git, by adding new variable `user.fixinstage` and setting it to `true` by running
 `git config user.fixinstage true`
 
 If you prefer "notification then fix" workflow (so you can examine the changes), use the default hook behaviour (for notifications) and then call `./config/pre-commit.hook --fix`, this checks and fixes files in "stage", files that have status "changed" are not tested.

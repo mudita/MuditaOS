@@ -30,20 +30,10 @@ set(APPLICATIONS
     settings
 )
 
-list(SORT APPLICATIONS)
-foreach(app IN LISTS APPLICATIONS)
-    string(TOUPPER ${app} app_upper)
-    string(REPLACE "-" "_" app_macro_name ${app_upper})
-    if (NOT DEFINED ENABLE_APP_${app_macro_name})
-        option(ENABLE_APP_${app_macro_name} "Enable application ${app}" ON)
-    endif()
-
-    if(ENABLE_APP_${app_macro_name})
-        message("Enabling application: ${app}")
-        add_subdirectory(application-${app})
-        list(APPEND ENABLED_APPS_DEFINES "ENABLE_APP_${app_macro_name}")
-    endif()
-endforeach()
+add_module_options( OPTION_PREFIX "APP"
+                    CATALOG_PREFIX "application"
+                    DEFINES_LIST_NAME "ENABLED_APPS_DEFINES"
+                    IN_MODULE_NAMES ${APPLICATIONS})
 
 target_compile_definitions(application-desktop PRIVATE "${ENABLED_APPS_DEFINES}")
 set(ENABLED_APPS_DEFINES ${ENABLED_APPS_DEFINES} PARENT_SCOPE)
@@ -84,9 +74,9 @@ endif()
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         app
-        application-calendar
-        application-messages
-        application-settings
+        $<$<BOOL:${ENABLE_APP_CALENDAR}>:application-calendar>
+        $<$<BOOL:${ENABLE_APP_MESSAGES}>:application-messages>
+        $<$<BOOL:${ENABLE_APP_SETTINGS}>:application-settings>
         apps-common
         date::date
         eventstore

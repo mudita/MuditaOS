@@ -168,7 +168,7 @@ target_link_libraries(${PROJECT_NAME}
         utf8
         desktop-endpoints
     PRIVATE
-        application-calendar
+        $<$<BOOL:${ENABLE_APP_CALENDAR}>:application-calendar>
         Microsoft.GSL::GSL
         rrule
         board

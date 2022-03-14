@@ -26,6 +26,7 @@ include(Utils)
 include(ModuleUtils)
 include(DiskImage)
 include(AddPackage)
+include(AutoModuleOption)
 
 message("Selected product: ${PRODUCT}")
 message("Selected board:   ${BOARD}")
