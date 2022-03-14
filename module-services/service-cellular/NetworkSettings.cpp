@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NetworkSettings.hpp"
@@ -260,7 +260,6 @@ at::Result::Code NetworkSettings::setPreferredSMSDomain(SMSDomainPreference pref
 
 at::Result::Code NetworkSettings::setIMSState(at::response::qcfg_ims::IMSState state)
 {
-    std::vector<std::string> operatorNames;
     auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;

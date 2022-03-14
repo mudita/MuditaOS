@@ -20,7 +20,6 @@ namespace app::bell_settings
 
     void AlarmVolumeModel::setValue(std::uint8_t value)
     {
-        const auto valStr = std::to_string(value);
         audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Alarm, {});
     }
 

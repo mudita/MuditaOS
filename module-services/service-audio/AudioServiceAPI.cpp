@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AudioMessage.hpp>
@@ -221,7 +221,6 @@ namespace AudioServiceAPI
 
     std::optional<audio::Volume> GetVolume(sys::Service *serv, audio::PlaybackType playbackType)
     {
-        std::optional<audio::Volume> volume;
         try {
             return static_cast<audio::Volume>(std::stoi(GetSetting(serv, audio::Setting::Volume, playbackType)));
         }
