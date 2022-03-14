@@ -2,6 +2,7 @@
 
 - [Logger](#Logger)
 - [Dumping to a file](#Dumping-to-a-file)
+- [System Logs](#System-logs)
 
 ## Logger
 
@@ -31,3 +32,10 @@ Current max log file size is 50 MB (after reaching this size no more logs are du
 
 Logs can be accessed using `mount_user_lfs_partition.py` script from `tools` directory.
 Additionally, `test/get_os_log.py` script allows getting a log file from a running phone.
+
+## System logs
+
+There are a series of useful system logging capabilities defined in:
+`module-utils/log/api/log/debug.hpp`
+
+Please see doxygen documentation for each parameter.

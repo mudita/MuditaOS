@@ -7,6 +7,7 @@
 #include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EventManagerCommon.hpp"
 #include "service-evtmgr/WorkerEventCommon.hpp"
+#include "service-evtmgr/AppSettingsNotify.hpp"
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
@@ -28,7 +29,6 @@
 #include <service-time/Constants.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <service-bluetooth/messages/Status.hpp>
-#include <application-settings/ApplicationSettings.hpp>
 
 #include <cassert>
 #include <fstream>
@@ -99,25 +99,7 @@ sys::MessagePointer EventManagerCommon::DataReceivedHandler(sys::DataMessage *ms
     }
     else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg) {
         auto event = msg->getEvent();
-        switch (event->getType()) {
-        case audio::EventType::BlutoothA2DPDeviceState: {
-            auto message = std::make_shared<message::bluetooth::ProfileStatus>(
-                bluetooth::AudioProfile::A2DP, (event->getDeviceState() == audio::Event::DeviceState::Connected));
-            bus.sendUnicast(message, app::name_settings);
-        } break;
-        case audio::EventType::BlutoothHSPDeviceState: {
-            auto message = std::make_shared<message::bluetooth::ProfileStatus>(
-                bluetooth::AudioProfile::HSP, (event->getDeviceState() == audio::Event::DeviceState::Connected));
-            bus.sendUnicast(message, app::name_settings);
-        } break;
-        case audio::EventType::BlutoothHFPDeviceState: {
-            auto message = std::make_shared<message::bluetooth::ProfileStatus>(
-                bluetooth::AudioProfile::HFP, (event->getDeviceState() == audio::Event::DeviceState::Connected));
-            bus.sendUnicast(message, app::name_settings);
-        } break;
-        default:
-            break;
-        }
+        evm::api::notifySettingsBluetoothAudio(bus, event);
         AudioServiceAPI::SendEvent(this, msg->getEvent());
         handled = true;
     }

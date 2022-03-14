@@ -48,18 +48,19 @@ target_link_libraries(PurePhone
     PRIVATE
         app
         $<$<BOOL:${ENABLE_APP_ANTENNA}>:application-antenna>
-        application-calculator
-        application-calendar
-        application-call
-        application-calllog
-        application-desktop
-        application-meditation
-        application-messages
-        application-music-player
-        application-notes
-        application-phonebook
-        application-settings
-        application-special-input
+        $<$<BOOL:${ENABLE_APP_CALCULATOR}>:application-calculator>
+        $<$<BOOL:${ENABLE_APP_CALENDAR}>:application-calendar>
+        $<$<BOOL:${ENABLE_APP_CALL}>:application-call>
+        $<$<BOOL:${ENABLE_APP_CALLLOG}>:application-calllog>
+        $<$<BOOL:${ENABLE_APP_DESKTOP}>:application-desktop>
+        $<$<BOOL:${ENABLE_APP_MEDITATION}>:application-meditation>
+        $<$<BOOL:${ENABLE_APP_MESSAGES}>:application-messages>
+        $<$<BOOL:${ENABLE_APP_MUSIC_PLAYER}>:application-music-player>
+        $<$<BOOL:${ENABLE_APP_NOTES}>:application-notes>
+        $<$<BOOL:${ENABLE_APP_PHONEBOOK}>:application-phonebook>
+        $<$<BOOL:${ENABLE_APP_SETTINGS}>:application-settings>
+        $<$<BOOL:${ENABLE_APP_SPECIAL_INPUT}>:application-special-input>
+        $<$<BOOL:${ENABLE_APP_ONBOARDING}>:application-onboarding>
         pure::time
         appmgr
         db
@@ -76,6 +77,7 @@ target_link_libraries(PurePhone
         service-desktop
         service-fileindexer
         service-time
+        $<$<BOOL:${ENABLE_SERVICE_TEST}>:service-test>
         sys
         version-header
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
@@ -86,7 +88,14 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     add_dependencies(Pure service_renderer)
 endif()
 
-set_source_files_properties(PurePhoneMain.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
+# set special main.cpp file properties
+set_property(
+  SOURCE PurePhoneMain.cpp
+  APPEND
+  PROPERTY COMPILE_DEFINITIONS
+  ${ENABLED_APPS_DEFINES}
+  ${ENABLED_SERVICES_DEFINES}
+)
 
 strip_executable(PurePhone)
 

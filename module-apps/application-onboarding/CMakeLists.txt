@@ -1,14 +1,14 @@
-﻿include_directories( ${CMAKE_PROJECT_NAME}
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
+﻿# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+add_library(application-onboarding STATIC)
+
+target_include_directories( application-onboarding
+    PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}
 )
 
-include_directories( ${PROJECT_NAME}
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
-target_sources(${PROJECT_NAME}
+target_sources(application-onboarding
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationOnBoarding.cpp"
@@ -43,4 +43,14 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingSimSelectWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/NoSimSelectedDialogWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/style/OnBoardingStyle.hpp"
+)
+
+target_link_libraries(application-onboarding
+    PRIVATE
+        app
+        i18n
+        log
+        module-gui
+    PUBLIC
+        apps-common
 )

@@ -50,6 +50,7 @@ namespace app::manager
         auto handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleAction(ActionEntry &action) -> ActionProcessStatus override;
         void handleStart(StartAllowedMessage *msg) override;
+        void runAppsInBackground();
 
         std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
         sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled;

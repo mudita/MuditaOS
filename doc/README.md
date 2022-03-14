@@ -22,7 +22,7 @@ Documentation listed below is system documentation listed depending on where it 
 
 - System architecture
 - Modules
-    - Applications
+   - [Applications](../module-apps/ModuleApps.md)
         - [Application Desktop](../module-apps/application-desktop/doc/README.md)
         - [Notifications](../module-apps/apps-common/notifications/README.md)
     - [Audio](../module-audio/README.md)
@@ -35,7 +35,7 @@ Documentation listed below is system documentation listed depending on where it 
     - [GUI](../module-gui/README.md)
     - [Modem](../module-cellular/modem/README.md)
     - [System](../module-sys/README.md)
-- Services
+- [Services](../module-services/ModuleServices.md)
     - [Application Manager](../module-services/service-appmgr/doc/README.md)
     - [Bluetooth](../module-services/service-bluetooth/doc/readme.md)
     - [Cellular](../module-services/service-cellular/doc/README.md)
@@ -46,11 +46,12 @@ Documentation listed below is system documentation listed depending on where it 
 - Tools
     - [MapParser](https://github.com/mudita/misc-tools/blob/master/mapparser/README.md)
     - [PureGDB](https://github.com/mudita/misc-tools/blob/master/puregdb/README.md)
+- [System cmake configuration](ProjectConfig.md)
 - [Development workflow](development_workflow.md)
 - [Contributing](../CONTRIBUTING.md)
 - [Internationalization](i18n.md)
 
 ## Changelog
 - [HOWTO](changelog_howto.md)
-- [Latest changelog](../changelog.md)
+- [The latest changelog](../changelog.md)
 

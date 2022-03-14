@@ -5,18 +5,30 @@ module_is_test_entity()
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
-add_subdirectory( service-antenna )
-add_subdirectory( service-appmgr )
-add_subdirectory( service-audio )
-add_subdirectory( service-bluetooth )
-add_subdirectory( service-cellular )
-add_subdirectory( service-db )
-add_subdirectory( service-desktop )
-add_subdirectory( service-eink )
-add_subdirectory( service-evtmgr )
-add_subdirectory( service-fileindexer )
-add_subdirectory( service-gui )
-add_subdirectory( service-time )
+option(ENABLE_SERVICE_TEST "Enable service test" OFF) 
+
+set(SERVICES 
+    antenna
+    appmgr
+    audio
+    bluetooth
+    cellular
+    db
+    desktop
+    eink
+    evtmgr
+    fileindexer
+    gui
+    time
+    test
+)
+
+add_module_options( OPTION_PREFIX "SERVICE"
+                    CATALOG_PREFIX "service"
+                    DEFINES_LIST_NAME "ENABLED_SERVICES_DEFINES"
+                    IN_MODULE_NAMES ${SERVICES})
+
+set(ENABLED_SERVICES_DEFINES ${ENABLED_SERVICES_DEFINES} PARENT_SCOPE)
 
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC
