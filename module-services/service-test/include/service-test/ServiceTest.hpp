@@ -7,6 +7,7 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <service-db/Settings.hpp>
+#include <service-db/DBServiceName.hpp>
 
 namespace service::name
 {
@@ -19,6 +20,7 @@ namespace service::test
     {
         settings::Settings settings;
         sys::TimerHandle th;
+        bool appStarted = false;
 
       public:
         ServiceTest();
@@ -37,6 +39,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name = service::name::service_test;
+            manifest.dependencies = {service::name::db};
             return manifest;
         }
     };

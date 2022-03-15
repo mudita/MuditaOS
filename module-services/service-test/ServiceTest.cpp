@@ -3,6 +3,8 @@
 
 #include "service-test/ServiceTest.hpp"
 #include "Timers/TimerFactory.hpp"
+#include "application-test/include/application-test/ApplicationTest.hpp"
+#include "service-appmgr/Controller.hpp"
 
 namespace service::test
 {
@@ -24,11 +26,28 @@ namespace service::test
         // it will output: "Now we can use settings! it works"
         LOG_INFO("Now we can use settings! %s", settings.getValue(setting_private_value).c_str());
 
-        // this code will create periodic system timer which will log:
-        // "timers are avesome, periodic timer is active: 1" around each second
+        // this code will create a periodic timer which will in 2 seconds:
+        // - log "timers are awesome, periodic timer is active: 1" around each second
+        // - trigger popup to the test application on the timer
         th = sys::TimerFactory::createPeriodicTimer(
-            this, "my  periodic timer", std::chrono::milliseconds(1000), [](sys::Timer &t) {
-                LOG_INFO("timers are avesome, periodic timer is active: %d", t.isActive());
+            this, "my  periodic timer", std::chrono::milliseconds(2 * 1000), [this](sys::Timer &t) {
+                LOG_INFO("timers are avesome, single shot timer is active: %d", t.isActive());
+                if (appStarted == false) {
+                    LOG_INFO("Launching TestApplication");
+                    app::manager::Controller::sendAction(
+                        this,
+                        app::manager::actions::Launch,
+                        std::make_unique<app::ApplicationLaunchData>(app::application_test));
+                    // not really started but.. will be good enough
+                    appStarted = true;
+                    return;
+                }
+                LOG_INFO("send action to the test appliaction!");
+                app::manager::Controller::sendAction(
+                    this,
+                    app::manager::actions::ShowPopup,
+                    std::make_unique<gui::PopupRequestParams>(gui::popup::ID::AppTestPopup));
+                t.stop();
             });
         th.start();
         return sys::ReturnCodes::Success;
@@ -39,7 +58,7 @@ namespace service::test
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes ServiceTest::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
+    sys::ReturnCodes ServiceTest::SwitchPowerModeHandler(const sys::ServicePowerMode /*mode*/)
     {
         return sys::ReturnCodes::Success;
     }

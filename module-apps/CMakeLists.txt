@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} STATIC)
 add_subdirectory(apps-common)
 
 option(ENABLE_APP_ANTENNA "Enable application antenna" OFF) 
+option(ENABLE_APP_TEST "Enable test application" OFF) 
 
 set(APPLICATIONS
     alarm-clock
@@ -28,6 +29,7 @@ set(APPLICATIONS
     calllog
     special-input
     settings
+    test
 )
 
 add_module_options( OPTION_PREFIX "APP"

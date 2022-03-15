@@ -31,6 +31,7 @@ namespace gui
             PowerOff,
             Reboot,
             BedtimeNotification,
+            AppTestPopup,
             Invalid,
         };
 
@@ -57,6 +58,7 @@ namespace gui
             inline constexpr auto alarm_window                      = "AlarmPopup";
             inline constexpr auto reboot_window                     = "RebootPopup";
             inline constexpr auto bedtime_notification_window       = "BedtimeNotificationPopup";
+            inline constexpr auto test_popup                        = "test_popup";
         } // namespace window
 
         std::string resolveWindowName(ID id);

@@ -50,6 +50,9 @@
 #ifdef ENABLE_APP_ONBOARDING
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #endif
+#ifdef ENABLE_APP_TEST
+#include <application-test/ApplicationTest.hpp>
+#endif
 
 // modules
 #include <module-db/Databases/CountryCodesDB.hpp>
@@ -264,6 +267,10 @@ int main()
 #ifdef ENABLE_APP_ONBOARDING
             applications.push_back(app::CreateLauncher<app::ApplicationOnBoarding>(app::name_onboarding));
 #endif
+#ifdef ENABLE_APP_TEST
+            applications.push_back(app::CreateLauncher<app::ApplicationTest>(app::application_test));
+#endif
+
             // start application manager
             return sysmgr->RunSystemService(std::make_shared<app::manager::ApplicationManager>(
                                                 service::name::appmgr, std::move(applications), app::name_desktop),

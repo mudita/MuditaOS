@@ -89,6 +89,10 @@ Documentation: [third party libraries](../third-party/ThirdParty.md)
 
 Documentation: [unit tests gathering cmake](../test/AddingUnitTests.md)
 
+## To change service order, failure timeout or name
+
+Documentation [service manifest](../module-sys/SystemManager/doc/ServicesSynchronization.md)
+
 # More on services configuration
 
 While we can enable and disable services, we do not have proper separation for services and API definition.

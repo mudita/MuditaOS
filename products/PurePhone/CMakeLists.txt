@@ -61,6 +61,7 @@ target_link_libraries(PurePhone
         $<$<BOOL:${ENABLE_APP_SETTINGS}>:application-settings>
         $<$<BOOL:${ENABLE_APP_SPECIAL_INPUT}>:application-special-input>
         $<$<BOOL:${ENABLE_APP_ONBOARDING}>:application-onboarding>
+        $<$<BOOL:${ENABLE_APP_TEST}>:application-test>
         pure::time
         appmgr
         db
