@@ -40,7 +40,7 @@ namespace style
 
         namespace font
         {
-            inline constexpr auto title = "gt_pressura_bold_30";
+            inline constexpr auto title = "bigbold";
         } // namespace font
     }     // namespace header
 
@@ -58,24 +58,24 @@ namespace style
         inline constexpr auto default_rect_yaps            = 10U;
         namespace font
         {
-            inline constexpr auto huge             = "gt_pressura_regular_190";
-            inline constexpr auto supersizeme      = "gt_pressura_regular_90";
-            inline constexpr auto supersizemelight = "gt_pressura_light_90";
-            inline constexpr auto largelight       = "gt_pressura_light_46";
-            inline constexpr auto large            = "gt_pressura_regular_46";
-            inline constexpr auto verybiglight     = "gt_pressura_light_38";
-            inline constexpr auto verybig          = "gt_pressura_regular_38";
-            inline constexpr auto mediumbigbold    = "gt_pressura_bold_32";
-            inline constexpr auto bigbold          = "gt_pressura_bold_30";
-            inline constexpr auto big              = "gt_pressura_regular_30";
-            inline constexpr auto biglight         = "gt_pressura_light_30";
-            inline constexpr auto mediumbold       = "gt_pressura_bold_27";
-            inline constexpr auto medium           = "gt_pressura_regular_27";
-            inline constexpr auto mediumlight      = "gt_pressura_light_27";
-            inline constexpr auto smallbold        = "gt_pressura_bold_24";
-            inline constexpr auto small            = "gt_pressura_regular_24";
-            inline constexpr auto verysmallbold    = "gt_pressura_bold_20";
-            inline constexpr auto verysmall        = "gt_pressura_regular_20";
+            inline constexpr auto huge             = "huge";
+            inline constexpr auto supersizeme      = "supersizeme";
+            inline constexpr auto supersizemelight = "supersizemelight";
+            inline constexpr auto largelight       = "largelight";
+            inline constexpr auto large            = "large";
+            inline constexpr auto verybiglight     = "verybiglight";
+            inline constexpr auto verybig          = "verybig";
+            inline constexpr auto mediumbigbold    = "mediumbigbold";
+            inline constexpr auto bigbold          = "bigbold";
+            inline constexpr auto big              = "big";
+            inline constexpr auto biglight         = "biglight";
+            inline constexpr auto mediumbold       = "mediumbold";
+            inline constexpr auto medium           = "medium";
+            inline constexpr auto mediumlight      = "mediumlight";
+            inline constexpr auto smallbold        = "smallbold";
+            inline constexpr auto small            = "small";
+            inline constexpr auto verysmallbold    = "verysmallbold";
+            inline constexpr auto verysmall        = "verysmall";
         }; // namespace font
 
         inline constexpr auto list_offset_default = 12U;
@@ -115,8 +115,8 @@ namespace style
 
         namespace font
         {
-            inline constexpr auto bold   = "gt_pressura_bold_24";
-            inline constexpr auto medium = "gt_pressura_regular_24";
+            inline constexpr auto bold   = "mediumbold";
+            inline constexpr auto medium = "medium";
         }; // namespace font
 
     } // namespace nav_bar

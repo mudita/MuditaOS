@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstdint> // for uint32_t
+#include <map>     // for map
 #include <string>  // for string
 #include <vector>  // for vector
 
@@ -24,10 +25,12 @@ namespace gui
 
       protected:
         std::string fontFolder;
+        std::string fontMapFile;
         std::vector<RawFont *> fonts;
-        std::vector<std::string> getFontsList();
+        std::map<std::string, std::string> fontMap{};
+        std::map<std::string, std::string> getFontsList();
 
-        RawFont *loadFont(std::string filename);
+        RawFont *loadFont(const std::string &font, const std::string &path);
         void loadFonts(std::string baseDirectory);
 
         FontManager() = default;
@@ -42,16 +45,22 @@ namespace gui
 
         virtual ~FontManager();
 
-        [[nodiscard]] auto getFont(std::string_view name = defaultFontName) const -> RawFont *;
+        [[nodiscard]] auto getFont() const -> RawFont *;
+        [[nodiscard]] auto getFont(const std::string &fontType) const -> RawFont *;
         [[nodiscard]] auto getFont(uint32_t num) const -> RawFont *;
+        [[nodiscard]] auto getFontByName(std::string_view name) const -> RawFont *;
         [[nodiscard]] auto isInitialized() const
         {
             return initialized;
         }
-
-        static constexpr auto defaultFontName{"gt_pressura_regular_27"};
+        [[nodiscard]] auto getFontName(const std::string &font) const -> std::string;
+        [[nodiscard]] auto getDefaultFontName() const -> std::string;
+        [[nodiscard]] auto getDefaultFontTypeName() const -> std::string;
 
       private:
+        std::string defaultFontName{};
+        std::string defaultFontTypeName{};
+
         [[nodiscard]] auto find(std::string_view name) const -> RawFont *;
     };
 }; // namespace gui

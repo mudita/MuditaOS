@@ -107,7 +107,8 @@ add_boot_bin(PurePhone)
 add_image(
     PRODUCT PurePhone
     SYSROOT sysroot
-    LUTS Luts.bin
+    "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:LUTS Luts.bin>"
+    "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:LUTS \"\">"
     DEPENDS assets updater.bin-target ecoboot.bin-target PurePhone-boot.bin PurePhone-version.json-target
 )
 
@@ -117,19 +118,33 @@ add_hex_target(PurePhone)
 include(BinaryAssetsVersions.cmake)
 include(DownloadAsset)
 
-download_asset_json( json-target
-                     ${CMAKE_CURRENT_SOURCE_DIR}/assets.json
-                     ${CMAKE_BINARY_DIR}/sysroot/sys/current/
-                     MuditaOSAssets
-                     ${MUDITA_CACHE_DIR}
-                    )
-download_asset_release_json(    json-images-target
-                                ${CMAKE_CURRENT_SOURCE_DIR}/assets_images.json
-                                ${CMAKE_BINARY_DIR}/sysroot/sys/current/
-                                MuditaOSPublicAssets
-                                0.0.4
-                                ${MUDITA_CACHE_DIR}
-                            )
+download_asset_json(json-proprietary-target
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_proprietary.json
+                    ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                    MuditaOSAssets
+                    ${MUDITA_CACHE_DIR}
+    )
+download_asset_release_json(json-common-target
+                            ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_common.json
+                            ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                            MuditaOSPublicAssets
+                            0.0.5
+                            ${MUDITA_CACHE_DIR}
+    )
+download_asset_release_json(json-community-target
+                            ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_community.json
+                            ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                            MuditaOSPublicAssets
+                            0.0.5
+                            ${MUDITA_CACHE_DIR}
+    )
+download_asset_release_json(json-rt1051-target
+                            ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_rt1051.json
+                            ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                            MuditaOSPublicAssets
+                            0.0.5
+                            ${MUDITA_CACHE_DIR}
+    )
 download_asset_release(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION} ${MUDITA_CACHE_DIR})
 download_asset_release(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION} ${MUDITA_CACHE_DIR})
 

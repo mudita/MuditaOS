@@ -609,9 +609,8 @@ TEST_CASE("Text addition bounds - text sings count restricted")
     std::string testStringOneLine  = "Test String 1";
     std::string testStringTwoLines = "Test String 1\n Test String 2";
 
-    std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test</text><text size='25'>String</text><text size='20' "
-        "weight='bold'>1</text><br></br><text>Test String 2</text>";
+    std::string richTextTwoLines = "<text color='12' size='30'>Test</text><text size='25'>String</text><text size='20' "
+                                   "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to max signs count set to 0")
     {
@@ -741,7 +740,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     std::string testStringSecondLine = "Test String 2";
 
     std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
+        "<text color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
         "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to 0 size text and no parent to grant size")
@@ -985,7 +984,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     std::string testStringSecondLine = "Test String 2";
 
     std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
+        "<text color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
         "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to 0 line size text")
@@ -1126,7 +1125,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     std::string testStringTwoLines = "Test String 1\nTest String 2";
 
     std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
+        "<text color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
         "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to lower limit set to signs count and size and lines on higher limit")

@@ -7,13 +7,10 @@
 #include "RawFont.hpp"  // for RawFont
 #include <log/log.hpp>  // for LOG_ERROR, LOG_INFO, LOG_WARN
 #include <Utils.hpp>
+#include <json11.hpp>
 #include <filesystem>
+#include <fstream>
 #include <cstdio>
-
-namespace style::window::font
-{
-    inline constexpr auto default_fallback_font = "dejavu_sans_bold_27";
-}
 
 namespace gui
 {
@@ -33,57 +30,63 @@ namespace gui
 
     void FontManager::loadFonts(std::string baseDirectory)
     {
-        fontFolder                         = baseDirectory + "/fonts";
-        std::vector<std::string> fontFiles = getFontsList();
+        fontFolder     = baseDirectory + "/fonts";
+        fontMapFile    = fontFolder + "/fontmap.json";
+        auto fontFiles = getFontsList();
 
-        for (std::string fontName : fontFiles) {
-            loadFont(fontName);
+        for (const auto &font : fontFiles) {
+            loadFont(font.first, font.second);
         }
     }
 
-    RawFont *FontManager::loadFont(std::string filename)
+    RawFont *FontManager::loadFont(const std::string &fontType, const std::string &path)
     {
 
-        auto file = std::fopen(filename.c_str(), "rb");
+        auto file = std::fopen(path.c_str(), "rb");
         if (file == nullptr) {
+            LOG_ERROR("Failed to open file: %s", path.c_str());
             return nullptr;
         }
 
-        auto fileSize = std::filesystem::file_size(filename);
-        std::rewind(file);
+        const auto fileSize = std::filesystem::file_size(path);
 
-        char *fontData = new char[fileSize];
-        if (fontData == nullptr) {
+        std::vector<uint8_t> fontData(fileSize, 0);
+
+        std::ifstream input(path, std::ios::in | std::ifstream::binary);
+        if (not input.is_open()) {
+            return nullptr;
+        }
+
+        if (not input.read(reinterpret_cast<char *>(&fontData[0]), fontData.size())) {
             std::fclose(file);
-            LOG_ERROR(" Failed to allocate temporary font buffer");
             return nullptr;
         }
 
-        // read data to buffer
-        auto bytesRead = std::fread(fontData, 1, fileSize, file);
+        const auto bytesRead = input.gcount();
 
         // close file
         std::fclose(file);
         if (static_cast<uintmax_t>(bytesRead) != fileSize) {
             LOG_ERROR("Failed to read all file");
-            delete[] fontData;
             return nullptr;
         }
 
         // allocate memory for new font
-        RawFont *font = new RawFont();
-        if (font->load(reinterpret_cast<uint8_t *>(fontData)) != gui::Status::GUI_SUCCESS) {
-            delete font;
-            delete[] fontData;
+        RawFont *rawfont = new RawFont();
+        if (!rawfont) {
+            return nullptr;
+        }
+        if (rawfont->load(&fontData[0]) != gui::Status::GUI_SUCCESS) {
+            delete rawfont;
             return nullptr;
         }
         else {
             // set id and push it to vector
-            font->id = fonts.size();
-            fonts.push_back(font);
+            rawfont->id = fonts.size();
+            fonts.push_back(rawfont);
+            fontMap.insert({fontType, rawfont->getName()});
         }
-        delete[] fontData;
-        return font;
+        return rawfont;
     }
 
     bool hasEnding(std::string const &fullString, std::string const &ending)
@@ -96,28 +99,60 @@ namespace gui
         }
     }
 
-    std::vector<std::string> FontManager::getFontsList()
+    std::map<std::string, std::string> FontManager::getFontsList()
     {
-
-        std::vector<std::string> fontFiles;
-
-        LOG_INFO("Scanning fonts folder: %s", fontFolder.c_str());
-
-        for (const auto &entry : std::filesystem::directory_iterator(fontFolder)) {
-            if (!std::filesystem::is_directory(entry) && entry.path().extension() == ".mpf") {
-                fontFiles.push_back(entry.path().string());
-            }
+        auto fd = std::fopen(fontMapFile.c_str(), "r");
+        if (fd == nullptr) {
+            LOG_FATAL("Error during opening file %s", fontMapFile.c_str());
+            return {};
         }
 
+        uint32_t fsize     = std::filesystem::file_size(fontMapFile);
+        auto fontmapString = std::make_unique<char[]>(fsize + 1);
+        memset(fontmapString.get(), 0, fsize + 1);
+        std::fread(fontmapString.get(), 1, fsize, fd);
+        std::fclose(fd);
+
+        json11::Json fontmapJson;
+        std::string err;
+        fontmapJson = json11::Json::parse(fontmapString.get(), err);
+        if (!err.empty()) {
+            LOG_ERROR("Failed parsing device string!");
+            throw std::invalid_argument("Can't parse the file!");
+        }
+
+        auto fontmapObjects = fontmapJson.object_items();
+        const auto infoJson = fontmapObjects["info"];
+        defaultFontName     = infoJson["default_font_name"].string_value();
+        defaultFontTypeName = infoJson["default_font_type_name"].string_value();
+
+        const auto styleJson = fontmapObjects["style"];
+        std::map<std::string, std::string> fontFiles;
+
+        for (const auto &entry : styleJson.object_items()) {
+            auto fontName = entry.second.string_value();
+            if (!std::filesystem::is_regular_file(fontFolder + "/" + fontName)) {
+                LOG_ERROR("Could not find font: %s", fontName.c_str());
+            }
+            else {
+                LOG_INFO("Add font to list: %s - %s", entry.first.c_str(), fontName.c_str());
+                fontFiles.insert({entry.first, fontFolder + "/" + fontName});
+            }
+        }
         LOG_INFO("Total number of fonts: %u", static_cast<unsigned int>(fontFiles.size()));
         return fontFiles;
+    }
+
+    auto FontManager::getFontName(const std::string &fontType) const -> std::string
+    {
+        return getFont(fontType)->getName();
     }
 
     bool FontManager::init(std::string baseDirectory)
     {
         loadFonts(baseDirectory);
 
-        auto fallback_font = find(style::window::font::default_fallback_font);
+        auto fallback_font = find(getFontName(defaultFontName));
         if (fallback_font != nullptr) {
             for (auto font : fonts) {
                 font->setFallbackFont(fallback_font);
@@ -137,11 +172,11 @@ namespace gui
         return instance;
     }
 
-    [[nodiscard]] auto FontManager::getFont(std::string_view name) const -> RawFont *
+    [[nodiscard]] auto FontManager::getFontByName(std::string_view name) const -> RawFont *
     {
         auto font = find(name);
         // default return first font
-        if (font == nullptr && fonts.size() > 0) {
+        if (font == nullptr && not fonts.empty()) {
 #if DEBUG_MISSING_ASSETS == 1
             LOG_ERROR("=> font not found: %s using default", name.data());
 #endif
@@ -161,6 +196,38 @@ namespace gui
         return fonts[num];
     }
 
+    [[nodiscard]] auto FontManager::getFont(const std::string &fontType) const -> RawFont *
+    {
+        auto fontPath = fontMap.find(fontType);
+        if (fontPath != fontMap.end()) {
+            auto rawFont = find(fontPath->second);
+            if (rawFont) {
+                return rawFont;
+            }
+        }
+        if (not fonts.empty()) {
+#if DEBUG_MISSING_ASSETS == 1
+            LOG_ERROR("=> font not found: %s using default", fontType.c_str());
+#endif
+            return fonts[0];
+        }
+        return nullptr;
+    }
+
+    [[nodiscard]] auto FontManager::getFont() const -> RawFont *
+    {
+        return getFont(defaultFontName);
+    }
+
+    auto FontManager::getDefaultFontName() const -> std::string
+    {
+        return defaultFontName;
+    }
+    auto FontManager::getDefaultFontTypeName() const -> std::string
+    {
+        return defaultFontTypeName;
+    }
+
     auto FontManager::find(std::string_view name) const -> RawFont *
     {
         for (const auto &font : fonts) {
@@ -170,4 +237,5 @@ namespace gui
         }
         return nullptr;
     }
+
 }; // namespace gui

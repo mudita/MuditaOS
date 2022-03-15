@@ -21,28 +21,28 @@ namespace style::status_bar
     }; // namespace margins
     namespace time
     {
-        inline constexpr auto font          = "gt_pressura_regular_24";
+        inline constexpr auto font          = style::window::font::small;
         inline constexpr auto maxX          = 100u;
         inline constexpr auto bottomPadding = 5u;
     }; // namespace time
     namespace nat
     {
         inline constexpr auto maxX = 35u;
-        inline constexpr auto font = "gt_pressura_regular_20";
+        inline constexpr auto font = style::window::font::verysmall;
     }; // namespace nat
     namespace phonemode
     {
         inline constexpr auto maxX = 157u;
-        inline constexpr auto font = "gt_pressura_regular_20";
+        inline constexpr auto font = style::window::font::verysmall;
     }; // namespace phonemode
     namespace signal
     {
-        inline constexpr auto font = "gt_pressura_regular_20";
+        inline constexpr auto font = style::window::font::verysmall;
         inline constexpr auto maxX = 80u;
     }; // namespace signal
     namespace battery
     {
-        inline constexpr auto font = "gt_pressura_regular_20";
+        inline constexpr auto font = style::window::font::verysmall;
         inline constexpr auto maxX = 70U;
     }; // namespace battery
     namespace boxes

@@ -86,3 +86,9 @@ Following configurations are for: [lwext4](third-party/lwext4/) - third party ex
     - `ENABLE_DEVELOPER_MODE_ENDPOINT_DEFAULT`
     - `LOG_SENSITIVE_DATA_ENABLED`
 default: `OFF`
+
+# Proprietary/Community build
+- option `ASSETS_TYPE` default `Proprietary`
+
+Setting to `Community` disables the download of proprietary files which are unaccessable for the community
+and disables tests basing on those files

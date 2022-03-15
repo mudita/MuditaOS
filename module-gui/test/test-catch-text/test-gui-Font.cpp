@@ -16,7 +16,7 @@ TEST_CASE("Testo Font")
     {
         auto f        = Font(27);
         auto raw_font = fm.getFont(style::window::font::medium);
-        REQUIRE(fm.getFont("gt_pressura_regular_27") == raw_font); /// check that style is ok
+        REQUIRE(fm.getFontByName("gt_pressura_regular_27") == raw_font); /// check that style is ok
         REQUIRE(f.raw() == raw_font);                              /// check that Font() works ok
         f.setWeight(Font::Weight::Bold);
         REQUIRE(f.raw() == fm.getFont(style::window::font::mediumbold)); // check for changed weight
