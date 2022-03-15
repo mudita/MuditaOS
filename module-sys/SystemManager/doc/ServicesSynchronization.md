@@ -9,10 +9,13 @@ It is a part of the Services Synchronization feature to order services based on 
 ## Service Manifest
 
 Each service should export its manifest. The manifest may contain the following information:
+- name
 - dependencies to other services
-- start limit
 - start timeout
-- on failure strategy
+
+**WARNING**: Currently there is no fail-safe mechanism to handle service startup failure - it will cause non-handled exception `SystemInitialisationError{"System startup failed: unable to start a system service."};`
+
+Please see: [ServiceManifest.hpp](../../Service/include/Service/ServiceManifest.hpp) to check current defaults
 
 The System Manager needs to read the manifests to run the services in the correct order.
 

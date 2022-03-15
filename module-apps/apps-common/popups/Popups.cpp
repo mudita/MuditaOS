@@ -50,6 +50,8 @@ namespace gui::popup
             return gui::popup::window::reboot_window;
         case ID::BedtimeNotification:
             return gui::popup::window::bedtime_notification_window;
+        case ID::AppTestPopup:
+            return gui::popup::window::test_popup;
         case ID::Invalid:
             assert(0);
             return gui::name::window::main_window;
