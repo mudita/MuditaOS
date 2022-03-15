@@ -95,7 +95,7 @@ All PRs are checked against a series of checks on CI:
     - linux targets
     - linux unittests
 
-Passing the CI is required element to  be able to integrate the changes.
+Passing the CI is a required element to be able to integrate the changes.
 
 ## Merge to `master` branch
 

@@ -47,11 +47,12 @@ Files required to boot from eMMC are:
 On linux you can use:
 1. `pureflash`
 
-Fastest command to burn image into the eMMC card `sudo pureflash <PurePhone.img> /dev/sdX` **Note:** Replace `/dev/sdX` with the disk name you found for your phone after connecting it to your computer.
+The fastest command to burn image into the eMMC card:  `sudo pureflash <PurePhone.img> /dev/sdX`
+**Note:** Replace `/dev/sdX` with the disk name you found for your phone after connecting it to your computer.
 
 2. `dd` or `etcher`
 
-You can use any raw memory copy tool such as `dd` or `etcher` which will transfer whole image built to the device memory. It will take much longer because it will copy whole 16GB memory.
+You can use any raw memory copy tool such as `dd` or `etcher` which will transfer the whole image built to the device memory. It will take much longer because it will copy the whole 16GB of memory.
 dd example:
 ```
 sudo dd if=./PurePhone.img of=/dev/sdb bs=1M status=progress conv=fsync                                                                                                                                                                                                    13:48:22
@@ -60,27 +61,27 @@ sudo dd if=./PurePhone.img of=/dev/sdb bs=1M status=progress conv=fsync         
 On MacOS you can use script:
 - `./tools/macflash.sh`
 
-**NOTE:** Devices in the field have direct eMMC via bootloader locked.
+**NOTE:** End-user devices have direct access to the eMMC locked in bootloader.
 
-#### via uptader utility
+#### via updater utility
 
-Every device is loaded with additional update software which is capable of updating any software package onto the device, while keeping last software backup.
-Updater utility is the only normal way to update devices running in field and is used by MuditaCenter.
+Every device is loaded with additional updater software which is capable of updating any software package onto the device while keeping the last software as a backup.
+Updater utility is the only normal way to update devices running in-field and is used by Mudita Center.
 
-**NOTE:** Porviding a minimum viable update package and utility for Open Source community is on our backlog. It can be created by trimming additional developemnt api from:
-[updater feature tests](https://github.com/mudita/QAMuditaOS/tree/master/scenarios/updater). You can ask for development version of MuditaCentre with "update from file" capability enabled.
+**NOTE:** Providing a minimum viable update package and utility for the Open Source community is on our backlog. It can be created by trimming additional development API from:
+[updater feature tests](https://github.com/mudita/QAMuditaOS/tree/master/scenarios/updater). You can ask for the development version of Mudita Center with "update from file" capability enabled.
 
-Update packede is defined here: [build targets](./build_targets.md)
+Update package is described here: [build targets](./build_targets.md)
 
 ## How to mount Mudita Pure as a USB MSC
 
-**NOTE:** all phones in field have eMMC access locked with password, following documentation is only for development devices or ones with eMMC unlocked or bypassed.
+**NOTE:** all phones in field have eMMC access locked with a password, the following documentation is only for development devices or ones with eMMC unlocked or bypassed.
 
-There are two ways to mount the phone as a USB MSC to access full access to the memory - using a bootloader or Ozone debugger.
+There are two ways to mount the phone as a USB MSC to gain full access to the memory - using a bootloader or Ozone debugger.
 
 ### Mounting using a bootloader
 
-**NOTE:** Devices in field have password blocked bootloaders. This is by design - normal users shouldn't ever require access to raw eMMC.
+**NOTE:** Devices in field have password-locked bootloaders. This is by design - normal users shouldn't ever require access to raw eMMC.
 
 - hold center button (selection)
 - reset the device, either:
@@ -101,4 +102,4 @@ We can have 3 types of partitions:
 - EXT4
 - LittleFS
 
-Both fat and ext4 can be mointed nativelly on linux, ext4 needs additional drivers on MacOS.   To access LittleFS you need to mount it via FUSE using the following command `lfsfuse /dev/sdX <mount_point> --block_size=32768`
+Both FAT and ext4 can be mounted natively on Linux, ext4 needs additional drivers on macOS.   To access LittleFS you need to mount it via FUSE using the following command `lfsfuse /dev/sdX <mount_point> --block_size=32768`

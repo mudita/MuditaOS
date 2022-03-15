@@ -34,7 +34,7 @@ The project can be build:
 - on linux
 - on windows with [WSL](https://docs.microsoft.com/en-us/windows/wsl/)
 - with docker image
-- Mac native compilation **is not supported**
+Note: Mac native compilation **is not supported**
 
 ### Download repository and submodules
 
@@ -42,7 +42,7 @@ MuditaOS uses submodules, therefore for clone use:
 ```
 git clone --recurse-submodules git@github.com:mudita/MuditaOS.git
 ```
-if you didin't use `--recurse-submodules` or have to update submodules use:
+if you didn't use `--recurse-submodules` or have to update submodules use:
 ```
 git submodule update --init --recursive
 ```
@@ -58,10 +58,10 @@ cd config && ./bootstrap.sh 0-
 
 The script is written for Ubuntu and tested on 20.04.  
 
-**Note** that this:
-- the script require sudo to:
-    - downloads a shellscript from `get.docker.com` and runs it with sudo for Docker installation.
-    - instals few required packages (list them with: `cat config/bootstrap_config`) which also require root privileges.
+**Note** The script:
+-requires sudo to:
+    - downloads a shell script from `get.docker.com` and runs it with sudo for Docker installation.
+    - installs a few required packages (list them with: `cat config/bootstrap_config`) which also require root privileges.
 - installs `GCCv10` and `CMake` to `$HOME` directory.
 - it's needed to be run only once
 
@@ -96,9 +96,9 @@ ex.:
 
 We are using J-Link driver in version J-Link v634f ([Ubuntu download](https://www.segger.com/downloads/jlink/JLink_Linux_V634f_x86_64.deb))  
 
-**NOTE:** This step is only required to load software and debug it via J-Link. It's not available for community - as it requires a programator board and soldered in programmator socket.
+**NOTE:** This step is only required to load software and debug it via J-Link. It's not available for the community - as it requires a programmer board and soldered in programmer socket.
 
-**WARNING:** newer J-Link software revisions seem to work fine, but loading via them do not result in usable software on the hardware tharget.
+**WARNING:** newer J-Link software revisions seem to work fine, but loading via them does not result in usable software on the hardware target.
 
 #### Add GitHub token
 
@@ -108,9 +108,9 @@ Please follow github token configuration here: [download assets documentation](.
 #### Project configuration
 
 To configure project we have helper script: `./configure.sh` which essentially passes through basic cmake configuration for each product for each platform.
-We hihly advice to use `ninja` as it has proven better compilation times over make.
+We highly advise using `ninja` as it has proven better compilation times over make.
 
-which can be run with following parameters:
+which can be run with the following parameters:
 ```
 # command      # product              # platform     # build type
 ./configure.sh [PurePhone|BellHybrid] [rt1051|linux] [release|debug|relwithdebinfo] [additional cmake parameters and options go here, i.e. -DENABLE_DEVELOPER_MODE_ENDPOINT=1 or "-G Ninja"]
@@ -118,15 +118,15 @@ which can be run with following parameters:
 
 __Examples:__
 
-1. building pure phone for rt1051 platform with ninja
+1. building PurePhone for rt1051 platform with ninja
 
-**NOTE** Due to software size we cant have full debug builds for rt1051 targets. Please use relwithdebinfo
+**NOTE** Due to software size we can't have full debug builds for rt1051 targets. Please use relwithdebinfo
 
 ```
 ./configure.sh pure rt1051 relWithDebInfo "-G Ninja"
 ```
 
-2. building pure phone for linux platform with make
+2. building PurePhone for Linux platform with make
 
 ```
 ./configure.sh pure linux debug
@@ -140,24 +140,24 @@ __Examples:__
 
 #### Project build
 
-Each run of `configure.sh` created `build-{PRODUCT}-{PLATFORM}-{OPTMALIZAION}` folder, i.e.: `build-PurePhone-rt1051-RelWithDebInfo`
+Each run of `configure.sh` creates `build-{PRODUCT}-{PLATFORM}-{OPTMALIZAION}` folder, i.e.: `build-PurePhone-rt1051-RelWithDebInfo`
 1. enter your selected build catalog
 2. run `ninja` or `make` depending on your selection during configuration.
 3. This will compile your selected target and create image of it
 
 To know more about build targets please see: [build targets documentation](../doc/build_targets.md)
 
-**WARNING:** our source code is open source, but the project itself is in progress of fully embracing the community. Currently you can:
-1. build binaries from the software
-2. are not able to create images - due difficulties with separation of 3rd party propritetary assets
+**WARNING:** our source code is open source, but the project itself is in the progress of fully embracing the community. Currently you:
+1. can build binaries from the software
+2. are not able to create images - due to difficulties with separation of 3rd party proprietary assets
 
 **Note** You can install and use ccache to speed up compilations
 
 #### Project load and run
 
-Project load and run is platform dependent. Curently we suport only linux and rt1051 targets.
+Project load and run are platform-dependent. Currently, we support only Linux and rt1051 targets.
 
-**NOTE:** Addition of open source assets is in progress and should be done in following weeks. Till then Open source community cant build their own images - due to lack od fonts and luts. Support will be added step by step:
+**NOTE:** Addition of open source assets is in progress and should be done in the following weeks. Till then Open source community can't build their own images - due to a lack of fonts and LUTs. Support will be added step by step:
 - addition of open source fonts
 - addition of partial update packages (not signed) for Open Source contributors
 
@@ -171,12 +171,12 @@ Please follow: [running on rt1051 platform](./running_on_phone.md)
 
 ### checking commits
 
-All commits have to compy with checks with:
+All commits have to comply with checks with:
 1. our pre commit hook
     1.1 required code have to be copyrighted with Mudita licensing
     1.2 required code have to comply to clang-format defined in repository
     1.3 code is checked against addition of binary blobs polluting software
-2. pre merge CI job checking if commit is in acceptable format:
+2. pre-merge CI job checking if the commit is in acceptable format:
 
 See [development workflow](./development_workflow.md) for more information
 
