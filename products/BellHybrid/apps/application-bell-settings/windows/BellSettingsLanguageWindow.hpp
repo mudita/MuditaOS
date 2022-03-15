@@ -28,6 +28,6 @@ namespace gui
         std::unique_ptr<app::bell_settings::LanguageWindowPresenter::Presenter> presenter;
 
         BellBaseLayout *body{};
-        UTF8Spinner *spinner = nullptr;
+        StringSpinner *spinner = nullptr;
     };
 } // namespace gui

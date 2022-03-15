@@ -24,8 +24,8 @@ namespace gui
         timeSetSpinner->setFont(focusFontName, noFocusFontName);
         timeSetSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        auto textRange = UTF8Spinner::Range{time::Locale::getAM(), time::Locale::getPM()};
-        fmt            = new UTF8Spinner(textRange, Boundaries::Continuous);
+        auto textRange = StringSpinner::range{time::Locale::getAM(), time::Locale::getPM()};
+        fmt            = new StringSpinner(textRange, Boundaries::Continuous);
         updateFmtFont(noFocusFontName);
         fmt->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         fmt->setMargins(getFmtMargins(noFocusFontName));
@@ -74,10 +74,10 @@ namespace gui
             if (timeFormat != newFormat) {
                 timeSetSpinner->setHour(date::make12(hours).count());
                 if (date::is_pm(hours)) {
-                    fmt->setCurrentValue(time::Locale::getPM());
+                    fmt->set_value(time::Locale::getPM());
                 }
                 else {
-                    fmt->setCurrentValue(time::Locale::getAM());
+                    fmt->set_value(time::Locale::getAM());
                 }
             }
 
@@ -215,7 +215,7 @@ namespace gui
 
     auto TimeSetFmtSpinner::isPM() const noexcept -> bool
     {
-        return fmt->getCurrentValue() == utils::time::Locale::getPM().c_str();
+        return fmt->value() == utils::time::Locale::getPM().c_str();
     }
 
     auto TimeSetFmtSpinner::getTimeFormat() const noexcept -> utils::time::Locale::TimeFormat
@@ -234,7 +234,7 @@ namespace gui
             const auto hours   = std::chrono::hours{t->tm_hour};
             const auto time12H = date::make12(hours);
             const auto isPM    = date::is_pm(hours);
-            fmt->setCurrentValue(isPM ? utils::time::Locale::getPM() : utils::time::Locale::getAM());
+            fmt->set_value(isPM ? utils::time::Locale::getPM() : utils::time::Locale::getAM());
             timeSetSpinner->setTime(time12H.count(), t->tm_min);
         }
     }

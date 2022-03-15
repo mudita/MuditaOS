@@ -7,5 +7,6 @@
 
 namespace utils::language
 {
-    auto getCorrectMinutesNumeralForm(int val) -> std::string;
+    auto getCorrectMinutesNumeralForm(std::uint32_t val) -> std::string;
+    auto getCorrectSecondsNumeralForm(std::uint32_t val) -> std::string;
 } // namespace utils::language

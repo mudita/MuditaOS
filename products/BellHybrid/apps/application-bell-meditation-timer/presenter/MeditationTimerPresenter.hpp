@@ -31,10 +31,10 @@ namespace app::meditation
         {
           public:
             virtual ~Presenter() noexcept                            = default;
-            virtual std::uint32_t getMinValue()                      = 0;
-            virtual std::uint32_t getMaxValue()                      = 0;
-            virtual std::uint32_t getStepValue()                     = 0;
-            virtual std::uint32_t getCurrentValue()                  = 0;
+            virtual std::uint8_t getMinValue()                       = 0;
+            virtual std::uint8_t getMaxValue()                       = 0;
+            virtual std::uint8_t getStepValue()                      = 0;
+            virtual std::uint8_t getCurrentValue()                   = 0;
             virtual std::string getTimeUnitName(std::uint32_t value) = 0;
             virtual void activate(std::uint32_t value)               = 0;
         };
@@ -45,10 +45,10 @@ namespace app::meditation
       public:
         MeditationTimerPresenter(app::ApplicationCommon *app, settings::Settings *settings);
 
-        std::uint32_t getMinValue() override;
-        std::uint32_t getMaxValue() override;
-        std::uint32_t getStepValue() override;
-        std::uint32_t getCurrentValue() override;
+        std::uint8_t getMinValue() override;
+        std::uint8_t getMaxValue() override;
+        std::uint8_t getStepValue() override;
+        std::uint8_t getCurrentValue() override;
         std::string getTimeUnitName(std::uint32_t value) override;
         void activate(std::uint32_t value) override;
 

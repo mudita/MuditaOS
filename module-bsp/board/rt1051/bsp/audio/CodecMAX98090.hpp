@@ -8,6 +8,8 @@
 #include "drivers/i2c/DriverI2C.hpp"
 #include <cstdint>
 
+#include <cstdint>
+
 class CodecParamsMAX98090 : public CodecParams
 {
   public:
@@ -66,8 +68,8 @@ class CodecParamsMAX98090 : public CodecParams
     bool micBiasEnable             = false;
     std::uint8_t playbackPathGain  = 0;
     std::uint8_t playbackPathAtten = 0;
-    InputPath inputPath   = InputPath::None;
-    OutputPath outputPath = OutputPath::None;
+    InputPath inputPath            = InputPath::None;
+    OutputPath outputPath          = OutputPath::None;
 };
 
 class CodecMAX98090 : public Codec

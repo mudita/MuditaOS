@@ -12,11 +12,12 @@
 
 #include "MeditationTimerPresenter.hpp"
 
-namespace gui
+namespace app::meditation
 {
-    class MeditationTimerWindow : public AppWindow, public app::meditation::MeditationTimerContract::View
+    class MeditationTimerWindow : public gui::AppWindow, public app::meditation::MeditationTimerContract::View
     {
       public:
+        static constexpr auto name = "MeditationTimerWindow";
         explicit MeditationTimerWindow(
             app::ApplicationCommon *app,
             std::unique_ptr<app::meditation::MeditationTimerContract::Presenter> &&windowPresenter);
@@ -29,8 +30,8 @@ namespace gui
 
       private:
         std::unique_ptr<app::meditation::MeditationTimerContract::Presenter> presenter;
-        BellBaseLayout *body{};
-        UIntegerSpinner *spinner{};
-        Label *bottomDescription{};
+        gui::BellBaseLayout *body{};
+        gui::UIntegerSpinner *spinner{};
+        gui::Label *bottomDescription{};
     };
-} // namespace gui
+} // namespace app::meditation

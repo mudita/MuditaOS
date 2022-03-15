@@ -13,6 +13,11 @@ namespace app
 
 namespace app::meditation
 {
+    namespace models
+    {
+        class StartDelay;
+    } // namespace models
+
     class ReadyGoingPresenterContract
     {
       public:
@@ -24,16 +29,19 @@ namespace app::meditation
         class Presenter : public BasePresenter<ReadyGoingPresenterContract::View>
         {
           public:
-            virtual void activate() = 0;
+            virtual void activate()                      = 0;
+            virtual std::chrono::seconds getStartDelay() = 0;
         };
     };
 
     class ReadyGoingPresenter : public ReadyGoingPresenterContract::Presenter
     {
         app::ApplicationCommon *app{};
+        const models::StartDelay &startDelayModel;
         void activate() override;
+        std::chrono::seconds getStartDelay() override;
 
       public:
-        explicit ReadyGoingPresenter(app::ApplicationCommon *app);
+        ReadyGoingPresenter(app::ApplicationCommon *app, const models::StartDelay &startDelayModel);
     };
 } // namespace app::meditation

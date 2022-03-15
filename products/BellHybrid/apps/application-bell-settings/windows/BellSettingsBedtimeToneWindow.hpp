@@ -17,8 +17,7 @@ namespace gui
       public:
         static constexpr auto name = "BellSettingsBedtimeToneWindow";
         explicit BellSettingsBedtimeToneWindow(
-            app::ApplicationCommon *app,
-            std::unique_ptr<app::bell_settings::BedtimeSettingsPresenter::Presenter> presenter);
+            app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::SettingsPresenter::Presenter> presenter);
 
         void buildInterface() override;
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
@@ -29,6 +28,6 @@ namespace gui
 
       private:
         SideListView *sidelistview{};
-        std::unique_ptr<app::bell_settings::BedtimeSettingsPresenter::Presenter> presenter;
+        std::unique_ptr<app::bell_settings::SettingsPresenter::Presenter> presenter;
     };
 } /* namespace gui */

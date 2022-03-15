@@ -12,6 +12,17 @@ namespace app
                                  public gui::ListItemProvider
     {
       public:
+        using Items = std::vector<gui::BellSideListItemWithCallbacks *>;
+        explicit BellListItemProvider(Items &&items)
+        {
+            for (const auto &item : items) {
+                internalData.emplace_back(item);
+                item->deleteByList = false;
+            }
+        }
+
+        BellListItemProvider() = default;
+
         std::vector<gui::BellSideListItemWithCallbacks *> getListItems();
 
         auto requestRecords(uint32_t offset, uint32_t limit) -> void override;

@@ -26,13 +26,13 @@ namespace gui
         setEdges(RectangleEdge::None);
         setFocusItem(body);
 
-        timeFormat = new UTF8Spinner({fmtSpinner12H, fmtSpinner24H}, Boundaries::Fixed);
+        timeFormat = new StringSpinner({fmtSpinner12H, fmtSpinner24H}, Boundaries::Fixed);
         timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         timeFormat->setFont(bell_settings_style::time_fmt_set_list_item::font);
         timeFormat->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeFormat->setFocusEdges(RectangleEdge::None);
         timeFormat->onValueChanged = [this](const auto &) {
-            body->setMinMaxArrowsVisibility(timeFormat->isAtMin(), timeFormat->isAtMax());
+            body->setMinMaxArrowsVisibility(timeFormat->is_min(), timeFormat->is_max());
         };
 
         body->getCenterBox()->addWidget(timeFormat);
@@ -64,19 +64,19 @@ namespace gui
 
     auto TimeFormatSetListItem::getTimeFmt() const noexcept -> utils::time::Locale::TimeFormat
     {
-        return timeFormat->getCurrentValue() == fmtSpinner12H ? utils::time::Locale::TimeFormat::FormatTime12H
-                                                              : utils::time::Locale::TimeFormat::FormatTime24H;
+        return timeFormat->value() == fmtSpinner12H ? utils::time::Locale::TimeFormat::FormatTime12H
+                                                    : utils::time::Locale::TimeFormat::FormatTime24H;
     }
 
     auto TimeFormatSetListItem::setTimeFmt(utils::time::Locale::TimeFormat fmt) noexcept -> void
     {
         using namespace utils::time;
         if (fmt == Locale::TimeFormat::FormatTime12H) {
-            timeFormat->setCurrentValue(fmtSpinner12H);
+            timeFormat->set_value(fmtSpinner12H);
         }
         else if (fmt == Locale::TimeFormat::FormatTime24H) {
-            timeFormat->setCurrentValue(fmtSpinner24H);
+            timeFormat->set_value(fmtSpinner24H);
         }
-        body->setMinMaxArrowsVisibility(timeFormat->isAtMin(), timeFormat->isAtMax());
+        body->setMinMaxArrowsVisibility(timeFormat->is_min(), timeFormat->is_max());
     }
 } // namespace gui

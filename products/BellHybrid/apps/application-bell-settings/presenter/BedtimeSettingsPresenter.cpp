@@ -5,10 +5,10 @@
 
 namespace app::bell_settings
 {
-    BedtimeSettingsPresenter::BedtimeSettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
-                                                       std::shared_ptr<AbstractBedtimeModel> model,
-                                                       AbstractAudioModel &audioModel,
-                                                       std::unique_ptr<AbstractSoundsRepository> soundsRepository)
+    SettingsPresenter::SettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
+                                         std::shared_ptr<AbstractBedtimeModel> model,
+                                         AbstractAudioModel &audioModel,
+                                         std::unique_ptr<AbstractSoundsRepository> soundsRepository)
         : provider(std::move(provider)),
           model(std::move(model)), audioModel{audioModel}, soundsRepository{std::move(soundsRepository)}
     {
@@ -35,35 +35,35 @@ namespace app::bell_settings
         };
     }
 
-    auto BedtimeSettingsPresenter::saveData() -> void
+    auto SettingsPresenter::saveData() -> void
     {
         for (const auto &item : provider->getListItems()) {
             item->getValue();
         }
     }
 
-    auto BedtimeSettingsPresenter::loadData() -> void
+    auto SettingsPresenter::loadData() -> void
     {
         for (const auto &item : provider->getListItems()) {
             item->setValue();
         }
     }
 
-    auto BedtimeSettingsPresenter::getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider>
+    auto SettingsPresenter::getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider>
     {
         return provider;
     }
 
-    void BedtimeSettingsPresenter::eraseProviderData()
+    void SettingsPresenter::eraseProviderData()
     {
         provider->clearData();
     }
 
-    void BedtimeSettingsPresenter::stopSound()
+    void SettingsPresenter::stopSound()
     {
         this->audioModel.stopPlayedByThis({});
     }
-    void BedtimeSettingsPresenter::exitWithoutSave()
+    void SettingsPresenter::exitWithoutSave()
     {
         model->getBedtimeVolume().restoreDefault();
     }

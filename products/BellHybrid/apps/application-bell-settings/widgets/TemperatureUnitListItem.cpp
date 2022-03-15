@@ -15,14 +15,14 @@ namespace gui
         setEdges(RectangleEdge::None);
         setFocusItem(body);
 
-        temperatureUnit = new UTF8Spinner(
+        temperatureUnit = new StringSpinner(
             {utils::temperature::celsiusDegreeSymbol, utils::temperature::fahrenheitDegreeSymbol}, Boundaries::Fixed);
         temperatureUnit->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         temperatureUnit->setFont(bell_settings_style::time_fmt_set_list_item::font);
         temperatureUnit->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         temperatureUnit->setFocusEdges(RectangleEdge::None);
         temperatureUnit->onValueChanged = [this](const auto &) {
-            body->setMinMaxArrowsVisibility(temperatureUnit->isAtMin(), temperatureUnit->isAtMax());
+            body->setMinMaxArrowsVisibility(temperatureUnit->is_min(), temperatureUnit->is_max());
         };
 
         body->getCenterBox()->addWidget(temperatureUnit);
@@ -44,13 +44,12 @@ namespace gui
 
     auto TemperatureUnitListItem::getUnitAsStr() const noexcept -> UTF8
     {
-        return temperatureUnit->getCurrentValue();
+        return temperatureUnit->value();
     }
     auto TemperatureUnitListItem::setUnit(const utils::temperature::Temperature::Unit unit) -> void
     {
         using namespace utils::temperature;
-        temperatureUnit->setCurrentValue(unit == Temperature::Unit::Celsius ? celsiusDegreeSymbol
-                                                                            : fahrenheitDegreeSymbol);
-        body->setMinMaxArrowsVisibility(temperatureUnit->isAtMin(), temperatureUnit->isAtMax());
+        temperatureUnit->set_value(unit == Temperature::Unit::Celsius ? celsiusDegreeSymbol : fahrenheitDegreeSymbol);
+        body->setMinMaxArrowsVisibility(temperatureUnit->is_min(), temperatureUnit->is_max());
     }
 } // namespace gui

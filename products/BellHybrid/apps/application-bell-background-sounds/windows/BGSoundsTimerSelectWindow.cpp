@@ -86,20 +86,20 @@ namespace gui
     {
         auto range = presenter->getTimerValuesRange();
 
-        spinner = new UTF8Spinner(toUTF8Range(range), Boundaries::Fixed);
+        spinner = new StringSpinner(toUTF8Range(range), Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(bgSoundsStyle::timerValueFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setEdges(RectangleEdge::None);
         spinner->setFocusEdges(RectangleEdge::None);
         auto currentValue = timerValueToUTF8(presenter->getCurrentTimerValue());
-        spinner->setCurrentValue(std::move(currentValue));
+        spinner->set_value(std::move(currentValue));
         spinner->onValueChanged = [this](const auto &) {
-            body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
+            body->setMinMaxArrowsVisibility(spinner->is_min(), spinner->is_max());
             updateBottomDescription();
         };
         body->getCenterBox()->addWidget(spinner);
-        body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
+        body->setMinMaxArrowsVisibility(spinner->is_min(), spinner->is_max());
     }
 
     void BGSoundsTimerSelectWindow::createBottomDescription()
@@ -117,7 +117,7 @@ namespace gui
     }
     void BGSoundsTimerSelectWindow::updateBottomDescription()
     {
-        const auto currentVal = spinner->getCurrentValue();
+        const auto currentVal = spinner->value();
         bottomDescription->setText(utils::language::getCorrectMinutesNumeralForm(UTF8ToTimerValue(currentVal).count()));
 
         const bool isDescriptionVisible = UTF8ToTimerValue(currentVal) != offValue;
@@ -158,7 +158,7 @@ namespace gui
             return true;
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-            auto currentValue = UTF8ToTimerValue(spinner->getCurrentValue());
+            auto currentValue = UTF8ToTimerValue(spinner->value());
             presenter->setTimerValue(currentValue);
 
             auto audioSwitchData                        = std::make_unique<BGSoundsSwitchData>(std::move(audioContext));

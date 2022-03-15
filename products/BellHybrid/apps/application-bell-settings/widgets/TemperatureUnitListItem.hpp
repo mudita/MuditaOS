@@ -20,7 +20,7 @@ namespace gui
         auto setUnit(utils::temperature::Temperature::Unit unit) -> void;
 
       private:
-        UTF8Spinner *temperatureUnit{};
+        StringSpinner *temperatureUnit{};
     };
 
 } // namespace gui

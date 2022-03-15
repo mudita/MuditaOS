@@ -6,7 +6,6 @@
 #include <common/models/AbstractSettingsModel.hpp>
 #include <common/widgets/BellSideListItemWithCallbacks.hpp>
 
-#include <apps-common/widgets/spinners/SpinnerContents.hpp>
 #include <apps-common/widgets/spinners/Spinners.hpp>
 #include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 
@@ -15,6 +14,7 @@
 
 namespace gui
 {
+
     class OnOffListItem : public BellSideListItemWithCallbacks
     {
       public:
@@ -25,67 +25,9 @@ namespace gui
       private:
         void setArrowsVisibility();
 
-        const UTF8 onStr;
-        const UTF8 offStr;
-        UTF8Spinner *spinner{};
-    };
-
-    class NumListItem : public BellSideListItemWithCallbacks
-    {
-      public:
-        explicit NumListItem(AbstractSettingsModel<std::uint8_t> &model,
-                             UIntegerSpinner::Range range,
-                             const std::string &topDescription    = "",
-                             const std::string &bottomDescription = "");
-
-        void setOnValueChanged(std::function<void(const UIntegerSpinner::Type &)> &&cb);
-        UIntegerSpinner::Type getCurrentValue();
-
-      private:
-        UIntegerSpinner *spinner{};
-
-        void setArrowsVisibility(UIntegerSpinner::Range range);
-    };
-
-    class NumWithStringListItem : public BellSideListItemWithCallbacks
-    {
-      public:
-        using Value                = NumWithString<std::uint32_t, UTF8>;
-        using NumWithStringSpinner = GenericSpinner<StringPolicy<Value>>;
-
-        explicit NumWithStringListItem(AbstractSettingsModel<std::uint8_t> &model,
-                                       NumWithStringSpinner::Range range,
-                                       const std::string &topDescription    = "",
-                                       const std::string &bottomDescription = "");
-
-        bool isOff() const;
-        NumWithStringSpinner *getSpinner()
-        {
-            return spinner;
-        }
-        NumWithStringSpinner::Type getCurrentValue();
-        void setArrowsVisibility();
-
-      private:
-        NumWithStringSpinner *spinner{};
-        const UTF8 offStr;
-        const UTF8 minStr;
-    };
-
-    class UTF8ListItem : public BellSideListItemWithCallbacks
-    {
-      public:
-        explicit UTF8ListItem(AbstractSettingsModel<UTF8> &model,
-                              UTF8Spinner::Range range,
-                              const std::string &topDescription = "");
-
-        void setOnValueChanged(std::function<void(const UTF8 &)> &&cb);
-        UTF8Spinner::Type getCurrentValue();
-
-      private:
-        void setArrowsVisibility(const UTF8Spinner::Range &range);
-
-        UTF8Spinner *spinner{};
+        const std::string onStr;
+        const std::string offStr;
+        StringSpinner *spinner;
     };
 
     class TimeListItem : public BellSideListItemWithCallbacks

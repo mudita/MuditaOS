@@ -76,7 +76,7 @@ namespace gui
         void handleContentChanged() override;
 
         TimeSetSpinner *timeSetSpinner = nullptr;
-        UTF8Spinner *fmt               = nullptr;
+        StringSpinner *fmt             = nullptr;
         EditMode editMode              = EditMode::Edit;
         std::string focusFontName      = style::window::font::supersizeme;
         std::string noFocusFontName    = style::window::font::supersizemelight;

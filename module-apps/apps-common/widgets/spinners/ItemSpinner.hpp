@@ -3,27 +3,27 @@
 
 #pragma once
 
-#include "SpinnerPolicies.hpp"
 #include <Item.hpp>
+#include <InputEvent.hpp>
 
 namespace gui
 {
-    template <typename Policy> class ItemSpinner : public Item
+    template <typename Container> class ItemSpinner : public Item
     {
       public:
-        using Range = typename Policy::Range;
-        using Type  = typename Policy::Type;
+        using range      = typename Container::range;
+        using value_type = typename Container::value_type;
 
-        using OnValueChanged = std::function<void(const Type &&)>;
+        using OnValueChanged = std::function<void(const value_type &&)>;
 
         explicit ItemSpinner(Item *parent,
-                             Range range,
+                             range range,
                              Boundaries boundaries   = Boundaries::Continuous,
                              Orientation orientation = Orientation::Vertical);
 
-        [[nodiscard]] Type getCurrentValue() const noexcept;
-        void setCurrentValue(Type val);
-        void setRange(Range range);
+        [[nodiscard]] value_type getCurrentValue() const noexcept;
+        void setCurrentValue(value_type val);
+        void setRange(range range);
 
         void setFocusEdges(RectangleEdge edges);
         bool onInput(const InputEvent &inputEvent) override;
@@ -33,6 +33,16 @@ namespace gui
         OnValueChanged onValueChanged;
 
       private:
+        inline typename Container::Boundaries convert_boundaries(gui::Boundaries boundaries)
+        {
+            switch (boundaries) {
+            case gui::Boundaries::Fixed:
+                return Container::Boundaries::Fixed;
+            case gui::Boundaries::Continuous:
+                return Container::Boundaries::Continuous;
+            }
+            return Container::Boundaries::Fixed;
+        }
         void stepNext();
         void stepPrevious();
         bool isPreviousEvent(const InputEvent &inputEvent);
@@ -40,18 +50,18 @@ namespace gui
         void update();
         void invoke();
 
-        Policy policy;
+        Container container;
         RectangleEdge focusEdges = RectangleEdge::Bottom;
         Orientation orientation  = Orientation::Vertical;
         gui::Item *currentLayout = nullptr;
     };
 
-    template <typename ValuePolicy>
-    ItemSpinner<ValuePolicy>::ItemSpinner(Item *parent,
-                                          ItemSpinner::Range range,
-                                          Boundaries boundaries,
-                                          Orientation orientation)
-        : Item(), policy{range, boundaries}, orientation(orientation)
+    template <typename Container>
+    ItemSpinner<Container>::ItemSpinner(Item *parent,
+                                        ItemSpinner::range range,
+                                        Boundaries boundaries,
+                                        Orientation orientation)
+        : Item(), container{range, convert_boundaries(boundaries)}, orientation(orientation)
     {
         this->parent = parent;
         if (parent != nullptr) {
@@ -59,41 +69,42 @@ namespace gui
         }
     }
 
-    template <typename ValuePolicy> void ItemSpinner<ValuePolicy>::setFocusEdges(RectangleEdge edges)
+    template <typename Container> void ItemSpinner<Container>::setFocusEdges(RectangleEdge edges)
     {
         focusEdges = edges;
     }
 
-    template <typename Policy> void ItemSpinner<Policy>::setRange(Range range)
+    template <typename Container> void ItemSpinner<Container>::setRange(range range)
     {
-        policy.updateRange(range);
+        container.updateRange(range);
         update();
     }
 
-    template <typename ValuePolicy> void ItemSpinner<ValuePolicy>::setCurrentValue(const Type val)
+    template <typename Container> void ItemSpinner<Container>::setCurrentValue(const value_type val)
     {
-        policy.set(val);
+        container.set(val);
         update();
     }
 
-    template <typename Policy> typename ItemSpinner<Policy>::Type ItemSpinner<Policy>::getCurrentValue() const noexcept
+    template <typename Container>
+    typename ItemSpinner<Container>::value_type ItemSpinner<Container>::getCurrentValue() const noexcept
     {
-        return policy.get();
+        return container.get();
     }
 
-    template <typename ValuePolicy> bool ItemSpinner<ValuePolicy>::isPreviousEvent(const InputEvent &inputEvent)
+    template <typename Container> bool ItemSpinner<Container>::isPreviousEvent(const InputEvent &inputEvent)
     {
         return (orientation == Orientation::Vertical && inputEvent.is(KeyCode::KEY_DOWN)) ||
                (orientation == Orientation::Horizontal && inputEvent.is(KeyCode::KEY_LEFT));
     }
 
-    template <typename ValuePolicy> bool ItemSpinner<ValuePolicy>::isNextEvent(const InputEvent &inputEvent)
+    template <typename Container> bool ItemSpinner<Container>::isNextEvent(const InputEvent &inputEvent)
     {
         return (orientation == Orientation::Vertical && inputEvent.is(KeyCode::KEY_UP)) ||
                (orientation == Orientation::Horizontal && inputEvent.is(KeyCode::KEY_RIGHT));
     }
 
-    template <typename ValuePolicy> bool ItemSpinner<ValuePolicy>::onInput(const InputEvent &inputEvent)
+    template <typename Container> bool ItemSpinner<Container>::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
             if (isPreviousEvent(inputEvent)) {
@@ -108,43 +119,43 @@ namespace gui
         return false;
     }
 
-    template <typename Policy> void ItemSpinner<Policy>::stepNext()
+    template <typename Container> void ItemSpinner<Container>::stepNext()
     {
-        if (policy.next()) {
+        if (container.next()) {
             update();
             invoke();
         }
     }
 
-    template <typename Policy> void ItemSpinner<Policy>::stepPrevious()
+    template <typename Container> void ItemSpinner<Container>::stepPrevious()
     {
-        if (policy.previous()) {
+        if (container.previous()) {
             update();
             invoke();
         }
     }
 
-    template <typename Policy> void ItemSpinner<Policy>::update()
+    template <typename Container> void ItemSpinner<Container>::update()
     {
-        if (currentLayout) {
+        if (currentLayout != nullptr) {
             this->removeWidget(currentLayout);
         }
-        currentLayout = policy.get();
+        currentLayout = container.get();
         this->addWidget(currentLayout);
         informContentChanged();
     }
-    template <typename Policy> void ItemSpinner<Policy>::invoke()
+    template <typename Container> void ItemSpinner<Container>::invoke()
     {
         if (onValueChanged) {
             onValueChanged(getCurrentValue());
         }
     }
-    template <typename Policy> bool ItemSpinner<Policy>::isAtMin() const
+    template <typename Container> bool ItemSpinner<Container>::isAtMin() const
     {
-        return policy.isAtMin();
+        return container.is_min();
     }
-    template <typename Policy> bool ItemSpinner<Policy>::isAtMax() const
+    template <typename Container> bool ItemSpinner<Container>::isAtMax() const
     {
-        return policy.isAtMax();
+        return container.is_max();
     }
 } // namespace gui
