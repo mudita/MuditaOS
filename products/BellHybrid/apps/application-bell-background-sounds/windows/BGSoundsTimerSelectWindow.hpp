@@ -18,7 +18,7 @@ namespace gui
     {
         std::unique_ptr<app::bgSounds::BGSoundsTimerSelectContract::Presenter> presenter;
         BellBaseLayout *body    = nullptr;
-        UTF8Spinner *spinner    = nullptr;
+        StringSpinner *spinner  = nullptr;
         Text *bottomDescription = nullptr;
         std::unique_ptr<BGSoundsAudioContext> audioContext;
 

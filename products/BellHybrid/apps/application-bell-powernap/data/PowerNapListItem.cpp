@@ -27,7 +27,7 @@ namespace gui
 
     void PowerNapListItem::createSpinner()
     {
-        spinner = new UIntegerSpinner(UIntegerSpinner::Range{spinnerMin, spinnerMax, spinnerStep}, Boundaries::Fixed);
+        spinner = new UIntegerSpinner(UIntegerSpinner::range{spinnerMin, spinnerMax, spinnerStep}, Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(powerNapStyle::napPeriodFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -65,7 +65,7 @@ namespace gui
 
         inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
             if (body->onInput(inputEvent)) {
-                setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(spinner->getCurrentValue()));
+                setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(spinner->value()));
                 return true;
             }
             return false;
@@ -74,13 +74,13 @@ namespace gui
 
     int PowerNapListItem::getSpinnerValue() const noexcept
     {
-        return spinner->getCurrentValue();
+        return spinner->value();
     }
 
     void PowerNapListItem::setSpinnerValue(int value)
     {
-        spinner->setCurrentValue(value);
-        setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(spinner->getCurrentValue()));
+        spinner->set_value(value);
+        setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(spinner->value()));
         onValueChanged(value);
     }
 

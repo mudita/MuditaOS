@@ -18,18 +18,24 @@ target_include_directories(application-bell-meditation-timer
 
 target_sources(application-bell-meditation-timer
     PRIVATE
-        ApplicationBellMeditationTimer.cpp
-        presenter/IntervalChimePresenter.cpp
+        MeditationTimer.cpp
+        models/ChimeInterval.cpp
+        models/ChimeVolume.cpp
+        models/StartDelay.cpp
         presenter/MeditationProgressPresenter.cpp
         presenter/MeditationTimerPresenter.cpp
         presenter/ReadyGoingPresenter.cpp
-        presenter/SessionEndedPresenter.cpp 
-        windows/IntervalChimeWindow.cpp
+        presenter/SessionEndedPresenter.cpp
+        presenter/SettingsPresenter.cpp
+        presenter/StatisticsPresenter.cpp
+        windows/MeditationMainWindow.cpp
         windows/MeditationRunningWindow.cpp
         windows/MeditationTimerWindow.cpp
         windows/ReadyGoingWindow.cpp
+        windows/SettingsWindow.cpp
+        windows/StatisticsWindow.cpp
     PUBLIC
-        include/application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp
+        include/application-bell-meditation-timer/MeditationTimer.hpp
 )
 
 target_link_libraries(application-bell-meditation-timer
@@ -38,7 +44,6 @@ target_link_libraries(application-bell-meditation-timer
         bell::audio
         bell::app-common
         bell::app-main
-        bellgui
         service-appmgr
         service-time
     PUBLIC

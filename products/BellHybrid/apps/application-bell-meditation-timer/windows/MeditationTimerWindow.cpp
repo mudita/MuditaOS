@@ -1,16 +1,18 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationBellMeditationTimer.hpp"
+#include "MeditationTimer.hpp"
+#include "MeditationCommon.hpp"
 #include "MeditationStyle.hpp"
 #include "MeditationTimerWindow.hpp"
 
-namespace gui
+namespace app::meditation
 {
+    using namespace gui;
     MeditationTimerWindow::MeditationTimerWindow(
         app::ApplicationCommon *app,
         std::unique_ptr<app::meditation::MeditationTimerContract::Presenter> &&windowPresenter)
-        : AppWindow(app, gui::name::window::meditationTimer), presenter{std::move(windowPresenter)}
+        : AppWindow(app, name), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();
@@ -36,8 +38,8 @@ namespace gui
         topMessage->drawUnderline(false);
 
         spinner = new UIntegerSpinner(
-            UIntegerSpinner::Range{presenter->getMinValue(), presenter->getMaxValue(), presenter->getStepValue()},
-            Boundaries::Fixed);
+            UIntegerSpinner::range{presenter->getMinValue(), presenter->getMaxValue(), presenter->getStepValue()},
+            gui::Boundaries::Fixed);
         spinner->onValueChanged = [this](const auto val) { this->onValueChanged(val); };
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(app::meditationStyle::mtStyle::text::font);
@@ -47,7 +49,7 @@ namespace gui
         body->getCenterBox()->addWidget(spinner);
 
         auto currentValue = presenter->getCurrentValue();
-        spinner->setCurrentValue(currentValue);
+        spinner->set_value(currentValue);
         body->setMinMaxArrowsVisibility(currentValue == presenter->getMinValue(),
                                         currentValue == presenter->getMaxValue());
 
@@ -57,7 +59,7 @@ namespace gui
         bottomDescription->setEdges(RectangleEdge::None);
         bottomDescription->activeItem = false;
         bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        bottomDescription->setText(presenter->getTimeUnitName(spinner->getCurrentValue()));
+        bottomDescription->setText(presenter->getTimeUnitName(spinner->value()));
 
         setFocusItem(spinner);
         body->resize();
@@ -70,7 +72,7 @@ namespace gui
         }
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
-            presenter->activate(spinner->getCurrentValue());
+            presenter->activate(spinner->value());
             return true;
         }
 
@@ -81,6 +83,6 @@ namespace gui
     {
         body->setMinMaxArrowsVisibility(currentValue == presenter->getMinValue(),
                                         currentValue == presenter->getMaxValue());
-        bottomDescription->setText(presenter->getTimeUnitName(spinner->getCurrentValue()));
+        bottomDescription->setText(presenter->getTimeUnitName(spinner->value()));
     }
-} // namespace gui
+} // namespace app::meditation

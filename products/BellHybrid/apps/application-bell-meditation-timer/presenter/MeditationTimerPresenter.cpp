@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationBellMeditationTimer.hpp"
+#include "MeditationTimer.hpp"
 #include "MeditationCommon.hpp"
 #include "MeditationStyle.hpp"
 #include "MeditationTimerPresenter.hpp"
@@ -23,25 +23,25 @@ namespace app::meditation
         : app{app}, settings{settings}
     {}
 
-    std::uint32_t MeditationTimerPresenter::getMinValue()
+    std::uint8_t MeditationTimerPresenter::getMinValue()
     {
         return spinnerMin;
     }
 
-    std::uint32_t MeditationTimerPresenter::getMaxValue()
+    std::uint8_t MeditationTimerPresenter::getMaxValue()
     {
         return spinnerMax;
     }
 
-    std::uint32_t MeditationTimerPresenter::getStepValue()
+    std::uint8_t MeditationTimerPresenter::getStepValue()
     {
         return spinnerStep;
     }
 
-    std::uint32_t MeditationTimerPresenter::getCurrentValue()
+    std::uint8_t MeditationTimerPresenter::getCurrentValue()
     {
         const auto value = settings->getValue(meditationDBRecordName, settings::SettingsScope::AppLocal);
-        auto defTimer    = utils::getNumericValue<std::uint32_t>(value);
+        auto defTimer    = utils::getNumericValue<std::uint8_t>(value);
         if (defTimer == emptyValue) {
             defTimer = defaultValue;
         }
@@ -65,6 +65,6 @@ namespace app::meditation
     void MeditationTimerPresenter::activate(std::uint32_t value)
     {
         settings->setValue(meditationDBRecordName, utils::to_string(value), settings::SettingsScope::AppLocal);
-        app->switchWindow(gui::name::window::intervalChime);
+        app->switchWindow(windows::readyGoing);
     }
 } // namespace app::meditation

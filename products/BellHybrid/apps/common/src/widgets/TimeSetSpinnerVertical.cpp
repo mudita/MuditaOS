@@ -29,25 +29,25 @@ namespace gui
         setEdges(RectangleEdge::None);
 
         hour =
-            new UIntegerSpinnerFixed(UIntegerSpinnerFixed::Range{hourMin, hourMax, hourStep}, Boundaries::Continuous);
+            new UIntegerSpinnerFixed(UIntegerSpinnerFixed::range{hourMin, hourMax, hourStep}, Boundaries::Continuous);
         updateFont(hour, fontName);
 
         hour->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         hour->setEdges(RectangleEdge::None);
         hour->setPenFocusWidth(style::time_set_spinner_vertical::focus::size);
-        hour->setCurrentValue(0);
+        hour->set_value(0);
         hour->setMargins(getHourMargins(fontName));
 
         addWidget(hour);
 
-        minute = new UIntegerSpinnerFixed(UIntegerSpinnerFixed::Range{minuteMin, minuteMax, minuteStep},
+        minute = new UIntegerSpinnerFixed(UIntegerSpinnerFixed::range{minuteMin, minuteMax, minuteStep},
                                           Boundaries::Continuous);
         updateFont(minute, fontName);
         minute->setPenFocusWidth(style::time_set_spinner_vertical::focus::size);
 
         minute->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         minute->setEdges(RectangleEdge::None);
-        minute->setCurrentValue(0);
+        minute->set_value(0);
         addWidget(minute);
 
         resizeItems();
@@ -61,22 +61,22 @@ namespace gui
 
         switch (newFormat) {
         case utils::time::Locale::TimeFormat::FormatTime12H: {
-            auto hours = std::chrono::hours(hour->getCurrentValue());
-            hour->setRange(UIntegerSpinnerFixed::Range{
+            auto hours = std::chrono::hours(hour->value());
+            hour->set_range(UIntegerSpinnerFixed::range{
                 time::Locale::min_hour_12H_mode, time::Locale::max_hour_12H_mode, hourStep});
 
             if (timeFormat != newFormat) {
-                hour->setCurrentValue(date::make12(hours).count());
+                hour->set_value(date::make12(hours).count());
             }
 
         } break;
         case utils::time::Locale::TimeFormat::FormatTime24H: {
-            auto hours = std::chrono::hours(hour->getCurrentValue());
-            hour->setRange(UIntegerSpinnerFixed::Range{
+            auto hours = std::chrono::hours(hour->value());
+            hour->set_range(UIntegerSpinnerFixed::range{
                 time::Locale::min_hour_24H_mode, time::Locale::max_hour_24H_mode, hourStep});
 
             if (newFormat != timeFormat) {
-                hour->setCurrentValue(date::make24(hours, isPM()).count());
+                hour->set_value(date::make24(hours, isPM()).count());
             }
         } break;
         default:
@@ -88,22 +88,22 @@ namespace gui
 
     auto TimeSetSpinnerVertical::setMinute(int value) noexcept -> void
     {
-        minute->setCurrentValue(value);
+        minute->set_value(value);
     }
 
     auto TimeSetSpinnerVertical::getHour() const noexcept -> int
     {
-        return hour->getCurrentValue();
+        return hour->value();
     }
 
     auto TimeSetSpinnerVertical::getMinute() const noexcept -> int
     {
-        return minute->getCurrentValue();
+        return minute->value();
     }
 
     auto TimeSetSpinnerVertical::setHour(int value) noexcept -> void
     {
-        hour->setCurrentValue(value);
+        hour->set_value(value);
     }
 
     auto TimeSetSpinnerVertical::updateFont(TextFixedSize *elem, const std::string &fontName) noexcept -> void
@@ -148,15 +148,17 @@ namespace gui
         const auto t = std::localtime(&time);
 
         if (timeFormat == Locale::TimeFormat::FormatTime24H) {
-            hour->setCurrentValue(t->tm_hour);
-            minute->setCurrentValue(t->tm_min);
+            hour->set_value(t->tm_hour);
+            minute->set_value(t->tm_min);
         }
         else {
             const auto hours   = std::chrono::hours{t->tm_hour};
             const auto time12H = date::make12(hours);
-            hour->setCurrentValue(time12H.count());
-            minute->setCurrentValue(t->tm_min);
+            hour->set_value(time12H.count());
+            minute->set_value(t->tm_min);
         }
+
+        handleContentChanged();
     }
 
     auto TimeSetSpinnerVertical::getTime() const noexcept -> std::time_t
@@ -165,12 +167,12 @@ namespace gui
         const auto now     = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         const auto newTime = std::localtime(&now);
         if (timeFormat == Locale::TimeFormat::FormatTime24H) {
-            newTime->tm_hour = hour->getCurrentValue();
+            newTime->tm_hour = hour->value();
         }
         else {
-            newTime->tm_hour = date::make24(std::chrono::hours{hour->getCurrentValue()}, isPM()).count();
+            newTime->tm_hour = date::make24(std::chrono::hours{hour->value()}, isPM()).count();
         }
-        newTime->tm_min = minute->getCurrentValue();
+        newTime->tm_min = minute->value();
 
         return std::mktime(newTime);
     }

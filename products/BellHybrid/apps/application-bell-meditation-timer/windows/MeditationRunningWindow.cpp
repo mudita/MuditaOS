@@ -1,7 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationBellMeditationTimer.hpp"
+#include "MeditationTimer.hpp"
+#include "MeditationCommon.hpp"
 #include "MeditationRunningWindow.hpp"
 #include "MeditationStyle.hpp"
 
@@ -64,7 +65,7 @@ namespace gui
     MeditationRunningWindow::MeditationRunningWindow(
         app::ApplicationCommon *app,
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> &&windowPresenter)
-        : AppWindow(app, gui::name::window::meditationProgress), presenter{std::move(windowPresenter)}
+        : AppWindow(app, app::meditation::windows::meditationProgress), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();

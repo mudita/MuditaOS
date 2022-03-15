@@ -80,6 +80,10 @@
   "common_minutes_lower": "minuty",
   "common_minutes_lower_genitive": "minut",
   "common_minute_short": "min",
+  "common_second_lower": "sekunda",
+  "common_seconds_lower": "sekundy",
+  "common_seconds_lower_genitive": "sekund",
+  "common_second_short": "sec",
   "common_paused": "Pauza",
   "common_text_copy": "Kopiuj tekst",
   "common_text_paste": "Wklej tekst",
@@ -691,10 +695,10 @@
   "app_bell_settings_about_info_title": "Instrukcja i informacje dot. certyfikacji",
   "app_bell_settings_about_info_text": "www.mudita.com",
   "app_bell_meditation_timer": "Medytacja",
-  "app_bell_meditation_interval_chime": "Dzwonek interwału",
+  "app_bell_meditation_chime_interval": "Dzwonek interwału",
   "app_bell_meditation_progress": "Medytacja",
   "app_bell_meditation_interval_none": "Brak",
-  "app_bell_meditation_interval_every_x_minutes": "co %0",
   "app_bell_meditation_put_down_and_wait": "<text>Odłóż Mudita Harmony<br>i czekaj na gong</text>",
-  "app_bell_meditation_thank_you_for_session": "<text>Dziękujemy<br>za sesję</text>"
+  "app_bell_meditation_thank_you_for_session": "<text>Dziękujemy<br>za sesję</text>",
+  "app_bell_meditation_statistics": "Statystyki"
 }

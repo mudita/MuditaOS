@@ -36,17 +36,17 @@ namespace gui
         topMessage->drawUnderline(false);
 
         auto data = presenter->getLanguages();
-        spinner   = new UTF8Spinner({data.begin(), data.end()}, Boundaries::Fixed);
+        spinner   = new StringSpinner({data.begin(), data.end()}, Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         spinner->setFont(style::window::font::large);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setFocusEdges(RectangleEdge::None);
-        spinner->setCurrentValue(presenter->getSelectedLanguage());
+        spinner->set_value(presenter->getSelectedLanguage());
         spinner->onValueChanged = [this](const auto &) {
-            body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
+            body->setMinMaxArrowsVisibility(spinner->is_min(), spinner->is_max());
         };
         body->getCenterBox()->addWidget(spinner);
-        body->setMinMaxArrowsVisibility(spinner->isAtMin(), spinner->isAtMax());
+        body->setMinMaxArrowsVisibility(spinner->is_min(), spinner->is_max());
 
         body->resize();
     }
@@ -62,7 +62,7 @@ namespace gui
             return true;
         }
         else if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-            presenter->setLanguage(spinner->getCurrentValue());
+            presenter->setLanguage(spinner->value());
             return true;
         }
         return AppWindow::onInput(inputEvent);

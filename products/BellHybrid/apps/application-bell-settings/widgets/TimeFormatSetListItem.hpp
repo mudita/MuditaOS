@@ -30,7 +30,7 @@ namespace gui
 
       private:
         Label *bottomDescription{};
-        UTF8Spinner *timeFormat;
+        StringSpinner *timeFormat;
     };
 
 } // namespace gui

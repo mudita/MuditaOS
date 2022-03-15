@@ -36,19 +36,19 @@ namespace gui
         topMessage->drawUnderline(false);
 
         auto data = presenter->getVolumeData();
-        spinner   = new UIntegerSpinner({static_cast<UIntegerSpinner::Type>(data.min),
-                                       static_cast<UIntegerSpinner::Type>(data.max),
-                                       static_cast<UIntegerSpinner::Type>(data.step)},
+        spinner   = new UIntegerSpinner({static_cast<UIntegerSpinner::value_type>(data.min),
+                                       static_cast<UIntegerSpinner::value_type>(data.max),
+                                       static_cast<UIntegerSpinner::value_type>(data.step)},
                                       Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         spinner->setFont(bgSoundsStyle::valumeValueFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setFocusEdges(RectangleEdge::None);
-        spinner->setCurrentValue(static_cast<UIntegerSpinner::Type>(presenter->getVolume()));
+        spinner->set_value(static_cast<UIntegerSpinner::value_type>(presenter->getVolume()));
         body->getCenterBox()->addWidget(spinner);
 
         spinner->onValueChanged = [this](const auto &value) { presenter->setVolume(value); };
-        body->setMinMaxArrowsVisibility(spinner->getCurrentValue() == data.min, spinner->getCurrentValue() == data.max);
+        body->setMinMaxArrowsVisibility(spinner->value() == data.min, spinner->value() == data.max);
 
         setFocusItem(body);
         body->resize();
@@ -63,7 +63,7 @@ namespace gui
         resetTimer();
         auto data              = presenter->getVolumeData();
         const auto ret         = body->onInput(inputEvent);
-        const auto selectedVal = spinner->getCurrentValue();
+        const auto selectedVal = spinner->value();
         body->setMinMaxArrowsVisibility(selectedVal == data.min, selectedVal == data.max);
         return ret;
     }

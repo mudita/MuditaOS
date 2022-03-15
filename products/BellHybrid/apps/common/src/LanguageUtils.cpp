@@ -3,21 +3,43 @@
 
 #include <i18n/i18n.hpp>
 
-namespace utils::language
+namespace
 {
-    auto getCorrectMinutesNumeralForm(int val) -> std::string
+    std::string transform(const std::uint32_t val,
+                          const std::string &minuteLower,
+                          const std::string &minutesLower,
+                          const std::string &minutesLowerGenitive)
     {
         if (val == 1) {
-            return utils::translate("common_minute_lower");
+            return minuteLower;
         }
         if (utils::getDisplayLanguage() == "Polski") {
             if (val < 10 || val > 20) {
                 if ((val % 10) == 2 || (val % 10) == 3 || (val % 10) == 4) {
-                    return utils::translate("common_minutes_lower");
+                    return minutesLower;
                 }
             }
-            return utils::translate("common_minutes_lower_genitive");
+            return minutesLowerGenitive;
         }
-        return utils::translate("common_minutes_lower");
+        return minutesLower;
+    }
+} // namespace
+
+namespace utils::language
+{
+    auto getCorrectMinutesNumeralForm(const std::uint32_t val) -> std::string
+    {
+        return transform(val,
+                         utils::translate("common_minute_lower"),
+                         utils::translate("common_minutes_lower"),
+                         utils::translate("common_minutes_lower_genitive"));
+    }
+
+    auto getCorrectSecondsNumeralForm(const std::uint32_t val) -> std::string
+    {
+        return transform(val,
+                         utils::translate("common_second_lower"),
+                         utils::translate("common_seconds_lower"),
+                         utils::translate("common_seconds_lower_genitive"));
     }
 } // namespace utils::language

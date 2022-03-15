@@ -1,22 +1,22 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationBellMeditationTimer.hpp"
+#include "MeditationTimer.hpp"
+#include "MeditationCommon.hpp"
 #include "MeditationStyle.hpp"
 #include "ReadyGoingWindow.hpp"
-
-namespace
-{
-    constexpr inline auto defaultTimeout = std::chrono::seconds{10};
-}
 
 namespace gui
 {
     ReadyGoingWindow::ReadyGoingWindow(
         app::ApplicationCommon *app,
         std::shared_ptr<app::meditation::ReadyGoingPresenterContract::Presenter> winPresenter)
-        : WindowWithTimer(app, gui::name::window::readyGoing, defaultTimeout), presenter{std::move(winPresenter)}
+        : WindowWithTimer(app, app::meditation::windows::readyGoing), presenter{std::move(winPresenter)}
     {
+        const auto startDelay = presenter->getStartDelay();
+        /// Even if the start delay is set to 0, give 'ReadyGoingWindow` 1s to display its contents
+        resetTimer(startDelay == std::chrono::seconds{0} ? std::chrono::seconds{1} : startDelay);
+
         buildInterface();
 
         timerCallback = [this](Item &, sys::Timer &) {
@@ -44,7 +44,7 @@ namespace gui
         }
     }
 
-    bool ReadyGoingWindow::onInput(const InputEvent &inputEvent)
+    bool ReadyGoingWindow::onInput(const InputEvent &)
     {
         return true;
     }

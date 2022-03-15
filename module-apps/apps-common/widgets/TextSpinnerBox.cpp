@@ -5,7 +5,7 @@
 
 namespace gui
 {
-    TextSpinnerBox::TextSpinnerBox(Item *parent, const std::vector<UTF8> &data, Boundaries boundaries) : HBox(parent)
+    TextSpinnerBox::TextSpinnerBox(Item *parent, std::vector<UTF8> data, Boundaries boundaries) : HBox(parent)
     {
         setEdges(RectangleEdge::Bottom);
 
@@ -13,7 +13,7 @@ namespace gui
         leftArrow->setMinimumSizeToFitImage();
         leftArrow->setVisible(false);
 
-        spinner = new UTF8Spinner(data, Boundaries::Continuous, Orientation::Horizontal);
+        spinner = new StringSpinner(std::move(data), boundaries, Orientation::Horizontal);
         spinner->setFont(style::window::font::medium);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setEdges(RectangleEdge::All);
@@ -27,13 +27,13 @@ namespace gui
         inputCallback = [&](Item &item, const InputEvent &event) { return spinner->onInput(event); };
 
         focusChangedCallback = [&](gui::Item &item) {
-            if (focus && !spinner->isSingle()) {
+            if (focus && spinner->size() != 1) {
                 leftArrow->setVisible(true);
                 rightArrow->setVisible(true);
                 spinner->setFont(style::window::font::mediumbold);
                 setPenWidth(style::window::default_border_focus_w);
             }
-            else if (focus && spinner->isSingle()) {
+            else if (focus && spinner->size() == 1) {
                 leftArrow->setVisible(false);
                 rightArrow->setVisible(false);
                 spinner->setFont(style::window::font::mediumbold);
@@ -58,16 +58,16 @@ namespace gui
 
     void TextSpinnerBox::setData(const std::vector<UTF8> &data)
     {
-        spinner->setRange(data);
+        spinner->set_range(data);
     }
 
     UTF8 TextSpinnerBox::getCurrentValue() const noexcept
     {
-        return spinner->getCurrentValue();
+        return spinner->value();
     }
 
     void TextSpinnerBox::setCurrentValue(UTF8 val)
     {
-        spinner->setCurrentValue(val);
+        spinner->set_value(val);
     }
 } // namespace gui

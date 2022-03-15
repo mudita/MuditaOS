@@ -28,6 +28,11 @@ namespace settings
 
 namespace app::meditation
 {
+    namespace models
+    {
+        class ChimeInterval;
+    } // namespace models
+
     class MeditationProgressContract
     {
       public:
@@ -62,8 +67,9 @@ namespace app::meditation
         settings::Settings *settings = nullptr;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
+        models::ChimeInterval &chimeIntervalModel;
         std::chrono::minutes duration;
-        std::chrono::minutes interval;
+        std::chrono::seconds interval;
 
         static constexpr auto endWindowTimeout = std::chrono::seconds{5};
 
@@ -73,7 +79,8 @@ namespace app::meditation
       public:
         MeditationProgressPresenter(app::ApplicationCommon *app,
                                     settings::Settings *settings,
-                                    std::unique_ptr<AbstractTimeModel> timeModel);
+                                    std::unique_ptr<AbstractTimeModel> timeModel,
+                                    models::ChimeInterval &chimeIntervalModel);
 
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void handleUpdateTimeEvent() override;

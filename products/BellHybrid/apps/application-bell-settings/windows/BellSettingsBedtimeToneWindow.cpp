@@ -11,7 +11,7 @@
 namespace gui
 {
     BellSettingsBedtimeToneWindow::BellSettingsBedtimeToneWindow(
-        app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::BedtimeSettingsPresenter::Presenter> presenter)
+        app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::SettingsPresenter::Presenter> presenter)
         : AppWindow(app, name), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);

@@ -3,7 +3,6 @@
 
 #include <models/alarm_settings/SnoozeSettingsModel.hpp>
 
-#include <apps-common/ApplicationCommon.hpp>
 #include <db/SystemSettings.hpp>
 
 namespace
@@ -47,7 +46,7 @@ namespace app::bell_settings
 
     std::uint8_t SnoozeLengthModel::getValue() const
     {
-        return get_helper<std::uint8_t>(settings, bell::settings::Snooze::length).value_or(0);
+        return get_helper<std::uint32_t>(settings, bell::settings::Snooze::length).value_or(0);
     }
 
     void SnoozeChimeIntervalModel::setValue(std::uint8_t value)
@@ -58,7 +57,7 @@ namespace app::bell_settings
 
     std::uint8_t SnoozeChimeIntervalModel::getValue() const
     {
-        return get_helper<std::uint8_t>(settings, bell::settings::Snooze::interval).value_or(0);
+        return get_helper<std::uint32_t>(settings, bell::settings::Snooze::interval).value_or(0);
     }
 
     void SnoozeChimeToneModel::setValue(UTF8 value)

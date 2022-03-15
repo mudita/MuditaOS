@@ -128,7 +128,7 @@ namespace app
                     std::make_unique<SoundsRepository>(alarms::paths::getBedtimeReminderChimesDir());
                 auto provider = std::make_shared<bell_settings::BedtimeSettingsListItemProvider>(
                     bedtimeModel, soundsRepository->getSongTitles());
-                auto presenter = std::make_unique<bell_settings::BedtimeSettingsPresenter>(
+                auto presenter = std::make_unique<bell_settings::SettingsPresenter>(
                     provider, bedtimeModel, *audioModel, std::move(soundsRepository));
                 return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app, std::move(presenter));
             });
