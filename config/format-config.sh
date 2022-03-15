@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 # config file for pre-commit.hook clang-format
@@ -43,6 +43,7 @@ export declare ignore_paths=(
     'module-bsp/board/rt1051/common/system_MIMXRT1051.h'
     'module-bsp/bsp/'
     'module-db/[Dd]atabase/config.h'
+    'module-db/[Dd]atabase/shell.c'
     'module-db/[Dd]atabase/sqlite3.c'
     'module-db/[Dd]atabase/sqlite3.h'
     'module-db/[Dd]atabase/sqlite3ext.h'
