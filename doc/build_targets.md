@@ -50,7 +50,7 @@ Image of the software to be loaded onto the device memory. Has all necessary dat
 The disk image can be built with additional, development assets. Please look for `WITH_DEVELOPMENT_FEATURES` for more information in make.
 
 **All disk images can be inspected** to do so you can:
-1. use losetup to add loop device for created image i.e.:
+1. use `losetup` to add loop device for created image i.e.:
 ```
 sudo losetup --show --partscan -f /path/to/file
 ```

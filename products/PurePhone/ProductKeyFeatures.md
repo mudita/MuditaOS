@@ -11,9 +11,9 @@ PurePhone product key features
 - alarm clock
 - contacts and calendar synchronization via Mudita Center desktop app 
 - flashlight
-- user interface optimized for E Ink displays with frontlight support
+- user interface optimized for E-Ink displays with front light support
 - dark mode
-- Bluetooth headset connectivity with A2DP (Advanced Audio Distribution Profile) and HSP (Headset Profile) support
+- Bluetooth headset connectivity with A2DP (Advanced Audio Distribution Profile) and HFP (Hands-free Profile) support
 - Passive Dual SIM support
 - USB-C Fast Charging
 - VoLTE and internet tethering support

@@ -28,12 +28,12 @@ For downloading assets, we need a ":repo" scope with all sub-scopes.
 **Note:** Tokens are displayed only during their creation, so this is the only moment you can copy them.
 If you forget to do this, you will have to generate a new token.
 
-**Note:** With token added [please double check](#Testing-for-proper-asset-download-configuration), if it's working before issuing not working toolkit as most of the problems lies with no, or improper configuration.
+**Note:** With token added [please double check](#Testing-for-proper-asset-download-configuration) if it's working before issuing not working toolkit as most of the problems lies with no, or improper configuration.
 
 ## Storing settings
 
-The `download_assets.py` loads authorisation data via git configuration.
-The process requires so that this data isstored in your current repository or global git configuration.
+The `download_assets.py` loads authorization data via git configuration.
+The process requires that this data is stored in your current repository or global git configuration.
 
 To do so:
 Add you github login to the git config:
