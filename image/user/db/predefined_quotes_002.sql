@@ -46,6 +46,7 @@ INSERT OR REPLACE INTO category_table (category_id, lang_id, category_name) VALU
 -- To add new quote add here next consecutive key with quote and the author
 -- Every quote has to be linked with specific one or many categories in quote_category_map
 -- Every category has to be assigned to specific language in category_table
+
 INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1,  'Do not dwell in the past, do not dream of the future, concentrate the mind on the present moment. ', 'Buddha'),
     (2,  'The only way to live is by accepting each minute as an unrepeatable miracle.', 'Tara Brach'),
@@ -86,7 +87,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (37,  'There is a candle in your heart, ready to be kindled. There is a void in your soul, ready to be filled. You feel it, don''t you?', 'Rumi'),
     (38,  'Set your life on fire. Seek those who fan your flames', 'Rumi'),
     (39,  'Let the beauty we love be what we do. There are hundreds of ways to kneel and kiss the ground.', 'Rumi'),
-    (40,  'And you? When will you begin that long journey into yourself?', 'Rumi'),
+    (40,  'And you? When will you begin that long journey into yourself?', 'Rumi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (41,  'Wherever you are, and whatever you do, be in love.', 'Rumi'),
     (42,  'Let yourself be silently drawn by the strange pull of what you really love. It will not lead you astray.', 'Rumi'),
     (43,  'Reason is powerless in the expression of Love.', 'Rumi'),
@@ -126,7 +128,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (77,  'Friendship is the only cure for hatred, the only guarantee of peace.', 'Buddha'),
     (78,  'What you are is what you have been. What you''ll be is what you do now.', 'Buddha'),
     (79,  'Health is the greatest gift, contentment the greatest wealth, faithfulness the best relationship. ', 'Buddha'),
-    (80,  'He is able who thinks he is able.', 'Buddha'),
+    (80,  'He is able who thinks he is able.', 'Buddha');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (81,  'Life is a river always flowing. Do not hold onto things. Work hard.', 'Buddha'),
     (82,  'Remembering a wrong is like carrying a burden on the mind.', 'Buddha'),
     (83,  'Anger will never disappear so long as thoughts of resentment are cherished in the mind.', 'Buddha'),
@@ -166,7 +169,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (117,  'I can''t give you a sure-fire formula for success, but I can give you a formula for failure: try to please everybody all the time.', 'Herbert Bayard Swope'),
     (118,  'If at first you don''t succeed, try, try again. Then quit. No use being a damn fool about it.', 'W.C. Fields'),
     (119,  'Try not to become a man of success. Rather become a man of value.', 'Albert Einstein'),
-    (120,  'Success is liking yourself, liking what you do, and liking how you do it.', 'Maya Angelou'),
+    (120,  'Success is liking yourself, liking what you do, and liking how you do it.', 'Maya Angelou');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (121,  'Failure is the condiment that gives success its flavor', 'Truman Capote'),
     (122,  'Success is not how high you have climbed, but how you make a positive difference to the world.', 'Roy T. Bennett'),
     (123,  'Success is stumbling from failure to failure with no loss of enthusiasm.', 'Winston S. Churchill'),
@@ -206,7 +210,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (157,  'Too many people spend money they haven’t earned, to buy things they don’t want, to impress people they don’t like.', 'Will Rogers'),
     (158,  'It is preoccupation with possession, more than anything else, that prevents men from living freely and nobly.', 'Bertrand Russell'),
     (159,  'Have nothing in your homes that you do not know to be useful or believe to be beautiful.', 'William Morris'),
-    (160,  'There is no greatness where there is not simplicity, goodness, and truth.', 'Leo Tolstoy'),
+    (160,  'There is no greatness where there is not simplicity, goodness, and truth.', 'Leo Tolstoy');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (161,  'It is the heart that makes a man rich. He is rich according to what he is, not according to what he has.', 'Henry David Beecher'),
     (162,  'Simplicity is the most difficult thing to secure in this world; it is the last limit of experience and the last effort of genius.', 'George Sand'),
     (163,  'My riches consist, not in the extent of my possessions, but in the fewness of my wants.', 'Joseph Brotherton'),
@@ -246,7 +251,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (197,  'The only person you are destined to become is the person you decide to be.', 'Ralph Waldo Emerson'),
     (198,  'Dare to live the life you have dreamed for yourself. Go forward and make your dreams come true.', 'Ralph Waldo Emerson'),
     (199,  'Write it on your heart that every day is the best day in the year.', 'Ralph Waldo Emerson'),
-    (200,  'Once you make a decision, the universe conspires to make it happen.', 'Ralph Waldo Emerson'),
+    (200,  'Once you make a decision, the universe conspires to make it happen.', 'Ralph Waldo Emerson');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (201,  'Adopt the pace of nature: her secret is patience.', 'Ralph Waldo Emerson'),
     (202,  'Life is a journey, not a destination.', 'Ralph Waldo Emerson'),
     (203,  'Make the most of yourself... for that is all there is of you.', 'Ralph Waldo Emerson'),
@@ -286,7 +292,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (237,  'Make each day both useful and pleasant, and prove that you understand the worth of time by employing it well.', 'Louisa May Alcott'),
     (238,  'Knowledge comes, but wisdom lingers.', 'Lord Alfred Tennyson'),
     (239,  'We carry within us the wonders we seek without us.', 'Sir Thomas Browne'),
-    (240,  'The only gift is a portion of thyself.', 'Ralph Waldo Emerson'),
+    (240,  'The only gift is a portion of thyself.', 'Ralph Waldo Emerson');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (241,  'The greater the obstacle, the more glory in overcoming it.', 'Molière'),
     (242,  'The more we see, the more we are capable of seeing.', 'Maria Mitchell '),
     (243,  'Be kind, for everyone you meet is fighting a harder battle.', 'Plato'),
@@ -326,7 +333,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (277,  'Whatever satisfies the soul is truth.', 'Walt Whitman'),
     (278,  'Music in the soul can be heard by the universe.', 'Lao Tzu'),
     (279,  'Life''s greatest happiness is to be convinced we are loved.', 'Victor Hugo'),
-    (280,  'He who enjoys doing and enjoys what he has done is happy.', 'Johann Wolfgang von Goethe'),
+    (280,  'He who enjoys doing and enjoys what he has done is happy.', 'Johann Wolfgang von Goethe');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (281,  'If we are not ashamed to think it, we should not be ashamed to say it.', 'Marcus Tullius Cicero'),
     (282,  'Friendship improves happiness, and abates misery, by doubling our joys, and dividing our grief.', 'Marcus Tullius Cicero'),
     (283,  'The life given us, by nature is short; but the memory of a well-spent life is eternal.', 'Marcus Tullius Cicero'),
@@ -366,7 +374,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (317,  'Hold faithfulness and sincerity as first principles.', 'Confucius'),
     (318,  'When it is obvious that the goals cannot be reached, don''t adjust the goals, adjust the action steps.', 'Confucius'),
     (319,  'Education breeds confidence. Confidence breeds hope. Hope breeds peace.', 'Confucius'),
-    (320,  'The beginning of wisdom is to call things by their proper name.', 'Confucius'),
+    (320,  'The beginning of wisdom is to call things by their proper name.', 'Confucius');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (321,  'Consideration for others is the basis of a good life, a good society.', 'Confucius'),
     (322,  'Roads were made for journeys not destinations.', 'Confucius'),
     (323,  'Settle one difficulty, and you keep a hundred away.', 'Confucius'),
@@ -406,7 +415,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (357,  'It is a rough road that leads to the heights of greatness.', 'Seneca'),
     (358,  'Whatever can happen at any time can happen today.', 'Seneca'),
     (359,  'It is quality rather than quantity that matters.', 'Seneca'),
-    (360,  'The only true wisdom is in knowing you know nothing.', 'Socrates'),
+    (360,  'The only true wisdom is in knowing you know nothing.', 'Socrates');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (361,  'To find yourself, think for yourself.', 'Socrates'),
     (362,  'Be slow to fall into friendship, but when you are in, continue firm and constant.', 'Socrates'),
     (363,  'Let him who would move the world first move himself.', 'Socrates'),
@@ -446,7 +456,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (397,  'I have been impressed with the urgency of doing. Knowing is not enough; we must apply. Being willing is not enough; we must do.', 'Leonardo da Vinci'),
     (398,  'It is easier to resist at the beginning than at the end.', 'Leonardo da Vinci'),
     (399,  'Life without love, is no life at all.', 'Leonardo da Vinci'),
-    (400,  'Realize that everything connects to everything else.', 'Leonardo da Vinci'),
+    (400,  'Realize that everything connects to everything else.', 'Leonardo da Vinci');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (401,  'Where the spirit does not work with the hand, there is no art.', 'Leonardo da Vinci'),
     (402,  'Make your work to be in keeping with your purpose.', 'Leonardo da Vinci'),
     (403,  'All our knowledge has its origin in our perceptions.', 'Leonardo da Vinci'),
@@ -486,7 +497,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (437,  'Jedynym sposobem na życie jest uznanie każdej minuty za niepowtarzalny cud.', 'Tara Brach'),
     (438,  'Najprostsze rzeczy są często najprawdziwsze.', 'Richard Bach'),
     (439,  'Zawsze mów „tak” obecnej chwili. Mów „tak” życiu.', 'Eckhart Tolle'),
-    (440,  'Miłość jest stanem bycia. Twoja miłość nie mieszka na zewnątrz ciebie, lecz tkwi głęboko w tobie.', 'Eckhart Tolle '),
+    (440,  'Miłość jest stanem bycia. Twoja miłość nie mieszka na zewnątrz ciebie, lecz tkwi głęboko w tobie.', 'Eckhart Tolle ');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (441,  'Zwolnij, upraszczaj, bądź życzliwy.', 'Naomi Judd'),
     (442,  'Możesz zwolnić. Pozwól marzeniom i celom się zmieniać, żyj jednak świadomie.', 'Kumail Nanjiani'),
     (443,  'Znajdź prostotę w nieładzie.', 'Albert Einstein'),
@@ -526,7 +538,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (477,  'Daj po cichu porwać się dziwnemu przyciąganiu rzeczy, które kochasz. Nie da ci ono zbłądzić.', 'Rumi'),
     (478,  'Rozsądek jest bezsilny w wyrazie Miłości.', 'Rumi'),
     (479,  'Nie jesteś kroplą w oceanie. Jesteś całym oceanem zawartym w kropli.', 'Rumi'),
-    (480,  'Jedynie z sercem możesz dotknąć nieba.', 'Rumi'),
+    (480,  'Jedynie z sercem możesz dotknąć nieba.', 'Rumi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (481,  'Gdy czujesz cichą radość, wiesz, że zbliżasz się do prawdy.', 'Rumi'),
     (482,  'Nie czuj się samotny, w tobie mieszka cały wszechświat.', 'Rumi'),
     (483,  'Lśnij, jak gdyby cały świat należał do ciebie.', 'Rumi'),
@@ -566,7 +579,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (517,  'Rozpamiętywanie błędów jest niczym dźwiganie ciężaru w umyśle.', 'Buddha'),
     (518,  'Złość nie zniknie tak długo, jak w umyśle będzie żal.', 'Buddha'),
     (519,  'Bądź tam, gdzie jesteś; inaczej przegapisz swoje życie.', 'Buddha'),
-    (520,  'Jeden moment może zmienić dzień, jeden dzień może zmienić życie, a jedno życie może zmienić świat.', 'Buddha'),
+    (520,  'Jeden moment może zmienić dzień, jeden dzień może zmienić życie, a jedno życie może zmienić świat.', 'Buddha');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (521,  'Bądź czujny; chroń swój umysł przed negatywnymi myślami.', 'Buddha'),
     (522,  'Bądź świadomy teraźniejszości.', 'Buddha'),
     (523,  'Jak wspaniale! Wszystko jest perfekcyjne takim, jakim jest.', 'Buddha'),
@@ -606,7 +620,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (557,  'Sukcesem nie jest to, jak wysoko udało ci się wspiąć, lecz to, jak sprawiasz, by świat był lepszy.', 'Roy T. Bennett'),
     (558,  'Sukces to błądzenie od porażki do porażki bez utraty entuzjazmu.', 'Winston S. Churchill'),
     (559,  'Zasada ta mówi, że ponowne połączenie się ze światem natury ma fundamentalne znaczenie dla zdrowia, samopoczucia, ducha i przetrwania.', 'Richard Louv'),
-    (560,  'Bądź zmianą, którą pragniesz ujrzeć w świecie.', 'Mahatma Gandhi'),
+    (560,  'Bądź zmianą, którą pragniesz ujrzeć w świecie.', 'Mahatma Gandhi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (561,  'Żyj tak, jakbyś miał umrzeć jutro. Ucz się tak, jakbyś miał żyć wiecznie.', 'Mahatma Gandhi'),
     (562,  'Szczęście występuje, gdy to, co myślisz, mówisz i robisz, jest ze sobą w harmonii.', 'Mahatma Gandhi'),
     (563,  'Tam, gdzie miłość, tam jest życie.', 'Mahatma Gandhi'),
@@ -646,7 +661,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (597,  'W tym świecie najtrudniej jest zachować prostotę; jest ona ostatnią granicą doświadczenia i ostatnim wysiłkiem geniuszu.', 'George Sand'),
     (598,  'Moje bogactwo nie wynika z rozmiaru mego majątku, lecz z niewielu potrzeb.', 'Joseph Brotherton'),
     (599,  'Prawdziwe szczęście jest tanie, zbyt wiele płacimy jednak za jego falsyfikat.', 'Hosea Ballou'),
-    (600,  'Z kilkoma kwiatami w mym ogrodzie, paroma obrazami i książkami mogę żyć bez zawiści.', 'Lope de Vega'),
+    (600,  'Z kilkoma kwiatami w mym ogrodzie, paroma obrazami i książkami mogę żyć bez zawiści.', 'Lope de Vega');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (601,  'Człowiek wzbija się ponad rzeczy ziemskie dwoma skrzydłami: prostotą i czystością.', 'Thomas a Kempis'),
     (602,  'Biednym jest nie ten, kto ma mało, lecz ten, kto tęskni za tym, by mieć więcej.', 'Seneca'),
     (603,  'Nic nie wystarczy człowiekowi, dla którego dość to za mało.', 'Epicurus'),
@@ -686,7 +702,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (637,  'Życie jest podróżą, nie celem.', 'Ralph Waldo Emerson'),
     (638,  'Zawsze dawaj z siebie wszystko, ponieważ jedynie to po tobie zostanie.', 'Ralph Waldo Emerson'),
     (639,  'Nigdy nie osiągnięto niczego wielkiego bez entuzjazmu.', 'Ralph Waldo Emerson'),
-    (640,  'Bądź niepoważny. Bądź szczery. Bądź życzliwy.', 'Ralph Waldo Emerson'),
+    (640,  'Bądź niepoważny. Bądź szczery. Bądź życzliwy.', 'Ralph Waldo Emerson');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (641,  'Najlepszym sposobem na znalezienie przyjaciela jest nim być.', 'Ralph Waldo Emerson'),
     (642,  'Bohater nie jest odważniejszy od zwykłego człowieka, ale jest odważniejszy o pięć minut dłużej.', 'Ralph Waldo Emerson'),
     (643,  'Każdy artysta zaczynał kiedyś jako amator.', 'Ralph Waldo Emerson'),
@@ -726,7 +743,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (677,  'Im więcej widzimy, tym więcej jesteśmy w stanie dostrzec.', 'Maria Mitchell '),
     (678,  'Bądź życzliwy, ponieważ każdy, kogo spotykasz, toczy ciężką bitwę.', 'Plato'),
     (679,  'Najważniejszą osobą jest zawsze osoba, z którą jesteś, która stoi przed tobą.', 'Leo Tolstoy'),
-    (680,  'Jedynym końcem życia jest bycie sobą i stanie się kimś, kim możemy się stać.', 'Robert Louis Stevenson'),
+    (680,  'Jedynym końcem życia jest bycie sobą i stanie się kimś, kim możemy się stać.', 'Robert Louis Stevenson');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (681,  'Próbując dokonać czegoś niemożliwego możemy osiągnąć szczyt możliwego.', 'August Strindberg '),
     (682,  'Połowy dokonał, kto zaczął. Odważ się być mądrym. Zacznij.', 'Horace'),
     (683,  'Ciekawość jest początkiem mądrości.', 'Socrates'),
@@ -766,7 +784,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (717,  'Przyjaźń zwiększa nasze szczęście i łagodzi cierpienie, mnożąc radość i dzieląc smutek.', 'Marcus Tullius Cicero'),
     (718,  'Dane nam życie jest z natury krótkie; jednak wspomnienie dobrego żywota jest wieczne.', 'Marcus Tullius Cicero'),
     (719,  'Twarz jest obrazem umysłu, a oczy jego objaśnieniem.', 'Marcus Tullius Cicero'),
-    (720,  'Szczęśliwe życie to spokój umysłu.', 'Marcus Tullius Cicero'),
+    (720,  'Szczęśliwe życie to spokój umysłu.', 'Marcus Tullius Cicero');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (721,  'Zadowolenie z tego, co posiadamy jest największym i najbezpieczniejszym skarbem.', 'Marcus Tullius Cicero'),
     (722,  'Wolność to posiadanie nieoszacowanej wartości.', 'Marcus Tullius Cicero'),
     (723,  'Dobroć jest silniejsza niż strach.', 'Marcus Tullius Cicero'),
@@ -806,7 +825,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (757,  'Drogi zbudowano, by podążać nimi do celu, nie jako cel sam w sobie.', 'Confucius'),
     (758,  'Rozwiąż jeden problem, a unikniesz setki innych.', 'Confucius'),
     (759,  'Jedna uciecha rozpędza tysiące smutków.', 'Confucius'),
-    (760,  'Istotą Wiedzy jest jej posiadanie, a nie wykorzystanie.', 'Confucius'),
+    (760,  'Istotą Wiedzy jest jej posiadanie, a nie wykorzystanie.', 'Confucius');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (761,  'Gdziekolwiek zmierzasz, rób to pełnią serca.', 'Confucius'),
     (762,  'Dostatek stanowią rzeczy, które sprawiają nam radość, a nie te, które posiadamy.', 'Epicurus'),
     (763,  'Milcz, albo powiedz coś takiego, co jest lepszym od milczenia.', 'Pythagoras'),
@@ -846,7 +866,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (797,  'Przyjaźń buduj powoli, a gdy już powstanie, kontynuuj ciągle i stale.', 'Socrates'),
     (798,  'Niech ten, który chce zmienić świat, najpierw zmieni siebie.', 'Socrates'),
     (799,  'Jedynym dobrem jest wiedza, a jedynym złem niewiedza.', 'Socrates'),
-    (800,  'Nie czyń innym tego, co złości cię, gdy uczynią ci to inni.', 'Socrates'),
+    (800,  'Nie czyń innym tego, co złości cię, gdy uczynią ci to inni.', 'Socrates');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (801,  'Nie ma życia lepszego, niż życie pełne starań, by stać się lepszym.', 'Socrates'),
     (802,  'Bądź osobą, którą chcesz, aby ludzie myśleli, że jesteś.', 'Socrates'),
     (803,  'Bądź dla innych milszy niż to konieczne. Każdy toczy ciężką walkę.', 'Socrates'),
@@ -886,7 +907,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (837,  'Niech twa praca zgodna będzie z twoim przeznaczeniem.', 'Leonardo da Vinci'),
     (838,  'Cała nasza wiedza ma swe źródło w postrzeganiu.', 'Leonardo da Vinci'),
     (839,  'Żadna przeszkoda mnie nie zegnie; każda przeszkoda ustąpi silnej determinacji.', 'Leonardo da Vinci'),
-    (840,  'Wiedza jest córką doświadczenia.', 'Leonardo da Vinci'),
+    (840,  'Wiedza jest córką doświadczenia.', 'Leonardo da Vinci');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (841,  'Szczegóły tworzą perfekcję, lecz perfekcja nie jest szczegółem.', 'Leonardo da Vinci'),
     (842,  'Wszyscy myślą o tym, aby zmienić świat, ale nikt nie myśli o tym, aby zmienić siebie.', 'Leo Tolstoy'),
     (843,  'Jeśli będziesz szukać ideału, nigdy nie będziesz szczęśliwy.', 'Leo Tolstoy'),
@@ -926,7 +948,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (877,  'Vous pouvez aller lentement. Permettez à vos rêves et à vos objectifs de changer, mais menez une vie intentionnelle.', 'Kumail Nanjiani'),
     (878,  'Dans le désordre, trouvez la simplicité.', 'Albert Einstein'),
     (879,  'Plus vous êtes concentré sur le temps — le passé et le futur — plus vous ratez le maintenant, la chose la plus précieuse qui soit.', 'Eckhart Tolle'),
-    (880,  'Et je vais dans la forêt, pour perdre la tête et trouver mon âme.', 'John Muir'),
+    (880,  'Et je vais dans la forêt, pour perdre la tête et trouver mon âme.', 'John Muir');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (881,  'Faites ce que vous pouvez, avec ce que vous avez, là où vous êtes.', 'Theodore Roosevelt'),
     (882,  'Le secret du bonheur, voyez-vous, ne se trouve pas dans la recherche du plus, mais dans le développement de la capacité à apprécier le moins.', 'Socrates '),
     (883,  'Le contentement ne vient pas tant d''une grande richesse que de peu de besoins.', 'Epictetus'),
@@ -966,7 +989,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (917,  'Ne vous sentez pas seul, l''univers entier est en vous.', 'Rumi'),
     (918,  'Brillez comme si l''univers entier était à vous.', 'Rumi'),
     (919,  'Peut-être cherchez-vous parmi les branches ce qui n''apparaît que dans les racines.', 'Rumi'),
-    (920,  'Ce qui compte, c''est la rapidité avec laquelle vous faites ce que votre âme vous indique.', 'Rumi'),
+    (920,  'Ce qui compte, c''est la rapidité avec laquelle vous faites ce que votre âme vous indique.', 'Rumi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (921,  'Votre cœur a la taille d''un océan. Allez vous retrouver dans ses profondeurs cachées.', 'Rumi'),
     (922,  'Laissez le silence vous emmener au cœur de la vie.', 'Rumi'),
     (923,  'La seule beauté durable est celle du cœur.', 'Rumi'),
@@ -1006,7 +1030,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (957,  'Soyez très conscient du présent.', 'Buddha'),
     (958,  'C''est merveilleux ! Toutes les choses sont parfaites, exactement comme elles sont.', 'Buddha'),
     (959,  'Apprenez ceci de l''eau : le ruisseau éclabousse bruyamment mais les profondeurs de l''océan sont calmes.', 'Buddha'),
-    (960,  'Le bonheur ne dépend pas de ce que vous avez ou de qui vous êtes, il dépend uniquement de ce que vous pensez.', 'Buddha'),
+    (960,  'Le bonheur ne dépend pas de ce que vous avez ou de qui vous êtes, il dépend uniquement de ce que vous pensez.', 'Buddha');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (961,  'Ce que vous pensez, vous le devenez. Ce que vous ressentez, vous l''attirez. Ce que vous imaginez, vous le créez.', 'Buddha'),
     (962,  'Lorsque vous aimez une fleur, cueillez-la. Mais lorsque vous adorez une fleur, arrosez-la quotidiennement.', 'Buddha'),
     (963,  'L''esprit est tout. Ce que vous pensez, vous le devenez.', 'Buddha'),
@@ -1046,7 +1071,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (997,  'Le bonheur, c''est lorsque ce que vous pensez, ce que vous dites et ce que vous faites sont en harmonie.', 'Mahatma Gandhi'),
     (998,  'Là où il y a l''amour, il y a la vie.', 'Mahatma Gandhi'),
     (999,  'Les faibles ne peuvent jamais pardonner. Le pardon est l''attribut des forts.', 'Mahatma Gandhi'),
-    (1000,  'La liberté ne vaut pas la peine d''être possédée si elle n''inclut pas la liberté de faire des erreurs.', 'Mahatma Gandhi'),
+    (1000,  'La liberté ne vaut pas la peine d''être possédée si elle n''inclut pas la liberté de faire des erreurs.', 'Mahatma Gandhi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1001,  'Personne ne peut me faire du mal sans ma permission.', 'Mahatma Gandhi'),
     (1002,  'L''avenir dépend de ce que vous faites aujourd''hui.', 'Mahatma Gandhi'),
     (1003,  'Chaque fois que vous êtes confronté à un adversaire. Conquérez-le avec amour.', 'Mahatma Gandhi'),
@@ -1086,7 +1112,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1037,  'Ce n''est pas l''homme qui a trop peu, mais celui qui en veut plus, qui est pauvre.', 'Seneca'),
     (1038,  'Rien n''est suffisant pour l''homme pour qui assez est trop peu.', 'Epicurus'),
     (1039,  'Pour mener une vie pure et désintéressée, il faut ne rien compter pour soi au milieu de l''abondance.', 'Buddha'),
-    (1040,  'Celui qui a la santé a l''espoir, et celui qui a l''espoir a tout.', 'Arabian Proverb'),
+    (1040,  'Celui qui a la santé a l''espoir, et celui qui a l''espoir a tout.', 'Arabian Proverb');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1041,  'La guérison est une question de temps, mais c''est parfois aussi une question d''opportunité.', 'Hippocrates'),
     (1042,  'Votre propre réalisation de soi est le plus grand service que vous puissiez offrir au monde.', 'Ramana Maharshi'),
     (1043,  'Il n''y a ni passé ni futur. Il n''y a que le présent.', 'Ramana Maharshi'),
@@ -1126,7 +1153,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1077,  'Un héros n''est pas plus courageux qu''un homme ordinaire, mais il l''est cinq minutes de plus.', 'Ralph Waldo Emerson'),
     (1078,  'Tout artiste a d''abord été un amateur.', 'Ralph Waldo Emerson'),
     (1079,  'La création de mille forêts se trouve dans un seul gland.', 'Ralph Waldo Emerson'),
-    (1080,  'Vous devenez ce à quoi vous pensez toute la journée.', 'Ralph Waldo Emerson'),
+    (1080,  'Vous devenez ce à quoi vous pensez toute la journée.', 'Ralph Waldo Emerson');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1081,  'Rien n''est enfin sacré si ce n''est l''intégrité de votre propre esprit.', 'Ralph Waldo Emerson'),
     (1082,  'Si vous n''essayez pas de faire quelque chose au-delà de ce que vous avez déjà maîtrisé, vous ne grandirez jamais.', 'Ralph Waldo Emerson'),
     (1083,  'L''esprit, une fois étiré par une nouvelle idée, ne revient jamais à ses dimensions initiales.', 'Ralph Waldo Emerson'),
@@ -1166,7 +1194,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1117,  'Celui qui a commencé est à moitié fait. Osez être sage. Commencez.', 'Horace'),
     (1118,  'L''émerveillement est le début de la sagesse.', 'Socrates'),
     (1119,  'Prononcez peu de mots, mais dites-les avec calme et sincérité, et ils seront durables.', 'Lao Tzu'),
-    (1120,  'Tenez-vous toujours au présent. Chaque situation, voire chaque instant, a une valeur infinie.', 'Johann Wolfgang von Goethe'),
+    (1120,  'Tenez-vous toujours au présent. Chaque situation, voire chaque instant, a une valeur infinie.', 'Johann Wolfgang von Goethe');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1121,  'Rappelez-vous qu''il n''y a qu''un seul moment important et c''est maintenant. L''instant présent est le seul temps sur lequel nous avons une emprise.', 'Leo Tolstoy'),
     (1122,  'La perfection du caractère est ceci : vivre chaque jour comme si c''était le dernier, sans frénésie, sans apathie, sans prétention.', 'Marcus Aurelius'),
     (1123,  'Un voyage de mille kilomètres commence par un seul pas.', 'Lao Tzu'),
@@ -1206,7 +1235,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1157,  'La liberté est une possession d''une valeur inestimable.', 'Marcus Tullius Cicero'),
     (1158,  'La bonté est plus forte que la peur.', 'Marcus Tullius Cicero'),
     (1159,  'La mémoire est le trésor et le gardien de toutes choses.', 'Marcus Tullius Cicero'),
-    (1160,  'Le silence est l''un des grands arts de la conversation.', 'Marcus Tullius Cicero'),
+    (1160,  'Le silence est l''un des grands arts de la conversation.', 'Marcus Tullius Cicero');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1161,  'Être profondément aimé par quelqu''un vous donne de la force, tandis qu''aimer quelqu''un profondément vous donne du courage.', 'Lao Tzu'),
     (1162,  'Lorsque vous vous contentez d''être simplement vous-même et que vous ne vous comparez pas ou ne rivalisez pas, tout le monde vous respectera.', 'Lao Tzu'),
     (1163,  'La nature ne se presse pas, et pourtant tout est accompli.', 'Lao Tzu'),
@@ -1246,7 +1276,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1197,  'Ce n''est pas ce que nous avons, mais ce dont nous jouissons qui constitue notre abondance.', 'Epicurus'),
     (1198,  'Soyez silencieux ou que vos paroles valent plus que le silence.', 'Pythagoras'),
     (1199,  'Le silence vaut mieux que des mots dénués de sens.', 'Pythagoras'),
-    (1200,  'Par-dessus tout, respectez-vous.', 'Pythagoras'),
+    (1200,  'Par-dessus tout, respectez-vous.', 'Pythagoras');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1201,  'Au-dessus du nuage avec son ombre se trouve l''étoile avec sa lumière.', 'Pythagoras'),
     (1202,  'Il faut faire de grandes choses, et non pas promettre de grandes choses.', 'Pythagoras'),
     (1203,  'Il est difficile de marcher en même temps sur plusieurs chemins de la vie.', 'Pythagoras'),
@@ -1286,7 +1317,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1237,  'Soyez tel que vous souhaitez paraître.', 'Socrates'),
     (1238,  'Soyez plus gentil que nécessaire avec tous ceux que vous rencontrez. Tout le monde mène une sorte de bataille.', 'Socrates'),
     (1239,  'Ceux qui sont les plus difficiles à aimer en ont le plus besoin.', 'Socrates'),
-    (1240,  'Pour faire bouger le monde, nous devons nous bouger nous-mêmes.', 'Socrates'),
+    (1240,  'Pour faire bouger le monde, nous devons nous bouger nous-mêmes.', 'Socrates');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1241,  'Trahissez un ami, et vous découvrirez souvent que vous vous êtes ruiné vous-même.', 'Aesop'),
     (1242,  'Après tout, il y a plus à dire qu''à faire.', 'Aesop'),
     (1243,  'Il est facile d''être courageux à une distance sûre.', 'Aesop'),
@@ -1326,7 +1358,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1277,  'Tout le monde pense à changer le monde, mais personne ne pense à se changer lui-même.', 'Leo Tolstoy'),
     (1278,  'Si vous recherchez la perfection, vous ne serez jamais satisfait.', 'Leo Tolstoy'),
     (1279,  'Il est étonnant de constater à quel point l''illusion selon laquelle la beauté est la bonté est complète.', 'Leo Tolstoy'),
-    (1280,  'Nous pouvons seulement savoir que nous ne savons rien. Et c''est là le plus haut degré de la sagesse humaine.', 'Leo Tolstoy'),
+    (1280,  'Nous pouvons seulement savoir que nous ne savons rien. Et c''est là le plus haut degré de la sagesse humaine.', 'Leo Tolstoy');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1281,  'Si vous voulez être heureux, faites-le.', 'Leo Tolstoy'),
     (1282,  'Les deux plus puissants guerriers sont la patience et le temps.', 'Leo Tolstoy'),
     (1283,  'Tout, tout ce que je comprends, je le comprends uniquement parce que j''aime.', 'Leo Tolstoy'),
@@ -1366,7 +1399,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1317,  'Como puedes ver, el secreto de la felicidad no consiste en buscar más, sino en desarrollar la capacidad de disfrutar menos.', 'Socrates '),
     (1318,  'La satisfacción no consiste en tener grandes riquezas, sino en tener pocos deseos.', 'Epictetus'),
     (1319,  'Lo sencillo es siempre lo que produce lo maravilloso.', 'Amelia Barr'),
-    (1320,  'Menos es más.', 'Mies Van Der Rohe'),
+    (1320,  'Menos es más.', 'Mies Van Der Rohe');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1321,  'Libera la mente y sé consciente. Cierra los ojos y escucha.', 'Rumi'),
     (1322,  'El milagro no es caminar por el agua. El milagro es caminar por la tierra.', 'Línjì Yìxuán'),
     (1323,  'Cada sitio es un buen lugar. El lugar donde estoy ahora puede ser un espacio sagrado.', 'Ravi Ravindra'),
@@ -1406,7 +1440,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1357,  'Deja que el silencio te lleve a la esencia de la vida.', 'Rumi'),
     (1358,  'La única belleza duradera es la belleza del corazón.', 'Rumi'),
     (1359,  'Prueba algo diferente. Ríndete.', 'Rumi'),
-    (1360,  'Vende tu ingenio y compra desconcierto. El ingenio es solo una opinión; el desconcierto, intuición.', 'Rumi'),
+    (1360,  'Vende tu ingenio y compra desconcierto. El ingenio es solo una opinión; el desconcierto, intuición.', 'Rumi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1361,  'La paz está dentro de ti. No la busques fuera.', 'Buddha'),
     (1362,  'Duda de todo. Encuentra tu luz.', 'Buddha'),
     (1363,  'Cada mañana renacemos. Lo que hacemos hoy es lo más importante.', 'Buddha'),
@@ -1446,7 +1481,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1397,  'Cuando te gusta una flor, la arrancas. Sin embargo, cuando te encanta una flor, la riegas a diario.', 'Buddha'),
     (1398,  'La mente lo es todo. Te conviertes en lo que piensas.', 'Buddha'),
     (1399,  'La lección es sencilla: haz lo correcto. Sé puro.', 'Buddha'),
-    (1400,  'Ser ocioso es un camino corto hacia la muerte y ser laborioso es una forma de vida. Los necios son ociosos; los sabios, laboriosos.', 'Buddha'),
+    (1400,  'Ser ocioso es un camino corto hacia la muerte y ser laborioso es una forma de vida. Los necios son ociosos; los sabios, laboriosos.', 'Buddha');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1401,  'Una jarra se llena gota a gota.', 'Buddha'),
     (1402,  'Soluciona tu salvación. No dependas de nadie.', 'Buddha'),
     (1403,  'Si vas por el buen camino, lo que tienes que hacer es seguir caminando.', 'Buddha'),
@@ -1486,7 +1522,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1437,  'El futuro dependerá de lo que hagas hoy.', 'Mahatma Gandhi'),
     (1438,  'Siempre que te enfrentes a un adversario, conquístalo con amor.', 'Mahatma Gandhi'),
     (1439,  'La fuerza no se basa en la capacidad física, se basa en la voluntad indomable.', 'Mahatma Gandhi'),
-    (1440,  'Nunca puedes saber qué resultados traerán tus acciones, pero si no haces nada, no habrá resultados.', 'Mahatma Gandhi'),
+    (1440,  'Nunca puedes saber qué resultados traerán tus acciones, pero si no haces nada, no habrá resultados.', 'Mahatma Gandhi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1441,  'Hay más cosas en la vida que aumentar su velocidad.', 'Mahatma Gandhi'),
     (1442,  'El amor es la fuerza más poderosa que el mundo posee, pero también la más humilde.', 'Mahatma Gandhi'),
     (1443,  'No hay camino para la paz, la paz es el camino.', 'Mahatma Gandhi'),
@@ -1526,7 +1563,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1477,  'La autorrealización es el mejor servicio que puedes brindarle al mundo.', 'Ramana Maharshi'),
     (1478,  'No hay pasado ni futuro, solo presente.', 'Ramana Maharshi'),
     (1479,  'Deja que venga lo que tenga que venir. Deja que se vaya lo que tenga que irse. Descubre lo que se queda.', 'Ramana Maharshi'),
-    (1480,  'Nadie triunfa sin esfuerzo. Los que triunfan le deben el éxito a la perseverancia.', 'Ramana Maharshi'),
+    (1480,  'Nadie triunfa sin esfuerzo. Los que triunfan le deben el éxito a la perseverancia.', 'Ramana Maharshi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1481,  'Cuando uno permanece sin pensar, entiende a los demás por medio del lenguaje universal del silencio.', 'Ramana Maharshi'),
     (1482,  'Haz lo correcto en un momento determinado y olvídalo.', 'Ramana Maharshi'),
     (1483,  'La verdadera paz es la felicidad. Los placeres no crean la felicidad.', 'Ramana Maharshi'),
@@ -1566,7 +1604,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1517,  'A menos que intentes hacer algo que vaya más allá de lo que ya dominas, nunca crecerás.', 'Ralph Waldo Emerson'),
     (1518,  'La mente, cuando se amolda a una idea nueva, nunca vuelve a su dimensión original.', 'Ralph Waldo Emerson'),
     (1519,  'Es fácil vivir para los demás, todo el mundo lo hace. Te pido que vivas para ti mismo.', 'Ralph Waldo Emerson'),
-    (1520,  'La felicidad es un perfume que no puedes echarle a los demás sin echarte a ti.', 'Ralph Waldo Emerson'),
+    (1520,  'La felicidad es un perfume que no puedes echarle a los demás sin echarte a ti.', 'Ralph Waldo Emerson');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1521,  'Nada externo a ti tiene poder sobre tu persona.', 'Ralph Waldo Emerson'),
     (1522,  'La marca invariable de la sabiduría es ver lo milagroso en lo común.', 'Ralph Waldo Emerson'),
     (1523,  'La tristeza mira hacia atrás; la preocupación mira a su alrededor; y la fe mira hacia arriba.', 'Ralph Waldo Emerson'),
@@ -1606,7 +1645,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1557,  'La perfección del carácter es lo siguiente: vivir cada día como si fuera el último, sin frenesí, apatía ni pretensiones.', 'Marcus Aurelius'),
     (1558,  'Un viaje de mil kilómetros comienza con un simple paso.', 'Lao Tzu'),
     (1559,  'La aventura vale la pena.', 'Aristotle'),
-    (1560,  'Cuando te das cuenta de que no te falta nada, el mundo entero te pertenece.', 'Lao Tzu'),
+    (1560,  'Cuando te das cuenta de que no te falta nada, el mundo entero te pertenece.', 'Lao Tzu');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1561,  'Hay un momento para muchas palabras, pero también hay un momento para dormir.', 'Homer'),
     (1562,  'Día a día, lo que elijas, lo que pienses y lo que hagas son en lo que te convertirás.', 'Heraclitus'),
     (1563,  'Desde que la felicidad oyó tu nombre, ha estado transitando las calles intentando encontrarte.', 'Hafez'),
@@ -1646,7 +1686,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1597,  'Cuando estés contento por ser tú mismo y no te compares ni compitas, todo el mundo te respetará.', 'Lao Tzu'),
     (1598,  'La naturaleza no se apresura. Sin embargo, todo se logra.', 'Lao Tzu'),
     (1599,  'El silencio es una fuente de gran fuerza.', 'Lao Tzu'),
-    (1600,  'La bondad en las palabras crea seguridad. La bondad en el pensamiento crea profundidad. La bondad de dar crea amor.', 'Lao Tzu'),
+    (1600,  'La bondad en las palabras crea seguridad. La bondad en el pensamiento crea profundidad. La bondad de dar crea amor.', 'Lao Tzu');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1601,  'Es mejor no hacer nada que estar ocupado sin hacer nada.', 'Lao Tzu'),
     (1602,  'Un hombre sabio es aquel que sabe que no sabe.', 'Lao Tzu'),
     (1603,  'El conocimiento es un tesoro, pero la práctica es la clave para lograrlo.', 'Lao Tzu'),
@@ -1686,7 +1727,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1637,  'Deberías hacer grandes cosas, no prometer grandes cosas.', 'Pythagoras'),
     (1638,  'Resulta difícil andar por varios caminos de la vida al mismo tiempo.', 'Pythagoras'),
     (1639,  'La suerte es lo que ocurre cuando se unen la preparación y la oportunidad.', 'Seneca'),
-    (1640,  'No hay ningún camino fácil desde la tierra hasta las estrellas.', 'Seneca'),
+    (1640,  'No hay ningún camino fácil desde la tierra hasta las estrellas.', 'Seneca');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1641,  'Los problemas fortalecen la mente, mientras que el trabajo fortalece el cuerpo.', 'Seneca'),
     (1642,  'La vida es como un cuento: no importa su duración, sino lo bueno que es.', 'Seneca'),
     (1643,  'Empieza primero por vivir y cuenta cada día como si fuera otra vida.', 'Seneca'),
@@ -1726,7 +1768,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1677,  'Entre lo dicho y lo hecho hay más de dicho que de hecho.', 'Aesop'),
     (1678,  'Es fácil ser valiente desde una distancia segura.', 'Aesop'),
     (1679,  'Cuando se intenta complacer a todo el mundo, no se complace a nadie.', 'Aesop'),
-    (1680,  'Declara el pasado, diagnostica el presente y pronostica el futuro.', 'Hippocrates'),
+    (1680,  'Declara el pasado, diagnostica el presente y pronostica el futuro.', 'Hippocrates');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1681,  'Los que veneran no saben y los que saben no veneran.', 'Bodhidharma'),
     (1682,  'Buscar es sufrir. No buscar nada es la felicidad.', 'Bodhidharma'),
     (1683,  'No participar en la ignorancia refleja sabiduría.', 'Bodhidharma'),
@@ -1766,7 +1809,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1717,  'Los dos guerreros más poderosos son la paciencia y el tiempo.', 'Leo Tolstoy'),
     (1718,  'Todo lo que comprendo lo entiendo porque amo.', 'Leo Tolstoy'),
     (1719,  'La felicidad no depende de las cosas externas, sino de la forma en que las vemos.', 'Leo Tolstoy'),
-    (1720,  'La verdadera vida se vive cuando ocurren las pequeñas cosas.', 'Leo Tolstoy'),
+    (1720,  'La verdadera vida se vive cuando ocurren las pequeñas cosas.', 'Leo Tolstoy');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1721,  'Dímelo y lo olvidaré, enséñame y puede que lo recuerde, implícame y lo aprenderé.', 'Benjamin Franklin'),
     (1722,  'Aquel que tenga paciencia obtendrá lo que desee.', 'Benjamin Franklin'),
     (1723,  'Puedes retrasarte, pero el tiempo no lo hará.', 'Benjamin Franklin'),
@@ -1806,7 +1850,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1757,  'Miraklet är inte att gå på vattnet. Miraklet är att gå på jorden.', 'Línjì Yìxuán'),
     (1758,  'Varje plats är rätt plats - den plats där jag nu är kan vara en helig plats.', 'Ravi Ravindra'),
     (1759,  'Stanna, andas, se dig omkring och omfamna varje dags mirakel, livets mirakel.', 'Jeffrey A. White'),
-    (1760,  'Vi kan inte förvänta oss någon större extas än just här, just nu — våra vardagliga liv.', 'Kosho Uchiyama Roshi'),
+    (1760,  'Vi kan inte förvänta oss någon större extas än just här, just nu — våra vardagliga liv.', 'Kosho Uchiyama Roshi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1761,  'Två tankar kan inte existera samtidigt: Om medvetandets klara ljus är närvarande, finns det inget utrymme för mental skymning.', 'Nyanaponika Thera'),
     (1762,  'Men kom ihåg, det finns ingen större gåva än nuet.', 'Dan Santat'),
     (1763,  'Din uppgift är inte att leta efter kärlek, utan bara att leta efter och hitta alla de barriärer inom dig som du har byggt mot den.', 'Rumi'),
@@ -1846,7 +1891,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1797,  'Tvivla på allting. Hitta ditt eget ljus.', 'Buddha'),
     (1798,  'Varje morgon föds vi på nytt. Vad vi  gör  idag  är  det  som  betyder mest.', 'Buddha'),
     (1799,  'Det finns ingen väg till lyckan: lyckan är vägen.', 'Buddha'),
-    (1800,  'Om du inte ändrar riktning, kanske du hamnar på den plats du är på väg till.', 'Buddha'),
+    (1800,  'Om du inte ändrar riktning, kanske du hamnar på den plats du är på väg till.', 'Buddha');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1801,  'Om vi kunde se miraklet i en enda blomma tydligt, skulle hela vårt liv förändras.', 'Buddha'),
     (1802,  'Leta inte efter en fristad hos någon utom dig själv.', 'Buddha'),
     (1803,  'Ingenting existerar helt ensamt; allt är i relation till allt annat.', 'Buddha'),
@@ -1886,7 +1932,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1837,  'Arbeta fram din egen räddning. Var inte beroende av andra.', 'Buddha'),
     (1838,  'Om du är vänd åt rätt håll, behöver du bara fortsätta gå.', 'Buddha'),
     (1839,  'Förnöjsamhet är den största rikedomen', 'Buddha'),
-    (1840,  'Varje upplevelse, oavsett hur dålig den verkar, innehåller en välsignelse av något slag. Målet är att hitta den.', 'Buddha'),
+    (1840,  'Varje upplevelse, oavsett hur dålig den verkar, innehåller en välsignelse av något slag. Målet är att hitta den.', 'Buddha');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1841,  'Rikta inte din uppmärksamhet mot vad andra gör eller misslyckas med att göra; rikta den mot vad du gör eller misslyckas med att göra.', 'Buddha'),
     (1842,  'Vi är vad vi tänker. Allt vi är kommer av  våra  tankar.  Med  våra  tankar skapar vi världen.', 'Buddha'),
     (1843,  'Framgång är inte nyckeln till lycka. Lycka är nyckeln till framgång.', 'Buddha'),
@@ -1926,7 +1973,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1877,  'Kärleken är den starkaste kraften som finns i världen, och ändå är det den mest ödmjuka man kan tänka sig.', 'Mahatma Gandhi'),
     (1878,  'Det finns ingen "väg till fred", det finns bara "fred".', 'Mahatma Gandhi'),
     (1879,  'När du gör någonting, gör det med kärlek eller gör det inte alls.', 'Mahatma Gandhi'),
-    (1880,  'På ett varsamt sätt kan du skaka om världen.', 'Mahatma Gandhi'),
+    (1880,  'På ett varsamt sätt kan du skaka om världen.', 'Mahatma Gandhi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1881,  'De kan inte ta bort vår självrespekt om vi inte ger den till dem.', 'Mahatma Gandhi'),
     (1882,  'Sanningen är en, vägarna är många.', 'Mahatma Gandhi'),
     (1883,  'Vilken barriär finns det som kärleken inte kan bryta?', 'Mahatma Gandhi'),
@@ -1966,7 +2014,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1917,  'Gör det som är rätt vid en given tidpunkt och lämna det bakom dig.', 'Ramana Maharshi'),
     (1918,  'Verklig fred är lycka.  Nöjen skapar inte lycka.', 'Ramana Maharshi'),
     (1919,  'Det finns inget "inre" eller "yttre". Båda betyder antingen samma sak eller ingenting.', 'Ramana Maharshi'),
-    (1920,  'Du är redan det som du söker.', 'Ramana Maharshi'),
+    (1920,  'Du är redan det som du söker.', 'Ramana Maharshi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1921,  'Det kommer en dag då du skrattar åt dina tidigare ansträngningar. Det du inser den dagen då du skrattar, finns också här och nu.', 'Ramana Maharshi'),
     (1922,  'Om solens ljus är osynligt för ugglan, är det bara fågelns fel och inte solens.', 'Ramana Maharshi'),
     (1923,  'Vill du veta vem du är? Fråga inte. Handla!   Handlingen   kommer   att beskriva och definiera dig.', 'Thomas Jefferson'),
@@ -2006,7 +2055,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1957,  'Visdomens beständiga tecken är att se det mirakulösa i det vanliga', 'Ralph Waldo Emerson'),
     (1958,  'Sorgen ser bakåt, oron ser sig omkring, tron ser uppåt', 'Ralph Waldo Emerson'),
     (1959,  'Ingenting kan ge dig fred utom du själv.', 'Ralph Waldo Emerson'),
-    (1960,  'Många ögon går genom ängen, men få ser blommorna på den.', 'Ralph Waldo Emerson'),
+    (1960,  'Många ögon går genom ängen, men få ser blommorna på den.', 'Ralph Waldo Emerson');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1961,  'Att  veta  att  bara  ett  liv  har  andats lättare  för  att  du  har  levt.  Det  är  att ha lyckats.', 'Ralph Waldo Emerson'),
     (1962,  'Ingenting är enklare än storhet; att vara enkel är i själva verket att vara stor.', 'Ralph Waldo Emerson'),
     (1963,  'Låt dig inte pressas av dina problem. Låt dig ledas av dina drömmar.', 'Ralph Waldo Emerson'),
@@ -2046,7 +2096,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (1997,  'Dag för dag, det du väljer, det du tänker, och det du gör är den du blir.', 'Heraclitus'),
     (1998,  'Ända sedan lyckan hörde ditt namn, har den sprungit genom gatorna för att försöka hitta dig.', 'Hafez'),
     (1999,  'Vart än mina resor för mig, är paradiset där jag är.', 'Voltaire'),
-    (2000,  'Solen är ny varje dag.', 'Heraclitus'),
+    (2000,  'Solen är ny varje dag.', 'Heraclitus');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2001,  'Lycka består av frekvent upprepning av njutning.', 'Arthur Schopenhauer '),
     (2002,  'Vi tänker sällan på det vi har, men alltid på det vi saknar.', 'Arthur Schopenhauer '),
     (2003,  'Varje ägodel och varje lycka är bara lånad av en händelse för en obestämd tid.', 'Arthur Schopenhauer '),
@@ -2086,7 +2137,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2037,  'Den vise mannen är en som vet vad han inte vet.', 'Lao Tzu'),
     (2038,  'Kunskap är en skatt, men användningen är nyckeln till den.', 'Lao Tzu'),
     (2039,  'Jag har endast tre saker att lära ut: enkelhet, tålamod, medkänsla. Dessa tre är dina största skatter.', 'Lao Tzu'),
-    (2040,  'Sluta lämna och du ska anlända. Sluta leta och du ska se. Sluta springa bort och du ska hittas.', 'Lao Tzu'),
+    (2040,  'Sluta lämna och du ska anlända. Sluta leta och du ska se. Sluta springa bort och du ska hittas.', 'Lao Tzu');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2041,  'Hälsa är den största ägodelen. Förnöjsamhet är den största skatten. Förtroende är den bästa vännen.', 'Lao Tzu'),
     (2042,  'Stora handlingar består av små gärningar.', 'Lao Tzu'),
     (2043,  'Gör ditt arbete, och kliv sedan tillbaka. Den enda vägen till stillheten.', 'Lao Tzu'),
@@ -2126,7 +2178,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2077,  'Så som en saga, så är livet: det är inte hur långt det är, utan hur bra det är, som är det viktiga.', 'Seneca'),
     (2078,  'Börja genast att leva, och räkna varje enskild dag som ett separat liv.', 'Seneca'),
     (2079,  'Den som är modig är fri.', 'Seneca'),
-    (2080,  'Umgås med människor som sannolikt kommer att förbättra dig.', 'Seneca'),
+    (2080,  'Umgås med människor som sannolikt kommer att förbättra dig.', 'Seneca');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2081,  'Endast tiden kan läka det som förnuftet inte kan.', 'Seneca'),
     (2082,  'Mest kraftfull är den som har sig själv i sin egen makt.', 'Seneca'),
     (2083,  'Njut av nutidens nöjen på ett sätt som inte skadar framtidens.', 'Seneca'),
@@ -2166,7 +2219,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2117,  'Att söka är att lida. Att inte söka något är välsignelse.', 'Bodhidharma'),
     (2118,  'Att inte involvera sig i okunnighet är visdom.', 'Bodhidharma'),
     (2119,  'Att frigöra sig från ord är befrielse.', 'Bodhidharma'),
-    (2120,  'Vägen är i grunden perfekt. Den behöver inte förfinas.', 'Bodhidharma'),
+    (2120,  'Vägen är i grunden perfekt. Den behöver inte förfinas.', 'Bodhidharma');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2121,  'Alla känner till välståndets väg, bara några få följer den.', 'Bodhidharma'),
     (2122,  'Verkligheten har ingen insida, utsida eller mittemellan.', 'Bodhidharma'),
     (2123,  'Visa män talar för att de har någonting att säga; dårar talar för att de måste säga någonting.', 'Plato'),
@@ -2206,7 +2260,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2157,  'Den som kan ha tålamod kan få vad han vill.', 'Benjamin Franklin'),
     (2158,  'Du kan dröja, men det gör inte tiden.', 'Benjamin Franklin'),
     (2159,  'Förstör aldrig en ursäkt med en bortförklaring.', 'Benjamin Franklin'),
-    (2160,  'Förlorad tid får man aldrig tillbaka.', 'Benjamin Franklin'),
+    (2160,  'Förlorad tid får man aldrig tillbaka.', 'Benjamin Franklin');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2161,  'Den verkliga upptäcktsresan består inte i att söka nya landskap, utan i att ha nya ögon.', 'Marcel Proust'),
     (2162,  'Försök alltid att hålla en bit av himlen över ditt liv.', 'Marcel Proust'),
     (2163,  'Min destination är inte längre en plats, utan snarare ett nytt sätt att se.', 'Marcel Proust'),
@@ -2246,7 +2301,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2197,  'Aber denke daran, es gibt kein größeres Geschenk als die Gegenwart.', 'Dan Santat'),
     (2198,  'Deine Aufgabe ist nicht nach Liebe zu suchen, sondern nach den Barrieren in dir selbst, die du gegen sie gebaut hast.', 'Rumi'),
     (2199,  'Wunden sind die Stellen, an denen das Licht in uns eintritt.', 'Rumi'),
-    (2200,  'Hör auf so klein zu handeln. Du bist das Universum in ekstatischer Bewegung.', 'Rumi'),
+    (2200,  'Hör auf so klein zu handeln. Du bist das Universum in ekstatischer Bewegung.', 'Rumi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2201,  'Gestern war ich klug und wollte die Welt verändern. Heute bin ich weise und möchte mich verändern.', 'Rumi'),
     (2202,  'Trauere nicht. Alles, was du verlierst, kommt in einer anderen Form wieder.', 'Rumi'),
     (2203,  'Wenn du bei jedem Reiben irritiert bist, wie soll dein Spiegel poliert werden?', 'Rumi'),
@@ -2286,7 +2342,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2237,  'Suche nicht nach einem Heiligtum in irgendjemandem außer dir selbst.', 'Buddha'),
     (2238,  'Nichts existiert jemals ganz alleine; alles steht in Beziehung zu allem anderen.', 'Buddha'),
     (2239,  'Hass wird nicht durch Hass, sondern durch Liebe besiegt; das ist die ewige Regel.', 'Buddha'),
-    (2240,  'Wahre Liebe wird aus Verständnis geboren.', 'Buddha'),
+    (2240,  'Wahre Liebe wird aus Verständnis geboren.', 'Buddha');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2241,  'Wenn du gehst, isst und reist, sei, wo du bist. Sonst wirst du den größten Teil deines Lebens verpassen.', 'Buddha'),
     (2242,  'Die Vergangenheit ist schon vorbei, die Zukunft ist noch nicht da. Es gibt nur einen Moment, den du leben kannst, und das ist der gegenwärtige Moment.', 'Buddha'),
     (2243,  'Hänge dein Herz daran, Gutes zu tun. Tue es immer und immer wieder und du wirst mit Freude erfüllt sein.', 'Buddha'),
@@ -2326,7 +2383,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2277,  'Wir sind, was wir denken. Alles, was wir sind, entsteht aus unseren Gedanken. Mit unseren Gedanken formen wir die Welt.', 'Buddha'),
     (2278,  'Erfolg ist nicht der Schlüssel zum Glück. Glück ist der Schlüssel zum Erfolg.', 'Buddha'),
     (2279,  'Wenn der Geist rein ist, folgt die Freude wie ein Schatten, der nie weggeht.', 'Buddha'),
-    (2280,  'Je weniger du hast, umso weniger Sorgen musst du dir darüber machen.', 'Buddha'),
+    (2280,  'Je weniger du hast, umso weniger Sorgen musst du dir darüber machen.', 'Buddha');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2281,  'Man erfasst die Schönheit einer Blume nicht, indem man ihre Blütenblätter ausreißt.', 'Buddha'),
     (2282,  'Seid eine Lampe für euch selbst.', 'Buddha'),
     (2283,  'In dem Moment, in dem du siehst, wie wichtig es ist, dich selbst zu lieben, wirst du aufhören, Andere leiden zu lassen.', 'Buddha'),
@@ -2366,7 +2424,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2317,  'Die Wahrheit ist eine, der Wege sind viele.', 'Mahatma Gandhi'),
     (2318,  'Wo wäre die Schranke, die Liebe nicht zerbrechen könnte?', 'Mahatma Gandhi'),
     (2319,  'Lebe einfach, damit alle einfach leben können.', 'Mahatma Gandhi'),
-    (2320,  'Es gibt eine Kraft im Universum, die, wenn wir sie zulassen, durch uns hindurchfließen und wunderbare Ergebnisse hervorbringen wird.', 'Mahatma Gandhi'),
+    (2320,  'Es gibt eine Kraft im Universum, die, wenn wir sie zulassen, durch uns hindurchfließen und wunderbare Ergebnisse hervorbringen wird.', 'Mahatma Gandhi');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2321,  'Zufriedenheit liegt in der Anstrengung, nicht im Erreichen. Volle Anstrengung ist voller Sieg.', 'Mahatma Gandhi'),
     (2322,  'Die wahre Schönheit kommt aus der Reinheit des Herzens.', 'Mahatma Gandhi'),
     (2323,  'Wenn ich glaube, dass ich es schaffen kann, werde ich mit Sicherheit die Fähigkeit dazu erwerben, auch wenn ich sie am Anfang vielleicht nicht habe.', 'Mahatma Gandhi'),
@@ -2406,7 +2465,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2357,  'Wenn das Licht der Sonne für die Eule unsichtbar ist, ist das nur die Schuld dieses Vogels und nicht die der Sonne.', 'Ramana Maharshi'),
     (2358,  'Willst du wissen, wer du bist? Frag nicht. Handle! Dein Handeln wird dich definieren.', 'Thomas Jefferson'),
     (2359,  'Ich glaube an Glück – je härter ich arbeite, desto mehr habe ich davon.', 'Thomas Jefferson'),
-    (2360,  'Wenn du etwas willst, das du nie hattest, musst du bereit sein, etwas zu tun, das du noch nie getan hast.', 'Thomas Jefferson'),
+    (2360,  'Wenn du etwas willst, das du nie hattest, musst du bereit sein, etwas zu tun, das du noch nie getan hast.', 'Thomas Jefferson');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2361,  'Sogar die dunkelste Nacht wird enden und die Sonne wird aufgehen.', 'Victor Hugo'),
     (2362,  'Alles ins Gleichgewicht zu bringen ist gut, alles in Harmonie zu bringen ist besser.', 'Victor Hugo'),
     (2363,  'Lachen ist Sonnenschein, es vertreibt den Winter aus dem menschlichen Gesicht.', 'Victor Hugo'),
@@ -2446,7 +2506,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2397,  'Nichts ist einfacher als Größe. Ja, einfach zu sein, heißt groß zu sein.', 'Ralph Waldo Emerson'),
     (2398,  'Lass dich nicht von deinen Problemen antreiben, lass dich von deinen Träumen leiten.', 'Ralph Waldo Emerson'),
     (2399,  'Jede Wand ist eine Tür.', 'Ralph Waldo Emerson'),
-    (2400,  'Morgen ist ein neuer Tag; beginne ihn gut und gelassen und in einer gehobenen Stimmung, sodass du dich nicht mit deinem alten Unsinn belastest.', 'Ralph Waldo Emerson'),
+    (2400,  'Morgen ist ein neuer Tag; beginne ihn gut und gelassen und in einer gehobenen Stimmung, sodass du dich nicht mit deinem alten Unsinn belastest.', 'Ralph Waldo Emerson');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2401,  'Der glücklichste Mensch ist derjenige, der von der Natur die Verehrung lernt.', 'Ralph Waldo Emerson'),
     (2402,  'Der Vorfahre jeder Handlung ist ein Gedanke.', 'Ralph Waldo Emerson'),
     (2403,  'Die Welt macht dem Menschen Platz, der weiß, wohin er geht.', 'Ralph Waldo Emerson'),
@@ -2486,7 +2547,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2437,  'Wir denken selten an das, was wir haben, aber immer an das, was uns fehlt. ', 'Arthur Schopenhauer '),
     (2438,  'Jeder Besitz und jedes Glück wird uns nur auf unbestimmte Zeit geliehen.', 'Arthur Schopenhauer '),
     (2439,  'Sei glücklich für diesen Moment. Dieser Moment ist dein Leben.', 'Omar Khayyam'),
-    (2440,  'Es geht nicht darum, wie viel wir besitzen, sondern wie viel wir genießen. Das sorgt für Glücksgefühl.', 'Charles Spurgeon '),
+    (2440,  'Es geht nicht darum, wie viel wir besitzen, sondern wie viel wir genießen. Das sorgt für Glücksgefühl.', 'Charles Spurgeon ');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2441,  'Die Seele denkt nie ohne ein Bild.', 'Aristotle'),
     (2442,  'Entscheide dich lieber für eine starke Seele als für einen starken Körper.', 'Pythagoras'),
     (2443,  'Freundschaft ist eine Seele in zwei Körpern.', 'Aristotle'),
@@ -2526,7 +2588,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2477,  'Große Handlungen bestehen aus kleinen Taten.', 'Lao Tzu'),
     (2478,  'Mache deine Arbeit, dann tritt zurück. Der einzige Pfad zur Gelassenheit.', 'Lao Tzu'),
     (2479,  'Wenn du mich kennenlernen willst, schau in dein Herz.', 'Lao Tzu'),
-    (2480,  'Wer weiß, dass genug genug ist, wird immer genug haben.', 'Lao Tzu'),
+    (2480,  'Wer weiß, dass genug genug ist, wird immer genug haben.', 'Lao Tzu');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2481,  'Andere zu meistern ist Stärke. Sich selbst zu beherrschen macht dich furchtlos.', 'Lao Tzu'),
     (2482,  'Die Wahrheit ist nicht schön und schöne Worte nicht die Wahrheit. Die Guten diskutieren nicht. Debattierer sind nicht gut.', 'Lao Tzu'),
     (2483,  'Lass es still sein, es wird nach und nach klar werden.', 'Lao Tzu'),
@@ -2566,7 +2629,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2517,  'Der sei der Mächtigste, der sich selbst in der Gewalt hat.', 'Seneca'),
     (2518,  'Genieß die gegenwärtigen Freuden so, dass du den zukünftigen nicht schadest.', 'Seneca'),
     (2519,  'Wenn du in Harmonie mit der Natur lebst, wirst du nie arm sein; wenn du nach dem lebst, was andere denken, wirst du nie reich sein.', 'Seneca'),
-    (2520,  'Bei dem Weisen ist der Reichtum nichts weiter als Sklave, bei dem Toren macht er sich zum Herrn.', 'Seneca'),
+    (2520,  'Bei dem Weisen ist der Reichtum nichts weiter als Sklave, bei dem Toren macht er sich zum Herrn.', 'Seneca');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2521,  'Solange du lebst, lerne weiter, wie man lebt.', 'Seneca'),
     (2522,  'Den Willigen lenkt das Schicksal, den Widerstrebenden zerrt es mit sich.', 'Seneca'),
     (2523,  'Jeder Neuanfang kommt vom Ende eines anderen Anfangs.', 'Seneca'),
@@ -2606,7 +2670,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2557,  'Die Wirklichkeit hat kein Innen, kein Außen und keinen Mittelteil.', 'Bodhidharma'),
     (2558,  'Weise reden, weil sie etwas zu sagen haben, Toren sagen etwas, weil sie reden müssen.', 'Plato'),
     (2559,  'Über zwei Dinge sollte der Mensch sich nie ärgern – über das, was er ändern kann, und über das, was er nicht ändern kann.', 'Plato'),
-    (2560,  'Der Anfang ist der wichtigste Teil der Arbeit.', 'Plato'),
+    (2560,  'Der Anfang ist der wichtigste Teil der Arbeit.', 'Plato');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2561,  'Ein Haus mit einer Bücherei darin besitzt eine Seele.', 'Plato'),
     (2562,  'Der größte Reichtum besteht darin, mit wenig zufrieden zu leben.', 'Plato'),
     (2563,  'Gute Taten geben uns selbst Stärke und inspirieren Andere zu guten Taten.', 'Plato'),
@@ -2646,7 +2711,8 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2597,  'Versuche stets, ein Stückchen Himmel über deinem Leben freizuhalten.', 'Marcel Proust'),
     (2598,  'Mein Ziel ist kein Ort mehr, sondern eine neue Art zu sehen.', 'Marcel Proust'),
     (2599,  'Wir erhalten keine Weisheit, wir müssen sie selbst entdecken, nach einer Reise, die niemand für uns tun, uns nicht ersparen kann.', 'Marcel Proust'),
-    (2600,  'Wenn es gefährlich ist, ein bisschen zu träumen, dann ist das Heilmittel dagegen nicht, weniger zu träumen, sondern mehr, ja, die ganze Zeit zu träumen.', 'Marcel Proust'),
+    (2600,  'Wenn es gefährlich ist, ein bisschen zu träumen, dann ist das Heilmittel dagegen nicht, weniger zu träumen, sondern mehr, ja, die ganze Zeit zu träumen.', 'Marcel Proust');
+INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2601,  'Liebe ist Raum und Zeit, dem Herzen fühlbar gemacht.', 'Marcel Proust'),
     (2602,  'Der klarste Weg ins Universum ist durch eine Waldwildnis.', 'John Muir'),
     (2603,  'Bei jedem Spaziergang mit der Natur erhält man weit mehr, als man sucht.', 'John Muir'),
@@ -2657,6 +2723,7 @@ INSERT OR REPLACE INTO quote_table (quote_id, quote, author) VALUES
     (2608,  'Wenn man an einem einzigen Ding in der Natur zieht, findet man es mit dem Rest der Welt verbunden.', 'John Muir'),
     (2609,  'Ich möchte nur leben, um die Menschen dazu zu bringen, die Schönheit der Natur zu betrachten.', 'John Muir'),
     (2610,  'Alles, was wir hören, ist eine Meinung, keine Tatsache. Alles, was wir sehen, ist eine Perspektive, nicht die Wahrheit.', 'Marcus Aurelius');
+
 
 INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (2, 1),
@@ -2698,7 +2765,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (2, 37), (4, 37),
     (4, 38), (5, 38),
     (3, 39), (4, 39), (5, 39),
-    (2, 40),
+    (2, 40);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (4, 41), (5, 41),
     (3, 42), (4, 42), (5, 42),
     (4, 43),
@@ -2738,7 +2806,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (3, 77), (4, 77),
     (2, 78), (3, 78),
     (3, 79), (4, 79),
-    (3, 80), (5, 80),
+    (3, 80), (5, 80);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (2, 81), (3, 81),
     (2, 82), (3, 82),
     (2, 83), (3, 83),
@@ -2778,7 +2847,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (5, 117),
     (5, 118),
     (5, 119),
-    (4, 120), (5, 120),
+    (4, 120), (5, 120);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (5, 121),
     (5, 122),
     (4, 123), (5, 123),
@@ -2818,7 +2888,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (1, 157), (3, 157),
     (1, 158), (3, 158),
     (1, 159), (3, 159),
-    (1, 160), (2, 160),
+    (1, 160), (2, 160);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (1, 161), (3, 161),
     (1, 162),
     (1, 163),
@@ -2858,7 +2929,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (3, 197), (5, 197),
     (3, 198), (5, 198),
     (2, 199), (4, 199),
-    (3, 200), (4, 200), (5, 200),
+    (3, 200), (4, 200), (5, 200);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (3, 201), (5, 201),
     (5, 202),
     (5, 203),
@@ -2898,7 +2970,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (2, 237), (3, 237), (4, 237), (5, 237),
     (5, 238),
     (2, 239), (4, 239), (5, 239),
-    (2, 240), (4, 240),
+    (2, 240), (4, 240);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (3, 241), (5, 241),
     (5, 242),
     (4, 243),
@@ -2938,7 +3011,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (2, 277),
     (2, 278), (4, 278),
     (4, 279),
-    (4, 280),
+    (4, 280);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (3, 281), (5, 281),
     (3, 282), (4, 282),
     (3, 283), (5, 283),
@@ -2978,7 +3052,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (2, 317), (3, 317),
     (5, 318),
     (4, 319), (5, 319),
-    (2, 320), (5, 320),
+    (2, 320), (5, 320);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (3, 321),
     (3, 322), (5, 322),
     (5, 323),
@@ -3018,7 +3093,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (3, 357), (5, 357),
     (4, 358), (5, 358),
     (1, 359), (3, 359), (5, 359),
-    (2, 360), (5, 360),
+    (2, 360), (5, 360);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (2, 361), (3, 361),
     (3, 362), (5, 362),
     (1, 363), (3, 363), (5, 363),
@@ -3058,7 +3134,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (5, 397),
     (5, 398),
     (2, 399), (4, 399),
-    (2, 400),
+    (2, 400);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (2, 401), (5, 401),
     (5, 402),
     (2, 403), (5, 403),
@@ -3098,7 +3175,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (7, 437), (9, 437),
     (6, 438),
     (7, 439), (9, 439),
-    (7, 440), (9, 440),
+    (7, 440), (9, 440);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (6, 441), (9, 441),
     (6, 442), (7, 442), (10, 442),
     (8, 443), (9, 443), (10, 443),
@@ -3138,7 +3216,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (8, 477), (9, 477), (10, 477),
     (9, 478),
     (7, 479), (9, 479),
-    (9, 480),
+    (9, 480);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (7, 481), (9, 481),
     (7, 482), (9, 482),
     (7, 483), (9, 483),
@@ -3178,7 +3257,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (7, 517), (8, 517),
     (7, 518), (8, 518),
     (7, 519), (8, 519),
-    (7, 520), (9, 520), (10, 520),
+    (7, 520), (9, 520), (10, 520);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (7, 521), (9, 521),
     (7, 522),
     (7, 523), (8, 523), (9, 523),
@@ -3218,7 +3298,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (10, 557),
     (9, 558), (10, 558),
     (7, 559), (8, 559),
-    (9, 560), (10, 560),
+    (9, 560), (10, 560);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (7, 561), (9, 561),
     (9, 562),
     (8, 563), (9, 563),
@@ -3258,7 +3339,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (6, 597),
     (6, 598),
     (6, 599), (8, 599), (9, 599),
-    (6, 600),
+    (6, 600);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (6, 601),
     (6, 602), (8, 602),
     (6, 603), (8, 603),
@@ -3298,7 +3380,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (10, 637),
     (10, 638),
     (9, 639), (10, 639),
-    (8, 640), (9, 640),
+    (8, 640), (9, 640);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (8, 641), (9, 641),
     (9, 642), (10, 642),
     (10, 643),
@@ -3338,7 +3421,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (10, 677),
     (9, 678),
     (7, 679), (9, 679),
-    (7, 680), (10, 680),
+    (7, 680), (10, 680);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (7, 681), (10, 681),
     (10, 682),
     (7, 683), (10, 683),
@@ -3378,7 +3462,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (8, 717), (9, 717),
     (8, 718), (10, 718),
     (7, 719), (8, 719),
-    (6, 720), (7, 720), (9, 720),
+    (6, 720), (7, 720), (9, 720);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (6, 721), (9, 721),
     (8, 722), (9, 722),
     (7, 723), (9, 723),
@@ -3418,7 +3503,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (8, 757), (10, 757),
     (10, 758),
     (8, 759), (9, 759),
-    (10, 760),
+    (10, 760);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (8, 761), (9, 761), (10, 761),
     (6, 762), (8, 762), (9, 762),
     (6, 763), (8, 763),
@@ -3458,7 +3544,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (8, 797), (10, 797),
     (6, 798), (8, 798), (10, 798),
     (7, 799),
-    (8, 800),
+    (8, 800);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (7, 801), (8, 801), (10, 801),
     (7, 802), (8, 802),
     (8, 803), (9, 803),
@@ -3498,7 +3585,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (10, 837),
     (7, 838), (10, 838),
     (8, 839), (10, 839),
-    (7, 840), (10, 840),
+    (7, 840), (10, 840);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (10, 841),
     (7, 842), (8, 842),
     (8, 843), (10, 843),
@@ -3538,7 +3626,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (11, 877), (12, 877), (15, 877),
     (13, 878), (14, 878), (15, 878),
     (12, 879),
-    (13, 880),
+    (13, 880);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (13, 881), (15, 881),
     (11, 882), (14, 882),
     (11, 883), (14, 883),
@@ -3578,7 +3667,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 917), (14, 917),
     (12, 918), (14, 918),
     (12, 919), (15, 919),
-    (12, 920), (15, 920),
+    (12, 920), (15, 920);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 921), (14, 921),
     (12, 922), (13, 922),
     (14, 923),
@@ -3618,7 +3708,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 957),
     (12, 958), (13, 958), (14, 958),
     (12, 959), (13, 959),
-    (13, 960), (14, 960),
+    (13, 960), (14, 960);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 961), (13, 961), (14, 961), (15, 961),
     (13, 962), (14, 962), (15, 962),
     (12, 963),
@@ -3658,7 +3749,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (14, 997),
     (13, 998), (14, 998),
     (14, 999),
-    (14, 1000), (15, 1000),
+    (14, 1000), (15, 1000);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (13, 1001), (14, 1001),
     (12, 1002), (15, 1002),
     (13, 1003), (14, 1003), (15, 1003),
@@ -3698,7 +3790,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (11, 1037), (13, 1037),
     (11, 1038), (13, 1038),
     (11, 1039), (12, 1039),
-    (13, 1040), (14, 1040),
+    (13, 1040), (14, 1040);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (13, 1041),
     (12, 1042), (14, 1042), (15, 1042),
     (12, 1043),
@@ -3738,7 +3831,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (14, 1077), (15, 1077),
     (15, 1078),
     (15, 1079),
-    (12, 1080), (13, 1080),
+    (12, 1080), (13, 1080);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 1081),
     (15, 1082),
     (12, 1083), (15, 1083),
@@ -3778,7 +3872,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (15, 1117),
     (12, 1118), (15, 1118),
     (11, 1119), (12, 1119), (14, 1119),
-    (12, 1120),
+    (12, 1120);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 1121),
     (12, 1122), (15, 1122),
     (11, 1123), (15, 1123),
@@ -3818,7 +3913,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (13, 1157), (14, 1157),
     (12, 1158), (14, 1158),
     (13, 1159), (14, 1159),
-    (11, 1160), (12, 1160), (13, 1160), (15, 1160),
+    (11, 1160), (12, 1160), (13, 1160), (15, 1160);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (13, 1161), (14, 1161),
     (13, 1162), (14, 1162),
     (12, 1163), (13, 1163), (15, 1163),
@@ -3858,7 +3954,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (11, 1197), (13, 1197), (14, 1197),
     (11, 1198), (13, 1198),
     (11, 1199), (13, 1199),
-    (12, 1200), (14, 1200),
+    (12, 1200), (14, 1200);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 1201), (13, 1201),
     (15, 1202),
     (12, 1203), (15, 1203),
@@ -3898,7 +3995,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 1237), (13, 1237),
     (13, 1238), (14, 1238),
     (13, 1239), (14, 1239),
-    (12, 1240), (15, 1240),
+    (12, 1240), (15, 1240);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 1241), (13, 1241),
     (12, 1242), (15, 1242),
     (13, 1243), (15, 1243),
@@ -3938,7 +4036,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (12, 1277), (13, 1277),
     (13, 1278), (15, 1278),
     (12, 1279),
-    (12, 1280),
+    (12, 1280);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (14, 1281),
     (12, 1282), (15, 1282),
     (12, 1283), (14, 1283),
@@ -3978,7 +4077,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (16, 1317), (19, 1317),
     (16, 1318), (19, 1318),
     (16, 1319), (20, 1319),
-    (16, 1320),
+    (16, 1320);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1321),
     (17, 1322), (19, 1322),
     (17, 1323),
@@ -4018,7 +4118,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1357), (18, 1357),
     (19, 1358),
     (18, 1359), (20, 1359),
-    (19, 1360), (20, 1360),
+    (19, 1360), (20, 1360);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1361), (19, 1361),
     (17, 1362), (20, 1362),
     (17, 1363), (18, 1363), (20, 1363),
@@ -4058,7 +4159,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (18, 1397), (19, 1397), (20, 1397),
     (17, 1398),
     (18, 1399), (19, 1399), (20, 1399),
-    (18, 1400), (20, 1400),
+    (18, 1400), (20, 1400);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (18, 1401), (20, 1401),
     (18, 1402), (20, 1402),
     (18, 1403), (20, 1403),
@@ -4098,7 +4200,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1437), (20, 1437),
     (18, 1438), (19, 1438), (20, 1438),
     (18, 1439), (20, 1439),
-    (20, 1440),
+    (20, 1440);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1441), (18, 1441), (19, 1441),
     (19, 1442), (20, 1442),
     (17, 1443), (18, 1443), (19, 1443),
@@ -4138,7 +4241,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1477), (19, 1477), (20, 1477),
     (17, 1478),
     (16, 1479), (17, 1479),
-    (20, 1480),
+    (20, 1480);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1481), (18, 1481),
     (17, 1482), (20, 1482),
     (17, 1483), (19, 1483),
@@ -4178,7 +4282,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (20, 1517),
     (17, 1518), (20, 1518),
     (18, 1519),
-    (19, 1520),
+    (19, 1520);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1521), (18, 1521),
     (18, 1522), (19, 1522),
     (17, 1523), (18, 1523),
@@ -4218,7 +4323,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1557), (20, 1557),
     (16, 1558), (20, 1558),
     (18, 1559), (19, 1559),
-    (16, 1560), (17, 1560),
+    (16, 1560), (17, 1560);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1561), (18, 1561), (20, 1561),
     (16, 1562), (17, 1562), (18, 1562),
     (17, 1563), (19, 1563),
@@ -4258,7 +4364,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (18, 1597), (19, 1597),
     (17, 1598), (18, 1598), (20, 1598),
     (16, 1599), (17, 1599), (20, 1599),
-    (19, 1600),
+    (19, 1600);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (16, 1601), (20, 1601),
     (16, 1602), (17, 1602),
     (17, 1603), (20, 1603),
@@ -4298,7 +4405,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (20, 1637),
     (17, 1638), (20, 1638),
     (18, 1639), (20, 1639),
-    (17, 1640), (20, 1640),
+    (17, 1640), (20, 1640);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (18, 1641), (20, 1641),
     (17, 1642), (18, 1642),
     (17, 1643), (18, 1643),
@@ -4338,7 +4446,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1677), (20, 1677),
     (18, 1678), (20, 1678),
     (18, 1679), (20, 1679),
-    (20, 1680),
+    (20, 1680);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1681),
     (16, 1682), (17, 1682),
     (17, 1683),
@@ -4378,7 +4487,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (17, 1717), (20, 1717),
     (17, 1718), (19, 1718),
     (19, 1719),
-    (17, 1720), (18, 1720),
+    (17, 1720), (18, 1720);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (20, 1721),
     (20, 1722),
     (20, 1723),
@@ -4418,7 +4528,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (22, 1757), (24, 1757),
     (22, 1758),
     (22, 1759), (24, 1759),
-    (22, 1760), (24, 1760),
+    (22, 1760), (24, 1760);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (22, 1761),
     (22, 1762),
     (22, 1763), (23, 1763), (24, 1763),
@@ -4458,7 +4569,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (22, 1797), (25, 1797),
     (22, 1798), (23, 1798), (25, 1798),
     (22, 1799), (23, 1799), (24, 1799),
-    (25, 1800),
+    (25, 1800);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (22, 1801), (23, 1801), (24, 1801),
     (22, 1802), (23, 1802),
     (22, 1803), (25, 1803),
@@ -4498,7 +4610,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (23, 1837), (25, 1837),
     (23, 1838), (25, 1838),
     (23, 1839), (24, 1839),
-    (23, 1840), (24, 1840), (25, 1840),
+    (23, 1840), (24, 1840), (25, 1840);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (23, 1841), (25, 1841),
     (22, 1842), (23, 1842),
     (24, 1843), (25, 1843),
@@ -4538,7 +4651,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (24, 1877), (25, 1877),
     (22, 1878), (23, 1878), (24, 1878),
     (24, 1879), (25, 1879),
-    (23, 1880), (24, 1880), (25, 1880),
+    (23, 1880), (24, 1880), (25, 1880);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (24, 1881),
     (22, 1882), (24, 1882),
     (24, 1883),
@@ -4578,7 +4692,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (22, 1917), (25, 1917),
     (22, 1918), (24, 1918),
     (22, 1919),
-    (22, 1920), (23, 1920), (24, 1920),
+    (22, 1920), (23, 1920), (24, 1920);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (22, 1921),
     (22, 1922),
     (22, 1923), (25, 1923),
@@ -4618,7 +4733,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (23, 1957), (24, 1957),
     (22, 1958), (23, 1958),
     (22, 1959), (24, 1959),
-    (24, 1960), (25, 1960),
+    (24, 1960), (25, 1960);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (23, 1961), (25, 1961),
     (21, 1962),
     (23, 1963), (25, 1963),
@@ -4658,7 +4774,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (21, 1997), (22, 1997), (23, 1997),
     (22, 1998), (24, 1998),
     (22, 1999),
-    (22, 2000), (23, 2000),
+    (22, 2000), (23, 2000);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (24, 2001),
     (22, 2002), (24, 2002),
     (24, 2003),
@@ -4698,7 +4815,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (21, 2037), (22, 2037),
     (22, 2038), (25, 2038),
     (21, 2039), (22, 2039), (23, 2039), (24, 2039), (25, 2039),
-    (22, 2040), (23, 2040),
+    (22, 2040), (23, 2040);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (23, 2041), (24, 2041),
     (21, 2042), (25, 2042),
     (23, 2043), (25, 2043),
@@ -4738,7 +4856,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (22, 2077), (23, 2077),
     (22, 2078), (23, 2078),
     (23, 2079), (24, 2079),
-    (25, 2080),
+    (25, 2080);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (23, 2081),
     (21, 2082), (23, 2082),
     (21, 2083), (23, 2083), (24, 2083), (25, 2083),
@@ -4778,7 +4897,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (21, 2117), (22, 2117),
     (22, 2118),
     (21, 2119), (22, 2119),
-    (21, 2120), (22, 2120),
+    (21, 2120), (22, 2120);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (22, 2121), (25, 2121),
     (22, 2122),
     (21, 2123),
@@ -4818,7 +4938,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (25, 2157),
     (25, 2158),
     (23, 2159), (25, 2159),
-    (22, 2160), (23, 2160), (25, 2160),
+    (22, 2160), (23, 2160), (25, 2160);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (21, 2161), (24, 2161), (25, 2161),
     (22, 2162), (24, 2162), (25, 2162),
     (21, 2163), (22, 2163),
@@ -4858,7 +4979,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2197),
     (27, 2198), (28, 2198), (29, 2198),
     (27, 2199), (28, 2199), (29, 2199),
-    (27, 2200), (29, 2200), (30, 2200),
+    (27, 2200), (29, 2200), (30, 2200);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (28, 2201), (29, 2201), (30, 2201),
     (29, 2202),
     (28, 2203), (30, 2203),
@@ -4898,7 +5020,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2237), (28, 2237),
     (27, 2238), (30, 2238),
     (27, 2239), (29, 2239),
-    (29, 2240),
+    (29, 2240);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2241),
     (27, 2242),
     (29, 2243),
@@ -4938,7 +5061,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2277), (28, 2277),
     (29, 2278), (30, 2278),
     (27, 2279), (29, 2279),
-    (26, 2280), (28, 2280),
+    (26, 2280), (28, 2280);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (28, 2281), (30, 2281),
     (28, 2282), (30, 2282),
     (28, 2283), (29, 2283),
@@ -4978,7 +5102,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2317), (29, 2317),
     (29, 2318),
     (26, 2319),
-    (27, 2320),
+    (27, 2320);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (28, 2321), (29, 2321), (30, 2321),
     (28, 2322), (29, 2322),
     (30, 2323),
@@ -5018,7 +5143,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2357),
     (27, 2358), (30, 2358),
     (29, 2359), (30, 2359),
-    (30, 2360),
+    (30, 2360);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (29, 2361),
     (27, 2362), (28, 2362),
     (29, 2363),
@@ -5058,7 +5184,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (26, 2397),
     (28, 2398), (30, 2398),
     (30, 2399),
-    (27, 2400), (28, 2400), (30, 2400),
+    (27, 2400), (28, 2400), (30, 2400);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (28, 2401), (29, 2401),
     (30, 2402),
     (30, 2403),
@@ -5098,7 +5225,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2437), (29, 2437),
     (29, 2438),
     (27, 2439), (29, 2439),
-    (26, 2440), (29, 2440),
+    (26, 2440), (29, 2440);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2441),
     (27, 2442), (28, 2442), (30, 2442),
     (27, 2443), (28, 2443),
@@ -5138,7 +5266,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (26, 2477), (30, 2477),
     (28, 2478), (30, 2478),
     (27, 2479), (28, 2479),
-    (26, 2480), (28, 2480),
+    (26, 2480), (28, 2480);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (28, 2481), (30, 2481),
     (26, 2482), (27, 2482), (28, 2482),
     (27, 2483), (28, 2483), (30, 2483),
@@ -5178,7 +5307,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (26, 2517), (28, 2517),
     (26, 2518), (28, 2518), (29, 2518), (30, 2518),
     (26, 2519), (28, 2519), (30, 2519),
-    (26, 2520), (30, 2520),
+    (26, 2520), (30, 2520);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2521), (28, 2521),
     (28, 2522), (30, 2522),
     (27, 2523), (28, 2523), (30, 2523),
@@ -5218,7 +5348,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2557),
     (26, 2558),
     (27, 2559), (28, 2559), (29, 2559),
-    (30, 2560),
+    (30, 2560);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (26, 2561), (27, 2561),
     (26, 2562), (29, 2562),
     (27, 2563), (29, 2563),
@@ -5258,7 +5389,8 @@ INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2597), (29, 2597), (30, 2597),
     (26, 2598), (27, 2598),
     (27, 2599), (30, 2599),
-    (27, 2600),
+    (27, 2600);
+INSERT OR REPLACE INTO quote_category_map (category_id, quote_id) VALUES
     (27, 2601), (29, 2601),
     (27, 2602), (28, 2602),
     (26, 2603), (27, 2603), (28, 2603),

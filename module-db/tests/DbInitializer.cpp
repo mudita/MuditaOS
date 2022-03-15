@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "module-db/Database/DatabaseInitializer.hpp"
@@ -21,7 +21,7 @@ bool DatabaseInitializer::run(std::filesystem::path path, std::string ext)
 
     auto files = listFiles(path, dbname, ext);
     for (auto file : files) {
-        LOG_DEBUG("Runing db script: %s", file.c_str());
+        LOG_DEBUG("Running db script: %s", file.c_str());
         auto commands = readCommands(file);
         if (!executeOnDb(commands)) {
             LOG_ERROR("Can't initialize database [%s] with [%s]", db->getName().c_str(), file.c_str());
