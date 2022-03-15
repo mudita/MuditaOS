@@ -1,0 +1,11 @@
+{
+    "comment": "This is kiss structure - asset path & sha",
+    "assets": [
+        {
+            "name": "image/Luts.bin.tgz",
+            "tarfile": "Luts.bin",
+            "output": "Luts.bin",
+            "unpack": true
+        }
+    ]
+}

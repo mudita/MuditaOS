@@ -25,19 +25,39 @@ set(TEST_ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/sys)
 set(TEST_ASSETS_DEST_DIR ${TEST_ASSETS_DEST_DIR} PARENT_SCOPE)
 
 include(DownloadAsset)
-download_asset_json( json-test-target
-                     ${CMAKE_CURRENT_SOURCE_DIR}/assets.json
-                     ${TEST_ASSETS_DEST_DIR}/current/
-                     MuditaOSAssets
-                     ${MUDITA_CACHE_DIR}
+
+download_asset_release_json(json-test-community-target
+                            ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_community.json
+                            ${TEST_ASSETS_DEST_DIR}/current/
+                            MuditaOSPublicAssets
+                            0.0.4
+                            ${MUDITA_CACHE_DIR}
     )
+
+download_asset_json(json-test-proprietary-target
+                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_proprietary.json
+                    ${TEST_ASSETS_DEST_DIR}/current/
+                    MuditaOSAssets
+                    ${MUDITA_CACHE_DIR}
+    )
+
+set(ASSETS_DEPENDENCIES "")
+
+if (${ASSETS_TYPE} STREQUAL "Proprietary")
+    list(APPEND ASSETS_DEPENDENCIES "json-test-proprietary-target")
+endif()
+
+if (${ASSETS_TYPE} STREQUAL "Community")
+    list(APPEND ASSETS_DEPENDENCIES "json-test-community-target")
+endif()
 
 add_assets_target(
     TARGET test-assets
     SOURCE_DIR ${ASSETS_SOURCE_DIR}
     DEST_DIR ${TEST_ASSETS_DEST_DIR}
     DEVEL ON
-    DEPENDS json-test-target
+    DEPENDS
+        ${ASSETS_DEPENDENCIES}
 )
 
 add_image(

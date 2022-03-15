@@ -7,9 +7,6 @@
 
 namespace gui
 {
-
-    inline const char *font_default_type = "gt_pressura";
-
     class RawFont;
 
     /// simple font interface for FontManager && RawFont
@@ -34,7 +31,6 @@ namespace gui
         Font(unsigned int size, Weight weight = Weight::Regular);
         Font(RawFont *font);
         void setFont(std::string name, unsigned int size, Weight weight = Weight::Regular);
-        /// just for gt_pressura - we have it as default
         void setFont(unsigned int size, Weight weight = Weight::Regular);
         void setSize(unsigned int size);
         void setWeight(Weight weight);

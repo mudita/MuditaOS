@@ -24,7 +24,7 @@ namespace gui
 
         namespace top_text
         {
-            inline constexpr auto font = "gt_pressura_light_46";
+            inline constexpr auto font = style::window::font::largelight;
         }
         namespace alarm_settings_window
         {
@@ -34,7 +34,7 @@ namespace gui
         } // namespace alarm_settings_window
         namespace alarm_settings_chime_tone
         {
-            inline constexpr auto font_center = "gt_pressura_light_46";
+            inline constexpr auto font_center = style::window::font::largelight;
         }
 
         namespace about_your_bell_window
@@ -57,7 +57,7 @@ namespace gui
         } // namespace bedtime_settings_window
         namespace bedtime_settings_chime_tone
         {
-            inline constexpr auto font_center = "gt_pressura_light_46";
+            inline constexpr auto font_center = style::window::font::largelight;
         }
     } // namespace bell_settings_style
 } // namespace gui

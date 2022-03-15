@@ -32,6 +32,7 @@ message("Selected product: ${PRODUCT}")
 message("Selected board:   ${BOARD}")
 message("Board revision:   ${BOARD_REVISION}")
 message("PROJECT_TARGET:   ${PROJECT_TARGET}")
+message("Assets version:   ${ASSETS_TYPE}")
 message("Version:          ${OS_VERSION_MAJOR}.${OS_VERSION_MINOR}.${OS_VERSION_PATCH}-${OS_VERSION_LABEL}")
 
 string(REPLACE "TARGET_" "" PROJECT_TARGET_NAME ${PROJECT_TARGET})

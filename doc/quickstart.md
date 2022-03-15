@@ -102,13 +102,13 @@ We are using J-Link driver in version J-Link v634f ([Ubuntu download](https://ww
 
 #### Add GitHub token
 
-We are storing assets on github pages and these are downloaded automatically before software images are built.
 Please follow github token configuration here: [download assets documentation](../doc/download_asset.py)
 
 #### Project configuration
 
 To configure project we have helper script: `./configure.sh` which essentially passes through basic cmake configuration for each product for each platform.
 We highly advise using `ninja` as it has proven better compilation times over make.
+To build MuditaOS with no access to proprietary files, please specify cmake flag: `-DASSETS_TYPE=Community`
 
 The script can be run with the following parameters:
 ```
@@ -136,6 +136,12 @@ __Examples:__
 
 ```
 ./configure.sh bell linux debug "-G Ninja"
+```
+
+4. building bell for linux platform with ninja and only community assets
+
+```
+./configure.sh bell linux debug -DASSETS_TYPE=Community "-G Ninja"
 ```
 
 #### Project build

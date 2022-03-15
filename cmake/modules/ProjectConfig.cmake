@@ -5,6 +5,11 @@ else()
     set (LOG_USE_COLOR 1 CACHE INTERNAL "")
 endif()
 
+set(ASSETS_TYPE "Proprietary" CACHE INTERNAL "")
+if (NOT ${ASSETS_TYPE} STREQUAL "Proprietary" AND NOT ${ASSETS_TYPE} STREQUAL "Community")
+    message(FATAL_ERROR " Unknown ASSETS_TYPE value: ${ASSETS_TYPE} - allowed values: Propertiary, Community")
+endif()
+
 # add LOG_SENSITIVE_DATA enable option
 option(LOG_SENSITIVE_DATA "LOG_SENSITIVE_DATA" ON)
 if (${LOG_SENSITIVE_DATA} STREQUAL "ON")

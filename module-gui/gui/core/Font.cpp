@@ -18,7 +18,8 @@ namespace gui
         setFont(name, size, weight);
     }
 
-    Font::Font(unsigned int size, Weight weight) : Font(font_default_type, size, weight)
+    Font::Font(unsigned int size, Weight weight)
+        : Font(FontManager::getInstance().getDefaultFontTypeName(), size, weight)
     {}
 
     Font::Font(RawFont *rawfont)
@@ -41,7 +42,6 @@ namespace gui
 
         setFont(name, size, weight);
     }
-
     void Font::setFont(std::string new_name, unsigned int new_size, Weight new_weight)
     {
         bool update = false;
@@ -56,13 +56,13 @@ namespace gui
         set(weight, new_weight);
         if (update) {
             std::string raw_font_name = new_name + "_" + c_str(new_weight) + "_" + std::to_string(new_size);
-            font                      = FontManager::getInstance().getFont(raw_font_name);
+            font                      = FontManager::getInstance().getFontByName(raw_font_name);
         }
     }
 
     void Font::setFont(unsigned int size, Weight weight)
     {
-        setFont((font_default_type), size, weight);
+        setFont((FontManager::getInstance().getDefaultFontTypeName()), size, weight);
     }
 
     void Font::setSize(unsigned int new_size)

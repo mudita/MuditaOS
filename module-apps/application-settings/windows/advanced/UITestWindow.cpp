@@ -30,7 +30,7 @@ namespace gui
         text->setFont(style::window::font::medium);
         LOG_DEBUG(
             "----------------------------------------------------------------------------------------------------");
-        text->addRichText("<p><text font='gt_pressura' color='12' size='30'>This</text><br>Text<text size='20' "
+        text->addRichText("<p><text color='12' size='30'>This</text><br>Text<text size='20' "
                           "weight='bold'> is rich </text><text color='3'>example</text></br></p>");
         LOG_DEBUG(
             "----------------------------------------------------------------------------------------------------");
