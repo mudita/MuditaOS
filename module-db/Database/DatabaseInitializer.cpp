@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DatabaseInitializer.hpp"
@@ -24,7 +24,7 @@ bool DatabaseInitializer::run(std::filesystem::path path, std::string ext)
         auto fname = std::make_unique<std::stringstream>();
         (*fname) << dbname << "_" << std::setfill('0') << std::setw(3) << i << '.' << ext;
         auto file = path / fname->str();
-        LOG_DEBUG("Runing db script: %s", file.c_str());
+        LOG_DEBUG("Running db script: %s", file.c_str());
         auto commands = readCommands(file);
         if (commands.empty())
             break;
