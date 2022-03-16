@@ -235,6 +235,7 @@ auto ServiceBluetooth::handle(BluetoothPairResultMessage *msg) -> std::shared_pt
 {
     auto device = msg->getDevice();
     if (msg->isSucceed()) {
+        bluetoothDevicesModel->mergeDevicesList(bluetooth::GAP::getDevicesList());
         bluetoothDevicesModel->setInternalDeviceState(device, DeviceState::Paired);
     }
     else {
@@ -368,7 +369,8 @@ auto ServiceBluetooth::handle(message::bluetooth::ResponseAuthenticatePasskey *m
 
 auto ServiceBluetooth::handle(message::bluetooth::ResponseAuthenticatePairCancel *msg) -> std::shared_ptr<sys::Message>
 {
-    /// TODO to be added in next PRs
+    auto accepted = msg->getPairApproved();
+    bluetooth::GAP::finishCodeComparison(accepted, msg->getDevice());
     return sys::MessageNone{};
 }
 

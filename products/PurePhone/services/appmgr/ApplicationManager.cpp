@@ -356,8 +356,8 @@ namespace app::manager
         connect(typeid(message::bluetooth::RequestAuthenticate), [&](sys::Message *msg) {
             auto m = dynamic_cast<::message::bluetooth::RequestAuthenticate *>(msg);
 
-            auto data =
-                std::make_unique<gui::BluetoothAuthenticateRequestParams>(m->getDevice(), m->getAuthenticateType());
+            auto data = std::make_unique<gui::BluetoothAuthenticateRequestParams>(
+                m->getDevice(), m->getAuthenticateType(), m->getPairingCode());
             data->setDisposition(gui::popup::Disposition{gui::popup::Disposition::Priority::High,
                                                          gui::popup::Disposition::WindowType::Popup,
                                                          gui::popup::ID::BluetoothAuthenticate});
