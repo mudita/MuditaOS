@@ -243,8 +243,20 @@ namespace bluetooth
         case HCI_EVENT_USER_CONFIRMATION_REQUEST: {
             bd_addr_t addr;
             hci_event_user_confirmation_request_get_bd_addr(packet, addr);
-            hci_connection_t *conn = hci_connection_for_bd_addr_and_type(addr, BD_ADDR_TYPE_ACL);
-            hci_send_cmd(&hci_user_confirmation_request_reply, &conn->address);
+
+            auto code = hci_event_user_passkey_notification_get_numeric_value(packet);
+            auto it   = devices().find(addr);
+            if (it == devices().end()) {
+                gap_remote_name_request(addr, PAGE_SCAN_MODE_STANDARD, 0);
+                it = devices().put(addr);
+            }
+            it->isPairingSSP = true;
+
+            auto msg = std::make_shared<::message::bluetooth::RequestAuthenticate>(
+                *it,
+                bluetooth::AuthenticateType::PairCancel,
+                (code != 0) ? static_cast<std::optional<unsigned long>>(code) : std::nullopt);
+            ownerService->bus.sendMulticast(std::move(msg), sys::BusChannel::BluetoothNotifications);
         } break;
 
         case HCI_EVENT_PIN_CODE_REQUEST: {
@@ -257,7 +269,6 @@ namespace bluetooth
             }
             it->isPairingSSP = false;
 
-            /// TODO additional authenticate types to be added in next PRs.
             auto msg =
                 std::make_shared<::message::bluetooth::RequestAuthenticate>(*it, bluetooth::AuthenticateType::Passkey);
             ownerService->bus.sendMulticast(std::move(msg), sys::BusChannel::BluetoothNotifications);
@@ -291,7 +302,6 @@ namespace bluetooth
             }
             it->isPairingSSP = true;
 
-            /// TODO additional authenticate types to be added in next PRs.
             ownerService->bus.sendMulticast(
                 std::make_shared<::message::bluetooth::RequestAuthenticate>(*it, bluetooth::AuthenticateType::Passkey),
                 sys::BusChannel::BluetoothNotifications);
@@ -408,5 +418,14 @@ namespace bluetooth
         }
         auto msg = std::make_shared<BluetoothPairResultMessage>(*it, status == ERROR_CODE_SUCCESS);
         ownerService->bus.sendUnicast(std::move(msg), service::name::bluetooth);
+    }
+    void GAP::finishCodeComparison(bool accepted, Devicei d)
+    {
+        if (accepted) {
+            gap_ssp_confirmation_response(d.address);
+        }
+        else {
+            gap_ssp_confirmation_negative(d.address);
+        }
     }
 } // namespace bluetooth

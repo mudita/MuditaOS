@@ -56,7 +56,8 @@ namespace gui
     void BluetoothAuthenticatePopup::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         auto temp          = dynamic_cast<BluetoothAuthenticateRequestParams *>(data);
-        authenticateParams = new BluetoothAuthenticateRequestParams(temp->getDevice(), temp->getAuthenticateType());
+        authenticateParams = new BluetoothAuthenticateRequestParams(
+            temp->getDevice(), temp->getAuthenticateType(), temp->getPairingCode());
 
         if (authenticateParams == nullptr) {
             LOG_ERROR("No authenticate data received");
@@ -143,8 +144,18 @@ namespace gui
 
     void BluetoothAuthenticatePopup::createButtonsAuthenticateInput()
     {
-        infoIcon->text->setRichText(utils::translate("bluetooth_popup_pair_cancel"),
-                                    {{"$DEVICE", std::string(authenticateParams->getDevice().name.data())}});
+        auto pairingCode = authenticateParams->getPairingCode();
+
+        if (pairingCode.has_value()) {
+            infoIcon->text->setRichText(utils::translate("bluetooth_popup_pair_cancel_code"),
+                                        {{"$DEVICE", std::string(authenticateParams->getDevice().name.data())},
+                                         {"$CODE", utils::to_string(pairingCode.value())}});
+        }
+        else {
+            infoIcon->text->setRichText(utils::translate("bluetooth_popup_pair_cancel_no_code"),
+                                        {{"$DEVICE", std::string(authenticateParams->getDevice().name.data())}});
+        }
+
         navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::confirm));
 
         auto hBox = new HBox(infoIcon, 0, 0, 0, 0);
@@ -157,7 +168,7 @@ namespace gui
             Label *option = new Label(hBox, 0, 0, 0, 0, "");
 
             if (optionName == gui::bluetooth::authenticate::ButtonsOptions::Pair) {
-                option->setText(utils::translate(style::strings::common::yes));
+                option->setText(utils::translate("bluetooth_popup_pair"));
                 option->activatedCallback = [&](Item &) -> bool {
                     application->bus.sendUnicast(std::make_shared<message::bluetooth::ResponseAuthenticatePairCancel>(
                                                      true, authenticateParams->getDevice()),
@@ -166,7 +177,7 @@ namespace gui
                 };
             }
             else if (optionName == gui::bluetooth::authenticate::ButtonsOptions::Cancel) {
-                option->setText(utils::translate(style::strings::common::no));
+                option->setText(utils::translate("bluetooth_popup_cancel"));
                 option->setMargins({0, 0, gui::bluetooth::authenticate::buttons_margin, 0});
                 option->activatedCallback = [=](Item &) -> bool {
                     application->bus.sendUnicast(std::make_shared<message::bluetooth::ResponseAuthenticatePairCancel>(

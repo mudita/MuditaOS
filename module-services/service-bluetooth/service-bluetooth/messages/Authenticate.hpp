@@ -23,9 +23,13 @@ namespace message::bluetooth
       private:
         Devicei device;
         ::bluetooth::AuthenticateType type;
+        std::optional<unsigned long> pairingCode;
 
       public:
-        RequestAuthenticate(const Devicei &dev, ::bluetooth::AuthenticateType type) : device(dev), type(type)
+        RequestAuthenticate(const Devicei &dev,
+                            ::bluetooth::AuthenticateType type,
+                            std::optional<unsigned long> pairingCode = std::nullopt)
+            : device(dev), type(type), pairingCode(pairingCode)
         {}
 
         [[nodiscard]] auto getDevice()
@@ -36,6 +40,10 @@ namespace message::bluetooth
         [[nodiscard]] auto getAuthenticateType()
         {
             return type;
+        }
+        [[nodiscard]] auto getPairingCode()
+        {
+            return pairingCode;
         }
     };
 

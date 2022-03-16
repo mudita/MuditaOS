@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -59,7 +59,7 @@ namespace bluetooth
         auto unpair(Devicei device) -> bool;
         static auto getDevicesList() -> std::vector<Devicei>;
         static void respondPinCode(const std::string &pin, Devicei d);
-
+        static void finishCodeComparison(bool accepted, Devicei d);
         static Devicei currentlyProccesedDevice;
         explicit GAP(sys::Service *owner);
     };

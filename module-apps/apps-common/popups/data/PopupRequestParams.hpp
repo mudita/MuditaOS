@@ -91,10 +91,14 @@ namespace gui
       private:
         Devicei device;
         bluetooth::AuthenticateType type;
+        std::optional<unsigned long> pairingCode;
 
       public:
-        explicit BluetoothAuthenticateRequestParams(const Devicei &dev, bluetooth::AuthenticateType type)
-            : PopupRequestParams{gui::popup::ID::BluetoothAuthenticate}, device{dev}, type{type}
+        explicit BluetoothAuthenticateRequestParams(const Devicei &dev,
+                                                    bluetooth::AuthenticateType type,
+                                                    std::optional<unsigned long> pairingCode = std::nullopt)
+            : PopupRequestParams{gui::popup::ID::BluetoothAuthenticate}, device{dev}, type{type}, pairingCode{
+                                                                                                      pairingCode}
         {}
 
         [[nodiscard]] auto getDevice() const noexcept
@@ -105,6 +109,10 @@ namespace gui
         [[nodiscard]] auto getAuthenticateType() const noexcept
         {
             return type;
+        }
+        [[nodiscard]] auto getPairingCode() const noexcept
+        {
+            return pairingCode;
         }
     };
 
