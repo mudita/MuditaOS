@@ -155,6 +155,7 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
             if (!targetApplication.empty()) {
                 bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
             }
+            bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::service_desktop);
         }
         return sys::msgHandled();
     });
