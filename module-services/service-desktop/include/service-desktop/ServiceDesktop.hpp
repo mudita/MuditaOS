@@ -11,6 +11,7 @@
 #include "Timers/TimerHandle.hpp"
 #include "Constants.hpp"
 #include "USBSecurityModel.hpp"
+#include "system/SystemReturnCodes.hpp"
 #include <service-desktop/BackupRestore.hpp>
 #include <service-desktop/Outbox.hpp>
 #include <service-db/DBServiceName.hpp>
@@ -92,6 +93,8 @@ class ServiceDesktop : public sys::Service
 
     void generateDeviceUniqueId();
     void setDeviceUniqueId(const std::string &token);
+    auto usbWorkerInit() -> sys::ReturnCodes;
+    auto usbWorkerDeinit() -> sys::ReturnCodes;
 
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;

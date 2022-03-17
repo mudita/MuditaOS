@@ -76,6 +76,11 @@ void WorkerDesktop::closeWorker(void)
 
     this->close();
 
+    auto sentinelRemoveMsg = std::make_shared<sys::SentinelRemovalMessage>("WorkerDesktop");
+    ownerService->bus.sendUnicast(sentinelRemoveMsg, service::name::system_manager);
+    cpuSentinel.reset();
+
+    usbSuspendTimer.reset();
     LOG_DEBUG("deinit end");
     initialized = false;
 }

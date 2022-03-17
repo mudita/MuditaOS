@@ -1,6 +1,8 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "service-evtmgr/BatteryMessages.hpp"
+#include "system/SystemReturnCodes.hpp"
 #include <service-appmgr/messages/DOMRequest.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
@@ -20,6 +22,7 @@
 #include <purefs/filesystem_paths.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <Timers/TimerFactory.hpp>
+#include <EventStore.hpp>
 
 #include <system/Constants.hpp>
 #include <system/messages/TetheringStateRequest.hpp>
@@ -112,27 +115,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
     usbSecurityModel = std::make_unique<sdesktop::USBSecurityModel>(this, settings.get());
-
-    auto serialNumber = getSerialNumber();
-
-    LOG_DEBUG("Serial Number: %s", serialNumber.c_str());
-
-    desktopWorker = std::make_unique<WorkerDesktop>(
-        this, std::bind(&ServiceDesktop::restartNotificationsClearTimer, this), *usbSecurityModel, serialNumber);
-
-    initialized =
-        desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
-                             {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size},
-                             {sdesktop::IRQ_QUEUE_BUFFER_NAME, 1, sdesktop::irq_queue_object_size}});
-
-    if (initialized == false) {
-        LOG_ERROR("!!! service-desktop InitHandler failed to initialize worker, service-desktop won't work");
-        return sys::ReturnCodes::Failure;
-    }
-    else {
-        desktopWorker->run();
-    }
-
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
         if (request->event != nullptr) {
@@ -213,6 +195,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         }
         bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
                         service::name::system_manager);
+
         return sys::MessageNone{};
     });
 
@@ -238,6 +221,15 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         auto msgl = static_cast<message::bluetooth::ResponseStatus *>(msg);
         return btMsgHandler->handle(msgl);
     });
+    connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) {
+        if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+            usbWorkerDeinit();
+        }
+        else {
+            usbWorkerInit();
+        }
+        return sys::MessageNone{};
+    });
 
     connect(typeid(message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
         auto msgl = static_cast<message::bluetooth::ResponseBondedDevices *>(msg);
@@ -249,19 +241,16 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return btMsgHandler->handle(msgl);
     });
 
+    if (auto resUsb = usbWorkerInit(); resUsb != sys::ReturnCodes::Success) {
+        return resUsb;
+    }
+
     return (sys::ReturnCodes::Success);
 }
 
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
 {
-    LOG_DEBUG(".. deinit ..");
-    if (initialized) {
-        settings->deinit();
-        desktopWorker->closeWorker();
-        desktopWorker.reset();
-        initialized = false;
-    }
-    return sys::ReturnCodes::Success;
+    return usbWorkerDeinit();
 }
 
 sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -336,4 +325,42 @@ void ServiceDesktop::removeNotificationEntries(const std::vector<int> &uidsOfNot
 void ServiceDesktop::restartNotificationsClearTimer()
 {
     notificationsClearTimer.restart(sdesktop::notificationsClearTimerDelayMs);
+}
+
+auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
+{
+    if (!initialized) {
+        auto serialNumber = getSerialNumber();
+
+        LOG_DEBUG("usbWorkerInit Serial Number: %s", serialNumber.c_str());
+
+        desktopWorker = std::make_unique<WorkerDesktop>(
+            this, std::bind(&ServiceDesktop::restartNotificationsClearTimer, this), *usbSecurityModel, serialNumber);
+
+        initialized = desktopWorker->init(
+            {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
+             {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size},
+             {sdesktop::IRQ_QUEUE_BUFFER_NAME, 1, sdesktop::irq_queue_object_size}});
+
+        if (initialized == false) {
+            LOG_ERROR("!!! service-desktop usbWorkerInit failed to initialize worker, service-desktop won't work");
+            return sys::ReturnCodes::Failure;
+        }
+        else {
+            desktopWorker->run();
+        }
+    }
+    return sys::ReturnCodes::Success;
+}
+
+auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
+{
+    if (initialized) {
+        LOG_DEBUG(".. usbWorkerDeinit ..");
+        settings->deinit();
+        desktopWorker->closeWorker();
+        desktopWorker.reset();
+        initialized = false;
+    }
+    return sys::ReturnCodes::Success;
 }
