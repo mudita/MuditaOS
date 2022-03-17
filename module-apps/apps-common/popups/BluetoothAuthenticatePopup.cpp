@@ -133,7 +133,7 @@ namespace gui
             authenticateParams->getAuthenticateType() == ::bluetooth::AuthenticateType::Pin) {
 
             if (inputText->getText().length() >= bluetooth::authenticate::min_passkey_signs_count) {
-                navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::confirm));
+                navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
             }
             else {
                 navBar->setActive(nav_bar::Side::Center, false);
