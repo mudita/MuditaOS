@@ -45,7 +45,7 @@ namespace
 {
     constexpr auto BluetoothServiceStackDepth = 2560U;
     inline constexpr auto nameSettings        = "ApplicationSettings";
-    inline constexpr auto connectionTimeout   = std::chrono::minutes{30};
+    inline constexpr auto connectionTimeout   = std::chrono::minutes{10};
     inline constexpr auto btRestartDelay      = std::chrono::milliseconds{500};
 
 } // namespace
@@ -79,11 +79,9 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
-    connectionTimeoutTimer =
-        sys::TimerFactory::createSingleShotTimer(this, "btTimeoutTimer", connectionTimeout, [this](sys::Timer &_) {
-            sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::DisconnectAudio));
-            LOG_ERROR("Disconnecting from timeout timer!");
-        });
+    connectionTimeoutTimer = sys::TimerFactory::createSingleShotTimer(
+        this, "btTimeoutTimer", connectionTimeout, [this](sys::Timer &_) { handleTurnOff(); });
+    startTimeoutTimer();
 
     connectHandler<BluetoothAddrMessage>();
     connectHandler<BluetoothAudioStartMessage>();
@@ -200,13 +198,11 @@ auto ServiceBluetooth::handle(message::bluetooth::SetStatus *msg) -> std::shared
             bluetoothDevicesModel->mergeDevicesList(SettingsSerializer::fromString(bondedDevicesStr));
             bluetoothDevicesModel->syncDevicesWithApp();
         }
+        startTimeoutTimer();
         break;
     case BluetoothStatus::State::Off:
-        sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOff));
-        cpuSentinel->ReleaseMinimumFrequency();
-        bus.sendMulticast(
-            std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Disabled),
-            sys::BusChannel::BluetoothModeChanges);
+        handleTurnOff();
+        stopTimeoutTimer();
         break;
     default:
         break;
@@ -303,10 +299,12 @@ auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::sh
         bluetoothDevicesModel->mergeInternalDeviceState(device);
 
         settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, bd_addr_to_str(device.address));
-        startTimeoutTimer();
+
         bus.sendMulticast(
             std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Connected),
             sys::BusChannel::BluetoothModeChanges);
+
+        stopTimeoutTimer();
     }
 
     for (auto &device : bluetoothDevicesModel->getDevices()) {
@@ -343,11 +341,12 @@ auto ServiceBluetooth::handle(message::bluetooth::DisconnectResult *msg) -> std:
         bus.sendMulticast(
             std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Enabled),
             sys::BusChannel::BluetoothModeChanges);
+
+        startTimeoutTimer();
     }
 
     bus.sendMulticast(std::make_shared<message::bluetooth::DisconnectResult>(msg->getDevice()),
                       sys::BusChannel::BluetoothNotifications);
-    stopTimeoutTimer();
 
     return sys::MessageNone{};
 }
@@ -377,6 +376,8 @@ auto ServiceBluetooth::handle(message::bluetooth::ResponseAuthenticatePairCancel
 auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Message>
 {
     LOG_INFO("Bluetooth request!");
+    resetTimeoutTimer();
+
     switch (msg->req) {
     case BluetoothMessage::Start:
         break;
@@ -398,8 +399,6 @@ auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Mes
     } break;
     case BluetoothMessage::Play:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StartStream));
-        stopTimeoutTimer();
-
         break;
     case BluetoothMessage::SwitchProfile:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::SwitchProfile));
@@ -409,7 +408,6 @@ auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Mes
         break;
     case BluetoothMessage::Stop:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StopStream));
-        startTimeoutTimer();
         break;
     default:
         break;
@@ -499,4 +497,20 @@ void ServiceBluetooth::stopTimeoutTimer()
     if (connectionTimeoutTimer.isValid()) {
         connectionTimeoutTimer.stop();
     }
+}
+
+void ServiceBluetooth::resetTimeoutTimer()
+{
+    if (connectionTimeoutTimer.isValid()) {
+        connectionTimeoutTimer.stop();
+        connectionTimeoutTimer.start();
+    }
+}
+
+void ServiceBluetooth::handleTurnOff()
+{
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOff));
+    cpuSentinel->ReleaseMinimumFrequency();
+    bus.sendMulticast(std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Disabled),
+                      sys::BusChannel::BluetoothModeChanges);
 }
