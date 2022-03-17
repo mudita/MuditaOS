@@ -9,7 +9,7 @@ file(GLOB_RECURSE LFSFUSE_SRCS *.c)
 add_executable(${PROJECT_NAME} ${LFSFUSE_SRCS})
 
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -pedantic -Wno-missing-field-initializers)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -pedantic -Wno-missing-field-initializers -Wno-array-bounds -Wno-maybe-uninitialized)
 target_compile_definitions( ${PROJECT_NAME}
         PRIVATE
         _FILE_OFFSET_BITS=64
