@@ -22,7 +22,6 @@ namespace app::bell_settings
         this->provider->onExit = [this]() { getView()->exit(); };
 
         this->provider->onToneEnter  = playSound;
-        this->provider->onToneExit   = [this](const auto &) { stopSound(); };
         this->provider->onToneChange = playSound;
 
         this->provider->onVolumeEnter  = playSound;
@@ -65,6 +64,7 @@ namespace app::bell_settings
     }
     void SettingsPresenter::exitWithoutSave()
     {
+        this->stopSound();
         model->getBedtimeVolume().restoreDefault();
     }
 } // namespace app::bell_settings

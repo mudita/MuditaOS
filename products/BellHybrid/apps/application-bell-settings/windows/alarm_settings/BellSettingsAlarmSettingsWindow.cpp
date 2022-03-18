@@ -55,6 +55,9 @@ namespace gui
             exit();
             return true;
         }
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            presenter->exitWithRollback();
+        }
 
         return AppWindow::onInput(inputEvent);
     }
