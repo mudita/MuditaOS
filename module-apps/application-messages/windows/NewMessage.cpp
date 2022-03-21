@@ -284,6 +284,12 @@ namespace gui
                 memento->setState(message);
                 return app->newMessageOptions(getName(), message);
             }
+            if (event.isShortRelease(KeyCode::KEY_RF)) {
+                onClose(CloseReason::WindowSwitch);
+            }
+            if (event.isKeyRelease(KeyCode::KEY_VOLUP) || event.isKeyRelease(KeyCode::KEY_VOLDN)) {
+                memento->setState(message);
+            }
             return false;
         };
         body->addWidget(message);
