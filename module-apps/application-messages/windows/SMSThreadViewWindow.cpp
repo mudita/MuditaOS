@@ -109,6 +109,9 @@ namespace gui
             smsList->rebuildList();
             return true;
         }
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            onClose(CloseReason::WindowSwitch);
+        }
         return AppWindow::onInput(inputEvent);
     }
 
