@@ -39,7 +39,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setNavBarText(utils::translate(style::strings::common::Switch), nav_bar::Side::Center);
+                        this->setNavBarText(utils::translate(style::strings::common::select), nav_bar::Side::Center);
                     }
                     return true;
                 },

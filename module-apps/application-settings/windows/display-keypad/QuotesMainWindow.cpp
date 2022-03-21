@@ -47,6 +47,18 @@ namespace gui
                                  quotesModel,
                                  gui::listview::ScrollBarType::Fixed);
 
+        list->emptyListCallback = [this]() {
+            navBar->setActive(nav_bar::Side::Left, false);
+            navBar->setActive(nav_bar::Side::Center, false);
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        };
+
+        list->notEmptyListCallback = [this]() {
+            navBar->setActive(nav_bar::Side::Left, true);
+            navBar->setActive(nav_bar::Side::Center, true);
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        };
+
         setFocusItem(list);
     }
 
