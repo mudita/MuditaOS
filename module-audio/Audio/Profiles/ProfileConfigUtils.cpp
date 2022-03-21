@@ -10,18 +10,20 @@ namespace audio
 {
     namespace strings
     {
-        constexpr inline auto samplerate   = "samplerate";
-        constexpr inline auto bitWidth     = "bitWidth";
-        constexpr inline auto flags        = "flags";
-        constexpr inline auto outputVolume = "outputVolume";
-        constexpr inline auto outputPath   = "outputPath";
-        constexpr inline auto inputGain    = "inputGain";
-        constexpr inline auto inputPath    = "inputPath";
-        constexpr inline auto filterParams = "filterParams";
-        constexpr inline auto filterType   = "filterType";
-        constexpr inline auto frequency    = "frequency";
-        constexpr inline auto Q            = "Q";
-        constexpr inline auto gain         = "gain";
+        constexpr inline auto samplerate        = "samplerate";
+        constexpr inline auto bitWidth          = "bitWidth";
+        constexpr inline auto flags             = "flags";
+        constexpr inline auto outputVolume      = "outputVolume";
+        constexpr inline auto outputPath        = "outputPath";
+        constexpr inline auto inputGain         = "inputGain";
+        constexpr inline auto inputPath         = "inputPath";
+        constexpr inline auto filterParams      = "filterParams";
+        constexpr inline auto filterType        = "filterType";
+        constexpr inline auto frequency         = "frequency";
+        constexpr inline auto Q                 = "Q";
+        constexpr inline auto gain              = "gain";
+        constexpr inline auto playbackPathGain  = "playbackPathGain";
+        constexpr inline auto playbackPathAtten = "playbackPathAtten";
     } // namespace strings
 
     namespace utils
@@ -86,6 +88,29 @@ namespace audio
         config.inputGain     = configJson[strings::inputGain].number_value();
         config.inputPath     = utils::toEnum<codec::InputPath>(configJson[strings::inputPath].int_value());
         config.outputPath    = utils::toEnum<codec::OutputPath>(configJson[strings::outputPath].int_value());
+
+        std::uint8_t playbackPathGain  = configJson[strings::playbackPathGain].int_value();
+        std::uint8_t playbackPathAtten = configJson[strings::playbackPathAtten].int_value();
+
+        constexpr std::uint8_t playbackPathGainMax = 3;
+        if (playbackPathGain <= playbackPathGainMax) {
+            config.playbackPathGain = playbackPathGain;
+        }
+        else {
+            LOG_WARN("playbackPathGain value out of range (%u), using fallback value %u!",
+                     playbackPathGain,
+                     config.playbackPathGain);
+        }
+
+        constexpr std::uint8_t playbackPathAttenMax = 15;
+        if (playbackPathAtten <= playbackPathAttenMax) {
+            config.playbackPathAtten = playbackPathAtten;
+        }
+        else {
+            LOG_WARN("playbackPathAtten value out of range (%u), using fallback value %u!",
+                     playbackPathAtten,
+                     config.playbackPathAtten);
+        }
 
         json11::Json::array paramsArray;
         audio::equalizer::Equalizer filterParams;

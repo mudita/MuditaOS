@@ -6,6 +6,8 @@
   "inputGain": 0,
   "inputPath": 1,
   "outputPath": 2,
+  "playbackPathGain": 0,
+  "playbackPathAtten": 5,
   "filterParams": [
     {
       "filterType": "HighPass",

@@ -6,8 +6,8 @@
   "inputGain": 2,
   "inputPath": 2,
   "outputPath": 3,
-  "playbackPathGain": 2,
-  "playbackPathAtten": 3,
+  "playbackPathGain": 30,
+  "playbackPathAtten": -17,
   "filterParams": [
     {
       "filterType": "None",
