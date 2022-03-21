@@ -21,10 +21,13 @@ namespace audio
                       .flags =
                           static_cast<uint32_t>(audio::codec::Flags::InputLeft) | // microphone use left audio channel
                           static_cast<uint32_t>(audio::codec::Flags::OutputMono),
-                      .outputVolume = 0,
-                      .inputGain    = 0,
-                      .inputPath    = audio::codec::InputPath::Microphone,
-                      .outputPath   = audio::codec::OutputPath::Earspeaker,
+                      .outputVolume      = 0,
+                      .inputGain         = 0,
+                      .playbackPathGain  = 0,
+                      .playbackPathAtten = 5,
+                      .inputPath         = audio::codec::InputPath::Microphone,
+                      .outputPath        = audio::codec::OutputPath::Earspeaker,
+
                       .filterCoefficients =
                           {qfilter_CalculateCoeffs(audio::equalizer::FilterType::HighPass, 700.f, 44100, 0.701f, 10),
                            qfilter_CalculateCoeffs(audio::equalizer::FilterType::LowPass, 4993.7f, 44100, 0.701f, -5),

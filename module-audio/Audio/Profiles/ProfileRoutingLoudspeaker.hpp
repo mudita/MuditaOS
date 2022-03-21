@@ -25,6 +25,8 @@ namespace audio
                           static_cast<uint32_t>(audio::codec::Flags::OutputMono),
                       .outputVolume       = 0,
                       .inputGain          = 0,
+                      .playbackPathGain   = 0,
+                      .playbackPathAtten  = 5,
                       .inputPath          = audio::codec::InputPath::Microphone,
                       .outputPath         = audio::codec::OutputPath::Loudspeaker,
                       .filterCoefficients = {qfilter_CalculateCoeffs(

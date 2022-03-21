@@ -60,6 +60,8 @@ TEST_CASE("Audio profile config utils")
         REQUIRE(config.outputVolume == 1.0);
         REQUIRE(config.inputPath == audio::codec::InputPath::None);
         REQUIRE(config.outputPath == audio::codec::OutputPath::None);
+        REQUIRE(config.playbackPathGain == 2);
+        REQUIRE(config.playbackPathAtten == 3);
 
         audio::equalizer::Equalizer filterCoefficients = {
             qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 1000.2f, 44100, 0.7f, 10),
@@ -71,5 +73,13 @@ TEST_CASE("Audio profile config utils")
         for (size_t i = 0; i < audio::equalizer::bands; i++) {
             REQUIRE(config.filterCoefficients.at(i) == filterCoefficients.at(i));
         }
+    }
+
+    SECTION("Checking if fallback values are loaded when playback path parameters are out of range")
+    {
+        auto config = audio::loadConfigurationFromFile("testfiles/testProfileFallback.json");
+
+        REQUIRE(config.playbackPathGain == 0);
+        REQUIRE(config.playbackPathAtten == 5);
     }
 }

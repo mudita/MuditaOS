@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CodecMAX98090.hpp"
@@ -134,9 +134,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2cAddr.subAddress                                   = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
 
-            constexpr uint8_t coarse = 2;
-            constexpr uint8_t fine   = 2;
-            SetPlaybackPath(coarse, fine);
+            SetPlaybackPath(params.playbackPathGain, params.playbackPathAtten);
             SetFilterMode(FilterMode::Voice);
         } break;
 
@@ -157,9 +155,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
             i2c->Write(i2cAddr, (uint8_t *)&outputenable, 1);
 
-            constexpr uint8_t coarse = 0;
-            constexpr uint8_t fine   = 2;
-            SetPlaybackPath(coarse, fine);
+            SetPlaybackPath(params.playbackPathGain, params.playbackPathAtten);
         } break;
 
         case CodecParamsMAX98090::OutputPath::LoudspeakerMono: {
@@ -175,9 +171,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
             i2c->Write(i2cAddr, (uint8_t *)&outputenable, 1);
 
-            constexpr uint8_t coarse = 0;
-            constexpr uint8_t fine   = 5;
-            SetPlaybackPath(coarse, fine);
+            SetPlaybackPath(params.playbackPathGain, params.playbackPathAtten);
             SetFilterMode(FilterMode::Voice);
         } break;
 

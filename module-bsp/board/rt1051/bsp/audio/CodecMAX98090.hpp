@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_CODECMAX98090_HPP
@@ -60,9 +60,11 @@ class CodecParamsMAX98090 : public CodecParams
         None
     };
 
-    bool muteEnable       = false;
-    bool resetEnable      = false;
-    bool micBiasEnable    = false;
+    bool muteEnable                = false;
+    bool resetEnable               = false;
+    bool micBiasEnable             = false;
+    std::uint8_t playbackPathGain  = 0;
+    std::uint8_t playbackPathAtten = 0;
     InputPath inputPath   = InputPath::None;
     OutputPath outputPath = OutputPath::None;
 };
