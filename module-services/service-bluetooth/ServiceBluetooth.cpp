@@ -201,8 +201,8 @@ auto ServiceBluetooth::handle(message::bluetooth::SetStatus *msg) -> std::shared
         startTimeoutTimer();
         break;
     case BluetoothStatus::State::Off:
-        handleTurnOff();
         stopTimeoutTimer();
+        handleTurnOff();
         break;
     default:
         break;
@@ -501,7 +501,7 @@ void ServiceBluetooth::stopTimeoutTimer()
 
 void ServiceBluetooth::resetTimeoutTimer()
 {
-    if (connectionTimeoutTimer.isValid()) {
+    if (connectionTimeoutTimer.isValid() && connectionTimeoutTimer.isActive()) {
         connectionTimeoutTimer.stop();
         connectionTimeoutTimer.start();
     }
