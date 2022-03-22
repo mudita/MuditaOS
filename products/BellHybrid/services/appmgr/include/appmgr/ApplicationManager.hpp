@@ -17,6 +17,7 @@ namespace app::manager
 
       protected:
         auto handleAction(ActionEntry &action) -> ActionProcessStatus override;
+        auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool override;
 
       private:
         sys::TimerHandle idleTimer;

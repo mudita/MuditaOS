@@ -51,6 +51,7 @@ namespace app::manager
         auto handleAction(ActionEntry &action) -> ActionProcessStatus override;
         void handleStart(StartAllowedMessage *msg) override;
         void runAppsInBackground();
+        auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool override;
 
         std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
         sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
