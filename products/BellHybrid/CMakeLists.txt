@@ -72,6 +72,12 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     add_dependencies(BellHybrid service_renderer)
 endif()
 
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    set(LUTSBIN "Luts.bin")
+else()
+    set(LUTSBIN "")
+endif()
+
 set_source_files_properties(BellHybridMain.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 
 strip_executable(BellHybrid)
@@ -82,8 +88,7 @@ add_boot_bin(BellHybrid)
 add_image(
     PRODUCT BellHybrid
     SYSROOT sysroot
-    "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:LUTS Luts.bin>"
-    "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:LUTS \"\">"
+    LUTS ${LUTSBIN}
     DEPENDS assets updater.bin-target ecoboot.bin-target BellHybrid-boot.bin BellHybrid-version.json-target
 )
 
@@ -113,11 +118,10 @@ download_asset_release_json(json-community-target
                             0.0.4
                             ${MUDITA_CACHE_DIR}
     )
-download_asset_release_json(json-rt1051-target
+download_asset_json(json-rt1051-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_rt1051.json
                             ${CMAKE_BINARY_DIR}/sysroot/sys/current/
-                            MuditaOSPublicAssets
-                            0.0.4
+                            MuditaOSAssets
                             ${MUDITA_CACHE_DIR}
     )
 download_asset_release(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION}  ${MUDITA_CACHE_DIR})
