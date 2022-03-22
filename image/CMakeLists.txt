@@ -15,7 +15,7 @@ if (${ASSETS_TYPE} STREQUAL "Community")
 endif()
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    list(APPEND ASSETS_DEPENDENCIES "json-json-rt1051-target")
+    list(APPEND ASSETS_DEPENDENCIES "json-rt1051-target")
 endif()
 
 add_assets_target(
