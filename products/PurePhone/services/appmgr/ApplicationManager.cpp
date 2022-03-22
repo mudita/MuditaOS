@@ -603,4 +603,19 @@ namespace app::manager
             break;
         }
     }
+
+    auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
+    {
+        const auto &requestedLanguage = msg->getLanguage();
+
+        if (not utils::setDisplayLanguage(requestedLanguage)) {
+            LOG_WARN("The selected language is already set. Ignore.");
+            return false;
+        }
+        settings->setValue(
+            settings::SystemProperties::displayLanguage, requestedLanguage, settings::SettingsScope::Global);
+        rebuildActiveApplications();
+        DBServiceAPI::InformLanguageChanged(this);
+        return true;
+    }
 } // namespace app::manager

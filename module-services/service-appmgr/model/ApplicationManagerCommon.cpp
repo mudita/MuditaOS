@@ -665,7 +665,6 @@ namespace app::manager
         settings->setValue(
             settings::SystemProperties::displayLanguage, requestedLanguage, settings::SettingsScope::Global);
         rebuildActiveApplications();
-        DBServiceAPI::InformLanguageChanged(this);
         return true;
     }
 

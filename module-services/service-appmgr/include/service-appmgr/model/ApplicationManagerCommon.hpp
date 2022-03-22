@@ -106,6 +106,8 @@ namespace app::manager
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         virtual void handleStart(StartAllowedMessage *msg);
         virtual auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
+        virtual auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
+        void rebuildActiveApplications();
 
         ApplicationName rootApplicationName;
         ActionsRegistry actionsRegistry;
@@ -113,7 +115,6 @@ namespace app::manager
 
       private:
         void startPendingApplicationOnCurrentClose();
-        void rebuildActiveApplications();
         void suspendSystemServices();
         void closeNoLongerNeededApplications();
         auto closeApplications() -> bool;
@@ -131,7 +132,6 @@ namespace app::manager
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
         auto handleInitApplication(ApplicationInitialised *msg) -> bool;
-        auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
         virtual auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer;

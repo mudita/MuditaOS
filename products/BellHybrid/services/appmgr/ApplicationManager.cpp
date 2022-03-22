@@ -9,6 +9,7 @@
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
 #include <service-appmgr/Constants.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace app::manager
 {
@@ -43,6 +44,11 @@ namespace app::manager
         default:
             return ApplicationManagerCommon::handleAction(action);
         }
+    }
+
+    auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
+    {
+        return ApplicationManagerCommon::handleDisplayLanguageChange(msg);
     }
 
     void ApplicationManager::registerMessageHandlers()
