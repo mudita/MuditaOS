@@ -43,7 +43,11 @@ namespace CellularCall
         if (callRingGuard(*this)) {
             startCall(utils::PhoneNumber::View(), CallType::CT_INCOMING);
             audio.play();
-            gui.notifyRING();
+
+            if (!wasRinging) {
+                wasRinging = true;
+                gui.notifyRING();
+            }
             return true;
         }
         return false;
@@ -58,7 +62,10 @@ namespace CellularCall
         }
 
         if (callClipGuard(*this) || callRingGuard(*this)) {
-            gui.notifyCLIP(number);
+            if (!isNumberDisplayed) {
+                isNumberDisplayed = true;
+                gui.notifyCLIP(number);
+            }
             return true;
         }
 

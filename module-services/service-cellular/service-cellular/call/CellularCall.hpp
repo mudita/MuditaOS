@@ -35,7 +35,9 @@ namespace CellularCall
     class Call
     {
         CalllogRecord call;
-        bool isActiveCall = false;
+        bool isActiveCall      = false;
+        bool wasRinging        = false;
+        bool isNumberDisplayed = false;
         std::function<CalllogRecord(const CalllogRecord &rec)> startCallAction;
         std::function<bool(const CalllogRecord &rec)> endCallAction;
         utils::time::Timestamp startActiveTime;
@@ -54,8 +56,10 @@ namespace CellularCall
 
         void clear()
         {
-            call         = CalllogRecord();
-            isActiveCall = false;
+            call              = CalllogRecord();
+            isActiveCall      = false;
+            wasRinging        = false;
+            isNumberDisplayed = false;
             startActiveTime.set_time(0);
         }
 
