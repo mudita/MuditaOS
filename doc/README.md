@@ -6,7 +6,7 @@ This folder contains the documentation of the MuditaOS.
 ## Developer guides
 
 - [Development environment](quickstart.md)
-- [Build targets supported by MuditaOS](./doc/build_targets.md)
+- [Build targets supported by MuditaOS](build_targets.md)
 - [Setting up integrated development environment](setup_ide.md)
 - [How to use Mudita Pure simulator](howto_simulator.md)
 - [Keybindings on Linux](host_keyboard_bindings.md)
@@ -14,7 +14,7 @@ This folder contains the documentation of the MuditaOS.
 - [Windows and macOS - flashing Pure with image](flashing_win_macos.md)
 - [Test harness](../test/README.md)
 - [Tethering](tethering.md)
-- [Coding Guidelines](./MuditaCppCodingGuidelines.md)
+- [Coding Guidelines](MuditaCppCodingGuidelines.md)
 
 ## System documentation
 
@@ -42,7 +42,7 @@ Documentation listed below is system documentation listed depending on where it 
     - [Desktop](../module-services/service-desktop/README.md)
     - [GUI](../module-services/service-gui/doc/README.md)
 - Utilities
-    - [How to use Logging engine](./module-utils/log/doc/logging_engine.md)
+    - [How to use Logging engine](../module-utils/log/doc/logging_engine.md)
 - Tools
     - [MapParser](https://github.com/mudita/misc-tools/blob/master/mapparser/README.md)
     - [PureGDB](https://github.com/mudita/misc-tools/blob/master/puregdb/README.md)

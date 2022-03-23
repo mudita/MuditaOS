@@ -1,6 +1,5 @@
-# Setting up an integrated development environment
-
-## Table of contents
+Setting up an integrated development environment
+================================================
 - [Setting up in Eclipse](#setting-up-in-eclipse)
 - [Setting up in CLion](#setting-up-in-clion)
 - [Setting up in QtCreator](#setting-up-in-qtcreator)
@@ -8,7 +7,7 @@
     + [Prevent Git from suggesting commits](#prevent-git-from-suggesting-commits)
     + [Seperate build folders](#separate-build-folders)
 
-### Setting up in Eclipse
+## Setting up in Eclipse
 
 To run the project in Eclipse:
 
@@ -22,9 +21,9 @@ To run the project in Eclipse:
 
 5. In `Debugger` tab set `GDB command file` to `${project_loc}/.gdbinit`
 
-### Setting up in CLion
+## Setting up in CLion
 
-#### Setting up Toolchains
+### Setting up Toolchains
 
 1. Open settings (CTRL+ALT+S)
 2. Go to `Build, Execution, Deployment` -> `Toolchain`
@@ -39,7 +38,7 @@ To run the project in Eclipse:
         - Select appropriate `gdb`
         - for RT1051 it's usually `~/gcc-arm-eabi…`
 
-#### Building configurations
+### Building configurations
 
 1. Open settings (CTRL+ALT+S)
 2. Go to `Build, Execution, Deployment` -> `CMake`
@@ -71,8 +70,8 @@ To run the project in Eclipse:
   - Generation path: `build-rt1051`
   - build options: `-j8`
 
-#### Running/debugging
-##### Linux configuration
+### Running/debugging
+#### Linux configuration
 
 **Important**
 Before 1st run, execute `Build All in 'Linux'` to generate the `service_renderer` utility.
@@ -82,7 +81,7 @@ In `Working directory` append `/build`.
 
 Now you can run/debug this configuration.
 
-##### RT1051 configuration
+#### RT1051 configuration
 
 Use file `.idea/JLink_server.xml` to setup IDE. It's already in the project folder, so CLion should pick it up automatically.
 
@@ -92,7 +91,7 @@ This file needs to be present in `$HOME/.gdbinit`.
 
 Try this command to input it there `ln -s %project_root%/.gdbinit-1051-clion ~/.gdbinit`. 
 
-##### Workflow
+#### Workflow
 
 In the debuging configuration dropdown select a pair of **<exec>** and **<toolchn>** (**[ \<exec\> | \<toolchn\> \]**):
 - **\[PurePhone | Linux\]** for run/debug on desktop (Linux)
@@ -100,9 +99,9 @@ In the debuging configuration dropdown select a pair of **<exec>** and **<toolch
 
 **Note:** RT1051 doesn't have *run* configuration. Only debug is available.
 
-![Profit](https://user-images.githubusercontent.com/56958031/71167426-f28ac780-2254-11ea-8efb-8375fb004004.png)
+![CLion screenshot 1](Images/setup_ide/clion_ss1.png)
 
-##### Running target
+#### Running target
 It's possible to see logs from a RT1051 booted from eMMC and not from RAM. 
 To do so select `JLink server (no upload)` configuration.
 
@@ -112,7 +111,7 @@ Open `JLinkRTTClient` in a separate terminal.
 
 To properly debug a running target you need to reset it first. Attaching to an already running target won't work.
 
-#### Separate build folders in CLion
+### Separate build folders in CLion
 
 To build separately for each architecture you need to:
 
@@ -134,14 +133,14 @@ After the above steps:
 - Change run/debug `Working directory` for Linux configuration. (`Edit configurations…` -> `PurePhone`)
 - Change `Working directory` from `…/PurePhone/build` to `…PurePhone/build-linux`
 
-### Setting up in QtCreator
+## Setting up in QtCreator
 
 - Install `QtCreator` version `3.5` or later
 - Install `CMake` version `3.19.5` or later
 - It is highly recommended that you install `Ninja` as it will radically decrease rebuild times.
 - [Ensure `CMake` is setup in `QtCreator`](https://doc.qt.io/qtcreator/creator-project-cmake.html)
 
-#### Project configurations
+### Project configurations
 
 - Go to `File` -> `Open File or Project...` and select the `CMakeLists.txt` project file.
 - After selecting the kits you wish to use select the `Projects` button on the left bar.
@@ -162,15 +161,15 @@ After the above steps:
     ```
 - Build project normally.
 
-### Additional info
+## Additional info
 
-#### Prevent git from suggesting commits
+### Prevent git from suggesting commits
 
 If you want to prevent git from suggesting you to commit changes to the configuration files where we place local paths and other data, please cast following spell: `git update-index --skip-worktree env.cmake`
 
 This will tell git to ignore local changes to the file. In above example we are preventing commiting changes to file called `env.cmake` where you probably want to place local path to Arm's toolchain.
 
-#### Separate build folders
+### Separate build folders
 
 By default both targets (Linux & RT1051) are build into the same destination (the `build` folder).
 
@@ -198,7 +197,7 @@ You can build only the Linux build inside its separate folder, and leave RT1051 
 
 Guide for CLion has a dedicated section entitled ["Separate build folders in CLion"](#separate-build-folders-in-clion).
 
-##### How it works
+#### How it works
 
 By default `./rebuild.sh` copies assets and generates CMakes to generic `build`.
 `SEPARATE_BUILDS=1` overrides it.

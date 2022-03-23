@@ -13,5 +13,3 @@ You can also run the simulator on disk image with the same layout as we got on t
 To unlock the simulator press `s` on the keyboard to simulate the centre function key and then press `c` which simulates a `#` key. Then enter the default pin of `3333`.
 
 To move around the simulator please use the ["Keyboard binding on Linux Pure simulator" document](host_keyboard_bindings.md).
-
-[![Mudita Pure Simulator](https://res.cloudinary.com/marcomontalbano/image/upload/v1616080178/video_to_markdown/images/google-drive--1qxRZMRJ2j6I4ilaF_77N4YQoiLoAdK9c-c05b58ac6eb4c4700831b2b3070cd403.jpg)](https://drive.google.com/file/d/1qxRZMRJ2j6I4ilaF_77N4YQoiLoAdK9c/view?usp=sharing "Mudita Pure Simulator")

@@ -2,8 +2,8 @@ How to generate documentation using Doxygen
 =============================================
 
 **NOTE:** doxygen documentation is just another target.
-Basic targets documentation can be found [here](./build_targets.md).
-How to setup environment to be able to build the targets is here: [quickstart](./quickstart.md)
+Basic targets documentation can be found [here](build_targets.md).
+How to setup environment to be able to build the targets is here: [quickstart](quickstart.md)
 
 
 Fully detailed doxygen documentation can be built locally using [Doxygen](https://www.doxygen.nl/index.html).
