@@ -1,32 +1,28 @@
-# Development environment setup
-
-Table of Contents
-=================
-
-* [Development environment setup](#development-environment-setup)
-   * [Introduction](#introduction)
-      * [Download repository and submodules](#download-repository-and-submodules)
-      * [Install dependencies](#install-dependencies)
-         * [bootstrap](#bootstrap)
-         * [JLink software](#jlink-software)
-         * [Add GitHub token](#add-github-token)
-         * [Project configuration](#project-configuration)
-         * [Project build](#project-build)
-         * [Project load and run](#project-load-and-run)
-            * [Running on linux](#running-on-linux)
-            * [Running on rt1051 from emmc](#running-on-rt1051-from-emmc)
-      * [checking commits](#checking-commits)
-      * [CMake options](#cmake-options)
-         * [Catching logs using UART](#catching-logs-using-uart)
-   * [More details on preparing your local environment](#more-details-on-preparing-your-local-environment)
-      * [Code style with git hooks](#code-style-with-git-hooks)
-      * [Commit message template](#commit-message-template)
-      * [Commit message hook](#commit-message-hook)
-         * [Adding a hook:](#adding-a-hook)
-         * [Using a hook:](#using-a-hook)
-   * [Build using Docker](#build-using-docker)
-      * [Building your own Docker image](#building-your-own-docker-image)
-   * [Preparing packages](#preparing-packages)
+Development environment setup
+=============================
+* [Introduction](#introduction)
+   * [Download repository and submodules](#download-repository-and-submodules)
+   * [Install dependencies](#install-dependencies)
+      * [bootstrap](#bootstrap)
+      * [JLink software](#jlink-software)
+      * [Add GitHub token](#add-github-token)
+      * [Project configuration](#project-configuration)
+      * [Project build](#project-build)
+      * [Project load and run](#project-load-and-run)
+         * [Running on linux](#running-on-linux)
+         * [Running on rt1051 from emmc](#running-on-rt1051-from-emmc)
+   * [checking commits](#checking-commits)
+   * [CMake options](#cmake-options)
+      * [Catching logs using UART](#catching-logs-using-uart)
+* [More details on preparing your local environment](#more-details-on-preparing-your-local-environment)
+   * [Code style with git hooks](#code-style-with-git-hooks)
+   * [Commit message template](#commit-message-template)
+   * [Commit message hook](#commit-message-hook)
+      * [Adding a hook:](#adding-a-hook)
+      * [Using a hook:](#using-a-hook)
+* [Build using Docker](#build-using-docker)
+   * [Building your own Docker image](#building-your-own-docker-image)
+* [Preparing packages](#preparing-packages)
 
 ## Introduction
 
@@ -102,7 +98,7 @@ We are using J-Link driver in version J-Link v634f ([Ubuntu download](https://ww
 
 #### Add GitHub token
 
-Please follow github token configuration here: [download assets documentation](../doc/download_asset.py)
+Please follow github token configuration here: [download assets documentation](download_assets.md)
 
 #### Project configuration
 
@@ -151,7 +147,7 @@ Each run of `configure.sh` creates `build-{PRODUCT}-{PLATFORM}-{OPTMALIZAION}` f
 2. run `ninja` or `make` depending on your selection during configuration.
 3. This will compile your selected target and create image of it
 
-To know more about build targets please see: [build targets documentation](../doc/build_targets.md)
+To know more about build targets please see: [build targets documentation](build_targets.md)
 
 **WARNING:** our source code is open source, but the project itself is in the progress of fully embracing the community. Currently, you:
 1. can build binaries from the software
@@ -173,7 +169,7 @@ Build default target and run `./PurePhone.elf` for phone target, or for BellHybr
 
 ##### Running on rt1051 from emmc
 
-Please follow: [running on rt1051 platform](./running_on_phone.md)
+Please follow: [running on rt1051 platform](running_on_phone.md)
 
 ### checking commits
 
@@ -184,7 +180,7 @@ All commits have to comply with checks with:
     1.3 code is checked against addition of binary blobs polluting software
 2. pre-merge CI job checking if the commit is in acceptable format:
 
-See [development workflow](./development_workflow.md) for more information
+See [development workflow](development_workflow.md) for more information
 
 ### CMake options
 Before configuring the project with `./configure.sh` you can tune it by enabling/disabling options to suite your needs.
@@ -344,4 +340,4 @@ Please be aware that when building custom image you'll have to give it some tag 
 
 ## Preparing packages
 
-If you need a package, containing everything needed to run the application, please check [build_targests.md](build_targests.md) document.
+If you need a package, containing everything needed to run the application, please check [build_targets.md](build_targets.md) document.

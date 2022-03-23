@@ -13,7 +13,7 @@
 
 - download [balenaEtcher](https://www.balena.io/etcher/) from the website for your operating system. The downloaded file is either called `balenaEtcher-Setup-{version}.exe` (for Windows) or `balenaEtcher-{version}.dmg` (for MacOS) and will be used to install the application on your computer.
 
-![balenaEtcher_download](./balenaetcher4.png)
+![balenaEtcher_download](Images/balenaetcher/ss4.png)
 
 - install the balenaEtcher application.
 - download the MuditaOS image you want to use and extract it locally. 
@@ -24,14 +24,14 @@ The `.xz` image is compressed twice using both `tar` and `xz`. Some unpackers wi
 
 - Run balenaEtcher application and choose `Flash from file` and the ISO image as the image type. Load unzipped image onto the target device. It might look something like this:
 
-![balenaEtcher interface screenshot](./balenaetcher1.png)
+![balenaEtcher interface screenshot](Images/balenaetcher/ss1.png)
 
-![balenaEtcher interface screenshot](./balenaetcher2.png)
+![balenaEtcher interface screenshot](Images/balenaetcher/ss2.png)
 
 - press `Flash!`` and confirm if asked for the superuser password.
 - wait for the flashing to complete:
 
-![balenaEtcher interface screenshots](./balenaetcher3.png)
+![balenaEtcher interface screenshots](Images/balenaetcher/ss3.png)
 
 - reboot the phone.
 

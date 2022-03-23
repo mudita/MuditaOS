@@ -71,7 +71,7 @@ Updater utility is the only normal way to update devices running in-field and is
 **NOTE:** Providing a minimum viable update package and utility for the Open Source community is on our backlog. It can be created by trimming additional development API from:
 [updater feature tests](https://github.com/mudita/QAMuditaOS/tree/master/scenarios/updater). You can ask for the development version of Mudita Center with "update from file" capability enabled.
 
-Update package is described here: [build targets](./build_targets.md)
+Update package is described here: [build targets](build_targets.md)
 
 ## How to mount Mudita Pure as a USB MSC
 

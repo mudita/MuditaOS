@@ -8,7 +8,7 @@ Reasons to use specific binary format:
 - reduce workload on CPU since it has no GPU unit
 - reduce size of fonts both on disk and in RAM
 ## Fonts source
-Fonts are assets which are downloaded from separate repositories using `download_assets.py` script (see more: [download assets documentation](../doc/download_assets.md)). Basing on configuration (Community/Proprietary) fonts will be downloaded from two different repositories.
+Fonts are assets which are downloaded from separate repositories using `download_assets.py` script (see more: [download assets documentation](download_assets.md)). Basing on configuration (Community/Proprietary) fonts will be downloaded from two different repositories.
 
 ## Fonts mapping
 Regardless of the source, both assets packages contain file fontmap.json, mapping font files to font types used in MuditaOS code.
