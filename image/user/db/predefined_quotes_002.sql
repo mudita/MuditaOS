@@ -18,7 +18,7 @@ INSERT OR REPLACE INTO category_table (category_id, lang_id, category_name) VALU
     (5, 1, 'Productivity & Success'),
     (6, 2, 'Prostota'),
     (7, 2, 'Uważność'),
-    (8, 2, 'Zdrowie i dobre samopoczucie'),
+    (8, 2, 'Zdrowie i dobrostan'),
     (9, 2, 'Pozytywne emocje'),
     (10, 2, 'Produktywność i sukces'),
     (11, 3, 'Simplicité'),
@@ -35,10 +35,10 @@ INSERT OR REPLACE INTO category_table (category_id, lang_id, category_name) VALU
     (22, 5, 'Medveten närvaro'),
     (23, 5, 'Hälsa och välbefinnande'),
     (24, 5, 'Positiva känslor'),
-    (25, 5, 'Produktivitet och framgång'),
+    (25, 5, 'Produktivitet och succé'),
     (26, 6, 'Einfachheit'),
     (27, 6, 'Achtsamkeit'),
-    (28, 6, 'Gesundheit & Wohlbefinden'),
+    (28, 6, 'Gesundheit & Wohlsein'),
     (29, 6, 'Positive Emotionen'),
     (30, 6, 'Produktivität & Erfolg');
 
