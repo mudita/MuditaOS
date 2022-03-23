@@ -10,7 +10,6 @@ namespace service::eink
 {
     namespace
     {
-        constexpr auto RedrawLockedEinkCpuFrequency   = bsp::CpuFrequencyMHz::Level_4;
         constexpr auto RedrawUnlockedEinkCpuFrequency = bsp::CpuFrequencyMHz::Level_6;
     } // namespace
 
@@ -27,10 +26,12 @@ namespace service::eink
 
     void EinkSentinel::HoldMinimumFrequency()
     {
-        currentReason = std::string("up: ") + owner->getCurrentProcessing() + std::string(" req: ") +
-                        std::to_string(static_cast<int>((GetFrequency())));
-        CpuSentinel::HoldMinimumFrequency(isScreenLocked ? RedrawLockedEinkCpuFrequency
-                                                         : RedrawUnlockedEinkCpuFrequency);
+        if (!isScreenLocked) {
+            currentReason = std::string("up: ") + owner->getCurrentProcessing() + std::string(" req: ") +
+                            std::to_string(static_cast<int>((GetFrequency())));
+
+            CpuSentinel::HoldMinimumFrequency(RedrawUnlockedEinkCpuFrequency);
+        }
     }
 
     sys::MessagePointer EinkSentinel::handleLockedPhone()

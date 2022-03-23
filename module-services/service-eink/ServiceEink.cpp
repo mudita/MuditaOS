@@ -28,7 +28,7 @@ namespace service::eink
     namespace
     {
         constexpr auto ServceEinkStackDepth = 4096U;
-        constexpr std::chrono::milliseconds displayPowerOffTimeout{3800};
+        constexpr std::chrono::milliseconds displayPowerOffTimeout{2000};
 
         std::string toSettingString(EinkModeMessage::Mode mode)
         {

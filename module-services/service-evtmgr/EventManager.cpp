@@ -280,10 +280,6 @@ int EventManagerCommon::dumpLogsToFile()
 
 void EventManagerCommon::handleMinuteUpdate(time_t timestamp)
 {
-    // temporary frequency lock to handle time update event
-    if (cpuSentinel) {
-        cpuSentinel->HoldMinimumFrequencyForTime(bsp::CpuFrequencyMHz::Level_2, std::chrono::seconds(1));
-    }
     if (onMinuteTick) {
         onMinuteTick(timestamp);
     }
