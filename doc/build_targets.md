@@ -29,8 +29,10 @@ For each product there are targets:
 |RT1051| \<Product\>-StandaloneImage    | PurePhone-\<version\>-RT1051-package-standalone   | Creates image that can be `dd` or `pureflash` to the device|
 |RT1051| \<Product>\-UpdatePackage      | PurePhone-\<version\>-RT1051-Update.tar           | Creates Update package, that can be used by Mudita Center or an update script|
 |linux | check                          |                                                   | build and run unittests |
-|common| assets                         |                                                   | Mudita company private assets |
-|common| json-images-target             |                                                   | Mudita company public assets |
+|common| json-common-target             |                                                   | Mudita company public assets common between community and proprietary builds |
+|common| json-community-target          |                                                   | Mudita company public assets for community build |
+|common| json-proprietary-target        |                                                   | Mudita company private assets proprietary build |
+|RT1051| json-rt1051-assets             |                                                   | Mudita company RT1051 specific assets |
 |RT1051| ecoboot.bin                    |                                                   | OS bootloader |
 |RT1051| updater.bin                    |                                                   | OS updater |
 
@@ -89,14 +91,24 @@ Following targets related to coverage report generation are available:
 will be generated in the `coverage-html` subdirectory of a build directory.
 * `coverage` - same as above, but generate an XML Cobertura report instead of an HTML.
 
-## assets
 
-Downloads Mudita private assets with [download_assets](./download_assets.md) that company is either not eligible or capable of sharing publicly.
-These are distributed with the image and update targets available for each product and. includes i.e. fonts.
 
-## json-images-target
+## json-common-target
 
-Downloads Mudita public assets with [download_assets](./download_assets.md).
+Downloads Mudita public assets with [download_assets](./download_assets.md). Those are used in both proprietary and community builds.
+
+## json-community-target
+
+Downloads Mudita public assets with [download_assets](./download_assets.md). Those are used only in community builds.
+
+## json-proprietary-target
+
+Downloads Mudita private assets with [download_assets](./download_assets.md) that company is either not eligible or capable of sharing publicly. They are used in proprietary builds.
+These are distributed with the image and update targets available for each product and include i.e. fonts.
+## json-rt1051-target
+
+Downloads Mudita private RT1051 specific assets with [download_assets](./download_assets.md) that company is either not eligible or capable of sharing publicly.
+These are distributed with the image and update targets available for each product.
 
 ## ecoboot.bin
 

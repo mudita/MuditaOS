@@ -42,8 +42,9 @@ function(add_standalone_image SOURCE_TARGET)
         COMMAND tar -I 'xz -T0' -Scf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         DEPENDS ${BIN_FILE}
-        DEPENDS json-target
-        DEPENDS json-images-target
+        DEPENDS json-common-target
+        DEPENDS json-proprietary-target
+        DEPENDS json-rt1051-target
         DEPENDS ecoboot.bin-target
         DEPENDS updater.bin-target
         DEPENDS ${SOURCE_TARGET}-version.json-target
