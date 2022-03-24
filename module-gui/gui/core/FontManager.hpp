@@ -54,12 +54,12 @@ namespace gui
             return initialized;
         }
         [[nodiscard]] auto getFontName(const std::string &font) const -> std::string;
-        [[nodiscard]] auto getDefaultFontName() const -> std::string;
-        [[nodiscard]] auto getDefaultFontTypeName() const -> std::string;
+        [[nodiscard]] auto getDefaultFontFamilyName() const -> std::string;
 
       private:
+        std::string fallbackFontName{};
+        std::string defaultFontFamilyName{};
         std::string defaultFontName{};
-        std::string defaultFontTypeName{};
 
         [[nodiscard]] auto find(std::string_view name) const -> RawFont *;
     };

@@ -19,7 +19,7 @@ namespace gui
     }
 
     Font::Font(unsigned int size, Weight weight)
-        : Font(FontManager::getInstance().getDefaultFontTypeName(), size, weight)
+        : Font(FontManager::getInstance().getDefaultFontFamilyName(), size, weight)
     {}
 
     Font::Font(RawFont *rawfont)
@@ -62,7 +62,7 @@ namespace gui
 
     void Font::setFont(unsigned int size, Weight weight)
     {
-        setFont((FontManager::getInstance().getDefaultFontTypeName()), size, weight);
+        setFont((FontManager::getInstance().getDefaultFontFamilyName()), size, weight);
     }
 
     void Font::setSize(unsigned int new_size)

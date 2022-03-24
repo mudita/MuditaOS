@@ -121,10 +121,11 @@ namespace gui
             throw std::invalid_argument("Can't parse the file!");
         }
 
-        auto fontmapObjects = fontmapJson.object_items();
-        const auto infoJson = fontmapObjects["info"];
-        defaultFontName     = infoJson["default_font_name"].string_value();
-        defaultFontTypeName = infoJson["default_font_type_name"].string_value();
+        auto fontmapObjects   = fontmapJson.object_items();
+        const auto infoJson   = fontmapObjects["info"];
+        fallbackFontName      = infoJson["fallback_font"].string_value();
+        defaultFontFamilyName = infoJson["default_font_family"].string_value();
+        defaultFontName       = infoJson["default_font"].string_value();
 
         const auto styleJson = fontmapObjects["style"];
         std::map<std::string, std::string> fontFiles;
@@ -152,11 +153,13 @@ namespace gui
     {
         loadFonts(baseDirectory);
 
-        auto fallback_font = find(getFontName(defaultFontName));
-        if (fallback_font != nullptr) {
-            for (auto font : fonts) {
-                font->setFallbackFont(fallback_font);
-            }
+        auto fallback_font = find(fallbackFontName);
+        if (not fallback_font) {
+            return false;
+        }
+
+        for (auto &font : fonts) {
+            font->setFallbackFont(fallback_font);
         }
         initialized = true;
         return initialized;
@@ -219,13 +222,9 @@ namespace gui
         return getFont(defaultFontName);
     }
 
-    auto FontManager::getDefaultFontName() const -> std::string
+    auto FontManager::getDefaultFontFamilyName() const -> std::string
     {
-        return defaultFontName;
-    }
-    auto FontManager::getDefaultFontTypeName() const -> std::string
-    {
-        return defaultFontTypeName;
+        return defaultFontFamilyName;
     }
 
     auto FontManager::find(std::string_view name) const -> RawFont *
