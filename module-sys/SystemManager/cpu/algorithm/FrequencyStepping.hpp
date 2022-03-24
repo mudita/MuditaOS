@@ -19,7 +19,7 @@ namespace sys::cpu
         CpuGovernor &cpuGovernor;
         unsigned int aboveThresholdCounter = 0;
         unsigned int belowThresholdCounter = 0;
-        bool isFrequencyLoweringInProgress = true;
+        bool isFrequencyDownscalingInProgress = true;
 
       public:
         FrequencyStepping(const bsp::PowerProfile &powerProfile, CpuGovernor &cpuGovernor);

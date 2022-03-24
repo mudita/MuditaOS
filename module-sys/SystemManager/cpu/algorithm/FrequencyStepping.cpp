@@ -51,7 +51,7 @@ namespace sys::cpu
         }
 
         if (belowThresholdCounter == 0u) {
-            isFrequencyLoweringInProgress = false;
+            isFrequencyDownscalingInProgress = false;
         }
 
         if (min.frequency > startFrequency) {}
@@ -66,9 +66,10 @@ namespace sys::cpu
             }
         }
         else {
-            if (belowThresholdCounter >= (isFrequencyLoweringInProgress ? powerProfile.maxBelowThresholdInRowCount
-                                                                        : powerProfile.maxBelowThresholdCount) &&
+            if (belowThresholdCounter >= (isFrequencyDownscalingInProgress ? powerProfile.maxBelowThresholdInRowCount
+                                                                           : powerProfile.maxBelowThresholdCount) &&
                 startFrequency > min.frequency) {
+                isFrequencyDownscalingInProgress = true;
                 reset();
                 return {algorithm::Change::Downscaled, stepDown(startFrequency, powerProfile)};
             }
