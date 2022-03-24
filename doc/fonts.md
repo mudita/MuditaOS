@@ -19,18 +19,20 @@ Short example:
 ```
 {
     "info" : {
-        "default_font_name" :       "dejavu_sans_bold_27",
-        "default_font_type_name" :  "dejavu_sans"
+        "fallback_font" : "dejavu_sans_bold_27",
+        "default_font": "gt_pressura_bold_27",
+        "default_font_family" : "gt_pressura"
     },
     "style": {
-        "mediumboldtitle":      "dejavu_sans/dejavu_sans_bold_27.mpf",
+        "small":      "gt_pressura/gt_pressura_regular_24.mpf",
         ...
     }
 }
 ```
-There are two values in `info` part:
-- `default_font_name` - fallback font in case of inability to load specified font
-- `default_font_type_name` - default font family name used in methods which specify only size and weight of a font
+There are three obligatory values in `info` part:
+- `fallback_font` - fallback font used when specified font is unable to display some glyphs
+- `default_font` - default font used in case of inability to load specified font
+- `default_font_family` - default font family name used in methods which specify only size and weight of a font
 
 
 Every key in `style` part defines font type to be used in fonts list in MuditaOS, which later can be used in `FontManager::getFont` method (ie `getFont("supersizemelight")`)
