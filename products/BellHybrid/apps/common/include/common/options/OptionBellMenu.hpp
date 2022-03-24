@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,7 +27,7 @@ namespace gui::option
                        std::function<bool(Item &)> activatedCallback,
                        std::function<bool(Item &)> focusChangedCallback,
                        AppWindow *app)
-            : text(std::move(text)), activatedCallback(std::move(activatedCallback)),
+            : text(text), activatedCallback(std::move(activatedCallback)),
               focusChangedCallback(std::move(focusChangedCallback)), app(app)
         {}
         [[nodiscard]] auto build() const -> ListItem * override;

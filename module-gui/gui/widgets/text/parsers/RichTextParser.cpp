@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RichTextParser.hpp"
@@ -382,12 +382,11 @@ struct walker : pugi::xml_tree_walker
     auto push_short_text_node(pugi::xml_node &node)
     {
         log_parser("shortened text node name: %s", node.name());
-        auto local_style = style_stack.back();
         auto &decor      = text::NodeDecor::get();
-
         auto attrName  = text::ShortTextNodes::get(node.name(), text::ShortTextNodes::AttributeContent::Name);
         auto attrValue = text::ShortTextNodes::get(node.name(), text::ShortTextNodes::AttributeContent::Value);
         if (attrName.has_value() && attrValue.has_value()) {
+            auto local_style = style_stack.back();
             decor.stack_visit(local_style, attrName.value(), attrValue.value());
             style_stack.push_back(local_style);
             log_parser("Attr loaded: %s", style_stack.back().str().c_str());

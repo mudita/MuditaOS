@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/AudioModel.hpp"
@@ -78,10 +78,11 @@ namespace app
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
         auto cb              = [_callback = callback, this](auto response) {
             auto result     = dynamic_cast<service::AudioStartPlaybackResponse *>(response);
-            lastPlayedToken = result->token;
             if (result == nullptr) {
                 return false;
             }
+            lastPlayedToken = result->token;
+
             if (_callback) {
                 _callback(result->retCode);
             }

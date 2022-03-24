@@ -152,4 +152,12 @@ SCENARIO("Calculate filter coeff")
                               std::invalid_argument);
         }
     }
+
+    GIVEN("Filter with sample rate equal to 0")
+    {
+        THEN("Calculation of coefficients should throw")
+        {
+            REQUIRE_THROWS_AS(qfilter_CalculateCoeffs(FilterType::HighPass, 300.9f, 0, 0.2f, 0), std::invalid_argument);
+        }
+    }
 }

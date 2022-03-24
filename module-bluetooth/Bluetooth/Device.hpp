@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -112,7 +112,7 @@ struct Devicei : public Device
     explicit Devicei(bd_addr_t &address);
     Devicei &operator=(const Devicei &d);
     Devicei(const Devicei &d);
-    Devicei &operator=(Devicei &&d) noexcept;
+    Devicei &operator=(Devicei &&d);
     Devicei(Devicei &&d) noexcept;
     ~Devicei() override = default;
     void setAddress(bd_addr_t *addr);

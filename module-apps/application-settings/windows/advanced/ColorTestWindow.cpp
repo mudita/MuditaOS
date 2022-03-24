@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ColorTestWindow.hpp"
@@ -76,7 +76,7 @@ namespace gui
         if (scheme != currentColorScheme) {
             currentColorScheme = scheme;
             application->bus.sendUnicastSync(
-                std::make_shared<service::gui::ChangeColorScheme>(std::move(scheme)), service::name::gui, 100);
+                std::make_shared<service::gui::ChangeColorScheme>(scheme), service::name::gui, 100);
             LOG_INFO("Updated color scheme");
 
             application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);

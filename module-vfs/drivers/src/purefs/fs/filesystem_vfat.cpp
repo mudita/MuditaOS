@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
@@ -557,7 +557,8 @@ namespace purefs::fs::drivers
             return -ENXIO;
         }
         const auto fspath = vmnt->native_path(path);
-        const auto fret   = f_chmod(fspath.c_str(), translate_mode_to_attrib(mode), translate_mode_to_attrib(mode));
+        const auto attrib = translate_mode_to_attrib(mode);
+        const auto fret   = f_chmod(fspath.c_str(), attrib, attrib);
         return translate_error(fret);
     }
 
@@ -569,7 +570,8 @@ namespace purefs::fs::drivers
             return -EBADF;
         }
         const auto fspath = vfile->open_path();
-        const auto fret   = f_chmod(fspath.c_str(), translate_mode_to_attrib(mode), translate_mode_to_attrib(mode));
+        const auto attrib = translate_mode_to_attrib(mode);
+        const auto fret   = f_chmod(fspath.c_str(), attrib, attrib);
         return translate_error(fret);
     }
 

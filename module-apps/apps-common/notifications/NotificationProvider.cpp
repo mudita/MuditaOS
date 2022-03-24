@@ -114,7 +114,7 @@ void NotificationProvider::handleSnooze(unsigned snoozeCount)
         notifications[NotificationType::AlarmSnooze] =
             std::make_shared<notifications::AlarmSnoozeNotification>(snoozeCount);
     }
-    else if (snoozeCount == 0) {
+    else {
         notifications.erase(NotificationType::AlarmSnooze);
     }
     send();

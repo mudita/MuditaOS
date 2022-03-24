@@ -38,7 +38,7 @@ namespace gui
             setColor(ColorFullWhite);
             setText(utils::translate("app_settings_toggle_on"));
         }
-        else if (currentState == ButtonState::Off) {
+        else {
             fill->setFillColor(ColorFullWhite);
             setColor(ColorFullBlack);
             setText(utils::translate("app_settings_toggle_off"));

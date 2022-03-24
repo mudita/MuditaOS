@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Device.hpp"
@@ -42,7 +42,7 @@ Devicei::Devicei(const Devicei &d) : Devicei(d.name.data())
     operator=(d);
 }
 
-Devicei &Devicei::operator=(Devicei &&d) noexcept
+Devicei &Devicei::operator=(Devicei &&d)
 {
     setAddress(&d.address);
     setName(d.name.data());
