@@ -74,3 +74,14 @@ add_subdirectory(common/fsl_drivers)
 add_subdirectory(${BOARD})
 
 target_link_libraries(module-bsp PUBLIC cmsis fsl)
+
+add_library(system-stats-sink-board)
+target_sources(system-stats-sink-board
+    PRIVATE
+      sink/RTTSink.cpp
+)
+target_link_libraries(system-stats-sink-board
+    PRIVATE
+        segger::rtt
+        system-stats-sink-interface
+)

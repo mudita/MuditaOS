@@ -102,7 +102,8 @@ namespace sys
         auto algorithms = {
             sys::cpu::AlgoID::FrequencyHold, sys::cpu::AlgoID::ImmediateUpscale, sys::cpu::AlgoID::FrequencyStepping};
 
-        auto result = cpuAlgorithms->calculate(algorithms, data, &retval.id);
+        auto result    = cpuAlgorithms->calculate(algorithms, data, &retval.id);
+        retval.changed = result.change;
         if (result.change == cpu::algorithm::Change::NoChange or result.change == cpu::algorithm::Change::Hold) {
             return retval;
         }

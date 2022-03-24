@@ -45,6 +45,7 @@ target_link_libraries(sys-manager
     PRIVATE
         service-desktop
         msgpack11
+        system-stats-sink
 )
 
 if (${ENABLE_TESTS})

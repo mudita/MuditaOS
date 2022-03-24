@@ -53,3 +53,14 @@ target_link_libraries(module-bsp PRIVATE sys-common)
 set_source_files_properties(board.cpp PROPERTIES COMPILE_FLAGS -Wno-unused-function)
 
 target_compile_options(module-bsp PUBLIC "-Wno-unused-result")
+
+add_library(system-stats-sink-board)
+target_sources(system-stats-sink-board
+    PRIVATE
+      sink/RTTSink.cpp
+)
+target_link_libraries(system-stats-sink-board
+    PRIVATE
+        segger::rtt
+        system-stats-sink-interface
+)

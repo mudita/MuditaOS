@@ -420,10 +420,6 @@ namespace sys
 
     std::string SystemManagerCommon::ServiceProcessor(const uint32_t &t)
     {
-        if (t == 0) {
-            return "Idle";
-        }
-
         auto foo = [](auto &l, const uint32_t &t) {
             auto found = std::find_if(l.begin(), l.end(), [&t](auto &r) {
                 auto right = uxTaskGetTCBNumber(r->GetHandle());

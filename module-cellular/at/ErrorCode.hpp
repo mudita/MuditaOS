@@ -116,13 +116,13 @@ namespace at
  */
 namespace magic_enum
 {
-    template <> struct enum_range<at::NetworkErrorCode>
+    template <> struct customize::enum_range<at::NetworkErrorCode>
     {
         static constexpr int min = 0;
         static constexpr int max = at::MAX_AT_ERROR_VALUE + 2;
     };
 
-    template <> struct enum_range<at::EquipmentErrorCode>
+    template <> struct customize::enum_range<at::EquipmentErrorCode>
     {
         static constexpr int min = 0;
         static constexpr int max = at::MAX_AT_ERROR_VALUE + 2;

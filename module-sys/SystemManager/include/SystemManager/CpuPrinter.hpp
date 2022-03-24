@@ -4,6 +4,10 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
+
+class Sink;
+
 struct task_prof_data;
 namespace sys::cpu
 {
@@ -18,6 +22,7 @@ namespace sys::cpu
             virtual void printSysUsage(struct task_prof_data *data, size_t size) = 0;
             virtual void printCPUChange(const cpu::UpdateResult &ret)            = 0;
             virtual void printPowerConsumption()                                 = 0;
+            virtual ~Printer()                                                   = default;
         };
 
         class NullPrinter : public Printer
@@ -40,7 +45,11 @@ namespace sys::cpu
 
         class PackPrinter : public Printer
         {
+            std::unique_ptr<Sink> sink;
+
           public:
+            PackPrinter();
+            ~PackPrinter();
             void printSysUsage(struct task_prof_data *data, size_t size) override;
             void printCPUChange(const cpu::UpdateResult &ret) override;
             void printPowerConsumption() override;

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct prof_pool 
+struct prof_pool
 {
     struct task_prof_data *pool;
     unsigned int _overflow_counter;
@@ -18,7 +18,7 @@ struct prof_pool
 };
 
 
-static struct prof_pool pool;
+static struct prof_pool pool = { .pool=NULL, ._overflow_counter=0, ._pos=0,.data = {0}, .clean = NULL, .handle_overflow = NULL, .get = NULL};
 
 static void _pool_clean()
 {
@@ -75,6 +75,9 @@ struct prof_pool_init_data prof_pool_get_data()
 
 void prof_pool_data_set(uint8_t ts, uint32_t id)
 {
+    if (pool.get == NULL ) {
+        return;
+    }
     struct task_prof_data *what = pool.get(id);
     if ( what == NULL) {
         return;
