@@ -67,6 +67,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 add_subdirectory(hal)
+add_subdirectory(sink)
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC

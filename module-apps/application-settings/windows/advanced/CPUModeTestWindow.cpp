@@ -14,7 +14,7 @@
 
 namespace magic_enum
 {
-    template <> struct enum_range<bsp::CpuFrequencyMHz>
+    template <> struct customize::enum_range<bsp::CpuFrequencyMHz>
     {
         static constexpr int min = 0;
         static constexpr int max = 528;
