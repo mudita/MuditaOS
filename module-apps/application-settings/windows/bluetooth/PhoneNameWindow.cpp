@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneNameWindow.hpp"
@@ -44,7 +44,7 @@ namespace gui
 
     void PhoneNameWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)
     {
-        if (const auto newData = dynamic_cast<PhoneNameData *>(data); data != nullptr) {
+        if (const auto newData = dynamic_cast<PhoneNameData *>(data); newData != nullptr) {
             inputField->setText(newData->getName());
             inputField->setTextLimitType(gui::TextLimitType::MaxSignsCount, maxNameLength);
         }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,7 +24,7 @@ namespace gui
         void addSwitchOption(std::list<gui::Option> &list,
                              const UTF8 &text,
                              bool &option,
-                             std::function<void()> callback,
+                             const std::function<void()> &callback,
                              bool indent = false);
 
         ///  Adds select option to the given options list
@@ -34,7 +34,7 @@ namespace gui
         ///  @param indent should the option be indent
         void addSelectOption(std::list<gui::Option> &list,
                              const UTF8 &text,
-                             std::function<void(void)> callback,
+                             const std::function<void(void)> &callback,
                              bool indent = false);
 
       private:

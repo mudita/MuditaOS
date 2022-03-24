@@ -21,6 +21,9 @@ namespace audio::equalizer
         if ((Q < qMinValue || Q > qMaxValue) && filter != FilterType::None) {
             throw std::invalid_argument("Q out of range");
         }
+        if (samplerate == 0 && filter != FilterType::None) {
+            throw std::invalid_argument("Sample rate has to be greater than zero");
+        }
         QFilterCoefficients filter_coeff;
         float a0       = 0;
         float omega    = 2 * M_PI * frequency / samplerate;

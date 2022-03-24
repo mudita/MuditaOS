@@ -24,7 +24,7 @@ namespace app::popup
 
     void AlarmPopupContract::AlarmModel::setSnoozed(std::vector<SingleEventRecord> snoozed)
     {
-        this->snoozedRecord = snoozed;
+        this->snoozedRecord = std::move(snoozed);
     }
 
     void AlarmPopupContract::AlarmModel::reset()

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OptionsWidgetMaker.hpp"
@@ -10,11 +10,14 @@ namespace gui
     OptionsWidgetMaker::OptionsWidgetMaker(OptionWindow *window) : mWindow(window)
     {}
 
-    void OptionsWidgetMaker::addSwitchOption(
-        std::list<gui::Option> &list, const UTF8 &text, bool &option, std::function<void()> callback, bool indent)
+    void OptionsWidgetMaker::addSwitchOption(std::list<gui::Option> &list,
+                                             const UTF8 &text,
+                                             bool &option,
+                                             const std::function<void()> &callback,
+                                             bool indent)
     {
         list.emplace_back(std::make_unique<option::OptionSettings>(
-            std::move(text),
+            text,
             [=](Item &item) {
                 callback();
                 return true;
@@ -35,11 +38,11 @@ namespace gui
 
     void OptionsWidgetMaker::addSelectOption(std::list<gui::Option> &list,
                                              const UTF8 &text,
-                                             std::function<void(void)> callback,
+                                             const std::function<void(void)> &callback,
                                              bool indent)
     {
         list.emplace_back(std::make_unique<option::OptionSettings>(
-            std::move(text),
+            text,
             [=](Item &item) {
                 callback();
                 return true;

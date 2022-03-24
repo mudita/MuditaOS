@@ -74,7 +74,7 @@ int main()
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
     systemServices.emplace_back(sys::CreatorFor<EventManager>([]() { return dumpLogs(); }));
-    systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>(std::move(fileIndexerAudioPaths)));
+    systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>(fileIndexerAudioPaths));
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
     systemServices.emplace_back(sys::CreatorFor<service::Audio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());

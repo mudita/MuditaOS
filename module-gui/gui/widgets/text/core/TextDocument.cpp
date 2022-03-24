@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextDocument.hpp"
@@ -10,7 +10,7 @@ namespace gui
 
     const std::string TextDocument::newline = "\n";
 
-    TextDocument::TextDocument(const std::list<TextBlock> &blocks) : blocks(std::move(blocks))
+    TextDocument::TextDocument(const std::list<TextBlock> &blocks) : blocks(blocks)
     {}
 
     TextDocument::~TextDocument()

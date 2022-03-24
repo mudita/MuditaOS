@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BoxLayoutSizeStore.hpp"
@@ -16,8 +16,8 @@ namespace gui
 
     Size BoxLayoutSizeStore::get(Item *it)
     {
-        Size size = {0, 0};
         if (it == nullptr) {
+            Size size = {0, 0};
             return size;
         }
         auto found = grants.find(it);

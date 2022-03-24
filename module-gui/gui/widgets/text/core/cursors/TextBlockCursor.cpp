@@ -5,6 +5,7 @@
 #include <core/TextBlock.hpp>
 #include <core/TextDocument.hpp>
 #include <log/log.hpp>
+#include <cassert>
 
 static const int last_char_inclusive = 0; // if then -1 / else 0
 
@@ -367,11 +368,13 @@ namespace gui
 
     auto BlockCursor::begin() -> std::list<TextBlock>::iterator
     {
-        return document == nullptr ? document->blocks.end() : document->blocks.begin();
+        assert(document != nullptr);
+        return document->blocks.begin();
     }
 
     auto BlockCursor::end() -> std::list<TextBlock>::iterator
     {
+        assert(document != nullptr);
         return document->blocks.end();
     }
 

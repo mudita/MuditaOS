@@ -246,7 +246,7 @@ namespace service
         const auto clampedValue = std::clamp(utils::getNumericValue<audio::Volume>(value), minVolume, maxInVolume);
 
         if (const auto activeInput = audioMux.GetActiveInput(); activeInput) {
-            if (activeInput) {
+            if (activeInput.value()) {
                 retCode = activeInput.value()->audio->SetOutputVolume(clampedValue);
             }
         }

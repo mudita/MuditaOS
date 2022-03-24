@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallLogDetailsWindow.hpp"
@@ -144,13 +144,13 @@ namespace gui
     {
         Expects(numberHBox != nullptr);
         numberHBox->erase();
-        ActiveIconFactory factory(this->application);
         const auto &numberView = record.phoneNumber;
         if (record.presentation == PresentationType::PR_UNKNOWN) {
             numberHBox->addText(utils::translate(callLogStyle::strings::privateNumber),
                                 style::window::font::mediumbold);
         }
         else {
+            ActiveIconFactory factory(this->application);
             numberHBox->addText(numberView.getFormatted(), style::window::font::mediumbold);
             numberHBox->addIcon(factory.makeCallIcon(numberView));
             numberHBox->addIcon(factory.makeSMSIcon(numberView));
@@ -211,7 +211,7 @@ namespace gui
             return;
         }
 
-        if (auto switchData = dynamic_cast<calllog::CallLogSwitchData *>(data); data != nullptr) {
+        if (auto switchData = dynamic_cast<calllog::CallLogSwitchData *>(data); switchData != nullptr) {
             record = switchData->getRecord();
             setTitle(record.name);
             initNumberWidget();

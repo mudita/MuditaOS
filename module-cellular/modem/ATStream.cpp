@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <cstring>
 #include "ATStream.hpp"
@@ -75,7 +75,7 @@ namespace at
                 result.errorCode = atmp_ec.value();
             }
             else {
-                LOG_ERROR("Unknow CMS error code %" PRIu32, errcode);
+                LOG_ERROR("Unknown CMS error code %" PRIu32, errcode);
                 result.errorCode = at::NetworkErrorCode::Unknown;
             }
         }
@@ -83,10 +83,11 @@ namespace at
 
     bool ATStream::checkATBegin()
     {
-        auto pos = atBuffer.find(at::delimiter, std::strlen(at::delimiter));
+        const auto delimiterLength = std::strlen(at::delimiter);
+        auto pos                   = atBuffer.find(at::delimiter, delimiterLength);
         if (pos != std::string::npos) {
             beginChecked   = true;
-            std::string rr = atBuffer.substr(std::strlen(at::delimiter), pos - std::strlen(at::delimiter)).c_str();
+            std::string rr = atBuffer.substr(delimiterLength, pos - delimiterLength);
             auto code      = parseState(rr, errcode);
             if (code != Result::Code::NONE) {
                 result.code = code;
@@ -99,11 +100,11 @@ namespace at
     bool ATStream::checkATEnd()
     {
         auto pos = atBuffer.rfind(at::delimiter);
+        const auto delimiterLength = std::strlen(at::delimiter);
         if (pos != std::string::npos) {
-            auto pos2 = atBuffer.rfind(at::delimiter, pos - std::strlen(at::delimiter));
+            auto pos2 = atBuffer.rfind(at::delimiter, pos - delimiterLength);
             if (pos2 != std::string::npos) {
-                std::string rr =
-                    atBuffer.substr(pos2 + std::strlen(at::delimiter), pos - pos2 - std::strlen(at::delimiter)).c_str();
+                std::string rr = atBuffer.substr(pos2 + delimiterLength, pos - pos2 - delimiterLength);
                 auto code = parseState(rr, errcode);
                 if (code != Result::Code::NONE) {
                     result.code = code;
@@ -119,12 +120,13 @@ namespace at
     {
         if (rxCount != 0) {
             auto pos = atBuffer.find(at::delimiter, lastPos);
+            const auto delimiterLength = std::strlen(at::delimiter);
             while (pos != std::string::npos) {
                 /// do not count empty lines, see implementation of utils:split
                 if ((lastPos) != pos) {
                     lineCounter++;
                 }
-                lastPos = pos + std::strlen(at::delimiter);
+                lastPos = pos + delimiterLength;
                 pos     = atBuffer.find(at::delimiter, lastPos);
             }
         }

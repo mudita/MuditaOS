@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -46,7 +46,7 @@ class DayMonthData : public gui::SwitchData
         return dateFilter;
     };
 
-    virtual void setData(std::string dayMonthText, const TimePoint &dateNumb)
+    virtual void setData(const std::string &dayMonthText, const TimePoint &dateNumb)
     {
         dayMonth   = dayMonthText;
         dateFilter = dateNumb;
