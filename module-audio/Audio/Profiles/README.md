@@ -41,7 +41,7 @@ appropriate filter type - `None`.
 | frequency  | float      | Defines the cutoff frequency for the filter                | \> 0 Hz        | 
 | samplerate | integer    | Defines the samplerate used to calculate the filter coeffs | \> 0 Hz        |
 | Q          | float      | Defines Q factor for the filter                            | 0.1 - 10       |
-| gain       | float      | Defines gain for shelf-like filters                        | \> 0           |
+| gain       | float      | Defines gain for shelf-like filters                        | ±12 dB         |
 
 Filter type can be selected from following types:
 
