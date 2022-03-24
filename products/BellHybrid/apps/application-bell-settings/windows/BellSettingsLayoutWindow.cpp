@@ -8,8 +8,7 @@
 
 namespace
 {
-    inline constexpr auto arrowsWidth      = 580U;
-    inline constexpr auto arrowsLeftMargin = 10U;
+    inline constexpr auto arrowsOuterMargin = 48U;
 } // namespace
 
 namespace gui
@@ -40,7 +39,7 @@ namespace gui
         auto selectedLayout = presenter->getSelectedLayout();
         spinner->setCurrentValue(selectedLayout);
 
-        createArrowsOverlay(0, 0, arrowsWidth, style::window_height);
+        createArrowsOverlay(0, 0, style::window_width, style::window_height);
         arrowLeft->setVisible(!spinner->isAtMin());
         arrowRight->setVisible(!spinner->isAtMax());
 
@@ -53,23 +52,26 @@ namespace gui
 
     void BellSettingsLayoutWindow::createArrowsOverlay(unsigned int x, unsigned y, unsigned int w, unsigned int h)
     {
-        auto arrowsOverlay = new HBox{this, arrowsLeftMargin, y, w, h};
+        auto arrowsOverlay = new HBox{this, x, y, w, h};
         arrowsOverlay->setEdges(gui::RectangleEdge::None);
         arrowLeft = new Image("bell_arrow_left_W_M");
         arrowLeft->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         arrowLeft->activeItem = false;
         arrowLeft->setEdges(RectangleEdge::None);
+        arrowLeft->setMargins(Margins{arrowsOuterMargin, 0, 0, 0});
         arrowsOverlay->addWidget(arrowLeft);
 
         arrowRight = new Image("bell_arrow_right_W_M");
         arrowRight->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
         arrowRight->activeItem = false;
         arrowRight->setEdges(RectangleEdge::None);
+        arrowRight->setMargins(Margins{0, 0, arrowsOuterMargin, 0});
 
         auto rectFiller = new gui::Rect(arrowsOverlay,
                                         0U,
                                         0U,
-                                        arrowsOverlay->getWidth() - arrowLeft->getWidth() - arrowRight->getWidth(),
+                                        arrowsOverlay->getWidth() - arrowLeft->getWidth() - arrowRight->getWidth() -
+                                            (2 * arrowsOuterMargin),
                                         arrowsOverlay->getHeight());
 
         rectFiller->setMaximumSize(arrowsOverlay->getWidth(), arrowsOverlay->getHeight());
