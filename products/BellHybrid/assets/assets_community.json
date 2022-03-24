@@ -12,6 +12,11 @@
         },
         {
             "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_light_200.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_light_200.mpf"
+        },
+        {
+            "name": "release.tgz",
             "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_regular_90.mpf",
             "output": "assets/fonts/dejavu_sans/dejavu_sans_regular_90.mpf"
         },

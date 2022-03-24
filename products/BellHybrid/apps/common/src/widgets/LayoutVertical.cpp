@@ -33,13 +33,14 @@ namespace gui
         leftBox = new VBox(mainScreen, 0, 0, 0, 0);
         leftBox->setMinimumSize(style::homescreen_vertical::side_box_w, style::window_height);
         leftBox->setEdges(RectangleEdge::None);
+        leftBox->setMargins(Margins({style::homescreen_vertical::leftMargin, 0, 0, 0}));
 
         auto centerBox = new VBox(mainScreen, 0, 0, 0, 0);
         centerBox->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
         centerBox->setEdges(RectangleEdge::None);
 
         time = new TimeSetSpinnerVertical(centerBox);
-        time->setFont(mainWindow::time::font);
+        time->setFont(style::window::font::colossal);
         time->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
         time->setEdges(RectangleEdge::None);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -47,6 +48,7 @@ namespace gui
         rightBox = new VBox(mainScreen, 0, 0, 0, 0);
         rightBox->setMinimumSize(style::homescreen_vertical::side_box_w, style::window_height);
         rightBox->setEdges(RectangleEdge::None);
+        rightBox->setMargins(Margins({0, 0, style::homescreen_vertical::rightMargin, 0}));
 
         alarmMainIcon = new AlarmIcon(nullptr);
         alarmMainIcon->setMinimumSize(style::bell_base_layout::outer_layouts_w,

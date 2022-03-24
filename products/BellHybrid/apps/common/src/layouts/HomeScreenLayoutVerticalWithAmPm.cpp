@@ -37,6 +37,7 @@ namespace gui
         leftTopBox->addWidget(alarmMainIcon);
         leftTopBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         alarmMainIcon->setMargins(Margins{0, style::homescreen_vertical_ampm::alarm_margin_top, 0, 0});
+        alarmMainIcon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
         leftBottomBox->addWidget(battery);
         leftBottomBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
@@ -45,7 +46,7 @@ namespace gui
         rightBox->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Bottom));
         fmt = new TextFixedSize(rightBox, 0, 0, 0, 0);
         fmt->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
-        fmt->setFont(mainWindow::bottomDescription::font_small);
+        fmt->setFont(mainWindow::bottomDescription::font_normal);
         fmt->setEdges(RectangleEdge::None);
         fmt->activeItem = false;
         fmt->drawUnderline(false);

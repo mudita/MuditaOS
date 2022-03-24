@@ -19,6 +19,7 @@ namespace style::time_set_spinner_vertical
 
     inline constexpr auto small_margin = 6U;
     inline constexpr auto big_margin   = 44U;
+    inline constexpr auto colossal_margin = -40;
 } // namespace style::time_set_spinner_vertical
 
 namespace gui
@@ -64,7 +65,8 @@ namespace gui
             {style::window::font::verybiglight, {0, 0, 0, style::time_set_spinner_vertical::small_margin}},
             {style::window::font::largelight, {0, 0, 0, style::time_set_spinner_vertical::small_margin}},
             {style::window::font::supersizemelight, {0, 0, 0, style::time_set_spinner_vertical::big_margin}},
-            {style::window::font::huge, {0, 0, 0, style::time_set_spinner_vertical::big_margin}}};
+            {style::window::font::huge, {0, 0, 0, style::time_set_spinner_vertical::big_margin}},
+            {style::window::font::colossal, {0, 0, 0, style::time_set_spinner_vertical::colossal_margin}}};
 
         void handleContentChanged() override;
 

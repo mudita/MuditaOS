@@ -9,8 +9,10 @@
 
 namespace style::homescreen_vertical
 {
-    constexpr inline auto side_box_w   = 180U;
+    constexpr inline auto side_box_w   = 120U;
     constexpr inline auto center_box_w = 240U;
+    constexpr inline auto leftMargin   = 60U;
+    constexpr inline auto rightMargin  = 60U;
 } // namespace style::homescreen_vertical
 
 namespace gui
