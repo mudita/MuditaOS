@@ -5,6 +5,8 @@
 
 #include "data/Contract.hpp"
 #include <common/BellListItemProvider.hpp>
+#include <common/models/AbstractAudioModel.hpp>
+#include <common/SoundsRepository.hpp>
 #include <memory>
 
 namespace app
@@ -27,18 +29,22 @@ namespace app::meditation
         SettingsPresenter(app::ApplicationCommon *app,
                           models::ChimeInterval &chimeIntervalModel,
                           models::ChimeVolume &chimeVolumeModel,
-                          models::StartDelay &startDelayModel);
+                          models::StartDelay &startDelayModel,
+                          AbstractAudioModel &audioModel);
         void loadData() override;
         void saveData() override;
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         void eraseProviderData() override;
         void handleEnter() override;
+        void exitWithoutSave() override;
 
       private:
+        void stopSound();
         ApplicationCommon *application{};
         models::ChimeInterval &chimeIntervalModel;
         models::ChimeVolume &chimeVolumeModel;
         models::StartDelay &startDelayModel;
+        AbstractAudioModel &audioModel;
         std::shared_ptr<BellListItemProvider> listItemsProvider;
     };
 } // namespace app::meditation

@@ -22,6 +22,8 @@ namespace
             return audio::PlaybackType::PreWakeUp;
         case Type::Bedtime:
             return audio::PlaybackType::Bedtime;
+        case Type::Meditation:
+            return audio::PlaybackType::Meditation;
         default:
             return audio::PlaybackType::Alarm;
         }

@@ -18,6 +18,7 @@
 #include "presenter/StatisticsPresenter.hpp"
 
 #include <common/models/TimeModel.hpp>
+#include <common/models/AudioModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/SessionPausedWindow.hpp>
 
@@ -38,8 +39,9 @@ namespace app
             return ret;
         }
 
+        audioModel         = std::make_unique<AudioModel>(this);
         chimeIntervalModel = std::make_unique<meditation::models::ChimeInterval>(this);
-        chimeVolumeModel   = std::make_unique<meditation::models::ChimeVolume>(this);
+        chimeVolumeModel   = std::make_unique<meditation::models::ChimeVolume>(*audioModel);
         startDelayModel    = std::make_unique<meditation::models::StartDelay>(this);
 
         createUserInterface();
@@ -58,7 +60,7 @@ namespace app
         windowsFactory.attach(meditation::SettingsWindow::name,
                               [this](ApplicationCommon *app, const std::string &name) {
                                   auto presenter = std::make_unique<app::meditation::SettingsPresenter>(
-                                      app, *chimeIntervalModel, *chimeVolumeModel, *startDelayModel);
+                                      app, *chimeIntervalModel, *chimeVolumeModel, *startDelayModel, *audioModel);
                                   return std::make_unique<meditation::SettingsWindow>(app, std::move(presenter));
                               });
 

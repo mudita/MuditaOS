@@ -19,4 +19,7 @@ namespace app::meditation
     }
     void StatisticsPresenter::handleEnter()
     {}
+
+    void StatisticsPresenter::exitWithoutSave()
+    {}
 } // namespace app::meditation

@@ -8,11 +8,20 @@ namespace app::meditation::models
 
     void ChimeVolume::setValue(std::uint8_t value)
     {
-        /// Dummy implementation.
+        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Meditation, {});
     }
     std::uint8_t ChimeVolume::getValue() const
     {
-        /// Dummy implementation
-        return 5;
+        return defaultValue;
+    }
+
+    void ChimeVolume::restoreDefault()
+    {
+        setValue(defaultValue);
+    }
+
+    ChimeVolume::ChimeVolume(AbstractAudioModel &audioModel) : audioModel{audioModel}
+    {
+        defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Meditation).value_or(0);
     }
 } // namespace app::meditation::models

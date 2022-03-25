@@ -23,5 +23,6 @@ namespace app::meditation::contract
         virtual void saveData()                                                         = 0;
         virtual void eraseProviderData()                                                = 0;
         virtual void handleEnter()                                                      = 0;
+        virtual void exitWithoutSave()                                                  = 0;
     };
 } // namespace app::meditation::contract

@@ -17,6 +17,7 @@ namespace app::meditation
         void saveData() override;
         void eraseProviderData() override;
         void handleEnter() override;
+        void exitWithoutSave() override;
 
       private:
     };

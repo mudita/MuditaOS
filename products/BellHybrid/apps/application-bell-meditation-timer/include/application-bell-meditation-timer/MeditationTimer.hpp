@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Application.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 
 namespace app::meditation::models
 {
@@ -43,6 +44,7 @@ namespace app
         std::unique_ptr<app::meditation::models::ChimeInterval> chimeIntervalModel;
         std::unique_ptr<app::meditation::models::ChimeVolume> chimeVolumeModel;
         std::unique_ptr<app::meditation::models::StartDelay> startDelayModel;
+        std::unique_ptr<AbstractAudioModel> audioModel;
     };
 
     template <> struct ManifestTraits<MeditationTimer>
