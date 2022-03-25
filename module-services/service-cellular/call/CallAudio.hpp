@@ -21,4 +21,8 @@ class CallRingAudio
 
     void play();
     void stop();
+    void muteCall();
+    void unmuteCall();
+    void setLaudspeakerOn();
+    void setLaudspeakerOff();
 };

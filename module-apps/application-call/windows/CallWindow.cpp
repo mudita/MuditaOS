@@ -189,9 +189,6 @@ namespace gui
             connectTimerOnExit();
         } break;
         case State::CALL_IN_PROGRESS: {
-            if (prevState == State::INCOMING_CALL) { // otherwise it is already started
-                interface->startAudioRouting();
-            }
             runCallTimer();
             navBar->setActive(gui::nav_bar::Side::Left, false);
             navBar->setActive(gui::nav_bar::Side::Center, false);
@@ -204,7 +201,6 @@ namespace gui
             setFocusItem(microphoneIcon);
         } break;
         case State::OUTGOING_CALL: {
-            interface->startAudioRouting();
             navBar->setActive(gui::nav_bar::Side::Left, false);
             navBar->setActive(gui::nav_bar::Side::Center, false);
             navBar->setText(gui::nav_bar::Side::Right, utils::translate(strings::endcall), true);

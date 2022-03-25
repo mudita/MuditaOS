@@ -1028,4 +1028,20 @@ namespace cellular
       public:
         RetryGetCSQ() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
     };
+
+    class CallAudioEventRequest : public sys::DataMessage
+    {
+      public:
+        enum class EventType
+        {
+            Mute,
+            Unmute,
+            LoudspeakerOn,
+            LoudspeakerOff
+        };
+        explicit CallAudioEventRequest(EventType event)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), eventType(event){};
+
+        EventType eventType;
+    };
 } // namespace cellular

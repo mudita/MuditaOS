@@ -16,7 +16,6 @@
 #include <PhoneNumber.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 #include <WindowsPopupFilter.hpp>
@@ -264,25 +263,20 @@ namespace app
         }
     }
 
-    void ApplicationCall::startAudioRouting()
-    {
-        AudioServiceAPI::RoutingStart(this);
-    }
-
     void ApplicationCall::sendAudioEvent(AudioEvent audioEvent)
     {
         switch (audioEvent) {
         case AudioEvent::Mute:
-            AudioServiceAPI::SendEvent(this, audio::EventType::CallMute);
+            CellularServiceAPI::CallAudioMuteEvent(this);
             break;
         case AudioEvent::Unmute:
-            AudioServiceAPI::SendEvent(this, audio::EventType::CallUnmute);
+            CellularServiceAPI::CallAudioUnmuteEvent(this);
             break;
         case AudioEvent::LoudspeakerOn:
-            AudioServiceAPI::SendEvent(this, audio::EventType::CallLoudspeakerOn);
+            CellularServiceAPI::CallAudioLoudspeakerOnEvent(this);
             break;
         case AudioEvent::LoudspeakerOff:
-            AudioServiceAPI::SendEvent(this, audio::EventType::CallLoudspeakerOff);
+            CellularServiceAPI::CallAudioLoudspeakerOffEvent(this);
             break;
         }
     }

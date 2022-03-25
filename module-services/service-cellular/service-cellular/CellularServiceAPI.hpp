@@ -141,4 +141,12 @@ namespace CellularServiceAPI
 
     bool SetConnectionFrequency(sys::Service *serv, uint8_t connectionFrequency);
 
+    bool CallAudioMuteEvent(sys::Service *serv);
+
+    bool CallAudioUnmuteEvent(sys::Service *serv);
+
+    bool CallAudioLoudspeakerOnEvent(sys::Service *serv);
+
+    bool CallAudioLoudspeakerOffEvent(sys::Service *serv);
+
 }; // namespace CellularServiceAPI

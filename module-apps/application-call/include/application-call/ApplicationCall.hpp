@@ -45,7 +45,6 @@ namespace app
             LoudspeakerOff
         };
 
-        virtual void startAudioRouting()                   = 0;
         virtual void sendAudioEvent(AudioEvent audioEvent) = 0;
 
         virtual void transmitDtmfTone(uint32_t digit) = 0;
@@ -119,7 +118,6 @@ namespace app
             this->callState = state;
         }
 
-        void startAudioRouting() override;
         void sendAudioEvent(AudioEvent audioEvent) override;
 
         void transmitDtmfTone(uint32_t digit) override;
