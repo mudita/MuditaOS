@@ -309,6 +309,8 @@
   "app_settings_display_wallpaper_logo": "Mudita-logotyp",
   "app_settings_display_wallpaper_clock": "Klocka",
   "app_settings_display_wallpaper_quotes": "Citat",
+  "app_settings_display_wallpaper_edit_quotes": "Redigera citat",
+  "app_settings_display_wallpaper_edit_custom_quotes": "Redigera citat",
   "app_settings_display_wallpaper_quotes_edit": "Redigera citat",
   "app_settings_display_wallpaper_quotes_delete": "Radera citat",
   "app_settings_display_wallpaper_quotes_new": "Nytt citat",
