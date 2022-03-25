@@ -13,4 +13,5 @@ namespace app::meditation
     }; // namespace windows
 
     constexpr auto meditationDBRecordName = "MeditationTimer";
+    inline constexpr auto meditationAudioPath = "assets/audio/meditation/Meditation_Gong.mp3";
 } // namespace app::meditation

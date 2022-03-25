@@ -3,6 +3,7 @@
 
 #include "SettingsPresenter.hpp"
 #include "MeditationMainWindow.hpp"
+#include "MeditationCommon.hpp"
 
 #include "models/ChimeInterval.hpp"
 #include "models/ChimeVolume.hpp"
@@ -60,10 +61,12 @@ namespace app::meditation
     SettingsPresenter::SettingsPresenter(app::ApplicationCommon *app,
                                          models::ChimeInterval &chimeIntervalModel,
                                          models::ChimeVolume &chimeVolumeModel,
-                                         models::StartDelay &startDelayModel)
+                                         models::StartDelay &startDelayModel,
+                                         AbstractAudioModel &audioModel)
         : application{app}, chimeIntervalModel{chimeIntervalModel}, chimeVolumeModel{chimeVolumeModel},
-          startDelayModel{startDelayModel}
+          startDelayModel{startDelayModel}, audioModel{audioModel}
     {
+
         auto chimeInterval =
             new list_items::Fraction{list_items::Fraction::spinner_type::range{{1, 1}, {1, 2}, {1, 3}, {1, 4}},
                                      chimeIntervalModel,
@@ -82,6 +85,23 @@ namespace app::meditation
         listItemsProvider =
             std::make_shared<BellListItemProvider>(BellListItemProvider::Items{startDelay, chimeInterval, chimeVolume});
 
+        chimeVolume->onEnter = [this]() {
+            this->audioModel.play(purefs::dir::getCurrentOSPath() / meditationAudioPath,
+                                  AbstractAudioModel::PlaybackType::Meditation,
+                                  {});
+        };
+
+        chimeVolume->onExit = [this]() { stopSound(); };
+
+        chimeVolume->set_on_value_change_cb([this](const auto &val) {
+            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Meditation, {});
+            if (this->audioModel.hasPlaybackFinished()) {
+                this->audioModel.play(purefs::dir::getCurrentOSPath() / meditationAudioPath,
+                                      AbstractAudioModel::PlaybackType::Meditation,
+                                      {});
+            }
+        });
+
         for (auto &item : listItemsProvider->getListItems()) {
             item->setValue();
         }
@@ -94,6 +114,7 @@ namespace app::meditation
     }
     void SettingsPresenter::saveData()
     {
+        stopSound();
         for (auto &item : listItemsProvider->getListItems()) {
             item->getValue();
         }
@@ -112,6 +133,16 @@ namespace app::meditation
         application->switchWindow(
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", MeditationMainWindow::defaultName));
+    }
+
+    void SettingsPresenter::stopSound()
+    {
+        audioModel.stopPlayedByThis({});
+    }
+
+    void SettingsPresenter::exitWithoutSave()
+    {
+        chimeVolumeModel.restoreDefault();
     }
 
 } // namespace app::meditation

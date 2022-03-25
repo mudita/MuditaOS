@@ -28,7 +28,8 @@ namespace app
             Snooze,
             Alarm,
             PreWakeup,
-            Bedtime
+            Bedtime,
+            Meditation
         };
 
         virtual ~AbstractAudioModel() noexcept                                                              = default;

@@ -16,7 +16,6 @@ namespace
     inline constexpr auto meditationProgressTimerName = "MeditationProgressTimer";
     inline constexpr std::chrono::seconds baseTick{1};
     inline constexpr auto meditationProgressMode = app::ProgressCountdownMode::Increasing;
-    inline constexpr auto meditationAudioPath    = "assets/audio/meditation/Meditation_Gong.mp3";
 
     using namespace app::meditationStyle;
 
@@ -187,7 +186,7 @@ namespace gui
     void MeditationRunningWindow::playGong()
     {
         auto msg = std::make_shared<service::AudioStartPlaybackRequest>(
-            purefs::dir::getCurrentOSPath() / meditationAudioPath, audio::PlaybackType::Meditation);
+            purefs::dir::getCurrentOSPath() / app::meditation::meditationAudioPath, audio::PlaybackType::Meditation);
         application->bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 } // namespace gui

@@ -4,15 +4,21 @@
 #pragma once
 
 #include <common/models/SettingsModel.hpp>
+#include <common/models/AudioModel.hpp>
 
 namespace app::meditation::models
 {
-    class ChimeVolume : public gui::SettingsModel<std::uint8_t>
+    class ChimeVolume : public gui::AbstractSettingsModel<std::uint8_t>
     {
       public:
-        using SettingsModel::SettingsModel;
+        explicit ChimeVolume(AbstractAudioModel &audioModel);
 
         void setValue(std::uint8_t value) override;
         std::uint8_t getValue() const override;
+        void restoreDefault() override;
+
+      private:
+        AbstractAudioModel &audioModel;
+        std::uint8_t defaultValue;
     };
 } // namespace app::meditation::models
