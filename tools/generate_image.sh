@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 usage() {
@@ -137,7 +137,7 @@ mcopy -s -i "$PART1" .boot.json ::
 mcopy -s -i "$PART1" .boot.json.crc32 ::
 
 # ^64bit - 64bit inodes are not supported by the lwext4
-# ^metadata_csum - Metatata checksums has buggy implementation in the lwext4 
+# ^metadata_csum - Metatata checksums has buggy implementation in the lwext4
 
 # Ext4 backup partition used by updater
 mke2fs \
@@ -167,7 +167,8 @@ mke2fs \
   -m 0 \
   -r 1 \
   -t ext4 \
-  "$IMAGE_NAME" > /dev/null
+  "$IMAGE_NAME" \
+  $((($PART3_SIZE*$DEVICE_BLK_SIZE)/1024)) > /dev/null
 
 # back to previous dir
 cd -
