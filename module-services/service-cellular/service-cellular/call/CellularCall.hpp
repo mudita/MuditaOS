@@ -7,6 +7,7 @@
 #include "call/CallGUI.hpp"
 #include "call/CallDB.hpp"
 #include "PhoneModes/PhoneMode.hpp"
+#include <service-cellular/CellularMessage.hpp>
 #include <Interface/CalllogRecord.hpp>
 #include <SystemManager/CpuSentinel.hpp>
 #include <PhoneNumber.hpp>
@@ -98,6 +99,8 @@ namespace CellularCall
         bool handleRING();
         bool handleCLIP(const utils::PhoneNumber::View &number);
         bool endCall(Forced forced = Forced::False);
+
+        void handleCallAudioEventRequest(cellular::CallAudioEventRequest::EventType event);
 
         bool isValid() const
         {

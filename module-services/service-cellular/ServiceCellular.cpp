@@ -20,6 +20,7 @@
 #include "system/messages/SentinelRegistrationMessage.hpp"
 
 #include <Audio/AudioCommon.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <BaseInterface.hpp>
 #include <CalllogRecord.hpp>
 #include <Commands.hpp>
@@ -588,6 +589,11 @@ void ServiceCellular::registerMessageHandlers()
         return sys::MessageNone{};
     });
 
+    connect(typeid(cellular::CallAudioEventRequest), [&](sys::Message *request) -> sys::MessagePointer {
+        auto message = static_cast<cellular::CallAudioEventRequest *>(request);
+        ongoingCall.handleCallAudioEventRequest(message->eventType);
+        return sys::MessageNone{};
+    });
     handle_CellularGetChannelMessage();
 }
 
@@ -1393,7 +1399,6 @@ bool ServiceCellular::handle_fatal_failure()
 
 bool ServiceCellular::handle_ready()
 {
-
     LOG_DEBUG("%s", priv->state->c_str());
     return true;
 }
@@ -1763,6 +1768,7 @@ auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *m
             // Propagate "CallActive" notification into system
             bus.sendMulticast(std::make_shared<CellularCallActiveNotification>(),
                               sys::BusChannel::ServiceCellularNotifications);
+            AudioServiceAPI::RoutingStart(this);
             ret = true;
         }
     }

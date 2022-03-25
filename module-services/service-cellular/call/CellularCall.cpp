@@ -186,6 +186,24 @@ namespace CellularCall
         cpuSentinel = std::move(sentinel);
     }
 
+    void Call::handleCallAudioEventRequest(cellular::CallAudioEventRequest::EventType event)
+    {
+        switch (event) {
+        case cellular::CallAudioEventRequest::EventType::Mute:
+            audio.muteCall();
+            break;
+        case cellular::CallAudioEventRequest::EventType::Unmute:
+            audio.unmuteCall();
+            break;
+        case cellular::CallAudioEventRequest::EventType::LoudspeakerOn:
+            audio.setLaudspeakerOn();
+            break;
+        case cellular::CallAudioEventRequest::EventType::LoudspeakerOff:
+            audio.setLaudspeakerOff();
+            break;
+        }
+    }
+
     bool Call::Operations::areCallsFromFavouritesEnabled()
     {
         return call.owner.areCallsFromFavouritesEnabled();

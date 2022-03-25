@@ -336,3 +336,31 @@ bool CellularServiceAPI::SetConnectionFrequency(sys::Service *serv, uint8_t conn
     return serv->bus.sendUnicast(std::make_shared<CellularSetConnectionFrequencyMessage>(connectionFrequency),
                                  ServiceCellular::serviceName);
 }
+
+bool CellularServiceAPI::CallAudioMuteEvent(sys::Service *serv)
+{
+    return serv->bus.sendUnicast(
+        std::make_shared<cellular::CallAudioEventRequest>(cellular::CallAudioEventRequest::EventType::Mute),
+        ServiceCellular::serviceName);
+}
+
+bool CellularServiceAPI::CallAudioUnmuteEvent(sys::Service *serv)
+{
+    return serv->bus.sendUnicast(
+        std::make_shared<cellular::CallAudioEventRequest>(cellular::CallAudioEventRequest::EventType::Unmute),
+        ServiceCellular::serviceName);
+}
+
+bool CellularServiceAPI::CallAudioLoudspeakerOnEvent(sys::Service *serv)
+{
+    return serv->bus.sendUnicast(
+        std::make_shared<cellular::CallAudioEventRequest>(cellular::CallAudioEventRequest::EventType::LoudspeakerOn),
+        ServiceCellular::serviceName);
+}
+
+bool CellularServiceAPI::CallAudioLoudspeakerOffEvent(sys::Service *serv)
+{
+    return serv->bus.sendUnicast(
+        std::make_shared<cellular::CallAudioEventRequest>(cellular::CallAudioEventRequest::EventType::LoudspeakerOff),
+        ServiceCellular::serviceName);
+}

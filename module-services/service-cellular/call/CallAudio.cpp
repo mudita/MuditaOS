@@ -39,3 +39,23 @@ void CallRingAudio::stop()
     owner.sync(meta->async);
     AudioServiceAPI::StopAll(&owner);
 }
+
+void CallRingAudio::muteCall()
+{
+    AudioServiceAPI::SendEvent(&owner, audio::EventType::CallMute);
+}
+
+void CallRingAudio::unmuteCall()
+{
+    AudioServiceAPI::SendEvent(&owner, audio::EventType::CallUnmute);
+}
+
+void CallRingAudio::setLaudspeakerOn()
+{
+    AudioServiceAPI::SendEvent(&owner, audio::EventType::CallLoudspeakerOn);
+}
+
+void CallRingAudio::setLaudspeakerOff()
+{
+    AudioServiceAPI::SendEvent(&owner, audio::EventType::CallLoudspeakerOff);
+}

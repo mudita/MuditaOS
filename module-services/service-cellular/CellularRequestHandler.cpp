@@ -24,6 +24,8 @@
 
 #include <service-appmgr/Constants.hpp>
 
+#include <service-audio/AudioServiceAPI.hpp>
+
 #include <module-cellular/at/response.hpp>
 
 void CellularRequestHandler::handle(cellular::ImeiRequest &request, at::Result &result)
@@ -71,6 +73,7 @@ void CellularRequestHandler::handle(cellular::CallRequest &request, at::Result &
     // Propagate "Ringing" notification into system
     cellular.bus.sendMulticast(std::make_shared<CellularRingingMessage>(request.getNumber()),
                                sys::BusChannel::ServiceCellularNotifications);
+    AudioServiceAPI::RoutingStart(&cellular);
     request.setHandled(true);
 }
 
