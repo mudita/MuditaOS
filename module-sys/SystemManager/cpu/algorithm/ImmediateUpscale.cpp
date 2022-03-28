@@ -12,6 +12,10 @@ namespace sys::cpu
         if (now > was) {
             return {algorithm::Change::UpScaled, now};
         }
+        else if (now == was) {
+            return {algorithm::Change::Hold, now};
+        }
+
         return {algorithm::Change::NoChange, was};
     }
 } // namespace sys::cpu

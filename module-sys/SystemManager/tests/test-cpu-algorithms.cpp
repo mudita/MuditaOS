@@ -118,3 +118,41 @@ TEST_CASE("combined algos")
     REQUIRE(result.value == bsp::CpuFrequencyMHz::Level_3);
     REQUIRE(result.change == sys::cpu::algorithm::Change::Downscaled);
 }
+
+TEST_CASE("test FrequencyStepping x FrequencyDown rippling")
+{
+    auto cpuGovernor = std::make_unique<mockup::Governor>();
+    const bsp::PowerProfile pp{.frequencyShiftLowerThreshold = 10,
+                               .frequencyShiftUpperThreshold = 70,
+                               .maxBelowThresholdCount       = 1,
+                               .maxBelowThresholdInRowCount  = 1,
+                               .maxAboveThresholdCount       = 3,
+                               .minimalFrequency             = bsp::CpuFrequencyMHz::Level_0};
+
+    std::shared_ptr<sys::cpu::AlgorithmFactory> cpuAlgorithms = mockup::getAlgos(*cpuGovernor, pp);
+    const bsp::CpuFrequencyMHz freq_now                       = bsp::CpuFrequencyMHz::Level_5;
+
+    /// first is upscaling algorithm then is frequency stepping
+    /// please mind that algorithm order matters - as it works in serve first aproach: we select first available change
+    auto algorithms = {sys::cpu::AlgoID::ImmediateUpscale, sys::cpu::AlgoID::FrequencyStepping};
+    auto data       = sys::cpu::AlgorithmData{0, freq_now, cpuGovernor->GetMinimumFrequencyRequested()};
+
+    sys::cpu::AlgoID id;
+    auto result = cpuAlgorithms->calculate(algorithms, data, &id);
+
+    // 1. upscale the value even though cpu is under 10% used because of sentinel value
+    REQUIRE(id == sys::cpu::AlgoID::ImmediateUpscale);
+    REQUIRE(result.value == bsp::CpuFrequencyMHz::Level_6);
+    REQUIRE(result.change == sys::cpu::algorithm::Change::UpScaled);
+
+    for (size_t i = 0; i < 3; ++i) {
+        // 2. store the calculated frequency for next calculation
+        data.curentFrequency = result.value;
+        result               = cpuAlgorithms->calculate(algorithms, data, &id);
+        // 3. even though frequency stepping would require changing to lower cpu
+        // the ImmediateUpscale will request to keep the frequency first
+        REQUIRE(id == sys::cpu::AlgoID::ImmediateUpscale);
+        REQUIRE(result.value == bsp::CpuFrequencyMHz::Level_6);
+        REQUIRE(result.change == sys::cpu::algorithm::Change::Hold);
+    }
+}
