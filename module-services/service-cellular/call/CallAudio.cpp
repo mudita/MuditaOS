@@ -9,6 +9,7 @@
 #include "service-audio/AudioServiceName.hpp"
 #include <service-audio/AudioServiceAPI.hpp>
 #include <Timers/TimerFactory.hpp>
+#include <gsl/util>
 
 struct CallRingAudio::CallMeta
 {
@@ -33,11 +34,13 @@ void CallRingAudio::play()
 
 void CallRingAudio::stop()
 {
+    auto _ = gsl::finally([this] { AudioServiceAPI::StopAll(&owner); });
+
     if (not started) {
         return;
     }
+    started = false;
     owner.sync(meta->async);
-    AudioServiceAPI::StopAll(&owner);
 }
 
 void CallRingAudio::muteCall()
