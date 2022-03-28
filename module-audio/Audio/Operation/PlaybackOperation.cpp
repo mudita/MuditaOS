@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlaybackOperation.hpp"
@@ -47,7 +47,7 @@ namespace audio
 
     audio::RetCode PlaybackOperation::Start(audio::Token token)
     {
-        if (state == State::Active || state == State::Paused) {
+        if (state == State::Active || (state == State::Paused && outputConnection != nullptr)) {
             return RetCode::InvokedInIncorrectState;
         }
 
@@ -108,9 +108,14 @@ namespace audio
 
     audio::RetCode PlaybackOperation::Resume()
     {
-        if (state == State::Active || state == State::Idle || outputConnection == nullptr) {
+        if (state == State::Active || state == State::Idle) {
             return RetCode::InvokedInIncorrectState;
         }
+
+        if (outputConnection == nullptr) {
+            Start(operationToken);
+        }
+
         state = State::Active;
         outputConnection->enable();
         return GetDeviceError(audioDevice->Resume());
