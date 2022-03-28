@@ -99,8 +99,8 @@ sys::ReturnCodes ServiceDBCommon::SwitchPowerModeHandler(const sys::ServicePower
     return sys::ReturnCodes::Success;
 }
 
-void ServiceDBCommon::sendUpdateNotification(db::Interface::Name interface, db::Query::Type type)
+void ServiceDBCommon::sendUpdateNotification(db::Interface::Name interface, db::Query::Type type, uint32_t recordId)
 {
-    auto notificationMessage = std::make_shared<db::NotificationMessage>(interface, type);
+    auto notificationMessage = std::make_shared<db::NotificationMessage>(interface, type, recordId);
     bus.sendMulticast(notificationMessage, sys::BusChannel::ServiceDBNotifications);
 }

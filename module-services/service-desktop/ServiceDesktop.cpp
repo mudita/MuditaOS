@@ -4,6 +4,7 @@
 #include "service-evtmgr/BatteryMessages.hpp"
 #include "system/SystemReturnCodes.hpp"
 #include <service-appmgr/messages/DOMRequest.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/WorkerDesktop.hpp>
@@ -34,14 +35,15 @@
 ServiceDesktop::ServiceDesktop()
     : sys::Service(service::name::service_desktop, "", sdesktop::service_stack),
       btMsgHandler(std::make_unique<sdesktop::bluetooth::BluetoothMessagesHandler>(this)),
-      notificationsClearTimer{
-          sys::TimerFactory::createSingleShotTimer(this,
-                                                   sdesktop::notificationsClearTimerName,
-                                                   sdesktop::notificationsClearTimerDelayMs,
-                                                   [this](sys::Timer & /*timer*/) { notificationEntries.clear(); })}
+      connectionActiveTimer{sys::TimerFactory::createSingleShotTimer(
+          this,
+          sdesktop::connectionActiveTimerName,
+          sdesktop::connectionActiveTimerDelayMs,
+          [this](sys::Timer & /*timer*/) { outboxNotifications.clearNotifications(); })}
 {
     LOG_INFO("[ServiceDesktop] Initializing");
     bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
+    bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     bus.channels.push_back(sys::BusChannel::USBNotifications);
 }
 
@@ -241,6 +243,18 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return btMsgHandler->handle(msgl);
     });
 
+    connect(typeid(db::NotificationMessage), [&](sys::Message *msg) {
+        if (!connectionActiveTimer.isActive()) {
+            return sys::MessageNone{};
+        }
+        auto notificationMessage = dynamic_cast<db::NotificationMessage *>(msg);
+        if (notificationMessage == nullptr) {
+            return sys::MessageNone{};
+        }
+        outboxNotifications.newNotificationHandler(notificationMessage);
+        return sys::MessageNone{};
+    });
+
     if (auto resUsb = usbWorkerInit(); resUsb != sys::ReturnCodes::Success) {
         return resUsb;
     }
@@ -306,27 +320,6 @@ void ServiceDesktop::prepareRestoreData(const std::filesystem::path &restoreLoca
     backupRestoreStatus.location  = purefs::dir::getBackupOSPath() / backupRestoreStatus.taskId;
 }
 
-auto ServiceDesktop::getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>
-{
-    return notificationEntries;
-}
-
-void ServiceDesktop::removeNotificationEntries(const std::vector<int> &uidsOfNotificationsToBeRemoved)
-{
-    for (auto const &entryUid : uidsOfNotificationsToBeRemoved) {
-        notificationEntries.erase(
-            std::remove_if(notificationEntries.begin(),
-                           notificationEntries.end(),
-                           [&](const Outbox::NotificationEntry &entry) { return entry.uid == entryUid; }),
-            notificationEntries.end());
-    }
-}
-
-void ServiceDesktop::restartNotificationsClearTimer()
-{
-    notificationsClearTimer.restart(sdesktop::notificationsClearTimerDelayMs);
-}
-
 auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
 {
     if (!initialized) {
@@ -335,7 +328,7 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
         LOG_DEBUG("usbWorkerInit Serial Number: %s", serialNumber.c_str());
 
         desktopWorker = std::make_unique<WorkerDesktop>(
-            this, std::bind(&ServiceDesktop::restartNotificationsClearTimer, this), *usbSecurityModel, serialNumber);
+            this, std::bind(&ServiceDesktop::restartConnectionActiveTimer, this), *usbSecurityModel, serialNumber);
 
         initialized = desktopWorker->init(
             {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
@@ -363,4 +356,19 @@ auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
         initialized = false;
     }
     return sys::ReturnCodes::Success;
+}
+
+auto ServiceDesktop::getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>
+{
+    return outboxNotifications.getNotificationEntries();
+}
+
+void ServiceDesktop::removeNotificationEntries(const std::vector<uint32_t> &uidsOfNotificationsToBeRemoved)
+{
+    outboxNotifications.removeNotificationEntries(uidsOfNotificationsToBeRemoved);
+}
+
+void ServiceDesktop::restartConnectionActiveTimer()
+{
+    connectionActiveTimer.restart(sdesktop::connectionActiveTimerDelayMs);
 }
