@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,9 +15,10 @@ namespace db
     class NotificationMessage : public sys::DataMessage
     {
       public:
-        NotificationMessage(db::Interface::Name interface, Query::Type type);
+        NotificationMessage(db::Interface::Name interface, Query::Type type, uint32_t recordId);
         const db::Interface::Name interface;
         const Query::Type type;
+        const uint32_t recordId;
 
         bool dataModified();
     };

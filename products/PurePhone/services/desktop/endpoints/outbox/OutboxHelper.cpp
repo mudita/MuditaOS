@@ -11,10 +11,10 @@ namespace sdesktop::endpoints
 {
     auto OutboxHelper::toJson(const Outbox::NotificationEntry &entry) -> json11::Json
     {
-        auto notificationEntry = json11::Json::object{{json::outbox::uid, entry.uid},
+        auto notificationEntry = json11::Json::object{{json::outbox::uid, static_cast<int>(entry.uid)},
                                                       {json::outbox::type, static_cast<int>(entry.entryType)},
                                                       {json::outbox::change, static_cast<int>(entry.entryChange)},
-                                                      {json::outbox::record_id, entry.recordId}};
+                                                      {json::outbox::record_id, static_cast<int>(entry.recordId)}};
         return notificationEntry;
     }
 
@@ -67,7 +67,7 @@ namespace sdesktop::endpoints
         }
 
         auto entriesToBeRemoved = context.getBody()[json::entries].array_items();
-        std::vector<int> uidsOfEntriesToBeRemoved;
+        std::vector<uint32_t> uidsOfEntriesToBeRemoved;
         uidsOfEntriesToBeRemoved.reserve(entriesToBeRemoved.size());
         for (const auto &entryUid : entriesToBeRemoved) {
             uidsOfEntriesToBeRemoved.emplace_back(entryUid.int_value());

@@ -11,6 +11,7 @@ target_sources(
         DesktopEvent.cpp
         DeveloperModeMessage.cpp
         DesktopMessages.cpp
+        OutboxNotifications.cpp
         ServiceDesktop.cpp
         WorkerDesktop.cpp
         USBSecurityModel.cpp
@@ -27,6 +28,7 @@ target_sources(
         include/service-desktop/DesktopMessages.hpp
         include/service-desktop/DeveloperModeMessage.hpp
         include/service-desktop/Outbox.hpp
+        include/service-desktop/OutboxNotifications.hpp
         include/service-desktop/ServiceDesktop.hpp
         include/service-desktop/USBSecurityModel.hpp
 )

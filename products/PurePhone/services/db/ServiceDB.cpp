@@ -91,7 +91,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         record->push_back(msg->record);
         LOG_DEBUG("Last ID %" PRIu32, msg->record.ID);
         responseMsg = std::make_shared<DBContactResponseMessage>(std::move(record), ret);
-        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Create);
+        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Create, msg->record.ID);
     } break;
 
     case MessageType::DBContactGetByID: {
@@ -151,7 +151,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret              = contactRecordInterface->RemoveByID(msg->id);
         responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Delete);
+        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Delete, msg->id);
     } break;
 
     case MessageType::DBContactUpdate: {
@@ -159,7 +159,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret              = contactRecordInterface->Update(msg->record);
         responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Update);
+        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Update, msg->record.ID);
     } break;
 
         /**
@@ -179,7 +179,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         record->push_back(msg->record);
         LOG_INFO("Last ID %" PRIu32, msg->record.ID);
         responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(record), ret);
-        sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Create);
+        sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Create, msg->record.ID);
     } break;
 
     case MessageType::DBCalllogRemove: {
@@ -187,7 +187,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
         auto ret              = calllogRecordInterface->RemoveByID(msg->id);
         responseMsg           = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Delete);
+        sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Delete, msg->id);
     } break;
 
     case MessageType::DBCalllogUpdate: {
@@ -195,7 +195,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
         auto ret              = calllogRecordInterface->Update(msg->record);
         responseMsg           = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Update);
+        sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Update, msg->record.ID);
     } break;
 
     case MessageType::DBServiceBackup: {

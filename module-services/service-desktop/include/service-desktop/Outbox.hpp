@@ -23,9 +23,9 @@ struct Outbox
 
     struct NotificationEntry
     {
-        int uid                 = 0;
+        uint32_t uid            = 0;
         EntryType entryType     = EntryType::INVALID;
         EntryChange entryChange = EntryChange::INVALID;
-        int recordId            = 0;
+        uint32_t recordId       = 0;
     };
 };
