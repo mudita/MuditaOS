@@ -156,7 +156,7 @@ namespace gui
                                         {{"$DEVICE", std::string(authenticateParams->getDevice().name.data())}});
         }
 
-        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::confirm));
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
 
         auto hBox = new HBox(infoIcon, 0, 0, 0, 0);
         hBox->setMinimumSize(style::window::default_body_width, bluetooth::authenticate::buttons_input_h);
@@ -168,7 +168,7 @@ namespace gui
             Label *option = new Label(hBox, 0, 0, 0, 0, "");
 
             if (optionName == gui::bluetooth::authenticate::ButtonsOptions::Pair) {
-                option->setText(utils::translate("bluetooth_popup_pair"));
+                option->setText(utils::translate("bluetooth_popup_confirm"));
                 option->activatedCallback = [&](Item &) -> bool {
                     application->bus.sendUnicast(std::make_shared<message::bluetooth::ResponseAuthenticatePairCancel>(
                                                      true, authenticateParams->getDevice()),
