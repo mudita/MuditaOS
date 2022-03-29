@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <unistd.h>
+#include <cstdio>
 
 namespace hal::key_input
 {

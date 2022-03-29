@@ -26,7 +26,7 @@ namespace app
                                      std::string parent                  = "",
                                      StatusIndicators statusIndicators   = StatusIndicators{},
                                      StartInBackground startInBackground = {false},
-                                     std::uint32_t stackDepth            = 10240);
+                                     std::uint32_t stackDepth            = 1024 * 15);
 
         sys::ReturnCodes InitHandler() override;
 

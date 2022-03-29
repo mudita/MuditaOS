@@ -39,9 +39,7 @@
  *----------------------------------------------------------*/
 #include <assert.h>
 #include <stdint.h>
-#include <log/log.hpp>
 
-// TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
 #ifdef __cplusplus
 extern "C"
 {
@@ -69,11 +67,7 @@ extern "C"
 #define configQUEUE_REGISTRY_SIZE     32
 #define configUSE_QUEUE_SETS          1
 #define configUSE_TIME_SLICING        1
-#ifdef TARGET_Linux
-#define configUSE_NEWLIB_REENTRANT 0
-#else
-#define configUSE_NEWLIB_REENTRANT 1
-#endif
+
 #define configENABLE_BACKWARD_COMPATIBILITY     1
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 #define configUSE_APPLICATION_TASK_TAG          0
@@ -81,11 +75,7 @@ extern "C"
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION  1
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
-#ifdef TARGET_Linux
 #define configTOTAL_HEAP_SIZE ((size_t)(1024 * 512))
-#else
-#define configTOTAL_HEAP_SIZE ((size_t)(1024 * 386))
-#endif
 
 #define configAPPLICATION_ALLOCATED_HEAP 0
 
@@ -181,10 +171,5 @@ standard names. */
 #define configSYSTEM_HEAP_INTEGRITY_CHECK    (1)
 #define PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS (1)
 #endif
-
-extern void vConfigureTimerForRunTimeStats(void);
-extern uint32_t ulHighFrequencyTimerTicks(void);
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTimerForRunTimeStats()
-#define portGET_RUN_TIME_COUNTER_VALUE()         ulHighFrequencyTimerTicks()
 
 #endif /* FREERTOS_CONFIG_H */

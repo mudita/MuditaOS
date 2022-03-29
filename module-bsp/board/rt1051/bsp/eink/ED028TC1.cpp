@@ -16,10 +16,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-//#include "fat_media.h"
-//#include "vfs.h"
 
-//#include "log.h"
+#include <log/log.hpp>
 #include "board.h"
 #include "eink_binarization_luts.h"
 #include "macros.h"

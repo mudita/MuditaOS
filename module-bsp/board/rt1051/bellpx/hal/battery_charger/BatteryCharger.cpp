@@ -13,6 +13,7 @@
 #include <devices/power/MP2639B.hpp>
 #include <devices/power/CW2015.hpp>
 #include <board/BoardDefinitions.hpp>
+#include <log/log.hpp>
 
 namespace
 {

@@ -57,10 +57,6 @@ namespace sys
         bool timeout_occurred{false};
         bool enableRunLoop{false};
         cpp_freertos::BinarySemaphore taskEndedSem{false};
-
-        static_assert(sizeof(lastRefreshTimestamp) == 4 && alignof(decltype(lastRefreshTimestamp)) == 4,
-                      "SystemWatchdog::lastRefreshTimestamp must be 32-bit long and properly aligned otherwise data "
-                      "races may occur");
     };
 
 } // namespace sys

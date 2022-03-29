@@ -14,6 +14,8 @@
 #include <service-bluetooth/service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/service-bluetooth/messages/Unpair.hpp>
 
+#include <log/log.hpp>
+
 namespace sdesktop::endpoints
 {
     using sender::putToSendQueue;

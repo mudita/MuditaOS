@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlatformFactory.hpp"
+#include "init_prof.hpp"
 
 // applications
 #include <application-bell-alarm/ApplicationBellAlarm.hpp>
@@ -46,6 +47,10 @@
 #include <memory>
 #include <vector>
 
+#if SYSTEM_VIEW_ENABLED
+#include <SEGGER/SEGGER_SYSVIEW.h>
+#endif
+
 int main()
 {
     constexpr auto ApplicationName = "BellHybrid";
@@ -60,6 +65,8 @@ int main()
     SEGGER_SYSVIEW_WaitForConnection();
     SEGGER_SYSVIEW_Start();
 #endif
+
+    prof::init();
 
     auto platformFactory = bellhybrid::PlatformFactory();
     auto platform        = platformFactory.makePlatform();

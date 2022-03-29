@@ -4,7 +4,7 @@
 #pragma once
 
 #include <FreeRTOS.h>
-#include <FreeRTOS/include/queue.h>
+#include <queue.h>
 #include <functional>
 
 namespace bsp

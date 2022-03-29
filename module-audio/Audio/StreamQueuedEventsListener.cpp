@@ -4,6 +4,7 @@
 #include "StreamQueuedEventsListener.hpp"
 
 #include <macros.h>
+#include <log/log.hpp>
 
 #include <utility>
 

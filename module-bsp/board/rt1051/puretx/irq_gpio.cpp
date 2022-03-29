@@ -11,6 +11,7 @@
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/key_input/KeyInput.hpp>
 #include <hal/battery_charger/BatteryChargerIRQ.hpp>
+#include <log/log.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/headset/headset.hpp"
 #include "board/BoardDefinitions.hpp"

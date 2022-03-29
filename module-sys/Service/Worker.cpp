@@ -3,16 +3,13 @@
 
 #include <Service/Worker.hpp>
 
-extern "C"
-{
 #include "FreeRTOS.h"
 #include "task.h"
-}
 
-#include <map>
+#include <log/log.hpp>
+
 #include <string>
 #include <utility>
-
 #include <cassert>
 
 namespace sys

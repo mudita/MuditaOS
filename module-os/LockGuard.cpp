@@ -6,25 +6,30 @@
 #include <macros.h>
 #include <stdexcept>
 
-LockGuard::LockGuard(cpp_freertos::MutexStandard& mutex) : mutex(mutex)
+namespace
 {
-
-    if (isOSRunning() == 0)
+    [[nodiscard]] bool isOSRunning()
     {
+        return xTaskGetSchedulerState() == taskSCHEDULER_RUNNING;
+    }
+} // namespace
+
+LockGuard::LockGuard(cpp_freertos::MutexStandard &mutex) : mutex(mutex)
+{
+    if (not isOSRunning()) {
         return;
     }
     if (isIRQ()) {
         savedInterruptStatus = cpp_freertos::CriticalSection::EnterFromISR();
     }
-    else if(!mutex.Lock()) {
+    else if (!mutex.Lock()) {
         throw std::runtime_error("LockGuard failed to lock mutex");
     }
 }
 
 LockGuard::~LockGuard()
 {
-    if (isOSRunning() == 0)
-    {
+    if (not isOSRunning()) {
         return;
     }
     if (isIRQ()) {

@@ -72,13 +72,4 @@ static inline bool isIRQ()
     return false;
 }
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-    int isOSRunning();
-#ifdef __cplusplus
-};
-#endif
-
 #endif /* MACROS_H_ */

@@ -14,6 +14,7 @@
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/fs/handle_mapper.hpp>
+#include <log/log.hpp>
 
 namespace purefs::fs::drivers::ffat::internal
 {

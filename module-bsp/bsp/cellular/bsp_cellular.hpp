@@ -9,7 +9,7 @@
 #include <memory>
 #include <chrono>
 #include <FreeRTOS.h>
-#include <FreeRTOS/include/queue.h>
+#include <queue.h>
 #include "drivers/lpuart/DriverLPUART.hpp"
 #include <EventStore.hpp>
 
