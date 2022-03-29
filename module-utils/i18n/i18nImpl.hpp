@@ -13,13 +13,6 @@
 
 namespace utils
 {
-
-    class LangLoaderImpl : public LangLoader
-    {
-      public:
-        json11::Json createJson(const std::string &filename);
-    };
-
     class i18n
     {
       private:
@@ -28,7 +21,6 @@ namespace utils
 
         json11::Json displayLanguage;
         json11::Json fallbackLanguage; // backup language if item not found
-        LangLoaderImpl loader;
         Language fallbackLanguageName = getDefaultLanguage();
         Language inputLanguage        = fallbackLanguageName;
         Language inputLanguageFilename;
