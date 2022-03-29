@@ -3,6 +3,7 @@
 
 #include <endpoints/backup/BackupEndpoint.hpp>
 #include <endpoints/message/Sender.hpp>
+#include <log/log.hpp>
 
 namespace sdesktop::endpoints
 {

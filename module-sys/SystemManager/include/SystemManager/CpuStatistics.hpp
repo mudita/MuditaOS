@@ -7,10 +7,7 @@
 #include "SystemManager/CpuPrinter.hpp"
 #include <cstdint>
 
-extern "C"
-{
 #include "prof.h"
-}
 
 namespace sys
 {

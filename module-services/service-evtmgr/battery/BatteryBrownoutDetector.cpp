@@ -6,6 +6,7 @@
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <system/Constants.hpp>
 #include <Timers/TimerFactory.hpp>
+#include <log/log.hpp>
 
 namespace
 {

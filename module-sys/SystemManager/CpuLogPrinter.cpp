@@ -4,6 +4,9 @@
 #include "SystemManager/CpuPrinter.hpp"
 #include "SystemManager/SysCpuUpdateResult.hpp"
 #include <SystemManager/SystemManagerCommon.hpp>
+#include <log/log.hpp>
+
+#include <cinttypes>
 
 extern "C"
 {

@@ -6,8 +6,8 @@
 #include <bsp/common.hpp>
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #include "board/BoardDefinitions.hpp"
+#include <log/log.hpp>
 
-#include <unistd.h>
 #include <cstring>
 #include <task.h>
 

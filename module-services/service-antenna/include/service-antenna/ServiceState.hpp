@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Service/Service.hpp>
+#include <log/log.hpp>
 
 namespace state
 {

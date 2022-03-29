@@ -7,6 +7,7 @@
 #include "transcode/TransformFactory.hpp"
 
 #include <Math.hpp>
+#include <log/log.hpp>
 
 #include <algorithm>
 #include <chrono>

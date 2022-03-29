@@ -10,6 +10,7 @@
 #include <endpoints/nullEndpoint/NullEndpoint.hpp>
 #include <endpoints/restore/RestoreEndpoint.hpp>
 #include <endpoints/update/UpdateEndpoint.hpp>
+#include <log/log.hpp>
 
 namespace sdesktop::endpoints
 {

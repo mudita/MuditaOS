@@ -4,6 +4,7 @@
 #include <endpoints/filesystem/FilesystemEndpoint.hpp>
 #include <endpoints/filesystem/FS_Helper.hpp>
 #include <endpoints/message/Sender.hpp>
+#include <log/log.hpp>
 
 namespace sdesktop::endpoints
 {

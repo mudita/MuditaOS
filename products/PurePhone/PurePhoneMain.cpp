@@ -108,6 +108,10 @@
 #include <cstdlib>
 #include "init_prof.hpp"
 
+#if SYSTEM_VIEW_ENABLED
+#include <SEGGER/SEGGER_SYSVIEW.h>
+#endif
+
 void atexit_cleanup_handler()
 {
     LOG_INFO("Starting clean up");

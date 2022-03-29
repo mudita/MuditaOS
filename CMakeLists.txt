@@ -121,7 +121,6 @@ if (NOT ENABLE_SECURE_BOOT)
         )
 endif ()
 
-add_subdirectory(third-party)
 add_subdirectory(board)
 add_subdirectory(source)
 add_subdirectory(module-platform)
@@ -139,6 +138,7 @@ add_subdirectory(module-apps)
 add_subdirectory(module-bluetooth)
 add_subdirectory(image)
 add_subdirectory(host-tools)
+add_subdirectory(third-party)
 
 include(tools/clang-tidy.cmake)
 

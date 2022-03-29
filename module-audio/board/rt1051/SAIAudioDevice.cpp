@@ -4,6 +4,7 @@
 #include "SAIAudioDevice.hpp"
 
 #include <Audio/Stream.hpp>
+#include <log/log.hpp>
 
 #include <cmath>
 

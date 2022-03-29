@@ -7,6 +7,7 @@
 #include <board/BoardDefinitions.hpp>
 #endif
 
+#include <log/log.hpp>
 #include <gui/core/Color.hpp>
 #include <gsl/util>
 #include <cstdio>

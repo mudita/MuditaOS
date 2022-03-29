@@ -7,6 +7,7 @@
 #include <timers.h>
 #include <fsl_common.h>
 #include <fsl_qtmr.h>
+#include <log/log.hpp>
 
 /* Hardware PINS
  * TMR3_CH0-----GPIO_B0_06-----

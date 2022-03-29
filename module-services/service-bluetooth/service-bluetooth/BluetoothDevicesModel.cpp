@@ -4,6 +4,7 @@
 #include "BluetoothDevicesModel.hpp"
 #include <Service/Service.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
+#include <log/log.hpp>
 
 BluetoothDevicesModel::BluetoothDevicesModel(sys::Service *service) : service{service}
 {}

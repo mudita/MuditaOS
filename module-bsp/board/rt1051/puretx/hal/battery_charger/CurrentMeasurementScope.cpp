@@ -3,12 +3,10 @@
 
 #include "CurrentMeasurementScope.hpp"
 
-extern "C"
-{
 #include "FreeRTOS.h"
-}
 #include <timers.h>
 #include <battery_charger/battery_charger.hpp>
+#include <log/log.hpp>
 #include <ticks.hpp>
 
 #include <chrono>

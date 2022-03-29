@@ -8,8 +8,6 @@
 #include "drivers/i2c/DriverI2C.hpp"
 #include <cstdint>
 
-#include <cstdint>
-
 class CodecParamsMAX98090 : public CodecParams
 {
   public:

@@ -3,7 +3,7 @@
 
 #include <endpoints/restore/RestoreEndpoint.hpp>
 #include <endpoints/message/Sender.hpp>
-
+#include <log/log.hpp>
 
 namespace sdesktop::endpoints
 {

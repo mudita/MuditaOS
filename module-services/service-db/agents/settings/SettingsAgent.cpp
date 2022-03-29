@@ -8,6 +8,7 @@
 #include <Service/Service.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-db/SettingsCache.hpp>
+#include <log/log.hpp>
 
 namespace settings
 {

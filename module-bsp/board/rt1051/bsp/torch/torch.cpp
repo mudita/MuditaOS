@@ -8,6 +8,7 @@
 #include "drivers/i2c/DriverI2C.hpp"
 
 #include "fsl_common.h"
+#include <log/log.hpp>
 
 using namespace drivers;
 

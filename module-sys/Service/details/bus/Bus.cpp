@@ -4,6 +4,7 @@
 #include "Bus.hpp"
 
 #include <Service/Service.hpp>
+#include <log/log.hpp>
 #include "SystemWatchdog/SystemWatchdog.hpp"
 #include "module-os/CriticalSectionGuard.hpp"
 

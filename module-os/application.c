@@ -2,7 +2,6 @@
 #include "task.h"
 #include <log/log.hpp>
 
-#include <assert.h>
 #include <stdlib.h>
 
 /* configSUPPORT_STATIC_ALLOCATION is set to 1, so the application must provide an
@@ -64,7 +63,6 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
  */
 void vApplicationMallocFailedHook(void)
 {
-    // LOG_FATAL("Task %s malloc failed ! \n", pcTaskGetName(NULL));
     abort();
 }
 #endif
@@ -77,7 +75,7 @@ void vApplicationMallocFailedHook(void)
  * memory used by another task/tasks hence there is no certainty that
  * system will be in healthy condition after task restore.
  */
-void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     (void)xTask;
     LOG_FATAL("Stack overflow:%s", pcTaskName);
@@ -86,7 +84,4 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
 #endif
 
 void vApplicationTickHook()
-{
-    //    static uint8_t status = 0;
-    //    GPIO_PinWrite(base, pin, output)
-}
+{}

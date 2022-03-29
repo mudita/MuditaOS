@@ -4,6 +4,7 @@
 #include <PhoneModes/Observer.hpp>
 
 #include <Service/Service.hpp>
+#include <log/log.hpp>
 
 namespace sys::phone_modes
 {

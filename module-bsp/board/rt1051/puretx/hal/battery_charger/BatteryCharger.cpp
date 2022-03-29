@@ -15,7 +15,7 @@
 
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
 #include <bsp/battery_charger/battery_charger.hpp>
-
+#include <log/log.hpp>
 #include <magic_enum.hpp>
 
 namespace

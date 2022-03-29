@@ -87,6 +87,7 @@ SECTIONS
     {
         *(NonCacheable)
         *(COMMON)
+        *libfreertos_kernel.a:*(.bss*)
         *libmodule-os.a:*(.bss*)
         *libmodule-sys.a:*(.bss*)
         *libmodule-bsp.a:*(.bss*)

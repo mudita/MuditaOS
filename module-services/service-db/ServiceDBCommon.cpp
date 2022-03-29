@@ -7,6 +7,7 @@
 #include <service-db/ServiceDBCommon.hpp>
 
 #include <purefs/filesystem_paths.hpp>
+#include <log/log.hpp>
 
 static const auto service_db_stack = 1024 * 24;
 

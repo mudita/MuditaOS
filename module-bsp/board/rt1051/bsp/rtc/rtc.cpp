@@ -9,6 +9,7 @@
 #include <module-os/RTOSWrapper/include/ticks.hpp>
 #include <time/time_constants.hpp>
 #include <time.h>
+#include <log/log.hpp>
 
 namespace
 {

@@ -6,6 +6,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include <log/log.hpp>
+
 /// CW2015 tips&tricks
 /// 1. Setting POR bits in Mode register doesn't seem to reset the state of registers. Nevertheless it is required to
 /// perform proper profile update.

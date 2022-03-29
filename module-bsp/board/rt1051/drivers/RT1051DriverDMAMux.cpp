@@ -4,6 +4,8 @@
 #include "RT1051DriverDMAMux.hpp"
 #include <algorithm>
 
+#include <log/log.hpp>
+
 namespace drivers
 {
 

@@ -39,9 +39,7 @@
  *----------------------------------------------------------*/
 #include <assert.h>
 #include <stdint.h>
-#include <log/log.hpp>
 
-// TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
 #ifdef __cplusplus
 extern "C"
 {
@@ -69,7 +67,7 @@ extern "C"
 #define configQUEUE_REGISTRY_SIZE               32
 #define configUSE_QUEUE_SETS                    1
 #define configUSE_TIME_SLICING                  1
-#define configUSE_NEWLIB_REENTRANT              0
+#define configUSE_NEWLIB_REENTRANT              1
 #define configENABLE_BACKWARD_COMPATIBILITY     1
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 #define configUSE_APPLICATION_TASK_TAG          0
@@ -77,14 +75,15 @@ extern "C"
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION  1
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
-#define configTOTAL_HEAP_SIZE            ((size_t)(1024 * 324))
+#define configTOTAL_HEAP_SIZE            ((size_t)(1024 * 386))
+
 #define configAPPLICATION_ALLOCATED_HEAP 0
 
 /* Hook function related definitions. */
 #define configUSE_IDLE_HOOK                0
 #define configUSE_TICK_HOOK                0
 #define configCHECK_FOR_STACK_OVERFLOW     2
-#define configUSE_MALLOC_FAILED_HOOK       0
+#define configUSE_MALLOC_FAILED_HOOK       1
 #define configUSE_DAEMON_TASK_STARTUP_HOOK 0
 
 /* Run time and task stats gathering related definitions. */
@@ -104,12 +103,9 @@ extern "C"
 #define configTIMER_TASK_STACK_DEPTH (1024)
 
 /* Define to trap errors during development. */
-#define configASSERT(x)                                                                                                \
-    if ((x) == 0) {                                                                                                    \
-        LOG_FATAL("Assertion: %s", x);                                                                                 \
-        while (1)                                                                                                      \
-            ;                                                                                                          \
-    }
+#ifndef NDEBUG
+#define configASSERT(x) assert(x)
+#endif
 
 /* Optional functions - most linkers will remove unused functions anyway. */
 #define INCLUDE_vTaskPrioritySet             1
@@ -168,10 +164,15 @@ standard names. */
 /* Low power Tickless idle. Low power timer (GPT) is initialized in application code. */
 #define configGPT_CLOCK_HZ (32768U)
 
-#if SYSTEM_VIEW_ENABLED
-#include <FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.h>
+/* system heap integrity check */
+#ifdef DEBUG_FREERTOS
+#define configSYSTEM_HEAP_STATS              (1)
+#define configUSER_HEAP_STATS                (1)
+#define configSYSTEM_HEAP_INTEGRITY_CHECK    (1)
+#define PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS (1)
 #endif
 
+extern void vConfigureTimerForRunTimeStats(void);
 extern uint32_t ulHighFrequencyTimerTicks(void);
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTimerForRunTimeStats()
 #define portGET_RUN_TIME_COUNTER_VALUE()         ulHighFrequencyTimerTicks()

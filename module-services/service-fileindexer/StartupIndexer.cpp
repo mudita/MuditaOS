@@ -8,6 +8,7 @@
 #include <Timers/TimerFactory.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <purefs/fs/inotify_message.hpp>
+#include <log/log.hpp>
 
 #include <filesystem>
 #include <fstream>

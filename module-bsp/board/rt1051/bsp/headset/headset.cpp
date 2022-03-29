@@ -9,6 +9,8 @@
 #include "fsl_common.h"
 #include "timers.h"
 
+#include <log/log.hpp>
+
 namespace bsp
 {
     namespace headset

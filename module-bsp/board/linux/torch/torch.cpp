@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/torch/torch.hpp"
+#include <log/log.hpp>
 
 static xQueueHandle qHandleIrq = NULL;
 

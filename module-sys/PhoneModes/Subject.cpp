@@ -4,6 +4,7 @@
 #include <PhoneModes/Subject.hpp>
 
 #include <Service/Service.hpp>
+#include <log/log.hpp>
 
 #include <magic_enum.hpp>
 

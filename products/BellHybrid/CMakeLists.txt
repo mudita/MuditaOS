@@ -12,7 +12,6 @@ target_compile_options(BellHybrid
     PRIVATE
         $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
         "-Wno-error=deprecated-declarations"
-        "-Wno-prio-ctor-dtor"
     )
 
 
@@ -22,6 +21,7 @@ target_sources(BellHybrid
         BellHybridMain.cpp
         PlatformFactory.cpp
         EinkSentinelBell.cpp
+        init_prof.cpp
     )
 
 target_include_directories(BellHybrid
