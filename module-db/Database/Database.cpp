@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Database.hpp"
@@ -94,7 +94,18 @@ Database::Database(const char *name, bool readOnly)
         return;
     }
 
-    const auto filePath = (purefs::dir::getUserDiskPath() / "db");
+    /** Workaround for [MOS-351].
+     * Updater app loads databases to wrong directory (1/current/user/db) rather than
+     * (3/user/db). Therefore, we need to check both directories to support both flashing image and updating through
+     * updater.
+     * !!! This workaround should be removed with minor patch of updater, however it cannot be released in one package
+     * with database changes.
+     **/
+    auto filePath = (purefs::dir::getCurrentOSPath() / "user/db");
+    if (!std::filesystem::exists(filePath)) {
+        filePath = (purefs::dir::getUserDiskPath() / "db");
+    }
+
     LOG_INFO("Running scripts: %s", filePath.c_str());
     isInitialized_ = initializer->run(filePath.c_str(), InitScriptExtension);
 
