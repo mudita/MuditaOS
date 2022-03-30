@@ -50,8 +50,7 @@ int main()
 {
     constexpr auto ApplicationName = "BellHybrid";
 
-    const std::vector<std::string> fileIndexerAudioPaths = {
-        {purefs::dir::getCurrentOSPath() / "assets/audio/bg_sounds"}};
+    std::vector<std::string> fileIndexerAudioPaths = {{purefs::dir::getCurrentOSPath() / "assets/audio/bg_sounds"}};
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
@@ -74,7 +73,7 @@ int main()
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
     systemServices.emplace_back(sys::CreatorFor<EventManager>([]() { return dumpLogs(); }));
-    systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>(fileIndexerAudioPaths));
+    systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>(std::move(fileIndexerAudioPaths)));
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
     systemServices.emplace_back(sys::CreatorFor<service::Audio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
