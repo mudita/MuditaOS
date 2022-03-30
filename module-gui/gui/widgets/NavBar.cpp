@@ -43,7 +43,7 @@ namespace gui::nav_bar
         left->setAlignment(Alignment(Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         left->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
         left->setMinimumHeight(widgetArea.h);
-        left->setFont(style::nav_bar::font::medium);
+        left->setFont(style::window::font::smallbold);
         left->setTextEllipsisType(TextEllipsis::Right);
         left->setVisible(true);
         left->setEdges(RectangleEdge::None);
@@ -53,7 +53,7 @@ namespace gui::nav_bar
         center->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
         center->setMinimumHeight(widgetArea.h);
         center->setMaximumWidth(widgetArea.w);
-        center->setFont(style::nav_bar::font::bold);
+        center->setFont(style::window::font::smallbold);
         center->setTextEllipsisType(TextEllipsis::Right);
         center->setVisible(true);
         center->setEdges(RectangleEdge::None);
@@ -62,7 +62,7 @@ namespace gui::nav_bar
         right->setAlignment(Alignment(Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
         right->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
         right->setMinimumHeight(widgetArea.h);
-        right->setFont(style::nav_bar::font::medium);
+        right->setFont(style::window::font::smallbold);
         right->setTextEllipsisType(TextEllipsis::Right);
         right->setVisible(true);
         right->setEdges(RectangleEdge::None);

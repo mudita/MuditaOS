@@ -113,13 +113,6 @@ namespace style
         inline constexpr auto bottom_padding = 16U;
         inline constexpr auto left_margin    = 30U;
         inline constexpr auto right_margin   = 30U;
-
-        namespace font
-        {
-            inline constexpr auto bold   = "mediumbold";
-            inline constexpr auto medium = "medium";
-        }; // namespace font
-
     } // namespace nav_bar
 
     namespace settings
