@@ -89,7 +89,7 @@ namespace hal::battery
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
       private:
-        static constexpr auto workerStackSize = 1024;
+        static constexpr auto workerStackSize = 2048;
 
         void setChargingCurrentLimit(std::uint8_t usbType);
         void sendNotification(AbstractBatteryCharger::Events event);
