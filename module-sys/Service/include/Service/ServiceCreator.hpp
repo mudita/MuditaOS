@@ -67,6 +67,10 @@ namespace sys
      */
     template <typename T, typename... Args> std::unique_ptr<BaseServiceCreator> CreatorFor(Args &&...args) noexcept
     {
+        if constexpr (sizeof...(args)) {
+            static_assert(not std::is_reference_v<Args...>,
+                          "Do not pass const T& or T& as parameters. Use r-values (std::move) instead");
+        }
         return std::make_unique<ServiceCreator<T, Args...>>(ManifestOf<T>(), std::forward<Args>(args)...);
     }
 } // namespace sys
