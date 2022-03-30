@@ -55,10 +55,13 @@ namespace message::bluetooth
     class Ring;
     class StartAudioRouting;
     class GetBluetoothDevicesModel;
+    class RequestStatusIndicatorData;
 } // namespace message::bluetooth
 
 class CellularCallerIdMessage;
 class CellularCallActiveNotification;
+class CellularSignalStrengthUpdateNotification;
+class CellularCurrentOperatorNameNotification;
 
 class ServiceBluetooth : public sys::Service
 {
@@ -72,7 +75,8 @@ class ServiceBluetooth : public sys::Service
     sys::ReturnCodes DeinitHandler() override;
     void ProcessCloseReason(sys::CloseReason closeReason) override;
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
-    void sendWorkerCommand(bluetooth::Command command);
+    void sendWorkerCommand(bluetooth::Command::Type commandType,
+                           std::unique_ptr<bluetooth::CommandData> data = nullptr);
     void handleTurnOff();
     QueueHandle_t workerQueue = nullptr;
     std::shared_ptr<bluetooth::SettingsHolder> settingsHolder;
@@ -117,8 +121,11 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::ResponseAuthenticatePin *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponseAuthenticatePasskey *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponseAuthenticatePairCancel *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::RequestStatusIndicatorData *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularCallActiveNotification *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(CellularSignalStrengthUpdateNotification *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(CellularCurrentOperatorNameNotification *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

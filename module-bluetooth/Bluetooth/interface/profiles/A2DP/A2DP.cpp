@@ -123,6 +123,16 @@ namespace bluetooth
         LOG_INFO("Setting number in A2DP - ignoring");
         return Error::Success;
     }
+    auto A2DP::setSignalStrength(int bars) const noexcept -> Error::Code
+    {
+        LOG_INFO("Setting signal bars in A2DP - ignoring");
+        return Error::Success;
+    }
+    auto A2DP::setOperatorName(const std::string_view &name) const noexcept -> Error::Code
+    {
+        LOG_INFO("Setting operator name in A2DP - ignoring");
+        return Error::Success;
+    }
 
     const sys::Service *A2DP::A2DPImpl::ownerService;
     QueueHandle_t A2DP::A2DPImpl::sourceQueue = nullptr;

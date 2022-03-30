@@ -11,6 +11,8 @@
 #include <service-bluetooth/messages/AudioVolume.hpp>
 #include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/Disconnect.hpp>
+#include <service-bluetooth/messages/RequestStatusIndicatorData.hpp>
+
 #include <BluetoothWorker.hpp>
 #include "SCO/ScoUtils.hpp"
 
@@ -99,8 +101,18 @@ namespace bluetooth
     }
     auto HFP::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
     {
-        LOG_INFO("Setting number: %s", num.c_str());
+        LOG_SENSITIVE(LOGDEBUG, "Setting number: %s", num.c_str());
         return pimpl->setIncomingCallNumber(num);
+    }
+    auto HFP::setSignalStrength(int bars) const noexcept -> Error::Code
+    {
+        LOG_DEBUG("Setting RSSI bars: %d/4", bars);
+        return pimpl->setSignalStrength(bars);
+    }
+    auto HFP::setOperatorName(const std::string_view &name) const noexcept -> Error::Code
+    {
+        LOG_DEBUG("Setting operator name: %s", name.data());
+        return pimpl->setOperatorName(name);
     }
 
     HFP::~HFP() = default;
@@ -125,7 +137,7 @@ namespace bluetooth
         {2, "call", 0, 1, 0, 1, 1, 0},
         {3, "callsetup", 0, 3, 0, 1, 1, 0},
         {4, "battchg", 0, 5, 3, 0, 0, 0},
-        {5, "signal", 0, 5, 5, 0, 1, 0},
+        {5, "signal", 0, 4, 5, 0, 1, 0},
         {6, "roam", 0, 1, 0, 0, 1, 0},
         {7, "callheld", 0, 2, 0, 1, 1, 0}};
     [[maybe_unused]] int HFP::HFPImpl::call_hold_services_nr                      = 5;
@@ -240,6 +252,9 @@ namespace bluetooth
                 auto &busProxy     = const_cast<sys::Service *>(ownerService)->bus;
                 device.deviceState = DeviceState::ConnectedVoice;
                 busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(device, true),
+                                     service::name::bluetooth);
+                // request cellular status indicators for HFP
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::RequestStatusIndicatorData>(),
                                      service::name::bluetooth);
             }
             dump_supported_codecs();
@@ -482,6 +497,18 @@ namespace bluetooth
     auto HFP::HFPImpl::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
     {
         hfp_ag_set_clip(129, num.c_str());
+        return Error::Success;
+    }
+    auto HFP::HFPImpl::setSignalStrength(int bars) const noexcept -> Error::Code
+    {
+        hfp_ag_set_signal_strength(bars);
+        return Error::Success;
+    }
+
+    auto HFP::HFPImpl::setOperatorName(const std::string_view &name) const noexcept -> Error::Code
+    {
+        auto result = hfp_ag_set_operator_name(HFP::HFPImpl::aclHandle, name.data());
+        LOG_DEBUG("Operator set name result: %d", result);
         return Error::Success;
     }
 

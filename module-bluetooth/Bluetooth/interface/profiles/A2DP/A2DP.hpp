@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,6 +40,10 @@ namespace bluetooth
         [[nodiscard]] auto callAnswered() const noexcept -> Error::Code override;
         /// @return Success - ignoring in A2DP
         [[nodiscard]] auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code override;
+        /// @return Success - ignoring in A2DP
+        [[nodiscard]] auto setSignalStrength(int bars) const noexcept -> Error::Code override;
+        /// @return Success - ignoring in A2DP
+        [[nodiscard]] auto setOperatorName(const std::string_view &name) const noexcept -> Error::Code override;
 
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override;
 

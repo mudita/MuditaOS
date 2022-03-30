@@ -30,6 +30,13 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/Profile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/ProfileManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/PhoneInterface.cpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/Command.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/DeviceData.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/PhoneNumberData.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/SignalStrengthData.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/OperatorNameData.cpp
+
         )
 
 include(lib/btstack.cmake)

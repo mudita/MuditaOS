@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log/log.hpp>
@@ -378,6 +378,14 @@ namespace bluetooth
         return Error::Success;
     }
     auto HSP::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
+    {
+        return Error::Success;
+    }
+    auto HSP::setSignalStrength(int bars) const noexcept -> Error::Code
+    {
+        return Error::Success;
+    }
+    auto HSP::setOperatorName(const std::string_view &name) const noexcept -> Error::Code
     {
         return Error::Success;
     }

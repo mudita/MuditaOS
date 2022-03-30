@@ -335,7 +335,8 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularRequestCurrentOperatorNameMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularRequestCurrentOperatorNameMessage *>(request);
-        return handleCellularRequestCurrentOperatorName(msg);
+        handleCellularRequestCurrentOperatorName(msg);
+        return sys::MessageNone{};
     });
 
     connect(typeid(CellularGetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
@@ -1653,14 +1654,14 @@ bool ServiceCellular::handle_apn_conf_procedure()
     return true;
 }
 
-std::shared_ptr<CellularCurrentOperatorNameResponse> ServiceCellular::handleCellularRequestCurrentOperatorName(
-    CellularRequestCurrentOperatorNameMessage *msg)
+void ServiceCellular::handleCellularRequestCurrentOperatorName(CellularRequestCurrentOperatorNameMessage *msg)
 {
     LOG_INFO("CellularRequestCurrentOperatorName handled");
     NetworkSettings networkSettings(*this);
     const auto currentNetworkOperatorName = networkSettings.getCurrentOperatorName();
     Store::GSM::get()->setNetworkOperatorName(currentNetworkOperatorName);
-    return std::make_shared<CellularCurrentOperatorNameResponse>(currentNetworkOperatorName);
+    auto notification = std::make_shared<CellularCurrentOperatorNameNotification>(currentNetworkOperatorName);
+    this->bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
 }
 
 std::shared_ptr<CellularGetAPNResponse> ServiceCellular::handleCellularGetAPNMessage(CellularGetAPNMessage *msg)

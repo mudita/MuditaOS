@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -53,8 +53,8 @@ namespace CellularServiceAPI
     void GetNetworkInfo(sys::Service *serv);
 
     /*
-     * @brief Get current operator, result async in
-     * CellularCurrentOperatorNameResponse message
+     * @brief Get current operator, result in
+     * CellularCurrentOperatorNameNotification message on notification channel
      */
     void RequestCurrentOperatorName(sys::Service *serv);
     /*

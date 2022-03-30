@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -39,6 +39,12 @@ namespace bluetooth
         /// Sets the incoming call number
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code = 0;
+        /// Sets the signal strength bars data in HFP profile
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto setSignalStrength(int bars) const noexcept -> Error::Code = 0;
+        /// Sets the operator name in HFP profile
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto setOperatorName(const std::string_view &name) const noexcept -> Error::Code = 0;
 
       protected:
         static void initSdp();

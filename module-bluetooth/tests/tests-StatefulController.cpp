@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -53,7 +53,7 @@ auto InitializerMock = []() { return Error::Success; };
 class HandlerMock : public AbstractCommandHandler
 {
   public:
-    Error::Code handle(Command command) override
+    Error::Code handle(Command &command) override
     {
         return returnCode;
     }
@@ -167,7 +167,8 @@ TEST_CASE("Given StatefulController when process command successfully then turne
     controller.turnOn();
     REQUIRE(controller.isOn());
 
-    controller.processCommand(bluetooth::Command(Command::Type::PowerOn));
+    auto command = bluetooth::Command(Command::Type::PowerOn);
+    controller.processCommand(command);
     REQUIRE(controller.isOn());
 }
 
@@ -180,7 +181,9 @@ TEST_CASE("Given StatefulController when processing command failed then restarte
     controller.turnOn();
     REQUIRE(controller.isOn());
 
-    controller.processCommand(bluetooth::Command(Command::Type::PowerOn));
-    controller.processCommand(bluetooth::Command(Command::Type::PowerOn));
+    auto command = bluetooth::Command(Command::Type::PowerOn);
+    controller.processCommand(command);
+    controller.processCommand(command);
+
     REQUIRE(controller.isOn());
 }
