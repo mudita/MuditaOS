@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,7 +24,7 @@ namespace bluetooth
         virtual auto isOn() const -> bool         = 0;
         virtual auto isTerminated() const -> bool = 0;
 
-        virtual void processCommand(Command command) = 0;
+        virtual void processCommand(Command &command) = 0;
     };
 
     class StatefulController : public AbstractController
@@ -41,7 +41,7 @@ namespace bluetooth
         [[nodiscard]] auto isOn() const -> bool override;
         [[nodiscard]] auto isTerminated() const -> bool override;
 
-        void processCommand(Command command) override;
+        void processCommand(Command &command) override;
 
       private:
         class Impl;

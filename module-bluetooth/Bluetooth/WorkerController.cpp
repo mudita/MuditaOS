@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerController.hpp"
@@ -26,7 +26,7 @@ namespace bluetooth
         {};
         struct ProcessCommand
         {
-            Command command;
+            Command &command;
         };
 
         class InitializationError : public std::runtime_error
@@ -176,10 +176,16 @@ namespace bluetooth
         return pimpl->sm.is(X);
     }
 
-    void StatefulController::processCommand(Command command)
+    void StatefulController::processCommand(Command &command)
     {
-        LOG_INFO("Process command: %s", magic_enum::enum_name(command.getType()).data());
-        pimpl->sm.process_event(ProcessCommand{command});
-        command.destroy();
+        try {
+            LOG_INFO("Process command: %s", magic_enum::enum_name(command.getType()).data());
+            pimpl->sm.process_event(ProcessCommand{command});
+            LOG_DEBUG("Command processed");
+        }
+        catch (std::bad_variant_access &e) {
+            LOG_ERROR(
+                "Failed to parse command %s, error: %s", magic_enum::enum_name(command.getType()).data(), e.what());
+        }
     }
 } // namespace bluetooth

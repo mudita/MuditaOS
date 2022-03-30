@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-bluetooth/ServiceBluetooth.hpp>
@@ -119,10 +119,29 @@ namespace bluetooth
     {
         return currentProfilePtr->callAnswered();
     }
-    auto ProfileManager::setIncomingCallNumber(const std::string &num) -> Error::Code
+    auto ProfileManager::setIncomingCallNumber(const DataVariant &data) -> Error::Code
     {
+        auto number = std::get<utils::PhoneNumber::View>(data);
         if (currentProfilePtr) {
-            return currentProfilePtr->setIncomingCallNumber(num);
+            return currentProfilePtr->setIncomingCallNumber(number.getE164());
+        }
+        LOG_ERROR("No profile, returning!");
+        return Error::NotReady;
+    }
+    auto ProfileManager::setSignalStrengthData(const DataVariant &data) -> Error::Code
+    {
+        auto signalData = std::get<Store::SignalStrength>(data);
+        if (currentProfilePtr) {
+            return currentProfilePtr->setSignalStrength(static_cast<int>(signalData.rssiBar));
+        }
+        LOG_ERROR("No profile, returning!");
+        return Error::NotReady;
+    }
+    auto ProfileManager::setOperatorNameData(const DataVariant &data) -> Error::Code
+    {
+        auto operatorName = std::get<OperatorName>(data);
+        if (currentProfilePtr) {
+            return currentProfilePtr->setOperatorName(operatorName.getName());
         }
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;

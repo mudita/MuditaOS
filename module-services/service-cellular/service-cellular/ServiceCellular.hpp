@@ -238,8 +238,7 @@ class ServiceCellular : public sys::Service
 
     std::shared_ptr<CellularSetOperatorAutoSelectResponse> handleCellularSetOperatorAutoSelect(
         CellularSetOperatorAutoSelectMessage *msg);
-    std::shared_ptr<CellularCurrentOperatorNameResponse> handleCellularRequestCurrentOperatorName(
-        CellularRequestCurrentOperatorNameMessage *msg);
+    void handleCellularRequestCurrentOperatorName(CellularRequestCurrentOperatorNameMessage *msg);
     std::shared_ptr<CellularGetAPNResponse> handleCellularGetAPNMessage(CellularGetAPNMessage *msg);
     std::shared_ptr<CellularSetAPNResponse> handleCellularSetAPNMessage(CellularSetAPNMessage *msg);
     std::shared_ptr<CellularNewAPNResponse> handleCellularNewAPNMessage(CellularNewAPNMessage *msg);

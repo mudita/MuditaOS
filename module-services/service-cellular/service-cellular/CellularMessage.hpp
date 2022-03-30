@@ -171,12 +171,12 @@ class CellularRequestCurrentOperatorNameMessage : public CellularMessage
 class CellularSetOperatorAutoSelectMessage : public sys::DataMessage
 {};
 
-class CellularCurrentOperatorNameResponse : public CellularMessage
+class CellularCurrentOperatorNameNotification : public CellularMessage
 {
     std::string currentOperatorName;
 
   public:
-    explicit CellularCurrentOperatorNameResponse(const std::string &currentOperatorName)
+    explicit CellularCurrentOperatorNameNotification(const std::string &currentOperatorName)
         : CellularMessage(Type::Notification), currentOperatorName(currentOperatorName)
     {}
 

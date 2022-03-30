@@ -10,6 +10,7 @@
 #include "interface/profiles/HSP/HSP.hpp"
 #include "audio/BluetoothAudioDevice.hpp"
 #include "BtKeysStorage.hpp"
+#include "command/DeviceData.hpp"
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
 #define logHciComs(...) LOG_DEBUG(__VA_ARGS__)
@@ -95,7 +96,7 @@ BluetoothWorker::BluetoothWorker(sys::Service *service)
 {
     init({
         {queues::io, sizeof(bluetooth::Message), queues::queueLength},
-        {queues::cmd, sizeof(bluetooth::Command), queues::queueLength},
+        {queues::cmd, sizeof(bluetooth::Command::CommandPack), queues::queueLength},
         {queues::btstack, sizeof(bool), queues::triggerQueueLength},
     });
     registerQueues();
@@ -140,11 +141,12 @@ auto BluetoothWorker::run() -> bool
 
 auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 {
-    bluetooth::Command command(bluetooth::Command::None);
-    if (xQueueReceive(queue, static_cast<void *>(&command), 0) != pdTRUE) {
+    bluetooth::Command::CommandPack pack{};
+    if (xQueueReceive(queue, static_cast<void *>(&pack), 0) != pdTRUE) {
         LOG_ERROR("Queue receive failure!");
         return false;
     }
+    auto command = bluetooth::Command(std::move(pack));
 
     switch (command.getType()) {
     case bluetooth::Command::PowerOn:
@@ -154,11 +156,12 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
     case bluetooth::Command::PowerOff:
         controller->turnOff();
         break;
-    case bluetooth::Command::Unpair:
+    case bluetooth::Command::Unpair: {
         controller->processCommand(command);
-        removeFromBoundDevices(command.getDevice().address);
-        handleUnpairDisconnect(command.getDevice());
-        break;
+        auto device = std::get<Devicei>(command.getData());
+        removeFromBoundDevices(device.address);
+        handleUnpairDisconnect(device);
+    } break;
     case bluetooth::Command::None:
         break;
     default:
@@ -294,7 +297,9 @@ auto BluetoothWorker::isAddressConnected(const uint8_t *addr) -> bool
 void BluetoothWorker::handleUnpairDisconnect(const Devicei &device)
 {
     if (isAddressConnected(device.address)) {
-        auto disconnectCmd = bluetooth::Command(bluetooth::Command::DisconnectAudio, device);
+        auto commandData   = std::make_unique<bluetooth::DeviceData>(device);
+        auto disconnectCmd = bluetooth::Command(
+            bluetooth::Command::CommandPack{bluetooth::Command::DisconnectAudio, std::move(commandData)});
         controller->processCommand(disconnectCmd);
     }
 }

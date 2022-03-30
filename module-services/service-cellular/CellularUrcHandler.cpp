@@ -49,6 +49,8 @@ void CellularUrcHandler::Handle(Creg &urc)
         }
         else {
             Store::GSM::get()->setNetworkOperatorName("");
+            auto notification = std::make_shared<CellularCurrentOperatorNameNotification>("");
+            cellularService.bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
         }
 
         Store::Network network{status, accessTechnology};
