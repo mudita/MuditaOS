@@ -78,9 +78,9 @@ namespace callAppStyle
         } // namespace imageCircleBottom
         namespace durationLabel
         {
-            inline constexpr auto x = 120U;
+            inline constexpr auto x = 80U;
             inline constexpr auto y = 223U;
-            inline constexpr auto w = 240U;
+            inline constexpr auto w = 320U;
             inline constexpr auto h = 20U;
         } // namespace durationLabel
         namespace iconsBox
