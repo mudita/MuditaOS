@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-desktop/BackupRestore.hpp>
@@ -35,7 +35,6 @@ namespace bkp
     inline constexpr auto backupInfo = "backup.json";
 };
 
-static const long unsigned int empty_dirlist_size = 2;
 static bool isValidDirentry(const std::filesystem::directory_entry &direntry)
 {
     return direntry.path() != "." && direntry.path() != ".." && direntry.path() != "...";
@@ -336,7 +335,7 @@ bool BackupRestore::UnpackBackupFile(const std::filesystem::path &tarFilePath)
 
     do {
         ret = mtar_read_header(&tarFile, &tarHeader);
-        LOG_DEBUG("Reading tar header name...");
+        LOG_DEBUG("Reading tar header name... Name: %s", tarHeader.name);
 
         if ((tarHeader.type == MTAR_TREG) && (ret == MTAR_ESUCCESS)) {
             LOG_DEBUG("Extracting tar file ...");
@@ -354,17 +353,12 @@ bool BackupRestore::UnpackBackupFile(const std::filesystem::path &tarFilePath)
             auto streamBuffer                 = std::make_unique<char[]>(streamBufferSize);
             setvbuf(file, streamBuffer.get(), _IOFBF, streamBufferSize);
 
-            uint32_t loopcount = (tarHeader.size / purefs::buffer::tar_buf) + 1u;
-            uint32_t readsize  = 0u;
+            uint32_t readsize      = 0u;
+            uint32_t remainingData = tarHeader.size;
 
-            for (uint32_t i = 0u; i < loopcount; i++) {
-
-                if (i + 1u == loopcount) {
-                    readsize = tarHeader.size % purefs::buffer::tar_buf;
-                }
-                else {
-                    readsize = purefs::buffer::tar_buf;
-                }
+            do {
+                readsize = remainingData > purefs::buffer::tar_buf ? purefs::buffer::tar_buf : remainingData;
+                memset(buffer.get(), 0, purefs::buffer::tar_buf);
 
                 if (mtar_read_data(&tarFile, buffer.get(), readsize) != MTAR_ESUCCESS) {
                     LOG_ERROR("Extracting file failed, quitting...");
@@ -381,7 +375,9 @@ bool BackupRestore::UnpackBackupFile(const std::filesystem::path &tarFilePath)
                     std::filesystem::remove(extractedFile.c_str());
                     return false;
                 }
-            }
+
+                remainingData = tarFile.remaining_data;
+            } while (remainingData);
 
             LOG_INFO("Extracting file succeeded");
             std::fclose(file);
@@ -403,7 +399,7 @@ bool BackupRestore::UnpackBackupFile(const std::filesystem::path &tarFilePath)
         LOG_WARN("Can't cleanup temporary dir, error: %d", errorCode.value());
     }
 
-    return true;
+    return ret == MTAR_ENULLRECORD ? true : false;
 }
 
 std::string BackupRestore::ReadFileAsString(const std::filesystem::path &fileToRead)
