@@ -18,5 +18,3 @@
 /module-utils/CMakeLists.txt                @mudita/chapter-bsp
 /cmake                                      @mudita/chapter-bsp
 /test/CMakeLists.txt                        @mudita/chapter-bsp
-/module-services/service-desktop            @mudita/embedded-centerpure
-
