@@ -106,6 +106,11 @@ namespace service::gui
         waitingForLastRender = true;
     }
 
+    void ServiceGUI::ProcessCloseReasonHandler(sys::CloseReason closeReason)
+    {
+        ProcessCloseReason(closeReason);
+    }
+
     sys::ReturnCodes ServiceGUI::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
         LOG_INFO("PowerModeHandler: %s", c_str(mode));
@@ -211,7 +216,13 @@ namespace service::gui
     void ServiceGUI::sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode)
     {
         setState(State::Busy);
-        auto imageMsg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
+        std::shared_ptr<service::eink::ImageMessage> imageMsg;
+        if (waitingForLastRender) {
+            imageMsg = std::make_shared<service::eink::ShutdownImageMessage>(contextId, context, refreshMode);
+        }
+        else {
+            imageMsg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
+        }
         bus.sendUnicast(imageMsg, service::name::eink);
         scheduleContextRelease(contextId);
     }
@@ -251,6 +262,7 @@ namespace service::gui
             trySendNextFrame();
         }
         else if (lastRenderScheduled && waitingForLastRender) {
+            isReady = false;
             sendCloseReadyMessage(this);
         }
 

@@ -41,6 +41,7 @@ namespace service::gui
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
         void ProcessCloseReason(sys::CloseReason closeReason) override;
+        auto ProcessCloseReasonHandler(sys::CloseReason closeReason) -> void override;
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 

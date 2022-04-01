@@ -171,6 +171,11 @@ namespace app::manager
         handleActionRequest(&act);
     }
 
+    void ApplicationManagerCommon::ProcessCloseReasonHandler(sys::CloseReason closeReason)
+    {
+        ProcessCloseReason(closeReason);
+    }
+
     auto ApplicationManagerCommon::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msgl,
                                                        [[maybe_unused]] sys::ResponseMessage *resp)
         -> sys::MessagePointer
@@ -255,6 +260,10 @@ namespace app::manager
             return sys::msgHandled();
         });
         connect(typeid(ActionHandledResponse), [this](sys::Message *response) {
+            if (actionsRegistry.getPendingAction()->actionId == app::manager::actions::DisplayLogoAtExit) {
+                isReady = false;
+                sendCloseReadyMessage(this);
+            }
             actionsRegistry.finished();
             return sys::MessageNone{};
         });

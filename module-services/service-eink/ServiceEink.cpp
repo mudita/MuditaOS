@@ -42,7 +42,7 @@ namespace service::eink
     ServiceEink::ServiceEink(ExitAction exitAction, const std::string &name, std::string parent)
         : sys::Service(name, std::move(parent), ServceEinkStackDepth),
           exitAction{exitAction}, display{{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}},
-          currentState{State::Running}, settings{std::make_unique<settings::Settings>()}
+          currentState{State::Running}, waitingForLastRender{false}, settings{std::make_unique<settings::Settings>()}
     {
         displayPowerOffTimer = sys::TimerFactory::createSingleShotTimer(
             this, "einkDisplayPowerOff", displayPowerOffTimeout, [this](sys::Timer &) { display.powerOff(); });
@@ -51,6 +51,9 @@ namespace service::eink
 
         connect(typeid(ImageMessage),
                 [this](sys::Message *request) -> sys::MessagePointer { return handleImageMessage(request); });
+
+        connect(typeid(ShutdownImageMessage),
+                [this](sys::Message *request) -> sys::MessagePointer { return handleShutdownImageMessage(request); });
 
         connect(typeid(PrepareDisplayEarlyRequest),
                 [this](sys::Message *request) -> sys::MessagePointer { return handlePrepareEarlyRequest(request); });
@@ -173,6 +176,15 @@ namespace service::eink
         return std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
     }
 
+    sys::MessagePointer ServiceEink::handleShutdownImageMessage(sys::Message *request)
+    {
+        if (waitingForLastRender) {
+            isReady = false;
+            sendCloseReadyMessage(this);
+        };
+        return handleImageMessage(request);
+    }
+
     void ServiceEink::showImage(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode)
     {
         displayPowerOffTimer.stop();
@@ -244,6 +256,11 @@ namespace service::eink
     bool ServiceEink::isInState(State state) const noexcept
     {
         return currentState == state;
+    }
+
+    void ServiceEink::ProcessCloseReasonHandler(sys::CloseReason closeReason)
+    {
+        waitingForLastRender = true;
     }
 
 } // namespace service::eink
