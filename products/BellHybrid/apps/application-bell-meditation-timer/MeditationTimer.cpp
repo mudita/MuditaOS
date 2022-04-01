@@ -30,7 +30,9 @@ namespace app
                                      StartInBackground startInBackground,
                                      uint32_t stackDepth)
         : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth)
-    {}
+    {
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+    }
 
     sys::ReturnCodes MeditationTimer::InitHandler()
     {
