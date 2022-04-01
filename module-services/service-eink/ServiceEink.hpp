@@ -68,13 +68,17 @@ namespace service::eink
 
         sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);
         sys::MessagePointer handleImageMessage(sys::Message *message);
+        sys::MessagePointer handleShutdownImageMessage(sys::Message *message);
         sys::MessagePointer handlePrepareEarlyRequest(sys::Message *message);
+
+        auto ProcessCloseReasonHandler(sys::CloseReason closeReason) -> void override;
 
         void initStaticData();
 
         ExitAction exitAction;
         EinkDisplay display;
         State currentState;
+        bool waitingForLastRender;
         sys::TimerHandle displayPowerOffTimer;
         std::shared_ptr<EinkSentinel> eInkSentinel;
         std::unique_ptr<settings::Settings> settings;

@@ -88,6 +88,7 @@ namespace app::manager
         auto InitHandler() -> sys::ReturnCodes override;
         auto DeinitHandler() -> sys::ReturnCodes override;
         auto ProcessCloseReason(sys::CloseReason closeReason) -> void override;
+        void ProcessCloseReasonHandler(sys::CloseReason closeReason) override;
         auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes override;
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
 

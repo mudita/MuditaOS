@@ -26,6 +26,12 @@ namespace service::eink
         ::gui::RefreshModes refreshMode;
     };
 
+    class ShutdownImageMessage : public ImageMessage
+    {
+      public:
+        using ImageMessage::ImageMessage;
+    };
+
     class ImageDisplayedNotification : public EinkMessage
     {
       public:
@@ -36,4 +42,4 @@ namespace service::eink
       private:
         int contextId;
     };
-} /* namespace seink */
+} // namespace service::eink
