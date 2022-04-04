@@ -5,12 +5,13 @@
 #include "board.h"
 #include "drivers/gpio/DriverGPIO.hpp"
 #include "board/BoardDefinitions.hpp"
+#include "lpm/CpuFreqLPM.hpp"
 
 namespace
 {
     using namespace drivers;
 
-    void board_power_off()
+    void power_off()
     {
         /// No memory allocation here as this specific GPIO was initialized at the startup. We are just grabbing here a
         /// reference to the already existing object
@@ -24,10 +25,13 @@ namespace
         gpio_wakeup->ClearPortInterrupts(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_WAKEUP));
         gpio_wakeup->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_WAKEUP));
 
+        auto cpuFreq = bsp::CpuFreqLPM();
+        cpuFreq.SetCpuFrequency(bsp::CpuFreqLPM::CpuClock::CpuClock_Osc_24_Mhz);
+
         SNVS->LPCR |= SNVS_LPCR_TOP(1); /// Enter SNVS mode
     }
 
-    void board_reset()
+    void reset()
     {
         NVIC_SystemReset();
     }
@@ -41,10 +45,10 @@ namespace bsp
         case rebootState::none:
             break;
         case rebootState::poweroff:
-            board_power_off();
+            power_off();
             break;
         case rebootState::reboot:
-            board_reset();
+            reset();
             break;
         }
         while (true) {}
