@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "rtc_configuration.hpp"
@@ -24,7 +24,8 @@ namespace bsp::rtc
 
     ErrorCode init(xQueueHandle qHandle)
     {
-        qHandleRtcIrq = qHandle;
+        static constexpr auto RTC_CALIBRATION_VALUE = 0;
+        qHandleRtcIrq                               = qHandle;
         CLOCK_EnableClock(kCLOCK_SnvsLp);
         SNVS_HP_RTC_GetDefaultConfig(&s_rtcConfig);
 
