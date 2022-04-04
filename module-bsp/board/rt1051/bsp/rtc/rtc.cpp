@@ -20,7 +20,7 @@ namespace bsp::rtc
 {
     ErrorCode init(xQueueHandle qHandle)
     {
-        static constexpr auto RTC_CALIBRATION_VALUE = 6;
+        static constexpr auto RTC_CALIBRATION_VALUE = 0;
         qHandleRtcIrq                               = qHandle;
         CLOCK_EnableClock(kCLOCK_SnvsLp);
         SNVS_HP_RTC_GetDefaultConfig(&s_rtcConfig);
