@@ -42,6 +42,7 @@ namespace CellularCall
         std::function<CalllogRecord(const CalllogRecord &rec)> startCallAction;
         std::function<bool(const CalllogRecord &rec)> endCallAction;
         utils::time::Timestamp startActiveTime;
+        time_t callDurationTime = 0;
 
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
@@ -62,6 +63,7 @@ namespace CellularCall
             wasRinging        = false;
             isNumberDisplayed = false;
             startActiveTime.set_time(0);
+            callDurationTime = 0;
         }
 
         bool startCall(const utils::PhoneNumber::View &number, const CallType type);
@@ -118,6 +120,8 @@ namespace CellularCall
         }
 
         void setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel);
+
+        void handleCallDurationTimer();
 
         struct Operations
         {

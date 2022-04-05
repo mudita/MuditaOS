@@ -107,6 +107,7 @@ namespace CellularCall
             return false;
         }
 
+        gui.notifyCallStarted();
         LOG_INFO("call started");
         return true;
     }
@@ -116,6 +117,7 @@ namespace CellularCall
         if (isValid()) {
             startActiveTime = utils::time::getCurrentTimestamp();
             isActiveCall    = true;
+            gui.notifyCallActive();
             LOG_INFO("set call active");
             return true;
         }
@@ -170,7 +172,7 @@ namespace CellularCall
 
         // Calllog entry was updated, ongoingCall can be cleared
         clear();
-
+        gui.notifyCallEnded();
         LOG_INFO("call ended");
         return true;
     }
@@ -202,6 +204,12 @@ namespace CellularCall
             audio.setLaudspeakerOff();
             break;
         }
+    }
+    void Call::handleCallDurationTimer()
+    {
+        auto now         = utils::time::getCurrentTimestamp();
+        callDurationTime = (now - startActiveTime).getSeconds();
+        gui.notifyCallDurationUpdate(callDurationTime);
     }
 
     bool Call::Operations::areCallsFromFavouritesEnabled()
