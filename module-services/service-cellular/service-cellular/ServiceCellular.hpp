@@ -117,6 +117,7 @@ class ServiceCellular : public sys::Service
     sys::TimerHandle ussdTimer;
     sys::TimerHandle simTimer;
     sys::TimerHandle csqTimer;
+    sys::TimerHandle callDurationTimer;
 
     // used to enter modem sleep mode
     sys::TimerHandle sleepTimer;

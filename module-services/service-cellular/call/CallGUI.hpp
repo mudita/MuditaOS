@@ -20,4 +20,8 @@ class CallGUI
 
     void notifyRING();
     void notifyCLIP(const utils::PhoneNumber::View &number);
+    void notifyCallStarted();
+    void notifyCallEnded();
+    void notifyCallActive();
+    void notifyCallDurationUpdate(const time_t &duration);
 };

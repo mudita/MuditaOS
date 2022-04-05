@@ -1044,4 +1044,30 @@ namespace cellular
 
         EventType eventType;
     };
+
+    class CallStartedNotification : public sys::DataMessage
+    {
+      public:
+        explicit CallStartedNotification() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
+
+    class CallEndedNotification : public sys::DataMessage
+    {
+      public:
+        explicit CallEndedNotification() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
+
+    class CallActiveNotification : public sys::DataMessage
+    {
+      public:
+        explicit CallActiveNotification() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
+
+    class CallDurationNotification : public sys::DataMessage
+    {
+      public:
+        explicit CallDurationNotification(const time_t duration)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), callDuration(duration){};
+        time_t callDuration;
+    };
 } // namespace cellular

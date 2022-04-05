@@ -156,6 +156,10 @@ ServiceCellular::ServiceCellular()
         priv->csqHandler->handleTimerTick();
     });
 
+    callDurationTimer = sys::TimerFactory::createPeriodicTimer(
+        this, "callDurationTimer", std::chrono::milliseconds{1000}, [this](sys::Timer &) {
+            ongoingCall.handleCallDurationTimer();
+        });
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
         auto call = DBServiceAPI::CalllogAdd(this, rec);
         if (call.ID == DB_ID_NONE) {
@@ -594,6 +598,17 @@ void ServiceCellular::registerMessageHandlers()
         ongoingCall.handleCallAudioEventRequest(message->eventType);
         return sys::MessageNone{};
     });
+
+    connect(typeid(cellular::CallActiveNotification), [&](sys::Message *request) -> sys::MessagePointer {
+        callDurationTimer.start();
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(cellular::CallEndedNotification), [&](sys::Message *request) -> sys::MessagePointer {
+        callDurationTimer.stop();
+        return sys::MessageNone{};
+    });
+
     handle_CellularGetChannelMessage();
 }
 
