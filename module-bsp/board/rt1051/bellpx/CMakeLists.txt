@@ -22,6 +22,7 @@ target_sources(
         bsp/lpm/PowerProfile.cpp
         bsp/lpm/RT1051LPM.cpp
         bsp/rotary_encoder/rotary_encoder.cpp
+        bsp/rtc/rtc_configuration.cpp
         bsp/switches/switches.cpp
 
         audio.cpp

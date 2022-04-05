@@ -1,6 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "rtc_configuration.hpp"
+
 #include <bsp/rtc/rtc.hpp>
 #include <fsl_snvs_hp.h>
 #include <fsl_snvs_lp.h>
@@ -18,14 +20,14 @@ namespace
 
 namespace bsp::rtc
 {
+
     ErrorCode init(xQueueHandle qHandle)
     {
-        static constexpr auto RTC_CALIBRATION_VALUE = 6;
-        qHandleRtcIrq                               = qHandle;
+        qHandleRtcIrq = qHandle;
         CLOCK_EnableClock(kCLOCK_SnvsLp);
         SNVS_HP_RTC_GetDefaultConfig(&s_rtcConfig);
 
-        s_rtcConfig.rtcCalValue  = RTC_CALIBRATION_VALUE;
+        s_rtcConfig.rtcCalValue  = getRtcCalibrationValue();
         s_rtcConfig.rtcCalEnable = true;
         SNVS_HP_RTC_Init(SNVS, &s_rtcConfig);
 
