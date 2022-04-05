@@ -46,6 +46,7 @@ namespace gui
         virtual auto setTime(std::time_t newTime) -> void override;
         auto setTextDescription(const UTF8 &desc) -> void override;
         auto setBatteryLevelState(const Store::Battery &batteryContext) -> void override;
+        auto setTimeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
         auto setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
         auto getAlarmTime() const -> std::time_t override;
         auto setAlarmTime(std::time_t newTime) -> void override;
