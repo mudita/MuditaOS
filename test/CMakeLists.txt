@@ -30,7 +30,7 @@ download_asset_release_json(json-test-community-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_community.json
                             ${TEST_ASSETS_DEST_DIR}/current/
                             MuditaOSPublicAssets
-                            0.0.4
+                            0.0.7
                             ${MUDITA_CACHE_DIR}
     )
 
