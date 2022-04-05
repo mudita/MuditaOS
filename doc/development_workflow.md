@@ -73,6 +73,8 @@ Include screenshots and gifs/screencasts if applicable. The more information you
 
 **Note:** If you're part of the MuditaOS core development team, please precede the PR name with a relevant Jira ticket number e.g. `[EGD-5555] Fixed contact details`.
 
+You also have to check if you comply with checkbox items - without them, you can't pass the CI checks. If it's not possible to check the checkbox (e.g. you can't write unit tests for documentation PR)
+just check it anyway.
 ## PR review - answer questions
 
 During a PR review, team members will ask you questions regarding your solution. Please answer them by explaining the reasoning behind the suggested changes. Even if the feedback you receive regarding your PR is an obvious change, please answer with a simple OK to show that you haven't missed it.
@@ -89,6 +91,7 @@ Add changes to your PR that are requested by reviewers and push the feature bran
 
 All PRs are checked against a series of checks on CI:
 - commit format
+- filled up PR checklist
 - whole PR clang style check
 - compilations for every product in release with debug info or debug configurations for:
     - rt1051
