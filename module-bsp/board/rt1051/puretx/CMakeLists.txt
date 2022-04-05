@@ -18,6 +18,7 @@ target_sources(
         bsp/keyboard/keyboard.cpp
         bsp/lpm/PowerProfile.cpp
         bsp/lpm/RT1051LPM.cpp
+        bsp/rtc/rtc_configuration.cpp
 
         audio.cpp
         pin_mux.c
