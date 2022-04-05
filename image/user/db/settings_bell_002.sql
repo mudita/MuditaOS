@@ -40,7 +40,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('prewake_up_light_duration','0'),
     ('alarm_tone','Morning Dew'),
     ('alarm_light_active','1'),
-    ('alarm_duration','10000'),
+    ('alarm_duration','5'),
     ('bedtime_active','0'),
     ('bedtime_time','21:00'),
     ('bedtime_tone','Evening Horizon'),

@@ -23,14 +23,11 @@ namespace alarms
         explicit PlayAudioAction(sys::Service &service,
                                  const std::filesystem::path &tonesDirPath,
                                  std::string_view toneSetting,
-                                 std::string_view durationSetting,
-                                 audio::PlaybackType = audio::PlaybackType::Alarm);
+                                 audio::PlaybackType                             = audio::PlaybackType::Alarm,
+                                 std::optional<std::string_view> durationSetting = {});
 
       private:
-        static constexpr auto InfiniteDuration = std::chrono::minutes::max();
-        static constexpr auto NoDuration       = std::chrono::minutes::zero();
-
-        bool play(const std::filesystem::path &path, std::chrono::minutes duration = InfiniteDuration);
+        bool play(const std::filesystem::path &path, std::optional<std::chrono::minutes> duration = {});
         void spawnTimer(std::chrono::minutes timeout);
         void detachTimer();
 
@@ -38,14 +35,13 @@ namespace alarms
         sys::TimerHandle timer;
         SoundsRepository soundsRepository;
         const std::string toneSetting;
-        const std::string durationSetting;
+        const std::optional<std::string> durationSetting;
         const audio::PlaybackType playbackType;
         settings::Settings settings;
     };
 
     namespace factory
     {
-        static constexpr auto NoPlaybackTimeout = "0";
         std::unique_ptr<PlayAudioAction> createAlarmToneAction(sys::Service &service);
         std::unique_ptr<PlayAudioAction> createPreWakeUpChimeAction(sys::Service &service);
         std::unique_ptr<PlayAudioAction> createSnoozeChimeAction(sys::Service &service);
