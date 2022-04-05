@@ -142,6 +142,11 @@ namespace gui
         setAlarmFmtSpinner->setTimeFormat(fmt);
     }
 
+    void HomeScreenLayoutVertical::setTimeFormat(utils::time::Locale::TimeFormat fmt)
+    {
+        time->setTimeFormat(fmt);
+    }
+
     std::time_t HomeScreenLayoutVertical::getAlarmTime() const
     {
         const auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
