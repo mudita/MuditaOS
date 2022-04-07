@@ -13,6 +13,7 @@ target_sources(sys-manager
     PRIVATE
         CpuGovernor.cpp
         CpuSentinel.cpp
+        GovernorSentinelOperations.cpp
         CpuStatistics.cpp
         CpuLogPrinter.cpp
         CpuPackPrinter.cpp
