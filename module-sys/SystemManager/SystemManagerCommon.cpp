@@ -608,7 +608,7 @@ namespace sys
             auto msg = static_cast<sys::SentinelRemovalMessage *>(message);
             powerManager->RemoveSentinel(msg->getSentinelName());
 
-            return sys::MessageNone{};
+            return std::make_shared<sys::ResponseMessage>();
         });
 
         connect(typeid(sys::HoldCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
