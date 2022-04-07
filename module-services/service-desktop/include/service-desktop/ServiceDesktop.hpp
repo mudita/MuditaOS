@@ -101,6 +101,7 @@ class ServiceDesktop : public sys::Service
     OutboxNotifications outboxNotifications;
     sys::TimerHandle connectionActiveTimer;
     void restartConnectionActiveTimer();
+    void checkChargingCondition();
 
     static constexpr unsigned int DefaultLogFlushTimeoutInMs = 1000U;
     bool initialized                                         = false;

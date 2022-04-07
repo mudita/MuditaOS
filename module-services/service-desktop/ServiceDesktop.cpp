@@ -224,12 +224,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return btMsgHandler->handle(msgl);
     });
     connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) {
-        if (Store::Battery::get().state == Store::Battery::State::Discharging) {
-            usbWorkerDeinit();
-        }
-        else {
-            usbWorkerInit();
-        }
+        checkChargingCondition();
         return sys::MessageNone{};
     });
 
@@ -255,9 +250,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return sys::MessageNone{};
     });
 
-    if (auto resUsb = usbWorkerInit(); resUsb != sys::ReturnCodes::Success) {
-        return resUsb;
-    }
+    // initial check
+    checkChargingCondition();
 
     return (sys::ReturnCodes::Success);
 }
@@ -371,4 +365,14 @@ void ServiceDesktop::removeNotificationEntries(const std::vector<uint32_t> &uids
 void ServiceDesktop::restartConnectionActiveTimer()
 {
     connectionActiveTimer.restart(sdesktop::connectionActiveTimerDelayMs);
+}
+
+void ServiceDesktop::checkChargingCondition()
+{
+    if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+        usbWorkerDeinit();
+    }
+    else {
+        usbWorkerInit();
+    }
 }
