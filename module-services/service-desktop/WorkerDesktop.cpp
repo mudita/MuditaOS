@@ -47,12 +47,11 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     ownerService->bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
-    usbSuspendTimer = sys::TimerFactory::createSingleShotTimer(
-        ownerService, "usbSuspend", constants::usbSuspendTimeout, [this](sys::Timer &) { suspendUsb(); });
-
     bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber.c_str()};
 
     initialized = bsp::usbInit(initParams) >= 0;
+
+    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
 
     return initialized;
 }
@@ -76,11 +75,14 @@ void WorkerDesktop::closeWorker(void)
 
     this->close();
 
+    cpuSentinel->ReleaseMinimumFrequency();
     auto sentinelRemoveMsg = std::make_shared<sys::SentinelRemovalMessage>("WorkerDesktop");
-    ownerService->bus.sendUnicast(sentinelRemoveMsg, service::name::system_manager);
+    auto result            = ownerService->bus.sendUnicastSync(sentinelRemoveMsg, service::name::system_manager, 1000);
+    if (result.first != sys::ReturnCodes::Success) {
+        LOG_ERROR("Sentinel %s could not be removed!", cpuSentinel->GetName().c_str());
+    }
     cpuSentinel.reset();
 
-    usbSuspendTimer.reset();
     LOG_DEBUG("deinit end");
     initialized = false;
 }
@@ -151,13 +153,11 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         LOG_DEBUG("USB status: %d", static_cast<int>(notification));
 
         if (notification == bsp::USBDeviceStatus::Connected) {
-            usbSuspendTimer.stop();
             ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
                                             sys::BusChannel::USBNotifications);
             usbStatus = bsp::USBDeviceStatus::Connected;
         }
         else if (notification == bsp::USBDeviceStatus::Configured) {
-            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
             if (usbStatus == bsp::USBDeviceStatus::Connected) {
                 ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConfigured>(
                                                   sdesktop::usb::USBConfigurationType::firstConfiguration),
@@ -171,8 +171,6 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             usbStatus = bsp::USBDeviceStatus::Configured;
         }
         else if (notification == bsp::USBDeviceStatus::Disconnected) {
-            usbSuspendTimer.start();
-            cpuSentinel->ReleaseMinimumFrequency();
             ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBDisconnected>(),
                                             sys::BusChannel::USBNotifications);
             usbStatus = bsp::USBDeviceStatus::Disconnected;

@@ -51,7 +51,6 @@ class WorkerDesktop : public sys::Worker
     const std::string serialNumber;
     sys::Service *ownerService = nullptr;
     sdesktop::endpoints::StateMachine parser;
-    sys::TimerHandle usbSuspendTimer;
     bsp::USBDeviceStatus usbStatus = bsp::USBDeviceStatus::Disconnected;
 
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
