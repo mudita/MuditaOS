@@ -4,7 +4,7 @@
 #include <SystemManager/CpuGovernor.hpp>
 #include <algorithm>
 #include <log/log.hpp>
-
+#include "GovernorSentinelOperations.hpp"
 namespace sys
 {
 
@@ -31,26 +31,22 @@ namespace sys
     {
         if (newSentinel) {
             auto isNewSentinelAlreadyRegistered = false;
-
-            for (auto &sentinel : sentinels) {
-                auto sentinelWeakPointer = sentinel->GetSentinel();
-                if (!sentinelWeakPointer.expired()) {
-                    std::shared_ptr<CpuSentinel> sharedResource = sentinelWeakPointer.lock();
-                    if (sharedResource->GetName() == newSentinel->GetName()) {
-                        isNewSentinelAlreadyRegistered = true;
-                        break;
-                    }
+            sentinel_foo checkSentinelAlreadyRegistered = [&](const std::shared_ptr<CpuSentinel> &s) -> bool {
+                if (s->GetName() == newSentinel->GetName()) {
+                    isNewSentinelAlreadyRegistered = true;
+                    return true;
                 }
-            }
+                return false;
+            };
+
+            for_each_sentinel(sentinels, checkSentinelAlreadyRegistered);
 
             if (!isNewSentinelAlreadyRegistered) {
                 sentinels.push_back(std::make_unique<GovernorSentinel>(newSentinel));
                 return true;
             }
-            else {
-                return false;
-                LOG_WARN("New sentinel %s is already registered", newSentinel->GetName().c_str());
-            }
+            LOG_WARN("New sentinel %s is already registered", newSentinel->GetName().c_str());
+            return false;
         }
         return false;
     }
@@ -101,7 +97,7 @@ namespace sys
         SetCpuFrequencyRequest(sentinelName, bsp::CpuFrequencyMHz::Level_0);
     }
 
-    [[nodiscard]] auto CpuGovernor::GetMinimumFrequencyRequested() const noexcept -> sentinel::View
+    [[nodiscard]] auto CpuGovernor::GetMinimumFrequencyRequested() noexcept -> sentinel::View
     {
         sentinel::View d;
         if (sentinels.empty()) {
@@ -109,14 +105,11 @@ namespace sys
             return d;
         }
 
-        auto minSentinel = sentinels.begin();
-        for (auto iter = sentinels.begin(); iter != std::end(sentinels); ++iter) {
-            const auto sentinelFrequency = (*iter)->GetRequestedFrequency();
+        clean(sentinels);
 
-            if (sentinelFrequency > (*minSentinel)->GetRequestedFrequency()) {
-                minSentinel = iter;
-            }
-        }
+        auto minSentinel = std::max_element(sentinels.begin(), sentinels.end(), [](const auto &l, const auto &r) {
+            return (*l).GetRequestedFrequency() < (*r).GetRequestedFrequency();
+        });
 
         d.frequency = (*minSentinel)->GetRequestedFrequency();
         if (auto p = (*minSentinel)->GetSentinel().lock()) {
@@ -129,15 +122,14 @@ namespace sys
         return d;
     }
 
-    void CpuGovernor::InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) const noexcept
+    void CpuGovernor::InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) noexcept
     {
-        for (auto &sentinel : sentinels) {
-            auto sentinelWeakPointer = sentinel->GetSentinel();
-            if (!sentinelWeakPointer.expired()) {
-                std::shared_ptr<CpuSentinel> sharedResource = sentinelWeakPointer.lock();
-                sharedResource->CpuFrequencyHasChanged(newFrequency);
-            }
-        }
+        sentinel_foo foo = [&newFrequency](const std::shared_ptr<CpuSentinel> &s) -> bool {
+            s->CpuFrequencyHasChanged(newFrequency);
+            return false;
+        };
+
+        for_each_sentinel(sentinels, foo);
     }
 
     void CpuGovernor::PrintName(const GovernorSentinelPointer &element)

@@ -43,8 +43,8 @@ namespace sys
         void SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request);
         void ResetCpuFrequencyRequest(const std::string &sentinelName);
 
-        [[nodiscard]] auto GetMinimumFrequencyRequested() const noexcept -> sentinel::View;
-        void InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) const noexcept;
+        [[nodiscard]] auto GetMinimumFrequencyRequested() noexcept -> sentinel::View;
+        void InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) noexcept;
 
       private:
         static void PrintName(const GovernorSentinelPointer &element);
