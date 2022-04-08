@@ -16,16 +16,13 @@ add_library(${PROJECT_NAME} STATIC
         RTOSWrapper/ctimer.cpp
         RTOSWrapper/cworkqueue.cpp
 
-        application.c
         memory/usermem.c
 
-        CriticalSectionGuard.cpp
         LockGuard.cpp
+        CriticalSectionGuard.cpp
 
         $<$<BOOL:${PROF_ON}>:prof/prof.c>
         )
-
-add_board_subdirectory(board)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
@@ -65,6 +62,10 @@ if ((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
 endif ()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC log-api board-config freertos_kernel)
+
+
+add_library(freertos-app application.c)
+target_link_libraries(freertos-app PRIVATE freertos_kernel log-api)
 
 if (${ENABLE_TESTS})
     add_subdirectory(test)

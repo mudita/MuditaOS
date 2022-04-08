@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -70,16 +70,15 @@ static void __attribute__((noreturn)) stop_system(void)
 void __attribute__((noreturn, used)) _exit_backtrace(int code, bool bt_dump)
 {
     LOG_INFO("_exit %d", code);
-    if( bt_dump && !isIRQ() ) {
+    if (bt_dump && !isIRQ()) {
         _StackTrace_Dump_And_Abort();
     }
     stop_system();
 };
 
-
 void __attribute__((noreturn, used)) _exit(int code)
 {
-     _exit_backtrace(code, code!=0);
+    _exit_backtrace(code, code != 0);
 }
 
 void __attribute__((noreturn, used)) exit(int code)
