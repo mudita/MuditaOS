@@ -3,12 +3,11 @@
 
 #pragma once
 
-#include "call/CellularCall.hpp"
+#include <call/CellularCall.hpp>
 #include "CellularMessage.hpp"
 #include "USSD.hpp"
 #include "PacketData.hpp"
 #include "PacketDataCellularMessage.hpp"
-#include "src/CallManager.hpp"
 #include <service-cellular/connection-manager/ConnectionManager.hpp>
 #include "src/URCCounter.hpp"
 
@@ -318,7 +317,6 @@ class ServiceCellular : public sys::Service
     auto tetheringTurnOnURC() -> bool;
     auto logTetheringCalls() -> void;
     std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;
-    cellular::internal::SimpleCallManager callManager;
     TaskHandle_t getTaskHandle();
 };
 

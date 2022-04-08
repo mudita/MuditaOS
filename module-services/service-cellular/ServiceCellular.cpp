@@ -4,7 +4,6 @@
 #include "endpoints/developerMode/event/ATRequest.hpp"
 #include "handler/RawATHandler.hpp"
 #include "CellularUrcHandler.hpp"
-#include "service-cellular/call/CellularCall.hpp"
 #include "service-cellular/CellularMessage.hpp"
 #include "service-cellular/CellularServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
@@ -490,11 +489,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularRingingMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularRingingMessage *>(request);
         return handleCellularRingingMessage(msg);
-    });
-
-    connect(typeid(CellularCallerIdMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        auto msg = static_cast<CellularCallerIdMessage *>(request);
-        return handleCellularCallerIdMessage(msg);
     });
 
     connect(typeid(CellularGetIMSIMessage),
@@ -1857,7 +1851,6 @@ void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
     auto channel = cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         if (channel->cmd(at::AT::ATH)) {
-            callManager.hangUp();
             callStateTimer.stop();
             callEndedRecentlyTimer.start();
             if (!ongoingCall.endCall(CellularCall::Forced::True)) {
@@ -1944,17 +1937,6 @@ auto ServiceCellular::handleCellularRingingMessage(CellularRingingMessage *msg) 
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
     return std::make_shared<CellularResponseMessage>(ongoingCall.startOutgoing(msg->number));
-}
-
-auto ServiceCellular::handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    auto message = static_cast<CellularCallerIdMessage *>(msg);
-    if (not ongoingCall.handleCLIP(message->number)) {
-        CellularServiceAPI::DismissCall(
-            this, phoneModeObserver->getCurrentPhoneMode() == sys::phone_modes::PhoneMode::DoNotDisturb);
-    }
-
-    return sys::MessageNone{};
 }
 
 auto ServiceCellular::handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
@@ -2143,8 +2125,10 @@ auto ServiceCellular::handleCallActiveNotification(sys::Message *msg) -> std::sh
 auto ServiceCellular::handleCallAbortedNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     callStateTimer.stop();
-    auto ret = ongoingCall.endCall();
-    callManager.hangUp();
+    const auto ret = ongoingCall.endCall();
+    if (not ret) {
+        LOG_ERROR("failed to end call");
+    }
     return std::make_shared<CellularResponseMessage>(ret);
 }
 auto ServiceCellular::handlePowerUpProcedureCompleteNotification(sys::Message *msg)
@@ -2219,14 +2203,6 @@ auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::
     }
     ongoingCall.handleRING();
 
-    /// NOTE: the code below should be investigated as there is something weird in this flow
-    /// most probably should be done on not dropped clip/ring
-    /// please see that in this case we lock antena, which makes sense when call is in progress
-    if (!callManager.isIncomingCallPropagated()) {
-        bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(),
-                          sys::BusChannel::ServiceCellularNotifications);
-        callManager.ring();
-    }
     return std::make_shared<CellularResponseMessage>(true);
 }
 
@@ -2242,11 +2218,11 @@ auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> s
         return std::make_shared<CellularResponseMessage>(hangUpCallBusy());
     }
 
-    if (!callManager.isCallerInfoComplete()) {
-        bus.sendMulticast(std::make_shared<CellularCallerIdMessage>(message->getNubmer()),
-                          sys::BusChannel::ServiceCellularNotifications);
-        callManager.completeCallerInfo();
+    if (not ongoingCall.handleCLIP(message->getNubmer())) {
+        CellularServiceAPI::DismissCall(
+            this, phoneModeObserver->getCurrentPhoneMode() == sys::phone_modes::PhoneMode::DoNotDisturb);
     }
+
     return std::make_shared<CellularResponseMessage>(true);
 }
 
@@ -2268,7 +2244,7 @@ auto ServiceCellular::hangUpCall() -> bool
     auto channel = cmux->get(CellularMux::Channel::Commands);
     if (channel != nullptr) {
         if (channel->cmd(at::factory(at::AT::ATH))) {
-            callManager.hangUp();
+            ongoingCall.endCall();
             return true;
         }
     }

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-cellular/call/CellularCall.hpp"
+#include "call/CellularCall.hpp"
 #include "service-cellular/call/CallRingGuard.hpp"
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-db/agents/settings/SystemSettings.hpp"
@@ -22,7 +22,7 @@
 
 namespace CellularCall
 {
-    Call::Call(ServiceCellular &owner) : owner(owner), audio(owner), gui(owner), db(owner)
+    Call::Call(ServiceCellular &owner) : owner(owner), audio(owner), multicast(owner), gui(owner), db(owner)
     {
         utils::PhoneNumber::View number = utils::PhoneNumber::View();
         const CallType type             = CallType::CT_NONE;
@@ -47,6 +47,7 @@ namespace CellularCall
             if (!wasRinging) {
                 wasRinging = true;
                 gui.notifyRING();
+                multicast.notifyIncommingCall();
             }
             return true;
         }
@@ -65,6 +66,7 @@ namespace CellularCall
             if (!isNumberDisplayed) {
                 isNumberDisplayed = true;
                 gui.notifyCLIP(number);
+                multicast.notifyIdentifiedCall(number);
             }
             return true;
         }

@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallRingGuard.hpp"
-#include "service-cellular/call/CellularCall.hpp"
+#include "call/CellularCall.hpp"
 
 bool callRingGuard(CellularCall::Call &call)
 {

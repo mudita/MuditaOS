@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include <service-cellular/call/CellularCall.hpp>
 
 namespace at
 {
