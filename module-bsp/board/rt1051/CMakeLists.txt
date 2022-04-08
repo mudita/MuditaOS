@@ -71,6 +71,7 @@ set_source_files_properties(
 target_compile_definitions(module-bsp PUBLIC USB_STACK_FREERTOS)
 
 add_subdirectory(common/fsl_drivers)
+add_subdirectory(os)
 add_subdirectory(${BOARD})
 
 target_link_libraries(module-bsp PUBLIC cmsis fsl)

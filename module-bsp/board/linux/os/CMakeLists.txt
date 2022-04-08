@@ -1,10 +1,6 @@
-target_include_directories(
-        module-os
-    PUBLIC
-    $<BUILD_INTERFACE:
-        ${CMAKE_CURRENT_SOURCE_DIR}
-    >
-)
+add_library(module-bsp-os INTERFACE)
+add_library(module-bsp::os ALIAS module-bsp-os)
+target_include_directories(module-bsp-os INTERFACE .)
 
 # Set required FreeRTOS CMake flags
 set(FREERTOS_PORT GCC_POSIX CACHE STRING "")

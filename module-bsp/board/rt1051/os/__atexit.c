@@ -40,13 +40,13 @@
 
 /* Make this a weak reference to avoid pulling in malloc.  */
 #ifndef MALLOC_PROVIDED
-void * malloc(size_t) _ATTRIBUTE((__weak__));
+void *malloc(size_t) _ATTRIBUTE((__weak__));
 #endif
 
 #ifdef _LITE_EXIT
 /* As __call_exitprocs is weak reference in lite exit, make a
    non-weak reference to it here.  */
-const void * __atexit_dummy = &__call_exitprocs;
+const void *__atexit_dummy = &__call_exitprocs;
 #endif
 
 #ifndef __SINGLE_THREAD__
@@ -55,105 +55,95 @@ extern _LOCK_RECURSIVE_T __atexit_recursive_mutex;
 
 #ifdef _REENT_GLOBAL_ATEXIT
 static struct _atexit _global_atexit0 = _ATEXIT_INIT;
-# define _GLOBAL_ATEXIT0 (&_global_atexit0)
+#define _GLOBAL_ATEXIT0 (&_global_atexit0)
 #else
-# define _GLOBAL_ATEXIT0 (&_GLOBAL_REENT->_atexit0)
+#define _GLOBAL_ATEXIT0 (&_GLOBAL_REENT->_atexit0)
 #endif
 
 /*
  * Register a function to be performed at exit or on shared library unload.
  */
 
-int
-__register_exitproc (int type,
-	void (*fn) (void),
-	void *arg,
-	void *d)
+int __register_exitproc(int type, void (*fn)(void), void *arg, void *d)
 {
-  struct _on_exit_args * args;
-  register struct _atexit *p;
+    struct _on_exit_args *args;
+    register struct _atexit *p;
 
 #ifndef __SINGLE_THREAD__
-  __lock_acquire_recursive(__atexit_recursive_mutex);
+    __lock_acquire_recursive(__atexit_recursive_mutex);
 #endif
 
-  p = _GLOBAL_ATEXIT;
-  if (p == NULL)
-    {
-      _GLOBAL_ATEXIT = p = _GLOBAL_ATEXIT0;
+    p = _GLOBAL_ATEXIT;
+    if (p == NULL) {
+        _GLOBAL_ATEXIT = p = _GLOBAL_ATEXIT0;
 #ifdef _REENT_SMALL
-      extern struct _on_exit_args * const __on_exit_args _ATTRIBUTE ((weak));
-      if (&__on_exit_args != NULL)
-	p->_on_exit_args_ptr = __on_exit_args;
-#endif	/* def _REENT_SMALL */
+        extern struct _on_exit_args *const __on_exit_args _ATTRIBUTE((weak));
+        if (&__on_exit_args != NULL)
+            p->_on_exit_args_ptr = __on_exit_args;
+#endif /* def _REENT_SMALL */
     }
-  if (p->_ind >= _ATEXIT_SIZE)
-    {
-#if !defined (_ATEXIT_DYNAMIC_ALLOC) || !defined (MALLOC_PROVIDED)
+    if (p->_ind >= _ATEXIT_SIZE) {
+#if !defined(_ATEXIT_DYNAMIC_ALLOC) || !defined(MALLOC_PROVIDED)
 #ifndef __SINGLE_THREAD__
-      __lock_release_recursive(__atexit_recursive_mutex);
+        __lock_release_recursive(__atexit_recursive_mutex);
 #endif
-      return -1;
+        return -1;
 #else
-      p = (struct _atexit *) malloc (sizeof *p);
-      if (p == NULL)
-	{
+        p = (struct _atexit *)malloc(sizeof *p);
+        if (p == NULL) {
 #ifndef __SINGLE_THREAD__
-	  __lock_release_recursive(__atexit_recursive_mutex);
+            __lock_release_recursive(__atexit_recursive_mutex);
 #endif
-	  return -1;
-	}
-      p->_ind = 0;
-      p->_next = _GLOBAL_ATEXIT;
-      _GLOBAL_ATEXIT = p;
+            return -1;
+        }
+        p->_ind                   = 0;
+        p->_next                  = _GLOBAL_ATEXIT;
+        _GLOBAL_ATEXIT            = p;
 #ifndef _REENT_SMALL
-      p->_on_exit_args._fntypes = 0;
-      p->_on_exit_args._is_cxa = 0;
+        p->_on_exit_args._fntypes = 0;
+        p->_on_exit_args._is_cxa  = 0;
 #else
-      p->_on_exit_args_ptr = NULL;
+        p->_on_exit_args_ptr = NULL;
 #endif
 #endif
     }
 
-  if (type != __et_atexit)
-    {
+    if (type != __et_atexit) {
 #ifdef _REENT_SMALL
-      args = p->_on_exit_args_ptr;
-      if (args == NULL)
-	{
+        args = p->_on_exit_args_ptr;
+        if (args == NULL) {
 #ifndef _ATEXIT_DYNAMIC_ALLOC
 #ifndef __SINGLE_THREAD__
-	  __lock_release_recursive(__atexit_recursive_mutex);
+            __lock_release_recursive(__atexit_recursive_mutex);
 #endif
-	  return -1;
+            return -1;
 #else
-	  if (malloc)
-	    args = malloc (sizeof * p->_on_exit_args_ptr);
+            if (malloc)
+                args = malloc(sizeof *p->_on_exit_args_ptr);
 
-	  if (args == NULL)
-	    {
+            if (args == NULL) {
 #ifndef __SINGLE_THREAD__
-	      __lock_release(__atexit_recursive_mutex);
+                __lock_release(__atexit_recursive_mutex);
 #endif
-	      return -1;
-	    }
-	  args->_fntypes = 0;
-	  args->_is_cxa = 0;
-	  p->_on_exit_args_ptr = args;
+                return -1;
+            }
+            args->_fntypes       = 0;
+            args->_is_cxa        = 0;
+            p->_on_exit_args_ptr = args;
 #endif
-	}
+        }
 #else
-      args = &p->_on_exit_args;
+        args                      = &p->_on_exit_args;
 #endif
-      args->_fnargs[p->_ind] = arg;
-      args->_fntypes |= (1 << p->_ind);
-      args->_dso_handle[p->_ind] = d;
-      if (type == __et_cxa)
-	args->_is_cxa |= (1 << p->_ind);
+        args->_fnargs[p->_ind] = arg;
+        args->_fntypes |= (1 << p->_ind);
+        args->_dso_handle[p->_ind] = d;
+        if (type == __et_cxa)
+            args->_is_cxa |= (1 << p->_ind);
     }
-  p->_fns[p->_ind++] = fn;
+    p->_fns[p->_ind++] = fn;
 #ifndef __SINGLE_THREAD__
-  __lock_release_recursive(__atexit_recursive_mutex);
+    __lock_release_recursive(__atexit_recursive_mutex);
 #endif
-  return 0;
+    return 0;
 }

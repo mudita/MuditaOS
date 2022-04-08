@@ -64,3 +64,5 @@ target_link_libraries(system-stats-sink-board
         segger::rtt
         system-stats-sink-interface
 )
+
+add_subdirectory(os)
