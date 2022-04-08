@@ -5,7 +5,6 @@ set(SOURCES
     src/ServiceCellularPriv.cpp
     src/State.cpp
     src/SimCard.cpp
-    src/CallManager.cpp
     src/NetworkTime.cpp
     src/SimContacts.cpp
     src/SMSPartsHandler.cpp
@@ -16,11 +15,6 @@ set(SOURCES
     src/URCCounter.cpp
     src/CSQHandler.cpp
 
-    call/CellularCall.cpp
-    call/CallAudio.cpp
-    call/CallGUI.cpp
-    call/CallDB.cpp
-    call/CallRingGuard.cpp
     CellularServiceAPI.cpp
     CellularUrcHandler.cpp
     checkSmsCenter.cpp
@@ -59,6 +53,8 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/src
 )
 
+add_subdirectory(call)
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         Microsoft.GSL::GSL
@@ -72,6 +68,7 @@ target_link_libraries(${PROJECT_NAME}
         json::json
         utils-time
     PUBLIC
+        service-cellular-call
         eventstore
         utf8
         hal

@@ -6,6 +6,7 @@
 #include "call/CallAudio.hpp"
 #include "call/CallGUI.hpp"
 #include "call/CallDB.hpp"
+#include "call/CallMulticast.hpp"
 #include "PhoneModes/PhoneMode.hpp"
 #include <service-cellular/CellularMessage.hpp>
 #include <Interface/CalllogRecord.hpp>
@@ -70,6 +71,7 @@ namespace CellularCall
 
         ServiceCellular &owner;
         CallRingAudio audio;
+        CallMulticast multicast;
         CallGUI gui;
         CallDB db;
 
