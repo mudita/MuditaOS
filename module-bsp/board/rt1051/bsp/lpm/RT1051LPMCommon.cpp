@@ -66,8 +66,6 @@ namespace bsp
         if ((freq <= CpuFrequencyMHz::Level_1) && (newFrequency > CpuFrequencyMHz::Level_1)) {
             // connect internal the load resistor
             ConnectInternalLoadResistor();
-            // turn off power save mode for DCDC inverter
-            DisableDcdcPowerSaveMode();
             // Switch DCDC to full throttle during oscillator switch
             SetHighestCoreVoltage();
             // Enable regular 2P5 and 1P1 LDO and Turn off weak 2P5 and 1P1 LDO
@@ -96,8 +94,6 @@ namespace bsp
             if (driverSEMC) {
                 driverSEMC->SwitchToPeripheralClockSource();
             }
-            // turn on power save mode for DCDC inverter
-            EnableDcdcPowerSaveMode();
 
             // disconnect internal the load resistor
             DisconnectInternalLoadResistor();
