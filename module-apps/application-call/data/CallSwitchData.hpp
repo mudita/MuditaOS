@@ -57,29 +57,10 @@ namespace app
         }
     };
 
-    class IncomingCallData : public CallSwitchData
-    {
-      public:
-        IncomingCallData(const utils::PhoneNumber::View &phoneNumber)
-            : CallSwitchData(phoneNumber, CallSwitchData::Type::INCOMING_CALL){};
-    };
-
     class ExecuteCallData : public CallSwitchData
     {
       public:
         ExecuteCallData(const utils::PhoneNumber::View &phoneNumber)
             : CallSwitchData(phoneNumber, app::CallSwitchData::Type::EXECUTE_CALL){};
-    };
-
-    class CallAbortData : public gui::SwitchData
-    {
-      public:
-        CallAbortData() = default;
-    };
-
-    class CallActiveData : public gui::SwitchData
-    {
-      public:
-        CallActiveData() = default;
     };
 } /* namespace app */

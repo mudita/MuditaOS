@@ -12,7 +12,7 @@
 #include <apps-common/windows/DialogMetadata.hpp>
 #include <log/log.hpp>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
-#include <Timers/TimerFactory.hpp>
+
 #include <PhoneNumber.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
@@ -37,7 +37,7 @@ namespace app
             if (popupParams.getPopupId() == gui::popup::ID::Volume) {
                 return true;
             }
-            return this->getCallState() == call::State::IDLE;
+            return true;
         });
         statusBarManager->enableIndicators(
             {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
@@ -82,34 +82,45 @@ namespace app
             return actionHandled();
         });
         addActionReceiver(manager::actions::AbortCall, [this](auto &&data) {
-            callerIdTimer.reset();
             if (const auto state = getState(); state == Application::State::ACTIVE_FORGROUND) {
-                switchWindow(window::name_call, std::make_unique<app::CallAbortData>());
+                switchWindow(window::name_call);
             }
             else if (state == Application::State::ACTIVE_BACKGROUND) {
-                setCallState(call::State::IDLE);
+                callModel->setState(app::call::CallState::None);
                 manager::Controller::finish(this);
             }
             return actionHandled();
         });
         addActionReceiver(manager::actions::ActivateCall, [this](auto &&data) {
-            switchWindow(window::name_call, std::make_unique<app::CallActiveData>());
+            switchWindow(window::name_call);
             return actionHandled();
         });
         addActionReceiver(manager::actions::HandleOutgoingCall, [this](auto &&data) {
-            auto callParams = static_cast<app::manager::actions::CallParams *>(data.get());
-            switchWindow(window::name_call, std::make_unique<app::ExecuteCallData>(callParams->getNumber()));
+            switchWindow(window::name_call);
             return actionHandled();
         });
         addActionReceiver(manager::actions::HandleIncomingCall, [this](auto &&data) {
-            handleIncomingCall();
+            callModel->setState(call::CallState::Incoming);
+            auto window = getCurrentWindow();
+            if (window->getName() != app::window::name_call) {
+                LOG_INFO("Switch to call window");
+                switchWindow(app::window::name_call);
+            }
             return actionHandled();
         });
         addActionReceiver(manager::actions::HandleCallerId, [this](auto &&data) {
             auto callParams = static_cast<app::manager::actions::CallParams *>(data.get());
-            handleCallerId(callParams);
+            callModel->setPhoneNumber(callParams->getNumber());
+            callModel->setState(call::CallState::Incoming);
+            auto window = getCurrentWindow();
+            if (window->getName() != app::window::name_call) {
+                LOG_INFO("Switch to call window");
+                switchWindow(app::window::name_call);
+            }
             return actionHandled();
         });
+
+        callModel = std::make_shared<app::call::CallModel>(this);
     }
 
     bool ApplicationCall::conditionalReturnToPreviousView()
@@ -145,6 +156,29 @@ namespace app
             return ret;
         }
 
+        connect(typeid(cellular::CallDurationNotification), [&](sys::Message *request) {
+            auto message = static_cast<cellular::CallDurationNotification *>(request);
+            callModel->setTime(message->callDuration);
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(cellular::CallActiveNotification), [&](sys::Message *request) {
+            callModel->setState(app::call::CallState::Active);
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(cellular::CallEndedNotification), [&](sys::Message *request) {
+            callModel->setState(app::call::CallState::Ended);
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(cellular::CallStartedNotification), [&](sys::Message *request) {
+            auto message = static_cast<cellular::CallStartedNotification *>(request);
+            callModel->setPhoneNumber(message->getNumber());
+            callModel->setState(app::call::CallState::Outgoing);
+            return sys::MessageNone{};
+        });
+
         createUserInterface();
 
         return ret;
@@ -155,8 +189,9 @@ namespace app
         windowsFactory.attach(app::window::name_enterNumber, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::EnterNumberWindow>(app, static_cast<ApplicationCall *>(app));
         });
-        windowsFactory.attach(app::window::name_call, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::CallWindow>(app, static_cast<ApplicationCall *>(app));
+        windowsFactory.attach(app::window::name_call, [this](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::CallWindow>(
+                app, std::make_unique<app::call::CallWindowContract::Presenter>(this->callModel));
         });
         windowsFactory.attach(app::window::name_emergencyCall, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::EmergencyCallWindow>(app, static_cast<ApplicationCall *>(app));
@@ -181,47 +216,17 @@ namespace app
     {
         auto buttonAction = [=]() -> bool { return conditionalReturnToPreviousView(); };
         auto icon         = type == NotificationType::Info ? "info_128px_W_G" : "fail_128px_W_G";
-        setCallState(call::State::IDLE);
+        callModel->clear();
         return showNotification(buttonAction, icon, text);
     }
 
     void ApplicationCall::destroyUserInterface()
     {}
 
-    void ApplicationCall::handleIncomingCall()
-    {
-        if (getCallState() != call::State::IDLE) {
-            return;
-        }
-
-        constexpr auto callerIdTimeout = std::chrono::seconds{1};
-        callerIdTimer                  = sys::TimerFactory::createSingleShotTimer(
-            this, "CallerIdTimer", callerIdTimeout, [this]([[maybe_unused]] sys::Timer &timer) {
-                switchWindow(window::name_call,
-                             std::make_unique<app::IncomingCallData>(utils::PhoneNumber().getView()));
-            });
-        callerIdTimer.start();
-    }
-
-    void ApplicationCall::handleCallerId(const app::manager::actions::CallParams *params)
-    {
-        /// there is race condition in this code, we require `INCOMMING_CALL` state check due to it.
-        /// alternatively we would require rewritting this application state handling
-        if (getCallState() != call::State::IDLE && getCallState() != app::call::State::INCOMING_CALL) {
-            LOG_ERROR("call id not handled");
-            return;
-        }
-        if (callerIdTimer.isValid()) {
-            callerIdTimer.stop();
-            callerIdTimer.reset();
-        }
-        switchWindow(window::name_call, std::make_unique<app::IncomingCallData>(params->getNumber()));
-    }
-
     void ApplicationCall::handleEmergencyCallEvent(const std::string &number)
     {
-        auto state = getCallState();
-        if (state != call::State::IDLE) {
+        auto state = callModel->getState();
+        if (state != call::CallState::None) {
             LOG_WARN("Cannot call in %s state", c_str(state));
             return;
         }
@@ -230,13 +235,12 @@ namespace app
 
     void ApplicationCall::handleCallEvent(const std::string &number, ExternalRequest isExternalRequest)
     {
-        auto state = getCallState();
-        if (state != call::State::IDLE) {
+        auto state = callModel->getState();
+        if (state != call::CallState::None) {
             LOG_WARN("Cannot call in %s state", c_str(state));
             return;
         }
         CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
-        setCallState(call::State::OUTGOING_CALL);
         externalRequest = isExternalRequest;
     }
 
@@ -260,41 +264,6 @@ namespace app
             data->ignoreCurrentWindowOnStack = true;
             app::manager::Controller::sendAction(
                 this, manager::actions::AddContact, std::move(data), manager::OnSwitchBehaviour::RunInBackground);
-        }
-    }
-
-    void ApplicationCall::sendAudioEvent(AudioEvent audioEvent)
-    {
-        switch (audioEvent) {
-        case AudioEvent::Mute:
-            CellularServiceAPI::CallAudioMuteEvent(this);
-            break;
-        case AudioEvent::Unmute:
-            CellularServiceAPI::CallAudioUnmuteEvent(this);
-            break;
-        case AudioEvent::LoudspeakerOn:
-            CellularServiceAPI::CallAudioLoudspeakerOnEvent(this);
-            break;
-        case AudioEvent::LoudspeakerOff:
-            CellularServiceAPI::CallAudioLoudspeakerOffEvent(this);
-            break;
-        }
-    }
-
-    void ApplicationCall::hangupCall()
-    {
-        CellularServiceAPI::HangupCall(this);
-    }
-
-    void ApplicationCall::answerIncomingCall()
-    {
-        CellularServiceAPI::AnswerIncomingCall(this);
-    }
-
-    void ApplicationCall::transmitDtmfTone(uint32_t digit)
-    {
-        if (!CellularServiceAPI::TransmitDtmfTones(this, digit)) {
-            LOG_ERROR("transmitDtmfTone failed");
         }
     }
 } // namespace app

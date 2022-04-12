@@ -21,9 +21,9 @@ void CallGUI::notifyCLIP(const utils::PhoneNumber::View &number)
         &owner, app::manager::actions::HandleCallerId, std::make_unique<app::manager::actions::CallParams>(number));
 }
 
-void CallGUI::notifyCallStarted()
+void CallGUI::notifyCallStarted(utils::PhoneNumber phoneNumber)
 {
-    owner.bus.sendMulticast(std::make_shared<cellular::CallStartedNotification>(),
+    owner.bus.sendMulticast(std::make_shared<cellular::CallStartedNotification>(phoneNumber),
                             sys::BusChannel::ServiceCellularNotifications);
 }
 
@@ -38,6 +38,7 @@ void CallGUI::notifyCallActive()
     owner.bus.sendMulticast(std::make_shared<cellular::CallActiveNotification>(),
                             sys::BusChannel::ServiceCellularNotifications);
 }
+
 void CallGUI::notifyCallDurationUpdate(const time_t &duration)
 {
     owner.bus.sendMulticast(std::make_shared<cellular::CallDurationNotification>(duration),

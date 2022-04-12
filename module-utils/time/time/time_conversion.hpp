@@ -6,7 +6,7 @@
 /// this calss uses strftime to convert timestamp to text, but for UTF8 elements (mon,day) it uses our locale
 /// as stdlib builtin locale doesn't provide way to substitute C-LOCALE
 
-#include "time/time_locale.hpp"
+#include <time/time_locale.hpp>
 #include <log/log.hpp>
 
 #include <vector>
