@@ -72,25 +72,32 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     add_dependencies(BellHybrid service_renderer)
 endif()
 
-if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    set(LUTSBIN "Luts.bin")
-else()
-    set(LUTSBIN "")
-endif()
 
 set_source_files_properties(BellHybridMain.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 
 strip_executable(BellHybrid)
 
-include(AddBootBin)
-add_boot_bin(BellHybrid)
+include(AddVersionJson)
 
-add_image(
-    PRODUCT BellHybrid
-    SYSROOT sysroot
-    LUTS ${LUTSBIN}
-    DEPENDS assets updater.bin-target ecoboot.bin-target BellHybrid-boot.bin BellHybrid-version.json-target
-)
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    include(AddBootBin)
+    add_boot_bin(BellHybrid)
+    add_image(
+        PRODUCT BellHybrid
+        SYSROOT sysroot
+        LUTS Luts.bin
+        DEPENDS assets updater.bin-target ecoboot.bin-target BellHybrid-boot.bin BellHybrid-version.json-target
+    )
+    add_version_rt1051_json(BellHybrid)
+else()
+    add_image(
+        PRODUCT BellHybrid
+        SYSROOT sysroot
+        LUTS ""
+        DEPENDS assets BellHybrid-version.json-target
+    )
+    add_version_linux_json(BellHybrid)
+endif()
 
 include(AddHexTarget)
 add_hex_target(BellHybrid)
@@ -127,8 +134,6 @@ download_asset_json(json-rt1051-target
 download_asset_release(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION}  ${MUDITA_CACHE_DIR})
 download_asset_release(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION}  ${MUDITA_CACHE_DIR})
 
-include(AddVersionJson)
-add_version_json(BellHybrid)
 
 add_standalone_image(BellHybrid)
 add_update_package(BellHybrid)

@@ -1,9 +1,15 @@
 list(APPEND CMAKE_MODULE_PATH "${SRC_DIR}/cmake/modules")
 include(Version)
 
-file(MD5 ${BOOTLOADER_FILE} BOOTLOADER_MD5SUM)
-file(MD5 ${BOOT_FILE} BOOT_MD5SUM)
-file(MD5 ${UPDATER_FILE} UPDATER_MD5SUM)
+if (NOT ${BOOTLOADER_FILE} STREQUAL "")
+    file(MD5 ${BOOTLOADER_FILE} BOOTLOADER_MD5SUM)
+endif()
+if (NOT ${BOOT_FILE} STREQUAL "")
+    file(MD5 ${BOOT_FILE} BOOT_MD5SUM)
+endif()
+if (NOT ${UPLOADER_FILE} STREQUAL "")
+    file(MD5 ${UPDATER_FILE} UPDATER_MD5SUM)
+endif()
 
 message("Configuring version.json file")
 configure_file(${SRC_FILE} ${DST_FILE} @ONLY)

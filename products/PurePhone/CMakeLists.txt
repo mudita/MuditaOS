@@ -89,11 +89,6 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     add_dependencies(Pure service_renderer)
 endif()
 
-if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    set(LUTSBIN "Luts.bin")
-else()
-    set(LUTSBIN "")
-endif()
 
 # set special main.cpp file properties
 set_property(
@@ -108,15 +103,29 @@ strip_executable(PurePhone)
 
 message_serial_status()
 
-include(AddBootBin)
-add_boot_bin(PurePhone)
 
-add_image(
-    PRODUCT PurePhone
-    SYSROOT sysroot
-    LUTS ${LUTSBIN}
-    DEPENDS assets updater.bin-target ecoboot.bin-target PurePhone-boot.bin PurePhone-version.json-target
-)
+include(AddVersionJson)
+
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    include(AddBootBin)
+    add_boot_bin(PurePhone)
+    add_image(
+        PRODUCT PurePhone
+        SYSROOT sysroot
+        LUTS Luts.bin
+        DEPENDS assets updater.bin-target ecoboot.bin-target PurePhone-boot.bin PurePhone-version.json-target
+    )
+    add_version_rt1051_json(PurePhone)
+else()
+    add_image(
+        PRODUCT PurePhone
+        SYSROOT sysroot
+        LUTS ""
+        DEPENDS assets PurePhone-version.json-target
+    )
+    add_version_linux_json(PurePhone)
+endif()
+
 
 include(AddHexTarget)
 add_hex_target(PurePhone)
@@ -150,11 +159,10 @@ download_asset_json(json-rt1051-target
                             MuditaOSAssets
                             ${MUDITA_CACHE_DIR}
     )
+
 download_asset_release(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION} ${MUDITA_CACHE_DIR})
 download_asset_release(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION} ${MUDITA_CACHE_DIR})
 
-include(AddVersionJson)
-add_version_json(PurePhone)
 
 add_standalone_image(PurePhone)
 add_update_package(PurePhone)
