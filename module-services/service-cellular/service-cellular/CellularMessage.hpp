@@ -602,17 +602,11 @@ class CellularAnswerIncomingCallMessage : public CellularMessage
     {}
 };
 
-class CellularHangupCallMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
+class CellularHangupCallMessage : public CellularMessage
 {
   public:
     CellularHangupCallMessage() : CellularMessage(Type::HangupCall)
     {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::AbortCall, std::make_unique<app::manager::actions::ActionParams>());
-    }
 };
 
 class CellularDismissCallMessage : public CellularMessage
@@ -1048,7 +1042,15 @@ namespace cellular
     class CallStartedNotification : public sys::DataMessage
     {
       public:
-        explicit CallStartedNotification() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+        explicit CallStartedNotification(utils::PhoneNumber phoneNumber)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), phoneNumber(phoneNumber){};
+        utils::PhoneNumber getNumber()
+        {
+            return phoneNumber;
+        };
+
+      private:
+        utils::PhoneNumber phoneNumber;
     };
 
     class CallEndedNotification : public sys::DataMessage
@@ -1070,4 +1072,5 @@ namespace cellular
             : sys::DataMessage(MessageType::MessageTypeUninitialized), callDuration(duration){};
         time_t callDuration;
     };
+
 } // namespace cellular

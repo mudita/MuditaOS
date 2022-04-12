@@ -4,8 +4,8 @@
 #pragma once
 
 #include "ApplicationCall.hpp"
-#include "CallState.hpp"
 #include "StateIcons.hpp"
+#include <application-call/presenter/CallPresenter.hpp>
 
 #include <AppWindow.hpp>
 #include <gui/input/Translator.hpp>
@@ -15,30 +15,22 @@
 
 namespace gui
 {
-    class CallWindow : public AppWindow
+    class CallWindow : public AppWindow, public app::call::CallWindowContract::View
     {
       private:
-        enum class CallEndType
-        {
-            None,
-            Ended,
-            Rejected,
-        } callEndType = CallEndType::None;
 
         gui::KeyInputMappedTranslation translator;
-        sys::TimerHandle callTimer;
         sys::TimerHandle delayedExitTimer;
-        std::chrono::seconds callDuration                = std::chrono::seconds().zero();
         static constexpr inline auto callDelayedStopTime = std::chrono::milliseconds{3000};
 
         [[nodiscard]] auto getDelayedStopTime() const
         {
             return callDelayedStopTime;
         }
-        void setCallEndMessage();
+
+        std::unique_ptr<app::call::CallWindowContract::Presenter> presenter;
 
       protected:
-        app::CallWindowInterface *interface = nullptr;
         // used to display both number and name of contact
         gui::Label *numberLabel = nullptr;
         // used to inform user about call state of call and display duration of call
@@ -53,18 +45,9 @@ namespace gui
 
         utils::PhoneNumber::View phoneNumber;
 
-        bool handleLeftButton();
-        bool handleRightButton();
-        bool handleHeadsetOkButton();
-        void setState(app::call::State state);
-        [[nodiscard]] auto getState() const noexcept -> app::call::State;
-
       public:
         CallWindow(app::ApplicationCommon *app,
-                   app::CallWindowInterface *interface,
-                   std::string windowName = app::window::name_call);
-
-        void updateDuration(const utils::time::Duration duration);
+                   std::unique_ptr<app::call::CallWindowContract::Presenter> &&windowPresenter);
 
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -74,10 +57,17 @@ namespace gui
         void destroyInterface() override;
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
-        bool handleDigit(const uint32_t digit);
         void connectTimerOnExit();
-        void runCallTimer();
-        void stopCallTimer();
+        void refreshWindow() override;
+
+        void updateDuration(const UTF8 &text, bool isVisible = true) override;
+        void setNavBarForActiveCall() override;
+        void setNavBarForIncomingCall() override;
+        void clearNavBar() override;
+        void setIncomingCallLayout(bool isValidCallerId) override;
+        void setActiveCallLayout() override;
+        void setCallEndedLayout() override;
+        void updateNumber(const UTF8 &text) override;
     };
 
 } /* namespace gui */

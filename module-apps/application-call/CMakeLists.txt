@@ -20,6 +20,8 @@ target_sources(application-call
 		ApplicationCall.cpp
 		data/CallAppStyle.hpp
 		data/CallSwitchData.hpp
+		model/CallModel.cpp
+		presenter/CallPresenter.cpp
 		widgets/StateIcon.hpp
 		widgets/StateIcons.cpp
 		widgets/StateIcons.hpp
@@ -33,7 +35,6 @@ target_sources(application-call
 		windows/NumberWindow.hpp
 	PUBLIC
 		include/application-call/ApplicationCall.hpp
-		include/application-call/CallState.hpp
 )
 
 target_link_libraries(application-call
@@ -55,3 +56,7 @@ target_link_libraries(application-call
 		service-cellular
 		service-evtmgr
 )
+
+if (${ENABLE_TESTS})
+	add_subdirectory( test )
+endif()

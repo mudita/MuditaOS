@@ -109,7 +109,7 @@ namespace CellularCall
             return false;
         }
 
-        gui.notifyCallStarted();
+        gui.notifyCallStarted(number);
         LOG_INFO("call started");
         return true;
     }
@@ -209,6 +209,9 @@ namespace CellularCall
     }
     void Call::handleCallDurationTimer()
     {
+        if (not isActiveCall) {
+            return;
+        }
         auto now         = utils::time::getCurrentTimestamp();
         callDurationTime = (now - startActiveTime).getSeconds();
         gui.notifyCallDurationUpdate(callDurationTime);

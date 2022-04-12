@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "Application.hpp"
-#include "CallState.hpp"
+#include <application-call/model/CallModel.hpp>
 
 #include <Timers/TimerHandle.hpp>
 #include <service-cellular/CellularMessage.hpp>
@@ -13,6 +12,7 @@
 #include <Service/Message.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <AppWindowConstants.hpp>
+#include <products/PurePhone/apps/include/Application.hpp>
 
 namespace app
 {
@@ -28,29 +28,6 @@ namespace app
         inline constexpr auto name_dialogConfirm     = "DialogConfirm";
         inline constexpr auto name_number            = "NumberWindow";
     } // namespace window
-    class CallWindowInterface
-    {
-      public:
-        using NumberChangeCallback              = std::function<void(utils::PhoneNumber::View)>;
-        virtual ~CallWindowInterface() noexcept = default;
-
-        virtual void setCallState(app::call::State state) noexcept              = 0;
-        [[nodiscard]] virtual auto getCallState() const noexcept -> call::State = 0;
-
-        enum class AudioEvent
-        {
-            Mute,
-            Unmute,
-            LoudspeakerOn,
-            LoudspeakerOff
-        };
-
-        virtual void sendAudioEvent(AudioEvent audioEvent) = 0;
-
-        virtual void transmitDtmfTone(uint32_t digit) = 0;
-        virtual void hangupCall()                     = 0;
-        virtual void answerIncomingCall()             = 0;
-    };
 
     class EnterNumberWindowInterface
     {
@@ -67,7 +44,7 @@ namespace app
         virtual void handleAddContactEvent(const std::string &number)                            = 0;
     };
 
-    class ApplicationCall : public Application, public CallWindowInterface, public EnterNumberWindowInterface
+    class ApplicationCall : public Application, public EnterNumberWindowInterface
     {
       public:
         explicit ApplicationCall(std::string name                    = name_call,
@@ -85,8 +62,6 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
 
-        void handleIncomingCall();
-        void handleCallerId(const app::manager::actions::CallParams *params);
         void handleEmergencyCallEvent(const std::string &number) override;
         void handleCallEvent(const std::string &number, ExternalRequest isExternalRequest) override;
         void handleAddContactEvent(const std::string &number) override;
@@ -99,36 +74,10 @@ namespace app
         };
         auto showNotificationAndRestartCallFlow(NotificationType type, const std::string &text) -> bool;
 
-        [[nodiscard]] auto getCallState() const noexcept -> call::State override
-        {
-            return callState;
-        }
-        void setCallState(call::State state) noexcept override
-        {
-            if (state == call::State::CALL_IN_PROGRESS) {
-                bus.sendUnicast(
-                    std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::turnOnCallMode),
-                    service::name::evt_manager);
-            }
-            else {
-                bus.sendUnicast(
-                    std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::turnOffCallMode),
-                    service::name::evt_manager);
-            }
-            this->callState = state;
-        }
-
-        void sendAudioEvent(AudioEvent audioEvent) override;
-
-        void transmitDtmfTone(uint32_t digit) override;
-        void hangupCall() override;
-        void answerIncomingCall() override;
-
       private:
-        sys::TimerHandle callerIdTimer;
+        std::shared_ptr<app::call::AbstractCallModel> callModel;
 
       protected:
-        call::State callState           = call::State::IDLE;
         ExternalRequest externalRequest = ExternalRequest::False;
 
         bool conditionalReturnToPreviousView();
