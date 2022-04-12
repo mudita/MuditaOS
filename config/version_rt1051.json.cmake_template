@@ -1,0 +1,29 @@
+{
+    "git":
+    {
+        "git_branch": "@GIT_BRANCH@",
+        "git_commit": "@GIT_REV@"
+    },
+    "version":
+    {
+        "version": "@PROJECT_VERSION@"
+    },
+    "bootloader":
+    {
+        "version":  "@ECOBOOT_BIN_VERSION@",
+        "filename": "@BOOTLOADER_FILENAME@",
+        "md5sum":   "@BOOTLOADER_MD5SUM@"
+    },
+    "boot":
+    {
+        "version":  "@OS_VERSION_MAJOR@.@OS_VERSION_MINOR@.@OS_VERSION_PATCH@",
+        "filename": "@BOOT_FILENAME@",
+        "md5sum":   "@BOOT_MD5SUM@"
+    },
+    "updater":
+    {
+        "version":  "@UPDATER_BIN_VERSION@",
+        "filename": "@UPDATER_FILENAME@",
+        "md5sum":   "@UPDATER_MD5SUM@"
+    }
+}
