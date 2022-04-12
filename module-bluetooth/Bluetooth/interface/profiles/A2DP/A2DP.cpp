@@ -133,6 +133,10 @@ namespace bluetooth
         LOG_INFO("Setting operator name in A2DP - ignoring");
         return Error::Success;
     }
+    auto A2DP::setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code
+    {
+        return Error::Success;
+    }
 
     const sys::Service *A2DP::A2DPImpl::ownerService;
     QueueHandle_t A2DP::A2DPImpl::sourceQueue = nullptr;

@@ -9,6 +9,7 @@
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 #include <memory>
+#include <command/BatteryLevel.hpp>
 
 namespace bluetooth
 {
@@ -45,6 +46,9 @@ namespace bluetooth
         /// Sets the operator name in HFP profile
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto setOperatorName(const std::string_view &name) const noexcept -> Error::Code = 0;
+        /// Sets the operator name in HFP profile
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code = 0;
 
       protected:
         static void initSdp();

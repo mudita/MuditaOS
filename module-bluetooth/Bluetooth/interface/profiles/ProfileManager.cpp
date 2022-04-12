@@ -146,5 +146,14 @@ namespace bluetooth
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;
     }
+    auto ProfileManager::setBatteryLevelData(const DataVariant &data) -> Error::Code
+    {
+        auto batteryLevel = std::get<BatteryLevel>(data);
+        if (currentProfilePtr) {
+            return currentProfilePtr->setBatteryLevel(batteryLevel);
+        }
+        LOG_ERROR("No profile, returning!");
+        return Error::NotReady;
+    }
 
 } // namespace bluetooth

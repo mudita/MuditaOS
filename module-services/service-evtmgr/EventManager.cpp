@@ -156,6 +156,7 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
                 bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
             }
             bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::service_desktop);
+            bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::bluetooth);
         }
         return sys::msgHandled();
     });

@@ -8,10 +8,12 @@
 #include "Device.hpp"
 #include "EventStore.hpp"
 #include "OperatorName.hpp"
+#include "BatteryLevel.hpp"
 
 namespace bluetooth
 {
-    using DataVariant = std::variant<OperatorName, Store::SignalStrength, Devicei, utils::PhoneNumber::View>;
+    using DataVariant =
+        std::variant<BatteryLevel, OperatorName, Store::SignalStrength, Devicei, utils::PhoneNumber::View>;
 
     class CommandData
     {

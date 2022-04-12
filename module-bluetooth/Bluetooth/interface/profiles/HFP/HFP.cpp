@@ -114,6 +114,11 @@ namespace bluetooth
         LOG_DEBUG("Setting operator name: %s", name.data());
         return pimpl->setOperatorName(name);
     }
+    auto HFP::setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code
+    {
+        LOG_DEBUG("Setting battery level: %d", level.getBatteryLevel());
+        return pimpl->setBatteryLevel(level);
+    }
 
     HFP::~HFP() = default;
 
@@ -136,7 +141,7 @@ namespace bluetooth
         {1, "service", 0, 1, 1, 0, 0, 0},
         {2, "call", 0, 1, 0, 1, 1, 0},
         {3, "callsetup", 0, 3, 0, 1, 1, 0},
-        {4, "battchg", 0, 5, 3, 0, 0, 0},
+        {4, "battchg", 0, 5, 3, 0, 1, 0},
         {5, "signal", 0, 4, 5, 0, 1, 0},
         {6, "roam", 0, 1, 0, 0, 1, 0},
         {7, "callheld", 0, 2, 0, 1, 1, 0}};
@@ -509,6 +514,12 @@ namespace bluetooth
     {
         auto result = hfp_ag_set_operator_name(HFP::HFPImpl::aclHandle, name.data());
         LOG_DEBUG("Operator set name result: %d", result);
+        return Error::Success;
+    }
+    auto HFP::HFPImpl::setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code
+    {
+        auto result = hfp_ag_set_battery_level(level.getBatteryLevelBars());
+        LOG_DEBUG("Battery level (bars): %d, set result: %d", level.getBatteryLevelBars(), result);
         return Error::Success;
     }
 

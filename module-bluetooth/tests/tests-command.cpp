@@ -6,6 +6,7 @@
 #include <command/Command.hpp>
 #include <command/DeviceData.hpp>
 #include <command/PhoneNumberData.hpp>
+#include <command/BatteryLevelData.hpp>
 
 using namespace bluetooth;
 
@@ -30,4 +31,39 @@ TEST_CASE("Command data handling test")
     auto receivedCommand = bluetooth::Command(std::move(receivedPack));
     REQUIRE(number == std::get<utils::PhoneNumber::View>(receivedCommand.getData()));
     REQUIRE(receivedCommand.getType() == bluetooth::Command::PowerOn);
+}
+
+TEST_CASE("BatteryLevel test")
+{
+
+    SECTION("1/5")
+    {
+        auto data = BatteryLevel(10);
+        REQUIRE(data.getBatteryLevel() == 10);
+        REQUIRE(data.getBatteryLevelBars() == 0);
+    }
+    SECTION("2/5")
+    {
+        auto data = BatteryLevel(20);
+        REQUIRE(data.getBatteryLevel() == 20);
+        REQUIRE(data.getBatteryLevelBars() == 1);
+    }
+    SECTION("3/5")
+    {
+        auto data = BatteryLevel(100);
+        REQUIRE(data.getBatteryLevel() == 100);
+        REQUIRE(data.getBatteryLevelBars() == 5);
+    }
+    SECTION("4/5")
+    {
+        auto data = BatteryLevel(500);
+        REQUIRE(data.getBatteryLevel() == 100);
+        REQUIRE(data.getBatteryLevelBars() == 5);
+    }
+    SECTION("5/5")
+    {
+        auto data = BatteryLevel(0);
+        REQUIRE(data.getBatteryLevel() == 0);
+        REQUIRE(data.getBatteryLevelBars() == 0);
+    }
 }
