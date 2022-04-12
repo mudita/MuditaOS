@@ -33,6 +33,7 @@ namespace bluetooth
             IncomingCallNumber,
             SignalStrengthData,
             OperatorNameData,
+            BatteryLevelData,
             None,
         };
 

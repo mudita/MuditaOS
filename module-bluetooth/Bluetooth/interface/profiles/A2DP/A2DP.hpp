@@ -44,6 +44,8 @@ namespace bluetooth
         [[nodiscard]] auto setSignalStrength(int bars) const noexcept -> Error::Code override;
         /// @return Success - ignoring in A2DP
         [[nodiscard]] auto setOperatorName(const std::string_view &name) const noexcept -> Error::Code override;
+        /// @return Success - ignoring in A2DP
+        [[nodiscard]] auto setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code override;
 
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override;
 

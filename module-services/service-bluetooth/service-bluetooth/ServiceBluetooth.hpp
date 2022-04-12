@@ -58,6 +58,11 @@ namespace message::bluetooth
     class RequestStatusIndicatorData;
 } // namespace message::bluetooth
 
+namespace sevm
+{
+    class BatteryStatusChangeMessage;
+}
+
 class CellularCallerIdMessage;
 class CellularCallActiveNotification;
 class CellularSignalStrengthUpdateNotification;
@@ -126,6 +131,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(CellularCallActiveNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularSignalStrengthUpdateNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularCurrentOperatorNameNotification *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(sevm::BatteryStatusChangeMessage *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

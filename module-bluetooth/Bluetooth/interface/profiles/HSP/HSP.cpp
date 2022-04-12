@@ -389,6 +389,10 @@ namespace bluetooth
     {
         return Error::Success;
     }
+    auto HSP::setBatteryLevel(const BatteryLevel &name) const noexcept -> Error::Code
+    {
+        return Error::Success;
+    }
 
     void HSP::HSPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {

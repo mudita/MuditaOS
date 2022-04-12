@@ -45,6 +45,8 @@
 #include <command/DeviceData.hpp>
 #include <command/SignalStrengthData.hpp>
 #include <command/OperatorNameData.hpp>
+#include <command/BatteryLevelData.hpp>
+#include <service-evtmgr/BatteryMessages.hpp>
 
 namespace
 {
@@ -118,6 +120,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<CellularCallActiveNotification>();
     connectHandler<CellularSignalStrengthUpdateNotification>();
     connectHandler<CellularCurrentOperatorNameNotification>();
+    connectHandler<sevm::BatteryStatusChangeMessage>();
 
     settingsHolder->onStateChange = [this]() {
         auto initialState = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
@@ -556,6 +559,15 @@ auto ServiceBluetooth::handle(message::bluetooth::RequestStatusIndicatorData *ms
 
     // just to execute proper handle method and sending it back to worker
     bus.sendUnicast(std::make_shared<CellularSignalStrengthUpdateNotification>(), service::name::bluetooth);
+    bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::bluetooth);
 
+    return sys::MessageNone{};
+}
+auto ServiceBluetooth::handle(sevm::BatteryStatusChangeMessage *msg) -> std::shared_ptr<sys::Message>
+{
+    auto batteryLevel = Store::Battery::get().level;
+    LOG_INFO("Bluetooth: Battery level %d", batteryLevel);
+    auto commandData = std::make_unique<bluetooth::BatteryLevelData>(bluetooth::BatteryLevel(batteryLevel));
+    sendWorkerCommand(bluetooth::Command::Type::BatteryLevelData, std::move(commandData));
     return sys::MessageNone{};
 }
