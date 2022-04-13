@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryChargerIRQ.hpp"
-#include "common/WorkerQueue.hpp"
+#include "WorkerQueue.hpp"
 #include "common/soc_scaler.hpp"
 
 #if ENABLE_CURRENT_MEASUREMENT_SCOPE

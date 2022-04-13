@@ -4,19 +4,16 @@
 #include <catch2/catch.hpp>
 
 #include "Audio/decoder/Decoder.hpp"
-
-#include "Audio/decoder/decoderMP3.hpp"
-#include "Audio/decoder/decoderFLAC.hpp"
-#include "Audio/decoder/decoderWAV.hpp"
-
 #include "Audio/AudioCommon.hpp"
-
 #include "Audio/AudioMux.hpp"
 #include "Audio/Audio.hpp"
 #include "Audio/Operation/Operation.hpp"
 #include <Audio/Operation/RouterOperation.hpp>
 
 using namespace audio;
+
+#include <memory>
+#include <utility>
 
 TEST_CASE("Audio Decoder")
 {

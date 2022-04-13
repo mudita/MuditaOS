@@ -41,7 +41,9 @@ INSTALL_PACKAGES="
         mtools \
         ninja-build \
         pkg-config \
-        portaudio19-dev \
+        pulseaudio \
+        libpulse0 \
+        libpulse-dev \
         python3-magic \
         python3-pip \
         python3-requests \
