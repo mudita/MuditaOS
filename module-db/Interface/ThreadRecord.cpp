@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadRecord.hpp"
@@ -22,21 +22,21 @@ ThreadRecordInterface::ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsD
 
 bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 {
-    auto ret = smsDB->threads.add(ThreadsTableRow{Record(rec.ID),
-                                                  .date           = rec.date,
-                                                  .msgCount       = rec.msgCount,
-                                                  .unreadMsgCount = rec.unreadMsgCount,
-                                                  .numberID       = rec.numberID,
-                                                  .snippet        = rec.snippet,
-                                                  .type           = rec.type});
+    auto result = smsDB->threads.add(ThreadsTableRow{Record(rec.ID),
+                                                     .date           = rec.date,
+                                                     .msgCount       = rec.msgCount,
+                                                     .unreadMsgCount = rec.unreadMsgCount,
+                                                     .numberID       = rec.numberID,
+                                                     .snippet        = rec.snippet,
+                                                     .type           = rec.type});
 
-    return ret;
+    return result;
 }
 
 bool ThreadRecordInterface::RemoveByID(uint32_t id)
 {
-    auto ret = smsDB->threads.removeById(id);
-    if (ret == false) {
+    auto result = smsDB->threads.removeById(id);
+    if (!result) {
         return false;
     }
 
@@ -71,9 +71,9 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 {
     auto records = std::make_unique<std::vector<ThreadRecord>>();
 
-    auto ret = smsDB->threads.getLimitOffset(offset, limit);
+    auto result = smsDB->threads.getLimitOffset(offset, limit);
 
-    for (const auto &w : ret) {
+    for (const auto &w : result) {
         records->push_back(w);
     }
 
@@ -97,8 +97,8 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
         return records;
     }
 
-    auto ret = smsDB->threads.getLimitOffsetByField(offset, limit, threadsField, str);
-    for (const auto &w : ret) {
+    auto result = smsDB->threads.getLimitOffsetByField(offset, limit, threadsField, str);
+    for (const auto &w : result) {
         records->push_back(w);
     }
 
@@ -193,16 +193,17 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::markAsReadQuery(const st
 {
     const auto localQuery = static_cast<const db::query::MarkAsRead *>(query.get());
     auto record           = GetByID(localQuery->id);
-    auto ret              = false;
+    auto result           = false;
 
     if (record.isValid()) {
         LOG_DEBUG("query-read %d", static_cast<int>(localQuery->read));
         record.unreadMsgCount = localQuery->read == db::query::MarkAsRead::Read::True ? 0 : 1;
-        ret                   = Update(record);
+        result                = Update(record);
     }
 
-    auto response = std::make_unique<db::query::MarkAsReadResult>(ret);
+    auto response = std::make_unique<db::query::MarkAsReadResult>(result);
     response->setRequestQuery(query);
+    response->setRecordID(localQuery->id);
     return response;
 }
 
@@ -278,9 +279,10 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadRemoveQuery(const 
 {
     const auto localQuery = static_cast<const db::query::ThreadRemove *>(query.get());
 
-    const auto ret = RemoveByID(localQuery->id);
-    auto response  = std::make_unique<db::query::ThreadRemoveResult>(ret);
+    const auto result = RemoveByID(localQuery->id);
+    auto response     = std::make_unique<db::query::ThreadRemoveResult>(result);
     response->setRequestQuery(query);
+    response->setRecordID(localQuery->id);
     return response;
 }
 
