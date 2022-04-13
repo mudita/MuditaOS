@@ -250,10 +250,21 @@ void INTRAM_Init() {
     MEM_WriteU32(gpr16_addr,ret);
     JLINK_SYS_Report("INTRAM Init Done");
 }
+
+void WDOG_Disable(){
+    unsigned int gpio_b1_13;
+
+    gpio_b1_13 = 0x401F81B0;
+
+    // Switch off WDOG1
+    MEM_WriteU32(gpio_b1_13, 1);
+}
+
 /* SetupTarget */
 int AfterResetTarget(void) {
   JLINK_SYS_Report("Enabling i.MXRT SDRAM");
   /*Load_Dcdc_Trim();*/
+  WDOG_Disable();
   Clock_Init();
   SDRAM_Init();
   INTRAM_Init();
