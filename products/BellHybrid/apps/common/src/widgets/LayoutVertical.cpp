@@ -37,7 +37,7 @@ namespace gui
 
         auto centerBox = new VBox(mainScreen, 0, 0, 0, 0);
         centerBox->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
-        centerBox->setEdges(RectangleEdge::None);
+        centerBox->setEdges(RectangleEdge::All);
 
         time = new TimeSetSpinnerVertical(centerBox);
         time->setFont(style::window::font::colossal);

@@ -45,15 +45,15 @@ namespace gui
 
         /// Switches currently displayed time format
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void;
-        auto setHour(int value) noexcept -> void;
-        auto setMinute(int value) noexcept -> void;
+        // auto setHour(int value) noexcept -> void;
+        // auto setMinute(int value) noexcept -> void;
         auto setTime(std::time_t time) noexcept -> void;
         auto setFont(const std::string &newFontName) noexcept -> void;
         auto updateFont(TextFixedSize *elem, const std::string &fontName) noexcept -> void;
 
-        [[nodiscard]] auto getTime() const noexcept -> std::time_t;
-        [[nodiscard]] auto getHour() const noexcept -> int;
-        [[nodiscard]] auto getMinute() const noexcept -> int;
+        //[[nodiscard]] auto getTime() const noexcept -> std::time_t;
+        // [[nodiscard]] auto getHour() const noexcept -> int;
+        // [[nodiscard]] auto getMinute() const noexcept -> int;
         [[nodiscard]] auto isPM() const noexcept -> bool;
 
         auto getTimeFormat() const noexcept -> utils::time::Locale::TimeFormat;
@@ -70,8 +70,12 @@ namespace gui
 
         void handleContentChanged() override;
 
-        UIntegerSpinnerFixed *hour   = nullptr;
-        UIntegerSpinnerFixed *minute = nullptr;
+        gui::HBox *hBoxHours              = nullptr;
+        gui::HBox *hBoxMinutes              = nullptr;
+        gui::TextFixedSize *hour_first   = nullptr;
+        gui::TextFixedSize *hour_second   = nullptr;
+        gui::TextFixedSize *minute_first   = nullptr;
+        gui::TextFixedSize *minute_second   = nullptr;
         std::string fontName         = style::window::font::supersizemelight;
 
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H;
