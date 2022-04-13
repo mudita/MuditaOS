@@ -51,7 +51,6 @@ namespace gui
         auto setFont(const std::string &newFontName) noexcept -> void;
         auto updateFont(TextFixedSize *elem, const std::string &fontName) noexcept -> void;
 
-        [[nodiscard]] auto getTime() const noexcept -> std::time_t;
         [[nodiscard]] auto getHour() const noexcept -> int;
         [[nodiscard]] auto getMinute() const noexcept -> int;
         [[nodiscard]] auto isPM() const noexcept -> bool;
@@ -70,8 +69,12 @@ namespace gui
 
         void handleContentChanged() override;
 
-        UIntegerSpinnerFixed *hour   = nullptr;
-        UIntegerSpinnerFixed *minute = nullptr;
+        gui::HBox *hBoxHours             = nullptr;
+        gui::HBox *hBoxMinutes           = nullptr;
+        gui::TextFixedSize *hourFirst    = nullptr;
+        gui::TextFixedSize *hourSecond   = nullptr;
+        gui::TextFixedSize *minuteFirst  = nullptr;
+        gui::TextFixedSize *minuteSecond = nullptr;
         std::string fontName         = style::window::font::supersizemelight;
 
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H;
