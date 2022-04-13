@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -93,7 +93,7 @@ TEST_CASE("Device handling")
         REQUIRE(devicesModel.getDevices().size() == 4);
     }
 
-    SECTION("Merge device list")
+    SECTION("Merge device list - std::vector<Devicei> as argument")
     {
         std::vector<Devicei> devicesList, targetList;
         Devicei dummy{"dummyDevice"};
@@ -109,6 +109,24 @@ TEST_CASE("Device handling")
         REQUIRE(!devicesModel.getDeviceByAddress(addr1Str).value().get().name.empty());
         REQUIRE(!devicesModel.getDeviceByAddress(addr2Str).value().get().name.empty());
         REQUIRE(!devicesModel.getDeviceByAddress(addr3Str).value().get().name.empty());
+        REQUIRE(devicesModel.getDevices().size() == 3);
+    }
+
+    SECTION("Merge device list - Devicei as argument")
+    {
+        std::vector<Devicei> targetList;
+        Devicei newDevice{"newDevice"};
+        newDevice.setAddress(&addr3);
+
+        targetList.push_back(device1);
+        targetList.push_back(device2);
+        targetList.push_back(device3);
+
+        devicesModel.mergeDevicesList(newDevice);
+
+        REQUIRE_FALSE(devicesModel.getDeviceByAddress(addr1Str).value().get().name.empty());
+        REQUIRE_FALSE(devicesModel.getDeviceByAddress(addr2Str).value().get().name.empty());
+        REQUIRE_FALSE(devicesModel.getDeviceByAddress(addr3Str).value().get().name.empty());
         REQUIRE(devicesModel.getDevices().size() == 3);
     }
 

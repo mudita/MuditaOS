@@ -250,13 +250,12 @@ auto ServiceBluetooth::handle(BluetoothPairResultMessage *msg) -> std::shared_pt
 {
     auto device = msg->getDevice();
     if (msg->isSucceed()) {
-        bluetoothDevicesModel->mergeDevicesList(bluetooth::GAP::getDevicesList());
+        bluetoothDevicesModel->mergeDevicesList(device);
         bluetoothDevicesModel->setInternalDeviceState(device, DeviceState::Paired);
     }
     else {
         bluetoothDevicesModel->removeDevice(device);
     }
-
     bluetoothDevicesModel->syncDevicesWithApp();
 
     /// TODO error code handing added in next PRs

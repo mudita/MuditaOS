@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothDevicesModel.hpp"
@@ -9,16 +9,25 @@
 BluetoothDevicesModel::BluetoothDevicesModel(sys::Service *service) : service{service}
 {}
 
-void BluetoothDevicesModel::mergeDevicesList(const std::vector<Devicei> &devicesList)
+void BluetoothDevicesModel::removeDeviceDuplicates()
 {
-    devices.insert(std::end(devices), std::begin(devicesList), std::end(devicesList));
-
-    // remove duplicates
     auto end = std::end(devices);
     for (auto it = std::begin(devices); it != end; ++it) {
         end = std::remove(it + 1, end, *it);
     }
     devices.erase(end, std::end(devices));
+}
+
+void BluetoothDevicesModel::mergeDevicesList(const Devicei &device)
+{
+    devices.emplace_back(device);
+    removeDeviceDuplicates();
+}
+
+void BluetoothDevicesModel::mergeDevicesList(const std::vector<Devicei> &devicesList)
+{
+    devices.insert(std::end(devices), std::begin(devicesList), std::end(devicesList));
+    removeDeviceDuplicates();
 }
 
 void BluetoothDevicesModel::insertDevice(const Devicei &device)
