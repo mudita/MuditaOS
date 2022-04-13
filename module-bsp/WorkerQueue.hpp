@@ -6,9 +6,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include <log/log.hpp>
 
 #include <functional>
 #include <utility>
+#include <cstdint>
 
 /*
  * Worker queue implementation is used to defer work from interrupt routines.
@@ -46,6 +48,7 @@ template <typename Message> class WorkerQueue
     xQueueHandle queueHandle{};
     xTaskHandle taskHandle{};
     WorkerHandle workerHandle{};
+    xTaskHandle callerHandle{};
 
     void worker();
 };
@@ -59,6 +62,7 @@ WorkerQueue<Message>::WorkerQueue(const char *name, WorkerHandle workerHandle, c
         [](void *pvp) {
             WorkerQueue *inst = static_cast<WorkerQueue *>(pvp);
             inst->worker();
+            vTaskDelete(nullptr);
         },
         name,
         stackSize / sizeof(std::uint32_t),
@@ -69,12 +73,17 @@ WorkerQueue<Message>::WorkerQueue(const char *name, WorkerHandle workerHandle, c
 
 template <typename Message> WorkerQueue<Message>::~WorkerQueue()
 {
-    if (queueHandle && taskHandle) {
-        const InternalMessage killMsg{.kill = true};
+    if ((queueHandle != nullptr) && (taskHandle != nullptr)) {
+        const InternalMessage killMsg{{}, true};
         InternalMessage responseMsg;
-        xQueueSend(queueHandle, &killMsg, pdMS_TO_TICKS(100));
+        callerHandle = xTaskGetCurrentTaskHandle();
+        xQueueReset(queueHandle);
+        if (xQueueSend(queueHandle, &killMsg, pdMS_TO_TICKS(500)) != pdPASS) {
+            LOG_FATAL("xQueueSend error will result in aborting worker thread");
+        }
+
         /// Wait 500ms for a response from the worker. If it does not arrive, kill it.
-        if (const auto result = xQueueReceive(queueHandle, &responseMsg, pdMS_TO_TICKS(500)); result != pdTRUE) {
+        if (const auto result = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(500)); result == pdFALSE) {
             vTaskDelete(taskHandle);
         }
         vQueueDelete(queueHandle);
@@ -87,9 +96,8 @@ template <typename Message> void WorkerQueue<Message>::worker()
         xQueueReceive(queueHandle, &msg, portMAX_DELAY);
 
         if (msg.kill) {
-            InternalMessage killMsg{.kill = true};
-            xQueueSend(queueHandle, &killMsg, pdMS_TO_TICKS(100));
-            vTaskDelete(nullptr);
+            xTaskNotifyGive(callerHandle);
+            return;
         }
         else {
             workerHandle(msg.msg);

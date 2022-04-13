@@ -3,21 +3,21 @@
 
 #pragma once
 
+#include <module-bsp/WorkerQueue.hpp>
+#include <Audio/AbstractStream.hpp>
 #include <Audio/AudioDevice.hpp>
 #include <Audio/AudioFormat.hpp>
 #include <Audio/codec.hpp>
+#include "PulseAudioWrapper.hpp"
 
-#include <portaudio.h>
-
-#include <deque>
+#include <variant>
 
 namespace audio
 {
     class LinuxAudioDevice : public audio::AudioDevice
     {
       public:
-        LinuxAudioDevice(const float initialVolume);
-        virtual ~LinuxAudioDevice();
+        explicit LinuxAudioDevice(const float initialVolume);
 
         auto Start() -> RetCode override;
         auto Stop() -> RetCode override;
@@ -45,15 +45,8 @@ namespace audio
         void disableOutput() override;
 
       private:
-        int streamCallback(const void *input,
-                           void *output,
-                           unsigned long frameCount,
-                           const PaStreamCallbackTimeInfo *timeInfo,
-                           PaStreamCallbackFlags statusFlags);
-        bool isCacheReady(std::size_t expectedSize) const noexcept;
-        void cacheToOutputBuffer(std::int16_t *buffer, std::size_t size);
-
-        void closeStream();
+        using AudioProxy = WorkerQueue<std::size_t>;
+        void scaleVolume(audio::AbstractStream::Span data);
 
         constexpr static std::initializer_list<unsigned int> supportedSampleRates  = {44100, 48000};
         constexpr static std::initializer_list<unsigned int> supportedBitWidths    = {16};
@@ -62,13 +55,12 @@ namespace audio
         std::vector<audio::AudioFormat> supportedFormats;
         audio::AudioFormat currentFormat;
 
-        /// pointer to portaudio stream
-        PaStream *stream = nullptr;
-
-        /// Local cache to store data read from Pure stream
-        std::deque<std::int16_t> cache;
-
         float volumeFactor = 1.0f;
+
+        std::unique_ptr<PulseAudioWrapper> pulseAudioWrapper;
+        AudioProxy audioProxy;
+        std::size_t requestedBytes{};
+        bool close{false};
     };
 
 } // namespace audio

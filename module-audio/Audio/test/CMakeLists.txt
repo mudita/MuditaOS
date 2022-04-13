@@ -4,6 +4,7 @@ add_catch2_executable(
     NAME
         audio-test
     SRCS
+        DummyAudioDevice.cpp
         unittest_audio.cpp
     LIBS
         module-audio

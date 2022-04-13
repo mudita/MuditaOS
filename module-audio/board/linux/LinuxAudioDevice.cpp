@@ -8,64 +8,15 @@
 
 namespace audio
 {
-    namespace
-    {
-        class PortAudio
-        {
-          public:
-            PortAudio();
-            PortAudio(const PortAudio &) = delete;
-            PortAudio(PortAudio &&)      = delete;
-            PortAudio &operator=(const PortAudio &) = delete;
-            PortAudio &operator=(PortAudio &&) = delete;
-            ~PortAudio() noexcept;
-        };
-
-        PortAudio::PortAudio()
-        {
-            if (const auto errorCode = Pa_Initialize(); errorCode == paNoError) {
-                LOG_INFO("Portaudio initialized successfully");
-            }
-            else {
-                LOG_ERROR("Error (code %d) initiializing Portaudio: %s", errorCode, Pa_GetErrorText(errorCode));
-            }
-        }
-
-        PortAudio::~PortAudio() noexcept
-        {
-            if (const auto errorCode = Pa_Terminate(); errorCode == paNoError) {
-                LOG_INFO("Portaudio terminated successfully");
-            }
-            else {
-                LOG_ERROR("Error (code %d) while terminating Portaudio: %s", errorCode, Pa_GetErrorText(errorCode));
-            }
-        }
-    } // namespace
-
     LinuxAudioDevice::LinuxAudioDevice(const float initialVolume)
         : supportedFormats(
-              audio::AudioFormat::makeMatrix(supportedSampleRates, supportedBitWidths, supportedChannelModes))
+              audio::AudioFormat::makeMatrix(supportedSampleRates, supportedBitWidths, supportedChannelModes)),
+          audioProxy("audioProxy", [this](const auto &data) {
+              requestedBytes = data;
+              onDataSend();
+          })
     {
         setOutputVolume(initialVolume);
-
-        static PortAudio portAudio;
-    }
-
-    LinuxAudioDevice::~LinuxAudioDevice()
-    {
-        if (stream != nullptr) {
-            closeStream();
-        }
-    }
-
-    void LinuxAudioDevice::closeStream()
-    {
-        if (const auto errorCode = Pa_AbortStream(stream); errorCode != paNoError) {
-            LOG_ERROR("Error (code %d) while stopping Portaudio stream: %s", errorCode, Pa_GetErrorText(errorCode));
-        }
-        if (const auto errorCode = Pa_CloseStream(stream); errorCode != paNoError) {
-            LOG_ERROR("Error (code %d) while closing Portaudio stream: %s", errorCode, Pa_GetErrorText(errorCode));
-        }
     }
 
     auto LinuxAudioDevice::Start() -> RetCode
@@ -113,10 +64,20 @@ namespace audio
     void LinuxAudioDevice::onDataSend()
     {
         audio::Stream::Span dataSpan;
+        if (!isSinkConnected()) {
+            return;
+        }
         Sink::_stream->peek(dataSpan);
-        auto streamData = reinterpret_cast<std::int16_t *>(dataSpan.data);
-        cache.insert(cache.end(), &streamData[0], &streamData[dataSpan.dataSize / sizeof(std::int16_t)]);
+        scaleVolume(dataSpan);
+        pulseAudioWrapper->insert(dataSpan);
         Sink::_stream->consume();
+
+        if (pulseAudioWrapper->bytes() >= requestedBytes) {
+            pulseAudioWrapper->consume();
+        }
+        else {
+            audioProxy.post(requestedBytes);
+        }
     }
 
     void LinuxAudioDevice::onDataReceive()
@@ -127,39 +88,15 @@ namespace audio
 
     void LinuxAudioDevice::enableOutput()
     {
-        LOG_INFO("Enabling audio output...");
         if (!isSinkConnected()) {
             LOG_ERROR("Output stream is not connected!");
             return;
         }
 
-        currentFormat                = Sink::_stream->getOutputTraits().format;
-        const auto numOutputChannels = currentFormat.getChannels();
-        auto callback                = [](const void *input,
-                           void *output,
-                           unsigned long frameCount,
-                           const PaStreamCallbackTimeInfo *timeInfo,
-                           PaStreamCallbackFlags statusFlags,
-                           void *userData) -> int {
-            LinuxAudioDevice *dev = static_cast<LinuxAudioDevice *>(userData);
-            return dev->streamCallback(input, output, frameCount, timeInfo, statusFlags);
-        };
-        auto errorCode = Pa_OpenDefaultStream(&stream,
-                                              0,
-                                              numOutputChannels,
-                                              paInt16,
-                                              currentFormat.getSampleRate(),
-                                              paFramesPerBufferUnspecified,
-                                              callback,
-                                              this);
-        if (errorCode != paNoError) {
-            LOG_ERROR("Error (code %d) while creating portaudio stream: %s", errorCode, Pa_GetErrorText(errorCode));
-            return;
-        }
-        if (errorCode = Pa_StartStream(stream); errorCode != paNoError) {
-            LOG_ERROR("Error (code %d) while starting portaudio stream: %s", errorCode, Pa_GetErrorText(errorCode));
-            return;
-        }
+        currentFormat = Sink::_stream->getOutputTraits().format;
+
+        pulseAudioWrapper = std::make_unique<PulseAudioWrapper>(
+            [this](const std::size_t size) { audioProxy.post(size); }, currentFormat);
     }
 
     void LinuxAudioDevice::disableInput()
@@ -167,50 +104,17 @@ namespace audio
 
     void LinuxAudioDevice::disableOutput()
     {
-        LOG_INFO("Disabling audio output...");
         if (!isSinkConnected()) {
             LOG_ERROR("Error while stopping Linux Audio Device! Null stream.");
             return;
         }
-
-        closeStream();
-        stream        = nullptr;
+        close         = true;
         currentFormat = {};
     }
-
-    int LinuxAudioDevice::streamCallback([[maybe_unused]] const void *input,
-                                         void *output,
-                                         unsigned long frameCount,
-                                         [[maybe_unused]] const PaStreamCallbackTimeInfo *timeInfo,
-                                         [[maybe_unused]] PaStreamCallbackFlags statusFlags)
+    void LinuxAudioDevice::scaleVolume(audio::AbstractStream::Span data)
     {
-        if (!isSinkConnected()) {
-            return paAbort;
-        }
-
-        const auto expectedBufferSize = frameCount * currentFormat.getChannels();
-        if (!isCacheReady(expectedBufferSize)) {
-            onDataSend();
-        }
-
-        const auto dataReadySize = std::min(expectedBufferSize, cache.size());
-        cacheToOutputBuffer(static_cast<std::int16_t *>(output), dataReadySize);
-
-        return paContinue;
-    }
-
-    bool LinuxAudioDevice::isCacheReady(std::size_t expectedSize) const noexcept
-    {
-        return cache.size() >= expectedSize;
-    }
-
-    void LinuxAudioDevice::cacheToOutputBuffer(std::int16_t *buffer, std::size_t size)
-    {
-        for (size_t i = 0; i < size; ++i) {
-            const auto adjustedValue = static_cast<float>(cache[i]) * volumeFactor;
-            *(buffer)                = static_cast<std::int16_t>(adjustedValue);
-            buffer++;
-        }
-        cache.erase(cache.begin(), cache.begin() + size);
+        const auto samplesBeg = reinterpret_cast<std::int16_t *>(data.data);
+        const auto samplesEnd = samplesBeg + data.dataSize / 2;
+        std::for_each(samplesBeg, samplesEnd, [this](auto &sample) { sample *= volumeFactor; });
     }
 } // namespace audio
