@@ -113,10 +113,11 @@ void sevm::battery::BatteryController::poll()
 }
 void sevm::battery::BatteryController::printCurrentState()
 {
-    LOG_INFO("Charger state:%s", magic_enum::enum_name(Store::Battery::get().state).data());
-    LOG_INFO("Battery SOC:%d", Store::Battery::get().level);
-    LOG_INFO("Battery voltage:%" PRIu32 "mV", charger->getBatteryVoltage());
-    LOG_INFO("Battery state:%s", magic_enum::enum_name(Store::Battery::get().levelState).data());
+    LOG_INFO("Charger state:%s Battery SOC %d voltage: %" PRIu32 "mV state: %s",
+             magic_enum::enum_name(Store::Battery::get().state).data(),
+             Store::Battery::get().level,
+             charger->getBatteryVoltage(),
+             magic_enum::enum_name(Store::Battery::get().levelState).data());
 }
 void sevm::battery::BatteryController::update()
 {

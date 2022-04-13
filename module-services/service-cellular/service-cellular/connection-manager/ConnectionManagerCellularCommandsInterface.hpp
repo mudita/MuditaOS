@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,9 +34,8 @@ class ConnectionManagerCellularCommandsInterface
     virtual auto clearNetworkIndicator() -> bool = 0;
     /**
      * @brief Checks if there is ongoing call and terminates it
-     * @return true on success, false on fail
      */
-    virtual auto hangUpOngoingCall() -> bool = 0;
+    virtual void hangUpOngoingCall() = 0;
     /**
      * @brief Checks if connection Timer is active
      * @return true when timer is active, false when not

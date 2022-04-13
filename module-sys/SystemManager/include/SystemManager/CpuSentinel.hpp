@@ -26,8 +26,8 @@ namespace sys
                              std::function<void(bsp::CpuFrequencyMHz)> callback = nullptr);
 
         [[nodiscard]] auto GetName() const noexcept -> std::string;
-        void HoldMinimumFrequency(bsp::CpuFrequencyMHz frequencyToHold);
-        void ReleaseMinimumFrequency();
+        virtual void HoldMinimumFrequency(bsp::CpuFrequencyMHz frequencyToHold);
+        virtual void ReleaseMinimumFrequency();
 
         [[nodiscard]] auto GetFrequency() const noexcept -> bsp::CpuFrequencyMHz;
 
@@ -36,6 +36,7 @@ namespace sys
         void ReadRegistrationData(bsp::CpuFrequencyMHz frequencyHz);
         TaskHandle_t getTask();
         std::string getReason();
+        virtual ~CpuSentinel() = default;
 
       protected:
         const std::string name;

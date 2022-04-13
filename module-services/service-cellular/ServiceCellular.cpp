@@ -164,28 +164,6 @@ ServiceCellular::ServiceCellular()
         priv->csqHandler->handleTimerTick();
     });
 
-    callDurationTimer = sys::TimerFactory::createPeriodicTimer(
-        this, "callDurationTimer", std::chrono::milliseconds{1000}, [this](sys::Timer &) {
-            ongoingCall.handleCallDurationTimer();
-        });
-    ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
-        auto call = DBServiceAPI::CalllogAdd(this, rec);
-        if (call.ID == DB_ID_NONE) {
-            LOG_ERROR("CalllogAdd failed");
-        }
-        return call;
-    });
-
-    ongoingCall.setEndCallAction([=](const CalllogRecord &rec) {
-        if (DBServiceAPI::CalllogUpdate(this, rec) && rec.type == CallType::CT_MISSED) {
-            DBServiceAPI::GetQuery(this,
-                                   db::Interface::Name::Notifications,
-                                   std::make_unique<db::query::notifications::Increment>(
-                                       NotificationsRecord::Key::Calls, rec.phoneNumber));
-        }
-        return true;
-    });
-
     notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
 
@@ -222,7 +200,7 @@ void ServiceCellular::SleepTimerHandler()
                                           ? currentTime - lastCommunicationTimestamp
                                           : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
 
-    if (!ongoingCall.isValid() && priv->state->get() >= State::ST::URCReady &&
+    if (!ongoingCall->active() && priv->state->get() >= State::ST::URCReady &&
         timeOfInactivity >= constants::maxTimeWithoutCommunication.count()) {
         cmux->enterSleepMode();
         cpuSentinel->ReleaseMinimumFrequency();
@@ -279,7 +257,16 @@ sys::ReturnCodes ServiceCellular::InitHandler()
     };
 
     cpuSentinel = std::make_shared<sys::CpuSentinel>(serviceName, this);
-    ongoingCall.setCpuSentinel(cpuSentinel);
+
+    ongoingCall =
+        std::make_unique<call::Call>(this,
+                                     cmux.get(),
+                                     sys::TimerFactory::createPeriodicTimer(
+                                         this,
+                                         "callDurationTimer",
+                                         std::chrono::milliseconds{1000},
+                                         [this](sys::Timer &) { ongoingCall->handle(call::event::OngoingTimer{}); }),
+                                     cpuSentinel);
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     bus.sendUnicast(sentinelRegistrationMsg, ::service::name::system_manager);
@@ -322,9 +309,10 @@ void ServiceCellular::registerMessageHandlers()
         if (priv->simCard->isSimCardSelected()) {
             connectionManager->onPhoneModeChange(mode);
         }
-        ongoingCall.setMode(mode);
+        if (ongoingCall != nullptr) {
+            ongoingCall->handle(call::event::ModeChange{mode});
+        }
     });
-    ongoingCall.setMode(phoneModeObserver->getCurrentPhoneMode());
     phoneModeObserver->subscribe([&](sys::phone_modes::Tethering tethering) {
         if (tethering == sys::phone_modes::Tethering::On) {
             priv->tetheringHandler->enable();
@@ -559,9 +547,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularCallActiveNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleCallActiveNotification(request); });
 
-    connect(typeid(CellularCallAbortedNotification),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleCallAbortedNotification(request); });
-
     connect(typeid(CellularPowerUpProcedureCompleteNotification), [&](sys::Message *request) -> sys::MessagePointer {
         return handlePowerUpProcedureCompleteNotification(request);
     });
@@ -609,17 +594,15 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(cellular::CallAudioEventRequest), [&](sys::Message *request) -> sys::MessagePointer {
         auto message = static_cast<cellular::CallAudioEventRequest *>(request);
-        ongoingCall.handleCallAudioEventRequest(message->eventType);
+        ongoingCall->handle(call::event::AudioRequest{message->eventType});
         return sys::MessageNone{};
     });
 
-    connect(typeid(cellular::CallActiveNotification), [&](sys::Message *request) -> sys::MessagePointer {
-        callDurationTimer.start();
-        return sys::MessageNone{};
-    });
-
-    connect(typeid(cellular::CallEndedNotification), [&](sys::Message *request) -> sys::MessagePointer {
-        callDurationTimer.stop();
+    /// aborted notification can come from:
+    /// 1. URC
+    /// 2. from here from handle cellular hangup
+    connect(typeid(CellularCallAbortedNotification), [&](sys::Message * /*request*/) -> sys::MessagePointer {
+        ongoingCall->handle(call::event::Ended{});
         return sys::MessageNone{};
     });
 
@@ -1786,22 +1769,7 @@ auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *m
     -> std::shared_ptr<CellularResponseMessage>
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
-    if (ongoingCall.getType() != CallType::CT_INCOMING) {
-        return std::make_shared<CellularResponseMessage>(true);
-    }
-
-    auto channel = cmux->get(CellularMux::Channel::Commands);
-    auto ret     = false;
-    if (channel) {
-        auto response = channel->cmd(at::AT::ATA);
-        if (response) {
-            // Propagate "CallActive" notification into system
-            bus.sendMulticast(std::make_shared<CellularCallActiveNotification>(),
-                              sys::BusChannel::ServiceCellularNotifications);
-            AudioServiceAPI::RoutingStart(this);
-            ret = true;
-        }
-    }
+    auto ret = ongoingCall->handle(call::event::Answer{});
     return std::make_shared<CellularResponseMessage>(ret);
 }
 
@@ -1868,37 +1836,17 @@ auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessag
 void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage *msg)
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
-    auto channel = cmux->get(CellularMux::Channel::Commands);
-    if (channel) {
-        if (channel->cmd(at::AT::ATH)) {
-            callStateTimer.stop();
-            callEndedRecentlyTimer.start();
-            if (!ongoingCall.endCall(CellularCall::Forced::True)) {
-                LOG_ERROR("Failed to end ongoing call");
-            }
-            bus.sendMulticast(std::make_shared<CellularResponseMessage>(true, msg->type),
-                              sys::BusChannel::ServiceCellularNotifications);
-        }
-        else {
-            LOG_ERROR("Call not aborted");
-            bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->type),
-                              sys::BusChannel::ServiceCellularNotifications);
-        }
+    if (!ongoingCall->handle(call::event::Reject{})) {
+        LOG_ERROR("Failed to end ongoing call");
     }
-    bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->type),
-                      sys::BusChannel::ServiceCellularNotifications);
+    callStateTimer.stop();
+    callEndedRecentlyTimer.start();
 }
 
 void ServiceCellular::handleCellularDismissCallMessage(sys::Message *msg)
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
-
-    auto message = static_cast<CellularDismissCallMessage *>(msg);
-
     hangUpCall();
-    if (message->addNotificationRequired()) {
-        handleCallAbortedNotification(msg);
-    }
 }
 
 auto ServiceCellular::handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>
@@ -1932,8 +1880,7 @@ auto ServiceCellular::handleCellularListCallsMessage(CellularMessage *msg) -> st
         });
 
         if (it != std::end(data)) {
-            auto notification = std::make_shared<CellularCallActiveNotification>();
-            bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
+            ongoingCall->handle(call::event::Answer{});
             callStateTimer.stop();
             return std::make_shared<CellularResponseMessage>(true);
         }
@@ -1955,7 +1902,8 @@ auto ServiceCellular::handleDBNotificationMessage(db::NotificationMessage *msg) 
 auto ServiceCellular::handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
-    return std::make_shared<CellularResponseMessage>(ongoingCall.startOutgoing(msg->number));
+    return std::make_shared<CellularResponseMessage>(
+        ongoingCall->handle(call::event::StartCall{CallType::CT_OUTGOING, msg->number}));
 }
 
 auto ServiceCellular::handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
@@ -2121,7 +2069,7 @@ auto ServiceCellular::handleStateRequestMessage(sys::Message *msg) -> std::share
 
 auto ServiceCellular::handleCallActiveNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    auto ret = std::make_shared<CellularResponseMessage>(ongoingCall.setActive());
+    auto ret = std::make_shared<CellularResponseMessage>(true);
     NetworkSettings networkSettings(*this);
     auto currentNAT = networkSettings.getCurrentNAT();
     if (currentNAT) {
@@ -2141,15 +2089,7 @@ auto ServiceCellular::handleCallActiveNotification(sys::Message *msg) -> std::sh
     }
     return ret;
 }
-auto ServiceCellular::handleCallAbortedNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    callStateTimer.stop();
-    const auto ret = ongoingCall.endCall();
-    if (not ret) {
-        LOG_ERROR("failed to end call");
-    }
-    return std::make_shared<CellularResponseMessage>(ret);
-}
+
 auto ServiceCellular::handlePowerUpProcedureCompleteNotification(sys::Message *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
@@ -2217,31 +2157,22 @@ auto ServiceCellular::handleCellularSetFlightModeMessage(sys::Message *msg) -> s
 auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
-
-    if (phoneModeObserver->isTetheringOn() || connectionManager->forceDismissCalls()) {
+    if (phoneModeObserver->isTetheringOn()) {
         return std::make_shared<CellularResponseMessage>(hangUpCall());
     }
-    ongoingCall.handleRING();
-
+    ongoingCall->handle(call::event::RING{});
     return std::make_shared<CellularResponseMessage>(true);
 }
 
 auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    if (connectionManager->forceDismissCalls()) {
-        return std::make_shared<CellularResponseMessage>(hangUpCall());
-    }
-
     auto message = static_cast<CellularCallerIdNotification *>(msg);
     if (phoneModeObserver->isTetheringOn()) {
         tetheringCalllog.push_back(CalllogRecord{CallType::CT_MISSED, message->getNubmer()});
         return std::make_shared<CellularResponseMessage>(hangUpCallBusy());
     }
 
-    if (not ongoingCall.handleCLIP(message->getNubmer())) {
-        CellularServiceAPI::DismissCall(
-            this, phoneModeObserver->getCurrentPhoneMode() == sys::phone_modes::PhoneMode::DoNotDisturb);
-    }
+    ongoingCall->handle(call::event::CLIP{message->getNubmer()});
 
     return std::make_shared<CellularResponseMessage>(true);
 }
@@ -2261,15 +2192,11 @@ auto ServiceCellular::handleCellularSetConnectionFrequencyMessage(sys::Message *
 
 auto ServiceCellular::hangUpCall() -> bool
 {
-    auto channel = cmux->get(CellularMux::Channel::Commands);
-    if (channel != nullptr) {
-        if (channel->cmd(at::factory(at::AT::ATH))) {
-            ongoingCall.endCall();
-            return true;
-        }
+    auto ret = ongoingCall->handle(call::event::Ended{});
+    if (!ret) {
+        LOG_ERROR("Failed to hang up call");
     }
-    LOG_ERROR("Failed to hang up call");
-    return false;
+    return ret;
 }
 
 auto ServiceCellular::hangUpCallBusy() -> bool
@@ -2355,12 +2282,6 @@ auto ServiceCellular::logTetheringCalls() -> void
 
         tetheringCalllog.clear();
     }
-}
-
-bool ServiceCellular::areCallsFromFavouritesEnabled()
-{
-    return utils::getNumericValue<bool>(
-        settings->getValue(settings::Offline::callsFromFavorites, settings::SettingsScope::Global));
 }
 
 TaskHandle_t ServiceCellular::getTaskHandle()

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,8 +29,10 @@ struct CalllogRecord : public Record
     [[nodiscard]] std::string str() const;
 
     CalllogRecord() = default;
+    CalllogRecord(const CalllogRecord &rhs);
     CalllogRecord(const CallType type, const utils::PhoneNumber::View &number);
     CalllogRecord(const CalllogTableRow &tableRow);
+    CalllogRecord &operator=(const CalllogRecord &);
 };
 
 enum class CalllogRecordField

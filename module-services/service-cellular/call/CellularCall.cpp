@@ -2,11 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "call/CellularCall.hpp"
-#include "service-cellular/call/CallRingGuard.hpp"
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-db/agents/settings/SystemSettings.hpp"
 
-#include <queries/notifications/QueryNotificationsIncrement.hpp>
 #include <CalllogRecord.hpp>
 #include <PhoneNumber.hpp>
 #include <Utils.hpp>
@@ -14,217 +12,124 @@
 
 #include <cinttypes>
 #include <ctime>
+#include <memory>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
+#include "CallMachine.hpp"
 
-namespace CellularCall
+namespace call
 {
-    Call::Call(ServiceCellular &owner) : owner(owner), audio(owner), multicast(owner), gui(owner), db(owner)
+
+    Call::Call()
+    {}
+
+    Call::Call(ServiceCellular *owner,
+               CellularMux *cmux,
+               sys::TimerHandle timer,
+               std::shared_ptr<sys::CpuSentinel> sentinel)
     {
-        utils::PhoneNumber::View number = utils::PhoneNumber::View();
-        const CallType type             = CallType::CT_NONE;
-        const time_t date               = 0;
-        const time_t duration           = 0;
-
-        clear();
-
-        this->call.phoneNumber = number;
-        this->call.date        = date;
-        this->call.duration    = duration;
-        this->call.type        = type;
-        this->call.name        = number.getEntered(); // temporary set number as name
+        machine = std::make_unique<StateMachine>(Dependencies{std::make_unique<Audio>(owner),
+                                                              std::make_unique<CallMulticast>(owner),
+                                                              std::make_unique<CallGUI>(owner),
+                                                              std::make_unique<CallDB>(owner),
+                                                              std::make_unique<CallTimer>(std::move(timer)),
+                                                              std::make_unique<cellular::Api>(owner, cmux),
+                                                              std::move(sentinel)});
     }
 
-    bool Call::handleRING()
-    {
-        if (callRingGuard(*this)) {
-            startCall(utils::PhoneNumber::View(), CallType::CT_INCOMING);
-            audio.play();
+    Call::~Call()
+    {}
 
-            if (!wasRinging) {
-                wasRinging = true;
-                gui.notifyRING();
-                multicast.notifyIncommingCall();
-            }
-            return true;
+    Call &Call::operator=(Call &&other) noexcept
+    {
+        if (not other.machine) {
+            LOG_ERROR("operator= on wrong call");
+            return *this;
         }
-        return false;
+        machine = std::make_unique<StateMachine>(std::move(other.machine->di));
+        return *this;
     }
 
-    bool Call::handleCLIP(const utils::PhoneNumber::View &number)
+    bool Call::handle(const call::event::RING &ring)
     {
-        setNumber(number);
-        if (callClipGuard(*this)) {
-            startCall(number, CallType::CT_INCOMING);
-            audio.play();
-        }
-
-        if (callClipGuard(*this) || callRingGuard(*this)) {
-            if (!isNumberDisplayed) {
-                isNumberDisplayed = true;
-                gui.notifyCLIP(number);
-                multicast.notifyIdentifiedCall(number);
-            }
-            return true;
-        }
-
-        if (callDNDGuard(*this)) {
-            db.incrementNotAnsweredCallsNotification(number);
-        }
-
-        return false;
-    }
-
-    bool Call::startOutgoing(const utils::PhoneNumber::View &number)
-    {
-        return startCall(number, CallType::CT_OUTGOING);
-    }
-
-    bool Call::startCall(const utils::PhoneNumber::View &number, const CallType type)
-    {
-        LOG_INFO("starting call");
-
-        if (isValid()) {
-            LOG_ERROR("call already established");
+        if (machine == nullptr) {
             return false;
-        }
+        };
+        return machine->machine.process_event(ring);
+    }
 
-        if (cpuSentinel) {
-            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
-        }
-
-        clear();
-        CalllogRecord callRec{type, number};
-        call = startCallAction ? startCallAction(callRec) : CalllogRecord();
-        if (!call.isValid()) {
-            LOG_ERROR("failed to obtain a call log record");
-            clear();
-            if (cpuSentinel) {
-                cpuSentinel->ReleaseMinimumFrequency();
-            }
-            LOG_INFO("failed to start call");
+    bool Call::handle(const call::event::CLIP &clip)
+    {
+        if (machine == nullptr) {
             return false;
-        }
+        };
+        return machine->machine.process_event(clip);
+    }
 
-        gui.notifyCallStarted(number, type);
-        LOG_INFO("call started");
+    bool Call::handle(const call::event::StartCall &call)
+    {
+        if (machine == nullptr) {
+            return false;
+        };
+        return machine->machine.process_event(call);
+    }
+
+    bool Call::handle(const call::event::Ended &ended)
+    {
+        if (machine == nullptr) {
+            return false;
+        };
+        return machine->machine.process_event(ended);
+    }
+
+    bool Call::handle(const call::event::Reject &reject)
+    {
+        if (machine == nullptr) {
+            return false;
+        };
+        return machine->machine.process_event(reject);
+    }
+
+    bool Call::handle(const call::event::AudioRequest &request)
+    {
+        if (machine == nullptr) {
+            return false;
+        };
+        return machine->machine.process_event(request);
+    }
+
+    bool Call::handle(const call::event::ModeChange &change)
+    {
+        if (machine == nullptr) {
+            return false;
+        };
+        machine->call.mode = change.mode;
         return true;
     }
 
-    bool Call::setActive()
+    bool Call::handle(const call::event::Answer &answer)
     {
-        if (isValid()) {
-            startActiveTime = utils::time::getCurrentTimestamp();
-            isActiveCall    = true;
-            gui.notifyCallActive();
-            LOG_INFO("set call active");
-            return true;
-        }
-        LOG_ERROR("no valid call to activate");
-        return false;
-    }
-
-    bool Call::endCall(Forced forced)
-    {
-        audio.stop();
-        LOG_INFO("ending call");
-        if (!isValid()) {
-            LOG_ERROR("no call to end");
+        if (machine == nullptr) {
             return false;
-        }
+        };
+        return machine->machine.process_event(answer);
+    }
 
-        if (cpuSentinel) {
-            cpuSentinel->ReleaseMinimumFrequency();
-        }
-
-        if (isActiveCall) {
-            auto endTime  = utils::time::getCurrentTimestamp();
-            call.duration = (endTime - startActiveTime).get();
-        }
-        else {
-            auto callType = call.type;
-            switch (callType) {
-            case CallType::CT_INCOMING: {
-                if (forced == Forced::True) {
-                    setType(CallType::CT_REJECTED);
-                }
-                else {
-                    setType(CallType::CT_MISSED);
-                    markUnread();
-                }
-            } break;
-
-            case CallType::CT_OUTGOING: {
-                // do nothing
-            } break;
-
-            default:
-                LOG_ERROR("Not a valid call type %u", static_cast<int>(callType));
-                return false;
-            }
-        }
-
-        if (!(endCallAction && endCallAction(call))) {
-            LOG_ERROR("CalllogUpdate failed, id %" PRIu32, call.ID);
+    bool Call::handle(const call::event::OngoingTimer &tim)
+    {
+        if (machine == nullptr) {
             return false;
-        }
-
-        // Calllog entry was updated, ongoingCall can be cleared
-        clear();
-        gui.notifyCallEnded();
-        LOG_INFO("call ended");
-        return true;
+        };
+        return machine->machine.process_event(tim);
     }
 
-    void Call::setNumber(const utils::PhoneNumber::View &number)
+    bool Call::active() const
     {
-        call.presentation = number.getFormatted().empty() ? PresentationType::PR_UNKNOWN : PresentationType::PR_ALLOWED;
-        call.phoneNumber  = number;
-    }
-
-    void Call::setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel)
-    {
-        cpuSentinel = std::move(sentinel);
-    }
-
-    void Call::handleCallAudioEventRequest(cellular::CallAudioEventRequest::EventType event)
-    {
-        switch (event) {
-        case cellular::CallAudioEventRequest::EventType::Mute:
-            audio.muteCall();
-            break;
-        case cellular::CallAudioEventRequest::EventType::Unmute:
-            audio.unmuteCall();
-            break;
-        case cellular::CallAudioEventRequest::EventType::LoudspeakerOn:
-            audio.setLaudspeakerOn();
-            break;
-        case cellular::CallAudioEventRequest::EventType::LoudspeakerOff:
-            audio.setLaudspeakerOff();
-            break;
-        }
-    }
-    void Call::handleCallDurationTimer()
-    {
-        if (not isActiveCall) {
-            return;
-        }
-        auto now         = utils::time::getCurrentTimestamp();
-        callDurationTime = (now - startActiveTime).getSeconds();
-        gui.notifyCallDurationUpdate(callDurationTime);
-    }
-
-    bool Call::Operations::areCallsFromFavouritesEnabled()
-    {
-        return call.owner.areCallsFromFavouritesEnabled();
-    }
-
-    bool Call::Operations::isNumberInFavourites()
-    {
-        return DBServiceAPI::IsContactInFavourites(&call.owner, call.call.phoneNumber);
+        return machine->active();
     }
 
 } // namespace CellularCall

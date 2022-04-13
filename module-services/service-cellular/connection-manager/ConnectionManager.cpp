@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-services/service-cellular/service-cellular/connection-manager/ConnectionManager.hpp>
@@ -10,10 +10,8 @@ auto ConnectionManager::onPhoneModeChange(sys::phone_modes::PhoneMode mode) -> b
     cellular->holdMinimumCpuFrequency();
 
     if (mode == sys::phone_modes::PhoneMode::Offline) {
-        forceDismissCallsFlag = true;
         return handleModeChangeToCommonOffline();
     }
-    forceDismissCallsFlag = false;
     return handleModeChangeToConnected();
 }
 
@@ -129,10 +127,6 @@ auto ConnectionManager::handleModeChangeToConnected() -> bool
     return true;
 }
 
-auto ConnectionManager::forceDismissCalls() -> bool
-{
-    return forceDismissCallsFlag;
-}
 void ConnectionManager::retryOnFail()
 {
     if (failRetries < maxFailRetries) {

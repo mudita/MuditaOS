@@ -613,17 +613,8 @@ class CellularHangupCallMessage : public CellularMessage
 class CellularDismissCallMessage : public CellularMessage
 {
   public:
-    CellularDismissCallMessage(bool addNotificationToDB)
-        : CellularMessage(Type::DismissCall), addNotificationToDB{addNotificationToDB}
+    CellularDismissCallMessage() : CellularMessage(Type::DismissCall)
     {}
-
-    auto addNotificationRequired() const noexcept -> bool
-    {
-        return addNotificationToDB;
-    }
-
-  private:
-    const bool addNotificationToDB;
 };
 
 class CellularListCallsMessage : public CellularMessage

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,7 +16,7 @@ class ConnectionManagerCellularCommands : public ConnectionManagerCellularComman
     auto connectToNetwork() -> bool final;
     auto isConnectedToNetwork() -> std::optional<bool> final;
     auto clearNetworkIndicator() -> bool final;
-    auto hangUpOngoingCall() -> bool final;
+    auto hangUpOngoingCall() -> void final;
     auto isConnectionTimerActive() -> bool final;
     void startConnectionTimer() final;
     void stopConnectionTimer() final;

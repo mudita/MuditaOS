@@ -110,7 +110,6 @@ class ServiceCellular : public sys::Service
     sys::TimerHandle ussdTimer;
     sys::TimerHandle simTimer;
     sys::TimerHandle csqTimer;
-    sys::TimerHandle callDurationTimer;
 
     // used to enter modem sleep mode
     sys::TimerHandle sleepTimer;
@@ -136,7 +135,7 @@ class ServiceCellular : public sys::Service
 
     std::vector<std::string> messageParts;
 
-    CellularCall::Call ongoingCall = CellularCall::Call(*this);
+    std::unique_ptr<call::Call> ongoingCall;
     std::vector<CalllogRecord> tetheringCalllog;
 
     ussd::State ussdState = ussd::State::none;
@@ -256,6 +255,7 @@ class ServiceCellular : public sys::Service
     friend class packet_data::PDPContext;
     friend class packet_data::PacketData;
     friend class ConnectionManagerCellularCommands;
+    friend class cellular::Api;
 
     void volteChanged(const std::string &value);
     void apnListChanged(const std::string &value);
@@ -266,8 +266,10 @@ class ServiceCellular : public sys::Service
     void handleCellularHangupCallMessage(CellularHangupCallMessage *msg);
     void handleCellularDismissCallMessage(sys::Message *msg);
     auto handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    /// when we start call from Pure -> to the calee, then we poll for the moment that the calee answered the call
     auto handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleDBNotificationMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    /// handle mudita phone -> world ringing (not AT RING!)
     auto handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
@@ -288,7 +290,6 @@ class ServiceCellular : public sys::Service
     auto handleStateRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
 
     auto handleCallActiveNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCallAbortedNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handlePowerUpProcedureCompleteNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handlePowerDownDeregisteringNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handlePowerDownDeregisteredNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;

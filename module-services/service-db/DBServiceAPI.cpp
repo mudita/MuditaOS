@@ -244,10 +244,7 @@ auto DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id) -> bool
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
         return false;
     }
-    if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode != 0)) {
-        return true;
-    }
-    return false;
+    return ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode != 0));
 }
 
 auto DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -> bool
@@ -260,10 +257,7 @@ auto DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
         return false;
     }
-    if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode != 0)) {
-        return true;
-    }
-    return false;
+    return ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode != 0));
 }
 
 auto DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath) -> bool

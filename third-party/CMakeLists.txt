@@ -4,6 +4,7 @@
 add_subdirectory(base64)
 add_subdirectory(date)
 add_subdirectory(reedgefs)
+add_subdirectory(fakeit)
 add_subdirectory(fatfs)
 add_subdirectory(gsl)
 add_subdirectory(hash-library)
