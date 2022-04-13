@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -97,6 +97,8 @@ namespace db
 
         void setRequestQuery(const std::shared_ptr<Query> &requestQueryToSet);
         std::shared_ptr<Query> getRequestQuery() const noexcept;
+        void setRecordID(const uint32_t modifiedRecordID);
+        [[nodiscard]] auto getRecordID() -> std::optional<uint32_t>;
 
         bool handle();
 
@@ -105,6 +107,9 @@ namespace db
 
       protected:
         std::shared_ptr<Query> requestQuery;
+
+      private:
+        std::optional<uint32_t> recordID;
     };
 
 } // namespace db

@@ -413,6 +413,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::addQuery(const std::shared_
     }
     auto response = std::make_unique<db::query::SMSAddResult>(record, ret);
     response->setRequestQuery(query);
+    if (ret) {
+        response->setRecordID(record.ID);
+    }
     return response;
 }
 std::unique_ptr<db::QueryResult> SMSRecordInterface::removeQuery(const std::shared_ptr<db::Query> &query)
@@ -421,6 +424,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::removeQuery(const std::shar
     auto ret              = RemoveByID(localQuery->id);
     auto response         = std::make_unique<db::query::SMSRemoveResult>(ret);
     response->setRequestQuery(query);
+    if (ret) {
+        response->setRecordID(localQuery->id);
+    }
     return response;
 }
 std::unique_ptr<db::QueryResult> SMSRecordInterface::updateQuery(const std::shared_ptr<db::Query> &query)
@@ -429,6 +435,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::updateQuery(const std::shar
     auto ret              = Update(localQuery->record);
     auto response         = std::make_unique<db::query::SMSUpdateResult>(ret);
     response->setRequestQuery(query);
+    if (ret) {
+        response->setRecordID(localQuery->record.ID);
+    }
     return response;
 }
 
