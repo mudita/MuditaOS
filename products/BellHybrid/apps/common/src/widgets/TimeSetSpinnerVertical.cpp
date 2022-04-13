@@ -1,20 +1,15 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/widgets/TimeSetSpinnerVertical.hpp>
+#include "widgets/LayoutVertical.hpp"
 
 #include <date/date.h>
 #include <gui/core/FontManager.hpp>
 #include <gui/core/RawFont.hpp>
 #include <widgets/spinners/Spinners.hpp>
 
-static constexpr auto hourMin         = 0;
-static constexpr auto hourMax         = 23;
-static constexpr auto hourDoubleDigit = 10;
-static constexpr auto hourStep        = 1;
-static constexpr auto minuteMin       = 0;
-static constexpr auto minuteMax       = 59;
-static constexpr auto minuteStep      = 1;
+static constexpr auto doubleDigit = 10;
 
 namespace gui
 {
@@ -28,27 +23,54 @@ namespace gui
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        hour =
-            new UIntegerSpinnerFixed(UIntegerSpinnerFixed::range{hourMin, hourMax, hourStep}, Boundaries::Continuous);
-        updateFont(hour, fontName);
+        hBoxHours = new gui::HBox(
+            this, 0, 0, style::homescreen_vertical::center_box_w, style::homescreen_vertical::center_box_h);
+        hBoxHours->setEdges(gui::RectangleEdge::None);
+        hBoxHours->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
 
-        hour->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        hour->setEdges(RectangleEdge::None);
-        hour->setPenFocusWidth(style::time_set_spinner_vertical::focus::size);
-        hour->set_value(0);
-        hour->setMargins(getHourMargins(fontName));
+        hourFirst = new gui::TextFixedSize(hBoxHours, 0, 0, 0, 0);
+        updateFont(hourFirst, fontName);
 
-        addWidget(hour);
+        hourFirst->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+        hourFirst->setEdges(RectangleEdge::None);
+        hourFirst->setText("0");
+        hourFirst->setMargins(getHourMargins(fontName));
 
-        minute = new UIntegerSpinnerFixed(UIntegerSpinnerFixed::range{minuteMin, minuteMax, minuteStep},
-                                          Boundaries::Continuous);
-        updateFont(minute, fontName);
-        minute->setPenFocusWidth(style::time_set_spinner_vertical::focus::size);
+        hourSecond = new gui::TextFixedSize(hBoxHours, 0, 0, 0, 0);
+        updateFont(hourSecond, fontName);
 
-        minute->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        minute->setEdges(RectangleEdge::None);
-        minute->set_value(0);
-        addWidget(minute);
+        hourSecond->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
+        hourSecond->setEdges(RectangleEdge::None);
+        hourSecond->setText("0");
+        hourSecond->setMargins(getHourMargins(fontName));
+
+        hBoxHours->addWidget(hourFirst);
+        hBoxHours->addWidget(hourSecond);
+
+        hBoxMinutes = new gui::HBox(
+            this, 0, 0, style::homescreen_vertical::center_box_w, style::homescreen_vertical::center_box_h);
+        hBoxMinutes->setEdges(gui::RectangleEdge::None);
+        hBoxMinutes->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        hBoxMinutes->setMargins(gui::Margins(0, 0, 0, style::homescreen_vertical::bottomMargin));
+
+        minuteFirst = new gui::TextFixedSize(hBoxMinutes, 0, 0, 0, 0);
+        updateFont(minuteFirst, fontName);
+
+        minuteFirst->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Top));
+        minuteFirst->setEdges(RectangleEdge::None);
+        minuteFirst->setText("0");
+        minuteFirst->drawUnderline(false);
+
+        minuteSecond = new gui::TextFixedSize(hBoxMinutes, 0, 0, 0, 0);
+        updateFont(minuteSecond, fontName);
+
+        minuteSecond->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Top));
+        minuteSecond->setEdges(RectangleEdge::None);
+        minuteSecond->setText("0");
+        minuteSecond->drawUnderline(false);
+
+        hBoxMinutes->addWidget(minuteFirst);
+        hBoxMinutes->addWidget(minuteSecond);
 
         resizeItems();
 
@@ -59,24 +81,40 @@ namespace gui
     {
         using namespace utils;
 
+        const auto hourFirstStr  = hourFirst->getText();
+        const auto hourSecondStr = hourSecond->getText();
+        const auto hoursStr      = hourFirstStr + hourSecondStr;
+        const auto hoursInt      = std::stoi(hoursStr.c_str());
+        const auto hours         = std::chrono::hours(hoursInt);
+
         switch (newFormat) {
         case utils::time::Locale::TimeFormat::FormatTime12H: {
-            auto hours = std::chrono::hours(hour->value());
-            hour->set_range(UIntegerSpinnerFixed::range{
-                time::Locale::min_hour_12H_mode, time::Locale::max_hour_12H_mode, hourStep});
-
             if (timeFormat != newFormat) {
-                hour->set_value(date::make12(hours).count());
+                const auto time12H    = date::make12(hours);
+                const auto stringHour = std::to_string(time12H.count());
+                if (hoursInt < doubleDigit) {
+                    hourFirst->setText("0");
+                    hourSecond->setText(stringHour.substr(0, 1));
+                }
+                else {
+                    hourFirst->setText(stringHour.substr(0, 1));
+                    hourSecond->setText(stringHour.substr(1, 1));
+                }
             }
 
         } break;
         case utils::time::Locale::TimeFormat::FormatTime24H: {
-            auto hours = std::chrono::hours(hour->value());
-            hour->set_range(UIntegerSpinnerFixed::range{
-                time::Locale::min_hour_24H_mode, time::Locale::max_hour_24H_mode, hourStep});
-
             if (newFormat != timeFormat) {
-                hour->set_value(date::make24(hours, isPM()).count());
+                const auto time24H    = date::make24(hours, isPM());
+                const auto stringHour = std::to_string(time24H.count());
+                if (hoursInt < doubleDigit) {
+                    hourFirst->setText("0");
+                    hourSecond->setText(stringHour.substr(0, 1));
+                }
+                else {
+                    hourFirst->setText(stringHour.substr(0, 1));
+                    hourSecond->setText(stringHour.substr(1, 1));
+                }
             }
         } break;
         default:
@@ -88,22 +126,44 @@ namespace gui
 
     auto TimeSetSpinnerVertical::setMinute(int value) noexcept -> void
     {
-        minute->set_value(value);
+        const auto valueStr = std::to_string(value);
+        if (value < doubleDigit) {
+            minuteFirst->setText("0");
+            minuteSecond->setText(valueStr.substr(0, 1));
+        }
+        else {
+            minuteFirst->setText(valueStr.substr(0, 1));
+            minuteSecond->setText(valueStr.substr(1, 1));
+        }
     }
 
     auto TimeSetSpinnerVertical::getHour() const noexcept -> int
     {
-        return hour->value();
+        auto hourFirstStr  = hourFirst->getText();
+        auto hourSecondStr = hourSecond->getText();
+        auto hoursStr      = hourFirstStr + hourSecondStr;
+        return std::stoi(hoursStr.c_str());
     }
 
     auto TimeSetSpinnerVertical::getMinute() const noexcept -> int
     {
-        return minute->value();
+        auto minuteFirstStr  = minuteFirst->getText();
+        auto minuteSecondStr = minuteSecond->getText();
+        auto minutesStr      = minuteFirstStr + minuteSecondStr;
+        return std::stoi(minutesStr.c_str());
     }
 
     auto TimeSetSpinnerVertical::setHour(int value) noexcept -> void
     {
-        hour->set_value(value);
+        auto valueStr = std::to_string(value);
+        if (value < doubleDigit) {
+            hourFirst->setText("0");
+            hourSecond->setText(valueStr.substr(0, 1));
+        }
+        else {
+            hourFirst->setText(valueStr.substr(0, 1));
+            hourSecond->setText(valueStr.substr(1, 1));
+        }
     }
 
     auto TimeSetSpinnerVertical::updateFont(TextFixedSize *elem, const std::string &fontName) noexcept -> void
@@ -119,16 +179,21 @@ namespace gui
     {
         fontName = newFontName;
 
-        updateFont(hour, fontName);
-        updateFont(minute, fontName);
+        updateFont(hourFirst, fontName);
+        updateFont(hourSecond, fontName);
+        updateFont(minuteFirst, fontName);
+        updateFont(minuteSecond, fontName);
         auto hourMargins = getHourMargins(fontName);
-        hour->setMargins(getHourMargins(fontName));
+        hourFirst->setMargins(getHourMargins(fontName));
+        hourSecond->setMargins(getHourMargins(fontName));
 
-        auto width = hour->widgetMinimumArea.w > minute->widgetMinimumArea.w ? hour->widgetMinimumArea.w
-                                                                             : minute->widgetMinimumArea.w;
+        auto hourArea   = hourFirst->widgetMinimumArea.w + hourSecond->widgetMinimumArea.w;
+        auto minuteArea = minuteFirst->widgetMinimumArea.w + minuteSecond->widgetMinimumArea.w;
+
+        auto width = hourArea > minuteArea ? hourArea : minuteArea;
 
         auto verticalMargin = hourMargins.top + hourMargins.bottom;
-        setMinimumSize(width, hour->widgetMinimumArea.h + minute->widgetMinimumArea.h + verticalMargin);
+        setMinimumSize(width, hourArea + minuteArea + verticalMargin);
         resizeItems();
     }
 
@@ -146,46 +211,53 @@ namespace gui
     {
         using namespace utils::time;
         const auto t = std::localtime(&time);
+        const auto hours = std::chrono::hours{t->tm_hour};
 
         if (timeFormat == Locale::TimeFormat::FormatTime24H) {
-            hour->set_value(t->tm_hour);
-            minute->set_value(t->tm_min);
+            const auto time24H = date::make24(hours, isPM());
+            auto stringHour    = std::to_string(time24H.count());
+
+            if (t->tm_hour < doubleDigit) {
+                hourFirst->setText("0");
+                hourSecond->setText(stringHour.substr(0, 1));
+            }
+            else {
+                hourFirst->setText(stringHour.substr(0, 1));
+                hourSecond->setText(stringHour.substr(1, 1));
+            }
         }
         else {
-            const auto hours   = std::chrono::hours{t->tm_hour};
             const auto time12H = date::make12(hours);
-            hour->set_value(time12H.count());
-            minute->set_value(t->tm_min);
+            auto stringHour    = std::to_string(time12H.count());
+            auto hourInt       = std::stoi(stringHour.c_str());
+
+            if (hourInt < doubleDigit) {
+                hourFirst->setText("0");
+                hourSecond->setText(stringHour.substr(0, 1));
+            }
+            else {
+                hourFirst->setText(stringHour.substr(0, 1));
+                hourSecond->setText(stringHour.substr(1, 1));
+            }
         }
 
+        setMinute(t->tm_min);
         handleContentChanged();
-    }
-
-    auto TimeSetSpinnerVertical::getTime() const noexcept -> std::time_t
-    {
-        using namespace utils::time;
-        const auto now     = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        const auto newTime = std::localtime(&now);
-        if (timeFormat == Locale::TimeFormat::FormatTime24H) {
-            newTime->tm_hour = hour->value();
-        }
-        else {
-            newTime->tm_hour = date::make24(std::chrono::hours{hour->value()}, isPM()).count();
-        }
-        newTime->tm_min = minute->value();
-
-        return std::mktime(newTime);
     }
 
     void TimeSetSpinnerVertical::handleContentChanged()
     {
-        hour->setMinimumWidthToFitText();
-        minute->setMinimumWidthToFitText();
+        hourFirst->setMinimumWidthToFitText();
+        hourSecond->setMinimumWidthToFitText();
+        minuteFirst->setMinimumWidthToFitText();
+        minuteSecond->setMinimumWidthToFitText();
 
-        auto width = hour->widgetMinimumArea.w > minute->widgetMinimumArea.w ? hour->widgetMinimumArea.w
-                                                                             : minute->widgetMinimumArea.w;
+        auto hourArea   = hourFirst->widgetMinimumArea.w + hourSecond->widgetMinimumArea.w;
+        auto minuteArea = minuteFirst->widgetMinimumArea.w + minuteSecond->widgetMinimumArea.w;
 
-        setMinimumSize(width, hour->widgetMinimumArea.h + minute->widgetMinimumArea.h + 10);
+        auto width = hourArea > minuteArea ? hourArea : minuteArea;
+
+        setMinimumSize(width, hourArea + minuteArea + 10);
         setMaximumWidth(widgetMinimumArea.w);
 
         VBox::informContentChanged();

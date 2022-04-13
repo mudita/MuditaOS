@@ -32,7 +32,7 @@ namespace gui
         navBar->setVisible(false);
 
         auto layouts = presenter->getLayouts();
-        spinner      = new WidgetSpinner(this, {layouts.begin(), layouts.end()}, Boundaries::Fixed);
+        spinner      = new WidgetSpinner(this, {layouts.begin(), layouts.end()}, Boundaries::Continuous);
         spinner->setSize(style::window_width, style::window_height);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setFocusEdges(RectangleEdge::None);
@@ -40,13 +40,9 @@ namespace gui
         spinner->setCurrentValue(selectedLayout);
 
         createArrowsOverlay(0, 0, style::window_width, style::window_height);
-        arrowLeft->setVisible(!spinner->isAtMin());
-        arrowRight->setVisible(!spinner->isAtMax());
+        arrowLeft->setVisible(true);
+        arrowRight->setVisible(true);
 
-        spinner->onValueChanged = [this](const auto &) {
-            arrowLeft->setVisible(!spinner->isAtMin());
-            arrowRight->setVisible(!spinner->isAtMax());
-        };
         setFocusItem(spinner);
     }
 
