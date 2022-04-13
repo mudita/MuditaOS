@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,6 +15,7 @@ class BluetoothDevicesModel
   public:
     explicit BluetoothDevicesModel(sys::Service *service);
 
+    void mergeDevicesList(const Devicei &device);
     void mergeDevicesList(const std::vector<Devicei> &devicesList);
     auto getDeviceByAddress(const std::string &address) -> std::optional<std::reference_wrapper<Devicei>>;
     auto getDeviceByAddress(const bd_addr_t address) -> std::optional<std::reference_wrapper<Devicei>>;
@@ -28,4 +29,5 @@ class BluetoothDevicesModel
   private:
     std::vector<Devicei> devices{};
     sys::Service *service = nullptr;
+    void removeDeviceDuplicates();
 };
