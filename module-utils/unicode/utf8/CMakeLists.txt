@@ -10,7 +10,7 @@ target_include_directories(utf8
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
-target_link_libraries(utf8 PRIVATE log-api)
+target_link_libraries(utf8 PRIVATE log-api log)
 
 if (${ENABLE_TESTS})
     add_subdirectory(test)

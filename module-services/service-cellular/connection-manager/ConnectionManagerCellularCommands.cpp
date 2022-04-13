@@ -64,23 +64,10 @@ auto ConnectionManagerCellularCommands::clearNetworkIndicator() -> bool
     return true;
 }
 
-auto ConnectionManagerCellularCommands::hangUpOngoingCall() -> bool
+void ConnectionManagerCellularCommands::hangUpOngoingCall()
 {
-    if (cellular.ongoingCall.isActive()) {
-        auto channel = cellular.cmux->get(CellularMux::Channel::Commands);
-        if (channel) {
-            if (channel->cmd(at::factory(at::AT::ATH))) {
-                cellular.callStateTimer.stop();
-                if (!cellular.ongoingCall.endCall(CellularCall::Forced::True)) {
-                    LOG_ERROR("Failed to end ongoing call");
-                    return false;
-                }
-                auto msg = std::make_shared<CellularCallAbortedNotification>();
-                cellular.bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
-            }
-        }
-    }
-    return true;
+    CellularHangupCallMessage msg;
+    cellular.handleCellularHangupCallMessage(&msg);
 }
 
 auto ConnectionManagerCellularCommands::isConnectionTimerActive() -> bool

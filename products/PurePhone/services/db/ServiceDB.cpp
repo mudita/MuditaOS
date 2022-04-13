@@ -172,6 +172,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         auto record           = std::make_unique<std::vector<CalllogRecord>>();
         msg->record.ID        = DB_ID_NONE;
         auto ret              = calllogRecordInterface->Add(msg->record);
+        LOG_INFO("HERE! ADD! SUCCESS? %s", ret ? "SUCCESS" : "FAIL");
         if (ret) {
             // return the newly added record
             msg->record = calllogRecordInterface->GetByID(calllogRecordInterface->GetLastID());

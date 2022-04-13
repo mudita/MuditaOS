@@ -212,7 +212,7 @@ void CellularUrcHandler::Handle(UrcResponse &urc)
 
     for (auto &t : typesToHandle) {
         if (t == urc.getURCResponseType()) {
-            LOG_TRACE("call aborted");
+            LOG_INFO("call (aborted|missed) type: %s", magic_enum::enum_name(t).data());
             response = std::make_unique<CellularCallAbortedNotification>();
             urc.setHandled(true);
         }

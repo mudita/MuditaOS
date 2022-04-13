@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/CellularRequestHandler.hpp"
@@ -68,12 +68,9 @@ void CellularRequestHandler::handle(cellular::CallRequest &request, at::Result &
         request.setHandled(false);
         return;
     }
-    // activate call state timer
     cellular.callStateTimer.start();
-    // Propagate "Ringing" notification into system
     cellular.bus.sendMulticast(std::make_shared<CellularRingingMessage>(request.getNumber()),
                                sys::BusChannel::ServiceCellularNotifications);
-    AudioServiceAPI::RoutingStart(&cellular);
     request.setHandled(true);
 }
 

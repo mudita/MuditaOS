@@ -3,11 +3,12 @@
 
 #pragma once
 
-#include "call/CallAudio.hpp"
-#include "call/CallGUI.hpp"
-#include "call/CallDB.hpp"
-#include "call/CallMulticast.hpp"
-#include "PhoneModes/PhoneMode.hpp"
+#include "api/CallAudio.hpp"
+#include "api/CallGUI.hpp"
+#include "api/CallDB.hpp"
+#include "api/CallTimer.hpp"
+#include "api/CallMulticast.hpp"
+#include "api/ModemCallApi.hpp"
 #include <service-cellular/CellularMessage.hpp>
 #include <Interface/CalllogRecord.hpp>
 #include <SystemManager/CpuSentinel.hpp>
@@ -23,120 +24,57 @@
 #include <iosfwd>
 #include <string>
 #include <sys/types.h>
+#include "CallEvents.hpp"
 
 class ServiceCellular;
 
-namespace CellularCall
+namespace call
 {
-    enum class Forced : bool
+    struct StateMachine;
+
+    struct CallData
     {
-        False,
-        True
+        CalllogRecord record             = {};
+        sys::phone_modes::PhoneMode mode = sys::phone_modes::PhoneMode::Connected;
+    };
+
+    struct Dependencies
+    {
+        std::shared_ptr<call::api::Audio> audio;
+        std::shared_ptr<call::api::Multicast> multicast;
+        std::shared_ptr<call::api::GUI> gui;
+        std::shared_ptr<call::api::DB> db;
+        std::shared_ptr<call::api::Timer> timer;
+        std::shared_ptr<call::api::Api> modem;
+        std::shared_ptr<sys::CpuSentinel> sentinel;
     };
 
     class Call
     {
-        CalllogRecord call;
-        bool isActiveCall      = false;
-        bool wasRinging        = false;
-        bool isNumberDisplayed = false;
-        std::function<CalllogRecord(const CalllogRecord &rec)> startCallAction;
-        std::function<bool(const CalllogRecord &rec)> endCallAction;
-        utils::time::Timestamp startActiveTime;
-        time_t callDurationTime = 0;
-
-        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
-
-        void setType(const CallType type)
-        {
-            call.type = type;
-        }
-
-        void markUnread()
-        {
-            call.isRead = false;
-        }
-
-        void clear()
-        {
-            call              = CalllogRecord();
-            isActiveCall      = false;
-            wasRinging        = false;
-            isNumberDisplayed = false;
-            startActiveTime.set_time(0);
-            callDurationTime = 0;
-        }
-
-        bool startCall(const utils::PhoneNumber::View &number, const CallType type);
-
-        ServiceCellular &owner;
-        CallRingAudio audio;
-        CallMulticast multicast;
-        CallGUI gui;
-        CallDB db;
+      private:
+        std::unique_ptr<StateMachine> machine;
 
       public:
-        void setMode(sys::phone_modes::PhoneMode mode)
-        {
-            this->mode = mode;
-        }
+        Call();
+        Call(ServiceCellular *owner,
+             CellularMux *cmux,
+             sys::TimerHandle timer,
+             std::shared_ptr<sys::CpuSentinel> sentinel);
+        ~Call();
+        Call &operator=(Call &&other) noexcept;
 
-        mutable sys::phone_modes::PhoneMode mode;
-        explicit Call(ServiceCellular &owner);
+        bool handle(const call::event::Answer &);
+        bool handle(const call::event::RING &);
+        bool handle(const call::event::StartCall &call);
+        bool handle(const call::event::CLIP &);
+        bool handle(const call::event::AudioRequest &);
+        bool handle(const call::event::ModeChange &);
+        bool handle(const call::event::OngoingTimer &);
+        bool handle(const call::event::Ended &);
+        bool handle(const call::event::Reject &);
 
-        void setStartCallAction(const std::function<CalllogRecord(const CalllogRecord &rec)> callAction)
-        {
-            startCallAction = callAction;
-        }
-
-        void ongoingCallShowUI();
-        void setEndCallAction(const std::function<bool(const CalllogRecord &rec)> callAction)
-        {
-            endCallAction = callAction;
-        }
-
-        bool setActive();
-        void setNumber(const utils::PhoneNumber::View &number);
-        bool ringAudioOnClip();
-
-        bool startOutgoing(const utils::PhoneNumber::View &number);
-        bool handleRING();
-        bool handleCLIP(const utils::PhoneNumber::View &number);
-        bool endCall(Forced forced = Forced::False);
-
-        void handleCallAudioEventRequest(cellular::CallAudioEventRequest::EventType event);
-
-        bool isValid() const
-        {
-            return call.ID != DB_ID_NONE;
-        }
-
-        bool isActive() const
-        {
-            return isActiveCall;
-        }
-
-        [[nodiscard]] CallType getType() const noexcept
-        {
-            return call.type;
-        }
-
-        void setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel);
-
-        void handleCallDurationTimer();
-
-        struct Operations
-        {
-            bool areCallsFromFavouritesEnabled();
-            bool isNumberInFavourites();
-
-          private:
-            friend Call;
-            Call &call;
-            explicit Operations(Call &owner) : call(owner)
-            {}
-        };
-        Operations operations = Operations(*this);
-        friend Operations;
+        /// return if call procesing is in any other state than `Idle`
+        /// if so - we have ongoing call in handling
+        bool active() const;
     };
 } // namespace CellularCall

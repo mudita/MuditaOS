@@ -113,3 +113,6 @@
 	path = third-party/freeRTOS-kernel/freeRTOS-kernel
 	url = ../FreeRTOS-Kernel.git
 	branch = mudita
+[submodule "third-party/fakeit/FakeIt"]
+	path = third-party/fakeit/FakeIt
+	url = https://github.com/eranpeer/FakeIt.git

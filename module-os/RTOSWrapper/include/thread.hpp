@@ -53,7 +53,7 @@
 #ifndef CPP_FREERTOS_NO_CPP_STRINGS
 #include <string>
 #endif
-#include "FreeRTOS.h"
+#include <FreeRTOS.h>
 #include "task.h"
 #include "mutex.hpp"
 #include "semaphore.hpp"

@@ -47,9 +47,9 @@ bool CellularServiceAPI::HangupCall(sys::Service *serv)
     return true;
 }
 
-bool CellularServiceAPI::DismissCall(sys::Service *serv, bool addNotificationToDB)
+bool CellularServiceAPI::DismissCall(sys::Service *serv)
 {
-    auto msg = std::make_shared<CellularDismissCallMessage>(addNotificationToDB);
+    auto msg = std::make_shared<CellularDismissCallMessage>();
     serv->bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceCellularNotifications);
     return true;
 }

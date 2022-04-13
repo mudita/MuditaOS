@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogRecord.hpp"
@@ -28,6 +28,24 @@ CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow)
 CalllogRecord::CalllogRecord(const CallType type, const utils::PhoneNumber::View &number)
     : presentation(PresentationType::PR_UNKNOWN), date(std::time(nullptr)), type(type), phoneNumber(number)
 {}
+
+CalllogRecord::CalllogRecord(const CalllogRecord &rhs) : Record(rhs)
+{
+    operator=(rhs);
+}
+
+CalllogRecord &CalllogRecord::operator=(const CalllogRecord &rhs)
+{
+    ID           = rhs.ID;
+    presentation = rhs.presentation;
+    date         = rhs.date;
+    duration     = rhs.duration;
+    type         = rhs.type;
+    name         = rhs.name;
+    phoneNumber  = rhs.phoneNumber;
+    isRead       = rhs.isRead;
+    return *this;
+}
 
 std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
 {
