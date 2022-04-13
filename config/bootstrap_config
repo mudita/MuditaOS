@@ -1,9 +1,9 @@
 
 # configuration variables used by bootstrap and dockerbuilder
 # ARM_GCC="gcc-arm-none-eabi-9-2020-q2-update"
-ARM_GCC="gcc-arm-none-eabi-10-2020-q4-major"
-ARM_GCC_PKG="${ARM_GCC}-x86_64-linux.tar.bz2"
-ARM_GCC_SOURCE_LINK="https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2?revision=ca0cbf9c-9de2-491c-ac48-898b5bbc0443&la=en&hash=68760A8AE66026BCF99F05AC017A6A50C6FD832A"
+ARM_GCC="gcc-arm-11.2-2022.02-x86_64-arm-none-eabi"
+ARM_GCC_PKG="${ARM_GCC}.tar.xz"
+ARM_GCC_SOURCE_LINK="https://developer.arm.com/-/media/Files/downloads/gnu/11.2-2022.02/binrel/gcc-arm-11.2-2022.02-x86_64-arm-none-eabi.tar.xz"
 ARM_GCC_PATH_VAR="${ARM_GCC//-/_}"
 ARM_GCC_MD5="8312c4c91799885f222f663fc81f9a31"
 
@@ -22,12 +22,12 @@ INSTALL_PACKAGES="
         build-essential \
         ca-certificates \
         ccache \
-        clang-format-12 \
-        clang-tidy-12 \
+        clang-format-14 \
+        clang-tidy-14 \
         curl \
         doxygen \
-        g++-10 \
-        gcc-10 \
+        g++-11 \
+        gcc-11 \
         gdb \
         git \
         gnupg2 \

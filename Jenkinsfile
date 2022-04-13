@@ -13,7 +13,7 @@ pipeline {
     }
     environment {
         JOBS=30
-        PATH="/usr/local/cmake-3.21.3-linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
+        PATH="/usr/local/cmake-3.21.3-linux-x86_64/bin:/usr/local/gcc-arm-11.2-2022.02-x86_64-arm-none-eabi/bin:$PATH"
         REPO_WORKSPACE="/home/jenkins/workspace/MuditaOS"
 
     }
