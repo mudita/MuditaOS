@@ -34,7 +34,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
         LOG_ERROR("Cannot find contact, for number %s", rec.number.getEntered().c_str());
         return false;
     }
-    auto numberID  = contactMatch->numberId;
+    auto numberID = contactMatch->numberId;
 
     ThreadRecordInterface threadInterface(smsDB, contactsDB);
     auto threadRec =
@@ -44,7 +44,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     if (threadRec->size() == 0) {
 
         ThreadRecord re;
-        re.numberID  = numberID;
+        re.numberID = numberID;
         if (!threadInterface.Add(re)) {
             LOG_ERROR("Cannot create new thread");
             return false;
@@ -407,37 +407,31 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::addQuery(const std::shared_
 {
     const auto localQuery = static_cast<const db::query::SMSAdd *>(query.get());
     auto record           = localQuery->record;
-    const auto ret        = Add(record);
-    if (ret) {
+    const auto result     = Add(record);
+    if (result) {
         record.ID = GetLastID();
     }
-    auto response = std::make_unique<db::query::SMSAddResult>(record, ret);
+    auto response = std::make_unique<db::query::SMSAddResult>(record, result);
     response->setRequestQuery(query);
-    if (ret) {
-        response->setRecordID(record.ID);
-    }
+    response->setRecordID(record.ID);
     return response;
 }
 std::unique_ptr<db::QueryResult> SMSRecordInterface::removeQuery(const std::shared_ptr<db::Query> &query)
 {
     const auto localQuery = static_cast<const db::query::SMSRemove *>(query.get());
-    auto ret              = RemoveByID(localQuery->id);
-    auto response         = std::make_unique<db::query::SMSRemoveResult>(ret);
+    auto result           = RemoveByID(localQuery->id);
+    auto response         = std::make_unique<db::query::SMSRemoveResult>(result);
     response->setRequestQuery(query);
-    if (ret) {
-        response->setRecordID(localQuery->id);
-    }
+    response->setRecordID(localQuery->id);
     return response;
 }
 std::unique_ptr<db::QueryResult> SMSRecordInterface::updateQuery(const std::shared_ptr<db::Query> &query)
 {
     const auto localQuery = static_cast<const db::query::SMSUpdate *>(query.get());
-    auto ret              = Update(localQuery->record);
-    auto response         = std::make_unique<db::query::SMSUpdateResult>(ret);
+    auto result           = Update(localQuery->record);
+    auto response         = std::make_unique<db::query::SMSUpdateResult>(result);
     response->setRequestQuery(query);
-    if (ret) {
-        response->setRecordID(localQuery->record.ID);
-    }
+    response->setRecordID(localQuery->record.ID);
     return response;
 }
 
@@ -500,8 +494,8 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::getForListQuery(const std::
         smsVector.begin(), smsVector.end(), std::back_inserter(recordVector), [number](const auto &recordRow) {
             return SMSRecord{recordRow, number};
         });
-    auto count        = smsDB->sms.countWithoutDraftsByThreadId(localQuery->threadId);
-    auto draft        = smsDB->sms.getDraftByThreadId(localQuery->threadId);
+    auto count = smsDB->sms.countWithoutDraftsByThreadId(localQuery->threadId);
+    auto draft = smsDB->sms.getDraftByThreadId(localQuery->threadId);
 
     auto response = std::make_unique<db::query::SMSGetForListResult>(recordVector, count, draft, number);
     response->setRequestQuery(query);
