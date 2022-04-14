@@ -20,7 +20,7 @@ namespace sdesktop::endpoints
 
     std::unique_ptr<Endpoint> EndpointFactoryBell::create(Context &context, sys::Service *ownerServicePtr)
     {
-        LOG_DEBUG("Creating endpoint: %d", static_cast<int>(context.getEndpoint()));
+        LOG_DEBUG("Creating endpoint: %s", magic_enum::enum_name(context.getEndpoint()).data());
         switch (context.getEndpoint()) {
         case EndpointType::update:
             return std::make_unique<UpdateEndpoint>(ownerServicePtr);
