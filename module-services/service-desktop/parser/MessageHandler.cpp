@@ -32,9 +32,9 @@ namespace sdesktop::endpoints
     {
         auto context = ContextFactory::create(messageJson);
 
-        LOG_DEBUG("[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %d\n",
-                  static_cast<int>(context->getMethod()),
-                  static_cast<int>(context->getEndpoint()),
+        LOG_DEBUG("[MsgHandler]\nmethod: %s\nendpoint: %s\nuuid: %d\n",
+                  magic_enum::enum_name(context->getMethod()).data(),
+                  magic_enum::enum_name(context->getEndpoint()).data(),
                   context->getUuid());
 
         auto handler = endpointFactory->create(*context, OwnerServicePtr);

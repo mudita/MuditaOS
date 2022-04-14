@@ -28,6 +28,7 @@ namespace bsp
         Connected,
         Configured,
         DataReceived,
+        Reset
     };
 
     struct usbInitParams

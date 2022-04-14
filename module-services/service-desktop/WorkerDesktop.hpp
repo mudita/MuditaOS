@@ -41,6 +41,7 @@ class WorkerDesktop : public sys::Worker
     }
 
   private:
+    void reset();
     void suspendUsb();
 
     bool stateChangeWait();
