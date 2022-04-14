@@ -97,6 +97,20 @@ bool WorkerDesktop::reinit(const std::filesystem::path &path)
     return true;
 }
 
+void WorkerDesktop::reset()
+{
+    usbStatus = bsp::USBDeviceStatus::Disconnected;
+    bsp::usbDeinit();
+
+    bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber.c_str()};
+    initialized                   = bsp::usbInit(initParams) >= 0;
+    if (initialized) {
+        ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
+                                        sys::BusChannel::USBNotifications);
+        usbStatus = bsp::USBDeviceStatus::Connected;
+    }
+}
+
 bool WorkerDesktop::handleMessage(uint32_t queueID)
 {
     auto &queue       = queues[queueID];
@@ -150,7 +164,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             return false;
         }
 
-        LOG_DEBUG("USB status: %d", static_cast<int>(notification));
+        LOG_DEBUG("USB status: %s", magic_enum::enum_name(notification).data());
 
         if (notification == bsp::USBDeviceStatus::Connected) {
             ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
@@ -177,6 +191,11 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         }
         else if (notification == bsp::USBDeviceStatus::DataReceived) {
             bsp::usbHandleDataReceived();
+        }
+        else if (notification == bsp::USBDeviceStatus::Reset) {
+            if (usbStatus == bsp::USBDeviceStatus::Configured) {
+                reset();
+            }
         }
     }
     else {
