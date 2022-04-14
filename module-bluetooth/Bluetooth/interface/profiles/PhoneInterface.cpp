@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneInterface.hpp"
@@ -9,17 +9,12 @@ namespace bluetooth
 {
     bool CellularInterfaceImpl::answerIncomingCall(sys::Service *service)
     {
-        callActive = true;
         return CellularServiceAPI::AnswerIncomingCall(service);
     }
 
     bool CellularInterfaceImpl::hangupCall(sys::Service *service)
     {
-        if (callActive) {
-            callActive = false;
-            return CellularServiceAPI::HangupCall(service);
-        }
-        return true;
+        return CellularServiceAPI::HangupCall(service);
     }
 
     bool AudioInterfaceImpl::startAudioRouting(sys::Service *service)
