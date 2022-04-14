@@ -28,7 +28,7 @@ namespace bluetooth
         void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
-        [[nodiscard]] auto callAnswered() const noexcept -> Error::Code;
+        [[nodiscard]] auto setupCall() const noexcept -> Error::Code;
         [[nodiscard]] auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code;
         [[nodiscard]] auto setSignalStrength(int bars) const noexcept -> Error::Code;
         [[nodiscard]] auto setOperatorName(const std::string_view &name) const noexcept -> Error::Code;
@@ -38,7 +38,6 @@ namespace bluetooth
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
         static void processHCIEvent(uint8_t *event);
         static void processHFPEvent(uint8_t *event);
-        static void establishAudioConnection();
         static void initCodecs();
         static void dump_supported_codecs(void);
         static std::array<uint8_t, serviceBufferLength> serviceBuffer;
@@ -61,8 +60,8 @@ namespace bluetooth
         [[maybe_unused]] static hfp_generic_status_indicator_t hf_indicators[2];
         static std::shared_ptr<CVSDAudioDevice> audioDevice;
         static Devicei device;
-        static bool isAudioRouted;
         static bool isConnected;
-        static bool isAudioConnectionEstablished;
+        static bool isIncomingCall;
+        static bool isCallInitialized;
     };
 } // namespace bluetooth
