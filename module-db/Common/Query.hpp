@@ -4,6 +4,7 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <endpoints/Context.hpp>
 
 namespace db
