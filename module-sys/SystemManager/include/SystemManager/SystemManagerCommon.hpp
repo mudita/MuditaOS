@@ -173,11 +173,10 @@ namespace sys
 
         void CloseServices();
 
-        void preCloseRoutine(CloseReason closeReason);
-
+        void InitiateSystemCloseSequence(CloseReason closeReason);
         void postStartRoutine();
 
-        void readyToCloseHandler(Message *msg);
+        void ServiceReadyToCloseHandler(Message *msg);
 
         void RestoreSystemHandler();
 
@@ -198,13 +197,13 @@ namespace sys
         UpdateReason updateReason{UpdateReason::Update};
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         sys::TimerHandle freqTimer;
-        sys::TimerHandle servicesPreShutdownRoutineTimeout;
+        sys::TimerHandle serviceCloseTimer;
         sys::TimerHandle lowBatteryShutdownDelay;
         sys::TimerHandle powerManagerEfficiencyTimer;
         InitFunction userInit;
         InitFunction systemInit;
         DeinitFunction systemDeinit;
-        std::vector<std::string> readyForCloseRegister;
+        std::vector<std::string> servicesToClose;
 
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 

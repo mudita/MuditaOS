@@ -591,6 +591,7 @@ namespace app::manager
             ApplicationManagerCommon::handleStart(msg);
             break;
         case StartupType::LowBattery:
+        case StartupType::CriticalBattery:
             handleSwitchApplication(std::make_unique<SwitchRequest>(
                                         service::name::appmgr, app::name_desktop, window::name::dead_battery, nullptr)
                                         .get());

@@ -16,6 +16,7 @@ namespace app::manager
                            const ApplicationName &_rootApplicationName);
 
       protected:
+        void handleStart(StartAllowedMessage *msg) override;
         auto handleAction(ActionEntry &action) -> ActionProcessStatus override;
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool override;
 

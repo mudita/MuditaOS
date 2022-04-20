@@ -50,6 +50,12 @@ namespace app
             return actionHandled();
         });
 
+        addActionReceiver(manager::actions::ChangeHomescreenLayout, [this](auto &&data) {
+            auto msgLayout = dynamic_cast<gui::ChangeHomescreenLayoutParams *>(data.get());
+            setHomeScreenLayout(msgLayout->getNewHomescreenLayoutName());
+            return actionHandled();
+        });
+
         addActionReceiver(app::manager::actions::DisplayLogoAtExit, [this](auto &&data) {
             requestShutdownWindow(gui::BellWelcomeWindow::defaultName);
             return actionHandled();
@@ -57,22 +63,6 @@ namespace app
 
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
             requestShutdownWindow(gui::window::name::bell_battery_shutdown);
-            return actionHandled();
-        });
-
-        addActionReceiver(manager::actions::ChangeHomescreenLayout, [this](auto &&data) {
-            auto msgLayout = dynamic_cast<gui::ChangeHomescreenLayoutParams *>(data.get());
-            setHomeScreenLayout(msgLayout->getNewHomescreenLayoutName());
-            return actionHandled();
-        });
-
-        addActionReceiver(app::manager::actions::DisplayLowBatteryScreen, [this](auto &&data) {
-            /**
-             * Due to the way of handling shutdown sequence by GUI renderer and applications it is required to leave
-             * this handler defined but not implemented even if it's not used at all.
-             * Without it, the renderer won't render the last frame properly.
-             * This issue will be addressed in future PRs.
-             */
             return actionHandled();
         });
     }
@@ -147,11 +137,6 @@ namespace app
             return sys::msgHandled();
         }
         return handleAsyncResponse(resp);
-    }
-
-    auto ApplicationBellMain::isHomeScreenFocused() -> bool
-    {
-        return GetName() == app::applicationBellName && getCurrentWindow()->getName() == gui::name::window::main_window;
     }
 
     // Empty: do not start idleTimer on application run

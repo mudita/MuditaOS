@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <gui/Common.hpp>
-
 #include <EinkIncludes.hpp>
+#include <gui/Common.hpp>
 #include "Common.hpp"
 
 #include <cstdint>

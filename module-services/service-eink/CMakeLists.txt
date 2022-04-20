@@ -14,9 +14,11 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 add_board_subdirectory(board)
 
 target_link_libraries( ${PROJECT_NAME}
-    module-utils
-    service-gui
-    Microsoft.GSL::GSL
+        module-utils
+        module-bsp
+        Microsoft.GSL::GSL
+        messagetype
+        module-sys
 )
 
 target_include_directories(${PROJECT_NAME}

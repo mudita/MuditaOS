@@ -9,6 +9,7 @@ namespace app::manager
     {
         Regular,
         LowBattery,
-        LowBatteryCharging
+        LowBatteryCharging,
+        CriticalBattery
     };
 } // namespace app::manager

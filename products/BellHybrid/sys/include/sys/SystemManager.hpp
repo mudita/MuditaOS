@@ -19,8 +19,6 @@ namespace sys
 
         auto handleAlarmActivationStatusChangeRequest(AlarmActivationStatusChangeRequest *request) -> MessagePointer;
 
-        void batteryShutdownLevelAction() override;
-
         void handleShutdown() override;
     };
 } // namespace sys

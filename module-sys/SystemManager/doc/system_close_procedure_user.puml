@@ -13,7 +13,7 @@ participant "service EINK" as eink
 User -> poff : confirm close
 poff -> app : GUI off switch
 app -> sysmgr : UserPowerDownRequest
-sysmgr -> srv : preCloseRoutine
+sysmgr -> srv : InitiateSystemCloseSequence
 
 srv -> appmgr : processCloseReason
 appmgr -> appmgr : switchWindowAtClose(logo)

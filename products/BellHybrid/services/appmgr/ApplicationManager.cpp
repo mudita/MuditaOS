@@ -3,13 +3,12 @@
 
 #include <appmgr/ApplicationManager.hpp>
 #include <appmgr/messages/AlarmMessage.hpp>
-#include <appmgr/messages/BatteryShutdown.hpp>
 #include <appmgr/messages/IdleTimerMessage.hpp>
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
 #include <service-appmgr/Constants.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
+#include <common/windows/BellWelcomeWindow.hpp>
 
 namespace app::manager
 {
@@ -46,6 +45,21 @@ namespace app::manager
         }
     }
 
+    void ApplicationManager::handleStart(StartAllowedMessage *msg)
+    {
+        switch (msg->getStartupType()) {
+        case StartupType::CriticalBattery:
+            handleSwitchApplication(
+                std::make_unique<SwitchRequest>(
+                    service::name::appmgr, resolveHomeApplication(), gui::window::name::bell_battery_shutdown, nullptr)
+                    .get());
+
+            break;
+        default:
+            ApplicationManagerCommon::handleStart(msg);
+        }
+    }
+
     auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
     {
         return ApplicationManagerCommon::handleDisplayLanguageChange(msg);
@@ -70,7 +84,6 @@ namespace app::manager
         });
         connect(typeid(AlarmActivated), convertibleToActionHandler);
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
-        connect(typeid(BatteryShutdown), convertibleToActionHandler);
         connect(typeid(BedtimeNotification), convertibleToActionHandler);
         connect(typeid(ChangeHomescreenLayoutMessage), convertibleToActionHandler);
     }
