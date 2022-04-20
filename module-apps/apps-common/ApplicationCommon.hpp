@@ -206,7 +206,6 @@ namespace app
         bool handleUpdateTextRefresh(gui::SwitchData *data);
         sys::MessagePointer handleAppRebuild(sys::Message *msgl);
         sys::MessagePointer handleAppRefresh(sys::Message *msgl);
-        sys::MessagePointer handleAppShutdownRefresh(sys::Message *msgl);
         sys::MessagePointer handleGetDOM(sys::Message *msgl);
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;

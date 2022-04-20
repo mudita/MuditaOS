@@ -5,8 +5,6 @@
 #include "WorkerGUI.hpp"
 
 #include "messages/DrawMessage.hpp"
-
-#include "messages/EinkInitialized.hpp"
 #include "messages/ChangeColorScheme.hpp"
 
 #include <DrawCommand.hpp>
@@ -43,10 +41,9 @@ namespace service::gui
         }
     } // namespace
 
-    ServiceGUI::ServiceGUI(const std::string &name, std::string parent)
-        : sys::Service(name, parent, ServiceGuiStackDepth), commandsQueue{std::make_unique<DrawCommandsQueue>(
-                                                                CommandsQueueCapacity)},
-          currentState{State::NotInitialised}, lastRenderScheduled{false}, waitingForLastRender{false}
+    ServiceGUI::ServiceGUI(::gui::Size displaySize, const std::string &name, std::string parent)
+        : sys::Service(name, parent, ServiceGuiStackDepth), displaySize{displaySize},
+          commandsQueue{std::make_unique<DrawCommandsQueue>(CommandsQueueCapacity)}
     {
         initAssetManagers();
         registerMessageHandlers();
@@ -63,9 +60,6 @@ namespace service::gui
 
     void ServiceGUI::registerMessageHandlers()
     {
-        connect(typeid(EinkInitialized),
-                [this](sys::Message *request) -> sys::MessagePointer { return handleEinkInitialized(request); });
-
         connect(typeid(DrawMessage),
                 [this](sys::Message *request) -> sys::MessagePointer { return handleDrawMessage(request); });
 
@@ -87,6 +81,8 @@ namespace service::gui
 
     sys::ReturnCodes ServiceGUI::InitHandler()
     {
+        contextPool = std::make_unique<ContextPool>(displaySize, ContextsCount);
+
         std::list<sys::WorkerQueueInfo> queueInfo{
             {WorkerGUI::SignallingQueueName, WorkerGUI::SignalSize, WorkerGUI::SignallingQueueCapacity}};
         worker = std::make_unique<WorkerGUI>(this);
@@ -103,7 +99,13 @@ namespace service::gui
 
     void ServiceGUI::ProcessCloseReason(sys::CloseReason closeReason)
     {
-        waitingForLastRender = true;
+        if (not isDisplaying and not isRendering) {
+            sendCloseReadyMessage(this);
+            return;
+        }
+        else {
+            isClosing = true;
+        }
     }
 
     void ServiceGUI::ProcessCloseReasonHandler(sys::CloseReason closeReason)
@@ -114,37 +116,12 @@ namespace service::gui
     sys::ReturnCodes ServiceGUI::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
         LOG_INFO("PowerModeHandler: %s", c_str(mode));
-        switch (mode) {
-        case sys::ServicePowerMode::Active:
-            setState(contextPool != nullptr ? State::Idle : State::NotInitialised);
-            break;
-        case sys::ServicePowerMode::SuspendToRAM:
-            [[fallthrough]];
-        case sys::ServicePowerMode::SuspendToNVM:
-            setState(State::Suspended);
-            break;
-        }
         return sys::ReturnCodes::Success;
     }
 
     sys::MessagePointer ServiceGUI::handleDrawMessage(sys::Message *message)
     {
-        if (isInState(State::NotInitialised)) {
-            LOG_WARN("Service not yet initialised - ignoring draw commands");
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-        }
-        if (isInState(State::Suspended) || lastRenderScheduled) {
-            LOG_WARN("Ignoring draw commands");
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-        }
-
         if (const auto drawMsg = static_cast<DrawMessage *>(message); !drawMsg->commands.empty()) {
-            if (drawMsg->isType(DrawMessage::Type::SUSPEND)) {
-                setState(State::Suspended);
-            }
-            else if (drawMsg->isType(DrawMessage::Type::SHUTDOWN)) {
-                lastRenderScheduled = true;
-            }
             if (!isAnyFrameBeingRenderedOrDisplayed()) {
                 prepareDisplayEarly(drawMsg->mode);
             }
@@ -169,6 +146,7 @@ namespace service::gui
     void ServiceGUI::notifyRenderer(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands,
                                     ::gui::RefreshModes refreshMode)
     {
+        isRendering = true;
         enqueueDrawCommands(DrawCommandsQueue::QueueItem{std::move(commands), refreshMode});
         worker->notify(WorkerGUI::Signal::Render);
     }
@@ -195,10 +173,12 @@ namespace service::gui
 
     sys::MessagePointer ServiceGUI::handleGUIRenderingFinished(sys::Message *message)
     {
+        isRendering          = false;
         auto finishedMsg     = static_cast<service::gui::RenderingFinished *>(message);
         const auto contextId = finishedMsg->getContextId();
         auto refreshMode     = finishedMsg->getRefreshMode();
-        if (isInState(State::Idle)) {
+
+        if (not isDisplaying) {
             if (cache.isRenderCached()) {
                 refreshMode = getMaxRefreshMode(cache.getCachedRender()->refreshMode, refreshMode);
                 cache.invalidate();
@@ -215,14 +195,9 @@ namespace service::gui
 
     void ServiceGUI::sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode)
     {
-        setState(State::Busy);
+        isDisplaying = true;
         std::shared_ptr<service::eink::ImageMessage> imageMsg;
-        if (waitingForLastRender) {
-            imageMsg = std::make_shared<service::eink::ShutdownImageMessage>(contextId, context, refreshMode);
-        }
-        else {
-            imageMsg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
-        }
+        imageMsg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
         bus.sendUnicast(imageMsg, service::name::eink);
         scheduleContextRelease(contextId);
     }
@@ -240,32 +215,24 @@ namespace service::gui
         contextReleaseTimer.start();
     }
 
-    sys::MessagePointer ServiceGUI::handleEinkInitialized(sys::Message *message)
-    {
-        const auto msg = static_cast<service::gui::EinkInitialized *>(message);
-        contextPool    = std::make_unique<ContextPool>(msg->getDisplaySize(), ContextsCount);
-        setState(State::Idle);
-        return sys::MessageNone{};
-    }
-
     sys::MessagePointer ServiceGUI::handleImageDisplayedNotification(sys::Message *message)
     {
+        isDisplaying         = false;
         const auto msg       = static_cast<eink::ImageDisplayedNotification *>(message);
         const auto contextId = msg->getContextId();
         contextPool->returnContext(contextId);
         contextReleaseTimer.stop();
-        setState(State::Idle);
 
-        // Even if the next render is already cached, if any context in the pool is currently being processed, then
-        // we better wait for it.
-        if (isNextFrameReady() and not isAnyFrameBeingRenderedOrDisplayed()) {
-            trySendNextFrame();
-        }
-        else if (lastRenderScheduled && waitingForLastRender) {
-            isReady = false;
+        if (isClosing) {
             sendCloseReadyMessage(this);
         }
-
+        else {
+            // Even if the next render is already cached, if any context in the pool is currently being processed, then
+            // we better wait for it.
+            if (isNextFrameReady() and not isAnyFrameBeingRenderedOrDisplayed()) {
+                trySendNextFrame();
+            }
+        }
         return sys::MessageNone{};
     }
 
@@ -286,15 +253,5 @@ namespace service::gui
             sendOnDisplay(context, contextId, cache.getCachedRender()->refreshMode);
         }
         cache.invalidate();
-    }
-
-    void ServiceGUI::setState(State state) noexcept
-    {
-        currentState = state;
-    }
-
-    bool ServiceGUI::isInState(State state) const noexcept
-    {
-        return currentState == state;
     }
 } // namespace service::gui

@@ -3,7 +3,7 @@
 
 module_is_test_entity()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(${PROJECT_NAME} INTERFACE)
 
 option(ENABLE_SERVICE_TEST "Enable service test" OFF) 
 
@@ -30,8 +30,8 @@ add_module_options( OPTION_PREFIX "SERVICE"
 
 set(ENABLED_SERVICES_DEFINES ${ENABLED_SERVICES_DEFINES} PARENT_SCOPE)
 
-target_link_libraries(${PROJECT_NAME} 
-    PUBLIC
+target_link_libraries(${PROJECT_NAME}
+    INTERFACE
         service-gui
         service-eink
         service-appmgr
@@ -45,25 +45,24 @@ target_link_libraries(${PROJECT_NAME}
         module-audio
         service-antenna
         ${TARGET_LIBRARIES}
-    PRIVATE
         utils-time
 )
 
 # Board specific compilation definitions,options,include directories and features
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${LWIP_INCLUDE_DIRS})
+target_compile_definitions(${PROJECT_NAME} INTERFACE ${PROJECT_CONFIG_DEFINITIONS})
+target_compile_definitions(${PROJECT_NAME} INTERFACE ${PROJECT_TARGET})
+target_include_directories(${PROJECT_NAME} INTERFACE ${PROJECT_INCLUDES})
+target_include_directories(${PROJECT_NAME} INTERFACE ${LWIP_INCLUDE_DIRS})
 
 target_include_directories(${PROJECT_NAME}
-        PUBLIC
+        INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/../source
         ${CMAKE_SOURCE_DIR}/module-bluetooth
 )
 
 target_compile_options(${PROJECT_NAME}
-        PUBLIC
+        INTERFACE
         -Wall
         $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
         $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>

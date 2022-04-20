@@ -7,12 +7,12 @@
 #include <functional>
 #include <optional>
 
-#include <Audio/AudioCommon.hpp>
-#include <Audio/AudioDeviceFactory.hpp>
-#include <Audio/AudioPlatform.hpp>
-#include <Audio/ServiceObserver.hpp>
-#include <Audio/encoder/Encoder.hpp>
-#include <Audio/Profiles/Profile.hpp>
+#include "Audio/AudioCommon.hpp"
+#include "Audio/AudioDeviceFactory.hpp"
+#include "Audio/AudioPlatform.hpp"
+#include "Audio/ServiceObserver.hpp"
+#include "Audio/encoder/Encoder.hpp"
+#include "Audio/Profiles/Profile.hpp"
 
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 

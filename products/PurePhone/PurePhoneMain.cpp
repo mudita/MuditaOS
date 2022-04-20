@@ -195,7 +195,8 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
 #endif
 #ifdef ENABLE_SERVICE_GUI
-    systemServices.emplace_back(sys::CreatorFor<service::gui::ServiceGUI>());
+    systemServices.emplace_back(
+        sys::CreatorFor<service::gui::ServiceGUI>(gui::Size{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}));
 #endif
 #if ENABLE_SERVICE_TEST
     systemServices.emplace_back(sys::CreatorFor<service::test::ServiceTest>());

@@ -24,8 +24,7 @@ namespace service::gui
         enum class Type
         {
             NORMAL,
-            SUSPEND,
-            SHUTDOWN
+            SUSPEND
         } type = Type::NORMAL;
 
       public:

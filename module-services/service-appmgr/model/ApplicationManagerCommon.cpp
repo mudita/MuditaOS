@@ -35,6 +35,23 @@ namespace app::manager
     namespace
     {
         constexpr auto ApplicationManagerStackDepth = 3072;
+
+        bool checkIfCloseableAction(const actions::Action action)
+        {
+            return action == app::manager::actions::DisplayLogoAtExit or
+                   action == app::manager::actions::SystemBrownout;
+        }
+
+        ActionRequest getCloseableAction(const app::ApplicationName &senderName, const sys::CloseReason closeReason)
+        {
+            switch (closeReason) {
+            case sys::CloseReason::SystemBrownout:
+            case sys::CloseReason::LowBattery:
+                return ActionRequest{senderName, app::manager::actions::SystemBrownout, nullptr};
+            default:
+                return ActionRequest{senderName, app::manager::actions::DisplayLogoAtExit, nullptr};
+            }
+        }
     } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
@@ -148,26 +165,14 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManagerCommon::DeinitHandler()
     {
-        settings->deinit();
         closeApplications();
+        settings->deinit();
         return sys::ReturnCodes::Success;
     }
 
     auto ApplicationManagerCommon::ProcessCloseReason(sys::CloseReason closeReason) -> void
     {
-        ActionRequest act = ActionRequest{this->GetName(), app::manager::actions::DisplayLogoAtExit, nullptr};
-        switch (closeReason) {
-        case sys::CloseReason::SystemBrownout:
-        case sys::CloseReason::LowBattery:
-            act = ActionRequest{this->GetName(), app::manager::actions::SystemBrownout, nullptr};
-            break;
-        case sys::CloseReason::RegularPowerDown:
-        case sys::CloseReason::Reboot:
-        case sys::CloseReason::RebootToUpdate:
-        case sys::CloseReason::RebootToUsbMscMode:
-        case sys::CloseReason::FactoryReset:
-            break;
-        }
+        auto act = getCloseableAction(this->GetName(), closeReason);
         handleActionRequest(&act);
     }
 
@@ -260,7 +265,7 @@ namespace app::manager
             return sys::msgHandled();
         });
         connect(typeid(ActionHandledResponse), [this](sys::Message *response) {
-            if (actionsRegistry.getPendingAction()->actionId == app::manager::actions::DisplayLogoAtExit) {
+            if (checkIfCloseableAction(actionsRegistry.getPendingAction()->actionId)) {
                 isReady = false;
                 sendCloseReadyMessage(this);
             }
@@ -846,5 +851,5 @@ namespace app::manager
     auto ApplicationManagerCommon::handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer
     {
         return sys::msgNotHandled();
-    };
+    }
 } // namespace app::manager

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <Audio/Endpoint.hpp>
+#include "Endpoint.hpp"
 
 #include <optional>
 #include <memory>

@@ -40,8 +40,27 @@ namespace sys
 {
     namespace
     {
-        constexpr std::chrono::milliseconds preShutdownRoutineTimeout{1500};
+        constexpr std::chrono::milliseconds serviceCloseResponseTimeout{1500};
         constexpr std::chrono::milliseconds lowBatteryShutdownDelayTime{5000};
+
+        app::manager::StartupType toStartupType(Store::Battery::LevelState state)
+        {
+            using bState = Store::Battery::LevelState;
+            using sState = app::manager::StartupType;
+
+            switch (state) {
+            case bState::Normal:
+                return sState::Regular;
+            case bState::Shutdown:
+                return sState::CriticalBattery;
+            case bState::CriticalNotCharging:
+                return sState::LowBattery;
+            case bState::CriticalCharging:
+                return sState::LowBatteryCharging;
+            }
+            return sState::Regular;
+        }
+
     } // namespace
 
     namespace state
@@ -444,20 +463,41 @@ namespace sys
         return "none";
     }
 
-    void SystemManagerCommon::preCloseRoutine(CloseReason closeReason)
+    void SystemManagerCommon::InitiateSystemCloseSequence(CloseReason closeReason)
     {
         for (const auto &service : servicesList) {
-            auto msg = std::make_shared<ServiceCloseReasonMessage>(closeReason);
-            bus.sendUnicast(std::move(msg), service->GetName());
-            readyForCloseRegister.push_back(service->GetName());
+            servicesToClose.push_back(service->GetName());
         }
-
-        // stored to be used later in CloseServices
         this->closeReason = closeReason;
 
-        servicesPreShutdownRoutineTimeout = sys::TimerFactory::createPeriodicTimer(
-            this, "servicesPreShutdownRoutine", preShutdownRoutineTimeout, [this](sys::Timer &) { CloseServices(); });
-        servicesPreShutdownRoutineTimeout.start();
+        serviceCloseTimer = sys::TimerFactory::createSingleShotTimer(
+            this, "serviceCloseTimer", serviceCloseResponseTimeout, [this](sys::Timer &) { CloseServices(); });
+        serviceCloseTimer.start();
+
+        /// Start the sequence by sending close request to the first service on the list
+        bus.sendUnicast(std::make_shared<ServiceCloseReasonMessage>(closeReason), servicesToClose.front());
+    }
+
+    void SystemManagerCommon::ServiceReadyToCloseHandler(Message *msg)
+    {
+        if (!servicesToClose.empty() && serviceCloseTimer.isActive()) {
+            serviceCloseTimer.stop();
+
+            const auto message = static_cast<ReadyToCloseMessage *>(msg);
+            LOG_INFO("ready to close %s", message->sender.c_str());
+            servicesToClose.erase(std::remove(servicesToClose.begin(), servicesToClose.end(), message->sender),
+                                  servicesToClose.end());
+
+            // All services responded
+            if (servicesToClose.empty()) {
+                LOG_INFO("All services ready to close.");
+                CloseServices();
+            }
+            else {
+                bus.sendUnicast(std::make_shared<ServiceCloseReasonMessage>(closeReason), servicesToClose.front());
+                serviceCloseTimer.start();
+            }
+        }
     }
 
     void SystemManagerCommon::postStartRoutine()
@@ -489,30 +529,14 @@ namespace sys
     void SystemManagerCommon::batteryShutdownLevelAction()
     {
         LOG_INFO("Battery level too low - shutting down the system...");
-        CloseSystemHandler(CloseReason::LowBattery);
+        if (!lowBatteryShutdownDelay.isActive()) {
+            lowBatteryShutdownDelay.start();
+        }
     }
 
     void SystemManagerCommon::batteryNormalLevelAction()
     {
         LOG_INFO("Battery level normal.");
-    }
-
-    void SystemManagerCommon::readyToCloseHandler(Message *msg)
-    {
-        if (!readyForCloseRegister.empty() && servicesPreShutdownRoutineTimeout.isActive()) {
-            auto message = static_cast<ReadyToCloseMessage *>(msg);
-            LOG_INFO("ready to close %s", message->sender.c_str());
-            readyForCloseRegister.erase(
-                std::remove(readyForCloseRegister.begin(), readyForCloseRegister.end(), message->sender),
-                readyForCloseRegister.end());
-
-            // All services responded
-            if (readyForCloseRegister.empty()) {
-                LOG_INFO("All services ready to close.");
-                servicesPreShutdownRoutineTimeout.stop();
-                CloseServices();
-            }
-        }
     }
 
     void SystemManagerCommon::kill(std::shared_ptr<Service> const &toKill)
@@ -586,7 +610,7 @@ namespace sys
         });
 
         connect(ReadyToCloseMessage(), [&](Message *msg) {
-            readyToCloseHandler(msg);
+            ServiceReadyToCloseHandler(msg);
             return MessageNone{};
         });
 
@@ -643,27 +667,9 @@ namespace sys
         });
 
         connect(typeid(app::manager::CheckIfStartAllowedMessage), [this](sys::Message *) -> sys::MessagePointer {
-            switch (Store::Battery::get().levelState) {
-            case Store::Battery::LevelState::Normal:
-                bus.sendUnicast(std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::Regular),
-                                service::name::appmgr);
-                break;
-            case Store::Battery::LevelState::Shutdown:
-                if (!lowBatteryShutdownDelay.isActive()) {
-                    lowBatteryShutdownDelay.start();
-                }
-                [[fallthrough]];
-            case Store::Battery::LevelState::CriticalNotCharging:
-                bus.sendUnicast(
-                    std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::LowBattery),
-                    service::name::appmgr);
-                break;
-            case Store::Battery::LevelState::CriticalCharging:
-                bus.sendUnicast(
-                    std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::LowBatteryCharging),
-                    service::name::appmgr);
-                break;
-            }
+            bus.sendUnicast(
+                std::make_unique<app::manager::StartAllowedMessage>(toStartupType(Store::Battery::get().levelState)),
+                service::name::appmgr);
             return sys::MessageNone{};
         });
 
@@ -697,16 +703,16 @@ namespace sys
         std::reverse(servicesList.begin(), servicesList.end());
         CriticalSection::Exit();
 
-        preCloseRoutine(closeReason);
+        InitiateSystemCloseSequence(closeReason);
     }
 
     void SystemManagerCommon::CloseServices()
     {
-        for (const auto &element : readyForCloseRegister) {
+        for (const auto &element : servicesToClose) {
             LOG_INFO("Service: %s did not reported before timeout", element.c_str());
         }
         // All delayed messages will be ignored
-        readyForCloseRegister.clear();
+        servicesToClose.clear();
 
         switch (closeReason) {
         case CloseReason::RegularPowerDown:

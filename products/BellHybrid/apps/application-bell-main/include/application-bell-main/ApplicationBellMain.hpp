@@ -42,7 +42,6 @@ namespace app
         }
 
       private:
-        auto isHomeScreenFocused() -> bool;
         void onStart() override;
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
         void setHomeScreenLayout(std::string layoutName);
@@ -57,7 +56,6 @@ namespace app
             return {{manager::actions::Launch,
                      manager::actions::ShowAlarm,
                      manager::actions::DisplayLogoAtExit,
-                     manager::actions::DisplayLowBatteryScreen,
                      manager::actions::SystemBrownout,
                      manager::actions::ChangeHomescreenLayout}};
         }

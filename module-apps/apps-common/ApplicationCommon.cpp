@@ -127,8 +127,6 @@ namespace app
 
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
-        connect(typeid(AppShutdownRefreshMessage),
-                [this](sys::Message *msg) -> sys::MessagePointer { return handleAppShutdownRefresh(msg); });
         connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) { return handleBatteryStatusChange(); });
         connect(typeid(app::manager::DOMRequest),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleGetDOM(msg); });
@@ -713,33 +711,6 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer ApplicationCommon::handleAppShutdownRefresh(sys::Message *msgl)
-    {
-        auto *msg = static_cast<AppShutdownRefreshMessage *>(msgl);
-        assert(msg);
-
-        if (not windowsFactory.isRegistered(msg->getWindowName())) {
-            LOG_ERROR("Cannot find window %s windowsFactory in application: %s",
-                      msg->getWindowName().c_str(),
-                      GetName().c_str());
-            return sys::msgHandled();
-        }
-
-        pushWindow(msg->getWindowName());
-        auto window = getWindow(msg->getWindowName());
-
-        if (not window) {
-            LOG_ERROR("Cannot find window %s in application %s", msg->getWindowName().c_str(), GetName().c_str());
-            return sys::msgHandled();
-        }
-
-        auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), msg->getMode());
-        message->setCommandType(service::gui::DrawMessage::Type::SHUTDOWN);
-        bus.sendUnicast(std::move(message), service::name::gui);
-
-        return sys::msgHandled();
-    }
-
     sys::MessagePointer ApplicationCommon::handleGetDOM(sys::Message *msgl)
     {
         if (windowsStack().isEmpty()) {
@@ -936,8 +907,25 @@ namespace app
                  GetName().c_str(),
                  windowName.length() ? windowName.c_str() : default_window.c_str());
 #endif
-        auto msg = std::make_shared<AppShutdownRefreshMessage>(windowName);
-        bus.sendUnicast(msg, this->GetName());
+        if (not windowsFactory.isRegistered(windowName)) {
+            LOG_ERROR("Cannot find window %s windowsFactory in application: %s", windowName.c_str(), GetName().c_str());
+            return;
+        }
+
+        pushWindow(windowName);
+        const auto window = getWindow(windowName);
+        if (not window) {
+            LOG_ERROR("Cannot find window %s in application %s", windowName.c_str(), GetName().c_str());
+            return;
+        }
+
+        const auto response = bus.sendUnicastSync(
+            std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), gui::RefreshModes::GUI_REFRESH_DEEP),
+            service::name::gui,
+            100);
+        if (response.first != sys::ReturnCodes::Success) {
+            LOG_FATAL("Failed to send the shutdown window frame");
+        }
     }
 
     bool ApplicationCommon::userInterfaceDBNotification([[maybe_unused]] sys::Message *msg,
