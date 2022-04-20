@@ -69,16 +69,6 @@ namespace bluetooth
         pimpl->disconnect();
     }
 
-    void HSP::start()
-    {
-        pimpl->start();
-    }
-
-    void HSP::stop()
-    {
-        pimpl->stop();
-    }
-
     auto HSP::startRinging() const noexcept -> Error::Code
     {
         pimpl->startRinging();
@@ -336,18 +326,6 @@ namespace bluetooth
     {
         return sco->getStreamData();
     }
-    void HSP::HSPImpl::start()
-    {
-        if (!isConnected) {
-            connect();
-        }
-    }
-    void HSP::HSPImpl::stop()
-    {
-        stopRinging();
-        hsp_ag_release_audio_connection();
-        callAnswered = false;
-    }
 
     void HSP::HSPImpl::startRinging() const noexcept
     {
@@ -393,9 +371,20 @@ namespace bluetooth
     {
         return Error::Success;
     }
+    auto HSP::terminateCall() const noexcept -> Error::Code
+    {
+        return pimpl->terminateCall();
+    }
 
     void HSP::HSPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
         HSP::HSPImpl::audioDevice = std::static_pointer_cast<CVSDAudioDevice>(audioDevice);
+    }
+    auto HSP::HSPImpl::terminateCall() const noexcept -> Error::Code
+    {
+        stopRinging();
+        hsp_ag_release_audio_connection();
+        callAnswered = false;
+        return Error::Success;
     }
 } // namespace bluetooth

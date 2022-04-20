@@ -118,6 +118,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::RequestStatusIndicatorData>();
     connectHandler<CellularCallerIdMessage>();
     connectHandler<CellularCallActiveNotification>();
+    connectHandler<cellular::CallEndedNotification>();
     connectHandler<CellularSignalStrengthUpdateNotification>();
     connectHandler<CellularCurrentOperatorNameNotification>();
     connectHandler<sevm::BatteryStatusChangeMessage>();
@@ -419,9 +420,6 @@ auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Mes
     case BluetoothMessage::Play:
         sendWorkerCommand(bluetooth::Command::Type::StartStream);
         break;
-    case BluetoothMessage::SwitchProfile:
-        sendWorkerCommand(bluetooth::Command::Type::SwitchProfile);
-        break;
     case BluetoothMessage::Disconnect:
         sendWorkerCommand(bluetooth::Command::Type::DisconnectAudio);
         break;
@@ -472,6 +470,7 @@ auto ServiceBluetooth::handle(message::bluetooth::HFPVolume *msg) -> std::shared
 
 auto ServiceBluetooth::handle(message::bluetooth::Ring *msg) -> std::shared_ptr<sys::Message>
 {
+    LOG_DEBUG("Start ringing from audio");
     const auto enableRing = msg->enabled();
     sendWorkerCommand(enableRing ? bluetooth::Command::Type::StartRinging : bluetooth::Command::Type::StopRinging);
 
@@ -568,5 +567,10 @@ auto ServiceBluetooth::handle(sevm::BatteryStatusChangeMessage *msg) -> std::sha
     LOG_INFO("Bluetooth: Battery level %d", batteryLevel);
     auto commandData = std::make_unique<bluetooth::BatteryLevelData>(bluetooth::BatteryLevel(batteryLevel));
     sendWorkerCommand(bluetooth::Command::Type::BatteryLevelData, std::move(commandData));
+    return sys::MessageNone{};
+}
+auto ServiceBluetooth::handle(cellular::CallEndedNotification *msg) -> std::shared_ptr<sys::Message>
+{
+    sendWorkerCommand(bluetooth::Command::Type::CallTerminated);
     return sys::MessageNone{};
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothDriverImpl.hpp"
@@ -83,8 +83,10 @@ namespace bluetooth
         hci_event_callback_registration.callback = &hci_packet_handler;
         hci_add_event_handler(&hci_event_callback_registration);
 
-        gap_ssp_set_io_capability(SSP_IO_CAPABILITY_KEYBOARD_ONLY);
+        gap_ssp_set_io_capability(SSP_IO_CAPABILITY_DISPLAY_YES_NO);
         gap_ssp_set_auto_accept(false);
+
+        gap_set_class_of_device(0x64020C);
         LOG_DEBUG("BT worker run success");
         return Error::Success;
     }

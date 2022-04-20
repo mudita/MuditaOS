@@ -25,11 +25,9 @@ namespace bluetooth
                     ptr->init();
                 }
             }
-            // TODO profile selection based on capabilities and priority?
-            // audio & capa cell & HSP & HFP  & A2DP-> HFP
-            // audio & capa cell & HSP  & A2DP-> HSP
-            // audio & HSP & HFP & A2DP -> A2DP
-            currentProfilePtr = profilesList[AudioProfile::A2DP].get();
+
+            musicProfilePtr = dynamic_cast<MusicProfile *>(profilesList[AudioProfile::A2DP].get());
+            callProfilePtr  = dynamic_cast<CallProfile *>(profilesList[AudioProfile::HFP].get());
 
             if (auto serviceBt = dynamic_cast<ServiceBluetooth *>(ownerService); serviceBt != nullptr) {
                 serviceBt->profileManagerPtr = this;
@@ -60,70 +58,58 @@ namespace bluetooth
         return Error::Success;
     }
 
-    auto ProfileManager::switchProfile(AudioProfile profile) -> Error::Code
-    {
-        if (profilesList[profile] == nullptr) {
-            LOG_ERROR("Invalid profile!");
-            return Error::SystemError;
-        }
-        if (currentProfilePtr == profilesList[profile].get()) {
-            return Error::Success;
-        }
-        stop();
-        currentProfilePtr = profilesList[profile].get();
-        start();
-        return Error::Success;
-    }
-
     auto ProfileManager::start() -> Error::Code
     {
-        currentProfilePtr->start();
+        musicProfilePtr->start();
         return Error::Success;
     }
 
     auto ProfileManager::stop() -> Error::Code
     {
-        currentProfilePtr->stop();
+        musicProfilePtr->stop();
         return Error::Success;
     }
 
     auto ProfileManager::startRinging() -> Error::Code
     {
-        switchProfile(AudioProfile::HFP);
-        return currentProfilePtr->startRinging();
+        return callProfilePtr->startRinging();
     }
 
     auto ProfileManager::stopRinging() -> Error::Code
     {
-        return currentProfilePtr->stopRinging();
+        return callProfilePtr->stopRinging();
     }
 
     auto ProfileManager::initializeCall() -> Error::Code
     {
-        switchProfile(AudioProfile::HFP);
-        return currentProfilePtr->initializeCall();
+        return callProfilePtr->initializeCall();
+    }
+    auto ProfileManager::terminateCall() -> Error::Code
+    {
+        return callProfilePtr->terminateCall();
     }
 
     auto ProfileManager::setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code
     {
         auto profileType = device->getProfileType();
 
-        if (currentProfilePtr == nullptr || profilesList[profileType] == nullptr) {
+        if (profilesList[profileType] == nullptr) {
             return Error::NotReady;
         }
 
         profilesList[profileType]->setAudioDevice(device);
-        return switchProfile(profileType);
+        LOG_ERROR("AudioDevice for profile: %s set!", magic_enum::enum_name(profileType).data());
+        return Error::Success;
     }
     auto ProfileManager::callAnswered() -> Error::Code
     {
-        return currentProfilePtr->callAnswered();
+        return callProfilePtr->callAnswered();
     }
     auto ProfileManager::setIncomingCallNumber(const DataVariant &data) -> Error::Code
     {
         auto number = std::get<utils::PhoneNumber::View>(data);
-        if (currentProfilePtr) {
-            return currentProfilePtr->setIncomingCallNumber(number.getE164());
+        if (callProfilePtr) {
+            return callProfilePtr->setIncomingCallNumber(number.getE164());
         }
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;
@@ -131,8 +117,8 @@ namespace bluetooth
     auto ProfileManager::setSignalStrengthData(const DataVariant &data) -> Error::Code
     {
         auto signalData = std::get<Store::SignalStrength>(data);
-        if (currentProfilePtr) {
-            return currentProfilePtr->setSignalStrength(static_cast<int>(signalData.rssiBar));
+        if (callProfilePtr) {
+            return callProfilePtr->setSignalStrength(static_cast<int>(signalData.rssiBar));
         }
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;
@@ -140,8 +126,8 @@ namespace bluetooth
     auto ProfileManager::setOperatorNameData(const DataVariant &data) -> Error::Code
     {
         auto operatorName = std::get<OperatorName>(data);
-        if (currentProfilePtr) {
-            return currentProfilePtr->setOperatorName(operatorName.getName());
+        if (callProfilePtr) {
+            return callProfilePtr->setOperatorName(operatorName.getName());
         }
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;
@@ -149,8 +135,8 @@ namespace bluetooth
     auto ProfileManager::setBatteryLevelData(const DataVariant &data) -> Error::Code
     {
         auto batteryLevel = std::get<BatteryLevel>(data);
-        if (currentProfilePtr) {
-            return currentProfilePtr->setBatteryLevel(batteryLevel);
+        if (callProfilePtr) {
+            return callProfilePtr->setBatteryLevel(batteryLevel);
         }
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;

@@ -27,10 +27,12 @@ namespace bluetooth
       public:
         virtual ~AudioInterface()                             = default;
         virtual bool startAudioRouting(sys::Service *service) = 0;
+        virtual bool stopAudioRouting(sys::Service *service)  = 0;
     };
     class AudioInterfaceImpl : public AudioInterface
     {
       public:
         bool startAudioRouting(sys::Service *service) override;
+        bool stopAudioRouting(sys::Service *service) override;
     };
 } // namespace bluetooth

@@ -17,11 +17,10 @@ namespace bluetooth
       public:
         static void packetHandler(uint8_t packetType, uint16_t channel, uint8_t *event, uint16_t eventSize);
         auto init() -> Error::Code;
-        void start();
-        void stop();
         void startRinging() const noexcept;
         void stopRinging() const noexcept;
         void initializeCall() const noexcept;
+        void terminateCall() const noexcept;
         void connect();
         void disconnect();
         void setDevice(Devicei device);

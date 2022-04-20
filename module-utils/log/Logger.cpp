@@ -40,7 +40,6 @@ namespace Log
             {CRIT_STR, logger_level::LOGTRACE},
             {IRQ_STR, logger_level::LOGTRACE},
             {"FileIndexer", logger_level::LOGINFO},
-            {"ServiceAudio", logger_level::LOGERROR},
             {"EventManager", logger_level::LOGINFO}
         };
     }

@@ -37,7 +37,6 @@ class BluetoothMessage : public sys::DataMessage
         getDevicesAvailable,
         Visible,
         Play,
-        SwitchProfile,
         Stop,
         Disconnect
     };

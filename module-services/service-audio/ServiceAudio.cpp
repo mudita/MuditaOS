@@ -423,8 +423,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
     if (opType == Operation::Type::Playback) {
         auto input = audioMux.GetPlaybackInput(playbackType);
-        if (playbackType == audio::PlaybackType::CallRingtone && bluetoothVoiceProfileConnected && input &&
-            (*input)->audio->GetPriorityPlaybackProfile() == Profile::Type::PlaybackBluetoothA2DP) {
+        if (playbackType == audio::PlaybackType::CallRingtone && bluetoothVoiceProfileConnected && input) {
             LOG_DEBUG("Sending Bluetooth start ringing");
             bus.sendUnicast(std::make_shared<message::bluetooth::Ring>(message::bluetooth::Ring::State::Enable),
                             service::name::bluetooth);
@@ -448,10 +447,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     }
     else if (opType == Operation::Type::Router) {
         auto input = audioMux.GetRoutingInput(true);
-        if (bluetoothVoiceProfileConnected) {
-            LOG_DEBUG("Sending Bluetooth start routing");
-            bus.sendUnicast(std::make_shared<message::bluetooth::StartAudioRouting>(), service::name::bluetooth);
-        }
         AudioStart(input);
         return std::make_unique<AudioStartRoutingResponse>(retCode, retToken);
     }
@@ -527,7 +522,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
     }
 
     // stop bluetooth stream if available
-    if (bluetoothA2DPConnected || bluetoothVoiceProfileConnected) {
+    if (bluetoothA2DPConnected) {
         LOG_DEBUG("Sending Bluetooth stop request");
         bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Stop), service::name::bluetooth);
     }

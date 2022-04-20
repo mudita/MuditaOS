@@ -49,7 +49,6 @@ namespace bluetooth
         Error::Code pair(const DataVariant &data);
         Error::Code unpair(const DataVariant &data);
         Error::Code availableDevices();
-        Error::Code switchAudioProfile();
         sys::Service *service;
         std::shared_ptr<bluetooth::SettingsHolder> settings;
         std::shared_ptr<bluetooth::ProfileManager> profileManager;
