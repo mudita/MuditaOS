@@ -21,12 +21,28 @@ namespace bluetooth
         virtual void setDevice(const Devicei &device)                                             = 0;
         virtual void setOwnerService(const sys::Service *service)                                 = 0;
         virtual void connect()                                                                    = 0;
-        virtual void start()                                                                      = 0;
-        virtual void stop()                                                                       = 0;
         virtual void disconnect()                                                                 = 0;
         virtual void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) = 0;
-        /// Starts ringing
-        /// @return Error code that determines, whether operation was successful or not
+
+      protected:
+        static void initSdp();
+        static void initL2cap();
+
+      private:
+        static bool isL2CapInitialized;
+        static bool isSdpInitialized;
+    };
+
+    class MusicProfile : public Profile
+    {
+      public:
+        virtual void start() = 0;
+        virtual void stop()  = 0;
+    };
+
+    class CallProfile : public Profile
+    {
+      public:
         [[nodiscard]] virtual auto startRinging() const noexcept -> Error::Code = 0;
         /// Stops ringing
         /// @return Error code that determines, whether operation was successful or not
@@ -34,6 +50,9 @@ namespace bluetooth
         /// Initializes call
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto initializeCall() const noexcept -> Error::Code = 0;
+        /// Terminates call
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto terminateCall() const noexcept -> Error::Code = 0;
         /// Executed after the call is answered
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto callAnswered() const noexcept -> Error::Code = 0;
@@ -49,14 +68,6 @@ namespace bluetooth
         /// Sets the operator name in HFP profile
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code = 0;
-
-      protected:
-        static void initSdp();
-        static void initL2cap();
-
-      private:
-        static bool isL2CapInitialized;
-        static bool isSdpInitialized;
     };
 
 } // namespace bluetooth

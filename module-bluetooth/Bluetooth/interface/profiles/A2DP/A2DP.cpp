@@ -94,48 +94,9 @@ namespace bluetooth
         pimpl->stop();
     }
 
-    auto A2DP::startRinging() const noexcept -> Error::Code
-    {
-        LOG_ERROR("Can't ring in A2DP profile");
-        return Error::SystemError;
-    }
-
-    auto A2DP::stopRinging() const noexcept -> Error::Code
-    {
-        return Error::SystemError;
-    }
-
-    auto A2DP::initializeCall() const noexcept -> Error::Code
-    {
-        return Error::SystemError;
-    }
-
     void A2DP::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
         pimpl->setAudioDevice(std::move(audioDevice));
-    }
-    auto A2DP::callAnswered() const noexcept -> Error::Code
-    {
-        return Error::SystemError;
-    }
-    auto A2DP::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
-    {
-        LOG_INFO("Setting number in A2DP - ignoring");
-        return Error::Success;
-    }
-    auto A2DP::setSignalStrength(int bars) const noexcept -> Error::Code
-    {
-        LOG_INFO("Setting signal bars in A2DP - ignoring");
-        return Error::Success;
-    }
-    auto A2DP::setOperatorName(const std::string_view &name) const noexcept -> Error::Code
-    {
-        LOG_INFO("Setting operator name in A2DP - ignoring");
-        return Error::Success;
-    }
-    auto A2DP::setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code
-    {
-        return Error::Success;
     }
 
     const sys::Service *A2DP::A2DPImpl::ownerService;
@@ -221,11 +182,6 @@ namespace bluetooth
             status != ERROR_CODE_SUCCESS) {
             LOG_ERROR("Can't register service. Status %x", status);
         }
-
-        // Set local name with a template Bluetooth address, that will be automatically
-        // replaced with a actual address once it is available, i.e. when BTstack boots
-        // up and starts talking to a Bluetooth module.
-        gap_set_class_of_device(0x200408);
 
         // Register for HCI events.
         hciEventCallbackRegistration.callback = &hciPacketHandler;

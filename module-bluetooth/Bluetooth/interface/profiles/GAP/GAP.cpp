@@ -226,7 +226,8 @@ namespace bluetooth
     void GAP::activeStateHandler(std::uint8_t eventType, std::uint8_t *packet, std::uint16_t size)
     {
         if (not(eventType == HCI_EVENT_TRANSPORT_PACKET_SENT || eventType == HCI_EVENT_COMMAND_STATUS ||
-                eventType == HCI_EVENT_INQUIRY_COMPLETE || eventType == HCI_EVENT_COMMAND_COMPLETE)) {
+                eventType == HCI_EVENT_INQUIRY_COMPLETE || eventType == HCI_EVENT_COMMAND_COMPLETE ||
+                eventType == HCI_EVENT_NUMBER_OF_COMPLETED_PACKETS)) {
             LOG_DEBUG("event: 0x%02X - %s - size: %" PRIu16, eventType, evt_cstr(eventType), size);
         }
         switch (eventType) {

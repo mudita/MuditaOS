@@ -21,4 +21,8 @@ namespace bluetooth
     {
         return AudioServiceAPI::RoutingStart(service);
     }
+    bool AudioInterfaceImpl::stopAudioRouting(sys::Service *service)
+    {
+        return AudioServiceAPI::StopAll(service);
+    }
 } // namespace bluetooth

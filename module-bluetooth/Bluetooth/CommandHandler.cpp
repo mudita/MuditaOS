@@ -64,8 +64,6 @@ namespace bluetooth
             return disconnectAudioConnection();
         case bluetooth::Command::PowerOff:
             return Error::Success;
-        case bluetooth::Command::SwitchProfile:
-            return switchAudioProfile();
         case bluetooth::Command::None:
             return Error::Success;
         case Command::StartRinging:
@@ -76,6 +74,8 @@ namespace bluetooth
             return profileManager->initializeCall();
         case Command::CallAnswered:
             return profileManager->callAnswered();
+        case Command::CallTerminated:
+            return profileManager->terminateCall();
         case Command::IncomingCallNumber:
             return profileManager->setIncomingCallNumber(command.getData());
         case Command::SignalStrengthData:
@@ -142,20 +142,6 @@ namespace bluetooth
         const auto errorCode = driver->pair(device) ? Error::Success : Error::LibraryError;
         LOG_INFO("Pairing result: %s", magic_enum::enum_name(errorCode).data());
         return errorCode;
-    }
-    Error::Code CommandHandler::switchAudioProfile()
-    {
-        static auto profile = AudioProfile::A2DP;
-        if (profile == AudioProfile::A2DP) {
-            profile = AudioProfile::HSP;
-            LOG_INFO("New profile: HSP");
-        }
-        else {
-            profile = AudioProfile::A2DP;
-            LOG_INFO("New profile: A2DP");
-        }
-        profileManager->switchProfile(profile);
-        return Error::Success;
     }
     Error::Code CommandHandler::unpair(const DataVariant &data)
     {

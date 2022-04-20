@@ -66,16 +66,6 @@ namespace bluetooth
     {
         pimpl->disconnect();
     }
-
-    void HFP::start()
-    {
-        pimpl->start();
-    }
-
-    void HFP::stop()
-    {
-        pimpl->stop();
-    }
     auto HFP::startRinging() const noexcept -> Error::Code
     {
         pimpl->startRinging();
@@ -89,6 +79,11 @@ namespace bluetooth
     auto HFP::initializeCall() const noexcept -> Error::Code
     {
         pimpl->initializeCall();
+        return Error::Success;
+    }
+    auto HFP::terminateCall() const noexcept -> Error::Code
+    {
+        pimpl->terminateCall();
         return Error::Success;
     }
     void HFP::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
@@ -217,6 +212,9 @@ namespace bluetooth
             if (audioDevice != nullptr) {
                 audioDevice->onDataSend(scoHandle);
             }
+            else {
+                LOG_DEBUG("Audiodevice nullptr :(");
+            }
             break;
         case HCI_EVENT_HFP_META:
             processHFPEvent(event);
@@ -285,6 +283,7 @@ namespace bluetooth
                 LOG_DEBUG("Audio connection established with SCO handle 0x%04x.\n", scoHandle);
                 codec = static_cast<SCOCodec>(hfp_subevent_audio_connection_established_get_negotiated_codec(event));
                 dump_supported_codecs();
+                audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
                 hci_request_sco_can_send_now_event();
                 RunLoop::trigger();
             }
@@ -292,6 +291,7 @@ namespace bluetooth
         case HFP_SUBEVENT_AUDIO_CONNECTION_RELEASED:
             LOG_DEBUG("Audio connection released");
             scoHandle = HCI_CON_HANDLE_INVALID;
+            audioInterface->stopAudioRouting(const_cast<sys::Service *>(ownerService));
             audioDevice.reset();
             break;
         case HFP_SUBEVENT_START_RINGING:
@@ -303,6 +303,8 @@ namespace bluetooth
             // todo stop ringtone stream here
             break;
         case HFP_SUBEVENT_PLACE_CALL_WITH_NUMBER:
+            break;
+        case HFP_SUBEVENT_RING:
             break;
 
         case HFP_SUBEVENT_ATTACH_NUMBER_TO_VOICE_TAG:
@@ -351,7 +353,7 @@ namespace bluetooth
 
         serviceBuffer.fill(0);
         constexpr std::uint32_t hspSdpRecordHandle = 0x10004;
-        uint16_t supported_features                = (1 << HFP_AGSF_ESCO_S4) /*| (1 << HFP_AGSF_HF_INDICATORS) */ |
+        uint16_t supported_features                = (1 << HFP_AGSF_ESCO_S4) | /* (1 << HFP_AGSF_HF_INDICATORS) | */
                                       (1 << HFP_AGSF_CODEC_NEGOTIATION) | (1 << HFP_AGSF_EXTENDED_ERROR_RESULT_CODES) |
                                       (1 << HFP_AGSF_ENHANCED_CALL_CONTROL) | (1 << HFP_AGSF_ENHANCED_CALL_STATUS) |
                                       (1 << HFP_AGSF_ABILITY_TO_REJECT_A_CALL) /*| (1 << HFP_AGSF_IN_BAND_RING_TONE) |*/
@@ -397,6 +399,8 @@ namespace bluetooth
         }
         LOG_DEBUG("Connecting the HFP profile");
         hfp_ag_establish_service_level_connection(device.address);
+        hfp_ag_set_speaker_gain(aclHandle, 8);
+        hfp_ag_set_microphone_gain(aclHandle, 10);
     }
 
     void HFP::HFPImpl::disconnect()
@@ -422,18 +426,10 @@ namespace bluetooth
         return sco->getStreamData();
     }
 
-    void HFP::HFPImpl::start()
-    {
-        if (!isConnected) {
-            connect();
-        }
-        hfp_ag_set_speaker_gain(aclHandle, 8);
-        hfp_ag_set_microphone_gain(aclHandle, 10);
-    }
-
-    void HFP::HFPImpl::stop()
+    void HFP::HFPImpl::terminateCall() const noexcept
     {
         hfp_ag_terminate_call();
+        hfp_ag_release_audio_connection(aclHandle);
         isCallInitialized = false;
         isIncomingCall    = false;
     }
@@ -470,6 +466,7 @@ namespace bluetooth
     {
         HFP::HFPImpl::audioDevice = std::static_pointer_cast<CVSDAudioDevice>(audioDevice);
         HFP::HFPImpl::audioDevice->setAclHandle(aclHandle);
+        LOG_DEBUG("Audiodevice set!");
     }
     void HFP::HFPImpl::startRinging() const noexcept
     {
@@ -492,13 +489,15 @@ namespace bluetooth
             audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
             hfp_ag_outgoing_call_established();
         }
-        LOG_DEBUG("Establishing HFP audio connection");
-        hfp_ag_establish_audio_connection(aclHandle);
 
         return Error::Success;
     }
     auto HFP::HFPImpl::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
     {
+        if (!isIncomingCall) {
+            isIncomingCall = true;
+            hfp_ag_incoming_call();
+        }
         hfp_ag_set_clip(129, num.c_str());
         return Error::Success;
     }

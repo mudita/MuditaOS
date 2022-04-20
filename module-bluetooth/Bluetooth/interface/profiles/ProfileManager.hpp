@@ -32,30 +32,26 @@ namespace bluetooth
         explicit ProfileManager(sys::Service *ownerService);
 
         auto init() -> Error::Code;
-
         auto connect(const Devicei &device) -> Error::Code;
-
         auto disconnect() -> Error::Code;
-
-        auto switchProfile(AudioProfile profile) -> Error::Code;
-
         auto start() -> Error::Code;
         auto stop() -> Error::Code;
         auto startRinging() -> Error::Code;
         auto stopRinging() -> Error::Code;
         auto initializeCall() -> Error::Code;
+        auto terminateCall() -> Error::Code;
         auto callAnswered() -> Error::Code;
         auto setIncomingCallNumber(const DataVariant &data) -> Error::Code;
         auto setSignalStrengthData(const DataVariant &data) -> Error::Code;
         auto setOperatorNameData(const DataVariant &data) -> Error::Code;
         auto setBatteryLevelData(const DataVariant &data) -> Error::Code;
-
         auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code;
 
       private:
         sys::Service *ownerService;
         ProfileList profilesList;
-        bluetooth::Profile *currentProfilePtr = nullptr;
+        bluetooth::MusicProfile *musicProfilePtr = nullptr;
+        bluetooth::CallProfile *callProfilePtr   = nullptr;
         bool initialized = false;
     };
 } // namespace bluetooth

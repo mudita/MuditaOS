@@ -11,7 +11,7 @@
 
 namespace bluetooth
 {
-    class A2DP : public Profile
+    class A2DP : public MusicProfile
     {
       public:
         A2DP();
@@ -30,23 +30,6 @@ namespace bluetooth
         void disconnect() override;
         void start() override;
         void stop() override;
-        /// @return SystemError - it's not posible to start ringing while there's A2DP active
-        [[nodiscard]] auto startRinging() const noexcept -> Error::Code override;
-        /// @return SystemError - it's not posible to stop ringing while there's A2DP active
-        [[nodiscard]] auto stopRinging() const noexcept -> Error::Code override;
-        /// @return SystemError - it's not posible to start routing while there's A2DP active
-        [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
-        /// @return SystemError - it's not posible to handle call answered while there's A2DP active
-        [[nodiscard]] auto callAnswered() const noexcept -> Error::Code override;
-        /// @return Success - ignoring in A2DP
-        [[nodiscard]] auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code override;
-        /// @return Success - ignoring in A2DP
-        [[nodiscard]] auto setSignalStrength(int bars) const noexcept -> Error::Code override;
-        /// @return Success - ignoring in A2DP
-        [[nodiscard]] auto setOperatorName(const std::string_view &name) const noexcept -> Error::Code override;
-        /// @return Success - ignoring in A2DP
-        [[nodiscard]] auto setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code override;
-
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override;
 
       private:

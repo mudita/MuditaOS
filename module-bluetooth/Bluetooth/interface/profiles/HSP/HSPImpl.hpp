@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,11 +17,10 @@ namespace bluetooth
       public:
         static void packetHandler(uint8_t packetType, uint16_t channel, uint8_t *event, uint16_t eventSize);
         auto init() -> Error::Code;
-        void start();
-        void stop();
         void startRinging() const noexcept;
         void stopRinging() const noexcept;
         void initializeCall() const noexcept;
+        auto terminateCall() const noexcept -> Error::Code;
         void connect();
         void disconnect();
         void setDevice(const Devicei &dev);

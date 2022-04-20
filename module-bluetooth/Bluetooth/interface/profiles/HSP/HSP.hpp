@@ -10,7 +10,7 @@
 
 namespace bluetooth
 {
-    class HSP : public Profile
+    class HSP : public CallProfile
     {
         static constexpr auto CLASS_OF_DEVICE = 0x400204;
         // Service class: Telephony, Major device class: Phone, Minor device class: Cellular
@@ -29,8 +29,6 @@ namespace bluetooth
 
         void connect() override;
         void disconnect() override;
-        void start() override;
-        void stop() override;
         /// @brief Starts ring
         /// @return Success
         [[nodiscard]] auto startRinging() const noexcept -> Error::Code override;
@@ -42,6 +40,7 @@ namespace bluetooth
         /// - SCO link establishment
         /// @return Success
         [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
+        [[nodiscard]] auto terminateCall() const noexcept -> Error::Code override;
         [[nodiscard]] auto callAnswered() const noexcept -> Error::Code override;
         [[nodiscard]] auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code override;
         /// @return Success - ignoring in HSP
