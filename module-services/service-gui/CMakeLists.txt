@@ -14,7 +14,6 @@ target_sources(service-gui
         service-gui/ServiceGUI.hpp
         service-gui/messages/ChangeColorScheme.hpp
         service-gui/messages/DrawMessage.hpp
-        service-gui/messages/EinkInitialized.hpp
         service-gui/messages/GUIMessage.hpp
         service-gui/messages/RenderingFinished.hpp
     PRIVATE

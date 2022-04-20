@@ -5,7 +5,6 @@ add_compile_options(-funsigned-char)
 set(TARGET_LIBRARIES
     rt
     pthread
-    portaudio
     CACHE INTERNAL "" )
 
 link_libraries(pthread rt)

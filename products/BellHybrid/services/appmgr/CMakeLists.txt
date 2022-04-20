@@ -9,7 +9,6 @@ target_sources(appmgr
         include/appmgr/messages/AlarmMessage.hpp
         include/appmgr/ApplicationManager.hpp
         include/appmgr/IdleHandler.hpp
-        include/appmgr/messages/BatteryShutdown.hpp
         include/appmgr/messages/ChangeHomescreenLayoutMessage.hpp
         include/appmgr/messages/ChangeHomescreenLayoutParams.hpp
         include/appmgr/messages/PowerOffPopupRequestParams.hpp

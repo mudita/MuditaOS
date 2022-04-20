@@ -5,7 +5,6 @@
 
 #include <DrawCommand.hpp>
 #include <log/log.hpp>
-#include <Renderer.hpp>
 #include <Service/Worker.hpp>
 #include <service-gui/ServiceGUI.hpp>
 

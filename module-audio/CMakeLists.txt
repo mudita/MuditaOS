@@ -53,7 +53,7 @@ target_sources(
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
-target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # supress warning for flac decoder
 set_source_files_properties(
@@ -75,6 +75,7 @@ target_link_libraries(${PROJECT_NAME}
                 utils-math
                 tagsfetcher
                 dr_libs::dr_libs
+                service-bluetooth
 )
 
 add_subdirectory(tags_fetcher)

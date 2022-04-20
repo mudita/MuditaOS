@@ -13,8 +13,7 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Timers/TimerHandle.hpp>
-
-#include <service-db/DBServiceName.hpp>
+#include <service-eink/Common.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -35,7 +34,9 @@ namespace service::gui
         friend WorkerGUI;
 
       public:
-        explicit ServiceGUI(const std::string &name = service::name::gui, std::string parent = {});
+        explicit ServiceGUI(::gui::Size displaySize,
+                            const std::string &name = service::name::gui,
+                            std::string parent      = {});
         ~ServiceGUI() noexcept override;
 
         sys::ReturnCodes InitHandler() override;
@@ -46,13 +47,9 @@ namespace service::gui
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
       private:
-        enum class State
-        {
-            NotInitialised,
-            Idle,
-            Busy,
-            Suspended
-        };
+        bool isRendering{};
+        bool isDisplaying{};
+        bool isClosing{};
 
         static void initAssetManagers();
         void registerMessageHandlers();
@@ -67,24 +64,18 @@ namespace service::gui
         bool isAnyFrameBeingRenderedOrDisplayed() const noexcept;
         void trySendNextFrame();
 
-        void setState(State state) noexcept;
-        bool isInState(State state) const noexcept;
-
         sys::MessagePointer handleDrawMessage(sys::Message *message);
         sys::MessagePointer handleGUIRenderingFinished(sys::Message *message);
-        sys::MessagePointer handleEinkInitialized(sys::Message *message);
         sys::MessagePointer handleImageDisplayedNotification(sys::Message *message);
         sys::MessagePointer handleChangeColorScheme(sys::Message *message);
 
+        ::gui::Size displaySize;
         std::unique_ptr<ContextPool> contextPool;
         std::unique_ptr<WorkerGUI> worker;
         std::unique_ptr<DrawCommandsQueue> commandsQueue;
         std::unique_ptr<::gui::ColorScheme> colorSchemeUpdate;
         RenderCache cache;
         sys::TimerHandle contextReleaseTimer;
-        State currentState;
-        bool lastRenderScheduled;
-        bool waitingForLastRender;
     };
 } // namespace service::gui
 
@@ -96,7 +87,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::gui;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = {service::name::eink};
             return manifest;
         }
     };

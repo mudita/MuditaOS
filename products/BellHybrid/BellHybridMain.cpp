@@ -86,7 +86,8 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>(service::eink::ExitAction::None));
-    systemServices.emplace_back(sys::CreatorFor<service::gui::ServiceGUI>());
+    systemServices.emplace_back(
+        sys::CreatorFor<service::gui::ServiceGUI>(gui::Size{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}));
 
     auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));
     sysmgr->StartSystem(
