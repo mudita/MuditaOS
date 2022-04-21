@@ -1,36 +1,15 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-evtmgr/BatteryMessages.hpp"
-#include "system/SystemReturnCodes.hpp"
-#include <service-appmgr/messages/DOMRequest.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-#include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/WorkerDesktop.hpp>
-#include <service-desktop/BackupRestore.hpp>
 #include <endpoints/EndpointFactory.hpp>
 #include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
-
-#include <MessageType.hpp>
-#include <Service/Worker.hpp>
-#include <log/log.hpp>
-#include <locks/data/PhoneLockMessages.hpp>
 #include <service-appmgr/Constants.hpp>
-#include <service-db/QueryMessage.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include <purefs/filesystem_paths.hpp>
-#include <SystemManager/SystemManagerCommon.hpp>
-#include <Timers/TimerFactory.hpp>
-#include <EventStore.hpp>
-
-#include <system/Constants.hpp>
 #include <system/messages/TetheringStateRequest.hpp>
-
-#include <ctime>
-#include <filesystem>
-#include <functional>
+#include <Timers/TimerFactory.hpp>
 
 ServiceDesktop::ServiceDesktop()
     : sys::Service(service::name::service_desktop, "", sdesktop::service_stack),
@@ -52,208 +31,30 @@ ServiceDesktop::~ServiceDesktop()
     LOG_INFO("[ServiceDesktop] Cleaning resources");
 }
 
-auto ServiceDesktop::getSerialNumber() const -> std::string
-{
-    return settings->getValue(std::string("factory_data/serial"), settings::SettingsScope::Global);
-}
-
-auto ServiceDesktop::generateDeviceUniqueId() -> void
-{
-    const auto deviceUniqueId = utils::generateRandomId(sdesktop::DeviceUniqueIdLength);
-    LOG_SENSITIVE(LOGINFO, "Device unique id: %s", deviceUniqueId.c_str());
-    setDeviceUniqueId(deviceUniqueId);
-}
-
-auto ServiceDesktop::setDeviceUniqueId(const std::string &token) -> void
-{
-    return settings->setValue(sdesktop::DeviceUniqueIdName, token);
-}
-
-auto ServiceDesktop::getDeviceToken() -> std::string
-{
-    std::string tokenSeed = getDeviceUniqueId();
-
-    if (tokenSeed.empty()) {
-        LOG_DEBUG("Device unique id is empty, generating one...");
-        generateDeviceUniqueId();
-        tokenSeed = getDeviceUniqueId();
-    }
-
-    return tokenSeed;
-}
-
-auto ServiceDesktop::getDeviceUniqueId() const -> std::string
-{
-    return settings->getValue(sdesktop::DeviceUniqueIdName);
-}
-
-auto ServiceDesktop::getCaseColour() const -> std::string
-{
-    return settings->getValue(std::string("factory_data/case_colour"), settings::SettingsScope::Global);
-}
-
-auto ServiceDesktop::requestLogsFlush() -> void
-{
-    int response = 0;
-    auto ret     = bus.sendUnicastSync(
-        std::make_shared<sevm::FlushLogsRequest>(), service::name::evt_manager, DefaultLogFlushTimeoutInMs);
-
-    if (ret.first == sys::ReturnCodes::Success) {
-        auto responseMsg = std::dynamic_pointer_cast<sevm::FlushLogsResponse>(ret.second);
-        if ((responseMsg != nullptr) && responseMsg->retCode) {
-            response = responseMsg->data;
-
-            LOG_DEBUG("Respone data: %d", response);
-        }
-    }
-    if (ret.first == sys::ReturnCodes::Failure || response < 0) {
-        throw std::runtime_error("Logs flush failed");
-    }
-}
-
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
-
     settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
     usbSecurityModel = std::make_unique<sdesktop::USBSecurityModel>(this, settings.get());
-    connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
-        auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
-        if (request->event != nullptr) {
-            request->event->send();
-        }
 
-        return sys::MessageNone{};
-    });
+    connectHandler<db::NotificationMessage>();
+    connectHandler<locks::UnlockedPhone>();
+    connectHandler<locks::LockedPhone>();
+    connectHandler<locks::NextPhoneUnlockAttemptLockTime>();
+    connectHandler<message::bluetooth::ResponseStatus>();
+    connectHandler<message::bluetooth::ResponseBondedDevices>();
+    connectHandler<message::bluetooth::ResponseVisibleDevices>();
+    connectHandler<sdesktop::developerMode::DeveloperModeRequest>();
+    connectHandler<sdesktop::BackupMessage>();
+    connectHandler<sdesktop::RestoreMessage>();
+    connectHandler<sdesktop::FactoryMessage>();
+    connectHandler<sdesktop::usb::USBConfigured>();
+    connectHandler<sdesktop::usb::USBDisconnected>();
+    connectHandler<sevm::BatteryStatusChangeMessage>();
 
-    connect(sdesktop::BackupMessage(), [&](sys::Message *msg) {
-        sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
-        if (backupMessage != nullptr) {
-            backupRestoreStatus.state = BackupRestore::OperationState::Running;
-            backupRestoreStatus.completionCode =
-                BackupRestore::BackupUserFiles(this, backupRestoreStatus.backupTempDir);
-            backupRestoreStatus.location = backupRestoreStatus.taskId;
-
-            if (backupRestoreStatus.completionCode == BackupRestore::CompletionCode::Success) {
-                LOG_INFO("Backup finished");
-                backupRestoreStatus.state = BackupRestore::OperationState::Finished;
-            }
-            else {
-                LOG_ERROR("Backup failed");
-                backupRestoreStatus.state = BackupRestore::OperationState::Error;
-            }
-        }
-        return sys::MessageNone{};
-    });
-
-    connect(sdesktop::RestoreMessage(), [&](sys::Message *msg) {
-        sdesktop::RestoreMessage *restoreMessage = dynamic_cast<sdesktop::RestoreMessage *>(msg);
-        if (restoreMessage != nullptr) {
-            backupRestoreStatus.state          = BackupRestore::OperationState::Running;
-            backupRestoreStatus.completionCode = BackupRestore::RestoreUserFiles(this, backupRestoreStatus.location);
-
-            if (backupRestoreStatus.completionCode == BackupRestore::CompletionCode::Success) {
-                LOG_DEBUG("Restore finished");
-                backupRestoreStatus.state = BackupRestore::OperationState::Finished;
-                sys::SystemManagerCommon::Reboot(this);
-            }
-            else {
-                LOG_ERROR("Restore failed");
-                backupRestoreStatus.state = BackupRestore::OperationState::Error;
-            }
-        }
-        return sys::MessageNone{};
-    });
-
-    connect(sdesktop::FactoryMessage(), [&](sys::Message *msg) {
-        auto *factoryMessage = dynamic_cast<sdesktop::FactoryMessage *>(msg);
-        if (factoryMessage != nullptr) {
-            LOG_DEBUG("ServiceDesktop: FactoryMessage received");
-            sys::SystemManagerCommon::FactoryReset(this);
-        }
-        return sys::MessageNone{};
-    });
-
-    connect(sdesktop::usb::USBConfigured(), [&](sys::Message *msg) {
-        auto message = static_cast<sdesktop::usb::USBConfigured *>(msg);
-        if (message->getConfigurationType() == sdesktop::usb::USBConfigurationType::firstConfiguration) {
-            bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
-                            service::name::system_manager);
-        }
-
-        if (usbSecurityModel->isSecurityEnabled()) {
-            LOG_INFO("Endpoint security enabled, requesting passcode");
-
-            bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), service::name::appmgr);
-        }
-
-        return sys::MessageNone{};
-    });
-
-    connect(sdesktop::usb::USBDisconnected(), [&](sys::Message *msg) {
-        LOG_INFO("USB disconnected");
-        if (usbSecurityModel->isSecurityEnabled()) {
-            bus.sendUnicast(std::make_shared<locks::CancelUnlockPhone>(), service::name::appmgr);
-        }
-        bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
-                        service::name::system_manager);
-
-        return sys::MessageNone{};
-    });
-
-    connect(typeid(locks::UnlockedPhone), [&](sys::Message *msg) {
-        LOG_INFO("Phone unlocked.");
-        usbSecurityModel->setPhoneUnlocked();
-        return sys::MessageNone{};
-    });
-
-    connect(typeid(locks::LockedPhone), [&](sys::Message *msg) {
-        LOG_INFO("Phone locked.");
-        usbSecurityModel->setPhoneLocked();
-        return sys::MessageNone{};
-    });
-
-    connect(typeid(locks::NextPhoneUnlockAttemptLockTime), [&](sys::Message *msg) {
-        auto message = static_cast<locks::NextPhoneUnlockAttemptLockTime *>(msg);
-        usbSecurityModel->updatePhoneLockTime(message->getTime());
-        return sys::MessageNone{};
-    });
-
-    connect(typeid(message::bluetooth::ResponseStatus), [&](sys::Message *msg) {
-        auto msgl = static_cast<message::bluetooth::ResponseStatus *>(msg);
-        return btMsgHandler->handle(msgl);
-    });
-    connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) {
-        checkChargingCondition();
-        return sys::MessageNone{};
-    });
-
-    connect(typeid(message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
-        auto msgl = static_cast<message::bluetooth::ResponseBondedDevices *>(msg);
-        return btMsgHandler->handle(msgl);
-    });
-
-    connect(typeid(message::bluetooth::ResponseVisibleDevices), [&](sys::Message *msg) {
-        auto msgl = static_cast<message::bluetooth::ResponseVisibleDevices *>(msg);
-        return btMsgHandler->handle(msgl);
-    });
-
-    connect(typeid(db::NotificationMessage), [&](sys::Message *msg) {
-        if (!connectionActiveTimer.isActive()) {
-            return sys::MessageNone{};
-        }
-        auto notificationMessage = dynamic_cast<db::NotificationMessage *>(msg);
-        if (notificationMessage == nullptr) {
-            return sys::MessageNone{};
-        }
-        outboxNotifications.newNotificationHandler(notificationMessage);
-        return sys::MessageNone{};
-    });
-
-    // initial check
     checkChargingCondition();
 
-    return (sys::ReturnCodes::Success);
+    return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
@@ -261,36 +62,38 @@ sys::ReturnCodes ServiceDesktop::DeinitHandler()
     return usbWorkerDeinit();
 }
 
-sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
+sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerMode /*mode*/)
 {
     return sys::ReturnCodes::Success;
 }
 
-sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage * /*msg*/, sys::ResponseMessage *resp)
 {
-    if (resp != nullptr) {
-        if (resp->responseTo == MessageType::DBQuery) {
-            if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
-                auto result = queryResponse->getResult();
-                if (result != nullptr) {
-                    if (result->hasListener()) {
-                        LOG_DEBUG("Handling result...");
-                        result->handle();
-                    }
-                }
-                else {
-                    LOG_ERROR("Wrong result - nullptr!");
-                }
-            }
+    auto response = std::make_shared<sys::ResponseMessage>();
+    if (resp == nullptr) {
+        return response;
+    }
+    if (resp->responseTo != MessageType::DBQuery) {
+        return response;
+    }
+    if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
+        auto result = queryResponse->getResult();
+        if (result == nullptr) {
+            LOG_ERROR("Wrong result - nullptr!");
+            return response;
+        }
+        if (result->hasListener()) {
+            LOG_DEBUG("Handling result...");
+            result->handle();
         }
     }
 
-    return std::make_shared<sys::ResponseMessage>();
+    return response;
 }
 
 std::string ServiceDesktop::prepareBackupFilename()
 {
-    std::array<char, 64> backupFileName;
+    std::array<char, 64> backupFileName{};
     std::time_t now;
     std::time(&now);
     std::strftime(backupFileName.data(), backupFileName.size(), "%FT%OH%OM%OSZ", std::localtime(&now));
@@ -314,30 +117,100 @@ void ServiceDesktop::prepareRestoreData(const std::filesystem::path &restoreLoca
     backupRestoreStatus.location  = purefs::dir::getBackupOSPath() / backupRestoreStatus.taskId;
 }
 
-auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
+auto ServiceDesktop::requestLogsFlush() -> void
 {
-    if (!initialized) {
-        auto serialNumber = getSerialNumber();
+    int response = 0;
+    auto ret     = bus.sendUnicastSync(
+        std::make_shared<sevm::FlushLogsRequest>(), service::name::evt_manager, DefaultLogFlushTimeoutInMs);
 
-        LOG_DEBUG("usbWorkerInit Serial Number: %s", serialNumber.c_str());
+    if (ret.first == sys::ReturnCodes::Success) {
+        auto responseMsg = std::dynamic_pointer_cast<sevm::FlushLogsResponse>(ret.second);
+        if ((responseMsg != nullptr) && responseMsg->retCode) {
+            response = responseMsg->data;
 
-        desktopWorker = std::make_unique<WorkerDesktop>(
-            this, std::bind(&ServiceDesktop::restartConnectionActiveTimer, this), *usbSecurityModel, serialNumber);
-
-        initialized = desktopWorker->init(
-            {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
-             {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size},
-             {sdesktop::IRQ_QUEUE_BUFFER_NAME, 1, sdesktop::irq_queue_object_size}});
-
-        if (initialized == false) {
-            LOG_ERROR("!!! service-desktop usbWorkerInit failed to initialize worker, service-desktop won't work");
-            return sys::ReturnCodes::Failure;
-        }
-        else {
-            desktopWorker->run();
+            LOG_DEBUG("Respone data: %d", response);
         }
     }
-    return sys::ReturnCodes::Success;
+    if (ret.first == sys::ReturnCodes::Failure || response < 0) {
+        throw std::runtime_error("Logs flush failed");
+    }
+}
+
+auto ServiceDesktop::getSerialNumber() const -> std::string
+{
+    return settings->getValue(sdesktop::pathFactoryDataSerial, settings::SettingsScope::Global);
+}
+
+auto ServiceDesktop::getCaseColour() const -> std::string
+{
+    return settings->getValue(sdesktop::pathFactoryDataCaseColour, settings::SettingsScope::Global);
+}
+
+auto ServiceDesktop::getDeviceToken() -> std::string
+{
+    auto tokenSeed = getDeviceUniqueId();
+
+    if (tokenSeed.empty()) {
+        LOG_DEBUG("Device unique id is empty, generating one...");
+        generateDeviceUniqueId();
+        tokenSeed = getDeviceUniqueId();
+    }
+
+    return tokenSeed;
+}
+
+auto ServiceDesktop::getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>
+{
+    return outboxNotifications.getNotificationEntries();
+}
+
+void ServiceDesktop::removeNotificationEntries(const std::vector<uint32_t> &uidsOfNotificationsToBeRemoved)
+{
+    outboxNotifications.removeNotificationEntries(uidsOfNotificationsToBeRemoved);
+}
+
+auto ServiceDesktop::generateDeviceUniqueId() -> void
+{
+    const auto deviceUniqueId = utils::generateRandomId(sdesktop::DeviceUniqueIdLength);
+    LOG_SENSITIVE(LOGINFO, "Device unique id: %s", deviceUniqueId.c_str());
+    setDeviceUniqueId(deviceUniqueId);
+}
+
+auto ServiceDesktop::getDeviceUniqueId() const -> std::string
+{
+    return settings->getValue(sdesktop::DeviceUniqueIdName);
+}
+
+auto ServiceDesktop::setDeviceUniqueId(const std::string &token) -> void
+{
+    return settings->setValue(sdesktop::DeviceUniqueIdName, token);
+}
+
+auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
+{
+    if (initialized) {
+        return sys::ReturnCodes::Success;
+    }
+    auto serialNumber = getSerialNumber();
+
+    LOG_DEBUG("usbWorkerInit Serial Number: %s", serialNumber.c_str());
+
+    desktopWorker = std::make_unique<WorkerDesktop>(
+        this, std::bind(&ServiceDesktop::restartConnectionActiveTimer, this), *usbSecurityModel, serialNumber);
+
+    initialized =
+        desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
+                             {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size},
+                             {sdesktop::IRQ_QUEUE_BUFFER_NAME, 1, sdesktop::irq_queue_object_size}});
+
+    if (!initialized) {
+        LOG_ERROR("!!! service-desktop usbWorkerInit failed to initialize worker, service-desktop won't work");
+        return sys::ReturnCodes::Failure;
+    }
+    else {
+        desktopWorker->run();
+        return sys::ReturnCodes::Success;
+    }
 }
 
 auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
@@ -350,16 +223,6 @@ auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
         initialized = false;
     }
     return sys::ReturnCodes::Success;
-}
-
-auto ServiceDesktop::getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>
-{
-    return outboxNotifications.getNotificationEntries();
-}
-
-void ServiceDesktop::removeNotificationEntries(const std::vector<uint32_t> &uidsOfNotificationsToBeRemoved)
-{
-    outboxNotifications.removeNotificationEntries(uidsOfNotificationsToBeRemoved);
 }
 
 void ServiceDesktop::restartConnectionActiveTimer()
@@ -375,4 +238,142 @@ void ServiceDesktop::checkChargingCondition()
     else {
         usbWorkerInit();
     }
+}
+
+auto ServiceDesktop::handle(db::NotificationMessage *msg) -> std::shared_ptr<sys::Message>
+{
+    if (!connectionActiveTimer.isActive()) {
+        return sys::MessageNone{};
+    }
+    auto notificationMessage = static_cast<db::NotificationMessage *>(msg);
+    outboxNotifications.newNotificationHandler(notificationMessage);
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(locks::UnlockedPhone * /*msg*/) -> std::shared_ptr<sys::Message>
+{
+    LOG_INFO("Phone unlocked.");
+    usbSecurityModel->setPhoneUnlocked();
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(locks::LockedPhone * /*msg*/) -> std::shared_ptr<sys::Message>
+{
+    LOG_INFO("Phone locked.");
+    usbSecurityModel->setPhoneLocked();
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(locks::NextPhoneUnlockAttemptLockTime *msg) -> std::shared_ptr<sys::Message>
+{
+    auto message = static_cast<locks::NextPhoneUnlockAttemptLockTime *>(msg);
+    usbSecurityModel->updatePhoneLockTime(message->getTime());
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(message::bluetooth::ResponseStatus *msg) -> std::shared_ptr<sys::Message>
+{
+    auto msgl = static_cast<message::bluetooth::ResponseStatus *>(msg);
+    return btMsgHandler->handle(msgl);
+}
+
+auto ServiceDesktop::handle(message::bluetooth::ResponseBondedDevices *msg) -> std::shared_ptr<sys::Message>
+{
+    auto msgl = static_cast<message::bluetooth::ResponseBondedDevices *>(msg);
+    return btMsgHandler->handle(msgl);
+}
+
+auto ServiceDesktop::handle(message::bluetooth::ResponseVisibleDevices *msg) -> std::shared_ptr<sys::Message>
+{
+    auto msgl = static_cast<message::bluetooth::ResponseVisibleDevices *>(msg);
+    return btMsgHandler->handle(msgl);
+}
+
+auto ServiceDesktop::handle(sdesktop::developerMode::DeveloperModeRequest *msg) -> std::shared_ptr<sys::Message>
+{
+    auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
+    if (request->event != nullptr) {
+        request->event->send();
+    }
+
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(sdesktop::BackupMessage * /*msg*/) -> std::shared_ptr<sys::Message>
+{
+    backupRestoreStatus.state          = BackupRestore::OperationState::Running;
+    backupRestoreStatus.completionCode = BackupRestore::BackupUserFiles(this, backupRestoreStatus.backupTempDir);
+    backupRestoreStatus.location       = backupRestoreStatus.taskId;
+
+    if (backupRestoreStatus.completionCode == BackupRestore::CompletionCode::Success) {
+        LOG_INFO("Backup finished");
+        backupRestoreStatus.state = BackupRestore::OperationState::Finished;
+    }
+    else {
+        LOG_ERROR("Backup failed");
+        backupRestoreStatus.state = BackupRestore::OperationState::Error;
+    }
+
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(sdesktop::RestoreMessage * /*msg*/) -> std::shared_ptr<sys::Message>
+{
+    backupRestoreStatus.state          = BackupRestore::OperationState::Running;
+    backupRestoreStatus.completionCode = BackupRestore::RestoreUserFiles(this, backupRestoreStatus.location);
+
+    if (backupRestoreStatus.completionCode == BackupRestore::CompletionCode::Success) {
+        LOG_DEBUG("Restore finished");
+        backupRestoreStatus.state = BackupRestore::OperationState::Finished;
+        sys::SystemManagerCommon::Reboot(this);
+    }
+    else {
+        LOG_ERROR("Restore failed");
+        backupRestoreStatus.state = BackupRestore::OperationState::Error;
+    }
+
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(sdesktop::FactoryMessage * /*msg*/) -> std::shared_ptr<sys::Message>
+{
+    LOG_DEBUG("ServiceDesktop: FactoryMessage received");
+    sys::SystemManagerCommon::FactoryReset(this);
+
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(sdesktop::usb::USBConfigured *msg) -> std::shared_ptr<sys::Message>
+{
+    auto message = static_cast<sdesktop::usb::USBConfigured *>(msg);
+    if (message->getConfigurationType() == sdesktop::usb::USBConfigurationType::firstConfiguration) {
+        bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
+                        service::name::system_manager);
+    }
+
+    if (usbSecurityModel->isSecurityEnabled()) {
+        LOG_INFO("Endpoint security enabled, requesting passcode");
+
+        bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), service::name::appmgr);
+    }
+
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(sdesktop::usb::USBDisconnected * /*msg*/) -> std::shared_ptr<sys::Message>
+{
+    LOG_INFO("USB disconnected");
+    if (usbSecurityModel->isSecurityEnabled()) {
+        bus.sendUnicast(std::make_shared<locks::CancelUnlockPhone>(), service::name::appmgr);
+    }
+    bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
+                    service::name::system_manager);
+
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(sevm::BatteryStatusChangeMessage * /*msg*/) -> std::shared_ptr<sys::Message>
+{
+    checkChargingCondition();
+    return sys::MessageNone{};
 }
