@@ -88,9 +88,9 @@ static inline std::string getListOfSupportedServicesInString(uint32_t cod)
 
 enum class DeviceState
 {
-    ConnectedBoth,
-    ConnectedAudio,
     ConnectedVoice,
+    ConnectedAudio,
+    ConnectedBoth,
     Connecting,
     Pairing,
     Paired,

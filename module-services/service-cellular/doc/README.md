@@ -15,6 +15,22 @@ This way system voltage will not be dropped down when module is trying to acheiv
 
 ![](urc_handling.svg)
 
+## CSQ handling flow
+
+There are 3 modes of CSQ signal handling:
+* Permanent Reporting
+
+The host is constantly waiting to report data from the modem when the CSQ signal changes. This mode is active only when the user unlocks the keyboard or connects USB or connects the BT car kit.
+![](csq_handling.svg)
+
+* Hybrid Reporting
+
+The host waits for data to be reported from the modem when the CSQ signal changes until the data is received more frequently than parameter 'cellular::service::urcThreshold'. When the threshold is exceeded, the mode changes to Hybrid Pooling.
+
+* Hybrid Polling
+
+Data reporting is disabled. The host queries the modem for the current CSQ value every 15 minutes. Every time specified by the 'cellular::service::pollTime' parameter, the system enters Hybrid Reporting mode again.
+
 ## Call Request handling flow
 
 Call request represents the string written by te user in the input window.

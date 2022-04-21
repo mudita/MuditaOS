@@ -8,20 +8,22 @@
 #include <cstdint>
 #include <chrono>
 #include <functional>
+#include <FreeRTOS.h>
 
 namespace cellular::service
 {
 
     constexpr auto urcThreshold = 4;
-    constexpr auto pollTime     = std::chrono::minutes{15};
+    constexpr auto pollTime     = std::chrono::minutes{60};
 
     static const auto invalid_rssi_low  = 99;
     static const auto invalid_rssi_high = 199;
 
     enum class CSQMode
     {
-        Reporting,
-        Polling
+        PermanentReporting,
+        HybridReporting,
+        HybridPolling
     };
 
     class CSQHandler
@@ -36,19 +38,28 @@ namespace cellular::service
         std::function<void(uint32_t)> onPropagateCSQ;
         std::function<void()> onInvalidCSQ;
 
-        std::function<void(bool)> onRetrySwitchMode;
+        std::function<void(CSQMode)> onRetrySwitchMode;
         std::function<void()> onRetryGetCSQ;
 
-        bool switchToReportMode();
-        bool switchToPollMode();
+        void handleLockPhone();
+        void handleUnlockPhone();
+        void handleBluetoothCarKitConnect();
+        void handleBluetoothCarKitDisconnect();
+        void checkConditionToChangeMode();
+        bool switchToPermanentReportMode();
+        bool switchToHybridReportMode();
+        bool switchToHybridPollMode();
         bool getCSQ();
 
       private:
         uint32_t urcCounter = 0;
-        CSQMode currentMode = CSQMode::Reporting;
-        std::chrono::minutes timeSpentInPollMode{};
+        CSQMode currentMode = CSQMode::HybridReporting;
+        TickType_t switchToPollModeTimestamp{0};
 
-        auto isInPollMode() -> bool;
+        // parameters needed to switch poll/report mode
+        bool isPhoneLocked{true};
+        bool isBluetoothCarKitConnected{false};
+
         auto isPollModeTimeElapsed() -> bool;
         auto isTooManyURC() -> bool;
     };

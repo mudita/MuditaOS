@@ -4,16 +4,19 @@
 #include "CSQHandler.hpp"
 
 #include <log/log.hpp>
+#include <EventStore.hpp>
+#include <ticks.hpp>
+#include <chrono>
 
 namespace cellular::service
 {
 
     void CSQHandler::handleTimerTick()
     {
-        if (isInPollMode()) {
-            timeSpentInPollMode++;
+        if (currentMode == CSQMode::HybridPolling) {
             if (isPollModeTimeElapsed()) {
-                switchToReportMode();
+                LOG_INFO("CSQ poll mode time elapsed.");
+                switchToHybridReportMode();
                 return;
             }
 
@@ -24,14 +27,9 @@ namespace cellular::service
     void CSQHandler::handleURCCounterMessage(const uint32_t counter)
     {
         urcCounter = counter;
-        if (isTooManyURC() && not isInPollMode()) {
-            switchToPollMode();
+        if (isTooManyURC() && currentMode == CSQMode::HybridReporting) {
+            switchToHybridPollMode();
         }
-    }
-
-    auto CSQHandler::isInPollMode() -> bool
-    {
-        return currentMode == CSQMode::Polling;
     }
 
     auto CSQHandler::isTooManyURC() -> bool
@@ -41,36 +39,72 @@ namespace cellular::service
 
     auto CSQHandler::isPollModeTimeElapsed() -> bool
     {
-        return timeSpentInPollMode > pollTime;
+        auto currentTime = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
+        auto timeSpentInPollMode =
+            currentTime >= switchToPollModeTimestamp
+                ? currentTime - switchToPollModeTimestamp
+                : std::numeric_limits<TickType_t>::max() - switchToPollModeTimestamp + currentTime;
+        return timeSpentInPollMode > std::chrono::duration_cast<std::chrono::milliseconds>(pollTime).count();
     }
 
-    bool CSQHandler::switchToReportMode()
+    void CSQHandler::checkConditionToChangeMode()
     {
-        LOG_INFO("CSQ poll mode time elapsed, switch to report mode.");
+        if (currentMode != CSQMode::PermanentReporting) {
+            if (not isPhoneLocked || isBluetoothCarKitConnected ||
+                Store::Battery::get().state != Store::Battery::State::Discharging) {
+                switchToPermanentReportMode();
+            }
+        }
+        else {
+            if (isPhoneLocked && not isBluetoothCarKitConnected &&
+                Store::Battery::get().state == Store::Battery::State::Discharging) {
+                switchToHybridReportMode();
+            }
+        }
+    }
+
+    bool CSQHandler::switchToPermanentReportMode()
+    {
+        LOG_INFO("Switch to permanent report mode.");
         if (onEnableCsqReporting != nullptr && onEnableCsqReporting()) {
-            timeSpentInPollMode = std::chrono::minutes{0};
-            currentMode         = CSQMode::Reporting;
+            currentMode = CSQMode::PermanentReporting;
             return true;
         }
 
-        LOG_ERROR("Failed to switch to CSQ report mode! Retry!");
+        LOG_ERROR("Failed to switch to CSQ permanent report mode! Retry!");
         if (onRetrySwitchMode != nullptr) {
-            onRetrySwitchMode(false);
+            onRetrySwitchMode(CSQMode::PermanentReporting);
         }
         return false;
     }
 
-    bool CSQHandler::switchToPollMode()
+    bool CSQHandler::switchToHybridReportMode()
     {
-        LOG_INFO("Too many signal strength updates, switch to poll mode.");
-        if (onDisableCsqReporting != nullptr && onDisableCsqReporting()) {
-            currentMode = CSQMode::Polling;
+        LOG_INFO("Switch to hybrid report mode.");
+        if (onEnableCsqReporting != nullptr && onEnableCsqReporting()) {
+            currentMode = CSQMode::HybridReporting;
             return true;
         }
 
-        LOG_ERROR("Failed to switch to CSQ poll mode! Retry!");
+        LOG_ERROR("Failed to switch to CSQ hybrid report mode! Retry!");
         if (onRetrySwitchMode != nullptr) {
-            onRetrySwitchMode(false);
+            onRetrySwitchMode(CSQMode::HybridReporting);
+        }
+        return false;
+    }
+
+    bool CSQHandler::switchToHybridPollMode()
+    {
+        LOG_INFO("Too many signal strength updates, switch to hybrid poll mode.");
+        if (onDisableCsqReporting != nullptr && onDisableCsqReporting()) {
+            currentMode               = CSQMode::HybridPolling;
+            switchToPollModeTimestamp = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
+            return true;
+        }
+
+        LOG_ERROR("Failed to switch to CSQ hybrid poll mode! Retry!");
+        if (onRetrySwitchMode != nullptr) {
+            onRetrySwitchMode(CSQMode::HybridPolling);
         }
         return false;
     }
@@ -103,4 +137,25 @@ namespace cellular::service
         }
         return false;
     }
+
+    void CSQHandler::handleLockPhone()
+    {
+        isPhoneLocked = true;
+    }
+
+    void CSQHandler::handleUnlockPhone()
+    {
+        isPhoneLocked = false;
+    }
+
+    void CSQHandler::handleBluetoothCarKitConnect()
+    {
+        isBluetoothCarKitConnected = true;
+    }
+
+    void CSQHandler::handleBluetoothCarKitDisconnect()
+    {
+        isBluetoothCarKitConnected = false;
+    }
+
 } // namespace cellular::service

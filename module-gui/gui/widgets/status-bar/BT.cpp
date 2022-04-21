@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BT.hpp"
@@ -23,7 +23,11 @@ namespace gui::status_bar
         case sys::bluetooth::BluetoothMode::Enabled:
             set(bt_status, style::status_bar::imageTypeSpecifier);
             break;
-        case sys::bluetooth::BluetoothMode::Connected:
+        case sys::bluetooth::BluetoothMode::ConnectedVoice:
+            [[fallthrough]];
+        case sys::bluetooth::BluetoothMode::ConnectedAudio:
+            [[fallthrough]];
+        case sys::bluetooth::BluetoothMode::ConnectedBoth:
             set(bt_connected_status, style::status_bar::imageTypeSpecifier);
             break;
         }

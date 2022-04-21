@@ -1006,15 +1006,21 @@ namespace cellular
     class RetrySwitchCSQMode : public sys::DataMessage
     {
       public:
-        explicit RetrySwitchCSQMode(bool switchToPollMode)
-            : sys::DataMessage(MessageType::MessageTypeUninitialized), switchToPollMode(switchToPollMode){};
-        auto isSwitchToPollMode()
+        enum class Mode
         {
-            return switchToPollMode;
+            PermanentReporting,
+            HybridReporting,
+            HybridPolling
+        };
+        explicit RetrySwitchCSQMode(Mode newMode)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), mode(newMode){};
+        auto getNewMode()
+        {
+            return mode;
         };
 
       private:
-        bool switchToPollMode = false;
+        Mode mode;
     };
 
     class RetryGetCSQ : public sys::DataMessage

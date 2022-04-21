@@ -29,6 +29,7 @@
 #include <service-time/Constants.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <service-bluetooth/messages/Status.hpp>
+#include <service-cellular/Constans.hpp>
 
 #include <cassert>
 #include <fstream>
@@ -157,6 +158,7 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
             }
             bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::service_desktop);
             bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::bluetooth);
+            bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::cellular);
         }
         return sys::msgHandled();
     });
