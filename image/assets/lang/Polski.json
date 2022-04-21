@@ -694,6 +694,7 @@
   "app_bell_turn_off_question": "Wyłączyć Mudita Harmony?",
   "app_bell_goodbye": "Do widzenia",
   "app_bell_settings_language": "Język",
+  "app_bell_settings_layout": "Tarcza zegara",
   "app_bell_settings_factory_reset": "Reset",
   "app_bell_settings_display_factory_reset_confirmation": "<text>Ustawienia fabryczne?</text>",
   "app_bell_settings_about": "O produkcie",

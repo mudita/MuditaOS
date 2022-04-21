@@ -625,6 +625,7 @@
   "app_bell_settings_turn_off": "Éteindre",
   "app_bell_settings_time_units": "Temps",
   "app_bell_settings_language": "Langue",
+  "app_bell_settings_layout": "Cadran",
   "app_bell_settings_about": "À propos",
   "app_bell_settings_about_product": "Mudita Harmony",
   "app_bell_settings_about_version": "<text>Version du système: <token>$VERSION</token></text>",
