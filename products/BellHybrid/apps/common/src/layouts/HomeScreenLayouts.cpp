@@ -16,7 +16,6 @@ namespace gui::factory
     std::map<std::string, LayoutGenerator> getLayoutsFormat24h()
     {
         return {{"Classic", []() { return new HomeScreenLayoutClassic("Classic"); }},
-                {"ClassicWithTemp", []() { return new HomeScreenLayoutClassicWithTemp("ClassicWithTemp"); }},
                 {"ClassicWithBattery", []() { return new HomeScreenLayoutClassicWithBattery("ClassicWithBattery"); }},
                 {"VerticalSimple", []() { return new HomeScreenLayoutVerticalSimple("VerticalSimple"); }}};
     };
@@ -24,7 +23,6 @@ namespace gui::factory
     std::map<std::string, LayoutGenerator> getLayoutsFormat12h()
     {
         return {{"Classic", []() { return new HomeScreenLayoutClassic("Classic"); }},
-                {"ClassicWithTemp", []() { return new HomeScreenLayoutClassicWithTemp("ClassicWithTemp"); }},
                 {"ClassicWithAmPm", []() { return new HomeScreenLayoutClassicWithAmPm("ClassicWithAmPm"); }},
                 {"ClassicWithBattery", []() { return new HomeScreenLayoutClassicWithBattery("ClassicWithBattery"); }},
                 {"VerticalSimple", []() { return new HomeScreenLayoutVerticalSimple("VerticalSimple"); }},
