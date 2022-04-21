@@ -11,6 +11,8 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 
+#include <service-bluetooth/messages/BluetoothModeChanged.hpp>
+#include <locks/data/PhoneLockMessages.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <service-time/Constants.hpp>
 #include <queries/messages/sms/QuerySMSUpdate.hpp>
@@ -399,7 +401,7 @@ namespace cellular::internal
     {
         csqHandler->onEnableCsqReporting = [this]() {
             if (owner->cpuSentinel) {
-                owner->cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
+                owner->cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_2);
             }
 
             auto channel = owner->cmux->get(CellularMux::Channel::Commands);
@@ -414,7 +416,7 @@ namespace cellular::internal
 
         csqHandler->onDisableCsqReporting = [this]() {
             if (owner->cpuSentinel) {
-                owner->cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
+                owner->cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_2);
             }
 
             auto channel = owner->cmux->get(CellularMux::Channel::Commands);
@@ -428,6 +430,10 @@ namespace cellular::internal
         };
 
         csqHandler->onGetCsq = [this]() -> std::optional<at::result::CSQ> {
+            if (owner->cpuSentinel) {
+                owner->cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_2);
+            }
+
             auto channel = owner->cmux->get(CellularMux::Channel::Commands);
             if (!channel) {
                 return std::nullopt;
@@ -452,8 +458,22 @@ namespace cellular::internal
 
         csqHandler->onInvalidCSQ = [this]() { AntennaServiceAPI::InvalidCSQNotification(owner); };
 
-        csqHandler->onRetrySwitchMode = [this](bool isSwitchToPollMode) {
-            owner->bus.sendUnicast(std::make_shared<RetrySwitchCSQMode>(isSwitchToPollMode), ::service::name::cellular);
+        csqHandler->onRetrySwitchMode = [this](service::CSQMode newMode) {
+            switch (newMode) {
+            case service::CSQMode::PermanentReporting:
+                owner->bus.sendUnicast(
+                    std::make_shared<RetrySwitchCSQMode>(RetrySwitchCSQMode::Mode::PermanentReporting),
+                    ::service::name::cellular);
+                break;
+            case service::CSQMode::HybridReporting:
+                owner->bus.sendUnicast(std::make_shared<RetrySwitchCSQMode>(RetrySwitchCSQMode::Mode::HybridReporting),
+                                       ::service::name::cellular);
+                break;
+            case service::CSQMode::HybridPolling:
+                owner->bus.sendUnicast(std::make_shared<RetrySwitchCSQMode>(RetrySwitchCSQMode::Mode::HybridPolling),
+                                       ::service::name::cellular);
+                break;
+            }
         };
 
         csqHandler->onRetryGetCSQ = [this]() {
@@ -465,6 +485,9 @@ namespace cellular::internal
 
     void ServiceCellularPriv::connectCSQHandler()
     {
+        owner->bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
+        owner->bus.channels.push_back(sys::BusChannel::BluetoothModeChanges);
+
         owner->connect(typeid(URCCounterMessage), [&](sys::Message *request) -> sys::MessagePointer {
             auto message = dynamic_cast<cellular::URCCounterMessage *>(request);
             csqHandler->handleURCCounterMessage(message->getCounter());
@@ -473,16 +496,53 @@ namespace cellular::internal
 
         owner->connect(typeid(RetrySwitchCSQMode), [&](sys::Message *request) -> sys::MessagePointer {
             auto message = dynamic_cast<cellular::RetrySwitchCSQMode *>(request);
-            if (message->isSwitchToPollMode()) {
-                csqHandler->switchToPollMode();
-                return sys::MessageNone{};
+            switch (message->getNewMode()) {
+            case cellular::RetrySwitchCSQMode::Mode::PermanentReporting:
+                csqHandler->switchToPermanentReportMode();
+                break;
+            case cellular::RetrySwitchCSQMode::Mode::HybridReporting:
+                csqHandler->switchToHybridReportMode();
+                break;
+            case cellular::RetrySwitchCSQMode::Mode::HybridPolling:
+                csqHandler->switchToHybridPollMode();
+                break;
             }
-            csqHandler->switchToReportMode();
             return sys::MessageNone{};
         });
 
         owner->connect(typeid(RetryGetCSQ), [&](sys::Message *request) -> sys::MessagePointer {
             csqHandler->getCSQ();
+            return sys::MessageNone{};
+        });
+
+        owner->connect(typeid(locks::UnlockedPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            csqHandler->handleUnlockPhone();
+            csqHandler->checkConditionToChangeMode();
+            return sys::MessageNone{};
+        });
+
+        owner->connect(typeid(locks::LockedPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            csqHandler->handleLockPhone();
+            csqHandler->checkConditionToChangeMode();
+            return sys::MessageNone{};
+        });
+
+        owner->connect(typeid(sys::bluetooth::BluetoothModeChanged), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data   = static_cast<sys::bluetooth::BluetoothModeChanged *>(request);
+            auto btMode = data->getBluetoothMode();
+            if (btMode == sys::bluetooth::BluetoothMode::ConnectedVoice ||
+                btMode == sys::bluetooth::BluetoothMode::ConnectedBoth) {
+                csqHandler->handleBluetoothCarKitConnect();
+            }
+            else {
+                csqHandler->handleBluetoothCarKitDisconnect();
+            }
+            csqHandler->checkConditionToChangeMode();
+            return sys::MessageNone{};
+        });
+
+        owner->connect(typeid(sevm::BatteryStatusChangeMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            csqHandler->checkConditionToChangeMode();
             return sys::MessageNone{};
         });
     }

@@ -313,6 +313,20 @@ auto ServiceBluetooth::handle(message::bluetooth::Connect *msg) -> std::shared_p
     return sys::MessageNone{};
 }
 
+auto convertDeviceStateIntoBluetoothState(const DeviceState &state) -> sys::bluetooth::BluetoothMode
+{
+    switch (state) {
+    case DeviceState::ConnectedVoice:
+        return sys::bluetooth::BluetoothMode::ConnectedVoice;
+    case DeviceState::ConnectedAudio:
+        return sys::bluetooth::BluetoothMode::ConnectedAudio;
+    case DeviceState::ConnectedBoth:
+        return sys::bluetooth::BluetoothMode::ConnectedBoth;
+    default:
+        return sys::bluetooth::BluetoothMode::Enabled;
+    }
+}
+
 auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::shared_ptr<sys::Message>
 {
     if (msg->isSucceed()) {
@@ -321,8 +335,9 @@ auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::sh
 
         settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, bd_addr_to_str(device.address));
 
+        auto deviceState = bluetoothDevicesModel->getDeviceByAddress(device.address)->get().deviceState;
         bus.sendMulticast(
-            std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Connected),
+            std::make_shared<sys::bluetooth::BluetoothModeChanged>(convertDeviceStateIntoBluetoothState(deviceState)),
             sys::BusChannel::BluetoothModeChanges);
 
         stopTimeoutTimer();

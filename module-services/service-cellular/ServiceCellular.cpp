@@ -156,7 +156,7 @@ ServiceCellular::ServiceCellular()
     simTimer = sys::TimerFactory::createSingleShotTimer(
         this, "simTimer", std::chrono::milliseconds{6000}, [this](sys::Timer &) { priv->simCard->handleSimTimer(); });
 
-    csqTimer = sys::TimerFactory::createPeriodicTimer(this, "csqTimer", std::chrono::seconds{60}, [this](sys::Timer &) {
+    csqTimer = sys::TimerFactory::createPeriodicTimer(this, "csqTimer", std::chrono::minutes{15}, [this](sys::Timer &) {
         auto message = std::make_shared<cellular::URCCounterMessage>(csqCounter.getCounter());
         csqCounter.clearCounter();
         bus.sendUnicast(std::move(message), serviceName);
