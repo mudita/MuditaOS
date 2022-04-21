@@ -57,7 +57,7 @@ namespace app
                      manager::actions::ShowAlarm,
                      manager::actions::DisplayLogoAtExit,
                      manager::actions::SystemBrownout,
-                     manager::actions::ChangeHomescreenLayout}};
+                     {manager::actions::ChangeHomescreenLayout, manager::actions::ActionFlag::AcceptWhenInBackground}}};
         }
     };
 } // namespace app
