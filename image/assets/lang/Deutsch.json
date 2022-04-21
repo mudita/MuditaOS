@@ -655,6 +655,7 @@
   "app_bell_settings_turn_off": "Ausschalten",
   "app_bell_settings_time_units": "Zeit",
   "app_bell_settings_language": "Sprache",
+  "app_bell_settings_layout": "Zifferblatt",
   "app_bell_settings_about": "Information",
   "app_bell_settings_about_product": "Mudita Harmony",
   "app_bell_settings_about_version": "<text>OS-Version: <token>$VERSION</token></text>",
