@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 # set -eo pipefail
@@ -8,19 +8,19 @@ if [ ! -e config/common.sh ]; then
 	exit 1
 fi
 
-if [ ! $(which sfdisk) ]; then
+if [ ! "$(which sfdisk)" ]; then
 	echo "No sfdisk, please install"
 	exit 1
 fi
 
-if [ ! $(which parted) ]; then
+if [ ! "$(which parted)" ]; then
 	echo "No parted, please install"
 	exit 1
 fi
 
 source config/common.sh
 is_root=`id -u`
-if [ $is_root != 0 ]; then
+if [ "$is_root" != 0 ]; then
 	echo "Runme as root [uid=$is_root]"
 	exit 1
 fi
@@ -58,8 +58,8 @@ if [ ! -f "$emmc_partition_table_dump_path" ]; then
 	exit 1
 fi
 
-pcount=$(sfdisk --dump $dev | grep "start=" | wc -l)
-is_mounted=$(grep $dev /etc/mtab | awk '{print $2}')
+pcount=$(sfdisk --dump "${dev}" | grep "start=" | wc -l)
+is_mounted=$(grep "${dev}" /etc/mtab | awk '{print $2}')
 if [ "$is_mounted" == "" ]; then
 	echo "$dev is not mounted"
 else
@@ -67,7 +67,7 @@ else
 	exit 1
 fi
 
-if [ $pcount == 2 ] && [ $use_the_force == 0 ]; then
+if [ "${pcount}" == 2 ] && [ $use_the_force == 0 ]; then
 	echo "device $dev already has 2 partitions (use -f to force)"
 	exit 1
 else
@@ -80,9 +80,9 @@ echo -ne "?"
 read
 
 echo "wipe disk header"
-dd if=/dev/zero of=$dev bs=8192 count=8192
+dd if=/dev/zero of="${dev}" bs=8192 count=8192
 echo "create msdos partition table"
-parted $dev mklabel msdos
+parted "${dev}" mklabel msdos
 
 sleep 1
 
@@ -92,22 +92,22 @@ sleep 1
 partprobe
 
 echo "write partition table"
-sfdisk --wipe always $dev < "$emmc_partition_table_dump_path"
+sfdisk --wipe always "${dev}" < "$emmc_partition_table_dump_path"
 
 if [ $? != 0 ]; then
 	echo "partitioning device $dev failed"
 	exit 1
 fi
 
-part1=$(sfdisk $dev --dump | grep bootable | awk '{print $1}')
-part2=$(sfdisk $dev --dump | tail -n 2 | head -n -1 | awk '{print $1}')
+part1=$(sfdisk "${dev}" --dump | grep "bootable" | awk '{print $1}')
+part2=$(sfdisk "${dev}" --dump | tail -n 2 | head -n -1 | awk '{print $1}')
 
 echo "create FATs"
 echo "FAT: $MUDITAOS_PARTITION_PRIMARY $part1"
-mkfs.vfat -n $MUDITAOS_PARTITION_PRIMARY $part1
+mkfs.vfat -n "${MUDITAOS_PARTITION_PRIMARY}" "${part1}"
 
 echo "FAT: $MUDITAOS_PARTITION_RECOVERY $part2"
-mkfs.vfat -n $MUDITAOS_PARTITION_RECOVERY $part2
+mkfs.vfat -n "${MUDITAOS_PARTITION_RECOVERY}" "${part2}"
 
 echo "probe new partitions to OS"
 partprobe

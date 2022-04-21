@@ -39,7 +39,7 @@ function install_brew_packages() {
 
     for pkg in $BREW_PKGS
     do
-        brew install $pkg
+        brew install "${pkg}"
     done
 }
 

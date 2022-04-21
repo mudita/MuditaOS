@@ -1,5 +1,5 @@
 #!/bin/env bash
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 set -eo pipefail
@@ -11,7 +11,7 @@ verify_clang_format_version()
     clang_format=$( find  /usr/bin/ -regextype egrep -regex ".*/clang-format(-[0-9][0-9])?")
     local version
     version=$( [[ $(which $clang_format) ]] && ($clang_format --version | sed "s/.*version \([^ ]*\).*$/\1/" |  cut -d'.' -f1) || echo "0")
-    echo $version
+    echo "$version"
     # check for either clang-format or clang-format-11
     if [[ $version -lt 11 ]]; then
         cat << EOF >&1

@@ -19,9 +19,9 @@ set -o pipefail
 # shellcheck source=../config/clang/common.sh
 
 L_GIT_DIR=$(git rev-parse --show-toplevel)
-source $L_GIT_DIR/config/format-config.sh
-source $L_GIT_DIR/config/clang/colors.sh
-source $L_GIT_DIR/config/clang/clang-common.sh
+source "${L_GIT_DIR}/config/format-config.sh"
+source "${L_GIT_DIR}/config/clang/colors.sh"
+source "${L_GIT_DIR}/config/clang/clang-common.sh"
 CHANGE_TARGET=${CHANGE_TARGET:-master}
 
 
@@ -148,7 +148,7 @@ declare -A results
 
 EXIT_CODE=0
 for file in ${FILES}; do
-    if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
+    if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore "${file}"; then
         check_file "${file}" ${LAST} || RESULT=$?
         if [[ ${RESULT} -eq 1 ]]; then
             EXIT_CODE=1
