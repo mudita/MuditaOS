@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,6 +24,7 @@ namespace sdesktop::endpoints
         auto deleteDBEntry(Context &context) -> sys::ReturnCodes override;
 
         static auto toJson(const SMSRecord &record) -> json11::Json;
+        static auto toJson(const ThreadRecord &thread) -> json11::Json;
         static auto toJson(const ThreadRecord &thread, const utils::PhoneNumber::View &number) -> json11::Json;
         static auto toJson(const SMSTemplateRecord &record) -> json11::Json;
         static auto fromJson(const json11::Json &msgJson) -> SMSTemplateRecord;
@@ -42,6 +43,9 @@ namespace sdesktop::endpoints
         auto updateTemplate(Context &context) -> sys::ReturnCodes;
         auto deleteTemplate(Context &context) -> sys::ReturnCodes;
 
+        void getThreadById(Context &context);
+        auto getThreads(Context &context) -> sys::ReturnCodes;
+
         void requestCount(Context &context);
         void getMessageById(Context &context);
         auto getMessagesByThreadID(Context &context) -> sys::ReturnCodes;
@@ -53,8 +57,5 @@ namespace sdesktop::endpoints
         auto getMessagesTemplates(Context &context) -> sys::ReturnCodes;
 
         json11::Json receivedJson;
-
-        const int defaultLimit = 100; // will be removed after introducing pagination
     };
-
 } // namespace sdesktop::endpoints

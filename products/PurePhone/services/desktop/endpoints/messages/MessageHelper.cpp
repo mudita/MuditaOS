@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/messages/MessageHelper.hpp>
@@ -33,6 +33,7 @@
 #include <memory>
 #include <utility>
 #include <module-db/queries/messages/sms/QuerySMSGetByText.hpp>
+#include "queries/messages/threads/QueryThreadGetByID.hpp"
 
 namespace sdesktop::endpoints
 {
@@ -56,6 +57,18 @@ namespace sdesktop::endpoints
             json11::Json::object{{json::messages::templateID, static_cast<int>(record.ID)},
                                  {json::messages::templateBody, record.text.c_str()},
                                  {json::messages::lastUsedAt, static_cast<int>(record.lastUsageTimestamp)}};
+        return recordEntry;
+    }
+
+    auto MessageHelper::toJson(const ThreadRecord &thread) -> json11::Json
+    {
+
+        auto recordEntry = json11::Json::object{{json::messages::lastUpdatedAt, static_cast<int>(thread.date)},
+                                                {json::messages::messageCount, static_cast<int>(thread.msgCount)},
+                                                {json::messages::threadID, static_cast<int>(thread.ID)},
+                                                {json::messages::messageSnippet, thread.snippet.c_str()},
+                                                {json::messages::isUnread, thread.isUnread()},
+                                                {json::messages::messageType, static_cast<int>(thread.type)}};
         return recordEntry;
     }
 
@@ -351,40 +364,11 @@ namespace sdesktop::endpoints
 
     auto MessageHelper::requestThread(Context &context) -> sys::ReturnCodes
     {
-        try {
-            auto &ctx                = dynamic_cast<PagedContext &>(context);
-            const std::size_t limit  = ctx.getBody()[json::messages::limit].int_value();
-            const std::size_t offset = ctx.getBody()[json::messages::offset].int_value();
-            ctx.setRequestedLimit(limit);
-            ctx.setRequestedOffset(offset);
-            auto query = std::make_unique<db::query::ThreadsGetForList>(offset, std::min(ctx.getPageSize(), limit));
-
-            auto listener = std::make_unique<db::EndpointListenerWithPages>(
-                [](db::QueryResult *result, PagedContext &context) {
-                    if (auto threadsResults = dynamic_cast<db::query::ThreadsGetForListResults *>(result)) {
-                        json11::Json::array threadsArray;
-                        const auto threads = threadsResults->getResults();
-                        const auto numbers = threadsResults->getNumbers();
-                        threadsArray.reserve(threads.size());
-                        for (std::size_t i = 0; i < threads.size(); ++i) {
-                            threadsArray.emplace_back(MessageHelper::toJson(threads[i], numbers[i]));
-                        }
-                        context.setResponseBody(std::move(threadsArray));
-                        context.setTotalCount(threadsResults->getCount());
-                        putToSendQueue(context.createSimpleResponse());
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                ctx);
-            query->setQueryListener(std::move(listener));
-            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSThread, std::move(query));
+        if (context.getBody()[json::messages::threadID].int_value() != 0) {
+            getThreadById(context);
         }
-        catch (const std::bad_cast &e) {
-            LOG_ERROR("exception while requesting thread");
-            return sys::ReturnCodes::Failure;
+        else {
+            return getThreads(context);
         }
         return sys::ReturnCodes::Success;
     }
@@ -436,6 +420,72 @@ namespace sdesktop::endpoints
     {
         context.setResponseStatus(http::Code::NotImplemented);
         putToSendQueue(context.createSimpleResponse());
+        return sys::ReturnCodes::Success;
+    }
+
+    void MessageHelper::getThreadById(Context &context)
+    {
+        auto query =
+            std::make_unique<db::query::ThreadGetByID>(context.getBody()[json::messages::threadID].int_value());
+
+        auto listener = std::make_unique<db::EndpointListener>(
+            [](db::QueryResult *result, Context &context) {
+                if (auto threadGetByIDResult = dynamic_cast<db::query::ThreadGetByIDResult *>(result)) {
+                    auto threadRecord = threadGetByIDResult->getRecord();
+                    if (!threadRecord.has_value()) {
+                        return false;
+                    }
+                    context.setResponseBody(MessageHelper::toJson(threadRecord.value()));
+                    putToSendQueue(context.createSimpleResponse());
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSThread, std::move(query));
+    }
+
+    auto MessageHelper::getThreads(Context &context) -> sys::ReturnCodes
+    {
+        try {
+            auto &ctx                = dynamic_cast<PagedContext &>(context);
+            const std::size_t limit  = ctx.getBody()[json::messages::limit].int_value();
+            const std::size_t offset = ctx.getBody()[json::messages::offset].int_value();
+            ctx.setRequestedLimit(limit);
+            ctx.setRequestedOffset(offset);
+            auto query = std::make_unique<db::query::ThreadsGetForList>(offset, std::min(ctx.getPageSize(), limit));
+
+            auto listener = std::make_unique<db::EndpointListenerWithPages>(
+                [](db::QueryResult *result, PagedContext &context) {
+                    if (auto threadsResults = dynamic_cast<db::query::ThreadsGetForListResults *>(result)) {
+                        json11::Json::array threadsArray;
+                        const auto threads = threadsResults->getResults();
+                        const auto numbers = threadsResults->getNumbers();
+                        threadsArray.reserve(threads.size());
+                        for (std::size_t i = 0; i < threads.size(); ++i) {
+                            threadsArray.emplace_back(MessageHelper::toJson(threads[i], numbers[i]));
+                        }
+                        context.setResponseBody(std::move(threadsArray));
+                        context.setTotalCount(threadsResults->getCount());
+                        putToSendQueue(context.createSimpleResponse());
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                ctx);
+            query->setQueryListener(std::move(listener));
+            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSThread, std::move(query));
+        }
+        catch (const std::bad_cast &e) {
+            LOG_ERROR("exception while requesting thread");
+            return sys::ReturnCodes::Failure;
+        }
         return sys::ReturnCodes::Success;
     }
 

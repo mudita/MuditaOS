@@ -2,7 +2,7 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
 from harness.request import TransactionError
-from harness.api.messages import GetThreadsWithOffsetAndLimit, MarkThreadAsUnread, GetMessageById, AddMessage, DeleteMessageById
+from harness.api.messages import GetThreadsWithOffsetAndLimit, GetThreadById, MarkThreadAsUnread, GetMessageById, AddMessage, DeleteMessageById
 
 
 class ThreadsTester:
@@ -16,6 +16,14 @@ class ThreadsTester:
             return False
         else:
             return True, result
+
+    def get_thread_by_id(self, thread_record_id):
+        try:
+            result = GetThreadById(thread_record_id).run(self.harness)
+        except TransactionError:
+            return False
+        else:
+            return True, result.thread
 
     def mark_thread_as_unread(self, thread_id, set_thread_unread):
         try:
@@ -109,3 +117,24 @@ def test_getting_threads(harness):
         assert type(thread["threadID"]) == int
         message_types = [1, 2, 4, 8, 16, 18, 255]
         assert thread["messageType"] in message_types
+
+
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_unlocked")
+def test_get_message_by_id(harness):
+    threads_tester = ThreadsTester(harness)
+
+    message_number = "123456789"
+    message_body = "Hello, how are you?"
+
+    result, message_record = threads_tester.add_message(message_number, message_body)
+    assert result, "Failed to add message!"
+
+    result, received_message_record = threads_tester.get_message_by_id(message_record["messageID"])
+    assert result, "Failed to get message by id!"
+
+    result, received_thread_record = threads_tester.get_thread_by_id(received_message_record["threadID"])
+    assert result, "Failed to get thread by id!"
+    assert received_thread_record["threadID"] == received_message_record["threadID"], "Wrong thread id!"
+
+    assert threads_tester.delete_message_by_id(message_record["messageID"]), "Failed to delete a message!"
