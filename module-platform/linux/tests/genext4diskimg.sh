@@ -1,5 +1,5 @@
 #!/bin/bash -e
-#Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+#Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 #For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 usage() {
@@ -26,19 +26,20 @@ if [ ! -d "${SYSROOT}" ]; then
 	exit -1
 fi
 
-_REQ_CMDS="sfdisk truncate mke2fs"
-for cmd in $_REQ_CMDS; do
-	if [ ! $(command -v $cmd) ]; then
-		echo "Error! $cmd is not installed, please use 'sudo apt install' for install required tool"
-		exit -1
-	fi
-done
+if [ -z ${L_GIT_DIR+unbound} ] && [ -z $(export L_GIT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)) ]; then
+  export L_GIT_DIR=$(readlink -f "$(dirname "$0")/../../..");
+fi
+
+. "$L_GIT_DIR"/tools/locate_bins.sh
+require_unprivileged truncate stat
+require_commands sfdisk mke2fs
+
 truncate -s $IMAGE_SIZE $IMAGE_FILE
 
 SECTOR_START=2048
 SECTOR_END=$(( $(stat -c "%s" $IMAGE_FILE)/512 - $SECTOR_START))
 
-sfdisk $IMAGE_FILE << ==sfdisk
+maysudo sfdisk "$IMAGE_FILE" << ==sfdisk
 label: dos
 unit: sectors
 
@@ -46,7 +47,7 @@ unit: sectors
 ==sfdisk
 
 #Generate image
-mke2fs \
+maysudo mke2fs \
   -F \
   -L 'user' \
   -N 0 \
