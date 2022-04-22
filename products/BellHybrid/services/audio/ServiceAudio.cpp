@@ -11,7 +11,7 @@
 namespace
 {
     constexpr auto stackSize            = 1024 * 4;
-    constexpr auto defaultVolume        = "7";
+    constexpr auto defaultVolume        = "5";
     constexpr auto defaultSnoozeVolume  = "4";
     constexpr auto defaultBedtimeVolume = "6";
     constexpr audio::Volume maxInVolume = 10;
