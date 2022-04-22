@@ -42,7 +42,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('alarm_light_active','1'),
     ('alarm_duration','5'),
     ('bedtime_active','0'),
-    ('bedtime_time','21:00'),
+    ('bedtime_time','22:00'),
     ('bedtime_tone','Evening Horizon'),
     ('bedtime_duration','5'),
     ('layout','Classic'),
