@@ -1,10 +1,11 @@
 name: 'PR Tasks Completed Check'
 on:
   pull_request:
-    types: [opened, edited, synchronize, ready_for_review, unlocked]
+    types: [opened, edited, synchronize, reopened, ready_for_review, unlocked]
 
 jobs:
   task-check:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: kentaro-m/task-completed-checker-action@v0.1.0
