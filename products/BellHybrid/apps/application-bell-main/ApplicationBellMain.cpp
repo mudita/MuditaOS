@@ -28,6 +28,7 @@
 #include <apps-common/WindowsPopupFilter.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <WindowsStack.hpp>
+#include <popups/Popups.hpp>
 
 namespace app
 {
@@ -39,8 +40,12 @@ namespace app
                                              std::uint32_t stackDepth)
         : Application(name, parent, statusIndicators, startInBackground, stackDepth)
     {
-        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &) {
-            return gui::name::window::main_window != getCurrentWindow()->getName();
+        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &params) {
+            const auto popupId = params.getPopupId();
+            if (popupId == gui::popup::ID::Alarm) {
+                return gui::name::window::main_window != getCurrentWindow()->getName();
+            }
+            return true;
         });
 
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
