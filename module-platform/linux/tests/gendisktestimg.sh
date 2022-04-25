@@ -1,13 +1,13 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+#Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 #For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 if [ $# -ne 1 ]; then
 	echo "Error! Invalid argument count"
-	exit -1
+	exit 1
 fi
 IMAGE_FILE_DIR="$1"
 
