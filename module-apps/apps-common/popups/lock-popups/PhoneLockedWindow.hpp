@@ -31,7 +31,7 @@ namespace gui
       private:
         bool processLongReleaseEvent(const InputEvent &inputEvent);
         static constexpr auto refreshTimerName = "PhoneLockRefreshTimer";
-        static constexpr auto refreshTimeout   = std::chrono::hours(4);
+        static constexpr auto refreshTimeout   = std::chrono::hours(1);
         sys::TimerHandle screenRefreshTimer;
 
         std::unique_ptr<WallpaperPresenter> wallpaperPresenter;
