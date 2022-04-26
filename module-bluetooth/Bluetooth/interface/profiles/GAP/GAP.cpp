@@ -244,8 +244,11 @@ namespace bluetooth
         case HCI_EVENT_USER_CONFIRMATION_REQUEST: {
             bd_addr_t addr;
             hci_event_user_confirmation_request_get_bd_addr(packet, addr);
+            auto conn = hci_connection_for_bd_addr_and_type(addr, BD_ADDR_TYPE_ACL);
+            if (conn == nullptr) {
+                break;
+            }
 
-            auto code = hci_event_user_passkey_notification_get_numeric_value(packet);
             auto it   = devices().find(addr);
             if (it == devices().end()) {
                 gap_remote_name_request(addr, PAGE_SCAN_MODE_STANDARD, 0);
@@ -253,6 +256,12 @@ namespace bluetooth
             }
             it->isPairingSSP = true;
 
+            if (conn->io_cap_response_io == SSP_IO_CAPABILITY_NO_INPUT_NO_OUTPUT) {
+                gap_ssp_confirmation_response(addr);
+                break;
+            }
+
+            auto code = hci_event_user_passkey_notification_get_numeric_value(packet);
             auto msg = std::make_shared<::message::bluetooth::RequestAuthenticate>(
                 *it,
                 bluetooth::AuthenticateType::PairCancel,
