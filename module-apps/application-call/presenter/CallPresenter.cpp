@@ -75,7 +75,7 @@ namespace app::call
         if (not callerId.empty()) {
             return callerId;
         }
-        return UTF8(callAppStyle::strings::privateNumber);
+        return UTF8(utils::translate(callAppStyle::strings::privateNumber));
     }
 
     bool CallWindowContract::Presenter::handleLeftButton()
