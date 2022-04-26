@@ -1,9 +1,8 @@
-#!/bin/bash 
+#!/bin/bash
 # Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-set -e
-set -o pipefail
+set -euo pipefail
 # trap 'echo ERROR on line: $LINENO running command: $BASH_COMMAND ; trap - EXIT; exit $?' EXIT
 
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved. 
@@ -100,7 +99,7 @@ function help() {
 		        --last              checks current branch against origin/master - doesn't fix
 		        --branch-fix        checks current branch against origin/master and fixes errors - you have to 'git add' and 'git commit' them
 		        --fix               fix style in currently staged files (ignores user.fixinstage variale), this is usefull for manual style applying
-		
+
 		If you would like to automatically fix style before commit
 		add to your git config "user.fixinstage" variable with value "True"
 		by calling:
@@ -109,40 +108,41 @@ function help() {
 }
 
 
-case "${1}" in
-    --about|--help )
-        help
-        FILES=''
-        LAST=""
-        exit 0
-        ;;
-    --last)
-        FILES=$(git diff --name-only remotes/origin/"${CHANGE_TARGET}"...HEAD)
-        LAST="True"
-        FIX="false"
-        ;;
-    --branch-fix)
-        FILES=$(git diff --name-only remotes/origin/"${CHANGE_TARGET}"...HEAD)
-        LAST="True"
-        FIX="true"
-        ;;
-    --fix)
-        FILES=$(git diff-index --cached --name-only HEAD)
-        LAST="Stage" 
-        FIX=true
-        ;;
-    *)
-        if [[ $# -ne 0 ]]; then
+if [ $# -eq 0 ]; then
+    FILES=$(git diff-index --cached --name-only HEAD)
+    LAST="Stage"
+    FIX=$([[ $(git config user.fixinstage) ]] && git config user.fixinstage || echo "false")
+    FIX=${FIX:-false}
+else
+    case "${1}" in
+        --about|--help )
+            help
+            FILES=''
+            LAST=""
+            exit 0
+            ;;
+        --last)
+            FILES=$(git diff --name-only remotes/origin/"${CHANGE_TARGET}"...HEAD)
+            LAST="True"
+            FIX="false"
+            ;;
+        --branch-fix)
+            FILES=$(git diff --name-only remotes/origin/"${CHANGE_TARGET}"...HEAD)
+            LAST="True"
+            FIX="true"
+            ;;
+        --fix)
+            FILES=$(git diff-index --cached --name-only HEAD)
+            LAST="Stage"
+            FIX=true
+            ;;
+        *)
             echo "unknown parameters: '$*'"
             help
             exit 1
-        fi
-        FILES=$(git diff-index --cached --name-only HEAD)
-        LAST="Stage" 
-        FIX=$([[ $(git config user.fixinstage) ]] && git config user.fixinstage || echo "false")
-        FIX=${FIX:-false}
-        ;;
-esac
+            ;;
+    esac
+fi
 
 declare -A results
 
