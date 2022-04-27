@@ -114,6 +114,16 @@ namespace bluetooth
         LOG_DEBUG("Setting battery level: %d", level.getBatteryLevel());
         return pimpl->setBatteryLevel(level);
     }
+    auto HFP::setNetworkRegistrationStatus(bool registered) const noexcept -> Error::Code
+    {
+        LOG_DEBUG("Setting network registration status: %s", registered ? "online" : "offline");
+        return pimpl->setNetworkRegistrationStatus(registered);
+    }
+    auto HFP::setRoamingStatus(bool enabled) const noexcept -> Error::Code
+    {
+        LOG_DEBUG("Setting roaming status: %s", enabled ? "enabled" : "disabled");
+        return pimpl->setRoamingStatus(enabled);
+    }
 
     HFP::~HFP() = default;
 
@@ -516,7 +526,18 @@ namespace bluetooth
     auto HFP::HFPImpl::setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code
     {
         auto result = hfp_ag_set_battery_level(level.getBatteryLevelBars());
+
         LOG_DEBUG("Battery level (bars): %d, set result: %d", level.getBatteryLevelBars(), result);
+        return Error::Success;
+    }
+    auto HFP::HFPImpl::setNetworkRegistrationStatus(bool registered) const noexcept -> Error::Code
+    {
+        hfp_ag_set_registration_status(registered);
+        return Error::Success;
+    }
+    auto HFP::HFPImpl::setRoamingStatus(bool enabled) const noexcept -> Error::Code
+    {
+        hfp_ag_set_roaming_status(enabled);
         return Error::Success;
     }
 

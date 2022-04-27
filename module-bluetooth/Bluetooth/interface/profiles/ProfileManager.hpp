@@ -45,6 +45,8 @@ namespace bluetooth
         auto setSignalStrengthData(const DataVariant &data) -> Error::Code;
         auto setOperatorNameData(const DataVariant &data) -> Error::Code;
         auto setBatteryLevelData(const DataVariant &data) -> Error::Code;
+        auto setNetworkStatusData(const DataVariant &data) -> Error::Code;
+
         auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code;
 
       private:

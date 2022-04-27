@@ -32,6 +32,8 @@ namespace bluetooth
         [[nodiscard]] auto setSignalStrength(int bars) const noexcept -> Error::Code;
         [[nodiscard]] auto setOperatorName(const std::string_view &name) const noexcept -> Error::Code;
         [[nodiscard]] auto setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code;
+        [[nodiscard]] auto setNetworkRegistrationStatus(bool registered) const noexcept -> Error::Code;
+        [[nodiscard]] auto setRoamingStatus(bool enabled) const noexcept -> Error::Code;
 
       private:
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
