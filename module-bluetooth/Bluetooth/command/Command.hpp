@@ -30,6 +30,7 @@ namespace bluetooth
             StopStream,
             CallAnswered,
             CallTerminated,
+            CallStarted,
             IncomingCallNumber,
             SignalStrengthData,
             OperatorNameData,

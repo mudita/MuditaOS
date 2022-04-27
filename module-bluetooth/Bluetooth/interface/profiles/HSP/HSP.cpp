@@ -322,11 +322,6 @@ namespace bluetooth
         ownerService = service;
     }
 
-    auto HSP::HSPImpl::getStreamData() -> std::shared_ptr<BluetoothStreamData>
-    {
-        return sco->getStreamData();
-    }
-
     void HSP::HSPImpl::startRinging() const noexcept
     {
         LOG_DEBUG("Bluetooth ring started");
@@ -351,7 +346,7 @@ namespace bluetooth
     {
         pimpl->setAudioDevice(audioDevice);
     }
-    auto HSP::callAnswered() const noexcept -> Error::Code
+    auto HSP::callActive() const noexcept -> Error::Code
     {
         return Error::Success;
     }

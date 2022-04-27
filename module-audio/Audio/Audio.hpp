@@ -1,9 +1,7 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-
-#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 #include "AudioCommon.hpp"
 #include "decoder/Decoder.hpp"
@@ -127,8 +125,6 @@ namespace audio
         void UpdateProfiles(audio::PlaybackType playbackType);
 
         Muted muted = Muted::False;
-
-        std::shared_ptr<BluetoothStreamData> btData;
 
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;

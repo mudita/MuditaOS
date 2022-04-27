@@ -4,6 +4,7 @@
 #pragma once
 
 #include <PhoneNumber.hpp>
+#include <Tables/CalllogTable.hpp>
 
 namespace sys
 {
@@ -20,7 +21,7 @@ class CallGUI
 
     void notifyRING();
     void notifyCLIP(const utils::PhoneNumber::View &number);
-    void notifyCallStarted(utils::PhoneNumber phoneNumber);
+    void notifyCallStarted(utils::PhoneNumber phoneNumber, const CallType type);
     void notifyCallEnded();
     void notifyCallActive();
     void notifyCallDurationUpdate(const time_t &duration);

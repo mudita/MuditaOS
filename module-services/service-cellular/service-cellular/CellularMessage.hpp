@@ -1048,15 +1048,21 @@ namespace cellular
     class CallStartedNotification : public sys::DataMessage
     {
       public:
-        explicit CallStartedNotification(utils::PhoneNumber phoneNumber)
-            : sys::DataMessage(MessageType::MessageTypeUninitialized), phoneNumber(phoneNumber){};
+        CallStartedNotification(utils::PhoneNumber phoneNumber, bool isIncoming)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), phoneNumber(phoneNumber),
+              isIncoming(isIncoming){};
         utils::PhoneNumber getNumber()
         {
             return phoneNumber;
         };
+        bool isCallIncoming()
+        {
+            return isIncoming;
+        };
 
       private:
         utils::PhoneNumber phoneNumber;
+        bool isIncoming;
     };
 
     class CallEndedNotification : public sys::DataMessage

@@ -12,6 +12,14 @@ namespace bluetooth
     static constexpr int serviceBufferLength = 150;
     static constexpr int commandBufferLength = 150;
 
+    enum class CallStatus
+    {
+        Outgoing,
+        Incoming,
+        Active,
+        Unknown
+    };
+
     class HFP::HFPImpl
     {
       public:
@@ -25,15 +33,15 @@ namespace bluetooth
         void disconnect();
         void setDevice(Devicei device);
         void setOwnerService(const sys::Service *service);
-        auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
-        [[nodiscard]] auto setupCall() const noexcept -> Error::Code;
+        [[nodiscard]] auto callActive() const noexcept -> Error::Code;
         [[nodiscard]] auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code;
         [[nodiscard]] auto setSignalStrength(int bars) const noexcept -> Error::Code;
         [[nodiscard]] auto setOperatorName(const std::string_view &name) const noexcept -> Error::Code;
         [[nodiscard]] auto setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code;
         [[nodiscard]] auto setNetworkRegistrationStatus(bool registered) const noexcept -> Error::Code;
         [[nodiscard]] auto setRoamingStatus(bool enabled) const noexcept -> Error::Code;
+        [[nodiscard]] auto callStarted(const std::string &number) const noexcept -> Error::Code;
 
       private:
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
@@ -61,8 +69,6 @@ namespace bluetooth
         [[maybe_unused]] static hfp_generic_status_indicator_t hf_indicators[2];
         static std::shared_ptr<CVSDAudioDevice> audioDevice;
         static Devicei device;
-        static bool isConnected;
-        static bool isIncomingCall;
-        static bool isCallInitialized;
+        static CallStatus currentCallStatus;
     };
 } // namespace bluetooth

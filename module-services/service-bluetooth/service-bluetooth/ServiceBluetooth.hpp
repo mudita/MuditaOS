@@ -67,10 +67,12 @@ class CellularCallerIdMessage;
 class CellularCallActiveNotification;
 class CellularSignalStrengthUpdateNotification;
 class CellularCurrentOperatorNameNotification;
+class CellularIncominCallMessage;
 class CellularNetworkStatusUpdateNotification;
 namespace cellular
 {
     class CallEndedNotification;
+    class CallStartedNotification;
 }
 
 class ServiceBluetooth : public sys::Service
@@ -126,7 +128,6 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::A2DPVolume *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::HSPVolume *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::HFPVolume *msg) -> std::shared_ptr<sys::Message>;
-    [[nodiscard]] auto handle(message::bluetooth::Ring *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::StartAudioRouting *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponseAuthenticatePin *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponseAuthenticatePasskey *msg) -> std::shared_ptr<sys::Message>;
@@ -134,7 +135,9 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::RequestStatusIndicatorData *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularCallActiveNotification *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(cellular::CallEndedNotification *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(cellular::CallStartedNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularSignalStrengthUpdateNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularCurrentOperatorNameNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularNetworkStatusUpdateNotification *msg) -> std::shared_ptr<sys::Message>;

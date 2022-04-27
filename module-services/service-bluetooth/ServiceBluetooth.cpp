@@ -20,7 +20,6 @@
 #include "service-bluetooth/messages/BondedDevices.hpp"
 #include "service-bluetooth/messages/Unpair.hpp"
 #include "service-bluetooth/messages/SetDeviceName.hpp"
-#include "service-bluetooth/messages/Ring.hpp"
 #include "service-bluetooth/BluetoothDevicesModel.hpp"
 #include "service-bluetooth/messages/BluetoothModeChanged.hpp"
 #include "service-bluetooth/messages/RequestStatusIndicatorData.hpp"
@@ -100,7 +99,6 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::A2DPVolume>();
     connectHandler<message::bluetooth::HSPVolume>();
     connectHandler<message::bluetooth::HFPVolume>();
-    connectHandler<message::bluetooth::Ring>();
     connectHandler<message::bluetooth::StartAudioRouting>();
     connectHandler<message::bluetooth::Connect>();
     connectHandler<message::bluetooth::ConnectResult>();
@@ -119,7 +117,9 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::RequestStatusIndicatorData>();
     connectHandler<CellularCallerIdMessage>();
     connectHandler<CellularCallActiveNotification>();
+    connectHandler<CellularIncominCallMessage>();
     connectHandler<cellular::CallEndedNotification>();
+    connectHandler<cellular::CallStartedNotification>();
     connectHandler<CellularSignalStrengthUpdateNotification>();
     connectHandler<CellularCurrentOperatorNameNotification>();
     connectHandler<CellularNetworkStatusUpdateNotification>();
@@ -485,15 +485,6 @@ auto ServiceBluetooth::handle(message::bluetooth::HFPVolume *msg) -> std::shared
     return sys::MessageNone{};
 }
 
-auto ServiceBluetooth::handle(message::bluetooth::Ring *msg) -> std::shared_ptr<sys::Message>
-{
-    LOG_DEBUG("Start ringing from audio");
-    const auto enableRing = msg->enabled();
-    sendWorkerCommand(enableRing ? bluetooth::Command::Type::StartRinging : bluetooth::Command::Type::StopRinging);
-
-    return std::make_shared<sys::ResponseMessage>();
-}
-
 auto ServiceBluetooth::handle(message::bluetooth::StartAudioRouting *msg) -> std::shared_ptr<sys::Message>
 {
     sendWorkerCommand(bluetooth::Command::Type::StartRouting);
@@ -598,5 +589,18 @@ auto ServiceBluetooth::handle(CellularNetworkStatusUpdateNotification *msg) -> s
     LOG_DEBUG("Bluetooth: Network status %s", magic_enum::enum_name(status).data());
     auto commandData = std::make_unique<bluetooth::NetworkStatusData>(status);
     sendWorkerCommand(bluetooth::Command::Type::NetworkStatusData, std::move(commandData));
+    return sys::MessageNone{};
+}
+auto ServiceBluetooth::handle(cellular::CallStartedNotification *msg) -> std::shared_ptr<sys::Message>
+{
+    if (!msg->isCallIncoming()) {
+        auto commandData = std::make_unique<bluetooth::PhoneNumberData>(msg->getNumber());
+        sendWorkerCommand(bluetooth::Command::Type::CallStarted, std::move(commandData));
+    }
+    return sys::MessageNone{};
+}
+auto ServiceBluetooth::handle(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::Message>
+{
+    sendWorkerCommand(bluetooth::Command::Type::StartRinging);
     return sys::MessageNone{};
 }

@@ -109,7 +109,7 @@ namespace CellularCall
             return false;
         }
 
-        gui.notifyCallStarted(number);
+        gui.notifyCallStarted(number, type);
         LOG_INFO("call started");
         return true;
     }

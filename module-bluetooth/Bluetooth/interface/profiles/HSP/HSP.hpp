@@ -41,7 +41,7 @@ namespace bluetooth
         /// @return Success
         [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
         [[nodiscard]] auto terminateCall() const noexcept -> Error::Code override;
-        [[nodiscard]] auto callAnswered() const noexcept -> Error::Code override;
+        [[nodiscard]] auto callActive() const noexcept -> Error::Code override;
         [[nodiscard]] auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code override;
         /// @return Success - ignoring in HSP
         [[nodiscard]] auto setSignalStrength(int bars) const noexcept -> Error::Code override;

@@ -90,9 +90,9 @@ namespace bluetooth
     {
         pimpl->setAudioDevice(audioDevice);
     }
-    auto HFP::callAnswered() const noexcept -> Error::Code
+    auto HFP::callActive() const noexcept -> Error::Code
     {
-        return pimpl->setupCall();
+        return pimpl->callActive();
     }
     auto HFP::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
     {
@@ -124,6 +124,10 @@ namespace bluetooth
         LOG_DEBUG("Setting roaming status: %s", enabled ? "enabled" : "disabled");
         return pimpl->setRoamingStatus(enabled);
     }
+    auto HFP::callStarted(const std::string &num) const noexcept -> Error::Code
+    {
+        return pimpl->callStarted(num);
+    }
 
     HFP::~HFP() = default;
 
@@ -138,9 +142,9 @@ namespace bluetooth
     SCOCodec HFP::HFPImpl::codec            = SCOCodec::CVSD;
     std::shared_ptr<CVSDAudioDevice> HFP::HFPImpl::audioDevice;
 
-    [[maybe_unused]] int HFP::HFPImpl::memory_1_enabled = 1;
+    int HFP::HFPImpl::memory_1_enabled = 1;
     btstack_packet_callback_registration_t HFP::HFPImpl::hci_event_callback_registration;
-    [[maybe_unused]] int HFP::HFPImpl::ag_indicators_nr = 7;
+    int HFP::HFPImpl::ag_indicators_nr                  = 7;
     hfp_ag_indicator_t HFP::HFPImpl::ag_indicators[]    = {
         // index, name, min range, max range, status, mandatory, enabled, status changed
         {1, "service", 0, 1, 1, 0, 0, 0},
@@ -150,17 +154,15 @@ namespace bluetooth
         {5, "signal", 0, 4, 5, 0, 1, 0},
         {6, "roam", 0, 1, 0, 0, 1, 0},
         {7, "callheld", 0, 2, 0, 1, 1, 0}};
-    [[maybe_unused]] int HFP::HFPImpl::call_hold_services_nr                      = 5;
+    int HFP::HFPImpl::call_hold_services_nr                                       = 5;
     const char *HFP::HFPImpl::call_hold_services[]                                = {"1", "1x", "2", "2x", "3"};
-    [[maybe_unused]] int HFP::HFPImpl::hf_indicators_nr                           = 2;
-    [[maybe_unused]] hfp_generic_status_indicator_t HFP::HFPImpl::hf_indicators[] = {
+    int HFP::HFPImpl::hf_indicators_nr                                            = 2;
+    hfp_generic_status_indicator_t HFP::HFPImpl::hf_indicators[]                  = {
         {1, 1},
         {2, 1},
     };
     Devicei HFP::HFPImpl::device;
-    bool HFP::HFPImpl::isConnected                  = false;
-    bool HFP::HFPImpl::isIncomingCall               = false;
-    bool HFP::HFPImpl::isCallInitialized            = false;
+    CallStatus HFP::HFPImpl::currentCallStatus = CallStatus::Unknown;
 
     void HFP::HFPImpl::dump_supported_codecs(void)
     {
@@ -223,7 +225,7 @@ namespace bluetooth
                 audioDevice->onDataSend(scoHandle);
             }
             else {
-                LOG_DEBUG("Audiodevice nullptr :(");
+                sco::utils::sendZeros(scoHandle);
             }
             break;
         case HCI_EVENT_HFP_META:
@@ -236,16 +238,6 @@ namespace bluetooth
 
     void HFP::HFPImpl::processHFPEvent(uint8_t *event)
     {
-        // NOTE some of the subevents are not mentioned here yet
-        /*
-         *
-         * in hfp_ag.h there are descriptions of cellular and UI interface of HFP:
-         * // Cellular Actions
-         * and
-         * // actions used by local device / user
-         * those should be called to trigger requested state in HFP's state machine
-         * (which this switch...case depends on)
-         */
         switch (hci_event_hfp_meta_get_subevent_code(event)) {
         case HFP_SUBEVENT_SERVICE_LEVEL_CONNECTION_ESTABLISHED:
             std::uint8_t status;
@@ -253,13 +245,11 @@ namespace bluetooth
             if (status) {
                 LOG_DEBUG("Connection failed, status 0x%02x\n", status);
                 sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
-                isConnected = false;
                 break;
             }
             aclHandle = hfp_subevent_service_level_connection_established_get_acl_handle(event);
             hfp_subevent_service_level_connection_established_get_bd_addr(event, device.address);
             LOG_DEBUG("Service level connection established to %s.\n", bd_addr_to_str(device.address));
-            isConnected = true;
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Connected);
             {
                 auto &busProxy     = const_cast<sys::Service *>(ownerService)->bus;
@@ -275,7 +265,6 @@ namespace bluetooth
         case HFP_SUBEVENT_SERVICE_LEVEL_CONNECTION_RELEASED:
             LOG_DEBUG("Service level connection released.\n");
             aclHandle   = HCI_CON_HANDLE_INVALID;
-            isConnected = false;
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
             {
                 auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
@@ -316,7 +305,6 @@ namespace bluetooth
             break;
         case HFP_SUBEVENT_RING:
             break;
-
         case HFP_SUBEVENT_ATTACH_NUMBER_TO_VOICE_TAG:
             // todo has to be feeded with proper phone number from cellular
             // LOG_DEBUG("Attach number to voice tag. Sending '1234567\n");
@@ -404,9 +392,7 @@ namespace bluetooth
 
     void HFP::HFPImpl::connect()
     {
-        if (isConnected) {
-            disconnect();
-        }
+        disconnect();
         LOG_DEBUG("Connecting the HFP profile");
         hfp_ag_establish_service_level_connection(device.address);
         hfp_ag_set_speaker_gain(aclHandle, 8);
@@ -415,9 +401,11 @@ namespace bluetooth
 
     void HFP::HFPImpl::disconnect()
     {
-        hfp_ag_release_service_level_connection(aclHandle);
-        auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
-        busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device), service::name::bluetooth);
+        if (hfp_ag_release_service_level_connection(aclHandle) == ERROR_CODE_SUCCESS) {
+            auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device),
+                                 service::name::bluetooth);
+        }
     }
 
     void HFP::HFPImpl::setDevice(Devicei dev)
@@ -429,19 +417,6 @@ namespace bluetooth
     void HFP::HFPImpl::setOwnerService(const sys::Service *service)
     {
         ownerService = service;
-    }
-
-    auto HFP::HFPImpl::getStreamData() -> std::shared_ptr<BluetoothStreamData>
-    {
-        return sco->getStreamData();
-    }
-
-    void HFP::HFPImpl::terminateCall() const noexcept
-    {
-        hfp_ag_terminate_call();
-        hfp_ag_release_audio_connection(aclHandle);
-        isCallInitialized = false;
-        isIncomingCall    = false;
     }
 
     void HFP::HFPImpl::initCodecs()
@@ -465,12 +440,6 @@ namespace bluetooth
     }
     void HFP::HFPImpl::initializeCall() const noexcept
     {
-        if (!isCallInitialized && !isIncomingCall) {
-            LOG_DEBUG("Initializing outgoing call");
-            constexpr auto mockNumber = "1234567"; // Mocking phone number - it is not used in stack
-            hfp_ag_outgoing_call_initiated(mockNumber);
-            isCallInitialized = true;
-        }
     }
     void HFP::HFPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
@@ -481,33 +450,41 @@ namespace bluetooth
     void HFP::HFPImpl::startRinging() const noexcept
     {
         LOG_DEBUG("Starting incoming call");
-        isIncomingCall = true;
+        currentCallStatus = CallStatus::Incoming;
         hfp_ag_incoming_call();
     }
     void HFP::HFPImpl::stopRinging() const noexcept
     {
         LOG_DEBUG("Stop ringing called!");
     }
-    auto HFP::HFPImpl::setupCall() const noexcept -> Error::Code
+    auto HFP::HFPImpl::callActive() const noexcept -> Error::Code
     {
-        if (isIncomingCall) {
-            LOG_DEBUG("Answering incoming call");
-            hfp_ag_answer_incoming_call();
+        switch (currentCallStatus) {
+        case CallStatus::Outgoing:
+            hfp_ag_outgoing_call_established();
+            break;
+        case CallStatus::Incoming:
+            hfp_ag_answer_incoming_call(); // will answer the call if it wasn't answered
+            break;
+        default:
+            break;
+        }
+        currentCallStatus = CallStatus::Active;
+        return Error::Success;
+    }
+    void HFP::HFPImpl::terminateCall() const noexcept
+    {
+        if (currentCallStatus == CallStatus::Active) {
+            hfp_ag_terminate_call();
         }
         else {
-            LOG_DEBUG("Establishing outgoing call");
-            audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
-            hfp_ag_outgoing_call_established();
+            hfp_ag_call_dropped();
         }
-
-        return Error::Success;
+        hfp_ag_release_audio_connection(aclHandle);
+        currentCallStatus = CallStatus::Unknown;
     }
     auto HFP::HFPImpl::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
     {
-        if (!isIncomingCall) {
-            isIncomingCall = true;
-            hfp_ag_incoming_call();
-        }
         hfp_ag_set_clip(129, num.c_str());
         return Error::Success;
     }
@@ -528,6 +505,13 @@ namespace bluetooth
         auto result = hfp_ag_set_battery_level(level.getBatteryLevelBars());
 
         LOG_DEBUG("Battery level (bars): %d, set result: %d", level.getBatteryLevelBars(), result);
+        return Error::Success;
+    }
+    auto HFP::HFPImpl::callStarted(const std::string &number) const noexcept -> Error::Code
+    {
+        LOG_DEBUG("Call started called");
+        hfp_ag_outgoing_call_initiated(number.c_str());
+        currentCallStatus = CallStatus::Outgoing;
         return Error::Success;
     }
     auto HFP::HFPImpl::setNetworkRegistrationStatus(bool registered) const noexcept -> Error::Code

@@ -76,6 +76,8 @@ namespace bluetooth
             return profileManager->callAnswered();
         case Command::CallTerminated:
             return profileManager->terminateCall();
+        case Command::CallStarted:
+            return profileManager->callStarted(command.getData());
         case Command::IncomingCallNumber:
             return profileManager->setIncomingCallNumber(command.getData());
         case Command::SignalStrengthData:
