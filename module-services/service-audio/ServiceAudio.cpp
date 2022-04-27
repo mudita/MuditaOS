@@ -12,9 +12,7 @@
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioRouting.hpp>
-#include <service-bluetooth/messages/Ring.hpp>
 #include <service-bluetooth/messages/AudioNotify.hpp>
-#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <Utils.hpp>
@@ -423,18 +421,11 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
     if (opType == Operation::Type::Playback) {
         auto input = audioMux.GetPlaybackInput(playbackType);
-        if (playbackType == audio::PlaybackType::CallRingtone && bluetoothVoiceProfileConnected && input) {
-            LOG_DEBUG("Sending Bluetooth start ringing");
-            bus.sendUnicast(std::make_shared<message::bluetooth::Ring>(message::bluetooth::Ring::State::Enable),
+
+        if (bluetoothA2DPConnected && playbackType != audio::PlaybackType::CallRingtone) {
+            LOG_DEBUG("Sending Bluetooth start stream request");
+            bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Play),
                             service::name::bluetooth);
-            return std::make_unique<AudioStartPlaybackResponse>(audio::RetCode::Success, retToken);
-        }
-        else if (bluetoothA2DPConnected) {
-            if (playbackType != audio::PlaybackType::CallRingtone) {
-                LOG_DEBUG("Sending Bluetooth start stream request");
-                bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Play),
-                                service::name::bluetooth);
-            }
         }
 
         AudioStart(input);

@@ -41,6 +41,7 @@ namespace bluetooth
         auto initializeCall() -> Error::Code;
         auto terminateCall() -> Error::Code;
         auto callAnswered() -> Error::Code;
+        auto callStarted(const DataVariant &data) -> Error::Code;
         auto setIncomingCallNumber(const DataVariant &data) -> Error::Code;
         auto setSignalStrengthData(const DataVariant &data) -> Error::Code;
         auto setOperatorNameData(const DataVariant &data) -> Error::Code;

@@ -30,7 +30,6 @@ namespace bluetooth
         static void receive(uint8_t *packet, uint16_t size);
         void setOwnerService(const sys::Service *service);
         void setCodec(uint8_t codec);
-        auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
 
       private:
         static constexpr auto BYTES_PER_FRAME     = 2;
@@ -82,10 +81,6 @@ namespace bluetooth
     void SCO::receive(uint8_t *packet, uint16_t size)
     {
         pimpl->receive(packet, size);
-    }
-    [[nodiscard]] auto SCO::getStreamData() const -> std::shared_ptr<BluetoothStreamData>
-    {
-        return pimpl->getStreamData();
     }
     void SCO::setOwnerService(const sys::Service *service)
     {
@@ -242,10 +237,6 @@ void SCO::SCOImpl::send(hci_con_handle_t scoHandle)
 void SCO::SCOImpl::receive(uint8_t *packet, uint16_t size)
 {
     receiveCvsd(packet, size);
-}
-auto SCO::SCOImpl::getStreamData() -> std::shared_ptr<BluetoothStreamData>
-{
-    return std::make_shared<BluetoothStreamData>(sinkQueue, sourceQueue, metadata);
 }
 void SCO::SCOImpl::setOwnerService(const sys::Service *service)
 {

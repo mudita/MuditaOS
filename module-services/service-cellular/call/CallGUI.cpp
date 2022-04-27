@@ -21,10 +21,11 @@ void CallGUI::notifyCLIP(const utils::PhoneNumber::View &number)
         &owner, app::manager::actions::HandleCallerId, std::make_unique<app::manager::actions::CallParams>(number));
 }
 
-void CallGUI::notifyCallStarted(utils::PhoneNumber phoneNumber)
+void CallGUI::notifyCallStarted(utils::PhoneNumber phoneNumber, const CallType type)
 {
-    owner.bus.sendMulticast(std::make_shared<cellular::CallStartedNotification>(phoneNumber),
-                            sys::BusChannel::ServiceCellularNotifications);
+    owner.bus.sendMulticast(
+        std::make_shared<cellular::CallStartedNotification>(phoneNumber, type == CallType::CT_INCOMING),
+        sys::BusChannel::ServiceCellularNotifications);
 }
 
 void CallGUI::notifyCallEnded()

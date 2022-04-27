@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "ServiceBluetoothCommon.hpp"
-
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <Service/Message.hpp>

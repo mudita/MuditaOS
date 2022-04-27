@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -33,7 +33,6 @@ namespace bluetooth
         void init();
         void send(hci_con_handle_t sco_handle);
         void receive(uint8_t *packet, uint16_t size);
-        [[nodiscard]] auto getStreamData() const -> std::shared_ptr<BluetoothStreamData>;
         void setOwnerService(const sys::Service *service);
         void setCodec(SCOCodec codec);
 

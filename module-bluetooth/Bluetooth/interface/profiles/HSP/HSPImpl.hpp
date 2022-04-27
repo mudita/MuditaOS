@@ -25,7 +25,6 @@ namespace bluetooth
         void disconnect();
         void setDevice(const Devicei &dev);
         void setOwnerService(const sys::Service *service);
-        auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
 
       private:

@@ -103,7 +103,7 @@ namespace bluetooth
     }
     auto ProfileManager::callAnswered() -> Error::Code
     {
-        return callProfilePtr->callAnswered();
+        return callProfilePtr->callActive();
     }
     auto ProfileManager::setIncomingCallNumber(const DataVariant &data) -> Error::Code
     {
@@ -154,6 +154,15 @@ namespace bluetooth
             default:
                 return callProfilePtr->setNetworkRegistrationStatus(false);
             }
+        }
+        LOG_ERROR("No profile, returning!");
+        return Error::NotReady;
+    }
+    auto ProfileManager::callStarted(const DataVariant &data) -> Error::Code
+    {
+        if (callProfilePtr) {
+            auto number = std::get<utils::PhoneNumber::View>(data);
+            return callProfilePtr->callStarted(number.getE164());
         }
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;

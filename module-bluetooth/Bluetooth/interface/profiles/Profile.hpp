@@ -6,13 +6,14 @@
 #include "Error.hpp"
 #include <audio/BluetoothAudioDevice.hpp>
 #include <Service/Message.hpp>
-#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 #include <memory>
 #include <command/BatteryLevel.hpp>
+#include <Device.hpp>
 
 namespace bluetooth
 {
+
     class Profile
     {
       public:
@@ -55,7 +56,11 @@ namespace bluetooth
         [[nodiscard]] virtual auto terminateCall() const noexcept -> Error::Code = 0;
         /// Executed after the call is answered
         /// @return Error code that determines, whether operation was successful or not
-        [[nodiscard]] virtual auto callAnswered() const noexcept -> Error::Code = 0;
+        [[nodiscard]] virtual auto callActive() const noexcept -> Error::Code = 0;
+        /// Executed after the call has been started
+        /// @param outgoing call number
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto callStarted(const std::string &num) const noexcept -> Error::Code = 0;
         /// Sets the incoming call number
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code = 0;

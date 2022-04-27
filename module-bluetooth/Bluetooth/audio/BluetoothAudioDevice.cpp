@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothAudioDevice.hpp"
@@ -75,6 +75,7 @@ void A2DPAudioDevice::onDataReceive()
 
 auto CVSDAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
 {
+    LOG_DEBUG("Setting CVSD volume: %f", vol);
     if (getProfileType() == AudioProfile::HSP) {
         const auto volumeToSet = audio::volume::scaler::hsp::toHSPGain(vol);
         hsp_ag_set_speaker_gain(volumeToSet);
@@ -200,6 +201,7 @@ void BluetoothAudioDevice::enableOutput()
 
 void BluetoothAudioDevice::disableInput()
 {
+    LOG_DEBUG("Disabling bluetooth audio input.");
     inputEnabled = false;
 }
 
@@ -211,6 +213,7 @@ void BluetoothAudioDevice::disableOutput()
 
 void CVSDAudioDevice::enableInput()
 {
+    LOG_DEBUG("Enabling CVSD bluetooth audio input.");
     auto blockSize = Source::_stream->getInputTraits().blockSize;
     rxLeftovers    = std::make_unique<std::uint8_t[]>(blockSize);
     decoderBuffer  = std::make_unique<std::int16_t[]>(scratchBufferSize);
