@@ -141,5 +141,22 @@ namespace bluetooth
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;
     }
+    auto ProfileManager::setNetworkStatusData(const DataVariant &data) -> Error::Code
+    {
+        auto status = std::get<Store::Network::Status>(data);
+        if (callProfilePtr) {
+            switch (status) {
+            case Store::Network::Status::RegisteredRoaming:
+                callProfilePtr->setRoamingStatus(true);
+                [[fallthrough]];
+            case Store::Network::Status::RegisteredHomeNetwork:
+                return callProfilePtr->setNetworkRegistrationStatus(true);
+            default:
+                return callProfilePtr->setNetworkRegistrationStatus(false);
+            }
+        }
+        LOG_ERROR("No profile, returning!");
+        return Error::NotReady;
+    }
 
 } // namespace bluetooth

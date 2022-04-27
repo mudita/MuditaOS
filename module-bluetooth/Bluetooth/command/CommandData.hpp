@@ -12,8 +12,12 @@
 
 namespace bluetooth
 {
-    using DataVariant =
-        std::variant<BatteryLevel, OperatorName, Store::SignalStrength, Devicei, utils::PhoneNumber::View>;
+    using DataVariant = std::variant<BatteryLevel,
+                                     OperatorName,
+                                     Store::SignalStrength,
+                                     Devicei,
+                                     utils::PhoneNumber::View,
+                                     Store::Network::Status>;
 
     class CommandData
     {

@@ -34,6 +34,7 @@ namespace bluetooth
             SignalStrengthData,
             OperatorNameData,
             BatteryLevelData,
+            NetworkStatusData,
             None,
         };
 

@@ -84,6 +84,8 @@ namespace bluetooth
             return profileManager->setOperatorNameData(command.getData());
         case Command::BatteryLevelData:
             return profileManager->setBatteryLevelData(command.getData());
+        case Command::NetworkStatusData:
+            return profileManager->setNetworkStatusData(command.getData());
         case Command::StartStream:
             profileManager->start();
             return Error::Success;

@@ -46,6 +46,7 @@
 #include <command/SignalStrengthData.hpp>
 #include <command/OperatorNameData.hpp>
 #include <command/BatteryLevelData.hpp>
+#include <command/NetworkStatusData.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 
 namespace
@@ -121,6 +122,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<cellular::CallEndedNotification>();
     connectHandler<CellularSignalStrengthUpdateNotification>();
     connectHandler<CellularCurrentOperatorNameNotification>();
+    connectHandler<CellularNetworkStatusUpdateNotification>();
     connectHandler<sevm::BatteryStatusChangeMessage>();
 
     settingsHolder->onStateChange = [this]() {
@@ -522,7 +524,7 @@ auto ServiceBluetooth::handle(CellularCallActiveNotification *msg) -> std::share
 auto ServiceBluetooth::handle(CellularSignalStrengthUpdateNotification *msg) -> std::shared_ptr<sys::Message>
 {
     auto signalStrength = Store::GSM::get()->getSignalStrength();
-    LOG_INFO("Bluetooth: RSSI %d/5", static_cast<int>(signalStrength.rssiBar));
+    LOG_DEBUG("Bluetooth: RSSI %d/5", static_cast<int>(signalStrength.rssiBar));
     auto commandData = std::make_unique<bluetooth::SignalStrengthData>(signalStrength);
     sendWorkerCommand(bluetooth::Command::Type::SignalStrengthData, std::move(commandData));
     return std::make_shared<sys::ResponseMessage>();
@@ -531,7 +533,7 @@ auto ServiceBluetooth::handle(CellularSignalStrengthUpdateNotification *msg) -> 
 auto ServiceBluetooth::handle(CellularCurrentOperatorNameNotification *msg) -> std::shared_ptr<sys::Message>
 {
     auto opName = msg->getCurrentOperatorName();
-    LOG_INFO("Bluetooth: Operator name: %s", opName.c_str());
+    LOG_DEBUG("Bluetooth: Operator name: %s", opName.c_str());
     auto commandData = std::make_unique<bluetooth::OperatorNameData>(bluetooth::OperatorName(opName));
     sendWorkerCommand(bluetooth::Command::Type::OperatorNameData, std::move(commandData));
     return std::make_shared<sys::ResponseMessage>();
@@ -573,13 +575,14 @@ auto ServiceBluetooth::handle(message::bluetooth::RequestStatusIndicatorData *ms
     // just to execute proper handle method and sending it back to worker
     bus.sendUnicast(std::make_shared<CellularSignalStrengthUpdateNotification>(), service::name::bluetooth);
     bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::bluetooth);
+    bus.sendUnicast(std::make_shared<CellularNetworkStatusUpdateNotification>(), service::name::bluetooth);
 
     return sys::MessageNone{};
 }
 auto ServiceBluetooth::handle(sevm::BatteryStatusChangeMessage *msg) -> std::shared_ptr<sys::Message>
 {
     auto batteryLevel = Store::Battery::get().level;
-    LOG_INFO("Bluetooth: Battery level %d", batteryLevel);
+    LOG_DEBUG("Bluetooth: Battery level %d", batteryLevel);
     auto commandData = std::make_unique<bluetooth::BatteryLevelData>(bluetooth::BatteryLevel(batteryLevel));
     sendWorkerCommand(bluetooth::Command::Type::BatteryLevelData, std::move(commandData));
     return sys::MessageNone{};
@@ -587,5 +590,13 @@ auto ServiceBluetooth::handle(sevm::BatteryStatusChangeMessage *msg) -> std::sha
 auto ServiceBluetooth::handle(cellular::CallEndedNotification *msg) -> std::shared_ptr<sys::Message>
 {
     sendWorkerCommand(bluetooth::Command::Type::CallTerminated);
+    return sys::MessageNone{};
+}
+auto ServiceBluetooth::handle(CellularNetworkStatusUpdateNotification *msg) -> std::shared_ptr<sys::Message>
+{
+    auto status = Store::GSM::get()->getNetwork().status;
+    LOG_DEBUG("Bluetooth: Network status %s", magic_enum::enum_name(status).data());
+    auto commandData = std::make_unique<bluetooth::NetworkStatusData>(status);
+    sendWorkerCommand(bluetooth::Command::Type::NetworkStatusData, std::move(commandData));
     return sys::MessageNone{};
 }

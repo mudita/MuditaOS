@@ -68,6 +68,12 @@ namespace bluetooth
         /// Sets the operator name in HFP profile
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto setBatteryLevel(const BatteryLevel &level) const noexcept -> Error::Code = 0;
+        /// Sets the network registration status in HFP profile
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto setNetworkRegistrationStatus(bool registered) const noexcept -> Error::Code = 0;
+        /// Sets the roaming status in HFP profile
+        /// @return Error code that determines, whether operation was successful or not
+        virtual auto setRoamingStatus(bool enabled) const noexcept -> Error::Code = 0;
     };
 
 } // namespace bluetooth

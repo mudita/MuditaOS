@@ -37,6 +37,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/SignalStrengthData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/OperatorNameData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/BatteryLevelData.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/NetworkStatusData.cpp
 
         )
 

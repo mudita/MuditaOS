@@ -375,6 +375,14 @@ namespace bluetooth
     {
         return pimpl->terminateCall();
     }
+    auto HSP::setNetworkRegistrationStatus(bool registered) const noexcept -> Error::Code
+    {
+        return Error::Success;
+    }
+    auto HSP::setRoamingStatus(bool enabled) const noexcept -> Error::Code
+    {
+        return Error::Success;
+    }
 
     void HSP::HSPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
