@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,6 +10,7 @@
 #include <task.h>
 #include <message_buffer.h>
 #include "BaseChannel.hpp"
+#include <functional>
 
 namespace sys
 {
@@ -85,5 +86,8 @@ namespace at
         virtual void cmdLog(std::string cmd, const Result &result, std::chrono::milliseconds timeout) final;
 
         Result checkResult(bsp::cellular::CellularResultCode cellularResult);
+
+        std::function<void()> onWakeUpModem;
+        std::function<void()> onSleepModem;
     };
 } // namespace at

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "rt1051_cellular.hpp"
@@ -239,8 +239,6 @@ namespace bsp
         sendXfer.data     = txBuffer;
         sendXfer.dataSize = nbytes;
 
-        exitSleep();
-
         uartDmaHandle.userData = xTaskGetCurrentTaskHandle();
         SCB_CleanInvalidateDCache();
 
@@ -338,7 +336,6 @@ namespace bsp
                                  std::chrono::milliseconds timeoutMs = std::chrono::milliseconds{0})
     {
         logUARTdebug("[RX] Read");
-        exitSleep();
 
         auto timeoutTicks = pdMS_TO_TICKS(timeoutMs.count());
         if ((timeoutTicks > portMAX_DELAY) || (timeoutMs == std::chrono::milliseconds::max())) {

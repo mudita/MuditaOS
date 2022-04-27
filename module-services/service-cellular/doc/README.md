@@ -27,7 +27,8 @@ The logic has to recognize the request and apply proper action.
 
 Conditions for cellular to enter sleep mode: 
 * no ongoing call
-* 5 seconds of inactivity in communication over UART
+* communication with the modem is complete
+* 1 seconds of inactivity on RX / TX UART lines
 
 Conditions for cellular to exit sleep mode: 
 * incoming URC
@@ -46,7 +47,7 @@ Host Enables GSM Module to Exit from Power Saving Mode:
 
 GSM Module Enables Host to Exit from Power Saving Mode
 * Host receives the change of RI pin, then exits from power saving mode and enters into normal mode
-* CPU sentinel block frequency decreasing below 132 MHz
+* CPU sentinel block frequency decreasing below 24 MHz
 * The wake-up described in the point above takes place
 
 ## Phone modes in cellular
