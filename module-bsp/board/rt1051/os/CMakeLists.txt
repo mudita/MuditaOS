@@ -9,6 +9,10 @@ add_library(module-bsp-os
 
 add_library(module-bsp::os ALIAS module-bsp-os)
 
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug" OR ${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
+    target_compile_definitions(module-bsp-os PUBLIC DEBUG_FREERTOS)
+endif ()
+
 target_include_directories(module-bsp-os
         PUBLIC
         include
