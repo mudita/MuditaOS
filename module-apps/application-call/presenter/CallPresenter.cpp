@@ -63,6 +63,10 @@ namespace app::call
             view->updateDuration(utils::translate(callAppStyle::strings::callended));
             view->setCallEndedLayout();
             break;
+        case app::call::CallState::Disconnecting:
+            view->updateDuration(utils::translate(callAppStyle::strings::endingcall));
+            view->setCallEndedLayout(false);
+            break;
         case app::call::CallState::None:
             view->clearNavBar();
             break;
@@ -114,6 +118,14 @@ namespace app::call
     void CallWindowContract::Presenter::hangUpCall()
     {
         model->hangUpCall();
+        model->setState(app::call::CallState::Disconnecting);
+    }
+
+    void CallWindowContract::Presenter::sendSms(const UTF8 &smsBody)
+    {
+        if (not model->sendSms(smsBody)) {
+            LOG_ERROR("SMS sending failed!");
+        }
     }
 
     bool CallWindowContract::Presenter::handleDigitButton(const uint32_t &digit)

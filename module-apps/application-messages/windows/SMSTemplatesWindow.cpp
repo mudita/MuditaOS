@@ -76,13 +76,12 @@ namespace gui
         auto app         = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
 
-        auto phoneNumber       = switchData->getPhoneNumber();
         app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
             LOG_DEBUG("SMS template id = %" PRIu32 "sent", templ->ID);
-            app->sendSms(phoneNumber, templ->text);
-            app::manager::Controller::switchBack(app,
-                                                 std::make_unique<app::manager::SwitchBackRequest>(
-                                                     application->GetName(), std::make_unique<SMSTemplateSent>()));
+            app::manager::Controller::switchBack(
+                app,
+                std::make_unique<app::manager::SwitchBackRequest>(application->GetName(),
+                                                                  std::make_unique<SMSTemplateSent>(templ->text)));
             app->popCurrentWindow();
             return true;
         };

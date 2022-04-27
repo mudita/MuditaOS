@@ -66,7 +66,7 @@ namespace gui
         void clearNavBar() override;
         void setIncomingCallLayout(bool isValidCallerId) override;
         void setActiveCallLayout() override;
-        void setCallEndedLayout() override;
+        void setCallEndedLayout(bool delayedClose = true) override;
         void updateNumber(const UTF8 &text) override;
     };
 

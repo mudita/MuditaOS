@@ -22,7 +22,7 @@ namespace app::call
             virtual void clearNavBar()                                           = 0;
             virtual void setIncomingCallLayout(bool isValidCallerId)             = 0;
             virtual void setActiveCallLayout()                                   = 0;
-            virtual void setCallEndedLayout()                                    = 0;
+            virtual void setCallEndedLayout(bool delayedClose = true)            = 0;
             virtual void updateNumber(const UTF8 &text)                          = 0;
 
             virtual ~View() noexcept = default;
@@ -48,6 +48,7 @@ namespace app::call
             void turnLoudspeakerOff();
 
             void hangUpCall();
+            void sendSms(const UTF8 &smsBody);
             utils::PhoneNumber getPhoneNumber();
 
           private:

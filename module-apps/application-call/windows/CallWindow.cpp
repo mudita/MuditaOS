@@ -154,8 +154,9 @@ namespace gui
     {
         presenter->buildLayout();
 
-        if (dynamic_cast<SMSTemplateSent *>(data) != nullptr) {
+        if (auto switchData = dynamic_cast<SMSTemplateSent *>(data); switchData != nullptr) {
             presenter->hangUpCall();
+            presenter->sendSms(switchData->getText());
             return;
         }
     }
@@ -273,7 +274,7 @@ namespace gui
         setFocusItem(microphoneIcon);
     }
 
-    void CallWindow::setCallEndedLayout()
+    void CallWindow::setCallEndedLayout(bool delayedClose)
     {
         navBar->setActive(gui::nav_bar::Side::Left, false);
         navBar->setActive(gui::nav_bar::Side::Center, false);
@@ -286,7 +287,9 @@ namespace gui
         iconsBox->resizeItems();
 
         setFocusItem(nullptr);
-        connectTimerOnExit();
+        if (delayedClose) {
+            connectTimerOnExit();
+        }
     }
 
     void CallWindow::updateNumber(const UTF8 &text)

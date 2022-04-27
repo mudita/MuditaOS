@@ -32,11 +32,11 @@ namespace app::call
             layoutShowed = LayoutShowed::Active;
         };
         ;
-        void setCallEndedLayout() override
+        void setCallEndedLayout(bool delayedClose = true) override
         {
             layoutShowed = LayoutShowed::Ended;
         };
-        ;
+
         void updateNumber(const UTF8 &text) override
         {
             number = text;
@@ -94,6 +94,10 @@ namespace app::call
         {
             answerCallCalled = true;
         };
+        bool sendSms(const UTF8 &smsBody) override
+        {
+            return true;
+        }
         void transmitDtmfTone(const uint32_t &digit) override{};
         void muteCall() override{};
         void unmuteCall() override{};

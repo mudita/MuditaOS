@@ -86,7 +86,17 @@ class SMSSendTemplateRequest : public SMSRequest
 };
 
 class SMSTemplateSent : public gui::SwitchData
-{};
+{
+  public:
+    explicit SMSTemplateSent(const UTF8 &text) : smsText(text){};
+    auto getText() -> UTF8
+    {
+        return smsText;
+    }
+
+  private:
+    UTF8 smsText;
+};
 
 class SMSTextData : public gui::SwitchData
 {
