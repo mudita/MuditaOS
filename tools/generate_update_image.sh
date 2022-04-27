@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #create update image
@@ -71,6 +71,7 @@ function linkInStageing(){
     ln -s ../../sysroot/sys/current/assets/fonts
     ln -s ../../sysroot/sys/current/assets/images
     ln -s ../../sysroot/sys/current/assets/lang
+    ln -s ../../sysroot/sys/current/assets/audio
     popd 1> /dev/null
 
     ln -s ../sysroot/sys/user
