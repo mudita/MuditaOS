@@ -1948,7 +1948,6 @@ auto ServiceCellular::handleDBNotificationMessage(db::NotificationMessage *msg) 
         (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update)) {
 
         priv->outSMSHandler.handleDBNotification();
-
         return std::make_shared<sys::ResponseMessage>();
     }
     return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);

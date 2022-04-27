@@ -614,6 +614,7 @@
   "app_desktop_update_ready_for_reset": "Bereit für Reset …",
   "app_desktop_update_success": "MuditaOS wurde erfolgreich auf Version $VERSION aktualisiert.",
   "app_call_private_number": "Private Nummer",
+  "app_call_ending_call": "Anruf beenden",
   "tethering": "Tethering",
   "tethering_turn_off_question": "Tethering ausschalten?",
   "tethering_enable_question": "<text>Sie sind mit dem Computer verbunden.<br />Tethering einschalten?<br /><text color='5'>(einige Funktionen können deaktiviert sein)</text></text>",

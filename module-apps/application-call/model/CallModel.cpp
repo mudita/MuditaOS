@@ -67,6 +67,24 @@ namespace app::call
         CellularServiceAPI::AnswerIncomingCall(application);
     }
 
+    bool CallModel::sendSms(const UTF8 &smsBody)
+    {
+        if (phoneNumber.getView().getEntered().empty() || smsBody.length() == 0) {
+            LOG_WARN("Number or sms body is empty");
+            return false;
+        }
+        SMSRecord record;
+        record.number = phoneNumber.getView();
+        record.body   = smsBody;
+        record.type   = SMSType::QUEUED;
+        record.date   = std::time(nullptr);
+
+        using db::query::SMSAdd;
+        const auto [succeed, _] =
+            DBServiceAPI::GetQuery(application, db::Interface::Name::SMS, std::make_unique<SMSAdd>(record));
+        return succeed;
+    }
+
     void CallModel::transmitDtmfTone(const uint32_t &digit)
     {
         CellularServiceAPI::TransmitDtmfTones(application, digit);

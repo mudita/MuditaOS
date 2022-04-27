@@ -19,7 +19,8 @@ namespace app::call
         Outgoing,
         Active,
         Ended,
-        Rejected
+        Rejected,
+        Disconnecting
     };
 
     inline auto c_str(app::call::CallState state) -> const char *
@@ -37,6 +38,8 @@ namespace app::call
             return "Ended";
         case CallState::Rejected:
             return "Ended";
+        case CallState::Disconnecting:
+            return "Disconnecting";
         }
         return "";
     }
@@ -55,6 +58,7 @@ namespace app::call
 
         virtual void hangUpCall()                            = 0;
         virtual void answerCall()                            = 0;
+        virtual bool sendSms(const UTF8 &smsBody)            = 0;
         virtual void transmitDtmfTone(const uint32_t &digit) = 0;
         virtual void muteCall()                              = 0;
         virtual void unmuteCall()                            = 0;
@@ -84,6 +88,7 @@ namespace app::call
 
         void hangUpCall() final;
         void answerCall() final;
+        bool sendSms(const UTF8 &smsBody) final;
         void transmitDtmfTone(const uint32_t &digit) final;
         void muteCall();
         void unmuteCall();
