@@ -105,14 +105,23 @@
 
 const char *ServiceCellular::serviceName = cellular::service::name;
 
-inline constexpr auto cellularStack = 8000;
-
 using namespace cellular;
 using namespace cellular::msg;
 using cellular::service::State;
 
+namespace constants
+{
+    using namespace std::chrono_literals;
+
+    inline constexpr auto cellularStack = 8000;
+
+    inline constexpr std::chrono::milliseconds sleepTimerInterval{500ms};
+    inline constexpr std::chrono::milliseconds maxUrcHandleTime{5s};
+    inline constexpr std::chrono::milliseconds maxTimeWithoutCommunication{1s};
+} // namespace constants
+
 ServiceCellular::ServiceCellular()
-    : sys::Service(serviceName, "", cellularStack, sys::ServicePriority::Idle),
+    : sys::Service(serviceName, "", constants::cellularStack, sys::ServicePriority::Idle),
       phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()},
       priv{std::make_unique<internal::ServiceCellularPriv>(this)}
 {
@@ -133,7 +142,7 @@ ServiceCellular::ServiceCellular()
         this, "state", std::chrono::milliseconds{1000}, [&](sys::Timer &) { handleStateTimer(); });
     ussdTimer = sys::TimerFactory::createPeriodicTimer(
         this, "ussd", std::chrono::milliseconds{1000}, [this](sys::Timer &) { handleUSSDTimer(); });
-    sleepTimer = sys::TimerFactory::createPeriodicTimer(
+    sleepTimer = sys::TimerFactory::createSingleShotTimer(
         this, "sleep", constants::sleepTimerInterval, [this](sys::Timer &) { SleepTimerHandler(); });
     connectionTimer =
         sys::TimerFactory::createPeriodicTimer(this, "connection", std::chrono::seconds{60}, [this](sys::Timer &) {
@@ -214,10 +223,20 @@ void ServiceCellular::SleepTimerHandler()
                                           : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
 
     if (!ongoingCall.isValid() && priv->state->get() >= State::ST::URCReady &&
-        timeOfInactivity >= constants::enterSleepModeTime.count()) {
+        timeOfInactivity >= constants::maxTimeWithoutCommunication.count()) {
         cmux->enterSleepMode();
         cpuSentinel->ReleaseMinimumFrequency();
     }
+    else {
+        sleepTimer.restart(constants::sleepTimerInterval);
+    }
+}
+
+void ServiceCellular::WakeUpHandler()
+{
+    sleepTimer.stop();
+    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_2);
+    cmux->exitSleepMode();
 }
 
 void ServiceCellular::CallStateTimerHandler()
@@ -1298,7 +1317,9 @@ bool ServiceCellular::handle_URCReady()
     ret = ret && channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
 
     bus.sendMulticast<cellular::msg::notification::ModemStateChanged>(cellular::api::ModemState::Ready);
-    sleepTimer.start();
+
+    channel->onWakeUpModem = [this]() { WakeUpHandler(); };
+    channel->onSleepModem  = [this]() { sleepTimer.restart(constants::sleepTimerInterval); };
 
     LOG_DEBUG("%s", priv->state->c_str());
     return ret;
@@ -2178,9 +2199,10 @@ auto ServiceCellular::handleNetworkStatusUpdateNotification(sys::Message *msg) -
 
 auto ServiceCellular::handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    // when handling URC, the CPU frequency does not go below a certain level
-    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_2);
-    cmux->exitSleepMode();
+    WakeUpHandler();
+    // if there is no response from the host to incoming URC,
+    // the modem will automatically sleep after time constants::maxUrcHandleTime
+    sleepTimer.restart(constants::maxUrcHandleTime);
     return std::make_shared<CellularResponseMessage>(true);
 }
 

@@ -48,13 +48,6 @@ namespace packet_data
     class PDPContext;
 } // namespace packet_data
 
-namespace constants
-{
-    using namespace std::chrono_literals;
-    inline constexpr std::chrono::milliseconds sleepTimerInterval{500ms};
-    inline constexpr std::chrono::milliseconds enterSleepModeTime{5s};
-} // namespace constants
-
 class ConnectionManager;
 
 namespace cellular::internal
@@ -127,6 +120,8 @@ class ServiceCellular : public sys::Service
     std::unique_ptr<settings::Settings> settings;
 
     void SleepTimerHandler();
+    void WakeUpHandler();
+
     void CallStateTimerHandler();
     DLCChannel::Callback_t notificationCallback = nullptr;
 

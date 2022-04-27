@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DLCChannel.h"
@@ -10,6 +10,7 @@
 #include <ticks.hpp>
 #include <Utils.hpp>
 #include <magic_enum.hpp>
+#include <gsl/util>
 
 DLCChannel::DLCChannel(DLCI_t DLCI, const std::string &name, bsp::Cellular *cellular, const Callback_t &callback)
     : Channel{new uint8_t[at::defaultReceiveBufferSize]}, name{name}, DLCI{DLCI}, pvCellular{cellular}
@@ -104,6 +105,15 @@ std::vector<std::string> DLCChannel::sendCommandPrompt(const char *cmd,
                                                        std::chrono::milliseconds timeout)
 {
     std::vector<std::string> tokens;
+
+    if (onWakeUpModem != nullptr) {
+        onWakeUpModem();
+    }
+    auto _ = gsl::finally([this] {
+        if (onSleepModem != nullptr) {
+            onSleepModem();
+        }
+    });
 
     awaitingResponseFlag.set();
 

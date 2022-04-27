@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATCommon.hpp"
@@ -10,6 +10,7 @@
 #include <Utils.hpp>
 #include "ATStream.hpp"
 #include <at/ATFactory.hpp>
+#include <gsl/util>
 
 using namespace at;
 using namespace std::chrono_literals;
@@ -71,6 +72,15 @@ Result Channel::cmd(const std::string &cmd, std::chrono::milliseconds timeout, s
         return result;
     }
     ATStream atStream(rxCount);
+
+    if (onWakeUpModem != nullptr) {
+        onWakeUpModem();
+    }
+    auto _ = gsl::finally([this] {
+        if (onSleepModem != nullptr) {
+            onSleepModem();
+        }
+    });
 
     awaitingResponseFlag.set();
 
