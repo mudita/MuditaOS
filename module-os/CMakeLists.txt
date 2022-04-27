@@ -41,10 +41,6 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
     set_source_files_properties(memory/usermem.c PROPERTIES COMPILE_OPTIONS "-O0")
 endif ()
 
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug" OR ${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC DEBUG_FREERTOS)
-endif ()
-
 target_include_directories(${PROJECT_NAME}
 
         PUBLIC
