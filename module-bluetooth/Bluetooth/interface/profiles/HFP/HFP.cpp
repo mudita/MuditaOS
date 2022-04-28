@@ -316,10 +316,12 @@ namespace bluetooth
             // LOG_DEBUG("Attach number to voice tag. Sending '1234567\n");
             hfp_ag_send_phone_number_for_voice_tag(aclHandle, "1234567");
             break;
-        case HFP_SUBEVENT_TRANSMIT_DTMF_CODES:
-            LOG_DEBUG("Send DTMF Codes: '%s'\n", hfp_subevent_transmit_dtmf_codes_get_dtmf(event));
+        case HFP_SUBEVENT_TRANSMIT_DTMF_CODES: {
+            auto digitStr = hfp_subevent_transmit_dtmf_codes_get_dtmf(event);
+            LOG_DEBUG("Send DTMF Codes: '%s'\n", digitStr);
+            cellularInterface->sendDTMFCode(const_cast<sys::Service *>(ownerService), utils::toNumeric(digitStr));
             hfp_ag_send_dtmf_code_done(aclHandle);
-            break;
+        } break;
         case HFP_SUBEVENT_CALL_ANSWERED:
             LOG_DEBUG("Call answered");
             cellularInterface->answerIncomingCall(const_cast<sys::Service *>(ownerService));

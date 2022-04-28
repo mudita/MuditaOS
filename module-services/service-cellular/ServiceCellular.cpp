@@ -1474,7 +1474,8 @@ bool ServiceCellular::transmitDtmfTone(uint32_t digit)
     at::Result resp;
     if (channel) {
         auto command           = at::factory(at::AT::QLDTMF);
-        std::string dtmfString = "\"" + std::string(1, digit) + "\"";
+        std::string dtmfString = "\"" + utils::singleDigitToString(digit) + "\"";
+        LOG_ERROR("Sending cmd: %s", dtmfString.c_str());
         resp                   = channel->cmd(command.getCmd() + dtmfString);
         if (resp) {
             command = at::factory(at::AT::VTS);

@@ -23,6 +23,26 @@ namespace utils
     std::string bytesToHex(const std::vector<std::uint8_t> &bytes);
     std::vector<std::uint8_t> hexToBytes(const std::string &hex);
 
+    template <typename T> inline char singleDigitToChar(T digit)
+    {
+        static_assert(std::is_integral<T>::value, "Integral number required.");
+
+        if (digit > 9 || digit < 0) {
+            return '\0';
+        }
+        // converting digit to ASCII code
+        return static_cast<char>(digit + '0');
+    }
+
+    template <typename T> inline std::string singleDigitToString(T digit)
+    {
+        auto charDigit = singleDigitToChar(digit);
+        if (charDigit == '\0') {
+            return std::string();
+        }
+        return std::string(1, charDigit);
+    }
+
     template <typename T> std::string numToHex(T c)
     {
         std::stringstream s;

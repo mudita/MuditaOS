@@ -1,10 +1,10 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <service-cellular/Constans.hpp>
 #include "PhoneInterface.hpp"
 #include "service-audio/AudioServiceAPI.hpp"
 #include "service-cellular/CellularServiceAPI.hpp"
-
 namespace bluetooth
 {
     bool CellularInterfaceImpl::answerIncomingCall(sys::Service *service)
@@ -15,6 +15,12 @@ namespace bluetooth
     bool CellularInterfaceImpl::hangupCall(sys::Service *service)
     {
         return CellularServiceAPI::HangupCall(service);
+    }
+    bool CellularInterfaceImpl::sendDTMFCode(sys::Service *service, uint32_t digit)
+    {
+        auto msg = std::make_shared<CellularDtmfRequestMessage>(digit);
+        service->bus.sendUnicast(std::move(msg), service::name::cellular);
+        return true;
     }
 
     bool CellularInterfaceImpl::dialNumber(sys::Service *service, const std::string &number)
