@@ -14,7 +14,8 @@ namespace bluetooth
 
     enum class CallStatus
     {
-        Outgoing,
+        OutgoingPlacedFromPure,
+        OutgoingPlacedFromHFP,
         Incoming,
         Active,
         Unknown

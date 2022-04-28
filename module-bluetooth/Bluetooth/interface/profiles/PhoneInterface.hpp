@@ -13,6 +13,7 @@ namespace bluetooth
         virtual ~CellularInterface()                           = default;
         virtual bool answerIncomingCall(sys::Service *service) = 0;
         virtual bool hangupCall(sys::Service *service)         = 0;
+        virtual bool dialNumber(sys::Service *service, const std::string &number) = 0;
     };
 
     class CellularInterfaceImpl : public CellularInterface
@@ -20,6 +21,7 @@ namespace bluetooth
       public:
         bool answerIncomingCall(sys::Service *service) override;
         bool hangupCall(sys::Service *service) override;
+        bool dialNumber(sys::Service *service, const std::string &number) override;
     };
 
     class AudioInterface
