@@ -47,6 +47,7 @@ target_link_libraries(application-bell-background-sounds
     PRIVATE
         apps-common
         bell::audio
+        bell::alarms
 
     PUBLIC
         module-gui

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsPresenter.hpp"
@@ -86,9 +86,7 @@ namespace app::meditation
             std::make_shared<BellListItemProvider>(BellListItemProvider::Items{startDelay, chimeInterval, chimeVolume});
 
         chimeVolume->onEnter = [this]() {
-            this->audioModel.play(purefs::dir::getCurrentOSPath() / meditationAudioPath,
-                                  AbstractAudioModel::PlaybackType::Meditation,
-                                  {});
+            this->audioModel.play(getMeditationAudioPath(), AbstractAudioModel::PlaybackType::Meditation, {});
         };
 
         chimeVolume->onExit = [this]() { stopSound(); };
@@ -96,9 +94,7 @@ namespace app::meditation
         chimeVolume->set_on_value_change_cb([this](const auto &val) {
             this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Meditation, {});
             if (this->audioModel.hasPlaybackFinished()) {
-                this->audioModel.play(purefs::dir::getCurrentOSPath() / meditationAudioPath,
-                                      AbstractAudioModel::PlaybackType::Meditation,
-                                      {});
+                this->audioModel.play(getMeditationAudioPath(), AbstractAudioModel::PlaybackType::Meditation, {});
             }
         });
 

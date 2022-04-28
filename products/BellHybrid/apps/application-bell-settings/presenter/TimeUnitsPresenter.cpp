@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/TemperatureUnitModel.hpp"
@@ -48,10 +48,10 @@ namespace app::bell_settings
             }
             if (isCurrentLayout12h) {
                 std::string fallbackLayout;
-                if (currentLayout.rfind("Classic", 0) == 0) {
+                if (currentLayout->rfind("Classic", 0) == 0) {
                     fallbackLayout = "Classic";
                 }
-                else if (currentLayout.rfind("Vertical", 0) == 0) {
+                else if (currentLayout->rfind("Vertical", 0) == 0) {
                     fallbackLayout = "VerticalSimple";
                 }
                 auto layoutChangeRequest = std::make_shared<ChangeHomescreenLayoutMessage>(fallbackLayout);

@@ -89,10 +89,20 @@ namespace app
     void ApplicationBellMain::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            auto layoutModel    = std::make_unique<bell_settings::LayoutModel>(app);
-            auto window         = std::make_unique<gui::BellHomeScreenWindow>(app, homeScreenPresenter);
-            auto selectedLayout = layoutModel->getValue();
-            setHomeScreenLayout(selectedLayout);
+            auto layoutModel = std::make_unique<bell_settings::LayoutModel>(app);
+            auto window      = std::make_unique<gui::BellHomeScreenWindow>(app, homeScreenPresenter);
+            if (const auto selectedLayout = layoutModel->getValue();
+                not selectedLayout or not setHomeScreenLayout(*selectedLayout)) {
+
+                const auto defaultLayout = gui::factory::getDefaultLayout();
+
+                /// Update database entry even if such a field does not exist
+                layoutModel->setValue(defaultLayout);
+                setHomeScreenLayout(defaultLayout);
+
+                LOG_WARN("Invalid layout, loading the default one, %s", defaultLayout.c_str());
+            }
+
             return window;
         });
 
@@ -160,13 +170,14 @@ namespace app
         return ApplicationCommon::handleSwitchWindow(msgl);
     }
 
-    void ApplicationBellMain::setHomeScreenLayout(std::string layoutName)
+    bool ApplicationBellMain::setHomeScreenLayout(std::string layoutName)
     {
         auto homeScreenLayoutsList = gui::factory::getAllLayouts();
         if (homeScreenLayoutsList.find(layoutName) == homeScreenLayoutsList.end()) {
-            return;
+            return false;
         }
-        auto layoutGenerator = homeScreenLayoutsList.at(layoutName);
+        const auto layoutGenerator = homeScreenLayoutsList.at(layoutName);
         homeScreenPresenter->setLayout(layoutGenerator);
+        return true;
     }
 } // namespace app

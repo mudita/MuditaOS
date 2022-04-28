@@ -18,5 +18,6 @@ namespace gui
         std::map<std::string, LayoutGenerator> getLayoutsFormat12h();
 
         std::map<std::string, LayoutGenerator> getAllLayouts();
+        std::string getDefaultLayout();
     } // namespace factory
 };    // namespace gui

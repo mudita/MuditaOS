@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellBackgroundSounds.hpp"
@@ -12,6 +12,7 @@
 #include "windows/BGSoundsTimerSelectWindow.hpp"
 #include "windows/BGSoundsVolumeWindow.hpp"
 #include "widgets/BGSoundsPlayer.hpp"
+#include <AlarmSoundPaths.hpp>
 #include <apps-common/messages/AppMessage.hpp>
 #include <apps-common/models/SongsRepository.hpp>
 #include <common/models/TimeModel.hpp>
@@ -19,12 +20,6 @@
 #include <audio/AudioMessage.hpp>
 
 #include <log/log.hpp>
-
-namespace
-{
-    const auto backgroundSoundsFilesPath =
-        purefs::createPath(purefs::dir::getCurrentOSPath(), "assets/audio/bg_sounds").string();
-}
 
 namespace app
 {
@@ -55,9 +50,9 @@ namespace app
     void ApplicationBellBackgroundSounds::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            auto tagsFetcher = std::make_unique<app::music::ServiceAudioTagsFetcher>(app);
-            auto soundsRepository =
-                std::make_unique<app::music::SongsRepository>(app, std::move(tagsFetcher), backgroundSoundsFilesPath);
+            auto tagsFetcher      = std::make_unique<app::music::ServiceAudioTagsFetcher>(app);
+            auto soundsRepository = std::make_unique<app::music::SongsRepository>(
+                app, std::move(tagsFetcher), alarms::paths::getBackgroundSoundsDir());
             auto presenter = std::make_unique<bgSounds::BGSoundsMainWindowPresenter>(std::move(soundsRepository));
             return std::make_unique<gui::BGSoundsMainWindow>(app, std::move(presenter));
         });
