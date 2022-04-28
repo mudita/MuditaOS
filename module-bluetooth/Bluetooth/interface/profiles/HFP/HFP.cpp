@@ -301,9 +301,15 @@ namespace bluetooth
             LOG_DEBUG("Stop Ringing\n");
             // todo stop ringtone stream here
             break;
-        case HFP_SUBEVENT_PLACE_CALL_WITH_NUMBER:
-            break;
+        case HFP_SUBEVENT_PLACE_CALL_WITH_NUMBER: {
+            auto receivedNumber = hfp_subevent_place_call_with_number_get_number(event);
+            LOG_DEBUG("Requested call from HFP to number %s", receivedNumber);
+            currentCallStatus = CallStatus::OutgoingPlacedFromHFP;
+            hfp_ag_outgoing_call_accepted();
+            cellularInterface->dialNumber(const_cast<sys::Service *>(ownerService), receivedNumber);
+        } break;
         case HFP_SUBEVENT_RING:
+            LOG_DEBUG("SUBEVENT_RING called!");
             break;
         case HFP_SUBEVENT_ATTACH_NUMBER_TO_VOICE_TAG:
             // todo has to be feeded with proper phone number from cellular
@@ -329,6 +335,7 @@ namespace bluetooth
         case HFP_SUBEVENT_CALL_TERMINATED:
             LOG_DEBUG("Call terminated");
             cellularInterface->hangupCall(const_cast<sys::Service *>(ownerService));
+            currentCallStatus = CallStatus::Unknown;
             break;
         default:
             LOG_DEBUG("Event not handled %u\n", hci_event_hfp_meta_get_subevent_code(event));
@@ -357,11 +364,12 @@ namespace bluetooth
                                       (1 << HFP_AGSF_ABILITY_TO_REJECT_A_CALL) /*| (1 << HFP_AGSF_IN_BAND_RING_TONE) |*/
             /* (1 << HFP_AGSF_VOICE_RECOGNITION_FUNCTION) |(1 << HFP_AGSF_THREE_WAY_CALLING)*/;
         int wide_band_speech = 0;
+        constexpr std::uint8_t abilityToRejectCall = 1;
         hfp_ag_create_sdp_record(serviceBuffer.data(),
                                  hspSdpRecordHandle,
                                  rfcommChannelNr,
                                  agServiceName.data(),
-                                 0,
+                                 abilityToRejectCall,
                                  supported_features,
                                  wide_band_speech);
 
@@ -459,15 +467,8 @@ namespace bluetooth
     }
     auto HFP::HFPImpl::callActive() const noexcept -> Error::Code
     {
-        switch (currentCallStatus) {
-        case CallStatus::Outgoing:
-            hfp_ag_outgoing_call_established();
-            break;
-        case CallStatus::Incoming:
+        if (currentCallStatus == CallStatus::Incoming) {
             hfp_ag_answer_incoming_call(); // will answer the call if it wasn't answered
-            break;
-        default:
-            break;
         }
         currentCallStatus = CallStatus::Active;
         return Error::Success;
@@ -480,8 +481,6 @@ namespace bluetooth
         else {
             hfp_ag_call_dropped();
         }
-        hfp_ag_release_audio_connection(aclHandle);
-        currentCallStatus = CallStatus::Unknown;
     }
     auto HFP::HFPImpl::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
     {
@@ -509,9 +508,12 @@ namespace bluetooth
     }
     auto HFP::HFPImpl::callStarted(const std::string &number) const noexcept -> Error::Code
     {
-        LOG_DEBUG("Call started called");
-        hfp_ag_outgoing_call_initiated(number.c_str());
-        currentCallStatus = CallStatus::Outgoing;
+        if (currentCallStatus != CallStatus::OutgoingPlacedFromHFP) {
+            LOG_DEBUG("Started outgoing call from Pure");
+            hfp_ag_outgoing_call_initiated(number.c_str());
+            currentCallStatus = CallStatus::OutgoingPlacedFromPure;
+        }
+        hfp_ag_outgoing_call_established();
         return Error::Success;
     }
     auto HFP::HFPImpl::setNetworkRegistrationStatus(bool registered) const noexcept -> Error::Code

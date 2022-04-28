@@ -17,6 +17,11 @@ namespace bluetooth
         return CellularServiceAPI::HangupCall(service);
     }
 
+    bool CellularInterfaceImpl::dialNumber(sys::Service *service, const std::string &number)
+    {
+        return CellularServiceAPI::DialNumber(service, number);
+    }
+
     bool AudioInterfaceImpl::startAudioRouting(sys::Service *service)
     {
         return AudioServiceAPI::RoutingStart(service);
