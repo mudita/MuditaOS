@@ -422,6 +422,11 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     if (opType == Operation::Type::Playback) {
         auto input = audioMux.GetPlaybackInput(playbackType);
 
+        if (playbackType == audio::PlaybackType::CallRingtone && bluetoothVoiceProfileConnected && input) {
+            // don't play ringtone on HFP connection on Pure
+            return std::make_unique<AudioStartPlaybackResponse>(audio::RetCode::Success, retToken);
+        }
+
         if (bluetoothA2DPConnected && playbackType != audio::PlaybackType::CallRingtone) {
             LOG_DEBUG("Sending Bluetooth start stream request");
             bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Play),
