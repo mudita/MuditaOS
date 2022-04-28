@@ -14,9 +14,14 @@ namespace app::bell_settings
         settings.init(service::ServiceProxy{app->weak_from_this()});
     }
 
-    std::string LayoutModel::getValue() const
+    std::optional<std::string> LayoutModel::getValue() const
     {
-        return settings.getValue(bell::settings::Layout::layout, settings::SettingsScope::Global);
+        if (const auto result = settings.getValue(bell::settings::Layout::layout, settings::SettingsScope::Global);
+            not result.empty()) {
+            return result;
+        }
+
+        return std::nullopt;
     }
 
     void LayoutModel::setValue(const std::string &value) const

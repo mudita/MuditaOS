@@ -44,7 +44,7 @@ namespace app
       private:
         void onStart() override;
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
-        void setHomeScreenLayout(std::string layoutName);
+        bool setHomeScreenLayout(std::string layoutName);
 
         std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter{};
     };

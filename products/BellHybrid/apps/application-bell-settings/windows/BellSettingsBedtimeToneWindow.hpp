@@ -15,7 +15,7 @@ namespace gui
                                           public app::bell_settings::BedtimeSettingsWindowContract::View
     {
       public:
-        static constexpr auto name = "BellSettingsBedtimeToneWindow";
+        static constexpr auto name = "BellSettingsBedtimeTone";
         explicit BellSettingsBedtimeToneWindow(
             app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::SettingsPresenter::Presenter> presenter);
 

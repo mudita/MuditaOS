@@ -15,9 +15,7 @@
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
 
 // modules
-#include <module-db/Databases/EventsDB.hpp>
 #include <module-db/Databases/MultimediaFilesDB.hpp>
-#include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 
 // services
@@ -43,6 +41,7 @@
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
 #include <time/AlarmOperations.hpp>
+#include "alarms/include/AlarmSoundPaths.hpp"
 
 #include <memory>
 #include <vector>
@@ -51,11 +50,24 @@
 #include <SEGGER/SEGGER_SYSVIEW.h>
 #endif
 
+namespace
+{
+    void validate_assets_path()
+    {
+        if (const auto ret = alarms::paths::validate(); not ret.empty()) {
+            for (const auto &e : ret) {
+                LOG_FATAL("%s path missing", e.c_str());
+            }
+            abort();
+        }
+    }
+} // namespace
+
 int main()
 {
     constexpr auto ApplicationName = "BellHybrid";
 
-    std::vector<std::string> fileIndexerAudioPaths = {{purefs::dir::getCurrentOSPath() / "assets/audio/bg_sounds"}};
+    std::vector<std::string> fileIndexerAudioPaths = {alarms::paths::getBackgroundSoundsDir()};
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
@@ -74,7 +86,7 @@ int main()
     if (!sys::SystemWatchdog::getInstance().init()) {
         LOG_ERROR("System watchdog failed to initialize");
         // wait for the hardware watchdog (initialized in reset ISR) to reset the system
-        while (1)
+        while (true)
             ;
     }
 
@@ -105,6 +117,9 @@ int main()
             /// otherwise we would end up with an init race and PhonenumberUtil could
             /// be initiated in a task with stack not big enough to handle it
             i18n::phonenumbers::PhoneNumberUtil::GetInstance();
+
+            validate_assets_path();
+
             return true;
         },
         [sysmgr]() {
