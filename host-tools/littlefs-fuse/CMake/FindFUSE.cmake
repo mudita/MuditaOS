@@ -24,7 +24,7 @@ else (APPLE)
 endif (APPLE)
 FIND_LIBRARY(FUSE_LIBRARIES
         NAMES ${FUSE_NAMES}
-        PATHS /lib64 /lib /usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib/x86_64-linux-gnu
+        PATHS /lib64 /lib /usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib/x86_64-linux-gnu /usr/lib/aarch64-linux-gnu
         )
 
 include ("FindPackageHandleStandardArgs")

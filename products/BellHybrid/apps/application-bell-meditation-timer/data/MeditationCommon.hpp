@@ -1,7 +1,12 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include <AlarmSoundPaths.hpp>
+
+#include <filesystem>
+#include <string>
 
 namespace app::meditation
 {
@@ -13,5 +18,10 @@ namespace app::meditation
     }; // namespace windows
 
     constexpr auto meditationDBRecordName = "MeditationTimer";
-    inline constexpr auto meditationAudioPath = "assets/audio/meditation/Meditation_Gong.mp3";
+
+    inline std::filesystem::path getMeditationAudioPath()
+    {
+        return alarms::paths::getMeditationSoundsDir() / "Meditation_Gong.mp3";
+    }
+
 } // namespace app::meditation

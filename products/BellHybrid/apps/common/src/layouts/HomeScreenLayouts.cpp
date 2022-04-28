@@ -36,4 +36,9 @@ namespace gui::factory
         return getLayoutsFormat12h();
     };
 
+    std::string getDefaultLayout()
+    {
+        return "Classic";
+    }
+
 } // namespace gui::factory

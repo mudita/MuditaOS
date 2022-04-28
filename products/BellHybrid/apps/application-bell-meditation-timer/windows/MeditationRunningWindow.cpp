@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -185,8 +185,8 @@ namespace gui
 
     void MeditationRunningWindow::playGong()
     {
-        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(
-            purefs::dir::getCurrentOSPath() / app::meditation::meditationAudioPath, audio::PlaybackType::Meditation);
+        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(app::meditation::getMeditationAudioPath(),
+                                                                        audio::PlaybackType::Meditation);
         application->bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 } // namespace gui

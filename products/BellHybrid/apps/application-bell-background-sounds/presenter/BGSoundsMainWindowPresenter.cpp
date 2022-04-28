@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BGSoundsMainWindowPresenter.hpp"
@@ -13,8 +13,6 @@ namespace
 
 namespace app::bgSounds
 {
-    auto bgSoundsPath = purefs::dir::getCurrentOSPath() / "assets" / "audio" / "bell" / "bg_sounds";
-
     BGSoundsMainWindowPresenter::BGSoundsMainWindowPresenter(
         std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository)
         : soundsRepository{std::move(soundsRepository)}
