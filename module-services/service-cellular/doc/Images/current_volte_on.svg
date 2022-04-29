@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="317px" preserveAspectRatio="none" style="width:423px;height:317px;background:#F0F0F0;" version="1.1" viewBox="0 0 423 317" width="423px" zoomAndPan="magnify"><defs><filter height="300%" id="f15eqk9n2t3sdx" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><rect fill="#FEFECE" filter="url(#f15eqk9n2t3sdx)" height="64.2344" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="251" x="83" y="242"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="83" x2="334" y1="268.2969" y2="268.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="108" x="154.5" y="259.9951">Reboot modem</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="174" x="88" y="284.4355">AT+CFUN=1,1 via SoftReset</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="231" x="88" y="298.4043">Init modem, MBN auto-setup IMS APN</text><rect fill="#FEFECE" filter="url(#f15eqk9n2t3sdx)" height="50.2656" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="131" x="143" y="132"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="143" x2="274" y1="158.2969" y2="158.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="24" x="196.5" y="149.9951">IMS</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="111" x="148" y="174.4355">AT+QCFG="ims",1</text><rect fill="#FEFECE" filter="url(#f15eqk9n2t3sdx)" height="64.2344" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="405" x="6" y="8"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="6" x2="411" y1="34.2969" y2="34.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="133" x="142" y="25.9951">Set PS as preferred</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="329" x="11" y="50.4355">Set Packets Switching as preferred method for voice</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="385" x="11" y="64.4043">AT+QNVFR="/nv/item_files/modem/mmode/voice_domain_pref"</text><!--MD5=[fb246cdc562dfb14a16122b4eecbb380]
+link SetPS to IMS--><path d="M208.5,72.12 C208.5,89.12 208.5,110.05 208.5,126.75 " fill="none" id="SetPS-&gt;IMS" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="208.5,131.78,212.5,122.78,208.5,126.78,204.5,122.78,208.5,131.78" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[4b29da18a45c1128d1fa3de7c6223de5]
+link IMS to Reboot--><path d="M208.5,182.11 C208.5,197.87 208.5,218.74 208.5,236.52 " fill="none" id="IMS-&gt;Reboot" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="208.5,241.92,212.5,232.92,208.5,236.92,204.5,232.92,208.5,241.92" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[39c735da088f5785376199452a6bd7c3]
+@startuml
+skinparam BackgroundColor F0F0F0
+
+
+
+state "Reboot modem" as Reboot
+Reboot: AT+CFUN=1,1 via SoftReset
+Reboot: Init modem, MBN auto-setup IMS APN
+
+state "IMS"  as IMS
+IMS: AT+QCFG="ims",1
+
+
+state "Set PS as preferred" as SetPS
+SetPS:Set Packets Switching as preferred method for voice 
+SetPS:AT+QNVFR="/nv/item_files/modem/mmode/voice_domain_pref"
+
+
+
+
+SetPS - -> IMS
+IMS - -> Reboot
+
+
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 05:22:07 EST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.14.1+1-post-Debian-1
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

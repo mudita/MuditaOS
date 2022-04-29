@@ -150,8 +150,7 @@ response:
 
 #### High level view
 
-![Flowchart](./doc/how_machine_works.svg)
-<img src="./doc/how_machine_works.svg">
+![Flowchart](./doc/Images/how_machine_works.svg)
 
 #### System asynchronous calls synchronization
 

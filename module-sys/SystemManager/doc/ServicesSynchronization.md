@@ -23,6 +23,6 @@ The System Manager needs to read the manifests to run the services in the correc
 
 The [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting) algorithm may be used to build a linear ordering of services that are to be started by the System Manager.
 
-![](./services_synchronization.png)
+![](./Images/services_synchronization.svg)
 
 **Important note: The Dependency Graph implementation handles Directed Acyclic Graphs only.**

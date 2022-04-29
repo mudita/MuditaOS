@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="248px" preserveAspectRatio="none" style="width:339px;height:248px;background:#F0F0F0;" version="1.1" viewBox="0 0 339 248" width="339px" zoomAndPan="magnify"><defs><filter height="300%" id="fodco7nerlups" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><rect fill="#F0F0F0" filter="url(#fodco7nerlups)" height="135.6641" style="stroke: #000000; stroke-width: 2.0;" width="314" x="13" y="55.2969"/><rect fill="#F0F0F0" height="89.3984" style="stroke: none; stroke-width: 1.0;" width="314" x="13" y="101.5625"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;" x1="101" x2="101" y1="38.2969" y2="207.9609"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;" x1="236" x2="236" y1="38.2969" y2="207.9609"/><rect fill="#FEFECE" filter="url(#fodco7nerlups)" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="153" x="23" y="3"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="139" x="30" y="22.9951">Application Manager</text><rect fill="#FEFECE" filter="url(#fodco7nerlups)" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="153" x="23" y="206.9609"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="139" x="30" y="226.9561">Application Manager</text><rect fill="#FEFECE" filter="url(#fodco7nerlups)" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="89" x="190" y="3"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="75" x="197" y="22.9951">Application</text><rect fill="#FEFECE" filter="url(#fodco7nerlups)" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="89" x="190" y="206.9609"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="75" x="197" y="226.9561">Application</text><path d="M13,55.2969 L77,55.2969 L77,62.2969 L67,72.2969 L13,72.2969 L13,55.2969 " fill="#EEEEEE" style="stroke: #000000; stroke-width: 1.0;"/><rect fill="none" height="135.6641" style="stroke: #000000; stroke-width: 2.0;" width="314" x="13" y="55.2969"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="19" x="28" y="68.3638">alt</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="230" x="92" y="67.5073">[Application running in background]</text><polygon fill="#A80036" points="224.5,89.5625,234.5,93.5625,224.5,97.5625,228.5,93.5625" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="101.5" x2="230.5" y1="93.5625" y2="93.5625"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="41" x="108.5" y="88.4966">Switch</text><line style="stroke: #000000; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" x1="13" x2="327" y1="102.5625" y2="102.5625"/><polygon fill="#A80036" points="224.5,120.6953,234.5,124.6953,224.5,128.6953,228.5,124.6953" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="101.5" x2="230.5" y1="124.6953" y2="124.6953"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="24" x="108.5" y="119.6294">Run</text><polygon fill="#A80036" points="112.5,149.8281,102.5,153.8281,112.5,157.8281,108.5,153.8281" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="106.5" x2="235.5" y1="153.8281" y2="153.8281"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="59" x="118.5" y="148.7622">Registers</text><polygon fill="#A80036" points="224.5,178.9609,234.5,182.9609,224.5,186.9609,228.5,182.9609" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="101.5" x2="230.5" y1="182.9609" y2="182.9609"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="41" x="108.5" y="177.895">Switch</text><!--MD5=[3eb354fa5625e7043eed8ae36232b175]
+@startuml
+skinparam BackgroundColor F0F0F0
+participant "Application Manager" as appmgr
+participant "Application" as app
+
+alt Application running in background
+    appmgr -> app: Switch
+else
+    appmgr -> app: Run
+    app -> appmgr: Registers
+    appmgr -> app: Switch
+end
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 05:22:07 EST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.14.1+1-post-Debian-1
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

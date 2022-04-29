@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="726px" preserveAspectRatio="none" style="width:521px;height:726px;background:#F0F0F0;" version="1.1" viewBox="0 0 521 726" width="521px" zoomAndPan="magnify"><defs><filter height="300%" id="f13b828j49r373" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><rect fill="#FEFECE" filter="url(#f13b828j49r373)" height="50.2656" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="204" x="162" y="147"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="162" x2="366" y1="173.2969" y2="173.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="164" x="182" y="164.9951">Disable autoselect MBN</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="184" x="167" y="189.4355">AT+QMBNCFG="autoselect",0</text><rect fill="#FEFECE" filter="url(#f13b828j49r373)" height="50.2656" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="143" x="192.5" y="258"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="192.5" x2="335.5" y1="284.2969" y2="284.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="59" x="234.5" y="275.9951">List MBN</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="123" x="197.5" y="300.4355">AT+QMBNCFG="list"</text><rect fill="#FEFECE" filter="url(#f13b828j49r373)" height="64.2344" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="298" x="6" y="385"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="6" x2="304" y1="411.2969" y2="411.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="117" x="96.5" y="402.9951">Select ROW MBN</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="171" x="11" y="427.4355">AT+QMBNCFG="deactivate"</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="278" x="11" y="441.4043">AT+QMBNCFG="select","ROW_Generic_3GPP"</text><rect fill="#FEFECE" filter="url(#f13b828j49r373)" height="64.2344" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="251" x="138.5" y="651"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="138.5" x2="389.5" y1="677.2969" y2="677.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="108" x="210" y="668.9951">Reboot modem</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="174" x="143.5" y="693.4355">AT+CFUN=1,1 via SoftReset</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="231" x="143.5" y="707.4043">Init modem, MBN auto-setup IMS APN</text><rect fill="#FEFECE" filter="url(#f13b828j49r373)" height="64.2344" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="285" x="121.5" y="510"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="121.5" x2="406.5" y1="536.2969" y2="536.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="24" x="252" y="527.9951">IMS</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="111" x="126.5" y="552.4355">AT+QCFG="ims",1</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="265" x="126.5" y="566.4043">AT+QNVFR="/nv/item_files/ims/IMS_enable"</text><rect fill="#FEFECE" filter="url(#f13b828j49r373)" height="78.2031" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="407" x="60.5" y="8"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="60.5" x2="467.5" y1="34.2969" y2="34.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="133" x="197.5" y="25.9951">Set PS as preferred</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="387" x="65.5" y="50.4355">Set Packets Switching as preferred method for voice and SMS</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="385" x="65.5" y="64.4043">AT+QNVFR="/nv/item_files/modem/mmode/voice_domain_pref"</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="378" x="65.5" y="78.373">AT+QNVFR="/nv/item_files/modem/mmode/sms_domain_pref"</text><!--MD5=[00ab51a6946445947a06c25d265dcaca]
+link SetPS to DautoMBN--><path d="M264,86.24 C264,104.14 264,125.11 264,141.72 " fill="none" id="SetPS-&gt;DautoMBN" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="264,146.73,268,137.73,264,141.73,260,137.73,264,146.73" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[b55c01be2b376fd9a1ae0593d3f30c5f]
+link DautoMBN to ListMBN--><path d="M264,197.19 C264,213.56 264,235.28 264,252.64 " fill="none" id="DautoMBN-&gt;ListMBN" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="264,257.88,268,248.88,264,252.88,260,248.88,264,257.88" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[f85b76ed86dc49d2603157def1a40652]
+link ListMBN to SelectROWMBN--><path d="M214.08,308.17 C201.54,316.2 189.08,326.17 180,338 C170.74,350.05 164.86,365.64 161.14,379.7 " fill="none" id="ListMBN-&gt;SelectROWMBN" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="159.87,384.81,165.9334,377.0489,161.0827,379.9593,158.1723,375.1086,159.87,384.81" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="166" x="181" y="351.0669">Generic MBN not selected</text><!--MD5=[aff9779680839404e1fb21921f4b4273]
+link ListMBN to IMS--><path d="M322.11,308.02 C334.06,315.77 345.08,325.64 352,338 C355.69,344.59 353.2,347.54 352,355 C345.02,398.43 339.6,409.14 321,449 C311.99,468.3 299.79,488.54 288.98,505.11 " fill="none" id="ListMBN-&gt;IMS" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="285.98,509.68,294.2585,504.3446,288.7205,505.4979,287.5672,499.9599,285.98,509.68" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="162" x="347" y="421.5669">If correct MBN is selected</text><!--MD5=[383162dd4da31bc85ea19a3dc7b95877]
+link SelectROWMBN to IMS--><path d="M182.51,449.04 C197.87,466.37 217.06,488.03 232.96,505.97 " fill="none" id="SelectROWMBN-&gt;IMS" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="236.5,509.97,233.5282,500.5802,233.1853,506.2267,227.5388,505.8838,236.5,509.97" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[4b29da18a45c1128d1fa3de7c6223de5]
+link IMS to Reboot--><path d="M264,574.19 C264,595.39 264,623.49 264,645.69 " fill="none" id="IMS-&gt;Reboot" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="264,650.91,268,641.91,264,645.91,260,641.91,264,650.91" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="144" x="265" y="617.0669">Only if select new MBN</text><!--MD5=[dcbd254deb8893e62224c6e3be130ed7]
+@startuml
+skinparam BackgroundColor F0F0F0
+
+state "Disable autoselect MBN" as DautoMBN
+DautoMBN:AT+QMBNCFG="autoselect",0
+
+state "List MBN" as ListMBN
+ListMBN:AT+QMBNCFG="list"
+
+state "Select ROW MBN" as SelectROWMBN
+SelectROWMBN:AT+QMBNCFG="deactivate"
+SelectROWMBN:AT+QMBNCFG="select","ROW_Generic_3GPP"
+
+state "Reboot modem" as Reboot
+Reboot: AT+CFUN=1,1 via SoftReset
+Reboot: Init modem, MBN auto-setup IMS APN
+
+state "IMS"  as IMS
+IMS: AT+QCFG="ims",1
+IMS: AT+QNVFR="/nv/item_files/ims/IMS_enable"
+
+state "Set PS as preferred" as SetPS
+SetPS:Set Packets Switching as preferred method for voice and SMS
+SetPS:AT+QNVFR="/nv/item_files/modem/mmode/voice_domain_pref"
+SetPS:AT+QNVFR="/nv/item_files/modem/mmode/sms_domain_pref"
+
+SetPS - -> DautoMBN
+DautoMBN - ->  ListMBN 
+ListMBN - -> SelectROWMBN: Generic MBN not selected
+ListMBN - -> IMS: If correct MBN is selected
+
+
+SelectROWMBN - -> IMS
+IMS - -> Reboot: Only if select new MBN
+
+
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 05:22:07 EST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.14.1+1-post-Debian-1
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

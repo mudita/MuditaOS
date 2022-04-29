@@ -7,14 +7,14 @@ Each test may consists of consecutive steps:
 * Pre-test device state setup. This includes:
   * `DB` data injection
   * test arguments read
-  * proper window navigation  
+  * proper window navigation
 * Test run on the device
 * Post-test device state analysis
 
 Tests shall be grouped (and named respectively) in categories by one of the following `Test run`-step based perspectives:
 *  `hmi_perspective` - test is performed in the user perspective (using `HMI` - human-machine interface), allowing tester to 
 observe and verify consecutive event handling
-* `dev_perspective` - test is performed and analysed using appropriate developer's mode endpoints and the internal system request-response system  
+* `dev_perspective` - test is performed and analysed using appropriate developer's mode endpoints and the internal system request-response system
 
 The `HMI` interface shall be accessed by `harness` for automation purposes. 
 For analyzing content inside displayed windows, the `DOM` functionality shall be used.
@@ -24,8 +24,8 @@ For analyzing content inside displayed windows, the `DOM` functionality shall be
 Each `S-BT` `hmi_perspective` test shall start in `ApplicationSettings:Bluetooth` main window, with `Bluetooth` in turned off state by default. 
 This can be achieved by following logic enforcement:
 
-![bt-pretest-state](./bluetooth-main-window-navigation.svg)
-![bt-main-navi](./bluetooth-pretest-condition.svg)
+![bt-pretest-state](./Images/bluetooth-main-window-navigation.svg)
+![bt-main-navi](./Images/bluetooth-pretest-condition.svg)
 
 ## Testing
 
@@ -33,13 +33,13 @@ This can be achieved by following logic enforcement:
 
 The test's goal is to ensure that the `BT` device power states can be controlled by `PurePhone` via internal request-response system.
 
-![bt-dev-test-on-off](./bluetooth-dev-test-on-off.svg)
+![bt-dev-test-on-off](./Images/bluetooth-dev-test-on-off.svg)
 
 ### TEST basic_control_dev_perspective - phone visibility on/off
 
 The test's goal is to ensure that the `BT` device visibility states can be controlled by `PurePhone` via internal request-response system.
 
-![bt-dev-test-visibility-on-off](./bluetooth-dev-test-visibility-on-off.svg)
+![bt-dev-test-visibility-on-off](./Images/bluetooth-dev-test-visibility-on-off.svg)
 
 ### TEST pairing_dev_perspective - pairing
 
@@ -48,7 +48,7 @@ Also once a device is paired with the `Pure`, it should stay paired despite turn
 The test inputs:
 * external `BT` device name (required)
 
-![bt-dev-test-pairing](./bluetooth-dev-test-connectivity.svg)
+![bt-dev-test-pairing](./Images/bluetooth-dev-test-connectivity.svg)
 
 ### TEST pairing_dev_perspective - connectivity
 
@@ -56,7 +56,7 @@ The test's goal is to ensure that the `PurePhone` can establish `Pure` - `BT` de
 The test inputs:
 * external `BT` device name (required)
 
-![bt-dev-test-connectivity](./bluetooth-dev-test-connectivity.svg)
+![bt-dev-test-connectivity](./Images/bluetooth-dev-test-connectivity.svg)
 
 ### TEST pairing_hmi_perspective - happy path 
 
@@ -66,17 +66,17 @@ The test inputs:
 * external `BT` device name (required)
 * external `BT` device password (optional)
 
-![bt-test-pairing-happy-path](./bluetooth-test-pairing-happy-path.svg)
+![bt-test-pairing-happy-path](./Images/bluetooth-test-pairing-happy-path.svg)
 
 ### TEST pairing_hmi_perspective - no device
 
 The test's goal is to ensure that the user will be correctly notified if the device stored in `DB` 
 (the user has paired with the device in the past successfully) cannot be reached at the moment.
 
-![bt-test-pairing-no-device](./bluetooth-test-pairing-no-device.svg)
+![bt-test-pairing-no-device](./Images/bluetooth-test-pairing-no-device.svg)
 
 ### TEST pairing_hmi_perspective - forgetting pair
 
 The test's goal is to ensure that the user can make `Pure` forget `BT` devices stored in `DB`.
 
-![bt-test-pairing-forget](./bluetooth-test-pairing-forget-pair.svg)
+![bt-test-pairing-forget](./Images/bluetooth-test-pairing-forget-pair.svg)

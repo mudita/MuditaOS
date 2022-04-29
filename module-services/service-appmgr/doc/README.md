@@ -10,19 +10,19 @@ This includes:
 
 ## Initialisation
 
-![](appmgr_init.png)
+![](./Images/appmgr_init.svg)
 
 ## Starting application
 
-![](appmgr_start_app.png)
+![](./Images/appmgr_start_app.svg)
 
 ##  Switching between applications
 
-![](appmgr_switch_app.png)
+![](./Images/appmgr_switch_app.svg)
 
 ## Switching to previous application
 
-![](appmgr_switch_back.png)
+![](./Images/appmgr_switch_back.svg)
 
 ## New Application Manager - Proposal
 
@@ -32,7 +32,7 @@ Main problems of current implementation:
 
 The proposal of New Application Manager solves these problems.
 
-![](appmgr_switch_sms_app_proposal.png)
+![](./Images/appmgr_switch_sms_app_proposal.svg)
 
 Applications do not request for application switch explicitly. Instead, applications send action requests to the Application Manager.
 The action request may contain:
