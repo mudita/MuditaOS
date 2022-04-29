@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Service/ServiceForward.hpp>
+#include <module-services/service-cellular/DTMFCode.hpp>
 
 namespace bluetooth
 {
@@ -13,7 +14,7 @@ namespace bluetooth
         virtual ~CellularInterface()                           = default;
         virtual bool answerIncomingCall(sys::Service *service) = 0;
         virtual bool hangupCall(sys::Service *service)         = 0;
-        virtual bool sendDTMFCode(sys::Service *service, uint32_t digit)          = 0;
+        virtual bool sendDTMFCode(sys::Service *service, DTMFCode code)           = 0;
         virtual bool dialNumber(sys::Service *service, const std::string &number) = 0;
     };
 
@@ -23,7 +24,7 @@ namespace bluetooth
         bool answerIncomingCall(sys::Service *service) override;
         bool hangupCall(sys::Service *service) override;
         bool dialNumber(sys::Service *service, const std::string &number) override;
-        bool sendDTMFCode(sys::Service *service, uint32_t digit) override;
+        bool sendDTMFCode(sys::Service *service, DTMFCode code) override;
     };
 
     class AudioInterface

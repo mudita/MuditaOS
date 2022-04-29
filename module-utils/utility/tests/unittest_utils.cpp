@@ -446,38 +446,3 @@ TEST_CASE("Generate random Id")
         REQUIRE((ret.size() == expectedSize));
     }
 }
-
-TEST_CASE("singleDigitToString test")
-{
-
-    SECTION("proper input")
-    {
-        uint8_t digit = 5;
-        auto str      = utils::singleDigitToString(digit);
-        REQUIRE(str == "5");
-    }
-    SECTION("proper input 2")
-    {
-        int digit = 9;
-        auto str  = utils::singleDigitToString(digit);
-        REQUIRE(str == "9");
-    }
-    SECTION("improper input - not a single digit")
-    {
-        int digit = 15;
-        auto str  = utils::singleDigitToString(digit);
-        REQUIRE(str.empty());
-    }
-    SECTION("improper input - negative number")
-    {
-        int digit = -10;
-        auto str  = utils::singleDigitToString(digit);
-        REQUIRE(str.empty());
-    }
-    SECTION("improper input - not an integer-related type")
-    {
-        char digit = '6';
-        auto str   = utils::singleDigitToString(digit);
-        REQUIRE(str.empty());
-    }
-}

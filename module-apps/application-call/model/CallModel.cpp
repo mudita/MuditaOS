@@ -85,9 +85,14 @@ namespace app::call
         return succeed;
     }
 
-    void CallModel::transmitDtmfTone(const uint32_t &digit)
+    void CallModel::transmitDtmfTone(const uint8_t &digitCode)
     {
-        CellularServiceAPI::TransmitDtmfTones(application, digit);
+        try {
+            CellularServiceAPI::TransmitDtmfTones(application, DTMFCode(static_cast<char>(digitCode)));
+        }
+        catch (std::out_of_range &e) {
+            LOG_ERROR("Can't send DTMF code for digit: %c", static_cast<char>(digitCode));
+        }
     }
 
     utils::PhoneNumber CallModel::getPhoneNumber()

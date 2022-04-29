@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <string>
+#include <module-services/service-cellular/DTMFCode.hpp>
 
 class Service;
 namespace sys
@@ -88,8 +89,12 @@ namespace CellularServiceAPI
     bool GetCREG(sys::Service *serv, std::string &response);
     bool GetQNWINFO(sys::Service *serv, std::string &response);
     bool GetAntenna(sys::Service *serv, bsp::cellular::antenna &response);
-
-    bool TransmitDtmfTones(sys::Service *serv, uint32_t digit);
+    /**
+     * @brief Transmits DTMF tone
+     * @param serv
+     * @param code - DTMF code to be sent
+     */
+    bool TransmitDtmfTones(sys::Service *serv, DTMFCode code);
 
     bool USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data = "");
 

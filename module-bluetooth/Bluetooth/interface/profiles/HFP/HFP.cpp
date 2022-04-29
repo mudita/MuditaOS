@@ -319,7 +319,12 @@ namespace bluetooth
         case HFP_SUBEVENT_TRANSMIT_DTMF_CODES: {
             auto digitStr = hfp_subevent_transmit_dtmf_codes_get_dtmf(event);
             LOG_DEBUG("Send DTMF Codes: '%s'\n", digitStr);
-            cellularInterface->sendDTMFCode(const_cast<sys::Service *>(ownerService), utils::toNumeric(digitStr));
+            try {
+                cellularInterface->sendDTMFCode(const_cast<sys::Service *>(ownerService), DTMFCode(digitStr));
+            }
+            catch (std::out_of_range &e) {
+                LOG_ERROR("Can't send DTMF code for digit: %s", digitStr);
+            }
             hfp_ag_send_dtmf_code_done(aclHandle);
         } break;
         case HFP_SUBEVENT_CALL_ANSWERED:

@@ -27,6 +27,7 @@
 #include <PhoneModes/Observer.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <DTMFCode.hpp>
 
 #include <optional> // for optional
 #include <memory>   // for unique_ptr, allocator, make_unique, shared_ptr
@@ -203,7 +204,7 @@ class ServiceCellular : public sys::Service
     [[nodiscard]] bool receiveAllMessages();
     /// @}
 
-    bool transmitDtmfTone(uint32_t digit);
+    bool transmitDtmfTone(DTMFCode digit);
     /// Handle message CellularGetChannelMessage
     void handle_CellularGetChannelMessage();
 

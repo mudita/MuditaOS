@@ -75,3 +75,11 @@ add_catch2_executable(
         LIBS
         module-cellular
 )
+add_catch2_executable(
+        NAME
+        DTMFCode
+        SRCS
+        unittest_DTMFCode.cpp
+        LIBS
+        module-cellular
+)
