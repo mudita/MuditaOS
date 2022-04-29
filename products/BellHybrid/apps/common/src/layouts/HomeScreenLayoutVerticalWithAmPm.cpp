@@ -14,7 +14,7 @@
 #include <time/time_constants.hpp>
 #include <widgets/AlarmIcon.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
-#include <widgets/TimeSetSpinnerVertical.hpp>
+#include <widgets/ClockVertical.hpp>
 
 namespace gui
 {

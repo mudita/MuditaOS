@@ -16,7 +16,7 @@
 #include <time/time_constants.hpp>
 #include <widgets/AlarmIcon.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
-#include <widgets/TimeSetSpinnerVertical.hpp>
+#include <widgets/ClockVertical.hpp>
 
 namespace gui
 {
@@ -39,7 +39,7 @@ namespace gui
         centerBox->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
         centerBox->setEdges(RectangleEdge::None);
 
-        time = new TimeSetSpinnerVertical(centerBox);
+        time = new ClockVertical(centerBox);
         time->setFont(style::window::font::colossal);
         time->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
         time->setEdges(RectangleEdge::None);
@@ -98,7 +98,7 @@ namespace gui
         alarmActivatedDeactivatedScreen->text->setFont(style::window::font::verybiglight);
         alarmActivatedDeactivatedScreen->resizeItems();
         alarmActivatedDeactivatedScreen->setVisible(false);
-        alarmActivatedDeactivatedScreen->image->setEdges(RectangleEdge::All);
+        alarmActivatedDeactivatedScreen->image->setEdges(RectangleEdge::None);
 
         resizeItems();
     }
