@@ -305,7 +305,9 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
         getSetting(Setting::VibrationLevel, Profile::Type::Idle, PlaybackType::System));
     EventManagerServiceAPI::setVibrationLevel(this, vibrationLevel);
 
-    switch (const auto curVibrationType = GetVibrationType(type); curVibrationType) {
+    auto curVibrationType = GetVibrationType(type);
+    LOG_DEBUG("Current vibration type: %s", magic_enum::enum_name(curVibrationType).data());
+    switch (curVibrationType) {
     case VibrationType::None:
         DisableVibration(input);
         break;
@@ -423,7 +425,8 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
         auto input = audioMux.GetPlaybackInput(playbackType);
 
         if (playbackType == audio::PlaybackType::CallRingtone && bluetoothVoiceProfileConnected && input) {
-            // don't play ringtone on HFP connection on Pure
+            // don't play ringtone on HFP connection on Pure, but do vibrate
+            VibrationUpdate(playbackType, input);
             return std::make_unique<AudioStartPlaybackResponse>(audio::RetCode::Success, retToken);
         }
 
