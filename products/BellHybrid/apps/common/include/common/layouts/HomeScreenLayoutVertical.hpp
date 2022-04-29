@@ -16,7 +16,7 @@ namespace gui
     class TextFixedSize;
     class AlarmIcon;
     class AlarmSetSpinner;
-    class TimeSetSpinnerVertical;
+    class ClockVertical;
     class TimeSetFmtSpinner;
     class SnoozeTimer;
     class BellBattery;

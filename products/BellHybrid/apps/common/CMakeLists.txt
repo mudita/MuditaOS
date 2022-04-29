@@ -42,7 +42,7 @@ target_sources(application-bell-common
         src/widgets/ProgressTimerWithSnoozeTimer.cpp
         src/widgets/SnoozeTimer.cpp
         src/widgets/LayoutVertical.cpp
-        src/widgets/TimeSetSpinnerVertical.cpp
+        src/widgets/ClockVertical.cpp
 
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
@@ -98,7 +98,7 @@ target_sources(application-bell-common
         include/common/widgets/SnoozeTimer.hpp
         include/common/widgets/ListItems.hpp
         include/common/widgets/LayoutVertical.hpp
-        include/common/widgets/TimeSetSpinnerVertical.hpp
+        include/common/widgets/ClockVertical.hpp
         include/common/options/BellOptionWindow.hpp
         include/common/options/BellShortOptionWindow.hpp
         include/common/options/OptionBellMenu.hpp
