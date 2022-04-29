@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,10 +16,6 @@ namespace style::time_set_spinner_vertical
     {
         inline constexpr auto size = 6U;
     } // namespace focus
-
-    inline constexpr auto small_margin = 6U;
-    inline constexpr auto big_margin   = 44U;
-    inline constexpr auto colossal_margin = -40;
 } // namespace style::time_set_spinner_vertical
 
 namespace gui
@@ -32,16 +28,15 @@ namespace gui
     /// Two time formats are supported:
     /// utils::time::Locale::TimeFormat::FormatTime12H
     /// utils::time::Locale::TimeFormat::FormatTime24H
-    class TimeSetSpinnerVertical : public VBox
+    class ClockVertical : public VBox
     {
       public:
-        TimeSetSpinnerVertical(
-            Item *parent                               = nullptr,
-            uint32_t x                                 = 0U,
-            uint32_t y                                 = 0U,
-            uint32_t w                                 = 0U,
-            uint32_t h                                 = 0U,
-            utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H);
+        ClockVertical(Item *parent                               = nullptr,
+                      uint32_t x                                 = 0U,
+                      uint32_t y                                 = 0U,
+                      uint32_t w                                 = 0U,
+                      uint32_t h                                 = 0U,
+                      utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H);
 
         /// Switches currently displayed time format
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void;
@@ -57,25 +52,18 @@ namespace gui
 
         auto getTimeFormat() const noexcept -> utils::time::Locale::TimeFormat;
 
-        auto getHourMargins(const std::string &font) const noexcept -> Margins;
-
       private:
-        std::map<std::string, Margins> spaceMarginsMap = {
-            {style::window::font::verybiglight, {0, 0, 0, style::time_set_spinner_vertical::small_margin}},
-            {style::window::font::largelight, {0, 0, 0, style::time_set_spinner_vertical::small_margin}},
-            {style::window::font::supersizemelight, {0, 0, 0, style::time_set_spinner_vertical::big_margin}},
-            {style::window::font::huge, {0, 0, 0, style::time_set_spinner_vertical::big_margin}},
-            {style::window::font::colossal, {0, 0, 0, style::time_set_spinner_vertical::colossal_margin}}};
-
-        void handleContentChanged() override;
-
         gui::HBox *hBoxHours             = nullptr;
+        gui::HBox *hBoxHoursLeft         = nullptr;
+        gui::HBox *hBoxHoursRight        = nullptr;
         gui::HBox *hBoxMinutes           = nullptr;
+        gui::HBox *hBoxMinutesLeft       = nullptr;
+        gui::HBox *hBoxMinutesRight      = nullptr;
         gui::TextFixedSize *hourFirst    = nullptr;
         gui::TextFixedSize *hourSecond   = nullptr;
         gui::TextFixedSize *minuteFirst  = nullptr;
         gui::TextFixedSize *minuteSecond = nullptr;
-        std::string fontName         = style::window::font::supersizemelight;
+        std::string fontName             = style::window::font::supersizemelight;
 
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H;
     };

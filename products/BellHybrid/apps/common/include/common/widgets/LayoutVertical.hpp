@@ -9,12 +9,13 @@
 
 namespace style::homescreen_vertical
 {
-    constexpr inline auto side_box_w   = 120U;
-    constexpr inline auto center_box_w = 240U;
-    constexpr inline auto center_box_h = 220U;
-    constexpr inline auto bottomMargin = 35U;
-    constexpr inline auto leftMargin   = 60U;
-    constexpr inline auto rightMargin  = 60U;
+    constexpr inline auto side_box_w        = 115U;
+    constexpr inline auto center_box_w      = 250U;
+    constexpr inline auto center_box_h      = 220U;
+    constexpr inline auto digit_box_w       = 125U;
+    constexpr inline auto leftMargin        = 60U;
+    constexpr inline auto rightMargin       = 60U;
+    constexpr inline auto topNegativeMargin = -35;
 } // namespace style::homescreen_vertical
 
 namespace gui
@@ -23,7 +24,7 @@ namespace gui
     class TextFixedSize;
     class AlarmIcon;
     class AlarmSetSpinner;
-    class TimeSetSpinnerVertical;
+    class ClockVertical;
     class TimeSetFmtSpinner;
     class SnoozeTimer;
     class BellBattery;
@@ -43,7 +44,7 @@ namespace gui
         BellBattery *battery{};
 
         // Main Screen
-        TimeSetSpinnerVertical *time{};
+        ClockVertical *time{};
         VBox *leftBox{};
         VBox *rightBox{};
 
