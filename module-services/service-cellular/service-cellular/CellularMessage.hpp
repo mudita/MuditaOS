@@ -25,6 +25,7 @@
 #include <service-appmgr/data/CallActionsParams.hpp>
 
 #include <service-cellular/api/common.hpp>
+#include <DTMFCode.hpp>
 
 class CellularMessage : public sys::DataMessage
 {
@@ -307,15 +308,15 @@ class CellularRequestMessage : public CellularMessage
 
 class CellularDtmfRequestMessage : public CellularMessage
 {
-    uint32_t digit = 0;
+    DTMFCode code;
 
   public:
-    CellularDtmfRequestMessage(uint32_t digit) : CellularMessage(Type::TransmitDtmfTones), digit(digit)
+    CellularDtmfRequestMessage(DTMFCode code) : CellularMessage(Type::TransmitDtmfTones), code(code)
     {}
 
-    uint32_t getDigit() const
+    DTMFCode getDTMFCode() const
     {
-        return digit;
+        return code;
     }
 };
 

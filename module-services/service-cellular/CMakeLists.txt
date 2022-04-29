@@ -14,6 +14,7 @@ set(SOURCES
     src/ModemResetHandler.cpp
     src/URCCounter.cpp
     src/CSQHandler.cpp
+        DTMFCode.cpp
 
     CellularServiceAPI.cpp
     CellularUrcHandler.cpp

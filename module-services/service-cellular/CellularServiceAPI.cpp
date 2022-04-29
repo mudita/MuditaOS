@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/CellularMessage.hpp"
@@ -258,9 +258,9 @@ bool CellularServiceAPI::GetAntenna(sys::Service *serv, bsp::cellular::antenna &
     return false;
 }
 
-bool CellularServiceAPI::TransmitDtmfTones(sys::Service *serv, uint32_t digit)
+bool CellularServiceAPI::TransmitDtmfTones(sys::Service *serv, DTMFCode code)
 {
-    auto msg = std::make_shared<CellularDtmfRequestMessage>(digit);
+    auto msg = std::make_shared<CellularDtmfRequestMessage>(code);
     return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 

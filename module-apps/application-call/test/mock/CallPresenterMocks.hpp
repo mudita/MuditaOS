@@ -98,7 +98,7 @@ namespace app::call
         {
             return true;
         }
-        void transmitDtmfTone(const uint32_t &digit) override{};
+        void transmitDtmfTone(const uint8_t &digitCode) override{};
         void muteCall() override{};
         void unmuteCall() override{};
         void turnLoudspeakerOn() override{};

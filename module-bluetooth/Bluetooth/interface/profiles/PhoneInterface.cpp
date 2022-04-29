@@ -16,9 +16,9 @@ namespace bluetooth
     {
         return CellularServiceAPI::HangupCall(service);
     }
-    bool CellularInterfaceImpl::sendDTMFCode(sys::Service *service, uint32_t digit)
+    bool CellularInterfaceImpl::sendDTMFCode(sys::Service *service, DTMFCode code)
     {
-        auto msg = std::make_shared<CellularDtmfRequestMessage>(digit);
+        auto msg = std::make_shared<CellularDtmfRequestMessage>(code);
         service->bus.sendUnicast(std::move(msg), service::name::cellular);
         return true;
     }

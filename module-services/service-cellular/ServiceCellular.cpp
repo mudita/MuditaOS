@@ -1468,17 +1468,16 @@ std::string ServiceCellular::GetScanMode(void)
     return {};
 }
 
-bool ServiceCellular::transmitDtmfTone(uint32_t digit)
+bool ServiceCellular::transmitDtmfTone(DTMFCode code)
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
     at::Result resp;
     if (channel) {
         auto command           = at::factory(at::AT::QLDTMF);
-        std::string dtmfString = "\"" + utils::singleDigitToString(digit) + "\"";
-        resp                   = channel->cmd(command.getCmd() + dtmfString);
+        resp                   = channel->cmd(command.getCmd() + std::string(code));
         if (resp) {
             command = at::factory(at::AT::VTS);
-            resp    = channel->cmd(command.getCmd() + dtmfString);
+            resp    = channel->cmd(command.getCmd() + std::string(code));
         }
     }
     return resp.code == at::Result::Code::OK;
@@ -2105,7 +2104,7 @@ auto ServiceCellular::handleCellularGetAntennaMessage(sys::Message *msg) -> std:
 auto ServiceCellular::handleCellularDtmfRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto message = static_cast<CellularDtmfRequestMessage *>(msg);
-    auto resp    = transmitDtmfTone(message->getDigit());
+    auto resp    = transmitDtmfTone(message->getDTMFCode());
     return std::make_shared<CellularResponseMessage>(resp);
 }
 auto ServiceCellular::handleCellularUSSDMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
