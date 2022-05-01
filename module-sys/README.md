@@ -44,7 +44,7 @@ The whole MuditaOS system can, with great simplification, be seen as a connectio
     * [Bus](#Bus) connected threads
     * operating on workers to perform hardware tasks
     * communicating with other services
-    * notifying applications via broadcast/multicasts & [actions](../module-apps/ModuleApps.md#System-actions)
+    * notifying applications via broadcast/multicasts & [actions](/module-apps/ModuleApps.md#System-actions)
     * Managed via [SystemManager](#System-manager)
 * Applications
     * Bus-connected threads
@@ -111,7 +111,7 @@ It's invoked for all messages without designated handlers.
 
 ## Applcations
 
-[module-apps](../module-apps/ModuleApps.md)
+[module-apps](/module-apps/ModuleApps.md)
 
 ## Timers
 
@@ -154,7 +154,7 @@ th.start();
 The Bus subsystem was developed in order to allow cross-services communication.
 Preferred method to achieve service -> application communication is either:
 - request and initialize communication from application to service
-- use [actions](../module-apps/ModuleApps.md#System-actions)
+- use [actions](/module-apps/ModuleApps.md#System-actions)
 
 The Bus enables us to:
 * send asynchronous unicast messages
@@ -270,7 +270,7 @@ If you ever set empty shared pointer to the response on message - the handling w
 * you can't call blocking bus unicasts to it - as there will be no response
 
 **NOTE**: This might render your application/service useless in some scenarions
-**NOTE**: you can see system messages handled by services unlocking flag in [debug.hpp](../module-utils/log/api/log/debug.hpp)
+**NOTE**: you can see system messages handled by services unlocking flag in [debug.hpp](/module-utils/log/api/log/debug.hpp)
 
 ## blocking requests
 

@@ -7,10 +7,10 @@ PureOS's audio subsystem was heavily inspired by two fine pieces of software:
 Implementation of module-audio was developed after going through [Linux Sound Subsystem Documentation](https://www.kernel.org/doc/html/latest/sound/index.html) and various other documents describing audio Linux audio. These documents were mainly used as inspiration as requested PureOS audio functionality is much less sophisticated. Also due to hardware limitations (mainly processor speed and hardware audio codec features) some additional assumptions were made.
 #### Paths
 
- * [../module-bsp/bsp/audio](../module-bsp/bsp/audio) - audio device interface and switching logic
- * [../module-bsp/board/linux/audio](../module-bsp/board/linux/audio) - Linux audio devices
- * [../module-bsp/board/rt1051/bsp/audio](../module-bsp/board/rt1051/bsp/audio) - RT1051 audio devices
- * [../module-audio/Audio/](../module-audio/Audio) - audio module
+ * [/module-bsp/bsp/audio](/module-bsp/bsp/audio) - audio device interface and switching logic
+ * [/module-bsp/board/linux/audio](/module-bsp/board/linux/audio) - Linux audio devices
+ * [/module-bsp/board/rt1051/bsp/audio](/module-bsp/board/rt1051/bsp/audio) - RT1051 audio devices
+ * [/module-audio/Audio](/module-audio/Audio) - audio module
 
 #### [PortAudio library](http://www.portaudio.com/)
 Audio device layer (which can be found in [audio paths](#paths)). concept of audio devices and audio module API were based on PortAudio library.
@@ -59,7 +59,7 @@ Currently we have four implementations of audio devices
 * Linux audio (via PortAudio library)
 * Linux audio cellular (also via PortAudio library)
 
-Each audio device must conform to API interface which is specified in `bsp::AudioDevice` class in [bsp_audio](../module-bsp/bsp/audio/bsp_audio.hpp)
+Each audio device must conform to API interface which is specified in `bsp::AudioDevice` class in [bsp_audio](/module-bsp/bsp/audio/bsp_audio.hpp)
 
 ### Decoders
 Decoders layer was developed in order to have unified API over vast range of audio decoders. Another very important part of decoders are ability to fetch audio metadata. Different kinds of decoders support different metadata, for instance MP3 decoder supports ID3 tags and so on. All of this implementation details are hidden to the higher layers. User receives metadata via unified structure describing metadata. See `struct Tags`.
@@ -118,12 +118,12 @@ Profiles configurations can be found in directory: [Profiles](./Audio/Profiles)
 `Operations` may not implement support for all possible `Profile` parameters i.e. `inputGain` and `inputPath` will be ignored in playback `Operation`.
 
 ~~**IMPORTANT:** For the time being profiles are not loaded and stored into database. This should be fixed.~~  
-**NOTE:** Currently some of the profiles are configurable via json files located [here](../image/user/data/equalizer). The json format explanation can be found [here](./Audio/Profiles/README.md).
+**NOTE:** Currently some of the profiles are configurable via json files located [here](/image/user/data/equalizer). The json format explanation can be found [here](./Audio/Profiles/README.md).
 
 **IMPORTANT:** Callbacks mechanism is only experimental and should be considered as incomplete.
 
 # Audio class
-Audio class [Audio class](./Audio/Audio.hpp) is main interface to audio subsystem. It is exclusively used by [audio-service](../module-services/service-audio) Audio class stores internally current `Operation`, `Profile`, `State`, async callback, db callback etc. 
+Audio class [Audio class](./Audio/Audio.hpp) is main interface to audio subsystem. It is exclusively used by [audio-service](/module-services/service-audio) Audio class stores internally current `Operation`, `Profile`, `State`, async callback, db callback etc. 
 
 `AsyncCallback` holds a wrapper for function that is invoked asynchronously when audio subsystem event occurs. It can be used for signalling user of audio subsystem about audio events. Possible events are listen in `audio::PlaybackEventType`  
 

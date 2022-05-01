@@ -25,7 +25,7 @@ if (${ENABLE_TESTS})
 endif ()
 ```
 
-**NOTE:** To see how test gathering works please see: [CMake for UT](CMakeLists.txt)
+**NOTE:** To see how test gathering works please see: [CMake for UT](./CMakeLists.txt)
 
 To add test target use either of functions:
 

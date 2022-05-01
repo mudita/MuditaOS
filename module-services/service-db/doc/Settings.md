@@ -15,7 +15,7 @@ Caveats:
 
 **IMPORTANT:**
 You need to initialize settings::Settings in Service/Application when init function, not in the constructor.
-Please see [module-sys documentation](../../module-sys/README.md#Services)
+Please see [module-sys documentation](/module-sys/README.md#Services)
 
 # How to add settings to use
 

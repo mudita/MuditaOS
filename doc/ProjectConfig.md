@@ -50,7 +50,7 @@ Or change printer configuration in `CPUStatistics.cpp` to other than messagepack
 
 ## CurrentMeasurement enable option
 To use direct current polling and have it in logs set `CURRENT_MEASUREMENT` to `ON`
-you can plot this with [plot_current_measurement.py](../tools/plot_current_measurement.py)
+you can plot this with [plot_current_measurement.py](/tools/plot_current_measurement.py)
 
 # USB
 
@@ -68,7 +68,7 @@ To test if USB-CDC works you can set USB-CDC echo with `USBCDC_ECHO`
 
 # Config options for the lwext4
 
-Following configurations are for: [lwext4](third-party/lwext4/) - third party ext4 library
+Following configurations are for: [lwext4](/third-party/lwext4/) - third party ext4 library
 
 ## LWEXT4 debug options
 

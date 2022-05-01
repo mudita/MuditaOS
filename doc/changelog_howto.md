@@ -4,7 +4,7 @@ This article is based on [keep a changelog](https://keepachangelog.com/en/1.0.0/
 
 **Note:** MuditaOS changelog should be **edited by the MuditaOS core development team only**.
 
-[View MuditaOS changelog](changelog.md).
+[View MuditaOS changelog](/changelog.md).
 
 ## 1. The purpose of a changelog
 To let the end user (not necessarily technically-skilled) know what your Pull Request changes. In practice, this means that if some spectacular crash has been fixed, changelog entry should say e.g. `Fixed system crash on saving SMS draft`.

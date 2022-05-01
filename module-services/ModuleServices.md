@@ -18,7 +18,7 @@ Table of Contents
 
 # General services documentation
 
-Services documentation is available [in module-sys here](../module-sys/README.md#Services).
+Services documentation is available [in module-sys here](/module-sys/README.md#Services).
 
 # How to add new service
 
@@ -71,27 +71,27 @@ option(ENABLE_SERVICE_TEST "Enable service test" OFF)
 
 ## To change service startup order
 
-Please see the [SystemManager services synchronization](./SystemManager/doc/ServicesSynchronization.md) documentation
+Please see the [SystemManager services synchronization](/module-sys/SystemManager/doc/ServicesSynchronization.md) documentation
 
 ## To use settings::Settings
 
-Documentation: [settings::Settings](Settings.md)
+Documentation: [settings::Settings](./service-db/doc/Settings.md)
 
 ## To add timer
 
-Documentation [timers](../module-sys/README.md#Timers)
+Documentation [timers](/module-sys/README.md#Timers)
 
 ## To add 3rd party library
 
-Documentation: [third party libraries](../third-party/ThirdParty.md)
+Documentation: [third party libraries](/third-party/ThirdParty.md)
 
 ## To add tests
 
-Documentation: [unit tests gathering cmake](../test/AddingUnitTests.md)
+Documentation: [unit tests gathering cmake](/test/AddingUnitTests.md)
 
 ## To change service order, failure timeout or name
 
-Documentation [service manifest](../module-sys/SystemManager/doc/ServicesSynchronization.md)
+Documentation [service manifest](/module-sys/SystemManager/doc/ServicesSynchronization.md)
 
 # More on services configuration
 

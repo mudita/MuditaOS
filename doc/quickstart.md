@@ -206,7 +206,7 @@ This can be done manually, by editing the `.cmake` files (not recommended though
 
 By using `ENABLE_APP_X` (where `X` is the name of the application) you can enable/disable any application.
 
-CMake-wide system config documentation is here: [Project config](ProjectConfig.md)
+CMake-wide system config documentation is here: [Project config](./ProjectConfig.md)
 
 #### Catching logs using UART
 
