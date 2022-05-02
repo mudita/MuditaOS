@@ -17,8 +17,8 @@ namespace call::api
         virtual void stop()              = 0;
         virtual void muteCall()          = 0;
         virtual void unmuteCall()        = 0;
-        virtual void setLaudspeakerOn()  = 0;
-        virtual void setLaudspeakerOff() = 0;
+        virtual void setLoudspeakerOn()  = 0;
+        virtual void setLoudspeakerOff() = 0;
         virtual void routingStart()      = 0;
         virtual ~Audio()                 = default;
     };
@@ -39,7 +39,7 @@ class Audio : public call::api::Audio
     void stop();
     void muteCall();
     void unmuteCall();
-    void setLaudspeakerOn();
-    void setLaudspeakerOff();
+    void setLoudspeakerOn();
+    void setLoudspeakerOff();
     void routingStart();
 };

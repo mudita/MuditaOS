@@ -252,10 +252,10 @@ namespace call
                 di.audio->unmuteCall();
                 break;
             case cellular::CallAudioEventRequest::EventType::LoudspeakerOn:
-                di.audio->setLaudspeakerOn();
+                di.audio->setLoudspeakerOn();
                 break;
             case cellular::CallAudioEventRequest::EventType::LoudspeakerOff:
-                di.audio->setLaudspeakerOff();
+                di.audio->setLoudspeakerOff();
                 break;
             }
         }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <gtest/gtest.h>
@@ -18,7 +18,7 @@ class MockCellular : public ConnectionManagerCellularCommandsInterface
     MOCK_METHOD(bool, connectToNetwork, (), (override));
     MOCK_METHOD(std::optional<bool>, isConnectedToNetwork, (), (override));
     MOCK_METHOD(bool, clearNetworkIndicator, (), (override));
-    MOCK_METHOD(bool, hangUpOngoingCall, (), (override));
+    MOCK_METHOD(void, hangUpOngoingCall, (), (override));
     MOCK_METHOD(bool, isConnectionTimerActive, (), (override));
     MOCK_METHOD(void, startConnectionTimer, (), (override));
     MOCK_METHOD(void, stopConnectionTimer, (), (override));
@@ -33,7 +33,7 @@ TEST(ConnectionManager, onPhoneModeChange)
 
     // Connected / Do not disturb to Offline
     EXPECT_CALL(*mock, isConnectedToNetwork()).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mock, hangUpOngoingCall()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mock, hangUpOngoingCall()).Times(1).WillOnce(Return());
     EXPECT_CALL(*mock, disconnectFromNetwork()).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mock, clearNetworkIndicator()).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mock, isConnectionTimerActive()).Times(1).WillOnce(Return(true));
@@ -45,7 +45,7 @@ TEST(ConnectionManager, onPhoneModeChange)
 
     // Connected / Do not disturb to Messages only
     EXPECT_CALL(*mock, isConnectedToNetwork()).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mock, hangUpOngoingCall()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mock, hangUpOngoingCall()).Times(1).WillOnce(Return());
     EXPECT_CALL(*mock, disconnectFromNetwork()).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mock, clearNetworkIndicator()).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mock, isConnectionTimerActive()).Times(1).WillOnce(Return(false));
