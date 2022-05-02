@@ -6,6 +6,7 @@
 #include "MeditationStyle.hpp"
 #include "MeditationTimerPresenter.hpp"
 
+#include <common/LanguageUtils.hpp>
 #include <service-db/Settings.hpp>
 
 namespace
@@ -51,15 +52,7 @@ namespace app::meditation
     std::string MeditationTimerPresenter::getTimeUnitName(std::uint32_t value)
     {
         using namespace app::meditationStyle::mtStyle::list;
-        if (value == 1) {
-            return utils::translate(timeUnitSingular);
-        }
-        else if (value > 4) {
-            return utils::translate(timeUnitGenitive);
-        }
-        else {
-            return utils::translate(timeUnitPlural);
-        }
+        return utils::language::getCorrectMinutesNumeralForm(value);
     }
 
     void MeditationTimerPresenter::activate(std::uint32_t value)
