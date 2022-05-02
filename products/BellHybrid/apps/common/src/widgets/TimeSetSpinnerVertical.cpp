@@ -214,10 +214,9 @@ namespace gui
         const auto hours = std::chrono::hours{t->tm_hour};
 
         if (timeFormat == Locale::TimeFormat::FormatTime24H) {
-            const auto time24H = date::make24(hours, isPM());
-            auto stringHour    = std::to_string(time24H.count());
+            auto stringHour    = std::to_string(hours.count());
 
-            if (t->tm_hour < doubleDigit) {
+            if (hours.count() < doubleDigit) {
                 hourFirst->setText("0");
                 hourSecond->setText(stringHour.substr(0, 1));
             }
