@@ -35,10 +35,18 @@ sys::MessagePointer ServiceDBCommon::DataReceivedHandler(sys::DataMessage *msgl,
         auto query     = msg->getQuery();
         auto queryType = query->type;
         auto result    = interface->runQuery(std::move(query));
-        auto recordID  = result->getRecordID().value_or(0);
-        responseMsg    = std::make_shared<db::QueryResponse>(std::move(result));
+        std::optional<uint32_t> id;
+        if (result != nullptr) {
+            id = result->getRecordID();
+        }
+        else {
+            LOG_WARN("There is no response associated with query: %s!", query ? query->debugInfo().c_str() : "");
+        }
+        responseMsg = std::make_shared<db::QueryResponse>(std::move(result));
 
-        sendUpdateNotification(msg->getInterface(), queryType, recordID);
+        if (id) {
+            sendUpdateNotification(msg->getInterface(), queryType, *id);
+        }
     } break;
 
     default:
