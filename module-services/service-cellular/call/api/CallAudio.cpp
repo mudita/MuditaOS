@@ -55,12 +55,12 @@ void Audio::unmuteCall()
     AudioServiceAPI::SendEvent(owner, audio::EventType::CallUnmute);
 }
 
-void Audio::setLaudspeakerOn()
+void Audio::setLoudspeakerOn()
 {
     AudioServiceAPI::SendEvent(owner, audio::EventType::CallLoudspeakerOn);
 }
 
-void Audio::setLaudspeakerOff()
+void Audio::setLoudspeakerOff()
 {
     AudioServiceAPI::SendEvent(owner, audio::EventType::CallLoudspeakerOff);
 }

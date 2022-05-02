@@ -26,8 +26,8 @@ namespace mocks
         fakeit::When(Method(audio, stop)).AlwaysReturn();
         fakeit::When(Method(audio, muteCall)).AlwaysReturn();
         fakeit::When(Method(audio, unmuteCall)).AlwaysReturn();
-        fakeit::When(Method(audio, setLaudspeakerOn)).AlwaysReturn();
-        fakeit::When(Method(audio, setLaudspeakerOff)).AlwaysReturn();
+        fakeit::When(Method(audio, setLoudspeakerOn)).AlwaysReturn();
+        fakeit::When(Method(audio, setLoudspeakerOff)).AlwaysReturn();
         fakeit::When(Method(audio, routingStart)).AlwaysReturn();
         return audio;
     }
