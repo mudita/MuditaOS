@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -62,6 +62,7 @@ namespace gui
 
     enum class RefreshModes
     {
+        GUI_REFRESH_NONE,
         GUI_REFRESH_FAST = 1,
         GUI_REFRESH_DEEP
     };
@@ -151,6 +152,8 @@ namespace gui
 inline const char *c_str(gui::RefreshModes refresh)
 {
     switch (refresh) {
+    case gui::RefreshModes::GUI_REFRESH_NONE:
+        return "GUI_REFRESH_NONE";
     case gui::RefreshModes::GUI_REFRESH_FAST:
         return "GUI_REFRESH_FAST";
     case gui::RefreshModes::GUI_REFRESH_DEEP:

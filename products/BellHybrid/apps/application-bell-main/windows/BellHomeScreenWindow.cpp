@@ -164,12 +164,12 @@ namespace gui
             presenter->handleAlarmRingingEvent();
         }
     }
-    bool BellHomeScreenWindow::updateTime()
+    RefreshModes BellHomeScreenWindow::updateTime()
     {
         if (presenter) {
             presenter->handleUpdateTimeEvent();
         }
-        return true;
+        return RefreshModes::GUI_REFRESH_NONE;
     }
 
     bool BellHomeScreenWindow::updateBatteryStatus()

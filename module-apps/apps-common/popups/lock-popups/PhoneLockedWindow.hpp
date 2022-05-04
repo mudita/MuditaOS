@@ -18,7 +18,8 @@ namespace gui
       public:
         PhoneLockedWindow(app::ApplicationCommon *app,
                           const std::string &name,
-                          std::unique_ptr<WallpaperPresenter> &&presenter);
+                          std::unique_ptr<WallpaperPresenter> &&presenter,
+                          unsigned lockScreenDeepRefreshRate);
 
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -26,16 +27,45 @@ namespace gui
         void buildInterface() override;
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
-        bool updateTime() override;
+        RefreshModes updateTime() override;
 
       private:
         bool processLongReleaseEvent(const InputEvent &inputEvent);
-        static constexpr auto refreshTimerName = "PhoneLockRefreshTimer";
-        static constexpr auto refreshTimeout   = std::chrono::hours(1);
-        sys::TimerHandle screenRefreshTimer;
 
         std::unique_ptr<WallpaperPresenter> wallpaperPresenter;
         bool refreshedOnPhoneLockTimeLock = false;
+
+        void initializeDeepRefreshCounter(unsigned deepRefreshRate);
+
+        struct
+        {
+            unsigned currentValue;
+            unsigned referenceValue;
+
+            [[nodiscard]] inline auto overflow() const noexcept -> bool
+            {
+                return currentValue >= referenceValue;
+            }
+
+            inline auto reset() noexcept -> void
+            {
+                currentValue = 0;
+            }
+
+            inline auto setReference(unsigned reference) noexcept -> void
+            {
+                referenceValue = reference;
+            }
+
+            inline auto operator++(int) noexcept -> unsigned
+            {
+                auto temp = currentValue;
+                currentValue++;
+                return temp;
+            }
+        } deepRefreshCounter;
+
+        void updateStatusBar();
     };
 
 } /* namespace gui */

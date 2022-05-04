@@ -22,7 +22,7 @@ namespace gui
       private:
         void buildInterface() override;
         void setLayout(LayoutGenerator layoutGenerator) override;
-        bool updateTime() override;
+        RefreshModes updateTime() override;
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onDatabaseMessage(sys::Message *msg) override;

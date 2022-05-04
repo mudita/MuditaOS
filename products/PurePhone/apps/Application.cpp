@@ -19,6 +19,7 @@
 #include <popups/lock-popups/SimLockInputWindow.hpp>
 #include <popups/lock-popups/SimInfoWindow.hpp>
 #include <popups/lock-popups/SimNotReadyWindow.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace app
 {
@@ -30,7 +31,6 @@ namespace app
         window->updateSim();
         window->updateSignalStrength();
         window->updateNetworkAccessTechnology();
-        window->updateTime();
         window->updatePhoneMode(statusIndicators.phoneMode);
     }
 
@@ -78,11 +78,14 @@ namespace app
             case ID::PhoneLockInput:
             case ID::PhoneLockInfo:
             case ID::PhoneLockChangeInfo:
-                windowsFactory.attach(window::phone_lock_window, [](ApplicationCommon *app, const std::string &name) {
-                    auto presenter = std::make_unique<gui::WallpaperPresenter>(app);
-                    return std::make_unique<gui::PhoneLockedWindow>(
-                        app, window::phone_lock_window, std::move(presenter));
-                });
+                windowsFactory.attach(
+                    window::phone_lock_window, [this](ApplicationCommon *app, const std::string &name) {
+                        auto presenter                 = std::make_unique<gui::WallpaperPresenter>(app);
+                        auto lockScreenDeepRefreshRate = utils::getNumericValue<unsigned>(settings->getValue(
+                            settings::Display::lockScreenDeepRefreshRate, settings::SettingsScope::Global));
+                        return std::make_unique<gui::PhoneLockedWindow>(
+                            app, window::phone_lock_window, std::move(presenter), lockScreenDeepRefreshRate);
+                    });
                 windowsFactory.attach(
                     window::phone_lock_info_window, [](ApplicationCommon *app, const std::string &name) {
                         return std::make_unique<gui::PhoneLockedInfoWindow>(app, window::phone_lock_info_window);

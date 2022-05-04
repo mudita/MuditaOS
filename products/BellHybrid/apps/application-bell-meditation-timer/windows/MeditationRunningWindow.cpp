@@ -164,12 +164,12 @@ namespace gui
         time->setTimeFormat(fmt);
     }
 
-    bool MeditationRunningWindow::updateTime()
+    RefreshModes MeditationRunningWindow::updateTime()
     {
         if (presenter != nullptr) {
             presenter->handleUpdateTimeEvent();
         }
-        return true;
+        return RefreshModes::GUI_REFRESH_FAST;
     }
 
     void MeditationRunningWindow::intervalTimeout()
