@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationSpecialInput.hpp"
@@ -9,7 +9,7 @@ using namespace app;
 
 namespace
 {
-    constexpr auto SpecialInputAppStackDepth = 2200;
+    constexpr auto SpecialInputAppStackDepth = 512 * 5;
 } // namespace
 
 ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
