@@ -14,13 +14,14 @@ namespace
     {
         return purefs::createPath(purefs::dir::getUserDiskPath(), "music").string();
     }
+    inline constexpr auto fileIndexerServiceStackSize = 1024 * 5;
 } // namespace
 
 namespace service
 {
 
     ServiceFileIndexer::ServiceFileIndexer(const std::vector<std::string> &paths)
-        : sys::Service{service::name::file_indexer}, mStartupIndexer{paths}
+        : sys::Service{service::name::file_indexer, "", fileIndexerServiceStackSize}, mStartupIndexer{paths}
     {
         LOG_DEBUG("[%s] Initializing", service::name::file_indexer);
     }
