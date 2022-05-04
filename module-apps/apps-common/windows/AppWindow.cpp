@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AppWindow.hpp"
@@ -139,12 +139,12 @@ namespace gui
         return preventsAutoLock;
     }
 
-    bool AppWindow::updateTime()
+    RefreshModes AppWindow::updateTime()
     {
         if (statusBar == nullptr) {
-            return false;
+            return RefreshModes::GUI_REFRESH_NONE;
         }
-        return statusBar->updateTime();
+        return statusBar->updateTime() ? RefreshModes::GUI_REFRESH_FAST : RefreshModes::GUI_REFRESH_NONE;
     }
 
     void AppWindow::setTitle(const UTF8 &text)

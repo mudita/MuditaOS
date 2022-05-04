@@ -467,13 +467,9 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleMinuteUpdated(sys::Message *msgl)
     {
-        if (state == State::ACTIVE_FORGROUND && getCurrentWindow()->updateTime()) {
-
-            if (isOnPhoneLockWindow()) {
-                updateStatusBarOnPhoneLockWindow();
-            }
-
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        if (state == State::ACTIVE_FORGROUND) {
+            auto requestedRefreshMode = getCurrentWindow()->updateTime();
+            refreshWindow(requestedRefreshMode);
         }
         return sys::msgHandled();
     }
@@ -1049,13 +1045,5 @@ namespace app
     bool ApplicationCommon::isOnPhoneLockWindow()
     {
         return getCurrentWindow()->getName() == gui::popup::window::phone_lock_window;
-    }
-
-    void ApplicationCommon::updateStatusBarOnPhoneLockWindow()
-    {
-        getCurrentWindow()->updateSignalStrength();
-        getCurrentWindow()->updateNetworkAccessTechnology();
-        getCurrentWindow()->updateBatteryStatus();
-        getCurrentWindow()->updateSim();
     }
 } /* namespace app */

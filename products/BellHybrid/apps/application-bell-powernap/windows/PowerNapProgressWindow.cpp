@@ -138,12 +138,12 @@ namespace gui
         time->setTimeFormat(fmt);
     }
 
-    bool PowerNapProgressWindow::updateTime()
+    RefreshModes PowerNapProgressWindow::updateTime()
     {
         if (presenter) {
             presenter->handleUpdateTimeEvent();
         }
-        return true;
+        return RefreshModes::GUI_REFRESH_NONE;
     }
 
     void PowerNapProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)

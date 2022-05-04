@@ -3,7 +3,6 @@
 
 #include "PhoneLockedWindow.hpp"
 #include "PhoneLockedInfoData.hpp"
-#include "Timers/TimerFactory.hpp"
 
 #include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -14,18 +13,17 @@ namespace gui
 {
     PhoneLockedWindow::PhoneLockedWindow(app::ApplicationCommon *app,
                                          const std::string &name,
-                                         std::unique_ptr<WallpaperPresenter> &&presenter)
+                                         std::unique_ptr<WallpaperPresenter> &&presenter,
+                                         unsigned lockScreenDeepRefreshRate)
         : AppWindow(app, name), wallpaperPresenter(std::move(presenter))
     {
         buildInterface();
+        initializeDeepRefreshCounter(lockScreenDeepRefreshRate);
 
-        preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
-
-        screenRefreshTimer =
-            sys::TimerFactory::createPeriodicTimer(application, refreshTimerName, refreshTimeout, [this](sys::Timer &) {
-                application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
-                return;
-            });
+        preBuildDrawListHook = [this](std::list<Command> &cmd) {
+            AppWindow::updateTime();
+            wallpaperPresenter->updateTime();
+        };
     }
 
     void PhoneLockedWindow::buildInterface()
@@ -72,15 +70,28 @@ namespace gui
             navBar->setText(nav_bar::Side::Center, utils::translate("app_desktop_unlock"));
             navBar->setActive(nav_bar::Side::Right, false);
         }
-
-        screenRefreshTimer.start();
     }
 
-    bool PhoneLockedWindow::updateTime()
+    RefreshModes PhoneLockedWindow::updateTime()
     {
         auto ret = AppWindow::updateTime();
         wallpaperPresenter->updateTime();
-        return ret;
+        updateStatusBar();
+
+        deepRefreshCounter++;
+
+        if (ret == RefreshModes::GUI_REFRESH_NONE) {
+            return RefreshModes::GUI_REFRESH_NONE;
+        }
+
+        if (deepRefreshCounter.overflow()) {
+            deepRefreshCounter.reset();
+            LOG_DEBUG("Requesting deep refresh on phone lock screen");
+            return RefreshModes::GUI_REFRESH_DEEP;
+        }
+
+        LOG_DEBUG("Requesting fast refresh on phone lock screen");
+        return RefreshModes::GUI_REFRESH_FAST;
     }
 
     bool PhoneLockedWindow::processLongReleaseEvent(const InputEvent &inputEvent)
@@ -119,9 +130,7 @@ namespace gui
     }
 
     void PhoneLockedWindow::onClose(Window::CloseReason reason)
-    {
-        screenRefreshTimer.stop();
-    }
+    {}
 
     status_bar::Configuration PhoneLockedWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
@@ -136,5 +145,29 @@ namespace gui
         appConfiguration.enable(status_bar::Indicator::AlarmClock);
 
         return appConfiguration;
+    }
+
+    void PhoneLockedWindow::initializeDeepRefreshCounter(unsigned deepRefreshRate)
+    {
+        constexpr auto fallbackDeepRefreshRate = 30;
+        deepRefreshCounter.reset(); // Clear the counter
+
+        if (deepRefreshRate == 0) {
+            LOG_ERROR("Invalid lock screen deep refresh value (%d) provided, fallback default (%d) loaded!",
+                      deepRefreshRate,
+                      fallbackDeepRefreshRate);
+            deepRefreshCounter.setReference(fallbackDeepRefreshRate);
+            return;
+        }
+
+        deepRefreshCounter.setReference(deepRefreshRate);
+    }
+
+    void PhoneLockedWindow::updateStatusBar()
+    {
+        updateSignalStrength();
+        updateNetworkAccessTechnology();
+        updateBatteryStatus();
+        updateSim();
     }
 } /* namespace gui */

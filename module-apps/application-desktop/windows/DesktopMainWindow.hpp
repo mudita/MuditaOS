@@ -46,7 +46,7 @@ namespace gui
         void destroyInterface() override;
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
-        bool updateTime() override;
+        RefreshModes updateTime() override;
 
       private:
         bool resolveDialAction(const std::string &number);

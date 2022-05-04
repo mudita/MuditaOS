@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -73,7 +73,7 @@ namespace gui
         bool updateNetworkAccessTechnology();
         void updatePhoneMode(sys::phone_modes::PhoneMode mode);
         [[nodiscard]] bool preventsAutoLocking() const noexcept;
-        virtual bool updateTime();
+        virtual RefreshModes updateTime();
 
         void rebuild() override;
         void buildInterface() override;

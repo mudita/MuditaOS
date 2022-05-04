@@ -433,7 +433,6 @@ namespace app
         locks::SimLockSubject simLockSubject;
 
         bool isOnPhoneLockWindow();
-        void updateStatusBarOnPhoneLockWindow();
 
       public:
         [[nodiscard]] auto getPhoneLockSubject() noexcept -> locks::PhoneLockSubject &;

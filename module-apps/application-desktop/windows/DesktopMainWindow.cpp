@@ -211,7 +211,7 @@ namespace gui
         return app;
     }
 
-    bool DesktopMainWindow::updateTime()
+    RefreshModes DesktopMainWindow::updateTime()
     {
         auto ret = AppWindow::updateTime();
         clockDate->setTime(std::time(nullptr));
