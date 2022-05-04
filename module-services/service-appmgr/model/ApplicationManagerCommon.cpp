@@ -34,7 +34,7 @@ namespace app::manager
 {
     namespace
     {
-        constexpr auto ApplicationManagerStackDepth = 3072;
+        constexpr auto ApplicationManagerStackDepth = 1024 * 4;
 
         bool checkIfCloseableAction(const actions::Action action)
         {
