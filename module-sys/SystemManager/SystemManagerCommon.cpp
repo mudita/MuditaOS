@@ -693,6 +693,8 @@ namespace sys
     {
         LOG_DEBUG("Invoking closing procedure...");
 
+        cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
+
         // In case if other power down request arrive in the meantime
         lowBatteryShutdownDelay.stop();
         freqTimer.stop();
