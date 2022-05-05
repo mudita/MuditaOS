@@ -102,6 +102,11 @@ void EventManager::initProductEvents()
         pureEventWorker->requestSliderPositionRead();
         return sys::MessageNone{};
     });
+
+    connect(typeid(sevm::TurnOffTorchRequest), [&](sys::Message *msg) {
+        toggleTorchOff();
+        return sys::MessageNone{};
+    });
 }
 
 void EventManager::toggleTorchOnOff()
@@ -109,6 +114,11 @@ void EventManager::toggleTorchOnOff()
     auto state    = bsp::torch::getState();
     auto newState = (state == bsp::torch::State::off) ? bsp::torch::State::on : bsp::torch::State::off;
     bsp::torch::turn(newState, bsp::torch::ColourTemperature::coldest);
+}
+
+void EventManager::toggleTorchOff()
+{
+    bsp::torch::turn(bsp::torch::State::off, bsp::torch::ColourTemperature::coldest);
 }
 
 void EventManager::toggleTorchColor()

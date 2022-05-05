@@ -21,6 +21,7 @@ class EventManager : public EventManagerCommon
   private:
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
     void toggleTorchOnOff();
+    void toggleTorchOff();
     void toggleTorchColor();
     void ProcessCloseReason(sys::CloseReason closeReason) override;
     void handleKeyEvent(sys::Message *msg) override;

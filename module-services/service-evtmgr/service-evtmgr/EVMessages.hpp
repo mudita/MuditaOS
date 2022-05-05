@@ -145,4 +145,9 @@ namespace sevm
         const int data{};
     };
 
+    class TurnOffTorchRequest : public sys::DataMessage
+    {
+      public:
+        TurnOffTorchRequest() : DataMessage(MessageType::MessageTypeUninitialized){};
+    };
 } /* namespace sevm*/
