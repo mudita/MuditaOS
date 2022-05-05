@@ -34,6 +34,7 @@
 #include <utility>
 #include <module-db/queries/messages/sms/QuerySMSGetByText.hpp>
 #include "queries/messages/threads/QueryThreadGetByID.hpp"
+#include "queries/messages/threads/QueryThreadRemove.hpp"
 
 namespace sdesktop::endpoints
 {
@@ -418,8 +419,22 @@ namespace sdesktop::endpoints
 
     auto MessageHelper::deleteThread(Context &context) -> sys::ReturnCodes
     {
-        context.setResponseStatus(http::Code::NotImplemented);
-        putToSendQueue(context.createSimpleResponse());
+        auto query = std::make_unique<db::query::ThreadRemove>(context.getBody()[json::messages::threadID].int_value());
+
+        auto listener = std::make_unique<db::EndpointListener>(
+            [](db::QueryResult *result, Context &context) {
+                if (auto threadRemoveResult = dynamic_cast<db::query::ThreadRemoveResult *>(result)) {
+                    context.setResponseStatus(threadRemoveResult->success() ? http::Code::NoContent
+                                                                            : http::Code::InternalServerError);
+                    putToSendQueue(context.createSimpleResponse());
+                    return true;
+                }
+                return false;
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSThread, std::move(query));
         return sys::ReturnCodes::Success;
     }
 
