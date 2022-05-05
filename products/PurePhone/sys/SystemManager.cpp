@@ -14,6 +14,7 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
 
 namespace sys
 {
@@ -147,6 +148,7 @@ namespace sys
     {
         SystemManagerCommon::batteryCriticalLevelAction(charging);
         CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::Off);
+        EventManagerServiceAPI::turnOffTorch(this);
         auto msg = std::make_shared<CriticalBatteryLevelNotification>(true, charging);
         bus.sendUnicast(std::move(msg), service::name::appmgr);
     }

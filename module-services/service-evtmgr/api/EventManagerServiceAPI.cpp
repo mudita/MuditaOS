@@ -46,3 +46,8 @@ void EventManagerServiceAPI::setVibrationLevel(sys::Service *serv, unsigned int 
 {
     serv->bus.sendUnicast(std::make_shared<sevm::VibratorLevelMessage>(vibrationLevel), service::name::evt_manager);
 }
+
+void EventManagerServiceAPI::turnOffTorch(sys::Service *serv)
+{
+    serv->bus.sendUnicast(std::make_shared<sevm::TurnOffTorchRequest>(), service::name::evt_manager);
+}

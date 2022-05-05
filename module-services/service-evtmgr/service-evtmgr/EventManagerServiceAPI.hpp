@@ -31,4 +31,6 @@ namespace EventManagerServiceAPI
     /// Set vibrator level
     void setVibrationLevel(sys::Service *serv, unsigned int vibrationLevel);
 
+    /// Turn off torch
+    void turnOffTorch(sys::Service *serv);
 } // namespace EventManagerServiceAPI
