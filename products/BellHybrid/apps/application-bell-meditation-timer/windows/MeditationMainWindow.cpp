@@ -50,7 +50,6 @@ namespace app::meditation
 
         addWinSettings(utils::translate("app_bell_meditation_start"), MeditationTimerWindow::name, defaultCallback);
         addWinSettings(utils::translate("app_bell_meditation_settings"), SettingsWindow::name, defaultCallback);
-        addWinSettings(utils::translate("app_bell_meditation_statistics"), StatisticsWindow::name, defaultCallback);
 
         return settingsOptionList;
     }
