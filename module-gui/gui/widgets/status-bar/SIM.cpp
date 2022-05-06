@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SIM.hpp"
@@ -37,11 +37,11 @@ namespace gui::status_bar
         }
     }
 
-    void SIM::show()
+    bool SIM::setEnabled(bool enabled)
     {
         bool isVisible = !(mode == SIMConfiguration::DisplayMode::OnlyInactiveState &&
                            (current == GSM::SIM::SIM1 || current == GSM::SIM::SIM2));
-        StatusBarWidgetBase<Image>::setVisible(isVisible);
+        return StatusBarWidgetBase<Image>::setEnabled(enabled && isVisible);
     }
 
     void SIM::acceptStatusBarVisitor(StatusBarVisitor &visitor)
@@ -65,8 +65,8 @@ namespace gui::status_bar
     SIMDevelopersMode::SIMDevelopersMode(Item *parent, uint32_t x, uint32_t y) : SIM(parent, x, y)
     {}
 
-    void SIMDevelopersMode::show()
+    bool SIMDevelopersMode::setEnabled(bool enable)
     {
-        StatusBarWidgetBase<Image>::setVisible(true);
+        return StatusBarWidgetBase<Image>::setEnabled(enable);
     }
 }; // namespace gui::status_bar

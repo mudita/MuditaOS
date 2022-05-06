@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -36,19 +36,11 @@ template <typename ItemPolicy> class StatusBarWidgetBase : public ItemPolicy
     using ItemPolicy::ItemPolicy;
     virtual ~StatusBarWidgetBase() = default;
 
-    virtual void show()
+    virtual bool setEnabled(bool enable)
     {
-        ItemPolicy::setVisible(true);
-    }
-
-    virtual void hide()
-    {
-        ItemPolicy::setVisible(false);
-    }
-
-    virtual bool isVisible()
-    {
-        return ItemPolicy::visible;
+        auto enabled = ItemPolicy::visible;
+        ItemPolicy::setVisible(enable);
+        return enabled != enable;
     }
 
     virtual void acceptStatusBarVisitor([[maybe_unused]] StatusBarVisitor &visitor)

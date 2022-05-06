@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -190,6 +190,7 @@ namespace gui::status_bar
         bool updatePhoneMode();
 
         /// Update NAT widget state depending on the current configuration
+        /// returns if should refresh
         bool updateNetworkAccessTechnology();
 
         /// Accepts GuiVisitor to update the status bar
@@ -205,11 +206,11 @@ namespace gui::status_bar
 
         /// Show/hide alarm clock status widget
         /// @param enabled true to show false to hide the widget
-        void showAlarmClock(bool enabled);
+        bool showAlarmClock(bool enabled);
 
         /// Show/hide sim card status widget
         /// @param enabled true to show false to hide the widget
-        void showSim(bool enabled);
+        bool showSim(bool enabled);
 
         /// Show/hide clock widget
         /// @param enabled true to show false to hide the widget
@@ -221,19 +222,19 @@ namespace gui::status_bar
 
         /// Show/hide battery status widget
         /// @param enabled true to show false to hide the widget
-        void showBattery(bool enabled);
+        bool showBattery(bool enabled);
 
         /// Show/hide signal strenght widget
         /// @param enabled true to show false to hide the widget
-        void showSignalStrength(bool enabled);
+        bool showSignalStrength(bool enabled);
 
         /// Show/hide phone mode widget
         /// @param enabled true to show false to hide the widget
         void showPhoneMode(bool enabled);
 
-        /// Show/hide NAT widget
+        /// Show/hide NAT widget - returns if was changed
         /// @param enabled true to show false to hide the widget
-        void showNetworkAccessTechnology(bool enabled);
+        bool showNetworkAccessTechnology(bool enabled);
 
         /// Sets the status of the specified indicator on the Status bar
         /// @param indicator indicator id

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <iomanip>
@@ -256,48 +256,38 @@ namespace gui::status_bar
         if (battery == nullptr) {
             return false;
         }
-        showBattery(configuration.isEnabled(Indicator::Battery));
-        return true;
+        return showBattery(configuration.isEnabled(Indicator::Battery));
     }
 
-    void StatusBar::showBattery(bool enabled)
+    bool StatusBar::showBattery(bool enabled)
     {
         battery->update(Store::Battery::get());
-        enabled ? battery->show() : battery->hide();
+        return battery->setEnabled(enabled);
     }
 
     void StatusBar::showBluetooth(bool enabled)
     {
-        if (enabled && configuration.getBluetoothMode() != sys::bluetooth::BluetoothMode::Disabled) {
-            bluetooth->show();
-        }
-        else {
-            bluetooth->hide();
-        }
+        auto show = enabled && configuration.getBluetoothMode() != sys::bluetooth::BluetoothMode::Disabled;
+        alarmClock->setEnabled(show);
         rightBox->resizeItems();
     }
 
-    void StatusBar::showAlarmClock(bool enabled)
+    bool StatusBar::showAlarmClock(bool enabled)
     {
-        if (enabled && configuration.getAlarmClockStatus()) {
-            alarmClock->show();
-        }
-        else {
-            alarmClock->hide();
-        }
+        bool show = enabled && configuration.getAlarmClockStatus();
+        auto ret  = alarmClock->setEnabled(show);
         rightBox->resizeItems();
+        return ret;
     }
 
-    void StatusBar::showSim(bool enabled)
+    bool StatusBar::showSim(bool enabled)
     {
         if (enabled) {
             sim->update();
-            sim->show();
         }
-        else {
-            sim->hide();
-        }
+        auto ret = sim->setEnabled(enabled);
         rightBox->resizeItems();
+        return ret;
     }
 
     bool StatusBar::updateBluetooth(sys::bluetooth::BluetoothMode mode)
@@ -327,16 +317,15 @@ namespace gui::status_bar
         if (sim == nullptr) {
             return false;
         }
-        showSim(configuration.isEnabled(Indicator::SimCard));
-        return true;
+        return showSim(configuration.isEnabled(Indicator::SimCard));
     }
 
-    void StatusBar::showSignalStrength(bool enabled)
+    bool StatusBar::showSignalStrength(bool enabled)
     {
         const auto signalStrength = Store::GSM::get()->getSignalStrength();
         const auto networkStatus  = Store::GSM::get()->getNetwork().status;
         signal->update(signalStrength, networkStatus);
-        enabled ? signal->show() : signal->hide();
+        return signal->setEnabled(enabled);
     }
 
     bool StatusBar::updateSignalStrength()
@@ -344,8 +333,7 @@ namespace gui::status_bar
         if (signal == nullptr) {
             return false;
         }
-        showSignalStrength(configuration.isEnabled(Indicator::Signal));
-        return true;
+        return showSignalStrength(configuration.isEnabled(Indicator::Signal));
     }
 
     bool StatusBar::updatePhoneMode()
@@ -359,7 +347,7 @@ namespace gui::status_bar
 
     void StatusBar::showPhoneMode(bool enabled)
     {
-        enabled ? phoneMode->show() : phoneMode->hide();
+        phoneMode->setEnabled(enabled);
     }
 
     bool StatusBar::updateNetworkAccessTechnology()
@@ -367,38 +355,35 @@ namespace gui::status_bar
         if (networkAccessTechnology == nullptr) {
             return false;
         }
-        showNetworkAccessTechnology(configuration.isEnabled(Indicator::NetworkAccessTechnology));
-        return true;
+        return showNetworkAccessTechnology(configuration.isEnabled(Indicator::NetworkAccessTechnology));
     }
 
-    void StatusBar::showNetworkAccessTechnology(bool enabled)
+    bool StatusBar::showNetworkAccessTechnology(bool enabled)
     {
         networkAccessTechnology->update(Store::GSM::get()->getNetwork().accessTechnology);
-        enabled ? networkAccessTechnology->show() : networkAccessTechnology->hide();
+        return networkAccessTechnology->setEnabled(enabled);
     }
 
     void StatusBar::showTime(bool enabled)
     {
         time->update();
+        time->setEnabled(enabled);
+        lock->setEnabled(!enabled);
         if (enabled) {
             centralBox->setMinimumSize(boxes::center::maxX, this->drawArea.h);
-            time->show();
-            lock->hide();
             centralBox->resizeItems();
             return;
         }
-        time->hide();
     }
 
     void StatusBar::showLock(bool enabled)
     {
+        lock->setEnabled(enabled);
+        time->setEnabled(!enabled);
         if (enabled) {
             centralBox->setMinimumSize(boxes::center::minX, this->drawArea.h);
-            lock->show();
-            time->hide();
             return;
         }
-        lock->hide();
     }
 
     bool StatusBar::updateTime()

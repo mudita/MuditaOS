@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,7 +40,7 @@ namespace gui::status_bar
         /// check if sim set in state -> if not -> show new sim
         void update();
 
-        void show() override;
+        bool setEnabled(bool enable) override;
 
         void acceptStatusBarVisitor(StatusBarVisitor &visitor) override;
     };
@@ -50,6 +50,6 @@ namespace gui::status_bar
       public:
         SIMDevelopersMode(Item *parent, uint32_t x, uint32_t y);
 
-        void show() override;
+        bool setEnabled(bool enable) override;
     };
 } // namespace gui::status_bar
