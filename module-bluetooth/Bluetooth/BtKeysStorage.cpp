@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <algorithm>
@@ -8,7 +8,6 @@
 json11::Json bluetooth::KeyStorage::keysJson = json11::Json();
 btstack_link_key_db_t bluetooth::KeyStorage::keyStorage;
 json11::Json::array bluetooth::KeyStorage::keys;
-std::string bluetooth::KeyStorage::keysEntry;
 std::shared_ptr<bluetooth::SettingsHolder> bluetooth::KeyStorage::settings = nullptr;
 
 namespace bluetooth
@@ -39,6 +38,7 @@ namespace bluetooth
     void KeyStorage::openStorage()
     {
         LOG_INFO("opening storage from API");
+        std::string keysEntry;
         if (settings) {
             keysEntry = std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BtKeys));
         }
@@ -71,33 +71,45 @@ namespace bluetooth
     {
         if (type != nullptr && bd_addr != nullptr) {
             LOG_INFO("getting key from API");
+
+            json11::Json finalJson = json11::Json::object{{strings::keys, keys}};
+            auto keysEntryDump     = finalJson.dump();
+            LOG_INFO("Current keys state: %s", keysEntryDump.c_str());
+
             if (keys.empty()) {
                 LOG_ERROR("Keys empty!");
                 return 0;
             }
-            for (auto key : keys) {
-                bd_addr_t addr;
-                sscanf_bd_addr(key[strings::bd_addr].string_value().c_str(), addr);
 
-                if (bd_addr_cmp(addr, bd_addr) == 0) {
-                    auto foundLinkKey = key[strings::link_key].string_value().c_str();
-                    memcpy(link_key, reinterpret_cast<const uint8_t *>(foundLinkKey), sizeof(link_key_t));
-                    LOG_INFO("Getting key: %s", foundLinkKey);
-                    *type = static_cast<link_key_type_t>(key[strings::type].int_value());
+            auto ret = processOnFoundKey(bd_addr, [&type, &link_key](const json11::Json &key, bd_addr_t) {
+                auto foundLinkKey = key[strings::link_key].string_value().c_str();
+                memcpy(link_key, reinterpret_cast<const uint8_t *>(foundLinkKey), sizeof(link_key_t));
+                LOG_INFO("Getting key: %s", foundLinkKey);
+                *type = static_cast<link_key_type_t>(key[strings::type].int_value());
 
-                    return 1;
-                }
+                return 1;
+            });
+            if (ret == 0) {
                 LOG_ERROR("Can't find key for this address!");
             }
+            return ret;
         }
         return 0;
     }
     void KeyStorage::putLinkKey(uint8_t *bd_addr, uint8_t *link_key, link_key_type_t type)
     {
+
+        processOnFoundKey(bd_addr, [](const json11::Json &, bd_addr_t bd_addr) {
+            LOG_ERROR("Key already found in the key storage - deleting!");
+            deleteLinkKey(bd_addr);
+            return 1;
+        });
+
         auto keyEntry = json11::Json::object{{strings::bd_addr, bd_addr_to_str(bd_addr)},
                                              {strings::link_key, std::string(reinterpret_cast<char *>(link_key))},
                                              {strings::type, type}};
         keys.emplace_back(keyEntry);
+
         if (settings->onLinkKeyAdded) {
             settings->onLinkKeyAdded(bd_addr_to_str(bd_addr));
         }
@@ -140,7 +152,7 @@ namespace bluetooth
     void KeyStorage::writeSettings()
     {
         json11::Json finalJson = json11::Json::object{{strings::keys, keys}};
-        keysEntry              = finalJson.dump();
+        auto keysEntry         = finalJson.dump();
         if (settings) {
             settings->setValue(bluetooth::Settings::BtKeys, keysEntry);
         }
@@ -148,6 +160,18 @@ namespace bluetooth
             LOG_ERROR("failed to open settings to write!");
             return;
         }
+    }
+    auto KeyStorage::processOnFoundKey(bd_addr_t bd_addr, const std::function<int(json11::Json, bd_addr_t)> &fun) -> int
+    {
+        for (const auto &key : keys) {
+            bd_addr_t addr;
+            sscanf_bd_addr(key[strings::bd_addr].string_value().c_str(), addr);
+
+            if (bd_addr_cmp(addr, bd_addr) == 0 && fun) {
+                return fun(key, bd_addr);
+            }
+        }
+        return 0;
     }
 
 } // namespace bluetooth

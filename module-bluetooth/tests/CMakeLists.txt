@@ -6,7 +6,11 @@ add_catch2_executable(
         tests-BluetoothDevicesModel.cpp
         tests-Devicei.cpp
         tests-command.cpp
+        tests-BTKeysStorage.cpp
     LIBS
         module-sys
         module-bluetooth
+        service-bluetooth
 )
+
+

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 #include <json11.hpp>
@@ -78,9 +78,11 @@ namespace bluetooth
     class SettingsHolder
     {
       public:
+        SettingsHolder()          = default;
+        virtual ~SettingsHolder() = default;
         explicit SettingsHolder(std::unique_ptr<settings::Settings> settingsPtr);
-        auto getValue(const Settings setting) -> SettingEntry;
-        void setValue(const Settings &newSetting, const SettingEntry &value);
+        virtual auto getValue(const Settings setting) -> SettingEntry;
+        virtual void setValue(const Settings &newSetting, const SettingEntry &value);
         std::function<void()> onStateChange;
         std::function<void(const std::string &)> onLinkKeyAdded;
         void deinit();

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,7 +17,6 @@ namespace bluetooth
       public:
         static auto getKeyStorage() -> btstack_link_key_db_t *;
         static std::shared_ptr<bluetooth::SettingsHolder> settings;
-
       private:
         static void openStorage();
         static void closeStorage();
@@ -31,11 +30,11 @@ namespace bluetooth
                                       link_key_type_t *type) -> int;
         static void iterator_done(btstack_link_key_iterator_t *it);
         static void set_local_bd_addr(bd_addr_t bd_addr);
+        static auto processOnFoundKey(bd_addr_t bd_addr, const std::function<int(json11::Json, bd_addr_t)> &fun) -> int;
         static void writeSettings();
         static json11::Json keysJson;
         static btstack_link_key_db_t keyStorage;
         static json11::Json::array keys;
-        static std::string keysEntry;
     };
 
 } // namespace Bt
