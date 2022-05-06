@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATFactory.hpp"
@@ -61,8 +61,12 @@ namespace at
         {AT::SIM_DET, {"AT+QSIMDET?"}},
         {AT::SIM_DET_ON, {"AT+QSIMDET=1,0"}},
         {AT::SIMSTAT_ON, {"AT+QSIMSTAT=1"}},
+        {AT::SET_DEFAULT_SCANMODE, {"AT+QCFG=\"nwscanmode\",0"}},
+        {AT::SET_DEFAULT_SERVICEDOMAIN, {"AT+QCFG=\"servicedomain\",2"}},
         {AT::SET_SCANMODE, {"AT+QCFG=\"nwscanmode\","}},
         {AT::GET_SCANMODE, {"AT+QCFG=\"nwscanmode\""}},
+        {AT::SET_SERVICEDOMAIN, {"AT+QCFG=\"servicedomain\","}},
+        {AT::GET_SERVICEDOMAIN, {"AT+QCFG=\"servicedomain\""}},
         {AT::QGMR, {"AT+QGMR"}},
         {AT::STORE_SETTINGS_ATW, {"AT&W"}},
         {AT::CEER, {"AT+CEER", 1s}},
