@@ -357,6 +357,7 @@ TEST_CASE("call outgoing - ended, before answered")
     auto machine = std::make_unique<call::StateMachine>(di.get());
 
     REQUIRE(machine->machine.process_event(call::event::StartCall{CallType::CT_OUTGOING, number.getView()}));
+    fakeit::Verify(Method(di.audio, routingStart)).Exactly(1);
     fakeit::Verify(Method(di.audio, play)).Exactly(0);
     REQUIRE(machine->machine.process_event(call::event::Ended{}));
     fakeit::Verify(Method(di.audio, stop)).Exactly(1);
