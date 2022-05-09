@@ -185,6 +185,7 @@ namespace call
             call.record.phoneNumber = start.number;
             call.record.date        = std::time(nullptr);
 
+            di.audio->routingStart();
             di.db->startCall(call.record);
             di.gui->notifyCallStarted(call.record.phoneNumber, call.record.type);
             di.sentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
@@ -195,7 +196,6 @@ namespace call
     {
         void operator()(Dependencies &di, CallData &call)
         {
-            di.audio->routingStart();
             di.timer->start();
         }
     } constexpr HandleStartedCall;
@@ -289,8 +289,8 @@ namespace call
                 // outgoing call: Pure is Ringing (called from: handleCellularRingingMessage)
                 "Idle"_s + boost::sml::event<evt::StartCall> / HandleStartCall = "Starting"_s,
 
-                "Starting"_s + boost::sml::event<evt::Ended> / HandleEndCall      = "Ongoing"_s,
-                "Starting"_s + boost::sml::event<evt::Reject> / HandleEndCall     = "Ongoing"_s,
+                "Starting"_s + boost::sml::event<evt::Ended> / HandleEndCall      = "Idle"_s,
+                "Starting"_s + boost::sml::event<evt::Reject> / HandleEndCall     = "Idle"_s,
                 "Starting"_s + boost::sml::event<evt::Answer> / HandleStartedCall = "Ongoing"_s,
 
                 "Ringing"_s + boost::sml::event<evt::Answer> / HandleAnswerCall                 = "Ongoing"_s,
