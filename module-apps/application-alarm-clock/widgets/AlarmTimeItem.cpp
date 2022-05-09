@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmTimeItem.hpp"
@@ -46,6 +46,8 @@ namespace gui
         focusChangedCallback = [&](Item &item) {
             setFocusItem(focus ? hBox : nullptr);
             if (!item.focus) {
+                hourInput->setText(timeValueToPaddedString<UTF8>(hourInput->getText()));
+                minuteInput->setText(timeValueToPaddedString<UTF8>(minuteInput->getText()));
                 validateHour();
             }
             return true;
@@ -102,11 +104,21 @@ namespace gui
                     hourInput->setText("12");
                 }
                 if (minutes > utils::time::minutesInHour - 1) {
-                    minuteInput->setText("00");
+                    minuteInput->setText("0");
                 }
                 return true;
             }
             else if (hBox->onInput(event)) {
+                switch (event.getKeyCode()) {
+                case gui::KeyCode::KEY_RIGHT:
+                    hourInput->setText(timeValueToPaddedString<UTF8>(hourInput->getText()));
+                    break;
+                case gui::KeyCode::KEY_LEFT:
+                    minuteInput->setText(timeValueToPaddedString<UTF8>(minuteInput->getText()));
+                    break;
+                default:
+                    break;
+                }
                 return true;
             }
 
@@ -204,8 +216,8 @@ namespace gui
                 const auto time12H = date::make12(hours);
                 const auto isPM    = date::is_pm(hours);
 
-                hourInput->setText(std::to_string(time12H.count()));
-                minuteInput->setText(std::to_string(alarm->alarmTime.minuteOfHour.count()));
+                hourInput->setText(timeValueToPaddedString<uint32_t>(time12H.count()));
+                minuteInput->setText(timeValueToPaddedString<uint32_t>(alarm->alarmTime.minuteOfHour.count()));
 
                 isPM ? mode12hInput->setText(utils::translate(utils::time::Locale::getPM()))
                      : mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
@@ -217,8 +229,8 @@ namespace gui
             minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
-                hourInput->setText(std::to_string(alarm->alarmTime.hourOfDay.count()));
-                minuteInput->setText(std::to_string(alarm->alarmTime.minuteOfHour.count()));
+                hourInput->setText(timeValueToPaddedString<uint32_t>(alarm->alarmTime.hourOfDay.count()));
+                minuteInput->setText(timeValueToPaddedString<uint32_t>(alarm->alarmTime.minuteOfHour.count()));
             };
         }
     }
@@ -234,5 +246,12 @@ namespace gui
             hourInput->setText("0");
             minuteInput->setText("00");
         }
+    }
+
+    template <typename T> UTF8 AlarmTimeItem::timeValueToPaddedString(const T &value)
+    {
+        std::ostringstream oss;
+        oss << std::setw(2) << std::setfill('0') << value;
+        return UTF8(oss.str());
     }
 } /* namespace gui */
