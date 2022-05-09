@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,6 +26,8 @@ namespace gui
         void prepareForTimeMode();
         [[nodiscard]] bool isPm(const std::string &text) const;
         void validateHour();
+
+        template <typename T> UTF8 timeValueToPaddedString(const T &value);
 
       public:
         AlarmTimeItem(std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
