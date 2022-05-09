@@ -9,7 +9,9 @@
 
 namespace db
 {
-    NotificationMessage::NotificationMessage(db::Interface::Name interface, Query::Type type, uint32_t recordId)
+    NotificationMessage::NotificationMessage(db::Interface::Name interface,
+                                             Query::Type type,
+                                             std::optional<uint32_t> recordId)
         : sys::DataMessage(MessageType::DBServiceNotification), interface(interface), type(type), recordId(recordId)
     {}
 

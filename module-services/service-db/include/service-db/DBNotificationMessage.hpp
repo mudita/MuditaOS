@@ -15,10 +15,10 @@ namespace db
     class NotificationMessage : public sys::DataMessage
     {
       public:
-        NotificationMessage(db::Interface::Name interface, Query::Type type, uint32_t recordId);
+        NotificationMessage(db::Interface::Name interface, Query::Type type, std::optional<uint32_t> recordId);
         const db::Interface::Name interface;
         const Query::Type type;
-        const uint32_t recordId;
+        const std::optional<uint32_t> recordId;
 
         bool dataModified();
     };

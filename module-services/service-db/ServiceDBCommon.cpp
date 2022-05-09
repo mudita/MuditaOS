@@ -43,10 +43,7 @@ sys::MessagePointer ServiceDBCommon::DataReceivedHandler(sys::DataMessage *msgl,
             LOG_WARN("There is no response associated with query: %s!", query ? query->debugInfo().c_str() : "");
         }
         responseMsg = std::make_shared<db::QueryResponse>(std::move(result));
-
-        if (id) {
-            sendUpdateNotification(msg->getInterface(), queryType, *id);
-        }
+        sendUpdateNotification(msg->getInterface(), queryType, id);
     } break;
 
     default:
@@ -110,7 +107,9 @@ sys::ReturnCodes ServiceDBCommon::SwitchPowerModeHandler(const sys::ServicePower
     return sys::ReturnCodes::Success;
 }
 
-void ServiceDBCommon::sendUpdateNotification(db::Interface::Name interface, db::Query::Type type, uint32_t recordId)
+void ServiceDBCommon::sendUpdateNotification(db::Interface::Name interface,
+                                             db::Query::Type type,
+                                             std::optional<uint32_t> recordId)
 {
     auto notificationMessage = std::make_shared<db::NotificationMessage>(interface, type, recordId);
     bus.sendMulticast(notificationMessage, sys::BusChannel::ServiceDBNotifications);
