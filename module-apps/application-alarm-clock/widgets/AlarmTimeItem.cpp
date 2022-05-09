@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmTimeItem.hpp"
@@ -46,6 +46,8 @@ namespace gui
         focusChangedCallback = [&](Item &item) {
             setFocusItem(focus ? hBox : nullptr);
             if (!item.focus) {
+                hourInput->setText(timeValueToPaddedString<UTF8>(hourInput->getText()));
+                minuteInput->setText(timeValueToPaddedString<UTF8>(minuteInput->getText()));
                 validateHour();
             }
             return true;
@@ -96,7 +98,23 @@ namespace gui
                 }
 
                 if (mode24H && hours > utils::time::hoursInday - 1) {
-                    hourInput->setText("0");
+                    //                    const char test[] = {0x30, 0x30, 0x00};
+                    //                    const char* initialString = "00";
+                    //                    int firstCharCode = (int)(*initialString);
+                    //                    int secondCharCode = (int)(*(initialString + 1));
+                    //                    int thirdCharCode = (int)(*(initialString + 2));
+                    //
+                    //                    LOG_ERROR("Test; initial C-string: %s", initialString);
+                    //                    LOG_ERROR("Char codes of initial C-string: %d %d %d", firstCharCode,
+                    //                    secondCharCode, thirdCharCode); LOG_ERROR("UTF8 created from this string: %s",
+                    //                    UTF8(initialString).c_str());
+                    const char *zero             = "0";
+                    const char *zeroZero         = "00";
+                    const char *zeroZeroZero     = "000";
+                    const char *zeroZeroZeroZero = "0000";
+                    LOG_ERROR("%s %s %s %s", zero, zeroZero, zeroZeroZero, zeroZeroZeroZero);
+
+                    hourInput->setText("00");
                 }
                 else if (!mode24H && hours > utils::time::hoursInday / 2) {
                     hourInput->setText("12");
@@ -107,6 +125,16 @@ namespace gui
                 return true;
             }
             else if (hBox->onInput(event)) {
+                switch (event.getKeyCode()) {
+                case gui::KeyCode::KEY_RIGHT:
+                    hourInput->setText(timeValueToPaddedString<UTF8>(hourInput->getText()));
+                    break;
+                case gui::KeyCode::KEY_LEFT:
+                    minuteInput->setText(timeValueToPaddedString<UTF8>(minuteInput->getText()));
+                    break;
+                default:
+                    break;
+                }
                 return true;
             }
 
@@ -204,8 +232,8 @@ namespace gui
                 const auto time12H = date::make12(hours);
                 const auto isPM    = date::is_pm(hours);
 
-                hourInput->setText(std::to_string(time12H.count()));
-                minuteInput->setText(std::to_string(alarm->alarmTime.minuteOfHour.count()));
+                hourInput->setText(timeValueToPaddedString<uint32_t>(time12H.count()));
+                minuteInput->setText(timeValueToPaddedString<uint32_t>(alarm->alarmTime.minuteOfHour.count()));
 
                 isPM ? mode12hInput->setText(utils::translate(utils::time::Locale::getPM()))
                      : mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
@@ -217,8 +245,8 @@ namespace gui
             minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
-                hourInput->setText(std::to_string(alarm->alarmTime.hourOfDay.count()));
-                minuteInput->setText(std::to_string(alarm->alarmTime.minuteOfHour.count()));
+                hourInput->setText(timeValueToPaddedString(alarm->alarmTime.hourOfDay.count()));
+                minuteInput->setText(timeValueToPaddedString(alarm->alarmTime.minuteOfHour.count()));
             };
         }
     }
@@ -234,5 +262,12 @@ namespace gui
             hourInput->setText("0");
             minuteInput->setText("00");
         }
+    }
+
+    template <typename T> UTF8 AlarmTimeItem::timeValueToPaddedString(const T &value)
+    {
+        std::ostringstream oss;
+        oss << std::setw(2) << std::setfill('0') << value;
+        return UTF8(oss.str());
     }
 } /* namespace gui */

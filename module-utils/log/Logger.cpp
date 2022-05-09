@@ -25,7 +25,7 @@ namespace Log
     Logger::Logger() : circularBuffer{circularBufferSize}, rotator{".log"}
     {
         filtered = {
-            {"ApplicationManager", logger_level::LOGINFO},
+            {"ApplicationManager", logger_level::LOGDEBUG},
             {"CellularMux", logger_level::LOGINFO},
 #if (!LOG_SENSITIVE_DATA_ENABLED)
             {"ServiceCellular", logger_level::LOGINFO},
