@@ -16,6 +16,11 @@ namespace call::api
         virtual time_t duration() = 0;
         virtual ~Timer()          = default;
     };
+
+    struct TimerRing
+    {
+        virtual void start() = 0;
+    };
 }; // namespace call::api
 
 class CallTimer : public call::api::Timer
@@ -28,4 +33,13 @@ class CallTimer : public call::api::Timer
     void start() override;
     void stop() override;
     time_t duration() override;
+};
+
+class TimerRing : public call::api::TimerRing
+{
+    sys::TimerHandle handle;
+
+  public:
+    explicit TimerRing(sys::TimerHandle handle);
+    void start() override;
 };

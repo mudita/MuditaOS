@@ -73,6 +73,13 @@ namespace mocks
         return timer;
     }
 
+    auto timerRing()
+    {
+        fakeit::Mock<call::api::TimerRing> timer;
+        fakeit::When(Method(timer, start)).AlwaysReturn();
+        return timer;
+    }
+
     auto api(bool dnd = false)
     {
         fakeit::Mock<call::api::Api> api;
@@ -98,6 +105,7 @@ namespace mocks
         decltype(mocks::gui()) gui             = mocks::gui();
         decltype(mocks::db()) db               = mocks::db();
         decltype(mocks::timer()) timer         = mocks::timer();
+        decltype(mocks::timerRing()) timerRing = mocks::timerRing();
         decltype(mocks::api()) api;
         call::Dependencies di{};
         std::shared_ptr<mocks::Sentinel> sentinel = std::make_shared<mocks::Sentinel>();
@@ -109,12 +117,14 @@ namespace mocks
             auto gui_p       = mock_to_shared<call::api::GUI>(&gui.get());
             auto db_p        = mock_to_shared<call::api::DB>(&db.get());
             auto timer_p     = mock_to_shared<call::api::Timer>(&timer.get());
+            auto timer_ring_p = mock_to_shared<call::api::TimerRing>(&timerRing.get());
             auto api_p       = mock_to_shared<call::api::Api>(&api.get());
-            di               = call::Dependencies{std::move(audio_p),
+            di                = call::Dependencies{std::move(audio_p),
                                     std::move(multicast_p),
                                     std::move(gui_p),
                                     std::move(db_p),
                                     std::move(timer_p),
+                                    std::move(timer_ring_p),
                                     std::move(api_p),
                                     sentinel};
         }
@@ -140,12 +150,15 @@ TEST_CASE("base positive call flow, answered, end from caller")
     fakeit::Verify(Method(di.audio, play)).Exactly(0);
     // 1st ring
     REQUIRE(machine->machine.process_event(call::event::RING{}));
-    fakeit::Verify(Method(di.audio, play)).Exactly(1);
-    fakeit::Verify(Method(di.gui, notifyRING)).Exactly(1);
+    fakeit::Verify(Method(di.audio, play)).Exactly(0);
+    fakeit::Verify(Method(di.timerRing, start)).Exactly(1);
     // 2nd ring - ignored
     REQUIRE(not machine->machine.process_event(call::event::RING{}));
+    fakeit::Verify(Method(di.timerRing, start)).Exactly(1);
+
+    REQUIRE(machine->machine.process_event(call::event::RingTimeout{}));
+    // we have to wait for RingTimeout first
     fakeit::Verify(Method(di.audio, play)).Exactly(1);
-    fakeit::Verify(Method(di.gui, notifyRING)).Exactly(1);
 
     REQUIRE(machine->machine.process_event(call::event::CLIP{number.getView()}));
     REQUIRE(machine->call.record.phoneNumber == number.getView());
@@ -197,6 +210,7 @@ TEST_CASE("no CLIP at all, anonymus call answered, end from caller")
     fakeit::Verify(Method(di.audio, play)).Exactly(0);
 
     REQUIRE(machine->machine.process_event(call::event::RING{}));
+    REQUIRE(machine->machine.process_event(call::event::RingTimeout{}));
     fakeit::Verify(Method(di.audio, play)).Exactly(1);
     fakeit::Verify(Method(di.gui, notifyRING)).Exactly(1);
 
@@ -230,7 +244,7 @@ TEST_CASE("reject on PURE after RING")
     auto machine = std::make_unique<call::StateMachine>(di.get());
 
     REQUIRE(machine->machine.process_event(call::event::RING{}));
-    fakeit::Verify(Method(di.audio, play)).Exactly(1);
+    REQUIRE(machine->machine.process_event(call::event::RingTimeout{}));
 
     CalllogRecord record_when_called;
     fakeit::When(Method(di.db, endCall)).AlwaysDo([&record_when_called](const CalllogRecord &rec) {
