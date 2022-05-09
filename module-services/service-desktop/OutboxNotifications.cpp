@@ -58,9 +58,9 @@ void OutboxNotifications::newNotificationHandler(db::NotificationMessage *notifi
     }
 
     if (entryType != Outbox::EntryType::INVALID && entryChange != Outbox::EntryChange::INVALID &&
-        notificationMessage->recordId != 0) {
+        notificationMessage->recordId) {
         Outbox::NotificationEntry newNotificationEntry = {
-            notificationCurrentUid++, entryType, entryChange, notificationMessage->recordId};
+            notificationCurrentUid++, entryType, entryChange, *notificationMessage->recordId};
         notificationEntries.emplace_back(newNotificationEntry);
     }
 }
