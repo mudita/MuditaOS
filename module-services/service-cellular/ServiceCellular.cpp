@@ -266,6 +266,11 @@ sys::ReturnCodes ServiceCellular::InitHandler()
                                          "callDurationTimer",
                                          std::chrono::milliseconds{1000},
                                          [this](sys::Timer &) { ongoingCall->handle(call::event::OngoingTimer{}); }),
+                                     sys::TimerFactory::createSingleShotTimer(
+                                         this,
+                                         "callRingTimeout",
+                                         std::chrono::milliseconds{1000},
+                                         [this](sys::Timer &) { ongoingCall->handle(call::event::RingTimeout{}); }),
                                      cpuSentinel);
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);

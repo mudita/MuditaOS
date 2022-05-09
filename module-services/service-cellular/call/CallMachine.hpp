@@ -61,13 +61,21 @@ namespace call
             setIncomingCall(di, call, nr);
             call.record.date = std::time(nullptr);
 
-            di.gui->notifyRING();
-            di.multicast->notifyIncommingCall();
-            di.db->startCall(call.record);
             di.sentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
-            di.audio->play();
+            di.ringTimer->start();
         }
     } constexpr HandleRing;
+
+    struct HandleRingTimeout
+    {
+        void operator()(Dependencies &di, CallData &call)
+        {
+            di.multicast->notifyIncommingCall();
+            di.db->startCall(call.record);
+            di.gui->notifyRING();
+            di.audio->play();
+        }
+    } constexpr HandleRingTimeout;
 
     struct ClipConnected
     {
@@ -282,7 +290,7 @@ namespace call
             return make_transition_table(
                 *"Idle"_s + on_entry<_> / HandleInit,
 
-                "Idle"_s + boost::sml::event<evt::RING>[RING] / HandleRing                     = "Ringing"_s,
+                "Idle"_s + boost::sml::event<evt::RING>[RING] / HandleRing                     = "RingDelay"_s,
                 "Idle"_s + boost::sml::event<evt::CLIP>[ClipConnected] / HandleClipWithoutRing = "HaveId"_s,
                 "Idle"_s + boost::sml::event<evt::CLIP>[ClipDND_OK] / HandleClipDND            = "HaveId"_s,
                 "Idle"_s + boost::sml::event<evt::CLIP>[ClipDND_NOK] / HandleDND_Reject        = "Idle"_s,
@@ -292,6 +300,10 @@ namespace call
                 "Starting"_s + boost::sml::event<evt::Ended> / HandleEndCall      = "Idle"_s,
                 "Starting"_s + boost::sml::event<evt::Reject> / HandleEndCall     = "Idle"_s,
                 "Starting"_s + boost::sml::event<evt::Answer> / HandleStartedCall = "Ongoing"_s,
+
+                "RingDelay"_s + boost::sml::event<evt::RingTimeout> / HandleRingTimeout = "Ringing"_s,
+                // here we do not need guard - RingDelay state is already guarded on entry
+                "RingDelay"_s + boost::sml::event<evt::CLIP> / HandleClipWithoutRing = "HaveId"_s,
 
                 "Ringing"_s + boost::sml::event<evt::Answer> / HandleAnswerCall                 = "Ongoing"_s,
                 "Ringing"_s + boost::sml::event<evt::Reject> / HandleRejectCall                 = "Idle"_s,
@@ -311,8 +323,8 @@ namespace call
                 "Ongoing"_s + boost::sml::event<evt::Ended> / HandleEndCall  = "Idle"_s,
                 "Ongoing"_s + boost::sml::event<evt::Reject> / HandleEndCall = "Idle"_s,
 
-                *("exceptions handling"_s) + exception<std::runtime_error> / ExceptionHandler = "Idle"_s,
-                "exceptions handling"_s + exception<std::runtime_error> / ExceptionHandler    = "Idle"_s);
+                *("ExceptionsHandling"_s) + exception<std::runtime_error> / ExceptionHandler = "Idle"_s,
+                "ExceptionsHandling"_s + exception<std::runtime_error> / ExceptionHandler    = "Idle"_s);
         }
     };
 

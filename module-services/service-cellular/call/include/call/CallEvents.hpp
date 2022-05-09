@@ -18,6 +18,10 @@ namespace call::event
     };
     struct RING
     {};
+
+    /// event signaling that we should not delay sending RING to UI any further
+    struct RingTimeout
+    {};
     struct CLIP
     {
         const utils::PhoneNumber::View number;

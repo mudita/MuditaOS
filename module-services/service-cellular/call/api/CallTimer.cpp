@@ -22,3 +22,11 @@ time_t CallTimer::duration()
 {
     return std::time(nullptr) - startActiveTime;
 }
+
+TimerRing::TimerRing(sys::TimerHandle handle) : handle(std::move(handle))
+{}
+
+void TimerRing::start()
+{
+    handle.start();
+}

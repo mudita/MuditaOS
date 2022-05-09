@@ -45,6 +45,7 @@ namespace call
         std::shared_ptr<call::api::GUI> gui;
         std::shared_ptr<call::api::DB> db;
         std::shared_ptr<call::api::Timer> timer;
+        std::shared_ptr<call::api::TimerRing> ringTimer;
         std::shared_ptr<call::api::Api> modem;
         std::shared_ptr<sys::CpuSentinel> sentinel;
     };
@@ -59,6 +60,7 @@ namespace call
         Call(ServiceCellular *owner,
              CellularMux *cmux,
              sys::TimerHandle timer,
+             sys::TimerHandle timerRing,
              std::shared_ptr<sys::CpuSentinel> sentinel);
         ~Call();
         Call &operator=(Call &&other) noexcept;
@@ -70,6 +72,7 @@ namespace call
         bool handle(const call::event::AudioRequest &);
         bool handle(const call::event::ModeChange &);
         bool handle(const call::event::OngoingTimer &);
+        bool handle(const call::event::RingTimeout &);
         bool handle(const call::event::Ended &);
         bool handle(const call::event::Reject &);
 

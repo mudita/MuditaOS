@@ -30,6 +30,7 @@ namespace call
     Call::Call(ServiceCellular *owner,
                CellularMux *cmux,
                sys::TimerHandle timer,
+               sys::TimerHandle timerRing,
                std::shared_ptr<sys::CpuSentinel> sentinel)
     {
         machine = std::make_unique<StateMachine>(Dependencies{std::make_unique<Audio>(owner),
@@ -37,6 +38,7 @@ namespace call
                                                               std::make_unique<CallGUI>(owner),
                                                               std::make_unique<CallDB>(owner),
                                                               std::make_unique<CallTimer>(std::move(timer)),
+                                                              std::make_unique<TimerRing>(std::move(timerRing)),
                                                               std::make_unique<cellular::Api>(owner, cmux),
                                                               std::move(sentinel)});
     }
@@ -120,6 +122,14 @@ namespace call
     }
 
     bool Call::handle(const call::event::OngoingTimer &tim)
+    {
+        if (machine == nullptr) {
+            return false;
+        };
+        return machine->machine.process_event(tim);
+    }
+
+    bool Call::handle(const call::event::RingTimeout &tim)
     {
         if (machine == nullptr) {
             return false;
