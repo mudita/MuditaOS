@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ActionsRegistry.hpp"
@@ -53,6 +53,11 @@ namespace app::manager
         LOG_INFO("Enqueue action %s", magic_enum::enum_name(action.actionId).data());
 
         addAction(std::move(action));
+        process();
+    }
+
+    void ActionsRegistry::process()
+    {
         if (!isCurrentlyProcessing()) {
             notifyAboutNextAction();
         }
