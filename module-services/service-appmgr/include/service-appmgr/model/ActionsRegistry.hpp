@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -54,6 +54,7 @@ namespace app::manager
 
         void enqueue(ActionEntry &&action);
         void finished();
+        void process();
 
         [[nodiscard]] auto hasPendingAction() const noexcept -> bool;
         [[nodiscard]] auto getPendingAction() noexcept -> ActionEntry *;
