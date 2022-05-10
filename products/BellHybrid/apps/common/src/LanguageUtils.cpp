@@ -13,9 +13,10 @@ namespace
         if (val == 1) {
             return minuteLower;
         }
+        auto core = val % 100;
         if (utils::getDisplayLanguage() == "Polski") {
-            if (val < 10 || val > 20) {
-                if ((val % 10) == 2 || (val % 10) == 3 || (val % 10) == 4) {
+            if (core < 10 || core > 20) {
+                if ((core % 10) == 2 || (core % 10) == 3 || (core % 10) == 4) {
                     return minutesLower;
                 }
             }
