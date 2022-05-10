@@ -1,3 +1,5 @@
+module_is_test_entity(bell-applications-common)
+
 add_library(application-bell-common STATIC)
 add_library(bell::app-common ALIAS application-bell-common)
 
@@ -126,3 +128,7 @@ target_link_libraries(application-bell-common
         module-gui
         bell::db
         )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif()
