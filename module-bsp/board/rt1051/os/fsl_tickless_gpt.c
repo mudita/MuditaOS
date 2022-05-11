@@ -11,8 +11,9 @@
 #include "task.h"
 #include "fsl_tickless_generic.h"
 
-#if configUSE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 2
 #include "fsl_gpt.h"
+#include "fsl_gpc.h"
 #else
 #include "fsl_common.h"
 #endif
@@ -23,7 +24,7 @@ extern uint32_t SystemCoreClock; /* in Kinetis SDK, this contains the system cor
  * GPT timer base address and interrupt number
  */
 
-#if configUSE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 2
 
 static GPT_Type *vPortGetGptBase(void)
 {
@@ -48,7 +49,7 @@ static IRQn_Type vPortGetGptIrqn(void)
 /*
  * The number of SysTick increments that make up one tick period.
  */
-#if configUSE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 2
 static uint32_t ulTimerCountsForOneTick = 0;
 #endif /* configUSE_TICKLESS_IDLE */
 
@@ -56,25 +57,25 @@ static uint32_t ulTimerCountsForOneTick = 0;
  * The maximum number of tick periods that can be suppressed is limited by the
  * 24 bit resolution of the SysTick timer.
  */
-#if configUSE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 2
 static uint32_t xMaximumPossibleSuppressedTicks = 0;
 #endif /* configUSE_TICKLESS_IDLE */
 
 /*
  * The number of GPT increments that make up one tick period.
  */
-#if configUSE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 2
 static uint32_t ulLPTimerCountsForOneTick = 0;
 #endif /* configUSE_TICKLESS_IDLE */
 
 /*
  * The flag of GPT is occurs or not.
  */
-#if configUSE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 2
 static volatile bool ulLPTimerInterruptFired = false;
 #endif /* configUSE_TICKLESS_IDLE */
 
-#if configUSE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 2
 void vPortGptIsr(void)
 {
     ulLPTimerInterruptFired = true;
@@ -99,14 +100,13 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
     GPT_Type *pxGptBase;
 
     pxGptBase = vPortGetGptBase();
-    if (pxGptBase == 0)
-        return;
     /* Make sure the SysTick reload value does not overflow the counter. */
     if (xExpectedIdleTime > xMaximumPossibleSuppressedTicks) {
         xExpectedIdleTime = xMaximumPossibleSuppressedTicks;
     }
-    if (xExpectedIdleTime == 0)
+    if (xExpectedIdleTime == 0) {
         return;
+    }
 
     /* Calculate the reload value required to wait xExpectedIdleTime
     tick periods.  -1 is used because this code will execute part way
@@ -211,7 +211,7 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
 void vPortSetupTimerInterrupt(void)
 {
 /* Calculate the constants required to configure the tick interrupt. */
-#if configUSE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 2
     gpt_config_t gptConfig;
     GPT_GetDefaultConfig(&gptConfig);
     gptConfig.clockSource = kGPT_ClockSource_LowFreq; /* 32K RTC OSC */
@@ -244,11 +244,11 @@ void vPortSetupTimerInterrupt(void)
 
 void vPortStopTimerInterrupt(void)
 {
-#if configUSE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 2
     NVIC_DisableIRQ(vPortGetGptIrqn());
     NVIC_ClearPendingIRQ(vPortGetGptIrqn());
     GPC_DisableIRQ(GPC, vPortGetGptIrqn());
-    GPC_Deinit(vPortGetGptBase());
+    GPT_Deinit(vPortGetGptBase());
 #endif
     portNVIC_SYSTICK_CTRL_REG = 0;
     NVIC_DisableIRQ(SysTick_IRQn);

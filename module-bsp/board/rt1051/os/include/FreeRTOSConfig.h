@@ -51,7 +51,7 @@ extern "C"
 #endif
 
 #define configUSE_PREEMPTION                    1
-#define configUSE_TICKLESS_IDLE                 0
+#define configUSE_TICKLESS_IDLE                 0 /* Set to 2 to enable GPT based tickless */
 #define configCPU_CLOCK_HZ                      (SystemCoreClock)
 #define configTICK_RATE_HZ                      ((TickType_t)1000)
 #define configMAX_PRIORITIES                    5
