@@ -85,3 +85,8 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 
 void vApplicationTickHook()
 {}
+
+void vPortPRE_SLEEP_PROCESSING(TickType_t idle_time)
+{}
+void vPortPOST_SLEEP_PROCESSING(TickType_t idle_time)
+{}
