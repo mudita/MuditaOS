@@ -63,6 +63,7 @@ namespace bluetooth
         case bluetooth::Command::DisconnectAudio:
             return disconnectAudioConnection();
         case bluetooth::Command::PowerOff:
+            profileManager->deInit();
             return Error::Success;
         case bluetooth::Command::None:
             return Error::Success;

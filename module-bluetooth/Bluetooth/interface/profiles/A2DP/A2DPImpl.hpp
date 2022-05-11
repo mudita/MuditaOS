@@ -50,9 +50,13 @@ namespace bluetooth
         static bool isConnected;
         static std::shared_ptr<BluetoothAudioDevice> audioDevice;
         static Devicei device;
+        static constexpr uint32_t a2dpSdpRecordHandle            = 0x10001;
+        static constexpr uint32_t avrcpServiceSdpRecordHandle    = 0x10002;
+        static constexpr uint32_t avrcpControllerSdpRecordHandle = 0x10003;
 
       public:
         auto init() -> Error::Code;
+        void deInit();
         void connect();
         void disconnect();
         void start();

@@ -129,7 +129,11 @@ namespace bluetooth
         return pimpl->callStarted(num);
     }
 
-    HFP::~HFP() = default;
+    HFP::~HFP()
+    {
+        pimpl->disconnect();
+        pimpl->deInit();
+    }
 
     hci_con_handle_t HFP::HFPImpl::scoHandle = HCI_CON_HANDLE_INVALID;
     hci_con_handle_t HFP::HFPImpl::aclHandle = HCI_CON_HANDLE_INVALID;
@@ -364,7 +368,6 @@ namespace bluetooth
         Profile::initSdp();
 
         serviceBuffer.fill(0);
-        constexpr std::uint32_t hspSdpRecordHandle = 0x10004;
         uint16_t supported_features                = (1 << HFP_AGSF_ESCO_S4) | /* (1 << HFP_AGSF_HF_INDICATORS) | */
                                       (1 << HFP_AGSF_CODEC_NEGOTIATION) | (1 << HFP_AGSF_EXTENDED_ERROR_RESULT_CODES) |
                                       (1 << HFP_AGSF_ENHANCED_CALL_CONTROL) | (1 << HFP_AGSF_ENHANCED_CALL_STATUS) |
@@ -373,7 +376,7 @@ namespace bluetooth
         int wide_band_speech = 0;
         constexpr std::uint8_t abilityToRejectCall = 1;
         hfp_ag_create_sdp_record(serviceBuffer.data(),
-                                 hspSdpRecordHandle,
+                                 hfpSdpRecordHandle,
                                  rfcommChannelNr,
                                  agServiceName.data(),
                                  abilityToRejectCall,
@@ -532,6 +535,15 @@ namespace bluetooth
     {
         hfp_ag_set_roaming_status(enabled);
         return Error::Success;
+    }
+    void HFP::HFPImpl::deInit() noexcept
+    {
+        LOG_DEBUG("[HFP] deinit");
+        sdp_unregister_service(hfpSdpRecordHandle);
+
+        cellularInterface.reset();
+        audioInterface.reset();
+        sco.reset();
     }
 
 } // namespace bluetooth

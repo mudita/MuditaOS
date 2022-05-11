@@ -32,7 +32,11 @@ namespace bluetooth
     A2DP::A2DP() : pimpl(std::make_unique<A2DPImpl>(A2DPImpl()))
     {}
 
-    A2DP::~A2DP() = default;
+    A2DP::~A2DP()
+    {
+        pimpl->disconnect();
+        pimpl->deInit();
+    }
 
     A2DP::A2DP(A2DP &other) : pimpl(new A2DPImpl(*other.pimpl))
     {}
@@ -148,7 +152,6 @@ namespace bluetooth
 
         // Create  A2DP Source service record and register it with SDP.
         sdpSourceServiceBuffer.fill(0);
-        constexpr uint32_t a2dpSdpRecordHandle = 0x10001;
         a2dp_source_create_sdp_record(
             sdpSourceServiceBuffer.data(), a2dpSdpRecordHandle, AVDTP_SOURCE_FEATURE_MASK_PLAYER, nullptr, nullptr);
         if (const auto status = sdp_register_service(sdpSourceServiceBuffer.data()); status != ERROR_CODE_SUCCESS) {
@@ -161,7 +164,6 @@ namespace bluetooth
 #ifdef AVRCP_BROWSING_ENABLED
         supported_features |= AVRCP_FEATURE_MASK_BROWSING;
 #endif
-        constexpr uint32_t avrcpServiceSdpRecordHandle = 0x10002;
         avrcp_target_create_sdp_record(
             AVRCP::sdpTargetServiceBuffer.data(), avrcpServiceSdpRecordHandle, supportedFeatures, nullptr, nullptr);
         if (const auto status = sdp_register_service(AVRCP::sdpTargetServiceBuffer.data());
@@ -172,7 +174,6 @@ namespace bluetooth
         // setup AVRCP Controller
         AVRCP::sdpControllerServiceBuffer.fill(0);
         uint16_t controllerSupportedFeatures              = AVRCP_FEATURE_MASK_CATEGORY_PLAYER_OR_RECORDER;
-        constexpr uint32_t avrcpControllerSdpRecordHandle = 0x10003;
         avrcp_controller_create_sdp_record(AVRCP::sdpControllerServiceBuffer.data(),
                                            avrcpControllerSdpRecordHandle,
                                            controllerSupportedFeatures,
@@ -299,6 +300,7 @@ namespace bluetooth
             a2dp_subevent_signaling_connection_established_get_bd_addr(packet, address);
             cid    = a2dp_subevent_signaling_connection_established_get_a2dp_cid(packet);
             status = a2dp_subevent_signaling_connection_established_get_status(packet);
+
             if (status != ERROR_CODE_SUCCESS) {
                 LOG_INFO("A2DP Source: Connection failed, status 0x%02x, cid 0x%02x, a2dp_cid 0x%02x \n",
                          status,
@@ -320,6 +322,9 @@ namespace bluetooth
             isConnected    = true;
             auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
             device.deviceState = DeviceState::ConnectedAudio;
+            // handle proper device matching when connection was initiated by remote device
+            a2dp_subevent_signaling_connection_established_get_bd_addr(packet, device.address);
+
             busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(device, true),
                                  service::name::bluetooth);
             break;
@@ -600,6 +605,16 @@ namespace bluetooth
     void A2DP::A2DPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> newAudioDevice)
     {
         A2DP::A2DPImpl::audioDevice = std::move(newAudioDevice);
+    }
+    void A2DP::A2DPImpl::deInit()
+    {
+        LOG_DEBUG("[A2DP] deinit");
+
+        sdp_unregister_service(a2dpSdpRecordHandle);
+        sdp_unregister_service(avrcpControllerSdpRecordHandle);
+        sdp_unregister_service(avrcpServiceSdpRecordHandle);
+
+        audioDevice.reset();
     }
 
 } // namespace bluetooth

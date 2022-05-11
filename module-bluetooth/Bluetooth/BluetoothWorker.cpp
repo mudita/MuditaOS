@@ -153,9 +153,6 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
         initDevicesList();
         controller->turnOn();
         break;
-    case bluetooth::Command::PowerOff:
-        controller->turnOff();
-        break;
     case bluetooth::Command::Unpair: {
         controller->processCommand(command);
         auto device = std::get<Devicei>(command.getData());
@@ -163,6 +160,10 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
         handleUnpairDisconnect(device);
     } break;
     case bluetooth::Command::None:
+        break;
+    case bluetooth::Command::PowerOff:
+        controller->processCommand(command);
+        controller->turnOff();
         break;
     default:
         controller->processCommand(command);

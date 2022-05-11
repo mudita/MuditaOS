@@ -32,6 +32,7 @@ namespace bluetooth
         explicit ProfileManager(sys::Service *ownerService);
 
         auto init() -> Error::Code;
+        void deInit();
         auto connect(const Devicei &device) -> Error::Code;
         auto disconnect() -> Error::Code;
         auto start() -> Error::Code;
