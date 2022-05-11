@@ -90,7 +90,7 @@ namespace gui
         auto contactRequest = dynamic_cast<PhonebookSearchRequest *>(data);
         model->setRequested(contactRequest != nullptr);
         if (model->requestedSearch()) {
-            enableNewContact                       = false;
+            enableNewContact = false;
             phonebookModel->activateContactSelectCallback();
 
             navBar->setActive(nav_bar::Side::Left, false);
@@ -166,6 +166,10 @@ namespace gui
     {
         navBar->setActive(gui::nav_bar::Side::Left, false);
         navBar->setActive(gui::nav_bar::Side::Center, false);
+        if (model->requestedSearch()) {
+            emptyListIcon->text->setRichText(utils::translate("app_phonebook_no_contacts_yet"));
+            emptyListIcon->image->setVisible(false);
+        }
         emptyListIcon->setVisible(true);
         header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
         application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);

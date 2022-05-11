@@ -499,6 +499,7 @@
   "common_search_results": "Search results",
   "app_phonebook_search_no_results": "No contacts found.",
   "app_phonebook_no_contacts": "<text align='center' color='4'>No contacts yet.<p>Press <b>left arrow</b> to add new.</p></text>",
+  "app_phonebook_no_contacts_yet": "<text align='center' color='4'>No contacts yet.</text>",
   "app_phonebook_contact_title": "Add contact",
   "app_phonebook_contact_no_name": "no name",
   "app_phonebook_contact_information": "Information",

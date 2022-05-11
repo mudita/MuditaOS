@@ -543,6 +543,7 @@
   "common_search_results": "Wyniki wyszukiwania",
   "app_phonebook_search_no_results": "Nie znaleziono kontaktów",
   "app_phonebook_no_contacts": "<text align='center' color='4'>Brak kontaktów.<p>Naciśnij <b>'w lewo'</b> by dodać kontakt.</p></text>",
+  "app_phonebook_no_contacts_yet": "<text align='center' color='4'>Brak kontaktów.</text>",
   "app_phonebook_contact_title": "Dodaj kontakt",
   "app_phonebook_contact_no_name": "brak nazwy",
   "app_phonebook_contact_information": "Informacje",
