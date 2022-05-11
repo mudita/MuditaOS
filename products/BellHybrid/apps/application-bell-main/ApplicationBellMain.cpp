@@ -42,7 +42,8 @@ namespace app
     {
         getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &params) {
             const auto popupId = params.getPopupId();
-            if (popupId == gui::popup::ID::Alarm) {
+            if (popupId == gui::popup::ID::Alarm || popupId == gui::popup::ID::AlarmActivated ||
+                popupId == gui::popup::ID::AlarmDeactivated) {
                 return gui::name::window::main_window != getCurrentWindow()->getName();
             }
             return true;
