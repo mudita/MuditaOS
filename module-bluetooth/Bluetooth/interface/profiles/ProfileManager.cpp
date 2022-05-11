@@ -167,5 +167,18 @@ namespace bluetooth
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;
     }
+    void ProfileManager::deInit()
+    {
+        for (auto &[profileName, ptr] : profilesList) {
+            if (ptr != nullptr) {
+                ptr.reset();
+            }
+        }
+        callProfilePtr  = nullptr;
+        musicProfilePtr = nullptr;
+        initialized     = false;
+
+        LOG_DEBUG("ProfileManager deinit done");
+    }
 
 } // namespace bluetooth

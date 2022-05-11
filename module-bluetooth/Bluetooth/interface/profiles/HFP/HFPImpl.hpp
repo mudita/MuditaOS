@@ -26,6 +26,7 @@ namespace bluetooth
       public:
         static void packetHandler(uint8_t packetType, uint16_t channel, uint8_t *event, uint16_t eventSize);
         auto init() -> Error::Code;
+        void deInit() noexcept;
         void startRinging() const noexcept;
         void stopRinging() const noexcept;
         void initializeCall() const noexcept;
@@ -68,6 +69,7 @@ namespace bluetooth
         static const char *call_hold_services[5];
         [[maybe_unused]] static int hf_indicators_nr;
         [[maybe_unused]] static hfp_generic_status_indicator_t hf_indicators[2];
+        static constexpr std::uint32_t hfpSdpRecordHandle = 0x10004;
         static std::shared_ptr<CVSDAudioDevice> audioDevice;
         static Devicei device;
         static CallStatus currentCallStatus;
