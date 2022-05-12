@@ -95,6 +95,7 @@ namespace app::home_screen
         virtual void decAlarmMinute()                                                            = 0;
         virtual void switchToMenu()                                                              = 0;
         virtual void switchToBatteryStatus()                                                     = 0;
+        virtual UTF8 getGreeting()                                                               = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -138,6 +139,7 @@ namespace app::home_screen
         void decAlarmMinute();
         void switchToMenu();
         void switchToBatteryStatus();
+        UTF8 getGreeting();
 
         void setLayout(gui::LayoutGenerator layoutGenerator) override;
 
@@ -150,6 +152,7 @@ namespace app::home_screen
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::shared_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
+        std::unique_ptr<std::mt19937> rngEngine;
 
         void handleCyclicDeepRefresh();
 
