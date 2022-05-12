@@ -7,6 +7,7 @@
 #include "glucode/BluetoothRunLoop.hpp"
 #include "interface/profiles/Profile.hpp"
 #include "service-bluetooth/SettingsHolder.hpp"
+#include "service-bluetooth/WorkerLock.hpp"
 #include "Service/Worker.hpp"
 
 #include "Device.hpp"
@@ -61,6 +62,15 @@ namespace bluetooth
     };
 }; // namespace bluetooth
 
+struct DeviceStore
+{};
+
+namespace bluetooth
+{
+    class Driver;
+    class CommandHandler;
+}; // namespace bluetooth
+
 class BluetoothWorker : private sys::Worker
 {
     enum WorkerEventQueues
@@ -78,10 +88,9 @@ class BluetoothWorker : private sys::Worker
 
     void registerQueues();
     void onLinkKeyAdded(const std::string &deviceAddress);
-    void initDevicesList();
     void removeFromBoundDevices(uint8_t *addr);
-    auto isAddressConnected(const bd_addr_t addr) -> bool;
-    void handleUnpairDisconnect(const Devicei &device);
+
+    std::shared_ptr<Mailbox<bluetooth::Command, QueueHandle_t, WorkerLock>> workerQueue;
 
   public:
     enum Error
@@ -91,7 +100,7 @@ class BluetoothWorker : private sys::Worker
         ErrorBtAPI,
     };
 
-    BluetoothWorker(sys::Service *service);
+    explicit BluetoothWorker(sys::Service *service);
     ~BluetoothWorker() override;
 
     auto handleMessage(uint32_t queueID) -> bool override;
@@ -107,7 +116,9 @@ class BluetoothWorker : private sys::Worker
     unsigned long active_features;
     std::shared_ptr<bluetooth::ProfileManager> profileManager;
     std::shared_ptr<bluetooth::SettingsHolder> settings;
-    std::vector<Devicei> pairedDevices;
+    std::shared_ptr<std::vector<Devicei>> pairedDevices = std::make_shared<std::vector<Devicei>>();
     std::unique_ptr<bluetooth::RunLoop> runLoop;
+    std::shared_ptr<bluetooth::Driver> driver;
+    std::shared_ptr<bluetooth::CommandHandler> handler;
     std::unique_ptr<bluetooth::AbstractController> controller;
 };

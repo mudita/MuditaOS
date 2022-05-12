@@ -105,11 +105,10 @@ namespace bluetooth
     {
         return callProfilePtr->callActive();
     }
-    auto ProfileManager::setIncomingCallNumber(const DataVariant &data) -> Error::Code
+    auto ProfileManager::setIncomingCallNumber(const utils::PhoneNumber &nr) -> Error::Code
     {
-        auto number = std::get<utils::PhoneNumber::View>(data);
         if (callProfilePtr) {
-            return callProfilePtr->setIncomingCallNumber(number.getE164());
+            return callProfilePtr->setIncomingCallNumber(nr.getView().getE164());
         }
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;
@@ -132,9 +131,9 @@ namespace bluetooth
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;
     }
-    auto ProfileManager::setBatteryLevelData(const DataVariant &data) -> Error::Code
+    auto ProfileManager::setBatteryLevelData(unsigned int level) -> Error::Code
     {
-        auto batteryLevel = std::get<BatteryLevel>(data);
+        auto batteryLevel = BatteryLevel(level);
         if (callProfilePtr) {
             return callProfilePtr->setBatteryLevel(batteryLevel);
         }
@@ -158,11 +157,10 @@ namespace bluetooth
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;
     }
-    auto ProfileManager::callStarted(const DataVariant &data) -> Error::Code
+    auto ProfileManager::callStarted(const utils::PhoneNumber &nr) -> Error::Code
     {
         if (callProfilePtr) {
-            auto number = std::get<utils::PhoneNumber::View>(data);
-            return callProfilePtr->callStarted(number.getE164());
+            return callProfilePtr->callStarted(nr.getView().getE164());
         }
         LOG_ERROR("No profile, returning!");
         return Error::NotReady;

@@ -26,30 +26,55 @@ namespace bluetooth
 
     using ProfileList = std::map<AudioProfile, std::shared_ptr<bluetooth::Profile>>;
 
-    class ProfileManager
+    class BaseProfileManager
+    {
+      public:
+        virtual ~BaseProfileManager()                                                            = default;
+        virtual auto init() -> Error::Code                                                       = 0;
+        virtual void deInit() = 0;
+        virtual auto connect(const Devicei &device) -> Error::Code                               = 0;
+        virtual auto disconnect() -> Error::Code                                                 = 0;
+        virtual auto start() -> Error::Code                                                      = 0;
+        virtual auto stop() -> Error::Code                                                       = 0;
+        virtual auto startRinging() -> Error::Code                                               = 0;
+        virtual auto stopRinging() -> Error::Code                                                = 0;
+        virtual auto initializeCall() -> Error::Code                                             = 0;
+        virtual auto terminateCall() -> Error::Code                                              = 0;
+        virtual auto callAnswered() -> Error::Code                                               = 0;
+        virtual auto callStarted(const utils::PhoneNumber &) -> Error::Code                      = 0;
+        virtual auto setIncomingCallNumber(const utils::PhoneNumber &nr) -> Error::Code          = 0;
+        virtual auto setSignalStrengthData(const DataVariant &data) -> Error::Code               = 0;
+        virtual auto setOperatorNameData(const DataVariant &data) -> Error::Code                 = 0;
+        virtual auto setBatteryLevelData(unsigned int) -> Error::Code                            = 0;
+        virtual auto setNetworkStatusData(const DataVariant &data) -> Error::Code                = 0;
+        virtual auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code = 0;
+    };
+
+    class ProfileManager : public BaseProfileManager
     {
       public:
         explicit ProfileManager(sys::Service *ownerService);
+        ProfileManager() = delete;
 
-        auto init() -> Error::Code;
-        void deInit();
-        auto connect(const Devicei &device) -> Error::Code;
-        auto disconnect() -> Error::Code;
-        auto start() -> Error::Code;
-        auto stop() -> Error::Code;
-        auto startRinging() -> Error::Code;
-        auto stopRinging() -> Error::Code;
-        auto initializeCall() -> Error::Code;
-        auto terminateCall() -> Error::Code;
-        auto callAnswered() -> Error::Code;
-        auto callStarted(const DataVariant &data) -> Error::Code;
-        auto setIncomingCallNumber(const DataVariant &data) -> Error::Code;
-        auto setSignalStrengthData(const DataVariant &data) -> Error::Code;
-        auto setOperatorNameData(const DataVariant &data) -> Error::Code;
-        auto setBatteryLevelData(const DataVariant &data) -> Error::Code;
-        auto setNetworkStatusData(const DataVariant &data) -> Error::Code;
+        auto init() -> Error::Code override;
+        void deInit() override;
+        auto connect(const Devicei &device) -> Error::Code override;
+        auto disconnect() -> Error::Code override;
+        auto start() -> Error::Code override;
+        auto stop() -> Error::Code override;
+        auto startRinging() -> Error::Code override;
+        auto stopRinging() -> Error::Code override;
+        auto initializeCall() -> Error::Code override;
+        auto terminateCall() -> Error::Code override;
+        auto callAnswered() -> Error::Code override;
+        auto callStarted(const utils::PhoneNumber &) -> Error::Code override;
+        auto setIncomingCallNumber(const utils::PhoneNumber &nr) -> Error::Code override;
+        auto setSignalStrengthData(const DataVariant &data) -> Error::Code override;
+        auto setOperatorNameData(const DataVariant &data) -> Error::Code override;
+        auto setBatteryLevelData(unsigned int) -> Error::Code override;
+        auto setNetworkStatusData(const DataVariant &data) -> Error::Code override;
 
-        auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code;
+        auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code override;
 
       private:
         sys::Service *ownerService;

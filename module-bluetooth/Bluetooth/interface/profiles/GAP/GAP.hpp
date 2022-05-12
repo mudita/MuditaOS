@@ -55,8 +55,8 @@ namespace bluetooth
         auto scan() -> Error;
         void stopScan();
         void setVisibility(bool visibility);
-        auto pair(Devicei device, std::uint8_t protectionLevel = 0) -> bool;
-        auto unpair(Devicei device) -> bool;
+        void pair(Devicei device, std::uint8_t protectionLevel = 0);
+        void unpair(Devicei device);
         static auto getDevicesList() -> std::vector<Devicei>;
         static void respondPinCode(const std::string &pin, Devicei d);
         static void finishCodeComparison(bool accepted, Devicei d);

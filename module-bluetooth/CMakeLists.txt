@@ -32,13 +32,6 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/PhoneInterface.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/Command.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/DeviceData.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/PhoneNumberData.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/SignalStrengthData.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/OperatorNameData.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/BatteryLevelData.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/NetworkStatusData.cpp
-
         )
 
 include(lib/btstack.cmake)
@@ -82,6 +75,7 @@ target_link_libraries(${PROJECT_NAME}
     service-bluetooth
     service-evtmgr
     sml::sml
+    sml::utils::logger
     json::json
 )
 

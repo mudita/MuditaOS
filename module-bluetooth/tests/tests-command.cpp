@@ -4,7 +4,6 @@
 #include <catch2/catch.hpp>
 #include "btstack_util.h"
 #include <command/Command.hpp>
-#include <command/DeviceData.hpp>
 #include <command/PhoneNumberData.hpp>
 #include <command/BatteryLevelData.hpp>
 
