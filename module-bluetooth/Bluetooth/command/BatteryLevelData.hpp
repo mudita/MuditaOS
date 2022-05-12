@@ -7,7 +7,7 @@
 namespace bluetooth
 {
 
-    class BatteryLevelData : public CommandData
+    class BatteryLevelData : public Action
     {
       public:
         explicit BatteryLevelData(const BatteryLevel &level);

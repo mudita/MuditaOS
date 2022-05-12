@@ -84,17 +84,16 @@ namespace bluetooth
         LOG_INFO("Visibility: %s", visibility ? "true" : "false");
     }
 
-    auto GAP::pair(Devicei device, std::uint8_t protectionLevel) -> bool
+    void GAP::pair(Devicei device, std::uint8_t protectionLevel)
     {
         if (hci_get_state() == HCI_STATE_WORKING) {
             auto it = devices().find(device.address);
             if (it == devices().end()) {
                 LOG_ERROR("device not found: %s", device.address_str());
-                return false;
             }
-            return gap_dedicated_bonding(device.address, protectionLevel) == 0;
+            // TODO just log
+            // return gap_dedicated_bonding(device.address, protectionLevel) == 0;
         }
-        return false;
     }
 
     void GAP::sendDevices()
@@ -378,7 +377,7 @@ namespace bluetooth
         return devices().getList();
     }
 
-    auto GAP::unpair(Devicei device) -> bool
+    void GAP::unpair(Devicei device)
     {
         LOG_INFO("Unpairing device");
         gap_drop_link_key_for_bd_addr(device.address);
@@ -386,7 +385,6 @@ namespace bluetooth
         LOG_INFO("Device unpaired");
         ownerService->bus.sendMulticast(std::make_shared<message::bluetooth::UnpairResult>(device, true),
                                         sys::BusChannel::BluetoothNotifications);
-        return true;
     }
 
     void GAP::respondPinCode(const std::string &pin, Devicei d)

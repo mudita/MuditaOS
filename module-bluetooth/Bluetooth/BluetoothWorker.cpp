@@ -10,7 +10,6 @@
 #include "interface/profiles/HSP/HSP.hpp"
 #include "audio/BluetoothAudioDevice.hpp"
 #include "BtKeysStorage.hpp"
-#include "command/DeviceData.hpp"
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
 #define logHciComs(...) LOG_DEBUG(__VA_ARGS__)
@@ -71,32 +70,44 @@ namespace
     };
 
     auto createStatefulController(sys::Service *service,
-                                  bluetooth::RunLoop *loop,
-                                  std::shared_ptr<bluetooth::SettingsHolder> settings,
-                                  std::shared_ptr<bluetooth::ProfileManager> profileManager,
-                                  DeviceRegistration::OnLinkKeyAddedCallback &&onLinkKeyAddedCallback)
+                                  std::shared_ptr<bluetooth::Driver> driver,
+                                  std::shared_ptr<bluetooth::CommandHandler> commandHandler,
+                                  const std::shared_ptr<bluetooth::SettingsHolder> &settings,
+                                  std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
+                                  DeviceRegistration::OnLinkKeyAddedCallback &&onLinkKeyAddedCallback,
+                                  std::shared_ptr<std::vector<Devicei>> pairedDevices)
     {
-        auto driver = std::make_shared<bluetooth::Driver>(loop->getRunLoopInstance(), service);
-        auto commandHandler =
-            std::make_unique<bluetooth::CommandHandler>(service, settings, std::move(profileManager), driver);
+        ;
+
         return std::make_unique<bluetooth::StatefulController>(
-            std::move(driver),
-            std::move(commandHandler),
-            DeviceRegistration{std::move(settings), std::move(onLinkKeyAddedCallback)});
+            driver,
+            commandHandler,
+            DeviceRegistration{settings, std::move(onLinkKeyAddedCallback)},
+            settings,
+            pairedDevices,
+            profileManager);
     }
 } // namespace
 
 BluetoothWorker::BluetoothWorker(sys::Service *service)
     : Worker(service, BluetoothWorkerStackDepth), service(service),
       profileManager(std::make_shared<bluetooth::ProfileManager>(service)),
-      settings(static_cast<ServiceBluetooth *>(service)->settingsHolder),
+      settings(dynamic_cast<ServiceBluetooth *>(service)->settingsHolder),
       runLoop(std::make_unique<bluetooth::RunLoop>()),
+      driver(std::make_shared<bluetooth::Driver>(runLoop->getRunLoopInstance(), service)),
+      handler(std::make_shared<bluetooth::CommandHandler>(service, settings, profileManager, driver)),
       controller{createStatefulController(
-          service, runLoop.get(), settings, profileManager, [this](const std::string &addr) { onLinkKeyAdded(addr); })}
+          service,
+          driver,
+          handler,
+          settings,
+          profileManager,
+          [this](const std::string &addr) { onLinkKeyAdded(addr); },
+          pairedDevices)}
 {
     init({
         {queues::io, sizeof(bluetooth::Message), queues::queueLength},
-        {queues::cmd, sizeof(bluetooth::Command::CommandPack), queues::queueLength},
+        {queues::cmd, 0, queues::queueLength},
         {queues::btstack, sizeof(bool), queues::triggerQueueLength},
     });
     registerQueues();
@@ -104,7 +115,10 @@ BluetoothWorker::BluetoothWorker(sys::Service *service)
 
 void BluetoothWorker::registerQueues()
 {
-    static_cast<ServiceBluetooth *>(service)->workerQueue = Worker::getQueueHandleByName(queues::cmd);
+    workerQueue = std::make_shared<Mailbox<bluetooth::Command, QueueHandle_t, WorkerLock>>(
+        Worker::getQueueHandleByName(queues::cmd));
+
+    dynamic_cast<ServiceBluetooth *>(service)->workerQueue = workerQueue;
     runLoop->setTriggerQueue(Worker::getQueueHandleByName(queues::btstack));
     bsp::BlueKitchen::getInstance()->qHandle = queues[queueIO_handle]->GetQueueHandle();
 }
@@ -114,15 +128,15 @@ void BluetoothWorker::onLinkKeyAdded(const std::string &deviceAddress)
     auto devices = bluetooth::GAP::getDevicesList();
     for (auto &device : devices) {
         if (bd_addr_to_str(device.address) == deviceAddress) {
-            pairedDevices.emplace_back(device);
-            settings->setValue(bluetooth::Settings::BondedDevices, SettingsSerializer::toString(pairedDevices));
+            pairedDevices->emplace_back(device);
+            settings->setValue(bluetooth::Settings::BondedDevices, SettingsSerializer::toString(*pairedDevices));
         }
     }
 }
 
 BluetoothWorker::~BluetoothWorker()
 {
-    controller->shutdown();
+    controller->handle(bt::evt::ShutDown{});
 }
 
 auto BluetoothWorker::run() -> bool
@@ -141,33 +155,18 @@ auto BluetoothWorker::run() -> bool
 
 auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 {
-    bluetooth::Command::CommandPack pack{};
-    if (xQueueReceive(queue, static_cast<void *>(&pack), 0) != pdTRUE) {
-        LOG_ERROR("Queue receive failure!");
-        return false;
-    }
-    auto command = bluetooth::Command(std::move(pack));
-
-    switch (command.getType()) {
-    case bluetooth::Command::PowerOn:
-        initDevicesList();
-        controller->turnOn();
-        break;
-    case bluetooth::Command::Unpair: {
-        controller->processCommand(command);
-        auto device = std::get<Devicei>(command.getData());
-        removeFromBoundDevices(device.address);
-        handleUnpairDisconnect(device);
-    } break;
-    case bluetooth::Command::None:
-        break;
-    case bluetooth::Command::PowerOff:
-        controller->processCommand(command);
-        controller->turnOff();
-        break;
-    default:
-        controller->processCommand(command);
-        break;
+    LOG_INFO("handle bluetooth command(s)");
+    xQueueReceive(queue, nullptr, 0);
+    while (not workerQueue->empty()) {
+        auto cmd = workerQueue->peek();
+        if (cmd == std::nullopt) {
+            LOG_ERROR("There was no data even with notification");
+            break;
+        }
+        if ((*cmd).evt != nullptr) {
+            controller->handle(*cmd->evt);
+            delete cmd->evt;
+        }
     }
     return true;
 }
@@ -264,43 +263,16 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
 
 void BluetoothWorker::closeWorker()
 {
-    controller->turnOff();
+    controller->handle(bt::evt::PowerOff{});
     this->close();
 }
-void BluetoothWorker::initDevicesList()
-{
-    auto bondedDevicesStr =
-        std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BondedDevices));
-    pairedDevices = SettingsSerializer::fromString(bondedDevicesStr);
-}
+
 void BluetoothWorker::removeFromBoundDevices(uint8_t *addr)
 {
-    auto position = std::find_if(
-        pairedDevices.begin(), pairedDevices.end(), [&](Devicei device) { return !bd_addr_cmp(addr, device.address); });
-    if (position != pairedDevices.end()) {
-        pairedDevices.erase(position);
-        settings->setValue(bluetooth::Settings::BondedDevices, SettingsSerializer::toString(pairedDevices));
-        LOG_INFO("Device removed from paired devices list");
-    }
 }
 
 void BluetoothWorker::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> device)
 {
     cpp_freertos::LockGuard lock(loopMutex);
     profileManager->setAudioDevice(std::move(device));
-}
-auto BluetoothWorker::isAddressConnected(const uint8_t *addr) -> bool
-{
-    auto deviceAddr =
-        std::visit(bluetooth::StringVisitor(), this->settings->getValue(bluetooth::Settings::ConnectedDevice));
-    return static_cast<bool>(deviceAddr == bd_addr_to_str(addr));
-}
-void BluetoothWorker::handleUnpairDisconnect(const Devicei &device)
-{
-    if (isAddressConnected(device.address)) {
-        auto commandData   = std::make_unique<bluetooth::DeviceData>(device);
-        auto disconnectCmd = bluetooth::Command(
-            bluetooth::Command::CommandPack{bluetooth::Command::DisconnectAudio, std::move(commandData)});
-        controller->processCommand(disconnectCmd);
-    }
 }
