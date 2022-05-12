@@ -6,21 +6,4 @@
 
 namespace bluetooth
 {
-
-    Command::Command(CommandPack &&pack) : pack(std::move(pack))
-    {}
-
-    auto Command::getType() const noexcept -> Command::Type
-    {
-        return pack.commandType;
-    }
-
-    auto Command::getData() -> DataVariant
-    {
-        if (pack.data == nullptr) {
-            LOG_ERROR("Terrible,terrible damage!");
-            return DataVariant{};
-        }
-        return pack.data->getData();
-    }
 } // namespace bluetooth

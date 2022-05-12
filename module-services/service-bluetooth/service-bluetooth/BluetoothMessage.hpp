@@ -29,7 +29,6 @@ class BluetoothMessage : public sys::DataMessage
     enum Request
     {
         None,
-        Start,
         Scan,
         StopScan,
         getDevicesAvailable,

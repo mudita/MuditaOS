@@ -48,6 +48,7 @@ void BluetoothSettingsModel::requestBondedDevices()
 
 void BluetoothSettingsModel::requestScan()
 {
+    /// TODO send event Scan{}
     service->bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Scan),
                              service::name::bluetooth);
 }

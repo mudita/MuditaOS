@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -44,7 +44,7 @@ namespace bluetooth
         auto scan() -> Error override;
         void stopScan() override;
         void setVisibility(bool visibility) override;
-        auto pair(Devicei device, std::uint8_t protectionLevel = 0) -> bool override;
-        auto unpair(Devicei device) -> bool override;
+        void pair(Devicei device, std::uint8_t protectionLevel = 0) override;
+        void unpair(Devicei device) override;
     };
 } // namespace bluetooth

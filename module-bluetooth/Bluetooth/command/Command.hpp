@@ -3,6 +3,7 @@
 
 #pragma once
 #include "CommandData.hpp"
+#include "event/Events.hpp"
 
 namespace bluetooth
 {
@@ -10,50 +11,10 @@ namespace bluetooth
     class Command
     {
       public:
-        enum Type
-        {
-            StartScan,
-            StopScan,
-            getDevicesAvailable,
-            VisibilityOn,
-            VisibilityOff,
-            ConnectAudio,
-            DisconnectAudio,
-            PowerOn,
-            PowerOff,
-            Pair,
-            Unpair,
-            StartRinging,
-            StopRinging,
-            StartRouting,
-            StartStream,
-            StopStream,
-            CallAnswered,
-            CallTerminated,
-            CallStarted,
-            IncomingCallNumber,
-            SignalStrengthData,
-            OperatorNameData,
-            BatteryLevelData,
-            NetworkStatusData,
-            None,
-        };
-
         struct CommandPack
         {
-            Command::Type commandType         = Command::None;
-            std::unique_ptr<CommandData> data = nullptr;
+            std::unique_ptr<bt::evt::Base> evt;
         };
-
-        explicit Command(CommandPack &&);
-        explicit Command(Command::Type type)
-        {
-            pack.commandType = type;
-        }
-        auto getType() const noexcept -> Command::Type;
-        auto getData() -> DataVariant;
-
-      private:
         CommandPack pack;
     };
 

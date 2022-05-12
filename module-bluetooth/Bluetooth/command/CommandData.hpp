@@ -18,11 +18,4 @@ namespace bluetooth
                                      Devicei,
                                      utils::PhoneNumber::View,
                                      Store::Network::Status>;
-
-    class CommandData
-    {
-      public:
-        virtual auto getData() -> DataVariant = 0;
-        virtual ~CommandData()                = default;
-    };
 } // namespace bluetooth

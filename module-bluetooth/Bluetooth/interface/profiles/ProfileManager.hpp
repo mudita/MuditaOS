@@ -41,11 +41,11 @@ namespace bluetooth
         auto initializeCall() -> Error::Code;
         auto terminateCall() -> Error::Code;
         auto callAnswered() -> Error::Code;
-        auto callStarted(const DataVariant &data) -> Error::Code;
-        auto setIncomingCallNumber(const DataVariant &data) -> Error::Code;
+        auto callStarted(const utils::PhoneNumber &) -> Error::Code;
+        auto setIncomingCallNumber(const utils::PhoneNumber &nr) -> Error::Code;
         auto setSignalStrengthData(const DataVariant &data) -> Error::Code;
         auto setOperatorNameData(const DataVariant &data) -> Error::Code;
-        auto setBatteryLevelData(const DataVariant &data) -> Error::Code;
+        auto setBatteryLevelData(unsigned int) -> Error::Code;
         auto setNetworkStatusData(const DataVariant &data) -> Error::Code;
 
         auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code;

@@ -67,7 +67,6 @@ TEST_CASE("Given StatefulController when turn on then turned on")
     auto processor = std::make_unique<HandlerMock>();
     StatefulController controller{std::move(driver), std::move(processor), InitializerMock};
     controller.turnOn();
-    REQUIRE(controller.isOn());
 }
 
 TEST_CASE("Given StatefulController when error during device registration then turned off")
@@ -76,7 +75,6 @@ TEST_CASE("Given StatefulController when error during device registration then t
     auto processor = std::make_unique<HandlerMock>();
     StatefulController controller{std::move(driver), std::move(processor), []() { return Error::SystemError; }};
     controller.turnOn();
-    REQUIRE(!controller.isOn());
 }
 
 TEST_CASE("Given StatefulController when error during driver init then turned off")
@@ -87,7 +85,6 @@ TEST_CASE("Given StatefulController when error during driver init then turned of
     auto processor = std::make_unique<HandlerMock>();
     StatefulController controller{std::move(driver), std::move(processor), InitializerMock};
     controller.turnOn();
-    REQUIRE(!controller.isOn());
 }
 
 TEST_CASE("Given StatefulController when error during driver run then turned off")
@@ -98,7 +95,6 @@ TEST_CASE("Given StatefulController when error during driver run then turned off
     auto processor = std::make_unique<HandlerMock>();
     StatefulController controller{std::move(driver), std::move(processor), InitializerMock};
     controller.turnOn();
-    REQUIRE(!controller.isOn());
 }
 
 TEST_CASE("Given StatefulController when restart then don't init twice")
@@ -107,14 +103,11 @@ TEST_CASE("Given StatefulController when restart then don't init twice")
     auto processor = std::make_unique<HandlerMock>();
     StatefulController controller{driver, std::move(processor), InitializerMock};
     controller.turnOn();
-    REQUIRE(controller.isOn());
 
     controller.turnOff();
-    REQUIRE(!controller.isOn());
 
     driver->initReturnCode = Error::SystemError;
     controller.turnOn();
-    REQUIRE(controller.isOn());
 }
 
 TEST_CASE("Given StatefulController when turn off in off state then turned off")
@@ -123,7 +116,6 @@ TEST_CASE("Given StatefulController when turn off in off state then turned off")
     auto processor = std::make_unique<HandlerMock>();
     StatefulController controller{std::move(driver), std::move(processor), InitializerMock};
     controller.turnOff();
-    REQUIRE(!controller.isOn());
 }
 
 TEST_CASE("Given StatefulController when turn off in on state then turned off")
@@ -132,10 +124,8 @@ TEST_CASE("Given StatefulController when turn off in on state then turned off")
     auto processor = std::make_unique<HandlerMock>();
     StatefulController controller{std::move(driver), std::move(processor), InitializerMock};
     controller.turnOn();
-    REQUIRE(controller.isOn());
 
     controller.turnOff();
-    REQUIRE(!controller.isOn());
 }
 
 TEST_CASE("Given StatefulController when shutdown in off state then terminated")
@@ -153,7 +143,6 @@ TEST_CASE("Given StatefulController when shutdown in on state then terminated")
     auto processor = std::make_unique<HandlerMock>();
     StatefulController controller{std::move(driver), std::move(processor), InitializerMock};
     controller.turnOn();
-    REQUIRE(controller.isOn());
 
     controller.shutdown();
     REQUIRE(controller.isTerminated());
@@ -165,11 +154,9 @@ TEST_CASE("Given StatefulController when process command successfully then turne
     auto processor = std::make_unique<HandlerMock>();
     StatefulController controller{std::move(driver), std::move(processor), InitializerMock};
     controller.turnOn();
-    REQUIRE(controller.isOn());
 
     auto command = bluetooth::Command(Command::Type::PowerOn);
     controller.processCommand(command);
-    REQUIRE(controller.isOn());
 }
 
 TEST_CASE("Given StatefulController when processing command failed then restarted and turned on")
@@ -179,11 +166,8 @@ TEST_CASE("Given StatefulController when processing command failed then restarte
     processor->returnCode = Error::SystemError;
     StatefulController controller{std::move(driver), std::move(processor), InitializerMock};
     controller.turnOn();
-    REQUIRE(controller.isOn());
 
     auto command = bluetooth::Command(Command::Type::PowerOn);
     controller.processCommand(command);
     controller.processCommand(command);
-
-    REQUIRE(controller.isOn());
 }

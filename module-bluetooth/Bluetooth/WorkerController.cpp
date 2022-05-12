@@ -9,8 +9,11 @@
 #include <log/log.hpp>
 #define BOOST_SML_CFG_DISABLE_MIN_SIZE // GCC10 fix
 #include <boost/sml.hpp>
+#include <sml-utils/Logger.hpp>
 #include <magic_enum.hpp>
 #include <stdexcept>
+#include "command/event/Events.hpp"
+#include "service-bluetooth/SettingsHolder.hpp"
 
 namespace bluetooth
 {
@@ -18,17 +21,6 @@ namespace bluetooth
 
     namespace
     {
-        struct TurnOn
-        {};
-        struct TurnOff
-        {};
-        struct ShutDown
-        {};
-        struct ProcessCommand
-        {
-            Command &command;
-        };
-
         class InitializationError : public std::runtime_error
         {
           public:
@@ -78,25 +70,261 @@ namespace bluetooth
             }
         };
 
+        struct
+        {
+            void operator()(const std::shared_ptr<AbstractCommandHandler> &handler)
+            {
+                handler->scan();
+            }
+        } constexpr HandleOn;
+
+        struct
+        {
+            void operator()(const std::shared_ptr<AbstractCommandHandler> &handler)
+            {
+                handler->stopScan();
+            }
+        } constexpr HandleOff;
+
+        struct
+        {
+            void operator()(const std::shared_ptr<AbstractCommandHandler> &handler, const bt::evt::Pair &event)
+            {
+                handler->pair(event.device);
+            }
+        } constexpr HandlePair;
+
+        struct
+        {
+            bool operator()(const std::shared_ptr<bluetooth::SettingsHolder> &settings, bt::evt::Unpair evt)
+            {
+                auto deviceAddr =
+                    std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::ConnectedDevice));
+                return static_cast<bool>(deviceAddr == bd_addr_to_str(evt.device.address));
+            }
+        } constexpr Connected;
+
+        struct
+        {
+            void operator()(const std::shared_ptr<AbstractDriver> &driver,
+                            const bt::evt::Unpair &event,
+                            const std::shared_ptr<bluetooth::SettingsHolder> &settings,
+                            const std::shared_ptr<std::vector<Devicei>> &pairedDevices)
+            {
+                driver->unpair(event.device);
+
+                auto position = std::find_if(pairedDevices->begin(), pairedDevices->end(), [&](const Devicei &device) {
+                    return !bd_addr_cmp(event.device.address, device.address);
+                });
+                if (position != pairedDevices->end()) {
+                    pairedDevices->erase(position);
+                    settings->setValue(bluetooth::Settings::BondedDevices,
+                                       SettingsSerializer::toString(*pairedDevices));
+                    LOG_INFO("Device removed from paired devices list");
+                }
+            }
+        } constexpr HandleUnpair;
+
+        struct
+        {
+            void operator()(const std::shared_ptr<AbstractCommandHandler> &handler)
+            {
+                handler->disconnectAudioConnection();
+            }
+
+        } constexpr HandleDisconnect;
+
+        struct
+        {
+            void operator()(const std::shared_ptr<AbstractCommandHandler> &handler)
+            {
+                handler->setVisibility(true);
+            }
+
+        } constexpr HandleSetVisibility;
+
+        struct
+        {
+            void operator()(const std::shared_ptr<AbstractCommandHandler> &handler)
+            {
+                handler->setVisibility(false);
+            }
+
+        } constexpr HandleUnsetVisibility;
+
+        struct
+        {
+            void operator()(const std::shared_ptr<AbstractCommandHandler> &handler, bt::evt::ConnectAudio evt)
+            {
+                handler->establishAudioConnection(evt.device);
+            }
+
+        } constexpr EstablishAudioConnection;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager)
+            {
+                profileManager->startRinging();
+            }
+
+        } constexpr StartRinging;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager)
+            {
+                profileManager->stopRinging();
+            }
+
+        } constexpr StopRinging;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager, bt::evt::ConnectAudio evt)
+            {
+                profileManager->initializeCall();
+            }
+
+        } constexpr InitializeCall;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager)
+            {
+                profileManager->callAnswered();
+            }
+
+        } constexpr CallAnswered;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager)
+            {
+                profileManager->terminateCall();
+            }
+
+        } constexpr TerminateCall;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager, bt::evt::CallStarted evt)
+            {
+                profileManager->callStarted(evt.number);
+            }
+
+        } constexpr CallStarted;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager, bt::evt::IncomingCallNumber evt)
+            {
+                profileManager->setIncomingCallNumber(evt.number);
+            }
+
+        } constexpr IncomingCall;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager, bt::evt::SignalStrengthData evt)
+            {
+                profileManager->setSignalStrengthData(evt.strength);
+            }
+
+        } constexpr SignalStrength;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager, bt::evt::OperatorNameData evt)
+            {
+                profileManager->setOperatorNameData(evt.name);
+            }
+
+        } constexpr SetOperatorName;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager, bt::evt::BatteryLevelData evt)
+            {
+                profileManager->setBatteryLevelData(evt.level);
+            }
+
+        } constexpr SetBatteryLevel;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager, bt::evt::NetworkStatusData evt)
+            {
+                profileManager->setNetworkStatusData(evt.status);
+            }
+        } constexpr SetNetworkStatus;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager)
+            {
+                profileManager->start();
+            }
+
+        } constexpr StartAudio;
+
+        struct
+        {
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager)
+            {
+                profileManager->stop();
+            }
+
+        } constexpr StopAudio;
+
         struct On
         {
             auto operator()() const
             {
                 auto isInit        = [](InitializationState &data) { return data.isInitDone; };
-                auto handleCommand = [](std::shared_ptr<AbstractCommandHandler> &processor,
-                                        const ProcessCommand &processCommand) {
-                    if (const auto status = processor->handle(processCommand.command); status != Error::Success) {
-                        throw ProcessingError{"Failed to process command"};
-                    }
-                };
 
                 using namespace sml;
                 // clang-format off
-                return make_transition_table(*"Idle"_s + event<ProcessCommand> [ isInit ] / handleCommand = "Processing"_s,
-                                             "Processing"_s = "Idle"_s);
+                return make_transition_table(
+                                            *"Idle"_s + event<bt::evt::StartScan>[isInit] / HandleOn = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::StopScan>[isInit] / HandleOff = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::Pair>[isInit] / HandlePair = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::Unpair>[isInit and Connected] / (HandleDisconnect, HandleUnpair) = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::Unpair>[isInit] / HandleUnpair = "Idle"_s,
+
+                                            "Idle"_s + event<bt::evt::VisibilityOn> / HandleSetVisibility = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::VisibilityOff> / HandleUnsetVisibility = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::ConnectAudio> / EstablishAudioConnection = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::StartRinging> / StartRinging = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::StopRinging> / StopRinging = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::StartRouting> /InitializeCall = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::CallAnswered> / CallAnswered = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::CallTerminated> / TerminateCall = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::CallStarted>/ CallStarted = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::IncomingCallNumber> / IncomingCall= "Idle"_s,
+                                            "Idle"_s + event<bt::evt::SignalStrengthData> / SignalStrength = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::OperatorNameData>/  SetOperatorName = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::BatteryLevelData>/ SetBatteryLevel = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::NetworkStatusData> / SetNetworkStatus = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::StartStream>/ StartAudio = "Idle"_s,
+                                            "Idle"_s + event<bt::evt::StopStream>/ StopAudio = "Idle"_s
+                                            );
                 // clang-format on
             }
         };
+
+        struct InitDevicesList
+        {
+            void operator()(const std::shared_ptr<bluetooth::SettingsHolder> &settings,
+                            const std::shared_ptr<std::vector<Devicei>> &pairedDevices)
+            {
+                auto bondedDevicesStr =
+                    std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BondedDevices));
+                pairedDevices->clear();
+                auto devices = SettingsSerializer::fromString(bondedDevicesStr);
+                pairedDevices->assign(devices.begin(), devices.end());
+            }
+        } constexpr InitDevicesList;
 
         class StateMachine
         {
@@ -109,13 +337,18 @@ namespace bluetooth
 
                 using namespace sml;
                 // clang-format off
-                return make_transition_table(*"Off"_s + event<TurnOn> = state<Setup>,
-                                             state<Setup> = state<On>,
+                return make_transition_table(*"Off"_s + event<bt::evt::PowerOn> = state<Setup>,
+                                             state<Setup> / InitDevicesList = state<On>,
                                              state<Setup> + exception<InitializationError> / printInitError = "Off"_s,
-                                             state<On> + event<TurnOff> / turnOff = "Off"_s,
+                                             state<On> + event<bt::evt::PowerOff> / turnOff = "Off"_s,
                                              state<On> + exception<ProcessingError> / ( printProcessingError, turnOff ) = "Restart"_s,
                                              "Restart"_s = state<Setup>,
-                                             "Off"_s + event<ShutDown> = X);
+
+                                             state<Setup> + event<bt::evt::ShutDown> / turnOff = X,
+                                             state<On> + event<bt::evt::ShutDown> / turnOff = X,
+                                             "Restart"_s + event<bt::evt::ShutDown> /turnOff = X,
+
+                                             "Off"_s + event<bt::evt::ShutDown> = X);
                 // clang-format on
             }
         };
@@ -126,66 +359,152 @@ namespace bluetooth
       public:
         Impl(std::shared_ptr<AbstractDriver> &&driver,
              std::shared_ptr<AbstractCommandHandler> &&handler,
-             DeviceRegistrationFunction &&registerDevice);
+             DeviceRegistrationFunction &&registerDevice,
+             std::shared_ptr<bluetooth::SettingsHolder> &&settings,
+             std::shared_ptr<std::vector<Devicei>> &&pairedDevices);
 
-        using SM = sml::sm<StateMachine>;
+        Logger logger;
+
+        using SM = sml::sm<StateMachine, boost::sml::logger<Logger>>;
         SM sm;
     };
 
     StatefulController::Impl::Impl(std::shared_ptr<AbstractDriver> &&driver,
                                    std::shared_ptr<AbstractCommandHandler> &&handler,
-                                   DeviceRegistrationFunction &&registerDevice)
-        : sm{std::move(driver), std::move(handler), std::move(registerDevice), InitializationState{}}
+                                   DeviceRegistrationFunction &&registerDevice,
+                                   std::shared_ptr<bluetooth::SettingsHolder> &&settings,
+                                   std::shared_ptr<std::vector<Devicei>> &&pairedDevices)
+        : sm{logger,
+             std::move(driver),
+             std::move(handler),
+             std::move(registerDevice),
+             InitializationState{},
+             std::move(settings),
+             std::move(pairedDevices)}
     {}
 
     StatefulController::StatefulController(std::shared_ptr<AbstractDriver> &&driver,
                                            std::shared_ptr<AbstractCommandHandler> &&handler,
-                                           DeviceRegistrationFunction &&registerDevice)
-        : pimpl(std::make_unique<Impl>(std::move(driver), std::move(handler), std::move(registerDevice)))
+                                           DeviceRegistrationFunction &&registerDevice,
+                                           std::shared_ptr<bluetooth::SettingsHolder> &&settings,
+                                           std::shared_ptr<std::vector<Devicei>> &&pairedDevices)
+        : pimpl(std::make_unique<Impl>(std::move(driver),
+                                       std::move(handler),
+                                       std::move(registerDevice),
+                                       std::move(settings),
+                                       std::move(pairedDevices)))
     {}
 
     StatefulController::~StatefulController() noexcept = default;
 
-    void StatefulController::turnOn()
+    void StatefulController::handle(const bt::evt::Base &evt)
     {
-        pimpl->sm.process_event(TurnOn{});
+        pimpl->sm.process_event(evt);
     }
-
-    void StatefulController::turnOff()
+    void StatefulController::handle(const bt::evt::StartScan &evt)
     {
-        pimpl->sm.process_event(TurnOff{});
-    }
-
-    void StatefulController::shutdown()
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::StopScan &evt)
     {
-        if (isOn()) {
-            turnOff();
-        }
-        pimpl->sm.process_event(ShutDown{});
-    }
-
-    auto StatefulController::isOn() const -> bool
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::GetDevicesAvailable &evt)
     {
-        using namespace sml;
-        return !pimpl->sm.is("Off"_s) && !isTerminated();
-    }
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::VisibilityOn &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::VisibilityOff &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::ConnectAudio &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::DisconnectAudio &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::PowerOn &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::PowerOff &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::ShutDown &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::Pair &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::Unpair &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::StartRinging &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::StopRinging &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::StartRouting &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::StartStream &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::StopStream &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::CallAnswered &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::CallTerminated &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::CallStarted &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::IncomingCallNumber &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::SignalStrengthData &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::OperatorNameData &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::BatteryLevelData &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+    void StatefulController::handle(const bt::evt::NetworkStatusData &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
 
     auto StatefulController::isTerminated() const -> bool
     {
         using namespace sml;
         return pimpl->sm.is(X);
-    }
-
-    void StatefulController::processCommand(Command &command)
-    {
-        try {
-            LOG_INFO("Process command: %s", magic_enum::enum_name(command.getType()).data());
-            pimpl->sm.process_event(ProcessCommand{command});
-            LOG_DEBUG("Command processed");
-        }
-        catch (std::bad_variant_access &e) {
-            LOG_ERROR(
-                "Failed to parse command %s, error: %s", magic_enum::enum_name(command.getType()).data(), e.what());
-        }
     }
 } // namespace bluetooth

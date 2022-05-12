@@ -27,7 +27,14 @@ namespace bluetooth
       public:
         virtual ~AbstractCommandHandler() noexcept = default;
 
-        virtual auto handle(Command &command) -> Error::Code = 0;
+        virtual Error::Code scan()                                            = 0;
+        virtual Error::Code stopScan()                                        = 0;
+        virtual Error::Code setVisibility(bool visibility)                    = 0;
+        virtual Error::Code establishAudioConnection(const DataVariant &data) = 0;
+        virtual Error::Code disconnectAudioConnection()                       = 0;
+        virtual Error::Code pair(const DataVariant &data)                     = 0;
+        virtual Error::Code unpair(const DataVariant &data)                   = 0;
+        virtual Error::Code availableDevices()                                = 0;
     };
 
     class CommandHandler : public AbstractCommandHandler
@@ -38,20 +45,23 @@ namespace bluetooth
                                 std::shared_ptr<bluetooth::ProfileManager> profileManager,
                                 std::shared_ptr<bluetooth::AbstractDriver> driver);
 
-        auto handle(Command &command) -> Error::Code override;
+        Error::Code scan() override;
+        Error::Code stopScan() override;
+        Error::Code setVisibility(bool visibility) override;
+        Error::Code establishAudioConnection(const DataVariant &data) override;
+        Error::Code disconnectAudioConnection() override;
+        Error::Code pair(const DataVariant &data) override;
+        Error::Code unpair(const DataVariant &data) override;
+        Error::Code availableDevices() override;
 
       private:
-        Error::Code scan();
-        Error::Code stopScan();
-        Error::Code setVisibility(bool visibility);
-        Error::Code establishAudioConnection(const DataVariant &data);
-        Error::Code disconnectAudioConnection();
-        Error::Code pair(const DataVariant &data);
-        Error::Code unpair(const DataVariant &data);
-        Error::Code availableDevices();
         sys::Service *service;
         std::shared_ptr<bluetooth::SettingsHolder> settings;
+
+      public:
         std::shared_ptr<bluetooth::ProfileManager> profileManager;
+
+      private:
         std::shared_ptr<AbstractDriver> driver;
     };
 } // namespace bluetooth

@@ -61,6 +61,9 @@ namespace bluetooth
     };
 }; // namespace bluetooth
 
+struct DeviceStore
+{};
+
 class BluetoothWorker : private sys::Worker
 {
     enum WorkerEventQueues
@@ -78,10 +81,7 @@ class BluetoothWorker : private sys::Worker
 
     void registerQueues();
     void onLinkKeyAdded(const std::string &deviceAddress);
-    void initDevicesList();
     void removeFromBoundDevices(uint8_t *addr);
-    auto isAddressConnected(const bd_addr_t addr) -> bool;
-    void handleUnpairDisconnect(const Devicei &device);
 
   public:
     enum Error
@@ -107,7 +107,7 @@ class BluetoothWorker : private sys::Worker
     unsigned long active_features;
     std::shared_ptr<bluetooth::ProfileManager> profileManager;
     std::shared_ptr<bluetooth::SettingsHolder> settings;
-    std::vector<Devicei> pairedDevices;
+    std::shared_ptr<std::vector<Devicei>> pairedDevices = std::make_shared<std::vector<Devicei>>();
     std::unique_ptr<bluetooth::RunLoop> runLoop;
     std::unique_ptr<bluetooth::AbstractController> controller;
 };
