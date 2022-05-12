@@ -7,7 +7,9 @@
 #include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
+#include "Service/Mailbox.hpp"
 #include "service-bluetooth/SettingsHolder.hpp"
+#include "service-bluetooth/WorkerLock.hpp"
 #include <service-db/DBServiceName.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
@@ -87,12 +89,14 @@ class ServiceBluetooth : public sys::Service
     sys::ReturnCodes DeinitHandler() override;
     void ProcessCloseReason(sys::CloseReason closeReason) override;
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
-    void sendWorkerCommand(bluetooth::Command::Type commandType,
-                           std::unique_ptr<bluetooth::CommandData> data = nullptr);
+
+    void sendWorkerCommand(bt::evt::Base *command);
+
     void handleTurnOff();
-    QueueHandle_t workerQueue = nullptr;
+
+    std::shared_ptr<Mailbox<bluetooth::Command, QueueHandle_t, WorkerLock>> workerQueue;
     std::shared_ptr<bluetooth::SettingsHolder> settingsHolder;
-    bluetooth::ProfileManager *profileManagerPtr = nullptr;
+    bluetooth::BaseProfileManager *profileManagerPtr = nullptr;
 
   private:
     std::unique_ptr<BluetoothWorker> worker;
@@ -114,6 +118,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::SetStatus *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(BluetoothPairMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(BluetoothPairResultMessage *msg) -> std::shared_ptr<sys::Message>;
+
     [[nodiscard]] auto handle(message::bluetooth::Unpair *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::RequestDeviceName *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::SetDeviceName *msg) -> std::shared_ptr<sys::Message>;

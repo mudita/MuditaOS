@@ -106,6 +106,7 @@ namespace bluetooth
             LOG_INFO("BTstack up and running");
             bluetooth::KeyStorage::settings->setValue(bluetooth::Settings::State,
                                                       static_cast<int>(BluetoothStatus::State::On));
+            // TODO inform SM and process ON?
             if (powerOnCallback) {
                 powerOnCallback();
             }
@@ -218,13 +219,15 @@ namespace bluetooth
     {
         gap->setVisibility(visibility);
     }
-    auto Driver::pair(Devicei device, std::uint8_t protectionLevel) -> bool
+    void Driver::pair(Devicei device, std::uint8_t protectionLevel)
     {
         LOG_INFO("Device: %s, addr: %s", device.name.data(), device.address_str());
-        return gap->pair(device, protectionLevel);
+        gap->pair(device, protectionLevel);
     }
-    auto Driver::unpair(Devicei device) -> bool
+
+    void Driver::unpair(Devicei device)
     {
-        return gap->unpair(device);
+        gap->unpair(device);
     }
+
 } // namespace bluetooth
