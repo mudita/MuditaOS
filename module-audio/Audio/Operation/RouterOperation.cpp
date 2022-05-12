@@ -9,6 +9,7 @@
 #include <Audio/StreamFactory.hpp>
 #include <Audio/transcode/TransformFactory.hpp>
 
+#include <bsp/headset/headset.hpp>
 #include <log/log.hpp>
 #include <mutex.hpp>
 
@@ -140,6 +141,13 @@ namespace audio
             jackState = isAvailable ? JackState::Plugged : JackState::Unplugged;
             SwitchToPriorityProfile();
             break;
+        case EventType::MicrophoneState: {
+            auto headsetHasMicrophone = isAvailable;
+            LOG_DEBUG("Microphone state event has been received, does the headset have a microphone? %s",
+                      headsetHasMicrophone ? "Yes" : "No");
+            setInputPathForHeadset(headsetHasMicrophone);
+            SwitchToPriorityProfile();
+        } break;
         case EventType::BlutoothHSPDeviceState:
             SetProfileAvailability({Profile::Type::RoutingBluetoothHSP}, isAvailable);
             SwitchToPriorityProfile();
@@ -180,10 +188,6 @@ namespace audio
 
         if (newProfile == nullptr) {
             return RetCode::UnsupportedProfile;
-        }
-
-        if (currentProfile && currentProfile->GetType() == newProfile->GetType()) {
-            return RetCode::Success;
         }
 
         if (callInProgress) {
@@ -232,6 +236,18 @@ namespace audio
     Position RouterOperation::GetPosition()
     {
         return 0.0;
+    }
+
+    void RouterOperation::setInputPathForHeadset(bool headsetHasMicrophone)
+    {
+        const auto inputPath =
+            headsetHasMicrophone ? audio::codec::InputPath::Headphones : audio::codec::InputPath::Microphone;
+        for (const auto &p : supportedProfiles) {
+            if (p.profile->GetType() == Profile::Type::RoutingHeadphones) {
+                p.profile->SetInputPath(inputPath);
+                return; // Don't check remaining profiles after finding the right one
+            }
+        }
     }
 
     RouterOperation::~RouterOperation()

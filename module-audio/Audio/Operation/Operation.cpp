@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Operation.hpp"
@@ -45,7 +45,7 @@ namespace audio
     std::shared_ptr<Profile> Operation::GetProfile(const Profile::Type type)
     {
         auto ret = std::find_if(supportedProfiles.begin(), supportedProfiles.end(), [type](const auto &w) {
-            return w.isAvailable == true && w.profile->GetType() == type;
+            return w.isAvailable && w.profile->GetType() == type;
         });
         if (ret == supportedProfiles.end()) {
             return nullptr;
@@ -58,7 +58,7 @@ namespace audio
     std::optional<Profile::Type> Operation::GetPriorityProfile() const
     {
         for (auto &p : supportedProfiles) {
-            if (p.isAvailable == true) {
+            if (p.isAvailable) {
                 return p.profile->GetType();
             }
         }

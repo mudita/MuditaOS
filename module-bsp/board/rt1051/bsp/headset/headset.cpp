@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "headset.hpp"
@@ -143,7 +143,7 @@ namespace bsp
             }
         }
 
-        HeadsetState headset_get_data(bool &headsetState, uint8_t &keyEvent, uint8_t &keyCode)
+        HeadsetState headset_get_data(bool &headsetState, bool &microphoneState, uint8_t &keyEvent, uint8_t &keyCode)
         {
             uint8_t reg;
             uint8_t acc_status              = 0;
@@ -158,7 +158,7 @@ namespace bsp
 
             // Check if jack removed event
             if (((acc_status & static_cast<uint8_t>(HeadsetIQRDetectionResult::DETRES_INSERTION_STATUS)) == 0) &&
-                (HeadsetInserted == true)) {
+                HeadsetInserted) {
                 HeadsetInserted = false;
                 MicrophoneInserted = false;
 
@@ -169,11 +169,12 @@ namespace bsp
                 i2cAddr.subAddress = HEADSET_DEV_SETTING_1_REG;
                 i2c->Modify(i2cAddr, reg, MicrophoneInserted, 1);
 
-                headsetState       = static_cast<uint8_t>(HeadsetInserted);
+                headsetState       = HeadsetInserted;
+                microphoneState    = MicrophoneInserted;
                 headsetStateChange = HeadsetState::Changed;
             }
             else if (((acc_status & static_cast<uint8_t>(HeadsetIQRDetectionResult::DETRES_INSERTION_STATUS)) != 0) &&
-                     (HeadsetInserted == false)) {
+                     !HeadsetInserted) {
                 LOG_INFO("Headset inserted");
                 HeadsetInserted = true;
 
@@ -196,7 +197,7 @@ namespace bsp
                     insertedHeadsetType = HeadsetType::TypeCTIA;
                     break;
                 default:
-                    LOG_INFO("uknown Headset type detected");
+                    LOG_INFO("Unknown Headset type detected");
                     MicrophoneInserted  = false;
                     insertedHeadsetType = HeadsetType::TypeDontCare;
                 }
@@ -206,7 +207,8 @@ namespace bsp
                 i2cAddr.subAddress = HEADSET_DEV_SETTING_1_REG;
                 i2c->Modify(i2cAddr, reg, MicrophoneInserted, 1);
 
-                headsetState       = static_cast<uint8_t>(HeadsetInserted);
+                headsetState       = HeadsetInserted;
+                microphoneState    = MicrophoneInserted;
                 headsetStateChange = HeadsetState::Changed;
             }
             // Key pressed/released event

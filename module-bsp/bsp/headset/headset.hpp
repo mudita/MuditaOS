@@ -19,11 +19,12 @@ namespace bsp {
     /**
      * @brief This method is responsible for reading state of headset and its keys.
      * @param headsetState headset event (1 - connected, 0 - removed)
+     * @param microphoneState headset event (1 - present, 0 - absent)
      * @param keyEvent key event (1 - pressed, 0 - released)
      * @param keyCode key code
      * @note Method returns `HeadsetState::Changed` if state of headset changed (connected -> removed)
      */
-    HeadsetState headset_get_data(bool &headsetState, uint8_t &keyEvent, uint8_t &keyCode);
+    HeadsetState headset_get_data(bool &headsetState, bool &microphoneState, uint8_t &keyEvent, uint8_t &keyCode);
 
     bool IsInserted();
 
