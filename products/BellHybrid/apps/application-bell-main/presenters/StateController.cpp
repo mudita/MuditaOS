@@ -80,20 +80,6 @@ namespace app::home_screen
             };
             auto isSnoozeActive = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isSnoozeActive(); };
             auto snooze         = [](AbstractController &controller) { controller.snooze(true); };
-            auto getRand        = [](const std::uint32_t lo, const std::uint32_t hi) -> std::uint32_t {
-                std::random_device dev;
-                std::mt19937 rng(dev());
-                std::uniform_int_distribution<std::mt19937::result_type> dist(lo, hi);
-                return dist(rng);
-            };
-            auto getGreeting = []() -> UTF8 {
-                const auto greetingCollection = utils::translate_array("app_bell_greeting_msg");
-                if (greetingCollection.empty()) {
-                    LOG_WARN("app_bell_greeting_msg array does not exist, using default string");
-                    return "app_bell_greeting_msg";
-                }
-                return greetingCollection[Helpers::getRand(0, greetingCollection.size() - 1)];
-            };
             auto turnOffRingingAlarm = [](AbstractAlarmModel &alarmModel) { alarmModel.turnOff(); };
             auto updateBatteryStatus = [](AbstractView &view, AbstractBatteryModel &batteryModel) {
                 view.setBatteryLevelState(batteryModel.getLevelState());
@@ -252,7 +238,7 @@ namespace app::home_screen
                 alarmModel.turnOff();
                 alarmModel.activate(false);
                 view.setViewState(ViewState::AlarmRingingDeactivatedWait);
-                view.setTextDescription(Helpers::getGreeting());
+                view.setTextDescription(presenter.getGreeting());
             };
             auto exit = [](AbstractView &view, AbstractPresenter &presenter) { presenter.detachTimer(); };
         } // namespace AlarmRingingDeactivatedWait
