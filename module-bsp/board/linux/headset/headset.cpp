@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "headset.hpp"
@@ -13,7 +13,7 @@ namespace bsp
             return 1;
         }
 
-        HeadsetState headset_get_data(bool &headsetState, uint8_t &keyEvent, uint8_t &keyCode)
+        HeadsetState headset_get_data(bool &headsetState, bool &microphoneState, uint8_t &keyEvent, uint8_t &keyCode)
         {
             return HeadsetState::NoChange;
         }

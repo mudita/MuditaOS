@@ -51,16 +51,21 @@ bool WorkerEvent::handleMessage(std::uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        bool headsetState = false;
+        bool headsetState, microphoneState;
         uint8_t headsetKeyEvent, headsetKeyCode;
 
-        if (bsp::headset::headset_get_data(headsetState, headsetKeyEvent, headsetKeyCode) ==
+        if (bsp::headset::headset_get_data(headsetState, microphoneState, headsetKeyEvent, headsetKeyCode) ==
             bsp::headset::HeadsetState::Changed) {
 
-            auto message = std::make_shared<AudioEventRequest>(audio::EventType::JackState,
-                                                               headsetState ? audio::Event::DeviceState::Connected
-                                                                            : audio::Event::DeviceState::Disconnected);
-            service->bus.sendUnicast(message, service::name::evt_manager);
+            auto jackStateMessage = std::make_shared<AudioEventRequest>(
+                audio::EventType::JackState,
+                headsetState ? audio::Event::DeviceState::Connected : audio::Event::DeviceState::Disconnected);
+            service->bus.sendUnicast(std::move(jackStateMessage), service::name::evt_manager);
+
+            auto micStateMessage = std::make_shared<AudioEventRequest>(
+                audio::EventType::MicrophoneState,
+                microphoneState ? audio::Event::DeviceState::Connected : audio::Event::DeviceState::Disconnected);
+            service->bus.sendUnicast(std::move(micStateMessage), service::name::evt_manager);
         }
         else if (auto keyCode = headsetKeyToKeyboardKey(headsetKeyCode); keyCode != bsp::KeyCodes::Undefined) {
             WorkerEventCommon::processKeyEvent(static_cast<bsp::KeyEvents>(headsetKeyEvent), keyCode);

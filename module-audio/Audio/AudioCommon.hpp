@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -95,7 +95,8 @@ namespace audio
     enum class EventType
     {
         // HW state change notifications
-        JackState,               //!< jack input plugged / unplugged event
+        JackState,               //!< Jack input plugged / unplugged event
+        MicrophoneState,         //!< Microphone presence in headset (3-pole w/o microphone or 4-pole with microphone)
         BlutoothHSPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
         BlutoothHFPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
         BlutoothA2DPDeviceState, //!< BT device connected / disconnected event (Advanced Audio Distribution Profile)
