@@ -75,7 +75,8 @@ namespace app::home_screen
                                              std::unique_ptr<AbstractTemperatureModel> temperatureModel,
                                              std::unique_ptr<AbstractTimeModel> timeModel)
         : app{app}, alarmModel{std::move(alarmModel)}, batteryModel{std::move(batteryModel)},
-          temperatureModel{std::move(temperatureModel)}, timeModel{std::move(timeModel)}
+          temperatureModel{std::move(temperatureModel)}, timeModel{std::move(timeModel)},
+          rngEngine{std::make_unique<std::mt19937>(std::random_device{}())}
     {}
 
     void HomeScreenPresenter::handleUpdateTimeEvent()
@@ -245,4 +246,16 @@ namespace app::home_screen
         app->switchWindow(gui::BellBatteryStatusWindow::name,
                           std::make_unique<gui::BellBatteryStatusWindow::Data>(getBatteryLvl(), isBatteryCharging()));
     }
+
+    UTF8 HomeScreenPresenter::getGreeting()
+    {
+        const auto greetingCollection = utils::translate_array("app_bell_greeting_msg");
+        if (greetingCollection.empty()) {
+            LOG_WARN("app_bell_greeting_msg array does not exist, using default string");
+            return "app_bell_greeting_msg";
+        }
+
+        std::uniform_int_distribution<std::mt19937::result_type> dist(0, greetingCollection.size() - 1);
+        return greetingCollection[dist(*rngEngine)];
+    };
 } // namespace app::home_screen
