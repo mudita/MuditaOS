@@ -7,6 +7,7 @@
 #include "glucode/BluetoothRunLoop.hpp"
 #include "interface/profiles/Profile.hpp"
 #include "service-bluetooth/SettingsHolder.hpp"
+#include "service-bluetooth/WorkerLock.hpp"
 #include "Service/Worker.hpp"
 
 #include "Device.hpp"
@@ -83,6 +84,8 @@ class BluetoothWorker : private sys::Worker
     void onLinkKeyAdded(const std::string &deviceAddress);
     void removeFromBoundDevices(uint8_t *addr);
 
+    std::shared_ptr<Mailbox<bluetooth::Command, QueueHandle_t, WorkerLock>> workerQueue;
+
   public:
     enum Error
     {
@@ -91,7 +94,7 @@ class BluetoothWorker : private sys::Worker
         ErrorBtAPI,
     };
 
-    BluetoothWorker(sys::Service *service);
+    explicit BluetoothWorker(sys::Service *service);
     ~BluetoothWorker() override;
 
     auto handleMessage(uint32_t queueID) -> bool override;

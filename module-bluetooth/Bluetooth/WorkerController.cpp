@@ -154,7 +154,7 @@ namespace bluetooth
 
         struct
         {
-            void operator()(const std::shared_ptr<AbstractCommandHandler> &handler, bt::evt::ConnectAudio evt)
+            void operator()(const std::shared_ptr<AbstractCommandHandler> &handler, const bt::evt::ConnectAudio &evt)
             {
                 handler->establishAudioConnection(evt.device);
             }
@@ -181,7 +181,7 @@ namespace bluetooth
 
         struct
         {
-            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager, bt::evt::ConnectAudio evt)
+            void operator()(std::shared_ptr<bluetooth::ProfileManager> profileManager)
             {
                 profileManager->initializeCall();
             }
@@ -399,7 +399,9 @@ namespace bluetooth
 
     void StatefulController::handle(const bt::evt::Base &evt)
     {
-        pimpl->sm.process_event(evt);
+        // TODO double dispatch this shit
+        evt.dispatch(this);
+        // pimpl->sm.process_event(evt);
     }
     void StatefulController::handle(const bt::evt::StartScan &evt)
     {

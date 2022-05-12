@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,22 +7,47 @@
 #include "thread.hpp"
 #include <mutex.hpp>
 #include <condition_variable.hpp>
+#include <optional>
 
-template <typename T> class Mailbox
+class ServiceLock
 {
+    cpp_freertos::Thread *thread;
+    cpp_freertos::MutexStandard &mutex_;
+    cpp_freertos::ConditionVariable cond_;
+
   public:
-    Mailbox(cpp_freertos::Thread *thread) : thread_(thread)
+    ServiceLock(cpp_freertos::Thread *thread, cpp_freertos::MutexStandard &mutex_) : thread(thread), mutex_(mutex_)
     {}
 
-    T peek()
+    bool wait()
     {
+        return thread->Wait(cond_, mutex_);
+    }
 
+    bool wait(TickType_t ticks)
+    {
+        return thread->Wait(cond_, mutex_, ticks);
+    }
+    bool signal()
+    {
+        cond_.Signal();
+        return true;
+    }
+};
+
+template <typename T, typename Base = cpp_freertos::Thread *, typename Lock = ServiceLock> class Mailbox
+{
+  public:
+    Mailbox(Base thread) : thread_(thread)
+    {}
+
+    std::optional<T> peek()
+    {
         cpp_freertos::LockGuard mlock(mutex_);
-        while (queue_.empty()) {
-            thread_->Wait(cond_, mutex_);
-        }
-        auto item = queue_.front();
-        return item;
+        if (queue_.empty()) {}
+        auto el = queue_.front();
+        queue_.pop_front();
+        return {el};
     }
 
     T pop(uint32_t timeout = portMAX_DELAY)
@@ -30,7 +55,7 @@ template <typename T> class Mailbox
 
         cpp_freertos::LockGuard mlock(mutex_);
         while (queue_.empty()) {
-            if (thread_->Wait(cond_, mutex_, timeout) == false) {
+            if (lock.wait(timeout) == false) {
                 return nullptr;
             }
         }
@@ -43,7 +68,7 @@ template <typename T> class Mailbox
     {
         cpp_freertos::LockGuard mlock(mutex_);
         while (queue_.empty()) {
-            thread_->Wait(cond_, mutex_);
+            lock.wait();
         }
         item = queue_.front();
         queue_.pop_front();
@@ -61,7 +86,7 @@ template <typename T> class Mailbox
         mutex_.Lock();
         queue_.push_back(item);
         mutex_.Unlock();
-        cond_.Signal();
+        lock.signal();
     }
 
     void push(T &&item)
@@ -69,12 +94,13 @@ template <typename T> class Mailbox
         mutex_.Lock();
         queue_.push_back(std::move(item));
         mutex_.Unlock();
-        cond_.Signal();
+        lock.signal();
     }
 
   private:
-    cpp_freertos::Thread *thread_;
+    Base thread_;
     std::deque<T> queue_;
     cpp_freertos::MutexStandard mutex_;
-    cpp_freertos::ConditionVariable cond_;
+
+    Lock lock{thread_, mutex_};
 };

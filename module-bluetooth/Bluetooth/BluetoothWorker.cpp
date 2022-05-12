@@ -102,7 +102,7 @@ BluetoothWorker::BluetoothWorker(sys::Service *service)
 {
     init({
         {queues::io, sizeof(bluetooth::Message), queues::queueLength},
-        {queues::cmd, sizeof(bluetooth::Command::CommandPack), queues::queueLength},
+        {queues::cmd, 0, queues::queueLength},
         {queues::btstack, sizeof(bool), queues::triggerQueueLength},
     });
     registerQueues();
@@ -110,7 +110,10 @@ BluetoothWorker::BluetoothWorker(sys::Service *service)
 
 void BluetoothWorker::registerQueues()
 {
-    static_cast<ServiceBluetooth *>(service)->workerQueue = Worker::getQueueHandleByName(queues::cmd);
+    workerQueue = std::make_shared<Mailbox<bluetooth::Command, QueueHandle_t, WorkerLock>>(
+        Worker::getQueueHandleByName(queues::cmd));
+
+    dynamic_cast<ServiceBluetooth *>(service)->workerQueue = workerQueue;
     runLoop->setTriggerQueue(Worker::getQueueHandleByName(queues::btstack));
     bsp::BlueKitchen::getInstance()->qHandle = queues[queueIO_handle]->GetQueueHandle();
 }
@@ -147,12 +150,13 @@ auto BluetoothWorker::run() -> bool
 
 auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 {
-    bluetooth::Command::CommandPack pack{};
-    if (xQueueReceive(queue, static_cast<void *>(&pack), 0) != pdTRUE) {
-        LOG_ERROR("Queue receive failure!");
-        return false;
+    LOG_INFO("handle bluetooth command(s)");
+    while (auto cmd = workerQueue->peek()) {
+        if (cmd && (cmd->evt != nullptr)) {
+            controller->handle(*cmd->evt);
+            delete cmd->evt;
+        }
     }
-    controller->handle(*pack.evt);
     return true;
 }
 

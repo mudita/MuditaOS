@@ -8,14 +8,9 @@
 namespace bluetooth
 {
 
-    class Command
+    struct Command
     {
-      public:
-        struct CommandPack
-        {
-            std::unique_ptr<bt::evt::Base> evt;
-        };
-        CommandPack pack;
+        bt::evt::Base *evt = nullptr;
     };
 
 } // namespace bluetooth
