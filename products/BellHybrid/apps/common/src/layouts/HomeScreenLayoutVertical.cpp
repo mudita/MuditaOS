@@ -34,6 +34,7 @@ namespace gui
     {
         switch (state) {
         case app::home_screen::ViewState::Deactivated:
+            alarmActivatedDeactivatedScreen->image->set("big_no-alarm_W_G", {});
             alarmMainIcon->setVisible(false);
             alarmTopIcon->setStatus(AlarmIcon::Status::DEACTIVATED);
             setScreenMode(ScreenMode::Main);
@@ -55,6 +56,7 @@ namespace gui
             alarmActivatedDeactivatedScreen->image->set("big_alarm_W_G", {});
             break;
         case app::home_screen::ViewState::Activated:
+            alarmActivatedDeactivatedScreen->image->set("big_alarm_W_G", {});
             alarmMainIcon->setVisible(true);
             alarmMainIcon->setStatus(AlarmIcon::Status::ACTIVATED);
             alarmTopIcon->setStatus(AlarmIcon::Status::ACTIVATED);
