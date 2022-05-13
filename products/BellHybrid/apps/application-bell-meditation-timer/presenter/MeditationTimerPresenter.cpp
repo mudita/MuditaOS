@@ -42,7 +42,7 @@ namespace app::meditation
     std::uint8_t MeditationTimerPresenter::getCurrentValue()
     {
         const auto value = settings->getValue(meditationDBRecordName, settings::SettingsScope::AppLocal);
-        auto defTimer    = utils::getNumericValue<std::uint8_t>(value);
+        auto defTimer    = utils::getNumericValue<std::uint32_t>(value);
         if (defTimer == emptyValue) {
             defTimer = defaultValue;
         }
