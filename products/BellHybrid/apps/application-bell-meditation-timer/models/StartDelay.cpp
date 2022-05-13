@@ -20,7 +20,7 @@ namespace app::meditation::models
     {
         const auto value = settings.getValue(start_delay_db);
         if (value.empty()) {
-            return 0;
+            return 30;
         }
         return utils::getNumericValue<std::uint32_t>(value);
     }

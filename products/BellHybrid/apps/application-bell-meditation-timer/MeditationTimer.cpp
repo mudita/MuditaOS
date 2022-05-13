@@ -53,11 +53,10 @@ namespace app
 
     void MeditationTimer::createUserInterface()
     {
-        windowsFactory.attach(
-            meditation::MeditationMainWindow::defaultName, [this](ApplicationCommon *app, const std::string &name) {
-                auto presenter = std::make_unique<app::meditation::MeditationTimerPresenter>(app, settings.get());
-                return std::make_unique<meditation::MeditationMainWindow>(app);
-            });
+        windowsFactory.attach("unused", [this](ApplicationCommon *app, const std::string &name) {
+            auto presenter = std::make_unique<app::meditation::MeditationTimerPresenter>(app, settings.get());
+            return std::make_unique<meditation::MeditationMainWindow>(app);
+        });
 
         windowsFactory.attach(meditation::SettingsWindow::name,
                               [this](ApplicationCommon *app, const std::string &name) {
@@ -72,7 +71,7 @@ namespace app
         });
 
         windowsFactory.attach(
-            meditation::MeditationTimerWindow::name, [this](ApplicationCommon *app, const std::string &name) {
+            meditation::MeditationMainWindow::defaultName, [this](ApplicationCommon *app, const std::string &name) {
                 auto presenter = std::make_unique<app::meditation::MeditationTimerPresenter>(app, settings.get());
                 return std::make_unique<meditation::MeditationTimerWindow>(app, std::move(presenter));
             });
