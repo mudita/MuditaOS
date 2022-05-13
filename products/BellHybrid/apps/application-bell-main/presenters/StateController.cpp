@@ -186,6 +186,10 @@ namespace app::home_screen
                 presenter.spawnTimer(defaultAlarmSetTime);
                 presenter.incAlarmMinute();
             };
+
+            auto revertChanges = [](AbstractView &view, AbstractAlarmModel &alarmModel) {
+                view.setAlarmTime(alarmModel.getAlarmTime());
+            };
         } // namespace AlarmEdit
 
         namespace WaitForConfirmation
@@ -314,12 +318,12 @@ namespace app::home_screen
                                              "DeactivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "DeactivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
                                              "DeactivatedEdit"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
-                                             "DeactivatedEdit"_s + event<Events::Timer> = "Deactivated"_s,
+                                             "DeactivatedEdit"_s + event<Events::Timer> / AlarmEdit::revertChanges = "Deactivated"_s,
                                              "DeactivatedEdit"_s + event<Events::RotateLeftPress> / AlarmEdit::processRotateLeft,
                                              "DeactivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
                                              "DeactivatedEdit"_s + event<Events::DeepUpPress> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
                                              "DeactivatedEdit"_s + event<Events::LightPress> / Helpers::setNewAlarmTime = "WaitForConfirmation"_s,
-                                             "DeactivatedEdit"_s + event<Events::BackPress> = "Deactivated"_s,
+                                             "DeactivatedEdit"_s + event<Events::BackPress> / AlarmEdit::revertChanges = "Deactivated"_s,
                                              "DeactivatedEdit"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
 
                                              "WaitForConfirmation"_s + sml::on_entry<_> / WaitForConfirmation::entry,
