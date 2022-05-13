@@ -158,7 +158,20 @@ namespace utils
         if (value.empty()) {
             return {};
         }
+
         T ret;
+        if constexpr (std::is_same<uint8_t, T>::value || std::is_same<int8_t, T>::value) {
+            try {
+                ret = std::stoi(value);
+            }
+            catch (const std::exception &e) {
+                LOG_INFO("Invalid input value: %s", e.what());
+                ret = 0;
+            }
+
+            return ret;
+        }
+
         std::istringstream(value) >> ret;
         return ret;
     }
