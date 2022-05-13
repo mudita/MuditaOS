@@ -11,6 +11,7 @@
 #include "queries/calllog/QueryCalllogGet.hpp"
 #include "queries/calllog/QueryCalllogGetCount.hpp"
 #include "queries/calllog/QueryCalllogRemove.hpp"
+#include "queries/calllog/QueryCalllogDeleteAll.hpp"
 #include "queries/calllog/QueryCalllogGetByContactID.hpp"
 
 #include <cassert>
@@ -250,6 +251,11 @@ bool CalllogRecordInterface::SetAllRead()
     return calllogDB->calls.SetAllRead();
 }
 
+bool CalllogRecordInterface::DeleteAll()
+{
+    return calllogDB->calls.DeleteAll();
+}
+
 std::unique_ptr<db::QueryResult> CalllogRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
     if (typeid(*query) == typeid(db::query::CalllogGet)) {
@@ -260,6 +266,9 @@ std::unique_ptr<db::QueryResult> CalllogRecordInterface::runQuery(std::shared_pt
     }
     else if (typeid(*query) == typeid(db::query::calllog::SetAllRead)) {
         return setAllReadQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::calllog::DeleteAll)) {
+        return deleteAllQuery(query);
     }
     else if (typeid(*query) == typeid(db::query::CalllogGetCount)) {
         return getCountQuery(query);
@@ -306,6 +315,14 @@ std::unique_ptr<db::QueryResult> CalllogRecordInterface::setAllReadQuery(std::sh
 {
     auto db_result = SetAllRead();
     auto response  = std::make_unique<db::query::calllog::SetAllReadResult>(db_result);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> CalllogRecordInterface::deleteAllQuery(std::shared_ptr<db::Query> query)
+{
+    auto db_result = DeleteAll();
+    auto response  = std::make_unique<db::query::calllog::DeleteAllResult>(db_result);
     response->setRequestQuery(query);
     return response;
 }
