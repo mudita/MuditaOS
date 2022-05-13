@@ -163,19 +163,108 @@ TEST_CASE("Converts enum to string")
 
 TEST_CASE("Get value from string")
 {
-    SECTION("UInt32_t")
+    SECTION("uint8_t")
+    {
+        std::string testString = "10";
+        const auto testValue   = utils::getNumericValue<uint8_t>(testString);
+        REQUIRE(testValue == 10);
+    }
+
+    SECTION("uint16_t")
+    {
+        std::string testString = "10";
+        const auto testValue   = utils::getNumericValue<uint16_t>(testString);
+        REQUIRE(testValue == 10);
+    }
+
+    SECTION("uint32_t")
     {
         std::string testString = "10";
         const auto testValue   = utils::getNumericValue<uint32_t>(testString);
         REQUIRE(testValue == 10);
     }
 
+    SECTION("uint64_t")
+    {
+        std::string testString = "10";
+        const auto testValue   = utils::getNumericValue<uint64_t>(testString);
+        REQUIRE(testValue == 10);
+    }
+
+    SECTION("int8_t")
+    {
+        std::string positiveString = "10";
+        const auto positiveValue   = utils::getNumericValue<int8_t>(positiveString);
+        REQUIRE(positiveValue == 10);
+
+        std::string negativeString = "-10";
+        const auto negativeValue   = utils::getNumericValue<int8_t>(negativeString);
+        REQUIRE(negativeValue == -10);
+    }
+
+    SECTION("int16_t")
+    {
+        std::string positiveString = "10";
+        const auto positiveValue   = utils::getNumericValue<int16_t>(positiveString);
+        REQUIRE(positiveValue == 10);
+
+        std::string negativeString = "-10";
+        const auto negativeValue   = utils::getNumericValue<int16_t>(negativeString);
+        REQUIRE(negativeValue == -10);
+    }
+
+    SECTION("int32_t")
+    {
+        std::string positiveString = "10";
+        const auto positiveValue   = utils::getNumericValue<int32_t>(positiveString);
+        REQUIRE(positiveValue == 10);
+
+        std::string negativeString = "-10";
+        const auto negativeValue   = utils::getNumericValue<int32_t>(negativeString);
+        REQUIRE(negativeValue == -10);
+    }
+
+    SECTION("int64_t")
+    {
+        std::string positiveString = "10";
+        const auto positiveValue   = utils::getNumericValue<int64_t>(positiveString);
+        REQUIRE(positiveValue == 10);
+
+        std::string negativeString = "-10";
+        const auto negativeValue   = utils::getNumericValue<int64_t>(negativeString);
+        REQUIRE(negativeValue == -10);
+    }
+
     SECTION("float")
     {
-        std::string testString = "1.f";
+        std::string testString = "1.5f";
         const auto testValue   = utils::getNumericValue<float>(testString);
-        Approx target          = Approx(1.f).margin(.01f);
+        Approx target          = Approx(1.5f).margin(.01f);
         REQUIRE(testValue == target);
+    }
+
+    SECTION("double")
+    {
+        std::string testString = "1.5";
+        const auto testValue   = utils::getNumericValue<double>(testString);
+        Approx target          = Approx(1.5).margin(.01);
+        REQUIRE(testValue == target);
+    }
+
+    SECTION("long double")
+    {
+        std::string testString = "1.5";
+        const auto testValue   = utils::getNumericValue<long double>(testString);
+        Approx target          = Approx(1.5).margin(.01);
+        REQUIRE(testValue == target);
+    }
+
+    SECTION("invalid stoi argument")
+    {
+        constexpr uint8_t fallbackDefault = 0;
+        std::string testString            = "+-10";
+        const auto testValue              = utils::getNumericValue<uint8_t>(testString);
+        REQUIRE(testValue == fallbackDefault);
     }
 }
 
