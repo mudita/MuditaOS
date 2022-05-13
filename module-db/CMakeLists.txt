@@ -63,6 +63,7 @@ set(SOURCES
         queries/alarm_events/QueryAlarmEventsGetInRange.cpp
         queries/alarm_events/QueryAlarmEventsRemove.cpp
         queries/alarm_events/QueryAlarmEventsToggleAll.cpp
+        queries/calllog/QueryCalllogDeleteAll.cpp
         queries/calllog/QueryCalllogGet.cpp
         queries/calllog/QueryCalllogGetByContactID.cpp
         queries/calllog/QueryCalllogGetCount.cpp

@@ -35,6 +35,7 @@
         {"name":"release.tgz", "tarfile": "./image/assets/images/desktop-menu/menu_tools_calculator_W_G.vpi", "output": "assets/images/desktop-menu/menu_tools_calculator_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/dot_12px_hard_alpha_W_M.vpi", "output": "assets/images/dot_12px_hard_alpha_W_M.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/label_rectangle_W_M.vpi", "output": "assets/images/label_rectangle_W_M.vpi" },
+        {"name":"release.tgz", "tarfile": "./image/assets/images/delete_24px_W_G.vpi", "output": "assets/images/delete_24px_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/arrow_right_24px_W_G.vpi", "output": "assets/images/arrow_right_24px_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/arrow_right_32px_W_G.vpi", "output": "assets/images/arrow_right_32px_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/phonebook/phonebook_empty_grey_circle_speed_dial.vpi", "output": "assets/images/phonebook/phonebook_empty_grey_circle_speed_dial.vpi" },

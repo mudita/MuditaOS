@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogTable.hpp"
@@ -225,4 +225,9 @@ uint32_t CalllogTable::countByFieldId(const char *field, uint32_t id)
 bool CalllogTable::SetAllRead()
 {
     return db->execute("UPDATE calls SET isRead = 1;");
+}
+
+bool CalllogTable::DeleteAll()
+{
+    return db->execute("DELETE FROM calls;");
 }

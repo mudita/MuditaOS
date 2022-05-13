@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,12 +18,14 @@ namespace gui
         gui::ListView *list                        = nullptr;
 
         gui::VBox *emptyLayout = nullptr;
+        bool isEmpty() const;
 
       public:
         explicit CallLogMainWindow(app::ApplicationCommon *app);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onInput(InputEvent const &inputEvent) override;
 
         void rebuild() override;
         void buildInterface() override;

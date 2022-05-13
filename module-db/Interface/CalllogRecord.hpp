@@ -55,6 +55,7 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
     uint32_t GetCount() override final;
     uint32_t GetCount(EntryState state);
     bool SetAllRead();
+    bool DeleteAll();
 
     std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
@@ -75,6 +76,7 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
 
     std::unique_ptr<db::QueryResult> getQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> setAllReadQuery(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::QueryResult> deleteAllQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> getCountQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> removeQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> getByContactIDQuery(std::shared_ptr<db::Query> query);
