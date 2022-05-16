@@ -74,13 +74,14 @@ namespace app::bell_settings
     void TimeUnitsModel::saveData()
     {
         const auto newTime = timeSetListItem->timeSetFmtSpinner->getTime();
-        const auto time_tm = std::localtime(&newTime);
+        auto time_tm       = std::localtime(&newTime);
         const auto newFmt  = timeFmtSetListItem->getTimeFmt();
         LOG_INFO("Setting new time: %d:%d fmt: %s",
                  time_tm->tm_hour,
                  time_tm->tm_min,
                  utils::time::Locale::format(newFmt).c_str());
-        sendRtcUpdateTimeMessage(newTime);
+        time_tm->tm_sec = 0;
+        sendRtcUpdateTimeMessage(std::mktime(time_tm));
         sendTimeFmtUpdateMessage(newFmt);
     }
 
