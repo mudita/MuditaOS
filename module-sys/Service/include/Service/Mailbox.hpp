@@ -47,9 +47,9 @@ template <typename T, typename Base = cpp_freertos::Thread *, typename Lock = Se
         if (queue_.empty()) {
             return {};
         }
-        auto el = queue_.front();
+        auto el = std::move(queue_.front());
         queue_.pop_front();
-        return {el};
+        return std::optional<T>(std::move(el));
     }
 
     T pop(uint32_t timeout = portMAX_DELAY)

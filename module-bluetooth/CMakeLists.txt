@@ -34,6 +34,12 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/command/Command.cpp
         )
 
+if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    add_subdirectory(Bluetooth/doc/uml/)
+endif()
+
+
+
 include(lib/btstack.cmake)
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_DIR_SOURCES})
 

@@ -73,7 +73,6 @@ namespace bluetooth
 
     struct PostInit
     {
-        // TODO shoundn't this be in driver?
         void operator()(DeviceRegistrationFunction registerDevice, InitializationState &data)
         {
             if (const auto status = registerDevice(); status != Error::Success) {
@@ -92,17 +91,6 @@ namespace bluetooth
             }
         }
     } static StartDriver;
-
-    struct Setup
-    {
-      public:
-        auto operator()() const
-        {
-            using namespace sml;
-            return make_transition_table(*"Setup"_s + on_entry<_>[!isInit] / (InitDevicesList, InitDriver, PostInit),
-                                         "Setup"_s / StartDriver = X);
-        }
-    };
 
     struct HandleOn
     {
@@ -140,9 +128,9 @@ namespace bluetooth
 
     struct HandleUnpair
     {
-        void operator()(std::shared_ptr<AbstractDriver> driver, const bt::evt::Unpair &event)
+        void operator()(std::shared_ptr<AbstractCommandHandler> handler, const bt::evt::Unpair &event)
         {
-            driver->unpair(event.device);
+            handler->unpair(event.device);
         }
     } constexpr HandleUnpair;
 
@@ -303,39 +291,79 @@ namespace bluetooth
         }
     } constexpr StopAudio;
 
+    struct Setup
+    {
+      public:
+        auto operator()() const
+        {
+            using namespace sml;
+            return make_transition_table(*"Setup"_s + on_entry<_>[!isInit] / (InitDevicesList, InitDriver, PostInit),
+                                         "Setup"_s / StartDriver = X);
+        }
+    };
+
+    struct Call
+    {
+        auto operator()() const
+        {
+            using namespace sml;
+            // clang-format off
+            return make_transition_table(
+                *"CallSetup"_s + event<bt::evt::StartRinging> / StartRinging = "CallRinging"_s,
+                "CallSetup"_s + event<bt::evt::StartRouting> / InitializeCall = "CallInitiated"_s,
+                "CallSetup"_s + event<bt::evt::CallStarted> / CallStarted = "CallInitiated"_s,
+                "CallSetup"_s + event<bt::evt::IncomingCallNumber> / (StartRinging, IncomingCall)  = "CallRinging"_s,
+
+                "CallRinging"_s + event<bt::evt::StopRinging> / StopRinging = "CallDropped"_s,
+                "CallRinging"_s + event<bt::evt::CallAnswered> / CallAnswered = "CallInProgress"_s,
+                "CallRinging"_s + event<bt::evt::CallTerminated> / TerminateCall = "CallDropped"_s,
+
+                "CallInitiated"_s + event<bt::evt::CallAnswered> / CallAnswered = "CallInProgress"_s,
+               "CallInitiated"_s + event<bt::evt::StopRinging> / StopRinging = "CallDropped"_s,
+               "CallInitiated"_s + event<bt::evt::CallTerminated> / TerminateCall = "CallDropped"_s,
+                "CallInitiated"_s + event<bt::evt::IncomingCallNumber> / IncomingCall= "CallInitiated"_s,
+
+                "CallInProgress"_s + event<bt::evt::CallTerminated> / TerminateCall = "CallDropped"_s,
+
+                "CallDropped"_s = X
+
+            );
+        }
+    };
+
+    class Idle;
     struct On
     {
         auto operator()() const
         {
-            auto isInit = [](InitializationState &data) { return data.isInitDone; };
-
+            auto forwardEvent = [](const auto &ev, auto &sm, auto &deps, auto &subs){sm.process_event(ev,deps,subs);};
             using namespace sml;
             // clang-format off
                 return make_transition_table(
-                       *"Idle"_s + event<bt::evt::StartScan>[isInit] / HandleOn = "Idle"_s,
-                       "Idle"_s + event<bt::evt::StopScan>[isInit] / HandleOff = "Idle"_s,
-                       "Idle"_s + event<bt::evt::Pair>[isInit] / HandlePair = "Idle"_s,
-                       "Idle"_s + event<bt::evt::Unpair>[isInit and Connected] / (HandleDisconnect, HandleUnpair) = "Idle"_s,
-                       "Idle"_s + event<bt::evt::Unpair>[isInit] / (HandleUnpair, HandleDrop) = "Idle"_s,
+                        *state<Idle> + event<bt::evt::StartScan> / HandleOn = state<Idle>,
+                        state<Idle> + event<bt::evt::StopScan> / HandleOff = state<Idle>,
+                        state<Idle> + event<bt::evt::Pair> / HandlePair = state<Idle>,
+                        state<Idle> + event<bt::evt::Unpair>[Connected] / (HandleDisconnect, HandleUnpair) = state<Idle>,
+                        state<Idle> + event<bt::evt::Unpair>[not Connected] / (HandleUnpair, HandleDrop) = state<Idle>,
 
-                       "Idle"_s + event<bt::evt::VisibilityOn> / HandleSetVisibility = "Idle"_s,
-                       "Idle"_s + event<bt::evt::VisibilityOff> / HandleUnsetVisibility = "Idle"_s,
-                       "Idle"_s + event<bt::evt::ConnectAudio> / EstablishAudioConnection = "Idle"_s,
+                        state<Idle> + event<bt::evt::VisibilityOn> / HandleSetVisibility = state<Idle>,
+                        state<Idle> + event<bt::evt::VisibilityOff> / HandleUnsetVisibility = state<Idle>,
+                        state<Idle> + event<bt::evt::ConnectAudio> / EstablishAudioConnection = state<Idle>,
 
-                       "Idle"_s + event<bt::evt::StartRinging> / StartRinging = "Idle"_s,
-                       "Idle"_s + event<bt::evt::StopRinging> / StopRinging = "Idle"_s,
-                       "Idle"_s + event<bt::evt::StartRouting> /InitializeCall = "Idle"_s,
-                       "Idle"_s + event<bt::evt::CallAnswered> / CallAnswered = "Idle"_s,
-                       "Idle"_s + event<bt::evt::CallTerminated> / TerminateCall = "Idle"_s,
-                       "Idle"_s + event<bt::evt::CallStarted>/ CallStarted = "Idle"_s,
-                       "Idle"_s + event<bt::evt::IncomingCallNumber> / IncomingCall= "Idle"_s,
-                       "Idle"_s + event<bt::evt::SignalStrengthData> / SignalStrength = "Idle"_s,
-                       "Idle"_s + event<bt::evt::OperatorNameData>/  SetOperatorName = "Idle"_s,
-                       "Idle"_s + event<bt::evt::BatteryLevelData>/ SetBatteryLevel = "Idle"_s,
-                       "Idle"_s + event<bt::evt::NetworkStatusData> / SetNetworkStatus = "Idle"_s,
-                       "Idle"_s + event<bt::evt::StartStream>/ StartAudio = "Idle"_s,
-                       "Idle"_s + event<bt::evt::StopStream>/ StopAudio = "Idle"_s
-                       );
+                        state<Idle> + event<bt::evt::SignalStrengthData> / SignalStrength = state<Idle>,
+                        state<Idle> + event<bt::evt::OperatorNameData>/  SetOperatorName = state<Idle>,
+                        state<Idle> + event<bt::evt::BatteryLevelData>/ SetBatteryLevel = state<Idle>,
+                        state<Idle> + event<bt::evt::NetworkStatusData> / SetNetworkStatus = state<Idle>,
+                        state<Idle> + event<bt::evt::StartStream>/ StartAudio = state<Idle>,
+                        state<Idle> + event<bt::evt::StopStream>/ StopAudio = state<Idle>,
+
+                        state<Idle> + event<bt::evt::StartRouting> / forwardEvent= state<Call>,
+
+                        state<Idle> + event<bt::evt::IncomingCallNumber>  / forwardEvent  = state<Call>,
+                        state<Idle> + event<bt::evt::CallStarted> / forwardEvent= state<Call>,
+                        state<Call> = state<Idle> // this one is needed to go out from Call substate properly!
+
+                            );
             // clang-format on
         }
     };
@@ -369,7 +397,8 @@ namespace bluetooth
             using namespace sml;
             // clang-format off
                 return make_transition_table(*"Off"_s + event<bt::evt::PowerOn> = state<Setup>,
-                                             state<Setup> = state<On>,
+                                             state<Setup>[isInit] = state<On>,
+                                             state<Setup>[not isInit] = "Restart"_s,
                                              state<Setup> + exception<InitializationError> / printInitError = "Off"_s,
 
                                              state<On> + event<bt::evt::PowerOff> / TurnOff = "Off"_s,

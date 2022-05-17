@@ -158,14 +158,13 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
     LOG_INFO("handle bluetooth command(s)");
     xQueueReceive(queue, nullptr, 0);
     while (not workerQueue->empty()) {
-        auto cmd = workerQueue->peek();
-        if (cmd == std::nullopt) {
+        auto command = workerQueue->peek();
+        if (command == std::nullopt) {
             LOG_ERROR("There was no data even with notification");
             break;
         }
-        if ((*cmd).evt != nullptr) {
-            controller->handle(*cmd->evt);
-            delete cmd->evt;
+        if ((*command).event != nullptr) {
+            controller->handle(*command->event);
         }
     }
     return true;

@@ -10,7 +10,7 @@ namespace bluetooth
 
     struct Command
     {
-        bt::evt::Base *evt = nullptr;
+        std::unique_ptr<bt::evt::Base> event;
     };
 
 } // namespace bluetooth
