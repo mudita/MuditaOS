@@ -168,7 +168,8 @@ namespace app
                 stopIdleTimer();
             }
             else if (newWindowName == gui::window::name::bell_main_menu ||
-                     newWindowName == gui::window::name::bell_main_menu_dialog) {
+                     newWindowName == gui::window::name::bell_main_menu_dialog ||
+                     newWindowName == gui::BellBatteryStatusWindow::name) {
                 startIdleTimer();
                 clearPendingPopups();
             }
