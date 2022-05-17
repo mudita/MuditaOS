@@ -22,6 +22,7 @@ namespace app
 
       protected:
         void attachPopups(const std::vector<gui::popup::ID> &popupsList) override;
+        std::optional<gui::popup::Blueprint> popupBlueprintFallback(gui::popup::ID id) override;
         void startIdleTimer();
         void restartIdleTimer();
         void stopIdleTimer();
