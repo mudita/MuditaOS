@@ -90,9 +90,9 @@ namespace bluetooth
             auto it = devices().find(device.address);
             if (it == devices().end()) {
                 LOG_ERROR("device not found: %s", device.address_str());
+                return;
             }
-            // TODO just log
-            // return gap_dedicated_bonding(device.address, protectionLevel) == 0;
+            gap_dedicated_bonding(device.address, protectionLevel);
         }
     }
 

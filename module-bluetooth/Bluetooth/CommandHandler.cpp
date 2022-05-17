@@ -86,7 +86,7 @@ namespace bluetooth
         LOG_INFO("Pairing...");
         auto errorCode = Error::Code::Success;
         driver->pair(device);
-        // LOG_INFO("Pairing result: %s", magic_enum::enum_name(errorCode).data());
+        LOG_INFO("Pairing result: %s", magic_enum::enum_name(errorCode).data());
         return errorCode;
     }
     Error::Code CommandHandler::unpair(const DataVariant &data)
@@ -95,7 +95,7 @@ namespace bluetooth
         LOG_INFO("Unpairing...");
         const auto errorCode = Error::Code::Success;
         driver->unpair(device);
-        // LOG_INFO("Unpairing result: %s", magic_enum::enum_name(errorCode).data());
+        LOG_INFO("Unpairing result: %s", magic_enum::enum_name(errorCode).data());
         return errorCode;
     }
 
