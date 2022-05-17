@@ -210,10 +210,6 @@ namespace app
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
         std::unordered_map<manager::actions::ActionId, OnActionReceived> receivers;
-        void switchWindowPopup(const std::string &windowName,
-                               const gui::popup::Disposition &disposition,
-                               std::unique_ptr<gui::SwitchData> data = nullptr,
-                               SwitchReason reason                   = SwitchReason::SwitchRequest);
 
       public:
         sys::TimerHandle longPressTimer;
@@ -345,7 +341,7 @@ namespace app
         /// Method to register all possible popups to handle in application
         virtual void registerPopupBlueprints();
         /// fallback method  to get popup if none is added
-        std::optional<gui::popup::Blueprint> popupBlueprintFallback(gui::popup::ID id);
+        virtual std::optional<gui::popup::Blueprint> popupBlueprintFallback(gui::popup::ID id);
         /// Method used to register all windows and widgets in application
         virtual void createUserInterface() = 0;
         /// Method closing application's windows.
@@ -362,6 +358,10 @@ namespace app
         virtual void clearPendingPopups();
         virtual bool tryShowPopup();
         void abortPopup(gui::popup::ID id);
+        void switchWindowPopup(const std::string &windowName,
+                               const gui::popup::Disposition &disposition,
+                               std::unique_ptr<gui::SwitchData> data = nullptr,
+                               SwitchReason reason                   = SwitchReason::SwitchRequest);
 
         bool userInterfaceDBNotification(sys::Message *msg, const UiNotificationFilter &filter = nullptr);
         virtual gui::popup::Filter &getPopupFilter() const;
