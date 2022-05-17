@@ -30,7 +30,7 @@ namespace Log
 #if (!LOG_SENSITIVE_DATA_ENABLED)
             {"ServiceCellular", logger_level::LOGINFO},
 #endif
-            {"ServiceAntenna", logger_level::LOGERROR},
+            //            {"ServiceAntenna", logger_level::LOGERROR},
             {"ServiceAudio", logger_level::LOGINFO},
             {"ServiceBluetooth", logger_level::LOGINFO},
             {"ServiceBluetooth_w1", logger_level::LOGINFO},

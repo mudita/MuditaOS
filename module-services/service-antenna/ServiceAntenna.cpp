@@ -286,6 +286,7 @@ bool ServiceAntenna::switchAntennaStateHandler(void)
 
 bool ServiceAntenna::signalCheckStateHandler(void)
 {
+    LOG_INFO("Curretn signal strength = %" PRIu32, currentCsq);
     if (currentCsq <= antenna::signalTreshold) {
         LOG_INFO("Signal strength below the threshold (CSQ = %" PRIu32 ", Threshold = %" PRIu32 "). Switch antenna",
                  currentCsq,

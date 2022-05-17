@@ -1418,6 +1418,8 @@ bool ServiceCellular::handle_fatal_failure()
 
 bool ServiceCellular::handle_ready()
 {
+    //    AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+    //    cmux->selectAntenna(bsp::cellular::antenna::highBand);
     LOG_DEBUG("%s", priv->state->c_str());
     return true;
 }

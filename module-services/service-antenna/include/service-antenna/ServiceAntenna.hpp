@@ -32,7 +32,8 @@ namespace antenna
 
     const char *c_str(antenna::State state);
 
-    constexpr uint32_t signalTreshold          = 10;
+    constexpr uint32_t signalTreshold = 10; // produkcyjny
+                                            //    constexpr uint32_t signalTreshold          = 31; // wyłączony
     constexpr uint32_t connectionStatusTimeout = 60000;
 
     enum class lockState
