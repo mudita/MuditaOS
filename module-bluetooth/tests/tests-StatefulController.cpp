@@ -119,12 +119,11 @@ TEST_CASE("Given StatefulController when turn on then turned on")
 
     StatefulController::Impl controller(drive, processor, InitializerMock, sett, devs, profile);
 
+    using namespace boost::sml;
     controller.sm.process_event(bt::evt::PowerOn{});
+    REQUIRE(controller.sm.is(state<bluetooth::On>));
     controller.sm.process_event(bt::evt::PowerOff{});
-    // TODO assert driver initialized
-    // TODO test for some loaded devices with some other mockup
-    // TODO move machine to Impl and assert for next states
-    // using namespace boost::sml; REQUIRE(controller->impl.is("Shutdown"_s));
+    REQUIRE(controller.sm.is("Off"_s));
 }
 
 // TEST_CASE("pair")
