@@ -93,6 +93,16 @@ namespace app
         }
     }
 
+    std::optional<gui::popup::Blueprint> Application::popupBlueprintFallback(gui::popup::ID id)
+    {
+        popupBlueprint.registerBlueprint(
+            id, [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &p) -> bool {
+                switchWindowPopup(gui::popup::resolveWindowName(id), p->getDisposition(), nullptr, SwitchReason::Popup);
+                return true;
+            });
+        return *popupBlueprint.getBlueprint(id);
+    }
+
     sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)
     {
         onKeyPressed();
