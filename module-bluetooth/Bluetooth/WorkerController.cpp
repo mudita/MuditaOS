@@ -67,7 +67,6 @@ namespace bluetooth
     {
         pimpl->sm.process_event(evt);
     };
-    // TODO split TurnOn and PowerOn?
     void StatefulController::handle(const bt::evt::PowerOn &evt)
     {
         pimpl->sm.process_event(evt);

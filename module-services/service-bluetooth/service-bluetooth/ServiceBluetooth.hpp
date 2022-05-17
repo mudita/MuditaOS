@@ -90,7 +90,7 @@ class ServiceBluetooth : public sys::Service
     void ProcessCloseReason(sys::CloseReason closeReason) override;
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
-    void sendWorkerCommand(bt::evt::Base *command);
+    void sendWorkerCommand(std::unique_ptr<bt::evt::Base> command);
 
     void handleTurnOff();
 

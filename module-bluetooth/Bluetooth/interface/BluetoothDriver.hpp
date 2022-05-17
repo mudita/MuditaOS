@@ -21,7 +21,6 @@ namespace bluetooth
         [[nodiscard]] virtual auto run() -> Error::Code  = 0;
         [[nodiscard]] virtual auto stop() -> Error::Code = 0;
         [[nodiscard]] virtual auto scan() -> Error       = 0;
-        // TODO make bool again
         virtual void stopScan()                                             = 0;
         virtual void setVisibility(bool visibility)                         = 0;
         virtual void pair(Devicei device, std::uint8_t protectionLevel = 0) = 0;
