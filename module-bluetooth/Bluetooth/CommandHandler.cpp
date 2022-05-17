@@ -31,7 +31,7 @@ namespace bluetooth
 
     CommandHandler::CommandHandler(sys::Service *service,
                                    std::shared_ptr<bluetooth::SettingsHolder> settings,
-                                   std::shared_ptr<bluetooth::ProfileManager> profileManager,
+                                   std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
                                    std::shared_ptr<bluetooth::AbstractDriver> driver)
         : service{service}, settings{std::move(settings)}, profileManager{std::move(profileManager)}, driver{std::move(
                                                                                                           driver)}

@@ -108,8 +108,7 @@ struct Devicei : public Device
     DeviceState deviceState;
     bool isPairingSSP = false;
 
-    // TODO why explicit is a musthave in SML...
-    Devicei(std::string name = "");
+    explicit Devicei(std::string name = "");
     explicit Devicei(bd_addr_t &address);
     Devicei &operator=(const Devicei &d);
     Devicei(const Devicei &d);

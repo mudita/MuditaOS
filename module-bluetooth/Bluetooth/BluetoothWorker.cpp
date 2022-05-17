@@ -70,35 +70,40 @@ namespace
     };
 
     auto createStatefulController(sys::Service *service,
-                                  bluetooth::RunLoop *loop,
-                                  std::shared_ptr<bluetooth::SettingsHolder> settings,
-                                  std::shared_ptr<bluetooth::ProfileManager> profileManager,
+                                  std::shared_ptr<bluetooth::Driver> driver,
+                                  std::shared_ptr<bluetooth::CommandHandler> commandHandler,
+                                  const std::shared_ptr<bluetooth::SettingsHolder> &settings,
+                                  std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
                                   DeviceRegistration::OnLinkKeyAddedCallback &&onLinkKeyAddedCallback,
                                   std::shared_ptr<std::vector<Devicei>> pairedDevices)
     {
-        auto driver = std::make_shared<bluetooth::Driver>(loop->getRunLoopInstance(), service);
-        auto commandHandler =
-            std::make_unique<bluetooth::CommandHandler>(service, settings, std::move(profileManager), driver);
+        ;
+
         return std::make_unique<bluetooth::StatefulController>(
-            std::move(driver),
-            std::move(commandHandler),
-            DeviceRegistration{std::move(settings), std::move(onLinkKeyAddedCallback)},
-            std::move(settings),
-            std::move(pairedDevices));
+            driver,
+            commandHandler,
+            DeviceRegistration{settings, std::move(onLinkKeyAddedCallback)},
+            settings,
+            pairedDevices,
+            profileManager);
     }
 } // namespace
 
 BluetoothWorker::BluetoothWorker(sys::Service *service)
     : Worker(service, BluetoothWorkerStackDepth), service(service),
       profileManager(std::make_shared<bluetooth::ProfileManager>(service)),
-      settings(static_cast<ServiceBluetooth *>(service)->settingsHolder),
-      runLoop(std::make_unique<bluetooth::RunLoop>()), controller{createStatefulController(
-                                                           service,
-                                                           runLoop.get(),
-                                                           settings,
-                                                           profileManager,
-                                                           [this](const std::string &addr) { onLinkKeyAdded(addr); },
-                                                           pairedDevices)}
+      settings(dynamic_cast<ServiceBluetooth *>(service)->settingsHolder),
+      runLoop(std::make_unique<bluetooth::RunLoop>()),
+      driver(std::make_shared<bluetooth::Driver>(runLoop->getRunLoopInstance(), service)),
+      handler(std::make_shared<bluetooth::CommandHandler>(service, settings, profileManager, driver)),
+      controller{createStatefulController(
+          service,
+          driver,
+          handler,
+          settings,
+          profileManager,
+          [this](const std::string &addr) { onLinkKeyAdded(addr); },
+          pairedDevices)}
 {
     init({
         {queues::io, sizeof(bluetooth::Message), queues::queueLength},
@@ -151,8 +156,14 @@ auto BluetoothWorker::run() -> bool
 auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 {
     LOG_INFO("handle bluetooth command(s)");
-    while (auto cmd = workerQueue->peek()) {
-        if (cmd && (cmd->evt != nullptr)) {
+    xQueueReceive(queue, nullptr, 0);
+    while (not workerQueue->empty()) {
+        auto cmd = workerQueue->peek();
+        if (cmd == std::nullopt) {
+            LOG_ERROR("There was no data even with notification");
+            break;
+        }
+        if ((*cmd).evt != nullptr) {
             controller->handle(*cmd->evt);
             delete cmd->evt;
         }

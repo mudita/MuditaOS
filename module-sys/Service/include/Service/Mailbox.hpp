@@ -44,7 +44,9 @@ template <typename T, typename Base = cpp_freertos::Thread *, typename Lock = Se
     std::optional<T> peek()
     {
         cpp_freertos::LockGuard mlock(mutex_);
-        if (queue_.empty()) {}
+        if (queue_.empty()) {
+            return {};
+        }
         auto el = queue_.front();
         queue_.pop_front();
         return {el};
@@ -62,16 +64,6 @@ template <typename T, typename Base = cpp_freertos::Thread *, typename Lock = Se
         auto item = queue_.front();
         queue_.pop_front();
         return item;
-    }
-
-    void pop(T &item)
-    {
-        cpp_freertos::LockGuard mlock(mutex_);
-        while (queue_.empty()) {
-            lock.wait();
-        }
-        item = queue_.front();
-        queue_.pop_front();
     }
 
     void push_front(const T &item)
@@ -95,6 +87,11 @@ template <typename T, typename Base = cpp_freertos::Thread *, typename Lock = Se
         queue_.push_back(std::move(item));
         mutex_.Unlock();
         lock.signal();
+    }
+
+    bool empty()
+    {
+        return queue_.empty();
     }
 
   private:

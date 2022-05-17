@@ -106,6 +106,7 @@ namespace bluetooth
             LOG_INFO("BTstack up and running");
             bluetooth::KeyStorage::settings->setValue(bluetooth::Settings::State,
                                                       static_cast<int>(BluetoothStatus::State::On));
+            // TODO inform SM and process ON?
             if (powerOnCallback) {
                 powerOnCallback();
             }

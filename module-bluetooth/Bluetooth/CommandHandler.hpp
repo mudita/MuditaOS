@@ -42,7 +42,7 @@ namespace bluetooth
       public:
         explicit CommandHandler(sys::Service *service,
                                 std::shared_ptr<bluetooth::SettingsHolder> settings,
-                                std::shared_ptr<bluetooth::ProfileManager> profileManager,
+                                std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
                                 std::shared_ptr<bluetooth::AbstractDriver> driver);
 
         Error::Code scan() override;
@@ -59,7 +59,7 @@ namespace bluetooth
         std::shared_ptr<bluetooth::SettingsHolder> settings;
 
       public:
-        std::shared_ptr<bluetooth::ProfileManager> profileManager;
+        std::shared_ptr<bluetooth::BaseProfileManager> profileManager;
 
       private:
         std::shared_ptr<AbstractDriver> driver;

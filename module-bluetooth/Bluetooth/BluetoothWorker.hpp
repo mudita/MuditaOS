@@ -65,6 +65,12 @@ namespace bluetooth
 struct DeviceStore
 {};
 
+namespace bluetooth
+{
+    class Driver;
+    class CommandHandler;
+}; // namespace bluetooth
+
 class BluetoothWorker : private sys::Worker
 {
     enum WorkerEventQueues
@@ -112,5 +118,7 @@ class BluetoothWorker : private sys::Worker
     std::shared_ptr<bluetooth::SettingsHolder> settings;
     std::shared_ptr<std::vector<Devicei>> pairedDevices = std::make_shared<std::vector<Devicei>>();
     std::unique_ptr<bluetooth::RunLoop> runLoop;
+    std::shared_ptr<bluetooth::Driver> driver;
+    std::shared_ptr<bluetooth::CommandHandler> handler;
     std::unique_ptr<bluetooth::AbstractController> controller;
 };

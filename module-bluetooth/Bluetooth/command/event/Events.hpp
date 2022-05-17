@@ -7,6 +7,7 @@
 #include "EventStore.hpp"
 #include "module-utils/phonenumber/PhoneNumber.hpp"
 #include "AbstractController.hpp"
+#include "log/log.hpp"
 
 namespace bt::evt
 {
@@ -14,6 +15,9 @@ namespace bt::evt
     {
         virtual void dispatch(bluetooth::AbstractController *controler) const = 0;
         virtual ~Base()                                                       = default;
+
+      protected:
+        Base() = default;
     };
 
     struct StartScan : public Base
@@ -57,6 +61,7 @@ namespace bt::evt
         explicit ConnectAudio(const Devicei &dev) : device(dev)
         {}
         const Devicei device;
+
         void dispatch(bluetooth::AbstractController *controler) const override
         {
             controler->handle(*this);

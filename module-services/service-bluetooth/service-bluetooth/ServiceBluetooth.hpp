@@ -96,7 +96,7 @@ class ServiceBluetooth : public sys::Service
 
     std::shared_ptr<Mailbox<bluetooth::Command, QueueHandle_t, WorkerLock>> workerQueue;
     std::shared_ptr<bluetooth::SettingsHolder> settingsHolder;
-    bluetooth::ProfileManager *profileManagerPtr = nullptr;
+    bluetooth::BaseProfileManager *profileManagerPtr = nullptr;
 
   private:
     std::unique_ptr<BluetoothWorker> worker;

@@ -18,11 +18,17 @@ namespace bluetooth
     class StatefulController : public AbstractController
     {
       public:
-        StatefulController(std::shared_ptr<AbstractDriver> &&driver,
-                           std::shared_ptr<AbstractCommandHandler> &&handler,
-                           DeviceRegistrationFunction &&registerDevice,
-                           std::shared_ptr<bluetooth::SettingsHolder> &&settings,
-                           std::shared_ptr<std::vector<Devicei>> &&pairedDevices);
+        StatefulController(std::shared_ptr<AbstractDriver> driver,
+                           std::shared_ptr<AbstractCommandHandler> handler,
+                           DeviceRegistrationFunction registerDevice,
+                           std::shared_ptr<bluetooth::SettingsHolder> settings,
+                           std::shared_ptr<std::vector<Devicei>> pairedDevices,
+                           std::shared_ptr<bluetooth::BaseProfileManager> profileManager);
+        StatefulController()                                = delete;
+        StatefulController(const StatefulController &other) = delete;
+        StatefulController(StatefulController &&other) noexcept;
+        StatefulController &operator=(const StatefulController &other) = delete;
+        StatefulController &operator                                   =(StatefulController &&other) noexcept;
 
         ~StatefulController() noexcept override;
 
