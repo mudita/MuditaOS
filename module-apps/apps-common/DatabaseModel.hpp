@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -46,7 +46,7 @@ namespace app
                 return true;
             }
             else {
-                LOG_ERROR("Null pointer received from DB");
+                LOG_WARN("DB is empty");
                 return false;
             }
         }
