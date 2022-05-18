@@ -177,6 +177,7 @@ namespace gui
     {
         container.set(value);
         update();
+        invoke();
     }
 
     template <typename Container, typename Formatter>
