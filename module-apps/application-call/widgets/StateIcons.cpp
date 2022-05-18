@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallAppStyle.hpp"
@@ -19,7 +19,7 @@ namespace gui
         constexpr auto speakerImg    = "call_speaker";
         constexpr auto speakerOnImg  = "call_speaker_on";
         constexpr auto speakerStr    = "app_call_speaker";
-        constexpr auto speakerOnStr  = "app_call_speaker";
+        constexpr auto speakerOnStr  = "app_call_speaker_on";
 
         const StateIcon<AddContactIconState>::IconMap contactIconMap = {
             {AddContactIconState::ADD_CONTACT, {crossImg, addContactStr}}};
