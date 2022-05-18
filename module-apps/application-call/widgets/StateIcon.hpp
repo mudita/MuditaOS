@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,9 +16,9 @@ namespace gui
 {
     namespace icon
     {
-        constexpr uint32_t w = 100;
-        constexpr uint32_t h = 100;
-        constexpr uint32_t defaultSideMargin = 20;
+        constexpr uint32_t w                 = 150;
+        constexpr uint32_t h                 = 100;
+        constexpr uint32_t defaultSideMargin = 5;
     }     // namespace icon
 
     /// @brief Icon widget with custom predefined images and strings
