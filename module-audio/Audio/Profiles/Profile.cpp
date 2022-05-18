@@ -11,6 +11,7 @@
 
 #include "ProfilePlaybackHeadphones.hpp"
 #include "ProfilePlaybackLoudspeaker.hpp"
+#include "ProfilePlaybackEarspeaker.hpp"
 
 #include "ProfileRoutingEarspeaker.hpp"
 #include "ProfileRoutingHeadphones.hpp"
@@ -43,6 +44,10 @@ namespace audio
         case Type::PlaybackBluetoothA2DP:
             assert(vol);
             inst = std::make_unique<ProfilePlaybackBluetoothA2DP>(vol.value());
+            break;
+        case Type::PlaybackEarspeaker:
+            assert(gain && vol);
+            inst = std::make_unique<ProfilePlaybackEarspeaker>(10);
             break;
         case Type::RecordingBuiltInMic:
             assert(gain);

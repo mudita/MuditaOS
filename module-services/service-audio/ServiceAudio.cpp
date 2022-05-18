@@ -49,6 +49,7 @@ static constexpr std::initializer_list<std::pair<audio::DbPathElement, const cha
     {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackHeadphones}, defaultVolumeLow},
     {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
     {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackEarspeaker}, defaultVolumeHigh},
 
     {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::Idle}, defaultVolumeLow},
 

@@ -68,6 +68,7 @@ namespace audio
     audio::RetCode Operation::SwitchToPriorityProfile()
     {
         if (const auto priorityProfile = GetPriorityProfile(); priorityProfile.has_value()) {
+            LOG_ERROR("calling switch profile from priorityProfile");
             return SwitchProfile(priorityProfile.value());
         }
         return audio::RetCode::ProfileNotSet;

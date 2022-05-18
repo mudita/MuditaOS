@@ -44,6 +44,7 @@ namespace audio
             PlaybackLoudspeaker,
             PlaybackHeadphones,
             PlaybackBluetoothA2DP,
+            PlaybackEarspeaker,
 
             Idle,
 
