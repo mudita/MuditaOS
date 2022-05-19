@@ -129,7 +129,7 @@ namespace gui
         }
         else if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             presenter->powerOff();
-            return true;
+            return false;
         }
         return false;
     }
