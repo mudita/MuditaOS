@@ -65,9 +65,8 @@ namespace gui
 
     void AlarmDeactivatedWindow::returnToPreviousWindow()
     {
-        app::manager::Controller::sendAction(application,
-                                             app::manager::actions::AbortPopup,
-                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::AlarmActivated));
+        application->windowsStack().pop(popup::window::alarm_activated_window);
+
         if (application->windowsStack().pop(gui::window::name::bellAlarmSet)) {
             app::manager::Controller::sendAction(
                 application,
