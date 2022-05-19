@@ -98,7 +98,6 @@ namespace app
                      manager::actions::CallRejectedByOfflineNotification,
                      manager::actions::PhoneModeChanged,
                      manager::actions::ActivateCall,
-                     {manager::actions::AbortCall, manager::actions::ActionFlag::AcceptWhenInBackground},
                      manager::actions::HandleOutgoingCall,
                      manager::actions::HandleIncomingCall,
                      manager::actions::HandleCallerId,

@@ -25,7 +25,6 @@ namespace app::manager
             AutoLock,
             Launch,
             Call,
-            AbortCall,
             ActivateCall,
             HandleOutgoingCall,
             HandleIncomingCall,

@@ -36,6 +36,11 @@ namespace call::event
         sys::phone_modes::PhoneMode mode;
     };
 
+    struct TetheringChange
+    {
+        sys::phone_modes::Tethering tethering;
+    };
+
     struct OngoingTimer
     {};
 

@@ -58,4 +58,13 @@ namespace cellular
         }
         return cellular->phoneModeObserver->getCurrentPhoneMode();
     }
+
+    sys::phone_modes::Tethering Api::getTethering()
+    {
+        if (cellular == nullptr) {
+            throw std::runtime_error("call api not initialized");
+        }
+        return cellular->phoneModeObserver->isTetheringOn() ? sys::phone_modes::Tethering::On
+                                                            : sys::phone_modes::Tethering::Off;
+    }
 } // namespace cellular

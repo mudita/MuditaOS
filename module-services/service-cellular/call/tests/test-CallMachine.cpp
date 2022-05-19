@@ -80,7 +80,7 @@ namespace mocks
         return timer;
     }
 
-    auto api(bool dnd = false)
+    auto api(bool dnd = false, bool tethering = false)
     {
         fakeit::Mock<call::api::Api> api;
         fakeit::When(Method(api, answerIncommingCall)).AlwaysReturn(true);
@@ -89,6 +89,8 @@ namespace mocks
         fakeit::When(Method(api, areCallsFromFavouritesEnabled)).AlwaysReturn(true);
         fakeit::When(Method(api, getMode))
             .AlwaysReturn(dnd ? sys::phone_modes::PhoneMode::DoNotDisturb : sys::phone_modes::PhoneMode::Connected);
+        fakeit::When(Method(api, getTethering))
+            .AlwaysReturn(tethering ? sys::phone_modes::Tethering::On : sys::phone_modes::Tethering::Off);
         return api;
     }
 
@@ -110,7 +112,7 @@ namespace mocks
         call::Dependencies di{};
         std::shared_ptr<mocks::Sentinel> sentinel = std::make_shared<mocks::Sentinel>();
 
-        DIWrapper(bool dnd = false) : api(mocks::api(dnd))
+        DIWrapper(bool dnd = false, bool tethering = false) : api(mocks::api(dnd, tethering))
         {
             auto audio_p     = mock_to_shared<call::api::Audio>(&audio.get());
             auto multicast_p = mock_to_shared<call::api::Multicast>(&multicast.get());
@@ -398,4 +400,20 @@ TEST_CASE("test call exception abort")
     REQUIRE(machine->machine.process_event(call::event::Ended{}));
 
     fakeit::Verify(Method(di.multicast, notifyCallAborted)).Exactly(1);
+}
+
+// --------------
+// TEST TETHERING
+// --------------
+
+TEST_CASE("test call in tethering")
+{
+    auto number  = utils::PhoneNumber("+48700800900");
+    auto di      = mocks::DIWrapper(false, true);
+    auto machine = std::make_unique<call::StateMachine>(di.get());
+
+    REQUIRE(not machine->machine.process_event(call::event::RING{}));
+    REQUIRE(machine->machine.process_event(call::event::CLIP{number.getView()}));
+    fakeit::Verify(Method(di.audio, play)).Exactly(0);
+    fakeit::Verify(Method(di.api, rejectCall)).Exactly(1);
 }

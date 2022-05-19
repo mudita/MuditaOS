@@ -734,19 +734,12 @@ class CellularCallActiveNotification : public CellularNotificationMessage,
     }
 };
 
-class CellularCallAbortedNotification : public CellularNotificationMessage,
-                                        public app::manager::actions::ConvertibleToAction
+class CellularCallAbortedNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularCallAbortedNotification(const std::string &data = "")
         : CellularNotificationMessage(CellularNotificationMessage::Content::CallAborted, data)
     {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::AbortCall, std::make_unique<app::manager::actions::CallParams>());
-    }
 };
 
 class CellularPowerUpProcedureCompleteNotification : public CellularNotificationMessage

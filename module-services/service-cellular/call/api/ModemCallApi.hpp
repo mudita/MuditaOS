@@ -4,6 +4,8 @@
 #pragma once
 
 #include "PhoneModes/PhoneMode.hpp"
+#include "PhoneModes/Tethering.hpp"
+
 class CellularMux;
 class ServiceCellular;
 
@@ -17,6 +19,7 @@ namespace call::api
         virtual bool rejectCall()                     = 0;
         virtual bool areCallsFromFavouritesEnabled()  = 0;
         virtual sys::phone_modes::PhoneMode getMode() = 0;
+        virtual sys::phone_modes::Tethering getTethering() = 0;
         virtual ~Api()                                = default;
     };
 } // namespace call::api
@@ -38,5 +41,6 @@ namespace cellular
         bool rejectCall() override;
         bool areCallsFromFavouritesEnabled() override;
         sys::phone_modes::PhoneMode getMode() override;
+        sys::phone_modes::Tethering getTethering() override;
     };
 } // namespace cellular
