@@ -113,6 +113,15 @@ namespace call
         return true;
     }
 
+    bool Call::handle(const call::event::TetheringChange &change)
+    {
+        if (machine == nullptr) {
+            return false;
+        };
+        machine->call.tethering = change.tethering;
+        return true;
+    }
+
     bool Call::handle(const call::event::Answer &answer)
     {
         if (machine == nullptr) {

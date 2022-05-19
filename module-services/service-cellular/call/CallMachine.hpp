@@ -42,12 +42,21 @@ namespace call
         }
     } constexpr RING;
 
+    struct Tethering
+    {
+        bool operator()(CallData &call)
+        {
+            return call.tethering == sys::phone_modes::Tethering::On;
+        }
+    } Tethering;
+
     struct HandleInit
     {
         void operator()(Dependencies &di, CallData &call)
         {
             call      = CallData{};
             call.mode = di.modem->getMode();
+            call.tethering = di.modem->getTethering();
             di.sentinel->ReleaseMinimumFrequency();
             di.timer->stop();
         }
@@ -290,10 +299,11 @@ namespace call
             return make_transition_table(
                 *"Idle"_s + on_entry<_> / HandleInit,
 
-                "Idle"_s + boost::sml::event<evt::RING>[RING] / HandleRing                     = "RingDelay"_s,
-                "Idle"_s + boost::sml::event<evt::CLIP>[ClipConnected] / HandleClipWithoutRing = "HaveId"_s,
-                "Idle"_s + boost::sml::event<evt::CLIP>[ClipDND_OK] / HandleClipDND            = "HaveId"_s,
-                "Idle"_s + boost::sml::event<evt::CLIP>[ClipDND_NOK] / HandleDND_Reject        = "Idle"_s,
+                "Idle"_s + boost::sml::event<evt::RING>[RING and not Tethering] / HandleRing = "RingDelay"_s,
+
+                "Idle"_s + boost::sml::event<evt::CLIP>[Tethering or ClipDND_NOK] / HandleDND_Reject = "Idle"_s,
+                "Idle"_s + boost::sml::event<evt::CLIP>[ClipConnected] / HandleClipWithoutRing       = "HaveId"_s,
+                "Idle"_s + boost::sml::event<evt::CLIP>[ClipDND_OK] / HandleClipDND                  = "HaveId"_s,
                 // outgoing call: Pure is Ringing (called from: handleCellularRingingMessage)
                 "Idle"_s + boost::sml::event<evt::StartCall> / HandleStartCall = "Starting"_s,
 

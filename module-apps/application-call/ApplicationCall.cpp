@@ -81,16 +81,6 @@ namespace app
             showNotificationAndRestartCallFlow(NotificationType::Info, utils::translate("app_call_offline"));
             return actionHandled();
         });
-        addActionReceiver(manager::actions::AbortCall, [this](auto &&data) {
-            if (const auto state = getState(); state == Application::State::ACTIVE_FORGROUND) {
-                switchWindow(window::name_call);
-            }
-            else if (state == Application::State::ACTIVE_BACKGROUND) {
-                callModel->setState(app::call::CallState::None);
-                manager::Controller::finish(this);
-            }
-            return actionHandled();
-        });
         addActionReceiver(manager::actions::ActivateCall, [this](auto &&data) {
             switchWindow(window::name_call);
             return actionHandled();

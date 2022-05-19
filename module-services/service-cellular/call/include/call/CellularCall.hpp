@@ -36,6 +36,7 @@ namespace call
     {
         CalllogRecord record             = {};
         sys::phone_modes::PhoneMode mode = sys::phone_modes::PhoneMode::Connected;
+        sys::phone_modes::Tethering tethering = sys::phone_modes::Tethering::Off;
     };
 
     struct Dependencies
@@ -71,6 +72,7 @@ namespace call
         bool handle(const call::event::CLIP &);
         bool handle(const call::event::AudioRequest &);
         bool handle(const call::event::ModeChange &);
+        bool handle(const call::event::TetheringChange &change);
         bool handle(const call::event::OngoingTimer &);
         bool handle(const call::event::RingTimeout &);
         bool handle(const call::event::Ended &);

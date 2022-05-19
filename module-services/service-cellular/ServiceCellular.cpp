@@ -324,7 +324,9 @@ void ServiceCellular::registerMessageHandlers()
         }
         else {
             priv->tetheringHandler->disable();
-            logTetheringCalls();
+        }
+        if (ongoingCall != nullptr) {
+            ongoingCall->handle(call::event::TetheringChange{tethering});
         }
     });
 
@@ -2162,9 +2164,6 @@ auto ServiceCellular::handleCellularSetFlightModeMessage(sys::Message *msg) -> s
 auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
-    if (phoneModeObserver->isTetheringOn()) {
-        return std::make_shared<CellularResponseMessage>(hangUpCall());
-    }
     ongoingCall->handle(call::event::RING{});
     return std::make_shared<CellularResponseMessage>(true);
 }
@@ -2172,13 +2171,7 @@ auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::
 auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto message = static_cast<CellularCallerIdNotification *>(msg);
-    if (phoneModeObserver->isTetheringOn()) {
-        tetheringCalllog.push_back(CalllogRecord{CallType::CT_MISSED, message->getNubmer()});
-        return std::make_shared<CellularResponseMessage>(hangUpCallBusy());
-    }
-
     ongoingCall->handle(call::event::CLIP{message->getNubmer()});
-
     return std::make_shared<CellularResponseMessage>(true);
 }
 
@@ -2263,30 +2256,6 @@ auto ServiceCellular::tetheringTurnOnURC() -> bool
         }
     }
     return true;
-}
-
-auto ServiceCellular::logTetheringCalls() -> void
-{
-    if (!tetheringCalllog.empty()) {
-        for (auto callRecord : tetheringCalllog) {
-            auto call = DBServiceAPI::CalllogAdd(this, callRecord);
-            if (call.ID == DB_ID_NONE) {
-                LOG_ERROR("CalllogAdd failed");
-            }
-        }
-
-        std::vector<utils::PhoneNumber::View> numbers;
-        for (auto calllogRecord : tetheringCalllog) {
-            numbers.push_back(calllogRecord.phoneNumber);
-        }
-
-        DBServiceAPI::GetQuery(
-            this,
-            db::Interface::Name::Notifications,
-            std::make_unique<db::query::notifications::MultipleIncrement>(NotificationsRecord::Key::Calls, numbers));
-
-        tetheringCalllog.clear();
-    }
 }
 
 TaskHandle_t ServiceCellular::getTaskHandle()

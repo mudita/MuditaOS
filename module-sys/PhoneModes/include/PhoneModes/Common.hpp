@@ -5,15 +5,10 @@
 
 #include <Service/Message.hpp>
 #include "PhoneMode.hpp"
+#include "Tethering.hpp"
 
 namespace sys::phone_modes
 {
-    enum class Tethering
-    {
-        Off,
-        On
-    };
-
     class PhoneModeChanged : public DataMessage
     {
       public:
