@@ -1,7 +1,0 @@
-set target-charset ASCII
-set pagination off
-
-source .gdb_macros
-source tools/gdb_crash_extend.py
-source tools/misc/puregdb/puregdb.py
-
