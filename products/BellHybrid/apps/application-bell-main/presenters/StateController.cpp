@@ -546,6 +546,7 @@ namespace app::home_screen
         using namespace sml;
 
         if (not pimpl->sm->is("Init"_s)) {
+            presenter.detachTimer();
             pimpl->resetSM();
         }
     }
