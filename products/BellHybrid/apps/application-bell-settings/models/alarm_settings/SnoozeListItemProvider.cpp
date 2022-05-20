@@ -26,12 +26,7 @@ namespace app::bell_settings
 
         chimeIntervals.erase(std::remove_if(chimeIntervals.begin(),
                                             chimeIntervals.end(),
-                                            [chimeLength](const auto &e) {
-                                                if (e == chimeLength) {
-                                                    return true;
-                                                }
-                                                return e and ((chimeLength % e) != 0);
-                                            }),
+                                            [chimeLength](const auto &e) { return e >= chimeLength; }),
                              chimeIntervals.end());
 
         return chimeIntervals;
