@@ -398,8 +398,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleSignalStrengthUpdate(sys::Message *msgl)
     {
-        if ((state == State::ACTIVE_FORGROUND) && !isOnPhoneLockWindow() &&
-            getCurrentWindow()->updateSignalStrength()) {
+        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -407,8 +406,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleNetworkAccessTechnologyUpdate(sys::Message *msgl)
     {
-        if ((state == State::ACTIVE_FORGROUND) && !isOnPhoneLockWindow() &&
-            getCurrentWindow()->updateNetworkAccessTechnology()) {
+        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateNetworkAccessTechnology()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -451,7 +449,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleBatteryStatusChange()
     {
-        if ((state == State::ACTIVE_FORGROUND) && !isOnPhoneLockWindow() && getCurrentWindow()->updateBatteryStatus()) {
+        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateBatteryStatus()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -459,7 +457,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleUSBStatusChange()
     {
-        if ((state == State::ACTIVE_FORGROUND) && isOnPhoneLockWindow() && getCurrentWindow()->updateBatteryStatus()) {
+        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateBatteryStatus()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -737,7 +735,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleSimStateUpdateMessage(sys::Message *msgl)
     {
-        if (!isOnPhoneLockWindow() && getCurrentWindow()->updateSim()) {
+        if (getCurrentWindow()->updateSim()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -1040,10 +1038,5 @@ namespace app
     auto ApplicationCommon::getSimLockSubject() noexcept -> locks::SimLockSubject &
     {
         return simLockSubject;
-    }
-
-    bool ApplicationCommon::isOnPhoneLockWindow()
-    {
-        return getCurrentWindow()->getName() == gui::popup::window::phone_lock_window;
     }
 } /* namespace app */
