@@ -24,6 +24,10 @@ namespace Store
 {
     struct Battery
     {
+      private:
+        static bool updated;
+
+      public:
         enum class LevelState : std::uint8_t
         {
             Normal,
@@ -41,8 +45,16 @@ namespace Store
         } state            = State::Discharging;
         unsigned int level = 0;
 
+        /// @brief Returns const reference to Battery instance, used to read battery state
+        /// @return const Battery&
         static const Battery &get();
+
+        /// @brief Returns reference to Battery instance, used to change battery state
+        /// @return Battery&
         static Battery &modify();
+
+        static void setUpdated();
+        static bool takeUpdated();
     };
 
     enum class RssiBar : size_t

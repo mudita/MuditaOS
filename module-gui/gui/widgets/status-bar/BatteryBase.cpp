@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryBase.hpp"
@@ -13,7 +13,7 @@ namespace gui::status_bar
         setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Bottom));
     }
 
-    void BatteryBase::update(const Store::Battery &batteryContext)
+    bool BatteryBase::update(const Store::Battery &batteryContext)
     {
         switch (batteryContext.state) {
         case Store::Battery::State::Discharging:
@@ -28,5 +28,7 @@ namespace gui::status_bar
             showBatteryChargingDone();
             break;
         }
+
+        return Store::Battery::takeUpdated();
     }
 } // namespace gui::status_bar

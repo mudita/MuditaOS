@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -221,7 +221,8 @@ namespace gui::status_bar
 
         /// Show/hide battery status widget
         /// @param enabled true to show false to hide the widget
-        void showBattery(bool enabled);
+        /// @return true if screen refresh is required, false if not required
+        bool showBattery(bool enabled);
 
         /// Show/hide signal strenght widget
         /// @param enabled true to show false to hide the widget

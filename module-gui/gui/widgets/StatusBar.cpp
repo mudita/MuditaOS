@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <iomanip>
@@ -256,14 +256,17 @@ namespace gui::status_bar
         if (battery == nullptr) {
             return false;
         }
-        showBattery(configuration.isEnabled(Indicator::Battery));
-        return true;
+        return showBattery(configuration.isEnabled(Indicator::Battery));
     }
 
-    void StatusBar::showBattery(bool enabled)
+    bool StatusBar::showBattery(bool enabled)
     {
-        battery->update(Store::Battery::get());
+        const auto visibilityChanged = battery->isVisible() == enabled ? false : true;
         enabled ? battery->show() : battery->hide();
+        const auto stateChanged    = battery->update(Store::Battery::get());
+        const auto refreshRequired = stateChanged || visibilityChanged;
+
+        return refreshRequired;
     }
 
     void StatusBar::showBluetooth(bool enabled)

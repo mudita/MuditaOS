@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventStore.hpp"
@@ -11,6 +11,7 @@ namespace Store
     // if it grows bigger than these few variables - consider moving it to ram with i.e.
     // delayed construction singletone
     Battery battery;
+    bool Battery::updated = true;
 
     const Battery &Battery::get()
     {
@@ -19,7 +20,22 @@ namespace Store
 
     Battery &Battery::modify()
     {
+        Battery::setUpdated();
         return battery;
+    }
+
+    void Battery::setUpdated()
+    {
+        battery.updated = true;
+    }
+
+    bool Battery::takeUpdated()
+    {
+        if (battery.updated) {
+            battery.updated = false;
+            return true;
+        }
+        return false;
     }
 
     cpp_freertos::MutexStandard GSM::mutex;

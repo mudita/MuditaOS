@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,6 +17,6 @@ namespace gui::status_bar
 
       public:
         BatteryBase(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-        void update(const Store::Battery &batteryContext);
+        bool update(const Store::Battery &batteryContext);
     };
 } // namespace gui::status_bar
