@@ -7,6 +7,7 @@
 #include <FreeRTOS.h>
 #include <queue.h>
 
+#include <optional>
 #include <memory>
 #include <cstdint>
 
@@ -40,7 +41,7 @@ namespace hal::battery
         virtual ~AbstractBatteryCharger() = default;
 
         virtual Voltage getBatteryVoltage() const        = 0;
-        virtual SOC getSOC() const                       = 0;
+        virtual std::optional<SOC> getSOC() const        = 0;
         virtual ChargingStatus getChargingStatus() const = 0;
 
         static_assert(sizeof(Events) == sizeof(std::uint8_t),

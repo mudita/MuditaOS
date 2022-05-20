@@ -83,7 +83,7 @@ namespace hal::battery
         ~PureBatteryCharger();
 
         Voltage getBatteryVoltage() const final;
-        SOC getSOC() const final;
+        std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
 
         static BatteryWorkerQueue &getWorkerQueueHandle();
@@ -154,15 +154,15 @@ namespace hal::battery
     {
         return bsp::battery_charger::getVoltageFilteredMeasurement();
     }
-    AbstractBatteryCharger::SOC PureBatteryCharger::getSOC() const
+    std::optional<AbstractBatteryCharger::SOC> PureBatteryCharger::getSOC() const
     {
         const auto soc        = bsp::battery_charger::getBatteryLevel();
         const auto scaled_soc = scale_soc(soc);
         if (not scaled_soc) {
-            LOG_ERROR("SOC is out of valid range.");
-            return 0;
+            LOG_ERROR("SOC is out of valid range. SoC: %d", soc);
+            return std::nullopt;
         }
-        return *scaled_soc;
+        return scaled_soc;
     }
     AbstractBatteryCharger::ChargingStatus PureBatteryCharger::getChargingStatus() const
     {
