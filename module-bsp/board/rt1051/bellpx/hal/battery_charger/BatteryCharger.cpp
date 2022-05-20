@@ -56,14 +56,14 @@ namespace hal::battery
         ~BellBatteryCharger();
 
         Voltage getBatteryVoltage() const final;
-        SOC getSOC() const final;
+        std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
 
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
       private:
         void sendNotification(Events event);
-        SOC fetchBatterySOC() const;
+        std::optional<SOC> fetchBatterySOC() const;
         void pollFuelGauge();
         bool tryEnableCharging();
 
@@ -144,7 +144,7 @@ namespace hal::battery
         }
     }
 
-    AbstractBatteryCharger::SOC BellBatteryCharger::getSOC() const
+    std::optional<AbstractBatteryCharger::SOC> BellBatteryCharger::getSOC() const
     {
         return fetchBatterySOC();
     }
@@ -178,14 +178,14 @@ namespace hal::battery
             return ChargingStatus::PluggedNotCharging;
         }
     }
-    AbstractBatteryCharger::SOC BellBatteryCharger::fetchBatterySOC() const
+    std::optional<AbstractBatteryCharger::SOC> BellBatteryCharger::fetchBatterySOC() const
     {
         if (const auto soc = fuel_gauge.get_battery_soc(); const auto scaled_soc = scale_soc(*soc)) {
-            return *scaled_soc;
+            return scaled_soc;
         }
         else {
             LOG_ERROR("Error during fetching battery level");
-            return 0;
+            return std::nullopt;
         }
     }
     BellBatteryCharger::BatteryWorkerQueue &BellBatteryCharger::getWorkerQueueHandle()

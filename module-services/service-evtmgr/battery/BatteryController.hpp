@@ -28,6 +28,7 @@ namespace sevm::battery
 
       private:
         void update();
+        void updateSoC();
         void printCurrentState();
         sys::Service *service{nullptr};
         std::unique_ptr<hal::battery::AbstractBatteryCharger> charger;

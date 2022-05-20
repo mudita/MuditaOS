@@ -37,7 +37,7 @@ namespace hal::battery
         ~BatteryCharger();
 
         Voltage getBatteryVoltage() const final;
-        SOC getSOC() const final;
+        std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
 
       private:
@@ -78,7 +78,7 @@ namespace hal::battery
         return dummyBatteryVoltageLevel;
     }
 
-    AbstractBatteryCharger::SOC BatteryCharger::getSOC() const
+    std::optional<AbstractBatteryCharger::SOC> BatteryCharger::getSOC() const
     {
         return batteryLevel;
     }

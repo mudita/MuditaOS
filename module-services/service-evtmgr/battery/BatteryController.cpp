@@ -83,7 +83,7 @@ BatteryController::BatteryController(sys::Service *service, xQueueHandle notific
                        this->service->bus.sendUnicast(std::move(stateChangeMessage), service::name::system_manager);
                    }}
 {
-    Store::Battery::modify().level = charger->getSOC();
+    updateSoC();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
     batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
 
@@ -124,7 +124,7 @@ void sevm::battery::BatteryController::update()
     const auto soc           = Store::Battery::get().level;
     const auto chargingState = Store::Battery::get().state;
 
-    Store::Battery::modify().level = charger->getSOC();
+    updateSoC();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
 
     /// Send BatteryStatusChangeMessage only when battery SOC or charger state has changed
@@ -136,4 +136,12 @@ void sevm::battery::BatteryController::update()
     batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
 
     printCurrentState();
+}
+
+void sevm::battery::BatteryController::updateSoC()
+{
+    auto batteryLevel = charger->getSOC();
+    if (batteryLevel.has_value()) {
+        Store::Battery::modify().level = batteryLevel.value();
+    }
 }
