@@ -6,39 +6,39 @@
   "inputGain": 0,
   "inputPath": 1,
   "outputPath": 1,
-  "playbackPathGain": 2,
-  "playbackPathAtten": 2,
+  "playbackPathGain": 0,
+  "playbackPathAtten": 12,
   "filterParams": [
     {
       "filterType": "HighPass",
-      "frequency": 700,
+      "frequency": 300,
       "samplerate": 44100,
       "Q": 0.701,
+      "gain": 0
+    },
+    {
+      "filterType": "Parametric",
+      "frequency": 3000,
+      "samplerate": 44100,
+      "Q": 1,
       "gain": 10
     },
     {
-      "filterType": "LowPass",
-      "frequency": 4993.7,
-      "samplerate": 44100,
-      "Q": 0.701,
-      "gain": -5
-    },
-    {
-      "filterType": "LowPass",
+      "filterType": "None",
       "frequency": 6000,
       "samplerate": 44100,
       "Q": 0.701,
       "gain": 10
     },
     {
-      "filterType": "HighPass",
+      "filterType": "None",
       "frequency": 100.4,
       "samplerate": 44100,
       "Q": 0.701,
       "gain": 10
     },
     {
-      "filterType": "Notch",
+      "filterType": "None",
       "frequency": 1500.7,
       "samplerate": 44100,
       "Q": 0.701,

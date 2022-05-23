@@ -8,14 +8,14 @@
   "outputPath": 0,
   "filterParams": [
     {
-      "filterType": "HighPass",
+      "filterType": "None",
       "frequency": 997,
       "samplerate": 44100,
       "Q": 0.701,
       "gain": 0
     },
     {
-      "filterType": "LowPass",
+      "filterType": "None",
       "frequency": 4993.7,
       "samplerate": 44100,
       "Q": 0.701,
