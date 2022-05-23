@@ -36,14 +36,16 @@ namespace
 }
 
 EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &name)
-    : EventManagerCommon(logDumpFunction, name),
-      temperatureSource{hal::temperature::AbstractTemperatureSource::Factory::create()},
-      backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
+    : EventManagerCommon(logDumpFunction, name), backlightHandler(settings, this),
+      userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
 {
     buildKeySequences();
-    updateTemperature(*temperatureSource);
 
+#if CONFIG_ENABLE_TEMP == 1
+    temperatureSource = hal::temperature::AbstractTemperatureSource::Factory::create();
+    updateTemperature(*temperatureSource);
     onMinuteTick = [this](const time_t) { updateTemperature(*temperatureSource); };
+#endif
 }
 
 void EventManager::handleKeyEvent(sys::Message *msg)

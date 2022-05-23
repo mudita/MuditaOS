@@ -10,19 +10,22 @@ namespace hal::temperature
     class BellTemperatureSource : public AbstractTemperatureSource
     {
       public:
+        BellTemperatureSource()
+        {
+            bsp::bell_temp_sensor::init();
+        }
+        ~BellTemperatureSource()
+        {
+            bsp::bell_temp_sensor::deinit();
+        }
         Result read()
         {
-            temperature = bsp::bell_temp_sensor::readout();
-            return temperature;
+            return bsp::bell_temp_sensor::readout();
         }
-
-      private:
-        AbstractTemperatureSource::Temperature temperature{};
     };
 
     std::shared_ptr<AbstractTemperatureSource> AbstractTemperatureSource::Factory::create()
     {
-        bsp::bell_temp_sensor::init();
         return hal::impl::factory<BellTemperatureSource, AbstractTemperatureSource>();
     }
 } // namespace hal::temperature
