@@ -10,22 +10,22 @@
   "playbackPathAtten": 5,
   "filterParams": [
     {
-      "filterType": "HighPass",
-      "frequency": 307.3,
+      "filterType": "None",
+      "frequency": 100.2,
       "samplerate": 16000,
       "Q": 0.701,
       "gain": 0
     },
     {
-      "filterType": "LowPass",
-      "frequency": 5080.1,
+      "filterType": "None",
+      "frequency": 17996.2,
       "samplerate": 16000,
-      "Q": 0.847,
+      "Q": 0.701,
       "gain": 0
     },
     {
       "filterType": "None",
-      "frequency": 15975.7,
+      "frequency": 13984.7,
       "samplerate": 16000,
       "Q": 0.701,
       "gain": -10
@@ -40,7 +40,7 @@
     {
       "filterType": "None",
       "frequency": 1496.7,
-      "samplerate": 44100,
+      "samplerate": 16000,
       "Q": 0.701,
       "gain": -4
     }

@@ -28,6 +28,7 @@ using namespace audio;
 inline constexpr auto audioServiceStackSize = 1024 * 8;
 
 static constexpr auto defaultVolumeHigh              = "10";
+static constexpr auto defaultVolumeMid               = "7";
 static constexpr auto defaultVolumeLow               = "5";
 static constexpr auto defaultVolumeMuted             = "0";
 static constexpr auto defaultTrue                    = "1";
@@ -71,9 +72,9 @@ static constexpr std::initializer_list<std::pair<audio::DbPathElement, const cha
     {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHSP}, defaultVolumeHigh},
     {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHFP}, defaultVolumeHigh},
 
-    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker}, defaultVolumeHigh},
-    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones}, defaultVolumeHigh},
-    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker}, defaultVolumeMid},
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones}, defaultVolumeMid},
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker}, defaultVolumeMid},
 
     // RECORDING
     {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RecordingBuiltInMic}, "200"},
