@@ -40,7 +40,10 @@ namespace app::meditation
         spinner = new UIntegerSpinner(
             UIntegerSpinner::range{presenter->getMinValue(), presenter->getMaxValue(), presenter->getStepValue()},
             gui::Boundaries::Fixed);
-        spinner->onValueChanged = [this](const auto val) { this->onValueChanged(val); };
+        spinner->onValueChanged = [this](const auto val) {
+            body->setMinMaxArrowsVisibility(spinner->is_min(), spinner->is_max());
+            bottomDescription->setText(presenter->getTimeUnitName(val));
+        };
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(app::meditationStyle::mtStyle::text::font);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -48,18 +51,14 @@ namespace app::meditation
         spinner->setFocusEdges(RectangleEdge::None);
         body->getCenterBox()->addWidget(spinner);
 
-        auto currentValue = presenter->getCurrentValue();
-        spinner->set_value(currentValue);
-        body->setMinMaxArrowsVisibility(currentValue == presenter->getMinValue(),
-                                        currentValue == presenter->getMaxValue());
-
         bottomDescription = new Label(body->lastBox);
         bottomDescription->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
         bottomDescription->setFont(app::meditationStyle::mtStyle::minute::font);
         bottomDescription->setEdges(RectangleEdge::None);
         bottomDescription->activeItem = false;
         bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        bottomDescription->setText(presenter->getTimeUnitName(spinner->value()));
+
+        spinner->set_value(presenter->getCurrentValue());
 
         setFocusItem(spinner);
         body->resize();
@@ -77,12 +76,5 @@ namespace app::meditation
         }
 
         return AppWindow::onInput(inputEvent);
-    }
-
-    void MeditationTimerWindow::onValueChanged(const std::uint32_t currentValue)
-    {
-        body->setMinMaxArrowsVisibility(currentValue == presenter->getMinValue(),
-                                        currentValue == presenter->getMaxValue());
-        bottomDescription->setText(presenter->getTimeUnitName(spinner->value()));
     }
 } // namespace app::meditation
