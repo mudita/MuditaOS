@@ -381,6 +381,11 @@ namespace app::manager
 
         auto currentlyFocusedApp = getFocusedApplication();
         if (currentlyFocusedApp == nullptr) {
+            if (auto appState = app->state(); appState == ApplicationCommon::State::INITIALIZING ||
+                                              appState == ApplicationCommon::State::ACTIVATING) {
+                LOG_INFO("No focused application at the moment, but %s is starting already...", app->name().c_str());
+                return false;
+            }
             LOG_INFO("No focused application at the moment. Starting new application...");
             onApplicationSwitch(*app, std::move(msg->getData()), msg->getWindow());
             startApplication(*app);
