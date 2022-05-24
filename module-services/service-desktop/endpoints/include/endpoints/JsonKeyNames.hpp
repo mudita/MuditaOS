@@ -108,13 +108,14 @@ namespace sdesktop::endpoints::json
 
     namespace usb
     {
-        inline constexpr auto config          = "config";
-        inline constexpr auto locked          = "locked";
-        inline constexpr auto unlocked        = "unlocked";
-        inline constexpr auto security        = "usbSecurity";
-        inline constexpr auto phoneLockCode   = "phoneLockCode";
-        inline constexpr auto phoneLockStatus = "phoneLockStatus";
-        inline constexpr auto phoneLockTime   = "phoneLockTime";
+        inline constexpr auto config                = "config";
+        inline constexpr auto locked                = "locked";
+        inline constexpr auto unlocked              = "unlocked";
+        inline constexpr auto security              = "usbSecurity";
+        inline constexpr auto phoneLockCode         = "phoneLockCode";
+        inline constexpr auto phoneLockStatus       = "phoneLockStatus";
+        inline constexpr auto phoneLockTime         = "phoneLockTime";
+        inline constexpr auto timeLeftToNextAttempt = "timeLeftToNextAttempt";
     } // namespace usb
 
 } // namespace sdesktop::endpoints::json
