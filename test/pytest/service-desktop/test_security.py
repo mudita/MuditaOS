@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import logging
 
@@ -192,6 +192,7 @@ def test_security_time_lock(harness):
     assert security_tester.confirm_phone_is_locked(), "Phone is unlocked, but should be locked!"
 
     assert time.time() < GetPhoneLockTime().run(harness).phoneLockTime <= time.time() + 30
+    assert GetPhoneLockTime().run(harness).timeLeftToNextAttempt <= 15
 
     """
     Attempt unlocking with default (correct) passcode while phone is time locked

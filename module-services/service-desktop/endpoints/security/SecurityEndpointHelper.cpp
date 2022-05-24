@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/security/SecurityEndpointHelper.hpp>
@@ -33,8 +33,10 @@ namespace sdesktop::endpoints
         }
         if (context.getBody()[json::messages::category].string_value() == json::usb::phoneLockTime) {
             if (auto phoneLockTime = getPhoneLockTime(context); phoneLockTime > std::time(nullptr)) {
-                context.setResponseBody(
-                    json11::Json::object({{json::usb::phoneLockTime, static_cast<int>(phoneLockTime)}}));
+                auto timeLeftToNextAttempt = phoneLockTime - std::time(nullptr);
+                context.setResponseBody(json11::Json::object(
+                    {{json::usb::phoneLockTime, static_cast<int>(phoneLockTime)},
+                     {json::usb::timeLeftToNextAttempt, static_cast<int>(timeLeftToNextAttempt)}}));
                 context.setResponseStatus(http::Code::OK);
             }
             else {
@@ -46,7 +48,7 @@ namespace sdesktop::endpoints
         return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
     }
 
-    auto SecurityEndpointHelper::processStatus(Context &context) -> http::Code
+    auto SecurityEndpointHelper::processStatus(Context & /*context*/) -> http::Code
     {
         auto desktopService = dynamic_cast<ServiceDesktop *>(owner);
         auto security       = desktopService->getSecurity()->getEndpointSecurity();
@@ -58,7 +60,7 @@ namespace sdesktop::endpoints
         return security == EndpointSecurity::Allow ? http::Code::NoContent : http::Code::Forbidden;
     }
 
-    auto SecurityEndpointHelper::getPhoneLockTime(Context &context) -> time_t
+    auto SecurityEndpointHelper::getPhoneLockTime(Context & /*context*/) -> time_t
     {
         auto desktopService = static_cast<ServiceDesktop *>(owner);
         return desktopService->getSecurity()->getPhoneLockTime();
