@@ -66,7 +66,9 @@ namespace gui
 
     void BellShortOptionWindow::onClose([[maybe_unused]] CloseReason reason)
     {
-        optionsList->onClose();
+        if (reason != CloseReason::Popup) {
+            optionsList->onClose();
+        }
     }
 
     void BellShortOptionWindow::onBeforeShow(ShowMode mode, SwitchData *data)
