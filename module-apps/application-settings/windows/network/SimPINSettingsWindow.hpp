@@ -4,20 +4,24 @@
 #pragma once
 
 #include <application-settings/windows/BaseSettingsWindow.hpp>
+#include <application-settings/presenter/network/SimPINSettingsPresenter.hpp>
 
 namespace gui
 {
-    class SimPINSettingsWindow : public BaseSettingsWindow
+    class SimPINSettingsWindow : public BaseSettingsWindow, public SimPINSettingsWindowContract::View
     {
       public:
-        explicit SimPINSettingsWindow(app::ApplicationCommon *app);
+        explicit SimPINSettingsWindow(app::ApplicationCommon *app,
+                                      std::unique_ptr<SimPINSettingsWindowContract::Presenter> simPINPresenter);
 
       private:
         auto buildOptionsList() -> std::list<Option> override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        void changePinState(bool &currentState);
+        void setNavbarCenterActive(bool state) override;
+        void setTitle(const UTF8 &text) override;
+        void refreshOptionsList() override;
 
-        bool pinIsOn = false;
+        std::unique_ptr<SimPINSettingsWindowContract::Presenter> presenter;
         OptionWindowDestroyer rai_destroyer = OptionWindowDestroyer(*this);
     };
 } // namespace gui

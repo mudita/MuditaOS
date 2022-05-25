@@ -30,6 +30,7 @@ target_sources(application-settings
         models/system/TechnicalInformationRepository.cpp
         models/bluetooth/BluetoothSettingsModel.cpp
         presenter/network/SimContactsImportWindowPresenter.cpp
+        presenter/network/SimPINSettingsPresenter.cpp
         presenter/system/SARInfoWindowPresenter.cpp
         presenter/system/TechnicalWindowPresenter.cpp
         widgets/advanced/ColorTestListItem.cpp
