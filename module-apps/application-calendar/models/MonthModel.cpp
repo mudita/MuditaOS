@@ -34,12 +34,7 @@ uint32_t MonthModel::getLastDay()
 
 uint32_t MonthModel::getFirstWeekOffset()
 {
-    if (this->firstWeekDayNumb == 0) {
-        return 6;
-    }
-    else {
-        return this->firstWeekDayNumb;
-    }
+    return this->firstWeekDayNumb;
 }
 
 std::vector<std::string> MonthModel::split(const std::string &s, char delim)
