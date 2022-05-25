@@ -3,40 +3,23 @@
 
 #include "SimPINSettingsWindow.hpp"
 
-#include <application-settings/data/PINSettingsLockStateData.hpp>
-#include <application-settings/data/PINSettingsSimData.hpp>
 #include <application-settings/windows/WindowNames.hpp>
-
 #include <OptionSetting.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
-    SimPINSettingsWindow::SimPINSettingsWindow(app::ApplicationCommon *app)
-        : BaseSettingsWindow(app, window::name::sim_pin_settings)
+    SimPINSettingsWindow::SimPINSettingsWindow(app::ApplicationCommon *app,
+                                               std::unique_ptr<SimPINSettingsWindowContract::Presenter> simPINPresenter)
+        : BaseSettingsWindow(app, window::name::sim_pin_settings), presenter(std::move(simPINPresenter))
     {
-        app->bus.sendUnicast<cellular::msg::request::sim::GetLockState>();
+        presenter->attach(this);
+        presenter->requestLockState();
     }
 
     void SimPINSettingsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (const auto pinSettingsSimData = dynamic_cast<PINSettingsSimData *>(data); pinSettingsSimData != nullptr) {
-            setTitle(utils::translate("app_settings_network_pin_settings") + " (" + pinSettingsSimData->getSim() + ")");
-        }
-        auto newPinLockStateRetrieved = false;
-        if (const auto pinSettingsLockStateData = dynamic_cast<PINSettingsLockStateData *>(data);
-            pinSettingsLockStateData != nullptr) {
-            newPinLockStateRetrieved = pinIsOn != pinSettingsLockStateData->getSimCardPinLockState();
-            if (newPinLockStateRetrieved) {
-                pinIsOn = pinSettingsLockStateData->getSimCardPinLockState();
-            }
-        }
-        if (mode == ShowMode::GUI_SHOW_RETURN) {
-            application->bus.sendUnicast<cellular::msg::request::sim::GetLockState>();
-        }
-        if (mode == ShowMode::GUI_SHOW_INIT || newPinLockStateRetrieved) {
-            refreshOptionsList();
-        }
+        presenter->onBeforeShow(mode, data);
     }
 
     auto SimPINSettingsWindow::buildOptionsList() -> std::list<Option>
@@ -46,7 +29,7 @@ namespace gui
         optionList.emplace_back(std::make_unique<option::OptionSettings>(
             utils::translate("app_settings_network_pin"),
             [=](Item & /*item*/) {
-                changePinState(pinIsOn);
+                presenter->togglePinState();
                 return true;
             },
             [=](Item &item) {
@@ -59,9 +42,9 @@ namespace gui
                 return true;
             },
             nullptr,
-            pinIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off));
+            presenter->getPinState() ? option::SettingRightItem::On : option::SettingRightItem::Off));
 
-        if (pinIsOn) {
+        if (presenter->getPinState()) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
                 utils::translate("app_settings_network_pin_change_code"),
                 [=](Item & /*item*/) {
@@ -76,14 +59,19 @@ namespace gui
         return optionList;
     }
 
-    void SimPINSettingsWindow::changePinState(bool &currentState)
+    void SimPINSettingsWindow::setNavbarCenterActive(bool state)
     {
-        currentState = !currentState;
-        if (!currentState) {
-            application->getSimLockSubject().disableSimPin();
-        }
-        else {
-            application->getSimLockSubject().enableSimPin();
-        }
+        setNavBarActive(nav_bar::Side::Center, state);
+    }
+
+    void SimPINSettingsWindow::setTitle(const UTF8 &text)
+    {
+        const auto currentWindow = application->getCurrentWindow();
+        currentWindow->setTitle(text);
+    }
+
+    void SimPINSettingsWindow::refreshOptionsList()
+    {
+        BaseSettingsWindow::refreshOptionsList();
     }
 } // namespace gui

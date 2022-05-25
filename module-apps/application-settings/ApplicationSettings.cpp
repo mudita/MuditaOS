@@ -383,9 +383,11 @@ namespace app
         windowsFactory.attach(gui::window::name::sim_cards, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SimCardsWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::sim_pin_settings, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::SimPINSettingsWindow>(app);
-        });
+        windowsFactory.attach(gui::window::name::sim_pin_settings,
+                              [&](ApplicationCommon *app, const std::string &name) {
+                                  auto presenter = std::make_unique<SimPINSettingsPresenter>(this);
+                                  return std::make_unique<gui::SimPINSettingsWindow>(app, std::move(presenter));
+                              });
         windowsFactory.attach(gui::window::name::import_contacts, [&](ApplicationCommon *app, const std::string &name) {
             auto repository = std::make_unique<SimContactsRepository>(this);
             auto model      = std::make_unique<SimContactsImportModel>(this, std::move(repository));
