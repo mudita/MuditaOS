@@ -64,6 +64,6 @@ class MonthModel
     date::month month;
     uint32_t lastDay;
     // first week offset
-    uint32_t firstWeekDayNumb;
+    uint32_t firstWeekDayNumber;
     date::year year;
 };
