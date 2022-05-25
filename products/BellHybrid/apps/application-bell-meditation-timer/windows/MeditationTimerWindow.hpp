@@ -26,6 +26,8 @@ namespace app::meditation
         void buildInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
+        void onValueChanged(const std::uint32_t currentValue);
+
       private:
         std::unique_ptr<app::meditation::MeditationTimerContract::Presenter> presenter;
         gui::BellBaseLayout *body{};
