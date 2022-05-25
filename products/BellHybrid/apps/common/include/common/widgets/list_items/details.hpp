@@ -28,6 +28,7 @@ namespace app::list_items
             void set_value(const value_type &value)
             {
                 spinner->set_value(value);
+                control_visibility();
             }
 
             void set_range(const typename spinner_type::range &range)
@@ -75,7 +76,10 @@ namespace app::list_items
                 };
 
                 getValue = [this]() { this->model.setValue(this->spinner->value()); };
-                setValue = [this]() { this->spinner->set_value(this->model.getValue()); };
+                setValue = [this]() {
+                    this->spinner->set_value(this->model.getValue());
+                    control_visibility();
+                };
 
                 inputCallback = [this, &bottomDescription](Item &, const gui::InputEvent &event) {
                     return OnInputCallback(event);
