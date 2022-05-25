@@ -68,6 +68,7 @@ namespace gui
             break;
         case app::home_screen::ViewState::AlarmRingingDeactivatedWait:
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
+            alarmActivatedDeactivatedScreen->image->set("big_no-alarm_W_G", {});
             break;
         case app::home_screen::ViewState::AlarmSnoozedWait:
             alarmMainIcon->setStatus(AlarmIcon::Status::SNOOZE);
