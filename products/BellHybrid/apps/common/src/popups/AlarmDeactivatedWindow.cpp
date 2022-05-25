@@ -37,6 +37,7 @@ namespace gui
     bool AlarmDeactivatedWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            detachTimerIfExists();
             returnToPreviousWindow();
             return true;
         }
