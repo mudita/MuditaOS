@@ -14,7 +14,7 @@ MonthModel::MonthModel(date::year_month_day yearMonthDay)
     date::year_month_day_last yearMonthDayLast = this->year / this->month / date::last;
     this->lastDay                              = static_cast<unsigned>(yearMonthDayLast.day());
     date::year_month_day yearMonthDayFirst     = this->year / this->month / 1;
-    this->firstWeekDayNumb                     = date::weekday{yearMonthDayFirst}.c_encoding();
+    this->firstWeekDayNumber                   = date::weekday{yearMonthDayFirst}.c_encoding();
 }
 
 date::year MonthModel::getYear()
@@ -34,7 +34,7 @@ uint32_t MonthModel::getLastDay()
 
 uint32_t MonthModel::getFirstWeekOffset()
 {
-    return this->firstWeekDayNumb;
+    return this->firstWeekDayNumber;
 }
 
 std::vector<std::string> MonthModel::split(const std::string &s, char delim)
