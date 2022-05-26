@@ -2225,10 +2225,6 @@ auto ServiceCellular::tetheringTurnOffURC() -> bool
             LOG_ERROR("Failed to stop SMS URC");
             return false;
         }
-        if (!channel->cmd(at::factory(at::AT::RING_URC_OFF))) {
-            LOG_ERROR("Failed to stop RING URC");
-            return false;
-        }
     }
     return true;
 }
@@ -2250,10 +2246,6 @@ auto ServiceCellular::tetheringTurnOnURC() -> bool
             return false;
         }
 
-        if (!channel->cmd(at::factory(at::AT::RING_URC_ON))) {
-            LOG_ERROR("Failed to stop RING URC");
-            return false;
-        }
     }
     return true;
 }
