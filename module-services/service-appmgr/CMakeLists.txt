@@ -29,7 +29,6 @@ target_sources(service-appmgr
         model/ApplicationManagerCommon.cpp
         model/ApplicationStack.cpp
         model/ApplicationsRegistry.cpp
-        model/OnActionPolicy.cpp
     PUBLIC
         include/service-appmgr/Actions.hpp
         include/service-appmgr/ApplicationManifest.hpp
@@ -67,7 +66,6 @@ target_sources(service-appmgr
         include/service-appmgr/model/ApplicationManagerCommon.hpp
         include/service-appmgr/model/ApplicationStack.hpp
         include/service-appmgr/model/ApplicationsRegistry.hpp
-        include/service-appmgr/model/OnActionPolicy.hpp
 )
 
 target_link_libraries(service-appmgr

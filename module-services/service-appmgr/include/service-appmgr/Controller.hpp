@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,7 +40,7 @@ namespace app::manager
         static auto sendAction(sys::Service *sender,
                                actions::ActionId actionId,
                                actions::ActionParamsPtr &&data     = nullptr,
-                               OnSwitchBehaviour onSwitchBehaviour = OnSwitchBehaviour::Close) -> bool;
+                               OnSwitchBehaviour onSwitchBehaviour = OnSwitchBehaviour::RunInBackground) -> bool;
         static auto switchBack(sys::Service *sender, std::unique_ptr<SwitchBackRequest> msg = nullptr) -> bool;
         static auto confirmSwitch(sys::Service *sender) -> bool;
         static auto closeApplication(sys::Service *sender, const ApplicationName &name) -> bool;
