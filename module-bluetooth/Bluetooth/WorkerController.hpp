@@ -32,32 +32,32 @@ namespace bluetooth
 
         ~StatefulController() noexcept override;
 
-        void handle(const bt::evt::Base &evt) override;
-        void handle(const bt::evt::StartScan &evt) override;
-        void handle(const bt::evt::StopScan &evt) override;
-        void handle(const bt::evt::GetDevicesAvailable &evt) override;
-        void handle(const bt::evt::VisibilityOn &evt) override;
-        void handle(const bt::evt::VisibilityOff &evt) override;
-        void handle(const bt::evt::ConnectAudio &evt) override;
-        void handle(const bt::evt::DisconnectAudio &evt) override;
-        void handle(const bt::evt::PowerOn &evt) override;
-        void handle(const bt::evt::PowerOff &evt) override;
-        void handle(const bt::evt::ShutDown &evt) override;
-        void handle(const bt::evt::Pair &evt) override;
-        void handle(const bt::evt::Unpair &evt) override;
-        void handle(const bt::evt::StartRinging &evt) override;
-        void handle(const bt::evt::StopRinging &evt) override;
-        void handle(const bt::evt::StartRouting &evt) override;
-        void handle(const bt::evt::StartStream &evt) override;
-        void handle(const bt::evt::StopStream &evt) override;
-        void handle(const bt::evt::CallAnswered &evt) override;
-        void handle(const bt::evt::CallTerminated &evt) override;
-        void handle(const bt::evt::CallStarted &evt) override;
-        void handle(const bt::evt::IncomingCallNumber &evt) override;
-        void handle(const bt::evt::SignalStrengthData &evt) override;
-        void handle(const bt::evt::OperatorNameData &evt) override;
-        void handle(const bt::evt::BatteryLevelData &evt) override;
-        void handle(const bt::evt::NetworkStatusData &evt) override;
+        void handle(const bluetooth::event::Base &evt) override;
+        void handle(const bluetooth::event::StartScan &evt) override;
+        void handle(const bluetooth::event::StopScan &evt) override;
+        void handle(const bluetooth::event::GetDevicesAvailable &evt) override;
+        void handle(const bluetooth::event::VisibilityOn &evt) override;
+        void handle(const bluetooth::event::VisibilityOff &evt) override;
+        void handle(const bluetooth::event::ConnectAudio &evt) override;
+        void handle(const bluetooth::event::DisconnectAudio &evt) override;
+        void handle(const bluetooth::event::PowerOn &evt) override;
+        void handle(const bluetooth::event::PowerOff &evt) override;
+        void handle(const bluetooth::event::ShutDown &evt) override;
+        void handle(const bluetooth::event::Pair &evt) override;
+        void handle(const bluetooth::event::Unpair &evt) override;
+        void handle(const bluetooth::event::StartRinging &evt) override;
+        void handle(const bluetooth::event::StopRinging &evt) override;
+        void handle(const bluetooth::event::StartRouting &evt) override;
+        void handle(const bluetooth::event::StartStream &evt) override;
+        void handle(const bluetooth::event::StopStream &evt) override;
+        void handle(const bluetooth::event::CallAnswered &evt) override;
+        void handle(const bluetooth::event::CallTerminated &evt) override;
+        void handle(const bluetooth::event::CallStarted &evt) override;
+        void handle(const bluetooth::event::IncomingCallNumber &evt) override;
+        void handle(const bluetooth::event::SignalStrengthData &evt) override;
+        void handle(const bluetooth::event::OperatorNameData &evt) override;
+        void handle(const bluetooth::event::BatteryLevelData &evt) override;
+        void handle(const bluetooth::event::NetworkStatusData &evt) override;
 
         class Impl;
 

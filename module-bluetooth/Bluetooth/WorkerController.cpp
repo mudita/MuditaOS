@@ -31,7 +31,7 @@ namespace bluetooth
 
     //--------------------------------------------------------------------
     // entry to dispatch to call handle (double visitor -> double dispatch)
-    void StatefulController::handle(const bt::evt::Base &evt)
+    void StatefulController::handle(const bluetooth::event::Base &evt)
     {
         evt.dispatch(this);
     }
@@ -39,103 +39,103 @@ namespace bluetooth
     //-----------------------------------------
     // all `handle` code below is casual visitor
 
-    void StatefulController::handle(const bt::evt::StartScan &evt)
+    void StatefulController::handle(const bluetooth::event::StartScan &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::StopScan &evt)
+    void StatefulController::handle(const bluetooth::event::StopScan &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::GetDevicesAvailable &evt)
+    void StatefulController::handle(const bluetooth::event::GetDevicesAvailable &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::VisibilityOn &evt)
+    void StatefulController::handle(const bluetooth::event::VisibilityOn &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::VisibilityOff &evt)
+    void StatefulController::handle(const bluetooth::event::VisibilityOff &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::ConnectAudio &evt)
+    void StatefulController::handle(const bluetooth::event::ConnectAudio &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::DisconnectAudio &evt)
+    void StatefulController::handle(const bluetooth::event::DisconnectAudio &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::PowerOn &evt)
+    void StatefulController::handle(const bluetooth::event::PowerOn &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::PowerOff &evt)
+    void StatefulController::handle(const bluetooth::event::PowerOff &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::ShutDown &evt)
+    void StatefulController::handle(const bluetooth::event::ShutDown &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::Pair &evt)
+    void StatefulController::handle(const bluetooth::event::Pair &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::Unpair &evt)
+    void StatefulController::handle(const bluetooth::event::Unpair &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::StartRinging &evt)
+    void StatefulController::handle(const bluetooth::event::StartRinging &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::StopRinging &evt)
+    void StatefulController::handle(const bluetooth::event::StopRinging &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::StartRouting &evt)
+    void StatefulController::handle(const bluetooth::event::StartRouting &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::StartStream &evt)
+    void StatefulController::handle(const bluetooth::event::StartStream &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::StopStream &evt)
+    void StatefulController::handle(const bluetooth::event::StopStream &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::CallAnswered &evt)
+    void StatefulController::handle(const bluetooth::event::CallAnswered &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::CallTerminated &evt)
+    void StatefulController::handle(const bluetooth::event::CallTerminated &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::CallStarted &evt)
+    void StatefulController::handle(const bluetooth::event::CallStarted &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::IncomingCallNumber &evt)
+    void StatefulController::handle(const bluetooth::event::IncomingCallNumber &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::SignalStrengthData &evt)
+    void StatefulController::handle(const bluetooth::event::SignalStrengthData &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::OperatorNameData &evt)
+    void StatefulController::handle(const bluetooth::event::OperatorNameData &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::BatteryLevelData &evt)
+    void StatefulController::handle(const bluetooth::event::BatteryLevelData &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bt::evt::NetworkStatusData &evt)
+    void StatefulController::handle(const bluetooth::event::NetworkStatusData &evt)
     {
         pimpl->sm.process_event(evt);
     };
