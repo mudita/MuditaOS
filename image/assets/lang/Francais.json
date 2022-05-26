@@ -155,6 +155,8 @@
   "app_calllog_date": "Date",
   "app_calllog_options_delete_call": "Supprimer l'appel",
   "app_calllog_delete_call_confirmation": "Supprimer cet appel de la liste?",
+  "app_calllog_delete_all_calls": "Supprimer tous les appels",
+  "app_calllog_delete_all_calls_confirmation": "Supprimer tous les appels de la liste",
   "app_calllog_no_calls": "Pas encore d'appels.",
   "app_phonebook_no_contacts": "<text align='center' color='4'>Aucun contact pour le moment.<p>Appuyez sur la <b>flèche gauche</b> pour en ajouter un nouveau.</p></text>",
   "app_phonebook_no_contacts": "<text align='center' color='4'>Aucun contact pour le moment.</text>",
