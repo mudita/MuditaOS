@@ -5,7 +5,6 @@
 #include "data/CallLogInternals.hpp"
 #include "ApplicationCallLog.hpp"
 #include "widgets/CalllogItem.hpp"
-#include "header/DeleteAction.hpp"
 
 #include <DialogMetadata.hpp>
 #include <DialogMetadataMessage.hpp>
@@ -44,14 +43,14 @@ namespace gui
         list->rebuildList(gui::listview::RebuildType::InPlace);
     }
 
-    gui::header::DeleteAction *ptr;
     void CallLogMainWindow::buildInterface()
     {
         AppWindow::buildInterface();
 
         setTitle(utils::translate("app_calllog_title_main"));
 
-        header->navigationIndicatorAdd((ptr = new gui::header::DeleteAction()), gui::header::BoxSelection::Right);
+        header->navigationIndicatorAdd((deleteAction = new gui::header::DeleteAction()),
+                                       gui::header::BoxSelection::Right);
 
         navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
         navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
@@ -189,7 +188,7 @@ namespace gui
 
     void CallLogMainWindow::onEmptyList()
     {
-        header->removeWidget(ptr);
+        header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
 
         navBar->setActive(gui::nav_bar::Side::Left, false);
         navBar->setActive(gui::nav_bar::Side::Center, false);
@@ -199,6 +198,9 @@ namespace gui
 
     void CallLogMainWindow::onListFilled()
     {
+        header->navigationIndicatorAdd((deleteAction = new gui::header::DeleteAction()),
+                                       gui::header::BoxSelection::Right);
+
         navBar->setActive(gui::nav_bar::Side::Left, true);
         navBar->setActive(gui::nav_bar::Side::Center, true);
         emptyLayout->setVisible(false);

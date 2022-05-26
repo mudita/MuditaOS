@@ -15,9 +15,9 @@ namespace gui::header
     {
         setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
-        setMargins(Margins(style::header::navigation_indicator::right_left_margin,
+        setMargins(Margins(0,
                            style::header::navigation_indicator::top_margin,
-                           0,
+                           style::header::navigation_indicator::right_left_margin,
                            0));
 
         auto wasteBin        = new gui::Image("delete_24px_W_G");
