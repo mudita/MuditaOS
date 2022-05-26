@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <memory>
+#include <array>
 #include <set>
 #include <string>
 #include <sstream>
