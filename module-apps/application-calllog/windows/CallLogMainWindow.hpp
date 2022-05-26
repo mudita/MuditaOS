@@ -4,6 +4,7 @@
 #pragma once
 
 #include "CalllogModel.hpp"
+#include "header/DeleteAction.hpp"
 
 #include <AppWindow.hpp>
 #include <ListView.hpp>
@@ -19,6 +20,8 @@ namespace gui
 
         gui::VBox *emptyLayout = nullptr;
         bool isEmpty() const;
+
+        header::DeleteAction *deleteAction = nullptr;
 
       public:
         explicit CallLogMainWindow(app::ApplicationCommon *app);
