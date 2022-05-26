@@ -7,7 +7,6 @@
 #include "ApplicationsRegistry.hpp"
 #include "ActionsRegistry.hpp"
 #include "ApplicationStack.hpp"
-#include "OnActionPolicy.hpp"
 #include <service-appmgr/messages/Message.hpp>
 
 #include <apps-common/ApplicationLauncher.hpp>
@@ -150,8 +149,6 @@ namespace app::manager
         void onLaunchFinished(ApplicationHandle &app);
         void onFinalizingClose();
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
-
-        OnActionPolicy actionPolicy;
 
         void displayLanguageChanged(std::string value);
         void inputLanguageChanged(std::string value);
