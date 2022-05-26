@@ -18,6 +18,8 @@ include(CMakeParseArguments)
 include(DiskImage)
 include(GoogleTest)
 
+target_compile_options(gtest PRIVATE -Wno-error=maybe-uninitialized)
+
 add_custom_target(unittests)
 
 set(ROOT_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
@@ -85,6 +87,7 @@ function(add_gtest_executable)
         ${ARGN}
     )
 
+
     if(NOT _TEST_ARGS_NAME)
         message(FATAL_ERROR "You must provide a test name")
     endif(NOT _TEST_ARGS_NAME)
@@ -112,18 +115,11 @@ function(add_gtest_executable)
         enable_test_filesystem()
     endif()
 
-    target_link_libraries(${_TESTNAME} PRIVATE gtest_main gmock log-api)
-    foreach(lib ${_TEST_ARGS_LIBS})
-        target_link_libraries(${_TESTNAME} PRIVATE ${lib})
-    endforeach(lib)
 
-    foreach(include ${_TEST_ARGS_INCLUDE})
-        target_include_directories(${_TESTNAME} PRIVATE ${include})
-    endforeach(include)
+    target_link_libraries(${_TESTNAME} PRIVATE gtest_main gmock log-api ${_TEST_ARGS_LIBS})
 
-    foreach(def ${_TEST_ARGS_DEFS})
-        target_compile_definitions(${_TESTNAME} PRIVATE ${def})
-    endforeach(def)
+    target_include_directories(${_TESTNAME} PRIVATE ${_TEST_ARGS_INCLUDE})
+    target_compile_definitions(${_TESTNAME} PRIVATE  ${_TEST_ARGS_DEFS})
 
     foreach(dep ${_TEST_ARGS_DEPS})
         add_dependencies(${_TESTNAME}  ${dep})

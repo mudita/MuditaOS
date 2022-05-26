@@ -124,7 +124,7 @@ std::pair<std::vector<NotesTableRow>, int> NotesTable::getByText(const std::stri
                                                                  unsigned int limit)
 {
 
-    unsigned int count = 0;
+    int count          = 0;
     auto queryRet      = db->query("SELECT COUNT(*), INSTR(snippet,'%q') pos FROM notes WHERE pos > 0;", text.c_str());
     if (queryRet && queryRet->getRowCount() != 0) {
         count = (*queryRet)[0].getUInt32();
