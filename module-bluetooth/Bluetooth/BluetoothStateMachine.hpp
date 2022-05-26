@@ -110,7 +110,7 @@ namespace bluetooth
 
     struct HandlePair
     {
-        void operator()(std::shared_ptr<AbstractCommandHandler> handler, const bt::evt::Pair &event)
+        void operator()(std::shared_ptr<AbstractCommandHandler> handler, const bluetooth::event::Pair &event)
         {
             handler->pair(event.device);
         }
@@ -118,7 +118,7 @@ namespace bluetooth
 
     struct Connected
     {
-        bool operator()(std::shared_ptr<bluetooth::SettingsHolder> settings, bt::evt::Unpair evt)
+        bool operator()(std::shared_ptr<bluetooth::SettingsHolder> settings, bluetooth::event::Unpair evt)
         {
             auto deviceAddr =
                 std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::ConnectedDevice));
@@ -128,7 +128,7 @@ namespace bluetooth
 
     struct HandleUnpair
     {
-        void operator()(std::shared_ptr<AbstractCommandHandler> handler, const bt::evt::Unpair &event)
+        void operator()(std::shared_ptr<AbstractCommandHandler> handler, const bluetooth::event::Unpair &event)
         {
             handler->unpair(event.device);
         }
@@ -136,7 +136,7 @@ namespace bluetooth
 
     struct HandleDrop
     {
-        void operator()(const bt::evt::Unpair &event,
+        void operator()(const bluetooth::event::Unpair &event,
                         std::shared_ptr<bluetooth::SettingsHolder> settings,
                         std::shared_ptr<std::vector<Devicei>> pairedDevices)
         {
@@ -180,7 +180,7 @@ namespace bluetooth
 
     struct EstablishAudioConnection
     {
-        void operator()(std::shared_ptr<AbstractCommandHandler> handler, bt::evt::ConnectAudio evt)
+        void operator()(std::shared_ptr<AbstractCommandHandler> handler, bluetooth::event::ConnectAudio evt)
         {
             handler->establishAudioConnection(evt.device);
         }
@@ -229,7 +229,8 @@ namespace bluetooth
 
     struct CallStarted
     {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager, bt::evt::CallStarted evt)
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
+                        bluetooth::event::CallStarted evt)
         {
             profileManager->callStarted(evt.number);
         }
@@ -237,7 +238,8 @@ namespace bluetooth
 
     struct IncomingCall
     {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager, bt::evt::IncomingCallNumber evt)
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
+                        bluetooth::event::IncomingCallNumber evt)
         {
             profileManager->setIncomingCallNumber(evt.number);
         }
@@ -245,7 +247,8 @@ namespace bluetooth
 
     struct SignalStrength
     {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager, bt::evt::SignalStrengthData evt)
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
+                        bluetooth::event::SignalStrengthData evt)
         {
             profileManager->setSignalStrengthData(evt.strength);
         }
@@ -253,7 +256,8 @@ namespace bluetooth
 
     struct SetOperatorName
     {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager, bt::evt::OperatorNameData evt)
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
+                        bluetooth::event::OperatorNameData evt)
         {
             profileManager->setOperatorNameData(bluetooth::OperatorName(evt.name));
         }
@@ -261,7 +265,8 @@ namespace bluetooth
 
     struct SetBatteryLevel
     {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager, bt::evt::BatteryLevelData evt)
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
+                        bluetooth::event::BatteryLevelData evt)
         {
             profileManager->setBatteryLevelData(evt.level);
         }
@@ -269,7 +274,8 @@ namespace bluetooth
 
     struct SetNetworkStatus
     {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager, bt::evt::NetworkStatusData evt)
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
+                        bluetooth::event::NetworkStatusData evt)
         {
             profileManager->setNetworkStatusData(evt.status);
         }
@@ -309,21 +315,21 @@ namespace bluetooth
             using namespace sml;
             // clang-format off
             return make_transition_table(
-                *"CallSetup"_s + event<bt::evt::StartRinging> / StartRinging = "CallRinging"_s,
-                "CallSetup"_s + event<bt::evt::StartRouting> / InitializeCall = "CallInitiated"_s,
-                "CallSetup"_s + event<bt::evt::CallStarted> / CallStarted = "CallInitiated"_s,
-                "CallSetup"_s + event<bt::evt::IncomingCallNumber> / (StartRinging, IncomingCall)  = "CallRinging"_s,
+                *"CallSetup"_s + sml::event<bluetooth::event::StartRinging> / StartRinging = "CallRinging"_s,
+                "CallSetup"_s + sml::event<bluetooth::event::StartRouting> / InitializeCall = "CallInitiated"_s,
+                "CallSetup"_s + sml::event<bluetooth::event::CallStarted> / CallStarted = "CallInitiated"_s,
+                "CallSetup"_s + sml::event<bluetooth::event::IncomingCallNumber> / (StartRinging, IncomingCall)  = "CallRinging"_s,
 
-                "CallRinging"_s + event<bt::evt::StopRinging> / StopRinging = "CallDropped"_s,
-                "CallRinging"_s + event<bt::evt::CallAnswered> / CallAnswered = "CallInProgress"_s,
-                "CallRinging"_s + event<bt::evt::CallTerminated> / TerminateCall = "CallDropped"_s,
+                "CallRinging"_s + sml::event<bluetooth::event::StopRinging> / StopRinging = "CallDropped"_s,
+                "CallRinging"_s + sml::event<bluetooth::event::CallAnswered> / CallAnswered = "CallInProgress"_s,
+                "CallRinging"_s + sml::event<bluetooth::event::CallTerminated> / TerminateCall = "CallDropped"_s,
 
-                "CallInitiated"_s + event<bt::evt::CallAnswered> / CallAnswered = "CallInProgress"_s,
-               "CallInitiated"_s + event<bt::evt::StopRinging> / StopRinging = "CallDropped"_s,
-               "CallInitiated"_s + event<bt::evt::CallTerminated> / TerminateCall = "CallDropped"_s,
-                "CallInitiated"_s + event<bt::evt::IncomingCallNumber> / IncomingCall= "CallInitiated"_s,
+                "CallInitiated"_s + sml::event<bluetooth::event::CallAnswered> / CallAnswered = "CallInProgress"_s,
+               "CallInitiated"_s + sml::event<bluetooth::event::StopRinging> / StopRinging = "CallDropped"_s,
+               "CallInitiated"_s + sml::event<bluetooth::event::CallTerminated> / TerminateCall = "CallDropped"_s,
+                "CallInitiated"_s + sml::event<bluetooth::event::IncomingCallNumber> / IncomingCall= "CallInitiated"_s,
 
-                "CallInProgress"_s + event<bt::evt::CallTerminated> / TerminateCall = "CallDropped"_s,
+                "CallInProgress"_s + sml::event<bluetooth::event::CallTerminated> / TerminateCall = "CallDropped"_s,
 
                 "CallDropped"_s = X
 
@@ -340,27 +346,27 @@ namespace bluetooth
             using namespace sml;
             // clang-format off
                 return make_transition_table(
-                        *state<Idle> + event<bt::evt::StartScan> / HandleOn = state<Idle>,
-                        state<Idle> + event<bt::evt::StopScan> / HandleOff = state<Idle>,
-                        state<Idle> + event<bt::evt::Pair> / HandlePair = state<Idle>,
-                        state<Idle> + event<bt::evt::Unpair>[Connected] / (HandleDisconnect, HandleUnpair) = state<Idle>,
-                        state<Idle> + event<bt::evt::Unpair>[not Connected] / (HandleUnpair, HandleDrop) = state<Idle>,
+                        *state<Idle> + sml::event<bluetooth::event::StartScan> / HandleOn = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::StopScan> / HandleOff = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::Pair> / HandlePair = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::Unpair>[Connected] / (HandleDisconnect, HandleUnpair) = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::Unpair>[not Connected] / (HandleUnpair, HandleDrop) = state<Idle>,
 
-                        state<Idle> + event<bt::evt::VisibilityOn> / HandleSetVisibility = state<Idle>,
-                        state<Idle> + event<bt::evt::VisibilityOff> / HandleUnsetVisibility = state<Idle>,
-                        state<Idle> + event<bt::evt::ConnectAudio> / EstablishAudioConnection = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::VisibilityOn> / HandleSetVisibility = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::VisibilityOff> / HandleUnsetVisibility = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::ConnectAudio> / EstablishAudioConnection = state<Idle>,
 
-                        state<Idle> + event<bt::evt::SignalStrengthData> / SignalStrength = state<Idle>,
-                        state<Idle> + event<bt::evt::OperatorNameData>/  SetOperatorName = state<Idle>,
-                        state<Idle> + event<bt::evt::BatteryLevelData>/ SetBatteryLevel = state<Idle>,
-                        state<Idle> + event<bt::evt::NetworkStatusData> / SetNetworkStatus = state<Idle>,
-                        state<Idle> + event<bt::evt::StartStream>/ StartAudio = state<Idle>,
-                        state<Idle> + event<bt::evt::StopStream>/ StopAudio = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::SignalStrengthData> / SignalStrength = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::OperatorNameData>/  SetOperatorName = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::BatteryLevelData>/ SetBatteryLevel = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::NetworkStatusData> / SetNetworkStatus = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::StartStream>/ StartAudio = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::StopStream>/ StopAudio = state<Idle>,
 
-                        state<Idle> + event<bt::evt::StartRouting> / forwardEvent= state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::StartRouting> / forwardEvent= state<Call>,
 
-                        state<Idle> + event<bt::evt::IncomingCallNumber>  / forwardEvent  = state<Call>,
-                        state<Idle> + event<bt::evt::CallStarted> / forwardEvent= state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::IncomingCallNumber>  / forwardEvent  = state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::CallStarted> / forwardEvent= state<Call>,
                         state<Call> = state<Idle> // this one is needed to go out from Call substate properly!
 
                             );
@@ -396,22 +402,22 @@ namespace bluetooth
 
             using namespace sml;
             // clang-format off
-                return make_transition_table(*"Off"_s + event<bt::evt::PowerOn> = state<Setup>,
+                return make_transition_table(*"Off"_s + sml::event<bluetooth::event::PowerOn> = state<Setup>,
                                              state<Setup>[isInit] = state<On>,
                                              state<Setup>[not isInit] = "Restart"_s,
                                              state<Setup> + exception<InitializationError> / printInitError = "Off"_s,
 
-                                             state<On> + event<bt::evt::PowerOff> / TurnOff = "Off"_s,
+                                             state<On> + sml::event<bluetooth::event::PowerOff> / TurnOff = "Off"_s,
                                              state<On> + exception<ProcessingError> / ( printProcessingError, TurnOff ) = "Restart"_s,
-                                             state<On> + event<bt::evt::ShutDown> / TurnOff = X,
+                                             state<On> + sml::event<bluetooth::event::ShutDown> / TurnOff = X,
 
                                              "Restart"_s = state<Setup>,
-                                             "Restart"_s + event<bt::evt::ShutDown> /TurnOff = X,
+                                             "Restart"_s + sml::event<bluetooth::event::ShutDown> /TurnOff = X,
 
                                             *("ExceptionsHandling"_s) + exception<std::runtime_error> / ExceptionHandler = "Off"_s,
                                             "ExceptionsHandling"_s + exception<std::runtime_error> / ExceptionHandler    = "Off"_s,
 
-                                             "Off"_s + event<bt::evt::ShutDown> = X);
+                                             "Off"_s + sml::event<bluetooth::event::ShutDown> = X);
             // clang-format on
         }
     };

@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace bt::evt
+namespace bluetooth::event
 {
     struct Base;
     struct StartScan;
@@ -31,7 +31,7 @@ namespace bt::evt
     struct OperatorNameData;
     struct BatteryLevelData;
     struct NetworkStatusData;
-} // namespace bt::evt
+} // namespace bluetooth::event
 
 namespace bluetooth
 {
@@ -41,31 +41,31 @@ namespace bluetooth
       public:
         virtual ~AbstractController() noexcept = default;
 
-        virtual void handle(const bt::evt::Base &evt)                = 0;
-        virtual void handle(const bt::evt::StartScan &evt)           = 0;
-        virtual void handle(const bt::evt::StopScan &evt)            = 0;
-        virtual void handle(const bt::evt::GetDevicesAvailable &evt) = 0;
-        virtual void handle(const bt::evt::VisibilityOn &evt)        = 0;
-        virtual void handle(const bt::evt::VisibilityOff &evt)       = 0;
-        virtual void handle(const bt::evt::ConnectAudio &evt)        = 0;
-        virtual void handle(const bt::evt::DisconnectAudio &evt)     = 0;
-        virtual void handle(const bt::evt::PowerOn &evt)             = 0;
-        virtual void handle(const bt::evt::PowerOff &evt)            = 0;
-        virtual void handle(const bt::evt::ShutDown &evt)            = 0;
-        virtual void handle(const bt::evt::Pair &evt)                = 0;
-        virtual void handle(const bt::evt::Unpair &evt)              = 0;
-        virtual void handle(const bt::evt::StartRinging &evt)        = 0;
-        virtual void handle(const bt::evt::StopRinging &evt)         = 0;
-        virtual void handle(const bt::evt::StartRouting &evt)        = 0;
-        virtual void handle(const bt::evt::StartStream &evt)         = 0;
-        virtual void handle(const bt::evt::StopStream &evt)          = 0;
-        virtual void handle(const bt::evt::CallAnswered &evt)        = 0;
-        virtual void handle(const bt::evt::CallTerminated &evt)      = 0;
-        virtual void handle(const bt::evt::CallStarted &evt)         = 0;
-        virtual void handle(const bt::evt::IncomingCallNumber &evt)  = 0;
-        virtual void handle(const bt::evt::SignalStrengthData &evt)  = 0;
-        virtual void handle(const bt::evt::OperatorNameData &evt)    = 0;
-        virtual void handle(const bt::evt::BatteryLevelData &evt)    = 0;
-        virtual void handle(const bt::evt::NetworkStatusData &evt)   = 0;
+        virtual void handle(const bluetooth::event::Base &evt)                = 0;
+        virtual void handle(const bluetooth::event::StartScan &evt)           = 0;
+        virtual void handle(const bluetooth::event::StopScan &evt)            = 0;
+        virtual void handle(const bluetooth::event::GetDevicesAvailable &evt) = 0;
+        virtual void handle(const bluetooth::event::VisibilityOn &evt)        = 0;
+        virtual void handle(const bluetooth::event::VisibilityOff &evt)       = 0;
+        virtual void handle(const bluetooth::event::ConnectAudio &evt)        = 0;
+        virtual void handle(const bluetooth::event::DisconnectAudio &evt)     = 0;
+        virtual void handle(const bluetooth::event::PowerOn &evt)             = 0;
+        virtual void handle(const bluetooth::event::PowerOff &evt)            = 0;
+        virtual void handle(const bluetooth::event::ShutDown &evt)            = 0;
+        virtual void handle(const bluetooth::event::Pair &evt)                = 0;
+        virtual void handle(const bluetooth::event::Unpair &evt)              = 0;
+        virtual void handle(const bluetooth::event::StartRinging &evt)        = 0;
+        virtual void handle(const bluetooth::event::StopRinging &evt)         = 0;
+        virtual void handle(const bluetooth::event::StartRouting &evt)        = 0;
+        virtual void handle(const bluetooth::event::StartStream &evt)         = 0;
+        virtual void handle(const bluetooth::event::StopStream &evt)          = 0;
+        virtual void handle(const bluetooth::event::CallAnswered &evt)        = 0;
+        virtual void handle(const bluetooth::event::CallTerminated &evt)      = 0;
+        virtual void handle(const bluetooth::event::CallStarted &evt)         = 0;
+        virtual void handle(const bluetooth::event::IncomingCallNumber &evt)  = 0;
+        virtual void handle(const bluetooth::event::SignalStrengthData &evt)  = 0;
+        virtual void handle(const bluetooth::event::OperatorNameData &evt)    = 0;
+        virtual void handle(const bluetooth::event::BatteryLevelData &evt)    = 0;
+        virtual void handle(const bluetooth::event::NetworkStatusData &evt)   = 0;
     };
 }; // namespace bluetooth

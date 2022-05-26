@@ -9,7 +9,7 @@
 #include "AbstractController.hpp"
 #include "log/log.hpp"
 
-namespace bt::evt
+namespace bluetooth::event
 {
     struct Base
     {
@@ -228,4 +228,4 @@ namespace bt::evt
             controler->handle(*this);
         }
     };
-} // namespace bt::evt
+} // namespace bluetooth::event

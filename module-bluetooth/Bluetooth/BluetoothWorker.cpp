@@ -136,7 +136,7 @@ void BluetoothWorker::onLinkKeyAdded(const std::string &deviceAddress)
 
 BluetoothWorker::~BluetoothWorker()
 {
-    controller->handle(bt::evt::ShutDown{});
+    controller->handle(bluetooth::event::ShutDown{});
 }
 
 auto BluetoothWorker::run() -> bool
@@ -163,7 +163,7 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
             LOG_ERROR("There was no data even with notification");
             break;
         }
-        if ((*command).event != nullptr) {
+        if (command->event != nullptr) {
             controller->handle(*command->event);
         }
     }
@@ -262,7 +262,7 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
 
 void BluetoothWorker::closeWorker()
 {
-    controller->handle(bt::evt::PowerOff{});
+    controller->handle(bluetooth::event::PowerOff{});
     this->close();
 }
 

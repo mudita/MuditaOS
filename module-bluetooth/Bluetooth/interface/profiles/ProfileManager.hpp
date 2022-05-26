@@ -31,7 +31,7 @@ namespace bluetooth
       public:
         virtual ~BaseProfileManager()                                                            = default;
         virtual auto init() -> Error::Code                                                       = 0;
-        virtual void deInit() = 0;
+        virtual void deInit()                                                                    = 0;
         virtual auto connect(const Devicei &device) -> Error::Code                               = 0;
         virtual auto disconnect() -> Error::Code                                                 = 0;
         virtual auto start() -> Error::Code                                                      = 0;
