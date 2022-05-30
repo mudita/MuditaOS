@@ -100,6 +100,7 @@ namespace gui
         case app::home_screen::ViewState::AlarmEdit:
             alarm->setEditMode(EditMode::Edit);
             setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+            removeTextDescription();
             break;
         case app::home_screen::ViewState::ActivatedWait:
             alarm->setAlarmStatus(AlarmSetSpinner::Status::ACTIVATED);
