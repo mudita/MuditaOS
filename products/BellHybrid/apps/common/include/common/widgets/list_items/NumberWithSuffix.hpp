@@ -39,7 +39,8 @@ namespace app::list_items
       private:
         void control_bottom_description(const spinner_type::value_type &value) final
         {
-            body->lastBox->setVisible(value != 0);
+            bottomText->setVisible(value != 0);
+            body->resize();
         }
     };
 } // namespace app::list_items
