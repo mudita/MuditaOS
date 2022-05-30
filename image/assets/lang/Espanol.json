@@ -685,7 +685,9 @@
   "app_bell_settings_frontlight_mode_auto": "automático",
   "app_bell_settings_frontlight_mode_on_demand": "manual",
   "app_bell_settings_frontlight_top_message": "Intensidad de luz frontal",
-  "app_bell_greeting_msg": "¡Hola! Levántate y brilla",
+  "app_bell_greeting_msg": [
+    "¡Hola! Levántate y brilla"
+  ],
   "app_bell_settings_factory_reset": "Restablecer",
   "app_bell_settings_display_factory_reset_confirmation": "<text>¿Restablecer la configuración?</text>",
   "app_bell_meditation_timer": "Meditación",
