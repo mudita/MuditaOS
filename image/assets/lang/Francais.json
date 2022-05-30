@@ -659,7 +659,9 @@
   "app_bell_settings_frontlight_mode_auto": "automatique",
   "app_bell_settings_frontlight_mode_on_demand": "manuel",
   "app_bell_settings_frontlight_top_message": "Intensité",
-  "app_bell_greeting_msg": "Re-bonjour!",
+  "app_bell_greeting_msg": [
+    "Re-bonjour!"
+  ],
   "app_bell_settings_factory_reset": "Réinitialisation",
   "app_bell_settings_display_factory_reset_confirmation": "<text>Rétablir<br></br>la configuration ?</text>",
   "app_bell_meditation_timer": "Méditation",
