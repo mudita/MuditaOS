@@ -187,7 +187,7 @@
   "app_calllog_options_delete_call": "Eliminar llamada",
   "app_calllog_delete_call_confirmation": "¿Eliminar esta llamada de la lista?",
   "app_calllog_delete_all_calls": "Eliminar todas las llamadas",
-  "app_calllog_delete_all_calls_confirmation": "Eliminar todas las llamadas de la lista?",
+  "app_calllog_delete_all_calls_confirmation": "Eliminar todas las llamadas de\nla lista?",
   "app_calllog_no_calls": "Aún no hay llamadas.",
   "app_phonebook_no_contacts": "<text align='center' color='4'>Aún no hay contactos. <p> Presiona la <b> flecha izquierda </b> para agregar nuevos. </p></text>",
   "app_phonebook_no_contacts_yet": "<text align='center' color='4'>Aún no hay contactos.</text>",
