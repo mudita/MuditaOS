@@ -689,7 +689,9 @@
   "app_bell_settings_frontlight_mode_auto": "automatisch",
   "app_bell_settings_frontlight_mode_on_demand": "manuell",
   "app_bell_settings_frontlight_top_message": "Lichtstärke des Frontlichts",
-  "app_bell_greeting_msg": "Guten Morgen! Stehen Sie auf",
+  "app_bell_greeting_msg": [
+    "Guten Morgen! Stehen Sie auf"
+  ],
   "app_bell_settings_factory_reset": "Zurücksetzen",
   "app_bell_settings_display_factory_reset_confirmation": "Zurücksetzen?",
   "app_bell_meditation_timer": "Meditation",
