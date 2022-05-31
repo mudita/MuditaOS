@@ -55,6 +55,7 @@ namespace gui
 
     void BedtimeNotificationWindow::returnToPreviousWindow()
     {
+        detachTimerIfExists();
         app::manager::Controller::sendAction(
             application,
             app::manager::actions::AbortPopup,
@@ -69,11 +70,6 @@ namespace gui
             return true;
         }
         return false;
-    }
-
-    void BedtimeNotificationWindow::onClose(CloseReason reason)
-    {
-        application->bus.sendUnicast(std::make_shared<service::AudioStopRequest>(), service::audioServiceName);
     }
 
 } /* namespace gui */
