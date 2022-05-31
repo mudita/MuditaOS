@@ -15,10 +15,9 @@ namespace
     using minutes = std::chrono::minutes;
     constexpr minutes offValue{minutes::zero()};
 
-    const std::string &getOffValueText()
+    const std::string getOffValueText()
     {
-        static const std::string offValueText = utils::translate("app_settings_toggle_off");
-        return offValueText;
+        return utils::translate("app_settings_toggle_off");
     }
 
     UTF8 timerValueToUTF8(minutes value)
