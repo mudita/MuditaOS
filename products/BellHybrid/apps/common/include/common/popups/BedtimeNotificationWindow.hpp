@@ -23,7 +23,6 @@ namespace gui
 
         app::ApplicationCommon *app;
         Icon *icon = nullptr;
-        void onClose(CloseReason reason) override;
         bool onInput(const InputEvent &inputEvent) override;
         void returnToPreviousWindow();
         void buildInterface() override;
