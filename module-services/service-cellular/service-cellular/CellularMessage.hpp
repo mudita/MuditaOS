@@ -1070,6 +1070,12 @@ namespace cellular
         time_t callDuration;
     };
 
+    class CallOutgoingAccepted : public sys::DataMessage
+    {
+      public:
+        explicit CallOutgoingAccepted() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
+
     class CellularIsCallActive : public sys::DataMessage
     {};
     struct CellularIsCallActiveResponse : public sys::ResponseMessage

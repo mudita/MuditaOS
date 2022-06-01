@@ -22,6 +22,7 @@ namespace call::api
         virtual void notifyCallEnded()                                                         = 0;
         virtual void notifyCallActive()                                                        = 0;
         virtual void notifyCallDurationUpdate(const time_t &duration)                          = 0;
+        virtual void notifyOutgoingCallAnswered()                                              = 0;
         virtual ~GUI()                                                                         = default;
     };
 }; // namespace call::api
@@ -40,4 +41,5 @@ class CallGUI : public call::api::GUI
     void notifyCallEnded() override;
     void notifyCallActive() override;
     void notifyCallDurationUpdate(const time_t &duration) override;
+    void notifyOutgoingCallAnswered() override;
 };

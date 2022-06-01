@@ -44,3 +44,8 @@ void CallGUI::notifyCallDurationUpdate(const time_t &duration)
     owner->bus.sendMulticast(std::make_shared<cellular::CallDurationNotification>(duration),
                              sys::BusChannel::ServiceCellularNotifications);
 }
+void CallGUI::notifyOutgoingCallAnswered()
+{
+    owner->bus.sendMulticast(std::make_shared<cellular::CallOutgoingAccepted>(),
+                             sys::BusChannel::ServiceCellularNotifications);
+}

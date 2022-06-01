@@ -480,6 +480,9 @@ namespace bluetooth
         if (currentCallStatus == CallStatus::Incoming) {
             hfp_ag_answer_incoming_call(); // will answer the call if it wasn't answered
         }
+        else {
+            hfp_ag_outgoing_call_established();
+        }
         currentCallStatus = CallStatus::Active;
         return Error::Success;
     }
@@ -521,9 +524,10 @@ namespace bluetooth
         if (currentCallStatus != CallStatus::OutgoingPlacedFromHFP) {
             LOG_DEBUG("Started outgoing call from Pure");
             hfp_ag_outgoing_call_initiated(number.c_str());
+            hfp_ag_outgoing_call_accepted();
+            hfp_ag_outgoing_call_ringing();
             currentCallStatus = CallStatus::OutgoingPlacedFromPure;
         }
-        hfp_ag_outgoing_call_established();
         return Error::Success;
     }
     auto HFP::HFPImpl::setNetworkRegistrationStatus(bool registered) const noexcept -> Error::Code

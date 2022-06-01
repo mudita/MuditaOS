@@ -66,7 +66,6 @@ namespace sevm
 }
 
 class CellularCallerIdMessage;
-class CellularCallActiveNotification;
 class CellularSignalStrengthUpdateNotification;
 class CellularCurrentOperatorNameNotification;
 class CellularIncominCallMessage;
@@ -75,6 +74,7 @@ namespace cellular
 {
     class CallEndedNotification;
     class CallStartedNotification;
+    class CallOutgoingAccepted;
 }
 
 class ServiceBluetooth : public sys::Service
@@ -139,10 +139,10 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::ResponseAuthenticatePairCancel *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::RequestStatusIndicatorData *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::Message>;
-    [[nodiscard]] auto handle(CellularCallActiveNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(cellular::CallEndedNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(cellular::CallStartedNotification *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(cellular::CallOutgoingAccepted *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularSignalStrengthUpdateNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularCurrentOperatorNameNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(CellularNetworkStatusUpdateNotification *msg) -> std::shared_ptr<sys::Message>;
