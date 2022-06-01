@@ -521,6 +521,11 @@ namespace app::manager
     auto ApplicationManager::startApplication(ApplicationHandle &app) -> bool
     {
         if (not ApplicationManagerCommon::startApplication(app)) {
+            if (ApplicationManagerCommon::isApplicationStarting(app)) {
+                LOG_INFO("%s is starting already...", app.name().c_str());
+                return false;
+            }
+
             LOG_INFO("Starting application %s", app.name().c_str());
             StatusIndicators statusIndicators;
             statusIndicators.phoneMode        = phoneModeObserver->getCurrentPhoneMode();

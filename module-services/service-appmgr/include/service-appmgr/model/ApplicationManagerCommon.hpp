@@ -108,6 +108,7 @@ namespace app::manager
         virtual auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
         virtual auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         void rebuildActiveApplications();
+        auto isApplicationStarting(ApplicationHandle &app) const noexcept -> bool;
 
         ApplicationName rootApplicationName;
         ActionsRegistry actionsRegistry;
@@ -119,6 +120,7 @@ namespace app::manager
         void closeNoLongerNeededApplications();
         auto closeApplications() -> bool;
         void closeApplication(ApplicationHandle *application);
+        auto getStartingApplication() const noexcept -> ApplicationHandle *;
 
         // Message handlers
         void handleActionRequest(ActionRequest *actionMsg);

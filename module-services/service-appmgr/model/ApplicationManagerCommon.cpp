@@ -381,9 +381,9 @@ namespace app::manager
 
         auto currentlyFocusedApp = getFocusedApplication();
         if (currentlyFocusedApp == nullptr) {
-            if (auto appState = app->state(); appState == ApplicationCommon::State::INITIALIZING ||
-                                              appState == ApplicationCommon::State::ACTIVATING) {
-                LOG_INFO("No focused application at the moment, but %s is starting already...", app->name().c_str());
+            if (auto startingApplication = getStartingApplication(); startingApplication != nullptr) {
+                LOG_INFO("No focused application at the moment, but %s is starting already...",
+                         startingApplication->name().c_str());
                 return false;
             }
             LOG_INFO("No focused application at the moment. Starting new application...");
@@ -857,4 +857,21 @@ namespace app::manager
     {
         return sys::msgNotHandled();
     }
+
+    auto ApplicationManagerCommon::isApplicationStarting(ApplicationHandle &app) const noexcept -> bool
+    {
+        return (app.state() == app::ApplicationCommon::State::INITIALIZING ||
+                app.state() == app::ApplicationCommon::State::ACTIVATING);
+    }
+
+    auto ApplicationManagerCommon::getStartingApplication() const noexcept -> ApplicationHandle *
+    {
+        for (const auto &item : stack) {
+            if (auto app = getApplication(item.appName); app != nullptr && isApplicationStarting(*app)) {
+                return app;
+            }
+        }
+        return nullptr;
+    }
+
 } // namespace app::manager
