@@ -169,4 +169,9 @@ extern "C"
     {
         return syscalls::pathconf(_REENT->_errno, path, name);
     }
+    int getentropy([[maybe_unused]] void *buf, [[maybe_unused]] size_t buflen)
+    {
+        errno = -ENOTSUP;
+        return -1;
+    }
 }

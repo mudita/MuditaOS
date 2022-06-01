@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <array>
 
 namespace service::detail
 {

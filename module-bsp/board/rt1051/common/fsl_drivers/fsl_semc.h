@@ -526,8 +526,8 @@ typedef struct _semc_queueb_weight
 /*! @brief SEMC AXI queue weight setting. */
 typedef struct _semc_axi_queueweight
 {
-    semc_queuea_weight_t *queueaWeight; /*!< Weight settings for queue a. */
-    semc_queueb_weight_t *queuebWeight; /*!< Weight settings for queue b. */
+    semc_queuea_weight_t queueaWeight; /*!< Weight settings for queue a. */
+    semc_queueb_weight_t queuebWeight; /*!< Weight settings for queue b. */
 } semc_axi_queueweight_t;
 
 /*!

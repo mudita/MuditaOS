@@ -135,7 +135,7 @@ std::pair<std::vector<NotesTableRow>, int> NotesTable::getByText(const std::stri
     auto retQuery = db->query(queryText.c_str());
 
     if (retQuery == nullptr || retQuery->getRowCount() == 0) {
-        return {{}, count};
+        return {{}, int(count)};
     }
 
     std::vector<NotesTableRow> records;

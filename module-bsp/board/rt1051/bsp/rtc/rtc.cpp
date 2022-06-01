@@ -32,7 +32,7 @@ namespace bsp::rtc
         s_rtcConfig.rtcCalEnable = true;
         SNVS_HP_RTC_Init(SNVS, &s_rtcConfig);
 
-        SNVS_LPCR_LPTA_EN(1);
+        (void)SNVS_LPCR_LPTA_EN(1);
 
         bool timedOut     = false;
         auto timeoutTicks = cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(utils::time::milisecondsInSecond);

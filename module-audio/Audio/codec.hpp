@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstdint>
+#include <array>
 #include <module-audio/Audio/equalizer/Equalizer.hpp>
 
 namespace audio::codec

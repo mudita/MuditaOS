@@ -22,6 +22,8 @@ export declare ignore_paths=(
     'board/rt1051/newlib/cxx_guards.cpp'
     'board/rt1051/newlib/dir-common.h'
     'board/rt1051/newlib/include/'
+    'board/rt1051/newlib/gcc11/'
+    'board/rt1051/newlib/gcc12/'
     'host-tools/littlefs-fuse/lfsfuse/'
     'module-audio/Audio/decoder/dr_flac.h'
     'module-bluetooth/Bluetooth/btstack_config.h'

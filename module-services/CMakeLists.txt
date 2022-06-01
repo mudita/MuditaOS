@@ -66,6 +66,5 @@ target_compile_options(${PROJECT_NAME}
         -Wall
         $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
         $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
 )

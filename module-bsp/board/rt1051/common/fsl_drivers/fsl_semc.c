@@ -255,8 +255,8 @@ void SEMC_GetDefaultConfig(semc_config_t *config)
     queuebWeight.weightPagehit    = SEMC_BMCR1_TYPICAL_WPH;
     queuebWeight.bankRotation     = SEMC_BMCR1_TYPICAL_WBR;
 
-    config->queueWeight.queueaWeight = &queueaWeight;
-    config->queueWeight.queuebWeight = &queuebWeight;
+    config->queueWeight.queueaWeight = queueaWeight;
+    config->queueWeight.queuebWeight = queuebWeight;
 }
 
 void SEMC_Init(SEMC_Type *base, semc_config_t *configure)
@@ -285,12 +285,8 @@ void SEMC_Init(SEMC_Type *base, semc_config_t *configure)
                  SEMC_MCR_CTO(configure->cmdTimeoutCycles) | SEMC_MCR_DQSMD(configure->dqsMode);
 
     /* Configure Queue 0/1 for AXI bus. */
-    if (configure->queueWeight.queueaWeight) {
-        base->BMCR0 = (uint32_t)(configure->queueWeight.queueaWeight);
-    }
-    if (configure->queueWeight.queuebWeight) {
-        base->BMCR1 = (uint32_t)(configure->queueWeight.queuebWeight);
-    }
+    base->BMCR0 = (uint32_t)&(configure->queueWeight.queueaWeight);
+    base->BMCR1 = (uint32_t)&(configure->queueWeight.queuebWeight);
     /* Enable SEMC. */
     base->MCR &= ~SEMC_MCR_MDIS_MASK;
 }
