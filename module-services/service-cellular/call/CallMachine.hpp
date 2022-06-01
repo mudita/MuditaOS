@@ -213,6 +213,7 @@ namespace call
     {
         void operator()(Dependencies &di, CallData &call)
         {
+            di.gui->notifyOutgoingCallAnswered();
             di.timer->start();
         }
     } constexpr HandleStartedCall;

@@ -110,7 +110,6 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::ResponseAuthenticatePairCancel>();
     connectHandler<message::bluetooth::RequestStatusIndicatorData>();
     connectHandler<CellularCallerIdMessage>();
-    connectHandler<CellularCallActiveNotification>();
     connectHandler<CellularIncominCallMessage>();
     connectHandler<cellular::CallEndedNotification>();
     connectHandler<cellular::CallStartedNotification>();
@@ -118,6 +117,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<CellularCurrentOperatorNameNotification>();
     connectHandler<CellularNetworkStatusUpdateNotification>();
     connectHandler<sevm::BatteryStatusChangeMessage>();
+    connectHandler<cellular::CallOutgoingAccepted>();
 
     settingsHolder->onStateChange = [this]() {
         auto initialState = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
@@ -496,12 +496,6 @@ auto ServiceBluetooth::handle(CellularCallerIdMessage *msg) -> std::shared_ptr<s
     return sys::MessageNone{};
 }
 
-auto ServiceBluetooth::handle(CellularCallActiveNotification *msg) -> std::shared_ptr<sys::Message>
-{
-    sendWorkerCommand(std::make_unique<bluetooth::event::CallAnswered>());
-    return std::make_shared<sys::ResponseMessage>();
-}
-
 auto ServiceBluetooth::handle(CellularSignalStrengthUpdateNotification *msg) -> std::shared_ptr<sys::Message>
 {
     auto signalStrength = Store::GSM::get()->getSignalStrength();
@@ -589,5 +583,12 @@ auto ServiceBluetooth::handle(cellular::CallStartedNotification *msg) -> std::sh
 auto ServiceBluetooth::handle(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::Message>
 {
     sendWorkerCommand(std::make_unique<bluetooth::event::StartRinging>());
+    return sys::MessageNone{};
+}
+auto ServiceBluetooth::handle(cellular::CallOutgoingAccepted *msg) -> std::shared_ptr<sys::Message>
+{
+    LOG_DEBUG("Outgoing call accepted");
+    sendWorkerCommand(std::make_unique<bluetooth::event::CallAnswered>());
+
     return sys::MessageNone{};
 }

@@ -5,7 +5,6 @@
 
 #define BOOST_SML_CFG_DISABLE_MIN_SIZE // GCC10 fix
 #include <boost/sml.hpp>
-#include <sml-utils/Logger.hpp>
 #include <stdexcept>
 #include "command/event/Events.hpp"
 #include "service-bluetooth/SettingsHolder.hpp"
@@ -13,6 +12,7 @@
 #include "WorkerController.hpp"
 #include "Device.hpp"
 #include <log/log.hpp>
+#include <sml-utils/Logger.hpp>
 
 namespace bluetooth
 {
@@ -364,10 +364,9 @@ namespace bluetooth
                         state<Idle> + sml::event<bluetooth::event::StartStream>/ StartAudio = state<Idle>,
                         state<Idle> + sml::event<bluetooth::event::StopStream>/ StopAudio = state<Idle>,
 
-                        state<Idle> + sml::event<bluetooth::event::StartRouting> / forwardEvent = state<Call>,
-
-                        state<Idle> + sml::event<bluetooth::event::IncomingCallNumber>  / forwardEvent = state<Call>,
-                        state<Idle> + sml::event<bluetooth::event::CallStarted> / forwardEvent = state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::StartRouting> / forwardEvent= state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::IncomingCallNumber>  / forwardEvent  = state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::CallStarted> / forwardEvent= state<Call>,
                         state<Call> = state<Idle> // this one is needed to go out from Call substate properly!
 
                             );

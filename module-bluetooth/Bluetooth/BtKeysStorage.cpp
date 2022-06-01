@@ -74,7 +74,7 @@ namespace bluetooth
 
             json11::Json finalJson = json11::Json::object{{strings::keys, keys}};
             auto keysEntryDump     = finalJson.dump();
-            LOG_INFO("Current keys state: %s", keysEntryDump.c_str());
+            LOG_DEBUG("Current keys state: %s", keysEntryDump.c_str());
 
             if (keys.empty()) {
                 LOG_ERROR("Keys empty!");
@@ -84,7 +84,7 @@ namespace bluetooth
             auto ret = processOnFoundKey(bd_addr, [&type, &link_key](const json11::Json &key, bd_addr_t) {
                 auto foundLinkKey = key[strings::link_key].string_value().c_str();
                 memcpy(link_key, reinterpret_cast<const uint8_t *>(foundLinkKey), sizeof(link_key_t));
-                LOG_INFO("Getting key: %s", foundLinkKey);
+                LOG_DEBUG("Getting key: %s", foundLinkKey);
                 *type = static_cast<link_key_type_t>(key[strings::type].int_value());
 
                 return 1;

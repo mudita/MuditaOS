@@ -41,6 +41,8 @@ namespace mocks
         fakeit::When(Method(gui, notifyCallEnded)).AlwaysReturn();
         fakeit::When(Method(gui, notifyCallActive)).AlwaysReturn();
         fakeit::When(Method(gui, notifyCallDurationUpdate)).AlwaysReturn();
+        fakeit::When(Method(gui, notifyOutgoingCallAnswered)).AlwaysReturn();
+
         return gui;
     }
 
@@ -362,6 +364,7 @@ TEST_CASE("call outgoing - answered")
     REQUIRE(machine->machine.process_event(call::event::StartCall{CallType::CT_OUTGOING, number.getView()}));
     REQUIRE(machine->machine.process_event(call::event::Answer{}));
     fakeit::Verify(Method(di.audio, play)).Exactly(0);
+    fakeit::Verify(Method(di.gui, notifyOutgoingCallAnswered)).Exactly(1);
     REQUIRE(machine->machine.process_event(call::event::Ended{}));
     fakeit::Verify(Method(di.audio, stop)).Exactly(1);
 }
