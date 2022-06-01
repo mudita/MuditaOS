@@ -16,7 +16,13 @@ namespace app
 
     sys::MessagePointer ApplicationCalculator::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-        return Application::DataReceivedHandler(msgl);
+        auto retMsg = Application::DataReceivedHandler(msgl);
+        // if message was handled by application's template there is no need to process further.
+        if (retMsg && (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+            return retMsg;
+        }
+
+        return handleAsyncResponse(resp);
     }
 
     // Invoked during initialization
