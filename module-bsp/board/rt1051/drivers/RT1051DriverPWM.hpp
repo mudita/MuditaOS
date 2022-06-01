@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <map>
+#include <array>
 namespace drivers
 {
     class RT1051DriverPWM : public DriverPWM

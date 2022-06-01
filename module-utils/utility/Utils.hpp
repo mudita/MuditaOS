@@ -13,6 +13,7 @@
 #include <chrono>
 #include <random>
 #include <tuple>
+#include <functional>
 
 namespace utils
 {

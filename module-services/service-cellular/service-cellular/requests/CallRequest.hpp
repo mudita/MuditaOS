@@ -4,6 +4,7 @@
 #pragma once
 
 #include <at/Result.hpp>
+#include <memory>
 
 #include "service-cellular/RequestHandler.hpp"
 #include "service-cellular/requests/Request.hpp"

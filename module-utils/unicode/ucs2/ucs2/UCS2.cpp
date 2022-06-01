@@ -11,6 +11,7 @@
 #include <iterator>
 #include <locale>
 #include <codecvt>
+#include <array>
 
 namespace ucs2
 {

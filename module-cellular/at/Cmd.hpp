@@ -37,10 +37,10 @@ namespace at
         Cmd() = delete;
         Cmd(std::string cmd, cmd::Modifier mod, std::chrono::milliseconds timeout = default_timeout) noexcept;
         Cmd(std::string cmd, std::chrono::milliseconds timeout = default_timeout) noexcept;
-        Cmd(const Cmd &p) noexcept;
-        Cmd(Cmd &&) noexcept;
-        auto operator  =(const Cmd &) noexcept -> Cmd &;
-        auto operator  =(Cmd &&) noexcept -> Cmd &;
+        Cmd(const Cmd &p) noexcept = default;
+        Cmd(Cmd &&) noexcept       = default;
+        auto operator=(const Cmd &) noexcept -> Cmd & = default;
+        auto operator=(Cmd &&) noexcept -> Cmd & = default;
         virtual ~Cmd() = default;
 
         auto setModifier(cmd::Modifier mod) noexcept

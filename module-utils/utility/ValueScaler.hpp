@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <optional>
 #include <cmath>
+#include <array>
 
 namespace utils
 {

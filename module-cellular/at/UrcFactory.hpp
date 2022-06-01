@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Urc.hpp"
+#include <memory>
 
 namespace at::urc
 {

@@ -187,13 +187,11 @@ static uint32_t SAI_GetInstance(I2S_Type *base)
     /* Find the instance index from base address mappings. */
     for (instance = 0; instance < ARRAY_SIZE(s_saiBases); instance++) {
         if (s_saiBases[instance] == base) {
-            break;
+            return instance;
         }
     }
-
     assert(instance < ARRAY_SIZE(s_saiBases));
-
-    return instance;
+    return 0;
 }
 
 static void SAI_WriteNonBlocking(I2S_Type *base, uint32_t channel, uint32_t bitWidth, uint8_t *buffer, uint32_t size)

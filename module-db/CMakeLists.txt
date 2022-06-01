@@ -132,6 +132,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3vfs.cpp PROPERTIES COMPILE_FLAGS -Wno-overflow)
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c PROPERTIES COMPILE_FLAGS "-DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=1 -Wno-misleading-indentation")
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Tables/NotesTable.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=narrowing")
 
 target_compile_definitions(${PROJECT_NAME}
 

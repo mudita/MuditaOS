@@ -13,16 +13,6 @@ namespace at
     Cmd::Cmd(std::string cmd, std::chrono::milliseconds timeout) noexcept : Cmd(cmd, cmd::Modifier::None, timeout)
     {}
 
-    Cmd::Cmd(const Cmd &p) noexcept
-    {
-        *this = operator=(p);
-    }
-
-    Cmd::Cmd(Cmd &&p) noexcept
-    {
-        *this = operator=(p);
-    }
-
     void Cmd::split(const std::string &str, Result &result)
     {
         constexpr char tokenDelimiter = ',';
@@ -35,30 +25,6 @@ namespace at
                 t = utils::trim(t);
             }
         }
-    }
-
-    auto Cmd::operator=(const Cmd &p) noexcept -> Cmd &
-    {
-        if (&p == this) {
-            return *this;
-        }
-        this->cmd     = p.cmd;
-        this->timeout = p.timeout;
-        this->mod     = p.mod;
-        this->body    = p.body;
-        return *this;
-    }
-
-    auto Cmd::operator=(Cmd &&p) noexcept -> Cmd &
-    {
-        if (&p == this) {
-            return *this;
-        }
-        this->cmd     = std::move(p.cmd);
-        this->timeout = std::move(p.timeout);
-        this->mod     = std::move(p.mod);
-        this->body    = std::move(p.body);
-        return *this;
     }
 
     Result Cmd::parseBase(const Result &that)

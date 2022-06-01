@@ -9,6 +9,7 @@
 #include <set>
 #include <string>
 #include <sstream>
+#include <array>
 #include <log/log.hpp>
 
 DatabaseInitializer::DatabaseInitializer(Database *db) : db(db)
