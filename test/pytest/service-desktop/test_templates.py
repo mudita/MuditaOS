@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
 from harness.interface.defs import status
@@ -19,7 +19,8 @@ class TemplatesTester:
     def __add_template(self):
         body = {"category": "template", "templateBody": self.template_body}
         ret = self.harness.endpoint_request("messages", "post", body)
-        assert ret["status"] == status["NoContent"]
+        assert ret["status"] == status["OK"]
+        assert type(ret["body"]["templateID"]) == int
         return ret
 
     def __get_templates(self, limit, offset):

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -85,6 +85,22 @@ TEST_CASE("SMS Templates Table tests")
         // Get table rows using invalid offset/limit parameters(should return empty object)
         auto retOffsetLimitFailed = templatesTbl.getLimitOffset(5, 4);
         REQUIRE(retOffsetLimitFailed.size() == 0);
+    }
+
+    SECTION("Get last ID")
+    {
+        REQUIRE(templatesTbl.getLastId() == 4);
+        REQUIRE(templatesTbl.add(testRow));
+        REQUIRE(templatesTbl.getLastId() == 5);
+        REQUIRE(templatesTbl.removeById(5));
+        REQUIRE(templatesTbl.getLastId() == 4);
+        REQUIRE(templatesTbl.add(testRow));
+        REQUIRE(templatesTbl.getLastId() == 5);
+        REQUIRE(templatesTbl.add(testRow));
+        REQUIRE(templatesTbl.getLastId() == 6);
+        REQUIRE(templatesTbl.removeById(5));
+        REQUIRE(templatesTbl.add(testRow));
+        REQUIRE(templatesTbl.getLastId() == 7);
     }
 
     SECTION("Remove entries")

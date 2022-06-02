@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplateTable.hpp"
@@ -109,6 +109,15 @@ uint32_t SMSTemplateTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM templates WHERE '%q'=%" PRIu32 ";", field, id);
 
+    if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
+        return 0;
+    }
+
+    return (*queryRet)[0].getUInt32();
+}
+uint32_t SMSTemplateTable::getLastId()
+{
+    auto queryRet = db->query("SELECT MAX(_id) FROM templates;");
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
