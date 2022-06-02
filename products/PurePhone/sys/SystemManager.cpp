@@ -32,9 +32,10 @@ namespace sys
 
     void SystemManager::StartSystem(InitFunction sysInit, InitFunction appSpaceInit, DeinitFunction sysDeinit)
     {
-        auto simSelected = []() {
-            return (Store::GSM::get()->selected == Store::GSM::SIM::SIM1 ||
-                    Store::GSM::get()->selected == Store::GSM::SIM::SIM2);
+        auto activeSimSelected = []() {
+            const auto storeGsm = Store::GSM::get();
+            return ((storeGsm->selected == Store::GSM::SIM::SIM1 || storeGsm->selected == Store::GSM::SIM::SIM2) &&
+                    storeGsm->simCardInserted());
         };
         auto isCallOngoing = [this]() {
             auto request = async_call<cellular::CellularIsCallActive, cellular::CellularIsCallActiveResponse>(
@@ -42,7 +43,8 @@ namespace sys
             sync(request);
             return request.getResult().active;
         };
-        phoneModeSubject = std::make_unique<phone_modes::Subject>(this, simSelected, isCallOngoing);
+        phoneModeSubject =
+            std::make_unique<phone_modes::Subject>(this, std::move(activeSimSelected), std::move(isCallOngoing));
         SystemManagerCommon::StartSystem(std::move(sysInit), std::move(appSpaceInit), std::move(sysDeinit));
     }
 
