@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,7 +16,7 @@ namespace db::query
     class SMSTemplateAdd : public Query
     {
       public:
-        SMSTemplateAdd(const SMSTemplateRecord &rec);
+        explicit SMSTemplateAdd(const SMSTemplateRecord &rec);
         SMSTemplateRecord rec;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
@@ -24,15 +24,20 @@ namespace db::query
     class SMSTemplateAddResult : public QueryResult
     {
       public:
-        SMSTemplateAddResult(bool result);
+        SMSTemplateAddResult(bool result, unsigned int id);
         auto getResult() -> bool
         {
             return result;
+        }
+        [[nodiscard]] auto getID() const noexcept -> unsigned int
+        {
+            return id;
         }
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
       private:
         bool result;
+        unsigned int id;
     };
 
 }; // namespace db::query

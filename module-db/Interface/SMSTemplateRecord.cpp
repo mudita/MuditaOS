@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplateRecord.hpp"
@@ -35,7 +35,7 @@ uint32_t SMSTemplateRecordInterface::GetCount()
 }
 
 std::unique_ptr<std::vector<SMSTemplateRecord>> SMSTemplateRecordInterface::GetLimitOffsetByField(
-    uint32_t offset, uint32_t limit, SMSTemplateRecordField field, const char *str)
+    uint32_t offset, uint32_t limit, SMSTemplateRecordField /*field*/, const char * /*str*/)
 {
     assert(0 && "need proper implementation");
     return GetLimitOffset(offset, limit);
@@ -71,7 +71,7 @@ bool SMSTemplateRecordInterface::RemoveByID(uint32_t id)
     return smsDB->templates.removeById(id);
 }
 
-bool SMSTemplateRecordInterface::RemoveByField(SMSTemplateRecordField field, const char *str)
+bool SMSTemplateRecordInterface::RemoveByField(SMSTemplateRecordField /*field*/, const char * /*str*/)
 {
     assert(0 && "need implementation");
     return false;
@@ -172,8 +172,12 @@ std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::getCountQuery(const
 std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::addQuery(const std::shared_ptr<db::Query> &query)
 {
     const auto localQuery = static_cast<const db::query::SMSTemplateAdd *>(query.get());
-    auto ret              = SMSTemplateRecordInterface::Add(localQuery->rec);
-    auto response         = std::make_unique<db::query::SMSTemplateAddResult>(ret);
+    auto record           = localQuery->rec;
+    auto ret              = SMSTemplateRecordInterface::Add(record);
+    if (ret) {
+        record.ID = smsDB->templates.getLastId();
+    }
+    auto response = std::make_unique<db::query::SMSTemplateAddResult>(ret, record.ID);
     response->setRequestQuery(query);
     return response;
 }

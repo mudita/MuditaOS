@@ -314,8 +314,9 @@ namespace sdesktop::endpoints
         auto listener = std::make_unique<db::EndpointListener>(
             [=](db::QueryResult *result, Context context) {
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateAddResult *>(result)) {
-
-                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::NoContent
+                    context.setResponseBody(json11::Json::object{
+                        {json::messages::templateID, static_cast<int>(smsTemplateResult->getID())}});
+                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::OK
                                                                              : http::Code::InternalServerError);
                     putToSendQueue(context.createSimpleResponse());
                     return true;

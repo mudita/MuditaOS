@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -41,4 +41,5 @@ class SMSTemplateTable : public Table<SMSTemplateTableRow, SMSTemplateTableField
     uint32_t count() override final;
     uint32_t count(EntryState state);
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
+    uint32_t getLastId();
 };
