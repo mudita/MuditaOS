@@ -16,7 +16,7 @@ namespace sys::phone_modes
     class Subject
     {
       public:
-        Subject(Service *owner, std::function<bool()> simSelect, std::function<bool()> isCallOngoing);
+        Subject(Service *owner, std::function<bool()> activeSimSelected, std::function<bool()> isCallOngoing);
 
         /**
          * Sets phone and tethering modes
@@ -53,7 +53,7 @@ namespace sys::phone_modes
         Service *owner;
         PhoneMode phoneMode     = PhoneMode::Connected;
         Tethering tetheringMode = Tethering::Off;
-        const std::function<bool()> simSelected;
+        const std::function<bool()> activeSimSelected;
         const std::function<bool()> isCallOngoing;
     };
 } // namespace sys::phone_modes
