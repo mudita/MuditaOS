@@ -290,11 +290,11 @@ namespace gui
         bottomBox->setMinimumSize(trackProgress::barWidth, trackProgress::bottomHeight);
         bottomBox->setEdges(RectangleEdge::None);
 
-        auto letfBox = new HBox(bottomBox);
-        letfBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom)); //
-        letfBox->setMinimumSize(trackProgress::barWidth / 2 - 1, trackProgress::bottomHeight);
-        letfBox->setEdges(RectangleEdge::None);
-        currentTimeText = new Text(letfBox, 0, 0, trackProgress::descriptionWidth, trackProgress::descriptionHeight);
+        auto leftBox = new HBox(bottomBox);
+        leftBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom)); //
+        leftBox->setMinimumSize(trackProgress::barWidth / 2 - 1, trackProgress::bottomHeight);
+        leftBox->setEdges(RectangleEdge::None);
+        currentTimeText = new Text(leftBox, 0, 0, trackProgress::descriptionWidth, trackProgress::descriptionHeight);
         currentTimeText->setMaximumWidth(trackProgress::barWidth / 2 - 1);
         currentTimeText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         currentTimeText->setTextType(TextType::SingleLine);

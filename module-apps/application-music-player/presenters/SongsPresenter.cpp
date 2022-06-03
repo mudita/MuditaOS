@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SongsPresenter.hpp"
@@ -218,6 +218,10 @@ namespace app::music_player
                 changePlayingStateCallback(app::music::SongState::NotPlaying);
             }
             updateViewSongState();
+            songProgressTimer.stop();
+            updateTrackProgressRatio();
+            updateViewProgresState();
+            refreshView();
             return true;
         }
         return false;
@@ -231,6 +235,9 @@ namespace app::music_player
                 changePlayingStateCallback(app::music::SongState::Playing);
             }
             updateViewSongState();
+            songProgressTimestamp = std::chrono::system_clock::now();
+            songProgressTimer.start();
+            refreshView();
             return true;
         }
         return false;
