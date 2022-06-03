@@ -613,6 +613,10 @@ void ServiceCellular::registerMessageHandlers()
         return sys::MessageNone{};
     });
 
+    connect(typeid(CellularIsCallActive), [&](sys::Message * /*request*/) -> sys::MessagePointer {
+        return std::make_shared<CellularIsCallActiveResponse>(ongoingCall && ongoingCall->active());
+    });
+
     handle_CellularGetChannelMessage();
 }
 

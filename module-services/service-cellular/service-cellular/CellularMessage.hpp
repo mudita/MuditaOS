@@ -1070,4 +1070,14 @@ namespace cellular
         time_t callDuration;
     };
 
+    class CellularIsCallActive : public sys::DataMessage
+    {};
+    struct CellularIsCallActiveResponse : public sys::ResponseMessage
+    {
+        explicit CellularIsCallActiveResponse(bool active) : active{active}
+        {}
+
+        const bool active = false;
+    };
+
 } // namespace cellular

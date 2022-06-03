@@ -36,7 +36,13 @@ namespace sys
             return (Store::GSM::get()->selected == Store::GSM::SIM::SIM1 ||
                     Store::GSM::get()->selected == Store::GSM::SIM::SIM2);
         };
-        phoneModeSubject = std::make_unique<phone_modes::Subject>(this, simSelected);
+        auto isCallOngoing = [this]() {
+            auto request = async_call<cellular::CellularIsCallActive, cellular::CellularIsCallActiveResponse>(
+                cellular::service::name);
+            sync(request);
+            return request.getResult().active;
+        };
+        phoneModeSubject = std::make_unique<phone_modes::Subject>(this, simSelected, isCallOngoing);
         SystemManagerCommon::StartSystem(std::move(sysInit), std::move(appSpaceInit), std::move(sysDeinit));
     }
 

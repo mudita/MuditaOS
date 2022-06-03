@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,7 +16,7 @@ namespace sys::phone_modes
     class Subject
     {
       public:
-        Subject(Service *owner, std::function<bool()> simSelect);
+        Subject(Service *owner, std::function<bool()> simSelect, std::function<bool()> isCallOngoing);
 
         /**
          * Sets phone and tethering modes
@@ -54,5 +54,6 @@ namespace sys::phone_modes
         PhoneMode phoneMode     = PhoneMode::Connected;
         Tethering tetheringMode = Tethering::Off;
         const std::function<bool()> simSelected;
+        const std::function<bool()> isCallOngoing;
     };
 } // namespace sys::phone_modes
