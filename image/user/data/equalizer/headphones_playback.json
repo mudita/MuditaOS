@@ -8,28 +8,28 @@
   "outputPath": 0,
   "filterParams": [
     {
-      "filterType": "HighPass",
+      "filterType": "None",
       "frequency": 100.2,
       "samplerate": 44100,
       "Q": 0.701,
       "gain": 0
     },
     {
-      "filterType": "LowPass",
+      "filterType": "None",
       "frequency": 17996.2,
       "samplerate": 44100,
       "Q": 0.701,
       "gain": 0
     },
     {
-      "filterType": "HighShelf",
+      "filterType": "None",
       "frequency": 13984.7,
       "samplerate": 44100,
       "Q": 0.701,
       "gain": -10
     },
     {
-      "filterType": "LowShelf",
+      "filterType": "None",
       "frequency": 200.4,
       "samplerate": 44100,
       "Q": 0.701,
