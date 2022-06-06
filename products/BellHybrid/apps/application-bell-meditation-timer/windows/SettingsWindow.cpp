@@ -41,8 +41,9 @@ namespace app::meditation
         setFocusItem(sideListView);
     }
 
-    void SettingsWindow::onBeforeShow(gui::ShowMode, gui::SwitchData *)
+    void SettingsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
+        AppWindow::onBeforeShow(mode, data);
         presenter->loadData();
         setFocusItem(sideListView);
     }
@@ -63,8 +64,10 @@ namespace app::meditation
         return AppWindow::onInput(inputEvent);
     }
 
-    void SettingsWindow::onClose(CloseReason)
+    void SettingsWindow::onClose(const CloseReason reason)
     {
-        presenter->eraseProviderData();
+        if (reason != CloseReason::Popup) {
+            presenter->eraseProviderData();
+        }
     }
 } // namespace app::meditation
