@@ -1,21 +1,21 @@
 {
-  "samplerate": 0,
+  "samplerate": 16000,
   "bitWidth": 16,
-  "flags": 0,
-  "outputVolume": 0,
-  "inputGain": 0,
-  "inputPath": 2,
+  "flags": 5,
+  "outputVolume": 10,
+  "inputGain": 5,
+  "inputPath": 0,
   "outputPath": 0,
   "filterParams": [
     {
-      "filterType": "HighPass",
+      "filterType": "None",
       "frequency": 997,
       "samplerate": 44100,
       "Q": 0.701,
       "gain": 0
     },
     {
-      "filterType": "LowPass",
+      "filterType": "None",
       "frequency": 4993.7,
       "samplerate": 44100,
       "Q": 0.701,
