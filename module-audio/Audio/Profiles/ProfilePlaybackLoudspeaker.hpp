@@ -15,7 +15,7 @@ namespace audio
             : Profile(
                   "Playback Loudspeaker",
                   Type::PlaybackLoudspeaker,
-                  purefs::dir::getUserDiskPath() / "data/equalizer/loudspeaker_playback.json",
+                  purefs::dir::getCurrentOSPath() / "user/data/equalizer/loudspeaker_playback.json",
                   audio::codec::Configuration{
                       .sampleRate_Hz     = 0,
                       .bitWidth          = 16,
