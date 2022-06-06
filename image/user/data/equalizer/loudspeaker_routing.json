@@ -6,41 +6,43 @@
   "inputGain": 0,
   "inputPath": 1,
   "outputPath": 2,
+  "playbackPathGain": 0,
+  "playbackPathAtten": 2,
   "filterParams": [
     {
       "filterType": "HighPass",
-      "frequency": 307.3,
-      "samplerate": 16000,
-      "Q": 0.701,
-      "gain": 0
-    },
-    {
-      "filterType": "LowPass",
-      "frequency": 5080.1,
-      "samplerate": 16000,
-      "Q": 0.847,
-      "gain": 0
-    },
-    {
-      "filterType": "None",
-      "frequency": 15975.7,
-      "samplerate": 16000,
-      "Q": 0.701,
-      "gain": -10
-    },
-    {
-      "filterType": "None",
-      "frequency": 200.4,
-      "samplerate": 16000,
-      "Q": 0.701,
-      "gain": -10
-    },
-    {
-      "filterType": "None",
-      "frequency": 1496.7,
+      "frequency": 501.8,
       "samplerate": 44100,
       "Q": 0.701,
+      "gain": 0
+    },
+    {
+      "filterType": "Parametric",
+      "frequency": 2800,
+      "samplerate": 44100,
+      "Q": 3,
       "gain": -4
+    },
+    {
+      "filterType": "Parametric",
+      "frequency": 4500,
+      "samplerate": 44100,
+      "Q": 3,
+      "gain": -6
+    },
+    {
+      "filterType": "Parametric",
+      "frequency": 7100,
+      "samplerate": 44100,
+      "Q": 3,
+      "gain": -3
+    },
+    {
+      "filterType": "Parametric",
+      "frequency": 2000.0,
+      "samplerate": 44100,
+      "Q": 2,
+      "gain": 6
     }
   ]
 }
