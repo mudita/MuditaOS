@@ -38,8 +38,8 @@ namespace bluetooth
         void handle(const bluetooth::event::GetDevicesAvailable &evt) override;
         void handle(const bluetooth::event::VisibilityOn &evt) override;
         void handle(const bluetooth::event::VisibilityOff &evt) override;
-        void handle(const bluetooth::event::ConnectAudio &evt) override;
-        void handle(const bluetooth::event::DisconnectAudio &evt) override;
+        void handle(const bluetooth::event::Connect &evt) override;
+        void handle(const bluetooth::event::Disconnect &evt) override;
         void handle(const bluetooth::event::PowerOn &evt) override;
         void handle(const bluetooth::event::PowerOff &evt) override;
         void handle(const bluetooth::event::ShutDown &evt) override;

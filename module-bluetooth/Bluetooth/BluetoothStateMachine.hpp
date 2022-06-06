@@ -151,11 +151,20 @@ namespace bluetooth
         }
     } constexpr HandleDrop;
 
+    struct HandleConnect
+    {
+        void operator()(std::shared_ptr<AbstractCommandHandler> handler, bluetooth::event::Connect evt)
+        {
+            handler->connect(evt.device);
+        }
+
+    } constexpr HandleConnect;
+
     struct HandleDisconnect
     {
         void operator()(std::shared_ptr<AbstractCommandHandler> handler)
         {
-            handler->disconnectAudioConnection();
+            handler->disconnect();
         }
 
     } constexpr HandleDisconnect;
@@ -177,15 +186,6 @@ namespace bluetooth
         }
 
     } constexpr HandleUnsetVisibility;
-
-    struct EstablishAudioConnection
-    {
-        void operator()(std::shared_ptr<AbstractCommandHandler> handler, bluetooth::event::ConnectAudio evt)
-        {
-            handler->establishAudioConnection(evt.device);
-        }
-
-    } constexpr EstablishAudioConnection;
 
     struct StartRinging
     {
@@ -354,7 +354,8 @@ namespace bluetooth
 
                         state<Idle> + sml::event<bluetooth::event::VisibilityOn> / HandleSetVisibility = state<Idle>,
                         state<Idle> + sml::event<bluetooth::event::VisibilityOff> / HandleUnsetVisibility = state<Idle>,
-                        state<Idle> + sml::event<bluetooth::event::ConnectAudio> / EstablishAudioConnection = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::Connect> / HandleConnect = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::Disconnect> / HandleDisconnect = state<Idle>,
 
                         state<Idle> + sml::event<bluetooth::event::SignalStrengthData> / SignalStrength = state<Idle>,
                         state<Idle> + sml::event<bluetooth::event::OperatorNameData>/  SetOperatorName = state<Idle>,
@@ -363,10 +364,10 @@ namespace bluetooth
                         state<Idle> + sml::event<bluetooth::event::StartStream>/ StartAudio = state<Idle>,
                         state<Idle> + sml::event<bluetooth::event::StopStream>/ StopAudio = state<Idle>,
 
-                        state<Idle> + sml::event<bluetooth::event::StartRouting> / forwardEvent= state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::StartRouting> / forwardEvent = state<Call>,
 
-                        state<Idle> + sml::event<bluetooth::event::IncomingCallNumber>  / forwardEvent  = state<Call>,
-                        state<Idle> + sml::event<bluetooth::event::CallStarted> / forwardEvent= state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::IncomingCallNumber>  / forwardEvent = state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::CallStarted> / forwardEvent = state<Call>,
                         state<Call> = state<Idle> // this one is needed to go out from Call substate properly!
 
                             );

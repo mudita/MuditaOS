@@ -30,8 +30,8 @@ namespace bluetooth
         virtual Error::Code scan()                                            = 0;
         virtual Error::Code stopScan()                                        = 0;
         virtual Error::Code setVisibility(bool visibility)                    = 0;
-        virtual Error::Code establishAudioConnection(const DataVariant &data) = 0;
-        virtual Error::Code disconnectAudioConnection()                       = 0;
+        virtual Error::Code connect(const DataVariant &data)                  = 0;
+        virtual Error::Code disconnect()                                      = 0;
         virtual Error::Code pair(const DataVariant &data)                     = 0;
         virtual Error::Code unpair(const DataVariant &data)                   = 0;
         virtual Error::Code availableDevices()                                = 0;
@@ -48,8 +48,8 @@ namespace bluetooth
         Error::Code scan() override;
         Error::Code stopScan() override;
         Error::Code setVisibility(bool visibility) override;
-        Error::Code establishAudioConnection(const DataVariant &data) override;
-        Error::Code disconnectAudioConnection() override;
+        Error::Code connect(const DataVariant &data) override;
+        Error::Code disconnect() override;
         Error::Code pair(const DataVariant &data) override;
         Error::Code unpair(const DataVariant &data) override;
         Error::Code availableDevices() override;
