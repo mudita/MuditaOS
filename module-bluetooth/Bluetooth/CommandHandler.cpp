@@ -66,17 +66,17 @@ namespace bluetooth
         return Error::Success;
     }
 
-    Error::Code CommandHandler::establishAudioConnection(const DataVariant &data)
+    Error::Code CommandHandler::connect(const DataVariant &data)
     {
         auto device = std::get<Devicei>(data);
-        LOG_INFO("Connecting audio");
+        LOG_INFO("Connecting device");
         profileManager->connect(device);
         return Error::Success;
     }
 
-    Error::Code CommandHandler::disconnectAudioConnection()
+    Error::Code CommandHandler::disconnect()
     {
-        LOG_INFO("Disconnecting audio");
+        LOG_INFO("Disconnecting device");
         profileManager->disconnect();
         return Error::Success;
     }

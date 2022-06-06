@@ -11,8 +11,8 @@ namespace bluetooth::event
     struct GetDevicesAvailable;
     struct VisibilityOn;
     struct VisibilityOff;
-    struct ConnectAudio;
-    struct DisconnectAudio;
+    struct Connect;
+    struct Disconnect;
     struct PowerOn;
     struct PowerOff;
     struct ShutDown;
@@ -47,8 +47,8 @@ namespace bluetooth
         virtual void handle(const bluetooth::event::GetDevicesAvailable &evt) = 0;
         virtual void handle(const bluetooth::event::VisibilityOn &evt)        = 0;
         virtual void handle(const bluetooth::event::VisibilityOff &evt)       = 0;
-        virtual void handle(const bluetooth::event::ConnectAudio &evt)        = 0;
-        virtual void handle(const bluetooth::event::DisconnectAudio &evt)     = 0;
+        virtual void handle(const bluetooth::event::Connect &evt)             = 0;
+        virtual void handle(const bluetooth::event::Disconnect &evt)          = 0;
         virtual void handle(const bluetooth::event::PowerOn &evt)             = 0;
         virtual void handle(const bluetooth::event::PowerOff &evt)            = 0;
         virtual void handle(const bluetooth::event::ShutDown &evt)            = 0;

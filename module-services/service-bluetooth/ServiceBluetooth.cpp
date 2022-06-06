@@ -139,7 +139,7 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler()
 
 void ServiceBluetooth::ProcessCloseReason(sys::CloseReason closeReason)
 {
-    sendWorkerCommand(std::make_unique<bluetooth::event::DisconnectAudio>());
+    sendWorkerCommand(std::make_unique<bluetooth::event::Disconnect>());
     sendWorkerCommand(std::make_unique<bluetooth::event::PowerOff>());
 }
 
@@ -299,7 +299,7 @@ auto ServiceBluetooth::handle(message::bluetooth::SetDeviceName *msg) -> std::sh
 auto ServiceBluetooth::handle(message::bluetooth::Connect *msg) -> std::shared_ptr<sys::Message>
 {
     auto device = msg->getDevice();
-    sendWorkerCommand(std::make_unique<bluetooth::event::ConnectAudio>(device));
+    sendWorkerCommand(std::make_unique<bluetooth::event::Connect>(device));
     bluetoothDevicesModel->setInternalDeviceState(device, DeviceState::Connecting);
     bluetoothDevicesModel->syncDevicesWithApp();
     return sys::MessageNone{};
@@ -349,7 +349,7 @@ auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::sh
 
 auto ServiceBluetooth::handle([[maybe_unused]] message::bluetooth::Disconnect *msg) -> std::shared_ptr<sys::Message>
 {
-    sendWorkerCommand(std::make_unique<bluetooth::event::DisconnectAudio>());
+    sendWorkerCommand(std::make_unique<bluetooth::event::Disconnect>());
     return sys::MessageNone{};
 }
 
@@ -430,7 +430,7 @@ auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Mes
         sendWorkerCommand(std::make_unique<bluetooth::event::StartStream>());
         break;
     case BluetoothMessage::Disconnect:
-        sendWorkerCommand(std::make_unique<bluetooth::event::DisconnectAudio>());
+        sendWorkerCommand(std::make_unique<bluetooth::event::Disconnect>());
         break;
     case BluetoothMessage::Stop:
         sendWorkerCommand(std::make_unique<bluetooth::event::StopStream>());
@@ -444,7 +444,7 @@ auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Mes
 
 auto ServiceBluetooth::handle(BluetoothAddrMessage *msg) -> std::shared_ptr<sys::Message>
 {
-    sendWorkerCommand(std::make_unique<bluetooth::event::ConnectAudio>(msg->device));
+    sendWorkerCommand(std::make_unique<bluetooth::event::Connect>(msg->device));
     return std::make_shared<sys::ResponseMessage>();
 }
 

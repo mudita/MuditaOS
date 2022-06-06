@@ -40,8 +40,8 @@ namespace mock
         fakeit::When(Method(mock, scan)).AlwaysReturn(Error::Code::Success);
         fakeit::When(Method(mock, stopScan)).AlwaysReturn(Error::Code::Success);
         fakeit::When(Method(mock, setVisibility)).AlwaysReturn(Error::Code::Success);
-        fakeit::When(Method(mock, establishAudioConnection)).AlwaysReturn(Error::Code::Success);
-        fakeit::When(Method(mock, disconnectAudioConnection)).AlwaysReturn(Error::Code::Success);
+        fakeit::When(Method(mock, connect)).AlwaysReturn(Error::Code::Success);
+        fakeit::When(Method(mock, disconnect)).AlwaysReturn(Error::Code::Success);
         fakeit::When(Method(mock, pair)).AlwaysReturn(Error::Code::Success);
         fakeit::When(Method(mock, unpair)).AlwaysReturn(Error::Code::Success);
         fakeit::When(Method(mock, availableDevices)).AlwaysReturn(Error::Code::Success);
@@ -151,6 +151,24 @@ TEST_CASE("pair/unpair")
 
     REQUIRE(controller.sm.process_event(bluetooth::event::Unpair{device}));
     fakeit::Verify(Method(sm.h, unpair)).Exactly(1);
+}
+
+TEST_CASE("connect/disconnect")
+{
+    using namespace boost::sml;
+
+    auto sm         = mock::SM();
+    auto controller = sm.get();
+    auto device     = Devicei{"lol"};
+
+    REQUIRE(controller.sm.process_event(bluetooth::event::PowerOn{}));
+    REQUIRE(controller.sm.is(state<bluetooth::On>));
+
+    REQUIRE(controller.sm.process_event(bluetooth::event::Connect{device}));
+    fakeit::Verify(Method(sm.h, connect)).Exactly(1);
+
+    REQUIRE(controller.sm.process_event(bluetooth::event::Disconnect{}));
+    fakeit::Verify(Method(sm.h, disconnect)).Exactly(1);
 }
 
 TEST_CASE("start/stop scan")

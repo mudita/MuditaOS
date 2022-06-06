@@ -59,11 +59,11 @@ namespace bluetooth
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bluetooth::event::ConnectAudio &evt)
+    void StatefulController::handle(const bluetooth::event::Connect &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bluetooth::event::DisconnectAudio &evt)
+    void StatefulController::handle(const bluetooth::event::Disconnect &evt)
     {
         pimpl->sm.process_event(evt);
     };

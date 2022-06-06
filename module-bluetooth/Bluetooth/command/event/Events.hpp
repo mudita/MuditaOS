@@ -56,9 +56,9 @@ namespace bluetooth::event
             controler->handle(*this);
         }
     };
-    struct ConnectAudio : public Base
+    struct Connect : public Base
     {
-        explicit ConnectAudio(const Devicei &dev) : device(dev)
+        explicit Connect(const Devicei &dev) : device(dev)
         {}
         const Devicei device;
 
@@ -67,7 +67,7 @@ namespace bluetooth::event
             controler->handle(*this);
         }
     };
-    struct DisconnectAudio : public Base
+    struct Disconnect : public Base
     {
         void dispatch(bluetooth::AbstractController *controler) const override
         {
