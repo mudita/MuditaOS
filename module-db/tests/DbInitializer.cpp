@@ -4,10 +4,8 @@
 #include "module-db/Database/DatabaseInitializer.hpp"
 
 #include <algorithm>
-#include <cstdio>
-#include <memory>
 #include <set>
-#include <string>
+#include <array>
 #include <log/log.hpp>
 
 DatabaseInitializer::DatabaseInitializer(Database *db) : db(db)

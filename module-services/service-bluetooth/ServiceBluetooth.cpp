@@ -109,13 +109,13 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::ResponseAuthenticatePasskey>();
     connectHandler<message::bluetooth::ResponseAuthenticatePairCancel>();
     connectHandler<message::bluetooth::RequestStatusIndicatorData>();
-    connectHandler<CellularCallerIdMessage>();
-    connectHandler<CellularIncominCallMessage>();
+    connectHandler<cellular::CallerIdMessage>();
+    connectHandler<cellular::IncomingCallMessage>();
     connectHandler<cellular::CallEndedNotification>();
     connectHandler<cellular::CallStartedNotification>();
-    connectHandler<CellularSignalStrengthUpdateNotification>();
-    connectHandler<CellularCurrentOperatorNameNotification>();
-    connectHandler<CellularNetworkStatusUpdateNotification>();
+    connectHandler<cellular::SignalStrengthUpdateNotification>();
+    connectHandler<cellular::CurrentOperatorNameNotification>();
+    connectHandler<cellular::NetworkStatusUpdateNotification>();
     connectHandler<sevm::BatteryStatusChangeMessage>();
     connectHandler<cellular::CallOutgoingAccepted>();
 
@@ -482,7 +482,7 @@ auto ServiceBluetooth::handle(message::bluetooth::StartAudioRouting *msg) -> std
     return std::make_shared<sys::ResponseMessage>();
 }
 
-auto ServiceBluetooth::handle(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::Message>
+auto ServiceBluetooth::handle(cellular::CallerIdMessage *msg) -> std::shared_ptr<sys::Message>
 {
     auto number = msg->number;
     auto btOn   = std::visit(bluetooth::BoolVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
@@ -496,7 +496,7 @@ auto ServiceBluetooth::handle(CellularCallerIdMessage *msg) -> std::shared_ptr<s
     return sys::MessageNone{};
 }
 
-auto ServiceBluetooth::handle(CellularSignalStrengthUpdateNotification *msg) -> std::shared_ptr<sys::Message>
+auto ServiceBluetooth::handle(cellular::SignalStrengthUpdateNotification *msg) -> std::shared_ptr<sys::Message>
 {
     auto signalStrength = Store::GSM::get()->getSignalStrength();
     LOG_DEBUG("Bluetooth: RSSI %d/5", static_cast<int>(signalStrength.rssiBar));
@@ -504,7 +504,7 @@ auto ServiceBluetooth::handle(CellularSignalStrengthUpdateNotification *msg) -> 
     return std::make_shared<sys::ResponseMessage>();
 }
 
-auto ServiceBluetooth::handle(CellularCurrentOperatorNameNotification *msg) -> std::shared_ptr<sys::Message>
+auto ServiceBluetooth::handle(cellular::CurrentOperatorNameNotification *msg) -> std::shared_ptr<sys::Message>
 {
     auto opName = msg->getCurrentOperatorName();
     LOG_DEBUG("Bluetooth: Operator name: %s", opName.c_str());
@@ -544,12 +544,12 @@ void ServiceBluetooth::handleTurnOff()
 }
 auto ServiceBluetooth::handle(message::bluetooth::RequestStatusIndicatorData *msg) -> std::shared_ptr<sys::Message>
 {
-    bus.sendUnicast(std::make_shared<CellularRequestCurrentOperatorNameMessage>(), cellular::service::name);
+    bus.sendUnicast(std::make_shared<cellular::RequestCurrentOperatorNameMessage>(), cellular::service::name);
 
     // just to execute proper handle method and sending it back to worker
-    bus.sendUnicast(std::make_shared<CellularSignalStrengthUpdateNotification>(), service::name::bluetooth);
+    bus.sendUnicast(std::make_shared<cellular::SignalStrengthUpdateNotification>(), service::name::bluetooth);
     bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::bluetooth);
-    bus.sendUnicast(std::make_shared<CellularNetworkStatusUpdateNotification>(), service::name::bluetooth);
+    bus.sendUnicast(std::make_shared<cellular::NetworkStatusUpdateNotification>(), service::name::bluetooth);
 
     return sys::MessageNone{};
 }
@@ -565,7 +565,7 @@ auto ServiceBluetooth::handle(cellular::CallEndedNotification *msg) -> std::shar
     sendWorkerCommand(std::make_unique<bluetooth::event::CallTerminated>());
     return sys::MessageNone{};
 }
-auto ServiceBluetooth::handle(CellularNetworkStatusUpdateNotification *msg) -> std::shared_ptr<sys::Message>
+auto ServiceBluetooth::handle(cellular::NetworkStatusUpdateNotification *msg) -> std::shared_ptr<sys::Message>
 {
     auto status = Store::GSM::get()->getNetwork().status;
     LOG_DEBUG("Bluetooth: Network status %s", magic_enum::enum_name(status).data());
@@ -580,7 +580,7 @@ auto ServiceBluetooth::handle(cellular::CallStartedNotification *msg) -> std::sh
     }
     return sys::MessageNone{};
 }
-auto ServiceBluetooth::handle(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::Message>
+auto ServiceBluetooth::handle(cellular::IncomingCallMessage *msg) -> std::shared_ptr<sys::Message>
 {
     sendWorkerCommand(std::make_unique<bluetooth::event::StartRinging>());
     return sys::MessageNone{};

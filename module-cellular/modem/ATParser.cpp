@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATParser.hpp"
@@ -90,7 +90,7 @@ at::Result ATParser::processNewData(sys::Service *service, const bsp::cellular::
         // 1) RDY
         // 2) +CFUN: 1
         if (urcs.size() == 2) {
-            auto msg = std::make_shared<CellularPowerUpProcedureCompleteNotification>();
+            auto msg = std::make_shared<cellular::PowerUpProcedureCompleteNotification>();
             service->bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceCellularNotifications);
             urcs.clear();
 

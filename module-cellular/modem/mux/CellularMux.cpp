@@ -431,7 +431,7 @@ CellularMux::ConfState CellularMux::startMultiplexer()
             SignalStrength signalStrength(strength);
             if (signalStrength.isValid()) {
                 Store::GSM::get()->setSignalStrength(signalStrength.data);
-                auto msg = std::make_shared<CellularSignalStrengthUpdateNotification>();
+                auto msg = std::make_shared<cellular::SignalStrengthUpdateNotification>();
                 parentService->bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceCellularNotifications);
             }
         }

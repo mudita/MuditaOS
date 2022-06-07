@@ -131,7 +131,7 @@ namespace app
             return retMsg;
         }
 
-        if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
+        if (auto phoneMsg = dynamic_cast<cellular::NotificationMessage *>(msgl); nullptr != phoneMsg) {
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
                 updateCurrentWindow();
@@ -260,9 +260,9 @@ namespace app
             return sys::MessageNone{};
         });
 
-        connect(typeid(CellularGetAPNResponse), [&](sys::Message *msg) {
+        connect(typeid(cellular::GetAPNResponse), [&](sys::Message *msg) {
             if (gui::window::name::apn_settings == getCurrentWindow()->getName()) {
-                auto apns = dynamic_cast<CellularGetAPNResponse *>(msg);
+                auto apns = dynamic_cast<cellular::GetAPNResponse *>(msg);
                 if (apns != nullptr) {
                     auto apnsData = std::make_unique<gui::ApnListData>(apns->getAPNs());
                     switchWindow(gui::window::name::apn_settings, std::move(apnsData));

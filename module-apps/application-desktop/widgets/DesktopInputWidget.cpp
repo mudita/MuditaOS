@@ -1,14 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DesktopInputWidget.hpp"
-
-#include <AppWindow.hpp>
-#include <Font.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
-#include <Style.hpp>
 
-#include <algorithm>
 
 namespace style::desktop
 {
@@ -65,7 +60,7 @@ namespace gui
         inputText->activatedCallback = [=](gui::Item &) {
             std::string data = inputText->getText().c_str();
             CellularServiceAPI::USSDRequest(
-                this->application, CellularUSSDMessage::RequestType::pullSesionRequest, data);
+                this->application, cellular::USSDMessage::RequestType::pullSessionRequest, data);
             inputText->clear();
             application->returnToPreviousWindow();
             return true;

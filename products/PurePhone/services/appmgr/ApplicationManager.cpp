@@ -7,7 +7,6 @@
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <apps-common/popups/data/PhoneModeParams.hpp>
-#include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <apps-common/actions/AlarmClockStatusChangeParams.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 #include <system/messages/TetheringQuestionRequest.hpp>
@@ -17,13 +16,10 @@
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 #include <service-appmgr/messages/GetWallpaperOptionRequest.hpp>
 #include <service-bluetooth/messages/BluetoothModeChanged.hpp>
-#include <service-bluetooth/messages/Authenticate.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-desktop/Constants.hpp>
-#include <service-desktop/DesktopMessages.hpp>
-#include <service-desktop/DeveloperModeMessage.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/torch.hpp>
@@ -383,23 +379,23 @@ namespace app::manager
         });
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
-        connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
-        connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
-        connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
-        connect(typeid(CellularNoSimNotification), convertibleToActionHandler);
-        connect(typeid(CellularNotAnEmergencyNotification), convertibleToActionHandler);
-        connect(typeid(CellularNoNetworkConenctionNotification), convertibleToActionHandler);
-        connect(typeid(CellularCallRequestGeneralError), convertibleToActionHandler);
-        connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
-        connect(typeid(CellularSMSRejectedByOfflineNotification), convertibleToActionHandler);
-        connect(typeid(CellularCallRejectedByOfflineNotification), convertibleToActionHandler);
+        connect(typeid(cellular::MMIResultMessage), convertibleToActionHandler);
+        connect(typeid(cellular::MMIResponseMessage), convertibleToActionHandler);
+        connect(typeid(cellular::MMIPushMessage), convertibleToActionHandler);
+        connect(typeid(cellular::NoSimNotification), convertibleToActionHandler);
+        connect(typeid(cellular::NotAnEmergencyNotification), convertibleToActionHandler);
+        connect(typeid(cellular::NoNetworkConenctionNotification), convertibleToActionHandler);
+        connect(typeid(cellular::CallRequestGeneralError), convertibleToActionHandler);
+        connect(typeid(cellular::SmsNoSimRequestMessage), convertibleToActionHandler);
+        connect(typeid(cellular::SMSRejectedByOfflineNotification), convertibleToActionHandler);
+        connect(typeid(cellular::CallRejectedByOfflineNotification), convertibleToActionHandler);
         connect(typeid(sys::TetheringQuestionRequest), convertibleToActionHandler);
         connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
         connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
-        connect(typeid(CellularCallAbortedNotification), convertibleToActionHandler);
-        connect(typeid(CellularRingingMessage), convertibleToActionHandler);
-        connect(typeid(CellularCallActiveNotification), convertibleToActionHandler);
-        connect(typeid(CellularHangupCallMessage), convertibleToActionHandler);
+        connect(typeid(cellular::CallAbortedNotification), convertibleToActionHandler);
+        connect(typeid(cellular::RingingMessage), convertibleToActionHandler);
+        connect(typeid(cellular::CallActiveNotification), convertibleToActionHandler);
+        connect(typeid(cellular::HangupCallMessage), convertibleToActionHandler);
     }
 
     void ApplicationManager::handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode)

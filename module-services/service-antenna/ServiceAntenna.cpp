@@ -382,7 +382,7 @@ void ServiceAntenna::registerMessageHandlers()
         return sys::MessageNone{};
     });
 
-    connect(typeid(CellularSignalStrengthUpdateNotification), [&](sys::Message *request) -> sys::MessagePointer {
+    connect(typeid(cellular::SignalStrengthUpdateNotification), [&](sys::Message *request) -> sys::MessagePointer {
         currentCsq = Store::GSM::get()->getSignalStrength().rssi;
         if (state->get() == antenna::State::idle) {
             state->set(antenna::State::csqChange);
@@ -390,28 +390,28 @@ void ServiceAntenna::registerMessageHandlers()
         return sys::MessageNone{};
     });
 
-    connect(typeid(CellularIncominCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
+    connect(typeid(cellular::IncomingCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto message =
             std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService, antenna::lockState::locked);
         bus.sendUnicast(std::move(message), service::name::antenna);
         return sys::MessageNone{};
     });
 
-    connect(typeid(CellularRingingMessage), [&](sys::Message *request) -> sys::MessagePointer {
+    connect(typeid(cellular::RingingMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto message =
             std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService, antenna::lockState::locked);
         bus.sendUnicast(std::move(message), service::name::antenna);
         return sys::MessageNone{};
     });
 
-    connect(typeid(CellularHangupCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
+    connect(typeid(cellular::HangupCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto message =
             std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService, antenna::lockState::unlocked);
         bus.sendUnicast(std::move(message), service::name::antenna);
         return sys::MessageNone{};
     });
 
-    connect(typeid(CellularCallAbortedNotification), [&](sys::Message *request) -> sys::MessagePointer {
+    connect(typeid(cellular::CallAbortedNotification), [&](sys::Message *request) -> sys::MessagePointer {
         auto message =
             std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService, antenna::lockState::unlocked);
         bus.sendUnicast(std::move(message), service::name::antenna);

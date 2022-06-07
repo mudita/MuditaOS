@@ -2,12 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsHandler.hpp"
-#include <service-db/DBServiceAPI.hpp>
-#include <log/log.hpp>
 #include <service-cellular/service-cellular/CellularMessage.hpp>
-#include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
 
 using namespace notifications;
 
@@ -17,7 +13,7 @@ NotificationsHandler::NotificationsHandler(sys::Service *parentService, Notifica
 
 void NotificationsHandler::registerMessageHandlers()
 {
-    parentService->connect(typeid(CellularIncomingSMSNotificationMessage),
+    parentService->connect(typeid(cellular::IncomingSMSNotificationMessage),
                            [&](sys::Message *request) -> sys::MessagePointer {
                                incomingSMSHandler();
                                return sys::msgHandled();

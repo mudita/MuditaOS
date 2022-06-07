@@ -9,9 +9,7 @@
 #include <system/messages/SystemManagerMessage.hpp>
 #include <system/messages/TetheringQuestionRequest.hpp>
 #include <system/messages/TetheringStateRequest.hpp>
-#include <EventStore.hpp>
 #include <service-appmgr/Constants.hpp>
-#include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
@@ -38,8 +36,7 @@ namespace sys
                     storeGsm->simCardInserted());
         };
         auto isCallOngoing = [this]() {
-            auto request = async_call<cellular::CellularIsCallActive, cellular::CellularIsCallActiveResponse>(
-                cellular::service::name);
+            auto request = async_call<cellular::IsCallActive, cellular::IsCallActiveResponse>(cellular::service::name);
             sync(request);
             return request.getResult().active;
         };
@@ -67,7 +64,7 @@ namespace sys
             return enableTethering(response);
         });
 
-        connect(CellularCheckIfStartAllowedMessage(), [&](Message *) {
+        connect(cellular::CheckIfStartAllowedMessage(), [&](Message *) {
             switch (Store::Battery::get().levelState) {
             case Store::Battery::LevelState::Normal:
                 CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::On);

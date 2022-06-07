@@ -58,7 +58,7 @@ auto ConnectionManagerCellularCommands::clearNetworkIndicator() -> bool
     constexpr auto rssi = 0;
     SignalStrength signalStrength(rssi);
     Store::GSM::get()->setSignalStrength(signalStrength.data);
-    auto msg = std::make_shared<CellularSignalStrengthUpdateNotification>();
+    auto msg = std::make_shared<cellular::SignalStrengthUpdateNotification>();
     cellular.bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
 
     return true;
@@ -66,7 +66,7 @@ auto ConnectionManagerCellularCommands::clearNetworkIndicator() -> bool
 
 void ConnectionManagerCellularCommands::hangUpOngoingCall()
 {
-    CellularHangupCallMessage msg;
+    cellular::HangupCallMessage msg;
     cellular.handleCellularHangupCallMessage(&msg);
 }
 

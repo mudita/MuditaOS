@@ -221,32 +221,32 @@ class ServiceCellular : public sys::Service
     // ussd handlers
     uint32_t ussdTimeout = 0;
     void setUSSDTimer();
-    bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
+    bool handleUSSDRequest(cellular::USSDMessage::RequestType requestType, const std::string &request = "");
     bool handleIMEIRequest();
 
     bool handleUSSDURC();
     void handleUSSDTimer();
 
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
-        CellularStartOperatorsScanMessage *msg);
+        cellular::StartOperatorsScanMessage *msg);
 
-    std::shared_ptr<CellularSetOperatorAutoSelectResponse> handleCellularSetOperatorAutoSelect(
-        CellularSetOperatorAutoSelectMessage *msg);
-    void handleCellularRequestCurrentOperatorName(CellularRequestCurrentOperatorNameMessage *msg);
-    std::shared_ptr<CellularGetAPNResponse> handleCellularGetAPNMessage(CellularGetAPNMessage *msg);
-    std::shared_ptr<CellularSetAPNResponse> handleCellularSetAPNMessage(CellularSetAPNMessage *msg);
-    std::shared_ptr<CellularNewAPNResponse> handleCellularNewAPNMessage(CellularNewAPNMessage *msg);
-    std::shared_ptr<CellularSetOperatorResponse> handleCellularSetOperator(CellularSetOperatorMessage *msg);
-    std::shared_ptr<CellularSetDataTransferResponse> handleCellularSetDataTransferMessage(
-        CellularSetDataTransferMessage *msg);
-    std::shared_ptr<CellularGetDataTransferResponse> handleCellularGetDataTransferMessage(
-        CellularGetDataTransferMessage *msg);
-    std::shared_ptr<CellularActivateContextResponse> handleCellularActivateContextMessage(
-        CellularActivateContextMessage *msg);
-    std::shared_ptr<CellularDeactivateContextResponse> handleCellularDeactivateContextMessage(
-        CellularDeactivateContextMessage *msg);
-    std::shared_ptr<CellularGetActiveContextsResponse> handleCellularGetActiveContextsMessage(
-        CellularGetActiveContextsMessage *msg);
+    std::shared_ptr<cellular::SetOperatorAutoSelectResponse> handleCellularSetOperatorAutoSelect(
+        cellular::SetOperatorAutoSelectMessage *msg);
+    void handleCellularRequestCurrentOperatorName(cellular::RequestCurrentOperatorNameMessage *msg);
+    std::shared_ptr<cellular::GetAPNResponse> handleCellularGetAPNMessage(cellular::GetAPNMessage *msg);
+    std::shared_ptr<cellular::SetAPNResponse> handleCellularSetAPNMessage(cellular::SetAPNMessage *msg);
+    std::shared_ptr<cellular::NewAPNResponse> handleCellularNewAPNMessage(cellular::NewAPNMessage *msg);
+    std::shared_ptr<cellular::SetOperatorResponse> handleCellularSetOperator(cellular::SetOperatorMessage *msg);
+    std::shared_ptr<cellular::SetDataTransferResponse> handleCellularSetDataTransferMessage(
+        cellular::SetDataTransferMessage *msg);
+    std::shared_ptr<cellular::GetDataTransferResponse> handleCellularGetDataTransferMessage(
+        cellular::GetDataTransferMessage *msg);
+    std::shared_ptr<cellular::ActivateContextResponse> handleCellularActivateContextMessage(
+        cellular::ActivateContextMessage *msg);
+    std::shared_ptr<cellular::DeactivateContextResponse> handleCellularDeactivateContextMessage(
+        cellular::DeactivateContextMessage *msg);
+    std::shared_ptr<cellular::GetActiveContextsResponse> handleCellularGetActiveContextsMessage(
+        cellular::GetActiveContextsMessage *msg);
     friend class CellularUrcHandler;
     friend class SimCard;
     friend class cellular::internal::ServiceCellularPriv;
@@ -261,16 +261,17 @@ class ServiceCellular : public sys::Service
     void apnListChanged(const std::string &value);
     bool volteOn = false;
 
-    auto handleCellularAnswerIncomingCallMessage(CellularMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
-    auto handleCellularCallRequestMessage(CellularCallRequestMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
-    void handleCellularHangupCallMessage(CellularHangupCallMessage *msg);
+    auto handleCellularAnswerIncomingCallMessage(CellularMessage *msg) -> std::shared_ptr<cellular::ResponseMessage>;
+    auto handleCellularCallRequestMessage(cellular::CallRequestMessage *msg)
+        -> std::shared_ptr<cellular::ResponseMessage>;
+    void handleCellularHangupCallMessage(cellular::HangupCallMessage *msg);
     void handleCellularDismissCallMessage(sys::Message *msg);
     auto handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>;
     /// when we start call from Pure -> to the calee, then we poll for the moment that the calee answered the call
     auto handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleDBNotificationMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     /// handle mudita phone -> world ringing (not AT RING!)
-    auto handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularRingingMessage(cellular::RingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetOwnNumberMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
