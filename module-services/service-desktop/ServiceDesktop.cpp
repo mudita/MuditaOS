@@ -50,7 +50,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connectHandler<sdesktop::FactoryMessage>();
     connectHandler<sdesktop::usb::USBConfigured>();
     connectHandler<sdesktop::usb::USBDisconnected>();
-    connectHandler<sevm::BatteryStatusChangeMessage>();
+    connectHandler<sevm::USBPlugEvent>();
 
     checkChargingCondition();
 
@@ -237,6 +237,7 @@ void ServiceDesktop::checkChargingCondition()
     }
     else {
         usbWorkerInit();
+        isPlugEventUnhandled = true;
     }
 }
 
@@ -346,9 +347,11 @@ auto ServiceDesktop::handle(sdesktop::FactoryMessage * /*msg*/) -> std::shared_p
 auto ServiceDesktop::handle(sdesktop::usb::USBConfigured *msg) -> std::shared_ptr<sys::Message>
 {
     auto message = static_cast<sdesktop::usb::USBConfigured *>(msg);
-    if (message->getConfigurationType() == sdesktop::usb::USBConfigurationType::firstConfiguration) {
+    if (message->getConfigurationType() == sdesktop::usb::USBConfigurationType::firstConfiguration &&
+        isPlugEventUnhandled) {
         bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
                         service::name::system_manager);
+        isPlugEventUnhandled = false;
     }
 
     if (usbSecurityModel->isSecurityEnabled()) {
@@ -372,8 +375,15 @@ auto ServiceDesktop::handle(sdesktop::usb::USBDisconnected * /*msg*/) -> std::sh
     return sys::MessageNone{};
 }
 
-auto ServiceDesktop::handle(sevm::BatteryStatusChangeMessage * /*msg*/) -> std::shared_ptr<sys::Message>
+auto ServiceDesktop::handle(sevm::USBPlugEvent *msg) -> std::shared_ptr<sys::Message>
 {
-    checkChargingCondition();
+    auto message = static_cast<sevm::USBPlugEvent *>(msg);
+    if (message->event == sevm::USBPlugEvent::Event::CablePlugged) {
+        usbWorkerInit();
+        isPlugEventUnhandled = true;
+    }
+    else {
+        usbWorkerDeinit();
+    }
     return sys::MessageNone{};
 }

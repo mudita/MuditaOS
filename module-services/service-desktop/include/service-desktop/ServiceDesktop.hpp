@@ -91,6 +91,7 @@ class ServiceDesktop : public sys::Service
     sys::TimerHandle connectionActiveTimer;
     static constexpr unsigned int DefaultLogFlushTimeoutInMs = 1000U;
     bool initialized                                         = false;
+    bool isPlugEventUnhandled                                = false;
 
     void generateDeviceUniqueId();
     auto getDeviceUniqueId() const -> std::string;
@@ -121,7 +122,7 @@ class ServiceDesktop : public sys::Service
     [[nodiscard]] auto handle(sdesktop::FactoryMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::usb::USBConfigured *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::usb::USBDisconnected *msg) -> std::shared_ptr<sys::Message>;
-    [[nodiscard]] auto handle(sevm::BatteryStatusChangeMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(sevm::USBPlugEvent *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

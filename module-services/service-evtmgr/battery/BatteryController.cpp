@@ -10,6 +10,7 @@
 
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <service-desktop/Constants.hpp>
 #include <module-utils/EventStore/EventStore.hpp>
 #include <log/log.hpp>
 #include <magic_enum.hpp>
@@ -98,6 +99,9 @@ void sevm::battery::BatteryController::handleNotification(Events evt)
     LOG_INFO("Incoming event: %s", std::string{magic_enum::enum_name(evt)}.c_str());
     switch (evt) {
     case Events::Charger:
+        checkPlugState();
+        update();
+        break;
     case Events::SOC:
         update();
         break;
@@ -143,5 +147,21 @@ void sevm::battery::BatteryController::updateSoC()
     auto batteryLevel = charger->getSOC();
     if (batteryLevel.has_value()) {
         Store::Battery::modify().level = batteryLevel.value();
+    }
+}
+
+void sevm::battery::BatteryController::checkPlugState()
+{
+    const auto chargingState = Store::Battery::get().state;
+    auto newState            = transformChargingState(charger->getChargingStatus());
+
+    if (chargingState == Store::Battery::State::Discharging && newState != Store::Battery::State::Discharging) {
+        service->bus.sendUnicast(std::make_shared<sevm::USBPlugEvent>(sevm::USBPlugEvent::Event::CablePlugged),
+                                 service::name::service_desktop);
+    }
+
+    if (chargingState != Store::Battery::State::Discharging && newState == Store::Battery::State::Discharging) {
+        service->bus.sendUnicast(std::make_shared<sevm::USBPlugEvent>(sevm::USBPlugEvent::Event::CableUnplugged),
+                                 service::name::service_desktop);
     }
 }

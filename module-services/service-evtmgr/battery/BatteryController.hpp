@@ -30,6 +30,7 @@ namespace sevm::battery
         void update();
         void updateSoC();
         void printCurrentState();
+        void checkPlugState();
         sys::Service *service{nullptr};
         std::unique_ptr<hal::battery::AbstractBatteryCharger> charger;
         BatteryBrownoutDetector brownoutDetector;
