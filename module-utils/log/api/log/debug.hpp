@@ -4,7 +4,7 @@
 #pragma once
 
 #define DEBUG_APPLICATION_MANAGEMENT 0 /// show verbose logs in ApplicationManager
-#define DEBUG_SCOPED_TIMINGS         0 /// show timings in measured functions
+#define DEBUG_SCOPED_TIMINGS         1 /// show timings in measured functions
 #define DEBUG_CELLULAR_UART          0 /// show full modem uart communication
 #define DEBUG_BLUETOOTH_HCI_COMS     0 /// show communication with BT module - transactions
 #define DEBUG_BLUETOOTH_HCI_BYTES    0 /// show communication with BT module - all the HCI bytes

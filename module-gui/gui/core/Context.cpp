@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -39,7 +39,7 @@ namespace gui
         retContext->y = gy;
 
         // create bounding boxes for the current context and return context
-        BoundingBox currentBox = BoundingBox(0, 0, w, h);
+        BoundingBox currentBox = BoundingBox(x, y, w, h);
         BoundingBox newBox     = BoundingBox(gx, gy, width, height);
         BoundingBox resultBox;
 
@@ -55,6 +55,7 @@ namespace gui
         }
         // else just return context filled with white colour.
 
+        retContext->area = {{retContext->x, retContext->y}, {retContext->w, retContext->h}};
         return retContext;
     }
 

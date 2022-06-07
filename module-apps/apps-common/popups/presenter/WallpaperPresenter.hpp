@@ -23,7 +23,7 @@ namespace gui
         /// returns true if actual switch back occured
         bool switchBackWallpaper();
 
-      private:
+      public:
         void buildWallpapers(Item *parent);
         void switchWallpaper(WallpaperOption option);
         app::ApplicationCommon *application;

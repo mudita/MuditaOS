@@ -166,11 +166,11 @@ namespace service::eink
         }
         utils::time::Scoped measurement("ImageMessage");
 
-        showImage(message->getData(), message->getRefreshMode());
+        showImage(message->get(), message->getRefreshMode());
         return std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
     }
 
-    void ServiceEink::showImage(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode)
+    void ServiceEink::showImage(gui::Context *frameBuffer, ::gui::RefreshModes refreshMode)
     {
         displayPowerOffTimer.stop();
 
@@ -182,7 +182,14 @@ namespace service::eink
             return;
         }
 
-        if (const auto status = updateDisplay(frameBuffer, refreshMode); status != EinkStatus_e::EinkOK) {
+        auto f = frameBuffer->get(
+            frameBuffer->area.p.x, frameBuffer->area.p.y, frameBuffer->area.size.width, frameBuffer->area.size.height);
+        printf("--- flush: %s\n", f->area.str().c_str());
+        const auto status =
+            display.update(f->area.p.x, f->area.p.y, f->area.size.width, f->area.size.height, f->getData());
+        delete f;
+
+        if (status != EinkStatus_e::EinkOK) {
             LOG_FATAL("Failed to update frame");
             return;
         }
@@ -191,11 +198,6 @@ namespace service::eink
             LOG_FATAL("Failed to refresh frame");
             return;
         }
-    }
-
-    EinkStatus_e ServiceEink::updateDisplay(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode)
-    {
-        return display.update(frameBuffer);
     }
 
     EinkStatus_e ServiceEink::refreshDisplay(::gui::RefreshModes refreshMode)

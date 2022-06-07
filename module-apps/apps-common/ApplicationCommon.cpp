@@ -229,7 +229,9 @@ namespace app
 
         // send drawing commands only when if application is in active and visible.
         if (state == State::ACTIVE_FORGROUND) {
+            auto time   = utils::time::Scoped("render");
             auto window = getCurrentWindow();
+            printf("--- render: %s\n", window->getName().c_str());
             updateStatuses(window);
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);

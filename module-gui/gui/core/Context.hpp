@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -29,6 +29,7 @@ namespace gui
         Context();
         Context(uint16_t width, uint16_t height);
         virtual ~Context();
+        Area area;
 
         /**
          * @brief Creates new context using provided coordinates. If there is no common part Context with 0 width and 0

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EinkDisplay.hpp"
@@ -113,6 +113,11 @@ namespace service::eink
                                displayBuffer,
                                getCurrentBitsPerPixelFormat(),
                                displayMode);
+    }
+
+    EinkStatus_e EinkDisplay::update(int32_t x, int32_t y, uint32_t w, uint32_t h, std::uint8_t *displayBuffer)
+    {
+        return EinkUpdateFrame(x, y, w, h, displayBuffer, getCurrentBitsPerPixelFormat(), displayMode);
     }
 
     EinkBpp_e EinkDisplay::getCurrentBitsPerPixelFormat() const noexcept

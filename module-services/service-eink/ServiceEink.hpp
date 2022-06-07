@@ -11,6 +11,7 @@
 #include "EinkSentinel.hpp"
 #include "EinkDisplay.hpp"
 
+#include <gui/core/Context.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/Settings.hpp>
 
@@ -59,10 +60,9 @@ namespace service::eink
         void enterActiveMode();
         void suspend();
 
-        void showImage(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode);
+        void showImage(::gui::Context *frameBuffer, ::gui::RefreshModes refreshMode);
         EinkStatus_e prepareDisplay(::gui::RefreshModes refreshMode, WaveformTemperature behaviour);
         EinkStatus_e refreshDisplay(::gui::RefreshModes refreshMode);
-        EinkStatus_e updateDisplay(uint8_t *frameBuffer, ::gui::RefreshModes refreshMode);
         void setDisplayMode(EinkModeMessage::Mode mode);
 
         sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);

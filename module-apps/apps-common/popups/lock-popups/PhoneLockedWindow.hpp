@@ -66,6 +66,8 @@ namespace gui
         } deepRefreshCounter;
 
         void updateStatusBar();
+
+        void buildDrawListImplementation(std::list<Command> &commands) override;
     };
 
 } /* namespace gui */

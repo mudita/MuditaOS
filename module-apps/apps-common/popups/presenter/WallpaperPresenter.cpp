@@ -88,5 +88,4 @@ namespace gui
             return false;
         }
     }
-
 } // namespace gui

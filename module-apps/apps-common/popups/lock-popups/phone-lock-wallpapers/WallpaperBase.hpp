@@ -18,6 +18,14 @@ namespace gui
         virtual void show()  = 0;
         virtual void hide()  = 0;
         virtual std::shared_ptr<NotificationsPresenter> getNotificationsPresenter() = 0;
+        /// WARNING do not do this
+        /// it's straight stupid:
+        /// - widget should be an item, not have ptr to parent...
+        /// it breaks how ui works...
+        Item *getItem()
+        {
+            return parent;
+        }
     };
 
 } /* namespace gui */

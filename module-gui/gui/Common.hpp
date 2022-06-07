@@ -5,6 +5,7 @@
 
 #include "Axes.hpp"
 #include <cstdint>
+#include <string>
 #include <utility>
 
 namespace gui
@@ -42,6 +43,17 @@ namespace gui
         [[nodiscard]] constexpr auto isZero() -> bool
         {
             return 0 == x && 0 == y;
+        }
+    };
+
+    struct Area
+    {
+        Point p{0, 0};
+        Size size{0, 0};
+        std::string str()
+        {
+            return "x: " + std::to_string(p.x) + " y: " + std::to_string(p.y) + " w: " + std::to_string(size.width) +
+                   " h: " + std::to_string(size.height);
         }
     };
 

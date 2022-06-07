@@ -170,4 +170,20 @@ namespace gui
         updateBatteryStatus();
         updateSim();
     }
+
+    void PhoneLockedWindow::buildDrawListImplementation(std::list<Command> &commands)
+    {
+        if (wallpaperPresenter && wallpaperPresenter->clockWallpaper && wallpaperPresenter->clockWallpaper->clockDate) {
+
+            printf("--- draw minimum\n");
+            printf("widgetArea %s\n", wallpaperPresenter->clockWallpaper->clockDate->widgetArea.str().c_str());
+            printf("widgetMin  %s\n", wallpaperPresenter->clockWallpaper->clockDate->widgetMinimumArea.str().c_str());
+            printf("widgetMax  %s\n", wallpaperPresenter->clockWallpaper->clockDate->widgetMaximumArea.str().c_str());
+            printf("widgetDraw %s\n", wallpaperPresenter->clockWallpaper->clockDate->drawArea.str().c_str());
+
+            return wallpaperPresenter->clockWallpaper->clockDate->buildDrawListImplementation(commands);
+        }
+        printf("--- draw all\n");
+        return AppWindow::buildDrawListImplementation(commands);
+    }
 } /* namespace gui */

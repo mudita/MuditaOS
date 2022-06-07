@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceGUI.hpp"
@@ -195,6 +195,8 @@ namespace service::gui
 
     void ServiceGUI::sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode)
     {
+        /// TODO pass real canvas
+        printf("--- reprint canvas\n");
         isDisplaying = true;
         std::shared_ptr<service::eink::ImageMessage> imageMsg;
         imageMsg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
