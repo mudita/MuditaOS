@@ -26,4 +26,18 @@ namespace sevm
     class BatteryBrownoutMessage : public sys::DataMessage
     {};
 
+    class USBPlugEvent : public sys::DataMessage
+    {
+      public:
+        enum class Event
+        {
+            CablePlugged,
+            CableUnplugged
+        };
+
+        explicit USBPlugEvent(const Event newEvent)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), event(newEvent){};
+
+        Event event = Event::CableUnplugged;
+    };
 } // namespace sevm

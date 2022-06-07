@@ -105,9 +105,9 @@ void WorkerDesktop::reset()
     bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber.c_str()};
     initialized                   = bsp::usbInit(initParams) >= 0;
     if (initialized) {
+        usbStatus = bsp::USBDeviceStatus::Connected;
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
                                         sys::BusChannel::USBNotifications);
-        usbStatus = bsp::USBDeviceStatus::Connected;
     }
 }
 
