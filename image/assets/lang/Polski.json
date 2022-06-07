@@ -714,5 +714,10 @@
   "app_bell_meditation_interval_none": "Brak",
   "app_bell_meditation_put_down_and_wait": "<text>Odłóż Mudita Harmony<br>i czekaj na gong</text>",
   "app_bell_meditation_thank_you_for_session": "<text>Dziękujemy<br>za sesję</text>",
-  "app_bell_meditation_statistics": "Statystyki"
+  "app_bell_meditation_statistics": "Statystyki",
+  "app_bell_meditation_start": "Rozpocznij medytację",
+  "app_bell_meditation_settings": "Ustawienia",
+  "app_bell_meditation_start_delay": "Opóźnienie startu",
+  "app_bell_meditation_chime_interval_bottom": "medytacji",
+  "app_bell_meditation_chime_volume": "Głośność dzwonka interwału"
 }
