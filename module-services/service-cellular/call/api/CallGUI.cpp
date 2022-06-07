@@ -21,31 +21,5 @@ void CallGUI::notifyCLIP(const utils::PhoneNumber::View &number)
         owner, app::manager::actions::HandleCallerId, std::make_unique<app::manager::actions::CallParams>(number));
 }
 
-void CallGUI::notifyCallStarted(const utils::PhoneNumber &number, const CallType &type)
-{
-    owner->bus.sendMulticast(std::make_shared<cellular::CallStartedNotification>(number, type == CallType::CT_INCOMING),
-                             sys::BusChannel::ServiceCellularNotifications);
-}
 
-void CallGUI::notifyCallEnded()
-{
-    owner->bus.sendMulticast(std::make_shared<cellular::CallEndedNotification>(),
-                             sys::BusChannel::ServiceCellularNotifications);
-}
 
-void CallGUI::notifyCallActive()
-{
-    owner->bus.sendMulticast(std::make_shared<cellular::CallActiveNotification>(),
-                             sys::BusChannel::ServiceCellularNotifications);
-}
-
-void CallGUI::notifyCallDurationUpdate(const time_t &duration)
-{
-    owner->bus.sendMulticast(std::make_shared<cellular::CallDurationNotification>(duration),
-                             sys::BusChannel::ServiceCellularNotifications);
-}
-void CallGUI::notifyOutgoingCallAnswered()
-{
-    owner->bus.sendMulticast(std::make_shared<cellular::CallOutgoingAccepted>(),
-                             sys::BusChannel::ServiceCellularNotifications);
-}

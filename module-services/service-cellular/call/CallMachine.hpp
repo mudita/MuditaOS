@@ -172,7 +172,6 @@ namespace call
             }
             di.audio->routingStart();
             di.multicast->notifyCallActive();
-            di.gui->notifyCallActive();
             di.timer->start();
         }
     } constexpr HandleAnswerCall;
@@ -189,7 +188,7 @@ namespace call
     {
         void operator()(Dependencies &di, CallData &call)
         {
-            di.gui->notifyCallDurationUpdate(di.timer->duration());
+            di.multicast->notifyCallDurationUpdate(di.timer->duration());
         }
     } constexpr HandleCallTimer;
 
@@ -204,7 +203,7 @@ namespace call
 
             di.audio->routingStart();
             di.db->startCall(call.record);
-            di.gui->notifyCallStarted(call.record.phoneNumber, call.record.type);
+            di.multicast->notifyCallStarted(call.record.phoneNumber, call.record.type);
             di.sentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
         }
     } constexpr HandleStartCall;
@@ -213,7 +212,7 @@ namespace call
     {
         void operator()(Dependencies &di, CallData &call)
         {
-            di.gui->notifyOutgoingCallAnswered();
+            di.multicast->notifyOutgoingCallAnswered();
             di.timer->start();
         }
     } constexpr HandleStartedCall;
@@ -226,7 +225,7 @@ namespace call
             call.record.type   = CallType::CT_REJECTED;
             call.record.isRead = false;
             di.db->endCall(call.record);
-            di.gui->notifyCallEnded();
+            di.multicast->notifyCallEnded();
             di.modem->hangupCall();
         }
     } constexpr HandleRejectCall;
@@ -239,7 +238,7 @@ namespace call
             call.record.type   = CallType::CT_MISSED;
             call.record.isRead = false;
             di.db->endCall(call.record);
-            di.gui->notifyCallEnded();
+            di.multicast->notifyCallEnded();
             di.modem->hangupCall();
         };
     } constexpr HandleMissedCall;
@@ -251,7 +250,7 @@ namespace call
             di.audio->stop();
             call.record.duration = di.timer->duration();
             di.db->endCall(call.record);
-            di.gui->notifyCallEnded();
+            di.multicast->notifyCallEnded();
             di.timer->stop();
             di.modem->hangupCall();
         }
@@ -285,7 +284,7 @@ namespace call
         void operator()(const std::runtime_error &err, Dependencies &di)
         {
             di.multicast->notifyCallAborted();
-            di.gui->notifyCallEnded();
+            di.multicast->notifyCallEnded();
             LOG_FATAL("EXCEPTION %s", err.what());
         }
     } constexpr ExceptionHandler;

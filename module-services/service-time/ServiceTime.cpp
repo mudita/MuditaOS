@@ -1,33 +1,17 @@
 ﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "AlarmMessageHandler.hpp"
 #include "ServiceTime.hpp"
-#include <service-time/AlarmMessage.hpp>
 #include <service-time/internal/StaticData.hpp>
 #include <service-time/RTCCommand.hpp>
 #include <service-time/TimeMessage.hpp>
 #include <service-time/TimeSettings.hpp>
 #include <service-time/TimezoneHandler.hpp>
 
-#include <BaseInterface.hpp>
-#include <Common/Query.hpp>
-#include <log/log.hpp>
-#include <MessageType.hpp>
-#include <module-db/Interface/EventRecord.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-#include <service-db/QueryMessage.hpp>
-#include <service-cellular/service-cellular/CellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
-#include <time/time_constants.hpp>
-#include <time/time_conversion_factory.hpp>
 #include <time/TimeZone.hpp>
-#include <service-evtmgr/Constants.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
 
-#include <memory>
-#include <utility>
-#include <chrono>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace stm
 {
@@ -105,7 +89,7 @@ namespace stm
 
     void ServiceTime::registerMessageHandlers()
     {
-        connect(typeid(CellularTimeNotificationMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        connect(typeid(cellular::TimeNotificationMessage), [&](sys::Message *request) -> sys::MessagePointer {
             return handleCellularTimeNotificationMessage(request);
         });
 
@@ -273,7 +257,7 @@ namespace stm
     auto ServiceTime::handleCellularTimeNotificationMessage(sys::Message *request)
         -> std::shared_ptr<sys::ResponseMessage>
     {
-        auto message       = static_cast<CellularTimeNotificationMessage *>(request);
+        auto message       = static_cast<cellular::TimeNotificationMessage *>(request);
         auto timezoneRules = TimezoneHandler(std::chrono::duration_cast<std::chrono::minutes>(
                                                  std::chrono::seconds{message->getTimeZoneOffset().value()}))
                                  .getTimezone();

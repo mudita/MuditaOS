@@ -2,58 +2,31 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCommon.hpp"
-#include "Common.hpp"      // for RefreshModes
 #include "GuiTimer.hpp"    // for GuiTimer
-#include "Item.hpp"        // for Item
-#include "MessageType.hpp" // for MessageType
-#include "Service/Message.hpp"
 #include "Timers/TimerFactory.hpp" // for Timer
-#include "StatusBar.hpp"
-#include "service-db/DBNotificationMessage.hpp"
 #include "status-bar/Time.hpp"
-#include "Translator.hpp" // for KeyInputSim...
-#include <EventStore.hpp> // for Battery
-#include <hal/key_input/RawKey.hpp>
-#include "gui/input/InputEvent.hpp" // for InputEvent
-#include <log/debug.hpp>            // for DEBUG_APPLI...
-#include <log/log.hpp>              // for LOG_INFO
-#include "messages/AppMessage.hpp"  // for AppSwitchMe...
 #include "messages/AppSwitchWindowPopupMessage.hpp"
 #include "service-appmgr/Controller.hpp" // for Controller
 #include "actions/AlarmClockStatusChangeParams.hpp"
-#include <service-cellular-api>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-#include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
-#include <service-appmgr/messages/UserPowerDownRequest.hpp>
 #include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
 #include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
-#include "task.h"                               // for xTaskGetTic...
 #include "windows/AppWindow.hpp"                // for AppWindow
 #include "DOMResponder.hpp"
-#include <Text.hpp>    // for Text
-#include <algorithm>   // for find
-#include <iterator>    // for distance, next
-#include <type_traits> // for add_const<>...
-#include <WindowsFactory.hpp>
 #include <WindowsStack.hpp>
 #include <WindowsPopupFilter.hpp>
 #include <service-gui/Common.hpp>
-#include <Utils.hpp>
+
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
-#include <popups/data/PopupData.hpp>
-#include <popups/data/PopupRequestParams.hpp>
-#include <popups/data/AlarmPopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
 #include <popups/data/BluetoothModeParams.hpp>
-#include <locks/data/LockData.hpp>
-#include <magic_enum.hpp>
 
 #if DEBUG_INPUT_EVENTS == 1
 #define debug_input_events(...) LOG_DEBUG(__VA_ARGS__)
@@ -339,12 +312,12 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::DataReceivedHandler(sys::DataMessage *msgl)
     {
-        auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+        auto msg = dynamic_cast<cellular::NotificationMessage *>(msgl);
         if (msg != nullptr) {
-            if (msg->content == CellularNotificationMessage::Content::SignalStrengthUpdate) {
+            if (msg->content == cellular::NotificationMessage::Content::SignalStrengthUpdate) {
                 return handleSignalStrengthUpdate(msgl);
             }
-            if (msg->content == CellularNotificationMessage::Content::NetworkStatusUpdate) {
+            if (msg->content == cellular::NotificationMessage::Content::NetworkStatusUpdate) {
                 return handleNetworkAccessTechnologyUpdate(msgl);
             }
         }

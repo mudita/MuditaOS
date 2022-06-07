@@ -43,6 +43,7 @@ target_link_libraries(sys-service
         module-os
         sys-common
         sys-watchdog
+        module-utils
 
         magic_enum::magic_enum
 )

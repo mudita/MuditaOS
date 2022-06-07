@@ -1,13 +1,7 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <cstring>
-#include <iostream>
-#include <memory>
-#include <unistd.h>
-
 #include <catch2/catch.hpp>
-
 #include <Clipboard.hpp>
 
 TEST_CASE("Clipboard")

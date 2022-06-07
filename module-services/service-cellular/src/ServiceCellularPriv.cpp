@@ -188,7 +188,7 @@ namespace cellular::internal
         outSMSHandler.onSIMNotInitialized = [this]() -> bool {
             bool ret = false;
             if (!simCard->initialized()) {
-                owner->bus.sendUnicast(std::make_shared<CellularSmsNoSimRequestMessage>(), ::service::name::appmgr);
+                owner->bus.sendUnicast(std::make_shared<cellular::SmsNoSimRequestMessage>(), ::service::name::appmgr);
                 ret = true;
             }
             return ret;
@@ -197,7 +197,7 @@ namespace cellular::internal
         outSMSHandler.onGetOfflineMode = [this]() -> bool {
             bool ret = false;
             if (owner->phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
-                owner->bus.sendUnicast(std::make_shared<CellularSMSRejectedByOfflineNotification>(),
+                owner->bus.sendUnicast(std::make_shared<cellular::SMSRejectedByOfflineNotification>(),
                                        ::service::name::appmgr);
                 ret = true;
             }
@@ -452,7 +452,7 @@ namespace cellular::internal
         csqHandler->onPropagateCSQ = [this](uint32_t csq) {
             SignalStrength signalStrength(static_cast<int>(csq));
             Store::GSM::get()->setSignalStrength(signalStrength.data);
-            auto message = std::make_shared<CellularSignalStrengthUpdateNotification>("");
+            auto message = std::make_shared<cellular::SignalStrengthUpdateNotification>("");
             owner->bus.sendMulticast(message, sys::BusChannel::ServiceCellularNotifications);
         };
 

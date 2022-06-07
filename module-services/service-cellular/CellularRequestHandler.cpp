@@ -43,7 +43,7 @@ void CellularRequestHandler::handle(cellular::ImeiRequest &request, at::Result &
         response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
     }
 
-    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
+    auto msg = std::make_shared<cellular::MMIResultMessage>(MMIResultParams::MMIResult::Success, response);
     cellular.bus.sendUnicast(msg, service::name::appmgr);
     request.setHandled(true);
 }
@@ -69,7 +69,7 @@ void CellularRequestHandler::handle(cellular::CallRequest &request, at::Result &
         return;
     }
     cellular.callStateTimer.start();
-    cellular.bus.sendMulticast(std::make_shared<CellularRingingMessage>(request.getNumber()),
+    cellular.bus.sendMulticast(std::make_shared<cellular::RingingMessage>(request.getNumber()),
                                sys::BusChannel::ServiceCellularNotifications);
     request.setHandled(true);
 }
@@ -77,15 +77,15 @@ void CellularRequestHandler::handle(cellular::CallRequest &request, at::Result &
 void CellularRequestHandler::handle(cellular::RejectRequest &request, at::Result &result)
 {
     if (request.getRejectReason() == cellular::RejectRequest::RejectReason::NoSim) {
-        auto message = std::make_shared<CellularNoSimNotification>(request.getNumber());
+        auto message = std::make_shared<cellular::NoSimNotification>(request.getNumber());
         cellular.bus.sendUnicast(message, service::name::appmgr);
     }
     else if (request.getRejectReason() == cellular::RejectRequest::RejectReason::NotAnEmergencyNumber) {
-        auto message = std::make_shared<CellularNotAnEmergencyNotification>(request.getNumber());
+        auto message = std::make_shared<cellular::NotAnEmergencyNotification>(request.getNumber());
         cellular.bus.sendUnicast(message, service::name::appmgr);
     }
     else if (request.getRejectReason() == cellular::RejectRequest::RejectReason::NoNetworkConnection) {
-        auto message = std::make_shared<CellularNoNetworkConenctionNotification>();
+        auto message = std::make_shared<cellular::NoNetworkConenctionNotification>();
         cellular.bus.sendUnicast(message, service::name::appmgr);
     }
     request.setHandled(true);
@@ -139,7 +139,7 @@ void CellularRequestHandler::handle(cellular::ClirRequest &request, at::Result &
             response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
         }
     }
-    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
+    auto msg = std::make_shared<cellular::MMIResultMessage>(MMIResultParams::MMIResult::Success, response);
     cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(true);
 }
@@ -204,7 +204,7 @@ void CellularRequestHandler::handle(cellular::CallForwardingRequest &request, at
             std::make_shared<MMICallForwardingResult>(IMMICustomResultParams::MMIType::CallForwardingNotification);
         response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
     }
-    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
+    auto msg = std::make_shared<cellular::MMIResultMessage>(MMIResultParams::MMIResult::Success, response);
     cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(true);
 }
@@ -253,7 +253,7 @@ void CellularRequestHandler::handle(cellular::CallBarringRequest &request, at::R
         response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
     }
 
-    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
+    auto msg = std::make_shared<cellular::MMIResultMessage>(MMIResultParams::MMIResult::Success, response);
     cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(true);
 }
@@ -291,7 +291,7 @@ void CellularRequestHandler::handle(cellular::ClipRequest &request, at::Result &
         response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
     }
 
-    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
+    auto msg = std::make_shared<cellular::MMIResultMessage>(MMIResultParams::MMIResult::Success, response);
     cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(true);
 }
@@ -338,7 +338,7 @@ void CellularRequestHandler::handle(cellular::CallWaitingRequest &request, at::R
         response = std::make_shared<MMICallWaitingResult>(IMMICustomResultParams::MMIType::CallWaitingNotification);
         response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
     }
-    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
+    auto msg = std::make_shared<cellular::MMIResultMessage>(MMIResultParams::MMIResult::Success, response);
     cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(true);
 }
@@ -347,7 +347,7 @@ void CellularRequestHandler::sendMmiResult(bool result)
 {
     using namespace app::manager::actions;
 
-    auto msg = std::make_shared<CellularMMIResultMessage>(result ? MMIResultParams::MMIResult::Success
-                                                                 : MMIResultParams::MMIResult::Failed);
+    auto msg = std::make_shared<cellular::MMIResultMessage>(result ? MMIResultParams::MMIResult::Success
+                                                                   : MMIResultParams::MMIResult::Failed);
     cellular.bus.sendUnicast(msg, ::service::name::appmgr);
 }

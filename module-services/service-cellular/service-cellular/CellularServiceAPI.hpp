@@ -96,7 +96,7 @@ namespace CellularServiceAPI
      */
     bool TransmitDtmfTones(sys::Service *serv, DTMFCode code);
 
-    bool USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data = "");
+    bool USSDRequest(sys::Service *serv, cellular::USSDMessage::RequestType type, std::string data = "");
 
     /**
      * @brief get all APNs from phone configuration

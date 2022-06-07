@@ -1,9 +1,7 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApnSettingsModel.hpp"
-
-#include <service-cellular/PacketDataCellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 
 ApnSettingsModel::ApnSettingsModel(app::ApplicationCommon *application) : application{application}
@@ -11,7 +9,7 @@ ApnSettingsModel::ApnSettingsModel(app::ApplicationCommon *application) : applic
 
 void ApnSettingsModel::requestAPNList()
 {
-    application->bus.sendUnicast(std::make_shared<CellularGetAPNMessage>(), ServiceCellular::serviceName);
+    application->bus.sendUnicast(std::make_shared<cellular::GetAPNMessage>(), ServiceCellular::serviceName);
 }
 
 void ApnSettingsModel::saveAPN(const std::shared_ptr<packet_data::APN::Config> &apn)
@@ -32,5 +30,5 @@ void ApnSettingsModel::removeAPN(const std::shared_ptr<packet_data::APN::Config>
 void ApnSettingsModel::setAsDefaultAPN(const std::shared_ptr<packet_data::APN::Config> &apn)
 {
     apn->apnType = packet_data::APN::APNType::Default;
-    application->bus.sendUnicast(std::make_shared<CellularSetAPNMessage>(apn), ServiceCellular::serviceName);
+    application->bus.sendUnicast(std::make_shared<cellular::SetAPNMessage>(apn), ServiceCellular::serviceName);
 }

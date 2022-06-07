@@ -5,14 +5,10 @@
 
 #include "WorkerEvent.hpp"
 
-#include <bsp/magnetometer/magnetometer.hpp>
-#include <bsp/torch/torch.hpp>
 #include <evtmgr/EVMessages.hpp>
-#include <screen-light-control/ScreenLightControl.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
-#include <service-evtmgr/WorkerEventCommon.hpp>
 #include <sys/SystemManager.hpp>
 #include <sys/messages/PhoneModeRequest.hpp>
 
@@ -157,7 +153,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         handled = true;
     }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {
-        auto msg = std::make_shared<CellularUrcIncomingNotification>();
+        auto msg = std::make_shared<cellular::UrcIncomingNotification>();
         bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
         handled = true;
     }

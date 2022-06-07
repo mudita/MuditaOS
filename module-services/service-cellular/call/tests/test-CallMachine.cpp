@@ -37,12 +37,6 @@ namespace mocks
         fakeit::Mock<call::api::GUI> gui;
         fakeit::When(Method(gui, notifyRING)).AlwaysReturn();
         fakeit::When(Method(gui, notifyCLIP)).AlwaysReturn();
-        fakeit::When(Method(gui, notifyCallStarted)).AlwaysReturn();
-        fakeit::When(Method(gui, notifyCallEnded)).AlwaysReturn();
-        fakeit::When(Method(gui, notifyCallActive)).AlwaysReturn();
-        fakeit::When(Method(gui, notifyCallDurationUpdate)).AlwaysReturn();
-        fakeit::When(Method(gui, notifyOutgoingCallAnswered)).AlwaysReturn();
-
         return gui;
     }
 
@@ -53,6 +47,10 @@ namespace mocks
         fakeit::When(Method(multicast, notifyIdentifiedCall)).AlwaysReturn();
         fakeit::When(Method(multicast, notifyCallActive)).AlwaysReturn();
         fakeit::When(Method(multicast, notifyCallAborted)).AlwaysReturn();
+        fakeit::When(Method(multicast, notifyCallStarted)).AlwaysReturn();
+        fakeit::When(Method(multicast, notifyCallEnded)).AlwaysReturn();
+        fakeit::When(Method(multicast, notifyCallDurationUpdate)).AlwaysReturn();
+        fakeit::When(Method(multicast, notifyOutgoingCallAnswered)).AlwaysReturn();
         return multicast;
     };
 
@@ -171,7 +169,7 @@ TEST_CASE("base positive call flow, answered, end from caller")
     // answer the call from the pure
     REQUIRE(machine->machine.process_event(call::event::Answer{}));
     fakeit::Verify(Method(di.audio, routingStart)).Exactly(1);
-    fakeit::Verify(Method(di.gui, notifyCallActive)).Exactly(1);
+    fakeit::Verify(Method(di.multicast, notifyCallActive)).Exactly(1);
 
     REQUIRE(machine->machine.process_event(call::event::OngoingTimer{}));
     REQUIRE(machine->machine.process_event(call::event::Ended{}));
@@ -190,7 +188,7 @@ TEST_CASE("CLIP before ring, answered, end from caller")
 
     REQUIRE(machine->machine.process_event(call::event::Answer{}));
     fakeit::Verify(Method(di.audio, routingStart)).Exactly(1);
-    fakeit::Verify(Method(di.gui, notifyCallActive)).Exactly(1);
+    fakeit::Verify(Method(di.multicast, notifyCallActive)).Exactly(1);
 
     REQUIRE(machine->machine.process_event(call::event::OngoingTimer{}));
 
@@ -220,7 +218,7 @@ TEST_CASE("no CLIP at all, anonymus call answered, end from caller")
 
     REQUIRE(machine->machine.process_event(call::event::Answer{}));
     fakeit::Verify(Method(di.audio, routingStart)).Exactly(1);
-    fakeit::Verify(Method(di.gui, notifyCallActive)).Exactly(1);
+    fakeit::Verify(Method(di.multicast, notifyCallActive)).Exactly(1);
 
     REQUIRE(machine->machine.process_event(call::event::OngoingTimer{}));
 
@@ -259,7 +257,7 @@ TEST_CASE("reject on PURE after RING")
 
     fakeit::Verify(Method(di.audio, stop)).Exactly(1);
     // UI was notified to stop "calling" display
-    fakeit::Verify(Method(di.gui, notifyCallEnded)).Exactly(1);
+    fakeit::Verify(Method(di.multicast, notifyCallEnded)).Exactly(1);
 
     REQUIRE(record_when_called.type == CallType::CT_REJECTED);
 }
@@ -364,7 +362,7 @@ TEST_CASE("call outgoing - answered")
     REQUIRE(machine->machine.process_event(call::event::StartCall{CallType::CT_OUTGOING, number.getView()}));
     REQUIRE(machine->machine.process_event(call::event::Answer{}));
     fakeit::Verify(Method(di.audio, play)).Exactly(0);
-    fakeit::Verify(Method(di.gui, notifyOutgoingCallAnswered)).Exactly(1);
+    fakeit::Verify(Method(di.multicast, notifyOutgoingCallAnswered)).Exactly(1);
     REQUIRE(machine->machine.process_event(call::event::Ended{}));
     fakeit::Verify(Method(di.audio, stop)).Exactly(1);
 }
