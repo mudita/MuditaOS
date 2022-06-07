@@ -80,6 +80,8 @@
   "common_minutes_lower": "minutos",
   "common_minutes_lower_genitive": "minutos",
   "common_minute_short": "min",
+  "common_second_lower": "segundo",
+  "common_seconds_lower": "segundos",
   "common_paused": "Pausado",
   "common_text_copy": "Copiar texto",
   "common_text_paste": "Pegar texto",
@@ -699,5 +701,10 @@
   "app_bell_meditation_progress": "Meditación",
   "app_bell_meditation_interval_none": "Ninguno",
   "app_bell_meditation_put_down_and_wait": "<text>Posicione Mudita Harmony<br>y espere el gong</text>",
-  "app_bell_meditation_thank_you_for_session": "<text>Gracias<br>por la sesión</text>"
+  "app_bell_meditation_thank_you_for_session": "<text>Gracias<br>por la sesión</text>",
+  "app_bell_meditation_start": "Meditar ahora",
+  "app_bell_meditation_settings": "Ajustes",
+  "app_bell_meditation_start_delay": "Retraso en el inicio",
+  "app_bell_meditation_chime_interval_bottom": "de la meditación",
+  "app_bell_meditation_chime_volume": "Volumen del timbre"
 }

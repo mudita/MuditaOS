@@ -80,6 +80,8 @@
   "common_minutes_lower": "minuten",
   "common_minutes_lower_genitive": "minuten",
   "common_minute_short": "min",
+  "common_second_lower": "zweite",
+  "common_seconds_lower": "zweites",
   "common_paused": "Pausiert",
   "common_text_copy": "Text kopieren",
   "common_text_paste": "Text einfügen",
@@ -699,5 +701,10 @@
   "app_bell_meditation_progress": "Meditation",
   "app_bell_meditation_interval_none": "kein",
   "app_bell_meditation_put_down_and_wait": "<text>Legen Sie Mudita Harmony<br>ab und warten Sie auf den Gong</text>",
-  "app_bell_meditation_thank_you_for_session": "<text>Danke für<br>die Sitzung</text>"
+  "app_bell_meditation_thank_you_for_session": "<text>Danke für<br>die Sitzung</text>",
+  "app_bell_meditation_start": "Jetzt meditieren",
+  "app_bell_meditation_settings": "Einstellungen",
+  "app_bell_meditation_start_delay": "Verzögerung starten",
+  "app_bell_meditation_chime_interval_bottom": "der meditation",
+  "app_bell_meditation_chime_volume": "Glocken-Lautstärke"
 }
