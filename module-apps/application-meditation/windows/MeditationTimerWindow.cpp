@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -76,8 +76,19 @@ void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
         auto onPreparation = [&]() -> void {
             setVisibleRunning();
             auto onMeditationEnd = [&]() -> void {
-                setVisibleMeditationEnd();
-                application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
+                // Workaround for the issue of phone self-unlocking after meditation has ended.
+                // If the phone was manually locked on meditation timer screen, the window stack
+                // is as follows: MainWindow->Timer->PhoneLockPopup.
+                // setVisibleMeditationEnd() triggers window switch to MainWindow, so Timer and
+                // PhoneLockPopup are getting dropped. This workaround prevents such behaviour
+                // when phone is locked, in such case only meditation timer window is being dropped.
+                if (application->getCurrentWindow()->getName() == gui::popup::window::phone_lock_window) {
+                    application->popWindow(app::window::name::meditation_timer);
+                }
+                else {
+                    setVisibleMeditationEnd();
+                    application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
+                }
                 timer->playSound();
             };
             timer->getTimer().registerOnFinishedCallback(onMeditationEnd);
