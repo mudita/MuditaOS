@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -98,6 +98,7 @@ namespace app::list_items
                 body->setMinMaxArrowsVisibility(spinner->is_min(), spinner->is_max());
                 if (not this->bottomDescription.empty()) {
                     control_bottom_description(spinner->value());
+                    body->resize();
                 }
             }
             SpinnerType *spinner{};

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,7 +40,6 @@ namespace app::list_items
         void control_bottom_description(const spinner_type::value_type &value) final
         {
             bottomText->setVisible(value != 0);
-            body->resize();
         }
     };
 } // namespace app::list_items
