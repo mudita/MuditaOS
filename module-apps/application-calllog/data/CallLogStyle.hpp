@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -43,14 +43,14 @@ namespace callLogStyle
             constexpr inline auto infoHeight                = 33;
             constexpr inline auto infoTopMargin             = 195;
             constexpr inline auto divLineTopMargin          = 90;
-            constexpr inline auto bottomBoxWidth            = 332;
+            constexpr inline auto bottomBoxWidth            = 352;
             constexpr inline auto bottomBoxHeight           = 132;
-            constexpr inline auto bottomBoxMargin           = 72;
+            constexpr inline auto bottomBoxMargin           = 70;
             constexpr inline auto infoIconMargin            = 2;
             constexpr inline auto descriptionSize           = 32;
             constexpr inline auto descriptionLeftMargin     = 55;
             constexpr inline auto descriptionInternalMargin = 5;
-            constexpr inline auto descriptionTextWidth      = 105;
+            constexpr inline auto descriptionTextWidth      = 135;
         } // namespace noCalls
     }     // namespace detailsWindow
 
