@@ -67,4 +67,39 @@ namespace gui
         Arc *progressArc          = nullptr;
         Circle *progressIndicator = nullptr;
     };
+
+    class ArcProgressBar : public Arc, public Progress
+    {
+      public:
+        enum class ProgressDirection
+        {
+            Clockwise,
+            CounterClockwise
+        };
+        ArcProgressBar(Item *parent,
+                       const Arc::ShapeParams &shape,
+                       ProgressDirection direction = ProgressDirection::Clockwise);
+
+        void setMaximum(unsigned int value) noexcept override;
+        auto setValue(unsigned int value) noexcept -> bool override;
+        void setPercentageValue(unsigned int value) noexcept override;
+        [[nodiscard]] int getMaximum() const noexcept override;
+
+        void buildDrawListImplementation(std::list<Command> &commands) override;
+        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
+
+      private:
+        void createWidgets();
+
+        auto calculateStartIndicatorCenter() const -> Point;
+        auto calculateEndIndicatorCenter() const -> Point;
+        auto getPercentageValue() const -> float;
+
+        unsigned int maxValue       = 0U;
+        unsigned int currentValue   = 0U;
+        Arc *progressArc            = nullptr;
+        Arc *progressStartIndicator = nullptr;
+        Arc *progressEndIndicator   = nullptr;
+        ProgressDirection direction = ProgressDirection::Clockwise;
+    };
 } // namespace gui

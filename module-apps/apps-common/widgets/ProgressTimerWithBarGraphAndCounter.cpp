@@ -27,7 +27,7 @@ namespace app
         if (text == nullptr) {
             return;
         }
-        const auto secondsRemaining = duration - elapsed;
+        const auto secondsRemaining = duration - std::chrono::duration_cast<std::chrono::seconds>(elapsed);
         const Duration remainingDuration{std::time_t{secondsRemaining.count()}};
         UTF8 timerText;
         if (countdownMode == ProgressCountdownMode::Increasing && secondsRemaining != std::chrono::seconds::zero()) {
@@ -40,7 +40,9 @@ namespace app
     void ProgressTimerWithBarGraphAndCounter::updateProgress()
     {
         if (progress != nullptr) {
-            const auto percentage  = static_cast<float>(elapsed.count()) / duration.count();
+            const auto percentage =
+                static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(elapsed).count()) /
+                duration.count();
             const auto currentStep = percentage * progress->getMaximum();
             progress->setValue(std::ceil(currentStep));
         }

@@ -18,6 +18,7 @@ namespace app
                            std::chrono::seconds interval = std::chrono::seconds::zero()) = 0;
         virtual void start()                                                             = 0;
         virtual void stop()                                                              = 0;
+        virtual std::chrono::milliseconds getElapsed()                                   = 0;
         virtual void registerOnFinishedCallback(std::function<void()> cb)                = 0;
         virtual void registerOnIntervalCallback(std::function<void()> cb)                = 0;
     };

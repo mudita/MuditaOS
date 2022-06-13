@@ -6,6 +6,7 @@
 #include "MeditationProgressPresenter.hpp"
 #include "models/ChimeInterval.hpp"
 
+#include <common/LanguageUtils.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/SessionPausedWindow.hpp>
@@ -59,7 +60,7 @@ namespace app::meditation
 
     void MeditationProgressPresenter::stop()
     {
-        timer->stop();
+        finish();
     }
 
     void MeditationProgressPresenter::pause()
@@ -82,9 +83,12 @@ namespace app::meditation
     void MeditationProgressPresenter::finish()
     {
         timer->stop();
+        const auto elapsed     = std::chrono::duration_cast<std::chrono::minutes>(timer->getElapsed());
+        const auto summaryText = utils::translate("app_meditation_summary") + std::to_string(elapsed.count()) + " " +
+                                 utils::language::getCorrectMinutesNumeralForm(elapsed.count());
         app->switchWindow(
             gui::window::bell_finished::defaultName,
-            gui::BellFinishedWindowData::Factory::create("big_namaste_W_G", "", "", true, endWindowTimeout));
+            gui::BellFinishedWindowData::Factory::create("big_namaste_W_G", "", summaryText, true, endWindowTimeout));
     }
 
     void MeditationProgressPresenter::onProgressFinished()
