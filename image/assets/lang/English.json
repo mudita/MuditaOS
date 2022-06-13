@@ -723,5 +723,6 @@
     "<text>Hejsan!<br />Have a wonderful day!</text>"
   ],
   "app_bell_settings_factory_reset": "Factory reset",
-  "app_bell_settings_display_factory_reset_confirmation": "<text>Reset to factory<br></br>settings ?</text>"
+  "app_bell_settings_display_factory_reset_confirmation": "<text>Reset to factory<br></br>settings ?</text>",
+  "app_meditation_summary": "<text>You have meditated for<br />"
 }

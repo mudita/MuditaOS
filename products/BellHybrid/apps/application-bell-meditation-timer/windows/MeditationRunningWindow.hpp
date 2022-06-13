@@ -30,9 +30,10 @@ namespace gui
 
       private:
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> presenter;
-        gui::HBarGraph *progress   = nullptr;
-        gui::Text *timer           = nullptr;
-        gui::BellStatusClock *time = nullptr;
+        gui::VBox *mainVBox           = nullptr;
+        gui::ArcProgressBar *progress = nullptr;
+        gui::Text *timer              = nullptr;
+        gui::BellStatusClock *clock   = nullptr;
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;

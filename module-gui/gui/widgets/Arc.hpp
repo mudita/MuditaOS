@@ -43,6 +43,7 @@ namespace gui
         Arc(Item *parent, const ShapeParams &params);
 
         void setCenter(Point point) noexcept;
+        void setStartAngle(trigonometry::Degrees angle) noexcept;
         void setSweepAngle(trigonometry::Degrees angle) noexcept;
         trigonometry::Degrees getSweepAngle() const noexcept;
         trigonometry::Degrees getStartAngle() const noexcept;

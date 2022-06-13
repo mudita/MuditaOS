@@ -39,23 +39,27 @@ namespace app::meditationStyle
 
     namespace mrStyle
     {
-        namespace title
-        {
-            constexpr inline auto font = style::window::font::verybiglight;
-        } // namespace title
-
         namespace progress
         {
-            constexpr inline auto progressMarginTop  = 40;
-            constexpr inline auto progressMarginLeft = 60;
-            constexpr inline auto boxesCount         = 16;
+            constexpr inline auto radius                   = 192;
+            constexpr inline auto penWidth                 = 3;
+            constexpr inline auto verticalDeviationDegrees = 38;
         } // namespace progress
 
         namespace timer
         {
-            constexpr inline auto timerMarginBottom = 20;
-            constexpr inline auto font              = style::window::font::largelight;
+            constexpr inline auto marginTop = 39;
+            constexpr inline auto font      = style::window::font::supersizeme;
+            constexpr inline auto maxSizeX  = 340;
+            constexpr inline auto maxSizeY  = 198;
         } // namespace timer
+
+        namespace clock
+        {
+            constexpr inline auto marginTop = 17;
+            constexpr inline auto maxSizeX  = 340;
+            constexpr inline auto maxSizeY  = 84;
+        } // namespace clock
     }     // namespace mrStyle
 
     namespace mtStyle

@@ -89,6 +89,11 @@ namespace gui
         center = point;
     }
 
+    void Arc::setStartAngle(trigonometry::Degrees angle) noexcept
+    {
+        start = angle;
+    }
+
     void Arc::setSweepAngle(trigonometry::Degrees angle) noexcept
     {
         sweep = angle;

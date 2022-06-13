@@ -43,10 +43,10 @@ namespace app
 
       protected:
         std::atomic_bool isRunning{false};
-        std::chrono::seconds duration{std::chrono::seconds::zero()};
-        std::chrono::seconds elapsed{std::chrono::seconds::zero()};
-        std::chrono::seconds interval{std::chrono::seconds::zero()};
-        std::chrono::milliseconds baseTickInterval{std::chrono::milliseconds::zero()};
+        std::chrono::seconds duration{};
+        std::chrono::milliseconds elapsed{};
+        std::chrono::seconds interval{};
+        std::chrono::milliseconds baseTickInterval{};
         bool hasInterval = false;
 
         sys::TimerHandle timerTask;
@@ -76,6 +76,7 @@ namespace app
                    std::chrono::seconds _interval = std::chrono::seconds::zero()) override;
         void start() override;
         void stop() override;
+        std::chrono::milliseconds getElapsed() override;
         void registerOnFinishedCallback(std::function<void()> cb) override;
         void registerOnIntervalCallback(std::function<void()> cb) override;
         [[nodiscard]] auto isStopped() const noexcept -> bool override;

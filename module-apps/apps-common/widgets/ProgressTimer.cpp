@@ -54,7 +54,7 @@ namespace app
 
     auto ProgressTimer::onTimerTimeout(sys::Timer &task) -> bool
     {
-        ++elapsed;
+        elapsed += baseTickInterval;
         update();
         if (isStopped() || isFinished()) {
             task.stop();
@@ -82,12 +82,17 @@ namespace app
 
     auto ProgressTimer::intervalReached() const noexcept -> bool
     {
-        return hasInterval && (elapsed.count() % interval.count()) == 0;
+        return hasInterval &&
+               (std::chrono::duration_cast<std::chrono::seconds>(elapsed).count() % interval.count()) == 0;
     }
 
     void ProgressTimer::stop()
     {
         isRunning = false;
+    }
+    std::chrono::milliseconds ProgressTimer::getElapsed()
+    {
+        return elapsed;
     }
 
     void ProgressTimer::registerOnFinishedCallback(std::function<void()> cb)
