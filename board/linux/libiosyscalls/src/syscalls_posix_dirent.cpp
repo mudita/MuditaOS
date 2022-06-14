@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "iosyscalls-internal.hpp"
@@ -7,6 +7,8 @@
 #include <errno.h>
 #include <cstring>
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <bits/fcntl2.h>
 
 #include "syscalls_real.hpp"
 
@@ -24,6 +26,7 @@ namespace
     namespace real
     {
         __REAL_DECL(opendir);
+        __REAL_DECL(__openat_2);
         __REAL_DECL(closedir);
         __REAL_DECL(readdir);
 #pragma GCC diagnostic push
@@ -38,6 +41,7 @@ namespace
     void __attribute__((constructor)) _lib_posix_dirent_initialize()
     {
         __REAL_DLSYM(opendir);
+        __REAL_DLSYM(__openat_2);
         __REAL_DLSYM(closedir);
         __REAL_DLSYM(readdir);
         __REAL_DLSYM(readdir_r);
@@ -45,8 +49,8 @@ namespace
         __REAL_DLSYM(seekdir);
         __REAL_DLSYM(telldir);
 
-        if (!(real::opendir && real::closedir && real::readdir && real::readdir_r && real::rewinddir && real::seekdir &&
-              real::telldir)) {
+        if (!(real::opendir && real::__openat_2 && real::closedir && real::readdir && real::readdir_r &&
+              real::rewinddir && real::seekdir && real::telldir)) {
             abort();
         }
     }
@@ -104,6 +108,28 @@ extern "C"
         return ret;
     }
     __asm__(".symver _iosys_opendir,opendir@GLIBC_2.2.5");
+
+    int _iosys__openat_2(int fd, const char *dirname, int flags)
+    {
+        int ret;
+        if (!dirname) {
+            TRACE_SYSCALLN("(%p) invalid argument", dirname);
+            errno = EINVAL;
+            return -1;
+        }
+        if (vfs::redirect_to_image(dirname)) {
+            std::cerr << "Unsupported syscall " << __PRETTY_FUNCTION__ << std::endl;
+        }
+        else {
+            char tmp[PATH_MAX];
+            const auto newpath = vfs::npath_translate(dirname, tmp);
+            TRACE_SYSCALLN("(%s) -> (%s) linux fs", dirname, newpath);
+            ret = real::__openat_2(fd, newpath, flags);
+        }
+        TRACE_SYSCALLN("(%s)=%p errno=%i", dirname, ret, errno);
+        return ret;
+    }
+    __asm__(".symver _iosys__openat_2,__openat_2@GLIBC_2.7");
 
     int _iosys_closedir(DIR *dirp)
     {

@@ -85,6 +85,10 @@ GLIBC_2.4 {
                 __fxstatat;
                 __fxstatat64;
 };
+GLIBC_2.7 {
+        global:
+                __openat_2;             
+};
 GLIBC_2.33 {
         global:
                 stat;
