@@ -523,7 +523,7 @@ namespace bluetooth
     {
         if (currentCallStatus != CallStatus::OutgoingPlacedFromHFP) {
             LOG_DEBUG("Started outgoing call from Pure");
-            hfp_ag_outgoing_call_initiated(number.c_str());
+            hfp_ag_outgoing_call_initiated();
             hfp_ag_outgoing_call_accepted();
             hfp_ag_outgoing_call_ringing();
             currentCallStatus = CallStatus::OutgoingPlacedFromPure;
