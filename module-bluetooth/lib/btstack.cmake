@@ -150,6 +150,7 @@ set(BOARD_DIR_SOURCES
     ${BT_STACK_ROOT}/3rd-party/hxcmod-player/mods/nao-deceased_by_disease.c
     ${BT_STACK_ROOT}/3rd-party/hxcmod-player/hxcmod.c
     ${BT_STACK_ROOT}/src/classic/btstack_sbc_encoder_bluedroid.c
+    ${BT_STACK_ROOT}/src/classic/a2dp.c
     ${BT_STACK_ROOT}/src/classic/a2dp_source.c
     ${BT_STACK_ROOT}/3rd-party/bluedroid/encoder/srce/sbc_encoder.c
     ${BT_STACK_ROOT}/src/classic/avdtp_util.c
