@@ -41,6 +41,7 @@ namespace app
         });
         statusBarManager->enableIndicators(
             {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
+
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
             if (auto msg = dynamic_cast<app::CallSwitchData *>(data.get()); msg != nullptr) {
                 handleCallEvent(msg->getPhoneNumber().getEntered(), ExternalRequest::True);
@@ -159,6 +160,7 @@ namespace app
 
         connect(typeid(cellular::CallEndedNotification), [&](sys::Message *request) {
             callModel->setState(app::call::CallState::Ended);
+            switchWindow(app::window::name_call);
             return sys::MessageNone{};
         });
 
@@ -166,6 +168,7 @@ namespace app
             auto message = static_cast<cellular::CallStartedNotification *>(request);
             callModel->setPhoneNumber(message->getNumber());
             callModel->setState(app::call::CallState::Outgoing);
+            switchWindow(app::window::name_call);
             return sys::MessageNone{};
         });
 

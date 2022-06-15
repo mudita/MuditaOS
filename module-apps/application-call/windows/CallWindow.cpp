@@ -201,8 +201,9 @@ namespace gui
     {
         timerCallback = [this](Item &, sys::Timer &timer) {
             LOG_DEBUG("Delayed exit timer callback");
-            app::manager::Controller::switchBack(application);
+            presenter->handleDelayedViewClose();
             application->popCurrentWindow();
+            app::manager::Controller::switchBack(application);
             return true;
         };
         delayedExitTimer =
