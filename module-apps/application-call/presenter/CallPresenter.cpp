@@ -171,4 +171,9 @@ namespace app::call
     {
         return model->getPhoneNumber();
     }
+
+    void CallWindowContract::Presenter::handleDelayedViewClose()
+    {
+        model->setState(CallState::None);
+    }
 } // namespace app::call

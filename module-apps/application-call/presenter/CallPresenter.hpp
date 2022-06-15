@@ -51,6 +51,8 @@ namespace app::call
             void sendSms(const UTF8 &smsBody);
             utils::PhoneNumber getPhoneNumber();
 
+            void handleDelayedViewClose();
+
           private:
             std::shared_ptr<app::call::AbstractCallModel> model;
             UTF8 getCallerId();
