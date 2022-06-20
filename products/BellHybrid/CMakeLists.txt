@@ -77,6 +77,7 @@ set_source_files_properties(BellHybridMain.cpp PROPERTIES COMPILE_DEFINITIONS "$
 
 strip_executable(BellHybrid)
 
+include(BinaryAssetsVersions.cmake)
 include(AddVersionJson)
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
@@ -102,7 +103,6 @@ endif()
 include(AddHexTarget)
 add_hex_target(BellHybrid)
 
-include(BinaryAssetsVersions.cmake)
 include(DownloadAsset)
 # copy all assets required to build catalog under current folder as in json recipe
 download_asset_json(json-proprietary-target

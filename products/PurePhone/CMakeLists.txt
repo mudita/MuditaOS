@@ -103,7 +103,7 @@ strip_executable(PurePhone)
 
 message_serial_status()
 
-
+include(BinaryAssetsVersions.cmake)
 include(AddVersionJson)
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
@@ -130,7 +130,6 @@ endif()
 include(AddHexTarget)
 add_hex_target(PurePhone)
 
-include(BinaryAssetsVersions.cmake)
 include(DownloadAsset)
 
 download_asset_json(json-proprietary-target
