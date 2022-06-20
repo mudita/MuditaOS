@@ -173,6 +173,7 @@ namespace gui
                     application->bus.sendUnicast(std::make_shared<message::bluetooth::ResponseAuthenticatePairCancel>(
                                                      true, authenticateParams->getDevice()),
                                                  service::name::bluetooth);
+                    application->returnToPreviousWindow();
                     return true;
                 };
             }
