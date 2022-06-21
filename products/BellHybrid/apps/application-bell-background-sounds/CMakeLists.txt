@@ -48,6 +48,7 @@ target_link_libraries(application-bell-background-sounds
         apps-common
         bell::audio
         bell::alarms
+        Microsoft.GSL::GSL
 
     PUBLIC
         module-gui

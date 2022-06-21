@@ -25,6 +25,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        Microsoft.GSL::GSL
         module-sys
         sml::utils::logger
     PUBLIC

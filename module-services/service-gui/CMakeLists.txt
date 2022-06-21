@@ -26,9 +26,13 @@ target_sources(service-gui
 
 
 target_link_libraries(service-gui
-    service-eink
-    module-gui
-    module-apps
+    PUBLIC
+        service-eink
+        module-gui
+        module-apps
+    PRIVATE
+        Microsoft.GSL::GSL
+        
 )
 
 target_include_directories(service-gui

@@ -13,7 +13,9 @@ target_sources(module-bsp
 		bsp/eink_frontlight/eink_frontlight.cpp
 		bsp/eink/bsp_eink.cpp
 		bsp/eink/ED028TC1.cpp
+		bsp/eink/EinkDisplay.cpp
 		bsp/eink/eink_binarization_luts.c
+		bsp/eink/eink_dimensions.cpp
 		bsp/eMMC/fsl_mmc.c
 		bsp/eMMC/fsl_sdmmc_common.c
 		bsp/eMMC/fsl_sdmmc_event.c
@@ -75,7 +77,7 @@ add_subdirectory(common/fsl_drivers)
 add_subdirectory(os)
 add_subdirectory(${BOARD})
 
-target_link_libraries(module-bsp PUBLIC cmsis fsl)
+target_link_libraries(module-bsp PUBLIC cmsis fsl Microsoft.GSL::GSL)
 
 add_library(system-stats-sink-board)
 target_sources(system-stats-sink-board

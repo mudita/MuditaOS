@@ -13,6 +13,7 @@ add_catch2_executable(
             module-vfs
             service-audio
             service-cellular
+            Microsoft.GSL::GSL
         DEPS
             module-sys
 )

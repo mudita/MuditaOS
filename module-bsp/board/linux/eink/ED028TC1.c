@@ -49,10 +49,6 @@ int shared_fd = 0;
 
 static uint8_t s_einkIsPoweredOn = false; //  Variable which contains the state of the power of the EPD display
 
-/* Function bodies */
-void EinkChangeDisplayUpdateTimings(EinkDisplayTimingsMode_e timingsMode)
-{}
-
 uint8_t EinkIsPoweredOn()
 {
     return s_einkIsPoweredOn;
@@ -71,11 +67,6 @@ void EinkPowerOff()
 void EinkPowerDown(void)
 {
     EinkPowerOff();
-}
-
-int16_t EinkGetTemperatureInternal()
-{
-    return 25;
 }
 
 static shared_memory_header *createSHMBuffer(const char *name)
@@ -128,30 +119,14 @@ EinkStatus_e EinkResetAndInitialize()
     return EinkOK;
 }
 
-EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
+EinkStatus_e EinkUpdateFrame(EinkFrame_t frame, uint8_t *buffer)
 {
-    return EinkOK;
-}
-
-EinkStatus_e EinkWaitTillPipelineBusy()
-{
-    return EinkOK;
-}
-
-EinkStatus_e EinkDitherDisplay()
-{
-    return EinkOK;
-}
-
-EinkStatus_e EinkUpdateFrame(
-    uint16_t X, uint16_t Y, uint16_t W, uint16_t H, uint8_t *buffer, EinkBpp_e bpp, EinkDisplayColorMode_e invertColors)
-{
-    uint32_t offset_eink   = Y * BOARD_EINK_DISPLAY_RES_X + X;
+    uint32_t offset_eink   = frame.pos_y * BOARD_EINK_DISPLAY_RES_X + frame.pos_x;
     uint32_t offset_buffer = 0;
-    for (uint32_t h = 0; h < H; ++h) {
-        memcpy(shared_buffer + offset_eink, buffer + offset_buffer, W);
+    for (uint32_t h = 0; h < frame.height; ++h) {
+        memcpy(shared_buffer + offset_eink, buffer + offset_buffer, frame.width);
         offset_eink += BOARD_EINK_DISPLAY_RES_X;
-        offset_buffer += W;
+        offset_buffer += frame.width;
     }
 
     shared_header->frameCount++;
@@ -168,8 +143,7 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     return EinkError;
 }
 
-EinkStatus_e EinkRefreshImage(
-    uint16_t X, uint16_t Y, uint16_t W, uint16_t H, EinkDisplayTimingsMode_e refreshTimingsMode)
+EinkStatus_e EinkRefreshImage(EinkFrame_t frame)
 {
     return EinkOK;
 }
