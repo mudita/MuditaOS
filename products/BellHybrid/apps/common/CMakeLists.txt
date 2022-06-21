@@ -127,6 +127,7 @@ target_link_libraries(application-bell-common
         bell::audio
         module-gui
         bell::db
+        Microsoft.GSL::GSL
         )
 
 if (${ENABLE_TESTS})

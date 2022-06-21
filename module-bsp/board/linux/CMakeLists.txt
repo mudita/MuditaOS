@@ -11,6 +11,7 @@ target_sources(module-bsp
                 eeprom/eeprom.cpp
                 eink_frontlight/eink_frontlight.cpp
                 eink/ED028TC1.c
+                eink/LinuxEinkDisplay.cpp
                 headset/headset.cpp
                 keypad_backlight/keypad_backlight.cpp
                 light_sensor/light_sensor.cpp

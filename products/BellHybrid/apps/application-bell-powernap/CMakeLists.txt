@@ -48,6 +48,7 @@ target_link_libraries(application-bell-powernap
         bell::keymap
         bell::alarms
         bell::db
+        Microsoft.GSL::GSL
 
     PUBLIC
         module-gui

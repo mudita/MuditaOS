@@ -21,6 +21,7 @@
 #include "board.h"
 #include "eink_binarization_luts.h"
 #include "macros.h"
+#include "eink_dimensions.hpp"
 
 #include <magic_enum.hpp>
 #include "drivers/pll/DriverPLL.hpp"
@@ -53,22 +54,6 @@
 #define EPD_BOOSTER_OFF_TIME_GDR_3_34uS 6
 #define EPD_BOOSTER_OFF_TIME_GDR_6_58uS 7
 #define EPD_BOOSTER_OFF_TIME_GDR_POS    0
-
-#if defined(EINK_ROTATE_90_CLOCKWISE)
-#define EINK_DISPLAY_RES_X         (BOARD_EINK_DISPLAY_RES_Y)
-#define EINK_DISPLAY_RES_Y         (BOARD_EINK_DISPLAY_RES_X)
-#define EINK_DISPLAY_X_AXIS        (BOARD_EINK_DISPLAY_RES_Y - Y - H)
-#define EINK_DISPLAY_Y_AXIS        (BOARD_EINK_DISPLAY_RES_X - X - W)
-#define EINK_DISPLAY_WINDOW_WIDTH  (H)
-#define EINK_DISPLAY_WINDOW_HEIGHT (W)
-#else
-#define EINK_DISPLAY_RES_X         (BOARD_EINK_DISPLAY_RES_X)
-#define EINK_DISPLAY_RES_Y         (BOARD_EINK_DISPLAY_RES_Y)
-#define EINK_DISPLAY_X_AXIS        (BOARD_EINK_DISPLAY_RES_X - X - W)
-#define EINK_DISPLAY_Y_AXIS        (BOARD_EINK_DISPLAY_RES_Y - Y - H)
-#define EINK_DISPLAY_WINDOW_WIDTH  (W)
-#define EINK_DISPLAY_WINDOW_HEIGHT (H)
-#endif
 
 #define EINK_BLACK_PIXEL_MASK      0x00 // This is the mask for the black pixel value
 #define EINK_1BPP_WHITE_PIXEL_MASK 0x01 // This is the mask for the white pixel in 1bpp mode
@@ -814,8 +799,7 @@ EinkStatus_e EinkDitherDisplay()
     return EinkOK;
 }
 
-EinkStatus_e EinkUpdateFrame(
-    uint16_t X, uint16_t Y, uint16_t W, uint16_t H, uint8_t *buffer, EinkBpp_e bpp, EinkDisplayColorMode_e invertColors)
+EinkStatus_e EinkUpdateFrame(EinkFrame_t frame, uint8_t *buffer, EinkBpp_e bpp, EinkDisplayColorMode_e invertColors)
 {
     uint8_t buf[10];
     uint8_t pixelsInByte = 8 / bpp;
@@ -826,20 +810,24 @@ EinkStatus_e EinkUpdateFrame(
     if ((s_einkConfiguredWaveform == EinkWaveformA2) || (s_einkConfiguredWaveform == EinkWaveformDU2)) {
         switch (bpp) {
         case Eink1Bpp: {
-            s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+            s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
         case Eink2Bpp: {
-            s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+            s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
         case Eink3Bpp: {
-            s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+            s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
         case Eink4Bpp: {
 #if defined(EINK_ROTATE_90_CLOCKWISE)
-            s_EinkTransformFrameCoordinateSystem_4Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+            s_EinkTransformFrameCoordinateSystem_4Bpp(
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
 #else
             s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(
-                buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
 #endif
         } break;
         }
@@ -847,49 +835,61 @@ EinkStatus_e EinkUpdateFrame(
     else {
         switch (bpp) {
         case Eink1Bpp: {
-            s_EinkTransformFrameCoordinateSystem_1Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+            s_EinkTransformFrameCoordinateSystem_1Bpp(
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
         case Eink2Bpp: {
-            s_EinkTransformFrameCoordinateSystem_2Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+            s_EinkTransformFrameCoordinateSystem_2Bpp(
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
         case Eink3Bpp: {
-            s_EinkTransformFrameCoordinateSystem_3Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+            s_EinkTransformFrameCoordinateSystem_3Bpp(
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
         case Eink4Bpp: {
 #if defined(EINK_ROTATE_90_CLOCKWISE)
-            s_EinkTransformFrameCoordinateSystem_4Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+            s_EinkTransformFrameCoordinateSystem_4Bpp(
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
 #else
             s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(
-                buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+                buffer, frame.width, frame.height, s_einkServiceRotatedBuf + 2, invertColors);
 #endif
         } break;
         }
     }
 
     buf[0] = EinkDataStartTransmissionWindow;           // set display window
-    buf[1] = (uint8_t)(EINK_DISPLAY_X_AXIS >> 8);       // MSB of the X axis in the EPD display. Value converted
-                                                        // from the standard GUI coords system to the ED028TC1 one
-    buf[2] = (uint8_t)EINK_DISPLAY_X_AXIS;              // LSB of the X axis in the EPD display. Value converted from
-                                                        // the standard GUI coords system to the ED028TC1 one
-    buf[3] = (uint8_t)(EINK_DISPLAY_Y_AXIS >> 8);       // MSB of the Y axis in the EPD display. Value converted
-                                                        // from the standard GUI coords system to the ED028TC1 one
-    buf[4] = (uint8_t)EINK_DISPLAY_Y_AXIS;              // LSB of the Y axis in the EPD display. Value converted from
-                                                        // the standard GUI coords system to the ED028TC1 one
-    buf[5] = (uint8_t)(EINK_DISPLAY_WINDOW_WIDTH >> 8); // MSB of the window height in the EPD display. Value converted
-                                                        // from the standard GUI coords system to the ED028TC1 one
-    buf[6] = (uint8_t)EINK_DISPLAY_WINDOW_WIDTH; // LSB of the window height in the EPD display. Value converted from
-                                                 // the standard GUI coords system to the ED028TC1 one
-    buf[7] = (uint8_t)(EINK_DISPLAY_WINDOW_HEIGHT >> 8); // MSB of the window width in the EPD display. Value converted
-                                                         // from the standard GUI coords system to the ED028TC1 one
-    buf[8] = (uint8_t)EINK_DISPLAY_WINDOW_HEIGHT; // LSB of the window width in the EPD display. Value converted from
+    buf[1] = static_cast<uint8_t>(hal::eink::getDisplayXAxis(frame) >>
+                                  8); // MSB of the X axis in the EPD display. Value converted
+                                      // from the standard GUI coords system to the ED028TC1 one
+    buf[2] = static_cast<uint8_t>(
+        hal::eink::getDisplayXAxis(frame)); // LSB of the X axis in the EPD display. Value converted from
+                                            // the standard GUI coords system to the ED028TC1 one
+    buf[3] = static_cast<uint8_t>(hal::eink::getDisplayYAxis(frame) >>
+                                  8); // MSB of the Y axis in the EPD display. Value converted
+                                      // from the standard GUI coords system to the ED028TC1 one
+    buf[4] = static_cast<uint8_t>(
+        hal::eink::getDisplayYAxis(frame)); // LSB of the Y axis in the EPD display. Value converted from
+                                            // the standard GUI coords system to the ED028TC1 one
+    buf[5] = static_cast<uint8_t>(hal::eink::getDisplayWindowWidth(frame) >>
+                                  8); // MSB of the window height in the EPD display. Value converted
+                                      // from the standard GUI coords system to the ED028TC1 one
+    buf[6] = static_cast<uint8_t>(
+        hal::eink::getDisplayWindowWidth(frame)); // LSB of the window height in the EPD display. Value converted from
                                                   // the standard GUI coords system to the ED028TC1 one
+    buf[7] = static_cast<uint8_t>(hal::eink::getDisplayWindowHeight(frame) >>
+                                  8); // MSB of the window width in the EPD display. Value converted
+                                      // from the standard GUI coords system to the ED028TC1 one
+    buf[8] = static_cast<uint8_t>(
+        hal::eink::getDisplayWindowHeight(frame)); // LSB of the window width in the EPD display. Value converted from
+                                                   // the standard GUI coords system to the ED028TC1 one
 
     if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
-    uint32_t msgSize = 2 + ((uint32_t)W * (uint32_t)H /
+    uint32_t msgSize = 2 + (static_cast<uint32_t>(frame.width) * static_cast<uint32_t>(frame.height) /
                             pixelsInByte); // command (1 byte) + bpp (1 byte) + dataSize(W*H/pixelsInByte bytes)
     // Send the part of the image to the display memory
 
@@ -952,13 +952,13 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 
     BSP_EinkWriteCS(BSP_Eink_CS_Set);
 
-    EinkRefreshImage(0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y, EinkDisplayTimingsDeepCleanMode);
+    EinkRefreshImage(EinkFrame_t{0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y},
+                     EinkDisplayTimingsDeepCleanMode);
 
     return EinkOK;
 }
 
-EinkStatus_e EinkRefreshImage(
-    uint16_t X, uint16_t Y, uint16_t W, uint16_t H, EinkDisplayTimingsMode_e refreshTimingsMode)
+EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refreshTimingsMode)
 {
     EinkChangeDisplayUpdateTimings(refreshTimingsMode);
 
@@ -969,22 +969,30 @@ EinkStatus_e EinkRefreshImage(
     buf[0] = EinkDisplayRefresh;
     buf[1] = UPD_CPY_TO_PRE;
 
-    buf[2] = (uint8_t)(EINK_DISPLAY_X_AXIS >> 8);       // MSB of the X axis in the EPD display. Value converted
-                                                        // from the standard GUI coords system to the ED028TC1 one
-    buf[3] = (uint8_t)EINK_DISPLAY_X_AXIS;              // LSB of the X axis in the EPD display. Value converted from
-                                                        // the standard GUI coords system to the ED028TC1 one
-    buf[4] = (uint8_t)(EINK_DISPLAY_Y_AXIS >> 8);       // MSB of the Y axis in the EPD display. Value converted
-                                                        // from the standard GUI coords system to the ED028TC1 one
-    buf[5] = (uint8_t)EINK_DISPLAY_Y_AXIS;              // LSB of the Y axis in the EPD display. Value converted from
-                                                        // the standard GUI coords system to the ED028TC1 one
-    buf[6] = (uint8_t)(EINK_DISPLAY_WINDOW_WIDTH >> 8); // MSB of the window height in the EPD display. Value converted
-                                                        // from the standard GUI coords system to the ED028TC1 one
-    buf[7] = (uint8_t)EINK_DISPLAY_WINDOW_WIDTH; // LSB of the window height in the EPD display. Value converted from
-                                                 // the standard GUI coords system to the ED028TC1 one
-    buf[8] = (uint8_t)(EINK_DISPLAY_WINDOW_HEIGHT >> 8); // MSB of the window width in the EPD display. Value converted
-                                                         // from the standard GUI coords system to the ED028TC1 one
-    buf[9] = (uint8_t)EINK_DISPLAY_WINDOW_HEIGHT; // LSB of the window width in the EPD display. Value converted from
+    buf[2] = static_cast<uint8_t>(hal::eink::getDisplayXAxis(frame) >>
+                                  8); // MSB of the X axis in the EPD display. Value converted
+                                      // from the standard GUI coords system to the ED028TC1 one
+    buf[3] = static_cast<uint8_t>(
+        hal::eink::getDisplayXAxis(frame)); // LSB of the X axis in the EPD display. Value converted from
+                                            // the standard GUI coords system to the ED028TC1 one
+    buf[4] = static_cast<uint8_t>(hal::eink::getDisplayYAxis(frame) >>
+                                  8); // MSB of the Y axis in the EPD display. Value converted
+                                      // from the standard GUI coords system to the ED028TC1 one
+    buf[5] = static_cast<uint8_t>(
+        hal::eink::getDisplayYAxis(frame)); // LSB of the Y axis in the EPD display. Value converted from
+                                            // the standard GUI coords system to the ED028TC1 one
+    buf[6] = static_cast<uint8_t>(hal::eink::getDisplayWindowWidth(frame) >>
+                                  8); // MSB of the window height in the EPD display. Value converted
+                                      // from the standard GUI coords system to the ED028TC1 one
+    buf[7] = static_cast<uint8_t>(
+        hal::eink::getDisplayWindowWidth(frame)); // LSB of the window height in the EPD display. Value converted from
                                                   // the standard GUI coords system to the ED028TC1 one
+    buf[8] = static_cast<uint8_t>(hal::eink::getDisplayWindowHeight(frame) >>
+                                  8); // MSB of the window width in the EPD display. Value converted
+                                      // from the standard GUI coords system to the ED028TC1 one
+    buf[9] = static_cast<uint8_t>(
+        hal::eink::getDisplayWindowHeight(frame)); // LSB of the window width in the EPD display. Value converted from
+                                                   // the standard GUI coords system to the ED028TC1 one
 
     if (BSP_EinkWriteData(buf, sizeof(buf), SPI_AUTOMATIC_CS) != 0) {
         EinkResetAndInitialize();

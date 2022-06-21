@@ -51,6 +51,7 @@ target_link_libraries(application-onboarding
         i18n
         log
         module-gui
+        Microsoft.GSL::GSL
     PUBLIC
         apps-common
 )

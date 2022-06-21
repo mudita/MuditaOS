@@ -47,6 +47,7 @@ target_link_libraries(application-meditation
         module-vfs
         service-audio
         utils-time
+        Microsoft.GSL::GSL
     PUBLIC
         apps-common
         module-gui

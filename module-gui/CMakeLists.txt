@@ -27,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}
         json::json
         pugixml::pugixml
         utils-time
+        Microsoft.GSL::GSL
 )
 
 # Board specific compilation definitions,options,include directories and features

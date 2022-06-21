@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /**
@@ -312,6 +312,14 @@ extern "C"
         uint32_t LUTDSize;
     } EinkWaveformSettings_t;
 
+    typedef struct
+    {
+        uint16_t pos_x;
+        uint16_t pos_y;
+        uint16_t width;
+        uint16_t height;
+    } EinkFrame_t;
+
     /* Exported constants --------------------------------------------------------*/
 
     /* Exported functions ------------------------------------------------------- */
@@ -365,10 +373,7 @@ extern "C"
     /**
      * @brief This function sends the part of image from the given buffer to the internal memory of the display. It
      * makes not screen to update.
-     * @param X [in] - image start position X in pixels
-     * @param Y [in] - image start position Y in pixels
-     * @param W [in] - image width in pixels
-     * @param H [in] - image height in pixels
+     * @param frame [in] - part of screen on which the image will be written
      * @param buffer [in] -  pointer to image encoded according to \ref bpp set in initialization
      * @param bpp [in] - The format of the \ref buffer (number of the bits per pixel)
      * @param invertColors[in] - true if colors of the image are to be inverted, false otherwise
@@ -376,10 +381,7 @@ extern "C"
      * @return  EinkNoMem - Could not allocate the temporary buffer
      *          EinkOK - Part of image send successfully
      */
-    EinkStatus_e EinkUpdateFrame(uint16_t X,
-                                 uint16_t Y,
-                                 uint16_t W,
-                                 uint16_t H,
+    EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
                                  uint8_t *buffer,
                                  EinkBpp_e bpp,
                                  EinkDisplayColorMode_e invertColors);
@@ -403,18 +405,14 @@ extern "C"
     /**
      * @brief Refresh window on the screen. E-paper display tends to loose contrast over time. To Keep the image sharp
      * refresh is needed.
-     * @param X refresh window position X in pixels
-     * @param Y refresh window position Y in pixels
-     * @param W refresh window width in pixels
-     * @param H refresh window height in pixels
+     * @param frame - part of screen on which image will be written
      * @param refreshTimingsMode [in] - EinkDisplayTimingsDeepCleanMode - if image is to be cleared precisely
      *                                  EinkDisplayTimingsHighContrastMode - if image is displayed in the high contrast
      * mode EinkDisplayTimingsFastRefreshMode - if image is to be displayed fast
      *
      * @return EinkOK
      */
-    EinkStatus_e EinkRefreshImage(
-        uint16_t X, uint16_t Y, uint16_t W, uint16_t H, EinkDisplayTimingsMode_e refreshTimingsMode);
+    EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refreshTimingsMode);
 
     /**
      * @brief This function sends the proper waveform consisting from the LUTC and LUTD data,

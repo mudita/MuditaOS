@@ -47,6 +47,7 @@ target_link_libraries(sys-manager
         service-desktop
         msgpack11
         system-stats-sink
+        Microsoft.GSL::GSL
 )
 
 if (${ENABLE_TESTS})

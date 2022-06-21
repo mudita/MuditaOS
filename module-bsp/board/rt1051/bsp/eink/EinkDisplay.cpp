@@ -3,17 +3,16 @@
 
 #include "EinkDisplay.hpp"
 
-#if defined(TARGET_RT1051)
 #include <board/BoardDefinitions.hpp>
-#endif
 
 #include <log/log.hpp>
-#include <gui/core/Color.hpp>
+
 #include <gsl/util>
+#include <stdexcept>
 #include <cstdio>
 #include <cstring>
 
-namespace service::eink
+namespace hal::eink
 {
     namespace
     {
@@ -44,10 +43,81 @@ namespace service::eink
             settings.LUTDSize    = 0;
             return settings;
         }
+
+        unsigned int toWaveformTemperatureOffset(std::int32_t temperature) noexcept
+        {
+            if (temperature >= LUTTemperatureCritical) {
+                return LUTTemperatureOffsetCritical;
+            }
+            if (temperature >= LUTTemperatureSubcritical) {
+                return LUTTemperatureOffsetSubcritical;
+            }
+            if (temperature < LUTTemperatureMinimal) {
+                temperature = LUTTemperatureMinimal;
+            }
+            return temperature / LUTTemperatureOffsetInterval;
+        }
+
+        unsigned int toWaveformOffset(unsigned short LUTbank, unsigned int temperatureOffset) noexcept
+        {
+            constexpr auto singleLUTOffset = (LUTTemperatureOffsetCritical + 1);
+            return LUTSTotalSize * (singleLUTOffset * LUTbank + temperatureOffset);
+        }
+
+        unsigned int toWaveformOffset(EinkWaveforms_e mode, unsigned int temperatureOffset)
+        {
+            switch (mode) {
+            case EinkWaveformINIT:
+                return toWaveformOffset(0, temperatureOffset);
+            case EinkWaveformA2:
+                return toWaveformOffset(1, temperatureOffset);
+            case EinkWaveformDU2:
+                return toWaveformOffset(2, temperatureOffset);
+            case EinkWaveformGLD16:
+                return toWaveformOffset(3, temperatureOffset);
+            case EinkWaveformGC16:
+                return toWaveformOffset(4, temperatureOffset);
+            default:
+                throw std::invalid_argument{"Invalid waveform mode."};
+            }
+        }
     } // namespace
 
-    EinkDisplay::EinkDisplay(::gui::Size screenSize)
-        : size{screenSize}, currentWaveform{createDefaultWaveFormSettings(EinkWaveformGC16)},
+    EinkDisplayColorMode_e translateDisplayColorMode(const EinkDisplayColorMode mode)
+    {
+        return mode == EinkDisplayColorMode::EinkDisplayColorModeStandard
+                   ? EinkDisplayColorMode_e::EinkDisplayColorModeStandard
+                   : EinkDisplayColorMode_e::EinkDisplayColorModeInverted;
+    }
+
+    EinkStatus translateStatus(const EinkStatus_e status_e)
+    {
+        switch (status_e) {
+        case EinkOK:
+            return EinkStatus::EinkOK;
+        case EinkError:
+            return EinkStatus::EinkError;
+        case EinkSPIErr:
+            return EinkStatus::EinkSPIErr;
+        case EinkSPINotInitializedErr:
+            return EinkStatus::EinkSPINotInitializedErr;
+        case EinkDMAErr:
+            return EinkStatus::EinkDMAErr;
+        case EinkInitErr:
+            return EinkStatus::EinkInitErr;
+        case EinkTimeout:
+            return EinkStatus::EinkTimeout;
+        case EinkNoMem:
+            return EinkStatus::EinkNoMem;
+        case EinkWaveformsFileOpenFail:
+            return EinkStatus::EinkWaveformsFileOpenFail;
+        default:
+            return EinkStatus::EinkUnknown;
+        }
+    }
+
+    EinkDisplay::EinkDisplay(FrameSize size)
+        : size{size}, currentWaveform{createDefaultWaveFormSettings(EinkWaveformGC16)},
           displayMode{EinkDisplayColorMode_e::EinkDisplayColorModeStandard}
     {
 #if defined(TARGET_RT1051)
@@ -62,9 +132,59 @@ namespace service::eink
         delete[] currentWaveform.LUTDData;
     }
 
-    EinkStatus_e EinkDisplay::resetAndInit()
+    EinkStatus EinkDisplay::updateDisplay(std::uint8_t *frameBuffer, [[maybe_unused]] const EinkRefreshMode refreshMode)
     {
-        return EinkResetAndInitialize();
+        return update(frameBuffer);
+    }
+
+    EinkStatus EinkDisplay::refreshDisplay(const EinkRefreshMode refreshMode)
+    {
+        const auto isDeepRefresh = refreshMode == EinkRefreshMode::REFRESH_DEEP;
+        return refresh(isDeepRefresh ? EinkDisplayTimingsDeepCleanMode : EinkDisplayTimingsFastRefreshMode);
+    }
+
+    EinkStatus EinkDisplay::prepareDisplay(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour)
+    {
+        powerOn();
+
+        const auto temperature =
+            behaviour == WaveformTemperature::KEEP_CURRENT ? getLastTemperature() : EinkGetTemperatureInternal();
+
+        if (refreshMode == EinkRefreshMode::REFRESH_DEEP) {
+            auto status = setWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+            if (status == EinkStatus::EinkOK) {
+                dither();
+            }
+            return status;
+        }
+        return setWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
+    }
+
+    EinkStatus EinkDisplay::showImage(std::uint8_t *frameBuffer, const EinkRefreshMode refreshMode)
+    {
+        if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
+            status != EinkStatus::EinkOK) {
+            return status;
+        }
+
+        if (const auto status = updateDisplay(frameBuffer, refreshMode); status != EinkStatus::EinkOK) {
+            return status;
+        }
+
+        if (const auto status = refreshDisplay(refreshMode); status != EinkStatus::EinkOK) {
+            return status;
+        }
+        return EinkStatus::EinkOK;
+    }
+
+    void EinkDisplay::prepareEarlyRequest(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour)
+    {
+        prepareDisplay(refreshMode, behaviour);
+    }
+
+    EinkStatus EinkDisplay::resetAndInit()
+    {
+        return translateStatus(EinkResetAndInitialize());
     }
 
     void EinkDisplay::dither()
@@ -77,9 +197,6 @@ namespace service::eink
         if (driverLPSPI) {
             driverLPSPI->Enable();
         }
-        if (eInkSentinel) {
-            eInkSentinel->HoldMinimumFrequency();
-        }
         EinkPowerOn();
     }
 
@@ -88,9 +205,6 @@ namespace service::eink
         EinkPowerOff();
         if (driverLPSPI) {
             driverLPSPI->Disable();
-        }
-        if (eInkSentinel) {
-            eInkSentinel->ReleaseMinimumFrequency();
         }
     }
 
@@ -104,15 +218,12 @@ namespace service::eink
         EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite);
     }
 
-    EinkStatus_e EinkDisplay::update(std::uint8_t *displayBuffer)
+    EinkStatus EinkDisplay::update(std::uint8_t *displayBuffer)
     {
-        return EinkUpdateFrame(pointTopLeft.x,
-                               pointTopLeft.y,
-                               size.width,
-                               size.height,
-                               displayBuffer,
-                               getCurrentBitsPerPixelFormat(),
-                               displayMode);
+        return translateStatus(EinkUpdateFrame(EinkFrame_t{0, 0, size.width, size.height},
+                                               displayBuffer,
+                                               getCurrentBitsPerPixelFormat(),
+                                               translateDisplayColorMode(displayMode)));
     }
 
     EinkBpp_e EinkDisplay::getCurrentBitsPerPixelFormat() const noexcept
@@ -123,13 +234,13 @@ namespace service::eink
         return Eink4Bpp;
     }
 
-    EinkStatus_e EinkDisplay::refresh(EinkDisplayTimingsMode_e refreshMode)
+    EinkStatus EinkDisplay::refresh(const EinkDisplayTimingsMode_e refreshMode)
     {
         currentWaveform.useCounter += 1;
-        return EinkRefreshImage(pointTopLeft.x, pointTopLeft.y, size.width, size.height, refreshMode);
+        return translateStatus(EinkRefreshImage(EinkFrame_t{0, 0, size.width, size.height}, refreshMode));
     }
 
-    bool EinkDisplay::isNewWaveformNeeded(EinkWaveforms_e newMode, std::int32_t newTemperature) const
+    bool EinkDisplay::isNewWaveformNeeded(const EinkWaveforms_e newMode, const std::int32_t newTemperature) const
     {
         constexpr auto lenientTemperatureUseCounter = 50; // arbitrary. not documented
         auto alloweLenientTemperature               = currentWaveform.useCounter < lenientTemperatureUseCounter;
@@ -160,10 +271,10 @@ namespace service::eink
         return true;
     }
 
-    EinkStatus_e EinkDisplay::setWaveform(EinkWaveforms_e mode, std::int32_t temperature)
+    EinkStatus EinkDisplay::setWaveform(const EinkWaveforms_e mode, const std::int32_t temperature)
     {
         if (!isNewWaveformNeeded(mode, temperature)) {
-            return EinkOK;
+            return EinkStatus::EinkOK;
         }
 
         auto currentOffset =
@@ -177,13 +288,13 @@ namespace service::eink
 
         if (offset == currentOffset) {
             // current waveform is still the best fit
-            return EinkOK;
+            return EinkStatus::EinkOK;
         }
 
         auto file = std::fopen(LutsFileName, "rb");
         if (file == nullptr) {
             LOG_FATAL("Could not find the LUTS.bin file. Returning");
-            return EinkWaveformsFileOpenFail;
+            return EinkStatus::EinkWaveformsFileOpenFail;
         }
         auto fileHandlerCleanup = gsl::finally([&file]() { std::fclose(file); });
 
@@ -201,43 +312,7 @@ namespace service::eink
         std::fread(&currentWaveform.LUTCData[1], 1, LUTCSize, file);
 
         EinkUpdateWaveform(&currentWaveform);
-        return EinkOK;
-    }
-
-    unsigned int EinkDisplay::toWaveformTemperatureOffset(std::int32_t temperature) noexcept
-    {
-        if (temperature >= LUTTemperatureCritical)
-            return LUTTemperatureOffsetCritical;
-        if (temperature >= LUTTemperatureSubcritical)
-            return LUTTemperatureOffsetSubcritical;
-        if (temperature < LUTTemperatureMinimal) {
-            temperature = LUTTemperatureMinimal;
-        }
-        return temperature / LUTTemperatureOffsetInterval;
-    }
-
-    unsigned int EinkDisplay::toWaveformOffset(unsigned short LUTbank, unsigned int temperatureOffset) noexcept
-    {
-        constexpr auto singleLUTOffset = (LUTTemperatureOffsetCritical + 1);
-        return LUTSTotalSize * (singleLUTOffset * LUTbank + temperatureOffset);
-    }
-
-    unsigned int EinkDisplay::toWaveformOffset(EinkWaveforms_e mode, unsigned int temperatureOffset)
-    {
-        switch (mode) {
-        case EinkWaveformINIT:
-            return toWaveformOffset(0, temperatureOffset);
-        case EinkWaveformA2:
-            return toWaveformOffset(1, temperatureOffset);
-        case EinkWaveformDU2:
-            return toWaveformOffset(2, temperatureOffset);
-        case EinkWaveformGLD16:
-            return toWaveformOffset(3, temperatureOffset);
-        case EinkWaveformGC16:
-            return toWaveformOffset(4, temperatureOffset);
-        default:
-            throw std::invalid_argument{"Invalid waveform mode."};
-        }
+        return EinkStatus::EinkOK;
     }
 
     void EinkDisplay::resetWaveformSettings()
@@ -253,7 +328,7 @@ namespace service::eink
         currentWaveform.LUTCData[0] = EinkLUTC;
     }
 
-    void EinkDisplay::setMode(EinkDisplayColorMode_e mode) noexcept
+    void EinkDisplay::setMode(const EinkDisplayColorMode mode) noexcept
     {
         displayMode = mode;
     }
@@ -263,19 +338,14 @@ namespace service::eink
         return currentWaveform.temperature;
     }
 
-    ::gui::Size EinkDisplay::getSize() const noexcept
-    {
-        return size;
-    }
-
     [[nodiscard]] auto EinkDisplay::getDevice() const noexcept -> std::shared_ptr<devices::Device>
     {
         return driverLPSPI;
     }
 
-    void EinkDisplay::setEinkSentinel(std::shared_ptr<EinkSentinel> sentinel)
+    std::unique_ptr<AbstractEinkDisplay> AbstractEinkDisplay::Factory::create(FrameSize size)
     {
-        eInkSentinel = std::move(sentinel);
+        return std::make_unique<EinkDisplay>(size);
     }
 
-} // namespace service::eink
+} // namespace hal::eink

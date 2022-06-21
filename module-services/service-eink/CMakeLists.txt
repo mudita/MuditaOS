@@ -3,7 +3,6 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
     ServiceEink.cpp
-    EinkDisplay.cpp
     api/ServiceEinkApi.cpp
     internal/StaticData.cpp
     messages/ImageMessage.cpp
@@ -14,11 +13,13 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 add_board_subdirectory(board)
 
 target_link_libraries( ${PROJECT_NAME}
-        module-utils
+    PUBLIC
         module-bsp
-        Microsoft.GSL::GSL
         messagetype
         module-sys
+    PRIVATE
+        Microsoft.GSL::GSL
+        module-utils
 )
 
 target_include_directories(${PROJECT_NAME}
