@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,19 +11,38 @@
 #include <functional>
 #include <deque>
 #include <vector>
+#include <memory>
 
-namespace audio
+namespace audio::pulse_audio
 {
-    class PulseAudioWrapper
+    class Stream
+    {
+      public:
+        Stream(AudioFormat audio_format_, pa_context *ctx);
+        ~Stream();
+
+        void insert(AbstractStream::Span span);
+        void consume();
+        std::size_t bytes() const;
+
+        pa_stream *raw();
+
+      private:
+        std::vector<std::uint8_t> cache{};
+        std::uint32_t cache_pos{};
+        AudioFormat audio_format;
+        pa_stream *stream{nullptr};
+    };
+
+    class Context
     {
       public:
         using WriteCallback = std::function<void(const std::size_t size)>;
-        PulseAudioWrapper(WriteCallback write_cb, AudioFormat audio_format);
-        ~PulseAudioWrapper();
+        Context();
+        ~Context();
 
-        void insert(audio::AbstractStream::Span span);
-        void consume();
-        std::size_t bytes() const;
+        Stream *open_stream(AudioFormat audio_format_, WriteCallback write_cb);
+        void close_stream();
 
       private:
         void context_state_callback();
@@ -32,16 +51,12 @@ namespace audio
         void quit(int ret = 0);
 
         pthread_t tid{};
-        pa_stream *stream{nullptr};
         pa_mainloop *mainloop{nullptr};
         pa_mainloop_api *mainloop_api{nullptr};
         pa_context *context{nullptr};
+        std::unique_ptr<Stream> stream;
 
         WriteCallback write_cb;
-        AudioFormat audio_format;
-
-        std::vector<std::uint8_t> cache{};
-        std::uint32_t cache_pos{};
     };
 
-} // namespace audio
+} // namespace audio::pulse_audio
