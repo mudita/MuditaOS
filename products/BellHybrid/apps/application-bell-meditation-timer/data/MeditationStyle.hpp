@@ -62,6 +62,32 @@ namespace app::meditationStyle
         } // namespace clock
     }     // namespace mrStyle
 
+    namespace mcStyle
+    {
+        namespace progress
+        {
+            constexpr inline auto radius                   = mrStyle::progress::radius;
+            constexpr inline auto penWidth                 = mrStyle::progress::penWidth;
+            constexpr inline auto verticalDeviationDegrees = mrStyle::progress::verticalDeviationDegrees;
+        } // namespace progress
+
+        namespace timer
+        {
+            constexpr inline auto marginTop = 23;
+            constexpr inline auto font      = mrStyle::timer::font;
+            constexpr inline auto maxSizeX  = mrStyle::timer::maxSizeX;
+            constexpr inline auto maxSizeY  = mrStyle::timer::maxSizeY;
+        } // namespace timer
+
+        namespace description
+        {
+            constexpr inline auto font      = style::window::font::large;
+            constexpr inline auto marginTop = 63;
+            constexpr inline auto maxSizeX  = 380;
+            constexpr inline auto maxSizeY  = 102;
+        } // namespace description
+    }     // namespace mcStyle
+
     namespace mtStyle
     {
         namespace text
