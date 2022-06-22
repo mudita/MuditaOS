@@ -42,6 +42,7 @@ TEST_CASE("SMS Templates Table tests")
         auto templ = templatesTbl.getById(4);
         REQUIRE(templ.ID == 4);
         REQUIRE(templ.text == testRow.text);
+        REQUIRE(templ.order == 4);
         REQUIRE(templ.lastUsageTimestamp == testRow.lastUsageTimestamp);
     }
 
@@ -49,11 +50,13 @@ TEST_CASE("SMS Templates Table tests")
     {
         testRow.ID                 = 4;
         testRow.text               = "New text";
+        testRow.order              = 5;
         testRow.lastUsageTimestamp = 200;
         REQUIRE(templatesTbl.update(testRow));
         auto templ = templatesTbl.getById(4);
         REQUIRE(templ.ID == 4);
         REQUIRE(templ.text == testRow.text);
+        REQUIRE(templ.order == testRow.order);
         REQUIRE(templ.lastUsageTimestamp == testRow.lastUsageTimestamp);
     }
 

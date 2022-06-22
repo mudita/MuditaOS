@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -39,15 +39,26 @@ TEST_CASE("SMS templates Record tests")
         REQUIRE(templ.lastUsageTimestamp == testRec.lastUsageTimestamp);
     }
 
+    SECTION("Check entry order")
+    {
+        for (std::uint32_t templateNumber = 1; templateNumber <= 4; templateNumber++) {
+            auto messageTemplate = SMSTemplateRecordInterface.GetByID(templateNumber);
+            REQUIRE(messageTemplate.ID == templateNumber);
+            REQUIRE(messageTemplate.order == templateNumber);
+        }
+    }
+
     SECTION("Entry update")
     {
         testRec.ID                 = 4;
         testRec.text               = "New text";
+        testRec.order              = 9;
         testRec.lastUsageTimestamp = 200;
         REQUIRE(SMSTemplateRecordInterface.Update(testRec));
         auto templ = SMSTemplateRecordInterface.GetByID(4);
         REQUIRE(templ.ID == 4);
         REQUIRE(templ.text == testRec.text);
+        REQUIRE(templ.order == testRec.order);
         REQUIRE(templ.lastUsageTimestamp == testRec.lastUsageTimestamp);
     }
 

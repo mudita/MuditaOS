@@ -1,4 +1,4 @@
--- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 -- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 BEGIN TRANSACTION;
 INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","error_code","body","type") VALUES (1,2,2,1547492320,0,'Thank you for today!' || CHAR(10) || 'You chose a fantastic place :)',8);

@@ -80,6 +80,7 @@ namespace sdesktop::endpoints::json
 
         inline constexpr auto limit              = "limit";
         inline constexpr auto offset             = "offset";
+        inline constexpr auto order              = "order";
         inline constexpr auto totalCount         = "totalCount";
         inline constexpr auto nextPage           = "nextPage";
         inline constexpr auto entries            = "entries";

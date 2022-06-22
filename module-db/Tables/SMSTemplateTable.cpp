@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplateTable.hpp"
+#include "Common/Types.hpp"
 
 #include <Utils.hpp>
 #include <log/log.hpp>
@@ -21,10 +22,16 @@ bool SMSTemplateTable::create()
 
 bool SMSTemplateTable::add(SMSTemplateTableRow entry)
 {
-    return db->execute("INSERT or ignore INTO templates (text, lastUsageTimestamp) VALUES ('%q', '%q');",
-
+    auto retQuery = db->query("SELECT MAX(rowOrder) FROM templates;");
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return false;
+    }
+    auto lastOrderValue = (*retQuery)[0].getUInt32() + 1;
+    return db->execute("INSERT or ignore INTO templates (text, lastUsageTimestamp, rowOrder) VALUES (" str_c str_c u32_
+                       ");",
                        entry.text.c_str(),
-                       utils::to_string(entry.lastUsageTimestamp).c_str());
+                       utils::to_string(entry.lastUsageTimestamp).c_str(),
+                       lastOrderValue);
 }
 
 bool SMSTemplateTable::removeById(uint32_t id)
@@ -40,9 +47,11 @@ bool SMSTemplateTable::removeByField(SMSTemplateTableFields field, const char *s
 
 bool SMSTemplateTable::update(SMSTemplateTableRow entry)
 {
-    return db->execute("UPDATE templates SET text = '%q', lastUsageTimestamp = %q WHERE _id=%" PRIu32 ";",
+    return db->execute("UPDATE templates SET text = '%q', lastUsageTimestamp = %q, rowOrder = %" PRIu32
+                       " WHERE _id=%" PRIu32 ";",
                        entry.text.c_str(),
                        utils::to_string(entry.lastUsageTimestamp).c_str(),
+                       entry.order,
                        entry.ID);
 }
 
@@ -58,15 +67,14 @@ SMSTemplateTableRow SMSTemplateTable::getById(uint32_t id)
         (*retQuery)[0].getUInt32(),                      // ID
         (*retQuery)[1].getString(),                      // text
         static_cast<time_t>((*retQuery)[2].getUInt64()), // lastUsageTimestamp
+        (*retQuery)[3].getUInt32(),                      // order
     };
 }
 
 std::vector<SMSTemplateTableRow> SMSTemplateTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery =
-        db->query("SELECT * from templates ORDER BY lastUsageTimestamp DESC LIMIT %" PRIu32 " OFFSET %" PRIu32 ";",
-                  limit,
-                  offset);
+    auto retQuery = db->query(
+        "SELECT * from templates ORDER BY rowOrder DESC LIMIT %" PRIu32 " OFFSET %" PRIu32 ";", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTemplateTableRow>();
@@ -79,6 +87,7 @@ std::vector<SMSTemplateTableRow> SMSTemplateTable::getLimitOffset(uint32_t offse
             (*retQuery)[0].getUInt32(),                      // ID
             (*retQuery)[1].getString(),                      // text
             static_cast<time_t>((*retQuery)[2].getUInt64()), // lastUsageTimestamp
+            (*retQuery)[3].getUInt32(),                      // order
         });
     } while (retQuery->nextRow());
 

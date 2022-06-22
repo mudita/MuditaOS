@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplateRecord.hpp"
@@ -19,6 +19,7 @@ SMSTemplateRecord::SMSTemplateRecord(const SMSTemplateTableRow &w)
     ID                 = w.ID;
     text               = w.text;
     lastUsageTimestamp = w.lastUsageTimestamp;
+    order              = w.order;
 }
 
 SMSTemplateRecordInterface::SMSTemplateRecordInterface(SmsDB *smsDb) : smsDB(smsDb)
@@ -51,13 +52,15 @@ std::unique_ptr<std::vector<SMSTemplateRecord>> SMSTemplateRecordInterface::GetL
 
 bool SMSTemplateRecordInterface::Update(const SMSTemplateRecord &rec)
 {
-    auto templ = smsDB->templates.getById(rec.ID);
+    const auto templ = smsDB->templates.getById(rec.ID);
     if (templ.ID == DB_ID_NONE) {
         return false;
     }
+    const auto templateText  = rec.text.empty() ? templ.text : rec.text;
+    const auto templateOrder = rec.order == 0 ? templ.order : rec.order;
 
-    return smsDB->templates.update(
-        SMSTemplateTableRow{Record(rec.ID), .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
+    return smsDB->templates.update(SMSTemplateTableRow{
+        Record(rec.ID), .text = templateText, .lastUsageTimestamp = rec.lastUsageTimestamp, .order = templateOrder});
 }
 
 bool SMSTemplateRecordInterface::RemoveByID(uint32_t id)

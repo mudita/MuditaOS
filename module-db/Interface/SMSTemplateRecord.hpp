@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,6 +14,7 @@ struct SMSTemplateRecord : public Record
 {
     UTF8 text;
     time_t lastUsageTimestamp = 0;
+    std::uint32_t order       = 0;
 
     SMSTemplateRecord() = default;
     SMSTemplateRecord(const SMSTemplateTableRow &);
