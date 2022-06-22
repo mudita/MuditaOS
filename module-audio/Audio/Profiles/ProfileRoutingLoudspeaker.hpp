@@ -23,22 +23,20 @@ namespace audio
                       .flags =
                           static_cast<uint32_t>(audio::codec::Flags::InputLeft) | // microphone use left audio channel
                           static_cast<uint32_t>(audio::codec::Flags::OutputMono),
-                      .outputVolume       = 0,
-                      .inputGain          = 0,
-                      .playbackPathGain   = 0,
-                      .playbackPathAtten  = 5,
-                      .inputPath          = audio::codec::InputPath::Microphone,
-                      .outputPath         = audio::codec::OutputPath::Loudspeaker,
-                      .filterCoefficients = {qfilter_CalculateCoeffs(
-                                                 audio::equalizer::FilterType::HighPass, 307.3f, sampleRate, 0.701f, 0),
-                                             qfilter_CalculateCoeffs(
-                                                 audio::equalizer::FilterType::LowPass, 5080.1f, sampleRate, 0.847f, 0),
-                                             qfilter_CalculateCoeffs(
-                                                 audio::equalizer::FilterType::None, 15975.7f, sampleRate, 0.701f, -10),
-                                             qfilter_CalculateCoeffs(
-                                                 audio::equalizer::FilterType::None, 200.4f, sampleRate, 0.701f, -10),
-                                             qfilter_CalculateCoeffs(
-                                                 audio::equalizer::FilterType::None, 1496.7f, sampleRate, 0.701f, -4)}},
+                      .outputVolume      = 1,
+                      .inputGain         = 0,
+                      .playbackPathGain  = 0,
+                      .playbackPathAtten = 5,
+                      .inputPath         = audio::codec::InputPath::Microphone,
+                      .outputPath        = audio::codec::OutputPath::Loudspeaker,
+                      .filterCoefficients =
+                          {qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 307.3f, sampleRate, 0.701f, 0),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 5080.1f, sampleRate, 0.847f, 0),
+                           qfilter_CalculateCoeffs(
+                               audio::equalizer::FilterType::None, 15975.7f, sampleRate, 0.701f, -10),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 200.4f, sampleRate, 0.701f, -10),
+                           qfilter_CalculateCoeffs(
+                               audio::equalizer::FilterType::None, 1496.7f, sampleRate, 0.701f, -4)}},
                   AudioDevice::Type::Audiocodec)
         {
             audioConfiguration.sampleRate_Hz = sampleRate;

@@ -26,8 +26,8 @@ namespace audio
                       .inputPath    = audio::codec::InputPath::Headphones,
                       .outputPath   = audio::codec::OutputPath::Headphones,
                       .filterCoefficients =
-                          {qfilter_CalculateCoeffs(audio::equalizer::FilterType::HighPass, 997.f, 44100, 0.701f, 0),
-                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::LowPass, 4993.7f, 44100, 0.701f, 0),
+                          {qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 997.f, 44100, 0.701f, 0),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 4993.7f, 44100, 0.701f, 0),
                            qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 15975.7f, 44100, 0.701f, -10),
                            qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 200.4f, 44100, 0.701f, -10),
                            qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 1496.7f, 44100, 0.701f, -4)}},
