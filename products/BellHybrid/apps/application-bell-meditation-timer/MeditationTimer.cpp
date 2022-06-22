@@ -4,9 +4,9 @@
 #include "MeditationTimer.hpp"
 #include "MeditationCommon.hpp"
 #include "windows/MeditationMainWindow.hpp"
+#include "windows/MeditationCountdownWindow.hpp"
 #include "windows/MeditationRunningWindow.hpp"
 #include "windows/MeditationTimerWindow.hpp"
-#include "windows/ReadyGoingWindow.hpp"
 #include "windows/SettingsWindow.hpp"
 #include "windows/StatisticsWindow.hpp"
 
@@ -77,10 +77,11 @@ namespace app
                 return std::make_unique<meditation::MeditationTimerWindow>(app, std::move(presenter));
             });
 
-        windowsFactory.attach(meditation::windows::readyGoing, [this](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<app::meditation::ReadyGoingPresenter>(app, *startDelayModel);
-            return std::make_unique<gui::ReadyGoingWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(
+            meditation::windows::meditationCountdown, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<app::meditation::MeditationCountdownPresenter>(app, settings.get());
+                return std::make_unique<gui::MeditationCountdownWindow>(app, std::move(presenter));
+            });
         windowsFactory.attach(meditation::windows::meditationProgress,
                               [this](ApplicationCommon *app, const std::string &name) {
                                   auto timeModel = std::make_unique<app::TimeModel>();

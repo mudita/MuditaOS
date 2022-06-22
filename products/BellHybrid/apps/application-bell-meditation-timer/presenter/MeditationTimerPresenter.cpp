@@ -58,6 +58,6 @@ namespace app::meditation
     void MeditationTimerPresenter::activate(std::uint32_t value)
     {
         settings->setValue(meditationDBRecordName, utils::to_string(value), settings::SettingsScope::AppLocal);
-        app->switchWindow(windows::readyGoing);
+        app->switchWindow(windows::meditationCountdown);
     }
 } // namespace app::meditation
