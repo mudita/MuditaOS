@@ -132,10 +132,10 @@ namespace call
 
     struct ClipDND_NOK
     {
-        bool operator()(Dependencies &di, CallData &call)
+        bool operator()(const call::event::CLIP &clip, Dependencies &di, CallData &call)
         {
             return call.mode == sys::phone_modes::PhoneMode::DoNotDisturb &&
-                   not di.db->isNumberInFavourites(call.record.phoneNumber);
+                   not(di.modem->areCallsFromFavouritesEnabled() && di.db->isNumberInFavourites(clip.number));
         }
     } constexpr ClipDND_NOK;
 
