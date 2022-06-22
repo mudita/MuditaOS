@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Helpers.hpp"
@@ -76,6 +76,23 @@ namespace
         return versions;
     }
 
+    std::vector<std::filesystem::path> searchForScripts(const std::filesystem::path &pathToVersion,
+                                                        const std::string &scriptName)
+    {
+        std::vector<std::filesystem::path> scripts{};
+        if (std::filesystem::exists(pathToVersion / scriptName)) {
+            scripts.push_back(pathToVersion / scriptName);
+        }
+        else {
+            for (const auto &subVersion : std::filesystem::directory_iterator(pathToVersion)) {
+                if (std::filesystem::exists(subVersion.path() / scriptName)) {
+                    scripts.push_back(subVersion.path() / scriptName);
+                }
+            }
+        }
+        return scripts;
+    }
+
     std::vector<std::filesystem::path> listFiles(const std::filesystem::path &path,
                                                  const std::string &prefix,
                                                  const bool withDevelopment)
@@ -84,9 +101,15 @@ namespace
         constexpr auto devel_sql = "devel.sql";
         std::vector<std::filesystem::path> files;
         for (const auto &version : listVersionDirectories(path, prefix)) {
-            files.push_back(version / up_sql);
-            if (withDevelopment and std::filesystem::exists(version / devel_sql)) {
-                files.push_back(version / devel_sql);
+            auto scriptsPath = searchForScripts(version, up_sql);
+            if (not scriptsPath.empty()) {
+                files.insert(files.end(), scriptsPath.begin(), scriptsPath.end());
+            }
+            if (withDevelopment) {
+                scriptsPath = searchForScripts(version, devel_sql);
+                if (not scriptsPath.empty()) {
+                    files.insert(files.end(), scriptsPath.begin(), scriptsPath.end());
+                }
             }
         }
         return files;

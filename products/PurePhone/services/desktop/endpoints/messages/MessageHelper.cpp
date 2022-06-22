@@ -55,7 +55,8 @@ namespace sdesktop::endpoints
         auto recordEntry =
             json11::Json::object{{json::messages::templateID, static_cast<int>(record.ID)},
                                  {json::messages::templateBody, record.text.c_str()},
-                                 {json::messages::lastUsedAt, static_cast<int>(record.lastUsageTimestamp)}};
+                                 {json::messages::lastUsedAt, static_cast<int>(record.lastUsageTimestamp)},
+                                 {json::messages::order, static_cast<int>(record.order)}};
         return recordEntry;
     }
 
@@ -314,16 +315,23 @@ namespace sdesktop::endpoints
             return sys::ReturnCodes::Unresolved;
         }
 
-        if (!context.getBody()[json::messages::templateBody].is_string()) {
-            LOG_ERROR("Bad request! templateBody is incorrect or missing!");
+        auto updateTemplateBody  = context.getBody()[json::messages::templateBody].is_string();
+        auto updateTemplateOrder = context.getBody()[json::messages::order].is_number();
+        if (!updateTemplateBody && !updateTemplateOrder) {
+            LOG_ERROR("Bad request! templateBody/order is incorrect or missing!");
             context.setResponseStatus(http::Code::BadRequest);
             putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Unresolved;
         }
 
         SMSTemplateRecord record;
-        record.ID   = context.getBody()[json::messages::templateID].int_value();
-        record.text = context.getBody()[json::messages::templateBody].string_value();
+        record.ID = context.getBody()[json::messages::templateID].int_value();
+        if (updateTemplateBody) {
+            record.text = context.getBody()[json::messages::templateBody].string_value();
+        }
+        if (updateTemplateOrder) {
+            record.order = context.getBody()[json::messages::order].int_value();
+        }
 
         auto query    = std::make_unique<db::query::SMSTemplateUpdate>(record);
         auto listener = std::make_unique<db::EndpointListener>(

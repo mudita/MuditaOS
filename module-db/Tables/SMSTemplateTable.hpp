@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,6 +14,7 @@ struct SMSTemplateTableRow : public Record
 {
     UTF8 text;
     time_t lastUsageTimestamp = 0;
+    std::uint32_t order       = 0;
 };
 
 enum class SMSTemplateTableFields
@@ -23,7 +24,7 @@ enum class SMSTemplateTableFields
 class SMSTemplateTable : public Table<SMSTemplateTableRow, SMSTemplateTableFields>
 {
   public:
-    SMSTemplateTable(Database *db);
+    explicit SMSTemplateTable(Database *db);
     virtual ~SMSTemplateTable();
 
     bool create() override final;

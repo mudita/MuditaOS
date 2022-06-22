@@ -100,7 +100,6 @@ class TemplatesTester:
         for template in templates:
 
             if template["templateBody"] == self.template_body:
-
                 # Change template
                 new_template_body = "NEW TEMPLATE BODY TEST"
                 body = {"category": "template", "templateID": template["templateID"], "templateBody": new_template_body}
@@ -116,6 +115,37 @@ class TemplatesTester:
         total_count = self.__get_count()
         assert total_count == initial_count
         assert test_passed == True
+
+    def test_changing_template_order(self):
+        template_id = 1
+        initial_order = 1
+        new_order = 9
+        body = {"category": "template", "templateID": template_id}
+        ret = self.harness.endpoint_request("messages", "get", body)
+
+        assert ret["status"] == status["OK"]
+        assert ret["body"]["templateID"] == template_id
+        assert ret["body"]["order"] == initial_order
+
+        body = {"category": "template", "templateID": template_id, "order": new_order}
+        ret = self.harness.endpoint_request("messages", "put", body)
+        assert ret["status"] == status["NoContent"]
+
+        body = {"category": "template", "templateID": template_id}
+        ret = self.harness.endpoint_request("messages", "get", body)
+        assert ret["status"] == status["OK"]
+        assert ret["body"]["templateID"] == template_id
+        assert ret["body"]["order"] == new_order
+
+        body = {"category": "template", "templateID": template_id, "order": initial_order}
+        ret = self.harness.endpoint_request("messages", "put", body)
+        assert ret["status"] == status["NoContent"]
+
+        body = {"category": "template", "templateID": template_id}
+        ret = self.harness.endpoint_request("messages", "get", body)
+        assert ret["status"] == status["OK"]
+        assert ret["body"]["templateID"] == template_id
+        assert ret["body"]["order"] == initial_order
 
     def test_getting_templates_with_pagination(self):
         initial_count = self.__get_count()
@@ -158,12 +188,22 @@ def test_get_templates_without_pagination(harness):
     templates_tester = TemplatesTester(harness)
     templates_tester.test_getting_templates_without_pagination()
 
+
 @pytest.mark.rt1051
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
-def test_change_template(harness):
+def test_change_template_text(harness):
     templates_tester = TemplatesTester(harness)
     templates_tester.test_changing_template_body()
+
+
+@pytest.mark.rt1051
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_unlocked")
+def test_change_template_order(harness):
+    templates_tester = TemplatesTester(harness)
+    templates_tester.test_changing_template_order()
+
 
 @pytest.mark.rt1051
 @pytest.mark.service_desktop_test
