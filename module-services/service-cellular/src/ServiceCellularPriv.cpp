@@ -408,6 +408,7 @@ namespace cellular::internal
             if (channel) {
                 auto result = channel->cmd(at::AT::CSQ_URC_ON);
                 if (result) {
+                    owner->csqCounter.clearCounter();
                     return true;
                 }
             }

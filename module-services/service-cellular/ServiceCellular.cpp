@@ -157,11 +157,8 @@ ServiceCellular::ServiceCellular()
         this, "simTimer", std::chrono::milliseconds{6000}, [this](sys::Timer &) { priv->simCard->handleSimTimer(); });
 
     csqTimer = sys::TimerFactory::createPeriodicTimer(this, "csqTimer", std::chrono::minutes{15}, [this](sys::Timer &) {
-        auto message = std::make_shared<cellular::URCCounterMessage>(csqCounter.getCounter());
-        csqCounter.clearCounter();
-        bus.sendUnicast(std::move(message), serviceName);
-
         priv->csqHandler->handleTimerTick();
+        csqCounter.clearCounter();
     });
 
     notificationCallback = [this](std::string &data) {
@@ -574,6 +571,8 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(cellular::SignalStrengthUpdateNotification), [&](sys::Message *request) -> sys::MessagePointer {
         csqCounter.count();
+        auto message = std::make_shared<cellular::URCCounterMessage>(csqCounter.getCounter());
+        bus.sendUnicast(std::move(message), serviceName);
         return handleSignalStrengthUpdateNotification(request);
     });
 
@@ -796,6 +795,7 @@ bool ServiceCellular::handle_power_down_started()
 
 bool ServiceCellular::handle_power_down_waiting()
 {
+    csqTimer.stop();
     switch (board) {
     case bsp::Board::RT1051:
         // wait for pin status become inactive (handled elsewhere)
