@@ -94,11 +94,11 @@ status_bar::Configuration PhoneLockedInfoWindow::configureStatusBar(status_bar::
 {
     appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
     appConfiguration.disable(status_bar::Indicator::Time);
+    appConfiguration.disable(status_bar::Indicator::SimCard);
     appConfiguration.enable(status_bar::Indicator::PhoneMode);
     appConfiguration.enable(status_bar::Indicator::Lock);
     appConfiguration.enable(status_bar::Indicator::Battery);
     appConfiguration.enable(status_bar::Indicator::Signal);
-    appConfiguration.enable(status_bar::Indicator::SimCard);
     appConfiguration.enable(status_bar::Indicator::Bluetooth);
     appConfiguration.enable(status_bar::Indicator::AlarmClock);
     return appConfiguration;

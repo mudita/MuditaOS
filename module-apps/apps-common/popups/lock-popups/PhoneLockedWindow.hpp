@@ -64,8 +64,6 @@ namespace gui
                 return temp;
             }
         } deepRefreshCounter;
-
-        void updateStatusBar();
     };
 
 } /* namespace gui */
