@@ -367,6 +367,7 @@ namespace bluetooth
                         state<Idle> + sml::event<bluetooth::event::StartRouting> / forwardEvent= state<Call>,
                         state<Idle> + sml::event<bluetooth::event::IncomingCallNumber>  / forwardEvent  = state<Call>,
                         state<Idle> + sml::event<bluetooth::event::CallStarted> / forwardEvent= state<Call>,
+
                         state<Call> = state<Idle> // this one is needed to go out from Call substate properly!
 
                             );
