@@ -5,33 +5,78 @@
 #include <pthread.h>
 #include <iostream>
 #include <utility>
+#include <stdexcept>
 
-namespace audio
+namespace audio::pulse_audio
 {
-    PulseAudioWrapper::PulseAudioWrapper(WriteCallback write_cb, AudioFormat audio_format)
-        : write_cb{std::move(write_cb)}, audio_format(audio_format)
+    Stream::Stream(AudioFormat audio_format_, pa_context *ctx) : audio_format{audio_format_}
     {
         /// PulseAudio requests at least SampleRate bytes of data to start playback
         /// Due to how module-audio's streams operate we can load a bit more data to the cache than needed.
         /// Doubling the buffer size is cheap and simple solution.
         cache.reserve(audio_format.getSampleRate() * 2);
 
+        pa_sample_spec sample_spec;
+        sample_spec.channels = audio_format.getChannels();
+        sample_spec.rate     = audio_format.getSampleRate();
+        sample_spec.format   = PA_SAMPLE_S16LE;
+
+        if ((stream = pa_stream_new(ctx, "PureOSStream", &sample_spec, nullptr)) == nullptr) {
+            throw std::runtime_error(pa_strerror(pa_context_errno(ctx)));
+        }
+    }
+
+    Stream::~Stream()
+    {
+        pa_stream_disconnect(stream);
+        pa_stream_unref(stream);
+    }
+
+    void Stream::insert(AbstractStream::Span span)
+    {
+        std::copy(span.data, span.dataEnd(), &cache[cache_pos]);
+        cache_pos += span.dataSize;
+    }
+
+    void Stream::consume()
+    {
+        if (pa_stream_write(stream, cache.data(), cache_pos, NULL, 0, PA_SEEK_RELATIVE) < 0) {
+            fprintf(stderr, "pa_stream_write() failed\n");
+            return;
+        }
+        cache_pos = 0;
+    }
+
+    std::size_t Stream::bytes() const
+    {
+        return cache_pos;
+    }
+
+    pa_stream *Stream::raw()
+    {
+        return stream;
+    }
+
+    Context::Context()
+    {
         pthread_create(
             &tid,
             nullptr,
             [](void *arg) -> void * {
-                /// Mask all available signals to not interfere with the FreeRTOS simulator port
+                /// Any 'external' threads that are not part of the FreeRTOS simulator port must be treated as a
+                /// interrupt source and have to have all the signals masked in order to not 'steal' work from the
+                /// threads managed by the port.
                 sigset_t set;
                 sigfillset(&set);
                 pthread_sigmask(SIG_SETMASK, &set, NULL);
 
-                auto *inst = static_cast<PulseAudioWrapper *>(arg);
+                auto *inst = static_cast<Context *>(arg);
                 return inst->worker();
             },
             this);
     }
 
-    void *PulseAudioWrapper::worker()
+    void *Context::worker()
     {
         mainloop     = pa_mainloop_new();
         mainloop_api = pa_mainloop_get_api(mainloop);
@@ -39,7 +84,7 @@ namespace audio
         pa_context_set_state_callback(
             context,
             [](pa_context *, void *arg) {
-                auto *inst = static_cast<PulseAudioWrapper *>(arg);
+                auto *inst = static_cast<Context *>(arg);
                 inst->context_state_callback();
             },
             this);
@@ -54,7 +99,7 @@ namespace audio
         return nullptr;
     }
 
-    void PulseAudioWrapper::context_state_callback()
+    void Context::context_state_callback()
     {
         assert(context);
 
@@ -62,35 +107,8 @@ namespace audio
         case PA_CONTEXT_CONNECTING:
         case PA_CONTEXT_AUTHORIZING:
         case PA_CONTEXT_SETTING_NAME:
+        case PA_CONTEXT_READY:
             break;
-
-        case PA_CONTEXT_READY: {
-            int r;
-            pa_sample_spec sample_spec;
-            sample_spec.channels = audio_format.getChannels();
-            sample_spec.rate     = audio_format.getSampleRate();
-            sample_spec.format   = PA_SAMPLE_S16LE;
-
-            if ((stream = pa_stream_new(context, "PureOSStream", &sample_spec, nullptr)) == nullptr) {
-                fprintf(stderr, "pa_stream_new() failed: %s\n", pa_strerror(pa_context_errno(context)));
-                return;
-            }
-
-            pa_stream_set_write_callback(
-                stream,
-                [](pa_stream *, size_t length, void *arg) {
-                    auto *inst = static_cast<PulseAudioWrapper *>(arg);
-                    inst->stream_write_cb(length);
-                },
-                this);
-
-            if ((r = pa_stream_connect_playback(stream, nullptr, nullptr, {}, nullptr, nullptr)) < 0) {
-                fprintf(stderr, "pa_stream_connect_playback() failed: %s\n", pa_strerror(pa_context_errno(context)));
-                return;
-            }
-
-            break;
-        }
 
         case PA_CONTEXT_TERMINATED:
             quit(0);
@@ -104,19 +122,15 @@ namespace audio
         }
     }
 
-    void PulseAudioWrapper::stream_write_cb(size_t length)
+    void Context::stream_write_cb(size_t length)
     {
         write_cb(length);
     }
 
-    PulseAudioWrapper::~PulseAudioWrapper()
+    Context::~Context()
     {
         quit();
         pthread_join(tid, nullptr);
-
-        if (stream != nullptr) {
-            pa_stream_unref(stream);
-        }
 
         if (context != nullptr) {
             pa_context_unref(context);
@@ -130,30 +144,40 @@ namespace audio
         }
     }
 
-    void PulseAudioWrapper::quit(int ret)
+    void Context::quit(int ret)
     {
         if (mainloop_api != nullptr) {
             mainloop_api->quit(mainloop_api, ret);
         }
     }
 
-    void PulseAudioWrapper::insert(audio::AbstractStream::Span span)
+    Stream *Context::open_stream(AudioFormat audio_format_, WriteCallback write_cb_)
     {
-        std::copy(span.data, span.dataEnd(), &cache[cache_pos]);
-        cache_pos += span.dataSize;
-    }
+        try {
+            stream   = std::make_unique<Stream>(audio_format_, context);
+            write_cb = write_cb_;
 
-    void PulseAudioWrapper::consume()
-    {
-        if (pa_stream_write(stream, cache.data(), cache_pos, NULL, 0, PA_SEEK_RELATIVE) < 0) {
-            fprintf(stderr, "pa_stream_write() failed\n");
-            return;
+            pa_stream_set_write_callback(
+                stream->raw(),
+                [](pa_stream *, size_t length, void *arg) {
+                    auto *inst = static_cast<Context *>(arg);
+                    inst->stream_write_cb(length);
+                },
+                this);
+
+            if (pa_stream_connect_playback(stream->raw(), nullptr, nullptr, {}, nullptr, nullptr) < 0) {
+                throw std::runtime_error(pa_strerror(pa_context_errno(context)));
+            }
         }
-        cache_pos = 0;
-    }
+        catch (const std::runtime_error &e) {
+            fprintf(stderr, e.what());
+            return nullptr;
+        }
 
-    std::size_t PulseAudioWrapper::bytes() const
-    {
-        return cache_pos;
+        return stream.get();
     }
-} // namespace audio
+    void Context::close_stream()
+    {
+        stream = {};
+    }
+} // namespace audio::pulse_audio

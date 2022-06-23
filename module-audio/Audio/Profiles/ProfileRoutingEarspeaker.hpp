@@ -21,19 +21,19 @@ namespace audio
                       .flags =
                           static_cast<uint32_t>(audio::codec::Flags::InputLeft) | // microphone use left audio channel
                           static_cast<uint32_t>(audio::codec::Flags::OutputMono),
-                      .outputVolume      = 0,
+                      .outputVolume      = 1,
                       .inputGain         = 0,
                       .playbackPathGain  = 0,
-                      .playbackPathAtten = 5,
+                      .playbackPathAtten = 12,
                       .inputPath         = audio::codec::InputPath::Microphone,
                       .outputPath        = audio::codec::OutputPath::Earspeaker,
 
                       .filterCoefficients =
-                          {qfilter_CalculateCoeffs(audio::equalizer::FilterType::HighPass, 700.f, 44100, 0.701f, 10),
-                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::LowPass, 4993.7f, 44100, 0.701f, -5),
-                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::LowPass, 6000.7f, 44100, 0.701f, 10),
-                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::HighPass, 100.4f, 44100, 0.701f, 10),
-                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::Notch, 1500.7f, 44100, 0.701f, -3)}},
+                          {qfilter_CalculateCoeffs(audio::equalizer::FilterType::HighPass, 300.f, 44100, 0.701f, 0),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::Parametric, 3000.f, 44100, 1.f, 10),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 6000.f, 44100, 0.701f, 10),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 100.4f, 44100, 0.701f, 10),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::None, 1500.7f, 44100, 0.701f, -3)}},
                   AudioDevice::Type::Audiocodec)
         {
             audioConfiguration.outputVolume = static_cast<float>(volume);

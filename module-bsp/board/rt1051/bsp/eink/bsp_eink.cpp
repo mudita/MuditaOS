@@ -278,7 +278,7 @@ void BSP_EinkDeinit(void)
 
 status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs)
 {
-    const uint32_t TX_TIMEOUT_MS = 1000;
+    const uint32_t TX_TIMEOUT_MS = 2000;
     status_t tx_status           = 0;
     status_t status;
     lpspi_transfer_t xfer = {};
@@ -359,7 +359,7 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
 
 status_t BSP_EinkReadData(void *rxBuffer, uint32_t len, eink_spi_cs_config_e cs)
 {
-    const int RX_TIMEOUT_MS = 1000;
+    const int RX_TIMEOUT_MS = 2000;
     status_t tx_status      = 0;
     status_t status;
     lpspi_transfer_t xfer = {};

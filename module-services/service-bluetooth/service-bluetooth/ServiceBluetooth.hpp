@@ -75,6 +75,7 @@ namespace cellular
     class SignalStrengthUpdateNotification;
     class CurrentOperatorNameNotification;
     class NetworkStatusUpdateNotification;
+    class CallActiveNotification;
 }
 
 class ServiceBluetooth : public sys::Service
@@ -147,6 +148,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(cellular::CurrentOperatorNameNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(cellular::NetworkStatusUpdateNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sevm::BatteryStatusChangeMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(cellular::CallActiveNotification *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

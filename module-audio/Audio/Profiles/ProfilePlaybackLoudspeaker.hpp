@@ -20,7 +20,7 @@ namespace audio
                       .sampleRate_Hz     = 0,
                       .bitWidth          = 16,
                       .flags             = 0,
-                      .outputVolume      = 0,
+                      .outputVolume      = 1,
                       .inputGain         = 0,
                       .playbackPathGain  = 0,
                       .playbackPathAtten = 2,
@@ -28,12 +28,10 @@ namespace audio
                       .outputPath        = audio::codec::OutputPath::Loudspeaker,
                       .filterCoefficients =
                           {qfilter_CalculateCoeffs(audio::equalizer::FilterType::HighPass, 501.8f, 44100, 0.701f, 0),
-                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::LowPass, 14999.5f, 44100, 0.701f, 0),
-                           qfilter_CalculateCoeffs(
-                               audio::equalizer::FilterType::HighShelf, 15975.7f, 44100, 0.701f, -10),
-                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::LowShelf, 401.f, 44100, 0.701f, -10),
-                           qfilter_CalculateCoeffs(
-                               audio::equalizer::FilterType::Parametric, 1496.7f, 44100, 0.701f, -4)}},
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::Parametric, 2800.f, 44100, 3.f, -4),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::Parametric, 4500.f, 44100, 3.f, -6),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::Parametric, 7100.f, 44100, 3.f, -3),
+                           qfilter_CalculateCoeffs(audio::equalizer::FilterType::Parametric, 2000.f, 44100, 2.f, 6)}},
                   AudioDevice::Type::Audiocodec)
         {
             audioConfiguration.outputVolume = static_cast<float>(volume);

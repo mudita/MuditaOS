@@ -22,7 +22,7 @@ namespace gui
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) {
             AppWindow::updateTime();
-            wallpaperPresenter->updateTime();
+            wallpaperPresenter->updateWallpaper();
         };
     }
 
@@ -74,24 +74,31 @@ namespace gui
 
     RefreshModes PhoneLockedWindow::updateTime()
     {
-        auto ret = AppWindow::updateTime();
-        wallpaperPresenter->updateTime();
-        updateStatusBar();
+        RefreshModes mode;
+
+        std::bitset<2> refresh;
+        refresh[0] = AppWindow::updateTime() == RefreshModes::GUI_REFRESH_FAST;
+        refresh[1] = wallpaperPresenter->updateWallpaper();
 
         deepRefreshCounter++;
 
-        if (ret == RefreshModes::GUI_REFRESH_NONE) {
+        if (refresh.none()) {
+            LOG_DEBUG("Nothing to refresh on phone lock screen");
             return RefreshModes::GUI_REFRESH_NONE;
         }
 
         if (deepRefreshCounter.overflow()) {
             deepRefreshCounter.reset();
-            LOG_DEBUG("Requesting deep refresh on phone lock screen");
-            return RefreshModes::GUI_REFRESH_DEEP;
+            mode = RefreshModes::GUI_REFRESH_DEEP;
+        }
+        else {
+            mode = RefreshModes::GUI_REFRESH_FAST;
         }
 
-        LOG_DEBUG("Requesting fast refresh on phone lock screen");
-        return RefreshModes::GUI_REFRESH_FAST;
+        LOG_DEBUG("Requesting %s refresh on phone lock screen (%s)",
+                  mode == RefreshModes::GUI_REFRESH_FAST ? "fast" : "deep",
+                  refresh.to_string().c_str());
+        return mode;
     }
 
     bool PhoneLockedWindow::processLongReleaseEvent(const InputEvent &inputEvent)
@@ -140,7 +147,7 @@ namespace gui
         appConfiguration.enable(status_bar::Indicator::Lock);
         appConfiguration.enable(status_bar::Indicator::Battery);
         appConfiguration.enable(status_bar::Indicator::Signal);
-        appConfiguration.enable(status_bar::Indicator::SimCard);
+        appConfiguration.disable(status_bar::Indicator::SimCard);
         appConfiguration.enable(status_bar::Indicator::Bluetooth);
         appConfiguration.enable(status_bar::Indicator::AlarmClock);
 
@@ -161,13 +168,5 @@ namespace gui
         }
 
         deepRefreshCounter.setReference(deepRefreshRate);
-    }
-
-    void PhoneLockedWindow::updateStatusBar()
-    {
-        updateSignalStrength();
-        updateNetworkAccessTechnology();
-        updateBatteryStatus();
-        updateSim();
     }
 } /* namespace gui */

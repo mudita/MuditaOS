@@ -118,6 +118,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<cellular::NetworkStatusUpdateNotification>();
     connectHandler<sevm::BatteryStatusChangeMessage>();
     connectHandler<cellular::CallOutgoingAccepted>();
+    connectHandler<cellular::CallActiveNotification>();
 
     settingsHolder->onStateChange = [this]() {
         auto initialState = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
@@ -588,6 +589,13 @@ auto ServiceBluetooth::handle(cellular::IncomingCallMessage *msg) -> std::shared
 auto ServiceBluetooth::handle(cellular::CallOutgoingAccepted *msg) -> std::shared_ptr<sys::Message>
 {
     LOG_DEBUG("Outgoing call accepted");
+    sendWorkerCommand(std::make_unique<bluetooth::event::CallAnswered>());
+
+    return sys::MessageNone{};
+}
+auto ServiceBluetooth::handle(cellular::CallActiveNotification *msg) -> std::shared_ptr<sys::Message>
+{
+    LOG_DEBUG("Incoming call accepted");
     sendWorkerCommand(std::make_unique<bluetooth::event::CallAnswered>());
 
     return sys::MessageNone{};

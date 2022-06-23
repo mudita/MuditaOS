@@ -317,13 +317,29 @@ TEST_CASE("call incoming - dnd - not favourite")
     fakeit::Verify(Method(di.api, rejectCall)).Exactly(1);
 }
 
-TEST_CASE("call incoming - dnd - in favourite")
+TEST_CASE("call incoming - dnd - in favourite - calls from favourites disabled")
 {
     auto number  = utils::PhoneNumber("+48700800900");
     auto di      = mocks::DIWrapper(true);
     auto machine = std::make_unique<call::StateMachine>(di.get());
 
     fakeit::When(Method(di.db, isNumberInFavourites)).AlwaysReturn(true);
+    fakeit::When(Method(di.api, areCallsFromFavouritesEnabled)).AlwaysReturn(false);
+
+    REQUIRE(not machine->machine.process_event(call::event::RING{}));
+    REQUIRE(machine->machine.process_event(call::event::CLIP{number.getView()}));
+    fakeit::Verify(Method(di.audio, play)).Exactly(0);
+    fakeit::Verify(Method(di.api, rejectCall)).Exactly(1);
+}
+
+TEST_CASE("call incoming - dnd - in favourite - calls from favourites enabled")
+{
+    auto number  = utils::PhoneNumber("+48700800900");
+    auto di      = mocks::DIWrapper(true);
+    auto machine = std::make_unique<call::StateMachine>(di.get());
+
+    fakeit::When(Method(di.db, isNumberInFavourites)).AlwaysReturn(true);
+    fakeit::When(Method(di.api, areCallsFromFavouritesEnabled)).AlwaysReturn(true);
 
     REQUIRE(not machine->machine.process_event(call::event::RING{}));
     REQUIRE(machine->machine.process_event(call::event::CLIP{number.getView()}));

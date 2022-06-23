@@ -38,6 +38,9 @@ namespace sdesktop::endpoints
         inline constexpr auto state                  = "state";
         inline constexpr auto ATResponse             = "ATResponse";
         inline constexpr auto AT                     = "AT";
+        inline constexpr auto EQ                     = "EQ";
+        inline constexpr auto fileName               = "fileName";
+        inline constexpr auto fileData               = "fileData";
         inline constexpr auto timeout                = "timeout";
         inline constexpr auto focus                  = "focus";
         inline constexpr auto phoneLocked            = "phoneLocked";

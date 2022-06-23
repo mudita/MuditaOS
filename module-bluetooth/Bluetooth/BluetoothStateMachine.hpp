@@ -349,7 +349,7 @@ namespace bluetooth
                         *state<Idle> + sml::event<bluetooth::event::StartScan> / HandleOn = state<Idle>,
                         state<Idle> + sml::event<bluetooth::event::StopScan> / HandleOff = state<Idle>,
                         state<Idle> + sml::event<bluetooth::event::Pair> / HandlePair = state<Idle>,
-                        state<Idle> + sml::event<bluetooth::event::Unpair>[Connected] / (HandleDisconnect, HandleUnpair) = state<Idle>,
+                        state<Idle> + sml::event<bluetooth::event::Unpair>[Connected] / (HandleDisconnect, HandleUnpair, HandleDrop) = state<Idle>,
                         state<Idle> + sml::event<bluetooth::event::Unpair>[not Connected] / (HandleUnpair, HandleDrop) = state<Idle>,
 
                         state<Idle> + sml::event<bluetooth::event::VisibilityOn> / HandleSetVisibility = state<Idle>,
@@ -367,6 +367,7 @@ namespace bluetooth
                         state<Idle> + sml::event<bluetooth::event::StartRouting> / forwardEvent= state<Call>,
                         state<Idle> + sml::event<bluetooth::event::IncomingCallNumber>  / forwardEvent  = state<Call>,
                         state<Idle> + sml::event<bluetooth::event::CallStarted> / forwardEvent= state<Call>,
+
                         state<Call> = state<Idle> // this one is needed to go out from Call substate properly!
 
                             );

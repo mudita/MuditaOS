@@ -7,7 +7,7 @@ endif()
 if (NOT ${BOOT_FILE} STREQUAL "")
     file(MD5 ${BOOT_FILE} BOOT_MD5SUM)
 endif()
-if (NOT ${UPLOADER_FILE} STREQUAL "")
+if (NOT ${UPDATER_FILE} STREQUAL "")
     file(MD5 ${UPDATER_FILE} UPDATER_MD5SUM)
 endif()
 

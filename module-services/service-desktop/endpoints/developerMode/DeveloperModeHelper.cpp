@@ -28,6 +28,8 @@
 
 #include <ctime>
 #include <locks/data/PhoneLockMessages.hpp>
+
+#include <fstream>
 namespace
 {
 
@@ -65,6 +67,34 @@ namespace sdesktop::endpoints
             auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
             code       = toCode(owner->bus.sendUnicast(msg, ServiceCellular::serviceName));
             return {sent::delayed, std::nullopt};
+        }
+        else if (body[json::developerMode::EQ].is_string()) {
+            using namespace sdesktop::developerMode;
+            auto cmd      = body[json::developerMode::EQ].string_value();
+            auto fileName = body[json::developerMode::fileName].string_value();
+            auto fileData = body[json::developerMode::fileData].string_value();
+            LOG_DEBUG("Received EQ file content: \n %s", fileData.c_str());
+            LOG_INFO("Replacing EQ file: %s", fileName.c_str());
+            auto targetFileName = purefs::dir::getUserDiskPath() / "data/equalizer" / fileName;
+            if (not fileData.empty()) {
+                std::fstream file(targetFileName, std::ios::out | std::ios::trunc);
+                file << fileData;
+                file.close();
+                LOG_INFO("EQ file replaced");
+            }
+
+            std::fstream file(targetFileName, std::ios::in);
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            if (buffer.str() != fileData) {
+                LOG_ERROR("Files mismatch...");
+                code = toCode(false);
+            }
+            else {
+                LOG_INFO("File verify OK");
+                code = toCode(true);
+            }
+            return {sent::no, ResponseContext{.status = code}};
         }
         else if (body[json::developerMode::focus].bool_value()) {
             auto event = std::make_unique<sdesktop::developerMode::AppFocusChangeEvent>();

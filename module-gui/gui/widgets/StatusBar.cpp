@@ -380,17 +380,21 @@ namespace gui::status_bar
         enabled ? networkAccessTechnology->show() : networkAccessTechnology->hide();
     }
 
-    void StatusBar::showTime(bool enabled)
+    bool StatusBar::showTime(bool enabled)
     {
+        const auto visibilityChanged = time->isVisible() == enabled ? false : true;
         time->update();
         if (enabled) {
             centralBox->setMinimumSize(boxes::center::maxX, this->drawArea.h);
             time->show();
             lock->hide();
             centralBox->resizeItems();
-            return;
         }
-        time->hide();
+        else {
+            time->hide();
+        }
+        const auto refreshRequired = visibilityChanged || enabled;
+        return refreshRequired;
     }
 
     void StatusBar::showLock(bool enabled)
@@ -409,8 +413,7 @@ namespace gui::status_bar
         if (time == nullptr) {
             return false;
         }
-        showTime(configuration.isEnabled(Indicator::Time));
-        return true;
+        return showTime(configuration.isEnabled(Indicator::Time));
     }
 
     void StatusBar::accept(GuiVisitor &visitor)
