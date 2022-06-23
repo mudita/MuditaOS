@@ -64,10 +64,22 @@ namespace gui
         return notificationsModel;
     }
 
-    void WallpaperPresenter::updateTime()
+    bool WallpaperPresenter::updateWallpaper()
     {
-        if (clockWallpaper) {
-            clockWallpaper->updateTime();
+        switch (selectedOption) {
+        case WallpaperOption::Clock:
+            if (clockWallpaper) {
+                clockWallpaper->updateTime();
+            }
+            return true;
+            break;
+        case WallpaperOption::Quote:
+            [[fallthrough]];
+        case WallpaperOption::Logo:
+            [[fallthrough]];
+        default:
+            return false;
+            break;
         }
     }
 

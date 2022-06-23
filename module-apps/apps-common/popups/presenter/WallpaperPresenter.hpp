@@ -18,7 +18,7 @@ namespace gui
         WallpaperPresenter(app::ApplicationCommon *app);
         void setupWallpaper(Item *parent);
         std::shared_ptr<gui::NotificationsModel> getNotificationsModel();
-        void updateTime();
+        bool updateWallpaper();
         void forceClockWallpaper();
         /// returns true if actual switch back occured
         bool switchBackWallpaper();

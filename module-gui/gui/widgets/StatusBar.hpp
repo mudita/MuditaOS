@@ -213,7 +213,7 @@ namespace gui::status_bar
 
         /// Show/hide clock widget
         /// @param enabled true to show false to hide the widget
-        void showTime(bool enabled);
+        bool showTime(bool enabled);
 
         /// Show/hide lock status widget
         /// @param enabled true to show false to hide the widget
