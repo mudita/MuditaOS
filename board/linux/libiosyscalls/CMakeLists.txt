@@ -26,6 +26,8 @@ target_sources(
         src/syscalls_real.hpp
         src/syscalls_scan_family.cpp
         src/syscalls_stdio.cpp
+        src/syscalls_common.hpp
+        src/syscalls_wrapper.cpp
 
     PUBLIC
         include/debug.hpp
