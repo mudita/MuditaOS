@@ -1,5 +1,132 @@
 # How to boot Mudita Pure and create a storage partition
 
+## General update architecture
+
+There are two major ways to update the OS:
+- via update utility
+- via MMC access (only for internal development)
+
+General applications interaction diagram:
+
+```
+                              +------------+
+       +_____ [reboot] _______| MuditaOS   |
+       ↓                      | (boot.bin) |
+------------+                 +------------+
+|bootloader  |                        ↑
+|ecoboot.bin |--[load and boot]------→◇
++------------+                        ↓
+    ↑  ↓                            +--------------+
+    |  |-----[update flag]---------→| Updater      |
+    |________ [reboot] ____________ | (updater.bin)|
+                                    +--------------+
+```
+
+Simplified flow:
+- Bootloader always starts first
+    - Then, depending on SNVS flag, it boots either:
+        - updater
+        - os
+- Updater starts after ecoboot, then executes one of the procedures:
+    - update
+        - creates backup
+        - updates the os
+        - **synchronises changes on success**
+        - reboots with clean boot flag
+    - system recovery
+        - restores last backup
+        - **synchronises changes on success**
+        - reboots with clean boot flag
+    - factory reset
+        - removes selected data
+        - **synchronises changes on success**
+        - reboots with clean boot flag
+    - pgm keys programming
+        - programs signkeys for bootloader and OS
+        - reboots with clean boot flag
+    - reboot with clean boot flag
+        - reboots with clean boot flag
+- OS, from update perspective
+    - accepts tar update package
+    - reboots the OS with SNVS flag set to update
+    - **nothing more**
+
+**Important**
+The updater is by design:
+- as OS-agnostic as possible
+- as simple as possible
+- does only one procedure at a time with fail-fast approach
+- procedural software with:
+    - short update trace
+    - that exits on first error
+    - with easy to pin point failure in the trace
+
+### How user update works - overview of the user flow
+
+```
+[PC] -> new session          -> [MuditaOS]
+[PC] -> send file update.tar -> [MuditaOS]
+[PC] <- OK <--                  [MuditaOS]
+[PC] -> reboot to update        [MuditaOS]
+[PC] <- OK <--                  [MuditaOS]
+                              --- REBOOT ---
+                                [MuditaOS] -- RAM flag ->   [ bootloader ]
+                                                            [ bootloader ] -- RAM flag --> [updater]
+                                                                                           [updater] -> process update -> save file: OK / FAIL
+--- REBOOT ---
+                                [MuditaOS] <--  [ bootloader ]
+[PC] -> new session          -> [MuditaOS]
+[PC] -> gimme update trace   -> [MuditaOS]
+[PC] <- OK <--                  [MuditaOS]
+[PC] -> if: process update == OK  => USER: success
+                           == NOK => USER: failure
+```
+
+### TL;DR; What updater provides:
+
+1. update
+2. restore: from last update to previous system version
+3. factory reset: it only cleans data, does not restore factory OS
+
+## Why is the updater a separate updater application
+
+To assert that the process is fully separated from the OS and as abstract from the 
+hardware as possible and finally as simple the update process was designed as 
+above.
+
+# Quick and dirty way of how to debug update issues:
+1. download update package
+2. run the update
+    - easiest with `QAMuditaOS` i.e. : `python -m pytest 
+./scenarios/updater/test_load_update.py -s 
+--update_package=/home/pholat/Downloads/PurePhone-1.2.1-rc.1-RT1051-Update.tar`
+3. see the trace result on either:
+    - trace file on the disk
+    - uart console from the phone
+    Trace file have explicitly:
+    - in what file & line line issue occured
+    - which procedure failed
+    - what was the procedure error
+    - what was the procedure extended error
+    i.e. 
+`t:10,name:"checksum_verify:/os/tmp/updater.bin",err:1,ext_err:88,err_cstr:"Checksu
+mInvalid",file:"/home/jenkins/workspace/PureUpdater_release_builder_-_signed/
+PureUpdater/updater/procedure/checksum/checksum.c",line:89,opt:checksum 
+mismatch:  : 94bbac3d04632172584d4cb5fd3c21bb`
+4. debug via:
+    ./run.sh
+    *OR*
+    load updater.bin
+    *OR* 
+    from the example: check why there is no checksum in the first place
+        - check if file with checksum exists
+        - check if it has checksum in it
+    Then: 
+    - it there is no checksum **FIX IT** on the CI/locally (for local builds)
+    - if there was a checksum, and the updater failed **FIX IT** in the updater
+5. status is always in 3:/updater.log
+6. There is no crash log, if it was to be added - then it should be added with upmost care to not i.e. depend on non existing filesystem into separate crash dump file.
+
 ## Booting Mudita Pure
 
 To follow these steps please make sure that you have the latest `ecoboot` bootloader on the phone. We recommend [version 1.0.4](https://github.com/mudita/ecoboot/releases/tag/1.0.4) which will work even if you manage to break the filesystems in the next steps (it's goot to be prepared).
