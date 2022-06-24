@@ -1,0 +1,11 @@
+add_catch2_executable(
+        NAME
+                gui-iter
+        SRCS
+        test-iter.cpp
+        ../mock/TestWindow.cpp
+        INCLUDE
+                ..
+        LIBS
+                module-gui
+)
