@@ -7,6 +7,7 @@ This folder contains the documentation of the MuditaOS.
 
 - [Development environment](quickstart.md)
 - [Build targets supported by MuditaOS](build_targets.md)
+- [Booting and updating MuditaOS](boot_and_update.md)
 - [Setting up integrated development environment](setup_ide.md)
 - [How to use Mudita Pure simulator](howto_simulator.md)
 - [Keybindings on Linux](host_keyboard_bindings.md)
