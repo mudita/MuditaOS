@@ -3,22 +3,11 @@
 
 #include "call/CellularCall.hpp"
 #include "service-cellular/ServiceCellular.hpp"
-#include "service-db/agents/settings/SystemSettings.hpp"
 
-#include <CalllogRecord.hpp>
-#include <PhoneNumber.hpp>
-#include <Utils.hpp>
 #include <log/log.hpp>
 
-#include <cinttypes>
-#include <ctime>
 #include <memory>
-#include <optional>
-#include <sstream>
-#include <stdexcept>
-#include <string>
 #include <utility>
-#include <vector>
 #include "CallMachine.hpp"
 
 namespace call
