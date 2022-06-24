@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <features.h>
+
 extern "C"
 {
 #if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 33))
