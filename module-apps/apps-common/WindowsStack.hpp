@@ -73,6 +73,8 @@ namespace app
         void dropPendingPopups();
         void clear();
 
+        bool isWindowOnStack(const std::string &window);
+
         bool rebuildWindows(app::WindowsFactory &windowsFactory, ApplicationCommon *app);
     };
 

@@ -187,6 +187,7 @@ namespace app
         std::unique_ptr<WindowsStack> windowsStackImpl;
         std::string default_window;
         State state = State::DEACTIVATED;
+        bool phoneIsLocked = true;
 
         sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);

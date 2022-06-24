@@ -116,6 +116,11 @@ namespace app
         return std::find_if(stack.begin(), stack.end(), [&](auto &el) { return el.name == window; });
     }
 
+    bool WindowsStack::isWindowOnStack(const std::string &window)
+    {
+        return findInStack(window) != stack.end();
+    }
+
     void WindowsStack::dropPendingPopups()
     {
         auto it = stack.rbegin();
