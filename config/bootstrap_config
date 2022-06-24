@@ -54,5 +54,6 @@ INSTALL_PACKAGES="
         vim \
         wget \
         zip \
+        fdisk \
 "
 

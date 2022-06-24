@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 MAINTAINER ops@mudita.com
 # Docker runner for MuditaOS builds
