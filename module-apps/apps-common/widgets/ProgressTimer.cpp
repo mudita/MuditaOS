@@ -54,9 +54,13 @@ namespace app
 
     auto ProgressTimer::onTimerTimeout(sys::Timer &task) -> bool
     {
+        if (isStopped()) {
+            task.stop();
+            return false;
+        }
         elapsed += baseTickInterval;
         update();
-        if (isStopped() || isFinished()) {
+        if (isFinished()) {
             task.stop();
             if (isFinished() && onFinishedCallback != nullptr) {
                 onFinishedCallback();

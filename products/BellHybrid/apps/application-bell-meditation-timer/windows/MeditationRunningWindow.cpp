@@ -74,6 +74,13 @@ namespace gui
         timer->setMargins(gui::Margins(0, mrStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
+        icon = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
+        icon->setMinimumSize(mrStyle::pauseIcon::maxSizeX, mrStyle::pauseIcon::maxSizeY);
+        icon->setMargins(gui::Margins(0, mrStyle::pauseIcon::marginTop, 0, 0));
+        icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        icon->image->set(mrStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
+        icon->setVisible(false);
+
         mainVBox->resizeItems();
     }
 
@@ -87,15 +94,17 @@ namespace gui
             playGong();
             presenter->start();
         }
-        else {
-            presenter->resume();
-        }
     }
 
     bool MeditationRunningWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
-            presenter->pause();
+            if (presenter->isTimerStopped()) {
+                presenter->resume();
+            }
+            else {
+                presenter->pause();
+            }
             return true;
         }
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
@@ -115,6 +124,20 @@ namespace gui
     void MeditationRunningWindow::intervalReached()
     {
         intervalTimeout();
+    }
+
+    void MeditationRunningWindow::pause()
+    {
+        timer->setVisible(false);
+        icon->setVisible(true);
+        mainVBox->resizeItems();
+    }
+
+    void MeditationRunningWindow::resume()
+    {
+        timer->setVisible(true);
+        icon->setVisible(false);
+        mainVBox->resizeItems();
     }
 
     void MeditationRunningWindow::configureTimer()
@@ -153,7 +176,6 @@ namespace gui
     void MeditationRunningWindow::endSession()
     {
         playGong();
-        presenter->finish();
     }
 
     void MeditationRunningWindow::playGong()

@@ -7,22 +7,6 @@
 
 namespace app::meditationStyle
 {
-    namespace itStyle
-    {
-        namespace icon
-        {
-            constexpr inline auto imageLogo         = "bell_big_logo";
-            constexpr inline auto imagePause        = "big_pause";
-            constexpr inline auto imageTopMargin    = 112;
-            constexpr inline auto imageBottomMargin = 30;
-        } // namespace icon
-
-        namespace text
-        {
-            constexpr inline auto font = style::window::font::verybiglight;
-        } // namespace text
-    }     // namespace itStyle
-
     namespace icStyle
     {
         namespace text
@@ -53,6 +37,14 @@ namespace app::meditationStyle
             constexpr inline auto maxSizeX  = 340;
             constexpr inline auto maxSizeY  = 198;
         } // namespace timer
+
+        namespace pauseIcon
+        {
+            constexpr inline auto image     = "big_pause";
+            constexpr inline auto marginTop = 39;
+            constexpr inline auto maxSizeX  = 203;
+            constexpr inline auto maxSizeY  = 203;
+        } // namespace pauseIcon
 
         namespace clock
         {

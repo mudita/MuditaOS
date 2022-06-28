@@ -9,6 +9,7 @@
 #include <Text.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
 #include <common/widgets/BellStatusClock.hpp>
+#include <gui/widgets/Icon.hpp>
 
 #include "MeditationProgressPresenter.hpp"
 
@@ -27,12 +28,15 @@ namespace gui
         void buildInterface() override;
         void progressFinished() override;
         void intervalReached() override;
+        void pause() override;
+        void resume() override;
 
       private:
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> presenter;
         gui::VBox *mainVBox           = nullptr;
         gui::ArcProgressBar *progress = nullptr;
         gui::Text *timer              = nullptr;
+        gui::Icon *icon               = nullptr;
         gui::BellStatusClock *clock   = nullptr;
 
         void setTime(std::time_t newTime) override;
