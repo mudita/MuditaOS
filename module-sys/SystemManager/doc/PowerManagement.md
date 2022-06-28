@@ -77,4 +77,4 @@ and requesting resources from `service_cellular` to make a phone call:
 
 # CpuStatistics
 
-CpuStatistics measurement is described in: [link](./module-sys/SystemManager/doc/CpuStatistics.md)
+CpuStatistics measurement is described in: [link](/module-sys/SystemManager/doc/CpuStatistics.md)

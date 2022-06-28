@@ -13,10 +13,10 @@ We have a few features built in service-db
 
 DB Query interface is a way to define a request -> response behavior to service-db. It's strongly recommended to use it asynchronously.
 
-Documentation available [here](../../module-db/queries/README.md)
+Documentation available [here](/module-db/queries/README.md)
 
 ## database settings agent : settings::Settings
 
-Documentation here: [settings::Settings](Settings.md)
+Documentation here: [settings::Settings](./Settings.md)
 
 ## **deprecated** DBServiceAPI

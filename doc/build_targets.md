@@ -23,7 +23,7 @@ For each product there are targets:
 
 | Arch | Name | Alias | Description |
 |------|------|-------|-------------|
-|common| doc                            |                                                   | Target to build doxygen documentation, [documentation](generate_doxygen.md) |
+|common| doc                            |                                                   | Target to build doxygen documentation, [documentation](./generate_doxygen.md) |
 |common| \<Product\>                    |                                                   | Binary target for the product |
 |common| \<Product\>-disk-img           | \<Product\>.img                                   | Disk image for the product    |
 |RT1051| \<Product\>-StandaloneImage    | PurePhone-\<version\>-RT1051-package-standalone   | Creates image that can be `dd` or `pureflash` to the device|
@@ -72,7 +72,7 @@ Currently, the update package has all of the base data that should be on the dev
 ## Check
 
 Builds and executes all of the unit tests in the repository for the selected product.
-Uses [download_assets](download_assets.md) to download unit test's required assets (fonts)
+Uses [download_assets](./download_assets.md) to download unit test's required assets (fonts)
 
 ### Code coverage
 
@@ -112,13 +112,13 @@ These are distributed with the image and update targets available for each produ
 
 ## ecoboot.bin
 
-Downloads the bootloader with [download_assets](download_assets.md).
+Downloads the bootloader with [download_assets](./download_assets.md).
 
 OS bootloader, used to pre-init hardware and launch either OS or updater utility.
 
 ## updater.bin
 
-Downloads the updater with [download_assets](download_assets.md).
+Downloads the updater with [download_assets](./download_assets.md).
 
 Updater is used to perform the firmware upgrade via update packages. 
 

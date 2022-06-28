@@ -12,10 +12,10 @@ In MuditaOS, application is a service derivative which:
 
 This paragraph is using `applicaton-test` as an example.
 
-**WARNING** All applications are enabled by default. Please disable yours if it's not always needed in [CMakeLists.txt](CMakeLists.txt). I.e.: `option(ENABLE_APP_TEST "Enable application test" OFF)`
+**WARNING** All applications are enabled by default. Please disable yours if it's not always needed in [CMakeLists.txt](./CMakeLists.txt). I.e.: `option(ENABLE_APP_TEST "Enable application test" OFF)`
 
 * Add new `application` catalog in `module-apps` i.e. `application-test`
-* Add a CMake for it, simple example here: [application-test/CMakeLists.txt](application-test/CMakeLists.txt)
+* Add a CMake for it, simple example here: [application-test/CMakeLists.txt](./application-test/CMakeLists.txt)
 * Create:
     * `include/application-test/` for public includes for this application
     * create the application header with:
@@ -26,13 +26,13 @@ This paragraph is using `applicaton-test` as an example.
 * Write `InitHandler()` for application.
     * **NOTE** This is your application entry point!
     * **NOTE** if it's not copied properly - application won't start and work
-Please see example in: [ApplicationTest.cpp](application-test/ApplicationTest.cpp) for `InitHandler()`
+Please see example in: [ApplicationTest.cpp](./application-test/ApplicationTest.cpp) for `InitHandler()`
 * Write `createUserInterface()`, which role is:
     * provide `windowsFactory` with windows blueprints for this application
     * inform what popups this application handles
 **WARNING** default window for each application is always named `gui::name::window::main_window`. Without that window application may be never shown properly
 
-Basic example can be found in this catalog: [application-test](./application-test)
+Basic example can be found in this catalog: [application-test](./application-test/)
 
 # How to launch app:
 
@@ -83,14 +83,14 @@ if (msgl->messageType == MessageType::DBServiceNotification) {
 
 # Asynchronous database queries
 
-You can perform datababase queries via [query interface](../../module-db/queries/README.md). 
+You can perform datababase queries via [query interface](/module-db/queries/README.md). 
 
 To have a safe way to perform asynchronous calls there is `app::AsyncQuery` which:
 * creates a query
 * when it's done results are passed to the callback
 * if i.e. UI element is removed its callback is automatically removed
 
-It's defined here: [AsyncTask.hpp](../apps-common/AsyncTask.hpp)
+It's defined here: [AsyncTask.hpp](apps-common/AsyncTask.hpp)
 
 **NOTE** to automatically pass async `db::query` data to an application you have to:
 * inherit in application/item from `public app::AsyncCallbackReceiver`
@@ -99,7 +99,7 @@ It's defined here: [AsyncTask.hpp](../apps-common/AsyncTask.hpp)
 
 # GUI library
 
-GUI library documentation: [module-gui](../module-gui/README.md)
+GUI library documentation: [module-gui](/module-gui/README.md)
 Please mind that it has Doxygen documentation explaining its use for all base elements and functions.
 
 # System actions
@@ -153,19 +153,19 @@ Now we can open such popup in the application via: `app::manager::Controller::se
 
 # System communication caveats
 
-* [Caveats and good practices](../module-sys/README.md#caveats-and-good-practices)
+* [Caveats and good practices](/module-sys/README.md#caveats-and-good-practices)
 
 # Adding 3rd party library
 
-Please follow information here: [third party libraries](../third-party/ThirdParty.md)
+Please follow information here: [third party libraries](/third-party/ThirdParty.md)
 
 # Adding tests to service
 
-Please follow information here: [unit tests gathering cmake](../test/AddingUnitTests.md)
+Please follow information here: [unit tests gathering cmake](/test/AddingUnitTests.md)
 
 # Application Manifest
 
-[ApplicationManifest.hpp](module-services/service-appmgr/include/service-appmgr/ApplicationManifest.hpp) is undocumented.
+[ApplicationManifest.hpp](/module-services/service-appmgr/include/service-appmgr/ApplicationManifest.hpp) is undocumented.
 Its role is to:
 - inform what actions the application can perform - actions are asynchronous application capabilities. Action can result in no change in UI, but a major change in logic behavior.
     - a special type of action is `ActionPopup` - it enables applications to show popup
