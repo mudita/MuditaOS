@@ -15,7 +15,7 @@ namespace gui::bell_style
 
     inline constexpr auto popup_icon_top_margin    = 120;
     inline constexpr auto popup_icon_bottom_margin = 30;
-    inline constexpr auto popup_icon_y_alignment   = 22;
+    inline constexpr auto popup_icon_y_alignment   = -11;
 
 } // namespace gui::bell_style
 

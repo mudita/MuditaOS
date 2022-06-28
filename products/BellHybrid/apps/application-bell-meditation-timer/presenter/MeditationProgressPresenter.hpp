@@ -44,12 +44,15 @@ namespace app::meditation
             virtual void intervalReached()                                  = 0;
             virtual void setTime(std::time_t newTime)                       = 0;
             virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
+            virtual void pause()                                            = 0;
+            virtual void resume()                                           = 0;
         };
         class Presenter : public BasePresenter<MeditationProgressContract::View>
         {
           public:
             virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
             virtual void handleUpdateTimeEvent()                                    = 0;
+            virtual bool isTimerStopped()                                           = 0;
             virtual void start()                                                    = 0;
             virtual void stop()                                                     = 0;
             virtual void pause()                                                    = 0;
@@ -84,6 +87,7 @@ namespace app::meditation
 
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void handleUpdateTimeEvent() override;
+        bool isTimerStopped() override;
         void start() override;
         void stop() override;
         void pause() override;

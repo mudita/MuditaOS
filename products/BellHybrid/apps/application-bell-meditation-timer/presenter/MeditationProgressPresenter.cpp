@@ -63,15 +63,21 @@ namespace app::meditation
         finish();
     }
 
+    bool MeditationProgressPresenter::isTimerStopped()
+    {
+        return timer->isStopped();
+    }
+
     void MeditationProgressPresenter::pause()
     {
         timer->stop();
-        app->switchWindow(gui::window::session_paused::sessionPaused);
+        getView()->pause();
     }
 
     void MeditationProgressPresenter::resume()
     {
         timer->start();
+        getView()->resume();
     }
 
     void MeditationProgressPresenter::abandon()
@@ -94,6 +100,7 @@ namespace app::meditation
     void MeditationProgressPresenter::onProgressFinished()
     {
         getView()->progressFinished();
+        finish();
     }
 
     void MeditationProgressPresenter::onIntervalReached()
