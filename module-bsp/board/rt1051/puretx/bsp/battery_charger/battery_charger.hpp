@@ -6,10 +6,13 @@
 #include "MAX77818.hpp"
 
 #include <cstdint>
+#include <optional>
+#include <fstream>
+#include <Units.hpp>
 
 namespace bsp::battery_charger
 {
-    using StateOfCharge = std::uint8_t;
+    using Register = std::uint16_t;
 
     enum class batteryChargerType
     {
@@ -63,9 +66,9 @@ namespace bsp::battery_charger
 
     void deinit();
 
-    StateOfCharge getBatteryLevel();
+    [[nodiscard]] std::optional<units::SOC> getBatteryLevel();
 
-    void evaluateBatteryLevelChange(const std::uint16_t currentLevel, const std::uint16_t updatedLevel);
+    void storeBatteryLevelChange(const units::SOC newSocValue);
 
     batteryRetval getChargeStatus();
 
@@ -73,7 +76,7 @@ namespace bsp::battery_charger
 
     void clearFuelGuageIRQ(std::uint16_t intToClear);
 
-    std::uint16_t getStatusRegister();
+    Register getStatusRegister();
 
     void checkTemperatureRange();
 
@@ -86,5 +89,7 @@ namespace bsp::battery_charger
     MaxMinVolt getMaxMinVolt();
 
     void printFuelGaugeInfo();
+
+    bool checkConfigurationFile(std::ifstream &file);
 
 } // namespace bsp::battery_charger
