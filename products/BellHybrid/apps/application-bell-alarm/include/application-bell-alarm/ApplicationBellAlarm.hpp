@@ -8,18 +8,10 @@
 
 namespace app
 {
-    namespace internal
-    {
-        class BellAlarmPriv;
-    } // namespace internal
-
     inline constexpr auto applicationBellAlarmName = "ApplicationBellAlarm";
 
     class ApplicationBellAlarm : public Application
     {
-      private:
-        std::unique_ptr<internal::BellAlarmPriv> priv;
-
       public:
         explicit ApplicationBellAlarm(std::string name                    = applicationBellAlarmName,
                                       std::string parent                  = "",

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,7 +34,7 @@ namespace app::bell_alarm
     class BellAlarmSetPresenter : public BellAlarmSetContract::Presenter
     {
       public:
-        explicit BellAlarmSetPresenter(app::ApplicationCommon *app, std::shared_ptr<AbstractAlarmModel> alarmModel);
+        explicit BellAlarmSetPresenter(app::ApplicationCommon *app, AbstractAlarmModel &alarmModel);
 
         time_t getAlarmTime() const noexcept;
         bool isAlarmActive() const noexcept;
@@ -43,6 +43,6 @@ namespace app::bell_alarm
       private:
         app::ApplicationCommon *app{};
 
-        std::shared_ptr<AbstractAlarmModel> alarmModel;
+        AbstractAlarmModel &alarmModel;
     };
 } // namespace app::bell_alarm

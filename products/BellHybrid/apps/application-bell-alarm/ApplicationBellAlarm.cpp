@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellAlarm.hpp"
@@ -12,26 +12,12 @@
 
 namespace app
 {
-
-    namespace internal
-    {
-        class BellAlarmPriv
-        {
-          public:
-            std::shared_ptr<AlarmModel> alarmModel;
-            std::shared_ptr<TimeModel> timeModel;
-            std::shared_ptr<bell_alarm::BellAlarmWindowPresenter> alarmPresenter;
-            std::shared_ptr<bell_alarm::BellAlarmSetPresenter> alarmSetPresenter;
-        };
-    } // namespace internal
-
     ApplicationBellAlarm::ApplicationBellAlarm(std::string name,
                                                std::string parent,
                                                StatusIndicators statusIndicators,
                                                StartInBackground startInBackground,
                                                uint32_t stackDepth)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth),
-          priv{std::make_unique<app::internal::BellAlarmPriv>()}
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth)
     {}
     ApplicationBellAlarm::~ApplicationBellAlarm() = default;
 
@@ -50,16 +36,14 @@ namespace app
     void ApplicationBellAlarm::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [&](ApplicationCommon *app, const std::string &name) {
-            priv->alarmModel = std::make_shared<app::AlarmModel>(app);
-            priv->timeModel  = std::make_shared<app::TimeModel>();
-            priv->alarmPresenter =
-                std::make_shared<bell_alarm::BellAlarmWindowPresenter>(priv->alarmModel, priv->timeModel);
-            return std::make_unique<gui::BellAlarmWindow>(app, priv->alarmPresenter, name);
+            auto timeModel      = std::make_shared<app::TimeModel>();
+            auto alarmPresenter = std::make_shared<bell_alarm::BellAlarmWindowPresenter>(*alarmModel, timeModel);
+            return std::make_unique<gui::BellAlarmWindow>(app, alarmPresenter, name);
         });
 
-        windowsFactory.attach(gui::window::name::bellAlarmSet, [&](ApplicationCommon *app, const std::string &name) {
-            priv->alarmSetPresenter = std::make_unique<bell_alarm::BellAlarmSetPresenter>(app, priv->alarmModel);
-            return std::make_unique<gui::BellAlarmSetWindow>(app, priv->alarmSetPresenter);
+        windowsFactory.attach(gui::window::name::bellAlarmSet, [&](ApplicationCommon *app, const std::string &) {
+            auto alarmPresenter = std::make_unique<bell_alarm::BellAlarmSetPresenter>(app, *alarmModel);
+            return std::make_unique<gui::BellAlarmSetWindow>(app, std::move(alarmPresenter));
         });
 
         attachPopups({gui::popup::ID::AlarmActivated,

@@ -9,19 +9,18 @@
 
 namespace app::bell_alarm
 {
-    BellAlarmSetPresenter::BellAlarmSetPresenter(app::ApplicationCommon *app,
-                                                 std::shared_ptr<AbstractAlarmModel> alarmModel)
-        : app{app}, alarmModel{std::move(alarmModel)}
+    BellAlarmSetPresenter::BellAlarmSetPresenter(app::ApplicationCommon *app, AbstractAlarmModel &alarmModel)
+        : app{app}, alarmModel{alarmModel}
     {}
 
     bool BellAlarmSetPresenter::isAlarmActive() const noexcept
     {
-        return alarmModel->isActive();
+        return alarmModel.isActive();
     }
 
     time_t BellAlarmSetPresenter::getAlarmTime() const noexcept
     {
-        return alarmModel->getAlarmTime();
+        return alarmModel.getAlarmTime();
     }
 
     void BellAlarmSetPresenter::activate()

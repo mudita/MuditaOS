@@ -15,10 +15,11 @@ target_include_directories(app
 target_link_libraries(app
     PRIVATE
         apps-common
-        bell::app-common
         bell::appmgr
         bell::alarms
         bell::audio
+    PUBLIC 
+        bell::app-common
 )
 
 add_subdirectory(application-bell-main)
