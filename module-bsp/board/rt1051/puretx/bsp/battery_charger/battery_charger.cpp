@@ -14,18 +14,25 @@
 #include <purefs/filesystem_paths.hpp>
 
 #include <utility>
-#include <fstream>
 #include <map>
 #include <log/log.hpp>
+#include <vector>
+#include <magic_enum.hpp>
+#include <crc32.h>
 
 namespace bsp::battery_charger
 {
     namespace
     {
+        using Crc32 = std::uint32_t;
+
         constexpr std::uint32_t i2cSubaddresSize = 1;
 
-        const auto cfgFile              = purefs::dir::getUserDiskPath() / "batteryFuelGaugeConfig.cfg";
-        constexpr auto registersToStore = 0xFF + 1;
+        const auto cfgFile = purefs::dir::getUserDiskPath() / "batteryFuelGaugeConfig.cfg";
+
+        constexpr auto registersToStore              = 0xFF + 1;
+        constexpr auto configFileSizeWithoutChecksum = registersToStore * sizeof(Register);
+        constexpr auto configFileSizeWithChecksum    = configFileSizeWithoutChecksum + sizeof(Crc32);
 
         constexpr std::uint16_t ENABLE_CHG_FG_IRQ_MASK = 0xFC;
         constexpr std::uint8_t UNLOCK_CHARGER          = 0x3 << 2;
@@ -37,8 +44,10 @@ namespace bsp::battery_charger
 
         constexpr std::uint16_t nominalCapacitymAh = 1600;
 
-        constexpr std::uint16_t fullyChargedSOC   = 100;
-        constexpr std::uint16_t percentLevelDelta = 5;
+        constexpr units::SOC fullyChargedSOC       = 100;
+        constexpr units::SOC dischargingSocDelta   = 5;
+        constexpr units::SOC chargingSocDelta      = 1;
+        constexpr units::SOC maxSocPercentageError = 20;
 
         constexpr std::uint16_t maxVoltagemV = 4400;
         constexpr std::uint16_t minVoltagemV = 3600;
@@ -82,6 +91,18 @@ namespace bsp::battery_charger
 
         } // namespace fuel_gauge_params
 
+        enum class fileConfigRetval
+        {
+            OK,
+            MissingFileError,
+            DataSizeError,
+            FileCrcError,
+            ReadingRegisterError,
+            WritingRegisterError,
+            StoreVerificationError,
+            ConfigFuelGaugeModelError
+        };
+
         enum class TemperatureRanges
         {
             Cold,
@@ -98,6 +119,22 @@ namespace bsp::battery_charger
             std::uint8_t alertLow;
             std::uint8_t alertHigh;
         };
+
+        class RawSocValue
+        {
+          public:
+            bool update(const units::SOC newSoc)
+            {
+                last    = current;
+                current = newSoc;
+                return current == last;
+            }
+
+          private:
+            units::SOC current{};
+            units::SOC last{};
+        };
+        RawSocValue rawSoc{};
 
         constexpr std::uint8_t maxAlertDisabled{0x7F};
         constexpr std::uint8_t minAlertDisabled{0x80};
@@ -120,6 +157,63 @@ namespace bsp::battery_charger
         drivers::I2CAddress fuelGaugeAddress      = {FUEL_GAUGE_I2C_ADDR, 0, i2cSubaddresSize};
         drivers::I2CAddress batteryChargerAddress = {BATTERY_CHARGER_I2C_ADDR, 0, i2cSubaddresSize};
         drivers::I2CAddress topControllerAddress  = {TOP_CONTROLLER_I2C_ADDR, 0, i2cSubaddresSize};
+
+        void addChecksumToConfigFile(std::filesystem::path cfgFile)
+        {
+            std::fstream file(cfgFile.c_str(), std::ios::binary | std::ios::in | std::ios::out);
+            if (!file.is_open()) {
+                return;
+            }
+
+            CRC32 checksum;
+            std::uint16_t regVal;
+            for (auto i = 0; i < registersToStore; ++i) {
+                file.read(reinterpret_cast<char *>(&regVal), sizeof(std::uint16_t));
+                checksum.add(&regVal, sizeof(std::uint16_t));
+            }
+            const auto result = checksum.getHashValue();
+            file.write(reinterpret_cast<const char *>(&result), sizeof(result));
+            file.close();
+        }
+
+        bool isCorrectChecksumFromConfigFile(std::filesystem::path cfgFile)
+        {
+            bool ret = false;
+            std::ifstream file(cfgFile.c_str(), std::ios::binary | std::ios::in);
+            if (!file.is_open()) {
+                return false;
+            }
+
+            const auto size = bsp::battery_charger::utils::getFileSize(file);
+            switch (size) {
+            case configFileSizeWithoutChecksum:
+                ret = true;
+                break;
+            case configFileSizeWithChecksum: {
+                CRC32 checksum;
+                std::uint16_t regVal;
+                for (auto i = 0; i < registersToStore; ++i) {
+                    file.read(reinterpret_cast<char *>(&regVal), sizeof(std::uint16_t));
+                    checksum.add(&regVal, sizeof(std::uint16_t));
+                }
+                std::uint32_t fileChecksum;
+                file.read(reinterpret_cast<char *>(&fileChecksum), sizeof(std::uint32_t));
+                ret = fileChecksum == checksum.getHashValue();
+            } break;
+            default:
+                ret = false;
+                break;
+            }
+            file.close();
+            return ret;
+        }
+
+        units::SOC getBatteryLevelFromRegisterValue(const Register registerValue)
+        {
+            /// 16 bit result. The high byte indicates 1% per LSB. The low byte reports fractional percent. We don't
+            /// care about fractional part.
+            return (registerValue & 0xff00) >> 8;
+        }
 
         int fuelGaugeWrite(Registers registerAddress, std::uint16_t value)
         {
@@ -305,56 +399,155 @@ namespace bsp::battery_charger
             return batteryRetval::OK;
         }
 
-        batteryRetval storeConfiguration()
+        fileConfigRetval saveConfigurationFile(std::vector<Register> &savedData)
         {
-            LOG_INFO("Storing fuel gauge configuration...");
             std::ofstream file(cfgFile.c_str(), std::ios::binary | std::ios::out);
             if (!file.is_open()) {
-                LOG_WARN("Configuration file [%s] could not be opened.", cfgFile.c_str());
-                return batteryRetval::ChargerError;
+                return fileConfigRetval::MissingFileError;
             }
-
+            if (savedData.size() != registersToStore) {
+                return fileConfigRetval::DataSizeError;
+            }
             for (unsigned int i = 0; i < registersToStore; ++i) {
                 auto regVal = fuelGaugeRead(static_cast<Registers>(i));
                 if (regVal.first != kStatus_Success) {
-                    LOG_ERROR("Reading register 0x%x failed.", i);
-                    return batteryRetval::ChargerError;
+                    file.close();
+                    return fileConfigRetval::ReadingRegisterError;
                 }
-                file.write(reinterpret_cast<const char *>(&regVal.second), sizeof(std::uint16_t));
+                file.write(reinterpret_cast<const char *>(&regVal.second), sizeof(Register));
+                savedData[i] = regVal.second;
             }
-
-            return batteryRetval::OK;
+            file.close();
+            addChecksumToConfigFile(cfgFile.c_str());
+            return fileConfigRetval::OK;
         }
 
-        batteryRetval loadConfiguration()
+        fileConfigRetval verifySavedConfigurationFile(const std::vector<Register> &dataForVerification)
+        {
+            std::ifstream readFile(cfgFile.c_str(), std::ios::binary | std::ios::in);
+            if (!readFile.is_open()) {
+                return fileConfigRetval::MissingFileError;
+            }
+            if (dataForVerification.size() != registersToStore) {
+                return fileConfigRetval::DataSizeError;
+            }
+            std::uint16_t savedRegValue;
+            for (unsigned int i = 0; i < registersToStore; ++i) {
+                readFile.read(reinterpret_cast<char *>(&savedRegValue), sizeof(savedRegValue));
+                if (savedRegValue != dataForVerification[i]) {
+                    readFile.close();
+                    return fileConfigRetval::StoreVerificationError;
+                }
+            }
+            readFile.close();
+            return fileConfigRetval::OK;
+        }
+
+        fileConfigRetval readConfigurationFile(std::vector<Register> &readData)
         {
             std::ifstream file(cfgFile.c_str(), std::ios::binary | std::ios::in);
             if (!file.is_open()) {
-                LOG_WARN("Configuration file [%s] could not be opened. Loading initial configuration.",
-                         cfgFile.c_str());
-                if (configureFuelGaugeBatteryModel() == batteryRetval::OK) {
-                    storeConfiguration();
-                    resetFuelGaugeModel();
-                    return batteryRetval::OK;
-                }
-                else {
-                    return batteryRetval::ChargerError;
-                }
+                return fileConfigRetval::MissingFileError;
             }
-
+            if (readData.size() != registersToStore) {
+                return fileConfigRetval::DataSizeError;
+            }
             std::uint16_t regVal;
             for (auto i = 0; i < registersToStore; ++i) {
-                file.read(reinterpret_cast<char *>(&regVal), sizeof(std::uint16_t));
-                if (fuelGaugeWrite(static_cast<Registers>(i), regVal) != kStatus_Success) {
-                    LOG_ERROR("Writing register 0x%x failed.", i);
-                    file.close();
-                    return batteryRetval::ChargerError;
-                }
+                file.read(reinterpret_cast<char *>(&regVal), sizeof(regVal));
+                readData[i] = regVal;
             }
             file.close();
-            resetFuelGaugeModel();
+            if (!isCorrectChecksumFromConfigFile(cfgFile.c_str())) {
+                return fileConfigRetval::FileCrcError;
+            }
+            return fileConfigRetval::OK;
+        }
 
-            return batteryRetval::OK;
+        fileConfigRetval storeFuelGaugeRegisters(const std::vector<Register> &writeData)
+        {
+            if (writeData.size() != registersToStore) {
+                return fileConfigRetval::DataSizeError;
+            }
+            for (auto i = 0; i < registersToStore; ++i) {
+                if (fuelGaugeWrite(static_cast<Registers>(i), writeData[i]) != kStatus_Success) {
+                    return fileConfigRetval::WritingRegisterError;
+                }
+            }
+            return fileConfigRetval::OK;
+        }
+
+        bool isSocDataDiscrepancy(const units::SOC SoC1, const units::SOC SoC2)
+        {
+            return (std::abs(SoC1 - SoC2) > maxSocPercentageError);
+        }
+
+        fileConfigRetval storeConfiguration()
+        {
+            std::vector<Register> storedData(registersToStore);
+
+            if (auto retVal = saveConfigurationFile(storedData); retVal != fileConfigRetval::OK) {
+                LOG_ERROR("Save configuration file error: %s", magic_enum::enum_name(retVal).data());
+                return retVal;
+            }
+            if (auto retVal = verifySavedConfigurationFile(storedData); retVal != fileConfigRetval::OK) {
+                LOG_ERROR("Verify configuration file error: %s", magic_enum::enum_name(retVal).data());
+                return retVal;
+            }
+
+            const auto soc = getBatteryLevelFromRegisterValue(storedData[static_cast<Register>(Registers::RepSOC_REG)]);
+            LOG_INFO("Storing fuel gauge configuration (RawSoC: %d)", soc);
+
+            return fileConfigRetval::OK;
+        }
+
+        fileConfigRetval loadConfiguration()
+        {
+            // First, we load the default battery configuration
+            if (configureFuelGaugeBatteryModel() == batteryRetval::OK) {
+                resetFuelGaugeModel();
+            }
+            else {
+                LOG_ERROR("Configure fuel gauge battery model failed.");
+                return fileConfigRetval::ConfigFuelGaugeModelError;
+            }
+
+            const auto batteryLevelAfterDefaultConfiguration = getBatteryLevel();
+            if (batteryLevelAfterDefaultConfiguration != std::nullopt) {
+                rawSoc.update(batteryLevelAfterDefaultConfiguration.value());
+            }
+            std::vector<Register> readData(registersToStore);
+
+            // then we read the battery configuration from the saved file
+            if (auto retVal = readConfigurationFile(readData); retVal != fileConfigRetval::OK) {
+                // if there is a problem with reading the data, leave the default configuration and exit
+                LOG_ERROR("Read configuration file error: %s", magic_enum::enum_name(retVal).data());
+                storeConfiguration();
+                return fileConfigRetval::OK;
+            }
+
+            const auto savedBatteryLevel =
+                getBatteryLevelFromRegisterValue(readData[static_cast<Register>(Registers::RepSOC_REG)]);
+
+            // if the difference in SOC readings is less than 'maxSocPercentageError' then load the configuration read
+            // from the file
+            if (batteryLevelAfterDefaultConfiguration &&
+                not isSocDataDiscrepancy(batteryLevelAfterDefaultConfiguration.value(), savedBatteryLevel)) {
+                if (auto retVal = storeFuelGaugeRegisters(readData); retVal != fileConfigRetval::OK) {
+                    LOG_ERROR("Store configuration file error: %s", magic_enum::enum_name(retVal).data());
+                    return retVal;
+                }
+                resetFuelGaugeModel();
+            }
+            else {
+                LOG_WARN("The discrepancy between SOC from the file %d and the current value %d. Loading initial "
+                         "configuration.",
+                         savedBatteryLevel,
+                         batteryLevelAfterDefaultConfiguration.value());
+                storeConfiguration();
+            }
+
+            return fileConfigRetval::OK;
         }
 
         batteryRetval setTemperatureThresholds(std::uint8_t minTemperatureDegrees, std::uint8_t maxTemperatureDegrees)
@@ -544,7 +737,6 @@ namespace bsp::battery_charger
 
         // Short time to synchronize after configuration
         vTaskDelay(pdMS_TO_TICKS(100));
-        StateOfCharge level = getBatteryLevel();
 
         clearAllChargerIRQs();
         clearFuelGuageIRQ(static_cast<std::uint16_t>(batteryINTBSource::all));
@@ -567,27 +759,48 @@ namespace bsp::battery_charger
         gpio.reset();
     }
 
-    void evaluateBatteryLevelChange(const std::uint16_t currentLevel, const std::uint16_t updatedLevel)
+    bool levelSocToStore(const units::SOC soc, std::uint16_t percentLevelDelta)
     {
-        if (currentLevel == updatedLevel) {
+        return (soc % percentLevelDelta) == 0;
+    }
+
+    void storeBatteryLevelChange(const units::SOC newSocValue)
+    {
+        if (rawSoc.update(newSocValue)) {
             return;
         }
 
-        if ((updatedLevel % percentLevelDelta) == 0) {
+        const auto status = getChargeStatus();
+        units::SOC percentLevelDelta;
+        switch (status) {
+        case batteryRetval::ChargerCharging:
+            percentLevelDelta = chargingSocDelta;
+            break;
+        default:
+            percentLevelDelta = dischargingSocDelta;
+            break;
+        }
+
+        if (levelSocToStore(newSocValue, percentLevelDelta)) {
             storeConfiguration();
         }
     }
 
-    StateOfCharge getBatteryLevel()
+    std::optional<units::SOC> getBatteryLevel()
     {
         auto readout = fuelGaugeRead(Registers::RepSOC_REG);
         if (readout.first != kStatus_Success) {
             LOG_ERROR("failed to get battery percent");
+            return std::nullopt;
         }
-
-        /// 16 bit result. The high byte indicates 1% per LSB. The low byte reports fractional percent. We don't care
-        /// about fractional part.
-        return (readout.second & 0xff00) >> 8;
+        auto soc = getBatteryLevelFromRegisterValue(readout.second);
+        if (soc > fullyChargedSOC) {
+            // Sometimes MAX77818 can return soc > 100% when config file is missing
+            // or Soc is based on voltage, so we need to truncate value.
+            LOG_WARN("Raw SOC value has been truncated (read value: %d)", soc);
+            soc = fullyChargedSOC;
+        }
+        return soc;
     }
 
     batteryRetval getChargeStatus()
@@ -637,7 +850,7 @@ namespace bsp::battery_charger
         return retVal;
     }
 
-    std::uint16_t getStatusRegister()
+    Register getStatusRegister()
     {
         auto status = fuelGaugeRead(Registers::STATUS_REG);
         return status.second;
@@ -726,6 +939,6 @@ namespace bsp::battery_charger
         LOG_INFO("\tMaxVolt: %dmV", maxMinVolt.maxMilliVolt);
         LOG_INFO("\tMinVolt: %dmV", maxMinVolt.minMilliVolt);
         LOG_INFO("\tAvgCurrent: %dmA", getAvgCurrent());
-        LOG_INFO("\tLevel: %d%%", getBatteryLevel());
+        LOG_INFO("\tRawSoC: %d%%", getBatteryLevel().value());
     }
 } // namespace bsp::battery_charger

@@ -75,7 +75,14 @@ add_subdirectory(common/fsl_drivers)
 add_subdirectory(os)
 add_subdirectory(${BOARD})
 
-target_link_libraries(module-bsp PUBLIC cmsis fsl)
+target_link_libraries(module-bsp
+	PUBLIC
+		cmsis
+		fsl
+		Microsoft.GSL::GSL
+	PRIVATE
+		hash-library::hash-library
+)
 
 add_library(system-stats-sink-board)
 target_sources(system-stats-sink-board

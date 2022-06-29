@@ -156,10 +156,15 @@ namespace hal::battery
     }
     std::optional<AbstractBatteryCharger::SOC> PureBatteryCharger::getSOC() const
     {
-        const auto soc        = bsp::battery_charger::getBatteryLevel();
-        const auto scaled_soc = scale_soc(soc);
+        const auto soc = bsp::battery_charger::getBatteryLevel();
+        if (not soc) {
+            LOG_ERROR("Cannot read SOC (I2C issue)");
+            return std::nullopt;
+        }
+        bsp::battery_charger::storeBatteryLevelChange(soc.value());
+        const auto scaled_soc = scale_soc(soc.value());
         if (not scaled_soc) {
-            LOG_ERROR("SOC is out of valid range. SoC: %d", soc);
+            LOG_ERROR("SOC is out of valid range. SOC: %d", soc.value());
             return std::nullopt;
         }
         return scaled_soc;
