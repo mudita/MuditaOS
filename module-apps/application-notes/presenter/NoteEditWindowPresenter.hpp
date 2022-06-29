@@ -25,7 +25,6 @@ namespace app::notes
             virtual ~Presenter() noexcept = default;
 
             virtual void onNoteChanged()                          = 0;
-            virtual bool isAutoSaveApproved() const noexcept      = 0;
             virtual void save(std::shared_ptr<NotesRecord> &note) = 0;
         };
     };
@@ -36,19 +35,10 @@ namespace app::notes
         explicit NoteEditWindowPresenter(std::unique_ptr<AbstractNotesRepository> &&notesRepository);
 
         void onNoteChanged() override;
-        bool isAutoSaveApproved() const noexcept override;
         void save(std::shared_ptr<NotesRecord> &note) override;
 
       private:
         std::unique_ptr<AbstractNotesRepository> notesRepository;
         bool noteChanged = false;
-    };
-
-    class NoteCreateWindowPresenter : public NoteEditWindowPresenter
-    {
-      public:
-        using NoteEditWindowPresenter::NoteEditWindowPresenter;
-
-        bool isAutoSaveApproved() const noexcept override;
     };
 } // namespace app::notes
