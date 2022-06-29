@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
 #include <bitset>
+#include <fstream>
 
 namespace bsp::battery_charger::utils
 {
@@ -20,4 +21,14 @@ namespace bsp::battery_charger::utils
             return static_cast<int>(toConvert);
         }
     }
+
+    std::size_t getFileSize(std::ifstream &file)
+    {
+        const auto begin = file.tellg();
+        file.seekg(0, std::ios::end);
+        const auto end = file.tellg();
+        file.seekg(0, std::ios::beg);
+        return end - begin;
+    }
+
 } // namespace bsp::battery_charger::utils
