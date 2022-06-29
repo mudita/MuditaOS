@@ -35,9 +35,23 @@ void CallDB::startCall(CalllogRecord &rec)
     }
 }
 
-void CallDB::endCall(const CalllogRecord &rec)
+void CallDB::endCall(CalllogRecord &rec)
 {
-    if (DBServiceAPI::CalllogUpdate(owner, rec) && rec.type == CallType::CT_MISSED) {
+    auto addCallToDB = [&](){
+        if (rec.ID != DB_ID_NONE) {
+            return false;
+        }
+
+        auto call = DBServiceAPI::CalllogAdd(owner, rec);
+        rec = call;
+        if (rec.ID == DB_ID_NONE) {
+            throw std::runtime_error("CalllogAdd failed");
+        }
+
+        return true;
+    };
+
+    if (rec.type == CallType::CT_NONE && (addCallToDB() || DBServiceAPI::CalllogUpdate(owner, rec))) {
         DBServiceAPI::GetQuery(
             owner,
             db::Interface::Name::Notifications,
