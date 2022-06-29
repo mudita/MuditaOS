@@ -5,17 +5,6 @@
 
 namespace app::notes
 {
-    namespace
-    {
-        struct AutoSavePolicy
-        {
-            bool operator()(bool isNoteEmpty) const noexcept
-            {
-                return !isNoteEmpty;
-            }
-        };
-    } // namespace
-
     NoteEditWindowPresenter::NoteEditWindowPresenter(std::unique_ptr<AbstractNotesRepository> &&notesRepository)
         : notesRepository{std::move(notesRepository)}
     {}
@@ -23,11 +12,6 @@ namespace app::notes
     void NoteEditWindowPresenter::onNoteChanged()
     {
         noteChanged = true;
-    }
-
-    bool NoteEditWindowPresenter::isAutoSaveApproved() const noexcept
-    {
-        return noteChanged;
     }
 
     void NoteEditWindowPresenter::save(std::shared_ptr<NotesRecord> &note)
@@ -39,11 +23,5 @@ namespace app::notes
             }
         });
         noteChanged = false;
-    }
-
-    bool NoteCreateWindowPresenter::isAutoSaveApproved() const noexcept
-    {
-        AutoSavePolicy policy;
-        return NoteEditWindowPresenter::isAutoSaveApproved() && policy(getView()->isNoteEmpty());
     }
 } // namespace app::notes

@@ -100,7 +100,7 @@ namespace app
         });
         windowsFactory.attach(gui::name::window::note_create, [](ApplicationCommon *app, const std::string &name) {
             auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
-            auto presenter       = std::make_unique<notes::NoteCreateWindowPresenter>(std::move(notesRepository));
+            auto presenter       = std::make_unique<notes::NoteEditWindowPresenter>(std::move(notesRepository));
             return std::make_unique<notes::NoteCreateWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::name::window::notes_search, [](ApplicationCommon *app, const std::string &name) {
