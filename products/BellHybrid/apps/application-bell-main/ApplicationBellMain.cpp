@@ -83,7 +83,6 @@ namespace app
         auto timeModel        = std::make_unique<app::TimeModel>();
         auto batteryModel     = std::make_unique<app::home_screen::BatteryModel>(this);
         auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(this);
-        auto alarmModel       = std::make_unique<app::AlarmModel>(this);
         homeScreenPresenter   = std::make_shared<app::home_screen::HomeScreenPresenter>(
             this, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
 

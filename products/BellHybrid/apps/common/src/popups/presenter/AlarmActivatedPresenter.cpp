@@ -8,32 +8,31 @@
 
 namespace app::popup
 {
-    AlarmActivatedPresenter::AlarmActivatedPresenter(std::shared_ptr<AbstractAlarmModel> alarmModel)
-        : alarmModel{std::move(alarmModel)}
+    AlarmActivatedPresenter::AlarmActivatedPresenter(AbstractAlarmModel &alarmModel) : alarmModel{alarmModel}
     {}
 
     bool AlarmActivatedPresenter::isAlarmActive() const noexcept
     {
-        return alarmModel->isActive();
+        return alarmModel.isActive();
     }
 
     time_t AlarmActivatedPresenter::getAlarmTime() const noexcept
     {
-        return alarmModel->getAlarmTime();
+        return alarmModel.getAlarmTime();
     }
 
     void AlarmActivatedPresenter::activate()
     {
-        return alarmModel->activate(true);
+        return alarmModel.activate(true);
     }
 
     void AlarmActivatedPresenter::deactivate()
     {
-        return alarmModel->activate(false);
+        return alarmModel.activate(false);
     }
 
     void AlarmActivatedPresenter::updateAlarmModel(AlarmModelReadyHandler callback)
     {
-        alarmModel->update(callback);
+        alarmModel.update(callback);
     }
 } // namespace app::popup

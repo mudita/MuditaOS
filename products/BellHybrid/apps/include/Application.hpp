@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <ApplicationCommon.hpp>
+#include <common/models/AlarmModel.hpp>
 
 namespace app
 {
@@ -20,6 +21,8 @@ namespace app
                              uint32_t stackDepth                 = 4096,
                              sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
+        sys::ReturnCodes InitHandler() override;
+
       protected:
         void attachPopups(const std::vector<gui::popup::ID> &popupsList) override;
         std::optional<gui::popup::Blueprint> popupBlueprintFallback(gui::popup::ID id) override;
@@ -28,6 +31,8 @@ namespace app
         void stopIdleTimer();
         void stopAllAudio();
         virtual void onStop();
+
+        std::unique_ptr<app::AlarmModel> alarmModel;
 
       private:
         sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl) override;

@@ -1,13 +1,13 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellAlarmWindowPresenter.hpp"
 
 namespace app::bell_alarm
 {
-    BellAlarmWindowPresenter::BellAlarmWindowPresenter(std::shared_ptr<AbstractAlarmModel> alarmModel,
+    BellAlarmWindowPresenter::BellAlarmWindowPresenter(AbstractAlarmModel &alarmModel,
                                                        std::shared_ptr<AbstractTimeModel> timeModel)
-        : alarmModel{std::move(alarmModel)}, timeModel{std::move(timeModel)}
+        : alarmModel{alarmModel}, timeModel{std::move(timeModel)}
     {}
 
     auto BellAlarmWindowPresenter::onBeforeShow() -> void
@@ -19,18 +19,18 @@ namespace app::bell_alarm
     {
         auto view       = getView();
         const auto time = view->getAlarmTime();
-        alarmModel->setAlarmTime(time);
+        alarmModel.setAlarmTime(time);
     }
 
     auto BellAlarmWindowPresenter::createData() -> void
     {
         auto updateAlarmTimeCallback = [&]() {
-            const auto time = alarmModel->getAlarmTime();
+            const auto time = alarmModel.getAlarmTime();
             auto view       = getView();
             view->setAlarmTime(time);
         };
 
-        alarmModel->update(updateAlarmTimeCallback);
+        alarmModel.update(updateAlarmTimeCallback);
     }
 
     auto BellAlarmWindowPresenter::setTimeFormat(utils::time::Locale::TimeFormat fmt) -> void

@@ -1,5 +1,5 @@
 
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -37,15 +37,14 @@ namespace app::bell_alarm
     class BellAlarmWindowPresenter : public BellAlarmWindowContract::Presenter
     {
       public:
-        BellAlarmWindowPresenter(std::shared_ptr<AbstractAlarmModel> alarmModel,
-                                 std::shared_ptr<AbstractTimeModel> timeModel);
+        BellAlarmWindowPresenter(AbstractAlarmModel &alarmModel, std::shared_ptr<AbstractTimeModel> timeModel);
         auto createData() -> void override;
         auto saveData() -> void override;
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
         auto onBeforeShow() -> void override;
 
       private:
-        std::shared_ptr<AbstractAlarmModel> alarmModel;
+        AbstractAlarmModel &alarmModel;
         std::shared_ptr<AbstractTimeModel> timeModel;
     };
 } // namespace app::bell_alarm

@@ -1,9 +1,7 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Application.hpp>
-
-#include <common/models/AlarmModel.hpp>
 
 #include <audio/AudioMessage.hpp>
 #include <appmgr/messages/IdleTimerMessage.hpp>
@@ -40,24 +38,34 @@ namespace app
         });
     }
 
+    sys::ReturnCodes Application::InitHandler()
+    {
+        auto ret = ApplicationCommon::InitHandler();
+        if (ret != sys::ReturnCodes::Success) {
+            return ret;
+        }
+
+        alarmModel = std::make_unique<app::AlarmModel>(this);
+        return sys::ReturnCodes::Success;
+    }
+
     void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)
     {
         using namespace gui::popup;
+
         for (auto popup : popupsList) {
             switch (popup) {
             case ID::AlarmActivated:
                 windowsFactory.attach(
-                    window::alarm_activated_window, [](app::ApplicationCommon *app, const std::string &name) {
-                        auto alarmModel = std::make_shared<app::AlarmModel>(app);
-                        auto presenter  = std::make_unique<app::popup::AlarmActivatedPresenter>(alarmModel);
+                    window::alarm_activated_window, [this](app::ApplicationCommon *app, const std::string &name) {
+                        auto presenter = std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel);
                         return std::make_unique<gui::AlarmActivatedWindow>(app, std::move(presenter));
                     });
                 break;
             case ID::AlarmDeactivated:
                 windowsFactory.attach(
-                    window::alarm_deactivated_window, [](app::ApplicationCommon *app, const std::string &name) {
-                        auto alarmModel = std::make_shared<app::AlarmModel>(app);
-                        auto presenter  = std::make_unique<app::popup::AlarmActivatedPresenter>(alarmModel);
+                    window::alarm_deactivated_window, [this](app::ApplicationCommon *app, const std::string &name) {
+                        auto presenter = std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel);
                         return std::make_unique<gui::AlarmDeactivatedWindow>(app, std::move(presenter));
                     });
                 break;
