@@ -31,6 +31,8 @@ namespace gui::status_bar
             setText(utils::translate("home_modes_offline"));
             break;
 
+        case sys::phone_modes::PhoneMode::Uninitialized:
+            [[fallthrough]];
         case sys::phone_modes::PhoneMode::Connected:
             setText("");
             break;

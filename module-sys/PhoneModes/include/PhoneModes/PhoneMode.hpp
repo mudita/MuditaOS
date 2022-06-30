@@ -9,6 +9,7 @@ namespace sys::phone_modes
     {
         Connected,
         DoNotDisturb,
-        Offline
+        Offline,
+        Uninitialized
     };
 }

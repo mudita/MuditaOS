@@ -51,7 +51,7 @@ namespace sys::phone_modes
         void notifyTetheringChange();
 
         Service *owner;
-        PhoneMode phoneMode     = PhoneMode::Connected;
+        PhoneMode phoneMode     = PhoneMode::Uninitialized;
         Tethering tetheringMode = Tethering::Off;
         const std::function<bool()> activeSimSelected;
         const std::function<bool()> isCallOngoing;

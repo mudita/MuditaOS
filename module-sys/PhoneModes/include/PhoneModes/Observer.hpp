@@ -35,7 +35,7 @@ namespace sys::phone_modes
 
         OnPhoneModeChangedCallback onPhoneModeChangedCallback;
         OnTetheringChangedCallback onTetheringChangedCallback;
-        PhoneMode phoneMode     = PhoneMode::Connected;
+        PhoneMode phoneMode     = PhoneMode::Uninitialized;
         Tethering tetheringMode = Tethering::Off;
     };
 } // namespace sys::phone_modes

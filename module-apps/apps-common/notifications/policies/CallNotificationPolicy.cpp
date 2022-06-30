@@ -12,6 +12,8 @@ void CallNotificationPolicy::updateCurrentCall(sys::phone_modes::PhoneMode phone
     numberCheckNeeded = false;
 
     switch (phoneMode) {
+    case sys::phone_modes::PhoneMode::Uninitialized:
+        [[fallthrough]];
     case sys::phone_modes::PhoneMode::Connected:
         popupOn    = true;
         ringtoneOn = true;

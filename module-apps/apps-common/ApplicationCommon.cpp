@@ -28,8 +28,6 @@
 #include <popups/data/PhoneModeParams.hpp>
 #include <popups/data/BluetoothModeParams.hpp>
 
-#include <locks/data/PhoneLockMessages.hpp>
-
 #if DEBUG_INPUT_EVENTS == 1
 #define debug_input_events(...) LOG_DEBUG(__VA_ARGS__)
 #else
@@ -94,7 +92,6 @@ namespace app
 
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
         bus.channels.push_back(sys::BusChannel::USBNotifications);
-        bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
                                                                 "LongPress",
@@ -114,16 +111,6 @@ namespace app
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUSBStatusChange(); });
         connect(typeid(sdesktop::usb::USBDisconnected),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUSBStatusChange(); });
-
-        connect(typeid(locks::UnlockedPhone), [&](sys::Message *msg) {
-            phoneIsLocked = false;
-            return sys::MessageNone{};
-        });
-
-        connect(typeid(locks::LockedPhone), [&](sys::Message *msg) {
-            phoneIsLocked = true;
-            return sys::MessageNone{};
-        });
 
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
@@ -561,17 +548,6 @@ namespace app
         const auto windowName = msg->getWindowName();
         if (not windowsFactory.isRegistered(windowName)) {
             LOG_ERROR("No such window: %s", windowName.c_str());
-            return sys::msgHandled();
-        }
-
-        // Workaround for corner case when phone started with mode slider in position different than "Connected".
-        // This triggers race condition between PhoneLockPopup and PhoneModesPopup. Usually PhoneLockPopup got placed
-        // on PhoneModesPopup in windows stack, which resulted in PhoneLockPopup being dropped when phone mode was
-        // changed again (see how pushWindow method works), what bypassed the phone lock.
-        if (phoneIsLocked && (not windowsStack().isWindowOnStack(gui::popup::window::phone_lock_window)) &&
-            (windowName == gui::popup::window::phone_modes_window)) {
-            LOG_ERROR(
-                "Tried to show PhoneModesPopup on locked phone, but PhoneLockPopup was not at the window stack yet!");
             return sys::msgHandled();
         }
 
