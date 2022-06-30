@@ -73,7 +73,7 @@ namespace app::meditation
                                      utils::translate("app_bell_meditation_chime_interval"),
                                      utils::translate("app_bell_meditation_chime_interval_bottom")};
 
-        auto startDelay = new list_items::StartDelay{list_items::StartDelay::spinner_type::range{0, 60, 1},
+        auto startDelay = new list_items::StartDelay{list_items::StartDelay::spinner_type::range{0, 90, 10},
                                                      startDelayModel,
                                                      utils::translate("app_bell_meditation_start_delay"),
                                                      utils::translate("common_second_lower")};
