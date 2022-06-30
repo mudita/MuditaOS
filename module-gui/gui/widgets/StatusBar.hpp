@@ -132,7 +132,7 @@ namespace gui::status_bar
         };
 
         /// Phone mode
-        sys::phone_modes::PhoneMode mPhoneMode = sys::phone_modes::PhoneMode::Connected;
+        sys::phone_modes::PhoneMode mPhoneMode = sys::phone_modes::PhoneMode::Uninitialized;
 
         /// Bluetooth mode
         sys::bluetooth::BluetoothMode mBluetoothMode = sys::bluetooth::BluetoothMode::Disabled;

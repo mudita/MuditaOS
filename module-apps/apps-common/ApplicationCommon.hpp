@@ -122,7 +122,7 @@ namespace app
     class StatusIndicators
     {
       public:
-        sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected;
+        sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Uninitialized;
         sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
         bool alarmClockStatus                       = false;
     };
@@ -187,7 +187,7 @@ namespace app
         std::unique_ptr<WindowsStack> windowsStackImpl;
         std::string default_window;
         State state = State::DEACTIVATED;
-        bool phoneIsLocked = true;
+        bool phoneIsLocked = false;
 
         sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);

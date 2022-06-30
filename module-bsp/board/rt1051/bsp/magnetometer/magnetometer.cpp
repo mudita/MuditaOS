@@ -195,7 +195,7 @@ namespace bsp
                 timerHandle = xTimerCreate(
                     "SliderTimer", pdMS_TO_TICKS(MAGNETOMETER_POLL_INTERVAL_MS), true, nullptr, TimerHandler);
                 if (timerHandle == nullptr) {
-                    LOG_FATAL("Could not create the timer for Headset insertion/removal detection");
+                    LOG_ERROR("Could not create the timer for magnetometer state change detection!");
                     return kStatus_Fail;
                 }
             }
