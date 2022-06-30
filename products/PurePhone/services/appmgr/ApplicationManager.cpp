@@ -138,7 +138,12 @@ namespace app::manager
 
         phoneModeObserver->connect(this);
         phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode phoneMode) {
+            static bool isFirstUpdateAfterStartup = true;
             handlePhoneModeChanged(phoneMode);
+            if (isFirstUpdateAfterStartup) {
+                isFirstUpdateAfterStartup = false;
+                return;
+            }
             actionsRegistry.enqueue(
                 ActionEntry{actions::ShowPopup, std::make_unique<gui::PhoneModePopupRequestParams>(phoneMode)});
         });

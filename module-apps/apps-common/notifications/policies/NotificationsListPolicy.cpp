@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsListPolicy.hpp"
@@ -17,6 +17,8 @@ void NotificationsListPolicy::updateCurrentList(sys::phone_modes::PhoneMode phon
         showWhenLocked = lockedScreenNotificationSetting;
         updateAllowed  = (isLocked && lockedScreenNotificationSetting) || (!isLocked);
         break;
+    case sys::phone_modes::PhoneMode::Uninitialized:
+        [[fallthrough]];
     case sys::phone_modes::PhoneMode::Connected:
         [[fallthrough]];
     case sys::phone_modes::PhoneMode::Offline:

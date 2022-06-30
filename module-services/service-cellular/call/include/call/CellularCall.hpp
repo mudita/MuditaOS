@@ -35,7 +35,7 @@ namespace call
     struct CallData
     {
         CalllogRecord record             = {};
-        sys::phone_modes::PhoneMode mode = sys::phone_modes::PhoneMode::Connected;
+        sys::phone_modes::PhoneMode mode      = sys::phone_modes::PhoneMode::Uninitialized;
         sys::phone_modes::Tethering tethering = sys::phone_modes::Tethering::Off;
     };
 
