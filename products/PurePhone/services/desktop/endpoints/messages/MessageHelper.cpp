@@ -15,26 +15,25 @@
 #include <ThreadRecord.hpp>
 #include <queries/messages/sms/QuerySMSGet.hpp>
 #include <queries/messages/sms/QuerySMSGetByID.hpp>
+#include <queries/messages/sms/QuerySMSGetByText.hpp>
 #include <queries/messages/sms/QuerySMSGetByThreadID.hpp>
 #include <queries/messages/sms/QuerySMSGetCount.hpp>
 #include <queries/messages/sms/QuerySMSRemove.hpp>
+#include <queries/messages/sms/QuerySMSUpdate.hpp>
 #include <queries/messages/templates/QuerySMSTemplateAdd.hpp>
 #include <queries/messages/templates/QuerySMSTemplateGet.hpp>
 #include <queries/messages/templates/QuerySMSTemplateGetByID.hpp>
 #include <queries/messages/templates/QuerySMSTemplateGetCount.hpp>
 #include <queries/messages/templates/QuerySMSTemplateRemove.hpp>
 #include <queries/messages/templates/QuerySMSTemplateUpdate.hpp>
+#include <queries/messages/threads/QueryThreadGetByID.hpp>
 #include <queries/messages/threads/QueryThreadsGetForList.hpp>
+#include <queries/messages/threads/QueryThreadRemove.hpp>
 #include <queries/messages/threads/QueryThreadMarkAsRead.hpp>
 #include <service-cellular/service-cellular/MessageConstants.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <utf8/UTF8.hpp>
 
-#include <memory>
-#include <utility>
-#include <module-db/queries/messages/sms/QuerySMSGetByText.hpp>
-#include "queries/messages/threads/QueryThreadGetByID.hpp"
-#include "queries/messages/threads/QueryThreadRemove.hpp"
 
 namespace sdesktop::endpoints
 {
@@ -128,7 +127,10 @@ namespace sdesktop::endpoints
 
     auto MessageHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
     {
-        if (context.getBody()[json::messages::category].string_value() == json::messages::categoryTemplate) {
+        if (context.getBody()[json::messages::category].string_value() == json::messages::categoryMessage) {
+            return updateSMS(context);
+        }
+        else if (context.getBody()[json::messages::category].string_value() == json::messages::categoryTemplate) {
             return updateTemplate(context);
         }
         else if (context.getBody()[json::messages::category].string_value() == json::messages::categoryThread) {
@@ -181,6 +183,7 @@ namespace sdesktop::endpoints
     {
         const auto smsNumber = context.getBody()[json::messages::number].string_value();
         const auto smsBody   = context.getBody()[json::messages::messageBody].string_value();
+        const auto smsType   = context.getBody()[json::messages::messageType].int_value();
 
         if (smsBody.size() > msgConstants::maxConcatenatedLen) {
             context.setResponseStatus(http::Code::BadRequest);
@@ -191,8 +194,9 @@ namespace sdesktop::endpoints
         SMSRecord smsRecord;
         smsRecord.number = utils::PhoneNumber(smsNumber).getView();
         smsRecord.body   = smsBody;
-        smsRecord.type   = SMSType::QUEUED;
-        smsRecord.date   = std::time(nullptr);
+        smsRecord.type =
+            smsType == static_cast<std::underlying_type_t<SMSType>>(SMSType::DRAFT) ? SMSType::DRAFT : SMSType::QUEUED;
+        smsRecord.date = std::time(nullptr);
 
         auto listener = std::make_unique<db::EndpointListener>(
             [=](db::QueryResult *result, Context &context) {
@@ -210,6 +214,50 @@ namespace sdesktop::endpoints
             context);
 
         DBServiceAPI::AddSMS(ownerServicePtr, smsRecord, std::move(listener));
+
+        return sys::ReturnCodes::Success;
+    }
+
+    auto MessageHelper::updateSMS(Context &context) -> sys::ReturnCodes
+    {
+        const auto smsBody = context.getBody()[json::messages::messageBody].string_value();
+        const auto smsId   = context.getBody()[json::messages::messageID].int_value();
+        const auto smsType = context.getBody()[json::messages::messageType].int_value();
+
+        if (smsBody.size() > msgConstants::maxConcatenatedLen) {
+            context.setResponseStatus(http::Code::BadRequest);
+            putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Success;
+        }
+        if (smsId == 0 || smsType != static_cast<std::underlying_type_t<SMSType>>(SMSType::DRAFT)) {
+            context.setResponseStatus(http::Code::BadRequest);
+            putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Success;
+        }
+
+        SMSRecord smsRecord;
+        smsRecord.ID   = smsId;
+        smsRecord.body = smsBody;
+        smsRecord.type = SMSType::DRAFT;
+        smsRecord.date = std::time(nullptr);
+
+        auto query    = std::make_unique<db::query::SMSUpdate>(smsRecord);
+        auto listener = std::make_unique<db::EndpointListener>(
+            [=](db::QueryResult *result, Context &context) {
+                const auto smsUpdateResult = dynamic_cast<db::query::SMSUpdateResult *>(result);
+                if (!smsUpdateResult) {
+                    LOG_ERROR("Received invalid SMS update result");
+                    return false;
+                }
+
+                context.setResponseStatus(http::Code::OK);
+                putToSendQueue(context.createSimpleResponse());
+                return true;
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
 
         return sys::ReturnCodes::Success;
     }

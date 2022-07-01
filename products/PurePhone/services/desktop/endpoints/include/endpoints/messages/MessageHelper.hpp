@@ -36,6 +36,7 @@ namespace sdesktop::endpoints
 
         auto requestSMS(Context &context) -> sys::ReturnCodes;
         auto createSMS(Context &context) -> sys::ReturnCodes;
+        auto updateSMS(Context &context) -> sys::ReturnCodes;
         auto deleteSMS(Context &context) -> sys::ReturnCodes;
 
         auto requestTemplate(Context &context) -> sys::ReturnCodes;
