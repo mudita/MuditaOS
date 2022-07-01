@@ -3,7 +3,7 @@
 import pytest
 from harness.request import TransactionError
 from harness.api.messages import GetMessagesCount, GetMessagesWithOffsetAndLimit, GetMessageById, \
-    GetMessagesByThreadIdWithOffsetAndLimit, AddMessage, DeleteMessageById
+    GetMessagesByThreadIdWithOffsetAndLimit, AddMessage, AddDraftMessage, UpdateDraftMessage, DeleteMessageById
 
 
 class MessagesTester:
@@ -49,6 +49,22 @@ class MessagesTester:
             return False
         else:
             return True, message
+
+    def add_draft_message(self, message_number, message_body):
+        try:
+            message = AddDraftMessage(message_number, message_body).run(self.harness).message
+        except TransactionError:
+            return False
+        else:
+            return True, message
+
+    def update_draft_message(self, message_body, message_id, thread_id):
+        try:
+            UpdateDraftMessage(message_body, message_id, thread_id).run(self.harness)
+        except TransactionError:
+            return False
+        else:
+            return True
 
     def delete_message_by_id(self, message_record_id):
         try:
@@ -261,6 +277,43 @@ def test_pagination(harness):
 
     for message_record in message_records:
         assert messages_tester.delete_message_by_id(message_record["messageID"]), "Failed to delete a message!"
+
+    result, received_messages_records_count = messages_tester.get_messages_count()
+    assert result, "Failed to get messages count!"
+    assert received_messages_records_count == initial_number_of_messages_records, "Wrong number of messages!"
+
+
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_unlocked")
+def test_draft_message(harness):
+    messages_tester = MessagesTester(harness)
+    result, received_messages_records_count = messages_tester.get_messages_count()
+    assert result, "Failed to get messages count!"
+    initial_number_of_messages_records = received_messages_records_count
+
+    message_number = "123456789"
+    draft_message_body = "This is a draft message"
+
+    result, message_record = messages_tester.add_draft_message(message_number, draft_message_body)
+    assert result, "Failed to add a draft message!"
+    assert message_record["messageBody"] == draft_message_body, "Draft message body corrupted!"
+    assert message_record["messageType"] == 1, "Wrong message type!"
+
+    result, received_messages_records_count = messages_tester.get_messages_count()
+    assert result, "Failed to get messages count!"
+    assert received_messages_records_count == initial_number_of_messages_records + 1, "Wrong number of messages!"
+
+    draft_message_new_body = "This is a changed draft message"
+
+    result = messages_tester.update_draft_message(draft_message_new_body, message_record["messageID"], message_record["threadID"])
+    assert result, "Failed to update draft message!"
+
+    result, received_message_record = messages_tester.get_message_by_id(message_record["messageID"])
+    assert result, "Failed to get a message by id!"
+    assert received_message_record["messageID"] == message_record["messageID"], "Wrong message id!"
+    assert received_message_record["messageBody"] == draft_message_new_body, "Wrong draft message body!"
+
+    assert messages_tester.delete_message_by_id(message_record["messageID"]), "Failed to delete a draft message!"
 
     result, received_messages_records_count = messages_tester.get_messages_count()
     assert result, "Failed to get messages count!"
