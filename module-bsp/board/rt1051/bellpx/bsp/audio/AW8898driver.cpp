@@ -518,7 +518,6 @@ namespace bsp::audio::AW8898
 
     void HAL_Delay(std::uint32_t count)
     {
-        extern std::uint32_t SystemCoreClock;
         vTaskDelay(pdMS_TO_TICKS(count));
     }
 

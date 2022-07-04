@@ -238,7 +238,8 @@ namespace bsp::rtc
     {
         std::uint32_t secondsToMinute = 60 - (timestamp % 60);
 
-        struct tm date;
+        struct tm date
+        {};
         getCurrentDateTime(&date);
 
         return setAlarmInSecondsFromNow(secondsToMinute);

@@ -544,7 +544,7 @@ namespace bsp::battery_charger
 
         // Short time to synchronize after configuration
         vTaskDelay(pdMS_TO_TICKS(100));
-        StateOfCharge level = getBatteryLevel();
+        getBatteryLevel();
 
         clearAllChargerIRQs();
         clearFuelGuageIRQ(static_cast<std::uint16_t>(batteryINTBSource::all));
