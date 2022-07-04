@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "models/StartDelay.hpp"
+
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
@@ -18,11 +20,6 @@ namespace app
 namespace gui
 {
     class Item;
-}
-
-namespace settings
-{
-    class Settings;
 }
 
 namespace app::meditation
@@ -47,15 +44,15 @@ namespace app::meditation
     class MeditationCountdownPresenter : public MeditationCountdownContract::Presenter
     {
       private:
-        app::ApplicationCommon *app  = nullptr;
-        settings::Settings *settings = nullptr;
+        app::ApplicationCommon *app{nullptr};
+        models::StartDelay &startDelayModel;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::chrono::seconds duration;
 
         void onCountdownFinished();
 
       public:
-        MeditationCountdownPresenter(app::ApplicationCommon *app, settings::Settings *settings);
+        MeditationCountdownPresenter(app::ApplicationCommon *app, models::StartDelay &startDelay);
 
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void start() override;

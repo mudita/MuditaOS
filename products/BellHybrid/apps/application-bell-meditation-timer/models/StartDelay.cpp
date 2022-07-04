@@ -18,9 +18,10 @@ namespace app::meditation::models
     }
     std::uint8_t StartDelay::getValue() const
     {
-        const auto value = settings.getValue(start_delay_db);
+        constexpr auto defaultValue = 30U;
+        const auto value            = settings.getValue(start_delay_db);
         if (value.empty()) {
-            return 0;
+            return defaultValue;
         }
         return utils::getNumericValue<std::uint32_t>(value);
     }

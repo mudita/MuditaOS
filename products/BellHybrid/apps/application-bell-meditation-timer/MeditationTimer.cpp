@@ -79,7 +79,7 @@ namespace app
 
         windowsFactory.attach(
             meditation::windows::meditationCountdown, [this](ApplicationCommon *app, const std::string &name) {
-                auto presenter = std::make_unique<app::meditation::MeditationCountdownPresenter>(app, settings.get());
+                auto presenter = std::make_unique<app::meditation::MeditationCountdownPresenter>(app, *startDelayModel);
                 return std::make_unique<gui::MeditationCountdownWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(meditation::windows::meditationProgress,
