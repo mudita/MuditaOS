@@ -38,8 +38,6 @@ target_compile_options(${PROJECT_NAME}
     -Wno-missing-field-initializers
     -Wno-unused-function
     -Wno-switch
-    -Wno-implicit-fallthrough
-    -Wno-unused-variable
 
     # C only flags
     $<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>

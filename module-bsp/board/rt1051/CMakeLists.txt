@@ -67,8 +67,6 @@ target_include_directories(module-bsp
 
 set_source_files_properties(
 	eMMC/fsl_mmc.c PROPERTIES COMPILE_FLAGS -Wno-unused-function
-	common/i2c.c PROPERTIES COMPILE_FLAGS -Wno-unused-function
-    bsp/rtc/rtc.cpp PROPERTIES COMPILE_FLAGS "-Wno-unused-value -Wno-error=unused-value"
 )
 
 target_compile_definitions(module-bsp PUBLIC USB_STACK_FREERTOS)

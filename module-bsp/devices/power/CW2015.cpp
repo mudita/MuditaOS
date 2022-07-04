@@ -50,7 +50,6 @@ namespace bsp::devices::power
         constexpr auto micro_to_milli_ratio    = 1000;
         constexpr auto adc_conversion_constant = 305;
 
-        uint8_t volt_h, volt_l;
         uint32_t ADMin = 0, ADMax = 0, ADResult = 0;
 
         /// Filter data using median
@@ -278,19 +277,18 @@ namespace bsp::devices::power
         BATTINFO profile{};
         RetCodes ret_code{RetCodes::Ok};
 
-        const auto result = std::all_of(
-            profile.cbegin(), profile.cend(), [this, ret_code, reg = BATTINFO::ADDRESS](const auto &e) mutable {
-                const auto result = read(reg++);
-                if (not result) {
-                    ret_code = RetCodes::CommunicationError;
-                    return false;
-                }
-                if (*result != e) {
-                    ret_code = RetCodes::ProfileInvalid;
-                    return false;
-                }
-                return true;
-            });
+        std::all_of(profile.cbegin(), profile.cend(), [this, ret_code, reg = BATTINFO::ADDRESS](const auto &e) mutable {
+            const auto result = read(reg++);
+            if (not result) {
+                ret_code = RetCodes::CommunicationError;
+                return false;
+            }
+            if (*result != e) {
+                ret_code = RetCodes::ProfileInvalid;
+                return false;
+            }
+            return true;
+        });
 
         return ret_code;
     }

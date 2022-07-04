@@ -159,8 +159,7 @@ namespace bsp::bell_switches
 
     void debounceTimerCallback(TimerHandle_t timerHandle)
     {
-        auto timerState                     = static_cast<DebounceTimerState *>(pvTimerGetTimerID(timerHandle));
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        auto timerState = static_cast<DebounceTimerState *>(pvTimerGetTimerID(timerHandle));
         xTimerStop(timerState->timer, 0);
 
         auto currentState = timerState->gpio->ReadPin(static_cast<uint32_t>(timerState->pin)) ? KeyEvents::Released
@@ -191,8 +190,7 @@ namespace bsp::bell_switches
 
     void debounceTimerCenterClickCallback(TimerHandle_t timerHandle)
     {
-        auto timerState                     = static_cast<DebounceTimerState *>(pvTimerGetTimerID(timerHandle));
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        auto timerState = static_cast<DebounceTimerState *>(pvTimerGetTimerID(timerHandle));
         xTimerStop(timerState->timer, 0);
 
         if (qHandleIrq != nullptr) {
@@ -317,7 +315,6 @@ namespace bsp::bell_switches
             return;
         }
         DebounceTimerState &debounceTimerState = debounceTimers.at(timerId);
-        auto temp                              = &debounceTimerState;
         debounceTimerState.gpio->DisableInterrupt(1U << static_cast<uint32_t>(debounceTimerState.pin));
         debounceTimerState.lastState = debounceTimerState.gpio->ReadPin(static_cast<uint32_t>(debounceTimerState.pin))
                                            ? KeyEvents::Released
@@ -374,7 +371,6 @@ namespace bsp::bell_switches
         gpio_sw->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT));
         gpio_sw->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
     }
-
 
     std::vector<KeyEvent> getKeyEvents(NotificationSource notification)
     {
