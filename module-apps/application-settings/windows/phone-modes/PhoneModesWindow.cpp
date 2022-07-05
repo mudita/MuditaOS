@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneModesWindow.hpp"
@@ -24,10 +24,14 @@ namespace gui
         auto selectedPhoneModeIndex = static_cast<unsigned int>(phoneModeSettings->getCurrentPhoneMode());
 
         modifiedModesStrings = initialModesStrings;
-        modifiedModesStrings[selectedPhoneModeIndex] =
-            "<text><b>" + modifiedModesStrings[selectedPhoneModeIndex] + " </b></text>";
-
-        refreshOptions(modesOptList(), selectedPhoneModeIndex);
+        if (selectedPhoneModeIndex < modifiedModesStrings.size()) {
+            modifiedModesStrings[selectedPhoneModeIndex] =
+                "<text><b>" + modifiedModesStrings[selectedPhoneModeIndex] + " </b></text>";
+            refreshOptions(modesOptList(), selectedPhoneModeIndex);
+        }
+        else {
+            refreshOptions(modesOptList());
+        }
     }
 
     auto PhoneModesWindow::modesOptList() -> std::list<gui::Option>
