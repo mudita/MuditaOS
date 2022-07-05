@@ -70,18 +70,17 @@ namespace
 namespace app::home_screen
 {
     HomeScreenPresenter::HomeScreenPresenter(ApplicationCommon *app,
-                                             std::unique_ptr<AbstractAlarmModel> alarmModel,
-                                             std::unique_ptr<AbstractBatteryModel> batteryModel,
-                                             std::unique_ptr<AbstractTemperatureModel> temperatureModel,
-                                             std::unique_ptr<AbstractTimeModel> timeModel)
-        : app{app}, alarmModel{std::move(alarmModel)}, batteryModel{std::move(batteryModel)},
-          temperatureModel{std::move(temperatureModel)}, timeModel{std::move(timeModel)},
-          rngEngine{std::make_unique<std::mt19937>(std::random_device{}())}
+                                             AbstractAlarmModel &alarmModel,
+                                             AbstractBatteryModel &batteryModel,
+                                             AbstractTemperatureModel &temperatureModel,
+                                             AbstractTimeModel &timeModel)
+        : app{app}, alarmModel{alarmModel}, batteryModel{batteryModel}, temperatureModel{temperatureModel},
+          timeModel{timeModel}, rngEngine{std::make_unique<std::mt19937>(std::random_device{}())}
     {}
 
     void HomeScreenPresenter::handleUpdateTimeEvent()
     {
-        getView()->setTime(timeModel->getCurrentTime());
+        getView()->setTime(timeModel.getCurrentTime());
         stateController->handleTimeUpdateEvent();
         handleCyclicDeepRefresh();
     }
@@ -122,16 +121,16 @@ namespace app::home_screen
     void HomeScreenPresenter::onBeforeShow()
     {
         stateController->resetStateMachine();
-        getView()->setTimeFormat(timeModel->getTimeFormat());
-        getView()->setTime(timeModel->getCurrentTime());
-        getView()->setAlarmTimeFormat(timeModel->getTimeFormat());
-        getView()->setSnoozeFormat(timeModel->getTimeFormat());
-        getView()->setTemperature(temperatureModel->getTemperature());
+        getView()->setTimeFormat(timeModel.getTimeFormat());
+        getView()->setTime(timeModel.getCurrentTime());
+        getView()->setAlarmTimeFormat(timeModel.getTimeFormat());
+        getView()->setSnoozeFormat(timeModel.getTimeFormat());
+        getView()->setTemperature(temperatureModel.getTemperature());
     }
     void HomeScreenPresenter::createData()
     {
-        stateController = std::make_unique<StateController>(
-            *getView(), *this, *batteryModel, *temperatureModel, *alarmModel, *timeModel);
+        stateController =
+            std::make_unique<StateController>(*getView(), *this, batteryModel, temperatureModel, alarmModel, timeModel);
     }
 
     void HomeScreenPresenter::refreshWindow()
@@ -141,12 +140,12 @@ namespace app::home_screen
     void HomeScreenPresenter::onDatabaseMessage(db::NotificationMessage *msg)
     {
         if (msg->interface == db::Interface::Name::AlarmEvents && msg->type == db::Query::Type::Update) {
-            alarmModel->update();
+            alarmModel.update();
         }
     }
     void HomeScreenPresenter::handleAlarmModelReady()
     {
-        getView()->setAlarmTime(alarmModel->getAlarmTime());
+        getView()->setAlarmTime(alarmModel.getAlarmTime());
         stateController->handleAlarmModelReady();
     }
 
@@ -173,12 +172,12 @@ namespace app::home_screen
 
     std::uint32_t HomeScreenPresenter::getBatteryLvl() const
     {
-        return batteryModel->getLevelState().level;
+        return batteryModel.getLevelState().level;
     }
 
     bool HomeScreenPresenter::isBatteryCharging() const
     {
-        return batteryModel->getLevelState().state == Store::Battery::State::Charging;
+        return batteryModel.getLevelState().state == Store::Battery::State::Charging;
     }
 
     bool HomeScreenPresenter::isAlarmActivatedByLatch() const
