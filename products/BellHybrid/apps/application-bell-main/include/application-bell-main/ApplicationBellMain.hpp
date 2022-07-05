@@ -27,6 +27,7 @@ namespace app
                                      StatusIndicators statusIndicators   = StatusIndicators{},
                                      StartInBackground startInBackground = {false},
                                      std::uint32_t stackDepth            = 1024 * 15);
+        ~ApplicationBellMain();
 
         sys::ReturnCodes InitHandler() override;
 
@@ -46,7 +47,10 @@ namespace app
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
         bool setHomeScreenLayout(std::string layoutName);
 
-        std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter{};
+        std::unique_ptr<home_screen::AbstractBatteryModel> batteryModel;
+        std::unique_ptr<home_screen::AbstractTemperatureModel> temperatureModel;
+        std::unique_ptr<AbstractTimeModel> timeModel;
+        std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter;
     };
 
     template <> struct ManifestTraits<ApplicationBellMain>

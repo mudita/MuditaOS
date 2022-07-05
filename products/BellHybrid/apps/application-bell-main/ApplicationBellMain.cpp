@@ -13,20 +13,16 @@
 #include <apps-common/messages/AppMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/layouts/HomeScreenLayouts.hpp>
-#include <common/models/AlarmModel.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/models/LayoutModel.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
-#include <service-appmgr/Controller.hpp>
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 #include <appmgr/messages/ChangeHomescreenLayoutParams.hpp>
 #include <system/messages/SystemManagerMessage.hpp>
-#include <common/popups/BedtimeNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
-#include <common/windows/BellTurnOffWindow.hpp>
 #include <WindowsStack.hpp>
 #include <popups/Popups.hpp>
 
@@ -80,11 +76,11 @@ namespace app
             return ret;
         }
 
-        auto timeModel        = std::make_unique<app::TimeModel>();
-        auto batteryModel     = std::make_unique<app::home_screen::BatteryModel>(this);
-        auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(this);
-        homeScreenPresenter   = std::make_shared<app::home_screen::HomeScreenPresenter>(
-            this, std::move(alarmModel), std::move(batteryModel), std::move(temperatureModel), std::move(timeModel));
+        timeModel           = std::make_unique<app::TimeModel>();
+        batteryModel        = std::make_unique<app::home_screen::BatteryModel>(this);
+        temperatureModel    = std::make_unique<app::home_screen::TemperatureModel>(this);
+        homeScreenPresenter = std::make_shared<app::home_screen::HomeScreenPresenter>(
+            this, *alarmModel, *batteryModel, *temperatureModel, *timeModel);
 
         createUserInterface();
 
@@ -161,7 +157,7 @@ namespace app
     sys::MessagePointer ApplicationBellMain::handleSwitchWindow(sys::Message *msgl)
     {
         auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
-        if (msg) {
+        if (msg != nullptr) {
             const auto newWindowName = msg->getWindowName();
             if (newWindowName == gui::name::window::main_window) {
                 stopIdleTimer();
@@ -186,4 +182,6 @@ namespace app
         homeScreenPresenter->setLayout(layoutGenerator);
         return true;
     }
+
+    ApplicationBellMain::~ApplicationBellMain() = default;
 } // namespace app

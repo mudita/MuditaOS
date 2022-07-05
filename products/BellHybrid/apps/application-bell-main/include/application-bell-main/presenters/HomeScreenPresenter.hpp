@@ -104,10 +104,10 @@ namespace app::home_screen
     {
       public:
         HomeScreenPresenter(ApplicationCommon *app,
-                            std::unique_ptr<AbstractAlarmModel> alarmModel,
-                            std::unique_ptr<AbstractBatteryModel> batteryModel,
-                            std::unique_ptr<AbstractTemperatureModel> temperatureModel,
-                            std::unique_ptr<AbstractTimeModel> timeModel);
+                            AbstractAlarmModel &alarmModel,
+                            AbstractBatteryModel &batteryModel,
+                            AbstractTemperatureModel &temperatureModel,
+                            AbstractTimeModel &timeModel);
         virtual ~HomeScreenPresenter();
         HomeScreenPresenter()        = delete;
         HomeScreenPresenter &operator=(const HomeScreenPresenter &oth) = delete;
@@ -146,11 +146,11 @@ namespace app::home_screen
       private:
         ApplicationCommon *app;
         sys::TimerHandle timer;
-        std::unique_ptr<AbstractAlarmModel> alarmModel;
-        std::unique_ptr<AbstractBatteryModel> batteryModel;
-        std::unique_ptr<AbstractTemperatureModel> temperatureModel;
-        std::unique_ptr<AbstractTimeModel> timeModel;
-        std::shared_ptr<AbstractController> stateController;
+        AbstractAlarmModel &alarmModel;
+        AbstractBatteryModel &batteryModel;
+        AbstractTemperatureModel &temperatureModel;
+        AbstractTimeModel &timeModel;
+        std::unique_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
         std::unique_ptr<std::mt19937> rngEngine;
 
