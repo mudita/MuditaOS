@@ -55,8 +55,9 @@ namespace alarms
     } // namespace
 
     FrontlightAction::FrontlightAction(sys::Service &service, Mode mode, SettingsDependency settingsDependency)
-        : settingsDependency{settingsDependency}, pimpl{createFrontlightImplementation(service, mode)},
-          settings{service::ServiceProxy{service.weak_from_this()}}
+        : service{service}, settingsDependency{settingsDependency},
+          pimpl{createFrontlightImplementation(service, mode)}, settings{
+                                                                    service::ServiceProxy{service.weak_from_this()}}
     {}
 
     bool FrontlightAction::execute()
@@ -67,6 +68,9 @@ namespace alarms
         case SettingsDependency::AlarmClock:
             settingString = settings.getValue(bell::settings::Alarm::lightActive, settings::SettingsScope::Global);
             if (settingString == std::string(alarmFrontlightOFF)) {
+                service.bus.sendUnicast(
+                    std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::ignoreKeypress),
+                    service::name::evt_manager);
                 return true;
             }
             break;
@@ -85,6 +89,20 @@ namespace alarms
 
     bool FrontlightAction::turnOff()
     {
+        std::string settingString;
+
+        switch (settingsDependency) {
+        case SettingsDependency::AlarmClock:
+            settingString = settings.getValue(bell::settings::Alarm::lightActive, settings::SettingsScope::Global);
+            if (settingString == std::string(alarmFrontlightOFF)) {
+                service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                                            screen_light_control::Action::stopIgnoringKeypress),
+                                        service::name::evt_manager);
+            }
+            break;
+        default:
+            break;
+        }
         return pimpl->turnOff();
     }
 

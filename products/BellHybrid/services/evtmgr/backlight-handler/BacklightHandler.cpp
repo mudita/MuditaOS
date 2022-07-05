@@ -69,7 +69,7 @@ namespace backlight
             if (controller->isLightOn()) {
                 timer->restart(timers::screenLightTimerHoldTimeout);
             }
-            else if (!onDemandModeOn) {
+            else if (!onDemandModeOn && !ignoreKeypress) {
                 setKeyPressedModeFrontlightOn();
                 controller->processRequest(screen_light_control::Action::turnOn);
                 timer->restart(timers::screenLightTimerHoldTimeout);
@@ -110,6 +110,12 @@ namespace backlight
             break;
         case screen_light_control::Action::disableAutomaticMode:
             onDemandModeOn = true;
+            break;
+        case screen_light_control::Action::ignoreKeypress:
+            ignoreKeypress = true;
+            break;
+        case screen_light_control::Action::stopIgnoringKeypress:
+            ignoreKeypress = false;
             break;
         default:
             break;

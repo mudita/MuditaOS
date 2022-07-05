@@ -36,6 +36,7 @@ namespace alarms
         static constexpr std::string_view alarmFrontlightOFF     = "0";
         static constexpr std::string_view prewakeupFrontlightOFF = "0";
 
+        sys::Service &service;
         SettingsDependency settingsDependency;
         std::unique_ptr<AbstractAlarmAction> pimpl;
         settings::Settings settings;
