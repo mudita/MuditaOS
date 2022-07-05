@@ -45,6 +45,7 @@ namespace backlight
         void setKeyPressedModeFrontlightOn();
         void setKeyPressedModeFrontlightOff();
 
+        bool ignoreKeypress         = false;
         bool onDemandModeOn         = true;
         BacklightMode backlightMode = BacklightMode::WithTimer;
     };

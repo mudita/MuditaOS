@@ -24,7 +24,9 @@ namespace screen_light_control
         disableAutomaticMode,       ///< Disable automatic mode of screen frontlight
         setManualModeBrightness,    ///< Set screen brightness in manual mode control
         setAutomaticModeParameters, ///< Set parameters for automatic mode of screen frontlight
-        fadeOut                     ///< Set light fade out in automatic mode
+        fadeOut,                    ///< Set light fade out in automatic mode
+        ignoreKeypress,             ///< Enter state that ignores keypress turnon
+        stopIgnoringKeypress,       ///< Leave state that ignores keypress turon
     };
 
     struct ManualModeParameters

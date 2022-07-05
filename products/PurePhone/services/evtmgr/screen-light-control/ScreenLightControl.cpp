@@ -65,6 +65,8 @@ namespace pure::screen_light_control
         case Action::fadeOut:
             handleFadeOut();
             break;
+        default:
+            break;
         }
     }
 
