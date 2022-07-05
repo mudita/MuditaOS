@@ -23,11 +23,16 @@ namespace gui
 
     void BellFinishedWindow::exit()
     {
-        if (closeApplication) {
+        switch (exitBehaviour) {
+        case BellFinishedWindowData::ExitBehaviour::CloseApplication:
             app::manager::Controller::switchBack(application);
-        }
-        else {
+            break;
+        case BellFinishedWindowData::ExitBehaviour::SwitchWindow:
             application->switchWindow(windowToReturn);
+            break;
+        case BellFinishedWindowData::ExitBehaviour::ReturnToHomescreen:
+            app::manager::Controller::sendAction(application, app::manager::actions::Home);
+            break;
         }
     }
 
@@ -64,7 +69,7 @@ namespace gui
             icon->text->setRichText(metadata->text);
             icon->resizeItems();
             windowToReturn   = metadata->windowToReturn;
-            closeApplication = metadata->closeApplication;
+            exitBehaviour    = metadata->exitBehaviour;
             if (metadata->timeout != std::chrono::seconds::zero()) {
                 resetTimer(metadata->timeout);
             }

@@ -109,7 +109,7 @@ namespace gui
         }
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
             reinterpret_cast<app::Application *>(application)->resumeIdleTimer();
-            presenter->finish();
+            presenter->abandon();
             return true;
         }
 

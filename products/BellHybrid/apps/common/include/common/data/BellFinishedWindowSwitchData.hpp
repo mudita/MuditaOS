@@ -13,24 +13,35 @@ namespace gui
     struct BellFinishedWindowData : public gui::SwitchData
     {
       public:
+        enum class ExitBehaviour
+        {
+            SwitchWindow,
+            CloseApplication,
+            ReturnToHomescreen,
+        };
+
         struct Factory
         {
-            static std::unique_ptr<BellFinishedWindowData> create(
-                const UTF8 &icon,
-                const std::string &windowToReturn,
-                const UTF8 &text                   = "",
-                bool closeApplication              = false,
-                const std::chrono::seconds timeout = std::chrono::seconds::zero())
+            static std::unique_ptr<BellFinishedWindowData> create(const UTF8 &icon,
+                                                                  const std::string &windowToReturn,
+                                                                  const UTF8 &text,
+                                                                  ExitBehaviour exitBehaviour,
+                                                                  std::chrono::seconds timeout)
             {
                 return std::unique_ptr<BellFinishedWindowData>(
-                    new BellFinishedWindowData(icon, windowToReturn, text, closeApplication, timeout));
+                    new BellFinishedWindowData(icon, windowToReturn, text, exitBehaviour, timeout));
+            }
+
+            static std::unique_ptr<BellFinishedWindowData> create(const UTF8 &icon, const std::string &windowToReturn)
+            {
+                return create(icon, windowToReturn, "", ExitBehaviour::SwitchWindow, std::chrono::seconds::zero());
             }
         };
 
         UTF8 icon{};
         std::string windowToReturn;
         UTF8 text{};
-        bool closeApplication;
+        ExitBehaviour exitBehaviour;
         std::chrono::seconds timeout;
 
       private:
@@ -39,10 +50,9 @@ namespace gui
         BellFinishedWindowData(const UTF8 &icon,
                                const std::string &windowToReturn,
                                const UTF8 &text                   = "",
-                               bool closeApplication              = false,
+                               const ExitBehaviour exitBehaviour  = ExitBehaviour::SwitchWindow,
                                const std::chrono::seconds timeout = std::chrono::seconds::zero())
-            : icon{icon}, windowToReturn{windowToReturn}, text{text}, closeApplication{closeApplication}, timeout{
-                                                                                                              timeout}
+            : icon{icon}, windowToReturn{windowToReturn}, text{text}, exitBehaviour{exitBehaviour}, timeout{timeout}
         {}
     };
 } // namespace gui
