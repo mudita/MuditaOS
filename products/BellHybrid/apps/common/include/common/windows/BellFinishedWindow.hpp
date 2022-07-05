@@ -28,8 +28,8 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         Icon *icon{};
-        std::string windowToReturn;
-        bool closeApplication; // is close application is true windowToReturn variable is ignored
+        std::string windowToReturn{};
+        BellFinishedWindowData::ExitBehaviour exitBehaviour;
     };
 
 } // namespace gui

@@ -69,7 +69,12 @@ namespace gui
     void BellBedtimeWindow::exit()
     {
         presenter->saveData();
-        application->switchWindow(gui::window::bell_finished::defaultName,
-                                  BellFinishedWindowData::Factory::create("circle_success_big", "", "", true));
+        application->switchWindow(
+            gui::window::bell_finished::defaultName,
+            BellFinishedWindowData::Factory::create("circle_success_big",
+                                                    "",
+                                                    "",
+                                                    BellFinishedWindowData::ExitBehaviour::CloseApplication,
+                                                    std::chrono::seconds::zero()));
     }
 } /* namespace gui */
