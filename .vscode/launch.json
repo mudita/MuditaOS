@@ -1,14 +1,17 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
+        // Linux
+
         {
-            "name": "Linux Launch",
+            "name": "Launch PurePhone (Linux)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build-bell-linux-Debug/BellHybrid.elf",
+            "program": "${workspaceFolder}/build-PurePhone-linux-Debug/PurePhone.elf",
             "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceFolder}/build-bell-linux-Debug/",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build-PurePhone-linux-Debug/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -18,82 +21,108 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 },
-                {
-                    "description": "disable SIGUSR1 logs",
-                    "text": "handle SIGUSR1 nostop noprint"
-                },
+                // {
+                //     "description": "disable SIGUSR1 logs",
+                //     "text": "handle SIGUSR1 nostop noprint"
+                // },
             ]
         },
+
         {
-            "name": "Linux Attach",
+            "name": "Launch BellHybrid (Linux)",
             "type": "cppdbg",
-            "request": "attach",
-            "program": "${workspaceFolder}/build-linux-Debug/PurePhone.elf",
+            "request": "launch",
+            "program": "${workspaceFolder}/build-BellHybrid-linux-Debug/BellHybrid.elf",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build-BellHybrid-linux-Debug/",
+            "environment": [],
+            "externalConsole": false,
             "MIMode": "gdb",
-            "processId": "${command:pickProcess}",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 },
-                {
-                    "description": "disable SIGUSR1 logs",
-                    "text": "handle SIGUSR1 nostop noprint"
-                },
+                // {
+                //     "description": "disable SIGUSR1 logs",
+                //     "text": "handle SIGUSR1 nostop noprint"
+                // }
             ]
         },
+
+        // RT1051
+
         {
-            "name": "Debug (rt1051)",
-            "type": "gdb",
-            "gdbpath": "arm-none-eabi-gdb",
-            "request": "attach",
-            "target": ":2331",
-            "remote": true,
-            "cwd": "${workspaceRoot}",
-            "valuesFormatting": "parseText",
-            "executable": "${workspaceFolder}/build-rt1051-Debug/PurePhone.elf",
-            "autorun": [
-                "eval \"monitor exec SetRTTAddr %p\", &_SEGGER_RTT",
+            "name": "Launch PurePhone (RT1051)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "executable": "${workspaceFolder}/build-PurePhone-rt1051-RelWithDebInfo/PurePhone.elf",
+            "servertype": "jlink",
+            "serverpath": "JLinkGDBServerCLExe",
+            "cwd": "${workspaceFolder}",
+            "gdbPath": "arm-none-eabi-gdb",
+            // "debuggerArgs": ["-x", "${workspaceFolder}/.gdbinit-1051"],
+            // "serverArgs": ["-strict", "-ir", "-singlerun", "-speed", "25000"],
+            // "runToEntryPoint": "main",
+            // "runToMain": true,
+            "preLaunchCommands": [],
+            "postLaunchCommands": [],
+            "interface": "swd",
+            "device": "MCIMXRT1051",
+            "jlinkscript": "${workspaceFolder}/evkbimxrt1050_sdram_init.jlinkscript",
+            "rtos": "FreeRTOS",
+            "overrideLaunchCommands": [
+                // "source .gdb_macros",
+                // "handle SIGUSR1 nostop noprint",
+                // "maint set internal-warning quit no",
+                // "maint set internal-warning corefile no",
+                // "set pagination off",
+                // "set python print-stack full",
+                // "target remote localhost:2331",
+                // "source tools/gdb_crash_extend.py",
+                // "source tools/misc/puregdb/puregdb.py",
                 "monitor reset 0",
                 "monitor halt",
                 "monitor memU32 0x401BC000 = 128;",
                 "load",
+                "eval \"monitor exec SetRTTAddr %p\", &_SEGGER_RTT",
                 "info threads",
                 "thread 2",
-                "b ResetISR",
-                "b main",
-                "b HardFault_Handler",
-                "b MemManage_Handler",
-                "b BusFault_Handler",
-                "b UsageFault_Handler",
+                "tb main",
+                // "b HardFault_Handler",
+                // "b _exit",
+                // "b abort",
+                // "b WDOG1_IRQHandler",
+                // "b RTWDOG_IRQHandler",
+                // "b IntDefaultHandler",
             ]
         },
+
         {
-            "name": "RelWithDebug (rt1051)",
-            "type": "gdb",
-            "gdbpath": "arm-none-eabi-gdb",
-            "request": "attach",
-            "target": ":2331",
-            "remote": true,
-            "cwd": "${workspaceRoot}",
-            "valuesFormatting": "parseText",
-            "executable": "${workspaceFolder}/build-rt1051-RelWithDebInfo/PurePhone.elf",
-            "autorun": [
-                "eval \"monitor exec SetRTTAddr %p\", &_SEGGER_RTT",
+            "name": "Launch BellHybrid (RT1051)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "executable": "${workspaceFolder}/build-BellHybrid-rt1051-RelWithDebInfo/BellHybrid.elf",
+            "servertype": "jlink",
+            "serverpath": "JLinkGDBServerCLExe",
+            "cwd": "${workspaceFolder}",
+            "gdbPath": "arm-none-eabi-gdb",
+            "interface": "swd",
+            "device": "MCIMXRT1051",
+            "jlinkscript": "${workspaceFolder}/evkbimxrt1050_sdram_init_T6.jlinkscript",
+            "rtos": "FreeRTOS",
+            "overrideLaunchCommands": [
                 "monitor reset 0",
                 "monitor halt",
                 "monitor memU32 0x401BC000 = 128;",
                 "load",
+                "eval \"monitor exec SetRTTAddr %p\", &_SEGGER_RTT",
                 "info threads",
                 "thread 2",
-                "b ResetISR",
-                "b main",
-                "b HardFault_Handler",
-                "b MemManage_Handler",
-                "b BusFault_Handler",
-                "b UsageFault_Handler",
+                "tb main",
             ]
-        }
+        },
     ]
 }

@@ -1,12 +1,12 @@
 buildType:
-  default: debug
+  default: Debug
   description: Build type
   choices:
-    debug:
+    Debug:
       short: Debug
       long: Build with debugging information
       buildType: Debug
-    relwithdebinfo:
+    RelWithDebInfo:
       short: Release with debug
       long: Build release with debug info version
       buildType: RelWithDebInfo
@@ -18,27 +18,23 @@ target:
     linux:
       short: Linux
       long: Build for Linux
-      target: linux
       settings:
         CMAKE_TOOLCHAIN_FILE: Target_Linux.cmake
     rt1051:
       short: RT1051
       long: Build for RT1051
-      target: rt1051
       settings:
         CMAKE_TOOLCHAIN_FILE: Target_RT1051.cmake
 
 product:
-  default: purephone
+  default: PurePhone
   description: Product
   choices:
-    purephone:
+    PurePhone:
       short: PurePhone
-      product: purephone
       settings:
         PRODUCT: PurePhone
-    bell:
+    BellHybrid:
       short: BellHybrid
-      product: bellhybrid
       settings:
         PRODUCT: BellHybrid
