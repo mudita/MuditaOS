@@ -4,7 +4,7 @@ doc/docs-gui/
 build-*/
 MuditaOS.log
 .vscode/ipch
-.vscode/tasks.json
+.vscode/.cortex-debug.*
 
 lib/
 

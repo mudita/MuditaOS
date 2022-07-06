@@ -1,0 +1,186 @@
+{
+    "version":"2.0.0",
+    "tasks": [
+
+        // Linux
+
+        {
+            "type": "shell",
+            "label": "Configure PurePhone (Linux)",
+            "command": "./configure.sh",
+            "args": [
+                "pure",
+                "linux",
+                "Debug",
+                "-G",
+                "Ninja"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "detail": "Run cmake configure script",
+        },
+        {
+            "type": "shell",
+            "label": "Build PurePhone (Linux)",
+            "command": "ninja",
+            "args": [
+                "-j`nproc`",
+                "Pure"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build-PurePhone-linux-Debug"
+            },
+            "group": {
+                "kind": "build",
+                //"isDefault": true
+            },
+            "detail": "Build dir has to be configured with Cmake using Ninja",
+        },
+        {
+            "type": "shell",
+            "label": "Configure and Build PurePhone (Linux)",
+            "group": "build",
+            "dependsOn": ["Configure PurePhone (Linux)", "Build PurePhone (Linux)"],
+            "dependsOrder": "sequence",
+            "detail": "Configure cmake project and build with Ninja",
+        },
+
+        {
+            "type": "shell",
+            "label": "Configure BellHybrid (Linux)",
+            "command": "./configure.sh",
+            "args": [
+                "bell",
+                "linux",
+                "Debug",
+                "-G",
+                "Ninja"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "detail": "Run cmake configure script",
+        },
+        {
+            "type": "shell",
+            "label": "Build BellHybrid (Linux)",
+            "command": "ninja",
+            "args": [
+                "-j`nproc`",
+                "BellHybrid"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build-BellHybrid-linux-Debug"
+            },
+            "group": "build",
+            "detail": "Build dir has to be configured with Cmake using Ninja",
+        },
+        {
+            "type": "shell",
+            "label": "Configure and Build BellHybrid (Linux)",
+            "group": "build",
+            "dependsOn": ["Configure BellHybrid (Linux)", "Build BellHybrid (Linux)"],
+            "dependsOrder": "sequence",
+            "detail": "Configure cmake project and build with Ninja",
+        },
+
+        // RT1051
+
+        {
+            "type": "shell",
+            "label": "Configure PurePhone (RT1051)",
+            "command": "./configure.sh",
+            "args": [
+                "pure",
+                "rt1051",
+                "RelWithDebInfo",
+                "-G",
+                "Ninja"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "detail": "Run cmake configure script",
+        },
+        {
+            "type": "shell",
+            "label": "Build PurePhone (RT1051)",
+            "command": "ninja",
+            "args": [
+                "-j`nproc`",
+                "Pure"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build-PurePhone-rt1051-RelWithDebInfo"
+            },
+            "group": "build",
+            "detail": "Build dir has to be configured with Cmake using Ninja",
+        },
+        {
+            "type": "shell",
+            "label": "Configure and Build PurePhone (RT1051)",
+            "group": "build",
+            "dependsOn": ["Configure PurePhone (RT1051)", "Build PurePhone (RT1051)"],
+            "dependsOrder": "sequence",
+            "detail": "Configure cmake project and build with Ninja",
+        },
+
+        {
+            "type": "shell",
+            "label": "Configure BellHybrid (RT1051)",
+            "command": "./configure.sh",
+            "args": [
+                "bell",
+                "rt1051",
+                "RelWithDebInfo",
+                "-G",
+                "Ninja"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "detail": "Run cmake configure script",
+        },
+        {
+            "type": "shell",
+            "label": "Build BellHybrid (RT1051)",
+            "command": "ninja",
+            "args": [
+                "-j`nproc`",
+                "BellHybrid"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build-BellHybrid-rt1051-RelWithDebInfo"
+            },
+            "group": "build",
+            "detail": "Build dir has to be configured with Cmake using Ninja",
+        },
+        {
+            "type": "shell",
+            "label": "Configure and Build BellHybrid (RT1051)",
+            "group": "build",
+            "dependsOn": ["Configure BellHybrid (RT1051)", "Build BellHybrid (RT1051)"],
+            "dependsOrder": "sequence",
+            "detail": "Configure cmake project and build with Ninja",
+        },
+
+        // {
+        //     "type": "shell",
+        //     "label": "Run JLink Server for PurePhone (RT1051)",
+        //     //"command": "if ps -C JLinkGDBServerCLExe -o comm= 2>/dev/null | grep -x JLinkGDBServerC >/dev/null 2>&1; then echo \"JLinkGDBServerCLExe is already running\"; else ./StartJLinkServer.sh; fi",
+        //     "command": "./StartJLinkServer.sh",
+        //     "args": [
+        //     ],
+        //     "options": {
+        //         "cwd": "${workspaceFolder}"
+        //     },
+        //     "group": "build", // TEST, this is technically incorrect
+        //     "detail": "Run JLink Server for PurePhone required for debugging",
+        // },
+    ]
+}
