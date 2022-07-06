@@ -706,5 +706,7 @@
   "app_bell_meditation_settings": "Ajustes",
   "app_bell_meditation_start_delay": "Retraso en el inicio",
   "app_bell_meditation_chime_interval_bottom": "de la meditación",
-  "app_bell_meditation_chime_volume": "Volumen del timbre"
+  "app_bell_meditation_chime_volume": "Volumen del timbre",
+  "app_meditation_summary": "<text>Has meditado por<br />",
+  "app_meditation_countdown_desc": "Empieza en"
 }

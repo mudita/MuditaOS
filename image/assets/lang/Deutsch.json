@@ -706,5 +706,7 @@
   "app_bell_meditation_settings": "Einstellungen",
   "app_bell_meditation_start_delay": "Verzögerung starten",
   "app_bell_meditation_chime_interval_bottom": "der meditation",
-  "app_bell_meditation_chime_volume": "Glocken-Lautstärke"
+  "app_bell_meditation_chime_volume": "Glocken-Lautstärke",
+  "app_meditation_summary": "<text>Du meditierst seit<br />",
+  "app_meditation_countdown_desc": "Beginnt in"
 }

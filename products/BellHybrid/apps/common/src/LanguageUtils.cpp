@@ -5,10 +5,10 @@
 
 namespace
 {
-    std::string transform(const std::uint32_t val,
-                          const std::string &minuteLower,
-                          const std::string &minutesLower,
-                          const std::string &minutesLowerGenitive)
+    std::string transformNumeral(const std::uint32_t val,
+                                 const std::string &minuteLower,
+                                 const std::string &minutesLower,
+                                 const std::string &minutesLowerGenitive)
     {
         if (val == 1) {
             return minuteLower;
@@ -24,23 +24,46 @@ namespace
         }
         return minutesLower;
     }
+
+    std::string transformAccusative(const std::uint32_t val,
+                                    const std::string &minuteLower,
+                                    const std::string &minuteAccusative,
+                                    const std::string &minutesLower,
+                                    const std::string &minutesLowerGenitive)
+    {
+        if (val == 1 && utils::getDisplayLanguage() == "Polski") {
+            return minuteAccusative;
+        }
+        else {
+            return transformNumeral(val, minuteLower, minutesLower, minutesLowerGenitive);
+        }
+    }
 } // namespace
 
 namespace utils::language
 {
     auto getCorrectMinutesNumeralForm(const std::uint32_t val) -> std::string
     {
-        return transform(val,
-                         utils::translate("common_minute_lower"),
-                         utils::translate("common_minutes_lower"),
-                         utils::translate("common_minutes_lower_genitive"));
+        return transformNumeral(val,
+                                utils::translate("common_minute_lower"),
+                                utils::translate("common_minutes_lower"),
+                                utils::translate("common_minutes_lower_genitive"));
     }
 
     auto getCorrectSecondsNumeralForm(const std::uint32_t val) -> std::string
     {
-        return transform(val,
-                         utils::translate("common_second_lower"),
-                         utils::translate("common_seconds_lower"),
-                         utils::translate("common_seconds_lower_genitive"));
+        return transformNumeral(val,
+                                utils::translate("common_second_lower"),
+                                utils::translate("common_seconds_lower"),
+                                utils::translate("common_seconds_lower_genitive"));
+    }
+
+    auto getCorrectMinutesAccusativeForm(const std::uint32_t val) -> std::string
+    {
+        return transformAccusative(val,
+                                   utils::translate("common_minute_lower"),
+                                   utils::translate("common_minute_lower_accusative"),
+                                   utils::translate("common_minutes_lower"),
+                                   utils::translate("common_minutes_lower_genitive"));
     }
 } // namespace utils::language

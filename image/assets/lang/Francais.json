@@ -676,5 +676,7 @@
   "app_bell_meditation_settings": "Paramètres",
   "app_bell_meditation_start_delay": "Retard de lancement",
   "app_bell_meditation_chime_interval_bottom": "de la méditation",
-  "app_bell_meditation_chime_volume": "Volume du gong intervalle"
+  "app_bell_meditation_chime_volume": "Volume du gong intervalle",
+  "app_meditation_summary": "<text>Vous a vez médité pendant<br />",
+  "app_meditation_countdown_desc": "Début dans"
 }
