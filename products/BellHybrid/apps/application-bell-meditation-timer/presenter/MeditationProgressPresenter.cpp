@@ -91,7 +91,7 @@ namespace app::meditation
         timer->stop();
         const auto elapsed     = std::chrono::duration_cast<std::chrono::minutes>(timer->getElapsed());
         const auto summaryText = utils::translate("app_meditation_summary") + std::to_string(elapsed.count()) + " " +
-                                 utils::language::getCorrectMinutesNumeralForm(elapsed.count());
+                                 utils::language::getCorrectMinutesAccusativeForm(elapsed.count());
         app->switchWindow(
             gui::window::bell_finished::defaultName,
             gui::BellFinishedWindowData::Factory::create("big_namaste_W_G", "", summaryText, true, endWindowTimeout));

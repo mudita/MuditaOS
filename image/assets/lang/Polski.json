@@ -77,6 +77,7 @@
   "common_search": "SZUKAJ",
   "common_accept": "AKCEPTUJ",
   "common_minute_lower": "minuta",
+  "common_minute_lower_accusative": "minutę",
   "common_minutes_lower": "minuty",
   "common_minutes_lower_genitive": "minut",
   "common_minute_short": "min",
@@ -724,5 +725,7 @@
   "app_bell_meditation_settings": "Ustawienia",
   "app_bell_meditation_start_delay": "Opóźnienie startu",
   "app_bell_meditation_chime_interval_bottom": "medytacji",
-  "app_bell_meditation_chime_volume": "Głośność dzwonka interwału"
+  "app_bell_meditation_chime_volume": "Głośność dzwonka interwału",
+  "app_meditation_summary": "<text>Medytowałeś przez<br />",
+  "app_meditation_countdown_desc": "Startuje za"
 }
