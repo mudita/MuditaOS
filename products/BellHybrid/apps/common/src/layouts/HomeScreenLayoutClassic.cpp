@@ -116,11 +116,13 @@ namespace gui
         case app::home_screen::ViewState::AlarmRinging:
             alarm->setAlarmStatus(AlarmSetSpinner::Status::RINGING);
             setHeaderViewMode(HeaderViewMode::AlarmIcon);
+            alarm->setEditMode(EditMode::Browse);
             removeTextDescription();
             break;
         case app::home_screen::ViewState::AlarmRingingDeactivatedWait:
             alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
             setHeaderViewMode(HeaderViewMode::AlarmIcon);
+            alarm->setEditMode(EditMode::Browse);
             break;
         case app::home_screen::ViewState::AlarmSnoozedWait:
             setHeaderViewMode(HeaderViewMode::SnoozeIcon);
@@ -128,6 +130,7 @@ namespace gui
             break;
         case app::home_screen::ViewState::AlarmSnoozed:
             setHeaderViewMode(HeaderViewMode::SnoozeIconAndTime);
+            alarm->setEditMode(EditMode::Browse);
             removeTextDescription();
             break;
         }
