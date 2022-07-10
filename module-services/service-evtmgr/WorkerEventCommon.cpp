@@ -146,40 +146,39 @@ bool WorkerEventCommon::deinit(void)
     return true;
 }
 
-void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
+void WorkerEventCommon::sendKeyUnicast(RawKey const &key)
 {
     auto message = std::make_shared<sevm::KbdMessage>();
+    message->key = key;
+    service->bus.sendUnicast(message, service::name::evt_manager);
+}
 
-    message->key.keyCode = code;
-
+void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
+{
     switch (event) {
-    case bsp::KeyEvents::Pressed:
+    case bsp::KeyEvents::Pressed: {
+        auto const tick = xTaskGetTickCount();
         if (lastState == bsp::KeyEvents::Pressed) {
-            return;
+            LOG_WARN("Generating Release %s", c_str(lastPressed));
+            sendKeyUnicast({RawKey::State::Released, lastPressed, 0, tick});
         }
-        message->key.state     = RawKey::State::Pressed;
-        message->key.timePress = xTaskGetTickCount();
-        lastPressed            = code;
-        lastState              = event;
-        break;
-    case bsp::KeyEvents::Released:
-        if (lastState != bsp::KeyEvents::Pressed) {
-            return;
-        }
-        if (lastPressed != code) {
-            return;
-        }
-        lastState = bsp::KeyEvents::Released;
-        {
-            message->key.state       = RawKey::State::Released;
-            message->key.timeRelease = xTaskGetTickCount();
-        }
-        break;
-    case bsp::KeyEvents::Moved:
-        message->key.state = RawKey::State::Moved;
+        sendKeyUnicast({RawKey::State::Pressed, code, tick, 0});
+        lastState   = bsp::KeyEvents::Pressed;
+        lastPressed = code;
         break;
     }
-    service->bus.sendUnicast(message, service::name::evt_manager);
+    case bsp::KeyEvents::Released:
+        if (lastState != bsp::KeyEvents::Pressed || lastPressed != code) {
+            return;
+        }
+        sendKeyUnicast({RawKey::State::Released, code, 0, xTaskGetTickCount()});
+        lastState   = bsp::KeyEvents::Released;
+        lastPressed = code;
+        break;
+    case bsp::KeyEvents::Moved:
+        sendKeyUnicast({RawKey::State::Moved, code});
+        break;
+    }
 }
 
 void WorkerEventCommon::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency)

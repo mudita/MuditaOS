@@ -69,6 +69,7 @@ class WorkerEventCommon : public sys::Worker
     void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency);
     bool initEventQueues();
     bool initCommonHardwareComponents();
+    void sendKeyUnicast(RawKey const &key);
 
     /**
      * @brief list of keys with long press enabled. First item is key code, second is long press time.
