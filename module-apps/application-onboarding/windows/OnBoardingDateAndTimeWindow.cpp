@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingDateAndTimeWindow.hpp"
@@ -28,10 +28,6 @@ namespace app::onBoarding
     {
         DateAndTimeMainWindow::onBeforeShow(mode, data);
         header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
-
-        navBar->setText(gui::nav_bar::Side::Center, utils::translate(style::strings::common::save));
-        navBar->setText(gui::nav_bar::Side::Left, utils::translate(style::strings::common::Switch));
-        navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
     }
 
     bool OnBoardingDateAndTimeWindow::onInput(const gui::InputEvent &inputEvent)
