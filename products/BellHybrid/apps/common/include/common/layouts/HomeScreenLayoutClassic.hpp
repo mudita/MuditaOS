@@ -39,12 +39,6 @@ namespace gui
         SnoozeIconAndTime,
     };
 
-    namespace battery
-    {
-        constexpr auto chargingLevelHideBot    = 100;
-        constexpr auto dischargingLevelShowTop = 20;
-    }; // namespace battery
-
     class HomeScreenLayoutClassic : public BaseHomeScreenLayoutProvider, BellBaseLayout
     {
       public:

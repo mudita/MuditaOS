@@ -8,12 +8,22 @@
 #include "widgets/SnoozeTimer.hpp"
 
 #include <apps-common/actions/AlarmRingingData.hpp>
-#include <gui/input/InputEvent.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
 #include <time/time_constants.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/TimeSetFmtSpinner.hpp>
+
+namespace
+{
+    constexpr auto dischargingLevelShowTop = 20;
+
+    bool isBatteryCharging(const Store::Battery::State state)
+    {
+        using State = Store::Battery::State;
+        return state == State::Charging or state == State::ChargingDone;
+    }
+} // namespace
 
 namespace gui
 {
@@ -193,15 +203,12 @@ namespace gui
 
     bool HomeScreenLayoutClassic::isBatteryVisibilityAllowed(const Store::Battery &batteryContext)
     {
-        // TODO fix magic values
-        return (batteryContext.level < battery::dischargingLevelShowTop) ||
-               (batteryContext.state == Store::Battery::State::Charging &&
-                batteryContext.level != battery::chargingLevelHideBot);
+        return (batteryContext.level < dischargingLevelShowTop) || isBatteryCharging(batteryContext.state);
     }
 
     void HomeScreenLayoutClassic::setBatteryLevelState(const Store::Battery &batteryContext)
     {
-        battery->update(batteryContext);
+        battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
         if (isBatteryVisibilityAllowed(batteryContext)) {
             battery->setVisible(true);
         }

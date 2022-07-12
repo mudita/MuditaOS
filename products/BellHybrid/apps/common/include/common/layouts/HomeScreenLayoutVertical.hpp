@@ -24,12 +24,6 @@ namespace gui
     class Icon;
     class Item;
 
-    namespace battery_vertical
-    {
-        constexpr auto chargingLevelHideBot    = 100;
-        constexpr auto dischargingLevelShowTop = 20;
-    }; // namespace battery_vertical
-
     enum class ScreenMode
     {
         Main,

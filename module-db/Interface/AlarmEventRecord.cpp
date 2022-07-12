@@ -39,9 +39,6 @@ auto AlarmEventRecord::isValid() const -> bool
 AlarmEventRecordInterface::AlarmEventRecordInterface(EventsDB *eventsDB) : eventsDB(eventsDB)
 {}
 
-AlarmEventRecordInterface::~AlarmEventRecordInterface()
-{}
-
 std::unique_ptr<db::QueryResult> AlarmEventRecordInterface::runQuery(std::shared_ptr<db::Query> query)
 {
     if (typeid(*query) == typeid(db::query::alarmEvents::Add)) {

@@ -7,22 +7,22 @@
 
 namespace
 {
+    constexpr auto battery_low      = "bell_battery_lvl1";
+    constexpr auto battery_charging = "bell_battery_charging";
+
     constexpr auto entries = std::array<battery_utils::BatteryLevelEntry, 6>{{{{0, 9}, "bell_battery_empty"},
                                                                               {{10, 19}, "bell_battery_lvl1"},
                                                                               {{20, 39}, "bell_battery_lvl2"},
                                                                               {{40, 69}, "bell_battery_lvl3"},
                                                                               {{70, 95}, "bell_battery_lvl4"},
                                                                               {{96, 100}, "bell_battery_lvl5"}}};
-
-    constexpr auto betteryFullLevel = 100;
-    constexpr auto lowBatteryLimit  = 20;
 } // namespace
 
 namespace gui
 {
     BellBattery::BellBattery(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : HBox(parent, x, y, w, h)
     {
-        img = new Image(this, battery::battery_low, gui::ImageTypeSpecifier::W_M);
+        img = new Image(this, battery_low, gui::ImageTypeSpecifier::W_M);
         img->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         img->setMargins(gui::Margins(0, 0, battery::image_right_margin, 0));
 
@@ -36,18 +36,17 @@ namespace gui
         percentText->setVisible(false);
     }
 
-    void BellBattery::update(const Store::Battery &batteryContext)
+    void BellBattery::update(const units::SOC soc, const bool isCharging)
     {
-        const auto image = battery_utils::getBatteryLevelImage(entries, batteryContext.level);
+        const auto image = battery_utils::getBatteryLevelImage(entries, soc);
         if (not image) {
             return;
         }
 
-        const auto level = batteryContext.level;
-        percentText->setText(std::to_string(level) + "%");
+        percentText->setText(std::to_string(soc) + "%");
 
-        if (batteryContext.state == Store::Battery::State::Charging) {
-            img->set(battery::battery_charging, gui::ImageTypeSpecifier::W_M);
+        if (isCharging) {
+            img->set(battery_charging, gui::ImageTypeSpecifier::W_M);
         }
         else {
             img->set(image->data(), gui::ImageTypeSpecifier::W_M);
@@ -68,12 +67,5 @@ namespace gui
         if (batteryPercentMode == BatteryPercentMode::Hide) {
             percentText->setVisible(false);
         }
-    }
-
-    std::uint32_t BellBattery::getLevel()
-    {
-        auto percentTextStr  = std::string(percentText->getText().c_str());
-        auto batteryLevelStr = percentTextStr.substr(0, percentTextStr.size() - 1);
-        return std::stoi(batteryLevelStr);
     }
 } // namespace gui
