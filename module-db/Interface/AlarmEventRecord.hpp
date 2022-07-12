@@ -66,7 +66,7 @@ class AlarmEventRecordInterface : public db::Interface
 {
   public:
     explicit AlarmEventRecordInterface(EventsDB *eventsDB);
-    ~AlarmEventRecordInterface();
+    virtual ~AlarmEventRecordInterface() noexcept = default;
 
     std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
