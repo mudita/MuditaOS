@@ -36,12 +36,15 @@ namespace
         decorateProgressItem(progressBar, gui::Alignment::Vertical::Center);
         return progressBar;
     }
-    gui::Text *createTimer(gui::Item *parent)
+    gui::TimeFixedWidget *createTimer(gui::Item *parent)
     {
         using namespace style;
         using namespace gui::powerNapStyle;
-        auto timer = new gui::Text(
-            parent, 0, 0, bell_base_layout::w, bell_base_layout::outer_layouts_h - progress::bottomDescTopMargin);
+        auto timer = new gui::TimeFixedWidget(parent,
+                                              0,
+                                              0,
+                                              bell_base_layout::outer_layouts_w,
+                                              bell_base_layout::outer_layouts_h - progress::bottomDescTopMargin);
         timer->setFont(napTimerFont);
         timer->setMargins(gui::Margins(0, progress::bottomDescTopMargin, 0, 0));
         decorateProgressItem(timer, gui::Alignment::Vertical::Top);

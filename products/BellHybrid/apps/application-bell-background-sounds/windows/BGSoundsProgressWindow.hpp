@@ -5,6 +5,7 @@
 
 #include "presenter/BGSoundsProgressPresenter.hpp"
 #include "data/BGSoundsAudioData.hpp"
+#include <apps-common/widgets/TimeFixedWidget.hpp>
 #include <AppWindow.hpp>
 #include <common/widgets/BellStatusClock.hpp>
 
@@ -17,7 +18,7 @@ namespace gui
         std::shared_ptr<app::bgSounds::BGSoundsProgressContract::Presenter> presenter;
         gui::Text *title            = nullptr;
         gui::HBarGraph *progressBar = nullptr;
-        gui::Text *timerText        = nullptr;
+        gui::TimeFixedWidget *timerText = nullptr;
         gui::BellStatusClock *time  = nullptr;
         std::unique_ptr<BGSoundsAudioContext> audioContext;
 

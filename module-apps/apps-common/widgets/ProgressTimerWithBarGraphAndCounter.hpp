@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ProgressTimer.hpp"
+#include "TimeFixedWidget.hpp"
 #include <Timers/TimerHandle.hpp>
 #include <time/time_conversion.hpp>
 #include <atomic>
@@ -21,6 +22,7 @@ namespace app
     {
         gui::Text *text         = nullptr;
         gui::Progress *progress = nullptr;
+        gui::TimeFixedWidget *timeWidget = nullptr;
 
         void update() override;
         void updateText();
@@ -31,6 +33,7 @@ namespace app
 
         void attach(gui::Progress *_progress);
         void attach(gui::Text *_text);
+        void attach(gui::TimeFixedWidget *_timeWidget);
     };
 
 } // namespace app

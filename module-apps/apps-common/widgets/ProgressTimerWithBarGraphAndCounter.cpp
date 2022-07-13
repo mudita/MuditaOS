@@ -23,18 +23,9 @@ namespace app
 
     void ProgressTimerWithBarGraphAndCounter::updateText()
     {
-        using utils::time::Duration;
-        if (text == nullptr) {
-            return;
-        }
         const auto secondsRemaining = duration - std::chrono::duration_cast<std::chrono::seconds>(elapsed);
-        const Duration remainingDuration{std::time_t{secondsRemaining.count()}};
-        UTF8 timerText;
-        if (countdownMode == ProgressCountdownMode::Increasing && secondsRemaining != std::chrono::seconds::zero()) {
-            timerText += increasingModePrefix;
-        }
-        timerText += remainingDuration.str(displayFormat);
-        text->setText(std::move(timerText));
+        timeWidget->setFirst(secondsRemaining.count() / 60);
+        timeWidget->setSecond(secondsRemaining.count() % 60);
     }
 
     void ProgressTimerWithBarGraphAndCounter::updateProgress()
@@ -58,5 +49,11 @@ namespace app
     {
         Expects(_text != nullptr);
         text = _text;
+    }
+
+    void ProgressTimerWithBarGraphAndCounter::attach(gui::TimeFixedWidget *_timeWidget)
+    {
+        Expects(_timeWidget != nullptr);
+        timeWidget = _timeWidget;
     }
 } // namespace app

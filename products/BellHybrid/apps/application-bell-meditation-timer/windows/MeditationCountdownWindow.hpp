@@ -7,6 +7,7 @@
 #include <AppWindow.hpp>
 #include <InputEvent.hpp>
 #include <Text.hpp>
+#include <apps-common/widgets/TimeFixedWidget.hpp>
 
 #include "MeditationCountdownPresenter.hpp"
 
@@ -30,7 +31,7 @@ namespace gui
         std::unique_ptr<app::meditation::MeditationCountdownContract::Presenter> presenter;
         VBox *mainVBox    = nullptr;
         Arc *progress     = nullptr;
-        Text *timer       = nullptr;
+        TimeFixedWidget *timer = nullptr;
         Text *description = nullptr;
 
         void buildLayout();

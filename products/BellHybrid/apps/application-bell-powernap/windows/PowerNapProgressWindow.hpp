@@ -5,6 +5,7 @@
 
 #include "presenter/PowerNapProgressPresenter.hpp"
 #include <common/widgets/BellStatusClock.hpp>
+#include <apps-common/widgets/TimeFixedWidget.hpp>
 #include <AppWindow.hpp>
 
 namespace gui
@@ -15,7 +16,7 @@ namespace gui
     {
         std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter;
         gui::HBarGraph *progressBar = nullptr;
-        gui::Text *timerText        = nullptr;
+        gui::TimeFixedWidget *timerText = nullptr;
         gui::BellStatusClock *time  = nullptr;
 
         void buildInterface() override;
