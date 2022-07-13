@@ -43,7 +43,7 @@ namespace mocks
     auto multicast()
     {
         fakeit::Mock<call::api::Multicast> multicast;
-        fakeit::When(Method(multicast, notifyIncommingCall)).AlwaysReturn();
+        fakeit::When(Method(multicast, notifyIncomingCall)).AlwaysReturn();
         fakeit::When(Method(multicast, notifyIdentifiedCall)).AlwaysReturn();
         fakeit::When(Method(multicast, notifyCallActive)).AlwaysReturn();
         fakeit::When(Method(multicast, notifyCallAborted)).AlwaysReturn();
@@ -83,7 +83,7 @@ namespace mocks
     auto api(bool dnd = false, bool tethering = false)
     {
         fakeit::Mock<call::api::Api> api;
-        fakeit::When(Method(api, answerIncommingCall)).AlwaysReturn(true);
+        fakeit::When(Method(api, answerIncomingCall)).AlwaysReturn(true);
         fakeit::When(Method(api, hangupCall)).AlwaysReturn(true);
         fakeit::When(Method(api, rejectCall)).AlwaysReturn(true);
         fakeit::When(Method(api, areCallsFromFavouritesEnabled)).AlwaysReturn(true);
@@ -139,7 +139,7 @@ namespace mocks
 } // namespace mocks
 
 // ----------------------------------
-// INCOMMING CALL TESTS - mode normal
+// INCOMING CALL TESTS - mode normal
 // ----------------------------------
 
 TEST_CASE("base positive call flow, answered, end from caller")
@@ -300,7 +300,7 @@ TEST_CASE("call missed on PURE after CLIP")
 }
 
 // ---------------------------------
-// INCOMMING CALL TESTS - mode dnd
+// INCOMING CALL TESTS - mode dnd
 // ---------------------------------
 
 TEST_CASE("call incoming - dnd - not favourite")
@@ -349,7 +349,7 @@ TEST_CASE("call incoming - dnd - in favourite - calls from favourites enabled")
     REQUIRE(machine->machine.is("HaveId"_s));
 }
 
-TEST_CASE("call incomming - proper date")
+TEST_CASE("call incoming - proper date")
 {
     auto di      = mocks::DIWrapper();
     auto machine = std::make_unique<call::StateMachine>(di.get());

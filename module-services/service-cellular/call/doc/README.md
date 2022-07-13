@@ -4,7 +4,7 @@ Call documentation
 MuditaOS's call library is able to perform:
 - ingoring and outgoing calls
 - perform call filtering
-    - on RING (notification that there is incomming call)
+    - on RING (notification that there is incoming call)
     - on CLIP (notification on identified call)
     - based on contacts
     - based on phone mode

@@ -14,7 +14,7 @@ namespace call::api
     class Api
     {
       public:
-        virtual bool answerIncommingCall()            = 0;
+        virtual bool answerIncomingCall()            = 0;
         virtual bool hangupCall()                     = 0;
         virtual bool rejectCall()                     = 0;
         virtual bool areCallsFromFavouritesEnabled()  = 0;
@@ -36,7 +36,7 @@ namespace cellular
         Api() = default;
         Api(ServiceCellular *cellular, CellularMux *);
 
-        bool answerIncommingCall() override;
+        bool answerIncomingCall() override;
         bool hangupCall() override;
         bool rejectCall() override;
         bool areCallsFromFavouritesEnabled() override;
