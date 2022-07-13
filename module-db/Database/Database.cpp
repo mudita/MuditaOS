@@ -72,6 +72,7 @@ extern "C"
 }
 
 constexpr auto dbApplicationId = 0x65727550; // ASCII for "Pure"
+constexpr auto enabled         = 1;
 
 Database::Database(const char *name, bool readOnly)
     : dbConnection(nullptr), dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false),
@@ -83,7 +84,7 @@ Database::Database(const char *name, bool readOnly)
         LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
         throw DatabaseInitialisationError{"Failed to initialize the sqlite db"};
     }
-
+    sqlite3_extended_result_codes(dbConnection, enabled);
     initQueryStatementBuffer();
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
@@ -168,10 +169,12 @@ bool Database::execute(const char *format, ...)
     va_start(ap, format);
     sqlite3_vsnprintf(maxQueryLen, queryStatementBuffer, format, ap);
     va_end(ap);
-
     if (const int result = sqlite3_exec(dbConnection, queryStatementBuffer, nullptr, nullptr, nullptr);
         result != SQLITE_OK) {
-        LOG_ERROR("Execution of query failed with %d", result);
+        LOG_ERROR("Execution of query failed with %d, errcode: %d, extended errcode: %d",
+                  result,
+                  sqlite3_errcode(dbConnection),
+                  sqlite3_extended_errcode(dbConnection));
         return false;
     }
     return true;
@@ -267,8 +270,20 @@ void Database::pragmaQuery(const std::string &pragmaStatement)
 
 bool Database::storeIntoFile(const std::filesystem::path &backupPath)
 {
+    // kind of workaround-fix for creating the backup - if somehow DB can't be properly
+    // vacuumed into file, the transaction is still outgoing (probably nested transaction)
+    // that's why we need to commit it manually
+    if (sqlite3_get_autocommit(dbConnection) == 0) {
+        if (const auto rc = execute("COMMIT;"); !rc) {
+            LOG_ERROR("failed to execute commit; sqlite3 autocommit after commit: %d",
+                      sqlite3_get_autocommit(dbConnection));
+            return false;
+        }
+        LOG_INFO("sqlite3 autocommit after commit: %d", sqlite3_get_autocommit(dbConnection));
+    }
+
     LOG_INFO("Backup database: %s, into file: %s - STARTED", dbName.c_str(), backupPath.c_str());
-    if (const auto rc = execute("VACUUM INTO '%q';", backupPath.c_str()); !rc) {
+    if (const auto rc = execute("VACUUM main INTO '%q';", backupPath.c_str()); !rc) {
         LOG_ERROR("Backup database: %s, into file: %s - FAILED", dbName.c_str(), backupPath.c_str());
         return false;
     }

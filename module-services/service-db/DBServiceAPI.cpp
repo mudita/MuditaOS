@@ -268,8 +268,8 @@ auto DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath) -> bool
         std::make_shared<DBServiceMessageBackup>(MessageType::DBServiceBackup, backupPath);
 
     auto ret = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
-    if (ret.first == sys::ReturnCodes::Success) {
-        return true;
+    if (auto retMsg = dynamic_cast<DBServiceResponseMessage *>(ret.second.get()); retMsg) {
+        return retMsg->retCode;
     }
     LOG_ERROR("DBBackup error, return code: %s", c_str(ret.first));
     return false;
