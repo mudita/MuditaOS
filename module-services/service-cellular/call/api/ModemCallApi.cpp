@@ -12,7 +12,7 @@ namespace cellular
     Api::Api(ServiceCellular *cellular, CellularMux *cmux) : cellular(cellular), cmux(cmux)
     {}
 
-    bool Api::answerIncommingCall()
+    bool Api::answerIncomingCall()
     {
         if (cmux == nullptr) {
             throw std::runtime_error("call api not initialized");
