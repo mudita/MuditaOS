@@ -16,7 +16,7 @@ namespace call::api
     class Multicast
     {
       public:
-        virtual void notifyIncommingCall()                                        = 0;
+        virtual void notifyIncomingCall()                                                      = 0;
         virtual void notifyIdentifiedCall(const utils::PhoneNumber::View &number) = 0;
         virtual void notifyCallActive()                                           = 0;
         virtual void notifyCallAborted()                                          = 0;
@@ -36,7 +36,7 @@ class CallMulticast : public call::api::Multicast
   public:
     explicit CallMulticast(sys::Service *owner) : owner(owner)
     {}
-    void notifyIncommingCall() override;
+    void notifyIncomingCall() override;
     void notifyIdentifiedCall(const utils::PhoneNumber::View &number) override;
     void notifyCallActive() override;
     void notifyCallAborted() override;

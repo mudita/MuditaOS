@@ -4,7 +4,7 @@
 #include "CallMulticast.hpp"
 #include "service-cellular/CellularMessage.hpp"
 
-void CallMulticast::notifyIncommingCall()
+void CallMulticast::notifyIncomingCall()
 {
     owner->bus.sendMulticast(std::make_shared<cellular::IncomingCallMessage>(),
                              sys::BusChannel::ServiceCellularNotifications);

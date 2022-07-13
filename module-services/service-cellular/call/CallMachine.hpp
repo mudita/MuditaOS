@@ -79,7 +79,7 @@ namespace call
     {
         void operator()(Dependencies &di, CallData &call)
         {
-            di.multicast->notifyIncommingCall();
+            di.multicast->notifyIncomingCall();
             di.db->startCall(call.record);
             di.gui->notifyRING();
             di.audio->play();
@@ -150,7 +150,7 @@ namespace call
         }
     } constexpr HandleDND_Reject;
 
-    /// when we have ongoing call - handle incomming CLIP information
+    /// when we have ongoing call - handle incoming CLIP information
     /// this happens when we answer call before first CLIP is received
     struct HandleAddID
     {
@@ -167,7 +167,7 @@ namespace call
     {
         void operator()(Dependencies &di, CallData &call)
         {
-            if (not di.modem->answerIncommingCall()) {
+            if (not di.modem->answerIncomingCall()) {
                 throw std::runtime_error("modem failure!");
             }
             di.audio->routingStart();
