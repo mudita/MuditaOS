@@ -57,6 +57,7 @@ target_sources(apps-common
         widgets/AlarmSetSpinner.cpp
         widgets/TimeSetFmtSpinner.cpp
         widgets/TimeWidget.cpp
+        widgets/TimeFixedWidget.cpp
         widgets/WidgetsUtils.cpp
         widgets/ProgressTimer.cpp
         widgets/ProgressTimerWithBarGraphAndCounter.cpp

@@ -8,6 +8,7 @@
 #include <InputEvent.hpp>
 #include <Text.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
+#include <apps-common/widgets/TimeFixedWidget.hpp>
 #include <common/widgets/BellStatusClock.hpp>
 #include <gui/widgets/Icon.hpp>
 
@@ -35,7 +36,7 @@ namespace gui
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> presenter;
         gui::VBox *mainVBox           = nullptr;
         gui::ArcProgressBar *progress = nullptr;
-        gui::Text *timer              = nullptr;
+        gui::TimeFixedWidget *timer   = nullptr;
         gui::Icon *icon               = nullptr;
         gui::BellStatusClock *clock   = nullptr;
 
