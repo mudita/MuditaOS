@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -30,7 +30,7 @@ typedef struct
 {
     al3644tt_brightness_code brightness_code : 7;
     uint8_t led2_brightness_override : 1;
-} al3644tt_led1_torch_brightness;
+} al3644tt_led1_torch_brightness_reg;
 
 constexpr bool AL3644TT_LED1_TORCH_BRIGHTNESS_OVERRIDE      = 0b1;
 constexpr auto AL3644TT_LED1_TORCH_BRIGHTNESS_DONT_OVERRIDE = 0b0;
@@ -79,8 +79,11 @@ typedef struct
 {
     uint8_t silicon_rev : 3;
     uint8_t device_id : 3;
-} al3644tt_device_id;
+} al3644tt_device_id_reg;
 
 constexpr auto AL3644TT_ID    = 0b000;
 constexpr auto AL3644TT_REV_1 = 0b100;
 constexpr auto AL3644TT_REV_2 = 0b010;
+
+constexpr auto AL3644TT_ENABLE  = 1;
+constexpr auto AL3644TT_DISABLE = 0;
