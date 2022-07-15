@@ -129,9 +129,7 @@ void EventManager::toggleTorchColor()
 }
 
 void EventManager::ProcessCloseReason(sys::CloseReason closeReason)
-{
-    bsp::torch::turn(bsp::torch::State::off);
-}
+{}
 
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
