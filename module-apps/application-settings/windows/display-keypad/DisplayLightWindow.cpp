@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DisplayLightWindow.hpp"
@@ -19,12 +19,16 @@ namespace gui
 
         setTitle(utils::translate("app_settings_display_display_light"));
 
+#if DEVELOPER_SETTINGS_OPTIONS == 1
+        // This timer interferes with navoptions of other windows so use it only for debug
         timerCallback = [this](Item &it, sys::Timer &task) { return onTimerTimeout(it, task); };
         timerTask     = app::GuiTimerFactory::createPeriodicTimer(
             application, this, "AmbientLightTimer", std::chrono::milliseconds{gui::lighting::AMBIENT_LIGHT_TIMER_MS});
         timerTask.start();
+#endif // DEVELOPER_SETTINGS_OPTIONS
     }
 
+#if DEVELOPER_SETTINGS_OPTIONS == 1
     DisplayLightWindow::~DisplayLightWindow()
     {
         if (timerTask.isActive()) {
@@ -34,6 +38,11 @@ namespace gui
 
     auto DisplayLightWindow::onTimerTimeout(Item &self, sys::Timer &task) -> bool
     {
+        // Skip refreshing values when not at DisplayLight window
+        if (application->getCurrentWindow()->getName() != gui::window::name::display_light) {
+            return false;
+        }
+
         ambientLight    = bsp::light_sensor::readout();
         auto values     = screenLightSettings->getCurrentValues();
         brightnessValue = values.parameters.manualModeBrightness;
@@ -42,6 +51,7 @@ namespace gui
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         return true;
     }
+#endif // DEVELOPER_SETTINGS_OPTIONS
 
     void DisplayLightWindow::switchHandler(bool &onOffSwitch)
     {
