@@ -160,11 +160,9 @@ namespace app
 
         connect(typeid(::message::bluetooth::ResponseStatus), [&](sys::Message *msg) {
             auto responseStatusMsg = static_cast<::message::bluetooth::ResponseStatus *>(msg);
-            if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
-                const auto status = responseStatusMsg->getStatus();
-                auto btStatusData = std::make_unique<gui::BluetoothStatusData>(status.state, status.visibility);
-                switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
-            }
+            const auto status         = responseStatusMsg->getStatus();
+            const auto bluetoothState = status.state == BluetoothStatus::State::On;
+            bluetoothSettingsModel->setStatus(bluetoothState, status.visibility);
             return sys::MessageNone{};
         });
 
@@ -327,6 +325,7 @@ namespace app
             ::settings::SettingsScope::Global);
 
         bluetoothSettingsModel->requestBondedDevices();
+        bluetoothSettingsModel->requestStatus();
         return ret;
     }
 
@@ -363,8 +362,8 @@ namespace app
             return std::make_unique<gui::TextImageColorWindow>(app);
         });
         // Bluetooth
-        windowsFactory.attach(gui::window::name::bluetooth, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::BluetoothWindow>(app);
+        windowsFactory.attach(gui::window::name::bluetooth, [this](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::BluetoothWindow>(app, bluetoothSettingsModel);
         });
         windowsFactory.attach(gui::window::name::add_device, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::AddDeviceWindow>(app, bluetoothSettingsModel);
