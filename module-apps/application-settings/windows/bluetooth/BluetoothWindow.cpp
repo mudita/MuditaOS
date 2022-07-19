@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothWindow.hpp"
@@ -19,17 +19,22 @@ namespace gui
         bluetoothSettingsModel->requestStatus();
     }
 
-    void BluetoothWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)
+    void BluetoothWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        const auto newData = dynamic_cast<BluetoothStatusData *>(data);
-        if (newData != nullptr) {
-            if (const auto btState = newData->getState(); btState.has_value()) {
-                isBluetoothSwitchOn = btState.value();
+        if (mode == ShowMode::GUI_SHOW_INIT) {
+            const auto newData = dynamic_cast<BluetoothStatusData *>(data);
+            if (newData != nullptr) {
+                if (const auto btState = newData->getState(); btState.has_value()) {
+                    isBluetoothSwitchOn = btState.value();
+                }
+                if (const auto visibility = newData->getVisibility(); visibility.has_value()) {
+                    isPhoneVisibilitySwitchOn = visibility.value();
+                }
+                refreshOptionsList();
             }
-            if (const auto visibility = newData->getVisibility(); visibility.has_value()) {
-                isPhoneVisibilitySwitchOn = visibility.value();
-            }
+            return;
         }
+
         refreshOptionsList();
     }
 

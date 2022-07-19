@@ -163,7 +163,8 @@ namespace app
             if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
                 const auto status = responseStatusMsg->getStatus();
                 auto btStatusData = std::make_unique<gui::BluetoothStatusData>(status.state, status.visibility);
-                switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
+                updateCurrentWindow(
+                    std::move(btStatusData), gui::ShowMode::GUI_SHOW_INIT, gui::RefreshModes::GUI_REFRESH_FAST);
             }
             return sys::MessageNone{};
         });
