@@ -11,7 +11,7 @@ namespace gui
     class BluetoothWindow : public BaseSettingsWindow
     {
       public:
-        explicit BluetoothWindow(app::ApplicationCommon *app);
+        BluetoothWindow(app::ApplicationCommon *app, std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel);
 
       private:
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -19,7 +19,7 @@ namespace gui
         void changeBluetoothState(bool &currentState);
         void changeVisibility(bool &currentVisibility);
 
-        std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
+        std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
         bool isBluetoothSwitchOn       = false;
         bool isPhoneVisibilitySwitchOn = false;
         OptionWindowDestroyer rai_destroyer = OptionWindowDestroyer(*this);

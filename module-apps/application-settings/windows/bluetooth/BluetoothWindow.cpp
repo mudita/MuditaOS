@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothWindow.hpp"
@@ -11,25 +11,20 @@
 namespace gui
 {
 
-    BluetoothWindow::BluetoothWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, window::name::bluetooth)
+    BluetoothWindow::BluetoothWindow(app::ApplicationCommon *app,
+                                     std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel)
+        : BaseSettingsWindow(app, window::name::bluetooth), bluetoothSettingsModel(bluetoothSettingsModel)
     {
         setTitle(utils::translate("app_settings_bluetooth_main"));
-
-        bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);
-        bluetoothSettingsModel->requestStatus();
     }
 
-    void BluetoothWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)
+    void BluetoothWindow::onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
-        const auto newData = dynamic_cast<BluetoothStatusData *>(data);
-        if (newData != nullptr) {
-            if (const auto btState = newData->getState(); btState.has_value()) {
-                isBluetoothSwitchOn = btState.value();
-            }
-            if (const auto visibility = newData->getVisibility(); visibility.has_value()) {
-                isPhoneVisibilitySwitchOn = visibility.value();
-            }
-        }
+        const auto bluetoothStatus = bluetoothSettingsModel->getStatus();
+
+        isBluetoothSwitchOn       = bluetoothStatus.state == BluetoothStatus::State::On;
+        isPhoneVisibilitySwitchOn = bluetoothStatus.visibility;
+
         refreshOptionsList();
     }
 
