@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimCard.hpp"
@@ -43,7 +43,7 @@ namespace cellular
     {
         bool SimCard::ready() const
         {
-            return channel;
+            return channel != nullptr;
         }
 
         bool SimCard::initialized() const
@@ -322,6 +322,11 @@ namespace cellular
 
         std::optional<at::SimInsertedStatus> SimCard::readSimCardInsertStatus()
         {
+            if (not ready()) {
+                LOG_ERROR("SIM not ready yet.");
+                return std::nullopt;
+            }
+
             auto command  = at::cmd::QSIMSTAT(at::cmd::Modifier::Get);
             auto response = channel->cmd(command);
             auto result   = command.parseQSIMSTAT(response);
