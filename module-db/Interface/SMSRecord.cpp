@@ -409,8 +409,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::addQuery(const std::shared_
     auto record           = localQuery->record;
     const auto result     = Add(record);
     if (result) {
-        record.ID = GetLastID();
+        record = GetByID(GetLastID());
     }
+
     auto response = std::make_unique<db::query::SMSAddResult>(record, result);
     response->setRequestQuery(query);
     response->setRecordID(record.ID);
