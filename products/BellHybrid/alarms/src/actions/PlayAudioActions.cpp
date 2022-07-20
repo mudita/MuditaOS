@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmSoundPaths.hpp"
@@ -35,7 +35,7 @@ namespace alarms
         const auto msg       = std::make_shared<service::AudioStopRequest>(stopPlaybackVec);
         return service.bus.sendUnicast(msg, service::audioServiceName);
     }
-    bool PlayAudioAction::execute()
+    bool PlayAudioAction::execute([[maybe_unused]] Record record)
     {
         const auto tone = settings.getValue(toneSetting, settings::SettingsScope::Global);
         std::optional<std::chrono::minutes> duration{};

@@ -17,7 +17,7 @@ namespace alarms
         auto result{true};
         if (record.enabled) {
             for (const auto &action : actions) {
-                result &= action->execute();
+                result &= action->execute(record.ID);
             }
         }
         return result;

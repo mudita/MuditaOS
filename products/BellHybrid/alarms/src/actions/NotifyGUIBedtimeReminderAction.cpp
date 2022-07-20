@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotifyGUIBedtimeReminderAction.hpp"
@@ -10,10 +10,12 @@ namespace alarms
 {
     NotifyGUIBedtimeReminderAction::NotifyGUIBedtimeReminderAction(sys::Service &service) : service{service}
     {}
-    bool NotifyGUIBedtimeReminderAction::execute()
+
+    bool NotifyGUIBedtimeReminderAction::execute(Record record)
     {
-        return service.bus.sendUnicast(std::make_shared<BedtimeNotification>(), service::name::appmgr);
+        return service.bus.sendUnicast(std::make_shared<BedtimeNotification>(record), service::name::appmgr);
     }
+
     bool NotifyGUIBedtimeReminderAction::turnOff()
     {
         return true;

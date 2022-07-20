@@ -128,6 +128,7 @@ target_link_libraries(application-bell-common
         module-gui
         bell::db
         Microsoft.GSL::GSL
+        bell::alarms
         )
 
 if (${ENABLE_TESTS})

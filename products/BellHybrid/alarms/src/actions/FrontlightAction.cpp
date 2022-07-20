@@ -18,7 +18,7 @@ namespace alarms
         {
           public:
             explicit ManualFrontlightAction(sys::Service &service);
-            bool execute() override;
+            bool execute(Record record) override;
             bool turnOff() override;
 
           private:
@@ -31,7 +31,7 @@ namespace alarms
         {
           public:
             explicit LinearProgressFrontlightAction(sys::Service &service);
-            bool execute() override;
+            bool execute(Record record) override;
             bool turnOff() override;
 
           private:
@@ -60,7 +60,7 @@ namespace alarms
                                                                     service::ServiceProxy{service.weak_from_this()}}
     {}
 
-    bool FrontlightAction::execute()
+    bool FrontlightAction::execute([[maybe_unused]] Record record)
     {
         std::string settingString;
 
@@ -84,7 +84,7 @@ namespace alarms
         case SettingsDependency::None:
             break;
         }
-        return pimpl->execute();
+        return pimpl->execute(record);
     }
 
     bool FrontlightAction::turnOff()
@@ -109,7 +109,7 @@ namespace alarms
     ManualFrontlightAction::ManualFrontlightAction(sys::Service &service) : service{service}
     {}
 
-    bool ManualFrontlightAction::execute()
+    bool ManualFrontlightAction::execute([[maybe_unused]] Record record)
     {
         auto params = prepareParameters();
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
@@ -136,7 +136,7 @@ namespace alarms
         settings.init(service::ServiceProxy{service.weak_from_this()});
     }
 
-    bool LinearProgressFrontlightAction::execute()
+    bool LinearProgressFrontlightAction::execute([[maybe_unused]] Record record)
     {
         const auto params = prepareParameters();
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightSetAutoProgressiveModeParams>(params),
@@ -155,9 +155,9 @@ namespace alarms
         return screen_light_control::LinearProgressModeParameters{
             .startBrightnessValue = 0.0f,
             .functions            = {screen_light_control::functions::LinearProgressFunction{.target   = 10.0f,
-                                                                                  .duration = firstTargetDuration},
-                          screen_light_control::functions::LinearProgressFunction{.target   = 100.0f,
-                                                                                  .duration = secondTargetDuration}},
+                                                                                             .duration = firstTargetDuration},
+                                     screen_light_control::functions::LinearProgressFunction{.target   = 100.0f,
+                                                                                             .duration = secondTargetDuration}},
             .brightnessHysteresis = 0.0f};
     }
 

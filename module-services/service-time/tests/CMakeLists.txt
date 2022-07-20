@@ -19,16 +19,25 @@ add_catch2_executable(
         module-db
 )
 
-add_gtest_executable(
-    NAME 
-        service-time-alarm-operations
-    SRCS
-        tests-AlarmOperations.cpp
-    LIBS
+add_library(service-time-alarm-operations-source OBJECT
+    tests-AlarmOperations.cpp)
+
+target_link_libraries(service-time-alarm-operations-source
+    PUBLIC
         module-sys
         service-time
-    INCLUDE
-        $<TARGET_PROPERTY:service-time,INCLUDE_DIRECTORIES>
-    DEFS
-        COMMON_ALARM_OPERATIONS_TEST
+        gtest_main
+        gmock
+        log-api)
+
+target_include_directories(service-time-alarm-operations-source
+    PUBLIC
+        $<TARGET_PROPERTY:service-time,INCLUDE_DIRECTORIES>)
+
+add_executable(googletest-service-time-alarm-operations)
+target_link_libraries(googletest-service-time-alarm-operations
+    PUBLIC
+    service-time-alarm-operations-source
 )
+
+add_gtest_manually_prepared_target(NAME googletest-service-time-alarm-operations)
