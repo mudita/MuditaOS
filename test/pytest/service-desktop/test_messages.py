@@ -73,6 +73,8 @@ def test_add_and_delete_message(harness):
     result, message_record = messages_tester.add_message(message_number, message_body)
     assert result, "Failed to add message!"
     assert message_record["messageBody"] == message_body, "Message body corrupted!"
+    assert message_record["messageID"] > 0, "Message ID not correct!"
+    assert message_record["threadID"] > 0, "Thread ID not correct!"
 
     result, received_messages_records_count = messages_tester.get_messages_count()
     assert result, "Failed to get messages count!"
