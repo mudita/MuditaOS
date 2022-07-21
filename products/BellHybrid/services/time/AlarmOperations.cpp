@@ -152,6 +152,18 @@ namespace alarms
           bedtime(std::move(bedtimeSettingsProvider))
     {}
 
+    bool AlarmOperations::turnOffAlarmIfFoundInBedtime(const std::uint32_t id)
+    {
+        if (not bedtime.isEventInContainer(id)) {
+            return false;
+        }
+
+        switchAlarmExecution(*(*bedtime.findEvent(id)), false);
+        bedtime.removeAllEvents();
+
+        return true;
+    }
+
     void AlarmOperations::minuteUpdated(TimePoint now)
     {
         /**
@@ -201,8 +213,10 @@ namespace alarms
     void AlarmOperations::processBedtime(TimePoint now)
     {
         if (bedtime.decide(now)) {
-            auto bedtimeEvent           = std::make_shared<AlarmEventRecord>();
-            bedtimeEvent.get()->enabled = true;
+
+            auto bedtimeEvent = bedtime.createEvent();
+            bedtime.pushEvent(bedtimeEvent);
+
             handleAlarmEvent(bedtimeEvent, alarms::AlarmType::BedtimeReminder, true);
         }
     }
@@ -282,7 +296,9 @@ namespace alarms
 
         handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
         handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
+        handleAlarmEvent(event, alarms::AlarmType::BedtimeReminder, false);
     }
+
     bool AlarmOperations::isBedtimeAllowed() const
     {
         return ongoingSingleEvents.empty() && snoozedSingleEvents.empty() && not preWakeUp.isActive();
@@ -334,6 +350,40 @@ namespace alarms
         const auto activated = settingsProvider->isBedtimeEnabled();
         const auto time      = settingsProvider->getBedtimeTime();
         return activated && isTimeForBed(now, time);
+    }
+
+    auto Bedtime::createEvent() -> std::shared_ptr<AlarmEventRecord>
+    {
+        auto bedtimeEvent     = std::make_shared<AlarmEventRecord>();
+        bedtimeEvent->enabled = true;
+        bedtimeEvent->ID      = nextFreeId;
+        nextFreeId++;
+
+        return bedtimeEvent;
+    }
+
+    void Bedtime::pushEvent(const std::shared_ptr<AlarmEventRecord> &bedtimeEvent)
+    {
+        auto bedtimeSingleEvent    = std::make_unique<SingleEventRecord>();
+        bedtimeSingleEvent->parent = bedtimeEvent;
+
+        bedtimeSingleEvents.push_back(std::move(bedtimeSingleEvent));
+    }
+
+    bool Bedtime::isEventInContainer(std::uint32_t id)
+    {
+        return findEvent(id) == bedtimeSingleEvents.end() ? false : true;
+    }
+
+    EventsContainer<SingleEventRecord>::iterator Bedtime::findEvent(uint32_t id)
+    {
+        return findSingleEventById(bedtimeSingleEvents, id);
+    }
+
+    void Bedtime::removeAllEvents()
+    {
+        bedtimeSingleEvents.clear();
+        nextFreeId = resonableIdOffset;
     }
 
     auto Bedtime::isTimeForBed(const TimePoint &now, const time_t &bedtime) -> bool

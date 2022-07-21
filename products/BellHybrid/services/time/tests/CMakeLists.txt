@@ -4,6 +4,7 @@ add_gtest_executable(
     SRCS
         test-BellAlarmOperations.cpp
     LIBS
+        service-time-alarm-operations-source
         module-sys
         bell::time
     INCLUDE

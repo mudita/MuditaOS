@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCommon.hpp"
-#include "GuiTimer.hpp"    // for GuiTimer
+#include "GuiTimer.hpp"            // for GuiTimer
 #include "Timers/TimerFactory.hpp" // for Timer
 #include "status-bar/Time.hpp"
 #include "messages/AppSwitchWindowPopupMessage.hpp"

@@ -1,15 +1,17 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <audio/AudioMessage.hpp>
 #include <apps-common/popups/Popups.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>
+#include <popups/data/BedtimeReminderPopupRequestParams.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <i18n/i18n.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <service-time/AlarmServiceAPI.hpp>
 
 namespace gui
 {
@@ -42,6 +44,25 @@ namespace gui
         icon->image->setMargins(Margins(0, icon::image_top_margin, 0, icon::image_bottom_margin));
         icon->text->setFont(style::window::font::verybiglight);
     }
+
+    bool BedtimeNotificationWindow::handleSwitchData(SwitchData *data)
+    {
+        if (data == nullptr) {
+            LOG_ERROR("Received null pointer");
+            return false;
+        }
+
+        auto *eventData = dynamic_cast<gui::BedtimeReminderPopupRequestParams *>(data);
+        if (eventData == nullptr) {
+            LOG_ERROR("eventData is null pointer");
+            return false;
+        }
+
+        currentEventRecord = eventData->eventRecord;
+
+        return true;
+    }
+
     void BedtimeNotificationWindow::onBeforeShow(ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
         WindowWithTimer::onBeforeShow(mode, data);
@@ -55,6 +76,7 @@ namespace gui
 
     void BedtimeNotificationWindow::returnToPreviousWindow()
     {
+        alarms::AlarmServiceAPI::requestTurnOffRingingAlarm(app, currentEventRecord.ID);
         detachTimerIfExists();
         app::manager::Controller::sendAction(
             application,
