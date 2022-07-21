@@ -15,6 +15,8 @@
 
 namespace alarms
 {
+    template <typename T> using EventsContainer = std::vector<std::unique_ptr<T>>;
+
     class IAlarmOperations
     {
       public:
@@ -114,14 +116,17 @@ namespace alarms
         AlarmHandlerFactory alarmHandlerFactory;
 
         // Events we are waiting for (on one timepoint)
-        std::vector<std::unique_ptr<SingleEventRecord>> nextSingleEvents;
-        std::vector<std::unique_ptr<SingleEventRecord>> ongoingSingleEvents;
-        std::vector<std::unique_ptr<SnoozedAlarmEventRecord>> snoozedSingleEvents;
+        EventsContainer<SingleEventRecord> nextSingleEvents;
+        EventsContainer<SingleEventRecord> ongoingSingleEvents;
+        EventsContainer<SnoozedAlarmEventRecord> snoozedSingleEvents;
 
         alarms::AlarmType getAlarmEventType(const SingleEventRecord &event);
         virtual void handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
                                       alarms::AlarmType alarmType,
                                       bool newStateOn);
+        virtual bool turnOffAlarmIfFoundInBedtime(std::uint32_t id);
+        bool turnOffAlarmIfFoundInOngoingEvents(std::uint32_t id);
+        void switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn);
 
       private:
         GetCurrentTime getCurrentTimeCallback;
@@ -139,7 +144,6 @@ namespace alarms
                                      std::vector<AlarmEventRecord> records,
                                      OnGetAlarmsProcessed handledCallback);
         void checkAndUpdateCache(AlarmEventRecord record);
-        void switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn);
         void processEvents(TimePoint now);
         void processOngoingEvents();
         void processNextEventsQueue(const TimePoint now);
@@ -160,8 +164,8 @@ namespace alarms
             IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const override;
     };
 
-    auto findSingleEventById(std::vector<std::unique_ptr<SingleEventRecord>> &events, const std::uint32_t id)
-        -> std::vector<std::unique_ptr<SingleEventRecord>>::iterator;
-    auto findSnoozedEventById(std::vector<std::unique_ptr<SnoozedAlarmEventRecord>> &events, const std::uint32_t id)
-        -> std::vector<std::unique_ptr<SnoozedAlarmEventRecord>>::iterator;
+    auto findSingleEventById(EventsContainer<SingleEventRecord> &events, const std::uint32_t id)
+        -> EventsContainer<SingleEventRecord>::iterator;
+    auto findSnoozedEventById(EventsContainer<SnoozedAlarmEventRecord> &events, const std::uint32_t id)
+        -> EventsContainer<SnoozedAlarmEventRecord>::iterator;
 } // namespace alarms

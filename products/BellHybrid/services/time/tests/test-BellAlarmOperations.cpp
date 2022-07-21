@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AlarmOperations.hpp>
@@ -8,15 +8,16 @@
 #include <products/BellHybrid/services/time/include/time/AlarmOperations.hpp>
 
 #include <gtest/gtest.h>
-
-// Included a .cpp file with AlarmOperations tests for the common part (the base class' implementation).
-// It needs to be built into this test in order to test the possible regression introduced by
-// the Bell-specific AlarmOperations class.
-// Generally, this should not be solved this way in other cases.
-#include <service-time/tests/tests-AlarmOperations.cpp>
-
+#include "tests/tests-AlarmOperations.hpp"
 namespace
 {
+    alarms::IAlarmOperations::OnUpdateAlarmProcessed universalBoolCallback = [](bool success) {
+        EXPECT_EQ(success, true);
+    };
+    alarms::IAlarmOperations::GetCurrentTime timeInjector = []() {
+        return TimePointFromStringWithShift("2022-11-11 05:00:00");
+    };
+
     class MockedPreWakeUpSettingsProvider : public alarms::PreWakeUpSettingsProvider
     {
       public:
@@ -95,17 +96,21 @@ namespace
                                                          std::move(snoozeChimeSettingsProvider),
                                                          std::move(bedtimeSettingsProvider));
     }
-} // namespace
 
-// This function replaces the `getMockedAlarmOperations` function from `service-time/tests/tests-AlarmOperations.cpp`
-std::unique_ptr<alarms::IAlarmOperations> AlarmOperationsFixture::getMockedAlarmOperations(
-    std::unique_ptr<MockAlarmEventsRepository> &alarmRepo)
-{
-    return ::getMockedAlarmOperations(alarmRepo,
-                                      std::make_unique<MockedPreWakeUpSettingsProvider>(),
-                                      std::make_unique<MockedSnoozeChimeSettingsProvider>(),
-                                      std::make_unique<MockedBedtimeModel>());
-}
+    class BellSpecificAlarmOperationsFixture : public AlarmOperationsFixture
+    {
+      protected:
+        std::unique_ptr<alarms::IAlarmOperations> getMockedAlarmOperations(
+            std::unique_ptr<MockAlarmEventsRepository> &alarmRepo) override
+        {
+            return ::getMockedAlarmOperations(alarmRepo,
+                                              std::make_unique<MockedPreWakeUpSettingsProvider>(),
+                                              std::make_unique<MockedSnoozeChimeSettingsProvider>(),
+                                              std::make_unique<MockedBedtimeModel>());
+        }
+    };
+
+} // namespace
 
 TEST(PreWakeUp, TooEarlyForPreWakeUp)
 {

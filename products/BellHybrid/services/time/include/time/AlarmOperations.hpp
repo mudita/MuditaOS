@@ -80,10 +80,18 @@ namespace alarms
       public:
         explicit Bedtime(std::unique_ptr<AbstractBedtimeSettingsProvider> &&settingsProvider);
         auto decide(TimePoint now) -> bool;
+        auto createEvent() -> std::shared_ptr<AlarmEventRecord>;
+        void pushEvent(const std::shared_ptr<AlarmEventRecord> &bedtimeEvent);
+        bool isEventInContainer(std::uint32_t id);
+        EventsContainer<SingleEventRecord>::iterator findEvent(std::uint32_t id);
+        void removeAllEvents();
 
       private:
         auto isTimeForBed(const TimePoint &now, const time_t &bedtime) -> bool;
+        static constexpr auto resonableIdOffset = 1000;
+        uint32_t nextFreeId{resonableIdOffset};
 
+        EventsContainer<SingleEventRecord> bedtimeSingleEvents;
         const std::unique_ptr<AbstractBedtimeSettingsProvider> settingsProvider;
     };
 
@@ -95,6 +103,8 @@ namespace alarms
                         std::unique_ptr<PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
                         std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider,
                         std::unique_ptr<AbstractBedtimeSettingsProvider> &&BedtimeModel);
+
+        bool turnOffAlarmIfFoundInBedtime(const std::uint32_t id) override;
 
       private:
         void minuteUpdated(TimePoint now) override;

@@ -30,8 +30,8 @@ namespace app::bell_bedtime
     class View
     {
       public:
-        virtual ~View() noexcept                  = default;
-        virtual void exit()                       = 0;
+        virtual ~View() noexcept = default;
+        virtual void exit()      = 0;
     };
 
     class AbstractBedtimePresenter : public BasePresenter<View>
