@@ -85,15 +85,13 @@ namespace gui
 
     bool AlarmPopup::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease()) {
-            if (inputEvent.is(KeyCode::KEY_RF)) {
-                getPresenter()->stopAlarm();
-                return true;
-            }
-            else if (inputEvent.is(KeyCode::KEY_LF) && getPresenter()->haveSnoozedSkip()) {
-                getPresenter()->skipToNextSnooze();
-                return true;
-            }
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF) || inputEvent.isLongRelease(KeyCode::KEY_RF)) {
+            getPresenter()->stopAlarm();
+            return true;
+        }
+        else if (inputEvent.isShortRelease(KeyCode::KEY_LF) && getPresenter()->haveSnoozedSkip()) {
+            getPresenter()->skipToNextSnooze();
+            return true;
         }
 
         return AppWindow::onInput(inputEvent);
