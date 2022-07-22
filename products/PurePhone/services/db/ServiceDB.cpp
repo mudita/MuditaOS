@@ -234,7 +234,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getUserDiskPath() / "notifications.db").c_str());
     predefinedQuotesDB = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "predefined_quotes.db").c_str());
     customQuotesDB     = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "custom_quotes.db").c_str());
-    multimediaFilesDB = std::make_unique<db::multimedia_files::MultimediaFilesDB>(
+    multimediaFilesDB  = std::make_unique<db::multimedia_files::MultimediaFilesDB>(
         (purefs::dir::getUserDiskPath() / "multimedia.db").c_str());
 
     // Create record interfaces
@@ -253,7 +253,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_v2.db"));
 
     for (auto &dbAgent : databaseAgents) {
-        dbAgent->initDb();
         dbAgent->registerMessages();
     }
 

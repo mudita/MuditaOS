@@ -754,22 +754,38 @@ static int ecophoneSleep(sqlite3_vfs *pVfs, int nMicro)
     return nMicro;
 }
 
+struct julian_clock
+{
+    using rep        = double;
+    using period     = std::ratio<86400>; /// Number of seconds per day
+    using duration   = std::chrono::duration<rep, period>;
+    using time_point = std::chrono::time_point<julian_clock>;
+
+    static constexpr bool is_steady = false;
+
+    /// Returns difference in hours between start of UTC epoch(01/01/1970) and Julian epoch(-4713-11-24 12:00:00)
+    static constexpr auto jdiff()
+    {
+        using namespace std::chrono_literals;
+        return 58574100h;
+    }
+
+    static time_point now() noexcept
+    {
+        using namespace std::chrono;
+        return time_point{duration{system_clock::now().time_since_epoch()} + jdiff()};
+    }
+};
+
 /*
  ** Set *pTime to the current UTC time expressed as a Julian day. Return
  ** SQLITE_OK if successful, or an error code otherwise.
  **
  **   http://en.wikipedia.org/wiki/Julian_day
- **
- ** This implementation is not very good. The current time is rounded to
- ** an integer number of seconds. Also, assuming time_t is a signed 32-bit
- ** value, it will stop working some time in the year 2038 AD (the so-called
- ** "year 2038" problem that afflicts systems that store time this way).
  */
 static int ecophoneCurrentTime(sqlite3_vfs *pVfs, double *pTime)
 {
-
-    time_t t = time(0);
-    *pTime   = t / 86400.0 + 2440587.5;
+    *pTime = julian_clock::now().time_since_epoch().count();
     return SQLITE_OK;
 }
 

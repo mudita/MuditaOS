@@ -28,10 +28,7 @@ SettingsAgent::SettingsAgent(sys::Service *parentService, const std::string dbNa
     }
 
     database = std::make_unique<Database>(getDbFilePath().c_str());
-}
 
-void SettingsAgent::initDb()
-{
     factorySettings.initDb(database.get());
 
     // first approach -> take care about big amount of variables
@@ -47,11 +44,6 @@ void SettingsAgent::initDb()
         variablePath.parse(path);
         cache->setValue(variablePath, value);
     } while (allVars->nextRow());
-}
-
-void SettingsAgent::deinitDb()
-{
-    database->deinitialize();
 }
 
 void SettingsAgent::registerMessages()
@@ -74,11 +66,6 @@ void SettingsAgent::unRegisterMessages()
     parentService->disconnect(typeid(settings::Messages::SetVariable));
     parentService->disconnect(typeid(settings::Messages::RegisterOnVariableChange));
     parentService->disconnect(typeid(settings::Messages::UnregisterOnVariableChange));
-}
-
-auto SettingsAgent::getDbInitString() -> const std::string
-{
-    return {};
 }
 
 auto SettingsAgent::getDbFilePath() -> const std::string

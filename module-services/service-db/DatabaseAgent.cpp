@@ -10,3 +10,11 @@ namespace sys
 
 DatabaseAgent::DatabaseAgent(sys::Service *parentService) : parentService(parentService)
 {}
+bool DatabaseAgent::storeIntoFile(const std::filesystem::path &file)
+{
+    if (database != nullptr) {
+        return database->storeIntoFile(file);
+    }
+
+    return false;
+}
