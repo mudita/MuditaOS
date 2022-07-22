@@ -155,9 +155,9 @@ namespace alarms
         return screen_light_control::LinearProgressModeParameters{
             .startBrightnessValue = 0.0f,
             .functions            = {screen_light_control::functions::LinearProgressFunction{.target   = 10.0f,
-                                                                                             .duration = firstTargetDuration},
+                                                                                  .duration = firstTargetDuration},
                           screen_light_control::functions::LinearProgressFunction{.target   = 100.0f,
-                                                                                             .duration = secondTargetDuration}},
+                                                                                  .duration = secondTargetDuration}},
             .brightnessHysteresis = 0.0f};
     }
 
