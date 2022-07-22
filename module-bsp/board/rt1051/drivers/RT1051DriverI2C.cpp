@@ -3,10 +3,54 @@
 
 #include "RT1051DriverI2C.hpp"
 #include <log/log.hpp>
-#include "../board.h"
+#include "board.h"
 
 namespace drivers
 {
+    namespace
+    {
+        ssize_t translateErrorCode(const status_t errorStatus)
+        {
+            I2CErrorCodes code;
+
+            switch (errorStatus) {
+            case kStatus_LPI2C_Busy:
+                code = I2CErrorCodes::busy;
+                break;
+            case kStatus_LPI2C_Idle:
+                code = I2CErrorCodes::idle;
+                break;
+            case kStatus_LPI2C_Nak:
+                code = I2CErrorCodes::nak;
+                break;
+            case kStatus_LPI2C_FifoError:
+                code = I2CErrorCodes::fifo;
+                break;
+            case kStatus_LPI2C_BitError:
+                code = I2CErrorCodes::bit;
+                break;
+            case kStatus_LPI2C_ArbitrationLost:
+                code = I2CErrorCodes::arbitrationLost;
+                break;
+            case kStatus_LPI2C_PinLowTimeout:
+                code = I2CErrorCodes::pinLowTimeout;
+                break;
+            case kStatus_LPI2C_NoTransferInProgress:
+                code = I2CErrorCodes::noTransferInProgress;
+                break;
+            case kStatus_LPI2C_DmaRequestFail:
+                code = I2CErrorCodes::dmaRequestFail;
+                break;
+            case kStatus_LPI2C_Timeout:
+                code = I2CErrorCodes::timeout;
+                break;
+            default:
+                code = I2CErrorCodes::unknown;
+                break;
+            }
+            return static_cast<ssize_t>(code);
+        }
+    } // namespace
 
     RT1051DriverI2C::RT1051DriverI2C(const I2CInstances inst, const DriverI2CParams &params) : DriverI2C(params, inst)
     {
@@ -64,7 +108,7 @@ namespace drivers
         auto ret = BOARD_LPI2C_Send(
             base, addr.deviceAddress, addr.subAddress, addr.subAddressSize, const_cast<uint8_t *>(txBuff), size);
         if (ret != kStatus_Success) {
-            return -1; // TODO:M.P: fix me
+            return translateErrorCode(ret);
         }
         else {
             return size;
@@ -76,7 +120,7 @@ namespace drivers
         cpp_freertos::LockGuard lock(mutex);
         auto ret = BOARD_LPI2C_Receive(base, addr.deviceAddress, addr.subAddress, addr.subAddressSize, rxBuff, size);
         if (ret != kStatus_Success) {
-            return -1; // TODO:M.P: fix me
+            return translateErrorCode(ret);
         }
         else {
             return size;
@@ -104,7 +148,7 @@ namespace drivers
         ret |= BOARD_LPI2C_Send(base, addr.deviceAddress, addr.subAddress, addr.subAddressSize, (uint8_t *)&rx, size);
 
         if (ret != kStatus_Success) {
-            return -1; // TODO:M.P: fix me
+            return translateErrorCode(ret);
         }
         else {
             return size;

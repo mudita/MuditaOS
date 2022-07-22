@@ -19,6 +19,21 @@ namespace drivers
         COUNT
     };
 
+    enum class I2CErrorCodes : std::int8_t
+    {
+        busy                 = 0,
+        idle                 = -1,
+        nak                  = -2,
+        fifo                 = -3,
+        bit                  = -4,
+        arbitrationLost      = -5,
+        pinLowTimeout        = -6,
+        noTransferInProgress = -7,
+        dmaRequestFail       = -8,
+        timeout              = -9,
+        unknown              = -10
+    };
+
     struct DriverI2CParams
     {
         uint32_t baudrate;
