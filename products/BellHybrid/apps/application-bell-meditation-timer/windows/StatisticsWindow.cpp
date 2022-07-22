@@ -1,16 +1,22 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StatisticsWindow.hpp"
 
 #include "MeditationMainWindow.hpp"
 
-#include <common/windows/BellFinishedWindow.hpp>
+#include <ListView.hpp>
 #include <common/data/StyleCommon.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
-#include <module-gui/gui/widgets/SideListView.hpp>
 #include <apps-common/InternalModel.hpp>
+
+namespace
+{
+    constexpr auto height     = 400;
+    constexpr auto width      = 380;
+    constexpr auto top_margin = 41;
+} // namespace
 
 namespace app::meditation
 {
@@ -35,23 +41,26 @@ namespace app::meditation
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
         navBar->setVisible(false);
+
+        list = new ListView(this,
+                            style::window::default_left_margin,
+                            top_margin,
+                            width,
+                            height,
+                            presenter->getPagesProvider(),
+                            listview::ScrollBarType::Fixed);
+        list->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
+        list->rebuildList();
     }
 
     void StatisticsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
-        setFocusItem(sideListView);
+        setFocusItem(list);
     }
 
     bool StatisticsWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (sideListView->onInput(inputEvent)) {
-            return true;
-        }
-        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-            presenter->handleEnter();
-            return true;
-        }
-
         return AppWindow::onInput(inputEvent);
     }
 

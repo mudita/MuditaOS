@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,7 +10,8 @@
 namespace gui
 {
     class SideListView;
-}
+    class ListView;
+} // namespace gui
 
 namespace app::meditation
 {
@@ -27,7 +28,7 @@ namespace app::meditation
         void rebuild() override;
 
       private:
-        gui::SideListView *sideListView{};
+        gui::ListView *list{};
         std::unique_ptr<app::meditation::contract::Presenter> presenter;
     };
 } // namespace app::meditation

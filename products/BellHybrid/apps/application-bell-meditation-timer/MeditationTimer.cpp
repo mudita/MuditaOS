@@ -67,7 +67,7 @@ namespace app
                               });
 
         windowsFactory.attach(meditation::StatisticsWindow::name, [](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<app::meditation::StatisticsPresenter>();
+            auto presenter = std::make_unique<app::meditation::StatisticsPresenter>(app);
             return std::make_unique<meditation::StatisticsWindow>(app, std::move(presenter));
         });
 

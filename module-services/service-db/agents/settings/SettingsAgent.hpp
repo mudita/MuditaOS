@@ -26,11 +26,9 @@ namespace sys
 class SettingsAgent : public DatabaseAgent
 {
   public:
-    SettingsAgent(sys::Service *parentService, const std::string dbName, settings::SettingsCache *cache = nullptr);
+    SettingsAgent(sys::Service *parentService, std::string dbName, settings::SettingsCache *cache = nullptr);
     ~SettingsAgent() = default;
 
-    void initDb() override;
-    void deinitDb() override;
     void registerMessages() override;
     void unRegisterMessages() override;
     auto getAgentName() -> const std::string override;
@@ -52,8 +50,6 @@ class SettingsAgent : public DatabaseAgent
     auto dbSetValue(const settings::EntryPath &path, const std::string &value) -> bool;
     auto dbRegisterValueChange(const settings::EntryPath &path) -> bool;
     auto dbUnregisterValueChange(const settings::EntryPath &path) -> bool;
-
-    auto getDbInitString() -> const std::string override;
 
     // msg handlers
     // variable

@@ -1,21 +1,28 @@
-add_library(db STATIC)
-add_library(bell::db ALIAS db)
+add_library(databases STATIC)
+add_library(bell::db ALIAS databases)
 
-target_sources(db
+add_subdirectory(databases)
+
+target_sources(databases
     PRIVATE
         ServiceDB.cpp
+        agents/MeditationStatsAgent.cpp
     PUBLIC
         include/db/ServiceDB.hpp
         include/db/SystemSettings.hpp
 )
 
-target_include_directories(db
+target_include_directories(databases
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        include
 )
 
-target_link_libraries(db
+target_link_libraries(databases
    PRIVATE
-        module-db
+        bell::db::meditation_stats
         service-db
 )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

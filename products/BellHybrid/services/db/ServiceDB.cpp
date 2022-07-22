@@ -3,6 +3,8 @@
 
 #include <db/ServiceDB.hpp>
 
+#include "agents/MeditationStatsAgent.hpp"
+
 #include <module-db/Databases/EventsDB.hpp>
 #include <module-db/Databases/MultimediaFilesDB.hpp>
 
@@ -82,9 +84,9 @@ sys::ReturnCodes ServiceDB::InitHandler()
         std::make_unique<db::multimedia_files::MultimediaFilesRecordInterface>(multimediaFilesDB.get());
 
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_bell.db"));
+    databaseAgents.emplace(std::make_unique<service::db::agents::MeditationStats>(this, "meditation_stats.db"));
 
     for (auto &dbAgent : databaseAgents) {
-        dbAgent->initDb();
         dbAgent->registerMessages();
     }
 
@@ -98,16 +100,11 @@ bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
         return false;
     }
 
-    for (auto &db : databaseAgents) {
-        if (db.get() && db.get()->getAgentName() == "settingsAgent") {
-
-            if (db->storeIntoFile(backupPath / std::filesystem::path(db->getDbFilePath()).filename()) == false) {
-                LOG_ERROR("settingsAgent backup failed");
-                return false;
-            }
-            break;
+    return std::all_of(databaseAgents.cbegin(), databaseAgents.cend(), [&backupPath](const auto &agent) {
+        if (not agent->storeIntoFile(backupPath / std::filesystem::path(agent->getDbFilePath()).filename())) {
+            LOG_ERROR("%s backup failed", agent->getAgentName().c_str());
+            return false;
         }
-    }
-
-    return true;
+        return true;
+    });
 }
