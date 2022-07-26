@@ -73,10 +73,6 @@ namespace gui
             }
             return true;
             break;
-        case WallpaperOption::Quote:
-            [[fallthrough]];
-        case WallpaperOption::Logo:
-            [[fallthrough]];
         default:
             return false;
             break;
