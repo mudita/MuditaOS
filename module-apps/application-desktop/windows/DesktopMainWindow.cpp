@@ -200,6 +200,30 @@ namespace gui
                 LOG_DEBUG("KEY_LF pressed to navigate to calls");
                 return app::manager::Controller::sendAction(application, app::manager::actions::ShowCallLog);
             }
+            if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
+                LOG_DEBUG("KEY_LEFT pressed to write new message");
+                return app::manager::Controller::sendAction(application,
+                                            app::manager::actions::Launch,
+                                            std::make_unique<app::ApplicationLaunchData>("ApplicationMessages"));
+            }
+            if (inputEvent.is(gui::KeyCode::KEY_RIGHT)) {
+                LOG_DEBUG("KEY_RIGHT pressed to open calendar");
+                return app::manager::Controller::sendAction(application,
+                                            app::manager::actions::Launch,
+                                            std::make_unique<app::ApplicationLaunchData>("ApplicationCalendar"));
+            }
+            if (inputEvent.is(gui::KeyCode::KEY_UP)) {
+                LOG_DEBUG("KEY_UP pressed to open alarm");
+                return app::manager::Controller::sendAction(application,
+                                            app::manager::actions::Launch,
+                                            std::make_unique<app::ApplicationLaunchData>("ApplicationAlarmClock"));
+            }
+            if (inputEvent.is(gui::KeyCode::KEY_UP)) {
+                LOG_DEBUG("KEY_UP pressed to open alarm");
+                return app::manager::Controller::sendAction(application,
+                                            app::manager::actions::Launch,
+                                            std::make_unique<app::ApplicationLaunchData>("ApplicationPhonebook"));
+            }
             return false;
         };
     }
