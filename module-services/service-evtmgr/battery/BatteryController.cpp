@@ -125,14 +125,17 @@ void sevm::battery::BatteryController::printCurrentState()
 }
 void sevm::battery::BatteryController::update()
 {
-    const auto soc           = Store::Battery::get().level;
-    const auto chargingState = Store::Battery::get().state;
+    const auto lastSoc   = Store::Battery::get().level;
+    const auto lastState = Store::Battery::get().state;
 
     updateSoC();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
 
+    const auto currentSoc   = Store::Battery::get().level;
+    const auto currentState = Store::Battery::get().state;
+
     /// Send BatteryStatusChangeMessage only when battery SOC or charger state has changed
-    if (soc != Store::Battery::get().level || chargingState != Store::Battery::get().state) {
+    if (lastSoc != currentSoc || lastState != currentState) {
         auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
         service->bus.sendUnicast(std::move(message), service::name::evt_manager);
     }

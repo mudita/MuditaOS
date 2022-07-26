@@ -22,8 +22,8 @@ namespace gui
     class DesktopMainWindow : public AppWindow
     {
       protected:
-        gui::ClockDateWidget *clockDate                                   = nullptr;
-        gui::ListView *notificationsList                                  = nullptr;
+        gui::ClockDateWidget *clockDate  = nullptr;
+        gui::ListView *notificationsList = nullptr;
         std::shared_ptr<gui::ActiveNotificationsListPresenter> notificationsListPresenter;
         std::shared_ptr<gui::NotificationsModel> notificationsModel;
 

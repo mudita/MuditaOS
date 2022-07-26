@@ -439,8 +439,10 @@ namespace app
     sys::MessagePointer ApplicationCommon::handleMinuteUpdated(sys::Message *msgl)
     {
         if (state == State::ACTIVE_FORGROUND) {
-            auto requestedRefreshMode = getCurrentWindow()->updateTime();
-            refreshWindow(requestedRefreshMode);
+            if (auto reqestedRefreshMode = getCurrentWindow()->updateTime();
+                reqestedRefreshMode != gui::RefreshModes::GUI_REFRESH_NONE) {
+                refreshWindow(reqestedRefreshMode);
+            }
         }
         return sys::msgHandled();
     }

@@ -213,9 +213,9 @@ namespace gui
 
     RefreshModes DesktopMainWindow::updateTime()
     {
-        auto ret = AppWindow::updateTime();
+        AppWindow::updateTime();
         clockDate->setTime(std::time(nullptr));
-        return ret;
+        return RefreshModes::GUI_REFRESH_FAST;
     }
 
     bool DesktopMainWindow::showInformationPopup(std::function<bool()> action, const std::string &notification)
