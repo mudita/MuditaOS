@@ -177,6 +177,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     }
 
     if (kbdMessage->key.state == RawKey::State::Pressed) {
+        userActivityHandler.handleUserInput();
         backlightHandler.handleKeyPressed(kbdMessage->key.keyCode);
     }
     else if (kbdMessage->key.state == RawKey::State::Moved) {

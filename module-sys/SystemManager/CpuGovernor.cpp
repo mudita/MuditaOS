@@ -81,14 +81,20 @@ namespace sys
 
     void CpuGovernor::SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request)
     {
+        auto isSentinelRecognized = false;
         for (auto &sentinel : sentinels) {
             auto sentinelWeakPointer = sentinel->GetSentinel();
             if (!sentinelWeakPointer.expired()) {
                 std::shared_ptr<CpuSentinel> sharedResource = sentinelWeakPointer.lock();
                 if (sharedResource->GetName() == sentinelName) {
                     sentinel->SetRequestedFrequency(request);
+                    isSentinelRecognized = true;
+                    break;
                 }
             }
+        }
+        if (!isSentinelRecognized) {
+            LOG_WARN("Sentinel %s is not recognized!", sentinelName.c_str());
         }
     }
 

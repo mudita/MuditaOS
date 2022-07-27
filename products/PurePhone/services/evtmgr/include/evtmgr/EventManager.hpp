@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,6 +6,7 @@
 #include <service-evtmgr/EventManagerCommon.hpp>
 
 #include "BacklightHandler.hpp"
+#include "UserActivityHandler.hpp"
 #include <bsp/vibrator/vibrator.hpp>
 #include <vibra/Vibra.hpp>
 
@@ -15,7 +16,7 @@ class EventManager : public EventManagerCommon
     explicit EventManager(LogDumpFunction logDumpFunction = nullptr,
                           const std::string &name         = service::name::evt_manager)
         : EventManagerCommon(logDumpFunction, name), vibrator(std::make_unique<vibra_handle::Vibra>(this)),
-          backlightHandler(settings, this)
+          backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
     {}
 
   private:
@@ -36,6 +37,7 @@ class EventManager : public EventManagerCommon
 
     std::unique_ptr<vibra_handle::Vibra> vibrator;
     backlight::Handler backlightHandler;
+    evm::UserActivityHandler userActivityHandler;
 };
 
 namespace sys
