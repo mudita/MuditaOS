@@ -22,10 +22,15 @@ void BluetoothSettingsModel::requestStatus()
     service->bus.sendUnicast(std::make_shared<::message::bluetooth::RequestStatus>(), service::name::bluetooth);
 }
 
-void BluetoothSettingsModel::setStatus(const bool desiredBluetoothState, const bool desiredVisibility)
+void BluetoothSettingsModel::updateStatus(const bool desiredBluetoothState, const bool desiredVisibility)
 {
     status.state      = desiredBluetoothState ? BluetoothStatus::State::On : BluetoothStatus::State::Off;
     status.visibility = desiredVisibility;
+}
+
+void BluetoothSettingsModel::setStatus(const bool desiredBluetoothState, const bool desiredVisibility)
+{
+    updateStatus(desiredBluetoothState, desiredVisibility);
     message::bluetooth::SetStatus setStatus(status);
     service->bus.sendUnicast(std::make_shared<::message::bluetooth::SetStatus>(std::move(setStatus)),
                              service::name::bluetooth);

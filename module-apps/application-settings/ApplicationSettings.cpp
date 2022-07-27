@@ -66,6 +66,7 @@
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
+#include <service-bluetooth/messages/BluetoothModeChanged.hpp>
 #include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
 #include <service-bluetooth/messages/InitializationResult.hpp>
@@ -105,6 +106,7 @@ namespace app
     {
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
         bus.channels.push_back(sys::BusChannel::BluetoothNotifications);
+        bus.channels.push_back(sys::BusChannel::BluetoothModeChanges);
 
         CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
             selectedSimNumber = number;
@@ -154,6 +156,21 @@ namespace app
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::sim_cards == currentWindow->getName()) {
                 updateCurrentWindow();
+            }
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(::sys::bluetooth::BluetoothModeChanged), [&](sys::Message *msg) {
+            const auto message   = static_cast<::sys::bluetooth::BluetoothModeChanged *>(msg);
+            const auto newState  = message->getBluetoothMode();
+            const auto oldStatus = bluetoothSettingsModel->getStatus();
+            const auto oldState  = oldStatus.state;
+            if (newState == sys::bluetooth::BluetoothMode::Disabled && oldState == BluetoothStatus::State::On) {
+                const auto isVisible = oldStatus.visibility;
+                bluetoothSettingsModel->updateStatus(false, isVisible);
+                if (getCurrentWindow()->getName() == gui::window::name::bluetooth) {
+                    updateCurrentWindow();
+                }
             }
             return sys::MessageNone{};
         });

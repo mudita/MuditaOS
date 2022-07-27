@@ -94,6 +94,7 @@ class ServiceBluetooth : public sys::Service
     void sendWorkerCommand(std::unique_ptr<bluetooth::event::Base> command);
 
     void handleTurnOff();
+    void handleTurnOn();
 
     std::shared_ptr<Mailbox<bluetooth::Command, QueueHandle_t, WorkerLock>> workerQueue;
     std::shared_ptr<bluetooth::SettingsHolder> settingsHolder;
