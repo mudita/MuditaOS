@@ -10,4 +10,24 @@ add_catch2_executable(
         module-apps
 )
 
-add_subdirectory(windows)
+add_catch2_executable(
+    NAME
+        windows-management
+    SRCS
+        windows/test-WindowsStack.cpp
+        windows/test-WindowsPopupQueue.cpp
+        windows/test-WindowsPopupFilter.cpp
+    LIBS
+        module-gui
+)
+
+add_gtest_executable(
+    NAME
+        apps-common-widgets
+    SRCS
+        widgets/test-TimeFixedWidget.cpp
+    LIBS
+       apps-common
+       gui-mock
+    USE_FS
+)

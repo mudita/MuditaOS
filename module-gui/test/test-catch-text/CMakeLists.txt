@@ -17,7 +17,6 @@ add_catch2_executable(
         SRCS
                 ../mock/buildTextDocument.cpp
                 ../mock/multi-line-string.cpp
-                ../mock/InitializedFontManager.cpp
                 test-gui-TextBlock.cpp
                 test-gui-TextBlockCursor.cpp
                 test-gui-TextDocument.cpp
@@ -31,5 +30,6 @@ add_catch2_executable(
         LIBS
                 module-sys
                 module-gui
+                gui-mock
 	USE_FS
 )

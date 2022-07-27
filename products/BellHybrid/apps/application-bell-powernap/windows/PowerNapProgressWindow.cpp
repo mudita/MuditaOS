@@ -45,7 +45,7 @@ namespace
                                               0,
                                               bell_base_layout::outer_layouts_w,
                                               bell_base_layout::outer_layouts_h - progress::bottomDescTopMargin);
-        timer->setFont(napTimerFont);
+        timer->setFontAndDimensions(napTimerFont);
         timer->setMargins(gui::Margins(0, progress::bottomDescTopMargin, 0, 0));
         decorateProgressItem(timer, gui::Alignment::Vertical::Top);
         return timer;

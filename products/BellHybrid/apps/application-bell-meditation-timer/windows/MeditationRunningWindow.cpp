@@ -69,7 +69,7 @@ namespace gui
         clock->setMargins(gui::Margins(0, mrStyle::clock::marginTop, 0, 0));
 
         timer = new gui::TimeFixedWidget(mainVBox, 0, 0, mrStyle::timer::maxSizeX, mrStyle::timer::maxSizeY, true);
-        timer->setFont(mrStyle::timer::font);
+        timer->setFontAndDimensions(mrStyle::timer::font);
         timer->setMinimumSize(mrStyle::timer::maxSizeX, mrStyle::timer::maxSizeY);
         timer->setMargins(gui::Margins(0, mrStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
