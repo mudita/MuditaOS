@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeFixedWidget.hpp"
@@ -13,8 +13,9 @@
 namespace
 {
     constexpr auto colonSign = ":";
+    constexpr auto minusSign = "-";
 
-    std::uint32_t getWidestDigitWidth(const gui::RawFont *const font)
+    constexpr std::uint32_t getWidestDigitWidth(const gui::RawFont *const font)
     {
         std::uint32_t widestWidth = 0;
         for (auto i = 0; i < 10; i++) {
@@ -31,130 +32,162 @@ namespace gui
 {
     namespace date_and_time = style::window::date_and_time;
 
-    TimeFixedWidget::TimeFixedWidget(
-        Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, const bool minus)
+    TimeFixedWidget::TimeFixedWidget(Item *parent,
+                                     const std::uint32_t &x,
+                                     const std::uint32_t &y,
+                                     const std::uint32_t &w,
+                                     const std::uint32_t &h,
+                                     const bool minus)
         : Rect(parent, x, y, w, h), minusVisible{minus}
     {
         setEdges(gui::RectangleEdge::None);
-        hBox = new gui::HBox(this, 0, 0, w, h);
-        hBox->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        hBox->setEdges(gui::RectangleEdge::None);
-        hBox->activeItem = false;
+        mainBox = new gui::HBox(this, 0, 0, w, h);
+        mainBox->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        mainBox->setEdges(gui::RectangleEdge::None);
+        mainBox->activeItem = false;
 
-        firstHBox = new gui::HBox(hBox, 0, 0, 0, 0);
-        firstHBox->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
-        firstHBox->setEdges(gui::RectangleEdge::None);
+        leftBox.box = new gui::HBox(mainBox, 0, 0, 0, 0);
+        leftBox.box->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        leftBox.box->setEdges(gui::RectangleEdge::None);
 
-        colonText = new gui::Label(hBox, 0, 0, 0, 0);
-        colonText->setEdges(gui::RectangleEdge::None);
-        colonText->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        colonText->setText(colonSign);
-        colonText->activeItem = false;
+        attachLabelToBox(colon, mainBox);
+        setColon();
 
-        secondHBox = new gui::HBox(hBox, 0, 0, 0, 0);
-        secondHBox->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        secondHBox->setEdges(gui::RectangleEdge::None);
+        rightBox.box = new gui::HBox(mainBox, 0, 0, 0, 0);
+        rightBox.box->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        rightBox.box->setEdges(gui::RectangleEdge::None);
 
-        minusText = new gui::Label(firstHBox, 0, 0, 0, 0);
-        minusText->setEdges(gui::RectangleEdge::None);
-        minusText->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        setMinus(minus);
+        attachLabelToBox(leftBox.minus, leftBox.box);
+        setMinus();
 
-        firstPrimoText = new gui::Label(firstHBox, 0, 0, 0, 0);
-        firstPrimoText->setEdges(gui::RectangleEdge::None);
-        firstPrimoText->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        firstSecundoText = new gui::Label(firstHBox, 0, 0, 0, 0);
-        firstSecundoText->setEdges(gui::RectangleEdge::None);
-        firstSecundoText->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        for (auto &digit : leftBox.digits) {
+            attachLabelToBox(digit, leftBox.box);
+        }
 
-        secondPrimoText = new gui::Label(secondHBox, 0, 0, 0, 0);
-        secondPrimoText->setEdges(gui::RectangleEdge::None);
-        secondPrimoText->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        secondSecundoText = new gui::Label(secondHBox, 0, 0, 0, 0);
-        secondSecundoText->setEdges(gui::RectangleEdge::None);
-        secondSecundoText->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        for (auto &digit : rightBox.digits) {
+            attachLabelToBox(digit, rightBox.box);
+        }
 
-        hBox->resizeItems();
+        mainBox->resizeItems();
     }
 
-    void TimeFixedWidget::setFirst(const uint32_t first)
+    void TimeFixedWidget::attachLabelToBox(Label *&label, HBox *&box) const
     {
-        const auto decimal = first / 10;
-        if (decimal != 0u) {
-            const auto widestDigit = getWidestDigitWidth(firstPrimoText->getTextFormat().getFont());
-            firstPrimoText->setSize(widestDigit, hBox->widgetArea.h);
-            firstPrimoText->setText(std::to_string(first / 10));
-            firstSecundoText->setText(std::to_string(first % 10));
-        }
-        else {
-            firstPrimoText->setText("");
-            firstPrimoText->setSize(0, 0);
-            firstSecundoText->setText(std::to_string(first));
-        }
-        firstHBox->resizeItems();
+        label = new gui::Label(box, 0, 0, 0, 0);
+        label->setEdges(gui::RectangleEdge::None);
+        label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     }
 
-    void TimeFixedWidget::setSecond(const uint32_t second)
+    void TimeFixedWidget::setMinus() const
     {
-        const auto decimal = second / 10;
-        if (decimal != 0u) {
-            secondPrimoText->setText(std::to_string(second / 10));
-            secondSecundoText->setText(std::to_string(second % 10));
-        }
-        else {
-            secondPrimoText->setText("0");
-            secondSecundoText->setText(std::to_string(second));
-        }
+        leftBox.minus->setText(minusVisible ? minusSign : "");
     }
 
-    void TimeFixedWidget::setMinus(const bool minus)
+    void TimeFixedWidget::setColon() const
     {
-        minusVisible = minus;
-        minusText->setText(minus ? "-" : "");
-        if (minusVisible) {
-            const auto widestDigit = getWidestDigitWidth(minusText->getTextFormat().getFont());
-            minusText->setSize(widestDigit, hBox->widgetArea.h);
-        }
-        else {
-            minusText->setSize(0, 0);
-        }
-        firstHBox->resizeItems();
+        colon->setText(colonSign);
+        colon->activeItem = false;
     }
 
-    void TimeFixedWidget::setFont(const UTF8 &fontName)
+    void TimeFixedWidget::setMinutesBox(std::uint32_t minutes)
     {
-        minusText->setFont(fontName);
-        firstPrimoText->setFont(fontName);
-        firstSecundoText->setFont(fontName);
-        colonText->setFont(fontName);
-        secondPrimoText->setFont(fontName);
-        secondSecundoText->setFont(fontName);
+        auto rangeGuard = 1000;
+        minutes %= rangeGuard;
 
-        const auto digitMaxWidth = getWidestDigitWidth(minusText->getTextFormat().getFont());
-        const auto colonWidth    = minusText->getTextFormat().getFont()->getPixelWidth(colonSign);
+        setDigits(std::to_string(minutes), leftBox.digits);
 
-        // Equal size for both boxes surrounding colon
-        const auto boxesSize = (hBox->widgetArea.w - colonWidth) / 2;
-        const auto height    = hBox->widgetArea.h;
-
-        firstHBox->setSize(boxesSize, height);
-        secondHBox->setSize(boxesSize, height);
-        firstPrimoText->setSize(digitMaxWidth, height);
-        firstSecundoText->setSize(digitMaxWidth, height);
-        colonText->setSize(colonWidth, height);
-        secondPrimoText->setSize(digitMaxWidth, height);
-        secondSecundoText->setSize(digitMaxWidth, height);
-
-        if (minusVisible) {
-            minusText->setSize(digitMaxWidth, height);
-        }
-        else {
-            minusText->setSize(0, 0);
-        }
-        hBox->resizeItems();
+        leftBox.box->resizeItems();
     }
+
+    void TimeFixedWidget::setSecondsBox(std::uint32_t seconds)
+    {
+        auto rangeGuard = 100;
+        seconds %= rangeGuard;
+
+        bool shouldBeDisplayedAsOneDigit = seconds < 10;
+        std::string text = shouldBeDisplayedAsOneDigit ? "0" + std::to_string(seconds) : std::to_string(seconds);
+
+        setDigits(std::move(text), rightBox.digits);
+    }
+
+    const TimeFixedWidget::LeftBox &TimeFixedWidget::getLeftBox()
+    {
+        return leftBox;
+    }
+
+    const TimeFixedWidget::RightBox &TimeFixedWidget::getRightBox()
+    {
+        return rightBox;
+    }
+
+    template <size_t N> void TimeFixedWidget::setDigits(std::string &&text, const DigitsContainer<N> &digits) const
+    {
+        const auto dimensions = getDimensions();
+
+        std::for_each(
+            std::crbegin(digits), std::crend(digits), [text = std::move(text), &dimensions](Label *label) mutable {
+                if (text.empty()) {
+                    label->setText("");
+                    label->setSize(0, 0);
+                }
+                else {
+                    label->setText(std::string{text.back()});
+                    label->setSize(dimensions.digitMaxWidth, dimensions.mainBoxHeight);
+                    text.pop_back();
+                }
+            });
+    }
+
+    void TimeFixedWidget::setFontAndDimensions(const UTF8 &fontName) const
+    {
+        leftBox.minus->setFont(fontName);
+        for (auto &digit : leftBox.digits) {
+            digit->setFont(fontName);
+        }
+
+        colon->setFont(fontName);
+
+        for (auto &digit : rightBox.digits) {
+            digit->setFont(fontName);
+        }
+
+        setDimensions(getDimensions());
+        mainBox->resizeItems();
+    }
+
+    void TimeFixedWidget::setDimensions(DimensionsParams &&params) const
+    {
+
+        leftBox.box->setSize(params.leftBoxWidth, params.mainBoxHeight);
+        rightBox.box->setSize(params.rightBoxWidth, params.mainBoxHeight);
+
+        leftBox.minus->setSize(params.minusWidth, params.mainBoxHeight);
+        for (auto &digit : leftBox.digits) {
+            digit->setSize(params.digitMaxWidth, params.mainBoxHeight);
+        }
+
+        colon->setSize(params.colonWidth, params.mainBoxHeight);
+
+        for (auto &digit : rightBox.digits) {
+            digit->setSize(params.digitMaxWidth, params.mainBoxHeight);
+        }
+    }
+
+    DimensionsParams TimeFixedWidget::getDimensions() const
+    {
+        DimensionsParams info{};
+
+        info.mainBoxHeight = mainBox->widgetArea.h;
+        info.mainBoxWidth  = mainBox->widgetArea.w;
+
+        info.digitMaxWidth = getWidestDigitWidth(leftBox.minus->getTextFormat().getFont());
+        info.colonWidth    = leftBox.minus->getTextFormat().getFont()->getPixelWidth(colonSign);
+        info.minusWidth    = leftBox.minus->getTextFormat().getFont()->getPixelWidth(minusSign);
+
+        info.leftBoxWidth  = (info.digitMaxWidth * leftBox.digits.size()) + info.minusWidth;
+        info.rightBoxWidth = info.mainBoxWidth - info.minusWidth - info.leftBoxWidth;
+
+        return info;
+    }
+
 } /* namespace gui */

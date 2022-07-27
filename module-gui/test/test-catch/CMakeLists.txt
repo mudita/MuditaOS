@@ -9,7 +9,6 @@ add_catch2_executable(
                 test-gui-resizes.cpp
                 test-gui-image.cpp
                 ../mock/TestWindow.cpp
-                ../mock/InitializedFontManager.cpp
                 test-language-input-parser.cpp
                 test-key-translator.cpp
         INCLUDE
@@ -17,6 +16,7 @@ add_catch2_executable(
         LIBS
                 module-sys
                 module-gui
+                gui-mock
 	USE_FS
 )
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/plus_32px_W_M.vpi" DESTINATION "${CMAKE_BINARY_DIR}/images")
