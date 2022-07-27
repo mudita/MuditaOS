@@ -13,7 +13,7 @@ namespace gui
 
     BluetoothWindow::BluetoothWindow(app::ApplicationCommon *app,
                                      std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel)
-        : BaseSettingsWindow(app, window::name::bluetooth), bluetoothSettingsModel(bluetoothSettingsModel)
+        : BaseSettingsWindow(app, window::name::bluetooth), bluetoothSettingsModel(std::move(bluetoothSettingsModel))
     {
         setTitle(utils::translate("app_settings_bluetooth_main"));
     }

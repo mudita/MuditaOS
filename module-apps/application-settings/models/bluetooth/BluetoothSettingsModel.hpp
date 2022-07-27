@@ -18,6 +18,7 @@ class BluetoothSettingsModel
     explicit BluetoothSettingsModel(sys::Service *service);
 
     void requestStatus();
+    void updateStatus(bool desiredBluetoothState, bool desiredVisibility);
     void setStatus(bool desiredBluetoothState, bool desiredVisibility);
     void requestDeviceName();
     void setDeviceName(const UTF8 &deviceName);
