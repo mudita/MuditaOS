@@ -13,23 +13,67 @@
 #include <chrono>
 #include <random>
 #include <tuple>
+#include <type_traits>
 #include <functional>
 
 namespace utils
 {
     inline constexpr auto WHITESPACE = " \n\r\t\f\v";
-    constexpr unsigned int secondsInMinute =
-        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::minutes(1)).count();
+    constexpr unsigned int secondsInMinute = 60;
 
-    std::string bytesToHex(const std::vector<std::uint8_t> &bytes);
-    std::vector<std::uint8_t> hexToBytes(const std::string &hex);
+    template <typename T> inline constexpr bool is_byte_v = std::is_integral_v<T> && sizeof(T) == sizeof(std::uint8_t);
 
-    template <typename T> std::string numToHex(T c)
+    template <typename T> using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
+
+    // NOTE: With short string optimization storing one byte hex in std::string is probably fine
+
+    template <typename T, std::enable_if_t<is_byte_v<T>, int> = 0> inline char halfByteToHex(T c)
     {
-        std::stringstream s;
-        s.fill('0');
-        s << std::setw(sizeof(T) * 2) << std::hex << static_cast<unsigned long long>(c);
-        return s.str();
+        return c < 10 ? '0' + c : 'a' + (c - 10);
+    }
+
+    template <typename T, std::enable_if_t<is_byte_v<T>, int> = 0> inline std::string byteToHex(T c)
+    {
+        return {halfByteToHex<std::uint8_t>((c & 0xF0) >> 4), halfByteToHex<std::uint8_t>(c & 0x0F)};
+    }
+
+    template <typename T = std::uint8_t, std::enable_if_t<is_byte_v<T>, int> = 0> inline T halfHexToByte(char c)
+    {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        else if (c >= 'A' && c <= 'F') {
+            return c - 'A' + 10;
+        }
+        else if (c >= 'a' && c <= 'f') {
+            return c - 'a' + 10;
+        }
+        throw std::invalid_argument("Unexpected hex digit");
+        return 0;
+    }
+
+    template <typename Bytes                                               = std::vector<std::uint8_t>,
+              std::enable_if_t<is_byte_v<typename Bytes::value_type>, int> = 0>
+    inline Bytes hexToBytes(const std::string &hex)
+    {
+        using Value                      = typename Bytes::value_type;
+        const std::size_t bytesCount     = (hex.size() + 1) / 2;
+        const std::size_t fullBytesCount = hex.size() / 2;
+        Bytes bytes(bytesCount, Value(0));
+        for (std::size_t i = 0; i < fullBytesCount; ++i) {
+            const std::size_t offset = i * 2;
+            bytes[i]                 = (halfHexToByte<Value>(hex[offset]) << 4) | halfHexToByte<Value>(hex[offset + 1]);
+        }
+        if (fullBytesCount < bytesCount) {
+            bytes.back() = halfHexToByte<Value>(hex.back());
+        }
+        return bytes;
+    }
+
+    inline bool endsWith(std::string const &str, std::string const &suffix)
+    {
+        return str.size() >= suffix.size() &&
+               std::equal(str.begin() + (str.size() - suffix.size()), str.end(), suffix.begin());
     }
 
     static inline std::string removeNewLines(const std::string &s)
@@ -78,7 +122,7 @@ namespace utils
         return base;
     }
 
-    template <typename T> [[nodiscard]] std::string to_string(T t)
+    template <typename T> [[nodiscard]] inline std::string to_string(T t)
     {
         return std::to_string(t);
     }
