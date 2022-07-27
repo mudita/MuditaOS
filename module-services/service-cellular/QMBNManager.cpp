@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QMBNManager.hpp"
-#include "Utils.hpp"
+#include <Utils.hpp>
 #include "response.hpp"
 #include <at/ATFactory.hpp>
 #include <modem/mux/DLCChannel.h>
@@ -77,7 +77,7 @@ at::Result::Code QMBNManager::setAutoSelect(at::response::qmbncfg::MBNAutoSelect
 
 at::Result::Code QMBNManager::writeNVByte(const std::string &nvfile, std::uint8_t byte)
 {
-    return writeNV(nvfile, utils::numToHex<std::uint8_t>(byte));
+    return writeNV(nvfile, utils::byteToHex<std::uint8_t>(byte));
 }
 
 at::Result::Code QMBNManager::writeNV(const std::string &nvfile, const std::string &hexvalue)

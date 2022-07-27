@@ -6,6 +6,7 @@
 #include "CellularUrcHandler.hpp"
 #include "service-cellular/CellularMessage.hpp"
 #include "service-cellular/CellularServiceAPI.hpp"
+#include "service-cellular/Pdu.hpp"
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/State.hpp"
@@ -949,6 +950,11 @@ std::optional<std::shared_ptr<sys::Message>> ServiceCellular::identifyNotificati
     return urcHandler.getResponse();
 }
 
+std::string numberFromAddress(std::string const &address)
+{
+    return utils::endsWith(address, "/TYPE=PLMN") ? address.substr(0, address.size() - 10) : std::string();
+}
+
 auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
 {
     auto retVal = true;
@@ -1075,7 +1081,20 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
                 if (messageParsed) {
                     messageParsed = false;
 
-                    const auto decodedMessage = UCS2(messageRawBody).toUTF8();
+                    UTF8 decodedMessage;
+
+                    const std::string decodedStr  = utils::hexToBytes<std::string>(messageRawBody);
+                    const auto mmsNotificationOpt = pdu::parse(decodedStr);
+                    if (mmsNotificationOpt) {
+                        std::string number = numberFromAddress(mmsNotificationOpt->fromAddress);
+                        // NOTE: number may be empty
+                        decodedMessage = UTF8("[MMS]");
+                        receivedNumber = UTF8(number);
+                    }
+
+                    if (decodedMessage.empty()) {
+                        decodedMessage = UCS2(messageRawBody).toUTF8();
+                    }
 
                     const auto record = createSMSRecord(decodedMessage, receivedNumber, messageDate);
 
@@ -1141,7 +1160,8 @@ bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
     LOG_ERROR("ServiceCellular::getIMSI failed.");
     return false;
 }
-std::vector<std::string> ServiceCellular::getNetworkInfo(void)
+
+std::vector<std::string> ServiceCellular::getNetworkInfo()
 {
     std::vector<std::string> data;
     auto channel = cmux->get(CellularMux::Channel::Commands);

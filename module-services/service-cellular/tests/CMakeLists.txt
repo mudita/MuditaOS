@@ -59,7 +59,7 @@ add_catch2_executable(
 
 add_gtest_executable(
         NAME
-        connection-manager
+        cellular-connection-manager
         SRCS
         unittest_connection-manager.cpp
         LIBS
@@ -75,11 +75,22 @@ add_catch2_executable(
         LIBS
         module-cellular
 )
+
 add_catch2_executable(
         NAME
-        DTMFCode
+        cellular-DTMFCode
         SRCS
         unittest_DTMFCode.cpp
         LIBS
         module-cellular
+)
+
+add_catch2_executable(
+        NAME
+        cellular-Pdu
+        SRCS
+        unittest_Pdu.cpp
+        LIBS
+        module-cellular
+        module-utils
 )

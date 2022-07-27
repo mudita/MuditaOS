@@ -496,19 +496,66 @@ TEST_CASE("Hex to bytes")
         REQUIRE(b[3] == 0xEF);
     }
 
+    SECTION("Odd number of digits")
+    {
+        auto b = utils::hexToBytes("AbcDe");
+        REQUIRE(b.size() == 3);
+        REQUIRE(b[0] == 0xAB);
+        REQUIRE(b[1] == 0xCD);
+        REQUIRE(b[2] == 0xE);
+    }
+
     SECTION("Out of hex")
     {
         REQUIRE_THROWS_AS(utils::hexToBytes("deAdbEZZ"), std::invalid_argument);
     }
 }
 
-TEST_CASE("Bytes to hex")
+TEST_CASE("Byte to hex")
 {
-    SECTION("Vector of bytes")
+    SECTION("One digit")
     {
-        std::vector<std::uint8_t> vb = {1, 2, 3, 4, 0xFF};
-        auto ret                     = utils::bytesToHex(vb);
-        REQUIRE((ret == "01020304ff"));
+        auto ret = utils::byteToHex(std::uint8_t(0xC));
+        REQUIRE((ret == "0c"));
+    }
+
+    SECTION("Two digits")
+    {
+        auto ret = utils::byteToHex(std::uint8_t(0x3F));
+        REQUIRE((ret == "3f"));
+    }
+}
+
+TEST_CASE("Ends with")
+{
+    SECTION("Empty string")
+    {
+        REQUIRE((utils::endsWith("", "abc") == false));
+    }
+
+    SECTION("Empty suffix")
+    {
+        REQUIRE((utils::endsWith("abc", "") == true));
+    }
+
+    SECTION("Both empty")
+    {
+        REQUIRE((utils::endsWith("", "") == true));
+    }
+
+    SECTION("No")
+    {
+        REQUIRE((utils::endsWith("Abcde", "def") == false));
+    }
+
+    SECTION("Yes")
+    {
+        REQUIRE((utils::endsWith("Abcde", "de") == true));
+    }
+
+    SECTION("Equal")
+    {
+        REQUIRE((utils::endsWith("Abc", "Abc") == true));
     }
 }
 

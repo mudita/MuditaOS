@@ -23,6 +23,7 @@ set(SOURCES
     SignalStrength.cpp
     NetworkSettings.cpp
     PacketData.cpp
+    Pdu.cpp
     QMBNManager.cpp
     RequestFactory.cpp
     CellularRequestHandler.cpp
