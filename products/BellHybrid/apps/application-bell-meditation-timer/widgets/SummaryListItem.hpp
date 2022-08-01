@@ -3,24 +3,17 @@
 
 #pragma once
 
-#include <ListItem.hpp>
+#include <common/widgets/BellSideListItemWithCallbacks.hpp>
 
-namespace gui
-{
-    class Text;
-    class VBox;
-} // namespace gui
+#include <chrono>
 
 namespace app::meditation
 {
-    class SummaryListItem : public gui::ListItem
+    class SummaryListItem : public gui::BellSideListItemWithCallbacks
     {
       public:
-        SummaryListItem(const std::string &title, const std::string &value);
-
-      private:
-        gui::VBox *body{};
-        gui::Text *title{};
-        gui::Text *value{};
+        SummaryListItem(const std::string &topDescription,
+                        std::chrono::minutes total,
+                        std::chrono::minutes average);
     };
 } // namespace app::meditation
