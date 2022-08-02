@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/filesystem/FS_Helper.hpp>
@@ -315,16 +315,17 @@ namespace sdesktop::endpoints
             return ResponseContext{.status = http::Code::NotFound};
         }
 
-        std::vector<std::string> filesInDir;
+        std::vector<std::pair<std::string, int>> filesInDir;
         for (const auto &entry : std::filesystem::directory_iterator{directory}) {
-            filesInDir.push_back(entry.path());
+            filesInDir.push_back(std::make_pair(entry.path(), entry.file_size()));
         }
 
         json11::Json::array jsonArr;
         jsonArr.reserve(filesInDir.size());
 
-        for (const auto &path : filesInDir) {
-            jsonArr.push_back(json11::Json::object{{json::fs::path, path}});
+        for (const auto &pathAndSize : filesInDir) {
+            jsonArr.push_back(
+                json11::Json::object{{json::fs::path, pathAndSize.first}, {json::fs::fileSize, pathAndSize.second}});
         }
 
         json11::Json::object response({{directory, jsonArr}});
