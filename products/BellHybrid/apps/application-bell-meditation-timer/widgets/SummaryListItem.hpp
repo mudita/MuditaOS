@@ -7,13 +7,16 @@
 
 #include <chrono>
 
+namespace gui
+{
+    class TextFixedSize;
+}
+
 namespace app::meditation
 {
     class SummaryListItem : public gui::BellSideListItemWithCallbacks
     {
       public:
-        SummaryListItem(const std::string &topDescription,
-                        std::chrono::minutes total,
-                        std::chrono::minutes average);
+        SummaryListItem(const std::string &topDescription, std::chrono::minutes total, std::chrono::minutes average);
     };
 } // namespace app::meditation

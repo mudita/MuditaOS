@@ -11,6 +11,7 @@ namespace app::meditation::models
     class ChimeInterval;
     class ChimeVolume;
     class StartDelay;
+    class Statistics;
 } // namespace app::meditation::models
 
 namespace app
@@ -45,6 +46,7 @@ namespace app
         std::unique_ptr<app::meditation::models::ChimeVolume> chimeVolumeModel;
         std::unique_ptr<app::meditation::models::StartDelay> startDelayModel;
         std::unique_ptr<AbstractAudioModel> audioModel;
+        std::unique_ptr<app::meditation::models::Statistics> statisticsModel;
     };
 
     template <> struct ManifestTraits<MeditationTimer>

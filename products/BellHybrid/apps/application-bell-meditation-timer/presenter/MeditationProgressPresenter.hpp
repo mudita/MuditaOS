@@ -31,6 +31,7 @@ namespace app::meditation
     namespace models
     {
         class ChimeInterval;
+        class Statistics;
     } // namespace models
 
     class MeditationProgressContract
@@ -71,6 +72,7 @@ namespace app::meditation
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
         models::ChimeInterval &chimeIntervalModel;
+        models::Statistics &statisticsModel;
         std::chrono::minutes duration;
         std::chrono::seconds interval;
 
@@ -79,11 +81,14 @@ namespace app::meditation
         void onProgressFinished();
         void onIntervalReached();
 
+        void addMeditationEntry(std::chrono::minutes elapsed);
+
       public:
         MeditationProgressPresenter(app::ApplicationCommon *app,
                                     settings::Settings *settings,
                                     std::unique_ptr<AbstractTimeModel> timeModel,
-                                    models::ChimeInterval &chimeIntervalModel);
+                                    models::ChimeInterval &chimeIntervalModel,
+                                    models::Statistics &statisticsModel);
 
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void handleUpdateTimeEvent() override;

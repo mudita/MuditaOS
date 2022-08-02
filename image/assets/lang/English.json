@@ -725,5 +725,8 @@
   "app_bell_settings_factory_reset": "Factory reset",
   "app_bell_settings_display_factory_reset_confirmation": "<text>Reset to factory<br></br>settings ?</text>",
   "app_meditation_summary": "<text>You've meditated for<br />",
-  "app_meditation_countdown_desc": "Starts in"
+  "app_meditation_countdown_desc": "Starts in",
+  "app_meditation_summary_total": "<text>Total:<br /><token>$VALUE</token></text>",
+  "app_meditation_summary_average": "Average/day:",
+  "app_meditation_summary_title": "<text>Last <token>$VALUE</token> days</text>"
 }

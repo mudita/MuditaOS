@@ -13,6 +13,7 @@
 #include "models/ChimeVolume.hpp"
 #include "models/StartDelay.hpp"
 #include "models/ChimeInterval.hpp"
+#include "models/Statistics.hpp"
 
 #include "presenter/SettingsPresenter.hpp"
 #include "presenter/StatisticsPresenter.hpp"
@@ -45,6 +46,7 @@ namespace app
         chimeIntervalModel = std::make_unique<meditation::models::ChimeInterval>(this);
         chimeVolumeModel   = std::make_unique<meditation::models::ChimeVolume>(*audioModel);
         startDelayModel    = std::make_unique<meditation::models::StartDelay>(this);
+        statisticsModel    = std::make_unique<meditation::models::Statistics>(this);
 
         createUserInterface();
 
@@ -66,10 +68,11 @@ namespace app
                                   return std::make_unique<meditation::SettingsWindow>(app, std::move(presenter));
                               });
 
-        windowsFactory.attach(meditation::StatisticsWindow::name, [](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<app::meditation::StatisticsPresenter>(app);
-            return std::make_unique<meditation::StatisticsWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(
+            meditation::StatisticsWindow::name, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<app::meditation::StatisticsPresenter>(app, *statisticsModel);
+                return std::make_unique<meditation::StatisticsWindow>(app, std::move(presenter));
+            });
 
         windowsFactory.attach(
             meditation::MeditationTimerWindow::name, [this](ApplicationCommon *app, const std::string &name) {
@@ -86,7 +89,7 @@ namespace app
                               [this](ApplicationCommon *app, const std::string &name) {
                                   auto timeModel = std::make_unique<app::TimeModel>();
                                   auto presenter = std::make_unique<app::meditation::MeditationProgressPresenter>(
-                                      app, settings.get(), std::move(timeModel), *chimeIntervalModel);
+                                      app, settings.get(), std::move(timeModel), *chimeIntervalModel, *statisticsModel);
                                   return std::make_unique<gui::MeditationRunningWindow>(app, std::move(presenter));
                               });
         windowsFactory.attach(gui::window::session_paused::sessionPaused,

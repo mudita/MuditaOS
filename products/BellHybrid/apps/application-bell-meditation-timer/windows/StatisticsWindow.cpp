@@ -5,24 +5,35 @@
 
 #include "MeditationMainWindow.hpp"
 
-#include <ListView.hpp>
-#include <common/data/StyleCommon.hpp>
-#include <apps-common/ApplicationCommon.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
-#include <apps-common/InternalModel.hpp>
-
-namespace
-{
-    constexpr auto height     = 400;
-    constexpr auto width      = 380;
-    constexpr auto top_margin = 41;
-} // namespace
+#include <module-gui/gui/widgets/SideListView.hpp>
 
 namespace app::meditation
 {
     using namespace gui;
+
+    InputEvent transformKeyToKnobEvent(const InputEvent &inputEvent)
+    {
+        InputEvent newEvent{inputEvent};
+
+        if (inputEvent.is(KeyCode::KEY_UP)) {
+            newEvent.setKeyCode(gui::KeyCode::KEY_ENTER);
+        }
+
+        if (inputEvent.is(KeyCode::KEY_DOWN)) {
+            newEvent.setKeyCode(KeyCode::KEY_RF);
+        }
+
+        return newEvent;
+    }
+
+    bool filterInputEvents(const gui::InputEvent &inputEvent)
+    {
+        return inputEvent.isShortRelease(KeyCode::KEY_ENTER);
+    }
+
     StatisticsWindow::StatisticsWindow(app::ApplicationCommon *app,
-                                       std::unique_ptr<app::meditation::contract::Presenter> presenter)
+                                       std::unique_ptr<app::meditation::contract::StatisticsPresenter> presenter)
         : AppWindow(app, name), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
@@ -42,30 +53,43 @@ namespace app::meditation
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        list = new ListView(this,
-                            style::window::default_left_margin,
-                            top_margin,
-                            width,
-                            height,
-                            presenter->getPagesProvider(),
-                            listview::ScrollBarType::Fixed);
-        list->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        sideListView = new gui::SideListView(
+            this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider(), PageBarType::None);
+        sideListView->setEdges(RectangleEdge::None);
+        sideListView->setBoundaries(gui::Boundaries::Continuous);
 
-        list->rebuildList();
+        sideListView->rebuildList(listview::RebuildType::Full);
+
+        setFocusItem(sideListView);
     }
 
     void StatisticsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
-        setFocusItem(list);
+        setFocusItem(sideListView);
     }
 
     bool StatisticsWindow::onInput(const gui::InputEvent &inputEvent)
     {
+        if (filterInputEvents(inputEvent)) {
+            return true;
+        }
+
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            presenter->handleExit();
+            return true;
+        }
+
+        if (sideListView->onInput(transformKeyToKnobEvent(inputEvent))) {
+            return true;
+        }
+
         return AppWindow::onInput(inputEvent);
     }
 
     void StatisticsWindow::onClose(CloseReason reason)
     {
-        presenter->eraseProviderData();
+        if (reason != CloseReason::Popup) {
+            presenter->eraseProviderData();
+        }
     }
 } // namespace app::meditation
