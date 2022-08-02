@@ -24,6 +24,17 @@ namespace
         return ret;
     }
 
+    gui::TextFixedSize *createCenterText(gui::Item *parent)
+    {
+        using namespace gui;
+        auto widget = new TextFixedSize(parent);
+        widget->setFont(style::bell_sidelist_item::title_font);
+        widget->setEdges(RectangleEdge::None);
+        widget->activeItem = false;
+        widget->drawUnderline(false);
+        return widget;
+    }
+
 } // namespace
 
 namespace app::meditation
@@ -40,24 +51,16 @@ namespace app::meditation
         duoBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         duoBox->setMaximumSize(::style::bell_base_layout::w, ::style::bell_base_layout::h);
 
-        auto centerText = new TextFixedSize(duoBox);
+        auto centerText = createCenterText(duoBox);
         centerText->setMinimumSize(style::bell_base_layout::w, 2 * (style::bell_base_layout::center_layout_h / 3));
-        centerText->setFont(style::bell_sidelist_item::title_font);
-        centerText->setEdges(RectangleEdge::None);
-        centerText->activeItem = false;
         centerText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         centerText->setRichText(utils::translate("app_meditation_summary_total"),
                                 text::RichTextParser::TokenMap({{"$VALUE", format(total)}}));
-        centerText->drawUnderline(false);
 
-        auto centerText2 = new TextFixedSize(duoBox);
-        centerText2->setFont(style::bell_sidelist_item::title_font);
+        auto centerText2 = createCenterText(duoBox);
         centerText2->setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h / 3);
-        centerText2->setEdges(RectangleEdge::None);
-        centerText2->activeItem = false;
         centerText2->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         centerText2->setRichText(utils::translate("app_meditation_summary_average"));
-        centerText2->drawUnderline(false);
 
         setupBottomDescription(format(average));
         bottomText->setFont(style::bell_sidelist_item::title_font);

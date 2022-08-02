@@ -8,48 +8,48 @@
 
 #include <db/MeditationStatsMessages.hpp>
 #include <ApplicationCommon.hpp>
-#include <common/windows/BellFinishedWindow.hpp>
 #include <common/BellListItemProvider.hpp>
+
+namespace
+{
+    std::string createTitle(const std::string &str, const std::uint32_t days)
+    {
+        auto parser       = gui::text::RichTextParser{};
+        const auto result = parser.parse(
+            utils::translate(str), nullptr, gui::text::RichTextParser::TokenMap({{"$VALUE", std::to_string(days)}}));
+        return result->getText();
+    }
+} // namespace
 
 namespace app::meditation
 {
-    StatisticsPresenter::StatisticsPresenter(app::ApplicationCommon *app)
+    StatisticsPresenter::StatisticsPresenter(app::ApplicationCommon *app, const models::Statistics &statisticsModel)
+        : app{app}
     {
-        const auto model = std::make_unique<models::Statistics>(app);
+        BellListItemProvider::Items listItems;
+        for (const auto e : std::array<std::uint32_t, 3>{7, 30, 365}) {
+            if (const auto summary = statisticsModel.getSummary(e)) {
+                auto listItem =
+                    new SummaryListItem(createTitle("app_meditation_summary_title", e), summary->sum, summary->avg);
+                listItems.push_back(listItem);
+            }
+            else {
+                LOG_ERROR("Fetching summary for the last %" PRIu32 " days failed", e);
+            }
+        }
 
-        const auto t1      = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
-        const auto summary = model->getSummary(500);
-        const auto t2      = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
-
-        auto entry1 = new SummaryListItem("Total [min]", std::to_string(summary->sum.count()));
-        auto entry2 = new SummaryListItem("Avg [min]", std::to_string(summary->avg.count()));
-        auto entry3 = new SummaryListItem("Entries", std::to_string(summary->count));
-        auto entry4 = new SummaryListItem("Query took [ms]", std::to_string(t2 - t1));
-
-        listItemsProvider = std::make_shared<BellListItemProvider>(
-            BellListItemProvider::Items{reinterpret_cast<gui::BellSideListItemWithCallbacks *>(entry1),
-                                        reinterpret_cast<gui::BellSideListItemWithCallbacks *>(entry2),
-                                        reinterpret_cast<gui::BellSideListItemWithCallbacks *>(entry3),
-                                        reinterpret_cast<gui::BellSideListItemWithCallbacks *>(entry4)});
+        listItemsProvider = std::make_shared<BellListItemProvider>(std::move(listItems));
     }
     void StatisticsPresenter::eraseProviderData()
     {
         listItemsProvider->clearData();
     }
-    void StatisticsPresenter::loadData()
-    {}
-    void StatisticsPresenter::saveData()
-    {}
     auto StatisticsPresenter::getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider>
     {
         return listItemsProvider;
     }
-    void StatisticsPresenter::handleEnter()
+    void StatisticsPresenter::handleExit()
     {
-        app->switchWindow(
-            gui::window::bell_finished::defaultName,
-            gui::BellFinishedWindowData::Factory::create("circle_success_big", MeditationMainWindow::defaultName));
+        app->returnToPreviousWindow();
     }
-    void StatisticsPresenter::exitWithoutSave()
-    {}
 } // namespace app::meditation

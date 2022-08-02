@@ -25,4 +25,13 @@ namespace app::meditation::contract
         virtual void handleEnter()                                                      = 0;
         virtual void exitWithoutSave()                                                  = 0;
     };
+
+    class StatisticsPresenter : public BasePresenter<View>
+    {
+      public:
+        virtual ~StatisticsPresenter() noexcept                                         = default;
+        virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
+        virtual void eraseProviderData()                                                = 0;
+        virtual void handleExit()                                                       = 0;
+    };
 } // namespace app::meditation::contract

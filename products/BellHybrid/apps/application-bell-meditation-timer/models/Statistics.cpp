@@ -27,14 +27,15 @@ namespace app::meditation::models
     Statistics::Statistics(app::ApplicationCommon *app) : app::AsyncCallbackReceiver{app}, app{app}
     {}
 
-    void Statistics::addEntry(const time_t utcTimestamp, const std::chrono::minutes duration)
+    void Statistics::addEntry(const std::chrono::minutes duration)
     {
-        const auto addRequest = AsyncRequest::createFromMessage(
-            std::make_unique<messages::Add>(Entry(utcTimestamp, duration)), service::name::db);
-        addRequest->execute(app, this, [this](sys::ResponseMessage *) { return true; });
+        const auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        const auto addRequest =
+            AsyncRequest::createFromMessage(std::make_unique<messages::Add>(Entry(now, duration)), service::name::db);
+        addRequest->execute(app, this, [](sys::ResponseMessage *) { return true; });
     }
 
-    std::optional<Summary> Statistics::getSummary(const std::uint32_t days)
+    std::optional<Summary> Statistics::getSummary(const std::uint32_t days) const
     {
         const auto result = sendDBRequest(app, std::make_shared<messages::GetByDays>(days));
         if (not result) {

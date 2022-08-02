@@ -15,16 +15,17 @@ namespace app
 
 namespace app::meditation
 {
-    class StatisticsPresenter : public contract::Presenter
+    namespace models
+    {
+        class Statistics;
+    }
+    class StatisticsPresenter : public contract::StatisticsPresenter
     {
       public:
-        explicit StatisticsPresenter(app::ApplicationCommon *app);
+        StatisticsPresenter(app::ApplicationCommon *app, const models::Statistics &statisticsModel);
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
-        void loadData() override;
-        void saveData() override;
         void eraseProviderData() override;
-        void handleEnter() override;
-        void exitWithoutSave() override;
+        void handleExit() override;
 
       private:
         app::ApplicationCommon *app{nullptr};

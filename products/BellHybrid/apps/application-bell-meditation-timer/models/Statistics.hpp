@@ -26,8 +26,8 @@ namespace app::meditation::models
     {
       public:
         explicit Statistics(app::ApplicationCommon *app);
-        void addEntry(time_t utcTimestamp, std::chrono::minutes duration);
-        std::optional<Summary> getSummary(std::uint32_t days);
+        void addEntry(std::chrono::minutes duration);
+        std::optional<Summary> getSummary(std::uint32_t days) const;
 
       private:
         app::ApplicationCommon *app{nullptr};

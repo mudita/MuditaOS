@@ -10,7 +10,6 @@
 namespace gui
 {
     class SideListView;
-    class ListView;
 } // namespace gui
 
 namespace app::meditation
@@ -19,7 +18,8 @@ namespace app::meditation
     {
       public:
         static constexpr auto name = "MeditationStatisticsWindow";
-        StatisticsWindow(app::ApplicationCommon *app, std::unique_ptr<app::meditation::contract::Presenter> presenter);
+        StatisticsWindow(app::ApplicationCommon *app,
+                         std::unique_ptr<app::meditation::contract::StatisticsPresenter> presenter);
 
         void buildInterface() override;
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
@@ -28,7 +28,7 @@ namespace app::meditation
         void rebuild() override;
 
       private:
-        gui::ListView *list{};
-        std::unique_ptr<app::meditation::contract::Presenter> presenter;
+        gui::SideListView *sideListView{};
+        std::unique_ptr<app::meditation::contract::StatisticsPresenter> presenter;
     };
 } // namespace app::meditation
