@@ -16,11 +16,6 @@
 #include <filesystem>
 #include <atomic>
 
-namespace constants
-{
-    constexpr auto usbSuspendTimeout = std::chrono::seconds{1};
-} // namespace constants
-
 class WorkerDesktop : public sys::Worker
 {
   public:
@@ -33,7 +28,7 @@ class WorkerDesktop : public sys::Worker
     void closeWorker();
     bool reinit(const std::filesystem::path &path);
 
-    bool handleMessage(uint32_t queueID) override final;
+    bool handleMessage(std::uint32_t queueID) override final;
 
     xQueueHandle getReceiveQueue()
     {
@@ -44,8 +39,13 @@ class WorkerDesktop : public sys::Worker
     void reset();
     void suspendUsb();
 
-    bool stateChangeWait();
-    bool initialized = false;
+    bool handleReceiveQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
+    bool handleSendQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
+    bool handleServiceQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
+    bool handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
+
+    std::atomic<bool> initialized = false;
+
     xQueueHandle receiveQueue;
     xQueueHandle irqQueue;
     const sdesktop::USBSecurityModel &securityModel;
