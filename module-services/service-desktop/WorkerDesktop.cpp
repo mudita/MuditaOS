@@ -66,10 +66,12 @@ void WorkerDesktop::closeWorker(void)
     while (parser.getCurrentState() != sdesktop::endpoints::State::NoMsg && --maxcount > 0) {
         vTaskDelay(300);
     }
+
+    initialized = false;
     LOG_INFO("we can deinit worker now");
 
     /// additional wait to flush on serial - we should wait for data sent...
-    vTaskDelay(3000);
+    vTaskDelay(500);
 
     bsp::usbDeinit();
 
@@ -84,7 +86,6 @@ void WorkerDesktop::closeWorker(void)
     cpuSentinel.reset();
 
     LOG_DEBUG("deinit end");
-    initialized = false;
 }
 
 bool WorkerDesktop::reinit(const std::filesystem::path &path)
@@ -99,6 +100,7 @@ bool WorkerDesktop::reinit(const std::filesystem::path &path)
 
 void WorkerDesktop::reset()
 {
+    initialized = false;
     usbStatus = bsp::USBDeviceStatus::Disconnected;
     bsp::usbDeinit();
 
@@ -111,97 +113,128 @@ void WorkerDesktop::reset()
     }
 }
 
-bool WorkerDesktop::handleMessage(uint32_t queueID)
+bool WorkerDesktop::handleMessage(std::uint32_t queueID)
 {
+    bool result       = false;
     auto &queue       = queues[queueID];
     const auto &qname = queue->GetQueueName();
 
     if (qname == sdesktop::RECEIVE_QUEUE_BUFFER_NAME) {
-        std::string *receivedMsg = nullptr;
-        if (!queue->Dequeue(&receivedMsg, 0)) {
-            LOG_ERROR("handleMessage failed to receive from \"%s\"", sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
-            return false;
-        }
-
-        using namespace sdesktop::endpoints;
-        auto factory = EndpointFactory::create(securityModel.getEndpointSecurity());
-        auto handler = std::make_unique<MessageHandler>(ownerService, messageProcessedCallback, std::move(factory));
-
-        parser.setMessageHandler(std::move(handler));
-        parser.processMessage(std::move(*receivedMsg));
-
-        delete receivedMsg;
+        result = handleReceiveQueueMessage(queue);
     }
     else if (qname == sdesktop::SEND_QUEUE_BUFFER_NAME) {
-        std::string *sendMsg = nullptr;
-        if (!queue->Dequeue(&sendMsg, 0)) {
-            LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::SEND_QUEUE_BUFFER_NAME);
-            return false;
-        }
-
-        bsp::usbCDCSend(sendMsg);
-        delete sendMsg;
+        result = handleSendQueueMessage(queue);
     }
     else if (qname == SERVICE_QUEUE_NAME) {
-        auto &serviceQueue = getServiceQueue();
-        sys::WorkerCommand cmd;
-
-        if (serviceQueue.Dequeue(&cmd, 0)) {
-            LOG_DEBUG("Received cmd: %d", static_cast<int>(cmd.command));
-#if defined(DEBUG)
-            assert(false);
-#endif
-        }
-        else {
-            LOG_ERROR("handleMessage xQueueReceive failed for %s.", SERVICE_QUEUE_NAME.c_str());
-            return false;
-        }
+        result = handleServiceQueueMessage(queue);
     }
     else if (qname == sdesktop::IRQ_QUEUE_BUFFER_NAME) {
-        bsp::USBDeviceStatus notification = bsp::USBDeviceStatus::Disconnected;
-        if (!queue->Dequeue(&notification, 0)) {
-            LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::IRQ_QUEUE_BUFFER_NAME);
-            return false;
-        }
-
-        LOG_DEBUG("USB status: %s", magic_enum::enum_name(notification).data());
-
-        if (notification == bsp::USBDeviceStatus::Connected) {
-            ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
-                                            sys::BusChannel::USBNotifications);
-            usbStatus = bsp::USBDeviceStatus::Connected;
-        }
-        else if (notification == bsp::USBDeviceStatus::Configured) {
-            if (usbStatus == bsp::USBDeviceStatus::Connected) {
-                ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConfigured>(
-                                                  sdesktop::usb::USBConfigurationType::firstConfiguration),
-                                              service::name::service_desktop);
-            }
-            else {
-                ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConfigured>(
-                                                  sdesktop::usb::USBConfigurationType::reconfiguration),
-                                              service::name::service_desktop);
-            }
-            usbStatus = bsp::USBDeviceStatus::Configured;
-        }
-        else if (notification == bsp::USBDeviceStatus::Disconnected) {
-            ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBDisconnected>(),
-                                            sys::BusChannel::USBNotifications);
-            usbStatus = bsp::USBDeviceStatus::Disconnected;
-        }
-        else if (notification == bsp::USBDeviceStatus::DataReceived) {
-            bsp::usbHandleDataReceived();
-        }
-        else if (notification == bsp::USBDeviceStatus::Reset) {
-            if (usbStatus == bsp::USBDeviceStatus::Configured) {
-                reset();
-            }
-        }
+        result = handleIrqQueueMessage(queue);
     }
     else {
         LOG_INFO("handeMessage got message on an unhandled queue");
     }
 
+    return result;
+}
+
+bool WorkerDesktop::handleReceiveQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue)
+{
+    if (!initialized) {
+        return false;
+    }
+    std::string *receivedMsg = nullptr;
+    if (!queue->Dequeue(&receivedMsg, 0)) {
+        LOG_ERROR("handleMessage failed to receive from \"%s\"", sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
+        return false;
+    }
+
+    using namespace sdesktop::endpoints;
+    auto factory = EndpointFactory::create(securityModel.getEndpointSecurity());
+    auto handler = std::make_unique<MessageHandler>(ownerService, messageProcessedCallback, std::move(factory));
+
+    parser.setMessageHandler(std::move(handler));
+    parser.processMessage(std::move(*receivedMsg));
+
+    delete receivedMsg;
+    return true;
+}
+bool WorkerDesktop::handleSendQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue)
+{
+    if (!initialized) {
+        return false;
+    }
+    std::string *sendMsg = nullptr;
+    if (!queue->Dequeue(&sendMsg, 0)) {
+        LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::SEND_QUEUE_BUFFER_NAME);
+        return false;
+    }
+
+    bsp::usbCDCSend(sendMsg);
+    delete sendMsg;
+    return true;
+}
+bool WorkerDesktop::handleServiceQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue)
+{
+    if (!initialized) {
+        return false;
+    }
+    auto &serviceQueue = getServiceQueue();
+    sys::WorkerCommand cmd;
+
+    if (serviceQueue.Dequeue(&cmd, 0)) {
+        LOG_DEBUG("Received cmd: %d", static_cast<int>(cmd.command));
+#if defined(DEBUG)
+        assert(false);
+#endif
+    }
+    else {
+        LOG_ERROR("handleMessage xQueueReceive failed for %s.", SERVICE_QUEUE_NAME.c_str());
+        return false;
+    }
+    return true;
+}
+bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue)
+{
+    bsp::USBDeviceStatus notification = bsp::USBDeviceStatus::Disconnected;
+    if (!queue->Dequeue(&notification, 0)) {
+        LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::IRQ_QUEUE_BUFFER_NAME);
+        return false;
+    }
+
+    LOG_DEBUG("USB status: %s", magic_enum::enum_name(notification).data());
+
+    if (notification == bsp::USBDeviceStatus::Connected) {
+        ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
+                                        sys::BusChannel::USBNotifications);
+        usbStatus = bsp::USBDeviceStatus::Connected;
+    }
+    else if (notification == bsp::USBDeviceStatus::Configured) {
+        if (usbStatus == bsp::USBDeviceStatus::Connected) {
+            ownerService->bus.sendUnicast(
+                std::make_shared<sdesktop::usb::USBConfigured>(sdesktop::usb::USBConfigurationType::firstConfiguration),
+                service::name::service_desktop);
+        }
+        else {
+            ownerService->bus.sendUnicast(
+                std::make_shared<sdesktop::usb::USBConfigured>(sdesktop::usb::USBConfigurationType::reconfiguration),
+                service::name::service_desktop);
+        }
+        usbStatus = bsp::USBDeviceStatus::Configured;
+    }
+    else if (notification == bsp::USBDeviceStatus::Disconnected) {
+        ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBDisconnected>(),
+                                        sys::BusChannel::USBNotifications);
+        usbStatus = bsp::USBDeviceStatus::Disconnected;
+    }
+    else if (notification == bsp::USBDeviceStatus::DataReceived) {
+        bsp::usbHandleDataReceived();
+    }
+    else if (notification == bsp::USBDeviceStatus::Reset) {
+        if (usbStatus == bsp::USBDeviceStatus::Configured) {
+            reset();
+        }
+    }
     return true;
 }
 
