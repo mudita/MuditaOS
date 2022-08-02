@@ -138,7 +138,7 @@ auto ServiceDesktop::requestLogsFlush() -> void
 
 auto ServiceDesktop::getSerialNumber() const -> std::string
 {
-    return settings->getValue(sdesktop::pathFactoryDataSerial, settings::SettingsScope::Global);
+    return "123456789";
 }
 
 auto ServiceDesktop::getCaseColour() const -> std::string

@@ -2,18 +2,12 @@
 # https://stackoverflow.com/questions/39810593/gdb-monitor-commands-in-clion
 # random FreeRTOS stuff triggers this
 handle SIGUSR1 noprint nostop
-# setting breakpoints triggers this signal
-# handle SIGTRAP print nostop
 
 define hookpost-load
 monitor halt
 monitor memU32 0x401BC000 = 128;
 eval "monitor exec SetRTTAddr %p", &_SEGGER_RTT
-b main
-b HardFault_Handler
-b MemManage_Handler
-b BusFault_Handler
-b UsageFault_Handler
+tb main
 b ResetISR
 end
 
