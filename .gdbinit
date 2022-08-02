@@ -1,3 +1,3 @@
-source .gdb_macros
+source ~/.gdbinit
 
 handle SIGUSR1 nostop noprint
