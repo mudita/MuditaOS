@@ -26,7 +26,7 @@ void SimPINSettingsPresenter::togglePinState()
     }
 }
 
-bool SimPINSettingsPresenter::getPinState() const noexcept
+bool SimPINSettingsPresenter::isPinEnabled() const noexcept
 {
     return isPinOn;
 }
@@ -48,7 +48,7 @@ void SimPINSettingsPresenter::onBeforeShow(gui::ShowMode mode, gui::SwitchData *
     if (const auto pinSettingsLockStateData = dynamic_cast<gui::PINSettingsLockStateData *>(data);
         pinSettingsLockStateData != nullptr) {
         view->setNavbarCenterActive(true);
-        pinLockStateChanged = getPinState() == pinSettingsLockStateData->getSimCardPinLockState() ? false : true;
+        pinLockStateChanged = isPinEnabled() == pinSettingsLockStateData->getSimCardPinLockState() ? false : true;
         if (pinLockStateChanged) {
             const auto currentPinState = pinSettingsLockStateData->getSimCardPinLockState();
             setCurrentPinState(currentPinState);
