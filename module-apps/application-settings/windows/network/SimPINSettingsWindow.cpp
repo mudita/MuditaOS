@@ -28,7 +28,7 @@ namespace gui
 
         optionList.emplace_back(std::make_unique<option::OptionSettings>(
             utils::translate("app_settings_network_pin"),
-            [=](Item & /*item*/) {
+            [=](Item &) {
                 presenter->togglePinState();
                 return true;
             },
@@ -42,12 +42,12 @@ namespace gui
                 return true;
             },
             nullptr,
-            presenter->getPinState() ? option::SettingRightItem::On : option::SettingRightItem::Off));
+            presenter->isPinEnabled() ? option::SettingRightItem::On : option::SettingRightItem::Off));
 
-        if (presenter->getPinState()) {
+        if (presenter->isPinEnabled()) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
                 utils::translate("app_settings_network_pin_change_code"),
-                [=](Item & /*item*/) {
+                [=](Item &) {
                     application->getSimLockSubject().changeSimPin();
                     return true;
                 },

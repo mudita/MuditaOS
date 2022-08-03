@@ -24,7 +24,7 @@ class SimPINSettingsWindowContract
         virtual ~Presenter() noexcept                                        = default;
         virtual void setCurrentPinState(bool state) noexcept                 = 0;
         virtual void togglePinState()                                        = 0;
-        virtual bool getPinState() const noexcept                            = 0;
+        virtual bool isPinEnabled() const noexcept                           = 0;
         virtual void requestLockState() const                                = 0;
         virtual void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) = 0;
     };
@@ -36,7 +36,7 @@ class SimPINSettingsPresenter : public SimPINSettingsWindowContract::Presenter
     explicit SimPINSettingsPresenter(app::ApplicationCommon *application);
     void setCurrentPinState(bool state) noexcept override;
     void togglePinState() override;
-    bool getPinState() const noexcept override;
+    bool isPinEnabled() const noexcept override;
     void requestLockState() const override;
     void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
 
