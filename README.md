@@ -55,7 +55,8 @@ A fully detailed documentation can be build locally using [Doxygen](https://www.
 
 ## Changelog
 
-The [MuditaOS changelog](changelog.md) is not regularly updated by the core development team.
+The [MuditaOS changelog - Pure edition](pure_changelog.md) describes releases of the Pure's version of MuditaOS.
+Description of Harmony's version of the OS can be found here: [MuditaOS changelog - Harmony edition](harmony_changelog.md)
 
 ## License
 MuditaOS is licensed under [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/).
