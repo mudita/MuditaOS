@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,22 +19,14 @@ namespace bluetooth
 {
     class AVRCP
     {
-      public:
-        constexpr static const uint8_t subunitInfo[] = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
-                                                        4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7};
-        constexpr static uint32_t companyId          = 0x112233;
-        constexpr static uint8_t companiesNum        = 1;
-        constexpr static uint8_t companies[]         = {
-            0x00, 0x19, 0x58 // BT SIG registered CompanyID
-        };
+      private:
+        static std::uint16_t targetVolumeToPercent(std::uint16_t volume);
+        static std::uint16_t controllerVolumeToPercent(std::uint16_t volume);
 
-        constexpr static uint8_t eventsNum     = 6;
-        constexpr static uint8_t events[]      = {AVRCP_NOTIFICATION_EVENT_PLAYBACK_STATUS_CHANGED,
-                                             AVRCP_NOTIFICATION_EVENT_TRACK_CHANGED,
-                                             AVRCP_NOTIFICATION_EVENT_PLAYER_APPLICATION_SETTING_CHANGED,
-                                             AVRCP_NOTIFICATION_EVENT_NOW_PLAYING_CONTENT_CHANGED,
-                                             AVRCP_NOTIFICATION_EVENT_AVAILABLE_PLAYERS_CHANGED,
-                                             AVRCP_NOTIFICATION_EVENT_ADDRESSED_PLAYER_CHANGED};
+      public:
+        static constexpr uint8_t subunitInfo[] = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
+                                                  4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7};
+        static constexpr uint32_t companyId    = 0x112233;
         static constexpr int SDP_BUFFER_LENGTH = 200;
         struct PlaybackStatusInfo
         {
@@ -44,8 +36,8 @@ namespace bluetooth
             uint32_t song_position_ms; // 0xFFFFFFFF if not supported
         };
 
-        static std::array<uint8_t, SDP_BUFFER_LENGTH> sdpTargetServiceBuffer;
-        static std::array<uint8_t, SDP_BUFFER_LENGTH> sdpControllerServiceBuffer;
+        static std::array<std::uint8_t, SDP_BUFFER_LENGTH> sdpTargetServiceBuffer;
+        static std::array<std::uint8_t, SDP_BUFFER_LENGTH> sdpControllerServiceBuffer;
         static sys::Service *ownerService;
 
         static avrcp_track_t tracks[3];
