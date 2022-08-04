@@ -187,6 +187,7 @@ namespace service::eink
         displayPowerOffTimer.stop();
         auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer.start(); });
 
+        eInkSentinel->HoldMinimumFrequency();
         auto status = display->showImage(message->getData(), translateToEinkRefreshMode(message->getRefreshMode()));
         if (status != hal::eink::EinkStatus::EinkOK) {
             LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
