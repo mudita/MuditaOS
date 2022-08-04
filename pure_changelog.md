@@ -1,6 +1,6 @@
 # MuditaOS changelog - PurePhone
 
-## [1.3.0 2022-08-03]
+## [1.3.0 2022-08-04]
 
 ### Added
 
