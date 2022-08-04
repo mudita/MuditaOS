@@ -1,10 +1,11 @@
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
 import filecmp
+import re
 
 from harness.api.developermode import PhoneModeLock
-from harness.api.filesystem import get_file, put_file, FsInitGet, FsGetChunk, FsRemoveFile, FsRenameFile
+from harness.api.filesystem import get_file, put_file, FsInitGet, FsGetChunk, FsRemoveFile, FsRenameFile, FsListFiles
 from harness import log
 from harness.request import TransactionError
 from harness.interface.defs import Status
@@ -18,7 +19,9 @@ testFileName = "lorem-ipsum.txt"
 osLogFileName = "MuditaOS.log"
 
 sysUserPath = "/sys/user"
-sysUserLogsPath = sysUserPath + "/logs"
+sysUserLogsPath = sysUserPath + "/logs/"
+sysUserMusicPath = sysUserPath + "/music/"
+
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
@@ -33,6 +36,19 @@ def test_send_file(harness):
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.rt1051
+def test_get_file_list(harness):
+    """
+    Test listing files
+    """
+    file_list = FsListFiles(sysUserMusicPath).run(harness)
+    for file in file_list:
+        assert re.match(r"" + sysUserMusicPath + ".*\.mp3", file["path"])
+        assert (type(file["fileSize"]) is int)
+
+
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.rt1051
 def test_get_file_back(harness):
     """
     Attempt requesting and transfering file data
@@ -42,6 +58,7 @@ def test_get_file_back(harness):
     get_file(harness, testFileName, "./", sysUserPath, loadedFile)
 
     assert filecmp.cmp(testFileName, loadedFile, shallow=True)
+
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
@@ -60,6 +77,7 @@ def test_rename_file(harness):
 
     assert filecmp.cmp(testFileName, renamedFile, shallow=True)
 
+
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.rt1051
@@ -67,7 +85,7 @@ def test_delete_files(harness):
     """
     Attempt deleting a file and confirm removal by attempting to get it back
     """
-    fileToRemove = sysUserPath + "/" + "renamed_" +  testFileName
+    fileToRemove = sysUserPath + "/" + "renamed_" + testFileName
     FsRemoveFile(fileToRemove).run(harness)
 
     with pytest.raises(TransactionError, match=r".*" + str(Status.NotFound.value) + ".*"):
