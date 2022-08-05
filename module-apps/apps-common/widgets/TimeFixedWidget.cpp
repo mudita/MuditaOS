@@ -60,11 +60,11 @@ namespace gui
         attachLabelToBox(leftBox.minus, leftBox.box);
         setMinus();
 
-        for (auto &digit : leftBox.digits) {
+        for (auto &digit : leftBox.container.digits) {
             attachLabelToBox(digit, leftBox.box);
         }
 
-        for (auto &digit : rightBox.digits) {
+        for (auto &digit : rightBox.container.digits) {
             attachLabelToBox(digit, rightBox.box);
         }
 
@@ -91,63 +91,25 @@ namespace gui
 
     void TimeFixedWidget::setMinutesBox(std::uint32_t minutes)
     {
-        auto rangeGuard = 1000;
-        minutes %= rangeGuard;
-
-        setDigits(std::to_string(minutes), leftBox.digits);
-
+        leftBox.container.setMinutesBox(minutes, getDimensions());
         leftBox.box->resizeItems();
     }
 
     void TimeFixedWidget::setSecondsBox(std::uint32_t seconds)
     {
-        auto rangeGuard = 100;
-        seconds %= rangeGuard;
-
-        bool shouldBeDisplayedAsOneDigit = seconds < 10;
-        std::string text = shouldBeDisplayedAsOneDigit ? "0" + std::to_string(seconds) : std::to_string(seconds);
-
-        setDigits(std::move(text), rightBox.digits);
-    }
-
-    const TimeFixedWidget::LeftBox &TimeFixedWidget::getLeftBox()
-    {
-        return leftBox;
-    }
-
-    const TimeFixedWidget::RightBox &TimeFixedWidget::getRightBox()
-    {
-        return rightBox;
-    }
-
-    template <size_t N> void TimeFixedWidget::setDigits(std::string &&text, const DigitsContainer<N> &digits) const
-    {
-        const auto dimensions = getDimensions();
-
-        std::for_each(
-            std::crbegin(digits), std::crend(digits), [text = std::move(text), &dimensions](Label *label) mutable {
-                if (text.empty()) {
-                    label->setText("");
-                    label->setSize(0, 0);
-                }
-                else {
-                    label->setText(std::string{text.back()});
-                    label->setSize(dimensions.digitMaxWidth, dimensions.mainBoxHeight);
-                    text.pop_back();
-                }
-            });
+        rightBox.container.setSecondsBox(seconds, getDimensions());
     }
 
     void TimeFixedWidget::setFontAndDimensions(const UTF8 &fontName) const
     {
         leftBox.minus->setFont(fontName);
-        for (auto &digit : leftBox.digits) {
+        for (auto &digit : leftBox.container.digits) {
             digit->setFont(fontName);
         }
 
         colon->setFont(fontName);
 
-        for (auto &digit : rightBox.digits) {
+        for (auto &digit : rightBox.container.digits) {
             digit->setFont(fontName);
         }
 
@@ -162,13 +124,13 @@ namespace gui
         rightBox.box->setSize(params.rightBoxWidth, params.mainBoxHeight);
 
         leftBox.minus->setSize(params.minusWidth, params.mainBoxHeight);
-        for (auto &digit : leftBox.digits) {
+        for (auto &digit : leftBox.container.digits) {
             digit->setSize(params.digitMaxWidth, params.mainBoxHeight);
         }
 
         colon->setSize(params.colonWidth, params.mainBoxHeight);
 
-        for (auto &digit : rightBox.digits) {
+        for (auto &digit : rightBox.container.digits) {
             digit->setSize(params.digitMaxWidth, params.mainBoxHeight);
         }
     }
@@ -184,7 +146,7 @@ namespace gui
         info.colonWidth    = leftBox.minus->getTextFormat().getFont()->getPixelWidth(colonSign);
         info.minusWidth    = leftBox.minus->getTextFormat().getFont()->getPixelWidth(minusSign);
 
-        info.leftBoxWidth  = (info.digitMaxWidth * leftBox.digits.size()) + info.minusWidth;
+        info.leftBoxWidth  = (info.digitMaxWidth * leftBox.container.digits.size()) + info.minusWidth;
         info.rightBoxWidth = info.mainBoxWidth - info.minusWidth - info.leftBoxWidth;
 
         return info;
