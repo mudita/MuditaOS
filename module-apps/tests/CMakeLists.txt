@@ -25,7 +25,7 @@ add_gtest_executable(
     NAME
         apps-common-widgets
     SRCS
-        widgets/test-TimeFixedWidget.cpp
+        widgets/test-DigitsContainer.cpp
     LIBS
        apps-common
        gui-mock

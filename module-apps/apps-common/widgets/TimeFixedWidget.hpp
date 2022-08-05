@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "DigitsContainer.hpp"
 #include <Text.hpp>
 #include <BoxLayout.hpp>
 #include "widgets/DateWidget.hpp"
@@ -10,33 +11,21 @@
 
 namespace gui
 {
-    struct DimensionsParams
-    {
-        std::uint32_t mainBoxHeight;
-        std::uint32_t mainBoxWidth;
-        std::uint32_t digitMaxWidth;
-        std::uint32_t colonWidth;
-        std::uint32_t minusWidth;
-        std::uint32_t leftBoxWidth;
-        std::uint32_t rightBoxWidth;
-    };
 
     class TimeFixedWidget : public Rect
     {
       public:
-        template <size_t N> using DigitsContainer = std::array<Label *, N>;
-
         struct LeftBox
         {
             HBox *box    = nullptr;
             Label *minus = nullptr;
-            DigitsContainer<3> digits{nullptr};
+            DigitsContainer<3> container{};
         };
 
         struct RightBox
         {
             HBox *box = nullptr;
-            DigitsContainer<2> digits{nullptr};
+            DigitsContainer<2> container{};
         };
 
         TimeFixedWidget(Item *parent,
@@ -50,16 +39,13 @@ namespace gui
         void setSecondsBox(std::uint32_t second);
         void setFontAndDimensions(const UTF8 &fontName) const;
 
-        const LeftBox &getLeftBox();
-        const RightBox &getRightBox();
+        DimensionsParams getDimensions() const;
 
       private:
         void attachLabelToBox(Label *&label, HBox *&box) const;
         void setMinus() const;
         void setColon() const;
         void setDimensions(DimensionsParams &&params) const;
-        DimensionsParams getDimensions() const;
-        template <size_t N> void setDigits(std::string &&text, const DigitsContainer<N> &digits) const;
 
         bool minusVisible = false;
         HBox *mainBox     = nullptr;
@@ -68,4 +54,5 @@ namespace gui
         LeftBox leftBox;
         RightBox rightBox;
     };
+
 } /* namespace gui */
