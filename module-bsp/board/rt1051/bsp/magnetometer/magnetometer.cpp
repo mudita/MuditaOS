@@ -68,6 +68,8 @@ namespace bsp
 
         bsp::KeyCodes current_parsed = bsp::KeyCodes::Undefined;
 
+        Measurements last{};
+
         static TimerHandle_t timerHandle;
         static constexpr uint16_t MAGNETOMETER_POLL_INTERVAL_MS = 500;
 
@@ -294,37 +296,51 @@ namespace bsp
             return read == 1;
         }
 
+        bool sliderChangedPosition(const Measurements &current)
+        {
+            /// The magnetometer is quite noisy. In some cases, noise can switch slider mode.
+            /// So we did a few measurements to calculate the level of noises and it should work fine.
+            constexpr auto maxNoiseLevel = 45;
+            bool result                  = false;
+
+            // We don't check Z axis, because it isn't logic dependend
+            if ((std::abs(current.X - last.X) > maxNoiseLevel) || (std::abs(current.Y - last.Y) > maxNoiseLevel)) {
+                result = true;
+            }
+            last = current;
+            return result;
+        }
+
         bsp::KeyCodes parse(const Measurements &measurements)
         {
             // X is tri-stable
-            const auto X_lower_boundary  = -150;
-            const auto X_upper_boundary  = 150;
-            const auto X_lower_threshold = -65;
-            const auto X_upper_threshold = 60;
+            constexpr auto X_lower_threshold = -85;
+            constexpr auto X_upper_threshold = 80;
             // Y is bi-stable
-            const auto Y_threshold = -175;
+            constexpr auto Y_threshold = -200;
             // Y is used only for proofing X, so no strict thresholds
             // Z is useless
 
-            if (measurements.X > X_lower_boundary && measurements.X < X_upper_boundary) {
+            auto code = bsp::KeyCodes::Undefined;
+
+            if (sliderChangedPosition(measurements)) {
                 if (measurements.X < X_lower_threshold) {
                     if (measurements.Y > Y_threshold) {
-                        return bsp::KeyCodes::SSwitchDown;
+                        code = bsp::KeyCodes::SSwitchDown;
                     }
                 }
-                else if (measurements.X > X_upper_threshold) {
+                if (measurements.X > X_upper_threshold) {
                     if (measurements.Y > Y_threshold) {
-                        return bsp::KeyCodes::SSwitchUp;
+                        code = bsp::KeyCodes::SSwitchUp;
                     }
                 }
-                else {
-                    if (measurements.Y < Y_threshold) {
-                        return bsp::KeyCodes::SSwitchMid;
-                    }
+                if (measurements.Y < Y_threshold) {
+                    code = bsp::KeyCodes::SSwitchMid;
                 }
             }
-            return bsp::KeyCodes::Undefined;
+            return code;
         }
+
         void resetCurrentParsedValue()
         {
             current_parsed = bsp::KeyCodes::Undefined;
