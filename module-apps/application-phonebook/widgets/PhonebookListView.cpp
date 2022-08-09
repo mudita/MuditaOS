@@ -8,35 +8,34 @@ namespace gui
 
     PhonebookListView::PhonebookListView(
         Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::shared_ptr<ListItemProvider> prov)
-        : ListView(parent, x, y, w, h, prov)
+        : ListView(parent, x, y, w, h, std::move(prov))
     {}
 
     void PhonebookListView::addLabelMarker(gui::PhonebookItem *item)
     {
-        if (direction == listview::Direction::Bottom) {
-            if (!(labelMark == (item)->getLabelMarker())) {
-
-                labelMark = (item)->getLabelMarker();
+        switch (direction) {
+        case listview::Direction::Bottom:
+            if (labelMark != item->getLabelMarker()) {
+                labelMark = item->getLabelMarker();
                 body->addWidget(new PhonebookMarkItem(labelMark));
             }
-        }
-        if (direction == listview::Direction::Top) {
-
+            break;
+        case listview::Direction::Top:
             if (currentPageSize == 0) {
-                labelMark = (item)->getLabelMarker();
+                labelMark = item->getLabelMarker();
                 return;
             }
-            else if (!(labelMark == (item)->getLabelMarker())) {
-
+            else if (labelMark != item->getLabelMarker()) {
                 previousLabelMark = labelMark;
-                labelMark         = (item)->getLabelMarker();
+                labelMark         = item->getLabelMarker();
 
                 body->removeWidget(item);
-                body->addWidget(new PhonebookMarkItem(labelMark));
+                body->addWidget(new PhonebookMarkItem(previousLabelMark));
                 body->addWidget(item);
 
                 previousItemIsLabel = true;
             }
+            break;
         }
     }
 
@@ -58,7 +57,7 @@ namespace gui
             body->addWidget(item);
 
             // if added item is not visible -> page is full.
-            if (item->visible != true) {
+            if (!item->visible) {
 
                 // if page full and direction top remove last element and add floating label mark on top if there was no
                 // one previously
