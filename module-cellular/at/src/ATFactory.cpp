@@ -45,6 +45,7 @@ namespace at
             {AT::CIMI, std::make_shared<Cmd>("AT+CIMI")},
             {AT::QCMGR, std::make_shared<Cmd>("AT+QCMGR=", 180s)},
             {AT::ATH, std::make_shared<Cmd>("ATH", 100s)},
+            {AT::CHUP, std::make_shared<Cmd>("AT+CHUP", 100s)},
             {AT::QHUP_BUSY, std::make_shared<Cmd>("AT+QHUP=17", 100s)},
             {AT::ATA, std::make_shared<Cmd>("ATA", 100s)},
             {AT::ATD, std::make_shared<Cmd>("ATD", 6s)},
