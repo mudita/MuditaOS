@@ -7,6 +7,7 @@
 * Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
+* Fixed not adding call log entries in Do Not Disturb mode.
 * Fixed improper duration of the rejected outgoing call shown in calls log
 * Fixed Bluetooth volume control issues
 * Fixed turning on loudspeaker before outgoing call is answered

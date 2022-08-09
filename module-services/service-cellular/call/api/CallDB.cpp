@@ -10,14 +10,6 @@
 CallDB::CallDB(sys::Service *s) : owner(s)
 {}
 
-void CallDB::incrementNotAnsweredCallsNotification(const utils::PhoneNumber::View &number)
-{
-    DBServiceAPI::GetQuery(
-        owner,
-        db::Interface::Name::Notifications,
-        std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Calls, number));
-}
-
 void CallDB::startCall(CalllogRecord &rec)
 {
     if (rec.ID == DB_ID_NONE) {
