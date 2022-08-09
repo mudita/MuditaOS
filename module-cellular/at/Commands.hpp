@@ -55,6 +55,7 @@ namespace at
         CIMI, /// Its getting IMSI from selected SIM card
         QCMGR,
         ATH,       /// hangup
+        CHUP,      /// hangup all calls
         QHUP_BUSY, /// hangup all calls with busy reason
         ATA,       /// (doc): timeout should be possibly set up to 90s
         ATD,       /// setup call

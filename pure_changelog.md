@@ -7,6 +7,7 @@
 * Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
+* Fixed dropping the call during the DND mode
 * Fixed wrong tethering popup order
 * Fixed crash during phone turn off
 * Fixed improper duration of the rejected outgoing call shown in calls log
