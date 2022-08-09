@@ -6,12 +6,29 @@
 #include <locks/data/LockData.hpp>
 #include <i18n/i18n.hpp>
 
+#include <application-settings/ApplicationSettings.hpp>
+
 using namespace gui;
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 SimInfoWindow::SimInfoWindow(app::ApplicationCommon *app, const std::string &name) : WindowWithTimer(app, name)
 {
     buildInterface();
+
+    timerCallback = [this](Item &, sys::Timer &timer) {
+        if (auto *settingsApp = dynamic_cast<app::ApplicationSettings *>(application);
+            settingsApp && settingsApp->isCurrentWindow(gui::window::name::sim_pin_settings)) {
+            settingsApp->switchWindow(gui::window::name::sim_cards);
+        }
+        else {
+            application->returnToPreviousWindow();
+        }
+
+        return true;
+    };
 }
+#pragma GCC pop_options
 
 status_bar::Configuration SimInfoWindow::configureStatusBar(status_bar::Configuration appConfiguration)
 {
@@ -31,7 +48,6 @@ void SimInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     WindowWithTimer::onBeforeShow(mode, data);
 
     if (auto infoData = dynamic_cast<locks::SimLockData *>(data)) {
-
         switch (infoData->getSimInputTypeAction()) {
         case locks::SimInputTypeAction::UnlockWithPuk:
         case locks::SimInputTypeAction::ChangePin:

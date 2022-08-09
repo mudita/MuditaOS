@@ -946,14 +946,19 @@ namespace app
         return window;
     }
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
     bool ApplicationCommon::isCurrentWindow(const std::string &windowName) const noexcept
     {
         if (const auto &window = windowsStack().get(topWindow); window != std::nullopt) {
+            volatile std::string dbgName = window.value();
+            volatile char const *dbgPlainName = dbgName.c_str();
             return window == windowName;
         }
         LOG_ERROR("no window: %s", windowName.c_str());
         return false;
     }
+#pragma GCC pop_options
 
     gui::AppWindow *ApplicationCommon::getWindow(const std::string &name)
     {

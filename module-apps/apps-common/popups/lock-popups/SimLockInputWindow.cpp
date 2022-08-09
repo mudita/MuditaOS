@@ -7,6 +7,8 @@
 #include <locks/widgets/SimLockBox.hpp>
 #include <locks/widgets/LockHash.hpp>
 
+#include <application-settings/ApplicationSettings.hpp>
+
 #include <service-appmgr/Controller.hpp>
 #include <popups/data/PopupRequestParams.hpp>
 
@@ -75,6 +77,8 @@ namespace gui
         setVisibleState();
     }
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
     bool SimLockInputWindow::onInput(const InputEvent &inputEvent)
     {
         if (!inputEvent.isShortRelease()) {
@@ -88,7 +92,13 @@ namespace gui
                 lock->consumeState();
             }
             application->getSimLockSubject().resetSimLockState();
-            application->returnToPreviousWindow();
+            if (auto *settingsApp = dynamic_cast<app::ApplicationSettings *>(application);
+                settingsApp && settingsApp->isCurrentWindow(gui::window::name::sim_pin_settings)) {
+                    settingsApp->switchWindow(gui::window::name::sim_cards);
+            }
+            else {
+                application->returnToPreviousWindow();
+            }
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_PND)) {
@@ -130,5 +140,6 @@ namespace gui
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }
+#pragma GCC pop_options
 
 } /* namespace gui */

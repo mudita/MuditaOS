@@ -6,6 +6,7 @@
 #include <apps-common/popups/data/BluetoothModeParams.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
+#include <application-settings/ApplicationSettings.hpp>
 #include <apps-common/popups/data/PhoneModeParams.hpp>
 #include <apps-common/actions/AlarmClockStatusChangeParams.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
@@ -132,6 +133,8 @@ namespace app::manager
         runAppsInBackground();
     }
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
     void ApplicationManager::registerMessageHandlers()
     {
         ApplicationManagerCommon::registerMessageHandlers();
@@ -250,7 +253,15 @@ namespace app::manager
         connect(typeid(cellular::msg::notification::SimNeedPuk), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<cellular::msg::notification::SimNeedPuk *>(request);
             if (phoneLockHandler.isPhoneLocked()) {
+                // TODO: figure out if this mysterious thing could be afftected by these changes
                 simLockHandler.setSimUnlockBlockOnLockedPhone();
+            }
+            if (auto *currentAppHandle = getFocusedApplication(); currentAppHandle->name() == app::name_settings) {
+                if (auto settingsAppPtr = currentAppHandle->launcher->handle;
+                    settingsAppPtr->isCurrentWindow(gui::window::name::sim_pin_settings)) {
+                    settingsAppPtr->switchWindow(gui::window::name::sim_cards);
+                    return sys::msgHandled();
+                }
             }
             return simLockHandler.handleSimPukRequest(data->attempts);
         });
@@ -402,6 +413,7 @@ namespace app::manager
         connect(typeid(cellular::CallActiveNotification), convertibleToActionHandler);
         connect(typeid(cellular::HangupCallMessage), convertibleToActionHandler);
     }
+#pragma GCC pop_options
 
     void ApplicationManager::handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode)
     {
