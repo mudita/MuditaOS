@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19.5)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
@@ -68,7 +68,10 @@ else()
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -DDEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
+endif()
 
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    add_compile_options(-Wno-error=volatile)
 endif()
 
 set(TOOLCHAIN_PATH "" CACHE STRING "Path to toolchain directory")
