@@ -22,14 +22,14 @@ namespace sdesktop::endpoints
 
     auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> http::Code
     {
-        auto [totalMbytes, freeUserMbytes, freePercent] = getStorageInfo();
+        auto [totalDeviceSpaceMiB, reservedSystemSpaceMiB, usedUserSpaceMiB] = getStorageInfo();
 
         context.setResponseBody(
             json11::Json::object({{json::batteryLevel, std::to_string(Store::Battery::get().level)},
                                   {json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
-                                  {json::fsTotal, std::to_string(totalMbytes)},
-                                  {json::fsFree, std::to_string(freeUserMbytes)},
-                                  {json::fsFreePercent, std::to_string(freePercent)},
+                                  {json::deviceSpaceTotal, std::to_string(totalDeviceSpaceMiB)},
+                                  {json::systemReservedSpace, std::to_string(reservedSystemSpaceMiB)},
+                                  {json::usedUserSpace, std::to_string(usedUserSpaceMiB)},
                                   {json::gitRevision, (std::string)(GIT_REV)},
                                   {json::gitBranch, (std::string)GIT_BRANCH},
                                   {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
