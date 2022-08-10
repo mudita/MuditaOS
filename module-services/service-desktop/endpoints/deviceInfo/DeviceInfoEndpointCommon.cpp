@@ -139,14 +139,13 @@ namespace sdesktop::endpoints
 
     auto DeviceInfoEndpointCommon::getStorageInfo() -> std::tuple<long, long, long>
     {
-        const std::array<std::filesystem::path, 2> storagePaths{purefs::dir::getRootDiskPath(),
-                                                                purefs::dir::getPreviousOSPath()};
+        unsigned long totalDeviceSpaceMiB    = 0;
+        unsigned long reservedSystemSpaceMiB = 0;
+        unsigned long usedUserSpaceMiB       = 0;
 
-        unsigned long totalMbytes    = 0;
-        unsigned long freeUserMbytes = 0;
-        unsigned long freePercent    = 0;
-
-        for (const auto &p : storagePaths) {
+        const std::array<std::filesystem::path, 2> systemStoragePaths{purefs::dir::getRootDiskPath(),
+                                                                      purefs::dir::getPreviousOSPath()};
+        for (const auto &p : systemStoragePaths) {
             auto [totalSpace, freeSpace] = getStorageStats(p);
 
             if (totalSpace < 0 || freeSpace < 0) {
@@ -154,29 +153,22 @@ namespace sdesktop::endpoints
                 continue;
             }
 
-            totalMbytes += totalSpace;
+            totalDeviceSpaceMiB += totalSpace;
+            reservedSystemSpaceMiB = totalDeviceSpaceMiB;
         }
 
         // User partition stats
-        const auto storagePath       = purefs::dir::getUserDiskPath();
-        auto [totalSpace, freeSpace] = getStorageStats(storagePath);
+        const auto userStoragePath   = purefs::dir::getUserDiskPath();
+        auto [totalSpace, freeSpace] = getStorageStats(userStoragePath);
 
         if (totalSpace < 0 || freeSpace < 0) {
-            LOG_ERROR("Failed to get stats for %s", storagePath.c_str());
+            LOG_ERROR("Failed to get stats for %s", userStoragePath.c_str());
         }
         else {
-            totalMbytes += totalSpace;
-            freeUserMbytes = freeSpace;
-
-            // Deduct 1024 MB reserved for OS data on User partition
-            freeUserMbytes -= OS_RESERVED_SPACE_IN_MB;
+            usedUserSpaceMiB = totalSpace - freeSpace;
+            totalDeviceSpaceMiB += totalSpace;
         }
 
-        if (totalMbytes) {
-            freePercent = (freeUserMbytes * 100) / totalMbytes;
-        }
-
-        return {totalMbytes, freeUserMbytes, freePercent};
+        return {totalDeviceSpaceMiB, reservedSystemSpaceMiB, usedUserSpaceMiB};
     }
-
 } // namespace sdesktop::endpoints

@@ -18,9 +18,9 @@ def test_get_device_information(harness):
     assert ret.diag_info["accessTechnology"] in ['0', '2', '3', '4', '5', '6', '7', '255']
     assert 0 <= int(ret.diag_info["networkStatus"]) < 7
     assert ret.diag_info["networkOperatorName"] is not None
-    assert 0 < int(ret.diag_info["fsTotal"]) < 16000
-    assert 0 < int(ret.diag_info["fsFree"]) < 16000
-    assert 0 < int(ret.diag_info["fsFreePercent"]) <= 100
+    assert int(ret.diag_info["deviceSpaceTotal"]) == 14945
+    assert int(ret.diag_info["systemReservedSpace"]) == 2042
+    assert 0 < int(ret.diag_info["usedUserSpace"]) <= 12903
     assert re.match(r"^(\d|[a-z]){8,40}$", ret.diag_info["gitRevision"])
     assert ret.diag_info["gitBranch"] is not None
     assert int(ret.diag_info["currentRTCTime"]) > 1641991996

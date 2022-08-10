@@ -11,9 +11,9 @@ namespace sdesktop::endpoints::json
     inline constexpr auto sim                 = "sim";
     inline constexpr auto trayState           = "trayState";
     inline constexpr auto signalStrength      = "signalStrength";
-    inline constexpr auto fsTotal             = "fsTotal";
-    inline constexpr auto fsFreePercent       = "fsFreePercent";
-    inline constexpr auto fsFree              = "fsFree";
+    inline constexpr auto deviceSpaceTotal    = "deviceSpaceTotal";
+    inline constexpr auto systemReservedSpace = "systemReservedSpace";
+    inline constexpr auto usedUserSpace       = "usedUserSpace";
     inline constexpr auto gitRevision         = "gitRevision";
     inline constexpr auto gitBranch           = "gitBranch";
     inline constexpr auto gitTag              = "gitTag";

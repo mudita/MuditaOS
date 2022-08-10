@@ -31,8 +31,6 @@ namespace sdesktop::endpoints
         auto getStorageStats(const std::string &path) -> std::tuple<long, long>;
         auto getStorageInfo() -> std::tuple<long, long, long>;
 
-        static constexpr auto OS_RESERVED_SPACE_IN_MB = (1024LU);
-
         explicit DeviceInfoEndpointCommon(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
         {
             debugName = "DeviceInfoEndpoint";
