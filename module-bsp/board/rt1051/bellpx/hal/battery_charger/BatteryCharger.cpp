@@ -71,6 +71,7 @@ namespace hal::battery
         xQueueHandle notification_channel;
         inline static std::unique_ptr<BatteryWorkerQueue> worker_queue;
 
+        std::shared_ptr<drivers::DriverI2C> i2c;
         std::shared_ptr<drivers::DriverGPIO> charger_gpio_chgok;
         std::shared_ptr<drivers::DriverGPIO> charger_gpio;
         mutable bsp::devices::power::MP2639B charger;
@@ -80,8 +81,8 @@ namespace hal::battery
     };
 
     BellBatteryCharger::BellBatteryCharger(xQueueHandle irqQueueHandle)
-        : notification_channel{irqQueueHandle}, charger_gpio_chgok{drivers::DriverGPIO::Create(charger_irq_gpio_chgok,
-                                                                                               {})},
+        : notification_channel{irqQueueHandle}, i2c{drivers::DriverI2C::Create(i2c_instance, i2c_params)},
+          charger_gpio_chgok{drivers::DriverGPIO::Create(charger_irq_gpio_chgok, {})},
           charger_gpio{drivers::DriverGPIO::Create(charger_irq_gpio, {})}, charger{MP2639B::Configuration{
                                                                                charger_gpio,
                                                                                charger_irq_pin_mode,
@@ -103,7 +104,7 @@ namespace hal::battery
                                                                                }}},
 
           fuel_gauge_gpio{drivers::DriverGPIO::Create(fuel_gauge_irq_gpio_instance, {})},
-          fuel_gauge{CW2015{*drivers::DriverI2C::Create(i2c_instance, i2c_params), battery_shutdown_threshold}}
+          fuel_gauge{CW2015{*i2c, battery_shutdown_threshold}}
     {
 
         reinit_timer = xTimerCreate("reinit_timer", reinit_poll_time, pdFALSE, this, [](TimerHandle_t xTimer) {

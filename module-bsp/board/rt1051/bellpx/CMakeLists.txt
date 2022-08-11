@@ -17,7 +17,6 @@ target_sources(
         bsp/audio/AW8898driver.cpp
         bsp/audio/CodecAW8898.cpp
 
-        bsp/bell_temp_sensor/bell_temp_sensor.cpp
         bsp/eink/eink_pin_config.cpp
         bsp/lpm/PowerProfile.cpp
         bsp/lpm/RT1051LPM.cpp

@@ -277,18 +277,19 @@ namespace bsp::devices::power
         BATTINFO profile{};
         RetCodes ret_code{RetCodes::Ok};
 
-        std::all_of(profile.cbegin(), profile.cend(), [this, ret_code, reg = BATTINFO::ADDRESS](const auto &e) mutable {
-            const auto result = read(reg++);
-            if (not result) {
-                ret_code = RetCodes::CommunicationError;
-                return false;
-            }
-            if (*result != e) {
-                ret_code = RetCodes::ProfileInvalid;
-                return false;
-            }
-            return true;
-        });
+        std::all_of(
+            profile.cbegin(), profile.cend(), [this, &ret_code, reg = BATTINFO::ADDRESS](const auto &e) mutable {
+                const auto result = read(reg++);
+                if (not result) {
+                    ret_code = RetCodes::CommunicationError;
+                    return false;
+                }
+                if (*result != e) {
+                    ret_code = RetCodes::ProfileInvalid;
+                    return false;
+                }
+                return true;
+            });
 
         return ret_code;
     }
