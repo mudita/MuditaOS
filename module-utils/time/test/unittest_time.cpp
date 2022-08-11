@@ -519,6 +519,19 @@ TEST_CASE("Duration - creation")
         REQUIRE(duration.get() == 333);
     }
 
+    SECTION("std::chrono::seconds constructor")
+    {
+        utils::time::Duration duration(std::chrono::seconds(333));
+        REQUIRE(duration.get() == 333);
+    }
+
+    SECTION("std::chrono::seconds by minutes constructor")
+    {
+        auto minutes = std::chrono::minutes(2);
+        utils::time::Duration duration(minutes);
+        REQUIRE(duration.get() == 120);
+    }
+
     SECTION("stop < start time_t constructor")
     {
         utils::time::Duration duration(100, 202);

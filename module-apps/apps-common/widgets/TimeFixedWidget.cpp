@@ -32,6 +32,18 @@ namespace gui
 {
     namespace date_and_time = style::window::date_and_time;
 
+    TimeFixedWidget::LeftBox::LeftBox(uint32_t digitsCount) : container{digitsCount}
+    {}
+
+    TimeFixedWidget::LeftBox::LeftBox() : container{defaultSize}
+    {}
+
+    TimeFixedWidget::RightBox::RightBox(uint32_t digitsCount) : container{digitsCount}
+    {}
+
+    TimeFixedWidget::RightBox::RightBox() : container{defaultSize}
+    {}
+
     TimeFixedWidget::TimeFixedWidget(Item *parent,
                                      const std::uint32_t &x,
                                      const std::uint32_t &y,
@@ -39,6 +51,24 @@ namespace gui
                                      const std::uint32_t &h,
                                      const bool minus)
         : Rect(parent, x, y, w, h), minusVisible{minus}
+    {
+        init(w, h);
+    }
+
+    TimeFixedWidget::TimeFixedWidget(Item *parent,
+                                     const std::uint32_t &x,
+                                     const std::uint32_t &y,
+                                     const std::uint32_t &w,
+                                     const std::uint32_t &h,
+                                     const bool minus,
+                                     const std::uint32_t leftBoxSize,
+                                     const std::uint32_t rightBoxSize)
+        : Rect(parent, x, y, w, h), minusVisible{minus}, leftBox{leftBoxSize}, rightBox{rightBoxSize}
+    {
+        init(w, h);
+    }
+
+    void TimeFixedWidget::init(const std::uint32_t w, const std::uint32_t h)
     {
         setEdges(gui::RectangleEdge::None);
         mainBox = new gui::HBox(this, 0, 0, w, h);
@@ -91,13 +121,13 @@ namespace gui
 
     void TimeFixedWidget::setMinutesBox(std::uint32_t minutes)
     {
-        leftBox.container.setMinutesBox(minutes, getDimensions());
+        leftBox.container.setMinutesBox(minutes, getInitialDimensions());
         leftBox.box->resizeItems();
     }
 
     void TimeFixedWidget::setSecondsBox(std::uint32_t seconds)
     {
-        rightBox.container.setSecondsBox(seconds, getDimensions());
+        rightBox.container.setSecondsBox(seconds, getInitialDimensions());
     }
 
     void TimeFixedWidget::setFontAndDimensions(const UTF8 &fontName) const
@@ -113,17 +143,17 @@ namespace gui
             digit->setFont(fontName);
         }
 
-        setDimensions(getDimensions());
+        setDimensions(getInitialDimensions());
         mainBox->resizeItems();
     }
 
     void TimeFixedWidget::setDimensions(DimensionsParams &&params) const
     {
-
         leftBox.box->setSize(params.leftBoxWidth, params.mainBoxHeight);
         rightBox.box->setSize(params.rightBoxWidth, params.mainBoxHeight);
 
         leftBox.minus->setSize(params.minusWidth, params.mainBoxHeight);
+
         for (auto &digit : leftBox.container.digits) {
             digit->setSize(params.digitMaxWidth, params.mainBoxHeight);
         }
@@ -135,7 +165,7 @@ namespace gui
         }
     }
 
-    DimensionsParams TimeFixedWidget::getDimensions() const
+    DimensionsParams TimeFixedWidget::getInitialDimensions() const
     {
         DimensionsParams info{};
 
@@ -144,10 +174,19 @@ namespace gui
 
         info.digitMaxWidth = getWidestDigitWidth(leftBox.minus->getTextFormat().getFont());
         info.colonWidth    = leftBox.minus->getTextFormat().getFont()->getPixelWidth(colonSign);
-        info.minusWidth    = leftBox.minus->getTextFormat().getFont()->getPixelWidth(minusSign);
+        info.minusWidth    = minusVisible ? leftBox.minus->getTextFormat().getFont()->getPixelWidth(minusSign) : 0;
 
-        info.leftBoxWidth  = (info.digitMaxWidth * leftBox.container.digits.size()) + info.minusWidth;
-        info.rightBoxWidth = info.mainBoxWidth - info.minusWidth - info.leftBoxWidth;
+        auto maximumWidthNeededForLeftBox = (info.digitMaxWidth * leftBox.container.digits.size()) + info.minusWidth;
+        auto avaliableEvenWidth           = (info.mainBoxWidth - info.colonWidth) / 2;
+
+        info.leftBoxWidth  = avaliableEvenWidth;
+        info.rightBoxWidth = avaliableEvenWidth;
+
+        if (avaliableEvenWidth < maximumWidthNeededForLeftBox) {
+
+            info.leftBoxWidth  = maximumWidthNeededForLeftBox;
+            info.rightBoxWidth = info.mainBoxWidth - info.minusWidth - info.leftBoxWidth;
+        }
 
         return info;
     }

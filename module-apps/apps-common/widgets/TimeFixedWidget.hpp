@@ -17,15 +17,21 @@ namespace gui
       public:
         struct LeftBox
         {
+            explicit LeftBox(std::uint32_t digitsCount);
+            LeftBox();
+            static constexpr std::uint32_t defaultSize{3};
             HBox *box    = nullptr;
             Label *minus = nullptr;
-            DigitsContainer<3> container{};
+            DigitsContainer container;
         };
 
         struct RightBox
         {
+            explicit RightBox(std::uint32_t digitsCount);
+            RightBox();
+            static constexpr std::uint32_t defaultSize{2};
             HBox *box = nullptr;
-            DigitsContainer<2> container{};
+            DigitsContainer container;
         };
 
         TimeFixedWidget(Item *parent,
@@ -33,13 +39,24 @@ namespace gui
                         const std::uint32_t &y,
                         const std::uint32_t &w,
                         const std::uint32_t &h,
-                        const bool minus = false);
+                        bool minus = false);
+
+        TimeFixedWidget(Item *parent,
+                        const std::uint32_t &x,
+                        const std::uint32_t &y,
+                        const std::uint32_t &w,
+                        const std::uint32_t &h,
+                        bool minus,
+                        std::uint32_t leftBoxSize,
+                        std::uint32_t rightBoxSize);
+
+        void init(std::uint32_t w, std::uint32_t h);
 
         void setMinutesBox(std::uint32_t first);
         void setSecondsBox(std::uint32_t second);
         void setFontAndDimensions(const UTF8 &fontName) const;
 
-        DimensionsParams getDimensions() const;
+        DimensionsParams getInitialDimensions() const;
 
       private:
         void attachLabelToBox(Label *&label, HBox *&box) const;

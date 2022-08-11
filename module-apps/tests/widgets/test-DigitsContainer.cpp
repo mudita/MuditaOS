@@ -11,26 +11,27 @@
 namespace
 {
 
-    template <size_t N> void checkDisplayedText(std::string text, const gui::DigitsContainer<N> &container)
+    void checkDisplayedText(std::string &&text, const gui::DigitsContainer &container)
     {
-        std::for_each(std::crbegin(container.digits), std::crend(container.digits), [&text](gui::Label *label) {
-            if (text.empty()) {
-                EXPECT_STREQ((label->getText()).c_str(), "");
-            }
-            else {
-                EXPECT_STREQ(label->getText().c_str(), &text.back());
-                text.pop_back();
-            }
-        });
+        std::for_each(std::crbegin(container.digits),
+                      std::crend(container.digits),
+                      [text = std::move(text)](gui::Label *label) mutable {
+                          if (text.empty()) {
+                              EXPECT_STREQ((label->getText()).c_str(), "");
+                          }
+                          else {
+                              EXPECT_STREQ(label->getText().c_str(), &text.back());
+                              text.pop_back();
+                          }
+                      });
 
         EXPECT_TRUE(text.empty());
     }
 
-    template <size_t N> auto initContainer(gui::HBox &box) -> gui::DigitsContainer<N>
+    template <size_t N> auto initContainer(gui::HBox &box) -> gui::DigitsContainer
     {
-        auto container = gui::DigitsContainer<N>{};
+        auto container = gui::DigitsContainer{N};
         for (auto &digit : container.digits) {
-
             digit = new gui::Label(&box, 0, 0, 0, 0);
         }
         return container;
@@ -56,7 +57,7 @@ TEST(DigitsContainerTest, setMinutesBox)
 
     for (auto &param : inputAndExpectedOutput) {
         container.setMinutesBox(param.first, gui::DimensionsParams{});
-        checkDisplayedText(param.second, container);
+        checkDisplayedText(std::move(param.second), container);
     }
 }
 
@@ -72,6 +73,6 @@ TEST(DigitsContainerTest, setSecondsBox)
 
     for (auto &param : inputAndExpectedOutput) {
         container.setSecondsBox(param.first, gui::DimensionsParams{});
-        checkDisplayedText(param.second, container);
+        checkDisplayedText(std::move(param.second), container);
     }
 }
