@@ -37,7 +37,6 @@ namespace drivers
     struct DriverI2CParams
     {
         uint32_t baudrate;
-        // TODO:M.P add slave conf
     };
 
     struct I2CAddress

@@ -15,6 +15,7 @@ target_sources(
         devices/Device.cpp
         devices/power/CW2015.cpp
         devices/power/MP2639B.cpp
+        devices/temperature/CT7117.cpp
         drivers/dma/DriverDMA.cpp
         drivers/dmamux/DriverDMAMux.cpp
         drivers/gpio/DriverGPIO.cpp

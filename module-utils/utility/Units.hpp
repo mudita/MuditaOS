@@ -7,6 +7,7 @@
 
 namespace units
 {
-    using Voltage = std::uint32_t; /// mV
-    using SOC     = std::uint8_t;  /// 0-100%
+    using Voltage     = std::uint32_t; /// mV
+    using SOC         = std::uint8_t;  /// 0-100%
+    using Temperature = float;
 } // namespace units
