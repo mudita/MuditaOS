@@ -18,12 +18,32 @@ namespace app
     {
         updateText();
         updateProgress();
+        updateTimeWidget();
         ProgressTimer::update();
     }
 
     void ProgressTimerWithBarGraphAndCounter::updateText()
     {
-        const auto secondsRemaining = duration - std::chrono::duration_cast<std::chrono::seconds>(elapsed);
+        using utils::time::Duration;
+        if (text == nullptr) {
+            return;
+        }
+        const auto secondsRemaining = std::chrono::duration_cast<std::chrono::seconds>(duration - elapsed);
+        const Duration remainingDuration{secondsRemaining};
+        UTF8 timerText;
+        if (countdownMode == ProgressCountdownMode::Increasing && secondsRemaining != std::chrono::seconds::zero()) {
+            timerText += increasingModePrefix;
+        }
+        timerText += remainingDuration.str(displayFormat);
+        text->setText(std::move(timerText));
+    }
+
+    void ProgressTimerWithBarGraphAndCounter::updateTimeWidget()
+    {
+        if (timeWidget == nullptr) {
+            return;
+        }
+        const auto secondsRemaining = std::chrono::duration_cast<std::chrono::seconds>(duration - elapsed);
         timeWidget->setMinutesBox(secondsRemaining.count() / 60);
         timeWidget->setSecondsBox(secondsRemaining.count() % 60);
     }

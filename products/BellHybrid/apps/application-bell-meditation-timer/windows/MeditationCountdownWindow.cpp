@@ -67,7 +67,14 @@ namespace gui
         description->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         description->setMargins(gui::Margins(0, mcStyle::description::marginTop, 0, 0));
 
-        timer = new gui::TimeFixedWidget(mainVBox, 0, 0, mrStyle::timer::maxSizeX, mrStyle::timer::maxSizeY, true);
+        timer = new gui::TimeFixedWidget(mainVBox,
+                                         0,
+                                         0,
+                                         mrStyle::timer::maxSizeX,
+                                         mrStyle::timer::maxSizeY,
+                                         true,
+                                         1,
+                                         TimeFixedWidget::RightBox::defaultSize);
         timer->setFontAndDimensions(mcStyle::timer::font);
         timer->setMinimumSize(mcStyle::timer::maxSizeX, mcStyle::timer::maxSizeY);
         timer->setMargins(gui::Margins(0, mcStyle::timer::marginTop, 0, 0));
