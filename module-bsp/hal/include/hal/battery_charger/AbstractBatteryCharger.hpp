@@ -33,6 +33,13 @@ namespace hal::battery
             Brownout
         };
 
+        enum class ChargerPresence
+        {
+            Undefined,
+            PluggedIn,
+            Unplugged
+        };
+
         struct Factory
         {
             static std::unique_ptr<AbstractBatteryCharger> create(xQueueHandle);
@@ -43,6 +50,7 @@ namespace hal::battery
         virtual Voltage getBatteryVoltage() const        = 0;
         virtual std::optional<SOC> getSOC() const        = 0;
         virtual ChargingStatus getChargingStatus() const = 0;
+        virtual ChargerPresence getChargerPresence() const = 0;
 
         static_assert(sizeof(Events) == sizeof(std::uint8_t),
                       "All events processed by event manager ought to have size of std::uint8_t");

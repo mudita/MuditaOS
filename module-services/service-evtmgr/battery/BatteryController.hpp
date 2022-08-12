@@ -19,6 +19,7 @@ namespace sevm::battery
     {
       public:
         using Events = hal::battery::AbstractBatteryCharger::Events;
+        using ChargerPresence = hal::battery::AbstractBatteryCharger::ChargerPresence;
         explicit BatteryController(sys::Service *service, xQueueHandle notificationChannel);
 
         void poll();
@@ -30,10 +31,11 @@ namespace sevm::battery
         void update();
         void updateSoC();
         void printCurrentState();
-        void checkPlugState();
+        void checkChargerPresence();
         sys::Service *service{nullptr};
         std::unique_ptr<hal::battery::AbstractBatteryCharger> charger;
         BatteryBrownoutDetector brownoutDetector;
         BatteryState batteryState;
+        ChargerPresence chargerPresence{ChargerPresence::Undefined};
     };
 }; // namespace sevm::battery

@@ -92,4 +92,6 @@ namespace bsp::battery_charger
 
     bool checkConfigurationFile(std::ifstream &file);
 
+    bool isChargerPlugged();
+
 } // namespace bsp::battery_charger

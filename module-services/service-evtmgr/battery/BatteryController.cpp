@@ -99,7 +99,7 @@ void sevm::battery::BatteryController::handleNotification(Events evt)
     LOG_INFO("Incoming event: %s", std::string{magic_enum::enum_name(evt)}.c_str());
     switch (evt) {
     case Events::Charger:
-        checkPlugState();
+        checkChargerPresence();
         update();
         break;
     case Events::SOC:
@@ -153,18 +153,14 @@ void sevm::battery::BatteryController::updateSoC()
     }
 }
 
-void sevm::battery::BatteryController::checkPlugState()
+void sevm::battery::BatteryController::checkChargerPresence()
 {
-    const auto chargingState = Store::Battery::get().state;
-    auto newState            = transformChargingState(charger->getChargingStatus());
-
-    if (chargingState == Store::Battery::State::Discharging && newState != Store::Battery::State::Discharging) {
-        service->bus.sendUnicast(std::make_shared<sevm::USBPlugEvent>(sevm::USBPlugEvent::Event::CablePlugged),
+    const auto newChargerPresence = charger->getChargerPresence();
+    if (chargerPresence != newChargerPresence) {
+        service->bus.sendUnicast(std::make_shared<sevm::USBPlugEvent>(newChargerPresence == ChargerPresence::PluggedIn
+                                                                          ? sevm::USBPlugEvent::Event::CablePlugged
+                                                                          : sevm::USBPlugEvent::Event::CableUnplugged),
                                  service::name::service_desktop);
-    }
-
-    if (chargingState != Store::Battery::State::Discharging && newState == Store::Battery::State::Discharging) {
-        service->bus.sendUnicast(std::make_shared<sevm::USBPlugEvent>(sevm::USBPlugEvent::Event::CableUnplugged),
-                                 service::name::service_desktop);
+        chargerPresence = newChargerPresence;
     }
 }

@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fixed PLAY label translation in German
+* Fixed USB connection/disconnection detection
 
 ## [1.3.0 2022-08-04]
 
