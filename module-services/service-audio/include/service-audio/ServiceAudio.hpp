@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,6 +9,8 @@
 #include <Audio/Audio.hpp>
 #include <Audio/AudioMux.hpp>
 #include <MessageType.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-bluetooth/Constants.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/QueryMessage.hpp>
@@ -139,7 +141,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::audio;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = {service::name::db, service::name::evt_manager, service::name::bluetooth};
             return manifest;
         }
     };

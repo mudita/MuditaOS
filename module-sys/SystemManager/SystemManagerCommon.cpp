@@ -30,7 +30,6 @@
 #include <service-appmgr/StartupType.hpp>
 #include <purefs/vfs_subsystem.hpp>
 #include <service-gui/Common.hpp>
-#include <service-db/DBServiceName.hpp>
 #include <module-gui/gui/Common.hpp>
 #include <service-eink/Common.hpp>
 

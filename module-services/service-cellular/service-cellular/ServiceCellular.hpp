@@ -23,6 +23,8 @@
 #include <Timers/TimerHandle.hpp>
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-desktop/Constants.hpp>
 #include <service-db/Settings.hpp>
 #include <PhoneModes/Observer.hpp>
 #include <service-db/DBServiceName.hpp>
@@ -326,7 +328,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = ServiceCellular::serviceName;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = {service::name::db, service::name::service_desktop, service::name::evt_manager};
             return manifest;
         }
     };

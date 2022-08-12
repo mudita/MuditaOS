@@ -9,6 +9,8 @@
 #include "DeveloperModeMessage.hpp"
 #include "DesktopMessages.hpp"
 #include <locks/data/PhoneLockMessages.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
@@ -133,7 +135,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::service_desktop;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = {service::name::db, service::name::bluetooth, service::name::evt_manager};
             return manifest;
         }
     };

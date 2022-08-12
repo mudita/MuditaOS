@@ -9,7 +9,7 @@
 #include "Constants.hpp"
 #include "service-time/TimeManager.hpp"
 #include "service-time/ServiceTime.hpp"
-
+#include <service-cellular/Constans.hpp>
 #include <service-db/DBServiceName.hpp>
 
 #include <MessageType.hpp>
@@ -72,7 +72,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::service_time;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = {service::name::db, service::name::cellular};
             return manifest;
         }
     };

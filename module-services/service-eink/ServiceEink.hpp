@@ -79,7 +79,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::eink;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = {service::name::db}; // OK
             return manifest;
         }
     };

@@ -10,6 +10,9 @@
 #include "Service/Mailbox.hpp"
 #include "service-bluetooth/SettingsHolder.hpp"
 #include "service-bluetooth/WorkerLock.hpp"
+#include <service-evtmgr/Constants.hpp>
+#include <service-cellular/Constans.hpp>
+#include <service-desktop/Constants.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
@@ -160,7 +163,11 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::bluetooth;
-            manifest.dependencies = {service::name::db, service::name::audio};
+            manifest.dependencies = {service::name::db,
+                                     service::name::audio, // Is it really needed?
+                                     service::name::cellular,
+                                     service::name::service_desktop,
+                                     service::name::evt_manager};
             return manifest;
         }
     };
