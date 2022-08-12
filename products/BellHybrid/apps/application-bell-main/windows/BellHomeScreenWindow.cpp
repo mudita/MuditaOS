@@ -167,7 +167,7 @@ namespace gui
     RefreshModes BellHomeScreenWindow::updateTime()
     {
         if (presenter) {
-            presenter->handleUpdateTimeEvent();
+            return presenter->handleUpdateTimeEvent();
         }
         return RefreshModes::GUI_REFRESH_NONE;
     }

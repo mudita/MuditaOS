@@ -175,6 +175,6 @@ namespace gui
         if (presenter) {
             presenter->handleUpdateTimeEvent();
         }
-        return RefreshModes::GUI_REFRESH_NONE;
+        return RefreshModes::GUI_REFRESH_FAST;
     }
 } // namespace gui

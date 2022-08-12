@@ -7,6 +7,7 @@
 #include <common/models/AbstractAlarmModel.hpp>
 #include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <common/layouts/HomeScreenLayouts.hpp>
+#include <gui/Common.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <module-utils/EventStore/EventStore.hpp>
 #include <Timers/TimerHandle.hpp>
@@ -73,7 +74,7 @@ namespace app::home_screen
       public:
         virtual ~AbstractPresenter() noexcept                                                    = default;
         virtual void createData()                                                                = 0;
-        virtual void handleUpdateTimeEvent()                                                     = 0;
+        virtual gui::RefreshModes handleUpdateTimeEvent()                                        = 0;
         virtual bool handleInputEvent(const gui::InputEvent &inputEvent)                         = 0;
         virtual void onBeforeShow()                                                              = 0;
         virtual void onDatabaseMessage(db::NotificationMessage *msg)                             = 0;
@@ -116,7 +117,7 @@ namespace app::home_screen
         HomeScreenPresenter(HomeScreenPresenter &&oth)            = delete;
 
         void createData() override;
-        void handleUpdateTimeEvent() override;
+        gui::RefreshModes handleUpdateTimeEvent() override;
         bool handleInputEvent(const gui::InputEvent &inputEvent) override;
         void onBeforeShow() override;
         void onDatabaseMessage(db::NotificationMessage *msg) override;
@@ -154,7 +155,7 @@ namespace app::home_screen
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
         std::unique_ptr<std::mt19937> rngEngine;
 
-        void handleCyclicDeepRefresh();
+        gui::RefreshModes handleCyclicDeepRefresh();
 
         static constexpr auto timerName  = "HS_timer";
         static constexpr auto snoozeTick = std::chrono::seconds(1);
