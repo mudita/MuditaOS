@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -260,19 +260,22 @@ class AudioKeyPressedRequest : public AudioMessage
 class VolumeChanged : public sys::DataMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
-    VolumeChanged(audio::Volume volume, audio::Context context)
-        : sys::DataMessage{MessageType::MessageTypeUninitialized}, volume{volume}, context{context}
+    VolumeChanged(audio::Volume volume, audio::Context context, audio::VolumeChangeRequestSource source)
+        : sys::DataMessage{MessageType::MessageTypeUninitialized}, volume{volume}, context{context}, source{source}
     {}
 
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest> override
     {
         return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::ShowPopup, std::make_unique<gui::VolumePopupRequestParams>(volume, context));
+            sender,
+            app::manager::actions::ShowPopup,
+            std::make_unique<gui::VolumePopupRequestParams>(volume, context, source));
     }
 
   private:
     const audio::Volume volume;
     audio::Context context;
+    audio::VolumeChangeRequestSource source;
 };
 
 class BluetoothDeviceVolumeChanged : public AudioMessage

@@ -11,8 +11,10 @@ namespace gui
     class VolumePopupData : public SwitchData
     {
       public:
-        explicit VolumePopupData(const audio::Volume volume, const audio::Context audioContext)
-            : SwitchData(), volume{volume}, audioContext{audioContext}
+        explicit VolumePopupData(const audio::Volume volume,
+                                 const audio::Context audioContext,
+                                 audio::VolumeChangeRequestSource source)
+            : SwitchData(), volume{volume}, audioContext{audioContext}, source{source}
         {}
 
         [[nodiscard]] auto getVolume() const noexcept -> audio::Volume
@@ -25,9 +27,15 @@ namespace gui
             return audioContext;
         }
 
+        [[nodiscard]] auto getVolumeChangeRequestSource() const noexcept -> audio::VolumeChangeRequestSource
+        {
+            return source;
+        }
+
       private:
         const audio::Volume volume;
         const audio::Context audioContext;
+        const audio::VolumeChangeRequestSource source;
     };
 
     class ModesPopupData : public SwitchData

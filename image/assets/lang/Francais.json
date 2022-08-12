@@ -270,6 +270,7 @@
   "app_desktop_clear_all": "TOUT EFFACER",
   "app_desktop_replay": "RÉPONDRE",
   "app_popup_volume_text": "VOLUME",
+  "app_popup_bt_volume_text": "VOLUME DE LA BLUETOOTH",
   "app_popup_music_volume_text": "VOLUME DE LA MUSIQUE",
   "app_popup_call_volume_text": "VOLUME D'APPEL",
   "app_popup_muted_text": "SILENCIEUX",

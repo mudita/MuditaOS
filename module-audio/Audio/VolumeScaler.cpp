@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "VolumeScaler.hpp"
@@ -37,11 +37,6 @@ namespace audio::volume::scaler
         Volume toSystemVolume(std::uint8_t avrcpVolume) noexcept
         {
             return btProfileToSystemVolume(avrcpVolume, static_cast<float>(avrcpMaxVolume));
-        }
-
-        std::uint8_t toAvrcpVolume(float systemVolume) noexcept
-        {
-            return systemToBtProfileVolume(systemVolume, avrcpMaxVolume);
         }
     } // namespace a2dp
     namespace hsp

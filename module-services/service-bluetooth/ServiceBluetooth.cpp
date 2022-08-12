@@ -86,7 +86,6 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
             LOG_INFO("Turning off Bluetooth due to inactivity timeout");
             handleTurnOff();
         });
-    startTimeoutTimer();
 
     connectHandler<BluetoothAddrMessage>();
     connectHandler<BluetoothAudioStartMessage>();
@@ -403,7 +402,6 @@ auto ServiceBluetooth::handle(message::bluetooth::ResponseAuthenticatePairCancel
 auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Message>
 {
     LOG_INFO("Bluetooth request!");
-    resetTimeoutTimer();
 
     switch (msg->req) {
     case BluetoothMessage::Scan:
@@ -522,14 +520,6 @@ void ServiceBluetooth::stopTimeoutTimer()
 {
     if (connectionTimeoutTimer.isValid()) {
         connectionTimeoutTimer.stop();
-    }
-}
-
-void ServiceBluetooth::resetTimeoutTimer()
-{
-    if (connectionTimeoutTimer.isValid() && connectionTimeoutTimer.isActive()) {
-        connectionTimeoutTimer.stop();
-        connectionTimeoutTimer.start();
     }
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -48,8 +48,10 @@ namespace bluetooth
     class A2DPAudioDevice : public BluetoothAudioDevice
     {
       public:
-        explicit A2DPAudioDevice() : BluetoothAudioDevice(AudioProfile::A2DP)
-        {}
+        explicit A2DPAudioDevice(const float volume) : BluetoothAudioDevice(AudioProfile::A2DP)
+        {
+            outputVolume = volume;
+        }
 
         auto setOutputVolume(float vol) -> audio::AudioDevice::RetCode override;
         void onDataSend() override;
@@ -65,8 +67,9 @@ namespace bluetooth
     class CVSDAudioDevice : public BluetoothAudioDevice
     {
       public:
-        explicit CVSDAudioDevice(const AudioProfile &profile) : BluetoothAudioDevice(profile)
+        explicit CVSDAudioDevice(const float volume, const AudioProfile &profile) : BluetoothAudioDevice(profile)
         {
+            outputVolume = volume;
             btstack_cvsd_plc_init(&cvsdPlcState);
         }
 
