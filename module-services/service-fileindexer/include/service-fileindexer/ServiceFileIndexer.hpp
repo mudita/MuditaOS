@@ -41,7 +41,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name = service::name::file_indexer;
-            manifest.dependencies = service::name::db;
+            manifest.dependencies = {service::name::db};
             return manifest;
         }
     };
