@@ -1,5 +1,5 @@
-#!/bin/env bash
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+#!/bin/bash
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 set -euo pipefail
@@ -49,12 +49,10 @@ get_compile_commands()
 
 main()
 {
-    if [[ $# -ne 1 ]]; then
+    if [ $# -ne 1 ]; then
         help
         exit 0
     fi
-    local tool
-    tool=$(get_clang_tidy)
     echo "Target branch: ${CHANGE_TARGET}"
 
     local files_to_check
@@ -73,7 +71,7 @@ main()
     verify_clang_format_version
     get_compile_commands "$1"
     # run tidy
-    git diff -U0 --no-color remotes/origin/${CHANGE_TARGET}...HEAD $files_to_check | ${tool[*]} -p 1 -path=/tmp/
+    git diff -U0 --no-color remotes/origin/${CHANGE_TARGET}...HEAD $files_to_check | "$(get_clang_tidy)" -p 1 -path=/tmp/
 }
 
 main "$1"
