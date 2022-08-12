@@ -49,14 +49,15 @@ namespace app
                          std::to_string(volumeParams->getVolume()).c_str());
                 auto volume          = volumeParams->getVolume();
                 auto context         = volumeParams->getAudioContext();
+                auto source          = volumeParams->getRequestSource();
+                auto popupData       = std::make_unique<gui::VolumePopupData>(volume, context, source);
+
                 const auto popupName = resolveWindowName(gui::popup::ID::Volume);
                 if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
-                    updateCurrentWindow(std::make_unique<gui::VolumePopupData>(volume, context));
+                    updateCurrentWindow(std::move(popupData));
                 }
                 else {
-                    switchWindowPopup(popupName,
-                                      volumeParams->getDisposition(),
-                                      std::make_unique<gui::VolumePopupData>(volume, context));
+                    switchWindowPopup(popupName, volumeParams->getDisposition(), std::move(popupData));
                 }
                 return true;
             });

@@ -301,6 +301,7 @@
   "app_desktop_clear_all": "BORRAR TODO",
   "app_desktop_replay": "RESPONDER",
   "app_popup_volume_text": "VOLUMEN",
+  "app_popup_bt_volume_text": "VOLUMEN DEL BLUETOOTH",
   "app_popup_music_volume_text": "VOLUMEN DE MÚSICA",
   "app_popup_call_volume_text": "VOLUMEN DE LLAMADAS",
   "app_popup_muted_text": "SILENCIADO",

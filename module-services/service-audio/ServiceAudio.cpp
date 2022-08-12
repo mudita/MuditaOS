@@ -5,13 +5,11 @@
 #include <ServiceAudio.hpp>
 
 #include <Audio/Operation/IdleOperation.hpp>
-#include <Audio/Operation/PlaybackOperation.hpp>
 #include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <module-audio/Audio/VolumeScaler.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
-#include <service-bluetooth/messages/AudioRouting.hpp>
 #include <service-bluetooth/messages/AudioNotify.hpp>
 #include <service-db/Settings.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
@@ -20,7 +18,6 @@
 #include <algorithm>
 #include <initializer_list>
 #include <iterator>
-#include <type_traits>
 #include <utility>
 
 using namespace audio;
@@ -602,7 +599,8 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> sys::MessagePointer
         // update volume of currently active sound
         setSetting(Setting::Volume, std::to_string(newVolume));
     }
-    bus.sendMulticast(std::make_shared<VolumeChanged>(newVolume, context), sys::BusChannel::ServiceAudioNotifications);
+    bus.sendMulticast(std::make_shared<VolumeChanged>(newVolume, context, VolumeChangeRequestSource::Other),
+                      sys::BusChannel::ServiceAudioNotifications);
     return sys::msgHandled();
 }
 
@@ -833,21 +831,25 @@ void ServiceAudio::settingsChanged(const std::string &name, std::string value)
     LOG_ERROR("ServiceAudio::settingsChanged received notification about not registered setting: %s", name.c_str());
 }
 
-void ServiceAudio::onVolumeChanged(Volume volume)
+void ServiceAudio::onVolumeChanged(const Volume volume, const VolumeChangeRequestSource source)
 {
     const auto [profileType, playbackType] = getCurrentContext();
     settingsProvider->setValue(dbPath(Setting::Volume, playbackType, profileType), std::to_string(volume));
     settingsCache[dbPath(Setting::Volume, playbackType, profileType)] = std::to_string(volume);
-    bus.sendMulticast(std::make_shared<VolumeChanged>(volume, std::make_pair(profileType, playbackType)),
+    bus.sendMulticast(std::make_shared<VolumeChanged>(volume, std::make_pair(profileType, playbackType), source),
                       sys::BusChannel::ServiceAudioNotifications);
 }
 
 auto ServiceAudio::handleA2DPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer
 {
-    auto *a2dpMsg = dynamic_cast<A2DPDeviceVolumeChanged *>(msgl);
+    const auto a2dpMsg = dynamic_cast<A2DPDeviceVolumeChanged *>(msgl);
     assert(a2dpMsg != nullptr);
+
+    const auto context = getCurrentContext();
     const auto volume = volume::scaler::a2dp::toSystemVolume(a2dpMsg->getVolume());
-    onVolumeChanged(volume);
+    bus.sendMulticast(std::make_shared<VolumeChanged>(volume, context, VolumeChangeRequestSource::A2DP),
+                      sys::BusChannel::ServiceAudioNotifications);
+
     return sys::msgHandled();
 }
 
@@ -856,7 +858,7 @@ auto ServiceAudio::handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -
     auto *hspMsg = dynamic_cast<HSPDeviceVolumeChanged *>(msgl);
     assert(hspMsg != nullptr);
     const auto volume = volume::scaler::hsp::toSystemVolume(hspMsg->getVolume());
-    onVolumeChanged(volume);
+    onVolumeChanged(volume, VolumeChangeRequestSource::HSP);
     return sys::msgHandled();
 }
 
@@ -865,7 +867,7 @@ auto ServiceAudio::handleHFPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -
     auto *hfpMsg = dynamic_cast<HFPDeviceVolumeChanged *>(msgl);
     assert(hfpMsg != nullptr);
     const auto volume = volume::scaler::hfp::toSystemVolume(hfpMsg->getVolume());
-    onVolumeChanged(volume);
+    onVolumeChanged(volume, VolumeChangeRequestSource::HFP);
     return sys::msgHandled();
 }
 auto ServiceAudio::handleA2DPAudioPause() -> sys::MessagePointer

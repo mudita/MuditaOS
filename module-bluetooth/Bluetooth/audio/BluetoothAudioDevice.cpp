@@ -23,7 +23,9 @@ using bluetooth::CVSDAudioDevice;
 using namespace std::chrono_literals;
 
 BluetoothAudioDevice::BluetoothAudioDevice(AudioProfile audioProfile) : profile(audioProfile)
-{}
+{
+    LOG_DEBUG("Creating bluetooth device with %s profile", magic_enum::enum_name(audioProfile).data());
+}
 
 BluetoothAudioDevice::~BluetoothAudioDevice()
 {
@@ -52,13 +54,6 @@ auto BluetoothAudioDevice::isOutputEnabled() const -> bool
 
 auto A2DPAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
 {
-    const auto volumeToSet = audio::volume::scaler::a2dp::toAvrcpVolume(vol);
-    const auto status      = avrcp_controller_set_absolute_volume(AVRCP::mediaTracker.avrcp_cid, volumeToSet);
-    if (status != ERROR_CODE_SUCCESS) {
-        LOG_ERROR("Can't set volume level. Status %x", status);
-        return audio::AudioDevice::RetCode::Failure;
-    }
-
     outputVolume = vol;
     return audio::AudioDevice::RetCode::Success;
 }
@@ -234,7 +229,19 @@ auto BluetoothAudioDevice::fillSbcAudioBuffer() -> int
         audio::Stream::Span dataSpan;
 
         Sink::_stream->peek(dataSpan);
-        btstack_sbc_encoder_process_data(reinterpret_cast<int16_t *>(dataSpan.data));
+
+        constexpr size_t bytesPerSample =
+            sizeof(std::int16_t) / sizeof(std::uint8_t); // Samples are signed 16-bit, but stored in uint8_t array
+        const float outputVolumeNormalized =
+            outputVolume / static_cast<float>(audio::maxVolume); // Volume in <0;1> range
+
+        std::int16_t *firstSample = reinterpret_cast<std::int16_t *>(dataSpan.data);
+        std::int16_t *lastSample  = firstSample + dataSpan.dataSize / bytesPerSample;
+
+        /* Scale each sample to reduce volume */
+        std::for_each(firstSample, lastSample, [&](std::int16_t &sample) { sample *= outputVolumeNormalized; });
+
+        btstack_sbc_encoder_process_data(firstSample);
         Sink::_stream->consume();
 
         uint16_t sbcFrameSize = btstack_sbc_encoder_sbc_buffer_length();

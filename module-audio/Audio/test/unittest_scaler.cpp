@@ -64,10 +64,6 @@ SCENARIO("Scale volume levels between system and bluetooth")
     {
         WHEN("Volume is set to 10")
         {
-            THEN("AVRCP volume is 127")
-            {
-                REQUIRE(audio::volume::scaler::a2dp::toAvrcpVolume(10) == std::uint8_t{127});
-            }
             THEN("HSP speaker gain is 15")
             {
                 REQUIRE(audio::volume::scaler::hsp::toHSPGain(10) == std::uint8_t{15});
@@ -75,10 +71,6 @@ SCENARIO("Scale volume levels between system and bluetooth")
         }
         WHEN("System volume is set to 7")
         {
-            THEN("AVRCP volume is 89")
-            {
-                REQUIRE(audio::volume::scaler::a2dp::toAvrcpVolume(7) == std::uint8_t{89});
-            }
             THEN("HSP speaker gain is 7")
             {
                 REQUIRE(audio::volume::scaler::hsp::toHSPGain(7) == std::uint8_t{11});
@@ -86,10 +78,6 @@ SCENARIO("Scale volume levels between system and bluetooth")
         }
         WHEN("System volume is set to 1")
         {
-            THEN("AVRCP volume is 13")
-            {
-                REQUIRE(audio::volume::scaler::a2dp::toAvrcpVolume(1) == std::uint8_t{13});
-            }
             THEN("HSP speaker gain is 2")
             {
                 REQUIRE(audio::volume::scaler::hsp::toHSPGain(1) == std::uint8_t{2});

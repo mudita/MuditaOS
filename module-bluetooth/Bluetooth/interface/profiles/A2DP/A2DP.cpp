@@ -12,7 +12,6 @@
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
 #include <log/log.hpp>
-#include <service-bluetooth/BluetoothMessage.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -108,8 +107,8 @@ namespace bluetooth
     QueueHandle_t A2DP::A2DPImpl::sinkQueue   = nullptr;
     DeviceMetadata_t A2DP::A2DPImpl::metadata;
     btstack_packet_callback_registration_t A2DP::A2DPImpl::hciEventCallbackRegistration;
-    std::array<uint8_t, 150> A2DP::A2DPImpl::sdpSourceServiceBuffer;
-    std::array<uint8_t, 4> A2DP::A2DPImpl::mediaSbcCodecCapabilities = {
+    std::array<std::uint8_t, A2DP::A2DPImpl::SDP_BUFFER_LENGTH> A2DP::A2DPImpl::sdpSourceServiceBuffer;
+    std::array<std::uint8_t, A2DP::A2DPImpl::MEDIA_CAP_SIZE> A2DP::A2DPImpl::mediaSbcCodecCapabilities = {
         (AVDTP_SBC_44100 << 4) | AVDTP_SBC_STEREO,
         0xFF, //(AVDTP_SBC_BLOCK_LENGTH_16 << 4) | (AVDTP_SBC_SUBBANDS_8 << 2) | AVDTP_SBC_ALLOCATION_METHOD_LOUDNESS,
         2,
@@ -160,7 +159,7 @@ namespace bluetooth
 
         // Create AVRCP target service record and register it with SDP.
         AVRCP::sdpTargetServiceBuffer.fill(0);
-        uint16_t supportedFeatures = AVRCP_FEATURE_MASK_CATEGORY_PLAYER_OR_RECORDER;
+        std::uint16_t supportedFeatures = AVRCP_FEATURE_MASK_CATEGORY_PLAYER_OR_RECORDER;
 #ifdef AVRCP_BROWSING_ENABLED
         supported_features |= AVRCP_FEATURE_MASK_BROWSING;
 #endif
@@ -173,7 +172,7 @@ namespace bluetooth
 
         // setup AVRCP Controller
         AVRCP::sdpControllerServiceBuffer.fill(0);
-        uint16_t controllerSupportedFeatures              = AVRCP_FEATURE_MASK_CATEGORY_PLAYER_OR_RECORDER;
+        uint16_t controllerSupportedFeatures = AVRCP_FEATURE_MASK_CATEGORY_MONITOR_OR_AMPLIFIER;
         avrcp_controller_create_sdp_record(AVRCP::sdpControllerServiceBuffer.data(),
                                            avrcpControllerSdpRecordHandle,
                                            controllerSupportedFeatures,
@@ -197,7 +196,7 @@ namespace bluetooth
     {
         int numBytesInFrame = btstack_sbc_encoder_sbc_buffer_length();
         int bytesInStorage  = AVRCP::mediaTracker.sbc_storage_count;
-        uint8_t numFrames   = bytesInStorage / numBytesInFrame;
+        std::uint8_t numFrames = bytesInStorage / numBytesInFrame;
         a2dp_source_stream_send_media_payload(AVRCP::mediaTracker.a2dp_cid,
                                               AVRCP::mediaTracker.local_seid,
                                               AVRCP::mediaTracker.sbc_storage,
@@ -213,14 +212,14 @@ namespace bluetooth
         auto *context = static_cast<MediaContext *>(btstack_run_loop_get_timer_context(timer));
         btstack_run_loop_set_timer(&context->audio_timer, AUDIO_TIMEOUT_MS);
         btstack_run_loop_add_timer(&context->audio_timer);
-        uint32_t now = btstack_run_loop_get_time_ms();
+        std::uint32_t now = btstack_run_loop_get_time_ms();
 
-        uint32_t updatePeriodMs = AUDIO_TIMEOUT_MS;
+        std::uint32_t updatePeriodMs = AUDIO_TIMEOUT_MS;
         if (context->time_audio_data_sent_in_ms > 0) {
             updatePeriodMs = now - context->time_audio_data_sent_in_ms;
         }
 
-        uint32_t numSamples = (updatePeriodMs * AVDTP::sampleRate) / 1000;
+        std::uint32_t numSamples = (updatePeriodMs * AVDTP::sampleRate) / 1000;
         context->acc_num_missed_samples += (updatePeriodMs * AVDTP::sampleRate) % 1000;
 
         while (context->acc_num_missed_samples >= 1000) {
@@ -274,19 +273,25 @@ namespace bluetooth
         btstack_run_loop_remove_timer(&context->audio_timer);
     }
 
-    void A2DP::A2DPImpl::hciPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size)
+    void A2DP::A2DPImpl::hciPacketHandler(uint8_t packetType,
+                                          [[maybe_unused]] uint16_t channel,
+                                          [[maybe_unused]] uint8_t *packet,
+                                          [[maybe_unused]] uint16_t size)
     {
         if (packetType != HCI_EVENT_PACKET) {
             return;
         }
     }
 
-    void A2DP::A2DPImpl::sourcePacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size)
+    void A2DP::A2DPImpl::sourcePacketHandler(uint8_t packetType,
+                                             [[maybe_unused]] uint16_t channel,
+                                             uint8_t *packet,
+                                             [[maybe_unused]] uint16_t size)
     {
-        uint8_t status;
-        uint8_t local_seid;
+        std::uint8_t status;
+        std::uint8_t local_seid;
         bd_addr_t address;
-        uint16_t cid;
+        std::uint16_t cid;
 
         if (packetType != HCI_EVENT_PACKET) {
             return;
@@ -446,7 +451,6 @@ namespace bluetooth
                      a2dp_subevent_stream_established_get_remote_seid(packet));
 
             sourceQueue = xQueueCreate(5, sizeof(AudioData_t));
-            sinkQueue   = nullptr;
             if (sourceQueue != nullptr) {
                 sendAudioEvent(audio::EventType::BlutoothA2DPDeviceState, audio::Event::DeviceState::Connected);
             }

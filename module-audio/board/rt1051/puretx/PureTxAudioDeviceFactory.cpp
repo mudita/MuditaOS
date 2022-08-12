@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PureTxAudioDeviceFactory.hpp"
@@ -16,21 +16,23 @@ using audio::RT1051CellularAudio;
 std::shared_ptr<AudioDevice> PureTxAudioDeviceFactory::getDevice(const audio::Profile &profile)
 {
     std::shared_ptr<AudioDevice> device;
+    const auto initialVolume = profile.GetOutputVolume();
+
     switch (profile.GetAudioDeviceType()) {
     case AudioDevice::Type::Audiocodec: {
         device = std::make_shared<PureTxAudioCodec>(profile.GetAudioConfiguration());
     } break;
 
     case AudioDevice::Type::BluetoothA2DP: {
-        device = std::make_shared<bluetooth::A2DPAudioDevice>();
+        device = std::make_shared<bluetooth::A2DPAudioDevice>(initialVolume);
     } break;
 
     case AudioDevice::Type::BluetoothHSP: {
-        device = std::make_shared<bluetooth::CVSDAudioDevice>(bluetooth::AudioProfile::HSP);
+        device = std::make_shared<bluetooth::CVSDAudioDevice>(initialVolume, bluetooth::AudioProfile::HSP);
     } break;
 
     case AudioDevice::Type::BluetoothHFP: {
-        device = std::make_shared<bluetooth::CVSDAudioDevice>(bluetooth::AudioProfile::HFP);
+        device = std::make_shared<bluetooth::CVSDAudioDevice>(initialVolume, bluetooth::AudioProfile::HFP);
     } break;
 
     case AudioDevice::Type::Cellular: {

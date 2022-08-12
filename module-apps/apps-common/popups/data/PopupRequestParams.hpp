@@ -146,8 +146,10 @@ namespace gui
     class VolumePopupRequestParams : public PopupRequestParams
     {
       public:
-        VolumePopupRequestParams(audio::Volume volume, const audio::Context audioContext)
-            : PopupRequestParams{gui::popup::ID::Volume}, volume{volume}, audioContext{audioContext}
+        VolumePopupRequestParams(audio::Volume volume,
+                                 const audio::Context audioContext,
+                                 audio::VolumeChangeRequestSource source)
+            : PopupRequestParams{gui::popup::ID::Volume}, volume{volume}, audioContext{audioContext}, source{source}
         {}
 
         [[nodiscard]] auto getVolume() const noexcept
@@ -160,9 +162,15 @@ namespace gui
             return audioContext;
         }
 
+        [[nodiscard]] auto getRequestSource() const noexcept
+        {
+            return source;
+        }
+
       private:
         const audio::Volume volume;
         const audio::Context audioContext;
+        const audio::VolumeChangeRequestSource source;
     };
 
 } // namespace gui

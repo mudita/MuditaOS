@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -123,7 +123,7 @@ class ServiceAudio : public sys::Service
 
     const audio::Context getCurrentContext();
     void settingsChanged(const std::string &name, std::string value);
-    void onVolumeChanged(audio::Volume volume);
+    void onVolumeChanged(audio::Volume volume, audio::VolumeChangeRequestSource source);
     auto handleA2DPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleHFPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;

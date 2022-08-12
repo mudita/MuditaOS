@@ -72,6 +72,14 @@ namespace audio
         Last = Bedtime,
     };
 
+    enum class VolumeChangeRequestSource
+    {
+        A2DP,
+        HFP,
+        HSP,
+        Other
+    };
+
     /// Used to describe audio operations
     using Context = std::pair<Profile::Type, PlaybackType>;
 

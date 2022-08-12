@@ -4,9 +4,11 @@
 
 ### Changed / Improved
 * Changed USB logging
+* Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
 * Fixed improper duration of the rejected outgoing call shown in calls log
+* Fixed Bluetooth volume control issues
 * Fixed turning on loudspeaker before outgoing call is answered
 * Fixed PLAY label translation in German
 * Fixed USB connection/disconnection detection

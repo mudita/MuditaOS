@@ -46,11 +46,12 @@ namespace bluetooth
             avrcp_target_support_event(AVRCP::mediaTracker.avrcp_cid, AVRCP_NOTIFICATION_EVENT_TRACK_CHANGED);
             avrcp_target_support_event(AVRCP::mediaTracker.avrcp_cid,
                                        AVRCP_NOTIFICATION_EVENT_NOW_PLAYING_CONTENT_CHANGED);
+
             avrcp_controller_enable_notification(AVRCP::mediaTracker.avrcp_cid,
                                                  AVRCP_NOTIFICATION_EVENT_VOLUME_CHANGED);
 
             avrcp_target_set_now_playing_info(
-                AVRCP::mediaTracker.avrcp_cid, NULL, sizeof(AVRCP::tracks) / sizeof(avrcp_track_t));
+                AVRCP::mediaTracker.avrcp_cid, nullptr, sizeof(AVRCP::tracks) / sizeof(avrcp_track_t));
             avrcp_target_set_unit_info(AVRCP::mediaTracker.avrcp_cid, AVRCP_SUBUNIT_TYPE_AUDIO, AVRCP::companyId);
             avrcp_target_set_subunit_info(AVRCP::mediaTracker.avrcp_cid,
                                           AVRCP_SUBUNIT_TYPE_AUDIO,
@@ -85,12 +86,6 @@ namespace bluetooth
 
         const auto subevent_code = hci_event_avrcp_meta_get_subevent_code(packet);
         switch (subevent_code) {
-        case AVRCP_SUBEVENT_NOTIFICATION_VOLUME_CHANGED:
-            AVRCP::mediaTracker.volume = avrcp_subevent_notification_volume_changed_get_absolute_volume(packet);
-            LOG_INFO("AVRCP Target: Volume set to %u%% (%u)\n",
-                     AVRCP::targetVolumeToPercent(AVRCP::mediaTracker.volume),
-                     AVRCP::mediaTracker.volume);
-            break;
         case AVRCP_SUBEVENT_PLAY_STATUS_QUERY:
             status = avrcp_target_play_status(AVRCP::mediaTracker.avrcp_cid,
                                               AVRCP::playInfo.song_length_ms,
@@ -146,20 +141,14 @@ namespace bluetooth
             return;
         }
 
-        const std::uint8_t status = packet[5];
-
-        // ignore INTERIM status
-        if (status == AVRCP_CTYPE_RESPONSE_INTERIM) {
-            return;
-        }
-
         const auto subevent_code = hci_event_avrcp_meta_get_subevent_code(packet);
         switch (subevent_code) {
+        /* BT device requested volume change */
         case AVRCP_SUBEVENT_NOTIFICATION_VOLUME_CHANGED: {
             const auto volume = avrcp_subevent_notification_volume_changed_get_absolute_volume(packet);
             auto &busProxy    = AVRCP::ownerService->bus;
             busProxy.sendUnicast(std::make_shared<message::bluetooth::A2DPVolume>(volume), service::name::bluetooth);
-            LOG_INFO("AVRCP Controller: notification absolute volume changed %u%% (%u)\n",
+            LOG_INFO("AVRCP Controller: BT device volume changed to %u%% (%u)\n",
                      AVRCP::controllerVolumeToPercent(volume),
                      volume);
         } break;
@@ -194,12 +183,12 @@ namespace bluetooth
 
     std::uint16_t AVRCP::targetVolumeToPercent(std::uint16_t volume)
     {
-        return volume * 127 / 100;
+        return volume * AVRCP::maxVolumeValue / 100;
     }
 
     std::uint16_t AVRCP::controllerVolumeToPercent(std::uint16_t volume)
     {
-        return volume * 100 / 127;
+        return volume * 100 / AVRCP::maxVolumeValue;
     }
 
 } // namespace bluetooth

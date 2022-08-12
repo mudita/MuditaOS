@@ -20,6 +20,7 @@ namespace bluetooth
     class AVRCP
     {
       private:
+        static constexpr std::uint16_t maxVolumeValue = 0x7F; // From Bluetooth AVRCP 1.6.2 spec, p. 83
         static std::uint16_t targetVolumeToPercent(std::uint16_t volume);
         static std::uint16_t controllerVolumeToPercent(std::uint16_t volume);
 

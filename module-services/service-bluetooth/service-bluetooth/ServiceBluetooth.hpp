@@ -108,7 +108,6 @@ class ServiceBluetooth : public sys::Service
 
     void startTimeoutTimer();
     void stopTimeoutTimer();
-    void resetTimeoutTimer();
 
     template <typename T> auto connectHandler() -> bool
     {
