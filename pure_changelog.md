@@ -1,5 +1,10 @@
 # MuditaOS changelog - PurePhone
 
+## Unreleased
+
+### Fixed
+* Fixed PLAY label translation in German
+
 ## [1.3.0 2022-08-04]
 
 ### Added
