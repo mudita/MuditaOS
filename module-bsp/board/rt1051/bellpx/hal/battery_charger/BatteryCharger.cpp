@@ -58,6 +58,7 @@ namespace hal::battery
         Voltage getBatteryVoltage() const final;
         std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
+        ChargerPresence getChargerPresence() const final;
 
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
@@ -179,6 +180,13 @@ namespace hal::battery
             return ChargingStatus::PluggedNotCharging;
         }
     }
+
+    AbstractBatteryCharger::ChargerPresence BellBatteryCharger::getChargerPresence() const
+    {
+        return getChargingStatus() == ChargingStatus::Discharging ? AbstractBatteryCharger::ChargerPresence::Unplugged
+                                                                  : AbstractBatteryCharger::ChargerPresence::PluggedIn;
+    }
+
     std::optional<AbstractBatteryCharger::SOC> BellBatteryCharger::fetchBatterySOC() const
     {
         if (const auto soc = fuel_gauge.get_battery_soc(); const auto scaled_soc = scale_soc(*soc)) {

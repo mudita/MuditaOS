@@ -85,6 +85,7 @@ namespace hal::battery
         Voltage getBatteryVoltage() const final;
         std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
+        ChargerPresence getChargerPresence() const final;
 
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
@@ -172,6 +173,11 @@ namespace hal::battery
     AbstractBatteryCharger::ChargingStatus PureBatteryCharger::getChargingStatus() const
     {
         return transformChargingState(bsp::battery_charger::getChargeStatus());
+    }
+    AbstractBatteryCharger::ChargerPresence PureBatteryCharger::getChargerPresence() const
+    {
+        return bsp::battery_charger::isChargerPlugged() ? AbstractBatteryCharger::ChargerPresence::PluggedIn
+                                                        : AbstractBatteryCharger::ChargerPresence::Unplugged;
     }
     PureBatteryCharger::BatteryWorkerQueue &PureBatteryCharger::getWorkerQueueHandle()
     {

@@ -39,6 +39,7 @@ namespace hal::battery
         Voltage getBatteryVoltage() const final;
         std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
+        ChargerPresence getChargerPresence() const final;
 
       private:
         void worker();
@@ -93,6 +94,11 @@ namespace hal::battery
         else {
             return ChargingStatus::Discharging;
         }
+    }
+    AbstractBatteryCharger::ChargerPresence BatteryCharger::getChargerPresence() const
+    {
+        return isPlugged ? AbstractBatteryCharger::ChargerPresence::PluggedIn
+                         : AbstractBatteryCharger::ChargerPresence::Unplugged;
     }
 
     void BatteryCharger::worker()

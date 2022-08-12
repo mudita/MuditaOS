@@ -941,4 +941,14 @@ namespace bsp::battery_charger
         LOG_INFO("\tAvgCurrent: %dmA", getAvgCurrent());
         LOG_INFO("\tRawSoC: %d%%", getBatteryLevel().value());
     }
+
+    bool isChargerPlugged()
+    {
+        const auto chargerStatus = chargerRead(Registers::CHG_INT_OK);
+        if (chargerStatus.first != kStatus_Success) {
+            LOG_ERROR("failed to read charger status");
+            return false;
+        }
+        return chargerStatus.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I);
+    }
 } // namespace bsp::battery_charger
