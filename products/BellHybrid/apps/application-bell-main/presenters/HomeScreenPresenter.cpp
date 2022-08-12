@@ -78,11 +78,11 @@ namespace app::home_screen
           timeModel{timeModel}, rngEngine{std::make_unique<std::mt19937>(std::random_device{}())}
     {}
 
-    void HomeScreenPresenter::handleUpdateTimeEvent()
+    gui::RefreshModes HomeScreenPresenter::handleUpdateTimeEvent()
     {
         getView()->setTime(timeModel.getCurrentTime());
         stateController->handleTimeUpdateEvent();
-        handleCyclicDeepRefresh();
+        return handleCyclicDeepRefresh();
     }
 
     void HomeScreenPresenter::handleAlarmRingingEvent()
@@ -198,16 +198,18 @@ namespace app::home_screen
         return false;
     }
 
-    void HomeScreenPresenter::handleCyclicDeepRefresh()
+    gui::RefreshModes HomeScreenPresenter::handleCyclicDeepRefresh()
     {
         constexpr auto deepRefreshPeriod = 30;
         static auto refreshCount         = 0;
+        gui::RefreshModes refresh{gui::RefreshModes::GUI_REFRESH_FAST};
 
         if (refreshCount >= deepRefreshPeriod) {
-            app->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+            refresh      = gui::RefreshModes::GUI_REFRESH_DEEP;
             refreshCount = 0;
         }
         refreshCount++;
+        return refresh;
     }
     void HomeScreenPresenter::handleBatteryStatus()
     {
