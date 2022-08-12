@@ -5,13 +5,11 @@
 #include <ServiceAudio.hpp>
 
 #include <Audio/Operation/IdleOperation.hpp>
-#include <Audio/Operation/PlaybackOperation.hpp>
 #include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <module-audio/Audio/VolumeScaler.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
-#include <service-bluetooth/messages/AudioRouting.hpp>
 #include <service-bluetooth/messages/AudioNotify.hpp>
 #include <service-db/Settings.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
@@ -20,7 +18,6 @@
 #include <algorithm>
 #include <initializer_list>
 #include <iterator>
-#include <type_traits>
 #include <utility>
 
 using namespace audio;

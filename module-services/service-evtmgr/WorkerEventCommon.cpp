@@ -32,12 +32,12 @@ WorkerEventCommon::WorkerEventCommon(sys::Service *service)
       service(service), keyInput{hal::key_input::AbstractKeyInput::Factory::create()}
 {}
 
-bool WorkerEventCommon::handleMessage(uint32_t queueID)
+bool WorkerEventCommon::handleMessage(std::uint32_t queueID)
 {
     auto &queue = queues[queueID];
 
     // service queue
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueService)) {
+    if (queueID == static_cast<std::uint32_t>(WorkerEventQueues::queueService)) {
         sys::WorkerCommand wcmd;
         if (!queue->Dequeue(&wcmd, 0)) {
             return false;
@@ -46,8 +46,8 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         // place some code here to handle messages from service
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardIRQ)) {
-        uint8_t notification;
+    if (queueID == static_cast<std::uint32_t>(WorkerEventQueues::queueKeyboardIRQ)) {
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
@@ -64,8 +64,8 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         batteryController->handleNotification(event);
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueRTC)) {
-        uint8_t notification;
+    if (queueID == static_cast<std::uint32_t>(WorkerEventQueues::queueRTC)) {
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }

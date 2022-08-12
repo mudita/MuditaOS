@@ -61,7 +61,7 @@ EventManagerCommon::EventManagerCommon(LogDumpFunction logDumpFunction, const st
                                               loggerTimerName,
                                               std::chrono::milliseconds{loggerDelayMs},
                                               [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
-      logDumpFunction(logDumpFunction), settings(std::make_shared<settings::Settings>())
+      logDumpFunction(std::move(logDumpFunction)), settings(std::make_shared<settings::Settings>())
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -74,7 +74,12 @@ EventManagerCommon::~EventManagerCommon()
 {
     if (EventWorker != nullptr) {
         EventWorker->close();
+        EventWorker.reset();
+        EventWorker = nullptr;
+        LOG_INFO("EventWorker is closed now!");
+        return;
     }
+    LOG_ERROR("EventWorker is nullptr, this shouldn't happen!");
 }
 
 // Invoked upon receiving data message
@@ -212,11 +217,6 @@ auto EventManagerCommon::createEventWorker() -> std::unique_ptr<WorkerEventCommo
 sys::ReturnCodes EventManagerCommon::DeinitHandler()
 {
     settings->deinit();
-
-    EventWorker->close();
-    EventWorker.reset();
-    EventWorker = nullptr;
-
     return sys::ReturnCodes::Success;
 }
 

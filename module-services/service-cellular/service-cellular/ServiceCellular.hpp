@@ -28,6 +28,7 @@
 #include <service-db/DBServiceName.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <DTMFCode.hpp>
+#include <service-desktop/Constants.hpp>
 
 #include <optional> // for optional
 #include <memory>   // for unique_ptr, allocator, make_unique, shared_ptr
@@ -326,7 +327,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = ServiceCellular::serviceName;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = {service::name::db, service::name::service_desktop};
             return manifest;
         }
     };

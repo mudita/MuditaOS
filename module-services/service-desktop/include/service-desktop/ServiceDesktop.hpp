@@ -16,6 +16,7 @@
 #include <service-desktop/BackupRestore.hpp>
 #include <service-desktop/OutboxNotifications.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 namespace settings
 {
@@ -133,7 +134,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::service_desktop;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = {service::name::db, service::name::evt_manager};
             return manifest;
         }
     };

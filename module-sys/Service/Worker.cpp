@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Service/Worker.hpp>
@@ -136,7 +136,7 @@ namespace sys
         auto setSize = SERVICE_QUEUE_LENGTH + CONTROL_QUEUE_LENGTH;
 
         // iterate over all entries in the list of queues and summarize queue sizes
-        for (auto wqi : queuesList) {
+        for (const auto &wqi : queuesList) {
             setSize += wqi.length;
         }
 
@@ -154,12 +154,12 @@ namespace sys
         controlQueueIndex = addQueue(getControlQueueName(), CONTROL_QUEUE_LENGTH, sizeof(std::uint8_t));
 
         // create and add all queues provided from service
-        for (auto wqi : queuesList) {
+        for (const auto &wqi : queuesList) {
             addQueue(wqi.name, wqi.length, wqi.elementSize);
         };
 
         // iterate over all user queues and add them to set
-        for (uint32_t i = 0; i < queues.size(); ++i) {
+        for (std::uint32_t i = 0; i < queues.size(); ++i) {
             if (xQueueAddToSet(queues[i]->GetQueueHandle(), queueSet) != pdPASS) {
                 state = State::Invalid;
                 deinit();
@@ -182,14 +182,14 @@ namespace sys
     bool Worker::deinit()
     {
         // for all queues - remove from set and delete queue
-        for (auto &q : queues) {
+        for (const auto &q : queues) {
             // remove queues from set
             xQueueRemoveFromSet(q->GetQueueHandle(), queueSet);
         }
         queues.clear();
 
         // delete queues set
-        vQueueDelete((QueueHandle_t)queueSet);
+        vQueueDelete(static_cast<QueueHandle_t>(queueSet));
 
         vSemaphoreDelete(joinSemaphore);
         vSemaphoreDelete(stateMutex);
@@ -222,7 +222,7 @@ namespace sys
 
     bool Worker::stop()
     {
-        if (runnerTask) {
+        if (runnerTask != nullptr) {
             assert(xTaskGetCurrentTaskHandle() == runnerTask);
             assert(getState() == State::Running);
             return sendControlMessage(ControlMessage::Stop);
@@ -275,7 +275,7 @@ namespace sys
 
     bool Worker::join(TickType_t timeout)
     {
-        if (runnerTask) {
+        if (runnerTask != nullptr) {
             assert(xTaskGetCurrentTaskHandle() == runnerTask);
             assert(getState() == State::Running || getState() == State::Stopped);
 

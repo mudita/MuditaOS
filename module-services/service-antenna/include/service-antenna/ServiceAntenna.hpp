@@ -7,8 +7,8 @@
 
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <Timers/TimerHandle.hpp>
-#include <service-db/DBServiceName.hpp>
 #include <PhoneModes/Observer.hpp>
+#include <service-cellular/Constans.hpp>
 
 namespace service::name
 {
@@ -100,7 +100,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::antenna;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = {service::name::cellular};
             return manifest;
         }
     };

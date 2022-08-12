@@ -40,7 +40,7 @@ namespace purephone
          * @brief This method is responsible for translating a headset key to keyboard key code.
          * @param code key code
          */
-        bsp::KeyCodes headsetKeyToKeyboardKey(uint8_t code);
+        bsp::KeyCodes headsetKeyToKeyboardKey(std::uint8_t code);
 
         enum class EventQueues
         {

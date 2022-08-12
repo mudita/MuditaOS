@@ -49,7 +49,7 @@ class WorkerEventCommon : public sys::Worker
     sys::Service *service = nullptr;
 
   private:
-    static constexpr auto stackDepthBytes = 3072;
+    static constexpr auto stackDepthBytes = 1024 * 5;
 
     static constexpr auto keyboardQueueName = "qIrq";
     static constexpr auto batteryQueueName  = "qBatteryCtrl";
@@ -74,7 +74,7 @@ class WorkerEventCommon : public sys::Worker
     /**
      * @brief list of keys with long press enabled. First item is key code, second is long press time.
      */
-    std::map<uint32_t, uint32_t> longPressParamsList;
+    std::map<std::uint32_t, std::uint32_t> longPressParamsList;
     bool longPressTaskEnabled = false;
     bsp::KeyEvents lastState  = bsp::KeyEvents::Released;
     bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
@@ -93,5 +93,5 @@ class WorkerEventCommon : public sys::Worker
      * This method is called from thread when new message arrives in queue.
      * @param queueID Index of the queue in the queues vector.
      */
-    bool handleMessage(uint32_t queueID) override;
+    bool handleMessage(std::uint32_t queueID) override;
 };
