@@ -709,5 +709,8 @@
   "app_bell_meditation_chime_interval_bottom": "der meditation",
   "app_bell_meditation_chime_volume": "Glocken-Lautstärke",
   "app_meditation_summary": "<text>Du meditierst seit<br />",
-  "app_meditation_countdown_desc": "Beginnt in"
+  "app_meditation_countdown_desc": "Beginnt in",
+  "app_meditation_summary_total": "<text>Gesamt:<br /><token>$VALUE</token></text>",
+  "app_meditation_summary_average": "Durchschnitt/tag:",
+  "app_meditation_summary_title": "<text>Letzte <token>$VALUE</token> tage</text>"
 }
