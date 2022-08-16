@@ -709,5 +709,8 @@
   "app_bell_meditation_chime_interval_bottom": "de la meditación",
   "app_bell_meditation_chime_volume": "Volumen del timbre",
   "app_meditation_summary": "<text>Has meditado por<br />",
-  "app_meditation_countdown_desc": "Empieza en"
+  "app_meditation_countdown_desc": "Empieza en",
+  "app_meditation_summary_total": "<text>Total:<br /><token>$VALUE</token></text>",
+  "app_meditation_summary_average": "Promedio/por día:",
+  "app_meditation_summary_title": "<text>Últimos <token>$VALUE</token> días</text>"
 }

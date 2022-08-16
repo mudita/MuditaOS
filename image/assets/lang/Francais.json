@@ -679,5 +679,8 @@
   "app_bell_meditation_chime_interval_bottom": "de la méditation",
   "app_bell_meditation_chime_volume": "Volume du gong intervalle",
   "app_meditation_summary": "<text>Vous avez médité pendant<br />",
-  "app_meditation_countdown_desc": "Début dans"
+  "app_meditation_countdown_desc": "Début dans",
+  "app_meditation_summary_total": "<text>Total :<br /><token>$VALUE</token></text>",
+  "app_meditation_summary_average": "Moyenne/jour :",
+  "app_meditation_summary_title": "<text>Derniers <token>$VALUE</token> jours</text>"
 }
