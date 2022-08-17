@@ -307,9 +307,10 @@ namespace call
                 // outgoing call: Pure is Ringing (called from: handleCellularRingingMessage)
                 "Idle"_s + boost::sml::event<evt::StartCall> / HandleStartCall = "Starting"_s,
 
-                "Starting"_s + boost::sml::event<evt::Ended> / HandleEndCall      = "Idle"_s,
-                "Starting"_s + boost::sml::event<evt::Reject> / HandleEndCall     = "Idle"_s,
-                "Starting"_s + boost::sml::event<evt::Answer> / HandleStartedCall = "Ongoing"_s,
+                "Starting"_s + boost::sml::event<evt::AudioRequest> / HandleAudioRequest = "Starting"_s,
+                "Starting"_s + boost::sml::event<evt::Ended> / HandleEndCall             = "Idle"_s,
+                "Starting"_s + boost::sml::event<evt::Reject> / HandleEndCall            = "Idle"_s,
+                "Starting"_s + boost::sml::event<evt::Answer> / HandleStartedCall        = "Ongoing"_s,
 
                 "RingDelay"_s + boost::sml::event<evt::RingTimeout> / HandleRingTimeout = "Ringing"_s,
                 // here we do not need guard - RingDelay state is already guarded on entry

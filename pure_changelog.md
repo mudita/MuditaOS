@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+* Fixed turning on loudspeaker before outgoing call is answered
 * Fixed PLAY label translation in German
 * Fixed USB connection/disconnection detection
 
