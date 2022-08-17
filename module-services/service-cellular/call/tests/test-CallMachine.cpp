@@ -434,3 +434,95 @@ TEST_CASE("test call in tethering")
     fakeit::Verify(Method(di.audio, play)).Exactly(0);
     fakeit::Verify(Method(di.api, rejectCall)).Exactly(1);
 }
+
+// --------------------------------------------
+// TEST LOUDSPEAKER SWITCHING IN STARTING STATE
+// --------------------------------------------
+
+TEST_CASE("test loudspeaker switching in starting state")
+{
+    using namespace boost::sml;
+    auto number  = utils::PhoneNumber("+48700800900");
+    auto di      = mocks::DIWrapper();
+    auto machine = std::make_unique<call::StateMachine>(di.get());
+
+    REQUIRE(machine->machine.process_event(call::event::StartCall{CallType::CT_OUTGOING, number.getView()}));
+    REQUIRE(machine->machine.is("Starting"_s));
+    REQUIRE(machine->machine.process_event(
+        call::event::AudioRequest{cellular::CallAudioEventRequest::EventType::LoudspeakerOn}));
+    fakeit::Verify(Method(di.audio, setLoudspeakerOn)).Exactly(1);
+
+    REQUIRE(machine->machine.process_event(
+        call::event::AudioRequest{cellular::CallAudioEventRequest::EventType::LoudspeakerOff}));
+    fakeit::Verify(Method(di.audio, setLoudspeakerOff)).Exactly(1);
+}
+
+// -----------------------------
+// TEST MUTING IN STARTING STATE
+// -----------------------------
+
+TEST_CASE("test muting in starting state")
+{
+    using namespace boost::sml;
+    auto number  = utils::PhoneNumber("+48700800900");
+    auto di      = mocks::DIWrapper();
+    auto machine = std::make_unique<call::StateMachine>(di.get());
+
+    REQUIRE(machine->machine.process_event(call::event::StartCall{CallType::CT_OUTGOING, number.getView()}));
+    REQUIRE(machine->machine.is("Starting"_s));
+    REQUIRE(
+        machine->machine.process_event(call::event::AudioRequest{cellular::CallAudioEventRequest::EventType::Mute}));
+    fakeit::Verify(Method(di.audio, muteCall)).Exactly(1);
+
+    REQUIRE(
+        machine->machine.process_event(call::event::AudioRequest{cellular::CallAudioEventRequest::EventType::Unmute}));
+    fakeit::Verify(Method(di.audio, unmuteCall)).Exactly(1);
+}
+
+// -------------------------------------------
+// TEST LOUDSPEAKER SWITCHING IN ONGOING STATE
+// -------------------------------------------
+
+TEST_CASE("test loudspeaker switching in ongoing state")
+{
+    using namespace boost::sml;
+    auto number  = utils::PhoneNumber("+48700800900");
+    auto di      = mocks::DIWrapper();
+    auto machine = std::make_unique<call::StateMachine>(di.get());
+
+    REQUIRE(machine->machine.process_event(call::event::StartCall{CallType::CT_OUTGOING, number.getView()}));
+    REQUIRE(machine->machine.is("Starting"_s));
+    REQUIRE(machine->machine.process_event(call::event::Answer{}));
+    REQUIRE(machine->machine.is("Ongoing"_s));
+    REQUIRE(machine->machine.process_event(
+        call::event::AudioRequest{cellular::CallAudioEventRequest::EventType::LoudspeakerOn}));
+    fakeit::Verify(Method(di.audio, setLoudspeakerOn)).Exactly(1);
+
+    REQUIRE(machine->machine.process_event(
+        call::event::AudioRequest{cellular::CallAudioEventRequest::EventType::LoudspeakerOff}));
+    fakeit::Verify(Method(di.audio, setLoudspeakerOff)).Exactly(1);
+}
+
+// ----------------------------
+// TEST MUTING IN ONGOING STATE
+// ----------------------------
+
+TEST_CASE("test muting in ongoing state")
+{
+    using namespace boost::sml;
+    auto number  = utils::PhoneNumber("+48700800900");
+    auto di      = mocks::DIWrapper();
+    auto machine = std::make_unique<call::StateMachine>(di.get());
+
+    REQUIRE(machine->machine.process_event(call::event::StartCall{CallType::CT_OUTGOING, number.getView()}));
+    REQUIRE(machine->machine.is("Starting"_s));
+    REQUIRE(machine->machine.process_event(call::event::Answer{}));
+    REQUIRE(machine->machine.is("Ongoing"_s));
+    REQUIRE(
+        machine->machine.process_event(call::event::AudioRequest{cellular::CallAudioEventRequest::EventType::Mute}));
+    fakeit::Verify(Method(di.audio, muteCall)).Exactly(1);
+
+    REQUIRE(
+        machine->machine.process_event(call::event::AudioRequest{cellular::CallAudioEventRequest::EventType::Unmute}));
+    fakeit::Verify(Method(di.audio, unmuteCall)).Exactly(1);
+}
