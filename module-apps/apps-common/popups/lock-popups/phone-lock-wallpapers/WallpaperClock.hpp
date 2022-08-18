@@ -13,8 +13,8 @@ namespace gui
     class WallpaperClock : public WallpaperBase
     {
       private:
-        gui::ClockDateWidget *clockDate                             = nullptr;
-        gui::ListView *notificationsList                            = nullptr;
+        gui::ClockDateWidget *clockDate  = nullptr;
+        gui::ListView *notificationsList = nullptr;
         std::shared_ptr<gui::NotificationsListPresenter> notificationsListPresenter;
 
       public:

@@ -76,7 +76,7 @@ namespace cellular
     class CurrentOperatorNameNotification;
     class NetworkStatusUpdateNotification;
     class CallActiveNotification;
-}
+} // namespace cellular
 
 class ServiceBluetooth : public sys::Service
 {
@@ -109,7 +109,8 @@ class ServiceBluetooth : public sys::Service
     void startTimeoutTimer();
     void stopTimeoutTimer();
 
-    template <typename T> auto connectHandler() -> bool
+    template <typename T>
+    auto connectHandler() -> bool
     {
         return connect(typeid(T), [&](sys::Message *msg) { return handle(static_cast<T *>(msg)); });
     }
@@ -153,7 +154,8 @@ class ServiceBluetooth : public sys::Service
 
 namespace sys
 {
-    template <> struct ManifestTraits<ServiceBluetooth>
+    template <>
+    struct ManifestTraits<ServiceBluetooth>
     {
         static auto GetManifest() -> ServiceManifest
         {

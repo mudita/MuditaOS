@@ -16,10 +16,10 @@ namespace gui
     class BGSoundsProgressWindow : public AppWindow, public app::bgSounds::BGSoundsProgressContract::View
     {
         std::shared_ptr<app::bgSounds::BGSoundsProgressContract::Presenter> presenter;
-        gui::Text *title            = nullptr;
-        gui::HBarGraph *progressBar = nullptr;
+        gui::Text *title                = nullptr;
+        gui::HBarGraph *progressBar     = nullptr;
         gui::TimeFixedWidget *timerText = nullptr;
-        gui::BellStatusClock *time  = nullptr;
+        gui::BellStatusClock *time      = nullptr;
         std::unique_ptr<BGSoundsAudioContext> audioContext;
 
         void buildInterface() override;

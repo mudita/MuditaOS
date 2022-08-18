@@ -34,7 +34,8 @@ namespace at
             return static_cast<std::uint8_t>(value);
         }
 
-        template <typename T> auto CLCC::toEnum(const std::string &text) -> std::optional<T>
+        template <typename T>
+        auto CLCC::toEnum(const std::string &text) -> std::optional<T>
         {
             static_assert(std::is_enum_v<T>);
             int ret = -1;

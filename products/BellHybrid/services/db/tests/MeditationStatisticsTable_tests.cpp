@@ -22,7 +22,8 @@ namespace
         return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     }
 
-    template <typename Db> class TestDatabase
+    template <typename Db>
+    class TestDatabase
     {
       public:
         explicit TestDatabase(std::filesystem::path name)

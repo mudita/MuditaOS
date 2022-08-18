@@ -101,7 +101,7 @@ bool WorkerDesktop::reinit(const std::filesystem::path &path)
 void WorkerDesktop::reset()
 {
     initialized = false;
-    usbStatus = bsp::USBDeviceStatus::Disconnected;
+    usbStatus   = bsp::USBDeviceStatus::Disconnected;
     bsp::usbDeinit();
 
     bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber.c_str()};

@@ -15,9 +15,9 @@ namespace call::api
     class GUI
     {
       public:
-        virtual void notifyRING()                                                              = 0;
-        virtual void notifyCLIP(const utils::PhoneNumber::View &number)                        = 0;
-        virtual ~GUI()                                                                         = default;
+        virtual void notifyRING()                                       = 0;
+        virtual void notifyCLIP(const utils::PhoneNumber::View &number) = 0;
+        virtual ~GUI()                                                  = default;
     };
 }; // namespace call::api
 

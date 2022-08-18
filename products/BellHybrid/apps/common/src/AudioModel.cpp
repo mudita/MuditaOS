@@ -78,8 +78,9 @@ namespace app
         playbackFinishedFlag = false;
         auto msg  = std::make_unique<service::AudioStartPlaybackRequest>(filePath, convertPlaybackType(type));
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
-        auto cb              = [_callback = callback, this](auto response) {
-            auto result     = dynamic_cast<service::AudioStartPlaybackResponse *>(response);
+
+        auto cb = [_callback = callback, this](auto response) {
+            auto result = dynamic_cast<service::AudioStartPlaybackResponse *>(response);
             if (result == nullptr) {
                 return false;
             }

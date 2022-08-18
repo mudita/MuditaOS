@@ -81,6 +81,6 @@ namespace bluetooth
         ProfileList profilesList;
         bluetooth::MusicProfile *musicProfilePtr = nullptr;
         bluetooth::CallProfile *callProfilePtr   = nullptr;
-        bool initialized = false;
+        bool initialized                         = false;
     };
 } // namespace bluetooth

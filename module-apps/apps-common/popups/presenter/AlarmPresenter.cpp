@@ -38,13 +38,14 @@ namespace app::popup
 
     auto async = app::AsyncRequest::createFromMessage;
 
-    template <typename requestType, typename responseType> void AlarmPopupContract::AlarmModel::snoozeAlarm()
+    template <typename requestType, typename responseType>
+    void AlarmPopupContract::AlarmModel::snoozeAlarm()
     {
         auto request = std::make_unique<requestType>(record->ID,
                                                      std::chrono::floor<std::chrono::minutes>(TimePointNow()) +
                                                          std::chrono::minutes(record->snoozeDuration));
-        auto task = async(std::move(request), service::name::service_time);
-        auto cb   = [&](auto response) {
+        auto task    = async(std::move(request), service::name::service_time);
+        auto cb      = [&](auto response) {
             auto result = dynamic_cast<responseType *>(response);
             assert(result);
             assert(result->success);
@@ -57,7 +58,8 @@ namespace app::popup
         task->execute(app, this, cb);
     }
 
-    template <typename requestType, typename responseType> void AlarmPopupContract::AlarmModel::stopAlarm()
+    template <typename requestType, typename responseType>
+    void AlarmPopupContract::AlarmModel::stopAlarm()
     {
         auto request = std::make_unique<requestType>(record->ID);
         auto task    = async(std::move(request), service::name::service_time);

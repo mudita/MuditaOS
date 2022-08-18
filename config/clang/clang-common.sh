@@ -1,5 +1,5 @@
 #!/bin/env bash
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 set -eo pipefail
@@ -48,8 +48,17 @@ get_tool() {
     echo "${tool}"
 }
 
-## Search for clang-format-diff.py
+## Search for clang-format.py
 get_clang_format() {
+    local searchpaths=(
+        "$(which "clang-format" 2>/dev/null 1>/dev/null)"  # clang-format in path
+        "/usr/bin/clang-format-*"
+    )
+    get_tool "clang-format" "${searchpaths[@]}"
+}
+
+## Search for clang-format-diff.py
+get_clang_format_diff() {
     local searchpaths=(
         "$(which "clang-format-diff.py" 2>/dev/null 1>/dev/null)"  # clang-format-diff in path
         "/usr/share/clang/clang-format-*/clang-format-diff.py"     # clang-format-diff location on Ubuntu/Debian
@@ -59,7 +68,7 @@ get_clang_format() {
 }
 
 ## search for clang-tidy-diff
-get_clang_tidy()
+get_clang_tidy_diff()
 {
     local searchpaths=(
         "$(which "clang-tidy-diff.py" 2>/dev/null 1>/dev/null)"  # clang-format-diff in path

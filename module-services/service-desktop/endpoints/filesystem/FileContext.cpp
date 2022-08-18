@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/filesystem/FileContext.hpp>
@@ -6,10 +6,7 @@
 #include <utility>
 #include <fstream>
 
-FileContext::FileContext(const std::filesystem::path &path,
-                         std::size_t size,
-                         std::size_t chunkSize,
-                         std::size_t offset)
+FileContext::FileContext(const std::filesystem::path &path, std::size_t size, std::size_t chunkSize, std::size_t offset)
     : path(path), size(size), offset(offset), chunkSize(chunkSize)
 {
     if (!size || !chunkSize) {
@@ -20,8 +17,7 @@ FileContext::FileContext(const std::filesystem::path &path,
 }
 
 FileContext::~FileContext()
-{
-}
+{}
 
 FileReadContext::FileReadContext(const std::filesystem::path &path,
                                  std::size_t size,

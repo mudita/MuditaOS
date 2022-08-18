@@ -320,7 +320,8 @@ class ServiceCellular : public sys::Service
 
 namespace sys
 {
-    template <> struct ManifestTraits<ServiceCellular>
+    template <>
+    struct ManifestTraits<ServiceCellular>
     {
         static auto GetManifest() -> ServiceManifest
         {

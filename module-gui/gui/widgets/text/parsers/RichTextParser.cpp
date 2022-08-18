@@ -382,7 +382,7 @@ struct walker : pugi::xml_tree_walker
     auto push_short_text_node(pugi::xml_node &node)
     {
         log_parser("shortened text node name: %s", node.name());
-        auto &decor      = text::NodeDecor::get();
+        auto &decor    = text::NodeDecor::get();
         auto attrName  = text::ShortTextNodes::get(node.name(), text::ShortTextNodes::AttributeContent::Name);
         auto attrValue = text::ShortTextNodes::get(node.name(), text::ShortTextNodes::AttributeContent::Value);
         if (attrName.has_value() && attrValue.has_value()) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -48,7 +48,7 @@ namespace purefs::fs
     {
         class directory_handle;
         class notifier;
-    }
+    } // namespace internal
     class filesystem
     {
         static constexpr auto path_separator = '/';
@@ -60,8 +60,8 @@ namespace purefs::fs
         static constexpr auto first_file_descriptor = 3;
 
       public:
-        using fsdir                    = std::shared_ptr<internal::directory_handle>;
-        using fsfile                         = std::shared_ptr<internal::file_handle>;
+        using fsdir  = std::shared_ptr<internal::directory_handle>;
+        using fsfile = std::shared_ptr<internal::file_handle>;
         explicit filesystem(std::shared_ptr<blkdev::disk_manager> diskmm);
         ~filesystem();
         filesystem(const filesystem &) = delete;
@@ -72,7 +72,8 @@ namespace purefs::fs
          * @param[in] fops Filesystem operation structure
          * @return zero on sucess otherwise error
          */
-        template <typename T> auto register_filesystem(std::string_view fsname, std::shared_ptr<T> fops) -> int
+        template <typename T>
+        auto register_filesystem(std::string_view fsname, std::shared_ptr<T> fops) -> int
         {
             if (!fops || !std::is_convertible_v<T *, filesystem_operations *>) {
                 return -EINVAL;
@@ -187,7 +188,7 @@ namespace purefs::fs
             rw  //! Syscall is RW
         };
         template <class Base, class T, typename... Args>
-        inline auto invoke_fops(T Base::*method, int fds, Args &&... args)
+        inline auto invoke_fops(T Base::*method, int fds, Args &&...args)
             -> decltype((static_cast<Base *>(nullptr)->*method)(0, std::forward<Args>(args)...))
         {
             auto fil = find_filehandle(fds);
@@ -210,7 +211,7 @@ namespace purefs::fs
         }
 
         template <class Base, class T, typename... Args>
-        inline auto invoke_fops(iaccess acc, T Base::*method, std::string_view path, Args &&... args) const
+        inline auto invoke_fops(iaccess acc, T Base::*method, std::string_view path, Args &&...args) const
             -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, {}, std::forward<Args>(args)...))
         {
             if (path.empty()) {
@@ -235,7 +236,7 @@ namespace purefs::fs
         inline auto invoke_fops_same_mp(T Base::*method,
                                         std::string_view path,
                                         std::string_view path2,
-                                        Args &&... args) const
+                                        Args &&...args) const
             -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, {}, {}, std::forward<Args>(args)...))
         {
             if (path.empty() || path2.empty()) {
@@ -261,7 +262,7 @@ namespace purefs::fs
                 return -EIO;
         }
         template <class Base, class T, typename... Args>
-        inline auto invoke_fops(T Base::*method, fsdir dirp, Args &&... args)
+        inline auto invoke_fops(T Base::*method, fsdir dirp, Args &&...args)
             -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, std::forward<Args>(args)...))
         {
             const auto err = dirp->error();

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "KeypadLightWindow.hpp"
@@ -18,7 +18,7 @@ namespace gui
 
         switch (keypadBacklightState) {
         case bsp::keypad_backlight::State::activeMode:
-            isActiveSwitchOn    = true;
+            isActiveSwitchOn = true;
             break;
         case bsp::keypad_backlight::State::off:
             isActiveSwitchOn = false;
@@ -30,7 +30,7 @@ namespace gui
 
     void KeypadLightWindow::switchHandler(bool &toggleSwitch)
     {
-        toggleSwitch       = !toggleSwitch;
+        toggleSwitch = !toggleSwitch;
         if (isActiveSwitchOn) {
             keypadLightSettings->setKeypadBacklightState(bsp::keypad_backlight::State::activeMode);
         }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,9 +23,11 @@ namespace sys
     };
 
     /// Type traits pattern used to enforce user-defined types to implement "GetManifest" function.
-    template <class T> struct ManifestTraits;
+    template <class T>
+    struct ManifestTraits;
 
-    template <class, class = void> struct HasManifest : std::false_type
+    template <class, class = void>
+    struct HasManifest : std::false_type
     {};
 
     /// Checks whether T implements "GetManifest" static method.
@@ -38,7 +40,8 @@ namespace sys
 
     /// Retrieves the manifest of T, if T implements ManifestTraits.
     /// Otherwise, reports an error during compile time.
-    template <class T, std::enable_if_t<HasManifest<T>::value, int> = 0> auto ManifestOf() -> ServiceManifest
+    template <class T, std::enable_if_t<HasManifest<T>::value, int> = 0>
+    auto ManifestOf() -> ServiceManifest
     {
         return ManifestTraits<T>::GetManifest();
     }

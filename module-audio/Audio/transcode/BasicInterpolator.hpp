@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,7 +25,8 @@ namespace audio::transcode
      * @tparam Ratio - order of the interpolator; e.g.: for Ratio = 4 repeats first sample 3
      * times for each block of 4 increasing sample rate by the factor of 4.
      */
-    template <typename SampleType, unsigned int Channels, unsigned int Ratio> class BasicInterpolator : public Transform
+    template <typename SampleType, unsigned int Channels, unsigned int Ratio>
+    class BasicInterpolator : public Transform
     {
         static_assert(Channels == 1 || Channels == 2);
         static_assert(std::is_integral<SampleType>::value);

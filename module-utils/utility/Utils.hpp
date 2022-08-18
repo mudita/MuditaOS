@@ -18,26 +18,31 @@
 
 namespace utils
 {
-    inline constexpr auto WHITESPACE = " \n\r\t\f\v";
+    inline constexpr auto WHITESPACE       = " \n\r\t\f\v";
     constexpr unsigned int secondsInMinute = 60;
 
-    template <typename T> inline constexpr bool is_byte_v = std::is_integral_v<T> && sizeof(T) == sizeof(std::uint8_t);
+    template <typename T>
+    inline constexpr bool is_byte_v = std::is_integral_v<T> && sizeof(T) == sizeof(std::uint8_t);
 
-    template <typename T> using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
+    template <typename T>
+    using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
 
     // NOTE: With short string optimization storing one byte hex in std::string is probably fine
 
-    template <typename T, std::enable_if_t<is_byte_v<T>, int> = 0> inline char halfByteToHex(T c)
+    template <typename T, std::enable_if_t<is_byte_v<T>, int> = 0>
+    inline char halfByteToHex(T c)
     {
         return c < 10 ? '0' + c : 'a' + (c - 10);
     }
 
-    template <typename T, std::enable_if_t<is_byte_v<T>, int> = 0> inline std::string byteToHex(T c)
+    template <typename T, std::enable_if_t<is_byte_v<T>, int> = 0>
+    inline std::string byteToHex(T c)
     {
         return {halfByteToHex<std::uint8_t>((c & 0xF0) >> 4), halfByteToHex<std::uint8_t>(c & 0x0F)};
     }
 
-    template <typename T = std::uint8_t, std::enable_if_t<is_byte_v<T>, int> = 0> inline T halfHexToByte(char c)
+    template <typename T = std::uint8_t, std::enable_if_t<is_byte_v<T>, int> = 0>
+    inline T halfHexToByte(char c)
     {
         if (c >= '0' && c <= '9') {
             return c - '0';
@@ -122,12 +127,14 @@ namespace utils
         return base;
     }
 
-    template <typename T> [[nodiscard]] inline std::string to_string(T t)
+    template <typename T>
+    [[nodiscard]] inline std::string to_string(T t)
     {
         return std::to_string(t);
     }
 
-    template <> [[nodiscard]] inline std::string to_string<long double>(long double t)
+    template <>
+    [[nodiscard]] inline std::string to_string<long double>(long double t)
     {
         uint32_t precision = 6;
         int base           = static_cast<int>(t);
@@ -163,31 +170,36 @@ namespace utils
         return baseAsStr + "." + fractionalAsStr;
     }
 
-    template <> [[nodiscard]] inline std::string to_string<float>(float t)
+    template <>
+    [[nodiscard]] inline std::string to_string<float>(float t)
     {
         return to_string(static_cast<long double>(t));
     }
 
-    template <> [[nodiscard]] inline std::string to_string<double>(double t)
+    template <>
+    [[nodiscard]] inline std::string to_string<double>(double t)
     {
         return to_string(static_cast<long double>(t));
     }
 
-    template <> [[nodiscard]] inline std::string to_string<std::int64_t>(std::int64_t value)
+    template <>
+    [[nodiscard]] inline std::string to_string<std::int64_t>(std::int64_t value)
     {
         std::ostringstream ss;
         ss << value;
         return ss.str();
     }
 
-    template <> [[nodiscard]] inline std::string to_string<std::uint64_t>(std::uint64_t value)
+    template <>
+    [[nodiscard]] inline std::string to_string<std::uint64_t>(std::uint64_t value)
     {
         std::ostringstream ss;
         ss << value;
         return ss.str();
     }
 
-    template <typename T> [[nodiscard]] const std::string enumToString(const T &t)
+    template <typename T>
+    [[nodiscard]] const std::string enumToString(const T &t)
     {
         static_assert(std::is_enum_v<T>);
         return std::string(magic_enum::enum_name(t));
@@ -197,7 +209,8 @@ namespace utils
     ///
     /// @param value to be converted
     /// @return Value casted to type T
-    template <typename T> [[nodiscard]] T getNumericValue(const std::string &value)
+    template <typename T>
+    [[nodiscard]] T getNumericValue(const std::string &value)
     {
         static_assert(std::is_arithmetic_v<T>);
         if (value.empty()) {

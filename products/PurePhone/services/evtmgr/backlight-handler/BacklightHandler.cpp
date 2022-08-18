@@ -15,10 +15,10 @@ namespace backlight
 {
     namespace timers
     {
-        constexpr auto keypadLightTimerName    = "KeypadLightTimer";
+        constexpr auto keypadLightTimerName      = "KeypadLightTimer";
         constexpr auto lightTimerTimeoutUnlocked = std::chrono::seconds(20);
         constexpr auto lightTimerTimeoutLocked   = std::chrono::seconds(5);
-        constexpr auto lightFadeoutTimerTimeout = std::chrono::seconds(10);
+        constexpr auto lightFadeoutTimerTimeout  = std::chrono::seconds(10);
     } // namespace timers
 
     namespace

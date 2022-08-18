@@ -10,7 +10,6 @@
 
 using namespace at::urc;
 
-
 void CellularUrcHandler::Handle(Clip &urc)
 {
     LOG_TRACE("incoming call...");

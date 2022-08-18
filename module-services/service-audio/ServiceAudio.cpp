@@ -846,7 +846,7 @@ auto ServiceAudio::handleA2DPVolumeChangedOnBluetoothDevice(sys::Message *msgl) 
     assert(a2dpMsg != nullptr);
 
     const auto context = getCurrentContext();
-    const auto volume = volume::scaler::a2dp::toSystemVolume(a2dpMsg->getVolume());
+    const auto volume  = volume::scaler::a2dp::toSystemVolume(a2dpMsg->getVolume());
     bus.sendMulticast(std::make_shared<VolumeChanged>(volume, context, VolumeChangeRequestSource::A2DP),
                       sys::BusChannel::ServiceAudioNotifications);
 

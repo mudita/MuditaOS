@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -194,16 +194,17 @@ namespace app
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
         std::string selectedSimNumber = {};
 
-        bool operatorsOn              = false;
-        bool voLteStateOn             = false;
-        bool notificationsWhenLocked  = true;
-        bool callsFromFavorites       = false;
-        int connectionFrequency       = 0;
-        bool flightModeOn             = true;
+        bool operatorsOn                                               = false;
+        bool voLteStateOn                                              = false;
+        bool notificationsWhenLocked                                   = true;
+        bool callsFromFavorites                                        = false;
+        int connectionFrequency                                        = 0;
+        bool flightModeOn                                              = true;
         std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel = nullptr;
     };
 
-    template <> struct ManifestTraits<ApplicationSettings>
+    template <>
+    struct ManifestTraits<ApplicationSettings>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

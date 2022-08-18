@@ -20,12 +20,12 @@ namespace sys::phone_modes
 
     void Observer::subscribe(OnPhoneModeChangedCallback &&onChange) noexcept
     {
-        onPhoneModeChangedCallback           = std::move(onChange);
+        onPhoneModeChangedCallback = std::move(onChange);
     }
 
     void Observer::subscribe(OnTetheringChangedCallback &&onChange) noexcept
     {
-        onTetheringChangedCallback           = std::move(onChange);
+        onTetheringChangedCallback = std::move(onChange);
     }
 
     bool Observer::isInMode(PhoneMode mode) const noexcept

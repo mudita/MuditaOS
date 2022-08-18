@@ -10,17 +10,20 @@
 
 namespace details
 {
-    template <typename T, typename = void> struct container_data
+    template <typename T, typename = void>
+    struct container_data
     {
         using value = T;
     };
 
-    template <typename T> struct container_data<T, std::enable_if_t<not std::is_fundamental_v<T>>>
+    template <typename T>
+    struct container_data<T, std::enable_if_t<not std::is_fundamental_v<T>>>
     {
         using value = typename T::value_type;
     };
 
-    template <class T> using container_data_v = typename container_data<T>::value;
+    template <class T>
+    using container_data_v = typename container_data<T>::value;
 
 } // namespace details
 
@@ -30,7 +33,8 @@ namespace gui
     // For the containers of types that are convertible to strings like std::string, integer, floating-point integers,
     // there is no need to provide the custom formatter. However, it is possible to pass a formatter if a user wants to
     // perform custom formatting. It is not possible to use a formatter when using container of std::string.
-    template <typename Container, typename Formatter = void> class StringOutputSpinner : public TextFixedSize
+    template <typename Container, typename Formatter = void>
+    class StringOutputSpinner : public TextFixedSize
     {
       public:
         using range      = typename Container::range;
@@ -157,17 +161,20 @@ namespace gui
         return true;
     }
 
-    template <typename Container, typename Formatter> size_t StringOutputSpinner<Container, Formatter>::size() const
+    template <typename Container, typename Formatter>
+    size_t StringOutputSpinner<Container, Formatter>::size() const
     {
         return container.size();
     }
 
-    template <typename Container, typename Formatter> bool StringOutputSpinner<Container, Formatter>::is_min() const
+    template <typename Container, typename Formatter>
+    bool StringOutputSpinner<Container, Formatter>::is_min() const
     {
         return container.is_min();
     }
 
-    template <typename Container, typename Formatter> bool StringOutputSpinner<Container, Formatter>::is_max() const
+    template <typename Container, typename Formatter>
+    bool StringOutputSpinner<Container, Formatter>::is_max() const
     {
         return container.is_max();
     }
@@ -186,7 +193,8 @@ namespace gui
         update();
     }
 
-    template <typename Container, typename Formatter> void StringOutputSpinner<Container, Formatter>::next()
+    template <typename Container, typename Formatter>
+    void StringOutputSpinner<Container, Formatter>::next()
     {
         if (container.next()) {
             update();
@@ -194,19 +202,22 @@ namespace gui
         }
     }
 
-    template <typename Container, typename Formatter> void StringOutputSpinner<Container, Formatter>::previous()
+    template <typename Container, typename Formatter>
+    void StringOutputSpinner<Container, Formatter>::previous()
     {
         if (container.previous()) {
             update();
             invoke();
         }
     }
-    template <typename Container, typename Formatter> void StringOutputSpinner<Container, Formatter>::update()
+    template <typename Container, typename Formatter>
+    void StringOutputSpinner<Container, Formatter>::update()
     {
         setText(value_as_str());
     }
 
-    template <typename Container, typename Formatter> void StringOutputSpinner<Container, Formatter>::invoke()
+    template <typename Container, typename Formatter>
+    void StringOutputSpinner<Container, Formatter>::invoke()
     {
         if (onValueChanged) {
             onValueChanged(value());
@@ -227,7 +238,8 @@ namespace gui
                (orientation == Orientation::Horizontal && inputEvent.is(KeyCode::KEY_RIGHT));
     }
 
-    template <typename Container, typename Formatter> void StringOutputSpinner<Container, Formatter>::init()
+    template <typename Container, typename Formatter>
+    void StringOutputSpinner<Container, Formatter>::init()
     {
         setEditMode(EditMode::Browse);
         drawUnderline(false);

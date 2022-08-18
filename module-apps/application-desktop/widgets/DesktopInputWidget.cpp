@@ -4,7 +4,6 @@
 #include "DesktopInputWidget.hpp"
 #include <service-cellular/CellularServiceAPI.hpp>
 
-
 namespace style::desktop
 {
     namespace inputWidget

@@ -73,7 +73,8 @@ namespace service::eink
 
 namespace sys
 {
-    template <> struct ManifestTraits<service::eink::ServiceEink>
+    template <>
+    struct ManifestTraits<service::eink::ServiceEink>
     {
         static auto GetManifest() -> ServiceManifest
         {

@@ -15,9 +15,9 @@ namespace gui
     class PowerNapProgressWindow : public AppWindow, public app::powernap::PowerNapProgressContract::View
     {
         std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter;
-        gui::HBarGraph *progressBar = nullptr;
+        gui::HBarGraph *progressBar     = nullptr;
         gui::TimeFixedWidget *timerText = nullptr;
-        gui::BellStatusClock *time  = nullptr;
+        gui::BellStatusClock *time      = nullptr;
 
         void buildInterface() override;
         auto onInput(const InputEvent &inputEvent) -> bool override;

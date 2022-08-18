@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -68,7 +68,8 @@ namespace app
         std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;
     };
 
-    template <> struct ManifestTraits<ApplicationMessages>
+    template <>
+    struct ManifestTraits<ApplicationMessages>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

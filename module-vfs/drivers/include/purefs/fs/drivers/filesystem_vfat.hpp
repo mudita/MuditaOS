@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,8 +10,8 @@ namespace purefs::fs::drivers
     class filesystem_vfat final : public filesystem_operations
     {
       public:
-        filesystem_vfat()                        = default;
-        virtual ~filesystem_vfat()               = default;
+        filesystem_vfat()          = default;
+        virtual ~filesystem_vfat() = default;
 
       private:
         auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path, unsigned flags)

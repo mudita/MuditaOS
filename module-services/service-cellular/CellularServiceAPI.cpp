@@ -59,7 +59,7 @@ std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumb
 
     auto msg = std::make_shared<cellular::GetIMSIMessage>();
 
-    auto ret                          = serv->bus.sendUnicastSync(msg, ServiceCellular::serviceName, 5000);
+    auto ret                            = serv->bus.sendUnicastSync(msg, ServiceCellular::serviceName, 5000);
     cellular::ResponseMessage *response = dynamic_cast<cellular::ResponseMessage *>(ret.second.get());
 
     if (response == nullptr) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,10 +15,10 @@ namespace gui
 
     namespace clItemStyle
     {
-        inline constexpr auto w                 = style::window::default_body_width;
-        inline constexpr auto h                 = style::window::label::big_h;
-        inline constexpr auto internal_margin   = 4;
-        inline constexpr auto right_margin      = 10;
+        inline constexpr auto w               = style::window::default_body_width;
+        inline constexpr auto h               = style::window::label::big_h;
+        inline constexpr auto internal_margin = 4;
+        inline constexpr auto right_margin    = 10;
 
         namespace timestamp
         {

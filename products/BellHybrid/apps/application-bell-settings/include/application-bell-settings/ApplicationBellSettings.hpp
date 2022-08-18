@@ -53,7 +53,8 @@ namespace app
         }
     };
 
-    template <> struct ManifestTraits<ApplicationBellSettings>
+    template <>
+    struct ManifestTraits<ApplicationBellSettings>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

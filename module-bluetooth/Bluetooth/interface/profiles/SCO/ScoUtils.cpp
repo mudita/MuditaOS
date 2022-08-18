@@ -19,8 +19,8 @@ namespace bluetooth::sco::utils
             return;
         }
         constexpr auto packetDataOffset = 3;
-        constexpr auto lengthPosition = 2;
-        const auto scoPacketLength    = hci_get_sco_packet_length();
+        constexpr auto lengthPosition   = 2;
+        const auto scoPacketLength      = hci_get_sco_packet_length();
         const auto scoPayloadLength     = scoPacketLength - packetDataOffset;
 
         hci_reserve_packet_buffer();

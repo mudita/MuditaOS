@@ -13,10 +13,10 @@ namespace gui::window::name
     inline constexpr auto status_bar_img_type = "StatusBarImgType";
     inline constexpr auto text_image_color    = "TextImageColor";
 
-    inline constexpr auto bluetooth               = "Bluetooth";
-    inline constexpr auto all_devices             = "AllDevices";
-    inline constexpr auto phone_name              = "PhoneName";
-    inline constexpr auto add_device              = "AddDevice";
+    inline constexpr auto bluetooth   = "Bluetooth";
+    inline constexpr auto all_devices = "AllDevices";
+    inline constexpr auto phone_name  = "PhoneName";
+    inline constexpr auto add_device  = "AddDevice";
 
     inline constexpr auto network          = "Network";
     inline constexpr auto sim_cards        = "SimCards";

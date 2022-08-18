@@ -13,12 +13,12 @@
 
 namespace style::window::volume
 {
-    constexpr inline auto title_height    = 33;
-    constexpr inline auto base_title_key  = "app_popup_volume_text";
+    constexpr inline auto title_height       = 33;
+    constexpr inline auto base_title_key     = "app_popup_volume_text";
     constexpr inline auto bt_audio_title_key = "app_popup_bt_volume_text";
-    constexpr inline auto music_title_key = "app_popup_music_volume_text";
-    constexpr inline auto call_title_key  = "app_popup_call_volume_text";
-    constexpr inline auto mute_title_key  = "app_popup_muted_text";
+    constexpr inline auto music_title_key    = "app_popup_music_volume_text";
+    constexpr inline auto call_title_key     = "app_popup_call_volume_text";
+    constexpr inline auto mute_title_key     = "app_popup_muted_text";
 
     namespace bar
     {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -251,8 +251,8 @@ namespace cellular::service
          */
         std::optional<at::SimInsertedStatus> readSimCardInsertStatus();
 
-        at::BaseChannel *channel        = nullptr;
-        std::optional<api::SimSlot> sim = std::nullopt;
+        at::BaseChannel *channel                         = nullptr;
+        std::optional<api::SimSlot> sim                  = std::nullopt;
         std::optional<at::SimInsertedStatus> simInserted = std::nullopt;
         bool simSelectInProgress                         = false;
         bool isSimSelected                               = false;

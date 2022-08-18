@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "response.hpp"
@@ -216,7 +216,7 @@ namespace at
                 auto pos = CSQstring.find(',');
                 if (pos != std::string::npos) {
                     LOG_INFO("%s", CSQstring.c_str());
-                    CSQstring = CSQstring.substr(0, pos);
+                    CSQstring     = CSQstring.substr(0, pos);
                     int parsedVal = 0;
                     if (utils::toNumeric(CSQstring, parsedVal) && parsedVal >= 0) {
                         result = parsedVal;

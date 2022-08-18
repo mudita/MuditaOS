@@ -63,8 +63,8 @@ namespace sys
 
     void CpuStatistics::UpdatePercentageCpuLoad()
     {
-        uint32_t idleTickCount  = xTaskGetIdleRunTimeCounter();
-        uint32_t totalTickCount = ulHighFrequencyTimerTicks();
+        uint32_t idleTickCount     = xTaskGetIdleRunTimeCounter();
+        uint32_t totalTickCount    = ulHighFrequencyTimerTicks();
         uint32_t idleTickIncrease  = ComputeIncrease(idleTickCount, lastIdleTickCount);
         uint32_t totalTickIncrease = ComputeIncrease(totalTickCount, lastTotalTickCount);
         lastIdleTickCount          = idleTickCount;

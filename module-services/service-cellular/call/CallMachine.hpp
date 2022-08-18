@@ -54,8 +54,8 @@ namespace call
     {
         void operator()(Dependencies &di, CallData &call)
         {
-            call      = CallData{};
-            call.mode = di.modem->getMode();
+            call           = CallData{};
+            call.mode      = di.modem->getMode();
             call.tethering = di.modem->getTethering();
             di.sentinel->ReleaseMinimumFrequency();
             di.timer->stop();

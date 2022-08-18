@@ -66,7 +66,8 @@ namespace stm
 
 namespace sys
 {
-    template <> struct ManifestTraits<stm::ServiceTime>
+    template <>
+    struct ManifestTraits<stm::ServiceTime>
     {
         static auto GetManifest() -> ServiceManifest
         {

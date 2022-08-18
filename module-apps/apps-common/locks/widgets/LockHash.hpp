@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,7 +9,8 @@
 #include <vector>
 #include <functional>
 
-template <> struct std::hash<std::vector<unsigned int>>
+template <>
+struct std::hash<std::vector<unsigned int>>
 {
     const static unsigned int digit_multiplier = 10;
     uint32_t operator()(std::vector<unsigned int> const &input) const noexcept

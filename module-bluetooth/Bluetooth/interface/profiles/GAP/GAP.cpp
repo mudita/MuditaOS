@@ -248,7 +248,7 @@ namespace bluetooth
                 break;
             }
 
-            auto it   = devices().find(addr);
+            auto it = devices().find(addr);
             if (it == devices().end()) {
                 gap_remote_name_request(addr, PAGE_SCAN_MODE_STANDARD, 0);
                 it = devices().put(addr);
@@ -261,7 +261,7 @@ namespace bluetooth
             }
 
             auto code = hci_event_user_passkey_notification_get_numeric_value(packet);
-            auto msg = std::make_shared<::message::bluetooth::RequestAuthenticate>(
+            auto msg  = std::make_shared<::message::bluetooth::RequestAuthenticate>(
                 *it,
                 bluetooth::AuthenticateType::PairCancel,
                 (code != 0) ? static_cast<std::optional<unsigned long>>(code) : std::nullopt);

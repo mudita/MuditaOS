@@ -143,13 +143,13 @@ namespace bluetooth
     std::unique_ptr<AudioInterface> HFP::HFPImpl::audioInterface       = nullptr;
     const sys::Service *HFP::HFPImpl::ownerService;
     const std::string_view HFP::HFPImpl::agServiceName = "Mudita Pure HFP";
-    SCOCodec HFP::HFPImpl::codec            = SCOCodec::CVSD;
+    SCOCodec HFP::HFPImpl::codec                       = SCOCodec::CVSD;
     std::shared_ptr<CVSDAudioDevice> HFP::HFPImpl::audioDevice;
 
     int HFP::HFPImpl::memory_1_enabled = 1;
     btstack_packet_callback_registration_t HFP::HFPImpl::hci_event_callback_registration;
-    int HFP::HFPImpl::ag_indicators_nr                  = 7;
-    hfp_ag_indicator_t HFP::HFPImpl::ag_indicators[]    = {
+    int HFP::HFPImpl::ag_indicators_nr               = 7;
+    hfp_ag_indicator_t HFP::HFPImpl::ag_indicators[] = {
         // index, name, min range, max range, status, mandatory, enabled, status changed
         {1, "service", 0, 1, 1, 0, 0, 0},
         {2, "call", 0, 1, 0, 1, 1, 0},
@@ -158,10 +158,10 @@ namespace bluetooth
         {5, "signal", 0, 4, 5, 0, 1, 0},
         {6, "roam", 0, 1, 0, 0, 1, 0},
         {7, "callheld", 0, 2, 0, 1, 1, 0}};
-    int HFP::HFPImpl::call_hold_services_nr                                       = 5;
-    const char *HFP::HFPImpl::call_hold_services[]                                = {"1", "1x", "2", "2x", "3"};
-    int HFP::HFPImpl::hf_indicators_nr                                            = 2;
-    hfp_generic_status_indicator_t HFP::HFPImpl::hf_indicators[]                  = {
+    int HFP::HFPImpl::call_hold_services_nr                      = 5;
+    const char *HFP::HFPImpl::call_hold_services[]               = {"1", "1x", "2", "2x", "3"};
+    int HFP::HFPImpl::hf_indicators_nr                           = 2;
+    hfp_generic_status_indicator_t HFP::HFPImpl::hf_indicators[] = {
         {1, 1},
         {2, 1},
     };
@@ -268,7 +268,7 @@ namespace bluetooth
             break;
         case HFP_SUBEVENT_SERVICE_LEVEL_CONNECTION_RELEASED:
             LOG_DEBUG("Service level connection released.\n");
-            aclHandle   = HCI_CON_HANDLE_INVALID;
+            aclHandle = HCI_CON_HANDLE_INVALID;
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
             {
                 auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
@@ -368,12 +368,12 @@ namespace bluetooth
         Profile::initSdp();
 
         serviceBuffer.fill(0);
-        uint16_t supported_features                = (1 << HFP_AGSF_ESCO_S4) | /* (1 << HFP_AGSF_HF_INDICATORS) | */
+        uint16_t supported_features = (1 << HFP_AGSF_ESCO_S4) | /* (1 << HFP_AGSF_HF_INDICATORS) | */
                                       (1 << HFP_AGSF_CODEC_NEGOTIATION) | (1 << HFP_AGSF_EXTENDED_ERROR_RESULT_CODES) |
                                       (1 << HFP_AGSF_ENHANCED_CALL_CONTROL) | (1 << HFP_AGSF_ENHANCED_CALL_STATUS) |
                                       (1 << HFP_AGSF_ABILITY_TO_REJECT_A_CALL) /*| (1 << HFP_AGSF_IN_BAND_RING_TONE) |*/
             /* (1 << HFP_AGSF_VOICE_RECOGNITION_FUNCTION) |(1 << HFP_AGSF_THREE_WAY_CALLING)*/;
-        int wide_band_speech = 0;
+        int wide_band_speech                       = 0;
         constexpr std::uint8_t abilityToRejectCall = 1;
         hfp_ag_create_sdp_record(serviceBuffer.data(),
                                  hfpSdpRecordHandle,
@@ -457,8 +457,7 @@ namespace bluetooth
         hfp_ag_init_codecs(codecsList.size(), reinterpret_cast<uint8_t *>(codecsList.data()));
     }
     void HFP::HFPImpl::initializeCall() const noexcept
-    {
-    }
+    {}
     void HFP::HFPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
         HFP::HFPImpl::audioDevice = std::static_pointer_cast<CVSDAudioDevice>(audioDevice);

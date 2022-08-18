@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Field.hpp"
@@ -10,7 +10,8 @@ const char *Field::getCString() const
     return mValue.c_str();
 }
 
-template <class T> static T lget(T &val, const std::string &mValue, std::function<T()> foo)
+template <class T>
+static T lget(T &val, const std::string &mValue, std::function<T()> foo)
 {
     val = 0;
     if (mValue.empty()) {

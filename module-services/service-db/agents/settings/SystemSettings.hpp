@@ -81,7 +81,7 @@ namespace settings
 
     namespace Display
     {
-        constexpr inline auto invertedMode = "display_inverted_mode";
+        constexpr inline auto invertedMode              = "display_inverted_mode";
         constexpr inline auto lockScreenDeepRefreshRate = "display_lock_screen_deep_refresh_rate";
     } // namespace Display
-}; // namespace settings
+};    // namespace settings

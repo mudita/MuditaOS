@@ -40,7 +40,8 @@ class EventManager : public EventManagerCommon
 
 namespace sys
 {
-    template <> struct ManifestTraits<EventManager>
+    template <>
+    struct ManifestTraits<EventManager>
     {
         static auto GetManifest() -> ServiceManifest
         {

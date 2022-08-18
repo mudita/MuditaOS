@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -56,7 +56,7 @@ namespace gui
         virtual void showSnoozeButton() override;
 
       private:
-        VBox *body = nullptr;
+        VBox *body                         = nullptr;
         gui::TextFixedSize *alarmTimeLabel = nullptr;
         gui::TextFixedSize *snoozeLabel    = nullptr;
         SnoozeShow snoozeShow              = SnoozeShow::First;

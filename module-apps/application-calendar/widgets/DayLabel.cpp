@@ -71,9 +71,7 @@ namespace gui
             else {
                 this->dayNumber->setFont(style::window::font::medium);
             }
-            this->activatedCallback = [=](gui::Item &item) {
-                return true;
-            };
+            this->activatedCallback = [=](gui::Item &item) { return true; };
             this->setPenWidth(style::window::default_border_no_focus_w);
             this->setPenFocusWidth(style::window::default_border_focus_w);
             this->setEdges(RectangleEdge::Top | RectangleEdge::Bottom);

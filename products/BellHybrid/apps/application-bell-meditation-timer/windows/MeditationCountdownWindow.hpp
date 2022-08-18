@@ -29,10 +29,10 @@ namespace gui
 
       private:
         std::unique_ptr<app::meditation::MeditationCountdownContract::Presenter> presenter;
-        VBox *mainVBox    = nullptr;
-        Arc *progress     = nullptr;
+        VBox *mainVBox         = nullptr;
+        Arc *progress          = nullptr;
         TimeFixedWidget *timer = nullptr;
-        Text *description = nullptr;
+        Text *description      = nullptr;
 
         void buildLayout();
         void configureTimer();

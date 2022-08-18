@@ -77,7 +77,7 @@ namespace cellular::internal
          * Request message handlers
          */
         owner->connect(typeid(request::sim::SetActiveSim), [&](sys::Message *request) -> sys::MessagePointer {
-            auto msg = static_cast<request::sim::SetActiveSim *>(request);
+            auto msg    = static_cast<request::sim::SetActiveSim *>(request);
             auto result = simCard->handleSetActiveSim(msg->sim);
             owner->simTimer.start();
             simCard->handleSimCardSelected();

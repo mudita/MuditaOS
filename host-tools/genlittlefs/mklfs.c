@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <lfs.h>
@@ -366,7 +366,7 @@ int main(int argc, char **argv)
         }
     }
     const lfs_ssize_t used_blocks = lfs_fs_size(&lfs);
-    err = lfs_unmount(&lfs);
+    err                           = lfs_unmount(&lfs);
     if (err < 0) {
         fprintf(stderr, "lfs umount error: error=%d\n", err);
         lfs_ioaccess_close(ioctx);

@@ -31,7 +31,8 @@ namespace at::cmd
             return CLCC::toUInt(text);
         }
 
-        template <typename T>[[nodiscard]] static auto toEnum(const std::string &text) -> std::optional<T>
+        template <typename T>
+        [[nodiscard]] static auto toEnum(const std::string &text) -> std::optional<T>
         {
             return CLCC::toEnum<T>(text);
         }

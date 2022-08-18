@@ -33,12 +33,13 @@ namespace service::test
 
 namespace sys
 {
-    template <> struct ManifestTraits<service::test::ServiceTest>
+    template <>
+    struct ManifestTraits<service::test::ServiceTest>
     {
         static auto GetManifest() -> ServiceManifest
         {
             ServiceManifest manifest;
-            manifest.name = service::name::service_test;
+            manifest.name         = service::name::service_test;
             manifest.dependencies = {service::name::db};
             return manifest;
         }

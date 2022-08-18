@@ -46,7 +46,8 @@ namespace app
         std::unique_ptr<gui::TestPresenter> presenter;
     };
 
-    template <> struct ManifestTraits<ApplicationTest>
+    template <>
+    struct ManifestTraits<ApplicationTest>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

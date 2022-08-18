@@ -51,7 +51,7 @@ namespace sys
 
     [[nodiscard]] auto CpuSentinel::GetFrequency() const noexcept -> bsp::CpuFrequencyMHz
     {
-            return currentFrequency;
+        return currentFrequency;
     }
 
     void CpuSentinel::CpuFrequencyHasChanged(bsp::CpuFrequencyMHz newFrequency)

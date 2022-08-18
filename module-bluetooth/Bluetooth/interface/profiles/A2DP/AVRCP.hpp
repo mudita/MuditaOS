@@ -51,4 +51,4 @@ namespace bluetooth
         static void controllerPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
         static void init(sys::Service *service);
     };
-} // namespace Bt
+} // namespace bluetooth

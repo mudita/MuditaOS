@@ -16,7 +16,7 @@ namespace sys
 {
     class Service;
     class Message;
-}
+} // namespace sys
 
 namespace bluetooth
 {
@@ -27,14 +27,14 @@ namespace bluetooth
       public:
         virtual ~AbstractCommandHandler() noexcept = default;
 
-        virtual Error::Code scan()                                            = 0;
-        virtual Error::Code stopScan()                                        = 0;
-        virtual Error::Code setVisibility(bool visibility)                    = 0;
-        virtual Error::Code connect(const DataVariant &data)                  = 0;
-        virtual Error::Code disconnect()                                      = 0;
-        virtual Error::Code pair(const DataVariant &data)                     = 0;
-        virtual Error::Code unpair(const DataVariant &data)                   = 0;
-        virtual Error::Code availableDevices()                                = 0;
+        virtual Error::Code scan()                           = 0;
+        virtual Error::Code stopScan()                       = 0;
+        virtual Error::Code setVisibility(bool visibility)   = 0;
+        virtual Error::Code connect(const DataVariant &data) = 0;
+        virtual Error::Code disconnect()                     = 0;
+        virtual Error::Code pair(const DataVariant &data)    = 0;
+        virtual Error::Code unpair(const DataVariant &data)  = 0;
+        virtual Error::Code availableDevices()               = 0;
     };
 
     class CommandHandler : public AbstractCommandHandler

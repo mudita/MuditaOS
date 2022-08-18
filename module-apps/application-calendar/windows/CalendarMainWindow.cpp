@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalendarMainWindow.hpp"
@@ -16,7 +16,7 @@ namespace gui
         : AppWindow(app, name), app::AsyncCallbackReceiver{app}
     {
         std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
-        this->actualDate = date::year_month_day{date::floor<date::days>(tp)};
+        this->actualDate                         = date::year_month_day{date::floor<date::days>(tp)};
         std::fill(std::begin(isDayEmpty), std::end(isDayEmpty), true);
         buildInterface();
     }

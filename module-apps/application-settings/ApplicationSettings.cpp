@@ -176,7 +176,7 @@ namespace app
         });
 
         connect(typeid(::message::bluetooth::ResponseStatus), [&](sys::Message *msg) {
-            auto responseStatusMsg = static_cast<::message::bluetooth::ResponseStatus *>(msg);
+            auto responseStatusMsg    = static_cast<::message::bluetooth::ResponseStatus *>(msg);
             const auto status         = responseStatusMsg->getStatus();
             const auto bluetoothState = status.state == BluetoothStatus::State::On;
             bluetoothSettingsModel->setStatus(bluetoothState, status.visibility);

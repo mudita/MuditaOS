@@ -95,40 +95,40 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
 {
     bool handled = false;
 
-        switch (msgl->messageType) {
-        case MessageType::StateChange:
-            HandleStateChange(state->get());
-            break;
-        case MessageType::AntennaChanged: {
-            bsp::cellular::antenna antenna;
-            if (CellularServiceAPI::GetAntenna(this, antenna)) {
-                currentAntenna = antenna;
-                if (state->get() == antenna::State::switchAntenna) {
-                    LOG_INFO("Antena switched.");
+    switch (msgl->messageType) {
+    case MessageType::StateChange:
+        HandleStateChange(state->get());
+        break;
+    case MessageType::AntennaChanged: {
+        bsp::cellular::antenna antenna;
+        if (CellularServiceAPI::GetAntenna(this, antenna)) {
+            currentAntenna = antenna;
+            if (state->get() == antenna::State::switchAntenna) {
+                LOG_INFO("Antena switched.");
 
-                    state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
-                                              pdMS_TO_TICKS(antenna::connectionStatusTimeout),
-                                              antenna::State::switchAntenna);
-                    state->set(antenna::State::connectionStatus);
-                }
+                state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
+                                          pdMS_TO_TICKS(antenna::connectionStatusTimeout),
+                                          antenna::State::switchAntenna);
+                state->set(antenna::State::connectionStatus);
             }
+        }
+        handled = true;
+        break;
+    }
+    case MessageType::AntennaLockService: {
+        auto msg = dynamic_cast<AntennaLockRequestMessage *>(msgl);
+        if (msg != nullptr) {
+            handleLockRequest(msg->request);
             handled = true;
-            break;
         }
-        case MessageType::AntennaLockService: {
-            auto msg = dynamic_cast<AntennaLockRequestMessage *>(msgl);
-            if (msg != nullptr) {
-                handleLockRequest(msg->request);
-                handled = true;
-            }
-        } break;
-        case MessageType::AntennaGetLockState: {
-            auto responseMessage = std::make_shared<AntennaLockRequestResponse>(true, serviceLocked);
-            return responseMessage;
-        } break;
-        default:
-            break;
-        }
+    } break;
+    case MessageType::AntennaGetLockState: {
+        auto responseMessage = std::make_shared<AntennaLockRequestResponse>(true, serviceLocked);
+        return responseMessage;
+    } break;
+    default:
+        break;
+    }
 
     if (handled)
         return std::make_shared<sys::ResponseMessage>();

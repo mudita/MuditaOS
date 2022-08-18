@@ -49,7 +49,8 @@ namespace app
         std::unique_ptr<app::meditation::models::Statistics> statisticsModel;
     };
 
-    template <> struct ManifestTraits<MeditationTimer>
+    template <>
+    struct ManifestTraits<MeditationTimer>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,7 +40,8 @@ namespace sys
         ServiceManifest manifest;
     };
 
-    template <typename T, typename... Args> class ServiceCreator : public BaseServiceCreator
+    template <typename T, typename... Args>
+    class ServiceCreator : public BaseServiceCreator
     {
       public:
         using BaseServiceCreator::BaseServiceCreator;
@@ -65,7 +66,8 @@ namespace sys
      * @param args      Parameter pack that is to be forwarded to the service constructor.
      * @return ServiceCreator for Service T.
      */
-    template <typename T, typename... Args> std::unique_ptr<BaseServiceCreator> CreatorFor(Args &&...args) noexcept
+    template <typename T, typename... Args>
+    std::unique_ptr<BaseServiceCreator> CreatorFor(Args &&...args) noexcept
     {
         if constexpr (sizeof...(args)) {
             static_assert(not std::is_reference_v<Args...>,

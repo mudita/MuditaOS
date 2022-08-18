@@ -71,7 +71,7 @@ namespace gui
 
         if (auto searchRequest = dynamic_cast<PhonebookSearchRequest *>(data); searchRequest != nullptr) {
             LOG_INFO("Received search results");
-            contact = searchRequest->result;
+            contact        = searchRequest->result;
             selectedNumber = searchRequest->selectedNumber;
             recipient->setText(contact->getFormattedName());
         }

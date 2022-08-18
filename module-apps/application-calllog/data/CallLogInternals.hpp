@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,9 +34,9 @@ namespace calllog
     namespace settings
     {
         // Windows
-        inline constexpr auto MainWindowStr    = gui::name::window::main_window;
-        inline constexpr auto DetailsWindowStr = "DetailsWindow";
-        inline constexpr auto DialogYesNoStr   = "DialogYesNo";
+        inline constexpr auto MainWindowStr     = gui::name::window::main_window;
+        inline constexpr auto DetailsWindowStr  = "DetailsWindow";
+        inline constexpr auto DialogYesNoStr    = "DialogYesNo";
         inline constexpr auto CallLogOptionsStr = "CallLogOptions";
 
     } // namespace settings

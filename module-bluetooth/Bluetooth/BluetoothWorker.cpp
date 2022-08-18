@@ -267,8 +267,7 @@ void BluetoothWorker::closeWorker()
 }
 
 void BluetoothWorker::removeFromBoundDevices(uint8_t *addr)
-{
-}
+{}
 
 void BluetoothWorker::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> device)
 {

@@ -13,8 +13,7 @@ namespace bluetooth
                                            std::shared_ptr<std::vector<Devicei>> pairedDevices,
                                            std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
         : pimpl(std::make_unique<Impl>(driver, handler, registerDevice, settings, pairedDevices, profileManager))
-    {
-    }
+    {}
 
     StatefulController::StatefulController(StatefulController &&other) noexcept
     {

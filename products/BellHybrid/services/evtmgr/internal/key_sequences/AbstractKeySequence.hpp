@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,7 +9,8 @@
 
 class AbstractKeySequence
 {
-    template <class Cb, class... Args> static void invoke(Cb &&callback, Args &&...args)
+    template <class Cb, class... Args>
+    static void invoke(Cb &&callback, Args &&...args)
     {
         if (callback) {
             callback(args...);

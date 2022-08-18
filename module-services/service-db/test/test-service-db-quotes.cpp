@@ -11,8 +11,8 @@
 
 using namespace Quotes;
 
-constexpr auto totalNumOfCategories          = 3;
-constexpr auto totalNumOfQuotes              = 5;
+constexpr auto totalNumOfCategories = 3;
+constexpr auto totalNumOfQuotes     = 5;
 
 TEST_CASE("Quotes")
 {
@@ -66,8 +66,8 @@ TEST_CASE("Quotes")
         REQUIRE(oldRandomizedSequence != quotesString);
 
         oldRandomizedSequence = quotesString;
-        enable = true;
-        success = tester->enableCategory(categoryId, enable);
+        enable                = true;
+        success               = tester->enableCategory(categoryId, enable);
         REQUIRE(success);
         categories = tester->getCategoriesList();
         for (const auto &category : categories) {
@@ -99,8 +99,8 @@ TEST_CASE("Quotes")
         REQUIRE(oldRandomizedSequence != quotesString);
 
         oldRandomizedSequence = quotesString;
-        enable = true;
-        success = tester->enableQuote(quoteId, enable);
+        enable                = true;
+        success               = tester->enableQuote(quoteId, enable);
         REQUIRE(success);
 
         customQuotes = tester->getQuotesFromCustomCategory();
@@ -114,9 +114,9 @@ TEST_CASE("Quotes")
 
     SECTION("Add/Read/Write/Delete quote")
     {
-        std::string quote   = "TEST QUOTE";
-        std::string author  = "TEST AUTHOR";
-        bool enabled        = true;
+        std::string quote  = "TEST QUOTE";
+        std::string author = "TEST AUTHOR";
+        bool enabled       = true;
 
         // Initial conditions
         auto customQuotes                  = tester->getQuotesFromCustomCategory();

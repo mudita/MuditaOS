@@ -83,7 +83,7 @@ void BluetoothDevicesModel::syncDevicesWithApp()
 
 void BluetoothDevicesModel::setInternalDeviceState(const Devicei &device, const DeviceState &state)
 {
-    auto dev                      = getDeviceByAddress(device.address);
+    auto dev = getDeviceByAddress(device.address);
     if (not dev) {
         LOG_ERROR("no such device - ignored");
         return;

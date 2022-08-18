@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <lfs.h>
@@ -214,10 +214,10 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
     }
     ret->part_offs = start_pos;
     // Mount the file system
-    cfg->read    = lfs_read;
-    cfg->prog    = lfs_prog;
-    cfg->erase   = lfs_erase;
-    cfg->sync    = lfs_sync;
+    cfg->read  = lfs_read;
+    cfg->prog  = lfs_prog;
+    cfg->erase = lfs_erase;
+    cfg->sync  = lfs_sync;
 #ifdef LFS_THREADSAFE
     cfg->lock   = lfs_lock_unlock;
     cfg->unlock = lfs_lock_unlock;

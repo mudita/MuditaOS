@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Constants.hpp"
@@ -13,7 +13,8 @@ namespace alarms
 
     namespace AlarmServiceAPI
     {
-        template <class requestType, typename... Types> bool sendRequest(sys::Service *serv, Types... messageArgs)
+        template <class requestType, typename... Types>
+        bool sendRequest(sys::Service *serv, Types... messageArgs)
         {
             auto msg = std::make_shared<requestType>(messageArgs...);
             return serv->bus.sendUnicast(msg, service::name::service_time);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "dma_config.h"
@@ -858,7 +858,7 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame, uint8_t *buffer, EinkBpp_e bpp, 
         }
     }
 
-    buf[0] = EinkDataStartTransmissionWindow;           // set display window
+    buf[0] = EinkDataStartTransmissionWindow; // set display window
     buf[1] = static_cast<uint8_t>(hal::eink::getDisplayXAxis(frame) >>
                                   8); // MSB of the X axis in the EPD display. Value converted
                                       // from the standard GUI coords system to the ED028TC1 one
