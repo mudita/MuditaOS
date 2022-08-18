@@ -202,20 +202,21 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
         return false;
     }
 
-    LOG_DEBUG("USB status: %s", magic_enum::enum_name(notification).data());
-
     if (notification == bsp::USBDeviceStatus::Connected) {
+        LOG_DEBUG("USB status: Connected");
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
                                         sys::BusChannel::USBNotifications);
         usbStatus = bsp::USBDeviceStatus::Connected;
     }
     else if (notification == bsp::USBDeviceStatus::Configured) {
         if (usbStatus == bsp::USBDeviceStatus::Connected) {
+            LOG_DEBUG("USB status: First configuration");
             ownerService->bus.sendUnicast(
                 std::make_shared<sdesktop::usb::USBConfigured>(sdesktop::usb::USBConfigurationType::firstConfiguration),
                 service::name::service_desktop);
         }
         else {
+            LOG_DEBUG("USB status: Reconfiguration");
             ownerService->bus.sendUnicast(
                 std::make_shared<sdesktop::usb::USBConfigured>(sdesktop::usb::USBConfigurationType::reconfiguration),
                 service::name::service_desktop);
@@ -223,6 +224,7 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
         usbStatus = bsp::USBDeviceStatus::Configured;
     }
     else if (notification == bsp::USBDeviceStatus::Disconnected) {
+        LOG_DEBUG("USB status: Disconnected");
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBDisconnected>(),
                                         sys::BusChannel::USBNotifications);
         usbStatus = bsp::USBDeviceStatus::Disconnected;
@@ -231,6 +233,7 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
         bsp::usbHandleDataReceived();
     }
     else if (notification == bsp::USBDeviceStatus::Reset) {
+        LOG_DEBUG("USB status: Reset");
         if (usbStatus == bsp::USBDeviceStatus::Configured) {
             reset();
         }

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Changed / Improved
+* Changed USB logging
+
 ### Fixed
 * Fixed improper duration of the rejected outgoing call shown in calls log
 * Fixed turning on loudspeaker before outgoing call is answered
