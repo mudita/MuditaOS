@@ -13,7 +13,7 @@ namespace db
     using sdesktop::endpoints::PagedContext;
 
     class QueryResult; // Forward declaration
-    using QueryCallbackFunction         = std::function<bool(db::QueryResult *)>;
+    using QueryCallbackFunction                  = std::function<bool(db::QueryResult *)>;
     using EndpointQueryCallbackFunction          = std::function<bool(db::QueryResult *, Context &)>;
     using EndpointQueryCallbackFunctionWithPages = std::function<bool(db::QueryResult *, PagedContext &)>;
     class QueryListener

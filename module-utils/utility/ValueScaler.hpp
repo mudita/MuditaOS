@@ -11,7 +11,8 @@
 
 namespace utils
 {
-    template <typename T> struct Range
+    template <typename T>
+    struct Range
     {
         T min;
         T max;
@@ -38,7 +39,8 @@ namespace utils
         return static_cast<T>(std::floor(output));
     }
 
-    template <typename T> struct Entry
+    template <typename T>
+    struct Entry
     {
         const Range<T> input;
         const Range<T> output;

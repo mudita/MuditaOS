@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common.hpp"
@@ -74,9 +74,9 @@ TEST_CASE("AlarmEventRecord queries tests")
                         uint32_t snoozeDuration,
                         const std::string &rruleText) {
         auto alarmEvent = AlarmEventRecord(0, AlarmTime{hour, minute}, musicTone, enabled, snoozeDuration, rruleText);
-        auto query  = std::make_shared<db::query::alarmEvents::Add>(alarmEvent);
-        auto ret    = alarmEventRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::alarmEvents::AddResult *>(ret.get());
+        auto query      = std::make_shared<db::query::alarmEvents::Add>(alarmEvent);
+        auto ret        = alarmEventRecordInterface.runQuery(query);
+        auto result     = dynamic_cast<db::query::alarmEvents::AddResult *>(ret.get());
         REQUIRE(result != nullptr);
         REQUIRE(result->getResult());
     };

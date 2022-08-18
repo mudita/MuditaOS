@@ -20,6 +20,3 @@ void CallGUI::notifyCLIP(const utils::PhoneNumber::View &number)
     app::manager::Controller::sendAction(
         owner, app::manager::actions::HandleCallerId, std::make_unique<app::manager::actions::CallParams>(number));
 }
-
-
-

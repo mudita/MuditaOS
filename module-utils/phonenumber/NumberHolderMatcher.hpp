@@ -15,7 +15,8 @@ namespace utils
      * @tparam STL container
      * @tparam Number holder class
      */
-    template <template <class, class> class C, class THolder> class NumberHolderMatcher
+    template <template <class, class> class C, class THolder>
+    class NumberHolderMatcher
     {
       public:
         using NumbersProvider =

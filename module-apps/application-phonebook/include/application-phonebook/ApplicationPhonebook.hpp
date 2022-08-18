@@ -56,7 +56,8 @@ namespace app
         bool searchEmpty(const std::string &query);
     };
 
-    template <> struct ManifestTraits<ApplicationPhonebook>
+    template <>
+    struct ManifestTraits<ApplicationPhonebook>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

@@ -87,7 +87,8 @@ namespace sys
                                                      service::name::service_desktop};
         }
 
-        template <typename T> static bool isOnWhitelist(const T &list, const std::string &serviceName)
+        template <typename T>
+        static bool isOnWhitelist(const T &list, const std::string &serviceName)
         {
             return std::find(std::begin(list), std::end(list), serviceName) != std::end(list);
         }
@@ -383,7 +384,8 @@ namespace sys
         return true;
     }
 
-    template <typename T> void SystemManagerCommon::DestroyServices(const T &whitelist)
+    template <typename T>
+    void SystemManagerCommon::DestroyServices(const T &whitelist)
     {
         cpp_freertos::LockGuard lck(serviceDestroyMutex);
         for (auto service = servicesList.begin(); service != servicesList.end();) {

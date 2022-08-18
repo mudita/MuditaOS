@@ -12,7 +12,8 @@ auto InitializerMock = []() { return Error::Success; };
 
 namespace mock
 {
-    template <typename T> auto mock_to_shared(T *val)
+    template <typename T>
+    auto mock_to_shared(T *val)
     {
         auto t = std::shared_ptr<T>(val, [](...) {});
         return t;

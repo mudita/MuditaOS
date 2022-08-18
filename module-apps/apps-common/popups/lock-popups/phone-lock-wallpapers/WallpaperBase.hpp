@@ -15,8 +15,8 @@ namespace gui
 
       public:
         explicit WallpaperBase(Item *parent);
-        virtual void show()  = 0;
-        virtual void hide()  = 0;
+        virtual void show()                                                         = 0;
+        virtual void hide()                                                         = 0;
         virtual std::shared_ptr<NotificationsPresenter> getNotificationsPresenter() = 0;
     };
 

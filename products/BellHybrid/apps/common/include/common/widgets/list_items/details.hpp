@@ -14,7 +14,8 @@ namespace app::list_items
 {
     namespace details
     {
-        template <typename SpinnerType> class ListItemBase : public gui::BellSideListItemWithCallbacks
+        template <typename SpinnerType>
+        class ListItemBase : public gui::BellSideListItemWithCallbacks
         {
           public:
             using spinner_type = SpinnerType;

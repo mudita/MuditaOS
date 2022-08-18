@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,7 +19,8 @@ namespace utils::integer
      *
      * @tparam T - type to return
      */
-    template <typename T> struct TypeHolder
+    template <typename T>
+    struct TypeHolder
     {
         using type = T;
     };
@@ -32,7 +33,8 @@ namespace utils::integer
      * @tparam Bits - number of bits which must an integer be able to hold.
      * @return integer type best suited to hold value Bits bits long.
      */
-    template <unsigned int Bits> auto getIntegerType()
+    template <unsigned int Bits>
+    auto getIntegerType()
     {
         static_assert(Bits <= 64);
 

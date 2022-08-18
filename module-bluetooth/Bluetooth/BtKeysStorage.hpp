@@ -17,6 +17,7 @@ namespace bluetooth
       public:
         static auto getKeyStorage() -> btstack_link_key_db_t *;
         static std::shared_ptr<bluetooth::SettingsHolder> settings;
+
       private:
         static void openStorage();
         static void closeStorage();
@@ -37,4 +38,4 @@ namespace bluetooth
         static json11::Json::array keys;
     };
 
-} // namespace Bt
+} // namespace bluetooth

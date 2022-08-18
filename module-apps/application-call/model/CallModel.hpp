@@ -56,14 +56,14 @@ namespace app::call
         virtual utils::PhoneNumber getPhoneNumber()                  = 0;
         virtual UTF8 getCallerId()                                   = 0;
 
-        virtual void hangUpCall()                            = 0;
-        virtual void answerCall()                            = 0;
-        virtual bool sendSms(const UTF8 &smsBody)            = 0;
+        virtual void hangUpCall()                               = 0;
+        virtual void answerCall()                               = 0;
+        virtual bool sendSms(const UTF8 &smsBody)               = 0;
         virtual void transmitDtmfTone(const uint8_t &digitCode) = 0;
-        virtual void muteCall()                              = 0;
-        virtual void unmuteCall()                            = 0;
-        virtual void turnLoudspeakerOn()                     = 0;
-        virtual void turnLoudspeakerOff()                    = 0;
+        virtual void muteCall()                                 = 0;
+        virtual void unmuteCall()                               = 0;
+        virtual void turnLoudspeakerOn()                        = 0;
+        virtual void turnLoudspeakerOff()                       = 0;
 
         virtual void turnOnKeypadBacklight()  = 0;
         virtual void turnOffKeypadBacklight() = 0;

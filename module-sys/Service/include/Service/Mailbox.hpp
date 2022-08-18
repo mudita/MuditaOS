@@ -35,7 +35,8 @@ class ServiceLock
     }
 };
 
-template <typename T, typename Base = cpp_freertos::Thread *, typename Lock = ServiceLock> class Mailbox
+template <typename T, typename Base = cpp_freertos::Thread *, typename Lock = ServiceLock>
+class Mailbox
 {
   public:
     Mailbox(Base thread) : thread_(thread)

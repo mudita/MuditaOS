@@ -19,8 +19,8 @@ namespace gui
     class SideListView : public Rect, public ListViewEngine
     {
       protected:
-        HBarGraph *pageBar  = nullptr;
-        VBox *bodyOverlay   = nullptr;
+        HBarGraph *pageBar = nullptr;
+        VBox *bodyOverlay  = nullptr;
 
         auto createPageBar() -> void;
         auto setFocus() -> void override;

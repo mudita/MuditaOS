@@ -112,7 +112,7 @@ namespace gui
                               unsigned int linesCount) -> void
     {
         const Position initialTopPadding = lineYPosition;
-        Length initHeight          = text->getTextFormat().getFont()->info.line_height;
+        Length initHeight                = text->getTextFormat().getFont()->info.line_height;
 
         while (true) {
             auto textLine = gui::MultiTextLine(drawCursor, w, initHeight, underLineProperties);

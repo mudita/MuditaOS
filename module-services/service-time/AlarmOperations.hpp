@@ -15,7 +15,8 @@
 
 namespace alarms
 {
-    template <typename T> using EventsContainer = std::vector<std::unique_ptr<T>>;
+    template <typename T>
+    using EventsContainer = std::vector<std::unique_ptr<T>>;
 
     class IAlarmOperations
     {

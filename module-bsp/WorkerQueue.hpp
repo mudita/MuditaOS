@@ -20,7 +20,8 @@
  * It is not suitable for performing stack-consuming tasks, for instance handling I/O.
  * If necessary, stack size can be manually reconfigured upon creation.
  */
-template <typename Message> class WorkerQueue
+template <typename Message>
+class WorkerQueue
 {
     static constexpr auto minimalStackSizeInBytes = configMINIMAL_STACK_SIZE * sizeof(std::uint32_t);
 
@@ -71,7 +72,8 @@ WorkerQueue<Message>::WorkerQueue(const char *name, WorkerHandle workerHandle, c
         &taskHandle);
 }
 
-template <typename Message> WorkerQueue<Message>::~WorkerQueue()
+template <typename Message>
+WorkerQueue<Message>::~WorkerQueue()
 {
     if ((queueHandle != nullptr) && (taskHandle != nullptr)) {
         const InternalMessage killMsg{{}, true};
@@ -89,7 +91,8 @@ template <typename Message> WorkerQueue<Message>::~WorkerQueue()
         vQueueDelete(queueHandle);
     }
 }
-template <typename Message> void WorkerQueue<Message>::worker()
+template <typename Message>
+void WorkerQueue<Message>::worker()
 {
     while (true) {
         InternalMessage msg{};
@@ -104,7 +107,8 @@ template <typename Message> void WorkerQueue<Message>::worker()
         }
     }
 }
-template <typename Message> BaseType_t WorkerQueue<Message>::post(const Message &msg)
+template <typename Message>
+BaseType_t WorkerQueue<Message>::post(const Message &msg)
 {
     BaseType_t notifyRequired{};
     const InternalMessage postMsg{msg, false};

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,7 +6,8 @@
 #include "../Database/Database.hpp"
 #include "BaseInterface.hpp"
 
-template <typename T, typename F> class RecordInterface : public db::Interface
+template <typename T, typename F>
+class RecordInterface : public db::Interface
 {
   public:
     RecordInterface() = default;

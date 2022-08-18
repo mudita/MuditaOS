@@ -47,10 +47,10 @@ namespace app
                 LOG_INFO("Playback: %s, volume: %s",
                          audio::str(volumeParams->getAudioContext().second).c_str(),
                          std::to_string(volumeParams->getVolume()).c_str());
-                auto volume          = volumeParams->getVolume();
-                auto context         = volumeParams->getAudioContext();
-                auto source          = volumeParams->getRequestSource();
-                auto popupData       = std::make_unique<gui::VolumePopupData>(volume, context, source);
+                auto volume    = volumeParams->getVolume();
+                auto context   = volumeParams->getAudioContext();
+                auto source    = volumeParams->getRequestSource();
+                auto popupData = std::make_unique<gui::VolumePopupData>(volume, context, source);
 
                 const auto popupName = resolveWindowName(gui::popup::ID::Volume);
                 if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {

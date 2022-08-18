@@ -50,7 +50,6 @@ namespace style
                 inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
             } // namespace newApn
 
-
             namespace phone_modes
             {
                 inline constexpr auto body_offset = 155U;

@@ -94,7 +94,8 @@ namespace mocks
         return api;
     }
 
-    template <typename T> auto mock_to_shared(T *val)
+    template <typename T>
+    auto mock_to_shared(T *val)
     {
         auto t = std::shared_ptr<T>(val, [](...) {});
         return t;
@@ -114,13 +115,13 @@ namespace mocks
 
         DIWrapper(bool dnd = false, bool tethering = false) : api(mocks::api(dnd, tethering))
         {
-            auto audio_p     = mock_to_shared<call::api::Audio>(&audio.get());
-            auto multicast_p = mock_to_shared<call::api::Multicast>(&multicast.get());
-            auto gui_p       = mock_to_shared<call::api::GUI>(&gui.get());
-            auto db_p        = mock_to_shared<call::api::DB>(&db.get());
-            auto timer_p     = mock_to_shared<call::api::Timer>(&timer.get());
+            auto audio_p      = mock_to_shared<call::api::Audio>(&audio.get());
+            auto multicast_p  = mock_to_shared<call::api::Multicast>(&multicast.get());
+            auto gui_p        = mock_to_shared<call::api::GUI>(&gui.get());
+            auto db_p         = mock_to_shared<call::api::DB>(&db.get());
+            auto timer_p      = mock_to_shared<call::api::Timer>(&timer.get());
             auto timer_ring_p = mock_to_shared<call::api::TimerRing>(&timerRing.get());
-            auto api_p       = mock_to_shared<call::api::Api>(&api.get());
+            auto api_p        = mock_to_shared<call::api::Api>(&api.get());
             di                = call::Dependencies{std::move(audio_p),
                                     std::move(multicast_p),
                                     std::move(gui_p),

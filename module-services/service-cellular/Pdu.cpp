@@ -466,7 +466,8 @@ namespace pdu
         const char *idCStr;
     };
 
-    template <typename NameOrValue> inline bool isKnown(NameOrValue const &nameOrValue, KnownHeader const &knownHeader)
+    template <typename NameOrValue>
+    inline bool isKnown(NameOrValue const &nameOrValue, KnownHeader const &knownHeader)
     {
         return std::visit(
             [&](auto const &val) {
@@ -608,7 +609,8 @@ namespace pdu
                 return true;
             }
 
-            template <typename Value> static bool text(Octets &octets, std::uint8_t charOctet, Value &value)
+            template <typename Value>
+            static bool text(Octets &octets, std::uint8_t charOctet, Value &value)
             {
                 // Do not ignore the first character, it's part of the text
                 Text text(octets.begin(), octets.begin());
@@ -668,7 +670,8 @@ namespace pdu
         // p81
         struct IgnoreHeaderValuePolicy
         {
-            template <typename Value> static bool data(Octets &octets, std::uint8_t lengthOctet, Value &value)
+            template <typename Value>
+            static bool data(Octets &octets, std::uint8_t lengthOctet, Value &value)
             {
                 octets.ignore();
                 std::uint32_t length = lengthOctet;
@@ -684,7 +687,8 @@ namespace pdu
                 return true;
             }
 
-            template <typename Value> static bool text(Octets &octets, std::uint8_t charOctet, Value &value)
+            template <typename Value>
+            static bool text(Octets &octets, std::uint8_t charOctet, Value &value)
             {
                 octets.ignore();
                 while (charOctet != EndOfString) {
@@ -695,7 +699,8 @@ namespace pdu
                 return true;
             }
 
-            template <typename Value> static bool shortInteger(Octets &octets, std::uint8_t uintOctet, Value &value)
+            template <typename Value>
+            static bool shortInteger(Octets &octets, std::uint8_t uintOctet, Value &value)
             {
                 octets.ignore();
                 return true;
@@ -704,7 +709,8 @@ namespace pdu
 
         // http://www.openmobilealliance.org/release/Browser_Protocol_Stack/V2_1-20110315-A/OMA-WAP-TS-WSP-V1_0-20110315-A.pdf,
         // p79
-        template <typename Policy, typename Value> static bool parseGeneric(Octets &octets, Value &value)
+        template <typename Policy, typename Value>
+        static bool parseGeneric(Octets &octets, Value &value)
         {
             std::uint8_t octet = 0x00;
             if (!octets.peek(octet)) {

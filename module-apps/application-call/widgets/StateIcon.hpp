@@ -19,7 +19,7 @@ namespace gui
         constexpr uint32_t w                 = 150;
         constexpr uint32_t h                 = 100;
         constexpr uint32_t defaultSideMargin = 5;
-    }     // namespace icon
+    } // namespace icon
 
     /// @brief Icon widget with custom predefined images and strings
     /// images and strings are stored in predefined map passed to the class during construction
@@ -29,7 +29,8 @@ namespace gui
     /// icon::h where w = icon::w + 2 * w_margin. It is necessary as it is possible that text will exceed Icon visible
     /// area
 
-    template <class T> class StateIcon : public ImageBoxWithText
+    template <class T>
+    class StateIcon : public ImageBoxWithText
     {
       public:
         using IconMap = std::map<T, std::pair<const std::string, const std::string>>;

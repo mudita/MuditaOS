@@ -104,7 +104,8 @@ class ServiceDesktop : public sys::Service
 
     void checkChargingCondition();
 
-    template <typename T> auto connectHandler() -> bool
+    template <typename T>
+    auto connectHandler() -> bool
     {
         return connect(typeid(T), [&](sys::Message *msg) { return handle(static_cast<T *>(msg)); });
     }
@@ -127,7 +128,8 @@ class ServiceDesktop : public sys::Service
 
 namespace sys
 {
-    template <> struct ManifestTraits<ServiceDesktop>
+    template <>
+    struct ManifestTraits<ServiceDesktop>
     {
         static auto GetManifest() -> ServiceManifest
         {

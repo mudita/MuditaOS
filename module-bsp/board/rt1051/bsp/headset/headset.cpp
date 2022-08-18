@@ -274,7 +274,7 @@ namespace bsp
 
             qHandleIrq = qHandle;
 
-            HeadsetInserted = false;
+            HeadsetInserted    = false;
             MicrophoneInserted = false;
 
             // Set Insertion de-bounce time to 1s, enable auto-detection and manually trigger detection

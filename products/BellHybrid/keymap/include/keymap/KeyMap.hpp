@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -71,13 +71,15 @@ struct KeyStates
         return states.count();
     }
 
-    template <typename... Args> bool ifOnlySet(Args... args)
+    template <typename... Args>
+    bool ifOnlySet(Args... args)
     {
         const auto mask = (... | [](auto x) { return KeySet{1UL << magic_enum::enum_integer(x)}; }(args));
         return (states | mask) == mask;
     }
 
-    template <std::size_t N> bool ifOnlySet(std::array<KeyMap, N> keys)
+    template <std::size_t N>
+    bool ifOnlySet(std::array<KeyMap, N> keys)
     {
         const auto mask = std::accumulate(keys.begin(), keys.end(), KeySet{}, [](auto m, auto val) {
             return m | KeySet{1UL << magic_enum::enum_integer(val)};

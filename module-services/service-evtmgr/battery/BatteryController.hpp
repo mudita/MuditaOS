@@ -18,7 +18,7 @@ namespace sevm::battery
     class BatteryController
     {
       public:
-        using Events = hal::battery::AbstractBatteryCharger::Events;
+        using Events          = hal::battery::AbstractBatteryCharger::Events;
         using ChargerPresence = hal::battery::AbstractBatteryCharger::ChargerPresence;
         explicit BatteryController(sys::Service *service, xQueueHandle notificationChannel);
 

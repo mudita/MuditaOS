@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,8 @@
 
 namespace utils
 {
-    template <typename Out> void split(const std::string &s, char delim, Out result)
+    template <typename Out>
+    void split(const std::string &s, char delim, Out result)
     {
         std::stringstream ss(s);
         std::string item;

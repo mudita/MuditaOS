@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,7 +10,8 @@
 #include <chrono>
 #include <memory>
 
-template <KeyMap... keys> class GenericLongPressSequence : public AbstractKeySequence
+template <KeyMap... keys>
+class GenericLongPressSequence : public AbstractKeySequence
 {
     using Keys = std::array<KeyMap, sizeof...(keys)>;
     enum class State

@@ -199,4 +199,4 @@ namespace pure::screen_light_control
         return fadeOut;
     }
 
-} // namespace screen_light_control
+} // namespace pure::screen_light_control

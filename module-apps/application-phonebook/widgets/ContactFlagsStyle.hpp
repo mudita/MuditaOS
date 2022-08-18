@@ -11,10 +11,10 @@ namespace style
     {
         namespace ContactFlag
         {
-            const uint32_t iconsSize   = 35;
-            const uint32_t height      = 74;
-            const uint32_t itemWidth   = 125;
-            const uint32_t itemHeight  = 64;
+            const uint32_t iconsSize  = 35;
+            const uint32_t height     = 74;
+            const uint32_t itemWidth  = 125;
+            const uint32_t itemHeight = 64;
         } // namespace ContactFlag
     }     // namespace widget
 } // namespace style

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -31,16 +31,16 @@ namespace gui
         void setState(ItemState state);
 
       private:
-        VBox *vBox                                                   = nullptr;
-        HBox *firstHBox                                              = nullptr;
-        HBox *secondHBox                                             = nullptr;
-        Label *authorText                                            = nullptr;
-        Label *songText                                              = nullptr;
-        TextFixedSize *durationText                                  = nullptr;
-        Image *playedSong                                            = nullptr;
-        ItemState itemState                                          = ItemState::None;
-        std::function<void(const UTF8 &text)> navBarTemporaryMode    = nullptr;
-        std::function<void()> navBarRestoreFromTemporaryMode         = nullptr;
+        VBox *vBox                                                = nullptr;
+        HBox *firstHBox                                           = nullptr;
+        HBox *secondHBox                                          = nullptr;
+        Label *authorText                                         = nullptr;
+        Label *songText                                           = nullptr;
+        TextFixedSize *durationText                               = nullptr;
+        Image *playedSong                                         = nullptr;
+        ItemState itemState                                       = ItemState::None;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
     };
 
 } /* namespace gui */

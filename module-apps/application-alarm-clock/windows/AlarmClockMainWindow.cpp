@@ -85,7 +85,7 @@ namespace app::alarmClock
         }
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
-            auto rec                              = new AlarmEventRecord();
+            auto rec = new AlarmEventRecord();
 
             const auto now   = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
             const auto local = std::localtime(&now);

@@ -1487,8 +1487,8 @@ bool ServiceCellular::transmitDtmfTone(DTMFCode code)
     auto channel = cmux->get(CellularMux::Channel::Commands);
     at::Result resp;
     if (channel) {
-        auto command           = at::factory(at::AT::QLDTMF);
-        resp                   = channel->cmd(command.getCmd() + std::string(code));
+        auto command = at::factory(at::AT::QLDTMF);
+        resp         = channel->cmd(command.getCmd() + std::string(code));
         if (resp) {
             command = at::factory(at::AT::VTS);
             resp    = channel->cmd(command.getCmd() + std::string(code));
@@ -2271,7 +2271,6 @@ auto ServiceCellular::tetheringTurnOnURC() -> bool
             LOG_ERROR("Failed to stop SMS URC");
             return false;
         }
-
     }
     return true;
 }

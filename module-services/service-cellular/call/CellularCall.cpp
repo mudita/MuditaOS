@@ -140,4 +140,4 @@ namespace call
         return machine->active();
     }
 
-} // namespace CellularCall
+} // namespace call

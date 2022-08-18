@@ -51,14 +51,14 @@ namespace bsp::rotary_encoder
 
     void deinit()
     {
-        gHandleIrq   = nullptr;
+        gHandleIrq = nullptr;
         QTMR_DisableInterrupts(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL, INTERRUPT_MODE);
         QTMR_Deinit(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL);
     }
 
     std::vector<KeyEvent> getKeyEvents()
     {
-        uint16_t tmp = QTMR_GetCurrentTimerCount(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL);
+        uint16_t tmp   = QTMR_GetCurrentTimerCount(BOARD_QTMR_ID, BOARD_QTMR_ENC_CHANNEL);
         auto direction = Direction::undefined;
         std::vector<KeyEvent> out;
 

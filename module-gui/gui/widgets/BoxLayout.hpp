@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,7 +24,8 @@ namespace gui
             bool noUpdate;
         };
 
-        template <Axis axis> Length sizeUsed(Item *box, Area area = Area::Min)
+        template <Axis axis>
+        Length sizeUsed(Item *box, Area area = Area::Min)
         {
             Length sum = 0;
 
@@ -34,7 +35,8 @@ namespace gui
             return sum;
         };
 
-        template <Axis axis> Length sizeUsedWithoutElem(Item *box, Item *elem, Area area = Area::Min)
+        template <Axis axis>
+        Length sizeUsedWithoutElem(Item *box, Item *elem, Area area = Area::Min)
         {
             Length sum = 0;
 
@@ -46,21 +48,25 @@ namespace gui
             return sum;
         };
 
-        template <Axis axis> Length sizeLeft(Item *box, Area area = Area::Min)
+        template <Axis axis>
+        Length sizeLeft(Item *box, Area area = Area::Min)
         {
             return (sizeUsed<axis>(box, area) >= box->getSize(axis)) ? 0
                                                                      : box->getSize(axis) - sizeUsed<axis>(box, area);
         };
 
-        template <Axis axis> Length sizeLeftWithoutElem(Item *box, Item *elem, Area area = Area::Min)
+        template <Axis axis>
+        Length sizeLeftWithoutElem(Item *box, Item *elem, Area area = Area::Min)
         {
             return (sizeUsedWithoutElem<axis>(box, elem, area) >= box->getSize(axis))
                        ? 0
                        : box->getSize(axis) - sizeUsedWithoutElem<axis>(box, elem, area);
         };
 
-        template <Axis axis> void resizeItems();
-        template <Axis axis> [[nodiscard]] Position getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el);
+        template <Axis axis>
+        void resizeItems();
+        template <Axis axis>
+        [[nodiscard]] Position getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el);
 
         std::list<Item *> outOfDrawAreaItems;
         void addToOutOfDrawAreaList(Item *item);
@@ -68,16 +74,19 @@ namespace gui
         virtual void resizeItems();
         bool reverseOrder = false;
 
-        template <Axis axis> [[nodiscard]] Length calculateElemResize(Item *el, Length &toSplit);
+        template <Axis axis>
+        [[nodiscard]] Length calculateElemResize(Item *el, Length &toSplit);
         template <Axis axis>
         [[nodiscard]] Length calculateElemAxisSize(Item *el, Length calculatedResize, Length &toSplit);
-        template <Axis axis> [[nodiscard]] Length calculateElemOrtAxisSize(Item *el);
+        template <Axis axis>
+        [[nodiscard]] Length calculateElemOrtAxisSize(Item *el);
         template <Axis axis>
         [[nodiscard]] Position calculateElemAxisPosition(Item *el,
                                                          Length axisItemSize,
                                                          Position &startingPosition,
                                                          Position &leftPosition);
-        template <Axis axis> [[nodiscard]] Position calculateElemOrtAxisPosition(Item *el, Length orthogonalItemSize);
+        template <Axis axis>
+        [[nodiscard]] Position calculateElemOrtAxisPosition(Item *el, Length orthogonalItemSize);
 
         Item *getLastVisibleElement();
 
@@ -100,7 +109,8 @@ namespace gui
         [[nodiscard]] bool empty() const noexcept;
         /// add item if it will fit in box, return true on success
         /// axis sets direction to define space left in container
-        template <Axis axis> void addWidget(Item *item);
+        template <Axis axis>
+        void addWidget(Item *item);
         /// set navigation from last to fist element in box
         virtual void setNavigation();
         std::list<Item *>::iterator getNavigationFocusedItem();
@@ -119,7 +129,8 @@ namespace gui
         /// set focus on specified box element
         bool setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
-        template <Axis axis> auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
+        template <Axis axis>
+        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         void handleContentChanged() override;
         /// Get primary sizes used in axis dominant layouts

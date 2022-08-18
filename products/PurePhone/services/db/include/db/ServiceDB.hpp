@@ -75,7 +75,8 @@ class ServiceDB : public ServiceDBCommon
 
 namespace sys
 {
-    template <> struct ManifestTraits<ServiceDB>
+    template <>
+    struct ManifestTraits<ServiceDB>
     {
         static auto GetManifest() -> ServiceManifest
         {

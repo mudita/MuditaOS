@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,7 +34,7 @@ namespace app::notes
         void onListFilled();
 
         std::unique_ptr<NotesMainWindowContract::Presenter> presenter;
-        gui::ListView *list         = nullptr;
-        gui::Icon *emptyListIcon    = nullptr;
+        gui::ListView *list      = nullptr;
+        gui::Icon *emptyListIcon = nullptr;
     };
 } // namespace app::notes

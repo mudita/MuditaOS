@@ -53,7 +53,8 @@ namespace app
         std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter;
     };
 
-    template <> struct ManifestTraits<ApplicationBellMain>
+    template <>
+    struct ManifestTraits<ApplicationBellMain>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

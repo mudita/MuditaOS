@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common.hpp"
@@ -23,7 +23,7 @@ TEST_CASE("Notifications Table tests")
     NotificationsDB notificationsDb{notificationsPath.c_str()};
     REQUIRE(notificationsDb.isInitialized());
 
-    auto &notificationsTbl = notificationsDb.notifications;
+    auto &notificationsTbl        = notificationsDb.notifications;
     const auto notificationsCount = notificationsTbl.count() + 1;
     // clear notifications table
     for (std::size_t id = 1; id <= notificationsCount; id++) {

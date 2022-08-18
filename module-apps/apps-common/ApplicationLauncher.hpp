@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -73,7 +73,8 @@ namespace app
     };
 
     /// application launcher boilerplate
-    template <class T> class ApplicationLauncherT : public ApplicationLauncher
+    template <class T>
+    class ApplicationLauncherT : public ApplicationLauncher
     {
       public:
         ApplicationLauncherT(std::string name, ApplicationManifest &&manifest, Closeable isCloseable = Closeable::True)

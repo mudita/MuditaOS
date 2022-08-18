@@ -172,7 +172,7 @@ namespace bluetooth
 
         // setup AVRCP Controller
         AVRCP::sdpControllerServiceBuffer.fill(0);
-        uint16_t controllerSupportedFeatures = AVRCP_FEATURE_MASK_CATEGORY_MONITOR_OR_AMPLIFIER;
+        std::uint16_t controllerSupportedFeatures = AVRCP_FEATURE_MASK_CATEGORY_MONITOR_OR_AMPLIFIER;
         avrcp_controller_create_sdp_record(AVRCP::sdpControllerServiceBuffer.data(),
                                            avrcpControllerSdpRecordHandle,
                                            controllerSupportedFeatures,
@@ -194,8 +194,8 @@ namespace bluetooth
 
     void A2DP::A2DPImpl::sendMediaPacket()
     {
-        int numBytesInFrame = btstack_sbc_encoder_sbc_buffer_length();
-        int bytesInStorage  = AVRCP::mediaTracker.sbc_storage_count;
+        int numBytesInFrame    = btstack_sbc_encoder_sbc_buffer_length();
+        int bytesInStorage     = AVRCP::mediaTracker.sbc_storage_count;
         std::uint8_t numFrames = bytesInStorage / numBytesInFrame;
         a2dp_source_stream_send_media_payload(AVRCP::mediaTracker.a2dp_cid,
                                               AVRCP::mediaTracker.local_seid,
@@ -324,8 +324,8 @@ namespace bluetooth
             LOG_INFO("A2DP Source: Connected, a2dp cid 0x%02x, local seid %d.\n",
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid);
-            isConnected    = true;
-            auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+            isConnected        = true;
+            auto &busProxy     = const_cast<sys::Service *>(ownerService)->bus;
             device.deviceState = DeviceState::ConnectedAudio;
             // handle proper device matching when connection was initiated by remote device
             a2dp_subevent_signaling_connection_established_get_bd_addr(packet, device.address);

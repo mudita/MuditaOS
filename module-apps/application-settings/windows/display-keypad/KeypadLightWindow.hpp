@@ -18,7 +18,7 @@ namespace gui
         void switchHandler(bool &onOffSwitch);
         std::list<Option> buildOptionsList() override;
 
-        bool isActiveSwitchOn            = false;
+        bool isActiveSwitchOn               = false;
         OptionWindowDestroyer rai_destroyer = OptionWindowDestroyer(*this);
     };
 } // namespace gui

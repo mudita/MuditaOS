@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,9 +15,9 @@ namespace gui
     class AbstractPowerOffPresenter
     {
       public:
-        virtual ~AbstractPowerOffPresenter() = default;
+        virtual ~AbstractPowerOffPresenter()                                                = default;
         virtual void powerOff(sys::CloseReason reason = sys::CloseReason::RegularPowerDown) = 0;
-        virtual void reboot()                = 0;
+        virtual void reboot()                                                               = 0;
     };
 
     class PowerOffPresenter : public AbstractPowerOffPresenter

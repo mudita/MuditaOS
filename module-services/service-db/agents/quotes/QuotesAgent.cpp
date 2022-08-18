@@ -64,9 +64,9 @@ namespace Quotes
 
     auto QuotesAgent::handleEnableCategoryById(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {
-        auto req         = std::dynamic_pointer_cast<Messages::EnableCategoryByIdRequest>(query);
+        auto req              = std::dynamic_pointer_cast<Messages::EnableCategoryByIdRequest>(query);
         auto queryResult      = predefinedDB->execute(Queries::enableCategory, req->enable, req->categoryId);
-        auto response    = std::make_unique<Messages::EnableCategoryByIdResponse>(std::move(queryResult));
+        auto response         = std::make_unique<Messages::EnableCategoryByIdResponse>(std::move(queryResult));
         constexpr auto forced = true;
         randomizedQuoteModel.updateList(forced);
         response->setRequestQuery(query);
@@ -86,9 +86,9 @@ namespace Quotes
 
     auto QuotesAgent::handleEnableQuoteById(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {
-        auto req         = std::dynamic_pointer_cast<Messages::EnableQuoteByIdRequest>(query);
+        auto req              = std::dynamic_pointer_cast<Messages::EnableQuoteByIdRequest>(query);
         auto queryResult      = customDB->execute(Queries::enableQuote, req->enable, req->quoteId);
-        auto response    = std::make_unique<Messages::EnableQuoteByIdResponse>(queryResult);
+        auto response         = std::make_unique<Messages::EnableQuoteByIdResponse>(queryResult);
         constexpr auto forced = true;
         randomizedQuoteModel.updateList(forced);
         response->setRequestQuery(query);
@@ -145,7 +145,7 @@ namespace Quotes
 
     auto QuotesAgent::handleWriteQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {
-        auto req         = std::dynamic_pointer_cast<Messages::WriteQuoteRequest>(query);
+        auto req = std::dynamic_pointer_cast<Messages::WriteQuoteRequest>(query);
         auto queryResult =
             customDB->execute(Queries::writeQuote, req->quote.c_str(), req->author.c_str(), req->enabled, req->quoteId);
         constexpr auto forced = true;
@@ -157,7 +157,7 @@ namespace Quotes
 
     auto QuotesAgent::handleDeleteQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {
-        auto req = std::dynamic_pointer_cast<Messages::DeleteQuoteRequest>(query);
+        auto req              = std::dynamic_pointer_cast<Messages::DeleteQuoteRequest>(query);
         auto queryResult      = customDB->execute(Queries::deleteQuote, req->quoteId);
         constexpr auto forced = true;
         randomizedQuoteModel.updateList(forced);

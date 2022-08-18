@@ -79,15 +79,18 @@ namespace gui
         Horizontal
     };
 
-    template <class T> bool operator&(const T &lhs, const T &rhs)
+    template <class T>
+    bool operator&(const T &lhs, const T &rhs)
     {
         return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
     }
-    template <class T> T operator|(const T &lhs, const T &rhs)
+    template <class T>
+    T operator|(const T &lhs, const T &rhs)
     {
         return static_cast<T>(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
     }
-    template <class T> T operator|=(const T &lhs, const T &rhs)
+    template <class T>
+    T operator|=(const T &lhs, const T &rhs)
     {
         lhs = lhs | rhs;
         return lhs;

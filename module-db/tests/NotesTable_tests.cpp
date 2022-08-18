@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -37,7 +37,7 @@ TEST_CASE("Notes Table tests")
 
     SECTION("Get notes by text query")
     {
-        constexpr auto testSearch = "TEST";
+        constexpr auto testSearch   = "TEST";
         const auto [records, count] = table.getByText(testSearch, 0, 1);
         REQUIRE(records.size() == 1);
         REQUIRE(records[0].snippet == testSnippet);

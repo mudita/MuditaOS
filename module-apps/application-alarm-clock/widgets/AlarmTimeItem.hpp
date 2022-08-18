@@ -27,7 +27,8 @@ namespace gui
         [[nodiscard]] bool isPm(const std::string &text) const;
         void validateHour();
 
-        template <typename T> UTF8 timeValueToPaddedString(const T &value);
+        template <typename T>
+        UTF8 timeValueToPaddedString(const T &value);
 
       public:
         AlarmTimeItem(std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,

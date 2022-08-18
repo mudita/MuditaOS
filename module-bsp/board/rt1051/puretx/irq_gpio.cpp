@@ -18,7 +18,6 @@
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
 
-
 namespace bsp
 {
 

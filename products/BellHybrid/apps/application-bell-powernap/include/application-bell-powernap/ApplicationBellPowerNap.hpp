@@ -50,7 +50,8 @@ namespace app
         }
     };
 
-    template <> struct ManifestTraits<ApplicationBellPowerNap>
+    template <>
+    struct ManifestTraits<ApplicationBellPowerNap>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

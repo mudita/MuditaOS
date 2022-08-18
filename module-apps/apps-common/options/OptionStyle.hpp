@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -44,14 +44,14 @@ namespace gui::option
 
     namespace window
     {
-        inline constexpr gui::Length option_left_margin       = 10;
-        inline constexpr gui::Length option_right_margin      = 10;
-        inline constexpr gui::Length option_bottom_margin     = style::margins::big;
-        inline constexpr uint32_t optionsListTopMargin        = 10U;
-        inline constexpr uint32_t optionsListX                = style::window::default_left_margin;
-        inline constexpr uint32_t optionsListY = style::window::default_vertical_pos + optionsListTopMargin;
-        inline constexpr uint32_t optionsListW                = style::listview::body_width_with_scroll;
-        inline constexpr uint32_t optionsListH                = style::window::default_body_height;
+        inline constexpr gui::Length option_left_margin   = 10;
+        inline constexpr gui::Length option_right_margin  = 10;
+        inline constexpr gui::Length option_bottom_margin = style::margins::big;
+        inline constexpr uint32_t optionsListTopMargin    = 10U;
+        inline constexpr uint32_t optionsListX            = style::window::default_left_margin;
+        inline constexpr uint32_t optionsListY            = style::window::default_vertical_pos + optionsListTopMargin;
+        inline constexpr uint32_t optionsListW            = style::listview::body_width_with_scroll;
+        inline constexpr uint32_t optionsListH            = style::window::default_body_height;
     } // namespace window
 
 } // namespace gui::option

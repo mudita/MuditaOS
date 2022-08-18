@@ -28,7 +28,8 @@ namespace
         EXPECT_TRUE(text.empty());
     }
 
-    template <size_t N> auto initContainer(gui::HBox &box) -> gui::DigitsContainer
+    template <size_t N>
+    auto initContainer(gui::HBox &box) -> gui::DigitsContainer
     {
         auto container = gui::DigitsContainer{N};
         for (auto &digit : container.digits) {

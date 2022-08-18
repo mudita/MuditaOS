@@ -104,7 +104,8 @@ namespace sys
 
     namespace
     {
-        template <class W, class X> void restoreMessagess(W &mailbox, X &tempMsg)
+        template <class W, class X>
+        void restoreMessagess(W &mailbox, X &tempMsg)
         {
             // Push messages collected during waiting for response to processing queue
             for (const auto &w : tempMsg) {
@@ -161,7 +162,7 @@ namespace sys
             }
 
             // Immediately block on rx queue
-            auto rxmsg = sender->mailbox.pop(timeoutNeeded - timeElapsed);
+            auto rxmsg  = sender->mailbox.pop(timeoutNeeded - timeElapsed);
             timeElapsed = cpp_freertos::Ticks::GetTicks();
 
             // check for timeout

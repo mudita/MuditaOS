@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -138,7 +138,8 @@ namespace audio
 
 namespace std
 {
-    template <> struct iterator_traits<audio::Stream::RawBlockIterator>
+    template <>
+    struct iterator_traits<audio::Stream::RawBlockIterator>
     {
         using iterator_category = std::forward_iterator_tag;
         using value_type        = audio::Stream::Span;

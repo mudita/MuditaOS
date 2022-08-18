@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,8 @@
 namespace purefs::fs::internal
 {
 
-    template <typename T> class handle_mapper
+    template <typename T>
+    class handle_mapper
     {
       public:
         T const &operator[](std::size_t index) const
@@ -52,7 +53,8 @@ namespace purefs::fs::internal
         std::vector<std::size_t> unused;
     };
 
-    template <typename T> std::size_t handle_mapper<T>::insert(T const &value)
+    template <typename T>
+    std::size_t handle_mapper<T>::insert(T const &value)
     {
         if (unused.empty()) {
             data.push_back(value);

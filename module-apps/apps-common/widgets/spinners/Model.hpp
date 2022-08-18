@@ -14,7 +14,8 @@
 /// Sometimes it is necessary to force the latter way of storing values even for fundamental types. For
 /// instance, the user might want to store a fixed list of integers to iterate. In that case, set the force parameter to
 /// true.
-template <class ElementType, bool force = false, typename = void> class Model
+template <class ElementType, bool force = false, typename = void>
+class Model
 {
   public:
     enum class Boundaries

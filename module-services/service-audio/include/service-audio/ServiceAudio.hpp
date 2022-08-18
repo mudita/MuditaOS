@@ -133,7 +133,8 @@ class ServiceAudio : public sys::Service
 
 namespace sys
 {
-    template <> struct ManifestTraits<ServiceAudio>
+    template <>
+    struct ManifestTraits<ServiceAudio>
     {
         static auto GetManifest() -> ServiceManifest
         {

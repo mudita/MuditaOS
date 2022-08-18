@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -91,8 +91,8 @@ TEST_CASE("Getting charKey after clicking button twice")
     gui::KeyInputMappedTranslation translator;
     RawKey key;
 
-    key.keyCode                    = bsp::KeyCodes::NumericKey2;
-    key.state                      = RawKey::State::Released;
+    key.keyCode = bsp::KeyCodes::NumericKey2;
+    key.state   = RawKey::State::Released;
     translator.handle(key, "English_lower");
     REQUIRE(translator.handle(key, "English_lower") == 98);
 }

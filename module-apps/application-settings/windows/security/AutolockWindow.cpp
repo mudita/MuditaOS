@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AutolockWindow.hpp"
@@ -60,7 +60,7 @@ namespace gui
     void AutolockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         currentAutoLockTimeout = autoLockSettings->getAutoLockTime();
-        auto it = std::find_if(
+        auto it                = std::find_if(
             autoLockTimes.begin(), autoLockTimes.end(), [&](const std::pair<std::string, std::chrono::seconds> &elem) {
                 return elem.second == currentAutoLockTimeout;
             });

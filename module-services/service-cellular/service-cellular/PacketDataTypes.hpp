@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -211,8 +211,8 @@ namespace packet_data
 
     } // namespace APN
     constexpr unsigned char EmptyContextId = 0;
-    constexpr unsigned char MINContextId = 1;
-    constexpr unsigned char MAXContextId = 16;
+    constexpr unsigned char MINContextId   = 1;
+    constexpr unsigned char MAXContextId   = 16;
 
     /** Comment from quectel (2020.12):
      * As I know, only VZW MBN would use IMS on CID 1 to register IMS service directly.
@@ -222,8 +222,8 @@ namespace packet_data
      * configure their own APN on CID1.  With this rule, it’s easy for customer
      * to configure their APN no matter which MBN file is activated
      */
-    constexpr auto internalAPNMaxId      = 4;
-    using ContextMap                     = std::unordered_map<unsigned char, std::shared_ptr<APN::Config>>;
-    using ContextPair                    = std::pair<unsigned char, std::shared_ptr<APN::Config>>;
+    constexpr auto internalAPNMaxId = 4;
+    using ContextMap                = std::unordered_map<unsigned char, std::shared_ptr<APN::Config>>;
+    using ContextPair               = std::pair<unsigned char, std::shared_ptr<APN::Config>>;
 
 } // namespace packet_data

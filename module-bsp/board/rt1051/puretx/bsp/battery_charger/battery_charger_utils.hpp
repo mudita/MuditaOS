@@ -7,7 +7,8 @@
 
 namespace bsp::battery_charger::utils
 {
-    template <typename T> int twosComplimentToInt(T toConvert)
+    template <typename T>
+    int twosComplimentToInt(T toConvert)
     {
         constexpr auto bitSize = sizeof(T) * 8;
         std::bitset<bitSize> bitset{toConvert};

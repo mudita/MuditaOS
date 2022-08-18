@@ -33,9 +33,15 @@ fi
 
 verify_clang_format_version
 
-L_CLANG_DIFF_TOOL=$(get_clang_format)
+L_CLANG_TOOL=$(get_clang_format)
+if ! [[ $L_CLANG_TOOL ]] || [[ $L_CLANG_TOOL == "" ]]; then
+    [[ $VERBOSE ]] && echo "clang-format not found"
+    exit 1
+fi
+
+L_CLANG_DIFF_TOOL=$(get_clang_format_diff)
 if ! [[ $L_CLANG_DIFF_TOOL ]] || [[ $L_CLANG_DIFF_TOOL == "" ]]; then
-    [[ $VERBOSE ]] && echo "clang tool not found"
+    [[ $VERBOSE ]] && echo "clang-format-diff not found"
     exit 1
 fi
 
@@ -79,6 +85,22 @@ check_file() {
                 fi
             fi
             ;;
+        "All")
+            if [[ ${FIX,,} == "true" ]]; then
+                ${L_CLANG_TOOL} -style file -i ${file}
+                STATUS=$(git status --short -- "${file}")
+                if [ -n "${STATUS}" ]; then
+                    git add "${file}"
+                    results["${file}"]="${FIXED}";
+                fi
+            else
+                OUT=$(${L_CLANG_TOOL} -style file ${file})
+                if [ -n "${OUT}" ]; then
+                    results["${file}"]="${ERROR}"
+                    return 1
+                fi
+            fi
+            ;;
         *)
             OUT=$(git diff -U0 --no-color --cached "${file}" | ${L_CLANG_DIFF_TOOL} -style file -p1 )
             if [[ -n ${OUT} ]]; then
@@ -100,6 +122,8 @@ function help() {
 		        --last              checks current branch against origin/master - doesn't fix
 		        --branch-fix        checks current branch against origin/master and fixes errors - you have to 'git add' and 'git commit' them
 		        --fix               fix style in currently staged files (ignores user.fixinstage variale), this is usefull for manual style applying
+		        --all               check style in all files
+		        --fix-all           fix style in all files
 		
 		If you would like to automatically fix style before commit
 		add to your git config "user.fixinstage" variable with value "True"
@@ -129,7 +153,17 @@ case "${1}" in
     --fix)
         FILES=$(git diff-index --cached --name-only HEAD)
         LAST="Stage" 
-        FIX=true
+        FIX="true"
+        ;;
+    --all)
+        FILES=$(find $L_GIT_DIR -type f -name '*.cpp' -o -name '*.hpp' -o -name '*.c' -o -name '*.h' -o -name '*.cxx' -o -name '*.gcc' -o -name '*.cc')
+        LAST="All" 
+        FIX="false"
+        ;;
+    --fix-all)
+        FILES=$(find $L_GIT_DIR -type f -name '*.cpp' -o -name '*.hpp' -o -name '*.c' -o -name '*.h' -o -name '*.cxx' -o -name '*.gcc' -o -name '*.cc')
+        LAST="All" 
+        FIX="true"
         ;;
     *)
         if [[ $# -ne 0 ]]; then

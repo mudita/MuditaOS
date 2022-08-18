@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-db/EntryPath.hpp>
@@ -58,7 +58,8 @@ namespace settings
         }
     }
 
-    template <typename T, typename... Args> auto message(sys::BusProxy &bus, Args... args)
+    template <typename T, typename... Args>
+    auto message(sys::BusProxy &bus, Args... args)
     {
         bus.sendUnicast(std::make_shared<T>(args...), service::name::db);
     }

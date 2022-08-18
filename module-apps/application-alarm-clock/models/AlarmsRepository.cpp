@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmsRepository.hpp"
@@ -19,8 +19,8 @@ namespace app::alarmClock
     void AlarmsDBRepository::getLimited(std::uint32_t offset, std::uint32_t limit, const OnGetCallback &callback)
     {
         auto request = std::make_unique<alarms::AlarmsGetInRangeRequestMessage>(offset, limit);
-        auto task = async(std::move(request), service::name::service_time); // -> std::unique_ptr<AsyncRequest>;
-        auto cb   = [callback](auto response) {
+        auto task    = async(std::move(request), service::name::service_time); // -> std::unique_ptr<AsyncRequest>;
+        auto cb      = [callback](auto response) {
             auto result = dynamic_cast<alarms::AlarmsGetInRangeResponseMessage *>(response);
             if (result == nullptr) {
                 LOG_ERROR("BAD RESULT");
