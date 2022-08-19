@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallTimer.hpp"
-#include <Timers/TimerFactory.hpp>
 
 CallTimer::CallTimer(sys::TimerHandle handle) : handle(std::move(handle))
 {}
@@ -20,7 +19,8 @@ void CallTimer::stop()
 
 time_t CallTimer::duration()
 {
-    return std::time(nullptr) - startActiveTime;
+    const auto timeElapsed = std::time(nullptr) - startActiveTime;
+    return handle.isActive() ? timeElapsed : 0;
 }
 
 TimerRing::TimerRing(sys::TimerHandle handle) : handle(std::move(handle))
