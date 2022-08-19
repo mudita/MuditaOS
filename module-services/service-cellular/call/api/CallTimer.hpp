@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <memory>
 #include <Timers/TimerHandle.hpp>
 
 namespace call::api
@@ -26,7 +25,7 @@ namespace call::api
 class CallTimer : public call::api::Timer
 {
     sys::TimerHandle handle;
-    std::time_t startActiveTime{};
+    std::time_t startActiveTime{0};
 
   public:
     explicit CallTimer(sys::TimerHandle handle);
