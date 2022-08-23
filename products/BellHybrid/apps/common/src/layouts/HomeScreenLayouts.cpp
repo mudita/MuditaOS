@@ -38,7 +38,7 @@ namespace gui::factory
 
     std::string getDefaultLayout()
     {
-        return "Classic";
+        return "ClassicWithBattery";
     }
 
 } // namespace gui::factory
