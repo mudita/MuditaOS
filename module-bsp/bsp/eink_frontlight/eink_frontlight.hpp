@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include <cstdint>
 #include "bsp/common.hpp"
-#include <utility>
 
 namespace bsp::eink_frontlight
 {

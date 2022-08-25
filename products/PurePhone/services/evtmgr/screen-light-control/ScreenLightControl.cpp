@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ScreenLightControl.hpp"
@@ -177,8 +177,8 @@ namespace pure::screen_light_control
     {
         bsp::eink_frontlight::turnOff();
         stashedReadout = bsp::light_sensor::readout();
-        bsp::light_sensor::standby();
         disableTimers();
+        bsp::light_sensor::standby();
         lightOn = false;
         fadeOut = false;
     }

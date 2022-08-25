@@ -16,7 +16,7 @@ namespace bsp::light_sensor
 {
     using IlluminanceLux = float;
 
-    std::int32_t init(xQueueHandle qHandle);
+    std::int32_t init();
 
     void deinit();
 
@@ -29,6 +29,4 @@ namespace bsp::light_sensor
     bool isPresent();
 
     IlluminanceLux readout();
-
-    BaseType_t IRQHandler();
 } // namespace bsp::light_sensor

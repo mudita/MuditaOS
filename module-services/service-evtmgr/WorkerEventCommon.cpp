@@ -18,14 +18,13 @@
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 
-#include "FreeRTOS.h"
-#include "projdefs.h"
-#include "queue.h"
 #include "task.h"
 
 #include <sys/types.h>
 #include <memory>
 #include <optional>
+
+#include <log/log.hpp>
 
 WorkerEventCommon::WorkerEventCommon(sys::Service *service)
     : sys::Worker(service, stackDepthBytes),

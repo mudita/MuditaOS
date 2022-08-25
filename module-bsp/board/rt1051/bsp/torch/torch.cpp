@@ -12,62 +12,60 @@
 
 using namespace drivers;
 
-static std::shared_ptr<drivers::DriverI2C> i2c;
-
 namespace bsp
 {
-
     namespace torch
     {
-        static xQueueHandle qHandleIrq = nullptr;
-        static constexpr auto delayMs  = 5;
-
-        static I2CAddress addr = {.deviceAddress = 0x63, .subAddress = 0, .subAddressSize = 1};
-
-        std::shared_ptr<DriverGPIO> gpio;
-        const unsigned short max_current_mA = 150;
-        ColourTemperature currentColourTemp = ColourTemperature::warmest;
-
-        void powerOnTorch()
+        namespace
         {
-            gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::TORCH_DRIVER_EN), AL3644TT_ENABLE);
-        }
+            std::shared_ptr<drivers::DriverI2C> i2c;
+            constexpr auto powerStateTransitionDelayMs = 5;
 
-        void powerOffTorch()
-        {
-            gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::TORCH_DRIVER_EN), AL3644TT_DISABLE);
-        }
+            I2CAddress addr = {.deviceAddress = 0x63, .subAddress = 0, .subAddressSize = 1};
 
-        void enablePowerSupply()
-        {
-            // Make sure torch power is supplied to write or read i2c message and wait a bit
-            if (getState() == State::off) {
-                powerOnTorch();
-                vTaskDelay(pdMS_TO_TICKS(delayMs));
+            std::shared_ptr<DriverGPIO> gpio;
+            constexpr unsigned short max_current_mA = 150;
+            ColourTemperature currentColourTemp     = ColourTemperature::warmest;
+
+            void powerOnTorch()
+            {
+                gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::TORCH_DRIVER_EN), AL3644TT_ENABLE);
             }
-        }
 
-        bool write(const drivers::I2CAddress &addr, const uint8_t *txBuff, const size_t size)
-        {
-            enablePowerSupply();
-            auto writeBytes = i2c->Write(addr, txBuff, size);
-            return writeBytes == size;
-        }
+            void powerOffTorch()
+            {
+                gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::TORCH_DRIVER_EN), AL3644TT_DISABLE);
+            }
 
-        bool read(const drivers::I2CAddress &addr, uint8_t *rxBuff, const size_t size)
-        {
-            enablePowerSupply();
-            auto readBytes = i2c->Read(addr, rxBuff, size);
-            return readBytes == size;
-        }
+            void enablePowerSupply()
+            {
+                // Make sure torch power is supplied to write or read i2c message and wait a bit
+                if (getState() == State::off) {
+                    powerOnTorch();
+                    vTaskDelay(pdMS_TO_TICKS(powerStateTransitionDelayMs));
+                }
+            }
 
-        int32_t init(xQueueHandle qHandle)
+            bool write(const drivers::I2CAddress &addr, const uint8_t *txBuff, const size_t size)
+            {
+                enablePowerSupply();
+                auto writeBytes = i2c->Write(addr, txBuff, size);
+                return writeBytes == size;
+            }
+
+            bool read(const drivers::I2CAddress &addr, uint8_t *rxBuff, const size_t size)
+            {
+                enablePowerSupply();
+                auto readBytes = i2c->Read(addr, rxBuff, size);
+                return readBytes == size;
+            }
+        } // namespace
+
+        std::int32_t init()
         {
             i2c = DriverI2C::Create(
                 static_cast<I2CInstances>(BoardDefinitions::TORCH_DRIVER_I2C),
                 DriverI2CParams{.baudrate = static_cast<std::uint32_t>(BoardDefinitions::TORCH_DRIVER_I2C_BAUDRATE)});
-
-            qHandleIrq = qHandle;
 
             gpio =
                 DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::TORCH_DRIVER_GPIO), DriverGPIOParams{});
@@ -78,9 +76,9 @@ namespace bsp
                                               .defLogic = 0,
                                               .pin = static_cast<std::uint32_t>(BoardDefinitions::TORCH_DRIVER_EN)});
             powerOffTorch();
-            vTaskDelay(pdMS_TO_TICKS(delayMs));
+            vTaskDelay(pdMS_TO_TICKS(powerStateTransitionDelayMs));
             powerOnTorch();
-            vTaskDelay(pdMS_TO_TICKS(delayMs));
+            vTaskDelay(pdMS_TO_TICKS(powerStateTransitionDelayMs));
 
             auto present = isPresent();
             turn(State::off);
@@ -90,8 +88,11 @@ namespace bsp
 
         void deinit()
         {
-            qHandleIrq = nullptr;
             turn(State::off);
+
+            /* Explicitly release peripherals */
+            i2c.reset();
+            gpio.reset();
         }
 
         bool isPresent(void)

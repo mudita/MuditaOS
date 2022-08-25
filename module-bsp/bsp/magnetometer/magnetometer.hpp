@@ -16,10 +16,8 @@ extern "C"
 
 namespace bsp
 {
-
     namespace magnetometer
     {
-
         int32_t init(xQueueHandle qHandle);
         void deinit();
 
@@ -33,15 +31,11 @@ namespace bsp
             int16_t Z;
         };
 
-        /// returns a pair of <new_data_read?, values>
-        std::pair<bool, Measurements> getMeasurement();
+        /// returns new data readout if it is available
+        std::optional<Measurements> getMeasurement();
 
         bsp::KeyCodes parse(const Measurements &measurements);
         std::optional<bsp::KeyCodes> WorkerEventHandler();
         void resetCurrentParsedValue();
-
-        BaseType_t IRQHandler();
-        void enableIRQ();
     } // namespace magnetometer
-
 } // namespace bsp

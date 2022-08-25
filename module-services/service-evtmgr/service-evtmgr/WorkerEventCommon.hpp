@@ -49,7 +49,7 @@ class WorkerEventCommon : public sys::Worker
     sys::Service *service = nullptr;
 
   private:
-    static constexpr auto stackDepthBytes = 3072;
+    static constexpr auto stackDepthBytes = 1024 * 4;
 
     static constexpr auto keyboardQueueName = "qIrq";
     static constexpr auto batteryQueueName  = "qBatteryCtrl";
@@ -57,7 +57,6 @@ class WorkerEventCommon : public sys::Worker
 
     static constexpr auto keyboardQueueSize = 10;
     static constexpr auto batteryQueueSize  = 10;
-    static constexpr auto chargerQueueSize  = 5;
     static constexpr auto rtcQueueSize      = 20;
 
     /**
@@ -75,7 +74,6 @@ class WorkerEventCommon : public sys::Worker
      * @brief list of keys with long press enabled. First item is key code, second is long press time.
      */
     std::map<uint32_t, uint32_t> longPressParamsList;
-    bool longPressTaskEnabled = false;
     bsp::KeyEvents lastState  = bsp::KeyEvents::Released;
     bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;

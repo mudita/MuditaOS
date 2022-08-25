@@ -20,15 +20,11 @@ namespace purephone
         static constexpr auto simNotifyQueueName          = "qSIM";
         static constexpr auto magnetometerQueueName       = "qMagnetometer";
         static constexpr auto magnetometerNotifyQueueName = "qMagnetometerNotify";
-        static constexpr auto torchQueueName              = "qTorch";
-        static constexpr auto lightSensorQueueName        = "qLightSensor";
 
         static constexpr auto headsetQueueSize            = 10;
         static constexpr auto simNotifyQueueSize          = 5;
         static constexpr auto magnetometerQueueSize       = 5;
         static constexpr auto magnetometerNotifyQueueSize = 1;
-        static constexpr auto torchQueueSize              = 5;
-        static constexpr auto lightSensorQueueSize        = 5;
 
         void addProductQueues(std::list<sys::WorkerQueueInfo> &queuesList) final;
         void initProductHardware() final;
@@ -48,8 +44,6 @@ namespace purephone
             queueCellular,
             queueMagnetometerIRQ,
             queueMagnetometerNotify,
-            queueTorch,
-            queueLightSensor,
         };
     };
 } // namespace purephone

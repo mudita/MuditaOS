@@ -4,28 +4,21 @@
 #include "bsp/torch/torch.hpp"
 #include <log/log.hpp>
 
-static xQueueHandle qHandleIrq = NULL;
-
 namespace bsp
 {
-
     namespace torch
     {
         State state_simulated               = State::off;
         ColourTemperature currentColourTemp = ColourTemperature::warmest;
 
-        int32_t init(xQueueHandle qHandle)
+        std::int32_t init()
         {
-
-            qHandleIrq      = qHandle;
             state_simulated = State::off;
             return 1;
         }
 
         void deinit()
-        {
-            qHandleIrq = nullptr;
-        }
+        {}
 
         bool isPresent(void)
         {
@@ -68,6 +61,5 @@ namespace bsp
         {
             return true;
         }
-
     } // namespace torch
 } // namespace bsp

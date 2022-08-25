@@ -79,13 +79,6 @@ namespace bsp
             BaseType_t xHigherPriorityTaskWoken = 0;
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO1);
 
-            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ))) {
-                xHigherPriorityTaskWoken |= bsp::magnetometer::IRQHandler();
-                LOG_DEBUG("magneto IRQ! >%s<",
-                          GPIO_PinRead(GPIO1, static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ)) ? "high"
-                                                                                                         : "low");
-            }
-
             if (irq_mask & (1 << BSP_BLUETOOTH_UART_CTS_PIN)) {
                 LOG_DEBUG("CTS IRQ!");
             }
@@ -118,10 +111,6 @@ namespace bsp
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_TRAY_INSERTED_PIN)) {
                 xHigherPriorityTaskWoken |= bsp::cellular::sim::trayIRQHandler();
-            }
-
-            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ))) {
-                xHigherPriorityTaskWoken |= bsp::light_sensor::IRQHandler();
             }
 
             // Clear all IRQs

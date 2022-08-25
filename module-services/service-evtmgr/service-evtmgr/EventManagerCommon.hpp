@@ -49,7 +49,7 @@ class EventManagerCommon : public sys::Service
     static bool messageSetApplication(sys::Service *sender, const std::string &applicationName);
 
   private:
-    static constexpr auto stackDepth = 4096;
+    static constexpr auto stackDepth = 1024 * 4;
     void handleMinuteUpdate(time_t timestamp);
 
     void processRTCFromTmRequest(struct tm &newTime);
