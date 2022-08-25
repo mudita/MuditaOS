@@ -26,17 +26,15 @@ void WorkerEvent::addProductQueues(std::list<sys::WorkerQueueInfo> &queuesList)
     queuesList.emplace_back(simNotifyQueueName, elementSize, simNotifyQueueSize);
     queuesList.emplace_back(magnetometerQueueName, elementSize, magnetometerQueueSize);
     queuesList.emplace_back(magnetometerNotifyQueueName, elementSize, magnetometerNotifyQueueSize);
-    queuesList.emplace_back(torchQueueName, elementSize, torchQueueSize);
-    queuesList.emplace_back(lightSensorQueueName, elementSize, lightSensorQueueSize);
 }
 
 void WorkerEvent::initProductHardware()
 {
-    bsp::headset::Init(queues[static_cast<int32_t>(EventQueues::queueHeadsetIRQ)]->GetQueueHandle());
-    bsp::cellular::init(queues[static_cast<int32_t>(EventQueues::queueCellular)]->GetQueueHandle());
-    bsp::magnetometer::init(queues[static_cast<int32_t>(EventQueues::queueMagnetometerIRQ)]->GetQueueHandle());
-    bsp::torch::init(queues[static_cast<int32_t>(EventQueues::queueTorch)]->GetQueueHandle());
-    bsp::light_sensor::init(queues[static_cast<int32_t>(EventQueues::queueLightSensor)]->GetQueueHandle());
+    bsp::cellular::init(queues[static_cast<std::int32_t>(EventQueues::queueCellular)]->GetQueueHandle());
+    bsp::headset::Init(queues[static_cast<std::int32_t>(EventQueues::queueHeadsetIRQ)]->GetQueueHandle());
+    bsp::magnetometer::init(queues[static_cast<std::int32_t>(EventQueues::queueMagnetometerIRQ)]->GetQueueHandle());
+    bsp::torch::init();
+    bsp::light_sensor::init();
     bsp::keypad_backlight::init();
     bsp::eink_frontlight::init();
     bsp::vibrator::init();
@@ -46,13 +44,13 @@ bool WorkerEvent::handleMessage(std::uint32_t queueID)
 {
     auto &queue = queues[queueID];
 
-    if (queueID == static_cast<uint32_t>(EventQueues::queueHeadsetIRQ)) {
-        uint8_t notification;
+    if (queueID == static_cast<std::uint32_t>(EventQueues::queueHeadsetIRQ)) {
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
         bool headsetState, microphoneState;
-        uint8_t headsetKeyEvent, headsetKeyCode;
+        std::uint8_t headsetKeyEvent, headsetKeyCode;
 
         if (bsp::headset::headset_get_data(headsetState, microphoneState, headsetKeyEvent, headsetKeyCode) ==
             bsp::headset::HeadsetState::Changed) {
@@ -72,8 +70,8 @@ bool WorkerEvent::handleMessage(std::uint32_t queueID)
         }
     }
 
-    if (queueID == static_cast<uint32_t>(EventQueues::queueCellular)) {
-        uint8_t notification;
+    if (queueID == static_cast<std::uint32_t>(EventQueues::queueCellular)) {
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
@@ -100,8 +98,8 @@ bool WorkerEvent::handleMessage(std::uint32_t queueID)
         }
     }
 
-    if (queueID == static_cast<uint32_t>(EventQueues::queueMagnetometerNotify)) {
-        uint8_t notification;
+    if (queueID == static_cast<std::uint32_t>(EventQueues::queueMagnetometerNotify)) {
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
@@ -111,8 +109,8 @@ bool WorkerEvent::handleMessage(std::uint32_t queueID)
         handleMagnetometerEvent();
     }
 
-    if (queueID == static_cast<uint32_t>(EventQueues::queueMagnetometerIRQ)) {
-        uint8_t notification;
+    if (queueID == static_cast<std::uint32_t>(EventQueues::queueMagnetometerIRQ)) {
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
@@ -120,31 +118,24 @@ bool WorkerEvent::handleMessage(std::uint32_t queueID)
         handleMagnetometerEvent();
     }
 
-    if (queueID == static_cast<uint32_t>(EventQueues::queueLightSensor)) {
-        uint8_t notification;
-        if (!queue->Dequeue(&notification, 0)) {
-            return false;
-        }
-        LOG_DEBUG("Light sensor IRQ");
-    }
-
     return WorkerEventCommon::handleMessage(queueID);
 }
 
 void WorkerEvent::deinitProductHardware()
 {
-    bsp::headset::Deinit();
-    bsp::torch::deinit();
-    bsp::keypad_backlight::deinit();
-    bsp::eink_frontlight::deinit();
-    bsp::light_sensor::deinit();
+    /* Deinitialize in reverse order */
     bsp::vibrator::deinit();
+    bsp::eink_frontlight::deinit();
+    bsp::keypad_backlight::deinit();
+    bsp::light_sensor::deinit();
+    bsp::torch::deinit();
     bsp::magnetometer::deinit();
+    bsp::headset::Deinit();
 }
 
 void WorkerEvent::requestSliderPositionRead()
 {
-    uint8_t request = 1;
+    std::uint8_t request = 1;
     if (auto queue = getQueueByName(WorkerEvent::magnetometerNotifyQueueName); !queue->Overwrite(&request)) {
         LOG_ERROR("Unable to overwrite the request.");
     }
@@ -158,16 +149,16 @@ void WorkerEvent::handleMagnetometerEvent()
     }
 }
 
-bsp::KeyCodes WorkerEvent::headsetKeyToKeyboardKey(uint8_t headsetKeyCode)
+bsp::KeyCodes WorkerEvent::headsetKeyToKeyboardKey(std::uint8_t headsetKeyCode)
 {
     switch (headsetKeyCode) {
-    case static_cast<uint8_t>(bsp::headset::KeyCode::Key1):
+    case static_cast<std::uint8_t>(bsp::headset::KeyCode::Key1):
         return bsp::KeyCodes::HeadsetOk;
 
-    case static_cast<uint8_t>(bsp::headset::KeyCode::Key3):
+    case static_cast<std::uint8_t>(bsp::headset::KeyCode::Key3):
         return bsp::KeyCodes::HeadsetVolUp;
 
-    case static_cast<uint8_t>(bsp::headset::KeyCode::Key4):
+    case static_cast<std::uint8_t>(bsp::headset::KeyCode::Key4):
         return bsp::KeyCodes::HeadsetVolDown;
     }
     return bsp::KeyCodes::Undefined;

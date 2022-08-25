@@ -128,8 +128,10 @@ void EventManager::toggleTorchColor()
     }
 }
 
-void EventManager::ProcessCloseReason(sys::CloseReason closeReason)
-{}
+void EventManager::ProcessCloseReason([[maybe_unused]] sys::CloseReason closeReason)
+{
+    backlightHandler.turnOffScreenLight();
+}
 
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {

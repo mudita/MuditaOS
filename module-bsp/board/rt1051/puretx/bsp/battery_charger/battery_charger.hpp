@@ -5,7 +5,6 @@
 
 #include "MAX77818.hpp"
 
-#include <cstdint>
 #include <optional>
 #include <fstream>
 #include <Units.hpp>

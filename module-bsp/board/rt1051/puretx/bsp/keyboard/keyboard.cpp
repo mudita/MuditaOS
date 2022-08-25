@@ -12,9 +12,7 @@
 #include <board.h>
 #include <log/log.hpp>
 
-#include <stdio.h>
-#include <stdint.h>
-#include <assert.h>
+#include <cstdint>
 
 namespace bsp::keyboard
 {
@@ -137,8 +135,8 @@ namespace bsp::keyboard
     {
         std::uint32_t reg = 0;
         /* Assemble a mask for row and column registers */
-        reg = ~(std::uint32_t(~0) << TCA8418_ROWS_COUNT);
-        reg += (~(std::uint32_t(~0) << TCA8418_COL_COUNT)) << 8;
+        reg = ~(static_cast<std::uint32_t>(~0) << TCA8418_ROWS_COUNT);
+        reg |= (~(static_cast<std::uint32_t>(~0) << TCA8418_COL_COUNT)) << 8;
 
         /* Set registers to keypad mode */
         i2cAddr.subAddress = REG_KP_GPIO1;
@@ -185,7 +183,6 @@ namespace bsp::keyboard
 
     std::int32_t init(xQueueHandle qHandle)
     {
-
         i2c = DriverI2C::Create(
             static_cast<I2CInstances>(BoardDefinitions::KEYBOARD_I2C),
             DriverI2CParams{.baudrate = static_cast<std::uint32_t>(BoardDefinitions::KEYBOARD_I2C_BAUDRATE)});
@@ -273,7 +270,7 @@ namespace bsp::keyboard
                 // key release/pressed is stored on the last bit
                 rel_pres = (retval & eventTypeRegisterMask) >> 7;
 
-                KeyEvent keyEvent;
+                KeyEvent keyEvent{};
                 keyEvent.code  = static_cast<KeyCodes>(key);
                 keyEvent.event = static_cast<KeyEvents>(rel_pres);
                 out.push_back(keyEvent);
@@ -283,14 +280,14 @@ namespace bsp::keyboard
         }
 
         if (notification & static_cast<std::uint8_t>(NotificationSource::rightFnPress)) {
-            KeyEvent keyEvent;
+            KeyEvent keyEvent{};
             keyEvent.code  = KeyCodes::FnRight;
             keyEvent.event = KeyEvents::Pressed;
             out.push_back(keyEvent);
         }
 
         if (notification & static_cast<std::uint8_t>(NotificationSource::rightFnRelease)) {
-            KeyEvent keyEvent;
+            KeyEvent keyEvent{};
             keyEvent.code  = KeyCodes::FnRight;
             keyEvent.event = KeyEvents::Released;
             out.push_back(keyEvent);

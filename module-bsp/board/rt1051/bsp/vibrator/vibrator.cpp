@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/vibrator/vibrator.hpp"
 
 #include "board/BoardDefinitions.hpp"
-#include <drivers/gpio/DriverGPIO.hpp>
 #include <drivers/pwm/DriverPWM.hpp>
 
 namespace bsp

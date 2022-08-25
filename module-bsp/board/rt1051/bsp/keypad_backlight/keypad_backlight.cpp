@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/keypad_backlight/keypad_backlight.hpp"
@@ -26,7 +26,7 @@ namespace bsp::keypad_backlight
         std::shared_ptr<drivers::DriverI2C> i2c;
 
         drivers::I2CAddress addr = {
-            .deviceAddress = static_cast<uint32_t>(LP55281_DEVICE_ADDR), .subAddress = 0, .subAddressSize = 1};
+            .deviceAddress = static_cast<std::uint32_t>(LP55281_DEVICE_ADDR), .subAddress = 0, .subAddressSize = 1};
 
         constexpr auto rgbChannelsNum = 3;
 
@@ -106,6 +106,10 @@ namespace bsp::keypad_backlight
     void deinit()
     {
         shutdown();
+
+        /* Explicitly release peripherals */
+        i2c.reset();
+        gpio.reset();
     }
 
     bool configureDiodes()

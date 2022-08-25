@@ -642,14 +642,14 @@ namespace bsp::battery_charger
                 drivers::DriverGPIO::Create(static_cast<drivers::GPIOInstances>(BoardDefinitions::BATTERY_CHARGER_GPIO),
                                             drivers::DriverGPIOParams{});
 
-            drivers::DriverGPIOPinParams INTBPinConfig;
+            drivers::DriverGPIOPinParams INTBPinConfig{};
             INTBPinConfig.dir      = drivers::DriverGPIOPinParams::Direction::Input;
             INTBPinConfig.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::IntFallingEdge;
             INTBPinConfig.defLogic = 0;
             INTBPinConfig.pin      = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN);
             gpio->ConfPin(INTBPinConfig);
 
-            drivers::DriverGPIOPinParams INOKBPinConfig;
+            drivers::DriverGPIOPinParams INOKBPinConfig{};
             INOKBPinConfig.dir      = drivers::DriverGPIOPinParams::Direction::Input;
             INOKBPinConfig.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge;
             INOKBPinConfig.defLogic = 0;
@@ -712,7 +712,7 @@ namespace bsp::battery_charger
 
     int init()
     {
-        drivers::DriverI2CParams i2cParams;
+        drivers::DriverI2CParams i2cParams{};
         i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_I2C_BAUDRATE);
         i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::BATTERY_CHARGER_I2C),
                                          i2cParams);

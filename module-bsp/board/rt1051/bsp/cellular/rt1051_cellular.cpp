@@ -83,7 +83,8 @@ namespace bsp
         MSPInit();
         /// to set Store::GSM sim state and to log debug
         Store::GSM::get()->tray =
-            GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0 ? Store::GSM::Tray::IN : Store::GSM::Tray::OUT;
+            gpio_2->ReadPin(BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0 ? Store::GSM::Tray::IN : Store::GSM::Tray::OUT;
+
         DMAInit();
 
         uartRxBuffer = xMessageBufferCreate(rxMessageBufferLength);
@@ -144,7 +145,7 @@ namespace bsp
 
     RT1051Cellular::~RT1051Cellular()
     {
-        if (uartRxBuffer) {
+        if (uartRxBuffer != nullptr) {
             vMessageBufferDelete(uartRxBuffer);
             uartRxBuffer = nullptr;
         }
@@ -565,7 +566,7 @@ namespace bsp
         LPUART_TransferCreateHandleEDMA(CELLULAR_UART_BASE,
                                         &uartDmaHandle,
                                         uartDMACallback,
-                                        NULL,
+                                        nullptr,
                                         reinterpret_cast<edma_handle_t *>(txDMAHandle->GetHandle()),
                                         reinterpret_cast<edma_handle_t *>(rxDMAHandle->GetHandle()));
     }
@@ -677,7 +678,7 @@ namespace bsp
                                                  DriverGPIOParams{});
                 bool state  = gpio_2->ReadPin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_USB_BOOT_PIN));
 
-                return (state == true ? BootPinState::FIRMWARE_UPGRADE : BootPinState::NORMAL_BOOT);
+                return (state ? BootPinState::FIRMWARE_UPGRADE : BootPinState::NORMAL_BOOT);
             }
             PassthroughState getPassthrough()
             {
@@ -685,7 +686,7 @@ namespace bsp
                                                  DriverGPIOParams{});
                 bool state  = gpio_1->ReadPin(magic_enum::enum_integer(BoardDefinitions::USB_FUNCTION_MUX_SELECT));
 
-                return (state == true ? PassthroughState::ENABLED : PassthroughState::DISABLED);
+                return (state ? PassthroughState::ENABLED : PassthroughState::DISABLED);
             }
 
             // modem needs a reboot to enter DFU (Firmware Upgrade) mode
@@ -722,7 +723,7 @@ namespace bsp
             BaseType_t statusIRQhandler()
             {
                 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-                if (qhandle != NULL) {
+                if (qhandle != nullptr) {
                     std::uint8_t val = static_cast<std::uint8_t>(IRQsource::statusPin);
                     xQueueSendFromISR(qhandle, &val, &xHigherPriorityTaskWoken);
                 }
@@ -738,7 +739,7 @@ namespace bsp
             {
                 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-                if (qhandle) {
+                if (qhandle != nullptr) {
                     std::uint8_t val = static_cast<std::uint8_t>(IRQsource::trayPin);
                     xQueueSendFromISR(qhandle, &val, &xHigherPriorityTaskWoken);
                 }
@@ -747,23 +748,28 @@ namespace bsp
 
             auto getTray() -> Store::GSM::Tray
             {
-                auto state = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0 ? Store::GSM::Tray::IN
-                                                                                          : Store::GSM::Tray::OUT;
+                const auto gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_2),
+                                                       DriverGPIOParams{});
+                const auto state  = gpio_2->ReadPin(BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0 ? Store::GSM::Tray::IN
+                                                                                             : Store::GSM::Tray::OUT;
+
                 return state;
             }
 
             void hotSwapTrigger()
             {
-                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 1);
+                const auto gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_2),
+                                                       DriverGPIOParams{});
+                gpio_2->WritePin(BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 1);
                 vTaskDelay(100); // sleep for 100 ms...
-                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 0);
+                gpio_2->WritePin(BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 0);
             }
 
             void simSelect()
             {
-                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT,
-                              BSP_CELLULAR_SIMSEL_PIN,
-                              static_cast<uint8_t>(Store::GSM::get()->selected));
+                const auto gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_2),
+                                                       DriverGPIOParams{});
+                gpio_2->WritePin(BSP_CELLULAR_SIMSEL_PIN, static_cast<uint8_t>(Store::GSM::get()->selected));
                 LOG_INFO("%s slot selected", magic_enum::enum_name(Store::GSM::get()->selected).data());
             }
         } // namespace sim
@@ -773,7 +779,7 @@ namespace bsp
             auto riIRQHandler() -> BaseType_t
             {
                 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-                if (qhandle != NULL) {
+                if (qhandle != nullptr) {
                     std::uint8_t val = static_cast<std::uint8_t>(IRQsource::ringIndicatorPin);
                     xQueueSendFromISR(qhandle, &val, &xHigherPriorityTaskWoken);
                 }

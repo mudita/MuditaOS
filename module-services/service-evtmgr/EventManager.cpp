@@ -222,8 +222,8 @@ sys::ReturnCodes EventManagerCommon::DeinitHandler()
 
 void EventManagerCommon::ProcessCloseReasonHandler(sys::CloseReason closeReason)
 {
-    EventWorker->deinitProductHardware();
     ProcessCloseReason(closeReason);
+    EventWorker->deinitProductHardware();
     sendCloseReadyMessage(this);
 }
 

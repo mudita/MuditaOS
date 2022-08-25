@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <evtmgr/BacklightHandler.hpp>
@@ -83,6 +83,11 @@ namespace backlight
             }
             screenLightController->processRequest(action);
         });
+    }
+
+    void Handler::turnOffScreenLight()
+    {
+        screenLightController->processRequest(screen_light_control::Action::turnOff);
     }
 
     void Handler::handleKeyPressed(bsp::KeyCodes key)

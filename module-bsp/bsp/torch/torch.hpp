@@ -10,7 +10,6 @@ extern "C"
 }
 
 #include "bsp/common.hpp"
-#include <utility>
 
 namespace bsp::torch
 {
@@ -27,7 +26,7 @@ namespace bsp::torch
         coldest = 6500,
     };
 
-    int32_t init(xQueueHandle qHandle);
+    std::int32_t init();
     void deinit();
 
     bool isPresent(void);

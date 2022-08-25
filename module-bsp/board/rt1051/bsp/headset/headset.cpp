@@ -82,66 +82,73 @@ namespace bsp
                 TypeDontCare
             };
 
-        } // anonymous namespace
+            std::shared_ptr<drivers::DriverI2C> i2c;
+            std::shared_ptr<drivers::DriverGPIO> gpio;
+            drivers::I2CAddress i2cAddr = {.deviceAddress = HEADSET_I2C_ADDR, .subAddress = 0, .subAddressSize = 0x01};
+            TimerHandle_t timerHandle;
 
-        static std::shared_ptr<drivers::DriverI2C> i2c;
-        static std::shared_ptr<drivers::DriverGPIO> gpio;
-        static drivers::I2CAddress i2cAddr = {
-            .deviceAddress = HEADSET_I2C_ADDR, .subAddress = 0, .subAddressSize = 0x01};
-        static TimerHandle_t timerHandle;
+            xQueueHandle qHandleIrq = nullptr;
+            bool HeadsetInserted    = false;
+            bool MicrophoneInserted = false;
 
-        static xQueueHandle qHandleIrq = nullptr;
-        static bool HeadsetInserted    = false;
-        static bool MicrophoneInserted = false;
+            HeadsetType insertedHeadsetType = HeadsetType::TypeDontCare;
 
-        static HeadsetType insertedHeadsetType = HeadsetType::TypeDontCare;
+            void readKeyCodeAndEvent(uint8_t &keyEvent, uint8_t &keyCode)
+            {
+                uint8_t keypress_int = 0;
 
-        static void readKeyCodeAndEvent(uint8_t &keyEvent, uint8_t &keyCode)
-        {
-            uint8_t keypress_int = 0;
+                i2cAddr.subAddress = HEADSET_KEY_PRESS_INT_REG;
+                i2c->Read(i2cAddr, static_cast<uint8_t *>(&keypress_int), 1);
 
-            i2cAddr.subAddress = HEADSET_KEY_PRESS_INT_REG;
-            i2c->Read(i2cAddr, static_cast<uint8_t *>(&keypress_int), 1);
-
-            switch (static_cast<HeadsetIQRKeyPressStatus>(keypress_int)) {
-            case HeadsetIQRKeyPressStatus::KEY4_RELEASE:
-                keyCode  = static_cast<uint8_t>(KeyCode::Key4);
-                keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
-                break;
-            case HeadsetIQRKeyPressStatus::KEY4_PRESS:
-                keyCode  = static_cast<uint8_t>(KeyCode::Key4);
-                keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
-                break;
-            case HeadsetIQRKeyPressStatus::KEY3_RELEASE:
-                keyCode  = static_cast<uint8_t>(KeyCode::Key3);
-                keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
-                break;
-            case HeadsetIQRKeyPressStatus::KEY3_PRESS:
-                keyCode  = static_cast<uint8_t>(KeyCode::Key3);
-                keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
-                break;
-            case HeadsetIQRKeyPressStatus::KEY2_RELEASE:
-                keyCode  = static_cast<uint8_t>(KeyCode::Key2);
-                keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
-                break;
-            case HeadsetIQRKeyPressStatus::KEY2_PRESS:
-                keyCode  = static_cast<uint8_t>(KeyCode::Key2);
-                keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
-                break;
-            case HeadsetIQRKeyPressStatus::KEY1_RELEASE:
-                keyCode  = static_cast<uint8_t>(KeyCode::Key1);
-                keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
-                break;
-            case HeadsetIQRKeyPressStatus::KEY1_PRESS:
-                keyCode  = static_cast<uint8_t>(KeyCode::Key1);
-                keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
-                break;
-            default:
-                keyCode  = static_cast<uint8_t>(KeyCode::Error);
-                keyEvent = static_cast<uint8_t>(KeyEvent::Error);
-                break;
+                switch (static_cast<HeadsetIQRKeyPressStatus>(keypress_int)) {
+                case HeadsetIQRKeyPressStatus::KEY4_RELEASE:
+                    keyCode  = static_cast<uint8_t>(KeyCode::Key4);
+                    keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
+                    break;
+                case HeadsetIQRKeyPressStatus::KEY4_PRESS:
+                    keyCode  = static_cast<uint8_t>(KeyCode::Key4);
+                    keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
+                    break;
+                case HeadsetIQRKeyPressStatus::KEY3_RELEASE:
+                    keyCode  = static_cast<uint8_t>(KeyCode::Key3);
+                    keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
+                    break;
+                case HeadsetIQRKeyPressStatus::KEY3_PRESS:
+                    keyCode  = static_cast<uint8_t>(KeyCode::Key3);
+                    keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
+                    break;
+                case HeadsetIQRKeyPressStatus::KEY2_RELEASE:
+                    keyCode  = static_cast<uint8_t>(KeyCode::Key2);
+                    keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
+                    break;
+                case HeadsetIQRKeyPressStatus::KEY2_PRESS:
+                    keyCode  = static_cast<uint8_t>(KeyCode::Key2);
+                    keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
+                    break;
+                case HeadsetIQRKeyPressStatus::KEY1_RELEASE:
+                    keyCode  = static_cast<uint8_t>(KeyCode::Key1);
+                    keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
+                    break;
+                case HeadsetIQRKeyPressStatus::KEY1_PRESS:
+                    keyCode  = static_cast<uint8_t>(KeyCode::Key1);
+                    keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
+                    break;
+                default:
+                    keyCode  = static_cast<uint8_t>(KeyCode::Error);
+                    keyEvent = static_cast<uint8_t>(KeyEvent::Error);
+                    break;
+                }
             }
-        }
+
+            void TimerHandler(TimerHandle_t xTimer)
+            {
+                if (qHandleIrq != nullptr) {
+                    uint8_t val = 0x01;
+                    xQueueSend(qHandleIrq, &val, 0);
+                    xTimerDelete(xTimer, 0);
+                }
+            }
+        } // anonymous namespace
 
         HeadsetState headset_get_data(bool &headsetState, bool &microphoneState, uint8_t &keyEvent, uint8_t &keyCode)
         {
@@ -159,7 +166,7 @@ namespace bsp
             // Check if jack removed event
             if (((acc_status & static_cast<uint8_t>(HeadsetIQRDetectionResult::DETRES_INSERTION_STATUS)) == 0) &&
                 HeadsetInserted) {
-                HeadsetInserted = false;
+                HeadsetInserted    = false;
                 MicrophoneInserted = false;
 
                 LOG_INFO("Headset removed");
@@ -183,17 +190,17 @@ namespace bsp
                 switch (static_cast<HeadsetIQRDetectionResult>(acc_status)) {
                 case HeadsetIQRDetectionResult::DETRES_3POLE:
                     LOG_INFO("Headset 3-pole detected");
-                    MicrophoneInserted = false;
+                    MicrophoneInserted  = false;
                     insertedHeadsetType = HeadsetType::Type3Pole;
                     break;
                 case HeadsetIQRDetectionResult::DETRES_OMTP:
                     LOG_INFO("Headset 4-pole OMTP detected");
-                    MicrophoneInserted = true;
+                    MicrophoneInserted  = true;
                     insertedHeadsetType = HeadsetType::TypeOMTP;
                     break;
                 case HeadsetIQRDetectionResult::DETRES_CTIA:
                     LOG_INFO("Headset 4-pole Standard detected");
-                    MicrophoneInserted = true;
+                    MicrophoneInserted  = true;
                     insertedHeadsetType = HeadsetType::TypeCTIA;
                     break;
                 default:
@@ -217,15 +224,6 @@ namespace bsp
             }
 
             return headsetStateChange;
-        }
-
-        static void TimerHandler(TimerHandle_t xTimer)
-        {
-            if (qHandleIrq != nullptr) {
-                uint8_t val = 0x01;
-                xQueueSend(qHandleIrq, &val, 0);
-                xTimerDelete(xTimer, 0);
-            }
         }
 
         BaseType_t headset_IRQHandler()
@@ -324,8 +322,8 @@ namespace bsp
 
         status_t Deinit()
         {
-            qHandleIrq      = nullptr;
-            HeadsetInserted = false;
+            qHandleIrq         = nullptr;
+            HeadsetInserted    = false;
             MicrophoneInserted = false;
 
             uint8_t reg        = HEADSET_DEV_SET_RESET;
@@ -335,6 +333,7 @@ namespace bsp
 
             gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
             gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::HEADSET_IRQ_PIN));
+            gpio.reset();
 
             return kStatus_Success;
         }
