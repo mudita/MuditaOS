@@ -13,7 +13,8 @@
 template <KeyMap... keys>
 class GenericLongPressSequence : public AbstractKeySequence
 {
-    using Keys = std::array<KeyMap, sizeof...(keys)>;
+    static constexpr auto keysToScanCount = sizeof...(keys);
+
     enum class State
     {
         Idle,
@@ -32,7 +33,7 @@ class GenericLongPressSequence : public AbstractKeySequence
 
         switch (state) {
         case State::Idle:
-            if (keyStates.count() == keysToScanCount && keyStates.ifOnlySet(keysToScan)) {
+            if (keyStates.count() == keysToScanCount && keyStates.ifOnlySet<keys...>()) {
                 switch_to_in_progress();
             }
             break;
@@ -80,8 +81,6 @@ class GenericLongPressSequence : public AbstractKeySequence
         timer.start();
     }
 
-    static constexpr Keys keysToScan      = {keys...};
-    static constexpr auto keysToScanCount = keysToScan.size();
     State state                           = State::Idle;
     KeyStates keyStates;
     sys::TimerHandle timer;

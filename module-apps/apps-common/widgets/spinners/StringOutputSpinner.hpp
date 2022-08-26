@@ -8,25 +8,6 @@
 #include <string>
 #include <type_traits>
 
-namespace details
-{
-    template <typename T, typename = void>
-    struct container_data
-    {
-        using value = T;
-    };
-
-    template <typename T>
-    struct container_data<T, std::enable_if_t<not std::is_fundamental_v<T>>>
-    {
-        using value = typename T::value_type;
-    };
-
-    template <class T>
-    using container_data_v = typename container_data<T>::value;
-
-} // namespace details
-
 namespace gui
 {
     // This spinner operates on container elements and transforms the current container into a string.
@@ -38,7 +19,7 @@ namespace gui
     {
       public:
         using range      = typename Container::range;
-        using value_type = details::container_data_v<Container>;
+        using value_type = typename Container::value_type;
 
         explicit StringOutputSpinner(Container &&container, Orientation orientation = Orientation::Vertical)
             : container{std::move(container)}, orientation{orientation}

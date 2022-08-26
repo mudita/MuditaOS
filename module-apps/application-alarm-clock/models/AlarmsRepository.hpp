@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -33,7 +33,7 @@ namespace app::alarmClock
         // void GetQuery(std::unique_ptr<sys::DataMessage> query, const AbstractAlarmsRepository::OnResultCallback
         // &callback);
         template <class QueryType, class ResultType, typename... Args>
-        void GetQuery(const AbstractAlarmsRepository::OnResultCallback &callback, Args... args);
+        void GetQuery(const AbstractAlarmsRepository::OnResultCallback &callback, Args &&...args);
         void add(const AlarmEventRecord &alarm, const OnResultCallback &callback) override;
         void remove(const AlarmEventRecord &alarm, const OnResultCallback &callback) override;
         void update(const AlarmEventRecord &alarm, const OnResultCallback &callback) override;

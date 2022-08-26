@@ -61,29 +61,20 @@ struct KeyStates
     {
         states.set(magic_enum::enum_integer(key), value);
     }
-    bool state(KeyMap key)
+    bool state(KeyMap key) const
     {
         return states.test(magic_enum::enum_integer(key));
     }
 
-    std::size_t count()
+    std::size_t count() const
     {
         return states.count();
     }
 
-    template <typename... Args>
-    bool ifOnlySet(Args... args)
+    template <KeyMap... keys>
+    bool ifOnlySet() const
     {
-        const auto mask = (... | [](auto x) { return KeySet{1UL << magic_enum::enum_integer(x)}; }(args));
-        return (states | mask) == mask;
-    }
-
-    template <std::size_t N>
-    bool ifOnlySet(std::array<KeyMap, N> keys)
-    {
-        const auto mask = std::accumulate(keys.begin(), keys.end(), KeySet{}, [](auto m, auto val) {
-            return m | KeySet{1UL << magic_enum::enum_integer(val)};
-        });
+        constexpr auto mask = KeySet{(... | (1UL << magic_enum::enum_integer(keys)))};
         return (states | mask) == mask;
     }
 

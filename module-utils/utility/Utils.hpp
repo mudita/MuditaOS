@@ -75,10 +75,14 @@ namespace utils
         return bytes;
     }
 
+    inline bool startsWith(std::string const &str, std::string const &prefix)
+    {
+        return prefix.size() <= str.size() && std::equal(prefix.begin(), prefix.end(), str.begin());
+    }
+
     inline bool endsWith(std::string const &str, std::string const &suffix)
     {
-        return str.size() >= suffix.size() &&
-               std::equal(str.begin() + (str.size() - suffix.size()), str.end(), suffix.begin());
+        return suffix.size() <= str.size() && std::equal(suffix.rbegin(), suffix.rend(), str.rbegin());
     }
 
     static inline std::string removeNewLines(const std::string &s)

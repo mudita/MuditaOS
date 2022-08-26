@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -79,7 +79,7 @@ namespace gui
         BoundingBox drawArea; // drawableArea would be more accurate
                               // maximal bounding box size
         /// gets bounding box for selected area
-        auto area(Area which = Area::Normal) -> BoundingBox &
+        BoundingBox &area(Area which = Area::Normal)
         {
             switch (which) {
             case Area::Min:
@@ -268,7 +268,7 @@ namespace gui
         /// requests bigger size from parent if parent available
         /// if no parent available - sets size
         /// @return true if handled positively
-        virtual auto requestSize(Length request_w, Length request_h) -> Size final;
+        virtual Size requestSize(Length request_w, Length request_h) final;
         /// handle for layouts to implement to resize on demand ( i.e. when it needs to expand after
         /// addition/removal of chars )
         ///
@@ -282,7 +282,7 @@ namespace gui
         /// should be handled without infinite loop on resize ( item->setSize -> notify Layout -> layout: item->setSize
         /// )
         /// @return bool requested size granted {w,h}
-        virtual auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
+        virtual Size handleRequestResize(const Item *, Length request_w, Length request_h);
 
         /// flag informing that content has changed
         bool contentChanged = false;
@@ -392,7 +392,7 @@ namespace gui
 
         /// simple check function to determine if item is active && visible.
         /// @return true if item is active and visible. Otherwise false.
-        inline bool isActive()
+        inline bool isActive() const
         {
             return (activeItem && visible);
         }
