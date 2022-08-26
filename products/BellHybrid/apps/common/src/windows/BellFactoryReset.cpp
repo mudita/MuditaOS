@@ -33,7 +33,8 @@ namespace gui
         if (icon == nullptr) {
             icon = new Icon(this, 0, 0, style::window_width, style::window_height, "circle_success_big", {});
             icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-            icon->setY(bell_style::popup_icon_y_alignment);
+            icon->text->setVisible(false);
+            icon->resizeItems();
         }
     }
     bool BellFactoryReset::onInput(const InputEvent &)
