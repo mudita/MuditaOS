@@ -411,12 +411,7 @@ namespace gui
 
     std::list<Item *>::iterator BoxLayout::nextNavigationItem(std::list<Item *>::iterator from)
     {
-        return std::find_if(from, this->children.end(), [](auto &el) -> bool {
-            if (el->isActive()) {
-                return true;
-            }
-            return false;
-        });
+        return std::find_if(from, this->children.end(), [](const auto &el) { return el->isActive(); });
     }
 
     std::list<Item *>::iterator BoxLayout::getNavigationFocusedItem()
@@ -465,7 +460,7 @@ namespace gui
     }
 
     template <Axis axis>
-    auto BoxLayout::handleRequestResize(const Item *child, Length request_w, Length request_h) -> Size
+    Size BoxLayout::handleRequestResize(const Item *child, Length request_w, Length request_h)
     {
         if (parent != nullptr) {
             auto [w, h] = requestSize(request_w, request_h);
@@ -570,7 +565,7 @@ namespace gui
         return nullptr;
     }
 
-    auto BoxLayout::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
+    bool BoxLayout::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         addFromOutOfDrawAreaList();
         resizeItems();
@@ -613,7 +608,7 @@ namespace gui
         BoxLayout::addWidget<Axis::X>(item);
     }
 
-    auto HBox::handleRequestResize(const Item *child, Length request_w, Length request_h) -> Size
+    Size HBox::handleRequestResize(const Item *child, Length request_w, Length request_h)
     {
         return BoxLayout::handleRequestResize<Axis::X>(child, request_w, request_h);
     }
@@ -639,7 +634,7 @@ namespace gui
         BoxLayout::addWidget<Axis::Y>(item);
     }
 
-    auto VBox::handleRequestResize(const Item *child, Length request_w, Length request_h) -> Size
+    Size VBox::handleRequestResize(const Item *child, Length request_w, Length request_h)
     {
         return BoxLayout::handleRequestResize<Axis::Y>(child, request_w, request_h);
     }

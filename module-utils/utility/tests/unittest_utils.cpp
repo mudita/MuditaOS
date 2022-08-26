@@ -526,6 +526,44 @@ TEST_CASE("Byte to hex")
     }
 }
 
+TEST_CASE("Starts with")
+{
+    SECTION("Empty string")
+    {
+        REQUIRE((utils::startsWith("", "abc") == false));
+    }
+
+    SECTION("Empty prefix")
+    {
+        REQUIRE((utils::startsWith("abc", "") == true));
+    }
+
+    SECTION("Empty string and prefix")
+    {
+        REQUIRE((utils::startsWith("", "") == true));
+    }
+
+    SECTION("Prefix almost at the beginning of string")
+    {
+        REQUIRE((utils::startsWith("Abcde", "bcd") == false));
+    }
+
+    SECTION("Prefix containing the beginning of string and more")
+    {
+        REQUIRE((utils::startsWith("Abcde", "AAbc") == false));
+    }
+
+    SECTION("Prefix at the beginning of string")
+    {
+        REQUIRE((utils::startsWith("Abcde", "Ab") == true));
+    }
+
+    SECTION("Equal string and prefix")
+    {
+        REQUIRE((utils::startsWith("Abc", "Abc") == true));
+    }
+}
+
 TEST_CASE("Ends with")
 {
     SECTION("Empty string")
@@ -538,22 +576,27 @@ TEST_CASE("Ends with")
         REQUIRE((utils::endsWith("abc", "") == true));
     }
 
-    SECTION("Both empty")
+    SECTION("Empty string and suffix")
     {
         REQUIRE((utils::endsWith("", "") == true));
     }
 
-    SECTION("No")
+    SECTION("Suffix almost at the end of string")
+    {
+        REQUIRE((utils::endsWith("Abcde", "cd") == false));
+    }
+
+    SECTION("Suffix containing the end of string and more")
     {
         REQUIRE((utils::endsWith("Abcde", "def") == false));
     }
 
-    SECTION("Yes")
+    SECTION("Suffix at the end of string")
     {
         REQUIRE((utils::endsWith("Abcde", "de") == true));
     }
 
-    SECTION("Equal")
+    SECTION("Equal string and suffix")
     {
         REQUIRE((utils::endsWith("Abc", "Abc") == true));
     }

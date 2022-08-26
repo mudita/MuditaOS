@@ -7,24 +7,6 @@
 #include <fstream>
 #include <filesystem>
 
-namespace
-{
-    template <typename T>
-    inline bool starts_with(const T &str, const T &start)
-    {
-        if (start.size() > str.size())
-            return false;
-        return str.compare(0, start.size(), start) == 0;
-    }
-    template <typename T>
-    inline bool ends_with(const T &str, const T &end)
-    {
-        if (end.size() > str.size())
-            return false;
-        return std::equal(end.rbegin(), end.rend(), str.rbegin());
-    }
-} // namespace
-
 class DatabaseInitializer
 {
     class ScopedFile

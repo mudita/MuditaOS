@@ -130,8 +130,8 @@ namespace gui
         bool setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
         template <Axis axis>
-        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
+        Size handleRequestResize(const Item *, Length request_w, Length request_h);
+        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         void handleContentChanged() override;
         /// Get primary sizes used in axis dominant layouts
         Length getPrimarySizeLeft();
@@ -146,7 +146,7 @@ namespace gui
         HBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~HBox() = default;
         virtual void addWidget(Item *item) override;
-        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
+        Size handleRequestResize(const Item *, Length request_w, Length request_h) override;
     };
 
     class VBox : public BoxLayout
@@ -157,7 +157,7 @@ namespace gui
         VBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
-        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
+        Size handleRequestResize(const Item *, Length request_w, Length request_h) override;
     };
 
 } /* namespace gui */

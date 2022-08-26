@@ -3,6 +3,9 @@
 
 #include "DatabaseInitializer.hpp"
 
+#include <log/log.hpp>
+#include <Utils.hpp>
+
 #include <algorithm>
 #include <cstdio>
 #include <memory>
@@ -11,7 +14,6 @@
 #include <string>
 #include <sstream>
 #include <array>
-#include <log/log.hpp>
 
 DatabaseInitializer::DatabaseInitializer(Database *db) : db(db)
 {}
@@ -76,11 +78,11 @@ std::vector<std::string> DatabaseInitializer::readCommands(std::filesystem::path
             line += c;
         }
         else {
-            if (line.empty() || starts_with(line, std::string("--"))) {
+            if (line.empty() || utils::startsWith(line, "--")) {
                 line.clear();
                 continue;
             }
-            if (ends_with(line, std::string(";"))) {
+            if (utils::endsWith(line, ";")) {
                 statements.push_back(currentStatement + line);
                 currentStatement.clear();
                 line.clear();

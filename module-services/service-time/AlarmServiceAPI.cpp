@@ -14,9 +14,9 @@ namespace alarms
     namespace AlarmServiceAPI
     {
         template <class requestType, typename... Types>
-        bool sendRequest(sys::Service *serv, Types... messageArgs)
+        bool sendRequest(sys::Service *serv, Types &&...messageArgs)
         {
-            auto msg = std::make_shared<requestType>(messageArgs...);
+            auto msg = std::make_shared<requestType>(std::forward<Types>(messageArgs)...);
             return serv->bus.sendUnicast(msg, service::name::service_time);
         }
 

@@ -79,60 +79,63 @@ namespace gui
         Horizontal
     };
 
-    template <class T>
-    bool operator&(const T &lhs, const T &rhs)
+    // This namespace exists to prevent instantiation of operators for other classes from namespace gui
+    namespace rectangle_enums
     {
-        return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
-    }
-    template <class T>
-    T operator|(const T &lhs, const T &rhs)
-    {
-        return static_cast<T>(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
-    }
-    template <class T>
-    T operator|=(const T &lhs, const T &rhs)
-    {
-        lhs = lhs | rhs;
-        return lhs;
-    }
+        enum class RectangleEdge
+        {
+            None   = 0x00,
+            Top    = 0x01,
+            Bottom = 0x02,
+            Left   = 0x04,
+            Right  = 0x08,
+            All    = 0x0F
+        };
 
-    enum class RectangleEdge
-    {
-        None   = 0x00,
-        Top    = 0x01,
-        Bottom = 0x02,
-        Left   = 0x04,
-        Right  = 0x08,
-        All    = 0x0F
-    };
+        enum class RectangleFlatEdge
+        {
+            None        = 0x00,
+            TopLeft     = 0x01,
+            TopRight    = 0x02,
+            BottomLeft  = 0x04,
+            BottomRight = 0x08
+        };
 
-    enum class RectangleRoundedCorner
-    {
-        None        = 0x00,
-        TopLeft     = 0x10,
-        TopRight    = 0x20,
-        BottomLeft  = 0x40,
-        BottomRight = 0x80,
-        All         = 0xF0,
-    };
+        enum class RectangleRoundedCorner
+        {
+            None        = 0x00,
+            TopLeft     = 0x10,
+            TopRight    = 0x20,
+            BottomLeft  = 0x40,
+            BottomRight = 0x80,
+            All         = 0xF0,
+        };
 
-    enum class RectangleFlatEdge
-    {
-        None        = 0x00,
-        TopLeft     = 0x01,
-        TopRight    = 0x02,
-        BottomLeft  = 0x04,
-        BottomRight = 0x08
-    };
+        enum class RectangleYap
+        {
+            None        = 0x00,
+            TopLeft     = 0x10,
+            TopRight    = 0x20,
+            BottomLeft  = 0x40,
+            BottomRight = 0x80,
+        };
 
-    enum class RectangleYap
-    {
-        None        = 0x00,
-        TopLeft     = 0x10,
-        TopRight    = 0x20,
-        BottomLeft  = 0x40,
-        BottomRight = 0x80,
-    };
+        template <class T>
+        inline bool operator&(const T &lhs, const T &rhs)
+        {
+            return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+        }
+        template <class T>
+        inline T operator|(const T &lhs, const T &rhs)
+        {
+            return static_cast<T>(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
+        }
+    } // namespace rectangle_enums
+
+    using rectangle_enums::RectangleEdge;
+    using rectangle_enums::RectangleFlatEdge;
+    using rectangle_enums::RectangleRoundedCorner;
+    using rectangle_enums::RectangleYap;
 
     enum class Boundaries
     {

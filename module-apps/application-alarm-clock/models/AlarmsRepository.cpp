@@ -35,9 +35,9 @@ namespace app::alarmClock
     }
 
     template <class Request, class Result, typename... Args>
-    void AlarmsDBRepository::GetQuery(const AbstractAlarmsRepository::OnResultCallback &callback, Args... args)
+    void AlarmsDBRepository::GetQuery(const AbstractAlarmsRepository::OnResultCallback &callback, Args &&...args)
     {
-        auto task = async(std::make_unique<Request>(args...), service::name::service_time);
+        auto task = async(std::make_unique<Request>(std::forward<Args>(args)...), service::name::service_time);
         auto cb   = [callback](auto response) {
             auto result = dynamic_cast<Result *>(response);
             if (result == nullptr) {

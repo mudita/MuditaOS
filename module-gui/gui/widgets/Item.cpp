@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Item.hpp"
@@ -157,7 +157,7 @@ namespace gui
         setArea({widgetArea.x, y, widgetArea.w, widgetArea.h});
     }
 
-    auto Item::requestSize(Length request_w, Length request_h) -> Size
+    Size Item::requestSize(Length request_w, Length request_h)
     {
         if (parent == nullptr) {
             setSize(request_w, request_h);
@@ -166,7 +166,7 @@ namespace gui
         return parent->handleRequestResize(this, request_w, request_h);
     }
 
-    auto Item::handleRequestResize(const Item *it, Length request_w, Length request_h) -> Size
+    Size Item::handleRequestResize(const Item *it, Length request_w, Length request_h)
     {
         if (it == nullptr) {
             return {0, 0};
@@ -530,7 +530,7 @@ namespace gui
         return false;
     }
 
-    auto Item::onTimer(sys::Timer &timer) -> bool
+    bool Item::onTimer(sys::Timer &timer)
     {
         if (timerCallback != nullptr) {
             return timerCallback(*this, timer);
