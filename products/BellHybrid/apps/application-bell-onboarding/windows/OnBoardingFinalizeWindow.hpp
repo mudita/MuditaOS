@@ -22,7 +22,6 @@ namespace gui
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 
 } // namespace gui

@@ -21,6 +21,11 @@ namespace gui
 
     void OnBoardingFinalizeWindow::buildInterface()
     {
+        BellFinishedWindow::buildInterface();
+
+        icon->image->set("circle_success_big");
+        icon->resizeItems();
+
         timerCallback = [this](Item &, sys::Timer &) {
             presenter->finalizeOnBoarding();
             return true;
@@ -34,13 +39,5 @@ namespace gui
             return true;
         }
         return false;
-    }
-
-    void OnBoardingFinalizeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        BellFinishedWindow::onBeforeShow(mode, data);
-
-        icon->image->set("circle_success_big");
-        icon->setY(gui::bell_style::popup_icon_y_alignment);
     }
 } // namespace gui
