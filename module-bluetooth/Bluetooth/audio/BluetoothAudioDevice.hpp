@@ -60,8 +60,10 @@ namespace bluetooth
         auto getTraits() const -> Traits override;
         auto getSourceFormat() -> ::audio::AudioFormat override;
 
-        audio::AudioDevice::RetCode Pause() override;
+        audio::AudioDevice::RetCode Start() override;
+        audio::AudioDevice::RetCode Stop() override;
         audio::AudioDevice::RetCode Resume() override;
+        audio::AudioDevice::RetCode Pause() override;
     };
 
     class CVSDAudioDevice : public BluetoothAudioDevice

@@ -6,7 +6,6 @@
 #include <Application.hpp>
 #include <Audio/decoder/Decoder.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <atomic>
 
 namespace gui
 {
