@@ -123,9 +123,9 @@ ServiceAudio::ServiceAudio()
     connect(typeid(HFPDeviceVolumeChanged),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleHFPVolumeChangedOnBluetoothDevice(msg); });
     connect(typeid(message::bluetooth::AudioPause),
-            [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPAudioPause(); });
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleMultimediaAudioPause(); });
     connect(typeid(message::bluetooth::AudioStart),
-            [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPAudioStart(); });
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleMultimediaAudioStart(); });
 }
 
 ServiceAudio::~ServiceAudio()
@@ -429,7 +429,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
         }
 
         if (bluetoothA2DPConnected && playbackType != audio::PlaybackType::CallRingtone) {
-            LOG_DEBUG("Sending Bluetooth start stream request");
             bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Play),
                             service::name::bluetooth);
         }
@@ -452,32 +451,40 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
-    // update bluetooth state
-    if (evt->getType() == EventType::BlutoothA2DPDeviceState) {
-        const auto newState = evt->getDeviceState() == Event::DeviceState::Connected;
-        if (newState != bluetoothA2DPConnected) {
-            LOG_DEBUG("Bluetooth connection status changed: %s", newState ? "connected" : "disconnected");
-            bluetoothA2DPConnected = newState;
-            const auto playbacksToBeStopped{
-                (bluetoothA2DPConnected) ? std::vector<audio::PlaybackType>{audio::PlaybackType::Alarm,
-                                                                            audio::PlaybackType::Meditation,
-                                                                            audio::PlaybackType::Notifications,
-                                                                            audio::PlaybackType::TextMessageRingtone}
-                                         : std::vector<audio::PlaybackType>{audio::PlaybackType::Alarm,
-                                                                            audio::PlaybackType::Meditation,
-                                                                            audio::PlaybackType::Multimedia,
-                                                                            audio::PlaybackType::Notifications,
-                                                                            audio::PlaybackType::TextMessageRingtone}};
-            HandleStop(playbacksToBeStopped, audio::Token());
+    const auto eventType       = evt->getType();
+    const auto deviceConnected = evt->getDeviceState() == audio::Event::DeviceState::Connected;
+
+    switch (eventType) {
+    case EventType::BlutoothA2DPDeviceState: {
+        LOG_DEBUG("Bluetooth A2DP connection status changed: %s", deviceConnected ? "connected" : "disconnected");
+
+        if (!deviceConnected) {
+            handleMultimediaAudioPause();
         }
-    }
-    else if (evt->getType() == EventType::BlutoothHSPDeviceState ||
-             evt->getType() == EventType::BlutoothHFPDeviceState) {
-        auto newState = evt->getDeviceState() == Event::DeviceState::Connected;
-        if (newState != bluetoothVoiceProfileConnected) {
-            LOG_DEBUG("Bluetooth connection status changed: %s", newState ? "connected" : "disconnected");
-            bluetoothVoiceProfileConnected = newState;
+
+        const auto playbacksToBeStopped = std::vector<audio::PlaybackType>{audio::PlaybackType::Alarm,
+                                                                           audio::PlaybackType::Meditation,
+                                                                           audio::PlaybackType::Notifications,
+                                                                           audio::PlaybackType::TextMessageRingtone};
+        HandleStop(playbacksToBeStopped, audio::Token());
+    } break;
+
+    case EventType::BlutoothHSPDeviceState:
+    case EventType::BlutoothHFPDeviceState: {
+        if (deviceConnected != bluetoothVoiceProfileConnected) {
+            LOG_DEBUG("Bluetooth voice connection status changed: %s", deviceConnected ? "connected" : "disconnected");
+            bluetoothVoiceProfileConnected = deviceConnected;
         }
+    } break;
+
+    case EventType::JackState: {
+        if (!deviceConnected) {
+            handleMultimediaAudioPause();
+        }
+    } break;
+
+    default:
+        break;
     }
 
     // update information about endpoints availability
@@ -520,7 +527,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
 
     // stop bluetooth stream if available
     if (bluetoothA2DPConnected) {
-        LOG_DEBUG("Sending Bluetooth stop request");
         bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Stop), service::name::bluetooth);
     }
 
@@ -647,14 +653,13 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     }
     else if (msgType == typeid(AudioStartPlaybackRequest)) {
         auto *msg   = static_cast<AudioStartPlaybackRequest *>(msgl);
-        responseMsg = HandleStart(Operation::Type::Playback, msg->fileName.c_str(), msg->playbackType);
+        responseMsg = HandleStart(Operation::Type::Playback, msg->fileName, msg->playbackType);
     }
     else if (msgType == typeid(AudioStartRecorderRequest)) {
         auto *msg   = static_cast<AudioStartRecorderRequest *>(msgl);
-        responseMsg = HandleStart(Operation::Type::Recorder, msg->fileName.c_str());
+        responseMsg = HandleStart(Operation::Type::Recorder, msg->fileName);
     }
     else if (msgType == typeid(AudioStartRoutingRequest)) {
-        LOG_DEBUG("AudioRoutingStart");
         responseMsg = HandleStart(Operation::Type::Router);
     }
     else if (msgType == typeid(AudioPauseRequest)) {
@@ -870,7 +875,8 @@ auto ServiceAudio::handleHFPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -
     onVolumeChanged(volume, VolumeChangeRequestSource::HFP);
     return sys::msgHandled();
 }
-auto ServiceAudio::handleA2DPAudioPause() -> sys::MessagePointer
+
+auto ServiceAudio::handleMultimediaAudioPause() -> sys::MessagePointer
 {
     if (auto input = audioMux.GetPlaybackInput(audio::PlaybackType::Multimedia);
         input && (*input)->audio->Pause() == RetCode::Success) {
@@ -880,7 +886,7 @@ auto ServiceAudio::handleA2DPAudioPause() -> sys::MessagePointer
     return sys::msgHandled();
 }
 
-auto ServiceAudio::handleA2DPAudioStart() -> sys::MessagePointer
+auto ServiceAudio::handleMultimediaAudioStart() -> sys::MessagePointer
 {
     if (auto input = audioMux.GetPlaybackInput(audio::PlaybackType::Multimedia);
         input && (*input)->audio->Resume() == RetCode::Success) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DecoderWorker.hpp"
@@ -10,7 +10,7 @@ audio::DecoderWorker::DecoderWorker(audio::AbstractStream *audioStreamOut,
                                     EndOfFileCallback endOfFileCallback,
                                     ChannelMode mode)
     : sys::Worker(DecoderWorker::workerName, DecoderWorker::workerPriority, stackDepth), audioStreamOut(audioStreamOut),
-      decoder(decoder), endOfFileCallback(endOfFileCallback),
+      decoder(decoder), endOfFileCallback(std::move(endOfFileCallback)),
       bufferSize(audioStreamOut->getInputTraits().blockSize / sizeof(BufferInternalType)), channelMode(mode)
 {}
 

@@ -57,6 +57,8 @@ namespace bluetooth
                                           AVRCP_SUBUNIT_TYPE_AUDIO,
                                           static_cast<const std::uint8_t *>(AVRCP::subunitInfo),
                                           sizeof(AVRCP::subunitInfo));
+
+            avrcp_target_set_playback_status(AVRCP::mediaTracker.avrcp_cid, AVRCP::playInfo.status);
             return;
 
         case AVRCP_SUBEVENT_CONNECTION_RELEASED:

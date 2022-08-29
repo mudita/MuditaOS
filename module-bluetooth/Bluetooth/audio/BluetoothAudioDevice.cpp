@@ -159,7 +159,7 @@ void CVSDAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
 auto CVSDAudioDevice::decodeCVSD(audio::AbstractStream::Span dataToDecode) -> audio::AbstractStream::Span
 {
     auto decodedData = dataToDecode;
-    std::array<std::int16_t, scratchBufferSize> scratchBuffer;
+    std::array<std::int16_t, scratchBufferSize> scratchBuffer{};
 
     const auto audioBytesRead = dataToDecode.dataSize - packetDataOffset;
     const auto samplesCount   = audioBytesRead / sizeof(std::int16_t);
@@ -293,16 +293,33 @@ void CVSDAudioDevice::setAclHandle(hci_con_handle_t handle)
     aclHandle = handle;
 }
 
-audio::AudioDevice::RetCode A2DPAudioDevice::Pause()
-{
-    return (a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid) == 0)
-               ? audio::AudioDevice::RetCode::Success
-               : audio::AudioDevice::RetCode::Failure;
-}
-
-audio::AudioDevice::RetCode A2DPAudioDevice::Resume()
+audio::AudioDevice::RetCode A2DPAudioDevice::Start()
 {
     return (a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid) == 0)
                ? audio::AudioDevice::RetCode::Success
                : audio::AudioDevice::RetCode::Failure;
+}
+
+audio::AudioDevice::RetCode A2DPAudioDevice::Stop()
+{
+    const auto retCode = a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
+    switch (retCode) {
+    case ERROR_CODE_SUCCESS:
+        return audio::AudioDevice::RetCode::Success;
+    case ERROR_CODE_UNKNOWN_CONNECTION_IDENTIFIER:
+        return audio::AudioDevice::RetCode::Disconnected; // Device disconnected during playback, e.g. headphones
+                                                          // discharged
+    default:
+        return audio::AudioDevice::RetCode::Failure;
+    }
+}
+
+audio::AudioDevice::RetCode A2DPAudioDevice::Resume()
+{
+    return Start();
+}
+
+audio::AudioDevice::RetCode A2DPAudioDevice::Pause()
+{
+    return Stop();
 }

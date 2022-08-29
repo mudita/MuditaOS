@@ -480,7 +480,7 @@ namespace bluetooth
 
             AVRCP::playInfo.status = AVRCP_PLAYBACK_STATUS_PLAYING;
             if (AVRCP::mediaTracker.avrcp_cid != 0u) {
-                avrcp_target_set_playback_status(AVRCP::mediaTracker.avrcp_cid, AVRCP_PLAYBACK_STATUS_PLAYING);
+                avrcp_target_set_playback_status(AVRCP::mediaTracker.avrcp_cid, AVRCP::playInfo.status);
             }
             startTimer(&AVRCP::mediaTracker);
             LOG_INFO(
@@ -504,7 +504,7 @@ namespace bluetooth
 
             AVRCP::playInfo.status = AVRCP_PLAYBACK_STATUS_PAUSED;
             if (AVRCP::mediaTracker.avrcp_cid != 0u) {
-                avrcp_target_set_playback_status(AVRCP::mediaTracker.avrcp_cid, AVRCP_PLAYBACK_STATUS_PAUSED);
+                avrcp_target_set_playback_status(AVRCP::mediaTracker.avrcp_cid, AVRCP::playInfo.status);
             }
             LOG_INFO(
                 "A2DP Source: Stream paused: a2dp_cid [expected 0x%02x, received 0x%02x], local_seid [expected %d, "
@@ -562,13 +562,13 @@ namespace bluetooth
         if (isConnected) {
             disconnect();
         }
-        LOG_INFO("Starting playback");
+        LOG_INFO("Connecting A2DP profile");
         a2dp_source_establish_stream(device.address, &AVRCP::mediaTracker.a2dp_cid);
     }
 
     void A2DP::A2DPImpl::disconnect()
     {
-        LOG_INFO("Stopping playback");
+        LOG_INFO("Disonnecting A2DP profile");
         a2dp_source_disconnect(AVRCP::mediaTracker.a2dp_cid);
         auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
         busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device), service::name::bluetooth);
@@ -612,7 +612,7 @@ namespace bluetooth
     }
     void A2DP::A2DPImpl::deInit()
     {
-        LOG_DEBUG("[A2DP] deinit");
+        LOG_DEBUG("Deinitializing A2DP profile");
 
         sdp_unregister_service(a2dpSdpRecordHandle);
         sdp_unregister_service(avrcpControllerSdpRecordHandle);
