@@ -7,6 +7,7 @@
 * Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
+* Fixed removing wrong sentinels
 * Fixed music player behaviour when connecting/disconnecting audio devices
 * Fixed dropping the call during the DND mode
 * Fixed wrong tethering popup order

@@ -119,6 +119,43 @@ TEST_CASE("GovernorSentinelsVector - single sentinel add and remove")
     REQUIRE(container.empty());
 }
 
+TEST_CASE("GovernorSentinelsVector - a few removed in the middle")
+{
+    using namespace sys;
+    size_t count          = 0;
+    constexpr size_t size = 10;
+    GovernorSentinelsVector container;
+    std::vector<std::shared_ptr<CpuSentinel>> sentinels;
+    std::vector<std::string> sentinelName;
+
+    governed_callback foo = [&](const GovernorSentinel &s) { return false; };
+
+    for (size_t i = 0; i < size; ++i) {
+        sentinelName.push_back("test_" + std::to_string(i));
+        sentinels.push_back(std::make_shared<CpuSentinel>(sentinelName[i], nullptr));
+        container.push_back(std::make_unique<GovernorSentinel>(sentinels[i]));
+    }
+
+    // Remove sentinel in the middle
+    sentinels.erase(sentinels.begin() + 2);
+    sentinelName.erase(sentinelName.begin() + 2);
+
+    // Remove sentinel in the middle
+    sentinels.erase(sentinels.begin() + 6);
+    sentinelName.erase(sentinelName.begin() + 6);
+
+    for_each_governed_sentinel(container, foo);
+
+    auto countSentinels = sentinels.size();
+    for (size_t i = 0; i < countSentinels; ++i) {
+        auto cont = container[i]->GetSentinel();
+        if (not cont.expired()) {
+            count++;
+        }
+    }
+    REQUIRE(count == countSentinels);
+}
+
 TEST_CASE("GovernorSentinelsVector - multiple sentinels add and remove")
 {
     using namespace sys;
