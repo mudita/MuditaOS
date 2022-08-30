@@ -9,8 +9,8 @@
 namespace gui
 {
     TemperatureUnitListItem::TemperatureUnitListItem(const UTF8 &topDesc, Length x, Length y, Length w, Length h)
-        : BellSideListItem(topDesc)
     {
+        setupTopTextBox(topDesc);
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
         setEdges(RectangleEdge::None);
         setFocusItem(body);

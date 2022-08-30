@@ -14,8 +14,9 @@ namespace
 } // namespace
 namespace gui
 {
-    PowerNapListItem::PowerNapListItem() : BellSideListItem(utils::translate("app_bellmain_power_nap"))
+    PowerNapListItem::PowerNapListItem()
     {
+        setupTopTextBox(utils::translate("app_bellmain_power_nap"));
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
         setEdges(RectangleEdge::None);
         setFocusItem(body);
@@ -27,7 +28,7 @@ namespace gui
 
     void PowerNapListItem::createSpinner()
     {
-        spinner = new UIntegerSpinner(UIntegerSpinner::range{spinnerMin, spinnerMax, spinnerStep}, Boundaries::Fixed);
+        spinner = new U8IntegerSpinner(U8IntegerSpinner::range{spinnerMin, spinnerMax, spinnerStep}, Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(powerNapStyle::napPeriodFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -40,7 +41,7 @@ namespace gui
 
     void PowerNapListItem::createBottomDescription()
     {
-        setupBottomDescription("");
+        setupBottomTextBox("");
         bottomText->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
     }
@@ -65,7 +66,7 @@ namespace gui
 
         inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
             if (body->onInput(inputEvent)) {
-                setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(spinner->value()));
+                setBottomDescriptionText(utils::language::getCorrectMinutesNumeralForm(spinner->value()));
                 return true;
             }
             return false;
@@ -80,7 +81,7 @@ namespace gui
     void PowerNapListItem::setSpinnerValue(int value)
     {
         spinner->set_value(value);
-        setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(spinner->value()));
+        setBottomDescriptionText(utils::language::getCorrectMinutesNumeralForm(spinner->value()));
         onValueChanged(value);
     }
 

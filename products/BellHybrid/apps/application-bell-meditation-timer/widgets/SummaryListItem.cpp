@@ -62,7 +62,7 @@ namespace app::meditation
         centerText2->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         centerText2->setRichText(utils::translate("app_meditation_summary_average"));
 
-        setupBottomDescription(format(average));
+        setupBottomTextBox(format(average));
         bottomText->setFont(style::bell_sidelist_item::title_font);
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         bottomText->setEdges(RectangleEdge::None);

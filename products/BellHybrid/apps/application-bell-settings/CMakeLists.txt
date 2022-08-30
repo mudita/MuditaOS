@@ -23,7 +23,7 @@ target_sources(application-bell-settings
     PRIVATE
         ApplicationBellSettings.cpp
         models/TemperatureUnitModel.cpp
-        models/TimeUnitsModel.cpp
+        models/DateTimeUnitsModel.cpp
         models/AboutYourBellModel.cpp
         models/FrontlightListItemProvider.cpp
         models/FrontlightModel.cpp
@@ -49,6 +49,7 @@ target_sources(application-bell-settings
 
         widgets/TemperatureUnitListItem.cpp
         widgets/TimeFormatSetListItem.cpp
+        widgets/DateSetListItem.cpp
         widgets/TimeSetListItem.cpp
         widgets/AboutYourBellListItem.cpp
         widgets/DialogYesNo.cpp
@@ -110,7 +111,7 @@ target_sources(application-bell-settings
         data/FinishedWindowMessageData.hpp
 
     PUBLIC
-        include/application-bell-settings/models/TimeUnitsModel.hpp
+        include/application-bell-settings/models/DateTimeUnitsModel.hpp
         include/application-bell-settings/presenter/TimeUnitsPresenter.hpp
         include/application-bell-settings/windows/BellSettingsTimeUnitsWindow.hpp
         include/application-bell-settings/ApplicationBellSettings.hpp

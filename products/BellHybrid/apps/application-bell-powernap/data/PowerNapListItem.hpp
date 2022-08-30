@@ -11,7 +11,7 @@ namespace gui
 
     class PowerNapListItem : public BellSideListItem
     {
-        gui::UIntegerSpinner *spinner{};
+        gui::U8IntegerSpinner *spinner{};
         Label *bottomDescription{};
 
         void createSpinner();

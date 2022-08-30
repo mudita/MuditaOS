@@ -9,14 +9,14 @@
 
 namespace app::list_items
 {
-    class Numeric : public details::ListItemBase<gui::UIntegerSpinner>
+    class Numeric : public details::ListItemBase<gui::U8IntegerSpinner>
     {
       public:
-        Numeric(gui::UIntegerSpinner::range &&range,
-                gui::AbstractSettingsModel<gui::UIntegerSpinner::value_type> &model,
+        Numeric(gui::U8IntegerSpinner::range &&range,
+                gui::AbstractSettingsModel<gui::U8IntegerSpinner::value_type> &model,
                 const std::string &topDescription    = "",
                 const std::string &bottomDescription = "")
-            : details::ListItemBase<gui::UIntegerSpinner>(std::move(range), model, topDescription, bottomDescription)
+            : details::ListItemBase<gui::U8IntegerSpinner>(std::move(range), model, topDescription, bottomDescription)
         {}
     };
 } // namespace app::list_items

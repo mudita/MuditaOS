@@ -11,8 +11,8 @@ namespace gui
 {
     TimeSetListItem::TimeSetListItem(
         gui::Length x, gui::Length y, gui::Length w, gui::Length h, std::string description)
-        : BellSideListItem(std::move(description))
     {
+        setupTopTextBox(description);
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
         timeSetFmtSpinner = new TimeSetFmtSpinner(body->getCenterBox());
         timeSetFmtSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
