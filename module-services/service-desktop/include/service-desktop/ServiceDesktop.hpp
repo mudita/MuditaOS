@@ -92,6 +92,7 @@ class ServiceDesktop : public sys::Service
     static constexpr unsigned int DefaultLogFlushTimeoutInMs = 1000U;
     bool initialized                                         = false;
     bool isPlugEventUnhandled                                = false;
+    bool isUsbConfigured                                     = false;
 
     void generateDeviceUniqueId();
     auto getDeviceUniqueId() const -> std::string;
