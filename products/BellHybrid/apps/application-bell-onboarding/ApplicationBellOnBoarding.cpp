@@ -21,7 +21,7 @@
 #include <common/models/LayoutModel.hpp>
 
 #include <application-bell-settings/models/TemperatureUnitModel.hpp>
-#include <application-bell-settings/models/TimeUnitsModel.hpp>
+#include <application-bell-settings/models/DateTimeUnitsModel.hpp>
 #include <application-bell-settings/presenter/TimeUnitsPresenter.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <AppMessage.hpp>
@@ -78,7 +78,7 @@ namespace app
             gui::window::name::onBoardingSettingsWindow, [this](ApplicationCommon *app, const std::string &name) {
                 auto layoutModel          = std::make_unique<bell_settings::LayoutModel>(this);
                 auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
-                auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModelFactoryResetValues>(app);
+                auto timeUnitsProvider    = std::make_shared<bell_settings::DateTimeUnitsModelFactoryResetValues>(app);
                 auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(
                     this, timeUnitsProvider, std::move(temperatureUnitModel), std::move(layoutModel));
                 return std::make_unique<gui::OnBoardingSettingsWindow>(app, std::move(presenter), name);

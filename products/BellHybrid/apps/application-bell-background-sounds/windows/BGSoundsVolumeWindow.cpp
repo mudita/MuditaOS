@@ -36,15 +36,15 @@ namespace gui
         topMessage->drawUnderline(false);
 
         auto data = presenter->getVolumeData();
-        spinner   = new UIntegerSpinner({static_cast<UIntegerSpinner::value_type>(data.min),
-                                       static_cast<UIntegerSpinner::value_type>(data.max),
-                                       static_cast<UIntegerSpinner::value_type>(data.step)},
-                                      Boundaries::Fixed);
+        spinner   = new U8IntegerSpinner({static_cast<U8IntegerSpinner::value_type>(data.min),
+                                        static_cast<U8IntegerSpinner::value_type>(data.max),
+                                        static_cast<U8IntegerSpinner::value_type>(data.step)},
+                                       Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         spinner->setFont(bgSoundsStyle::valumeValueFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setFocusEdges(RectangleEdge::None);
-        spinner->set_value(static_cast<UIntegerSpinner::value_type>(presenter->getVolume()));
+        spinner->set_value(static_cast<U8IntegerSpinner::value_type>(presenter->getVolume()));
         body->getCenterBox()->addWidget(spinner);
 
         spinner->onValueChanged = [this](const auto &value) { presenter->setVolume(value); };

@@ -66,7 +66,7 @@ namespace app::list_items
                 body->getCenterBox()->addWidget(spinner);
 
                 if (not this->bottomDescription.empty()) {
-                    setupBottomDescription(this->bottomDescription);
+                    setupBottomTextBox(this->bottomDescription);
                 }
 
                 spinner->onValueChanged = [this](const auto &val) {

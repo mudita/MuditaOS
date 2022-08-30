@@ -30,6 +30,11 @@ namespace gui
     class TimeSetFmtSpinner : public HBox
     {
       public:
+        enum class Period
+        {
+            AM,
+            PM
+        };
         explicit TimeSetFmtSpinner(
             Item *parent                               = nullptr,
             uint32_t x                                 = 0U,
@@ -43,6 +48,7 @@ namespace gui
         auto setTimeFormatSpinnerVisibility(bool visibility) noexcept -> void;
         auto setHour(int value) noexcept -> void;
         auto setMinute(int value) noexcept -> void;
+        auto set12HPeriod(Period period) -> void;
         auto setTime(std::time_t time) noexcept -> void;
         auto setEditMode(EditMode newEditMode) noexcept -> void;
         auto setFont(std::string newFontName) noexcept -> void;
@@ -51,6 +57,8 @@ namespace gui
 
         [[nodiscard]] auto getTime() const noexcept -> std::time_t;
         [[nodiscard]] auto getHour() const noexcept -> int;
+        /// Always returns current hour in 24-hour format, even if the currently set format is set to 12-hour clock.
+        [[nodiscard]] auto getHour24Format() const noexcept -> std::chrono::hours;
         [[nodiscard]] auto getMinute() const noexcept -> int;
         [[nodiscard]] auto isPM() const noexcept -> bool;
 

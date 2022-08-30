@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <application-bell-settings/models/TimeUnitsModel.hpp>
+#include <application-bell-settings/models/DateTimeUnitsModel.hpp>
 
 #include <apps-common/BasePresenter.hpp>
 
@@ -37,7 +37,7 @@ namespace app::bell_settings
     {
       public:
         explicit TimeUnitsWindowPresenter(app::ApplicationCommon *app,
-                                          std::shared_ptr<TimeUnitsModel> pagesProvider,
+                                          std::shared_ptr<DateTimeUnitsModel> pagesProvider,
                                           std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel,
                                           std::unique_ptr<AbstractLayoutModel> layoutModel);
 
@@ -49,7 +49,7 @@ namespace app::bell_settings
 
       private:
         app::ApplicationCommon *app{};
-        std::shared_ptr<TimeUnitsModel> pagesProvider;
+        std::shared_ptr<DateTimeUnitsModel> pagesProvider;
         std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel;
         std::unique_ptr<AbstractLayoutModel> layoutModel;
     };

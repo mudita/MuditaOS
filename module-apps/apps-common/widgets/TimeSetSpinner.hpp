@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -62,9 +62,9 @@ namespace gui
             {style::window::font::huge,
              {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}}};
 
-        UIntegerSpinner *hour        = nullptr;
+        U8IntegerSpinner *hour        = nullptr;
         ImageBox *colon              = nullptr;
-        UIntegerSpinnerFixed *minute = nullptr;
+        U8IntegerSpinnerFixed *minute = nullptr;
         EditMode editMode            = EditMode::Edit;
         Item *lastFocus              = nullptr;
         std::string focusFontName    = style::window::font::supersizeme;

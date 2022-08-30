@@ -16,7 +16,7 @@ namespace gui
     {
         std::unique_ptr<app::bgSounds::AbstractBGSoundsVolumePresenter> presenter;
         BellBaseLayout *body{};
-        UIntegerSpinner *spinner = nullptr;
+        U8IntegerSpinner *spinner = nullptr;
 
         void buildInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;

@@ -74,6 +74,7 @@ namespace gui
 
         void set_range(const range &range);
         void set_value(const value_type &value);
+        auto get_value() -> value_type;
         [[nodiscard]] auto value() const noexcept;
 
       private:
@@ -184,6 +185,12 @@ namespace gui
     {
         container.set(value);
         update();
+    }
+
+    template <typename Container, typename Formatter>
+    auto StringOutputSpinner<Container, Formatter>::get_value() -> StringOutputSpinner<Container, Formatter>::value_type
+    {
+        return container.get();
     }
 
     template <typename Container, typename Formatter>

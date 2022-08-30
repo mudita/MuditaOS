@@ -20,8 +20,8 @@ namespace gui
 {
     TimeFormatSetListItem::TimeFormatSetListItem(
         Length x, Length y, Length w, Length h, const UTF8 &topDesc, const UTF8 &botDesc)
-        : BellSideListItem(topDesc)
     {
+        setupTopTextBox(topDesc);
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
         setEdges(RectangleEdge::None);
         setFocusItem(body);
@@ -36,7 +36,7 @@ namespace gui
         };
 
         body->getCenterBox()->addWidget(timeFormat);
-        setupBottomDescription(botDesc);
+        setupBottomTextBox(botDesc);
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
             body->setArea({0, 0, newDim.w, newDim.h});
             return true;

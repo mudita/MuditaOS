@@ -1,31 +1,29 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "BellBaseLayout.hpp"
-#include <ListItemWithDescription.hpp>
-
-namespace style::bell_sidelist_item
-{
-    inline constexpr auto title_font       = style::window::font::largelight;
-    inline constexpr auto description_font = style::window::font::verybiglight;
-
-} // namespace style::bell_sidelist_item
+#include "BellSideListItemStyle.hpp"
+#include <ListItem.hpp>
 
 namespace gui
 {
     class TextFixedSize;
-    class BellSideListItem : public ListItemWithDescription
+    class BellSideListItem : public ListItem
     {
       public:
-        BellBaseLayout *body = nullptr;
-
-        explicit BellSideListItem(const std::string &description);
-        void setupBottomDescription(const std::string &description);
-        void setBottomDescribtionText(const std::string &description);
+        void setBottomDescriptionText(const std::string &description);
 
       protected:
+        BellSideListItem();
+        void setupBottomTextBox(const std::string &description);
+        void setupTopTextBox(const std::string &description);
+
+        BellBaseLayout *body      = nullptr;
         TextFixedSize *bottomText = nullptr;
+
+      private:
+        void setupTextBox(TextFixedSize *textBox, const std::string &fontName, const std::string &description);
     };
 } /* namespace gui */
