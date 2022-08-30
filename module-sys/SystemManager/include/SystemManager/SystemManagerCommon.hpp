@@ -193,6 +193,7 @@ namespace sys
         void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency);
 
         bool cpuStatisticsTimerInit{false};
+        bool serviceListReversed{false};
 
         CloseReason closeReason{CloseReason::RegularPowerDown};
         UpdateReason updateReason{UpdateReason::Update};
