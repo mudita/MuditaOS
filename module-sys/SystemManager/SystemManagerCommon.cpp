@@ -67,11 +67,12 @@ namespace sys
     {
         namespace restore
         {
-            static constexpr std::array whitelist = {service::name::service_desktop,
-                                                     service::name::evt_manager,
-                                                     service::name::eink,
-                                                     service::name::appmgr,
-                                                     service::name::cellular};
+            static constexpr std::array whitelist = {
+                service::name::service_desktop, // Handle restore procedure
+                service::name::evt_manager, // Workaround for charging battery after shutting down and turn on the phone
+                service::name::appmgr,
+                service::name::cellular,
+            };
         }
 
         namespace regularClose
@@ -704,7 +705,10 @@ namespace sys
 
         // We are going to remove services in reversed order of creation
         CriticalSection::Enter();
-        std::reverse(servicesList.begin(), servicesList.end());
+        if (not serviceListReversed) {
+            std::reverse(servicesList.begin(), servicesList.end());
+            serviceListReversed = true;
+        }
         CriticalSection::Exit();
 
         InitiateSystemCloseSequence(closeReason);
@@ -741,10 +745,12 @@ namespace sys
     void SystemManagerCommon::RestoreSystemHandler()
     {
         LOG_INFO("Entering restore system state");
-
         // We are going to remove services in reversed order of creation
         CriticalSection::Enter();
-        std::reverse(servicesList.begin(), servicesList.end());
+        if (not serviceListReversed) {
+            std::reverse(servicesList.begin(), servicesList.end());
+            serviceListReversed = true;
+        }
         CriticalSection::Exit();
 
         DestroyServices(sys::state::restore::whitelist);

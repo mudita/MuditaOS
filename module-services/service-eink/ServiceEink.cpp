@@ -111,6 +111,8 @@ namespace service::eink
 
     sys::ReturnCodes ServiceEink::DeinitHandler()
     {
+        // Eink must be turn on before wiping out the display
+        display->powerOn();
         if (exitAction == ExitAction::WipeOut) {
             display->wipeOut();
         }
