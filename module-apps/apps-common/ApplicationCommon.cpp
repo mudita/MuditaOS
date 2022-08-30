@@ -927,7 +927,7 @@ namespace app
         windowsStack().push(newWindow, windowsFactory.build(this, newWindow), d);
     }
 
-    std::optional<std::string> ApplicationCommon::getPrevWindow(uint32_t count) const
+    std::optional<std::string> ApplicationCommon::getPreviousWindow(uint32_t count) const
     {
         return windowsStack().get(count);
     }
