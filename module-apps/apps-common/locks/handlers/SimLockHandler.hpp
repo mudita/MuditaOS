@@ -22,7 +22,7 @@ namespace locks
 
         SimInputTypeAction simInputTypeAction = SimInputTypeAction::UnlockWithPin;
         unsigned int storedErrorCode          = 0;
-        bool simUnlockBlockOnLockedPhone      = false;
+        bool simUnlockingNeeded_              = false;
         bool simReady                         = false;
         StoredLockInput storedFirstInput;
         StoredLockInput storedSecondInput;
@@ -48,10 +48,10 @@ namespace locks
       public:
         explicit SimLockHandler(sys::Service *owner);
 
-        void setSimUnlockBlockOnLockedPhone();
         void setSimReady();
 
-        sys::MessagePointer releaseSimUnlockBlockOnLockedPhone();
+        void needSimUnlocking();
+        sys::MessagePointer askForSimUnlocking();
 
         sys::MessagePointer verifySimLockInput(LockInput inputData);
 

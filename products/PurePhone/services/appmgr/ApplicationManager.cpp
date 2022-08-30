@@ -197,7 +197,7 @@ namespace app::manager
         });
         connect(typeid(locks::UnlockedPhone), [&](sys::Message *request) -> sys::MessagePointer {
             autoLockTimer.start();
-            return simLockHandler.releaseSimUnlockBlockOnLockedPhone();
+            return simLockHandler.askForSimUnlocking();
         });
         connect(typeid(locks::ChangePhoneLock),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleChangePhoneLock(); });
@@ -228,7 +228,7 @@ namespace app::manager
         connect(typeid(cellular::msg::notification::SimNeedPin), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<cellular::msg::notification::SimNeedPin *>(request);
             if (phoneLockHandler.isPhoneLocked()) {
-                simLockHandler.setSimUnlockBlockOnLockedPhone();
+                simLockHandler.needSimUnlocking();
             }
             return simLockHandler.handleSimPinRequest(data->attempts);
         });
@@ -250,7 +250,7 @@ namespace app::manager
         connect(typeid(cellular::msg::notification::SimNeedPuk), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<cellular::msg::notification::SimNeedPuk *>(request);
             if (phoneLockHandler.isPhoneLocked()) {
-                simLockHandler.setSimUnlockBlockOnLockedPhone();
+                simLockHandler.needSimUnlocking();
             }
             return simLockHandler.handleSimPukRequest(data->attempts);
         });
@@ -296,14 +296,14 @@ namespace app::manager
                 });
         connect(typeid(cellular::msg::notification::SimBlocked), [&](sys::Message *request) -> sys::MessagePointer {
             if (phoneLockHandler.isPhoneLocked()) {
-                simLockHandler.setSimUnlockBlockOnLockedPhone();
+                simLockHandler.needSimUnlocking();
             }
             return simLockHandler.handleSimBlockedRequest();
         });
         connect(typeid(cellular::msg::notification::UnhandledCME), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<cellular::msg::notification::UnhandledCME *>(request);
             if (phoneLockHandler.isPhoneLocked()) {
-                simLockHandler.setSimUnlockBlockOnLockedPhone();
+                simLockHandler.needSimUnlocking();
             }
             return simLockHandler.handleCMEErrorRequest(data->code);
         });

@@ -113,7 +113,7 @@ namespace locks
         lock.attemptsLeft = attempts;
         lock.lockName     = utils::enumToString(Store::GSM::get()->selected);
 
-        if (simUnlockBlockOnLockedPhone) {
+        if (simUnlockingNeeded_) {
             return sys::msgNotHandled();
         }
 
@@ -134,7 +134,7 @@ namespace locks
         lock.attemptsLeft = attempts;
         lock.lockName     = utils::enumToString(Store::GSM::get()->selected);
 
-        if (simUnlockBlockOnLockedPhone) {
+        if (simUnlockingNeeded_) {
             return sys::msgNotHandled();
         }
 
@@ -240,7 +240,7 @@ namespace locks
     {
         setSimInputTypeAction(SimInputTypeAction::Blocked);
 
-        if (simUnlockBlockOnLockedPhone) {
+        if (simUnlockingNeeded_) {
             return sys::msgNotHandled();
         }
 
@@ -255,7 +255,7 @@ namespace locks
     {
         setSimInputTypeAction(SimInputTypeAction::Error);
 
-        if (simUnlockBlockOnLockedPhone) {
+        if (simUnlockingNeeded_) {
             storedErrorCode = errorCode;
             return sys::msgNotHandled();
         }
@@ -332,9 +332,9 @@ namespace locks
         }
     }
 
-    void SimLockHandler::setSimUnlockBlockOnLockedPhone()
+    void SimLockHandler::needSimUnlocking()
     {
-        simUnlockBlockOnLockedPhone = true;
+        simUnlockingNeeded_ = true;
     }
 
     void SimLockHandler::setSimReady()
@@ -343,24 +343,26 @@ namespace locks
         simReadyAction();
     }
 
-    sys::MessagePointer SimLockHandler::releaseSimUnlockBlockOnLockedPhone()
+    sys::MessagePointer SimLockHandler::askForSimUnlocking()
     {
-        if (simUnlockBlockOnLockedPhone) {
-            simUnlockBlockOnLockedPhone = false;
-            if (simInputTypeAction == SimInputTypeAction::UnlockWithPin) {
-                return handleSimPinRequest(lock.getAttemptsLeft());
-            }
-            else if (simInputTypeAction == SimInputTypeAction::UnlockWithPuk) {
-                return handleSimPukRequest(lock.getAttemptsLeft());
-            }
-            else if (simInputTypeAction == SimInputTypeAction::Blocked) {
-                return handleSimBlockedRequest();
-            }
-            else if (simInputTypeAction == SimInputTypeAction::Error) {
-                return handleCMEErrorRequest(storedErrorCode);
-            }
+        if (!simUnlockingNeeded_) {
+            return sys::msgNotHandled();
         }
-        return sys::msgNotHandled();
+
+        simUnlockingNeeded_ = false;
+        switch (simInputTypeAction) {
+        case SimInputTypeAction::UnlockWithPin:
+            return handleSimPinRequest(lock.getAttemptsLeft());
+        case SimInputTypeAction::UnlockWithPuk:
+            return handleSimPukRequest(lock.getAttemptsLeft());
+        case SimInputTypeAction::Blocked:
+            return handleSimBlockedRequest();
+        case SimInputTypeAction::Error:
+            return handleCMEErrorRequest(storedErrorCode);
+        default:
+            LOG_WARN("got message of unexpected type: %s", magic_enum::enum_name(simInputTypeAction).data());
+            return sys::msgNotHandled();
+        }
     }
 
     sys::MessagePointer SimLockHandler::resolveNewInputAction(LockInput firstInputData, LockInput secondInputData)

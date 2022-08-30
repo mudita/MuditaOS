@@ -206,7 +206,7 @@ namespace app
 
         auto selectedWindowCondition =
             getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow &&
-            msg->getWindowName() == *getPrevWindow() &&
+            msg->getWindowName() == *getPreviousWindow() &&
             msg->getSenderWindowName() == gui::window::name::informationOnBoardingWindow;
 
         if (selectedWindowCondition && informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
@@ -238,7 +238,7 @@ namespace app
                      inputEvent.isKeyRelease(gui::KeyCode::KEY_LEFT)) {
                 informationState = OnBoarding::InformationStates::DeepClickWarningInfo;
                 if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
-                    displayInformation(*getPrevWindow());
+                    displayInformation(*getPreviousWindow());
                 }
                 else {
                     displayInformation(getCurrentWindow()->getName());
@@ -248,7 +248,7 @@ namespace app
                 if (informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
                     informationPromptTimer.stop();
                     informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
-                    displayInformation(*getPrevWindow());
+                    displayInformation(*getPreviousWindow());
                 }
                 else {
                     informationState = OnBoarding::InformationStates::RotateInfo;
@@ -260,13 +260,13 @@ namespace app
                 switch (informationState) {
                 case OnBoarding::InformationStates::DeepClickCorrectionInfo:
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(*getPrevWindow());
+                        switchWindow(*getPreviousWindow());
                         return true;
                     }
                     break;
                 case OnBoarding::InformationStates::LightClickInfo:
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(*getPrevWindow());
+                        switchWindow(*getPreviousWindow());
                         return true;
                     }
                     break;
@@ -274,7 +274,7 @@ namespace app
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) ||
                         inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN) ||
                         inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(*getPrevWindow());
+                        switchWindow(*getPreviousWindow());
                         return true;
                     }
                     break;

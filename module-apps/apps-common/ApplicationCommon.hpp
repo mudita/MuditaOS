@@ -377,7 +377,7 @@ namespace app
         void pushWindow(const std::string &newWindow, const gui::popup::Disposition &d = gui::popup::WindowDisposition);
         /// getter for previous window name
         /// @ingrup AppWindowStack
-        std::optional<std::string> getPrevWindow(uint32_t count = 1) const;
+        std::optional<std::string> getPreviousWindow(std::uint32_t count = 1) const;
         /// clears windows stack
         /// @ingrup AppWindowStack
         void cleanPrevWindw();
