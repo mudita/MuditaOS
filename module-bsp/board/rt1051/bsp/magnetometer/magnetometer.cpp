@@ -35,8 +35,8 @@ namespace bsp
 
             xQueueHandle qHandleIrq = nullptr;
 
-            bsp::KeyCodes current_parsed = bsp::KeyCodes::Undefined;
-
+            bsp::KeyCodes current_parsed       = bsp::KeyCodes::Undefined;
+            bsp::KeyCodes last_slider_position = bsp::KeyCodes::Undefined;
             Measurements last{};
 
             enum class LPDCM_INACTIVE_TIME
@@ -265,8 +265,7 @@ namespace bsp
                 als31300::measurements_LSB_reg reg_lsb = read_reg;
 
                 meas.X = als31300::measurement_sign_convert(reg_msb.X_MSB << 4 | reg_lsb.X_LSB);
-                meas.Y = als31300::measurement_sign_convert(
-                    reg_msb.Y_MSB << 4 | reg_lsb.Z_LSB); // TODO here we merge wrong registers - Y with Z
+                meas.Y = als31300::measurement_sign_convert(reg_msb.Y_MSB << 4 | reg_lsb.Y_LSB);
                 meas.Z = als31300::measurement_sign_convert(reg_msb.Z_MSB << 4 | reg_lsb.Z_LSB);
 
                 return meas;
@@ -307,24 +306,25 @@ namespace bsp
             // Y is used only for proofing X, so no strict thresholds
             // Z is useless
 
-            auto code = bsp::KeyCodes::Undefined;
+            auto position = last_slider_position;
 
             if (sliderChangedPosition(measurements)) {
                 if (measurements.X < X_lower_threshold) {
                     if (measurements.Y > Y_threshold) {
-                        code = bsp::KeyCodes::SSwitchDown;
+                        position = bsp::KeyCodes::SSwitchDown;
                     }
                 }
                 if (measurements.X > X_upper_threshold) {
                     if (measurements.Y > Y_threshold) {
-                        code = bsp::KeyCodes::SSwitchUp;
+                        position = bsp::KeyCodes::SSwitchUp;
                     }
                 }
                 if (measurements.Y < Y_threshold) {
-                    code = bsp::KeyCodes::SSwitchMid;
+                    position = bsp::KeyCodes::SSwitchMid;
                 }
+                last_slider_position = position;
             }
-            return code;
+            return position;
         }
 
         void resetCurrentParsedValue()
