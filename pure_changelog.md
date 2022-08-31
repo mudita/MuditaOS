@@ -7,6 +7,7 @@
 * Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
+* Fixed cellular DMA errors
 * Fixed order of the services while closing system
 * Fixed crash of the E-ink service while restoring system data
 * Fixed removing wrong sentinels
