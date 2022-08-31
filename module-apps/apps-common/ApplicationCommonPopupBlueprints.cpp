@@ -7,7 +7,6 @@
 #include "service-db/Settings.hpp"
 #include "service-db/agents/settings/SystemSettings.hpp"
 #include "popups/data/PopupData.hpp"
-#include "popups/data/BedtimeReminderPopupRequestParams.hpp"
 
 namespace app
 {
@@ -132,19 +131,6 @@ namespace app
                 switchWindowPopup(gui::popup::resolveWindowName(id),
                                   popupParams->getDisposition(),
                                   std::make_unique<gui::AlarmPopupRequestParams>(popupParams));
-                return true;
-            });
-
-        popupBlueprint.registerBlueprint(
-            ID::BedtimeNotification, [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
-                auto popupParams = dynamic_cast<gui::BedtimeReminderPopupRequestParams *>(params.get());
-                if (popupParams == nullptr) {
-                    return false;
-                }
-
-                switchWindowPopup(gui::popup::resolveWindowName(id),
-                                  params->getDisposition(),
-                                  std::make_unique<gui::BedtimeReminderPopupRequestParams>(popupParams->eventRecord));
                 return true;
             });
     }

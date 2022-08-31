@@ -29,7 +29,7 @@ namespace alarms
         FrontlightAction(sys::Service &service,
                          Mode mode,
                          SettingsDependency settingsDependency = SettingsDependency::None);
-        bool execute(Record record) override;
+        bool execute() override;
         bool turnOff() override;
 
       private:
