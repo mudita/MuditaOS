@@ -94,7 +94,7 @@ function(add_gtest_executable)
     set(_TESTNAME "googletest-${_TEST_ARGS_NAME}")
 
     if(NOT _TEST_ARGS_SRCS)
-        message(FATAL_ERROR "You must provide test sources for ${_TESTNAME}")
+	message(FATAL_ERROR "You must provide test sources for ${_TESTNAME}")
     endif(NOT _TEST_ARGS_SRCS)
 
     get_directory_property(_TEST_ENTITY TEST_ENTITY)
@@ -242,54 +242,6 @@ function(add_test_entity)
     add_custom_target(unittests-${_ARGS_NAME})
     add_custom_target(check-${_ARGS_NAME} ${CMAKE_CTEST_COMMAND} -L ${_ARGS_NAME})
     add_dependencies(check-${_ARGS_NAME} unittests-${_ARGS_NAME})
-endfunction()
-
-function(add_gtest_manually_prepared_target)
-    cmake_parse_arguments(
-        _TEST_ARGS
-        ""
-        "NAME"
-        ""
-        ${ARGN}
-    )
-
-    if(NOT _TEST_ARGS_NAME)
-        message(FATAL_ERROR "You must provide a test name")
-    endif(NOT _TEST_ARGS_NAME)
-
-    target_compile_options(${_TEST_ARGS_NAME} PUBLIC "-fsanitize=address")
-    target_link_options(${_TEST_ARGS_NAME} PUBLIC "-fsanitize=address")
-
-    # disable logs in unit tests
-    if (NOT ${ENABLE_TEST_LOGS})
-        target_sources(${_TEST_ARGS_NAME} PRIVATE ${ROOT_TEST_DIR}/mock-logs.cpp)
-        target_sources(${_TEST_ARGS_NAME} PRIVATE ${ROOT_TEST_DIR}/mock-freertos-tls.cpp)
-    endif (NOT ${ENABLE_TEST_LOGS})
-
-    set(_TEST_LABELS "")
-    if(_TEST_ARGS_USE_FS)
-        enable_test_filesystem()
-    endif()
-
-    target_compile_options(${_TEST_ARGS_NAME} PUBLIC "-pthread")
-    target_link_options(${_TEST_ARGS_NAME} PUBLIC "-pthread")
-
-    add_dependencies(unittests ${_TEST_ARGS_NAME})
-    add_dependencies(check ${_TEST_ARGS_NAME})
-
-    get_directory_property(_TEST_ENTITY TEST_ENTITY)
-    if(_TEST_ENTITY)
-        add_dependencies(unittests-${_TEST_ENTITY} ${_TEST_ARGS_NAME})
-        list(APPEND _TEST_LABELS ${_TEST_ENTITY})
-    endif()
-
-    gtest_add_tests(
-        TARGET ${_TEST_ARGS_NAME}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        TEST_LIST _TEST_LIST
-    )
-
-    set_tests_properties(${_TEST_LIST} PROPERTIES LABELS ${_TEST_LABELS})
 endfunction()
 
 set(_CATCH_DISCOVER_TESTS_SCRIPT ${_CATCH_DISCOVER_TESTS_SCRIPT} PARENT_SCOPE)

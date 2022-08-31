@@ -77,7 +77,6 @@ target_sources(apps-common
         widgets/TimeSetFmtSpinner.hpp
         actions/AlarmRingingData.hpp
         actions/AlarmTriggeredAction.hpp
-        popups/data/BedtimeReminderPopupRequestParams.hpp
 
         models/SongContext.hpp
         models/SongsRepository.hpp

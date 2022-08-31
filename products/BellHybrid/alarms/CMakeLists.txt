@@ -20,6 +20,7 @@ target_sources(alarms
         include/AlarmSoundPaths.hpp
         include/popups/AlarmActivatedPopupRequestParams.hpp
         include/popups/AlarmDeactivatedPopupRequestParams.hpp
+        include/popups/BedtimeReminderPopupRequestParams.hpp
 )
 
 target_include_directories(alarms
