@@ -568,7 +568,7 @@ namespace bluetooth
 
     void A2DP::A2DPImpl::disconnect()
     {
-        LOG_INFO("Disonnecting A2DP profile");
+        LOG_INFO("Disconnecting A2DP profile");
         a2dp_source_disconnect(AVRCP::mediaTracker.a2dp_cid);
         auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
         busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device), service::name::bluetooth);

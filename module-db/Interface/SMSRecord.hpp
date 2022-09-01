@@ -7,7 +7,6 @@
 
 #include "Record.hpp"
 #include "ThreadRecord.hpp"
-#include "ContactRecord.hpp"
 #include "module-db/Databases/SmsDB.hpp"
 #include "module-db/Databases/ContactsDB.hpp"
 #include "module-db/Common/Common.hpp"

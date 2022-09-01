@@ -13,7 +13,6 @@
 
 #include <cstdint>
 #include <vector>
-#include <utility>
 
 struct CalllogRecord : public Record
 {

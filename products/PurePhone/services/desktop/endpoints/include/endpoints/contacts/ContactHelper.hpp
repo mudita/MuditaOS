@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,8 +9,6 @@
 #include <system/Common.hpp>
 #include <Service/Service.hpp>
 #include <json11.hpp>
-
-#include <string>
 
 namespace sdesktop::endpoints
 {
@@ -29,7 +27,7 @@ namespace sdesktop::endpoints
         auto requestCount(Context &context) -> sys::ReturnCodes;
         auto requestContactByID(Context &context) -> sys::ReturnCodes;
         static auto to_json(const ContactRecord &record) -> json11::Json;
-        static auto from_json(const json11::Json &contactJSON) -> ContactRecord;
+        static auto from_json(const json11::Json &contactJSON) -> std::optional<ContactRecord>;
     };
 
     namespace json::contacts
