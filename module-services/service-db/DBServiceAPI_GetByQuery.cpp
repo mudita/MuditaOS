@@ -9,7 +9,6 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 
-#include <cstdint>
 #include <memory>
 #include <utility>
 

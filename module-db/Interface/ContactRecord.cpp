@@ -43,34 +43,34 @@ auto ContactRecordInterface::Add(ContactRecord &rec) -> bool
     LOG_DEBUG("New contact with ID %" PRIu32 " created", contactID);
     rec.ID = contactID;
 
-    auto [numbersAdded, numbersIDs] = addNumbers(contactID, rec.numbers);
-    if (!numbersAdded) {
+    const auto numbersIDs = addNumbers(contactID, rec.numbers);
+    if (!numbersIDs.has_value()) {
         return false;
     }
     if (!rec.isTemporary()) {
-        auto [nameAdded, nameID] = addOrUpdateName(contactID, DB_ID_NONE, rec);
-        if (!nameAdded) {
+        const auto nameID = addOrUpdateName(contactID, DB_ID_NONE, rec);
+        if (!nameID.has_value()) {
             return false;
         }
-        auto [addressAdded, addressID] = addOrUpdateAddress(contactID, DB_ID_NONE, rec);
-        if (!addressAdded) {
+        const auto addressID = addOrUpdateAddress(contactID, DB_ID_NONE, rec);
+        if (!addressID.has_value()) {
             return false;
         }
-        auto [ringtoneAdded, ringtoneID] = addOrUpdateRingtone(contactID, DB_ID_NONE, rec);
-        if (!ringtoneAdded) {
+        const auto ringtoneID = addOrUpdateRingtone(contactID, DB_ID_NONE, rec);
+        if (!ringtoneID.has_value()) {
             return false;
         }
         result = contactDB->contacts.update(ContactsTableRow{Record(contactID),
-                                                             .nameID    = nameID,
-                                                             .numbersID = numbersIDs,
-                                                             .ringID    = ringtoneID,
-                                                             .addressID = addressID,
+                                                             .nameID    = nameID.value(),
+                                                             .numbersID = numbersIDs.value(),
+                                                             .ringID    = ringtoneID.value(),
+                                                             .addressID = addressID.value(),
                                                              .speedDial = rec.speeddial});
     }
     else {
         result = contactDB->contacts.update(ContactsTableRow{Record(contactID),
                                                              .nameID    = DB_ID_NONE,
-                                                             .numbersID = numbersIDs,
+                                                             .numbersID = numbersIDs.value(),
                                                              .ringID    = DB_ID_NONE,
                                                              .addressID = DB_ID_NONE,
                                                              .speedDial = rec.speeddial});
@@ -131,12 +131,21 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
             if (!numberRecord.isValid()) {
                 return false;
             }
-            auto [succeed, tmpContactRecord] =
-                addTemporaryContactForNumber(ContactRecord::Number{numberRecord.numberUser, numberRecord.numbere164});
-            if (!succeed) {
+            ContactRecord::Number number;
+            try {
+                number = ContactRecord::Number(numberRecord.numberUser, numberRecord.numbere164);
+            }
+            catch (const utils::PhoneNumber::Error &e) {
+                LOG_ERROR("Exception in ContactRecord::Number while processing number %s! Reason: %s",
+                          e.getNumber().c_str(),
+                          e.what());
                 return false;
             }
-            numberRecord.contactID = tmpContactRecord.ID;
+            const auto tmpContactRecord = addTemporaryContactForNumber(number);
+            if (!tmpContactRecord.has_value()) {
+                return false;
+            }
+            numberRecord.contactID = tmpContactRecord.value().ID;
             if (!contactDB->number.update(numberRecord)) {
                 return false;
             }
@@ -145,24 +154,24 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
 
     unbindSpeedDialKeyFromOtherContacts(rec.speeddial);
 
-    auto [nameAdded, nameID] = addOrUpdateName(contact.ID, contact.nameID, rec);
-    if (!nameAdded) {
+    const auto nameID = addOrUpdateName(contact.ID, contact.nameID, rec);
+    if (!nameID.has_value()) {
         return false;
     }
-    auto [addressAdded, addressID] = addOrUpdateAddress(contact.ID, contact.addressID, rec);
-    if (!addressAdded) {
+    const auto addressID = addOrUpdateAddress(contact.ID, contact.addressID, rec);
+    if (!addressID.has_value()) {
         return false;
     }
-    auto [ringtoneAdded, ringtoneID] = addOrUpdateRingtone(contact.ID, contact.ringID, rec);
-    if (!ringtoneAdded) {
+    const auto ringtoneID = addOrUpdateRingtone(contact.ID, contact.ringID, rec);
+    if (!ringtoneID.has_value()) {
         return false;
     }
 
     ContactsTableRow row{Record(contact.ID),
-                         .nameID          = nameID,
+                         .nameID          = nameID.value(),
                          .numbersID       = joinNumberIDs(newNumbersIDs),
-                         .ringID          = ringtoneID,
-                         .addressID       = addressID,
+                         .ringID          = ringtoneID.value(),
+                         .addressID       = addressID.value(),
                          .speedDial       = rec.speeddial,
                          .namePrimary     = rec.primaryName,
                          .nameAlternative = rec.alternativeName};
@@ -193,8 +202,18 @@ auto ContactRecordInterface::getNumbersIDs(std::uint32_t contactID, const Contac
 
     auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
     for (const auto &number : contact.numbers) {
-        auto numberMatch =
-            numberMatcher.bestMatch(utils::PhoneNumber(number.number), utils::PhoneNumber::Match::POSSIBLE);
+        utils::PhoneNumber phoneNumber;
+        try {
+            phoneNumber = utils::PhoneNumber(number.number);
+        }
+        catch (const utils::PhoneNumber::Error &e) {
+            LOG_ERROR("Exception in utils::PhoneNumber while processing number %s! Reason: %s",
+                      e.getNumber().c_str(),
+                      e.what());
+            return {};
+        }
+
+        auto numberMatch = numberMatcher.bestMatch(phoneNumber, utils::PhoneNumber::Match::POSSIBLE);
         if (!numberMatch.has_value()) {
             // number does not exist in the DB yet. Let's add it.
             if (!contactDB->number.add(ContactsNumberTableRow{Record(DB_ID_NONE),
@@ -234,13 +253,22 @@ auto ContactRecordInterface::getNumbersIDs(std::uint32_t contactID, const Contac
 }
 
 auto ContactRecordInterface::addNumbers(std::uint32_t contactID, const std::vector<ContactRecord::Number> &numbers)
-    -> std::pair<bool, std::string>
+    -> std::optional<std::string>
 {
     std::string numbersIDs;
     auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
     for (const auto &number : numbers) {
-        auto numberMatch =
-            numberMatcher.bestMatch(utils::PhoneNumber(number.number), utils::PhoneNumber::Match::POSSIBLE);
+        utils::PhoneNumber phoneNumber;
+        try {
+            phoneNumber = utils::PhoneNumber(number.number);
+        }
+        catch (const utils::PhoneNumber::Error &e) {
+            LOG_ERROR("Exception in utils::PhoneNumber while processing number %s! Reason: %s",
+                      e.getNumber().c_str(),
+                      e.what());
+            return std::nullopt;
+        }
+        auto numberMatch = numberMatcher.bestMatch(phoneNumber, utils::PhoneNumber::Match::POSSIBLE);
         if (!numberMatch.has_value()) {
             auto result = contactDB->number.add(ContactsNumberTableRow{Record(DB_ID_NONE),
                                                                        .contactID  = contactID,
@@ -248,18 +276,18 @@ auto ContactRecordInterface::addNumbers(std::uint32_t contactID, const std::vect
                                                                        .numbere164 = number.number.getE164(),
                                                                        .type       = number.numberType});
             if (!result) {
-                return {false, {}};
+                return std::nullopt;
             }
             numbersIDs += std::to_string(contactDB->getLastInsertRowId()) + " ";
         }
         else {
             auto numberRecord = contactDB->number.getById(numberMatch->getNumberID());
             if (!unbindNumber(numberRecord.contactID, numberRecord.ID)) {
-                return {false, {}};
+                return std::nullopt;
             }
             numberRecord.contactID = contactID;
             if (!contactDB->number.update(numberRecord)) {
-                return {false, {}};
+                return std::nullopt;
             }
             numbersIDs += std::to_string(numberRecord.ID) + " ";
         }
@@ -267,12 +295,12 @@ auto ContactRecordInterface::addNumbers(std::uint32_t contactID, const std::vect
     if (!numbersIDs.empty()) {
         numbersIDs.pop_back(); // remove trailing space
     }
-    return {true, numbersIDs};
+    return numbersIDs;
 }
 
 auto ContactRecordInterface::addOrUpdateName(std::uint32_t contactID,
                                              std::uint32_t nameID,
-                                             const ContactRecord &contact) -> std::pair<bool, std::uint32_t>
+                                             const ContactRecord &contact) -> std::optional<std::uint32_t>
 {
     if (nameID == DB_ID_NONE) {
         bool result = contactDB->name.add(ContactsNameTableRow{Record(DB_ID_NONE),
@@ -281,7 +309,7 @@ auto ContactRecordInterface::addOrUpdateName(std::uint32_t contactID,
                                                                .nameAlternative = contact.alternativeName});
         if (!result) {
             error_db_data("Failed to add contact name");
-            return {false, DB_ID_NONE};
+            return std::nullopt;
         }
         nameID = contactDB->getLastInsertRowId();
     }
@@ -292,15 +320,15 @@ auto ContactRecordInterface::addOrUpdateName(std::uint32_t contactID,
                                                                   .nameAlternative = contact.alternativeName});
         if (!result) {
             error_db_data("Failed to update contact name");
-            return {false, DB_ID_NONE};
+            return std::nullopt;
         }
     }
-    return {true, nameID};
+    return nameID;
 }
 
 auto ContactRecordInterface::addOrUpdateAddress(std::uint32_t contactID,
                                                 std::uint32_t addressID,
-                                                const ContactRecord &contact) -> std::pair<bool, std::uint32_t>
+                                                const ContactRecord &contact) -> std::optional<std::uint32_t>
 {
     if (addressID == DB_ID_NONE) {
         bool result = contactDB->address.add(ContactsAddressTableRow{Record(DB_ID_NONE),
@@ -310,7 +338,7 @@ auto ContactRecordInterface::addOrUpdateAddress(std::uint32_t contactID,
                                                                      .mail      = contact.mail});
         if (!result) {
             error_db_data("Failed to add contact address");
-            return {false, DB_ID_NONE};
+            return std::nullopt;
         }
         addressID = contactDB->getLastInsertRowId();
     }
@@ -322,21 +350,21 @@ auto ContactRecordInterface::addOrUpdateAddress(std::uint32_t contactID,
                                                                         .mail      = contact.mail});
         if (!result) {
             error_db_data("Failed to update contact address");
-            return {false, DB_ID_NONE};
+            return std::nullopt;
         }
     }
-    return {true, addressID};
+    return addressID;
 }
 
 auto ContactRecordInterface::addOrUpdateRingtone(std::uint32_t contactID,
                                                  std::uint32_t ringtoneID,
-                                                 const ContactRecord &contact) -> std::pair<bool, std::uint32_t>
+                                                 const ContactRecord &contact) -> std::optional<std::uint32_t>
 {
     if (ringtoneID == DB_ID_NONE) {
         bool result = contactDB->ringtones.add(ContactsRingtonesTableRow{contact.ID, contact.assetPath});
         if (!result) {
             error_db_data("Failed to add contact ringtone");
-            return {false, DB_ID_NONE};
+            return std::nullopt;
         }
         ringtoneID = contactDB->getLastInsertRowId();
     }
@@ -344,10 +372,10 @@ auto ContactRecordInterface::addOrUpdateRingtone(std::uint32_t contactID,
         bool result = contactDB->ringtones.update(ContactsRingtonesTableRow{ringtoneID, contact.ID, contact.assetPath});
         if (!result) {
             error_db_data("Failed to update contact ringtone");
-            return {false, DB_ID_NONE};
+            return std::nullopt;
         }
     }
-    return {true, ringtoneID};
+    return ringtoneID;
 }
 
 auto ContactRecordInterface::runQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
@@ -1104,7 +1132,15 @@ auto ContactRecordInterface::getContactByNumber(const UTF8 &number) -> const std
 auto ContactRecordInterface::GetByNumber(const UTF8 &number, CreateTempContact createTempContact)
     -> std::unique_ptr<std::vector<ContactRecord>>
 {
-    return GetByNumber(utils::PhoneNumber(number.c_str(), utils::country::Id::UNKNOWN).getView(), createTempContact);
+    try {
+        return GetByNumber(utils::PhoneNumber(number.c_str(), utils::country::Id::UNKNOWN).getView(),
+                           createTempContact);
+    }
+    catch (const utils::PhoneNumber::Error &e) {
+        LOG_ERROR(
+            "Exception in utils::PhoneNumber while processing number %s! Reason: %s", e.getNumber().c_str(), e.what());
+        return {};
+    }
 }
 
 auto ContactRecordInterface::GetByNumber(const utils::PhoneNumber::View &numberView,
@@ -1120,11 +1156,11 @@ auto ContactRecordInterface::GetByNumber(const utils::PhoneNumber::View &numberV
     // Contact not found, create temporary one
     if (createTempContact == CreateTempContact::True) {
         debug_db_data("Cannot find contact for number %s, creating temporary one", number.c_str());
-        auto [added, tmpRecord] = addTemporaryContactForNumber(ContactRecord::Number(numberView));
-        if (!added) {
+        const auto tmpRecord = addTemporaryContactForNumber(ContactRecord::Number(numberView));
+        if (!tmpRecord.has_value()) {
             return result;
         }
-        result->push_back(GetByID(tmpRecord.ID));
+        result->push_back(GetByID(tmpRecord.value().ID));
     }
     return result;
 }
@@ -1145,16 +1181,16 @@ auto ContactRecordInterface::GetByNumberID(std::uint32_t numberId) -> std::optio
 }
 
 auto ContactRecordInterface::addTemporaryContactForNumber(const ContactRecord::Number &number)
-    -> std::pair<bool, ContactRecord>
+    -> std::optional<ContactRecord>
 {
     ContactRecord tmp;
     tmp.numbers = std::vector<ContactRecord::Number>{number};
     tmp.addToGroup(ContactsDB::temporaryGroupId());
     if (!Add(tmp)) {
         error_db_data("Cannot add contact record");
-        return {false, {}};
+        return std::nullopt;
     }
-    return {true, tmp};
+    return tmp;
 }
 
 auto ContactRecordInterface::buildNumberMatcher(unsigned int maxPageSize)
@@ -1178,8 +1214,18 @@ auto ContactRecordInterface::MatchByNumber(const utils::PhoneNumber::View &numbe
                                            utils::PhoneNumber::Match matchLevel)
     -> std::optional<ContactRecordInterface::ContactNumberMatch>
 {
+    utils::PhoneNumber phoneNumber;
+    try {
+        phoneNumber = utils::PhoneNumber(numberView);
+    }
+    catch (const utils::PhoneNumber::Error &e) {
+        LOG_ERROR(
+            "Exception in utils::PhoneNumber while processing number %s! Reason: %s", e.getNumber().c_str(), e.what());
+        return std::nullopt;
+    }
+
     auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
-    auto matchedNumber = numberMatcher.bestMatch(utils::PhoneNumber(numberView), matchLevel);
+    auto matchedNumber = numberMatcher.bestMatch(phoneNumber, matchLevel);
     if (!matchedNumber.has_value()) {
         if (createTempContact != CreateTempContact::True) {
             return std::nullopt;
@@ -1372,8 +1418,15 @@ ContactRecordInterface::ContactNumberMatch::ContactNumberMatch(ContactRecord rec
 
 auto ContactRecordInterface::GetNumberById(std::uint32_t numberId) -> utils::PhoneNumber::View
 {
-    auto row = contactDB->number.getById(numberId);
-    return utils::PhoneNumber(row.numberUser, row.numbere164).getView();
+    const auto row = contactDB->number.getById(numberId);
+    try {
+        return utils::PhoneNumber(row.numberUser, row.numbere164).getView();
+    }
+    catch (const utils::PhoneNumber::Error &e) {
+        LOG_ERROR(
+            "Exception in utils::PhoneNumber while processing number %s! Reason: %s", e.getNumber().c_str(), e.what());
+        return utils::PhoneNumber().getView();
+    }
 }
 
 auto ContactRecordInterface::GetNumbersIdsByContact(std::uint32_t contactId) -> std::vector<std::uint32_t>
