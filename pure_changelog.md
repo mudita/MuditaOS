@@ -21,6 +21,7 @@
 * Fixed turning on loudspeaker before outgoing call is answered
 * Fixed PLAY label translation in German
 * Fixed USB connection/disconnection detection
+* Fixed memory leaks in APN settings
 * Added basic MMS handling
 
 ## [1.3.0 2022-08-04]
