@@ -29,7 +29,7 @@ namespace gui
         std::uint16_t getFontHeight(const std::string &fontName) const;
         void updateFocus(Item *newFocus);
         bool onInput(const InputEvent &inputEvent) override;
-        void clampDayOfMonth();
+        void correctDayOfMonth();
         bool handleEnterKey();
         bool handleRightFunctionKey();
 
