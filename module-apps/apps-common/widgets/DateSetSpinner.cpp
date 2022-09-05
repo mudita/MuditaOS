@@ -13,6 +13,9 @@ namespace gui
 {
     namespace
     {
+        constexpr std::uint8_t step    = 1;
+        constexpr std::uint8_t dayMin  = 1;
+        constexpr std::uint8_t dayMax  = 31;
         constexpr auto focusFontName   = style::window::font::large;
         constexpr auto noFocusFontName = style::window::font::largelight;
 
@@ -64,21 +67,21 @@ namespace gui
     DateSetSpinner::DateSetSpinner(Item *parent, TextFixedSize *title, Length x, Length y, Length w, Length h)
         : HBox(parent, x, y, w, h), title{title}
     {
-        constexpr std::uint8_t step     = 1;
-        constexpr std::uint8_t dayMin   = 1;
-        constexpr std::uint8_t dayMax   = 31;
         constexpr std::uint8_t monthMin = 1;
         constexpr std::uint8_t monthMax = 12;
 
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        attachDateField(day, U8IntegerSpinnerFixed::range{dayMin, dayMax, step});
+        attachDateField(
+            year, U16IntegerSpinnerFixed::range{utils::time::Locale::min_years, utils::time::Locale::max_years, step});
         attachSlash(firstSlash);
         attachDateField(month, U8IntegerSpinnerFixed::range{monthMin, monthMax, step});
         attachSlash(secondSlash);
-        attachDateField(
-            year, U16IntegerSpinnerFixed::range{utils::time::Locale::min_years, utils::time::Locale::max_years, step});
+        attachDateField(day, U8IntegerSpinnerFixed::range{dayMin, dayMax, step});
+
+        month->onValueChanged = [this](auto) { correctDayOfMonth(); };
+        year->onValueChanged  = [this](auto) { correctDayOfMonth(); };
 
         resizeItems();
 
@@ -89,7 +92,7 @@ namespace gui
             return true;
         };
 
-        updateFocus(day);
+        updateFocus(year);
     }
 
     date::year_month_day DateSetSpinner::getDate()
@@ -174,25 +177,28 @@ namespace gui
         return false;
     }
 
-    void DateSetSpinner::clampDayOfMonth()
+    void DateSetSpinner::correctDayOfMonth()
     {
-        auto dayCountInMonth =
+        const auto dayCountInMonth =
             static_cast<unsigned>((date::year(year->get_value()) / date::month(month->get_value()) / date::last).day());
 
         if (day->get_value() > dayCountInMonth) {
             day->set_value(dayCountInMonth);
         }
+
+        const auto currentValue = day->get_value();
+        day->set_range({dayMin, static_cast<std::uint8_t>(dayCountInMonth), step});
+        day->set_value(currentValue);
     }
 
     bool DateSetSpinner::handleEnterKey()
     {
-        if (focusItem == day) {
+        if (focusItem == year) {
             updateFocus(month);
             return true;
         }
         if (focusItem == month) {
-            clampDayOfMonth();
-            updateFocus(year);
+            updateFocus(day);
             return true;
         }
         return false;
@@ -201,10 +207,10 @@ namespace gui
     bool DateSetSpinner::handleRightFunctionKey()
     {
         if (focusItem == month) {
-            updateFocus(day);
+            updateFocus(year);
             return true;
         }
-        if (focusItem == year) {
+        if (focusItem == day) {
             updateFocus(month);
             return true;
         }
@@ -237,5 +243,4 @@ namespace gui
 
         applySizeRestrictions();
     }
-
 } /* namespace gui */
