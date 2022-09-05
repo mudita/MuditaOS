@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,6 @@ namespace gui
         auto buildOptionsList() -> std::list<gui::Option> override;
         auto handleSwitchData(SwitchData *data) -> bool override;
         std::shared_ptr<packet_data::APN::Config> apn;
-        ApnSettingsModel *apnSettingsModel = nullptr;
+        ApnSettingsModel apnSettingsModel;
     };
 } // namespace gui
