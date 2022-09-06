@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,11 +8,12 @@
 class LoggerBuffer : public StringCircularBuffer
 {
   public:
-    using StringCircularBuffer::StringCircularBuffer;
+    explicit LoggerBuffer(size_t size) : StringCircularBuffer(size)
+    {}
 
-    [[nodiscard]] std::pair<bool, std::string> get() override;
-    void put(const std::string &logMsg) override;
-    void put(std::string &&logMsg) override;
+    [[nodiscard]] std::pair<bool, std::string> get();
+    void put(const std::string &logMsg);
+    void put(std::string &&logMsg);
 
     static constexpr auto lostBytesMessage = "bytes was lost.";
 

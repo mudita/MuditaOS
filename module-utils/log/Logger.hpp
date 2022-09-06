@@ -3,15 +3,18 @@
 
 #pragma once
 
-#include <assert.h>
-#include <log/log.hpp>
 #include "LoggerBuffer.hpp"
+#include "LoggerWorker.hpp"
+#include "LoggerBufferContainer.hpp"
 #include "log_colors.hpp"
-#include <rotator/Rotator.hpp>
-#include <map>
+#include "Timers/TimerFactory.hpp"
+#include <log/log.hpp>
 #include <mutex.hpp>
-#include <string>
-#include <filesystem>
+#include <Service/Service.hpp>
+#include <rotator/Rotator.hpp>
+
+#include <assert.h>
+#include <map>
 
 namespace Log
 {
@@ -38,11 +41,14 @@ namespace Log
         static void destroyInstance();
         auto getLogs() -> std::string;
         void init(Application app, size_t fileSize = MAX_LOG_FILE_SIZE);
+        void createTimer(sys::Service *parent);
         auto log(Device device, const char *fmt, va_list args) -> int;
         auto log(logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
             -> int;
         auto logAssert(const char *fmt, va_list args) -> int;
         auto dumpToFile(std::filesystem::path logPath) -> int;
+        auto diagnosticDump() -> int;
+        auto flushLogs() -> int;
 
         static constexpr auto CRIT_STR = "CRIT";
         static constexpr auto IRQ_STR  = "IRQ";
@@ -63,6 +69,7 @@ namespace Log
         [[nodiscard]] auto getLogLevel(const std::string &name) -> logger_level;
         void logToDevice(const char *fmt, va_list args);
         void logToDevice(Device device, std::string_view logMsg, size_t length);
+        auto writeLog(Device device, const char *fmt, va_list args) -> int;
         [[nodiscard]] size_t loggerBufferSizeLeft() const noexcept
         {
             const auto sizeLeft = LOGGER_BUFFER_SIZE - loggerBufferCurrentPos;
@@ -71,6 +78,7 @@ namespace Log
         }
 
         void addFileHeader(std::ofstream &file) const;
+        void checkBufferState();
 
         cpp_freertos::MutexStandard mutex;
         cpp_freertos::MutexStandard logFileMutex;
@@ -81,13 +89,17 @@ namespace Log
         size_t maxFileSize                    = MAX_LOG_FILE_SIZE;
 
         Application application;
-        LoggerBuffer circularBuffer;
+
+        LoggerBufferContainer buffer;
+
         utils::Rotator<MAX_LOG_FILES_COUNT> rotator;
-        static constexpr size_t circularBufferSize = 1000;
+
+        sys::TimerHandle writeLogsTimer;
 
         static const char *levelNames[];
         std::map<std::string, logger_level> filtered;
         static Logger *_logger;
+        std::unique_ptr<LoggerWorker> worker;
     };
 
     const char *getTaskDesc();

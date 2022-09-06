@@ -44,7 +44,7 @@
 static void __attribute__((noreturn)) stop_system(void)
 {
     if (!isIRQ()) {
-        if (dumpLogs() != 1) {
+        if (shutdownFlushLogs() != 1) {
             LOG_ERROR("Cannot dump logs");
         }
         const auto err = purefs::subsystem::unmount_all();

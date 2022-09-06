@@ -10,7 +10,7 @@
 #include "thread.hpp"
 #include "ticks.hpp"
 #include "critical.hpp"
-#include <algorithm>
+#include "Logger.hpp"
 #include <service-evtmgr/KbdMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -33,6 +33,8 @@
 #include <service-db/DBServiceName.hpp>
 #include <module-gui/gui/Common.hpp>
 #include <service-eink/Common.hpp>
+
+#include <algorithm>
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -115,6 +117,8 @@ namespace sys
             this, "lowBatteryShutdownDelay", lowBatteryShutdownDelayTime, [this](sys::Timer &) {
                 CloseSystemHandler(CloseReason::LowBattery);
             });
+
+        Log::Logger::get().createTimer(this);
     }
 
     SystemManagerCommon::~SystemManagerCommon()
