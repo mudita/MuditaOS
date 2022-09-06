@@ -6,6 +6,7 @@
 #include <string>
 
 #include <log/Logger.hpp>
+#include <log/LoggerBufferContainer.hpp>
 
 namespace
 {
@@ -113,4 +114,24 @@ TEST_CASE("Test if log files rotate")
 
     // Clean-up the environment
     std::filesystem::remove_all(logsDir);
+}
+
+TEST_CASE("Test if choose proper buffer")
+{
+    LoggerBufferContainer buffer;
+
+    size_t bufferIndex = buffer.getCurrentIndex();
+    REQUIRE(bufferIndex == 0);
+
+    buffer.nextBuffer();
+    bufferIndex = buffer.getCurrentIndex();
+    REQUIRE(bufferIndex == 1);
+
+    buffer.nextBuffer();
+    bufferIndex = buffer.getCurrentIndex();
+    REQUIRE(bufferIndex == 0);
+
+    buffer.nextBuffer();
+    bufferIndex = buffer.getCurrentIndex();
+    REQUIRE(bufferIndex == 1);
 }

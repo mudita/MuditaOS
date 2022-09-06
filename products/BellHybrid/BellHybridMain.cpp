@@ -91,7 +91,7 @@ int main()
     }
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
-    systemServices.emplace_back(sys::CreatorFor<EventManager>([]() { return dumpLogs(); }));
+    systemServices.emplace_back(sys::CreatorFor<EventManager>([]() { return diagnosticDumpLogs(); }));
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>(std::move(fileIndexerAudioPaths)));
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
     systemServices.emplace_back(sys::CreatorFor<service::Audio>());
@@ -145,7 +145,7 @@ int main()
         [&platform] {
             try {
                 LOG_DEBUG("System deinit");
-                if (dumpLogs() != 1) {
+                if (shutdownFlushLogs() != 1) {
                     LOG_ERROR("Cannot dump logs");
                 }
                 platform->deinit();

@@ -49,25 +49,14 @@
 #define debug_input_events(...)
 #endif
 
-namespace
-{
-    constexpr auto loggerDelayMs   = 1000 * 60 * 5;
-    constexpr auto loggerTimerName = "Logger";
-} // namespace
-
 EventManagerCommon::EventManagerCommon(LogDumpFunction logDumpFunction, const std::string &name)
-    : sys::Service(name, "", stackDepth), loggerTimer{sys::TimerFactory::createPeriodicTimer(
-                                              this,
-                                              loggerTimerName,
-                                              std::chrono::milliseconds{loggerDelayMs},
-                                              [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
-      logDumpFunction(logDumpFunction), settings(std::make_shared<settings::Settings>())
+    : sys::Service(name, "", stackDepth), logDumpFunction(std::move(logDumpFunction)),
+      settings(std::make_shared<settings::Settings>())
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
     alarmID        = 0;
     bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
-    loggerTimer.start();
 }
 
 EventManagerCommon::~EventManagerCommon()
@@ -277,7 +266,6 @@ int EventManagerCommon::dumpLogsToFile()
     if (logDumpFunction) {
         return logDumpFunction();
     }
-
     return 0;
 }
 

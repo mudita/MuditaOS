@@ -1,19 +1,20 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "critical.hpp"
-#include <fstream>
+#include "Logger.hpp"
 #include "LockGuard.hpp"
-#include <Logger.hpp>
-#include <Utils.hpp>
-#include <portmacro.h>
 #include <ticks.hpp>
-#include "macros.h"
+#include <purefs/filesystem_paths.hpp>
+
+#include <fstream>
 
 namespace Log
 {
     const char *Logger::levelNames[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
     Logger *Logger::_logger          = nullptr;
+
+    using namespace std::chrono_literals;
+    constexpr std::chrono::minutes writeLogsToFileInterval = 15min;
 
     std::ostream &operator<<(std::ostream &stream, const Application &application)
     {
@@ -22,7 +23,7 @@ namespace Log
         return stream;
     }
 
-    Logger::Logger() : circularBuffer{circularBufferSize}, rotator{".log"}
+    Logger::Logger() : buffer{}, rotator{".log"}
     {
         filtered = {
             {"ApplicationManager", logger_level::LOGINFO},
@@ -42,6 +43,12 @@ namespace Log
             {"FileIndexer", logger_level::LOGINFO},
             {"EventManager", logger_level::LOGINFO}
         };
+
+        std::list<sys::WorkerQueueInfo> queueInfo{
+            {LoggerWorker::SignalQueueName, LoggerWorker::SignalSize, LoggerWorker::SignalQueueLenght}};
+        worker = std::make_unique<LoggerWorker>(Log::workerName);
+        worker->init(queueInfo);
+        worker->run();
     }
 
     void Logger::enableColors(bool enable)
@@ -58,6 +65,7 @@ namespace Log
 
     void Logger::destroyInstance()
     {
+
         delete _logger;
         _logger = nullptr;
     }
@@ -79,8 +87,8 @@ namespace Log
         LockGuard lock(mutex);
 
         std::string logs;
-        while (!circularBuffer.isEmpty()) {
-            const auto [result, msg] = circularBuffer.get();
+        while (!buffer.getFlushBuffer()->isEmpty()) {
+            const auto [result, msg] = buffer.getFlushBuffer()->get();
             if (result) {
                 logs += msg;
             }
@@ -99,23 +107,21 @@ namespace Log
 #endif
     }
 
+    void Logger::createTimer(sys::Service *parent)
+    {
+        writeLogsTimer = sys::TimerFactory::createPeriodicTimer(
+            parent, "writeLogsToFileTimer", writeLogsToFileInterval, [this](sys::Timer &) {
+                buffer.nextBuffer();
+                worker->notify(LoggerWorker::Signal::DumpIntervalBuffer);
+            });
+        writeLogsTimer.start();
+    }
+
     auto Logger::log(Device device, const char *fmt, va_list args) -> int
     {
         LockGuard lock(mutex);
-
         loggerBufferCurrentPos = 0;
-
-        const auto sizeLeft = loggerBufferSizeLeft();
-        const auto result   = vsnprintf(&loggerBuffer[loggerBufferCurrentPos], sizeLeft, fmt, args);
-        if (0 <= result) {
-            const auto numOfBytesAddedToBuffer = static_cast<size_t>(result);
-            loggerBufferCurrentPos += (numOfBytesAddedToBuffer < sizeLeft) ? numOfBytesAddedToBuffer : (sizeLeft - 1);
-
-            logToDevice(device, loggerBuffer, loggerBufferCurrentPos);
-            circularBuffer.put(std::string(loggerBuffer, loggerBufferCurrentPos));
-            return loggerBufferCurrentPos;
-        }
-        return -1;
+        return writeLog(device, fmt, args);
     }
 
     auto Logger::log(
@@ -125,10 +131,13 @@ namespace Log
             return -1;
         }
         LockGuard lock(mutex);
-
         loggerBufferCurrentPos = 0;
         addLogHeader(level, file, line, function);
+        return writeLog(Device::DEFAULT, fmt, args);
+    }
 
+    auto Logger::writeLog(Device device, const char *fmt, va_list args) -> int
+    {
         const auto sizeLeft = loggerBufferSizeLeft();
         const auto result   = vsnprintf(&loggerBuffer[loggerBufferCurrentPos], sizeLeft, fmt, args);
         if (0 <= result) {
@@ -137,7 +146,8 @@ namespace Log
             loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), "\n");
 
             logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
-            circularBuffer.put(std::string(loggerBuffer, loggerBufferCurrentPos));
+            buffer.getCurrentBuffer()->put(std::string(loggerBuffer, loggerBufferCurrentPos));
+            checkBufferState();
             return loggerBufferCurrentPos;
         }
         return -1;
@@ -160,6 +170,7 @@ namespace Log
     {
         std::error_code errorCode;
         auto firstDump = !std::filesystem::exists(logPath, errorCode);
+
         if (errorCode) {
             LOG_ERROR("Failed to check if file %s exists, error: %d", logPath.c_str(), errorCode.value());
             return -EIO;
@@ -201,6 +212,34 @@ namespace Log
         LOG_DEBUG("Flush ended with status: %d", status);
 
         return status;
+    }
+
+    auto Logger::diagnosticDump() -> int
+    {
+        buffer.nextBuffer();
+        worker->notify(LoggerWorker::Signal::DumpDiagnostic);
+        writeLogsTimer.restart(writeLogsToFileInterval);
+        return 1;
+    }
+
+    auto Logger::flushLogs() -> int
+    {
+        LOG_INFO("Shutdown dump logs");
+        worker->kill();
+        writeLogsTimer.stop();
+        buffer.nextBuffer();
+        return dumpToFile(purefs::dir::getLogsPath() / LOG_FILE_NAME);
+    }
+
+    void Logger::checkBufferState()
+    {
+        auto size = buffer.getCurrentBuffer()->getSize();
+
+        if (size >= buffer.getCircularBufferSize()) {
+            worker->notify(LoggerWorker::Signal::DumpFilledBuffer);
+            buffer.nextBuffer();
+            writeLogsTimer.restart(writeLogsToFileInterval);
+        }
     }
 
     void Logger::addFileHeader(std::ofstream &file) const

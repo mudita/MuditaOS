@@ -56,8 +56,6 @@ class EventManagerCommon : public sys::Service
     void processRTCFromTimestampRequest(time_t &newTime);
     void processTimezoneRequest(const std::string &timezone);
 
-    sys::TimerHandle loggerTimer;
-
     LogDumpFunction logDumpFunction;
 
     /// @return: < 0 - error occured during log flush
