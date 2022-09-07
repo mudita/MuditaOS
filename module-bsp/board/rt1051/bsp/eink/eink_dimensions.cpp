@@ -22,7 +22,8 @@ namespace hal::eink
 #if defined(EINK_ROTATE_90_CLOCKWISE)
         return BOARD_EINK_DISPLAY_RES_X - frame.pos_x - frame.width;
 #else
-        return BOARD_EINK_DISPLAY_RES_Y - frame.pos_y - frame.height;
+        // return BOARD_EINK_DISPLAY_RES_Y - frame.pos_y - frame.height;
+        return frame.pos_y;
 #endif
     }
 

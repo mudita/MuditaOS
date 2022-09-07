@@ -6,6 +6,7 @@
 * Added Polish translation to a calendar title
 * Changed USB logging
 * Separated system volume from Bluetooth device volume for A2DP
+* Implemented partial refresh of the display
 
 ### Fixed
 * Fixed mixed SMS messages
