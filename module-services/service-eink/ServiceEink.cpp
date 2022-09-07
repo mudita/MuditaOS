@@ -175,7 +175,78 @@ namespace service::eink
             display->setMode(hal::eink::EinkDisplayColorMode::EinkDisplayColorModeStandard);
         }
         internal::StaticData::get().setInvertedMode(invertedModeRequested);
+
+        previousContext.reset();
+        previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
     }
+
+    // Merge boxes if the gap between them is lesser than the threshold
+    template <typename BoxesContainer>
+    inline std::vector<gui::BoundingBox> mergeBoundingBoxes(const BoxesContainer &boxes, std::uint16_t gapThreshold)
+    {
+        std::vector<gui::BoundingBox> mergedBoxes;
+        if (boxes.empty())
+            return mergedBoxes;
+        mergedBoxes.reserve(boxes.size());
+        gui::BoundingBox merged = boxes.front();
+        for (std::size_t i = 1; i < boxes.size(); ++i) {
+            const auto &bb = boxes[i];
+            const auto gap = bb.y - (merged.y + merged.h);
+            if (gap < gapThreshold) {
+                merged.h = (bb.y + bb.h) - merged.y;
+            }
+            else {
+                mergedBoxes.push_back(merged);
+                merged = bb;
+            }
+        }
+        mergedBoxes.push_back(merged);
+        return mergedBoxes;
+    }
+
+    // Enlarge each box to match alignment-wide grid in y coordinate
+    template <typename BoxesContainer>
+    inline std::vector<hal::eink::EinkFrame> makeAlignedFrames(const BoxesContainer &boxes, std::uint16_t alignment)
+    {
+        std::vector<hal::eink::EinkFrame> frames;
+        if (boxes.empty())
+            return frames;
+        frames.reserve(boxes.size());
+        auto a = alignment;
+        for (const auto &bb : boxes) {
+            auto f = hal::eink::EinkFrame{
+                std::uint16_t(bb.x), std::uint16_t(bb.y), {std::uint16_t(bb.w), std::uint16_t(bb.h)}};
+            auto y        = f.pos_y;
+            auto h        = f.size.height;
+            f.pos_y       = y / a * a;
+            f.size.height = (y - f.pos_y + h + (a - 1)) / a * a;
+            frames.push_back(f);
+        }
+        return frames;
+    }
+
+#if DEBUG_EINK_REFRESH == 1
+    inline std::string debug_toString(const gui::BoundingBox &bb)
+    {
+        return bb.str();
+    }
+
+    inline std::string debug_toString(const hal::eink::EinkFrame &f)
+    {
+        std::stringstream ss;
+        ss << '{' << f.pos_x << ' ' << f.pos_y << ' ' << f.size.width << ' ' << f.size.height << "}";
+        return ss.str();
+    }
+
+    template <typename Container>
+    inline void debug_handleImageMessage(const char *name, const Container &container)
+    {
+        std::stringstream ss;
+        for (auto const &el : container)
+            ss << debug_toString(el) << ' ';
+        LOG_INFO("%s: %s", name, ss.str().c_str());
+    }
+#endif
 
     sys::MessagePointer ServiceEink::handleImageMessage(sys::Message *request)
     {
@@ -189,11 +260,66 @@ namespace service::eink
         displayPowerOffTimer.stop();
         auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer.start(); });
 
-        eInkSentinel->HoldMinimumFrequency();
-        auto status = display->showImage(message->getData(), translateToEinkRefreshMode(message->getRefreshMode()));
-        if (status != hal::eink::EinkStatus::EinkOK) {
-            LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
+        const gui::Context &ctx = *message->getContext();
+        auto refreshMode        = translateToEinkRefreshMode(message->getRefreshMode());
+
+        // Get areas changed since last update
+        std::vector<hal::eink::EinkFrame> updateFrames;
+        if (!previousContext) {
+            updateFrames = {{0, 0, {ctx.getW(), ctx.getH()}}};
+
+            previousContext.reset(new gui::Context(ctx.get(0, 0, ctx.getW(), ctx.getH())));
         }
+        else if (refreshMode > previousRefreshMode) {
+            updateFrames = {{0, 0, {ctx.getW(), ctx.getH()}}};
+
+            previousContext->insert(0, 0, ctx);
+        }
+        else {
+            // Each bounding box cover the whole width of the context. They are disjoint and sorted by y coordinate.
+            const auto diffBoundingBoxes = gui::Context::linesDiffs(ctx, *previousContext);
+            if (!diffBoundingBoxes.empty()) {
+                const std::uint16_t gapThreshold = ctx.getH() / 4;
+                const std::uint16_t alignment    = 8;
+
+                const auto mergedBoxes = mergeBoundingBoxes(diffBoundingBoxes, gapThreshold);
+                updateFrames           = makeAlignedFrames(mergedBoxes, alignment);
+
+#if DEBUG_EINK_REFRESH == 1
+                debug_handleImageMessage("Boxes", diffBoundingBoxes);
+                debug_handleImageMessage("Merged boxes", mergedBoxes);
+#endif
+
+                previousContext->insert(0, 0, ctx);
+            }
+        }
+
+        if (!updateFrames.empty()) {
+            hal::eink::EinkFrame refreshFrame;
+            refreshFrame = updateFrames.front();
+            refreshFrame.size.height =
+                updateFrames.back().pos_y + updateFrames.back().size.height - updateFrames.front().pos_y;
+
+            eInkSentinel->HoldMinimumFrequency();
+
+            const auto status = display->showImage(updateFrames, refreshFrame, ctx.getData(), refreshMode);
+            if (status != hal::eink::EinkStatus::EinkOK) {
+                previousContext.reset();
+                refreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
+                LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
+            }
+
+#if DEBUG_EINK_REFRESH == 1
+            debug_handleImageMessage("Frames", updateFrames);
+            debug_handleImageMessage("Refresh frame", std::vector<hal::eink::EinkFrame>({refreshFrame}));
+#endif
+        }
+
+#if DEBUG_EINK_REFRESH == 1
+        LOG_INFO("Refresh context: %d %d, mode: %d", (int)ctx.getW(), (int)ctx.getH(), (int)refreshMode);
+#endif
+
+        previousRefreshMode = refreshMode;
 
         return std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
     }

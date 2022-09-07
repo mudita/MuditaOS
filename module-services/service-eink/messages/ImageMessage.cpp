@@ -10,9 +10,9 @@ namespace service::eink
         : contextId{contextId}, context{context}, refreshMode{refreshMode}
     {}
 
-    auto ImageMessage::getData() noexcept -> std::uint8_t *
+    auto ImageMessage::getContext() noexcept -> ::gui::Context *
     {
-        return context->getData();
+        return context;
     }
 
     auto ImageMessage::getRefreshMode() const noexcept -> ::gui::RefreshModes

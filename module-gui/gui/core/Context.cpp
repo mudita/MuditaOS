@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -8,35 +8,28 @@
  *      Author: robert
  */
 
-#include <ios>
-#include <cstring>
-
-#include "BoundingBox.hpp"
 #include "Context.hpp"
+
+#include <cassert>
+#include <cstring>
+#include <ios>
 
 namespace gui
 {
-
-    Context::Context() : x{0}, y{0}, w{0}, h{0}, data{nullptr}
-    {}
-
-    Context::Context(uint16_t width, uint16_t height) : x{0}, y{0}, w{width}, h{height}, data(new uint8_t[w * h])
+    Context::Context(std::uint16_t width, std::uint16_t height) : w{width}, h{height}, data(new std::uint8_t[w * h])
     {
-        memset(data, 15, w * h);
+        memset(data.get(), clearColor, w * h);
     }
 
-    Context::~Context()
+    Context Context::get(std::int16_t gx, std::int16_t gy, std::uint16_t width, std::uint16_t height) const
     {
-        if (data != nullptr)
-            delete[] data;
-    }
+        Context retContext = Context(width, height);
 
-    Context *Context::get(int16_t gx, int16_t gy, uint16_t width, uint16_t height)
-    {
-        Context *retContext = new Context(width, height);
-
-        retContext->x = gx;
-        retContext->y = gy;
+        // Copy the whole block if context is fully inside and covering the whole width
+        if (gx == 0 && width == w && gy >= 0 && std::uint16_t(gy + height) <= h) {
+            memcpy(retContext.data.get(), data.get() + gy * w, w * height);
+            return retContext;
+        }
 
         // create bounding boxes for the current context and return context
         BoundingBox currentBox = BoundingBox(0, 0, w, h);
@@ -48,7 +41,7 @@ namespace gui
             Length sourceOffset = resultBox.y * w + resultBox.x;
             Length destOffset   = (resultBox.y - gy) * width + (resultBox.x - gx);
             for (Length h = 0; h < resultBox.h; h++) {
-                memcpy(retContext->data + destOffset, data + sourceOffset, resultBox.w);
+                memcpy(retContext.data.get() + destOffset, data.get() + sourceOffset, resultBox.w);
                 sourceOffset += w;
                 destOffset += width;
             }
@@ -58,27 +51,38 @@ namespace gui
         return retContext;
     }
 
-    void Context::insert(int16_t ix, int16_t iy, Context *context)
+    void Context::insert(std::int16_t ix, std::int16_t iy, const Context &context)
     {
+        // Copy the whole block if context is fully inside and covering the whole width
+        if (ix == 0 && context.w == w && iy >= 0 && std::uint16_t(iy + context.h) <= h) {
+            memcpy(data.get() + iy * w, context.data.get(), w * context.h);
+            return;
+        }
+
         // create bounding boxes for the current context and return context
         BoundingBox currentBox = BoundingBox(0, 0, w, h);
-        BoundingBox insertBox  = BoundingBox(ix, iy, context->w, context->h);
+        BoundingBox insertBox  = BoundingBox(ix, iy, context.w, context.h);
         BoundingBox resultBox;
 
         // if boxes overlap copy part defined by result from current context to the new context.
         if (BoundingBox::intersect(currentBox, insertBox, resultBox)) {
-            Length sourceOffset = (resultBox.y - iy) * context->w + (resultBox.x - ix);
+            Length sourceOffset = (resultBox.y - iy) * context.w + (resultBox.x - ix);
             Length destOffset   = (resultBox.y) * w + (resultBox.x);
             for (Length h = 0; h < resultBox.h; h++) {
-                memcpy(data + destOffset, context->data + sourceOffset, resultBox.w);
-                sourceOffset += context->w;
+                memcpy(data.get() + destOffset, context.data.get() + sourceOffset, resultBox.w);
+                sourceOffset += context.w;
                 destOffset += w;
             }
         }
     }
 
-    void Context::insertArea(
-        int16_t ix, int16_t iy, int16_t iareaX, int16_t iareaY, int16_t iareaW, int16_t iareaH, Context *context)
+    void Context::insertArea(std::int16_t ix,
+                             std::int16_t iy,
+                             std::int16_t iareaX,
+                             std::int16_t iareaY,
+                             std::int16_t iareaW,
+                             std::int16_t iareaH,
+                             const Context &context)
     {
         // create bounding boxes for the current context and return context
         BoundingBox currentBox = BoundingBox(0, 0, w, h);
@@ -87,39 +91,98 @@ namespace gui
 
         // if boxes overlap copy part defined by result from current context to the new context.
         if (BoundingBox::intersect(currentBox, insertBox, resultBox)) {
-            int16_t xBoxOffset = 0;
-            int16_t yBoxOffset = 0;
+            std::int16_t xBoxOffset = 0;
+            std::int16_t yBoxOffset = 0;
             if (iareaX < 0)
                 xBoxOffset = iareaX;
             if (iareaY < 0)
                 yBoxOffset = iareaY;
-            Length sourceOffset = (resultBox.y - iy - yBoxOffset) * context->w + (resultBox.x - ix - xBoxOffset);
+            Length sourceOffset = (resultBox.y - iy - yBoxOffset) * context.w + (resultBox.x - ix - xBoxOffset);
             Length destOffset   = (resultBox.y) * w + (resultBox.x);
             for (Length h = 0; h < resultBox.h; h++) {
-                memcpy(data + destOffset, context->data + sourceOffset, resultBox.w);
-                sourceOffset += context->w;
+                memcpy(data.get() + destOffset, context.data.get() + sourceOffset, resultBox.w);
+                sourceOffset += context.w;
                 destOffset += w;
             }
         }
     }
 
-    void Context::fill(uint8_t colour)
+    struct LRange
+    {
+        LRange(std::uint16_t begin, std::uint16_t end) : begin(begin), end(end)
+        {}
+        void expand(LRange const &other)
+        {
+            begin = std::min(begin, other.begin);
+            end   = std::max(end, other.end);
+        }
+        static LRange inversed(std::uint16_t end)
+        {
+            return {end, 0};
+        }
+        std::uint16_t begin, end;
+    };
+
+    inline BoundingBox makeBoundingBox(const LRange &rangeX, const LRange &rangeY)
+    {
+        return {rangeX.begin,
+                rangeY.begin,
+                std::uint16_t(rangeX.end - rangeX.begin),
+                std::uint16_t(rangeY.end - rangeY.begin)};
+    }
+
+    // Currently the algorithm only works properly for width divisible by 8 due to the use of 64b integers.
+    std::deque<BoundingBox> gui::Context::linesDiffs(const gui::Context &ctx1, const gui::Context &ctx2)
+    {
+        using casted_t        = std::uint64_t;
+        const std::uint16_t w = ctx1.getW();
+        const std::uint16_t h = ctx1.getH();
+        assert(w == ctx2.getW() && h == ctx2.getH() && w % 8 == 0);
+        const std::uint16_t cw = w / sizeof(casted_t);
+        const auto data1       = reinterpret_cast<const casted_t *>(ctx1.getData());
+        const auto data2       = reinterpret_cast<const casted_t *>(ctx2.getData());
+
+        std::deque<BoundingBox> result;
+        LRange rangeY = LRange::inversed(h);
+        for (std::uint16_t y = 0; y < h; ++y) {
+            const auto begin1 = data1 + y * cw;
+            const auto end1   = begin1 + cw;
+            const auto begin2 = data2 + y * cw;
+            if (std::mismatch(begin1, end1, begin2).first != end1) {
+                if (rangeY.begin == h) { // diff pixels found first time
+                    rangeY.begin = y;
+                }
+            }
+            else {
+                if (rangeY.begin != h) { // diff pixels found before
+                    rangeY.end = y;
+                    result.push_back(makeBoundingBox({0, w}, rangeY));
+                    rangeY = LRange::inversed(h);
+                }
+            }
+        }
+        if (rangeY.begin != h) { // diff pixels found before
+            rangeY.end = h;
+            result.push_back(makeBoundingBox({0, w}, rangeY));
+        }
+        return result;
+    }
+
+    void Context::fill(std::uint8_t colour)
     {
         if (data) {
-            memset(data, colour, w * h);
+            memset(data.get(), colour, w * h);
         }
-        //	uint32_t size = 480*600;
-        //	memset( data, colour, size );
     }
 
     std::ostream &operator<<(std::ostream &out, const Context &c)
     {
-        out << "x:" << c.x << "y:" << c.y << "w:" << c.w << "h:" << c.h << std::endl;
+        out << "w:" << c.w << "h:" << c.h << std::endl;
 
-        uint32_t offset = 0;
-        for (uint32_t y = 0; y < c.h; y++) {
-            for (uint32_t x = 0; x < c.w; x++) {
-                uint32_t value = *(c.data + offset);
+        std::uint32_t offset = 0;
+        for (std::uint32_t y = 0; y < c.h; y++) {
+            for (std::uint32_t x = 0; x < c.w; x++) {
+                std::uint32_t value = *(c.data.get() + offset);
                 std::cout << std::hex << value;
                 offset++;
             }

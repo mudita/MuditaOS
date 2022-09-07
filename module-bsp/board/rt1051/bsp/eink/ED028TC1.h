@@ -382,7 +382,7 @@ extern "C"
      *          EinkOK - Part of image send successfully
      */
     EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
-                                 uint8_t *buffer,
+                                 const uint8_t *buffer,
                                  EinkBpp_e bpp,
                                  EinkDisplayColorMode_e invertColors);
 
@@ -431,7 +431,7 @@ extern "C"
      * @param displayWidth    [in] - display width in pixels
      * @param displayHeight   [in] - display height in pixels
      */
-    void EinkARGBToLuminance(uint8_t *dataIn, uint8_t *dataOut, uint32_t displayWidth, uint32_t displayHeight);
+    void EinkARGBToLuminance(const uint8_t *dataIn, uint8_t *dataOut, uint32_t displayWidth, uint32_t displayHeight);
 
 #if defined(__cplusplus)
 }
