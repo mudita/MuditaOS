@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -101,6 +101,7 @@ namespace locks
         void setNextUnlockAttemptLockTime(time_t time);
         void setNoLockTimeAttemptsLeft(unsigned int attemptsNumber);
         void increaseLockTime() noexcept;
+        void setNextUnlockAttemptFormattedTime() noexcept;
         void resetLockTime() noexcept;
         void broadcastLockTime() noexcept;
     };
