@@ -8,6 +8,7 @@
 * Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
+* Fixed passcode lock time discrepancy between lock screen and 'Wrong password' popup
 * Fixed cellular DMA errors
 * Fixed order of the services while closing system
 * Fixed crash of the E-ink service while restoring system data
@@ -22,6 +23,8 @@
 * Fixed PLAY label translation in German
 * Fixed USB connection/disconnection detection
 * Fixed memory leaks in APN settings
+
+### Added
 * Added basic MMS handling
 
 ## [1.3.0 2022-08-04]

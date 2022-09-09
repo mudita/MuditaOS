@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneLockHandler.hpp"
@@ -10,6 +10,10 @@
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <time/time_conversion_factory.hpp>
+
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 namespace locks
 {
@@ -28,7 +32,8 @@ namespace locks
                 if (lockedFor == nextUnlockAttemptLockTime) {
                     phoneLockTimeUpdateInfoAction(LockTimerState::Start);
                 }
-                else if (lockedFor % utils::secondsInMinute == 0 || lockedFor <= utils::secondsInMinute) {
+                else if (lockedFor % std::chrono::duration_cast<std::chrono::seconds>(1min).count() == 0 ||
+                         lockedFor <= std::chrono::duration_cast<std::chrono::seconds>(1min).count()) {
                     phoneLockTimeUpdateInfoAction(LockTimerState::Counting);
                 }
 
@@ -37,8 +42,6 @@ namespace locks
                 if (lockedFor == 0) {
                     savePhoneLockTime();
                 }
-
-                return;
             });
     }
 
@@ -181,19 +184,22 @@ namespace locks
         auto rebuildRequired = state == LockTimerState::Start;
 
         if (state == LockTimerState::Start || state == LockTimerState::Counting) {
-            if (lockedFor <= utils::secondsInMinute) {
+            if (lockedFor <= std::chrono::duration_cast<std::chrono::seconds>(1min).count()) {
                 using utils::time::Duration;
                 const Duration remainingDuration{static_cast<uint32_t>(std::time_t{lockedFor})};
                 textToPrint = remainingDuration.str(Duration::DisplayedFormat::Fixed0M0S);
 
-                if (lockedFor == utils::secondsInMinute) {
+                if (lockedFor == std::chrono::duration_cast<std::chrono::seconds>(1min).count()) {
                     rebuildRequired = true;
                 }
             }
             else {
-                textToPrint = std::to_string(lockedFor / utils::secondsInMinute) +
-                              utils::translate("phone_lock_blocked_information_minutes");
+                textToPrint =
+                    std::to_string(lockedFor / std::chrono::duration_cast<std::chrono::seconds>(1min).count()) +
+                    utils::translate("phone_lock_blocked_information_minutes");
             }
+
+            setNextUnlockAttemptFormattedTime();
         }
 
         owner->bus.sendMulticast(std::make_shared<locks::PhoneLockTimeUpdate>(textToPrint, rebuildRequired),
@@ -486,16 +492,22 @@ namespace locks
         phoneLockTimer.start();
         phoneLockTimeUpdateInfoAction(LockTimerState::Start);
 
-        if (lockedFor < utils::secondsInMinute) {
+        setNextUnlockAttemptFormattedTime();
+    }
+
+    void PhoneLockHandler::setNextUnlockAttemptFormattedTime() noexcept
+    {
+        if (lockedFor < std::chrono::duration_cast<std::chrono::seconds>(1min).count()) {
             lock.setNextUnlockAttemptFormattedTime(std::to_string(lockedFor) +
                                                    utils::translate("phone_lock_blocked_information_seconds"));
         }
-        else if (lockedFor >= utils::secondsInMinute && lockedFor < 2 * utils::secondsInMinute) {
+        else if (lockedFor < std::chrono::duration_cast<std::chrono::seconds>(2min).count()) {
             lock.setNextUnlockAttemptFormattedTime(utils::translate("phone_lock_blocked_information_minute"));
         }
         else {
-            lock.setNextUnlockAttemptFormattedTime(std::to_string(lockedFor / utils::secondsInMinute) +
-                                                   utils::translate("phone_lock_blocked_information_minutes"));
+            lock.setNextUnlockAttemptFormattedTime(
+                std::to_string(lockedFor / std::chrono::duration_cast<std::chrono::seconds>(1min).count()) +
+                utils::translate("phone_lock_blocked_information_minutes"));
         }
     }
 
