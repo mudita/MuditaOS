@@ -133,7 +133,7 @@ int main()
 {
     constexpr auto ApplicationName = "PurePhone";
 
-    const std::vector<std::string> fileIndexerAudioPaths = {{purefs::dir::getUserDiskPath() / "music"}};
+    const std::vector<std::string> fileIndexerAudioPaths = {{purefs::dir::getUserAudioPath()}};
 
     prof::init();
 

@@ -4,17 +4,19 @@
 #pragma once
 
 #include "presenter/BGSoundsMainWindowPresenter.hpp"
-#include <common/options/BellOptionWindow.hpp>
+
+#include <AppWindow.hpp>
+
 namespace gui
 {
-    class BGSoundsMainWindow : public BellOptionWindow, public app::bgSounds::BGSoundsMainWindowContract::View
+    class ListViewWithArrows;
+
+    class BGSoundsMainWindow : public AppWindow, public app::bgSounds::BGSoundsMainWindowContract::View
     {
         std::unique_ptr<app::bgSounds::BGSoundsMainWindowContract::Presenter> presenter;
+        ListViewWithArrows *listView{nullptr};
 
-        void setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> soundsTags);
         void buildInterface() override;
-
-        void onActivated(const db::multimedia_files::MultimediaFilesRecord &selectedSound);
 
       public:
         BGSoundsMainWindow(app::ApplicationCommon *app,

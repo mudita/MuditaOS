@@ -46,7 +46,7 @@ target_link_libraries(application-bell-powernap
         bell::app-common
         bell::app-main
         bell::keymap
-        bell::alarms
+        bell::paths
         bell::db
         Microsoft.GSL::GSL
 
