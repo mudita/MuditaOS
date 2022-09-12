@@ -36,8 +36,8 @@ namespace db::multimedia_files
         if (typeid(*query) == typeid(query::GetLimited)) {
             return runQueryImplGetLimited(std::static_pointer_cast<query::GetLimited>(query));
         }
-        if (typeid(*query) == typeid(query::GetLimitedByPath)) {
-            return runQueryImplGetLimited(std::static_pointer_cast<query::GetLimitedByPath>(query));
+        if (typeid(*query) == typeid(query::GetLimitedByPaths)) {
+            return runQueryImplGetLimited(std::static_pointer_cast<query::GetLimitedByPaths>(query));
         }
         if (typeid(*query) == typeid(query::Remove)) {
             return runQueryImplRemove(std::static_pointer_cast<query::Remove>(query));
@@ -252,10 +252,10 @@ namespace db::multimedia_files
     }
 
     std::unique_ptr<db::multimedia_files::query::GetLimitedResult> MultimediaFilesRecordInterface::
-        runQueryImplGetLimited(const std::shared_ptr<db::multimedia_files::query::GetLimitedByPath> &query)
+        runQueryImplGetLimited(const std::shared_ptr<db::multimedia_files::query::GetLimitedByPaths> &query)
     {
-        const auto records = database->files.getLimitOffsetByPath(query->path, query->offset, query->limit);
-        auto response      = std::make_unique<query::GetLimitedResult>(records, database->files.count());
+        const auto records = database->files.getLimitOffsetByPaths(query->paths, query->offset, query->limit);
+        auto response      = std::make_unique<query::GetLimitedResult>(records, database->files.count(query->paths));
         response->setRequestQuery(query);
 
         return response;
