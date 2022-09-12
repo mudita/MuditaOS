@@ -34,7 +34,7 @@ namespace db::multimedia_files::query
     class GetCountForArtist;
     class GetCountResult;
     class GetLimited;
-    class GetLimitedByPath;
+    class GetLimitedByPaths;
     class GetLimitedForAlbum;
     class GetLimitedForArtist;
     class GetLimitedResult;
@@ -72,7 +72,7 @@ namespace db::multimedia_files
         std::unique_ptr<db::multimedia_files::query::GetLimitedResult> runQueryImplGetLimited(
             const std::shared_ptr<db::multimedia_files::query::GetLimited> &query);
         std::unique_ptr<db::multimedia_files::query::GetLimitedResult> runQueryImplGetLimited(
-            const std::shared_ptr<db::multimedia_files::query::GetLimitedByPath> &query);
+            const std::shared_ptr<db::multimedia_files::query::GetLimitedByPaths> &query);
         std::unique_ptr<db::multimedia_files::query::RemoveResult> runQueryImplRemove(
             const std::shared_ptr<db::multimedia_files::query::Remove> &query);
         std::unique_ptr<db::multimedia_files::query::RemoveResult> runQueryImplRemoveAll(

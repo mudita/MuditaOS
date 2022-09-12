@@ -32,15 +32,16 @@ namespace app::music
 
     SongsRepository::SongsRepository(ApplicationCommon *application,
                                      std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
-                                     std::string pathPrefix)
+                                     const std::vector<std::string> &pathPrefixes)
         : app::AsyncCallbackReceiver{application}, application{application},
-          tagsFetcher(std::move(tagsFetcher)), pathPrefix{pathPrefix}
+          tagsFetcher(std::move(tagsFetcher)), pathPrefixes{pathPrefixes}
     {}
 
     void SongsRepository::initCache()
     {
-        auto query = std::make_unique<db::multimedia_files::query::GetLimited>(0, constants::cacheMaxSize);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::MultimediaFiles);
+        auto query =
+            std::make_unique<db::multimedia_files::query::GetLimitedByPaths>(pathPrefixes, 0, constants::cacheMaxSize);
+        auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::MultimediaFiles);
         musicFilesModelCache.recordsOffset = 0;
 
         task->setCallback([this](auto response) {
@@ -59,7 +60,7 @@ namespace app::music
                                             std::uint32_t limit,
                                             const OnGetMusicFilesListCallback &callback)
     {
-        auto query = std::make_unique<db::multimedia_files::query::GetLimitedByPath>(pathPrefix, offset, limit);
+        auto query = std::make_unique<db::multimedia_files::query::GetLimitedByPaths>(pathPrefixes, offset, limit);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::MultimediaFiles);
 
         task->setCallback([this, callback, offset](auto response) {
@@ -187,7 +188,7 @@ namespace app::music
                                                std::uint32_t limit,
                                                const OnUpdateMusicFilesListCallback &callback)
     {
-        auto query = std::make_unique<db::multimedia_files::query::GetLimited>(offset, limit);
+        auto query = std::make_unique<db::multimedia_files::query::GetLimitedByPaths>(pathPrefixes, offset, limit);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::MultimediaFiles);
 
         task->setCallback([offset, callback](auto response) {
