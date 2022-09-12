@@ -29,7 +29,6 @@ LinuxPlatform::~LinuxPlatform()
 void LinuxPlatform::init()
 {
     initFilesystem();
-    ::platform::Platform::initCommonUserFolders();
 }
 
 void LinuxPlatform::initFilesystem()
