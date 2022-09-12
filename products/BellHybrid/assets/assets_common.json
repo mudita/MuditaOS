@@ -54,23 +54,23 @@
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_arrow_down_W_M.vpi", "output": "assets/images/bell/bell_arrow_down_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/big_bell_ringing_W_G.vpi", "output": "assets/images/bell/big_bell_ringing_W_G.vpi"},
 
-        
+
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Blissful_Dream.mp3", "output": "assets/audio/chimes/Blissful_Dream.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Gentle_Chime.mp3", "output": "assets/audio/chimes/Gentle_Chime.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Rise_&_Shine.mp3", "output": "assets/audio/chimes/Rise_&_Shine.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Twinkle_Chime.mp3", "output": "assets/audio/chimes/Twinkle_Chime.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Ancient_Greek.mp3", "output": "assets/audio/bg_sounds/Ancient_Greek.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Autumnal_Sea.mp3", "output": "assets/audio/bg_sounds/Autumnal_Sea.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Bubbling_Brook.mp3", "output": "assets/audio/bg_sounds/Bubbling_Brook.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Charming_Bells.mp3", "output": "assets/audio/bg_sounds/Charming_Bells.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Forest_Creek.mp3", "output": "assets/audio/bg_sounds/Forest_Creek.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Mountain_Lagoon.mp3", "output": "assets/audio/bg_sounds/Mountain_Lagoon.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Mystic_Nature.mp3", "output": "assets/audio/bg_sounds/Mystic_Nature.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Natures_Harmony.mp3", "output": "assets/audio/bg_sounds/Natures_Harmony.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Rhythmic_Lullaby.mp3", "output": "assets/audio/bg_sounds/Rhythmic_Lullaby.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Seaside_Symphony.mp3", "output": "assets/audio/bg_sounds/Seaside_Symphony.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Under_the_Water.mp3", "output": "assets/audio/bg_sounds/Under_the_Water.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Woodland_Ambiance.mp3", "output": "assets/audio/bg_sounds/Woodland_Ambiance.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Ancient_Greek.mp3", "output": "assets/audio/relaxation/Ancient_Greek.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Autumnal_Sea.mp3", "output": "assets/audio/relaxation/Autumnal_Sea.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Bubbling_Brook.mp3", "output": "assets/audio/relaxation/Bubbling_Brook.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Charming_Bells.mp3", "output": "assets/audio/relaxation/Charming_Bells.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Forest_Creek.mp3", "output": "assets/audio/relaxation/Forest_Creek.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Mountain_Lagoon.mp3", "output": "assets/audio/relaxation/Mountain_Lagoon.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Mystic_Nature.mp3", "output": "assets/audio/relaxation/Mystic_Nature.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Natures_Harmony.mp3", "output": "assets/audio/relaxation/Natures_Harmony.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Rhythmic_Lullaby.mp3", "output": "assets/audio/relaxation/Rhythmic_Lullaby.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Seaside_Symphony.mp3", "output": "assets/audio/relaxation/Seaside_Symphony.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Under_the_Water.mp3", "output": "assets/audio/relaxation/Under_the_Water.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Woodland_Ambiance.mp3", "output": "assets/audio/relaxation/Woodland_Ambiance.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/meditation/Meditation_Gong.mp3", "output": "assets/audio/meditation/Meditation_Gong.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/prewakeup/Joyful_Awakening.mp3", "output": "assets/audio/prewakeup/Joyful_Awakening.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/prewakeup/Morning_Spirit.mp3", "output": "assets/audio/prewakeup/Morning_Spirit.mp3"},
@@ -96,8 +96,6 @@
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/evening_reminder/Evening_Horizon.mp3", "output": "assets/audio/evening_reminder/Evening_Horizon.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/evening_reminder/Evolving_Dusk.mp3", "output": "assets/audio/evening_reminder/Evolving_Dusk.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/evening_reminder/Melodic_Mirth.mp3", "output": "assets/audio/evening_reminder/Melodic_Mirth.mp3"},
-        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/evening_reminder/Twilight_Gleam.mp3", "output": "assets/audio/evening_reminder/Twilight_Gleam.mp3"},
-
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/bell/evening_reminder/Twilight_Gleam.mp3", "output": "../user/music/Twilight_Gleam.mp3"}
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/evening_reminder/Twilight_Gleam.mp3", "output": "assets/audio/evening_reminder/Twilight_Gleam.mp3"}
     ]
 }

@@ -18,6 +18,7 @@ target_sources(application-bell-background-sounds
         presenter/BGSoundsTimerSelectPresenter.cpp
         presenter/BGSoundsVolumePresenter.cpp
         widgets/BGSoundsPlayer.cpp
+        widgets/SoundListItem.cpp
         windows/BGSoundsMainWindow.cpp
         windows/BGSoundsPausedWindow.cpp
         windows/BGSoundsProgressWindow.cpp
@@ -47,7 +48,7 @@ target_link_libraries(application-bell-background-sounds
     PRIVATE
         apps-common
         bell::audio
-        bell::alarms
+        bell::paths
         Microsoft.GSL::GSL
 
     PUBLIC

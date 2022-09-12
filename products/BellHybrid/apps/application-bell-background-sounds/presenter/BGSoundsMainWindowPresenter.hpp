@@ -4,18 +4,26 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
-#include <module-db/Interface/MultimediaFilesRecord.hpp>
-#include <tags_fetcher/TagsFetcher.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 
+namespace gui
+{
+    class ListItemProvider;
+}
+namespace app
+{
+    class ApplicationCommon;
+}
 namespace app::music
 {
     class AbstractSongsRepository;
 }
 namespace app::bgSounds
 {
+    class SoundsProvider;
+
     class BGSoundsMainWindowContract
     {
       public:
@@ -23,24 +31,25 @@ namespace app::bgSounds
         {
           public:
             virtual ~View() = default;
-
-            virtual void setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> songs) = 0;
         };
 
         class Presenter : public BasePresenter<BGSoundsMainWindowContract::View>
         {
           public:
-            virtual void loadAudioRecords() = 0;
+            virtual std::shared_ptr<gui::ListItemProvider> getProvider() = 0;
         };
     };
 
     class BGSoundsMainWindowPresenter : public BGSoundsMainWindowContract::Presenter
     {
-        std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository;
-        void loadAudioRecords() override;
-
       public:
-        explicit BGSoundsMainWindowPresenter(std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository);
+        BGSoundsMainWindowPresenter(app::ApplicationCommon *app,
+                                    std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository);
+
+      private:
+        std::shared_ptr<SoundsProvider> soundsProvider;
+
+        std::shared_ptr<gui::ListItemProvider> getProvider() override;
     };
 
 } // namespace app::bgSounds
