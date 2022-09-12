@@ -106,6 +106,13 @@ message_serial_status()
 include(BinaryAssetsVersions.cmake)
 include(AddVersionJson)
 
+add_directories(
+        TARGET user_directories
+        PREFIX ${CMAKE_BINARY_DIR}/sysroot/sys/user/audio
+        DEPENDS user_directories_common
+        DIRECTORIES music_player
+)
+
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(AddBootBin)
     add_boot_bin(PurePhone)
@@ -113,7 +120,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         PRODUCT PurePhone
         SYSROOT sysroot
         LUTS Luts.bin
-        DEPENDS assets updater.bin-target ecoboot.bin-target PurePhone-boot.bin PurePhone-version.json-target
+        DEPENDS user_directories assets updater.bin-target ecoboot.bin-target PurePhone-boot.bin PurePhone-version.json-target
     )
     add_version_rt1051_json(PurePhone)
 else()
@@ -121,7 +128,7 @@ else()
         PRODUCT PurePhone
         SYSROOT sysroot
         LUTS ""
-        DEPENDS assets PurePhone-version.json-target
+        DEPENDS user_directories assets PurePhone-version.json-target
     )
     add_version_linux_json(PurePhone)
 endif()
