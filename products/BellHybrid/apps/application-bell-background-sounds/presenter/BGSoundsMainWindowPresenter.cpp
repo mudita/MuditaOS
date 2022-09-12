@@ -2,30 +2,27 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BGSoundsMainWindowPresenter.hpp"
+#include "data/BGSoundsAudioData.hpp"
+#include "widgets/SoundListItem.hpp"
+#include "ApplicationBellBackgroundSounds.hpp"
 #include <apps-common/models/SongsRepository.hpp>
-#include <purefs/filesystem_paths.hpp>
-
-namespace
-{
-    constexpr auto soundsRepoOffset = 0;
-    constexpr auto soundsRepoLimit  = 100;
-} // namespace
+#include <common/SoundsProvider.hpp>
 
 namespace app::bgSounds
 {
     BGSoundsMainWindowPresenter::BGSoundsMainWindowPresenter(
-        std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository)
-        : soundsRepository{std::move(soundsRepository)}
-    {}
-    void BGSoundsMainWindowPresenter::loadAudioRecords()
+        app::ApplicationCommon *app, std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository)
+        : soundsProvider{std::make_shared<SoundsProvider>(
+              app, sound_list_item::build, std::move(soundsRepository), sound_list_item::size())}
     {
-        soundsRepository->getMusicFilesList(
-            soundsRepoOffset,
-            soundsRepoLimit,
-            [this](const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
-                   unsigned int repoRecordsCount) {
-                getView()->setSoundsList(records);
-                return true;
-            });
+        soundsProvider->setOnSoundItemActivatedCallback([app](const auto &sound) {
+            auto audioContext = std::make_unique<gui::BGSoundsAudioContext>(sound);
+            auto switchData   = std::make_unique<gui::BGSoundsSwitchData>(std::move(audioContext));
+            app->switchWindow(gui::window::name::bgSoundsTimerSelect, std::move(switchData));
+        });
+    }
+    std::shared_ptr<gui::ListItemProvider> BGSoundsMainWindowPresenter::getProvider()
+    {
+        return soundsProvider;
     }
 } // namespace app::bgSounds

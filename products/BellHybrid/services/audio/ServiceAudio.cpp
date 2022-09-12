@@ -10,7 +10,7 @@
 
 namespace
 {
-    constexpr auto stackSize            = 1024 * 4;
+    constexpr auto stackSize            = 1024 * 8;
     constexpr auto defaultVolume        = "5";
     constexpr auto defaultSnoozeVolume  = "4";
     constexpr auto defaultBedtimeVolume = "6";

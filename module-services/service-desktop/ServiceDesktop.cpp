@@ -199,7 +199,7 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
                                                     std::bind(&ServiceDesktop::restartConnectionActiveTimer, this),
                                                     *usbSecurityModel,
                                                     serialNumber,
-                                                    purefs::dir::getUserDiskPath() / "music");
+                                                    purefs::dir::getUserStoragePath());
 
     initialized = desktopWorker->init(
         {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdcReceiveQueueLength},

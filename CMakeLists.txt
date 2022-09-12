@@ -27,6 +27,7 @@ include(ModuleUtils)
 include(DiskImage)
 include(AddPackage)
 include(AutoModuleOption)
+include(AddDirectories)
 
 message("Selected product: ${PRODUCT}")
 message("Selected board:   ${BOARD}")
@@ -167,6 +168,12 @@ add_custom_target(
         "Generating version info"
     )
 
+add_directories(
+        TARGET user_directories_common
+        PREFIX ${CMAKE_BINARY_DIR}/sysroot/sys/user
+        DEPENDS assets
+        DIRECTORIES logs crash_dumps backup tmp storage audio
+)
 add_library(version-header INTERFACE)
 target_include_directories(version-header INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/source/include>)
 add_dependencies(version-header version)
