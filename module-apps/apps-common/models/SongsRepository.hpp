@@ -64,9 +64,9 @@ namespace app::music
     class SongsRepository : public AbstractSongsRepository, public app::AsyncCallbackReceiver
     {
       public:
-        explicit SongsRepository(ApplicationCommon *application,
-                                 std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
-                                 std::string pathPrefix);
+        SongsRepository(ApplicationCommon *application,
+                        std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
+                        const std::vector<std::string> &pathPrefixes);
 
         void initCache();
         void getMusicFilesList(std::uint32_t offset, std::uint32_t limit, const OnGetMusicFilesListCallback &callback);
@@ -88,7 +88,7 @@ namespace app::music
 
         std::unique_ptr<AbstractTagsFetcher> tagsFetcher;
 
-        std::string pathPrefix;
+        std::vector<std::string> pathPrefixes;
 
         /// collection of music files displayed in the list view
         FilesCache musicFilesViewCache;

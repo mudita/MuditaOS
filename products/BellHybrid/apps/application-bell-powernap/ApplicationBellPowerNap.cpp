@@ -9,7 +9,7 @@
 #include "windows/PowerNapProgressWindow.hpp"
 #include "windows/PowerNapSessionEndedWindow.hpp"
 #include <common/models/TimeModel.hpp>
-#include <AlarmSoundPaths.hpp>
+#include <Paths.hpp>
 #include <common/windows/SessionPausedWindow.hpp>
 
 namespace app
@@ -46,10 +46,11 @@ namespace app
         });
         windowsFactory.attach(
             gui::window::name::powernapProgress, [this](ApplicationCommon *app, const std::string &name) {
-                auto timeModel        = std::make_unique<app::TimeModel>();
-                auto alarmLightOnOff  = std::make_unique<bell_settings::AlarmLightOnOffModel>(this);
-                auto soundsRepository = std::make_unique<SoundsRepository>(alarms::paths::getAlarmDir());
-                auto presenter        = std::make_unique<powernap::PowerNapProgressPresenter>(app,
+                auto timeModel       = std::make_unique<app::TimeModel>();
+                auto alarmLightOnOff = std::make_unique<bell_settings::AlarmLightOnOffModel>(this);
+                auto soundsRepository =
+                    std::make_unique<SoundsRepository>(paths::audio::proprietary() / paths::audio::alarm());
+                auto presenter = std::make_unique<powernap::PowerNapProgressPresenter>(app,
                                                                                        settings.get(),
                                                                                        std::move(soundsRepository),
                                                                                        *audioModel,

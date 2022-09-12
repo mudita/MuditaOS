@@ -41,7 +41,7 @@
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
 #include <time/AlarmOperations.hpp>
-#include "alarms/include/AlarmSoundPaths.hpp"
+#include <Paths.hpp>
 
 #include <memory>
 #include <vector>
@@ -50,24 +50,11 @@
 #include <SEGGER/SEGGER_SYSVIEW.h>
 #endif
 
-namespace
-{
-    void validate_assets_path()
-    {
-        if (const auto ret = alarms::paths::validate(); not ret.empty()) {
-            for (const auto &e : ret) {
-                LOG_FATAL("%s path missing", e.c_str());
-            }
-            abort();
-        }
-    }
-} // namespace
-
 int main()
 {
     constexpr auto ApplicationName = "BellHybrid";
 
-    std::vector<std::string> fileIndexerAudioPaths = {alarms::paths::getBackgroundSoundsDir()};
+    std::vector<std::string> fileIndexerAudioPaths = {paths::audio::proprietary(), paths::audio::user()};
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
@@ -117,9 +104,6 @@ int main()
             /// otherwise we would end up with an init race and PhonenumberUtil could
             /// be initiated in a task with stack not big enough to handle it
             i18n::phonenumbers::PhoneNumberUtil::GetInstance();
-
-            validate_assets_path();
-
             return true;
         },
         [sysmgr]() {
