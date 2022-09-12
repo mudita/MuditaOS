@@ -20,6 +20,7 @@ target_sources(application-bell-common
         src/BatteryModel.cpp
         src/SoundsRepository.cpp
         src/BellListItemProvider.cpp
+        src/SoundsProvider.cpp
         src/windows/BellFactoryReset.cpp
         src/windows/BellFinishedWindow.cpp
         src/windows/BellTurnOffWindow.cpp

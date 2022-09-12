@@ -12,29 +12,66 @@
 
 #include <filesystem>
 #include <fstream>
+#include <optional>
 
 namespace service::detail
 {
     namespace fs = std::filesystem;
-    namespace
-    {
-        using namespace std::string_literals;
-        // Lock file name
-        const auto lock_file_name = purefs::dir::getUserDiskPath() / ".directory_is_indexed";
-        // Time for indexing first unit
-        constexpr auto timer_indexing_delay = 400;
-        // Time for initial delay after start
-        constexpr auto timer_run_delay = 10000;
-    } // namespace
+    using namespace std::literals;
+    using namespace std::chrono_literals;
 
-    StartupIndexer::StartupIndexer(const std::vector<std::string> &paths) : start_dirs{paths}
+    const auto lock_file_name        = purefs::dir::getUserDiskPath() / ".directory_is_indexed";
+    constexpr auto indexing_interval = 50ms;
+    constexpr auto start_delay       = 10000ms;
+
+    bool isDirectoryFullyTraversed(const std::filesystem::recursive_directory_iterator &directory)
+    {
+        return directory == std::filesystem::recursive_directory_iterator();
+    }
+
+    bool createLockFile()
+    {
+        std::ofstream ofs(lock_file_name);
+        ofs << time(nullptr);
+        return ofs.good();
+    }
+
+    bool hasLockFile()
+    {
+        std::error_code ec;
+        return fs::is_regular_file(lock_file_name, ec);
+    }
+
+    bool removeLockFile()
+    {
+        if (hasLockFile()) {
+            std::error_code ec;
+            if (!remove(lock_file_name, ec)) {
+                LOG_ERROR("Failed to remove lock file, error: %d", ec.value());
+                return false;
+            }
+        }
+        return true;
+    }
+
+    std::optional<std::filesystem::recursive_directory_iterator> scanPath(std::vector<std::string>::const_iterator path)
+    {
+        std::error_code err;
+        const auto mSubDirIterator = fs::recursive_directory_iterator(*path, err);
+        if (err) {
+            LOG_WARN("Directory '%s' not indexed, it does not exist", path->c_str());
+            return std::nullopt;
+        }
+        return mSubDirIterator;
+    }
+
+    StartupIndexer::StartupIndexer(const std::vector<std::string> &paths) : directoriesToScan{paths}
     {}
 
     // Process single entry
     auto StartupIndexer::processEntry(std::shared_ptr<sys::Service> svc,
                                       const std::filesystem::recursive_directory_iterator::value_type &entry) -> void
     {
-        using namespace std::string_view_literals;
         if (fs::is_regular_file(entry)) {
             auto ext = fs::path(entry).extension();
             if (!isExtSupported(ext)) {
@@ -49,24 +86,22 @@ namespace service::detail
         }
     }
 
-    // On timer timeout
     auto StartupIndexer::onTimerTimeout(std::shared_ptr<sys::Service> svc) -> void
     {
         if (mForceStop) {
             return;
         }
-        if (!mStarted) {
-            mIdxTimer.restart(std::chrono::milliseconds{timer_indexing_delay});
-            mStarted = true;
-        }
-        if (mSubDirIterator == std::filesystem::recursive_directory_iterator()) {
-            if (mTopDirIterator == std::cend(start_dirs)) {
+        if (isDirectoryFullyTraversed(mSubDirIterator)) {
+            if (mTopDirIterator == std::cend(directoriesToScan)) {
                 createLockFile();
                 LOG_INFO("Initial startup indexer - Finished ...");
                 mIdxTimer.stop();
+                return;
             }
             else {
-                mSubDirIterator = fs::recursive_directory_iterator(*mTopDirIterator);
+                if (auto result = scanPath(mTopDirIterator)) {
+                    mSubDirIterator = *result;
+                }
                 mTopDirIterator++;
             }
         }
@@ -74,15 +109,15 @@ namespace service::detail
             processEntry(svc, *mSubDirIterator);
             mSubDirIterator++;
         }
+
+        mIdxTimer.restart(indexing_interval);
     }
 
     // Setup timers for notification
     auto StartupIndexer::setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
     {
-        mIdxTimer = sys::TimerFactory::createPeriodicTimer(svc.get(),
-                                                           "file_indexing",
-                                                           std::chrono::milliseconds{timer_run_delay},
-                                                           [this, svc](sys::Timer &) { onTimerTimeout(svc); });
+        mIdxTimer = sys::TimerFactory::createSingleShotTimer(
+            svc.get(), svc_name.data(), start_delay, [this, svc](auto &) { onTimerTimeout(svc); });
         mIdxTimer.start();
     }
 
@@ -91,7 +126,7 @@ namespace service::detail
     {
         if (!hasLockFile()) {
             LOG_INFO("Initial startup indexer - Started...");
-            mTopDirIterator = std::begin(start_dirs);
+            mTopDirIterator = std::begin(directoriesToScan);
             setupTimers(svc, svc_name);
             mForceStop = false;
         }
@@ -110,30 +145,5 @@ namespace service::detail
     {
         stop();
         removeLockFile();
-    }
-
-    auto StartupIndexer::createLockFile() -> bool
-    {
-        std::ofstream ofs(lock_file_name);
-        ofs << time(nullptr);
-        return ofs.good();
-    }
-
-    auto StartupIndexer::hasLockFile() -> bool
-    {
-        std::error_code ec;
-        return fs::is_regular_file(lock_file_name, ec);
-    }
-
-    auto StartupIndexer::removeLockFile() -> bool
-    {
-        if (hasLockFile()) {
-            std::error_code ec;
-            if (!remove(lock_file_name, ec)) {
-                LOG_ERROR("Failed to remove lock file, error: %d", ec.value());
-                return false;
-            }
-        }
-        return true;
     }
 } // namespace service::detail

@@ -3,6 +3,7 @@
 
 #include <catch2/catch.hpp>
 
+#include "common.hpp"
 #include <Databases/MultimediaFilesDB.hpp>
 #include <Interface/MultimediaFilesRecord.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesAdd.hpp>
@@ -36,31 +37,31 @@ const std::vector<Album> albums = {{.artist = artists[0], .title = {}},
 
 const std::vector<TableRow> records = {
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music/file1.mp3", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/audio/file1.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song1, .album = albums[3], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music/file2.mp3", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/audio/file2.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song2, .album = albums[3], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music/file3.mp3", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/audio/file3.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song2, .album = albums[4], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music/file4.mp3", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/audio/file4.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song2, .album = albums[5], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music/file5.mp3", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/audio/file5.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song3, .album = albums[0], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music/file6.mp3", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/audio/file6.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song3, .album = albums[7], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music/file7.mp3", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/audio/file7.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song3, .album = albums[5], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
@@ -78,17 +79,8 @@ const std::vector<TableRow> records = {
 
 TEST_CASE("Multimedia DB tests")
 {
-    REQUIRE(Database::initialize());
-
-    const auto path = (std::filesystem::path{"sys/user"} / "multimedia.db");
-    if (std::filesystem::exists(path)) {
-        REQUIRE(std::filesystem::remove(path));
-    }
-
-    MultimediaFilesDB db(path.c_str());
-    MultimediaFilesRecordInterface multimediaFilesRecordInterface(&db);
-
-    REQUIRE(db.isInitialized());
+    DatabaseUnderTest<MultimediaFilesDB> db{"multimedia.db"};
+    MultimediaFilesRecordInterface multimediaFilesRecordInterface(&db.get());
 
     constexpr auto PageSize = 8;
 
@@ -100,95 +92,95 @@ TEST_CASE("Multimedia DB tests")
             REQUIRE(!record.isValid());
 
             record.ID            = 1;
-            record.fileInfo.path = "music";
+            record.fileInfo.path = "audio";
 
             REQUIRE(record.isValid());
         }
 
         SECTION("Empty")
         {
-            REQUIRE(db.files.count() == 0);
-            REQUIRE(db.files.getLimitOffset(0, PageSize).empty());
+            REQUIRE(db.get().files.count() == 0);
+            REQUIRE(db.get().files.getLimitOffset(0, PageSize).empty());
         }
 
         SECTION("Add, get and remove")
         {
-            const auto path = "music/user";
+            const auto path = "audio/user";
             TableRow record;
             record.fileInfo.path = path;
             REQUIRE(!record.isValid());
-            REQUIRE(db.files.add(record));
+            REQUIRE(db.get().files.add(record));
 
-            REQUIRE(db.files.count() == 1);
-            auto result = db.files.getById(1);
+            REQUIRE(db.get().files.count() == 1);
+            auto result = db.get().files.getById(1);
             REQUIRE(result.isValid());
 
             SECTION("Remove by ID")
             {
-                REQUIRE(db.files.removeById(1));
-                REQUIRE(db.files.count() == 0);
-                auto result = db.files.getById(1);
+                REQUIRE(db.get().files.removeById(1));
+                REQUIRE(db.get().files.count() == 0);
+                auto result = db.get().files.getById(1);
                 REQUIRE(!result.isValid());
             }
             SECTION("Remove by field")
             {
-                REQUIRE(db.files.removeByField(TableFields::path, path));
-                REQUIRE(db.files.count() == 0);
-                auto result = db.files.getById(1);
+                REQUIRE(db.get().files.removeByField(TableFields::path, path));
+                REQUIRE(db.get().files.count() == 0);
+                auto result = db.get().files.getById(1);
                 REQUIRE(!result.isValid());
             }
         }
 
         for (const auto &record : records) {
-            REQUIRE(db.files.add(record));
+            REQUIRE(db.get().files.add(record));
         }
 
         SECTION("Remove all")
         {
-            REQUIRE(db.files.count() == records.size());
-            REQUIRE(db.files.removeAll());
-            REQUIRE(db.files.count() == 0);
+            REQUIRE(db.get().files.count() == records.size());
+            REQUIRE(db.get().files.removeAll());
+            REQUIRE(db.get().files.count() == 0);
         }
 
         SECTION("Add for existing path")
         {
-            auto resultPre               = db.files.getById(2);
+            auto resultPre               = db.get().files.getById(2);
             resultPre.fileInfo.mediaType = "bla bla";
-            REQUIRE(db.files.add(resultPre));
-            auto resultPost = db.files.getById(2);
+            REQUIRE(db.get().files.add(resultPre));
+            auto resultPost = db.get().files.getById(2);
             REQUIRE((resultPre.ID == resultPost.ID && resultPre.fileInfo.mediaType == resultPost.fileInfo.mediaType));
         }
 
         SECTION("Update")
         {
-            auto resultPre               = db.files.getById(2);
+            auto resultPre               = db.get().files.getById(2);
             resultPre.fileInfo.mediaType = "bla bla";
-            REQUIRE(db.files.update(resultPre));
-            auto resultPost = db.files.getById(2);
+            REQUIRE(db.get().files.update(resultPre));
+            auto resultPost = db.get().files.getById(2);
             REQUIRE((resultPre.ID == resultPost.ID && resultPre.fileInfo.mediaType == resultPost.fileInfo.mediaType));
         }
 
         SECTION("Add or Update")
         {
-            REQUIRE(db.files.removeAll());
-            REQUIRE(db.files.count() == 0);
+            REQUIRE(db.get().files.removeAll());
+            REQUIRE(db.get().files.count() == 0);
 
             for (const auto &record : records) {
-                REQUIRE(db.files.addOrUpdate(record));
+                REQUIRE(db.get().files.addOrUpdate(record));
             }
 
-            REQUIRE(db.files.count() == records.size());
+            REQUIRE(db.get().files.count() == records.size());
 
             auto oldPath           = records[1].fileInfo.path;
-            auto resultPre         = db.files.getByPath(oldPath);
+            auto resultPre         = db.get().files.getByPath(oldPath);
             const auto referenceID = resultPre.ID;
             resultPre.ID           = 10;
 
             SECTION("No changes")
             {
-                REQUIRE(db.files.addOrUpdate(resultPre));
-                REQUIRE(db.files.count() == records.size());
-                auto resultPost = db.files.getByPath(oldPath);
+                REQUIRE(db.get().files.addOrUpdate(resultPre));
+                REQUIRE(db.get().files.count() == records.size());
+                auto resultPost = db.get().files.getByPath(oldPath);
                 REQUIRE(resultPost.isValid());
                 REQUIRE((resultPost.ID == referenceID && resultPre.fileInfo.path == resultPost.fileInfo.path));
             }
@@ -196,19 +188,19 @@ TEST_CASE("Multimedia DB tests")
             {
                 auto newPath            = "user/newPath";
                 resultPre.fileInfo.path = newPath;
-                REQUIRE(db.files.addOrUpdate(resultPre, oldPath));
-                REQUIRE(db.files.count() == records.size());
-                auto notExistingEntry = db.files.getByPath(oldPath);
+                REQUIRE(db.get().files.addOrUpdate(resultPre, oldPath));
+                REQUIRE(db.get().files.count() == records.size());
+                auto notExistingEntry = db.get().files.getByPath(oldPath);
                 REQUIRE(!notExistingEntry.isValid());
-                auto resultPost = db.files.getByPath(newPath);
+                auto resultPost = db.get().files.getByPath(newPath);
                 REQUIRE(resultPost.isValid());
                 REQUIRE((resultPost.ID == referenceID && resultPre.fileInfo.path == resultPost.fileInfo.path));
             }
             SECTION("change any field")
             {
                 resultPre.fileInfo.mediaType = "bla bla";
-                REQUIRE(db.files.addOrUpdate(resultPre));
-                auto resultPost = db.files.getByPath(oldPath);
+                REQUIRE(db.get().files.addOrUpdate(resultPre));
+                auto resultPost = db.get().files.getByPath(oldPath);
                 REQUIRE(resultPost.isValid());
                 REQUIRE((resultPost.ID == referenceID && resultPre.fileInfo.path == resultPost.fileInfo.path &&
                          resultPre.fileInfo.mediaType == resultPost.fileInfo.mediaType));
@@ -218,20 +210,20 @@ TEST_CASE("Multimedia DB tests")
         SECTION("getLimitOffset")
         {
             auto size = records.size();
-            REQUIRE(db.files.getLimitOffset(0, size - 3).size() == size - 3);
-            REQUIRE(db.files.getLimitOffset(size - 3, size).size() == 3);
+            REQUIRE(db.get().files.getLimitOffset(0, size - 3).size() == size - 3);
+            REQUIRE(db.get().files.getLimitOffset(size - 3, size).size() == 3);
         }
 
         SECTION("getLimitOffsetByField")
         {
             auto size = records.size();
-            REQUIRE(db.files.getLimitOffsetByField(0, size, TableFields::artist, artists[1].c_str()).size() == 4);
+            REQUIRE(db.get().files.getLimitOffsetByField(0, size, TableFields::artist, artists[1].c_str()).size() == 4);
         }
 
         SECTION("Artists")
         {
-            REQUIRE(db.files.countArtists() == artists.size());
-            auto artistsList = db.files.getArtistsLimitOffset(0, artists.size());
+            REQUIRE(db.get().files.countArtists() == artists.size());
+            auto artistsList = db.get().files.getArtistsLimitOffset(0, artists.size());
             REQUIRE(artistsList.size() == artists.size());
             for (size_t i = 0; i < artists.size(); i++) {
                 REQUIRE(artistsList[i] == artists[i]);
@@ -242,16 +234,16 @@ TEST_CASE("Multimedia DB tests")
                 const auto size         = artists.size();
                 constexpr auto reminder = 2;
                 const auto pageSize     = size - reminder;
-                REQUIRE(db.files.getLimitOffset(0, pageSize).size() == pageSize);
-                REQUIRE(db.files.getLimitOffset(pageSize, pageSize).size() == reminder);
+                REQUIRE(db.get().files.getLimitOffset(0, pageSize).size() == pageSize);
+                REQUIRE(db.get().files.getLimitOffset(pageSize, pageSize).size() == reminder);
             }
         }
 
         const auto numberOfAlbums = albums.size();
         SECTION("Albums")
         {
-            REQUIRE(db.files.countAlbums() == numberOfAlbums);
-            auto albumsList = db.files.getAlbumsLimitOffset(0, numberOfAlbums);
+            REQUIRE(db.get().files.countAlbums() == numberOfAlbums);
+            auto albumsList = db.get().files.getAlbumsLimitOffset(0, numberOfAlbums);
             REQUIRE(albumsList.size() == numberOfAlbums);
             for (const auto &album : albumsList) {
                 auto it = std::find_if(albums.begin(), albums.end(), [album](const Album &albumRef) {
@@ -265,8 +257,8 @@ TEST_CASE("Multimedia DB tests")
                 const auto size         = numberOfAlbums;
                 constexpr auto reminder = 2;
                 const auto pageSize     = size - reminder;
-                REQUIRE(db.files.getAlbumsLimitOffset(0, pageSize).size() == pageSize);
-                REQUIRE(db.files.getAlbumsLimitOffset(pageSize, pageSize).size() == reminder);
+                REQUIRE(db.get().files.getAlbumsLimitOffset(0, pageSize).size() == pageSize);
+                REQUIRE(db.get().files.getAlbumsLimitOffset(pageSize, pageSize).size() == reminder);
             }
         }
 
@@ -276,8 +268,8 @@ TEST_CASE("Multimedia DB tests")
                 size_t size = std::count_if(records.begin(), records.end(), [artist](const TableRow &record) {
                     return record.tags.album.artist == artist;
                 });
-                REQUIRE(db.files.count(artist) == size);
-                auto artistsList = db.files.getLimitOffset(artist, 0, records.size());
+                REQUIRE(db.get().files.count(artist) == size);
+                auto artistsList = db.get().files.getLimitOffset(artist, 0, records.size());
                 REQUIRE(artistsList.size() == size);
                 for (size_t i = 0; i < artistsList.size(); i++) {
                     REQUIRE(artistsList[i].tags.album.artist == artist);
@@ -291,8 +283,8 @@ TEST_CASE("Multimedia DB tests")
                 size_t size = std::count_if(records.begin(), records.end(), [album](const TableRow &record) {
                     return record.tags.album.artist == album.artist && record.tags.album.title == album.title;
                 });
-                REQUIRE(db.files.count(album) == size);
-                auto artistsList = db.files.getLimitOffset(album, 0, records.size());
+                REQUIRE(db.get().files.count(album) == size);
+                auto artistsList = db.get().files.getLimitOffset(album, 0, records.size());
                 REQUIRE(artistsList.size() == size);
                 for (size_t i = 0; i < artistsList.size(); i++) {
                     REQUIRE((artistsList[i].tags.album.artist == album.artist &&
@@ -345,14 +337,15 @@ TEST_CASE("Multimedia DB tests")
             return record;
         };
 
-        auto getLimitedByPathQuery = [&](const std::string &pathPrefix, const uint32_t offset, const uint32_t limit) {
-            auto query  = std::make_shared<db::multimedia_files::query::GetLimitedByPath>(pathPrefix, offset, limit);
-            auto ret    = multimediaFilesRecordInterface.runQuery(query);
-            auto result = dynamic_cast<db::multimedia_files::query::GetLimitedResult *>(ret.get());
-            REQUIRE(result != nullptr);
-            auto record = result->getResult();
-            return record;
-        };
+        auto getLimitedByPathsQuery =
+            [&](const std::vector<std::string> &paths, const uint32_t offset, const uint32_t limit) {
+                auto query  = std::make_shared<db::multimedia_files::query::GetLimitedByPaths>(paths, offset, limit);
+                auto ret    = multimediaFilesRecordInterface.runQuery(query);
+                auto result = dynamic_cast<db::multimedia_files::query::GetLimitedResult *>(ret.get());
+                REQUIRE(result != nullptr);
+                auto record = result->getResult();
+                return record;
+            };
 
         auto updateQuery = [&](const MultimediaFilesRecord &record) {
             const auto query  = std::make_shared<db::multimedia_files::query::Edit>(record);
@@ -464,7 +457,7 @@ TEST_CASE("Multimedia DB tests")
 
         SECTION("add, get, remove query")
         {
-            const auto path = "music/user";
+            const auto path = "audio/user";
             MultimediaFilesRecord record;
             record.fileInfo.path = path;
             REQUIRE(!record.isValid());
@@ -573,19 +566,31 @@ TEST_CASE("Multimedia DB tests")
             REQUIRE(getLimitedQuery(size - 3, size).size() == 3);
         }
 
-        SECTION("getLimitOffsetByPath")
+        SECTION("getLimitOffsetByPaths")
         {
-            auto rootPrefix   = "user/";
-            auto musicPrefix  = "user/music/";
-            auto falsePrefix1 = "user/music1/";
-            auto flasePrefix2 = "user/music2";
-            auto falsePrefix3 = "abc/";
-            auto size         = records.size();
-            REQUIRE(getLimitedByPathQuery(rootPrefix, 0, size).size() == size);
-            REQUIRE(getLimitedByPathQuery(musicPrefix, 0, size).size() == (size - 3));
-            REQUIRE(getLimitedByPathQuery(falsePrefix1, 0, size).size() == 0);
-            REQUIRE(getLimitedByPathQuery(flasePrefix2, 0, size).size() == 0);
-            REQUIRE(getLimitedByPathQuery(falsePrefix3, 0, size).size() == 0);
+            MultimediaFilesRecord entry;
+            const auto user_count       = records.size();
+            const auto user_audio_count = user_count - 3;
+
+            REQUIRE(getLimitedByPathsQuery({"user/"}, 0, UINT32_MAX).size() == user_count);
+            REQUIRE(getLimitedByPathsQuery({"user/audio/"}, 0, UINT32_MAX).size() == user_audio_count);
+            REQUIRE(getLimitedByPathsQuery({"user/audio1/"}, 0, UINT32_MAX).size() == 0);
+            REQUIRE(getLimitedByPathsQuery({"user/audio2"}, 0, UINT32_MAX).size() == 0);
+            REQUIRE(getLimitedByPathsQuery({"abc/"}, 0, UINT32_MAX).size() == 0);
+
+            entry.fileInfo.path = "assets/audio/file30.mp3";
+            addQuery(entry);
+            entry.fileInfo.path = "assets/audio/file31.mp3";
+            addQuery(entry);
+            REQUIRE(getLimitedByPathsQuery({"user/audio", "assets/audio"}, 0, UINT32_MAX).size() ==
+                    user_audio_count + 2);
+            REQUIRE(getLimitedByPathsQuery({"user/audio", "assets/audio", "non/existing/path"}, 0, UINT32_MAX).size() ==
+                    user_audio_count + 2);
+
+            entry.fileInfo.path = "assets/audio/app/file32.mp3";
+            addQuery(entry);
+            REQUIRE(getLimitedByPathsQuery({"user/audio", "assets/audio/app"}, 0, UINT32_MAX).size() ==
+                    user_audio_count + 1);
         }
 
         SECTION("Artists")
@@ -625,8 +630,8 @@ TEST_CASE("Multimedia DB tests")
                 const auto size         = numberOfAlbums;
                 constexpr auto reminder = 2;
                 const auto pageSize     = size - reminder;
-                REQUIRE(db.files.getAlbumsLimitOffset(0, pageSize).size() == pageSize);
-                REQUIRE(db.files.getAlbumsLimitOffset(pageSize, pageSize).size() == reminder);
+                REQUIRE(db.get().files.getAlbumsLimitOffset(0, pageSize).size() == pageSize);
+                REQUIRE(db.get().files.getAlbumsLimitOffset(pageSize, pageSize).size() == reminder);
             }
         }
 
