@@ -6,6 +6,7 @@
 #include <popups/WindowWithTimer.hpp>
 #include <Text.hpp>
 #include <gui/widgets/Icon.hpp>
+#include <locks/data/LockData.hpp>
 
 namespace gui
 {
@@ -19,5 +20,13 @@ namespace gui
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
+
+        locks::SimInputTypeAction getAction() const
+        {
+            return action_.value();
+        }
+
+      private:
+        std::optional<locks::SimInputTypeAction> action_;
     };
 } /* namespace gui */

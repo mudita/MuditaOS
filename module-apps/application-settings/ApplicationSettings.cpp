@@ -84,6 +84,7 @@
 #include <service-appmgr/model/ApplicationManagerCommon.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
+#include <apps-common/popups/lock-popups/SimInfoWindow.hpp>
 
 #include <i18n/i18n.hpp>
 #include <service-bluetooth/messages/SyncDevices.hpp>
@@ -568,6 +569,40 @@ namespace app
     std::string ApplicationSettings::getNumber()
     {
         return selectedSimNumber;
+    }
+
+    void ApplicationSettings::returnToPreviousWindow()
+    {
+        using namespace gui::popup::window;
+        using namespace gui::window::name;
+
+        auto previousWindowName = getPreviousWindow();
+        if (!previousWindowName.has_value()) {
+            ApplicationCommon::returnToPreviousWindow();
+            return;
+        }
+
+        bool previousWindowBackingToSimCards =
+            (previousWindowName == sim_pin_settings || previousWindowName == import_contacts ||
+             previousWindowName == sim_unlock_window);
+        auto currentWindowName = getCurrentWindow()->getName();
+
+        // despite "import_contacts" has auto-lock prevented, it's included here in previousWindowBackingToSimCards for
+        // simplicity
+        if (currentWindowName == phone_lock_window && previousWindowBackingToSimCards) {
+            switchWindow(sim_cards);
+            return;
+        }
+
+        if (currentWindowName == sim_info_window) {
+            auto simInfoWindowAction = static_cast<gui::SimInfoWindow *>(getCurrentWindow())->getAction();
+            if (simInfoWindowAction == locks::SimInputTypeAction::Error && previousWindowBackingToSimCards) {
+                switchWindow(sim_cards);
+                return;
+            }
+        }
+
+        ApplicationCommon::returnToPreviousWindow();
     }
 
     void ApplicationSettings::setSim(Store::GSM::SIM sim)

@@ -6,6 +6,7 @@
 * Added Polish translation to a calendar title
 * Changed USB logging
 * Separated system volume from Bluetooth device volume for A2DP
+* Made windows flow in SIM cards settings more robust
 
 ### Fixed
 * Fixed receiving an empty SMS message
