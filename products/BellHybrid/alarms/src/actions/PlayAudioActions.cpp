@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "AlarmSoundPaths.hpp"
 #include "PlayAudioActions.hpp"
 
+#include <Paths.hpp>
 #include <audio/AudioMessage.hpp>
 #include <db/SystemSettings.hpp>
 #include <Timers/TimerFactory.hpp>
@@ -69,26 +69,30 @@ namespace alarms
         std::unique_ptr<PlayAudioAction> createPreWakeUpChimeAction(sys::Service &service)
         {
             return std::make_unique<PlayAudioAction>(service,
-                                                     paths::getPreWakeUpChimesDir(),
+                                                     paths::audio::proprietary() / paths::audio::preWakeup(),
                                                      bell::settings::PrewakeUp::tone,
                                                      audio::PlaybackType::PreWakeUp);
         }
 
         std::unique_ptr<PlayAudioAction> createSnoozeChimeAction(sys::Service &service)
         {
-            return std::make_unique<PlayAudioAction>(
-                service, paths::getSnoozeChimesDir(), bell::settings::Snooze::tone, audio::PlaybackType::Snooze);
+            return std::make_unique<PlayAudioAction>(service,
+                                                     paths::audio::proprietary() / paths::audio::snooze(),
+                                                     bell::settings::Snooze::tone,
+                                                     audio::PlaybackType::Snooze);
         }
         std::unique_ptr<PlayAudioAction> createAlarmToneAction(sys::Service &service)
         {
             /// Alarm duration is controlled from the main application's state machine
-            return std::make_unique<PlayAudioAction>(
-                service, paths::getAlarmDir(), bell::settings::Alarm::tone, audio::PlaybackType::Alarm);
+            return std::make_unique<PlayAudioAction>(service,
+                                                     paths::audio::proprietary() / paths::audio::alarm(),
+                                                     bell::settings::Alarm::tone,
+                                                     audio::PlaybackType::Alarm);
         }
         std::unique_ptr<PlayAudioAction> createBedtimeChimeAction(sys::Service &service)
         {
             return std::make_unique<PlayAudioAction>(service,
-                                                     paths::getBedtimeReminderChimesDir(),
+                                                     paths::audio::proprietary() / paths::audio::bedtimeReminder(),
                                                      bell::settings::Bedtime::tone,
                                                      audio::PlaybackType::Bedtime);
         }

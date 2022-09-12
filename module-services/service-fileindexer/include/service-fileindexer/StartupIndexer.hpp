@@ -22,28 +22,16 @@ namespace service::detail
         void stop();
 
       private:
-        // Process single entry
-        static auto processEntry(std::shared_ptr<sys::Service> svc,
-                                 const std::filesystem::recursive_directory_iterator::value_type &entry) -> void;
-        // Setup timers for notification
+        auto processEntry(std::shared_ptr<sys::Service> svc,
+                          const std::filesystem::recursive_directory_iterator::value_type &entry) -> void;
         auto setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void;
-        // On timer timeout
         auto onTimerTimeout(std::shared_ptr<sys::Service> svc) -> void;
-        // Create lock file
-        static auto createLockFile() -> bool;
-        //  Check if lock file exists
-        static auto hasLockFile() -> bool;
-        //  remove lock file exists
-        static auto removeLockFile() -> bool;
 
-      private:
         std::vector<std::string>::const_iterator mTopDirIterator;
         std::filesystem::recursive_directory_iterator mSubDirIterator;
         sys::TimerHandle mIdxTimer;
-        bool mStarted{};
         bool mForceStop{};
 
-        // List of initial dirs for scan
-        const std::vector<std::string> start_dirs;
+        const std::vector<std::string> directoriesToScan;
     };
 } // namespace service::detail

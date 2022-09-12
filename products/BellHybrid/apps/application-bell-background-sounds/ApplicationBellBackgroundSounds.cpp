@@ -12,13 +12,12 @@
 #include "windows/BGSoundsTimerSelectWindow.hpp"
 #include "windows/BGSoundsVolumeWindow.hpp"
 #include "widgets/BGSoundsPlayer.hpp"
-#include <AlarmSoundPaths.hpp>
 #include <apps-common/messages/AppMessage.hpp>
 #include <apps-common/models/SongsRepository.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/models/AudioModel.hpp>
 #include <audio/AudioMessage.hpp>
-
+#include <Paths.hpp>
 #include <log/log.hpp>
 
 namespace app
@@ -49,11 +48,12 @@ namespace app
 
     void ApplicationBellBackgroundSounds::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
+            const auto paths      = std::vector<std::string>{paths::audio::proprietary() / paths::audio::relaxation(),
+                                                        paths::audio::user() / paths::audio::relaxation()};
             auto tagsFetcher      = std::make_unique<app::music::ServiceAudioTagsFetcher>(app);
-            auto soundsRepository = std::make_unique<app::music::SongsRepository>(
-                app, std::move(tagsFetcher), alarms::paths::getBackgroundSoundsDir());
-            auto presenter = std::make_unique<bgSounds::BGSoundsMainWindowPresenter>(std::move(soundsRepository));
+            auto soundsRepository = std::make_unique<app::music::SongsRepository>(app, std::move(tagsFetcher), paths);
+            auto presenter = std::make_unique<bgSounds::BGSoundsMainWindowPresenter>(app, std::move(soundsRepository));
             return std::make_unique<gui::BGSoundsMainWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(

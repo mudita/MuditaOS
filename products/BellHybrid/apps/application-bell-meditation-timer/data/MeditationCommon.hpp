@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include <AlarmSoundPaths.hpp>
-
+#include <Paths.hpp>
 #include <filesystem>
 #include <string>
 
@@ -14,15 +13,13 @@ namespace app::meditation
     {
         static constexpr auto meditationCountdown = "MeditationCountdown";
         static constexpr auto meditationProgress  = "MeditationProgress";
-        static constexpr auto sessionEnded        = "MeditationSessionEnded";
     }; // namespace windows
 
-    constexpr auto meditationDBRecordName          = "MeditationTimer";
-    constexpr auto meditationCountdownDBRecordName = "start_delay";
+    constexpr auto meditationDBRecordName = "MeditationTimer";
 
     inline std::filesystem::path getMeditationAudioPath()
     {
-        return alarms::paths::getMeditationSoundsDir() / "Meditation_Gong.mp3";
+        return paths::audio::proprietary() / "Meditation_Gong.mp3";
     }
 
 } // namespace app::meditation
