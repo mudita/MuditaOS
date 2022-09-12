@@ -144,6 +144,8 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
+        void returnToPreviousWindow() override;
+
         void setSim(Store::GSM::SIM sim) override;
         void updateSim() override;
         Store::GSM::SIM getSim() override;

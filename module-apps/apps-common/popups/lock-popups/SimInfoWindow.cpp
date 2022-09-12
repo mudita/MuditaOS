@@ -6,6 +6,8 @@
 #include <locks/data/LockData.hpp>
 #include <i18n/i18n.hpp>
 
+#include <application-settings/ApplicationSettings.hpp>
+
 using namespace gui;
 
 SimInfoWindow::SimInfoWindow(app::ApplicationCommon *app, const std::string &name) : WindowWithTimer(app, name)
@@ -31,8 +33,8 @@ void SimInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     WindowWithTimer::onBeforeShow(mode, data);
 
     if (auto infoData = dynamic_cast<locks::SimLockData *>(data)) {
-
-        switch (infoData->getSimInputTypeAction()) {
+        action_ = infoData->getSimInputTypeAction();
+        switch (action_.value()) {
         case locks::SimInputTypeAction::UnlockWithPuk:
         case locks::SimInputTypeAction::ChangePin:
             setTitle(utils::translate("sim_change_pin"));
