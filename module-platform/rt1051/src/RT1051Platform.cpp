@@ -22,7 +22,6 @@ RT1051Platform::RT1051Platform()
 void RT1051Platform::init()
 {
     initFilesystem();
-    ::platform::Platform::initCommonUserFolders();
 }
 
 void RT1051Platform::initFilesystem()
