@@ -394,13 +394,13 @@ void ServiceCellular::registerMessageHandlers()
         if ((vstate != VoLTEState::On) && volteOn) {
             LOG_DEBUG("VoLTE On");
             if (networkSettings.setVoLTEState(VoLTEState::On) == at::Result::Code::OK) {
-                priv->modemResetHandler->performSoftReset();
+                priv->modemResetHandler->performHardReset();
             }
         }
         else if (!volteOn) {
             LOG_DEBUG("VoLTE Off");
             if (networkSettings.setVoLTEState(VoLTEState::Off) == at::Result::Code::OK) {
-                priv->modemResetHandler->performSoftReset();
+                priv->modemResetHandler->performHardReset();
             }
         }
         return std::make_shared<cellular::ResponseMessage>(true);

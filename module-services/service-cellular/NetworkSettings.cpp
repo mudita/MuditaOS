@@ -321,7 +321,7 @@ at::Result::Code NetworkSettings::setVoLTEState(VoLTEState state)
         setIMSState(at::response::qcfg_ims::IMSState::Disable);
         qmbn.setAutoSelect(at::response::qmbncfg::MBNAutoSelect::On);
     }
-    LOG_DEBUG("Modem soft reboot");
+    LOG_DEBUG("Modem hard reboot");
     return at::Result::Code::OK;
 }
 
