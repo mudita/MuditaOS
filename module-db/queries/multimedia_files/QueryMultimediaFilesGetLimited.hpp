@@ -101,13 +101,13 @@ namespace db::multimedia_files::query
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-    class GetLimitedByPath : public Query
+    class GetLimitedByPaths : public Query
     {
       public:
-        GetLimitedByPath(std::string path, uint32_t offset, uint32_t limit);
+        GetLimitedByPaths(const std::vector<std::string> &paths, uint32_t offset, uint32_t limit);
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
-        const std::string path;
+        const std::vector<std::string> paths;
         const uint32_t offset = 0;
         const uint32_t limit  = 0;
     };

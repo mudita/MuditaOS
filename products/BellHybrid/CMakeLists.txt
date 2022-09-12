@@ -52,6 +52,7 @@ target_link_libraries(BellHybrid
         bell::db
         bell::audio
         bell::evtmgr
+        bell::paths
         log
         logdump
         messagetype
@@ -80,6 +81,13 @@ strip_executable(BellHybrid)
 include(BinaryAssetsVersions.cmake)
 include(AddVersionJson)
 
+add_directories(
+        TARGET user_directories
+        PREFIX ${CMAKE_BINARY_DIR}/sysroot/sys/user/audio
+        DEPENDS user_directories_common
+        DIRECTORIES relaxation
+)
+
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(AddBootBin)
     add_boot_bin(BellHybrid)
@@ -87,7 +95,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         PRODUCT BellHybrid
         SYSROOT sysroot
         LUTS Luts.bin
-        DEPENDS assets updater.bin-target ecoboot.bin-target BellHybrid-boot.bin BellHybrid-version.json-target
+        DEPENDS user_directories assets updater.bin-target ecoboot.bin-target BellHybrid-boot.bin BellHybrid-version.json-target
     )
     add_version_rt1051_json(BellHybrid)
 else()
@@ -95,7 +103,7 @@ else()
         PRODUCT BellHybrid
         SYSROOT sysroot
         LUTS ""
-        DEPENDS assets BellHybrid-version.json-target
+        DEPENDS user_directories assets BellHybrid-version.json-target
     )
     add_version_linux_json(BellHybrid)
 endif()
@@ -144,6 +152,7 @@ add_subdirectory(keymap)
 add_subdirectory(services)
 add_subdirectory(sys)
 add_subdirectory(serial-number-reader)
+add_subdirectory(paths)
 
 option(CONFIG_ENABLE_TEMP "Enable displaying temperature" OFF)
 option(CONFIG_SHOW_MEMORY_INFO "Enable displaying memory info" OFF)

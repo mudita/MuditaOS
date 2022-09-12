@@ -46,11 +46,9 @@ namespace app
 
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 
-        auto tagsFetcher = std::make_unique<app::music::ServiceAudioTagsFetcher>(this);
-
-        const auto musicPlayerFilesPath = purefs::createPath(purefs::dir::getUserDiskPath(), "music").string();
-        auto songsRepository =
-            std::make_unique<app::music::SongsRepository>(this, std::move(tagsFetcher), musicPlayerFilesPath);
+        const auto paths     = std::vector<std::string>{purefs::dir::getUserAudioPath()};
+        auto tagsFetcher     = std::make_unique<app::music::ServiceAudioTagsFetcher>(this);
+        auto songsRepository = std::make_unique<app::music::SongsRepository>(this, std::move(tagsFetcher), paths);
 
         priv->songsModel     = std::make_unique<app::music::SongsModel>(this, std::move(songsRepository));
         auto audioOperations = std::make_unique<app::AsyncAudioOperations>(this);

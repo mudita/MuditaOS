@@ -34,7 +34,7 @@ namespace
                 REQUIRE(std::filesystem::remove(name));
             }
 
-            db = std::make_unique<MeditationStatisticsDB>(name.c_str());
+            db = std::make_unique<Db>(name.c_str());
 
             if (not db->isInitialized()) {
                 throw std::runtime_error("Could not initialize database");

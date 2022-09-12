@@ -6,6 +6,12 @@
 #include <Database/QueryResult.hpp>
 #include <Utils.hpp>
 #include <magic_enum.hpp>
+#include <inttypes.h>
+
+#define u32_  "%" PRIu32
+#define u32_c "%" PRIu32 ","
+#define str_  "%Q"
+#define str_c "%Q,"
 
 namespace db::multimedia_files
 {
@@ -39,6 +45,17 @@ namespace db::multimedia_files
         return (!fileInfo.path.empty() && Record::isValid());
     }
 
+    auto constructMatchPattern = [](const std::vector<std::string> &paths) -> std::string {
+        std::string ret;
+        for (auto e = paths.begin(); e != paths.end(); e++) {
+            ret += "path LIKE '" + *e + "%%'";
+            if (std::next(e) != paths.end()) {
+                ret += " or ";
+            }
+        }
+        return ret;
+    };
+
     MultimediaFilesTable::MultimediaFilesTable(Database *db) : Table(db)
     {
         createTableRow = CreateTableRow;
@@ -53,7 +70,8 @@ namespace db::multimedia_files
     {
         return db->execute("INSERT INTO files (path, media_type, size, title, artist, album, "
                            "comment, genre, year, track, song_length, bitrate, sample_rate, channels) "
-                           "VALUES('%q', '%q', %lu, '%q', '%q', '%q', '%q', '%q', %lu, %lu, %lu, %lu, %lu, %lu) "
+                           "VALUES(" str_c str_c u32_c str_c str_c str_c str_c str_c u32_c u32_c u32_c u32_c u32_c u32_
+                           ") "
                            "ON CONFLICT(path) DO UPDATE SET "
                            "path = excluded.path, "
                            "media_type = excluded.media_type, "
@@ -98,7 +116,7 @@ namespace db::multimedia_files
             return false;
         }
 
-        return db->execute("DELETE FROM files WHERE %q = '%q';", fieldName.c_str(), str);
+        return db->execute("DELETE FROM files WHERE %q = %Q;", fieldName.c_str(), str);
     }
 
     bool MultimediaFilesTable::removeAll()
@@ -108,9 +126,10 @@ namespace db::multimedia_files
 
     bool MultimediaFilesTable::update(TableRow entry)
     {
-        return db->execute("UPDATE files SET path = '%q', media_type = '%q', size = %lu, title = '%q', artist = '%q',"
-                           "album = '%q', comment = '%q', genre = '%q', year = %lu, track = %lu, song_length = %lu,"
-                           "bitrate = %lu, sample_rate = %lu, channels = %lu WHERE _id = %lu;",
+        return db->execute("UPDATE files SET path=" str_c "media_type=" str_c "size=" u32_c "title=" str_c
+                           "artist=" str_c "album=" str_c "comment=" str_c "genre=" str_c "year=" u32_c "track=" u32_c
+                           "song_length=" u32_c "bitrate=" u32_c "sample_rate=" u32_c "channels=" u32_
+                           " WHERE _id=" u32_ ";",
                            entry.fileInfo.path.c_str(),
                            entry.fileInfo.mediaType.c_str(),
                            entry.fileInfo.size,
@@ -133,10 +152,11 @@ namespace db::multimedia_files
         auto path = oldPath.empty() ? entry.fileInfo.path : oldPath;
 
         return db->execute("BEGIN TRANSACTION; "
-                           "INSERT OR IGNORE INTO files (path) VALUES ('%q'); "
-                           "UPDATE files SET path = '%q', media_type = '%q', size = %lu, title = '%q', artist = '%q', "
-                           "album = '%q', comment = '%q', genre = '%q', year = %lu, track = %lu, song_length = %lu, "
-                           "bitrate = %lu, sample_rate = %lu, channels = %lu WHERE path = '%q'; "
+                           "INSERT OR IGNORE INTO files (path) VALUES (" str_ "); "
+                           "UPDATE files SET path=" str_c "media_type=" str_c "size=" u32_c "title=" str_c
+                           "artist=" str_c "album=" str_c "comment=" str_c "genre=" str_c "year=" u32_c "track=" u32_c
+                           "song_length=" u32_c "bitrate=" u32_c "sample_rate=" u32_c "channels=" u32_
+                           " WHERE path=" str_ "; "
                            "COMMIT;",
                            path.c_str(),
                            entry.fileInfo.path.c_str(),
@@ -158,7 +178,7 @@ namespace db::multimedia_files
 
     TableRow MultimediaFilesTable::getById(uint32_t id)
     {
-        auto retQuery = db->query("SELECT * FROM files WHERE _id = %lu;", id);
+        auto retQuery = db->query("SELECT * FROM files WHERE _id=" u32_ ";", id);
 
         if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
             return TableRow();
@@ -169,7 +189,7 @@ namespace db::multimedia_files
 
     TableRow MultimediaFilesTable::getByPath(std::string path)
     {
-        auto retQuery = db->query("SELECT * FROM files WHERE path = '%q';", path.c_str());
+        auto retQuery = db->query("SELECT * FROM files WHERE path=" str_ ";", path.c_str());
 
         if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
             return TableRow();
@@ -180,15 +200,16 @@ namespace db::multimedia_files
 
     std::vector<TableRow> MultimediaFilesTable::getLimitOffset(uint32_t offset, uint32_t limit)
     {
-        auto retQuery = db->query("SELECT * from files ORDER BY title ASC LIMIT %lu OFFSET %lu;", limit, offset);
+        auto retQuery =
+            db->query("SELECT * from files ORDER BY title ASC LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
         return retQueryUnpack(std::move(retQuery));
     }
 
     auto MultimediaFilesTable::getArtistsLimitOffset(uint32_t offset, uint32_t limit) -> std::vector<Artist>
     {
-        auto retQuery =
-            db->query("SELECT DISTINCT artist from files ORDER BY artist ASC LIMIT %lu OFFSET %lu;", limit, offset);
+        auto retQuery = db->query(
+            "SELECT DISTINCT artist from files ORDER BY artist ASC LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
         if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
             return {};
@@ -214,7 +235,7 @@ namespace db::multimedia_files
             return {};
         }
 
-        retQuery = db->query("SELECT * FROM files WHERE %q = '%q' ORDER BY title ASC LIMIT %lu OFFSET %lu;",
+        retQuery = db->query("SELECT * FROM files WHERE %q=" str_ " ORDER BY title ASC LIMIT " u32_ " OFFSET " u32_ ";",
                              fieldName.c_str(),
                              str,
                              limit,
@@ -245,8 +266,10 @@ namespace db::multimedia_files
 
     auto MultimediaFilesTable::getAlbumsLimitOffset(uint32_t offset, uint32_t limit) -> std::vector<Album>
     {
-        auto retQuery = db->query(
-            "SELECT DISTINCT artist,album from files ORDER BY album ASC LIMIT %lu OFFSET %lu;", limit, offset);
+        auto retQuery =
+            db->query("SELECT DISTINCT artist,album from files ORDER BY album ASC LIMIT " u32_ " OFFSET " u32_ ";",
+                      limit,
+                      offset);
 
         if ((retQuery == nullptr) || (retQuery->getRowCount() < 2)) {
             return {};
@@ -277,7 +300,7 @@ namespace db::multimedia_files
             return 0;
         }
 
-        auto queryRet = db->query("SELECT COUNT(*) FROM files WHERE %q=%lu;", field, id);
+        auto queryRet = db->query("SELECT COUNT(*) FROM files WHERE " str_ "=" u32_ ";", field, id);
         if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
             return 0;
         }
@@ -298,7 +321,7 @@ namespace db::multimedia_files
 
     auto MultimediaFilesTable::count(const Artist &artist) -> uint32_t
     {
-        auto queryRet = db->query("SELECT COUNT(*) FROM files WHERE artist='%q';", artist.c_str());
+        auto queryRet = db->query("SELECT COUNT(*) FROM files WHERE artist=" str_ " ;", artist.c_str());
         if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
             return 0;
         }
@@ -309,19 +332,19 @@ namespace db::multimedia_files
     auto MultimediaFilesTable::getLimitOffset(const Album &album, uint32_t offset, uint32_t limit)
         -> std::vector<TableRow>
     {
-        std::unique_ptr<QueryResult> retQuery = db->query(
-            "SELECT * FROM files WHERE artist = '%q' AND album = '%q' ORDER BY title ASC LIMIT %lu OFFSET %lu;",
-            album.artist.c_str(),
-            album.title.c_str(),
-            limit,
-            offset);
+        std::unique_ptr<QueryResult> retQuery = db->query("SELECT * FROM files WHERE artist=" str_ " AND album=" str_
+                                                          " ORDER BY title ASC LIMIT " u32_ " OFFSET " u32_ ";",
+                                                          album.artist.c_str(),
+                                                          album.title.c_str(),
+                                                          limit,
+                                                          offset);
 
         return retQueryUnpack(std::move(retQuery));
     }
 
     auto MultimediaFilesTable::count(const Album &album) -> uint32_t
     {
-        auto queryRet = db->query("SELECT COUNT(*) FROM files WHERE artist='%q' AND album = '%q';",
+        auto queryRet = db->query("SELECT COUNT(*) FROM files WHERE artist=" str_ " AND album=" str_ ";",
                                   album.artist.c_str(),
                                   album.title.c_str());
         if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
@@ -331,12 +354,26 @@ namespace db::multimedia_files
         return (*queryRet)[0].getUInt32();
     }
 
-    auto MultimediaFilesTable::getLimitOffsetByPath(const std::string &path, uint32_t offset, uint32_t limit)
-        -> std::vector<TableRow>
+    auto MultimediaFilesTable::getLimitOffsetByPaths(const std::vector<std::string> &paths,
+                                                     uint32_t offset,
+                                                     uint32_t limit) -> std::vector<TableRow>
     {
-        std::string query = "SELECT * FROM files WHERE path LIKE '" + path + "%%' ORDER BY title ASC LIMIT " +
-                            std::to_string(limit) + " OFFSET " + std::to_string(offset) + ";";
+        const std::string query = "SELECT * FROM files WHERE " + constructMatchPattern(paths) +
+                                  " ORDER BY title ASC LIMIT " + std::to_string(limit) + " OFFSET " +
+                                  std::to_string(offset) + ";";
         std::unique_ptr<QueryResult> retQuery = db->query(query.c_str());
         return retQueryUnpack(std::move(retQuery));
+    }
+
+    auto MultimediaFilesTable::count(const std::vector<std::string> &paths) -> uint32_t
+    {
+        const std::string query = "SELECT COUNT(*) FROM files WHERE " + constructMatchPattern(paths) + ";";
+        const auto retQuery     = db->query(query.c_str());
+
+        if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+            return 0;
+        }
+
+        return (*retQuery)[0].getUInt32();
     }
 } // namespace db::multimedia_files
