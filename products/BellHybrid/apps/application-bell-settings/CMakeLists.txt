@@ -123,7 +123,7 @@ target_link_libraries(application-bell-settings
         bell::audio
         bellgui
         bell::db
-        bell::alarms
+        bell::paths
         bell::app-main
         bell::appmgr
         service-appmgr

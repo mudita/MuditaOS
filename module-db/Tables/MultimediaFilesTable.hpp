@@ -24,16 +24,16 @@ namespace db::multimedia_files
         Album album{};
         std::string comment{};
         std::string genre{};
-        unsigned year{};
-        unsigned track{};
+        std::uint32_t year{};
+        std::uint32_t track{};
     };
 
     struct AudioProperties
     {
-        unsigned songLength{}; /// in seconds
-        unsigned bitrate{};    /// in kb/s
-        unsigned sampleRate{}; /// in Hz
-        unsigned channels{};   /// 1 - mono, 2 - stereo
+        std::uint32_t songLength{}; /// in seconds
+        std::uint32_t bitrate{};    /// in kb/s
+        std::uint32_t sampleRate{}; /// in Hz
+        std::uint32_t channels{};   /// 1 - mono, 2 - stereo
     };
 
     struct FileInfo
@@ -101,7 +101,9 @@ namespace db::multimedia_files
         auto getLimitOffset(const Album &album, uint32_t offset, uint32_t limit) -> std::vector<TableRow>;
         auto count(const Album &album) -> uint32_t;
 
-        auto getLimitOffsetByPath(const std::string &path, uint32_t offset, uint32_t limit) -> std::vector<TableRow>;
+        auto getLimitOffsetByPaths(const std::vector<std::string> &paths, uint32_t offset, uint32_t limit)
+            -> std::vector<TableRow>;
+        auto count(const std::vector<std::string> &paths) -> uint32_t;
         TableRow getByPath(std::string path);
 
         /// @note entry.ID is skipped
