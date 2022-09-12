@@ -220,19 +220,19 @@
         {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/ringtone/ringtone_drum_2.mp3", "output": "assets/audio/ringtone/ringtone_drum_2.mp3"},
         {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/ringtone/ringtone_drum.mp3", "output": "assets/audio/ringtone/ringtone_drum.mp3"},
 
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Love_Peace_Harmony.mp3", "output": "../user/music/Nick_Lewis_-_Love_Peace_Harmony.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/lazy_nature_reserve-devel.mp3", "output": "../user/music/lazy_nature_reserve-devel.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Que_Bien_Me_Dijo_Mi_Madre.mp3", "output": "../user/music/Nick_Lewis_-_Que_Bien_Me_Dijo_Mi_Madre.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Mahamrityunjaya_Mantra.mp3", "output": "../user/music/Nick_Lewis_-_Mahamrityunjaya_Mantra.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/autumn_in_jelitkowo-devel.mp3", "output": "../user/music/autumn_in_jelitkowo-devel.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Love_Peace_And_Forgiveness.mp3", "output": "../user/music/Nick_Lewis_-_Love_Peace_And_Forgiveness.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Bring_The_Light.mp3", "output": "../user/music/Nick_Lewis_-_Bring_The_Light.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Kristies_Elephant.mp3", "output": "../user/music/Nick_Lewis_-_Kristies_Elephant.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/secret_river-devel.mp3", "output": "../user/music/secret_river-devel.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/beka_nature_reserve-devel.mp3", "output": "../user/music/beka_nature_reserve-devel.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Always_With_You.mp3", "output": "../user/music/Nick_Lewis_-_Always_With_You.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/baltic_seagulls-devel.mp3", "output": "../user/music/baltic_seagulls-devel.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_You_Are_Holy.mp3", "output": "../user/music/Nick_Lewis_-_You_Are_Holy.mp3"},
-        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Pure_Ocean.mp3", "output": "../user/music/Nick_Lewis_-_Pure_Ocean.mp3"}
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Love_Peace_Harmony.mp3", "output": "../user/audio/music_player/Nick_Lewis_-_Love_Peace_Harmony.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/lazy_nature_reserve-devel.mp3", "output": "../user/audio/music_player/lazy_nature_reserve-devel.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Que_Bien_Me_Dijo_Mi_Madre.mp3", "output": "../user/audio/music_player/Nick_Lewis_-_Que_Bien_Me_Dijo_Mi_Madre.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Mahamrityunjaya_Mantra.mp3", "output": "../user/audio/music_player/Nick_Lewis_-_Mahamrityunjaya_Mantra.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/autumn_in_jelitkowo-devel.mp3", "output": "../user/audio/music_player/autumn_in_jelitkowo-devel.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Love_Peace_And_Forgiveness.mp3", "output": "../user/audio/music_player/Nick_Lewis_-_Love_Peace_And_Forgiveness.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Bring_The_Light.mp3", "output": "../user/audio/music_player/Nick_Lewis_-_Bring_The_Light.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Kristies_Elephant.mp3", "output": "../user/audio/music_player/Nick_Lewis_-_Kristies_Elephant.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/secret_river-devel.mp3", "output": "../user/audio/music_player/secret_river-devel.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/beka_nature_reserve-devel.mp3", "output": "../user/audio/music_player/beka_nature_reserve-devel.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Always_With_You.mp3", "output": "../user/audio/music_player/Nick_Lewis_-_Always_With_You.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/baltic_seagulls-devel.mp3", "output": "../user/audio/music_player/baltic_seagulls-devel.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_You_Are_Holy.mp3", "output": "../user/audio/music_player/Nick_Lewis_-_You_Are_Holy.mp3"},
+        {"name" : "release_audio.tgz", "tarfile": "./image/assets/audio/pure/music/Nick_Lewis_-_Pure_Ocean.mp3", "output": "../user/audio/music_player/Nick_Lewis_-_Pure_Ocean.mp3"}
     ]
 }

@@ -14,7 +14,6 @@ target_sources(
 
     PUBLIC
         include/Platform.hpp
-        CommonPlatform.cpp
 )
 
 target_link_libraries(
