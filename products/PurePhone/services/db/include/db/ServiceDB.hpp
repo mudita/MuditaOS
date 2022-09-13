@@ -43,6 +43,7 @@ class ServiceDB : public ServiceDBCommon
     ~ServiceDB() override;
 
     bool StoreIntoBackup(const std::filesystem::path &backupPath);
+    bool StoreIntoSyncPackage(const std::filesystem::path &syncPackagePath);
 
   private:
     std::unique_ptr<EventsDB> eventsDB;
