@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,5 +19,7 @@ namespace sdesktop::endpoints
       private:
         auto executeRequest(Context &context) -> ProcessResult;
         auto checkState(Context &context) -> ProcessResult;
+        auto executeSyncRequest(Context &context) -> ProcessResult;
+        auto checkSyncState(Context &context) -> ProcessResult;
     };
 } // namespace sdesktop::endpoints

@@ -14,6 +14,7 @@ namespace
     constexpr inline auto PATH_UPDATES      = "updates";
     constexpr inline auto PATH_TMP          = "tmp";
     constexpr inline auto PATH_BACKUP       = "backup";
+    constexpr inline auto PATH_SYNC  = "sync";
     constexpr inline auto PATH_FACTORY      = "factory";
     constexpr inline auto PATH_LOGS         = "logs";
     constexpr inline auto PATH_CRASH_DUMPS  = "crash_dumps";
@@ -69,6 +70,11 @@ namespace purefs
         std::filesystem::path getBackupOSPath() noexcept
         {
             return getUserDiskPath() / PATH_BACKUP;
+        }
+
+        std::filesystem::path getSyncPackagePath() noexcept
+        {
+            return getUserDiskPath() / PATH_SYNC;
         }
 
         std::filesystem::path getFactoryOSPath() noexcept
