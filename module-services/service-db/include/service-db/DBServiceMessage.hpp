@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,6 +15,13 @@ class DBServiceMessageBackup : public DBMessage
   public:
     DBServiceMessageBackup(MessageType messageType, std::string backupPath);
     std::string backupPath;
+};
+
+class DBServiceMessageSyncPackage : public DBMessage
+{
+  public:
+    DBServiceMessageSyncPackage(MessageType messageType, const std::string &syncPackagePath);
+    std::string syncPackagePath;
 };
 
 class DBServiceResponseMessage : public DBResponseMessage
