@@ -19,6 +19,7 @@ namespace purefs
         std::filesystem::path getUpdatesOSPath() noexcept;
         std::filesystem::path getTemporaryPath() noexcept;
         std::filesystem::path getBackupOSPath() noexcept;
+        std::filesystem::path getSyncPackagePath() noexcept;
         std::filesystem::path getFactoryOSPath() noexcept;
         std::filesystem::path getLogsPath() noexcept;
         std::filesystem::path getCrashDumpsPath() noexcept;
