@@ -58,7 +58,7 @@ class ServiceDesktop : public sys::Service
     ~ServiceDesktop() override;
 
     std::unique_ptr<WorkerDesktop> desktopWorker;
-    BackupRestore::OperationStatus backupRestoreStatus;
+    BackupSyncRestore::OperationStatus backupSyncRestoreStatus;
 
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
@@ -66,11 +66,13 @@ class ServiceDesktop : public sys::Service
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
 
     std::string prepareBackupFilename();
+    std::string prepareSyncFilename();
     void prepareBackupData();
+    void prepareSyncData();
     void prepareRestoreData(const std::filesystem::path &restoreLocation);
-    const BackupRestore::OperationStatus getBackupRestoreStatus()
+    const BackupSyncRestore::OperationStatus getBackupSyncRestoreStatus()
     {
-        return backupRestoreStatus;
+        return backupSyncRestoreStatus;
     }
     const sdesktop::USBSecurityModel *getSecurity()
     {
@@ -123,6 +125,7 @@ class ServiceDesktop : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::ResponseVisibleDevices *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::developerMode::DeveloperModeRequest *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::BackupMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(sdesktop::SyncMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::RestoreMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::FactoryMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::usb::USBConfigured *msg) -> std::shared_ptr<sys::Message>;

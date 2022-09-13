@@ -109,6 +109,7 @@ class DBServiceAPI
     [[deprecated]] static auto CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -> bool;
 
     static auto DBBackup(sys::Service *serv, std::string backupPath) -> bool;
+    static auto DBPrepareSyncPackage(sys::Service *serv, const std::string &syncPackagePath) -> bool;
 
     static auto IsContactInFavourites(sys::Service *serv, const utils::PhoneNumber::View &numberView) -> bool;
     /**

@@ -46,6 +46,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connectHandler<message::bluetooth::ResponseVisibleDevices>();
     connectHandler<sdesktop::developerMode::DeveloperModeRequest>();
     connectHandler<sdesktop::BackupMessage>();
+    connectHandler<sdesktop::SyncMessage>();
     connectHandler<sdesktop::RestoreMessage>();
     connectHandler<sdesktop::FactoryMessage>();
     connectHandler<sdesktop::usb::USBConfigured>();
@@ -101,20 +102,39 @@ std::string ServiceDesktop::prepareBackupFilename()
     return std::string(backupFileName.data());
 }
 
+std::string ServiceDesktop::prepareSyncFilename()
+{
+    const std::size_t maxFileNameSize = 64;
+    std::array<char, maxFileNameSize> syncFileName{};
+    std::time_t now;
+    std::time(&now);
+    std::strftime(syncFileName.data(), syncFileName.size(), "%FT%OH%OM%OSZ", std::localtime(&now));
+
+    return std::string(syncFileName.data());
+}
+
 void ServiceDesktop::prepareBackupData()
 {
-    backupRestoreStatus.operation     = BackupRestore::Operation::Backup;
-    backupRestoreStatus.taskId        = prepareBackupFilename();
-    backupRestoreStatus.state         = BackupRestore::OperationState::Stopped;
-    backupRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupRestoreStatus.taskId;
+    backupSyncRestoreStatus.operation     = BackupSyncRestore::Operation::Backup;
+    backupSyncRestoreStatus.taskId        = prepareBackupFilename();
+    backupSyncRestoreStatus.state         = BackupSyncRestore::OperationState::Stopped;
+    backupSyncRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupSyncRestoreStatus.taskId;
+}
+
+void ServiceDesktop::prepareSyncData()
+{
+    backupSyncRestoreStatus.operation     = BackupSyncRestore::Operation::Sync;
+    backupSyncRestoreStatus.taskId        = prepareSyncFilename();
+    backupSyncRestoreStatus.state         = BackupSyncRestore::OperationState::Stopped;
+    backupSyncRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupSyncRestoreStatus.taskId;
 }
 
 void ServiceDesktop::prepareRestoreData(const std::filesystem::path &restoreLocation)
 {
-    backupRestoreStatus.operation = BackupRestore::Operation::Restore;
-    backupRestoreStatus.taskId    = restoreLocation.filename();
-    backupRestoreStatus.state     = BackupRestore::OperationState::Stopped;
-    backupRestoreStatus.location  = purefs::dir::getBackupOSPath() / backupRestoreStatus.taskId;
+    backupSyncRestoreStatus.operation = BackupSyncRestore::Operation::Restore;
+    backupSyncRestoreStatus.taskId    = restoreLocation.filename();
+    backupSyncRestoreStatus.state     = BackupSyncRestore::OperationState::Stopped;
+    backupSyncRestoreStatus.location  = purefs::dir::getBackupOSPath() / backupSyncRestoreStatus.taskId;
 }
 
 auto ServiceDesktop::requestLogsFlush() -> void
@@ -315,17 +335,37 @@ auto ServiceDesktop::handle(sdesktop::developerMode::DeveloperModeRequest *msg) 
 
 auto ServiceDesktop::handle(sdesktop::BackupMessage * /*msg*/) -> std::shared_ptr<sys::Message>
 {
-    backupRestoreStatus.state          = BackupRestore::OperationState::Running;
-    backupRestoreStatus.completionCode = BackupRestore::BackupUserFiles(this, backupRestoreStatus.backupTempDir);
-    backupRestoreStatus.location       = backupRestoreStatus.taskId;
+    backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Running;
+    backupSyncRestoreStatus.completionCode =
+        BackupSyncRestore::BackupUserFiles(this, backupSyncRestoreStatus.backupTempDir);
+    backupSyncRestoreStatus.location = backupSyncRestoreStatus.taskId;
 
-    if (backupRestoreStatus.completionCode == BackupRestore::CompletionCode::Success) {
+    if (backupSyncRestoreStatus.completionCode == BackupSyncRestore::CompletionCode::Success) {
         LOG_INFO("Backup finished");
-        backupRestoreStatus.state = BackupRestore::OperationState::Finished;
+        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Finished;
     }
     else {
         LOG_ERROR("Backup failed");
-        backupRestoreStatus.state = BackupRestore::OperationState::Error;
+        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Error;
+    }
+
+    return sys::MessageNone{};
+}
+
+auto ServiceDesktop::handle(sdesktop::SyncMessage * /*msg*/) -> std::shared_ptr<sys::Message>
+{
+    backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Running;
+    backupSyncRestoreStatus.completionCode =
+        BackupSyncRestore::PrepareSyncPackage(this, backupSyncRestoreStatus.backupTempDir);
+    backupSyncRestoreStatus.location = backupSyncRestoreStatus.taskId;
+
+    if (backupSyncRestoreStatus.completionCode == BackupSyncRestore::CompletionCode::Success) {
+        LOG_INFO("Sync package preparation finished");
+        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Finished;
+    }
+    else {
+        LOG_ERROR("Sync package preparation failed");
+        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Error;
     }
 
     return sys::MessageNone{};
@@ -333,17 +373,18 @@ auto ServiceDesktop::handle(sdesktop::BackupMessage * /*msg*/) -> std::shared_pt
 
 auto ServiceDesktop::handle(sdesktop::RestoreMessage * /*msg*/) -> std::shared_ptr<sys::Message>
 {
-    backupRestoreStatus.state          = BackupRestore::OperationState::Running;
-    backupRestoreStatus.completionCode = BackupRestore::RestoreUserFiles(this, backupRestoreStatus.location);
+    backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Running;
+    backupSyncRestoreStatus.completionCode =
+        BackupSyncRestore::RestoreUserFiles(this, backupSyncRestoreStatus.location);
 
-    if (backupRestoreStatus.completionCode == BackupRestore::CompletionCode::Success) {
+    if (backupSyncRestoreStatus.completionCode == BackupSyncRestore::CompletionCode::Success) {
         LOG_DEBUG("Restore finished");
-        backupRestoreStatus.state = BackupRestore::OperationState::Finished;
+        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Finished;
         sys::SystemManagerCommon::Reboot(this);
     }
     else {
         LOG_ERROR("Restore failed");
-        backupRestoreStatus.state = BackupRestore::OperationState::Error;
+        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Error;
     }
 
     return sys::MessageNone{};
