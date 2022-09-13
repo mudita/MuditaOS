@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,14 @@ namespace sdesktop
         BackupMessage() : sys::DataMessage(MessageType::Backup)
         {}
         ~BackupMessage() override = default;
+    };
+
+    class SyncMessage : public sys::DataMessage
+    {
+      public:
+        SyncMessage() : sys::DataMessage(MessageType::Sync)
+        {}
+        ~SyncMessage() override = default;
     };
 
     class RestoreMessage : public sys::DataMessage

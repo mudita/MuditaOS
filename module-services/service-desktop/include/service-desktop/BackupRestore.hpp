@@ -13,12 +13,13 @@ namespace sys
     class Service;
 } // namespace sys
 
-class BackupRestore
+class BackupSyncRestore
 {
   public:
     enum class Operation
     {
         Backup,
+        Sync,
         Restore
     };
 
@@ -102,13 +103,17 @@ class BackupRestore
     };
 
     static CompletionCode BackupUserFiles(sys::Service *ownerService, std::filesystem::path &path);
+    static CompletionCode PrepareSyncPackage(sys::Service *ownerService, std::filesystem::path &path);
     static CompletionCode RestoreUserFiles(sys::Service *ownerService, const std::filesystem::path &path);
     static json11::Json GetBackupFiles();
 
   private:
     static bool RemoveBackupDir(const std::filesystem::path &path);
     static bool CreateBackupDir(const std::filesystem::path &path);
+    static bool RemoveSyncDir(const std::filesystem::path &path);
+    static bool CreateSyncDir(const std::filesystem::path &path);
     static bool PackUserFiles(const std::filesystem::path &path);
+    static bool PackSyncFiles(const std::filesystem::path &path);
     static bool UnpackBackupFile(const std::filesystem::path &path);
     static std::string ReadVersionFromJsonFile(const std::filesystem::path &jsonFilePath);
     static bool CheckBackupVersion(const std::filesystem::path &extractedBackup);
