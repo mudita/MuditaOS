@@ -17,6 +17,7 @@ enum class MessageType
 
     DBServiceNotification, ///< Common service-db notification message.
     DBServiceBackup,
+    DBSyncPackage,
 
     DBSettingsGet,    ///< get current settings from database
     DBSettingsUpdate, ///< update settings
@@ -119,6 +120,7 @@ enum class MessageType
     // service-desktop  messages
     UpdateOS,
     Backup,
+    Sync,
     Restore,
     Factory,
     DeveloperModeRequest,

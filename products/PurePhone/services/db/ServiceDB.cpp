@@ -228,6 +228,13 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         responseMsg = std::make_shared<DBServiceResponseMessage>(ret);
     } break;
 
+    case MessageType::DBSyncPackage: {
+        auto time   = utils::time::Scoped("DBSyncPackage");
+        auto msg    = static_cast<DBServiceMessageSyncPackage *>(msgl);
+        auto ret    = StoreIntoSyncPackage({msg->syncPackagePath});
+        responseMsg = std::make_shared<DBServiceResponseMessage>(ret);
+    } break;
+
     default:
         break;
     }
@@ -344,6 +351,21 @@ bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
             }
             break;
         }
+    }
+
+    return true;
+}
+
+bool ServiceDB::StoreIntoSyncPackage(const std::filesystem::path &syncPackagePath)
+{
+    if (!contactsDB->storeIntoFile(syncPackagePath / std::filesystem::path(contactsDB->getName()).filename())) {
+        LOG_ERROR("Store contactsDB in sync package failed");
+        return false;
+    }
+
+    if (!smsDB->storeIntoFile(syncPackagePath / std::filesystem::path(smsDB->getName()).filename())) {
+        LOG_ERROR("Store smsDB in sync package failed");
+        return false;
     }
 
     return true;
