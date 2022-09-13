@@ -25,34 +25,35 @@ namespace sdesktop::endpoints::json
     inline constexpr auto networkOperatorName = "networkOperatorName";
     inline constexpr auto accessTechnology    = "accessTechnology";
 
-    inline constexpr auto update         = "update";
-    inline constexpr auto updateInfo     = "updateInfo";
-    inline constexpr auto updateError    = "updateError";
-    inline constexpr auto errorCode      = "errorCode";
-    inline constexpr auto statusCode     = "statusCode";
-    inline constexpr auto updateHistory  = "updateHistory";
-    inline constexpr auto usbMscMode     = "usbMscMode";
-    inline constexpr auto versionString  = "string";
-    inline constexpr auto fileExists     = "fileExists";
-    inline constexpr auto boot           = "boot";
-    inline constexpr auto version        = "version";
-    inline constexpr auto taskId         = "id";
-    inline constexpr auto state          = "state";
-    inline constexpr auto success        = "success";
-    inline constexpr auto reboot         = "reboot";
-    inline constexpr auto rebootMode     = "rebootMode";
-    inline constexpr auto request        = "request";
-    inline constexpr auto restore        = "restore";
-    inline constexpr auto finished       = "finished";
-    inline constexpr auto pending        = "pending";
-    inline constexpr auto location       = "location";
-    inline constexpr auto reason         = "reason";
-    inline constexpr auto serialNumber   = "serialNumber";
-    inline constexpr auto caseColour     = "caseColour";
-    inline constexpr auto fileList       = "fileList";
-    inline constexpr auto files          = "files";
-    inline constexpr auto backupLocation = "backupLocation";
-    inline constexpr auto deviceToken    = "deviceToken";
+    inline constexpr auto update              = "update";
+    inline constexpr auto updateInfo          = "updateInfo";
+    inline constexpr auto updateError         = "updateError";
+    inline constexpr auto errorCode           = "errorCode";
+    inline constexpr auto statusCode          = "statusCode";
+    inline constexpr auto updateHistory       = "updateHistory";
+    inline constexpr auto usbMscMode          = "usbMscMode";
+    inline constexpr auto versionString       = "string";
+    inline constexpr auto fileExists          = "fileExists";
+    inline constexpr auto boot                = "boot";
+    inline constexpr auto version             = "version";
+    inline constexpr auto taskId              = "id";
+    inline constexpr auto state               = "state";
+    inline constexpr auto success             = "success";
+    inline constexpr auto reboot              = "reboot";
+    inline constexpr auto rebootMode          = "rebootMode";
+    inline constexpr auto request             = "request";
+    inline constexpr auto restore             = "restore";
+    inline constexpr auto finished            = "finished";
+    inline constexpr auto pending             = "pending";
+    inline constexpr auto location            = "location";
+    inline constexpr auto reason              = "reason";
+    inline constexpr auto serialNumber        = "serialNumber";
+    inline constexpr auto caseColour          = "caseColour";
+    inline constexpr auto fileList            = "fileList";
+    inline constexpr auto files               = "files";
+    inline constexpr auto backupLocation      = "backupLocation";
+    inline constexpr auto syncPackageLocation = "syncPackageLocation";
+    inline constexpr auto deviceToken         = "deviceToken";
 
     namespace updateprocess
     {
@@ -71,6 +72,8 @@ namespace sdesktop::endpoints::json
         inline constexpr auto categoryMessage  = "message";
         inline constexpr auto categoryThread   = "thread";
         inline constexpr auto categoryTemplate = "template";
+        inline constexpr auto categoryBackup   = "backup";
+        inline constexpr auto categorySync     = "sync";
 
         inline constexpr auto limit              = "limit";
         inline constexpr auto offset             = "offset";

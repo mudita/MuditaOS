@@ -275,6 +275,20 @@ auto DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath) -> bool
     return false;
 }
 
+auto DBServiceAPI::DBPrepareSyncPackage(sys::Service *serv, const std::string &syncPackagePath) -> bool
+{
+    LOG_INFO("DBPrepareSyncPackage %s", syncPackagePath.c_str());
+
+    auto msg = std::make_shared<DBServiceMessageSyncPackage>(MessageType::DBSyncPackage, syncPackagePath);
+
+    auto ret = serv->bus.sendUnicastSync(std::move(msg), service::name::db, DefaultTimeoutInMs);
+    if (auto retMsg = dynamic_cast<DBServiceResponseMessage *>(ret.second.get()); retMsg) {
+        return retMsg->retCode;
+    }
+    LOG_ERROR("DBPrepareSyncPackage error, return code: %s", c_str(ret.first));
+    return false;
+}
+
 bool DBServiceAPI::AddSMS(sys::Service *serv, const SMSRecord &record, std::unique_ptr<db::QueryListener> &&listener)
 {
     auto query = std::make_unique<db::query::SMSAdd>(record);
