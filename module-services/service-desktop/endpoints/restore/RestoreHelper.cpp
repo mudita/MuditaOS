@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/Context.hpp>
@@ -31,9 +31,9 @@ namespace sdesktop::endpoints
         auto ownerService = static_cast<ServiceDesktop *>(owner);
 
         if (context.getBody()[json::taskId].is_string()) {
-            if (ownerService->getBackupRestoreStatus().taskId == context.getBody()[json::taskId].string_value()) {
+            if (ownerService->getBackupSyncRestoreStatus().taskId == context.getBody()[json::taskId].string_value()) {
                 context.setResponseStatus(http::Code::OK);
-                context.setResponseBody(ownerService->getBackupRestoreStatus());
+                context.setResponseBody(ownerService->getBackupSyncRestoreStatus());
             }
             else {
                 return {sent::no, ResponseContext{.status = http::Code::NotFound}};
@@ -46,7 +46,7 @@ namespace sdesktop::endpoints
 
                 return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
             }
-            auto filesList = json11::Json::object{{json::files, BackupRestore::GetBackupFiles()}};
+            auto filesList = json11::Json::object{{json::files, BackupSyncRestore::GetBackupFiles()}};
             context.setResponseBody(filesList);
         }
 
@@ -61,7 +61,7 @@ namespace sdesktop::endpoints
         auto ownerService = static_cast<ServiceDesktop *>(owner);
 
         if (context.getBody()[json::restore].is_string()) {
-            if (ownerService->getBackupRestoreStatus().state == BackupRestore::OperationState::Running) {
+            if (ownerService->getBackupSyncRestoreStatus().state == BackupSyncRestore::OperationState::Running) {
                 LOG_WARN("Restore is running, try again later");
 
                 return {sent::no, ResponseContext{.status = http::Code::NotAcceptable}};
@@ -88,7 +88,7 @@ namespace sdesktop::endpoints
                                               service::name::service_desktop);
 
                 // return new generated restore info
-                context.setResponseBody(ownerService->getBackupRestoreStatus());
+                context.setResponseBody(ownerService->getBackupSyncRestoreStatus());
             }
         }
         else {
