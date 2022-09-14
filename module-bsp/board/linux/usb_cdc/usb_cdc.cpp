@@ -150,7 +150,7 @@ namespace bsp
         std::remove(ptsFileName);
     }
 
-    void usbReinit(const char * /*mtpRoot*/)
+    void usbReinit(const std::string &)
     {
         LOG_INFO("usbReinit");
     }

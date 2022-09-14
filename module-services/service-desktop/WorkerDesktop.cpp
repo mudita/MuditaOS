@@ -23,9 +23,10 @@ inline constexpr auto uploadFailedMessage = "file upload terminated before all d
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr,
                              std::function<void()> messageProcessedCallback,
                              const sdesktop::USBSecurityModel &securityModel,
-                             const std::string &serialNumber)
-    : sys::Worker(ownerServicePtr, sdesktop::worker_stack), securityModel(securityModel), serialNumber(serialNumber),
-      ownerService(ownerServicePtr), parser(ownerServicePtr),
+                             const std::string &serialNumber,
+                             const std::string &rootPath)
+    : sys::Worker(ownerServicePtr, sdesktop::worker_stack), securityModel(securityModel),
+      serialNumber(serialNumber), rootPath{rootPath}, ownerService(ownerServicePtr), parser(ownerServicePtr),
       messageProcessedCallback(std::move(messageProcessedCallback))
 {}
 
@@ -45,7 +46,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     ownerService->bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
-    bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber.c_str()};
+    bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber, rootPath};
 
     initialized = bsp::usbInit(initParams) >= 0;
 
@@ -90,7 +91,7 @@ bool WorkerDesktop::reinit(const std::filesystem::path &path)
 {
     LOG_DEBUG("Reinit USB begin");
 
-    bsp::usbReinit(path.c_str());
+    bsp::usbReinit(path);
 
     LOG_DEBUG("Reinit USB end");
     return true;
@@ -102,7 +103,7 @@ void WorkerDesktop::reset()
     usbStatus   = bsp::USBDeviceStatus::Disconnected;
     bsp::usbDeinit();
 
-    bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber.c_str()};
+    bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber, rootPath};
     initialized                   = bsp::usbInit(initParams) >= 0;
     if (initialized) {
         usbStatus = bsp::USBDeviceStatus::Connected;

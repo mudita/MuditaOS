@@ -22,7 +22,8 @@ class WorkerDesktop : public sys::Worker
     WorkerDesktop(sys::Service *ownerServicePtr,
                   std::function<void()> messageProcessedCallback,
                   const sdesktop::USBSecurityModel &securityModel,
-                  const std::string &serialNumber);
+                  const std::string &serialNumber,
+                  const std::string &rootPath);
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     void closeWorker();
@@ -50,6 +51,7 @@ class WorkerDesktop : public sys::Worker
     xQueueHandle irqQueue;
     const sdesktop::USBSecurityModel &securityModel;
     const std::string serialNumber;
+    std::string rootPath;
     sys::Service *ownerService = nullptr;
     sdesktop::endpoints::StateMachine parser;
     bsp::USBDeviceStatus usbStatus = bsp::USBDeviceStatus::Disconnected;
