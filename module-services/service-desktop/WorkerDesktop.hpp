@@ -19,6 +19,11 @@
 class WorkerDesktop : public sys::Worker
 {
   public:
+    enum class Signal
+    {
+        startMTP
+    };
+
     WorkerDesktop(sys::Service *ownerServicePtr,
                   std::function<void()> messageProcessedCallback,
                   const sdesktop::USBSecurityModel &securityModel,
@@ -30,6 +35,7 @@ class WorkerDesktop : public sys::Worker
     bool reinit(const std::filesystem::path &path);
 
     bool handleMessage(std::uint32_t queueID) override final;
+    void notify(Signal command);
 
     xQueueHandle getReceiveQueue()
     {
@@ -44,6 +50,7 @@ class WorkerDesktop : public sys::Worker
     bool handleSendQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
     bool handleServiceQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
     bool handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
+    bool handleSignallingQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
 
     std::atomic<bool> initialized = false;
 

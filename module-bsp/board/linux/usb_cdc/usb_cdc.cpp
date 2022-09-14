@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/usb/usb.hpp"
@@ -158,6 +158,11 @@ namespace bsp
     void usbSuspend()
     {
         LOG_INFO("usbSuspend");
+    }
+
+    void usbStartMTP()
+    {
+        LOG_INFO("mtpStart");
     }
 
     int usbInit(const bsp::usbInitParams &initParams)
