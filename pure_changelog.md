@@ -8,6 +8,7 @@
 * Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
+* Fixed SIM card pop-ups not showing
 * Fixed lost bytes in logs
 * Fixed passcode lock time discrepancy between lock screen and 'Wrong password' popup
 * Fixed cellular DMA errors
