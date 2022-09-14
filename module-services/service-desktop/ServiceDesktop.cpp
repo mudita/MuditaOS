@@ -195,8 +195,11 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
 
     LOG_DEBUG("usbWorkerInit Serial Number: %s", serialNumber.c_str());
 
-    desktopWorker = std::make_unique<WorkerDesktop>(
-        this, std::bind(&ServiceDesktop::restartConnectionActiveTimer, this), *usbSecurityModel, serialNumber);
+    desktopWorker = std::make_unique<WorkerDesktop>(this,
+                                                    std::bind(&ServiceDesktop::restartConnectionActiveTimer, this),
+                                                    *usbSecurityModel,
+                                                    serialNumber,
+                                                    purefs::dir::getUserDiskPath() / "music");
 
     initialized =
         desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
@@ -220,7 +223,7 @@ auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
         settings->deinit();
         desktopWorker->closeWorker();
         desktopWorker.reset();
-        initialized = false;
+        initialized     = false;
         isUsbConfigured = false;
     }
     return sys::ReturnCodes::Success;
