@@ -112,6 +112,13 @@ void WorkerDesktop::reset()
     }
 }
 
+void WorkerDesktop::notify(Signal command)
+{
+    if (auto queue = getQueueByName(sdesktop::SIGNALLING_QUEUE_BUFFER_NAME); !queue->Overwrite(&command)) {
+        LOG_ERROR("Unable to overwrite the command in the commands queue.");
+    }
+}
+
 bool WorkerDesktop::handleMessage(std::uint32_t queueID)
 {
     bool result       = false;
@@ -129,6 +136,9 @@ bool WorkerDesktop::handleMessage(std::uint32_t queueID)
     }
     else if (qname == sdesktop::IRQ_QUEUE_BUFFER_NAME) {
         result = handleIrqQueueMessage(queue);
+    }
+    else if (qname == sdesktop::SIGNALLING_QUEUE_BUFFER_NAME) {
+        result = handleSignallingQueueMessage(queue);
     }
     else {
         LOG_INFO("handeMessage got message on an unhandled queue");
@@ -236,6 +246,28 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
         if (usbStatus == bsp::USBDeviceStatus::Configured) {
             reset();
         }
+    }
+    return true;
+}
+
+bool WorkerDesktop::handleSignallingQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue)
+{
+    if (!initialized) {
+        return false;
+    }
+    sys::WorkerCommand command;
+    if (!queue->Dequeue(&command, 0)) {
+        LOG_ERROR("handleMessage failed to receive from \"%s\"", sdesktop::SIGNALLING_QUEUE_BUFFER_NAME);
+        return false;
+    }
+
+    switch (static_cast<Signal>(command.command)) {
+    case Signal::startMTP:
+        bsp::usbStartMTP();
+        break;
+    default:
+        LOG_ERROR("Command not valid.");
+        return false;
     }
     return true;
 }

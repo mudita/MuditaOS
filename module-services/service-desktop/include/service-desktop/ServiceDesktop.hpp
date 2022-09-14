@@ -28,14 +28,17 @@ namespace sdesktop
 {
     inline constexpr auto service_stack             = 8192;
     inline constexpr auto worker_stack              = 8704;
-    inline constexpr auto cdc_queue_len             = 1024;
-    inline constexpr auto cdc_queue_object_size     = 1024;
-    inline constexpr auto irq_queue_object_size     = sizeof(bsp::USBDeviceStatus);
+    inline constexpr auto cdcReceiveQueueLength        = 1024;
+    inline constexpr auto cdcSendQueueLength           = 1024;
+    inline constexpr auto signallingQueueLength        = 4;
+    inline constexpr auto irqQueueLength               = 4;
+    inline constexpr auto irqQueueSize                 = sizeof(bsp::USBDeviceStatus);
     constexpr auto connectionActiveTimerName        = "connectionActiveTimer";
     constexpr auto connectionActiveTimerDelayMs     = std::chrono::milliseconds{1000 * 20};
     inline constexpr auto RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
     inline constexpr auto SEND_QUEUE_BUFFER_NAME    = "sendQueueBuffer";
     inline constexpr auto IRQ_QUEUE_BUFFER_NAME     = "irqQueueBuffer";
+    inline constexpr auto SIGNALLING_QUEUE_BUFFER_NAME = "signallingQueueBuffer";
     inline constexpr auto DeviceUniqueIdLength      = 32;
     inline constexpr auto DeviceUniqueIdName        = "sd_device_unique_id";
     constexpr auto pathFactoryDataSerial            = "factory_data/serial";
