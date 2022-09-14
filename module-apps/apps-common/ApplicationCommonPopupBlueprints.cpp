@@ -106,10 +106,14 @@ namespace app
         popupBlueprint.registerBlueprint(ID::PhoneLockChangeInfo, phoneLockBlueprint);
 
         auto simLockBlueprint = [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
-            auto popupParams = dynamic_cast<const gui::SimUnlockInputRequestParams *>(params.get());
+            auto popupParams = dynamic_cast<gui::SimUnlockInputRequestParams *>(params.get());
             if (popupParams == nullptr) {
                 return false;
             }
+
+            popupParams->setDisposition(gui::popup::Disposition{gui::popup::Disposition::Priority::High,
+                                                                gui::popup::Disposition::WindowType::Popup,
+                                                                params->getPopupId()});
             switchWindowPopup(gui::popup::resolveWindowName(id),
                               popupParams->getDisposition(),
                               std::make_unique<locks::SimLockData>(popupParams->getLock(),
