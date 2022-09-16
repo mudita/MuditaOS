@@ -573,7 +573,7 @@ namespace app
             getCurrentWindow()->onClose(closeReason);
         }
 
-        LOG_DEBUG("Current window: %s vs %s", getCurrentWindow()->getName().c_str(), windowName.c_str());
+        LOG_DEBUG("Request to switch window from %s to %s", getCurrentWindow()->getName().c_str(), windowName.c_str());
         const auto &[name, data] = msg->getSwitchData();
         pushWindow(name, data);
         getCurrentWindow()->handleSwitchData(switchData.get());
