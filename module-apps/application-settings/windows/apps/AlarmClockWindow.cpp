@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmClockWindow.hpp"
@@ -31,10 +31,12 @@ namespace gui
                                      [&]() { switchManualVolumeState(); });
 
         if (mManualVolumeEnabled) {
+            constexpr auto maxVolumeLevel = 10;
             optionList.emplace_back(std::make_unique<gui::SpinBoxOptionSettings>(
                 utils::translate("app_settings_volume"),
+                utils::translate("app_settings_volume_focused"),
                 mAudioModel->getVolume(),
-                std::ceil(10.0),
+                maxVolumeLevel,
                 [&](uint8_t value) {
                     setVolume(value);
                     return true;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SpinBoxOptionSettings.hpp"
@@ -7,22 +7,29 @@
 
 namespace gui
 {
-    SpinBoxOptionSettings::SpinBoxOptionSettings(UTF8 text,
+    SpinBoxOptionSettings::SpinBoxOptionSettings(const UTF8 &text,
+                                                 const UTF8 &textFocused,
                                                  std::uint8_t value,
                                                  std::uint8_t maxValue,
-                                                 std::function<bool(uint8_t)> updateCallback,
+                                                 std::function<bool(std::uint8_t)> updateCallback,
                                                  std::function<void(const UTF8 &text)> navBarTemporaryMode,
                                                  std::function<void()> navBarRestoreFromTemporaryMode,
                                                  bool indent)
         : updateCallback(std::move(updateCallback)), navBarTemporaryMode(std::move(navBarTemporaryMode)),
           navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode)), maxValue(maxValue), value(value),
-          text(text), indent(indent)
+          text(text), textFocused(textFocused), indent(indent)
     {}
 
     auto SpinBoxOptionSettings::build() const -> ListItem *
     {
-        auto spinBox = new SpinBox(
-            nullptr, text, updateCallback, maxValue, value, navBarTemporaryMode, navBarRestoreFromTemporaryMode);
+        auto spinBox = new SpinBox(nullptr,
+                                   text,
+                                   textFocused,
+                                   updateCallback,
+                                   maxValue,
+                                   value,
+                                   navBarTemporaryMode,
+                                   navBarRestoreFromTemporaryMode);
 
         auto optionItem = new gui::ListItem();
         optionItem->setMinimumSize(style::window::default_body_width, style::window::label::big_h);

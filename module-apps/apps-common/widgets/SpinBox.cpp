@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SpinBox.hpp"
@@ -14,9 +14,10 @@ namespace gui
 {
     SpinBox::SpinBox(Item *parent,
                      const std::string &title,
+                     const std::string &titleFocused,
                      UpdateCallback updateCallback,
-                     uint8_t maxValue,
-                     uint8_t startValue,
+                     std::uint8_t maxValue,
+                     std::uint8_t startValue,
                      std::function<void(const UTF8 &text)> navBarTemporaryMode,
                      std::function<void()> navBarRestoreFromTemporaryMode)
         : HBox(parent, style::window::default_left_margin), updateBarCallback(std::move(updateCallback)),
@@ -33,25 +34,31 @@ namespace gui
         rightArrow = addArrow(this, "arrow_right_20px_W_M", Alignment::Horizontal::Right, false);
         bar        = addBarGraph(this, maxValue, startValue);
 
-        focusChangedCallback = [this](Item &item) {
-            leftArrow->setVisible(item.focus);
-            rightArrow->setVisible(item.focus);
-            resizeItems();
-
+        focusChangedCallback = [=](Item &item) {
             if (item.focus) {
+                titleLabel->setMinimumWidthToFitText(titleFocused);
+                titleLabel->setText(titleFocused);
+                leftArrow->setVisible(true);
+                rightArrow->setVisible(true);
                 if (this->navBarTemporaryMode) {
                     this->navBarTemporaryMode("");
                 }
             }
             else {
+                leftArrow->setVisible(false);
+                rightArrow->setVisible(false);
+                titleLabel->setMinimumWidthToFitText(title);
+                titleLabel->setText(title);
                 if (this->navBarRestoreFromTemporaryMode) {
                     this->navBarRestoreFromTemporaryMode();
                 }
             }
+
+            resizeItems();
             return true;
         };
 
-        inputCallback = [this](gui::Item &item, const gui::InputEvent &event) {
+        inputCallback = [this]([[maybe_unused]] gui::Item &item, const gui::InputEvent &event) {
             auto ret = false;
             if (!event.isShortRelease()) {
                 return false;
@@ -101,7 +108,7 @@ namespace gui
         return title;
     }
 
-    HBarGraph *SpinBox::addBarGraph(Item *parent, uint8_t maxValue, uint8_t startValue)
+    HBarGraph *SpinBox::addBarGraph(Item *parent, std::uint8_t maxValue, std::uint8_t startValue)
     {
         auto barGraph = new HBarGraph(parent, 0, 0, maxValue);
         barGraph->setMaximumWidth(style::window::default_body_width);

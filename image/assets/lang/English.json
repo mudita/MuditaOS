@@ -374,6 +374,7 @@
   "app_settings_vibration": "Vibration",
   "app_settings_sound": "Sound",
   "app_settings_volume": "Volume",
+  "app_settings_volume_focused": "Volume",
   "app_settings_call_ringtome": "Call ringtone",
   "app_settings_message_sound": "Message sound",
   "app_settings_notification_sound": "Notification sound",

@@ -384,6 +384,7 @@
   "app_settings_vibration": "Vibration",
   "app_settings_sound": "Son",
   "app_settings_volume": "Volume",
+  "app_settings_volume_focused": "Volume",
   "app_settings_apps_alarm_clock_manual_volume": "Volume sonore manuel",
   "app_settings_call_ringtome": "Sonnerie d'appel",
   "app_settings_message_sound": "Son de messages",
