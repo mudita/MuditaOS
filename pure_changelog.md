@@ -8,6 +8,7 @@
 * Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
+* Fixed mixed SMS messages
 * Fixed disappearing manual alarm and vibration volume setting in German
 * Fixed the accessibility of user files by MTP
 * Fixed SIM card pop-ups not showing

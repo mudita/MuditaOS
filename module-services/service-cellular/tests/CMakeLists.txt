@@ -39,6 +39,16 @@ add_catch2_executable(
 
 add_catch2_executable(
         NAME
+        cellular-smsParseHandler
+        SRCS
+        unittest_smsparsehandler.cpp
+        LIBS
+        module-cellular
+        ucs2
+)
+
+add_catch2_executable(
+        NAME
         cellular-datatransfer
         SRCS
         unittest_datatransfer.cpp
