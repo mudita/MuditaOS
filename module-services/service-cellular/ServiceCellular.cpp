@@ -14,6 +14,7 @@
 #include "service-cellular/MessageConstants.hpp"
 #include "service-cellular/connection-manager/ConnectionManagerCellularCommands.hpp"
 #include "SimCard.hpp"
+#include "SMSParser.hpp"
 #include "NetworkSettings.hpp"
 #include "service-cellular/RequestFactory.hpp"
 #include "service-cellular/CellularRequestHandler.hpp"
@@ -986,17 +987,13 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
         }
     });
 
-    bool messageParsed = false;
-
-    std::string messageRawBody;
-    UTF8 receivedNumber;
     const auto &cmd = at::factory(at::AT::QCMGR);
-    at::Result ret;
+    at::Result rawMessage;
     auto qcmgrRetries = 0;
 
     while (qcmgrRetries < at::AtCmdMaxRetries) {
-        ret = channel->cmd(cmd + messageNumber, cmd.getTimeout());
-        if (!ret) {
+        rawMessage = channel->cmd(cmd + messageNumber, cmd.getTimeout());
+        if (!rawMessage) {
             ++qcmgrRetries;
             LOG_ERROR("Could not read text message. Retry %d", qcmgrRetries);
             // There are cases where +QCMGR command is issued to soon after +CMTI URC,
@@ -1010,104 +1007,44 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
         }
     }
 
-    if (!ret || qcmgrRetries == at::AtCmdMaxRetries) {
+    if (!rawMessage || qcmgrRetries == at::AtCmdMaxRetries) {
         LOG_ERROR("!!!! Could not read text message !!!!");
         retVal = false;
     }
     else {
-        for (std::size_t i = 0; i < ret.response.size(); i++) {
-            if (ret.response[i].find("QCMGR") != std::string::npos) {
+        auto receivedMessages = rawMessage.response.size();
+        for (std::size_t i = 0; i < receivedMessages; i++) {
+            bool messageParsed = SMSParser::parse(&rawMessage.response[i]);
+            if (messageParsed) {
+                UTF8 decodedMessage;
+                UTF8 smsNumber         = SMSParser::getNumber();
+                std::string smsMessage = SMSParser::getMessage();
 
-                std::istringstream ss(ret.response[i]);
-                std::string token;
-                std::vector<std::string> tokens;
-                while (std::getline(ss, token, ',')) {
-                    tokens.push_back(token);
+                const std::string decodedStr  = utils::hexToBytes<std::string>(smsMessage);
+                const auto mmsNotificationOpt = pdu::parse(decodedStr);
+                if (mmsNotificationOpt) {
+                    std::string number = numberFromAddress(mmsNotificationOpt->fromAddress);
+                    // NOTE: number may be empty
+                    decodedMessage = UTF8("[MMS]");
+                    smsNumber      = UTF8(number);
                 }
-                tokens[1].erase(std::remove(tokens[1].begin(), tokens[1].end(), '\"'), tokens[1].end());
-                /*
-                 * tokens:
-                 * [0] - +QCMGR
-                 * [1] - sender number
-                 * [2] - none
-                 * [3] - date YY/MM/DD
-                 * [4] - hour HH/MM/SS/timezone
-                 * concatenaded messages
-                 * [5] - unique concatenated message id
-                 * [6] - current message number
-                 * [7] - total messages count
-                 *
-                 */
-                // parse sender number
-                receivedNumber = UCS2(tokens[1]).toUTF8();
 
-                // parse date
-                tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
-
-                auto messageDate = std::time(nullptr);
-
-                if (tokens.size() == 5) {
-                    LOG_DEBUG("Single message");
-                    messageRawBody = ret.response[i + 1];
-                    messageParsed  = true;
+                if (decodedMessage.empty()) {
+                    decodedMessage = UCS2(smsMessage).toUTF8();
                 }
-                else if (tokens.size() == 8) {
-                    LOG_DEBUG("Concatenated message");
-                    uint32_t last    = 0;
-                    uint32_t current = 0;
-                    try {
-                        last    = std::stoi(tokens[7]);
-                        current = std::stoi(tokens[6]);
-                    }
-                    catch (const std::exception &e) {
-                        LOG_ERROR("ServiceCellular::receiveSMS error %s", e.what());
-                        retVal = false;
-                        break;
-                    }
-                    LOG_DEBUG("part %" PRIu32 "from %" PRIu32, current, last);
-                    if (current == last) {
-                        messageParts.push_back(ret.response[i + 1]);
+                smsMessage.clear();
 
-                        for (std::size_t j = 0; j < messageParts.size(); j++) {
-                            messageRawBody += messageParts[j];
-                        }
-                        messageParts.clear();
-                        messageParsed = true;
-                    }
-                    else {
-                        messageParts.push_back(ret.response[i + 1]);
-                    }
-                }
-                if (messageParsed) {
-                    messageParsed = false;
+                auto messageDate  = SMSParser::getTime();
+                const auto record = createSMSRecord(decodedMessage, smsNumber, messageDate);
 
-                    UTF8 decodedMessage;
-
-                    const std::string decodedStr  = utils::hexToBytes<std::string>(messageRawBody);
-                    const auto mmsNotificationOpt = pdu::parse(decodedStr);
-                    if (mmsNotificationOpt) {
-                        std::string number = numberFromAddress(mmsNotificationOpt->fromAddress);
-                        // NOTE: number may be empty
-                        decodedMessage = UTF8("[MMS]");
-                        receivedNumber = UTF8(number);
-                    }
-
-                    if (decodedMessage.empty()) {
-                        decodedMessage = UCS2(messageRawBody).toUTF8();
-                    }
-
-                    const auto record = createSMSRecord(decodedMessage, receivedNumber, messageDate);
-
-                    if (!dbAddSMSRecord(record)) {
-                        LOG_ERROR("Failed to add text message to db");
-                        retVal = false;
-                        break;
-                    }
+                if (!dbAddSMSRecord(record)) {
+                    LOG_ERROR("Failed to add text message to db");
+                    retVal = false;
+                    break;
                 }
             }
         }
     }
-
     return retVal;
 }
 
