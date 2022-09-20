@@ -5,7 +5,7 @@
 
 #include <Common/Query.hpp>
 #include <Common/Logging.hpp>
-#include <Databases/ContactsDB.hpp>
+#include "module-db/databases/ContactsDB.hpp"
 #include <Tables/ContactsGroups.hpp>
 
 #include <i18n/i18n.hpp>

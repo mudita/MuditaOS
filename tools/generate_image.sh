@@ -96,7 +96,7 @@ fi
 cd "${SYSROOT}/sys"
 
 #Copy FAT data
-CURRENT_DATA="assets country-codes.db ${LUTS}"
+CURRENT_DATA="assets ${LUTS}"
 
 mmd -i "$PART1" ::/current
 mmd -i "$PART1" ::/current/sys

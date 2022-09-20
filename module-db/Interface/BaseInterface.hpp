@@ -25,7 +25,6 @@ namespace db
             Contact,
             Notes,
             Calllog,
-            CountryCodes,
             Notifications,
             Quotes,
             MultimediaFiles
@@ -50,8 +49,6 @@ constexpr const char *c_str(enum db::Interface::Name db)
         return "Notes";
     case db::Interface::Name::Calllog:
         return "Callog";
-    case db::Interface::Name::CountryCodes:
-        return "CountryCodes";
     case db::Interface::Name::Notifications:
         return "Notifications";
     case db::Interface::Name::Quotes:

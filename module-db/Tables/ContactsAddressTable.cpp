@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsAddressTable.hpp"
+#include "Common/Types.hpp"
 
 ContactsAddressTable::ContactsAddressTable(Database *db) : Table(db)
 {}
@@ -17,7 +18,7 @@ bool ContactsAddressTable::create()
 bool ContactsAddressTable::add(ContactsAddressTableRow entry)
 {
     return db->execute("insert or ignore into contact_address (contact_id, address, note, mail) "
-                       "VALUES (%lu, '%q', '%q', '%q');",
+                       "VALUES (" u32_c str_c str_c str_ ");",
                        entry.contactID,
                        entry.address.c_str(),
                        entry.note.c_str(),
@@ -26,13 +27,13 @@ bool ContactsAddressTable::add(ContactsAddressTableRow entry)
 
 bool ContactsAddressTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM contact_address where _id = %u;", id);
+    return db->execute("DELETE FROM contact_address where _id=" u32_ ";", id);
 }
 
 bool ContactsAddressTable::update(ContactsAddressTableRow entry)
 {
-    return db->execute("UPDATE contact_address SET contact_id = %lu, address = '%q', note = '%q', mail = '%q' "
-                       "WHERE _id=%lu;",
+    return db->execute("UPDATE contact_address SET contact_id=" u32_c "address=" str_c "note=" str_c "mail=" str_
+                       "WHERE _id=" u32_ ";",
                        entry.contactID,
                        entry.address.c_str(),
                        entry.note.c_str(),
@@ -42,7 +43,7 @@ bool ContactsAddressTable::update(ContactsAddressTableRow entry)
 
 ContactsAddressTableRow ContactsAddressTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM contact_address WHERE _id= %lu;", id);
+    auto retQuery = db->query("SELECT * FROM contact_address WHERE _id=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return ContactsAddressTableRow();
@@ -59,7 +60,8 @@ ContactsAddressTableRow ContactsAddressTable::getById(uint32_t id)
 
 std::vector<ContactsAddressTableRow> ContactsAddressTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * from contact_address ORDER BY contact_id LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery =
+        db->query("SELECT * from contact_address ORDER BY contact_id LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsAddressTableRow>();
@@ -95,11 +97,12 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::getLimitOffsetByField
         return std::vector<ContactsAddressTableRow>();
     }
 
-    auto retQuery = db->query("SELECT * from contact_address WHERE %q='%q' ORDER BY contact_id LIMIT %lu OFFSET %lu;",
-                              fieldName.c_str(),
-                              str,
-                              limit,
-                              offset);
+    auto retQuery =
+        db->query("SELECT * from contact_address WHERE %q=" str_ " ORDER BY contact_id LIMIT " u32_ " OFFSET " u32_ ";",
+                  fieldName.c_str(),
+                  str,
+                  limit,
+                  offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsAddressTableRow>();
@@ -133,7 +136,7 @@ uint32_t ContactsAddressTable::count()
 
 uint32_t ContactsAddressTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM contact_address WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM contact_address WHERE %q=" u32_ ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;

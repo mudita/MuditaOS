@@ -15,7 +15,7 @@ namespace service
     class ServiceFileIndexer final : public sys::Service
     {
       public:
-        ServiceFileIndexer(const std::vector<std::string> &paths);
+        explicit ServiceFileIndexer(const std::vector<std::string> &paths);
         virtual ~ServiceFileIndexer()                  = default;
         ServiceFileIndexer(const ServiceFileIndexer &) = delete;
         ServiceFileIndexer &operator=(const ServiceFileIndexer &) = delete;
