@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsTable.hpp"
+#include "Common/Types.hpp"
 #include "Database/Database.hpp"
 
 #include <log/log.hpp>
-#include <Utils.hpp>
 #include <cassert>
 
 NotificationsTable::NotificationsTable(Database *db) : Table(db)
@@ -18,7 +18,7 @@ bool NotificationsTable::create()
 
 bool NotificationsTable::add(NotificationsTableRow entry)
 {
-    return db->execute("INSERT or IGNORE INTO notifications (key, value, contact_id) VALUES (%lu, %lu, %lu);",
+    return db->execute("INSERT or IGNORE INTO notifications (key, value, contact_id) VALUES (" u32_c u32_c u32_ ");",
                        entry.key,
                        entry.value,
                        entry.contactID);
@@ -26,7 +26,7 @@ bool NotificationsTable::add(NotificationsTableRow entry)
 
 bool NotificationsTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM notifications where _id = %lu;", id);
+    return db->execute("DELETE FROM notifications where _id=" u32_ ";", id);
 }
 
 bool NotificationsTable::removeByField(NotificationsTableFields field, const char *str)
@@ -39,12 +39,12 @@ bool NotificationsTable::removeByField(NotificationsTableFields field, const cha
         break;
     }
 
-    return db->execute("DELETE FROM notifications where %q = '%q';", fieldName.c_str(), str);
+    return db->execute("DELETE FROM notifications where %q=" str_ ";", fieldName.c_str(), str);
 }
 
 bool NotificationsTable::update(NotificationsTableRow entry)
 {
-    return db->execute("UPDATE notifications SET key = %lu, value = %lu, contact_id = %lu WHERE _id = %lu;",
+    return db->execute("UPDATE notifications SET key=" u32_c "value=" u32_c "contact_id=" u32_ " WHERE _id=" u32_ ";",
                        entry.key,
                        entry.value,
                        entry.contactID,
@@ -53,7 +53,7 @@ bool NotificationsTable::update(NotificationsTableRow entry)
 
 NotificationsTableRow NotificationsTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM notifications WHERE _id= %u;", id);
+    auto retQuery = db->query("SELECT * FROM notifications WHERE _id=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return NotificationsTableRow();
@@ -71,7 +71,7 @@ NotificationsTableRow NotificationsTable::getById(uint32_t id)
 
 NotificationsTableRow NotificationsTable::getByKey(uint32_t key)
 {
-    auto retQuery = db->query("SELECT * FROM notifications WHERE key= %u;", key);
+    auto retQuery = db->query("SELECT * FROM notifications WHERE key=" u32_ ";", key);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return NotificationsTableRow();
@@ -89,7 +89,7 @@ NotificationsTableRow NotificationsTable::getByKey(uint32_t key)
 
 std::vector<NotificationsTableRow> NotificationsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * from notifications LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from notifications LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<NotificationsTableRow>();

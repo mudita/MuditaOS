@@ -2,14 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "Database/Database.hpp"
-#include "Tables/CountryCodesTable.hpp"
 
-class CountryCodesDB : public Database
+#include "Database/Database.hpp"
+#include "module-db/Tables/NotesTable.hpp"
+
+class NotesDB : public Database
 {
   public:
-    CountryCodesDB(const char *name);
-    ~CountryCodesDB();
+    NotesDB(const char *name);
+    ~NotesDB() = default;
 
-    CountryCodesTable countryCodes;
+    NotesTable notes;
 };

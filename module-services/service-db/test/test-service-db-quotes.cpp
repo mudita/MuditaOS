@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
+#include <Helpers.hpp>
 
 #include "test-service-db-quotes.hpp"
 #include <purefs/filesystem_paths.hpp>
@@ -11,22 +12,37 @@
 
 using namespace Quotes;
 
-constexpr auto totalNumOfCategories = 3;
-constexpr auto totalNumOfQuotes     = 5;
+constexpr auto totalNumOfCategories = 5;
+
+namespace
+{
+    std::filesystem::path getScriptsPath()
+    {
+        const std::string path              = __FILE__;
+        const std::filesystem::path scripts = "../../../products/PurePhone/services/db/databases/scripts";
+        return std::filesystem::path{path.substr(0, path.rfind('/'))} / scripts;
+    }
+
+    std::filesystem::path getLanguagePath()
+    {
+        const std::string path = __FILE__;
+        return std::filesystem::path{path.substr(0, path.rfind('/'))};
+    }
+} // namespace
 
 TEST_CASE("Quotes")
 {
-    Database::initialize();
-    auto predefinedDB =
-        std::make_unique<Database>((purefs::dir::getUserDiskPath() / "predefined_quotes.db").string().c_str());
-    auto customDB = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "custom_quotes.db").string().c_str());
+    db::tests::DatabaseUnderTest<Database> predefinedDb{"predefined_quotes.db", getScriptsPath(), true};
+    db::tests::DatabaseUnderTest<Database> customDb{"custom_quotes.db", getScriptsPath(), true};
+
     std::string timestampString{};
     std::string quotesString{};
     auto settings = std::make_unique<Quotes::SettingsMock>(quotesString, timestampString);
-    auto tester   = std::make_unique<QuotesAgentTester>(predefinedDB.get(), customDB.get(), std::move(settings));
+    auto tester   = std::make_unique<QuotesAgentTester>(&predefinedDb.get(), &customDb.get(), std::move(settings));
 
     SECTION("Get all categories")
     {
+        utils::resetAssetsPath(getLanguagePath());
         utils::setDisplayLanguage("English");
         tester->informLanguageChange();
         auto categories = tester->getCategoriesList();
@@ -236,8 +252,6 @@ TEST_CASE("Quotes")
         // No crash expected
         REQUIRE_NOTHROW(tester->readRandomizedQuote());
     }
-
-    Database::deinitialize();
 }
 
 TEST_CASE("Serializer test")

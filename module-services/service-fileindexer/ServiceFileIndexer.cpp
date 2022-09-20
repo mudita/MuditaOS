@@ -10,10 +10,6 @@
 
 namespace
 {
-    inline auto getMusicPath()
-    {
-        return purefs::createPath(purefs::dir::getUserDiskPath(), "music").string();
-    }
     inline constexpr auto fileIndexerServiceStackSize = 1024 * 5;
 } // namespace
 
@@ -35,7 +31,7 @@ namespace service
     sys::ReturnCodes ServiceFileIndexer::InitHandler()
     {
         if (mInotifyHandler.init(shared_from_this())) {
-            mInotifyHandler.addWatch(getMusicPath());
+            mInotifyHandler.addWatch(purefs::dir::getUserAudioPath().c_str());
 
             // Start the initial indexer
             mStartupIndexer.start(shared_from_this(), service::name::file_indexer);

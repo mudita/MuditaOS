@@ -27,7 +27,6 @@ target_include_directories(application-bell-bedtime
 target_link_libraries(application-bell-bedtime
     PRIVATE
         app
-        bellgui
         bell::app-common
         bell::db
         date::date

@@ -3,7 +3,7 @@
 
 #include "AlarmEventRecord.hpp"
 
-#include <Databases/EventsDB.hpp>
+#include <databases/EventsDB.hpp>
 #include <queries/alarm_events/QueryAlarmEventsAdd.hpp>
 #include <queries/alarm_events/QueryAlarmEventsEdit.hpp>
 #include <queries/alarm_events/QueryAlarmEventsGet.hpp>

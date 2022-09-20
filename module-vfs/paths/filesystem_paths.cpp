@@ -8,6 +8,7 @@ namespace
     constexpr inline auto PATH_SYS          = "/sys";
     constexpr inline auto PATH_CONF         = "/mfgconf";
     constexpr inline auto PATH_USER         = "user";
+    constexpr inline auto PATH_DB           = "db";
     constexpr inline auto PATH_OS          = "os";
     constexpr inline auto PATH_CURRENT      = "current";
     constexpr inline auto PATH_PREVIOUS     = "previous";
@@ -45,6 +46,10 @@ namespace purefs
         std::filesystem::path getUserDiskPath() noexcept
         {
             return std::filesystem::path{eMMC_disk} / PATH_USER;
+        }
+        std::filesystem::path getDatabasesPath() noexcept
+        {
+            return getUserDiskPath() / PATH_DB;
         }
 
         std::filesystem::path getCurrentOSPath() noexcept
