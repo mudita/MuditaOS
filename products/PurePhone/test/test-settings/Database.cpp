@@ -123,9 +123,7 @@ std::unique_ptr<QueryResult> stubQuery(const std::string &format, const std::str
     return queryResult;
 }
 
-Database::Database(const char *name, bool)
-    : dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false),
-      initializer(std::make_unique<DatabaseInitializer>(this))
+Database::Database(const char *name, bool) : dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false)
 {
     isInitialized_ = true;
 }

@@ -121,7 +121,6 @@ target_link_libraries(application-bell-settings
     PRIVATE
         app
         bell::audio
-        bellgui
         bell::db
         bell::paths
         bell::app-main

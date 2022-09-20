@@ -4,8 +4,8 @@
 #pragma once
 
 #include "Record.hpp"
-#include "module-db/Databases/SmsDB.hpp"
-#include "module-db/Databases/ContactsDB.hpp"
+#include "module-db/databases/SmsDB.hpp"
+#include "module-db/databases/ContactsDB.hpp"
 #include "module-db/Common/Common.hpp"
 #include "module-db/queries/messages/threads/QueryThreadMarkAsRead.hpp"
 #include <PhoneNumber.hpp>
