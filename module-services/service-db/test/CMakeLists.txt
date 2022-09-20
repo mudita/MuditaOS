@@ -8,7 +8,7 @@ add_catch2_executable(
             test-service-db-quotes.cpp
             test-factory-settings.cpp
         LIBS
-            iosyscalls
+            module-db::test::helpers
             module-audio
             module-cellular
             module-sys
@@ -16,7 +16,6 @@ add_catch2_executable(
             module-vfs
             service-audio
             service-cellular
-        USE_FS
 )
 
 add_catch2_executable(

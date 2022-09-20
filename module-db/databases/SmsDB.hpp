@@ -4,9 +4,9 @@
 #pragma once
 
 #include "Database/Database.hpp"
-#include "../Tables/SMSTable.hpp"
-#include "../Tables/ThreadsTable.hpp"
-#include "../Tables/SMSTemplateTable.hpp"
+#include "module-db/Tables/SMSTable.hpp"
+#include "module-db/Tables/ThreadsTable.hpp"
+#include "module-db/Tables/SMSTemplateTable.hpp"
 
 class SmsDB : public Database
 {

@@ -2,21 +2,17 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
+#include "Helpers.hpp"
 
 #include <filesystem>
 #include <Tables/NotesTable.hpp>
-#include "Database/Database.hpp"
-#include "Databases/NotesDB.hpp"
+#include "module-db/databases/NotesDB.hpp"
 
 TEST_CASE("Notes Table tests")
 {
-    Database::initialize();
+    db::tests::DatabaseUnderTest<NotesDB> notesDb{"notes.db", db::tests::getPurePhoneScriptsPath()};
 
-    const auto notesDbPath = std::filesystem::path{"sys/user"} / "notes.db";
-    NotesDB notesDb{notesDbPath.c_str()};
-    REQUIRE(notesDb.isInitialized());
-
-    NotesTable table{&notesDb};
+    NotesTable table{&notesDb.get()};
     table.removeAll();
     REQUIRE(table.count() == 0);
 
@@ -70,6 +66,4 @@ TEST_CASE("Notes Table tests")
         table.removeById(1);
         REQUIRE(table.count() == 0);
     }
-
-    Database::deinitialize();
 }

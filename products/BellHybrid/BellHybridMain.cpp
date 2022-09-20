@@ -15,7 +15,7 @@
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
 
 // modules
-#include <module-db/Databases/MultimediaFilesDB.hpp>
+#include <module-db/databases/MultimediaFilesDB.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 
 // services

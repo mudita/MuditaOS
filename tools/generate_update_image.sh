@@ -32,7 +32,6 @@ function setVars() {
         "sysroot/sys/current/assets"
         "sysroot/sys/user"
         "sysroot/sys/current/${SOURCE_TARGET}-boot.bin"
-        "sysroot/sys/current/country-codes.db"
         "sysroot/sys/current/Luts.bin"
         "version.json"
         "ecoboot.bin"
@@ -75,7 +74,6 @@ function linkInStageing(){
 
     ln -s ../sysroot/sys/user
     ln -s ../sysroot/sys/current/${SOURCE_TARGET}-boot.bin boot.bin
-    ln -s ../sysroot/sys/current/country-codes.db
     ln -s ../sysroot/sys/current/Luts.bin
     ln -s ../ecoboot.bin
     ln -s ../updater.bin
