@@ -22,6 +22,7 @@ namespace sdesktop::endpoints::http
         NotAcceptable       = 406,
         Conflict            = 409,
         UnprocessableEntity = 422,
+        Locked              = 423,
         InternalServerError = 500,
         NotImplemented      = 501,
         InsufficientStorage = 507

@@ -44,13 +44,22 @@ namespace sdesktop
         return isPasscodeEnabled() && isPhoneLocked();
     }
 
-    auto USBSecurityModel::getEndpointSecurity() const -> EndpointSecurity
+    auto USBSecurityModel::isEulaAccepted() const -> bool
     {
-        if (isSecurityEnabled()) {
-            return EndpointSecurity::Block;
+        return utils::getNumericValue<bool>(
+            settings->getValue(settings::SystemProperties::eulaAccepted, settings::SettingsScope::Global));
+    }
+
+    auto USBSecurityModel::getEndpointSecurity() const -> endpointSecurity_t
+    {
+        if (!isEulaAccepted()) {
+            return {EndpointSecurity::Block, BlockReason::EulaNotAccepted};
+        }
+        else if (isSecurityEnabled()) {
+            return {EndpointSecurity::Block, BlockReason::DeviceLocked};
         }
         else {
-            return EndpointSecurity::Allow;
+            return {EndpointSecurity::Allow, BlockReason::NoReason};
         }
     }
 

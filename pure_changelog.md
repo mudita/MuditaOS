@@ -9,6 +9,7 @@
 * Made windows flow in SIM cards settings more robust
 
 ### Fixed
+* Fixed access to the phone before going onboarding
 * Fixed receiving an empty SMS message
 * Fixed issue with inability to send SMS
 * Fixed mixed SMS messages
