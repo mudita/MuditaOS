@@ -1,21 +1,18 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "common.hpp"
+#include "Helpers.hpp"
 #include <Database/Database.hpp>
-#include <Databases/ContactsDB.hpp>
-#include <Databases/SmsDB.hpp>
+#include "module-db/databases/ContactsDB.hpp"
+#include "module-db/databases/SmsDB.hpp"
 #include <Interface/ContactRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Interface/ThreadRecord.hpp>
 
 #include <country.hpp>
 #include <PhoneNumber.hpp>
-
 #include <catch2/catch.hpp>
-
 #include <algorithm>
-#include <filesystem>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -29,15 +26,8 @@ struct test
 
 TEST_CASE("SMS Record tests")
 {
-    Database::initialize();
-
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    const auto smsPath      = (std::filesystem::path{"sys/user"} / "sms.db");
-    RemoveDbFiles(contactsPath.stem());
-    RemoveDbFiles(smsPath.stem());
-
-    ContactsDB contactsDB(contactsPath.c_str());
-    SmsDB smsDB(smsPath.c_str());
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
+    db::tests::DatabaseUnderTest<SmsDB> smsDb{"sms.db", db::tests::getPurePhoneScriptsPath()};
 
     const uint32_t dateTest      = 123456789;
     const uint32_t errorCodeTest = 555;
@@ -47,7 +37,7 @@ TEST_CASE("SMS Record tests")
     const char *bodyTest2        = "Test SMS Body2";
     const SMSType typeTest       = SMSType::DRAFT;
 
-    SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
+    SMSRecordInterface smsRecInterface(&smsDb.get(), &contactsDb.get());
 
     SMSRecord recordIN;
     recordIN.date      = dateTest;
@@ -136,7 +126,7 @@ TEST_CASE("SMS Record tests")
         }
 
         // Remove sms records in order to check automatic management of threads and contact databases
-        ThreadRecordInterface threadRecordInterface(&smsDB, &contactsDB);
+        ThreadRecordInterface threadRecordInterface(&smsDb.get(), &contactsDb.get());
         REQUIRE(smsRecInterface.RemoveByID(1));
         REQUIRE(smsRecInterface.RemoveByID(2));
 
@@ -145,7 +135,7 @@ TEST_CASE("SMS Record tests")
 
         // Test removing a message which belongs to non-existent thread
         REQUIRE(smsRecInterface.Add(recordIN));
-        REQUIRE(smsDB.threads.removeById(1)); // stealthy thread remove
+        REQUIRE(smsDb.get().threads.removeById(1)); // stealthy thread remove
         REQUIRE(smsRecInterface.RemoveByID(1));
 
         // Test handling of missmatch in sms vs. thread tables
@@ -166,7 +156,7 @@ TEST_CASE("SMS Record tests")
                                   .snippet        = threadRec.snippet,
                                   .type           = threadRec.type};
         threadRaw.msgCount = trueCount + 1; // break the DB
-        REQUIRE(smsDB.threads.update(threadRaw));
+        REQUIRE(smsDb.get().threads.update(threadRaw));
 
         REQUIRE(static_cast<int>(
                     smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ThreadID, "1")->size()) == trueCount);
@@ -203,7 +193,6 @@ TEST_CASE("SMS Record tests")
         REQUIRE(smsRecInterface.Add(recordIN));
         REQUIRE(smsRecInterface.Add(recordIN));
         REQUIRE(smsRecInterface.Add(recordIN));
-        Database::deinitialize();
     }
 
     SECTION("SMS Record Draft and Input test")
@@ -225,6 +214,4 @@ TEST_CASE("SMS Record tests")
         auto result = dynamic_cast<db::query::SMSGetForListResult *>(ret.get());
         REQUIRE(result != nullptr);
     }
-
-    Database::deinitialize();
 }

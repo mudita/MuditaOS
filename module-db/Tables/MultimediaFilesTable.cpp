@@ -2,16 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MultimediaFilesTable.hpp"
-
+#include "Common/Types.hpp"
 #include <Database/QueryResult.hpp>
 #include <Utils.hpp>
 #include <magic_enum.hpp>
 #include <inttypes.h>
-
-#define u32_  "%" PRIu32
-#define u32_c "%" PRIu32 ","
-#define str_  "%Q"
-#define str_c "%Q,"
 
 namespace db::multimedia_files
 {
@@ -105,7 +100,7 @@ namespace db::multimedia_files
 
     bool MultimediaFilesTable::removeById(uint32_t id)
     {
-        return db->execute("DELETE FROM files WHERE _id = %lu;", id);
+        return db->execute("DELETE FROM files WHERE _id=" u32_ ";", id);
     }
 
     bool MultimediaFilesTable::removeByField(TableFields field, const char *str)
@@ -116,7 +111,7 @@ namespace db::multimedia_files
             return false;
         }
 
-        return db->execute("DELETE FROM files WHERE %q = %Q;", fieldName.c_str(), str);
+        return db->execute("DELETE FROM files WHERE %q=" str_ ";", fieldName.c_str(), str);
     }
 
     bool MultimediaFilesTable::removeAll()

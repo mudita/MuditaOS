@@ -1,10 +1,9 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "common.hpp"
-
+#include <Helpers.hpp>
 #include <Database/Database.hpp>
-#include <Databases/EventsDB.hpp>
+#include <databases/EventsDB.hpp>
 #include <Interface/AlarmEventRecord.hpp>
 #include <queries/alarm_events/QueryAlarmEventsAdd.hpp>
 #include <queries/alarm_events/QueryAlarmEventsEdit.hpp>
@@ -17,7 +16,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <cstdio>
 #include <cstring>
 #include <filesystem>
 
@@ -34,15 +32,8 @@ TEST_CASE("AlarmEventRecord queries tests")
     constexpr auto testEnabled        = true;
     constexpr auto testSnoozeDuration = 15;
 
-    Database::initialize();
-
-    const auto eventsPath = (std::filesystem::path{"sys/user"} / "events.db");
-    RemoveDbFiles(eventsPath.stem());
-
-    auto eventsDB = EventsDB(eventsPath.c_str());
-    REQUIRE(eventsDB.isInitialized());
-
-    AlarmEventRecordInterface alarmEventRecordInterface(&eventsDB);
+    db::tests::DatabaseUnderTest<EventsDB> db{"events.db", db::tests::getScriptsPath()};
+    AlarmEventRecordInterface alarmEventRecordInterface(&db.get());
 
     auto getQuery = [&](uint32_t id,
                         std::chrono::hours hour,
@@ -260,8 +251,6 @@ TEST_CASE("AlarmEventRecord queries tests")
         REQUIRE(retAlarmEvents[1].enabled);
         REQUIRE(retAlarmEvents[2].enabled);
     }
-
-    Database::deinitialize();
 }
 
 TEST_CASE("AlarmEventRecord recurrence generation tests")

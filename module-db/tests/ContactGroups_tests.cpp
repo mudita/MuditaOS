@@ -1,17 +1,12 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "common.hpp"
 #include <catch2/catch.hpp>
+#include "Helpers.hpp"
 
-#include <Databases/ContactsDB.hpp>
+#include "module-db/databases/ContactsDB.hpp"
 #include <Tables/ContactsTable.hpp>
 #include <Tables/ContactsGroups.hpp>
-
-#include <filesystem>
-
-#include <iomanip>
-#include <sstream>
 
 namespace consts
 {
@@ -25,16 +20,8 @@ void addSomeContacts(ContactsDB &contactsDb);
 
 TEST_CASE("Contact Groups tests")
 {
-    INFO("sqlite Init");
-    Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    RemoveDbFiles(contactsPath.stem());
-
-    ContactsDB contactDb{contactsPath.c_str()};
-    INFO("contactDB init");
-    REQUIRE(contactDb.isInitialized());
-    ContactsGroupsTable contactGroupsTable = ContactsGroupsTable(&contactDb);
-    INFO("Create groups table");
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
+    ContactsGroupsTable contactGroupsTable = ContactsGroupsTable(&contactsDb.get());
     REQUIRE(contactGroupsTable.create());
 
     SECTION("Adding checking standard groups")
@@ -108,16 +95,16 @@ TEST_CASE("Contact Groups tests")
         REQUIRE(someGroups[9].ID == 17);
 
         INFO("Adding some contacts");
-        addSomeContacts(contactDb);
+        addSomeContacts(contactsDb.get());
     }
 
     SECTION("Update Groups")
     {
-        addSomeContacts(contactDb);
+        addSomeContacts(contactsDb.get());
 
-        ContactsGroupsTableRow favouritesGroup(contactGroupsTable.getById(contactDb.favouritesGroupId()));
-        ContactsGroupsTableRow iceGroup(contactGroupsTable.getById(contactDb.iceGroupId()));
-        ContactsGroupsTableRow blockedGroup(contactGroupsTable.getById(contactDb.blockedGroupId()));
+        ContactsGroupsTableRow favouritesGroup(contactGroupsTable.getById(contactGroupsTable.favouritesId()));
+        ContactsGroupsTableRow iceGroup(contactGroupsTable.getById(contactGroupsTable.iceId()));
+        ContactsGroupsTableRow blockedGroup(contactGroupsTable.getById(contactGroupsTable.blockedId()));
         ContactsGroupsTableRow familyGroup("Family");
         ContactsGroupsTableRow friendsGroup("Friends");
         ContactsGroupsTableRow workGroup("Work");
@@ -131,13 +118,13 @@ TEST_CASE("Contact Groups tests")
         workGroup.ID = contactGroupsTable.getId(workGroup.name);
 
         // adding contact to some groups
-        contactGroupsTable.addContactToGroup(1, contactDb.favouritesGroupId());
-        contactGroupsTable.addContactToGroup(1, contactDb.iceGroupId());
-        contactGroupsTable.addContactToGroup(1, contactDb.blockedGroupId());
+        contactGroupsTable.addContactToGroup(1, contactGroupsTable.favouritesId());
+        contactGroupsTable.addContactToGroup(1, contactGroupsTable.iceId());
+        contactGroupsTable.addContactToGroup(1, contactGroupsTable.blockedId());
         contactGroupsTable.addContactToGroup(1, familyGroup.ID);
         contactGroupsTable.addContactToGroup(1, workGroup.ID);
 
-        // checking if adding was sucessfull
+        // checking if adding was successful
         REQUIRE(contactGroupsTable.getGroupsForContact(1).size() == 5);
 
         // creating new groups set
@@ -154,7 +141,7 @@ TEST_CASE("Contact Groups tests")
         auto checkGroupsSet = contactGroupsTable.getGroupsForContact(1);
         auto checkEnd       = checkGroupsSet.end();
 
-        // checking if update was successfull
+        // checking if update was successful
         REQUIRE(checkGroupsSet.size() == 4);
         REQUIRE(checkGroupsSet.find(blockedGroup) != checkEnd);
         REQUIRE(checkGroupsSet.find(familyGroup) != checkEnd);
@@ -164,8 +151,6 @@ TEST_CASE("Contact Groups tests")
         REQUIRE(checkGroupsSet.find(favouritesGroup) == checkEnd);
         REQUIRE(checkGroupsSet.find(iceGroup) == checkEnd);
     }
-
-    Database::deinitialize();
 }
 
 void addSomeContacts(ContactsDB &contactsDb)

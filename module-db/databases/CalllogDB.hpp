@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Database/Database.hpp"
-#include "../Tables/CalllogTable.hpp"
+#include "module-db/Tables/CalllogTable.hpp"
 
 class CalllogDB : public Database
 {

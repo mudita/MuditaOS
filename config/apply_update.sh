@@ -99,7 +99,6 @@ fi
 echo "Copyind data"
 cp $TMPDIR/boot.bin $PHONE_MOUNT/current/
 cp $TMPDIR/Luts.bin $PHONE_MOUNT/current/
-cp $TMPDIR/country-codes.db $PHONE_MOUNT/current/
 cp $TMPDIR/version.json $PHONE_MOUNT/current/
 cp -r $TMPDIR/assets $PHONE_MOUNT/current/
 

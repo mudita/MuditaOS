@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsNumberTable.hpp"
+#include "Common/Types.hpp"
 
 ContactsNumberTable::ContactsNumberTable(Database *db) : Table(db)
 {}
@@ -16,33 +17,34 @@ bool ContactsNumberTable::create()
 
 bool ContactsNumberTable::add(ContactsNumberTableRow entry)
 {
-    return db->execute("insert or ignore into contact_number (contact_id, number_user, number_e164, type) VALUES (%lu, "
-                       "'%q', '%q', %lu);",
-                       entry.contactID,
-                       entry.numberUser.c_str(),
-                       entry.numbere164.c_str(),
-                       entry.type);
+    return db->execute(
+        "insert or ignore into contact_number (contact_id, number_user, number_e164, type) VALUES (" u32_c str_c str_c
+            u32_ ");",
+        entry.contactID,
+        entry.numberUser.c_str(),
+        entry.numbere164.c_str(),
+        entry.type);
 }
 
 bool ContactsNumberTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM contact_number where _id = %u;", id);
+    return db->execute("DELETE FROM contact_number where _id=" u32_ ";", id);
 }
 
 bool ContactsNumberTable::update(ContactsNumberTableRow entry)
 {
-    return db->execute(
-        "UPDATE contact_number SET contact_id = %lu, number_user = '%q', number_e164 = '%q', type = %lu WHERE _id=%lu;",
-        entry.contactID,
-        entry.numberUser.c_str(),
-        entry.numbere164.c_str(),
-        entry.type,
-        entry.ID);
+    return db->execute("UPDATE contact_number SET contact_id=" u32_c "number_user=" str_c "number_e164=" str_c
+                       "type=" u32_ " WHERE _id=" u32_ ";",
+                       entry.contactID,
+                       entry.numberUser.c_str(),
+                       entry.numbere164.c_str(),
+                       entry.type,
+                       entry.ID);
 }
 
 ContactsNumberTableRow ContactsNumberTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM contact_number WHERE _id= %lu;", id);
+    auto retQuery = db->query("SELECT * FROM contact_number WHERE _id=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return ContactsNumberTableRow();
@@ -59,7 +61,7 @@ ContactsNumberTableRow ContactsNumberTable::getById(uint32_t id)
 
 std::vector<ContactsNumberTableRow> ContactsNumberTable::getByContactId(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM contact_number WHERE contact_id = %lu;", id);
+    auto retQuery = db->query("SELECT * FROM contact_number WHERE contact_id=" u32_ ";", id);
     if (!retQuery || (retQuery->getRowCount() == 0U)) {
         return {};
     }
@@ -81,7 +83,7 @@ std::vector<ContactsNumberTableRow> ContactsNumberTable::getByContactId(uint32_t
 
 std::vector<ContactsNumberTableRow> ContactsNumberTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * from contact_number LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from contact_number LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsNumberTableRow>();
@@ -107,10 +109,11 @@ std::vector<ContactsNumberTableRow> ContactsNumberTable::getLimitOffset(const st
                                                                         uint32_t limit)
 {
     const char lastCharacter = number.back();
-    auto retQuery = db->query("SELECT * from contact_number WHERE number_user like '%%%c' LIMIT %lu OFFSET %lu;",
-                              lastCharacter,
-                              limit,
-                              offset);
+    auto retQuery =
+        db->query("SELECT * from contact_number WHERE number_user like '%%%c' LIMIT " u32_ " OFFSET " u32_ ";",
+                  lastCharacter,
+                  limit,
+                  offset);
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsNumberTableRow>();
     }
@@ -145,11 +148,12 @@ std::vector<ContactsNumberTableRow> ContactsNumberTable::getLimitOffsetByField(u
         return std::vector<ContactsNumberTableRow>();
     }
 
-    auto retQuery = db->query("SELECT * from contact_number WHERE %q='%q' ORDER BY number_user LIMIT %lu OFFSET %lu;",
-                              fieldName.c_str(),
-                              str,
-                              limit,
-                              offset);
+    auto retQuery =
+        db->query("SELECT * from contact_number WHERE %q=" str_ " ORDER BY number_user LIMIT " u32_ " OFFSET " u32_ ";",
+                  fieldName.c_str(),
+                  str,
+                  limit,
+                  offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsNumberTableRow>();
@@ -183,7 +187,7 @@ uint32_t ContactsNumberTable::count()
 
 uint32_t ContactsNumberTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM contact_number WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM contact_number WHERE %q=" u32_ ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
