@@ -4,6 +4,7 @@
 #include <catch2/catch.hpp>
 
 #include <MeditationStatisticsDB.hpp>
+#include <Helpers.hpp>
 
 #include <filesystem>
 #include <iostream>
@@ -22,44 +23,17 @@ namespace
         return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     }
 
-    template <typename Db>
-    class TestDatabase
+    std::filesystem::path getScriptsPath()
     {
-      public:
-        explicit TestDatabase(std::filesystem::path name)
-        {
-            Database::initialize();
-
-            if (std::filesystem::exists(name)) {
-                REQUIRE(std::filesystem::remove(name));
-            }
-
-            db = std::make_unique<Db>(name.c_str());
-
-            if (not db->isInitialized()) {
-                throw std::runtime_error("Could not initialize database");
-            }
-        }
-
-        ~TestDatabase()
-        {
-            Database::deinitialize();
-        }
-
-        Db &get()
-        {
-            return *db;
-        }
-
-      private:
-        std::filesystem::path name;
-        std::unique_ptr<Db> db;
-    };
+        const std::string path = __FILE__;
+        const auto dir         = std::filesystem::path{path.substr(0, path.rfind('/'))};
+        return dir / "../databases/scripts";
+    }
 } // namespace
 
 TEST_CASE("Meditation statistics Table - API basic checks")
 {
-    TestDatabase<MeditationStatisticsDB> db{"meditation_stats.db"};
+    db::tests::DatabaseUnderTest<MeditationStatisticsDB> db{"meditation_stats.db", getScriptsPath()};
 
     const auto timestamp = get_utc_time();
     REQUIRE(db.get().table.add({Record{0}, timestamp, std::chrono::minutes{20}}));
@@ -88,7 +62,7 @@ TEST_CASE("Meditation statistics Table - API basic checks")
 
 TEST_CASE("Meditation statistics Table - get by days")
 {
-    TestDatabase<MeditationStatisticsDB> db{"meditation_stats.db"};
+    db::tests::DatabaseUnderTest<MeditationStatisticsDB> db{"meditation_stats.db", getScriptsPath()};
 
     REQUIRE(db.get().table.add({Record{0}, subtract_time(std::chrono::hours{23}), std::chrono::minutes{1}}));
     REQUIRE(db.get().table.getByDays(1).size() == 1);

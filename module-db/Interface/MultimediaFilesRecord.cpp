@@ -4,7 +4,7 @@
 #include "MultimediaFilesRecord.hpp"
 #include "BaseInterface.hpp"
 
-#include <Databases/MultimediaFilesDB.hpp>
+#include <databases/MultimediaFilesDB.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesAdd.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesEdit.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesGet.hpp>

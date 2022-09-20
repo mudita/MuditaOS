@@ -1,11 +1,11 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "common.hpp"
 #include <catch2/catch.hpp>
+#include "Helpers.hpp"
 
 #include "Database/Database.hpp"
-#include "Databases/NotificationsDB.hpp"
+#include "module-db/databases/NotificationsDB.hpp"
 #include "Interface/NotificationsRecord.hpp"
 #include "Tables/NotificationsTable.hpp"
 
@@ -17,13 +17,10 @@
 
 TEST_CASE("Notifications Table tests")
 {
-    Database::initialize();
-    const auto notificationsPath = (std::filesystem::path{"sys/user"} / "notifications.db");
-    RemoveDbFiles(notificationsPath.stem());
-    NotificationsDB notificationsDb{notificationsPath.c_str()};
-    REQUIRE(notificationsDb.isInitialized());
+    db::tests::DatabaseUnderTest<NotificationsDB> notificationDb{"notifications.db",
+                                                                 db::tests::getPurePhoneScriptsPath()};
 
-    auto &notificationsTbl        = notificationsDb.notifications;
+    auto &notificationsTbl        = notificationDb.get().notifications;
     const auto notificationsCount = notificationsTbl.count() + 1;
     // clear notifications table
     for (std::size_t id = 1; id <= notificationsCount; id++) {
@@ -170,6 +167,4 @@ TEST_CASE("Notifications Table tests")
         REQUIRE(entry.value == 8);
         REQUIRE(entry.contactID == DB_ID_NONE);
     }
-
-    Database::deinitialize();
 }

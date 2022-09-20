@@ -10,7 +10,7 @@
 
 #include <utf8/UTF8.hpp>
 
-#include "module-db/Databases/NotesDB.hpp"
+#include "module-db/databases/NotesDB.hpp"
 #include "../Common/Common.hpp"
 
 struct NotesRecord : public Record
