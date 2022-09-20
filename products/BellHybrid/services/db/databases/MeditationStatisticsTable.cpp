@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationStatisticsTable.hpp"
+#include <Common/Types.hpp>
 #include <time.h>
 #include <chrono>
 #include <date/date.h>
@@ -40,8 +41,8 @@ namespace
             return {};
         }
 
-        const auto retQuery = db->query("SELECT * from %s where timestamp BETWEEN "
-                                        "datetime('now','-%lu %s') and datetime('now');",
+        const auto retQuery = db->query("SELECT * from " str_ " where timestamp BETWEEN "
+                                        "datetime('now','-" u32_ " %s') and datetime('now');",
                                         tableName,
                                         x,
                                         modifier.data());
@@ -106,16 +107,16 @@ namespace db::meditation_stats
 
     auto MeditationStatsTable::add(const TableRow entry) -> bool
     {
-        return db->execute("INSERT INTO '%s' (timestamp,duration) "
-                           "VALUES('%s', '%lu') ",
+        return db->execute("INSERT INTO " str_ " (timestamp,duration) "
+                           "VALUES(" str_c u32_ ")",
                            tableName,
                            prepare_timestamp(entry.timestamp).c_str(),
                            static_cast<std::uint32_t>(entry.duration.count()));
     }
     auto MeditationStatsTable::getLimitOffset(const uint32_t offset, const uint32_t limit) -> std::vector<TableRow>
     {
-        const auto retQuery =
-            db->query("SELECT * from '%s' ORDER BY timestamp DESC LIMIT %lu OFFSET %lu;", tableName, limit, offset);
+        const auto retQuery = db->query(
+            "SELECT * from " str_ " ORDER BY timestamp DESC LIMIT " u32_ " OFFSET " u32_ ";", tableName, limit, offset);
 
         if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
             return {};
@@ -136,7 +137,7 @@ namespace db::meditation_stats
     }
     auto MeditationStatsTable::count() -> uint32_t
     {
-        const auto queryRet = db->query("SELECT COUNT(*) FROM '%s';", tableName);
+        const auto queryRet = db->query("SELECT COUNT(*) FROM" str_ ";", tableName);
         if (queryRet == nullptr || queryRet->getRowCount() == 0) {
             return 0;
         }

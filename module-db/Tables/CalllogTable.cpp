@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogTable.hpp"
+#include "Common/Types.hpp"
 #include <log/log.hpp>
 #include <Utils.hpp>
 
@@ -18,23 +19,22 @@ bool CalllogTable::create()
 
 bool CalllogTable::add(CalllogTableRow entry)
 {
-    return db->execute(
-        "INSERT or ignore INTO calls (number, e164number, presentation, date, duration, type, name, contactId, "
-        "isRead) VALUES ('%q', '%q', %lu, %q, %q, %lu, '%q', '%lu', %d);",
-        entry.number.c_str(),
-        entry.e164number.c_str(),
-        static_cast<uint32_t>(entry.presentation),
-        utils::to_string(entry.date).c_str(),
-        utils::to_string(entry.duration).c_str(),
-        static_cast<uint32_t>(entry.type),
-        entry.name.c_str(),
-        entry.contactId,
-        entry.isRead);
+    return db->execute("INSERT or ignore INTO calls (number, e164number, presentation, date, duration, type, name, "
+                       "contactId,isRead) VALUES (" str_c str_c u32_c str_c str_c u32_c str_c u32_c u32_ ");",
+                       entry.number.c_str(),
+                       entry.e164number.c_str(),
+                       static_cast<uint32_t>(entry.presentation),
+                       utils::to_string(entry.date).c_str(),
+                       utils::to_string(entry.duration).c_str(),
+                       static_cast<uint32_t>(entry.type),
+                       entry.name.c_str(),
+                       entry.contactId,
+                       entry.isRead);
 }
 
 bool CalllogTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM calls where _id = %lu;", id);
+    return db->execute("DELETE FROM calls where _id=" u32_ ";", id);
 }
 
 bool CalllogTable::removeByField(CalllogTableFields field, const char *str)
@@ -44,10 +44,9 @@ bool CalllogTable::removeByField(CalllogTableFields field, const char *str)
 
 bool CalllogTable::update(CalllogTableRow entry)
 {
-    return db->execute("UPDATE calls SET number = '%q', e164number = '%q', presentation = %lu, date = %lu, duration = "
-                       "%lu, type = %lu, "
-                       "name = '%q', contactId = '%u', isRead = "
-                       "%d WHERE _id = %lu;",
+    return db->execute("UPDATE calls SET number=" str_c "e164number=" str_c "presentation=" u32_c "date=" u32_c
+                       "duration=" u32_c "type=" u32_c "name=" str_c "contactId=" u32_c "isRead=" u32_
+                       " WHERE _id=" u32_ ";",
                        entry.number.c_str(),
                        entry.e164number.c_str(),
                        static_cast<uint32_t>(entry.presentation),
@@ -62,7 +61,7 @@ bool CalllogTable::update(CalllogTableRow entry)
 
 CalllogTableRow CalllogTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM calls WHERE _id= %u;", id);
+    auto retQuery = db->query("SELECT * FROM calls WHERE _id=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return CalllogTableRow();
@@ -84,7 +83,7 @@ CalllogTableRow CalllogTable::getById(uint32_t id)
 
 std::vector<CalllogTableRow> CalllogTable::getByContactId(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM calls WHERE contactId= %lu;", id);
+    auto retQuery = db->query("SELECT * FROM calls WHERE contactId=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<CalllogTableRow>();
@@ -112,7 +111,7 @@ std::vector<CalllogTableRow> CalllogTable::getByContactId(uint32_t id)
 
 std::vector<CalllogTableRow> CalllogTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * from calls ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from calls ORDER BY date DESC LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<CalllogTableRow>();
@@ -156,8 +155,11 @@ std::vector<CalllogTableRow> CalllogTable::getLimitOffsetByField(uint32_t offset
         return std::vector<CalllogTableRow>();
     }
 
-    auto retQuery = db->query(
-        "SELECT * from calls WHERE %q='%q' ORDER BY date LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
+    auto retQuery = db->query("SELECT * from calls WHERE %q=" u32_ " ORDER BY date LIMIT " u32_ " OFFSET " u32_ ";",
+                              fieldName.c_str(),
+                              str,
+                              limit,
+                              offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<CalllogTableRow>();
@@ -213,7 +215,7 @@ uint32_t CalllogTable::count()
 
 uint32_t CalllogTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM calls WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM calls WHERE %q=" u32_ ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;

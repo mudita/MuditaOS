@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <db/ServiceDB.hpp>
 
 #include "agents/MeditationStatsAgent.hpp"
 
-#include <module-db/Databases/EventsDB.hpp>
-#include <module-db/Databases/MultimediaFilesDB.hpp>
+#include <module-db/databases/EventsDB.hpp>
+#include <module-db/databases/MultimediaFilesDB.hpp>
 
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
@@ -74,9 +74,9 @@ sys::ReturnCodes ServiceDB::InitHandler()
     }
 
     // Create databases
-    eventsDB          = std::make_unique<EventsDB>((purefs::dir::getUserDiskPath() / "events.db").c_str());
+    eventsDB          = std::make_unique<EventsDB>((purefs::dir::getDatabasesPath() / "events.db").c_str());
     multimediaFilesDB = std::make_unique<db::multimedia_files::MultimediaFilesDB>(
-        (purefs::dir::getUserDiskPath() / "multimedia.db").c_str());
+        (purefs::dir::getDatabasesPath() / "multimedia.db").c_str());
 
     // Create record interfaces
     alarmEventRecordInterface = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());

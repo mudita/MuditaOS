@@ -1,11 +1,11 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "common.hpp"
+#include "Helpers.hpp"
 
 #include <Database/Database.hpp>
-#include <Databases/ContactsDB.hpp>
-#include <Databases/SmsDB.hpp>
+#include "module-db/databases/ContactsDB.hpp"
+#include "module-db/databases/SmsDB.hpp"
 #include <Interface/ContactRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Interface/ThreadRecord.hpp>
@@ -27,24 +27,15 @@
 
 TEST_CASE("Thread Record tests")
 {
-    Database::initialize();
-
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    const auto smsPath      = (std::filesystem::path{"sys/user"} / "sms.db");
-    RemoveDbFiles(contactsPath.stem());
-    RemoveDbFiles(smsPath.stem());
-
-    SmsDB smsDB(smsPath.c_str());
-    REQUIRE(smsDB.isInitialized());
-    ContactsDB contactsDB(contactsPath.c_str());
-    REQUIRE(contactsDB.isInitialized());
+    db::tests::DatabaseUnderTest<SmsDB> smsDb{"sms.db", db::tests::getPurePhoneScriptsPath()};
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
     const uint32_t dateTest  = 123456789;
     const char *snippetTest  = "Test snippet";
     const char *snippetTest2 = "Test snippet2";
     const SMSType typeTest   = SMSType::UNKNOWN;
 
-    ThreadRecordInterface threadRecordInterface1(&smsDB, &contactsDB);
+    ThreadRecordInterface threadRecordInterface1(&smsDb.get(), &contactsDb.get());
 
     ThreadRecord recordIN;
     recordIN.date    = dateTest;
@@ -187,7 +178,7 @@ TEST_CASE("Thread Record tests")
         const utils::PhoneNumber phoneNumber("+48600123456", utils::country::Id::UNKNOWN);
         const std::string lastSmsBody = "Ola";
 
-        SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
+        SMSRecordInterface smsRecInterface(&smsDb.get(), &contactsDb.get());
         SMSRecord recordIN;
         recordIN.date      = 123456789;
         recordIN.errorCode = 0;
@@ -242,7 +233,7 @@ TEST_CASE("Thread Record tests")
 
         const utils::PhoneNumber phoneNumber("+48600123456", utils::country::Id::UNKNOWN);
 
-        SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
+        SMSRecordInterface smsRecInterface(&smsDb.get(), &contactsDb.get());
         SMSRecord recordIN;
         recordIN.date      = 123456789;
         recordIN.errorCode = 0;
@@ -279,6 +270,4 @@ TEST_CASE("Thread Record tests")
             REQUIRE(smsRec->body == smsBody);
         }
     }
-
-    Database::deinitialize();
 }

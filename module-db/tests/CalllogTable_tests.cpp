@@ -2,30 +2,20 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
-
-#include "Database/Database.hpp"
-#include "Databases/CalllogDB.hpp"
+#include "Helpers.hpp"
+#include "module-db/databases/CalllogDB.hpp"
 
 #include "Tables/CalllogTable.hpp"
 
 #include <cstdint>
 #include <string>
 #include <algorithm>
-#include <filesystem>
 
 TEST_CASE("Calllog Table tests")
 {
-    Database::initialize();
+    db::tests::DatabaseUnderTest<CalllogDB> calllogDb{"calllog.db", db::tests::getPurePhoneScriptsPath()};
 
-    const auto calllogPath = (std::filesystem::path{"sys/user"} / "calllog.db");
-    if (std::filesystem::exists(calllogPath)) {
-        REQUIRE(std::filesystem::remove(calllogPath));
-    }
-
-    CalllogDB calllogDb{calllogPath.c_str()};
-    REQUIRE(calllogDb.isInitialized());
-
-    auto &callsTbl = calllogDb.calls;
+    auto &callsTbl = calllogDb.get().calls;
 
     SECTION("Default Constructor")
     {
@@ -164,6 +154,4 @@ TEST_CASE("Calllog Table tests")
         REQUIRE(callsTbl.count(EntryState::UNREAD) == 0);
         REQUIRE(callsTbl.count(EntryState::READ) == 4);
     }
-
-    Database::deinitialize();
 }

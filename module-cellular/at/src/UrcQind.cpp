@@ -40,7 +40,7 @@ auto Qind::getFotaStage() const noexcept -> std::optional<FotaStage>
 
 auto Qind::getFotaParameter() const noexcept -> std::string
 {
-    if (isFotaValid() && tokens.size() >= fotaMinTokenSize) {
+    if (isFotaValid() && tokens.size() > fotaMinTokenSize) {
         return tokens[Param];
     }
     return std::string();
