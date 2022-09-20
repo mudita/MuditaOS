@@ -42,7 +42,6 @@ target_link_libraries(application-bell-main
     PRIVATE
         app
         apps-common
-        bellgui
         i18n
         module-gui
         service-gui

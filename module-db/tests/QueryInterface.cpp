@@ -3,10 +3,11 @@
 
 #include <catch2/catch.hpp>
 
+#include "Helpers.hpp"
 #include "Common/Query.hpp"
-#include "Databases/ContactsDB.hpp"
+#include "module-db/databases/ContactsDB.hpp"
 #include "Database/Database.hpp"
-#include "Databases/SmsDB.hpp"
+#include "module-db/databases/SmsDB.hpp"
 #include "SMSRecord.hpp"
 #include "ThreadRecord.hpp"
 #include "queries/messages/threads/QueryThreadsSearchForList.hpp"
@@ -37,15 +38,12 @@ namespace db
 
 TEST_CASE("Query interface")
 {
-    Database::initialize();
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
+    db::tests::DatabaseUnderTest<SmsDB> smsDb{"sms.db", db::tests::getPurePhoneScriptsPath()};
 
-    auto contactsDB      = std::make_unique<ContactsDB>((std::filesystem::path{"sys/user"} / "contacts.db").c_str());
-    auto smsDB           = std::make_unique<SmsDB>((std::filesystem::path{"sys/user"} / "sms.db").c_str());
-    auto smsInterface    = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
-    auto threadInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
+    auto smsInterface    = std::make_unique<SMSRecordInterface>(&smsDb.get(), &contactsDb.get());
+    auto threadInterface = std::make_unique<ThreadRecordInterface>(&smsDb.get(), &contactsDb.get());
 
-    REQUIRE(contactsDB);
-    REQUIRE(smsDB);
     REQUIRE(smsInterface);
 
     SECTION("unknown query -> no results")

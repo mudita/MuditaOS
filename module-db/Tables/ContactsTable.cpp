@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsTable.hpp"
+#include "Common/Types.hpp"
 #include <log/log.hpp>
 #include <Utils.hpp>
 
@@ -17,15 +18,14 @@ namespace ColumnName
 
 namespace statements
 {
-    const auto selectWithoutTemp = "SELECT * FROM contacts WHERE _id= %lu"
-                                   " AND "
+    const auto selectWithoutTemp = "SELECT * FROM contacts WHERE _id=" u32_ " AND "
                                    " contacts._id NOT IN ( "
                                    "   SELECT cmg.contact_id "
                                    "   FROM contact_match_groups cmg, contact_groups cg "
                                    "   WHERE cmg.group_id = cg._id "
                                    "       AND cg.name = 'Temporary' "
                                    "   ) ";
-    const auto selectWithTemp = "SELECT * FROM contacts WHERE _id= %lu";
+    const auto selectWithTemp = "SELECT * FROM contacts WHERE _id=" u32_ ";";
 } // namespace statements
 
 ContactsTable::ContactsTable(Database *db) : Table(db)
@@ -42,7 +42,7 @@ bool ContactsTable::create()
 bool ContactsTable::add(ContactsTableRow entry)
 {
     return db->execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_id, speeddial) "
-                       " VALUES (%lu, '%q', %lu, %lu, '%q');",
+                       " VALUES (" u32_c str_c u32_c u32_c str_ ");",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
@@ -52,18 +52,18 @@ bool ContactsTable::add(ContactsTableRow entry)
 
 bool ContactsTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM contacts where _id = %u;", id);
+    return db->execute("DELETE FROM contacts where _id=" u32_ ";", id);
 }
 
 bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
 {
-    return db->execute("UPDATE contacts SET blacklist=%lu WHERE _id=%lu", shouldBeBlocked ? 1 : 0, id);
+    return db->execute("UPDATE contacts SET blacklist=" u32_ " WHERE _id=" u32_ ";", shouldBeBlocked ? 1 : 0, id);
 }
 
 bool ContactsTable::update(ContactsTableRow entry)
 {
-    return db->execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q', ring_id = %lu, address_id = %lu, "
-                       " speeddial = '%q' WHERE _id=%lu;",
+    return db->execute("UPDATE contacts SET name_id=" u32_c "numbers_id=" str_c "ring_id=" u32_c "address_id=" u32_c
+                       "speeddial=" str_ " WHERE _id=" u32_ ";",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
@@ -362,7 +362,7 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uin
                               "    WHERE cmg.group_id = cg._id "
                               "        AND cg.name = 'Temporary' "
                               " ) "
-                              "ORDER BY name_id LIMIT %lu OFFSET %lu;",
+                              "ORDER BY name_id LIMIT " u32_ " OFFSET " u32_ ";",
                               limit,
                               offset);
 
@@ -401,11 +401,12 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
         return std::vector<ContactsTableRow>();
     }
 
-    auto retQuery = db->query("SELECT * from contacts WHERE %q='%q' ORDER BY name_id LIMIT %lu OFFSET %lu;",
-                              fieldName.c_str(),
-                              str,
-                              limit,
-                              offset);
+    auto retQuery =
+        db->query("SELECT * from contacts WHERE %q=" str_ " ORDER BY name_id LIMIT " u32_ " OFFSET " u32_ ";",
+                  fieldName.c_str(),
+                  str,
+                  limit,
+                  offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
@@ -446,7 +447,7 @@ uint32_t ContactsTable::count()
 
 uint32_t ContactsTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM contacts WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM contacts WHERE %q=" u32_ ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;

@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <Database/Database.hpp>
-#include <Tables/ContactsTable.hpp>
-#include <Tables/ContactsNameTable.hpp>
-#include <Tables/ContactsNumberTable.hpp>
-#include <Tables/ContactsRingtonesTable.hpp>
-#include <Tables/ContactsAddressTable.hpp>
-#include <Tables/ContactsGroups.hpp>
+#include "module-db/Database/Database.hpp"
+#include "module-db/Tables/ContactsTable.hpp"
+#include "module-db/Tables/ContactsNameTable.hpp"
+#include "module-db/Tables/ContactsNumberTable.hpp"
+#include "module-db/Tables/ContactsRingtonesTable.hpp"
+#include "module-db/Tables/ContactsAddressTable.hpp"
+#include "module-db/Tables/ContactsGroups.hpp"
 
 class ContactsDB : public Database
 {

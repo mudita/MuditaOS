@@ -6,5 +6,5 @@ add_catch2_executable(
 
         LIBS
         bell::db::meditation_stats
-        USE_FS
+        module-db::test::helpers
 )

@@ -8,7 +8,7 @@ INSERT OR REPLACE INTO dictionary_tab (path, value) VALUES
     ('system/phone_mode', 'dnd');
 
 -- ----------- insert default values -------------------
-INSERT OR IGNORE INTO settings_tab (path, value) VALUES
+INSERT OR REPLACE INTO settings_tab (path, value) VALUES
     ('system/phone_mode', 'online'),
     ('gs_time_format', '0'),
     ('gs_date_format', '1'),

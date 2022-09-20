@@ -85,6 +85,10 @@ void Cusd::split(const std::string &str)
         t = utils::trim(t);
     }
 
+    if (not isValid()) {
+        return;
+    }
+
     auto dcs       = tokens[Tokens::DCS];
     auto dcsTokens = utils::split(dcs, commaString);
 

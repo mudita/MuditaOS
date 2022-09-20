@@ -28,8 +28,7 @@ function(add_assets_target)
         COMMAND rsync -qravu ${EXCLUDED}
             ${_ASSETS_SOURCE_DIR}/user
             ${_ASSETS_DEST_DIR}
-        COMMAND find ${_ASSETS_DEST_DIR} -name "*-devel*" | sed "\"s,\\(.*\\)-devel\\(.*\\),& \\1\\2,\"" | xargs --no-run-if-empty -L1 mv
         COMMENT
-            "Copying assets.. add_assets_target (${_ASSETS_TARGET}) <- ${_ASSETS_DEPENDS}"
+            "Copying assets, development features: ${_ASSETS_DEVEL}"
     )
 endfunction()

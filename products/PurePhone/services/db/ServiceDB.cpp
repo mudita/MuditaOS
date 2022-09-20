@@ -3,10 +3,10 @@
 
 #include <db/ServiceDB.hpp>
 
-#include <module-db/Databases/CountryCodesDB.hpp>
-#include <module-db/Databases/EventsDB.hpp>
-#include <module-db/Databases/MultimediaFilesDB.hpp>
-#include <module-db/Databases/NotificationsDB.hpp>
+#include "module-db/databases/CountryCodesDB.hpp"
+#include <module-db/databases/EventsDB.hpp>
+#include <module-db/databases/MultimediaFilesDB.hpp>
+#include "module-db/databases/NotificationsDB.hpp"
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/CalllogRecord.hpp>
 #include <module-db/Interface/CountryCodeRecord.hpp>
@@ -231,17 +231,17 @@ sys::ReturnCodes ServiceDB::InitHandler()
     }
 
     // Create databases
-    eventsDB        = std::make_unique<EventsDB>((purefs::dir::getUserDiskPath() / "events.db").c_str());
-    contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());
-    smsDB           = std::make_unique<SmsDB>((purefs::dir::getUserDiskPath() / "sms.db").c_str());
-    notesDB         = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
-    calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getUserDiskPath() / "calllog.db").c_str());
+    eventsDB        = std::make_unique<EventsDB>((purefs::dir::getDatabasesPath() / "events.db").c_str());
+    contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getDatabasesPath() / "contacts.db").c_str());
+    smsDB           = std::make_unique<SmsDB>((purefs::dir::getDatabasesPath() / "sms.db").c_str());
+    notesDB         = std::make_unique<NotesDB>((purefs::dir::getDatabasesPath() / "notes.db").c_str());
+    calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getDatabasesPath() / "calllog.db").c_str());
     countryCodesDB  = std::make_unique<CountryCodesDB>("country-codes.db");
-    notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getUserDiskPath() / "notifications.db").c_str());
-    predefinedQuotesDB = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "predefined_quotes.db").c_str());
-    customQuotesDB     = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "custom_quotes.db").c_str());
+    notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getDatabasesPath() / "notifications.db").c_str());
+    predefinedQuotesDB = std::make_unique<Database>((purefs::dir::getDatabasesPath() / "predefined_quotes.db").c_str());
+    customQuotesDB     = std::make_unique<Database>((purefs::dir::getDatabasesPath() / "custom_quotes.db").c_str());
     multimediaFilesDB  = std::make_unique<db::multimedia_files::MultimediaFilesDB>(
-        (purefs::dir::getUserDiskPath() / "multimedia.db").c_str());
+        (purefs::dir::getDatabasesPath() / "multimedia.db").c_str());
 
     // Create record interfaces
     alarmEventRecordInterface  = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());
