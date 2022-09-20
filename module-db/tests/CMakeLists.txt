@@ -1,3 +1,9 @@
+add_library(module-db-test_helpers Helpers.cpp)
+add_library(module-db::test::helpers ALIAS module-db-test_helpers)
+target_link_libraries(module-db-test_helpers PRIVATE module-db)
+target_include_directories(module-db-test_helpers PUBLIC . )
+
+
 add_catch2_executable(
     NAME
         db
@@ -12,7 +18,6 @@ add_catch2_executable(
         ContactsRecord_tests.cpp
         ContactsRingtonesTable_tests.cpp
         ContactsTable_tests.cpp
-        DbInitializer.cpp
         MultimediaFilesTable_tests.cpp
         NotesRecord_tests.cpp
         NotesTable_tests.cpp
@@ -25,12 +30,9 @@ add_catch2_executable(
         SMSTemplateTable_tests.cpp
         ThreadRecord_tests.cpp
         ThreadsTable_tests.cpp
-        common.cpp
         
     LIBS
-        module-sys
+        module-db::test::helpers
         module-db
         json::json
-    USE_FS
 )
-add_subdirectory(test-initializer)

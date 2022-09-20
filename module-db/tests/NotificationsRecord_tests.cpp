@@ -1,21 +1,18 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "common.hpp"
 #include <catch2/catch.hpp>
-
+#include "Helpers.hpp"
 #include <Interface/NotificationsRecord.hpp>
 #include <Interface/ContactRecord.hpp>
 #include <Database/Database.hpp>
-#include <Databases/NotificationsDB.hpp>
-#include <Databases/ContactsDB.hpp>
+#include "module-db/databases/NotificationsDB.hpp"
+#include "module-db/databases/ContactsDB.hpp"
 #include <queries/notifications/QueryNotificationsGet.hpp>
 #include <queries/notifications/QueryNotificationsIncrement.hpp>
 #include <queries/notifications/QueryNotificationsDecrement.hpp>
 #include <queries/notifications/QueryNotificationsClear.hpp>
 #include <queries/notifications/QueryNotificationsGetAll.hpp>
-
-#include <filesystem>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -48,37 +45,30 @@ TEST_CASE("Notifications Record tests")
         REQUIRE_FALSE(testRec.contactRecord.has_value());
     }
 
-    Database::initialize();
-    const auto notificationsPath = (std::filesystem::path{"sys/user"} / "notifications.db");
-    const auto contactsPath      = (std::filesystem::path{"sys/user"} / "contacts.db");
-    RemoveDbFiles(notificationsPath.stem());
-    RemoveDbFiles(contactsPath.stem());
+    db::tests::DatabaseUnderTest<NotificationsDB> notificationsDb{"notifications.db",
+                                                                  db::tests::getPurePhoneScriptsPath()};
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
-    NotificationsDB notificationsDb{notificationsPath.c_str()};
-    ContactsDB contactsDb{contactsPath.c_str()};
-    REQUIRE(notificationsDb.isInitialized());
-    REQUIRE(contactsDb.isInitialized());
-
-    const auto notificationsCount = notificationsDb.notifications.count() + 1;
+    const auto notificationsCount = notificationsDb.get().notifications.count() + 1;
     // clear notifications table
     for (std::size_t id = 1; id <= notificationsCount; id++) {
-        REQUIRE(notificationsDb.notifications.removeById(id));
+        REQUIRE(notificationsDb.get().notifications.removeById(id));
     }
 
-    ContactRecordInterface contactRecordInterface(&contactsDb);
-    NotificationsRecordInterface notificationsRecordInterface(&notificationsDb, &contactRecordInterface);
+    ContactRecordInterface contactRecordInterface(&contactsDb.get());
+    NotificationsRecordInterface notificationsRecordInterface(&notificationsDb.get(), &contactRecordInterface);
     REQUIRE(contactRecordInterface.GetCount() == 0);
     REQUIRE(notificationsRecordInterface.GetCount() == 0);
 
     NotificationsTableRow callsRow{
         Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
 
-    REQUIRE(notificationsDb.notifications.add(callsRow));
+    REQUIRE(notificationsDb.get().notifications.add(callsRow));
 
     NotificationsTableRow smsRow{
         Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
 
-    REQUIRE(notificationsDb.notifications.add(smsRow));
+    REQUIRE(notificationsDb.get().notifications.add(smsRow));
     NotificationsRecord testRec;
     auto numberOfNotifcations = notificationsRecordInterface.GetCount();
     REQUIRE(numberOfNotifcations == 2); // calls and sms notifications
@@ -404,6 +394,4 @@ TEST_CASE("Notifications Record tests")
             getByKey(NotificationsRecord::Key::Sms, noNotificationExpected, contactNotExpected);
         }
     }
-
-    Database::deinitialize();
 }

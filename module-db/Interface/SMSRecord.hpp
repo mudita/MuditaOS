@@ -7,8 +7,8 @@
 
 #include "Record.hpp"
 #include "ThreadRecord.hpp"
-#include "module-db/Databases/SmsDB.hpp"
-#include "module-db/Databases/ContactsDB.hpp"
+#include "module-db/databases/SmsDB.hpp"
+#include "module-db/databases/ContactsDB.hpp"
 #include "module-db/Common/Common.hpp"
 
 #include <utf8/UTF8.hpp>

@@ -13,18 +13,17 @@ set(SOURCES
         Database/Field.cpp
         Database/QueryResult.cpp
         Database/Database.cpp
-        Database/DatabaseInitializer.cpp
         Database/sqlite3vfs.cpp
         ${SQLITE3_SOURCE}
 
-        Databases/CalllogDB.cpp
-        Databases/ContactsDB.cpp
-        Databases/CountryCodesDB.cpp
-        Databases/EventsDB.cpp
-        Databases/MultimediaFilesDB.cpp
-        Databases/NotesDB.cpp
-        Databases/NotificationsDB.cpp
-        Databases/SmsDB.cpp
+        databases/EventsDB.cpp
+        databases/MultimediaFilesDB.cpp
+
+        databases/CalllogDB.cpp
+        databases/ContactsDB.cpp
+        databases/NotesDB.cpp
+        databases/NotificationsDB.cpp
+        databases/SmsDB.cpp
 
         Tables/AlarmEventsTable.cpp
         Tables/Table.cpp
@@ -38,7 +37,6 @@ set(SOURCES
         Tables/ContactsGroups.cpp
         Tables/NotesTable.cpp
         Tables/CalllogTable.cpp
-        Tables/CountryCodesTable.cpp
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
         Tables/MultimediaFilesTable.cpp
@@ -153,7 +151,7 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables
-        ${CMAKE_CURRENT_SOURCE_DIR}/Databases
+        ${CMAKE_CURRENT_SOURCE_DIR}/databases
         ${CMAKE_CURRENT_SOURCE_DIR}/Database
 )
 
