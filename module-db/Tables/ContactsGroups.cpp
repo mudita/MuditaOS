@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsGroups.hpp"
+#include "Common/Types.hpp"
 
 namespace statements
 {
@@ -12,8 +13,8 @@ namespace statements
     const char *blockedId    = "SELECT _id FROM contact_groups WHERE name = 'Blocked';";
     const char *temporaryId  = "SELECT _id FROM contact_groups WHERE name = 'Temporary';";
 
-    const char *getId   = "SELECT _id FROM contact_groups WHERE name = '%q';";
-    const char *getById = "SELECT _id, name FROM contact_groups WHERE _id = %u;";
+    const char *getId   = "SELECT _id FROM contact_groups WHERE name=" str_ ";";
+    const char *getById = "SELECT _id, name FROM contact_groups WHERE _id=" u32_ ";";
 
     /**
      * delete a group only if it is not a "special group"
@@ -22,24 +23,21 @@ namespace statements
      * delete cg from contact_groups cg left join contact_group_protected cgp on cg._id=cgp.group_id where cgp._id is
      * null; so we have the following statement
      */
-    const char *deleteById = "DELETE FROM contact_groups WHERE _id = %u "
-                             "AND NOT EXISTS (SELECT * FROM contact_group_protected WHERE group_id=contact_groups._id)";
+    const char *deleteById =
+        "DELETE FROM contact_groups WHERE _id=" u32_
+        " AND NOT EXISTS (SELECT * FROM contact_group_protected WHERE group_id=contact_groups._id)";
 
-    const char *getAllLimtOfset = "SELECT _id, name FROM contact_groups ORDER BY _id LIMIT %lu OFFSET %lu;";
+    const char *getAllLimtOfset = "SELECT _id, name FROM contact_groups ORDER BY _id LIMIT " u32_ " OFFSET " u32_ ";";
 
-    const char *addGrup           = "INSERT INTO contact_groups (name) VALUES ('%q');";
-    const char *addProtectedGroup = "INSERT INTO conctact_group_protected (group_id) VALUES ('%u');";
-    const char *updateGroupName   = "UPDATE contact_groups SET name = '%q' WHERE _id = '%u';";
-    const char *deleteGroup       = "DELETE FROM table_name WHERE _id = :id;";
+    const char *addGrup         = "INSERT INTO contact_groups (name) VALUES(" str_ ");";
+    const char *updateGroupName = "UPDATE contact_groups SET name=" str_ " WHERE _id=" u32_ ";";
 
-    const char *addContactToGroup = "INSERT INTO contact_match_groups (contact_id, group_id)"
-                                    "  VALUES(%u, %u)";
+    const char *addContactToGroup = "INSERT INTO contact_match_groups (contact_id, group_id) VALUES(" u32_c u32_ ");";
 
     const char *delContactFromGroup = "DELETE FROM contact_match_groups "
                                       "   WHERE "
-                                      "      contact_id = %u "
-                                      "      AND "
-                                      "      group_id = %u;";
+                                      "      contact_id=" u32_ " AND "
+                                      "      group_id=" u32_ ";";
 
     const char *getGroupsForContact = "SELECT groups._id, groups.name "
                                       " FROM contact_groups as groups,"
@@ -47,11 +45,10 @@ namespace statements
                                       "     contacts "
                                       " WHERE contacts._id = cmg.contact_id "
                                       "      AND groups._id = cmg.group_id "
-                                      "      AND contacts._id = %u "
-                                      " ORDER BY groups._id ASC;";
+                                      "      AND contacts._id=" u32_ " ORDER BY groups._id ASC;";
 
-    const char *getContactsForGroup = "SELECT cmg.contact_id FROM contact_match_groups as cmg "
-                                      " WHERE cmg.group_id = %u;";
+    const char *getContactsForGroup =
+        "SELECT cmg.contact_id FROM contact_match_groups as cmg WHERE cmg.group_id=" u32_ ";";
 } // namespace statements
 
 ContactsGroupsTable::ContactsGroupsTable(Database *db) : Table(db)

@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsNameTable.hpp"
+#include "Common/Types.hpp"
 #include <Utils.hpp>
 
 ContactsNameTable::ContactsNameTable(Database *db) : Table(db)
@@ -18,7 +19,7 @@ bool ContactsNameTable::create()
 bool ContactsNameTable::add(ContactsNameTableRow entry)
 {
     return db->execute("insert or ignore into contact_name (contact_id, name_primary, name_alternative) "
-                       "VALUES (%lu, '%q', '%q');",
+                       "VALUES (" u32_c str_c str_ ");",
                        entry.contactID,
                        entry.namePrimary.c_str(),
                        entry.nameAlternative.c_str());
@@ -26,13 +27,13 @@ bool ContactsNameTable::add(ContactsNameTableRow entry)
 
 bool ContactsNameTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM contact_name where _id = %lu;", id);
+    return db->execute("DELETE FROM contact_name where _id=" u32_ ";", id);
 }
 
 bool ContactsNameTable::update(ContactsNameTableRow entry)
 {
-    return db->execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%q', name_alternative = '%q' "
-                       "WHERE _id = %lu;",
+    return db->execute("UPDATE contact_name SET contact_id=" u32_c "name_primary=" str_c "name_alternative=" str_
+                       "WHERE _id=" u32_ ";",
                        entry.contactID,
                        entry.namePrimary.c_str(),
                        entry.nameAlternative.c_str(),
@@ -41,7 +42,7 @@ bool ContactsNameTable::update(ContactsNameTableRow entry)
 
 ContactsNameTableRow ContactsNameTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM contact_name WHERE _id= %lu;", id);
+    auto retQuery = db->query("SELECT * FROM contact_name WHERE _id=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return ContactsNameTableRow();
@@ -57,8 +58,8 @@ ContactsNameTableRow ContactsNameTable::getById(uint32_t id)
 
 std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery =
-        db->query("SELECT * from contact_name ORDER BY name_alternative ASC LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query(
+        "SELECT * from contact_name ORDER BY name_alternative ASC LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsNameTableRow>();
@@ -97,12 +98,12 @@ std::vector<ContactsNameTableRow> ContactsNameTable::getLimitOffsetByField(uint3
         return std::vector<ContactsNameTableRow>();
     }
 
-    auto retQuery =
-        db->query("SELECT * from contact_name WHERE %q='%q' ORDER BY name_alternative LIMIT %lu OFFSET %lu;",
-                  fieldName.c_str(),
-                  str,
-                  limit,
-                  offset);
+    auto retQuery = db->query("SELECT * from contact_name WHERE %q=" str_ " ORDER BY name_alternative LIMIT " u32_
+                              " OFFSET " u32_ ";",
+                              fieldName.c_str(),
+                              str,
+                              limit,
+                              offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsNameTableRow>();
@@ -135,7 +136,7 @@ uint32_t ContactsNameTable::count()
 
 uint32_t ContactsNameTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM contact_name WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM contact_name WHERE %q=" u32_ ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
@@ -147,10 +148,11 @@ uint32_t ContactsNameTable::countByFieldId(const char *field, uint32_t id)
 std::vector<ContactsNameTableRow> ContactsNameTable::GetByName(const char *primaryName, const char *alternativeName)
 {
 
-    auto retQuery = db->query("SELECT * from contact_name WHERE name_primary='%q' AND name_alternative='%q' ORDER BY "
-                              "name_alternative LIMIT 1;",
-                              primaryName,
-                              alternativeName);
+    auto retQuery =
+        db->query("SELECT * from contact_name WHERE name_primary=" str_ " AND name_alternative=" str_ " ORDER BY "
+                  "name_alternative LIMIT 1;",
+                  primaryName,
+                  alternativeName);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsNameTableRow>();

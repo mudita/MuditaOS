@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsRingtonesTable.hpp"
+#include "Common/Types.hpp"
 
 ContactsRingtonesTable::ContactsRingtonesTable(Database *db) : Table(db)
 {}
@@ -16,19 +17,19 @@ bool ContactsRingtonesTable::create()
 
 bool ContactsRingtonesTable::add(ContactsRingtonesTableRow entry)
 {
-    return db->execute("insert or ignore into contact_ringtones (contact_id, asset_path ) VALUES (%lu, '%q');",
+    return db->execute("insert or ignore into contact_ringtones (contact_id, asset_path ) VALUES (" u32_c str_ ");",
                        entry.contactID,
                        entry.assetPath.c_str());
 }
 
 bool ContactsRingtonesTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM contact_ringtones where _id = %u;", id);
+    return db->execute("DELETE FROM contact_ringtones where _id=" u32_ ";", id);
 }
 
 bool ContactsRingtonesTable::update(ContactsRingtonesTableRow entry)
 {
-    return db->execute("UPDATE contact_ringtones SET contact_id = %lu, asset_path = '%q' WHERE _id=%lu;",
+    return db->execute("UPDATE contact_ringtones SET contact_id=" u32_c "asset_path=" str_ " WHERE _id=" u32_ ";",
                        entry.contactID,
                        entry.assetPath.c_str(),
                        entry.ID);
@@ -36,7 +37,7 @@ bool ContactsRingtonesTable::update(ContactsRingtonesTableRow entry)
 
 ContactsRingtonesTableRow ContactsRingtonesTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM contact_ringtones WHERE _id= %lu;", id);
+    auto retQuery = db->query("SELECT * FROM contact_ringtones WHERE _id=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return ContactsRingtonesTableRow();
@@ -52,7 +53,7 @@ ContactsRingtonesTableRow ContactsRingtonesTable::getById(uint32_t id)
 std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery =
-        db->query("SELECT * from contact_ringtones ORDER BY contact_id LIMIT %lu OFFSET %lu;", limit, offset);
+        db->query("SELECT * from contact_ringtones ORDER BY contact_id LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ContactsRingtonesTableRow>();
@@ -85,7 +86,8 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::getLimitOffsetByF
         return std::vector<ContactsRingtonesTableRow>();
     }
 
-    auto retQuery = db->query("SELECT * from contact_ringtones WHERE %q='%q' ORDER BY contact_id LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->query("SELECT * from contact_ringtones WHERE %q=" str_ " ORDER BY contact_id LIMIT " u32_
+                              " OFFSET " u32_ ";",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -121,7 +123,7 @@ uint32_t ContactsRingtonesTable::count()
 
 uint32_t ContactsRingtonesTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM contact_ringtones WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM contact_ringtones WHERE %q=" u32_ ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;

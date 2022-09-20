@@ -82,7 +82,7 @@ include(BinaryAssetsVersions.cmake)
 include(AddVersionJson)
 
 add_directories(
-        TARGET user_directories
+        TARGET create_user_directories
         PREFIX ${CMAKE_BINARY_DIR}/sysroot/sys/user/audio
         DEPENDS user_directories_common
         DIRECTORIES relaxation
@@ -95,7 +95,14 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         PRODUCT BellHybrid
         SYSROOT sysroot
         LUTS Luts.bin
-        DEPENDS user_directories assets updater.bin-target ecoboot.bin-target BellHybrid-boot.bin BellHybrid-version.json-target
+        DEPENDS
+            create_product_databases
+            create_user_directories
+            assets
+            updater.bin-target
+            ecoboot.bin-target
+            BellHybrid-boot.bin
+            BellHybrid-version.json-target
     )
     add_version_rt1051_json(BellHybrid)
 else()
@@ -103,7 +110,11 @@ else()
         PRODUCT BellHybrid
         SYSROOT sysroot
         LUTS ""
-        DEPENDS user_directories assets BellHybrid-version.json-target
+        DEPENDS
+            create_product_databases
+            create_user_directories
+            assets
+            BellHybrid-version.json-target
     )
     add_version_linux_json(BellHybrid)
 endif()

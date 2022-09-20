@@ -28,6 +28,7 @@ include(DiskImage)
 include(AddPackage)
 include(AutoModuleOption)
 include(AddDirectories)
+include(AddDatabases)
 
 message("Selected product: ${PRODUCT}")
 message("Selected board:   ${BOARD}")
@@ -168,12 +169,30 @@ add_custom_target(
         "Generating version info"
     )
 
+# Create common user directories
 add_directories(
         TARGET user_directories_common
         PREFIX ${CMAKE_BINARY_DIR}/sysroot/sys/user
         DEPENDS assets
-        DIRECTORIES logs crash_dumps backup tmp storage audio
+        DIRECTORIES logs crash_dumps backup tmp storage audio db
 )
+
+# Create and initialize common databases
+add_databases_target(
+        TARGET create_databases_common
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/module-db/databases/scripts
+        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/sys/user/db
+        DEVEL ${WITH_DEVELOPMENT_FEATURES}
+)
+# Create and initialize product-specific databases
+add_databases_target(
+        TARGET create_product_databases
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases/scripts
+        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/sys/user/db
+        DEVEL ${WITH_DEVELOPMENT_FEATURES}
+        DEPENDS create_databases_common
+)
+
 add_library(version-header INTERFACE)
 target_include_directories(version-header INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/source/include>)
 add_dependencies(version-header version)
