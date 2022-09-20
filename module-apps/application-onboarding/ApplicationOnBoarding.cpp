@@ -70,6 +70,9 @@ namespace app
 
         createUserInterface();
 
+        settings->setValue(
+            settings::SystemProperties::eulaAccepted, utils::to_string(false), settings::SettingsScope::Global);
+
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
             if (gui::name::window::main_window == getCurrentWindow()->getName()) {
                 switchWindow(gui::window::name::onBoarding_eula, nullptr);

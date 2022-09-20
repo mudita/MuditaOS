@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,6 +17,7 @@ namespace sys
 
 namespace sdesktop
 {
+    using endpoints::BlockReason;
     using endpoints::EndpointSecurity;
 
     class USBSecurityModel
@@ -27,17 +28,26 @@ namespace sdesktop
             Unlocked = false,
             Locked
         };
+        typedef struct
+        {
+            EndpointSecurity access;
+            BlockReason reason;
+        } endpointSecurity_t;
+
         explicit USBSecurityModel(sys::Service *ownerSrv, settings::Settings *srvSettings);
-        auto isPasscodeEnabled() const -> bool;
+
         auto setPhoneLocked() -> void;
         auto setPhoneUnlocked() -> void;
-        auto isPhoneLocked() const -> bool;
         auto isSecurityEnabled() const -> bool;
-        auto getEndpointSecurity() const -> EndpointSecurity;
+        auto getEndpointSecurity() const -> endpointSecurity_t;
         auto updatePhoneLockTime(const time_t newPhoneLockTime) -> void;
         auto getPhoneLockTime() const -> time_t;
 
       private:
+        auto isPasscodeEnabled() const -> bool;
+        auto isPhoneLocked() const -> bool;
+        auto isEulaAccepted() const -> bool;
+
         PhoneLockState phoneLocked;
         settings::Settings *settings;
         time_t phoneLockTime = 0;

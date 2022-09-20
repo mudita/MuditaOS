@@ -149,7 +149,7 @@ bool WorkerDesktop::handleReceiveQueueMessage(std::shared_ptr<sys::WorkerQueue> 
     }
 
     using namespace sdesktop::endpoints;
-    auto factory = EndpointFactory::create(securityModel.getEndpointSecurity());
+    auto factory = EndpointFactory::create(securityModel.getEndpointSecurity().access);
     auto handler = std::make_unique<MessageHandler>(ownerService, messageProcessedCallback, std::move(factory));
 
     parser.setMessageHandler(std::move(handler));

@@ -50,14 +50,26 @@ namespace sdesktop::endpoints
 
     auto SecurityEndpointHelper::processStatus(Context & /*context*/) -> http::Code
     {
+        auto result         = http::Code::NoContent;
         auto desktopService = dynamic_cast<ServiceDesktop *>(owner);
         auto security       = desktopService->getSecurity()->getEndpointSecurity();
 
-        if (security == EndpointSecurity::Allow) {
+        if (security.access == EndpointSecurity::Allow) {
             preventBlockingDevice();
+            result = http::Code::NoContent;
         }
-
-        return security == EndpointSecurity::Allow ? http::Code::NoContent : http::Code::Forbidden;
+        else {
+            switch (security.reason) {
+            case BlockReason::NoReason:
+            case BlockReason::DeviceLocked:
+                result = http::Code::Forbidden;
+                break;
+            case BlockReason::EulaNotAccepted:
+                result = http::Code::Locked;
+                break;
+            }
+        }
+        return result;
     }
 
     auto SecurityEndpointHelper::getPhoneLockTime(Context & /*context*/) -> time_t
