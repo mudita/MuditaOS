@@ -2,9 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
+#include "Helpers.hpp"
 
 #include "Database/Database.hpp"
-#include "Databases/SmsDB.hpp"
+#include "module-db/databases/SmsDB.hpp"
 
 #include "Tables/SMSTemplateTable.hpp"
 
@@ -17,17 +18,9 @@
 
 TEST_CASE("SMS Templates Table tests")
 {
-    Database::initialize();
+    db::tests::DatabaseUnderTest<SmsDB> smsDb{"sms.db", db::tests::getPurePhoneScriptsPath()};
 
-    const auto smsPath = (std::filesystem::path{"sys/user"} / "sms.db");
-    if (std::filesystem::exists(smsPath)) {
-        REQUIRE(std::filesystem::remove(smsPath));
-    }
-
-    SmsDB smsDb{smsPath.c_str()};
-    REQUIRE(smsDb.isInitialized());
-
-    auto &templatesTbl = smsDb.templates;
+    auto &templatesTbl = smsDb.get().templates;
 
     SMSTemplateTableRow testRow = {Record(0), .text = "Test text", .lastUsageTimestamp = 100};
 
@@ -121,6 +114,4 @@ TEST_CASE("SMS Templates Table tests")
         // Table should be empty now
         REQUIRE(templatesTbl.count() == 0);
     }
-
-    Database::deinitialize();
 }

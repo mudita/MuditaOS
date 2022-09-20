@@ -4,13 +4,13 @@
 #pragma once
 
 #include "Database/Database.hpp"
-#include "../Tables/NotesTable.hpp"
+#include "module-db/Tables/CalllogTable.hpp"
 
-class NotesDB : public Database
+class CalllogDB : public Database
 {
   public:
-    NotesDB(const char *name);
-    ~NotesDB() = default;
+    CalllogDB(const char *name);
+    ~CalllogDB() = default;
 
-    NotesTable notes;
+    CalllogTable calls;
 };

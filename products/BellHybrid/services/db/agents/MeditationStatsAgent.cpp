@@ -42,7 +42,7 @@ namespace service::db::agents
 
     auto MeditationStats::getDbFilePath() -> const std::string
     {
-        return (purefs::dir::getUserDiskPath() / dbName).string();
+        return (purefs::dir::getDatabasesPath() / dbName).string();
     }
     auto MeditationStats::getAgentName() -> const std::string
     {

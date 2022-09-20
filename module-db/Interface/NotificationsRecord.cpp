@@ -8,7 +8,7 @@
 #include "module-db/queries/notifications/QueryNotificationsMultipleIncrement.hpp"
 #include "module-db/queries/notifications/QueryNotificationsClear.hpp"
 #include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
-#include "Databases/NotificationsDB.hpp"
+#include "module-db/databases/NotificationsDB.hpp"
 
 #include <log/log.hpp>
 #include <Utils.hpp>

@@ -3,8 +3,8 @@
 
 #include <catch2/catch.hpp>
 
-#include "common.hpp"
-#include <Databases/MultimediaFilesDB.hpp>
+#include <Helpers.hpp>
+#include <databases/MultimediaFilesDB.hpp>
 #include <Interface/MultimediaFilesRecord.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesAdd.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesEdit.hpp>
@@ -79,7 +79,7 @@ const std::vector<TableRow> records = {
 
 TEST_CASE("Multimedia DB tests")
 {
-    DatabaseUnderTest<MultimediaFilesDB> db{"multimedia.db"};
+    db::tests::DatabaseUnderTest<MultimediaFilesDB> db{"multimedia.db", db::tests::getScriptsPath()};
     MultimediaFilesRecordInterface multimediaFilesRecordInterface(&db.get());
 
     constexpr auto PageSize = 8;
@@ -666,6 +666,4 @@ TEST_CASE("Multimedia DB tests")
             }
         }
     }
-
-    REQUIRE(Database::deinitialize());
 }
