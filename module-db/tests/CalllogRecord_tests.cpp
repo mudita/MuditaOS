@@ -3,34 +3,19 @@
 
 #include <catch2/catch.hpp>
 
+#include "Helpers.hpp"
 #include "Interface/CalllogRecord.hpp"
 #include "Database/Database.hpp"
-#include "Databases/CalllogDB.hpp"
+#include "module-db/databases/CalllogDB.hpp"
 
-#include <cstdint>
 #include <cstring>
 #include <filesystem>
 #include <algorithm>
-#include <iostream>
 
 TEST_CASE("Calllog Record tests")
 {
-    Database::initialize();
-
-    const auto calllogPath  = (std::filesystem::path{"sys/user"} / "calllog.db");
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    if (std::filesystem::exists(calllogPath)) {
-        REQUIRE(std::filesystem::remove(calllogPath));
-    }
-    if (std::filesystem::exists(contactsPath)) {
-        REQUIRE(std::filesystem::remove(contactsPath));
-    }
-
-    CalllogDB calllogDb(calllogPath.c_str());
-    ContactsDB contactsDb(contactsPath.c_str());
-
-    REQUIRE(calllogDb.isInitialized());
-    REQUIRE(contactsDb.isInitialized());
+    db::tests::DatabaseUnderTest<CalllogDB> calllogDb{"calllog.db", db::tests::getPurePhoneScriptsPath()};
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
     SECTION("Default Constructor")
     {
@@ -44,7 +29,7 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(testRec.isRead == true);
     }
 
-    CalllogRecordInterface calllogRecordInterface(&calllogDb, &contactsDb);
+    CalllogRecordInterface calllogRecordInterface(&calllogDb.get(), &contactsDb.get());
     CalllogRecord testRec;
     testRec.presentation = PresentationType::PR_ALLOWED;
     testRec.date         = 100;
@@ -181,6 +166,4 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(calllogRecordInterface.GetCount(EntryState::UNREAD) == 0);
         REQUIRE(calllogRecordInterface.GetCount(EntryState::READ) == 4);
     }
-
-    Database::deinitialize();
 }

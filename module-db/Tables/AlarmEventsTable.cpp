@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmEventsTable.hpp"
+#include "Common/Types.hpp"
 
 #include <Interface/AlarmEventRecord.hpp>
 
@@ -50,7 +51,7 @@ bool AlarmEventsTable::create()
 bool AlarmEventsTable::add(AlarmEventsTableRow entry)
 {
     return db->execute("INSERT or ignore INTO alarms ( hour, minute, music_tone, enabled, snooze_duration, rrule)"
-                       "VALUES ( %lu, %lu, '%q', %d, %lu, '%q');",
+                       "VALUES (" u32_c u32_c str_c u32_c u32_c str_ ");",
                        entry.hourOfDay,
                        entry.minuteOfHour,
                        entry.musicTone.c_str(),
@@ -61,16 +62,13 @@ bool AlarmEventsTable::add(AlarmEventsTableRow entry)
 
 bool AlarmEventsTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM alarms "
-                       "WHERE alarms._id = %lu;",
-                       id);
+    return db->execute("DELETE FROM alarms WHERE alarms._id=" u32_ ";", id);
 }
 
 bool AlarmEventsTable::update(AlarmEventsTableRow entry)
 {
-    return db->execute("UPDATE alarms SET hour = '%lu', minute = '%lu', music_tone = '%q', enabled = '%d', "
-                       "snooze_duration = '%lu', rrule = '%q' "
-                       "WHERE _id=%lu;",
+    return db->execute("UPDATE alarms SET hour=" u32_c "minute=" u32_c "music_tone=" str_c "enabled=" u32_c
+                       "snooze_duration=" u32_c "rrule=" str_ " WHERE _id=" u32_ ";",
                        entry.hourOfDay,
                        entry.minuteOfHour,
                        entry.musicTone.c_str(),
@@ -82,10 +80,7 @@ bool AlarmEventsTable::update(AlarmEventsTableRow entry)
 
 AlarmEventsTableRow AlarmEventsTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * "
-                              "FROM alarms "
-                              "WHERE _id = %lu;",
-                              id);
+    auto retQuery = db->query("SELECT * FROM alarms WHERE _id=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return AlarmEventsTableRow();
@@ -96,19 +91,15 @@ AlarmEventsTableRow AlarmEventsTable::getById(uint32_t id)
 
 std::vector<AlarmEventsTableRow> AlarmEventsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * FROM alarms "
-                              "ORDER BY hour, minute "
-                              "LIMIT %lu OFFSET %lu;",
-                              limit,
-                              offset);
+    auto retQuery =
+        db->query("SELECT * FROM alarms ORDER BY hour, minute LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
     return retQueryUnpack(std::move(retQuery));
 }
 
 std::vector<AlarmEventsTableRow> AlarmEventsTable::getEnabled()
 {
-    auto retQuery = db->query("SELECT * FROM alarms "
-                              "WHERE enabled = 1;");
+    auto retQuery = db->query("SELECT * FROM alarms WHERE enabled = 1;");
 
     return retQueryUnpack(std::move(retQuery));
 }
@@ -125,21 +116,19 @@ std::vector<AlarmEventsTableRow> AlarmEventsTable::getLimitOffsetByField(uint32_
         return {};
     }
 
-    retQuery = db->query("SELECT * FROM alarms e "
-                         "WHERE %q = '%q' "
-                         "ORDER BY hour, minute "
-                         "LIMIT %lu OFFSET %lu;",
-                         fieldName.c_str(),
-                         str,
-                         limit,
-                         offset);
+    retQuery =
+        db->query("SELECT * FROM alarms e WHERE %q=" str_ "ORDER BY hour, minute LIMIT " u32_ " OFFSET " u32_c ";",
+                  fieldName.c_str(),
+                  str,
+                  limit,
+                  offset);
 
     return retQueryUnpack(std::move(retQuery));
 }
 
 auto AlarmEventsTable::toggleAll(bool toggle) -> bool
 {
-    auto ret = db->execute("UPDATE alarms SET enabled = '%d';", static_cast<int>(toggle));
+    auto ret = db->execute("UPDATE alarms SET enabled=" u32_ ";", static_cast<int>(toggle));
 
     return ret;
 }
@@ -156,10 +145,7 @@ uint32_t AlarmEventsTable::count()
 
 uint32_t AlarmEventsTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM alarms "
-                              "WHERE %q=%lu;",
-                              field,
-                              id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM alarms WHERE %q=" u32_ ";", field, id);
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }

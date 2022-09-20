@@ -70,7 +70,7 @@ void SettingsAgent::unRegisterMessages()
 
 auto SettingsAgent::getDbFilePath() -> const std::string
 {
-    return (purefs::dir::getUserDiskPath() / dbName).string();
+    return (purefs::dir::getDatabasesPath() / dbName).string();
 }
 auto SettingsAgent::getAgentName() -> const std::string
 {

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "EventRecord.hpp"
-#include <Databases/EventsDB.hpp>
+#include <databases/EventsDB.hpp>
 
 #include <cstdint>
 
