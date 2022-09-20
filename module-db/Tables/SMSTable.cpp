@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTable.hpp"
+#include "Common/Types.hpp"
 #include <log/log.hpp>
 
 SMSTable::SMSTable(Database *db) : Table(db)
@@ -15,7 +16,7 @@ bool SMSTable::create()
 bool SMSTable::add(SMSTableRow entry)
 {
     return db->execute("INSERT or ignore INTO sms ( thread_id,contact_id, date, error_code, body, "
-                       "type ) VALUES (%lu,%lu,%lu,0,'%q',%d);",
+                       "type ) VALUES (" u32_c u32_c u32_c "0," str_c u32_ ");",
                        entry.threadID,
                        entry.contactID,
                        entry.date,
@@ -25,7 +26,7 @@ bool SMSTable::add(SMSTableRow entry)
 
 bool SMSTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM sms where _id = %u;", id);
+    return db->execute("DELETE FROM sms where _id=" u32_ ";", id);
 }
 
 bool SMSTable::removeByField(SMSTableFields field, const char *str)
@@ -48,13 +49,13 @@ bool SMSTable::removeByField(SMSTableFields field, const char *str)
         return false;
     }
 
-    return db->execute("DELETE FROM sms where %q = '%q';", fieldName.c_str(), str);
+    return db->execute("DELETE FROM sms where %q=" u32_ ";", fieldName.c_str(), str);
 }
 
 bool SMSTable::update(SMSTableRow entry)
 {
-    return db->execute("UPDATE sms SET thread_id = %lu, contact_id = %lu ,date = %lu, error_code = 0, "
-                       "body = '%q', type =%d WHERE _id=%lu;",
+    return db->execute("UPDATE sms SET thread_id=" u32_c "contact_id=" u32_c "date=" u32_c "error_code=0,"
+                       "body=" str_c "type=" u32_ " WHERE _id=" u32_ ";",
                        entry.threadID,
                        entry.contactID,
                        entry.date,
@@ -65,7 +66,7 @@ bool SMSTable::update(SMSTableRow entry)
 
 SMSTableRow SMSTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM sms WHERE _id= %u;", id);
+    auto retQuery = db->query("SELECT * FROM sms WHERE _id=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return SMSTableRow();
@@ -84,7 +85,7 @@ SMSTableRow SMSTable::getById(uint32_t id)
 
 std::vector<SMSTableRow> SMSTable::getByContactId(uint32_t contactId)
 {
-    auto retQuery = db->query("SELECT * FROM sms WHERE contact_id= %u;", contactId);
+    auto retQuery = db->query("SELECT * FROM sms WHERE contact_id=" u32_ ";", contactId);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTableRow>();
@@ -108,10 +109,11 @@ std::vector<SMSTableRow> SMSTable::getByContactId(uint32_t contactId)
 }
 std::vector<SMSTableRow> SMSTable::getByThreadId(uint32_t threadId, uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * FROM sms WHERE thread_id= %u", threadId);
+    auto retQuery = db->query("SELECT * FROM sms WHERE thread_id=" u32_ ";", threadId);
 
     if (limit != 0) {
-        retQuery = db->query("SELECT * FROM sms WHERE thread_id= %u LIMIT %u OFFSET %u", threadId, limit, offset);
+        retQuery = db->query(
+            "SELECT * FROM sms WHERE thread_id=" u32_ " LIMIT " u32_ " OFFSET " u32_ ";", threadId, limit, offset);
     }
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
@@ -139,14 +141,15 @@ std::vector<SMSTableRow> SMSTable::getByThreadIdWithoutDraftWithEmptyInput(uint3
                                                                            uint32_t offset,
                                                                            uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * FROM sms WHERE thread_id= %u AND type != %u UNION ALL SELECT 0 as _id, 0 as "
-                              "thread_id, 0 as contact_id, 0 as "
-                              "date, 0 as error_code, 0 as body, %u as type LIMIT %u OFFSET %u",
-                              threadId,
-                              SMSType::DRAFT,
-                              SMSType::INPUT,
-                              limit,
-                              offset);
+    auto retQuery =
+        db->query("SELECT * FROM sms WHERE thread_id=" u32_ " AND type!=" u32_ " UNION ALL SELECT 0 as _id, 0 as "
+                  "thread_id, 0 as contact_id, 0 as "
+                  "date, 0 as error_code, 0 as body, " u32_ " as type LIMIT " u32_ " OFFSET " u32_,
+                  threadId,
+                  SMSType::DRAFT,
+                  SMSType::INPUT,
+                  limit,
+                  offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTableRow>();
@@ -171,7 +174,8 @@ std::vector<SMSTableRow> SMSTable::getByThreadIdWithoutDraftWithEmptyInput(uint3
 
 uint32_t SMSTable::countWithoutDraftsByThreadId(uint32_t threadId)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM sms WHERE thread_id= %u AND type != %u;", threadId, SMSType::DRAFT);
+    auto queryRet =
+        db->query("SELECT COUNT(*) FROM sms WHERE thread_id=" u32_ " AND type!=" u32_ ";", threadId, SMSType::DRAFT);
 
     if (queryRet == nullptr || queryRet->getRowCount() == 0) {
         return 0;
@@ -182,8 +186,10 @@ uint32_t SMSTable::countWithoutDraftsByThreadId(uint32_t threadId)
 
 SMSTableRow SMSTable::getDraftByThreadId(uint32_t threadId)
 {
-    auto retQuery = db->query(
-        "SELECT * FROM sms WHERE thread_id= %u AND type = %u ORDER BY date DESC LIMIT 1;", threadId, SMSType::DRAFT);
+    auto retQuery =
+        db->query("SELECT * FROM sms WHERE thread_id=" u32_ " AND type=" u32_ " ORDER BY date DESC LIMIT 1;",
+                  threadId,
+                  SMSType::DRAFT);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return SMSTableRow();
@@ -203,7 +209,7 @@ SMSTableRow SMSTable::getDraftByThreadId(uint32_t threadId)
 std::vector<SMSTableRow> SMSTable::getByText(std::string text)
 {
 
-    auto retQuery = db->query("SELECT *, INSTR(body,'%q') pos FROM sms WHERE pos > 0;", text.c_str());
+    auto retQuery = db->query("SELECT *, INSTR(body," str_ ") pos FROM sms WHERE pos > 0;", text.c_str());
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTableRow>();
@@ -228,8 +234,8 @@ std::vector<SMSTableRow> SMSTable::getByText(std::string text)
 
 std::vector<SMSTableRow> SMSTable::getByText(std::string text, uint32_t threadId)
 {
-    auto retQuery =
-        db->query("SELECT *, INSTR(body,'%q') pos FROM sms WHERE pos > 0 AND thread_id=%u;", text.c_str(), threadId);
+    auto retQuery = db->query(
+        "SELECT *, INSTR(body," str_ ") pos FROM sms WHERE pos > 0 AND thread_id=" u32_ ";", text.c_str(), threadId);
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return {};
     }
@@ -251,7 +257,7 @@ std::vector<SMSTableRow> SMSTable::getByText(std::string text, uint32_t threadId
 
 std::vector<SMSTableRow> SMSTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * from sms ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from sms ORDER BY date DESC LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTableRow>();
@@ -295,7 +301,7 @@ std::vector<SMSTableRow> SMSTable::getLimitOffsetByField(uint32_t offset,
         return std::vector<SMSTableRow>();
     }
 
-    auto retQuery = db->query("SELECT * from sms WHERE %q='%q' ORDER BY date DESC LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->query("SELECT * from sms WHERE %q=" str_ " ORDER BY date DESC LIMIT " u32_ " OFFSET " u32_ ";",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -335,7 +341,7 @@ uint32_t SMSTable::count()
 
 uint32_t SMSTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM sms WHERE %q=%lu;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM sms WHERE %q=" u32_ ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
@@ -347,12 +353,15 @@ uint32_t SMSTable::countByFieldId(const char *field, uint32_t id)
 std::pair<uint32_t, std::vector<SMSTableRow>> SMSTable::getManyByType(SMSType type, uint32_t offset, uint32_t limit)
 {
     auto ret   = std::pair<uint32_t, std::vector<SMSTableRow>>{0, {}};
-    auto count = db->query("SELECT COUNT (*) from sms WHERE type='%lu';", type);
+    auto count = db->query("SELECT COUNT (*) from sms WHERE type=" u32_ ";", type);
     ret.first  = count == nullptr ? 0 : (*count)[0].getUInt32();
     if (ret.first != 0) {
-        limit         = limit == 0 ? ret.first : limit; // no limit intended
-        auto retQuery = db->query(
-            "SELECT * from sms WHERE type='%lu' ORDER BY date ASC LIMIT %lu OFFSET %lu;", type, limit, offset);
+        limit = limit == 0 ? ret.first : limit; // no limit intended
+        auto retQuery =
+            db->query("SELECT * from sms WHERE type=" u32_ " ORDER BY date ASC LIMIT " u32_ " OFFSET " u32_ ";",
+                      type,
+                      limit,
+                      offset);
 
         if (retQuery == nullptr || retQuery->getRowCount() == 0) {
             ret.second = {};

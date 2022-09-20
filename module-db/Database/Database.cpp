@@ -2,16 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Database.hpp"
-#include "DatabaseInitializer.hpp"
 
 #include <log/log.hpp>
-
-#include <purefs/filesystem_paths.hpp>
 #include <gsl/util>
-
-#include <cassert>
 #include <cstring>
-#include <memory>
 
 /* Declarations *********************/
 extern sqlite3_vfs *sqlite3_ecophonevfs(void);
@@ -75,8 +69,7 @@ constexpr auto dbApplicationId = 0x65727550; // ASCII for "Pure"
 constexpr auto enabled         = 1;
 
 Database::Database(const char *name, bool readOnly)
-    : dbConnection(nullptr), dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false),
-      initializer(std::make_unique<DatabaseInitializer>(this))
+    : dbConnection(nullptr), dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false)
 {
     const int flags = (readOnly) ? (SQLITE_OPEN_READONLY) : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
     LOG_INFO("Opening database: %s", dbName.c_str());
@@ -89,30 +82,11 @@ Database::Database(const char *name, bool readOnly)
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
 
-    if (pragmaQueryForValue("PRAGMA application_id;", dbApplicationId)) {
-        LOG_DEBUG("Database %s initialized", dbName.c_str());
-        isInitialized_ = true;
-        return;
-    }
-
-    /** Workaround for [MOS-351].
-     * Updater app loads databases to wrong directory (1/current/user/db) rather than
-     * (3/user/db). Therefore, we need to check both directories to support both flashing image and updating through
-     * updater.
-     * !!! This workaround should be removed with minor patch of updater, however it cannot be released in one package
-     * with database changes.
-     **/
-    auto filePath = (purefs::dir::getCurrentOSPath() / "user/db");
-    if (!std::filesystem::exists(filePath)) {
-        filePath = (purefs::dir::getUserDiskPath() / "db");
-    }
-
-    LOG_INFO("Running scripts: %s", filePath.c_str());
-    isInitialized_ = initializer->run(filePath.c_str(), InitScriptExtension);
-
-    if (isInitialized_) {
+    if (isInitialized_ = pragmaQueryForValue("PRAGMA application_id;", dbApplicationId); not isInitialized_) {
         populateDbAppId();
+        isInitialized_ = true;
     }
+    LOG_DEBUG("Database %s initialized", dbName.c_str());
 }
 
 void Database::populateDbAppId()
