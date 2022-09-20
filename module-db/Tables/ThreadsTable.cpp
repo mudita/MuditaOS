@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadsTable.hpp"
+#include "Common/Types.hpp"
 #include <log/log.hpp>
 
 ThreadsTable::ThreadsTable(Database *db) : Table(db)
@@ -17,7 +18,7 @@ bool ThreadsTable::add(ThreadsTableRow entry)
 
     return db->execute(
         "INSERT or ignore INTO threads ( date, msg_count, read, contact_id, number_id, snippet, last_dir ) VALUES "
-        "( %lu, %lu, %lu, %lu, %lu, '%q', %lu );",
+        "(" u32_c u32_c u32_c u32_c u32_c str_c u32_ ");",
         entry.date,
         entry.msgCount,
         entry.unreadMsgCount,
@@ -29,14 +30,13 @@ bool ThreadsTable::add(ThreadsTableRow entry)
 
 bool ThreadsTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM threads where _id = %u;", id);
+    return db->execute("DELETE FROM threads where _id= " u32_ ";", id);
 }
 
 bool ThreadsTable::update(ThreadsTableRow entry)
 {
-    return db->execute("UPDATE threads SET date = %lu, msg_count = %lu ,read = %lu, contact_id = %lu, number_id = %lu, "
-                       "snippet = '%q', "
-                       "last_dir = %lu WHERE _id=%lu;",
+    return db->execute("UPDATE threads SET date=" u32_c "msg_count=" u32_c "read=" u32_c "contact_id=" u32_c
+                       "number_id=" u32_c "snippet=" str_c "last_dir=" u32_ " WHERE _id=" u32_ ";",
                        entry.date,
                        entry.msgCount,
                        entry.unreadMsgCount,
@@ -49,7 +49,7 @@ bool ThreadsTable::update(ThreadsTableRow entry)
 
 ThreadsTableRow ThreadsTable::getById(uint32_t id)
 {
-    auto retQuery = db->query("SELECT * FROM threads WHERE _id= %u;", id);
+    auto retQuery = db->query("SELECT * FROM threads WHERE _id=" u32_ ";", id);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return ThreadsTableRow();
@@ -86,7 +86,8 @@ void fillRetQuery(std::vector<ThreadsTableRow> &ret, const std::unique_ptr<Query
 std::vector<ThreadsTableRow> ThreadsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
 
-    auto retQuery = db->query("SELECT * from threads ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery =
+        db->query("SELECT * from threads ORDER BY date DESC LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();
@@ -171,7 +172,7 @@ uint32_t ThreadsTable::count(EntryState state)
 
 uint32_t ThreadsTable::countByFieldId(const char *field, uint32_t id)
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM threads WHERE %q=%u;", field, id);
+    auto queryRet = db->query("SELECT COUNT(*) FROM threads WHERE %q=" u32_ ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
@@ -184,26 +185,26 @@ std::pair<uint32_t, std::vector<ThreadsTableRow>> ThreadsTable::getBySMSQuery(st
                                                                               uint32_t offset,
                                                                               uint32_t limit)
 {
-    auto ret       = std::pair<uint32_t, std::vector<ThreadsTableRow>>{0, {}};
-    auto count_ret = db->query("SELECT COUNT (*) from sms WHERE sms.body like \'%%%q%%\'", text.c_str());
-    ret.first      = count_ret == nullptr ? 0 : (*count_ret)[0].getUInt32();
+    const auto totalCountQuery =
+        db->query("SELECT COUNT(*) from sms INNER JOIN threads ON sms.thread_id=threads._id where sms.body "
+                  "like \'%%%q%%\'",
+                  text.c_str());
 
-    if (ret.first != 0) {
-        auto retQuery =
-            db->query("SELECT * from sms WHERE sms.body like \'%%%q%%\' ORDER BY date DESC LIMIT %lu OFFSET %lu;",
-                      text.c_str(),
-                      limit,
-                      offset);
+    if ((totalCountQuery == nullptr) || (totalCountQuery->getRowCount() == 0)) {
+        return {};
+    }
 
-        if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
-            ret.second = {};
-        }
-        else {
-            fillRetQuery(ret.second, retQuery);
-        }
+    const auto retQuery = db->query("SELECT * from sms INNER JOIN threads ON sms.thread_id=threads._id where sms.body "
+                                    "like \'%%%q%%\' ORDER BY date DESC LIMIT " u32_ " OFFSET " u32_ ";",
+                                    text.c_str(),
+                                    limit,
+                                    offset);
+
+    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+        return {};
     }
-    else {
-        ret.second = {};
-    }
+
+    auto ret = std::pair<uint32_t, std::vector<ThreadsTableRow>>{(*totalCountQuery)[0].getUInt32(), {}};
+    fillRetQuery(ret.second, retQuery);
     return ret;
 }

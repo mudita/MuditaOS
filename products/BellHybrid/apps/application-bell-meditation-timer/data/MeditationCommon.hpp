@@ -19,7 +19,7 @@ namespace app::meditation
 
     inline std::filesystem::path getMeditationAudioPath()
     {
-        return paths::audio::proprietary() / "Meditation_Gong.mp3";
+        return paths::audio::proprietary() / paths::audio::meditation() / "Meditation_Gong.mp3";
     }
 
 } // namespace app::meditation

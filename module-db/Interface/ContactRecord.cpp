@@ -1211,7 +1211,7 @@ auto ContactRecordInterface::addTemporaryContactForNumber(const ContactRecord::N
 {
     ContactRecord tmp;
     tmp.numbers = std::vector<ContactRecord::Number>{number};
-    tmp.addToGroup(ContactsDB::temporaryGroupId());
+    tmp.addToGroup(contactDB->groups.temporaryId());
     if (!Add(tmp)) {
         error_db_data("Cannot add contact record");
         return std::nullopt;

@@ -2,21 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common.hpp"
+#include "Helpers.hpp"
 #include <catch2/catch.hpp>
 
 #include "Interface/ContactRecord.hpp"
-#include <filesystem>
 #include <i18n/i18n.hpp>
 
 TEST_CASE("Contact Record db tests")
 {
-    Database::initialize();
-
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    RemoveDbFiles(contactsPath.stem());
-
-    ContactsDB contactDB(contactsPath.c_str());
-    REQUIRE(contactDB.isInitialized());
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
     const char *primaryNameTest                   = "PrimaryNameTest";
     const char *alternativeNameTest               = "AlternativeNameTest";
@@ -29,7 +23,7 @@ TEST_CASE("Contact Record db tests")
     const char *speeddialTest                     = "100";
     const ContactNumberType contactNumberTypeTest = ContactNumberType::PAGER;
 
-    ContactRecordInterface contRecInterface(&contactDB);
+    ContactRecordInterface contRecInterface(&contactsDb.get());
 
     ContactRecord recordIN;
 
@@ -134,8 +128,6 @@ TEST_CASE("Contact Record db tests")
             REQUIRE(w.speeddial == speeddialTest);
         }
     }
-
-    Database::deinitialize();
 }
 
 TEST_CASE("Test contact name formatting")
@@ -254,14 +246,9 @@ TEST_CASE("Test converting contact data to string")
 
 TEST_CASE("Contact record numbers update")
 {
-    Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    RemoveDbFiles(contactsPath.stem());
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
-    ContactsDB contactDB(contactsPath.c_str());
-    REQUIRE(contactDB.isInitialized());
-
-    auto records = ContactRecordInterface(&contactDB);
+    auto records = ContactRecordInterface(&contactsDb.get());
 
     ContactRecord testRecord, otherRecord;
     std::array<std::string, 4> numbers   = {{{"600100100"}, {"600100200"}, {"600100300"}, {"600100400"}}};
@@ -288,7 +275,7 @@ TEST_CASE("Contact record numbers update")
         auto newRecord = records.GetByID(1);
         REQUIRE(newRecord.numbers.size() == 2);
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         auto validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 2);
@@ -309,7 +296,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
 
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         auto validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 1);
@@ -323,7 +310,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[0], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 2);
@@ -348,7 +335,7 @@ TEST_CASE("Contact record numbers update")
         REQUIRE(records.Update(newRecord));
 
         auto validatationRecord = records.GetByID(1);
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
         REQUIRE(validatationRecord.numbers.size() == 2);
         REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[1]);
         REQUIRE(validatationRecord.numbers[1].number.getEntered() == numbers[0]);
@@ -362,7 +349,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[2], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         auto validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 2);
@@ -383,10 +370,10 @@ TEST_CASE("Contact record numbers update")
             std::vector<ContactRecord::Number>({ContactRecord::Number(unUsedNumbers[0], std::string("")),
                                                 ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
-        REQUIRE(contactDB.number.count() == 5);
-        REQUIRE(contactDB.number.getById(1).contactID != 1); // old numbers do not belong to any contact
-        REQUIRE(contactDB.number.getById(1).contactID != 2);
+        REQUIRE(contactsDb.get().contacts.count() == 2); // amount of non-temporary contacts
+        REQUIRE(contactsDb.get().number.count() == 5);
+        REQUIRE(contactsDb.get().number.getById(1).contactID != 1); // old numbers do not belong to any contact
+        REQUIRE(contactsDb.get().number.getById(1).contactID != 2);
 
         auto validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
@@ -418,12 +405,12 @@ TEST_CASE("Contact record numbers update")
             std::vector<ContactRecord::Number>({ContactRecord::Number(unUsedNumbers[1], std::string("")),
                                                 ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
-        REQUIRE(contactDB.number.count() == 6);
-        REQUIRE(contactDB.number.getById(1).contactID != 1); // old numbers do not belong to any contact
-        REQUIRE(contactDB.number.getById(1).contactID != 2);
-        REQUIRE(contactDB.number.getById(5).contactID != 1);
-        REQUIRE(contactDB.number.getById(5).contactID != 2);
+        REQUIRE(contactsDb.get().contacts.count() == 2); // amount of non-temporary contacts
+        REQUIRE(contactsDb.get().number.count() == 6);
+        REQUIRE(contactsDb.get().number.getById(1).contactID != 1); // old numbers do not belong to any contact
+        REQUIRE(contactsDb.get().number.getById(1).contactID != 2);
+        REQUIRE(contactsDb.get().number.getById(5).contactID != 1);
+        REQUIRE(contactsDb.get().number.getById(5).contactID != 2);
 
         auto validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
@@ -456,12 +443,12 @@ TEST_CASE("Contact record numbers update")
             std::vector<ContactRecord::Number>({ContactRecord::Number(unUsedNumbers[0], std::string("")),
                                                 ContactRecord::Number(unUsedNumbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
-        REQUIRE(contactDB.number.count() == 6);
-        REQUIRE(contactDB.number.getById(1).contactID != 1); // old numbers do not belong to any contact
-        REQUIRE(contactDB.number.getById(1).contactID != 2);
-        REQUIRE(contactDB.number.getById(2).contactID != 1);
-        REQUIRE(contactDB.number.getById(2).contactID != 2);
+        REQUIRE(contactsDb.get().contacts.count() == 2); // amount of non-temporary contacts
+        REQUIRE(contactsDb.get().number.count() == 6);
+        REQUIRE(contactsDb.get().number.getById(1).contactID != 1); // old numbers do not belong to any contact
+        REQUIRE(contactsDb.get().number.getById(1).contactID != 2);
+        REQUIRE(contactsDb.get().number.getById(2).contactID != 1);
+        REQUIRE(contactsDb.get().number.getById(2).contactID != 2);
 
         auto validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
@@ -492,7 +479,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbersPL[0], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         auto validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
@@ -518,18 +505,18 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersPL[0], std::string("")),
                                                                 ContactRecord::Number(numbersPL[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         auto validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
         REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]);
         REQUIRE(validationRecord.numbers[1].number.getEntered() == numbersPL[1]);
-        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
+        REQUIRE(contactsDb.get().contacts.count() == 2); // amount of non-temporary contacts
 
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersFR[0], std::string("")),
                                                                 ContactRecord::Number(numbersPL[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 5);
+        REQUIRE(contactsDb.get().number.count() == 5);
 
         validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
@@ -562,18 +549,18 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersPL[0], std::string("")),
                                                                 ContactRecord::Number(numbersFR[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         auto validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
         REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]);
         REQUIRE(validationRecord.numbers[1].number.getEntered() == numbersFR[1]);
-        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
+        REQUIRE(contactsDb.get().contacts.count() == 2); // amount of non-temporary contacts
 
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[0], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
@@ -599,7 +586,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[2], std::string("")), ContactRecord::Number(numbers[3], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         auto validationRecord = records.GetByIdWithTemporary(1);
         REQUIRE(validationRecord.ID != DB_ID_NONE);
@@ -630,13 +617,13 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersPL[0], std::string("")),
                                                                 ContactRecord::Number(numbersFR[0], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 5);
+        REQUIRE(contactsDb.get().number.count() == 5);
 
         auto validationRecord = records.GetByIdWithTemporary(1);
         REQUIRE(validationRecord.ID != DB_ID_NONE);
         REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]);
         REQUIRE(validationRecord.numbers[1].number.getEntered() == numbersFR[0]);
-        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
+        REQUIRE(contactsDb.get().contacts.count() == 2); // amount of non-temporary contacts
 
         validationRecord = records.GetByID(2);
         REQUIRE(validationRecord.numbers.size() == 2);
@@ -659,15 +646,10 @@ TEST_CASE("Contact record numbers update")
 
 TEST_CASE("Contacts list merge")
 {
-    Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    RemoveDbFiles(contactsPath.stem());
-
-    ContactsDB contactDB(contactsPath.c_str());
-    REQUIRE(contactDB.isInitialized());
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
     // Preparation of DB initial state
-    auto records                                                          = ContactRecordInterface(&contactDB);
+    auto records                                                          = ContactRecordInterface(&contactsDb.get());
     std::array<std::pair<std::string, std::string>, 3> rawContactsInitial = {
         {{"600100100", "test1"}, {"600100200", "test2"}, {"600100300", "test3"}}};
     for (auto &rawContact : rawContactsInitial) {
@@ -753,21 +735,14 @@ TEST_CASE("Contacts list merge")
         REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsOverlapping[1].first);
         REQUIRE(validatationRecord.primaryName == rawContactsOverlapping[1].second);
     }
-
-    Database::deinitialize();
 }
 
 TEST_CASE("Contacts list merge - advanced cases")
 {
-    Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    RemoveDbFiles(contactsPath.stem());
-
-    ContactsDB contactDB(contactsPath.c_str());
-    REQUIRE(contactDB.isInitialized());
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
     // Preparation of DB initial state
-    auto records = ContactRecordInterface(&contactDB);
+    auto records = ContactRecordInterface(&contactsDb.get());
     // 3 numbers in single contact
     std::array<std::string, 3> numbers = {"600100100", "600100200", "600100300"};
     ContactRecord record;
@@ -800,15 +775,10 @@ TEST_CASE("Contacts list merge - advanced cases")
 
 TEST_CASE("Contacts list duplicates search")
 {
-    Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    RemoveDbFiles(contactsPath.stem());
-
-    ContactsDB contactDB(contactsPath.c_str());
-    REQUIRE(contactDB.isInitialized());
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
     // Preparation of DB initial state
-    auto records                                                          = ContactRecordInterface(&contactDB);
+    auto records                                                          = ContactRecordInterface(&contactsDb.get());
     std::array<std::pair<std::string, std::string>, 3> rawContactsInitial = {
         {{"600100100", "test1"}, {"600100200", "test2"}, {"600100300", "test3"}}};
     for (auto &rawContact : rawContactsInitial) {
@@ -848,21 +818,14 @@ TEST_CASE("Contacts list duplicates search")
 
     REQUIRE(duplicates[1].numbers[0].number.getEntered() == rawContactsToCheck[2].first);
     REQUIRE(duplicates[1].primaryName == rawContactsToCheck[2].second);
-
-    Database::deinitialize();
 }
 
 TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
 {
-    Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    RemoveDbFiles(contactsPath.stem());
-
-    ContactsDB contactDB(contactsPath.c_str());
-    REQUIRE(contactDB.isInitialized());
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
     // Preparation of DB initial state
-    auto records = ContactRecordInterface(&contactDB);
+    auto records = ContactRecordInterface(&contactsDb.get());
     ContactRecord testContactRecord;
 
     testContactRecord.primaryName     = "PrimaryNameTest";
@@ -897,21 +860,14 @@ TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
 
         REQUIRE(records.verifyDuplicate(duplicateContactRecord) == true);
     }
-
-    Database::deinitialize();
 }
 
 TEST_CASE("Check if new contact record exists in DB as a temporary contact")
 {
-    Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    RemoveDbFiles(contactsPath.stem());
-
-    ContactsDB contactDB(contactsPath.c_str());
-    REQUIRE(contactDB.isInitialized());
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
 
     // Preparation of DB initial state
-    auto records = ContactRecordInterface(&contactDB);
+    auto records = ContactRecordInterface(&contactsDb.get());
     ContactRecord testContactRecord;
 
     testContactRecord.primaryName     = "PrimaryNameTest";
@@ -940,7 +896,7 @@ TEST_CASE("Check if new contact record exists in DB as a temporary contact")
         temporaryContactRecord.numbers = std::vector<ContactRecord::Number>({
             ContactRecord::Number("600123452", "+48600123452", ContactNumberType::HOME),
         });
-        temporaryContactRecord.addToGroup(ContactsDB::temporaryGroupId());
+        temporaryContactRecord.addToGroup(contactsDb.get().groups.temporaryId());
 
         REQUIRE(records.Add(temporaryContactRecord));
 
@@ -953,6 +909,4 @@ TEST_CASE("Check if new contact record exists in DB as a temporary contact")
 
         REQUIRE(records.verifyTemporary(noTemporaryContactRecord) == true);
     }
-
-    Database::deinitialize();
 }

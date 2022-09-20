@@ -87,6 +87,3 @@ set(PROJECT_CONFIG_DEFINITIONS
         PROF_ON=${PROF_ON}
         CACHE INTERNAL ""
         )
-
-message(STATUS "BlueKitchen selected")
-set(BT_STACK "BlueKitchen")

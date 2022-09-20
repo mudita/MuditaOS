@@ -3,13 +3,11 @@
 
 #include <db/ServiceDB.hpp>
 
-#include <module-db/Databases/CountryCodesDB.hpp>
-#include <module-db/Databases/EventsDB.hpp>
-#include <module-db/Databases/MultimediaFilesDB.hpp>
-#include <module-db/Databases/NotificationsDB.hpp>
+#include <module-db/databases/EventsDB.hpp>
+#include <module-db/databases/MultimediaFilesDB.hpp>
+#include "module-db/databases/NotificationsDB.hpp"
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/CalllogRecord.hpp>
-#include <module-db/Interface/CountryCodeRecord.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <module-db/Interface/NotesRecord.hpp>
 #include <module-db/Interface/NotificationsRecord.hpp>
@@ -30,7 +28,6 @@ ServiceDB::~ServiceDB()
     contactsDB.reset();
     smsDB.reset();
     notesDB.reset();
-    countryCodesDB.reset();
     notificationsDB.reset();
     predefinedQuotesDB.reset();
     customQuotesDB.reset();
@@ -57,8 +54,6 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
         return notesRecordInterface.get();
     case db::Interface::Name::Calllog:
         return calllogRecordInterface.get();
-    case db::Interface::Name::CountryCodes:
-        return countryCodeRecordInterface.get();
     case db::Interface::Name::Notifications:
         return notificationsRecordInterface.get();
     case db::Interface::Name::Quotes:
@@ -231,17 +226,16 @@ sys::ReturnCodes ServiceDB::InitHandler()
     }
 
     // Create databases
-    eventsDB        = std::make_unique<EventsDB>((purefs::dir::getUserDiskPath() / "events.db").c_str());
-    contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());
-    smsDB           = std::make_unique<SmsDB>((purefs::dir::getUserDiskPath() / "sms.db").c_str());
-    notesDB         = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
-    calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getUserDiskPath() / "calllog.db").c_str());
-    countryCodesDB  = std::make_unique<CountryCodesDB>("country-codes.db");
-    notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getUserDiskPath() / "notifications.db").c_str());
-    predefinedQuotesDB = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "predefined_quotes.db").c_str());
-    customQuotesDB     = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "custom_quotes.db").c_str());
+    eventsDB        = std::make_unique<EventsDB>((purefs::dir::getDatabasesPath() / "events.db").c_str());
+    contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getDatabasesPath() / "contacts.db").c_str());
+    smsDB           = std::make_unique<SmsDB>((purefs::dir::getDatabasesPath() / "sms.db").c_str());
+    notesDB         = std::make_unique<NotesDB>((purefs::dir::getDatabasesPath() / "notes.db").c_str());
+    calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getDatabasesPath() / "calllog.db").c_str());
+    notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getDatabasesPath() / "notifications.db").c_str());
+    predefinedQuotesDB = std::make_unique<Database>((purefs::dir::getDatabasesPath() / "predefined_quotes.db").c_str());
+    customQuotesDB     = std::make_unique<Database>((purefs::dir::getDatabasesPath() / "custom_quotes.db").c_str());
     multimediaFilesDB  = std::make_unique<db::multimedia_files::MultimediaFilesDB>(
-        (purefs::dir::getUserDiskPath() / "multimedia.db").c_str());
+        (purefs::dir::getDatabasesPath() / "multimedia.db").c_str());
 
     // Create record interfaces
     alarmEventRecordInterface  = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());
@@ -251,7 +245,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     smsTemplateRecordInterface = std::make_unique<SMSTemplateRecordInterface>(smsDB.get());
     notesRecordInterface       = std::make_unique<NotesRecordInterface>(notesDB.get());
     calllogRecordInterface     = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
-    countryCodeRecordInterface = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
     notificationsRecordInterface =
         std::make_unique<NotificationsRecordInterface>(notificationsDB.get(), contactRecordInterface.get());
     multimediaFilesRecordInterface =

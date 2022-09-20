@@ -2,8 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
-
-#include <filesystem>
+#include "Helpers.hpp"
 #include <Interface/NotesRecord.hpp>
 #include <queries/notes/QueryNotesGet.hpp>
 #include <queries/notes/QueryNotesGetByText.hpp>
@@ -11,17 +10,13 @@
 #include <queries/notes/QueryNoteStore.hpp>
 
 #include "Database/Database.hpp"
-#include "Databases/NotesDB.hpp"
+#include "module-db/databases/NotesDB.hpp"
 
 TEST_CASE("Notes Record tests")
 {
-    Database::initialize();
+    db::tests::DatabaseUnderTest<NotesDB> notesDb{"notes.db", db::tests::getPurePhoneScriptsPath()};
 
-    const auto notesDbPath = std::filesystem::path{"sys/user"} / "notes.db";
-    NotesDB notesDb{notesDbPath.c_str()};
-    REQUIRE(notesDb.isInitialized());
-
-    NotesRecordInterface notesRecordInterface{&notesDb};
+    NotesRecordInterface notesRecordInterface{&notesDb.get()};
     notesRecordInterface.RemoveAll(); // Empty the notes database.
 
     constexpr auto testSnippet = "TEST SNIPPET";
@@ -94,6 +89,4 @@ TEST_CASE("Notes Record tests")
         REQUIRE(removeResult->succeed());
         REQUIRE(notesRecordInterface.GetCount() == 0);
     }
-
-    Database::deinitialize();
 };

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,8 +9,6 @@
 #include <memory>
 #include <stdexcept>
 #include <filesystem>
-
-class DatabaseInitializer;
 
 class DatabaseInitialisationError : public std::runtime_error
 {
@@ -52,7 +50,6 @@ class Database
     }
 
   private:
-    static constexpr auto InitScriptExtension  = "sql";
     static constexpr std::uint32_t maxQueryLen = (8 * 1024);
 
     void initQueryStatementBuffer();
@@ -75,5 +72,4 @@ class Database
     std::string dbName;
     char *queryStatementBuffer;
     bool isInitialized_;
-    std::unique_ptr<DatabaseInitializer> initializer;
 };
