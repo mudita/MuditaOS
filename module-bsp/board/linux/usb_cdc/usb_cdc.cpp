@@ -160,11 +160,6 @@ namespace bsp
         LOG_INFO("usbSuspend");
     }
 
-    void usbStartMTP()
-    {
-        LOG_INFO("mtpStart");
-    }
-
     int usbInit(const bsp::usbInitParams &initParams)
     {
 

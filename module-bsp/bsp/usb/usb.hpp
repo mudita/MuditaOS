@@ -47,6 +47,5 @@ namespace bsp
     void usbReinit(const std::string& rootPath);
     void usbSuspend();
     void usbHandleDataReceived();
-    void usbStartMTP();
 
 } // namespace bsp
