@@ -10,7 +10,6 @@
 ### Fixed
 * Fixed mixed SMS messages
 * Fixed disappearing manual alarm and vibration volume setting in German
-* Fixed the accessibility of user files by MTP
 * Fixed SIM card pop-ups not showing
 * Fixed lost bytes in logs
 * Fixed passcode lock time discrepancy between lock screen and 'Wrong password' popup
