@@ -117,6 +117,7 @@ namespace gui
                 lock->clearAttempt();
                 setVisibleState();
             }
+
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_LEFT) && isIceVisible()) {

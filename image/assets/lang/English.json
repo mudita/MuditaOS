@@ -232,6 +232,7 @@
   "sim_setup_wrong_pin_last_attempt": "<text>Wrong PIN code. You have<br></br>1 attempt left.</text>",
   "sim_wrong_pin_confirmation": "Wrong PIN code.",
   "sim_pin_changed_successfully": "PIN code changed successfully",
+  "sim_card_pin_blocked": "<text>The SIM card is blocked.<br></br>To unblock it, try again with PUK.</text>",
   "sim_cme_error": "<text>SIM card<br></br>CME error:<token>$CMECODE</token></text>",
   "sim_puk_blocked": "<text>The SIM card is blocked.<br></br>Please, contact the operator.</text>",
   "sim_setup_enter_puk": "<text>The SIM card is blocked.<br></br>To unblock it, type the PUK code:</text>",

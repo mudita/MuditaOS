@@ -2,9 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimInfoWindow.hpp"
+
+#include <application-settings/ApplicationSettings.hpp>
+#include <i18n/i18n.hpp>
 #include <locks/data/LockStyle.hpp>
 #include <locks/data/LockData.hpp>
-#include <i18n/i18n.hpp>
+#include <module-utils/log/Logger.hpp>
 
 using namespace gui;
 
@@ -45,6 +48,11 @@ void SimInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
         case locks::SimInputTypeAction::DisablePin:
             setTitle("");
             infoIcon->text->setRichText(utils::translate("sim_card_pin_disabled"));
+            break;
+        case locks::SimInputTypeAction::Blocked:
+            setTitle("");
+            infoIcon->text->setRichText(utils::translate("sim_card_pin_blocked"));
+            infoIcon->image->set("lock_128px_W_G");
             break;
         case locks::SimInputTypeAction::Error:
             setTitle(utils::translate("app_settings_net"));

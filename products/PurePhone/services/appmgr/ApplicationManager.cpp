@@ -6,12 +6,14 @@
 #include <apps-common/popups/data/BluetoothModeParams.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
+#include <application-settings/include/application-settings/ApplicationSettings.hpp>
 #include <apps-common/popups/data/PhoneModeParams.hpp>
 #include <apps-common/actions/AlarmClockStatusChangeParams.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 #include <system/messages/TetheringQuestionRequest.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <service-appmgr/Constants.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-appmgr/messages/AutoLockRequests.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 #include <service-appmgr/messages/GetWallpaperOptionRequest.hpp>
@@ -26,6 +28,8 @@
 #include <sys/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 #include <service-time/include/service-time/AlarmMessage.hpp>
 #include <service-time/include/service-time/AlarmServiceAPI.hpp>
+
+#include <module-utils/log/Logger.hpp>
 
 namespace app::manager
 {
@@ -251,6 +255,17 @@ namespace app::manager
             auto data = static_cast<cellular::msg::notification::SimNeedPuk *>(request);
             if (phoneLockHandler.isPhoneLocked()) {
                 simLockHandler.needSimUnlocking();
+            }
+            if (auto *currentAppHandle = getFocusedApplication(); currentAppHandle->name() == app::name_settings) {
+                if (auto settingsAppPtr = currentAppHandle->launcher->handle;
+                    settingsAppPtr->isPreviousWindow(gui::window::name::sim_pin_settings)) {
+                    Controller::sendAction(
+                        settingsAppPtr.get(),
+                        app::manager::actions::ShowPopup,
+                        std::make_unique<gui::SimUnlockInputRequestParams>(
+                            gui::popup::ID::SimInfo, simLockHandler.getLock(), locks::SimInputTypeAction::Blocked));
+                    return sys::msgHandled();
+                }
             }
             return simLockHandler.handleSimPukRequest(data->attempts);
         });

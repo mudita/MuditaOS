@@ -921,7 +921,7 @@ namespace app
             return;
         }
         if (windowsStack().pop(newWindow)) {
-            LOG_INFO("Get back to window!");
+            LOG_INFO("Requested window %s is previous one - get back to it", newWindow.c_str());
             return;
         }
         LOG_INFO("Create window for stack: %s", newWindow.c_str());
@@ -953,6 +953,16 @@ namespace app
             return window == windowName;
         }
         LOG_ERROR("no window: %s", windowName.c_str());
+        return false;
+    }
+
+    bool ApplicationCommon::isPreviousWindow(const std::string &windowName) const noexcept
+    {
+        if (const auto &previousWindowName = getPreviousWindow(); previousWindowName != std::nullopt) {
+            return previousWindowName == windowName;
+        }
+
+        LOG_INFO("no previous window");
         return false;
     }
 

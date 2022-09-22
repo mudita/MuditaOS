@@ -387,6 +387,7 @@ namespace app
         gui::AppWindow *getCurrentWindow();
         /// @ingrup AppWindowStack
         bool isCurrentWindow(const std::string &windowName) const noexcept;
+        bool isPreviousWindow(const std::string &windowName) const noexcept;
 
         /// @ingrup AppWindowStack
         gui::AppWindow *getWindow(const std::string &name);

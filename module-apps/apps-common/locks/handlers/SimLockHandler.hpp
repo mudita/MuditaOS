@@ -73,6 +73,11 @@ namespace locks
 
         void getSettingsSimSelect(const std::string &settingsSim);
         void setSim(cellular::api::SimSlot simSlot);
+
+        Lock &getLock()
+        {
+            return lock;
+        }
     };
 
 } // namespace locks
