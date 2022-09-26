@@ -9,6 +9,7 @@
 * Implemented partial refresh of the display
 
 ### Fixed
+* Fixed issue with inability to send SMS
 * Fixed mixed SMS messages
 * Fixed disappearing manual alarm and vibration volume setting in German
 * Fixed SIM card pop-ups not showing

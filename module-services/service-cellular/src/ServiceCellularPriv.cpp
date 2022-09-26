@@ -294,6 +294,8 @@ namespace cellular::internal
             if (!checkSmsCenter(*channel)) {
                 LOG_ERROR("SMS center check failed");
             }
+            // Perform soft reset because sometimes the modem is not able to send next messages
+            modemResetHandler->performSoftReset();
         }
 
         DBServiceAPI::GetQuery(

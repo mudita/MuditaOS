@@ -339,6 +339,14 @@ namespace utils
                                country::Id defaultCountryCode = country::defaultCountry);
 
         /**
+         * @brief Check whether character must be removed
+         *
+         * @param c - a character to check
+         * @return true is character is on the list
+         */
+        static bool CharacterToRemove(char c);
+
+        /**
          * @brief Create instance of View directly from the E164 format.
          *
          * @param inputNumber - a string represenation of a number to create View from
