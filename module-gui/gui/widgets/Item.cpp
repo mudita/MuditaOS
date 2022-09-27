@@ -136,7 +136,7 @@ namespace gui
     {
         BoundingBox oldArea = widgetArea;
         widgetArea          = area;
-        widgetMaximumArea.sum(widgetArea);
+        widgetMaximumArea.expandSize(widgetArea);
         contentChanged = false;
         updateDrawArea();
         onDimensionChanged(oldArea, widgetArea);

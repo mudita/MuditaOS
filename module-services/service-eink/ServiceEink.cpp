@@ -22,6 +22,8 @@
 #include <gsl/util>
 #include "Utils.hpp"
 
+#include <service-gui/Common.hpp>
+
 namespace service::eink
 {
     namespace
@@ -66,6 +68,12 @@ namespace service::eink
 
         connect(typeid(ImageMessage),
                 [this](sys::Message *request) -> sys::MessagePointer { return handleImageMessage(request); });
+
+        connect(typeid(RefreshMessage),
+                [this](sys::Message *request) -> sys::MessagePointer { return handleRefreshMessage(request); });
+
+        connect(typeid(CancelRefreshMessage),
+                [this](sys::Message *request) -> sys::MessagePointer { return handleCancelRefreshMessage(request); });
 
         connect(typeid(PrepareDisplayEarlyRequest),
                 [this](sys::Message *request) -> sys::MessagePointer { return handlePrepareEarlyRequest(request); });
@@ -175,27 +183,257 @@ namespace service::eink
             display->setMode(hal::eink::EinkDisplayColorMode::EinkDisplayColorModeStandard);
         }
         internal::StaticData::get().setInvertedMode(invertedModeRequested);
+
+        previousContext.reset();
+        previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
     }
+
+#if DEBUG_EINK_REFRESH == 1
+    inline std::string debug_toString(const gui::BoundingBox &bb)
+    {
+        return bb.str();
+    }
+
+    inline std::string debug_toString(const hal::eink::EinkFrame &f)
+    {
+        std::stringstream ss;
+        ss << '{' << f.pos_x << ' ' << f.pos_y << ' ' << f.size.width << ' ' << f.size.height << "}";
+        return ss.str();
+    }
+
+    template <typename Container>
+    inline void debug_handleImageMessage(const char *name, const Container &container)
+    {
+        std::stringstream ss;
+        for (auto const &el : container)
+            ss << debug_toString(el) << ' ';
+        LOG_INFO("%s: %s", name, ss.str().c_str());
+    }
+#endif
+
+    // Merge boxes if the gap between them is smaller than the threshold
+    template <typename BoxesContainer>
+    inline auto mergeBoundingBoxes(const BoxesContainer &boxes, std::uint16_t gapThreshold)
+    {
+        std::vector<gui::BoundingBox> mergedBoxes;
+        if (boxes.empty())
+            return mergedBoxes;
+        mergedBoxes.reserve(boxes.size());
+        gui::BoundingBox merged = boxes.front();
+        for (std::size_t i = 1; i < boxes.size(); ++i) {
+            const auto &bb = boxes[i];
+            const auto gap = bb.y - (merged.y + merged.h);
+            if (gap < gapThreshold) {
+                merged.h = (bb.y + bb.h) - merged.y;
+            }
+            else {
+                mergedBoxes.push_back(merged);
+                merged = bb;
+            }
+        }
+        mergedBoxes.push_back(merged);
+        return mergedBoxes;
+    }
+
+    // Enlarge each box to match alignment-wide grid in y coordinate
+    template <typename BoxesContainer>
+    inline auto makeAlignedFrames(const BoxesContainer &boxes, std::uint16_t alignment)
+    {
+        std::vector<hal::eink::EinkFrame> frames;
+        if (boxes.empty())
+            return frames;
+        frames.reserve(boxes.size());
+        auto a = alignment;
+        for (const auto &bb : boxes) {
+            auto f = hal::eink::EinkFrame{
+                std::uint16_t(bb.x), std::uint16_t(bb.y), {std::uint16_t(bb.w), std::uint16_t(bb.h)}};
+            auto y        = f.pos_y;
+            auto h        = f.size.height;
+            f.pos_y       = y / a * a;
+            f.size.height = (y - f.pos_y + h + (a - 1)) / a * a;
+            frames.push_back(f);
+        }
+        return frames;
+    }
+
+    // Return frames representing difference of contexts
+    inline auto calculateUpdateFrames(const gui::Context &context, const gui::Context &previousContext)
+    {
+        std::vector<hal::eink::EinkFrame> updateFrames;
+        // Each bounding box cover the whole width of the context. They are disjoint and sorted by y coordinate.
+        const auto diffBoundingBoxes = gui::Context::linesDiffs(context, previousContext);
+        if (!diffBoundingBoxes.empty()) {
+            const std::uint16_t gapThreshold = context.getH() / 4;
+            const std::uint16_t alignment    = 8;
+
+            const auto mergedBoxes = mergeBoundingBoxes(diffBoundingBoxes, gapThreshold);
+            updateFrames           = makeAlignedFrames(mergedBoxes, alignment);
+
+#if DEBUG_EINK_REFRESH == 1
+            debug_handleImageMessage("Diff boxes", diffBoundingBoxes);
+            debug_handleImageMessage("Merged boxes", mergedBoxes);
+#endif
+        }
+        return updateFrames;
+    }
+
+    inline auto expandFrame(hal::eink::EinkFrame &frame, const hal::eink::EinkFrame &other)
+    {
+        const auto x      = std::min(frame.pos_x, other.pos_x);
+        const auto y      = std::min(frame.pos_y, other.pos_y);
+        const auto xmax1  = frame.pos_x + frame.size.width;
+        const auto xmax2  = other.pos_x + other.size.width;
+        const auto w      = std::max(xmax1, xmax2) - x;
+        const auto ymax1  = frame.pos_y + frame.size.height;
+        const auto ymax2  = other.pos_y + other.size.height;
+        const auto h      = std::max(ymax1, ymax2) - y;
+        frame.pos_x       = x;
+        frame.pos_y       = y;
+        frame.size.width  = w;
+        frame.size.height = h;
+    }
+
+#if DEBUG_EINK_REFRESH == 1
+    TickType_t tick1, tick2, tick3;
+#endif
 
     sys::MessagePointer ServiceEink::handleImageMessage(sys::Message *request)
     {
+#if DEBUG_EINK_REFRESH == 1
+        tick1 = xTaskGetTickCount();
+#endif
+
         const auto message = static_cast<service::eink::ImageMessage *>(request);
         if (isInState(State::Suspended)) {
             LOG_WARN("Received image while suspended, ignoring");
             return sys::MessageNone{};
         }
-        utils::time::Scoped measurement("ImageMessage");
 
         displayPowerOffTimer.stop();
         auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer.start(); });
 
-        eInkSentinel->HoldMinimumFrequency();
-        auto status = display->showImage(message->getData(), translateToEinkRefreshMode(message->getRefreshMode()));
-        if (status != hal::eink::EinkStatus::EinkOK) {
-            LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
+        const gui::Context &ctx = *message->getContext();
+        auto refreshMode        = translateToEinkRefreshMode(message->getRefreshMode());
+
+        // Calculate update and refresh frames based on areas changed since last update
+        std::vector<hal::eink::EinkFrame> updateFrames;
+        hal::eink::EinkFrame refreshFrame{0, 0, {ctx.getW(), ctx.getH()}};
+        bool isRefreshRequired = true;
+        if (!previousContext) {
+            updateFrames = {refreshFrame};
+            previousContext.reset(new gui::Context(ctx.get(0, 0, ctx.getW(), ctx.getH())));
+        }
+        else {
+            updateFrames = calculateUpdateFrames(ctx, *previousContext);
+            if (refreshMode > previousRefreshMode) {
+                previousContext->insert(0, 0, ctx);
+            }
+            else if (updateFrames.empty()) {
+                isRefreshRequired = false;
+            }
+            else {
+                refreshFrame = updateFrames.front();
+                refreshFrame.size.height =
+                    updateFrames.back().pos_y + updateFrames.back().size.height - updateFrames.front().pos_y;
+                previousContext->insert(0, 0, ctx);
+            }
         }
 
-        return std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
+        // If parts of the screen were changed, update eink
+        bool isImageUpdated = false;
+        if (!updateFrames.empty()) {
+
+#if DEBUG_EINK_REFRESH == 1
+            debug_handleImageMessage("Update frames", updateFrames);
+            debug_handleImageMessage("Refresh frame", std::vector<hal::eink::EinkFrame>({refreshFrame}));
+#endif
+
+            eInkSentinel->HoldMinimumFrequency();
+
+            auto status = display->showImageUpdate(updateFrames, ctx.getData());
+            if (status == hal::eink::EinkStatus::EinkOK) {
+                isImageUpdated = true;
+            }
+            else {
+                previousContext.reset();
+                refreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
+                LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
+            }
+        }
+
+        previousRefreshMode = refreshMode;
+
+#if DEBUG_EINK_REFRESH == 1
+        LOG_INFO("Update contextId: %d, mode: %d", (int)message->getContextId(), (int)refreshMode);
+        tick2 = xTaskGetTickCount();
+        LOG_INFO("Time to update: %d", (int)(tick2 - tick1));
+#endif
+
+        // Refresh is required if:
+        // - there are parts of the screen that were changed
+        // - deep refresh is requested after fast refresh even if nothing has changed
+        // - previous refresh was canceled
+        if (isImageUpdated || isRefreshRequired || isRefreshFramesSumValid) {
+            if (refreshMode > refreshModeSum) {
+                refreshModeSum = refreshMode;
+            }
+            if (!isRefreshFramesSumValid) {
+                refreshFramesSum        = refreshFrame;
+                isRefreshFramesSumValid = true;
+            }
+            else {
+                expandFrame(refreshFramesSum, refreshFrame);
+            }
+            einkDisplayState = EinkDisplayState::NeedRefresh;
+            auto msg         = std::make_shared<service::eink::RefreshMessage>(
+                message->getContextId(), refreshFrame, refreshMode, message->sender);
+            bus.sendUnicast(msg, this->GetName());
+            return sys::MessageNone{};
+        }
+        else {
+            einkDisplayState = EinkDisplayState::Idle;
+            return std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
+        }
+    }
+
+    sys::MessagePointer ServiceEink::handleRefreshMessage(sys::Message *request)
+    {
+        const auto message = static_cast<service::eink::RefreshMessage *>(request);
+
+        if (einkDisplayState == EinkDisplayState::NeedRefresh) {
+            const auto status = display->showImageRefresh(refreshFramesSum, refreshModeSum);
+            if (status != hal::eink::EinkStatus::EinkOK) {
+                previousContext.reset();
+                previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
+                LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
+            }
+
+            einkDisplayState        = EinkDisplayState::Idle;
+            isRefreshFramesSumValid = false;
+            refreshModeSum          = hal::eink::EinkRefreshMode::REFRESH_NONE;
+
+#if DEBUG_EINK_REFRESH == 1
+            LOG_INFO("Refresh contextId: %d, mode: %d", message->getContextId(), (int)message->getRefreshMode());
+#endif
+        }
+
+#if DEBUG_EINK_REFRESH == 1
+        tick3 = xTaskGetTickCount();
+        LOG_INFO("Time to refresh: %d", (int)(tick3 - tick1));
+#endif
+
+        auto msg = std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
+        bus.sendUnicast(msg, message->getOriginalSender());
+
+        return sys::MessageNone{};
+    }
+
+    sys::MessagePointer ServiceEink::handleCancelRefreshMessage(sys::Message *request)
+    {
+        LOG_INFO("Refresh cancel");
+        if (einkDisplayState == EinkDisplayState::NeedRefresh)
+            einkDisplayState = EinkDisplayState::Canceled;
+        return sys::MessageNone{};
     }
 
     sys::MessagePointer ServiceEink::handlePrepareEarlyRequest(sys::Message *message)

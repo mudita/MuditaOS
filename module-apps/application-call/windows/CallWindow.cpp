@@ -123,6 +123,10 @@ namespace gui
                                                         app::manager::OnSwitchBehaviour::RunInBackground);
         };
 
+        sendSmsIcon->setVisible(false);
+        microphoneIcon->setVisible(false);
+        speakerIcon->setVisible(false);
+
         // define navigation between icons
         microphoneIcon->setNavigationItem(NavigationDirection::LEFT, speakerIcon);
         microphoneIcon->setNavigationItem(NavigationDirection::RIGHT, speakerIcon);

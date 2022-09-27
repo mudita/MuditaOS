@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DrawCommand.hpp"
@@ -56,8 +56,9 @@ namespace gui
             return;
         }
 
+        Context tempContext;
         Context *drawingContext = ctx;
-        Point position;
+        Point position(0, 0);
 
         if (yaps & (RectangleYap::BottomLeft | RectangleYap::TopLeft)) {
             position.x += yapSize;
@@ -76,7 +77,8 @@ namespace gui
         else {
             const auto xCtx = areaX < 0 ? origin.x + areaX : origin.x;
             const auto yCtx = areaY < 0 ? origin.y + areaY : origin.y;
-            drawingContext  = ctx->get(xCtx, yCtx, areaW, areaH);
+            tempContext     = ctx->get(xCtx, yCtx, areaW, areaH);
+            drawingContext  = &tempContext;
         }
 
         if (radius == 0) {
@@ -89,8 +91,7 @@ namespace gui
         }
 
         if (drawingContext != ctx) {
-            ctx->insertArea(origin.x, origin.y, areaX, areaY, width, height, drawingContext);
-            delete drawingContext;
+            ctx->insertArea(origin.x, origin.y, areaX, areaY, width, height, tempContext);
         }
     }
 
@@ -116,7 +117,7 @@ namespace gui
 
         for (position.y = glyphOrigin.y - glyph->yoffset; position.y < glyphMaxY; ++position.y) {
             for (position.x = glyphOrigin.x; position.x < glyphMaxX; ++position.x) {
-                if (!ctx->addressInData(position)) {
+                if (!ctx->hasPixel(position)) {
                     log_warn_glyph(
                         "drawing out of: {x=%d,y=%d} vs {w=%d,h=%d}", position.x, position.y, ctx->getW(), ctx->getH());
                     return;
@@ -138,18 +139,17 @@ namespace gui
         }
 
         // get copy of original context using x,y of draw coordinates and original size of the widget
-        Context *drawCtx;
+        Context ctxCopy;
         bool copyContext   = false;
         Point widgetOrigin = {0, 0};
 
         // check if there is a need of making copy of context to use it as background
         if ((areaW == width) && (areaH == height)) {
-            drawCtx      = ctx;
             widgetOrigin = origin;
         }
         else {
             copyContext = true;
-            drawCtx     = ctx->get(origin.x, origin.y, areaW, areaH);
+            ctxCopy     = ctx->get(origin.x, origin.y, areaW, areaH);
         }
 
         // retrieve font used to draw text
@@ -164,6 +164,7 @@ namespace gui
             FontGlyph *glyph = font->getGlyph(idCurrent);
 
             // do not start drawing outside of draw context.
+            Context *drawCtx = copyContext ? &ctxCopy : ctx;
             if ((widgetOrigin.x + position.x + glyph->xoffset >= drawCtx->getW()) ||
                 (widgetOrigin.x + position.x + glyph->xoffset < 0)) {
                 LOG_FATAL("Drawing outside context's X boundary for glyph: %" PRIu32, glyph->id);
@@ -188,10 +189,9 @@ namespace gui
         }
 
         // if drawing was performed in temporary context
-        // reinsert drawCtx into bast context
+        // reinsert drawCtx into base context
         if (copyContext) {
-            ctx->insert(origin.x, origin.y, drawCtx);
-            delete drawCtx;
+            ctx->insert(origin.x, origin.y, ctxCopy);
         }
     }
 
@@ -269,23 +269,20 @@ namespace gui
         }
 
         // get copy of original context using x,y of draw coordinates and original size of the widget
-        Context *drawCtx = ctx->get(origin.x, origin.y, areaW, areaH);
+        Context drawCtx = ctx->get(origin.x, origin.y, areaW, areaH);
 
         if (imageMap->getType() == gui::ImageMap::Type::PIXMAP) {
             auto pixMap = dynamic_cast<PixMap *>(imageMap);
             assert(pixMap);
-            drawPixMap(drawCtx, pixMap);
+            drawPixMap(&drawCtx, pixMap);
         }
         else if (imageMap->getType() == gui::ImageMap::Type::VECMAP) {
             auto vecMap = dynamic_cast<VecMap *>(imageMap);
             assert(vecMap);
-            drawVecMap(drawCtx, vecMap);
+            drawVecMap(&drawCtx, vecMap);
         }
 
         // reinsert drawCtx into bast context
         ctx->insert(origin.x, origin.y, drawCtx);
-
-        // remove draw context
-        delete drawCtx;
     }
 } /* namespace gui */

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerGUI.hpp"
@@ -9,6 +9,7 @@
 #include <service-gui/ServiceGUI.hpp>
 
 #include <memory>
+#include <sstream>
 #include "messages/RenderingFinished.hpp"
 
 namespace service::gui
@@ -53,7 +54,13 @@ namespace service::gui
     void WorkerGUI::render(DrawCommandsQueue::CommandList &commands, ::gui::RefreshModes refreshMode)
     {
         const auto [contextId, context] = guiService->contextPool->borrowContext(); // Waits for the context.
+
         renderer.render(context, commands);
+
+#if DEBUG_EINK_REFRESH == 1
+        LOG_INFO("Render ContextId: %d\n%s", contextId, context->toAsciiScaled().c_str());
+#endif
+
         onRenderingFinished(contextId, refreshMode);
     }
 

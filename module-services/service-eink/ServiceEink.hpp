@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <module-gui/gui/core/Context.hpp>
 #include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
@@ -48,6 +49,13 @@ namespace service::eink
             Suspended
         };
 
+        enum class EinkDisplayState
+        {
+            Idle,
+            NeedRefresh,
+            Canceled
+        };
+
         void setState(State state) noexcept;
         bool isInState(State state) const noexcept;
 
@@ -58,6 +66,8 @@ namespace service::eink
 
         sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);
         sys::MessagePointer handleImageMessage(sys::Message *message);
+        sys::MessagePointer handleRefreshMessage(sys::Message *message);
+        sys::MessagePointer handleCancelRefreshMessage(sys::Message *message);
         sys::MessagePointer handlePrepareEarlyRequest(sys::Message *message);
 
         void initStaticData();
@@ -68,6 +78,13 @@ namespace service::eink
         sys::TimerHandle displayPowerOffTimer;
         std::shared_ptr<EinkSentinel> eInkSentinel;
         std::unique_ptr<settings::Settings> settings;
+
+        std::unique_ptr<::gui::Context> previousContext;
+        hal::eink::EinkRefreshMode previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
+        EinkDisplayState einkDisplayState              = EinkDisplayState::Idle;
+        hal::eink::EinkFrame refreshFramesSum;
+        hal::eink::EinkRefreshMode refreshModeSum = hal::eink::EinkRefreshMode::REFRESH_NONE;
+        bool isRefreshFramesSumValid              = false;
     };
 } // namespace service::eink
 
