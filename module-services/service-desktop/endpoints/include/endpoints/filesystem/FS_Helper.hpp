@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,6 +40,8 @@ namespace sdesktop::endpoints
       private:
         auto startGetFile(Context &context) const -> ResponseContext;
         auto getFileChunk(Context &context) const -> ResponseContext;
+
+        auto getFreeSpaceForUserFilesMiB() const -> unsigned long;
 
         auto startSendFile(Context &context) const -> ResponseContext;
         auto sendFileChunk(Context &context) const -> ResponseContext;
