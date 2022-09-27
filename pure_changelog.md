@@ -7,6 +7,7 @@
 * Changed USB logging
 * Separated system volume from Bluetooth device volume for A2DP
 * Made windows flow in SIM cards settings more robust
+* Improve refreshing of the display.
 
 ### Fixed
 * Fixed wrong time displayed on password locked screen with 'Quotes' or 'Logo' wallpaper

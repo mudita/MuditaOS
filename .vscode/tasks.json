@@ -169,6 +169,44 @@
             "detail": "Configure cmake project and build with Ninja",
         },
 
+        {
+            "type": "shell",
+            "label": "Configure PurePhone (RT1051, DEV)",
+            "command": "./configure.sh",
+            "args": [
+                "pure",
+                "rt1051",
+                "RelWithDebInfo",
+                "-DWITH_DEVELOPMENT_FEATURES=ON",
+                "-G",
+                "Ninja"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "detail": "Run cmake configure script",
+        },
+
+        {
+            "type": "shell",
+            "label": "Configure BellHybrid (RT1051, DEV)",
+            "command": "./configure.sh",
+            "args": [
+                "bell",
+                "rt1051",
+                "RelWithDebInfo",
+                "-DWITH_DEVELOPMENT_FEATURES=ON",
+                "-G",
+                "Ninja"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "detail": "Run cmake configure script",
+        },
+
         // {
         //     "type": "shell",
         //     "label": "Run JLink Server for PurePhone (RT1051)",

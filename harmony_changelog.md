@@ -23,6 +23,7 @@
 
 #### UI/UX:
 * UI update (Home Screen settings).
+* Improve refreshing of the display.
 
 #### Translations:
 * Completed missing translations.

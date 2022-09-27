@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BoundingBox.hpp"
@@ -105,7 +105,7 @@ namespace gui
         return ss.str();
     }
 
-    void BoundingBox::sum(const BoundingBox &box)
+    void BoundingBox::expandSize(const BoundingBox &box)
     {
         w = box.w > w ? box.w : w;
         h = box.h > h ? box.h : h;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /**
@@ -90,7 +90,7 @@ extern "C"
      * @return  EinkNoMem - Could not allocate the temporary buffer
      *          EinkOK - Part of image send successfully
      */
-    EinkStatus_e EinkUpdateFrame(EinkFrame_t frame, uint8_t *buffer);
+    EinkStatus_e EinkUpdateFrame(EinkFrame_t frame, const uint8_t *buffer);
 
     /**
      * @brief This function sets the waveform to the \ref EinkWaveformINIT to make the display clearing more deep and

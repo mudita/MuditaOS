@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceGUI.hpp"
@@ -184,11 +184,18 @@ namespace service::gui
                 cache.invalidate();
             }
             const auto context = contextPool->peekContext(contextId);
+#if DEBUG_EINK_REFRESH == 1
+            LOG_INFO("Rendering finished, send, contextId: %d, mode: %d", contextId, (int)refreshMode);
+#endif
             sendOnDisplay(context, contextId, refreshMode);
         }
         else {
             cache.cache({contextId, refreshMode});
             contextPool->returnContext(contextId);
+#if DEBUG_EINK_REFRESH == 1
+            LOG_INFO("Rendering finished, cancel, contextId: %d, mode: %d", contextId, (int)refreshMode);
+#endif
+            sendCancelRefresh();
         }
         return sys::MessageNone{};
     }
@@ -196,10 +203,15 @@ namespace service::gui
     void ServiceGUI::sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode)
     {
         isDisplaying = true;
-        std::shared_ptr<service::eink::ImageMessage> imageMsg;
-        imageMsg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
-        bus.sendUnicast(imageMsg, service::name::eink);
+        auto msg     = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
+        bus.sendUnicast(std::move(msg), service::name::eink);
         scheduleContextRelease(contextId);
+    }
+
+    void ServiceGUI::sendCancelRefresh()
+    {
+        auto msg = std::make_shared<service::eink::CancelRefreshMessage>();
+        bus.sendUnicast(std::move(msg), service::name::eink);
     }
 
     void ServiceGUI::scheduleContextRelease(int contextId)

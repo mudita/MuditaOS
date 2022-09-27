@@ -1,7 +1,10 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#pragma once
+
 #include <memory>
+#include <vector>
 
 #include <devices/Device.hpp>
 
@@ -65,8 +68,14 @@ namespace hal::eink
 
         virtual ~AbstractEinkDisplay() = default;
 
-        virtual void setMode(const EinkDisplayColorMode mode) noexcept                                     = 0;
-        virtual EinkStatus showImage(std::uint8_t *frameBuffer, const EinkRefreshMode refreshMode)         = 0;
+        virtual void setMode(const EinkDisplayColorMode mode) noexcept                                        = 0;
+        virtual EinkStatus showImageUpdate(const std::vector<EinkFrame> &updateFrames,
+                                           const std::uint8_t *frameBuffer)                                   = 0;
+        virtual EinkStatus showImageRefresh(const EinkFrame &refreshFrame, const EinkRefreshMode refreshMode) = 0;
+        virtual EinkStatus showImage(const std::vector<EinkFrame> &updateFrames,
+                                     const EinkFrame &refreshFrame,
+                                     const std::uint8_t *frameBuffer,
+                                     const EinkRefreshMode refreshMode)                                       = 0;
         virtual void prepareEarlyRequest(EinkRefreshMode refreshMode, const WaveformTemperature behaviour) = 0;
 
         virtual void dither()                                               = 0;
