@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ImageManager.hpp"
@@ -176,27 +176,31 @@ namespace gui
         // Creation of square with crossed lines as fallback image
         constexpr auto squareWidth = 15;
 
-        DrawRectangle rectangle;
-        rectangle.origin = {0, 0};
-        rectangle.width  = squareWidth;
-        rectangle.height = squareWidth;
-        rectangle.areaX  = 0;
-        rectangle.areaY  = 0;
-        rectangle.areaW  = squareWidth;
-        rectangle.areaH  = squareWidth;
+        std::list<std::unique_ptr<gui::DrawCommand>> commands;
+        auto rectangle    = std::make_unique<DrawRectangle>();
+        rectangle->origin = {0, 0};
+        rectangle->width  = squareWidth;
+        rectangle->height = squareWidth;
+        rectangle->areaX  = 0;
+        rectangle->areaY  = 0;
+        rectangle->areaW  = squareWidth;
+        rectangle->areaH  = squareWidth;
+        commands.emplace_back(std::move(rectangle));
 
-        DrawLine line1;
-        line1.start = {0, 0};
-        line1.end   = {squareWidth, squareWidth};
+        auto line1   = std::make_unique<DrawLine>();
+        line1->start = {0, 0};
+        line1->end   = {squareWidth, squareWidth};
+        commands.emplace_back(std::move(line1));
 
-        DrawLine line2;
-        line2.start = {squareWidth - 1, 0};
-        line2.end   = {0, squareWidth - 1};
+        auto line2   = std::make_unique<DrawLine>();
+        line2->start = {squareWidth - 1, 0};
+        line2->end   = {0, squareWidth - 1};
+        commands.emplace_back(std::move(line2));
 
-        Context renderContext(squareWidth, squareWidth);
-        Renderer().render(renderContext, rectangle, line1, line2);
+        auto renderContext = std::make_unique<Context>(squareWidth, squareWidth);
+        Renderer().render(renderContext.get(), commands);
 
-        return new PixMap(squareWidth, squareWidth, renderContext.getData());
+        return new PixMap(squareWidth, squareWidth, renderContext->getData());
     }
 
     auto ImageManager::getImageMapList(std::string ext1, std::string ext2)

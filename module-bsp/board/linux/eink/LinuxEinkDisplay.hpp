@@ -15,10 +15,7 @@ namespace hal::eink
 
       private:
         void setMode(const EinkDisplayColorMode mode) noexcept override;
-        EinkStatus showImage(const std::vector<EinkFrame> &updateFrames,
-                             const EinkFrame &refreshFrame,
-                             const std::uint8_t *frameBuffer,
-                             const EinkRefreshMode refreshMode) override;
+        EinkStatus showImage(std::uint8_t *frameBuffer, const EinkRefreshMode refreshMode) override;
         void prepareEarlyRequest(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour) override;
 
         void dither() override;

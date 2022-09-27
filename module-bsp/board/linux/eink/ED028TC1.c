@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /**
@@ -119,7 +119,7 @@ EinkStatus_e EinkResetAndInitialize()
     return EinkOK;
 }
 
-EinkStatus_e EinkUpdateFrame(EinkFrame_t frame, const uint8_t *buffer)
+EinkStatus_e EinkUpdateFrame(EinkFrame_t frame, uint8_t *buffer)
 {
     uint32_t offset_eink   = frame.pos_y * BOARD_EINK_DISPLAY_RES_X + frame.pos_x;
     uint32_t offset_buffer = 0;

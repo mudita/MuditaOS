@@ -138,7 +138,7 @@ static uint8_t s_einkMaskLut_2Bpp[16] = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 
  *
  * @return
  */
-static uint8_t *s_EinkTransformFrameCoordinateSystem_1Bpp(const uint8_t *dataIn,
+static uint8_t *s_EinkTransformFrameCoordinateSystem_1Bpp(uint8_t *dataIn,
                                                           uint16_t windowWidthPx,
                                                           uint16_t windowHeightPx,
                                                           uint8_t *dataOut,
@@ -187,7 +187,7 @@ static uint8_t *s_EinkTransformFrameCoordinateSystem_1Bpp(const uint8_t *dataIn,
  *
  * @return
  */
-static uint8_t *s_EinkTransformFrameCoordinateSystem_2Bpp(const uint8_t *dataIn,
+static uint8_t *s_EinkTransformFrameCoordinateSystem_2Bpp(uint8_t *dataIn,
                                                           uint16_t windowWidthPx,
                                                           uint16_t windowHeightPx,
                                                           uint8_t *dataOut,
@@ -236,7 +236,7 @@ static uint8_t *s_EinkTransformFrameCoordinateSystem_2Bpp(const uint8_t *dataIn,
  *
  * @return
  */
-static uint8_t *s_EinkTransformFrameCoordinateSystem_3Bpp(const uint8_t *dataIn,
+static uint8_t *s_EinkTransformFrameCoordinateSystem_3Bpp(uint8_t *dataIn,
                                                           uint16_t windowWidthPx,
                                                           uint16_t windowHeightPx,
                                                           uint8_t *dataOut,
@@ -285,7 +285,7 @@ static uint8_t *s_EinkTransformFrameCoordinateSystem_3Bpp(const uint8_t *dataIn,
  *
  * @return
  */
-static uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(const uint8_t *dataIn,
+static uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(uint8_t *dataIn,
                                                           uint16_t windowWidthPx,
                                                           uint16_t windowHeightPx,
                                                           uint8_t *dataOut,
@@ -334,7 +334,7 @@ static uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(const uint8_t *dataIn,
  *
  * @return
  */
-static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(const uint8_t *dataIn,
+static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(uint8_t *dataIn,
                                                                    uint16_t windowWidthPx,
                                                                    uint16_t windowHeightPx,
                                                                    uint8_t *dataOut,
@@ -383,7 +383,7 @@ static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(const uint8_t
  *
  * @return
  */
-static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(const uint8_t *dataIn,
+static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(uint8_t *dataIn,
                                                                    uint16_t windowWidthPx,
                                                                    uint16_t windowHeightPx,
                                                                    uint8_t *dataOut,
@@ -432,7 +432,7 @@ static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(const uint8_t
  *
  * @return
  */
-static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(const uint8_t *dataIn,
+static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(uint8_t *dataIn,
                                                                    uint16_t windowWidthPx,
                                                                    uint16_t windowHeightPx,
                                                                    uint8_t *dataOut,
@@ -487,7 +487,7 @@ static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(const uint8_t
  * It is used when EINK_ROTATE_90_CLOCKWISE is not defined.
  */
 
-static uint8_t *s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(const uint8_t *dataIn,
+static uint8_t *s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(uint8_t *dataIn,
                                                                     uint16_t windowWidthPx,
                                                                     uint16_t windowHeightPx,
                                                                     uint8_t *dataOut,
@@ -799,10 +799,7 @@ EinkStatus_e EinkDitherDisplay()
     return EinkOK;
 }
 
-EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
-                             const uint8_t *buffer,
-                             EinkBpp_e bpp,
-                             EinkDisplayColorMode_e invertColors)
+EinkStatus_e EinkUpdateFrame(EinkFrame_t frame, uint8_t *buffer, EinkBpp_e bpp, EinkDisplayColorMode_e invertColors)
 {
     uint8_t buf[10];
     uint8_t pixelsInByte = 8 / bpp;
@@ -1007,7 +1004,7 @@ EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refres
     return EinkOK;
 }
 
-__attribute__((optimize("O3"))) void EinkARGBToLuminance(const uint8_t *dataIn,
+__attribute__((optimize("O3"))) void EinkARGBToLuminance(uint8_t *dataIn,
                                                          uint8_t *dataOut,
                                                          uint32_t displayWidth,
                                                          uint32_t displayHeight)
@@ -1040,7 +1037,7 @@ __attribute__((optimize("O3"))) void EinkARGBToLuminance(const uint8_t *dataIn,
 }
 
 __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_1Bpp(
-    const uint8_t *dataIn,
+    uint8_t *dataIn,
     uint16_t windowWidthPx,
     uint16_t windowHeightPx,
     uint8_t *dataOut,
@@ -1087,7 +1084,7 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
 }
 
 __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_2Bpp(
-    const uint8_t *dataIn,
+    uint8_t *dataIn,
     uint16_t windowWidthPx,
     uint16_t windowHeightPx,
     uint8_t *dataOut,
@@ -1138,7 +1135,7 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
 }
 
 __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_3Bpp(
-    const uint8_t *dataIn,
+    uint8_t *dataIn,
     uint16_t windowWidthPx,
     uint16_t windowHeightPx,
     uint8_t *dataOut,
@@ -1149,7 +1146,7 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
 }
 
 __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(
-    const uint8_t *dataIn,
+    uint8_t *dataIn,
     uint16_t windowWidthPx,
     uint16_t windowHeightPx,
     uint8_t *dataOut,
@@ -1196,7 +1193,7 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoo
 }
 
 __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(
-    const uint8_t *dataIn,
+    uint8_t *dataIn,
     uint16_t windowWidthPx,
     uint16_t windowHeightPx,
     uint8_t *dataOut,
@@ -1245,7 +1242,7 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoo
 }
 
 __attribute__((optimize("O3"))) static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(
-    const uint8_t *dataIn,
+    uint8_t *dataIn,
     uint16_t windowWidthPx,
     uint16_t windowHeightPx,
     uint8_t *dataOut,
@@ -1256,7 +1253,7 @@ __attribute__((optimize("O3"))) static uint8_t *s_EinkTransformAnimationFrameCoo
 }
 
 __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(
-    const uint8_t *dataIn,
+    uint8_t *dataIn,
     uint16_t windowWidthPx,
     uint16_t windowHeightPx,
     uint8_t *dataOut,
@@ -1303,7 +1300,7 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
 }
 
 __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(
-    const uint8_t *dataIn,
+    uint8_t *dataIn,
     uint16_t windowWidthPx,
     uint16_t windowHeightPx,
     uint8_t *dataOut,
@@ -1318,7 +1315,7 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
     int32_t inputRow   = 0;
     int32_t inputCol   = 0;
 
-    for (inputRow = 0; inputRow < windowHeightPx; ++inputRow) {
+    for (inputRow = 0; inputRow < windowHeightPx - 1; ++inputRow) {
         for (inputCol = windowWidthPx - 7; inputCol >= 0; inputCol -= pixelsInByte) {
             // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better
             // performance.

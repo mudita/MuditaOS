@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,14 +34,10 @@ namespace gui
          */
 
       public:
-        void changeColorScheme(const std::unique_ptr<ColorScheme> &scheme) const;
-        void render(Context *ctx, const std::list<std::unique_ptr<DrawCommand>> &commands) const;
+        virtual ~Renderer() = default;
 
-        template <typename... Commands>
-        void render(Context &ctx, const Commands &...commands) const
-        {
-            (..., commands.draw(&ctx));
-        }
+        void render(Context *ctx, std::list<std::unique_ptr<DrawCommand>> &commands);
+        void changeColorScheme(const std::unique_ptr<ColorScheme> &scheme);
     };
 
 } /* namespace gui */

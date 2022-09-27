@@ -47,19 +47,9 @@ namespace hal::eink
         displayColorMode = mode;
     }
 
-    EinkStatus LinuxEinkDisplay::showImage(const std::vector<EinkFrame> &updateFrames,
-                                           const EinkFrame &refreshFrame,
-                                           const std::uint8_t *frameBuffer,
-                                           const EinkRefreshMode refreshMode)
+    EinkStatus LinuxEinkDisplay::showImage(std::uint8_t *frameBuffer, const EinkRefreshMode refreshMode)
     {
-        for (const EinkFrame &frame : updateFrames) {
-            const std::uint8_t *buffer = frameBuffer + frame.pos_y * frame.size.width;
-            const auto status          = translateStatus(
-                EinkUpdateFrame({frame.pos_x, frame.pos_y, frame.size.width, frame.size.height}, buffer));
-            if (status != EinkStatus::EinkOK)
-                return status;
-        }
-        return EinkStatus::EinkOK;
+        return translateStatus(EinkUpdateFrame(EinkFrame_t{0, 0, size.width, size.height}, frameBuffer));
     }
 
     void LinuxEinkDisplay::prepareEarlyRequest([[maybe_unused]] const EinkRefreshMode refreshMode,

@@ -12,7 +12,6 @@
 
 #### UI/UX:
 * UI update (Home Screen settings).
-* Implemented partial refresh of the display.
 
 #### Translations:
 * Completed missing translations.

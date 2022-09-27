@@ -4,10 +4,10 @@
 #include "EinkDisplay.hpp"
 
 #include <board/BoardDefinitions.hpp>
+
 #include <log/log.hpp>
 
 #include <gsl/util>
-
 #include <stdexcept>
 #include <cstdio>
 #include <cstring>
@@ -132,15 +132,15 @@ namespace hal::eink
         delete[] currentWaveform.LUTDData;
     }
 
-    EinkStatus EinkDisplay::updateDisplay(EinkFrame frame, const std::uint8_t *frameBuffer)
+    EinkStatus EinkDisplay::updateDisplay(std::uint8_t *frameBuffer, [[maybe_unused]] const EinkRefreshMode refreshMode)
     {
-        return update(frame, frameBuffer);
+        return update(frameBuffer);
     }
 
-    EinkStatus EinkDisplay::refreshDisplay(EinkFrame frame, const EinkRefreshMode refreshMode)
+    EinkStatus EinkDisplay::refreshDisplay(const EinkRefreshMode refreshMode)
     {
         const auto isDeepRefresh = refreshMode == EinkRefreshMode::REFRESH_DEEP;
-        return refresh(frame, isDeepRefresh ? EinkDisplayTimingsDeepCleanMode : EinkDisplayTimingsFastRefreshMode);
+        return refresh(isDeepRefresh ? EinkDisplayTimingsDeepCleanMode : EinkDisplayTimingsFastRefreshMode);
     }
 
     EinkStatus EinkDisplay::prepareDisplay(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour)
@@ -160,27 +160,20 @@ namespace hal::eink
         return setWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
     }
 
-    EinkStatus EinkDisplay::showImage(const std::vector<EinkFrame> &updateFrames,
-                                      const EinkFrame &refreshFrame,
-                                      const std::uint8_t *frameBuffer,
-                                      const EinkRefreshMode refreshMode)
+    EinkStatus EinkDisplay::showImage(std::uint8_t *frameBuffer, const EinkRefreshMode refreshMode)
     {
         if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
             status != EinkStatus::EinkOK) {
             return status;
         }
 
-        for (const EinkFrame &frame : updateFrames) {
-            const std::uint8_t *buffer = frameBuffer + frame.pos_y * frame.size.width;
-            if (const auto status = updateDisplay(frame, buffer); status != EinkStatus::EinkOK) {
-                return status;
-            }
-        }
-
-        if (const auto status = refreshDisplay(refreshFrame, refreshMode); status != EinkStatus::EinkOK) {
+        if (const auto status = updateDisplay(frameBuffer, refreshMode); status != EinkStatus::EinkOK) {
             return status;
         }
 
+        if (const auto status = refreshDisplay(refreshMode); status != EinkStatus::EinkOK) {
+            return status;
+        }
         return EinkStatus::EinkOK;
     }
 
@@ -225,13 +218,12 @@ namespace hal::eink
         EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite);
     }
 
-    EinkStatus EinkDisplay::update(EinkFrame frame, const std::uint8_t *displayBuffer)
+    EinkStatus EinkDisplay::update(std::uint8_t *displayBuffer)
     {
-        return translateStatus(
-            EinkUpdateFrame(EinkFrame_t{frame.pos_x, frame.pos_y, frame.size.width, frame.size.height},
-                            displayBuffer,
-                            getCurrentBitsPerPixelFormat(),
-                            translateDisplayColorMode(displayMode)));
+        return translateStatus(EinkUpdateFrame(EinkFrame_t{0, 0, size.width, size.height},
+                                               displayBuffer,
+                                               getCurrentBitsPerPixelFormat(),
+                                               translateDisplayColorMode(displayMode)));
     }
 
     EinkBpp_e EinkDisplay::getCurrentBitsPerPixelFormat() const noexcept
@@ -242,11 +234,10 @@ namespace hal::eink
         return Eink4Bpp;
     }
 
-    EinkStatus EinkDisplay::refresh(EinkFrame frame, const EinkDisplayTimingsMode_e refreshMode)
+    EinkStatus EinkDisplay::refresh(const EinkDisplayTimingsMode_e refreshMode)
     {
         currentWaveform.useCounter += 1;
-        return translateStatus(
-            EinkRefreshImage(EinkFrame_t{frame.pos_x, frame.pos_y, frame.size.width, frame.size.height}, refreshMode));
+        return translateStatus(EinkRefreshImage(EinkFrame_t{0, 0, size.width, size.height}, refreshMode));
     }
 
     bool EinkDisplay::isNewWaveformNeeded(const EinkWaveforms_e newMode, const std::int32_t newTemperature) const

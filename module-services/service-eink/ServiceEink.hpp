@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <module-gui/gui/core/Context.hpp>
 #include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
@@ -69,8 +68,6 @@ namespace service::eink
         sys::TimerHandle displayPowerOffTimer;
         std::shared_ptr<EinkSentinel> eInkSentinel;
         std::unique_ptr<settings::Settings> settings;
-        std::unique_ptr<::gui::Context> previousContext;
-        hal::eink::EinkRefreshMode previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
     };
 } // namespace service::eink
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -11,97 +11,83 @@
 #ifndef GUI_CORE_CONTEXT_HPP_
 #define GUI_CORE_CONTEXT_HPP_
 
-#include "BoundingBox.hpp"
-
-#include "module-gui/gui/Common.hpp"
-
 #include <cstdint>
-#include <deque>
 #include <iostream>
-#include <memory>
+#include "module-gui/gui/Common.hpp"
 
 namespace gui
 {
+
     class Context
     {
-        static constexpr std::uint8_t clearColor = 15;
+      protected:
+        int16_t x, y;
+        uint32_t w, h;
+        uint8_t *data;
 
       public:
-        Context() = default;
-        Context(std::uint16_t width, std::uint16_t height);
+        Context();
+        Context(uint16_t width, uint16_t height);
+        virtual ~Context();
 
         /**
-         * @brief Creates new context using provided coordinates. If there is no common part Context filled with
-         * clearColor is returned. The size of the returned context is defiend by parameters, so it may represent
-         * area outside the original context.
+         * @brief Creates new context using provided coordinates. If there is no common part Context with 0 width and 0
+         * height is returned.
          */
-        Context get(std::int16_t gx, std::int16_t gy, std::uint16_t width, std::uint16_t height) const;
+        Context *get(int16_t gx, int16_t gy, uint16_t width, uint16_t height);
         /**
          * @brief Pastes provided context into current one. Overlapping content will be inserted into current context.
          */
-        void insert(std::int16_t ix, std::int16_t iy, const Context &context);
+        void insert(int16_t ix, int16_t iy, Context *context);
         /**
          * @brief Pastes provided context into current one. Overlapping content will be inserted into current context.
          */
-        void insertArea(std::int16_t ix,
-                        std::int16_t iy,
-                        std::int16_t iareaX,
-                        std::int16_t iareaY,
-                        std::int16_t iareaW,
-                        std::int16_t iareaH,
-                        const Context &context);
-
-        /**
-         * @brief Calculate regions of difference between contexts. Each bounding box covers the whole width of the
-         * context. They are disjoint and sorted by y coordinate. The contexts has to have the same sizes.
-         */
-        static std::deque<BoundingBox> linesDiffs(const gui::Context &ctx1, const gui::Context &ctx2);
-
+        void insertArea(
+            int16_t ix, int16_t iy, int16_t iareaX, int16_t iareaY, int16_t iareaW, int16_t iareaH, Context *context);
         /**
          * @brief Fills whole context with specified colour;
          */
-        void fill(std::uint8_t colour);
+        void fill(uint8_t colour);
         /**
          * @brief returns pointer to context's data;
          */
-        inline const std::uint8_t *getData() const
+        inline const uint8_t *getData() const
         {
-            return data.get();
+            return data;
         }
-        inline std::uint8_t *getData()
+        inline uint8_t *getData()
         {
-            return data.get();
+            return data;
         }
-        inline std::uint16_t getW() const
+        inline int16_t getX() const
+        {
+            return x;
+        }
+        inline int16_t getY() const
+        {
+            return y;
+        }
+        inline uint16_t getW() const
         {
             return w;
         }
-        inline std::uint16_t getH() const
+        inline uint16_t getH() const
         {
             return h;
         }
-        inline BoundingBox getBoundingBox() const
+
+        inline bool addressInData(const uint8_t *ptr) const
         {
-            return {0, 0, w, h};
+            return (ptr >= data) && (ptr < data + w * h);
         }
 
-        inline std::uint8_t getPixel(const Point point, uint8_t defaultColor = clearColor) const
+        inline bool addressInData(const Point point) const noexcept
         {
-            return hasPixel(point) ? data[point.y * w + point.x] : defaultColor;
-        }
-
-        inline bool hasPixel(const Point point) const noexcept
-        {
-            return (point.x >= 0 && static_cast<std::uint32_t>(point.x) < w) &&
-                   (point.y >= 0 && static_cast<std::uint32_t>(point.y) < h);
+            return (point.x >= 0 && static_cast<uint32_t>(point.x) <= w) &&
+                   (point.y >= 0 && static_cast<uint32_t>(point.y) <= h);
         }
 
         friend std::ostream &operator<<(std::ostream &out, const Context &c);
-
-      private:
-        std::uint32_t w = 0;
-        std::uint32_t h = 0;
-        std::unique_ptr<uint8_t[]> data;
     };
 
 } /* namespace gui */
