@@ -9,6 +9,7 @@
 #include <endpoints/message/Sender.hpp>
 #include <purefs/filesystem_paths.hpp>
 
+#include <sys/statvfs.h>
 #include <filesystem>
 
 namespace sdesktop::endpoints
@@ -208,6 +209,15 @@ namespace sdesktop::endpoints
             return ResponseContext{.status = code};
         }
 
+        auto freeSpaceLeftForUserFilesMiB = getFreeSpaceForUserFilesMiB();
+        constexpr auto bytesInMebibyte    = 1048576;
+
+        if (fileSize / bytesInMebibyte > freeSpaceLeftForUserFilesMiB) {
+            LOG_ERROR("Not enough space left on device!");
+            code = http::Code::InsufficientStorage;
+            return ResponseContext{.status = code};
+        }
+
         if (!std::filesystem::exists(filePath)) {
             LOG_DEBUG("Creating file %s", filePath.c_str());
 
@@ -330,5 +340,21 @@ namespace sdesktop::endpoints
 
         json11::Json::object response({{directory, jsonArr}});
         return ResponseContext{.status = http::Code::OK, .body = response};
+    }
+
+    auto FS_Helper::getFreeSpaceForUserFilesMiB() const -> unsigned long
+    {
+        const auto userDiskPath = purefs::dir::getUserDiskPath();
+
+        std::unique_ptr<struct statvfs> vfstat = std::make_unique<struct statvfs>();
+        if (statvfs(userDiskPath.c_str(), vfstat.get()) < 0) {
+            return 0;
+        }
+
+        unsigned long freeMbytes =
+            (static_cast<std::uint64_t>(vfstat->f_bfree) * static_cast<std::uint64_t>(vfstat->f_bsize)) /
+                (1024LLU * 1024LLU) -
+            purefs::userSpaceOffset;
+        return freeMbytes;
     }
 } // namespace sdesktop::endpoints
