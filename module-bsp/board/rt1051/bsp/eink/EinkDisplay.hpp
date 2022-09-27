@@ -26,10 +26,7 @@ namespace hal::eink
         ~EinkDisplay() noexcept;
 
         void setMode(EinkDisplayColorMode mode) noexcept override;
-        EinkStatus showImage(const std::vector<EinkFrame> &updateFrames,
-                             const EinkFrame &refreshFrame,
-                             const std::uint8_t *frameBuffer,
-                             const EinkRefreshMode refreshMode) override;
+        EinkStatus showImage(std::uint8_t *frameBuffer, const EinkRefreshMode refreshMode) override;
         void prepareEarlyRequest(EinkRefreshMode refreshMode, const WaveformTemperature behaviour) override;
 
         EinkStatus resetAndInit() override;
@@ -51,11 +48,11 @@ namespace hal::eink
 
         std::int32_t getLastTemperature() const noexcept;
 
-        EinkStatus update(EinkFrame frame, const std::uint8_t *displayBuffer);
-        EinkStatus refresh(EinkFrame frame, const EinkDisplayTimingsMode_e refreshMode);
+        EinkStatus update(std::uint8_t *displayBuffer);
+        EinkStatus refresh(const EinkDisplayTimingsMode_e refreshMode);
 
-        EinkStatus updateDisplay(EinkFrame frame, const std::uint8_t *frameBuffer);
-        EinkStatus refreshDisplay(EinkFrame frame, const EinkRefreshMode refreshMode);
+        EinkStatus updateDisplay(std::uint8_t *frameBuffer, const EinkRefreshMode refreshMode);
+        EinkStatus refreshDisplay(const EinkRefreshMode refreshMode);
         EinkStatus prepareDisplay(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour);
 
         FrameSize size;

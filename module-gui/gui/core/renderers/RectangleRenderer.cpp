@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RectangleRenderer.hpp"
@@ -13,6 +13,19 @@
 
 namespace gui::renderer
 {
+    namespace
+    {
+        std::uint8_t getPixelColor(Context *ctx, const Point &point, std::uint8_t defaultColor)
+        {
+            const auto contextWidth = ctx->getW();
+            const auto position     = point.y * contextWidth + point.x;
+            if (!ctx->addressInData(ctx->getData() + position)) {
+                return defaultColor;
+            }
+            return *(ctx->getData() + position);
+        }
+    } // namespace
+
     auto RectangleRenderer::DrawableStyle::from(const DrawRectangle &command) -> DrawableStyle
     {
         return DrawableStyle{command.penWidth,
@@ -170,7 +183,7 @@ namespace gui::renderer
         while (!q.empty()) {
             const auto currPoint = q.front();
             q.pop();
-            if (const auto color = ctx->getPixel(currPoint, PixelRenderer::getColor(borderColor.intensity));
+            if (const auto color = getPixelColor(ctx, currPoint, PixelRenderer::getColor(borderColor.intensity));
                 color == PixelRenderer::getColor(borderColor.intensity) ||
                 color == PixelRenderer::getColor(fillColor.intensity)) {
                 continue;

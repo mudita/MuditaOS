@@ -239,22 +239,24 @@ namespace gui
         unsupported->xadvance =
             unsupported->width + (2 * unsupported->xoffset); // use xoffset as margins on the left/right of the glyph
         // populate with a bitmap (glyph)
-        DrawRectangle commandRect;
-        commandRect.origin   = {0, 0};
-        commandRect.width    = unsupported->width;
-        commandRect.height   = unsupported->height;
-        commandRect.areaX    = 0;
-        commandRect.areaY    = 0;
-        commandRect.areaW    = unsupported->width;
-        commandRect.areaH    = unsupported->height;
-        commandRect.penWidth = unsupported->xoffset;
+        auto commandRect      = std::make_unique<DrawRectangle>();
+        commandRect->origin   = {0, 0};
+        commandRect->width    = unsupported->width;
+        commandRect->height   = unsupported->height;
+        commandRect->areaX    = 0;
+        commandRect->areaY    = 0;
+        commandRect->areaW    = unsupported->width;
+        commandRect->areaH    = unsupported->height;
+        commandRect->penWidth = unsupported->xoffset;
 
-        Context renderCtx(unsupported->width, unsupported->height);
-        Renderer().render(renderCtx, commandRect);
+        auto renderCtx = std::make_unique<Context>(unsupported->width, unsupported->height);
+        std::list<std::unique_ptr<gui::DrawCommand>> commands;
+        commands.emplace_back(std::move(commandRect));
+        Renderer().render(renderCtx.get(), commands);
 
         auto size         = unsupported->width * unsupported->height;
         unsupported->data = new uint8_t[size];
-        std::memcpy(unsupported->data, renderCtx.getData(), size);
+        std::memcpy(unsupported->data, renderCtx->getData(), size);
     }
 
     void RawFont::setFallbackFont(RawFont *fallback)

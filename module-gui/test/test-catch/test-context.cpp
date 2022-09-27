@@ -14,63 +14,77 @@
 
 TEST_CASE("test context size and position")
 {
-    auto ctx = gui::Context(30, 30);
-    ctx.fill(0);
+    auto ctx = new gui::Context(30, 30);
+    ctx->fill(0);
 
-    gui::Context test = ctx.get(17, 17, 30, 30);
+    gui::Context *test = ctx->get(17, 17, 30, 30);
 
-    test = ctx.get(-17, -17, 30, 30);
+    delete test;
+    test = ctx->get(-17, -17, 30, 30);
+    delete test;
+
+    delete ctx;
 }
 
 TEST_CASE("insertContextTest")
 {
 
-    gui::Context dstCtx;
-    gui::Context insCtx;
+    gui::Context *dstCtx;
+    gui::Context *insCtx;
 
     SECTION("RECTANGLE INSIDE")
     {
-        dstCtx = gui::Context(30, 30);
-        dstCtx.fill(0);
-        insCtx = gui::Context(28, 28);
-        insCtx.fill(15);
-        dstCtx.insert(1, 1, insCtx);
+        dstCtx = new gui::Context(30, 30);
+        dstCtx->fill(0);
+        insCtx = new gui::Context(static_cast<unsigned short>(28), static_cast<unsigned short>(28));
+        insCtx->fill(15);
+        dstCtx->insert(1, 1, insCtx);
+        delete dstCtx;
+        delete insCtx;
     }
 
     SECTION("2 COLUMNS ON RIGHT SIDE, TOP AND BOTTOM ROW UNTOUCHED")
     {
-        dstCtx = gui::Context(30, 30);
-        dstCtx.fill(0);
-        insCtx = gui::Context(28, 28);
-        insCtx.fill(15);
-        dstCtx.insert(28, 1, insCtx);
+        dstCtx = new gui::Context(static_cast<unsigned short>(30), static_cast<unsigned short>(30));
+        dstCtx->fill(0);
+        insCtx = new gui::Context(static_cast<unsigned short>(28), static_cast<unsigned short>(28));
+        insCtx->fill(15);
+        dstCtx->insert(28, 1, insCtx);
+        delete dstCtx;
+        delete insCtx;
     }
 
     SECTION("2 COLUMNS ON LEFT SIDE, TOP AND BOTTOM ROW UNTOUCHED")
     {
-        dstCtx = gui::Context(30, 30);
-        dstCtx.fill(0);
-        insCtx = gui::Context(28, 28);
-        insCtx.fill(15);
-        dstCtx.insert(-26, 1, insCtx);
+        dstCtx = new gui::Context(static_cast<unsigned short>(30), static_cast<unsigned short>(30));
+        dstCtx->fill(0);
+        insCtx = new gui::Context(static_cast<unsigned short>(28), static_cast<unsigned short>(28));
+        insCtx->fill(15);
+        dstCtx->insert(-26, 1, insCtx);
+        delete dstCtx;
+        delete insCtx;
     }
 
     SECTION("2 COLUMNS ON RIGHT SIDE")
     {
-        dstCtx = gui::Context(30, 30);
-        dstCtx.fill(0);
-        insCtx = gui::Context(32, 32);
-        insCtx.fill(15);
-        dstCtx.insert(28, -1, insCtx);
+        dstCtx = new gui::Context(static_cast<unsigned short>(30), static_cast<unsigned short>(30));
+        dstCtx->fill(0);
+        insCtx = new gui::Context(static_cast<unsigned short>(32), static_cast<unsigned short>(32));
+        insCtx->fill(15);
+        dstCtx->insert(28, -1, insCtx);
+        delete dstCtx;
+        delete insCtx;
     }
 
     SECTION("2 COLUMNS ON LEFT SIDE")
     {
-        dstCtx = gui::Context(30, 30);
-        dstCtx.fill(0);
-        insCtx = gui::Context(32, 32);
-        insCtx.fill(15);
-        dstCtx.insert(-30, -1, insCtx);
+        dstCtx = new gui::Context(static_cast<unsigned short>(30), static_cast<unsigned short>(30));
+        dstCtx->fill(0);
+        insCtx = new gui::Context(static_cast<unsigned short>(32), static_cast<unsigned short>(32));
+        insCtx->fill(15);
+        dstCtx->insert(-30, -1, insCtx);
+        delete dstCtx;
+        delete insCtx;
     }
 }
 
@@ -110,7 +124,7 @@ TEST_CASE("Draw vector image test")
                                                    "ffffffffffffffffffffffffffffffff\n"
                                                    "ffffffffffffffffffffffffffffffff\n";
 
-    auto context = gui::Context(32, 32);
+    auto context = std::make_unique<gui::Context>(static_cast<unsigned short>(32), static_cast<unsigned short>(32));
 
     gui::ImageManager::getInstance().init(".");
     auto id                 = gui::ImageManager::getInstance().getImageMapID("plus_32px_W_M");
@@ -124,13 +138,13 @@ TEST_CASE("Draw vector image test")
     drawCommand.imageID = id;
     drawCommand.areaH   = 32;
     drawCommand.areaW   = 32;
-    drawCommand.draw(&context);
+    drawCommand.draw(context.get());
     std::string dump;
 
-    std::uint32_t offset = 0;
-    for (std::uint32_t y = 0; y < context.getH(); y++) {
-        for (std::uint32_t x = 0; x < context.getW(); x++) {
-            std::uint32_t value = *(context.getData() + offset);
+    uint32_t offset = 0;
+    for (uint32_t y = 0; y < context->getH(); y++) {
+        for (uint32_t x = 0; x < context->getW(); x++) {
+            uint32_t value = *(context->getData() + offset);
             std::stringstream stream;
             stream << std::hex << value;
             dump.append(stream.str());
