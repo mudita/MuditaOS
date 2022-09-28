@@ -1007,41 +1007,62 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
         }
     }
 
-    if (!rawMessage || qcmgrRetries == at::AtCmdMaxRetries) {
-        LOG_ERROR("!!!! Could not read text message !!!!");
-        retVal = false;
+    if (qcmgrRetries == at::AtCmdMaxRetries) {
+        LOG_ERROR("Could not read text message");
+        return false;
     }
-    else {
-        auto receivedMessages = rawMessage.response.size();
-        for (std::size_t i = 0; i < receivedMessages; i++) {
-            bool messageParsed = SMSParser::parse(&rawMessage.response[i]);
-            if (messageParsed) {
-                UTF8 decodedMessage;
-                UTF8 smsNumber         = SMSParser::getNumber();
-                std::string smsMessage = SMSParser::getMessage();
 
-                const std::string decodedStr  = utils::hexToBytes<std::string>(smsMessage);
-                const auto mmsNotificationOpt = pdu::parse(decodedStr);
-                if (mmsNotificationOpt) {
-                    std::string number = numberFromAddress(mmsNotificationOpt->fromAddress);
-                    // NOTE: number may be empty
-                    decodedMessage = UTF8("[MMS]");
-                    smsNumber      = UTF8(number);
-                }
+    if (!rawMessage) {
+        LOG_ERROR("AT invalid result: %s", magic_enum::enum_name(rawMessage.code).data());
+        return false;
+    }
 
-                if (decodedMessage.empty()) {
-                    decodedMessage = UCS2(smsMessage).toUTF8();
-                }
-                smsMessage.clear();
+    // The modem should send 3 responses:
+    //  1. Data with phone number, time etc,
+    //  2. Message content
+    //  3. Status: OK, ERROR
+    auto receivedMessages = rawMessage.response.size();
+    if (receivedMessages < 3) {
+        LOG_ERROR("AT response too short: %zu", receivedMessages);
+        return false;
+    }
 
-                auto messageDate  = SMSParser::getTime();
-                const auto record = createSMSRecord(decodedMessage, smsNumber, messageDate);
+    for (std::size_t i = 0; i < receivedMessages; i++) {
+        bool messageParsed = SMSParser::parse(&rawMessage.response[i]);
+        if (messageParsed) {
+            UTF8 decodedMessage;
+            UTF8 smsNumber         = SMSParser::getNumber();
+            std::string smsMessage = SMSParser::getMessage();
 
-                if (!dbAddSMSRecord(record)) {
-                    LOG_ERROR("Failed to add text message to db");
-                    retVal = false;
-                    break;
-                }
+            std::string decodedStr;
+            try {
+                decodedStr = utils::hexToBytes<std::string>(smsMessage);
+            }
+            catch (const std::exception &e) {
+                LOG_ERROR("Decoded SMS: %s", e.what());
+                retVal = false;
+                break;
+            }
+            const auto mmsNotificationOpt = pdu::parse(decodedStr);
+            if (mmsNotificationOpt) {
+                std::string number = numberFromAddress(mmsNotificationOpt->fromAddress);
+                // NOTE: number may be empty
+                decodedMessage = UTF8("[MMS]");
+                smsNumber      = UTF8(number);
+            }
+
+            if (decodedMessage.empty()) {
+                decodedMessage = UCS2(smsMessage).toUTF8();
+            }
+            smsMessage.clear();
+
+            auto messageDate  = SMSParser::getTime();
+            const auto record = createSMSRecord(decodedMessage, smsNumber, messageDate);
+
+            if (!dbAddSMSRecord(record)) {
+                LOG_ERROR("Failed to add text message to db");
+                retVal = false;
+                break;
             }
         }
     }

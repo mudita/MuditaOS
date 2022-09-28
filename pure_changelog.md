@@ -8,6 +8,7 @@
 * Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
+* Fixed receiving an empty SMS message
 * Fixed issue with inability to send SMS
 * Fixed mixed SMS messages
 * Fixed disappearing manual alarm and vibration volume setting in German
