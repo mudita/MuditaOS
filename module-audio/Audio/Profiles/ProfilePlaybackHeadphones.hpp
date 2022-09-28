@@ -14,7 +14,7 @@ namespace audio
             : Profile(
                   "Playback Headphones",
                   Type::PlaybackHeadphones,
-                  purefs::dir::getUserDiskPath() / "data/equalizer/headphones_playback.json",
+                  purefs::dir::getCurrentOSPath() / "user/data/equalizer/headphones_playback.json",
                   audio::codec::Configuration{
                       .sampleRate_Hz = 0,
                       .bitWidth      = 16,
