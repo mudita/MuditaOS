@@ -26,7 +26,7 @@ namespace gui
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        hour = new UIntegerSpinner(UIntegerSpinner::range{hourMin, hourMax, hourStep}, Boundaries::Continuous);
+        hour = new U8IntegerSpinner(U8IntegerSpinner::range{hourMin, hourMax, hourStep}, Boundaries::Continuous);
         updateFont(hour, noFocusFontName);
 
         hour->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
@@ -42,8 +42,8 @@ namespace gui
         colon->setEdges(RectangleEdge::None);
         colon->activeItem = false;
 
-        minute = new UIntegerSpinnerFixed(UIntegerSpinnerFixed::range{minuteMin, minuteMax, minuteStep},
-                                          Boundaries::Continuous);
+        minute = new U8IntegerSpinnerFixed(U8IntegerSpinnerFixed::range{minuteMin, minuteMax, minuteStep},
+                                           Boundaries::Continuous);
         updateFont(minute, noFocusFontName);
         minute->setPenFocusWidth(style::time_set_spinner::focus::size);
 
@@ -221,7 +221,7 @@ namespace gui
     auto TimeSetSpinner::setHourRange(std::uint32_t min, std::uint32_t max) -> void
     {
         hour->set_range(
-            UIntegerSpinner::range{static_cast<std::uint8_t>(min), static_cast<std::uint8_t>(max), hourStep});
+            U8IntegerSpinner::range{static_cast<std::uint8_t>(min), static_cast<std::uint8_t>(max), hourStep});
     }
 
     auto TimeSetSpinner::getColonImage(const std::string &colonFont) const noexcept -> std::string

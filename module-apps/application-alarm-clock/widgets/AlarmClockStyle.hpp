@@ -26,21 +26,21 @@ namespace style::alarmClock
 
         namespace item
         {
-            inline constexpr auto height         = 100;
-            inline constexpr auto botMargin      = 4;
-            inline constexpr auto imageMargin    = 150;
-            inline constexpr auto timeHeight     = 60 - style::margins::small;
-            inline constexpr auto periodHeight   = 40;
+            inline constexpr auto height       = 100;
+            inline constexpr auto botMargin    = 4;
+            inline constexpr auto imageMargin  = 150;
+            inline constexpr auto timeHeight   = 60 - style::margins::small;
+            inline constexpr auto periodHeight = 40;
 
             namespace time
             {
-                inline constexpr auto width        = style::listview::item_width_with_without_scroll;
-                inline constexpr auto height       = 80;
-                inline constexpr auto marginTop    = 32;
-                inline constexpr auto marginBot    = 20;
-                inline constexpr auto separator    = 30;
+                inline constexpr auto width     = style::listview::item_width_with_without_scroll;
+                inline constexpr auto height    = 80;
+                inline constexpr auto marginTop = 32;
+                inline constexpr auto marginBot = 20;
+                inline constexpr auto separator = 30;
             } // namespace time
-        } // namespace item
+        }     // namespace item
 
     } // namespace window
 } // namespace style::alarmClock

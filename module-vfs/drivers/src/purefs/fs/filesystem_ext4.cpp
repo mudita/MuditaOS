@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <memory>
@@ -27,7 +27,8 @@ namespace purefs::fs::drivers
 {
     namespace
     {
-        template <typename T, typename... Args> auto invoke_efs(filesystem_ext4::fsfile zfil, T efs_fun, Args &&...args)
+        template <typename T, typename... Args>
+        auto invoke_efs(filesystem_ext4::fsfile zfil, T efs_fun, Args &&...args)
         {
             auto vfile = std::dynamic_pointer_cast<file_handle_ext4>(zfil);
             if (!vfile) {
@@ -70,7 +71,8 @@ namespace purefs::fs::drivers
             auto err = efs_fun(native_path.c_str(), std::forward<Args>(args)...);
             return -err;
         }
-        template <typename T, typename... Args> auto invoke_efs(filesystem_ext4::fsdir zdir, T lfs_fun, Args &&...args)
+        template <typename T, typename... Args>
+        auto invoke_efs(filesystem_ext4::fsdir zdir, T lfs_fun, Args &&...args)
         {
             auto vdir = std::dynamic_pointer_cast<directory_handle_ext4>(zdir);
             if (!vdir) {

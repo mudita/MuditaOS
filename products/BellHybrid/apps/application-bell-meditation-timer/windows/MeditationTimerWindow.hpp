@@ -31,7 +31,7 @@ namespace app::meditation
       private:
         std::unique_ptr<app::meditation::MeditationTimerContract::Presenter> presenter;
         gui::BellBaseLayout *body{};
-        gui::UIntegerSpinner *spinner{};
+        gui::U8IntegerSpinner *spinner{};
         gui::Label *bottomDescription{};
     };
 } // namespace app::meditation

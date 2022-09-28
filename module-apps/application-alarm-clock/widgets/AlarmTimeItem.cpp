@@ -248,7 +248,8 @@ namespace gui
         }
     }
 
-    template <typename T> UTF8 AlarmTimeItem::timeValueToPaddedString(const T &value)
+    template <typename T>
+    UTF8 AlarmTimeItem::timeValueToPaddedString(const T &value)
     {
         std::ostringstream oss;
         oss << std::setw(2) << std::setfill('0') << value;

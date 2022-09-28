@@ -21,7 +21,7 @@
 #include <common/models/LayoutModel.hpp>
 
 #include <application-bell-settings/models/TemperatureUnitModel.hpp>
-#include <application-bell-settings/models/TimeUnitsModel.hpp>
+#include <application-bell-settings/models/DateTimeUnitsModel.hpp>
 #include <application-bell-settings/presenter/TimeUnitsPresenter.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <AppMessage.hpp>
@@ -78,7 +78,7 @@ namespace app
             gui::window::name::onBoardingSettingsWindow, [this](ApplicationCommon *app, const std::string &name) {
                 auto layoutModel          = std::make_unique<bell_settings::LayoutModel>(this);
                 auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
-                auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModelFactoryResetValues>(app);
+                auto timeUnitsProvider    = std::make_shared<bell_settings::DateTimeUnitsModelFactoryResetValues>(app);
                 auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(
                     this, timeUnitsProvider, std::move(temperatureUnitModel), std::move(layoutModel));
                 return std::make_unique<gui::OnBoardingSettingsWindow>(app, std::move(presenter), name);
@@ -206,7 +206,7 @@ namespace app
 
         auto selectedWindowCondition =
             getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow &&
-            msg->getWindowName() == *getPrevWindow() &&
+            msg->getWindowName() == *getPreviousWindow() &&
             msg->getSenderWindowName() == gui::window::name::informationOnBoardingWindow;
 
         if (selectedWindowCondition && informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
@@ -238,7 +238,7 @@ namespace app
                      inputEvent.isKeyRelease(gui::KeyCode::KEY_LEFT)) {
                 informationState = OnBoarding::InformationStates::DeepClickWarningInfo;
                 if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
-                    displayInformation(*getPrevWindow());
+                    displayInformation(*getPreviousWindow());
                 }
                 else {
                     displayInformation(getCurrentWindow()->getName());
@@ -248,7 +248,7 @@ namespace app
                 if (informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
                     informationPromptTimer.stop();
                     informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
-                    displayInformation(*getPrevWindow());
+                    displayInformation(*getPreviousWindow());
                 }
                 else {
                     informationState = OnBoarding::InformationStates::RotateInfo;
@@ -260,13 +260,13 @@ namespace app
                 switch (informationState) {
                 case OnBoarding::InformationStates::DeepClickCorrectionInfo:
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(*getPrevWindow());
+                        switchWindow(*getPreviousWindow());
                         return true;
                     }
                     break;
                 case OnBoarding::InformationStates::LightClickInfo:
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(*getPrevWindow());
+                        switchWindow(*getPreviousWindow());
                         return true;
                     }
                     break;
@@ -274,7 +274,7 @@ namespace app
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) ||
                         inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN) ||
                         inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(*getPrevWindow());
+                        switchWindow(*getPreviousWindow());
                         return true;
                     }
                     break;

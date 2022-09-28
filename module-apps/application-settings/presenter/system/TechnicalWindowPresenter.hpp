@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,7 +14,7 @@ class TechnicalWindowContract
     class View
     {
       public:
-        virtual ~View() noexcept = default;
+        virtual ~View() noexcept          = default;
         virtual void imeiReady() noexcept = 0;
     };
     class Presenter : public app::BasePresenter<TechnicalWindowContract::View>

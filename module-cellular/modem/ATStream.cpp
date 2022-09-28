@@ -99,13 +99,13 @@ namespace at
 
     bool ATStream::checkATEnd()
     {
-        auto pos = atBuffer.rfind(at::delimiter);
+        auto pos                   = atBuffer.rfind(at::delimiter);
         const auto delimiterLength = std::strlen(at::delimiter);
         if (pos != std::string::npos) {
             auto pos2 = atBuffer.rfind(at::delimiter, pos - delimiterLength);
             if (pos2 != std::string::npos) {
                 std::string rr = atBuffer.substr(pos2 + delimiterLength, pos - pos2 - delimiterLength);
-                auto code = parseState(rr, errcode);
+                auto code      = parseState(rr, errcode);
                 if (code != Result::Code::NONE) {
                     result.code = code;
                     return true;
@@ -119,7 +119,7 @@ namespace at
     void ATStream::countLines()
     {
         if (rxCount != 0) {
-            auto pos = atBuffer.find(at::delimiter, lastPos);
+            auto pos                   = atBuffer.find(at::delimiter, lastPos);
             const auto delimiterLength = std::strlen(at::delimiter);
             while (pos != std::string::npos) {
                 /// do not count empty lines, see implementation of utils:split

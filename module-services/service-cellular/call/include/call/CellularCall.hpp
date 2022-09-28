@@ -34,7 +34,7 @@ namespace call
 
     struct CallData
     {
-        CalllogRecord record             = {};
+        CalllogRecord record                  = {};
         sys::phone_modes::PhoneMode mode      = sys::phone_modes::PhoneMode::Uninitialized;
         sys::phone_modes::Tethering tethering = sys::phone_modes::Tethering::Off;
     };
@@ -82,4 +82,4 @@ namespace call
         /// if so - we have ongoing call in handling
         bool active() const;
     };
-} // namespace CellularCall
+} // namespace call

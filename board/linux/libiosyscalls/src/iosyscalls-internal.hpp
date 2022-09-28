@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -37,7 +37,7 @@ namespace vfsn::linux::internal
     bool is_image_DIR(__dirstream *indir);
 
     template <class Base, typename T, typename... Args>
-    auto invoke_fs(T Base::*lfs_fun, Args &&... args)
+    auto invoke_fs(T Base::*lfs_fun, Args &&...args)
         -> decltype((static_cast<Base *>(nullptr)->*lfs_fun)(std::forward<Args>(args)...))
     {
         auto vfs = purefs::subsystem::vfs_core();

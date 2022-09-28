@@ -11,7 +11,8 @@
 
 namespace gui
 {
-    template <typename ValType, size_t Width> struct FixedIntegerFormatter
+    template <typename ValType, size_t Width>
+    struct FixedIntegerFormatter
     {
         std::string operator()(const ValType val) const
         {
@@ -23,11 +24,16 @@ namespace gui
 
     using StringContainer = Model<UTF8>;
     using UINT8Container  = Model<std::uint8_t>;
+    using UINT16Container = Model<std::uint16_t>;
 
-    using StringSpinner        = StringOutputSpinner<StringContainer>;
-    using UIntegerSpinner      = StringOutputSpinner<UINT8Container>;
-    using UIntegerSpinnerFixed = StringOutputSpinner<UINT8Container, FixedIntegerFormatter<std::uint32_t, 2>>;
-    using WidgetSpinner        = ItemSpinner<Model<Item *>>;
-    template <typename T> using UIntegerSpinnerWithFormatter = StringOutputSpinner<UINT8Container, T>;
+    using StringSpinner    = StringOutputSpinner<StringContainer>;
+    using U8IntegerSpinner = StringOutputSpinner<UINT8Container>;
+
+    using U8IntegerSpinnerFixed  = StringOutputSpinner<UINT8Container, FixedIntegerFormatter<std::uint32_t, 2>>;
+    using U16IntegerSpinnerFixed = StringOutputSpinner<UINT16Container, FixedIntegerFormatter<std::uint32_t, 4>>;
+
+    using WidgetSpinner = ItemSpinner<Model<Item *>>;
+    template <typename T>
+    using U8IntegerSpinnerWithFormatter = StringOutputSpinner<UINT8Container, T>;
 
 } // namespace gui

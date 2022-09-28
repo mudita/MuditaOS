@@ -9,8 +9,8 @@ namespace gui
 {
 
     gui::BellSideListItemWithCallbacks::BellSideListItemWithCallbacks(const std::string &description)
-        : BellSideListItem(description)
     {
+        setupTopTextBox(description);
         focusChangedCallback = [&](Item &) {
             OnFocusChangedCallback();
             return true;

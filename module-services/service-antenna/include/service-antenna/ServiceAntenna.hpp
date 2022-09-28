@@ -94,7 +94,8 @@ class ServiceAntenna : public sys::Service
 
 namespace sys
 {
-    template <> struct ManifestTraits<ServiceAntenna>
+    template <>
+    struct ManifestTraits<ServiceAntenna>
     {
         static auto GetManifest() -> ServiceManifest
         {

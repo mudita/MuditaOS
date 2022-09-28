@@ -127,6 +127,7 @@
   "app_alarm_clock_snooze_10_min": "10 min",
   "app_alarm_clock_snooze_15_min": "15 min",
   "app_alarm_clock_custom_repeat_title": "Własne powtarzanie",
+  "app_calendar_title_main": "Kalendarz",
   "common_paused": "Pauza",
   "locale_12hour_min": "%I:%M %p",
   "locale_12hour_min_short": "%I:%M",
@@ -427,6 +428,7 @@
   "app_settings_vibration": "Wibracje",
   "app_settings_sound": "Dźwięk",
   "app_settings_volume": "Głośność",
+  "app_settings_volume_focused": "Głośność",
   "app_settings_call_ringtome": "Dźwięk dzwonka",
   "app_settings_message_sound": "Dźwięk wiadomości",
   "app_settings_notification_sound": "Dźwięk powiadomienia",
@@ -728,5 +730,8 @@
   "app_bell_meditation_chime_interval_bottom": "medytacji",
   "app_bell_meditation_chime_volume": "Głośność dzwonka interwału",
   "app_meditation_summary": "<text>Medytowałeś przez<br />",
-  "app_meditation_countdown_desc": "Startuje za"
+  "app_meditation_countdown_desc": "Startuje za",
+  "app_meditation_summary_total": "<text>Suma:<br /><token>$VALUE</token></text>",
+  "app_meditation_summary_average": "Średnia/dzień:",
+  "app_meditation_summary_title": "<text>Ostatnie <token>$VALUE</token> dni</text>"
 }

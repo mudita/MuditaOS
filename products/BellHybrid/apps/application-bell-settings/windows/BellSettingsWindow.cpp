@@ -74,6 +74,8 @@ namespace gui
                 },
                 this));
         };
+        const std::string bellSettingsTimeUnitsTitle{utils::translate("app_calllog_date") + " & " +
+                                                     utils::translate("app_bell_settings_time_units")};
 
         addWinSettings(
             utils::translate("app_bell_settings_layout"), gui::window::name::bellSettingsLayout, defaultCallback);
@@ -82,8 +84,7 @@ namespace gui
                        defaultCallback);
         addWinSettings(
             utils::translate("app_bell_settings_bedtime_tone"), window::name::bellSettingsBedtimeTone, defaultCallback);
-        addWinSettings(
-            utils::translate("app_bell_settings_time_units"), window::name::bellSettingsTimeUnits, defaultCallback);
+        addWinSettings(bellSettingsTimeUnitsTitle, window::name::bellSettingsTimeUnits, defaultCallback);
         addWinSettings(
             utils::translate("app_bell_settings_language"), gui::window::name::bellSettingsLanguage, defaultCallback);
         addWinSettings(

@@ -98,9 +98,11 @@ namespace app
     };
 
     /// Type traits pattern used to enforce user-defined types to implement "GetManifest" function.
-    template <class T> struct ManifestTraits;
+    template <class T>
+    struct ManifestTraits;
 
-    template <class, class = void> struct HasManifest : std::false_type
+    template <class, class = void>
+    struct HasManifest : std::false_type
     {};
 
     /// Checks whether T implements "GetManifest" static method.
@@ -186,7 +188,7 @@ namespace app
         std::unique_ptr<gui::popup::Filter> popupFilter;
         std::unique_ptr<WindowsStack> windowsStackImpl;
         std::string default_window;
-        State state = State::DEACTIVATED;
+        State state        = State::DEACTIVATED;
         bool phoneIsLocked = false;
 
         sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
@@ -375,7 +377,7 @@ namespace app
         void pushWindow(const std::string &newWindow, const gui::popup::Disposition &d = gui::popup::WindowDisposition);
         /// getter for previous window name
         /// @ingrup AppWindowStack
-        std::optional<std::string> getPrevWindow(uint32_t count = 1) const;
+        std::optional<std::string> getPreviousWindow(std::uint32_t count = 1) const;
         /// clears windows stack
         /// @ingrup AppWindowStack
         void cleanPrevWindw();

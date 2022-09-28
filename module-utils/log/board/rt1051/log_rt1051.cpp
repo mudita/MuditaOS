@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <board.h>
@@ -27,7 +27,7 @@ namespace Log
 
         loggerBufferCurrentPos += vsnprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), fmt, args);
         logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
-        circularBuffer.put(std::string(loggerBuffer, loggerBufferCurrentPos));
+        buffer.getCurrentBuffer()->put(std::string(loggerBuffer, loggerBufferCurrentPos));
     }
 
     void Logger::logToDevice(Device device, std::string_view logMsg, size_t length)

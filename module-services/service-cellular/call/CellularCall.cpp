@@ -50,6 +50,10 @@ namespace call
         if (machine == nullptr) {
             return false;
         };
+        // triggering the sentinel here is necessary to speed up the state machine processing,
+        // as the DND mode is based on quick hangup when the call arrives - thus we can hear some
+        // calling signal if the hangup wasn't fast enough
+        machine->di.sentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
         return machine->machine.process_event(ring);
     }
 
@@ -140,4 +144,4 @@ namespace call
         return machine->active();
     }
 
-} // namespace CellularCall
+} // namespace call

@@ -573,7 +573,7 @@ namespace app
             getCurrentWindow()->onClose(closeReason);
         }
 
-        LOG_DEBUG("Current window: %s vs %s", getCurrentWindow()->getName().c_str(), windowName.c_str());
+        LOG_DEBUG("Request to switch window from %s to %s", getCurrentWindow()->getName().c_str(), windowName.c_str());
         const auto &[name, data] = msg->getSwitchData();
         pushWindow(name, data);
         getCurrentWindow()->handleSwitchData(switchData.get());
@@ -824,7 +824,8 @@ namespace app
             blueprint = popupBlueprintFallback(id);
         }
         if (data->getDisposition().windowtype != gui::popup::Disposition::WindowType::Popup) {
-            LOG_ERROR("setting popup window type to popup - fallback");
+            LOG_ERROR("setting popup window type from %s to popup - fallback",
+                      magic_enum::enum_name(data->getDisposition().windowtype).data());
             data->setDisposition(gui::popup::Disposition{
                 gui::popup::Disposition::Priority::Normal, gui::popup::Disposition::WindowType::Popup, id});
         }
@@ -927,7 +928,7 @@ namespace app
         windowsStack().push(newWindow, windowsFactory.build(this, newWindow), d);
     }
 
-    std::optional<std::string> ApplicationCommon::getPrevWindow(uint32_t count) const
+    std::optional<std::string> ApplicationCommon::getPreviousWindow(std::uint32_t count) const
     {
         return windowsStack().get(count);
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApnOptionsWindow.hpp"
@@ -10,10 +10,10 @@
 
 namespace gui
 {
-    ApnOptionsWindow::ApnOptionsWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, window::name::apn_options)
+    ApnOptionsWindow::ApnOptionsWindow(app::ApplicationCommon *app)
+        : BaseSettingsWindow(app, window::name::apn_options), apnSettingsModel(app)
     {
         setTitle(utils::translate("common_options_title"));
-        apnSettingsModel = new ApnSettingsModel(application);
     }
 
     auto ApnOptionsWindow::buildOptionsList() -> std::list<gui::Option>
@@ -34,7 +34,7 @@ namespace gui
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_apn_options_delete"),
             [=](gui::Item &item) {
-                apnSettingsModel->removeAPN(apn);
+                apnSettingsModel.removeAPN(apn);
                 application->returnToPreviousWindow();
                 return true;
             },
@@ -44,7 +44,7 @@ namespace gui
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_apn_options_set_as_default"),
             [=](gui::Item &item) {
-                apnSettingsModel->setAsDefaultAPN(apn);
+                apnSettingsModel.setAsDefaultAPN(apn);
                 application->returnToPreviousWindow();
                 return true;
             },

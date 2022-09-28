@@ -17,7 +17,9 @@ namespace sys
             auto sentinelWeakPointer = (*sentinel)->GetSentinel();
             // remove expired ptrs
             if (sentinelWeakPointer.expired()) {
-                sentinels.erase(sentinel.base());
+                // shift iterator to point on the correct successor,
+                // without std::next it removes (sentinel - 1) element
+                sentinels.erase(std::next(sentinel).base());
                 continue;
             }
             // call foo on sentinel

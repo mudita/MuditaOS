@@ -39,17 +39,17 @@ TEST_CASE("Thread Record tests")
     ContactsDB contactsDB(contactsPath.c_str());
     REQUIRE(contactsDB.isInitialized());
 
-    const uint32_t dateTest      = 123456789;
-    const char *snippetTest      = "Test snippet";
-    const char *snippetTest2     = "Test snippet2";
-    const SMSType typeTest       = SMSType::UNKNOWN;
+    const uint32_t dateTest  = 123456789;
+    const char *snippetTest  = "Test snippet";
+    const char *snippetTest2 = "Test snippet2";
+    const SMSType typeTest   = SMSType::UNKNOWN;
 
     ThreadRecordInterface threadRecordInterface1(&smsDB, &contactsDB);
 
     ThreadRecord recordIN;
-    recordIN.date      = dateTest;
-    recordIN.snippet   = snippetTest;
-    recordIN.type      = typeTest;
+    recordIN.date    = dateTest;
+    recordIN.snippet = snippetTest;
+    recordIN.type    = typeTest;
 
     const auto threadRecords = threadRecordInterface1.GetCount() + 1;
     // clear all records

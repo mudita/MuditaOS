@@ -24,7 +24,7 @@ void ConnectionManager::onTimerTick()
     minutesOfflineElapsed++;
     if (minutesOfflineElapsed.count() >= connectionInterval.count()) {
         minutesOfflineElapsed = static_cast<std::chrono::minutes>(0);
-        onlinePeriod = true;
+        onlinePeriod          = true;
         cellular->holdMinimumCpuFrequency();
         cellular->connectToNetwork();
         return;
@@ -42,8 +42,8 @@ void ConnectionManager::onTimerTick()
 
 void ConnectionManager::setInterval(const std::chrono::minutes interval)
 {
-    connectionInterval   = interval;
-    minutesOnlineElapsed = static_cast<std::chrono::minutes>(0);
+    connectionInterval    = interval;
+    minutesOnlineElapsed  = static_cast<std::chrono::minutes>(0);
     minutesOfflineElapsed = static_cast<std::chrono::minutes>(0);
 }
 
@@ -77,7 +77,7 @@ auto ConnectionManager::handleModeChangeToCommonOffline() -> bool
 
     failRetries           = 0;
     minutesOfflineElapsed = static_cast<std::chrono::minutes>(0);
-    minutesOnlineElapsed = static_cast<std::chrono::minutes>(0);
+    minutesOnlineElapsed  = static_cast<std::chrono::minutes>(0);
 
     if (isMessagesOnlyMode()) {
         handleModeChangeToMessageOnlyMode();

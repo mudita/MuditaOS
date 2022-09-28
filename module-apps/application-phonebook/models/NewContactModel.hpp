@@ -14,7 +14,7 @@
 class NewContactModel : public app::InternalModel<gui::ContactListItem *>, public gui::ListItemProvider
 {
   private:
-    app::ApplicationCommon *application = nullptr;
+    app::ApplicationCommon *application        = nullptr;
     PhonebookItemData::RequestType requestType = PhonebookItemData::RequestType::Internal;
 
     void openTextOptions(gui::Text *text);

@@ -15,8 +15,8 @@ namespace gui
 
     void QuotesPresenter::requestQuote()
     {
-        auto query             = std::make_unique<Quotes::Messages::ReadRandomizedQuoteRequest>();
-        auto task              = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+        auto query = std::make_unique<Quotes::Messages::ReadRandomizedQuoteRequest>();
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->setCallback([this](auto response) { return onQuoteRetreived(response); });
         task->execute(application, this);
     }

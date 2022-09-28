@@ -18,7 +18,7 @@ namespace alarms
         {
           public:
             explicit ManualFrontlightAction(sys::Service &service);
-            bool execute(Record record) override;
+            bool execute() override;
             bool turnOff() override;
 
           private:
@@ -31,7 +31,7 @@ namespace alarms
         {
           public:
             explicit LinearProgressFrontlightAction(sys::Service &service);
-            bool execute(Record record) override;
+            bool execute() override;
             bool turnOff() override;
 
           private:
@@ -60,7 +60,7 @@ namespace alarms
                                                                     service::ServiceProxy{service.weak_from_this()}}
     {}
 
-    bool FrontlightAction::execute([[maybe_unused]] Record record)
+    bool FrontlightAction::execute()
     {
         std::string settingString;
 
@@ -84,7 +84,7 @@ namespace alarms
         case SettingsDependency::None:
             break;
         }
-        return pimpl->execute(record);
+        return pimpl->execute();
     }
 
     bool FrontlightAction::turnOff()
@@ -109,7 +109,7 @@ namespace alarms
     ManualFrontlightAction::ManualFrontlightAction(sys::Service &service) : service{service}
     {}
 
-    bool ManualFrontlightAction::execute([[maybe_unused]] Record record)
+    bool ManualFrontlightAction::execute()
     {
         auto params = prepareParameters();
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
@@ -136,7 +136,7 @@ namespace alarms
         settings.init(service::ServiceProxy{service.weak_from_this()});
     }
 
-    bool LinearProgressFrontlightAction::execute([[maybe_unused]] Record record)
+    bool LinearProgressFrontlightAction::execute()
     {
         const auto params = prepareParameters();
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightSetAutoProgressiveModeParams>(params),

@@ -8,8 +8,6 @@
 
 #include <Audio/Audio.hpp>
 #include <Audio/AudioMux.hpp>
-#include <MessageType.hpp>
-#include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <Service/Service.hpp>
@@ -127,13 +125,14 @@ class ServiceAudio : public sys::Service
     auto handleA2DPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleHFPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
-    auto handleA2DPAudioPause() -> sys::MessagePointer;
-    auto handleA2DPAudioStart() -> sys::MessagePointer;
+    auto handleMultimediaAudioPause() -> sys::MessagePointer;
+    auto handleMultimediaAudioStart() -> sys::MessagePointer;
 };
 
 namespace sys
 {
-    template <> struct ManifestTraits<ServiceAudio>
+    template <>
+    struct ManifestTraits<ServiceAudio>
     {
         static auto GetManifest() -> ServiceManifest
         {

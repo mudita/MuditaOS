@@ -72,7 +72,7 @@ extern "C"
 /**
  * Log functions (one per level).
  */
-#define LOG_PRINTF(...)              log_Printf(__VA_ARGS__)
+#define LOG_PRINTF(...) log_Printf(__VA_ARGS__)
 #ifndef LOG_IGNORE_ALL
 #define LOG_TRACE(...)               log_Log(LOGTRACE, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 #define LOG_DEBUG(...)               log_Log(LOGDEBUG, __FILENAME__, __LINE__, __func__, __VA_ARGS__)

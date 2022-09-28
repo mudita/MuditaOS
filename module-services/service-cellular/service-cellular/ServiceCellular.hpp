@@ -133,8 +133,6 @@ class ServiceCellular : public sys::Service
     /// URC GSM notification handler
     std::optional<std::shared_ptr<sys::Message>> identifyNotification(const std::string &data);
 
-    std::vector<std::string> messageParts;
-
     std::unique_ptr<call::Call> ongoingCall;
     std::vector<CalllogRecord> tetheringCalllog;
 
@@ -203,7 +201,7 @@ class ServiceCellular : public sys::Service
     [[nodiscard]] bool receiveAllMessages();
     /// @}
 
-    bool transmitDtmfTone(DTMFCode digit);
+    bool transmitDtmfTone(DTMFCode code);
     /// Handle message CellularGetChannelMessage
     void handle_CellularGetChannelMessage();
 
@@ -320,7 +318,8 @@ class ServiceCellular : public sys::Service
 
 namespace sys
 {
-    template <> struct ManifestTraits<ServiceCellular>
+    template <>
+    struct ManifestTraits<ServiceCellular>
     {
         static auto GetManifest() -> ServiceManifest
         {

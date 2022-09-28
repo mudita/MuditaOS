@@ -77,7 +77,7 @@ namespace cellular::internal
          * Request message handlers
          */
         owner->connect(typeid(request::sim::SetActiveSim), [&](sys::Message *request) -> sys::MessagePointer {
-            auto msg = static_cast<request::sim::SetActiveSim *>(request);
+            auto msg    = static_cast<request::sim::SetActiveSim *>(request);
             auto result = simCard->handleSetActiveSim(msg->sim);
             owner->simTimer.start();
             simCard->handleSimCardSelected();
@@ -294,6 +294,8 @@ namespace cellular::internal
             if (!checkSmsCenter(*channel)) {
                 LOG_ERROR("SMS center check failed");
             }
+            // Perform soft reset because sometimes the modem is not able to send next messages
+            modemResetHandler->performSoftReset();
         }
 
         DBServiceAPI::GetQuery(

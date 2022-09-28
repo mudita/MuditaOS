@@ -34,7 +34,7 @@ TEST_CASE("SMSSendHandler functionality")
 
     SECTION("Schedule standard send SMS procedure")
     {
-        auto record = buildValidSMSRecord();
+        auto record                = buildValidSMSRecord();
         constexpr auto sendOnDelay = false;
 
         outSMS.handleDBNotification();
@@ -47,7 +47,7 @@ TEST_CASE("SMSSendHandler functionality")
 
     SECTION("Schedule non-standard send SMS procedure")
     {
-        auto record = buildValidSMSRecord();
+        auto record                = buildValidSMSRecord();
         constexpr auto sendOnDelay = false;
 
         outSMS.handleDBNotification();
@@ -61,7 +61,7 @@ TEST_CASE("SMSSendHandler functionality")
     }
     SECTION("Schedule queued send SMS procedure")
     {
-        auto record = buildValidSMSRecord();
+        auto record                = buildValidSMSRecord();
         constexpr auto sendOnDelay = false;
 
         outSMS.handleDBNotification();
@@ -79,8 +79,8 @@ TEST_CASE("SMSSendHandler functionality")
 
     SECTION("Check offline mode")
     {
-        outSMS.onGetOfflineMode = []() -> bool { return true; };
-        auto record             = buildValidSMSRecord();
+        outSMS.onGetOfflineMode    = []() -> bool { return true; };
+        auto record                = buildValidSMSRecord();
         constexpr auto sendOnDelay = false;
 
         outSMS.handleDBNotification();

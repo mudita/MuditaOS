@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewApnWindow.hpp"
@@ -11,7 +11,8 @@ namespace gui
 
     NewApnWindow::NewApnWindow(app::ApplicationCommon *app)
         : AppWindow(app, gui::window::name::new_apn),
-          apn(std::make_shared<packet_data::APN::Config>()), newApnModel{std::make_shared<NewApnModel>(app)}
+          apn(std::make_shared<packet_data::APN::Config>()), newApnModel{std::make_shared<NewApnModel>(app)},
+          apnSettingsModel(app)
     {
         buildInterface();
     }
@@ -38,7 +39,6 @@ namespace gui
                                  style::settings::window::newApn::h,
                                  newApnModel);
         setFocusItem(list);
-        apnSettingsModel = new ApnSettingsModel(application);
     }
 
     void NewApnWindow::destroyInterface()
@@ -100,7 +100,7 @@ namespace gui
             newApnModel->saveData(apn);
             LOG_DEBUG("APN: \"%s\" ", apn->apn.c_str());
             if (apn != nullptr && !apn->apn.empty()) {
-                apnSettingsModel->saveAPN(apn);
+                apnSettingsModel.saveAPN(apn);
                 LOG_INFO("APN record saved: \"%s\" ", apn->apn.c_str());
                 application->returnToPreviousWindow();
             }

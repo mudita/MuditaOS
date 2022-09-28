@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneNumber.hpp"
 
 #include "country.hpp"
-#include <log/log.hpp>
 
 #include <phonenumbers/phonenumberutil.h>
 #include <phonenumbers/asyoutypeformatter.h>
@@ -31,7 +30,9 @@ PhoneNumber::PhoneNumber(const std::string &phoneNumber, country::Id defaultCoun
     : countryCode(defaultCountryCode)
 {
     auto &util = *phn_util::GetInstance();
-    util.ParseAndKeepRawInput(phoneNumber, country::getAlpha2Code(countryCode), &pbNumber);
+    auto number = phoneNumber;
+    number.erase(std::remove_if(number.begin(), number.end(), PhoneNumber::CharacterToRemove), number.end());
+    util.ParseAndKeepRawInput(number, country::getAlpha2Code(countryCode), &pbNumber);
 
     // determine real country code from number
     std::string regionCode;
@@ -39,7 +40,7 @@ PhoneNumber::PhoneNumber(const std::string &phoneNumber, country::Id defaultCoun
     countryCode = country::getIdByAlpha2Code(regionCode);
 
     // create view representation
-    viewSelf = makeView(phoneNumber);
+    viewSelf = makeView(number);
 }
 
 PhoneNumber::PhoneNumber(const View &numberView)
@@ -83,6 +84,9 @@ PhoneNumber::PhoneNumber(const std::string &phoneNumber, const std::string &e164
     auto &util = *phn_util::GetInstance();
     std::string regionCode;
 
+    auto number = phoneNumber;
+    number.erase(std::remove_if(number.begin(), number.end(), PhoneNumber::CharacterToRemove), number.end());
+
     // non empty E164 format: match numbers, throw on error
     if (e164number.size() > 0) {
         // parse E164 number
@@ -103,18 +107,18 @@ PhoneNumber::PhoneNumber(const std::string &phoneNumber, const std::string &e164
 
         // use region code to parse number originally entered by the user
         // keep raw input in order to be able to use original format in formatting
-        if (util.ParseAndKeepRawInput(phoneNumber, regionCode, &pbNumber) != errCode::NO_PARSING_ERROR) {
-            throw PhoneNumber::Error(phoneNumber, "Can't parse phone number");
+        if (util.ParseAndKeepRawInput(number, regionCode, &pbNumber) != errCode::NO_PARSING_ERROR) {
+            throw PhoneNumber::Error(number, "Can't parse phone number");
         }
 
         // check if numbers match
         if (util.IsNumberMatch(pbNumberE164, pbNumber) != phn_util::EXACT_MATCH) {
-            throw PhoneNumber::Error(phoneNumber, "Can't match number with E164 format");
+            throw PhoneNumber::Error(number, "Can't match number with E164 format");
         }
     }
     // empty E164: use entered number
     else {
-        util.ParseAndKeepRawInput(phoneNumber, country::getAlpha2Code(countryCode), &pbNumber);
+        util.ParseAndKeepRawInput(number, country::getAlpha2Code(countryCode), &pbNumber);
 
         // determine real country code from number
         util.GetRegionCodeForNumber(pbNumber, &regionCode);
@@ -122,7 +126,7 @@ PhoneNumber::PhoneNumber(const std::string &phoneNumber, const std::string &e164
     }
 
     // create view representation
-    viewSelf = makeView(phoneNumber);
+    viewSelf = makeView(number);
 }
 
 bool PhoneNumber::isValid() const
@@ -143,6 +147,20 @@ std::string PhoneNumber::getFormatted() const
 std::string PhoneNumber::toE164() const
 {
     return viewSelf.getE164();
+}
+
+bool PhoneNumber::CharacterToRemove(char c)
+{
+    // According to Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf p.91
+    switch (c) {
+    case '(':
+    case ')':
+    case '-':
+    case ' ':
+        return true;
+    default:
+        return false;
+    }
 }
 
 PhoneNumber::Match PhoneNumber::match(const PhoneNumber &other) const

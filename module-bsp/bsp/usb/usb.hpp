@@ -35,7 +35,8 @@ namespace bsp
     {
         xQueueHandle queueHandle;
         xQueueHandle irqQueueHandle;
-        const char *serialNumber;
+        std::string serialNumber;
+        std::string rootPath;
     };
 
     int usbInit(const usbInitParams &initParams);
@@ -43,7 +44,7 @@ namespace bsp
     int usbCDCSend(std::string *sendMsg);
     int usbCDCSendRaw(const char *dataPtr, size_t dataLen);
     void usbDeinit();
-    void usbReinit(const char *mtpRoot);
+    void usbReinit(const std::string& rootPath);
     void usbSuspend();
     void usbHandleDataReceived();
 

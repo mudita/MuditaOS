@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,9 +10,11 @@
 #include <chrono>
 #include <memory>
 
-template <KeyMap... keys> class GenericLongPressSequence : public AbstractKeySequence
+template <KeyMap... keys>
+class GenericLongPressSequence : public AbstractKeySequence
 {
-    using Keys = std::array<KeyMap, sizeof...(keys)>;
+    static constexpr auto keysToScanCount = sizeof...(keys);
+
     enum class State
     {
         Idle,
@@ -31,7 +33,7 @@ template <KeyMap... keys> class GenericLongPressSequence : public AbstractKeySeq
 
         switch (state) {
         case State::Idle:
-            if (keyStates.count() == keysToScanCount && keyStates.ifOnlySet(keysToScan)) {
+            if (keyStates.count() == keysToScanCount && keyStates.ifOnlySet<keys...>()) {
                 switch_to_in_progress();
             }
             break;
@@ -79,8 +81,6 @@ template <KeyMap... keys> class GenericLongPressSequence : public AbstractKeySeq
         timer.start();
     }
 
-    static constexpr Keys keysToScan      = {keys...};
-    static constexpr auto keysToScanCount = keysToScan.size();
     State state                           = State::Idle;
     KeyStates keyStates;
     sys::TimerHandle timer;

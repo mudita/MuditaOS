@@ -417,6 +417,7 @@
   "app_settings_vibration": "Vibración",
   "app_settings_sound": "Sonido",
   "app_settings_volume": "Volumen",
+  "app_settings_volume_focused": "Volumen",
   "app_settings_call_ringtome": "Tono de llamada",
   "app_settings_message_sound": "Sonido de mensajes",
   "app_settings_notification_sound": "Sonido de notificaciones",
@@ -709,5 +710,8 @@
   "app_bell_meditation_chime_interval_bottom": "de la meditación",
   "app_bell_meditation_chime_volume": "Volumen del timbre",
   "app_meditation_summary": "<text>Has meditado por<br />",
-  "app_meditation_countdown_desc": "Empieza en"
+  "app_meditation_countdown_desc": "Empieza en",
+  "app_meditation_summary_total": "<text>Total:<br /><token>$VALUE</token></text>",
+  "app_meditation_summary_average": "Promedio/por día:",
+  "app_meditation_summary_title": "<text>Últimos <token>$VALUE</token> días</text>"
 }

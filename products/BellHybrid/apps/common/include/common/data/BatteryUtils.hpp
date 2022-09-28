@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <optional>
 #include <string>
-#include <array>
 
 #include <Units.hpp>
 

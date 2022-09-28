@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BoxLayout.hpp"
@@ -69,7 +69,8 @@ namespace gui
         resizeItems();
     }
 
-    template <Axis axis> void BoxLayout::addWidget(Item *item)
+    template <Axis axis>
+    void BoxLayout::addWidget(Item *item)
     {
         Rect::addWidget(item);
         resizeItems<axis>();
@@ -202,7 +203,8 @@ namespace gui
     // space left distposition `first is better` tactics
     // there could be other i.e. socialism: each element take in equal part up to it's max size
     // not needed now == not implemented
-    template <Axis axis> void BoxLayout::resizeItems()
+    template <Axis axis>
+    void BoxLayout::resizeItems()
     {
         Position startingPosition = reverseOrder ? this->area().size(axis) : 0;
         Position leftPosition     = this->getSize(axis);
@@ -242,7 +244,8 @@ namespace gui
         Rect::updateDrawArea();
     }
 
-    template <Axis axis> Length BoxLayout::calculateElemResize(Item *el, Length &toSplit)
+    template <Axis axis>
+    Length BoxLayout::calculateElemResize(Item *el, Length &toSplit)
     {
         auto grantedSize        = sizeStore->get(el);
         Length calculatedResize = 0;
@@ -270,7 +273,8 @@ namespace gui
         return calculatedResize;
     }
 
-    template <Axis axis> Length BoxLayout::calculateElemAxisSize(Item *el, Length calculatedResize, Length &toSplit)
+    template <Axis axis>
+    Length BoxLayout::calculateElemAxisSize(Item *el, Length calculatedResize, Length &toSplit)
     {
         Length axisItemSize = 0;
 
@@ -285,7 +289,8 @@ namespace gui
         return axisItemSize;
     }
 
-    template <Axis axis> Length BoxLayout::calculateElemOrtAxisSize(Item *el)
+    template <Axis axis>
+    Length BoxLayout::calculateElemOrtAxisSize(Item *el)
     {
         // Get maximum size that element in orthogonal axis can occupy in current layout size.
         Length maxOrthogonalItemInParentSize =
@@ -342,12 +347,14 @@ namespace gui
         return axisItemPosition;
     }
 
-    template <Axis axis> Position BoxLayout::calculateElemOrtAxisPosition(Item *el, Length orthogonalItemSize)
+    template <Axis axis>
+    Position BoxLayout::calculateElemOrtAxisPosition(Item *el, Length orthogonalItemSize)
     {
         return el->getAxisAlignmentValue(orthogonal(axis), orthogonalItemSize);
     }
 
-    template <Axis axis> Position BoxLayout::getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el)
+    template <Axis axis>
+    Position BoxLayout::getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el)
     {
         auto offset = sizeLeftWithoutElem<axis>(this, el, Area::Normal) <= calcSize
                           ? 0
@@ -404,12 +411,7 @@ namespace gui
 
     std::list<Item *>::iterator BoxLayout::nextNavigationItem(std::list<Item *>::iterator from)
     {
-        return std::find_if(from, this->children.end(), [](auto &el) -> bool {
-            if (el->isActive()) {
-                return true;
-            }
-            return false;
-        });
+        return std::find_if(from, this->children.end(), [](const auto &el) { return el->isActive(); });
     }
 
     std::list<Item *>::iterator BoxLayout::getNavigationFocusedItem()
@@ -458,7 +460,7 @@ namespace gui
     }
 
     template <Axis axis>
-    auto BoxLayout::handleRequestResize(const Item *child, Length request_w, Length request_h) -> Size
+    Size BoxLayout::handleRequestResize(const Item *child, Length request_w, Length request_h)
     {
         if (parent != nullptr) {
             auto [w, h] = requestSize(request_w, request_h);
@@ -563,7 +565,7 @@ namespace gui
         return nullptr;
     }
 
-    auto BoxLayout::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
+    bool BoxLayout::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         addFromOutOfDrawAreaList();
         resizeItems();
@@ -606,7 +608,7 @@ namespace gui
         BoxLayout::addWidget<Axis::X>(item);
     }
 
-    auto HBox::handleRequestResize(const Item *child, Length request_w, Length request_h) -> Size
+    Size HBox::handleRequestResize(const Item *child, Length request_w, Length request_h)
     {
         return BoxLayout::handleRequestResize<Axis::X>(child, request_w, request_h);
     }
@@ -632,7 +634,7 @@ namespace gui
         BoxLayout::addWidget<Axis::Y>(item);
     }
 
-    auto VBox::handleRequestResize(const Item *child, Length request_w, Length request_h) -> Size
+    Size VBox::handleRequestResize(const Item *child, Length request_w, Length request_h)
     {
         return BoxLayout::handleRequestResize<Axis::Y>(child, request_w, request_h);
     }

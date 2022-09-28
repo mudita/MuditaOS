@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,9 +14,9 @@ namespace gui
     class AlarmRRuleOptionsItem : public AlarmOptionsItem, public app::alarmClock::AlarmRRuleItem
     {
       private:
-        app::ApplicationCommon *app                                  = nullptr;
-        std::function<void(const UTF8 &text)> navBarTemporaryMode    = nullptr;
-        std::function<void()> navBarRestoreFromTemporaryMode         = nullptr;
+        app::ApplicationCommon *app                               = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
 
         using RRule                                             = app::alarmClock::AlarmRRulePresenter::RRuleOptions;
         std::vector<std::pair<RRule, std::string>> rRuleOptions = {

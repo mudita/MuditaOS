@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,4 +24,3 @@ typedef struct
  * @return 1 if success, otherwise 0.
  */
 uint8_t parseXingHeader(uint8_t *data, size_t datasize, xing_info_t *info);
-

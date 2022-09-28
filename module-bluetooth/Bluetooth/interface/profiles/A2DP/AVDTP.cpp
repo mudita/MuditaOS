@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AVDTP.hpp"
@@ -21,4 +21,4 @@ namespace bluetooth
         LOG_INFO("    - allocationMethod: %d", sbcConfig.allocationMethod);
         LOG_INFO("    - bitpool_value [%d, %d] ", sbcConfig.minBitpoolValue, sbcConfig.maxBitpoolValue);
     }
-} // namespace Bt
+} // namespace bluetooth

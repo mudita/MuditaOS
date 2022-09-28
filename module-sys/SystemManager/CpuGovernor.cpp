@@ -30,7 +30,7 @@ namespace sys
     bool CpuGovernor::RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel)
     {
         if (newSentinel) {
-            auto isNewSentinelAlreadyRegistered = false;
+            auto isNewSentinelAlreadyRegistered         = false;
             sentinel_foo checkSentinelAlreadyRegistered = [&](const std::shared_ptr<CpuSentinel> &s) -> bool {
                 if (s->GetName() == newSentinel->GetName()) {
                     isNewSentinelAlreadyRegistered = true;

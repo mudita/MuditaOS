@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,8 +12,8 @@ class Database;
 
 struct NotificationsTableRow : public Record
 {
-    uint32_t key   = 0;
-    uint32_t value = 0;
+    uint32_t key       = 0;
+    uint32_t value     = 0;
     uint32_t contactID = DB_ID_NONE;
 };
 

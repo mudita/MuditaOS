@@ -22,7 +22,8 @@ namespace audio
         enum class RetCode
         {
             Success = 0,
-            Failure
+            Failure,
+            Disconnected
         };
 
         enum class Type

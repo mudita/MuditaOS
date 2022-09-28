@@ -27,14 +27,16 @@ namespace app::popup
             void set(std::shared_ptr<AlarmEventRecord> record);
             void setSnoozed(std::vector<SingleEventRecord> snoozed);
             void reset();
-            template <typename requestType, typename responseType> void snoozeAlarm();
-            template <typename requestType, typename responseType> void stopAlarm();
+            template <typename requestType, typename responseType>
+            void snoozeAlarm();
+            template <typename requestType, typename responseType>
+            void stopAlarm();
             void setRefreshWindowCallback(std::function<void()> callback);
             void processIfSnoozed();
 
             std::shared_ptr<AlarmEventRecord> record = nullptr;
             std::vector<SingleEventRecord> snoozedRecord;
-            Presenter *presenter                     = nullptr;
+            Presenter *presenter                        = nullptr;
             std::function<void()> refreshWindowCallback = nullptr;
             std::string snoozedTill                     = std::string{};
             bool isSnoozedAlarm                         = false;

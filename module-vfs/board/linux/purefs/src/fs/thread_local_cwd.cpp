@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <string>
@@ -11,7 +11,7 @@ namespace purefs::fs::internal
     {
         thread_local std::string cwd_per_thread;
         std::string default_cwd{"/"};
-    }
+    } // namespace
     auto get_thread_local_cwd_path() noexcept -> std::string_view
     {
         if (cwd_per_thread.empty()) {

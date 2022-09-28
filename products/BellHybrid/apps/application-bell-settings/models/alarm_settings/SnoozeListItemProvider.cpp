@@ -77,7 +77,7 @@ namespace app::bell_settings
             chimeLengthBottomDescription);
 
         chimeLength->set_on_value_change_cb([chimeLength](const auto &val) {
-            chimeLength->setBottomDescribtionText(utils::language::getCorrectMinutesNumeralForm(val));
+            chimeLength->setBottomDescriptionText(utils::language::getCorrectMinutesNumeralForm(val));
         });
 
         chimeLength->onEnter = [onOff, this]() {

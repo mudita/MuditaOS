@@ -47,9 +47,9 @@ namespace style::meditation
 
     namespace intervalBox
     {
-        constexpr auto X      = style::window::default_left_margin;
-        constexpr auto Y      = style::meditation::timer::Y + 2 * style::meditation::timer::Radius + VerticalWidgetGap;
-        constexpr auto Width  = style::window::default_body_width;
+        constexpr auto X     = style::window::default_left_margin;
+        constexpr auto Y     = style::meditation::timer::Y + 2 * style::meditation::timer::Radius + VerticalWidgetGap;
+        constexpr auto Width = style::window::default_body_width;
     } // namespace intervalBox
 
     namespace itemList

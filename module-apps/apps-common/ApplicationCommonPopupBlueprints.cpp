@@ -7,7 +7,6 @@
 #include "service-db/Settings.hpp"
 #include "service-db/agents/settings/SystemSettings.hpp"
 #include "popups/data/PopupData.hpp"
-#include "popups/data/BedtimeReminderPopupRequestParams.hpp"
 
 namespace app
 {
@@ -47,10 +46,10 @@ namespace app
                 LOG_INFO("Playback: %s, volume: %s",
                          audio::str(volumeParams->getAudioContext().second).c_str(),
                          std::to_string(volumeParams->getVolume()).c_str());
-                auto volume          = volumeParams->getVolume();
-                auto context         = volumeParams->getAudioContext();
-                auto source          = volumeParams->getRequestSource();
-                auto popupData       = std::make_unique<gui::VolumePopupData>(volume, context, source);
+                auto volume    = volumeParams->getVolume();
+                auto context   = volumeParams->getAudioContext();
+                auto source    = volumeParams->getRequestSource();
+                auto popupData = std::make_unique<gui::VolumePopupData>(volume, context, source);
 
                 const auto popupName = resolveWindowName(gui::popup::ID::Volume);
                 if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
@@ -107,10 +106,14 @@ namespace app
         popupBlueprint.registerBlueprint(ID::PhoneLockChangeInfo, phoneLockBlueprint);
 
         auto simLockBlueprint = [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
-            auto popupParams = dynamic_cast<const gui::SimUnlockInputRequestParams *>(params.get());
+            auto popupParams = dynamic_cast<gui::SimUnlockInputRequestParams *>(params.get());
             if (popupParams == nullptr) {
                 return false;
             }
+
+            popupParams->setDisposition(gui::popup::Disposition{gui::popup::Disposition::Priority::High,
+                                                                gui::popup::Disposition::WindowType::Popup,
+                                                                params->getPopupId()});
             switchWindowPopup(gui::popup::resolveWindowName(id),
                               popupParams->getDisposition(),
                               std::make_unique<locks::SimLockData>(popupParams->getLock(),
@@ -132,19 +135,6 @@ namespace app
                 switchWindowPopup(gui::popup::resolveWindowName(id),
                                   popupParams->getDisposition(),
                                   std::make_unique<gui::AlarmPopupRequestParams>(popupParams));
-                return true;
-            });
-
-        popupBlueprint.registerBlueprint(
-            ID::BedtimeNotification, [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
-                auto popupParams = dynamic_cast<gui::BedtimeReminderPopupRequestParams *>(params.get());
-                if (popupParams == nullptr) {
-                    return false;
-                }
-
-                switchWindowPopup(gui::popup::resolveWindowName(id),
-                                  params->getDisposition(),
-                                  std::make_unique<gui::BedtimeReminderPopupRequestParams>(popupParams->eventRecord));
                 return true;
             });
     }

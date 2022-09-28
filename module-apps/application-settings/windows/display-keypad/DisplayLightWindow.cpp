@@ -119,6 +119,7 @@ namespace gui
 
         auto spinner = std::make_unique<gui::SpinBoxOptionSettings>(
             utils::translate("app_settings_display_light_brightness"),
+            utils::translate("app_settings_display_light_brightness"),
             std::ceil(brightnessValue / brightnessStep),
             std::ceil(screen_light_control::ManualModeParameters::MAX_BRIGHTNESS / brightnessStep),
             setBrightness,

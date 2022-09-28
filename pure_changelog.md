@@ -3,16 +3,34 @@
 ## Unreleased
 
 ### Changed / Improved
+* Added Polish translation to a calendar title
 * Changed USB logging
 * Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
+* Fixed issue with inability to send SMS
+* Fixed mixed SMS messages
+* Fixed disappearing manual alarm and vibration volume setting in German
+* Fixed SIM card pop-ups not showing
+* Fixed lost bytes in logs
+* Fixed passcode lock time discrepancy between lock screen and 'Wrong password' popup
+* Fixed cellular DMA errors
+* Fixed order of the services while closing system
+* Fixed crash of the E-ink service while restoring system data
+* Fixed removing wrong sentinels
+* Fixed music player behaviour when connecting/disconnecting audio devices
+* Fixed dropping the call during the DND mode
+* Fixed wrong tethering popup order
 * Fixed crash during phone turn off
 * Fixed improper duration of the rejected outgoing call shown in calls log
 * Fixed Bluetooth volume control issues
 * Fixed turning on loudspeaker before outgoing call is answered
 * Fixed PLAY label translation in German
 * Fixed USB connection/disconnection detection
+* Fixed memory leaks in APN settings
+
+### Added
+* Added basic MMS handling
 
 ## [1.3.0 2022-08-04]
 

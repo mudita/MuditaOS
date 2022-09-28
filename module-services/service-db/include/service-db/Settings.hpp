@@ -7,14 +7,11 @@
 #include "SettingsScope.hpp"
 #include "SettingsProxy.hpp"
 
-#include <cstdint>
 #include <functional>
 #include <list>
 #include <map>
 #include <memory>
 #include <optional>
-#include <string>
-#include <exception>
 
 namespace settings
 {

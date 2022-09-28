@@ -5,7 +5,7 @@
 
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-settings/presenter/TimeUnitsPresenter.hpp>
-#include <application-bell-settings/models/TimeUnitsModel.hpp>
+#include <application-bell-settings/models/DateTimeUnitsModel.hpp>
 
 #include <apps-common/windows/AppWindow.hpp>
 

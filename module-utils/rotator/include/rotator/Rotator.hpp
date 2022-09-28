@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,8 @@
 
 namespace utils
 {
-    template <std::size_t maxRotationFilesCount> class Rotator
+    template <std::size_t maxRotationFilesCount>
+    class Rotator
     {
       protected:
         const std::string extension;

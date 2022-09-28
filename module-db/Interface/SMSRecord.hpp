@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,6 @@
 
 #include "Record.hpp"
 #include "ThreadRecord.hpp"
-#include "ContactRecord.hpp"
 #include "module-db/Databases/SmsDB.hpp"
 #include "module-db/Databases/ContactsDB.hpp"
 #include "module-db/Common/Common.hpp"
@@ -26,8 +25,8 @@ struct SMSRecord : public Record
     uint32_t date      = 0;
     uint32_t errorCode = 0;
     UTF8 body;
-    SMSType type       = SMSType::UNKNOWN;
-    uint32_t threadID  = 0;
+    SMSType type      = SMSType::UNKNOWN;
+    uint32_t threadID = 0;
     utils::PhoneNumber::View number;
 
     SMSRecord() = default;

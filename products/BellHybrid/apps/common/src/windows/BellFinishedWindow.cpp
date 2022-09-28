@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "windows/BellFinishedWindow.hpp"
@@ -47,7 +47,7 @@ namespace gui
             icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
             icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
             icon->text->setFont(style::window::font::verybiglight);
-            icon->setY(bell_style::popup_icon_y_alignment);
+            icon->text->setVisible(false);
         }
     }
 
@@ -66,10 +66,13 @@ namespace gui
 
         if (auto metadata = dynamic_cast<BellFinishedWindowData *>(data)) {
             icon->image->set(metadata->icon);
-            icon->text->setRichText(metadata->text);
+            if (not metadata->text.empty()) {
+                icon->text->setRichText(metadata->text);
+                icon->text->setVisible(true);
+            }
             icon->resizeItems();
-            windowToReturn   = metadata->windowToReturn;
-            exitBehaviour    = metadata->exitBehaviour;
+            windowToReturn = metadata->windowToReturn;
+            exitBehaviour  = metadata->exitBehaviour;
             if (metadata->timeout != std::chrono::seconds::zero()) {
                 resetTimer(metadata->timeout);
             }

@@ -26,7 +26,8 @@
 #include "SimState.hpp"
 #include <at/SimInsertedState.hpp>
 
-template <typename urcType> static auto getURC(std::unique_ptr<at::urc::Urc> &urc) -> std::shared_ptr<urcType>
+template <typename urcType>
+static auto getURC(std::unique_ptr<at::urc::Urc> &urc) -> std::shared_ptr<urcType>
 {
     if (urc) {
         auto &rawUrc = *urc.get();

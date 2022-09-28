@@ -61,26 +61,6 @@ namespace utils::filesystem
 
 namespace utils
 {
-    std::vector<std::uint8_t> hexToBytes(const std::string &hex)
-    {
-        std::vector<std::uint8_t> bytes;
-
-        for (unsigned int i = 0; i < hex.length(); i += 2) {
-            std::string byteString = hex.substr(i, 2);
-            std::uint8_t byte      = std::stoull(byteString.c_str(), nullptr, 16);
-            bytes.push_back(byte);
-        }
-        return bytes;
-    }
-    std::string bytesToHex(const std::vector<std::uint8_t> &bytes)
-    {
-        std::stringstream s;
-        s.fill('0');
-        for (auto const &b : bytes)
-            s << std::setw(2) << std::hex << (unsigned short)b;
-        return s.str();
-    }
-
     std::string generateRandomId(std::size_t length) noexcept
     {
         if (!length)

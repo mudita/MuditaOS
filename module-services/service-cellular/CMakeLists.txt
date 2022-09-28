@@ -20,9 +20,11 @@ set(SOURCES
     CellularUrcHandler.cpp
     checkSmsCenter.cpp
     ServiceCellular.cpp
+    SMSParser.cpp
     SignalStrength.cpp
     NetworkSettings.cpp
     PacketData.cpp
+    Pdu.cpp
     QMBNManager.cpp
     RequestFactory.cpp
     CellularRequestHandler.cpp

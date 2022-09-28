@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,11 +11,11 @@ namespace gui
 {
     class CheckBox : public HBox
     {
-        bool checkState                                              = false;
-        Image *image                                                 = nullptr;
-        std::function<void(const UTF8 &text)> navBarTemporaryMode    = nullptr;
-        std::function<void()> navBarRestoreFromTemporaryMode         = nullptr;
-        nav_bar::Side navBarSide                                     = nav_bar::Side::Left;
+        bool checkState                                           = false;
+        Image *image                                              = nullptr;
+        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
+        nav_bar::Side navBarSide                                  = nav_bar::Side::Left;
 
         void applyCallbacks();
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
@@ -32,7 +32,7 @@ namespace purefs::fs
             }
             return spath1 == spath2;
         }
-    }
+    } // namespace
     filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm)
         : m_diskmm(diskmm), m_lock(std::make_unique<cpp_freertos::MutexRecursive>()),
           m_notifier(std::make_unique<internal::notifier>())

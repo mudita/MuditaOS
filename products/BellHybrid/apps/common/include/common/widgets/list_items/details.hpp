@@ -14,7 +14,8 @@ namespace app::list_items
 {
     namespace details
     {
-        template <typename SpinnerType> class ListItemBase : public gui::BellSideListItemWithCallbacks
+        template <typename SpinnerType>
+        class ListItemBase : public gui::BellSideListItemWithCallbacks
         {
           public:
             using spinner_type = SpinnerType;
@@ -65,7 +66,7 @@ namespace app::list_items
                 body->getCenterBox()->addWidget(spinner);
 
                 if (not this->bottomDescription.empty()) {
-                    setupBottomDescription(this->bottomDescription);
+                    setupBottomTextBox(this->bottomDescription);
                 }
 
                 spinner->onValueChanged = [this](const auto &val) {

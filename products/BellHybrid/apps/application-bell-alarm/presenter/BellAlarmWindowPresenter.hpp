@@ -17,7 +17,7 @@ namespace app::bell_alarm
         class View
         {
           public:
-            virtual ~View() noexcept = default;
+            virtual ~View() noexcept                                        = default;
             virtual void setAlarmTime(time_t time)                          = 0;
             virtual time_t getAlarmTime() const                             = 0;
             virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
@@ -26,9 +26,9 @@ namespace app::bell_alarm
         class Presenter : public BasePresenter<BellAlarmWindowContract::View>
         {
           public:
-            virtual ~Presenter() noexcept   = default;
+            virtual ~Presenter() noexcept                                           = default;
             virtual auto createData() -> void                                       = 0;
-            virtual auto saveData() -> void = 0;
+            virtual auto saveData() -> void                                         = 0;
             virtual auto setTimeFormat(utils::time::Locale::TimeFormat fmt) -> void = 0;
             virtual auto onBeforeShow() -> void                                     = 0;
         };

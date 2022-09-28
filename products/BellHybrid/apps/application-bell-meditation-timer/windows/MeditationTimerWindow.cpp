@@ -37,8 +37,8 @@ namespace app::meditation
         topMessage->setText(utils::translate("app_bell_meditation_timer"));
         topMessage->drawUnderline(false);
 
-        spinner = new UIntegerSpinner(
-            UIntegerSpinner::range{presenter->getMinValue(), presenter->getMaxValue(), presenter->getStepValue()},
+        spinner = new U8IntegerSpinner(
+            U8IntegerSpinner::range{presenter->getMinValue(), presenter->getMaxValue(), presenter->getStepValue()},
             gui::Boundaries::Fixed);
         spinner->onValueChanged = [this](const auto val) { this->onValueChanged(val); };
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);

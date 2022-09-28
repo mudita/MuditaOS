@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,6 @@
 
 #include <phonenumbers/phonenumberutil.h>
 
-#include <exception>
 #include <utf8/UTF8.hpp>
 
 namespace utils
@@ -338,6 +337,14 @@ namespace utils
         static bool e164format(const std::string &number,
                                std::string &e164,
                                country::Id defaultCountryCode = country::defaultCountry);
+
+        /**
+         * @brief Check whether character must be removed
+         *
+         * @param c - a character to check
+         * @return true is character is on the list
+         */
+        static bool CharacterToRemove(char c);
 
         /**
          * @brief Create instance of View directly from the E164 format.

@@ -130,7 +130,7 @@ namespace purefs::fs::drivers
 #if FF_MAX_SS != FF_MIN_SS
             st.st_blksize = fatfs->ssize;
 #else
-            st.st_blksize = FF_MIN_SS;
+            st.st_blksize     = FF_MIN_SS;
 #endif
             st.st_blocks = fs.fsize / st.st_blksize;
             st.st_atime  = 0;
@@ -389,7 +389,7 @@ namespace purefs::fs::drivers
             return -EBADF;
         }
         FILINFO finfo;
-        const auto fspath = vmnt->native_path(file);
+        const auto fspath                     = vmnt->native_path(file);
         static constexpr auto slash_pos       = 2U;
         static constexpr auto root_size       = 3U;
         static constexpr auto empty_root_size = 2U;

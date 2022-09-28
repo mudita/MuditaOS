@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MmiActionsParams.hpp"
@@ -76,7 +76,6 @@ std::string MMIParams::getData() const
 MMIResultParams::MMIResultParams(MMIResult result, std::shared_ptr<MMICustomResultParams> customResult)
     : result(result), customResult(std::move(customResult))
 {}
-
 
 MMIResultParams::MMIResult MMIResultParams::getData() const noexcept
 {

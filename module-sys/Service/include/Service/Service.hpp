@@ -34,7 +34,8 @@ namespace sys
         {}
     };
 
-    template <typename Request, typename Response> struct Async
+    template <typename Request, typename Response>
+    struct Async
     {
         enum class State
         {

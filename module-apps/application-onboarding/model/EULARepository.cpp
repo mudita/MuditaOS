@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EULARepository.hpp"
@@ -16,8 +16,8 @@ namespace app::onBoarding
     std::string EULARepository::getEulaText()
     {
         const auto &displayLanguageName = utils::getDisplayLanguage();
-        auto eulaFile            = std::ifstream(licensesPath / displayLanguageName / fileName);
-        auto fileHandlerCleanup  = gsl::finally([&eulaFile]() { eulaFile.close(); });
+        auto eulaFile                   = std::ifstream(licensesPath / displayLanguageName / fileName);
+        auto fileHandlerCleanup         = gsl::finally([&eulaFile]() { eulaFile.close(); });
 
         if (!eulaFile.is_open()) {
             eulaFile.open(licensesPath / utils::getDefaultLanguage() / fileName);

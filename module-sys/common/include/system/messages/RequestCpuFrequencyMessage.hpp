@@ -33,8 +33,7 @@ namespace sys
     };
 
     class HoldCpuFrequencyPermanentlyResponse : public sys::ResponseMessage
-    {
-    };
+    {};
 
     class ReleaseCpuPermanentFrequencyMessage : public sys::DataMessage
     {};

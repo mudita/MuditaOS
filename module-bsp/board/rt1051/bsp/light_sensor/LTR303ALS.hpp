@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -30,7 +30,7 @@ namespace bsp::light_sensor
 
     constexpr inline auto MEASUREMENT_GAIN_8 = 0b00001100;
     constexpr inline auto ACTIVE_MODE        = 0b00000001 | MEASUREMENT_GAIN_8;
-    constexpr inline auto SW_RESET    = 0b00000010;
+    constexpr inline auto SW_RESET           = 0b00000010;
 
     constexpr inline auto INTEGRATION_TIME_50MS  = 0b00001000;
     constexpr inline auto ALS_INT_50MS           = 0.5f;

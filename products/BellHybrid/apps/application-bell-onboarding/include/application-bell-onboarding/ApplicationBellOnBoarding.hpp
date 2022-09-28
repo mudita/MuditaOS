@@ -56,7 +56,8 @@ namespace app
         void finalizeOnBoarding();
     };
 
-    template <> struct ManifestTraits<ApplicationBellOnBoarding>
+    template <>
+    struct ManifestTraits<ApplicationBellOnBoarding>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

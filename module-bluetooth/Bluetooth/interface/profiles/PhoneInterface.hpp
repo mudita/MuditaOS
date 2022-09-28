@@ -11,9 +11,9 @@ namespace bluetooth
     class CellularInterface
     {
       public:
-        virtual ~CellularInterface()                           = default;
-        virtual bool answerIncomingCall(sys::Service *service) = 0;
-        virtual bool hangupCall(sys::Service *service)         = 0;
+        virtual ~CellularInterface()                                              = default;
+        virtual bool answerIncomingCall(sys::Service *service)                    = 0;
+        virtual bool hangupCall(sys::Service *service)                            = 0;
         virtual bool sendDTMFCode(sys::Service *service, DTMFCode code)           = 0;
         virtual bool dialNumber(sys::Service *service, const std::string &number) = 0;
     };

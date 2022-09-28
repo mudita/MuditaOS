@@ -34,7 +34,6 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <utf8/UTF8.hpp>
 
-
 namespace sdesktop::endpoints
 {
     using sender::putToSendQueue;

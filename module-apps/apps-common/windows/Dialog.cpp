@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Dialog.hpp"
@@ -153,7 +153,7 @@ void DialogRetry::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
         Dialog::onBeforeShow(mode, metadata);
-        auto foo                     = metadata->get().action;
-        navBar->activatedCallback    = [foo](Item &) -> bool { return foo(); };
+        auto foo                  = metadata->get().action;
+        navBar->activatedCallback = [foo](Item &) -> bool { return foo(); };
     }
 }

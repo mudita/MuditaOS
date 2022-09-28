@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -288,14 +288,14 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto checkContactsListDuplicatesQuery(const std::shared_ptr<db::Query> &query)
         -> const std::unique_ptr<db::QueryResult>;
 
-    auto addTemporaryContactForNumber(const ContactRecord::Number &number) -> std::pair<bool, ContactRecord>;
+    auto addTemporaryContactForNumber(const ContactRecord::Number &number) -> std::optional<ContactRecord>;
     auto getNumbersIDs(std::uint32_t contactID, const ContactRecord &contact) -> std::vector<std::uint32_t>;
     auto addNumbers(std::uint32_t contactID, const std::vector<ContactRecord::Number> &numbers)
-        -> std::pair<bool, std::string>;
+        -> std::optional<std::string>;
     auto addOrUpdateName(std::uint32_t contactID, std::uint32_t nameID, const ContactRecord &contact)
-        -> std::pair<bool, std::uint32_t>;
+        -> std::optional<std::uint32_t>;
     auto addOrUpdateAddress(std::uint32_t contactID, std::uint32_t addressID, const ContactRecord &contact)
-        -> std::pair<bool, std::uint32_t>;
+        -> std::optional<std::uint32_t>;
     auto addOrUpdateRingtone(std::uint32_t contactID, std::uint32_t ringtoneID, const ContactRecord &contact)
-        -> std::pair<bool, std::uint32_t>;
+        -> std::optional<std::uint32_t>;
 };

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/calllog/CalllogHelper.hpp>
@@ -53,9 +53,7 @@ namespace sdesktop::endpoints
                         putToSendQueue(context.createSimpleResponse());
                         return true;
                     }
-                    else {
-                        return false;
-                    }
+                    return false;
                 },
                 context);
 
@@ -78,9 +76,7 @@ namespace sdesktop::endpoints
                     putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
-                else {
-                    return false;
-                }
+                return false;
             },
             context);
 
@@ -108,9 +104,7 @@ namespace sdesktop::endpoints
                     putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
-                else {
-                    return false;
-                }
+                return false;
             },
             context);
 
@@ -136,9 +130,7 @@ namespace sdesktop::endpoints
                     putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
-                else {
-                    return false;
-                }
+                return false;
             },
             context);
         query->setQueryListener(std::move(listener));
@@ -151,7 +143,7 @@ namespace sdesktop::endpoints
     }
     auto CalllogHelper::to_json(CalllogRecord record) -> json11::Json
     {
-        std::unique_ptr<std::stringstream> ss = std::make_unique<std::stringstream>();
+        const auto ss = std::make_unique<std::stringstream>();
 
         (*ss) << record.date;
         std::string date = ss->str();

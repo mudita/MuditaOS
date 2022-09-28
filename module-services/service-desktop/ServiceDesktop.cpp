@@ -195,8 +195,11 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
 
     LOG_DEBUG("usbWorkerInit Serial Number: %s", serialNumber.c_str());
 
-    desktopWorker = std::make_unique<WorkerDesktop>(
-        this, std::bind(&ServiceDesktop::restartConnectionActiveTimer, this), *usbSecurityModel, serialNumber);
+    desktopWorker = std::make_unique<WorkerDesktop>(this,
+                                                    std::bind(&ServiceDesktop::restartConnectionActiveTimer, this),
+                                                    *usbSecurityModel,
+                                                    serialNumber,
+                                                    purefs::dir::getUserDiskPath() / "music");
 
     initialized =
         desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
@@ -220,7 +223,8 @@ auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
         settings->deinit();
         desktopWorker->closeWorker();
         desktopWorker.reset();
-        initialized = false;
+        initialized     = false;
+        isUsbConfigured = false;
     }
     return sys::ReturnCodes::Success;
 }
@@ -255,6 +259,13 @@ auto ServiceDesktop::handle(locks::UnlockedPhone * /*msg*/) -> std::shared_ptr<s
 {
     LOG_INFO("Phone unlocked.");
     usbSecurityModel->setPhoneUnlocked();
+
+    if (isUsbConfigured && isPlugEventUnhandled) {
+        bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
+                        service::name::system_manager);
+        isPlugEventUnhandled = false;
+    }
+
     return sys::MessageNone{};
 }
 
@@ -346,18 +357,19 @@ auto ServiceDesktop::handle(sdesktop::FactoryMessage * /*msg*/) -> std::shared_p
 
 auto ServiceDesktop::handle(sdesktop::usb::USBConfigured *msg) -> std::shared_ptr<sys::Message>
 {
-    auto message = static_cast<sdesktop::usb::USBConfigured *>(msg);
-    if (message->getConfigurationType() == sdesktop::usb::USBConfigurationType::firstConfiguration &&
-        isPlugEventUnhandled) {
-        bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
-                        service::name::system_manager);
-        isPlugEventUnhandled = false;
-    }
-
+    isUsbConfigured = true;
     if (usbSecurityModel->isSecurityEnabled()) {
         LOG_INFO("Endpoint security enabled, requesting passcode");
-
         bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), service::name::appmgr);
+    }
+    else {
+        auto message = static_cast<sdesktop::usb::USBConfigured *>(msg);
+        if (message->getConfigurationType() == sdesktop::usb::USBConfigurationType::firstConfiguration &&
+            isPlugEventUnhandled) {
+            bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
+                            service::name::system_manager);
+            isPlugEventUnhandled = false;
+        }
     }
 
     return sys::MessageNone{};

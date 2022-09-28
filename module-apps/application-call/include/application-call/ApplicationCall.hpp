@@ -83,7 +83,8 @@ namespace app
         bool conditionalReturnToPreviousView();
     };
 
-    template <> struct ManifestTraits<ApplicationCall>
+    template <>
+    struct ManifestTraits<ApplicationCall>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {

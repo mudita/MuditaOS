@@ -163,7 +163,8 @@ namespace sys
         static bool RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
         static bool RequestServiceClose(const std::string &name, Service *caller, TickType_t timeout = 5000);
 
-        template <typename T> void DestroyServices(const T &whitelist);
+        template <typename T>
+        void DestroyServices(const T &whitelist);
         /// Sysmgr stores list of all active services but some of them are under control of parent services.
         /// Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
         /// parents.
@@ -192,6 +193,7 @@ namespace sys
         void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency);
 
         bool cpuStatisticsTimerInit{false};
+        bool serviceListReversed{false};
 
         CloseReason closeReason{CloseReason::RegularPowerDown};
         UpdateReason updateReason{UpdateReason::Update};

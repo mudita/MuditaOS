@@ -9,7 +9,8 @@
 namespace app
 {
 
-    template <class T> class InternalModel
+    template <class T>
+    class InternalModel
     {
 
       protected:

@@ -33,7 +33,7 @@ namespace bluetooth
         {
             uint8_t track_id[8];
             uint32_t song_length_ms;
-            avrcp_playback_status_t status;
+            avrcp_playback_status_t status = AVRCP_PLAYBACK_STATUS_STOPPED;
             uint32_t song_position_ms; // 0xFFFFFFFF if not supported
         };
 
@@ -51,4 +51,4 @@ namespace bluetooth
         static void controllerPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
         static void init(sys::Service *service);
     };
-} // namespace Bt
+} // namespace bluetooth

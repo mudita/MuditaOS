@@ -18,7 +18,7 @@ namespace gui
     {
       private:
         std::shared_ptr<NotificationsPresenter> notificationsPresenter;
-        bool tetheringOn = false;
+        bool tetheringOn   = false;
         bool phoneTimeLock = false;
         const NotificationsListPlacement listPlacement;
 

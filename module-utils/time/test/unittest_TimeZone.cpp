@@ -29,7 +29,7 @@ TEST_CASE("TimeZone parser")
     SECTION("Checking the time zone rules for Warsaw")
     {
         std::string zone{"Warsaw"};
-        auto rules  = utils::time::getTimeZoneRules(zone);
+        auto rules        = utils::time::getTimeZoneRules(zone);
         auto summerOffset = utils::time::getTimeZoneOffset(zone, summerTime);
         auto winterOffset = utils::time::getTimeZoneOffset(zone, winterTime);
 
@@ -41,7 +41,7 @@ TEST_CASE("TimeZone parser")
     SECTION("Checking the time zone rules for London")
     {
         std::string zone{"London"};
-        auto rules  = utils::time::getTimeZoneRules(zone);
+        auto rules        = utils::time::getTimeZoneRules(zone);
         auto summerOffset = utils::time::getTimeZoneOffset(zone, summerTime);
         auto winterOffset = utils::time::getTimeZoneOffset(zone, winterTime);
 
@@ -53,7 +53,7 @@ TEST_CASE("TimeZone parser")
     SECTION("Checking the time zone rules for New York")
     {
         std::string zone{"New York"};
-        auto rules  = utils::time::getTimeZoneRules(zone);
+        auto rules        = utils::time::getTimeZoneRules(zone);
         auto summerOffset = utils::time::getTimeZoneOffset(zone, summerTime);
         auto winterOffset = utils::time::getTimeZoneOffset(zone, winterTime);
 
@@ -65,7 +65,7 @@ TEST_CASE("TimeZone parser")
     SECTION("Checking the time zone rules for Tehran")
     {
         std::string zone{"Tehran"};
-        auto rules  = utils::time::getTimeZoneRules(zone);
+        auto rules        = utils::time::getTimeZoneRules(zone);
         auto summerOffset = utils::time::getTimeZoneOffset(zone, summerTime);
         auto winterOffset = utils::time::getTimeZoneOffset(zone, winterTime);
 
@@ -77,7 +77,7 @@ TEST_CASE("TimeZone parser")
     SECTION("Checking the time zone rules for Auckland")
     {
         std::string zone{"Auckland"};
-        auto rules  = utils::time::getTimeZoneRules(zone);
+        auto rules        = utils::time::getTimeZoneRules(zone);
         auto summerOffset = utils::time::getTimeZoneOffset(zone, summerTime);
         auto winterOffset = utils::time::getTimeZoneOffset(zone, winterTime);
 
@@ -89,7 +89,7 @@ TEST_CASE("TimeZone parser")
     SECTION("Checking the time zone rules for unknown zone")
     {
         std::string zone{"unknown"};
-        auto rules  = utils::time::getTimeZoneRules(zone);
+        auto rules        = utils::time::getTimeZoneRules(zone);
         auto summerOffset = utils::time::getTimeZoneOffset(zone, summerTime);
         auto winterOffset = utils::time::getTimeZoneOffset(zone, winterTime);
 

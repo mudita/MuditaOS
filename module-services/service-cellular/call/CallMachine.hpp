@@ -38,6 +38,8 @@ namespace call
     {
         bool operator()(CallData &call)
         {
+            LOG_DEBUG("Called RING, status: %s",
+                      call.mode == sys::phone_modes::PhoneMode::Connected ? "true" : "false");
             return call.mode == sys::phone_modes::PhoneMode::Connected;
         }
     } constexpr RING;
@@ -54,8 +56,8 @@ namespace call
     {
         void operator()(Dependencies &di, CallData &call)
         {
-            call      = CallData{};
-            call.mode = di.modem->getMode();
+            call           = CallData{};
+            call.mode      = di.modem->getMode();
             call.tethering = di.modem->getTethering();
             di.sentinel->ReleaseMinimumFrequency();
             di.timer->stop();
@@ -116,6 +118,7 @@ namespace call
     {
         bool operator()(const call::event::CLIP &clip, Dependencies &di, CallData &call)
         {
+            LOG_DEBUG("Called ClipDND_OK!");
             return call.mode == sys::phone_modes::PhoneMode::DoNotDisturb &&
                    di.modem->areCallsFromFavouritesEnabled() && di.db->isNumberInFavourites(clip.number);
         }
@@ -125,6 +128,7 @@ namespace call
     {
         void operator()(const call::event::CLIP &clip, Dependencies &di, CallData &call)
         {
+            LOG_DEBUG("Called HandleClipDND!");
             handleClipCommon(di, clip, call);
             di.audio->play();
         }
@@ -134,6 +138,7 @@ namespace call
     {
         bool operator()(const call::event::CLIP &clip, Dependencies &di, CallData &call)
         {
+            LOG_DEBUG("Called ClipDND_NOK!");
             return call.mode == sys::phone_modes::PhoneMode::DoNotDisturb &&
                    not(di.modem->areCallsFromFavouritesEnabled() && di.db->isNumberInFavourites(clip.number));
         }
@@ -143,10 +148,24 @@ namespace call
     {
         void operator()(Dependencies &di, const call::event::CLIP &clip, CallData &call)
         {
+            di.db->startCall(call.record);
+
+            LOG_DEBUG("Called HandleDND_Reject!");
             setNumber(call, clip.number);
-            di.db->incrementNotAnsweredCallsNotification(call.record.phoneNumber);
-            di.db->endCall(call.record);
+            call.record.date = std::time(nullptr);
+            call.record.type = CallType::CT_MISSED;
+
+#ifdef TARGET_RT1051
+            /* Workaround for a DND mode failed rejections.
+             * Probably modem needs some time to process
+             * the request internally, so there is a delay
+             * required before issuing call rejecting.
+             * The 750ms value has been obtained experimentally. */
+            constexpr auto modemProcessingTimeDelayMs = 750;
+            vTaskDelay(pdMS_TO_TICKS(modemProcessingTimeDelayMs));
+#endif
             di.modem->rejectCall();
+            di.db->endCall(call.record);
         }
     } constexpr HandleDND_Reject;
 
@@ -226,7 +245,7 @@ namespace call
             call.record.isRead = false;
             di.db->endCall(call.record);
             di.multicast->notifyCallEnded();
-            di.modem->hangupCall();
+            di.modem->rejectCall();
         }
     } constexpr HandleRejectCall;
 
@@ -239,7 +258,7 @@ namespace call
             call.record.isRead = false;
             di.db->endCall(call.record);
             di.multicast->notifyCallEnded();
-            di.modem->hangupCall();
+            di.modem->rejectCall();
         };
     } constexpr HandleMissedCall;
 
@@ -302,8 +321,9 @@ namespace call
                 "Idle"_s + boost::sml::event<evt::RING>[RING and not Tethering] / HandleRing = "RingDelay"_s,
 
                 "Idle"_s + boost::sml::event<evt::CLIP>[Tethering or ClipDND_NOK] / HandleDND_Reject = "Idle"_s,
-                "Idle"_s + boost::sml::event<evt::CLIP>[ClipConnected] / HandleClipWithoutRing       = "HaveId"_s,
-                "Idle"_s + boost::sml::event<evt::CLIP>[ClipDND_OK] / HandleClipDND                  = "HaveId"_s,
+
+                "Idle"_s + boost::sml::event<evt::CLIP>[ClipConnected] / HandleClipWithoutRing = "HaveId"_s,
+                "Idle"_s + boost::sml::event<evt::CLIP>[ClipDND_OK] / HandleClipDND            = "HaveId"_s,
                 // outgoing call: Pure is Ringing (called from: handleCellularRingingMessage)
                 "Idle"_s + boost::sml::event<evt::StartCall> / HandleStartCall = "Starting"_s,
 

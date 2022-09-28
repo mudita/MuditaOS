@@ -17,15 +17,15 @@ namespace call::api
     {
       public:
         virtual void notifyIncomingCall()                                                      = 0;
-        virtual void notifyIdentifiedCall(const utils::PhoneNumber::View &number) = 0;
-        virtual void notifyCallActive()                                           = 0;
-        virtual void notifyCallAborted()                                          = 0;
+        virtual void notifyIdentifiedCall(const utils::PhoneNumber::View &number)              = 0;
+        virtual void notifyCallActive()                                                        = 0;
+        virtual void notifyCallAborted()                                                       = 0;
         virtual void notifyOutgoingCallAnswered()                                              = 0;
         virtual void notifyCallStarted(const utils::PhoneNumber &number, const CallType &type) = 0;
         virtual void notifyCallEnded()                                                         = 0;
         virtual void notifyCallDurationUpdate(const time_t &duration)                          = 0;
 
-        virtual ~Multicast()                                                      = default;
+        virtual ~Multicast() = default;
     };
 } // namespace call::api
 

@@ -73,12 +73,7 @@ namespace gui
 
             if (timeFormat != newFormat) {
                 timeSetSpinner->setHour(date::make12(hours).count());
-                if (date::is_pm(hours)) {
-                    fmt->set_value(time::Locale::getPM());
-                }
-                else {
-                    fmt->set_value(time::Locale::getAM());
-                }
+                set12HPeriod(date::is_pm(hours) ? Period::PM : Period::AM);
             }
 
         } break;
@@ -275,6 +270,20 @@ namespace gui
         setMaximumWidth(widgetMinimumArea.w);
 
         HBox::handleContentChanged();
+    }
+    auto TimeSetFmtSpinner::set12HPeriod(const Period period) -> void
+    {
+        period == Period::AM ? fmt->set_value(utils::time::Locale::getAM())
+                             : fmt->set_value(utils::time::Locale::getPM());
+    }
+    auto TimeSetFmtSpinner::getHour24Format() const noexcept -> std::chrono::hours
+    {
+        using namespace utils::time;
+        if (timeFormat == Locale::TimeFormat::FormatTime24H) {
+            return std::chrono::hours{timeSetSpinner->getHour()};
+        }
+
+        return date::make24(std::chrono::hours{timeSetSpinner->getHour()}, isPM());
     }
 
 } // namespace gui

@@ -14,7 +14,7 @@ namespace app::bell_settings
 {
     TimeUnitsWindowPresenter::TimeUnitsWindowPresenter(
         app::ApplicationCommon *app,
-        std::shared_ptr<TimeUnitsModel> pagesProvider,
+        std::shared_ptr<DateTimeUnitsModel> pagesProvider,
         std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel,
         std::unique_ptr<AbstractLayoutModel> layoutModel)
         : app{app}, pagesProvider(std::move(pagesProvider)), temperatureUnitModel{std::move(temperatureUnitModel)},

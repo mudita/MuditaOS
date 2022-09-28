@@ -57,13 +57,14 @@ export declare ignore_paths=(
     'module-vfs/board/free_rtos_custom/include/FreeRTOSFATConfig.h'
     'module-vfs/drivers/include/thirdparty/fatfs/ffconf.h'
     'module-vfs/thirdparty/*'
+    'test/'
     'third-party/'
 )
 
 # bash function using above config function
 shouldnt_ignore() {
     # change full name path to path relative to root git dir
-    local fname=${1/"$L_GIT_DIR"/"./"}
+    local fname=${1/"$L_GIT_DIR/"/}
     for el in ${ignore_paths[@]}; do
         if [[ ${fname}  =~ ^${el}.* ]]; then
             [[ $VERBOSE ]] && echo "Ignore: ${fname} formatting due to: $el match!"

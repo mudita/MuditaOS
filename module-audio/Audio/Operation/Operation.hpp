@@ -14,7 +14,6 @@
 #include "Audio/encoder/Encoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
 
-
 namespace audio
 {
     class Operation

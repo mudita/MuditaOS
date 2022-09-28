@@ -15,12 +15,12 @@ namespace call::api
     {
       public:
         virtual bool answerIncomingCall()                  = 0;
-        virtual bool hangupCall()                     = 0;
-        virtual bool rejectCall()                     = 0;
-        virtual bool areCallsFromFavouritesEnabled()  = 0;
-        virtual sys::phone_modes::PhoneMode getMode() = 0;
+        virtual bool hangupCall()                          = 0;
+        virtual bool rejectCall()                          = 0;
+        virtual bool areCallsFromFavouritesEnabled()       = 0;
+        virtual sys::phone_modes::PhoneMode getMode()      = 0;
         virtual sys::phone_modes::Tethering getTethering() = 0;
-        virtual ~Api()                                = default;
+        virtual ~Api()                                     = default;
     };
 } // namespace call::api
 

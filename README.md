@@ -45,11 +45,11 @@ To develop MuditaOS please follow guide on [environment setup](doc/quickstart.md
 
 ### Development workflow
 
-When contributing code or documentation changes please follow the guidleines inside the ["Development workflow"](doc/development_workflow.md) article.
+When contributing code or documentation changes please follow the guidelines inside the ["Development workflow"](doc/development_workflow.md) article.
 
 ## Documentation
 
-For everything you need to kickstart your development environment please go to the [Documentation](doc/README.md) on GitHub.
+For everything you need to kick-start your development environment please go to the [Documentation](doc/README.md) on GitHub.
 
 A fully detailed documentation can be build locally using [Doxygen](https://www.doxygen.nl/index.html).
 

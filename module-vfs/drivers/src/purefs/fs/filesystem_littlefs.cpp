@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/drivers/filesystem_littlefs.hpp>
@@ -26,7 +26,8 @@ namespace
     // NOTE: lfs block size is configured during format
     static constexpr auto c_lfs_block_size = 32U * 1024U;
 
-    template <typename T> auto lfs_to_errno(T error) -> T
+    template <typename T>
+    auto lfs_to_errno(T error) -> T
     {
         if (error >= 0) {
             return error;

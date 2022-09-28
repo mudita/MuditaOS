@@ -97,9 +97,9 @@ namespace bluetooth
     std::unique_ptr<AudioInterface> HSP::HSPImpl::audioInterface       = nullptr;
     const sys::Service *HSP::HSPImpl::ownerService;
     const std::string_view HSP::HSPImpl::agServiceName = "Mudita Pure HSP";
-    bool HSP::HSPImpl::isConnected          = false;
-    bool HSP::HSPImpl::callAnswered         = false;
-    bool HSP::HSPImpl::isRinging            = false;
+    bool HSP::HSPImpl::isConnected                     = false;
+    bool HSP::HSPImpl::callAnswered                    = false;
+    bool HSP::HSPImpl::isRinging                       = false;
     std::shared_ptr<CVSDAudioDevice> HSP::HSPImpl::audioDevice;
     Devicei HSP::HSPImpl::device;
 

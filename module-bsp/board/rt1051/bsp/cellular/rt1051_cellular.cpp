@@ -230,6 +230,11 @@ namespace bsp
                 if (!LPUART_IsEDMATxBusy(&uartDmaHandle)) {
                     break;
                 }
+                else if (i == maxTXCheckRetires - 1) {
+                    LOG_ERROR("Cellular Uart error: EDMA is busy");
+                    LPUART_TransferAbortSendEDMA(CELLULAR_UART_BASE, &uartDmaHandle);
+                    return -1;
+                }
             }
         }
 
@@ -249,6 +254,7 @@ namespace bsp
 
         if (status != kStatus_Success) {
             LOG_ERROR("Cellular: TX Failed! , status: %d", static_cast<int>(status));
+            LPUART_TransferAbortSendEDMA(CELLULAR_UART_BASE, &uartDmaHandle);
             disableTx();
             return -1;
         }
@@ -258,6 +264,7 @@ namespace bsp
 
         if (ulNotificationValue == 0) {
             LOG_ERROR("Cellular Uart error: TX Transmission timeout");
+            LPUART_TransferAbortSendEDMA(CELLULAR_UART_BASE, &uartDmaHandle);
             disableTx();
             return -1;
         }

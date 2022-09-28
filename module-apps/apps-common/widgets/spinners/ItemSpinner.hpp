@@ -8,7 +8,8 @@
 
 namespace gui
 {
-    template <typename Container> class ItemSpinner : public Item
+    template <typename Container>
+    class ItemSpinner : public Item
     {
       public:
         using range      = typename Container::range;
@@ -69,18 +70,21 @@ namespace gui
         }
     }
 
-    template <typename Container> void ItemSpinner<Container>::setFocusEdges(RectangleEdge edges)
+    template <typename Container>
+    void ItemSpinner<Container>::setFocusEdges(RectangleEdge edges)
     {
         focusEdges = edges;
     }
 
-    template <typename Container> void ItemSpinner<Container>::setRange(range range)
+    template <typename Container>
+    void ItemSpinner<Container>::setRange(range range)
     {
         container.updateRange(range);
         update();
     }
 
-    template <typename Container> void ItemSpinner<Container>::setCurrentValue(const value_type val)
+    template <typename Container>
+    void ItemSpinner<Container>::setCurrentValue(const value_type val)
     {
         container.set(val);
         update();
@@ -92,19 +96,22 @@ namespace gui
         return container.get();
     }
 
-    template <typename Container> bool ItemSpinner<Container>::isPreviousEvent(const InputEvent &inputEvent)
+    template <typename Container>
+    bool ItemSpinner<Container>::isPreviousEvent(const InputEvent &inputEvent)
     {
         return (orientation == Orientation::Vertical && inputEvent.is(KeyCode::KEY_DOWN)) ||
                (orientation == Orientation::Horizontal && inputEvent.is(KeyCode::KEY_LEFT));
     }
 
-    template <typename Container> bool ItemSpinner<Container>::isNextEvent(const InputEvent &inputEvent)
+    template <typename Container>
+    bool ItemSpinner<Container>::isNextEvent(const InputEvent &inputEvent)
     {
         return (orientation == Orientation::Vertical && inputEvent.is(KeyCode::KEY_UP)) ||
                (orientation == Orientation::Horizontal && inputEvent.is(KeyCode::KEY_RIGHT));
     }
 
-    template <typename Container> bool ItemSpinner<Container>::onInput(const InputEvent &inputEvent)
+    template <typename Container>
+    bool ItemSpinner<Container>::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
             if (isPreviousEvent(inputEvent)) {
@@ -119,7 +126,8 @@ namespace gui
         return false;
     }
 
-    template <typename Container> void ItemSpinner<Container>::stepNext()
+    template <typename Container>
+    void ItemSpinner<Container>::stepNext()
     {
         if (container.next()) {
             update();
@@ -127,7 +135,8 @@ namespace gui
         }
     }
 
-    template <typename Container> void ItemSpinner<Container>::stepPrevious()
+    template <typename Container>
+    void ItemSpinner<Container>::stepPrevious()
     {
         if (container.previous()) {
             update();
@@ -135,7 +144,8 @@ namespace gui
         }
     }
 
-    template <typename Container> void ItemSpinner<Container>::update()
+    template <typename Container>
+    void ItemSpinner<Container>::update()
     {
         if (currentLayout != nullptr) {
             this->removeWidget(currentLayout);
@@ -144,17 +154,20 @@ namespace gui
         this->addWidget(currentLayout);
         informContentChanged();
     }
-    template <typename Container> void ItemSpinner<Container>::invoke()
+    template <typename Container>
+    void ItemSpinner<Container>::invoke()
     {
         if (onValueChanged) {
             onValueChanged(getCurrentValue());
         }
     }
-    template <typename Container> bool ItemSpinner<Container>::isAtMin() const
+    template <typename Container>
+    bool ItemSpinner<Container>::isAtMin() const
     {
         return container.is_min();
     }
-    template <typename Container> bool ItemSpinner<Container>::isAtMax() const
+    template <typename Container>
+    bool ItemSpinner<Container>::isAtMax() const
     {
         return container.is_max();
     }

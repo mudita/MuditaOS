@@ -89,7 +89,6 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
     notificationsPresenter->updateData(params, callAndSMSVisibility);
 }
 
-
 bool NotificationsModel::isTetheringOn() const noexcept
 {
     return tetheringOn;

@@ -20,8 +20,8 @@ namespace gui
         void changeVisibility(bool &currentVisibility);
 
         std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
-        bool isBluetoothSwitchOn       = false;
-        bool isPhoneVisibilitySwitchOn = false;
+        bool isBluetoothSwitchOn            = false;
+        bool isPhoneVisibilitySwitchOn      = false;
         OptionWindowDestroyer rai_destroyer = OptionWindowDestroyer(*this);
     };
 } // namespace gui

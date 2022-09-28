@@ -169,6 +169,6 @@ namespace sdesktop::endpoints
             totalDeviceSpaceMiB += totalSpace;
         }
 
-        return {totalDeviceSpaceMiB, reservedSystemSpaceMiB, usedUserSpaceMiB};
+        return {totalDeviceSpaceMiB, reservedSystemSpaceMiB, usedUserSpaceMiB + purefs::userSpaceOffset};
     }
 } // namespace sdesktop::endpoints

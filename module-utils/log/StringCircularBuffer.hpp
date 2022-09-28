@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,6 @@ class StringCircularBuffer
   public:
     explicit StringCircularBuffer(size_t size) : buffer(std::make_unique<std::string[]>(size)), capacity(size)
     {}
-    virtual ~StringCircularBuffer() = default;
     [[nodiscard]] size_t getCapacity() const noexcept
     {
         return capacity;
@@ -29,8 +28,8 @@ class StringCircularBuffer
     {
         return full;
     }
-    virtual void put(const std::string &item);
-    virtual void put(std::string &&item);
+    void put(const std::string &item);
+    void put(std::string &&item);
     void reset();
 
   private:

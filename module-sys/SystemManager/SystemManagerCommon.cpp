@@ -10,7 +10,7 @@
 #include "thread.hpp"
 #include "ticks.hpp"
 #include "critical.hpp"
-#include <algorithm>
+#include "Logger.hpp"
 #include <service-evtmgr/KbdMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -33,6 +33,8 @@
 #include <service-db/DBServiceName.hpp>
 #include <module-gui/gui/Common.hpp>
 #include <service-eink/Common.hpp>
+
+#include <algorithm>
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -67,11 +69,12 @@ namespace sys
     {
         namespace restore
         {
-            static constexpr std::array whitelist = {service::name::service_desktop,
-                                                     service::name::evt_manager,
-                                                     service::name::eink,
-                                                     service::name::appmgr,
-                                                     service::name::cellular};
+            static constexpr std::array whitelist = {
+                service::name::service_desktop, // Handle restore procedure
+                service::name::evt_manager, // Workaround for charging battery after shutting down and turn on the phone
+                service::name::appmgr,
+                service::name::cellular,
+            };
         }
 
         namespace regularClose
@@ -87,7 +90,8 @@ namespace sys
                                                      service::name::service_desktop};
         }
 
-        template <typename T> static bool isOnWhitelist(const T &list, const std::string &serviceName)
+        template <typename T>
+        static bool isOnWhitelist(const T &list, const std::string &serviceName)
         {
             return std::find(std::begin(list), std::end(list), serviceName) != std::end(list);
         }
@@ -113,6 +117,8 @@ namespace sys
             this, "lowBatteryShutdownDelay", lowBatteryShutdownDelayTime, [this](sys::Timer &) {
                 CloseSystemHandler(CloseReason::LowBattery);
             });
+
+        Log::Logger::get().createTimer(this);
     }
 
     SystemManagerCommon::~SystemManagerCommon()
@@ -383,7 +389,8 @@ namespace sys
         return true;
     }
 
-    template <typename T> void SystemManagerCommon::DestroyServices(const T &whitelist)
+    template <typename T>
+    void SystemManagerCommon::DestroyServices(const T &whitelist)
     {
         cpp_freertos::LockGuard lck(serviceDestroyMutex);
         for (auto service = servicesList.begin(); service != servicesList.end();) {
@@ -702,7 +709,10 @@ namespace sys
 
         // We are going to remove services in reversed order of creation
         CriticalSection::Enter();
-        std::reverse(servicesList.begin(), servicesList.end());
+        if (not serviceListReversed) {
+            std::reverse(servicesList.begin(), servicesList.end());
+            serviceListReversed = true;
+        }
         CriticalSection::Exit();
 
         InitiateSystemCloseSequence(closeReason);
@@ -739,10 +749,12 @@ namespace sys
     void SystemManagerCommon::RestoreSystemHandler()
     {
         LOG_INFO("Entering restore system state");
-
         // We are going to remove services in reversed order of creation
         CriticalSection::Enter();
-        std::reverse(servicesList.begin(), servicesList.end());
+        if (not serviceListReversed) {
+            std::reverse(servicesList.begin(), servicesList.end());
+            serviceListReversed = true;
+        }
         CriticalSection::Exit();
 
         DestroyServices(sys::state::restore::whitelist);

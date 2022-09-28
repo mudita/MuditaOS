@@ -28,7 +28,8 @@ namespace
         EXPECT_TRUE(text.empty());
     }
 
-    template <size_t N> auto initContainer(gui::HBox &box) -> gui::DigitsContainer
+    template <size_t N>
+    auto initContainer(gui::HBox &box) -> gui::DigitsContainer
     {
         auto container = gui::DigitsContainer{N};
         for (auto &digit : container.digits) {
@@ -50,8 +51,8 @@ TEST(DigitsContainerTest, setMinutesBox)
                                                                 {1233433, "433"s},
                                                                 {99, "99"s},
                                                                 {10, "10"s},
-                                                                {1, "1"s},
-                                                                {0, "0"s}};
+                                                                {1, "01"s},
+                                                                {0, "00"s}};
     gui::HBox box{};
     auto container = initContainer<3>(box);
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmOperations.hpp"
@@ -128,13 +128,18 @@ namespace alarms
 
     void AlarmOperationsCommon::turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)
     {
-        bool ongoingEventsResult = turnOffAlarmIfFoundInOngoingEvents(id);
-        bool bedtimeEventsResult = turnOffAlarmIfFoundInBedtime(id);
-        if (not ongoingEventsResult and not bedtimeEventsResult) {
-            LOG_ERROR("Trying to turn off nonexisting event ID %d", static_cast<int>(id));
+        auto found = findSingleEventById(ongoingSingleEvents, id);
+        if (found == ongoingSingleEvents.end()) {
+            LOG_ERROR("Trying to turn off nonexisting event");
             callback(false);
+            return;
         }
+        switchAlarmExecution(*(*found), false);
+        ongoingSingleEvents.erase(found);
 
+        processOngoingEvents();
+
+        handleActiveAlarmsCountChange();
         callback(true);
     }
 
@@ -333,26 +338,6 @@ namespace alarms
         }
     }
 
-    bool AlarmOperationsCommon::turnOffAlarmIfFoundInOngoingEvents(std::uint32_t id)
-    {
-        auto found = findSingleEventById(ongoingSingleEvents, id);
-        if (found == ongoingSingleEvents.end()) {
-            return false;
-        }
-
-        switchAlarmExecution(*(*found), false);
-        ongoingSingleEvents.erase(found);
-        processOngoingEvents();
-        handleActiveAlarmsCountChange();
-
-        return true;
-    }
-
-    bool AlarmOperationsCommon::turnOffAlarmIfFoundInBedtime(const std::uint32_t id)
-    {
-        return false;
-    }
-
     void AlarmOperationsCommon::onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event,
                                                  alarms::AlarmType alarmType)
     {}
@@ -448,16 +433,15 @@ namespace alarms
         callback(std::move(snoozedEvents));
     }
 
-    auto findSingleEventById(EventsContainer<SingleEventRecord> &events, const std::uint32_t id)
-        -> EventsContainer<SingleEventRecord>::iterator
+    auto findSingleEventById(std::vector<std::unique_ptr<SingleEventRecord>> &events, const std::uint32_t id)
+        -> std::vector<std::unique_ptr<SingleEventRecord>>::iterator
     {
         return std::find_if(events.begin(), events.end(), [id](const std::unique_ptr<SingleEventRecord> &event) {
             return id == event->parent->ID;
         });
     }
-
-    auto findSnoozedEventById(EventsContainer<SnoozedAlarmEventRecord> &events, const std::uint32_t id)
-        -> EventsContainer<SnoozedAlarmEventRecord>::iterator
+    auto findSnoozedEventById(std::vector<std::unique_ptr<SnoozedAlarmEventRecord>> &events, const std::uint32_t id)
+        -> std::vector<std::unique_ptr<SnoozedAlarmEventRecord>>::iterator
     {
         return std::find_if(events.begin(), events.end(), [id](const std::unique_ptr<SnoozedAlarmEventRecord> &event) {
             return id == event->parent->ID;

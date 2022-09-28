@@ -46,6 +46,7 @@ target_sources(apps-common
         widgets/BellBaseLayout.cpp
         widgets/BellSideListItem.cpp
         widgets/ClockDateWidget.cpp
+        widgets/DateSetSpinner.cpp
         widgets/DateWidget.cpp
         widgets/InputBox.cpp
         widgets/ModesBox.cpp
@@ -76,7 +77,6 @@ target_sources(apps-common
         widgets/TimeSetFmtSpinner.hpp
         actions/AlarmRingingData.hpp
         actions/AlarmTriggeredAction.hpp
-        popups/data/BedtimeReminderPopupRequestParams.hpp
 
         models/SongContext.hpp
         models/SongsRepository.hpp

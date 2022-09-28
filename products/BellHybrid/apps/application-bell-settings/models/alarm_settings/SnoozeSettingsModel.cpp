@@ -7,7 +7,8 @@
 
 namespace
 {
-    template <typename T> std::optional<T> get_helper(settings::Settings &settings, const std::string &str)
+    template <typename T>
+    std::optional<T> get_helper(settings::Settings &settings, const std::string &str)
     {
         const auto retStr = settings.getValue(str, settings::SettingsScope::Global);
         if (retStr.empty()) {

@@ -15,10 +15,9 @@ namespace audio
 {
 
     using namespace AudioServiceMessage;
-    using namespace utils;
 
     PlaybackOperation::PlaybackOperation(const char *file, const audio::PlaybackType &playbackType, Callback callback)
-        : Operation(callback, playbackType), dec(nullptr)
+        : Operation(std::move(callback), playbackType), dec(nullptr)
     {
         // order defines priority
         AddProfile(Profile::Type::PlaybackHeadphones, playbackType, false);
@@ -157,7 +156,7 @@ namespace audio
 
     audio::RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
     {
-        auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected ? true : false;
+        const auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected;
         switch (evt->getType()) {
         case EventType::JackState:
             SetProfileAvailability({Profile::Type::PlaybackHeadphones}, isAvailable);

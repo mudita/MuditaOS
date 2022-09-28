@@ -9,12 +9,12 @@ namespace bsp
     {
         PowerProfile bellPowerProfile;
 
-        bellPowerProfile.frequencyShiftLowerThreshold      = 50;
-        bellPowerProfile.frequencyShiftUpperThreshold      = 80;
-        bellPowerProfile.maxBelowThresholdCount            = 5;
-        bellPowerProfile.maxBelowThresholdInRowCount       = 1;
-        bellPowerProfile.maxAboveThresholdCount            = 2;
-        bellPowerProfile.minimalFrequency                  = CpuFrequencyMHz::Level_0;
+        bellPowerProfile.frequencyShiftLowerThreshold = 50;
+        bellPowerProfile.frequencyShiftUpperThreshold = 80;
+        bellPowerProfile.maxBelowThresholdCount       = 5;
+        bellPowerProfile.maxBelowThresholdInRowCount  = 1;
+        bellPowerProfile.maxAboveThresholdCount       = 2;
+        bellPowerProfile.minimalFrequency             = CpuFrequencyMHz::Level_0;
 
         return bellPowerProfile;
     }

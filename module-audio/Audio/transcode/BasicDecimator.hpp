@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,7 +24,8 @@ namespace audio::transcode
      * @tparam Ratio - order of the decimator; e.g.: for Ratio = 4 drops 3 sample for each block of 4
      * reducing sample rate by the factor of 4.
      */
-    template <typename SampleType, unsigned int Channels, unsigned int Ratio> class BasicDecimator : public Transform
+    template <typename SampleType, unsigned int Channels, unsigned int Ratio>
+    class BasicDecimator : public Transform
     {
         static_assert(Channels == 1 || Channels == 2);
         static_assert(std::is_integral<SampleType>::value);
@@ -33,8 +34,9 @@ namespace audio::transcode
         /**
          * @brief Integer type to be used to read and write data from/to a buffer.
          */
-        using IntegerType = typename decltype(
-            utils::integer::getIntegerType<sizeof(SampleType) * utils::integer::BitsInByte * Channels>())::type;
+        using IntegerType =
+            typename decltype(utils::integer::getIntegerType<sizeof(SampleType) * utils::integer::BitsInByte *
+                                                             Channels>())::type;
 
       public:
         auto transformBlockSize(std::size_t blockSize) const noexcept -> std::size_t override

@@ -104,10 +104,10 @@ namespace audio
             LOG_ERROR("Unsupported sample rate");
         }
 
-        codecParams.inputPath  = getCodecInputPath(currentFormat);
-        codecParams.outputPath = getCodecOutputPath(currentFormat);
-        codecParams.outVolume  = currentFormat.outputVolume;
-        codecParams.inGain     = currentFormat.inputGain;
+        codecParams.inputPath         = getCodecInputPath(currentFormat);
+        codecParams.outputPath        = getCodecOutputPath(currentFormat);
+        codecParams.outVolume         = currentFormat.outputVolume;
+        codecParams.inGain            = currentFormat.inputGain;
         codecParams.playbackPathGain  = currentFormat.playbackPathGain;
         codecParams.playbackPathAtten = currentFormat.playbackPathAtten;
         SetupEQ();

@@ -24,7 +24,6 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 namespace sdesktop::endpoints
 {
@@ -53,7 +52,7 @@ namespace sdesktop::endpoints
         return recordEntry;
     }
 
-    auto ContactHelper::from_json(const json11::Json &contactJSON) -> ContactRecord
+    auto ContactHelper::from_json(const json11::Json &contactJSON) -> std::optional<ContactRecord>
     {
         auto newRecord            = ContactRecord();
         newRecord.primaryName     = UTF8(contactJSON[json::contacts::primaryName].string_value());
@@ -63,13 +62,20 @@ namespace sdesktop::endpoints
         newRecord.mail            = UTF8(contactJSON[json::contacts::mail].string_value());
         newRecord.note            = UTF8(contactJSON[json::contacts::note].string_value());
         newRecord.speeddial       = UTF8(contactJSON[json::contacts::speedDial].string_value());
-
         for (const auto &num : contactJSON[json::contacts::numbers].array_items()) {
             utils::PhoneNumber phoneNumber(num.string_value());
-            auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType::CELL);
-            newRecord.numbers.push_back(contactNum);
+            ContactRecord::Number contactNum;
+            try {
+                contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType::CELL);
+            }
+            catch (const utils::PhoneNumber::Error &e) {
+                LOG_ERROR("Exception in ContactRecord::Number while processing number %s! Reason: %s",
+                          e.getNumber().c_str(),
+                          e.what());
+                return std::nullopt;
+            }
+            newRecord.numbers.push_back(std::move(contactNum));
         }
-
         newRecord.addToBlocked(contactJSON[json::contacts::isBlocked].bool_value());
         newRecord.addToFavourites(contactJSON[json::contacts::isFavourite].bool_value());
         newRecord.addToIce(contactJSON[json::contacts::isICE].bool_value());
@@ -110,9 +116,7 @@ namespace sdesktop::endpoints
                         putToSendQueue(context.createSimpleResponse());
                         return true;
                     }
-                    else {
-                        return false;
-                    }
+                    return false;
                 },
                 ctx);
             query->setQueryListener(std::move(listener));
@@ -140,9 +144,7 @@ namespace sdesktop::endpoints
                     putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
-                else {
-                    return false;
-                }
+                return false;
             },
             context);
 
@@ -155,9 +157,14 @@ namespace sdesktop::endpoints
 
     auto ContactHelper::createDBEntry(Context &context) -> sys::ReturnCodes
     {
-        auto newRecord = from_json(context.getBody());
-        auto query     = std::make_unique<db::query::ContactAdd>(newRecord);
+        const auto newRecord = from_json(context.getBody());
+        if (!newRecord.has_value()) {
+            context.setResponseStatus(http::Code::InternalServerError);
+            putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Failure;
+        }
 
+        auto query    = std::make_unique<db::query::ContactAdd>(newRecord.value());
         auto listener = std::make_unique<db::EndpointListener>(
             [](db::QueryResult *result, Context context) {
                 if (auto contactResult = dynamic_cast<db::query::ContactAddResult *>(result)) {
@@ -177,9 +184,7 @@ namespace sdesktop::endpoints
 
                     return true;
                 }
-                else {
-                    return false;
-                }
+                return false;
             },
             context);
 
@@ -204,9 +209,7 @@ namespace sdesktop::endpoints
 
                     return true;
                 }
-                else {
-                    return false;
-                }
+                return false;
             },
             context);
 
@@ -218,9 +221,14 @@ namespace sdesktop::endpoints
 
     auto ContactHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
     {
-        auto contact = from_json(context.getBody());
-        auto query   = std::make_unique<db::query::ContactUpdate>(contact);
+        const auto contact = from_json(context.getBody());
+        if (!contact.has_value()) {
+            context.setResponseStatus(http::Code::InternalServerError);
+            putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Failure;
+        }
 
+        auto query    = std::make_unique<db::query::ContactUpdate>(contact.value());
         auto listener = std::make_unique<db::EndpointListener>(
             [](db::QueryResult *result, Context context) {
                 if (auto contactResult = dynamic_cast<db::query::ContactUpdateResult *>(result)) {
@@ -231,9 +239,7 @@ namespace sdesktop::endpoints
 
                     return true;
                 }
-                else {
-                    return false;
-                }
+                return false;
             },
             context);
 
@@ -258,9 +264,7 @@ namespace sdesktop::endpoints
 
                     return true;
                 }
-                else {
-                    return false;
-                }
+                return false;
             },
             context);
 

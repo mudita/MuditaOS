@@ -5,5 +5,4 @@
 #include <log/log.hpp>
 
 namespace bluetooth
-{
-} // namespace bluetooth
+{} // namespace bluetooth

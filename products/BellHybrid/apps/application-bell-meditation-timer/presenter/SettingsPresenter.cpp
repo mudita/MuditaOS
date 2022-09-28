@@ -33,7 +33,7 @@ namespace app::list_items
         std::string none;
     };
 
-    using StartDelaySpinner = gui::UIntegerSpinnerWithFormatter<StartDelayFormatter>;
+    using StartDelaySpinner = gui::U8IntegerSpinnerWithFormatter<StartDelayFormatter>;
     class StartDelay : public app::list_items::details::ListItemBase<StartDelaySpinner>
     {
       public:
