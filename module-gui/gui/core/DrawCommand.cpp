@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DrawCommand.hpp"
@@ -225,26 +225,22 @@ namespace gui
     void DrawImage::drawVecMap(Context *ctx, VecMap *vecMap) const
     {
         uint32_t offsetContext    = 0;
-        uint32_t offsetRowContext = 0;
         uint32_t imageOffset      = 0;
         uint8_t alphaColor        = vecMap->getAlphaColor();
+        checkImageSize(ctx, vecMap);
 
         for (uint32_t row = 0; row < std::min(vecMap->getHeight(), ctx->getH()); row++) {
-            checkImageSize(ctx, vecMap);
-            uint16_t vecCount = *(vecMap->getData() + imageOffset);
-            imageOffset += sizeof(uint16_t);
+            uint16_t vecCount = vecMap->getData()[imageOffset++];
+            vecCount |= vecMap->getData()[imageOffset++] << 8;
 
             const auto ctxData = ctx->getData();
-            offsetRowContext   = offsetContext;
+            uint32_t offsetRowContext = offsetContext;
 
             for (uint32_t vec = 0; vec < vecCount; ++vec) {
-
-                uint16_t vecOffset = *(vecMap->getData() + imageOffset);
-                imageOffset += sizeof(uint16_t);
-                uint16_t vecLength = *(vecMap->getData() + imageOffset);
-                imageOffset += sizeof(uint8_t);
-                uint8_t vecColor = *(vecMap->getData() + imageOffset);
-                imageOffset += sizeof(uint8_t);
+                uint16_t vecOffset = vecMap->getData()[imageOffset++];
+                vecOffset |= vecMap->getData()[imageOffset++] << 8;
+                uint16_t vecLength = vecMap->getData()[imageOffset++];
+                uint8_t vecColor   = vecMap->getData()[imageOffset++];
 
                 offsetRowContext += vecOffset;
                 if (vecColor != alphaColor) {

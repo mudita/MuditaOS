@@ -20,3 +20,4 @@ add_catch2_executable(
 	USE_FS
 )
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/plus_32px_W_M.vpi" DESTINATION "${CMAKE_BINARY_DIR}/images")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/gradient_512px.vpi" DESTINATION "${CMAKE_BINARY_DIR}/images")
