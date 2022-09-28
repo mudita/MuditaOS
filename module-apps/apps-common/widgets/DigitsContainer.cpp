@@ -8,6 +8,12 @@
 namespace gui
 {
 
+    std::size_t minStringLength(const std::uint32_t number)
+    {
+        /// Add leading zero to 1-digit numbers
+        return (number < 100) ? 2 : 3;
+    }
+
     void setDigits(std::string text, const DigitsContainer &container, DimensionsParams params)
     {
         std::for_each(std::crbegin(container.digits),
@@ -33,7 +39,7 @@ namespace gui
         constexpr auto rangeGuard = 1000;
         minutes %= rangeGuard;
 
-        setDigits(std::to_string(minutes), *this, params);
+        setDigits(utils::addLeadingZeros(std::to_string(minutes), minStringLength(minutes)), *this, params);
     }
 
     void DigitsContainer::setSecondsBox(std::uint32_t seconds, DimensionsParams params)
@@ -41,9 +47,7 @@ namespace gui
         constexpr auto rangeGuard = 100;
         seconds %= rangeGuard;
 
-        std::string text = utils::addLeadingZeros(std::to_string(seconds), digits.size());
-
-        setDigits(std::move(text), *this, params);
+        setDigits(utils::addLeadingZeros(std::to_string(seconds), digits.size()), *this, params);
     }
 
 } // namespace gui
