@@ -17,8 +17,7 @@ namespace sdesktop::endpoints
         auto processGet(Context &context) -> ProcessResult final;
 
       private:
-        auto executeRequest(Context &context) -> ProcessResult;
-        auto checkState(Context &context) -> ProcessResult;
+        auto executeBackupRequest(Context &context) -> ProcessResult;
         auto executeSyncRequest(Context &context) -> ProcessResult;
         auto checkSyncState(Context &context) -> ProcessResult;
     };

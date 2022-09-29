@@ -89,15 +89,19 @@ namespace sys
         return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUsbMscMode);
     }
 
-    int32_t PowerManager::RebootToUpdate(UpdateReason reason)
+    int32_t PowerManager::RebootToUpdater(UpdaterReason reason)
     {
         switch (reason) {
-        case UpdateReason::FactoryReset:
+        case UpdaterReason::FactoryReset:
             return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterFactoryReset);
-        case UpdateReason::Recovery:
+        case UpdaterReason::Recovery:
             return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterRecovery);
-        case UpdateReason::Update:
+        case UpdaterReason::Update:
             return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterUpdate);
+        case UpdaterReason::Backup:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterBackup);
+        case UpdaterReason::Restore:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterRestore);
         default:
             return -1;
         }
