@@ -29,6 +29,7 @@
 * Fixed PLAY label translation in German
 * Fixed USB connection/disconnection detection
 * Fixed memory leaks in APN settings
+* Fixed windows flow regarding PUK requests after too many PIN mistakes
 
 ### Added
 * Added basic MMS handling

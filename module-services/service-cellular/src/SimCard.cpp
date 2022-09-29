@@ -227,9 +227,16 @@ namespace cellular
                 }
             }
             else if (result != sim::Result::OK) {
-                if (onUnhandledCME)
+                if (result == sim::Result::SIM_PUKRequired) {
+                    // MOS-242: silence this case to avoid a misleading "wrong PUK" pop-up
+                    return false;
+                }
+
+                if (onUnhandledCME) {
                     onUnhandledCME(static_cast<unsigned int>(result));
+                }
             }
+
             return result == sim::Result::OK;
         }
 
