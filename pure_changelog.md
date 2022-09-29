@@ -12,7 +12,6 @@
 * Fixed issue with inability to send SMS
 * Fixed mixed SMS messages
 * Fixed disappearing manual alarm and vibration volume setting in German
-* Fixed SIM card pop-ups not showing
 * Fixed lost bytes in logs
 * Fixed passcode lock time discrepancy between lock screen and 'Wrong password' popup
 * Fixed cellular DMA errors
