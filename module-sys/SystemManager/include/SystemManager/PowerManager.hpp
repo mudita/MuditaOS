@@ -45,7 +45,7 @@ namespace sys
         int32_t PowerOff();
         int32_t Reboot();
         int32_t RebootToUsbMscMode();
-        int32_t RebootToUpdate(UpdateReason reason);
+        int32_t RebootToUpdater(UpdaterReason reason);
 
         /// called periodically to calculate the CPU requirement
         ///
