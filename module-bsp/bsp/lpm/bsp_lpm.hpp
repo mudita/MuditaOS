@@ -26,10 +26,13 @@ namespace bsp
         enum class RebootType
         {
             NormalRestart,
-            GoToUsbMscMode,             // Reboot into USB MSC mode
+            GoToUsbMscMode,          // Reboot into USB MSC mode
             GoToUpdaterUpdate,       //! Goto updater into the update mode
             GoToUpdaterFactoryReset, //! GOto updater into the factory reset mode
-            GoToUpdaterRecovery      //! Goto to updater into recovery mode
+            GoToUpdaterRecovery,     //! Goto to updater into recovery mode
+            GoToUpdaterBackup,       //! Goto to updater into backup mode
+            GoToUpdaterRestore       //! Goto to updater into restore mode
+
         };
 
         LowPowerMode()          = default;
@@ -41,7 +44,7 @@ namespace bsp
         virtual int32_t Reboot(RebootType reason) = 0;
 
         virtual void SetCpuFrequency(CpuFrequencyMHz freq) = 0;
-        virtual void SetHighestCoreVoltage() = 0;
+        virtual void SetHighestCoreVoltage()               = 0;
         [[nodiscard]] CpuFrequencyMHz GetCurrentFrequencyLevel() const noexcept;
         [[nodiscard]] virtual uint32_t GetCpuFrequency() const noexcept = 0;
 
@@ -51,8 +54,8 @@ namespace bsp
         virtual void EnableDcdcPowerSaveMode()  = 0;
         virtual void DisableDcdcPowerSaveMode() = 0;
 
-        virtual void DisconnectInternalLoadResistor()  = 0;
-        virtual void ConnectInternalLoadResistor() = 0;
+        virtual void DisconnectInternalLoadResistor() = 0;
+        virtual void ConnectInternalLoadResistor()    = 0;
 
         virtual void SwitchToRegularModeLDO()  = 0;
         virtual void SwitchToLowPowerModeLDO() = 0;
