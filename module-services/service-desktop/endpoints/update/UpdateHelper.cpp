@@ -32,7 +32,7 @@ namespace sdesktop::endpoints
             return {sent::no, ResponseContext{.status = http::Code::NotFound}};
         }
 
-        if (sys::SystemManagerCommon::RebootToUpdate(owner, sys::UpdateReason::Update)) {
+        if (sys::SystemManagerCommon::RebootToUpdater(owner, sys::UpdaterReason::Update)) {
             return {sent::no, ResponseContext{.status = http::Code::NoContent}};
         }
 
