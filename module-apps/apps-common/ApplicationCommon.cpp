@@ -824,7 +824,8 @@ namespace app
             blueprint = popupBlueprintFallback(id);
         }
         if (data->getDisposition().windowtype != gui::popup::Disposition::WindowType::Popup) {
-            LOG_ERROR("setting popup window type to popup - fallback");
+            LOG_ERROR("setting popup window type from %s to popup - fallback",
+                      magic_enum::enum_name(data->getDisposition().windowtype).data());
             data->setDisposition(gui::popup::Disposition{
                 gui::popup::Disposition::Priority::Normal, gui::popup::Disposition::WindowType::Popup, id});
         }
