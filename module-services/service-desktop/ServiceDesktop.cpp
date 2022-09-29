@@ -45,9 +45,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connectHandler<message::bluetooth::ResponseBondedDevices>();
     connectHandler<message::bluetooth::ResponseVisibleDevices>();
     connectHandler<sdesktop::developerMode::DeveloperModeRequest>();
-    connectHandler<sdesktop::BackupMessage>();
     connectHandler<sdesktop::SyncMessage>();
-    connectHandler<sdesktop::RestoreMessage>();
     connectHandler<sdesktop::FactoryMessage>();
     connectHandler<sdesktop::usb::USBConfigured>();
     connectHandler<sdesktop::usb::USBDisconnected>();
@@ -113,28 +111,12 @@ std::string ServiceDesktop::prepareSyncFilename()
     return std::string(syncFileName.data());
 }
 
-void ServiceDesktop::prepareBackupData()
-{
-    backupSyncRestoreStatus.operation     = BackupSyncRestore::Operation::Backup;
-    backupSyncRestoreStatus.taskId        = prepareBackupFilename();
-    backupSyncRestoreStatus.state         = BackupSyncRestore::OperationState::Stopped;
-    backupSyncRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupSyncRestoreStatus.taskId;
-}
-
 void ServiceDesktop::prepareSyncData()
 {
     backupSyncRestoreStatus.operation     = BackupSyncRestore::Operation::Sync;
     backupSyncRestoreStatus.taskId        = prepareSyncFilename();
     backupSyncRestoreStatus.state         = BackupSyncRestore::OperationState::Stopped;
     backupSyncRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupSyncRestoreStatus.taskId;
-}
-
-void ServiceDesktop::prepareRestoreData(const std::filesystem::path &restoreLocation)
-{
-    backupSyncRestoreStatus.operation = BackupSyncRestore::Operation::Restore;
-    backupSyncRestoreStatus.taskId    = restoreLocation.filename();
-    backupSyncRestoreStatus.state     = BackupSyncRestore::OperationState::Stopped;
-    backupSyncRestoreStatus.location  = purefs::dir::getBackupOSPath() / backupSyncRestoreStatus.taskId;
 }
 
 auto ServiceDesktop::requestLogsFlush() -> void
@@ -333,25 +315,6 @@ auto ServiceDesktop::handle(sdesktop::developerMode::DeveloperModeRequest *msg) 
     return sys::MessageNone{};
 }
 
-auto ServiceDesktop::handle(sdesktop::BackupMessage * /*msg*/) -> std::shared_ptr<sys::Message>
-{
-    backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Running;
-    backupSyncRestoreStatus.completionCode =
-        BackupSyncRestore::BackupUserFiles(this, backupSyncRestoreStatus.backupTempDir);
-    backupSyncRestoreStatus.location = backupSyncRestoreStatus.taskId;
-
-    if (backupSyncRestoreStatus.completionCode == BackupSyncRestore::CompletionCode::Success) {
-        LOG_INFO("Backup finished");
-        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Finished;
-    }
-    else {
-        LOG_ERROR("Backup failed");
-        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Error;
-    }
-
-    return sys::MessageNone{};
-}
-
 auto ServiceDesktop::handle(sdesktop::SyncMessage * /*msg*/) -> std::shared_ptr<sys::Message>
 {
     backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Running;
@@ -365,25 +328,6 @@ auto ServiceDesktop::handle(sdesktop::SyncMessage * /*msg*/) -> std::shared_ptr<
     }
     else {
         LOG_ERROR("Sync package preparation failed");
-        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Error;
-    }
-
-    return sys::MessageNone{};
-}
-
-auto ServiceDesktop::handle(sdesktop::RestoreMessage * /*msg*/) -> std::shared_ptr<sys::Message>
-{
-    backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Running;
-    backupSyncRestoreStatus.completionCode =
-        BackupSyncRestore::RestoreUserFiles(this, backupSyncRestoreStatus.location);
-
-    if (backupSyncRestoreStatus.completionCode == BackupSyncRestore::CompletionCode::Success) {
-        LOG_DEBUG("Restore finished");
-        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Finished;
-        sys::SystemManagerCommon::Reboot(this);
-    }
-    else {
-        LOG_ERROR("Restore failed");
         backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Error;
     }
 

@@ -139,7 +139,7 @@ namespace sys
         case SystemManagerCommon::State::RebootToUsbMscMode:
             LOG_INFO("  ---> REBOOT TO USB MSC Mode <--- ");
             break;
-        case SystemManagerCommon::State::RebootToUpdate:
+        case SystemManagerCommon::State::RebootToUpdater:
             LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
             break;
         case SystemManagerCommon::State::Running:
@@ -163,8 +163,8 @@ namespace sys
         case State::RebootToUsbMscMode:
             powerManager->RebootToUsbMscMode();
             break;
-        case State::RebootToUpdate:
-            powerManager->RebootToUpdate(updateReason);
+        case State::RebootToUpdater:
+            powerManager->RebootToUpdater(updaterReason);
             break;
         case SystemManagerCommon::State::Running:
         case SystemManagerCommon::State::Suspend:
@@ -305,10 +305,11 @@ namespace sys
         return true;
     }
 
-    bool SystemManagerCommon::RebootToUpdate(Service *s, UpdateReason updateReason)
+    bool SystemManagerCommon::RebootToUpdater(Service *s, UpdaterReason updaterReason)
     {
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::RebootToUpdate, CloseReason::Reboot, updateReason),
-                           service::name::system_manager);
+        s->bus.sendUnicast(
+            std::make_shared<SystemManagerCmd>(Code::RebootToUpdater, CloseReason::Reboot, updaterReason),
+            service::name::system_manager);
         return true;
     }
 
@@ -574,8 +575,8 @@ namespace sys
                 case Code::Reboot:
                     RebootHandler();
                     break;
-                case Code::RebootToUpdate:
-                    RebootToUpdateHandler(data->updateReason);
+                case Code::RebootToUpdater:
+                    RebootToUpdaterHandler(data->updaterReason);
                     break;
                 case Code::RebootToUsbMscMode:
                     RebootToUsbMscModeHandler(State::RebootToUsbMscMode);
@@ -740,9 +741,9 @@ namespace sys
             DestroyServices(sys::state::regularClose::whitelist);
             set(State::Reboot);
             break;
-        case CloseReason::RebootToUpdate:
+        case CloseReason::RebootToUpdater:
             DestroyServices(sys::state::update::whitelist);
-            set(State::RebootToUpdate);
+            set(State::RebootToUpdater);
             break;
         }
     }
@@ -768,10 +769,10 @@ namespace sys
         CloseSystemHandler(CloseReason::Reboot);
     }
 
-    void SystemManagerCommon::RebootToUpdateHandler(UpdateReason updateReason)
+    void SystemManagerCommon::RebootToUpdaterHandler(UpdaterReason updaterReason)
     {
-        CloseSystemHandler(CloseReason::RebootToUpdate);
-        this->updateReason = updateReason;
+        CloseSystemHandler(CloseReason::RebootToUpdater);
+        this->updaterReason = updaterReason;
     }
 
     void SystemManagerCommon::RebootToUsbMscModeHandler(State newState)
