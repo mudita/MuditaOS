@@ -49,7 +49,7 @@ namespace sys
     {
         RegularPowerDown,
         Reboot,
-        RebootToUpdate,
+        RebootToUpdater,
         RebootToUsbMscMode,
         FactoryReset,
         SystemBrownout,
@@ -57,11 +57,13 @@ namespace sys
     };
 
     // Updater reason code
-    enum class UpdateReason
+    enum class UpdaterReason
     {
         Update,
         Recovery,
-        FactoryReset
+        FactoryReset,
+        Backup,
+        Restore
     };
 
 } // namespace sys
