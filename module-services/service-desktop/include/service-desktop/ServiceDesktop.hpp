@@ -64,9 +64,7 @@ class ServiceDesktop : public sys::Service
 
     std::string prepareBackupFilename();
     std::string prepareSyncFilename();
-    void prepareBackupData();
     void prepareSyncData();
-    void prepareRestoreData(const std::filesystem::path &restoreLocation);
     const BackupSyncRestore::OperationStatus getBackupSyncRestoreStatus()
     {
         return backupSyncRestoreStatus;
@@ -121,9 +119,7 @@ class ServiceDesktop : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::ResponseBondedDevices *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponseVisibleDevices *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::developerMode::DeveloperModeRequest *msg) -> std::shared_ptr<sys::Message>;
-    [[nodiscard]] auto handle(sdesktop::BackupMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::SyncMessage *msg) -> std::shared_ptr<sys::Message>;
-    [[nodiscard]] auto handle(sdesktop::RestoreMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::FactoryMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::usb::USBConfigured *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::usb::USBDisconnected *msg) -> std::shared_ptr<sys::Message>;
