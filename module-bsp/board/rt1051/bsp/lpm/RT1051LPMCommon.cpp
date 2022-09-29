@@ -36,13 +36,19 @@ namespace bsp
     {
         switch (reason) {
         case RebootType::GoToUpdaterUpdate:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToUpdateCode;
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootToUpdaterCode;
             break;
         case RebootType::GoToUpdaterRecovery:
             SNVS->LPGPR[0] = bsp::rebootCode::rebootToRecoveryCode;
             break;
         case RebootType::GoToUpdaterFactoryReset:
             SNVS->LPGPR[0] = bsp::rebootCode::rebootToFactoryRstCode;
+            break;
+        case RebootType::GoToUpdaterBackup:
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootToBackupCode;
+            break;
+        case RebootType::GoToUpdaterRestore:
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootToRestoreCode;
             break;
         case RebootType::GoToUsbMscMode:
             SNVS->LPGPR[0] = bsp::rebootCode::rebootToUsbMscModeCode;

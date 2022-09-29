@@ -9,9 +9,6 @@
 #include <service-desktop/ServiceDesktop.hpp>
 
 #include <json11.hpp>
-#include <purefs/filesystem_paths.hpp>
-
-#include <filesystem>
 
 namespace sdesktop::endpoints
 {
@@ -22,74 +19,34 @@ namespace sdesktop::endpoints
         if (context.getBody()[json::messages::category].string_value() == json::messages::categorySync) {
             return checkSyncState(context);
         }
-        return checkState(context);
+        context.setResponseStatus(http::Code::BadRequest);
+        putToSendQueue(context.createSimpleResponse());
+
+        return {sent::yes, std::nullopt};
     }
 
     auto BackupHelper::processPost(Context &context) -> ProcessResult
     {
-        if (context.getBody()[json::messages::category].string_value() == json::messages::categorySync) {
+        auto category = context.getBody()[json::messages::category].string_value();
+        if (category == json::messages::categorySync) {
             return executeSyncRequest(context);
         }
-        return executeRequest(context);
-    }
-
-    auto BackupHelper::executeRequest(Context &context) -> ProcessResult
-    {
-        auto ownerServicePtr = static_cast<ServiceDesktop *>(owner);
-
-        if (ownerServicePtr->getBackupSyncRestoreStatus().state == BackupSyncRestore::OperationState::Running) {
-            LOG_DEBUG("Backup already running");
-            // a backup is already running, don't start a second task
-            context.setResponseStatus(http::Code::NotAcceptable);
+        else if (category == json::messages::categoryBackup) {
+            return executeBackupRequest(context);
         }
-        else {
-            LOG_DEBUG("Starting backup");
-            // initialize new backup information
-            ownerServicePtr->prepareBackupData();
-
-            // start the backup process in the background
-            ownerServicePtr->bus.sendUnicast(std::make_shared<sdesktop::BackupMessage>(),
-                                             service::name::service_desktop);
-
-            // return new generated backup info
-            context.setResponseBody(ownerServicePtr->getBackupSyncRestoreStatus());
-        }
-
+        context.setResponseStatus(http::Code::BadRequest);
         putToSendQueue(context.createSimpleResponse());
 
         return {sent::yes, std::nullopt};
     }
 
-    auto BackupHelper::checkState(Context &context) -> ProcessResult
+    auto BackupHelper::executeBackupRequest([[maybe_unused]] Context &context) -> ProcessResult
     {
-        auto ownerServicePtr = static_cast<ServiceDesktop *>(owner);
-
-        if (context.getBody()[json::taskId].is_string()) {
-            if (ownerServicePtr->getBackupSyncRestoreStatus().taskId ==
-                context.getBody()[json::taskId].string_value()) {
-                if (ownerServicePtr->getBackupSyncRestoreStatus().state ==
-                    BackupSyncRestore::OperationState::Finished) {
-                    context.setResponseStatus(http::Code::SeeOther);
-                }
-                else {
-                    context.setResponseStatus(http::Code::OK);
-                }
-
-                context.setResponseBody(ownerServicePtr->getBackupSyncRestoreStatus());
-            }
-            else {
-                context.setResponseStatus(http::Code::NotFound);
-            }
-        }
-        else {
-            LOG_DEBUG("Backup task not found");
-            context.setResponseStatus(http::Code::BadRequest);
+        if (sys::SystemManagerCommon::RebootToUpdater(owner, sys::UpdaterReason::Backup)) {
+            return {sent::no, ResponseContext{.status = http::Code::NoContent}};
         }
 
-        LOG_DEBUG("Responding");
-        putToSendQueue(context.createSimpleResponse());
-
-        return {sent::yes, std::nullopt};
+        return {sent::no, ResponseContext{.status = http::Code::InternalServerError}};
     }
 
     auto BackupHelper::executeSyncRequest(Context &context) -> ProcessResult
