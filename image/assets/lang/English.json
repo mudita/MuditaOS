@@ -224,7 +224,7 @@
   "app_desktop_info_mmi_result_failed": "Failed",
   "sim_header_setup": "<text><token>$SIM</token> setup</text>",
   "sim_enter_pin_unlock": "<text>Enter the PIN code to set up <br></br> the <token>$PINTYPE</token> card:</text>",
-  "sim_enter_enter_current": "<text>Type current Pin Code:</text>",
+  "sim_enter_enter_current": "<text>Type current PIN code:</text>",
   "sim_change_pin": "Change PIN code",
   "sim_enter_new_pin": "Enter new PIN code:",
   "sim_confirm_new_pin": "Confirm new PIN code:",
