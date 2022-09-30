@@ -12,15 +12,12 @@
 #include <evtmgr/EventManager.hpp>
 #include <sys/SystemManager.hpp>
 
-#include <service-evtmgr/Constants.hpp>
-
 #include "test-service-db-settings-testmsgs.hpp"
 #include "test-service-db-settings-testservices.hpp"
 #include "test-service-db-settings-testapps.hpp"
 #include "Database.cpp"
 
 #include "module-db/databases/CalllogDB.hpp"
-#include "module-db/databases/CountryCodesDB.hpp"
 #include <module-db/databases/EventsDB.hpp>
 #include <module-db/databases/MultimediaFilesDB.hpp>
 #include "module-db/databases/NotesDB.hpp"
@@ -28,7 +25,6 @@
 #include "module-db/databases/SmsDB.hpp"
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/CalllogRecord.hpp>
-#include <module-db/Interface/CountryCodeRecord.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <module-db/Interface/NotesRecord.hpp>
 #include <module-db/Interface/NotificationsRecord.hpp>

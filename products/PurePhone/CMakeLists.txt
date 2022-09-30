@@ -86,7 +86,7 @@ target_link_libraries(PurePhone
     )
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    add_dependencies(Pure service_renderer)
+    add_dependencies(PurePhone service_renderer)
 endif()
 
 

@@ -21,7 +21,6 @@ set(SOURCES
 
         databases/CalllogDB.cpp
         databases/ContactsDB.cpp
-        databases/CountryCodesDB.cpp
         databases/NotesDB.cpp
         databases/NotificationsDB.cpp
         databases/SmsDB.cpp
@@ -38,7 +37,6 @@ set(SOURCES
         Tables/ContactsGroups.cpp
         Tables/NotesTable.cpp
         Tables/CalllogTable.cpp
-        Tables/CountryCodesTable.cpp
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
         Tables/MultimediaFilesTable.cpp

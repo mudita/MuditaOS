@@ -23,7 +23,6 @@ function(add_assets_target)
             ${_ASSETS_DEST_DIR}
         COMMAND rsync -qravu
             ${_ASSETS_SOURCE_DIR}/assets
-            ${_ASSETS_SOURCE_DIR}/country-codes.db
             ${_ASSETS_DEST_DIR}/current
         COMMAND rsync -qravu ${EXCLUDED}
             ${_ASSETS_SOURCE_DIR}/user

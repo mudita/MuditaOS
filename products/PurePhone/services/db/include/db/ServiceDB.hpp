@@ -7,13 +7,11 @@
 #include <service-db/ServiceDBCommon.hpp>
 
 class AlarmEventRecordInterface;
-class AlarmsRecordInterface;
 class CalllogDB;
 class CalllogRecordInterface;
 class ContactRecordInterface;
 class ContactsDB;
 class CountryCodeRecordInterface;
-class CountryCodesDB;
 class DatabaseAgent;
 class EventsDB;
 class NotesDB;
@@ -22,7 +20,6 @@ class NotificationsDB;
 class NotificationsRecordInterface;
 class SMSRecordInterface;
 class SMSTemplateRecordInterface;
-class SettingsDB;
 
 class SmsDB;
 class ThreadRecordInterface;
@@ -51,7 +48,6 @@ class ServiceDB : public ServiceDBCommon
     std::unique_ptr<ContactsDB> contactsDB;
     std::unique_ptr<NotesDB> notesDB;
     std::unique_ptr<CalllogDB> calllogDB;
-    std::unique_ptr<CountryCodesDB> countryCodesDB;
     std::unique_ptr<NotificationsDB> notificationsDB;
     std::unique_ptr<Database> predefinedQuotesDB;
     std::unique_ptr<Database> customQuotesDB;
@@ -64,7 +60,6 @@ class ServiceDB : public ServiceDBCommon
     std::unique_ptr<ContactRecordInterface> contactRecordInterface;
     std::unique_ptr<NotesRecordInterface> notesRecordInterface;
     std::unique_ptr<CalllogRecordInterface> calllogRecordInterface;
-    std::unique_ptr<CountryCodeRecordInterface> countryCodeRecordInterface;
     std::unique_ptr<NotificationsRecordInterface> notificationsRecordInterface;
     std::unique_ptr<Quotes::QuotesAgent> quotesRecordInterface;
     std::unique_ptr<db::multimedia_files::MultimediaFilesRecordInterface> multimediaFilesRecordInterface;
