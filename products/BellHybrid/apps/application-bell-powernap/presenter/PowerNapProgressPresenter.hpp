@@ -45,6 +45,9 @@ namespace app::powernap
             virtual void napEnded()                                         = 0;
             virtual void setTime(std::time_t newTime)                       = 0;
             virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
+            virtual void progressFinished()                                 = 0;
+            virtual void pause()                                            = 0;
+            virtual void resume()                                           = 0;
         };
 
         class Presenter : public BasePresenter<PowerNapProgressContract::View>
@@ -52,6 +55,7 @@ namespace app::powernap
           public:
             virtual void activate()                                                 = 0;
             virtual void endNap()                                                   = 0;
+            virtual bool isTimerStopped()                                           = 0;
             virtual void pause()                                                    = 0;
             virtual void resume()                                                   = 0;
             virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
@@ -74,17 +78,7 @@ namespace app::powernap
         sys::TimerHandle napAlarmTimer;
         bool napFinished{false};
 
-        void activate() override;
-        void endNap() override;
-        void pause() override;
-        void resume() override;
-        void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
-        void handleUpdateTimeEvent() override;
-        bool isNapFinished() override;
-
-        void onNapFinished();
-        void onNapAlarmFinished();
-        void onBeforeShow() override;
+        static constexpr auto endWindowTimeout = std::chrono::seconds{5};
 
       public:
         PowerNapProgressPresenter(app::ApplicationCommon *app,
@@ -94,5 +88,18 @@ namespace app::powernap
                                   app::bell_settings::AbstractFrontlightModel &frontLightModel,
                                   std::unique_ptr<AbstractTimeModel> timeModel,
                                   std::unique_ptr<app::bell_settings::AlarmLightOnOffModel> alarmLightOnOffModel);
+
+        void activate() override;
+        void endNap() override;
+        void pause() override;
+        void resume() override;
+        void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
+        void handleUpdateTimeEvent() override;
+        bool isNapFinished() override;
+        bool isTimerStopped() override;
+
+        void onNapFinished();
+        void onNapAlarmFinished();
+        void onBeforeShow() override;
     };
 } // namespace app::powernap
