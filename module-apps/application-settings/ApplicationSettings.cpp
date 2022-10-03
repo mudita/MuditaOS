@@ -589,7 +589,8 @@ namespace app
 
         // despite "import_contacts" has auto-lock prevented, it's included here in previousWindowBackingToSimCards for
         // simplicity
-        if (currentWindowName == phone_lock_window && previousWindowBackingToSimCards) {
+        if ((currentWindowName == phone_lock_window || currentWindowName == sim_unlock_window) &&
+            previousWindowBackingToSimCards) {
             switchWindow(sim_cards);
             return;
         }
