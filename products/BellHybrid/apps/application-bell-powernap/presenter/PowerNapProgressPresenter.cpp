@@ -10,9 +10,9 @@
 #include <db/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
-#include <Utils.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/SessionPausedWindow.hpp>
-
+#include <Utils.hpp>
 #include <gsl/assert>
 
 namespace
@@ -42,7 +42,10 @@ namespace app::powernap
     void PowerNapProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
     {
         timer = std::move(_timer);
-        timer->registerOnFinishedCallback([this]() { onNapFinished(); });
+        timer->registerOnFinishedCallback([this]() {
+            getView()->progressFinished();
+            onNapFinished();
+        });
     }
 
     void PowerNapProgressPresenter::activate()
@@ -66,15 +69,13 @@ namespace app::powernap
     void PowerNapProgressPresenter::pause()
     {
         timer->stop();
-        app->switchWindow(gui::window::session_paused::sessionPaused);
+        getView()->pause();
     }
 
     void PowerNapProgressPresenter::resume()
     {
-        if (napFinished) {
-            return;
-        }
         timer->start();
+        getView()->resume();
     }
 
     void PowerNapProgressPresenter::onNapFinished()
@@ -117,6 +118,11 @@ namespace app::powernap
     void PowerNapProgressPresenter::onBeforeShow()
     {
         getView()->setTimeFormat(timeModel->getTimeFormat());
+    }
+
+    bool PowerNapProgressPresenter::isTimerStopped()
+    {
+        return timer->isStopped();
     }
 
 } // namespace app::powernap
