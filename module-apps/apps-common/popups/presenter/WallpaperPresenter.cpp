@@ -66,17 +66,13 @@ namespace gui
 
     bool WallpaperPresenter::updateWallpaper()
     {
-        switch (selectedOption) {
-        case WallpaperOption::Clock:
+        if (selectedOption == WallpaperOption::Clock || clockWallpaperForced) {
             if (clockWallpaper) {
                 clockWallpaper->updateTime();
             }
             return true;
-            break;
-        default:
-            return false;
-            break;
         }
+        return false;
     }
 
     void WallpaperPresenter::forceClockWallpaper()
