@@ -9,6 +9,7 @@
 * Made windows flow in SIM cards settings more robust
 
 ### Fixed
+* Fixed wrong time displayed on password locked screen with 'Quotes' or 'Logo' wallpaper
 * Fixed access to the phone before going onboarding
 * Fixed receiving an empty SMS message
 * Fixed issue with inability to send SMS
