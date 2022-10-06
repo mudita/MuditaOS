@@ -11,6 +11,9 @@
 * Fixed back button behavior in Relaxation
 
 ### Added
+#### Home Screen:
+* Font size increased
+
 #### PowerNap:
 * New circular progress bar 
 * Ringing bell image at the end of the Power Nap

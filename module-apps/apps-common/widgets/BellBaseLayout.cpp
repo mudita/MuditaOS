@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellBaseLayout.hpp"
@@ -84,7 +84,7 @@ namespace gui
         centerThreeBox->firstBox->setEdges(RectangleEdge::None);
         centerThreeBox->firstBox->activeItem = false;
 
-        leftArrow = new ImageBox(centerThreeBox->firstBox, 0, 0, 0, 0, new Image("bell_arrow_left_W_M"));
+        leftArrow = new ImageBox(centerThreeBox->firstBox, new Image("bell_arrow_left_W_M"));
         leftArrow->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
         leftArrow->setMinimumSizeToFitImage();
         leftArrow->setVisible(true);
@@ -102,9 +102,8 @@ namespace gui
         centerThreeBox->lastBox->setEdges(RectangleEdge::None);
         centerThreeBox->lastBox->activeItem = false;
 
-        rightArrow = new ImageBox(centerThreeBox->lastBox, 0, 0, 0, 0, new Image("bell_arrow_right_W_M"));
+        rightArrow = new ImageBox(centerThreeBox->lastBox, new Image("bell_arrow_right_W_M"));
         rightArrow->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-        rightArrow->setMargins(Margins(0, 0, 0, 0));
         rightArrow->setMinimumSizeToFitImage();
         rightArrow->setVisible(true);
         rightArrow->setEdges(RectangleEdge::None);
@@ -123,7 +122,13 @@ namespace gui
     {
         setArrowVisible(BellBaseLayout::Arrow::Left, !minCondition);
         setArrowVisible(BellBaseLayout::Arrow::Right, !maxCondition);
-        centerThreeBox->firstBox->resizeItems();
-        centerThreeBox->lastBox->resizeItems();
+        if (centerThreeBox != nullptr) {
+            if (centerThreeBox->firstBox != nullptr) {
+                centerThreeBox->firstBox->resizeItems();
+            }
+            if (centerThreeBox->lastBox != nullptr) {
+                centerThreeBox->lastBox->resizeItems();
+            }
+        }
     }
 } // namespace gui

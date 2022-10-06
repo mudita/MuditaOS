@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FontInfo.hpp"
@@ -29,11 +29,11 @@ namespace gui
         memcpy(&smooth, data + offset, sizeof(uint16_t));
         offset += sizeof(uint16_t);
         // TODO additional space between characters????
-        memcpy(&char_spacing, data + offset, sizeof(uint16_t));
-        offset += sizeof(uint16_t);
+        memcpy(&char_spacing, data + offset, sizeof(int16_t));
+        offset += sizeof(int16_t);
         // TODO additional space between lines
-        memcpy(&line_spacing, data + offset, sizeof(uint16_t));
-        offset += sizeof(uint16_t);
+        memcpy(&line_spacing, data + offset, sizeof(int16_t));
+        offset += sizeof(int16_t);
         // distance in pixels between each line of text
         memcpy(&line_height, data + offset, sizeof(uint16_t));
         offset += sizeof(uint16_t);

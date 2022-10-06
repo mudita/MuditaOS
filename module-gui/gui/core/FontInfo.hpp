@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,9 +24,9 @@ namespace gui
         // flag that informs if smoothing was turned on. 1 - smoothing was turned on.
         uint16_t smooth;
         // TODO additional space between characters????
-        uint16_t char_spacing;
+        int16_t char_spacing;
         // TODO additional space between lines
-        uint16_t line_spacing;
+        int16_t line_spacing;
         // distance in pixels between each line of text
         uint16_t line_height;
         // number of pixels from the absolute top of the line to the base of the characters
