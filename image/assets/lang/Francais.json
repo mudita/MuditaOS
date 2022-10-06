@@ -669,6 +669,7 @@
   "app_bell_settings_factory_reset": "Réinitialisation",
   "app_bell_settings_display_factory_reset_confirmation": "<text>Rétablir<br></br>la configuration ?</text>",
   "app_bell_meditation_timer": "Méditation",
+  "app_bell_meditation_statistics": "Statistiques",
   "app_bell_meditation_chime_interval": "gong intervalle",
   "app_bell_meditation_progress": "Méditation",
   "app_bell_meditation_interval_none": "Aucune",
