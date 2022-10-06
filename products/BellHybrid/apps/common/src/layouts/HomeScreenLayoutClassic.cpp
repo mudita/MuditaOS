@@ -52,10 +52,9 @@ namespace gui
 
         time = new TimeSetFmtSpinner(this->centerBox);
         time->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
-        time->setFont(bellMainStyle::mainWindow::time::font);
+        time->setFont(mainWindow::time::font);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         time->setEditMode(EditMode::Browse);
-        time->setFont(mainWindow::time::font);
         time->activeItem = false;
 
         statusBox = new DuoHBox(this->lastBox, 0, 0, 0, 0);

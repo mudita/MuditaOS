@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,7 @@ namespace bellMainStyle
     {
         namespace time
         {
-            inline constexpr auto font = style::window::font::huge;
+            inline constexpr auto font = style::window::font::gargantuan;
         } // namespace time
 
         namespace alarmSetSpinner

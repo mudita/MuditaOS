@@ -18,6 +18,8 @@ namespace style::time_set_spinner
 
     inline constexpr auto small_margin = 6U;
     inline constexpr auto big_margin   = 6U;
+    inline constexpr auto gargantuan_margin_left  = 14U;
+    inline constexpr auto gargantuan_margin_right = 7U;
 } // namespace style::time_set_spinner
 
 namespace gui
@@ -48,7 +50,8 @@ namespace gui
             {style::window::font::largelight, "alarm_colon_W_M"},
             {style::window::font::supersizeme, "alarm_colon_select_W_M"},
             {style::window::font::supersizemelight, "alarm_colon_select_W_M"},
-            {style::window::font::huge, "alarm_colon_clock_W_M"}};
+            {style::window::font::huge, "alarm_colon_clock_W_M"},
+            {style::window::font::gargantuan, "alarm_colon_clock_W_M"}};
 
         std::map<std::string, Margins> colonMarginsMap = {
             {style::window::font::verybiglight,
@@ -60,7 +63,12 @@ namespace gui
             {style::window::font::supersizemelight,
              {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
             {style::window::font::huge,
-             {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}}};
+             {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
+            {style::window::font::gargantuan,
+             {style::time_set_spinner::gargantuan_margin_left,
+              0,
+              style::time_set_spinner::gargantuan_margin_right,
+              0}}};
 
         U8IntegerSpinner *hour        = nullptr;
         ImageBox *colon              = nullptr;

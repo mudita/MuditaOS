@@ -35,6 +35,11 @@
             "output": "assets/fonts/gt_pressura/gt_pressura_light_200.mpf"
         },
         {
+            "name": "./fonts/bell/gt_pressura_regular_220_altered.mpf",
+            "ref": "5df11a03b9b9b5b9ff4cb99d09091670f5a6361d",
+            "output": "assets/fonts/gt_pressura/gt_pressura_regular_220_altered.mpf"
+        },
+        {
             "name": "./fonts/common/gt_pressura_light_30.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura/gt_pressura_light_30.mpf"

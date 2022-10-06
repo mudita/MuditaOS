@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -75,7 +75,8 @@ namespace gui
             {style::window::font::verybiglight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
             {style::window::font::largelight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
             {style::window::font::supersizemelight, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}},
-            {style::window::font::huge, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}}};
+            {style::window::font::huge, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}},
+            {style::window::font::gargantuan, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}}};
         [[nodiscard]] auto getFmtMargins(const std::string &fmtFont) const noexcept -> Margins;
 
         auto onInput(const InputEvent &inputEvent) -> bool override;

@@ -23,7 +23,7 @@ namespace gui
 
         fmt = new TextFixedSize(nullptr, 0, 0, 0, 0);
         fmt->setMaximumSize(style::homescreen_classic::bottom_box_w, style::homescreen_classic::bottom_box_h);
-        fmt->setFont(mainWindow::bottomDescription::font_small);
+        fmt->setFont(mainWindow::bottomDescription::font_normal);
         fmt->setEdges(RectangleEdge::None);
         fmt->activeItem = false;
         fmt->drawUnderline(false);

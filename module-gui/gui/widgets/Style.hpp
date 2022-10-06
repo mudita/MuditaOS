@@ -58,6 +58,7 @@ namespace style
         inline constexpr auto default_rect_yaps            = 10U;
         namespace font
         {
+            inline constexpr auto gargantuan       = "gargantuan";
             inline constexpr auto colossal         = "colossal";
             inline constexpr auto huge             = "huge";
             inline constexpr auto supersizeme      = "supersizeme";
