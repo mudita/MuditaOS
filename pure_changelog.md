@@ -1,37 +1,70 @@
 # MuditaOS changelog - PurePhone
-
 ## Unreleased
 
+### Added
+
 ### Changed / Improved
-* Added Polish translation to a calendar title
-* Changed USB logging
-* Separated system volume from Bluetooth device volume for A2DP
 
 ### Fixed
-* Fixed wrong time displayed on password locked screen with 'Quotes' or 'Logo' wallpaper
-* Fixed issue with inability to send SMS
-* Fixed mixed SMS messages
-* Fixed disappearing manual alarm and vibration volume setting in German
-* Fixed SIM card pop-ups not showing
-* Fixed lost bytes in logs
-* Fixed passcode lock time discrepancy between lock screen and 'Wrong password' popup
-* Fixed cellular DMA errors
-* Fixed order of the services while closing system
-* Fixed crash of the E-ink service while restoring system data
-* Fixed removing wrong sentinels
-* Fixed music player behaviour when connecting/disconnecting audio devices
-* Fixed dropping the call during the DND mode
-* Fixed wrong tethering popup order
-* Fixed crash during phone turn off
-* Fixed improper duration of the rejected outgoing call shown in calls log
-* Fixed Bluetooth volume control issues
-* Fixed turning on loudspeaker before outgoing call is answered
-* Fixed PLAY label translation in German
-* Fixed USB connection/disconnection detection
-* Fixed memory leaks in APN settings
+
+## [1.4.0 2022-10-06]
 
 ### Added
-* Added basic MMS handling
+
+#### MMS:
+* Added basic MMS handling.
+
+#### Bluetooth:
+* Added state refresh when BT automatically turns off.
+
+### Changed / Improved
+
+#### Calendar: 
+
+* Added Polish translation to a calendar title.
+
+#### General:
+
+* Changed USB logging.
+* Improved keyboard responsiveness.
+* Improved lock screen power consumption.
+
+#### Bluetooth:
+
+* Separated system volume from Bluetooth device volume for A2DP.
+
+### Fixed
+* Fixed issue with music not pausing when BT device is disconnected.
+* Fixed music player behaviour when connecting/disconnecting audio devices.
+* Fixed issue with message handling in which characters not supported by Pure appear.
+* Fixed problem with message display on Pure for Verizon network.
+* Fixed issue with inability to send SMS.
+* Fixed mixed SMS messages.
+* Fixed SIM card pop-ups not showing.
+* Fixed disappearing manual alarm and vibration volume setting in German.
+* Fixed an issue with the screen not displaying a message about changing the phone mode from DND/Offline/Connected.
+* Fixed USB connection/disconnection detection.
+* Fixed passcode lock time discrepancy between lock screen and 'Wrong password' popup.
+* Fixed lost bytes in logs.
+* Fixed cellular DMA errors.
+* Fixed order of the services while closing system.
+* Fixed removing wrong sentinels.
+* Fixed crash during phone turn off.
+* Fixed PLAY label translation in German.
+* Fixed memory leaks in APN settings.
+* Fixed poor phone responsiveness.
+* Fixed crash on entering PIN settings.
+* Fixed crash of the E-ink service while restoring system data.
+* Fixed dropping the call during the DND mode.
+* Fixed improper duration of the rejected outgoing call shown in calls log.
+* Fixed turning on loudspeaker before outgoing call is answered.
+* Fixed no calllog entries in DND mode.
+* Fixed wrong tethering popup order.
+* Fixed Bluetooth volume control issues.
+* Fixed Bluetooth state first rendering off.
+* Fixed crash on importing unprocessable contact.
+* Fixed the order in which contacts are displayed in the list.
+* Fixed incorrect nav text in onboarding for timezone and date time.
 
 ## [1.3.0 2022-08-04]
 
