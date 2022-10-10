@@ -6,6 +6,8 @@
 
 ### Fixed
 
+* Fixed resetting meditation settings with deep press.
+
 ### Added
 #### PowerNap:
 * New circular progress bar 
