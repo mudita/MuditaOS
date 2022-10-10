@@ -1,5 +1,18 @@
 # MuditaOS changelog - Harmony
 
+## Unreleased
+
+### Changed / Improved
+
+### Fixed
+
+* Fixed resetting meditation settings with deep press.
+
+### Added
+#### PowerNap:
+* New circular progress bar 
+* Ringing bell image at the end of the Power Nap
+
 ## [1.6.0 2022-06-14]
 
 ### Added

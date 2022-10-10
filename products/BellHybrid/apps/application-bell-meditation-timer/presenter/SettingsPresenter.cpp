@@ -73,10 +73,14 @@ namespace app::meditation
                                      utils::translate("app_bell_meditation_chime_interval"),
                                      utils::translate("app_bell_meditation_chime_interval_bottom")};
 
+        chimeInterval->set_on_value_change_cb([this](const auto &val) { this->chimeIntervalModel.setValue(val); });
+
         auto startDelay = new list_items::StartDelay{list_items::StartDelay::spinner_type::range{0, 90, 10},
                                                      startDelayModel,
                                                      utils::translate("app_bell_meditation_start_delay"),
                                                      utils::translate("common_second_lower")};
+
+        startDelay->set_on_value_change_cb([this](const auto &val) { this->startDelayModel.setValue(val); });
 
         auto chimeVolume = new list_items::Numeric{list_items::Numeric::spinner_type::range{1, 10, 1},
                                                    chimeVolumeModel,
