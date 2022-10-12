@@ -27,6 +27,7 @@ namespace gui
         class SIM;
         class Time;
         class Lock;
+        class Tethering;
     } // namespace status_bar
 } // namespace gui
 
@@ -48,6 +49,7 @@ namespace gui::status_bar
         NetworkAccessTechnology, /// NAT (eg 3G, 4G, LTE)
         PhoneMode,               /// phone mode
         AlarmClock,              /// alarm clock active
+        Tethering,               /// tethering status
     };
 
     using Indicators          = std::vector<Indicator>;
@@ -87,6 +89,10 @@ namespace gui::status_bar
         /// @param alarmClockStatus desired alarm clock status
         void setAlarmClockStatus(bool alarmClockStatus);
 
+        /// Set tethering state
+        /// @param tetheringState desired tethering state
+        void setTetheringState(sys::phone_modes::Tethering tetheringState);
+
         /// Set a configuration modifier to the specified indicator
         /// @param indicator indicator type
         /// @param config desired indicator's configuration
@@ -103,6 +109,10 @@ namespace gui::status_bar
         /// Get the Alarm Clock status configuration
         /// @return alarm clock status
         [[nodiscard]] auto getAlarmClockStatus() const noexcept -> bool;
+
+        /// Get the tethering state configuration
+        /// @return tethering state
+        [[nodiscard]] auto getTetheringState() const noexcept -> sys::phone_modes::Tethering;
 
         /// Check if the specified indicator is enabled
         /// @param indicator indicator to be checked
@@ -129,6 +139,7 @@ namespace gui::status_bar
             {Indicator::SimCard, false},
             {Indicator::NetworkAccessTechnology, false},
             {Indicator::AlarmClock, false},
+            {Indicator::Tethering, false},
         };
 
         /// Phone mode
@@ -139,6 +150,9 @@ namespace gui::status_bar
 
         /// Alarm Clock status
         bool mAlarmClockStatus = false;
+
+        /// Tethering state
+        sys::phone_modes::Tethering mTetheringState = sys::phone_modes::Tethering::Off;
 
         /// Indicator modifiers:
         IndicatorsModifiers indicatorsModifiers;
@@ -192,6 +206,9 @@ namespace gui::status_bar
         /// Update NAT widget state depending on the current configuration
         bool updateNetworkAccessTechnology();
 
+        /// Update tethering widget state depending on the current configuration
+        bool updateTetheringState(const sys::phone_modes::Tethering state);
+
         /// Accepts GuiVisitor to update the status bar
         void accept(GuiVisitor &visitor) override;
 
@@ -236,6 +253,13 @@ namespace gui::status_bar
         /// @param enabled true to show false to hide the widget
         void showNetworkAccessTechnology(bool enabled);
 
+        /// Show/hide tethering state widget
+        /// @param enabled true to show false to hide the widget
+        void showTethering(bool enabled);
+
+        /// Show/hide phone mode or tethering widget
+        void showPhoneModeOrTethering(bool phoneModeEnabled, bool tetheringEnabled);
+
         /// Sets the status of the specified indicator on the Status bar
         /// @param indicator indicator id
         /// @param enabled enable or disable the specified indicator
@@ -272,6 +296,9 @@ namespace gui::status_bar
 
         /// Pointer to widget with battery status
         BatteryBase *battery = nullptr;
+
+        /// Pointer to widget with tethering state
+        Tethering *tethering = nullptr;
 
         /// Pointer to the left horizontal box
         HBox *leftBox = nullptr;

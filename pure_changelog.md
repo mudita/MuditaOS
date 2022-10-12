@@ -35,6 +35,7 @@
 * Fixed windows flow regarding PUK requests after too many PIN mistakes
 
 ### Added
+* Added tethering information on the status bar
 * Added basic MMS handling
 
 ## [1.3.0 2022-08-04]

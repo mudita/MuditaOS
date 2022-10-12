@@ -41,6 +41,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/SignalStrengthText.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/NetworkAccessTechnology.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/PhoneMode.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/status-bar/Tethering.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/Time.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/Lock.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Style.cpp"

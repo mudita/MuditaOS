@@ -44,6 +44,7 @@ namespace gui
             appConfiguration.enable(status_bar::Indicator::SimCard);
             appConfiguration.enable(status_bar::Indicator::Bluetooth);
             appConfiguration.enable(status_bar::Indicator::AlarmClock);
+            appConfiguration.enable(status_bar::Indicator::Tethering);
         }
         else {
             appConfiguration.enable(status_bar::Indicator::Time);

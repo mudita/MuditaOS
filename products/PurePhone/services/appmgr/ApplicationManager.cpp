@@ -4,6 +4,7 @@
 #include <appmgr/ApplicationManager.hpp>
 
 #include <apps-common/popups/data/BluetoothModeParams.hpp>
+#include <apps-common/popups/data/TetheringParams.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <apps-common/popups/data/PhoneModeParams.hpp>
@@ -455,6 +456,16 @@ namespace app::manager
     void ApplicationManager::handleTetheringChanged(sys::phone_modes::Tethering tethering)
     {
         notificationProvider.handle(tethering);
+        for (const auto app : getStackedApplications()) {
+            changeTetheringState(tethering, app);
+        }
+    }
+
+    void ApplicationManager::changeTetheringState(const sys::phone_modes::Tethering state, const ApplicationHandle *app)
+    {
+        ActionEntry action{actions::TetheringStateChanged, std::make_unique<gui::TetheringParams>(state)};
+        action.setTargetApplication(app->name());
+        actionsRegistry.enqueue(std::move(action));
     }
 
     void ApplicationManager::handleSnoozeCountChange(unsigned snoozeCount)
@@ -532,6 +543,8 @@ namespace app::manager
             LOG_INFO("Starting application %s", app.name().c_str());
             StatusIndicators statusIndicators;
             statusIndicators.phoneMode        = phoneModeObserver->getCurrentPhoneMode();
+            statusIndicators.tetheringState =
+                phoneModeObserver->isTetheringOn() ? sys::phone_modes::Tethering::On : sys::phone_modes::Tethering::Off;
             statusIndicators.bluetoothMode    = bluetoothMode;
             statusIndicators.alarmClockStatus = alarmClockStatus;
             app.run(statusIndicators, this);
@@ -585,6 +598,7 @@ namespace app::manager
         switch (action.actionId) {
         case actions::BluetoothModeChanged:
         case actions::PhoneModeChanged:
+        case actions::TetheringStateChanged:
         case actions::AlarmClockStatusChanged:
             return handleActionOnActiveApps(action);
         default:

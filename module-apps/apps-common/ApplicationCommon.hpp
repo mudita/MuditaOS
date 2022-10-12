@@ -125,6 +125,7 @@ namespace app
     {
       public:
         sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Uninitialized;
+        sys::phone_modes::Tethering tetheringState  = sys::phone_modes::Tethering::Off;
         sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
         bool alarmClockStatus                       = false;
     };

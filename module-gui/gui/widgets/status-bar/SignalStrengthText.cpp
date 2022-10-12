@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SignalStrengthText.hpp"
@@ -23,7 +23,8 @@ namespace gui::status_bar
     }
 
     void SignalStrengthText::update(const Store::SignalStrength &signal,
-                                    [[maybe_unused]] const Store::Network::Status &status)
+                                    [[maybe_unused]] const Store::Network::Status &status,
+                                    [[maybe_unused]] const Store::Tethering &tethering)
     {
         label->setText(utils::to_string(signal.rssidBm) + " dBm");
     }

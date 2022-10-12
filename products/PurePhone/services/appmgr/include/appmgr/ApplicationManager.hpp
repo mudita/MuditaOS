@@ -30,6 +30,7 @@ namespace app::manager
         void changeBluetoothMode(const ApplicationHandle *app);
         void changeAlarmClockStatus(const ApplicationHandle *app);
         void handleTetheringChanged(sys::phone_modes::Tethering tethering);
+        void changeTetheringState(const sys::phone_modes::Tethering state, const ApplicationHandle *app);
         void handleSnoozeCountChange(unsigned snoozeCount);
         void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
         void registerMessageHandlers() override;

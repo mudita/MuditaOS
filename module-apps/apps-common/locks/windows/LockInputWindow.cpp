@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LockInputWindow.hpp"
@@ -113,6 +113,7 @@ namespace gui
         appConfiguration.enable(status_bar::Indicator::SimCard);
         appConfiguration.enable(status_bar::Indicator::Bluetooth);
         appConfiguration.enable(status_bar::Indicator::AlarmClock);
+        appConfiguration.enable(status_bar::Indicator::Tethering);
         return appConfiguration;
     }
 

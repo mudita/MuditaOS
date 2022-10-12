@@ -55,6 +55,7 @@ namespace app::manager
             SMSRejectedByOfflineNotification,
             CallRejectedByOfflineNotification,
             PhoneModeChanged,
+            TetheringStateChanged,
             BluetoothModeChanged,
             AlarmClockStatusChanged,
             NotificationsChanged,

@@ -590,6 +590,7 @@
   "app_desktop_update_success": "La mise à jour de MuditaOS à la version $VERSION a été effectuée avec succès.",
   "app_call_private_number": "Numéro privé",
   "app_call_ending_call": "Déconnexion de l'appel",
+  "statusbar_tethering": "MODE MODEM",
   "tethering": "Partage de connexion",
   "tethering_turn_off_question": "Voulez-vous désactiver le partage de connexion?",
   "tethering_enable_question": "<text>Vous êtes connecté à l'ordinateur.<br />Voulez-vous activer le partage de connexion?<br /><text color='5'>(certaines fonctions peuvent être désactivées)</text></text>",

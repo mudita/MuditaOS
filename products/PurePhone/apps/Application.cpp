@@ -32,6 +32,7 @@ namespace app
         window->updateSignalStrength();
         window->updateNetworkAccessTechnology();
         window->updatePhoneMode(statusIndicators.phoneMode);
+        window->updateTethering(statusIndicators.tetheringState);
     }
 
     void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)

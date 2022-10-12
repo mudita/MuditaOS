@@ -639,6 +639,7 @@
   "app_desktop_update_success": "System MuditaOS został pomyślnie zaktualizowany do wer. $VERSION.",
   "app_call_private_number": "Numer prywatny",
   "app_call_ending_call": "Kończenie połączenia",
+  "statusbar_tethering": "TETHERING",
   "tethering": "Tethering",
   "tethering_turn_off_question": "Wyłączyć tethering?",
   "tethering_enable_question": "<text>Połączono z komputerem.<br />Włączyć tethering?<br /><text color='5'>(Niektóre funkcje mogą być niedostępne)</text></text>",

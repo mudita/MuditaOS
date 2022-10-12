@@ -65,7 +65,8 @@ namespace app
                      manager::actions::PhoneModeChanged,
                      manager::actions::BluetoothModeChanged,
                      manager::actions::NotificationsChanged,
-                     manager::actions::AlarmClockStatusChanged}};
+                     manager::actions::AlarmClockStatusChanged,
+                     manager::actions::TetheringStateChanged}};
         }
     };
 

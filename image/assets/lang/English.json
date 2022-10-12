@@ -595,6 +595,7 @@
   "app_desktop_update_success": "MuditaOS has been updated to ver. $VERSION succesfully.",
   "app_call_private_number": "Private number",
   "app_call_ending_call": "Disconnecting call",
+  "statusbar_tethering": "TETHERING",
   "tethering": "Tethering",
   "tethering_turn_off_question": "Turn tethering off?",
   "tethering_enable_question": "<text>You're connected to the computer.<br />Turn tethering on?<br /><text color='5'>(some functions may be disabled)</text></text>",

@@ -134,6 +134,15 @@ namespace gui
         applyToStatusBar(std::move(fn));
     }
 
+    bool AppWindow::updateTethering(const sys::phone_modes::Tethering state)
+    {
+        if (statusBar == nullptr) {
+            return false;
+        }
+
+        return statusBar->updateTetheringState(state);
+    }
+
     bool AppWindow::preventsAutoLocking() const noexcept
     {
         return preventsAutoLock;
