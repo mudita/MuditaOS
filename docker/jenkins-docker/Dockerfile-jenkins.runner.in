@@ -5,19 +5,21 @@ MAINTAINER ops@mudita.com
 
 USER root
 
-RUN export DEBIAN_FRONTEND=noninteractive 
+RUN export DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update 
-RUN apt-get full-upgrade -y 
+RUN apt-get update
+RUN apt-get full-upgrade -y
 
 RUN apt-get install -y \
         openssh-server \
-        openjdk-8-jdk
+        openjdk-11-jdk
 
 RUN apt-get -qy clean
 
 #Docker drops audit-related capabilities, removing from pam requirements
 RUN sed -i 's|session    required     pam_loginuid.so|session    optional     pam_loginuid.so|g' /etc/pam.d/sshd
+
+ENV PATH="/usr/local/codeql:/user/local/actions-runner:/usr/local/@CMAKE_NAME@/bin:/usr/local/@ARM_GCC@/bin:$PATH"
 
 RUN sed -i /etc/ssh/sshd_config \
         -e 's/#PermitRootLogin.*/PermitRootLogin no/' \
@@ -33,12 +35,11 @@ RUN adduser --quiet --gecos '' --disabled-password --uid 6666 jenkins
 COPY .ssh/authorized_keys /home/jenkins/.ssh/authorized_keys
 COPY start-sshd /usr/local/bin/start-sshd
 RUN chown -R jenkins:jenkins /home/jenkins/.ssh
+RUN echo "export PATH="/usr/local/codeql:/user/local/actions-runner:/usr/local/@CMAKE_NAME@/bin:/usr/local/@ARM_GCC@/bin:$PATH"" > /etc/profile.d/setup_path.sh
+RUN chmod +x /etc/profile.d/setup_path.sh
 RUN cat /etc/profile.d/setup_path.sh >> /home/jenkins/.bashrc
 
-#RUN chmod -x /cmd.sh && \
-#    chmod -x /entrypoint.sh
 
 EXPOSE 22
 
 ENTRYPOINT ["/usr/local/bin/start-sshd"]
-#ENTRYPOINT ["/bin/sleep", "infinity"]

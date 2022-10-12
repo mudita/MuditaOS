@@ -21,3 +21,7 @@ function getArmCC() {
 function getCMake() {
     wget --no-verbose --show-progress -O ${CMAKE_PKG} ${CMAKE_SOURCE_LINK}
 }
+
+function getCodeQL() {
+    wget --no-verbose --show-progress -O ${CODEQL_PKG} ${CODEQL_SOURCE_LINK}
+}

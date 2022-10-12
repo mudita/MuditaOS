@@ -41,8 +41,14 @@ function getPythonReq() {
     cat ${DEST_PYREQ_TMP} | sort | uniq > ${DEST_PYREQ}
 }
 
+function get_CodeQL() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    wget --no-verbose --show-progress -c -O ${CODEQL_PKG} ${CODEQL_SOURCE_LINK}
+}
+
 get_arm_toolchain
 get_cmake
+get_CodeQL
 getPythonReq
 
 
