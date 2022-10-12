@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <sys/types.h>
-
+#include <cstdint>
 namespace drivers
 {
 

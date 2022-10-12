@@ -8,6 +8,7 @@ source ${SRC_ROOT}/config/bootstrap_config
 
 DOCKER_DIR=${SRC_ROOT}/docker
 DOCKER_TEMPLATE=${DOCKER_DIR}/Dockerfile.runner.in
+JENKINS_DOCKER_TEMPLATE=${DOCKER_DIR}/jenkins-docker/Dockerfile-jenkins.runner.in
 DOCKER_TIMEZONE="Europe/Warsaw"
 DOCKER_IMAGE_NAME="wearemudita/mudita_os_builder"
 DOCKER_IMAGE_TAG="latest"
@@ -19,10 +20,18 @@ function prepareDockerFile() {
         -e "s#@CMAKE_PKG@#${CMAKE_PKG}#g" \
         -e "s#@CMAKE_NAME@#${CMAKE_NAME}#g" \
         -e "s#@ARM_GCC@#${ARM_GCC}#g;" \
+        -e "s#@CODEQL_PKG@#${CODEQL_PKG}#g" \
         -e "s#@DOCKER_TIMEZONE@#${DOCKER_TIMEZONE}#g;" \
         -e "s#@INSTALL_PACKAGES@#${INSTALL_PACKAGES}#g;" \
         -e "s#@ENTRYPOINT@#${ENTRYPOINT}#g;" \
         -s ${DOCKER_TEMPLATE} > ${DOCKER_DEST}
+
+    sed -e "s#@ARM_GCC_PKG@#${ARM_GCC_PKG}#g" \
+        -e "s#@CMAKE_PKG@#${CMAKE_PKG}#g" \
+        -e "s#@CMAKE_NAME@#${CMAKE_NAME}#g" \
+        -e "s#@ARM_GCC@#${ARM_GCC}#g;" \
+        -e "s#@CODEQL_PKG@#${CODEQL_PKG}#g" \
+        -s ${JENKINS_DOCKER_TEMPLATE} > ${JENKINS_DOCKER_DEST}
 }
 
 function help() {
@@ -45,6 +54,8 @@ case ${1} in
     *)
         ENTRYPOINT="entrypoint.sh"
         DOCKER_DEST=${DOCKER_DIR}/Dockerfile
+        JENKINS_DOCKER_DEST=${DOCKER_DIR}/jenkins-docker/Dockerfile
+
     ;;
 esac
 
