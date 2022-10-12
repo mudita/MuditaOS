@@ -33,7 +33,7 @@
 #include <module-db/Interface/ThreadRecord.hpp>
 #include <service-db/agents/quotes/QuotesAgent.hpp>
 
-TEST_CASE("SettingsApi")
+TEST_CASE("SettingsApi", "[.]")
 {
     SECTION("variable/profile/mode register/set/get/unregister")
     {
