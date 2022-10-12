@@ -319,9 +319,11 @@ void ServiceCellular::registerMessageHandlers()
     });
     phoneModeObserver->subscribe([&](sys::phone_modes::Tethering tethering) {
         if (tethering == sys::phone_modes::Tethering::On) {
+            Store::GSM::get()->setTethering(Store::Tethering::On);
             priv->tetheringHandler->enable();
         }
         else {
+            Store::GSM::get()->setTethering(Store::Tethering::Off);
             priv->tetheringHandler->disable();
         }
         if (ongoingCall != nullptr) {

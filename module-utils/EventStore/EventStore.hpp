@@ -74,6 +74,12 @@ namespace Store
         RssiBar rssiBar = RssiBar::zero;
     };
 
+    enum class Tethering
+    {
+        Off,
+        On
+    };
+
     struct Network
     {
         enum class Status
@@ -116,6 +122,7 @@ namespace Store
         SignalStrength signalStrength;
         Network network;
         std::string networkOperatorName;
+        Tethering tethering;
 
         static cpp_freertos::MutexStandard mutex;
 
@@ -154,11 +161,14 @@ namespace Store
         void setSignalStrength(const SignalStrength &signalStrength);
         SignalStrength getSignalStrength() const;
 
-        void setNetwork(const Network &signalStrength);
+        void setNetwork(const Network &network);
         Network getNetwork() const;
 
         void setNetworkOperatorName(const std::string &newNetworkOperatorName);
         std::string getNetworkOperatorName() const;
+
+        void setTethering(const Tethering &tethering);
+        Tethering getTethering() const;
 
         static GSM *get();
     };

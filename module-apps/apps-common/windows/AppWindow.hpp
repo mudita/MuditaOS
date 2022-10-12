@@ -72,6 +72,7 @@ namespace gui
         bool updateSignalStrength();
         bool updateNetworkAccessTechnology();
         void updatePhoneMode(sys::phone_modes::PhoneMode mode);
+        bool updateTethering(const sys::phone_modes::Tethering state);
         [[nodiscard]] bool preventsAutoLocking() const noexcept;
         virtual RefreshModes updateTime();
 

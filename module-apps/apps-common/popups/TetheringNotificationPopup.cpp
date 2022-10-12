@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TetheringNotificationPopup.hpp"
@@ -20,6 +20,7 @@ namespace gui
         appConfiguration.setIndicator(gui::status_bar::Indicator::Battery, true);
         appConfiguration.setIndicator(gui::status_bar::Indicator::SimCard, false);
         appConfiguration.setIndicator(gui::status_bar::Indicator::Signal, true);
+        appConfiguration.setIndicator(gui::status_bar::Indicator::Tethering, true);
         return appConfiguration;
     }
 } // namespace gui

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,7 +17,8 @@ namespace gui::status_bar
       public:
         SignalStrengthText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
         void update(const Store::SignalStrength &signal,
-                    [[maybe_unused]] const Store::Network::Status &status) override;
+                    [[maybe_unused]] const Store::Network::Status &status,
+                    [[maybe_unused]] const Store::Tethering &tethering) override;
 
       private:
         Label *label = nullptr;

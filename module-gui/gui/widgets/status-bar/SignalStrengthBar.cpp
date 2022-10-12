@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SignalStrengthBar.hpp"
@@ -47,7 +47,9 @@ namespace gui::status_bar
         setMinimumSize(img->getWidth(), style::status_bar::height);
     }
 
-    void SignalStrengthBar::update(const Store::SignalStrength &signal, const Store::Network::Status &status)
+    void SignalStrengthBar::update(const Store::SignalStrength &signal,
+                                   const Store::Network::Status &status,
+                                   const Store::Tethering &tethering)
     {
         try {
             if (img == nullptr) {
@@ -55,7 +57,10 @@ namespace gui::status_bar
                 return;
             }
 
-            if (status == Store::Network::Status::RegisteredRoaming) {
+            if (tethering == Store::Tethering::On) {
+                img->set(signal_none, style::status_bar::imageTypeSpecifier);
+            }
+            else if (status == Store::Network::Status::RegisteredRoaming) {
                 img->set(signalMapRoaming.at(signal.rssiBar), style::status_bar::imageTypeSpecifier);
             }
             else if (status == Store::Network::Status::RegisteredHomeNetwork) {

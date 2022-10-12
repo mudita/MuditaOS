@@ -13,6 +13,8 @@ namespace app::manager
             if (auto app = getApplication(name); app != nullptr) {
                 StatusIndicators statusIndicators;
                 statusIndicators.phoneMode        = phoneModeObserver->getCurrentPhoneMode();
+                statusIndicators.tetheringState   = phoneModeObserver->isTetheringOn() ? sys::phone_modes::Tethering::On
+                                                                                       : sys::phone_modes::Tethering::Off;
                 statusIndicators.bluetoothMode    = bluetoothMode;
                 statusIndicators.alarmClockStatus = alarmClockStatus;
                 app->runInBackground(statusIndicators, this);

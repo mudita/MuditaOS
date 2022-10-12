@@ -13,6 +13,7 @@
 #include "status-bar/SignalStrengthText.hpp"
 #include "status-bar/NetworkAccessTechnology.hpp"
 #include "status-bar/PhoneMode.hpp"
+#include "status-bar/Tethering.hpp"
 #include "status-bar/AlarmClock.hpp"
 #include "status-bar/BT.hpp"
 #include "status-bar/SIM.hpp"
@@ -87,6 +88,16 @@ namespace gui::status_bar
         return mAlarmClockStatus;
     }
 
+    void Configuration::setTetheringState(sys::phone_modes::Tethering tetheringState)
+    {
+        mTetheringState = tetheringState;
+    }
+
+    auto Configuration::getTetheringState() const noexcept -> sys::phone_modes::Tethering
+    {
+        return mTetheringState;
+    }
+
     auto Configuration::isEnabled(Indicator indicator) const -> bool
     {
         return indicatorStatuses.at(indicator);
@@ -135,6 +146,10 @@ namespace gui::status_bar
         phoneMode->setMaximumSize(phonemode::maxX, this->drawArea.h);
         phoneMode->setMargins(gui::Margins(margins::between, 0, 0, margins::textBottom));
         phoneMode->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
+        tethering = new Tethering(leftBox, 0, 0, 0, 0);
+        tethering->setMaximumSize(tethering::maxX, this->drawArea.h);
+        tethering->setMargins(gui::Margins(margins::between, 0, 0, margins::textBottom));
+        tethering->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
 
         // center
         centralBox = new HBox(this, 0, 0, 0, 0);
@@ -241,6 +256,9 @@ namespace gui::status_bar
         case Indicator::PhoneMode:
             showPhoneMode(enabled);
             break;
+        case Indicator::Tethering:
+            showTethering(enabled);
+            break;
         }
     }
 
@@ -338,7 +356,8 @@ namespace gui::status_bar
     {
         const auto signalStrength = Store::GSM::get()->getSignalStrength();
         const auto networkStatus  = Store::GSM::get()->getNetwork().status;
-        signal->update(signalStrength, networkStatus);
+        const auto tethering      = Store::GSM::get()->getTethering();
+        signal->update(signalStrength, networkStatus, tethering);
         enabled ? signal->show() : signal->hide();
     }
 
@@ -362,7 +381,19 @@ namespace gui::status_bar
 
     void StatusBar::showPhoneMode(bool enabled)
     {
-        enabled ? phoneMode->show() : phoneMode->hide();
+        showPhoneModeOrTethering(enabled, configuration.isEnabled(Indicator::Tethering));
+    }
+
+    void StatusBar::showPhoneModeOrTethering(bool phoneModeEnabled, bool tetheringEnabled)
+    {
+        if (tetheringEnabled && configuration.getTetheringState() != sys::phone_modes::Tethering::Off) {
+            phoneMode->hide();
+            tethering->show();
+        }
+        else {
+            tethering->hide();
+            phoneModeEnabled ? phoneMode->show() : phoneMode->hide();
+        }
     }
 
     bool StatusBar::updateNetworkAccessTechnology()
@@ -414,6 +445,23 @@ namespace gui::status_bar
             return false;
         }
         return showTime(configuration.isEnabled(Indicator::Time));
+    }
+
+    bool StatusBar::updateTetheringState(const sys::phone_modes::Tethering state)
+    {
+        if (tethering == nullptr) {
+            return false;
+        }
+        configuration.setTetheringState(state);
+        showTethering(configuration.isEnabled(Indicator::Tethering));
+        leftBox->resizeItems();
+
+        return true;
+    }
+
+    void StatusBar::showTethering(bool enabled)
+    {
+        showPhoneModeOrTethering(configuration.isEnabled(Indicator::PhoneMode), enabled);
     }
 
     void StatusBar::accept(GuiVisitor &visitor)

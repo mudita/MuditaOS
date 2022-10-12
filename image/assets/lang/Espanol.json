@@ -623,6 +623,7 @@
   "app_desktop_update_success": "El SO de MuditaOS se ha actualizado a la ver. $VERSION correctamente.",
   "app_call_private_number": "Número privado",
   "app_call_ending_call": "Desconectando llamada",
+  "statusbar_tethering": "ANCLAJE DE RED",
   "tethering": "Anclaje de red",
   "tethering_turn_off_question": "¿Desactivar el anclaje de red?",
   "tethering_enable_question": "<text>Estás conectado al ordenador.<br />¿Activar el anclaje de red?<br /><text color='5'>(algunas funciones podrían desactivarse)</text></text>",

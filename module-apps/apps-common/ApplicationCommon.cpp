@@ -27,6 +27,7 @@
 
 #include <popups/data/PhoneModeParams.hpp>
 #include <popups/data/BluetoothModeParams.hpp>
+#include <popups/data/TetheringParams.hpp>
 
 #if DEBUG_INPUT_EVENTS == 1
 #define debug_input_events(...) LOG_DEBUG(__VA_ARGS__)
@@ -116,6 +117,13 @@ namespace app
             if (params != nullptr) {
                 auto modeParams                  = static_cast<gui::PhoneModeParams *>(params.get());
                 this->statusIndicators.phoneMode = modeParams->getPhoneMode();
+            }
+            return actionHandled();
+        });
+        addActionReceiver(app::manager::actions::TetheringStateChanged, [this](auto &&params) {
+            if (params != nullptr) {
+                auto modeParams                       = static_cast<gui::TetheringParams *>(params.get());
+                this->statusIndicators.tetheringState = modeParams->getTetheringState();
             }
             return actionHandled();
         });

@@ -90,4 +90,14 @@ namespace Store
         cpp_freertos::LockGuard lock(mutex);
         return networkOperatorName;
     }
+    void GSM::setTethering(const Tethering &tethering)
+    {
+        cpp_freertos::LockGuard lock(mutex);
+        this->tethering = tethering;
+    }
+    Tethering GSM::getTethering() const
+    {
+        cpp_freertos::LockGuard lock(mutex);
+        return tethering;
+    }
 }; // namespace Store

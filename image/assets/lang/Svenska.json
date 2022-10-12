@@ -524,6 +524,7 @@
   "app_desktop_update_unpacking": "Packar upp",
   "app_call_private_number": "Dolt nummer",
   "app_call_ending_call": "Avslutar samtalet",
+  "statusbar_tethering": "INTERNETDELNING",
   "tethering": "Internetdelning",
   "tethering_turn_off_question": "Stänga av Internetdelning?",
   "tethering_enable_question": "<text>Du är ansluten till datorn.<br />Slå på Internetdelning?<br /><text color='9'>(vissa funktioner kan vara inaktiverade)</text></text>",
