@@ -33,8 +33,7 @@ void SimInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     WindowWithTimer::onBeforeShow(mode, data);
 
     if (auto infoData = dynamic_cast<locks::SimLockData *>(data)) {
-        action_ = infoData->getSimInputTypeAction();
-        switch (action_.value()) {
+        switch (infoData->getSimInputTypeAction()) {
         case locks::SimInputTypeAction::UnlockWithPuk:
         case locks::SimInputTypeAction::ChangePin:
             setTitle(utils::translate("sim_change_pin"));

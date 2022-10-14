@@ -288,6 +288,15 @@ namespace app
         }
         LOG_INFO("Back to previous window: %s", window->c_str());
         windowsStack().pop(*window);
+
+        // MOS-350: SimInfo pop-us should be ignored in windows history - pop one window deeper
+        auto const simInfoName = gui::popup::resolveWindowName(gui::popup::ID::SimInfo);
+        if (window == simInfoName) {
+            window = windowsStack().get(previousWindow);
+            // SimInfo won't arrive with no preceding window, so no need to check the optional
+            LOG_INFO("Previous window is %s - omit it and go one more back: %s", simInfoName.c_str(), window->c_str());
+        }
+
         switchWindow(*window, gui::ShowMode::GUI_SHOW_RETURN);
     }
 
@@ -846,18 +855,29 @@ namespace app
 
     bool ApplicationCommon::tryShowPopup()
     {
+        using namespace gui::popup;
+
         auto request = windowsPopupQueue->popRequest(getPopupFilter());
-        if (request) {
-            const auto popup = magic_enum::enum_name(request->getPopupParams().getPopupId()).data();
-            LOG_DEBUG("handling popup: %s", popup);
-            /// request handle actually switches window to popup window
-            auto retval = request->handle();
-            if (not retval) {
-                LOG_ERROR("Popup %s handling failure, please check registered blueprint!", popup);
-            }
-            return retval;
+        if (!request) {
+            return false;
         }
-        return false;
+
+        auto const id = request->getPopupParams().getPopupId();
+
+        if (id == ID::SimInfo) {
+            // MOS-350: silently get rid of the first occurence of SimLock pop-up and all subsequent windows
+            windowsStack().drop(resolveWindowName(ID::SimLock));
+        }
+
+        auto const popup = magic_enum::enum_name(id).data();
+        LOG_DEBUG("handling popup: %s", popup);
+        /// request handle actually switches window to popup window
+        auto retval = request->handle();
+        if (not retval) {
+            LOG_ERROR("Popup %s handling failure, please check registered blueprint!", popup);
+        }
+
+        return retval;
     }
 
     void ApplicationCommon::abortPopup(gui::popup::ID id)

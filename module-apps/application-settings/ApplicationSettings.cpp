@@ -82,6 +82,7 @@
 #include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <service-appmgr/model/ApplicationManagerCommon.hpp>
+#include <apps-common/WindowsStack.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
 #include <apps-common/popups/lock-popups/SimInfoWindow.hpp>
@@ -576,31 +577,24 @@ namespace app
         using namespace gui::popup::window;
         using namespace gui::window::name;
 
+        if (!windowsStack().isWindowOnStack(sim_cards)) {
+            return ApplicationCommon::returnToPreviousWindow();
+        }
+
         auto previousWindowName = getPreviousWindow();
         if (!previousWindowName.has_value()) {
-            ApplicationCommon::returnToPreviousWindow();
-            return;
+            return ApplicationCommon::returnToPreviousWindow();
         }
 
-        bool previousWindowBackingToSimCards =
-            (previousWindowName == sim_pin_settings || previousWindowName == import_contacts ||
-             previousWindowName == sim_unlock_window);
-        auto currentWindowName = getCurrentWindow()->getName();
+        auto backToSimCards = [this]() { switchWindow(sim_cards); };
 
-        // despite "import_contacts" has auto-lock prevented, it's included here in previousWindowBackingToSimCards for
-        // simplicity
-        if ((currentWindowName == phone_lock_window || currentWindowName == sim_unlock_window) &&
-            previousWindowBackingToSimCards) {
-            switchWindow(sim_cards);
-            return;
+        if (previousWindowName == sim_pin_settings || previousWindowName == import_contacts ||
+            previousWindowName == sim_unlock_window || previousWindowName == sim_info_window) {
+            return backToSimCards();
         }
 
-        if (currentWindowName == sim_info_window) {
-            auto simInfoWindowAction = static_cast<gui::SimInfoWindow *>(getCurrentWindow())->getAction();
-            if (simInfoWindowAction == locks::SimInputTypeAction::Error && previousWindowBackingToSimCards) {
-                switchWindow(sim_cards);
-                return;
-            }
+        if (getCurrentWindow()->getName() == sim_info_window) {
+            return backToSimCards();
         }
 
         ApplicationCommon::returnToPreviousWindow();

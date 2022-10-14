@@ -90,13 +90,7 @@ namespace gui
                 lock->consumeState();
             }
             application->getSimLockSubject().resetSimLockState();
-            if (auto *settingsApp = dynamic_cast<app::ApplicationSettings *>(application);
-                settingsApp && settingsApp->isPreviousWindow(gui::window::name::sim_pin_settings)) {
-                settingsApp->switchWindow(gui::window::name::sim_cards);
-            }
-            else {
-                application->returnToPreviousWindow();
-            }
+            application->returnToPreviousWindow();
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_PND)) {

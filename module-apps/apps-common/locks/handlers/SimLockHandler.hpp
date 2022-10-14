@@ -59,14 +59,14 @@ namespace locks
         sys::MessagePointer handleSimPukRequest(unsigned int attempts);
         sys::MessagePointer handleSimPinChangeRequest();
         sys::MessagePointer handleSimPinChangeFailedRequest();
-        sys::MessagePointer handleSimEnableRequest();
-        sys::MessagePointer handleSimDisableRequest();
+        sys::MessagePointer handleSimPinLockEnableRequest();
+        sys::MessagePointer handleSimPinLockDisableRequest();
         sys::MessagePointer handleResetSimLockStateRequest();
         sys::MessagePointer handleSimBlockedRequest();
         sys::MessagePointer handleCMEErrorRequest(unsigned int errorCode);
         sys::MessagePointer handleSimUnlockedMessage();
         sys::MessagePointer handleSimPinChangedMessage();
-        sys::MessagePointer handleSimAvailabilityMessage();
+        sys::MessagePointer handleSimPinLockStateMessage();
         sys::MessagePointer handleSimReadyMessage();
         sys::MessagePointer handleSimNotInsertedMessage();
         sys::MessagePointer handleSimNotRespondingMessage();

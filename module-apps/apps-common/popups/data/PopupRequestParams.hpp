@@ -45,8 +45,9 @@ namespace gui
                                     locks::Lock lock,
                                     locks::SimInputTypeAction simInputTypeAction,
                                     unsigned int errorCode = 0)
-            : PopupRequestParams{popupId}, lock{std::move(lock)}, simInputTypeAction(simInputTypeAction),
-              errorCode(errorCode)
+            : PopupRequestParams(
+                  popupId, {popup::Disposition::Priority::Normal, popup::Disposition::WindowType::Popup, popupId}),
+              lock{std::move(lock)}, simInputTypeAction(simInputTypeAction), errorCode(errorCode)
         {}
 
         [[nodiscard]] auto getLock() const noexcept

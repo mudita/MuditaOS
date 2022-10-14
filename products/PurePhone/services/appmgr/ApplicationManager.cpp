@@ -275,22 +275,24 @@ namespace app::manager
                         return simLockHandler.handleSimPinChangeFailedRequest();
                     }
                 });
-        connect(typeid(locks::EnableSimPin),
-                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimEnableRequest(); });
-        connect(typeid(locks::DisableSimPin),
-                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimDisableRequest(); });
+        connect(typeid(locks::EnableSimPin), [&](sys::Message *request) -> sys::MessagePointer {
+            return simLockHandler.handleSimPinLockEnableRequest();
+        });
+        connect(typeid(locks::DisableSimPin), [&](sys::Message *request) -> sys::MessagePointer {
+            return simLockHandler.handleSimPinLockDisableRequest();
+        });
         connect(typeid(cellular::msg::request::sim::SetPinLock::Response),
                 [&](sys::Message *request) -> sys::MessagePointer {
                     auto data = static_cast<cellular::msg::request::sim::SetPinLock::Response *>(request);
                     if (data->retCode) {
-                        return simLockHandler.handleSimAvailabilityMessage();
+                        return simLockHandler.handleSimPinLockStateMessage();
                     }
                     else {
                         if (data->lock == cellular::api::SimLockState::Enabled) {
-                            return simLockHandler.handleSimEnableRequest();
+                            return simLockHandler.handleSimPinLockEnableRequest();
                         }
                         else {
-                            return simLockHandler.handleSimDisableRequest();
+                            return simLockHandler.handleSimPinLockDisableRequest();
                         }
                     }
                 });

@@ -120,6 +120,7 @@ With this, we can:
 
 **WARNING** In the MuditaOS a popup is a Window that can be shown any time on an action request.
 **NOTE** `attachPopups` should be most probably moved to `manifest` and popup enum just removed
+**NOTE** Pop-ups regarding SIM cards' presence/availability currently have some special logic regarding windows stack around them.
 
 Popups weren't designed as a part of the system, but rather step by step integrated into it. While there should be no issue with partially overflowing popups in the applications and UI, it would mean major source code refactoring and planning.
 
