@@ -22,9 +22,12 @@ namespace gui::popup
     {
       private:
         std::list<std::function<bool(const gui::PopupRequestParams &)>> appDependentFilter;
+        /// non-owning pointer to existing stack - @see attachWindowsStack()
         app::WindowsStack *stack = nullptr;
 
       public:
+        virtual ~Filter() = default;
+
         void attachWindowsStack(app::WindowsStack *stack);
         void addAppDependentFilter(std::function<bool(const gui::PopupRequestParams &)> f);
         virtual bool isPermitted(const gui::PopupRequestParams &params) const;
