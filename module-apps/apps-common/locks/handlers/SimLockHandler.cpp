@@ -176,7 +176,7 @@ namespace locks
         return sys::msgHandled();
     }
 
-    sys::MessagePointer SimLockHandler::handleSimAvailabilityMessage()
+    sys::MessagePointer SimLockHandler::handleSimPinLockStateMessage()
     {
         lock.lockState = Lock::LockState::Unlocked;
         simInfoAction();
@@ -207,7 +207,7 @@ namespace locks
         return sys::MessagePointer();
     }
 
-    sys::MessagePointer SimLockHandler::handleSimEnableRequest()
+    sys::MessagePointer SimLockHandler::handleSimPinLockEnableRequest()
     {
         setSimInputTypeAction(SimInputTypeAction::EnablePin);
 
@@ -218,7 +218,7 @@ namespace locks
         return sys::msgHandled();
     }
 
-    sys::MessagePointer SimLockHandler::handleSimDisableRequest()
+    sys::MessagePointer SimLockHandler::handleSimPinLockDisableRequest()
     {
         setSimInputTypeAction(SimInputTypeAction::DisablePin);
 
