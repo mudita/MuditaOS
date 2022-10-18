@@ -317,6 +317,14 @@ namespace app
             return handleAudioStop(notification);
         });
 
+        try {
+            voLteStateOn =
+                !!std::stoul(settings->getValue(::settings::Cellular::volte_on, ::settings::SettingsScope::Global));
+        }
+        catch (std::exception const &exc) {
+            LOG_ERROR("[VoLTE] checking on/off state failed: %s; left as default FALSE", exc.what());
+        }
+
         createUserInterface();
 
         settings->registerValueChange(settings::operators_on,
@@ -650,6 +658,9 @@ namespace app
     {
         if (!value.empty()) {
             voLteStateOn = utils::getNumericValue<bool>(value);
+        }
+        else {
+            LOG_ERROR("[VoLTE] empty state setting string!");
         }
     }
 

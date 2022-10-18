@@ -73,7 +73,6 @@ class NetworkSettings
     bool setOperator(at::response::cops::CopsMode mode, at::response::cops::NameFormat format, const std::string &name);
 
     at::Result::Code setIMSState(at::response::qcfg_ims::IMSState state);
-    std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState>> getIMSState();
 
     std::string printVoLTEDebug();
 

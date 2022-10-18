@@ -395,13 +395,13 @@ void ServiceCellular::registerMessageHandlers()
         NetworkSettings networkSettings(*this);
         auto vstate = networkSettings.getVoLTEConfigurationState();
         if ((vstate != VoLTEState::On) && volteOn) {
-            LOG_DEBUG("VoLTE On");
+            LOG_DEBUG("[VoLTE] ON");
             if (networkSettings.setVoLTEState(VoLTEState::On) == at::Result::Code::OK) {
                 priv->modemResetHandler->performSoftReset();
             }
         }
         else if (!volteOn) {
-            LOG_DEBUG("VoLTE Off");
+            LOG_DEBUG("[VoLTE] OFF");
             if (networkSettings.setVoLTEState(VoLTEState::Off) == at::Result::Code::OK) {
                 priv->modemResetHandler->performSoftReset();
             }
@@ -1162,6 +1162,24 @@ std::vector<std::string> ServiceCellular::getNetworkInfo()
     return data;
 }
 
+std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState>> ServiceCellular::
+    getIMSState()
+{
+    auto channel = cmux->get(CellularMux::Channel::Commands);
+    if (!channel) {
+        return std::nullopt;
+    }
+
+    at::Cmd buildCmd = at::factory(at::AT::QCFG_IMS);
+    auto resp        = channel->cmd(buildCmd);
+    std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState> ret;
+    if ((resp.code == at::Result::Code::OK) && (at::response::parseQCFG_IMS(resp, ret))) {
+        return ret;
+    }
+
+    return std::nullopt;
+}
+
 std::vector<std::string> get_last_AT_error(DLCChannel *channel)
 {
     auto ret = channel->cmd(at::AT::CEER);
@@ -1275,6 +1293,41 @@ bool ServiceCellular::handle_modem_on()
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
     channel->cmd("AT+CCLK?");
+
+    auto const imsAndVolteState = getIMSState();
+    if (!imsAndVolteState) {
+        LOG_ERROR("Unable to check IMS and VoLTE capabilities");
+    }
+    else {
+        using namespace at::response::qcfg_ims;
+
+        auto const &[ims, volte]   = *imsAndVolteState;
+        std::string imsDescription = [&]() {
+            switch (ims) {
+            case IMSState::ViaMBN:
+                return "ON (MBN dependent)";
+            case IMSState::Enable:
+                return "ON";
+            case IMSState::Disable:
+                return "OFF";
+            default:
+                return "<UNKNOWN>";
+            }
+        }();
+        std::string volteDescription = [&]() {
+            switch (volte) {
+            case VoLTEIMSState::Ready:
+                return "AVAILABLE";
+            case VoLTEIMSState::NotReady:
+                return "UNAVAILABLE";
+            default:
+                return "<UNKNOWN>";
+            }
+        }();
+        LOG_DEBUG(
+            "[VoLTE] modem IMS state: %s, VoLTE capabilities: %s", imsDescription.c_str(), volteDescription.c_str());
+    }
+
     // inform host ap ready
     cmux->informModemHostWakeup();
     tetheringTurnOnURC();
@@ -1744,8 +1797,11 @@ std::shared_ptr<cellular::SetOperatorResponse> ServiceCellular::handleCellularSe
 void ServiceCellular::volteChanged(const std::string &value)
 {
     if (!value.empty()) {
-        LOG_INFO("VoLTE setting state changed to '%s'.", value.c_str());
+        LOG_INFO("[VoLTE] setting state changed to '%s'", value.c_str());
         volteOn = utils::getNumericValue<bool>(value);
+    }
+    else {
+        LOG_ERROR("[VoLTE] empty state setting string!");
     }
 }
 

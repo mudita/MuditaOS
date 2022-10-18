@@ -269,24 +269,6 @@ at::Result::Code NetworkSettings::setIMSState(at::response::qcfg_ims::IMSState s
     return resp.code;
 }
 
-std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState>> NetworkSettings::
-    getIMSState()
-{
-    std::vector<std::string> operatorNames;
-    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
-    if (channel) {
-
-        at::Cmd buildCmd = at::factory(at::AT::QCFG_IMS);
-        auto resp        = channel->cmd(buildCmd);
-        std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState> ret;
-        if ((resp.code == at::Result::Code::OK) && (at::response::parseQCFG_IMS(resp, ret))) {
-            return ret;
-        }
-    }
-
-    return std::nullopt;
-}
-
 at::Result::Code NetworkSettings::setVoLTEState(VoLTEState state)
 {
     /**
@@ -336,7 +318,7 @@ VoLTEState NetworkSettings::getVoLTEConfigurationState()
      * about whether the VoLTE actually works in the selected network
      *
      */
-    if (auto state = getIMSState(); state) {
+    if (auto state = cellularService.getIMSState(); state) {
         /// check disable in any other state VoLTE is likely
         return state->first == at::response::qcfg_ims::IMSState::Disable ? VoLTEState::Off : VoLTEState::On;
     }

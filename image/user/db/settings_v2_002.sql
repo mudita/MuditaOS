@@ -33,6 +33,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('battery_critical_level', '10'),
     ('cl_offline_mode', '1'),
     ('cl_current_uid', '0'),
+    ('cl_volte_on', '0'),
     ('msg_only_mode_connection_frequency', '15'),
     ('off_notifications_when_locked', '0'),
     ('off_calls_from_favorites', '0'),

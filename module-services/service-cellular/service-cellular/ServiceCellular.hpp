@@ -95,6 +95,7 @@ class ServiceCellular : public sys::Service
      */
     bool getIMSI(std::string &destination, bool fullNumber = false);
     std::vector<std::string> getNetworkInfo();
+    std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState>> getIMSState();
 
     auto areCallsFromFavouritesEnabled() -> bool;
 
