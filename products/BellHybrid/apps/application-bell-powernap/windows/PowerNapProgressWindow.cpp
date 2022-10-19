@@ -100,8 +100,7 @@ namespace gui
     {
         if (inputEvent.isShortRelease()) {
             const auto key = mapKey(inputEvent.getKeyCode());
-            if (presenter->isNapFinished() &&
-                (key == KeyMap::LightPress || key == KeyMap::DeepPressDown || key == KeyMap::DeepPressUp)) {
+            if (presenter->isNapFinished() && key == KeyMap::LightPress) {
                 presenter->endNap();
                 return true;
             }
