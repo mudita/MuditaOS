@@ -27,7 +27,10 @@ namespace app::meditation
         void rebuild() override;
 
       private:
+        void switchToExitWindow();
+
         gui::SideListView *sideListView{};
         std::unique_ptr<app::meditation::contract::Presenter> presenter;
+        bool isSaveNeeded{false};
     };
 } // namespace app::meditation

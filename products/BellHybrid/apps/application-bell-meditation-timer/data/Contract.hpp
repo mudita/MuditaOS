@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,7 +22,7 @@ namespace app::meditation::contract
         virtual void loadData()                                                         = 0;
         virtual void saveData()                                                         = 0;
         virtual void eraseProviderData()                                                = 0;
-        virtual void handleEnter()                                                      = 0;
+        virtual void exitWithSave()                                                     = 0;
         virtual void exitWithoutSave()                                                  = 0;
     };
 

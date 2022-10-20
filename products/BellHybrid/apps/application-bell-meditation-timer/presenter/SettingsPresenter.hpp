@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,8 +26,7 @@ namespace app::meditation
     class SettingsPresenter : public contract::Presenter
     {
       public:
-        SettingsPresenter(app::ApplicationCommon *app,
-                          models::ChimeInterval &chimeIntervalModel,
+        SettingsPresenter(models::ChimeInterval &chimeIntervalModel,
                           models::ChimeVolume &chimeVolumeModel,
                           models::StartDelay &startDelayModel,
                           AbstractAudioModel &audioModel);
@@ -35,12 +34,11 @@ namespace app::meditation
         void saveData() override;
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         void eraseProviderData() override;
-        void handleEnter() override;
+        void exitWithSave() override;
         void exitWithoutSave() override;
 
       private:
         void stopSound();
-        ApplicationCommon *application{};
         models::ChimeInterval &chimeIntervalModel;
         models::ChimeVolume &chimeVolumeModel;
         models::StartDelay &startDelayModel;

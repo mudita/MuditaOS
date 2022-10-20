@@ -1,9 +1,11 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "MeditationMainWindow.hpp"
 #include "SettingsWindow.hpp"
 
 #include <common/data/StyleCommon.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/SideListView.hpp>
@@ -23,6 +25,7 @@ namespace app::meditation
     {
         erase();
         buildInterface();
+        isSaveNeeded = false;
     }
 
     void SettingsWindow::buildInterface()
@@ -38,13 +41,12 @@ namespace app::meditation
 
         sideListView->rebuildList(listview::RebuildType::Full);
 
-        setFocusItem(sideListView);
+        presenter->loadData();
     }
 
     void SettingsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         AppWindow::onBeforeShow(mode, data);
-        presenter->loadData();
         setFocusItem(sideListView);
     }
 
@@ -54,7 +56,8 @@ namespace app::meditation
             return true;
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-            presenter->handleEnter();
+            isSaveNeeded = true;
+            switchToExitWindow();
             return true;
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
@@ -64,10 +67,22 @@ namespace app::meditation
         return AppWindow::onInput(inputEvent);
     }
 
+    void SettingsWindow::switchToExitWindow()
+    {
+        application->switchWindow(
+            window::bell_finished::defaultName,
+            BellFinishedWindowData::Factory::create("circle_success_big", MeditationMainWindow::defaultName));
+    }
+
     void SettingsWindow::onClose(const CloseReason reason)
     {
         if (reason != CloseReason::Popup) {
-            presenter->eraseProviderData();
+            if (isSaveNeeded) {
+                presenter->exitWithSave();
+            }
+            else {
+                presenter->exitWithoutSave();
+            }
         }
     }
 } // namespace app::meditation

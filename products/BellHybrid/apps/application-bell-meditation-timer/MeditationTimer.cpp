@@ -64,7 +64,7 @@ namespace app
         windowsFactory.attach(meditation::SettingsWindow::name,
                               [this](ApplicationCommon *app, const std::string &name) {
                                   auto presenter = std::make_unique<app::meditation::SettingsPresenter>(
-                                      app, *chimeIntervalModel, *chimeVolumeModel, *startDelayModel, *audioModel);
+                                      *chimeIntervalModel, *chimeVolumeModel, *startDelayModel, *audioModel);
                                   return std::make_unique<meditation::SettingsWindow>(app, std::move(presenter));
                               });
 
