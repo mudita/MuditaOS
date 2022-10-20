@@ -430,7 +430,10 @@ namespace service::eink
 
     sys::MessagePointer ServiceEink::handleCancelRefreshMessage(sys::Message *request)
     {
+#if DEBUG_EINK_REFRESH == 1
         LOG_INFO("Refresh cancel");
+#endif
+
         if (einkDisplayState == EinkDisplayState::NeedRefresh)
             einkDisplayState = EinkDisplayState::Canceled;
         return sys::MessageNone{};
