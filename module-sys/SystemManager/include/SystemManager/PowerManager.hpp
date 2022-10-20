@@ -10,6 +10,7 @@
 #include "drivers/semc/DriverSEMC.hpp"
 #include "SysCpuUpdateResult.hpp"
 #include "CpuGovernor.hpp"
+#include "TaskStatistics.hpp"
 #include <bsp/lpm/PowerProfile.hpp>
 #include <vector>
 
@@ -28,18 +29,23 @@ namespace sys
         explicit CpuFrequencyMonitor(const std::string name);
 
         [[nodiscard]] auto GetName() const noexcept -> std::string;
-        [[nodiscard]] auto GetRuntimePercentage() const noexcept -> std::uint32_t;
+        [[nodiscard]] auto GetPeriodRuntimePercentage(const TickType_t periodTicksIncrease) const noexcept
+            -> std::uint32_t;
+        [[nodiscard]] auto GetTotalRuntimePercentage(const TickType_t totalTicksIncrease) const noexcept
+            -> std::uint32_t;
         void IncreaseTicks(TickType_t ticks);
+        void SavePeriodTicks();
 
       private:
         std::string levelName;
-        std::uint64_t totalTicksCount{0};
+        std::uint32_t totalTicksCount{0};
+        std::uint32_t lastTotalTicksCount{0};
     };
 
     class PowerManager
     {
       public:
-        explicit PowerManager(CpuStatistics &stats);
+        explicit PowerManager(CpuStatistics &cpuStats, TaskStatistics &taskStats);
         ~PowerManager();
 
         int32_t PowerOff();
@@ -65,7 +71,7 @@ namespace sys
         void SetPernamentFrequency(bsp::CpuFrequencyMHz freq);
         void ResetPernamentFrequency();
 
-        void LogPowerManagerEfficiency();
+        void LogPowerManagerStatistics();
         void SetBootSuccess();
 
       private:
@@ -75,6 +81,7 @@ namespace sys
         void UpdateCpuFrequencyMonitor(bsp::CpuFrequencyMHz currentFreq);
 
         TickType_t lastCpuFrequencyChangeTimestamp{0};
+        TickType_t lastLogStatisticsTimestamp{0};
 
         std::vector<CpuFrequencyMonitor> cpuFrequencyMonitor;
 
@@ -85,6 +92,7 @@ namespace sys
 
         std::unique_ptr<sys::cpu::AlgorithmFactory> cpuAlgorithms;
         CpuStatistics &cpuStatistics;
+        TaskStatistics &taskStatistics;
     };
 
 } // namespace sys

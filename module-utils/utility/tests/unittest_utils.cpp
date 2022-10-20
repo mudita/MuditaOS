@@ -625,3 +625,19 @@ TEST_CASE("Generate random Id")
         REQUIRE((ret.size() == expectedSize));
     }
 }
+
+TEST_CASE("Compute increase")
+{
+    SECTION("positive")
+    {
+        const std::uint64_t a{2500}, b{2000};
+        const auto data = utils::computeIncrease(a, b);
+        REQUIRE(data == 500);
+    }
+    SECTION("overfow")
+    {
+        const std::uint32_t a{500}, b{0xFFFFFFFF - 500};
+        const auto data = utils::computeIncrease(a, b);
+        REQUIRE(data == 1000);
+    }
+}

@@ -16,6 +16,7 @@
 #include <hal/key_input/RawKey.hpp>
 #include <system/Constants.hpp>
 #include "CpuStatistics.hpp"
+#include "TaskStatistics.hpp"
 #include "DeviceManager.hpp"
 #include <chrono>
 #include <vector>
@@ -201,7 +202,7 @@ namespace sys
         sys::TimerHandle freqTimer;
         sys::TimerHandle serviceCloseTimer;
         sys::TimerHandle lowBatteryShutdownDelay;
-        sys::TimerHandle powerManagerEfficiencyTimer;
+        sys::TimerHandle powerManagerStatisticsTimer;
         InitFunction userInit;
         InitFunction systemInit;
         DeinitFunction systemDeinit;
@@ -214,6 +215,7 @@ namespace sys
         static cpp_freertos::MutexStandard serviceDestroyMutex;
         static cpp_freertos::MutexStandard appDestroyMutex;
         std::unique_ptr<CpuStatistics> cpuStatistics;
+        std::unique_ptr<TaskStatistics> taskStatistics;
         std::unique_ptr<PowerManager> powerManager;
         std::unique_ptr<DeviceManager> deviceManager;
     };

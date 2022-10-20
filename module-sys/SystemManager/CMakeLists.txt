@@ -9,12 +9,14 @@ target_sources(sys-manager
         include/SystemManager/CpuGovernor.hpp
         include/SystemManager/PowerManager.hpp
         include/SystemManager/DeviceManager.hpp
+        include/SystemManager/TaskStatistics.hpp
     
     PRIVATE
         CpuGovernor.cpp
         CpuSentinel.cpp
         GovernorSentinelOperations.cpp
         CpuStatistics.cpp
+        TaskStatistics.cpp
         CpuLogPrinter.cpp
         CpuPackPrinter.cpp
         data/SystemManagerActionsParams.hpp

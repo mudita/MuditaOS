@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /*
  * FreeRTOS Kernel V10.0.1
  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
@@ -122,7 +125,7 @@ extern "C"
 #define INCLUDE_eTaskGetState                0
 #define INCLUDE_xTimerPendFunctionCall       1
 #define INCLUDE_xTaskAbortDelay              1
-#define INCLUDE_xTaskGetHandle               0
+#define INCLUDE_xTaskGetHandle               1
 #define INCLUDE_xTaskResumeFromISR           1
 
 #ifdef __NVIC_PRIO_BITS
@@ -176,5 +179,8 @@ extern void vConfigureTimerForRunTimeStats(void);
 extern uint32_t ulHighFrequencyTimerTicks(void);
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTimerForRunTimeStats()
 #define portGET_RUN_TIME_COUNTER_VALUE()         ulHighFrequencyTimerTicks()
+
+extern void trace_deleteTask(const char *name);
+#define traceTASK_DELETE(pxTaskToDelete) trace_deleteTask(pxTaskToDelete->pcTaskName)
 
 #endif /* FREERTOS_CONFIG_H */

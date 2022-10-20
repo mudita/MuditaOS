@@ -24,3 +24,12 @@ add_catch2_executable(
     LIBS
         module-sys
 )
+
+add_catch2_executable(
+    NAME
+        task-statistics
+    SRCS
+        test-taskStatistics.cpp
+    LIBS
+        module-sys
+)

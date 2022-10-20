@@ -22,6 +22,8 @@ add_library(${PROJECT_NAME} STATIC
         CriticalSectionGuard.cpp
 
         $<$<BOOL:${PROF_ON}>:prof/prof.c>
+
+        trace/DeletedTasks.cpp
         )
 
 # Board specific compilation definitions,options,include directories and features
@@ -49,6 +51,7 @@ target_include_directories(${PROJECT_NAME}
 
         RTOSWrapper/include
         prof
+        trace
 
         )
 
@@ -60,7 +63,7 @@ endif ()
 target_link_libraries(${PROJECT_NAME} PUBLIC log-api board-config freertos_kernel)
 
 
-add_library(freertos-app application.c)
+add_library(freertos-app application.c trace/DeletedTasks.cpp)
 target_link_libraries(freertos-app PRIVATE freertos_kernel log-api)
 
 if (${ENABLE_TESTS})
