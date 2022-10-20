@@ -252,7 +252,8 @@ namespace sys
     void SystemManagerCommon::StartSystem(InitFunction sysInit, InitFunction appSpaceInit, DeinitFunction sysDeinit)
     {
         cpuStatistics = std::make_unique<CpuStatistics>();
-        powerManager  = std::make_unique<PowerManager>(*cpuStatistics);
+        taskStatistics = std::make_unique<TaskStatistics>();
+        powerManager   = std::make_unique<PowerManager>(*cpuStatistics, *taskStatistics);
         deviceManager = std::make_unique<DeviceManager>();
 
         systemInit   = std::move(sysInit);
@@ -265,11 +266,11 @@ namespace sys
             this, "cpuTick", constants::timerInitInterval, [this](sys::Timer &) { FreqUpdateTick(); });
         freqTimer.start();
 
-        powerManagerEfficiencyTimer = sys::TimerFactory::createPeriodicTimer(
-            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [this](sys::Timer &) {
-                powerManager->LogPowerManagerEfficiency();
+        powerManagerStatisticsTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "PowerManagerStatisticsTimer", constants::powerManagerLogsTimerInterval, [this](sys::Timer &) {
+                powerManager->LogPowerManagerStatistics();
             });
-        powerManagerEfficiencyTimer.start();
+        powerManagerStatisticsTimer.start();
     }
 
     bool SystemManagerCommon::Restore(Service *s)
@@ -705,7 +706,7 @@ namespace sys
         // In case if other power down request arrive in the meantime
         lowBatteryShutdownDelay.stop();
         freqTimer.stop();
-        powerManagerEfficiencyTimer.stop();
+        powerManagerStatisticsTimer.stop();
 
         // We are going to remove services in reversed order of creation
         CriticalSection::Enter();

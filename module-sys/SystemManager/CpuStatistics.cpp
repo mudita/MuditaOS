@@ -5,7 +5,7 @@
 #include <log/log.hpp>
 #include <FreeRTOS.h>
 #include <task.h>
-#include <limits>
+#include <Utils.hpp>
 
 extern "C"
 {
@@ -65,8 +65,8 @@ namespace sys
     {
         uint32_t idleTickCount     = xTaskGetIdleRunTimeCounter();
         uint32_t totalTickCount    = ulHighFrequencyTimerTicks();
-        uint32_t idleTickIncrease  = ComputeIncrease(idleTickCount, lastIdleTickCount);
-        uint32_t totalTickIncrease = ComputeIncrease(totalTickCount, lastTotalTickCount);
+        uint32_t idleTickIncrease  = utils::computeIncrease(idleTickCount, lastIdleTickCount);
+        uint32_t totalTickIncrease = utils::computeIncrease(totalTickCount, lastTotalTickCount);
         lastIdleTickCount          = idleTickCount;
         lastTotalTickCount         = totalTickCount;
         if (totalTickIncrease != 0u) {
@@ -83,13 +83,4 @@ namespace sys
         return cpuLoad;
     }
 
-    uint32_t CpuStatistics::ComputeIncrease(uint32_t currentCount, uint32_t lastCount) const
-    {
-        if (currentCount >= lastCount) {
-            return currentCount - lastCount;
-        }
-        else {
-            return std::numeric_limits<uint32_t>::max() - lastCount + currentCount;
-        }
-    }
 } // namespace sys

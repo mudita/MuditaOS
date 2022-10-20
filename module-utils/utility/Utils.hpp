@@ -259,6 +259,17 @@ namespace utils
         }
     }
 
+    template <class T>
+    [[nodiscard]] inline T computeIncrease(const T currentCount, const T lastCount)
+    {
+        if (currentCount >= lastCount) {
+            return currentCount - lastCount;
+        }
+        else {
+            return std::numeric_limits<T>::max() - lastCount + currentCount;
+        }
+    }
+
     static inline void findAndReplaceAll(std::string &data,
                                          const std::vector<std::pair<std::string, std::optional<std::string>>> &values,
                                          std::function<std::string(int)> getReplaceString = nullptr)

@@ -10,6 +10,7 @@
 #include <SystemManager/PowerManager.hpp>
 #include <gsl/util>
 #include <log/log.hpp>
+#include <Utils.hpp>
 
 namespace sys
 {
@@ -28,10 +29,19 @@ namespace sys
         return levelName;
     }
 
-    [[nodiscard]] auto CpuFrequencyMonitor::GetRuntimePercentage() const noexcept -> std::uint32_t
+    [[nodiscard]] auto CpuFrequencyMonitor::GetTotalRuntimePercentage(
+        const TickType_t totalTicksIncrease) const noexcept -> std::uint32_t
     {
-        auto tickCount = xTaskGetTickCount();
-        return tickCount == 0 ? 0 : ((totalTicksCount * 100) / tickCount);
+        return totalTicksIncrease == 0 ? 0 : ((totalTicksCount * 100) / totalTicksIncrease);
+    }
+
+    [[nodiscard]] auto CpuFrequencyMonitor::GetPeriodRuntimePercentage(
+        const TickType_t periodTicksIncrease) const noexcept -> std::uint32_t
+    {
+        return periodTicksIncrease == 0
+                   ? 0
+                   : ((static_cast<std::uint64_t>(utils::computeIncrease(totalTicksCount, lastTotalTicksCount)) * 100) /
+                      periodTicksIncrease);
     }
 
     void CpuFrequencyMonitor::IncreaseTicks(TickType_t ticks)
@@ -39,7 +49,13 @@ namespace sys
         totalTicksCount += ticks;
     }
 
-    PowerManager::PowerManager(CpuStatistics &stats) : powerProfile{bsp::getPowerProfile()}, cpuStatistics(stats)
+    void CpuFrequencyMonitor::SavePeriodTicks()
+    {
+        lastTotalTicksCount = totalTicksCount;
+    }
+
+    PowerManager::PowerManager(CpuStatistics &cpuStats, TaskStatistics &taskStats)
+        : powerProfile{bsp::getPowerProfile()}, cpuStatistics(cpuStats), taskStatistics(taskStats)
     {
         driverSEMC      = drivers::DriverSEMC::Create(drivers::name::ExternalRAM);
         lowPowerControl = bsp::LowPowerMode::Create().value_or(nullptr);
@@ -184,16 +200,23 @@ namespace sys
         lastCpuFrequencyChangeTimestamp = ticks;
     }
 
-    void PowerManager::LogPowerManagerEfficiency()
+    void PowerManager::LogPowerManagerStatistics()
     {
-        std::string log{"PowerManager Efficiency: "};
+        const TickType_t tickCount          = xTaskGetTickCount();
+        const TickType_t periodTickIncrease = tickCount - lastLogStatisticsTimestamp;
         UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
 
+        std::string log{"last period (total): "};
         for (auto &level : cpuFrequencyMonitor) {
-            log.append(level.GetName() + ": " + std::to_string(level.GetRuntimePercentage()) + "% ");
+            log.append(level.GetName() + ": " + std::to_string(level.GetPeriodRuntimePercentage(periodTickIncrease)) +
+                       "% (" + std::to_string(level.GetTotalRuntimePercentage(tickCount)) + "%) ");
+            level.SavePeriodTicks();
         }
-
+        lastLogStatisticsTimestamp = tickCount;
         LOG_INFO("%s", log.c_str());
+
+        taskStatistics.Update();
+        taskStatistics.LogCpuUsage();
     }
 
     void PowerManager::SetBootSuccess()

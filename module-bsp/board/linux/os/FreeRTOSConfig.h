@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /*
  * FreeRTOS Kernel V10.0.1
  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
@@ -122,7 +125,7 @@ extern "C"
 #define INCLUDE_eTaskGetState                0
 #define INCLUDE_xTimerPendFunctionCall       1
 #define INCLUDE_xTaskAbortDelay              1
-#define INCLUDE_xTaskGetHandle               0
+#define INCLUDE_xTaskGetHandle               1
 #define INCLUDE_xTaskResumeFromISR           1
 
 #ifdef __NVIC_PRIO_BITS
@@ -171,5 +174,8 @@ standard names. */
 #define configSYSTEM_HEAP_INTEGRITY_CHECK    (1)
 #define PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS (1)
 #endif
+
+extern void trace_deleteTask(const char *name);
+#define traceTASK_DELETE(pxTaskToDelete) trace_deleteTask(pxTaskToDelete->pcTaskName)
 
 #endif /* FREERTOS_CONFIG_H */
