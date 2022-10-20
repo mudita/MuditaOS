@@ -80,9 +80,22 @@
         },
         {
             "type": "shell",
+            "label": "Build BellHybrid Disk Image (Linux)",
+            "command": "ninja",
+            "args": [
+                "BellHybrid-disk-img"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build-BellHybrid-linux-Debug"
+            },
+            "group": "build",
+            "detail": "Build dir has to be configured with Cmake using Ninja",
+        },
+        {
+            "type": "shell",
             "label": "Configure and Build BellHybrid (Linux)",
             "group": "build",
-            "dependsOn": ["Configure BellHybrid (Linux)", "Build BellHybrid (Linux)"],
+            "dependsOn": ["Configure BellHybrid (Linux)", "Build BellHybrid (Linux)", "Build BellHybrid Disk Image (Linux)"],
             "dependsOrder": "sequence",
             "detail": "Configure cmake project and build with Ninja",
         },
@@ -162,9 +175,22 @@
         },
         {
             "type": "shell",
+            "label": "Build BellHybrid Disk Image (RT1051)",
+            "command": "ninja",
+            "args": [
+                "BellHybrid-disk-img"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build-BellHybrid-rt1051-RelWithDebInfo"
+            },
+            "group": "build",
+            "detail": "Build dir has to be configured with Cmake using Ninja",
+        },
+        {
+            "type": "shell",
             "label": "Configure and Build BellHybrid (RT1051)",
             "group": "build",
-            "dependsOn": ["Configure BellHybrid (RT1051)", "Build BellHybrid (RT1051)"],
+            "dependsOn": ["Configure BellHybrid (RT1051)", "Build BellHybrid (RT1051)", "Build BellHybrid Disk Image (RT1051)"],
             "dependsOrder": "sequence",
             "detail": "Configure cmake project and build with Ninja",
         },
