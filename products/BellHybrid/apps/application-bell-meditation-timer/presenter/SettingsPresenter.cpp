@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsPresenter.hpp"
-#include "MeditationMainWindow.hpp"
 #include "MeditationCommon.hpp"
 
 #include "models/ChimeInterval.hpp"
@@ -12,7 +11,6 @@
 #include <ApplicationCommon.hpp>
 #include <common/widgets/list_items/Fraction.hpp>
 #include <common/widgets/list_items/Numeric.hpp>
-#include <common/windows/BellFinishedWindow.hpp>
 #include <common/LanguageUtils.hpp>
 #include <apps-common/InternalModel.hpp>
 #include <apps-common/widgets/spinners/Spinners.hpp>
@@ -58,13 +56,12 @@ namespace app::list_items
 namespace app::meditation
 {
     using namespace gui;
-    SettingsPresenter::SettingsPresenter(app::ApplicationCommon *app,
-                                         models::ChimeInterval &chimeIntervalModel,
+    SettingsPresenter::SettingsPresenter(models::ChimeInterval &chimeIntervalModel,
                                          models::ChimeVolume &chimeVolumeModel,
                                          models::StartDelay &startDelayModel,
                                          AbstractAudioModel &audioModel)
-        : application{app}, chimeIntervalModel{chimeIntervalModel}, chimeVolumeModel{chimeVolumeModel},
-          startDelayModel{startDelayModel}, audioModel{audioModel}
+        : chimeIntervalModel{chimeIntervalModel}, chimeVolumeModel{chimeVolumeModel}, startDelayModel{startDelayModel},
+          audioModel{audioModel}
     {
 
         auto chimeInterval =
@@ -73,14 +70,10 @@ namespace app::meditation
                                      utils::translate("app_bell_meditation_chime_interval"),
                                      utils::translate("app_bell_meditation_chime_interval_bottom")};
 
-        chimeInterval->set_on_value_change_cb([this](const auto &val) { this->chimeIntervalModel.setValue(val); });
-
         auto startDelay = new list_items::StartDelay{list_items::StartDelay::spinner_type::range{0, 90, 10},
                                                      startDelayModel,
                                                      utils::translate("app_bell_meditation_start_delay"),
                                                      utils::translate("common_second_lower")};
-
-        startDelay->set_on_value_change_cb([this](const auto &val) { this->startDelayModel.setValue(val); });
 
         auto chimeVolume = new list_items::Numeric{list_items::Numeric::spinner_type::range{1, 10, 1},
                                                    chimeVolumeModel,
@@ -89,16 +82,18 @@ namespace app::meditation
         listItemsProvider =
             std::make_shared<BellListItemProvider>(BellListItemProvider::Items{startDelay, chimeInterval, chimeVolume});
 
-        chimeVolume->onEnter = [this]() {
+        auto playSound = [this]() {
             this->audioModel.play(getMeditationAudioPath(), AbstractAudioModel::PlaybackType::Meditation, {});
         };
 
+        chimeVolume->onEnter = playSound;
+
         chimeVolume->onExit = [this]() { stopSound(); };
 
-        chimeVolume->set_on_value_change_cb([this](const auto &val) {
+        chimeVolume->set_on_value_change_cb([this, playSound](const auto &val) {
             this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Meditation, {});
             if (this->audioModel.hasPlaybackFinished()) {
-                this->audioModel.play(getMeditationAudioPath(), AbstractAudioModel::PlaybackType::Meditation, {});
+                playSound();
             }
         });
 
@@ -114,7 +109,6 @@ namespace app::meditation
     }
     void SettingsPresenter::saveData()
     {
-        stopSound();
         for (auto &item : listItemsProvider->getListItems()) {
             item->getValue();
         }
@@ -127,12 +121,10 @@ namespace app::meditation
     {
         listItemsProvider->clearData();
     }
-    void SettingsPresenter::handleEnter()
+    void SettingsPresenter::exitWithSave()
     {
         saveData();
-        application->switchWindow(
-            window::bell_finished::defaultName,
-            BellFinishedWindowData::Factory::create("circle_success_big", MeditationMainWindow::defaultName));
+        eraseProviderData();
     }
 
     void SettingsPresenter::stopSound()
@@ -142,7 +134,9 @@ namespace app::meditation
 
     void SettingsPresenter::exitWithoutSave()
     {
+        this->stopSound();
         chimeVolumeModel.restoreDefault();
+        eraseProviderData();
     }
 
 } // namespace app::meditation
