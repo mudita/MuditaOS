@@ -13,6 +13,7 @@ set(SOURCES
     src/TerhetingHandler.cpp
     src/ModemResetHandler.cpp
     src/URCCounter.cpp
+    src/VolteHandlerImpl.cpp
     src/CSQHandler.cpp
         DTMFCode.cpp
 

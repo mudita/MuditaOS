@@ -870,7 +870,19 @@ bool ServiceCellular::handle_cellular_priv_init()
     priv->simContacts->setChannel(channel);
     priv->imeiGetHandler->setChannel(channel);
 
-    if (!priv->tetheringHandler->configure()) {
+#if ENABLE_VOLTE == 1
+    constexpr bool enableVolte = true;
+#else
+    constexpr bool enableVolte = false;
+#endif
+    bool needReset = false;
+    try {
+        needReset = !priv->tetheringHandler->configure() || !priv->volteHandler->switchVolte(*channel, enableVolte);
+    }
+    catch (std::runtime_error const &exc) {
+        LOG_ERROR("%s", exc.what());
+    }
+    if (needReset) {
         priv->modemResetHandler->performHardReset();
         return true;
     }

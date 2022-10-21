@@ -12,6 +12,8 @@
 #include "SimContacts.hpp"
 #include "ImeiGetHandler.hpp"
 #include "TetheringHandler.hpp"
+#include "VolteHandler.hpp"
+#include "VolteHandlerImpl.hpp"
 #include "ModemResetHandler.hpp"
 #include "CSQHandler.hpp"
 
@@ -24,6 +26,7 @@ namespace cellular::internal
     using service::SimContacts;
     using service::State;
     using service::TetheringHandler;
+    using service::VolteHandler;
 
     class ServiceCellularPriv
     {
@@ -36,6 +39,7 @@ namespace cellular::internal
         std::unique_ptr<SimContacts> simContacts;
         std::unique_ptr<service::ImeiGetHandler> imeiGetHandler;
         std::unique_ptr<TetheringHandler> tetheringHandler;
+        std::unique_ptr<VolteHandler<DLCChannel, ModemResponseParserImpl>> volteHandler;
         std::unique_ptr<ModemResetHandler> modemResetHandler;
         std::unique_ptr<CSQHandler> csqHandler;
 
