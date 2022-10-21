@@ -260,21 +260,6 @@ auto DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -
     return ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode != 0));
 }
 
-auto DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath) -> bool
-{
-    LOG_INFO("DBBackup %s", backupPath.c_str());
-
-    std::shared_ptr<DBServiceMessageBackup> msg =
-        std::make_shared<DBServiceMessageBackup>(MessageType::DBServiceBackup, backupPath);
-
-    auto ret = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
-    if (auto retMsg = dynamic_cast<DBServiceResponseMessage *>(ret.second.get()); retMsg) {
-        return retMsg->retCode;
-    }
-    LOG_ERROR("DBBackup error, return code: %s", c_str(ret.first));
-    return false;
-}
-
 auto DBServiceAPI::DBPrepareSyncPackage(sys::Service *serv, const std::string &syncPackagePath) -> bool
 {
     LOG_INFO("DBPrepareSyncPackage %s", syncPackagePath.c_str());
