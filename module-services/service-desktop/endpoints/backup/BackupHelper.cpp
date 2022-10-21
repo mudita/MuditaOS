@@ -19,10 +19,8 @@ namespace sdesktop::endpoints
         if (context.getBody()[json::messages::category].string_value() == json::messages::categorySync) {
             return checkSyncState(context);
         }
-        context.setResponseStatus(http::Code::BadRequest);
-        putToSendQueue(context.createSimpleResponse());
 
-        return {sent::yes, std::nullopt};
+        return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
     }
 
     auto BackupHelper::processPost(Context &context) -> ProcessResult
@@ -34,10 +32,8 @@ namespace sdesktop::endpoints
         else if (category == json::messages::categoryBackup) {
             return executeBackupRequest(context);
         }
-        context.setResponseStatus(http::Code::BadRequest);
-        putToSendQueue(context.createSimpleResponse());
 
-        return {sent::yes, std::nullopt};
+        return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
     }
 
     auto BackupHelper::executeBackupRequest([[maybe_unused]] Context &context) -> ProcessResult
@@ -49,14 +45,14 @@ namespace sdesktop::endpoints
         return {sent::no, ResponseContext{.status = http::Code::InternalServerError}};
     }
 
-    auto BackupHelper::executeSyncRequest(Context &context) -> ProcessResult
+    auto BackupHelper::executeSyncRequest([[maybe_unused]] Context &context) -> ProcessResult
     {
         auto ownerServicePtr = static_cast<ServiceDesktop *>(owner);
 
-        if (ownerServicePtr->getBackupSyncRestoreStatus().state == BackupSyncRestore::OperationState::Running) {
+        if (ownerServicePtr->getSyncStatus().state == Sync::OperationState::Running) {
             LOG_DEBUG("Sync already running");
             // a sync package preparation is already running, don't start a second task
-            context.setResponseStatus(http::Code::NotAcceptable);
+            return {sent::no, ResponseContext{.status = http::Code::NotAcceptable}};
         }
         else {
             LOG_DEBUG("Starting a sync package preparation");
@@ -67,44 +63,38 @@ namespace sdesktop::endpoints
             ownerServicePtr->bus.sendUnicast(std::make_shared<sdesktop::SyncMessage>(), service::name::service_desktop);
 
             // return new generated sync package info
-            context.setResponseBody(ownerServicePtr->getBackupSyncRestoreStatus());
+
+            return {sent::no,
+                    ResponseContext{.status = http::Code::Accepted,
+                                    .body   = json11::Json::object{
+                                        {sdesktop::endpoints::json::taskId, ownerServicePtr->getSyncStatus().taskId}}}};
         }
-
-        putToSendQueue(context.createSimpleResponse());
-
-        return {sent::yes, std::nullopt};
     }
 
     auto BackupHelper::checkSyncState(Context &context) -> ProcessResult
     {
         auto ownerServicePtr = static_cast<ServiceDesktop *>(owner);
+        auto status          = http::Code::BadRequest;
 
-        if (context.getBody()[json::taskId].is_string()) {
-            if (ownerServicePtr->getBackupSyncRestoreStatus().taskId ==
-                context.getBody()[json::taskId].string_value()) {
-                if (ownerServicePtr->getBackupSyncRestoreStatus().state ==
-                    BackupSyncRestore::OperationState::Finished) {
-                    context.setResponseStatus(http::Code::SeeOther);
-                }
-                else {
-                    context.setResponseStatus(http::Code::OK);
-                }
+        if (!context.getBody()[json::taskId].is_string()) {
+            LOG_DEBUG("Backup task not found");
+            return {sent::no, ResponseContext{.status = status}};
+        }
 
-                context.setResponseBody(ownerServicePtr->getBackupSyncRestoreStatus());
-            }
-            else {
-                context.setResponseStatus(http::Code::NotFound);
-            }
+        if (ownerServicePtr->getSyncStatus().taskId != context.getBody()[json::taskId].string_value()) {
+            status = http::Code::NotFound;
+            return {sent::no, ResponseContext{.status = status}};
+        }
+
+        auto syncStatus = ownerServicePtr->getSyncStatus();
+
+        if (syncStatus.state == Sync::OperationState::Finished) {
+            status = http::Code::SeeOther;
         }
         else {
-            LOG_DEBUG("Backup task not found");
-            context.setResponseStatus(http::Code::BadRequest);
+            status = http::Code::OK;
         }
-
-        LOG_DEBUG("Responding");
-        putToSendQueue(context.createSimpleResponse());
-
-        return {sent::yes, std::nullopt};
+        return {sent::no, ResponseContext{.status = status, .body = syncStatus}};
     }
 
 } // namespace sdesktop::endpoints
