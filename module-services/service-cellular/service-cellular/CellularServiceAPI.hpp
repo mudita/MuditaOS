@@ -138,7 +138,6 @@ namespace CellularServiceAPI
 
     bool SetDataTransfer(sys::Service *serv, packet_data::DataTransfer dt);
     bool GetDataTransfer(sys::Service *serv);
-    bool SetVoLTE(sys::Service *serv, bool value);
 
     bool ChangeModulePowerState(sys::Service *serv, cellular::service::State::PowerState newState);
 

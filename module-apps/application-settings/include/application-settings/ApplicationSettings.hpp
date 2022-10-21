@@ -37,8 +37,6 @@ namespace app
             virtual ~OperatorsSettings()                               = default;
             virtual void setOperatorsOn(bool value)                    = 0;
             [[nodiscard]] virtual bool getOperatorsOn() const noexcept = 0;
-            virtual void setVoLTEOn(bool value)                        = 0;
-            [[nodiscard]] virtual bool getVoLTEOn() const noexcept     = 0;
         };
         class ScreenLightSettings
         {
@@ -154,9 +152,6 @@ namespace app
         void operatorOnChanged(const std::string &value);
         void setOperatorsOn(bool value) override;
         bool getOperatorsOn() const noexcept override;
-        void setVoLTEOn(bool value) override;
-        bool getVoLTEOn() const noexcept override;
-        void volteChanged(const std::string &value);
         void setOsUpdateVersion(const std::string &value);
 
         ScreenLightSettings::Values getCurrentValues() override;
@@ -197,7 +192,6 @@ namespace app
         std::string selectedSimNumber = {};
 
         bool operatorsOn                                               = false;
-        bool voLteStateOn                                              = false;
         bool notificationsWhenLocked                                   = true;
         bool callsFromFavorites                                        = false;
         int connectionFrequency                                        = 0;

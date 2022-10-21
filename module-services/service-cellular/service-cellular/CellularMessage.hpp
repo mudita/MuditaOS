@@ -46,7 +46,6 @@ class CellularMessage : public sys::DataMessage
 
         ListCurrentCalls,
         SimResponse, // Send to PIN window (show, error state, hide)
-        SetVoLTE,
         SetFlightMode,
 
         PacketData, ///< for all PacketData messages
@@ -464,26 +463,6 @@ namespace cellular
     {
       public:
         explicit SetOperatorResponse(bool ret) : ResponseMessage(ret)
-        {}
-    };
-
-    class VoLTEDataMessage : public CellularMessage
-    {
-        bool VoLTEon = false;
-
-      public:
-        explicit VoLTEDataMessage(bool VoLTEon) : CellularMessage{Type::SetVoLTE}, VoLTEon{VoLTEon}
-        {}
-        [[nodiscard]] bool getVoLTEon() const noexcept
-        {
-            return VoLTEon;
-        }
-    };
-
-    class ChangeVoLTEDataMessage : public VoLTEDataMessage
-    {
-      public:
-        explicit ChangeVoLTEDataMessage(bool VoLTEon) : VoLTEDataMessage{VoLTEon}
         {}
     };
 

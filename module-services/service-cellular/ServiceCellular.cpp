@@ -239,10 +239,6 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 
     priv->state->set(State::ST::WaitForStartPermission);
     settings->registerValueChange(
-        settings::Cellular::volte_on,
-        [this](const std::string &value) { volteChanged(value); },
-        ::settings::SettingsScope::Global);
-    settings->registerValueChange(
         settings::Cellular::apn_list,
         [this](const std::string &value) { apnListChanged(value); },
         ::settings::SettingsScope::Global);
@@ -386,27 +382,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(cellular::DeactivateContextMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<cellular::DeactivateContextMessage *>(request);
         return handleCellularDeactivateContextMessage(msg);
-    });
-
-    connect(typeid(cellular::ChangeVoLTEDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        auto msg = static_cast<cellular::ChangeVoLTEDataMessage *>(request);
-        volteOn  = msg->getVoLTEon();
-        settings->setValue(settings::Cellular::volte_on, std::to_string(volteOn), settings::SettingsScope::Global);
-        NetworkSettings networkSettings(*this);
-        auto vstate = networkSettings.getVoLTEConfigurationState();
-        if ((vstate != VoLTEState::On) && volteOn) {
-            LOG_DEBUG("VoLTE On");
-            if (networkSettings.setVoLTEState(VoLTEState::On) == at::Result::Code::OK) {
-                priv->modemResetHandler->performSoftReset();
-            }
-        }
-        else if (!volteOn) {
-            LOG_DEBUG("VoLTE Off");
-            if (networkSettings.setVoLTEState(VoLTEState::Off) == at::Result::Code::OK) {
-                priv->modemResetHandler->performSoftReset();
-            }
-        }
-        return std::make_shared<cellular::ResponseMessage>(true);
     });
 
     connect(typeid(cellular::SetFlightModeMessage), [&](sys::Message *request) -> sys::MessagePointer {
@@ -1739,14 +1714,6 @@ std::shared_ptr<cellular::SetOperatorResponse> ServiceCellular::handleCellularSe
     NetworkSettings networkSettings(*this);
     return std::make_shared<cellular::SetOperatorResponse>(
         networkSettings.setOperator(msg->getMode(), msg->getFormat(), msg->getName()));
-}
-
-void ServiceCellular::volteChanged(const std::string &value)
-{
-    if (!value.empty()) {
-        LOG_INFO("VoLTE setting state changed to '%s'.", value.c_str());
-        volteOn = utils::getNumericValue<bool>(value);
-    }
 }
 
 void ServiceCellular::apnListChanged(const std::string &value)

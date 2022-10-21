@@ -56,26 +56,11 @@ class NetworkSettings
      * @return
      */
     std::vector<std::string> scanOperators(bool fullInfoList = false);
-    at::Result::Code setVoLTEState(VoLTEState state);
-
-    /// This is information about configuration setup, not information
-    /// about whether the VoLTE actually works in the selected network
-    VoLTEState getVoLTEConfigurationState();
-
-    at::Result::Code getPreferredVoiceDomain(VoiceDomainPreference &pref);
-    at::Result::Code setPreferredVoiceDomain(VoiceDomainPreference pref);
 
     bool setOperatorAutoSelect();
     std::string getCurrentOperatorName() const;
     std::optional<at::response::cops::Operator> getCurrentOperator() const;
-    at::Result::Code getPreferredSMSDomain(SMSDomainPreference &pref);
-    at::Result::Code setPreferredSMSDomain(SMSDomainPreference pref);
     bool setOperator(at::response::cops::CopsMode mode, at::response::cops::NameFormat format, const std::string &name);
-
-    at::Result::Code setIMSState(at::response::qcfg_ims::IMSState state);
-    std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState>> getIMSState();
-
-    std::string printVoLTEDebug();
 
     enum class SimpleNAT
     {
