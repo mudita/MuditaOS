@@ -13,7 +13,7 @@
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-db/DBServiceName.hpp>
-#include <service-desktop/BackupRestore.hpp>
+#include <service-desktop/Sync.hpp>
 #include <service-desktop/OutboxNotifications.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 
@@ -55,19 +55,18 @@ class ServiceDesktop : public sys::Service
     ~ServiceDesktop() override;
 
     std::unique_ptr<WorkerDesktop> desktopWorker;
-    BackupSyncRestore::OperationStatus backupSyncRestoreStatus;
+    Sync::OperationStatus syncStatus;
 
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(sys::ServicePowerMode mode) override;
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
 
-    std::string prepareBackupFilename();
     std::string prepareSyncFilename();
     void prepareSyncData();
-    const BackupSyncRestore::OperationStatus getBackupSyncRestoreStatus()
+    const Sync::OperationStatus getSyncStatus()
     {
-        return backupSyncRestoreStatus;
+        return syncStatus;
     }
     const sdesktop::USBSecurityModel *getSecurity()
     {
