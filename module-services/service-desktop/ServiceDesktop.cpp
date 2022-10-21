@@ -90,16 +90,6 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage * /*msg
     return response;
 }
 
-std::string ServiceDesktop::prepareBackupFilename()
-{
-    std::array<char, 64> backupFileName{};
-    std::time_t now;
-    std::time(&now);
-    std::strftime(backupFileName.data(), backupFileName.size(), "%FT%OH%OM%OSZ", std::localtime(&now));
-
-    return std::string(backupFileName.data());
-}
-
 std::string ServiceDesktop::prepareSyncFilename()
 {
     const std::size_t maxFileNameSize = 64;
@@ -113,10 +103,9 @@ std::string ServiceDesktop::prepareSyncFilename()
 
 void ServiceDesktop::prepareSyncData()
 {
-    backupSyncRestoreStatus.operation     = BackupSyncRestore::Operation::Sync;
-    backupSyncRestoreStatus.taskId        = prepareSyncFilename();
-    backupSyncRestoreStatus.state         = BackupSyncRestore::OperationState::Stopped;
-    backupSyncRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupSyncRestoreStatus.taskId;
+    syncStatus.taskId  = prepareSyncFilename();
+    syncStatus.state   = Sync::OperationState::Stopped;
+    syncStatus.tempDir = purefs::dir::getTemporaryPath() / syncStatus.taskId;
 }
 
 auto ServiceDesktop::requestLogsFlush() -> void
@@ -315,18 +304,16 @@ auto ServiceDesktop::handle(sdesktop::developerMode::DeveloperModeRequest *msg) 
 
 auto ServiceDesktop::handle(sdesktop::SyncMessage * /*msg*/) -> std::shared_ptr<sys::Message>
 {
-    backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Running;
-    backupSyncRestoreStatus.completionCode =
-        BackupSyncRestore::PrepareSyncPackage(this, backupSyncRestoreStatus.backupTempDir);
-    backupSyncRestoreStatus.location = backupSyncRestoreStatus.taskId;
+    syncStatus.state          = Sync::OperationState::Running;
+    syncStatus.completionCode = Sync::PrepareSyncPackage(this, syncStatus.tempDir);
 
-    if (backupSyncRestoreStatus.completionCode == BackupSyncRestore::CompletionCode::Success) {
+    if (syncStatus.completionCode == Sync::CompletionCode::Success) {
         LOG_INFO("Sync package preparation finished");
-        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Finished;
+        syncStatus.state = Sync::OperationState::Finished;
     }
     else {
         LOG_ERROR("Sync package preparation failed");
-        backupSyncRestoreStatus.state = BackupSyncRestore::OperationState::Error;
+        syncStatus.state = Sync::OperationState::Error;
     }
 
     return sys::MessageNone{};
