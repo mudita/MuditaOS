@@ -44,6 +44,6 @@ namespace purefs
 
     namespace buffer
     {
-        constexpr inline auto tar_buf = 8192 * 4;
+        constexpr inline auto tar_buf = 1024;
     }
 } // namespace purefs
