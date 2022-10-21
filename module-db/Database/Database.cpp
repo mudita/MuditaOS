@@ -242,9 +242,9 @@ void Database::pragmaQuery(const std::string &pragmaStatement)
     }
 }
 
-bool Database::storeIntoFile(const std::filesystem::path &backupPath)
+bool Database::storeIntoFile(const std::filesystem::path &syncPath)
 {
-    // kind of workaround-fix for creating the backup - if somehow DB can't be properly
+    // kind of workaround-fix for creating the sync package - if somehow DB can't be properly
     // vacuumed into file, the transaction is still outgoing (probably nested transaction)
     // that's why we need to commit it manually
     if (sqlite3_get_autocommit(dbConnection) == 0) {
@@ -256,11 +256,11 @@ bool Database::storeIntoFile(const std::filesystem::path &backupPath)
         LOG_INFO("sqlite3 autocommit after commit: %d", sqlite3_get_autocommit(dbConnection));
     }
 
-    LOG_INFO("Backup database: %s, into file: %s - STARTED", dbName.c_str(), backupPath.c_str());
-    if (const auto rc = execute("VACUUM main INTO '%q';", backupPath.c_str()); !rc) {
-        LOG_ERROR("Backup database: %s, into file: %s - FAILED", dbName.c_str(), backupPath.c_str());
+    LOG_INFO("Store database: %s, into file: %s - STARTED", dbName.c_str(), syncPath.c_str());
+    if (const auto rc = execute("VACUUM main INTO '%q';", syncPath.c_str()); !rc) {
+        LOG_ERROR("Store database: %s, into file: %s - FAILED", dbName.c_str(), syncPath.c_str());
         return false;
     }
-    LOG_INFO("Backup database: %s, into file: %s - SUCCEDED", dbName.c_str(), backupPath.c_str());
+    LOG_INFO("Store database: %s, into file: %s - SUCCEEDED", dbName.c_str(), syncPath.c_str());
     return true;
 }

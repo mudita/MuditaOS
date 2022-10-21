@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,7 @@ namespace sdesktop::endpoints
     class BackupEndpoint : public Endpoint
     {
       public:
-        BackupEndpoint(sys::Service *ownerServicePtr)
+        explicit BackupEndpoint(sys::Service *ownerServicePtr)
             : Endpoint(ownerServicePtr), helper(std::make_unique<BackupHelper>(ownerServicePtr))
         {
             debugName = "BackupEndpoint";
