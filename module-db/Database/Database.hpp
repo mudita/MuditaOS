@@ -32,7 +32,7 @@ class Database
     // Must be invoked before closing system in order to properly close OS layer
     static bool deinitialize();
 
-    bool storeIntoFile(const std::filesystem::path &backupPath);
+    bool storeIntoFile(const std::filesystem::path &syncPath);
 
     uint32_t getLastInsertRowId();
     void pragmaQuery(const std::string &pragmaStatement);
