@@ -13,6 +13,9 @@
 * New circular progress bar 
 * Ringing bell image at the end of the Power Nap
 
+#### General:
+* Bedside lamp mode
+
 ## [1.6.0 2022-06-14]
 
 ### Added

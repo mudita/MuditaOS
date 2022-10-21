@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,6 +16,12 @@ namespace settings
 
 namespace backlight
 {
+    enum class Type
+    {
+        Frontlight,
+        BedsideLamp
+    };
+
     enum class BacklightMode
     {
         WithTimer,
@@ -30,6 +36,8 @@ namespace backlight
         void init() override;
 
         void handleKeyPressed(int key = 0);
+
+        void handleScreenLight(Type type);
 
         void processScreenRequest(screen_light_control::Action action,
                                   const screen_light_control::Parameters &params) override;
@@ -48,5 +56,6 @@ namespace backlight
         bool ignoreKeypress         = false;
         bool onDemandModeOn         = true;
         BacklightMode backlightMode = BacklightMode::WithTimer;
+        Type backlightType          = Type::Frontlight;
     };
 } // namespace backlight
