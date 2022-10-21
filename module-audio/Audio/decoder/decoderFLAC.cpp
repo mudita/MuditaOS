@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp>
@@ -15,15 +15,15 @@
 namespace audio
 {
 
-    decoderFLAC::decoderFLAC(const char *fileName) : Decoder(fileName)
+    decoderFLAC::decoderFLAC(const std::string &filePath) : Decoder(filePath)
     {
-
         if (fileSize == 0) {
             return;
         }
 
-        flac = drflac_open(drflac_read, drflac_seek, this, NULL);
-        if (flac == NULL) {
+        flac = drflac_open(drflac_read, drflac_seek, this, nullptr);
+        if (flac == nullptr) {
+            LOG_ERROR("Unable to initialize FLAC decoder");
             return;
         }
 
@@ -39,15 +39,13 @@ namespace audio
         drflac_close(flac);
     }
 
-    uint32_t decoderFLAC::decode(uint32_t samplesToRead, int16_t *pcmData)
+    std::uint32_t decoderFLAC::decode(std::uint32_t samplesToRead, int16_t *pcmData)
     {
-
-        uint32_t samples_read = 0;
-
-        samples_read = drflac_read_pcm_frames_s16(flac, samplesToRead / chanNumber, (drflac_int16 *)pcmData);
-        if (samples_read) {
+        std::uint32_t samples_read =
+            drflac_read_pcm_frames_s16(flac, samplesToRead / chanNumber, reinterpret_cast<drflac_int16 *>(pcmData));
+        if (samples_read > 0) {
             /* Calculate frame duration in seconds */
-            position += float(samples_read) / float(sampleRate);
+            position += static_cast<float>(samples_read) / static_cast<float>(sampleRate);
         }
 
         return samples_read * chanNumber;
@@ -56,34 +54,37 @@ namespace audio
     void decoderFLAC::setPosition(float pos)
     {
         if (!isInitialized) {
-            LOG_ERROR("Wav decoder not initialized");
+            LOG_ERROR("FLAC decoder not initialized");
             return;
         }
         drflac_seek_to_pcm_frame(flac, flac->totalPCMFrameCount * pos);
 
         // Calculate new position
-        position = float(flac->totalPCMFrameCount) * pos / float(sampleRate);
+        position = static_cast<float>(flac->totalPCMFrameCount) * pos / static_cast<float>(sampleRate);
     }
 
     /* Data encoded in UTF-8 */
-    void decoderFLAC::flac_parse_text(uint8_t *in, uint32_t taglen, uint32_t datalen, uint8_t *out, uint32_t outlen)
+    void decoderFLAC::flac_parse_text(
+        std::uint8_t *in, std::uint32_t taglen, std::uint32_t datalen, std::uint8_t *out, std::uint32_t outlen)
     {
         /* Little Endian here. */
-        uint32_t size = datalen - taglen > outlen - 1 ? outlen - 1 : datalen - taglen;
+        std::uint32_t size = ((datalen - taglen) > (outlen - 1)) ? (outlen - 1) : (datalen - taglen);
         memcpy(out, in + taglen, size);
         out[size] = '\0';
     }
 
     size_t decoderFLAC::drflac_read(void *pUserData, void *pBufferOut, size_t bytesToRead)
     {
-        decoderFLAC *userdata = (decoderFLAC *)pUserData;
-        return std::fread(pBufferOut, 1, bytesToRead, userdata->fd);
+        const auto decoderContext = reinterpret_cast<decoderFLAC *>(pUserData);
+        return std::fread(pBufferOut, 1, bytesToRead, decoderContext->fd);
     }
 
     drflac_bool32 decoderFLAC::drflac_seek(void *pUserData, int offset, drflac_seek_origin origin)
     {
-        decoderFLAC *userdata = (decoderFLAC *)pUserData;
-        return !std::fseek(userdata->fd, offset, origin == drflac_seek_origin_start ? SEEK_SET : SEEK_CUR);
+        const auto decoderContext = reinterpret_cast<decoderFLAC *>(pUserData);
+        const int seekError =
+            std::fseek(decoderContext->fd, offset, origin == drflac_seek_origin_start ? SEEK_SET : SEEK_CUR);
+        return (seekError == 0) ? DRFLAC_TRUE : DRFLAC_FALSE;
     }
 
 } // namespace audio

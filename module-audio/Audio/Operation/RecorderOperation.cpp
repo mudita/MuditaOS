@@ -8,7 +8,6 @@
 #include "Audio/AudioCommon.hpp"
 
 #include <log/log.hpp>
-#include "FreeRTOS.h"
 
 namespace audio
 {
@@ -16,15 +15,18 @@ namespace audio
 
 #define PERF_STATS_ON 0
 
-    RecorderOperation::RecorderOperation(const char *file, AudioServiceMessage::Callback callback) : Operation(callback)
+    RecorderOperation::RecorderOperation(const std::string &filePath, AudioServiceMessage::Callback callback)
+        : Operation(std::move(callback))
     {
 
-        audioCallback = [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
+        audioCallback = [this](const void *inputBuffer,
+                               [[maybe_unused]] void *outputBuffer,
+                               unsigned long framesPerBuffer) -> std::int32_t {
 
 #if PERF_STATS_ON == 1
             auto tstamp = xTaskGetTickCount();
 #endif
-            auto ret = enc->Encode(framesPerBuffer, reinterpret_cast<int16_t *>(const_cast<void *>(inputBuffer)));
+            auto ret = enc->Encode(framesPerBuffer, reinterpret_cast<std::int16_t *>(const_cast<void *>(inputBuffer)));
 #if PERF_STATS_ON == 1
             LOG_DEBUG("Enc:%dms", xTaskGetTickCount() - tstamp);
             // LOG_DEBUG("Watermark:%lu",uxTaskGetStackHighWaterMark2(NULL));  M.P: left here on purpose, it's handy
@@ -49,16 +51,17 @@ namespace audio
         }
         currentProfile = defaultProfile;
 
-        uint32_t channels = 0;
-        if ((currentProfile->GetInOutFlags() & static_cast<uint32_t>(audio::codec::Flags::InputLeft)) ||
-            (currentProfile->GetInOutFlags() & static_cast<uint32_t>(audio::codec::Flags::InputRight))) {
+        std::uint32_t channels = 0;
+        if ((currentProfile->GetInOutFlags() & static_cast<std::uint32_t>(audio::codec::Flags::InputLeft)) ||
+            (currentProfile->GetInOutFlags() & static_cast<std::uint32_t>(audio::codec::Flags::InputRight))) {
             channels = 1;
         }
-        else if (currentProfile->GetInOutFlags() & static_cast<uint32_t>(audio::codec::Flags::InputStereo)) {
+        else if (currentProfile->GetInOutFlags() & static_cast<std::uint32_t>(audio::codec::Flags::InputStereo)) {
             channels = 2;
         }
 
-        enc = Encoder::Create(file, Encoder::Format{.chanNr = channels, .sampleRate = currentProfile->GetSampleRate()});
+        enc = Encoder::Create(filePath,
+                              Encoder::Format{.chanNr = channels, .sampleRate = currentProfile->GetSampleRate()});
         if (enc == nullptr) {
             throw AudioInitException("Error during initializing encoder", RetCode::InvalidFormat);
         }

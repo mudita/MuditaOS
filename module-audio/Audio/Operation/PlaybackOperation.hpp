@@ -23,7 +23,7 @@ namespace audio
     class PlaybackOperation : public Operation
     {
       public:
-        PlaybackOperation(const char *file,
+        PlaybackOperation(const std::string &filePath,
                           const audio::PlaybackType &playbackType,
                           AudioServiceMessage::Callback callback = nullptr);
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstdio>
@@ -8,18 +8,16 @@
 #include "decoderFLAC.hpp"
 #include "decoderWAV.hpp"
 
-#include "fileref.h"
 #include "tag.h"
-#include "tfilestream.h"
 #include <tags_fetcher/TagsFetcher.hpp>
 
 namespace audio
 {
-    Decoder::Decoder(const char *fileName)
-        : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize))
+    Decoder::Decoder(const std::string &path)
+        : filePath(path), workerBuffer(std::make_unique<std::int16_t[]>(workerBufferSize))
     {
-        fd = std::fopen(fileName, "r");
-        if (fd == NULL) {
+        fd = std::fopen(path.c_str(), "r");
+        if (fd == nullptr) {
             return;
         }
 
@@ -40,7 +38,7 @@ namespace audio
             audioWorker->close();
         }
 
-        if (fd) {
+        if (fd != nullptr) {
             std::fclose(fd);
         }
     }
@@ -50,17 +48,21 @@ namespace audio
         return std::make_unique<tags::fetcher::Tags>(tags::fetcher::fetchTags(filePath));
     }
 
-    std::unique_ptr<Decoder> Decoder::Create(const char *file)
+    std::unique_ptr<Decoder> Decoder::Create(const std::string &filePath)
     {
+        const auto extension          = std::filesystem::path(filePath).extension();
+        const auto extensionLowercase = utils::stringToLowercase(extension);
+
         std::unique_ptr<Decoder> dec;
-        if ((strstr(file, ".wav") != NULL) || (strstr(file, ".WAV") != NULL)) {
-            dec = std::make_unique<decoderWAV>(file);
+
+        if (extensionLowercase == ".wav") {
+            dec = std::make_unique<decoderWAV>(filePath);
         }
-        else if ((strstr(file, ".mp3") != NULL) || (strstr(file, ".MP3") != NULL)) {
-            dec = std::make_unique<decoderMP3>(file);
+        else if (extensionLowercase == ".mp3") {
+            dec = std::make_unique<decoderMP3>(filePath);
         }
-        else if ((strstr(file, ".flac") != NULL) || (strstr(file, ".FLAC") != NULL)) {
-            dec = std::make_unique<decoderFLAC>(file);
+        else if (extensionLowercase == ".flac") {
+            dec = std::make_unique<decoderFLAC>(filePath);
         }
         else {
             return nullptr;
@@ -69,9 +71,8 @@ namespace audio
         if (!dec->isInitialized) {
             return nullptr;
         }
-        else {
-            return dec;
-        }
+
+        return dec;
     }
 
     void Decoder::convertmono2stereo(int16_t *pcm, uint32_t samplecount)
@@ -88,7 +89,7 @@ namespace audio
         memcpy(pcm, &workerBuffer[0], samplecount * 2 * sizeof(int16_t));
     }
 
-    void Decoder::startDecodingWorker(DecoderWorker::EndOfFileCallback endOfFileCallback)
+    void Decoder::startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback)
     {
         assert(_stream != nullptr);
         if (!audioWorker) {

@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Decoder.hpp"
 #include <src/dr_mp3.h>
-#include <cstring>
 
 extern "C"
 {
@@ -19,22 +18,16 @@ namespace audio
     {
 
       public:
-        decoderMP3(const char *fileName);
+        explicit decoderMP3(const std::string &filePath);
 
         ~decoderMP3();
 
-        uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) override;
+        std::uint32_t decode(std::uint32_t samplesToRead, std::int16_t *pcmData) override;
 
         void setPosition(float pos) override;
 
       private:
-        bool find_first_valid_frame();
-
-        uint32_t get_frames_count();
-
-        const uint32_t DECODER_BUFFER_SIZE = 1024 * 24;
-
-        std::unique_ptr<drmp3> mp3;
+        std::unique_ptr<drmp3> mp3 = nullptr;
 
         // Callback for when data needs to be read from the client.
         //
@@ -60,22 +53,6 @@ namespace audio
         // determined by the "origin" parameter which will be either drflac_seek_origin_start or
         // drflac_seek_origin_current.
         static drmp3_bool32 drmp3_seek(void *pUserData, int offset, drmp3_seek_origin origin);
-        //        std::unique_ptr<uint8_t[]> decoderBuffer = nullptr;
-        //        uint32_t decoderBufferIdx                = 0;
-        //
-        //        std::unique_ptr<uint16_t[]> pcmsamplesbuffer = nullptr;
-        //        uint32_t pcmsamplesbuffer_idx                = 0;
-        //
-        //        const size_t pcmsamplesbuffer_size = (8192 + MINIMP3_MAX_SAMPLES_PER_FRAME) * sizeof(int16_t);
-        //
-        //        uint32_t samplesPerFrame = 0;
-        //
-        //        // Variables below are used during decoding procedure
-        //        uint32_t firstValidFrameByteSize   = 0;
-        //        uint32_t firstValidFrameFileOffset = 0;
-        //        bool lastRefill                    = false;
-        //        bool decoderNotFirstRun            = false;
-        //        uint32_t bytesAvailable            = 0;
     };
 
 } // namespace audio

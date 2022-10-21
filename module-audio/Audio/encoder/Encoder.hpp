@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,24 +15,24 @@ namespace audio
       public:
         struct Format
         {
-            uint32_t chanNr;
-            uint32_t sampleRate;
+            std::uint32_t chanNr;
+            std::uint32_t sampleRate;
         };
 
-        static std::unique_ptr<Encoder> Create(const char *file, const Format &frmt);
+        static std::unique_ptr<Encoder> Create(const std::string &filePath, const Format &frmt);
 
-        Encoder(const char *file, const Format &frmt);
+        Encoder(const std::string &filePath, const Format &frmt);
 
         virtual ~Encoder();
 
-        virtual uint32_t Encode(uint32_t samplesToWrite, int16_t *pcmData) = 0;
+        virtual std::uint32_t Encode(std::uint32_t samplesToWrite, std::int16_t *pcmData) = 0;
 
         float getCurrentPosition()
         {
             return position;
         }
 
-        uint32_t GetFileSize()
+        std::uint32_t GetFileSize()
         {
             return fileSize;
         }
@@ -43,7 +43,7 @@ namespace audio
         float position = 0;
         std::FILE *fd  = nullptr;
         std::unique_ptr<char[]> streamBuffer;
-        uint32_t fileSize = 0;
+        std::uint32_t fileSize = 0;
         std::string filePath;
 
         bool isInitialized = false;

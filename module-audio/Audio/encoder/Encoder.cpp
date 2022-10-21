@@ -1,22 +1,23 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Encoder.hpp"
 #include "EncoderWAV.hpp"
 
-#include <stdint.h>
+#include <Utils.hpp>
+
 #include <string>
 #include <memory>
 #include <cstring>
+#include <filesystem>
 
 namespace audio
 {
 
-    Encoder::Encoder(const char *fileName, const Format &frmt) : format(frmt), filePath(fileName)
+    Encoder::Encoder(const std::string &filePath, const Format &frmt) : format(frmt), filePath(filePath)
     {
-
-        fd = std::fopen(fileName, "w");
-        if (fd == NULL) {
+        fd = std::fopen(filePath.c_str(), "w");
+        if (fd == nullptr) {
             return;
         }
         constexpr size_t streamBufferSize = 6;
@@ -27,16 +28,19 @@ namespace audio
 
     Encoder::~Encoder()
     {
-        if (fd) {
+        if (fd != nullptr) {
             std::fclose(fd);
         }
     }
 
-    std::unique_ptr<Encoder> Encoder::Create(const char *file, const Format &frmt)
+    std::unique_ptr<Encoder> Encoder::Create(const std::string &filePath, const Format &frmt)
     {
+        const auto extension          = std::filesystem::path(filePath).extension();
+        const auto extensionLowercase = utils::stringToLowercase(extension);
+
         std::unique_ptr<Encoder> enc;
-        if ((strstr(file, ".wav") != NULL) || (strstr(file, ".WAV") != NULL)) {
-            enc = std::make_unique<EncoderWAV>(file, frmt);
+        if (extensionLowercase == ".wav") {
+            enc = std::make_unique<EncoderWAV>(filePath, frmt);
         }
         else {
             return nullptr;
@@ -45,9 +49,8 @@ namespace audio
         if (enc->isInitialized) {
             return enc;
         }
-        else {
-            return nullptr;
-        }
+
+        return nullptr;
     }
 
 } // namespace audio

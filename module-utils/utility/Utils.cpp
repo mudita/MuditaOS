@@ -7,6 +7,7 @@
 
 #include <ctime>
 #include <filesystem>
+#include <random>
 
 namespace utils::filesystem
 {

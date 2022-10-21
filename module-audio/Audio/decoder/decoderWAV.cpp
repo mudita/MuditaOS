@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "decoderWAV.hpp"
 #include <log/log.hpp>
 #include <memory>
-#include "Audio/AudioCommon.hpp"
 
 #define DR_WAV_IMPLEMENTATION
 #include <src/dr_wav.h>
@@ -19,11 +18,11 @@ namespace audio
         };
     } // namespace internal
 
-    decoderWAV::decoderWAV(const char *fileName)
-        : Decoder(fileName), decoderContext(std::make_unique<internal::wavContext>())
+    decoderWAV::decoderWAV(const std::string &filePath)
+        : Decoder(filePath), decoderContext(std::make_unique<internal::wavContext>())
     {
         auto dwav = &decoderContext->wav;
-        if (!drwav_init_file(dwav, fileName, NULL)) {
+        if (drwav_init_file(dwav, filePath.c_str(), nullptr) == DRWAV_FALSE) {
             LOG_ERROR("Unable to init wav decoder");
             return;
         }
@@ -43,7 +42,7 @@ namespace audio
         }
     }
 
-    uint32_t decoderWAV::decode(uint32_t samplesToRead, int16_t *pcmData)
+    std::uint32_t decoderWAV::decode(std::uint32_t samplesToRead, std::int16_t *pcmData)
     {
         if (!isInitialized) {
             LOG_ERROR("Wav decoder not initialized");
@@ -53,7 +52,7 @@ namespace audio
         const auto samples_read = drwav_read_pcm_frames_s16(dwav, samplesToRead / chanNumber, pcmData);
         if (samples_read) {
             /* Calculate frame duration in seconds */
-            position += float(samplesToRead) / float(sampleRate);
+            position += static_cast<float>(samplesToRead) / static_cast<float>(sampleRate);
         }
         return samples_read * chanNumber;
     }
@@ -68,6 +67,6 @@ namespace audio
         drwav_seek_to_pcm_frame(dwav, dwav->totalPCMFrameCount * pos);
 
         // Calculate new position
-        position = float(dwav->totalPCMFrameCount) * pos / float(sampleRate);
+        position = static_cast<float>(dwav->totalPCMFrameCount) * pos / static_cast<float>(sampleRate);
     }
 } // namespace audio

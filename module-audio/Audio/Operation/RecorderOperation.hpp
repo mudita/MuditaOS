@@ -12,7 +12,7 @@ namespace audio
     class RecorderOperation : public Operation
     {
       public:
-        RecorderOperation(const char *file, AudioServiceMessage::Callback callback);
+        RecorderOperation(const std::string &filePath, AudioServiceMessage::Callback callback);
 
         audio::RetCode Start(audio::Token token) final;
         audio::RetCode Stop() final;

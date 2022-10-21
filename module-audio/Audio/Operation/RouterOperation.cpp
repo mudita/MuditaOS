@@ -20,8 +20,9 @@
 namespace audio
 {
 
-    RouterOperation::RouterOperation([[maybe_unused]] const char *file, AudioServiceMessage::Callback callback)
-        : Operation(callback)
+    RouterOperation::RouterOperation([[maybe_unused]] const std::string &filePath,
+                                     AudioServiceMessage::Callback callback)
+        : Operation(std::move(callback))
     {
         // order defines priority
         AddProfile(Profile::Type::RoutingHeadphones, PlaybackType::None, false);

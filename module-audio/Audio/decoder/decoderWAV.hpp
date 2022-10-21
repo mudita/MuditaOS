@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Decoder.hpp"
-#include <vector>
 
 namespace audio
 {
@@ -15,15 +14,14 @@ namespace audio
     class decoderWAV : public Decoder
     {
       public:
-        explicit decoderWAV(const char *fileName);
+        explicit decoderWAV(const std::string &filePath);
         virtual ~decoderWAV();
 
-        uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) override;
+        std::uint32_t decode(std::uint32_t samplesToRead, std::int16_t *pcmData) override;
 
         void setPosition(float pos) override;
 
       private:
-        std::vector<int32_t> pcmsamplesbuffer;
         std::unique_ptr<internal::wavContext> decoderContext;
     };
 

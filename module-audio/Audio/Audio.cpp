@@ -59,12 +59,12 @@ namespace audio
 
     audio::RetCode Audio::Start(Operation::Type op,
                                 audio::Token token,
-                                const char *fileName,
+                                const std::string &filePath,
                                 const audio::PlaybackType &playbackType)
     {
 
         try {
-            auto ret = Operation::Create(op, fileName, playbackType, serviceCallback);
+            auto ret = Operation::Create(op, filePath, playbackType, serviceCallback);
             switch (op) {
             case Operation::Type::Playback:
                 currentState = State::Playback;
@@ -84,7 +84,7 @@ namespace audio
         catch (const AudioInitException &audioException) {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
             LOG_ERROR(
-                "Failed to create operation type %s, error message:\n%s", Operation::c_str(op), audioException.what());
+                "Failed to create operation type %s, error message: %s", Operation::c_str(op), audioException.what());
             currentOperation = Operation::Create(Operation::Type::Idle);
             currentState     = State::Idle;
             return audioException.getErrorCode();
@@ -98,7 +98,7 @@ namespace audio
         currentOperation->Stop();
         return Start(currentOperation->GetOperationType(),
                      currentOperation->GetToken(),
-                     currentOperation->GetFilePath().c_str(),
+                     currentOperation->GetFilePath(),
                      currentOperation->GetPlaybackType());
     }
 

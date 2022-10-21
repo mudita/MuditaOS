@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-fileindexer/InotifyHandler.hpp>
@@ -13,6 +13,7 @@
 #include <purefs/fs/inotify.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <tags_fetcher/TagsFetcher.hpp>
+#include <Utils.hpp>
 
 namespace service::detail
 {
@@ -88,7 +89,7 @@ namespace service::detail
     {
         std::string getMimeType(const fs::path &path)
         {
-            auto extension = path.extension();
+            const auto extension = utils::stringToLowercase(path.extension());
 
             if (extension == ".mp3") {
                 return "audio/mpeg";
@@ -147,9 +148,9 @@ namespace service::detail
             return;
         }
 
-        auto ext = fs::path(path).extension();
-        if (!isExtSupported(ext)) {
-            LOG_WARN("Not supported ext - %s", ext.c_str());
+        const auto extension = utils::stringToLowercase(fs::path(path).extension());
+        if (!isExtSupported(extension)) {
+            LOG_WARN("Not supported extension - %s", extension.c_str());
             return;
         }
 
@@ -172,9 +173,9 @@ namespace service::detail
             return;
         }
 
-        auto ext = fs::path(path).extension();
-        if (!isExtSupported(ext)) {
-            LOG_WARN("Not supported ext - %s", ext.c_str());
+        const auto extension = utils::stringToLowercase(fs::path(path).extension());
+        if (!isExtSupported(extension)) {
+            LOG_WARN("Not supported extension - %s", extension.c_str());
             return;
         }
 

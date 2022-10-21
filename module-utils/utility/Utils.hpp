@@ -6,11 +6,9 @@
 #include <log/log.hpp>
 #include <magic_enum.hpp>
 
-#include <algorithm> // std::find_if_not
 #include <sstream>
 #include <iomanip>
 #include <cmath>
-#include <chrono>
 #include <random>
 #include <tuple>
 #include <type_traits>
@@ -310,6 +308,13 @@ namespace utils
     static inline void findAndReplaceAll(std::string &data, const std::string &toSearch, const std::string &replaceStr)
     {
         findAndReplaceAll(data, {{toSearch, replaceStr}});
+    }
+
+    static inline std::string stringToLowercase(const std::string &inputString)
+    {
+        std::string outputString;
+        std::for_each(inputString.begin(), inputString.end(), [&](char ch) { outputString += std::tolower(ch); });
+        return outputString;
     }
 
     static inline std::tuple<uint8_t, uint8_t, uint8_t> floatingPointConverter(float value)

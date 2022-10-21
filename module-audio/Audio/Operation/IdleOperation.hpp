@@ -4,8 +4,6 @@
 #pragma once
 
 #include <memory>
-#include <optional>
-#include <functional>
 
 #include "Operation.hpp"
 
@@ -15,7 +13,7 @@ namespace audio
     class IdleOperation : public Operation
     {
       public:
-        explicit IdleOperation([[maybe_unused]] const char *file);
+        explicit IdleOperation([[maybe_unused]] const std::string &filePath);
 
         ~IdleOperation() = default;
 

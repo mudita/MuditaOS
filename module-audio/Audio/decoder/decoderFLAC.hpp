@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,7 +13,7 @@ namespace audio
     {
 
       public:
-        decoderFLAC(const char *fileName);
+        explicit decoderFLAC(const std::string &filePath);
 
         ~decoderFLAC();
 
@@ -23,8 +23,6 @@ namespace audio
 
       private:
         drflac *flac = nullptr;
-
-        uint32_t totalSamplesCount = 0;
 
         /* Data encoded in UTF-8 */
         void flac_parse_text(uint8_t *in, uint32_t taglen, uint32_t datalen, uint8_t *out, uint32_t outlen);
