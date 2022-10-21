@@ -255,9 +255,7 @@ class ServiceCellular : public sys::Service
     friend class ConnectionManagerCellularCommands;
     friend class cellular::Api;
 
-    void volteChanged(const std::string &value);
     void apnListChanged(const std::string &value);
-    bool volteOn = false;
 
     auto handleCellularAnswerIncomingCallMessage(CellularMessage *msg) -> std::shared_ptr<cellular::ResponseMessage>;
     auto handleCellularCallRequestMessage(cellular::CallRequestMessage *msg)

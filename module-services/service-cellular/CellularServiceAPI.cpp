@@ -313,12 +313,6 @@ bool CellularServiceAPI::GetDataTransfer(sys::Service *serv)
     return serv->bus.sendUnicast(std::make_shared<cellular::GetDataTransferMessage>(), ServiceCellular::serviceName);
 }
 
-bool CellularServiceAPI::SetVoLTE(sys::Service *serv, bool voLTE)
-{
-    return serv->bus.sendUnicast(std::make_shared<cellular::ChangeVoLTEDataMessage>(voLTE),
-                                 ServiceCellular::serviceName);
-}
-
 bool CellularServiceAPI::ChangeModulePowerState(sys::Service *serv, cellular::service::State::PowerState newState)
 {
     return serv->bus.sendUnicast(std::make_shared<cellular::PowerStateChange>(newState), ServiceCellular::serviceName);

@@ -322,10 +322,6 @@ namespace app
         settings->registerValueChange(settings::operators_on,
                                       [this](const std::string &value) { operatorOnChanged(value); });
         settings->registerValueChange(
-            ::settings::Cellular::volte_on,
-            [this](const std::string &value) { volteChanged(value); },
-            ::settings::SettingsScope::Global);
-        settings->registerValueChange(
             ::settings::Cellular::offlineMode,
             [this](const std::string &value) { flightModeOn = utils::getNumericValue<bool>(value); },
             ::settings::SettingsScope::Global);
@@ -633,24 +629,6 @@ namespace app
         operatorsOn = value;
         LOG_DEBUG("[ApplicationSettings::setOperatorsOn] to %d", operatorsOn);
         settings->setValue(settings::operators_on, std::to_string(static_cast<int>(value)));
-    }
-
-    void ApplicationSettings::setVoLTEOn(bool value)
-    {
-        voLteStateOn = value;
-        CellularServiceAPI::SetVoLTE(this, voLteStateOn);
-    };
-
-    bool ApplicationSettings::getVoLTEOn() const noexcept
-    {
-        return voLteStateOn;
-    }
-
-    void ApplicationSettings::volteChanged(const std::string &value)
-    {
-        if (!value.empty()) {
-            voLteStateOn = utils::getNumericValue<bool>(value);
-        }
     }
 
     void ApplicationSettings::setOsUpdateVersion(const std::string &value)
