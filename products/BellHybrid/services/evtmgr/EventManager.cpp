@@ -5,6 +5,8 @@
 #include "internal/StaticData.hpp"
 #include "internal/key_sequences/KeySequenceMgr.hpp"
 #include "internal/key_sequences/PowerOffSequence.hpp"
+#include "internal/key_sequences/BedsideLampSequence.hpp"
+#include "internal/key_sequences/FrontlightSequence.hpp"
 #include "internal/key_sequences/AlarmActivateSequence.hpp"
 #include "internal/key_sequences/AlarmDeactivateSequence.hpp"
 #include "internal/key_sequences/ResetSequence.hpp"
@@ -144,6 +146,14 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
 void EventManager::buildKeySequences()
 {
     KeySequenceMgr::SequenceCollection collection;
+
+    auto frontlightSeq      = std::make_unique<FrontlightSequence>(*this);
+    frontlightSeq->onAction = [this]() { backlightHandler.handleScreenLight(backlight::Type::Frontlight); };
+    collection.emplace_back(std::move(frontlightSeq));
+
+    auto bedsideLampSeq      = std::make_unique<BedsideLampSequence>(*this);
+    bedsideLampSeq->onAction = [this]() { backlightHandler.handleScreenLight(backlight::Type::BedsideLamp); };
+    collection.emplace_back(std::move(bedsideLampSeq));
 
     auto powerOffSeq      = std::make_unique<PowerOffSequence>(*this);
     powerOffSeq->onAction = [this]() {

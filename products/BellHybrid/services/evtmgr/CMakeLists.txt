@@ -17,6 +17,8 @@ target_sources(evtmgr
         internal/key_sequences/AbstractKeySequence.hpp
         internal/key_sequences/KeySequenceMgr.hpp
         internal/key_sequences/PowerOffSequence.hpp
+        internal/key_sequences/BedsideLampSequence.hpp
+        internal/key_sequences/FrontlightSequence.hpp
         internal/key_sequences/AlarmActivateSequence.hpp
         internal/key_sequences/AlarmDeactivateSequence.hpp
         internal/key_sequences/ReleaseSequence.hpp

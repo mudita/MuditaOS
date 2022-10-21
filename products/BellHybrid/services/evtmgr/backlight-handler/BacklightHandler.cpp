@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <evtmgr/backlight-handler/BacklightHandler.hpp>
@@ -15,8 +15,9 @@ namespace backlight
 {
     namespace timers
     {
-        constexpr auto screenLightTimerTimeout     = std::chrono::seconds(5);
-        constexpr auto screenLightTimerHoldTimeout = std::chrono::seconds(10);
+        constexpr auto screenLightTimerTimeout       = std::chrono::seconds(5);
+        constexpr auto screenLightTimerHoldTimeout   = std::chrono::seconds(10);
+        constexpr auto screenLightBedsideLampTimeout = std::chrono::minutes(10);
     } // namespace timers
 
     Handler::Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
@@ -25,6 +26,9 @@ namespace backlight
                         parent,
                         [this](sys::Timer &t) {
                             if (this->screenLightController->isLightOn()) {
+                                if (backlightType == Type::BedsideLamp) {
+                                    backlightType = Type::Frontlight;
+                                }
                                 this->screenLightController->processRequest(screen_light_control::Action::turnOff);
                             }
                         })
@@ -53,19 +57,7 @@ namespace backlight
         auto controller = getScreenLightControl();
         auto timer      = getScreenLightTimer();
 
-        if (key == static_cast<int>(KeyMap::Frontlight)) {
-            if (controller->isLightOn()) {
-                setKeyPressedModeFrontlightOff();
-                controller->processRequest(screen_light_control::Action::turnOff);
-                timer->stop();
-            }
-            else {
-                setKeyPressedModeFrontlightOn();
-                controller->processRequest(screen_light_control::Action::turnOn);
-                timer->restart(onDemandModeOn ? timers::screenLightTimerTimeout : timers::screenLightTimerHoldTimeout);
-            }
-        }
-        else {
+        if (key != static_cast<int>(KeyMap::Frontlight) && backlightType != Type::BedsideLamp) {
             if (controller->isLightOn()) {
                 timer->restart(timers::screenLightTimerHoldTimeout);
             }
@@ -75,6 +67,40 @@ namespace backlight
                 timer->restart(timers::screenLightTimerHoldTimeout);
             }
         }
+    }
+
+    void Handler::handleScreenLight(Type type)
+    {
+        const auto controller = getScreenLightControl();
+        const auto timer      = getScreenLightTimer();
+
+        auto lightTime = std::chrono::seconds(0);
+
+        switch (type) {
+        case Type::Frontlight:
+            if (onDemandModeOn) {
+                lightTime = timers::screenLightTimerTimeout;
+            }
+            else {
+                lightTime = timers::screenLightTimerHoldTimeout;
+            }
+            break;
+        case Type::BedsideLamp:
+            lightTime = timers::screenLightBedsideLampTimeout;
+            break;
+        }
+
+        if (controller->isLightOn() && type == Type::Frontlight) {
+            setKeyPressedModeFrontlightOff();
+            controller->processRequest(screen_light_control::Action::turnOff);
+            timer->stop();
+        }
+        else if (!controller->isLightOn()) {
+            setKeyPressedModeFrontlightOn();
+            controller->processRequest(screen_light_control::Action::turnOn);
+            timer->restart(lightTime);
+        }
+        backlightType = type;
     }
 
     void Handler::processScreenRequest(screen_light_control::Action action,
@@ -126,7 +152,7 @@ namespace backlight
 
     void Handler::onScreenLightTurnedOn()
     {
-        if (backlightMode == BacklightMode::WithTimer) {
+        if (backlightMode == BacklightMode::WithTimer && backlightType != Type::BedsideLamp) {
             startScreenLightTimer();
         }
     }
