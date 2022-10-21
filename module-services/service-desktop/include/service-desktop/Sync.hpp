@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <Service/Service.hpp>
 #include <endpoints/JsonKeyNames.hpp>
 #include <json11.hpp>
 #include <filesystem>
@@ -13,16 +12,9 @@ namespace sys
     class Service;
 } // namespace sys
 
-class BackupSyncRestore
+class Sync
 {
   public:
-    enum class Operation
-    {
-        Backup,
-        Sync,
-        Restore
-    };
-
     enum class OperationState
     {
         Stopped,
@@ -49,12 +41,9 @@ class BackupSyncRestore
     enum class CompletionCode
     {
         Success,
-        VersionConflict,
         DBError,
         FSError,
-        UnpackError,
         PackError,
-        CopyError,
         OtherError
     };
 
@@ -63,18 +52,12 @@ class BackupSyncRestore
         switch (code) {
         case CompletionCode::Success:
             return "Success";
-        case CompletionCode::VersionConflict:
-            return "Version conflict";
         case CompletionCode::DBError:
             return "DB operation error";
         case CompletionCode::FSError:
             return "FSError error";
-        case CompletionCode::UnpackError:
-            return "Backup unpack failed";
         case CompletionCode::PackError:
             return "Backup pack failed";
-        case CompletionCode::CopyError:
-            return "File copying failed";
         case CompletionCode::OtherError:
             return "Undetermined error";
         }
@@ -83,16 +66,13 @@ class BackupSyncRestore
 
     struct OperationStatus
     {
-        std::filesystem::path backupTempDir;
-        std::filesystem::path location;
+        std::filesystem::path tempDir;
         CompletionCode completionCode = CompletionCode::Success;
         std::string taskId;
         OperationState state = OperationState::Stopped;
-        Operation operation  = Operation::Backup;
         json11::Json to_json() const
         {
-            auto response = json11::Json::object{{sdesktop::endpoints::json::taskId, taskId},
-                                                 {sdesktop::endpoints::json::state, opToString(state)}};
+            auto response = json11::Json::object{{sdesktop::endpoints::json::state, opToString(state)}};
 
             if (state == OperationState::Error) {
                 response[sdesktop::endpoints::json::reason] = completionCodeToString(completionCode);
@@ -102,24 +82,10 @@ class BackupSyncRestore
         }
     };
 
-    static CompletionCode BackupUserFiles(sys::Service *ownerService, std::filesystem::path &path);
     static CompletionCode PrepareSyncPackage(sys::Service *ownerService, std::filesystem::path &path);
-    static CompletionCode RestoreUserFiles(sys::Service *ownerService, const std::filesystem::path &path);
-    static json11::Json GetBackupFiles();
 
   private:
-    static bool RemoveBackupDir(const std::filesystem::path &path);
-    static bool CreateBackupDir(const std::filesystem::path &path);
     static bool RemoveSyncDir(const std::filesystem::path &path);
     static bool CreateSyncDir(const std::filesystem::path &path);
-    static bool PackUserFiles(const std::filesystem::path &path);
     static bool PackSyncFiles(const std::filesystem::path &path);
-    static bool UnpackBackupFile(const std::filesystem::path &path);
-    static std::string ReadVersionFromJsonFile(const std::filesystem::path &jsonFilePath);
-    static bool CheckBackupVersion(const std::filesystem::path &extractedBackup);
-    static bool CanRestoreFromBackup(const std::filesystem::path &path);
-    static auto TempPathForBackupFile(const std::filesystem::path &tarFilePath) -> std::filesystem::path const;
-    static bool ReplaceUserFiles(const std::filesystem::path &path);
-    static bool WriteBackupInfo(sys::Service *ownerService, const std::filesystem::path &path);
-    static std::string ReadFileAsString(const std::filesystem::path &fileToRead);
 };

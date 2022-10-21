@@ -7,7 +7,7 @@ add_library(service-desktop STATIC)
 target_sources(
         service-desktop
     PRIVATE
-        BackupRestore.cpp
+        Sync.cpp
         DesktopEvent.cpp
         DeveloperModeMessage.cpp
         DesktopMessages.cpp
@@ -23,7 +23,7 @@ target_sources(
         parser/ParserFSM.hpp
         parser/MessageHandler.hpp
     PUBLIC
-        include/service-desktop/BackupRestore.hpp
+        include/service-desktop/Sync.hpp
         include/service-desktop/Constants.hpp
         include/service-desktop/DesktopEvent.hpp
         include/service-desktop/DesktopMessages.hpp
