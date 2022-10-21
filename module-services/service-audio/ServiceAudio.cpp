@@ -408,7 +408,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
             if (IsOperationEnabled(playbackType, opType)) {
                 try {
-                    retCode = (*input)->audio->Start(opType, retToken, fileName.c_str(), playbackType);
+                    retCode = (*input)->audio->Start(opType, retToken, fileName, playbackType);
                 }
                 catch (const AudioInitException &audioException) {
                     retCode = audio::RetCode::FailedToAllocateMemory;

@@ -43,7 +43,7 @@ namespace audio
         };
 
       public:
-        RouterOperation(const char *file, AudioServiceMessage::Callback callback);
+        RouterOperation(const std::string &filePath, AudioServiceMessage::Callback callback);
         ~RouterOperation();
 
         audio::RetCode Start(audio::Token token) final;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "IdleOperation.hpp"
@@ -8,7 +8,7 @@
 namespace audio
 {
 
-    IdleOperation::IdleOperation([[maybe_unused]] const char *file) : Operation(nullptr)
+    IdleOperation::IdleOperation([[maybe_unused]] const std::string &filePath) : Operation(nullptr)
     {
         supportedProfiles.emplace_back(Profile::Create(Profile::Type::Idle), true);
         currentProfile = supportedProfiles[0].profile;

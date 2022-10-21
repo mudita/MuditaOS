@@ -184,7 +184,8 @@ class MockRouterOperation : public RouterOperation
 
   public:
     /* value - volume and gain value */
-    explicit MockRouterOperation(AudioServiceMessage::Callback callback) : RouterOperation(nullptr, callback)
+    explicit MockRouterOperation(AudioServiceMessage::Callback callback)
+        : RouterOperation(std::string(""), std::move(callback))
     {}
 
     std::optional<Profile::Type> getPriorityProfile() const

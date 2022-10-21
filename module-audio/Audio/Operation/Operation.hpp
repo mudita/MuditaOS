@@ -11,7 +11,6 @@
 #include "Audio/AudioDeviceFactory.hpp"
 #include "Audio/AudioPlatform.hpp"
 #include "Audio/ServiceObserver.hpp"
-#include "Audio/encoder/Encoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
 
 namespace audio
@@ -21,7 +20,7 @@ namespace audio
       public:
         explicit Operation(AudioServiceMessage::Callback callback,
                            const PlaybackType &playbackType = PlaybackType::None)
-            : playbackType(playbackType), serviceCallback(callback), observer(serviceCallback)
+            : playbackType(playbackType), serviceCallback(std::move(callback)), observer(serviceCallback)
         {
             factory = AudioPlatform::GetDeviceFactory();
             factory->setObserver(&observer);
@@ -60,7 +59,7 @@ namespace audio
         virtual ~Operation() = default;
 
         static std::unique_ptr<Operation> Create(Type t,
-                                                 const char *fileName                   = "",
+                                                 const std::string &filePath            = "",
                                                  const audio::PlaybackType &operations  = audio::PlaybackType::None,
                                                  AudioServiceMessage::Callback callback = nullptr);
 
@@ -151,7 +150,7 @@ namespace audio
         AudioServiceMessage::Callback serviceCallback;
         ServiceObserver observer;
 
-        std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
+        std::function<std::int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
             audioCallback = nullptr;
 
         void SetProfileAvailability(std::vector<Profile::Type> profiles, bool available);

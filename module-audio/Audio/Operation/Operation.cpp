@@ -16,7 +16,7 @@
 namespace audio
 {
     std::unique_ptr<Operation> Operation::Create(Operation::Type t,
-                                                 const char *fileName,
+                                                 const std::string &filePath,
                                                  const audio::PlaybackType &playbackType,
                                                  AudioServiceMessage::Callback callback)
     {
@@ -24,21 +24,21 @@ namespace audio
 
         switch (t) {
         case Type::Idle:
-            inst = std::make_unique<IdleOperation>(fileName);
+            inst = std::make_unique<IdleOperation>(filePath);
             break;
         case Type::Playback:
-            inst = std::make_unique<PlaybackOperation>(fileName, playbackType, callback);
+            inst = std::make_unique<PlaybackOperation>(filePath, playbackType, callback);
             break;
         case Type::Router:
-            inst = std::make_unique<RouterOperation>(fileName, callback);
+            inst = std::make_unique<RouterOperation>(filePath, callback);
             break;
         case Type::Recorder:
-            inst = std::make_unique<RecorderOperation>(fileName, callback);
+            inst = std::make_unique<RecorderOperation>(filePath, callback);
             break;
         }
 
         inst->opType   = t;
-        inst->filePath = fileName;
+        inst->filePath = filePath;
         return inst;
     }
 

@@ -16,7 +16,9 @@ namespace audio
 
     using namespace AudioServiceMessage;
 
-    PlaybackOperation::PlaybackOperation(const char *file, const audio::PlaybackType &playbackType, Callback callback)
+    PlaybackOperation::PlaybackOperation(const std::string &filePath,
+                                         const audio::PlaybackType &playbackType,
+                                         Callback callback)
         : Operation(std::move(callback), playbackType), dec(nullptr)
     {
         // order defines priority
@@ -31,7 +33,7 @@ namespace audio
             return std::string();
         };
 
-        dec = Decoder::Create(file);
+        dec = Decoder::Create(filePath);
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
@@ -187,7 +189,7 @@ namespace audio
 
         // adjust new profile with information from file's tags
         newProfile->SetSampleRate(dec->getSourceFormat().getSampleRate());
-        newProfile->SetInOutFlags(static_cast<uint32_t>(audio::codec::Flags::OutputStereo));
+        newProfile->SetInOutFlags(static_cast<std::uint32_t>(audio::codec::Flags::OutputStereo));
 
         /// profile change - (re)create output device; stop audio first by
         /// killing audio connection
