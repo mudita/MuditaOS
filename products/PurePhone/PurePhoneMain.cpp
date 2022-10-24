@@ -129,6 +129,18 @@ class Cleanup
     }
 };
 
+#pragma GCC push_options
+#pragma GCC optimize("00")
+
+void test()
+{
+    int *var = new int[16];
+    LOG_ERROR("Test: %d", *var);
+    free(var);
+}
+
+#pragma GCC pop_options
+
 int main()
 {
     constexpr auto ApplicationName = "PurePhone";
@@ -148,6 +160,8 @@ int main()
 
     auto platformFactory = purephone::PlatformFactory();
     auto platform        = platformFactory.makePlatform();
+
+    test();
 
     if (!sys::SystemWatchdog::getInstance().init()) {
         LOG_ERROR("System watchdog failed to initialize");
