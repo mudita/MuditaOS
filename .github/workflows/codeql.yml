@@ -1,0 +1,46 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+#    types: [opened, edited, synchronize, reopened, ready_for_review, unlocked]
+    branches: [ master ]
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Ninja
+        run: |
+          sudo apt-get install ninja-build
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Configure and run the build
+        run: |
+         echo "Configuring MuditaOS project for RT1051 target"
+         ./configure.sh PurePhone rt1051 Release -GNinja
+         cd ./build-PurePhone-rt1051-Release
+         echo "Starting build for target Pure"
+         ninja Pure
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
