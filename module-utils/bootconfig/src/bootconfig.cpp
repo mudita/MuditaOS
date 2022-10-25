@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <boot/bootconfig.hpp>
 #include <boot/bootconstants.hpp>
@@ -77,7 +77,7 @@ namespace boot
         }
     } // namespace
 
-    BootConfig::BootConfig() : m_os_root_path(purefs::dir::getRootDiskPath())
+    BootConfig::BootConfig() : m_os_root_path(purefs::dir::getOSDiskPath())
     {}
 
     json11::Json BootConfig::to_json() const
@@ -141,7 +141,7 @@ namespace boot
         if (parseErrors == "") {
             m_os_type            = m_boot_json_parsed[boot::json::main][boot::json::os_type].string_value();
             m_os_image           = m_boot_json_parsed[boot::json::main][boot::json::os_image].string_value();
-            m_os_root_path       = purefs::createPath(purefs::dir::getRootDiskPath(), m_os_type);
+            m_os_root_path       = purefs::createPath(purefs::dir::getOSDiskPath(), m_os_type);
             m_boot_json          = bootJsonPath;
             m_bootloader_version = m_boot_json_parsed[boot::json::bootloader][boot::json::os_version].string_value();
             m_timestamp          = utils::time::getCurrentTimestamp().str("%c");
@@ -153,7 +153,7 @@ namespace boot
         else {
             m_os_type      = purefs::dir::getCurrentOSPath();
             m_os_image     = purefs::file::boot_bin;
-            m_os_root_path = purefs::createPath(purefs::dir::getRootDiskPath(), m_os_type);
+            m_os_root_path = purefs::createPath(purefs::dir::getOSDiskPath(), m_os_type);
             m_boot_json    = bootJsonPath;
             m_timestamp    = utils::time::getCurrentTimestamp().str("%c");
             m_os_version   = std::string(VERSION);
@@ -164,7 +164,7 @@ namespace boot
 
     std::filesystem::path BootConfig::getCurrentBootJSON()
     {
-        auto boot_json_path = purefs::dir::getRootDiskPath() / purefs::file::boot_json;
+        auto boot_json_path = purefs::dir::getOSDiskPath() / purefs::file::boot_json;
         if (!readAndVerifyCRC(boot_json_path)) {
             LOG_INFO("CRC check failed on %s", boot_json_path.c_str());
         }

@@ -143,7 +143,7 @@ namespace sdesktop::endpoints
         unsigned long reservedSystemSpaceMiB = 0;
         unsigned long usedUserSpaceMiB       = 0;
 
-        const std::array<std::filesystem::path, 2> systemStoragePaths{purefs::dir::getRootDiskPath(),
+        const std::array<std::filesystem::path, 2> systemStoragePaths{purefs::dir::getOSDiskPath(),
                                                                       purefs::dir::getPreviousOSPath()};
         for (const auto &p : systemStoragePaths) {
             auto [totalSpace, freeSpace] = getStorageStats(p);

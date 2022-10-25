@@ -18,7 +18,7 @@ namespace purefs::fs
     namespace
     {
         constexpr std::pair<short, std::string_view> part_types_to_vfs[] = {
-            {0x0b, "vfat"}, {0x9e, "littlefs"}, {0x83, "ext4"}};
+            {0x0B, "vfat"}, {0x9E, "littlefs"}, {0x83, "ext4"}};
 
         auto compare_mount_points(std::string_view path1, std::string_view path2)
         {
@@ -92,7 +92,7 @@ namespace purefs::fs
             return -EINVAL;
         }
         if (flags & ~(mount_flags::remount | mount_flags::read_only)) {
-            LOG_ERROR("VFS: passed mount flags is not supported");
+            LOG_ERROR("VFS: passed mount flags are not supported");
             return -ENOTSUP;
         }
         {

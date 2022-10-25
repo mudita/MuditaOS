@@ -13,9 +13,9 @@ namespace purefs
 
     namespace dir
     {
-        std::filesystem::path getRootDiskPath() noexcept;
-        std::filesystem::path getMfgConfPath() noexcept;
+        std::filesystem::path getOSDiskPath() noexcept;
         std::filesystem::path getUserDiskPath() noexcept;
+        std::filesystem::path getMfgConfPath() noexcept;
         std::filesystem::path getCurrentOSPath() noexcept;
         std::filesystem::path getPreviousOSPath() noexcept;
         std::filesystem::path getUpdatesOSPath() noexcept;

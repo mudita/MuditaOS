@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/filesystem.hpp>
@@ -21,8 +21,8 @@ namespace purefs::subsystem
     {
         constexpr auto default_blkdev_name      = "emmc0";
         constexpr auto default_nvrom_name       = "nvrom0";
-        constexpr auto fat_part_code            = 0x0b;
-        constexpr auto lfs_part_code            = 0x9e;
+        constexpr auto fat_part_code            = 0x0B;
+        constexpr auto lfs_part_code            = 0x9E;
         constexpr auto linux_part_code          = 0x83;
         constexpr auto layout_part_count        = 3;
         constexpr auto boot_part_index          = 0;
@@ -180,7 +180,7 @@ namespace purefs::subsystem
         }
         const auto parts = disk->partitions(default_blkdev_name);
         if (parts.size() != layout_part_count) {
-            LOG_FATAL("Unknown partitions layout part size is %u", unsigned(parts.size()));
+            LOG_FATAL("Unknown partitions layout part size is %u", (unsigned)(parts.size()));
             return -EIO;
         }
         const auto &boot_part = parts[boot_part_index];
@@ -189,12 +189,16 @@ namespace purefs::subsystem
             LOG_FATAL("First partition is not bootable");
             return -EIO;
         }
-        if (boot_part.type != fat_part_code) {
-            LOG_FATAL("Invalid boot partition type expected code: %i current code: %i", fat_part_code, boot_part.type);
+        if ((boot_part.type != fat_part_code) && (boot_part.type != linux_part_code)) {
+            LOG_FATAL("Invalid boot partition type expected code: %02X or %02X current code: %02X",
+                      fat_part_code,
+                      linux_part_code,
+                      boot_part.type);
             return -EIO;
         }
-        if ((user_part.type != lfs_part_code) && (user_part.type != linux_part_code)) {
-            LOG_FATAL("Invalid user partition type expected code: %i current code: %i", lfs_part_code, user_part.type);
+        if (user_part.type != linux_part_code) {
+            LOG_FATAL(
+                "Invalid user partition type expected code: %02X current code: %02X", linux_part_code, user_part.type);
             return -EIO;
         }
         auto vfs = g_fs_core.lock();
@@ -203,7 +207,7 @@ namespace purefs::subsystem
             return -EIO;
         }
         auto err =
-            vfs->mount(boot_part.name, purefs::dir::getRootDiskPath().string(), "vfat", fs::mount_flags::read_only);
+            vfs->mount(boot_part.name, purefs::dir::getOSDiskPath().string(), "auto", fs::mount_flags::read_only);
         if (err) {
             return err;
         }
@@ -221,9 +225,9 @@ namespace purefs::subsystem
         else {
             err = vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "ext4");
         }
-        const std::string json_file = (dir::getRootDiskPath() / file::boot_json).string();
+        const std::string json_file = (dir::getOSDiskPath() / file::boot_json).string();
         const auto boot_dir_name    = parse_boot_json_directory(json_file);
-        const auto user_dir         = (dir::getRootDiskPath() / boot_dir_name).string();
+        const auto user_dir         = (dir::getOSDiskPath() / boot_dir_name).string();
         fs::internal::set_default_thread_cwd(user_dir);
 
         // Mount NVRAM memory
