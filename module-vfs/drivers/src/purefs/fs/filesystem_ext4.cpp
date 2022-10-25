@@ -17,7 +17,6 @@
 #include <climits>
 #include <syslimits.h>
 #include <sys/statvfs.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <cstring>
 #include <algorithm>
@@ -166,7 +165,7 @@ namespace purefs::fs::drivers
         // Start journaling
         err = ext4_journal_start(mnt_path.c_str());
         if (err) {
-            LOG_WARN("Unable to start journalling errno %i", err);
+            LOG_WARN("Unable to start journaling errno %i", err);
         }
         err = ext4_block_cache_write_back(bd, true);
         if (err) {
@@ -256,6 +255,9 @@ namespace purefs::fs::drivers
         const auto fspath = vmnt->native_path(path);
         auto filp         = std::make_shared<file_handle_ext4>(mnt, fspath, flags);
         auto err          = ext4_fopen2(filp->filp(), fspath.c_str(), flags);
+        if (err == EOK) {
+            ext4_atime_set(fspath.c_str(), time(nullptr));
+        }
         filp->error(-err);
         return filp;
     }
@@ -268,7 +270,16 @@ namespace purefs::fs::drivers
     auto filesystem_ext4::write(fsfile zfile, const char *ptr, size_t len) noexcept -> ssize_t
     {
         size_t n_written;
-        auto err = invoke_efs(zfile, ::ext4_fwrite, ptr, len, &n_written);
+        const auto err = invoke_efs(zfile, ::ext4_fwrite, ptr, len, &n_written);
+        if (err == EOK) {
+            const auto vfile     = std::dynamic_pointer_cast<file_handle_ext4>(zfile);
+            const auto vmnt      = std::dynamic_pointer_cast<mount_point_ext4>(vfile->mntpoint());
+            const auto timestamp = time(nullptr);
+
+            ext4_locker _lck(vmnt);
+            ext4_ctime_set(vfile->open_path().c_str(), timestamp);
+            ext4_mtime_set(vfile->open_path().c_str(), timestamp);
+        }
         return (err) ? (-err) : (n_written);
     }
 
@@ -281,7 +292,6 @@ namespace purefs::fs::drivers
 
     auto filesystem_ext4::seek(fsfile zfile, off_t pos, int dir) noexcept -> off_t
     {
-
         auto vfile = std::dynamic_pointer_cast<file_handle_ext4>(zfile);
         if (!vfile) {
             LOG_ERROR("Non ext4 filesystem file pointer");
@@ -322,13 +332,16 @@ namespace purefs::fs::drivers
             st->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
         }
         // Update file type
-        st->st_nlink   = ext4_inode_get_links_cnt(&ino);
-        st->st_uid     = ext4_inode_get_uid(&ino);
-        st->st_gid     = ext4_inode_get_gid(&ino);
-        st->st_blocks  = ext4_inode_get_blocks_count(sb, &ino);
-        st->st_size    = ext4_inode_get_size(sb, &ino);
-        st->st_blksize = ext4_sb_get_block_size(sb);
-        st->st_dev     = ext4_inode_get_dev(&ino);
+        st->st_nlink       = ext4_inode_get_links_cnt(&ino);
+        st->st_uid         = ext4_inode_get_uid(&ino);
+        st->st_gid         = ext4_inode_get_gid(&ino);
+        st->st_blocks      = ext4_inode_get_blocks_count(sb, &ino);
+        st->st_size        = ext4_inode_get_size(sb, &ino);
+        st->st_blksize     = ext4_sb_get_block_size(sb);
+        st->st_dev         = ext4_inode_get_dev(&ino);
+        st->st_atim.tv_sec = ext4_inode_get_access_time(&ino);
+        st->st_ctim.tv_sec = ext4_inode_get_change_inode_time(&ino);
+        st->st_mtim.tv_sec = ext4_inode_get_modif_time(&ino);
         return err;
     }
 

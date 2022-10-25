@@ -14,6 +14,11 @@
 
 namespace sdesktop::endpoints
 {
+    namespace
+    {
+        constexpr auto bytesInMebibyte = 1024LLU * 1024LLU;
+    }
+
     using sender::putToSendQueue;
     namespace fs = std::filesystem;
 
@@ -209,8 +214,7 @@ namespace sdesktop::endpoints
             return ResponseContext{.status = code};
         }
 
-        auto freeSpaceLeftForUserFilesMiB = getFreeSpaceForUserFilesMiB();
-        constexpr auto bytesInMebibyte    = 1048576;
+        const auto freeSpaceLeftForUserFilesMiB = getFreeSpaceForUserFilesMiB();
 
         if (fileSize / bytesInMebibyte > freeSpaceLeftForUserFilesMiB) {
             LOG_ERROR("Not enough space left on device!");
@@ -351,10 +355,10 @@ namespace sdesktop::endpoints
             return 0;
         }
 
-        unsigned long freeMbytes =
-            (static_cast<std::uint64_t>(vfstat->f_bfree) * static_cast<std::uint64_t>(vfstat->f_bsize)) /
-                (1024LLU * 1024LLU) -
-            purefs::userSpaceOffset;
-        return freeMbytes;
+        const auto freeBytes =
+            (static_cast<std::uint64_t>(vfstat->f_bfree) * static_cast<std::uint64_t>(vfstat->f_bsize));
+        const auto freeMiBs = freeBytes / bytesInMebibyte;
+
+        return freeMiBs;
     }
 } // namespace sdesktop::endpoints
