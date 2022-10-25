@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #create update image
@@ -67,11 +67,31 @@ function linkInStageing(){
     pushd ${STAGEING_DIR} 1> /dev/null
 
     mkdir assets
-    pushd assets 1> /dev/null
+    pushd assets 1> /dev/null # assets/
+
     ln -s ../../sysroot/sys/current/assets/fonts
     ln -s ../../sysroot/sys/current/assets/images
     ln -s ../../sysroot/sys/current/assets/lang
-    popd 1> /dev/null
+
+    # Add only those mp3 files that are required for update to 1.7.0
+    mkdir audio
+    pushd audio 1> /dev/null
+    ln -s ../../../sysroot/sys/current/assets/audio/alarm
+    ln -s ../../../sysroot/sys/current/assets/audio/chimes
+    ln -s ../../../sysroot/sys/current/assets/audio/evening_reminder
+    ln -s ../../../sysroot/sys/current/assets/audio/meditation
+    ln -s ../../../sysroot/sys/current/assets/audio/prewakeup
+    mkdir bell
+    pushd bell 1> /dev/null
+    mkdir bg_sounds
+    pushd bg_sounds 1> /dev/null
+    ln -s ../../../../../sysroot/sys/current/assets/audio/bg_sounds/Ancient_Greek.mp3
+    ln -s ../../../../../sysroot/sys/current/assets/audio/bg_sounds/Woodland_Ambiance.mp3
+    popd 1> /dev/null # bg_sounds
+    popd 1> /dev/null # bell
+    popd 1> /dev/null # audio
+
+    popd 1> /dev/null # assets
 
     ln -s ../sysroot/sys/user
     ln -s ../sysroot/sys/current/${SOURCE_TARGET}-boot.bin boot.bin
@@ -80,7 +100,8 @@ function linkInStageing(){
     ln -s ../ecoboot.bin
     ln -s ../updater.bin
     ln -s ../${SOURCE_TARGET}-version.json version.json
-    popd 1> /dev/null
+
+    popd 1> /dev/null # STAGEING_DIR
 }
 
 function addChecksums() {
