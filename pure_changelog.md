@@ -9,6 +9,7 @@
 * Made windows flow in SIM cards settings more robust
 * Improve refreshing of the display.
 * Fixed music files extension case sensitivity
+* Fixed MTP issues
 
 ### Fixed
 * Fixed wrong time displayed on password locked screen with 'Quotes' or 'Logo' wallpaper

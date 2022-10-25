@@ -8,8 +8,6 @@
 namespace purefs
 {
     std::filesystem::path createPath(const std::string &parent, const std::string &child) noexcept;
-    constexpr inline auto userSpaceOffset = 1023; // This space is additionally reserved on the user partition,
-                                                  // and it's excluded from the space that user can use for his files
 
     namespace dir
     {
