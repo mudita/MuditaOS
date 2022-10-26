@@ -9,13 +9,9 @@ namespace cellular::internal
     {
         using namespace at::response::qcfg_ims;
 
-        if (!response) {
-            throw std::runtime_error("[VoLTE] modem responded with error to QCFG_IMS");
-        }
-
         std::pair<IMSState, VoLTEIMSState> parsed;
         if (!at::response::parseQCFG_IMS(response, parsed)) {
-            throw std::runtime_error("[VoLTE] unable to parse modem's response to QCFG_IMS");
+            throw std::runtime_error("[VoLTE] unable to parse modem's response to QCFG with IMS");
         }
 
         auto const &ims          = parsed.first;
