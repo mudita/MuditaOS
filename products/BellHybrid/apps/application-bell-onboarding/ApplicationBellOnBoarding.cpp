@@ -4,12 +4,15 @@
 #include "ApplicationBellOnBoarding.hpp"
 
 #include <presenter/OnBoardingLanguageWindowPresenter.hpp>
+#include <presenter/OnBoardingShortcutsWindowPresenter.hpp>
 #include <windows/OnBoardingLanguageWindow.hpp>
 #include <windows/OnBoardingFinalizeWindow.hpp>
 #include <windows/OnBoardingOnOffWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
 #include <windows/OnBoardingWelcomeWindow.hpp>
 #include <windows/OnBoardingInstructionPromptWindow.hpp>
+#include <windows/OnBoardingShortcutsOptionWindow.hpp>
+#include <windows/OnBoardingShortcutsWindow.hpp>
 
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
@@ -45,7 +48,7 @@ namespace app
 
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
             if (gui::window::name::onBoardingLanguageWindow == getCurrentWindow()->getName()) {
-                switchWindow(gui::window::name::onBoardingSettingsWindow);
+                switchWindow(gui::window::name::onBoardingShortcutsOptionWindow);
                 return sys::msgHandled();
             }
             return sys::msgNotHandled();
@@ -72,6 +75,17 @@ namespace app
             gui::window::name::onBoardingLanguageWindow, [this](ApplicationCommon *app, const std::string &name) {
                 auto presenter = std::make_unique<OnBoarding::OnBoardingLanguageWindowPresenter>(this);
                 return std::make_unique<gui::OnBoardingLanguageWindow>(app, std::move(presenter), name);
+            });
+
+        windowsFactory.attach(gui::window::name::onBoardingShortcutsOptionWindow,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::OnBoardingShortcutsOptionWindow>(app, name);
+                              });
+
+        windowsFactory.attach(
+            gui::window::name::onBoardingShortcutsWindow, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<OnBoarding::OnBoardingShortcutsWindowPresenter>(this);
+                return std::make_unique<gui::OnBoardingShortcutsWindow>(app, std::move(presenter), name);
             });
 
         windowsFactory.attach(
@@ -234,24 +248,26 @@ namespace app
             if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) || inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN)) {
                 informationState = OnBoarding::InformationStates::LightClickInfo;
             }
-            else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RIGHT) ||
-                     inputEvent.isKeyRelease(gui::KeyCode::KEY_LEFT)) {
-                informationState = OnBoarding::InformationStates::DeepClickWarningInfo;
-                if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
-                    displayInformation(*getPreviousWindow());
+            else if (getCurrentWindow()->getName() != gui::window::name::onBoardingShortcutsWindow) {
+                if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RIGHT) ||
+                    inputEvent.isKeyRelease(gui::KeyCode::KEY_LEFT)) {
+                    informationState = OnBoarding::InformationStates::DeepClickWarningInfo;
+                    if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
+                        displayInformation(*getPreviousWindow());
+                    }
+                    else {
+                        displayInformation(getCurrentWindow()->getName());
+                    }
                 }
-                else {
-                    displayInformation(getCurrentWindow()->getName());
-                }
-            }
-            else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                if (informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
-                    informationPromptTimer.stop();
-                    informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
-                    displayInformation(*getPreviousWindow());
-                }
-                else {
-                    informationState = OnBoarding::InformationStates::RotateInfo;
+                else if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
+                    if (informationState == OnBoarding::InformationStates::DeepClickWarningInfo) {
+                        informationPromptTimer.stop();
+                        informationState = OnBoarding::InformationStates::DeepClickCorrectionInfo;
+                        displayInformation(*getPreviousWindow());
+                    }
+                    else {
+                        informationState = OnBoarding::InformationStates::RotateInfo;
+                    }
                 }
             }
         }
@@ -283,7 +299,6 @@ namespace app
                 }
             }
         }
-
         return false;
     }
 

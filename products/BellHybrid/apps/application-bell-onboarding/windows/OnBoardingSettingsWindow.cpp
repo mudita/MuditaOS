@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingSettingsWindow.hpp"
@@ -13,5 +13,6 @@ namespace gui
         : BellSettingsTimeUnitsWindow(app, std::move(windowPresenter), name)
     {
         finishedCallback = [this]() { application->switchWindow(window::name::finalizeOnBoardingWindow); };
+        returnCallback   = [this]() { application->switchWindow(window::name::onBoardingShortcutsOptionWindow); };
     }
 } // namespace gui

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common/options/BellShortOptionWindow.hpp"
@@ -36,6 +36,7 @@ namespace gui
         navBar->setVisible(false);
 
         body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, false);
+        body->setEdges(RectangleEdge::None);
 
         optionsList = new gui::ListView(body->centerBox, 0, 0, 0, 0, optionsModel, listview::ScrollBarType::None);
         optionsList->setAlignment(Alignment(Alignment::Vertical::Bottom));

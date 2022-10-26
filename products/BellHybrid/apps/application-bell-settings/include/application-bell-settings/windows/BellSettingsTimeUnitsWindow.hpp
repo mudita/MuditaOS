@@ -28,6 +28,7 @@ namespace gui
 
       protected:
         std::function<void()> finishedCallback = nullptr;
+        std::function<void()> returnCallback   = nullptr;
 
       private:
         SideListView *sidelistview = nullptr;
