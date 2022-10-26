@@ -88,6 +88,15 @@ add_catch2_executable(
 
 add_catch2_executable(
         NAME
+        cellular-volte-handler
+        SRCS
+        unittest_volteHandler.cpp
+        LIBS
+        module-cellular
+)
+
+add_catch2_executable(
+        NAME
         cellular-DTMFCode
         SRCS
         unittest_DTMFCode.cpp

@@ -50,20 +50,23 @@ namespace cellular::service
                 }
 
                 // can be left as always on: doesn't disturb when VoLTE disabled
-                auto qmbnAnswer =
-                    channel.cmd(factory(at::AT::QMBNCFG) + std::string("\"autosel\",1"));
+                auto qmbnAnswer = channel.cmd(factory(at::AT::QMBNCFG) + std::string("\"autosel\",1"));
                 if (!qmbnAnswer) {
                     throw std::runtime_error("[VoLTE] failed to enable MBN auto-select before trying to enable VoLTE");
                 }
             }
 
             auto imsCheckAnswer = channel.cmd(factory(AT::QCFG_IMS));
+            if (!imsCheckAnswer) {
+                throw std::runtime_error("[VoLTE] modem responded with error to QCFG_IMS");
+            }
+
             bool alreadyConfigured;
             try {
                 alreadyConfigured = parser(QcfgImsResult{imsCheckAnswer}, enable);
             }
             catch (std::runtime_error const &exc) {
-                throw std::runtime_error(std::string("[VoLTE] while checking IMS configuration state: ") + exc.what());
+                throw;
             }
 
             if (!alreadyConfigured) {
