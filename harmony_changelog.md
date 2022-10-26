@@ -13,6 +13,9 @@
 #### UI/UX:
 * Improve refreshing of the display.
 
+#### Onboarding
+* Shortcuts instruction
+
 ### Fixed
 
 ## [1.7.0 2022-11-14]

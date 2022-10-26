@@ -69,6 +69,12 @@ namespace gui
             }
             return true;
         }
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            if (returnCallback) {
+                returnCallback();
+                return true;
+            }
+        }
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }

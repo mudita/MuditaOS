@@ -53,7 +53,13 @@
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/alarm_colon_select_W_M.vpi", "output": "assets/images/bell/alarm_colon_select_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_arrow_down_W_M.vpi", "output": "assets/images/bell/bell_arrow_down_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/big_bell_ringing_W_G.vpi", "output": "assets/images/bell/big_bell_ringing_W_G.vpi"},
-
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/shortcuts_step_rotate_W_G.vpi", "output": "assets/images/bell/shortcuts_step_rotate_W_G.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/shortcuts_step_light_click_W_G.vpi", "output": "assets/images/bell/shortcuts_step_light_click_W_G.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/shortcuts_step_deep_press_W_G.vpi", "output": "assets/images/bell/shortcuts_step_deep_press_W_G.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/shortcuts_step_home_and_battery_W_G.vpi", "output": "assets/images/bell/shortcuts_step_home_and_battery_W_G.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/shortcuts_step_turn_off_W_G.vpi", "output": "assets/images/bell/shortcuts_step_turn_off_W_G.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/shortcuts_step_restart_W_G.vpi", "output": "assets/images/bell/shortcuts_step_restart_W_G.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/shortcuts_step_bedside_lamp_W_G.vpi", "output": "assets/images/bell/shortcuts_step_bedside_lamp_W_G.vpi"},
         
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Blissful_Dream.mp3", "output": "assets/audio/chimes/Blissful_Dream.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Gentle_Chime.mp3", "output": "assets/audio/chimes/Gentle_Chime.mp3"},
