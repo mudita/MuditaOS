@@ -16,7 +16,7 @@
 | Authors           | Change description        | Status | Modification date |
 | ----------------- | ------------------------- | ------ | ----------------- |
 | Bartosz Reichel | Initial version           | Draft  | 2021.01.29        |
-
+| Marcin Zieliński | Updated according to the most recent knowledge and implementation state | Draft | 2022.10.27 |
 
 ## Scope
 This document defines how VoLTE is run on modem
@@ -32,20 +32,9 @@ The mechanisms available in Quectel modems will be described.
 
 ### VoLTE On flow
 
-The current implementation only puts voice call in PS (Packet Switch) mode. Automatic selection of MBN files is used depending on the searched operator (assuming that ROW_Generic_3GPP will be selected for one not on the list). In the current implementation, the modem restart is performed every time. 
+The current implementation only puts voice call in PS (Packet Switch) mode. Automatic selection of MBN files is used depending on the searched operator (assuming that ROW_Generic_3GPP will be selected for one not on the list). In the current implementation, the current state of VoLTE enablement is checked and then a modem restart is performed only if the current state doesn't match the request to enable/disable. 
 
 ![alt text](./Images/current_volte_on.png "Current VoLTE")
-
-## Implementation with manual select
-
-### VoLTE on flow
-
-This implementation, disable autoselect of MBN and propose to choose ROW_Generic_3GPP.
-This proposal came from one of the cellular network engineers, there is a certain probability that in the absence of the MBN file for the selected network, the wrong one may be selected. 
-
-In this case, the restart is only performed when the MBN is changed (currently it is not possible to implement this functionality due to the large response message via UART). 
-
-![alt text](./Images/volte_on.png "Current VoLTE")
 
 ## Debug command
 
