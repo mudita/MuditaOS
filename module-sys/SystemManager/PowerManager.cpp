@@ -32,7 +32,7 @@ namespace sys
     [[nodiscard]] auto CpuFrequencyMonitor::GetTotalRuntimePercentage(
         const TickType_t totalTicksIncrease) const noexcept -> std::uint32_t
     {
-        return totalTicksIncrease == 0 ? 0 : ((totalTicksCount * 100) / totalTicksIncrease);
+        return totalTicksIncrease == 0 ? 0 : ((static_cast<std::uint64_t>(totalTicksCount) * 100) / totalTicksIncrease);
     }
 
     [[nodiscard]] auto CpuFrequencyMonitor::GetPeriodRuntimePercentage(
