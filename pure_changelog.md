@@ -12,6 +12,7 @@
 * Fixed MTP issues
 
 ### Fixed
+* Fixed incorrect total CPU usage in logs
 * Fixed wrong time displayed on password locked screen with 'Quotes' or 'Logo' wallpaper
 * Fixed access to the phone before going onboarding
 * Fixed receiving an empty SMS message
