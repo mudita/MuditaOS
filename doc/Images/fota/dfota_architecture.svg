@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="246px" preserveAspectRatio="none" style="width:663px;height:246px;background:#F0F0F0;" version="1.1" viewBox="0 0 663 246" width="663px" zoomAndPan="magnify"><defs><filter height="300%" id="f3gz10dlbd6le" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[1ceccb184820b849d0e1f9bb23cafb29]
+cluster PurePhone--><polygon fill="#F0F0F0" filter="url(#f3gz10dlbd6le)" points="22,24,115,24,122,46.2969,371,46.2969,371,234,22,234,22,24" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="22" x2="122" y1="46.2969" y2="46.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="87" x="26" y="38.9951">PurePhone</text><!--MD5=[4ebfafdc28f5b949c136a3b9693d3a8e]
+cluster Mudita Server--><polygon fill="#F0F0F0" filter="url(#f3gz10dlbd6le)" points="493,24,609,24,616,46.2969,641,46.2969,641,111,493,111,493,24" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="493" x2="616" y1="46.2969" y2="46.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="110" x="497" y="38.9951">Mudita Server</text><!--MD5=[78761c03146c327bf3acb5940687309c]
+entity screen--><ellipse cx="117" cy="189" fill="#FEFECE" filter="url(#f3gz10dlbd6le)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="48" x="93" y="218.9951">screen</text><!--MD5=[4f37262b63e955077d66c6f1be6c135c]
+entity MCU--><rect fill="#FEFECE" filter="url(#f3gz10dlbd6le)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="52" x="91" y="59"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="86" y="64"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="86" y="85.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="32" x="101" y="81.9951">MCU</text><!--MD5=[aada75a502fc4a09b78234ac4ad2c2ed]
+entity keyboard--><ellipse cx="47" cy="77" fill="#FEFECE" filter="url(#f3gz10dlbd6le)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="64" x="15" y="106.9951">keyboard</text><!--MD5=[60ac64ebe59cda12d135c56118453c64]
+entity Modem--><rect fill="#FEFECE" filter="url(#f3gz10dlbd6le)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="72" x="178" y="59"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="173" y="64"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="173" y="85.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="52" x="188" y="81.9951">Modem</text><!--MD5=[0fa462be121d972a44defe6db2ee49b5]
+entity Antena--><rect fill="#FEFECE" filter="url(#f3gz10dlbd6le)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="69" x="285.5" y="59"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="280.5" y="64"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="280.5" y="85.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="49" x="295.5" y="81.9951">Antena</text><!--MD5=[9eb86c2b3d925a16ba1bdada40016c70]
+entity Internet--><path d="M399.3988,63.8259 C401.9638,57.7893 405.934,57.2086 410.7765,61.2565 C414.2724,56.4522 419.434,55.3207 422.4051,61.7975 C424.2201,56.4323 428.7807,56.207 432.2423,60.0356 C435.801,56.0078 441.5415,55.6781 443.4392,61.8576 C446.8776,57.0845 451.2059,55.9358 454.7597,61.734 C459.2738,56.2606 462.7886,56.8011 466.0842,62.9238 C475.1733,65.5517 478.5441,69.8833 473.4225,78.9985 C479.1203,85.9383 474.8494,93.2118 466.9515,94.4623 C464.8116,99.9021 460.8219,101.4209 456.1207,97.3921 C452.9415,103.0008 448.5858,103.734 444.0572,98.9599 C442.5309,105.0836 438.476,107.7844 432.7206,103.6199 C427.5438,107.6585 423.8058,105.4273 422.6306,99.5486 C417.2901,103.9801 412.7708,103.5968 409.9358,96.7326 C405.8968,100.3147 401.7822,99.0293 400.1123,94.0228 C391.5685,90.3959 390.8125,83.5713 396.9753,77.2018 C390.7885,71.4275 391.2846,67.0092 399.3988,63.8259 " fill="#F0F0F0" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="54" x="405" y="81.9951">Internet</text><!--MD5=[2a935936ea28b73548bb3a69795b91f8]
+entity HTTPd--><rect fill="#FEFECE" filter="url(#f3gz10dlbd6le)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="115" x="509.5" y="59"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="504.5" y="64"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="504.5" y="85.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="95" x="519.5" y="81.9951">"HTTP Server"</text><!--MD5=[ed9407b50b656d1ac8a981d492de6d9e]
+link MCU to screen--><path d="M117,95.19 C117,119.24 117,161.98 117,179.82 " fill="none" id="MCU-screen" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[b9ea831053f1ec4e0a78f6b5dbd386bb]
+link keyboard to MCU--><path d="M56.02,77 C67.62,77 79.21,77 90.8,77 " fill="none" id="keyboard-MCU" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[ed3281877675ed8c0c6cc37d805c448b]
+link MCU to Modem--><path d="M143.14,77 C154.68,77 166.21,77 177.74,77 " fill="none" id="MCU-Modem" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[18428f3278459e1708ec2304bfff0fbd]
+link Modem to Antena--><path d="M250.02,77 C261.78,77 273.53,77 285.29,77 " fill="none" id="Modem-Antena" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[fc3cf6728a7135bbe0e9d12f731f1ef5]
+link Antena to Internet--><path d="M359.82,77 C368.14,77 376.45,77 384.77,77 " fill="none" id="Antena-Internet" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="389.95,77,380.95,73,384.95,77,380.95,81,389.95,77" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="354.56,77,363.56,81,359.56,77,363.56,73,354.56,77" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[8b1bb30abafaf9b804a28b8ad1747dd4]
+link Internet to HTTPd--><path d="M479.41,77 C487.67,77 495.94,77 504.21,77 " fill="none" id="Internet-HTTPd" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="509.35,77,500.35,73,504.35,77,500.35,81,509.35,77" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="474.19,77,483.19,81,479.19,77,483.19,73,474.19,77" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[44eae02c5babf02c6efe3b3a087de1f0]
+@startuml
+skinparam BackgroundColor F0F0F0
+skinparam rectangle{
+    roundCorner 25
+}
+
+package PurePhone {
+    screen -up- [MCU]
+    keyboard - [MCU]
+    [MCU] - [Modem]
+    [Modem] - [Antena]
+}
+cloud Internet {
+}
+
+[Antena] <-> Internet
+
+
+package "Mudita Server" {
+ ["HTTP Server"] as HTTPd
+}
+Internet <-> HTTPd
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 05:22:07 EST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.14.1+1-post-Debian-1
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

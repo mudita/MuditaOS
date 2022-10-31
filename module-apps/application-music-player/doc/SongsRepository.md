@@ -8,30 +8,30 @@ The cache for musicFiles contains a list of songs currently being processed. It 
 
 ## Sequence flow 
 
-![](./data/update_data_sequence_flow.svg)
+![](./Images/update_data_sequence_flow.svg)
 
 ## UpdateRepository
 
 **Queries:**
 
-![](./data/UpdateRepoQueries.svg)
+![](./Images/UpdateRepoQueries.svg)
 
 **Receiving new records:**
 
 1. newData
      - when new data is received, the musicFiles cache is completely overwritten 
 
-![](./data/newData.svg)
+![](./Images/newData.svg)
 
 2. newBackData
      - when we receive newBackData, new records are added to the musicFiles cache and records from the top of the list are deleted 
 
-![](./data/newBackData.svg)
+![](./Images/newBackData.svg)
 
 3. newFrontData
      - when we receive newFrontData, new records are added at the beginning of the musicFiles cache and records from the end of the list are deleted 
 
-![](./data/newFrontData.svg)
+![](./Images/newFrontData.svg)
 
 ## Sort/Repeat Mode
 
@@ -40,4 +40,4 @@ The cache for musicFiles contains a list of songs currently being processed. It 
   - Each change of sort / repeat mode must update the data according to this scheme.
   - For the shuffle mode, random songs are downloaded to the music files cache, therefore getting the next and previous track is done in the same way as for the other modes.
 
-![](./data/UpdateRepoSortRepeatModes.svg)
+![](./Images/UpdateRepoSortRepeatModes.svg)

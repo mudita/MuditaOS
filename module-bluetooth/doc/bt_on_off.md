@@ -34,4 +34,4 @@ to the reset state.
 
 ## Bluetooth on/off state machine diagram
 To be able to handle all events during start up and shutting down of the Bluetooth module the following state machine has been implemented:
-![bt_on_off_state_diagram](./bt_on_off_state_diagram.svg)
+![bt_on_off_state_diagram](./Images/bt_on_off_state_diagram.svg)

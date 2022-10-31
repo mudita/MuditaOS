@@ -2,18 +2,18 @@
 
 Full state machine of Cellular service could be found below.
 
-![](cellular_state_machine.svg)
+![](./Images/cellular_state_machine.svg)
 
 ## GSM powerup/powerdown control flow
 
 In order to protect system of sudden blackout, GSM module has to be switched off below certain critical battery level.
 This way system voltage will not be dropped down when module is trying to acheive cellular network connection.
 
-![](cellular_gsm_onoff_flow.svg)
+![](./Images/cellular_gsm_onoff_flow.svg)
 
 ## URC handling flow
 
-![](urc_handling.svg)
+![](./Images/urc_handling.svg)
 
 ## CSQ handling flow
 
@@ -21,7 +21,7 @@ There are 3 modes of CSQ signal handling:
 * Permanent Reporting
 
 The host is constantly waiting to report data from the modem when the CSQ signal changes. This mode is active only when the user unlocks the keyboard or connects USB or connects the BT car kit.
-![](csq_handling.svg)
+![](./Images/csq_handling.svg)
 
 * Hybrid Reporting
 
@@ -37,7 +37,7 @@ Call request represents the string written by te user in the input window.
 It can be request of external phone number but also emergency call request,USSD code request or MMI request.
 The logic has to recognize the request and apply proper action.
 
-![](call_request_handling.svg)
+![](./Images/call_request_handling.svg)
 
 ## Cellular sleep mode
 
@@ -92,6 +92,6 @@ Messages only mode
 |Incoming messages| Allowed | Allowed | Not allowed | Rejected |
 |Outgoing messages| Allowed | Allowed | Not allowed | Partially allowed |
 
-![](phone_modes.svg)
+![](./Images/phone_modes.svg)
 
-![](connection_manager.svg)
+![](./Images/connection_manager.svg)

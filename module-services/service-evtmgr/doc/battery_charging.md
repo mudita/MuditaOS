@@ -31,7 +31,7 @@ Default current limit of a charger to draw from USB port is 500mA. Due to severa
 
 PureOS limits the bus current to 500mA, in case of SDP, and to 1000mA in case of CDP and DCP. USB type recognition is part of the USB stack.
 
-![](USB_current_selection.svg "Current selection algorithm")
+![](./Images/USB_current_selection.svg "Current selection algorithm")
 
 ## Charger cutoff due to temperature
 
@@ -46,7 +46,7 @@ For battery in the system value of 1C equals 1600mA.
 
 Implementation is interrupt-driven. In interrupt handler temperature measurement is sampled and appropriate interrupt range is set. The same action is done at the time of initialization. This way no cyclic sampling of the temperature has to be done. Algorithm could be described by following graph:
 
-![](charger_temperature_algorithm.svg "Charging control due to temperature")
+![](./Images/charger_temperature_algorithm.svg "Charging control due to temperature")
 
 Additional 2 Cdeg hysteresis was introduced to prevent rapid changes in charging states.
 

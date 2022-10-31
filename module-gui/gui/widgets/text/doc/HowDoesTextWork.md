@@ -22,7 +22,7 @@ To do so we've decomposed gui::Text item to possibly single responsibility objec
 
 ## Visual relationship between classes "on screen"
 
-![Text Document and Block relation](document-block-relation.svg)
+![Text Document and Block relation](./Images/document-block-relation.svg)
 
 ## TextCursor movement - how it works?
 
@@ -43,11 +43,11 @@ When changing how removing / adding are seen on screen and react to key presses 
 
 #### key handling cases
 
-![key handling cases](text-cursor-corner-cases.svg)
+![key handling cases](./Images/text-cursor-corner-cases.svg)
 
 #### text movement, addition and remove in action
 
-![text movement, addition and remove](text_move_add_remove.gif)
+![text movement, addition and remove](./Images/text_move_add_remove.gif)
 
 ## special character input
 
@@ -56,7 +56,7 @@ One of these keys is newline.
 
 ### special char selection - how it works example
 
-![How to input special char](how_to_special_char.gif)
+![How to input special char](./Images/how_to_special_char.gif)
 
 ## digit input in textual mode
 
@@ -64,4 +64,4 @@ User can input digits while in textual mode with long press of selected digit ke
 
 ### Digit long press - how it works example
 
-![Digit long press](digit_long_press.gif)
+![Digit long press](./Images/digit_long_press.gif)

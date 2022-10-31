@@ -4,7 +4,7 @@ The following document provides a description of the `ServiceBluetooth` endpoint
 
 ## Overview
 
-![bt-endpoints-structure](./doc/bt-endpoints-general-structure.svg)
+![bt-endpoints-structure](./doc/Images/bt-endpoints-general-structure.svg)
 
 ## Calling HTTP methods
 The `Bluetooth` endpoint supports four HTTP-like methods: 

@@ -6,7 +6,7 @@ This article includes details on how MuditaOS widgets are rendered and how the G
 
 ### How widgets are rendered
 
-![Simplified UI](./doc/how_ui_work.svg "Simplified UI flow")
+![Simplified UI](./doc/Images/how_ui_work.svg "Simplified UI flow")
 
 * All widgets are children of `gui::Item`
 * There are two major commands to trigger screen redraw:
@@ -22,7 +22,7 @@ This article includes details on how MuditaOS widgets are rendered and how the G
 
 Please see `app::Application`, `app::manager::ApplicationManager` for detailed information on how messages are handled between both. This is just general documentation.
 
-![Simplified app start diagram](./doc/how_app_start_work.svg "Simplified hi level app start")
+![Simplified app start diagram](./doc/Images/how_app_start_work.svg "Simplified hi level app start")
 
 These actions are done on a chained bus request between: `app::Application`, `app::manager::ApplicationManager` and `sapm::EventWorker`
 
@@ -48,7 +48,7 @@ All of these are asynchronous and there is little state machine maintenance.
 
 ### What happens when you press a key?
 
-![Key Handling Diagram](./doc/how_keypress_work.svg "High level perspective of the key handling")
+![Key Handling Diagram](./doc/Images/how_keypress_work.svg "High level perspective of the key handling")
 
 * `bsp` handles key press on I2C IRQ and sends Event to event worker on naked FreeRTOS pipe (on target RT1051, on Linux `gtk` does that)
 * `EventWorker` worker of `EventService`:
@@ -110,7 +110,7 @@ In order to ensure that a class in `gui::Item` hierarchy is recognized by its co
 otherwise it will be resolved as a closest ancestor. On the diagram below both `gui::CustomItem1` and `gui::CustomItem2` will be resolved as `gui::Rect`
 despite existing `gui::GuiVisitor::visit(gui::CustomItem2 &)` overload and `gui::CustomItem1::accept(...)` override.
 
-![Simplified UI](./doc/visitor_item_structure.svg "Visitor-Item structure")
+![Simplified UI](./doc/Images/visitor_item_structure.svg "Visitor-Item structure")
 
 ### Tree of `gui::Item`
 
@@ -120,7 +120,7 @@ Concerning the need of a `ConcreteVisitors` to visit not only the parent but als
 `gui::ItemTree` is an interface class providing abstract interface for implementation of `gui::Item` tree traversal.
 The concrete realization of `gui::ItemTree` is `gui::DepthFirstItemTree`.
 
-![Simplified UI](./doc/item_tree.svg "ItemTree structure")
+![Simplified UI](./doc/Images/item_tree.svg "ItemTree structure")
 
 #### Depth-First tree of `gui::Item`
 
@@ -132,7 +132,7 @@ The class offers two traverse modes:
 
 ### Example
 
-![Simplified UI](./doc/visitor_item_example.svg "Visitor-Item  example")
+![Simplified UI](./doc/Images/visitor_item_example.svg "Visitor-Item  example")
 
 ## Domain Object Model of `gui::Item`
 

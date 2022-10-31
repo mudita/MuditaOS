@@ -1,0 +1,16 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+#lightblue :12 MHz;
+
+partition "**immediately **" {
+   if (minFrequencyRequested > currentCpuFrequency) then (yes)
+  : IncreaseCpuFrequency();
+  else (no) 
+  stop;
+  endif
+}
+
+
+#lightblue :minFrequencyRequested;
+@enduml

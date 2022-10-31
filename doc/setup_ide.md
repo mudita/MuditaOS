@@ -99,7 +99,7 @@ In the debuging configuration dropdown select a pair of **<exec>** and **<toolch
 
 **Note:** RT1051 doesn't have *run* configuration. Only debug is available.
 
-![CLion screenshot 1](Images/setup_ide/clion_ss1.png)
+![CLion screenshot 1](./Images/setup_ide/clion_ss1.png)
 
 #### Running target
 It's possible to see logs from a RT1051 booted from eMMC and not from RAM. 

@@ -14,4 +14,4 @@ is complete, the `ServiceBluetooth` sends back the device to the application.
 - process the device
 - send `BluetoothMessage(BluetoothMessage::Request::StopScan)` to the `ServiceBluetooth` to stop the scan.
 
-![bt_scan](./bt_scan.svg)
+![bt_scan](./Images/bt_scan.svg)

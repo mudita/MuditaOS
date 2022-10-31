@@ -34,7 +34,7 @@ The mechanisms available in Quectel modems will be described.
 
 The current implementation only puts voice call in PS (Packet Switch) mode. Automatic selection of MBN files is used depending on the searched operator (assuming that ROW_Generic_3GPP will be selected for one not on the list). In the current implementation, the modem restart is performed every time. 
 
-![alt text](./Images/current_volte_on.png "Current VoLTE")
+![alt text](./Images/current_volte_on.svg "Current VoLTE")
 
 ## Implementation with manual select
 
@@ -45,7 +45,7 @@ This proposal came from one of the cellular network engineers, there is a certai
 
 In this case, the restart is only performed when the MBN is changed (currently it is not possible to implement this functionality due to the large response message via UART). 
 
-![alt text](./Images/volte_on.png "Current VoLTE")
+![alt text](./Images/volte_on.svg "Current VoLTE")
 
 ## Debug command
 

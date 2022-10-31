@@ -1,0 +1,89 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+#lightblue :528 MHz;
+
+partition "**loop** UpdateCpuFrequency interval" {
+	while ((__cpuLoad__ < __frequencyShiftLowerThreshold)__ __maxBelowThresholdCount__ time in a row) is (no)
+	
+	endwhile (yes)
+	
+	note right
+	  Minimum execution time:
+	  __maxBelowThresholdCount__ * __UpdateCpuFrequencyInterval__
+	  ====
+	  Currently it is 30 * 100 ms = <b> 3s </b>
+	end note
+}
+
+:DecreaseCpuFrequency();
+
+#lightblue :264 MHz;
+
+partition "**loop** UpdateCpuFrequency interval" {
+	while ((__cpuLoad__ < __frequencyShiftLowerThreshold)__ __maxBelowThresholdInRowCount__ time in a row) is (no)
+	
+	endwhile (yes)
+	
+	note right
+	  Minimum execution time:
+	  __maxBelowThresholdInRowCount__ * __UpdateCpuFrequencyInterval__
+	  ====
+	  Currently it is 10 * 100 ms = <b> 1s </b>
+	end note
+}
+
+:DecreaseCpuFrequency();
+
+#lightblue :132 MHz;
+
+partition "**loop** UpdateCpuFrequency interval" {
+	while ((__cpuLoad__ < __frequencyShiftLowerThreshold)__ __maxBelowThresholdInRowCount__ time in a row) is (no)
+	
+	endwhile (yes)
+	
+	note right
+	  Minimum execution time:
+	  __maxBelowThresholdInRowCount__ * __UpdateCpuFrequencyInterval__
+	  ====
+	  Currently it is 10 * 100 ms = <b> 1s </b>
+	end note	
+}
+:DecreaseCpuFrequency();
+
+#lightblue :66 MHz;
+
+partition "**loop** UpdateCpuFrequency interval" {
+	while ((__cpuLoad__ < __frequencyShiftLowerThreshold)__ __maxBelowThresholdInRowCount__ time in a row) is (no)
+	
+	endwhile (yes)
+	
+	note right
+	  Minimum execution time:
+	  __maxBelowThresholdInRowCount__ * __UpdateCpuFrequencyInterval__
+	  ====
+	  Currently it is 10 * 100 ms = <b> 1s </b>
+	end note	
+}
+:DecreaseCpuFrequency();
+
+#lightblue :24 MHz;
+
+partition "**loop** UpdateCpuFrequency interval" {
+	while ((__cpuLoad__ < __frequencyShiftLowerThreshold)__ __maxBelowThresholdInRowCount__ time in a row) is (no)
+	
+	endwhile (yes)
+	
+	note right
+	  Minimum execution time:
+	  __maxBelowThresholdInRowCount__ * __UpdateCpuFrequencyInterval__
+	  ====
+	  Currently it is 10 * 100 ms = <b> 1s </b>
+	end note	
+}
+:DecreaseCpuFrequency();
+
+#lightblue :12 MHz;
+
+
+@enduml

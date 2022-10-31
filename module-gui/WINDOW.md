@@ -7,7 +7,7 @@ to display information back to users.
 
 Window consist of 4 different segments presented on image below. 
 
-![alt text](./doc/window_structure.png "Window structure png")
+![alt text](./doc/Images/window_structure.png "Window structure png")
 
 * `StatusBar` - Top part of screen displaying system wide information. In example Time, Signal Strength, 
 selected sim. Objects in status bar are not focusable and activeable. 
