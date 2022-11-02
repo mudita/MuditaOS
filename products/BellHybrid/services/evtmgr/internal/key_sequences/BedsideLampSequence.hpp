@@ -11,6 +11,6 @@ class BedsideLampSequence : public GenericLongPressSequence<KeyMap::Frontlight>
   public:
     explicit BedsideLampSequence(sys::Service &service)
         : GenericLongPressSequence<KeyMap::Frontlight>{sys::TimerFactory::createSingleShotTimer(
-              &service, "lampseq", std::chrono::milliseconds{3000}, [this](auto &) { handleTimer(); })}
+              &service, "lampseq", std::chrono::milliseconds{2000}, [this](auto &) { handleTimer(); })}
     {}
 };

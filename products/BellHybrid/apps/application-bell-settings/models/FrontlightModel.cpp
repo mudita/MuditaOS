@@ -56,17 +56,17 @@ namespace app::bell_settings
     }
     void FrontlightModel::setStatus(bool onOff)
     {
-        app->bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+        app->bus.sendUnicast(std::make_shared<sevm::ScreenLightSettingsControlMessage>(
                                  onOff ? screen_light_control::Action::turnOn : screen_light_control::Action::turnOff),
                              service::name::evt_manager);
     }
     void FrontlightModel::setMode(screen_light_control::ScreenLightMode mode)
     {
-        app->bus.sendUnicast(
-            std::make_shared<sevm::ScreenLightControlMessage>(mode == screen_light_control::ScreenLightMode::Automatic
-                                                                  ? screen_light_control::Action::enableAutomaticMode
-                                                                  : screen_light_control::Action::disableAutomaticMode),
-            service::name::evt_manager);
+        app->bus.sendUnicast(std::make_shared<sevm::ScreenLightSettingsControlMessage>(
+                                 mode == screen_light_control::ScreenLightMode::Automatic
+                                     ? screen_light_control::Action::enableAutomaticMode
+                                     : screen_light_control::Action::disableAutomaticMode),
+                             service::name::evt_manager);
     }
     void FrontlightModel::setBrightness(Brightness value)
     {

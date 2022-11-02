@@ -26,9 +26,7 @@ namespace backlight
                         parent,
                         [this](sys::Timer &t) {
                             if (this->screenLightController->isLightOn()) {
-                                if (backlightType == Type::BedsideLamp) {
-                                    backlightType = Type::Frontlight;
-                                }
+                                backlightType = Type::Frontlight;
                                 this->screenLightController->processRequest(screen_light_control::Action::turnOff);
                             }
                         })
@@ -101,6 +99,13 @@ namespace backlight
             timer->restart(lightTime);
         }
         backlightType = type;
+    }
+
+    void Handler::screenRequest(screen_light_control::Action action, const screen_light_control::Parameters &params)
+    {
+        if (backlightType == Type::Frontlight) {
+            processScreenRequest(action, params);
+        }
     }
 
     void Handler::processScreenRequest(screen_light_control::Action action,
