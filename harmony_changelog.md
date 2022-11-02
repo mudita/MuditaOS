@@ -7,6 +7,7 @@
 ### Fixed
 
 * Fixed resetting meditation settings with deep press.
+* Fixed bedside lamp in alarm application
 
 ### Added
 #### PowerNap:

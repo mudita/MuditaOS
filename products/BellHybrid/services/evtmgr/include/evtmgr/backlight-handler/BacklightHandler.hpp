@@ -39,6 +39,8 @@ namespace backlight
 
         void handleScreenLight(Type type);
 
+        void screenRequest(screen_light_control::Action action, const screen_light_control::Parameters &params);
+
         void processScreenRequest(screen_light_control::Action action,
                                   const screen_light_control::Parameters &params) override;
 
