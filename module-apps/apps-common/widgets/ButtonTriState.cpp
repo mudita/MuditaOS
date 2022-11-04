@@ -8,40 +8,58 @@
 
 namespace gui
 {
-    ButtonTriState::ButtonTriState(Item *parent, State state) : Label{parent}
+    ButtonTriState::ButtonTriState(Item *parent, State state)
+        : Label{parent}, transitingText{utils::translate("app_settings_toggle_transiting")}
     {
-        setMinimumSize(style::buttonTriState::w, style::buttonTriState::h);
-        setEdges(RectangleEdge::None);
-
-        setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        setFont(style::window::font::small);
-
-        fill = new Rect(this, 0, 0, 0, 0);
-        fill->setEdges(RectangleEdge::All);
-        fill->setCorners(RectangleRoundedCorner::All);
-        fill->setRadius(4);
-        fill->setPenWidth(2);
-
-        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
-            fill->setArea({0, 0, newDim.w, newDim.h});
-            return true;
-        };
-
         switchState(state);
     }
 
     void ButtonTriState::switchState(State requestedState)
     {
+        setFont(style::window::font::small);
+        setRadius(4);
+        setPenWidth(2);
+
+        auto setRectangleStyle = [this]() {
+            setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+            setMinimumSize(style::buttonTriState::w, style::buttonTriState::h);
+            setEdges(RectangleEdge::All);
+            setCorners(RectangleRoundedCorner::All);
+        };
+
+        auto setTextOnlyStyle = [this]() {
+            setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+            setMinimumSize(120,
+                           style::buttonTriState::h); // unfortunately, setMinimumWidthToFitText() doesn't work here
+            setEdges(RectangleEdge::None);
+            setCorners(RectangleRoundedCorner::None);
+            setColor(ColorFullBlack);
+        };
+
         currentState = requestedState;
-        if (currentState == State::On) {
-            fill->setFillColor(ColorFullBlack);
+        // placed here instead of a narrower scope because magic_enum can't retrieve the enum element's name inside a
+        // switch()
+        std::string_view stateName = magic_enum::enum_name(currentState);
+        switch (currentState) {
+        case State::On:
+            setRectangleStyle();
+            setFillColor(ColorFullBlack);
             setColor(ColorFullWhite);
             setText(utils::translate("app_settings_toggle_on"));
-        }
-        else {
-            fill->setFillColor(ColorFullWhite);
+            break;
+        case State::Transiting:
+            setTextOnlyStyle();
+            setText(transitingText);
+            break;
+        default:
+            LOG_ERROR("button state '%s' not implemented - defaulting to OFF", stateName.data());
+            [[fallthrough]];
+        case State::Off:
+            setRectangleStyle();
+            setFillColor(ColorFullWhite);
             setColor(ColorFullBlack);
             setText(utils::translate("app_settings_toggle_off"));
+            break;
         }
     }
 } /* namespace gui */

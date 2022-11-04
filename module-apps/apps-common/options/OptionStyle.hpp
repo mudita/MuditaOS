@@ -26,6 +26,7 @@ namespace gui::option
         Disabled,
         ArrowBlack,
         ArrowWhite,
+        Transiting,
         On,
         Off,
         Bt,

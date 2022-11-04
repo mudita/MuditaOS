@@ -141,7 +141,8 @@ NotificationWithEventCounter::NotificationWithEventCounter(notifications::Notifi
     text->setMaximumSize(text->getSize(Axis::X), Axis::X);
 }
 
-NotificationWithOnOffButton::NotificationWithOnOffButton(notifications::NotificationType type, gui::ButtonTriState::State state)
+NotificationWithOnOffButton::NotificationWithOnOffButton(notifications::NotificationType type,
+                                                         gui::ButtonTriState::State state)
     : NotificationListItem(type)
 {
     auto button = new ButtonTriState(nullptr, state);

@@ -44,6 +44,9 @@ namespace gui::option
         case SettingRightItem::ArrowWhite:
             imageName = "arrow_right_empty_32px_W_G";
             break;
+        case SettingRightItem::Transiting:
+            button = new ButtonTriState(optionBodyHBox, ButtonTriState::State::Transiting);
+            break;
         case SettingRightItem::On:
             button = new ButtonTriState(optionBodyHBox, ButtonTriState::State::On);
             break;
