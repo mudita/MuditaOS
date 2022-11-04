@@ -54,7 +54,8 @@ namespace gui
                                           getPresenter()->getAlarm()->alarmTime.minuteOfHour,
                                           utils::time::TimestampType::Time);
         timeLabel->setText(time);
-        onOffImage->switchState(getPresenter()->getAlarm()->enabled ? ButtonTriState::State::On : ButtonTriState::State::Off);
+        onOffImage->switchState(getPresenter()->getAlarm()->enabled ? ButtonTriState::State::On
+                                                                    : ButtonTriState::State::Off);
 
         if (getPresenter()->hasRecurrence()) {
             periodLabel->setText(getPresenter()->getDescription());

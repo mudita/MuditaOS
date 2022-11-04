@@ -5,8 +5,8 @@
 
 #include <application-settings/ApplicationSettings.hpp>
 #include <application-settings/windows/WindowNames.hpp>
-
 #include <OptionSetting.hpp>
+#include <widgets/ButtonTriState.hpp>
 
 namespace gui
 {
@@ -36,6 +36,35 @@ namespace gui
             nullptr,
             gui::option::SettingRightItem::ArrowWhite,
             false));
+
+#if ENABLE_VOLTE == 1
+#pragma message "state switching not connected to the actual state yet - see MOS-793"
+        auto getNextVolteState = []() {
+            using namespace gui::option;
+
+            static size_t volteStateIndex;
+            static constexpr SettingRightItem volteStates[]{
+                SettingRightItem::Transiting, SettingRightItem::On, SettingRightItem::Off};
+
+            auto currentIndex = ++volteStateIndex % (sizeof(volteStates) / sizeof(volteStates[0]));
+            return volteStates[currentIndex];
+        };
+
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+            utils::translate("app_settings_network_voice_over_lte"),
+            [=](gui::Item &item) {
+                refreshOptionsList();
+                return true;
+            },
+            [&](Item &item) {
+                auto navBarCaption =
+                    (item.focus) ? utils::translate("common_switch") : utils::translate("common_select");
+                navBar->setText(nav_bar::Side::Center, navBarCaption);
+                return true;
+            },
+            nullptr,
+            getNextVolteState()));
+#endif
 
 #if DISABLED_SETTINGS_OPTIONS == 1
         auto operatorsOn = operatorsSettings->getOperatorsOn();

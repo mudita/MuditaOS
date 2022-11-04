@@ -11,8 +11,8 @@ namespace style
     {
         constexpr uint32_t w = 56;
         constexpr uint32_t h = 32;
-    }
-}
+    } // namespace buttonTriState
+} // namespace style
 
 namespace gui
 {
@@ -30,7 +30,7 @@ namespace gui
         void switchState(State requestedState);
 
       private:
-        Rect *fill = nullptr;
+        std::string const transitingText;
         State currentState;
     };
-}
+} // namespace gui
