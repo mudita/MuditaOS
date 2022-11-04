@@ -5,7 +5,7 @@
 
 #include "Application.hpp"
 #include <module-db/Interface/AlarmEventRecord.hpp>
-#include <widgets/ButtonOnOff.hpp>
+#include <widgets/ButtonTriState.hpp>
 #include <ListItem.hpp>
 #include <BoxLayout.hpp>
 #include <Label.hpp>
@@ -17,7 +17,7 @@ namespace gui
     {
         gui::HBox *hBox              = nullptr;
         gui::VBox *vBox              = nullptr;
-        gui::ButtonOnOff *onOffImage = nullptr;
+        gui::ButtonTriState *onOffImage = nullptr;
         gui::Label *timeLabel        = nullptr;
         gui::Label *periodLabel      = nullptr;
         void setAlarm();

@@ -1,16 +1,16 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ButtonOnOff.hpp"
+#include "ButtonTriState.hpp"
 
 #include <Style.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui
 {
-    ButtonOnOff::ButtonOnOff(Item *parent, const ButtonState buttonState) : Label{parent}
+    ButtonTriState::ButtonTriState(Item *parent, State state) : Label{parent}
     {
-        setMinimumSize(style::buttonOnOff::w, style::buttonOnOff::h);
+        setMinimumSize(style::buttonTriState::w, style::buttonTriState::h);
         setEdges(RectangleEdge::None);
 
         setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
@@ -27,13 +27,13 @@ namespace gui
             return true;
         };
 
-        switchState(buttonState);
+        switchState(state);
     }
 
-    void ButtonOnOff::switchState(const ButtonState newButtonState)
+    void ButtonTriState::switchState(State requestedState)
     {
-        currentState = newButtonState;
-        if (currentState == ButtonState::On) {
+        currentState = requestedState;
+        if (currentState == State::On) {
             fill->setFillColor(ColorFullBlack);
             setColor(ColorFullWhite);
             setText(utils::translate("app_settings_toggle_on"));
@@ -44,9 +44,4 @@ namespace gui
             setText(utils::translate("app_settings_toggle_off"));
         }
     }
-    void ButtonOnOff::toggleState()
-    {
-        switchState(static_cast<ButtonState>(!static_cast<bool>(currentState)));
-    }
-
 } /* namespace gui */

@@ -37,7 +37,7 @@ namespace gui
         periodLabel->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
         periodLabel->setFont(style::window::font::small);
 
-        onOffImage = new gui::ButtonOnOff(hBox, ButtonState::On);
+        onOffImage = new gui::ButtonTriState(hBox, ButtonTriState::State::On);
         onOffImage->setMargins(gui::Margins(0, 0, style::widgets::rightMargin, 0));
 
         setAlarm();
@@ -54,7 +54,7 @@ namespace gui
                                           getPresenter()->getAlarm()->alarmTime.minuteOfHour,
                                           utils::time::TimestampType::Time);
         timeLabel->setText(time);
-        onOffImage->switchState(getPresenter()->getAlarm()->enabled ? ButtonState::On : ButtonState::Off);
+        onOffImage->switchState(getPresenter()->getAlarm()->enabled ? ButtonTriState::State::On : ButtonTriState::State::Off);
 
         if (getPresenter()->hasRecurrence()) {
             periodLabel->setText(getPresenter()->getDescription());

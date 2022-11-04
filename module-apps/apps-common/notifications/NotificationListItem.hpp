@@ -6,7 +6,7 @@
 #include <ListItem.hpp>
 #include <BoxLayout.hpp>
 #include <Text.hpp>
-#include <widgets/ButtonOnOff.hpp>
+#include <widgets/ButtonTriState.hpp>
 
 #include "NotificationData.hpp"
 
@@ -46,7 +46,7 @@ namespace gui
     {
 
       public:
-        NotificationWithOnOffButton(notifications::NotificationType type, gui::ButtonState state);
+        NotificationWithOnOffButton(notifications::NotificationType type, gui::ButtonTriState::State state);
     };
 
 } // namespace gui

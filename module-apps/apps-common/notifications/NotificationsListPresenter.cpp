@@ -95,7 +95,7 @@ auto NotificationsListPresenter::create(const notifications::NotSeenCallNotifica
 auto NotificationsListPresenter::create(const notifications::TetheringNotification *notification)
     -> NotificationListItem *
 {
-    auto item = new NotificationWithOnOffButton(notifications::NotificationType::Tethering, gui::ButtonState::On);
+    auto item = new NotificationWithOnOffButton(notifications::NotificationType::Tethering, gui::ButtonTriState::State::On);
     item->setName(utils::translate("Tethering"), false);
     item->deleteByList = false;
     return item;
