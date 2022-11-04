@@ -3,7 +3,7 @@
 
 #include <TextFixedSize.hpp>
 #include "OptionSetting.hpp"
-#include "widgets/ButtonOnOff.hpp"
+#include "widgets/ButtonTriState.hpp"
 #include <Image.hpp>
 
 namespace gui::option
@@ -35,7 +35,7 @@ namespace gui::option
         optionText->setRichText(text);
 
         std::string imageName;
-        ButtonOnOff *button = nullptr;
+        ButtonTriState *button = nullptr;
 
         switch (rightItem) {
         case SettingRightItem::ArrowBlack:
@@ -45,10 +45,10 @@ namespace gui::option
             imageName = "arrow_right_empty_32px_W_G";
             break;
         case SettingRightItem::On:
-            button = new ButtonOnOff(optionBodyHBox, ButtonState::On);
+            button = new ButtonTriState(optionBodyHBox, ButtonTriState::State::On);
             break;
         case SettingRightItem::Off:
-            button = new ButtonOnOff(optionBodyHBox, ButtonState::Off);
+            button = new ButtonTriState(optionBodyHBox, ButtonTriState::State::Off);
             break;
         case SettingRightItem::Bt:
             imageName = "bluetooth_32px_W_M";

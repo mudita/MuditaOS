@@ -141,10 +141,10 @@ NotificationWithEventCounter::NotificationWithEventCounter(notifications::Notifi
     text->setMaximumSize(text->getSize(Axis::X), Axis::X);
 }
 
-NotificationWithOnOffButton::NotificationWithOnOffButton(notifications::NotificationType type, gui::ButtonState state)
+NotificationWithOnOffButton::NotificationWithOnOffButton(notifications::NotificationType type, gui::ButtonTriState::State state)
     : NotificationListItem(type)
 {
-    auto button = new ButtonOnOff(nullptr, state);
+    auto button = new ButtonTriState(nullptr, state);
     button->setMargins(Margins(0, 0, 20, 0));
     box->addWidget(button);
 }

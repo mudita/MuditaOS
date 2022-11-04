@@ -42,7 +42,7 @@ target_sources(apps-common
         widgets/ActiveIconFactory.cpp
         widgets/BarGraph.cpp
         widgets/BrightnessBox.cpp
-        widgets/ButtonOnOff.cpp
+        widgets/ButtonTriState.cpp
         widgets/BellBaseLayout.cpp
         widgets/BellSideListItem.cpp
         widgets/ClockDateWidget.cpp
