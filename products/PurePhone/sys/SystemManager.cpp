@@ -32,7 +32,8 @@ namespace sys
     {
         auto activeSimSelected = []() {
             const auto storeGsm = Store::GSM::get();
-            return ((storeGsm->selected == Store::GSM::SIM::SIM1 || storeGsm->selected == Store::GSM::SIM::SIM2) &&
+            return ((storeGsm->selected == Store::GSM::SelectedSIM::SIM1 ||
+                     storeGsm->selected == Store::GSM::SelectedSIM::SIM2) &&
                     storeGsm->simCardInserted());
         };
         auto isCallOngoing = [this]() {

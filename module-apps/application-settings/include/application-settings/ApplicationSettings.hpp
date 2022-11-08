@@ -25,11 +25,12 @@ namespace app
         class SimParams
         {
           public:
-            virtual ~SimParams()                     = default;
-            virtual void setSim(Store::GSM::SIM sim) = 0;
-            virtual void updateSim()                 = 0;
-            virtual Store::GSM::SIM getSim()         = 0;
-            virtual std::string getNumber()          = 0;
+            virtual ~SimParams()                                     = default;
+            virtual void updateSimParam()                            = 0;
+            virtual void setSelectedSim(Store::GSM::SelectedSIM sim) = 0;
+            virtual Store::GSM::SelectedSIM getSelectedSim()         = 0;
+            virtual Store::GSM::SIM getSimState()                    = 0;
+            virtual std::string getNumber()                          = 0;
         };
         class OperatorsSettings
         {
@@ -144,9 +145,10 @@ namespace app
         void destroyUserInterface() override;
         void returnToPreviousWindow() override;
 
-        void setSim(Store::GSM::SIM sim) override;
-        void updateSim() override;
-        Store::GSM::SIM getSim() override;
+        void updateSimParam() override;
+        void setSelectedSim(Store::GSM::SelectedSIM sim) override;
+        Store::GSM::SelectedSIM getSelectedSim() override;
+        Store::GSM::SIM getSimState() override;
         std::string getNumber() override;
 
         void operatorOnChanged(const std::string &value);
@@ -185,11 +187,13 @@ namespace app
         void attachQuotesWindows();
         void switchToAllDevicesViaBtErrorPrompt(std::shared_ptr<sys::DataMessage> msg, const std::string &errorMsg);
 
+        auto handleSimNotification() -> sys::MessagePointer;
         auto handleAudioStop(AudioStopNotification *notification) -> sys::MessagePointer;
 
         std::shared_ptr<SoundsPlayer> soundsPlayer;
-        Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
-        std::string selectedSimNumber = {};
+        Store::GSM::SelectedSIM selectedSim = Store::GSM::get()->selected;
+        Store::GSM::SIM simState            = Store::GSM::get()->sim;
+        std::string selectedSimNumber       = {};
 
         bool operatorsOn                                               = false;
         bool notificationsWhenLocked                                   = true;

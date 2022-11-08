@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimLockHandler.hpp"
@@ -85,21 +85,21 @@ namespace locks
 
     void SimLockHandler::getSettingsSimSelect(const std::string &settingsSim)
     {
-        auto selectedSim = magic_enum::enum_cast<Store::GSM::SIM>(settingsSim);
+        auto selectedSim = magic_enum::enum_cast<Store::GSM::SelectedSIM>(settingsSim);
 
-        if (selectedSim.has_value() &&
-            (selectedSim.value() == Store::GSM::SIM::SIM1 || selectedSim.value() == Store::GSM::SIM::SIM2)) {
+        if (selectedSim.has_value() && (selectedSim.value() == Store::GSM::SelectedSIM::SIM1 ||
+                                        selectedSim.value() == Store::GSM::SelectedSIM::SIM2)) {
             setSim(static_cast<cellular::api::SimSlot>(selectedSim.value()));
         }
         else {
-            Store::GSM::get()->selected = Store::GSM::SIM::NONE;
+            Store::GSM::get()->selected = Store::GSM::SelectedSIM::NONE;
         }
     }
 
     void SimLockHandler::setSim(cellular::api::SimSlot simSlot)
     {
         if (simReady) {
-            Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(simSlot);
+            Store::GSM::get()->selected = static_cast<Store::GSM::SelectedSIM>(simSlot);
             owner->bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(simSlot);
         }
         else {
@@ -348,8 +348,12 @@ namespace locks
         if (!simUnlockingNeeded_) {
             return sys::msgNotHandled();
         }
-
         simUnlockingNeeded_ = false;
+        return handleSimUnlockRequest();
+    }
+
+    sys::MessagePointer SimLockHandler::handleSimUnlockRequest()
+    {
         switch (simInputTypeAction) {
         case SimInputTypeAction::UnlockWithPin:
             return handleSimPinRequest(lock.getAttemptsLeft());
@@ -396,14 +400,14 @@ namespace locks
 
     sys::MessagePointer SimLockHandler::enableSimPin(LockInput pinInputData)
     {
-        owner->bus.sendUnicast<cellular::msg::request::sim::SetPinLock>(cellular::api::SimLockState::Enabled,
+        owner->bus.sendUnicast<cellular::msg::request::sim::SetPinLock>(cellular::api::SimPinState::Enabled,
                                                                         pinInputData);
         return sys::msgHandled();
     }
 
     sys::MessagePointer SimLockHandler::disableSimPin(LockInput pinInputData)
     {
-        owner->bus.sendUnicast<cellular::msg::request::sim::SetPinLock>(cellular::api::SimLockState::Disabled,
+        owner->bus.sendUnicast<cellular::msg::request::sim::SetPinLock>(cellular::api::SimPinState::Disabled,
                                                                         pinInputData);
         return sys::msgHandled();
     }

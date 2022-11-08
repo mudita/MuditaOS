@@ -86,12 +86,12 @@ namespace cellular::internal
             simCard->handleSimCardSelected();
             return std::make_shared<request::sim::SetActiveSim::Response>(result);
         });
-        owner->connect(typeid(request::sim::GetLockState), [&](sys::Message *) -> sys::MessagePointer {
+        owner->connect(typeid(request::sim::GetPinSettings), [&](sys::Message *) -> sys::MessagePointer {
             if (!simCard->isSimCardInserted()) {
                 owner->bus.sendMulticast<notification::SimNotInserted>();
                 return sys::MessageNone{};
             }
-            return std::make_shared<request::sim::GetLockState::Response>(simCard->handleIsPinLocked());
+            return std::make_shared<request::sim::GetPinSettings::Response>(simCard->handleIsPinNeeded());
         });
         owner->connect(typeid(request::sim::ChangePin), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::ChangePin *>(request);
@@ -116,8 +116,8 @@ namespace cellular::internal
                 owner->bus.sendMulticast<notification::SimNotInserted>();
                 return sys::MessageNone{};
             }
-            return std::make_shared<request::sim::SetPinLock::Response>(simCard->handleSetPinLock(msg->pin, msg->lock),
-                                                                        msg->lock);
+            return std::make_shared<request::sim::SetPinLock::Response>(
+                simCard->handleSetPinLock(msg->pin, msg->pinLock), msg->pinLock);
         });
         owner->connect(typeid(request::sim::PinUnlock), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::PinUnlock *>(request);

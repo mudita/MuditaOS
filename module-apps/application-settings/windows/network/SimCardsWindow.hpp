@@ -4,6 +4,7 @@
 #pragma once
 
 #include <application-settings/windows/BaseSettingsWindow.hpp>
+#include <application-settings/ApplicationSettings.hpp>
 
 namespace app::settingsInterface
 {
@@ -17,6 +18,15 @@ namespace gui
       private:
         auto buildOptionsList() -> std::list<Option> override;
         app::settingsInterface::SimParams *simParams;
+
+        std::list<gui::Option> createListWithNoConnectedSim(const Store::GSM::SelectedSIM sim,
+                                                            const std::string &simStr);
+        std::list<gui::Option> createListWithBlockedSim(const Store::GSM::SelectedSIM sim, const std::string &simStr);
+        std::list<gui::Option> createListWithActiveSim(const Store::GSM::SelectedSIM sim,
+                                                       const std::string &simStr,
+                                                       const std::string &phoneNumber);
+        bool createSwitchSimAction(const Store::GSM::SelectedSIM selectedSim) const;
+        bool createNavBarText(const gui::Item &item);
 
       public:
         SimCardsWindow(app::ApplicationCommon *app, app::settingsInterface::SimParams *simParams);

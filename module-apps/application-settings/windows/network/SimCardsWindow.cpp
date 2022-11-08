@@ -3,10 +3,8 @@
 
 #include "SimCardsWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
 #include <application-settings/data/PINSettingsSimData.hpp>
 #include <application-settings/windows/WindowNames.hpp>
-
 #include <OptionSetting.hpp>
 
 namespace gui
@@ -18,7 +16,7 @@ namespace gui
     void SimCardsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         setTitle(utils::translate("app_settings_network_sim_cards"));
-        simParams->updateSim();
+        simParams->updateSimParam();
         BaseSettingsWindow::onBeforeShow(mode, data);
     }
 
@@ -27,43 +25,98 @@ namespace gui
         std::list<gui::Option> optList;
         std::string simStr;
         auto phoneNumber = simParams->getNumber();
-        auto sim         = simParams->getSim();
-        switch (sim) {
-        case Store::GSM::SIM::SIM1:
+        auto selectedSim = simParams->getSelectedSim();
+        auto simState    = simParams->getSimState();
+
+        switch (selectedSim) {
+        case Store::GSM::SelectedSIM::SIM1:
             simStr = utils::translate("app_settings_network_sim1");
             break;
-        case Store::GSM::SIM::SIM2:
+        case Store::GSM::SelectedSIM::SIM2:
             simStr = utils::translate("app_settings_network_sim2");
             break;
-        case Store::GSM::SIM::NONE:
-        case Store::GSM::SIM::SIM_FAIL:
-        case Store::GSM::SIM::SIM_UNKNOWN:
+        case Store::GSM::SelectedSIM::NONE:
             simStr      = utils::translate("app_settings_network_sim_none");
             phoneNumber = {};
             break;
         }
 
+        switch (simState) {
+        case Store::GSM::SIM::SIM1:
+        case Store::GSM::SIM::SIM2:
+            optList = createListWithActiveSim(selectedSim, simStr, phoneNumber);
+            break;
+        case Store::GSM::SIM::SIM_NEED_PIN:
+        case Store::GSM::SIM::SIM_NEED_PUK:
+        case Store::GSM::SIM::SIM_LOCKED:
+            optList = createListWithBlockedSim(selectedSim, simStr);
+            break;
+        case Store::GSM::SIM::NONE:
+        case Store::GSM::SIM::SIM_FAIL:
+        case Store::GSM::SIM::SIM_UNKNOWN:
+            optList = createListWithNoConnectedSim(selectedSim, simStr);
+            break;
+        }
+
+        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
+
+        return optList;
+    }
+
+    std::list<gui::Option> SimCardsWindow::createListWithNoConnectedSim(const Store::GSM::SelectedSIM sim,
+                                                                        const std::string &simStr)
+    {
+        std::list<gui::Option> optList;
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+            utils::translate("app_settings_network_active_card") + " (" +
+                utils::translate("app_settings_network_not_connected") + ")",
+            [=](gui::Item &item) { return createSwitchSimAction(sim); },
+            [=](gui::Item &item) { return createNavBarText(item); },
+            this,
+            gui::option::SettingRightItem::Text,
+            false,
+            simStr,
+            true));
+
+        return optList;
+    }
+
+    std::list<gui::Option> SimCardsWindow::createListWithBlockedSim(const Store::GSM::SelectedSIM sim,
+                                                                    const std::string &simStr)
+    {
+        std::list<gui::Option> optList;
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_active_card"),
-            [=](gui::Item &item) {
-                if (Store::GSM::SIM::SIM1 == sim) {
-                    simParams->setSim(Store::GSM::SIM::SIM2);
-                }
-                else {
-                    simParams->setSim(Store::GSM::SIM::SIM1);
-                }
+            [=](gui::Item &item) { return createSwitchSimAction(sim); },
+            [=](gui::Item &item) { return createNavBarText(item); },
+            this,
+            gui::option::SettingRightItem::Text,
+            false,
+            simStr,
+            true));
 
-                return true;
-            },
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+            utils::translate("app_settings_network_unblock_card"),
             [=](gui::Item &item) {
-                if (item.focus) {
-                    this->setNavBarText(utils::translate(style::strings::common::Switch), nav_bar::Side::Center);
-                }
-                else {
-                    this->setNavBarText(utils::translate(style::strings::common::select), nav_bar::Side::Center);
-                }
+                application->getSimLockSubject().unblockSim();
                 return true;
             },
+            nullptr,
+            nullptr,
+            gui::option::SettingRightItem::ArrowWhite));
+
+        return optList;
+    }
+
+    std::list<gui::Option> SimCardsWindow::createListWithActiveSim(const Store::GSM::SelectedSIM sim,
+                                                                   const std::string &simStr,
+                                                                   const std::string &phoneNumber)
+    {
+        std::list<gui::Option> optList;
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+            utils::translate("app_settings_network_active_card"),
+            [=](gui::Item &item) { return createSwitchSimAction(sim); },
+            [=](gui::Item &item) { return createNavBarText(item); },
             this,
             gui::option::SettingRightItem::Text,
             false,
@@ -92,8 +145,20 @@ namespace gui
             nullptr,
             gui::option::SettingRightItem::ArrowWhite));
 
-        navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
-
         return optList;
+    }
+
+    bool SimCardsWindow::createSwitchSimAction(const Store::GSM::SelectedSIM selectedSim) const
+    {
+        selectedSim == Store::GSM::SelectedSIM::SIM1 ? simParams->setSelectedSim(Store::GSM::SelectedSIM::SIM2)
+                                                     : simParams->setSelectedSim(Store::GSM::SelectedSIM::SIM1);
+        return true;
+    }
+
+    bool SimCardsWindow::createNavBarText(const gui::Item &item)
+    {
+        item.focus ? this->setNavBarText(utils::translate(style::strings::common::Switch), nav_bar::Side::Center)
+                   : this->setNavBarText(utils::translate(style::strings::common::select), nav_bar::Side::Center);
+        return true;
     }
 } // namespace gui

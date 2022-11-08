@@ -49,9 +49,9 @@ namespace cellular
         bool SimCard::initialized() const
         {
             return (Store::GSM::get()->sim == Store::GSM::SIM::SIM1 &&
-                    Store::GSM::get()->selected == Store::GSM::SIM::SIM1) ||
+                    Store::GSM::get()->selected == Store::GSM::SelectedSIM::SIM1) ||
                    (Store::GSM::get()->sim == Store::GSM::SIM::SIM2 &&
-                    Store::GSM::get()->selected == Store::GSM::SIM::SIM2);
+                    Store::GSM::get()->selected == Store::GSM::SelectedSIM::SIM2);
         }
 
         void SimCard::setChannel(at::BaseChannel *channel)
@@ -61,7 +61,8 @@ namespace cellular
 
         bool SimCard::handleSetActiveSim(api::SimSlot sim)
         {
-            Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(sim);
+            Store::GSM::get()->selected =
+                sim == api::SimSlot::SIM1 ? Store::GSM::SelectedSIM::SIM1 : Store::GSM::SelectedSIM::SIM2;
             bsp::cellular::sim::simSelect();
             bsp::cellular::sim::hotSwapTrigger();
             clearSimInsertedStatus();
@@ -69,9 +70,9 @@ namespace cellular
             return true;
         }
 
-        bool SimCard::handleIsPinLocked() const
+        bool SimCard::handleIsPinNeeded() const
         {
-            return isPinLocked();
+            return isPinNeeded();
         }
 
         bool SimCard::handleChangePin(const api::SimCode &oldPin, const api::SimCode &pin)
@@ -88,10 +89,10 @@ namespace cellular
             return processPinResult(supplyPuk(_puk, _pin));
         }
 
-        bool SimCard::handleSetPinLock(const api::SimCode &pin, api::SimLockState lock)
+        bool SimCard::handleSetPinLock(const api::SimCode &pin, api::SimPinState pinLock)
         {
             const auto _pin = internal::simCodeToString(pin);
-            return processPinResult(setPinLock(_pin, lock == cellular::api::SimLockState::Enabled));
+            return processPinResult(setPinLock(_pin, pinLock == cellular::api::SimPinState::Enabled));
         }
 
         bool SimCard::handlePinUnlock(const api::SimCode &pin)
@@ -131,7 +132,18 @@ namespace cellular
             switch (state) {
             case at::SimState::Ready:
                 if (initSimCard()) {
-                    Store::GSM::get()->sim = Store::GSM::get()->selected;
+                    switch (Store::GSM::get()->selected) {
+                    case Store::GSM::SelectedSIM::SIM1:
+                        Store::GSM::get()->sim = Store::GSM::SIM::SIM1;
+                        break;
+                    case Store::GSM::SelectedSIM::SIM2:
+                        Store::GSM::get()->sim = Store::GSM::SIM::SIM2;
+                        break;
+                    case Store::GSM::SelectedSIM::NONE:
+                        Store::GSM::get()->sim = Store::GSM::SIM::NONE;
+                        break;
+                    }
+
                     if (onSimReady)
                         onSimReady();
                 }
@@ -146,6 +158,7 @@ namespace cellular
             case at::SimState::SimPin:
                 [[fallthrough]];
             case at::SimState::SimPin2: {
+                Store::GSM::get()->sim = Store::GSM::SIM::SIM_NEED_PIN;
                 if (auto pc = getAttemptsCounters(state == at::SimState::SimPin ? sim::Pin::PIN1 : sim::Pin::PIN2);
                     pc) {
                     if (pc.value().PukCounter != 0) {
@@ -161,6 +174,7 @@ namespace cellular
             case at::SimState::SimPuk:
                 [[fallthrough]];
             case at::SimState::SimPuk2: {
+                Store::GSM::get()->sim = Store::GSM::SIM::SIM_NEED_PUK;
                 if (auto pc = getAttemptsCounters(state == at::SimState::SimPuk ? sim::Pin::PIN1 : sim::Pin::PIN2);
                     pc) {
                     if (pc.value().PukCounter != 0) {
@@ -174,7 +188,7 @@ namespace cellular
                 break;
             }
             case at::SimState::Locked:
-                Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+                Store::GSM::get()->sim = Store::GSM::SIM::SIM_LOCKED;
                 if (onSimBlocked)
                     onSimBlocked();
                 break;
@@ -262,7 +276,7 @@ namespace cellular
                                at::factory(at::AT::CLCK) + "\"SC\"," + (lock ? "1" : "0") + ",\"" + pin + "\"");
         }
 
-        bool SimCard::isPinLocked() const
+        bool SimCard::isPinNeeded() const
         {
             auto resp = channel->cmd(at::factory(at::AT::CLCK) + "\"SC\",2\r");
             int val   = 0;

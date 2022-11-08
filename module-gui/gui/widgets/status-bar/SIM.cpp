@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SIM.hpp"
@@ -30,6 +30,12 @@ namespace gui::status_bar
         case GSM::SIM::SIM_FAIL:
             [[fallthrough]];
         case GSM::SIM::NONE:
+            [[fallthrough]];
+        case GSM::SIM::SIM_NEED_PIN:
+            [[fallthrough]];
+        case GSM::SIM::SIM_NEED_PUK:
+            [[fallthrough]];
+        case GSM::SIM::SIM_LOCKED:
             [[fallthrough]];
         case GSM::SIM::SIM_UNKNOWN:
             set(no_sim, style::status_bar::imageTypeSpecifier);

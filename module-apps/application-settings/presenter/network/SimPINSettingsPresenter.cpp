@@ -33,7 +33,7 @@ bool SimPINSettingsPresenter::isPinEnabled() const noexcept
 
 void SimPINSettingsPresenter::requestLockState() const
 {
-    application->bus.sendUnicast<cellular::msg::request::sim::GetLockState>();
+    application->bus.sendUnicast<cellular::msg::request::sim::GetPinSettings>();
 }
 
 void SimPINSettingsPresenter::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)

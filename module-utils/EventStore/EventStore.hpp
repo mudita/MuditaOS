@@ -141,11 +141,20 @@ namespace Store
         {
             SIM1 = static_cast<int>(hal::cellular::SimSlot::SIM1),
             SIM2 = static_cast<int>(hal::cellular::SimSlot::SIM2),
+            SIM_NEED_PIN,
+            SIM_NEED_PUK,
+            SIM_LOCKED,
             SIM_FAIL,
             SIM_UNKNOWN,
             NONE,
-        } sim      = SIM::SIM_UNKNOWN,
-          selected = SIM::SIM1;
+        } sim = SIM::SIM_UNKNOWN;
+
+        enum class SelectedSIM
+        {
+            SIM1 = static_cast<int>(SIM::SIM1),
+            SIM2 = static_cast<int>(SIM::SIM2),
+            NONE,
+        } selected = SelectedSIM::SIM1;
 
         bool simCardInserted();
 

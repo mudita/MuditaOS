@@ -10,6 +10,7 @@
 * Improve refreshing of the display.
 * Fixed music files extension case sensitivity
 * Fixed MTP issues
+* Rebuilt SIM cards window
 
 ### Fixed
 * Fixed incorrect total CPU usage in logs
