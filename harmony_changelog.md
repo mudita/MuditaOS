@@ -7,6 +7,7 @@
 ### Fixed
 
 * Fixed resetting meditation settings with deep press.
+* Fixed back button behavior in Relaxation
 
 ### Added
 #### PowerNap:
