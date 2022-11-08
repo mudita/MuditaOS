@@ -248,6 +248,8 @@ namespace app::manager
         connect(typeid(locks::ResetSimLockState), [&](sys::Message *request) -> sys::MessagePointer {
             return simLockHandler.handleResetSimLockStateRequest();
         });
+        connect(typeid(locks::UnblockSim),
+                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimUnlockRequest(); });
         connect(typeid(cellular::msg::notification::SimNeedPuk), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<cellular::msg::notification::SimNeedPuk *>(request);
             if (phoneLockHandler.isPhoneLocked()) {
@@ -289,7 +291,7 @@ namespace app::manager
                         return simLockHandler.handleSimPinLockStateMessage();
                     }
                     else {
-                        if (data->lock == cellular::api::SimLockState::Enabled) {
+                        if (data->pinLock == cellular::api::SimPinState::Enabled) {
                             return simLockHandler.handleSimPinLockEnableRequest();
                         }
                         else {

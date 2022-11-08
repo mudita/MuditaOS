@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimLockSubject.hpp"
@@ -44,5 +44,10 @@ namespace locks
     void SimLockSubject::verifyInput(LockInput inputData)
     {
         owner->bus.sendUnicast(std::make_shared<UnLockSimInput>(inputData), service::name::appmgr);
+    }
+
+    void SimLockSubject::unblockSim()
+    {
+        owner->bus.sendUnicast(std::make_shared<UnblockSim>(), service::name::appmgr);
     }
 } // namespace locks

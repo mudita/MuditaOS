@@ -84,10 +84,10 @@ namespace cellular::service
          * Request message handlers
          */
         bool handleSetActiveSim(api::SimSlot sim);
-        bool handleIsPinLocked() const;
+        bool handleIsPinNeeded() const;
         bool handleChangePin(const api::SimCode &old_pin, const api::SimCode &pin);
         bool handleUnblockWithPuk(const api::SimCode &puk, const api::SimCode &pin);
-        bool handleSetPinLock(const api::SimCode &pin, api::SimLockState lock);
+        bool handleSetPinLock(const api::SimCode &pin, api::SimPinState pinLock);
         bool handlePinUnlock(const api::SimCode &pin);
 
         /**
@@ -173,6 +173,11 @@ namespace cellular::service
         {
             return isSimSelected;
         }
+
+        /** Read internal SIM state using CPIN AT commands
+         */
+        std::optional<at::SimState> simState() const;
+
         /**
          * Notification events
          */
@@ -229,11 +234,7 @@ namespace cellular::service
         /** Check whether the pin needs to be provided, only for standard pin.
          * \return true if need pin to unlock SIM card functionality
          */
-        bool isPinLocked() const;
-
-        /** Read internal SIM state using CPIN AT commands
-         */
-        std::optional<at::SimState> simState() const;
+        bool isPinNeeded() const;
 
         /** Process sim::Result from PIN lock/unlock operations
          * \param result result from operation (`sendCommand()`)

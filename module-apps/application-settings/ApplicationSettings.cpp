@@ -109,13 +109,14 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
         bus.channels.push_back(sys::BusChannel::BluetoothNotifications);
         bus.channels.push_back(sys::BusChannel::BluetoothModeChanges);
+        bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
         CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
             selectedSimNumber = number;
             LOG_DEBUG("Sim number changed");
         });
-        if ((Store::GSM::SIM::SIM1 == selectedSim || Store::GSM::SIM::SIM2 == selectedSim) &&
-            Store::GSM::get()->sim == selectedSim) {
+        if ((Store::GSM::SIM::SIM1 == simState || Store::GSM::SIM::SIM2 == simState) &&
+            Store::GSM::get()->sim == simState) {
             CellularServiceAPI::RequestForOwnNumber(this);
         }
         bluetoothSettingsModel = std::make_shared<BluetoothSettingsModel>(this);
@@ -153,14 +154,18 @@ namespace app
             return ret;
         }
         connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *) {
-            selectedSim = Store::GSM::get()->selected;
             CellularServiceAPI::RequestForOwnNumber(this);
-            auto currentWindow = getCurrentWindow();
-            if (gui::window::name::sim_cards == currentWindow->getName()) {
-                updateCurrentWindow();
-            }
-            return sys::MessageNone{};
+            return handleSimNotification();
         });
+
+        connect(typeid(cellular::msg::notification::SimBlocked),
+                [&](sys::Message *) { return handleSimNotification(); });
+
+        connect(typeid(cellular::msg::notification::SimNeedPin),
+                [&](sys::Message *) { return handleSimNotification(); });
+
+        connect(typeid(cellular::msg::notification::SimNeedPuk),
+                [&](sys::Message *) { return handleSimNotification(); });
 
         connect(typeid(::sys::bluetooth::BluetoothModeChanged), [&](sys::Message *msg) {
             const auto message   = static_cast<::sys::bluetooth::BluetoothModeChanged *>(msg);
@@ -288,11 +293,10 @@ namespace app
             return sys::MessageNone{};
         });
 
-        connect(typeid(cellular::msg::request::sim::GetLockState::Response), [&](sys::Message *msg) {
-            auto simCardPinLockState = static_cast<cellular::msg::request::sim::GetLockState::Response *>(msg);
-            auto pinSettingsLockStateData =
-                std::make_unique<gui::PINSettingsLockStateData>(simCardPinLockState->locked);
-            updateCurrentWindow(std::move(pinSettingsLockStateData));
+        connect(typeid(cellular::msg::request::sim::GetPinSettings::Response), [&](sys::Message *msg) {
+            auto simCardPinSettings     = static_cast<cellular::msg::request::sim::GetPinSettings::Response *>(msg);
+            auto simCardPinSettingsData = std::make_unique<gui::PINSettingsLockStateData>(simCardPinSettings->locked);
+            updateCurrentWindow(std::move(simCardPinSettingsData));
             return sys::MessageNone{};
         });
 
@@ -596,20 +600,26 @@ namespace app
         ApplicationCommon::returnToPreviousWindow();
     }
 
-    void ApplicationSettings::setSim(Store::GSM::SIM sim)
+    void ApplicationSettings::setSelectedSim(Store::GSM::SelectedSIM sim)
     {
-        auto arg = (sim == Store::GSM::SIM::SIM2) ? cellular::api::SimSlot::SIM2 : cellular::api::SimSlot::SIM1;
+        auto arg = (sim == Store::GSM::SelectedSIM::SIM2) ? cellular::api::SimSlot::SIM2 : cellular::api::SimSlot::SIM1;
         getSimLockSubject().setSim(arg);
     }
 
-    void ApplicationSettings::updateSim()
+    void ApplicationSettings::updateSimParam()
     {
         selectedSim = Store::GSM::get()->selected;
+        simState    = Store::GSM::get()->sim;
     }
 
-    Store::GSM::SIM ApplicationSettings::getSim()
+    Store::GSM::SelectedSIM ApplicationSettings::getSelectedSim()
     {
         return selectedSim;
+    }
+
+    Store::GSM::SIM ApplicationSettings::getSimState()
+    {
+        return simState;
     }
 
     void ApplicationSettings::operatorOnChanged(const std::string &value)
@@ -784,6 +794,15 @@ namespace app
     auto ApplicationSettings::handleAudioStop(AudioStopNotification *notification) -> sys::MessagePointer
     {
         soundsPlayer->stop(notification->token);
+        return sys::MessageNone{};
+    }
+
+    auto ApplicationSettings::handleSimNotification() -> sys::MessagePointer
+    {
+        auto currentWindow = getCurrentWindow();
+        if (gui::window::name::sim_cards == currentWindow->getName()) {
+            updateCurrentWindow();
+        }
         return sys::MessageNone{};
     }
 } /* namespace app */

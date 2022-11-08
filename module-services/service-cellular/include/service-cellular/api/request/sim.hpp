@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,9 +23,9 @@ namespace cellular::msg::request::sim
         };
     };
 
-    /** Get current state of PIN lock
+    /** Get current state of settings PIN lock
      */
-    struct GetLockState : public msg::Request
+    struct GetPinSettings : public msg::Request
     {
         struct Response : public msg::Response
         {
@@ -86,16 +86,16 @@ namespace cellular::msg::request::sim
      */
     struct SetPinLock : msg::Request
     {
-        explicit SetPinLock(api::SimLockState lock, const api::SimCode &pin) : lock(lock), pin(pin)
+        explicit SetPinLock(api::SimPinState pinLock, const api::SimCode &pin) : pinLock(pinLock), pin(pin)
         {}
-        const api::SimLockState lock;
+        const api::SimPinState pinLock;
         const api::SimCode pin;
 
         struct Response : msg::Response
         {
-            explicit Response(bool retCode, api::SimLockState lock) : msg::Response(retCode), lock(lock)
+            explicit Response(bool retCode, api::SimPinState pinLock) : msg::Response(retCode), pinLock(pinLock)
             {}
-            const api::SimLockState lock;
+            const api::SimPinState pinLock;
         };
     };
 } // namespace cellular::msg::request::sim

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -70,6 +70,7 @@ namespace locks
         sys::MessagePointer handleSimReadyMessage();
         sys::MessagePointer handleSimNotInsertedMessage();
         sys::MessagePointer handleSimNotRespondingMessage();
+        sys::MessagePointer handleSimUnlockRequest();
 
         void getSettingsSimSelect(const std::string &settingsSim);
         void setSim(cellular::api::SimSlot simSlot);
