@@ -8,6 +8,7 @@
 
 * Fixed resetting meditation settings with deep press.
 * Fixed bedside lamp in alarm application
+* Fixed back button behavior in Relaxation
 
 ### Added
 #### PowerNap:
