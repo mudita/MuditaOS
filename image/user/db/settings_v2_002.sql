@@ -45,7 +45,8 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('gs_current_timezone_rules', ''),
     ('\ServiceTime\\gs_automatic_date_and_time_is_on', '1'),
     ('\ServiceEink\\display_inverted_mode', '0'),
-    ('display_lock_screen_deep_refresh_rate', '30');
+    ('display_lock_screen_deep_refresh_rate', '30'),
+    ('cl_volte_enabled', '0');
 
 
 
