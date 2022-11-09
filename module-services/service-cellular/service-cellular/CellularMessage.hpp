@@ -5,7 +5,6 @@
 
 #include "SignalStrength.hpp"
 #include <service-cellular/State.hpp>
-#include <service-cellular/VolteState.hpp>
 
 #include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
@@ -1056,28 +1055,4 @@ namespace cellular
         const bool active = false;
     };
 
-    class GetVolteStateRequest : public sys::DataMessage
-    {};
-
-    struct GetVolteStateResponse : public sys::ResponseMessage
-    {
-        VolteState volteState;
-        explicit GetVolteStateResponse(VolteState volteState) : volteState(volteState)
-        {}
-    };
-
-    struct VolteStateNotification : public sys::DataMessage
-    {
-        VolteState volteState;
-        explicit VolteStateNotification(VolteState volteState)
-            : sys::DataMessage(MessageType::MessageTypeUninitialized), volteState(volteState)
-        {}
-    };
-
-    struct SwitchVolteOnOffRequest : public sys::DataMessage
-    {
-        bool enable = false;
-        SwitchVolteOnOffRequest(bool enable) : DataMessage(MessageType::MessageTypeUninitialized), enable(enable)
-        {}
-    };
 } // namespace cellular
