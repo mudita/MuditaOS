@@ -251,6 +251,12 @@ sys::ReturnCodes ServiceCellular::InitHandler()
             settings::Cellular::currentUID, std::to_string(static_cast<int>(uid)), settings::SettingsScope::Global);
     };
 
+    const auto rawVolteSetting = settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global);
+    if (rawVolteSetting.empty()) {
+        LOG_ERROR("VoLTE setting missing, setting to default disabled");
+        settings->setValue(settings::Cellular::volteEnabled, "0", settings::SettingsScope::Global);
+    }
+
     cpuSentinel = std::make_shared<sys::CpuSentinel>(serviceName, this);
 
     ongoingCall =
@@ -595,6 +601,27 @@ void ServiceCellular::registerMessageHandlers()
         return std::make_shared<cellular::IsCallActiveResponse>(ongoingCall && ongoingCall->active());
     });
 
+    connect(typeid(cellular::GetVolteStateRequest), [&](sys::Message *request) -> sys::MessagePointer {
+        return std::make_shared<cellular::GetVolteStateResponse>(priv->volteHandler->getVolteState());
+    });
+
+    connect(typeid(cellular::SwitchVolteOnOffRequest), [&](sys::Message *request) -> sys::MessagePointer {
+        auto message = static_cast<cellular::SwitchVolteOnOffRequest *>(request);
+        auto channel = cmux->get(CellularMux::Channel::Commands);
+        if (channel == nullptr) {
+            LOG_ERROR("Failed to get channel, skipping VoLTE request!");
+            return sys::MessageNone{};
+        }
+        settings->setValue(
+            settings::Cellular::volteEnabled, message->enable ? "1" : "0", settings::SettingsScope::Global);
+        if (not priv->volteHandler->switchVolte(*channel, message->enable)) {
+            auto notification = std::make_shared<cellular::VolteStateNotification>(priv->volteHandler->getVolteState());
+            bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
+            priv->modemResetHandler->performHardReset();
+        }
+        return sys::MessageNone{};
+    });
+
     handle_CellularGetChannelMessage();
 }
 
@@ -870,12 +897,11 @@ bool ServiceCellular::handle_cellular_priv_init()
     priv->simContacts->setChannel(channel);
     priv->imeiGetHandler->setChannel(channel);
 
-#if ENABLE_VOLTE == 1
-    constexpr bool enableVolte = true;
-#else
-    constexpr bool enableVolte = false;
-#endif
     bool needReset = false;
+
+    auto enableVolte =
+        settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global) == "1" ? true : false;
+
     try {
         needReset = !priv->tetheringHandler->configure() || !priv->volteHandler->switchVolte(*channel, enableVolte);
     }

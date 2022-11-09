@@ -37,7 +37,10 @@ namespace cellular::internal
           networkTime{std::make_unique<NetworkTime>()}, simContacts{std::make_unique<SimContacts>()},
           imeiGetHandler{std::make_unique<service::ImeiGetHandler>()},
           tetheringHandler{std::make_unique<TetheringHandler>()},
-          modemResetHandler{std::make_unique<ModemResetHandler>()}, csqHandler{std::make_unique<CSQHandler>()}
+          volteHandler{std::make_unique<VolteHandler<DLCChannel, ModemResponseParserImpl>>()},
+          modemResetHandler{std::make_unique<ModemResetHandler>()}, csqHandler{
+                                                                        std::make_unique<CSQHandler>(),
+                                                                    }
     {
         initSimCard();
         initSMSSendHandler();
