@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <service-cellular/VolteState.hpp>
 #include <module-cellular/at/ATFactory.hpp>
 #include <module-cellular/at/response.hpp>
 #include <module-utils/utility/Utils.hpp>
@@ -36,7 +35,7 @@ namespace cellular::service
     template <typename CmuxChannel, typename ModemResponseParser>
     struct VolteHandler : private NonCopyable
     {
-        bool switchVolte(CmuxChannel &channel, bool enable)
+        bool switchVolte(CmuxChannel &channel, bool enable) const
         {
             ModemResponseParser const parser;
 
@@ -78,18 +77,9 @@ namespace cellular::service
                     throw std::runtime_error("[VoLTE] failed to " + std::string(enable ? "enable" : "disable") +
                                              " IMS");
                 }
-                volteState = enable ? cellular::VolteState::SwitchingToOn : cellular::VolteState::SwitchingToOff;
-            }
-            else {
-                volteState = enable ? cellular::VolteState::On : cellular::VolteState::Off;
             }
 
             return alreadyConfigured;
-        }
-
-        auto getVolteState() -> cellular::VolteState
-        {
-            return volteState;
         }
 
       private:
@@ -97,6 +87,5 @@ namespace cellular::service
         {
             return std::to_string(magic_enum::enum_integer(imsState));
         }
-        cellular::VolteState volteState = cellular::VolteState::Undefined;
     };
 } // namespace cellular::service
