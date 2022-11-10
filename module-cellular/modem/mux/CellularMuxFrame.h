@@ -134,8 +134,17 @@ class CellularMuxFrame
             else { // long length
                 Length = static_cast<uint16_t>(serData[3] >> 1) + (static_cast<uint16_t>(serData[3]) << 7);
             }
-            if (serData[3] == 0xFF) // ugly hack for Quectel misimplementation of the standard
-                Length = myLen - 6;
+            if (serData[3] == 0xFF) { // ugly hack for Quectel misimplementation of the standard
+                if (myLen < 6) {
+                    LOG_ERROR("The size of the hacked frame is less than 6 bytes. Dropping...");
+                    Address     = 0;
+                    Control     = 0;
+                    frameStatus = EmptyFrame;
+                    return;
+                }
+                else
+                    Length = myLen - 6;
+            }
 
             data.clear();
             data.insert(data.begin(),
