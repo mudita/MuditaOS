@@ -3,7 +3,6 @@
 
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
 #include "StateController.hpp"
-#include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
 
 #include <windows/BellHomeScreenWindow.hpp>
@@ -12,6 +11,7 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <common/models/TimeModel.hpp>
+#include <common/models/BatteryModel.hpp>
 #include <common/widgets/ProgressTimerWithSnoozeTimer.hpp>
 #include <Timers/SystemTimer.hpp>
 #include <Timers/TimerFactory.hpp>

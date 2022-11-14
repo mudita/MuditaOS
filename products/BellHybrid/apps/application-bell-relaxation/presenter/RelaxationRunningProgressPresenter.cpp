@@ -1,33 +1,33 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "RelaxationProgressPresenter.hpp"
+#include "RelaxationRunningProgressPresenter.hpp"
 #include "data/RelaxationCommon.hpp"
 #include "widgets/RelaxationPlayer.hpp"
-#include <ApplicationBellRelaxation.hpp>
-#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
-#include <common/models/TimeModel.hpp>
-#include <service-db/Settings.hpp>
-#include <Timers/TimerFactory.hpp>
-#include <Utils.hpp>
 
+#include <common/models/TimeModel.hpp>
 #include <gsl/assert>
 
 namespace app::relaxation
 {
-    RelaxationProgressPresenter::RelaxationProgressPresenter(settings::Settings *settings,
-                                                             AbstractRelaxationPlayer &player,
-                                                             std::unique_ptr<AbstractTimeModel> timeModel)
+    RelaxationRunningProgressPresenter::RelaxationRunningProgressPresenter(settings::Settings *settings,
+                                                                           AbstractRelaxationPlayer &player,
+                                                                           std::unique_ptr<AbstractTimeModel> timeModel)
         : settings{settings}, player{player}, timeModel{std::move(timeModel)}
-    {}
-
-    void RelaxationProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
     {
-        timer = std::move(_timer);
-        timer->registerOnFinishedCallback([this]() { onFinished(); });
+        timerFinished = false;
     }
 
-    void RelaxationProgressPresenter::activate(const db::multimedia_files::MultimediaFilesRecord &song)
+    void RelaxationRunningProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
+    {
+        timer = std::move(_timer);
+        timer->registerOnFinishedCallback([this]() {
+            timerFinished = true;
+            onFinished();
+        });
+    }
+
+    void RelaxationRunningProgressPresenter::activate(const db::multimedia_files::MultimediaFilesRecord &song)
     {
         Expects(timer != nullptr);
         AbstractRelaxationPlayer::PlaybackMode mode;
@@ -47,12 +47,14 @@ namespace app::relaxation
         };
         player.start(song.fileInfo.path, mode, std::move(onStartCallback));
     }
-    void RelaxationProgressPresenter::stop()
+
+    void RelaxationRunningProgressPresenter::stop()
     {
         onFinished();
         timer->stop();
     }
-    void RelaxationProgressPresenter::onFinished()
+
+    void RelaxationRunningProgressPresenter::onFinished()
     {
         auto onStopCallback = [this](audio::RetCode retCode) {
             if (retCode == audio::RetCode::Success) {
@@ -61,7 +63,8 @@ namespace app::relaxation
         };
         player.stop(std::move(onStopCallback));
     }
-    void RelaxationProgressPresenter::pause()
+
+    void RelaxationRunningProgressPresenter::pause()
     {
         if (not timer->isStopped()) {
             auto onPauseCallback = [this](audio::RetCode retCode) {
@@ -73,27 +76,42 @@ namespace app::relaxation
             player.pause(std::move(onPauseCallback));
         }
     }
-    void RelaxationProgressPresenter::resume()
+
+    void RelaxationRunningProgressPresenter::resume()
     {
         if (timer->isStopped()) {
             auto onResumeCallback = [this](audio::RetCode retCode) {
                 if (retCode == audio::RetCode::Success) {
                     timer->start();
+                    getView()->resume();
                 }
             };
             player.resume(std::move(onResumeCallback));
         }
     }
-    void RelaxationProgressPresenter::handleUpdateTimeEvent()
+
+    void RelaxationRunningProgressPresenter::handleUpdateTimeEvent()
     {
         getView()->setTime(timeModel->getCurrentTime());
     }
-    bool RelaxationProgressPresenter::isPaused()
+
+    bool RelaxationRunningProgressPresenter::isPaused()
     {
         return player.isPaused();
     }
-    void RelaxationProgressPresenter::onBeforeShow()
+
+    void RelaxationRunningProgressPresenter::onBeforeShow()
     {
         getView()->setTimeFormat(timeModel->getTimeFormat());
+    }
+
+    bool RelaxationRunningProgressPresenter::isTimerStopped()
+    {
+        return timer->isStopped();
+    }
+
+    bool RelaxationRunningProgressPresenter::isTimerFinished()
+    {
+        return timerFinished;
     }
 } // namespace app::relaxation

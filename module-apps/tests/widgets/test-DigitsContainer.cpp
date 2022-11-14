@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <apps-common/widgets/TimeFixedWidget.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
-#include <products/BellHybrid/apps/application-bell-background-sounds/data/RelaxationStyle.hpp>
+#include <products/BellHybrid/apps/application-bell-relaxation/data/RelaxationStyle.hpp>
 #include <gui/core/FontManager.hpp>
 #include <mock/InitializedFontManager.hpp>
 

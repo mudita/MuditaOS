@@ -15,7 +15,7 @@ namespace app
     class ApplicationCommon;
 }
 
-namespace app::home_screen
+namespace app
 {
     class AbstractBatteryModel
     {
@@ -34,4 +34,4 @@ namespace app::home_screen
       private:
         mutable settings::Settings settings;
     };
-} // namespace app::home_screen
+} // namespace app

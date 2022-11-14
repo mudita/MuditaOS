@@ -10,7 +10,6 @@ target_sources(application-bell-main
         windows/BellMainMenuWindow.cpp
         windows/BellBatteryStatusWindow.cpp
 
-        models/BatteryModel.cpp
         models/TemperatureModel.cpp
 
         presenters/HomeScreenPresenter.cpp
@@ -21,7 +20,6 @@ target_sources(application-bell-main
         windows/BellMainMenuWindow.hpp
         windows/BellBatteryStatusWindow.hpp
 
-        models/BatteryModel.cpp
         models/TemperatureModel.hpp
 
         presenters/StateController.hpp

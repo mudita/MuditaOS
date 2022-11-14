@@ -1,13 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BatteryModel.hpp"
+#include "models/BatteryModel.hpp"
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <db/SystemSettings.hpp>
 
-namespace app::home_screen
+namespace app
 {
     BatteryModel::BatteryModel(app::ApplicationCommon *app)
     {
@@ -18,4 +18,4 @@ namespace app::home_screen
     {
         return Store::Battery::get();
     }
-} // namespace app::home_screen
+} // namespace app

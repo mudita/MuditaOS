@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
-#include "models/BatteryModel.hpp"
 #include "models/TemperatureModel.hpp"
 
 #include "windows/BellBatteryShutdownWindow.hpp"
@@ -14,6 +13,7 @@
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/models/TimeModel.hpp>
+#include <common/models/BatteryModel.hpp>
 #include <common/models/LayoutModel.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
@@ -77,7 +77,7 @@ namespace app
         }
 
         timeModel           = std::make_unique<app::TimeModel>();
-        batteryModel        = std::make_unique<app::home_screen::BatteryModel>(this);
+        batteryModel        = std::make_unique<app::BatteryModel>(this);
         temperatureModel    = std::make_unique<app::home_screen::TemperatureModel>(this);
         homeScreenPresenter = std::make_shared<app::home_screen::HomeScreenPresenter>(
             this, *alarmModel, *batteryModel, *temperatureModel, *timeModel);

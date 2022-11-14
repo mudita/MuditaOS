@@ -2,9 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationVolumeWindow.hpp"
-#include <ApplicationBellRelaxation.hpp>
-#include <apps-common/widgets/BellBaseLayout.hpp>
 #include <data/RelaxationStyle.hpp>
+#include <ApplicationBellRelaxation.hpp>
+
+#include <apps-common/widgets/BellBaseLayout.hpp>
 #include <popups/data/PopupData.hpp>
 
 namespace gui

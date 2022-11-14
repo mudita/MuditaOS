@@ -5,13 +5,18 @@
 
 #include <Application.hpp>
 #include <common/models/AbstractAudioModel.hpp>
+#include <common/models/BatteryModel.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 namespace gui::window::name
 {
-    inline constexpr auto relaxationPaused      = "RelaxationPausedWindow";
-    inline constexpr auto relaxationProgress    = "RelaxationProgressWindow";
-    inline constexpr auto relaxationTimerSelect = "RelaxationTimerSelectWindow";
+    inline constexpr auto relaxationPaused          = "RelaxationPausedWindow";
+    inline constexpr auto relaxationRunningProgress = "RelaxationRunningProgressWindow";
+    inline constexpr auto relaxationRunningLoop     = "RelaxationRunningLoopWindow";
+    inline constexpr auto relaxationTimerSelect     = "RelaxationTimerSelectWindow";
+    inline constexpr auto relaxationEnded           = "RelaxationEndedWindow";
+    inline constexpr auto relaxationLowBattery      = "RelaxationLowBatteryWindow";
+
 } // namespace gui::window::name
 namespace app
 {
@@ -25,6 +30,7 @@ namespace app
     {
       private:
         std::unique_ptr<AbstractAudioModel> audioModel;
+        std::unique_ptr<AbstractBatteryModel> batteryModel;
         std::unique_ptr<relaxation::RelaxationPlayer> player;
 
         void onStop() override;
