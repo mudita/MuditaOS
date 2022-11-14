@@ -52,7 +52,7 @@ target_link_libraries(application-bell-main
         bell::evtmgr
         bell::app-alarm
         bell::app-onboarding
-        bell::app-background-sounds
+        bell::app-relaxation
         bell::app-bedtime
         bell::app-meditation-timer
         bell::app-settings

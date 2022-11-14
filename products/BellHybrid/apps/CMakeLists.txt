@@ -24,7 +24,7 @@ target_link_libraries(app
 
 add_subdirectory(application-bell-main)
 add_subdirectory(application-bell-onboarding)
-add_subdirectory(application-bell-background-sounds)
+add_subdirectory(application-bell-relaxation)
 add_subdirectory(application-bell-alarm)
 add_subdirectory(application-bell-bedtime)
 add_subdirectory(application-bell-meditation-timer)
