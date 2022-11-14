@@ -2,24 +2,71 @@
 
 ## Unreleased
 
-### Changed / Improved
-
-### Fixed
-
-* Fixed resetting meditation settings with deep press.
-* Fixed bedside lamp in alarm application
-* Fixed back button behavior in Relaxation
-
 ### Added
+
 #### Home Screen:
 * Font size increased
 
-#### PowerNap:
-* New circular progress bar 
-* Ringing bell image at the end of the Power Nap
-
 #### General:
 * Bedside lamp mode
+
+#### UI/UX:
+* Improve refreshing of the display.
+
+### Fixed
+
+## [1.7.0 2022-11-14]
+
+### Added
+
+#### Home Screen:
+* Battery status icon.
+
+#### Meditation:
+* Option to see Meditation statistics from the last 7, 30, and 365 days. 
+* Preview a countdown before the Meditation starts.
+* New meditation progress layout.
+* Additional start delay interval - up to 90s.
+
+#### PowerNap:
+* New circular progress bar
+* Ringing bell image at the end of the Power Nap
+
+#### Settings:
+* Option to set date.
+
+### Fixed
+
+#### Mudita Center:
+* Fixed problem with errors while connecting the device to Mudita Center.
+
+#### Snooze:
+* Fixed the problem with the alarm light flashing during snooze time.
+
+#### Bedtime reminder:
+* Fixed an issue with not pausing music notifications at bedtime.
+
+#### Alarm:
+* Fixed problem with wrong alarm status message when setting alarm from the menu.
+* Fixed the spelling of the titles of two soundtracks in the alarms application.
+* Fixed the issue with the welcome message not being displayed when the alarm is turned off.
+
+#### Meditation:
+* Fixed view of diacritic signs.
+* Fixed resetting meditation settings with deep press.
+* Fixed an issue with saving meditation settings before going through the entire setup process.
+
+#### Relaxation:
+* Fixed the navigation of the back button during relaxation.
+
+#### General:
+* Fixed inconsistencies in welcome messages.
+
+#### UX/UI:
+* Updated screens according to design.
+
+#### Translations:
+* Fixed gaps in translations.
 
 ## [1.6.0 2022-06-14]
 
@@ -33,7 +80,6 @@
 
 #### UI/UX:
 * UI update (Home Screen settings).
-* Improve refreshing of the display.
 
 #### Translations:
 * Completed missing translations.
