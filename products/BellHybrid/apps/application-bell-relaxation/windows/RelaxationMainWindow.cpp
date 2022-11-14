@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationMainWindow.hpp"
-#include "data/RelaxationAudioData.hpp"
-#include <application-bell-relaxation/ApplicationBellRelaxation.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
+#include <data/RelaxationAudioData.hpp>
+#include <ApplicationBellRelaxation.hpp>
+
 #include <common/options/OptionBellMenu.hpp>
 #include <i18n/i18n.hpp>
 
@@ -19,6 +19,7 @@ namespace gui
         buildInterface();
         setListTitle(utils::translate("app_bellmain_relaxation"));
     }
+
     void RelaxationMainWindow::setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> sounds)
     {
         std::list<gui::Option> menuOptionList;
@@ -38,6 +39,7 @@ namespace gui
 
         addOptions(std::move(menuOptionList));
     }
+
     void RelaxationMainWindow::buildInterface()
     {
         BellOptionWindow::buildInterface();

@@ -47,9 +47,9 @@ namespace app
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
         bool setHomeScreenLayout(std::string layoutName);
 
-        std::unique_ptr<home_screen::AbstractBatteryModel> batteryModel;
-        std::unique_ptr<home_screen::AbstractTemperatureModel> temperatureModel;
         std::unique_ptr<AbstractTimeModel> timeModel;
+        std::unique_ptr<AbstractBatteryModel> batteryModel;
+        std::unique_ptr<home_screen::AbstractTemperatureModel> temperatureModel;
         std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter;
     };
 

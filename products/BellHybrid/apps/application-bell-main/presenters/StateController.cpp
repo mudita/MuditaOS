@@ -10,7 +10,7 @@
 
 #include <keymap/KeyMap.hpp>
 
-#include <models/BatteryModel.hpp>
+#include <common/models/BatteryModel.hpp>
 
 #include <boost/sml.hpp>
 #include <time/time_conversion.hpp>

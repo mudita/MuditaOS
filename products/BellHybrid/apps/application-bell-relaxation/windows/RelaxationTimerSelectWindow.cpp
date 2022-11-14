@@ -2,36 +2,49 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationTimerSelectWindow.hpp"
-#include <application-bell-relaxation/ApplicationBellRelaxation.hpp>
-#include <apps-common/widgets/BellBaseLayout.hpp>
 #include <data/RelaxationStyle.hpp>
-#include <gui/input/InputEvent.hpp>
+#include <ApplicationBellRelaxation.hpp>
+
+#include <apps-common/widgets/BellBaseLayout.hpp>
 #include <common/LanguageUtils.hpp>
 #include <i18n/i18n.hpp>
-#include <SideListView.hpp>
 #include <Utils.hpp>
+
 namespace
 {
     using minutes = std::chrono::minutes;
-    constexpr minutes offValue{minutes::zero()};
+    using namespace std::chrono_literals;
+    constexpr minutes onceValue{minutes::zero()};
+    constexpr minutes loopValue{8760h};
 
-    const std::string getOffValueText()
+    const std::string getOnceValueText()
     {
-        return utils::translate("app_settings_toggle_off");
+        return utils::translate("app_bell_relaxation_once");
+    }
+
+    const std::string getLoopValueText()
+    {
+        return utils::translate("app_bell_relaxation_loop");
     }
 
     UTF8 timerValueToUTF8(minutes value)
     {
-        if (value == offValue) {
-            return getOffValueText();
+        if (value == onceValue) {
+            return getOnceValueText();
+        }
+        if (value == loopValue) {
+            return getLoopValueText();
         }
         return utils::to_string(value.count());
     }
 
     minutes UTF8ToTimerValue(const UTF8 &str)
     {
-        if (str == getOffValueText()) {
-            return offValue;
+        if (str == getOnceValueText()) {
+            return onceValue;
+        }
+        if (str == getLoopValueText()) {
+            return loopValue;
         }
         return minutes(utils::getNumericValue<int>(str));
     }
@@ -111,17 +124,29 @@ namespace gui
         bottomDescription->setEdges(RectangleEdge::All);
         bottomDescription->activeItem = false;
         bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        bottomDescription->setText(utils::translate("common_minutes_lower"));
+        bottomDescription->setVisible(true);
         body->lastBox->addWidget(bottomDescription);
         updateBottomDescription();
     }
+
     void RelaxationTimerSelectWindow::updateBottomDescription()
     {
         const auto currentVal = spinner->value();
         bottomDescription->setText(utils::language::getCorrectMinutesNumeralForm(UTF8ToTimerValue(currentVal).count()));
 
-        const bool isDescriptionVisible = UTF8ToTimerValue(currentVal) != offValue;
-        bottomDescription->setVisible(isDescriptionVisible);
+        const auto description = UTF8ToTimerValue(currentVal);
+
+        switch (description.count()) {
+        case onceValue.count():
+            bottomDescription->setText(utils::translate("app_bell_relaxation_once_description"));
+            break;
+        case loopValue.count():
+            bottomDescription->setText(utils::translate("app_bell_relaxation_loop_description"));
+            break;
+        default:
+            bottomDescription->setText(utils::translate("common_minutes_lower"));
+            break;
+        }
     }
 
     void RelaxationTimerSelectWindow::registerCallbacks()
@@ -163,7 +188,12 @@ namespace gui
 
             auto audioSwitchData = std::make_unique<RelaxationSwitchData>(std::move(audioContext));
             audioSwitchData->ignoreCurrentWindowOnStack = true;
-            application->switchWindow(gui::window::name::relaxationProgress, std::move(audioSwitchData));
+            if (currentValue == loopValue) {
+                application->switchWindow(gui::window::name::relaxationRunningLoop, std::move(audioSwitchData));
+            }
+            else {
+                application->switchWindow(gui::window::name::relaxationRunningProgress, std::move(audioSwitchData));
+            }
 
             return true;
         }

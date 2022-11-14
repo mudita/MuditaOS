@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationMainWindowPresenter.hpp"
+
 #include <apps-common/models/SongsRepository.hpp>
-#include <purefs/filesystem_paths.hpp>
 
 namespace
 {
@@ -17,6 +17,7 @@ namespace app::relaxation
         std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository)
         : soundsRepository{std::move(soundsRepository)}
     {}
+
     void RelaxationMainWindowPresenter::loadAudioRecords()
     {
         soundsRepository->getMusicFilesList(

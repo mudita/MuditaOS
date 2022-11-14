@@ -22,6 +22,10 @@
 #### Home Screen:
 * Placement of battery and time format indicators.
 
+#### Relaxation:
+* New circular progress bar
+* Add loop mode
+
 ### Fixed
 
 #### Home Screen:

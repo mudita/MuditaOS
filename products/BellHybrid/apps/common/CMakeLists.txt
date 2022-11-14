@@ -17,6 +17,7 @@ target_sources(application-bell-common
         src/AudioModel.cpp
         src/LanguageUtils.cpp
         src/TimeModel.cpp
+        src/BatteryModel.cpp
         src/SoundsRepository.cpp
         src/BellListItemProvider.cpp
         src/windows/BellFactoryReset.cpp
@@ -81,6 +82,7 @@ target_sources(application-bell-common
         include/common/models/AlarmModel.hpp
         include/common/models/SettingsModel.hpp
         include/common/models/BedtimeModel.hpp
+        include/common/models/BatteryModel.hpp
         include/common/models/TimeModel.hpp
         include/common/models/AudioModel.hpp
         include/common/models/FrontlightModel.hpp

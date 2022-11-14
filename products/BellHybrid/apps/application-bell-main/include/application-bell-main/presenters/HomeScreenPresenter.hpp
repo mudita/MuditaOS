@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,6 +21,7 @@
 namespace app
 {
     class AbstractTimeModel;
+    class AbstractBatteryModel;
     class ApplicationCommon;
     class TemperatureModel;
     class ProgressTimerWithSnoozeTimer;
@@ -40,7 +41,6 @@ namespace db
 namespace app::home_screen
 {
     class AbstractController;
-    class AbstractBatteryModel;
     class AbstractTemperatureModel;
 
     class AbstractView
