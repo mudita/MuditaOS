@@ -7,7 +7,7 @@
 // applications
 #include <application-bell-alarm/ApplicationBellAlarm.hpp>
 #include <application-bell-onboarding/ApplicationBellOnBoarding.hpp>
-#include <application-bell-background-sounds/ApplicationBellBackgroundSounds.hpp>
+#include <application-bell-relaxation/ApplicationBellRelaxation.hpp>
 #include <application-bell-bedtime/ApplicationBellBedtime.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-meditation-timer/MeditationTimer.hpp>
@@ -134,7 +134,7 @@ int main()
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellOnBoarding>(app::applicationBellOnBoardingName));
             applications.push_back(
-                app::CreateLauncher<app::ApplicationBellBackgroundSounds>(app::applicationBellBackgroundSoundsName));
+                app::CreateLauncher<app::ApplicationBellRelaxation>(app::applicationBellRelaxationName));
             applications.push_back(app::CreateLauncher<app::MeditationTimer>(app::MeditationTimer::defaultName));
             // start application manager
             return sysmgr->RunSystemService(

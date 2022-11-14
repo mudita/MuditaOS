@@ -42,7 +42,7 @@ target_link_libraries(BellHybrid
         appmgr
         bell::app-alarm
         bell::app-onboarding
-        bell::app-background-sounds
+        bell::app-relaxation
         bell::app-bedtime
         bell::app-common
         bell::app-main
