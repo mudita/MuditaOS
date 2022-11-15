@@ -18,6 +18,8 @@ namespace gui
         auto buildOptionsList() -> std::list<Option> override;
         app::settingsInterface::OperatorsSettings *operatorsSettings;
 
+        OptionWindowDestroyer rai_destroyer = OptionWindowDestroyer(*this);
+
       public:
         NetworkWindow(app::ApplicationCommon *app, app::settingsInterface::OperatorsSettings *operatorsSettings);
 
