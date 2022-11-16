@@ -37,9 +37,7 @@ namespace gui
         };
 
         currentState = requestedState;
-        // placed here instead of a narrower scope because magic_enum can't retrieve the enum element's name inside a
-        // switch()
-        std::string_view stateName = magic_enum::enum_name(currentState);
+
         switch (currentState) {
         case State::On:
             setRectangleStyle();
@@ -52,7 +50,8 @@ namespace gui
             setText(transitingText);
             break;
         default:
-            LOG_ERROR("button state '%s' not implemented - defaulting to OFF", stateName.data());
+            LOG_ERROR("button state '%s' not implemented - defaulting to OFF",
+                      magic_enum::enum_name(currentState).data());
             [[fallthrough]];
         case State::Off:
             setRectangleStyle();
