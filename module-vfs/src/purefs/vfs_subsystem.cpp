@@ -42,61 +42,6 @@ namespace purefs::subsystem
 
     namespace
     {
-        int read_file_to_cpp_string(std::shared_ptr<fs::filesystem> vfs, std::string_view file, std::string &str)
-        {
-            int fd = vfs->open(file, O_RDONLY, 0664);
-            if (fd < 0) {
-                return fd;
-            }
-            size_t rd_pos  = 0;
-            size_t to_read = str.size();
-            do {
-                int err = vfs->read(fd, &str[rd_pos], to_read);
-                if (err < 0) {
-                    vfs->close(fd);
-                    return err;
-                }
-                else {
-                    to_read -= err;
-                    rd_pos += err;
-                }
-            } while (to_read > 0);
-            return vfs->close(fd);
-        }
-
-        std::string parse_boot_json_directory(std::string_view file)
-        {
-            using namespace std::literals;
-            auto vfsn = g_fs_core.lock();
-            if (!vfsn) {
-                LOG_ERROR("Unable to lock vfs. Fallback to current dir");
-                return "current"s;
-            }
-            struct stat stbuf;
-            int err = vfsn->stat(file, stbuf);
-            if (err) {
-                LOG_ERROR("Unable to lock vfs. Fallback to current dir");
-                return "current"s;
-            }
-            if (stbuf.st_size > boot_size_limit) {
-                LOG_ERROR("Boot file to long. Fallback to current dir");
-                return "current"s;
-            }
-            std::string json_str(stbuf.st_size, ' ');
-            std::string error;
-            err = read_file_to_cpp_string(vfsn, file, json_str);
-            if (err) {
-                LOG_ERROR("Unable to read boot file (err: %i). Fallback to current dir", err);
-                return "current"s;
-            }
-            auto json = json11::Json::parse(json_str, error);
-            if (!error.empty()) {
-                LOG_ERROR("Unable to parse json boot file (err: %s). Fallback to current dir", error.c_str());
-                return "current"s;
-            }
-            return json[json::main][json::os_type].string_value();
-        }
-
         int read_mbr_lfs_erase_size(std::shared_ptr<blkdev::disk_manager> disk_mngr,
                                     std::string_view dev_name,
                                     int part_no)
@@ -185,10 +130,6 @@ namespace purefs::subsystem
         }
         const auto &boot_part = parts[boot_part_index];
         const auto &user_part = parts[user_part_index];
-        if (!boot_part.bootable) {
-            LOG_FATAL("First partition is not bootable");
-            return -EIO;
-        }
         if ((boot_part.type != fat_part_code) && (boot_part.type != linux_part_code)) {
             LOG_FATAL("Invalid boot partition type expected code: %02X or %02X current code: %02X",
                       fat_part_code,
@@ -206,8 +147,7 @@ namespace purefs::subsystem
             LOG_FATAL("Unable to lock vfs core");
             return -EIO;
         }
-        auto err =
-            vfs->mount(boot_part.name, purefs::dir::getRootDiskPath().string(), "auto", fs::mount_flags::read_only);
+        auto err = vfs->mount(boot_part.name, purefs::dir::getSystemDiskPath().string(), "auto");
         if (err) {
             return err;
         }
@@ -225,10 +165,7 @@ namespace purefs::subsystem
         else {
             err = vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "ext4");
         }
-        const std::string json_file = (dir::getRootDiskPath() / file::boot_json).string();
-        const auto boot_dir_name    = parse_boot_json_directory(json_file);
-        const auto user_dir         = (dir::getRootDiskPath() / boot_dir_name).string();
-        fs::internal::set_default_thread_cwd(user_dir);
+        fs::internal::set_default_thread_cwd(dir::getSystemDiskPath().string());
 
         // Mount NVRAM memory
         err = vfs->mount(default_nvrom_name,
