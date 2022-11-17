@@ -14,11 +14,33 @@
 #include <vector>
 #include <sys/statvfs.h>
 #include <purefs/filesystem_paths.hpp>
+#include <purefs/vfs_subsystem.hpp>
 
 #include <ctime>
+namespace
+{
+    constexpr auto DEVICE_NAME      = "emmc0sys1";
+    constexpr auto EMMC_SN_LENGTH   = 13;
+    constexpr auto EMMC_BUFFER_SIZE = 512;
+    constexpr auto SECTOR_TO_READ   = 2;
+    constexpr auto SECTOR_COUNT     = 1U;
 
+    std::string readSerialNumberFromEmmc()
+    {
+        char buffer[EMMC_BUFFER_SIZE];
+        purefs::subsystem::disk_mgr()->read(DEVICE_NAME, buffer, SECTOR_TO_READ, SECTOR_COUNT);
+        buffer[EMMC_SN_LENGTH] = '\0';
+        return std::string(buffer);
+    }
+
+} // namespace
 namespace sdesktop::endpoints
 {
+
+    auto DeviceInfoEndpoint::getSerialNumber() -> std::string
+    {
+        return readSerialNumberFromEmmc();
+    }
 
     auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> http::Code
     {
@@ -33,7 +55,8 @@ namespace sdesktop::endpoints
                                   {json::gitRevision, (std::string)(GIT_REV)},
                                   {json::gitBranch, (std::string)GIT_BRANCH},
                                   {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
-                                  {json::version, std::string(VERSION)}}));
+                                  {json::version, std::string(VERSION)},
+                                  {json::serialNumber, getSerialNumber()}}));
 
         return http::Code::OK;
     }
