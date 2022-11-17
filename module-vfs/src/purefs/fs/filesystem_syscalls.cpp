@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/fs/filesystem.hpp>
 #include <errno.h>
 #include <log/log.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
-#include <purefs/fs/file_handle.hpp>
 #include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
 #include <purefs/fs/notifier.hpp>
@@ -160,7 +159,7 @@ namespace purefs::fs
         auto fsops = mountp->fs_ops();
         if (fsops) {
             if ((flags & O_ACCMODE) != O_RDONLY && (mountp->flags() & mount_flags::read_only)) {
-                LOG_ERROR("Trying to open file with WR... flag on RO filesystem");
+                LOG_ERROR("Trying to open file with 'WR' flag on read-only filesystem");
                 return -EACCES;
             }
             auto fh = fsops->open(mountp, abspath, flags, mode);

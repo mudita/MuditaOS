@@ -2,7 +2,8 @@
 include(Utils)
 
 set(SYSROOT ${CMAKE_BINARY_DIR}/sysroot)
-set(ASSETS_DEST_DIR ${SYSROOT}/sys)
+set(SYSTEM_DEST_DIR ${SYSROOT}/system_a)
+set(USER_DEST_DIR ${SYSROOT}/user)
 
 set(ASSETS_DEPENDENCIES "json-common-target")
 
@@ -21,16 +22,10 @@ endif()
 add_assets_target(
     TARGET assets
     SOURCE_DIR ${ASSETS_SOURCE_DIR}
-    DEST_DIR ${ASSETS_DEST_DIR}
+    SYSTEM_DEST_DIR ${SYSTEM_DEST_DIR}
+    USER_DEST_DIR ${USER_DEST_DIR}
     DEVEL ${WITH_DEVELOPMENT_FEATURES}
-    DEPENDS
-        ${ASSETS_DEPENDENCIES}
+    DEPENDS ${ASSETS_DEPENDENCIES}
 )
 
-multicomp_install(
-    FILES
-        ${ASSETS_DEST_DIR}/.boot.json
-        ${ASSETS_DEST_DIR}/.boot.json.crc32
-    DESTINATION ./
-    COMPONENTS Standalone Update
-)
+#multicomp_install(FILES  ${USER_DEST_DIR}/boot.json DESTINATION ./ COMPONENTS Standalone Update)
