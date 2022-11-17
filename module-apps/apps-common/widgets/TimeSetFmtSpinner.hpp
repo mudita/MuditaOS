@@ -37,10 +37,6 @@ namespace gui
         };
         explicit TimeSetFmtSpinner(
             Item *parent                               = nullptr,
-            uint32_t x                                 = 0U,
-            uint32_t y                                 = 0U,
-            uint32_t w                                 = 0U,
-            uint32_t h                                 = 0U,
             utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H);
 
         /// Switches currently displayed time format
@@ -64,6 +60,8 @@ namespace gui
 
         auto getTimeFormat() const noexcept -> utils::time::Locale::TimeFormat;
 
+        void setVisible(bool value) override;
+
       private:
         enum class TraverseDir : bool
         {
@@ -73,6 +71,7 @@ namespace gui
 
         std::map<std::string, Margins> fmtMarginsMap = {
             {style::window::font::verybiglight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
+            {style::window::font::veryverybiglight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
             {style::window::font::largelight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
             {style::window::font::supersizemelight, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}},
             {style::window::font::huge, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}},

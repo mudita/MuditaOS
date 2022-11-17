@@ -119,10 +119,10 @@ namespace gui
       public:
         Text();
         Text(Item *parent,
-             const uint32_t &x,
-             const uint32_t &y,
-             const uint32_t &w,
-             const uint32_t &h,
+             const uint32_t &x     = 0,
+             const uint32_t &y     = 0,
+             const uint32_t &w     = 0,
+             const uint32_t &h     = 0,
              ExpandMode expandMode = ExpandMode::None,
              TextType textType     = TextType::MultiLine);
         ~Text() override;

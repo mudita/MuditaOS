@@ -55,10 +55,12 @@ target_sources(application-bell-common
         src/layouts/HomeScreenLayoutClassic.cpp
         src/layouts/HomeScreenLayoutClassicWithAmPm.cpp
         src/layouts/HomeScreenLayoutClassicWithBattery.cpp
+        src/layouts/HomeScreenLayoutClassicWithDate.cpp
         src/layouts/HomeScreenLayoutClassicWithTemp.cpp
         src/layouts/HomeScreenLayoutVertical.cpp
         src/layouts/HomeScreenLayoutVerticalSimple.cpp
         src/layouts/HomeScreenLayoutVerticalWithAmPm.cpp
+        src/layouts/HomeScreenLayoutVerticalWithDate.cpp
 
     PUBLIC
         include/common/BellListItemProvider.hpp
@@ -109,10 +111,12 @@ target_sources(application-bell-common
         include/common/layouts/HomeScreenLayoutClassic.hpp
         include/common/layouts/HomeScreenLayoutClassicWithAmPm.hpp
         include/common/layouts/HomeScreenLayoutClassicWithBattery.hpp
+        include/common/layouts/HomeScreenLayoutClassicWithDate.hpp
         include/common/layouts/HomeScreenLayoutClassicWithTemp.hpp
         include/common/layouts/HomeScreenLayoutVertical.hpp
         include/common/layouts/HomeScreenLayoutVerticalSimple.hpp
         include/common/layouts/HomeScreenLayoutVerticalWithAmPm.hpp
+        include/common/layouts/HomeScreenLayoutVerticalWithDate.hpp
 )
 
 target_link_libraries(application-bell-common

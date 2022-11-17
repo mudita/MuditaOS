@@ -18,12 +18,6 @@
 namespace
 {
     constexpr auto dischargingLevelShowTop = 20;
-
-    bool isBatteryCharging(const Store::Battery::State state)
-    {
-        using State = Store::Battery::State;
-        return state == State::Charging or state == State::ChargingDone;
-    }
 } // namespace
 
 namespace gui
@@ -44,6 +38,7 @@ namespace gui
         case app::home_screen::ViewState::Deactivated:
             alarmActivatedDeactivatedScreen->image->set("big_no-alarm_W_G", {});
             alarmMainIcon->setVisible(false);
+            alarmMainTime->setVisible(false);
             alarmTopIcon->setStatus(AlarmIcon::Status::DEACTIVATED);
             setScreenMode(ScreenMode::Main);
             break;
@@ -67,12 +62,21 @@ namespace gui
             alarmActivatedDeactivatedScreen->image->set("big_alarm_W_G", {});
             alarmMainIcon->setVisible(true);
             alarmMainIcon->setStatus(AlarmIcon::Status::ACTIVATED);
+            if (isAlarmTimeVisibilityAllowed()) {
+                alarmMainTime->setVisible(true);
+                // For unknown reason the mode is modified by showing/hiding windows
+                alarmMainTime->setEditMode(EditMode::Browse);
+            }
+            else {
+                alarmMainTime->setVisible(false);
+            }
             alarmTopIcon->setStatus(AlarmIcon::Status::ACTIVATED);
             setScreenMode(ScreenMode::Main);
             break;
         case app::home_screen::ViewState::AlarmRinging:
             setScreenMode(ScreenMode::Main);
             alarmMainIcon->setStatus(AlarmIcon::Status::RINGING);
+            alarmMainTime->setVisible(false);
             break;
         case app::home_screen::ViewState::AlarmRingingDeactivatedWait:
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
@@ -80,11 +84,13 @@ namespace gui
             break;
         case app::home_screen::ViewState::AlarmSnoozedWait:
             alarmMainIcon->setStatus(AlarmIcon::Status::SNOOZE);
+            alarmMainTime->setVisible(false);
             alarmActivatedDeactivatedScreen->image->set("big_alarm_snoozed_W_M", {});
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
             break;
         case app::home_screen::ViewState::AlarmSnoozed:
             alarmMainIcon->setStatus(AlarmIcon::Status::SNOOZE);
+            alarmMainTime->setVisible(false);
             setScreenMode(ScreenMode::Main);
             break;
         }
@@ -126,7 +132,18 @@ namespace gui
 
     bool HomeScreenLayoutVertical::isBatteryVisibilityAllowed(const Store::Battery &batteryContext)
     {
-        return (batteryContext.level < dischargingLevelShowTop) or isBatteryCharging(batteryContext.state);
+        return (batteryContext.level < dischargingLevelShowTop) || isBatteryCharging(batteryContext.state);
+    }
+
+    bool HomeScreenLayoutVertical::isAlarmTimeVisibilityAllowed()
+    {
+        return false;
+    }
+
+    bool HomeScreenLayoutVertical::isBatteryCharging(const Store::Battery::State state)
+    {
+        using State = Store::Battery::State;
+        return (state == State::Charging) || (state == State::ChargingDone);
     }
 
     void HomeScreenLayoutVertical::setBatteryLevelState(const Store::Battery &batteryContext)
@@ -149,6 +166,7 @@ namespace gui
     void HomeScreenLayoutVertical::setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt)
     {
         setAlarmFmtSpinner->setTimeFormat(fmt);
+        alarmMainTime->setTimeFormat(fmt);
     }
 
     void HomeScreenLayoutVertical::setTimeFormat(utils::time::Locale::TimeFormat fmt)
@@ -169,6 +187,7 @@ namespace gui
     void HomeScreenLayoutVertical::setAlarmTime(std::time_t newTime)
     {
         setAlarmFmtSpinner->setTime(newTime);
+        alarmMainTime->setTime(newTime);
     }
 
     auto HomeScreenLayoutVertical::getLayout() -> Item *

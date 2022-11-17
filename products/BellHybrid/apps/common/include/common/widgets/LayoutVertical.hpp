@@ -16,6 +16,7 @@ namespace style::homescreen_vertical
     constexpr inline auto leftMargin        = 60U;
     constexpr inline auto rightMargin       = 60U;
     constexpr inline auto topNegativeMargin = -35;
+    constexpr inline auto info_line_h       = 44U;
 } // namespace style::homescreen_vertical
 
 namespace gui
@@ -37,19 +38,20 @@ namespace gui
         LayoutVertical(
             Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
 
-        HBox *mainScreen{};
-        BellBaseLayout *setAlarmScreen{};
-        Icon *alarmActivatedDeactivatedScreen{};
-        AlarmIcon *alarmMainIcon{};
-        BellBattery *battery{};
+        HBox *mainScreen                      = nullptr;
+        BellBaseLayout *setAlarmScreen        = nullptr;
+        Icon *alarmActivatedDeactivatedScreen = nullptr;
+        AlarmIcon *alarmMainIcon              = nullptr;
+        TimeSetFmtSpinner *alarmMainTime      = nullptr;
+        BellBattery *battery                  = nullptr;
 
         // Main Screen
-        ClockVertical *time{};
-        VBox *leftBox{};
-        VBox *rightBox{};
+        ClockVertical *time = nullptr;
+        VBox *leftBox       = nullptr;
+        VBox *rightBox      = nullptr;
 
         // Set Alarm Screen
-        AlarmIcon *alarmTopIcon{};
-        TimeSetFmtSpinner *setAlarmFmtSpinner{};
+        AlarmIcon *alarmTopIcon               = nullptr;
+        TimeSetFmtSpinner *setAlarmFmtSpinner = nullptr;
     };
 }; // namespace gui

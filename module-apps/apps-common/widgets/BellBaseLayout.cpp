@@ -6,13 +6,7 @@
 
 namespace gui
 {
-    BellBaseLayout::BellBaseLayout(Item *parent,
-                                   Position x,
-                                   Position y,
-                                   Length w,
-                                   Length h,
-                                   bool withSideArrows,
-                                   style::bell_base_layout::ParentType type)
+    BellBaseLayout::BellBaseLayout(Item *parent, Position x, Position y, Length w, Length h, bool withSideArrows)
         : VThreeBox(parent, x, y, w, h)
     {
         setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::h);
@@ -37,10 +31,6 @@ namespace gui
         lastBox->setEdges(RectangleEdge::None);
         lastBox->activeItem = false;
 
-        if (type == style::bell_base_layout::ParentType::SideListView) {
-            lastBox->setMargins(Margins(0, 0, 0, style::bell_base_layout::outer_layout_margin));
-        }
-
         resizeItems();
 
         if (withSideArrows) {
@@ -50,8 +40,8 @@ namespace gui
 
     Item *BellBaseLayout::getCenterBox() const noexcept
     {
-        if (centerThreeBox != nullptr) {
-            return centerThreeBox->centerBox;
+        if (arrowsThreeBox != nullptr) {
+            return arrowsThreeBox->centerBox;
         }
         return centerBox;
     }
@@ -59,8 +49,8 @@ namespace gui
     void BellBaseLayout::resizeCenter()
     {
         centerBox->resizeItems();
-        if (centerThreeBox != nullptr) {
-            centerThreeBox->resizeItems();
+        if (arrowsThreeBox != nullptr) {
+            arrowsThreeBox->resizeItems();
         }
     }
 
@@ -74,40 +64,41 @@ namespace gui
 
     void BellBaseLayout::addSideArrows()
     {
-        centerThreeBox = new HThreeBox<HBox, HBox, HBox>(centerBox);
-        centerThreeBox->setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
-        centerThreeBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        centerThreeBox->setEdges(RectangleEdge::None);
+        arrowsThreeBox = new HThreeBox<HBox, HBox, HBox>(centerBox);
+        arrowsThreeBox->setMinimumSize(style::bell_base_layout::arrows_layout_w,
+                                       style::bell_base_layout::center_layout_h);
+        arrowsThreeBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        arrowsThreeBox->setEdges(RectangleEdge::None);
 
-        centerThreeBox->firstBox = new HBox(centerThreeBox);
-        centerThreeBox->firstBox->setAlignment(Alignment(Alignment::Vertical::Center));
-        centerThreeBox->firstBox->setEdges(RectangleEdge::None);
-        centerThreeBox->firstBox->activeItem = false;
+        arrowsThreeBox->firstBox = new HBox(arrowsThreeBox);
+        arrowsThreeBox->firstBox->setAlignment(Alignment(Alignment::Vertical::Center));
+        arrowsThreeBox->firstBox->setEdges(RectangleEdge::None);
+        arrowsThreeBox->firstBox->activeItem = false;
 
-        leftArrow = new ImageBox(centerThreeBox->firstBox, new Image("bell_arrow_left_W_M"));
+        leftArrow = new ImageBox(arrowsThreeBox->firstBox, new Image("bell_arrow_left_W_M"));
         leftArrow->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
         leftArrow->setMinimumSizeToFitImage();
         leftArrow->setVisible(true);
         leftArrow->setEdges(RectangleEdge::None);
-        centerThreeBox->firstBox->setMinimumSize(leftArrow->widgetMinimumArea.w, leftArrow->widgetMinimumArea.h);
+        arrowsThreeBox->firstBox->setMinimumSize(leftArrow->widgetMinimumArea.w, leftArrow->widgetMinimumArea.h);
 
-        centerThreeBox->centerBox = new HBox(centerThreeBox);
-        centerThreeBox->centerBox->setEdges(RectangleEdge::None);
-        centerThreeBox->centerBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
-        centerThreeBox->centerBox->setMaximumSize(style::bell_base_layout::center_layout_w,
+        arrowsThreeBox->centerBox = new HBox(arrowsThreeBox);
+        arrowsThreeBox->centerBox->setEdges(RectangleEdge::None);
+        arrowsThreeBox->centerBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
+        arrowsThreeBox->centerBox->setMaximumSize(style::bell_base_layout::center_layout_w,
                                                   style::bell_base_layout::center_layout_h);
 
-        centerThreeBox->lastBox = new HBox(centerThreeBox);
-        centerThreeBox->lastBox->setAlignment(Alignment(Alignment::Vertical::Center));
-        centerThreeBox->lastBox->setEdges(RectangleEdge::None);
-        centerThreeBox->lastBox->activeItem = false;
+        arrowsThreeBox->lastBox = new HBox(arrowsThreeBox);
+        arrowsThreeBox->lastBox->setAlignment(Alignment(Alignment::Vertical::Center));
+        arrowsThreeBox->lastBox->setEdges(RectangleEdge::None);
+        arrowsThreeBox->lastBox->activeItem = false;
 
-        rightArrow = new ImageBox(centerThreeBox->lastBox, new Image("bell_arrow_right_W_M"));
+        rightArrow = new ImageBox(arrowsThreeBox->lastBox, new Image("bell_arrow_right_W_M"));
         rightArrow->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         rightArrow->setMinimumSizeToFitImage();
         rightArrow->setVisible(true);
         rightArrow->setEdges(RectangleEdge::None);
-        centerThreeBox->lastBox->setMinimumSize(rightArrow->widgetMinimumArea.w, rightArrow->widgetMinimumArea.h);
+        arrowsThreeBox->lastBox->setMinimumSize(rightArrow->widgetMinimumArea.w, rightArrow->widgetMinimumArea.h);
     }
 
     void BellBaseLayout::setArrowVisible(Arrow arrow, bool isVisible)
@@ -122,12 +113,12 @@ namespace gui
     {
         setArrowVisible(BellBaseLayout::Arrow::Left, !minCondition);
         setArrowVisible(BellBaseLayout::Arrow::Right, !maxCondition);
-        if (centerThreeBox != nullptr) {
-            if (centerThreeBox->firstBox != nullptr) {
-                centerThreeBox->firstBox->resizeItems();
+        if (arrowsThreeBox != nullptr) {
+            if (arrowsThreeBox->firstBox != nullptr) {
+                arrowsThreeBox->firstBox->resizeItems();
             }
-            if (centerThreeBox->lastBox != nullptr) {
-                centerThreeBox->lastBox->resizeItems();
+            if (arrowsThreeBox->lastBox != nullptr) {
+                arrowsThreeBox->lastBox->resizeItems();
             }
         }
     }

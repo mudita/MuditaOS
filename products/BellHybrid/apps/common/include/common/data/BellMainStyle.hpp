@@ -12,6 +12,7 @@ namespace bellMainStyle
         namespace time
         {
             inline constexpr auto font = style::window::font::gargantuan;
+            inline constexpr auto font_small = style::window::font::veryverybiglight;
         } // namespace time
 
         namespace alarmSetSpinner
@@ -22,6 +23,7 @@ namespace bellMainStyle
         namespace bottomDescription
         {
             inline constexpr auto font_normal = style::window::font::largelight;
+            inline constexpr auto font_smallnormal = style::window::font::veryverybiglight;
             inline constexpr auto font_small  = style::window::font::verybiglight;
 
         } // namespace bottomDescription

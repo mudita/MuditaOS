@@ -13,15 +13,9 @@ namespace style::bell_base_layout
     constexpr inline auto first_layout_min_h  = 30U;
     constexpr inline auto outer_layouts_w     = 448U;
     constexpr inline auto outer_layouts_h     = 102U;
-    constexpr inline auto outer_layout_margin = 38U;
-    constexpr inline auto center_layout_w     = 504U;
-    constexpr inline auto center_layout_h     = h - 2 * outer_layout_margin - 2 * outer_layouts_h;
-
-    enum class ParentType
-    {
-        SideListView,
-        Window
-    };
+    constexpr inline auto center_layout_w     = w;
+    constexpr inline auto center_layout_h     = 200U;
+    constexpr inline auto arrows_layout_w     = 504U;
 } // namespace style::bell_base_layout
 
 namespace gui
@@ -35,13 +29,8 @@ namespace gui
             Right
         };
 
-        explicit BellBaseLayout(Item *parent,
-                                Position x                               = 0,
-                                Position y                               = 0,
-                                Length w                                 = 0,
-                                Length h                                 = 0,
-                                bool withSideArrows                      = true,
-                                style::bell_base_layout::ParentType type = style::bell_base_layout::ParentType::Window);
+        explicit BellBaseLayout(
+            Item *parent, Position x = 0, Position y = 0, Length w = 0, Length h = 0, bool withSideArrows = true);
 
         [[nodiscard]] Item *getCenterBox() const noexcept;
         void resizeCenter();
@@ -51,9 +40,9 @@ namespace gui
         void setMinMaxArrowsVisibility(bool minCondition, bool maxCondition);
 
       private:
-        HThreeBox<HBox, HBox, HBox> *centerThreeBox{nullptr};
-        ImageBox *leftArrow{nullptr};
-        ImageBox *rightArrow{nullptr};
+        HThreeBox<HBox, HBox, HBox> *arrowsThreeBox = nullptr;
+        ImageBox *leftArrow                         = nullptr;
+        ImageBox *rightArrow                        = nullptr;
 
         void addSideArrows();
     };

@@ -5,18 +5,30 @@
 ### Added
 
 #### Home Screen:
-* Font size increased
+* Font size increased.
+* Clock faces with dates.
 
 #### General:
-* Bedside lamp mode
+* Bedside lamp mode.
 
 #### UI/UX:
 * Improve refreshing of the display.
 
 #### Onboarding
-* Shortcuts instruction
+* Shortcuts instruction.
+
+### Changed
+
+#### Home Screen:
+* Placement of battery and time format indicators.
 
 ### Fixed
+
+#### Home Screen:
+* Centering of battery indicator.
+
+#### Settings:
+* Incorrect time format of the alarm in clock face settings.
 
 ## [1.7.0 2022-11-14]
 
