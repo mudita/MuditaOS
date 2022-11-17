@@ -18,8 +18,7 @@ function(download_asset_release asset_name_in asset_name_out asset_repo asset_ve
 
     add_custom_target(${asset_name_out}-target DEPENDS ${asset_repo})
 
-    multicomp_install(PROGRAMS ${CMAKE_BINARY_DIR}/${asset_repo} DESTINATION "./"
-        COMPONENTS Standalone Update)
+#    multicomp_install(PROGRAMS ${CMAKE_BINARY_DIR}/${asset_repo} DESTINATION "./" COMPONENTS Standalone Update)
 endfunction()
 
 function(download_asset_release_json
@@ -32,7 +31,6 @@ function(download_asset_release_json
         )
     add_custom_target(
         ${target}
-        # python3 tools/download_asset.py github --repository "MuditaOSPublicAssets" download --json products/PurePhone/assets_images.json --version '0.0.1' --product pure
         COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/download_asset.py
             --cache_dir ${cache_dir}
             github

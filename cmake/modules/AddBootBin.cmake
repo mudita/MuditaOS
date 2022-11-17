@@ -1,5 +1,5 @@
 function(add_boot_bin SOURCE_TARGET)
-    set(BIN_FILE ${CMAKE_BINARY_DIR}/sysroot/sys/current/${SOURCE_TARGET}-boot.bin)
+    set(BIN_FILE ${CMAKE_BINARY_DIR}/sysroot/system_a/bin/boot.bin)
 
     set_target_properties(
             ${SOURCE_TARGET}
