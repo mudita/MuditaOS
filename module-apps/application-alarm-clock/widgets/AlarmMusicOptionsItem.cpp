@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmMusicOptionsItem.hpp"
@@ -93,7 +93,7 @@ namespace gui
 
     std::vector<tags::fetcher::Tags> AlarmMusicOptionsItem::getMusicFilesList()
     {
-        const auto musicFolder = (purefs::dir::getCurrentOSPath() / "assets/audio/alarm").string();
+        const auto musicFolder = (purefs::dir::getSystemDiskPath() / "assets/audio/alarm").string();
         std::vector<tags::fetcher::Tags> musicFiles;
         LOG_INFO("Scanning music folder: %s", musicFolder.c_str());
         for (const auto &ent : std::filesystem::directory_iterator(musicFolder)) {

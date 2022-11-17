@@ -113,7 +113,7 @@ void atexit_cleanup_handler()
     LOG_INFO("Starting clean up");
 }
 
-class Cleanup
+class Cleanup // TODO is this required? It doesn't seem to do anything productive
 {
   public:
     ~Cleanup()
@@ -129,7 +129,7 @@ int main()
 {
     constexpr auto ApplicationName = "PurePhone";
 
-    const std::vector<std::string> fileIndexerAudioPaths = {{purefs::dir::getUserAudioPath()}};
+    const std::vector<std::string> fileIndexerAudioPaths = {{purefs::dir::getUserMediaPath()}};
 
     prof::init();
 
