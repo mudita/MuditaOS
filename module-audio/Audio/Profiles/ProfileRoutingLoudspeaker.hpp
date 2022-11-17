@@ -15,7 +15,7 @@ namespace audio
         ProfileRoutingLoudspeaker(Volume volume, Gain gain)
             : Profile("Routing Speakerphone",
                       Type::RoutingLoudspeaker,
-                      purefs::dir::getCurrentOSPath() / "user/data/equalizer/loudspeaker_routing.json",
+                      purefs::dir::getSystemDiskPath() / "data/equalizer/loudspeaker_routing.json",
                       audio::codec::Configuration{
                           .sampleRate_Hz = sampleRate,
                           .bitWidth      = 16,

@@ -20,7 +20,7 @@ namespace service::detail
     using namespace std::literals;
     using namespace std::chrono_literals;
 
-    const auto lock_file_name        = purefs::dir::getUserDiskPath() / ".directory_is_indexed";
+    const auto lock_file_name        = purefs::dir::getUserDiskPath() / "data" / ".directory_is_indexed";
     constexpr auto indexing_interval = 50ms;
     constexpr auto start_delay       = 10000ms;
 
