@@ -24,9 +24,17 @@ function(add_version_rt1051_json SOURCE_TARGET)
         DEPENDS ${SOURCE_TARGET}-boot.bin
     )
 
-    add_custom_target(${SOURCE_TARGET}-version.json-target DEPENDS ${SOURCE_TARGET}-version.json)
+    add_custom_command(OUTPUT add-${SOURCE_TARGET}-version.json
+        COMMAND rsync -qravu
+            ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json
+            ${CMAKE_BINARY_DIR}/sysroot/system_a/version.json
+        DEPENDS
+            ${SOURCE_TARGET}-version.json
+    )
 
-    multicomp_install(FILES ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json DESTINATION "./" RENAME "version.json" COMPONENTS Standalone Update)
+    add_custom_target(${SOURCE_TARGET}-version.json-target DEPENDS add-${SOURCE_TARGET}-version.json)
+
+#    multicomp_install(FILES ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json DESTINATION "./" RENAME "version.json" COMPONENTS Standalone Update)
 endfunction()
 
 function(add_version_linux_json SOURCE_TARGET)
@@ -43,7 +51,15 @@ function(add_version_linux_json SOURCE_TARGET)
             -P ${CMAKE_SOURCE_DIR}/cmake/modules/ConfigureVersionJson.cmake
     )
 
-    add_custom_target(${SOURCE_TARGET}-version.json-target DEPENDS ${SOURCE_TARGET}-version.json)
+    add_custom_command(OUTPUT add-${SOURCE_TARGET}-version.json
+        COMMAND rsync -qravu
+            ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json
+            ${CMAKE_BINARY_DIR}/sysroot/system_a/version.json
+        DEPENDS
+            ${SOURCE_TARGET}-version.json
+    )
 
-    multicomp_install(FILES ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json DESTINATION "./" RENAME "version.json" COMPONENTS Standalone Update)
+    add_custom_target(${SOURCE_TARGET}-version.json-target DEPENDS add-${SOURCE_TARGET}-version.json)
+
+#    multicomp_install(FILES ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json DESTINATION "./" RENAME "version.json" COMPONENTS Standalone Update)
 endfunction()

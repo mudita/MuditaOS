@@ -11,34 +11,26 @@ namespace purefs
 
     namespace dir
     {
-        std::filesystem::path getRootDiskPath() noexcept;
-        std::filesystem::path getMfgConfPath() noexcept;
+        std::filesystem::path getSystemDiskPath() noexcept;
         std::filesystem::path getUserDiskPath() noexcept;
+        std::filesystem::path getMfgConfPath() noexcept;
         std::filesystem::path getDatabasesPath() noexcept;
-        std::filesystem::path getCurrentOSPath() noexcept;
-        std::filesystem::path getPreviousOSPath() noexcept;
-        std::filesystem::path getUpdatesOSPath() noexcept;
-        std::filesystem::path getTemporaryPath() noexcept;
-        std::filesystem::path getBackupOSPath() noexcept;
+        std::filesystem::path getUpdateDirPath() noexcept;
         std::filesystem::path getSyncPackagePath() noexcept;
-        std::filesystem::path getFactoryOSPath() noexcept;
+        std::filesystem::path getFactoryDBsPath() noexcept;
         std::filesystem::path getLogsPath() noexcept;
         std::filesystem::path getCrashDumpsPath() noexcept;
-        std::filesystem::path getUserAudioPath() noexcept;
-        std::filesystem::path getUserStoragePath() noexcept;
+        std::filesystem::path getUserMediaPath() noexcept;
+        std::filesystem::path getTemporaryPath() noexcept;
+        std::filesystem::path getBackupOSPath() noexcept;
     } // namespace dir
 
     namespace file
     {
-        constexpr inline auto boot_json    = ".boot.json";
+        constexpr inline auto boot_json    = "boot.json";
         constexpr inline auto boot_bin     = "boot.bin";
         constexpr inline auto version_json = "version.json";
     } // namespace file
-
-    namespace extension
-    {
-        constexpr inline auto tar = ".tar";
-    }
 
     namespace buffer
     {
