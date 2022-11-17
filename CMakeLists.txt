@@ -170,26 +170,27 @@ add_custom_target(
         "Generating version info"
     )
 
-# Create common user directories
+# Create common system directories
 add_directories(
-        TARGET user_directories_common
-        PREFIX ${CMAKE_BINARY_DIR}/sysroot/sys/user
+        TARGET system_directories_common
+        PREFIX ${CMAKE_BINARY_DIR}/sysroot/system_a
         DEPENDS assets
-        DIRECTORIES logs crash_dumps backup tmp storage audio db
+        DIRECTORIES log assets crash_dumps data bin db scripts
 )
 
 # Create and initialize common databases
 add_databases_target(
         TARGET create_databases_common
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/module-db/databases/scripts
-        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/sys/user/db
+        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/system_a/db
         DEVEL ${WITH_DEVELOPMENT_FEATURES}
 )
+
 # Create and initialize product-specific databases
 add_databases_target(
         TARGET create_product_databases
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases/scripts
-        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/sys/user/db
+        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/system_a/db
         DEVEL ${WITH_DEVELOPMENT_FEATURES}
         DEPENDS create_databases_common
 )

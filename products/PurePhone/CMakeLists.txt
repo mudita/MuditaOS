@@ -41,7 +41,7 @@ target_include_directories(PurePhone
 set_target_properties(PurePhone
     PROPERTIES
         SUFFIX ".elf"
-        LINK_FLAGS "-Xlinker -Map=${CMAKE_BINARY_DIR}/PurePhone.map "
+        LINK_FLAGS "-Xlinker -Map=${CMAKE_BINARY_DIR}/PurePhone.map"
     )
 
 target_link_libraries(PurePhone
@@ -108,8 +108,8 @@ include(AddVersionJson)
 
 add_directories(
         TARGET create_user_directories
-        PREFIX ${CMAKE_BINARY_DIR}/sysroot/sys/user/audio
-        DEPENDS user_directories_common
+        PREFIX ${CMAKE_BINARY_DIR}/sysroot/user/media/app
+        DEPENDS system_directories_common
         DIRECTORIES music_player
 )
 
@@ -119,12 +119,12 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     add_image(
         PRODUCT PurePhone
         SYSROOT sysroot
-        LUTS Luts.bin
         DEPENDS
             install_scripts
             create_product_databases
             create_user_directories
-            assets updater.bin-target
+            assets
+            updater.bin-target
             ecoboot.bin-target
             PurePhone-boot.bin
             PurePhone-version.json-target
@@ -134,7 +134,6 @@ else()
     add_image(
         PRODUCT PurePhone
         SYSROOT sysroot
-        LUTS ""
         DEPENDS
             install_scripts
             create_product_databases
@@ -153,27 +152,27 @@ include(DownloadAsset)
 
 download_asset_json(json-proprietary-target
                     ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_proprietary.json
-                    ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                    ${CMAKE_BINARY_DIR}/sysroot/system_a/
                     MuditaOSAssets
                     ${MUDITA_CACHE_DIR}
     )
 download_asset_release_json(json-common-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_common.json
-                            ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                            ${CMAKE_BINARY_DIR}/sysroot/
                             MuditaOSPublicAssets
                             0.0.8
                             ${MUDITA_CACHE_DIR}
     )
 download_asset_release_json(json-community-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_community.json
-                            ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                            ${CMAKE_BINARY_DIR}/sysroot/system_a/
                             MuditaOSPublicAssets
                             0.0.8
                             ${MUDITA_CACHE_DIR}
     )
 download_asset_json(json-rt1051-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_rt1051.json
-                            ${CMAKE_BINARY_DIR}/sysroot/sys/current/
+                            ${CMAKE_BINARY_DIR}/sysroot/system_a/assets
                             MuditaOSAssets
                             ${MUDITA_CACHE_DIR}
     )

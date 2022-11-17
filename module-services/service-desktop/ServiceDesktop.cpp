@@ -192,7 +192,7 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
                                                     *usbSecurityModel,
                                                     serialNumber,
                                                     caseColour,
-                                                    purefs::dir::getUserStoragePath());
+                                                    purefs::dir::getUserMediaPath());
 
     initialized =
         desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
