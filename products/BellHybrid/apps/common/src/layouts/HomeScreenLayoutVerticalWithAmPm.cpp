@@ -44,18 +44,18 @@ namespace gui
         battery->setMargins(Margins{0, 0, 0, style::homescreen_vertical_ampm::battery_margin_bot});
 
         rightBox->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Bottom));
-        fmt = new TextFixedSize(rightBox, 0, 0, 0, 0);
-        fmt->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
-        fmt->setFont(mainWindow::bottomDescription::font_normal);
-        fmt->setEdges(RectangleEdge::None);
-        fmt->activeItem = false;
-        fmt->drawUnderline(false);
-        fmt->setMargins(Margins{0, 0, 0, style::homescreen_vertical_ampm::fmt_margin_bot});
-        fmt->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
+        ampm = new TextFixedSize(rightBox, 0, 0, 0, 0);
+        ampm->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        ampm->setFont(mainWindow::bottomDescription::font_normal);
+        ampm->setEdges(RectangleEdge::None);
+        ampm->activeItem = false;
+        ampm->drawUnderline(false);
+        ampm->setMargins(Margins{0, 0, 0, style::homescreen_vertical_ampm::ampm_margin_bot});
+        ampm->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
 
         alarmMainIcon->informContentChanged();
         battery->informContentChanged();
-        fmt->informContentChanged();
+        ampm->informContentChanged();
     }
 
     auto HomeScreenLayoutVerticalWithAmPm::setTime(std::time_t newTime) -> void
@@ -65,6 +65,6 @@ namespace gui
         const auto t     = std::localtime(&newTime);
         const auto hours = std::chrono::hours{t->tm_hour};
         const auto isPM  = date::is_pm(hours);
-        fmt->setText(isPM ? utils::time::Locale::getPM() : utils::time::Locale::getAM());
+        ampm->setText(isPM ? utils::time::Locale::getPM() : utils::time::Locale::getAM());
     }
 }; // namespace gui

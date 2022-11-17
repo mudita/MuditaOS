@@ -9,7 +9,7 @@ namespace style::homescreen_vertical_ampm
 {
     constexpr inline auto alarm_margin_top   = 83U;
     constexpr inline auto battery_margin_bot = 68U;
-    constexpr inline auto fmt_margin_bot     = 77U;
+    constexpr inline auto ampm_margin_bot    = 77U;
 } // namespace style::homescreen_vertical_ampm
 
 namespace gui
@@ -22,6 +22,6 @@ namespace gui
 
         auto setTime(std::time_t newTime) -> void override;
 
-        TextFixedSize *fmt{};
+        TextFixedSize *ampm{};
     };
 }; // namespace gui

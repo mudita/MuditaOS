@@ -20,14 +20,12 @@ namespace gui
     {
         using namespace bellMainStyle;
 
-        tempText = new TextFixedSize(nullptr, 0, 0, 0, 0);
+        tempText = new TextFixedSize(statusBox);
         tempText->setMaximumSize(style::homescreen_classic::temperature_w, style::homescreen_classic::temperature_h);
         tempText->setFont(mainWindow::bottomDescription::font_normal);
         tempText->setEdges(RectangleEdge::None);
         tempText->activeItem = false;
         tempText->drawUnderline(false);
-
-        statusBox->setItems(battery, tempText);
     }
 
     auto HomeScreenLayoutClassicWithTemp::setTemperature(utils::temperature::Temperature newTemp) -> void

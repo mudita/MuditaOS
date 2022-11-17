@@ -11,8 +11,8 @@
 #include <Temperature.hpp>
 #include <service-appmgr/Constants.hpp>
 
-constexpr auto alarmTime              = 1000 * 60 * 60 * 12;
-constexpr auto clockTime              = 1000 * 60 * 60 * 12;
+constexpr auto alarmTime              = 0;
+constexpr auto clockTime              = 0;
 constexpr Store::Battery batteryState = {
     .levelState = Store::Battery::LevelState::Normal,
     .state      = Store::Battery::State::Discharging,
@@ -71,16 +71,17 @@ namespace app::bell_settings
 
     void LayoutWindowPresenter::initLayoutOptions()
     {
-
-        auto layoutsList = timeModel->getTimeFormat() == utils::time::Locale::TimeFormat::FormatTime24H
-                               ? gui::factory::getLayoutsFormat24h()
-                               : gui::factory::getLayoutsFormat12h();
+        const auto timeFormat = timeModel->getTimeFormat();
+        auto layoutsList      = timeFormat == utils::time::Locale::TimeFormat::FormatTime24H
+                                    ? gui::factory::getLayoutsFormat24h()
+                                    : gui::factory::getLayoutsFormat12h();
 
         for (auto &layoutEntry : layoutsList) {
             auto layout = layoutEntry.second();
             layout->setViewState(app::home_screen::ViewState::Activated);
-            layout->setTimeFormat(timeModel->getTimeFormat());
+            layout->setTimeFormat(timeFormat);
             layout->setTime(clockTime);
+            layout->setAlarmTimeFormat(timeFormat);
             layout->setAlarmTime(alarmTime);
             layout->setBatteryLevelState(batteryState);
             layout->setTemperature(temperature);

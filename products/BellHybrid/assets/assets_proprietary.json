@@ -20,6 +20,11 @@
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a"
         },
         {
+            "name": "./fonts/bell/gt_pressura_light_40.mpf",
+            "output": "assets/fonts/gt_pressura/gt_pressura_light_40.mpf",
+            "ref": "594167d42d7881e3d7c6fa28db945cd5409db69c"
+        },
+        {
             "name": "./fonts/bell/gt_pressura_regular_90.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura/gt_pressura_regular_90.mpf"

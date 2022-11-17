@@ -11,9 +11,7 @@
 namespace gui
 {
 
-    TimeSetFmtSpinner::TimeSetFmtSpinner(
-        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, utils::time::Locale::TimeFormat timeFormat)
-        : HBox{parent, x, y, w, h}
+    TimeSetFmtSpinner::TimeSetFmtSpinner(Item *parent, utils::time::Locale::TimeFormat timeFormat) : HBox{parent}
     {
         using namespace utils;
 
@@ -218,6 +216,14 @@ namespace gui
         return timeFormat;
     }
 
+    void TimeSetFmtSpinner::setVisible(bool value)
+    {
+        HBox::setVisible(value);
+        // This is a workaround for fmt visibility not changed properly
+        // It's probably caused by a bug in BoxLayout
+        fmt->setVisible(value);
+    }
+
     auto TimeSetFmtSpinner::setTime(std::time_t time) noexcept -> void
     {
         using namespace utils::time;
@@ -258,16 +264,17 @@ namespace gui
 
     void TimeSetFmtSpinner::handleContentChanged()
     {
-        fmt->setMinimumWidthToFitText();
-        fmt->setMargins(getFmtMargins(noFocusFontName));
+        auto widthToSet = timeSetSpinner->widgetMinimumArea.w;
 
-        auto widthToSet =
-            timeFormat == utils::time::Locale::TimeFormat::FormatTime12H
-                ? timeSetSpinner->widgetMinimumArea.w + fmt->widgetMinimumArea.w + fmt->margins.getSumInAxis(Axis::X)
-                : timeSetSpinner->widgetMinimumArea.w;
+        if (timeFormat == utils::time::Locale::TimeFormat::FormatTime12H && fmt->visible) {
+            fmt->setMinimumWidthToFitText();
+            fmt->setMargins(getFmtMargins(noFocusFontName));
+            widthToSet =
+                timeSetSpinner->widgetMinimumArea.w + fmt->widgetMinimumArea.w + fmt->margins.getSumInAxis(Axis::X);
+        }
 
         setMinimumWidth(widthToSet);
-        setMaximumWidth(widgetMinimumArea.w);
+        setMaximumWidth(widthToSet);
 
         HBox::handleContentChanged();
     }

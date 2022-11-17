@@ -65,6 +65,7 @@ namespace style
             inline constexpr auto supersizemelight = "supersizemelight";
             inline constexpr auto largelight       = "largelight";
             inline constexpr auto large            = "large";
+            inline constexpr auto veryverybiglight = "veryverybiglight";
             inline constexpr auto verybiglight     = "verybiglight";
             inline constexpr auto verybig          = "verybig";
             inline constexpr auto mediumbigbold    = "mediumbigbold";

@@ -18,7 +18,7 @@ namespace gui
         constexpr auto percent_h          = 102U;
         constexpr auto percent_w          = 106U;
         constexpr auto battery_widget_h   = 64U;
-        constexpr auto battery_widget_w   = 240U;
+        constexpr auto battery_widget_w   = 184U;
 
     } // namespace battery
 
@@ -31,13 +31,16 @@ namespace gui
     class BellBattery : public gui::HBox
     {
       public:
-        BellBattery(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        BellBattery(Item *parent);
+        void setFont(const UTF8 &fontName);
         void update(units::SOC soc, bool isCharging);
         void setBatteryPercentMode(BatteryPercentMode mode);
 
       private:
+        void setWidthsToFitContent();
+
         BatteryPercentMode batteryPercentMode = BatteryPercentMode::Show;
-        TextFixedSize *percentText;
-        Image *img;
+        Text *percentText                     = nullptr;
+        Image *img                            = nullptr;
     };
 } // namespace gui

@@ -26,9 +26,14 @@ namespace gui
     {
         using namespace bellMainStyle;
 
+        setMinimumSize(style::window_width, style::window_height);
+        setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        setEdges(RectangleEdge::None);
+
         // Main Screen
         mainScreen = new HBox(this);
         mainScreen->setMinimumSize(style::window_width, style::window_height);
+        mainScreen->setEdges(RectangleEdge::None);
 
         leftBox = new VBox(mainScreen, 0, 0, 0, 0);
         leftBox->setMinimumSize(style::homescreen_vertical::side_box_w, style::window_height);
@@ -38,6 +43,7 @@ namespace gui
         auto centerBox = new VBox(mainScreen, 0, 0, 0, 0);
         centerBox->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
         centerBox->setEdges(RectangleEdge::None);
+        centerBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         time = new ClockVertical(centerBox);
         time->setFont(style::window::font::colossal);
@@ -56,7 +62,15 @@ namespace gui
         alarmMainIcon->setStatus(AlarmIcon::Status::DEACTIVATED);
         alarmMainIcon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        battery = new BellBattery(nullptr, 0, 0, 0, 0);
+        alarmMainTime = new TimeSetFmtSpinner(leftBox);
+        alarmMainTime->setMaximumSize(style::bell_base_layout::outer_layouts_w,
+                                      style::homescreen_vertical::info_line_h);
+        alarmMainTime->setFont(mainWindow::bottomDescription::font_smallnormal);
+        alarmMainTime->setEditMode(EditMode::Browse);
+        alarmMainTime->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
+        alarmMainTime->setVisible(false);
+
+        battery = new BellBattery(nullptr);
         battery->setMinimumSize(battery::battery_widget_w, battery::battery_widget_h);
         battery->setEdges(RectangleEdge::None);
         battery->setVisible(true);

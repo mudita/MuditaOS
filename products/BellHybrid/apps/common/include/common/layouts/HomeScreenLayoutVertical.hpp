@@ -51,5 +51,7 @@ namespace gui
       protected:
         auto setScreenMode(ScreenMode mode) -> void;
         virtual bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext);
+        virtual bool isAlarmTimeVisibilityAllowed();
+        bool isBatteryCharging(const Store::Battery::State state);
     };
 }; // namespace gui

@@ -20,30 +20,39 @@ namespace
 
 namespace gui
 {
-    BellBattery::BellBattery(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : HBox(parent, x, y, w, h)
+    BellBattery::BellBattery(Item *parent) : HBox(parent)
     {
         img = new Image(this, battery_low, gui::ImageTypeSpecifier::W_M);
         img->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-        img->setMargins(gui::Margins(0, 0, battery::image_right_margin, 0));
 
-        percentText = new TextFixedSize(this, 0, 0, 0, 0);
-        percentText->setMinimumSize(battery::percent_w, battery::percent_h);
+        percentText = new Text(this);
+        percentText->setMaximumSize(battery::percent_w, battery::percent_h);
         percentText->setFont(battery::font_small);
         percentText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         percentText->setEdges(RectangleEdge::None);
+        percentText->setEditMode(EditMode::Browse);
         percentText->activeItem = false;
         percentText->drawUnderline(false);
         percentText->setVisible(false);
+        percentText->setText("000%");
+    }
+
+    void BellBattery::setFont(const UTF8 &fontName)
+    {
+        percentText->setFont(fontName);
     }
 
     void BellBattery::update(const units::SOC soc, const bool isCharging)
     {
         const auto image = battery_utils::getBatteryLevelImage(entries, soc);
-        if (not image) {
+        if (!image) {
             return;
         }
 
-        percentText->setText(std::to_string(soc) + "%");
+        const auto text = UTF8(std::to_string(soc) + "%");
+        // Without this the text is not set properly if percentText was hidden
+        percentText->setMinimumWidthToFitText(text);
+        percentText->setText(text);
 
         if (isCharging) {
             img->set(battery_charging, gui::ImageTypeSpecifier::W_M);
@@ -52,20 +61,33 @@ namespace gui
             img->set(image->data(), gui::ImageTypeSpecifier::W_M);
         }
 
-        if (batteryPercentMode == BatteryPercentMode::Show) {
-            percentText->setVisible(true);
-        }
-        else {
-            percentText->setVisible(false);
-        }
-        img->informContentChanged();
+        setBatteryPercentMode(batteryPercentMode);
     }
 
     void BellBattery::setBatteryPercentMode(BatteryPercentMode mode)
     {
         batteryPercentMode = mode;
-        if (batteryPercentMode == BatteryPercentMode::Hide) {
+        if (batteryPercentMode == BatteryPercentMode::Show) {
+            img->setMargins(gui::Margins(0, 0, battery::image_right_margin, 0));
+            percentText->setVisible(true);
+        }
+        else {
+            img->setMargins(gui::Margins(0, 0, 0, 0));
             percentText->setVisible(false);
         }
+
+        setWidthsToFitContent();
+        img->informContentChanged();
+    }
+
+    void BellBattery::setWidthsToFitContent()
+    {
+        auto width = img->widgetMinimumArea.w + img->getMargins().right;
+        if (percentText->visible) {
+            percentText->setMinimumWidthToFitText();
+            width += percentText->widgetMinimumArea.w;
+        }
+        setMinimumWidth(width);
+        setMaximumWidth(width);
     }
 } // namespace gui

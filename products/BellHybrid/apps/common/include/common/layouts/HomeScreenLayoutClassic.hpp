@@ -9,8 +9,7 @@
 
 namespace style::homescreen_classic
 {
-    constexpr inline auto bottom_box_w = 390U;
-    constexpr inline auto bottom_box_h = 102U;
+    constexpr inline auto status_box_layout_w = 350U;
 } // namespace style::homescreen_classic
 namespace gui
 {
@@ -39,7 +38,7 @@ namespace gui
         SnoozeIconAndTime,
     };
 
-    class HomeScreenLayoutClassic : public BaseHomeScreenLayoutProvider, BellBaseLayout
+    class HomeScreenLayoutClassic : public BaseHomeScreenLayoutProvider, protected BellBaseLayout
     {
       public:
         HomeScreenLayoutClassic(std::string name);
@@ -59,16 +58,17 @@ namespace gui
         auto getLayout() -> Item * override;
 
       protected:
-        auto setHeaderViewMode(HeaderViewMode mode) -> void;
-        virtual auto buildInterface() -> void;
+        void setHeaderViewMode(HeaderViewMode mode);
+        virtual void buildInterface();
         virtual bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext);
-        auto removeTextDescription() -> void;
+        void removeTextDescription();
 
-        TimeSetFmtSpinner *time{};
-        DuoHBox *statusBox{};
-        BellBattery *battery{};
-        TextFixedSize *bottomText{};
-        AlarmSetSpinner *alarm{};
-        SnoozeTimer *snoozeTimer{};
+        HBox *timeHBox            = nullptr;
+        TimeSetFmtSpinner *time   = nullptr;
+        HBox *statusBox           = nullptr;
+        BellBattery *battery      = nullptr;
+        TextFixedSize *bottomText = nullptr;
+        AlarmSetSpinner *alarm    = nullptr;
+        SnoozeTimer *snoozeTimer  = nullptr;
     };
 }; // namespace gui

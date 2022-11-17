@@ -21,7 +21,7 @@ namespace
     bool isBatteryCharging(const Store::Battery::State state)
     {
         using State = Store::Battery::State;
-        return state == State::Charging or state == State::ChargingDone;
+        return (state == State::Charging) || (state == State::ChargingDone);
     }
 } // namespace
 
@@ -50,27 +50,31 @@ namespace gui
         snoozeTimer->setVisible(false);
         snoozeTimer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        time = new TimeSetFmtSpinner(this->centerBox);
-        time->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
+        timeHBox = new HBox(this->centerBox);
+        timeHBox->setMaximumSize(style::bell_base_layout::center_layout_w, style::bell_base_layout::center_layout_h);
+        timeHBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        timeHBox->setEdges(RectangleEdge::None);
+
+        time = new TimeSetFmtSpinner(timeHBox);
+        time->setMaximumSize(style::bell_base_layout::center_layout_w, style::bell_base_layout::center_layout_h);
         time->setFont(mainWindow::time::font);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         time->setEditMode(EditMode::Browse);
         time->activeItem = false;
 
-        statusBox = new DuoHBox(this->lastBox, 0, 0, 0, 0);
-        statusBox->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        statusBox = new HBox(this->lastBox);
+        statusBox->setMinimumSize(style::homescreen_classic::status_box_layout_w,
+                                  style::bell_base_layout::outer_layouts_h);
         statusBox->setEdges(RectangleEdge::None);
         statusBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         statusBox->setVisible(true);
 
-        battery = new BellBattery(nullptr, 0, 0, 0, 0);
-        battery->setMinimumSize(battery::battery_widget_w, battery::battery_widget_h);
+        battery = new BellBattery(statusBox);
+        battery->setMaximumSize(battery::battery_widget_w, battery::battery_widget_h);
         battery->setEdges(RectangleEdge::None);
         battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         battery->setVisible(true);
         battery->setBatteryPercentMode(BatteryPercentMode::Show);
-
-        statusBox->setItems(battery, nullptr);
 
         bottomText = new TextFixedSize(this->lastBox, 0, 0, 0, 0);
         bottomText->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
@@ -226,6 +230,8 @@ namespace gui
     void HomeScreenLayoutClassic::setTimeFormat(utils::time::Locale::TimeFormat fmt)
     {
         time->setTimeFormat(fmt);
+        // setTimeFormat makes AM/PM "visible" so disable it
+        time->setTimeFormatSpinnerVisibility(false);
     }
 
     void HomeScreenLayoutClassic::setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt)

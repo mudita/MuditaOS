@@ -47,6 +47,7 @@ namespace gui
       private:
         std::map<std::string, std::string> colonFontMap = {
             {style::window::font::verybiglight, "alarm_colon_W_M"},
+            {style::window::font::veryverybiglight, "alarm_colon_W_M"},
             {style::window::font::largelight, "alarm_colon_W_M"},
             {style::window::font::supersizeme, "alarm_colon_select_W_M"},
             {style::window::font::supersizemelight, "alarm_colon_select_W_M"},
@@ -55,6 +56,8 @@ namespace gui
 
         std::map<std::string, Margins> colonMarginsMap = {
             {style::window::font::verybiglight,
+             {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},
+            {style::window::font::veryverybiglight,
              {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},
             {style::window::font::largelight,
              {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},

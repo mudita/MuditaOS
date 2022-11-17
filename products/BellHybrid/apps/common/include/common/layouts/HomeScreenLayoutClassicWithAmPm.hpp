@@ -16,6 +16,8 @@ namespace gui
 
       protected:
         auto buildInterface() -> void override;
+        bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext) override;
+        void handleContentChanged() override;
 
         TextFixedSize *fmt{};
     };
