@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SoundsModel.hpp"
@@ -77,16 +77,16 @@ std::filesystem::path SoundsModel::getSoundPath(audio_settings::AbstractAudioSet
     assert(model);
     switch (model->getPlaybackType()) {
     case audio::PlaybackType::CallRingtone:
-        return purefs::dir::getCurrentOSPath() / "assets/audio/ringtone";
+        return purefs::dir::getSystemDiskPath() / "assets/audio/ringtone";
 
     case audio::PlaybackType::TextMessageRingtone:
-        return purefs::dir::getCurrentOSPath() / "assets/audio/sms";
+        return purefs::dir::getSystemDiskPath() / "assets/audio/sms";
 
     case audio::PlaybackType::Notifications:
-        return purefs::dir::getCurrentOSPath() / "assets/audio/alarm";
+        return purefs::dir::getSystemDiskPath() / "assets/audio/alarm";
 
     default:
-        return purefs::dir::getCurrentOSPath() / "assets/audio";
+        return purefs::dir::getSystemDiskPath() / "assets/audio";
     }
 }
 
@@ -97,7 +97,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
     auto currentItemIndex  = 0;
     auto selectedItemIndex = 0;
 
-    std::string selectedSound = purefs::dir::getCurrentOSPath() / model->getSound();
+    std::string selectedSound = purefs::dir::getSystemDiskPath() / model->getSound();
     for (const auto &sound : sounds) {
 
         bool isSelected = false;
@@ -122,7 +122,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
         case audio::PlaybackType::TextMessageRingtone:
         case audio::PlaybackType::Notifications:
             item->activatedCallback = [=](gui::Item &) {
-                auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
+                auto fileRelativePath = sound.lexically_relative(purefs::dir::getSystemDiskPath());
                 LOG_INFO("Setting sound to %s", fileRelativePath.c_str());
                 model->setSound(fileRelativePath);
                 soundsPlayer->stop();
@@ -132,7 +132,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
 
             // callback to handle preview of the sound
             item->inputCallback = [=](gui::Item &item, const gui::InputEvent &event) {
-                auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
+                auto fileRelativePath = sound.lexically_relative(purefs::dir::getSystemDiskPath());
 
                 if (event.isShortRelease(gui::KeyCode::KEY_RF)) {
                     soundsPlayer->stop();
@@ -168,7 +168,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
                     return true;
                 }
 
-                auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
+                auto fileRelativePath = sound.lexically_relative(purefs::dir::getSystemDiskPath());
                 if (!soundsPlayer->previouslyPlayed(fileRelativePath)) {
                     app->getCurrentWindow()->navBarTemporaryMode(
                         utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);

@@ -3,6 +3,7 @@
 
 #include "EinkDisplay.hpp"
 
+#include <purefs/filesystem_paths.hpp>
 #include <board/BoardDefinitions.hpp>
 #include <log/log.hpp>
 
@@ -17,7 +18,6 @@ namespace hal::eink
     namespace
     {
         constexpr auto DefaultSurroundingTemperature = -1000;
-        constexpr auto LutsFileName                  = "Luts.bin";
         constexpr auto LUTDSize                      = 16385;
         constexpr auto LUTCSize                      = 64;
         constexpr auto LUTRSize                      = 256; ///< Needed due to \ref LutsFileName structure
@@ -30,6 +30,8 @@ namespace hal::eink
         constexpr auto LUTTemperatureOffsetInterval    = 3;
         constexpr auto LUTTemperatureOffsetSubcritical = 12;
         constexpr auto LUTTemperatureOffsetCritical    = 13;
+
+        const auto LutsFilePath = purefs::dir::getSystemDiskPath() / "assets" / "Luts.bin";
 
         EinkWaveformSettings_t createDefaultWaveFormSettings(EinkWaveforms_e waveformMode)
         {
@@ -321,9 +323,9 @@ namespace hal::eink
             return EinkStatus::EinkOK;
         }
 
-        auto file = std::fopen(LutsFileName, "rb");
+        auto file = std::fopen(LutsFilePath.c_str(), "rb");
         if (file == nullptr) {
-            LOG_FATAL("Could not find the LUTS.bin file. Returning");
+            LOG_FATAL("Could not find LUTS file in '%s'! Returning...", LutsFilePath.c_str());
             return EinkStatus::EinkWaveformsFileOpenFail;
         }
         auto fileHandlerCleanup = gsl::finally([&file]() { std::fclose(file); });

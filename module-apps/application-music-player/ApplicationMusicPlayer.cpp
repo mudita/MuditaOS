@@ -46,7 +46,7 @@ namespace app
 
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 
-        const auto paths     = std::vector<std::string>{purefs::dir::getUserAudioPath()};
+        const auto paths     = std::vector<std::string>{purefs::dir::getUserMediaPath()};
         auto tagsFetcher     = std::make_unique<app::music::ServiceAudioTagsFetcher>(this);
         auto songsRepository = std::make_unique<app::music::SongsRepository>(this, std::move(tagsFetcher), paths);
 

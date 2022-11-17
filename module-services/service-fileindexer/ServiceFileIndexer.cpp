@@ -31,7 +31,7 @@ namespace service
     sys::ReturnCodes ServiceFileIndexer::InitHandler()
     {
         if (mInotifyHandler.init(shared_from_this())) {
-            mInotifyHandler.addWatch(purefs::dir::getUserAudioPath().c_str());
+            mInotifyHandler.addWatch(purefs::dir::getUserMediaPath().c_str());
 
             // Start the initial indexer
             mStartupIndexer.start(shared_from_this(), service::name::file_indexer);
