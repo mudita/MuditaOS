@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -88,6 +88,6 @@ namespace gui
     {
         AudioServiceAPI::PlaybackStart(application,
                                        audio::PlaybackType::Meditation,
-                                       purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
+                                       purefs::dir::getSystemDiskPath() / "assets/audio/meditation/gong.mp3");
     }
 } // namespace gui

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <boot/bootconfig.hpp>
 #include <boot/bootconstants.hpp>
@@ -22,7 +22,6 @@ namespace boot
 {
     namespace
     {
-
         std::string loadFileAsString(const std::filesystem::path &fileToLoad)
         {
             std::string content;
@@ -30,54 +29,9 @@ namespace boot
             std::getline(in, content, std::string::traits_type::to_char_type(std::string::traits_type::eof()));
             return content;
         }
-
-        bool verifyCRC(const std::filesystem::path &file, const unsigned long crc32)
-        {
-            auto fp = fopen(file.c_str(), "r");
-            if (!fp) {
-                LOG_ERROR("verifyCRC can't open %s", file.c_str());
-                return false;
-            }
-            auto fpCloseAct = gsl::finally([fp] { fclose(fp); });
-
-            unsigned long crc32Read = utils::filesystem::computeFileCRC32(fp);
-            LOG_INFO(
-                "verifyCRC computed crc32 for %s is %08" PRIX32, file.c_str(), static_cast<std::uint32_t>(crc32Read));
-
-            return crc32Read == crc32;
-        }
-
-        bool readAndVerifyCRC(const std::filesystem::path &file)
-        {
-            std::filesystem::path crcFilePath(file);
-            crcFilePath += boot::consts::ext_crc32;
-
-            auto fp = fopen(crcFilePath.c_str(), "r");
-            if (!fp) {
-                LOG_ERROR("verifyCRC can't open %s", crcFilePath.c_str());
-                return false;
-            }
-            auto fpCloseAct = gsl::finally([fp] { fclose(fp); });
-
-            std::array<char, boot::consts::crc_char_size + 1> crcBuf;
-            size_t readSize = std::fread(crcBuf.data(), 1, boot::consts::crc_char_size, fp);
-            if (readSize != boot::consts::crc_char_size) {
-                LOG_ERROR("verifyCRC fread on %s returned different size then %d [%zu]",
-                          crcFilePath.c_str(),
-                          boot::consts::crc_char_size,
-                          readSize);
-                return false;
-            }
-
-            crcBuf[boot::consts::crc_char_size] = 0;
-            const unsigned long crc32Read       = strtoull(crcBuf.data(), nullptr, boot::consts::crc_radix);
-
-            LOG_INFO("verifyCRC read %s string:\"%s\" hex:%08lX", crcFilePath.c_str(), crcBuf.data(), crc32Read);
-            return verifyCRC(file, crc32Read);
-        }
     } // namespace
 
-    BootConfig::BootConfig() : m_os_root_path(purefs::dir::getRootDiskPath())
+    BootConfig::BootConfig() : m_os_root_path(purefs::dir::getSystemDiskPath())
     {}
 
     json11::Json BootConfig::to_json() const
@@ -141,7 +95,7 @@ namespace boot
         if (parseErrors == "") {
             m_os_type            = m_boot_json_parsed[boot::json::main][boot::json::os_type].string_value();
             m_os_image           = m_boot_json_parsed[boot::json::main][boot::json::os_image].string_value();
-            m_os_root_path       = purefs::createPath(purefs::dir::getRootDiskPath(), m_os_type);
+            m_os_root_path       = purefs::createPath(purefs::dir::getSystemDiskPath(), m_os_type);
             m_boot_json          = bootJsonPath;
             m_bootloader_version = m_boot_json_parsed[boot::json::bootloader][boot::json::os_version].string_value();
             m_timestamp          = utils::time::getCurrentTimestamp().str("%c");
@@ -151,9 +105,8 @@ namespace boot
             return true;
         }
         else {
-            m_os_type      = purefs::dir::getCurrentOSPath();
             m_os_image     = purefs::file::boot_bin;
-            m_os_root_path = purefs::createPath(purefs::dir::getRootDiskPath(), m_os_type);
+            m_os_root_path = purefs::dir::getSystemDiskPath();
             m_boot_json    = bootJsonPath;
             m_timestamp    = utils::time::getCurrentTimestamp().str("%c");
             m_os_version   = std::string(VERSION);
@@ -164,10 +117,7 @@ namespace boot
 
     std::filesystem::path BootConfig::getCurrentBootJSON()
     {
-        auto boot_json_path = purefs::dir::getRootDiskPath() / purefs::file::boot_json;
-        if (!readAndVerifyCRC(boot_json_path)) {
-            LOG_INFO("CRC check failed on %s", boot_json_path.c_str());
-        }
+        auto boot_json_path = purefs::dir::getUserDiskPath() / purefs::file::boot_json;
         return boot_json_path;
     }
 } // namespace boot
