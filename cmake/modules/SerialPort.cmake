@@ -5,18 +5,18 @@
 #   define_serial(TARGET_NAME)
 #
 #  this checks if SERIAL_PORT variable is defined and if so, add proper defines
-#  for the specyfied target
+#  for the specified target
 #
 #####
-#   message_seraial_satus()
+#   message_serial_status()
 #
-#  This macro can be ussed to message if and which port is ussed
+#  This macro can be used to message if and which port is used
 
 include(Colours)
 
 macro(define_serial)
     if(NOT ${ARGC} EQUAL 1 )
-        messge(WARNING "No target specyfied!")
+        message(WARNING "No target specified!")
     else()
         if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
             if (SERIAL_PORT)

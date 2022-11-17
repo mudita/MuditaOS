@@ -143,7 +143,7 @@ namespace app
                                   return std::make_unique<app::onBoarding::StartConfigurationWindow>(app);
                               });
         windowsFactory.attach(gui::window::name::onBoarding_eula, [&](ApplicationCommon *app, const std::string &name) {
-            auto eulaRepository = std::make_unique<app::onBoarding::EULARepository>("assets/licenses", "eula.txt");
+            auto eulaRepository = std::make_unique<app::onBoarding::EULARepository>("data/licenses", "eula.txt");
             auto presenter      = std::make_unique<app::onBoarding::EULALicenseWindowPresenter>([&]() { acceptEULA(); },
                                                                                            std::move(eulaRepository));
             return std::make_unique<app::onBoarding::EULALicenseWindow>(app, std::move(presenter));
