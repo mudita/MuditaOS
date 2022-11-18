@@ -29,6 +29,7 @@ include(AddPackage)
 include(AutoModuleOption)
 include(AddDirectories)
 include(AddDatabases)
+include(FetchContent)
 include(AddScripts)
 
 message("Selected product: ${PRODUCT}")
@@ -123,6 +124,12 @@ if (NOT ENABLE_SECURE_BOOT)
         XIP_BOOT_HEADER_DCD_ENABLE=0
         )
 endif ()
+
+FetchContent_Declare(
+        pure-core
+        GIT_REPOSITORY git@github.com:mudita/pure-core
+)
+FetchContent_MakeAvailable(pure-core)
 
 add_subdirectory(board)
 add_subdirectory(source)

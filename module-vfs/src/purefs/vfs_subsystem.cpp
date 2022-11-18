@@ -8,6 +8,8 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/vfs_subsystem.hpp>
 #include <purefs/vfs_subsystem_internal.hpp>
+#include <hal/boot_reason.h>
+#include <hal/boot_control.h>
 #include <purefs/fs/thread_local_cwd.hpp>
 #include <log/log.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -38,30 +40,6 @@ namespace purefs::subsystem
         } // namespace json
         std::weak_ptr<blkdev::disk_manager> g_disk_mgr;
         std::weak_ptr<fs::filesystem> g_fs_core;
-    } // namespace
-
-    namespace
-    {
-        int read_mbr_lfs_erase_size(std::shared_ptr<blkdev::disk_manager> disk_mngr,
-                                    std::string_view dev_name,
-                                    int part_no)
-        {
-            static constexpr auto MBR_ERASE_BLK_OFFSET = 0x00E0;
-            if (part_no <= 0) {
-                return -EINVAL;
-            }
-            const auto sect_size = disk_mngr->get_info(dev_name, blkdev::info_type::sector_size);
-            if (sect_size <= MBR_ERASE_BLK_OFFSET + part_no) {
-                return (sect_size > 0) ? (-ERANGE) : (sect_size);
-            }
-            auto mbr_buf = std::make_unique<char[]>(sect_size);
-            int err      = disk_mngr->read(dev_name, mbr_buf.get(), 0, 1);
-            if (err < 0) {
-                return err;
-            }
-            return mbr_buf[MBR_ERASE_BLK_OFFSET + part_no];
-        }
-
     } // namespace
 
     auto initialize(std::unique_ptr<DeviceFactory> deviceFactory)
@@ -128,8 +106,24 @@ namespace purefs::subsystem
             LOG_FATAL("Unknown partitions layout part size is %u", (unsigned)(parts.size()));
             return -EIO;
         }
-        const auto &boot_part = parts[boot_part_index];
+
+        auto vfs = g_fs_core.lock();
+        if (!vfs) {
+            LOG_FATAL("Unable to lock vfs core");
+            return -EIO;
+        }
+
         const auto &user_part = parts[user_part_index];
+
+        vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "auto");
+
+        auto ret = boot_control_init(purefs::dir::getBootJSONPath().string().c_str());
+        if (ret != 0) {
+            LOG_FATAL("Unable to init boot.json handling");
+            return -ENOENT;
+        }
+
+        const auto &boot_part = parts[(get_current_slot() == Slot_A) ? 0 : 1];
         if ((boot_part.type != fat_part_code) && (boot_part.type != linux_part_code)) {
             LOG_FATAL("Invalid boot partition type expected code: %02X or %02X current code: %02X",
                       fat_part_code,
@@ -142,30 +136,13 @@ namespace purefs::subsystem
                 "Invalid user partition type expected code: %02X current code: %02X", linux_part_code, user_part.type);
             return -EIO;
         }
-        auto vfs = g_fs_core.lock();
-        if (!vfs) {
-            LOG_FATAL("Unable to lock vfs core");
-            return -EIO;
-        }
+
         auto err = vfs->mount(boot_part.name, purefs::dir::getSystemDiskPath().string(), "auto");
-        if (err) {
+        if (err != 0) {
             return err;
         }
-        if (user_part.type == lfs_part_code) {
-            const int lfs_block_log2 = read_mbr_lfs_erase_size(disk, default_blkdev_name, user_part.physical_number);
-            uint32_t lfs_block_size  = 0;
-            uint32_t *lfs_block_size_ptr = nullptr;
-            if (lfs_block_log2 >= block_size_min_shift && lfs_block_log2 <= block_size_max_shift) {
-                lfs_block_size     = 1U << lfs_block_log2;
-                lfs_block_size_ptr = &lfs_block_size;
-            }
-            err =
-                vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "littlefs", 0, lfs_block_size_ptr);
-        }
-        else {
-            err = vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "ext4");
-        }
-        fs::internal::set_default_thread_cwd(dir::getSystemDiskPath().string());
+
+        fs::internal::set_default_thread_cwd(purefs::dir::getSystemDiskPath().string());
 
         // Mount NVRAM memory
         err = vfs->mount(default_nvrom_name,
@@ -173,7 +150,7 @@ namespace purefs::subsystem
                          "littlefs",
                          fs::mount_flags::read_only,
                          &nvrom_lfs_block_size);
-        if (err) {
+        if (err != 0) {
             LOG_WARN("Unable to mount NVROM partition err %i. Possible: NVROM unavailable", err);
             err = 0;
         }
