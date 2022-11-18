@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_LINUXLPM_H
@@ -18,7 +18,6 @@ namespace bsp
         void SetHighestCoreVoltage() final;
         [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
-        void SetBootSuccess() override;
 
         void EnableDcdcPowerSaveMode() final;
         void DisableDcdcPowerSaveMode() final;
