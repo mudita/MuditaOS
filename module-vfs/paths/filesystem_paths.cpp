@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/filesystem_paths.hpp>
+#include <hal/boot_control.h>
 
 namespace
 {
@@ -18,6 +19,8 @@ namespace
         "media"; // TODO this won't work with our current non-hierarchical MTP implementation
     constexpr inline auto PATH_TMP    = "tmp";
     constexpr inline auto PATH_BACKUP = "backup";
+    constexpr inline auto PATH_ASSETS  = "assets";
+
 } // namespace
 
 namespace purefs
@@ -87,6 +90,14 @@ namespace purefs
         std::filesystem::path getBackupOSPath() noexcept
         {
             return getUserDiskPath() / PATH_BACKUP; // TODO is it still needed?
+        }
+        std::filesystem::path getBootJSONPath() noexcept
+        {
+            return getUserDiskPath() / file::boot_json;
+        }
+        std::filesystem::path getAssetsPath() noexcept
+        {
+            return getSystemDiskPath() / PATH_ASSETS;
         }
     } // namespace dir
 } // namespace purefs
