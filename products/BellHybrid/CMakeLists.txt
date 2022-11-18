@@ -65,6 +65,7 @@ target_link_libraries(BellHybrid
         bell::time
         platform
         version-header
+        pure-core
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )
