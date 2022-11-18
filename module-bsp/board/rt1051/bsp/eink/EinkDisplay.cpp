@@ -31,7 +31,7 @@ namespace hal::eink
         constexpr auto LUTTemperatureOffsetSubcritical = 12;
         constexpr auto LUTTemperatureOffsetCritical    = 13;
 
-        const auto LutsFilePath = purefs::dir::getSystemDiskPath() / "assets" / "Luts.bin";
+        const auto LutsFilePath = purefs::dir::getAssetsDirPath() / "luts.bin";
 
         EinkWaveformSettings_t createDefaultWaveFormSettings(EinkWaveforms_e waveformMode)
         {
