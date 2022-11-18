@@ -93,7 +93,7 @@ namespace gui
 
     std::vector<tags::fetcher::Tags> AlarmMusicOptionsItem::getMusicFilesList()
     {
-        const auto musicFolder = (purefs::dir::getSystemDiskPath() / "assets/audio/alarm").string();
+        const auto musicFolder = (purefs::dir::getAssetsPath() / "audio/alarm").string();
         std::vector<tags::fetcher::Tags> musicFiles;
         LOG_INFO("Scanning music folder: %s", musicFolder.c_str());
         for (const auto &ent : std::filesystem::directory_iterator(musicFolder)) {

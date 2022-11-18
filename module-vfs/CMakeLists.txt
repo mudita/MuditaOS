@@ -123,10 +123,12 @@ target_link_libraries(module-vfs
         module-bsp 
         module-os
         module-utils
-    PUBLIC 
+        pure-core
+
+        PUBLIC
         purefs-paths
         module-sys
-)
+        )
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
