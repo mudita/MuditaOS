@@ -265,6 +265,8 @@
   "sim_setup_wrong_pin_last_attempt": "<text>Código PIN incorrecto. Te queda<br></br>1 intento.</text>",
   "sim_wrong_pin_confirmation": "Código PIN incorrecto.",
   "sim_pin_changed_successfully": "El código PIN se ha cambiado con éxito.",
+  "sim_card_changed_successfully": "La tarjeta SIM se ha cambiado con éxito.",
+  "sim_card_change_in_progress": "<text>Proceso de cambio de SIM en curso.<br></br>Tarda unos segundos.</text>",
   "sim_cme_error": "<text>Tarjeta SIM<br></br>Error CME:<token>$CMECODE</token></text>",
   "sim_puk_blocked": "<text>La tarjeta SIM está bloqueada.<br></br>Ponte en contacto con tu operador.</text>",
   "sim_setup_enter_puk": "<text>La tarjeta SIM está bloqueada.<br></br>Para desbloquearla, introduce el código PUK:</text>",

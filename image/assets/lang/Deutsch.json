@@ -265,6 +265,8 @@
   "sim_setup_wrong_pin_last_attempt": "<text>Falscher PIN-Code. <br></br>1 Versuch übrig.</text>",
   "sim_wrong_pin_confirmation": "Falscher PIN-Code.",
   "sim_pin_changed_successfully": "PIN-Code erfolgreich geändert",
+  "sim_card_changed_successfully": "SIM-Karte erfolgreich geändert.",
+  "sim_card_change_in_progress": "<text>SIM-Wechselvorgang läuft.<br></br>Es dauert bis zu ein paar Sekunden.</text>",
   "sim_cme_error": "<text>SIM-Karte<br></br>CME-Fehler:<token>$CMECODE</token></text>",
   "sim_puk_blocked": "<text>Die SIM-Karte ist gesperrt.<br></br>Bitte kontaktieren Sie den Betreiber.</text>",
   "sim_setup_enter_puk": "<text>Die SIM-Karte ist gesperrt.<br></br>Zum Entsperren PUK-Code eingeben:</text>",

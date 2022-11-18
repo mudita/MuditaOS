@@ -276,6 +276,8 @@
   "sim_setup_wrong_pin_last_attempt": "<text>Błędny kod PIN. Pozostała ci<br></br>1 próba.</text>",
   "sim_wrong_pin_confirmation": "Błędny kod PIN.",
   "sim_pin_changed_successfully": "Pomyślnie zmieniono kod PIN",
+  "sim_card_changed_successfully": "Pomyślnie zmieniono kartę SIM.",
+  "sim_card_change_in_progress": "<text>Proces zmiany karty SIM w toku.<br></br>Może to potrwać kilka sekund.</text>",
   "sim_cme_error": "<text>Błąd CME<br></br>karty SIM:<token>$CMECODE</token></text>",
   "sim_puk_blocked": "<text>Karta SIM jest zablokowana.<br></br>Skontaktuj się z operatorem.</text>",
   "sim_setup_enter_puk": "<text>Karta SIM jest zablokowana.<br></br>Aby odblokować, wprowadź kod PUK:</text>",

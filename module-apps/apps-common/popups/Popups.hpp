@@ -25,6 +25,7 @@ namespace gui
             SimLock,
             SimInfo,
             SimNotReady,
+            SimSwitching,
             AlarmActivated,
             AlarmDeactivated,
             Alarm,
@@ -53,6 +54,7 @@ namespace gui
             inline constexpr auto sim_unlock_window                 = "SimUnlockPopup";
             inline constexpr auto sim_info_window                   = "SimInfoPopup";
             inline constexpr auto sim_not_ready_window              = "SimNotReadyPopup";
+            inline constexpr auto sim_switching_window              = "SimSwitchingPopup";
             inline constexpr auto alarm_activated_window            = "AlarmActivatedPopup";
             inline constexpr auto alarm_deactivated_window          = "AlarmDeactivatedPopup";
             inline constexpr auto alarm_window                      = "AlarmPopup";

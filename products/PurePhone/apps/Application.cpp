@@ -19,6 +19,7 @@
 #include <popups/lock-popups/SimLockInputWindow.hpp>
 #include <popups/lock-popups/SimInfoWindow.hpp>
 #include <popups/lock-popups/SimNotReadyWindow.hpp>
+#include <popups/lock-popups/SimSwitchingWindow.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace app
@@ -108,6 +109,7 @@ namespace app
             case ID::SimLock:
             case ID::SimInfo:
             case ID::SimNotReady:
+            case ID::SimSwitching:
                 windowsFactory.attach(window::sim_unlock_window, [](ApplicationCommon *app, const std::string &name) {
                     return std::make_unique<gui::SimLockInputWindow>(app, window::sim_unlock_window);
                 });
@@ -117,6 +119,10 @@ namespace app
                 windowsFactory.attach(
                     window::sim_not_ready_window, [](ApplicationCommon *app, const std::string &name) {
                         return std::make_unique<gui::SimNotReadyWindow>(app, window::sim_not_ready_window);
+                    });
+                windowsFactory.attach(
+                    window::sim_switching_window, [](ApplicationCommon *app, const std::string &name) {
+                        return std::make_unique<gui::SimSwitchingWindow>(app, window::sim_switching_window);
                     });
                 break;
             case ID::Alarm:

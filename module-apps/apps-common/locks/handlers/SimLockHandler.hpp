@@ -24,11 +24,13 @@ namespace locks
         unsigned int storedErrorCode          = 0;
         bool simUnlockingNeeded_              = false;
         bool simReady                         = false;
+        bool simSwitching                     = false;
         StoredLockInput storedFirstInput;
         StoredLockInput storedSecondInput;
 
         void clearStoredInputs();
         void setSimInputTypeAction(SimInputTypeAction _simInputTypeAction);
+        void setSim(cellular::api::SimSlot simSlot);
 
         void simInputRequiredAction();
         void simErrorAction(unsigned int errorCode);
@@ -71,9 +73,10 @@ namespace locks
         sys::MessagePointer handleSimNotInsertedMessage();
         sys::MessagePointer handleSimNotRespondingMessage();
         sys::MessagePointer handleSimUnlockRequest();
+        sys::MessagePointer handleSimSwitchingMessage(cellular::api::SimSlot simSlot);
+        sys::MessagePointer handleSimSwitchedMessage();
 
         void getSettingsSimSelect(const std::string &settingsSim);
-        void setSim(cellular::api::SimSlot simSlot);
     };
 
 } // namespace locks

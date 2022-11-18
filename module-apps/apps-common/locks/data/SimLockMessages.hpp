@@ -53,4 +53,6 @@ namespace locks
     class UnblockSim : public sys::DataMessage
     {};
 
+    class SimSwitched : public sys::DataMessage
+    {};
 } // namespace locks

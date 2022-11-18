@@ -38,6 +38,8 @@ namespace gui::popup
             return gui::popup::window::sim_info_window;
         case ID::SimNotReady:
             return gui::popup::window::sim_not_ready_window;
+        case ID::SimSwitching:
+            return gui::popup::window::sim_switching_window;
         case ID::AlarmActivated:
             return gui::popup::window::alarm_activated_window;
         case ID::AlarmDeactivated:
