@@ -115,11 +115,15 @@ namespace purefs::subsystem
 
         const auto &user_part = parts[user_part_index];
 
-        vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "auto");
-
-        auto ret = boot_control_init(purefs::dir::getBootJSONPath().string().c_str());
+        auto ret = vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "auto");
         if (ret != 0) {
-            LOG_FATAL("Unable to init boot.json handling");
+            LOG_FATAL("Failed to mount user partition on '%s'!", purefs::dir::getUserDiskPath().c_str());
+            return -EIO;
+        }
+
+        ret = boot_control_init(purefs::dir::getBootJSONPath().string().c_str());
+        if (ret != 0) {
+            LOG_FATAL("Unable to init boot.json handling!");
             return -ENOENT;
         }
 

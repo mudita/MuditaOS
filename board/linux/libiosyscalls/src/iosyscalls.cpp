@@ -23,13 +23,14 @@ namespace
     constexpr auto ENV_NAME       = "IOSYSCALLS_REDIRECT_TO_IMAGE";
     constexpr auto FIRST_FILEDESC = 64'566'756;
     constexpr auto SYSROOT        = "sysroot";
+    constexpr auto SYSTEM_PARTITION = "system_a";
+    constexpr auto SYSTEM_DATA_DIR  = "data";
     bool g_evaluated              = false;
     bool g_redirect               = false;
 
-    constexpr const char *LINUX_PATHS[]{
-        "/dev/", "/etc/", "/lib", "/usr/share", "/run/user", "/home", "/proc", "/tmp", "MuditaOS.log", nullptr};
-
-    constexpr const char *IMAGE_PATHS[]{"/sys", "/mfgconf", "sys", "assets", "country-codes.db", "Luts.bin", nullptr};
+    constexpr auto LINUX_PATHS = {
+        "/dev/", "/etc/", "/lib", "/usr/share", "/run/user", "/home", "/proc", "/tmp", "MuditaOS.log"};
+    constexpr auto IMAGE_PATHS = {"/system", "/mfgconf", "/user"};
 
     pthread_mutex_t g_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
     phmap::flat_hash_set<vfsn::linux::internal::FILEX *> g_fdlist;
@@ -70,8 +71,8 @@ namespace vfsn::linux::internal
             return false;
         }
 
-        for (auto path = LINUX_PATHS; *path; ++path) {
-            if (std::strstr(inpath, *path) == inpath) {
+        for (const auto &path : LINUX_PATHS) {
+            if (std::strstr(inpath, path) == inpath) {
                 return false;
             }
         }
@@ -83,35 +84,24 @@ namespace vfsn::linux::internal
     {
         const auto inputPath = std::string(inpath);
 
-        for (auto path = IMAGE_PATHS; *path != 0; ++path) {
-            if (std::strstr(inpath, *path) == inpath) {
-                std::string outpath;
+        for (const auto &path : IMAGE_PATHS) {
+            if (std::strstr(inpath, path) == inpath) {
+                std::string outpath   = sysroot;
+                const auto pathLength = std::strlen(path);
 
-                if (std::strcmp(*path, "/mfgconf") == 0) {
-                    outpath = sysroot;
-                    outpath += "/sys/";
-                    outpath += inputPath;
-                }
-                else if (std::strcmp(*path, "sys") == 0) {
-                    outpath = sysroot;
+                if (std::strcmp(path, "/mfgconf") == 0) {
                     outpath += "/";
-                    outpath += inputPath;
+                    outpath += SYSTEM_PARTITION;
+                    outpath += "/";
+                    outpath += SYSTEM_DATA_DIR;
+                    outpath += inputPath.substr(pathLength);
+                }
+                else if (std::strcmp(path, "/system") == 0) {
+                    outpath += "/";
+                    outpath += SYSTEM_PARTITION;
+                    outpath += inputPath.substr(pathLength);
                 }
                 else if (*inpath == '/') {
-                    constexpr auto os_path    = "/sys/os";
-                    const auto os_path_length = strlen(os_path);
-                    if (std::strncmp(inpath, os_path, os_path_length) == 0) {
-                        outpath = sysroot;
-                        outpath += "/sys";
-                        outpath += inputPath.substr(os_path_length);
-                    }
-                    else {
-                        outpath = sysroot + inputPath;
-                    }
-                }
-                else {
-                    outpath = sysroot;
-                    outpath += "/sys/current/";
                     outpath += inputPath;
                 }
 

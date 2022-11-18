@@ -4,7 +4,7 @@
         {
             "name": "image/Luts.bin.tgz",
             "tarfile": "Luts.bin",
-            "output": "Luts.bin",
+            "output": "luts.bin",
             "unpack": true
         }
     ]
