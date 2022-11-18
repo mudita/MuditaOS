@@ -77,16 +77,16 @@ std::filesystem::path SoundsModel::getSoundPath(audio_settings::AbstractAudioSet
     assert(model);
     switch (model->getPlaybackType()) {
     case audio::PlaybackType::CallRingtone:
-        return purefs::dir::getSystemDiskPath() / "assets/audio/ringtone";
+        return purefs::dir::getAssetsPath() / "audio/ringtone";
 
     case audio::PlaybackType::TextMessageRingtone:
-        return purefs::dir::getSystemDiskPath() / "assets/audio/sms";
+        return purefs::dir::getAssetsPath() / "audio/sms";
 
     case audio::PlaybackType::Notifications:
-        return purefs::dir::getSystemDiskPath() / "assets/audio/alarm";
+        return purefs::dir::getAssetsPath() / "audio/alarm";
 
     default:
-        return purefs::dir::getSystemDiskPath() / "assets/audio";
+        return purefs::dir::getAssetsPath() / "audio";
     }
 }
 
@@ -97,7 +97,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
     auto currentItemIndex  = 0;
     auto selectedItemIndex = 0;
 
-    std::string selectedSound = purefs::dir::getSystemDiskPath() / model->getSound();
+    std::string selectedSound = purefs::dir::getAssetsPath() / model->getSound();
     for (const auto &sound : sounds) {
 
         bool isSelected = false;

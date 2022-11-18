@@ -86,8 +86,7 @@ namespace gui
     }
     void MeditationTimer::playSound()
     {
-        AudioServiceAPI::PlaybackStart(application,
-                                       audio::PlaybackType::Meditation,
-                                       purefs::dir::getSystemDiskPath() / "assets/audio/meditation/gong.mp3");
+        AudioServiceAPI::PlaybackStart(
+            application, audio::PlaybackType::Meditation, purefs::dir::getAssetsPath() / "audio/meditation/gong.mp3");
     }
 } // namespace gui
