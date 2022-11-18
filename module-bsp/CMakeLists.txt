@@ -78,6 +78,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         purefs-paths
         time-constants
+        pure-core
 )
 
 if (${ENABLE_TESTS})

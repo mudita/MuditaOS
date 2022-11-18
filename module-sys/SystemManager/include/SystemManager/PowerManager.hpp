@@ -72,7 +72,6 @@ namespace sys
         void ResetPernamentFrequency();
 
         void LogPowerManagerStatistics();
-        void SetBootSuccess();
 
       private:
         void ResetFrequencyShiftCounter();
