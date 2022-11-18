@@ -11,6 +11,8 @@
 #include <json11.hpp>
 #include <i18n/i18n.hpp>
 
+#include <purefs/filesystem_paths.hpp>
+
 namespace utils
 {
     class i18n
@@ -25,8 +27,8 @@ namespace utils
         Language inputLanguage        = fallbackLanguageName;
         Language inputLanguageFilename;
         Language currentDisplayLanguage;
-        std::filesystem::path InputLanguageDirPath   = "data/profiles";
-        std::filesystem::path DisplayLanguageDirPath = "data/lang";
+        std::filesystem::path InputLanguageDirPath   = purefs::dir::getDataDirPath() / "profiles";
+        std::filesystem::path DisplayLanguageDirPath = purefs::dir::getDataDirPath() / "lang";
         cpp_freertos::MutexStandard mutex;
         std::vector<LanguageMetadata> metadata;
 
