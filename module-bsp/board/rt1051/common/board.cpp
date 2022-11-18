@@ -17,12 +17,24 @@ extern "C"
 }
 #include "chip.hpp"
 #include "board/irq_gpio.hpp"
-#include "reboot_codes.hpp"
 #include <board/debug_console.hpp>
 
 #include <cstdint>
 
 extern std::uint32_t __sdram_cached_start[];
+
+extern "C"
+{
+    uint32_t boot_reason_get_raw()
+    {
+        return SNVS->LPGPR[0];
+    }
+
+    void boot_reason_set_raw(uint32_t raw)
+    {
+        SNVS->LPGPR[0] = raw;
+    }
+}
 
 namespace bsp
 {
@@ -163,7 +175,8 @@ namespace bsp
         SNVS_HP_ChangeSSMState(SNVS);
 
         // Default flag set on start in non-volatile memory to detect boot fault
-        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
+        //        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
+        // TODO: Here we can implement boot-time fail detection
 
         // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
         DCDC_BootIntoDCM(DCDC);
