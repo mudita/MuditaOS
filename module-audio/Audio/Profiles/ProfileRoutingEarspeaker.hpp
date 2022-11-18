@@ -14,7 +14,7 @@ namespace audio
             : Profile(
                   "Routing Earspeaker",
                   Type::RoutingEarspeaker,
-                  purefs::dir::getSystemDiskPath() / "data/equalizer/earspeaker_routing.json",
+                  purefs::dir::getDataDirPath() / "equalizer/earspeaker_routing.json",
                   audio::codec::Configuration{
                       .sampleRate_Hz = 16000,
                       .bitWidth      = 16,

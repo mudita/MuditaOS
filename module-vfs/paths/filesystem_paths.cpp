@@ -10,17 +10,16 @@ namespace
     constexpr inline auto PATH_USER         = "/user";
     constexpr inline auto PATH_CONF         = "/mfgconf";
     constexpr inline auto PATH_DB           = "db";
-    constexpr inline auto PATH_FACTORY      = "factory";
     constexpr inline auto PATH_UPDATE       = "update";
     constexpr inline auto PATH_SYNC         = "sync";
-    constexpr inline auto PATH_LOGS         = "logs";
+    constexpr inline auto PATH_LOGS         = "log";
     constexpr inline auto PATH_CRASH_DUMPS  = "crash_dumps";
     constexpr inline auto PATH_USER_MEDIA =
         "media"; // TODO this won't work with our current non-hierarchical MTP implementation
     constexpr inline auto PATH_TMP    = "tmp";
     constexpr inline auto PATH_BACKUP = "backup";
     constexpr inline auto PATH_ASSETS  = "assets";
-
+    constexpr inline auto PATH_DATA    = "data";
 } // namespace
 
 namespace purefs
@@ -62,11 +61,6 @@ namespace purefs
             return getUserDiskPath() / PATH_SYNC; // TODO what's this?
         }
 
-        std::filesystem::path getFactoryDBsPath() noexcept
-        {
-            return getDatabasesPath() / PATH_FACTORY; // TODO this might not be required in OS
-        }
-
         std::filesystem::path getLogsPath() noexcept
         {
             return getSystemDiskPath() / PATH_LOGS;
@@ -91,13 +85,20 @@ namespace purefs
         {
             return getUserDiskPath() / PATH_BACKUP; // TODO is it still needed?
         }
+
         std::filesystem::path getBootJSONPath() noexcept
         {
             return getUserDiskPath() / file::boot_json;
         }
-        std::filesystem::path getAssetsPath() noexcept
+
+        std::filesystem::path getAssetsDirPath() noexcept
         {
             return getSystemDiskPath() / PATH_ASSETS;
+        }
+
+        std::filesystem::path getDataDirPath() noexcept
+        {
+            return getSystemDiskPath() / PATH_DATA;
         }
     } // namespace dir
 } // namespace purefs
