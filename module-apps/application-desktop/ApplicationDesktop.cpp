@@ -4,35 +4,19 @@
 #include "ApplicationDesktop.hpp"
 #include "ChargingBatteryWindow.hpp"
 #include "DeadBatteryWindow.hpp"
-#include "DesktopData.hpp"
 #include "DesktopMainWindow.hpp"
 #include "ClosingWindow.hpp"
 #include "MenuWindow.hpp"
 #include "MmiInternalMsgWindow.hpp"
 #include "MmiPullWindow.hpp"
-#include "MmiPushWindow.hpp"
-#include "Reboot.hpp"
 #include "WindowsPopupFilter.hpp"
 
 #include <apps-common/messages/AppMessage.hpp>
-#include <AppWindow.hpp>
-#include <Dialog.hpp>
-#include <magic_enum.hpp>
-#include <messages/DialogMetadataMessage.hpp>
-#include <MessageType.hpp>
 #include <module-gui/gui/widgets/status-bar/SIM.hpp>
-#include <service-desktop/Constants.hpp>
-#include <popups/presenter/PowerOffPresenter.hpp>
 #include <popups/TetheringOffPopup.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-cellular-api>
 #include <service-db/DBNotificationMessage.hpp>
-#include <service-db/QueryMessage.hpp>
 #include <system/messages/SystemManagerMessage.hpp>
-#include <windows/Dialog.hpp>
-#include <windows/DialogMetadata.hpp>
-
-#include <cassert>
 
 namespace app
 {

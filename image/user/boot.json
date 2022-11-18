@@ -3,13 +3,13 @@
         "slots": {
             "a": {
                 "bootable": true,
-                "successful": true,
-                "boot_attempts_left": "1",
+                "successful": false,
+                "boot_attempts_left": "10",
                 "prefix" : "/system_a"
             },
             "b": {
                 "bootable": true,
-                "successful": true,
+                "successful": false,
                 "boot_attempts_left": "10",
                 "prefix" : "/system_b"
             },
