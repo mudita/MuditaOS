@@ -3,17 +3,13 @@
 
 #include "RT1051LPMCommon.hpp"
 
-#include "board.h"
-#include "reboot_codes.hpp"
 #include <log/log.hpp>
-#include "bsp/watchdog/watchdog.hpp"
-#include <board/clock_config.h>
 #include <fsl_clock.h>
 #include <bsp/bsp.hpp>
-#include "ClockState.hpp"
 #include "Oscillator.hpp"
 #include "critical.hpp"
 #include "drivers/semc/DriverSEMC.hpp"
+#include <hal/boot_reason.h>
 
 namespace bsp
 {
@@ -36,26 +32,28 @@ namespace bsp
     {
         switch (reason) {
         case RebootType::GoToUpdaterUpdate:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToUpdaterCode;
+            set_boot_reason(boot_reason_code_update);
             break;
         case RebootType::GoToUpdaterRecovery:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToRecoveryCode;
+            set_boot_reason(boot_reason_code_recovery);
             break;
         case RebootType::GoToUpdaterFactoryReset:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToFactoryRstCode;
+            set_boot_reason(boot_reason_code_factory);
             break;
         case RebootType::GoToUpdaterBackup:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToBackupCode;
+            set_boot_reason(boot_reason_code_backup);
             break;
         case RebootType::GoToUpdaterRestore:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToRestoreCode;
+            set_boot_reason(boot_reason_code_restore);
             break;
         case RebootType::GoToUsbMscMode:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToUsbMscModeCode;
+            set_boot_reason(boot_reason_code_usb_mc_mode);
             break;
         case RebootType::NormalRestart:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
+            set_boot_reason(boot_reason_code_os);
             break;
+        default:
+            set_boot_reason(boot_reason_code_unknown);
         }
         board_restart();
         return 0;
@@ -168,11 +166,6 @@ namespace bsp
             bsp::EnableExternalOscillator();
             cpp_freertos::CriticalSection::Exit();
         }
-    }
-
-    void RT1051LPMCommon::SetBootSuccess()
-    {
-        SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
     }
 
     void RT1051LPMCommon::DisconnectInternalLoadResistor()

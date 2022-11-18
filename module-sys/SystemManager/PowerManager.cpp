@@ -222,9 +222,4 @@ namespace sys
         taskStatistics.Update();
         taskStatistics.LogCpuUsage();
     }
-
-    void PowerManager::SetBootSuccess()
-    {
-        lowPowerControl->SetBootSuccess();
-    }
 } // namespace sys
