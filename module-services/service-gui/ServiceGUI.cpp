@@ -53,8 +53,8 @@ namespace service::gui
 
     void ServiceGUI::initAssetManagers()
     {
-        ::gui::FontManager::getInstance().init(purefs::dir::getAssetsPath());
-        ::gui::ImageManager::getInstance().init(purefs::dir::getAssetsPath());
+        ::gui::FontManager::getInstance().init(purefs::dir::getAssetsDirPath());
+        ::gui::ImageManager::getInstance().init(purefs::dir::getAssetsDirPath());
     }
 
     void ServiceGUI::registerMessageHandlers()
