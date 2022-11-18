@@ -152,6 +152,7 @@ namespace gui
     {
         selectedSim == Store::GSM::SelectedSIM::SIM1 ? simParams->setSelectedSim(Store::GSM::SelectedSIM::SIM2)
                                                      : simParams->setSelectedSim(Store::GSM::SelectedSIM::SIM1);
+        this->application->switchWindow(gui::popup::window::sim_switching_window);
         return true;
     }
 

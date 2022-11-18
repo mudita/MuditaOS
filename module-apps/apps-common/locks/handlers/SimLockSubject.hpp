@@ -25,6 +25,7 @@ namespace locks
         void disableSimPin();
         void verifyInput(LockInput inputData);
         void unblockSim();
+        void simSwitched();
     };
 
 } // namespace locks

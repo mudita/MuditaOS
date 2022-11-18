@@ -26,6 +26,7 @@ target_sources(apps-common
 		lock-popups/SimLockInputWindow.cpp
 		lock-popups/SimInfoWindow.cpp
 		lock-popups/SimNotReadyWindow.cpp
+		lock-popups/SimSwitchingWindow.cpp
 		lock-popups/phone-lock-wallpapers/WallpaperBase.cpp
 		lock-popups/phone-lock-wallpapers/WallpaperClock.cpp
 		lock-popups/phone-lock-wallpapers/WallpaperQuote.cpp
@@ -56,6 +57,7 @@ target_sources(apps-common
 		lock-popups/SimLockInputWindow.hpp
 		lock-popups/SimInfoWindow.hpp
 		lock-popups/SimNotReadyWindow.hpp
+		lock-popups/SimSwitchingWindow.hpp
 		lock-popups/phone-lock-wallpapers/WallpaperBase.hpp
 		lock-popups/phone-lock-wallpapers/WallpaperClock.hpp
 		lock-popups/phone-lock-wallpapers/WallpaperQuote.hpp

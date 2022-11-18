@@ -41,6 +41,7 @@
 * Fixed disappearing "confirm" button in PIN entering screen
 
 ### Added
+* Added a popup for changing the SIM card
 * Added tethering information on the status bar
 * Added basic MMS handling
 * Added run-time statistics for tasks

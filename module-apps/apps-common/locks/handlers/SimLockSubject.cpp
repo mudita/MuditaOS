@@ -50,4 +50,9 @@ namespace locks
     {
         owner->bus.sendUnicast(std::make_shared<UnblockSim>(), service::name::appmgr);
     }
+
+    void SimLockSubject::simSwitched()
+    {
+        owner->bus.sendUnicast(std::make_shared<locks::SimSwitched>(), service::name::appmgr);
+    }
 } // namespace locks

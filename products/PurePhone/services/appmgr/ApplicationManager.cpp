@@ -317,8 +317,10 @@ namespace app::manager
         });
         connect(typeid(locks::SetSim), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<locks::SetSim *>(request);
-            simLockHandler.setSim(data->getSimSlot());
-            return sys::msgHandled();
+            return simLockHandler.handleSimSwitchingMessage(data->getSimSlot());
+        });
+        connect(typeid(locks::SimSwitched), [&](sys::Message *request) -> sys::MessagePointer {
+            return simLockHandler.handleSimSwitchedMessage();
         });
         connect(typeid(cellular::msg::request::sim::SetActiveSim::Response),
                 [&](sys::Message *request) -> sys::MessagePointer {

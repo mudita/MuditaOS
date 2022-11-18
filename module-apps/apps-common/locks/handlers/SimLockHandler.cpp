@@ -49,6 +49,9 @@ namespace locks
     void SimLockHandler::simErrorAction(unsigned int errorCode)
     {
         app::manager::Controller::sendAction(owner,
+                                             app::manager::actions::AbortPopup,
+                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::SimSwitching));
+        app::manager::Controller::sendAction(owner,
                                              app::manager::actions::ShowPopup,
                                              std::make_unique<gui::SimUnlockInputRequestParams>(
                                                  gui::popup::ID::SimLock, lock, simInputTypeAction, errorCode));
@@ -64,6 +67,9 @@ namespace locks
     void SimLockHandler::simNotReadyAction()
     {
         app::manager::Controller::sendAction(owner,
+                                             app::manager::actions::AbortPopup,
+                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::SimSwitching));
+        app::manager::Controller::sendAction(owner,
                                              app::manager::actions::ShowPopup,
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::SimNotReady));
     }
@@ -77,6 +83,9 @@ namespace locks
 
     void SimLockHandler::simInfoAction()
     {
+        app::manager::Controller::sendAction(owner,
+                                             app::manager::actions::AbortPopup,
+                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::SimSwitching));
         app::manager::Controller::sendAction(
             owner,
             app::manager::actions::ShowPopup,
@@ -113,7 +122,7 @@ namespace locks
         lock.attemptsLeft = attempts;
         lock.lockName     = utils::enumToString(Store::GSM::get()->selected);
 
-        if (simUnlockingNeeded_) {
+        if (simUnlockingNeeded_ || simSwitching) {
             return sys::msgNotHandled();
         }
 
@@ -134,7 +143,7 @@ namespace locks
         lock.attemptsLeft = attempts;
         lock.lockName     = utils::enumToString(Store::GSM::get()->selected);
 
-        if (simUnlockingNeeded_) {
+        if (simUnlockingNeeded_ || simSwitching) {
             return sys::msgNotHandled();
         }
 
@@ -410,6 +419,35 @@ namespace locks
         owner->bus.sendUnicast<cellular::msg::request::sim::SetPinLock>(cellular::api::SimPinState::Disabled,
                                                                         pinInputData);
         return sys::msgHandled();
+    }
+
+    sys::MessagePointer SimLockHandler::handleSimSwitchingMessage(cellular::api::SimSlot simSlot)
+    {
+        simSwitching = true;
+        setSim(simSlot);
+        return sys::msgHandled();
+    }
+
+    sys::MessagePointer SimLockHandler::handleSimSwitchedMessage()
+    {
+        auto retValue = sys::msgHandled();
+        simSwitching  = false;
+        auto simState = Store::GSM::get()->sim;
+        switch (simState) {
+        case Store::GSM::SIM::SIM_LOCKED:
+        case Store::GSM::SIM::SIM_NEED_PIN:
+        case Store::GSM::SIM::SIM_NEED_PUK:
+            retValue = handleSimUnlockRequest();
+            break;
+        case Store::GSM::SIM::NONE:
+        case Store::GSM::SIM::SIM1:
+        case Store::GSM::SIM::SIM2:
+        case Store::GSM::SIM::SIM_FAIL:
+        case Store::GSM::SIM::SIM_UNKNOWN:
+            retValue = sys::msgHandled();
+            break;
+        }
+        return retValue;
     }
 
 } // namespace locks

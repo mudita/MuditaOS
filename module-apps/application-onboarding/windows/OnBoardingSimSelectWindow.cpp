@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingSimSelectWindow.hpp"
@@ -49,6 +49,7 @@ namespace app::onBoarding
             "SIM1",
             [=](const gui::Item &item) {
                 application->getSimLockSubject().setSim(cellular::api::SimSlot::SIM1);
+                application->switchWindow(gui::popup::window::sim_switching_window);
                 return true;
             },
             nullptr,
@@ -59,6 +60,7 @@ namespace app::onBoarding
             "SIM2",
             [=](const gui::Item &item) {
                 application->getSimLockSubject().setSim(cellular::api::SimSlot::SIM2);
+                application->switchWindow(gui::popup::window::sim_switching_window);
                 return true;
             },
             nullptr,
