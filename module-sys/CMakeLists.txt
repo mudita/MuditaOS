@@ -15,4 +15,5 @@ target_link_libraries(module-sys
         sys-phonemodes
         sys-watchdog
         sys-manager
+        pure-core
     )
