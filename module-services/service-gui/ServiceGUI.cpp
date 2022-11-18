@@ -53,9 +53,8 @@ namespace service::gui
 
     void ServiceGUI::initAssetManagers()
     {
-        const auto assetsPath = purefs::dir::getSystemDiskPath() / "assets";
-        ::gui::FontManager::getInstance().init(assetsPath);
-        ::gui::ImageManager::getInstance().init(assetsPath);
+        ::gui::FontManager::getInstance().init(purefs::dir::getAssetsPath());
+        ::gui::ImageManager::getInstance().init(purefs::dir::getAssetsPath());
     }
 
     void ServiceGUI::registerMessageHandlers()
