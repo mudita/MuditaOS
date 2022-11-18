@@ -45,27 +45,4 @@ namespace service::eink
         int contextId;
     };
 
-    class RefreshMessage : public EinkMessage
-    {
-      public:
-        RefreshMessage(int contextId,
-                       hal::eink::EinkFrame refreshBox,
-                       hal::eink::EinkRefreshMode refreshMode,
-                       const std::string &originalSender);
-
-        [[nodiscard]] auto getContextId() const noexcept -> int;
-        [[nodiscard]] auto getRefreshFrame() noexcept -> hal::eink::EinkFrame;
-        [[nodiscard]] auto getRefreshMode() const noexcept -> hal::eink::EinkRefreshMode;
-        [[nodiscard]] auto getOriginalSender() const noexcept -> const std::string &;
-
-      private:
-        int contextId;
-        hal::eink::EinkFrame refreshFrame;
-        hal::eink::EinkRefreshMode refreshMode;
-        std::string originalSender;
-    };
-
-    class CancelRefreshMessage : public EinkMessage
-    {};
-
 } // namespace service::eink

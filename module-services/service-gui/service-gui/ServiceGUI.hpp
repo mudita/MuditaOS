@@ -59,7 +59,6 @@ namespace service::gui
         void notifyRenderColorSchemeChange(::gui::ColorScheme &&scheme);
         void enqueueDrawCommands(DrawCommandsQueue::QueueItem &&item);
         void sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode);
-        void sendCancelRefresh();
         void scheduleContextRelease(int contextId);
         bool isNextFrameReady() const noexcept;
         bool isAnyFrameBeingRenderedOrDisplayed() const noexcept;

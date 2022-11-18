@@ -184,18 +184,11 @@ namespace service::gui
                 cache.invalidate();
             }
             const auto context = contextPool->peekContext(contextId);
-#if DEBUG_EINK_REFRESH == 1
-            LOG_INFO("Rendering finished, send, contextId: %d, mode: %d", contextId, (int)refreshMode);
-#endif
             sendOnDisplay(context, contextId, refreshMode);
         }
         else {
             cache.cache({contextId, refreshMode});
             contextPool->returnContext(contextId);
-#if DEBUG_EINK_REFRESH == 1
-            LOG_INFO("Rendering finished, cancel, contextId: %d, mode: %d", contextId, (int)refreshMode);
-#endif
-            sendCancelRefresh();
         }
         return sys::MessageNone{};
     }
@@ -206,12 +199,6 @@ namespace service::gui
         auto msg     = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
         bus.sendUnicast(std::move(msg), service::name::eink);
         scheduleContextRelease(contextId);
-    }
-
-    void ServiceGUI::sendCancelRefresh()
-    {
-        auto msg = std::make_shared<service::eink::CancelRefreshMessage>();
-        bus.sendUnicast(std::move(msg), service::name::eink);
     }
 
     void ServiceGUI::scheduleContextRelease(int contextId)

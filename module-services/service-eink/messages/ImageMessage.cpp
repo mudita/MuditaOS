@@ -33,28 +33,4 @@ namespace service::eink
         return contextId;
     }
 
-    RefreshMessage::RefreshMessage(int contextId,
-                                   hal::eink::EinkFrame refreshFrame,
-                                   hal::eink::EinkRefreshMode refreshMode,
-                                   const std::string &originalSender)
-        : contextId(contextId), refreshFrame(refreshFrame), refreshMode(refreshMode), originalSender(originalSender)
-    {}
-
-    auto RefreshMessage::getContextId() const noexcept -> int
-    {
-        return contextId;
-    }
-    auto RefreshMessage::getRefreshFrame() noexcept -> hal::eink::EinkFrame
-    {
-        return refreshFrame;
-    }
-    auto RefreshMessage::getRefreshMode() const noexcept -> hal::eink::EinkRefreshMode
-    {
-        return refreshMode;
-    }
-    auto RefreshMessage::getOriginalSender() const noexcept -> const std::string &
-    {
-        return originalSender;
-    }
-
 } // namespace service::eink
