@@ -59,6 +59,9 @@ namespace cellular::internal
         void setInitialMultiPartSMSUID(std::uint8_t uid);
         std::function<void(std::uint8_t uid)> saveNewMultiPartSMSUIDCallback;
 
+        void privInit(at::BaseChannel *channel);
+        void privDeinit();
+
       private:
         void initSimCard();
         void initSMSSendHandler();

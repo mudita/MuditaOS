@@ -405,11 +405,7 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(sdesktop::developerMode::DeveloperModeRequest), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(request);
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularHotStartEvent)) {
-            priv->simCard->setChannel(nullptr);
-            priv->networkTime->setChannel(nullptr);
-            priv->simContacts->setChannel(nullptr);
-            priv->imeiGetHandler->setChannel(nullptr);
-
+            priv->privDeinit();
             cmux->closeChannels();
             ///> change state - simulate hot start
             handle_power_up_request();
@@ -602,7 +598,9 @@ void ServiceCellular::registerMessageHandlers()
     });
 
     connect(typeid(cellular::GetVolteStateRequest), [&](sys::Message *request) -> sys::MessagePointer {
-        return std::make_shared<cellular::GetVolteStateResponse>(priv->volteHandler->getVolteState());
+        bus.sendUnicast(std::make_shared<cellular::GetVolteStateResponse>(priv->volteHandler->getVolteState()),
+                        request->sender);
+        return sys::MessageNone{};
     });
 
     connect(typeid(cellular::SwitchVolteOnOffRequest), [&](sys::Message *request) -> sys::MessagePointer {
@@ -614,10 +612,25 @@ void ServiceCellular::registerMessageHandlers()
         }
         settings->setValue(
             settings::Cellular::volteEnabled, message->enable ? "1" : "0", settings::SettingsScope::Global);
-        if (not priv->volteHandler->switchVolte(*channel, message->enable)) {
-            auto notification = std::make_shared<cellular::VolteStateNotification>(priv->volteHandler->getVolteState());
-            bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
+        try {
+            if (not priv->volteHandler->switchVolte(*channel, message->enable)) {
+                auto notification =
+                    std::make_shared<cellular::VolteStateNotification>(priv->volteHandler->getVolteState());
+                bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
+                priv->modemResetHandler->performHardReset();
+            }
+        }
+        catch (std::runtime_error const &exc) {
+            LOG_ERROR("%s", exc.what());
             priv->modemResetHandler->performHardReset();
+        }
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *) {
+        if (priv->volteHandler->isFunctionalityResetNeeded()) {
+            LOG_INFO("First run after VoLTE switch, functionality reset needed");
+            priv->modemResetHandler->performFunctionalityReset();
         }
         return sys::MessageNone{};
     });
@@ -821,6 +834,7 @@ bool ServiceCellular::handle_power_down_waiting()
 bool ServiceCellular::handle_power_down()
 {
     LOG_DEBUG("Powered Down");
+    priv->privDeinit();
     cmux->closeChannels();
     cmux.reset();
     cmux = std::make_unique<CellularMux>(PortSpeed_e::PS460800, this);
@@ -892,23 +906,28 @@ bool ServiceCellular::handle_audio_conf_procedure()
 bool ServiceCellular::handle_cellular_priv_init()
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
-    priv->simCard->setChannel(channel);
-    priv->networkTime->setChannel(channel);
-    priv->simContacts->setChannel(channel);
-    priv->imeiGetHandler->setChannel(channel);
+    if (!channel) {
+        LOG_ERROR("no cmux channel provided");
+        priv->modemResetHandler->performHardReset();
+        return true;
+    }
 
-    bool needReset = false;
+    priv->privInit(channel);
 
     auto enableVolte =
         settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global) == "1" ? true : false;
-
+    bool volteNeedReset = false;
     try {
-        needReset = !priv->tetheringHandler->configure() || !priv->volteHandler->switchVolte(*channel, enableVolte);
+        volteNeedReset    = !priv->volteHandler->switchVolte(*channel, enableVolte);
+        auto notification = std::make_shared<cellular::VolteStateNotification>(priv->volteHandler->getVolteState());
+        bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
     }
     catch (std::runtime_error const &exc) {
         LOG_ERROR("%s", exc.what());
     }
-    if (needReset) {
+
+    auto tetheringNeedReset = !priv->tetheringHandler->configure();
+    if (tetheringNeedReset || volteNeedReset) {
         priv->modemResetHandler->performHardReset();
         return true;
     }
@@ -1086,7 +1105,12 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
 
 bool ServiceCellular::getOwnNumber(std::string &destination)
 {
-    auto ret = cmux->get(CellularMux::Channel::Commands)->cmd(at::AT::CNUM);
+    auto channel = cmux->get(CellularMux::Channel::Commands);
+    if (not channel) {
+        LOG_ERROR("ServiceCellular::getOwnNumber failed because no cmux channel provided");
+        return false;
+    }
+    auto ret = channel->cmd(at::AT::CNUM);
 
     if (ret) {
         auto begin = ret.response[0].find(',');
@@ -1113,8 +1137,13 @@ bool ServiceCellular::getOwnNumber(std::string &destination)
 
 bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
 {
-    auto ret = cmux->get(CellularMux::Channel::Commands)->cmd(at::AT::CIMI);
+    auto channel = cmux->get(CellularMux::Channel::Commands);
+    if (!channel) {
+        LOG_ERROR("no cmux channel provided");
+        return false;
+    }
 
+    auto ret = channel->cmd(at::AT::CIMI);
     if (ret) {
         if (fullNumber) {
             destination = ret.response[0];
@@ -1253,8 +1282,12 @@ void save_SIM_detection_status(DLCChannel *channel)
 
 bool sim_check_hot_swap(DLCChannel *channel)
 {
-    assert(channel);
     bool reboot_needed = false;
+
+    if (!channel) {
+        LOG_ERROR("no cmux channel provided");
+        return reboot_needed;
+    }
 
     if (!is_SIM_detection_enabled(channel)) {
         reboot_needed = true;
@@ -1287,6 +1320,11 @@ bool ServiceCellular::handle_sim_sanity_check()
 bool ServiceCellular::handle_modem_on()
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
+    if (!channel) {
+        LOG_ERROR("no cmux channel provided");
+        return false;
+    }
+
     channel->cmd("AT+CCLK?");
     // inform host ap ready
     cmux->informModemHostWakeup();
@@ -1299,6 +1337,11 @@ bool ServiceCellular::handle_modem_on()
 bool ServiceCellular::handle_URCReady()
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
+    if (!channel) {
+        LOG_ERROR("no cmux channel provided");
+        return false;
+    }
+
     bool ret     = true;
 
     ret = ret && channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
@@ -1476,6 +1519,7 @@ void ServiceCellular::handle_CellularGetChannelMessage()
         auto getChannelMsg = static_cast<cellular::GetChannelMessage *>(req);
         LOG_DEBUG("Handle request for channel: %s", CellularMux::name(getChannelMsg->dataChannel).c_str());
         std::shared_ptr<cellular::GetChannelResponseMessage> channelResponsMessage =
+            // MOS-809: find out if there's a need here for checking 'cmux' against nullptr
             std::make_shared<cellular::GetChannelResponseMessage>(cmux->get(getChannelMsg->dataChannel));
         LOG_DEBUG("channel ptr: %p", channelResponsMessage->dataChannelPtr);
         bus.sendUnicast(std::move(channelResponsMessage), req->sender);
@@ -1869,7 +1913,13 @@ auto ServiceCellular::handleDBQueryResponseMessage(db::QueryResponse *msg) -> st
 auto ServiceCellular::handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     at::cmd::CLCC cmd;
-    auto base = cmux->get(CellularMux::Channel::Commands)->cmd(cmd);
+    auto channel = cmux->get(CellularMux::Channel::Commands);
+    if (!channel) {
+        LOG_ERROR("no cmux channel provided");
+        return std::make_shared<cellular::ResponseMessage>(false);
+    }
+
+    auto base = channel->cmd(cmd);
     if (auto response = cmd.parseCLCC(base); response) {
         const auto &data = response.getData();
         auto it          = std::find_if(std::begin(data), std::end(data), [&](const auto &entry) {

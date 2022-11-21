@@ -30,19 +30,31 @@ namespace cellular
     bool Api::hangupCall()
     {
         if (cmux == nullptr) {
-            throw std::runtime_error("call api not initialized");
+            return false;
         }
         auto channel = cmux->get(CellularMux::Channel::Commands);
-        return channel != nullptr && channel->cmd(at::AT::ATH);
+        if (channel != nullptr) {
+            auto response = channel->cmd(at::AT::ATH);
+            if (response) {
+                return true;
+            }
+        }
+        return false;
     }
 
     bool Api::rejectCall()
     {
         if (cmux == nullptr) {
-            throw std::runtime_error("call api not initialized");
+            return false;
         }
         auto channel = cmux->get(CellularMux::Channel::Commands);
-        return channel != nullptr && channel->cmd(at::AT::CHUP);
+        if (channel != nullptr) {
+            auto response = channel->cmd(at::AT::CHUP);
+            if (response) {
+                return true;
+            }
+        }
+        return false;
     }
 
     bool Api::areCallsFromFavouritesEnabled()

@@ -91,7 +91,11 @@ namespace cellular::internal
                 owner->bus.sendMulticast<notification::SimNotInserted>();
                 return sys::MessageNone{};
             }
-            return std::make_shared<request::sim::GetPinSettings::Response>(simCard->handleIsPinNeeded());
+            auto simLockState = simCard->handleIsPinNeeded();
+            if (!simLockState.has_value()) {
+                return sys::MessageNone{};
+            }
+            return std::make_shared<request::sim::GetPinSettings::Response>(simLockState.value());
         });
         owner->connect(typeid(request::sim::ChangePin), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::ChangePin *>(request);
@@ -255,7 +259,6 @@ namespace cellular::internal
                     result = false;
                 }
                 else {
-                    auto channel = owner->cmux->get(CellularMux::Channel::Commands);
                     saveNewMultiPartSMSUIDCallback(multiPartSMSUID);
 
                     for (unsigned i = 0; i < partHandler.getPartsCount(); i++) {
@@ -399,6 +402,25 @@ namespace cellular::internal
                 return true;
             }
             return false;
+        };
+
+        modemResetHandler->onFunctionalityReset = [this]() -> bool {
+            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+            if (channel == nullptr) {
+                return false;
+            }
+            auto succeed  = false;
+            auto response = channel->cmd(at::AT::CFUN_DISABLE_TRANSMITTING);
+            if (response) {
+                succeed = true;
+            }
+            constexpr auto delay = 200;
+            vTaskDelay(pdMS_TO_TICKS(delay));
+            response = channel->cmd(at::AT::CFUN_FULL_FUNCTIONALITY);
+            if (response) {
+                succeed |= true;
+            }
+            return succeed;
         };
     }
 
@@ -551,5 +573,21 @@ namespace cellular::internal
             csqHandler->checkConditionToChangeMode();
             return sys::MessageNone{};
         });
+    }
+
+    void ServiceCellularPriv::privInit(at::BaseChannel *channel)
+    {
+        simCard->setChannel(channel);
+        networkTime->setChannel(channel);
+        simContacts->setChannel(channel);
+        imeiGetHandler->setChannel(channel);
+    }
+
+    void ServiceCellularPriv::privDeinit()
+    {
+        simCard->setChannel(nullptr);
+        networkTime->setChannel(nullptr);
+        simContacts->setChannel(nullptr);
+        imeiGetHandler->setChannel(nullptr);
     }
 } // namespace cellular::internal

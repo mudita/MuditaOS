@@ -30,6 +30,11 @@ namespace cellular::service
          */
         auto performReboot() -> bool;
         /**
+         * It performs functionality reset via AT command. It does not require cellular reinitialisation.
+         * @return true on success
+         */
+        auto performFunctionalityReset() -> bool;
+        /**
          * It handles STATUS pin changed event when any reset procedure is in progress, other case it's doing nothing.
          * @param isActive STATUS pin value. True when STATUS is active, false when it's inactive
          * @return true when event is handled, false when not
@@ -48,6 +53,7 @@ namespace cellular::service
         std::function<void()> onTurnModemOff;
         std::function<bool()> onSoftReset;
         std::function<void()> onHardReset;
+        std::function<bool()> onFunctionalityReset;
 
       private:
         enum class ProcedureInProgress

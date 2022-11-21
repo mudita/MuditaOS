@@ -37,23 +37,21 @@ namespace gui
             gui::option::SettingRightItem::ArrowWhite,
             false));
 
-#if ENABLE_VOLTE == 1
-#pragma message "state switching not connected to the actual state yet - see MOS-793"
-        auto getNextVolteState = []() {
-            using namespace gui::option;
-
-            static size_t volteStateIndex;
-            static constexpr SettingRightItem volteStates[]{
-                SettingRightItem::Transiting, SettingRightItem::On, SettingRightItem::Off};
-
-            auto currentIndex = ++volteStateIndex % (sizeof(volteStates) / sizeof(volteStates[0]));
-            return volteStates[currentIndex];
-        };
-
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_voice_over_lte"),
-            [=](gui::Item &item) {
-                refreshOptionsList();
+            [&](gui::Item &item) {
+                auto *settingsApp = static_cast<app::ApplicationSettings *>(application);
+                switch (settingsApp->getVolteState()) {
+                case cellular::VolteState::Off:
+                    settingsApp->sendVolteChangeRequest(true);
+                    break;
+                case cellular::VolteState::On:
+                    settingsApp->sendVolteChangeRequest(false);
+                    break;
+                default:
+                    LOG_INFO("Skip request due unsettled VoLTE state");
+                    break;
+                }
                 return true;
             },
             [&](Item &item) {
@@ -63,8 +61,17 @@ namespace gui
                 return true;
             },
             nullptr,
-            getNextVolteState()));
-#endif
+            [&]() {
+                auto const *settingsApp = static_cast<app::ApplicationSettings *>(application);
+                switch (settingsApp->getVolteState()) {
+                case cellular::VolteState::Off:
+                    return option::SettingRightItem::Off;
+                case cellular::VolteState::On:
+                    return option::SettingRightItem::On;
+                default:
+                    return option::SettingRightItem::Transiting;
+                }
+            }()));
 
 #if DISABLED_SETTINGS_OPTIONS == 1
         auto operatorsOn = operatorsSettings->getOperatorsOn();

@@ -78,9 +78,15 @@ namespace cellular::service
                     throw std::runtime_error("[VoLTE] failed to " + std::string(enable ? "enable" : "disable") +
                                              " IMS");
                 }
+
                 volteState = enable ? cellular::VolteState::SwitchingToOn : cellular::VolteState::SwitchingToOff;
+                isFirstRunAfterSwitch = false;
             }
             else {
+                if (volteState == cellular::VolteState::SwitchingToOn ||
+                    volteState == cellular::VolteState::SwitchingToOff) {
+                    isFirstRunAfterSwitch = true;
+                }
                 volteState = enable ? cellular::VolteState::On : cellular::VolteState::Off;
             }
 
@@ -92,11 +98,18 @@ namespace cellular::service
             return volteState;
         }
 
+        auto isFunctionalityResetNeeded() -> bool
+        {
+            return isFirstRunAfterSwitch;
+        }
+
       private:
         std::string imsStateToString(response::qcfg_ims::IMSState imsState) const
         {
             return std::to_string(magic_enum::enum_integer(imsState));
         }
+
         cellular::VolteState volteState = cellular::VolteState::Undefined;
+        bool isFirstRunAfterSwitch      = false;
     };
 } // namespace cellular::service

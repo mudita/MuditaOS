@@ -61,6 +61,7 @@
 #include <application-settings/data/AutoLockData.hpp>
 #include <application-settings/models/apps/SoundsModel.hpp>
 #include <application-settings/models/display-keypad/DisplayModeModel.hpp>
+#include <module-services/service-cellular/service-cellular/VolteState.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
@@ -74,6 +75,7 @@
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
 #include <service-bluetooth/messages/Disconnect.hpp>
+#include <service-cellular/Constans.hpp>
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <module-services/service-appmgr/include/service-appmgr/Constants.hpp>
@@ -321,6 +323,12 @@ namespace app
             return handleAudioStop(notification);
         });
 
+        connect(typeid(cellular::GetVolteStateResponse),
+                [&](sys::Message *msg) -> sys::MessagePointer { return handleVolteState(msg); });
+
+        connect(typeid(cellular::VolteStateNotification),
+                [&](sys::Message *msg) -> sys::MessagePointer { return handleVolteState(msg); });
+
         createUserInterface();
 
         settings->registerValueChange(settings::operators_on,
@@ -345,6 +353,9 @@ namespace app
 
         bluetoothSettingsModel->requestBondedDevices();
         bluetoothSettingsModel->requestStatus();
+
+        bus.sendUnicast(std::make_shared<cellular::GetVolteStateRequest>(), service::name::cellular);
+
         return ret;
     }
 
@@ -769,6 +780,11 @@ namespace app
         return statusIndicators.phoneMode;
     }
 
+    auto ApplicationSettings::getVolteState() const noexcept -> cellular::VolteState
+    {
+        return volteState;
+    }
+
     void ApplicationSettings::setAutoLockTime(std::chrono::seconds lockTime)
     {
         bus.sendUnicast(std::make_shared<app::manager::SetAutoLockTimeoutRequest>(lockTime), service::name::appmgr);
@@ -805,4 +821,23 @@ namespace app
         }
         return sys::MessageNone{};
     }
+
+    auto ApplicationSettings::handleVolteState(sys::Message *msg) -> sys::MessagePointer
+    {
+        auto *volteStateMessage = static_cast<cellular::GetVolteStateResponse *>(msg);
+        volteState              = volteStateMessage->volteState;
+
+        if (isCurrentWindow(gui::window::name::network)) {
+            // refreshWindow() would be insufficient because wouldn't trigger list rebuild
+            switchWindow(gui::window::name::network);
+        }
+
+        return sys::MessageNone{};
+    }
+
+    void ApplicationSettings::sendVolteChangeRequest(bool enable)
+    {
+        auto message = std::make_shared<cellular::SwitchVolteOnOffRequest>(enable);
+        bus.sendUnicast(std::move(message), service::name::cellular);
+    };
 } /* namespace app */

@@ -77,6 +77,8 @@ namespace at
 
               };
 
+        virtual ~Channel() = default;
+
         /// waits till ok or timeout
         virtual auto cmd(const std::string &cmd,
                          std::chrono::milliseconds timeout = at::default_timeout,

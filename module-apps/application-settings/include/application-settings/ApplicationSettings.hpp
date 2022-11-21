@@ -13,6 +13,7 @@
 #include <EventStore.hpp>
 #include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
 #include <application-settings/data/WallpaperOption.hpp>
+#include <module-services/service-cellular/service-cellular/VolteState.hpp>
 
 class AudioStopNotification; // Forward declaration
 
@@ -183,12 +184,16 @@ namespace app
 
         auto getCurrentPhoneMode() const noexcept -> sys::phone_modes::PhoneMode override;
 
+        auto getVolteState() const noexcept -> cellular::VolteState;
+        void sendVolteChangeRequest(bool enable);
+
       private:
         void attachQuotesWindows();
         void switchToAllDevicesViaBtErrorPrompt(std::shared_ptr<sys::DataMessage> msg, const std::string &errorMsg);
 
         auto handleSimNotification() -> sys::MessagePointer;
         auto handleAudioStop(AudioStopNotification *notification) -> sys::MessagePointer;
+        auto handleVolteState(sys::Message *msg) -> sys::MessagePointer;
 
         std::shared_ptr<SoundsPlayer> soundsPlayer;
         Store::GSM::SelectedSIM selectedSim = Store::GSM::get()->selected;
@@ -200,6 +205,7 @@ namespace app
         bool callsFromFavorites                                        = false;
         int connectionFrequency                                        = 0;
         bool flightModeOn                                              = true;
+        cellular::VolteState volteState{cellular::VolteState::Undefined};
         std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel = nullptr;
     };
 
