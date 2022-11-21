@@ -23,14 +23,17 @@ target_compile_options(gtest PRIVATE -Wno-error=maybe-uninitialized)
 add_custom_target(unittests)
 
 set(ROOT_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
-set(TEST_ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/sys)
-set(TEST_ASSETS_DEST_DIR ${TEST_ASSETS_DEST_DIR} PARENT_SCOPE)
+set(SYSROOT ${CMAKE_BINARY_DIR}/test-sysroot)
+set(SYSTEM_DEST_DIR ${SYSROOT}/system_a)
+set(SYSTEM_DEST_DIR ${SYSTEM_DEST_DIR} PARENT_SCOPE)
+set(USER_DEST_DIR ${SYSROOT}/user)
+set(USER_DEST_DIR ${USER_DEST_DIR} PARENT_SCOPE)
 
 include(DownloadAsset)
 
 download_asset_release_json(json-test-community-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_community.json
-                            ${TEST_ASSETS_DEST_DIR}/current/
+                            ${SYSTEM_DEST_DIR}
                             MuditaOSPublicAssets
                             0.0.7
                             ${MUDITA_CACHE_DIR}
@@ -38,7 +41,7 @@ download_asset_release_json(json-test-community-target
 
 download_asset_json(json-test-proprietary-target
                     ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_proprietary.json
-                    ${TEST_ASSETS_DEST_DIR}/current/
+                    ${SYSTEM_DEST_DIR}
                     MuditaOSAssets
                     ${MUDITA_CACHE_DIR}
     )
@@ -56,7 +59,8 @@ endif()
 add_assets_target(
     TARGET test-assets
     SOURCE_DIR ${ASSETS_SOURCE_DIR}
-    DEST_DIR ${TEST_ASSETS_DEST_DIR}
+    SYSTEM_DEST_DIR ${SYSTEM_DEST_DIR}
+    USER_DEST_DIR ${USER_DEST_DIR}
     DEVEL ON
     DEPENDS
         ${ASSETS_DEPENDENCIES}

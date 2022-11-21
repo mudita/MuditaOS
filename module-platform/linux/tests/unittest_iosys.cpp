@@ -13,11 +13,12 @@ TEST_CASE("VFS linux support")
 
     REQUIRE_NOTHROW(platform.init());
 
-    static constexpr auto filenm = "assets/lang/English.json";
+    static constexpr auto filenm = "/system/data/lang/English.json";
 
     SECTION("std::filesystem")
     {
-        REQUIRE(std::filesystem::file_size(filenm) > 0);
+        const auto file_size = std::filesystem::file_size(filenm);
+        REQUIRE(file_size > 0);
     }
 
     SECTION("iterators")
