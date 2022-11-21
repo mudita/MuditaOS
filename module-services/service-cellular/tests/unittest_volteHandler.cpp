@@ -119,7 +119,10 @@ TEST_CASE("VoLTE handler test")
     SECTION("ThrowsAboutMbnAutoselectFailure_When_TryingToEnableVolte_And_AutoselectCommandRespondsNOK")
     {
         std::queue<CommandAndResponse> chain;
-        push(chain, std::make_pair(AT::QNVFW, DummyOkResult{}), std::make_pair(AT::QMBNCFG, DummyErrorResult{}));
+        push(chain,
+             std::make_pair(AT::QNVFW, DummyOkResult{}),
+             std::make_pair(AT::QNVFW, DummyOkResult{}),
+             std::make_pair(AT::QMBNCFG, DummyErrorResult{}));
         CommandSequentialChannel channel(std::move(chain));
 
         VolteHandler<CommandSequentialChannel, DummyModemResponseParser> handler;
@@ -131,6 +134,7 @@ TEST_CASE("VoLTE handler test")
     {
         std::queue<CommandAndResponse> chain;
         push(chain,
+             std::make_pair(AT::QNVFW, DummyOkResult{}),
              std::make_pair(AT::QNVFW, DummyOkResult{}),
              std::make_pair(AT::QMBNCFG, DummyOkResult{}),
              std::make_pair(AT::QCFG_IMS, DummyErrorResult{}));
@@ -146,6 +150,7 @@ TEST_CASE("VoLTE handler test")
         std::queue<CommandAndResponse> chain;
         push(chain,
              std::make_pair(AT::QNVFW, DummyOkResult{}),
+             std::make_pair(AT::QNVFW, DummyOkResult{}),
              std::make_pair(AT::QMBNCFG, DummyOkResult{}),
              std::make_pair(AT::QCFG_IMS, DummyOkResult{}));
         CommandSequentialChannel channel(std::move(chain));
@@ -160,6 +165,7 @@ TEST_CASE("VoLTE handler test")
         std::queue<CommandAndResponse> chain;
         push(chain,
              std::make_pair(AT::QNVFW, DummyOkResult{}),
+             std::make_pair(AT::QNVFW, DummyOkResult{}),
              std::make_pair(AT::QMBNCFG, DummyOkResult{}),
              std::make_pair(AT::QCFG_IMS, DummyOkResult{}));
         CommandSequentialChannel channel(std::move(chain));
@@ -172,7 +178,7 @@ TEST_CASE("VoLTE handler test")
     SECTION("ReturnsOk_When_TryingToDisableVolte_And_AlreadyDisabled")
     {
         std::queue<CommandAndResponse> chain;
-        push(chain, std::make_pair(AT::QCFG_IMS, DummyOkResult{}));
+        push(chain, std::make_pair(AT::QNVFW, DummyOkResult{}), std::make_pair(AT::QCFG_IMS, DummyOkResult{}));
         CommandSequentialChannel channel(std::move(chain));
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<true>> handler;
@@ -183,7 +189,10 @@ TEST_CASE("VoLTE handler test")
     SECTION("ReturnsFalse_When_TryingToDisableVolte_And_WasEnabledBefore")
     {
         std::queue<CommandAndResponse> chain;
-        push(chain, std::make_pair(AT::QCFG_IMS, DummyOkResult{}), std::make_pair(AT::QCFG_IMS, DummyOkResult{}));
+        push(chain,
+             std::make_pair(AT::QNVFW, DummyOkResult{}),
+             std::make_pair(AT::QCFG_IMS, DummyOkResult{}),
+             std::make_pair(AT::QCFG_IMS, DummyOkResult{}));
         CommandSequentialChannel channel(std::move(chain));
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<false>> handler;
@@ -194,7 +203,10 @@ TEST_CASE("VoLTE handler test")
     SECTION("ReturnsFalse_When_TryingToEnableVolte_And_WasEnabledBefore")
     {
         std::queue<CommandAndResponse> chain;
-        push(chain, std::make_pair(AT::QCFG_IMS, DummyOkResult{}), std::make_pair(AT::QCFG_IMS, DummyOkResult{}));
+        push(chain,
+             std::make_pair(AT::QNVFW, DummyOkResult{}),
+             std::make_pair(AT::QCFG_IMS, DummyOkResult{}),
+             std::make_pair(AT::QCFG_IMS, DummyOkResult{}));
         CommandSequentialChannel channel(std::move(chain));
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<false>> handler;
@@ -205,7 +217,10 @@ TEST_CASE("VoLTE handler test")
     SECTION("ThrowsAboutImsFailure_When_DisablingVolte_And_ImsSteeringCommandFailed")
     {
         std::queue<CommandAndResponse> chain;
-        push(chain, std::make_pair(AT::QCFG_IMS, DummyOkResult{}), std::make_pair(AT::QCFG_IMS, DummyErrorResult{}));
+        push(chain,
+             std::make_pair(AT::QNVFW, DummyOkResult{}),
+             std::make_pair(AT::QCFG_IMS, DummyOkResult{}),
+             std::make_pair(AT::QCFG_IMS, DummyErrorResult{}));
         CommandSequentialChannel channel(std::move(chain));
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<false>> handler;
@@ -217,6 +232,7 @@ TEST_CASE("VoLTE handler test")
     {
         std::queue<CommandAndResponse> chain;
         push(chain,
+             std::make_pair(AT::QNVFW, DummyOkResult{}),
              std::make_pair(AT::QNVFW, DummyOkResult{}),
              std::make_pair(AT::QMBNCFG, DummyOkResult{}),
              std::make_pair(AT::QCFG_IMS, DummyOkResult{}),
