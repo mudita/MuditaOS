@@ -1,17 +1,16 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
-#include <sstream>
 
 #include "gui/dom/Item2JsonSerializer.hpp"
 
 #include "Item.hpp"
-#include "Rect.hpp"
 #include "Label.hpp"
 #include "Text.hpp"
 #include "FontManager.hpp"
-#include <iostream>
+
+#include <purefs/filesystem_paths.hpp>
 
 class Item2JsonSerializerTester : public ::testing::Test
 {
@@ -21,7 +20,7 @@ class Item2JsonSerializerTester : public ::testing::Test
     Item2JsonSerializerTester()
     {
         auto &fm = gui::FontManager::getInstance();
-        fm.init("sys/current/assets");
+        fm.init(purefs::dir::getAssetsDirPath());
 
         auto text = new gui::Text(nullptr, 0, 0, 0, 0);
         text->setText(testTextValue1);
