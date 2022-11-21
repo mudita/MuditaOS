@@ -42,18 +42,29 @@ namespace cellular::service
 
             if (enable) {
                 // according to Quectel, this setting doesn't have to be reset when disabling
-                constexpr std::uint8_t voiceDomainPacketSwitchedPreferred = 0x03;
                 auto voiceDomainAnswer =
-                    channel.cmd(factory(at::AT::QNVFW) + "\"/nv/item_files/modem/mmode/voice_domain_pref\"," +
-                                utils::byteToHex<std::uint8_t>(voiceDomainPacketSwitchedPreferred));
+                    channel.cmd(factory(at::AT::QNVFW) + NetworkServiceDomain(NetworkServiceDomain::Type::Voice));
                 if (!voiceDomainAnswer) {
                     throw std::runtime_error("[VoLTE] failed to set voice domain before trying to enable VoLTE");
+                }
+
+                auto smsDomainAnswer =
+                    channel.cmd(factory(at::AT::QNVFW) + NetworkServiceDomain(NetworkServiceDomain::Type::SmsViaIms));
+                if (!smsDomainAnswer) {
+                    throw std::runtime_error("[VoLTE] failed to set SMS domain before trying to enable VoLTE");
                 }
 
                 // can be left as always on: doesn't disturb when VoLTE disabled
                 auto qmbnAnswer = channel.cmd(factory(at::AT::QMBNCFG) + std::string("\"autosel\",1"));
                 if (!qmbnAnswer) {
                     throw std::runtime_error("[VoLTE] failed to enable MBN auto-select before trying to enable VoLTE");
+                }
+            }
+            else {
+                auto smsDomainAnswer =
+                    channel.cmd(factory(at::AT::QNVFW) + NetworkServiceDomain(NetworkServiceDomain::Type::SmsViaSgs));
+                if (!smsDomainAnswer) {
+                    throw std::runtime_error("[VoLTE] failed to reset SMS domain before trying to disable VoLTE");
                 }
             }
 
@@ -102,6 +113,47 @@ namespace cellular::service
         {
             return isFirstRunAfterSwitch;
         }
+
+        struct NetworkServiceDomain
+        {
+            enum class Type
+            {
+                SmsViaIms,
+                SmsViaSgs,
+                Voice
+            };
+            explicit NetworkServiceDomain(Type type) : type_{type}
+            {
+                switch (type) {
+                case Type::SmsViaSgs:
+                    domain_     = "sms";
+                    preference_ = 0x00;
+                    return;
+                case Type::SmsViaIms:
+                    domain_     = "sms";
+                    preference_ = 0x01;
+                    return;
+                case Type::Voice:
+                    domain_     = "voice";
+                    preference_ = 0x03;
+                    return;
+                default:
+                    throw std::logic_error("unimplemented network service domain: " +
+                                           std::string(magic_enum::enum_name(type)));
+                }
+            }
+
+            operator std::string()
+            {
+                return "\"/nv/item_files/modem/mmode/" + domain_ + "_domain_pref\"," +
+                       utils::byteToHex<std::uint8_t>(preference_);
+            }
+
+          private:
+            std::string domain_;
+            Type type_;
+            std::uint8_t preference_;
+        };
 
       private:
         std::string imsStateToString(response::qcfg_ims::IMSState imsState) const
