@@ -1059,7 +1059,7 @@ namespace cellular
     class GetVolteStateRequest : public sys::DataMessage
     {};
 
-    struct GetVolteStateResponse : public sys::ResponseMessage
+    struct GetVolteStateResponse : public sys::DataMessage
     {
         VolteState volteState;
         explicit GetVolteStateResponse(VolteState volteState) : volteState(volteState)

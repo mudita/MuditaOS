@@ -84,7 +84,7 @@ namespace cellular::service
          * Request message handlers
          */
         bool handleSetActiveSim(api::SimSlot sim);
-        bool handleIsPinNeeded() const;
+        std::optional<bool> handleIsPinNeeded() const;
         bool handleChangePin(const api::SimCode &old_pin, const api::SimCode &pin);
         bool handleUnblockWithPuk(const api::SimCode &puk, const api::SimCode &pin);
         bool handleSetPinLock(const api::SimCode &pin, api::SimPinState pinLock);
@@ -231,10 +231,11 @@ namespace cellular::service
          */
         sim::Result changePin(const std::string &oldPin, const std::string &newPin) const;
 
-        /** Check whether the pin needs to be provided, only for standard pin.
-         * \return true if need pin to unlock SIM card functionality
+        /** Check whether the PIN needs to be provided, only for standard PIN.
+         * \return true if need PIN to unlock SIM card functionality, false if don't need, std::nullopt if SIM card
+         * not ready
          */
-        bool isPinNeeded() const;
+        std::optional<bool> isPinNeeded() const;
 
         /** Process sim::Result from PIN lock/unlock operations
          * \param result result from operation (`sendCommand()`)

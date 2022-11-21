@@ -42,7 +42,7 @@
 * Added tethering information on the status bar
 * Added basic MMS handling
 * Added run-time statistics for tasks
-* Added VoLTE state in settings database
+* Added VoLTE support
 
 ## [1.3.0 2022-08-04]
 

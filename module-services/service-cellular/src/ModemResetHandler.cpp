@@ -87,4 +87,12 @@ namespace cellular::service
         onCellularStateSet(State::ST::StatusCheck);
         return true;
     }
+
+    auto ModemResetHandler::performFunctionalityReset() -> bool
+    {
+        if (onFunctionalityReset) {
+            return onFunctionalityReset();
+        }
+        return false;
+    }
 } // namespace cellular::service

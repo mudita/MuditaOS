@@ -70,7 +70,7 @@ namespace cellular
             return true;
         }
 
-        bool SimCard::handleIsPinNeeded() const
+        std::optional<bool> SimCard::handleIsPinNeeded() const
         {
             return isPinNeeded();
         }
@@ -276,8 +276,12 @@ namespace cellular
                                at::factory(at::AT::CLCK) + "\"SC\"," + (lock ? "1" : "0") + ",\"" + pin + "\"");
         }
 
-        bool SimCard::isPinNeeded() const
+        std::optional<bool> SimCard::isPinNeeded() const
         {
+            if (not ready()) {
+                return std::nullopt;
+            }
+
             auto resp = channel->cmd(at::factory(at::AT::CLCK) + "\"SC\",2\r");
             int val   = 0;
             if (at::response::parseCLCK(resp, val)) {
@@ -288,6 +292,10 @@ namespace cellular
 
         std::optional<at::SimState> SimCard::simState() const
         {
+            if (not ready()) {
+                return at::SimState::Unknown;
+            }
+
             auto resp = channel->cmd(at::factory(at::AT::GET_CPIN));
             if (resp.code == at::Result::Code::OK) {
                 if (resp.response.size()) {

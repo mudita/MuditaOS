@@ -33,6 +33,8 @@ class DLCChannel : public at::Channel
     DLCChannel(DLCI_t DLCI, const std::string &name, bsp::Cellular *cellular, const Callback_t &callback = nullptr);
     DLCChannel() : Channel{nullptr}, name{"none"}, DLCI{-1} {};
 
+    virtual ~DLCChannel() = default;
+
     bool init();
     bool establish();
     void sendData(std::vector<uint8_t> &data);
