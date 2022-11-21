@@ -8,13 +8,10 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/vfs_subsystem.hpp>
 #include <purefs/vfs_subsystem_internal.hpp>
-#include <hal/boot_reason.h>
 #include <hal/boot_control.h>
 #include <purefs/fs/thread_local_cwd.hpp>
 #include <log/log.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <json11.hpp>
-#include <sys/stat.h>
 #include <fcntl.h>
 
 namespace purefs::subsystem
@@ -178,6 +175,7 @@ namespace purefs::subsystem
             if (err)
                 break;
         }
+        boot_control_deinit();
         return err;
     }
 
