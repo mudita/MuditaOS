@@ -7,8 +7,7 @@
 
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
-#include <purefs/fs/drivers/filesystem_vfat.hpp>
-#include <purefs/vfs_subsystem.hpp>
+#include <purefs/fs/drivers/filesystem_ext4.hpp>
 
 #include <purefs/fs/thread_local_cwd.hpp>
 
@@ -30,27 +29,27 @@ TEST_CASE("Corefs: Registering and unregistering block device")
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
     /* Requested filesystem is not registered */
-    REQUIRE(fscore.mount("emmc0", "/sys", "vfat") == -ENODEV);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fscore.register_filesystem("vfat", vfs_vfat);
+    REQUIRE(fscore.mount("emmc0", "/sys", "ext4") == -ENODEV);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fscore.register_filesystem("ext4", vfs_ext4);
     REQUIRE(ret == 0);
-    ret = fscore.mount("emmc0part0", "/sys", "vfat");
+    ret = fscore.mount("emmc0part0", "/sys", "ext4");
     REQUIRE(ret == 0);
-    REQUIRE(vfs_vfat->mount_count() == 1);
+    REQUIRE(vfs_ext4->mount_count() == 1);
     REQUIRE(fscore.umount("/ala") == -ENOENT);
-    ret = fscore.mount("emmc0part0", "/sys", "vfat");
+    ret = fscore.mount("emmc0part0", "/sys", "ext4");
     REQUIRE(ret == -EBUSY);
-    ret = fscore.mount("emmc0part0", "/path", "vfat");
+    ret = fscore.mount("emmc0part0", "/path", "ext4");
     REQUIRE(ret == -EBUSY);
     ret = fscore.mount("emmc0part2", "/path", "nonexisting_fs");
     REQUIRE(ret == -ENODEV);
     ret = fscore.umount("/sys");
     REQUIRE(ret == 0);
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    ret = fscore.mount("emmc0part0", "/path", "vfat");
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    ret = fscore.mount("emmc0part0", "/path", "ext4");
     REQUIRE(ret == 0);
-    REQUIRE(vfs_vfat->mount_count() == 1);
+    REQUIRE(vfs_ext4->mount_count() == 1);
     ret = fscore.umount("/path");
     REQUIRE(ret == 0);
 }
@@ -63,29 +62,31 @@ TEST_CASE("Corefs: Basic API test")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fscore.register_filesystem("vfat", vfs_vfat);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fscore.register_filesystem("ext4", vfs_ext4);
     REQUIRE(ret == 0);
     // List partitions
     for (const auto &part : dm->partitions("emmc0")) {
         std::cout << part.name << " " << part.bootable << std::endl;
     }
-    ret = fscore.mount("emmc0part0", "/sys", "vfat");
+    ret = fscore.mount("emmc0part0", "/sys", "ext4");
     REQUIRE(ret == 0);
     {
-        struct statvfs ssv;
-        ret = fscore.stat_vfs("/sys/", ssv);
+        struct statvfs sv
+        {};
+        ret = fscore.stat_vfs("/sys/", sv);
         REQUIRE(ret == 0);
     }
     {
         ret = fscore.open("/sys/ala/ma/kota/", 0, 0);
         REQUIRE(ret == -ENOENT);
         // Simple file test
-        int hwnd = fscore.open("/sys/.boot.json", 0, 0);
+        int hwnd = fscore.open("/sys/assets/fonts/fontmap.json", 0, 0);
         REQUIRE(hwnd >= 3);
         std::cout << "File open handle " << hwnd << std::endl;
-        struct stat st;
+        struct stat st
+        {};
         ret = fscore.fstat(hwnd, st);
         REQUIRE(ret == 0);
         std::cout << "File size " << st.st_size << std::endl;
@@ -122,18 +123,20 @@ TEST_CASE("Corefs: Create new file, write, read from it")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fscore.register_filesystem("vfat", vfs_vfat);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fscore.register_filesystem("ext4", vfs_ext4);
     REQUIRE(ret == 0);
-    REQUIRE(fscore.mount("emmc0part0", "/sys", "vfat") == 0);
+    REQUIRE(fscore.mount("emmc0part0", "/sys", "ext4") == 0);
 
-    int hwnd = fscore.open("/sys/test.txt", O_RDWR | O_CREAT, 0660);
-    REQUIRE(hwnd >= 3);
     const std::string text = "test";
-    fscore.write(hwnd, text.c_str(), text.size());
 
-    REQUIRE(fscore.close(hwnd) == 0);
+    {
+        int hwnd = fscore.open("/sys/test.txt", O_RDWR | O_CREAT, 0660);
+        REQUIRE(hwnd >= 3);
+        fscore.write(hwnd, text.c_str(), text.size());
+        REQUIRE(fscore.close(hwnd) == 0);
+    }
 
     {
         int hwnd = fscore.open("/sys/test.txt", O_RDONLY, 0);
@@ -182,9 +185,9 @@ TEST_CASE("Corefs: Mount empty strings")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fscore.register_filesystem("vfat", vfs_vfat);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fscore.register_filesystem("vfat", vfs_ext4);
     REQUIRE(ret == 0);
     REQUIRE(fscore.mount("", "", "") == -EINVAL);
     REQUIRE(fscore.umount("") == -ENOENT);
@@ -198,16 +201,16 @@ TEST_CASE("Corefs: Write to not valid file descriptor")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fscore.register_filesystem("vfat", vfs_vfat);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fscore.register_filesystem("ext4", vfs_ext4);
     REQUIRE(ret == 0);
-    REQUIRE(fscore.mount("emmc0part0", "/sys", "vfat") == 0);
+    REQUIRE(fscore.mount("emmc0part0", "/sys", "ext4") == 0);
 
-    const auto fd = fscore.open("/sys/.boot.json", 0, 0);
+    const auto fd = fscore.open("/sys/assets/fonts/fontmap.json", 0, 0);
     REQUIRE(fd >= 3);
     const auto text = "test";
-    REQUIRE(fscore.write(0, text, sizeof(text)) == -EBADF);
+    REQUIRE(fscore.write(0, text, strlen(text)) == -EBADF);
     REQUIRE(fscore.close(fd) == 0);
     REQUIRE(fscore.umount("/sys") == 0);
 }
@@ -220,19 +223,20 @@ TEST_CASE("Corefs: Directory operations")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fscore.register_filesystem("vfat", vfs_vfat);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fscore.register_filesystem("ext4", vfs_ext4);
     REQUIRE(ret == 0);
-    REQUIRE(fscore.mount("emmc0part0", "/sys", "vfat") == 0);
+    REQUIRE(fscore.mount("emmc0part0", "/sys", "ext4") == 0);
 
-    const auto dirhandle = fscore.diropen("/sys/current");
+    const auto dirhandle = fscore.diropen("/sys/assets");
     REQUIRE(dirhandle);
     REQUIRE(dirhandle->error() == 0);
 
     SECTION("Null pointer handle dirnext")
     {
-        struct stat st;
+        struct stat st
+        {};
         std::string fnm;
         REQUIRE(fscore.dirnext(nullptr, fnm, st) == -ENXIO);
         REQUIRE(fscore.dirclose(dirhandle) == 0);
@@ -248,7 +252,8 @@ TEST_CASE("Corefs: Directory operations")
 
     SECTION("Directory reset")
     {
-        struct stat st;
+        struct stat st
+        {};
         std::vector<std::tuple<std::string, struct stat>> vec;
         for (std::string fnm;;) {
             if (fscore.dirnext(dirhandle, fnm, st) != 0) {
@@ -286,11 +291,11 @@ TEST_CASE("Corefs: Read only filesystem")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fscore.register_filesystem("vfat", vfs_vfat);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fscore.register_filesystem("ext4", vfs_ext4);
     REQUIRE(ret == 0);
-    REQUIRE(fscore.mount("emmc0part0", "/sys", "vfat", fs::mount_flags::read_only) == 0);
+    REQUIRE(fscore.mount("emmc0part0", "/sys", "ext4", fs::mount_flags::read_only) == 0);
     SECTION("Open file in O_RDWR")
     {
         int hwnd = fscore.open("/sys/rotest.txt", O_RDWR | O_CREAT, 0660);
@@ -300,14 +305,16 @@ TEST_CASE("Corefs: Read only filesystem")
     }
     SECTION("Check function which not modify fs")
     {
-        struct statvfs ssv;
-        ret = fscore.stat_vfs("/sys/", ssv);
+        struct statvfs sv
+        {};
+        ret = fscore.stat_vfs("/sys/", sv);
         REQUIRE(ret == 0);
     }
     SECTION("Check stat to not set S_IW...")
     {
-        struct stat st;
-        ret = fscore.stat("/sys/current", st);
+        struct stat st
+        {};
+        ret = fscore.stat("/sys/assets", st);
         REQUIRE(ret == 0);
         REQUIRE(st.st_mode & S_IFDIR);
         REQUIRE((st.st_mode & (S_IWGRP | S_IWUSR | S_IWOTH)) == 0);
@@ -323,11 +330,11 @@ TEST_CASE("Corefs: Remount filesystem from RO to RW and to RO")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     auto fscore         = std::make_shared<purefs::fs::filesystem>(dm);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fscore->register_filesystem("vfat", vfs_vfat);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fscore->register_filesystem("ext4", vfs_ext4);
     REQUIRE(ret == 0);
-    REQUIRE(fscore->mount("emmc0part0", "/sys", "vfat", fs::mount_flags::read_only) == 0);
+    REQUIRE(fscore->mount("emmc0part0", "/sys", "ext4", fs::mount_flags::read_only) == 0);
 
     {
         const int hwnd = fscore->open("/sys/remount_test.txt", O_RDWR | O_CREAT, 0660);
@@ -342,8 +349,9 @@ TEST_CASE("Corefs: Remount filesystem from RO to RW and to RO")
         REQUIRE(fscore->close(hwnd) == 0);
     }
     {
-        struct stat st;
-        ret = fscore->stat("/sys/current", st);
+        struct stat st
+        {};
+        ret = fscore->stat("/sys/assets", st);
         REQUIRE(ret == 0);
         REQUIRE(st.st_mode & S_IFDIR);
         REQUIRE(st.st_mode & (S_IWGRP | S_IWUSR | S_IWOTH));
@@ -359,9 +367,9 @@ TEST_CASE("Corefs: Autodetect filesystems")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     auto fscore         = std::make_shared<purefs::fs::filesystem>(dm);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fscore->register_filesystem("vfat", vfs_vfat);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fscore->register_filesystem("ext4", vfs_ext4);
     REQUIRE(ret == 0);
     REQUIRE(fscore->mount("emmc0part0", "/sys", "auto") == 0);
     REQUIRE(fscore->umount("/sys") == 0);
@@ -375,14 +383,15 @@ TEST_CASE("Corefs: stat extended")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fs_core(dm);
-    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
-    REQUIRE(vfs_vfat->mount_count() == 0);
-    auto ret = fs_core.register_filesystem("vfat", vfs_vfat);
+    const auto vfs_ext4 = std::make_shared<fs::drivers::filesystem_ext4>();
+    REQUIRE(vfs_ext4->mount_count() == 0);
+    auto ret = fs_core.register_filesystem("ext4", vfs_ext4);
     REQUIRE(ret == 0);
-    REQUIRE(fs_core.mount("emmc0part0", "/sys", "vfat") == 0);
+    REQUIRE(fs_core.mount("emmc0part0", "/sys", "ext4") == 0);
 
     // Check if it is a directory
-    struct stat st;
+    struct stat st
+    {};
     REQUIRE(fs_core.stat("/sys", st) == 0);
     REQUIRE(S_ISDIR(st.st_mode));
     REQUIRE(fs_core.stat("/sys/", st) == 0);
