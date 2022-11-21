@@ -7,23 +7,14 @@
 
 #include <memory>
 #include <functional>
-#include <iostream>
-#include <string>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
 #include <catch2/catch.hpp>
 
-#include <log/log.hpp>
-#include <utf8/UTF8.hpp>
-
-#include <module-gui/gui/core/ImageManager.hpp>
 #include <module-gui/gui/core/BoundingBox.hpp>
 #include <module-gui/gui/widgets/text/Label.hpp>
 #include <module-gui/gui/widgets/BoxLayout.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
+
+#include <purefs/filesystem_paths.hpp>
 
 #include <mock/TestWindow.hpp>
 
@@ -53,8 +44,8 @@ TEST_CASE("Are fonts loaded")
     // check getInstance - getting even default font will result in nullptr
     // this is because no fonts are loaded
     REQUIRE(fontmanager.getFont() == nullptr);
-    // now initialize, from where is it taken? nobody knows from this foo
-    fontmanager.init("sys/current/assets");
+    // now initialize
+    fontmanager.init(purefs::dir::getAssetsDirPath());
     // check if there is at least default font
     REQUIRE(fontmanager.getFont() != nullptr);
 }
