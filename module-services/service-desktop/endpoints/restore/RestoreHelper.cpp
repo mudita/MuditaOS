@@ -9,7 +9,7 @@ namespace sdesktop::endpoints
 {
     auto RestoreHelper::processPost([[maybe_unused]] Context &context) -> ProcessResult
     {
-        if (sys::SystemManagerCommon::RebootToUpdater(owner, sys::UpdaterReason::Restore)) {
+        if (sys::SystemManagerCommon::RebootToRecovery(owner, sys::RecoveryReason::Restore)) {
             return {sent::no, ResponseContext{.status = http::Code::NoContent}};
         }
 
