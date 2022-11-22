@@ -27,11 +27,11 @@ namespace bsp
         {
             NormalRestart,
             GoToUsbMscMode,          // Reboot into USB MSC mode
-            GoToUpdaterUpdate,       //! Goto updater into the update mode
-            GoToUpdaterFactoryReset, //! GOto updater into the factory reset mode
-            GoToUpdaterRecovery,     //! Goto to updater into recovery mode
-            GoToUpdaterBackup,       //! Goto to updater into backup mode
-            GoToUpdaterRestore       //! Goto to updater into restore mode
+            GoToRecoveryUpdate,       //! Goto recovery into the update mode
+            GoToRecoveryFactoryReset, //! GOto recovery into the factory reset mode
+            GoToRecoveryRecovery,     //! Goto to recovery into recovery mode
+            GoToRecoveryBackup,       //! Goto to recovery into backup mode
+            GoToRecoveryRestore       //! Goto to recovery into restore mode
 
         };
 
