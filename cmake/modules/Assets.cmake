@@ -15,21 +15,21 @@ function(add_assets_target)
 
         # Copy user assets
         COMMAND mkdir -p ${_ASSETS_USER_DEST_DIR}
-        COMMAND rsync -qravu
+        COMMAND rsync -qau
             ${_ASSETS_SOURCE_DIR}/user/
             ${_ASSETS_USER_DEST_DIR}
         COMMAND find ${_ASSETS_USER_DEST_DIR} -name "*-devel*" | sed "\"s,\\(.*\\)-devel\\(.*\\),& \\1\\2,\"" | xargs --no-run-if-empty -L1 mv
 
         # Copy system assets
         COMMAND mkdir -p ${_ASSETS_SYSTEM_DEST_DIR}
-        COMMAND rsync -qravu
+        COMMAND rsync -qau
             ${_ASSETS_SOURCE_DIR}/system_a/data
             ${_ASSETS_SOURCE_DIR}/system_a/db
             ${_ASSETS_SYSTEM_DEST_DIR}
 
         # Create 'golden copy' of DBs
-        COMMAND rsync -qravu
-            ${_ASSETS_SYSTEM_DEST_DIR}/db/
+        COMMAND rsync -qlptgoDu
+            ${_ASSETS_SYSTEM_DEST_DIR}/db/*
             ${_ASSETS_SYSTEM_DEST_DIR}/db/factory
 
         COMMENT  "Copying assets... add_assets_target (${_ASSETS_TARGET}) <- ${_ASSETS_DEPENDS}"
