@@ -140,8 +140,8 @@ namespace sys
         case SystemManagerCommon::State::RebootToUsbMscMode:
             LOG_INFO("  ---> REBOOT TO USB MSC Mode <--- ");
             break;
-        case SystemManagerCommon::State::RebootToUpdater:
-            LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
+        case SystemManagerCommon::State::RebootToRecovery:
+            LOG_INFO("  ---> REBOOT TO RECOVERY <--- ");
             break;
         case SystemManagerCommon::State::Running:
         case SystemManagerCommon::State::Suspend:
@@ -164,8 +164,8 @@ namespace sys
         case State::RebootToUsbMscMode:
             powerManager->RebootToUsbMscMode();
             break;
-        case State::RebootToUpdater:
-            powerManager->RebootToUpdater(updaterReason);
+        case State::RebootToRecovery:
+            powerManager->RebootToRecovery(recoveryReason);
             break;
         case SystemManagerCommon::State::Running:
         case SystemManagerCommon::State::Suspend:
@@ -286,7 +286,8 @@ namespace sys
 
     bool SystemManagerCommon::FactoryReset(Service *s)
     {
-        return s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::FactoryReset, CloseReason::FactoryReset),
+        return s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(
+                                      Code::FactoryReset, CloseReason::FactoryReset, RecoveryReason::FactoryReset),
                                   service::name::system_manager);
     }
 
@@ -304,10 +305,10 @@ namespace sys
         return true;
     }
 
-    bool SystemManagerCommon::RebootToUpdater(Service *s, UpdaterReason updaterReason)
+    bool SystemManagerCommon::RebootToRecovery(Service *s, RecoveryReason recoveryReason)
     {
         s->bus.sendUnicast(
-            std::make_shared<SystemManagerCmd>(Code::RebootToUpdater, CloseReason::Reboot, updaterReason),
+            std::make_shared<SystemManagerCmd>(Code::RebootToRecovery, CloseReason::Reboot, recoveryReason),
             service::name::system_manager);
         return true;
     }
@@ -578,14 +579,14 @@ namespace sys
                 case Code::Reboot:
                     RebootHandler();
                     break;
-                case Code::RebootToUpdater:
-                    RebootToUpdaterHandler(data->updaterReason);
+                case Code::RebootToRecovery:
+                    RebootToRecoveryHandler(data->recoveryReason);
                     break;
                 case Code::RebootToUsbMscMode:
                     RebootToUsbMscModeHandler(State::RebootToUsbMscMode);
                     break;
                 case Code::FactoryReset:
-                    CloseSystemHandler(CloseReason::FactoryReset);
+                    RebootToRecoveryHandler(data->recoveryReason);
                     break;
                 case Code::None:
                     break;
@@ -733,7 +734,6 @@ namespace sys
 
         switch (closeReason) {
         case CloseReason::RegularPowerDown:
-        case CloseReason::FactoryReset:
         case CloseReason::SystemBrownout:
         case CloseReason::LowBattery:
         case CloseReason::RebootToUsbMscMode:
@@ -744,9 +744,10 @@ namespace sys
             DestroyServices(sys::state::regularClose::whitelist);
             set(State::Reboot);
             break;
-        case CloseReason::RebootToUpdater:
+        case CloseReason::RebootToRecovery:
+        case CloseReason::FactoryReset:
             DestroyServices(sys::state::update::whitelist);
-            set(State::RebootToUpdater);
+            set(State::RebootToRecovery);
             break;
         }
     }
@@ -772,10 +773,10 @@ namespace sys
         CloseSystemHandler(CloseReason::Reboot);
     }
 
-    void SystemManagerCommon::RebootToUpdaterHandler(UpdaterReason updaterReason)
+    void SystemManagerCommon::RebootToRecoveryHandler(RecoveryReason recoveryReason)
     {
-        CloseSystemHandler(CloseReason::RebootToUpdater);
-        this->updaterReason = updaterReason;
+        CloseSystemHandler(CloseReason::RebootToRecovery);
+        this->recoveryReason = recoveryReason;
     }
 
     void SystemManagerCommon::RebootToUsbMscModeHandler(State newState)
