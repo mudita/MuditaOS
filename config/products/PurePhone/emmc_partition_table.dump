@@ -1,7 +1,0 @@
-label: dos
-label-id: 0x09650eb4
-device: /dev/sda
-unit: sectors
-
-/dev/sda1 : start= 2048,     size= 28522496, type=b, bootable
-/dev/sda2 : start= 28524544, size= 2097152,  type=9e

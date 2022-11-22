@@ -38,7 +38,7 @@ source ${IMAGE_PARTITIONS}
 DEVICE_BLK_SIZE=512
 
 # Partition sizes in sector 512 units
-PART1_START=2048
+PART1_START=1
 PART2_START=$(($PART1_START + $PART1_SIZE))
 PART2_SIZE=$PART1_SIZE
 PART3_START=$(($PART2_START + $PART2_SIZE))
@@ -93,7 +93,7 @@ mke2fs \
   -d 'system_a' \
   -t ext4 \
   "$IMAGE_NAME" \
-  $((($PART1_SIZE*$DEVICE_BLK_SIZE)/1024))  > /dev/null
+  $((($PART1_SIZE*$DEVICE_BLK_SIZE)/1024)) > /dev/null
 
 # Format ext4 system_b partition
 echo "Formatting system_b partition as ext4..."
@@ -109,7 +109,7 @@ mke2fs \
   -r 1 \
   -t ext4 \
   "$IMAGE_NAME" \
-  $((($PART2_SIZE*$DEVICE_BLK_SIZE)/1024))  > /dev/null
+  $((($PART2_SIZE*$DEVICE_BLK_SIZE)/1024)) > /dev/null
 
 # Format ext4 user partition
 echo "Formatting user partition as ext4..."
