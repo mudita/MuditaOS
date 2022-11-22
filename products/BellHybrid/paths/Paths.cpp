@@ -10,7 +10,7 @@ std::filesystem::path paths::audio::user() noexcept
 }
 std::filesystem::path paths::audio::proprietary() noexcept
 {
-    return purefs::dir::getCurrentOSPath() / "assets/audio";
+    return purefs::dir::getAssetsDirPath() / "audio";
 }
 std::filesystem::path paths::audio::alarm() noexcept
 {
