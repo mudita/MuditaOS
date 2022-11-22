@@ -149,7 +149,7 @@ download_asset_release_json(json-community-target
     )
 download_asset_json(json-rt1051-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_rt1051.json
-                            ${CMAKE_BINARY_DIR}/sysroot/system_a/
+                            ${CMAKE_BINARY_DIR}/sysroot/system_a/assets
                             MuditaOSAssets
                             ${MUDITA_CACHE_DIR}
     )
