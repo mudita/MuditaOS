@@ -38,7 +38,7 @@ namespace sdesktop::endpoints
 
     auto BackupHelper::executeBackupRequest([[maybe_unused]] Context &context) -> ProcessResult
     {
-        if (sys::SystemManagerCommon::RebootToUpdater(owner, sys::UpdaterReason::Backup)) {
+        if (sys::SystemManagerCommon::RebootToRecovery(owner, sys::RecoveryReason::Backup)) {
             return {sent::no, ResponseContext{.status = http::Code::NoContent}};
         }
 
