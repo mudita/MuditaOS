@@ -89,19 +89,19 @@ namespace sys
         return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUsbMscMode);
     }
 
-    int32_t PowerManager::RebootToUpdater(UpdaterReason reason)
+    int32_t PowerManager::RebootToRecovery(RecoveryReason reason)
     {
         switch (reason) {
-        case UpdaterReason::FactoryReset:
-            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterFactoryReset);
-        case UpdaterReason::Recovery:
-            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterRecovery);
-        case UpdaterReason::Update:
-            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterUpdate);
-        case UpdaterReason::Backup:
-            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterBackup);
-        case UpdaterReason::Restore:
-            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterRestore);
+        case RecoveryReason::FactoryReset:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToRecoveryFactoryReset);
+        case RecoveryReason::Recovery:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToRecoveryRecovery);
+        case RecoveryReason::Update:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToRecoveryUpdate);
+        case RecoveryReason::Backup:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToRecoveryBackup);
+        case RecoveryReason::Restore:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToRecoveryRestore);
         default:
             return -1;
         }
