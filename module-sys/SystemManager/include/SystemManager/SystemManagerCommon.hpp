@@ -42,7 +42,7 @@ namespace sys
         CloseSystem,
         Restore,
         Reboot,
-        RebootToUpdater,
+        RebootToRecovery,
         RebootToUsbMscMode,
         FactoryReset,
         None,
@@ -57,16 +57,16 @@ namespace sys
     class SystemManagerCmd : public DataMessage
     {
       public:
-        explicit SystemManagerCmd(Code type                   = Code::None,
-                                  CloseReason closeReason     = CloseReason::RegularPowerDown,
-                                  UpdaterReason updaterReason = UpdaterReason::Update)
+        explicit SystemManagerCmd(Code type                     = Code::None,
+                                  CloseReason closeReason       = CloseReason::RegularPowerDown,
+                                  RecoveryReason recoveryReason = RecoveryReason::Update)
             : DataMessage(BusChannel::SystemManagerRequests), type(type), closeReason(closeReason),
-              updaterReason(updaterReason)
+              recoveryReason(recoveryReason)
         {}
 
         Code type;
         CloseReason closeReason;
-        UpdaterReason updaterReason;
+        RecoveryReason recoveryReason;
     };
 
     class SystemManagerCommon : public Service
@@ -81,7 +81,7 @@ namespace sys
             Shutdown,
             ShutdownReady,
             Reboot,
-            RebootToUpdater,
+            RebootToRecovery,
             RebootToUsbMscMode
         } state = State::Running;
 
@@ -102,7 +102,7 @@ namespace sys
 
         static bool RebootToUsbMscMode(Service *s);
 
-        static bool RebootToUpdater(Service *s, UpdaterReason updaterReason);
+        static bool RebootToRecovery(Service *s, RecoveryReason recoveryReason);
 
         static bool SuspendService(const std::string &name, Service *caller);
 
@@ -184,7 +184,7 @@ namespace sys
 
         void RebootHandler();
 
-        void RebootToUpdaterHandler(UpdaterReason updaterReason);
+        void RebootToRecoveryHandler(RecoveryReason recoveryReason);
 
         void RebootToUsbMscModeHandler(State newState);
 
@@ -197,7 +197,7 @@ namespace sys
         bool serviceListReversed{false};
 
         CloseReason closeReason{CloseReason::RegularPowerDown};
-        UpdaterReason updaterReason{UpdaterReason::Update};
+        RecoveryReason recoveryReason{RecoveryReason::Update};
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         sys::TimerHandle freqTimer;
         sys::TimerHandle serviceCloseTimer;
@@ -232,8 +232,8 @@ inline const char *c_str(sys::SystemManagerCommon::State state)
         return "Shutdown";
     case sys::SystemManagerCommon::State::Reboot:
         return "Reboot";
-    case sys::SystemManagerCommon::State::RebootToUpdater:
-        return "RebootToUpdater";
+    case sys::SystemManagerCommon::State::RebootToRecovery:
+        return "RebootToRecovery";
     case sys::SystemManagerCommon::State::RebootToUsbMscMode:
         return "RebootToUsbMscModeUpdate";
         break;
