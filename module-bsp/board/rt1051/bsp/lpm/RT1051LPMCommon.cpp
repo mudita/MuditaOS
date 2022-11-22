@@ -31,19 +31,19 @@ namespace bsp
     int32_t RT1051LPMCommon::Reboot(RebootType reason)
     {
         switch (reason) {
-        case RebootType::GoToUpdaterUpdate:
+        case RebootType::GoToRecoveryUpdate:
             set_boot_reason(boot_reason_code_update);
             break;
-        case RebootType::GoToUpdaterRecovery:
+        case RebootType::GoToRecoveryRecovery:
             set_boot_reason(boot_reason_code_recovery);
             break;
-        case RebootType::GoToUpdaterFactoryReset:
+        case RebootType::GoToRecoveryFactoryReset:
             set_boot_reason(boot_reason_code_factory);
             break;
-        case RebootType::GoToUpdaterBackup:
+        case RebootType::GoToRecoveryBackup:
             set_boot_reason(boot_reason_code_backup);
             break;
-        case RebootType::GoToUpdaterRestore:
+        case RebootType::GoToRecoveryRestore:
             set_boot_reason(boot_reason_code_restore);
             break;
         case RebootType::GoToUsbMscMode:
