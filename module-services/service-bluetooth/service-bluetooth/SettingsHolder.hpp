@@ -45,7 +45,7 @@ namespace bluetooth
     {
         auto operator()(const std::string &input) const -> int
         {
-            int value;
+            int value = 0;
             utils::toNumeric(input, value);
             return value;
         }

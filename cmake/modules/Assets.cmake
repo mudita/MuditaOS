@@ -28,6 +28,7 @@ function(add_assets_target)
             ${_ASSETS_SYSTEM_DEST_DIR}
 
         # Create 'golden copy' of DBs
+        COMMAND mkdir -p ${_ASSETS_SYSTEM_DEST_DIR}/db/factory
         COMMAND rsync -qlptgoDu
             ${_ASSETS_SYSTEM_DEST_DIR}/db/*
             ${_ASSETS_SYSTEM_DEST_DIR}/db/factory
