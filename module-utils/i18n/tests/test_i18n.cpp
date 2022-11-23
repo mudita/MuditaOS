@@ -12,7 +12,7 @@ using namespace std;
 
 TEST_CASE("Test set display language - empty display language string")
 {
-    utils::resetAssetsPath(purefs::dir::getDataDirPath());
+    utils::resetAssetsPath(purefs::dir::getSystemDataDirPath());
     utils::resetDisplayLanguages();
     REQUIRE(utils::getDisplayLanguage().empty());
 
@@ -23,7 +23,7 @@ TEST_CASE("Test set display language - empty display language string")
 
 TEST_CASE("Test set display language - invalid display language string")
 {
-    utils::resetAssetsPath(purefs::dir::getDataDirPath());
+    utils::resetAssetsPath(purefs::dir::getSystemDataDirPath());
     utils::resetDisplayLanguages();
     REQUIRE(utils::getDisplayLanguage().empty());
 
@@ -34,7 +34,7 @@ TEST_CASE("Test set display language - invalid display language string")
 
 TEST_CASE("Test set display language - double invalid display language string")
 {
-    utils::resetAssetsPath(purefs::dir::getDataDirPath());
+    utils::resetAssetsPath(purefs::dir::getSystemDataDirPath());
     utils::resetDisplayLanguages();
     REQUIRE(utils::getDisplayLanguage().empty());
 
@@ -51,7 +51,7 @@ TEST_CASE("Test set display language - set display language with valid string")
 {
     static constexpr auto languageToChange = "Polski";
 
-    utils::resetAssetsPath(purefs::dir::getDataDirPath());
+    utils::resetAssetsPath(purefs::dir::getSystemDataDirPath());
     utils::resetDisplayLanguages();
     REQUIRE(utils::getDisplayLanguage().empty());
 
@@ -64,7 +64,7 @@ TEST_CASE("Test set display language - set display language with valid string an
 {
     static constexpr auto languageToChange = "Polski";
 
-    utils::resetAssetsPath(purefs::dir::getDataDirPath());
+    utils::resetAssetsPath(purefs::dir::getSystemDataDirPath());
     utils::resetDisplayLanguages();
     REQUIRE(utils::getDisplayLanguage().empty());
 
@@ -79,7 +79,7 @@ TEST_CASE("Test set display language - set display language with valid string an
 
 TEST_CASE("Test get string method - no display language set")
 {
-    utils::resetAssetsPath(purefs::dir::getDataDirPath());
+    utils::resetAssetsPath(purefs::dir::getSystemDataDirPath());
     utils::resetDisplayLanguages();
     REQUIRE(utils::getDisplayLanguage().empty());
 
@@ -89,7 +89,7 @@ TEST_CASE("Test get string method - no display language set")
 
 TEST_CASE("Test get string method - invalid display language set")
 {
-    utils::resetAssetsPath(purefs::dir::getDataDirPath());
+    utils::resetAssetsPath(purefs::dir::getSystemDataDirPath());
     utils::resetDisplayLanguages();
     REQUIRE(utils::getDisplayLanguage().empty());
 
@@ -105,7 +105,7 @@ TEST_CASE("Test get string method - valid display language set")
 {
     static constexpr auto languageToChange = "Polski";
 
-    utils::resetAssetsPath(purefs::dir::getDataDirPath());
+    utils::resetAssetsPath(purefs::dir::getSystemDataDirPath());
     utils::resetDisplayLanguages();
     REQUIRE(utils::getDisplayLanguage().empty());
 
