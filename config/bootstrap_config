@@ -62,5 +62,6 @@ INSTALL_PACKAGES="
         wget \
         zip \
         fdisk \
+        luarocks \
 "
 
