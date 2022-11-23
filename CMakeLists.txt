@@ -50,7 +50,7 @@ endif()
 
 if (${ENABLE_TESTS})
     enable_testing()
-    add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
+    add_custom_target(check ${CMAKE_CTEST_COMMAND} -V DEPENDS create_test_product_databases create_test_databases_common)
     add_subdirectory(test)
     include(PureCoverage)
 endif ()
@@ -206,6 +206,23 @@ add_scripts_target(
         TARGET install_scripts
         PRODUCT ${PRODUCT}
         DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/system_a/scripts
+)
+
+# Create and initialize common databases for tests
+add_databases_target(
+        TARGET create_test_databases_common
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/module-db/databases/scripts
+        DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/system_a/db
+        DEVEL ${WITH_DEVELOPMENT_FEATURES}
+)
+
+# Create and initialize product-specific databases for tests
+add_databases_target(
+        TARGET create_test_product_databases
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases/scripts
+        DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/system_a/db
+        DEVEL ${WITH_DEVELOPMENT_FEATURES}
+        DEPENDS create_databases_common
 )
 
 add_library(version-header INTERFACE)

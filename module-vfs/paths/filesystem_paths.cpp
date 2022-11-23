@@ -6,20 +6,20 @@
 
 namespace
 {
-    constexpr inline auto PATH_SYSTEM       = "/system";
-    constexpr inline auto PATH_USER         = "/user";
-    constexpr inline auto PATH_CONF         = "/mfgconf";
-    constexpr inline auto PATH_DB           = "db";
-    constexpr inline auto PATH_UPDATE       = "update";
-    constexpr inline auto PATH_SYNC         = "sync";
-    constexpr inline auto PATH_LOGS         = "log";
-    constexpr inline auto PATH_CRASH_DUMPS  = "crash_dumps";
+    constexpr inline auto PATH_SYSTEM      = "/system";
+    constexpr inline auto PATH_USER        = "/user";
+    constexpr inline auto PATH_CONF        = "/mfgconf";
+    constexpr inline auto PATH_DB          = "db";
+    constexpr inline auto PATH_UPDATE      = "update";
+    constexpr inline auto PATH_SYNC        = "sync";
+    constexpr inline auto PATH_LOGS        = "log";
+    constexpr inline auto PATH_CRASH_DUMPS = "crash_dumps";
     constexpr inline auto PATH_USER_MEDIA =
         "media"; // TODO this won't work with our current non-hierarchical MTP implementation
     constexpr inline auto PATH_TMP    = "tmp";
     constexpr inline auto PATH_BACKUP = "backup";
-    constexpr inline auto PATH_ASSETS  = "assets";
-    constexpr inline auto PATH_DATA    = "data";
+    constexpr inline auto PATH_ASSETS = "assets";
+    constexpr inline auto PATH_DATA   = "data";
 } // namespace
 
 namespace purefs
