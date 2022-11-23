@@ -26,6 +26,7 @@ RUN apt-get install software-properties-common -y
 RUN add-apt-repository ppa:git-core/ppa -y
 RUN apt-get update
 RUN apt-get install git -y
+RUN luarocks install ldoc
 
 #add python packages
 ADD assets/requirements.txt /home/docker/requirements.txt
