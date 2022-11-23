@@ -95,7 +95,6 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     add_image(
         PRODUCT BellHybrid
         SYSROOT sysroot
-        LUTS Luts.bin
         DEPENDS
             install_scripts
             create_product_databases
