@@ -82,9 +82,6 @@ namespace CellularServiceAPI
     bool SetScanMode(sys::Service *serv, std::string mode);
     bool GetScanMode(sys::Service *serv);
     bool GetFirmwareVersion(sys::Service *serv, std::string &response);
-    bool GetChannel(sys::Service *serv,
-                    CellularMux::Channel channel); /// asynchronous, returns message CellureMessageChannelReady;
-    bool GetDataChannel(sys::Service *serv);
     bool GetCSQ(sys::Service *serv, std::string &response);
     bool GetCREG(sys::Service *serv, std::string &response);
     bool GetQNWINFO(sys::Service *serv, std::string &response);

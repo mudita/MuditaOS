@@ -634,8 +634,6 @@ void ServiceCellular::registerMessageHandlers()
         }
         return sys::MessageNone{};
     });
-
-    handle_CellularGetChannelMessage();
 }
 
 void ServiceCellular::change_state(cellular::StateChange *msg)
@@ -1513,19 +1511,6 @@ bool ServiceCellular::transmitDtmfTone(DTMFCode code)
     return resp.code == at::Result::Code::OK;
 }
 
-void ServiceCellular::handle_CellularGetChannelMessage()
-{
-    connect(cellular::GetChannelMessage(), [&](sys::Message *req) {
-        auto getChannelMsg = static_cast<cellular::GetChannelMessage *>(req);
-        LOG_DEBUG("Handle request for channel: %s", CellularMux::name(getChannelMsg->dataChannel).c_str());
-        std::shared_ptr<cellular::GetChannelResponseMessage> channelResponsMessage =
-            // MOS-809: find out if there's a need here for checking 'cmux' against nullptr
-            std::make_shared<cellular::GetChannelResponseMessage>(cmux->get(getChannelMsg->dataChannel));
-        LOG_DEBUG("channel ptr: %p", channelResponsMessage->dataChannelPtr);
-        bus.sendUnicast(std::move(channelResponsMessage), req->sender);
-        return sys::MessageNone{};
-    });
-}
 bool ServiceCellular::handle_status_check(void)
 {
     LOG_INFO("Checking modem status.");

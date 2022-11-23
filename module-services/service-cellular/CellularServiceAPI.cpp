@@ -190,17 +190,6 @@ bool CellularServiceAPI::GetFirmwareVersion(sys::Service *serv, std::string &res
     return false;
 }
 
-bool CellularServiceAPI::GetChannel(sys::Service *serv, CellularMux::Channel channel)
-{
-    auto msg = std::make_shared<cellular::GetChannelMessage>(channel);
-    return serv->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
-}
-
-bool CellularServiceAPI::GetDataChannel(sys::Service *serv)
-{
-    return GetChannel(serv, CellularMux::Channel::Data);
-}
-
 bool CellularServiceAPI::GetCSQ(sys::Service *serv, std::string &response)
 {
 

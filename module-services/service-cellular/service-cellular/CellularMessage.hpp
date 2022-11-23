@@ -63,8 +63,6 @@ class CellularMessage : public sys::DataMessage
         GetScanModeResult,
         GetFirmwareVersion,       ///< Asks for current firmware version
         GetFirmwareVersionResult, ///< Returns current firmware version
-        GetChannel,               ///< Asks for channel, requres chnnel name
-        GetChannelResponse,       ///< Returns channel (and it's name)
         GetCSQ,
         GetCREG,
         GetNWINFO,
@@ -333,24 +331,6 @@ namespace cellular
             return std::make_unique<app::manager::ActionRequest>(
                 sender, app::manager::actions::SmsRejectNoSim, std::make_unique<app::manager::actions::ActionParams>());
         }
-    };
-
-    class GetChannelMessage : public CellularMessage
-    {
-      public:
-        explicit GetChannelMessage(CellularMux::Channel dataChannel = CellularMux::Channel::None)
-            : CellularMessage{Type::GetChannel}, dataChannel(dataChannel)
-        {}
-        CellularMux::Channel dataChannel;
-    };
-
-    class GetChannelResponseMessage : public CellularMessage
-    {
-      public:
-        explicit GetChannelResponseMessage(DLCChannel *dataChannelPtr = nullptr)
-            : CellularMessage{Type::GetChannelResponse}, dataChannelPtr(dataChannelPtr)
-        {}
-        DLCChannel *dataChannelPtr;
     };
 
     class ResponseMessage : public sys::ResponseMessage

@@ -202,8 +202,6 @@ class ServiceCellular : public sys::Service
     /// @}
 
     bool transmitDtmfTone(DTMFCode code);
-    /// Handle message CellularGetChannelMessage
-    void handle_CellularGetChannelMessage();
 
     bool SetScanMode(std::string mode);
     std::string GetScanMode();
