@@ -44,6 +44,12 @@ namespace gui
         setFocusItem(spinner);
     }
 
+    bool OnBoardingShortcutsWindow::isOneOfTwoLastShortcuts() const
+    {
+        auto currentLayout = spinner->getCurrentValue();
+        return presenter->isOneOfTwoLastLayouts(currentLayout);
+    }
+
     bool OnBoardingShortcutsWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (spinner->onInput(inputEvent)) {

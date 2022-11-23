@@ -27,5 +27,7 @@ namespace gui
             app::ApplicationCommon *app,
             std::unique_ptr<app::OnBoarding::OnBoardingShortcutsWindowContract::Presenter> &&presenter,
             const std::string &name);
+
+        bool isOneOfTwoLastShortcuts() const;
     };
 } // namespace gui
