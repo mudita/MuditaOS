@@ -17,7 +17,7 @@ function(add_databases_target)
             ${ARGN}
     )
 
-    if (${_ARG_DEVEL} STREQUAL "ON")
+    if (${_ARG_DEVEL} STREQUAL "ON" OR ${_ARG_DEVEL} EQUAL 1)
         set (DEVEL --development True)
     endif()
 
