@@ -18,12 +18,17 @@ namespace app::OnBoarding
 
     gui::Item *OnBoardingShortcutsWindowPresenter::getFirstLayout() const
     {
-        return layoutOptions.front();
+        return layoutOptions.empty() ? nullptr : layoutOptions.front();
     }
 
     bool OnBoardingShortcutsWindowPresenter::isLastLayout(const gui::Item *layout) const
     {
-        return layoutOptions.back() == layout;
+        return !layoutOptions.empty() && layoutOptions.back() == layout;
+    }
+
+    bool OnBoardingShortcutsWindowPresenter::isOneOfTwoLastLayouts(const gui::Item *layout) const
+    {
+        return isLastLayout(layout) || (layoutOptions.size() >= 2 && layoutOptions[layoutOptions.size() - 2] == layout);
     }
 
     void OnBoardingShortcutsWindowPresenter::initLayoutOptions()

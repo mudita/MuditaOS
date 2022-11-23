@@ -646,7 +646,7 @@
   "app_bell_onboarding_shortcuts_skip": "Skip",
   "app_bell_onboarding_shortcuts_step_rotate": "Rotate to select",
   "app_bell_onboarding_shortcuts_step_light_click": "Light click to accept and move forward",
-  "app_bell_onboarding_shortcuts_step_deep_press": "Deep press to active or deactivate the alarm",
+  "app_bell_onboarding_shortcuts_step_deep_press": "Deep press to activate or deactivate the alarm",
   "app_bell_onboarding_shortcuts_step_home": "Long press back (2s) to return to the home view",
   "app_bell_onboarding_shortcuts_step_battery": "Long press back (2s) on the home view to see status battery",
   "app_bell_onboarding_shortcuts_step_turn_off": "Press back for 10s to turn off the device",

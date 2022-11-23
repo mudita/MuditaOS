@@ -246,7 +246,19 @@ namespace app
 
         if (isInformationPromptPermittedOnCurrentWindow()) {
             if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) || inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN)) {
-                informationState = OnBoarding::InformationStates::LightClickInfo;
+                gui::AppWindow *window = getCurrentWindow();
+                auto shortcutsWindow   = window->getName() == gui::window::name::onBoardingShortcutsWindow
+                                             ? dynamic_cast<gui::OnBoardingShortcutsWindow *>(window)
+                                             : nullptr;
+                if (shortcutsWindow != nullptr) {
+                    if (shortcutsWindow->isOneOfTwoLastShortcuts() && inputEvent.isKeyRelease(gui::KeyCode::KEY_UP))
+                        informationState = OnBoarding::InformationStates::LightClickInfo;
+                    else
+                        informationState = OnBoarding::InformationStates::RotateInfo;
+                }
+                else {
+                    informationState = OnBoarding::InformationStates::LightClickInfo;
+                }
             }
             else if (getCurrentWindow()->getName() != gui::window::name::onBoardingShortcutsWindow) {
                 if (inputEvent.isKeyRelease(gui::KeyCode::KEY_RIGHT) ||
