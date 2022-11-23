@@ -28,7 +28,7 @@ namespace bsp::battery_charger
 
         constexpr std::uint32_t i2cSubaddresSize = 1;
 
-        const auto cfgFile = purefs::dir::getUserDiskPath() / "batteryFuelGaugeConfig.cfg";
+        const auto cfgFile = purefs::dir::getUserDataDirPath() / "batteryFuelGaugeConfig.cfg";
 
         constexpr auto registersToStore              = 0xFF + 1;
         constexpr auto configFileSizeWithoutChecksum = registersToStore * sizeof(Register);
@@ -158,7 +158,7 @@ namespace bsp::battery_charger
         drivers::I2CAddress batteryChargerAddress = {BATTERY_CHARGER_I2C_ADDR, 0, i2cSubaddresSize};
         drivers::I2CAddress topControllerAddress  = {TOP_CONTROLLER_I2C_ADDR, 0, i2cSubaddresSize};
 
-        void addChecksumToConfigFile(std::filesystem::path cfgFile)
+        void addChecksumToConfigFile()
         {
             std::fstream file(cfgFile.c_str(), std::ios::binary | std::ios::in | std::ios::out);
             if (!file.is_open()) {
@@ -176,7 +176,7 @@ namespace bsp::battery_charger
             file.close();
         }
 
-        bool isCorrectChecksumFromConfigFile(std::filesystem::path cfgFile)
+        bool isCorrectChecksumFromConfigFile()
         {
             bool ret = false;
             std::ifstream file(cfgFile.c_str(), std::ios::binary | std::ios::in);
@@ -418,7 +418,7 @@ namespace bsp::battery_charger
                 savedData[i] = regVal.second;
             }
             file.close();
-            addChecksumToConfigFile(cfgFile.c_str());
+            addChecksumToConfigFile();
             return fileConfigRetval::OK;
         }
 
@@ -458,7 +458,7 @@ namespace bsp::battery_charger
                 readData[i] = regVal;
             }
             file.close();
-            if (!isCorrectChecksumFromConfigFile(cfgFile.c_str())) {
+            if (!isCorrectChecksumFromConfigFile()) {
                 return fileConfigRetval::FileCrcError;
             }
             return fileConfigRetval::OK;
