@@ -27,8 +27,8 @@ namespace utils
         Language inputLanguage        = fallbackLanguageName;
         Language inputLanguageFilename;
         Language currentDisplayLanguage;
-        std::filesystem::path InputLanguageDirPath   = purefs::dir::getDataDirPath() / "profiles";
-        std::filesystem::path DisplayLanguageDirPath = purefs::dir::getDataDirPath() / "lang";
+        std::filesystem::path InputLanguageDirPath   = purefs::dir::getSystemDataDirPath() / "profiles";
+        std::filesystem::path DisplayLanguageDirPath = purefs::dir::getSystemDataDirPath() / "lang";
         cpp_freertos::MutexStandard mutex;
         std::vector<LanguageMetadata> metadata;
 

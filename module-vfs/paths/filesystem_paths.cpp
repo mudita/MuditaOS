@@ -96,9 +96,14 @@ namespace purefs
             return getSystemDiskPath() / PATH_ASSETS;
         }
 
-        std::filesystem::path getDataDirPath() noexcept
+        std::filesystem::path getSystemDataDirPath() noexcept
         {
             return getSystemDiskPath() / PATH_DATA;
+        }
+
+        std::filesystem::path getUserDataDirPath() noexcept
+        {
+            return getUserDiskPath() / PATH_DATA;
         }
     } // namespace dir
 } // namespace purefs
