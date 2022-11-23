@@ -14,7 +14,7 @@ namespace audio
             : Profile(
                   "Routing Headset",
                   Type::RoutingHeadphones,
-                  purefs::dir::getDataDirPath() / "equalizer/headphones_routing.json",
+                  purefs::dir::getSystemDataDirPath() / "equalizer/headphones_routing.json",
                   audio::codec::Configuration{
                       .sampleRate_Hz = 16000,
                       .bitWidth      = 16,
