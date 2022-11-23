@@ -111,7 +111,7 @@ extern "C"
 
     int _iosys__openat_2(int fd, const char *dirname, int flags)
     {
-        int ret;
+        int ret = 0;
         if (!dirname) {
             TRACE_SYSCALLN("(%p) invalid argument", dirname);
             errno = EINVAL;
