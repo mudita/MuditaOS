@@ -121,6 +121,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         SYSROOT sysroot
         LUTS Luts.bin
         DEPENDS
+            install_scripts
             create_product_databases
             create_user_directories
             assets updater.bin-target
@@ -135,6 +136,7 @@ else()
         SYSROOT sysroot
         LUTS ""
         DEPENDS
+            install_scripts
             create_product_databases
             create_user_directories
             assets
