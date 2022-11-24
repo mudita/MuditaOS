@@ -84,7 +84,7 @@ include(AddVersionJson)
 
 add_directories(
         TARGET create_user_directories
-        PREFIX ${CMAKE_BINARY_DIR}/sysroot/user/media/app
+        PREFIX ${SYSROOT_PATH}/user/media/app
         DEPENDS system_directories_common
         DIRECTORIES relaxation
 )
@@ -100,7 +100,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
             create_product_databases
             create_user_directories
             assets
-            updater.bin-target
+            recovery.bin-target
             ecoboot.bin-target
             BellHybrid-boot.bin
             BellHybrid-version.json-target
@@ -128,31 +128,31 @@ include(DownloadAsset)
 # copy all assets required to build catalog under current folder as in json recipe
 download_asset_json(json-proprietary-target
                     ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_proprietary.json
-                    ${CMAKE_BINARY_DIR}/sysroot/system_a/
+                   ${SYSROOT_PATH}/system_a/
                     MuditaOSAssets
                     ${MUDITA_CACHE_DIR}
     )
 download_asset_release_json(json-common-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_common.json
-                            ${CMAKE_BINARY_DIR}/sysroot/system_a/
+                           ${SYSROOT_PATH}/system_a/
                             MuditaOSPublicAssets
                             0.0.14
                             ${MUDITA_CACHE_DIR}
     )
 download_asset_release_json(json-community-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_community.json
-                            ${CMAKE_BINARY_DIR}/sysroot/system_a/
+                           ${SYSROOT_PATH}/system_a/
                             MuditaOSPublicAssets
                             0.0.14
                             ${MUDITA_CACHE_DIR}
     )
 download_asset_json(json-rt1051-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_rt1051.json
-                            ${CMAKE_BINARY_DIR}/sysroot/system_a/assets
+                           ${SYSROOT_PATH}/system_a/assets
                             MuditaOSAssets
                             ${MUDITA_CACHE_DIR}
     )
-download_asset_release(PureUpdater_RT.bin updater.bin PureUpdater ${UPDATER_BIN_VERSION}  ${MUDITA_CACHE_DIR})
+download_asset_release(PureRecovery.bin recovery.bin PureRecovery ${RECOVERY_BIN_VERSION}  ${MUDITA_CACHE_DIR})
 download_asset_release(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION}  ${MUDITA_CACHE_DIR})
 
 
