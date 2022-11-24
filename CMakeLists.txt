@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 set(MUDITA_CACHE_DIR "~/.mudita/" CACHE STRING "cache directory for our downloaded assets")
+
 project(PureOS)
 enable_language(C CXX ASM)
 
@@ -11,6 +12,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 include(Product)
 include(Board)
+
+set(SYSROOT_PATH ${CMAKE_CURRENT_BINARY_DIR}/sysroot)
+set(SYSROOT_BIN_PATH ${SYSROOT_PATH}/system_a/bin)
 
 validate_product_selection()
 include(products/${PRODUCT}/config.cmake)
@@ -180,7 +184,7 @@ add_custom_target(
 # Create common system directories
 add_directories(
         TARGET system_directories_common
-        PREFIX ${CMAKE_BINARY_DIR}/sysroot/system_a
+        PREFIX ${SYSROOT_PATH}/system_a
         DEPENDS assets
         DIRECTORIES log assets crash_dumps data bin db scripts
 )
@@ -189,7 +193,7 @@ add_directories(
 add_databases_target(
         TARGET create_databases_common
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/module-db/databases/scripts
-        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/system_a/db
+        DEST_DIR ${SYSROOT_PATH}/system_a/db
         DEVEL ${WITH_DEVELOPMENT_FEATURES}
 )
 
@@ -197,7 +201,7 @@ add_databases_target(
 add_databases_target(
         TARGET create_product_databases
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases/scripts
-        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/system_a/db
+        DEST_DIR ${SYSROOT_PATH}/system_a/db
         DEVEL ${WITH_DEVELOPMENT_FEATURES}
         DEPENDS create_databases_common
 )
@@ -205,7 +209,7 @@ add_databases_target(
 add_scripts_target(
         TARGET install_scripts
         PRODUCT ${PRODUCT}
-        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/system_a/scripts
+        DEST_DIR ${SYSROOT_PATH}/system_a/scripts
 )
 
 # Create and initialize common databases for tests
