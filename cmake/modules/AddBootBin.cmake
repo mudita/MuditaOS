@@ -1,5 +1,5 @@
 function(add_boot_bin SOURCE_TARGET)
-    set(BIN_FILE ${SYSROOT_PATH}/system_a/bin/boot.bin)
+    set(BIN_FILE ${SYSROOT_PATH}/system_a/bin/os.bin)
 
     set_target_properties(
             ${SOURCE_TARGET}
@@ -10,7 +10,7 @@ function(add_boot_bin SOURCE_TARGET)
     if (ENABLE_SECURE_BOOT)
         IF(EXISTS ${SIGN_CLIENT_PATH}/signclient.py)
             add_custom_command(
-                COMMENT "Generate signed boot.bin (Secure Boot)"
+                COMMENT "Generate signed os.bin (Secure Boot)"
                 OUTPUT ${BIN_FILE}
                 DEPENDS ${SOURCE_TARGET}
                 COMMAND python3 ${SIGN_CLIENT_PATH}/signclient.py --in_file $<TARGET_FILE:${SOURCE_TARGET}> --out_file=${BIN_FILE} --keystore ${KEYSTORE} --keyslot ${KEYSLOT} --server ${SERVER} --login ${LOGIN}
