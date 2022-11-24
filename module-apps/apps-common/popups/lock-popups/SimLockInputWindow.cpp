@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimLockInputWindow.hpp"
@@ -43,6 +43,7 @@ namespace gui
         if (lock->isState(locks::Lock::LockState::ErrorOccurred)) {
             lockBox->setVisibleStateError(errorCode);
         }
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
     status_bar::Configuration SimLockInputWindow::configureStatusBar(status_bar::Configuration appConfiguration)

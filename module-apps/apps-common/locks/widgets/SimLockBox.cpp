@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimLockBox.hpp"
@@ -64,7 +64,7 @@ namespace gui
         }
 
         LockWindow->setImage("sim_128px_W_G");
-        LockWindow->setNavBarWidgetsActive(false, false, true);
+        LockWindow->setNavBarWidgetsActive(false, LockWindow->lock->canVerify(), true);
     }
 
     void SimLockBox::setVisibleStateInputInvalid(InputErrorType type, unsigned int value)
