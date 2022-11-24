@@ -29,6 +29,7 @@ include(AddPackage)
 include(AutoModuleOption)
 include(AddDirectories)
 include(AddDatabases)
+include(AddScripts)
 
 message("Selected product: ${PRODUCT}")
 message("Selected board:   ${BOARD}")
@@ -191,6 +192,12 @@ add_databases_target(
         DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/sys/user/db
         DEVEL ${WITH_DEVELOPMENT_FEATURES}
         DEPENDS create_databases_common
+)
+# Install scripts
+add_scripts_target(
+        TARGET install_scripts
+        PRODUCT ${PRODUCT}
+        DEST_DIR ${CMAKE_BINARY_DIR}/sysroot/system_a/scripts
 )
 
 add_library(version-header INTERFACE)
