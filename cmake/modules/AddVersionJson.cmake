@@ -6,7 +6,7 @@ function(add_version_rt1051_json SOURCE_TARGET)
             -DDST_FILE=${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json
             -DBOOTLOADER_FILENAME=ecoboot.bin
             -DBOOTLOADER_FILE=${SYSROOT_BIN_PATH}/ecoboot.bin
-            -DBOOT_FILENAME=boot.bin
+            -DBOOT_FILENAME=os.bin
             -DBOOT_FILE=$<TARGET_PROPERTY:${SOURCE_TARGET},BIN_FILE>
             -DBOOT_VERSION=${PROJECT_VERSION}
             -DRECOVERY_FILENAME=recovery.bin
