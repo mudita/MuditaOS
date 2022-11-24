@@ -20,10 +20,10 @@
         "filename": "@BOOT_FILENAME@",
         "md5sum":   "@BOOT_MD5SUM@"
     },
-    "updater":
+    "recovery":
     {
-        "version":  "@UPDATER_BIN_VERSION@",
-        "filename": "@UPDATER_FILENAME@",
-        "md5sum":   "@UPDATER_MD5SUM@"
+        "version":  "@RECOVERY_BIN_VERSION@",
+        "filename": "@RECOVERY_FILENAME@",
+        "md5sum":   "@RECOVERY_MD5SUM@"
     }
 }
