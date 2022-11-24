@@ -105,7 +105,7 @@ namespace boot
             return true;
         }
         else {
-            m_os_image     = purefs::file::boot_bin;
+            m_os_image     = purefs::file::os_bin;
             m_os_root_path = purefs::dir::getSystemDiskPath();
             m_boot_json    = bootJsonPath;
             m_timestamp    = utils::time::getCurrentTimestamp().str("%c");
