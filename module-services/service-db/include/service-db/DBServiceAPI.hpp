@@ -35,7 +35,8 @@ namespace sys
 class DBServiceAPI
 {
   public:
-    static constexpr unsigned int DefaultTimeoutInMs = 5000U;
+    static constexpr unsigned int DefaultTimeoutInMs       = 5000U;
+    static constexpr unsigned int DefaultBackupTimeoutInMs = 60000U;
 
     enum class ContactVerificationResult
     {

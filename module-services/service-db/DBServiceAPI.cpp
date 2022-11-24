@@ -267,7 +267,7 @@ auto DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath) -> bool
     std::shared_ptr<DBServiceMessageBackup> msg =
         std::make_shared<DBServiceMessageBackup>(MessageType::DBServiceBackup, backupPath);
 
-    auto ret = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
+    auto ret = serv->bus.sendUnicastSync(msg, service::name::db, DefaultBackupTimeoutInMs);
     if (auto retMsg = dynamic_cast<DBServiceResponseMessage *>(ret.second.get()); retMsg) {
         return retMsg->retCode;
     }
