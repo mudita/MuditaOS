@@ -29,6 +29,10 @@
 #define LOG_FATAL(...)
 #define LOG_CUSTOM(loggerLevel, ...)
 #endif
+namespace
+{
+    xTaskHandle taskHandleReceive;
+}
 namespace bsp
 {
     int fd;
@@ -148,6 +152,8 @@ namespace bsp
     {
         LOG_INFO("usbDeinit removing file %s", ptsFileName);
         std::remove(ptsFileName);
+        if (taskHandleReceive)
+            vTaskDelete(taskHandleReceive);
     }
 
     void usbReinit(const std::string &)
@@ -202,7 +208,6 @@ namespace bsp
         cfsetospeed(&newtio, SERIAL_BAUDRATE);
         tcsetattr(fd, TCSANOW, &newtio);
 
-        xTaskHandle taskHandleReceive;
         USBReceiveQueue = initParams.queueHandle;
         USBIrqQueue     = initParams.irqQueueHandle;
 
