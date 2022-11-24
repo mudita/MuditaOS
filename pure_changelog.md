@@ -38,6 +38,7 @@
 * Fixed USB connection/disconnection detection
 * Fixed memory leaks in APN settings
 * Fixed windows flow regarding PUK requests after too many PIN mistakes
+* Fixed disappearing "confirm" button in PIN entering screen
 
 ### Added
 * Added tethering information on the status bar
