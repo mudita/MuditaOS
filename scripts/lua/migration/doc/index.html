@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>migration</strong></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>migration</code></h1>
+<p>Database migration scripts</p>
+<p></p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#up">up (db_path, scripts, target_version)</a></td>
+	<td class="summary">Perform database migration from lower to higher version</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#down">down (db_path, scripts, target_version)</a></td>
+	<td class="summary">Perform database migration from higher to lower version</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_db_version">get_db_version (db_path)</a></td>
+	<td class="summary">Read the database version</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#migrate">migrate (db_dir, scripts_dir, db_set)</a></td>
+	<td class="summary">Perform databases migration(up/down) automatically</td>
+	</tr>
+</table>
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#retcode">retcode</a></td>
+	<td class="summary">Return codes</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "up"></a>
+    <strong>up (db_path, scripts, target_version)</strong>
+    </dt>
+    <dd>
+    Perform database migration from lower to higher version
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">db_path</span>
+         path to the database we want to perform migration on
+        </li>
+        <li><span class="parameter">scripts</span>
+         array of {""}
+        </li>
+        <li><span class="parameter">target_version</span>
+         database version we want to migrate in to
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        <a href="index.html#retcode">retcode</a>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "down"></a>
+    <strong>down (db_path, scripts, target_version)</strong>
+    </dt>
+    <dd>
+    Perform database migration from higher to lower version
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">db_path</span>
+         path to the database we want to perform migration on
+        </li>
+        <li><span class="parameter">scripts</span>
+         array of {""}
+        </li>
+        <li><span class="parameter">target_version</span>
+         database version we want to migrate in to
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        <a href="index.html#retcode">retcode</a>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_db_version"></a>
+    <strong>get_db_version (db_path)</strong>
+    </dt>
+    <dd>
+    Read the database version
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">db_path</span>
+         path to the database
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        database version number
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "migrate"></a>
+    <strong>migrate (db_dir, scripts_dir, db_set)</strong>
+    </dt>
+    <dd>
+    Perform databases migration(up/down) automatically
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">db_dir</span>
+         location of the databases
+        </li>
+        <li><span class="parameter">scripts_dir</span>
+         location of the database migration scripts
+        </li>
+        <li><span class="parameter">db_set</span>
+         array of {<"database_name"> = <db_target_version>} entries
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        <a href="index.html#retcode">retcode</a>
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "retcode"></a>
+    <strong>retcode</strong>
+    </dt>
+    <dd>
+    Return codes
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">OK</span>
+
+        </li>
+        <li><span class="parameter">ALREADY_UP_TO_DATE</span>
+
+        </li>
+        <li><span class="parameter">WRONG_TARGET_VERSION</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-11-24 08:40:54 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
