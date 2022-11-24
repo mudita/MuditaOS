@@ -8,6 +8,15 @@
 #include <OptionSetting.hpp>
 #include <widgets/ButtonTriState.hpp>
 
+namespace
+{
+    cellular::VolteState getVolteStateFromSettingsApp(app::ApplicationCommon *application)
+    {
+        auto const *settingsApp = static_cast<app::ApplicationSettings *>(application);
+        return settingsApp->getVolteState();
+    }
+} // namespace
+
 namespace gui
 {
     NetworkWindow::NetworkWindow(app::ApplicationCommon *app,
@@ -24,6 +33,8 @@ namespace gui
 
     auto NetworkWindow::buildOptionsList() -> std::list<gui::Option>
     {
+        using namespace cellular;
+
         std::list<gui::Option> optList;
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
@@ -38,14 +49,29 @@ namespace gui
             false));
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translate("app_settings_network_voice_over_lte"),
-            [&](gui::Item &item) {
+            [this]() {
+                auto ret              = utils::translate("app_settings_network_voice_over_lte");
+                const auto volteState = getVolteStateFromSettingsApp(application);
+                if (!volteState.permitted) {
+                    if (volteState.enablement == VolteState::Enablement::On) {
+                        LOG_ERROR("[VoLTE] still enabled in modem despite not permitted by operator");
+                    }
+                    ret += ": ";
+                    ret += utils::translate("app_settings_network_volte_not_available");
+                }
+                return ret;
+            }(),
+            [this](gui::Item &item) {
+                const auto volteState = getVolteStateFromSettingsApp(application);
+                if (!volteState.permitted) {
+                    return true;
+                }
                 auto *settingsApp = static_cast<app::ApplicationSettings *>(application);
-                switch (settingsApp->getVolteState()) {
-                case cellular::VolteState::Off:
+                switch (volteState.enablement) {
+                case VolteState::Enablement::Off:
                     settingsApp->sendVolteChangeRequest(true);
                     break;
-                case cellular::VolteState::On:
+                case VolteState::Enablement::On:
                     settingsApp->sendVolteChangeRequest(false);
                     break;
                 default:
@@ -55,18 +81,24 @@ namespace gui
                 return true;
             },
             [&](Item &item) {
-                auto navBarCaption =
-                    (item.focus) ? utils::translate("common_switch") : utils::translate("common_select");
-                navBar->setText(nav_bar::Side::Center, navBarCaption);
+                navBar->setText(nav_bar::Side::Center, [&]() {
+                    if (!item.focus) {
+                        return utils::translate("common_select");
+                    }
+                    return getVolteStateFromSettingsApp(application).permitted ? utils::translate("common_switch") : "";
+                }());
                 return true;
             },
             nullptr,
             [&]() {
-                auto const *settingsApp = static_cast<app::ApplicationSettings *>(application);
-                switch (settingsApp->getVolteState()) {
-                case cellular::VolteState::Off:
+                const auto volteState = getVolteStateFromSettingsApp(application);
+                if (!volteState.permitted) {
+                    return option::SettingRightItem::Disabled;
+                }
+                switch (volteState.enablement) {
+                case VolteState::Enablement::Off:
                     return option::SettingRightItem::Off;
-                case cellular::VolteState::On:
+                case VolteState::Enablement::On:
                     return option::SettingRightItem::On;
                 default:
                     return option::SettingRightItem::Transiting;

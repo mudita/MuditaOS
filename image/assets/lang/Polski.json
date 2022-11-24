@@ -480,6 +480,7 @@
   "app_settings_about": "O Mudita Pure",
   "app_settings_title_languages": "Wybór języka",
   "app_settings_network_sim_cards": "Karty SIM",
+  "app_settings_network_volte_not_available": "niedostępne",
   "app_settings_network_active_card": "Aktywny slot",
   "app_settings_network_unblock_card": "Odblokuj kartę",
   "app_settings_network_not_connected": "brak karty",

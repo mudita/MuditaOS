@@ -90,15 +90,17 @@ namespace cellular::service
                                              " IMS");
                 }
 
-                volteState = enable ? cellular::VolteState::SwitchingToOn : cellular::VolteState::SwitchingToOff;
+                volteState.enablement = enable ? cellular::VolteState::Enablement::SwitchingToOn
+                                               : cellular::VolteState::Enablement::SwitchingToOff;
                 isFirstRunAfterSwitch = false;
             }
             else {
-                if (volteState == cellular::VolteState::SwitchingToOn ||
-                    volteState == cellular::VolteState::SwitchingToOff) {
+                if (volteState.enablement == cellular::VolteState::Enablement::SwitchingToOn ||
+                    volteState.enablement == cellular::VolteState::Enablement::SwitchingToOff) {
                     isFirstRunAfterSwitch = true;
                 }
-                volteState = enable ? cellular::VolteState::On : cellular::VolteState::Off;
+                volteState.enablement =
+                    enable ? cellular::VolteState::Enablement::On : cellular::VolteState::Enablement::Off;
             }
 
             return alreadyConfigured;
@@ -161,7 +163,7 @@ namespace cellular::service
             return std::to_string(magic_enum::enum_integer(imsState));
         }
 
-        cellular::VolteState volteState = cellular::VolteState::Undefined;
+        cellular::VolteState volteState;
         bool isFirstRunAfterSwitch      = false;
     };
 } // namespace cellular::service
