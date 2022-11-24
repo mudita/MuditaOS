@@ -2,9 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationMainWindowPresenter.hpp"
-#include "data/BGSoundsAudioData.hpp"
-#include "widgets/SoundListItem.hpp"
-#include "ApplicationBellBackgroundSounds.hpp"
 #include <apps-common/models/SongsRepository.hpp>
 
 namespace
