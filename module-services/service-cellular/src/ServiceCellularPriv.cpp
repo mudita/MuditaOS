@@ -8,6 +8,10 @@
 #include <service-cellular-api>
 #include <service-cellular/Constans.hpp>
 
+#include <volte/ImsiParserUS.hpp>
+#include <volte/VolteAllowedUSList.hpp>
+#include <volte/VolteCapabilityHandlerCellular.hpp>
+
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 
@@ -38,9 +42,14 @@ namespace cellular::internal
           imeiGetHandler{std::make_unique<service::ImeiGetHandler>()},
           tetheringHandler{std::make_unique<TetheringHandler>()},
           volteHandler{std::make_unique<VolteHandler<DLCChannel, ModemResponseParserImpl>>()},
-          modemResetHandler{std::make_unique<ModemResetHandler>()}, csqHandler{
-                                                                        std::make_unique<CSQHandler>(),
-                                                                    }
+          modemResetHandler{std::make_unique<ModemResetHandler>()},
+          csqHandler{
+              std::make_unique<CSQHandler>(),
+          },
+          volteCapability{
+              std::make_unique<VolteCapabilityHandler>(std::make_unique<cellular::service::ImsiParserUS>(),
+                                                       std::make_unique<cellular::service::VolteAllowedUSList>(),
+                                                       std::make_unique<cellular::service::VolteCapabilityCellular>())}
     {
         initSimCard();
         initSMSSendHandler();

@@ -15,7 +15,13 @@ set(SOURCES
     src/URCCounter.cpp
     src/VolteHandlerImpl.cpp
     src/CSQHandler.cpp
-        DTMFCode.cpp
+
+    src/volte/VolteCapabilityHandler.cpp
+    src/volte/ImsiParserUS.cpp
+    src/volte/VolteAllowedUSList.cpp
+    src/volte/VolteCapabilityHandlerCellular.cpp
+
+    DTMFCode.cpp
 
     CellularServiceAPI.cpp
     CellularUrcHandler.cpp

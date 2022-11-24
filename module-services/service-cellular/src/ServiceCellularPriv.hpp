@@ -16,6 +16,7 @@
 #include "VolteHandlerImpl.hpp"
 #include "ModemResetHandler.hpp"
 #include "CSQHandler.hpp"
+#include "volte/VolteCapabilityHandler.hpp"
 
 namespace cellular::internal
 {
@@ -26,6 +27,7 @@ namespace cellular::internal
     using service::SimContacts;
     using service::State;
     using service::TetheringHandler;
+    using service::VolteCapabilityHandler;
     using service::VolteHandler;
 
     class ServiceCellularPriv
@@ -42,6 +44,7 @@ namespace cellular::internal
         std::unique_ptr<VolteHandler<DLCChannel, ModemResponseParserImpl>> volteHandler;
         std::unique_ptr<ModemResetHandler> modemResetHandler;
         std::unique_ptr<CSQHandler> csqHandler;
+        std::unique_ptr<VolteCapabilityHandler> volteCapability;
 
         State::PowerState nextPowerState = State::PowerState::Off;
         std::uint8_t multiPartSMSUID     = 0;
