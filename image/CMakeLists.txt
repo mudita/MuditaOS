@@ -1,9 +1,8 @@
 ﻿include(Assets)
 include(Utils)
 
-set(SYSROOT ${CMAKE_BINARY_DIR}/sysroot)
-set(SYSTEM_DEST_DIR ${SYSROOT}/system_a)
-set(USER_DEST_DIR ${SYSROOT}/user)
+set(SYSTEM_DEST_DIR ${SYSROOT_PATH}/system_a)
+set(USER_DEST_DIR ${SYSROOT_PATH}/user)
 
 set(ASSETS_DEPENDENCIES "json-common-target")
 
