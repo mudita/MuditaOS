@@ -5,12 +5,16 @@
 
 namespace cellular
 {
-    enum class VolteState
+    struct VolteState
     {
-        On,
-        Off,
-        SwitchingToOff,
-        SwitchingToOn,
-        Undefined
+        enum class Enablement
+        {
+            On,
+            Off,
+            SwitchingToOff,
+            SwitchingToOn,
+            Undefined
+        } enablement   = Enablement::Undefined;
+        bool permitted = true;
     };
 }

@@ -426,6 +426,7 @@
   "app_settings_about": "About Mudita Pure",
   "app_settings_title_languages": "Language selection",
   "app_settings_network_sim_cards": "SIM cards",
+  "app_settings_network_volte_not_available": "not available",
   "app_settings_network_active_card": "Active slot",
   "app_settings_network_unblock_card": "Unblock card",
   "app_settings_network_not_connected": "no card",

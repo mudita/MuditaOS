@@ -205,7 +205,7 @@ namespace app
         bool callsFromFavorites                                        = false;
         int connectionFrequency                                        = 0;
         bool flightModeOn                                              = true;
-        cellular::VolteState volteState{cellular::VolteState::Undefined};
+        cellular::VolteState volteState;
         std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel = nullptr;
     };
 
