@@ -7,7 +7,7 @@ function(download_asset_release asset_name_in asset_name_out asset_repo asset_ve
             github
             --owner mudita
             --repository ${asset_repo}
-            --install_dir ${CMAKE_BINARY_DIR}
+            --install_dir ${SYSROOT_BIN_PATH}
             download
             --name_in ${asset_name_in}
             --name_out ${asset_name_out}
