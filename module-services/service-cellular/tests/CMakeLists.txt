@@ -113,3 +113,12 @@ add_catch2_executable(
         module-cellular
         module-utils
 )
+
+add_catch2_executable(
+        NAME
+        cellular-volte-capability-handler
+        SRCS
+        unittest_volteCapabilityHandler.cpp
+        LIBS
+        module-cellular
+)
