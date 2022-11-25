@@ -51,13 +51,13 @@ namespace gui
         setFocusItem(optionsList);
     }
 
-    void BellShortOptionWindow::setListTitle(const std::string &title)
+    void BellShortOptionWindow::setListTitle(const std::string &title, gui::Length height)
     {
         auto titleBody = new TextFixedSize(body->firstBox);
         titleBody->drawUnderline(false);
         titleBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         titleBody->setFont(style::window::font::largelight);
-        titleBody->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        titleBody->setMinimumSize(style::bell_base_layout::outer_layouts_w, height);
         titleBody->setEdges(RectangleEdge::None);
         titleBody->setEditMode(EditMode::Browse);
         titleBody->setRichText(title);
