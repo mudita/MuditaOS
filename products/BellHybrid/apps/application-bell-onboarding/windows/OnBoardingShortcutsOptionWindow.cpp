@@ -15,8 +15,26 @@ namespace gui
         : BellShortOptionWindow(app, name), startString{utils::translate("app_bell_onboarding_shortcuts_start")},
           skipString{utils::translate("app_bell_onboarding_shortcuts_skip")}
     {
+        body->firstBox->setMinimumHeight(style::bell_shortcuts_layout::top_layout_h);
+        body->firstBox->setMaximumHeight(style::bell_shortcuts_layout::top_layout_h);
+        body->centerBox->setMinimumSize(style::bell_base_layout::center_layout_w,
+                                        style::bell_shortcuts_layout::center_layout_h);
+        body->centerBox->setMaximumSize(style::bell_base_layout::center_layout_w,
+                                        style::bell_shortcuts_layout::center_layout_h);
+        body->lastBox->setMinimumHeight(style::bell_shortcuts_layout::bottom_layout_h);
+        body->lastBox->setMaximumHeight(style::bell_shortcuts_layout::bottom_layout_h);
+        optionsList->setAlignment(Alignment(Alignment::Vertical::Center));
+        optionsList->setMinimumSize(style::bell_options::default_text_width,
+                                    style::bell_shortcuts_layout::center_layout_h);
+        optionsList->setMaximumSize(style::bell_options::default_text_width,
+                                    style::bell_shortcuts_layout::center_layout_h);
+
         addOptions(settingsOptionsList());
-        setListTitle(utils::translate("app_bell_onboarding_shortcuts_question"));
+        setListTitle(utils::translate("app_bell_onboarding_shortcuts_question"),
+                     style::bell_shortcuts_layout::top_layout_h);
+
+        body->resize();
+        body->resizeItems();
     }
 
     std::list<Option> OnBoardingShortcutsOptionWindow::settingsOptionsList()
