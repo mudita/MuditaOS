@@ -10,20 +10,13 @@
 
 namespace at
 {
-    class Result;
     class BaseChannel;
 } // namespace at
 
 namespace cellular::service
 {
-
-    class VolteCapabilityCellular : public VolteCapabilityCellularInterface
+    struct VolteCapabilityCellular : VolteCapabilityCellularInterface
     {
-      public:
-        void setChannel(at::BaseChannel *channel) final;
-        auto getImsi() -> std::optional<std::string> final;
-
-      private:
-        at::BaseChannel *channel = nullptr;
+        auto getImsi(at::BaseChannel &) -> std::optional<std::string> final;
     };
 } // namespace cellular::service

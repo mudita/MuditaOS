@@ -23,12 +23,12 @@ namespace cellular::service
             mnc = imsi.substr(mccSize, mncSize);
         }
         catch (const std::out_of_range &e) {
-            LOG_ERROR("IMSI parsing error: %s", e.what());
+            LOG_ERROR("[VoLTE] IMSI parsing error: %s", e.what());
             return std::nullopt;
         }
 
         if (std::find(std::begin(usMcc), std::end(usMcc), mcc) == std::end(usMcc)) {
-            LOG_ERROR("Not US MCC.");
+            LOG_ERROR("[VoLTE] MCC not from USA");
             return std::nullopt;
         }
 

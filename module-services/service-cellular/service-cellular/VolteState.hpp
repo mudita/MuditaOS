@@ -15,6 +15,6 @@ namespace cellular
             SwitchingToOn,
             Undefined
         } enablement   = Enablement::Undefined;
-        bool permitted = true;
+        bool permitted = false;
     };
 }

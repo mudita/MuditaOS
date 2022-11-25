@@ -3,24 +3,15 @@
 
 #include "VolteCapabilityHandlerCellular.hpp"
 #include <modem/mux/CellularMux.h>
+#include <module-cellular/modem/BaseChannel.hpp>
 
 namespace cellular::service
 {
-    void VolteCapabilityCellular::setChannel(at::BaseChannel *channel)
+    auto VolteCapabilityCellular::getImsi(at::BaseChannel &channel) -> std::optional<std::string>
     {
-        this->channel = channel;
-    }
-
-    auto VolteCapabilityCellular::getImsi() -> std::optional<std::string>
-    {
-        if (channel == nullptr) {
-            LOG_ERROR("No channel provided. Request ignored");
-            return std::nullopt;
-        }
-
-        auto result = channel->cmd(at::AT::CIMI);
+        auto result = channel.cmd(at::AT::CIMI);
         if (not result) {
-            LOG_ERROR("Failed to read IMSI, disable VoLTE.");
+            LOG_ERROR("[VoLTE] failed to read IMSI - will disable VoLTE");
             return std::nullopt;
         }
 

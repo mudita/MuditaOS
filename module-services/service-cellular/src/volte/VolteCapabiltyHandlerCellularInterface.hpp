@@ -8,18 +8,15 @@
 
 namespace at
 {
-    class Result;
     class BaseChannel;
-} // namespace at
+}
 
 namespace cellular::service
 {
-
     class VolteCapabilityCellularInterface
     {
       public:
         virtual ~VolteCapabilityCellularInterface()          = default;
-        virtual void setChannel(at::BaseChannel *channel)    = 0;
-        virtual auto getImsi() -> std::optional<std::string> = 0;
+        virtual auto getImsi(at::BaseChannel &) -> std::optional<std::string> = 0;
     };
 } // namespace cellular::service

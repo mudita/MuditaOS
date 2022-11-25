@@ -36,9 +36,15 @@ namespace cellular::service
     template <typename CmuxChannel, typename ModemResponseParser>
     struct VolteHandler : private NonCopyable
     {
-        bool switchVolte(CmuxChannel &channel, bool enable)
+        bool switchVolte(CmuxChannel &channel, bool permit, bool enable)
         {
-            ModemResponseParser const parser;
+            if (!permit) {
+                if (enable) {
+                    LOG_INFO("[VoLTE] requested to enable, but not permitted for this operator - disabling");
+                }
+
+                enable = false;
+            }
 
             if (enable) {
                 // according to Quectel, this setting doesn't have to be reset when disabling
@@ -75,7 +81,7 @@ namespace cellular::service
 
             bool alreadyConfigured;
             try {
-                alreadyConfigured = parser(QcfgImsResult{imsCheckAnswer}, enable);
+                alreadyConfigured = ModemResponseParser()(QcfgImsResult{imsCheckAnswer}, enable);
             }
             catch (std::runtime_error const &exc) {
                 throw;
@@ -103,6 +109,7 @@ namespace cellular::service
                     enable ? cellular::VolteState::Enablement::On : cellular::VolteState::Enablement::Off;
             }
 
+            volteState.permitted = permit;
             return alreadyConfigured;
         }
 
@@ -140,7 +147,7 @@ namespace cellular::service
                     preference_ = 0x03;
                     return;
                 default:
-                    throw std::logic_error("unimplemented network service domain: " +
+                    throw std::logic_error("[VoLTE] unimplemented network service domain: " +
                                            std::string(magic_enum::enum_name(type)));
                 }
             }

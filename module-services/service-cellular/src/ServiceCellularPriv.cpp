@@ -8,6 +8,8 @@
 #include <service-cellular-api>
 #include <service-cellular/Constans.hpp>
 
+#include <service-db/agents/settings/SystemSettings.hpp>
+
 #include <volte/ImsiParserUS.hpp>
 #include <volte/VolteAllowedUSList.hpp>
 #include <volte/VolteCapabilityHandlerCellular.hpp>
@@ -62,6 +64,28 @@ namespace cellular::internal
         using namespace cellular::msg;
         simCard->onSimReady = [this]() {
             state->set(State::ST::Ready);
+
+            auto channel     = owner->cmux->get(CellularMux::Channel::Commands);
+            auto permitVolte = volteCapability->isVolteAllowed(*channel);
+            auto enableVolte =
+                owner->settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global) == "1"
+                    ? true
+                    : false;
+            bool volteNeedReset = false;
+            try {
+                volteNeedReset    = !volteHandler->switchVolte(*channel, permitVolte, enableVolte);
+                auto notification = std::make_shared<cellular::VolteStateNotification>(volteHandler->getVolteState());
+                owner->bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
+            }
+            catch (std::runtime_error const &exc) {
+                LOG_ERROR("%s", exc.what());
+            }
+
+            if (volteNeedReset) {
+                modemResetHandler->performHardReset();
+                return;
+            }
+
             owner->bus.sendMulticast<notification::SimReady>();
         };
         simCard->onNeedPin = [this](unsigned int attempts) {

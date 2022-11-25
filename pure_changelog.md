@@ -12,6 +12,7 @@
 * Fixed MTP issues
 * Rebuilt SIM cards window
 * Added option to provide custom GDB to crash analysis script
+* Made VoLTE available for proven cellular network(s) only
 
 ### Fixed
 * Fixed incorrect total CPU usage in logs

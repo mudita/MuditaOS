@@ -25,11 +25,11 @@ namespace cellular::service
 
     auto VolteAllowedUSList::isVolteAllowed(const OperatorInfo &operatorInfo) -> bool
     {
-        LOG_INFO("Trying to find MCC: %s, MNC: %s", operatorInfo.MCC.c_str(), operatorInfo.MNC.c_str());
+        LOG_INFO("[VoLTE] trying to find MCC: %s, MNC: %s", operatorInfo.MCC.c_str(), operatorInfo.MNC.c_str());
 
         if (std::find(std::begin(allowedOperators), std::end(allowedOperators), operatorInfo) ==
             std::end(allowedOperators)) {
-            LOG_ERROR("Unable to find. VoLTE not allowed.");
+            LOG_ERROR("[VoLTE] unable to find MCC+MNC on list - VoLTE not allowed");
             return false;
         }
         return true;
