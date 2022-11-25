@@ -2,8 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "VolteCapabilityHandler.hpp"
+#include <modem/BaseChannel.hpp>
 #include <modem/mux/CellularMux.h>
 #include <log/log.hpp>
+
 namespace cellular::service
 {
     VolteCapabilityHandler::VolteCapabilityHandler(std::unique_ptr<ImsiParserInteface> imsiParser,
@@ -13,31 +15,20 @@ namespace cellular::service
           cellularInterface(std::move(cellularInterface))
     {}
 
-    void VolteCapabilityHandler::setChannel(at::BaseChannel *channel)
+    auto VolteCapabilityHandler::isVolteAllowed(at::BaseChannel &channel) -> bool
     {
-        if (cellularInterface.get() != nullptr) {
-            cellularInterface->setChannel(channel);
-        }
-    }
-
-    auto VolteCapabilityHandler::isVolteAllowed() -> bool
-    {
-        const auto imsi = cellularInterface->getImsi();
+        const auto imsi = cellularInterface->getImsi(channel);
         if (not imsi.has_value()) {
-            LOG_ERROR("Failed to read IMSI, disable VoLTE.");
+            LOG_ERROR("[VoLTE] failed to read IMSI - VoLTE not permitted");
             return false;
         }
 
         const auto operatorInfo = imsiParser->parse(imsi.value());
         if (not operatorInfo.has_value()) {
-            LOG_ERROR("Failed to parse IMSI, disable VoLTE.");
+            LOG_ERROR("[VoLTE] failed to parse IMSI - VoLTE not permitted");
             return false;
         }
-        return allowedList->isVolteAllowed(operatorInfo.value());
-    }
 
-    auto VolteCapabilityHandler::isCellularInterfaceReady() -> bool
-    {
-        return cellularInterface.get() != nullptr;
+        return allowedList->isVolteAllowed(operatorInfo.value());
     }
 } // namespace cellular::service

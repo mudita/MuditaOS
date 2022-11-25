@@ -113,7 +113,7 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, DummyModemResponseParser> handler;
 
-        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true), Catch::Contains("voice domain"));
+        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true, true), Catch::Contains("voice domain"));
     }
 
     SECTION("ThrowsAboutMbnAutoselectFailure_When_TryingToEnableVolte_And_AutoselectCommandRespondsNOK")
@@ -127,7 +127,7 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, DummyModemResponseParser> handler;
 
-        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true), Catch::Contains("MBN"));
+        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true, true), Catch::Contains("MBN"));
     }
 
     SECTION("ThrowsAboutImsCheckingFailure_When_TryingToEnableVolte_And_ImsConfigurationQueryRespondsNOK")
@@ -142,7 +142,7 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, DummyModemResponseParser> handler;
 
-        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true), Catch::Contains("IMS"));
+        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true, true), Catch::Contains("IMS"));
     }
 
     SECTION("ThrowsAboutImsCheckingFailure_When_TryingToEnableVolte_And_CantParseImsConfigurationQuery")
@@ -157,7 +157,7 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, QcfgImsThrowingParser> handler;
 
-        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true), Catch::Contains("IMS"));
+        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true, true), Catch::Contains("IMS"));
     }
 
     SECTION("ReturnsOk_When_TryingToEnableVolte_And_AlreadyEnabled")
@@ -172,7 +172,7 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<true>> handler;
 
-        REQUIRE(handler.switchVolte(channel, true));
+        REQUIRE(handler.switchVolte(channel, true, true));
     }
 
     SECTION("ReturnsOk_When_TryingToDisableVolte_And_AlreadyDisabled")
@@ -183,7 +183,7 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<true>> handler;
 
-        REQUIRE(handler.switchVolte(channel, false));
+        REQUIRE(handler.switchVolte(channel, true, false));
     }
 
     SECTION("ReturnsFalse_When_TryingToDisableVolte_And_WasEnabledBefore")
@@ -197,7 +197,7 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<false>> handler;
 
-        REQUIRE_FALSE(handler.switchVolte(channel, false));
+        REQUIRE_FALSE(handler.switchVolte(channel, true, false));
     }
 
     SECTION("ReturnsFalse_When_TryingToEnableVolte_And_WasEnabledBefore")
@@ -211,7 +211,7 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<false>> handler;
 
-        REQUIRE_FALSE(handler.switchVolte(channel, false));
+        REQUIRE_FALSE(handler.switchVolte(channel, true, false));
     }
 
     SECTION("ThrowsAboutImsFailure_When_DisablingVolte_And_ImsSteeringCommandFailed")
@@ -225,7 +225,8 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<false>> handler;
 
-        REQUIRE_THROWS_WITH(handler.switchVolte(channel, false), Catch::Contains("fail") && Catch::Contains("IMS"));
+        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true, false),
+                            Catch::Contains("fail") && Catch::Contains("IMS"));
     }
 
     SECTION("ThrowsAboutImsFailure_When_EnablingVolte_And_ImsSteeringCommandFailed")
@@ -241,6 +242,7 @@ TEST_CASE("VoLTE handler test")
 
         VolteHandler<CommandSequentialChannel, QcfgImsDummyParser<false>> handler;
 
-        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true), Catch::Contains("fail") && Catch::Contains("IMS"));
+        REQUIRE_THROWS_WITH(handler.switchVolte(channel, true, true),
+                            Catch::Contains("fail") && Catch::Contains("IMS"));
     }
 }

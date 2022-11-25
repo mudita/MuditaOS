@@ -8,13 +8,6 @@
 #include "VolteAllowedListInterface.hpp"
 
 #include <memory>
-#include <vector>
-
-namespace at
-{
-    class Result;
-    class BaseChannel;
-} // namespace at
 
 namespace cellular::service
 {
@@ -24,20 +17,14 @@ namespace cellular::service
         VolteCapabilityHandler(std::unique_ptr<ImsiParserInteface> imsiParser,
                                std::unique_ptr<VolteAllowedListInterface> allowedList,
                                std::unique_ptr<VolteCapabilityCellularInterface> cellularInterface);
-        /** Set AT command channel
-         * \param channel channel (or nullptr to block communication):
-         */
-        void setChannel(at::BaseChannel *channel);
         /** Check if it is a possibility to enable VoLTE on current operator
          * @return true when VoLTE is allowed, false when not
          */
-        auto isVolteAllowed() -> bool;
+        auto isVolteAllowed(at::BaseChannel &channel) -> bool;
 
       private:
         std::unique_ptr<ImsiParserInteface> imsiParser;
         std::unique_ptr<VolteAllowedListInterface> allowedList;
         std::unique_ptr<VolteCapabilityCellularInterface> cellularInterface;
-
-        auto isCellularInterfaceReady() -> bool;
     };
 } // namespace cellular::service

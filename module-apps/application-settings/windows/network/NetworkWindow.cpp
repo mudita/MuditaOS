@@ -75,7 +75,7 @@ namespace gui
                     settingsApp->sendVolteChangeRequest(false);
                     break;
                 default:
-                    LOG_INFO("Skip request due unsettled VoLTE state");
+                    LOG_INFO("[VoLTE] skip request due to unsettled VoLTE state");
                     break;
                 }
                 return true;

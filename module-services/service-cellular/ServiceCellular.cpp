@@ -253,7 +253,7 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 
     const auto rawVolteSetting = settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global);
     if (rawVolteSetting.empty()) {
-        LOG_ERROR("VoLTE setting missing, setting to default disabled");
+        LOG_ERROR("[VoLTE] setting missing in database - defaulting to disabled");
         settings->setValue(settings::Cellular::volteEnabled, "0", settings::SettingsScope::Global);
     }
 
@@ -607,13 +607,15 @@ void ServiceCellular::registerMessageHandlers()
         auto message = static_cast<cellular::SwitchVolteOnOffRequest *>(request);
         auto channel = cmux->get(CellularMux::Channel::Commands);
         if (channel == nullptr) {
-            LOG_ERROR("Failed to get channel, skipping VoLTE request!");
+            LOG_ERROR("[VoLTE] failed to get channel, skipping request");
             return sys::MessageNone{};
         }
         settings->setValue(
             settings::Cellular::volteEnabled, message->enable ? "1" : "0", settings::SettingsScope::Global);
         try {
-            if (not priv->volteHandler->switchVolte(*channel, message->enable)) {
+            // here we always assume that VoLTE is permitted as changing the setting when not permitted is made
+            // impossible by the GUI
+            if (not priv->volteHandler->switchVolte(*channel, true, message->enable)) {
                 auto notification =
                     std::make_shared<cellular::VolteStateNotification>(priv->volteHandler->getVolteState());
                 bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
@@ -629,7 +631,7 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *) {
         if (priv->volteHandler->isFunctionalityResetNeeded()) {
-            LOG_INFO("First run after VoLTE switch, functionality reset needed");
+            LOG_INFO("[VoLTE] first run after switching - functionality reset needed");
             priv->modemResetHandler->performFunctionalityReset();
         }
         return sys::MessageNone{};
@@ -912,20 +914,8 @@ bool ServiceCellular::handle_cellular_priv_init()
 
     priv->privInit(channel);
 
-    auto enableVolte =
-        settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global) == "1" ? true : false;
-    bool volteNeedReset = false;
-    try {
-        volteNeedReset    = !priv->volteHandler->switchVolte(*channel, enableVolte);
-        auto notification = std::make_shared<cellular::VolteStateNotification>(priv->volteHandler->getVolteState());
-        bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
-    }
-    catch (std::runtime_error const &exc) {
-        LOG_ERROR("%s", exc.what());
-    }
-
     auto tetheringNeedReset = !priv->tetheringHandler->configure();
-    if (tetheringNeedReset || volteNeedReset) {
+    if (tetheringNeedReset) {
         priv->modemResetHandler->performHardReset();
         return true;
     }
