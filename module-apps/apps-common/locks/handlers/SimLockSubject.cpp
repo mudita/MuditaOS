@@ -53,6 +53,6 @@ namespace locks
 
     void SimLockSubject::simSwitched()
     {
-        owner->bus.sendUnicast(std::make_shared<locks::SimSwitched>(), service::name::appmgr);
+        owner->bus.sendMulticast(std::make_shared<locks::SimSwitched>(), sys::BusChannel::PhoneLockChanges);
     }
 } // namespace locks
