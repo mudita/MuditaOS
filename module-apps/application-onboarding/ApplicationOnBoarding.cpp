@@ -19,9 +19,11 @@
 
 #include <application-settings/windows/system/ChangeTimeZone.hpp>
 #include <apps-common/locks/data/PhoneLockMessages.hpp>
+#include <apps-common/locks/data/SimLockMessages.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <EventStore.hpp>
 
 namespace app
 {
@@ -93,8 +95,17 @@ namespace app
             return sys::msgHandled();
         });
 
+        connect(typeid(locks::SimSwitched), [&](sys::Message *msg) {
+            auto simState = Store::GSM::get()->sim;
+            if (simState == Store::GSM::SIM::SIM1 || simState == Store::GSM::SIM::SIM2) {
+                phoneLockSubject.setPhoneLock();
+                return sys::msgHandled();
+            }
+            return sys::msgNotHandled();
+        });
+
         connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *msg) {
-            if (getCurrentWindow()->getName() == gui::window::name::onBoarding_sim_select) {
+            if (getCurrentWindow()->getName() != gui::popup::window::sim_switching_window) {
                 phoneLockSubject.setPhoneLock();
                 return sys::msgHandled();
             }

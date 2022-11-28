@@ -39,6 +39,7 @@
 * Fixed memory leaks in APN settings
 * Fixed windows flow regarding PUK requests after too many PIN mistakes
 * Fixed disappearing "confirm" button in PIN entering screen
+* Fixed looping on the SIM card selection screen
 
 ### Added
 * Added a popup for changing the SIM card
