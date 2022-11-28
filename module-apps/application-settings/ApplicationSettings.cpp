@@ -548,7 +548,9 @@ namespace app
             return std::make_unique<gui::CertificationWindow>(app);
         });
         windowsFactory.attach(gui::window::name::sar, [&](ApplicationCommon *app, const std::string &name) {
-            auto sarInfoRepository = std::make_unique<SARInfoRepository>("assets/certification_info", "sar.txt");
+            const auto path        = purefs::dir::getSystemDataDirPath() / "certification_info";
+            const auto filename    = "sar.txt";
+            auto sarInfoRepository = std::make_unique<SARInfoRepository>(path, filename);
             auto presenter         = std::make_unique<SARInfoWindowPresenter>(std::move(sarInfoRepository));
             return std::make_unique<gui::SARInfoWindow>(app, std::move(presenter));
         });
