@@ -21,12 +21,14 @@ namespace bell::settings
         constexpr inline auto duration      = "prewake_up_duration";
         constexpr inline auto tone          = "prewake_up_tone";
         constexpr inline auto lightDuration = "prewake_up_light_duration";
+        constexpr inline auto brightness    = "prewake_up_brightness";
     } // namespace PrewakeUp
     namespace Alarm
     {
         constexpr inline auto tone        = "alarm_tone";
         constexpr inline auto lightActive = "alarm_light_active";
         constexpr inline auto duration    = "alarm_duration";
+        constexpr inline auto brightness  = "alarm_brightness";
     } // namespace Alarm
     namespace Bedtime
     {

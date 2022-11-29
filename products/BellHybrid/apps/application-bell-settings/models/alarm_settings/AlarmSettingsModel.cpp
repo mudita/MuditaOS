@@ -47,4 +47,16 @@ namespace app::bell_settings
         const auto str = settings.getValue(bell::settings::Alarm::lightActive, settings::SettingsScope::Global);
         return std::stoi(str);
     }
+
+    void AlarmFrontlightModel::setValue(frontlight_utils::Brightness value)
+    {
+        const auto valStr = std::to_string(value);
+        settings.setValue(bell::settings::Alarm::brightness, valStr, settings::SettingsScope::Global);
+    }
+
+    frontlight_utils::Brightness AlarmFrontlightModel::getValue() const
+    {
+        const auto str = settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
+        return std::stoi(str);
+    }
 } // namespace app::bell_settings

@@ -5,18 +5,20 @@
 
 #include "SettingsListItemProvider.hpp"
 #include <common/models/AbstractAlarmSettingsModel.hpp>
+#include <common/models/AbstractSettingsModel.hpp>
 
 namespace app::bell_settings
 {
+    class AbstractFrontlightModel;
     class AlarmSettingsListItemProvider : public SettingsListItemProvider
     {
       public:
-        AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &model, std::vector<UTF8> alarmToneRange);
+        AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &settingsModel, std::vector<UTF8> alarmToneRange);
 
       private:
         void buildListItems(std::vector<UTF8> alarmTonesRange);
 
-        AbstractAlarmSettingsModel &model;
+        AbstractAlarmSettingsModel &settingsModel;
     };
 
 } // namespace app::bell_settings

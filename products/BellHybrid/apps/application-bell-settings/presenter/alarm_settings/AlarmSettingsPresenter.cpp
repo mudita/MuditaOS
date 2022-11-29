@@ -6,12 +6,13 @@
 
 namespace app::bell_settings
 {
-    AlarmSettingsPresenter::AlarmSettingsPresenter(std::shared_ptr<AlarmSettingsListItemProvider> provider,
-                                                   std::unique_ptr<AbstractAlarmSettingsModel> model,
+    AlarmSettingsPresenter::AlarmSettingsPresenter(std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
+                                                   std::unique_ptr<AbstractAlarmSettingsModel> &&settingsModel,
                                                    AbstractAudioModel &audioModel,
-                                                   std::unique_ptr<AbstractSoundsRepository> soundsRepository)
-        : provider(provider),
-          model(std::move(model)), audioModel{audioModel}, soundsRepository{std::move(soundsRepository)}
+                                                   std::unique_ptr<AbstractSoundsRepository> &&soundsRepository,
+                                                   std::unique_ptr<AbstractFrontlightModel> &&frontlight)
+        : provider{std::move(provider)}, settingsModel{std::move(settingsModel)}, audioModel{audioModel},
+          soundsRepository{std::move(soundsRepository)}, frontlight{std::move(frontlight)}
     {
 
         auto playSound = [this](const UTF8 &val) {
@@ -29,6 +30,15 @@ namespace app::bell_settings
         this->provider->onVolumeChange = [this](const auto &val) {
             this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Alarm, {});
         };
+
+        auto setBrightness = [this](const auto &brightness) {
+            this->frontlight->setStatus(true);
+            this->frontlight->setBrightness(brightness);
+        };
+
+        this->provider->onFrontlightEnter  = setBrightness;
+        this->provider->onFrontlightChange = setBrightness;
+        this->provider->onFrontlightExit   = [this]() { this->frontlight->revertUnsavedChanges(); };
     }
 
     auto AlarmSettingsPresenter::saveData() -> void
@@ -54,10 +64,12 @@ namespace app::bell_settings
     {
         provider->clearData();
     }
+
     void AlarmSettingsPresenter::stopSound()
     {
         this->audioModel.stopPlayedByThis({});
     }
+
     void AlarmSettingsPresenter::exitWithSave()
     {
         saveData();
@@ -67,7 +79,7 @@ namespace app::bell_settings
     void AlarmSettingsPresenter::exitWithRollback()
     {
         this->stopSound();
-        model->getAlarmVolume().restoreDefault();
+        settingsModel->getAlarmVolume().restoreDefault();
         eraseProviderData();
     }
 } // namespace app::bell_settings

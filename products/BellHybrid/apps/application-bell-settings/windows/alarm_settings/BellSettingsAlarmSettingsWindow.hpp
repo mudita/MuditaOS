@@ -31,6 +31,5 @@ namespace gui
       private:
         SideListView *sidelistview{};
         std::unique_ptr<app::bell_settings::AlarmSettingsWindowContract::Presenter> presenter;
-        bool isSaveNeeded{false};
     };
 } /* namespace gui */
