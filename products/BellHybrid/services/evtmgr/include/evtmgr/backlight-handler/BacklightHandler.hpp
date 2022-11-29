@@ -33,13 +33,15 @@ namespace backlight
       public:
         Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
 
-        void init() override;
-
         void handleKeyPressed(int key = 0);
 
         void handleScreenLight(Type type);
 
-        void screenRequest(screen_light_control::Action action, const screen_light_control::Parameters &params);
+        void processRequest(screen_light_control::Action action,
+                            const screen_light_control::Parameters &params,
+                            screen_light_control::Sender sender);
+
+        void init() override;
 
         void processScreenRequest(screen_light_control::Action action,
                                   const screen_light_control::Parameters &params) override;

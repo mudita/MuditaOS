@@ -11,37 +11,18 @@
 
 namespace sevm
 {
-    class ScreenLightSettingsControlMessage : public sys::DataMessage
-    {
-        const screen_light_control::Action action;
-        std::optional<screen_light_control::Parameters> params;
-
-      public:
-        explicit ScreenLightSettingsControlMessage(
-            screen_light_control::Action act, std::optional<screen_light_control::Parameters> params = std::nullopt)
-            : sys::DataMessage(MessageType::ScreenLightControlAction), action(act), params{std::move(params)}
-        {}
-
-        [[nodiscard]] auto getAction() const noexcept -> screen_light_control::Action
-        {
-            return action;
-        }
-
-        [[nodiscard]] auto getParams() const noexcept -> const std::optional<screen_light_control::Parameters> &
-        {
-            return params;
-        }
-    };
-
     class ScreenLightControlMessage : public sys::DataMessage
     {
         const screen_light_control::Action action;
         std::optional<screen_light_control::Parameters> params;
+        const screen_light_control::Sender sender;
 
       public:
         explicit ScreenLightControlMessage(screen_light_control::Action act,
-                                           std::optional<screen_light_control::Parameters> params = std::nullopt)
-            : sys::DataMessage(MessageType::ScreenLightControlAction), action(act), params{std::move(params)}
+                                           std::optional<screen_light_control::Parameters> params = std::nullopt,
+                                           screen_light_control::Sender sender = screen_light_control::Sender::Other)
+            : sys::DataMessage(MessageType::ScreenLightControlAction),
+              action(act), params{std::move(params)}, sender{sender}
         {}
 
         [[nodiscard]] auto getAction() const noexcept -> screen_light_control::Action
@@ -52,6 +33,11 @@ namespace sevm
         [[nodiscard]] auto getParams() const noexcept -> const std::optional<screen_light_control::Parameters> &
         {
             return params;
+        }
+
+        [[nodiscard]] auto getSender() const noexcept -> screen_light_control::Sender
+        {
+            return sender;
         }
     };
 

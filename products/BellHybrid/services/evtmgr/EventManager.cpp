@@ -87,17 +87,11 @@ void EventManager::initProductEvents()
 {
     backlightHandler.init();
 
-    connect(typeid(sevm::ScreenLightSettingsControlMessage), [&](sys::Message *msgl) {
-        auto *m           = static_cast<sevm::ScreenLightSettingsControlMessage *>(msgl);
-        const auto params = m->getParams();
-        backlightHandler.processScreenRequest(m->getAction(), params.value_or(screen_light_control::Parameters()));
-        return sys::msgHandled();
-    });
-
     connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
         auto *m           = static_cast<sevm::ScreenLightControlMessage *>(msgl);
         const auto params = m->getParams();
-        backlightHandler.screenRequest(m->getAction(), params.value_or(screen_light_control::Parameters()));
+        backlightHandler.processRequest(
+            m->getAction(), params.value_or(screen_light_control::Parameters()), m->getSender());
         return sys::msgHandled();
     });
 

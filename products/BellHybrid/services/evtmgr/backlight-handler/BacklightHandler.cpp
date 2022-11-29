@@ -101,10 +101,25 @@ namespace backlight
         backlightType = type;
     }
 
-    void Handler::screenRequest(screen_light_control::Action action, const screen_light_control::Parameters &params)
+    void Handler::processRequest(screen_light_control::Action action,
+                                 const screen_light_control::Parameters &params,
+                                 screen_light_control::Sender sender)
     {
-        if (backlightType == Type::Frontlight) {
+        switch (sender) {
+        case screen_light_control::Sender::AlarmPrewakeup:
+        case screen_light_control::Sender::Alarm:
+            switch (action) {
+            case screen_light_control::Action::turnOff:
+                backlightType = Type::Frontlight;
+                break;
+            default:
+                break;
+            }
             processScreenRequest(action, params);
+            break;
+        default:
+            processScreenRequest(action, params);
+            break;
         }
     }
 
