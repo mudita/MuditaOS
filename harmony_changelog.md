@@ -30,6 +30,7 @@
 * Add loop mode
 
 ### Fixed
+* Brightness calculation for alarms
 
 #### Home Screen:
 * Centering of battery indicator.

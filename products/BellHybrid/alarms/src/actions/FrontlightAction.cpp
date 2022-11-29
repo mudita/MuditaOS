@@ -15,10 +15,29 @@ namespace alarms
 {
     namespace
     {
+        screen_light_control::Sender translateDependency(FrontlightAction::SettingsDependency dependency)
+        {
+            screen_light_control::Sender sender;
+
+            switch (dependency) {
+            case FrontlightAction::SettingsDependency::AlarmClock:
+                sender = screen_light_control::Sender::Alarm;
+                break;
+            case FrontlightAction::SettingsDependency::Prewakeup:
+                sender = screen_light_control::Sender::AlarmPrewakeup;
+                break;
+            case FrontlightAction::SettingsDependency::None:
+            default:
+                sender = screen_light_control::Sender::Other;
+                break;
+            }
+            return sender;
+        }
+
         class ManualFrontlightAction : public AbstractAlarmAction
         {
           public:
-            explicit ManualFrontlightAction(sys::Service &service);
+            explicit ManualFrontlightAction(sys::Service &service, FrontlightAction::SettingsDependency dependency);
             bool execute() override;
             bool turnOff() override;
 
@@ -27,12 +46,14 @@ namespace alarms
 
             sys::Service &service;
             settings::Settings settings;
+            FrontlightAction::SettingsDependency settingsDependency;
         };
 
         class LinearProgressFrontlightAction : public AbstractAlarmAction
         {
           public:
-            explicit LinearProgressFrontlightAction(sys::Service &service);
+            explicit LinearProgressFrontlightAction(sys::Service &service,
+                                                    FrontlightAction::SettingsDependency dependency);
             bool execute() override;
             bool turnOff() override;
 
@@ -41,16 +62,17 @@ namespace alarms
 
             sys::Service &service;
             settings::Settings settings;
+            FrontlightAction::SettingsDependency settingsDependency;
         };
 
-        std::unique_ptr<AbstractAlarmAction> createFrontlightImplementation(sys::Service &service,
-                                                                            FrontlightAction::Mode mode)
+        std::unique_ptr<AbstractAlarmAction> createFrontlightImplementation(
+            sys::Service &service, FrontlightAction::Mode mode, FrontlightAction::SettingsDependency settingsDependency)
         {
             switch (mode) {
             case FrontlightAction::Mode::Manual:
-                return std::make_unique<ManualFrontlightAction>(service);
+                return std::make_unique<ManualFrontlightAction>(service, settingsDependency);
             case FrontlightAction::Mode::LinearProgress:
-                return std::make_unique<LinearProgressFrontlightAction>(service);
+                return std::make_unique<LinearProgressFrontlightAction>(service, settingsDependency);
             }
             return nullptr;
         }
@@ -58,8 +80,8 @@ namespace alarms
 
     FrontlightAction::FrontlightAction(sys::Service &service, Mode mode, SettingsDependency settingsDependency)
         : service{service}, settingsDependency{settingsDependency},
-          pimpl{createFrontlightImplementation(service, mode)}, settings{
-                                                                    service::ServiceProxy{service.weak_from_this()}}
+          pimpl{createFrontlightImplementation(service, mode, settingsDependency)}, settings{service::ServiceProxy{
+                                                                                        service.weak_from_this()}}
     {}
 
     bool FrontlightAction::execute()
@@ -116,12 +138,14 @@ namespace alarms
             settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
 
         screen_light_control::ManualModeParameters params{};
-        params.manualModeBrightness = frontlight_utils::fixedValToPercentage(std::stoi(brightnessString));
+        params.manualModeBrightness = utils::toNumeric(brightnessString);
 
         return params;
     }
 
-    ManualFrontlightAction::ManualFrontlightAction(sys::Service &service) : service{service}
+    ManualFrontlightAction::ManualFrontlightAction(sys::Service &service,
+                                                   FrontlightAction::SettingsDependency dependency)
+        : service{service}, settingsDependency{dependency}
     {
         settings.init(service::ServiceProxy{service.weak_from_this()});
     }
@@ -129,21 +153,26 @@ namespace alarms
     bool ManualFrontlightAction::execute()
     {
         auto params = prepareParameters();
-        service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
-                                    screen_light_control::Action::turnOn, screen_light_control::Parameters{params}),
-                                service::name::evt_manager);
+        auto sender = translateDependency(settingsDependency);
+        service.bus.sendUnicast(
+            std::make_shared<sevm::ScreenLightControlMessage>(
+                screen_light_control::Action::turnOn, screen_light_control::Parameters{params}, sender),
+            service::name::evt_manager);
         return true;
     }
 
     bool ManualFrontlightAction::turnOff()
     {
-        service.bus.sendUnicast(
-            std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::turnOff),
-            service::name::evt_manager);
+        auto sender = translateDependency(settingsDependency);
+        service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                                    screen_light_control::Action::turnOff, std::nullopt, sender),
+                                service::name::evt_manager);
         return true;
     }
 
-    LinearProgressFrontlightAction::LinearProgressFrontlightAction(sys::Service &service) : service{service}
+    LinearProgressFrontlightAction::LinearProgressFrontlightAction(sys::Service &service,
+                                                                   FrontlightAction::SettingsDependency dependency)
+        : service{service}, settingsDependency{dependency}
     {
         settings.init(service::ServiceProxy{service.weak_from_this()});
     }
@@ -151,9 +180,11 @@ namespace alarms
     bool LinearProgressFrontlightAction::execute()
     {
         const auto params = prepareParameters();
+        auto sender       = translateDependency(settingsDependency);
         service.bus.sendUnicast(std::make_shared<sevm::ScreenLightSetAutoProgressiveModeParams>(params),
                                 service::name::evt_manager);
-        service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::turnOn),
+        service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                                    screen_light_control::Action::turnOn, std::nullopt, sender),
                                 service::name::evt_manager);
         return true;
     }
@@ -175,8 +206,7 @@ namespace alarms
         startFunction.target   = 10.0f;
 
         endFunction.duration = secondTargetDuration;
-        endFunction.target   = frontlight_utils::fixedValToPercentage(std::stoi(brightnessString));
-        ;
+        endFunction.target   = utils::toNumeric(brightnessString);
 
         params.startBrightnessValue = 0.0f;
         params.brightnessHysteresis = 0.0f;
@@ -187,9 +217,10 @@ namespace alarms
 
     bool LinearProgressFrontlightAction::turnOff()
     {
-        service.bus.sendUnicast(
-            std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::turnOff),
-            service::name::evt_manager);
+        auto sender = translateDependency(settingsDependency);
+        service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                                    screen_light_control::Action::turnOff, std::nullopt, sender),
+                                service::name::evt_manager);
         return true;
     }
 

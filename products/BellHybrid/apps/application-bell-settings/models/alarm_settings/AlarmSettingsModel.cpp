@@ -50,13 +50,13 @@ namespace app::bell_settings
 
     void AlarmFrontlightModel::setValue(frontlight_utils::Brightness value)
     {
-        const auto valStr = std::to_string(value);
+        const auto valStr = std::to_string(frontlight_utils::fixedValToPercentage(value));
         settings.setValue(bell::settings::Alarm::brightness, valStr, settings::SettingsScope::Global);
     }
 
     frontlight_utils::Brightness AlarmFrontlightModel::getValue() const
     {
         const auto str = settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
-        return std::stoi(str);
+        return frontlight_utils::percentageToFixedVal(std::stoi(str));
     }
 } // namespace app::bell_settings
