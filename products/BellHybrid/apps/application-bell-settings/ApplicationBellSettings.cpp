@@ -154,20 +154,28 @@ namespace app
 
         windowsFactory.attach(
             gui::BellSettingsPrewakeUpWindow::name, [this](ApplicationCommon *app, const std::string &name) {
-                auto chimeDurationModel = std::make_unique<bell_settings::PrewakeUpChimeDurationModel>(this);
-                auto chimeToneModel     = std::make_unique<bell_settings::PrewakeUpChimeToneModel>(this);
-                auto chimeVolumeModel   = std::make_unique<bell_settings::PrewakeUpChimeVolumeModel>(*audioModel);
-                auto lightDurationModel = std::make_unique<bell_settings::PrewakeUpLightDurationModel>(this);
+                auto prewakeUpChimeDurationModel = std::make_unique<bell_settings::PrewakeUpChimeDurationModel>(this);
+                auto prewakeUpChimeToneModel     = std::make_unique<bell_settings::PrewakeUpChimeToneModel>(this);
+                auto prewakeUpChimeVolumeModel =
+                    std::make_unique<bell_settings::PrewakeUpChimeVolumeModel>(*audioModel);
+                auto prewakeUpLightDurationModel = std::make_unique<bell_settings::PrewakeUpLightDurationModel>(this);
+                auto prewakeUpFrontlightModel    = std::make_unique<bell_settings::PrewakeUpFrontlightModel>(this);
                 auto prewakeUpSettingsModel =
-                    std::make_unique<bell_settings::PrewakeUpSettingsModel>(std::move(chimeDurationModel),
-                                                                            std::move(chimeToneModel),
-                                                                            std::move(chimeVolumeModel),
-                                                                            std::move(lightDurationModel));
+                    std::make_unique<bell_settings::PrewakeUpSettingsModel>(std::move(prewakeUpChimeDurationModel),
+                                                                            std::move(prewakeUpChimeToneModel),
+                                                                            std::move(prewakeUpChimeVolumeModel),
+                                                                            std::move(prewakeUpLightDurationModel),
+                                                                            std::move(prewakeUpFrontlightModel));
                 auto soundsRepository = std::make_unique<SoundsRepository>(alarms::paths::getPreWakeUpChimesDir());
-                auto provider         = std::make_shared<bell_settings::PrewakeUpListItemProvider>(
+                auto provider         = std::make_unique<bell_settings::PrewakeUpListItemProvider>(
                     *prewakeUpSettingsModel, soundsRepository->getSongTitles());
-                auto presenter = std::make_unique<bell_settings::PrewakeUpWindowPresenter>(
-                    provider, std::move(prewakeUpSettingsModel), *audioModel, std::move(soundsRepository));
+                auto frontlightModel = std::make_unique<bell_settings::FrontlightModel>(app);
+                auto presenter =
+                    std::make_unique<bell_settings::PrewakeUpWindowPresenter>(std::move(provider),
+                                                                              std::move(prewakeUpSettingsModel),
+                                                                              *audioModel,
+                                                                              std::move(soundsRepository),
+                                                                              std::move(frontlightModel));
                 return std::make_unique<gui::BellSettingsPrewakeUpWindow>(app, std::move(presenter));
             });
 
@@ -201,13 +209,21 @@ namespace app
                 auto alarmToneModel       = std::make_unique<bell_settings::AlarmToneModel>(this);
                 auto alarmVolumeModel     = std::make_unique<bell_settings::AlarmVolumeModel>(*audioModel);
                 auto alarmLightOnOffModel = std::make_unique<bell_settings::AlarmLightOnOffModel>(this);
-                auto alarmSettingsModel   = std::make_unique<bell_settings::AlarmSettingsModel>(
-                    std::move(alarmToneModel), std::move(alarmVolumeModel), std::move(alarmLightOnOffModel));
+                auto alarmFrontlightModel = std::make_unique<bell_settings::AlarmFrontlightModel>(this);
+                auto alarmSettingsModel =
+                    std::make_unique<bell_settings::AlarmSettingsModel>(std::move(alarmToneModel),
+                                                                        std::move(alarmVolumeModel),
+                                                                        std::move(alarmLightOnOffModel),
+                                                                        std::move(alarmFrontlightModel));
                 auto soundsRepository = std::make_unique<SoundsRepository>(alarms::paths::getAlarmDir());
-                auto provider         = std::make_shared<bell_settings::AlarmSettingsListItemProvider>(
+                auto frontlightModel  = std::make_unique<bell_settings::FrontlightModel>(app);
+                auto provider         = std::make_unique<bell_settings::AlarmSettingsListItemProvider>(
                     *alarmSettingsModel, soundsRepository->getSongTitles());
-                auto presenter = std::make_unique<bell_settings::AlarmSettingsPresenter>(
-                    provider, std::move(alarmSettingsModel), *audioModel, std::move(soundsRepository));
+                auto presenter = std::make_unique<bell_settings::AlarmSettingsPresenter>(std::move(provider),
+                                                                                         std::move(alarmSettingsModel),
+                                                                                         *audioModel,
+                                                                                         std::move(soundsRepository),
+                                                                                         std::move(frontlightModel));
                 return std::make_unique<gui::BellSettingsAlarmSettingsWindow>(app, std::move(presenter));
             });
 

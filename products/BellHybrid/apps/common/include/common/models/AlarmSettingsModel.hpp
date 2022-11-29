@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,6 +6,7 @@
 #include "AbstractAlarmSettingsModel.hpp"
 #include <common/models/SettingsModel.hpp>
 #include <common/models/AudioModel.hpp>
+#include <common/data/FrontlightUtils.hpp>
 
 namespace app::bell_settings
 {
@@ -40,14 +41,26 @@ namespace app::bell_settings
         bool getValue() const override;
     };
 
+    class AlarmFrontlightModel : public gui::SettingsModel<frontlight_utils::Brightness>
+    {
+      public:
+        using SettingsModel::SettingsModel;
+
+        void setValue(frontlight_utils::Brightness value) override;
+        frontlight_utils::Brightness getValue() const override;
+    };
+
     class AlarmSettingsModel : public AbstractAlarmSettingsModel
     {
       public:
         AlarmSettingsModel(std::unique_ptr<AlarmToneModel> alarmToneModel,
                            std::unique_ptr<AlarmVolumeModel> alarmVolumeModel,
-                           std::unique_ptr<AlarmLightOnOffModel> alarmLightOnOffModel)
-            : AbstractAlarmSettingsModel(
-                  std::move(alarmToneModel), std::move(alarmVolumeModel), std::move(alarmLightOnOffModel))
+                           std::unique_ptr<AlarmLightOnOffModel> alarmLightOnOffModel,
+                           std::unique_ptr<AlarmFrontlightModel> alarmFrontlightModel)
+            : AbstractAlarmSettingsModel(std::move(alarmToneModel),
+                                         std::move(alarmVolumeModel),
+                                         std::move(alarmLightOnOffModel),
+                                         std::move(alarmFrontlightModel))
         {}
     };
 } // namespace app::bell_settings

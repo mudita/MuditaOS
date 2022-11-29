@@ -6,6 +6,7 @@
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/AudioOperations.hpp>
 #include <common/models/AbstractAudioModel.hpp>
+#include <common/models/FrontlightModel.hpp>
 #include <common/SoundsRepository.hpp>
 #include <memory>
 
@@ -35,6 +36,7 @@ namespace app::bell_settings
             virtual ~Presenter() noexcept                                                   = default;
             virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
             virtual auto loadData() -> void                                                 = 0;
+            virtual auto saveData() -> void                                                 = 0;
             virtual auto eraseProviderData() -> void                                        = 0;
             virtual auto exitWithSave() -> void                                             = 0;
             virtual auto exitWithRollback() -> void                                         = 0;
@@ -44,24 +46,26 @@ namespace app::bell_settings
     class AlarmSettingsPresenter : public AlarmSettingsWindowContract::Presenter
     {
       public:
-        AlarmSettingsPresenter(std::shared_ptr<AlarmSettingsListItemProvider> provider,
-                               std::unique_ptr<AbstractAlarmSettingsModel> model,
+        AlarmSettingsPresenter(std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
+                               std::unique_ptr<AbstractAlarmSettingsModel> &&settingsModel,
                                AbstractAudioModel &audioModel,
-                               std::unique_ptr<AbstractSoundsRepository> soundsRepository);
+                               std::unique_ptr<AbstractSoundsRepository> &&soundsRepository,
+                               std::unique_ptr<AbstractFrontlightModel> &&frontlight);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto loadData() -> void override;
+        auto saveData() -> void;
         auto eraseProviderData() -> void override;
         auto exitWithSave() -> void override;
         auto exitWithRollback() -> void override;
 
       private:
         auto stopSound() -> void;
-        auto saveData() -> void;
 
         std::shared_ptr<AlarmSettingsListItemProvider> provider;
-        std::unique_ptr<AbstractAlarmSettingsModel> model;
+        std::unique_ptr<AbstractAlarmSettingsModel> settingsModel;
         AbstractAudioModel &audioModel;
         std::unique_ptr<AbstractSoundsRepository> soundsRepository;
+        std::unique_ptr<AbstractFrontlightModel> frontlight;
     };
 } // namespace app::bell_settings

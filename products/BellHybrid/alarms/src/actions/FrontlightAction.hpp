@@ -5,6 +5,7 @@
 
 #include "AbstractAlarmAction.hpp"
 #include <service-db/Settings.hpp>
+#include <service-evtmgr/ScreenLightControlMessage.hpp>
 
 #include <Service/Service.hpp>
 

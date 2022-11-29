@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,7 @@
 #include <apps-common/AudioOperations.hpp>
 #include <models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp>
 #include <common/models/AbstractAudioModel.hpp>
+#include <common/models/FrontlightModel.hpp>
 #include <common/SoundsRepository.hpp>
 #include <memory>
 
@@ -44,10 +45,11 @@ namespace app::bell_settings
     class PrewakeUpWindowPresenter : public PrewakeUpWindowContract::Presenter
     {
       public:
-        PrewakeUpWindowPresenter(std::shared_ptr<PrewakeUpListItemProvider> provider,
-                                 std::unique_ptr<AbstractPrewakeUpSettingsModel> model,
+        PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
+                                 std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
                                  AbstractAudioModel &audioModel,
-                                 std::unique_ptr<AbstractSoundsRepository> soundsRepository);
+                                 std::unique_ptr<AbstractSoundsRepository> &&soundsRepository,
+                                 std::unique_ptr<AbstractFrontlightModel> &&frontlight);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto saveData() -> void override;
@@ -62,6 +64,7 @@ namespace app::bell_settings
         std::unique_ptr<AbstractPrewakeUpSettingsModel> model;
         AbstractAudioModel &audioModel;
         std::unique_ptr<AbstractSoundsRepository> soundsRepository;
+        std::unique_ptr<AbstractFrontlightModel> frontlight;
         UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

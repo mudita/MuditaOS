@@ -5,6 +5,7 @@
 
 #include <apps-common/AsyncTask.hpp>
 #include <common/models/SettingsModel.hpp>
+#include <common/data/FrontlightUtils.hpp>
 #include <screen-light-control/ScreenLightControlParameters.hpp>
 
 namespace app
@@ -17,10 +18,8 @@ namespace app::bell_settings
     class AbstractFrontlightModel
     {
       public:
-        /// 1-10 range
-        using Brightness                                                 = std::uint8_t;
         virtual ~AbstractFrontlightModel()                               = default;
-        virtual void setBrightness(Brightness value)                     = 0;
+        virtual void setBrightness(frontlight_utils::Brightness value)   = 0;
         virtual void setMode(screen_light_control::ScreenLightMode mode) = 0;
         virtual void setStatus(bool onOff)                               = 0;
         virtual void revertUnsavedChanges()                              = 0;
@@ -40,7 +39,7 @@ namespace app::bell_settings
         gui::AbstractSettingsModel<std::uint8_t> &getBrightnessModel() override;
         gui::AbstractSettingsModel<UTF8> &getModeModel() override;
 
-        void setBrightness(Brightness value) override;
+        void setBrightness(frontlight_utils::Brightness value) override;
         void setMode(screen_light_control::ScreenLightMode mode) override;
         void setStatus(bool onOff) override;
         void revertUnsavedChanges() override;

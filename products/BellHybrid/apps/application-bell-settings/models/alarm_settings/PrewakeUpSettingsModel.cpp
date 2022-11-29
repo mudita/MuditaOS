@@ -59,4 +59,16 @@ namespace app::bell_settings
         const auto str = settings.getValue(bell::settings::PrewakeUp::lightDuration, settings::SettingsScope::Global);
         return std::stoi(str);
     }
+
+    void PrewakeUpFrontlightModel::setValue(frontlight_utils::Brightness value)
+    {
+        const auto valStr = std::to_string(frontlight_utils::fixedValToPercentage(value));
+        settings.setValue(bell::settings::PrewakeUp::brightness, valStr, settings::SettingsScope::Global);
+    }
+
+    frontlight_utils::Brightness PrewakeUpFrontlightModel::getValue() const
+    {
+        const auto str = settings.getValue(bell::settings::PrewakeUp::brightness, settings::SettingsScope::Global);
+        return frontlight_utils::percentageToFixedVal(std::stoi(str));
+    }
 } // namespace app::bell_settings

@@ -17,6 +17,9 @@
 #### Onboarding
 * Shortcuts instruction.
 
+#### Alarm
+* Front light intensity during the main alarm and pre-wake up
+
 ### Changed
 
 #### Home Screen:

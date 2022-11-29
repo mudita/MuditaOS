@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsStyle.hpp"
 #include "AlarmSettingsListItemProvider.hpp"
+#include <common/models/FrontlightModel.hpp>
 #include <common/widgets/ListItems.hpp>
 #include <common/widgets/list_items/Text.hpp>
 #include <common/widgets/list_items/Numeric.hpp>
@@ -12,20 +13,23 @@ namespace app::bell_settings
 {
     using namespace gui;
 
-    AlarmSettingsListItemProvider::AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &model,
+    AlarmSettingsListItemProvider::AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &settingsModel,
                                                                  std::vector<UTF8> alarmToneRange)
-        : model{model}
+        : settingsModel{settingsModel}
     {
         buildListItems(std::move(alarmToneRange));
     }
 
     void AlarmSettingsListItemProvider::buildListItems(std::vector<UTF8> alarmTonesRange)
     {
-        constexpr auto itemCount = 4U;
+        constexpr auto brightnessMin  = 1U;
+        constexpr auto brightnessMax  = 10U;
+        constexpr auto brightnessStep = 1U;
+        constexpr auto itemCount      = 5U;
         internalData.reserve(itemCount);
 
         auto alarmTone = new list_items::Text(std::move(alarmTonesRange),
-                                              model.getAlarmTone(),
+                                              settingsModel.getAlarmTone(),
                                               utils::translate("app_bell_settings_alarm_settings_tone"));
         alarmTone->set_on_value_change_cb([this](const auto &val) {
             if (onToneChange) {
@@ -49,7 +53,7 @@ namespace app::bell_settings
         constexpr auto volumeMax  = 10U;
         auto alarmVolume =
             new list_items::Numeric(list_items::Numeric::spinner_type::range{volumeMin, volumeMax, volumeStep},
-                                    model.getAlarmVolume(),
+                                    settingsModel.getAlarmVolume(),
                                     utils::translate("app_bell_settings_alarm_settings_volume"));
         alarmVolume->set_on_value_change_cb([this](const auto &val) {
             if (onVolumeChange) {
@@ -69,8 +73,44 @@ namespace app::bell_settings
 
         internalData.emplace_back(alarmVolume);
 
-        internalData.emplace_back(
-            new OnOffListItem(model.getAlarmLightOnOff(), utils::translate("app_bell_settings_alarm_settings_light")));
+        auto onOffLight = new OnOffListItem(settingsModel.getAlarmLightOnOff(),
+                                            utils::translate("app_bell_settings_alarm_settings_light"));
+
+        internalData.emplace_back(onOffLight);
+
+        onOffLight->onProceed = [onOffLight, this]() {
+            if (!onOffLight->isActive()) {
+                this->onExit();
+                return true;
+            }
+            return false;
+        };
+
+        auto brightness = new list_items::Numeric(
+            list_items::Numeric::spinner_type::range{brightnessMin, brightnessMax, brightnessStep},
+            settingsModel.getBrightness(),
+            utils::translate("app_bell_settings_frontlight_top_message"));
+
+        brightness->set_on_value_change_cb([this](const auto &val) {
+            if (onFrontlightChange) {
+                onFrontlightChange(val);
+            }
+        });
+
+        brightness->onEnter = [this]() {
+            auto brightness = settingsModel.getBrightness().getValue();
+            if (onFrontlightEnter) {
+                onFrontlightEnter(brightness);
+            }
+        };
+
+        brightness->onExit = [this]() {
+            if (onFrontlightExit) {
+                onFrontlightExit();
+            }
+        };
+
+        internalData.emplace_back(brightness);
 
         for (auto item : internalData) {
             item->deleteByList = false;

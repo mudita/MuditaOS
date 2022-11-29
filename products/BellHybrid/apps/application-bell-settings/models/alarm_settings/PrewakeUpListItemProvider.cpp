@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PrewakeUpListItemProvider.hpp"
+#include <common/models/FrontlightModel.hpp>
 #include <common/widgets/list_items/NumberWithSuffix.hpp>
 #include <common/widgets/list_items/Numeric.hpp>
 #include <common/widgets/ListItems.hpp>
@@ -14,29 +15,31 @@ namespace app::bell_settings
 {
     using namespace gui;
 
-    PrewakeUpListItemProvider::PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &model,
+    PrewakeUpListItemProvider::PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &settingsModel,
                                                          std::vector<UTF8> chimeToneRange)
-        : model{model}
+        : settingsModel{settingsModel}
     {
         buildListItems(std::move(chimeToneRange));
     }
 
     void PrewakeUpListItemProvider::buildListItems(std::vector<UTF8> chimeToneRange)
     {
-        constexpr auto itemCount = 4U;
+        constexpr auto brightnessMin  = 1U;
+        constexpr auto brightnessMax  = 10U;
+        constexpr auto brightnessStep = 1U;
+        constexpr auto itemCount      = 5U;
         internalData.reserve(itemCount);
 
         const std::string minStr = utils::translate("common_minute_short");
         auto chimeDuration       = new list_items::NumberWithSuffix(
             list_items::NumberWithSuffix::spinner_type::range{0, 5, 10, 15},
-            model.getChimeDuration(),
+            settingsModel.getChimeDuration(),
             utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_top_description"),
             utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_bottom_description"));
 
         chimeDuration->onProceed = [chimeDuration, this]() {
             if (chimeDuration->value() == 0) {
-                constexpr auto lightDurationListIndex = 3U;
-                list->rebuildList(gui::listview::RebuildType::OnOffset, lightDurationListIndex);
+                this->onExit();
                 return true;
             }
             return false;
@@ -46,7 +49,7 @@ namespace app::bell_settings
 
         auto chimeTone =
             new list_items::Text(std::move(chimeToneRange),
-                                 model.getChimeTone(),
+                                 settingsModel.getChimeTone(),
                                  utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone"));
         chimeTone->set_on_value_change_cb([this](const auto &val) {
             if (onToneChange) {
@@ -70,7 +73,7 @@ namespace app::bell_settings
         constexpr auto volumeMax  = 10U;
         auto volume =
             new list_items::Numeric(list_items::Numeric::spinner_type::range{volumeMin, volumeMax, volumeStep},
-                                    model.getChimeVolume(),
+                                    settingsModel.getChimeVolume(),
                                     utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_volume"));
         volume->set_on_value_change_cb([this](const auto &val) {
             if (onVolumeChange) {
@@ -93,7 +96,7 @@ namespace app::bell_settings
 
         auto lightDuration = new list_items::NumberWithSuffix(
             list_items::NumberWithSuffix::spinner_type::range{0, 5, 10, 15},
-            model.getLightDuration(),
+            settingsModel.getLightDuration(),
             utils::translate("app_bell_settings_alarm_settings_prewake_up_light_top_description"),
             utils::translate("app_bell_settings_alarm_settings_prewake_up_light_bottom_description"));
 
@@ -105,7 +108,41 @@ namespace app::bell_settings
             return false;
         };
 
+        lightDuration->onProceed = [lightDuration, this]() {
+            if (lightDuration->value() == 0) {
+                this->onExit();
+                return true;
+            }
+            return false;
+        };
+
         internalData.emplace_back(lightDuration);
+
+        auto brightness = new list_items::Numeric(
+            list_items::Numeric::spinner_type::range{brightnessMin, brightnessMax, brightnessStep},
+            settingsModel.getBrightness(),
+            utils::translate("app_bell_settings_frontlight_top_message"));
+
+        brightness->set_on_value_change_cb([this](const auto &val) {
+            if (onFrontlightChange) {
+                onFrontlightChange(val);
+            }
+        });
+
+        brightness->onEnter = [this]() {
+            auto brightness = settingsModel.getBrightness().getValue();
+            if (onFrontlightEnter) {
+                onFrontlightEnter(brightness);
+            }
+        };
+
+        brightness->onExit = [this]() {
+            if (onFrontlightExit) {
+                onFrontlightExit();
+            }
+        };
+
+        internalData.emplace_back(brightness);
 
         for (auto item : internalData) {
             item->deleteByList = false;

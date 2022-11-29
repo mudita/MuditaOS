@@ -9,6 +9,7 @@
 #include <service-db/Settings.hpp>
 #include <db/SystemSettings.hpp>
 #include <module-utils/utility/Utils.hpp>
+#include <common/data/FrontlightUtils.hpp>
 
 namespace alarms
 {
@@ -25,6 +26,7 @@ namespace alarms
             screen_light_control::ManualModeParameters prepareParameters();
 
             sys::Service &service;
+            settings::Settings settings;
         };
 
         class LinearProgressFrontlightAction : public AbstractAlarmAction
@@ -84,6 +86,7 @@ namespace alarms
         case SettingsDependency::None:
             break;
         }
+
         return pimpl->execute();
     }
 
@@ -103,11 +106,25 @@ namespace alarms
         default:
             break;
         }
+
         return pimpl->turnOff();
     }
 
+    screen_light_control::ManualModeParameters ManualFrontlightAction::prepareParameters()
+    {
+        std::string brightnessString =
+            settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
+
+        screen_light_control::ManualModeParameters params{};
+        params.manualModeBrightness = frontlight_utils::fixedValToPercentage(std::stoi(brightnessString));
+
+        return params;
+    }
+
     ManualFrontlightAction::ManualFrontlightAction(sys::Service &service) : service{service}
-    {}
+    {
+        settings.init(service::ServiceProxy{service.weak_from_this()});
+    }
 
     bool ManualFrontlightAction::execute()
     {
@@ -116,11 +133,6 @@ namespace alarms
                                     screen_light_control::Action::turnOn, screen_light_control::Parameters{params}),
                                 service::name::evt_manager);
         return true;
-    }
-
-    screen_light_control::ManualModeParameters ManualFrontlightAction::prepareParameters()
-    {
-        return screen_light_control::ManualModeParameters{.manualModeBrightness = 100.0f};
     }
 
     bool ManualFrontlightAction::turnOff()
@@ -149,16 +161,28 @@ namespace alarms
     screen_light_control::LinearProgressModeParameters LinearProgressFrontlightAction::prepareParameters()
     {
         constexpr auto firstTargetDuration = std::chrono::seconds{5};
+
+        std::string brightnessString =
+            settings.getValue(bell::settings::PrewakeUp::brightness, settings::SettingsScope::Global);
         const auto value = settings.getValue(bell::settings::PrewakeUp::lightDuration, settings::SettingsScope::Global);
         const auto lightDuration        = std::chrono::minutes{utils::toNumeric(value)};
         const auto secondTargetDuration = lightDuration - std::chrono::minutes{1} - firstTargetDuration;
-        return screen_light_control::LinearProgressModeParameters{
-            .startBrightnessValue = 0.0f,
-            .functions            = {screen_light_control::functions::LinearProgressFunction{.target   = 10.0f,
-                                                                                  .duration = firstTargetDuration},
-                          screen_light_control::functions::LinearProgressFunction{.target   = 100.0f,
-                                                                                  .duration = secondTargetDuration}},
-            .brightnessHysteresis = 0.0f};
+
+        screen_light_control::LinearProgressModeParameters params{};
+        screen_light_control::functions::LinearProgressFunction startFunction{}, endFunction{};
+
+        startFunction.duration = firstTargetDuration;
+        startFunction.target   = 10.0f;
+
+        endFunction.duration = secondTargetDuration;
+        endFunction.target   = frontlight_utils::fixedValToPercentage(std::stoi(brightnessString));
+        ;
+
+        params.startBrightnessValue = 0.0f;
+        params.brightnessHysteresis = 0.0f;
+        params.functions            = {startFunction, endFunction};
+
+        return params;
     }
 
     bool LinearProgressFrontlightAction::turnOff()
@@ -168,4 +192,5 @@ namespace alarms
             service::name::evt_manager);
         return true;
     }
+
 } // namespace alarms

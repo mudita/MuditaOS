@@ -8,28 +8,6 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 
-namespace
-{
-    constexpr auto minPercent                       = 0.0f;
-    constexpr auto maxPercent                       = 100.0f;
-    constexpr auto minimumLightOnPercentOffsetValue = 16.0f;
-    constexpr auto minBrightness                    = 1U;
-    constexpr auto maxBrightness                    = 10U;
-    constexpr float multiplier                      = (maxPercent - minimumLightOnPercentOffsetValue) / maxBrightness;
-
-    float fixedValToPercentage(app::bell_settings::AbstractFrontlightModel::Brightness value)
-    {
-        float scaled = minimumLightOnPercentOffsetValue + (value - minBrightness) * multiplier;
-        return std::min(maxPercent, std::max(minPercent, scaled));
-    }
-
-    app::bell_settings::AbstractFrontlightModel::Brightness percentageToFixedVal(float percent)
-    {
-        auto value = (percent - minimumLightOnPercentOffsetValue) / multiplier;
-        return std::round(value + minBrightness);
-    }
-} // namespace
-
 namespace app::bell_settings
 {
     FrontlightModel::FrontlightModel(ApplicationCommon *app)
@@ -41,7 +19,8 @@ namespace app::bell_settings
         const auto responseCallback = [this](const auto response) -> bool {
             const auto resp = dynamic_cast<sevm::ScreenLightControlParametersResponse *>(response);
             if (resp) {
-                this->brightnessAdapter->update(percentageToFixedVal(resp->getParams().manualModeBrightness));
+                this->brightnessAdapter->update(
+                    frontlight_utils::percentageToFixedVal(resp->getParams().manualModeBrightness));
                 this->modeAdapter->update(
                     resp->getMode() == screen_light_control::ScreenLightMode::Automatic ? autoStr : onDemandStr);
                 if (this->onReady) {
@@ -68,10 +47,11 @@ namespace app::bell_settings
                                      : screen_light_control::Action::disableAutomaticMode),
                              service::name::evt_manager);
     }
-    void FrontlightModel::setBrightness(Brightness value)
+    void FrontlightModel::setBrightness(frontlight_utils::Brightness value)
     {
         hasUnsavedChanges = true;
-        screen_light_control::ConstLinearProgressModeParameters parameters{fixedValToPercentage(value)};
+        screen_light_control::ConstLinearProgressModeParameters parameters{
+            frontlight_utils::fixedValToPercentage(value)};
         app->bus.sendUnicast(std::make_shared<sevm::ScreenLightSetConstLinearModeParams>(parameters),
                              service::name::evt_manager);
     }
@@ -89,10 +69,10 @@ namespace app::bell_settings
         if (!hasUnsavedChanges) {
             return;
         }
-        setStatus(false);
         setMode(modeAdapter->getValue() == autoStr ? screen_light_control::ScreenLightMode::Automatic
                                                    : screen_light_control::ScreenLightMode::Manual);
         setBrightness(brightnessAdapter->getValue());
+        setStatus(true);
     }
 
     void FrontlightModel::setChangesSaved()
