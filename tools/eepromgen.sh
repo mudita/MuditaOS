@@ -23,6 +23,9 @@ FACTORY_FILENAME="personalization.json"
 IMAGE_NAME=$(realpath "$1")
 
 #Find genlittlefs tool
+if [ -z "$SDIR" ]; then
+  SDIR=".."
+fi
 GENLFS=$(find $SDIR -type f -iname genlittlefs -executable -print -quit)
 if [ -z ${GENLFS} ]; then
     echo "Error: Unable to find genlilttlefs..."
