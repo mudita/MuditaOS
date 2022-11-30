@@ -92,8 +92,7 @@ end
 local function print_db_set(db_set)
     print("database set:")
     for name, version in pairs(db_set) do
-        print("\tname: " .. name)
-        print("\ttarget version: " .. version)
+        print(string.format("'%s':%d",name,version))
     end
 end
 
