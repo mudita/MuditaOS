@@ -10,14 +10,11 @@ namespace
     constexpr inline auto PATH_USER        = "/user";
     constexpr inline auto PATH_CONF        = "/mfgconf";
     constexpr inline auto PATH_DB          = "db";
-    constexpr inline auto PATH_UPDATE      = "update";
-    constexpr inline auto PATH_SYNC        = "sync";
     constexpr inline auto PATH_LOGS        = "log";
     constexpr inline auto PATH_CRASH_DUMPS = "crash_dumps";
     constexpr inline auto PATH_USER_MEDIA =
         "media"; // TODO this won't work with our current non-hierarchical MTP implementation
-    constexpr inline auto PATH_TMP    = "tmp";
-    constexpr inline auto PATH_BACKUP = "backup";
+    constexpr inline auto PATH_TMP    = "temp";
     constexpr inline auto PATH_ASSETS = "assets";
     constexpr inline auto PATH_DATA   = "data";
 } // namespace
@@ -51,16 +48,6 @@ namespace purefs
             return getSystemDiskPath() / PATH_DB;
         }
 
-        std::filesystem::path getUpdateDirPath() noexcept
-        {
-            return getUserDiskPath() / PATH_UPDATE;
-        }
-
-        std::filesystem::path getSyncPackagePath() noexcept
-        {
-            return getUserDiskPath() / PATH_SYNC; // TODO what's this?
-        }
-
         std::filesystem::path getLogsPath() noexcept
         {
             return getSystemDiskPath() / PATH_LOGS;
@@ -78,12 +65,7 @@ namespace purefs
 
         std::filesystem::path getTemporaryPath() noexcept
         {
-            return getSystemDiskPath() / PATH_TMP; // TODO is it needed + if it is, where it should be placed
-        }
-
-        std::filesystem::path getBackupOSPath() noexcept
-        {
-            return getUserDiskPath() / PATH_BACKUP; // TODO is it still needed?
+            return getSystemDiskPath() / PATH_TMP;
         }
 
         std::filesystem::path getBootJSONPath() noexcept

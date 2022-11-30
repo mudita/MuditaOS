@@ -8,4 +8,4 @@
 namespace service::name
 {
     inline constexpr auto service_desktop = "ServiceDesktop";
-};
+}
