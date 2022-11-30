@@ -6,6 +6,11 @@
 #include "PhoneModes/PhoneMode.hpp"
 #include "PhoneModes/Tethering.hpp"
 
+namespace at
+{
+    enum class AT;
+}
+
 class CellularMux;
 class ServiceCellular;
 
@@ -30,11 +35,12 @@ namespace cellular
     {
       private:
         ServiceCellular *cellular = nullptr;
-        CellularMux *cmux         = nullptr;
+
+        bool handleEvent(at::AT modemCommand);
 
       public:
         Api() = default;
-        Api(ServiceCellular *cellular, CellularMux *);
+        Api(ServiceCellular *cellular);
 
         bool answerIncomingCall() override;
         bool hangupCall() override;
