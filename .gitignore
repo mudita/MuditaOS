@@ -61,6 +61,13 @@ update/*
 # often created by the visual studio code
 /null.d
 
+# macOS spotlight indexing files
+*.DS_Store
+
 test/test_env
 image/luts.bin
 image/assets/fonts/*
+
+scripts/lua/test/assets*
+scripts/lua/test/update/user/temp/*
+scripts/lua/test/update/target/*
