@@ -1,0 +1,10 @@
+{
+  "BellHybrid": {
+    "databases":[
+      {"name": "events", "version": "0"},
+      {"name": "multimedia", "version": "0"},
+      {"name": "meditation_stats", "version": "0"},
+      {"name": "settings_bell", "version": "0"}
+    ]
+  }
+}
