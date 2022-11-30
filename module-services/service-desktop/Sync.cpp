@@ -92,7 +92,7 @@ bool Sync::PackSyncFiles(const std::filesystem::path &path)
     }
 
     auto isTarFileOpen                = false;
-    std::filesystem::path tarFilePath = (purefs::dir::getSyncPackagePath() / path.filename());
+    std::filesystem::path tarFilePath = (purefs::dir::getTemporaryPath() / path.filename());
     mtar_t tarFile;
 
     auto cleanup = gsl::finally([&isTarFileOpen, &tarFile]() {
