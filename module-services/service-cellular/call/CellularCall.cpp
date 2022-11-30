@@ -28,7 +28,7 @@ namespace call
                                                               std::make_unique<CallDB>(owner),
                                                               std::make_unique<CallTimer>(std::move(timer)),
                                                               std::make_unique<TimerRing>(std::move(timerRing)),
-                                                              std::make_unique<cellular::Api>(owner, cmux),
+                                                              std::make_unique<cellular::Api>(owner),
                                                               std::move(sentinel)});
     }
 

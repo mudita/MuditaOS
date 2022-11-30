@@ -3,58 +3,50 @@
 
 #include "ModemCallApi.hpp"
 #include <modem/mux/CellularMux.h>
+#include <module-cellular/at/Commands.hpp>
 #include <stdexcept>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace cellular
 {
-    Api::Api(ServiceCellular *cellular, CellularMux *cmux) : cellular(cellular), cmux(cmux)
+    Api::Api(ServiceCellular *cellular) : cellular{cellular}
     {}
+
+    bool Api::handleEvent(at::AT modemCommand)
+    {
+        if (!cellular->cmux) {
+            LOG_INFO("no cmux at this time - ignoring request");
+            return false;
+        }
+
+        auto channel = cellular->cmux->get(CellularMux::Channel::Commands);
+        if (!channel) {
+            LOG_INFO("no cmux command channel at this time - ignoring request");
+            return false;
+        }
+
+        if (!channel->cmd(modemCommand)) {
+            LOG_WARN("AT+%s command failed - ignoring request", magic_enum::enum_name(modemCommand).data());
+            return false;
+        }
+
+        return true;
+    }
 
     bool Api::answerIncomingCall()
     {
-        if (cmux == nullptr) {
-            throw std::runtime_error("call api not initialized");
-        }
-        auto channel = cmux->get(CellularMux::Channel::Commands);
-        if (channel != nullptr) {
-            auto response = channel->cmd(at::AT::ATA);
-            if (response) {
-                return true;
-            }
-        }
-        return false;
+        return handleEvent(at::AT::ATA);
     }
 
     bool Api::hangupCall()
     {
-        if (cmux == nullptr) {
-            return false;
-        }
-        auto channel = cmux->get(CellularMux::Channel::Commands);
-        if (channel != nullptr) {
-            auto response = channel->cmd(at::AT::ATH);
-            if (response) {
-                return true;
-            }
-        }
-        return false;
+        return handleEvent(at::AT::ATH);
     }
 
     bool Api::rejectCall()
     {
-        if (cmux == nullptr) {
-            return false;
-        }
-        auto channel = cmux->get(CellularMux::Channel::Commands);
-        if (channel != nullptr) {
-            auto response = channel->cmd(at::AT::CHUP);
-            if (response) {
-                return true;
-            }
-        }
-        return false;
+        return handleEvent(at::AT::CHUP);
     }
 
     bool Api::areCallsFromFavouritesEnabled()
