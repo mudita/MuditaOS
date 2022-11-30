@@ -78,8 +78,10 @@ enum class Method
       "trayState":"1",
       "version": "0.73.1",
       "serialNumber": "12345678901234",
-      "backupLocation": "path/to/directory",
-      "syncPackageLocationLocation": "path/to/directory"
+      "recoveryStatusFilePath": "path/to/recovery_status",
+      "updateFilePath": "path/to/update_package",
+      "backupFilePath": "path/to/backup_package",
+      "syncFilePath": "path/to/sync_package",
    },
    "endpoint":1,
    "status":200,
@@ -112,8 +114,10 @@ enum class Method
  - *uuid* - unique payload id, same as in request message
  - *version* - os version string
  - *serialNumber* - device serial number (14 digits)
- - *"backupLocation"* - path to the location of backup files on device file-system
- - *"syncPackageLocation"* - path to the location of sync package on device filesystem
+ - *recoveryStatusFilePath* - location of the PureRecovery status file
+ - *updateFilePath* - location of the update package
+ - *backupFilePath* - location of the backup package
+ - *syncFilePath* - location of the sync package
 
 ```
 struct Network
