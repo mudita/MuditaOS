@@ -3,6 +3,7 @@
 --- helper scripts
 -- @module helpers
 local lfs = require('lfs')
+local json = require('lunajson')
 
 local helpers = {}
 
@@ -78,7 +79,7 @@ function helpers.copy_file(filename_in, filename_out)
     fd_out:close()
 end
 
---- Remove directory and its contents
+--- Remove directory and its content
 -- @function rmdir
 -- @param dir directory to remove
 function helpers.rmdir(dir)
@@ -93,6 +94,22 @@ function helpers.rmdir(dir)
         end
     end
     lfs.rmdir(dir)
+end
+
+--- Remove directory content
+-- @function rmdir_content
+-- @param dir directory path
+function helpers.rmdir_content(dir)
+    for file in lfs.dir(dir) do
+        local file_path = dir .. "/" .. file
+        if file ~= "." and file ~= ".." then
+            if lfs.attributes(file_path, "mode") == "file" then
+                assert(os.remove(file_path))
+            elseif lfs.attributes(file_path, "mode") == "directory" then
+                helpers.rmdir(file_path)
+            end
+        end
+    end
 end
 
 --- Remove all files from directory without touching internal directories
@@ -184,6 +201,9 @@ function helpers.get_file_extension(file)
     return file:match("^.+(%..+)$")
 end
 
+--- Create directory and all required subdirectories
+-- @function mkdirp
+-- @param file file path
 function helpers.mkdirp(p)
     if lfs.attributes(p, 'mode') == 'directory' then
         return nil, 'already exists'
@@ -197,6 +217,15 @@ function helpers.mkdirp(p)
         end
     end
     return lfs.mkdir(p)
+end
+
+--- Get OS version from the 'version.json'
+-- @function get_os_version
+-- @param file file path
+function helpers.get_os_version(file)
+    local contents = helpers.read_whole_file(file)
+    local root = json.decode(contents)
+    return root.os.version
 end
 
 return helpers

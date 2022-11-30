@@ -2,6 +2,7 @@ package.path = package.path .. ";share/?.lua"
 
 local helpers = require('helpers')
 
+local paths = require('paths')
 local rec = require('recovery')
 local backup = require('backup')
 local restore = require('restore')
@@ -32,11 +33,11 @@ local function print_boot_reason()
     print(string.format("Boot reason: %s", rec.sys.boot_reason_str()))
 end
 
-local function generate_report_file(boot_reason, success, message)
-    local file_path = rec.sys.source_slot() .. "/log/recovery_status.json"
+local function generate_report_file(boot_reason_str, success, message)
+    local file_path = paths.temp_dir .. "/recovery_status.json"
     local body = string.format(
-        "{\"version\": \"%s\",\"branch\": \"%s\",\"revision\": \"%s\",\"boot_reason\": %d,\"result\": %s,\"message\": \"%s\"}",
-        rec.version(), rec.branch(), rec.revision(), boot_reason, tostring(success), message)
+        "{\"version\": \"%s\",\"branch\": \"%s\",\"revision\": \"%s\",\"operation\": \"%s\",\"successful\": %s,\"message\": \"%s\"}",
+        rec.version(), rec.branch(), rec.revision(), boot_reason_str, tostring(success), message)
     local fd = io.open(file_path, 'w')
     fd:write(body)
     fd:close()
@@ -44,8 +45,9 @@ end
 
 local function handle_boot_reason()
     local boot_reason = rec.sys.boot_reason()
+    local boot_reason_str = rec.sys.boot_reason_str()
     rec.sys.set_boot_reason(rec.sys.boot_reason_codes.os)
-    return boot_reason
+    return boot_reason, boot_reason_str
 end
 
 local function handle_script_success(boot_reason)
@@ -58,8 +60,8 @@ local function handle_script_failure(boot_reason, message)
     display_image(scripts[boot_reason].img_failure)
 end
 
-local function handle_exit(boot_reason, status, message)
-    generate_report_file(boot_reason, status, message)
+local function handle_exit(boot_reason_str, status, message)
+    generate_report_file(boot_reason_str, status, message)
     rec.sys.sleep(1)
     rec.gui.clear()
 end
@@ -80,7 +82,7 @@ end
 
 print_recovery_info()
 print_boot_reason()
-local boot_reason = handle_boot_reason()
+local boot_reason, boot_reason_str = handle_boot_reason()
 local status, message = invoke_script(boot_reason)
-handle_exit(boot_reason, status, message)
+handle_exit(boot_reason_str, status, message)
 
