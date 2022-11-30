@@ -15,13 +15,12 @@ namespace db::tests
     class DatabaseScripts
     {
       public:
-        DatabaseScripts(std::filesystem::path directory, std::vector<std::string> &&exclude);
+        DatabaseScripts(std::filesystem::path directory, bool withDevelopment);
         bool operator()(Database &db);
 
       private:
         std::filesystem::path directory;
-        std::string extension;
-        std::vector<std::string> exclude;
+        bool withDevelopment;
     };
 
     template <typename Db>
@@ -36,11 +35,6 @@ namespace db::tests
 
             std::filesystem::remove(directory);
 
-            std::vector<std::string> excludeList;
-            if (not withDevelopment) {
-                excludeList.emplace_back("-devel");
-            }
-
             /// Some databases initialize internal fields in the constructors. To avoid fetching wrong data from
             /// uninitialized database fields spawn temporary database, execute any available scripts and finally
             /// recreate it. This way we are sure database will load correct data.
@@ -51,7 +45,7 @@ namespace db::tests
                     throw std::runtime_error("Could not initialize database");
                 }
 
-                if (not scriptsPath.empty() and not DatabaseScripts{scriptsPath, std::move(excludeList)}(*tempDb)) {
+                if (not scriptsPath.empty() and not DatabaseScripts{scriptsPath, withDevelopment}(*tempDb)) {
                     throw std::runtime_error("Failed to execute database scripts");
                 }
             }

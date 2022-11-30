@@ -19,7 +19,7 @@ namespace
     std::filesystem::path getScriptsPath()
     {
         const std::string path              = __FILE__;
-        const std::filesystem::path scripts = "../../../products/PurePhone/services/db/databases/scripts";
+        const std::filesystem::path scripts = "../../../products/PurePhone/services/db/databases/migration";
         return std::filesystem::path{path.substr(0, path.rfind('/'))} / scripts;
     }
 
@@ -32,7 +32,7 @@ namespace
 
 TEST_CASE("Quotes")
 {
-    db::tests::DatabaseUnderTest<Database> predefinedDb{"predefined_quotes.db", getScriptsPath(), true};
+    db::tests::DatabaseUnderTest<Database> predefinedDb{"predefined_quotes.db", getScriptsPath()};
     db::tests::DatabaseUnderTest<Database> customDb{"custom_quotes.db", getScriptsPath(), true};
 
     std::string timestampString{};
@@ -57,7 +57,7 @@ TEST_CASE("Quotes")
 
     SECTION("Enable category by id")
     {
-        bool enable;
+        bool enable{};
         const unsigned int categoryId = 5;
 
         // Initial conditions set
