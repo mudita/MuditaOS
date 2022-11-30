@@ -19,7 +19,6 @@
 
 namespace sdesktop::endpoints
 {
-
     auto DeviceInfoEndpoint::getSerialNumber() -> std::string
     {
         return dynamic_cast<ServiceDesktop *>(ownerServicePtr)->getSerialNumber();
@@ -58,8 +57,10 @@ namespace sdesktop::endpoints
              {json::version, std::string(VERSION)},
              {json::serialNumber, getSerialNumber()},
              {json::caseColour, getCaseColour()},
-             {json::backupLocation, purefs::dir::getBackupOSPath().string()},
-             {json::syncPackageLocation, purefs::dir::getSyncPackagePath().string()},
+             {json::recoveryStatusFilePath, purefs::dir::getTemporaryPath() / recoveryStatusFilename},
+             {json::updateFilePath, purefs::dir::getTemporaryPath() / updateFilename},
+             {json::backupFilePath, purefs::dir::getTemporaryPath() / backupFilename},
+             {json::syncFilePath, purefs::dir::getTemporaryPath() / syncFilename},
              {json::deviceToken, getDeviceToken()}}));
 
         return http::Code::OK;
