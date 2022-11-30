@@ -8,7 +8,7 @@
                 "prefix" : "/system_a"
             },
             "b": {
-                "bootable": true,
+                "bootable": false,
                 "successful": false,
                 "boot_attempts_left": "10",
                 "prefix" : "/system_b"
@@ -19,6 +19,6 @@
         "os": "os.bin",
         "recovery": "recovery.bin",
         "bin_dir": "bin",
-        "update_dir": "/user/update"
+        "update_dir": "/user/temp/update"
     }
 }
