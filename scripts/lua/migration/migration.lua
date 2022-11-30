@@ -56,7 +56,7 @@ local function read_db_version(file)
 end
 
 local function db_migrate_up(db_path, scripts, target_version)
-    current_version = read_db_version(db_path)
+    local current_version = read_db_version(db_path)
 
     if current_version == target_version then
         return migration.retcode.ALREADY_UP_TO_DATE
@@ -73,7 +73,7 @@ local function db_migrate_up(db_path, scripts, target_version)
 end
 
 local function db_migrate_down(db_path, scripts, target_version)
-    current_version = read_db_version(db_path)
+    local current_version = read_db_version(db_path)
 
     if current_version == target_version then
         return migration.retcode.ALREADY_UP_TO_DATE
