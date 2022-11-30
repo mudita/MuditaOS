@@ -1,0 +1,42 @@
+{
+    "git":
+    {
+        "git_branch": "@GIT_BRANCH@",
+        "git_commit": "@GIT_REV@"
+    },
+    "version":
+    {
+        "version": "@PROJECT_VERSION@"
+    },
+    "bootloader":
+    {
+        "version":  "@ECOBOOT_BIN_VERSION@",
+        "filename": "@BOOTLOADER_FILENAME@",
+        "md5sum":   "@BOOTLOADER_MD5SUM@"
+    },
+    "os":
+    {
+        "version":  "@OS_VERSION_MAJOR@.@OS_VERSION_MINOR@.@OS_VERSION_PATCH@",
+        "filename": "@OS_FILENAME@",
+        "md5sum":   "@OS_MD5SUM@"
+    },
+    "recovery":
+    {
+        "version":  "@RECOVERY_BIN_VERSION@",
+        "filename": "@RECOVERY_FILENAME@",
+        "md5sum":   "@RECOVERY_MD5SUM@"
+    },
+    "databases":[
+      {"name": "alarms", "version": "0"},
+      {"name": "callog", "version": "0"},
+      {"name": "contacts", "version": "0"},
+      {"name": "custom_quotes", "version": "0"},
+      {"name": "events", "version": "0"},
+      {"name": "multimedia", "version": "0"},
+      {"name": "notes", "version": "0"},
+      {"name": "notifications", "version": "0"},
+      {"name": "predefined_quotes", "version": "0"},
+      {"name": "settings_v2", "version": "0"},
+      {"name": "sms", "version": "0"}
+    ]
+}
