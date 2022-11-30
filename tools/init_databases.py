@@ -8,33 +8,45 @@ import sqlite3
 import argparse
 import logging
 import sys
+import json
 
 log = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', level=logging.INFO)
 
+databases_json_filename = "databases.json"
+scripts_folder_name = "scripts"
+migration_folder_name = "migration"
+
 
 # this helper script creates DBs from SQL schema files
-
-def initialize_database(script_path: os.path, dst_directory: os.path) -> int:
-    file_name = os.path.basename(script_path)
+def migrate_database_up(database: str, migration_path: os.path, dst_directory: os.path, dst_version: int, devel: bool):
     connection = None
 
-    db_name = file_name.split("_0")[0]
-    db_name = f"{db_name}.db"
-    dst_db_path = os.path.join(dst_directory, db_name)
-    log.debug(f"Executing {script_path} script into {dst_db_path} database")
+    db_name_full = f"{database}.db"
+    dst_db_path = os.path.join(dst_directory, db_name_full)
 
     ret = 0
     try:
         connection = sqlite3.connect(dst_db_path)
-        with open(script_path) as fp:
-            connection.executescript(fp.read())
-        connection.commit()
+        log.info(f"\nPerforming up-migration of {database} to {dst_version}")
+        for i in range(dst_version+1):
+            migration_script = os.path.join(migration_path, *[database, str(i), "up.sql"])
+            devel_script = os.path.join(migration_path, *[database, str(i), "devel.sql"])
+            with open(migration_script) as ms:
+                connection.executescript(ms.read())
+                connection.commit()
+                if devel and os.path.exists(devel_script):
+                    with open(devel_script) as ds:
+                        connection.executescript(ds.read())
+                connection.commit()
+                connection.execute(f"PRAGMA user_version = {i};")
+                connection.commit()
+
     except OSError as e:
         log.error(f"System error: {e}")
         ret = 1
     except sqlite3.Error as e:
-        log.error(f"[SQLite] {db_name} database error: {e}")
+        log.error(f"[SQLite] {database} database error: {e}")
         ret = 1
     finally:
         if connection:
@@ -43,12 +55,32 @@ def initialize_database(script_path: os.path, dst_directory: os.path) -> int:
     return ret
 
 
+def migrate_database_wrapper(migration_path: os.path, json: json, dst_directory: os.path, devel: bool) -> int:
+    product = list(json.keys())[0]
+    databases_json = json[product]["databases"]
+    databases = os.listdir(migration_path)
+    databases_to_migrate = set([database["name"] for database in databases_json]).intersection(databases)
+
+    for database in databases_json:
+        name = database["name"]
+        if name in databases_to_migrate:
+            migrate_database_up(name, migration_path, dst_directory, int(database["version"]), devel)
+
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description='Create databases from schema scripts')
-    parser.add_argument('--input_path',
-                        metavar='schema_path',
+    parser.add_argument('--common_path',
+                        metavar='common_path',
                         type=str,
-                        help='path to schema scripts',
+                        help='path to common databases scripts',
+                        required=True)
+
+    parser.add_argument('--product_path',
+                        metavar='product_path',
+                        type=str,
+                        help='path to product-specific databases scripts',
                         required=True)
 
     parser.add_argument('--output_path',
@@ -65,28 +97,24 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    db_script_files = [
-        os.path.join(args.input_path, file)
-        for file in os.listdir(args.input_path)
-        if os.path.isfile(os.path.join(args.input_path, file)) and ".sql" in file
-    ]
-    db_script_devel = [file for file in db_script_files if "devel" in file]
-    db_script_no_devel = list(set(db_script_files) - set(db_script_devel))
+    ret = 0
 
-    db_script_devel.sort()
-    db_script_no_devel.sort()
+    json_path = os.path.join(args.product_path, databases_json_filename)
+    json_data = None
+
+    if os.path.exists(json_path):
+        with open(json_path, "r") as json_file:
+            json_data = json.load(json_file)
+    else:
+        log.error("Json file does not exists!")
+        return 1
 
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path, exist_ok=True)
 
-    ret = 0
-
-    for script in db_script_no_devel:
-        ret |= initialize_database(script, args.output_path)
-
-    if args.development:
-        for script in db_script_devel:
-            ret |= initialize_database(script, args.output_path)
+    for database_path in [args.common_path, args.product_path]:
+        migration_path = os.path.join(database_path, migration_folder_name)
+        ret |= migrate_database_wrapper(migration_path, json_data, args.output_path, args.development)
 
     return ret
 
