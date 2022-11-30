@@ -19,6 +19,10 @@ function(add_version_rt1051_json SOURCE_TARGET)
             -DRECOVERY_BIN_VERSION=${RECOVERY_BIN_VERSION}
             -B ${CMAKE_BINARY_DIR}
             -P ${CMAKE_SOURCE_DIR}/cmake/modules/ConfigureVersionJson.cmake
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/add_dbs_to_version_json.py
+            --input_path ${CMAKE_SOURCE_DIR}/products/${SOURCE_TARGET}/services/db/databases/databases.json
+            --output_path ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json
+            --product ${SOURCE_TARGET}
         DEPENDS ecoboot.bin-target
         DEPENDS recovery.bin-target
         DEPENDS ${SOURCE_TARGET}-boot.bin
@@ -35,7 +39,6 @@ function(add_version_rt1051_json SOURCE_TARGET)
 
     add_custom_target(${SOURCE_TARGET}-version.json-target DEPENDS add-${SOURCE_TARGET}-version.json)
 
-#    multicomp_install(FILES ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json DESTINATION "./" RENAME "version.json" COMPONENTS Standalone Update)
 endfunction()
 
 function(add_version_linux_json SOURCE_TARGET)
@@ -50,6 +53,10 @@ function(add_version_linux_json SOURCE_TARGET)
             -DOS_VERSION_LABEL=${OS_VERSION_LABEL}
             -B ${CMAKE_BINARY_DIR}
             -P ${CMAKE_SOURCE_DIR}/cmake/modules/ConfigureVersionJson.cmake
+COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/add_dbs_to_version_json.py
+            --input_path ${CMAKE_SOURCE_DIR}/products/${SOURCE_TARGET}/services/db/databases/databases.json
+            --output_path ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json
+            --product ${SOURCE_TARGET}
     )
 
     add_custom_command(OUTPUT add-${SOURCE_TARGET}-version.json
@@ -63,5 +70,4 @@ function(add_version_linux_json SOURCE_TARGET)
 
     add_custom_target(${SOURCE_TARGET}-version.json-target DEPENDS add-${SOURCE_TARGET}-version.json)
 
-#    multicomp_install(FILES ${CMAKE_BINARY_DIR}/${SOURCE_TARGET}-version.json DESTINATION "./" RENAME "version.json" COMPONENTS Standalone Update)
 endfunction()

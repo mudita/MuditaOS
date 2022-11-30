@@ -27,7 +27,7 @@ namespace
     {
         const std::string path = __FILE__;
         const auto dir         = std::filesystem::path{path.substr(0, path.rfind('/'))};
-        return dir / "../databases/scripts";
+        return dir / "../databases/migration";
     }
 } // namespace
 
