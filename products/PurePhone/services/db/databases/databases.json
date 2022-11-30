@@ -1,0 +1,17 @@
+{
+  "PurePhone": {
+    "databases":[
+      {"name": "events", "version": "0"},
+      {"name": "multimedia", "version": "0"},
+      {"name": "alarms", "version": "0"},
+      {"name": "calllog", "version": "0"},
+      {"name": "contacts", "version": "0"},
+      {"name": "custom_quotes", "version": "0"},
+      {"name": "notes", "version": "0"},
+      {"name": "notifications", "version": "0"},
+      {"name": "predefined_quotes", "version": "0"},
+      {"name": "settings_v2", "version": "0"},
+      {"name": "sms", "version": "0"}
+    ]
+  }
+}
