@@ -79,7 +79,7 @@ function helpers.copy_file(filename_in, filename_out)
     fd_out:close()
 end
 
---- Remove directory and its content
+--- Remove directory and its contents
 -- @function rmdir
 -- @param dir directory to remove
 function helpers.rmdir(dir)

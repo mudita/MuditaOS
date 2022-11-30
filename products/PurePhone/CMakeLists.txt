@@ -108,9 +108,9 @@ include(AddVersionJson)
 
 add_directories(
         TARGET create_user_directories
-        PREFIX ${SYSROOT_PATH}/user/media/app
+        PREFIX ${SYSROOT_PATH}/user
         DEPENDS system_directories_common
-        DIRECTORIES music_player
+        DIRECTORIES data temp media/app/music_player
 )
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")

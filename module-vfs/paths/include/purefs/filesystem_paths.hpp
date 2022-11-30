@@ -15,13 +15,11 @@ namespace purefs
         std::filesystem::path getUserDiskPath() noexcept;
         std::filesystem::path getMfgConfPath() noexcept;
         std::filesystem::path getDatabasesPath() noexcept;
-        std::filesystem::path getUpdateDirPath() noexcept;
         std::filesystem::path getSyncPackagePath() noexcept;
         std::filesystem::path getLogsPath() noexcept;
         std::filesystem::path getCrashDumpsPath() noexcept;
         std::filesystem::path getUserMediaPath() noexcept;
         std::filesystem::path getTemporaryPath() noexcept;
-        std::filesystem::path getBackupOSPath() noexcept;
         std::filesystem::path getBootJSONPath() noexcept;
         std::filesystem::path getAssetsDirPath() noexcept;
         std::filesystem::path getSystemDataDirPath() noexcept;
