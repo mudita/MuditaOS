@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -36,6 +36,7 @@ namespace bsp
         xQueueHandle queueHandle;
         xQueueHandle irqQueueHandle;
         std::string serialNumber;
+        std::uint16_t deviceVersion;
         std::string rootPath;
     };
 
@@ -44,7 +45,7 @@ namespace bsp
     int usbCDCSend(std::string *sendMsg);
     int usbCDCSendRaw(const char *dataPtr, size_t dataLen);
     void usbDeinit();
-    void usbReinit(const std::string& rootPath);
+    void usbReinit(const std::string &rootPath);
     void usbSuspend();
     void usbHandleDataReceived();
 

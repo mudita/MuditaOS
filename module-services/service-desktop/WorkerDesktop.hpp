@@ -23,6 +23,7 @@ class WorkerDesktop : public sys::Worker
                   std::function<void()> messageProcessedCallback,
                   const sdesktop::USBSecurityModel &securityModel,
                   const std::string &serialNumber,
+                  const std::string &caseColour,
                   const std::string &rootPath);
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
@@ -51,6 +52,7 @@ class WorkerDesktop : public sys::Worker
     xQueueHandle irqQueue;
     const sdesktop::USBSecurityModel &securityModel;
     const std::string serialNumber;
+    const std::string caseColour;
     std::string rootPath;
     sys::Service *ownerService = nullptr;
     sdesktop::endpoints::StateMachine parser;
