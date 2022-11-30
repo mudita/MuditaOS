@@ -4,6 +4,7 @@
 #include "Helpers.hpp"
 
 #include <Utils.hpp>
+#include <vector>
 #include <set>
 #include <algorithm>
 #include <utility>
@@ -62,44 +63,32 @@ namespace
         return statements;
     }
 
-    std::array<std::string, 3> splitFilename(const std::string &filename)
+    std::set<std::filesystem::path> listVersionDirectories(const std::filesystem::path &path, const std::string &dbName)
     {
-        const auto name    = filename.substr(0, filename.find("."));
-        const auto prefix  = name.substr(0, name.find_last_of("_"));
-        const auto postfix = name.substr(name.find_last_of("_") + 1, std::string::npos);
-
-        return {name, prefix, postfix};
-    }
-
-    bool isOnExcludedList(const std::string &name, const std::vector<std::string> &excludedList)
-    {
-        return std::any_of(excludedList.begin(), excludedList.end(), [&name](const auto &entry) {
-            return name.find(entry) != std::string::npos;
-        });
+        std::set<std::filesystem::path> versions;
+        for (const auto &entry : std::filesystem::directory_iterator(path)) {
+            if (entry.is_directory() and entry.path().filename() == dbName) {
+                for (const auto &version : std::filesystem::directory_iterator(entry.path())) {
+                    versions.insert(version.path());
+                }
+            }
+        }
+        return versions;
     }
 
     std::vector<std::filesystem::path> listFiles(const std::filesystem::path &path,
                                                  const std::string &prefix,
-                                                 const std::vector<std::string> &excludedList)
+                                                 const bool withDevelopment)
     {
-        std::set<std::pair<int, std::filesystem::path>> orderedFiles;
-        for (const auto &entry : std::filesystem::directory_iterator(path)) {
-            if (!entry.is_directory() && entry.path().has_filename()) {
-                try {
-                    const auto parts       = splitFilename(entry.path().filename().string());
-                    const auto &filePrefix = parts[1];
-                    if (filePrefix == prefix and not isOnExcludedList(parts[0], excludedList)) {
-                        orderedFiles.insert({std::stoi(parts[2]), entry.path()});
-                    }
-                }
-                catch (std::invalid_argument &e) {
-                    printf("Ignoring file: %s", entry.path().c_str());
-                }
+        constexpr auto up_sql    = "up.sql";
+        constexpr auto devel_sql = "devel.sql";
+        std::vector<std::filesystem::path> files;
+        for (const auto &version : listVersionDirectories(path, prefix)) {
+            files.push_back(version / up_sql);
+            if (withDevelopment and std::filesystem::exists(version / devel_sql)) {
+                files.push_back(version / devel_sql);
             }
         }
-
-        std::vector<std::filesystem::path> files;
-        std::for_each(orderedFiles.begin(), orderedFiles.end(), [&](auto item) { files.push_back(item.second); });
         return files;
     }
 
@@ -121,7 +110,7 @@ namespace db::tests
 
     std::filesystem::path getScriptsPath()
     {
-        return currentFileLocation() / "../databases/scripts";
+        return currentFileLocation() / "../databases/migration";
     }
 
     /// TODO:
@@ -131,7 +120,7 @@ namespace db::tests
     /// placed in the correct directory.
     std::filesystem::path getPurePhoneScriptsPath()
     {
-        return currentFileLocation() / "../../products/PurePhone/services/db/databases/scripts";
+        return currentFileLocation() / "../../products/PurePhone/services/db/databases/migration";
     }
 
     bool DatabaseScripts::operator()(Database &db)
@@ -139,12 +128,12 @@ namespace db::tests
         const std::filesystem::path dbpath = db.getName();
         const std::string dbname           = dbpath.filename().replace_extension();
 
-        const auto scripts = listFiles(directory, dbname, exclude);
+        const auto scripts = listFiles(directory, dbname, withDevelopment);
         return std::all_of(scripts.begin(), scripts.end(), [&db](const auto &script) {
             return executeOnDb(db, readCommands(script));
         });
     }
-    DatabaseScripts::DatabaseScripts(std::filesystem::path directory, std::vector<std::string> &&exclude)
-        : directory{std::move(directory)}, extension{".sql"}, exclude{std::move(exclude)}
+    DatabaseScripts::DatabaseScripts(std::filesystem::path directory, bool withDevelopment)
+        : directory{std::move(directory)}, withDevelopment{withDevelopment}
     {}
 } // namespace db::tests
