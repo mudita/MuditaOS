@@ -28,7 +28,8 @@ if validate_product_selection; then
     cd "$parent_path"
 
     mkdir -p ${DESTINATION}
-    cp -r assets/${PRODUCT} ${DESTINATION}/assets/
+    cp -r products/${PRODUCT}/assets ${DESTINATION}/assets/
+    cp products/${PRODUCT}/product_updater.lua ${DESTINATION}/product_updater.lua
     cp -r share ${DESTINATION}/share
     cp -r migration/migration.lua ${DESTINATION}/share
     cp *.lua ${DESTINATION}
