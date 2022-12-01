@@ -65,6 +65,7 @@ namespace gui::window::name
     inline constexpr auto certification         = "Certification";
     inline constexpr auto sar                   = "Sar";
     inline constexpr auto factory_reset         = "FactoryReset";
+    inline constexpr auto factory_reset_in_progress = "FactoryResetInProgress";
 
     inline constexpr auto dialog_settings = "DialogSettings";
 } // namespace gui::window::name

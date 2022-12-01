@@ -185,7 +185,7 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
 #endif
 #ifdef ENABLE_SERVICE_EINK
-    systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
+    systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>(service::eink::ExitAction::None));
 #endif
 #ifdef ENABLE_SERVICE_GUI
     systemServices.emplace_back(
