@@ -9,6 +9,7 @@ import argparse
 import logging
 import sys
 import json
+import shutil
 
 log = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', level=logging.INFO)
@@ -29,7 +30,7 @@ def migrate_database_up(database: str, migration_path: os.path, dst_directory: o
     try:
         connection = sqlite3.connect(dst_db_path)
         log.info(f"\nPerforming up-migration of {database} to {dst_version}")
-        for i in range(dst_version+1):
+        for i in range(dst_version + 1):
             migration_script = os.path.join(migration_path, *[database, str(i), "up.sql"])
             devel_script = os.path.join(migration_path, *[database, str(i), "devel.sql"])
             with open(migration_script) as ms:
@@ -115,6 +116,7 @@ def main() -> int:
     for database_path in [args.common_path, args.product_path]:
         migration_path = os.path.join(database_path, migration_folder_name)
         ret |= migrate_database_wrapper(migration_path, json_data, args.output_path, args.development)
+        shutil.copytree(migration_path, os.path.join(args.output_path, migration_folder_name), dirs_exist_ok=True)
 
     return ret
 
