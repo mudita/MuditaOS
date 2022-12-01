@@ -217,7 +217,8 @@ namespace app
             return {{manager::actions::Launch,
                      manager::actions::PhoneModeChanged,
                      manager::actions::BluetoothModeChanged,
-                     manager::actions::AlarmClockStatusChanged}};
+                     manager::actions::AlarmClockStatusChanged,
+                     manager::actions::DisplayFactoryResetInProgressScreen}};
         }
     };
 } /* namespace app */
