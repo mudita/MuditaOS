@@ -21,11 +21,9 @@
 #include <Utils.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-desktop/Constants.hpp>
-#include <service-desktop/DesktopMessages.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <AppWindowConstants.hpp>
-#include <service-db/DBServiceAPI.hpp>
 
 #include <algorithm>
 #include <utility>
@@ -38,7 +36,8 @@ namespace app::manager
 
         bool checkIfCloseableAction(const actions::Action action)
         {
-            return action == app::manager::actions::DisplayLogoAtExit or
+            return action == app::manager::actions::DisplayFactoryResetInProgressScreen ||
+                   action == app::manager::actions::DisplayLogoAtExit ||
                    action == app::manager::actions::SystemBrownout;
         }
 
@@ -48,6 +47,8 @@ namespace app::manager
             case sys::CloseReason::SystemBrownout:
             case sys::CloseReason::LowBattery:
                 return ActionRequest{senderName, app::manager::actions::SystemBrownout, nullptr};
+            case sys::CloseReason::RebootToRecovery:
+                return ActionRequest{senderName, app::manager::actions::DisplayFactoryResetInProgressScreen, nullptr};
             default:
                 return ActionRequest{senderName, app::manager::actions::DisplayLogoAtExit, nullptr};
             }
