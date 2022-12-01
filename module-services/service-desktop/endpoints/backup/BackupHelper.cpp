@@ -64,36 +64,17 @@ namespace sdesktop::endpoints
 
             // return new generated sync package info
 
-            return {sent::no,
-                    ResponseContext{.status = http::Code::Accepted,
-                                    .body   = json11::Json::object{
-                                        {sdesktop::endpoints::json::taskId, ownerServicePtr->getSyncStatus().taskId}}}};
+            return {sent::no, ResponseContext{.status = http::Code::Accepted, .body = json11::Json::object{}}};
         }
     }
 
-    auto BackupHelper::checkSyncState(Context &context) -> ProcessResult
+    auto BackupHelper::checkSyncState([[maybe_unused]] Context &context) -> ProcessResult
     {
-        auto ownerServicePtr = static_cast<ServiceDesktop *>(owner);
-        auto status          = http::Code::BadRequest;
+        const auto ownerServicePtr = static_cast<ServiceDesktop *>(owner);
+        const auto syncStatus      = ownerServicePtr->getSyncStatus();
 
-        if (!context.getBody()[json::taskId].is_string()) {
-            LOG_DEBUG("Backup task not found");
-            return {sent::no, ResponseContext{.status = status}};
-        }
-
-        if (ownerServicePtr->getSyncStatus().taskId != context.getBody()[json::taskId].string_value()) {
-            status = http::Code::NotFound;
-            return {sent::no, ResponseContext{.status = status}};
-        }
-
-        auto syncStatus = ownerServicePtr->getSyncStatus();
-
-        if (syncStatus.state == Sync::OperationState::Finished) {
-            status = http::Code::SeeOther;
-        }
-        else {
-            status = http::Code::OK;
-        }
+        const auto status =
+            (syncStatus.state == Sync::OperationState::Finished) ? http::Code::SeeOther : http::Code::NoContent;
         return {sent::no, ResponseContext{.status = status, .body = syncStatus}};
     }
 

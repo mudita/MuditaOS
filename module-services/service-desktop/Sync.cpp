@@ -8,6 +8,7 @@
 #include <fstream>
 #include <gsl/util>
 #include <microtar.hpp>
+#include <service-desktop/Constants.hpp>
 
 namespace sys
 {
@@ -92,7 +93,7 @@ bool Sync::PackSyncFiles(const std::filesystem::path &path)
     }
 
     auto isTarFileOpen                = false;
-    std::filesystem::path tarFilePath = (purefs::dir::getTemporaryPath() / path.filename());
+    std::filesystem::path tarFilePath = (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename);
     mtar_t tarFile;
 
     auto cleanup = gsl::finally([&isTarFileOpen, &tarFile]() {
@@ -151,10 +152,8 @@ bool Sync::PackSyncFiles(const std::filesystem::path &path)
                 readSize = purefs::buffer::tar_buf;
             }
 
-            LOG_DEBUG("Reading file ...");
             fileStream.read(fileStreamBuffer.get(), readSize);
 
-            LOG_DEBUG("Writing into sync package...");
             if (mtar_write_data(&tarFile, fileStreamBuffer.get(), readSize) != MTAR_ESUCCESS) {
                 LOG_ERROR("Writing into sync package failed, quitting...");
                 return false;
