@@ -65,7 +65,7 @@ namespace purefs
 
         std::filesystem::path getTemporaryPath() noexcept
         {
-            return getSystemDiskPath() / PATH_TMP;
+            return getUserDiskPath() / PATH_TMP;
         }
 
         std::filesystem::path getBootJSONPath() noexcept
