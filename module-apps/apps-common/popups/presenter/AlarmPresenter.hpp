@@ -4,6 +4,7 @@
 #pragma once
 
 #include "time/dateCommon.hpp"
+#include "Timers/TimerFactory.hpp"
 #include <AlarmEventRecord.hpp>
 #include <ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
@@ -130,6 +131,7 @@ namespace app::popup
 
       private:
         bool noteChanged = false;
+        sys::TimerHandle timerHandle{};
         /// returns how many seconds we can snooze the alarm
         virtual std::uint32_t getSnoozeTime() override;
         /// returns if alarm has snooze time available
