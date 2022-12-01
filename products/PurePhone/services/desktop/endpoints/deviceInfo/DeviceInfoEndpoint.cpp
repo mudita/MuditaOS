@@ -57,10 +57,10 @@ namespace sdesktop::endpoints
              {json::version, std::string(VERSION)},
              {json::serialNumber, getSerialNumber()},
              {json::caseColour, getCaseColour()},
-             {json::recoveryStatusFilePath, purefs::dir::getTemporaryPath() / recoveryStatusFilename},
-             {json::updateFilePath, purefs::dir::getTemporaryPath() / updateFilename},
-             {json::backupFilePath, purefs::dir::getTemporaryPath() / backupFilename},
-             {json::syncFilePath, purefs::dir::getTemporaryPath() / syncFilename},
+             {json::recoveryStatusFilePath, (purefs::dir::getTemporaryPath() / recoveryStatusFilename).string()},
+             {json::updateFilePath, (purefs::dir::getTemporaryPath() / updateFilename).string()},
+             {json::backupFilePath, (purefs::dir::getTemporaryPath() / backupFilename).string()},
+             {json::syncFilePath, (purefs::dir::getTemporaryPath() / syncFilename).string()},
              {json::deviceToken, getDeviceToken()}}));
 
         return http::Code::OK;
