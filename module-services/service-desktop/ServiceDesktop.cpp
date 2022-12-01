@@ -90,22 +90,10 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage * /*msg
     return response;
 }
 
-std::string ServiceDesktop::prepareSyncFilename()
-{
-    const std::size_t maxFileNameSize = 64;
-    std::array<char, maxFileNameSize> syncFileName{};
-    std::time_t now;
-    std::time(&now);
-    std::strftime(syncFileName.data(), syncFileName.size(), "%FT%OH%OM%OSZ", std::localtime(&now));
-
-    return std::string(syncFileName.data());
-}
-
 void ServiceDesktop::prepareSyncData()
 {
-    syncStatus.taskId  = prepareSyncFilename();
     syncStatus.state   = Sync::OperationState::Stopped;
-    syncStatus.tempDir = purefs::dir::getTemporaryPath() / syncStatus.taskId;
+    syncStatus.tempDir = purefs::dir::getTemporaryPath() / "sync";
 }
 
 auto ServiceDesktop::requestLogsFlush() -> void
