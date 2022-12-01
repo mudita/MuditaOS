@@ -52,6 +52,7 @@ namespace app::manager
             DisplayLowBatteryScreen,
             SystemBrownout,
             DisplayLogoAtExit,
+            DisplayFactoryResetInProgressScreen,
             SMSRejectedByOfflineNotification,
             CallRejectedByOfflineNotification,
             PhoneModeChanged,
