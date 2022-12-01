@@ -7,6 +7,11 @@
 #include "service-time/AlarmMessage.hpp"
 #include "time/dateCommon.hpp"
 
+namespace
+{
+    constexpr auto ACTIVE_ALARM_TIMEOUT = 30min;
+}
+
 namespace app::popup
 {
     AlarmPopupContract::AlarmModel::AlarmModel(ApplicationCommon *app) : AsyncCallbackReceiver(app), app(app)
@@ -130,6 +135,8 @@ namespace app::popup
         else {
             this->getModel()
                 ->snoozeAlarm<alarms::RingingAlarmSnoozeRequestMessage, alarms::RingingAlarmSnoozeResponseMessage>();
+            if (timerHandle.isActive())
+                timerHandle.stop();
         }
         LOG_DEBUG("Snoozed!");
     }
@@ -142,6 +149,8 @@ namespace app::popup
         else {
             this->getModel()
                 ->stopAlarm<alarms::RingingAlarmTurnOffRequestMessage, alarms::RingingAlarmTurnOffResponseMessage>();
+            if (timerHandle.isActive())
+                timerHandle.stop();
         }
         LOG_DEBUG("Stopped!");
     }
@@ -185,5 +194,9 @@ namespace app::popup
     }
 
     AlarmPopupPresenter::AlarmPopupPresenter(ApplicationCommon *app) : AlarmPopupContract::Presenter(app)
-    {}
+    {
+        timerHandle = sys::TimerFactory::createSingleShotTimer(
+            app, "AlarmTimer", ACTIVE_ALARM_TIMEOUT, [this](sys::Timer &) { snoozeHit(); });
+        timerHandle.start();
+    }
 } // namespace app::popup
