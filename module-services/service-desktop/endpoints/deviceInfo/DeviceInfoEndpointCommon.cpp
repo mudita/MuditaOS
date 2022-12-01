@@ -3,19 +3,10 @@
 
 #include <endpoints/deviceInfo/DeviceInfoEndpointCommon.hpp>
 #include <endpoints/message/Sender.hpp>
-#include <endpoints/JsonKeyNames.hpp>
 
-#include <EventStore.hpp>
-#include <product/version.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 
-#include <cstdint>
-#include <string>
-#include <vector>
 #include <sys/statvfs.h>
-#include <purefs/filesystem_paths.hpp>
-
-#include <ctime>
 
 namespace sdesktop::endpoints
 {
@@ -37,8 +28,7 @@ namespace sdesktop::endpoints
     auto DeviceInfoEndpointCommon::handleGet(Context &context) -> http::Code
     {
         const auto &requestBody = context.getBody();
-
-        if (requestBody[json::fileList].is_number()) {
+        if (not requestBody.object_items().empty() and requestBody[json::fileList].is_number()) {
 
             const auto diagFileType = parseDiagnosticFileType(requestBody[json::fileList]);
 
@@ -47,12 +37,10 @@ namespace sdesktop::endpoints
 
                 return http::Code::BadRequest;
             }
-
             return gatherListOfDiagnostics(context, diagFileType);
         }
-        else {
-            return getDeviceInfo(context);
-        }
+
+        return getDeviceInfo(context);
     }
 
     auto DeviceInfoEndpointCommon::parseDiagnosticFileType(const json11::Json &fileList) -> DiagnosticFileType
