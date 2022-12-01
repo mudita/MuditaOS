@@ -42,10 +42,11 @@ namespace sdesktop::endpoints
              {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
              {json::version, std::string(VERSION)},
              {json::serialNumber, getSerialNumber()},
-             {json::recoveryStatusFilePath, (purefs::dir::getTemporaryPath() / recoveryStatusFilename).string()},
-             {json::updateFilePath, (purefs::dir::getTemporaryPath() / updateFilename).string()},
-             {json::backupFilePath, (purefs::dir::getTemporaryPath() / backupFilename).string()},
-             {json::syncFilePath, (purefs::dir::getTemporaryPath() / syncFilename).string()}}));
+             {json::recoveryStatusFilePath,
+              (purefs::dir::getTemporaryPath() / sdesktop::paths::recoveryStatusFilename).string()},
+             {json::updateFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename).string()},
+             {json::backupFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::backupFilename).string()},
+             {json::syncFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename).string()}}));
 
         return http::Code::OK;
     }

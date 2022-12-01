@@ -68,7 +68,6 @@ class Sync
     {
         std::filesystem::path tempDir;
         CompletionCode completionCode = CompletionCode::Success;
-        std::string taskId;
         OperationState state = OperationState::Stopped;
         json11::Json to_json() const
         {
