@@ -18,7 +18,7 @@ restore.img_failure = "assets/gui_image_restore_failed.bin"
 
 local function check_available_space()
     local backup_size = lfs.attributes(paths.backup_file, 'size')
-    local available_space = recovery.sys.free_space(paths.user_dir)
+    local available_space = recovery.sys.free_space(recovery.sys.user())
 
     print(string.format("Checking disk space:\nNeeded space: %d bytes, available space: %d bytes", backup_size,
         available_space))

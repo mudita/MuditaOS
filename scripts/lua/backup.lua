@@ -16,7 +16,7 @@ backup.img_failure = "assets/gui_image_backup_failed.bin"
 local function check_available_space()
     local db_size = helpers.dir_size_filtered(paths.db_dir, match_db_files)
     local version_size = lfs.attributes(paths.version_file, 'size')
-    local available_space = recovery.sys.free_space(paths.user_dir)
+    local available_space = recovery.sys.free_space(recovery.sys.user())
     -- Multiply the result by two due to the internal padding inside tar
     local required_space = (db_size + version_size) * 2
 
