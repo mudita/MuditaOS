@@ -4,13 +4,17 @@
 #pragma once
 
 #include <AppWindow.hpp>
+#include <gui/widgets/Icon.hpp>
 
 namespace gui
 {
-    class ClosingWindow : public AppWindow
+    class FactoryResetInProgressWindow : public AppWindow
     {
+      private:
+        Icon *infoIcon = nullptr;
+
       public:
-        explicit ClosingWindow(app::ApplicationCommon *app);
+        explicit FactoryResetInProgressWindow(app::ApplicationCommon *app);
         void buildInterface() override;
     };
 } /* namespace gui */

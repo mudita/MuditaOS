@@ -94,6 +94,7 @@ target_sources(application-settings
         windows/system/SARInfoWindow.cpp
         windows/system/SystemMainWindow.cpp
         windows/system/TechnicalInformationWindow.cpp
+        windows/system/FactoryResetInProgressWindow.cpp
     PRIVATE
         models/advanced/ColorTestModel.hpp
         widgets/SettingsStyle.hpp
@@ -128,6 +129,7 @@ target_sources(application-settings
         windows/system/LanguagesWindow.hpp
         windows/system/SystemMainWindow.hpp
         windows/system/TechnicalInformationWindow.hpp
+        windows/system/FactoryResetInProgressWindow.hpp
     PUBLIC
         include/application-settings/ApplicationSettings.hpp
 )
