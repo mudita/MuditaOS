@@ -22,6 +22,8 @@ local function display_image(path)
     local raw_data = helpers.read_whole_file(path)
     rec.gui.clear()
     rec.gui.display_raw_img(600, 480, raw_data)
+    -- Give some time to an user to view the displayed image
+    rec.sys.sleep(5)
 end
 
 local function print_recovery_info()
@@ -56,13 +58,12 @@ local function handle_script_success(boot_reason)
 end
 
 local function handle_script_failure(boot_reason, message)
-    print(message)
     display_image(scripts[boot_reason].img_failure)
+    print(message)
 end
 
 local function handle_exit(boot_reason_str, status, message)
     generate_report_file(boot_reason_str, status, message)
-    rec.sys.sleep(1)
     rec.gui.clear()
 end
 

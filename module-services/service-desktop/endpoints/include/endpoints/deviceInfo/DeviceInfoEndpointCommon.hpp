@@ -40,12 +40,6 @@ namespace sdesktop::endpoints
         {
             return http::Code::BadRequest;
         };
-
-      protected:
-        static constexpr auto updateFilename         = "update.tar";
-        static constexpr auto syncFilename           = "sync.tar";
-        static constexpr auto backupFilename         = "backup.tar";
-        static constexpr auto recoveryStatusFilename = "recovery_status.json";
     };
 
 } // namespace sdesktop::endpoints
