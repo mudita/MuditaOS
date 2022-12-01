@@ -51,6 +51,7 @@
 #include <application-settings/windows/system/TechnicalInformationWindow.hpp>
 #include <application-settings/windows/system/CertificationWindow.hpp>
 #include <application-settings/windows/system/SARInfoWindow.hpp>
+#include <application-settings/windows/system/FactoryResetInProgressWindow.hpp>
 #include <application-settings/data/ApnListData.hpp>
 #include <application-settings/data/BondedDevicesData.hpp>
 #include <application-settings/data/BluetoothStatusData.hpp>
@@ -329,6 +330,11 @@ namespace app
         connect(typeid(cellular::VolteStateNotification),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleVolteState(msg); });
 
+        addActionReceiver(app::manager::actions::DisplayFactoryResetInProgressScreen, [this](auto &&data) {
+            requestShutdownWindow(gui::window::name::factory_reset_in_progress);
+            return actionHandled();
+        });
+
         createUserInterface();
 
         settings->registerValueChange(settings::operators_on,
@@ -557,7 +563,6 @@ namespace app
         windowsFactory.attach(gui::window::name::factory_reset, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
-
         windowsFactory.attach(gui::window::name::dialog_settings, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
         });
@@ -567,6 +572,10 @@ namespace app
         windowsFactory.attach(gui::window::name::dialog_retry, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogRetry>(app, name);
         });
+        windowsFactory.attach(gui::window::name::factory_reset_in_progress,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::FactoryResetInProgressWindow>(app);
+                              });
 
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
