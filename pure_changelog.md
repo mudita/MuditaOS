@@ -41,6 +41,7 @@
 * Fixed windows flow regarding PUK requests after too many PIN mistakes
 * Fixed disappearing "confirm" button in PIN entering screen
 * Fixed looping on the SIM card selection screen
+* Fixed adding country code prefix to existing contact
 
 ### Added
 * Added a popup for changing the SIM card

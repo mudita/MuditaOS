@@ -264,7 +264,12 @@ TEST_CASE("Contact record numbers update")
     auto records = ContactRecordInterface(&contactDB);
 
     ContactRecord testRecord, otherRecord;
-    std::array<std::string, 4> numbers = {{{"600100100"}, {"600100200"}, {"600100300"}, {"600100400"}}};
+    std::array<std::string, 4> numbers   = {{{"600100100"}, {"600100200"}, {"600100300"}, {"600100400"}}};
+    std::array<std::string, 4> numbersPL = {
+        {{"+48600100100"}, {"+48600100200"}, {"+48600100300"}, {"+48600100400"}}}; // Poland country code
+    std::array<std::string, 4> numbersFR = {
+        {{"+33600100100"}, {"+33600100200"}, {"+33600100300"}, {"+33600100400"}}}; // France country code
+    std::array<std::string, 2> unUsedNumbers = {{{"612130140"}, {"612130141"}}};
 
     testRecord.primaryName     = "number";
     testRecord.alternativeName = "test";
@@ -369,6 +374,223 @@ TEST_CASE("Contact record numbers update")
         REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[3]);
     }
 
+    SECTION("Single number update - new unused number")
+    {
+        auto newRecord = records.GetByID(1);
+        REQUIRE(newRecord.numbers.size() == 2);
+
+        newRecord.numbers =
+            std::vector<ContactRecord::Number>({ContactRecord::Number(unUsedNumbers[0], std::string("")),
+                                                ContactRecord::Number(numbers[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
+        REQUIRE(contactDB.number.count() == 5);
+        REQUIRE(contactDB.number.getById(1).contactID != 1); // old numbers do not belong to any contact
+        REQUIRE(contactDB.number.getById(1).contactID != 2);
+
+        auto validationRecord = records.GetByID(1);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == unUsedNumbers[0]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[1]);
+
+        validationRecord = records.GetByID(2);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
+
+        // A temporary contact for number[0] (which was previously assigned to recordID=1) has been created.
+        validationRecord = records.GetByIdWithTemporary(3);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[0]);
+    }
+
+    SECTION("Single number update twice - new unused number")
+    {
+        auto newRecord = records.GetByID(1);
+        REQUIRE(newRecord.numbers.size() == 2);
+
+        newRecord.numbers =
+            std::vector<ContactRecord::Number>({ContactRecord::Number(unUsedNumbers[0], std::string("")),
+                                                ContactRecord::Number(numbers[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+
+        newRecord.numbers =
+            std::vector<ContactRecord::Number>({ContactRecord::Number(unUsedNumbers[1], std::string("")),
+                                                ContactRecord::Number(numbers[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
+        REQUIRE(contactDB.number.count() == 6);
+        REQUIRE(contactDB.number.getById(1).contactID != 1); // old numbers do not belong to any contact
+        REQUIRE(contactDB.number.getById(1).contactID != 2);
+        REQUIRE(contactDB.number.getById(5).contactID != 1);
+        REQUIRE(contactDB.number.getById(5).contactID != 2);
+
+        auto validationRecord = records.GetByID(1);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == unUsedNumbers[1]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[1]);
+
+        validationRecord = records.GetByID(2);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
+
+        // A temporary contact for number ID 1 (which was previously assigned to recordID=1) has been created.
+        validationRecord = records.GetByIdWithTemporary(3);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[0]);
+
+        // A temporary contact for numberID 5 (which was previously assigned to recordID=1 for a moment) has been
+        // created.
+        validationRecord = records.GetByIdWithTemporary(4);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == unUsedNumbers[0]);
+    }
+
+    SECTION("Both numbers update - new newer used number")
+    {
+        auto newRecord = records.GetByID(1);
+        REQUIRE(newRecord.numbers.size() == 2);
+
+        newRecord.numbers =
+            std::vector<ContactRecord::Number>({ContactRecord::Number(unUsedNumbers[0], std::string("")),
+                                                ContactRecord::Number(unUsedNumbers[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
+        REQUIRE(contactDB.number.count() == 6);
+        REQUIRE(contactDB.number.getById(1).contactID != 1); // old numbers do not belong to any contact
+        REQUIRE(contactDB.number.getById(1).contactID != 2);
+        REQUIRE(contactDB.number.getById(2).contactID != 1);
+        REQUIRE(contactDB.number.getById(2).contactID != 2);
+
+        auto validationRecord = records.GetByID(1);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == unUsedNumbers[0]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == unUsedNumbers[1]);
+
+        validationRecord = records.GetByID(2);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
+
+        // A temporary contact for number ID 1 (which was previously assigned to recordID=1) has been created.
+        validationRecord = records.GetByIdWithTemporary(3);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[0]);
+
+        // A temporary contact for numberID 2 (which was previously assigned to recordID=1) has been created.
+        validationRecord = records.GetByIdWithTemporary(4);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[1]);
+    }
+
+    SECTION("Single number update - add country code")
+    {
+        auto newRecord = records.GetByID(1);
+        REQUIRE(newRecord.numbers.size() == 2);
+
+        newRecord.numbers = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(numbersPL[0], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+        REQUIRE(contactDB.number.count() == 4);
+
+        auto validationRecord = records.GetByID(1);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[1]);
+
+        validationRecord = records.GetByID(2);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
+
+        // there is no new temporary number
+        validationRecord = records.GetByIdWithTemporary(3);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+    }
+
+    SECTION("Single number update - change country code")
+    {
+        auto newRecord = records.GetByID(1);
+        REQUIRE(newRecord.numbers.size() == 2);
+
+        newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersPL[0], std::string("")),
+                                                                ContactRecord::Number(numbersPL[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+        REQUIRE(contactDB.number.count() == 4);
+
+        auto validationRecord = records.GetByID(1);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbersPL[1]);
+        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
+
+        newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersFR[0], std::string("")),
+                                                                ContactRecord::Number(numbersPL[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+        REQUIRE(contactDB.number.count() == 5);
+
+        validationRecord = records.GetByID(1);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersFR[0]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbersPL[1]);
+
+        validationRecord = records.GetByID(2);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
+
+        // There is new temporary contact for number[0] (which was previously assigned to recordID=1) with
+        // old country code
+        validationRecord = records.GetByIdWithTemporary(3);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]);
+
+        // There is new temporary contact for number[1] (which was previously assigned to recordID=1) with
+        // old country code
+        validationRecord = records.GetByIdWithTemporary(4);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+    }
+
+    SECTION("Both number update - remove country code")
+    {
+        auto newRecord = records.GetByID(1);
+        REQUIRE(newRecord.numbers.size() == 2);
+
+        newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersPL[0], std::string("")),
+                                                                ContactRecord::Number(numbersFR[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+        REQUIRE(contactDB.number.count() == 4);
+
+        auto validationRecord = records.GetByID(1);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbersFR[1]);
+        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
+
+        newRecord.numbers = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(numbers[0], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+        REQUIRE(contactDB.number.count() == 4);
+
+        validationRecord = records.GetByID(1);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[0]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[1]);
+
+        validationRecord = records.GetByID(2);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
+
+        // There is no new temporary number
+        validationRecord = records.GetByIdWithTemporary(3);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+    }
+
     SECTION("Change both numbers")
     {
         auto newRecord = records.GetByID(1);
@@ -398,6 +620,38 @@ TEST_CASE("Contact record numbers update")
         validationRecord = records.GetByIdWithTemporary(4);
         REQUIRE(validationRecord.ID != DB_ID_NONE);
         REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[1]);
+    }
+
+    SECTION("Change both numbers - same number with different country code")
+    {
+        auto newRecord = records.GetByID(1);
+        REQUIRE(newRecord.numbers.size() == 2);
+
+        newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersPL[0], std::string("")),
+                                                                ContactRecord::Number(numbersFR[0], std::string(""))});
+        REQUIRE(records.Update(newRecord));
+        REQUIRE(contactDB.number.count() == 5);
+
+        auto validationRecord = records.GetByIdWithTemporary(1);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbersFR[0]);
+        REQUIRE(contactDB.contacts.count() == 2); // amount of non-temporary contacts
+
+        validationRecord = records.GetByID(2);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
+
+        // A temporary contact for number[1] (which was previously assigned to recordID=1) has been created.
+        validationRecord = records.GetByIdWithTemporary(3);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[1]);
+
+        // There is no new temporary number
+        validationRecord = records.GetByIdWithTemporary(4);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
     }
 
     Database::deinitialize();
