@@ -332,9 +332,11 @@ namespace service::eink
                 isRefreshRequired = false;
             }
             else {
-                refreshFrame = updateFrames.front();
-                refreshFrame.size.height =
-                    updateFrames.back().pos_y + updateFrames.back().size.height - updateFrames.front().pos_y;
+                if (refreshMode != hal::eink::EinkRefreshMode::REFRESH_DEEP) {
+                    refreshFrame = updateFrames.front();
+                    refreshFrame.size.height =
+                        updateFrames.back().pos_y + updateFrames.back().size.height - updateFrames.front().pos_y;
+                }
                 previousContext->insert(0, 0, ctx);
             }
         }
