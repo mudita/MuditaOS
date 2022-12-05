@@ -14,7 +14,7 @@ namespace gui
     namespace battery
     {
         constexpr auto font_small         = style::window::font::largelight;
-        constexpr auto image_right_margin = 10U;
+        constexpr auto image_right_margin = 5U;
         constexpr auto percent_h          = 102U;
         constexpr auto percent_w          = 106U;
         constexpr auto battery_widget_h   = 64U;
@@ -28,10 +28,16 @@ namespace gui
         Hide  // Never show percentage
     };
 
+    enum class BatteryWidthMode
+    {
+        Fixed,
+        FitToContent
+    };
+
     class BellBattery : public gui::HBox
     {
       public:
-        BellBattery(Item *parent);
+        BellBattery(Item *parent, BatteryWidthMode widthMode);
         void setFont(const UTF8 &fontName);
         void update(units::SOC soc, bool isCharging);
         void setBatteryPercentMode(BatteryPercentMode mode);
@@ -42,5 +48,6 @@ namespace gui
         BatteryPercentMode batteryPercentMode = BatteryPercentMode::Show;
         Text *percentText                     = nullptr;
         Image *img                            = nullptr;
+        BatteryWidthMode widthMode            = BatteryWidthMode::Fixed;
     };
 } // namespace gui

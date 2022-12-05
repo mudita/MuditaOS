@@ -70,7 +70,7 @@ namespace gui
         alarmMainTime->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
         alarmMainTime->setVisible(false);
 
-        battery = new BellBattery(nullptr);
+        battery = new BellBattery(nullptr, gui::BatteryWidthMode::Fixed);
         battery->setMinimumSize(battery::battery_widget_w, battery::battery_widget_h);
         battery->setEdges(RectangleEdge::None);
         battery->setVisible(true);

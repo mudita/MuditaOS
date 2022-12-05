@@ -20,7 +20,7 @@ namespace
 
 namespace gui
 {
-    BellBattery::BellBattery(Item *parent) : HBox(parent)
+    BellBattery::BellBattery(Item *parent, BatteryWidthMode widthMode) : HBox(parent), widthMode(widthMode)
     {
         img = new Image(this, battery_low, gui::ImageTypeSpecifier::W_M);
         img->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
@@ -33,8 +33,8 @@ namespace gui
         percentText->setEditMode(EditMode::Browse);
         percentText->activeItem = false;
         percentText->drawUnderline(false);
-        percentText->setVisible(false);
         percentText->setText("000%");
+        percentText->setVisible(false);
     }
 
     void BellBattery::setFont(const UTF8 &fontName)
@@ -50,8 +50,10 @@ namespace gui
         }
 
         const auto text = UTF8(std::to_string(soc) + "%");
-        // Without this the text is not set properly if percentText was hidden
-        percentText->setMinimumWidthToFitText(text);
+        if (widthMode == BatteryWidthMode::FitToContent) {
+            // Without this the text is not set properly if percentText was hidden
+            percentText->setMinimumWidthToFitText(text);
+        }
         percentText->setText(text);
 
         if (isCharging) {
@@ -76,7 +78,9 @@ namespace gui
             percentText->setVisible(false);
         }
 
-        setWidthsToFitContent();
+        if (widthMode == BatteryWidthMode::FitToContent) {
+            setWidthsToFitContent();
+        }
         img->informContentChanged();
     }
 

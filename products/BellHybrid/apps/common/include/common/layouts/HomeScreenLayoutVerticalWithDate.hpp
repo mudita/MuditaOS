@@ -23,7 +23,7 @@ namespace gui
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
 
       private:
-        void setBatteryLevelState(const Store::Battery &batteryContext) override;
+        bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext) override;
         bool isAlarmTimeVisibilityAllowed() override;
 
         TextFixedSize *ampm = nullptr;

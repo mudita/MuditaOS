@@ -16,6 +16,7 @@ namespace style::time_set_spinner
         inline constexpr auto size = 6U;
     } // namespace focus
 
+    inline constexpr auto very_small_margin       = 3U;
     inline constexpr auto small_margin = 6U;
     inline constexpr auto big_margin   = 6U;
     inline constexpr auto gargantuan_margin_left  = 14U;
@@ -56,9 +57,9 @@ namespace gui
 
         std::map<std::string, Margins> colonMarginsMap = {
             {style::window::font::verybiglight,
-             {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},
+             {style::time_set_spinner::very_small_margin, 0, style::time_set_spinner::very_small_margin, 0}},
             {style::window::font::veryverybiglight,
-             {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},
+             {style::time_set_spinner::very_small_margin, 0, style::time_set_spinner::very_small_margin, 0}},
             {style::window::font::largelight,
              {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},
             {style::window::font::supersizeme,
