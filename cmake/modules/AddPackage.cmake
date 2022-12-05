@@ -63,7 +63,7 @@ function(add_update_package SOURCE_TARGET)
     endif()
     set(CPACK_PACKAGE_NAME ${SOURCE_TARGET})
     set_cpack_vars()
-    set(UPDATE_PKG "${SOURCE_TARGET}-${PROJECT_VERSION}-${CPACK_SYSTEM_NAME}-Update.tar")
+    set(UPDATE_PKG "${SOURCE_TARGET}-${PROJECT_VERSION}-RT1051-Update.tar")
 
     set(PACKAGE_UPDATE_FILE_NAME ${UPDATE_PKG} PARENT_SCOPE)
     set(PACKAGE_UPDATE_MIME "application/x-tar" PARENT_SCOPE)
@@ -76,7 +76,7 @@ function(add_update_package SOURCE_TARGET)
                 ecoboot.bin-target
                 recovery.bin-target
                 assets
-        COMMAND ${CMAKE_SOURCE_DIR}/tools/generate_update_image.sh ${SOURCE_TARGET} ${PROJECT_VERSION} ${CPACK_SYSTEM_NAME}
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/generate_update_package.py --output_path ${CMAKE_BINARY_DIR} --system_path ${SYSROOT_PATH}/system_a --product ${SOURCE_TARGET}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating update image: ${UPDATE_PKG}"
     )
