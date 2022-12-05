@@ -1,5 +1,6 @@
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+import time
 import pytest
 from harness.request import TransactionError
 from harness import log
@@ -39,8 +40,8 @@ def run_backup(harness):
 def remove_backup_file(harness):
     try:
         resp = GetDeviceInfo().run(harness)
-        bkpPath = resp.diag_info["backupLocation"]
-        FsRemoveFile(bkpPath + "/backup_db.tar").run(harness)
+        backupFilePath = resp.diag_info["backupFilePath"]
+        FsRemoveFile(backupFilePath).run(harness)
     except TransactionError:
         return False
     else:
@@ -89,9 +90,9 @@ def clear_user_data(harness, contactIdList):
 
         assert contactsCountAfterClear == contactsCount - len(contactIdList)
     except TransactionError:
-        return False
+        return False, -1
     else:
-        return True
+        return True, contactsCountAfterClear
 
 
 def save_user_data(harness, contactIdList, referenceContacts):
@@ -110,12 +111,12 @@ def save_user_data(harness, contactIdList, referenceContacts):
         return True
 
 
-def compare_user_data(harness, referenceContacts, referenceContactIds):
+def compare_user_data(harness, referenceContacts, referenceContactIds, contactsCountAfterClear):
     try:
         contactsCountAfterRestore = GetContactsCount().run(harness).count
 
         log.debug(f"Contacts after restore: {contactsCountAfterRestore}")
-        assert len(referenceContacts) == contactsCountAfterRestore
+        assert (len(referenceContacts) + contactsCountAfterClear) == contactsCountAfterRestore
 
         log.debug("Get user data from device for comparison")
         resp = GetContactsWithOffsetAndLimit(0, contactsCountAfterRestore).run(harness)
@@ -145,22 +146,24 @@ def test_backup_and_restore(harness):
     log.debug("Creating backup")
     assert run_backup(harness), "Failed to initialize backup!"
 
-    harness.connection.watch_port_reboot(20)
-    harness = get_harness_automatic(20)
+    timeout_seconds = 50
+    harness.connection.watch_port_reboot(timeout_seconds)
+    harness = get_harness_automatic(timeout_seconds)
     harness.unlock_phone()
 
     log.debug("Removing user data from device")
-    assert clear_user_data(harness, ReferenceContactIds), "Failed to clear user data!"
+    status, contactsCountAfterClear = clear_user_data(harness, ReferenceContactIds)
+    assert status, "Failed to clear user data!"
 
     log.debug("Requesting restore")
     assert run_restore(harness), "Failed to initialize restore process!"
 
-    harness.connection.watch_port_reboot(20)
-    harness = get_harness_automatic(20)
+    harness.connection.watch_port_reboot(timeout_seconds)
+    harness = get_harness_automatic(timeout_seconds)
     harness.unlock_phone()
 
     log.debug("Confirm user data on device match saved data")
-    assert compare_user_data(harness, ReferenceContacts, ReferenceContactIds), "User data inconsistent after backup!"
+    assert compare_user_data(harness, ReferenceContacts, ReferenceContactIds, contactsCountAfterClear), "User data inconsistent after backup!"
 
     log.debug("Remove user data added by test")
     assert clear_user_data(harness, TestContactIds), "Failed to clear user data!"
