@@ -69,7 +69,7 @@ namespace gui
         statusBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         statusBox->setVisible(true);
 
-        battery = new BellBattery(statusBox);
+        battery = new BellBattery(statusBox, gui::BatteryWidthMode::FitToContent);
         battery->setMaximumSize(battery::battery_widget_w, battery::battery_widget_h);
         battery->setEdges(RectangleEdge::None);
         battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));

@@ -108,18 +108,9 @@ namespace gui
         }
     }
 
-    void HomeScreenLayoutVerticalWithDate::setBatteryLevelState(const Store::Battery &batteryContext)
+    bool HomeScreenLayoutVerticalWithDate::isBatteryVisibilityAllowed(const Store::Battery &batteryContext)
     {
-        // In 24h mode battery indicator is lower so 100% is too long to be displayed
-        if (!ampm->visible) {
-            const auto percentMode = batteryContext.level < 100 ? BatteryPercentMode::Show : BatteryPercentMode::Hide;
-            battery->setBatteryPercentMode(percentMode);
-        }
-        else
-            battery->setBatteryPercentMode(BatteryPercentMode::Show);
-        battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
-        battery->setVisible(true);
-        battery->informContentChanged();
+        return true;
     }
 
     bool HomeScreenLayoutVerticalWithDate::isAlarmTimeVisibilityAllowed()

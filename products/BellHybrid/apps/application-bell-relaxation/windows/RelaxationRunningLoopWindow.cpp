@@ -60,7 +60,7 @@ namespace
 
     gui::BellBattery *createBattery(gui::VBox *parent)
     {
-        auto battery = new gui::BellBattery(parent);
+        auto battery = new gui::BellBattery(parent, gui::BatteryWidthMode::Fixed);
         battery->setMinimumSize(gui::battery::battery_widget_w, gui::battery::battery_widget_h);
         battery->setEdges(gui::RectangleEdge::None);
         battery->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
