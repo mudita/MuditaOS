@@ -78,6 +78,10 @@ void CellularUrcHandler::Handle(Cusd &urc)
     if (!message) {
         return;
     }
+    auto constexpr logLength = 16;
+    auto logMessage          = message->substr(0, logLength);
+
+    LOG_INFO("USSD body: %s", logMessage.c_str());
 
     if (urc.isActionNeeded()) {
         if (cellularService.ussdState == ussd::State::pullRequestSent) {
