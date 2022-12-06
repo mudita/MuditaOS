@@ -14,11 +14,11 @@
         "filename": "@BOOTLOADER_FILENAME@",
         "md5sum":   "@BOOTLOADER_MD5SUM@"
     },
-    "boot":
+    "os":
     {
         "version":  "@OS_VERSION_MAJOR@.@OS_VERSION_MINOR@.@OS_VERSION_PATCH@",
-        "filename": "@BOOT_FILENAME@",
-        "md5sum":   "@BOOT_MD5SUM@"
+        "filename": "@OS_FILENAME@",
+        "md5sum":   "@OS_MD5SUM@"
     },
     "recovery":
     {
