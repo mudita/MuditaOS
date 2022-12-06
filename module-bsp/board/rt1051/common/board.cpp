@@ -25,6 +25,20 @@ extern "C"
 
 extern std::uint32_t __sdram_cached_start[];
 
+extern "C"
+{
+    uint32_t boot_reason_get_raw()
+    {
+        return SNVS->LPGPR[0];
+    }
+
+    void boot_reason_set_raw(uint32_t raw)
+    {
+        SNVS->LPGPR[0] = raw;
+    }
+}
+
+
 namespace bsp
 {
     namespace
@@ -165,7 +179,7 @@ namespace bsp
         SNVS_HP_ChangeSSMState(SNVS);
 
         // Default flag set on start in non-volatile memory to detect boot fault
-        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
+//        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
 
         // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
         DCDC_BootIntoDCM(DCDC);
