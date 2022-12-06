@@ -15,6 +15,7 @@ namespace cellular::service
         }
 
         procedureInProgress = ProcedureInProgress::SoftReset;
+        onAnyReset();
         onCellularStateSet(State::ST::PowerDownWaiting);
         return onSoftReset();
     }
@@ -27,6 +28,7 @@ namespace cellular::service
         }
 
         procedureInProgress = ProcedureInProgress::HardReset;
+        onAnyReset();
         onCellularStateSet(State::ST::PowerDownWaiting);
         onHardReset();
         return false;
@@ -40,6 +42,7 @@ namespace cellular::service
         }
 
         procedureInProgress = ProcedureInProgress::Reboot;
+        onAnyReset();
         onCellularStateSet(State::ST::PowerDownWaiting);
         onTurnModemOff();
         return false;
@@ -79,7 +82,6 @@ namespace cellular::service
     auto ModemResetHandler::handleSwitchToActive() -> bool
     {
         if (procedureInProgress == ProcedureInProgress::None) {
-
             return false;
         }
 
@@ -90,6 +92,8 @@ namespace cellular::service
 
     auto ModemResetHandler::performFunctionalityReset() -> bool
     {
+        onAnyReset();
+
         if (onFunctionalityReset) {
             return onFunctionalityReset();
         }

@@ -302,7 +302,6 @@ class ServiceCellular : public sys::Service
 
     auto receiveSMS(std::string messageNumber) -> bool;
 
-    auto hangUpCall() -> bool;
     auto hangUpCallBusy() -> bool;
 
     auto tetheringTurnOffURC() -> bool;

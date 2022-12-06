@@ -455,6 +455,8 @@ namespace cellular::internal
             }
             return succeed;
         };
+
+        modemResetHandler->onAnyReset = [this]() { owner->callStateTimer.stop(); };
     }
 
     void ServiceCellularPriv::initCSQHandler()

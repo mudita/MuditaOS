@@ -3,7 +3,6 @@
 
 #include "VolteCapabilityHandler.hpp"
 #include <modem/BaseChannel.hpp>
-#include <modem/mux/CellularMux.h>
 #include <log/log.hpp>
 
 namespace cellular::service

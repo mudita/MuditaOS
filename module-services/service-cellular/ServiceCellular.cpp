@@ -458,11 +458,6 @@ void ServiceCellular::registerMessageHandlers()
         return sys::MessageNone{};
     });
 
-    connect(typeid(cellular::DismissCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        handleCellularDismissCallMessage(request);
-        return sys::MessageNone{};
-    });
-
     connect(typeid(db::QueryResponse), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<db::QueryResponse *>(request);
         return handleDBQueryResponseMessage(msg);
@@ -590,6 +585,7 @@ void ServiceCellular::registerMessageHandlers()
     /// 2. from here from handle cellular hangup
     connect(typeid(cellular::CallAbortedNotification), [&](sys::Message * /*request*/) -> sys::MessagePointer {
         ongoingCall->handle(call::event::Ended{});
+        callStateTimer.stop();
         return sys::MessageNone{};
     });
 
@@ -1859,12 +1855,6 @@ void ServiceCellular::handleCellularHangupCallMessage(cellular::HangupCallMessag
     callEndedRecentlyTimer.start();
 }
 
-void ServiceCellular::handleCellularDismissCallMessage(sys::Message *msg)
-{
-    LOG_INFO("%s", __PRETTY_FUNCTION__);
-    hangUpCall();
-}
-
 auto ServiceCellular::handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     bool responseHandled = false;
@@ -2202,15 +2192,6 @@ auto ServiceCellular::handleCellularSetConnectionFrequencyMessage(sys::Message *
     connectionManager->setInterval(std::chrono::minutes{setMsg->getConnectionFrequency()});
     connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode());
     return std::make_shared<cellular::ResponseMessage>(true);
-}
-
-auto ServiceCellular::hangUpCall() -> bool
-{
-    auto ret = ongoingCall->handle(call::event::Ended{});
-    if (!ret) {
-        LOG_ERROR("Failed to hang up call");
-    }
-    return ret;
 }
 
 auto ServiceCellular::hangUpCallBusy() -> bool

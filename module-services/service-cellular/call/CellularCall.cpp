@@ -12,6 +12,7 @@
 
 namespace call
 {
+    Call::~Call() = default;
 
     Call::Call()
     {}
@@ -31,9 +32,6 @@ namespace call
                                                               std::make_unique<cellular::Api>(owner),
                                                               std::move(sentinel)});
     }
-
-    Call::~Call()
-    {}
 
     Call &Call::operator=(Call &&other) noexcept
     {

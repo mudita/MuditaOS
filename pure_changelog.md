@@ -43,6 +43,7 @@
 * Fixed looping on the SIM card selection screen
 * Fixed screen lock during onboarding
 * Fixed displayed device name when connected to Windows
+* Fixed redundant modem polling for call states
 
 ### Added
 * Added a popup for changing the SIM card
