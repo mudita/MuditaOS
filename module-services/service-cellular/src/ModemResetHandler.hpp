@@ -54,6 +54,7 @@ namespace cellular::service
         std::function<bool()> onSoftReset;
         std::function<void()> onHardReset;
         std::function<bool()> onFunctionalityReset;
+        std::function<void()> onAnyReset;
 
       private:
         enum class ProcedureInProgress

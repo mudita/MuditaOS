@@ -19,6 +19,7 @@ namespace call::api
     struct TimerRing
     {
         virtual void start() = 0;
+        virtual ~TimerRing() = default;
     };
 }; // namespace call::api
 

@@ -47,13 +47,6 @@ bool CellularServiceAPI::HangupCall(sys::Service *serv)
     return true;
 }
 
-bool CellularServiceAPI::DismissCall(sys::Service *serv)
-{
-    auto msg = std::make_shared<cellular::DismissCallMessage>();
-    serv->bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceCellularNotifications);
-    return true;
-}
-
 std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumber)
 {
 
