@@ -14,6 +14,7 @@
 #include "Oscillator.hpp"
 #include "critical.hpp"
 #include "drivers/semc/DriverSEMC.hpp"
+#include <hal/boot_reason.h>
 
 namespace bsp
 {
@@ -36,21 +37,24 @@ namespace bsp
     {
         switch (reason) {
         case RebootType::GoToUpdaterUpdate:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToUpdateCode;
+            set_boot_reason(boot_reason_code_update);
             break;
         case RebootType::GoToUpdaterRecovery:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToRecoveryCode;
+            set_boot_reason(boot_reason_code_recovery);
             break;
         case RebootType::GoToUpdaterFactoryReset:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToFactoryRstCode;
+            set_boot_reason(boot_reason_code_factory);
             break;
         case RebootType::GoToUsbMscMode:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootToUsbMscModeCode;
+            set_boot_reason(boot_reason_code_usb_mc_mode);
             break;
         case RebootType::NormalRestart:
-            SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
+            set_boot_reason(boot_reason_code_os);
             break;
+        default:
+            set_boot_reason(boot_reason_code_unknown);
         }
+
         board_restart();
         return 0;
     }
@@ -166,7 +170,7 @@ namespace bsp
 
     void RT1051LPMCommon::SetBootSuccess()
     {
-        SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
+        //        SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
     }
 
     void RT1051LPMCommon::DisconnectInternalLoadResistor()

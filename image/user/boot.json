@@ -1,0 +1,24 @@
+{
+  "boot": {
+    "slots": {
+      "a": {
+        "bootable": true,
+        "successful": true,
+        "boot_attempts_left": "10",
+        "prefix" : "/system_a"
+      },
+      "b": {
+        "bootable": false,
+        "successful": true,
+        "boot_attempts_left": "10",
+        "prefix" : "/system_b"
+      },
+      "active": "a",
+      "boot_attempts_max": "10"
+    },
+    "os": "boot.bin",
+    "recovery": "recovery.bin",
+    "bin_dir": "bin",
+    "update_dir": "/user/temp/update"
+  }
+}

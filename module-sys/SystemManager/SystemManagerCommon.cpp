@@ -33,6 +33,7 @@
 #include <service-db/DBServiceName.hpp>
 #include <module-gui/gui/Common.hpp>
 #include <service-eink/Common.hpp>
+#include <hal/boot_control.h>
 
 #include <algorithm>
 
