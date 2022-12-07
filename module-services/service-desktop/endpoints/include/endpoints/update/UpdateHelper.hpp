@@ -5,16 +5,21 @@
 
 #include <endpoints/BaseHelper.hpp>
 
+#include <filesystem>
+
 namespace sdesktop::endpoints
 {
     class UpdateHelper : public BaseHelper
     {
       public:
-        explicit UpdateHelper(sys::Service *p) : BaseHelper(p)
-        {}
+        explicit UpdateHelper(sys::Service *p);
 
         auto processPost(Context &context) -> ProcessResult final;
         auto processPut(Context &context) -> ProcessResult final;
         void preProcess(http::Method method, Context &context) final;
+
+      private:
+        std::filesystem::path updatePackagePath;
+        std::filesystem::path binariesPath;
     };
 } // namespace sdesktop::endpoints
