@@ -11,7 +11,7 @@ function(add_scripts_target)
             ${_ARG_TARGET}
             DEPENDS ${_ARG_DEPENDS}
 
-            COMMAND  ${PROJECT_SOURCE_DIR}/scripts/lua/install.sh ${_ARG_PRODUCT} ${_ARG_DEST_DIR}
+            COMMAND  ${PROJECT_SOURCE_DIR}/scripts/lua/install.sh ${_ARG_PRODUCT} ${_ARG_DEST_DIR} udm
             COMMENT
             "Installing scripts for ${_ARG_PRODUCT} to ${_ARG_DEST_DIR} directory"
     )

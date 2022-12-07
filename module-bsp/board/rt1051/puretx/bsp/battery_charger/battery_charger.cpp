@@ -28,7 +28,7 @@ namespace bsp::battery_charger
 
         constexpr std::uint32_t i2cSubaddresSize = 1;
 
-        const auto cfgFile = purefs::dir::getUserDataDirPath() / "batteryFuelGaugeConfig.cfg";
+        const auto cfgFile = purefs::dir::getSystemVarDirPath() / "batteryFuelGaugeConfig.cfg";
 
         constexpr auto registersToStore              = 0xFF + 1;
         constexpr auto configFileSizeWithoutChecksum = registersToStore * sizeof(Register);
