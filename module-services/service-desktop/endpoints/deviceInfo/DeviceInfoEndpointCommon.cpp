@@ -38,7 +38,7 @@ namespace sdesktop::endpoints
     {
         const auto &requestBody = context.getBody();
 
-        if (requestBody[json::fileList].is_number()) {
+        if (not requestBody.object_items().empty() and requestBody[json::fileList].is_number()) {
 
             const auto diagFileType = parseDiagnosticFileType(requestBody[json::fileList]);
 
