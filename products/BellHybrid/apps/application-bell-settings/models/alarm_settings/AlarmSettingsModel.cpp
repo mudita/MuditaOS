@@ -8,6 +8,11 @@
 
 namespace app::bell_settings
 {
+    namespace
+    {
+        static constexpr std::string_view DefaultBrightness{"50.0"};
+    }
+
     void AlarmToneModel::setValue(UTF8 value)
     {
         settings.setValue(bell::settings::Alarm::tone, value, settings::SettingsScope::Global);
@@ -56,7 +61,10 @@ namespace app::bell_settings
 
     frontlight_utils::Brightness AlarmFrontlightModel::getValue() const
     {
-        const auto str = settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
+        auto str = settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
+        if (str.empty()) {
+            str = DefaultBrightness;
+        }
         return frontlight_utils::percentageToFixedVal(std::stoi(str));
     }
 } // namespace app::bell_settings
