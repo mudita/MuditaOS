@@ -7,7 +7,6 @@ namespace
 {
     constexpr inline auto PATH_SYS         = "/sys";
     constexpr inline auto PATH_CONF        = "/mfgconf";
-    constexpr inline auto PATH_OS          = "os";
     constexpr inline auto PATH_USER        = "user";
     constexpr inline auto PATH_CURRENT     = "current";
     constexpr inline auto PATH_PREVIOUS    = "previous";
@@ -31,7 +30,7 @@ namespace purefs
     {
         std::filesystem::path getRootDiskPath() noexcept
         {
-            return std::filesystem::path{eMMC_disk} / PATH_OS;
+            return std::filesystem::path{eMMC_disk};
         }
 
         std::filesystem::path getMfgConfPath() noexcept
@@ -46,27 +45,27 @@ namespace purefs
 
         std::filesystem::path getCurrentOSPath() noexcept
         {
-            return getRootDiskPath() / PATH_CURRENT;
+            return std::filesystem::path{eMMC_disk} / PATH_CURRENT;
         }
 
         std::filesystem::path getPreviousOSPath() noexcept
         {
-            return getRootDiskPath() / PATH_PREVIOUS;
+            return std::filesystem::path{eMMC_disk} / PATH_PREVIOUS;
         }
 
         std::filesystem::path getUpdatesOSPath() noexcept
         {
-            return getUserDiskPath() / PATH_UPDATES;
+            return std::filesystem::path{eMMC_disk} / PATH_USER / PATH_UPDATES;
         }
 
         std::filesystem::path getTemporaryPath() noexcept
         {
-            return getUserDiskPath() / PATH_TMP;
+            return std::filesystem::path{eMMC_disk} / PATH_USER / PATH_TMP;
         }
 
         std::filesystem::path getBackupOSPath() noexcept
         {
-            return getUserDiskPath() / PATH_BACKUP;
+            return std::filesystem::path{eMMC_disk} / PATH_USER / PATH_BACKUP;
         }
 
         std::filesystem::path getFactoryOSPath() noexcept

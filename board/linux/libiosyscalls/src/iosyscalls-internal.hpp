@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+#include <stddef.h>
 #include <stdio.h>
 #include <purefs/vfs_subsystem.hpp>
 
