@@ -71,3 +71,7 @@ image/assets/fonts/*
 scripts/lua/test/assets*
 scripts/lua/test/update/user/temp/*
 scripts/lua/test/update/target/*
+scripts/lua/test/update/system/*
+scripts/lua/test/update_udm/user/temp/*
+scripts/lua/test/update_udm/target/*
+scripts/lua/test/update_udm/system/*

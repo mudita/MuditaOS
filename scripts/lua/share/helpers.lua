@@ -49,7 +49,7 @@ local function build_path(prefix, name)
     return prefix .. name
 end
 
-local function strip_from_prefix(prefix,path)
+local function strip_from_prefix(prefix, path)
     local name = path:gsub(prefix, "")
     name = name:sub(2, -1)
     return name
@@ -141,6 +141,24 @@ function helpers.copy_dir(from, where)
     end
 end
 
+--- Copy directory recursively using regex filter
+-- @function copy_dir_filtered
+-- @param from source directory
+-- @param where target directory
+-- @param matcher regex expression
+function helpers.copy_dir_filtered(from, where, filter)
+    for filename, attr in dirtree(from) do
+        local name = strip_from_prefix(from, filename)
+        if name:match(filter) then
+            if attr.mode == "directory" then
+                assert(lfs.mkdir(build_path(where, name)))
+            else
+                helpers.copy_file(filename, build_path(where, name))
+            end
+        end
+    end
+end
+
 --- Get the size of specified directory using regex filter
 -- @function dir_size_filtered
 -- @param path directory path
@@ -149,7 +167,7 @@ end
 function helpers.dir_size_filtered(path, filter)
     local total_size = 0
     for filename, attr in dirtree(path) do
-        local name = strip_from_prefix(path,filename)
+        local name = strip_from_prefix(path, filename)
         if name:match(filter) then
             total_size = total_size + attr.size
         end
