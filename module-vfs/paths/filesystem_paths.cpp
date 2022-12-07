@@ -12,7 +12,7 @@ namespace
     constexpr inline auto PATH_CURRENT     = "current";
     constexpr inline auto PATH_PREVIOUS    = "previous";
     constexpr inline auto PATH_UPDATES     = "updates";
-    constexpr inline auto PATH_TMP         = "tmp";
+    constexpr inline auto PATH_TMP         = "temp";
     constexpr inline auto PATH_BACKUP      = "backup";
     constexpr inline auto PATH_FACTORY     = "factory";
     constexpr inline auto PATH_LOGS        = "logs";

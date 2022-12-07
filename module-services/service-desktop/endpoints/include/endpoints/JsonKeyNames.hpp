@@ -53,6 +53,10 @@ namespace sdesktop::endpoints::json
     inline constexpr auto files          = "files";
     inline constexpr auto backupLocation = "backupLocation";
     inline constexpr auto deviceToken    = "deviceToken";
+    inline constexpr auto recoveryStatusFilePath = "recoveryStatusFilePath";
+    inline constexpr auto updateFilePath         = "updateFilePath";
+    inline constexpr auto backupFilePath         = "backupFilePath";
+    inline constexpr auto syncFilePath           = "syncFilePath";
 
     namespace updateprocess
     {
