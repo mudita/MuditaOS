@@ -56,6 +56,7 @@ namespace gui
         onLoadCallback = [&]([[maybe_unused]] std::shared_ptr<AlarmEventRecord> alarm) {
             checkCustomOption(getPresenter()->getDescription());
             optionSpinner->setCurrentValue(getPresenter()->getDescription());
+            this->navBarRestoreFromTemporaryMode();
         };
     }
 
