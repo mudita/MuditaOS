@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/filesystem_paths.hpp>
-#include <hal/boot_control.h>
 
 namespace
 {
@@ -17,15 +16,11 @@ namespace
     constexpr inline auto PATH_TMP    = "temp";
     constexpr inline auto PATH_ASSETS = "assets";
     constexpr inline auto PATH_DATA   = "data";
+    constexpr inline auto PATH_VAR    = "var";
 } // namespace
 
 namespace purefs
 {
-    std::filesystem::path createPath(const std::string &parent, const std::string &child) noexcept
-    {
-        return std::filesystem::path{parent} / child;
-    }
-
     namespace dir
     {
         std::filesystem::path getSystemDiskPath() noexcept
@@ -82,10 +77,10 @@ namespace purefs
         {
             return getSystemDiskPath() / PATH_DATA;
         }
-
-        std::filesystem::path getUserDataDirPath() noexcept
+        std::filesystem::path getSystemVarDirPath() noexcept
         {
-            return getUserDiskPath() / PATH_DATA;
+            return getSystemDiskPath() / PATH_VAR;
         }
+
     } // namespace dir
 } // namespace purefs
