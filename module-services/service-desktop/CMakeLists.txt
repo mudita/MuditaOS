@@ -53,7 +53,6 @@ target_link_libraries(service-desktop
         service-cellular
         service-evtmgr
         utf8
-        utils-bootconfig
         Microsoft.GSL::GSL
         json::json
         microtar::microtar
