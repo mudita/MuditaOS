@@ -59,7 +59,10 @@ namespace sdesktop::endpoints
              {json::serialNumber, getSerialNumber()},
              {json::caseColour, getCaseColour()},
              {json::backupLocation, purefs::dir::getBackupOSPath().string()},
-             {json::deviceToken, getDeviceToken()}}));
+             {json::deviceToken, getDeviceToken()},
+             {json::updateFilePath, (purefs::dir::getTemporaryPath() / updateFilename).string()},
+             {json::backupFilePath, (purefs::dir::getTemporaryPath() / backupFilename).string()},
+             {json::syncFilePath, (purefs::dir::getTemporaryPath() / syncFilename).string()}}));
 
         return http::Code::OK;
     }
