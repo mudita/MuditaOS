@@ -11,7 +11,6 @@ namespace service::name
 }
 namespace sdesktop::paths
 {
-
     inline constexpr auto updateFilename         = "update.tar";
     inline constexpr auto syncFilename           = "sync.tar";
     inline constexpr auto backupFilename         = "backup.tar";
