@@ -67,7 +67,6 @@ target_link_libraries(application-desktop
 		service-time
 		utils-time
 		utf8
-		utils-bootconfig
 	PUBLIC
 		apps-common
 		module-sys
