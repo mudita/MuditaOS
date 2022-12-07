@@ -7,15 +7,12 @@
 
 namespace purefs
 {
-    std::filesystem::path createPath(const std::string &parent, const std::string &child) noexcept;
-
     namespace dir
     {
         std::filesystem::path getSystemDiskPath() noexcept;
         std::filesystem::path getUserDiskPath() noexcept;
         std::filesystem::path getMfgConfPath() noexcept;
         std::filesystem::path getDatabasesPath() noexcept;
-        std::filesystem::path getSyncPackagePath() noexcept;
         std::filesystem::path getLogsPath() noexcept;
         std::filesystem::path getCrashDumpsPath() noexcept;
         std::filesystem::path getUserMediaPath() noexcept;
@@ -23,7 +20,7 @@ namespace purefs
         std::filesystem::path getBootJSONPath() noexcept;
         std::filesystem::path getAssetsDirPath() noexcept;
         std::filesystem::path getSystemDataDirPath() noexcept;
-        std::filesystem::path getUserDataDirPath() noexcept;
+        std::filesystem::path getSystemVarDirPath() noexcept;
     } // namespace dir
 
     namespace file
