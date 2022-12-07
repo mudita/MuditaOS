@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "iosyscalls-internal.hpp"
@@ -81,7 +81,7 @@ namespace vfsn::linux::internal
 
     const char *npath_translate(const char *inpath, char *buffer)
     {
-        const auto inputPath = std::string(inpath);
+        auto inputPath = std::string(inpath);
 
         for (auto path = IMAGE_PATHS; *path != 0; ++path) {
             if (std::strstr(inpath, *path) == inpath) {
@@ -98,16 +98,7 @@ namespace vfsn::linux::internal
                     outpath += inputPath;
                 }
                 else if (*inpath == '/') {
-                    constexpr auto os_path    = "/sys/os";
-                    const auto os_path_length = strlen(os_path);
-                    if (std::strncmp(inpath, os_path, os_path_length) == 0) {
-                        outpath = sysroot;
-                        outpath += "/sys";
-                        outpath += inputPath.substr(os_path_length);
-                    }
-                    else {
-                        outpath = sysroot + inputPath;
-                    }
+                    outpath = sysroot + inputPath;
                 }
                 else {
                     outpath = sysroot;
