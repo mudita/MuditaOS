@@ -124,13 +124,9 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
     }
 
     auto oldNumberIDs  = splitNumberIDs(contact.numbersID);
-    auto newNumbersIDs = getNumbersIDs(contact.ID, rec, utils::PhoneNumber::Match::EXACT);
+    auto newNumbersIDs = getNumbersIDs(contact.ID, rec);
     for (auto oldNumberID : oldNumberIDs) {
         if (std::find(std::begin(newNumbersIDs), std::end(newNumbersIDs), oldNumberID) == std::end(newNumbersIDs)) {
-            // If oldNumberID is NOT in newNumbersIDs vector then:
-            //  -> remove oldNumberID from DB - if the old number is the same as one of the new ones
-            //     but with different country number (to prevent a mismatch of same numbers)
-            //  -> make temporary contact with this oldNumberID - otherwise
             auto numberRecord = contactDB->number.getById(oldNumberID);
             if (!numberRecord.isValid()) {
                 return false;
@@ -145,34 +141,13 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
                           e.what());
                 return false;
             }
-
-            bool isOldNumberToRemove = false;
-            utils::PhoneNumber oldPhoneNumber(numberRecord.numberUser, numberRecord.numbere164);
-            for (const auto newNumberID : newNumbersIDs) {
-                auto newNumberRecord = contactDB->number.getById(newNumberID);
-                utils::PhoneNumber newPhoneNumber(newNumberRecord.numberUser, newNumberRecord.numbere164);
-                if (newPhoneNumber.match(oldPhoneNumber) >= utils::PhoneNumber::Match::POSSIBLE &&
-                    oldPhoneNumber.getCountryCode() != newPhoneNumber.getCountryCode()) {
-                    isOldNumberToRemove = true;
-                }
+            const auto tmpContactRecord = addTemporaryContactForNumber(number);
+            if (!tmpContactRecord.has_value()) {
+                return false;
             }
-
-            if (isOldNumberToRemove) {
-                // remove old number from DB table
-                if (!contactDB->number.removeById(oldNumberID)) {
-                    return false;
-                }
-            }
-            else {
-                // make temporary contact with old number
-                const auto tmpContactRecord = addTemporaryContactForNumber(number);
-                if (!tmpContactRecord.has_value()) {
-                    return false;
-                }
-                numberRecord.contactID = tmpContactRecord.value().ID;
-                if (!contactDB->number.update(numberRecord)) {
-                    return false;
-                }
+            numberRecord.contactID = tmpContactRecord.value().ID;
+            if (!contactDB->number.update(numberRecord)) {
+                return false;
             }
         }
     }
@@ -220,9 +195,8 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
     return true;
 }
 
-auto ContactRecordInterface::getNumbersIDs(std::uint32_t contactID,
-                                           const ContactRecord &contact,
-                                           utils::PhoneNumber::Match matchLevel) -> std::vector<std::uint32_t>
+auto ContactRecordInterface::getNumbersIDs(std::uint32_t contactID, const ContactRecord &contact)
+    -> std::vector<std::uint32_t>
 {
     std::vector<std::uint32_t> result;
 
@@ -239,7 +213,7 @@ auto ContactRecordInterface::getNumbersIDs(std::uint32_t contactID,
             return {};
         }
 
-        auto numberMatch = numberMatcher.bestMatch(phoneNumber, matchLevel);
+        auto numberMatch = numberMatcher.bestMatch(phoneNumber, utils::PhoneNumber::Match::POSSIBLE);
         if (!numberMatch.has_value()) {
             // number does not exist in the DB yet. Let's add it.
             if (!contactDB->number.add(ContactsNumberTableRow{Record(DB_ID_NONE),
