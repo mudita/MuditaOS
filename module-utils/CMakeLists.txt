@@ -2,7 +2,7 @@
 
 add_library(module-utils INTERFACE)
 
-add_subdirectory(bootconfig)
+add_subdirectory(tar)
 add_subdirectory(Clipboard)
 add_subdirectory(EventStore)
 add_subdirectory(i18n)
@@ -23,7 +23,6 @@ target_link_libraries(module-utils
         log-api
         rrule
         utility
-        utils-bootconfig
         utils-locale
         utils-math
         utils-phonenumber

@@ -88,7 +88,6 @@ target_link_libraries(${PROJECT_NAME}
         service-evtmgr
         service-time-api
         utils-time
-        utils-bootconfig
     PUBLIC
         module-audio
         module-bsp
