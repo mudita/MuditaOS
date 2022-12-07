@@ -186,7 +186,7 @@ add_directories(
         TARGET system_directories_common
         PREFIX ${SYSROOT_PATH}/system_a
         DEPENDS assets
-        DIRECTORIES log assets crash_dumps data bin db scripts
+        DIRECTORIES log assets crash_dumps data bin db scripts var
 )
 
 # Create and initialize product-specific databases
