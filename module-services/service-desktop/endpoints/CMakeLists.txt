@@ -102,7 +102,10 @@ target_link_libraries(
         desktop-endpoint-base
     PRIVATE
         base64::base64
-        microtar::microtar
+        tar
+        json
+        hash-library
+        pure-core
 )
 
 add_library(desktop-endpoints INTERFACE)
