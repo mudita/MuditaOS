@@ -60,7 +60,7 @@ namespace app
             return retMsg;
         }
 
-        return sys::msgNotHandled();
+        return handleAsyncResponse(resp);
     }
 
     sys::ReturnCodes ApplicationOnBoarding::InitHandler()
