@@ -5,6 +5,8 @@
 
 #include <endpoints/BaseHelper.hpp>
 
+#include <ctime>
+
 namespace sdesktop::endpoints
 {
 
