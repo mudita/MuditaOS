@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* Fixed displayed device name when connected to Windows
+
 ### Added
 
 #### Home Screen:
