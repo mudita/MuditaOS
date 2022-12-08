@@ -624,7 +624,7 @@
   "app_bell_onboarding_info_deep_click_warning": "<text weight='light' size='38'>Vous avez </text><text weight='regular' size='38'>appuyé fort</text>",
   "app_bell_onboarding_info_deep_click_correction": "<text weight='light' size='38'>Soyez plus doux, <br></br>essayez </text><text weight='regular' size='38'>de cliquer plus </text><text weight='light' size='38'>légèrement cette fois</text>",
   "app_bell_onboarding_welcome": "Bienvenu",
-  "app_bell_onboarding_shortcuts_question": "Voulez-vous voir les instructions sur les raccourcis ?",
+  "app_bell_onboarding_shortcuts_question": "Voulez-vous voir les instructions sur les raccourcis ?",
   "app_bell_onboarding_shortcuts_start": "Commencer",
   "app_bell_onboarding_shortcuts_skip": "Ignorer",
   "app_bell_onboarding_shortcuts_step_rotate": "Faites tourner pour sélectionner",
