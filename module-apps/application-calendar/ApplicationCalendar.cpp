@@ -48,6 +48,7 @@ namespace app
                       gui::popup::ID::BluetoothAuthenticate,
                       gui::popup::ID::PhoneModes,
                       gui::popup::ID::PhoneLock,
+                      gui::popup::ID::SimLock,
                       gui::popup::ID::Alarm});
     }
 
