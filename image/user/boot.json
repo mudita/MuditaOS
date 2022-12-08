@@ -16,7 +16,7 @@
       "active": "a",
       "boot_attempts_max": "10"
     },
-    "os": "boot.bin",
+    "os": "os.bin",
     "recovery": "recovery.bin",
     "bin_dir": "bin",
     "update_dir": "/user/temp/update"
