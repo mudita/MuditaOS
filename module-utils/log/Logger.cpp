@@ -38,6 +38,8 @@ namespace Log
             {"ServiceFota", logger_level::LOGINFO},
             {"ServiceEink", logger_level::LOGINFO},
             {"ServiceDB", logger_level::LOGINFO},
+            {"ServiceDesktop", logger_level::LOGINFO},
+            {"ServiceDesktop_w3", logger_level::LOGINFO},
             {CRIT_STR, logger_level::LOGTRACE},
             {IRQ_STR, logger_level::LOGTRACE},
             {"FileIndexer", logger_level::LOGINFO},
