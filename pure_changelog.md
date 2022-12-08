@@ -49,6 +49,7 @@
 * Added basic MMS handling
 * Added run-time statistics for tasks
 * Added VoLTE support
+* Added pop-up about SIM removed/inserted in all apps
 
 ## [1.3.0 2022-08-04]
 
