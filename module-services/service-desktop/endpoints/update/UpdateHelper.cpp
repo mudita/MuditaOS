@@ -206,7 +206,7 @@ namespace sdesktop::endpoints
         return {sent::no, ResponseContext{.status = code}};
     }
     UpdateHelper::UpdateHelper(sys::Service *p)
-        : BaseHelper(p), updatePackagePath{purefs::dir::getTemporaryPath() / "update"}, binariesPath{get_binary_dir()}
+        : BaseHelper(p), updatePackagePath{purefs::dir::getTemporaryPath() / "update"}, binariesPath{"bin"}
     {}
 
 } // namespace sdesktop::endpoints
