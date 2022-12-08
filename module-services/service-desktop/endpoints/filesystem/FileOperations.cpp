@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/filesystem/FileOperations.hpp>
@@ -22,8 +22,6 @@ auto FileOperations::createReceiveIDForFile(const std::filesystem::path &file) -
         throw std::runtime_error("File size error");
     }
 
-    LOG_DEBUG("Creating rxID %u", static_cast<unsigned>(rxID));
-
     createFileReadContextFor(file, size, rxID);
 
     return std::make_pair(rxID, size);
@@ -44,8 +42,6 @@ void FileOperations::cancelTimedOutReadTransfer()
     }
 
     fileCtxEntry->second.reset();
-
-    LOG_DEBUG("Canceling timed out rxID %u", static_cast<unsigned>(timedOutXfer));
     readTransfers.erase(timedOutXfer);
 }
 
@@ -66,8 +62,6 @@ void FileOperations::cancelTimedOutWriteTransfer()
     fileCtxEntry->second->removeFile();
 
     fileCtxEntry->second.reset();
-
-    LOG_DEBUG("Canceling timed out rxID %u", static_cast<unsigned>(timedOutXfer));
     writeTransfers.erase(timedOutXfer);
 }
 
@@ -128,8 +122,6 @@ auto FileOperations::decodeDataFromBase64(const std::string &encodedData) const 
 
 auto FileOperations::getDataForReceiveID(transfer_id rxID, std::uint32_t chunkNo) -> DataWithCrc32
 {
-    LOG_DEBUG("Getting chunk %u for rxID %u", static_cast<unsigned>(chunkNo), static_cast<unsigned>(rxID));
-
     const auto fileCtxEntry = readTransfers.find(rxID);
     std::string fileCrc32   = {};
 
@@ -173,8 +165,6 @@ auto FileOperations::createTransmitIDForFile(const std::filesystem::path &file,
     cancelTimedOutWriteTransfer();
     const auto txID = ++runningTxId;
 
-    LOG_DEBUG("Creating txID %u", static_cast<unsigned>(txID));
-
     createFileWriteContextFor(file, size, Crc32, txID);
 
     return txID;
@@ -183,7 +173,6 @@ auto FileOperations::createTransmitIDForFile(const std::filesystem::path &file,
 auto FileOperations::sendDataForTransmitID(transfer_id txID, std::uint32_t chunkNo, const std::string &data)
     -> sys::ReturnCodes
 {
-    LOG_DEBUG("Transmitting chunk %u for txID %u", static_cast<unsigned>(chunkNo), static_cast<unsigned>(txID));
     auto returnCode = sys::ReturnCodes::Success;
 
     const auto fileCtxEntry = writeTransfers.find(txID);

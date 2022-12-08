@@ -1,6 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="JLink server" type="com.jetbrains.cidr.embedded.customgdbserver.type" factoryName="com.jetbrains.cidr.embedded.customgdbserver.factory" PROGRAM_PARAMS="-if SWD -device MCIMXRT1051 -speed 25000 -jlinkscriptfile &quot;evkbimxrt1050_sdram_init.jlinkscript&quot; -strict -ir -rtos GDBServer/RTOSPlugin_FreeRTOS" REDIRECT_INPUT="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="PurePhone" CONFIG_NAME="Linux" version="1" RUN_TARGET_PROJECT_NAME="PurePhone" RUN_TARGET_NAME="PurePhone">
-    <custom-gdb-server version="1" gdb-connect="localhost:2331" executable="JLinkGDBServerCLExe" warmup-ms="0" download-type="ALWAYS" reset-cmd="monitor reset 0" reset-after-download="false" />
+  <configuration default="false" name="JLink server" type="com.jetbrains.cidr.embedded.customgdbserver.type" factoryName="com.jetbrains.cidr.embedded.customgdbserver.factory" PROGRAM_PARAMS="-if SWD -device MCIMXRT1051 -speed 25000 -jlinkscriptfile &quot;evkbimxrt1050_sdram_init.jlinkscript&quot; -strict -ir -rtos GDBServer/RTOSPlugin_FreeRTOS" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PureOS" TARGET_NAME="Pure" CONFIG_NAME="Linux" version="1" RUN_PATH="$PROJECT_DIR$/build-rt1051/PurePhone.elf">
+    <custom-gdb-server version="1" gdb-connect="localhost:2331" executable="JLinkGDBServerCLExe" warmup-ms="0" download-type="ALWAYS" reset-cmd="monitor reset 0" reset-type="NEVER">
+      <debugger kind="GDB" isBundled="true" />
+    </custom-gdb-server>
     <method v="2" />
   </configuration>
 </component>

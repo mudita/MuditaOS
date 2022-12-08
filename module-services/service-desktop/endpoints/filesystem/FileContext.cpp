@@ -113,8 +113,6 @@ auto FileReadContext::read() -> std::vector<std::uint8_t>
 
 auto FileWriteContext::write(const std::vector<std::uint8_t> &data) -> void
 {
-    LOG_DEBUG("Sending file data");
-
     std::ofstream file(path, std::ios::binary | std::ios::app);
 
     if (!file.is_open() || file.fail()) {
