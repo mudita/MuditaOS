@@ -42,6 +42,7 @@
 * Fixed disappearing "confirm" button in PIN entering screen
 * Fixed looping on the SIM card selection screen
 * Fixed screen lock during onboarding
+* Fixed displayed device name when connected to Windows
 
 ### Added
 * Added a popup for changing the SIM card
