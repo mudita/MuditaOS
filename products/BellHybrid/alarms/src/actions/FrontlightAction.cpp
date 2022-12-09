@@ -15,6 +15,18 @@ namespace alarms
 {
     namespace
     {
+        void validateBrightness(std::string &brightness)
+        {
+            constexpr std::string_view DefaultBrightness{"50.0"};
+
+            if (brightness.empty()) {
+                brightness = DefaultBrightness;
+            }
+        }
+    } // namespace
+
+    namespace
+    {
         screen_light_control::Sender translateDependency(FrontlightAction::SettingsDependency dependency)
         {
             screen_light_control::Sender sender;
@@ -136,7 +148,7 @@ namespace alarms
     {
         std::string brightnessString =
             settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
-
+        validateBrightness(brightnessString);
         screen_light_control::ManualModeParameters params{};
         params.manualModeBrightness = utils::toNumeric(brightnessString);
 
@@ -195,6 +207,7 @@ namespace alarms
 
         std::string brightnessString =
             settings.getValue(bell::settings::PrewakeUp::brightness, settings::SettingsScope::Global);
+        validateBrightness(brightnessString);
         const auto value = settings.getValue(bell::settings::PrewakeUp::lightDuration, settings::SettingsScope::Global);
         const auto lightDuration        = std::chrono::minutes{utils::toNumeric(value)};
         const auto secondTargetDuration = lightDuration - std::chrono::minutes{1} - firstTargetDuration;
