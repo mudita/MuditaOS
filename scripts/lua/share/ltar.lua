@@ -60,6 +60,7 @@ end
 
 local function write_tarfile_chunks(handle, fd)
     local size = 1024 * 512
+    collectgarbage()
     while true do
         local block = fd:read(size)
         if not block then
@@ -73,6 +74,7 @@ local function read_tarfile_chunks(handle, fd, total_size)
     local block_size = 1024 * 512
     local to_read = {};
 
+    collectgarbage()
     while total_size > 0 do
         if total_size > block_size then
             to_read = block_size

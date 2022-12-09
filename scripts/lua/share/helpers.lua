@@ -68,6 +68,7 @@ function helpers.copy_file(filename_in, filename_out)
     local size_in = lfs.attributes(filename_in, "size")
     local fd_in = assert(io.open(filename_in, "r"))
     local fd_out = assert(io.open(filename_out, "w"))
+    collectgarbage()
     while true do
         local block = fd_in:read(size)
         if not block then
@@ -137,6 +138,21 @@ function helpers.copy_dir(from, where)
             assert(lfs.mkdir(build_path(where, name)))
         else
             helpers.copy_file(filename, build_path(where, name))
+        end
+    end
+end
+
+--- Move directory recursively
+-- @function move_dir
+-- @param from source directory
+-- @param where target directory
+function helpers.move_dir(from, where)
+    for filename, attr in dirtree(from) do
+        local name = filename:gsub(from, "")
+        if attr.mode == "directory" then
+            assert(lfs.mkdir(build_path(where, name)))
+        else
+            assert(os.rename(build_path(from, name),build_path(where, name)))
         end
     end
 end
