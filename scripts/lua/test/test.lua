@@ -44,6 +44,16 @@ end
 function bootctrl.mark_as_bootable(slot)
 end
 
+function bootctrl.mark_as_unbootable(slot)
+end
+
+function bootctrl.mark_as_successful()
+end
+
+function bootctrl.get_current_slot()
+    return bootctrl.slot.b
+end
+
 function bootctrl.get_next_active()
 end
 
@@ -57,6 +67,10 @@ function gui.clear()
 end
 
 function gui.display_raw_img(width, height, data)
+end
+
+-- Overwrite lfs.chdir method as we do not want to change working directory during running tests on the host
+lfs.chdir = function(dir)
 end
 
 sys.user = stub()

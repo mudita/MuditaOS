@@ -34,19 +34,19 @@ end
 
 local function copy_update_package()
     local target_dir = recovery.sys.target_slot()
-    print(string.format("Copying content of the update package '%s to '%s'", paths.update_dir, target_dir))
+    print(string.format("Copying content of the update package '%s' to '%s'", paths.update_dir, target_dir))
     helpers.copy_dir(paths.update_dir, target_dir)
 end
 
 local function copy_databases()
-    local from = paths.db_dir
+    local from = recovery.sys.user()
     local to = paths.target.db_dir
     print(string.format("Copying databases from '%s' to '%s'", from, to))
     helpers.copy_dir_filtered(from, to, match_db_files)
 end
 
 local function create_directories()
-    print("Creating 'log', 'crash_dumps' and 'var' directories")
+    print("Creating 'log', 'crash_dumps' and 'sys' directories")
 
     local target_dir = recovery.sys.target_slot()
     lfs.mkdir(target_dir .. "/log")
@@ -66,22 +66,41 @@ local function migrate_db()
     assert(result == migration.retcode.OK, string.format("Database migration process failed with %d", result))
 end
 
+local function enter()
+    -- Mark the current slot as successful 
+    recovery.bootctrl.mark_as_successful()
+    -- Mark the target slot as unbootable
+    recovery.bootctrl.mark_as_unbootable(recovery.bootctrl.get_next_active())
+end
+
 local function exit()
     print("Finishing update process")
     helpers.rmdir(paths.update_dir)
     os.remove(paths.update_file)
+
+    -- Update the working directory to the newly updated scripts directory
+    lfs.chdir(recovery.sys.target_slot() .. "/scripts")
+
+    -- Mark the old 'MUDITAOS' partition as unbootable&unsuccessful
+    recovery.bootctrl.mark_as_unbootable(recovery.bootctrl.get_current_slot())
+    -- Mark the 'system_b' as bootable and active
     recovery.bootctrl.mark_as_bootable(recovery.bootctrl.get_next_active())
     recovery.bootctrl.mark_as_active(recovery.bootctrl.get_next_active())
     recovery.sys.set_os_boot_status(false)
 end
 
 local function repartition_filesystem()
-    print("Repartinioning 'MUDITAOS' and 'BACKUP' partitions and changing theirs labels")
+    print("Repartitioning 'MUDITAOS' and 'BACKUP' partitions and changing theirs labels")
+
+    -- Repartitioning filesystem remounts all available disks. During this process, working directory
+    -- will be set to the default one hence we need to recreate it.
+    local wdir = lfs.currentdir()
     recovery.sys.repartition_fs()
+    lfs.chdir(wdir)
 end
 
 local function user_remove_directories()
-    print("->Removing backup, crash_dums, data, db, logs, tmp directories")
+    print("->Removing backup, crash_dumps, data, db, logs, tmp directories")
     if helpers.exists(recovery.sys.user() .. "/backup") then
         helpers.rmdir(recovery.sys.user() .. "/backup")
     end
@@ -108,9 +127,8 @@ local function user_remove_files()
 end
 
 local function user_create_directories()
-    print("->Creating media, temp directories")
+    print("->Creating media directory")
     lfs.mkdir(recovery.sys.user() .. "/media")
-    lfs.mkdir(recovery.sys.user() .. "/temp")
 end
 
 local function user_product_specific()
@@ -127,6 +145,7 @@ local function adjust_user_partition_layout()
 end
 
 function update.execute()
+    enter()
     repartition_filesystem()
     purge_target_slot()
     copy_update_package()

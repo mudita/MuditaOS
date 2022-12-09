@@ -1,4 +1,5 @@
 local update = {}
+local lfs = require('lfs')
 local json = require('lunajson')
 local paths = require('paths')
 local consts = require('consts')
@@ -76,16 +77,29 @@ local function copy_var_directory()
 
 end
 
+local function enter()
+    -- Mark the current slot as successful 
+    recovery.bootctrl.mark_as_successful()
+    -- Mark the target slot as unbootable
+    recovery.bootctrl.mark_as_unbootable(recovery.bootctrl.get_next_active())
+end
+
 local function exit()
-    print("Finishing update process")
+    print("Finishing update process...")
+
     helpers.rmdir(paths.update_dir)
     os.remove(paths.update_file)
+
+    -- Update the working directory to the newly updated scripts directory
+    lfs.chdir(recovery.sys.target_slot() .. "/scripts")
+
     recovery.bootctrl.mark_as_bootable(recovery.bootctrl.get_next_active())
     recovery.bootctrl.mark_as_active(recovery.bootctrl.get_next_active())
     recovery.sys.set_os_boot_status(false)
 end
 
 function update.execute()
+    enter()
     purge_target_slot()
     copy_update_package()
     copy_databases()
