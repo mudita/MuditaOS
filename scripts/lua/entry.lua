@@ -1,7 +1,4 @@
-package.path = package.path .. ";share/?.lua"
-
 local helpers = require('helpers')
-
 local paths = require('paths')
 local rec = require('recovery')
 local backup = require('backup')

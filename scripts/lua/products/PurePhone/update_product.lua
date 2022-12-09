@@ -12,9 +12,11 @@ function update_product.execute()
     local new_battery_config = paths.target.var_dir .. "/batteryFuelGaugeConfig.cfg"
 
     assert(helpers.mkdirp(new_music_dir))
-    helpers.copy_dir(old_music_dir, new_music_dir)
+    helpers.move_dir(old_music_dir, new_music_dir)
     helpers.rmdir(old_music_dir)
-    helpers.copy_file(old_battery_config, new_battery_config)
+    if helpers.exists(old_battery_config) then
+        helpers.copy_file(old_battery_config, new_battery_config)
+    end
 end
 
 return update_product
