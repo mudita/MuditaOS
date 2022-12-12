@@ -39,7 +39,8 @@ namespace app::bell_settings
 
         chimeDuration->onProceed = [chimeDuration, this]() {
             if (chimeDuration->value() == 0) {
-                this->onExit();
+                constexpr auto lightDurationListIndex = 3U;
+                list->rebuildList(gui::listview::RebuildType::OnOffset, lightDurationListIndex);
                 return true;
             }
             return false;
