@@ -99,7 +99,6 @@ namespace alarms
     bool FrontlightAction::execute()
     {
         std::string settingString;
-        std::string prewakeupString;
 
         switch (settingsDependency) {
         case SettingsDependency::AlarmClock:
@@ -112,10 +111,9 @@ namespace alarms
             }
             break;
         case SettingsDependency::Prewakeup:
-            prewakeupString = settings.getValue(bell::settings::PrewakeUp::duration, settings::SettingsScope::Global);
             settingString =
                 settings.getValue(bell::settings::PrewakeUp::lightDuration, settings::SettingsScope::Global);
-            if (settingString == std::string(prewakeupFrontlightOFF) || prewakeupString == std::string(prewakeupOFF)) {
+            if (settingString == std::string(prewakeupFrontlightOFF)) {
                 return true;
             }
             break;
