@@ -181,6 +181,9 @@ int main()
 #ifdef ENABLE_SERVICE_BLUETOOTH
     systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
 #endif
+#ifdef ENABLE_SERVICE_DESKTOP
+    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>(purefs::dir::getUserMediaPath() / "app/music_player"));
+#endif
 #ifdef ENABLE_SERVICE_TIME
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
 #endif

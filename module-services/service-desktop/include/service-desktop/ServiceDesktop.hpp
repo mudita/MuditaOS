@@ -51,7 +51,7 @@ namespace sdesktop::bluetooth
 class ServiceDesktop : public sys::Service
 {
   public:
-    ServiceDesktop();
+    explicit ServiceDesktop(const std::filesystem::path &mtpRootPath);
     ~ServiceDesktop() override;
 
     std::unique_ptr<WorkerDesktop> desktopWorker;
@@ -92,6 +92,7 @@ class ServiceDesktop : public sys::Service
     bool initialized                                         = false;
     bool isPlugEventUnhandled                                = false;
     bool isUsbConfigured                                     = false;
+    std::filesystem::path mtpRootPath;
 
     void generateDeviceUniqueId();
     auto getDeviceUniqueId() const -> std::string;
