@@ -36,7 +36,6 @@ namespace alarms
       private:
         static constexpr std::string_view alarmFrontlightOFF     = "0";
         static constexpr std::string_view prewakeupFrontlightOFF = "0";
-        static constexpr std::string_view prewakeupOFF           = "0";
 
         sys::Service &service;
         SettingsDependency settingsDependency;
