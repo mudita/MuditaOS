@@ -11,14 +11,15 @@
 #include <system/messages/TetheringStateRequest.hpp>
 #include <Timers/TimerFactory.hpp>
 
-ServiceDesktop::ServiceDesktop()
+ServiceDesktop::ServiceDesktop(const std::filesystem::path &mtpRootPath)
     : sys::Service(service::name::service_desktop, "", sdesktop::service_stack),
       btMsgHandler(std::make_unique<sdesktop::bluetooth::BluetoothMessagesHandler>(this)),
       connectionActiveTimer{sys::TimerFactory::createSingleShotTimer(
           this,
           sdesktop::connectionActiveTimerName,
           sdesktop::connectionActiveTimerDelayMs,
-          [this](sys::Timer & /*timer*/) { outboxNotifications.clearNotifications(); })}
+          [this](sys::Timer & /*timer*/) { outboxNotifications.clearNotifications(); })},
+      mtpRootPath{mtpRootPath}
 {
     LOG_INFO("[ServiceDesktop] Initializing");
     bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
@@ -180,7 +181,7 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
                                                     *usbSecurityModel,
                                                     serialNumber,
                                                     caseColour,
-                                                    purefs::dir::getUserMediaPath());
+                                                    mtpRootPath);
 
     initialized =
         desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},

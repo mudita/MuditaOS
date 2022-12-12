@@ -11,12 +11,11 @@ namespace
     constexpr inline auto PATH_DB          = "db";
     constexpr inline auto PATH_LOGS        = "log";
     constexpr inline auto PATH_CRASH_DUMPS = "crash_dumps";
-    constexpr inline auto PATH_USER_MEDIA =
-        "media"; // TODO this won't work with our current non-hierarchical MTP implementation
-    constexpr inline auto PATH_TMP    = "temp";
-    constexpr inline auto PATH_ASSETS = "assets";
-    constexpr inline auto PATH_DATA   = "data";
-    constexpr inline auto PATH_VAR    = "var";
+    constexpr inline auto PATH_USER_MEDIA  = "media";
+    constexpr inline auto PATH_TMP         = "temp";
+    constexpr inline auto PATH_ASSETS      = "assets";
+    constexpr inline auto PATH_DATA        = "data";
+    constexpr inline auto PATH_VAR         = "var";
 } // namespace
 
 namespace purefs
