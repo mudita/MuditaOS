@@ -6,7 +6,7 @@
 
 std::filesystem::path paths::audio::user() noexcept
 {
-    return purefs::dir::getUserDiskPath() / "audio";
+    return purefs::dir::getUserMediaPath() / "app";
 }
 std::filesystem::path paths::audio::proprietary() noexcept
 {
