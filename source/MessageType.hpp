@@ -16,7 +16,6 @@ enum class MessageType
     DBServiceEvents,
 
     DBServiceNotification, ///< Common service-db notification message.
-    DBServiceBackup,
     DBSyncPackage,
 
     DBSettingsGet,    ///< get current settings from database

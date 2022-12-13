@@ -21,8 +21,6 @@ class ServiceDB : public ServiceDBCommon
   public:
     ~ServiceDB() override;
 
-    bool StoreIntoBackup(const std::filesystem::path &backupPath);
-
   private:
     std::unique_ptr<EventsDB> eventsDB;
     std::unique_ptr<db::multimedia_files::MultimediaFilesDB> multimediaFilesDB;
@@ -31,7 +29,6 @@ class ServiceDB : public ServiceDBCommon
     std::unique_ptr<db::multimedia_files::MultimediaFilesRecordInterface> multimediaFilesRecordInterface;
 
     db::Interface *getInterface(db::Interface::Name interface) override;
-    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
     sys::ReturnCodes InitHandler() override;
 };
 
