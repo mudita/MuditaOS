@@ -39,34 +39,6 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
     return nullptr;
 }
 
-sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
-{
-    auto responseMsg = std::static_pointer_cast<sys::ResponseMessage>(ServiceDBCommon::DataReceivedHandler(msgl, resp));
-    if (responseMsg) {
-        return responseMsg;
-    }
-    auto type = static_cast<MessageType>(msgl->messageType);
-    switch (type) {
-
-    case MessageType::DBServiceBackup: {
-        auto time   = utils::time::Scoped("DBServiceBackup");
-        auto msg    = static_cast<DBServiceMessageBackup *>(msgl);
-        auto ret    = StoreIntoBackup({msg->backupPath});
-        responseMsg = std::make_shared<DBServiceResponseMessage>(ret);
-    } break;
-
-    default:
-        break;
-    }
-
-    if (responseMsg == nullptr) {
-        return std::make_shared<sys::ResponseMessage>();
-    }
-
-    responseMsg->responseTo = msgl->messageType;
-    return responseMsg;
-}
-
 sys::ReturnCodes ServiceDB::InitHandler()
 {
     if (const auto returnCode = ServiceDBCommon::InitHandler(); returnCode != sys::ReturnCodes::Success) {
@@ -91,20 +63,4 @@ sys::ReturnCodes ServiceDB::InitHandler()
     }
 
     return sys::ReturnCodes::Success;
-}
-
-bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
-{
-    if (eventsDB->storeIntoFile(backupPath / std::filesystem::path(eventsDB->getName()).filename()) == false) {
-        LOG_ERROR("eventsDB backup failed");
-        return false;
-    }
-
-    return std::all_of(databaseAgents.cbegin(), databaseAgents.cend(), [&backupPath](const auto &agent) {
-        if (not agent->storeIntoFile(backupPath / std::filesystem::path(agent->getDbFilePath()).filename())) {
-            LOG_ERROR("%s backup failed", agent->getAgentName().c_str());
-            return false;
-        }
-        return true;
-    });
 }

@@ -27,7 +27,7 @@ SettingsAgent::SettingsAgent(sys::Service *parentService, const std::string dbNa
         this->cache = settings::SettingsCache::getInstance();
     }
 
-    database = std::make_unique<Database>(getDbFilePath().c_str());
+    database = std::make_unique<Database>((purefs::dir::getDatabasesPath() / dbName).c_str());
 
     factorySettings.initDb(database.get());
 
@@ -68,10 +68,6 @@ void SettingsAgent::unRegisterMessages()
     parentService->disconnect(typeid(settings::Messages::UnregisterOnVariableChange));
 }
 
-auto SettingsAgent::getDbFilePath() -> const std::string
-{
-    return (purefs::dir::getDatabasesPath() / dbName).string();
-}
 auto SettingsAgent::getAgentName() -> const std::string
 {
     return std::string("settingsAgent");

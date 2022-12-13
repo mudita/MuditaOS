@@ -25,9 +25,6 @@ class DatabaseAgent
     virtual void unRegisterMessages()                              = 0;
     [[nodiscard]] virtual auto getAgentName() -> const std::string = 0;
 
-    bool storeIntoFile(const std::filesystem::path &file);
-    [[nodiscard]] virtual auto getDbFilePath() -> const std::string = 0;
-
     static constexpr auto ZERO_ROWS_FOUND = 0;
     static constexpr auto ONE_ROW_FOUND   = 1;
 
