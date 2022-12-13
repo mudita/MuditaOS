@@ -16,9 +16,10 @@ from harness import utils
 from harness.interface.error import TestError, Error
 from harness.interface.CDCSerial import Keytype, CDCSerial as serial
 from harness.interface.defs import key_codes
-
-
+from harness.api.security import SetPhoneLockOff, GetPhoneLockStatus
+from harness.request import TransactionError
 simulator_port = 'simulator'
+
 
 def pytest_addoption(parser):
     parser.addoption("--port", type=str, action="store", required=False)
@@ -27,6 +28,8 @@ def pytest_addoption(parser):
     parser.addoption("--call_duration", type=int, action="store", default=30)
     parser.addoption("--sms_text", type=str, action="store", default='')
     parser.addoption("--bt_device", type=str, action="store", default='')
+    parser.addoption("--passcode", type=str, action="store", default="3333")
+    parser.addoption("--update_file_path", type=str, action="store", default="")
 
 
 @pytest.fixture(scope='session')
@@ -42,6 +45,18 @@ def call_duration(request):
     assert call_duration
     return call_duration
 
+@pytest.fixture(scope='session')
+def passcode(request):
+    passcode = request.config.option.passcode
+    assert passcode
+    pass_list = [int(x) for x in passcode]
+    return pass_list
+
+@pytest.fixture(scope='session')
+def update_file_path(request):
+    update_file_path = request.config.option.update_file_path
+    assert update_file_path
+    return update_file_path
 
 @pytest.fixture(scope='session')
 def sms_text(request):
@@ -49,10 +64,12 @@ def sms_text(request):
     assert sms_text != ''
     return sms_text
 
+
 @pytest.fixture(scope='session')
 def bt_device(request):
     bt_device = request.config.option.bt_device
     return bt_device
+
 
 @pytest.fixture(scope='session')
 def harness(request):
@@ -76,7 +93,7 @@ def harness(request):
                         harness = Harness.from_detect()
                     except TestError as e:
                         if e.get_error_code() == Error.PORT_NOT_FOUND:
-                            log.info(f"waiting for a serial port… ({TIMEOUT- int(time.time() - timeout_started)})")
+                            log.info(f"waiting for a serial port… ({TIMEOUT - int(time.time() - timeout_started)})")
                             time.sleep(RETRY_EVERY_SECONDS)
         else:
             assert '/dev' in port_name or simulator_port in port_name
@@ -89,7 +106,7 @@ def harness(request):
                             file = open("/tmp/purephone_pts_name", "r")
                         except FileNotFoundError as err:
                             log.info(
-                                f"waiting for a simulator port… ({TIMEOUT- int(time.time() - timeout_started)})")
+                                f"waiting for a simulator port… ({TIMEOUT - int(time.time() - timeout_started)})")
                             time.sleep(RETRY_EVERY_SECONDS)
                 port_name = file.readline()
                 if port_name.isascii():
@@ -116,6 +133,7 @@ def harness(request):
     else:
         return harness
 
+
 @pytest.fixture(scope='session')
 def harnesses():
     '''
@@ -128,15 +146,28 @@ def harnesses():
     assert len(harnesses) >= 2
     return harnesses
 
+
 @pytest.fixture(scope='session')
 def phone_unlocked(harness):
     harness.unlock_phone()
     assert not harness.is_phone_locked()
 
+
+@pytest.fixture(scope='session')
+def phone_security_unlocked(harness,passcode):
+    for _ in range(2):
+        try:
+            GetPhoneLockStatus().run(harness)
+        except TransactionError as e:
+            log.info(f"transaction code: {e}")
+            log.info("Phone security locked, unlocking")
+            SetPhoneLockOff(passcode=passcode).run(harness)
+
 @pytest.fixture(scope='session')
 def phone_locked(harness):
     harness.lock_phone()
     assert harness.is_phone_locked()
+
 
 @pytest.fixture(scope='session')
 def phones_unlocked(harnesses):
@@ -156,16 +187,17 @@ def phone_in_desktop(harness):
     # assert that we are in ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
 
+
 @pytest.fixture(scope='function')
 def phone_ends_test_in_desktop(harness):
     yield
     target_application = "ApplicationDesktop"
-    target_window     = "MainWindow"
+    target_window = "MainWindow"
     log.info(f"returning to {target_window} of {target_application} ...")
     time.sleep(1)
 
-    if harness.get_application_name() != target_application :
-        body = {"switchApplication" : {"applicationName": target_application, "windowName" : target_window }}
+    if harness.get_application_name() != target_application:
+        body = {"switchApplication": {"applicationName": target_application, "windowName": target_window}}
         harness.endpoint_request("developerMode", "put", body)
         time.sleep(1)
 
@@ -177,15 +209,16 @@ def phone_ends_test_in_desktop(harness):
 
             log.info(f"Not in {target_application}, {max_retry_counter} attempts left...")
             time.sleep(1)
-    else :
+    else:
         # switching window in case ApplicationDesktop is not on MainWindow:
-        body = {"switchWindow" : {"applicationName": target_application, "windowName" : target_window }}
+        body = {"switchWindow": {"applicationName": target_application, "windowName": target_window}}
         harness.endpoint_request("developerMode", "put", body)
         time.sleep(1)
 
     # assert that we are in ApplicationDesktop
     assert harness.get_application_name() == target_application
     time.sleep(1)
+
 
 def pytest_configure(config):
     config.addinivalue_line("markers",
