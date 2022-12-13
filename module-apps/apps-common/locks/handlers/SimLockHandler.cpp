@@ -40,10 +40,13 @@ namespace locks
 
     void SimLockHandler::simInputRequiredAction()
     {
-        app::manager::Controller::sendAction(
-            owner,
-            app::manager::actions::ShowPopup,
-            std::make_unique<gui::SimUnlockInputRequestParams>(gui::popup::ID::SimLock, lock, simInputTypeAction));
+        // If the SIM card is not selected yet, we do not show the pop-up
+        if (Store::GSM::get()->selected != Store::GSM::SelectedSIM::NONE) {
+            app::manager::Controller::sendAction(
+                owner,
+                app::manager::actions::ShowPopup,
+                std::make_unique<gui::SimUnlockInputRequestParams>(gui::popup::ID::SimLock, lock, simInputTypeAction));
+        }
     }
 
     void SimLockHandler::simErrorAction(unsigned int errorCode)
