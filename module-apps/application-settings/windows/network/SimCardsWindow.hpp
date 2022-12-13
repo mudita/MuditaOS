@@ -21,6 +21,8 @@ namespace gui
 
         std::list<gui::Option> createListWithNoConnectedSim(const Store::GSM::SelectedSIM sim,
                                                             const std::string &simStr);
+        std::list<gui::Option> createListWithNoSelectedSim(const Store::GSM::SelectedSIM sim,
+                                                           const std::string &simStr);
         std::list<gui::Option> createListWithBlockedSim(const Store::GSM::SelectedSIM sim, const std::string &simStr);
         std::list<gui::Option> createListWithActiveSim(const Store::GSM::SelectedSIM sim,
                                                        const std::string &simStr,
