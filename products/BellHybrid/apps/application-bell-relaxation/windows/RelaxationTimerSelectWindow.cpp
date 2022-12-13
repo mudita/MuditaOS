@@ -131,12 +131,9 @@ namespace gui
 
     void RelaxationTimerSelectWindow::updateBottomDescription()
     {
-        const auto currentVal = spinner->value();
-        bottomDescription->setText(utils::language::getCorrectMinutesNumeralForm(UTF8ToTimerValue(currentVal).count()));
+        const auto minutesValue = UTF8ToTimerValue(spinner->value());
 
-        const auto description = UTF8ToTimerValue(currentVal);
-
-        switch (description.count()) {
+        switch (minutesValue.count()) {
         case onceValue.count():
             bottomDescription->setText(utils::translate("app_bell_relaxation_once_description"));
             break;
@@ -144,7 +141,7 @@ namespace gui
             bottomDescription->setText(utils::translate("app_bell_relaxation_loop_description"));
             break;
         default:
-            bottomDescription->setText(utils::translate("common_minutes_lower"));
+            bottomDescription->setText(utils::language::getCorrectMinutesNumeralForm(minutesValue.count()));
             break;
         }
     }
