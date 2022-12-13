@@ -25,7 +25,7 @@ namespace
 namespace service::db::agents
 {
     MeditationStats::MeditationStats(sys::Service *parentService, const std::string dbName)
-        : DatabaseAgent(parentService), dbName{dbName}, db{getDbFilePath().c_str()}
+        : DatabaseAgent(parentService), dbName{dbName}, db{(purefs::dir::getDatabasesPath() / dbName).c_str()}
     {}
 
     void MeditationStats::registerMessages()
@@ -40,10 +40,6 @@ namespace service::db::agents
         parentService->disconnect(typeid(messages::GetByDays));
     }
 
-    auto MeditationStats::getDbFilePath() -> const std::string
-    {
-        return (purefs::dir::getDatabasesPath() / dbName).string();
-    }
     auto MeditationStats::getAgentName() -> const std::string
     {
         return dbName + "_agent";

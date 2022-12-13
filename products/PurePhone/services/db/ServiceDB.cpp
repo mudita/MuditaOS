@@ -193,13 +193,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Update, msg->record.ID);
     } break;
 
-    case MessageType::DBServiceBackup: {
-        auto time   = utils::time::Scoped("DBServiceBackup");
-        auto msg    = static_cast<DBServiceMessageBackup *>(msgl);
-        auto ret    = StoreIntoBackup({msg->backupPath});
-        responseMsg = std::make_shared<DBServiceResponseMessage>(ret);
-    } break;
-
     case MessageType::DBSyncPackage: {
         auto time   = utils::time::Scoped("DBSyncPackage");
         auto msg    = static_cast<DBServiceMessageSyncPackage *>(msgl);
@@ -262,65 +255,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
         std::make_unique<Quotes::QuotesAgent>(predefinedQuotesDB.get(), customQuotesDB.get(), std::move(settings));
 
     return sys::ReturnCodes::Success;
-}
-
-bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
-{
-    if (eventsDB->storeIntoFile(backupPath / std::filesystem::path(eventsDB->getName()).filename()) == false) {
-        LOG_ERROR("eventsDB backup failed");
-        return false;
-    }
-
-    if (contactsDB->storeIntoFile(backupPath / std::filesystem::path(contactsDB->getName()).filename()) == false) {
-        LOG_ERROR("contactsDB backup failed");
-        return false;
-    }
-
-    if (smsDB->storeIntoFile(backupPath / std::filesystem::path(smsDB->getName()).filename()) == false) {
-        LOG_ERROR("smsDB backup failed");
-        return false;
-    }
-
-    if (notesDB->storeIntoFile(backupPath / std::filesystem::path(notesDB->getName()).filename()) == false) {
-        LOG_ERROR("notesDB backup failed");
-        return false;
-    }
-
-    if (calllogDB->storeIntoFile(backupPath / std::filesystem::path(calllogDB->getName()).filename()) == false) {
-        LOG_ERROR("calllogDB backup failed");
-        return false;
-    }
-
-    if (predefinedQuotesDB->storeIntoFile(backupPath /
-                                          std::filesystem::path(predefinedQuotesDB->getName()).filename()) == false) {
-        LOG_ERROR("predefinedQuotesDB backup failed");
-        return false;
-    }
-
-    if (customQuotesDB->storeIntoFile(backupPath / std::filesystem::path(customQuotesDB->getName()).filename()) ==
-        false) {
-        LOG_ERROR("customQuotesDB backup failed");
-        return false;
-    }
-
-    if (notificationsDB->storeIntoFile(backupPath / std::filesystem::path(notificationsDB->getName()).filename()) ==
-        false) {
-        LOG_ERROR("notificationsDB backup failed");
-        return false;
-    }
-
-    for (auto &db : databaseAgents) {
-        if (db.get() && db.get()->getAgentName() == "settingsAgent") {
-
-            if (db->storeIntoFile(backupPath / std::filesystem::path(db->getDbFilePath()).filename()) == false) {
-                LOG_ERROR("settingsAgent backup failed");
-                return false;
-            }
-            break;
-        }
-    }
-
-    return true;
 }
 
 bool ServiceDB::StoreIntoSyncPackage(const std::filesystem::path &syncPackagePath)
