@@ -10,7 +10,9 @@
 
 namespace
 {
-    constexpr auto stackSize            = 1024 * 4;
+    // 4kB is too small because internally drflac_open() uses cache which by default has 4kB.
+    // Alternatively smaller DR_FLAC_BUFFER_SIZE could be defined.
+    constexpr auto stackSize            = 1024 * 8;
     constexpr auto defaultVolume        = "5";
     constexpr auto defaultSnoozeVolume  = "4";
     constexpr auto defaultBedtimeVolume = "6";
