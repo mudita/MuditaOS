@@ -32,7 +32,6 @@ class SettingsAgent : public DatabaseAgent
     void registerMessages() override;
     void unRegisterMessages() override;
     auto getAgentName() -> const std::string override;
-    auto getDbFilePath() -> const std::string override;
 
   private:
     settings::SettingsCache *cache;
