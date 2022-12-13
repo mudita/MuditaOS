@@ -34,7 +34,7 @@ namespace alarms::paths
 
     std::filesystem::path getBackgroundSoundsDir() noexcept
     {
-        return purefs::dir::getAssetsDirPath() / "audio/bg_sounds";
+        return purefs::dir::getAssetsDirPath() / "audio/relaxation";
     }
 
     std::filesystem::path getMeditationSoundsDir() noexcept
