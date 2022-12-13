@@ -156,7 +156,7 @@ namespace app::manager
 
         connect(typeid(PreventBlockingRequest), [this]([[maybe_unused]] sys::Message *msg) {
             if (!phoneLockHandler.isPhoneLocked()) {
-                autoLockTimer.start();
+                autoLockTimer.stop();
             }
             return std::make_shared<sys::ResponseMessage>();
         });
