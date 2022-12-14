@@ -7,6 +7,14 @@
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [1.8.0 2022-12-14]
+
+### Added
+
 #### Home Screen:
 * Font size increased.
 * Clock faces with dates.
