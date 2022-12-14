@@ -56,7 +56,9 @@ namespace gui
         onLoadCallback = [&]([[maybe_unused]] std::shared_ptr<AlarmEventRecord> alarm) {
             checkCustomOption(getPresenter()->getDescription());
             optionSpinner->setCurrentValue(getPresenter()->getDescription());
-            this->navBarRestoreFromTemporaryMode();
+            if (app::alarmClock::AlarmRRulePresenter::RRuleOptions::Never == getPresenter()->getOption())
+                this->navBarRestoreFromTemporaryMode();
+
         };
     }
 
@@ -73,6 +75,13 @@ namespace gui
 
     void AlarmRRuleOptionsItem::checkCustomOption(const std::string &selectedOption)
     {
+        if (rRuleOptions.back().second != "Custom")
+            if (const auto days = getPresenter()->getCustomDays();
+                std::none_of(days.cbegin(), days.cend(), [](const auto &day) { return day.second; })) {
+                rRuleOptions.back().second = "Custom";
+                printOptions();
+            }
+
         for (auto const &option : rRuleOptions) {
             if (selectedOption.empty() || option.second == selectedOption) {
                 return;
