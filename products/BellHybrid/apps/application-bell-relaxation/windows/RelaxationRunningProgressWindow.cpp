@@ -88,11 +88,6 @@ namespace gui
         presenter->onBeforeShow();
         updateTime();
 
-        if (mode == ShowMode::GUI_SHOW_RETURN && presenter->isPaused()) {
-            presenter->resume();
-            return;
-        }
-
         if (data && typeid(*data) == typeid(RelaxationSwitchData)) {
             auto *audioSwitchData = static_cast<RelaxationSwitchData *>(data);
             audioContext          = audioSwitchData->getAudioContext();
