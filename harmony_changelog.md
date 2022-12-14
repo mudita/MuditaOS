@@ -5,12 +5,11 @@
 ### Fixed
 * Fixed displayed device name when connected to Windows
 * Fixed the wrong front light on back action in alarms
+* Fixed the pause deactivation by a deep press in relaxation
 
 ### Added
 
 ### Changed
-
-### Fixed
 
 ## [1.8.0 2022-12-14]
 
