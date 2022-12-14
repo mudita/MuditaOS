@@ -130,10 +130,9 @@ namespace app::bell_settings
             }
         });
 
-        brightness->onEnter = [this]() {
-            auto brightness = settingsModel.getBrightness().getValue();
+        brightness->onEnter = [this, brightness]() {
             if (onFrontlightEnter) {
-                onFrontlightEnter(brightness);
+                onFrontlightEnter(brightness->value());
             }
         };
 
