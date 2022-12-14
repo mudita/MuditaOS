@@ -5,5 +5,5 @@ if( NOT DEFINED ECOBOOT_BIN_VERSION)
 endif()
 
 if (NOT DEFINED RECOVERY_BIN_VERSION)
-    set(RECOVERY_BIN_VERSION 0.0.1 CACHE STRING "recovery binary version to download from recovery release page")
+    set(RECOVERY_BIN_VERSION 1.0.0 CACHE STRING "recovery binary version to download from recovery release page")
 endif()
