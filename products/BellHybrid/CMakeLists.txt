@@ -1,5 +1,11 @@
 add_executable(BellHybrid)
 
+add_custom_target(Bell ALL
+    DEPENDS
+        BellHybrid
+        BellHybrid.img
+        )
+
 target_link_directories(BellHybrid PRIVATE ${PROJECT_LIB_DIRECTORY})
 
 target_compile_definitions(BellHybrid
