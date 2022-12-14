@@ -15,6 +15,7 @@ from harness.harness import Harness
 from harness import utils
 from harness.interface.error import TestError, Error
 from harness.interface.CDCSerial import Keytype, CDCSerial as serial
+from harness.api.security import SetPhoneLockOff, GetPhoneLockStatus
 from harness.interface.defs import key_codes
 
 
@@ -27,6 +28,8 @@ def pytest_addoption(parser):
     parser.addoption("--call_duration", type=int, action="store", default=30)
     parser.addoption("--sms_text", type=str, action="store", default='')
     parser.addoption("--bt_device", type=str, action="store", default='')
+    parser.addoption("--passcode", type=str, action="store", default='')
+    parser.addoption("--update_file_path", type=str, action="store", default='')
 
 
 @pytest.fixture(scope='session')
@@ -34,6 +37,17 @@ def phone_number(request):
     phone_number = request.config.option.phone_number
     assert phone_number
     return phone_number
+
+@pytest.fixture(scope='session')
+def passcode(request):
+    passcode = request.config.option.passcode
+    assert passcode
+    return passcode
+@pytest.fixture(scope='session')
+def update_file_path(request):
+    update_file_path = request.config.option.update_file_path
+    assert update_file_path
+    return update_file_path
 
 
 @pytest.fixture(scope='session')
@@ -186,6 +200,16 @@ def phone_ends_test_in_desktop(harness):
     # assert that we are in ApplicationDesktop
     assert harness.get_application_name() == target_application
     time.sleep(1)
+
+@pytest.fixture(scope='session')
+def phone_security_unlocked(harness,passcode):
+    for _ in range(2):
+        try:
+            GetPhoneLockStatus().run(harness)
+        except TransactionError as e:
+            log.info(f"transaction code: {e}")
+            log.info("Phone security locked, unlocking")
+            SetPhoneLockOff(passcode=passcode).run(harness)
 
 def pytest_configure(config):
     config.addinivalue_line("markers",
