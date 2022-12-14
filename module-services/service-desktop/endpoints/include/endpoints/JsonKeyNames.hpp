@@ -51,8 +51,9 @@ namespace sdesktop::endpoints::json
     inline constexpr auto caseColour     = "caseColour";
     inline constexpr auto fileList       = "fileList";
     inline constexpr auto files          = "files";
-    inline constexpr auto backupLocation = "backupLocation";
     inline constexpr auto deviceToken    = "deviceToken";
+    inline constexpr auto recoveryStatusFilePath = "recoveryStatusFilePath";
+    inline constexpr auto updateFilePath         = "updateFilePath";
 
     namespace updateprocess
     {

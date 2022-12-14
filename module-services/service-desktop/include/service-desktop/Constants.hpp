@@ -9,11 +9,11 @@ namespace service::name
 {
     inline constexpr auto service_desktop = "ServiceDesktop";
 }
+
 namespace sdesktop::paths
 {
     inline constexpr auto updateFilename         = "update.tar";
     inline constexpr auto syncFilename           = "sync.tar";
     inline constexpr auto backupFilename         = "backup.tar";
     inline constexpr auto recoveryStatusFilename = "recovery_status.json";
-
 } // namespace sdesktop::paths

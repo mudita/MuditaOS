@@ -29,13 +29,13 @@ def disable_some_logs(harness: Harness):
         log.info(f"{ret.response}")
 
 
-@pytest.mark.usefixtures("phone_unlocked")
+# @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.rt1051
 def test_update(harness: Harness):
     filename = "update.tar"
 
     log.info(get_version(harness))
-    PhoneModeLock(False).run(harness)
+    # PhoneModeLock(False).run(harness)
     put_file(harness, filename, "/sys/user")
     PhoneReboot(Reboot.UPDATE).run(harness)
     assert harness.connection.watch_port_reboot(300)
@@ -43,14 +43,14 @@ def test_update(harness: Harness):
     harness = get_harness_automatic(300)
     import time
     time.sleep(15)
-    harness.unlock_phone()
-    PhoneModeLock(False).run(harness)
+    # harness.unlock_phone()
+    # PhoneModeLock(False).run(harness)
 
     log.info(get_version(harness))
     get_file(harness, "updater.log", "./")
     with open("updater.log") as f:
         line = f.readline()
         assert "OK" in line
-    PhoneModeLock(True).run(harness)
+    # PhoneModeLock(True).run(harness)
 
     log.info("update done!")
