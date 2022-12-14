@@ -28,6 +28,7 @@ target_sources(application-onboarding
 		"${CMAKE_CURRENT_LIST_DIR}/windows/NoSimSelectedDialogWindow.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationOnBoarding.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/Constants.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/StartConfigurationWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingLanguagesWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/OnBoardingSwitchData.hpp"

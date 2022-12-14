@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Application.hpp"
+#include "Constants.hpp"
 
 namespace gui::window::name
 {
@@ -22,8 +23,6 @@ namespace gui::window::name
 
 namespace app
 {
-    inline constexpr auto name_onboarding = "ApplicationOnBoarding";
-
     class ApplicationOnBoarding : public Application
     {
       public:

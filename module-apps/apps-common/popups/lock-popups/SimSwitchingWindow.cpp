@@ -5,6 +5,7 @@
 
 #include <Application.hpp>
 #include <EventStore.hpp>
+#include <application-onboarding/Constants.hpp>
 
 namespace constants
 {
@@ -66,23 +67,28 @@ namespace gui
 
     void SimSwitchingWindow::buildInterface()
     {
+        bool isOnboardingInProgress = application->GetName() == app::name_onboarding;
         AppWindow::buildInterface();
         setTitle(utils::translate("app_settings_network_sim_cards"));
-        infoIcon = new gui::Icon(this,
-                                 style::window::default_left_margin,
-                                 style::window::default_vertical_pos,
-                                 style::window::default_body_width,
-                                 style::window::default_body_height,
-                                 "progress_128px_W_G",
-                                 utils::translate("sim_card_change_in_progress"));
+        infoIcon = new gui::Icon(
+            this,
+            style::window::default_left_margin,
+            style::window::default_vertical_pos,
+            style::window::default_body_width,
+            style::window::default_body_height,
+            "progress_128px_W_G",
+            utils::translate(isOnboardingInProgress ? "sim_card_select_in_progress" : "sim_card_change_in_progress"));
         infoIcon->setAlignment(Alignment::Horizontal::Center);
     }
 
     void SimSwitchingWindow::updateInterface()
     {
+        bool isOnboardingInProgress = application->GetName() == app::name_onboarding;
         setTitle(utils::translate(switchedSuccessful ? "app_settings_net" : "app_settings_network_sim_cards"));
-        infoIcon->text->setRichText(
-            utils::translate(switchedSuccessful ? "sim_card_changed_successfully" : "sim_card_change_in_progress"));
+        infoIcon->text->setRichText(utils::translate(
+            switchedSuccessful
+                ? (isOnboardingInProgress ? "sim_card_select_successfully" : "sim_card_changed_successfully")
+                : "sim_card_change_in_progress"));
         infoIcon->image->set(switchedSuccessful ? "success_128px_W_G" : "progress_128px_W_G");
     }
 
