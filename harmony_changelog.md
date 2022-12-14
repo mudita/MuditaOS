@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fixed displayed device name when connected to Windows
+* Fixed the wrong front light on back action in alarms
 
 ### Added
 
