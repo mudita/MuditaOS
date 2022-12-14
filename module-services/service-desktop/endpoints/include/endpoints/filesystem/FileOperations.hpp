@@ -51,7 +51,7 @@ class FileOperations
     static constexpr auto Mod3MaxReminder   = 2u;
     // SingleChunkSize must be a multiple of 3 and 4 so that SingleChunkSize % 12 == 0
     static constexpr auto SingleChunkSize     = Base64ToBinFactor * BinToBase64Factor * 1024u; // 12KB
-    static constexpr auto ChunkSizeMultiplier = 24u;
+    static constexpr auto ChunkSizeMultiplier = 12u;
     static constexpr auto ChunkSize           = ChunkSizeMultiplier * SingleChunkSize;
 
     struct DataWithCrc32
