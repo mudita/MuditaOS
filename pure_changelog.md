@@ -107,6 +107,7 @@
 * Fixed the order in which contacts are displayed in the list.
 * Fixed incorrect navigation text in onboarding for timezone and date time.
 * Fixed wrong time displayed on password locked screen with 'Quotes' or 'Logo' wallpaper.
+* Fixed wrong navigation bar state after exit from custom repeat window
 
 
 ## [1.3.0 2022-08-04]
