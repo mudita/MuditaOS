@@ -91,11 +91,15 @@ function(add_update_package SOURCE_TARGET)
     message("Adding '${SOURCE_TARGET}-UpdatePackage' target")
     if(ENABLE_SECURE_BOOT)
         add_custom_target(${SOURCE_TARGET}-UpdatePackage
-            DEPENDS ${UPDATE_PKG}.sig
+            DEPENDS
+                ${SOURCE_TARGET}-disk-img
+                ${UPDATE_PKG}.sig
         )
     else()
         add_custom_target(${SOURCE_TARGET}-UpdatePackage
-            DEPENDS ${UPDATE_PKG}
+            DEPENDS
+                ${SOURCE_TARGET}-disk-img
+                ${UPDATE_PKG}
         )
     endif()
 endfunction()
