@@ -34,15 +34,14 @@
 #include <module-gui/gui/Common.hpp>
 #include <service-eink/Common.hpp>
 #include <hal/boot_control.h>
-
 #include <algorithm>
-
-const inline size_t systemManagerStack = 4096 * 2;
 
 namespace sys
 {
     namespace
     {
+        constexpr auto systemManagerStack = 1024 * 8;
+
         constexpr std::chrono::milliseconds serviceCloseResponseTimeout{1500};
         constexpr std::chrono::milliseconds lowBatteryShutdownDelayTime{5000};
 
@@ -308,7 +307,7 @@ namespace sys
     bool SystemManagerCommon::RebootToRecovery(Service *s, RecoveryReason recoveryReason)
     {
         s->bus.sendUnicast(
-            std::make_shared<SystemManagerCmd>(Code::RebootToRecovery, CloseReason::Reboot, recoveryReason),
+            std::make_shared<SystemManagerCmd>(Code::RebootToRecovery, CloseReason::RebootToRecovery, recoveryReason),
             service::name::system_manager);
         return true;
     }
@@ -578,14 +577,12 @@ namespace sys
                 case Code::Reboot:
                     RebootHandler();
                     break;
-                case Code::RebootToRecovery:
-                    RebootToRecoveryHandler(data->recoveryReason);
-                    break;
                 case Code::RebootToUsbMscMode:
                     RebootToUsbMscModeHandler(State::RebootToUsbMscMode);
                     break;
+                case Code::RebootToRecovery:
                 case Code::FactoryReset:
-                    RebootToRecoveryHandler(data->recoveryReason);
+                    RebootToRecoveryHandler(data->closeReason, data->recoveryReason);
                     break;
                 case Code::None:
                     break;
@@ -772,9 +769,9 @@ namespace sys
         CloseSystemHandler(CloseReason::Reboot);
     }
 
-    void SystemManagerCommon::RebootToRecoveryHandler(RecoveryReason recoveryReason)
+    void SystemManagerCommon::RebootToRecoveryHandler(CloseReason closeReason, RecoveryReason recoveryReason)
     {
-        CloseSystemHandler(CloseReason::RebootToRecovery);
+        CloseSystemHandler(closeReason);
         this->recoveryReason = recoveryReason;
     }
 
