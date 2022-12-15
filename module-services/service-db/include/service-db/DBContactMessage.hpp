@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -59,6 +59,42 @@ class DBContactNumberMessage : public sys::DataMessage
      *
      */
     utils::PhoneNumber::View numberView;
+};
+
+/**
+ * @brief Message used to match Contact by an instance of PhoneNumber::View while omitting the specific contactID.
+ *        Omitting specific Contact during searching is helpful to ignore the number which is already signed to Contact
+ *        that we want to find a matching number for
+ *
+ */
+class DBMatchContactNumberBesidesOfContactIDMessage : public sys::DataMessage
+{
+  public:
+    /**
+     * @brief Construct a new DBMatchContactNumberBesidesOfContactIDMessage object
+     *
+     * @param numberView - a number to match with
+     */
+
+    DBMatchContactNumberBesidesOfContactIDMessage(const utils::PhoneNumber::View &numberView,
+                                                  std::uint32_t contactIDToOmit);
+    /**
+     * @brief Destroy the DBMatchContactNumberBesidesOfContactIDMessage object
+     *
+     */
+    virtual ~DBMatchContactNumberBesidesOfContactIDMessage();
+
+    /**
+     * @brief number to match with
+     *
+     */
+    utils::PhoneNumber::View numberView;
+
+    /**
+     * @brief numbers connected with this contact Id are omitting during the searching
+     *
+     */
+    std::uint32_t contactIDToOmit;
 };
 
 /**

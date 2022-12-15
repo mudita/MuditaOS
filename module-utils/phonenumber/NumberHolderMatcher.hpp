@@ -58,10 +58,12 @@ namespace utils
          *
          * @param other - number to match with
          * @param level - minimum acceptable match level
+         * @param contactIDToIgnore - for this contact ID the match will be ignored
          * @return Best match for the other phone number
          */
         std::optional<THolder> bestMatch(const PhoneNumber &phoneNumber,
-                                         PhoneNumber::Match level = PhoneNumber::Match::EXACT)
+                                         PhoneNumber::Match level              = PhoneNumber::Match::EXACT,
+                                         const std::uint32_t contactIDToIgnore = 0u)
         {
             utils::time::Scoped t{"bestMatch()"};
             // if empty string, do not try to match, simply return
@@ -71,9 +73,10 @@ namespace utils
 
             restartFor(phoneNumber);
             do {
-                const auto it =
-                    std::find_if(numbers.cbegin(), numbers.cend(), [&phoneNumber, level](const auto &number) {
-                        return phoneNumber.match(number.getNumber()) >= level;
+                const auto it = std::find_if(
+                    numbers.cbegin(), numbers.cend(), [&phoneNumber, level, contactIDToIgnore](const auto &number) {
+                        return (phoneNumber.match(number.getNumber()) >= level) &&
+                               (number.getContactID() != contactIDToIgnore);
                     });
                 if (it != numbers.cend()) {
                     return *it;

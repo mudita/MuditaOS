@@ -92,9 +92,12 @@ class DBServiceAPI
      *
      * @param serv - calling service
      * @param numberView - number to match contact with
+     * @param contactIDToOmit - for this contact ID the match will be ignored
      * @return std::unique_ptr<ContactRecord>
      */
-    [[deprecated]] static auto MatchContactByPhoneNumber(sys::Service *serv, const utils::PhoneNumber::View &numberView)
+    [[deprecated]] static auto MatchContactByPhoneNumber(sys::Service *serv,
+                                                         const utils::PhoneNumber::View &numberView,
+                                                         const std::uint32_t contactIDToOmit = 0u)
         -> std::unique_ptr<ContactRecord>;
     [[deprecated]] static auto MatchContactByNumberID(sys::Service *serv, std::uint32_t numberID)
         -> std::unique_ptr<ContactRecord>;

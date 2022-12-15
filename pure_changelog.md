@@ -9,6 +9,7 @@
 * Fixed looping on the SIM card selection screen
 * Fixed notes paste option showing for empty clipboard
 * Fixed notes window title
+* Fixed adding and deleting country code prefix to existing contact
 
 ### Added
 

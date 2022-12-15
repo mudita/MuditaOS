@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -16,15 +16,26 @@ using namespace utils;
 class DummyHolder
 {
     PhoneNumber number;
+    static std::uint32_t dummyHolderCount; // init by 0
+    std::uint32_t contactID;
 
   public:
-    DummyHolder(const PhoneNumber &number) : number(number)
-    {}
+    DummyHolder(const PhoneNumber &number, const std::uint32_t contactID = 0u) : number(number), contactID(contactID)
+    {
+        if (contactID == 0)
+            this->contactID = ++dummyHolderCount;
+    }
     const PhoneNumber &getNumber() const
     {
         return number;
     }
+
+    const decltype(contactID) &getContactID() const
+    {
+        return contactID;
+    }
 };
+std::uint32_t DummyHolder::dummyHolderCount = 0u;
 
 static constexpr auto DefaultPageSize = 1; // so the paging mechanism is checked.
 

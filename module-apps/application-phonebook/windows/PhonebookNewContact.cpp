@@ -149,10 +149,10 @@ namespace gui
             case DBServiceAPI::ContactVerificationResult::emptyContact:
                 return false;
             case DBServiceAPI::ContactVerificationResult::primaryNumberDuplicate:
-                showDialogDuplicatedNumber(contact->numbers[0].number);
+                showDialogDuplicatedNumber(contact->numbers[0].number, contact->ID);
                 return false;
             case DBServiceAPI::ContactVerificationResult::secondaryNumberDuplicate:
-                showDialogDuplicatedNumber(contact->numbers[1].number);
+                showDialogDuplicatedNumber(contact->numbers[1].number, contact->ID);
                 return false;
             case DBServiceAPI::ContactVerificationResult::speedDialDuplicate:
                 showDialogDuplicatedSpeedDialNumber();
@@ -191,9 +191,11 @@ namespace gui
         return true;
     } // namespace gui
 
-    void PhonebookNewContact::showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber)
+    void PhonebookNewContact::showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber,
+                                                         const std::uint32_t duplicatedNumberContactID)
     {
-        auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber);
+        auto matchedContact =
+            DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber, duplicatedNumberContactID);
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
         auto metaData         = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{duplicatedNumber.getFormatted(),

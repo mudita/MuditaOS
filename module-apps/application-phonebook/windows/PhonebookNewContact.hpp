@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -35,7 +35,8 @@ namespace gui
         };
 
         auto verifyAndSave() -> bool;
-        void showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber);
+        void showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber,
+                                        const std::uint32_t duplicatedNumberContactID = 0u);
         void showDialogDuplicatedSpeedDialNumber();
         void setSaveButtonVisible(bool visible);
 

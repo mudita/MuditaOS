@@ -68,10 +68,11 @@ auto DBServiceAPI::ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial)
     return ContactGetByIDCommon(serv, msg);
 }
 
-auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv, const utils::PhoneNumber::View &numberView)
-    -> std::unique_ptr<ContactRecord>
+auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv,
+                                             const utils::PhoneNumber::View &numberView,
+                                             const std::uint32_t contactIDToOmit) -> std::unique_ptr<ContactRecord>
 {
-    auto msg = std::make_shared<DBContactNumberMessage>(numberView);
+    auto msg = std::make_shared<DBMatchContactNumberBesidesOfContactIDMessage>(numberView, contactIDToOmit);
 
     auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
@@ -139,8 +140,8 @@ auto DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec)
     }
 
     if (rec.numbers.size() > 0 && rec.numbers[0].number.getEntered().size() > 0) {
-        auto retPhone1 = MatchContactByPhoneNumber(serv, rec.numbers[0].number);
-        if (retPhone1 && retPhone1->ID != rec.ID) {
+        auto retPhone1 = MatchContactByPhoneNumber(serv, rec.numbers[0].number, rec.ID);
+        if (retPhone1) {
             if (retPhone1->isTemporary()) {
                 return ContactVerificationResult::temporaryContactExists;
             }
