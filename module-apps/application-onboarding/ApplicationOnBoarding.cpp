@@ -105,7 +105,9 @@ namespace app
         });
 
         connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *msg) {
-            if (getCurrentWindow()->getName() != gui::popup::window::sim_switching_window) {
+            auto selectedSIM = Store::GSM::get()->selected;
+            if (getCurrentWindow()->getName() != gui::popup::window::sim_switching_window &&
+                selectedSIM != Store::GSM::SelectedSIM::NONE) {
                 phoneLockSubject.setPhoneLock();
                 return sys::msgHandled();
             }
