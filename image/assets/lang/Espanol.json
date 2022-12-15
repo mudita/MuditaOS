@@ -256,7 +256,7 @@
   "app_desktop_info_mmi_result_success": "Correcto",
   "app_desktop_info_mmi_result_failed": "Error",
   "sim_header_setup": "<text>Configuración de <token>$SIM</token></text>",
-  "sim_enter_pin_unlock": "<text>Introduce el código PIN para configurar <br></br> la tarjeta <token>$PINTYPE</token>:</text>",
+  "sim_enter_pin_unlock": "<text>Introduce el código PIN<br></br>para configurar la tarjeta <token>$PINTYPE</token>:</text>",
   "sim_enter_enter_current": "<text>Introduce el código PIN actual:</text>",
   "sim_change_pin": "Cambiar código PIN",
   "sim_enter_new_pin": "Introduce el nuevo código PIN:",
