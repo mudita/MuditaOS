@@ -184,7 +184,7 @@ namespace sys
 
         void RebootHandler();
 
-        void RebootToRecoveryHandler(RecoveryReason recoveryReason);
+        void RebootToRecoveryHandler(CloseReason closeReason, RecoveryReason recoveryReason);
 
         void RebootToUsbMscModeHandler(State newState);
 
@@ -236,7 +236,6 @@ inline const char *c_str(sys::SystemManagerCommon::State state)
         return "RebootToRecovery";
     case sys::SystemManagerCommon::State::RebootToUsbMscMode:
         return "RebootToUsbMscModeUpdate";
-        break;
     case sys::SystemManagerCommon::State::ShutdownReady:
         return "ShutdownReady";
     }
