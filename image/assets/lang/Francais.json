@@ -317,7 +317,7 @@
   "app_onboarding_start_configuration": "<text weight='light' size='46'><p>Bonjour !</p></text><br></br><text weight='regular' size='27'>Configurons votre Mudita Pure.</text>",
   "app_onboarding_eula_license": "License agreement (EULA)",
   "app_onboarding_select_sim": "Choisissez la carte SIM active",
-  "app_onboarding_select_sim_description": "<text>Une seule carte SIM peut être active à la fois.<br></br>Vous pouvez la choisir maintenant et activer<br></br>les paramètres à tout moment.</text>",
+  "app_onboarding_select_sim_description": "<text>Une seule carte SIM peut être<br></br>active à la fois. Vous pouvez<br></br>la choisir maintenant et activer<br></br>les paramètres à tout moment.</text>",
   "app_onboarding_no_sim_selected_title": "Configuration SIM",
   "app_onboarding_no_sim_selected_description": "<text>No SIM card set up.<br></br>To connect to network, set up <br></br> SIM cards in Settings.</text>",
   "app_onboarding_title_configuration": "Configuration",
