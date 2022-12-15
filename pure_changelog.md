@@ -45,6 +45,7 @@
 * Fixed displayed device name when connected to Windows
 * Fixed redundant modem polling for call states
 * Fixed selecting SIM during onboarding
+* Fixed broken text on SIM selection screen during onboarding
 
 ### Added
 * Added a popup for changing the SIM card
