@@ -47,7 +47,7 @@ namespace app::manager
             case sys::CloseReason::SystemBrownout:
             case sys::CloseReason::LowBattery:
                 return ActionRequest{senderName, app::manager::actions::SystemBrownout, nullptr};
-            case sys::CloseReason::RebootToRecovery:
+            case sys::CloseReason::FactoryReset:
                 return ActionRequest{senderName, app::manager::actions::DisplayFactoryResetInProgressScreen, nullptr};
             default:
                 return ActionRequest{senderName, app::manager::actions::DisplayLogoAtExit, nullptr};
