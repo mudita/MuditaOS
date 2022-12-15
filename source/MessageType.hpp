@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,6 +26,9 @@ enum class MessageType
     DBContactMatchByNumberID [[deprecated]],
     DBContactMatchByNumber
     [[deprecated]], ///< used to best match with a single contact using a phone number (primary or secondary)
+    DBMatchContactNumberBesidesOfContactID
+    [[deprecated]], ///< used to best match with a single contact using a phone number (primary or secondary)
+                    ///< but witch omitting specific contact ID
     DBContactAdd [[deprecated]],    ///< Add contact record
     DBContactRemove [[deprecated]], ///< Remove contact remove
     DBContactUpdate [[deprecated]], ///< Update contact remove

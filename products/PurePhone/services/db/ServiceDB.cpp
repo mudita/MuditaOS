@@ -133,6 +133,24 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         }
     } break;
 
+    case MessageType::DBMatchContactNumberBesidesOfContactID: {
+        auto time = utils::time::Scoped("DBMatchContactNumberBesidesOfContactID");
+        auto *msg = dynamic_cast<DBMatchContactNumberBesidesOfContactIDMessage *>(msgl);
+        auto ret  = contactRecordInterface->MatchByNumber(msg->numberView,
+                                                         ContactRecordInterface::CreateTempContact::False,
+                                                         utils::PhoneNumber::Match::POSSIBLE,
+                                                         msg->contactIDToOmit);
+
+        if (ret.has_value()) {
+            responseMsg = std::make_shared<DBContactNumberResponseMessage>(
+                sys::ReturnCodes::Success, std::make_unique<ContactRecord>(std::move(ret->contact)));
+        }
+        else {
+            responseMsg = std::make_shared<DBContactNumberResponseMessage>(sys::ReturnCodes::Success,
+                                                                           std::unique_ptr<ContactRecord>());
+        }
+    } break;
+
     case MessageType::DBContactMatchByNumberID: {
         auto time = utils::time::Scoped("DBContactMatchByNumberID");
         auto *msg = dynamic_cast<DBMatchContactByNumberIDMessage *>(msgl);

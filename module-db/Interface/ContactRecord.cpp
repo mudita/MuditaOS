@@ -123,10 +123,37 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
         return false;
     }
 
-    auto oldNumberIDs  = splitNumberIDs(contact.numbersID);
-    auto newNumbersIDs = getNumbersIDs(contact.ID, rec);
+    auto oldNumberIDs = splitNumberIDs(contact.numbersID);
+
+    /* Changing number table record in place if new number is same as old number but with/without country code */
+    auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
+    for (const auto oldNumberID : oldNumberIDs) { // pick one of the old number for this contactID (from DB)
+        auto numberRecord = contactDB->number.getById(oldNumberID);
+        utils::PhoneNumber oldPhoneNumber(numberRecord.numberUser, numberRecord.numbere164);
+        for (const auto &newNumberID : rec.numbers) { // pick one of the new number from &rec
+            utils::PhoneNumber newPhoneNumber(newNumberID.number);
+            // if DB have not such a new number already and if one of this have country code and other doesn't
+            if (!numberMatcher.bestMatch(newPhoneNumber, utils::PhoneNumber::Match::EXACT).has_value() &&
+                (newPhoneNumber.match(oldPhoneNumber) == utils::PhoneNumber::Match::POSSIBLE) &&
+                ((!oldPhoneNumber.isValid() && newPhoneNumber.isValid()) ||
+                 (oldPhoneNumber.isValid() && !newPhoneNumber.isValid()))) {
+                // which means that only country code is to add or remove (change of country code is not supported here)
+                // then change old number record in number table to the new number
+                auto oldNumberRecordToUpdate       = contactDB->number.getById(oldNumberID);
+                oldNumberRecordToUpdate.numberUser = newPhoneNumber.get();
+                oldNumberRecordToUpdate.numbere164 = newPhoneNumber.toE164();
+                if (!contactDB->number.update(oldNumberRecordToUpdate)) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    auto newNumbersIDs = getNumbersIDs(contact.ID, rec, utils::PhoneNumber::Match::EXACT);
     for (auto oldNumberID : oldNumberIDs) {
         if (std::find(std::begin(newNumbersIDs), std::end(newNumbersIDs), oldNumberID) == std::end(newNumbersIDs)) {
+            // If any oldNumberID is NOT one of the newNumbersID, which will be assigned to this contact, then
+            // make temporary contact with this oldNumberID
             auto numberRecord = contactDB->number.getById(oldNumberID);
             if (!numberRecord.isValid()) {
                 return false;
@@ -141,6 +168,7 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
                           e.what());
                 return false;
             }
+            // make temporary contact with old number
             const auto tmpContactRecord = addTemporaryContactForNumber(number);
             if (!tmpContactRecord.has_value()) {
                 return false;
@@ -195,8 +223,9 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
     return true;
 }
 
-auto ContactRecordInterface::getNumbersIDs(std::uint32_t contactID, const ContactRecord &contact)
-    -> std::vector<std::uint32_t>
+auto ContactRecordInterface::getNumbersIDs(std::uint32_t contactID,
+                                           const ContactRecord &contact,
+                                           utils::PhoneNumber::Match matchLevel) -> std::vector<std::uint32_t>
 {
     std::vector<std::uint32_t> result;
 
@@ -213,7 +242,7 @@ auto ContactRecordInterface::getNumbersIDs(std::uint32_t contactID, const Contac
             return {};
         }
 
-        auto numberMatch = numberMatcher.bestMatch(phoneNumber, utils::PhoneNumber::Match::POSSIBLE);
+        auto numberMatch = numberMatcher.bestMatch(phoneNumber, matchLevel);
         if (!numberMatch.has_value()) {
             // number does not exist in the DB yet. Let's add it.
             if (!contactDB->number.add(ContactsNumberTableRow{Record(DB_ID_NONE),
@@ -1211,7 +1240,8 @@ auto ContactRecordInterface::buildNumberMatcher(unsigned int maxPageSize)
 
 auto ContactRecordInterface::MatchByNumber(const utils::PhoneNumber::View &numberView,
                                            CreateTempContact createTempContact,
-                                           utils::PhoneNumber::Match matchLevel)
+                                           utils::PhoneNumber::Match matchLevel,
+                                           const std::uint32_t contactIDToIgnore)
     -> std::optional<ContactRecordInterface::ContactNumberMatch>
 {
     utils::PhoneNumber phoneNumber;
@@ -1225,7 +1255,7 @@ auto ContactRecordInterface::MatchByNumber(const utils::PhoneNumber::View &numbe
     }
 
     auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
-    auto matchedNumber = numberMatcher.bestMatch(phoneNumber, matchLevel);
+    auto matchedNumber = numberMatcher.bestMatch(phoneNumber, matchLevel, contactIDToIgnore);
     if (!matchedNumber.has_value()) {
         if (createTempContact != CreateTempContact::True) {
             return std::nullopt;

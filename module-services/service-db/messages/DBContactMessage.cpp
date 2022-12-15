@@ -36,6 +36,15 @@ DBContactNumberMessage::DBContactNumberMessage(const utils::PhoneNumber::View &n
 DBContactNumberMessage::~DBContactNumberMessage()
 {}
 
+DBMatchContactNumberBesidesOfContactIDMessage::DBMatchContactNumberBesidesOfContactIDMessage(
+    const utils::PhoneNumber::View &numberView, std::uint32_t contactIDToOmit)
+    : sys::DataMessage(MessageType::DBMatchContactNumberBesidesOfContactID), numberView(numberView),
+      contactIDToOmit(contactIDToOmit)
+{}
+
+DBMatchContactNumberBesidesOfContactIDMessage::~DBMatchContactNumberBesidesOfContactIDMessage()
+{}
+
 DBContactNumberResponseMessage::DBContactNumberResponseMessage(sys::ReturnCodes retCode,
                                                                std::unique_ptr<ContactRecord> contact)
     : sys::ResponseMessage(retCode, MessageType::DBContactMatchByNumber), contact(std::move(contact))

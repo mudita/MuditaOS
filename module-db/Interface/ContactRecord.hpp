@@ -206,9 +206,9 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto GetByNumberID(std::uint32_t numberId) -> std::optional<ContactRecord>;
 
     auto MatchByNumber(const utils::PhoneNumber::View &numberView,
-                       CreateTempContact createTempContact  = CreateTempContact::False,
-                       utils::PhoneNumber::Match matchLevel = utils::PhoneNumber::Match::POSSIBLE)
-        -> std::optional<ContactNumberMatch>;
+                       CreateTempContact createTempContact   = CreateTempContact::False,
+                       utils::PhoneNumber::Match matchLevel  = utils::PhoneNumber::Match::POSSIBLE,
+                       const std::uint32_t contactIDToIgnore = 0u) -> std::optional<ContactNumberMatch>;
 
     auto GetBySpeedDial(const UTF8 &speedDial) -> std::unique_ptr<std::vector<ContactRecord>>;
 
@@ -289,7 +289,10 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
         -> const std::unique_ptr<db::QueryResult>;
 
     auto addTemporaryContactForNumber(const ContactRecord::Number &number) -> std::optional<ContactRecord>;
-    auto getNumbersIDs(std::uint32_t contactID, const ContactRecord &contact) -> std::vector<std::uint32_t>;
+    auto getNumbersIDs(std::uint32_t contactID,
+                       const ContactRecord &contact,
+                       utils::PhoneNumber::Match matchLevel = utils::PhoneNumber::Match::POSSIBLE)
+        -> std::vector<std::uint32_t>;
     auto addNumbers(std::uint32_t contactID, const std::vector<ContactRecord::Number> &numbers)
         -> std::optional<std::string>;
     auto addOrUpdateName(std::uint32_t contactID, std::uint32_t nameID, const ContactRecord &contact)
