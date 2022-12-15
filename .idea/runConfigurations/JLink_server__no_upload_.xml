@@ -1,6 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="JLink server (no upload)" type="com.jetbrains.cidr.embedded.customgdbserver.type" factoryName="com.jetbrains.cidr.embedded.customgdbserver.factory" PROGRAM_PARAMS="-if SWD -device MCIMXRT1051 -speed 25000 -jlinkscriptfile &quot;evkbimxrt1050_sdram_init.jlinkscript&quot; -strict -ir -rtos /opt/SEGGER/JLink/GDBServer/RTOSPlugin_FreeRTOS.so" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="PurePhone" CONFIG_NAME="Linux" RUN_TARGET_PROJECT_NAME="PurePhone" RUN_TARGET_NAME="PurePhone">
-    <custom-gdb-server version="1" gdb-connect="localhost:2331" executable="JLinkGDBServerCLExe" warmup-ms="0" download-type="NONE" reset-cmd="monitor reset 0" />
-    <method v="2" />
-  </configuration>
-</component>

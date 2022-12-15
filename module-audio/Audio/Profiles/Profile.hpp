@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Audio/AudioDevice.hpp"
-#include "Audio/codec.hpp"
+#include "Audio/CodecDefinitions.hpp"
 
 #include <memory>
 #include <functional>

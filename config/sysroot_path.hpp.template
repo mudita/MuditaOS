@@ -1,0 +1,4 @@
+#pragma once
+
+inline constexpr auto SYS_PATH = "${SYS_PATH}";
+inline constexpr auto USER_PATH = "${USER_PATH}";

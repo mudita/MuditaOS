@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Harmony Running Target" type="com.jetbrains.cidr.embedded.customgdbserver.type" factoryName="com.jetbrains.cidr.embedded.customgdbserver.factory" PROGRAM_PARAMS="-if SWD -device MCIMXRT1051 -speed 25000 -strict -noir -nohalt -noreset" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PureOS" TARGET_NAME="BellHybrid" version="1" RUN_TARGET_PROJECT_NAME="PureOS" RUN_TARGET_NAME="BellHybrid">
+    <custom-gdb-server version="1" gdb-connect="localhost:2331" executable="JLinkGDBServerCLExe" warmup-ms="0" download-type="NONE" reset-cmd="monitor reset 0" reset-type="NEVER">
+      <debugger kind="GDB" isBundled="true" />
+    </custom-gdb-server>
+    <method v="2" />
+  </configuration>
+</component>

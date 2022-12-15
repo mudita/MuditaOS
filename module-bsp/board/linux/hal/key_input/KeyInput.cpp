@@ -6,7 +6,7 @@
 #include <hal/GenericFactory.hpp>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/epoll.h>
+#include <poll.h>
 #include <unistd.h>
 #include <cstdio>
 
@@ -39,47 +39,33 @@ namespace hal::key_input
 
     void LinuxKeyInput::worker()
     {
-        constexpr static auto maxEvents   = 1U;
         constexpr auto *keyFifo           = "/tmp/myfifo3";
         constexpr auto keyFifoPermissions = 0666;
-
-        struct epoll_event event
-        {};
-        struct epoll_event events[maxEvents];
-
-        const auto epollFd = epoll_create1(0);
-        if (epollFd == -1) {
-            fprintf(stderr, "Failed to create epoll file descriptor\n");
-            assert(0);
-        }
+        struct pollfd pfd
+        {
+            .events = POLLIN
+        };
 
         mkfifo(keyFifo, keyFifoPermissions);
-        const auto fd = open(keyFifo, O_RDONLY | O_NONBLOCK);
-        event.events  = EPOLLIN;
-        event.data.fd = fd;
-
-        if (epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event)) {
-            fprintf(stderr, "Failed to add file descriptor to epoll\n");
-            close(epollFd);
-            assert(0);
-        }
+        pfd.fd = open(keyFifo, O_RDONLY | O_NONBLOCK);
 
         while (shouldRun) {
-            const auto eventCount = epoll_wait(epollFd, events, maxEvents, 1000);
-            for (auto i = 0; i < eventCount; ++i) {
-                std::uint8_t buff[16]{};
-                const auto bytesRead = read(events[i].data.fd, buff, sizeof buff);
-                if (bytesRead > 1) {
-                    keyEvents.clear();
-                    consumeBytes(buff, bytesRead);
+            /// It's not possible to use POSIX blocking calls from FreeRTOS thread context. Instead, we use polling.
+            if (const auto ready = poll(&pfd, 1, 0); ready > 0) {
+                for (auto i = 0; i < ready; ++i) {
+                    std::uint8_t buff[16]{};
+                    if (const auto bytesRead = read(pfd.fd, buff, sizeof buff)) {
+                        keyEvents.clear();
+                        consumeBytes(buff, bytesRead);
 
-                    std::uint8_t notification = 0x01;
-                    xQueueSend(queueHandle, &notification, 100);
+                        std::uint8_t notification = 0x01;
+                        xQueueSend(queueHandle, &notification, 100);
+                    }
                 }
             }
+            vTaskDelay(10);
         }
-        close(fd);
-        close(epollFd);
+        close(pfd.fd);
         vTaskDelete(nullptr);
     }
 

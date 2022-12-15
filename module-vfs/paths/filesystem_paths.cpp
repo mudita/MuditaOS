@@ -3,10 +3,13 @@
 
 #include <purefs/filesystem_paths.hpp>
 
+#include <sysroot_path.hpp>
+#include <hal/boot_control.h>
+
 namespace
 {
-    constexpr inline auto PATH_SYSTEM      = "/system";
-    constexpr inline auto PATH_USER        = "/user";
+    constexpr inline auto PATH_SYSTEM      = SYS_PATH;
+    constexpr inline auto PATH_USER        = USER_PATH;
     constexpr inline auto PATH_CONF        = "/mfgconf";
     constexpr inline auto PATH_DB          = "db";
     constexpr inline auto PATH_LOGS        = "log";

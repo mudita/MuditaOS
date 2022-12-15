@@ -25,6 +25,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <spawn.h>
 
 #include "macros.h"
 
@@ -98,11 +99,8 @@ static shared_memory_header *createSHMBuffer(const char *name)
     return shared_header;
 }
 
-// on linux this function is responsible for creating/opeingin shared memory region where image from eink task will be
-// copied
 EinkStatus_e EinkResetAndInitialize()
 {
-
     s_einkIsPoweredOn = false;
 
     // create and map shared memory
@@ -111,9 +109,9 @@ EinkStatus_e EinkResetAndInitialize()
         return EinkError;
     }
 
-    // start renderer application
-    if (system("LD_PRELOAD=;./service_renderer &") < 0) {
-        perror("system");
+    pid_t pid;
+    if (posix_spawn(&pid, "./service_renderer", NULL, NULL, NULL, NULL) != 0) {
+        fprintf(stderr,"Could not start service_renderer");
         return EinkError;
     }
     return EinkOK;

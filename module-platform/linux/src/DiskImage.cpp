@@ -63,7 +63,7 @@ namespace purefs::blkdev
         if (err) {
             return err;
         }
-        auto offs = ::lseek64(m_filedes[hwpart], off64_t(lba) * off64_t(m_sector_size), SEEK_SET);
+        auto offs = ::lseek(m_filedes[hwpart], off_t (lba) * off_t (m_sector_size), SEEK_SET);
         if (offs < 0) {
             return offs;
         }
@@ -97,7 +97,7 @@ namespace purefs::blkdev
         if (err) {
             return err;
         }
-        auto offs = ::lseek64(m_filedes[hwpart], off64_t(lba) * off64_t(m_sector_size), SEEK_SET);
+        auto offs = ::lseek(m_filedes[hwpart], off_t (lba) * off_t (m_sector_size), SEEK_SET);
         if (offs < 0) {
             return offs;
         }

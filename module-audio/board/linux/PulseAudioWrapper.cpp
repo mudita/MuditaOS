@@ -3,6 +3,7 @@
 
 #include "PulseAudioWrapper.hpp"
 #include <pthread.h>
+#include <signal.h>
 #include <iostream>
 #include <utility>
 #include <stdexcept>

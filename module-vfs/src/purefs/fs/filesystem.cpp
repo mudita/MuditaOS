@@ -87,7 +87,7 @@ namespace purefs::fs
                            const void *data) -> int
     {
         // Sanity check input data
-        if (target.size() <= 1 || target[0] != '/') {
+        if (target.size() <= 1) {
             LOG_ERROR("VFS: Invalid target mountpoint path");
             return -EINVAL;
         }

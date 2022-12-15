@@ -16,7 +16,7 @@
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
 
-#include <Audio/codec.hpp>
+#include <Audio/CodecDefinitions.hpp>
 
 #include <initializer_list>
 #include <vector>

@@ -3,7 +3,7 @@
 
 #pragma once
 #include <filesystem>
-#include <Audio/codec.hpp>
+#include <Audio/CodecDefinitions.hpp>
 
 namespace audio
 {

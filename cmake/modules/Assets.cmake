@@ -18,7 +18,7 @@ function(add_assets_target)
         COMMAND rsync -qau
             ${_ASSETS_SOURCE_DIR}/user/
             ${_ASSETS_USER_DEST_DIR}
-        COMMAND find ${_ASSETS_USER_DEST_DIR} -name "*-devel*" | sed "\"s,\\(.*\\)-devel\\(.*\\),& \\1\\2,\"" | xargs --no-run-if-empty -L1 mv
+        COMMAND find ${_ASSETS_USER_DEST_DIR} -name "*-devel*" | sed "\"s,\\(.*\\)-devel\\(.*\\),& \\1\\2,\"" | xargs -L1 mv
 
         # Copy system assets
         COMMAND mkdir -p ${_ASSETS_SYSTEM_DEST_DIR}

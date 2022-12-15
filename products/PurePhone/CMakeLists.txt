@@ -38,12 +38,6 @@ target_include_directories(PurePhone
         ${CMAKE_BINARY_DIR}
     )
 
-set_target_properties(PurePhone
-    PROPERTIES
-        SUFFIX ".elf"
-        LINK_FLAGS "-Xlinker -Map=${CMAKE_BINARY_DIR}/PurePhone.map"
-    )
-
 target_link_libraries(PurePhone
     PRIVATE
         app
@@ -81,7 +75,6 @@ target_link_libraries(PurePhone
         $<$<BOOL:${ENABLE_SERVICE_TEST}>:service-test>
         sys
         version-header
-        "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )
 

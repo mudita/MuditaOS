@@ -13,3 +13,5 @@ target_include_directories(purefs-paths
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
 )
+
+target_link_libraries(purefs-paths PRIVATE sysroot_path)

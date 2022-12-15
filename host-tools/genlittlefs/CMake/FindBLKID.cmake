@@ -6,16 +6,17 @@
 
 # check if already in cache, be silent
 IF (BLKID_INCLUDE_DIR)
-    SET (BLKID_FIND_QUIETLY TRUE)
+    SET(BLKID_FIND_QUIETLY TRUE)
 ENDIF (BLKID_INCLUDE_DIR)
 
 # find includes
-FIND_PATH (BLKID_INCLUDE_DIR blkid.h
+FIND_PATH(BLKID_INCLUDE_DIR blkid.h
         /usr/local/include/blkid
         /usr/local/include
         /usr/include
         /usr/include/blkid
-)
+        /opt/homebrew/opt/util-linux/include/blkid
+        )
 
 # find lib
 if (APPLE)
@@ -25,11 +26,20 @@ else (APPLE)
 endif (APPLE)
 FIND_LIBRARY(BLKID_LIBRARIES
         NAMES ${BLKID_NAMES}
-        PATHS /lib64 /lib /usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib/x86_64-linux-gnu /usr/lib/aarch64-linux-gnu
+        PATHS
+        /lib64
+        /lib
+        /usr/lib64
+        /usr/lib
+        /usr/local/lib64
+        /usr/local/lib
+        /usr/lib/x86_64-linux-gnu
+        /usr/lib/aarch64-linux-gnu
+        /opt/homebrew/opt/util-linux/lib
         )
 
-include ("FindPackageHandleStandardArgs")
-find_package_handle_standard_args ("BLKID" DEFAULT_MSG
+include("FindPackageHandleStandardArgs")
+find_package_handle_standard_args("BLKID" DEFAULT_MSG
         BLKID_INCLUDE_DIR BLKID_LIBRARIES)
 
-mark_as_advanced (BLKID_INCLUDE_DIR FDISK_LIBRARIES)
+mark_as_advanced(BLKID_INCLUDE_DIR FDISK_LIBRARIES)

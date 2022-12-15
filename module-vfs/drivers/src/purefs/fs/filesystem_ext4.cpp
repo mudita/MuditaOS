@@ -332,16 +332,22 @@ namespace purefs::fs::drivers
             st->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
         }
         // Update file type
-        st->st_nlink       = ext4_inode_get_links_cnt(&ino);
-        st->st_uid         = ext4_inode_get_uid(&ino);
-        st->st_gid         = ext4_inode_get_gid(&ino);
-        st->st_blocks      = ext4_inode_get_blocks_count(sb, &ino);
-        st->st_size        = ext4_inode_get_size(sb, &ino);
-        st->st_blksize     = ext4_sb_get_block_size(sb);
-        st->st_dev         = ext4_inode_get_dev(&ino);
+        st->st_nlink   = ext4_inode_get_links_cnt(&ino);
+        st->st_uid     = ext4_inode_get_uid(&ino);
+        st->st_gid     = ext4_inode_get_gid(&ino);
+        st->st_blocks  = ext4_inode_get_blocks_count(sb, &ino);
+        st->st_size    = ext4_inode_get_size(sb, &ino);
+        st->st_blksize = ext4_sb_get_block_size(sb);
+        st->st_dev     = ext4_inode_get_dev(&ino);
+#ifdef __APPLE__
+        st->st_atimespec.tv_sec = ext4_inode_get_access_time(&ino);
+        st->st_ctimespec.tv_sec = ext4_inode_get_change_inode_time(&ino);
+        st->st_mtimespec.tv_sec = ext4_inode_get_modif_time(&ino);
+#else
         st->st_atim.tv_sec = ext4_inode_get_access_time(&ino);
         st->st_ctim.tv_sec = ext4_inode_get_change_inode_time(&ino);
         st->st_mtim.tv_sec = ext4_inode_get_modif_time(&ino);
+#endif
         return err;
     }
 

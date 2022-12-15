@@ -61,21 +61,27 @@ endif ()
 
 # setting build flags
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG")
-    set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
-    set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
+    if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Darwin)
+        set(CMAKE_C_FLAGS_DEBUG " -gdwarf-3 -DDEBUG")
+        set(CMAKE_CXX_FLAGS_DEBUG " -gdwarf-3 -DDEBUG")
+    else()
+        set(CMAKE_C_FLAGS_DEBUG " -g3 -DDEBUG")
+        set(CMAKE_CXX_FLAGS_DEBUG " -g3 -DDEBUG")
+    endif()
 
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -DDEBUG")
+    set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g3 -DNDEBUG")
+
     set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g3 -DNDEBUG")
 else()
-    set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG")
+    set(CMAKE_C_FLAGS_DEBUG "-g3 -DDEBUG")
     set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
-    set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g3 -DNDEBUG")
 
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -DDEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g3 -DDEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g3 -DNDEBUG")
 
 endif()
 
@@ -218,3 +224,6 @@ target_include_directories(version-header INTERFACE $<BUILD_INTERFACE:${CMAKE_BI
 add_dependencies(version-header version)
 
 add_subdirectory(products)
+
+# Generate .map file
+target_compile_options(${PRODUCT} PRIVATE "-Wl,-Map,${CMAKE_BINARY_DIR}/${PRODUCT}.map ")

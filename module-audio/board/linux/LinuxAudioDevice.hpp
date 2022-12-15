@@ -7,7 +7,7 @@
 #include <Audio/AbstractStream.hpp>
 #include <Audio/AudioDevice.hpp>
 #include <Audio/AudioFormat.hpp>
-#include <Audio/codec.hpp>
+#include <Audio/CodecDefinitions.hpp>
 #include "PulseAudioWrapper.hpp"
 
 #include <variant>

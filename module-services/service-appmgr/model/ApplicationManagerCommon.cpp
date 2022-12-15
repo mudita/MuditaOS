@@ -135,6 +135,7 @@ namespace app::manager
     sys::ReturnCodes ApplicationManagerCommon::InitHandler()
     {
         settings->init(service::ServiceProxy(shared_from_this()));
+        utils::resetAssetsPath(purefs::dir::getSystemDataDirPath());
         utils::setDisplayLanguage(
             settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
         settings->registerValueChange(

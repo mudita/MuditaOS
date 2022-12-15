@@ -6,41 +6,15 @@
 #include <fcntl.h>
 #include <fstream>
 #include <string>
-#include <sys/inotify.h>
-#include <array>
-#include <limits.h>
 
-#ifndef DEUBG_USB
-#undef LOG_PRINTF
-#undef LOG_TRACE
-#undef LOG_DEBUG
-#undef LOG_INFO
-#undef LOG_WARN
-#undef LOG_ERROR
-#undef LOG_FATAL
-#undef LOG_CUSTOM
-
-#define LOG_PRINTF(...)
-#define LOG_TRACE(...)
-#define LOG_DEBUG(...)
-#define LOG_INFO(...)
-#define LOG_WARN(...)
-#define LOG_ERROR(...)
-#define LOG_FATAL(...)
-#define LOG_CUSTOM(loggerLevel, ...)
-#endif
-namespace
-{
-    xTaskHandle taskHandleReceive;
-}
 namespace bsp
 {
     int fd;
-    int fdNofity;
     xQueueHandle USBReceiveQueue;
     xQueueHandle USBIrqQueue;
     constexpr auto ptsFileName = "/tmp/purephone_pts_name";
     char *pts_name             = NULL;
+    bool shouldExecute         = false;
 
 #if USBCDC_ECHO_ENABLED
     bool usbCdcEchoEnabled = false;
@@ -52,37 +26,12 @@ namespace bsp
     constexpr auto usbCDCEchoOffCmdLength = usbCDCEchoOffCmd.length();
 #endif
 
-    void usbDeviceTask(void *ptr)
-    {
-        usbCDCReceive(ptr);
-    }
-
-    void checkUsbStatus()
-    {
-        char eventsBuff[((sizeof(inotify_event) + NAME_MAX + 1))];
-        int len = read(fdNofity, eventsBuff, ((sizeof(inotify_event) + NAME_MAX + 1)));
-        if (len > 0) {
-            const inotify_event *event = (inotify_event *)&eventsBuff[0];
-            if (event->mask & IN_OPEN) {
-                USBDeviceStatus notification = USBDeviceStatus::Configured;
-                xQueueSend(USBIrqQueue, &notification, 0);
-            }
-            if (event->mask & IN_CLOSE_WRITE) {
-                USBDeviceStatus notification = USBDeviceStatus::Disconnected;
-                xQueueSend(USBIrqQueue, &notification, 0);
-            }
-        }
-    }
-
-    int usbCDCReceive(void *)
+    static void usbCDCReceive(void *)
     {
         LOG_INFO("[ServiceDesktop:BSP_Driver] Start reading on fd:%d", fd);
         char inputData[SERIAL_BUFFER_LEN];
 
-        while (1) {
-
-            checkUsbStatus();
-
+        while (shouldExecute) {
             if (uxQueueSpacesAvailable(USBReceiveQueue) != 0) {
                 memset(inputData, 0, SERIAL_BUFFER_LEN);
 
@@ -113,7 +62,7 @@ namespace bsp
                 }
                 else {
                     // yielding task because nothing in a buffer
-                    vTaskDelay(10);
+                    vTaskDelay(pdMS_TO_TICKS(10));
                 }
             }
             else {
@@ -121,6 +70,12 @@ namespace bsp
                 vTaskDelay(1000);
             }
         }
+    }
+
+    void usbDeviceTask(void *ptr)
+    {
+        usbCDCReceive(ptr);
+        vTaskDelete(nullptr);
     }
 
     int usbCDCSend(std::string *sendMsg)
@@ -141,19 +96,18 @@ namespace bsp
         }
     }
 
-    void writePtsToFile(const char *pts_name)
+    void writePtsToFile(const char *name)
     {
         std::ofstream ptsNameFile;
         ptsNameFile.open(ptsFileName, std::ios::out | std::ios::trunc);
-        ptsNameFile << pts_name;
+        ptsNameFile << name;
     }
 
     void usbDeinit()
     {
+        shouldExecute = false;
         LOG_INFO("usbDeinit removing file %s", ptsFileName);
         std::remove(ptsFileName);
-        if (taskHandleReceive)
-            vTaskDelete(taskHandleReceive);
     }
 
     void usbReinit(const std::string &)
@@ -185,9 +139,6 @@ namespace bsp
             return -1;
         }
 
-        fdNofity = inotify_init1(O_NONBLOCK);
-        inotify_add_watch(fdNofity, pts_name, IN_OPEN | IN_CLOSE_WRITE);
-
         writePtsToFile(pts_name);
         LOG_INFO("bsp::usbInit linux ptsname: %s", pts_name);
         struct termios newtio;
@@ -208,8 +159,10 @@ namespace bsp
         cfsetospeed(&newtio, SERIAL_BAUDRATE);
         tcsetattr(fd, TCSANOW, &newtio);
 
+        xTaskHandle taskHandleReceive;
         USBReceiveQueue = initParams.queueHandle;
         USBIrqQueue     = initParams.irqQueueHandle;
+        shouldExecute   = true;
 
         BaseType_t task_error = xTaskCreate(&bsp::usbDeviceTask,
                                             "USBLinuxReceive",

@@ -32,7 +32,11 @@ macro(select_board)
 
     if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
         set(BOARD linux)
-    elseif(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+        set(SYS_PATH ${CMAKE_CURRENT_BINARY_DIR}/sysroot/system_a)
+        set(USER_PATH ${CMAKE_CURRENT_BINARY_DIR}/sysroot/user)
+    elseif(${PROJECT_TARGET} STREQUAL "TARGET_RT1051" )
+        set(SYS_PATH /system)
+        set(USER_PATH /user)
         if(${PRODUCT} STREQUAL "PurePhone")
             set(BOARD puretx)
             set(BOARD_REVISION 7)
@@ -53,4 +57,12 @@ macro(select_board)
     if("${BOARD}" STREQUAL "")
         message(FATAL_ERROR "Cannot determine board selection.")
     endif()
+
+    configure_file(
+            ${PROJECT_SOURCE_DIR}/config/sysroot_path.hpp.template
+            ${CMAKE_BINARY_DIR}/source/include/product/sysroot_path.hpp
+    )
+
+    add_library(sysroot_path INTERFACE)
+    target_include_directories(sysroot_path INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/source/include/product>)
 endmacro()
