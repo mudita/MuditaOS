@@ -521,7 +521,7 @@ namespace app::manager
             autoLockTimer.stop();
             return;
         }
-        if (auto focusedApp = getFocusedApplication(); focusedApp == nullptr || focusedApp->preventsAutoLocking()) {
+        if (const auto focusedApp = getFocusedApplication(); (focusedApp == nullptr) || focusedApp->preventsAutoLocking()) {
             autoLockTimer.start();
             return;
         }
