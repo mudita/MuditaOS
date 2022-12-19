@@ -156,7 +156,7 @@ namespace app::manager
 
         connect(typeid(PreventBlockingRequest), [this]([[maybe_unused]] sys::Message *msg) {
             if (!phoneLockHandler.isPhoneLocked()) {
-                autoLockTimer.stop();
+                autoLockTimer.start();
             }
             return std::make_shared<sys::ResponseMessage>();
         });
@@ -521,8 +521,9 @@ namespace app::manager
             autoLockTimer.stop();
             return;
         }
-        if (auto focusedApp = getFocusedApplication(); focusedApp == nullptr || focusedApp->preventsAutoLocking()) {
-            autoLockTimer.stop();
+        if (const auto focusedApp = getFocusedApplication();
+            (focusedApp == nullptr) || (focusedApp->preventsAutoLocking())) {
+            autoLockTimer.start();
             return;
         }
         if (phoneModeObserver->isTetheringOn()) {
