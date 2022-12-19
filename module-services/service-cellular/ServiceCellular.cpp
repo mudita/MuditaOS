@@ -842,8 +842,15 @@ bool ServiceCellular::handle_power_down()
 
 bool ServiceCellular::handle_start_conf_procedure()
 {
+    auto simSelected = settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global);
+    auto disableRF   = false;
+    if (simSelected.empty()) {
+        LOG_ERROR("No sim selected, disabling RF module.");
+        disableRF = true;
+    }
+
     // Start configuration procedure, if it's first run modem will be restarted
-    auto confRet = cmux->confProcedure();
+    auto confRet = cmux->confProcedure(disableRF);
     if (confRet == CellularMux::ConfState::Success) {
         priv->state->set(State::ST::AudioConfigurationProcedure);
         return true;

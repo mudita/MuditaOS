@@ -305,7 +305,7 @@ class CellularMux
 
     ConfState baudDetectOnce();
     ConfState baudDetectProcedure(uint16_t timeout_s = 30);
-    ConfState confProcedure();
+    ConfState confProcedure(bool disableRF);
     ConfState audioConfProcedure();
     ConfState startMultiplexer();
 

@@ -51,14 +51,7 @@ TEST_CASE("Emergency handling")
         // no SIM and SIM emergency number / sim inserted
         {false, true, true, true, true, std::nullopt, typeid(CallRequest).name()},
         // no SIM and SIM emergency number / sim inserted / no network connection
-        {false,
-         true,
-         true,
-         true,
-         false,
-         RejectRequest::RejectReason::NoNetworkConnection,
-         typeid(RejectRequest).name(),
-         ""},
+        {true, true, true, true, false, std::nullopt, typeid(CallRequest).name()},
         // no SIM emergency number / sim inserted
         {false, false, true, true, true, std::nullopt, typeid(CallRequest).name()},
         // SIM emergency number / sim inserted
