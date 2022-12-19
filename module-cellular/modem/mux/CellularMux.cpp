@@ -215,7 +215,7 @@ CellularMux::ConfState CellularMux::baudDetectProcedure(uint16_t timeout_s)
     return ConfState::Failure;
 }
 
-CellularMux::ConfState CellularMux::confProcedure()
+CellularMux::ConfState CellularMux::confProcedure(bool disableRF)
 {
     LOG_DEBUG("Configuring modem...");
 
@@ -269,7 +269,7 @@ CellularMux::ConfState CellularMux::confProcedure()
         }
     }
 
-    if (!parser->cmd(at::AT::CFUN_DISABLE_TRANSMITTING)) {
+    if (disableRF && !parser->cmd(at::AT::CFUN_DISABLE_TRANSMITTING)) {
         return ConfState::Failure;
     }
 

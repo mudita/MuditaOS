@@ -81,8 +81,7 @@ namespace cellular
 
     std::unique_ptr<IRequest> RequestFactory::create()
     {
-        auto isRegisteredToNetwork = isConnectedToNetwork();
-        if (auto req = emergencyCheck(); req && isRegisteredToNetwork) {
+        if (auto req = emergencyCheck(); req) {
             return req;
         }
 
@@ -132,6 +131,7 @@ namespace cellular
         if (!simInserted) {
             return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
         }
+        auto isRegisteredToNetwork = isConnectedToNetwork();
         if (!isRegisteredToNetwork) {
             return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoNetworkConnection, request);
         }
