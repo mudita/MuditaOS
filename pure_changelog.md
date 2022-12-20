@@ -3,59 +3,101 @@
 ## Unreleased
 
 ### Changed / Improved
-* Added Polish translation to a calendar title
-* Changed USB logging
-* Separated system volume from Bluetooth device volume for A2DP
-* Made windows flow in SIM cards settings more robust
-* Improve refreshing of the display.
-* Fixed music files extension case sensitivity
-* Fixed MTP issues
-* Rebuilt SIM cards window
-* Added option to provide custom GDB to crash analysis script
-* Made VoLTE available for proven cellular network(s) only
 
 ### Fixed
-* Fixed incorrect total CPU usage in logs
-* Fixed wrong time displayed on password locked screen with 'Quotes' or 'Logo' wallpaper
-* Fixed access to the phone before going onboarding
-* Fixed receiving an empty SMS message
-* Fixed issue with inability to send SMS
-* Fixed mixed SMS messages
-* Fixed disappearing manual alarm and vibration volume setting in German
-* Fixed lost bytes in logs
-* Fixed passcode lock time discrepancy between lock screen and 'Wrong password' popup
-* Fixed cellular DMA errors
-* Fixed order of the services while closing system
-* Fixed crash of the E-ink service while restoring system data
-* Fixed removing wrong sentinels
-* Fixed music player behaviour when connecting/disconnecting audio devices
-* Fixed dropping the call during the DND mode
-* Fixed wrong tethering popup order
-* Fixed crash during phone turn off
-* Fixed improper duration of the rejected outgoing call shown in calls log
-* Fixed Bluetooth volume control issues
-* Fixed turning on loudspeaker before outgoing call is answered
-* Fixed PLAY label translation in German
-* Fixed USB connection/disconnection detection
-* Fixed memory leaks in APN settings
-* Fixed windows flow regarding PUK requests after too many PIN mistakes
 * Fixed disappearing "confirm" button in PIN entering screen
 * Fixed looping on the SIM card selection screen
-* Fixed screen lock during onboarding
-* Fixed displayed device name when connected to Windows
-* Fixed redundant modem polling for call states
-* Fixed selecting SIM during onboarding
-* Fixed broken text in French and German on SIM selection screen during onboarding
-* Fixed broken text in Spanish on the PIN input screen
 * Fixed notes paste option showing for empty clipboard
 
+
 ### Added
-* Added a popup for changing the SIM card
-* Added tethering information on the status bar
-* Added basic MMS handling
-* Added run-time statistics for tasks
-* Added VoLTE support
-* Added pop-up about SIM removed/inserted in all apps
+
+## [1.5.0 2022-12-20]
+
+### Added
+
+#### Messages:
+* Added text message support via VoLTE modem.
+#### Calls:
+* Call support via VoLTE for users in the US
+#### Home Screen:
+* Added tethering info on status bar.
+
+### Changed / Improved
+#### SIM Cards:
+* Change windows flow in SIM settings.
+* Improved support for reinserting the SIM card into the device during SIM setup.
+
+### Fixed
+* Fixed MTP integration.
+* Fixed incorrect total CPU usage in logs.
+* Fixed disappearing button in PIN entering screen.
+* Restored notifications about PIN changes.
+* Fixed windows flow after PIN mistakes.
+* Fixed music files extensions case sensitivity.
+* Fixed locked password wallpaper behavior.
+* Fixed access to the phone before going onboarding.
+* Fixed the phone hanging up after receiving an empty SMS message.
+
+
+## [1.4.0 2022-10-06]
+### Added
+#### MMS:
+* Added basic MMS handling.
+
+#### Bluetooth:
+* Added state refresh when BT automatically turns off.
+
+### Changed / Improved
+
+#### Calendar:
+
+* Added Polish translation to a calendar title.
+
+#### General:
+
+* Changed USB logging.
+* Improved keyboard responsiveness.
+* Improved lock screen power consumption.
+
+#### Bluetooth:
+
+* Separated system volume from Bluetooth device volume for A2DP.
+
+### Fixed
+* Fixed issue with music not pausing when BT device is disconnected.
+* Fixed music player behaviour when connecting/disconnecting audio devices.
+* Fixed issue with message handling in which characters not supported by Pure appear.
+* Fixed problem with message display on Pure for Verizon network.
+* Fixed issue with inability to send SMS.
+* Fixed mixed SMS messages.
+* Fixed SIM card pop-ups not showing.
+* Fixed disappearing manual alarm and vibration volume setting in German.
+* Fixed an issue with the screen not displaying a message about changing the phone mode from DND/Offline/Connected.
+* Fixed USB connection/disconnection detection.
+* Fixed passcode lock time discrepancy between lock screen and 'Wrong password' popup.
+* Fixed lost bytes in logs.
+* Fixed cellular DMA errors.
+* Fixed order of the services while closing system.
+* Fixed removing wrong sentinels.
+* Fixed crash during phone turn off.
+* Fixed PLAY label translation in German.
+* Fixed memory leaks in APN settings.
+* Fixed poor phone responsiveness.
+* Fixed crash on entering PIN settings.
+* Fixed crash of the Eink service while restoring system data.
+* Fixed dropping the call during the DND mode.
+* Fixed improper duration of the rejected outgoing call shown in calls log.
+* Fixed turning on loudspeaker before outgoing call is answered.
+* Fixed no calllog entries in DND mode.
+* Fixed wrong tethering popup order.
+* Fixed Bluetooth volume control issues.
+* Fixed Bluetooth state first rendering off.
+* Fixed crash on importing unprocessable contact.
+* Fixed the order in which contacts are displayed in the list.
+* Fixed incorrect navigation text in onboarding for timezone and date time.
+* Fixed wrong time displayed on password locked screen with 'Quotes' or 'Logo' wallpaper.
+
 
 ## [1.3.0 2022-08-04]
 
