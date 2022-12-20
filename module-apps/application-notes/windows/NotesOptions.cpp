@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesOptions.hpp"
@@ -101,16 +101,20 @@ namespace app::notes
                 return true;
             },
             options);
-        addOption(
-            {"common_text_paste"},
-            [application, textWidget](gui::Item &item) {
-                if (textWidget != nullptr) {
-                    textWidget->addText(Clipboard::getInstance().paste(), gui::AdditionType::perBlock);
-                }
-                application->returnToPreviousWindow();
-                return true;
-            },
-            options);
+
+        if (Clipboard::getInstance().gotData()) {
+            addOption(
+                {"common_text_paste"},
+                [application, textWidget](gui::Item &item) {
+                    if (textWidget != nullptr) {
+                        textWidget->addText(Clipboard::getInstance().paste(), gui::AdditionType::perBlock);
+                    }
+                    application->returnToPreviousWindow();
+                    return true;
+                },
+                options);
+        }
+
         return options;
     }
 } // namespace app::notes

@@ -47,6 +47,7 @@
 * Fixed selecting SIM during onboarding
 * Fixed broken text in French and German on SIM selection screen during onboarding
 * Fixed broken text in Spanish on the PIN input screen
+* Fixed notes paste option showing for empty clipboard
 
 ### Added
 * Added a popup for changing the SIM card
