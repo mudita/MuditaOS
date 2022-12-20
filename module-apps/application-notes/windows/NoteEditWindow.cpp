@@ -54,8 +54,6 @@ namespace app::notes
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::translate("app_notes_edit_new_note"));
-
         namespace editStyle = app::notes::style::edit;
         charactersCounter   = new gui::Label(
             this, editStyle::LeftMargin, editStyle::TopMargin, editStyle::Width, editStyle::counter::Height);
@@ -125,6 +123,8 @@ namespace app::notes
 
         notesRecord = editData->getRecord();
         setNoteText(notesRecord->snippet);
+
+        setTitle(isNoteEmpty() ? utils::translate("app_notes_new_note") : utils::translate("app_notes_edit_note"));
     }
 
     void NoteEditWindow::setNoteText(const UTF8 &text)

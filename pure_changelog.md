@@ -8,7 +8,7 @@
 * Fixed disappearing "confirm" button in PIN entering screen
 * Fixed looping on the SIM card selection screen
 * Fixed notes paste option showing for empty clipboard
-
+* Fixed notes window title
 
 ### Added
 
