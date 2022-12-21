@@ -10,6 +10,7 @@ local restore = {}
 
 local unpacked_backup_dir = paths.temp_dir .. "/backup"
 local version_file = unpacked_backup_dir .. "/" .. consts.version_file
+local legacy_version_file = unpacked_backup_dir .. "/" .. consts.legacy_version_file
 
 restore.script_name = "restore.lua"
 restore.img_in_progress = "assets/gui_image_restore_in_progress.bin"
@@ -46,9 +47,34 @@ local function build_db_set(file)
     return set
 end
 
+local function get_legacy_db_set()
+    local set = {
+        ["calllog"] = 0,
+        ["sms"] = 0,
+        ["events"] = 0,
+        ["settings_v2"] = 0,
+        ["notes"] = 0,
+        ["custom_quotes"] = 0,
+        ["predefined_quotes"] = 0,
+        ["contacts"] = 0,
+        ["alarms"] = 0,
+        ["notifications"] = 0,
+        ["multimedia"] = 0
+    }
+    return set
+end
+
 local function perform_db_migration()
     print("Performing database migration")
-    local dbset = build_db_set(version_file)
+    local dbset = {}
+    if helpers.exists(version_file) then
+        dbset = build_db_set(version_file)
+    else
+        assert(helpers.exists(legacy_version_file))
+        print("Legacy backup file, assuming legacy databases set")
+        dbset = get_legacy_db_set()
+    end
+
     local result = migration.migrate(unpacked_backup_dir, paths.migration_scripts_dir, dbset)
     assert(result == migration.retcode.OK, string.format("Database migration process failed with %d", result))
 end
@@ -59,7 +85,12 @@ local function sync_databases()
 
     helpers.rm_files_from_dir(paths.db_dir)
     helpers.copy_dir(unpacked_backup_dir, paths.db_dir)
-    assert(os.remove(paths.db_dir .. "/" .. consts.version_file))
+
+    local version_file_path = paths.db_dir .. "/" .. consts.version_file
+    if not helpers.exists(version_file_path) then
+        version_file_path = paths.db_dir .. "/" .. consts.legacy_version_file
+    end
+    assert(os.remove(version_file_path))
 end
 
 local function remove_cache()
