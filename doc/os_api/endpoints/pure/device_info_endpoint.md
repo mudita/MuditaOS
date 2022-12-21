@@ -82,6 +82,7 @@ enum class Method
       "updateFilePath": "path/to/update_package",
       "backupFilePath": "path/to/backup_package",
       "syncFilePath": "path/to/sync_package",
+      "mtpPath": "/path/to/music/assets/or/other/available/from/MTP"
    },
    "endpoint":1,
    "status":200,
@@ -118,6 +119,7 @@ enum class Method
  - *updateFilePath* - location of the update package
  - *backupFilePath* - location of the backup package
  - *syncFilePath* - location of the sync package
+ - *mtpPath* - path to the catalog available via MTP
 
 ```
 struct Network
