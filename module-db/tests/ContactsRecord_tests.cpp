@@ -369,7 +369,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersPL[0], std::string("")),
                                                                 ContactRecord::Number(numbersFR[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         auto validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
@@ -395,13 +395,13 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersPL[0], std::string("")),
                                                                 ContactRecord::Number(numbersFR[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         // deleting country code
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[0], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         auto validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
@@ -427,17 +427,17 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersPL[0], std::string("")),
                                                                 ContactRecord::Number(numbersPL[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 4);
+        REQUIRE(contactsDb.get().number.count() == 4);
 
         // changing country code (to FR)
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbersFR[0], std::string("")),
                                                                 ContactRecord::Number(numbersFR[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 6);
-        REQUIRE(contactDB.number.getById(1).contactID != 1); // old numbers do not belong to any contact
-        REQUIRE(contactDB.number.getById(1).contactID != 2);
-        REQUIRE(contactDB.number.getById(2).contactID != 1);
-        REQUIRE(contactDB.number.getById(2).contactID != 2);
+        REQUIRE(contactsDb.get().number.count() == 6);
+        REQUIRE(contactsDb.get().number.getById(1).contactID != 1); // old numbers do not belong to any contact
+        REQUIRE(contactsDb.get().number.getById(1).contactID != 2);
+        REQUIRE(contactsDb.get().number.getById(2).contactID != 1);
+        REQUIRE(contactsDb.get().number.getById(2).contactID != 2);
 
         auto validationRecord = records.GetByID(1);
         REQUIRE(validationRecord.numbers.size() == 2);
