@@ -82,7 +82,7 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>(std::move(fileIndexerAudioPaths)));
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
     systemServices.emplace_back(sys::CreatorFor<service::Audio>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>(purefs::dir::getUserMediaPath() / "app/relaxation"));
+    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>(purefs::dir::getRelaxationPath()));
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>(service::eink::ExitAction::None));
     systemServices.emplace_back(
