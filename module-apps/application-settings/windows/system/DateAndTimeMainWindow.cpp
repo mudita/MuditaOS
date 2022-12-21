@@ -52,6 +52,10 @@ namespace gui
                 application->bus.sendUnicast(
                     std::make_shared<stm::message::SetAutomaticDateAndTimeRequest>(automaticDateAndTimeIsOn),
                     service::name::service_time);
+                if (!automaticDateAndTimeIsOn) {
+                    application->switchWindow(window::name::change_time_zone, nullptr);
+                    return true;
+                }
                 refreshOptionsList();
                 return true;
             },
