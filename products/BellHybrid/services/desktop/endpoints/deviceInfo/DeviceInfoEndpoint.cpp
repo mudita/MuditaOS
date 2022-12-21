@@ -61,7 +61,8 @@ namespace sdesktop::endpoints
               (purefs::dir::getTemporaryPath() / sdesktop::paths::recoveryStatusFilename).string()},
              {json::updateFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename).string()},
              {json::backupFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::backupFilename).string()},
-             {json::syncFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename).string()}}));
+             {json::syncFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename).string()},
+             {json::mtpPath, purefs::dir::getRelaxationPath().string()}}));
 
         return http::Code::OK;
     }
