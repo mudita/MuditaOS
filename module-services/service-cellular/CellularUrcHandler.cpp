@@ -76,30 +76,41 @@ void CellularUrcHandler::Handle(Cusd &urc)
     response     = std::nullopt;
     auto message = urc.getMessage();
     if (!message) {
+        LOG_WARN("CUSD with empty message - will be treated as not handled");
         return;
     }
-    auto constexpr logLength = 16;
-    auto logMessage          = message->substr(0, logLength);
 
-    LOG_INFO("USSD body: %s", logMessage.c_str());
+#if LOG_SENSITIVE_DATA_ENABLED
+    LOG_INFO("USSD body: %s", message->c_str());
+#else
+    size_t constexpr truncatedLength = 16;
+    LOG_INFO("USSD body (first %zu characters): %s", truncatedLength, message->substr(0, truncatedLength).c_str());
+#endif
+
+    urc.setHandled(true);
 
     if (urc.isActionNeeded()) {
-        if (cellularService.ussdState == ussd::State::pullRequestSent) {
+        switch (cellularService.ussdState) {
+        case ussd::State::pullRequestSent:
             cellularService.ussdState = ussd::State::pullResponseReceived;
+            [[fallthrough]];
+        case ussd::State::pushSession: {
             cellularService.setUSSDTimer();
             auto msg = std::make_shared<cellular::MMIResponseMessage>(*message);
             cellularService.bus.sendUnicast(msg, service::name::appmgr);
+            return;
+        }
+        default:
+            LOG_WARN("unexpected URC handling state: %s", magic_enum::enum_name(cellularService.ussdState).data());
+            return;
         }
     }
-    else {
-        CellularServiceAPI::USSDRequest(&cellularService, cellular::USSDMessage::RequestType::abortSession);
-        cellularService.ussdState = ussd::State::sessionAborted;
-        cellularService.setUSSDTimer();
-        auto msg = std::make_shared<cellular::MMIPushMessage>(*message);
-        cellularService.bus.sendUnicast(msg, service::name::appmgr);
-    }
 
-    urc.setHandled(true);
+    CellularServiceAPI::USSDRequest(&cellularService, cellular::USSDMessage::RequestType::abortSession);
+    cellularService.ussdState = ussd::State::sessionAborted;
+    cellularService.setUSSDTimer();
+    auto msg = std::make_shared<cellular::MMIPushMessage>(*message);
+    cellularService.bus.sendUnicast(msg, service::name::appmgr);
 }
 
 void CellularUrcHandler::Handle(Ctze &urc)
