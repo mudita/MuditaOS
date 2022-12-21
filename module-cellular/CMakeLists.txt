@@ -75,6 +75,7 @@ target_link_libraries(${PROJECT_NAME}
 
     PRIVATE
         Microsoft.GSL::GSL
+	re2::re2
         time-constants
 )
 

@@ -279,74 +279,77 @@ TEST_CASE("+Qind: FOTA")
     }
 }
 
-TEST_CASE("+Cusd")
+TEST_CASE("+CUSD")
 {
-    SECTION("Cusd action needed")
-    {
-        auto urc  = at::urc::UrcFactory::Create("+CUSD:1,\"test msg\",14");
-        auto cusd = getURC<at::urc::Cusd>(urc);
+    using namespace at::urc;
 
-        REQUIRE(cusd);
-        REQUIRE(cusd->isValid());
-        REQUIRE(cusd->isActionNeeded());
-        REQUIRE(*cusd->getMessage() == "test msg");
-        REQUIRE(*cusd->getStatus() == at::urc::Cusd::StatusType::FurtherUserActionRequired);
-        REQUIRE(*cusd->getDCS() == 14);
+    SECTION("MessageWithCorruptedHeader_IsntRecognizedAsCusd")
+    {
+        auto urc       = UrcFactory::Create("+CUSDD: 9,\"xyz\",15\r\n");
+        auto maybeCusd = dynamic_cast<Cusd *>(urc.get());
+        REQUIRE_FALSE(maybeCusd);
     }
 
-    SECTION("Cusd action needed with white spaces")
+    SECTION("MessageWithUnrecognizedStatus_RendersInvalid")
     {
-        auto urc  = at::urc::UrcFactory::Create("+CUSD: 0 , \"test msg\" , 15 ");
-        auto cusd = getURC<at::urc::Cusd>(urc);
-        REQUIRE(cusd);
-        REQUIRE(cusd->isValid());
-        REQUIRE_FALSE(cusd->isActionNeeded());
-        REQUIRE(*cusd->getMessage() == "test msg");
-        REQUIRE(*cusd->getStatus() == at::urc::Cusd::StatusType::NoFurtherUserActionRequired);
-        REQUIRE(*cusd->getDCS() == 15);
-    }
-
-    SECTION("Cusd wrong status and DCS")
-    {
-        auto urc  = at::urc::UrcFactory::Create("+CUSD:100,\"test msg\", abc");
-        auto cusd = getURC<at::urc::Cusd>(urc);
-        REQUIRE(cusd);
-        REQUIRE(cusd->isValid());
-        REQUIRE_FALSE(cusd->isActionNeeded());
-        REQUIRE(*cusd->getMessage() == "test msg");
-        REQUIRE_FALSE(cusd->getStatus());
-        REQUIRE_FALSE(cusd->getDCS());
-    }
-
-    SECTION("Cusd action not needed")
-    {
-        auto urc  = at::urc::UrcFactory::Create("+CUSD:2,\"test msg\",15");
-        auto cusd = getURC<at::urc::Cusd>(urc);
-        REQUIRE(cusd);
-        REQUIRE(cusd->isValid());
-        REQUIRE_FALSE(cusd->isActionNeeded());
-    }
-
-    SECTION("no Cusd")
-    {
-        auto urc  = at::urc::UrcFactory::Create("+CSUD:1,\"test msg\",15");
-        auto cusd = getURC<at::urc::Cusd>(urc);
-        REQUIRE_FALSE(cusd);
-    }
-
-    SECTION("too short")
-    {
-        auto urc  = at::urc::UrcFactory::Create("+CUSD:1,\"test msg\"");
-        auto cusd = getURC<at::urc::Cusd>(urc);
-        REQUIRE(cusd);
+        auto urc  = UrcFactory::Create("+CUSD: 9,\"xyz\",15\r\n");
+        auto cusd = static_cast<Cusd *>(urc.get());
         REQUIRE_FALSE(cusd->isValid());
     }
 
-    SECTION("too long")
+    SECTION("MessageWithUnsupportedAlphabet_RendersInvalid")
     {
-        auto urc  = at::urc::UrcFactory::Create("+CUSD:1,\"test msg\",15,15");
-        auto cusd = getURC<at::urc::Cusd>(urc);
-        REQUIRE(cusd);
+        auto urc  = UrcFactory::Create("+CUSD: 0,\"xyz\",9\r\n");
+        auto cusd = static_cast<Cusd *>(urc.get());
+        REQUIRE_FALSE(cusd->isValid());
+    }
+
+    SECTION("EmptyMessage_RendersValid")
+    {
+        auto urc  = UrcFactory::Create("+CUSD: 0,\"\",15\r\n");
+        auto cusd = static_cast<Cusd *>(urc.get());
+        REQUIRE(cusd->isValid());
+    }
+
+    SECTION("MessageWithNoActionRequiredAndSupportedAlphabet_RendersValid")
+    {
+        auto urc  = UrcFactory::Create("+CUSD: 0,\"xyz\",15\r\n");
+        auto cusd = static_cast<Cusd *>(urc.get());
+        REQUIRE(cusd->isValid());
+    }
+
+    SECTION("MessageWithSpacesInside_RendersValidAndHasSpacesPreserved")
+    {
+        std::string cusdBody(" xy    zzzz  ");
+        auto urc  = UrcFactory::Create("+CUSD: 0,\"" + cusdBody + "\",15\r\n");
+        auto cusd = static_cast<Cusd *>(urc.get());
+        REQUIRE(cusd->isValid());
+        REQUIRE(cusd->getMessage().has_value());
+        REQUIRE(*cusd->getMessage() == cusdBody);
+    }
+
+    SECTION("MessageWithQuotationMarksInside_RendersValidAndHasQuotationMarksPreserved")
+    {
+        std::string cusdBody("xy\"zz\"aa");
+        auto urc  = UrcFactory::Create("+CUSD: 0,\"" + cusdBody + "\",15\r\n");
+        auto cusd = static_cast<Cusd *>(urc.get());
+        REQUIRE(cusd->isValid());
+        REQUIRE(cusd->getMessage().has_value());
+        REQUIRE(*cusd->getMessage() == cusdBody);
+    }
+
+    SECTION("MessageWithFurtherActionRequiredAndSupportedAlphabet_RendersValid")
+    {
+        auto urc  = UrcFactory::Create("+CUSD: 1,\"xyz\",15\r\n");
+        auto cusd = static_cast<Cusd *>(urc.get());
+        REQUIRE(cusd->isValid());
+        REQUIRE(cusd->isActionNeeded());
+    }
+
+    SECTION("MessageWithExcessiveLineEnding_RendersInvalid")
+    {
+        auto urc  = UrcFactory::Create("+CUSD: 1,\"xyz\",15\r\n\r\n");
+        auto cusd = static_cast<Cusd *>(urc.get());
         REQUIRE_FALSE(cusd->isValid());
     }
 }

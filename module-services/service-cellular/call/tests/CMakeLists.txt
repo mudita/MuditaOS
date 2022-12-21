@@ -10,6 +10,7 @@ add_catch2_executable(
         sml::sml
         sml::utils::logger
         test::fakeit
+	libphonenumber
 )
 
 set_source_files_properties(
