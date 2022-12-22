@@ -10,6 +10,7 @@
 * Fixed notes paste option showing for empty clipboard
 * Fixed notes window title
 * Fixed adding and deleting country code prefix to existing contact
+* Fixed French translation for SIM cards texts
 
 ### Added
 
