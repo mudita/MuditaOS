@@ -83,10 +83,17 @@ namespace sdesktop::endpoints
 
     auto DeviceInfoEndpointCommon::requestLogsFlush() const -> void
     {
-        auto owner = dynamic_cast<ServiceDesktop *>(ownerServicePtr);
-        if (owner) {
+        if (const auto owner = dynamic_cast<ServiceDesktop *>(ownerServicePtr); owner != nullptr) {
             owner->requestLogsFlush();
         }
+    }
+
+    auto DeviceInfoEndpointCommon::getMtpPath() const -> std::filesystem::path
+    {
+        if (const auto owner = dynamic_cast<ServiceDesktop *>(ownerServicePtr); owner != nullptr) {
+            return owner->getMtpPath();
+        }
+        return std::filesystem::path{};
     }
 
     auto DeviceInfoEndpointCommon::fileListToJsonObject(const std::vector<std::string> &fileList) const
