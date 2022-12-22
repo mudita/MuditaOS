@@ -62,7 +62,7 @@ namespace sdesktop::endpoints
              {json::updateFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename).string()},
              {json::backupFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::backupFilename).string()},
              {json::syncFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename).string()},
-             {json::mtpPath, purefs::dir::getMusicPlayerPath().string()},
+             {json::mtpPath, getMtpPath().string()},
              {json::deviceToken, getDeviceToken()}}));
 
         return http::Code::OK;
