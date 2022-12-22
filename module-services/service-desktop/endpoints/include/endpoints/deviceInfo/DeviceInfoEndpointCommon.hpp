@@ -8,7 +8,7 @@
 
 #include <string>
 #include <tuple>
-
+#include <filesystem>
 #include <json11.hpp>
 
 namespace sdesktop::endpoints
@@ -30,6 +30,7 @@ namespace sdesktop::endpoints
         auto requestLogsFlush() const -> void;
         auto getStorageStats(const std::string &path) -> std::tuple<long, long>;
         auto getStorageInfo() -> std::tuple<long, long, long>;
+        auto getMtpPath() const -> std::filesystem::path;
 
         explicit DeviceInfoEndpointCommon(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
         {
