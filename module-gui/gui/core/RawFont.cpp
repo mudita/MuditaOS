@@ -142,6 +142,8 @@ namespace gui
         if (glyph != nullptr) {
             return glyph;
         }
+
+        LOG_WARN("unsupported font glyph ID: %" PRIu32, glyph_id);
         return unsupported.get();
     }
 
