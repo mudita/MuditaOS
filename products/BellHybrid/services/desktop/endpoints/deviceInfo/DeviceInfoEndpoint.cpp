@@ -62,7 +62,7 @@ namespace sdesktop::endpoints
              {json::updateFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename).string()},
              {json::backupFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::backupFilename).string()},
              {json::syncFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename).string()},
-             {json::mtpPath, purefs::dir::getRelaxationPath().string()}}));
+             {json::mtpPath, getMtpPath().string()}}));
 
         return http::Code::OK;
     }
