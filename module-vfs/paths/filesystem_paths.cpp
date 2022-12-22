@@ -80,14 +80,6 @@ namespace purefs
         {
             return getSystemDiskPath() / PATH_VAR;
         }
-        std::filesystem::path getMusicPlayerPath() noexcept
-        {
-            return purefs::dir::getUserMediaPath() / "app/music_player";
-        }
-        std::filesystem::path getRelaxationPath() noexcept
-        {
-            return purefs::dir::getUserMediaPath() / "app/relaxation";
-        }
 
     } // namespace dir
 } // namespace purefs

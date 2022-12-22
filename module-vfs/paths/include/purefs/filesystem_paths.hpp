@@ -21,8 +21,6 @@ namespace purefs
         std::filesystem::path getAssetsDirPath() noexcept;
         std::filesystem::path getSystemDataDirPath() noexcept;
         std::filesystem::path getSystemVarDirPath() noexcept;
-        std::filesystem::path getMusicPlayerPath() noexcept;
-        std::filesystem::path getRelaxationPath() noexcept;
 
     } // namespace dir
 

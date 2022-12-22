@@ -362,3 +362,8 @@ auto ServiceDesktop::handle(sevm::USBPlugEvent *msg) -> std::shared_ptr<sys::Mes
     }
     return sys::MessageNone{};
 }
+
+auto ServiceDesktop::getMtpPath() const noexcept -> std::filesystem::path
+{
+    return mtpRootPath;
+}
