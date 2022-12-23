@@ -1,5 +1,5 @@
 #!/bin/bash -e
-#Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+#Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 #For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 usage() {
@@ -15,7 +15,7 @@ Usage: $(basename $0) [image_size] [image_file] [sysroot] [files]...
 if [ $# -lt 2 ]; then
 	echo "Error! Invalid argument count"
 	usage
-	exit -1
+	exit 1
 fi
 IMAGE_SIZE="$1"
 IMAGE_FILE="$2"
@@ -24,14 +24,14 @@ shift 3
 
 if [ ! -d "${SYSROOT}/sys" ]; then
 	echo "Invalid sysroot: ${SYSROOT}"
-	exit -1
+	exit 1
 fi
 
 _REQ_CMDS="sfdisk truncate"
 for cmd in $_REQ_CMDS; do
 	if [ ! $(command -v $cmd) ]; then
 		echo "Error! $cmd is not installed, please use 'sudo apt install' for install required tool"
-		exit -1
+		exit 1
 	fi
 done
 truncate -s $IMAGE_SIZE $IMAGE_FILE

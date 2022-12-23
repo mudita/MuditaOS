@@ -17,7 +17,7 @@ Usage: $(basename $0) image_path image_partitions build_dir [version.json_file] 
 if [[ ( $# -lt 3 )  || ( $# -gt 8 ) ]]; then
 	echo "Error! Invalid argument count $# args: $*"
 	usage
-	exit -1
+	exit 1
 fi
 
 IMAGE_NAME=$(realpath $1)
@@ -33,13 +33,13 @@ UPDATER_FILE=$7
 if [ ! -d "$SYSROOT" ]; then
 	echo "Error! ${SYSROOT} is not a directory"
 	usage
-	exit -1
+	exit 1
 fi
 _REQ_CMDS="sfdisk mtools awk truncate"
 for cmd in $_REQ_CMDS; do
 	if [ ! $(command -v $cmd) ]; then
 		echo "Error! $cmd is not installed, please use 'sudo apt install' for install required tool"
-		exit -1
+		exit 1
 	fi
 done
 #mtools version
@@ -55,7 +55,7 @@ MTOOLS_OK=$(mtools --version | awk "${_AWK_SCRIPT}")
 
 if [ ! $MTOOLS_OK ]; then
 	echo "Invalid mtools version, please upgrade mtools to >= 4.0.24"
-	exit -1
+	exit 1
 fi
 
 source ${IMAGE_PARTITIONS}
@@ -91,7 +91,7 @@ mformat -i "$PART2" -F -T $PART2_SIZE -M $DEVICE_BLK_SIZE -v RECOVER
 
 if [ ! -d "${SYSROOT}/sys" ]; then
 	echo "Fatal! Image folder sys/ missing in build. Check build system."
-	exit -1
+	exit 1
 fi
 cd "${SYSROOT}/sys"
 

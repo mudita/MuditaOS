@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 arraymenu ()
@@ -30,7 +30,7 @@ elif [ ${#dirs[@]} -gt 1 ]; then
     cd "${dirs[$REPLY-1]}"
 else
     echo "Error: Simulator directory doesn't exists"
-    exit -1
+    exit 1
 fi
 
 PRELOAD_LIB=$(realpath board/linux/libiosyscalls/libiosyscalls.so)
