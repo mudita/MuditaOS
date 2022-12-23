@@ -12,11 +12,11 @@
 # it's support is added to default ccache
 
 # packages settings
-SCRIPT=$(readlink -f $0)
-SCRIPT_DIR="$(dirname ${SCRIPT})"
+SCRIPT=$(readlink -f "$0")
+SCRIPT_DIR=$(dirname "${SCRIPT}")
 
-. ${SCRIPT_DIR}/bootstrap_config
-. ${SCRIPT_DIR}/common_scripts_lib
+. "${SCRIPT_DIR}/bootstrap_config"
+. "${SCRIPT_DIR}/common_scripts_lib"
 
 function test_if_run_as_root() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
@@ -42,10 +42,10 @@ function add_to_path() {
 
     if [[ -n ${check_if_exists} ]]; then
         SED_SCRIPT="s%${TOOL_PATH_VAR}=\".*\"%${TOOL_PATH_VAR}=\"${TOOL_DIR}\"%"
-        sed -e "$SED_SCRIPT" -i ${BASH_RC}
+        sed -e "$SED_SCRIPT" -i "${BASH_RC}"
     else
-        echo "export ${TOOL_PATH_VAR}=\"${TOOL_DIR}\"" >> ${BASH_RC}
-        echo "PATH=\"\${${TOOL_PATH_VAR}:+\${${TOOL_PATH_VAR}}:}\${PATH}\"" >> ${BASH_RC}
+        echo "export ${TOOL_PATH_VAR}=\"${TOOL_DIR}\"" >> "${BASH_RC}"
+        echo "PATH=\"\${${TOOL_PATH_VAR}:+\${${TOOL_PATH_VAR}}:}\${PATH}\"" >> "${BASH_RC}"
     fi
 }
 function install_hooks(){
@@ -59,7 +59,7 @@ function install_hooks(){
     HOOK="pre-commit.hook"
 
     L_GIT_DIR=$(git rev-parse --show-toplevel)
-    ln -sf ${L_GIT_DIR}/config/${HOOK} ${L_GIT_DIR}/.git/hooks/pre-commit
+    ln -sf "${L_GIT_DIR}/config/${HOOK}" "${L_GIT_DIR}/.git/hooks/pre-commit"
 }
 
 function add_ignore_revs_for_blame() {
@@ -78,8 +78,8 @@ function setup_gcc_alternatives() {
 
 function install_pip_packages() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
-    pip3 install -r ${SCRIPT_DIR}/requirements.txt
-    pip3 install -r ${SCRIPT_DIR}/../test/requirements.txt
+    pip3 install -r "${SCRIPT_DIR}/requirements.txt"
+    pip3 install -r "${SCRIPT_DIR}/../test/requirements.txt"
 }
 
 function install_ubuntu_packages() {
@@ -105,7 +105,7 @@ function setup_arm_toolchain() {
     # untar to HOME
     if [[ ! -d ${HOME}/${ARM_GCC} ]]; then
         echo "extracting: ${ARM_GCC_PKG} to ${HOME}"
-        tar -xjf ${ARM_GCC_PKG} -C ${HOME}/
+        tar -xjf "${ARM_GCC_PKG}" -C "${HOME}/"
     fi
     echo "ARM GCC installed to ${HOME}/${ARM_GCC}"
     popd 
@@ -114,10 +114,10 @@ function setup_arm_toolchain() {
 function setup_cmake() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     pushd /tmp
-    [[ ! -f ${CMAKE_NAME}.tgz ]] &&
+    [[ ! -f "${CMAKE_NAME}.tgz" ]] &&
         getCMake
-    [[ ! -d ${HOME}/${CMAKE_NAME} ]] &&
-        tar -xf ${CMAKE_PKG} -C ${HOME}/
+    [[ ! -d "${HOME}/${CMAKE_NAME}" ]] &&
+        tar -xf "${CMAKE_PKG}" -C "${HOME}/"
     popd
     echo "CMAKEV installed to ${HOME}/${CMAKE_NAME} and set in PATH"
 }
@@ -126,7 +126,7 @@ function install_docker() {
     if [[ -n $(command -v docker) ]]; then
         TESTED_VERSION="19.03.8"
         DOCKER_VERSION=$(docker version -f '{{.Server.Version}}')
-        if [[ ${TESTED_VERSION} != ${DOCKER_VERSION} ]]; then
+        if [[ "${TESTED_VERSION}" != "${DOCKER_VERSION}" ]]; then
             echo -e "Tested with docker ${DOCKER_VERSION} your is ${DOCKER_VERSION} consider updating"
         else
             echo "Docker already installed"
@@ -140,10 +140,10 @@ function install_docker() {
 
 function add_to_docker_group() {
     DOCKER_GRP="docker"
-    if grep -q $DOCKER_GRP /etc/group
+    if grep -q "$DOCKER_GRP" /etc/group
     then
         NAME=$(whoami)
-        sudo usermod -aG ${DOCKER_GRP} ${NAME}
+        sudo usermod -aG "${DOCKER_GRP}" "${NAME}"
         cat <<-MSGEND
 		Group is updated, please logout and login back so
 		the change has come into effect
@@ -167,7 +167,7 @@ BUILD_STEPS=(
 
 test_if_run_as_root
 
-if [ $# -eq 1 ]; then 
+if [ $# -eq 1 ]; then
     PARAM=$1
     if [ "${PARAM:$(( ${#PARAM} - 1 )):1}" == "-" ]; then
         START=${PARAM%*-}
@@ -199,7 +199,7 @@ echo "START:${BUILD_STEPS[$START]}(${START})"
 echo "END:${BUILD_STEPS[$END]}(${END})"
 
 I=${START}
-while [ ${I} -lt ${END} ]
+while [ "${I}" -lt "${END}" ]
 do
     eval ${BUILD_STEPS[${I}]}
     echo "${I}" > LAST_STEP

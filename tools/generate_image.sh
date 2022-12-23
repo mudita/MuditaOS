@@ -4,7 +4,7 @@
 
 usage() {
 cat << ==usage
-Usage: $(basename $0) image_path image_partitions build_dir [version.json_file] [boot.bin_file] [updater.bin_file]
+Usage: $(basename "$0") image_path image_partitions build_dir [version.json_file] [boot.bin_file] [updater.bin_file]
     image_path        - Destination image path name e.g., PurePhone.img
     image_partitions  - Path to image_partitions.map product-specific file
     sysroot           - product's system root e.g., build-rt1051-RelWithDebInfo/sysroot
@@ -20,15 +20,15 @@ if [[ ( $# -lt 3 )  || ( $# -gt 8 ) ]]; then
 	exit -1
 fi
 
-IMAGE_NAME=$(realpath $1)
-PRODUCT_NAME=$(basename -s .img $1)
-IMAGE_PARTITIONS=$(realpath $2)
+IMAGE_NAME=$(realpath "${1}")
+PRODUCT_NAME=$(basename -s .img "${1}")
+IMAGE_PARTITIONS=$(realpath "${2}")
 
-SYSROOT=$(realpath $3)
-LUTS=$4
-VERSION_FILE=$5
-BIN_FILE=$6
-UPDATER_FILE=$7
+SYSROOT=$(realpath "${3}")
+LUTS=${4}
+VERSION_FILE=${5}
+BIN_FILE=${6}
+UPDATER_FILE=${7}
 
 if [ ! -d "$SYSROOT" ]; then
 	echo "Error! ${SYSROOT} is not a directory"
@@ -58,7 +58,7 @@ if [ ! $MTOOLS_OK ]; then
 	exit -1
 fi
 
-source ${IMAGE_PARTITIONS}
+source "${IMAGE_PARTITIONS}"
 DEVICE_BLK_SIZE=512
 
 # Partition sizes in sector 512 units
@@ -69,8 +69,8 @@ PART3_START=$(($PART2_START + $PART2_SIZE))
 PART3_SIZE=$(($DEVICE_BLK_COUNT - $PART1_SIZE - $PART2_SIZE - $PART1_START))
 
 echo "Remove previous image file"
-rm -f $IMAGE_NAME
-truncate -s $(($DEVICE_BLK_COUNT * $DEVICE_BLK_SIZE)) $IMAGE_NAME
+rm -f "${IMAGE_NAME}"
+truncate -s $(($DEVICE_BLK_COUNT * $DEVICE_BLK_SIZE)) "${IMAGE_NAME}"
 sfdisk $IMAGE_NAME << ==sfdisk
 label: dos
 label-id: 0x09650eb4

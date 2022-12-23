@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #create update image
@@ -57,14 +57,14 @@ function checkForDeps() {
 
 function cleanStagingDir(){
     local STAGEING_DIR=${1}
-    if [[ -d ${STAGEING_DIR} ]]; then
-        rm -Rf ${STAGEING_DIR}
+    if [[ -d "${STAGEING_DIR}" ]]; then
+        rm -Rf "${STAGEING_DIR}"
     fi
-    mkdir ${STAGEING_DIR} -v
+    mkdir "${STAGEING_DIR}" -v
 }
 
 function linkInStageing(){
-    pushd ${STAGEING_DIR} 1> /dev/null
+    pushd "${STAGEING_DIR}" 1> /dev/null
 
     mkdir assets
     pushd assets 1> /dev/null
@@ -74,23 +74,23 @@ function linkInStageing(){
     popd 1> /dev/null
 
     ln -s ../sysroot/sys/user
-    ln -s ../sysroot/sys/current/${SOURCE_TARGET}-boot.bin boot.bin
+    ln -s "../sysroot/sys/current/${SOURCE_TARGET}-boot.bin" boot.bin
     ln -s ../sysroot/sys/current/country-codes.db
     ln -s ../sysroot/sys/current/Luts.bin
     ln -s ../ecoboot.bin
     ln -s ../updater.bin
-    ln -s ../${SOURCE_TARGET}-version.json version.json
+    ln -s "../${SOURCE_TARGET}-version.json" version.json
     popd 1> /dev/null
 }
 
 function addChecksums() {
-    pushd ${STAGEING_DIR} 1> /dev/null
+    pushd "${STAGEING_DIR}" 1> /dev/null
     rhash -u checksums.txt -r .
     popd 1> /dev/null
 }
 
 function compress() {
-    tar chf ${PACKAGE_FILE} -C ${STAGEING_DIR} .
+    tar chf "${PACKAGE_FILE}" -C "${STAGEING_DIR}" .
 }
 
 if [[ $# -ne 3 ]]; then
@@ -99,8 +99,8 @@ if [[ $# -ne 3 ]]; then
 fi
 
 setVars "${1}" "${2}" "${3}"
-checkForDeps ${DEPS}
-cleanStagingDir ${STAGEING_DIR}
+checkForDeps "${DEPS}"
+cleanStagingDir "${STAGEING_DIR}"
 linkInStageing
 addChecksums
 compress

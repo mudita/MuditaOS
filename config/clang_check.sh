@@ -9,9 +9,9 @@ set -euo pipefail
 # shellcheck source=../config/clang/common.sh
 
 L_GIT_DIR=$(git rev-parse --show-toplevel)
-source $L_GIT_DIR/config/format-config.sh
-source $L_GIT_DIR/config/clang/clang-common.sh
-source $L_GIT_DIR/config/clang/colors.sh
+source "${L_GIT_DIR}/config/format-config.sh"
+source "${L_GIT_DIR}/config/clang/clang-common.sh"
+source "${L_GIT_DIR}/config/clang/colors.sh"
 
 help()
 {
@@ -41,8 +41,8 @@ get_files_to_check()
 get_compile_commands()
 {
     product=$1
-    [[ -f build-$product-linux-Debug/compile_commands.json ]] || ./configure.sh $product linux debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 > /dev/null 2>&1
-    cp build-$product-linux-Debug/compile_commands.json /tmp/compile_commands.json
+    [[ -f "build-${product}-linux-Debug/compile_commands.json" ]] || ./configure.sh "${product}" linux debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 > /dev/null 2>&1
+    cp "build-${product}-linux-Debug/compile_commands.json" /tmp/compile_commands.json
     sed -i 's|-static-libasan||g'     /tmp/compile_commands.json
     sed -i 's|-Wno-literal-suffix||g' /tmp/compile_commands.json
 }

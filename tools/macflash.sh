@@ -10,16 +10,16 @@ PHONE_DEV=""
 
 function get_phone_dev() {
 	BLOCK_DEV="/dev/r"$(diskutil info $OS_PARTITION_NAME | grep "Part of Whole" | awk '{print $4}')
-	echo ${BLOCK_DEV}
+	echo "${BLOCK_DEV}"
 }
 
 function unmount_muditaos_partition() {
-	PART_NODE=$(diskutil info $OS_PARTITION_NAME | grep "Device Node" | awk '{print $3}')
-	diskutil unmount $PART_NODE  > /dev/null 2>&1
+	PART_NODE=$(diskutil info "$OS_PARTITION_NAME" | grep "Device Node" | awk '{print $3}')
+	diskutil unmount "$PART_NODE"  > /dev/null 2>&1
 }
 
 function eject_device() {
-	diskutil eject $1
+	diskutil eject "${1}"
 }
 
 MAC_DD="gdd"
@@ -37,7 +37,7 @@ function test_if_run_as_root() {
 }
 
 function test_if_gdd_installed() {
-    if ! command -v $MAC_DD &> /dev/null; then
+    if ! command -v "${MAC_DD}" &> /dev/null; then
         echo "$MAC_DD command could not be found. Please, run macflash_setup.sh"
         exit 1
     fi
@@ -76,16 +76,16 @@ done
 test_if_run_as_root
 test_if_gdd_installed
 
-if [ -z $PHONE_DEV ]; then
+if [ -z "${PHONE_DEV}" ]; then
 	PHONE_DEV=$(get_phone_dev)
 fi
 
-if [ ! -e $IMAGE_FILE ]; then
+if [ ! -e "${IMAGE_FILE}" ]; then
 	echo "Image file $IMAGE_FILE does not exist"
 	exit 1
 fi
 
-if [ ! -e $PHONE_DEV ]; then
+if [ ! -e "${PHONE_DEV}" ]; then
 	echo "Block device $PHONE_DEV does not exist"
 	exit 1
 fi
@@ -94,6 +94,6 @@ unmount_muditaos_partition
 
 echo "Flashing $IMAGE_FILE to $PHONE_DEV..."
 
-sudo gdd if=$IMAGE_FILE of=$PHONE_DEV bs=1M conv=sparse,fdatasync status=progress
+sudo gdd if="${IMAGE_FILE}" of="${PHONE_DEV}" bs=1M conv=sparse,fdatasync status=progress
 
-eject_device $PHONE_DEV
+eject_device "${PHONE_DEV}"
