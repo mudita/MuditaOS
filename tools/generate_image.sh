@@ -35,13 +35,15 @@ if [ ! -d "$SYSROOT" ]; then
 	usage
 	exit -1
 fi
-_REQ_CMDS="sfdisk mtools awk truncate"
-for cmd in $_REQ_CMDS; do
-	if [ ! $(command -v $cmd) ]; then
-		echo "Error! $cmd is not installed, please use 'sudo apt install' for install required tool"
-		exit -1
-	fi
-done
+
+if [ -z ${L_GIT_DIR+unbound} ] && [ -z $(export L_GIT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)) ]; then
+  export L_GIT_DIR=$(readlink -f "$(dirname "$0")/..");
+fi
+
+. "$L_GIT_DIR"/tools/locate_bins.sh
+require_unprivileged truncate basename realpath sync
+require_commands sfdisk mke2fs mtools mformat mcopy mmd awk
+
 #mtools version
 _AWK_SCRIPT='
 /[0-9]/ {
@@ -51,7 +53,7 @@ _AWK_SCRIPT='
 	}
 	exit 0;
 }'
-MTOOLS_OK=$(mtools --version | awk "${_AWK_SCRIPT}")
+MTOOLS_OK=$(maysudo mtools --version | awk "${_AWK_SCRIPT}")
 
 if [ ! $MTOOLS_OK ]; then
 	echo "Invalid mtools version, please upgrade mtools to >= 4.0.24"
@@ -71,7 +73,7 @@ PART3_SIZE=$(($DEVICE_BLK_COUNT - $PART1_SIZE - $PART2_SIZE - $PART1_START))
 echo "Remove previous image file"
 rm -f $IMAGE_NAME
 truncate -s $(($DEVICE_BLK_COUNT * $DEVICE_BLK_SIZE)) $IMAGE_NAME
-sfdisk $IMAGE_NAME << ==sfdisk
+maysudo sfdisk "$IMAGE_NAME" << ==sfdisk
 label: dos
 label-id: 0x09650eb4
 unit: sectors
@@ -84,10 +86,10 @@ unit: sectors
 
 # Format FAT partitions
 PART1="$IMAGE_NAME@@$(($PART1_START * $DEVICE_BLK_SIZE))"
-mformat -i "$PART1" -F -T $PART1_SIZE -M $DEVICE_BLK_SIZE -v MUDITAOS
+maysudo mformat -i "$PART1" -F -T "$PART1_SIZE" -M "$DEVICE_BLK_SIZE" -v MUDITAOS
 
 PART2="$IMAGE_NAME@@$(($PART2_START * $DEVICE_BLK_SIZE))"
-mformat -i "$PART2" -F -T $PART2_SIZE -M $DEVICE_BLK_SIZE -v RECOVER
+maysudo mformat -i "$PART2" -F -T "$PART2_SIZE" -M "$DEVICE_BLK_SIZE" -v RECOVER
 
 if [ ! -d "${SYSROOT}/sys" ]; then
 	echo "Fatal! Image folder sys/ missing in build. Check build system."
@@ -98,9 +100,9 @@ cd "${SYSROOT}/sys"
 #Copy FAT data
 CURRENT_DATA="assets country-codes.db ${LUTS}"
 
-mmd -i "$PART1" ::/current
-mmd -i "$PART1" ::/current/sys
-mmd -i "$PART1" ::/updates
+maysudo mmd -i "$PART1" ::/current
+maysudo mmd -i "$PART1" ::/current/sys
+maysudo mmd -i "$PART1" ::/updates
 
 for i in $CURRENT_DATA; do
 	f="current/$i"
@@ -113,34 +115,34 @@ for i in $CURRENT_DATA; do
 done
 
 if [[ -n "${VERSION_FILE}" && -f "${VERSION_FILE}" ]]; then
-	mcopy -v -s -i "$PART1" ${VERSION_FILE} ::/current/version.json
+	maysudo mcopy -v -s -i "$PART1" "${VERSION_FILE}" ::/current/version.json
 else
 	echo "Warning! Missing version.json"
 	echo "(it's fine for a Linux build)"
 fi
 
 if [[ -n "${BIN_FILE}" && -f "${BIN_FILE}" ]]; then
-	mcopy -v -s -i "$PART1" ${BIN_FILE} ::/current/boot.bin
+	maysudo mcopy -v -s -i "$PART1" "${BIN_FILE}" ::/current/boot.bin
 else
 	echo "Warning! Missing boot.bin"
 	echo "(it's fine for a Linux build)"
 fi
 
 if [[ -n "${UPDATER_FILE}" && -f "${UPDATER_FILE}" ]]; then
-	mcopy -v -s -i "$PART1" ${UPDATER_FILE} ::/current/updater.bin
+	maysudo mcopy -v -s -i "$PART1" "${UPDATER_FILE}" ::/current/updater.bin
 else
 	echo "Warning! Missing updater.bin"
 	echo "(it's fine for a Linux build)"
 fi
 
-mcopy -s -i "$PART1" .boot.json ::
-mcopy -s -i "$PART1" .boot.json.crc32 ::
+maysudo mcopy -s -i "$PART1" .boot.json ::
+maysudo mcopy -s -i "$PART1" .boot.json.crc32 ::
 
 # ^64bit - 64bit inodes are not supported by the lwext4
 # ^metadata_csum - Metatata checksums has buggy implementation in the lwext4
 
 # Ext4 backup partition used by updater
-mke2fs \
+maysudo mke2fs \
   -F \
   -L 'backup' \
   -N 0 \
@@ -155,7 +157,7 @@ mke2fs \
   $((($PART2_SIZE*$DEVICE_BLK_SIZE)/1024))  > /dev/null
 
 # EXT4 user partition
-mke2fs \
+maysudo mke2fs \
   -F \
   -L 'user' \
   -N 0 \
