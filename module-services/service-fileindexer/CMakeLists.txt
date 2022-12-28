@@ -29,6 +29,7 @@ target_link_libraries(service-fileindexer
 		module-os 
 		module-utils 
 		module-vfs 
-		module-sys 
+		module-sys
+		module-db
 		tag
 )
