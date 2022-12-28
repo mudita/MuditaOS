@@ -10,9 +10,9 @@
 #include <purefs/fs/inotify_message.hpp>
 #include <log/log.hpp>
 
-#include <filesystem>
 #include <fstream>
-#include <optional>
+#include <queries/multimedia_files/QueryMultimediaFilesRemove.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
 namespace service::detail
 {
@@ -126,6 +126,10 @@ namespace service::detail
     {
         if (!hasLockFile()) {
             LOG_INFO("Initial startup indexer - Started...");
+
+            auto query = std::make_unique<db::multimedia_files::query::RemoveAll>();
+            DBServiceAPI::GetQuery(svc.get(), db::Interface::Name::MultimediaFiles, std::move(query));
+
             mTopDirIterator = std::begin(directoriesToScan);
             setupTimers(svc, svc_name);
             mForceStop = false;
