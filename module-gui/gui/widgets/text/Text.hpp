@@ -149,6 +149,7 @@ namespace gui
         /// add rich text with default RichTextParser - please see RichTextParser documentation on how to use format
         void addRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokens = text::RichTextParser::TokenMap{});
         /// @}
+        void removeFromCursor();
         virtual void clear();
         bool isEmpty();
         virtual UTF8 getText() const;

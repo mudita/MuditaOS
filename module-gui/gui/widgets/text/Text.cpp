@@ -186,6 +186,21 @@ namespace gui
         drawLines();
     }
 
+    void Text::removeFromCursor()
+    {
+        const auto currentText    = getText();
+        const auto cursorPosition = cursor->getAbsolutePosition();
+        const auto substrLength   = currentText.length() - cursorPosition;
+
+        const auto newText = currentText.substr(cursorPosition, substrLength);
+        buildDocument(newText);
+
+        /* Rewind cursor to the beginning of the line */
+        cursor->moveCursor(NavigationDirection::LEFT, cursorPosition);
+
+        onTextChanged();
+    }
+
     void Text::clear()
     {
         buildDocument("");
@@ -634,7 +649,7 @@ namespace gui
         }
         if (inputEvent.isLongRelease(removeKey)) {
             if (!document->isEmpty()) {
-                clear();
+                removeFromCursor();
                 return true;
             }
         }
