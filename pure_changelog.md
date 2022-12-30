@@ -11,6 +11,7 @@
 * Fixed notes window title
 * Fixed adding and deleting country code prefix to existing contact
 * Fixed French translation for SIM cards texts
+* Fixed crash on music file with invalid tags
 
 ### Added
 

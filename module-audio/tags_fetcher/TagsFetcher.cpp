@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TagsFetcher.hpp"
@@ -14,8 +14,8 @@ namespace tags::fetcher
 {
     std::optional<Tags> fetchTagsInternal(std::string filePath)
     {
-        TagLib::FileRef tagReader(filePath.c_str());
-        if (!tagReader.isNull() && tagReader.tag()) {
+        TagLib::FileRef const tagReader(filePath.c_str());
+        if (!tagReader.isNull() && (tagReader.tag() != nullptr)) {
             TagLib::Tag *tags                   = tagReader.tag();
             TagLib::AudioProperties *properties = tagReader.audioProperties();
 
@@ -24,8 +24,8 @@ namespace tags::fetcher
             auto getTitle = [&]() -> std::string {
                 const auto title = tags->title().to8Bit(unicode);
                 // If title tag empty fill it with raw file name
-                if (title.size() == 0) {
-                    if (const auto pos = filePath.rfind("/"); pos == std::string::npos) {
+                if (title.empty()) {
+                    if (const auto pos = filePath.rfind('/'); pos == std::string::npos) {
                         return filePath;
                     }
                     else {
@@ -71,7 +71,7 @@ namespace tags::fetcher
         return {};
     }
 
-    Tags fetchTags(std::string filePath)
+    Tags fetchTags(const std::string &filePath)
     {
         return fetchTagsInternal(filePath).value_or(Tags{filePath});
     }
