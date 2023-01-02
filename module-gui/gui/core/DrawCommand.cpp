@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DrawCommand.hpp"
@@ -20,7 +20,6 @@
 // utils
 #include <log/log.hpp>
 // module-utils
-#include <cmath>
 #include <cassert>
 
 #if DEBUG_FONT == 1
@@ -138,22 +137,8 @@ namespace gui
             return;
         }
 
-        // get copy of original context using x,y of draw coordinates and original size of the widget
-        Context ctxCopy;
-        bool copyContext   = false;
-        Point widgetOrigin = {0, 0};
-
-        // check if there is a need of making copy of context to use it as background
-        if ((areaW == width) && (areaH == height)) {
-            widgetOrigin = origin;
-        }
-        else {
-            copyContext = true;
-            ctxCopy     = ctx->get(origin.x, origin.y, areaW, areaH);
-        }
-
         // retrieve font used to draw text
-        RawFont *font = FontManager::getInstance().getFont(fontID);
+        const auto font = FontManager::getInstance().getFont(fontID);
 
         // draw every sign
         uint32_t idLast = 0, idCurrent = 0;
@@ -161,17 +146,18 @@ namespace gui
 
         for (uint32_t i = 0; i < str.length(); ++i) {
             idCurrent        = str[i]; // id stands for glued together utf-16 with no order bytes (0xFF 0xFE)
-            FontGlyph *glyph = font->getGlyph(idCurrent);
+            const auto glyph = font->getGlyph(idCurrent);
+
+            const auto xDrawingPosition = origin.x + position.x + glyph->xoffset;
+            const auto yDrawingPosition = origin.y + position.y;
 
             // do not start drawing outside of draw context.
-            Context *drawCtx = copyContext ? &ctxCopy : ctx;
-            if ((widgetOrigin.x + position.x + glyph->xoffset >= drawCtx->getW()) ||
-                (widgetOrigin.x + position.x + glyph->xoffset < 0)) {
-                LOG_FATAL("Drawing outside context's X boundary for glyph: %" PRIu32, glyph->id);
+            if ((xDrawingPosition >= ctx->getW()) || (xDrawingPosition < 0)) {
+                LOG_ERROR("Drawing outside context's X boundary for glyph: %" PRIu32, glyph->id);
                 return;
             }
-            if ((widgetOrigin.y + position.y >= drawCtx->getH()) || (widgetOrigin.y + position.y < 0)) {
-                LOG_FATAL("Drawing outside context's Y boundary for glyph: %" PRIu32, glyph->id);
+            if ((yDrawingPosition >= ctx->getH()) || (yDrawingPosition < 0)) {
+                LOG_ERROR("Drawing outside context's Y boundary for glyph: %" PRIu32, glyph->id);
                 return;
             }
 
@@ -180,18 +166,10 @@ namespace gui
                 kernValue = font->getKerning(idLast, idCurrent);
             }
 
-            drawChar(drawCtx,
-                     {widgetOrigin.x + position.x + glyph->xoffset + kernValue, widgetOrigin.y + position.y},
-                     glyph);
+            drawChar(ctx, {xDrawingPosition + kernValue, yDrawingPosition}, glyph);
             position.x += glyph->xadvance + kernValue;
 
             idLast = idCurrent;
-        }
-
-        // if drawing was performed in temporary context
-        // reinsert drawCtx into base context
-        if (copyContext) {
-            ctx->insert(origin.x, origin.y, ctxCopy);
         }
     }
 
