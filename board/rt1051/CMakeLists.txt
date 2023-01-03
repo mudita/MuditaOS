@@ -2,6 +2,7 @@ add_library(board STATIC)
 
 add_subdirectory(cmsis)
 add_subdirectory(${BOARD})
+add_subdirectory(crashdump-serial-number)
 
 if (${MEMORY_LINKER_FILE_PATH} STREQUAL "")
     message(FATAL_ERROR "Linker RAM layout not provided")
@@ -42,6 +43,7 @@ target_include_directories(board
 target_link_libraries(board
     PRIVATE
         utils-rotator
+        crashdump-serial-number
     PUBLIC
         fsl
         module-vfs

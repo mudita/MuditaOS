@@ -4,6 +4,7 @@
 
 ### Changed / Improved
 * Improved dialog with network via USSD
+* Added serial number and timestamp to crashdump filename
 
 ### Fixed
 * Fixed disappearing "confirm" button in PIN entering screen

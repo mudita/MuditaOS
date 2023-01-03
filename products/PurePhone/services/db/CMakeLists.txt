@@ -16,4 +16,5 @@ target_link_libraries(db
    PRIVATE
         module-db
         service-db
+        crashdump-serial-number
 )

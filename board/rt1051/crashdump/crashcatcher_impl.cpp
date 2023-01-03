@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma GCC optimize("Og")
@@ -60,6 +60,7 @@ void CrashCatcher_DumpMemory(const void *pvMemory, CrashCatcherElementSizes elem
 CrashCatcherReturnCodes CrashCatcher_DumpEnd(void)
 {
     cwrite.saveDump();
+    cwrite.deleteOldDump();
     _exit_backtrace(-1, false);
     return CRASH_CATCHER_EXIT;
 }

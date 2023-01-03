@@ -22,6 +22,7 @@ target_link_libraries(
         desktop-endpoints-common
     PRIVATE
         version-header
+        serial-number-reader
 )
 
 target_compile_definitions(

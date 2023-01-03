@@ -143,6 +143,7 @@ add_subdirectory(apps)
 add_subdirectory(keymap)
 add_subdirectory(services)
 add_subdirectory(sys)
+add_subdirectory(serial-number-reader)
 
 option(CONFIG_ENABLE_TEMP "Enable displaying temperature" OFF)
 option(CONFIG_SHOW_MEMORY_INFO "Enable displaying memory info" OFF)
