@@ -21,6 +21,8 @@ target_link_libraries(databases
    PRIVATE
         bell::db::meditation_stats
         service-db
+        serial-number-reader
+        crashdump-serial-number
 )
 
 if (${ENABLE_TESTS})

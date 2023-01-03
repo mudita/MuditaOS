@@ -10,6 +10,7 @@
 ### Added
 
 ### Changed
+* Added serial number and timestamp to crashdump filename
 
 ## [1.8.0 2022-12-14]
 

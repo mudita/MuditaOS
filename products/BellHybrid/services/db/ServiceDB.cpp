@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <db/ServiceDB.hpp>
@@ -16,6 +16,9 @@
 #include <time/ScopedTime.hpp>
 
 #include <purefs/filesystem_paths.hpp>
+
+#include <serial-number-reader/SerialNumberReader.hpp>
+#include <crashdump-serial-number/crashdump_serial_number.hpp>
 
 ServiceDB::~ServiceDB()
 {
@@ -89,6 +92,11 @@ sys::ReturnCodes ServiceDB::InitHandler()
     for (auto &dbAgent : databaseAgents) {
         dbAgent->registerMessages();
     }
+
+    LOG_INFO("Serial number: %s", serial_number_reader::readSerialNumber().c_str());
+
+    // Saving serial number for crashdump generation purpose.
+    crashdump::setSerialNumber(serial_number_reader::readSerialNumber());
 
     return sys::ReturnCodes::Success;
 }

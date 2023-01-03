@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <db/ServiceDB.hpp>
@@ -23,7 +23,12 @@
 #include <service-db/DBServiceMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <time/ScopedTime.hpp>
+#include <crashdump-serial-number/crashdump_serial_number.hpp>
 
+namespace
+{
+    constexpr auto serial_number_path = "factory_data/serial";
+}
 ServiceDB::~ServiceDB()
 {
     eventsDB.reset();
@@ -275,6 +280,9 @@ sys::ReturnCodes ServiceDB::InitHandler()
 
     auto settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
+
+    // Saving serial number for crashdump generation purpose.
+    crashdump::setSerialNumber(settings->getValue(serial_number_path, settings::SettingsScope::Global));
 
     quotesRecordInterface =
         std::make_unique<Quotes::QuotesAgent>(predefinedQuotesDB.get(), customQuotesDB.get(), std::move(settings));
