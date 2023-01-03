@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Text.hpp"
@@ -196,7 +196,7 @@ namespace gui
         buildDocument(newText);
 
         /* Rewind cursor to the beginning of the line */
-        cursor->moveCursor(NavigationDirection::LEFT, cursorPosition);
+        cursor->moveCursor(NavigationDirection::LEFT, substrLength);
 
         onTextChanged();
     }
