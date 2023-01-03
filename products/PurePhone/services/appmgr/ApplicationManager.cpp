@@ -10,6 +10,7 @@
 #include <apps-common/popups/data/PhoneModeParams.hpp>
 #include <apps-common/actions/AlarmClockStatusChangeParams.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
+#include <module-services/service-cellular/service-cellular/VolteState.hpp>
 #include <system/messages/TetheringQuestionRequest.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <service-appmgr/Constants.hpp>
@@ -313,6 +314,10 @@ namespace app::manager
             return simLockHandler.handleCMEErrorRequest(data->code);
         });
         connect(typeid(cellular::msg::notification::SimNotInserted), [&](sys::Message *request) -> sys::MessagePointer {
+            using cellular::VolteState;
+            auto notification =
+                std::make_shared<cellular::VolteStateNotification>(VolteState{VolteState::Enablement::Off, false});
+            bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
             return simLockHandler.handleSimNotInsertedMessage();
         });
         connect(typeid(locks::SetSim), [&](sys::Message *request) -> sys::MessagePointer {
