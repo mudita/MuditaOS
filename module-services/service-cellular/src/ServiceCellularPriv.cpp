@@ -15,7 +15,6 @@
 #include <volte/VolteCapabilityHandlerCellular.hpp>
 
 #include <service-evtmgr/EVMessages.hpp>
-#include <service-evtmgr/Constants.hpp>
 
 #include <service-bluetooth/messages/BluetoothModeChanged.hpp>
 #include <locks/data/PhoneLockMessages.hpp>
@@ -31,7 +30,6 @@
 #include <ucs2/UCS2.hpp>
 #include <service-appmgr/Constants.hpp>
 
-#include "service-cellular/MessageConstants.hpp"
 #include "checkSmsCenter.hpp"
 
 using service::name::service_time;
