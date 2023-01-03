@@ -152,7 +152,7 @@ function helpers.move_dir(from, where)
         if attr.mode == "directory" then
             assert(lfs.mkdir(build_path(where, name)))
         else
-            assert(os.rename(build_path(from, name),build_path(where, name)))
+            assert(os.rename(build_path(from, name), build_path(where, name)))
         end
     end
 end
@@ -233,6 +233,14 @@ end
 -- @return file extension
 function helpers.get_file_extension(file)
     return file:match("^.+(%..+)$")
+end
+
+--- Strips file name from its extension
+-- @function strip_from_extension
+-- @param file file path
+-- @return file name without extension
+function helpers.strip_from_extension(file)
+    return file:match("^(.*)%..*$")
 end
 
 --- Create directory and all required subdirectories
