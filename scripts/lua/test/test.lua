@@ -133,12 +133,6 @@ describe("Factory/backup/restore scripts", function()
         recovery.sys.boot_reason_str.returns("restore")
         assert.has_no.error(invoke_entry)
     end)
-    it("invoke restore script, no free space", function()
-        recovery.sys.free_space.returns(10)
-        recovery.sys.boot_reason.returns(recovery.sys.boot_reason_codes.restore)
-        recovery.sys.boot_reason_str.returns("restore")
-        assert.has_no.error(invoke_entry)
-    end)
 end)
 
 local function remove_test_package(path)
@@ -150,6 +144,43 @@ end
 local function extract_test_package(path, where)
     os.execute(string.format("tar xf %s -C %s", path, where))
 end
+
+describe("Restore script", function()
+    recovery.sys.free_space.returns(1024 * 1024 * 1024)
+    recovery.sys.boot_reason.returns(recovery.sys.boot_reason_codes.restore)
+    recovery.sys.boot_reason_str.returns("restore")
+    recovery.sys.source_slot.returns("restore/system")
+    recovery.sys.target_slot.returns("restore/target")
+    recovery.sys.user.returns("restore/user")
+
+    package.loaded['paths'] = false
+    package.loaded['restore'] = false
+
+    it("the same set of databases", function()
+        -- Prepare test directory and its data
+        remove_test_package("restore/system")
+        remove_test_package("restore/user")
+        extract_test_package("restore/restore1.tar", "restore")
+        assert.has_no.error(require('restore').execute)
+    end)
+
+    it("legacy backup", function()
+        -- Prepare test directory and its data
+        remove_test_package("restore/system")
+        remove_test_package("restore/user")
+        extract_test_package("restore/restore2.tar", "restore")
+        assert.has_no.error(require('restore').execute)
+    end)
+
+    it("not enough disk space", function()
+        recovery.sys.free_space.returns(10)
+        -- Prepare test directory and its data
+        remove_test_package("restore/system")
+        remove_test_package("restore/user")
+        extract_test_package("restore/restore1.tar", "restore")
+        assert.has.error(require('restore').execute)
+    end)
+end)
 
 describe("Update script", function()
     recovery.sys.boot_reason.returns(recovery.sys.boot_reason_codes.update)
