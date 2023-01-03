@@ -37,7 +37,7 @@ local function generate_report_file(boot_reason_str, success, message)
     local body = string.format(
         "{\"version\": \"%s\",\"branch\": \"%s\",\"revision\": \"%s\",\"operation\": \"%s\",\"successful\": %s,\"message\": \"%s\"}",
         rec.version(), rec.branch(), rec.revision(), boot_reason_str, tostring(success), message)
-    local fd = io.open(file_path, 'w')
+    local fd = assert(io.open(file_path, 'w'))
     fd:write(body)
     fd:close()
 end

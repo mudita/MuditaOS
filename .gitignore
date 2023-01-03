@@ -68,10 +68,16 @@ test/test_env
 image/luts.bin
 image/assets/fonts/*
 
+scripts/lua/migration/test/databases/*
+scripts/lua/migration/test/migrations/*
 scripts/lua/test/assets*
-scripts/lua/test/update/user/temp/*
+scripts/lua/test/device/user/temp/recovery_status.json
+scripts/lua/test/update/user/*
 scripts/lua/test/update/target/*
 scripts/lua/test/update/system/*
-scripts/lua/test/update_udm/user/temp/*
+scripts/lua/test/update_udm/user/*
 scripts/lua/test/update_udm/target/*
 scripts/lua/test/update_udm/system/*
+scripts/lua/test/restore/user/*
+scripts/lua/test/restore/target/*
+scripts/lua/test/restore/system/*
