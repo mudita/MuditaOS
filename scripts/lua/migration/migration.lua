@@ -37,10 +37,10 @@ local function build_database_path(path, db_name)
 end
 
 local function db_exec(file, script, version)
-    local db = assert(sqlite3.open(file), string.format("file: %s", file))
-    assert(db:exec(script) == sqlite3.OK, string.format("script:\n%s\n", script))
+    local db = assert(sqlite3.open(file))
+    assert(db:exec(script) == sqlite3.OK, string.format("Script execution failed:\n%s\n", script))
     assert(db:exec(string.format("PRAGMA user_version=%u;", version)) == sqlite3.OK,
-        string.format("version: %d", version))
+        string.format("Setting database version: %d failed", version))
     db:close()
 end
 
@@ -90,26 +90,33 @@ local function db_migrate_down(db_path, scripts, target_version)
 end
 
 local function print_db_set(db_set)
-    print("database set:")
+    print("Database set(name,version):")
     for name, version in pairs(db_set) do
-        print(string.format("'%s':%d",name,version))
+        print(string.format("   '%s':%d", name, version))
     end
 end
 
 local function validate_inputs(migration_dir, db_dir)
-    assert(helpers.exists(migration_dir), "Migrations directory does not exist")
+    assert(helpers.exists(migration_dir), "Migration directory does not exist")
     assert(helpers.exists(db_dir), "Databases directory does not exist")
     return true
 end
 
 local function migrate(db_path, scripts_up, scripts_down, target_version)
     local db_version = read_db_version(db_path)
+
     if db_version > target_version then
+        print(string.format("Performing migration-down of '%s' from version %d to %d", db_path, db_version,
+            target_version))
         return migration.down(db_path, scripts_down, target_version)
     end
     if db_version < target_version then
+        print(
+            string.format("Performing migration-up of '%s' from version %d to %d", db_path, db_version, target_version))
         return migration.up(db_path, scripts_up, target_version)
     end
+
+    print(string.format("Migration not needed, '%s' is already the newest version", db_path))
     return migration.retcode.OK
 end
 
@@ -148,8 +155,8 @@ end
 -- @param db_set array of {<"database_name"> = <db_target_version>} entries
 -- @return @{retcode}
 function migration.migrate(db_dir, scripts_dir, db_set)
-    print(string.format("migrations scripts directory: '%s'", scripts_dir))
-    print(string.format("databases directory: '%s'", db_dir))
+    print(string.format("Migration scripts directory: '%s'", scripts_dir))
+    print(string.format("Databases directory: '%s'", db_dir))
     print_db_set(db_set)
 
     for name, version in pairs(db_set) do

@@ -10,6 +10,7 @@ import logging
 import sys
 import json
 import shutil
+from pathlib import Path
 
 log = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', level=logging.INFO)
@@ -25,6 +26,7 @@ def migrate_database_up(database: str, migration_path: os.path, dst_directory: o
 
     db_name_full = f"{database}.db"
     dst_db_path = os.path.join(dst_directory, db_name_full)
+    Path(dst_db_path).unlink(missing_ok=True)
 
     ret = 0
     try:
