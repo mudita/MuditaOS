@@ -18,6 +18,7 @@
 * Fixed VoLTE switch availability after taking out SIM card
 * Fixed improper message text displaying after pasting from clipboard
 * Fixed USSD handling crash
+* Fixed calls to emergency contact when typed manually
 
 ### Added
 
