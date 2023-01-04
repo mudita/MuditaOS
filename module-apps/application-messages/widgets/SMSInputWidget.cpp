@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -72,28 +72,15 @@ namespace gui
             assert(body != nullptr);
             assert(application != nullptr);
 
+            const auto threadViewWindow = application->getWindow(gui::name::window::thread_view);
+
             if (inputText->focus) {
-
-                application->getWindow(gui::name::window::thread_view)
-                    ->setNavBarText(utils::translate(utils::translate(style::strings::common::send)),
-                                    nav_bar::Side::Center);
-
-                if (inputText->getText() == utils::translate("sms_temp_reply")) {
-                    inputText->clear();
-                }
-
                 inputText->setCursorStartPosition(CursorStartPosition::DocumentEnd);
+                threadViewWindow->setNavBarText(utils::translate(utils::translate(style::strings::common::send)),
+                                                nav_bar::Side::Center);
             }
             else {
-
-                if (inputText->isEmpty()) {
-
-                    inputText->setColor(Color(7, 0));
-                    inputText->setText(utils::translate("sms_temp_reply"));
-                }
-
-                application->getWindow(gui::name::window::thread_view)
-                    ->setNavBarText(utils::translate(style::strings::common::reply), nav_bar::Side::Center);
+                threadViewWindow->setNavBarText(utils::translate(style::strings::common::reply), nav_bar::Side::Center);
             }
 
             return true;
@@ -117,12 +104,8 @@ namespace gui
 
     void SMSInputWidget::handleDraftMessage()
     {
-        if (const auto &text = inputText->getText(); text.empty() || (text == utils::translate("sms_temp_reply"))) {
-            clearDraftMessage();
-        }
-        else {
-            updateDraftMessage(text);
-        }
+        const auto &text = inputText->getText();
+        text.empty() ? clearDraftMessage() : updateDraftMessage(text);
     }
 
     void SMSInputWidget::clearDraftMessage()
