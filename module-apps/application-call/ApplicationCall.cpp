@@ -224,6 +224,12 @@ namespace app
             LOG_WARN("Cannot call in %s state", c_str(state));
             return;
         }
+
+        if (DBServiceAPI::IsContactInEmergency(this, utils::PhoneNumber(number).getView())) {
+            CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
+            return;
+        }
+
         CellularServiceAPI::DialEmergencyNumber(this, utils::PhoneNumber(number));
     }
 
