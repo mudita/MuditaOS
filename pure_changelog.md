@@ -15,6 +15,7 @@
 * Fixed backspace behavior in text edit
 * Fixed text not showing when adding/editing contact if text began with 'j' glyph
 * Fixed VoLTE switch availability after taking out SIM card
+* Fixed improper message text displaying after pasting from clipboard
 
 ### Added
 
