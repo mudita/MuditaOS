@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookNewContact.hpp"
@@ -71,7 +71,7 @@ namespace gui
             break;
         }
 
-        !newContactModel->emptyData() ? setSaveButtonVisible(true) : setSaveButtonVisible(false);
+        setSaveButtonVisible(!newContactModel->emptyData());
     }
 
     void PhonebookNewContact::onClose(Window::CloseReason reason)
@@ -121,7 +121,7 @@ namespace gui
     {
         auto ret = AppWindow::onInput(inputEvent);
 
-        !newContactModel->emptyData() ? setSaveButtonVisible(true) : setSaveButtonVisible(false);
+        setSaveButtonVisible(!newContactModel->emptyData());
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER) && !newContactModel->emptyData() &&
             newContactModel->verifyData()) {
