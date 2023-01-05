@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AppWindow.hpp"
@@ -32,7 +32,8 @@ namespace app
                 else {
                     switchWindowPopup(popupName,
                                       popupParams->getDisposition(),
-                                      std::make_unique<gui::ModesPopupData>(mode, flightMode));
+                                      std::make_unique<gui::ModesPopupData>(mode, flightMode),
+                                      SwitchReason::Popup);
                 }
                 return true;
             });
@@ -56,7 +57,8 @@ namespace app
                     updateCurrentWindow(std::move(popupData));
                 }
                 else {
-                    switchWindowPopup(popupName, volumeParams->getDisposition(), std::move(popupData));
+                    switchWindowPopup(
+                        popupName, volumeParams->getDisposition(), std::move(popupData), SwitchReason::Popup);
                 }
                 return true;
             });

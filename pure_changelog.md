@@ -19,6 +19,7 @@
 * Fixed improper message text displaying after pasting from clipboard
 * Fixed USSD handling crash
 * Fixed calls to emergency contact when typed manually
+* Fixed message content being deleted when phone mode changed on new message window
 
 ### Added
 
