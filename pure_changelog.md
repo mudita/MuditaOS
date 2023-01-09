@@ -18,6 +18,10 @@
 * Fixed VoLTE switch availability after taking out SIM card
 * Fixed improper message text displaying after pasting from clipboard
 * Fixed USSD handling crash
+* Fixed calls to emergency contact when typed manually
+* Fixed message content being deleted when phone mode changed on new message window
+* Fixed wrong navigation bar state after exit from custom repeat window
+* Fixed OS crash when editing contact by adding country prefix to number
 
 ### Added
 
