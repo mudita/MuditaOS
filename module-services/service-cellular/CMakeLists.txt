@@ -10,7 +10,7 @@ set(SOURCES
     src/SMSPartsHandler.cpp
     src/SMSSendHandler.cpp
     src/ImeiGetHandler.cpp
-    src/TerhetingHandler.cpp
+    src/TetheringHandler.cpp
     src/ModemResetHandler.cpp
     src/URCCounter.cpp
     src/VolteHandlerImpl.cpp
