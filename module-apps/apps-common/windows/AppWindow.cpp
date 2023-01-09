@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AppWindow.hpp"
@@ -184,9 +184,10 @@ namespace gui
         }
 
         if (inputEvent.isLongRelease(gui::KeyCode::KEY_PND)) {
-            LOG_INFO("Locking phone");
-
-            application->getPhoneLockSubject().lock();
+            if (not preventsLongPressLock) {
+                LOG_INFO("Locking phone");
+                application->getPhoneLockSubject().lock();
+            }
         }
 
         if ((inputEvent.isShortRelease())) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
@@ -28,6 +28,7 @@ namespace gui
         assert(interface != nullptr);
         assert(app != nullptr);
         switchFormatter(utils::country::getAlpha2Code(currentCountry));
+        preventsLongPressLock = true;
     }
 
     void NumberWindow::setNumberLabel(const std::string &num)
