@@ -22,6 +22,7 @@
 * Fixed message content being deleted when phone mode changed on new message window
 * Fixed wrong navigation bar state after exit from custom repeat window
 * Fixed OS crash when editing contact by adding country prefix to number
+* Fixed unwanted Mudita Center passcode prompt after long press '#' while dialing 
 
 ### Added
 
