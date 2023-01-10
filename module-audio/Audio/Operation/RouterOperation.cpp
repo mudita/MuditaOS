@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RouterOperation.hpp"
@@ -8,14 +8,8 @@
 #include <Audio/Profiles/Profile.hpp>
 #include <Audio/StreamFactory.hpp>
 #include <Audio/transcode/TransformFactory.hpp>
-
-#include <bsp/headset/headset.hpp>
 #include <log/log.hpp>
-#include <mutex.hpp>
-
-#include <algorithm>
 #include <optional>
-#include <vector>
 
 namespace audio
 {
@@ -134,7 +128,7 @@ namespace audio
 
     audio::RetCode RouterOperation::SendEvent(std::shared_ptr<Event> evt)
     {
-        auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected ? true : false;
+        const auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected;
 
         switch (evt->getType()) {
         case EventType::JackState:
@@ -184,8 +178,8 @@ namespace audio
 
     audio::RetCode RouterOperation::SwitchProfile(const audio::Profile::Type type)
     {
-        auto newProfile     = GetProfile(type);
-        auto callInProgress = state == State::Active;
+        const auto newProfile     = GetProfile(type);
+        const auto callInProgress = state == State::Active;
 
         if (newProfile == nullptr) {
             return RetCode::UnsupportedProfile;

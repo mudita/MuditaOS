@@ -28,6 +28,8 @@
 * Fixed inability to unblock SIM card when previously ejected during slot switching
 * Fixed French translations for Ulock Screen
 * Fixed crash when syncing with Mudita Center
+* Fixed inactive alarms after timezone change and reboot.
+* Fixed no sound when Bluetooth audio device connected/disconnected during call
 
 ### Added
 
@@ -261,7 +263,6 @@
 * Fixed problem with Music Player application crashing when trying to play files with unknown formats.
 * Fixed problem with resuming music playback after connecting a headset.
 * Fixed problem of battery discharging of phone without SIM card.
-* Fixed inactive alarms after timezone change and reboot.
 
 ## [1.1.6 2022-01-20]
 

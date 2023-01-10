@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 //
@@ -138,7 +138,7 @@ namespace bluetooth
                                                AVDTP::sbcCodecConfiguration.data(),
                                                AVDTP::sbcCodecConfiguration.size());
         if (local_stream_endpoint == nullptr) {
-            LOG_INFO("A2DP Source: not enough memory to create local stream endpoint\n");
+            LOG_INFO("A2DP Source: not enough memory to create local stream endpoint");
             return bluetooth::Error::SystemError;
         }
         AVRCP::mediaTracker.local_seid = avdtp_local_seid(local_stream_endpoint);
@@ -307,7 +307,7 @@ namespace bluetooth
             status = a2dp_subevent_signaling_connection_established_get_status(packet);
 
             if (status != ERROR_CODE_SUCCESS) {
-                LOG_INFO("A2DP Source: Connection failed, status 0x%02x, cid 0x%02x, a2dp_cid 0x%02x \n",
+                LOG_INFO("A2DP Source: Connection failed, status 0x%02x, cid 0x%02x, a2dp_cid 0x%02x ",
                          status,
                          cid,
                          AVRCP::mediaTracker.a2dp_cid);
@@ -321,7 +321,7 @@ namespace bluetooth
             AVRCP::mediaTracker.a2dp_cid = cid;
             AVRCP::mediaTracker.volume   = 64;
 
-            LOG_INFO("A2DP Source: Connected, a2dp cid 0x%02x, local seid %d.\n",
+            LOG_INFO("A2DP Source: Connected, a2dp cid 0x%02x, local seid %d",
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid);
             isConnected        = true;
@@ -356,7 +356,7 @@ namespace bluetooth
             AVDTP::sbcConfig.maxBitpoolValue =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_max_bitpool_value(packet);
             LOG_INFO("A2DP Source: Received SBC codec configuration, sampling frequency %u, a2dp_cid 0x%02x, local "
-                     "seid 0x%02x, remote seid 0x%02x.\n",
+                     "seid 0x%02x, remote seid 0x%02x",
                      AVDTP::sbcConfig.samplingFrequency,
                      cid,
                      AVRCP::mediaTracker.local_seid,
@@ -405,16 +405,16 @@ namespace bluetooth
         }
 
         case A2DP_SUBEVENT_SIGNALING_DELAY_REPORTING_CAPABILITY:
-            LOG_INFO("A2DP Source: remote supports delay report, remote seid %d\n",
+            LOG_INFO("A2DP Source: remote supports delay report, remote seid %d",
                      avdtp_subevent_signaling_delay_reporting_capability_get_remote_seid(packet));
             break;
         case A2DP_SUBEVENT_SIGNALING_CAPABILITIES_DONE:
-            LOG_INFO("A2DP Source: All capabilities reported, remote seid %d\n",
+            LOG_INFO("A2DP Source: All capabilities reported, remote seid %d",
                      avdtp_subevent_signaling_capabilities_done_get_remote_seid(packet));
             break;
 
         case A2DP_SUBEVENT_SIGNALING_DELAY_REPORT:
-            LOG_INFO("A2DP Source: Received delay report of %d.%0d ms, local seid %d\n",
+            LOG_INFO("A2DP Source: Received delay report of %d.%0d ms, local seid %d",
                      avdtp_subevent_signaling_delay_report_get_delay_100us(packet) / 10,
                      avdtp_subevent_signaling_delay_report_get_delay_100us(packet) % 10,
                      avdtp_subevent_signaling_delay_report_get_local_seid(packet));
@@ -424,14 +424,14 @@ namespace bluetooth
             a2dp_subevent_stream_established_get_bd_addr(packet, address);
             status = a2dp_subevent_stream_established_get_status(packet);
             if (status != 0u) {
-                LOG_INFO("A2DP Source: Stream failed, status 0x%02x.\n", status);
+                LOG_INFO("A2DP Source: Stream failed, status 0x%02x", status);
                 break;
             }
 
             local_seid = a2dp_subevent_stream_established_get_local_seid(packet);
             cid        = a2dp_subevent_stream_established_get_a2dp_cid(packet);
             LOG_INFO("A2DP_SUBEVENT_STREAM_ESTABLISHED:  a2dp_cid [expected 0x%02x, received 0x%02x], local_seid %d "
-                     "(expected %d), remote_seid %d (expected %d)\n",
+                     "(expected %d), remote_seid %d (expected %d)",
                      AVRCP::mediaTracker.a2dp_cid,
                      cid,
                      local_seid,
@@ -440,12 +440,12 @@ namespace bluetooth
                      AVRCP::mediaTracker.remote_seid);
 
             if (local_seid != AVRCP::mediaTracker.local_seid) {
-                LOG_INFO("A2DP Source: Stream failed, wrong local seid %d, expected %d.\n",
+                LOG_INFO("A2DP Source: Stream failed, wrong local seid %d, expected %d",
                          local_seid,
                          AVRCP::mediaTracker.local_seid);
                 break;
             }
-            LOG_INFO("A2DP Source: Stream established, a2dp cid 0x%02x, local seid %d, remote seid %d.\n",
+            LOG_INFO("A2DP Source: Stream established, a2dp cid 0x%02x, local seid %d, remote seid %d",
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid,
                      a2dp_subevent_stream_established_get_remote_seid(packet));
@@ -466,12 +466,12 @@ namespace bluetooth
             cid        = a2dp_subevent_stream_reconfigured_get_a2dp_cid(packet);
 
             LOG_INFO("A2DP Source: Reconfigured: a2dp_cid [expected 0x%02x, received 0x%02x], local_seid [expected %d, "
-                     "received %d]\n",
+                     "received %d]",
                      AVRCP::mediaTracker.a2dp_cid,
                      cid,
                      AVRCP::mediaTracker.local_seid,
                      local_seid);
-            LOG_INFO("Status 0x%02x\n", status);
+            LOG_INFO("Status 0x%02x", status);
             break;
 
         case A2DP_SUBEVENT_STREAM_STARTED:
@@ -485,7 +485,7 @@ namespace bluetooth
             startTimer(&AVRCP::mediaTracker);
             LOG_INFO(
                 "A2DP Source: Stream started: a2dp_cid [expected 0x%02x, received 0x%02x], local_seid [expected %d, "
-                "received %d]\n",
+                "received %d]",
                 AVRCP::mediaTracker.a2dp_cid,
                 cid,
                 AVRCP::mediaTracker.local_seid,
@@ -508,7 +508,7 @@ namespace bluetooth
             }
             LOG_INFO(
                 "A2DP Source: Stream paused: a2dp_cid [expected 0x%02x, received 0x%02x], local_seid [expected %d, "
-                "received %d]\n",
+                "received %d]",
                 AVRCP::mediaTracker.a2dp_cid,
                 cid,
                 AVRCP::mediaTracker.local_seid,
@@ -523,7 +523,7 @@ namespace bluetooth
             local_seid             = a2dp_subevent_stream_released_get_local_seid(packet);
             LOG_INFO(
                 "A2DP Source: Stream released: a2dp_cid [expected 0x%02x, received 0x%02x], local_seid [expected %d, "
-                "received %d]\n",
+                "received %d]",
                 AVRCP::mediaTracker.a2dp_cid,
                 cid,
                 AVRCP::mediaTracker.local_seid,
@@ -531,7 +531,7 @@ namespace bluetooth
             sendAudioEvent(audio::EventType::BlutoothA2DPDeviceState, audio::Event::DeviceState::Disconnected);
             if (cid == AVRCP::mediaTracker.a2dp_cid) {
                 AVRCP::mediaTracker.stream_opened = 0;
-                LOG_INFO("A2DP Source: Stream released.\n");
+                LOG_INFO("A2DP Source: Stream released");
             }
             if (AVRCP::mediaTracker.avrcp_cid != 0u) {
 
@@ -548,7 +548,7 @@ namespace bluetooth
             if (cid == AVRCP::mediaTracker.a2dp_cid) {
                 AVRCP::mediaTracker.avrcp_cid = 0;
                 AVRCP::mediaTracker.a2dp_cid  = 0;
-                LOG_INFO("A2DP Source: Signaling released.\n\n");
+                LOG_INFO("A2DP Source: Signaling released");
             }
             isConnected = false;
             break;

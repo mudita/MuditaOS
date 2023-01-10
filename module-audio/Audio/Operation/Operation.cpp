@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Operation.hpp"
@@ -47,12 +47,10 @@ namespace audio
         auto ret = std::find_if(supportedProfiles.begin(), supportedProfiles.end(), [type](const auto &w) {
             return w.isAvailable && w.profile->GetType() == type;
         });
-        if (ret == supportedProfiles.end()) {
-            return nullptr;
-        }
-        else {
+        if (ret != supportedProfiles.end()) {
             return ret->profile;
         }
+        return nullptr;
     }
 
     std::optional<Profile::Type> Operation::GetPriorityProfile() const
@@ -81,12 +79,12 @@ namespace audio
     void Operation::SetProfileAvailability(std::vector<Profile::Type> profiles, bool available)
     {
         for (auto &p : supportedProfiles) {
-            if (auto shouldSet = (std::find(profiles.begin(), profiles.end(), p.profile->GetType()) != profiles.end());
-                shouldSet) {
+            if (std::find(profiles.begin(), profiles.end(), p.profile->GetType()) != profiles.end()) {
                 p.isAvailable = available;
             }
         }
     }
+
     void Operation::AddProfile(const Profile::Type &profile, const PlaybackType &playback, bool isAvailable)
     {
         const auto reqVol  = AudioServiceMessage::DbRequest(Setting::Volume, playback, profile);
