@@ -1,23 +1,52 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/filesystem/FS_Helper.hpp>
-#include <endpoints/Context.hpp>
-#include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-#include <endpoints/JsonKeyNames.hpp>
 #include <endpoints/message/Sender.hpp>
-#include <purefs/filesystem_paths.hpp>
 
 #include <sys/statvfs.h>
-#include <filesystem>
 
 namespace sdesktop::endpoints
 {
     namespace
     {
         constexpr auto bytesInMebibyte = 1024LLU * 1024LLU;
-    }
+
+        enum FileType
+        {
+            directory,
+            regularFile,
+            symlink,
+            other,
+        };
+
+        auto parseFileEntry(const std::filesystem::directory_entry &entry) -> json11::Json
+        {
+            int size = 0;
+            FileType type;
+
+            if (entry.is_directory()) {
+                type = FileType::directory;
+            }
+            else {
+                size = static_cast<int>(entry.file_size());
+            }
+
+            if (entry.is_regular_file()) {
+                type = FileType::regularFile;
+            }
+            else if (entry.is_symlink()) {
+                type = FileType::symlink;
+            }
+            else {
+                type = FileType::other;
+            }
+
+            return json11::Json::object{
+                {json::fs::path, entry.path().string()}, {json::fs::fileSize, size}, {json::fs::type, type}};
+        }
+    } // namespace
 
     using sender::putToSendQueue;
     namespace fs = std::filesystem;
@@ -98,7 +127,6 @@ namespace sdesktop::endpoints
 
         return {sent::no, ResponseContext{.status = code}};
     }
-
     auto FS_Helper::requestLogsFlush() const -> void
     {
         auto ownerService = dynamic_cast<ServiceDesktop *>(owner);
@@ -201,7 +229,7 @@ namespace sdesktop::endpoints
     auto FS_Helper::startSendFile(Context &context) const -> ResponseContext
     {
         const auto &body               = context.getBody();
-        std::filesystem::path filePath = body[json::fs::fileName].string_value();
+        const auto filePath            = body[json::fs::fileName].string_value();
         const uint32_t fileSize        = body[json::fs::fileSize].int_value();
         const auto fileCrc32           = body[json::fs::fileCrc32].string_value();
         auto code                      = http::Code::BadRequest;
@@ -329,20 +357,13 @@ namespace sdesktop::endpoints
             return ResponseContext{.status = http::Code::NotFound};
         }
 
-        std::vector<std::pair<std::string, int>> filesInDir;
-        for (const auto &entry : std::filesystem::directory_iterator{directory}) {
-            filesInDir.push_back(std::make_pair(entry.path(), entry.file_size()));
-        }
-
         json11::Json::array jsonArr;
-        jsonArr.reserve(filesInDir.size());
 
-        for (const auto &pathAndSize : filesInDir) {
-            jsonArr.push_back(
-                json11::Json::object{{json::fs::path, pathAndSize.first}, {json::fs::fileSize, pathAndSize.second}});
+        for (const auto &entry : std::filesystem::directory_iterator{directory}) {
+            jsonArr.push_back(parseFileEntry(entry));
         }
 
-        json11::Json::object response({{directory, jsonArr}});
+        json11::Json::object const response({{directory, jsonArr}});
         return ResponseContext{.status = http::Code::OK, .body = response};
     }
 
@@ -350,7 +371,7 @@ namespace sdesktop::endpoints
     {
         const auto userDiskPath = purefs::dir::getUserDiskPath();
 
-        std::unique_ptr<struct statvfs> vfstat = std::make_unique<struct statvfs>();
+        auto vfstat = std::make_unique<struct statvfs>();
         if (statvfs(userDiskPath.c_str(), vfstat.get()) < 0) {
             return 0;
         }
