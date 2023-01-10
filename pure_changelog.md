@@ -26,6 +26,7 @@
 * Fixed unwanted Mudita Center passcode prompt after long press '#' while dialing 
 * Fixed inability to unblock SIM card when previously ejected during slot switching
 * Fixed French translations for Ulock Screen
+* Fixed crash when syncing with Mudita Center
 
 ### Added
 
