@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "HFPImpl.hpp"
@@ -184,7 +184,7 @@ namespace bluetooth
                 LOG_DEBUG("mSBC");
             }
             else {
-                LOG_WARN("mSBC codec disabled because eSCO not supported by local controller.\n");
+                LOG_WARN("mSBC codec disabled because eSCO not supported by local controller.");
             }
             break;
 
@@ -247,13 +247,13 @@ namespace bluetooth
             std::uint8_t status;
             status = hfp_subevent_service_level_connection_established_get_status(event);
             if (status) {
-                LOG_DEBUG("Connection failed, status 0x%02x\n", status);
+                LOG_DEBUG("Connection failed, status 0x%02x", status);
                 sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
                 break;
             }
             aclHandle = hfp_subevent_service_level_connection_established_get_acl_handle(event);
             hfp_subevent_service_level_connection_established_get_bd_addr(event, device.address);
-            LOG_DEBUG("Service level connection established to %s.\n", bd_addr_to_str(device.address));
+            LOG_DEBUG("Service level connection established to %s", bd_addr_to_str(device.address));
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Connected);
             {
                 auto &busProxy     = const_cast<sys::Service *>(ownerService)->bus;
@@ -267,7 +267,7 @@ namespace bluetooth
             dump_supported_codecs();
             break;
         case HFP_SUBEVENT_SERVICE_LEVEL_CONNECTION_RELEASED:
-            LOG_DEBUG("Service level connection released.\n");
+            LOG_DEBUG("Service level connection released");
             aclHandle = HCI_CON_HANDLE_INVALID;
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
             {
@@ -278,15 +278,14 @@ namespace bluetooth
             break;
         case HFP_SUBEVENT_AUDIO_CONNECTION_ESTABLISHED:
             if (hfp_subevent_audio_connection_established_get_status(event)) {
-                LOG_DEBUG("Audio connection establishment failed with status %u\n",
+                LOG_DEBUG("Audio connection establishment failed with status %u",
                           hfp_subevent_audio_connection_established_get_status(event));
             }
             else {
                 scoHandle = hfp_subevent_audio_connection_established_get_sco_handle(event);
-                LOG_DEBUG("Audio connection established with SCO handle 0x%04x.\n", scoHandle);
+                LOG_DEBUG("Audio connection established with SCO handle 0x%04x", scoHandle);
                 codec = static_cast<SCOCodec>(hfp_subevent_audio_connection_established_get_negotiated_codec(event));
                 dump_supported_codecs();
-                audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
                 hci_request_sco_can_send_now_event();
                 RunLoop::trigger();
             }
@@ -294,15 +293,14 @@ namespace bluetooth
         case HFP_SUBEVENT_AUDIO_CONNECTION_RELEASED:
             LOG_DEBUG("Audio connection released");
             scoHandle = HCI_CON_HANDLE_INVALID;
-            audioInterface->stopAudioRouting(const_cast<sys::Service *>(ownerService));
             audioDevice.reset();
             break;
         case HFP_SUBEVENT_START_RINGING:
-            LOG_DEBUG("Start Ringing\n");
+            LOG_DEBUG("Start Ringing");
             // todo request here ringtone stream
             break;
         case HFP_SUBEVENT_STOP_RINGING:
-            LOG_DEBUG("Stop Ringing\n");
+            LOG_DEBUG("Stop Ringing");
             // todo stop ringtone stream here
             break;
         case HFP_SUBEVENT_PLACE_CALL_WITH_NUMBER: {
@@ -317,12 +315,12 @@ namespace bluetooth
             break;
         case HFP_SUBEVENT_ATTACH_NUMBER_TO_VOICE_TAG:
             // todo has to be feeded with proper phone number from cellular
-            // LOG_DEBUG("Attach number to voice tag. Sending '1234567\n");
+            // LOG_DEBUG("Attach number to voice tag. Sending '1234567'");
             hfp_ag_send_phone_number_for_voice_tag(aclHandle, "1234567");
             break;
         case HFP_SUBEVENT_TRANSMIT_DTMF_CODES: {
             auto digitStr = hfp_subevent_transmit_dtmf_codes_get_dtmf(event);
-            LOG_DEBUG("Send DTMF Codes: '%s'\n", digitStr);
+            LOG_DEBUG("Send DTMF Codes: '%s'", digitStr);
             try {
                 cellularInterface->sendDTMFCode(const_cast<sys::Service *>(ownerService), DTMFCode(digitStr));
             }
@@ -340,7 +338,7 @@ namespace bluetooth
             const auto volume = hfp_subevent_speaker_volume_get_gain(event);
             auto &busProxy    = const_cast<sys::Service *>(ownerService)->bus;
             busProxy.sendUnicast(std::make_shared<message::bluetooth::HFPVolume>(volume), service::name::bluetooth);
-            LOG_DEBUG("Received speaker gain change %d\n", hsp_subevent_speaker_gain_changed_get_gain(event));
+            LOG_DEBUG("Received speaker gain change %d", hsp_subevent_speaker_gain_changed_get_gain(event));
         } break;
 
         case HFP_SUBEVENT_CALL_TERMINATED:
@@ -349,7 +347,7 @@ namespace bluetooth
             currentCallStatus = CallStatus::Unknown;
             break;
         default:
-            LOG_DEBUG("Event not handled %u\n", hci_event_hfp_meta_get_subevent_code(event));
+            LOG_DEBUG("Event not handled %u", hci_event_hfp_meta_get_subevent_code(event));
             break;
         }
     }

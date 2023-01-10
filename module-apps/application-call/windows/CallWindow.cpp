@@ -14,17 +14,11 @@
 #include <text/modes/InputMode.hpp>
 #include <Label.hpp>
 #include <log/log.hpp>
-#include <magic_enum.hpp>
 #include <Margins.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-db/DBServiceAPI.hpp>
-#include <time/time_conversion.hpp>
 
-#include <cassert>
 #include <functional>
-#include <iomanip>
 #include <memory>
-#include <sstream>
 
 namespace gui
 {
@@ -82,7 +76,7 @@ namespace gui
         microphoneIcon                    = new MicrophoneIcon(iconsBox);
         microphoneIcon->activatedCallback = [=](gui::Item &item) {
             microphoneIcon->setNext();
-            LOG_INFO("Mic activated %d", static_cast<int>(microphoneIcon->get()));
+            LOG_INFO("Microphone %s", static_cast<bool>(microphoneIcon->get()) ? "activated" : "deactivated");
 
             microphoneIcon->get() == MicrophoneIconState::MUTED ? presenter->muteCall() : presenter->unmuteCall();
 
@@ -92,7 +86,7 @@ namespace gui
         speakerIcon                    = new SpeakerIcon(iconsBox);
         speakerIcon->activatedCallback = [=](gui::Item &item) {
             speakerIcon->setNext();
-            LOG_INFO("Speaker activated %d", static_cast<int>(speakerIcon->get()));
+            LOG_INFO("Speaker %s", static_cast<bool>(speakerIcon->get()) ? "activated" : "deactivated");
 
             switch (speakerIcon->get()) {
             case SpeakerIconState::SPEAKER: {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AVRCP.hpp"
@@ -36,7 +36,7 @@ namespace bluetooth
             local_cid = avrcp_subevent_connection_established_get_avrcp_cid(packet);
             status    = avrcp_subevent_connection_established_get_status(packet);
             if (status != ERROR_CODE_SUCCESS) {
-                LOG_INFO("AVRCP: Connection failed, local cid 0x%02x, status 0x%02x\n", local_cid, status);
+                LOG_INFO("AVRCP: Connection failed, local cid 0x%02x, status 0x%02x", local_cid, status);
                 return;
             }
             AVRCP::mediaTracker.avrcp_cid = local_cid;
@@ -62,7 +62,7 @@ namespace bluetooth
             return;
 
         case AVRCP_SUBEVENT_CONNECTION_RELEASED:
-            LOG_INFO("AVRCP Target: Disconnected, avrcp_cid 0x%02x\n",
+            LOG_INFO("AVRCP Target: Disconnected, avrcp_cid 0x%02x",
                      avrcp_subevent_connection_released_get_avrcp_cid(packet));
             AVRCP::mediaTracker.avrcp_cid = 0;
             return;
@@ -71,7 +71,7 @@ namespace bluetooth
         }
 
         if (status != ERROR_CODE_SUCCESS) {
-            LOG_INFO("Responding to event 0x%02x failed with status 0x%02x\n", subevent_code, status);
+            LOG_INFO("Responding to event 0x%02x failed with status 0x%02x", subevent_code, status);
         }
     }
 
@@ -99,23 +99,23 @@ namespace bluetooth
                 static_cast<avrcp_operation_id_t>(avrcp_subevent_operation_get_operation_id(packet));
             switch (operation_id) {
             case AVRCP_OPERATION_ID_PLAY: {
-                LOG_INFO("AVRCP Target: PLAY\n");
+                LOG_INFO("AVRCP Target: PLAY");
                 auto &busProxy = AVRCP::ownerService->bus;
                 busProxy.sendUnicast(std::make_shared<message::bluetooth::AudioStart>(), service::name::audio);
                 return;
             } break;
             case AVRCP_OPERATION_ID_PAUSE: {
-                LOG_INFO("AVRCP Target: PAUSE\n");
+                LOG_INFO("AVRCP Target: PAUSE");
                 auto &busProxy = AVRCP::ownerService->bus;
                 busProxy.sendUnicast(std::make_shared<message::bluetooth::AudioPause>(), service::name::audio);
                 return;
             } break;
             case AVRCP_OPERATION_ID_STOP:
-                LOG_INFO("AVRCP Target: STOP\n");
+                LOG_INFO("AVRCP Target: STOP");
                 status = a2dp_source_disconnect(AVRCP::mediaTracker.a2dp_cid);
                 break;
             default:
-                LOG_INFO("AVRCP Target: operation 0x%2x is not handled\n", operation_id);
+                LOG_INFO("AVRCP Target: operation 0x%2x is not handled", operation_id);
                 return;
             }
             break;
@@ -126,7 +126,7 @@ namespace bluetooth
         }
 
         if (status != ERROR_CODE_SUCCESS) {
-            LOG_INFO("Responding to event 0x%02x failed with status 0x%02x\n", subevent_code, status);
+            LOG_INFO("Responding to event 0x%02x failed with status 0x%02x", subevent_code, status);
         }
     }
 
@@ -150,18 +150,18 @@ namespace bluetooth
             const auto volume = avrcp_subevent_notification_volume_changed_get_absolute_volume(packet);
             auto &busProxy    = AVRCP::ownerService->bus;
             busProxy.sendUnicast(std::make_shared<message::bluetooth::A2DPVolume>(volume), service::name::bluetooth);
-            LOG_INFO("AVRCP Controller: BT device volume changed to %u%% (%u)\n",
+            LOG_INFO("AVRCP Controller: BT device volume changed to %u%% (%u)",
                      AVRCP::controllerVolumeToPercent(volume),
                      volume);
         } break;
 
         case AVRCP_SUBEVENT_NOTIFICATION_EVENT_BATT_STATUS_CHANGED:
             // see avrcp_battery_status_t
-            LOG_INFO("AVRCP Controller: Notification Battery Status %d\n",
+            LOG_INFO("AVRCP Controller: Notification Battery Status %d",
                      avrcp_subevent_notification_event_batt_status_changed_get_battery_status(packet));
             break;
         case AVRCP_SUBEVENT_NOTIFICATION_STATE:
-            LOG_INFO("AVRCP Controller: Notification %s - %s\n",
+            LOG_INFO("AVRCP Controller: Notification %s - %s",
                      avrcp_event2str(avrcp_subevent_notification_state_get_event_id(packet)),
                      avrcp_subevent_notification_state_get_enabled(packet) != 0 ? "enabled" : "disabled");
             break;
