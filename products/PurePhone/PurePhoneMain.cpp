@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "config.h"
@@ -185,9 +185,6 @@ int main()
 #ifdef ENABLE_SERVICE_BLUETOOTH
     systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
 #endif
-#ifdef ENABLE_SERVICE_DESKTOP
-    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
-#endif
 #ifdef ENABLE_SERVICE_TIME
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
 #endif
@@ -197,6 +194,9 @@ int main()
 #ifdef ENABLE_SERVICE_GUI
     systemServices.emplace_back(
         sys::CreatorFor<service::gui::ServiceGUI>(gui::Size{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}));
+#endif
+#ifdef ENABLE_SERVICE_DESKTOP
+    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
 #endif
 #if ENABLE_SERVICE_TEST
     systemServices.emplace_back(sys::CreatorFor<service::test::ServiceTest>());
