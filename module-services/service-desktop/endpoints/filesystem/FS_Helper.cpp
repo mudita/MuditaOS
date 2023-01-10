@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/filesystem/FS_Helper.hpp>
@@ -98,7 +98,6 @@ namespace sdesktop::endpoints
 
         return {sent::no, ResponseContext{.status = code}};
     }
-
     auto FS_Helper::requestLogsFlush() const -> void
     {
         auto ownerService = dynamic_cast<ServiceDesktop *>(owner);
@@ -323,26 +322,53 @@ namespace sdesktop::endpoints
         return !ec;
     }
 
+    auto FS_Helper::parseFileEntry(const std::filesystem::directory_entry &entry) -> FileEntry
+    {
+        FileEntry fileEntry;
+        fileEntry.filename = entry.path();
+
+        if (entry.is_directory()) {
+            fileEntry.type = FileType::directory;
+            return fileEntry;
+        }
+
+        fileEntry.size = entry.file_size();
+        if (entry.is_regular_file()) {
+            fileEntry.type = FileType::regularFile;
+        }
+        else if (entry.is_symlink()) {
+            fileEntry.type = FileType::symlink;
+        }
+        else {
+            fileEntry.type = FileType::other;
+        }
+
+        return fileEntry;
+    }
+
     auto FS_Helper::requestListDir(const std::string &directory) -> ResponseContext
     {
+        using FileEntriesVector = std::vector<FileEntry>;
+
         if (!std::filesystem::exists(directory)) {
             return ResponseContext{.status = http::Code::NotFound};
         }
 
-        std::vector<std::pair<std::string, int>> filesInDir;
+        FileEntriesVector filesInDir;
         for (const auto &entry : std::filesystem::directory_iterator{directory}) {
-            filesInDir.push_back(std::make_pair(entry.path(), entry.file_size()));
+            filesInDir.emplace_back(parseFileEntry(entry));
         }
 
         json11::Json::array jsonArr;
         jsonArr.reserve(filesInDir.size());
 
-        for (const auto &pathAndSize : filesInDir) {
-            jsonArr.push_back(
-                json11::Json::object{{json::fs::path, pathAndSize.first}, {json::fs::fileSize, pathAndSize.second}});
+        for (const auto &fileEntry : filesInDir) {
+            jsonArr.push_back(json11::Json::object{{json::fs::path, fileEntry.filename},
+                                                   {json::fs::fileSize, static_cast<int>(fileEntry.size)},
+                                                   {json::fs::type, fileEntry.type}});
         }
 
-        json11::Json::object response({{directory, jsonArr}});
+        json11::Json::object const response({{directory, jsonArr}});
         return ResponseContext{.status = http::Code::OK, .body = response};
     }
 

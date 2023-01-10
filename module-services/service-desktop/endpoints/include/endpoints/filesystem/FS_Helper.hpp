@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,6 +17,7 @@ namespace sdesktop::endpoints
         inline constexpr auto path         = "path";
         inline constexpr auto fileName     = "fileName";
         inline constexpr auto fileSize     = "fileSize";
+        inline constexpr auto type         = "type";
         inline constexpr auto fileCrc32    = "fileCrc32";
         inline constexpr auto chunkSize    = "chunkSize";
         inline constexpr auto chunkNo      = "chunkNo";
@@ -26,6 +27,21 @@ namespace sdesktop::endpoints
 
         inline constexpr auto fileDoesNotExist = "file does not exist";
     } // namespace json::fs
+
+    enum FileType
+    {
+        directory,
+        regularFile,
+        symlink,
+        other,
+    };
+
+    struct FileEntry
+    {
+        std::string filename;
+        unsigned long long size = 0;
+        FileType type;
+    };
 
     class FS_Helper : public BaseHelper
     {
@@ -49,6 +65,7 @@ namespace sdesktop::endpoints
         auto requestFileRemoval(const std::string &fileName) -> bool;
         auto requestFileRename(const std::string &fileName, const std::string &destFileName) noexcept -> bool;
         auto requestListDir(const std::string &directory) -> ResponseContext;
+        auto parseFileEntry(const std::filesystem::directory_entry &entry) -> FileEntry;
 
         auto requestLogsFlush() const -> void;
 
