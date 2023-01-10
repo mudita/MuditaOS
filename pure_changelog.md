@@ -5,6 +5,7 @@
 ### Changed / Improved
 * Improved dialog with network via USSD
 * Added serial number and timestamp to crashdump filename
+* Changed order of starting services, ServiceDesktop moved to the back
 
 ### Fixed
 * Fixed disappearing "confirm" button in PIN entering screen
