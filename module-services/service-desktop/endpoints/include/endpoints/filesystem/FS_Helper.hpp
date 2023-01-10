@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,6 +17,7 @@ namespace sdesktop::endpoints
         inline constexpr auto path         = "path";
         inline constexpr auto fileName     = "fileName";
         inline constexpr auto fileSize     = "fileSize";
+        inline constexpr auto type         = "type";
         inline constexpr auto fileCrc32    = "fileCrc32";
         inline constexpr auto chunkSize    = "chunkSize";
         inline constexpr auto chunkNo      = "chunkNo";
