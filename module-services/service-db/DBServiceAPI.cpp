@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-db/DBServiceAPI.hpp"
@@ -26,6 +26,12 @@
 #include <utility>
 #include <cassert>
 
+namespace constants
+{
+    constexpr std::uint32_t DefaultTimeoutInMs = 10000U;
+    constexpr std::uint32_t BackupTimeoutInMs  = 120000U;
+} // namespace constants
+
 struct NotesRecord;
 
 auto DBServiceAPI::ContactGetByID(sys::Service *serv, uint32_t contactID) -> std::unique_ptr<std::vector<ContactRecord>>
@@ -40,7 +46,7 @@ auto DBServiceAPI::ContactGetByID(sys::Service *serv, uint32_t contactID) -> std
 auto DBServiceAPI::ContactGetByIDCommon(sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg)
     -> std::unique_ptr<std::vector<ContactRecord>>
 {
-    auto ret             = serv->bus.sendUnicastSync(contactMsg, service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(contactMsg, service::name::db, constants::DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -74,7 +80,7 @@ auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv,
 {
     auto msg = std::make_shared<DBMatchContactNumberBesidesOfContactIDMessage>(numberView, contactIDToOmit);
 
-    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, constants::DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr || contactResponse->retCode != sys::ReturnCodes::Success) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -86,7 +92,7 @@ auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv,
 auto DBServiceAPI::MatchContactByNumberID(sys::Service *serv, std::uint32_t numberID) -> std::unique_ptr<ContactRecord>
 {
     auto msg             = std::make_shared<DBMatchContactByNumberIDMessage>(numberID);
-    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, constants::DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr || contactResponse->retCode != sys::ReturnCodes::Success) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -98,8 +104,8 @@ auto DBServiceAPI::MatchContactByNumberID(sys::Service *serv, std::uint32_t numb
 auto DBServiceAPI::NumberByID(sys::Service *serv, std::uint32_t numberID) -> utils::PhoneNumber::View
 {
     auto msg = std::make_unique<db::query::NumberGetByID>(numberID);
-    const auto [status, response] =
-        DBServiceAPI::GetQueryWithReply(serv, db::Interface::Name::Contact, std::move(msg), DefaultTimeoutInMs);
+    const auto [status, response] = DBServiceAPI::GetQueryWithReply(
+        serv, db::Interface::Name::Contact, std::move(msg), constants::DefaultTimeoutInMs);
     if (status != sys::ReturnCodes::Success || !response) {
         return utils::PhoneNumber::View{};
     }
@@ -116,7 +122,7 @@ auto DBServiceAPI::IsContactInFavourites(sys::Service *serv, const utils::PhoneN
 {
     auto msg = std::make_shared<DBContactNumberMessage>(numberView);
 
-    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, constants::DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr || contactResponse->retCode != sys::ReturnCodes::Success) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -129,7 +135,7 @@ auto DBServiceAPI::IsContactInEmergency(sys::Service *serv, const utils::PhoneNu
 {
     auto msg = std::make_shared<DBContactNumberMessage>(numberView);
 
-    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, constants::DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr || contactResponse->retCode != sys::ReturnCodes::Success) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -179,7 +185,7 @@ auto DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) -> s
 {
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactAdd, rec);
 
-    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, constants::DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -199,7 +205,7 @@ auto DBServiceAPI::ContactRemove(sys::Service *serv, uint32_t id) -> bool
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactRemove);
     msg->id                               = id;
 
-    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, constants::DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -215,7 +221,7 @@ auto DBServiceAPI::ContactUpdate(sys::Service *serv, const ContactRecord &rec) -
 {
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactUpdate, rec);
 
-    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, constants::DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -231,7 +237,7 @@ auto DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec) -> C
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogAdd, rec);
 
-    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, constants::DefaultTimeoutInMs);
     auto calllogResponse = dynamic_cast<DBCalllogResponseMessage *>(ret.second.get());
     if (calllogResponse == nullptr) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -252,7 +258,7 @@ auto DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id) -> bool
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogRemove);
     msg->id                               = id;
 
-    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, constants::DefaultTimeoutInMs);
     auto calllogResponse = dynamic_cast<DBCalllogResponseMessage *>(ret.second.get());
     if (calllogResponse == nullptr) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -265,7 +271,7 @@ auto DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogUpdate, rec);
 
-    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
+    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, constants::DefaultTimeoutInMs);
     auto calllogResponse = dynamic_cast<DBCalllogResponseMessage *>(ret.second.get());
     if (calllogResponse == nullptr) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
@@ -281,7 +287,7 @@ auto DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath) -> bool
     std::shared_ptr<DBServiceMessageBackup> msg =
         std::make_shared<DBServiceMessageBackup>(MessageType::DBServiceBackup, backupPath);
 
-    auto ret = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
+    auto ret = serv->bus.sendUnicastSync(msg, service::name::db, constants::BackupTimeoutInMs);
     if (auto retMsg = dynamic_cast<DBServiceResponseMessage *>(ret.second.get()); retMsg) {
         return retMsg->retCode;
     }
