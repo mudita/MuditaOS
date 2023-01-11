@@ -24,6 +24,7 @@
 * Fixed wrong navigation bar state after exit from custom repeat window
 * Fixed OS crash when editing contact by adding country prefix to number
 * Fixed unwanted Mudita Center passcode prompt after long press '#' while dialing 
+* Fixed inability to unblock SIM card when previously ejected during slot switching
 
 ### Added
 
