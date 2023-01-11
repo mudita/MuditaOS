@@ -292,6 +292,8 @@ namespace locks
 
     sys::MessagePointer SimLockHandler::handleSimNotRespondingMessage()
     {
+        simSwitching = false;
+
         setSimInputTypeAction(SimInputTypeAction::Error);
 
         lock.lockName = utils::enumToString(Store::GSM::get()->selected);
