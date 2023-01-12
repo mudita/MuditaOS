@@ -23,14 +23,14 @@ namespace sdesktop::endpoints
 
         auto parseFileEntry(const std::filesystem::directory_entry &entry) -> json11::Json
         {
-            int size = 0;
+            uintmax_t size = 0;
             FileType type;
 
             if (entry.is_directory()) {
                 type = FileType::directory;
             }
             else {
-                size = static_cast<int>(entry.file_size());
+                size = entry.file_size();
             }
 
             if (entry.is_regular_file()) {
@@ -370,14 +370,15 @@ namespace sdesktop::endpoints
     auto FS_Helper::getFreeSpaceForUserFilesMiB() const -> unsigned long
     {
         const auto userDiskPath = purefs::dir::getUserDiskPath();
+        struct statvfs vfstat
+        {};
 
-        auto vfstat = std::make_unique<struct statvfs>();
-        if (statvfs(userDiskPath.c_str(), vfstat.get()) < 0) {
+        if (statvfs(userDiskPath.c_str(), &vfstat) < 0) {
             return 0;
         }
 
         const auto freeBytes =
-            (static_cast<std::uint64_t>(vfstat->f_bfree) * static_cast<std::uint64_t>(vfstat->f_bsize));
+            (static_cast<std::uint64_t>(vfstat.f_bfree) * static_cast<std::uint64_t>(vfstat.f_bsize));
         const auto freeMiBs = freeBytes / bytesInMebibyte;
 
         return freeMiBs;
