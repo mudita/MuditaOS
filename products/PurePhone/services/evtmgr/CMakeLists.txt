@@ -11,6 +11,7 @@ target_sources(evtmgr
     PUBLIC
         include/evtmgr/EVMessages.hpp
         include/evtmgr/EventManager.hpp
+        include/evtmgr/battery/Thresholds.hpp
 )
 
 target_include_directories(evtmgr

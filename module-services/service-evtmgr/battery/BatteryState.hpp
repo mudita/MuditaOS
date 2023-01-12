@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <memory>
 #include <functional>
+#include <Units.hpp>
 
 namespace sys
 {
@@ -30,9 +31,15 @@ class BatteryState
         CriticalNotCharging
     };
 
+    struct Thresholds
+    {
+        units::Percent critical;
+        units::Percent shutdown;
+    };
+
     using NotifyStateChangedCallback = std::function<void(State)>;
 
-    BatteryState(sys::Service *service, NotifyStateChangedCallback notifyCallback);
+    BatteryState(sys::Service *service, NotifyStateChangedCallback notifyCallback, Thresholds thresholds);
 
     void check(ChargingState state, float soc);
 

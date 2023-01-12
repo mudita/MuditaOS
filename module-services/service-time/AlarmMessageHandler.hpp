@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,7 +6,7 @@
 #include "AlarmOperations.hpp"
 
 #include <service-time/AlarmMessage.hpp>
-
+#include <service-evtmgr/BatteryMessages.hpp>
 #include <Service/Service.hpp>
 
 namespace stm
@@ -47,6 +47,7 @@ namespace alarms
         auto handleToggleAll(AlarmToggleAllRequestMessage *request) -> std::shared_ptr<AlarmToggleAllResponseMessage>;
         auto handleGetSnoozedAlarms(GetSnoozedAlarmsRequestMessage *request)
             -> std::shared_ptr<GetSnoozedAlarmsResponseMessage>;
+        auto handleBatteryStateChange(sevm::BatteryStateChangeMessage *request) -> void;
 
       private:
         stm::ServiceTime *service = nullptr;

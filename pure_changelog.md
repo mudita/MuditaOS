@@ -32,6 +32,7 @@
 * Fixed no sound when Bluetooth audio device connected/disconnected during call
 * Fixed full filesystem path displayed in music player for invalid files instead of just filename
 * Fixed problem with track info not being displayed correctly
+* Fixed alarm rings on the low battery screen
 
 ### Added
 

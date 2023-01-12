@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/SystemManagerCommon.hpp>
@@ -112,7 +112,7 @@ namespace sys
         : Service(service::name::system_manager, "", systemManagerStack), systemServiceCreators{std::move(creators)}
     {
         // Specify list of channels which System Manager is registered to
-        bus.channels            = {BusChannel::SystemManagerRequests};
+        bus.channels            = {BusChannel::SystemManagerRequests, BusChannel::ServiceEvtmgrNotifications};
         lowBatteryShutdownDelay = sys::TimerFactory::createPeriodicTimer(
             this, "lowBatteryShutdownDelay", lowBatteryShutdownDelayTime, [this](sys::Timer &) {
                 CloseSystemHandler(CloseReason::LowBattery);
@@ -510,22 +510,23 @@ namespace sys
 
     void SystemManagerCommon::postStartRoutine()
     {
-        connect(sevm::BatteryStateChangeMessage(), [&](Message *) {
-            switch (Store::Battery::get().levelState) {
-            case Store::Battery::LevelState::Normal:
+        connect(typeid(sevm::BatteryStateChangeMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sevm::BatteryStateChangeMessage *>(message);
+            switch (msg->getState()) {
+            case BatteryState::State::Normal:
                 batteryNormalLevelAction();
                 break;
-            case Store::Battery::LevelState::Shutdown:
+            case BatteryState::State::Shutdown:
                 batteryShutdownLevelAction();
                 break;
-            case Store::Battery::LevelState::CriticalCharging:
+            case BatteryState::State::CriticalCharging:
                 batteryCriticalLevelAction(true);
                 break;
-            case Store::Battery::LevelState::CriticalNotCharging:
+            case BatteryState::State::CriticalNotCharging:
                 batteryCriticalLevelAction(false);
                 break;
             }
-            return MessageNone{};
+            return sys::MessageNone{};
         });
     }
 

@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "EventManagerCommon.hpp"
+#include "EventManagerParams.hpp"
 
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
@@ -67,7 +68,7 @@ class WorkerEventCommon : public sys::Worker
      */
     void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency);
     bool initEventQueues();
-    bool initCommonHardwareComponents();
+    bool initCommonHardwareComponents(EventManagerParams params);
     void sendKeyUnicast(RawKey const &key);
 
     /**
@@ -83,7 +84,7 @@ class WorkerEventCommon : public sys::Worker
   public:
     explicit WorkerEventCommon(sys::Service *service);
 
-    void init(std::shared_ptr<settings::Settings> settings);
+    void init(std::shared_ptr<settings::Settings> settings, EventManagerParams params);
     virtual void deinitProductHardware();
     virtual bool deinit() override;
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/EVMessages.hpp"
@@ -107,12 +107,12 @@ bool WorkerEventCommon::initEventQueues()
     return Worker::init(queuesList);
 }
 
-bool WorkerEventCommon::initCommonHardwareComponents()
+bool WorkerEventCommon::initCommonHardwareComponents(EventManagerParams params)
 {
     keyInput->init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
     auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBatteryController)]->GetQueueHandle();
 
-    batteryController = std::make_shared<sevm::battery::BatteryController>(service, queueBatteryHandle);
+    batteryController = std::make_shared<sevm::battery::BatteryController>(service, queueBatteryHandle, params.battery);
     bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
 
     time_t timestamp;
@@ -131,10 +131,10 @@ bool WorkerEventCommon::initCommonHardwareComponents()
     return true;
 }
 
-void WorkerEventCommon::init(std::shared_ptr<settings::Settings> settings)
+void WorkerEventCommon::init(std::shared_ptr<settings::Settings> settings, EventManagerParams params)
 {
     initEventQueues();
-    initCommonHardwareComponents();
+    initCommonHardwareComponents(params);
 }
 
 bool WorkerEventCommon::deinit(void)
