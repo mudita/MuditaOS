@@ -180,8 +180,7 @@ namespace gui
 
     void Item::informContentChanged()
     {
-        // check if item has been initialized to prevent looping
-        if (parent != nullptr && widgetArea != BoundingBox()) {
+        if (parent != nullptr) {
             contentChanged = true;
             parent->handleContentChanged();
         }
@@ -189,9 +188,7 @@ namespace gui
 
     void Item::handleContentChanged()
     {
-        if (parent != nullptr) {
-            informContentChanged();
-        }
+        informContentChanged();
     }
 
     void Item::setSize(Length w, Length h)

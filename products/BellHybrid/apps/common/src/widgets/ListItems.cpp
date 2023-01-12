@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/data/StyleCommon.hpp>
@@ -48,7 +48,8 @@ namespace gui
                                const std::string &topDescription)
         : BellSideListItemWithCallbacks(topDescription)
     {
-        spinner = new TimeSetFmtSpinner(body->getCenterBox(), timeFormat);
+        spinner = new TimeSetFmtSpinner(body->getCenterBox());
+        spinner->setTimeFormat(timeFormat);
         spinner->setMaximumSize(::style::bell_base_layout::w, ::style::bell_base_layout::h);
         spinner->setFont(focusFont, noFocusFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));

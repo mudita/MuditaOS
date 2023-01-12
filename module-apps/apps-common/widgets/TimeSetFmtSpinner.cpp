@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeSetFmtSpinner.hpp"
@@ -11,18 +11,18 @@
 namespace gui
 {
 
-    TimeSetFmtSpinner::TimeSetFmtSpinner(Item *parent, utils::time::Locale::TimeFormat timeFormat) : HBox{parent}
+    TimeSetFmtSpinner::TimeSetFmtSpinner(Item *parent) : HBox{parent}
     {
         using namespace utils;
 
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        timeSetSpinner = new TimeSetSpinner(this, 0, 0, 0, 0);
+        timeSetSpinner = new TimeSetSpinner(nullptr);
         timeSetSpinner->setFont(focusFontName, noFocusFontName);
         timeSetSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        auto textRange = StringSpinner::range{time::Locale::getAM(), time::Locale::getPM()};
+        auto textRange = {time::Locale::getAM(), time::Locale::getPM()};
         fmt            = new StringSpinner(textRange, Boundaries::Continuous);
         updateFmtFont(noFocusFontName);
         fmt->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -30,8 +30,14 @@ namespace gui
         fmt->setEdges(RectangleEdge::None);
         fmt->setVisible(false);
         fmt->setPenFocusWidth(style::time_set_spinner::focus::size);
-        addWidget(fmt);
         fmt->setEdges(RectangleEdge::Bottom);
+
+        addWidget(timeSetSpinner);
+        addWidget(fmt);
+
+        setTimeFormat(timeFormat, false);
+
+        resizeItems();
 
         focusChangedCallback = [&](Item &) {
             if (focus) {
@@ -55,11 +61,15 @@ namespace gui
             }
             return true;
         };
-
-        setTimeFormat(timeFormat);
     }
 
     auto TimeSetFmtSpinner::setTimeFormat(utils::time::Locale::TimeFormat newFormat) noexcept -> void
+    {
+        setTimeFormat(newFormat, true);
+    }
+
+    auto TimeSetFmtSpinner::setTimeFormat(utils::time::Locale::TimeFormat newFormat, bool informContentChanged) noexcept
+        -> void
     {
         using namespace utils;
 
@@ -93,7 +103,10 @@ namespace gui
         }
 
         timeFormat = newFormat;
-        fmt->handleContentChanged();
+
+        if (informContentChanged) {
+            fmt->handleContentChanged();
+        }
     }
 
     auto TimeSetFmtSpinner::setMinute(int value) noexcept -> void

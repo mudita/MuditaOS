@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -35,9 +35,7 @@ namespace gui
             AM,
             PM
         };
-        explicit TimeSetFmtSpinner(
-            Item *parent                               = nullptr,
-            utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H);
+        explicit TimeSetFmtSpinner(Item *parent = nullptr);
 
         /// Switches currently displayed time format
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void;
@@ -68,6 +66,8 @@ namespace gui
             Left,
             Right
         };
+
+        auto setTimeFormat(utils::time::Locale::TimeFormat fmt, bool informContentChanged) noexcept -> void;
 
         std::map<std::string, Margins> fmtMarginsMap = {
             {style::window::font::verybiglight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
