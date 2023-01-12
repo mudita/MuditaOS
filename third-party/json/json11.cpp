@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <limits>
+#include <cinttypes>
 
 namespace json11 {
 
@@ -69,6 +70,22 @@ static void dump(int value, string &out) {
     snprintf(buf, sizeof buf, "%d", value);
     out += buf;
 }
+static void dump(unsigned int value, string &out) {
+    char buf[32];
+    snprintf(buf, sizeof buf, "%u", value);
+    out += buf;
+}
+static void dump(intmax_t value, string &out) {
+    char buf[32];
+    snprintf(buf, sizeof buf, "%" PRIiMAX, value);
+    out += buf;
+}
+static void dump(uintmax_t value, string &out) {
+    char buf[32];
+    snprintf(buf, sizeof buf, "%" PRIuMAX, value);
+    out += buf;
+}
+
 
 static void dump(bool value, string &out) {
     out += value ? "true" : "false";
@@ -187,6 +204,30 @@ class JsonInt final : public Value<Json::NUMBER, int> {
 public:
     explicit JsonInt(int value) : Value(value) {}
 };
+class JsonUnsignedInt final : public Value<Json::NUMBER, unsigned int> {
+    double number_value() const override { return m_value; }
+    unsigned int unsigned_int_value() const override { return m_value; }
+    bool equals(const JsonValue * other) const override { return m_value == other->number_value(); }
+    bool less(const JsonValue * other)   const override { return m_value <  other->number_value(); }
+  public:
+    explicit JsonUnsignedInt(unsigned int value) : Value(value) {}
+};
+class JsonIntmax_t final : public Value<Json::NUMBER, intmax_t> {
+    double number_value() const override { return m_value; }
+    intmax_t intmax_t_value() const override { return m_value; }
+    bool equals(const JsonValue * other) const override { return m_value == other->number_value(); }
+    bool less(const JsonValue * other)   const override { return m_value <  other->number_value(); }
+  public:
+    explicit JsonIntmax_t(intmax_t value) : Value(value) {}
+};
+class JsonUintmax_t final : public Value<Json::NUMBER, uintmax_t> {
+    double number_value() const override { return m_value; }
+    uintmax_t uintmax_t_value() const override { return m_value; }
+    bool equals(const JsonValue * other) const override { return m_value == other->number_value(); }
+    bool less(const JsonValue * other)   const override { return m_value <  other->number_value(); }
+  public:
+    explicit JsonUintmax_t(uintmax_t value) : Value(value) {}
+};
 
 class JsonBoolean final : public Value<Json::BOOL, bool> {
     bool bool_value() const override { return m_value; }
@@ -254,6 +295,9 @@ Json::Json() noexcept                  : m_ptr(statics().null) {}
 Json::Json(std::nullptr_t) noexcept    : m_ptr(statics().null) {}
 Json::Json(double value)               : m_ptr(make_shared<JsonDouble>(value)) {}
 Json::Json(int value)                  : m_ptr(make_shared<JsonInt>(value)) {}
+Json::Json(unsigned int value)         : m_ptr(make_shared<JsonUnsignedInt>(value)) {}
+Json::Json(intmax_t value)             : m_ptr(make_shared<JsonIntmax_t>(value)) {}
+Json::Json(uintmax_t value)            : m_ptr(make_shared<JsonUintmax_t>(value)) {}
 Json::Json(bool value)                 : m_ptr(value ? statics().t : statics().f) {}
 Json::Json(const string &value)        : m_ptr(make_shared<JsonString>(value)) {}
 Json::Json(string &&value)             : m_ptr(make_shared<JsonString>(move(value))) {}
@@ -279,6 +323,9 @@ const Json & Json::operator[] (const string &key) const { return (*m_ptr)[key]; 
 
 double                    JsonValue::number_value()              const { return 0; }
 int                       JsonValue::int_value()                 const { return 0; }
+unsigned int              JsonValue::unsigned_int_value()        const { return 0; }
+intmax_t                  JsonValue::intmax_t_value()            const { return 0; }
+uintmax_t                 JsonValue::uintmax_t_value()           const { return 0; }
 bool                      JsonValue::bool_value()                const { return false; }
 const string &            JsonValue::string_value()              const { return statics().empty_string; }
 const vector<Json> &      JsonValue::array_items()               const { return statics().empty_vector; }
