@@ -18,19 +18,23 @@
 
 namespace
 {
-    constexpr inline auto suffix = "_crashdump.hex";
+    constexpr inline auto suffix     = "_crashdump.hex";
+    constexpr inline auto file_index = ".1";
 
     // Crashdump filename pattern:
-    // [serial-number]_[timestamp-in-seconds]_crashdump.hex
+    // [serial-number]_[timestamp-in-seconds]_crashdump.hex.[index]
+    // [index] was added to ensure resistance to the device date retraction
 
     inline std::string generate_crashdump_filename()
     {
         const auto crash_time =
             std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch())
                 .count();
-        auto filename = std::string("/") + crashdump::getSerialNumber() + "_" + std::to_string(crash_time) + suffix;
+        auto filename =
+            std::string("/") + crashdump::getSerialNumber() + "_" + std::to_string(crash_time) + suffix + file_index;
         return filename;
     }
+
 } // namespace
 
 namespace crashdump
@@ -41,6 +45,10 @@ namespace crashdump
         const auto crashDumpFilePath = purefs::dir::getCrashDumpsPath().string() + generate_crashdump_filename();
 
         LOG_INFO("Crash dump %s preparing ...", crashDumpFilePath.c_str());
+        if (!rotator.rotateFiles(purefs::dir::getCrashDumpsPath())) {
+            LOG_FATAL("Failed to rotate crash dumps errno: %i", errno);
+            _exit_backtrace(-1, false);
+        }
         file = std::fopen(crashDumpFilePath.c_str(), "w");
         if (!file) {
             LOG_FATAL("Failed to open crash dump file errno %i", errno);
@@ -54,23 +62,6 @@ namespace crashdump
         fflush(file);
         fsync(fileno(file));
         std::fclose(file);
-    }
-
-    void CrashDumpWriterVFS::deleteOldDump()
-    {
-        std::set<std::filesystem::path> crashdumps{};
-        for (const auto &entry : std::filesystem::directory_iterator(purefs::dir::getCrashDumpsPath())) {
-            std::cout << entry.path() << std::endl;
-            crashdumps.insert(entry.path());
-        }
-
-        if (crashdumps.size() > maxFilesCount) {
-            auto crashdump_to_delete = crashdumps.begin();
-            LOG_INFO("Deleting %s ...", crashdump_to_delete->c_str());
-            if (not std::filesystem::remove(crashdump_to_delete->c_str())) {
-                LOG_WARN("File: %s was not deleted.", crashdump_to_delete->c_str());
-            }
-        }
     }
 
     void CrashDumpWriterVFS::writeBytes(const uint8_t *buff, std::size_t size)

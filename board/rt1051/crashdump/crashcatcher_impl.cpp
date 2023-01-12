@@ -60,7 +60,6 @@ void CrashCatcher_DumpMemory(const void *pvMemory, CrashCatcherElementSizes elem
 CrashCatcherReturnCodes CrashCatcher_DumpEnd(void)
 {
     cwrite.saveDump();
-    cwrite.deleteOldDump();
     _exit_backtrace(-1, false);
     return CRASH_CATCHER_EXIT;
 }
