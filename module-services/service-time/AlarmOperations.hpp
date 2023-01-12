@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -64,6 +64,8 @@ namespace alarms
         virtual void addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange)                             = 0;
         virtual void toggleAll(bool toggle, OnToggleAll callback)                                            = 0;
         virtual void getSnoozedAlarms(OnGetSnoozedAlarms callback)                                           = 0;
+        virtual void handleCriticalBatteryLevel()                                                            = 0;
+        virtual void handleNormalBatteryLevel()                                                              = 0;
     };
 
     class IAlarmOperationsFactory
@@ -108,6 +110,8 @@ namespace alarms
         void addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange callback) override;
         void toggleAll(bool toggle, OnToggleAll callback) override;
         void getSnoozedAlarms(OnGetSnoozedAlarms callback) override;
+        void handleCriticalBatteryLevel() override;
+        void handleNormalBatteryLevel() override;
 
       protected:
         std::unique_ptr<AbstractAlarmEventsRepository> alarmEventsRepo;
@@ -124,6 +128,7 @@ namespace alarms
                                       bool newStateOn);
 
       private:
+        bool isCriticalBatteryLevel{false};
         GetCurrentTime getCurrentTimeCallback;
         OnSnoozedAlarmsCountChange onSnoozedAlarmsCountChangeCallback = nullptr;
         OnActiveAlarmCountChange onActiveAlarmCountChangeCallback     = nullptr;
@@ -144,6 +149,8 @@ namespace alarms
         void processOngoingEvents();
         void processNextEventsQueue(const TimePoint now);
         void processSnoozedEventsQueue(const TimePoint now);
+        void stopAllRingingAlarms();
+        void triggerAlarm();
         virtual void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType);
 
         TimePoint getCurrentTime();

@@ -30,6 +30,7 @@ target_sources(evtmgr
         include/evtmgr/api/TemperatureApi.hpp
         include/evtmgr/backlight-handler/BacklightHandler.hpp
         include/evtmgr/user-activity-handler/UserActivityHandler.hpp
+        include/evtmgr/battery/Thresholds.hpp
 )
 
 target_include_directories(evtmgr
