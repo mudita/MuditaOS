@@ -158,6 +158,7 @@ namespace alarms
         AlarmOperationsCommon::OnActiveAlarmCountChange callback) -> void
     {
         alarmOperations->addActiveAlarmCountChangeCallback(callback);
+        alarmOperations->updateEventsCache(TimePointNow());
     }
 
     auto AlarmMessageHandler::handleGetSnoozedAlarms(GetSnoozedAlarmsRequestMessage *request)
