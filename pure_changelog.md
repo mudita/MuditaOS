@@ -259,6 +259,7 @@
 * Fixed problem with Music Player application crashing when trying to play files with unknown formats.
 * Fixed problem with resuming music playback after connecting a headset.
 * Fixed problem of battery discharging of phone without SIM card.
+* Fixed inactive alarms after timezone change and reboot.
 
 ## [1.1.6 2022-01-20]
 
