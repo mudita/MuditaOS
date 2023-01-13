@@ -64,6 +64,7 @@ target_link_libraries(application-bell-relaxation
         bell::app-main
         bell::audio
         bell::alarms
+        bell::paths
         Microsoft.GSL::GSL
 
     PUBLIC

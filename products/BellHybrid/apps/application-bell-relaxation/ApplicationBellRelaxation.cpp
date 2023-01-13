@@ -19,7 +19,7 @@
 #include "windows/RelaxationEndedWindow.hpp"
 #include "windows/RelaxationLowBatteryWindow.hpp"
 #include "widgets/RelaxationPlayer.hpp"
-#include <AlarmSoundPaths.hpp>
+#include <Paths.hpp>
 #include <apps-common/messages/AppMessage.hpp>
 #include <apps-common/models/SongsRepository.hpp>
 #include <common/models/TimeModel.hpp>
@@ -60,9 +60,10 @@ namespace app
 
     void ApplicationBellRelaxation::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             auto tagsFetcher      = std::make_unique<app::music::ServiceAudioTagsFetcher>(app);
-            const auto paths      = std::vector<std::string>{alarms::paths::getBackgroundSoundsDir()};
+            const auto paths      = std::vector<std::string>{paths::audio::proprietary() / paths::audio::relaxation(),
+                                                        paths::audio::userApp() / paths::audio::relaxation()};
             auto soundsRepository = std::make_unique<app::music::SongsRepository>(app, std::move(tagsFetcher), paths);
             auto presenter = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(soundsRepository));
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
