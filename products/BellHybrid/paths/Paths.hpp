@@ -9,7 +9,7 @@ namespace paths
 {
     namespace audio
     {
-        std::filesystem::path user() noexcept;
+        std::filesystem::path userApp() noexcept;
         std::filesystem::path proprietary() noexcept;
         std::filesystem::path alarm() noexcept;
         std::filesystem::path preWakeup() noexcept;
