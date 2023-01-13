@@ -4,7 +4,6 @@ add_library(bell::alarms ALIAS alarms)
 target_sources(alarms
     PRIVATE
         BellAlarmHandler.cpp
-        src/AlarmSoundPaths.cpp
         src/actions/PlayAudioActions.cpp
         src/actions/NotifyGUIAction.cpp
         src/actions/NotifyGUIBedtimeReminderAction.cpp

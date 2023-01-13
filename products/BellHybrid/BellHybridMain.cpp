@@ -54,7 +54,7 @@ int main()
 {
     constexpr auto ApplicationName = "BellHybrid";
 
-    std::vector<std::string> fileIndexerAudioPaths = {paths::audio::proprietary(), paths::audio::user()};
+    std::vector<std::string> fileIndexerAudioPaths = {paths::audio::proprietary(), {purefs::dir::getUserMediaPath()}};
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
@@ -82,7 +82,11 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>(std::move(fileIndexerAudioPaths)));
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
     systemServices.emplace_back(sys::CreatorFor<service::Audio>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>(purefs::dir::getUserMediaPath() / "app/relaxation"));
+    /// Due to the problem with USB MTP not supporting hierarchical folders structure, we cannot use
+    /// 'purefs::dir::getUserMediaPath()'. Instead, we can only pass a specific app folder which is very limiting.
+    /// Hopefully, support for hierarchical folders will be added in the future and such a case won't be relevant
+    /// anymore.
+    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>(paths::audio::userApp() / paths::audio::relaxation()));
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>(service::eink::ExitAction::None));
     systemServices.emplace_back(

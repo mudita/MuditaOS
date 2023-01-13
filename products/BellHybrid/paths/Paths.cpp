@@ -4,7 +4,7 @@
 #include "Paths.hpp"
 #include <purefs/filesystem_paths.hpp>
 
-std::filesystem::path paths::audio::user() noexcept
+std::filesystem::path paths::audio::userApp() noexcept
 {
     return purefs::dir::getUserMediaPath() / "app";
 }
