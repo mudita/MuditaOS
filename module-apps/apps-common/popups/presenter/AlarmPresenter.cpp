@@ -196,7 +196,7 @@ namespace app::popup
     AlarmPopupPresenter::AlarmPopupPresenter(ApplicationCommon *app) : AlarmPopupContract::Presenter(app)
     {
         timerHandle = sys::TimerFactory::createSingleShotTimer(
-            app, "AlarmTimer", ACTIVE_ALARM_TIMEOUT, [this](sys::Timer &) { snoozeHit(); });
+            app, "AlarmTimer", ACTIVE_ALARM_TIMEOUT, [this](sys::Timer &) { stopAlarm(); });
         timerHandle.start();
     }
 } // namespace app::popup
