@@ -86,15 +86,29 @@ namespace app::music
 
     std::size_t SongsRepository::getCachedFileIndex(const std::string &filePath) const
     {
-        auto it = std::find_if(musicFilesModelCache.records.begin(),
-                               musicFilesModelCache.records.end(),
-                               [filePath](const auto &musicFile) { return musicFile.fileInfo.path == filePath; });
+        const auto it = std::find_if(musicFilesModelCache.records.begin(),
+                                     musicFilesModelCache.records.end(),
+                                     [filePath](const auto &musicFile) { return musicFile.fileInfo.path == filePath; });
 
         if (it != musicFilesModelCache.records.end()) {
             return std::distance(musicFilesModelCache.records.begin(), it);
         }
 
         return std::numeric_limits<size_t>::max();
+    }
+
+    std::optional<db::multimedia_files::MultimediaFilesRecord> SongsRepository::getCachedViewEntryByFilePath(
+        const std::string &filePath) const
+    {
+        const auto it = std::find_if(musicFilesViewCache.records.begin(),
+                                     musicFilesViewCache.records.end(),
+                                     [filePath](const auto &musicFile) { return musicFile.fileInfo.path == filePath; });
+
+        if (it != musicFilesViewCache.records.end()) {
+            return *it;
+        }
+
+        return std::nullopt;
     }
 
     std::string SongsRepository::getNextFilePath(const std::string &filePath) const
@@ -249,11 +263,10 @@ namespace app::music
     std::optional<db::multimedia_files::MultimediaFilesRecord> SongsRepository::getRecord(
         const std::string &filePath) const
     {
-        const auto index = getCachedFileIndex(filePath);
-        if (index == std::numeric_limits<size_t>::max()) {
-            return std::nullopt;
+        if (const auto index = getCachedFileIndex(filePath); index != std::numeric_limits<size_t>::max()) {
+            return musicFilesModelCache.records[index];
         }
-        return musicFilesModelCache.records[index];
+        return getCachedViewEntryByFilePath(filePath);
     }
 
 } // namespace app::music

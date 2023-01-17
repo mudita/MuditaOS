@@ -31,6 +31,7 @@
 * Fixed inactive alarms after timezone change and reboot.
 * Fixed no sound when Bluetooth audio device connected/disconnected during call
 * Fixed full filesystem path displayed in music player for invalid files instead of just filename
+* Fixed problem with track info not being displayed correctly
 
 ### Added
 

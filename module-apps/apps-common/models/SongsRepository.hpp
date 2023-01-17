@@ -98,6 +98,10 @@ namespace app::music
         std::size_t getCachedFileIndex(const std::string &filePath) const;
         std::uint32_t calculateOffset();
 
+        /// Try to fetch list view's entry by the file name
+        std::optional<db::multimedia_files::MultimediaFilesRecord> getCachedViewEntryByFilePath(
+            const std::string &filePath) const;
+
         /// overwrite the musicFiles view cache with new data from the given index
         void updateMusicFilesList(std::uint32_t offset,
                                   std::uint32_t limit,
