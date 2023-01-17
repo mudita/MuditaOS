@@ -30,6 +30,7 @@
 * Fixed crash when syncing with Mudita Center
 * Fixed inactive alarms after timezone change and reboot.
 * Fixed no sound when Bluetooth audio device connected/disconnected during call
+* Fixed full filesystem path displayed in music player for invalid files instead of just filename
 
 ### Added
 
