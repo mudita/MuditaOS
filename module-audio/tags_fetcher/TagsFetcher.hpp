@@ -1,5 +1,5 @@
 
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,12 +7,12 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <utility>
 
 namespace tags::fetcher
 {
     struct Tags
     {
-
         /* Total audio duration in seconds */
         uint32_t total_duration_s = 0;
         /* Audio duration - hours part */
@@ -55,12 +55,12 @@ namespace tags::fetcher
              std::string comment,
              uint32_t track)
             : total_duration_s{total_duration_s}, duration_hour{duration_hour}, duration_min{duration_min},
-              duration_sec{duration_sec}, sample_rate{sample_rate},
-              num_channel{num_channel}, bitrate{bitrate}, artist{artist}, genre{genre}, album{album}, year{year},
-              filePath{filePath}, title{title}, comment{comment}, track{track}
+              duration_sec{duration_sec}, sample_rate{sample_rate}, num_channel{num_channel}, bitrate{bitrate},
+              artist{std::move(artist)}, genre{std::move(genre)}, album{std::move(album)}, year{year},
+              filePath{std::move(filePath)}, title{std::move(title)}, comment{std::move(comment)}, track{track}
         {}
 
-        explicit Tags(std::string filePath) : filePath{filePath}, title{filePath}
+        Tags(std::string filePath, std::string title) : filePath{std::move(filePath)}, title{std::move(title)}
         {}
     };
 
