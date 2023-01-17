@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051LPMCommon.hpp"
@@ -193,10 +193,14 @@ namespace bsp
         while ((PMU->REG_1P1 & PMU_REG_1P1_OK_VDD1P1_MASK) == 0) {}
         // Turn off weak 1P1
         PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
+
+        NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
+        EnableIRQ(ANATOP_EVENT0_IRQn);
     }
 
     void RT1051LPMCommon::SwitchToLowPowerModeLDO()
     {
+        DisableIRQ(ANATOP_EVENT0_IRQn);
         // Enable weak 2P5 and turn off regular 2P5
         PMU->REG_2P5 |= PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
         PMU->REG_2P5 &= ~PMU_REG_2P5_ENABLE_LINREG_MASK;

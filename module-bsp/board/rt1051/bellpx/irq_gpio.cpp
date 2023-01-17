@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "board/irq_gpio.hpp"
@@ -10,6 +10,7 @@
 #include "fsl_common.h"
 #include <fsl_qtmr.h>
 #include <fsl_gpc.h>
+#include <fsl_pmu.h>
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/key_input/KeyInput.hpp>
@@ -31,6 +32,7 @@ namespace bsp
         DisableIRQ(GPIO5_Combined_0_15_IRQn);
         DisableIRQ(TMR3_IRQn);
         DisableIRQ(RTWDOG_IRQn);
+        DisableIRQ(ANATOP_EVENT0_IRQn);
 
         GPIO_PortDisableInterrupts(GPIO1, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO2, UINT32_MAX);
@@ -71,6 +73,21 @@ namespace bsp
 
         NVIC_ClearPendingIRQ(RTWDOG_IRQn);
         EnableIRQ(RTWDOG_IRQn);
+
+        // Config for PMU
+        PMU_2P5EnableOutput(PMU, true);
+        PMU_2P5SetRegulatorOutputVoltage(PMU, 0x19); // 0x19 = 2.725V, 0x1b = 2.775V
+        PMU_1P1EnableOutput(PMU, true);
+        PMU_1P1SetRegulatorOutputVoltage(PMU, 0x19); // 0x10 = 1.225V, 0x1b = 1.275V
+
+        PMU_1P1EnableBrownout(PMU, true);
+        PMU_1P1SetBrownoutOffsetVoltage(PMU, 0x5); // 5*25mv
+
+        PMU_2P5nableBrownout(PMU, true);
+        PMU_2P5SetBrownoutOffsetVoltage(PMU, 0x5); // 5*25mv
+
+        NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
+        EnableIRQ(ANATOP_EVENT0_IRQn);
     }
 
     extern "C"
@@ -193,6 +210,21 @@ namespace bsp
             // Asserting WDOG_B pin to provide power reset of whole board
             // Way to do it is via WDOG1 built-in assertion, RTWDOG does not provide it
             WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
+        }
+
+        void ANATOP_EVENT0_IRQHandler(void)
+        {
+            const uint32_t status = PMU_GetStatusFlags(PMU);
+
+            if (status & kPMU_1P1BrownoutOnOutput) {
+                WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
+            }
+
+            if (status & kPMU_2P5BrownoutOnOutput) {
+                WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
+            }
+
+            NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
         }
     }
 } // namespace bsp
