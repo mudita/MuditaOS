@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -70,9 +70,6 @@ namespace audio
         }
         virtual std::unique_ptr<tags::fetcher::Tags> fetchTags();
 
-        void convertmono2stereo(std::int16_t *pcm, std::uint32_t samplecount);
-
-        static constexpr auto workerBufferSize        = 1024 * 8;
         static constexpr Endpoint::Traits decoderCaps = {.usesDMA = false};
 
         std::uint32_t sampleRate = 0;
@@ -84,8 +81,6 @@ namespace audio
         std::uint32_t fileSize = 0;
         std::string filePath;
 
-        // Worker buffer used for converting mono stream to stereo
-        std::unique_ptr<std::int16_t[]> workerBuffer;
         std::unique_ptr<tags::fetcher::Tags> tags;
         bool isInitialized = false;
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Service/Worker.hpp>
@@ -136,7 +136,7 @@ namespace sys
         auto setSize = SERVICE_QUEUE_LENGTH + CONTROL_QUEUE_LENGTH;
 
         // iterate over all entries in the list of queues and summarize queue sizes
-        for (auto wqi : queuesList) {
+        for (const auto &wqi : queuesList) {
             setSize += wqi.length;
         }
 
@@ -154,7 +154,7 @@ namespace sys
         controlQueueIndex = addQueue(getControlQueueName(), CONTROL_QUEUE_LENGTH, sizeof(std::uint8_t));
 
         // create and add all queues provided from service
-        for (auto wqi : queuesList) {
+        for (const auto &wqi : queuesList) {
             addQueue(wqi.name, wqi.length, wqi.elementSize);
         };
 
