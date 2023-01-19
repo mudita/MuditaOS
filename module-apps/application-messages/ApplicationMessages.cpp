@@ -25,6 +25,7 @@
 #include <module-db/queries/messages/threads/QueryThreadGetByID.hpp>
 #include <module-db/queries/messages/threads/QueryThreadRemove.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByNumberID.hpp>
+#include <module-db/queries/notifications/QueryNotificationsDecrement.hpp>
 #include <OptionsWindow.hpp>
 #include <OptionWindow.hpp>
 #include <service-cellular/CellularMessage.hpp>
@@ -221,9 +222,15 @@ namespace app
 
         auto query = std::make_unique<ThreadRemove>(record.ID);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
-        task->setCallback([this, threadId = record.ID](auto response) {
+        task->setCallback([this, threadId = record.ID, unreadMsgCount = record.unreadMsgCount](auto response) {
             const auto result = dynamic_cast<ThreadRemoveResult *>(response);
             if ((result != nullptr) && result->success()) {
+                if (unreadMsgCount) {
+                    DBServiceAPI::GetQuery(this,
+                                           db::Interface::Name::Notifications,
+                                           std::make_unique<db::query::notifications::Decrement>(
+                                               NotificationsRecord::Key::Sms, unreadMsgCount));
+                }
                 switchWindow(gui::name::window::main_window);
                 return true;
             }
