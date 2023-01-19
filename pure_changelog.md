@@ -28,12 +28,13 @@
 * Fixed inability to unblock SIM card when previously ejected during slot switching
 * Fixed French translations for Ulock Screen
 * Fixed crash when syncing with Mudita Center
-* Fixed inactive alarms after timezone change and reboot.
+* Fixed inactive alarms after timezone change and reboot
 * Fixed no sound when Bluetooth audio device connected/disconnected during call
 * Fixed full filesystem path displayed in music player for invalid files instead of just filename
 * Fixed problem with track info not being displayed correctly
 * Fixed alarm rings on the low battery screen
 * Fixed crash when trying to play 96kHz FLAC with USB cable connected
+* Fixed the notification of unread messages are not deleted with the thread
 
 ### Added
 
