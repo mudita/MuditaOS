@@ -38,6 +38,7 @@ pipeline {
             }
             steps {
                 script{
+                    common.checkIfBranchIsRebased("false")
                     buildSteps.performChecks("false");
                 }
             }
