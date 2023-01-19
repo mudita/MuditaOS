@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
@@ -49,11 +49,9 @@
 #define debug_input_events(...)
 #endif
 
-EventManagerCommon::EventManagerCommon(LogDumpFunction logDumpFunction,
-                                       EventManagerParams params,
-                                       const std::string &name)
+EventManagerCommon::EventManagerCommon(LogDumpFunction logDumpFunction, const std::string &name)
     : sys::Service(name, "", stackDepth), logDumpFunction(std::move(logDumpFunction)),
-      settings(std::make_shared<settings::Settings>()), eventManagerParams(params)
+      settings(std::make_shared<settings::Settings>())
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -182,7 +180,7 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
     initProductEvents();
 
     EventWorker = createEventWorker();
-    EventWorker->init(settings, eventManagerParams);
+    EventWorker->init(settings);
     EventWorker->run();
 
     cpuSentinel                  = std::make_shared<sys::TimedCpuSentinel>(service::name::evt_manager, this);

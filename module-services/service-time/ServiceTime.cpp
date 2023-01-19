@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTime.hpp"
@@ -184,11 +184,6 @@ namespace stm
         connect(typeid(alarms::GetSnoozedAlarmsRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
             auto message = static_cast<alarms::GetSnoozedAlarmsRequestMessage *>(request);
             return alarmMessageHandler->handleGetSnoozedAlarms(message);
-        });
-        connect(typeid(sevm::BatteryStateChangeMessage), [&](sys::Message *request) -> sys::MessagePointer {
-            auto message = static_cast<sevm::BatteryStateChangeMessage *>(request);
-            alarmMessageHandler->handleBatteryStateChange(message);
-            return std::make_shared<sys::ResponseMessage>();
         });
     }
 

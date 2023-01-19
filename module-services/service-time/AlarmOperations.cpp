@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmOperations.hpp"
@@ -345,9 +345,9 @@ namespace alarms
     auto AlarmOperationsCommon::processNextEventsQueue(const TimePoint now) -> void
     {
         if (nextSingleEvents.front()->startDate <= now) {
-            if (!isCriticalBatteryLevel) {
-                triggerAlarm();
-            }
+            ongoingSingleEvents.insert(ongoingSingleEvents.end(),
+                                       std::make_move_iterator(nextSingleEvents.begin()),
+                                       std::make_move_iterator(nextSingleEvents.end()));
             nextSingleEvents.clear();
             updateEventsCache(now);
         }
@@ -371,24 +371,6 @@ namespace alarms
         snoozedSingleEvents.clear();
         handleSnoozedAlarmsCountChange();
         handleActiveAlarmsCountChange();
-    }
-
-    auto AlarmOperationsCommon::stopAllRingingAlarms() -> void
-    {
-        if (!ongoingSingleEvents.empty()) {
-            for (auto &event : ongoingSingleEvents) {
-                switchAlarmExecution(*event, false);
-            }
-            ongoingSingleEvents.clear();
-            handleActiveAlarmsCountChange();
-        }
-    }
-
-    void AlarmOperationsCommon::triggerAlarm()
-    {
-        ongoingSingleEvents.insert(ongoingSingleEvents.end(),
-                                   std::make_move_iterator(nextSingleEvents.begin()),
-                                   std::make_move_iterator(nextSingleEvents.end()));
     }
 
     void AlarmOperationsCommon::toggleAll(bool toggle, OnToggleAll callback)
@@ -449,18 +431,6 @@ namespace alarms
             std::sort(snoozedEvents.begin(), snoozedEvents.end(), isEarlier);
         }
         callback(std::move(snoozedEvents));
-    }
-
-    void AlarmOperationsCommon::handleCriticalBatteryLevel()
-    {
-        isCriticalBatteryLevel = true;
-        stopAllRingingAlarms();
-        stopAllSnoozedAlarms();
-    }
-
-    void AlarmOperationsCommon::handleNormalBatteryLevel()
-    {
-        isCriticalBatteryLevel = false;
     }
 
     auto findSingleEventById(std::vector<std::unique_ptr<SingleEventRecord>> &events, const std::uint32_t id)

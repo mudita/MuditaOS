@@ -1,29 +1,27 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Service/Message.hpp"
-#include <battery/BatteryState.hpp>
+
+#include <module-bsp/bsp/torch/torch.hpp>
 
 namespace sevm
 {
     class BatteryStatusChangeMessage : public sys::DataMessage
     {};
 
-    class BatteryStateChangeMessage : public sys::DataMessage
+    class BatterySetCriticalLevel : public sys::DataMessage
     {
       public:
-        explicit BatteryStateChangeMessage(BatteryState::State state) : state{state} {};
-
-        [[nodiscard]] BatteryState::State getState() const
-        {
-            return state;
-        }
-
-      private:
-        BatteryState::State state{BatteryState::State::Normal};
+        BatterySetCriticalLevel(std::uint8_t level) : criticalLevel(level)
+        {}
+        const unsigned int criticalLevel = 0;
     };
+
+    class BatteryStateChangeMessage : public sys::DataMessage
+    {};
 
     class BatteryBrownoutMessage : public sys::DataMessage
     {};

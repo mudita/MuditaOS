@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryState.hpp"
@@ -128,21 +128,22 @@ class BatteryState::Pimpl
     friend BatteryState;
 
   public:
-    Pimpl(NotifyStateChangedCallback notifyCallback, Thresholds thresholds)
-        : thresholds(thresholds), notifyCallback{std::move(notifyCallback)}
+    explicit Pimpl(NotifyStateChangedCallback notifyCallback) : notifyCallback{std::move(notifyCallback)}
     {}
 
   private:
-    const Thresholds thresholds;
     NotifyStateChangedCallback notifyCallback;
     sml::sm<StateMachine, NotifyStateChangedCallback> sm{notifyCallback};
+
+    static constexpr auto criticalThreshold = 10; // %
+    static constexpr auto shutdownThreshold = 1;  // %
 };
 
 void BatteryState::check(const ChargingState state, const float soc)
 {
-    pimpl->sm.process_event(events::Check{soc, state, pimpl->thresholds.critical, pimpl->thresholds.shutdown});
+    pimpl->sm.process_event(events::Check{soc, state, Pimpl::criticalThreshold, Pimpl::shutdownThreshold});
 }
 
-BatteryState::BatteryState(sys::Service *service, NotifyStateChangedCallback notifyCallback, Thresholds thresholds)
-    : pimpl{std::make_shared<Pimpl>(notifyCallback, thresholds)}
+BatteryState::BatteryState(sys::Service *service, NotifyStateChangedCallback notifyCallback)
+    : pimpl{std::make_shared<Pimpl>(notifyCallback)}
 {}

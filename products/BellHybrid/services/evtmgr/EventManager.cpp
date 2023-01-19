@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerEvent.hpp"
@@ -14,7 +14,6 @@
 #include <appmgr/messages/PowerOffPopupRequestParams.hpp>
 #include <appmgr/messages/RebootPopupRequestParams.hpp>
 #include <evtmgr/EventManager.hpp>
-#include <evtmgr/battery/Thresholds.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <hal/temperature_source/TemperatureSource.hpp>
 #include <system/Constants.hpp>
@@ -39,10 +38,8 @@ namespace
 }
 
 EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &name)
-    : EventManagerCommon(logDumpFunction,
-                         {.battery{.critical = constants::criticalThreshold, .shutdown = constants::shutdownThreshold}},
-                         name),
-      backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
+    : EventManagerCommon(logDumpFunction, name), backlightHandler(settings, this),
+      userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
 {
     buildKeySequences();
 

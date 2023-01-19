@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <service-evtmgr/EventManagerCommon.hpp>
-#include <evtmgr/battery/Thresholds.hpp>
+
 #include "BacklightHandler.hpp"
 #include "UserActivityHandler.hpp"
 #include <bsp/vibrator/vibrator.hpp>
@@ -15,12 +15,8 @@ class EventManager : public EventManagerCommon
   public:
     explicit EventManager(LogDumpFunction logDumpFunction = nullptr,
                           const std::string &name         = service::name::evt_manager)
-        : EventManagerCommon(
-              logDumpFunction,
-              {.battery{.critical = constants::criticalThreshold, .shutdown = constants::shutdownThreshold}},
-              name),
-          vibrator(std::make_unique<vibra_handle::Vibra>(this)), backlightHandler(settings, this),
-          userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
+        : EventManagerCommon(logDumpFunction, name), vibrator(std::make_unique<vibra_handle::Vibra>(this)),
+          backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
     {}
 
   private:

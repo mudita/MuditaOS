@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryController.hpp"
@@ -75,19 +75,14 @@ namespace
     }
 } // namespace
 
-BatteryController::BatteryController(sys::Service *service,
-                                     xQueueHandle notificationChannel,
-                                     BatteryState::Thresholds thresholds)
+BatteryController::BatteryController(sys::Service *service, xQueueHandle notificationChannel)
     : service{service}, charger{hal::battery::AbstractBatteryCharger::Factory::create(notificationChannel)},
       brownoutDetector(service, *charger),
-      batteryState{service,
-                   [this](const auto state) {
+      batteryState{service, [this](const auto state) {
                        Store::Battery::modify().levelState = transformBatteryState(state);
-                       auto stateChangeMessage             = std::make_shared<sevm::BatteryStateChangeMessage>(state);
-                       this->service->bus.sendMulticast(std::move(stateChangeMessage),
-                                                        sys::BusChannel::ServiceEvtmgrNotifications);
-                   },
-                   thresholds}
+                       auto stateChangeMessage             = std::make_shared<sevm::BatteryStateChangeMessage>();
+                       this->service->bus.sendUnicast(std::move(stateChangeMessage), service::name::system_manager);
+                   }}
 {
     updateSoC();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());

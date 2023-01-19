@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmMessageHandler.hpp"
@@ -170,20 +170,6 @@ namespace alarms
             request, [&](GetSnoozedAlarmsRequestMessage *request, IAlarmOperations::OnGetSnoozedAlarms callback) {
                 alarmOperations->getSnoozedAlarms(callback);
             });
-    }
-
-    auto AlarmMessageHandler::handleBatteryStateChange(sevm::BatteryStateChangeMessage *request) -> void
-    {
-        switch (request->getState()) {
-        case BatteryState::State::Normal:
-            alarmOperations->handleNormalBatteryLevel();
-            break;
-        case BatteryState::State::Shutdown:
-        case BatteryState::State::CriticalCharging:
-        case BatteryState::State::CriticalNotCharging:
-            alarmOperations->handleCriticalBatteryLevel();
-            break;
-        }
     }
 
     template <class RequestType, class ResponseType, class CallbackParamType>

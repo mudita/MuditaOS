@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Constants.hpp"
-#include "EventManagerParams.hpp"
 
 #include <hal/key_input/RawKey.hpp>
 #include <MessageType.hpp>
@@ -29,9 +28,7 @@ class EventManagerCommon : public sys::Service
   public:
     using LogDumpFunction = std::function<int()>;
 
-    EventManagerCommon(LogDumpFunction logDumpFunction,
-                       EventManagerParams params,
-                       const std::string &name = service::name::evt_manager);
+    explicit EventManagerCommon(LogDumpFunction logDumpFunction, const std::string &name = service::name::evt_manager);
     ~EventManagerCommon() override;
 
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -82,5 +79,4 @@ class EventManagerCommon : public sys::Service
     uint32_t alarmTimestamp;
     // ID of alarm waiting to trigger
     uint32_t alarmID;
-    const EventManagerParams eventManagerParams;
 };
