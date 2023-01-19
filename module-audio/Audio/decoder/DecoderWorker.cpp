@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DecoderWorker.hpp"
@@ -21,10 +21,10 @@ audio::DecoderWorker::~DecoderWorker()
 
 auto audio::DecoderWorker::init(std::list<sys::WorkerQueueInfo> queues) -> bool
 {
-    std::list<sys::WorkerQueueInfo> list{
+    const std::list<sys::WorkerQueueInfo> list{
         {listenerQueueName, StreamQueuedEventsListener::listenerElementSize, listenerQueueCapacity}};
 
-    auto isSuccessful = Worker::init(list);
+    const auto isSuccessful = Worker::init(list);
 
     queueListener = std::make_unique<StreamQueuedEventsListener>(getQueueByName(listenerQueueName));
     if (!queueListener) {

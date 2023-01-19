@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstdio>
@@ -13,8 +13,7 @@
 
 namespace audio
 {
-    Decoder::Decoder(const std::string &path)
-        : filePath(path), workerBuffer(std::make_unique<std::int16_t[]>(workerBufferSize))
+    Decoder::Decoder(const std::string &path) : filePath(path)
     {
         fd = std::fopen(path.c_str(), "r");
         if (fd == nullptr) {
@@ -73,20 +72,6 @@ namespace audio
         }
 
         return dec;
-    }
-
-    void Decoder::convertmono2stereo(int16_t *pcm, uint32_t samplecount)
-    {
-        uint32_t i = 0, j = 0;
-
-        memset(workerBuffer.get(), 0, workerBufferSize * sizeof(int16_t));
-
-        for (; j < samplecount; j++) {
-            workerBuffer[i++] = pcm[j];
-            workerBuffer[i++] = pcm[j];
-        }
-
-        memcpy(pcm, &workerBuffer[0], samplecount * 2 * sizeof(int16_t));
     }
 
     void Decoder::startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback)

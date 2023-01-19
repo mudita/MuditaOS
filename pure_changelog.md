@@ -33,6 +33,7 @@
 * Fixed full filesystem path displayed in music player for invalid files instead of just filename
 * Fixed problem with track info not being displayed correctly
 * Fixed alarm rings on the low battery screen
+* Fixed crash when trying to play 96kHz FLAC with USB cable connected
 
 ### Added
 
