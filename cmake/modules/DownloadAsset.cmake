@@ -18,7 +18,6 @@ function(download_asset_release asset_name_in asset_name_out asset_repo asset_ve
 
     add_custom_target(${asset_name_out}-target DEPENDS ${asset_repo})
 
-#    multicomp_install(PROGRAMS ${CMAKE_BINARY_DIR}/${asset_repo} DESTINATION "./" COMPONENTS Standalone Update)
 endfunction()
 
 function(download_asset_release_json

@@ -28,4 +28,5 @@ function(add_directories)
             COMMENT
             "Adding directories: ${_ASSETS_DIRECTORIES}"
     )
+
 endfunction()

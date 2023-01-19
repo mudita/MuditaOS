@@ -192,7 +192,11 @@ int main()
         sys::CreatorFor<service::gui::ServiceGUI>(gui::Size{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}));
 #endif
 #ifdef ENABLE_SERVICE_DESKTOP
-    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
+    /// Due to the problem with USB MTP not supporting hierarchical folders structure, we cannot use
+    /// 'purefs::dir::getUserMediaPath()'. Instead, we can only pass a specific app folder which is very limiting.
+    /// Hopefully, support for hierarchical folders will be added in the future and such a case won't be relevant
+    /// anymore.
+    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>(purefs::dir::getUserMediaPath() / "app/music_player"));
 #endif
 #if ENABLE_SERVICE_TEST
     systemServices.emplace_back(sys::CreatorFor<service::test::ServiceTest>());
