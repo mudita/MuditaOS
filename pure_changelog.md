@@ -1,18 +1,23 @@
 # MuditaOS changelog - PurePhone
 
 ## Unreleased
+
 ### Added
+
 * Always display network access technology and signal strength on the status bar
 * Added days of the week to the list of SMS, calls and notes
 * Added date formatting of received/sent SMS
 
 ### Changed / Improved
+
 * Improved dialog with network via USSD
 * Added serial number and timestamp to crashdump filename
 * Changed order of starting services, ServiceDesktop moved to the back
 * Shortened duration of phone modes pop-up from 3s to 1s
+* Changed responses in contacts and messages endpoints used to communicate with Center
 
 ### Fixed
+
 * Fixed not marking thread as read when new message arrives in the opened thread
 * Fixed disappearing "confirm" button in PIN entering screen
 * Fixed looping on the SIM card selection screen
@@ -30,7 +35,7 @@
 * Fixed message content being deleted when phone mode changed on new message window
 * Fixed wrong navigation bar state after exit from custom repeat window
 * Fixed OS crash when editing contact by adding country prefix to number
-* Fixed unwanted Mudita Center passcode prompt after long press '#' while dialing 
+* Fixed unwanted Mudita Center passcode prompt after long press '#' while dialing
 * Fixed inability to unblock SIM card when previously ejected during slot switching
 * Fixed French translations for Ulock Screen
 * Fixed crash when syncing with Mudita Center
@@ -47,7 +52,7 @@
 * Fixed broken French translation on 'Configure passcode' screen in Onboarding
 * Fixed time disappearing in SMS thread
 * Fixed scrollbar behavior in call log view
-* Fixed contacts imported from SIM not showing up in Mudita Center 
+* Fixed contacts imported from SIM not showing up in Mudita Center
 * Fixed broken events counter on main screen for more than 99 events
 * Fixed incorrect signal strength displayed in Center
 * Fixed inability to enter text in search field after clicking right arrow
@@ -60,7 +65,7 @@
 * Fixed inability to import contacts from Orange SIM cards
 * Fixed SMS notification behaviour when only one thread is unread
 * Fixed improper asterisk button behavior when adding new contact
-* Fixed for contacts removed and imported from SIM card once again were added to database without names 
+* Fixed for contacts removed and imported from SIM card once again were added to database without names
 * Fixed (removed) redundant leading zero from time representation unless exactly midnight
 * Fixed inability to type characters other than digits in USSD replies
 * Fixed screen ghosting after emoji selection
@@ -72,18 +77,26 @@
 ### Added
 
 #### Messages:
+
 * Added text message support via VoLTE modem.
+
 #### Calls:
+
 * Call support via VoLTE for users in the US
+
 #### Home Screen:
+
 * Added tethering info on status bar.
 
 ### Changed / Improved
+
 #### SIM Cards:
+
 * Change windows flow in SIM settings.
 * Improved support for reinserting the SIM card into the device during SIM setup.
 
 ### Fixed
+
 * Fixed MTP integration.
 * Fixed incorrect total CPU usage in logs.
 * Fixed disappearing button in PIN entering screen.
@@ -94,13 +107,16 @@
 * Fixed access to the phone before going onboarding.
 * Fixed the phone hanging up after receiving an empty SMS message.
 
-
 ## [1.4.0 2022-10-06]
+
 ### Added
+
 #### MMS:
+
 * Added basic MMS handling.
 
 #### Bluetooth:
+
 * Added state refresh when BT automatically turns off.
 
 ### Changed / Improved
@@ -120,6 +136,7 @@
 * Separated system volume from Bluetooth device volume for A2DP.
 
 ### Fixed
+
 * Fixed issue with music not pausing when BT device is disconnected.
 * Fixed music player behaviour when connecting/disconnecting audio devices.
 * Fixed issue with message handling in which characters not supported by Pure appear.
@@ -152,7 +169,6 @@
 * Fixed the order in which contacts are displayed in the list.
 * Fixed incorrect navigation text in onboarding for timezone and date time.
 * Fixed wrong time displayed on password locked screen with 'Quotes' or 'Logo' wallpaper.
-
 
 ## [1.3.0 2022-08-04]
 
@@ -236,6 +252,7 @@
 ## [1.2.1 2022-06-10]
 
 ### Improved
+
 * Improved audio quality
 
 ## [1.2.0 2022-04-01]
@@ -243,23 +260,29 @@
 ### Added
 
 #### Quotes:
+
 * Possibility to set periodically drawn quotes as wallpaper - predefined and custom.
 
 #### Messages:
+
 * Text writing option - "Abc" mode.
 
 #### Contacts:
+
 * Functionality to support the display of long contact names.
 
 #### General:
+
 * Extended time for displaying instructions to unlock the device.
 
 #### Music Player:
+
 * Extended audio files format support.
 
 ### Changed / Improved
 
 #### General:
+
 * Changed the default text input type from ABC mode to Abc mode.
 
 ### Fixed
@@ -301,6 +324,7 @@
 ## [1.1.6 2022-01-20]
 
 ### Changed / Improved
+
 * Changed speaker equalizer settings.
 
 ### Fixed
@@ -339,10 +363,12 @@
 * Fixed problem with contacts disappearing after editing them.
 
 ## [1.0.2 2021-11-08]
+
 ## [1.0.1 2021-11-08]
 
 1.0.2 has the same scope as 1.0.1, we released it due to the minor issue with the version name in 1.0.1.
 
 ### Fixed
+
 * Fixed problem with contacts disappearing after editing them.
 * Fixed problem with MTP on Windows.

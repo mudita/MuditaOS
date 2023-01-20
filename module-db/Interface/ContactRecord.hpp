@@ -32,11 +32,15 @@ struct ContactRecord : public Record
     {
         utils::PhoneNumber::View number;
         ContactNumberType numberType = ContactNumberType::OTHER;
+        std::uint64_t numberId       = 0;
         Number();
-        explicit Number(const utils::PhoneNumber::View &number, ContactNumberType = ContactNumberType::CELL);
+        explicit Number(const utils::PhoneNumber::View &number,
+                        ContactNumberType      = ContactNumberType::CELL,
+                        const std::uint64_t id = 0);
         explicit Number(const std::string &entered,
                         const std::string &e164,
-                        ContactNumberType n_type = ContactNumberType::CELL);
+                        ContactNumberType n_type = ContactNumberType::CELL,
+                        const std::uint64_t id   = 0);
     };
     std::vector<Number> numbers = {};
 
@@ -257,8 +261,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
   private:
     ContactsDB *contactDB = nullptr;
 
-    /// get multiple numbers by split numbers_id
-    auto getNumbers(const std::string &numbers_id) -> std::vector<ContactRecord::Number>;
+    /// get multiple numbers by split numbersId
+    auto getNumbers(const std::string &numbersId) -> std::vector<ContactRecord::Number>;
     auto getByIdCommon(ContactsTableRow &contact) -> ContactRecord;
     auto getContactByNumber(const UTF8 &number) -> const std::unique_ptr<std::vector<ContactRecord>>;
     auto getAllNumbers() -> const std::vector<ContactsNumberTableRow>;
@@ -305,7 +309,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto matchedNumberRefersToTemporary(const ContactNumberHolder &matchedNumber) -> bool;
 
     /**
-     * @brief Changing number table record in place if new number is same as old number but with/without country code
+     * @brief Changing number table record in place if new number is same as old number but with/without country
+     * code
      *
      * @param oldNumberIDs vector of old number IDs in contact_number table which can be changed in place
      *                     only if in  newNumbers  is same number but with/without country code

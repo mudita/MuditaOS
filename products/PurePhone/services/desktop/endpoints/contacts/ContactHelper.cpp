@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/contacts/ContactHelper.hpp>
@@ -32,10 +32,12 @@ namespace sdesktop::endpoints
 
     auto ContactHelper::to_json(const ContactRecord &record) -> json11::Json
     {
-        auto numberArray = json11::Json::array();
+        auto numberArray   = json11::Json::array();
+        auto numberIDArray = json11::Json::array();
 
         for (const auto &number : record.numbers) {
             numberArray.emplace_back(number.number.getEntered().c_str());
+            numberIDArray.emplace_back(std::to_string(number.numberId).c_str());
         }
 
         auto recordEntry = json11::Json::object{{json::contacts::primaryName, record.primaryName.c_str()},
@@ -48,7 +50,8 @@ namespace sdesktop::endpoints
                                                 {json::contacts::isFavourite, record.isOnFavourites()},
                                                 {json::contacts::isICE, record.isOnIce()},
                                                 {json::contacts::speedDial, record.speeddial.c_str()},
-                                                {json::contacts::numbers, numberArray}};
+                                                {json::contacts::numbers, numberArray},
+                                                {json::contacts::numbersIDs, numberIDArray}};
         return recordEntry;
     }
 

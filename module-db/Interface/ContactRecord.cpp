@@ -1276,26 +1276,26 @@ auto ContactRecordInterface::GetBySpeedDial(const UTF8 &speedDial) -> std::uniqu
     return GetLimitOffsetByField(0, 1, ContactRecordField::SpeedDial, speedDial.c_str());
 }
 
-auto ContactRecordInterface::getNumbers(const std::string &numbers_id) -> std::vector<ContactRecord::Number>
+auto ContactRecordInterface::getNumbers(const std::string &numbersId) -> std::vector<ContactRecord::Number>
 {
     std::vector<ContactRecord::Number> nrs;
-    for (const auto &nr_str : utils::split(numbers_id, ' ')) {
-        auto nr_val = 0L;
+    for (const auto &nrStr : utils::split(numbersId, ' ')) {
+        auto nrVal = 0L;
         try {
-            nr_val = std::stol(nr_str);
+            nrVal = std::stol(nrStr);
         }
         catch (const std::exception &e) {
-            error_db_data("Convertion error from %s, taking default value %ld", nr_str.c_str(), nr_val);
+            error_db_data("Convertion error from %s, taking default value %ld", nrStr.c_str(), nrVal);
         }
 
-        auto nr = contactDB->number.getById(nr_val);
+        auto nr = contactDB->number.getById(nrVal);
         if (!nr.isValid()) {
             return nrs;
         }
         try {
             auto &&number = nr.numbere164.empty() ? utils::PhoneNumber(nr.numberUser, utils::country::Id::UNKNOWN)
                                                   : utils::PhoneNumber(nr.numberUser, nr.numbere164);
-            nrs.emplace_back(number.getView(), nr.type);
+            nrs.emplace_back(number.getView(), nr.type, nrVal);
         }
         catch (const utils::PhoneNumber::Error &e) {
             error_db_data(
@@ -1303,7 +1303,7 @@ auto ContactRecordInterface::getNumbers(const std::string &numbers_id) -> std::v
                 e.what(),
                 nr.numberUser.c_str(),
                 nr.numbere164.c_str());
-            nrs.emplace_back(utils::PhoneNumber(nr.numberUser, utils::country::Id::UNKNOWN).getView(), nr.type);
+            nrs.emplace_back(utils::PhoneNumber(nr.numberUser, utils::country::Id::UNKNOWN).getView(), nr.type, nrVal);
         }
     }
     return nrs;
@@ -1311,12 +1311,15 @@ auto ContactRecordInterface::getNumbers(const std::string &numbers_id) -> std::v
 
 ContactRecord::Number::Number() = default;
 
-ContactRecord::Number::Number(const std::string &entered, const std::string &e164, ContactNumberType n_type)
-    : number(utils::PhoneNumber(entered, e164).getView()), numberType(n_type)
+ContactRecord::Number::Number(const std::string &entered,
+                              const std::string &e164,
+                              ContactNumberType n_type,
+                              const std::uint64_t id)
+    : number(utils::PhoneNumber(entered, e164).getView()), numberType(n_type), numberId(id)
 {}
 
-ContactRecord::Number::Number(const utils::PhoneNumber::View &number, ContactNumberType n_type)
-    : number(number), numberType(n_type)
+ContactRecord::Number::Number(const utils::PhoneNumber::View &number, ContactNumberType n_type, const std::uint64_t id)
+    : number(number), numberType(n_type), numberId(id)
 {}
 
 auto ContactRecordInterface::getAllNumbers() -> const std::vector<ContactsNumberTableRow>
