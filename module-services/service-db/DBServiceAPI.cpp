@@ -102,7 +102,7 @@ auto DBServiceAPI::MatchContactByNumberID(sys::Service *serv, std::uint32_t numb
 
 auto DBServiceAPI::NumberByID(sys::Service *serv, std::uint32_t numberID) -> utils::PhoneNumber::View
 {
-    auto msg = std::make_unique<db::query::NumberGetByID>(numberID);
+    auto msg                      = std::make_unique<db::query::NumberGetByID>(numberID);
     const auto [status, response] = DBServiceAPI::GetQueryWithReply(
         serv, db::Interface::Name::Contact, std::move(msg), constants::DefaultTimeoutInMs);
     if (status != sys::ReturnCodes::Success || !response) {
@@ -168,8 +168,8 @@ auto DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec)
     }
 
     if (rec.numbers.size() > 1 && rec.numbers[1].number.getEntered().size() > 0) {
-        auto retPhone2 = MatchContactByPhoneNumber(serv, rec.numbers[1].number);
-        if (retPhone2 && retPhone2->ID != rec.ID) {
+        auto retPhone2 = MatchContactByPhoneNumber(serv, rec.numbers[1].number, rec.ID);
+        if (retPhone2) {
             if (retPhone2->isTemporary()) {
                 return ContactVerificationResult::temporaryContactExists;
             }

@@ -47,6 +47,13 @@ auto ContactRecordInterface::Add(ContactRecord &rec) -> bool
     if (!numbersIDs.has_value()) {
         return false;
     }
+
+    auto oldNumberIDs = splitNumberIDs(numbersIDs.value());
+    auto newNumbers   = rec.numbers;
+    if (!changeNumberRecordInPlaceIfCountryCodeIsOnlyDifferent(oldNumberIDs, newNumbers)) {
+        return false;
+    }
+
     if (!rec.isTemporary()) {
         const auto nameID = addOrUpdateName(contactID, DB_ID_NONE, rec);
         if (!nameID.has_value()) {
@@ -124,29 +131,9 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
     }
 
     auto oldNumberIDs = splitNumberIDs(contact.numbersID);
-
-    /* Changing number table record in place if new number is same as old number but with/without country code */
-    auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
-    for (const auto oldNumberID : oldNumberIDs) { // pick one of the old number for this contactID (from DB)
-        auto numberRecord = contactDB->number.getById(oldNumberID);
-        utils::PhoneNumber oldPhoneNumber(numberRecord.numberUser, numberRecord.numbere164);
-        for (const auto &newNumberID : rec.numbers) { // pick one of the new number from &rec
-            utils::PhoneNumber newPhoneNumber(newNumberID.number);
-            // if DB have not such a new number already and if one of this have country code and other doesn't
-            if (!numberMatcher.bestMatch(newPhoneNumber, utils::PhoneNumber::Match::EXACT).has_value() &&
-                (newPhoneNumber.match(oldPhoneNumber) == utils::PhoneNumber::Match::POSSIBLE) &&
-                ((!oldPhoneNumber.isValid() && newPhoneNumber.isValid()) ||
-                 (oldPhoneNumber.isValid() && !newPhoneNumber.isValid()))) {
-                // which means that only country code is to add or remove (change of country code is not supported here)
-                // then change old number record in number table to the new number
-                auto oldNumberRecordToUpdate       = contactDB->number.getById(oldNumberID);
-                oldNumberRecordToUpdate.numberUser = newPhoneNumber.get();
-                oldNumberRecordToUpdate.numbere164 = newPhoneNumber.toE164();
-                if (!contactDB->number.update(oldNumberRecordToUpdate)) {
-                    return false;
-                }
-            }
-        }
+    auto newNumbers   = rec.numbers;
+    if (!changeNumberRecordInPlaceIfCountryCodeIsOnlyDifferent(oldNumberIDs, newNumbers)) {
+        return false;
     }
 
     auto newNumbersIDs = getNumbersIDs(contact.ID, rec, utils::PhoneNumber::Match::EXACT);
@@ -1558,4 +1545,43 @@ auto ContactRecordInterface::verifyTemporary(ContactRecord &record) -> bool
     }
 
     return isTemporary;
+}
+
+auto ContactRecordInterface::changeNumberRecordInPlaceIfCountryCodeIsOnlyDifferent(
+    const std::vector<std::uint32_t> &oldNumberIDs, std::vector<ContactRecord::Number> &newNumbers) -> bool
+{
+    if (oldNumberIDs.empty() || newNumbers.empty()) {
+        LOG_ERROR("Failed to change number record in place if country code is only different. "
+                  "Empty input data.");
+        return false;
+    }
+    for (const auto id : oldNumberIDs) {
+        if (id == 0)
+            LOG_WARN("Number ID == 0");
+    }
+
+    auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
+    for (const auto oldNumberID : oldNumberIDs) { // pick one of the old number for this contactID (from DB)
+        auto numberRecord = contactDB->number.getById(oldNumberID);
+        utils::PhoneNumber oldPhoneNumber(numberRecord.numberUser, numberRecord.numbere164);
+        for (const auto &newNumberID : newNumbers) { // pick one of the new number from newNumbers
+            utils::PhoneNumber newPhoneNumber(newNumberID.number);
+            // if DB have not such a new number already and if one of this have country code and other doesn't
+            if (!numberMatcher.bestMatch(newPhoneNumber, utils::PhoneNumber::Match::EXACT).has_value() &&
+                (newPhoneNumber.match(oldPhoneNumber) == utils::PhoneNumber::Match::POSSIBLE) &&
+                ((!oldPhoneNumber.isValid() && newPhoneNumber.isValid()) ||
+                 (oldPhoneNumber.isValid() && !newPhoneNumber.isValid()))) {
+                // which means that only country code is to add or remove (change of country code is not supported here)
+                // then change old number record in number table to the new number
+                numberRecord.numberUser = newPhoneNumber.get();
+                numberRecord.numbere164 = newPhoneNumber.toE164();
+                if (!contactDB->number.update(numberRecord)) {
+                    LOG_ERROR("Failed to change number record in place if country code is only different. "
+                              "Number update failed.");
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
