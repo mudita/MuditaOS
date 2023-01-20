@@ -594,8 +594,11 @@ void ServiceCellular::registerMessageHandlers()
     });
 
     connect(typeid(cellular::GetVolteStateRequest), [&](sys::Message *request) -> sys::MessagePointer {
-        bus.sendUnicast(std::make_shared<cellular::GetVolteStateResponse>(priv->volteHandler->getVolteState()),
-                        request->sender);
+        auto simInsertedStatus = priv->simCard->getSimInsertedStatus();
+        auto volteState = (simInsertedStatus.has_value() && *simInsertedStatus == at::SimInsertedStatus::Inserted)
+                              ? priv->volteHandler->getVolteState()
+                              : VolteState{VolteState::Enablement::Off, false};
+        bus.sendUnicast(std::make_shared<cellular::GetVolteStateResponse>(volteState), request->sender);
         return sys::MessageNone{};
     });
 
