@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -42,7 +42,7 @@ namespace app
 
         bool removeSms(const SMSRecord &record);
         bool removeSmsThread(const ThreadRecord *record);
-        bool markSmsThreadAsRead(const uint32_t id);
+        bool markSmsThreadAsRead(const ThreadRecord *record);
         bool markSmsThreadAsUnread(const uint32_t id);
         /// show dialog with big search icon and text which was used for query
         bool searchEmpty(const std::string &query = "");
