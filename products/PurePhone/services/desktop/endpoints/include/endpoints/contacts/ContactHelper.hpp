@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -41,6 +41,7 @@ namespace sdesktop::endpoints
         inline constexpr auto mail            = "email";
         inline constexpr auto id              = "id";
         inline constexpr auto numbers         = "numbers";
+        inline constexpr auto numbersIDs      = "numbersIDs";
         inline constexpr auto isBlocked       = "blocked";
         inline constexpr auto isFavourite     = "favourite";
         inline constexpr auto isICE           = "ice";

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/messages/MessageHelper.hpp>
@@ -75,6 +75,7 @@ namespace sdesktop::endpoints
     {
 
         auto recordEntry = json11::Json::object{{json::messages::number, number.getFormatted()},
+                                                {json::messages::numberID, std::to_string(thread.numberID).c_str()},
                                                 {json::messages::lastUpdatedAt, static_cast<int>(thread.date)},
                                                 {json::messages::messageCount, static_cast<int>(thread.msgCount)},
                                                 {json::messages::threadID, static_cast<int>(thread.ID)},
