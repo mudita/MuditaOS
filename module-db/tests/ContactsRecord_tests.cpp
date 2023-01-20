@@ -760,3 +760,167 @@ TEST_CASE("Check if new contact record exists in DB as a temporary contact")
         REQUIRE(records.verifyTemporary(noTemporaryContactRecord) == true);
     }
 }
+
+TEST_CASE("Check replacement of number in place in db when only different is having of country code")
+{
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
+
+    // Preparation of DB initial state
+    auto records = ContactRecordInterface(&contactsDb.get());
+    ContactRecord testContactRecord;
+
+    std::array<std::string, 2> numbers   = {{{"500600100"}, {"500600200"}}};
+    std::array<std::string, 2> numbersPL = {{{"+48500600100"}, {"+48500600200"}}}; // Poland country code
+    std::array<std::string, 2> numbersFR = {{{"+33500600100"}, {"+33500600200"}}}; // France country code
+
+    SECTION("Temporary contact exists but new one with same number have country code")
+    {
+        // Number of record in number table should stay the same
+        constexpr int32_t NUMBER_IN_RECORD_DURING_REPLACEMENT = 1;
+
+        // Adding of temporary contact without country code
+        ContactRecord temporaryContactRecord;
+        temporaryContactRecord.numbers = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numbers[0], std::string(""), ContactNumberType::HOME),
+        });
+        temporaryContactRecord.addToGroup(contactsDb.get().groups.temporaryId());
+
+        REQUIRE(records.Add(temporaryContactRecord));
+        REQUIRE(contactsDb.get().number.count() == NUMBER_IN_RECORD_DURING_REPLACEMENT);
+
+        auto validationRecord = records.GetByID(1); // There aren't new normal contact
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        validationRecord = records.GetByIdWithTemporary(1); // There are new temporary contact
+        REQUIRE(validationRecord.numbers.size() == 1);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[0]);
+
+        // Adding of normal contact witch same number than previous temporary but with country code
+        ContactRecord noTemporaryContactRecord;
+        noTemporaryContactRecord.primaryName     = "PrimaryNameNoTemporary";
+        noTemporaryContactRecord.alternativeName = "AlternativeNameNoTemporary";
+        noTemporaryContactRecord.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numbersPL[0], std::string(""), ContactNumberType::HOME),
+        });
+
+        REQUIRE(records.verifyTemporary(noTemporaryContactRecord) == true);
+
+        REQUIRE(records.Add(noTemporaryContactRecord));
+        REQUIRE(contactsDb.get().number.count() == NUMBER_IN_RECORD_DURING_REPLACEMENT); // That was replacement in
+                                                                                         // place
+
+        validationRecord = records.GetByID(1);
+        REQUIRE(validationRecord.numbers.size() == 0); // Now first contact is temporary
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        validationRecord = records.GetByID(2);
+        REQUIRE(validationRecord.numbers.size() == 1);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]);
+    }
+
+    SECTION("Adding contact without country code after deleting one with same number but with country code")
+    {
+        // Scenario from MOS-864:
+        // After deleting contact with prefix: e.g. +48 512 345 678, there was an issue when
+        // new contact with similar number but without country code "512 345 678" was added.
+        // Then new contact had number with prefix: "+48 512 345 678" instead of provided number by user
+
+        // Number of record in number table should stay the same
+        constexpr int32_t NUMBER_IN_RECORD_DURING_REPLACEMENT = 1;
+        constexpr int32_t FIRST_CONTACT_ID                    = 1;
+
+        // Adding of normal contact with country code
+        ContactRecord noTemporaryContactRecord;
+        noTemporaryContactRecord.primaryName     = "PrimaryNameNoTemporary";
+        noTemporaryContactRecord.alternativeName = "AlternativeNameNoTemporary";
+        noTemporaryContactRecord.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numbersPL[0], std::string(""), ContactNumberType::HOME),
+        });
+
+        REQUIRE(records.Add(noTemporaryContactRecord));
+        REQUIRE(contactsDb.get().number.count() == NUMBER_IN_RECORD_DURING_REPLACEMENT);
+
+        auto validationRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.numbers.size() == 1);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]); // with country code
+
+        // Remove contact
+        REQUIRE(records.RemoveByID(FIRST_CONTACT_ID));
+
+        validationRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.numbers.size() == 0); // Now first contact is temporary
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        // Add new contact with same number as previously deleted but without country code
+        ContactRecord NewNoTemporaryContactRecord;
+        NewNoTemporaryContactRecord.primaryName     = "PrimaryNameNoTemporaryOther";
+        NewNoTemporaryContactRecord.alternativeName = "AlternativeNameNoTemporaryOther";
+        NewNoTemporaryContactRecord.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numbers[0], std::string(""), ContactNumberType::HOME),
+        });
+
+        REQUIRE(records.Add(NewNoTemporaryContactRecord));
+        REQUIRE(contactsDb.get().number.count() == NUMBER_IN_RECORD_DURING_REPLACEMENT);
+
+        validationRecord = records.GetByID(FIRST_CONTACT_ID + 1); // New contact
+        REQUIRE(validationRecord.numbers.size() == 1);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[0]); // without country code
+    }
+
+    SECTION("Adding contact with country code after deleting one with same number but with different country code")
+    {
+        // Number of record in number table should NOT stay the same - no replacement in place
+        constexpr int32_t FIRST_CONTACT_ID      = 1;
+        constexpr int32_t SECOND_NEW_CONTACT_ID = 2;
+
+        // Adding of normal contact with country code
+        ContactRecord noTemporaryContactRecordPL;
+        noTemporaryContactRecordPL.primaryName     = "PrimaryNameNoTemporary";
+        noTemporaryContactRecordPL.alternativeName = "AlternativeNameNoTemporary";
+        noTemporaryContactRecordPL.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numbersPL[0], std::string(""), ContactNumberType::HOME),
+        });
+
+        REQUIRE(records.Add(noTemporaryContactRecordPL));
+        REQUIRE(contactsDb.get().number.count() == 1);
+
+        auto validationRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.numbers.size() == 1);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersPL[0]); // with country code
+
+        // Remove contact
+        REQUIRE(records.RemoveByID(FIRST_CONTACT_ID));
+
+        validationRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.numbers.size() == 0); // Now first contact is temporary
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        // Add new contact with same number as previously deleted but without country code
+        ContactRecord NewNoTemporaryContactRecordFR;
+        NewNoTemporaryContactRecordFR.primaryName     = "PrimaryNameNoTemporaryOther";
+        NewNoTemporaryContactRecordFR.alternativeName = "AlternativeNameNoTemporaryOther";
+        NewNoTemporaryContactRecordFR.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numbersFR[0], std::string(""), ContactNumberType::HOME),
+        });
+
+        REQUIRE(records.Add(NewNoTemporaryContactRecordFR));
+        REQUIRE(contactsDb.get().number.count() == 2); // New number record - there are record for PL and FR number
+
+        validationRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.numbers.size() == 0); // Now first contact is temporary
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        validationRecord = records.GetByID(SECOND_NEW_CONTACT_ID); // New contact
+        REQUIRE(validationRecord.numbers.size() == 1);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbersFR[0]); // without country code
+
+        // Check number table
+        REQUIRE(contactsDb.get().number.getById(FIRST_CONTACT_ID).numberUser == numbersPL[0]);
+        REQUIRE(contactsDb.get().number.getById(SECOND_NEW_CONTACT_ID).numberUser == numbersFR[0]);
+    }
+}

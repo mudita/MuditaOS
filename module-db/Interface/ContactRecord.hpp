@@ -301,4 +301,15 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
         -> std::optional<std::uint32_t>;
     auto addOrUpdateRingtone(std::uint32_t contactID, std::uint32_t ringtoneID, const ContactRecord &contact)
         -> std::optional<std::uint32_t>;
+
+    /**
+     * @brief Changing number table record in place if new number is same as old number but with/without country code
+     *
+     * @param oldNumberIDs vector of old number IDs in contact_number table which can be changed in place
+     *                     only if in  newNumbers  is same number but with/without country code
+     * @param newNumbers  vector of numbers to which we want to change the old ones
+     * @return true if operation have no error
+     */
+    auto changeNumberRecordInPlaceIfCountryCodeIsOnlyDifferent(const std::vector<std::uint32_t> &oldNumberIDs,
+                                                               std::vector<ContactRecord::Number> &newNumbers) -> bool;
 };
