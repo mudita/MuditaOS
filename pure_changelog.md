@@ -35,6 +35,7 @@
 * Fixed alarm rings on the low battery screen
 * Fixed crash when trying to play 96kHz FLAC with USB cable connected
 * Fixed the notification of unread messages are not deleted with the thread
+* Fixed several MTP issues
 
 ### Added
 
