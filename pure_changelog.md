@@ -36,6 +36,7 @@
 * Fixed crash when trying to play 96kHz FLAC with USB cable connected
 * Fixed the notification of unread messages are not deleted with the thread
 * Fixed several MTP issues
+* Fixed notifications of unread SMS threads on the home screen
 
 ### Added
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -72,21 +72,12 @@ namespace gui
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
                 if (application->getCurrentWindow() == this) {
-                    app->markSmsThreadAsRead(pdata->thread->ID);
+                    app->markSmsThreadAsRead(pdata->thread.get());
                 }
             }
             smsModel->numberID    = pdata->thread->numberID;
             smsModel->smsThreadID = pdata->thread->ID;
             smsList->rebuildList();
-
-            if (pdata->thread->unreadMsgCount) {
-                const auto countToClear = pdata->thread->unreadMsgCount;
-
-                DBServiceAPI::GetQuery(
-                    application,
-                    db::Interface::Name::Notifications,
-                    std::make_unique<db::query::notifications::Decrement>(NotificationsRecord::Key::Sms, countToClear));
-            }
         }
         else if (smsModel->numberID != DB_ID_NONE) {
             requestContact(smsModel->numberID);

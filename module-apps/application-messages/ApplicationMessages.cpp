@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -165,19 +165,28 @@ namespace app
     void ApplicationMessages::destroyUserInterface()
     {}
 
-    bool ApplicationMessages::markSmsThreadAsRead(const uint32_t id)
+    bool ApplicationMessages::markSmsThreadAsRead(const ThreadRecord *record)
     {
         using namespace db::query;
-        LOG_DEBUG("markSmsThreadAsRead");
+        if (record == nullptr) {
+            LOG_ERROR("Trying to mark as read a null SMS thread!");
+            return false;
+        }
         DBServiceAPI::GetQuery(
-            this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(id, MarkAsRead::Read::True));
+            this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(record->ID, MarkAsRead::Read::True));
+
+        if (record->unreadMsgCount) {
+            DBServiceAPI::GetQuery(
+                this,
+                db::Interface::Name::Notifications,
+                std::make_unique<notifications::Decrement>(NotificationsRecord::Key::Sms, record->unreadMsgCount));
+        }
         return true;
     }
 
     bool ApplicationMessages::markSmsThreadAsUnread(const uint32_t id)
     {
         using namespace db::query;
-        LOG_DEBUG("markSmsThreadAsUnRead");
         DBServiceAPI::GetQuery(
             this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(id, MarkAsRead::Read::False));
         return true;
