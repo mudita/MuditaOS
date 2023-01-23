@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -50,7 +50,7 @@ namespace audio
             virtual UniqueStreamBuffer allocate(std::size_t size) = 0;
         };
 
-        static constexpr auto defaultBufferingSize = 32U;
+        static constexpr auto defaultBufferingSize = 24U;
 
         Stream(AudioFormat format,
                Allocator &allocator,

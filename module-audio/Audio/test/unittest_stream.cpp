@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <gtest/gtest.h>
@@ -21,15 +21,13 @@
 using audio::NonCacheableStreamAllocator;
 using audio::StandardStreamAllocator;
 using audio::Stream;
-using audio::StreamFactory;
 using testing::Return;
 using testing::audio::MockStream;
-using testing::audio::MockStreamEventListener;
 
 using namespace std::chrono_literals;
 
 constexpr std::size_t defaultBlockSize = 64U;
-constexpr std::size_t defaultBuffering = 32U;
+constexpr std::size_t defaultBuffering = 24U;
 constexpr audio::AudioFormat format    = audio::AudioFormat(44100, 16, 2);
 
 static std::uint8_t testData[defaultBuffering][defaultBlockSize];
