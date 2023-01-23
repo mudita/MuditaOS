@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -32,7 +32,7 @@ namespace audio
       private:
         using Traits = audio::Endpoint::Traits;
 
-        static constexpr auto defaultBuffering = 32U;
+        static constexpr auto defaultBuffering = 24U;
 
         auto makeStream(Traits sourceTraits, Traits sinkTraits, AudioFormat streamFormat) -> std::unique_ptr<Stream>;
 

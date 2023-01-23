@@ -51,12 +51,11 @@ auto StreamFactory::makeStream(Source &source, Sink &sink) -> std::unique_ptr<Ab
 auto StreamFactory::makeStream(Traits sourceTraits, Traits sinkTraits, AudioFormat streamFormat)
     -> std::unique_ptr<Stream>
 {
-    auto streamBuffering     = defaultBuffering;
-    auto endpointsTraits     = {sourceTraits, sinkTraits};
+    const auto endpointsTraits  = {sourceTraits, sinkTraits};
+    const auto timingConstraint = getTimingConstraints(std::initializer_list<std::optional<std::chrono::milliseconds>>{
+        sinkTraits.timeConstraint, sourceTraits.timeConstraint, periodRequirement});
     auto blockSizeConstraint = getBlockSizeConstraint(endpointsTraits);
     auto &streamAllocator    = negotiateAllocator(endpointsTraits);
-    auto timingConstraint    = getTimingConstraints(std::initializer_list<std::optional<std::chrono::milliseconds>>{
-        sinkTraits.timeConstraint, sourceTraits.timeConstraint, periodRequirement});
 
     if (streamFormat == audio::nullFormat) {
         throw std::invalid_argument("No source format provided");
@@ -66,13 +65,15 @@ auto StreamFactory::makeStream(Traits sourceTraits, Traits sinkTraits, AudioForm
         blockSizeConstraint = binary::ceilPowerOfTwo(streamFormat.microsecondsToBytes(timingConstraint));
     }
 
-    auto blockTransferDuration =
+    const auto blockTransferDuration =
         std::chrono::duration<double, std::milli>(streamFormat.bytesToMicroseconds(blockSizeConstraint.value()));
-    streamBuffering = static_cast<unsigned int>(std::ceil(timingConstraint / blockTransferDuration)) * defaultBuffering;
+    const auto streamBuffering =
+        static_cast<unsigned int>(std::ceil(timingConstraint / blockTransferDuration)) * defaultBuffering;
 
-    LOG_DEBUG("Creating audio stream: block size = %lu; buffering = %u",
+    LOG_DEBUG("Creating audio stream: block size = %lu bytes; buffering = %u -> stream buffer size = %lu bytes",
               static_cast<unsigned long>(blockSizeConstraint.value()),
-              streamBuffering);
+              streamBuffering,
+              static_cast<unsigned long>(blockSizeConstraint.value() * streamBuffering));
 
     return std::make_unique<Stream>(streamFormat, streamAllocator, blockSizeConstraint.value(), streamBuffering);
 }
