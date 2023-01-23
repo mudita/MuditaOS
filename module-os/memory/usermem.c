@@ -104,8 +104,8 @@ static BlockLink_t userxStart, *userpxEnd = NULL;
 
 /* Keeps track of the number of free bytes remaining, but says nothing about
 fragmentation. */
-static size_t xFreeBytesRemaining = 0U;
-static size_t xMinimumEverFreeBytesRemaining = 0U;
+static size_t userxFreeBytesRemaining = 0U;
+static size_t userxMinimumEverFreeBytesRemaining = 0U;
 
 
 /* Gets set to the top bit of an size_t type.  When this bit in the xBlockSize
@@ -167,7 +167,7 @@ void *usermalloc(size_t xWantedSize)
 					mtCOVERAGE_TEST_MARKER();
 				}
 
-				if( ( xWantedSize > 0 ) && ( xWantedSize <= xFreeBytesRemaining ) )
+				if( ( xWantedSize > 0 ) && ( xWantedSize <= userxFreeBytesRemaining ) )
 				{
 					/* Traverse the list from the start	(lowest address) block until
 					one	of adequate size is found. */
@@ -222,11 +222,11 @@ void *usermalloc(size_t xWantedSize)
 							mtCOVERAGE_TEST_MARKER();
 						}
 
-						xFreeBytesRemaining -= pxBlock->xBlockSize;
+						userxFreeBytesRemaining -= pxBlock->xBlockSize;
 
-						if( xFreeBytesRemaining < xMinimumEverFreeBytesRemaining )
+						if( userxFreeBytesRemaining < userxMinimumEverFreeBytesRemaining )
 						{
-							xMinimumEverFreeBytesRemaining = xFreeBytesRemaining;
+							userxMinimumEverFreeBytesRemaining = userxFreeBytesRemaining;
 						}
 						else
 						{
@@ -330,7 +330,7 @@ void userfree(void *pv)
 					vTaskSuspendAll();
 					{
 						/* Add this block to the list of free blocks. */
-						xFreeBytesRemaining += pxLink->xBlockSize;
+						userxFreeBytesRemaining += pxLink->xBlockSize;
 						traceFREE( pv, pxLink->xBlockSize );
 						prvInsertBlockIntoFreeList( ( ( BlockLink_t * ) pxLink ) );
 					}
@@ -397,13 +397,13 @@ void *userrealloc(void *pv, size_t xWantedSize) {
 
 size_t usermemGetFreeHeapSize( void )
 {
-    return xFreeBytesRemaining;
+    return userxFreeBytesRemaining;
 }
 /*-----------------------------------------------------------*/
 
 size_t usermemGetMinimumEverFreeHeapSize( void )
 {
-    return xMinimumEverFreeBytesRemaining;
+    return userxMinimumEverFreeBytesRemaining;
 }
 /*-----------------------------------------------------------*/
 
@@ -462,8 +462,8 @@ size_t xTotalHeapSize = USERMEM_TOTAL_HEAP_SIZE;
     #endif
 
 	/* Only one block exists - and it covers the entire usable heap space. */
-	xMinimumEverFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
-	xFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
+	userxMinimumEverFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
+	userxFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
 
 	/* Work out the position of the top bit in a size_t variable. */
 	xBlockAllocatedBit = ( ( size_t ) 1 ) << ( ( sizeof( size_t ) * heapBITS_PER_BYTE ) - 1 );
