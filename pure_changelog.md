@@ -8,6 +8,7 @@
 * Changed order of starting services, ServiceDesktop moved to the back
 
 ### Fixed
+* Fixed not marking thread as read when new message arrives in the opened thread
 * Fixed disappearing "confirm" button in PIN entering screen
 * Fixed looping on the SIM card selection screen
 * Fixed notes paste option showing for empty clipboard

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -7,10 +7,14 @@
 #include "SMSThreadModel.hpp"
 
 #include <ListView.hpp>
-#include <module-db/queries/messages/sms/QuerySMSGetCountByThreadID.hpp>
 #include <module-db/queries/messages/sms/QuerySMSGetForList.hpp>
-#include <service-db/DBServiceAPI.hpp>
-#include <service-db/QueryMessage.hpp>
+#include <queries/messages/threads/QueryThreadGetByID.hpp>
+#include <queries/notifications/QueryNotificationsDecrement.hpp>
+
+namespace
+{
+    constexpr auto threadQueryTimeoutMs = 1000;
+}
 
 SMSThreadModel::SMSThreadModel(app::ApplicationCommon *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {
@@ -76,6 +80,8 @@ auto SMSThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
         // Additional one element for SMSInputWidget.
         recordsCount = msgResponse->getCount() + 1;
         list->reSendLastRebuildRequest();
+
+        markCurrentThreadAsRead();
         return false;
     }
 
@@ -122,4 +128,32 @@ void SMSThreadModel::resetInputWidget()
     smsInput->setVisible(true);
     smsInput->clearNavigationItem(gui::NavigationDirection::UP);
     smsInput->clearNavigationItem(gui::NavigationDirection::DOWN);
+}
+void SMSThreadModel::markCurrentThreadAsRead()
+{
+    const auto [code, msg] = DBServiceAPI::GetQueryWithReply(application,
+                                                             db::Interface::Name::SMSThread,
+                                                             std::make_unique<db::query::ThreadGetByID>(smsThreadID),
+                                                             threadQueryTimeoutMs);
+
+    if (code == sys::ReturnCodes::Success && msg != nullptr) {
+        const auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
+        assert(queryResponse != nullptr);
+
+        const auto resultResponse = queryResponse->getResult();
+        const auto result         = dynamic_cast<db::query::ThreadGetByIDResult *>(resultResponse.get());
+        assert(result != nullptr);
+
+        if (const auto unreadMsgCount = result->getRecord()->unreadMsgCount; unreadMsgCount > 0) {
+            DBServiceAPI::GetQuery(
+                application,
+                db::Interface::Name::SMSThread,
+                std::make_unique<db::query::MarkAsRead>(smsThreadID, db::query::MarkAsRead::Read::True));
+
+            DBServiceAPI::GetQuery(
+                application,
+                db::Interface::Name::Notifications,
+                std::make_unique<db::query::notifications::Decrement>(NotificationsRecord::Key::Sms, unreadMsgCount));
+        }
+    }
 }
