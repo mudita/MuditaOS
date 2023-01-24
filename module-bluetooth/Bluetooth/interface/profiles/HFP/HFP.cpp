@@ -286,6 +286,7 @@ namespace bluetooth
                 LOG_DEBUG("Audio connection established with SCO handle 0x%04x", scoHandle);
                 codec = static_cast<SCOCodec>(hfp_subevent_audio_connection_established_get_negotiated_codec(event));
                 dump_supported_codecs();
+                audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
                 hci_request_sco_can_send_now_event();
                 RunLoop::trigger();
             }
