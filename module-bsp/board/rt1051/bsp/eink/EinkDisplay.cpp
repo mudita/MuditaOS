@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EinkDisplay.hpp"
@@ -283,14 +283,11 @@ namespace hal::eink
 
             switch (currentWaveform.mode) {
             case EinkWaveformA2:
-                [[fallthrough]];
             case EinkWaveformDU2:
                 temperatureFine = abs(newTemperature - currentWaveform.temperature) <= 3;
                 break;
             case EinkWaveformINIT:
-                [[fallthrough]];
             case EinkWaveformGLD16:
-                [[fallthrough]];
             case EinkWaveformGC16:
                 temperatureFine = abs(newTemperature - currentWaveform.temperature) <= 2;
                 break;
@@ -363,6 +360,11 @@ namespace hal::eink
     void EinkDisplay::setMode(const EinkDisplayColorMode mode) noexcept
     {
         displayMode = mode;
+    }
+
+    EinkDisplayColorMode EinkDisplay::getMode() const noexcept
+    {
+        return displayMode;
     }
 
     std::int32_t EinkDisplay::getLastTemperature() const noexcept
