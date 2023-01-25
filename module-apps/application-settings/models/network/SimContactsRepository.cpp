@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimContactsRepository.hpp"
@@ -93,11 +93,15 @@ void SimContactsRepository::save(const std::vector<bool> &selectedContacts,
         if (result == nullptr) {
             return false;
         }
+        for (const auto &r : result->getResult()) {
+            sendNotification(r);
+        }
         if (callback) {
             callback();
         }
         return true;
     });
+
     task->execute(application, this);
 }
 
@@ -139,6 +143,13 @@ void SimContactsRepository::updateImportedRecords(const std::vector<cellular::Si
 #if DEBUG_SIM_IMPORT_DATA == 1
     printRecordsData("Imported records from sim", importedRecords);
 #endif
+}
+
+void SimContactsRepository::sendNotification(const NotificationData &notificationData)
+{
+    auto notificationMessage = std::make_shared<db::NotificationMessage>(
+        db::Interface::Name::Contact, notificationData.first, notificationData.second);
+    application->bus.sendMulticast(notificationMessage, sys::BusChannel::ServiceDBNotifications);
 }
 
 #if DEBUG_SIM_IMPORT_DATA == 1

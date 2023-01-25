@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactRecord.hpp"
@@ -1471,8 +1471,10 @@ auto ContactRecordInterface::GetNumbersIdsByContact(std::uint32_t contactId) -> 
     return numbersIds;
 }
 
-auto ContactRecordInterface::MergeContactsList(std::vector<ContactRecord> &contacts) -> bool
+auto ContactRecordInterface::MergeContactsList(std::vector<ContactRecord> &contacts)
+    -> std::vector<std::pair<db::Query::Type, uint32_t>>
 {
+    std::vector<std::pair<db::Query::Type, uint32_t>> dataForNotification{};
     auto numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
 
     for (auto &contact : contacts) {
@@ -1485,18 +1487,23 @@ auto ContactRecordInterface::MergeContactsList(std::vector<ContactRecord> &conta
         if (!matchedNumber.has_value()) {
             if (!Add(contact)) {
                 LOG_ERROR("Contacts list merge fail when adding the contact.");
-                return false;
+            }
+            else {
+                dataForNotification.push_back({db::Query::Type::Create, contactDB->getLastInsertRowId()});
             }
         }
         else {
             // Complete override of the contact data
             contact.ID = matchedNumber->getContactID();
+            dataForNotification.push_back({db::Query::Type::Update, contact.ID});
+
             Update(contact);
             // Rebuild number matcher
             numberMatcher = buildNumberMatcher(NumberMatcherPageSize);
         }
     }
-    return true;
+
+    return dataForNotification;
 }
 
 auto ContactRecordInterface::CheckContactsListDuplicates(std::vector<ContactRecord> &contacts)
