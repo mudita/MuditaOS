@@ -479,7 +479,7 @@
   "phone_lock_blocked_information": "<text>Code d'accès erroné. <br></br>Réessayez dans <token>$TIME</token>.</text>",
   "phone_lock_changed_successfully": "Le code d'accès a été modifié avec succès !",
   "phone_lock_disabled": "Le code d'accès est désactivé !",
-  "phone_lock_set": "<text>Ajouter un code d'accès qui déverrouille <br></br> le téléphone</text>",
+  "phone_lock_set": "<text>Ajouter un code d'accès qui<br></br>déverrouille le téléphone</text>",
   "phone_lock_confirm": "Confirmez le code d'accès",
   "phone_lock_invalid_retry": "<text>Mauvais code d'accès. <br></br> Veuillez configurer le code d'accès à nouveau.</text>",
   "phone_lock_configure": "Configurer le code d'accès",
