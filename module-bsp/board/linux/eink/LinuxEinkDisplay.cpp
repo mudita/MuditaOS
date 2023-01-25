@@ -1,11 +1,6 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <board.h>
-
-#include <log/log.hpp>
-
-#include <cstring>
 #include <memory>
 
 #include "LinuxEinkDisplay.hpp"
@@ -47,6 +42,11 @@ namespace hal::eink
         displayColorMode = mode;
     }
 
+    EinkDisplayColorMode LinuxEinkDisplay::getMode() const noexcept
+    {
+        return displayColorMode;
+    }
+
     EinkStatus LinuxEinkDisplay::showImageUpdate(const std::vector<EinkFrame> &updateFrames,
                                                  const std::uint8_t *frameBuffer)
     {
@@ -54,8 +54,9 @@ namespace hal::eink
             const std::uint8_t *buffer = frameBuffer + frame.pos_y * frame.size.width;
             const auto status          = translateStatus(
                 EinkUpdateFrame({frame.pos_x, frame.pos_y, frame.size.width, frame.size.height}, buffer));
-            if (status != EinkStatus::EinkOK)
+            if (status != EinkStatus::EinkOK) {
                 return status;
+            }
         }
         return EinkStatus::EinkOK;
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <board.h>
@@ -6,7 +6,6 @@
 #include "internal/StaticData.hpp"
 #include "messages/EinkModeMessage.hpp"
 #include "messages/PrepareDisplayEarlyRequest.hpp"
-#include <time/ScopedTime.hpp>
 #include <Timers/TimerFactory.hpp>
 
 #include <log/log.hpp>
@@ -21,8 +20,6 @@
 #include <memory>
 #include <gsl/util>
 #include "Utils.hpp"
-
-#include <service-gui/Common.hpp>
 
 namespace service::eink
 {
@@ -119,14 +116,30 @@ namespace service::eink
 
     sys::ReturnCodes ServiceEink::DeinitHandler()
     {
-        // Eink must be turn on before wiping out the display
+        // Eink must be turned on before wiping out the display
         display->powerOn();
-        if (exitAction == ExitAction::WipeOut) {
+
+        if ((exitAction == ExitAction::WipeOut) ||
+            ((display->getMode() == hal::eink::EinkDisplayColorMode::EinkDisplayColorModeInverted) &&
+             (systemCloseReason != sys::CloseReason::FactoryReset))) {
+            LOG_INFO("Performing low-level display wipeout");
             display->wipeOut();
         }
+
         display->shutdown();
         settings->deinit();
         return sys::ReturnCodes::Success;
+    }
+
+    void ServiceEink::ProcessCloseReason(sys::CloseReason closeReason)
+    {
+        systemCloseReason = closeReason;
+        sendCloseReadyMessage(this);
+    }
+
+    void ServiceEink::ProcessCloseReasonHandler(sys::CloseReason closeReason)
+    {
+        ProcessCloseReason(closeReason);
     }
 
     sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
