@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmRRuleOptionsItem.hpp"
@@ -56,8 +56,12 @@ namespace gui
         onLoadCallback = [&]([[maybe_unused]] std::shared_ptr<AlarmEventRecord> alarm) {
             checkCustomOption(getPresenter()->getDescription());
             optionSpinner->setCurrentValue(getPresenter()->getDescription());
-            if (app::alarmClock::AlarmRRulePresenter::RRuleOptions::Never == getPresenter()->getOption())
+            if (getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom) {
+                this->navBarTemporaryMode(utils::translate(style::strings::common::edit));
+            }
+            else {
                 this->navBarRestoreFromTemporaryMode();
+            }
 
         };
     }
