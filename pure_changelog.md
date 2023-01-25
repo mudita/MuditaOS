@@ -41,6 +41,7 @@
 * Fixed notifications of unread SMS threads on the home screen
 * Fixed false dotted notification above Calls app in case of answered call
 * Fixed broken French translation on 'Configure passcode' screen in Onboarding
+* Fixed time disappearing in SMS thread
 
 ### Added
 
