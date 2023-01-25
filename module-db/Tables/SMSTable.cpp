@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTable.hpp"
@@ -49,7 +49,7 @@ bool SMSTable::removeByField(SMSTableFields field, const char *str)
         return false;
     }
 
-    return db->execute("DELETE FROM sms where %q=" u32_ ";", fieldName.c_str(), str);
+    return db->execute("DELETE FROM sms where %q=" str_ ";", fieldName.c_str(), str);
 }
 
 bool SMSTable::update(SMSTableRow entry)
