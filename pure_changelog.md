@@ -45,6 +45,9 @@
 * Fixed broken French translation on 'Configure passcode' screen in Onboarding
 * Fixed time disappearing in SMS thread
 * Fixed scrollbar behavior in call log view
+* Fixed contacts imported from SIM do not show up in Mudita Center 
+
+### Added
 
 ## [1.5.0 2022-12-20]
 

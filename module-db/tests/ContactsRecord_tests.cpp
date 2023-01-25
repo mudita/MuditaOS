@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common.hpp"
@@ -523,7 +523,7 @@ TEST_CASE("Contacts list merge")
                 std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
             contacts.push_back(record);
         }
-        REQUIRE(records.MergeContactsList(contacts));
+        REQUIRE(!records.MergeContactsList(contacts).empty());
 
         // Validate if non-overlapping were appended to DB
         REQUIRE(records.GetCount() == (rawContactsInitial.size() + rawContactsToAdd.size()));
@@ -565,7 +565,7 @@ TEST_CASE("Contacts list merge")
                 std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
             contacts.push_back(record);
         }
-        REQUIRE(records.MergeContactsList(contacts));
+        REQUIRE(!records.MergeContactsList(contacts).empty());
 
         REQUIRE(records.GetCount() == (rawContactsInitial.size() + numberOfNewContacts));
 
@@ -612,7 +612,7 @@ TEST_CASE("Contacts list merge - advanced cases")
         record.primaryName = rawContact.second;
         record.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
         contacts.push_back(record);
-        REQUIRE(records.MergeContactsList(contacts));
+        REQUIRE(!records.MergeContactsList(contacts).empty());
 
         REQUIRE(records.GetCount() == 1);
 

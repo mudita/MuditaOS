@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QueryMergeContactsList.hpp"
@@ -15,8 +15,14 @@ std::vector<ContactRecord> &MergeContactsList::getContactsList()
     return contacts;
 }
 
-MergeContactsListResult::MergeContactsListResult(bool result) : result(result)
+MergeContactsListResult::MergeContactsListResult(const std::vector<std::pair<db::Query::Type, uint32_t>> &addedContacts)
+    : addedContacts(addedContacts)
 {}
+
+std::vector<std::pair<db::Query::Type, uint32_t>> &MergeContactsListResult::getResult()
+{
+    return addedContacts;
+}
 
 [[nodiscard]] auto MergeContactsList::debugInfo() const -> std::string
 {

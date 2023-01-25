@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -28,15 +28,12 @@ namespace db::query
     class MergeContactsListResult : public QueryResult
     {
       public:
-        MergeContactsListResult(bool result);
-        [[nodiscard]] auto getResult() const noexcept -> bool
-        {
-            return result;
-        }
+        MergeContactsListResult(const std::vector<std::pair<db::Query::Type, uint32_t>> &addedContacts);
+        std::vector<std::pair<db::Query::Type, uint32_t>> &getResult();
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
       private:
-        bool result = false;
+        std::vector<std::pair<db::Query::Type, uint32_t>> addedContacts{};
     };
 
 }; // namespace db::query

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -227,7 +227,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
      * @param contacts vector of contacts with single number
      * @return boolean status
      */
-    auto MergeContactsList(std::vector<ContactRecord> &contacts) -> bool;
+    auto MergeContactsList(std::vector<ContactRecord> &contacts) -> std::vector<std::pair<db::Query::Type, uint32_t>>;
 
     /**
      * @brief Check which contacts in vector are duplicating contacts in DB

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,6 +27,7 @@ class AbstractSimContactsRepository
 class SimContactsRepository : public AbstractSimContactsRepository, public app::AsyncCallbackReceiver
 {
   public:
+    using NotificationData = std::pair<db::Query::Type, uint32_t>;
     explicit SimContactsRepository(app::ApplicationCommon *application);
 
     const std::vector<ContactRecord> &getImportedRecords() override;
@@ -36,6 +37,9 @@ class SimContactsRepository : public AbstractSimContactsRepository, public app::
     void save(const std::vector<bool> &selectedContacts, bool duplicatesFound, OnSaveCallback callback) override;
     void findDuplicates(const std::vector<bool> &selectedContacts, OnDupplicatesCheckCallback callback) override;
     void updateImportedRecords(const std::vector<cellular::SimContact> &simData);
+
+  protected:
+    void sendNotification(const NotificationData &notificationData);
 
   private:
     std::vector<ContactRecord> importedRecords;
