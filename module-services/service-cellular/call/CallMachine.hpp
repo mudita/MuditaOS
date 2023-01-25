@@ -268,6 +268,7 @@ namespace call
         {
             di.audio->stop();
             call.record.duration = di.timer->duration();
+            call.record.isRead   = true;
             di.db->endCall(call.record);
             di.multicast->notifyCallEnded();
             di.timer->stop();

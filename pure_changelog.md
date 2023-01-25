@@ -38,6 +38,7 @@
 * Fixed the notification of unread messages are not deleted with the thread
 * Fixed several MTP issues
 * Fixed notifications of unread SMS threads on the home screen
+* Fixed false dotted notification above Calls app in case of answered call
 
 ### Added
 
