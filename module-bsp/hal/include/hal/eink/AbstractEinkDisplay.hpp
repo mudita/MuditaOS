@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -69,6 +69,7 @@ namespace hal::eink
         virtual ~AbstractEinkDisplay() = default;
 
         virtual void setMode(const EinkDisplayColorMode mode) noexcept                                        = 0;
+        virtual EinkDisplayColorMode getMode() const noexcept                                                 = 0;
         virtual EinkStatus showImageUpdate(const std::vector<EinkFrame> &updateFrames,
                                            const std::uint8_t *frameBuffer)                                   = 0;
         virtual EinkStatus showImageRefresh(const EinkFrame &refreshFrame, const EinkRefreshMode refreshMode) = 0;
