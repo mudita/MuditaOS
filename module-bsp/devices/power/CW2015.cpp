@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CW2015.hpp"
@@ -323,6 +323,16 @@ namespace bsp::devices::power
             return ret_val;
         }
         else {
+            constexpr uint8_t maxProbes = 5;
+            for (uint8_t i = 0; i < maxProbes; ++i) {
+                if (const auto result = i2c.Read(fuelGaugeAddress, &ret_val, i2c_subaddr_size);
+                    result == i2c_subaddr_size) {
+                    return ret_val;
+                }
+                i2c.ReInit();
+                LOG_INFO("Trying to get I2C data: %d", i);
+                vTaskDelay(pdMS_TO_TICKS(i * 10));
+            }
             return std::nullopt;
         }
     }
