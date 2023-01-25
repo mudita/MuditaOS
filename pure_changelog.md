@@ -6,6 +6,7 @@
 * Improved dialog with network via USSD
 * Added serial number and timestamp to crashdump filename
 * Changed order of starting services, ServiceDesktop moved to the back
+* Shortened duration of phone modes pop-up from 3s to 1s
 
 ### Fixed
 * Fixed not marking thread as read when new message arrives in the opened thread

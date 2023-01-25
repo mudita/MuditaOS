@@ -9,9 +9,15 @@
 #include <module-gui/gui/widgets/Arc.hpp>
 #include <PhoneModes/Common.hpp>
 
+namespace
+{
+    constexpr auto oneSecondTimeout = std::chrono::seconds{1};
+}
+
 namespace gui
 {
-    HomeModesWindow::HomeModesWindow(app::ApplicationCommon *app, const std::string &name) : WindowWithTimer(app, name)
+    HomeModesWindow::HomeModesWindow(app::ApplicationCommon *app, const std::string &name)
+        : WindowWithTimer(app, name, oneSecondTimeout)
     {
         buildInterface();
     }
