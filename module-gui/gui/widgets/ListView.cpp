@@ -1,10 +1,8 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ListView.hpp"
 #include "InputEvent.hpp"
-#include "cassert"
-#include <log/log.hpp>
 
 namespace gui
 {
@@ -21,11 +19,11 @@ namespace gui
 
     void ListViewScroll::updateProportional(const ListViewScrollUpdateData &data)
     {
-        double scrollStep =
+        const auto scrollStep =
             static_cast<double>((parent->widgetArea.h - topMargin)) / static_cast<double>(data.elementsCount);
 
-        auto scrollH = scrollStep * data.listPageSize;
-        auto scrollY = scrollStep * data.startIndex > 0 ? scrollStep * data.startIndex : topMargin;
+        const auto scrollH = scrollStep * data.listPageSize;
+        const auto scrollY = (scrollStep * data.startIndex > 0) ? scrollStep * data.startIndex : topMargin;
 
         setArea(BoundingBox(
             parent->widgetArea.w - style::listview::scroll::margin, scrollY, style::listview::scroll::w, scrollH));
@@ -33,15 +31,15 @@ namespace gui
 
     void ListViewScroll::updateFixed(const ListViewScrollUpdateData &data)
     {
-        auto elementsOnPage = parent->widgetArea.h / data.elementMinimalSpaceRequired;
+        const auto elementsOnPage = parent->widgetArea.h / data.elementMinimalSpaceRequired;
 
-        pagesCount = data.elementsCount % elementsOnPage == 0 ? data.elementsCount / elementsOnPage
-                                                              : data.elementsCount / elementsOnPage + 1;
+        pagesCount = (data.elementsCount % elementsOnPage == 0) ? data.elementsCount / elementsOnPage
+                                                                : data.elementsCount / elementsOnPage + 1;
 
         currentPage = data.startIndex / elementsOnPage;
 
-        auto scrollH = (parent->widgetArea.h - topMargin) / pagesCount;
-        auto scrollY = scrollH * currentPage > 0 ? scrollH * currentPage : topMargin;
+        const auto scrollH = (parent->widgetArea.h - topMargin) / pagesCount;
+        const auto scrollY = (scrollH * currentPage > 0) ? scrollH * currentPage : topMargin;
 
         setArea(BoundingBox(
             parent->widgetArea.w - style::listview::scroll::margin, scrollY, style::listview::scroll::w, scrollH));
@@ -110,8 +108,9 @@ namespace gui
 
             setVisible(true);
         }
-        else
+        else {
             setVisible(false);
+        }
     }
     void ListViewScroll::setTopMargin(int _topMargin)
     {
@@ -125,7 +124,7 @@ namespace gui
                        unsigned int h,
                        std::shared_ptr<ListItemProvider> prov,
                        listview::ScrollBarType scrollBarType)
-        : Rect{parent, x, y, w, h}, ListViewEngine(prov)
+        : Rect{parent, x, y, w, h}, ListViewEngine(std::move(prov))
     {
         this->setEdges(RectangleEdge::None);
 
@@ -143,12 +142,10 @@ namespace gui
             else if (inputEvent.is(KeyCode::KEY_DOWN) && pageLoaded) {
                 return this->requestNextPage();
             }
-            else {
-                return false;
-            }
+            return false;
         };
 
-        inputCallback = [&](Item &item, const InputEvent &event) { return body->onInput(event); };
+        inputCallback = [&]([[maybe_unused]] Item &item, const InputEvent &event) { return body->onInput(event); };
 
         focusChangedCallback = [this]([[maybe_unused]] Item &item) -> bool {
             if (focus) {
@@ -161,8 +158,9 @@ namespace gui
         };
 
         body->parentOnRequestedResizeCallback = [this]() {
-            if (pageLoaded)
+            if (pageLoaded) {
                 recalculateOnBoxRequestedResize();
+            }
         };
 
         checkFullRenderRequirementCallback = [this]() {
