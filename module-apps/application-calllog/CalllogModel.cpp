@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogModel.hpp"
@@ -12,8 +12,6 @@
 #include <service-appmgr/Controller.hpp>
 #include "application-call/data/CallSwitchData.hpp"
 #include <module-db/queries/calllog/QueryCalllogGet.hpp>
-
-using namespace calllog;
 
 CalllogModel::CalllogModel(app::ApplicationCommon *app) : DatabaseModel(app), app::AsyncCallbackReceiver(app)
 {}
@@ -56,7 +54,7 @@ bool CalllogModel::updateRecords(std::vector<CalllogRecord> records)
 
 unsigned int CalllogModel::getMinimalItemSpaceRequired() const
 {
-    return gui::clItemStyle::h;
+    return gui::clItemStyle::h + gui::clItemStyle::top_margin;
 }
 
 gui::ListItem *CalllogModel::getItem(gui::Order order)

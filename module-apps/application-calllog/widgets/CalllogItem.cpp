@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogItem.hpp"
@@ -8,14 +8,11 @@
 
 #include <Style.hpp>
 
-using namespace calllog;
-
 namespace gui
 {
-
     CalllogItem::CalllogItem(CalllogModel *model) : model{model}
     {
-        setMargins(Margins(0, style::margins::big, 0, 0));
+        setMargins(Margins(0, clItemStyle::top_margin, 0, 0));
         setMinimumSize(clItemStyle::w, clItemStyle::h);
         setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
 
@@ -24,7 +21,7 @@ namespace gui
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
         hBox->setPenWidth(style::window::default_border_rect_no_focus);
 
-        auto newImg = [=](const UTF8 imageName) -> gui::Image * {
+        auto newImg = [=](const UTF8 &imageName) -> gui::Image * {
             auto img = new gui::Image(hBox, imageName, gui::ImageTypeSpecifier::W_M);
             img->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center});
             img->setMargins(Margins(0, 0, clItemStyle::internal_margin, 0));

@@ -62,7 +62,6 @@ class ServiceDesktop : public sys::Service
     sys::ReturnCodes SwitchPowerModeHandler(sys::ServicePowerMode mode) override;
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
 
-    std::string prepareSyncFilename();
     void prepareSyncData();
     const Sync::OperationStatus getSyncStatus()
     {
