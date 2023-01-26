@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -39,12 +39,11 @@ namespace gui
     class NotificationWithEventCounter : public NotificationListItem
     {
       public:
-        NotificationWithEventCounter(notifications::NotificationType type, const UTF8 &indicator);
+        NotificationWithEventCounter(notifications::NotificationType type, unsigned count);
     };
 
     class NotificationWithOnOffButton : public NotificationListItem
     {
-
       public:
         NotificationWithOnOffButton(notifications::NotificationType type, gui::ButtonTriState::State state);
     };

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationListItem.hpp"
@@ -10,6 +10,7 @@
 
 #include <widgets/Style.hpp>
 #include <map>
+#include <Utils.hpp>
 
 using namespace gui;
 
@@ -57,30 +58,35 @@ namespace
         hbox->setMaximumSize(style::window::default_body_width, style::notifications::itemHeight);
     }
 
-    constexpr auto maxNotificationValue = "99+";
-    constexpr auto singleNotification   = "1";
+    constexpr auto singleNotification             = 1;
+    constexpr auto maxNotificationValue           = 99;
+    constexpr auto maxNotificationReplacementText = "99+";
 
-    auto buildNotificationCountText(const UTF8 &indicator) -> gui::Text *
+    auto buildNotificationCountText(unsigned count) -> gui::Text *
     {
-        auto number = new gui::TextFixedSize();
-        if (indicator.length() > 2) {
-            number->setText(maxNotificationValue);
+        const auto number = new gui::TextFixedSize();
+        UTF8 countText;
+
+        if (count == singleNotification) {
+            countText = "";
         }
-        else if (indicator == singleNotification) {
-            number->clear();
+        else if (count > maxNotificationValue) {
+            countText = maxNotificationReplacementText;
         }
         else {
-            number->setText(indicator);
+            countText = utils::to_string(count);
         }
 
         number->drawUnderline(false);
         number->setFont(style::window::font::mediumbold);
-        number->setMinimumWidthToFitText(indicator);
+        number->setMinimumWidthToFitText(countText);
         number->setMinimumHeightToFitText();
         number->setPenWidth(style::window::default_border_no_focus_w);
         number->setMargins(gui::Margins(0, 0, style::window::default_right_margin, 0));
         number->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        number->setText(countText);
         number->activeItem = false;
+
         return number;
     }
 
@@ -133,11 +139,11 @@ notifications::NotificationType NotificationListItem::getType() const noexcept
     return type;
 }
 
-NotificationWithEventCounter::NotificationWithEventCounter(notifications::NotificationType type, const UTF8 &indicator)
+NotificationWithEventCounter::NotificationWithEventCounter(notifications::NotificationType type, unsigned count)
     : NotificationListItem(type)
 {
     box->addWidget(buildImageInactive("dot_12px_hard_alpha_W_G"));
-    box->addWidget(buildNotificationCountText(indicator));
+    box->addWidget(buildNotificationCountText(count));
     text->setMaximumSize(text->getSize(Axis::X), Axis::X);
 }
 
