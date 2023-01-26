@@ -1,7 +1,9 @@
 # MuditaOS changelog - PurePhone
 
 ## Unreleased
-
+### Added
+* Always display network access technology and signal strength on the status bar
+* 
 ### Changed / Improved
 * Improved dialog with network via USSD
 * Added serial number and timestamp to crashdump filename
@@ -42,8 +44,6 @@
 * Fixed false dotted notification above Calls app in case of answered call
 * Fixed broken French translation on 'Configure passcode' screen in Onboarding
 * Fixed time disappearing in SMS thread
-
-### Added
 
 ## [1.5.0 2022-12-20]
 

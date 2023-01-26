@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneLockedWindow.hpp"
@@ -141,7 +141,7 @@ namespace gui
 
     status_bar::Configuration PhoneLockedWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.enable(status_bar::Indicator::NetworkAccessTechnology);
         appConfiguration.disable(status_bar::Indicator::Time);
         appConfiguration.enable(status_bar::Indicator::PhoneMode);
         appConfiguration.enable(status_bar::Indicator::Lock);

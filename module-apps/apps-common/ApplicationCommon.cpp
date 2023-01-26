@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCommon.hpp"
@@ -89,9 +89,12 @@ namespace app
           lockPolicyHandler(this), simLockSubject(this)
     {
         popupFilter->attachWindowsStack(windowsStackImpl.get());
-        statusBarManager->enableIndicators({gui::status_bar::Indicator::Time});
+        statusBarManager->enableIndicators({gui::status_bar::Indicator::Time,
+                                            gui::status_bar::Indicator::Signal,
+                                            gui::status_bar::Indicator::NetworkAccessTechnology});
 
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+
         bus.channels.push_back(sys::BusChannel::USBNotifications);
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
