@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,13 +15,14 @@ namespace db::query::notifications
     {
         const NotificationsRecord::Key key;
         const size_t count;
+        size_t numberID = 0;
 
       public:
-        Decrement(NotificationsRecord::Key key, const size_t count);
+        Decrement(NotificationsRecord::Key key, size_t numberID, size_t count);
 
         [[nodiscard]] auto getKey() const noexcept -> NotificationsRecord::Key;
         [[nodiscard]] auto getCount() const noexcept -> size_t;
-
+        [[nodiscard]] auto getNumberID() const noexcept -> size_t;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 

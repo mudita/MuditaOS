@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsRecord.hpp"
@@ -182,7 +182,7 @@ std::unique_ptr<db::query::notifications::IncrementResult> NotificationsRecordIn
 std::unique_ptr<db::query::notifications::DecrementResult> NotificationsRecordInterface::runQueryImpl(
     const db::query::notifications::Decrement *query)
 {
-    auto ret = processDecrement(query->getKey(), query->getCount());
+    auto ret = processDecrement(query->getKey(), query->getNumberID(), query->getCount());
 
     return std::make_unique<db::query::notifications::DecrementResult>(ret);
 }
@@ -211,6 +211,7 @@ std::unique_ptr<db::query::notifications::ClearResult> NotificationsRecordInterf
     if (auto record = GetByKey(query->getKey()); record.isValid()) {
         record.value = 0;
         record.contactRecord.reset();
+        unreadMsgNumberIDs.clear();
         ret = Update(record);
     }
     return std::make_unique<db::query::notifications::ClearResult>(ret);
@@ -241,6 +242,10 @@ bool NotificationsRecordInterface::processIncrement(NotificationsRecord::Key key
                          numberMatch.value().contactId != currentContactRecord.value().ID) {
                     currentContactRecord.reset();
                 }
+                if (key == NotificationsRecord::Key::Sms &&
+                    std::find(unreadMsgNumberIDs.begin(), unreadMsgNumberIDs.end(), numberMatch.value().numberId) ==
+                        unreadMsgNumberIDs.end())
+                    unreadMsgNumberIDs.push_back(numberMatch.value().numberId);
             }
             else {
                 currentContactRecord.reset();
@@ -256,7 +261,9 @@ bool NotificationsRecordInterface::processIncrement(NotificationsRecord::Key key
     return ret;
 }
 
-bool NotificationsRecordInterface::processDecrement(NotificationsRecord::Key key, size_t delta)
+bool NotificationsRecordInterface::processDecrement(const NotificationsRecord::Key key,
+                                                    const std::uint32_t numberID,
+                                                    const size_t delta)
 {
     auto ret = false;
 
@@ -264,9 +271,22 @@ bool NotificationsRecordInterface::processDecrement(NotificationsRecord::Key key
         if (delta >= record.value) {
             record.contactRecord.reset();
             record.value = 0;
+            if (key == NotificationsRecord::Key::Sms) {
+                unreadMsgNumberIDs.clear();
+            }
         }
         else {
             record.value -= delta;
+            if (key == NotificationsRecord::Key::Sms) {
+                unreadMsgNumberIDs.erase(std::remove_if(unreadMsgNumberIDs.begin(),
+                                                        unreadMsgNumberIDs.end(),
+                                                        [numberID](std::uint32_t value) { return numberID == value; }),
+                                         unreadMsgNumberIDs.end());
+                if (unreadMsgNumberIDs.size() == 1) {
+                    auto contactRecord   = contactsDb->GetByNumberID(unreadMsgNumberIDs.at(0));
+                    record.contactRecord = std::move(contactRecord);
+                }
+            }
         }
 
         ret = Update(record);
