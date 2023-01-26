@@ -46,6 +46,7 @@
 * Fixed time disappearing in SMS thread
 * Fixed scrollbar behavior in call log view
 * Fixed contacts imported from SIM do not show up in Mudita Center 
+* Fixed broken events counter on main screen for more than 99 events
 
 ### Added
 

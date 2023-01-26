@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsListPresenter.hpp"
@@ -76,8 +76,7 @@ bool NotificationsListPresenter::isEmpty() const noexcept
 auto NotificationsListPresenter::create(const notifications::NotSeenSMSNotification *notification)
     -> NotificationListItem *
 {
-    auto item = new NotificationWithEventCounter(notifications::NotificationType::NotSeenSms,
-                                                 utils::to_string(notification->getValue()));
+    auto item = new NotificationWithEventCounter(notifications::NotificationType::NotSeenSms, notification->getValue());
     setNotificationText(item, notification, "app_desktop_unread_messages");
     item->deleteByList = false;
     return item;
@@ -85,8 +84,8 @@ auto NotificationsListPresenter::create(const notifications::NotSeenSMSNotificat
 auto NotificationsListPresenter::create(const notifications::NotSeenCallNotification *notification)
     -> NotificationListItem *
 {
-    auto item = new NotificationWithEventCounter(notifications::NotificationType::NotSeenCall,
-                                                 utils::to_string(notification->getValue()));
+    auto item =
+        new NotificationWithEventCounter(notifications::NotificationType::NotSeenCall, notification->getValue());
     setNotificationText(item, notification, "app_desktop_missed_calls");
     item->deleteByList = false;
     return item;
@@ -105,8 +104,8 @@ auto NotificationsListPresenter::create(const notifications::TetheringNotificati
 auto NotificationsListPresenter::create(const notifications::AlarmSnoozeNotification *notification)
     -> NotificationListItem *
 {
-    auto item = new NotificationWithEventCounter(notifications::NotificationType::AlarmSnooze,
-                                                 utils::to_string(notification->getValue()));
+    auto item =
+        new NotificationWithEventCounter(notifications::NotificationType::AlarmSnooze, notification->getValue());
     item->setName(utils::translate("app_desktop_alarm_snooze"), true);
     item->deleteByList = false;
     return item;
