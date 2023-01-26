@@ -56,6 +56,7 @@
 * Fixed displaying an incorrect window after double ending a phone call
 * Fixed templates list not looping
 * Fixed inability to import contacts from Orange SIM cards
+* Fixed SMS notification behaviour when only one thread is unread
 * Fixed improper asterisk button behavior when adding new contact
 * Fixed for contacts removed and imported from SIM card once again were added to database without names 
 * Fixed (removed) redundant leading zero from time representation unless exactly midnight
