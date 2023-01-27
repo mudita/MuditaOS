@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,7 @@
 
 #include <AppWindow.hpp>
 #include <TextFixedSize.hpp>
+#include <ImageBoxWithText.hpp>
 
 #include <string>
 
@@ -37,11 +38,6 @@ namespace style::popup::alarm
 
 namespace gui
 {
-    enum class SnoozeShow
-    {
-        First,
-        Next
-    };
     class AlarmPopup : public AppWindow, app::popup::AlarmPopupContract::View
     {
       public:
@@ -53,19 +49,20 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
 
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
-        virtual void showSnoozeButton() override;
 
       private:
         VBox *body                         = nullptr;
+        VBox *snoozeLabelBox               = nullptr;
+        gui::TextFixedSize *alarmLabel     = nullptr;
         gui::TextFixedSize *alarmTimeLabel = nullptr;
         gui::TextFixedSize *snoozeLabel    = nullptr;
-        SnoozeShow snoozeShow              = SnoozeShow::First;
+        gui::ImageBoxWithText *snoozeIcon  = nullptr;
 
         void addArcOverlay();
         void createMainLayout();
-        void addAlarmLabels();
-        void addSnoozeLabel();
-        void addWindowElements();
+        void createLabels();
+        void createSnoozeButton();
+        void updateItems();
         void refillText();
     };
 

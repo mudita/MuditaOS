@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -63,7 +63,6 @@ namespace app::popup
             explicit View(std::shared_ptr<Presenter> presenter) : presenter(std::move(presenter))
             {}
             virtual ~View() noexcept        = default;
-            virtual void showSnoozeButton() = 0;
         };
 
         class Presenter : public BasePresenter<AlarmPopupContract::View>
