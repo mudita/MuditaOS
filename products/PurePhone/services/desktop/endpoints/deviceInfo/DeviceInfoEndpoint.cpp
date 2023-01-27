@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/deviceInfo/DeviceInfoEndpoint.hpp>
@@ -38,12 +38,20 @@ namespace sdesktop::endpoints
     {
         auto [totalDeviceSpaceMiB, reservedSystemSpaceMiB, usedUserSpaceMiB] = getStorageInfo();
 
+        const auto signalStrength = []() {
+            const auto status = Store::GSM::get()->getNetwork().status;
+            if (status == Store::Network::Status::NotRegistered) {
+                return 0;
+            }
+            return static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar);
+        }();
+
         context.setResponseBody(json11::Json::object(
             {{json::batteryLevel, std::to_string(Store::Battery::get().level)},
              {json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
              {json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
              {json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))},
-             {json::signalStrength, std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
+             {json::signalStrength, std::to_string(signalStrength)},
              {json::accessTechnology,
               std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().accessTechnology))},
              {json::networkStatus, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().status))},
