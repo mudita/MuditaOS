@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
@@ -160,6 +160,7 @@ namespace app::home_screen
                 [](AbstractView &view, AbstractPresenter &presenter, AbstractTemperatureModel &temperatureModel) {
                     view.setViewState(ViewState::AlarmEdit);
                     view.setTemperature(temperatureModel.getTemperature());
+                    presenter.spawnTimer(defaultAlarmSetTime);
                 };
             auto exit = [](AbstractView &view, AbstractPresenter &presenter) { presenter.detachTimer(); };
 
