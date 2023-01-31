@@ -1471,12 +1471,12 @@ auto ContactRecordInterface::MergeContactsList(std::vector<ContactRecord> &conta
         }
         auto matchedNumber = numberMatcher.bestMatch(contact.numbers[0].number, utils::PhoneNumber::Match::POSSIBLE);
 
-        if (!matchedNumber.has_value()) {
+        if (!matchedNumber.has_value() or matchedNumberRefersToTemporary(matchedNumber.value())) {
             if (!Add(contact)) {
                 LOG_ERROR("Contacts list merge fail when adding the contact.");
             }
             else {
-                dataForNotification.push_back({db::Query::Type::Create, contactDB->getLastInsertRowId()});
+                dataForNotification.push_back({db::Query::Type::Create, contact.ID});
             }
         }
         else {
@@ -1506,7 +1506,7 @@ auto ContactRecordInterface::CheckContactsListDuplicates(std::vector<ContactReco
             LOG_WARN("Contact with multiple numbers detected - ignoring all numbers except first");
         }
         auto matchedNumber = numberMatcher.bestMatch(contact.numbers[0].number, utils::PhoneNumber::Match::POSSIBLE);
-        if (matchedNumber.has_value()) {
+        if (matchedNumber.has_value() and !matchedNumberRefersToTemporary(matchedNumber.value())) {
             duplicates.push_back(contact);
         }
         else {
@@ -1545,6 +1545,13 @@ auto ContactRecordInterface::verifyTemporary(ContactRecord &record) -> bool
     }
 
     return isTemporary;
+}
+
+auto ContactRecordInterface::matchedNumberRefersToTemporary(const ContactNumberHolder &matchedNumber) -> bool
+{
+    auto contact = GetByNumberID(matchedNumber.getNumberID());
+
+    return contact.has_value() and contact->isTemporary();
 }
 
 auto ContactRecordInterface::changeNumberRecordInPlaceIfCountryCodeIsOnlyDifferent(

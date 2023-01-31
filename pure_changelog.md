@@ -57,6 +57,7 @@
 * Fixed templates list not looping
 * Fixed inability to import contacts from Orange SIM cards
 * Fixed improper asterisk button behavior when adding new contact
+* Fixed for contacts removed and imported from SIM card once again were added to database without names 
 
 ## [1.5.0 2022-12-20]
 
