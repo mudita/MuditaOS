@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BoxLayout.hpp"
@@ -41,10 +41,13 @@ namespace gui
 
     bool BoxLayout::onFocus(bool state)
     {
-        if (state)
+        if (state) {
             this->setVisible(state);
-        else
+        }
+        else {
             this->setFocusItem(nullptr);
+        }
+
         this->setNavigation();
         if (this->focusChangedCallback && state != focus) {
             this->focusChangedCallback(*this);
@@ -78,7 +81,7 @@ namespace gui
 
     bool BoxLayout::removeWidget(Item *item)
     {
-        bool ret = Rect::removeWidget(item);
+        const auto ret = Rect::removeWidget(item);
 
         outOfDrawAreaItems.remove(item);
         resizeItems();
@@ -109,7 +112,7 @@ namespace gui
     void BoxLayout::setVisible(bool value, bool previous)
     {
         visible = value; // maybe use parent setVisible(...)? would be better but which one?
-        if (value == true) {
+        if (value) {
             resizeItems();         // move items in box in proper places
             setNavigation();       // set navigation through kids -> TODO handle out of last/first to parent
             if (children.size()) { // set first visible kid as focused item - TODO should check for actionItems too...
@@ -189,7 +192,7 @@ namespace gui
 
     void BoxLayout::addFromOutOfDrawAreaList()
     {
-        if (children.size() != 0) {
+        if (!children.empty()) {
             for (auto it : outOfDrawAreaItems) {
                 it->setVisible(true);
                 it->setFocusItem(nullptr);
@@ -212,8 +215,9 @@ namespace gui
 
         for (auto &el : children) {
 
-            if (!el->visible)
+            if (!el->visible) {
                 continue;
+            }
 
             auto axisItemPosition       = 0;
             auto orthogonalItemPosition = 0;
@@ -237,8 +241,9 @@ namespace gui
             orthogonalItemPosition = calculateElemOrtAxisPosition<axis>(el, orthogonalItemSize);
 
             // 6. If element still visible (not added to outOfDrawAreaList) set it Area with calculated values.
-            if (el->visible)
+            if (el->visible) {
                 el->setAreaInAxis(axis, axisItemPosition, orthogonalItemPosition, axisItemSize, orthogonalItemSize);
+            }
         }
 
         Rect::updateDrawArea();
@@ -293,14 +298,14 @@ namespace gui
     Length BoxLayout::calculateElemOrtAxisSize(Item *el)
     {
         // Get maximum size that element in orthogonal axis can occupy in current layout size.
-        Length maxOrthogonalItemInParentSize =
+        const Length maxOrthogonalItemInParentSize =
             static_cast<Position>(this->area(Area::Normal).size(orthogonal(axis))) <=
                     el->getMargins().getSumInAxis(orthogonal(axis))
                 ? 0
                 : this->area(Area::Normal).size(orthogonal(axis)) - el->getMargins().getSumInAxis(orthogonal(axis));
 
         // Get maximum size of element in orthogonal axis based on its min-max.
-        Length maxOrthogonalItemSize =
+        const Length maxOrthogonalItemSize =
             el->area(Area::Max).size(orthogonal(axis)) > el->area(Area::Min).size(orthogonal(axis))
                 ? el->area(Area::Max).size(orthogonal(axis))
                 : el->area(Area::Min).size(orthogonal(axis));
@@ -318,7 +323,7 @@ namespace gui
         auto axisItemPosition = 0;
 
         // Check if elements in axis can fit with margins in layout free space.
-        if (((Position)(axisItemSize + el->getMargins().getSumInAxis(axis))) <= leftPosition) {
+        if (static_cast<Position>(axisItemSize + el->getMargins().getSumInAxis(axis)) <= leftPosition) {
 
             if (reverseOrder) {
                 startingPosition -= el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
@@ -464,8 +469,8 @@ namespace gui
     {
         if (parent != nullptr) {
             auto [w, h] = requestSize(request_w, request_h);
-            request_w   = std::min(w, (Length)request_w);
-            request_h   = std::min(h, (Length)request_h);
+            request_w   = std::min(w, static_cast<Length>(request_w));
+            request_h   = std::min(h, static_cast<Length>(request_h));
         }
 
         auto el = std::find(children.begin(), children.end(), child);

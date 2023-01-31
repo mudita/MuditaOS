@@ -45,9 +45,10 @@
 * Fixed broken French translation on 'Configure passcode' screen in Onboarding
 * Fixed time disappearing in SMS thread
 * Fixed scrollbar behavior in call log view
-* Fixed contacts imported from SIM do not show up in Mudita Center 
+* Fixed contacts imported from SIM not showing up in Mudita Center 
 * Fixed broken events counter on main screen for more than 99 events
-* Fixed for incorrect signal strength displayed in Center
+* Fixed incorrect signal strength displayed in Center
+* Fixed inability to enter text in search field after clicking right arrow
 
 ### Added
 

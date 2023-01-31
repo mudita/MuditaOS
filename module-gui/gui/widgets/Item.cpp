@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Item.hpp"
@@ -47,11 +47,13 @@ namespace gui
 
     Item::~Item()
     {
-        for (auto &widget : children)
+        for (auto &widget : children) {
             delete widget;
+        }
 
-        if (navigationDirections)
+        if (navigationDirections) {
             delete navigationDirections;
+        }
     }
 
     bool Item::erase(Item *item)
@@ -72,8 +74,9 @@ namespace gui
 
     void Item::addWidget(Item *item)
     {
-        if (item == nullptr)
+        if (item == nullptr) {
             return;
+        }
         if (item->parent) {
             item->parent->removeWidget(item);
         }
@@ -85,8 +88,9 @@ namespace gui
 
     bool Item::removeWidget(Item *item)
     {
-        if (item == nullptr)
+        if (item == nullptr) {
             return false;
+        }
         if (item == focusItem) {
             focusItem = nullptr;
         }
@@ -358,11 +362,13 @@ namespace gui
     {
         auto tempAlignment = getAlignment(axis);
 
-        if (parent->getAlignment(axis).vertical != Alignment::Vertical::None)
+        if (parent->getAlignment(axis).vertical != Alignment::Vertical::None) {
             tempAlignment.vertical = parent->getAlignment(axis).vertical;
+        }
 
-        if (parent->getAlignment(axis).horizontal != Alignment::Horizontal::None)
+        if (parent->getAlignment(axis).horizontal != Alignment::Horizontal::None) {
             tempAlignment.horizontal = parent->getAlignment(axis).horizontal;
+        }
 
         switch (tempAlignment.vertical) {
         case gui::Alignment::Vertical::Top:
@@ -414,7 +420,7 @@ namespace gui
             result.x += parentItem->widgetArea.x;
             result.y += parentItem->widgetArea.y;
             BoundingBox newResult;
-            if (BoundingBox::intersect(parentItem->widgetArea, result, newResult) == false) {
+            if (!BoundingBox::intersect(parentItem->widgetArea, result, newResult)) {
                 result.clear();
                 break;
             }
@@ -425,8 +431,9 @@ namespace gui
 
         drawArea = result;
 
-        for (gui::Item *it : children)
+        for (const auto &it : children) {
             it->updateDrawArea();
+        }
     }
 
     Item *Item::getNavigationItem(NavigationDirection direction)
@@ -439,8 +446,9 @@ namespace gui
 
     void Item::setNavigationItem(gui::NavigationDirection direction, Item *item)
     {
-        if (navigationDirections == nullptr)
+        if (navigationDirections == nullptr) {
             navigationDirections = new Navigation();
+        }
         navigationDirections->setDirectionItem(direction, item);
     }
 
@@ -475,8 +483,9 @@ namespace gui
         if (state != focus) {
             focus = state;
             onFocus(state);
-            if (focusChangedCallback)
+            if (focusChangedCallback) {
                 focusChangedCallback(*this);
+            }
         };
         return state;
     }
@@ -502,15 +511,16 @@ namespace gui
         return nullptr;
     }
 
-    bool Item::onFocus(bool state)
+    bool Item::onFocus([[maybe_unused]] bool state)
     {
         return true;
     }
 
-    bool Item::onActivated(void *data)
+    bool Item::onActivated([[maybe_unused]] void *data)
     {
-        if (activatedCallback)
+        if (activatedCallback) {
             return activatedCallback(*this);
+        }
         return false;
     }
 

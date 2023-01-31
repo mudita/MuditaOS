@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputBox.hpp"
@@ -30,13 +30,13 @@ namespace gui
                                     input_Box::h);
         verticalBox->setEdges(RectangleEdge::None);
 
-        auto l = new Label(verticalBox);
-        l->setMinimumHeight(input_Box::label_h);
-        l->setMaximumWidth(style::window::default_body_width);
-        l->setFont(style::window::font::small);
-        l->setEdges(RectangleEdge::None);
-        l->setText(header);
-        l->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
+        auto label = new Label(verticalBox);
+        label->setMinimumHeight(input_Box::label_h);
+        label->setMaximumWidth(style::window::default_body_width);
+        label->setFont(style::window::font::small);
+        label->setEdges(RectangleEdge::None);
+        label->setText(header);
+        label->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
         auto horizontalBox = new HBox(verticalBox);
         horizontalBox->setAlignment({gui::Alignment::Vertical::Top});
@@ -60,6 +60,7 @@ namespace gui
         if (!icon.empty()) {
             auto imageBox = new ImageBox(horizontalBox, new Image(icon));
             imageBox->setMinimumSizeToFitImage();
+            imageBox->activeItem = false; // Prevent switching focus to the image
         }
 
         verticalBox->resizeItems();
