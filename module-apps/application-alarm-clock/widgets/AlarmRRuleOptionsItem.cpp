@@ -56,7 +56,7 @@ namespace gui
         onLoadCallback = [&]([[maybe_unused]] std::shared_ptr<AlarmEventRecord> alarm) {
             checkCustomOption(getPresenter()->getDescription());
             optionSpinner->setCurrentValue(getPresenter()->getDescription());
-            if (getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom) {
+            if (optionSpinner->focus && getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom) {
                 this->navBarTemporaryMode(utils::translate(style::strings::common::edit));
             }
             else {
