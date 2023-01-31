@@ -9,14 +9,13 @@
 #include <Style.hpp>
 #include <i18n/i18n.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
 
 using namespace style::header;
 
 namespace gui
 {
 
-    AppWindow::AppWindow(app::ApplicationCommon *app, std::string name) : Window(name), application{app}
+    AppWindow::AppWindow(app::ApplicationCommon *app, std::string name) : Window(std::move(name)), application{app}
     {
         setSize(style::window_width, style::window_height);
     }
@@ -126,7 +125,7 @@ namespace gui
     void AppWindow::updatePhoneMode(sys::phone_modes::PhoneMode mode)
     {
         auto fn = [&](gui::status_bar::Configuration cfg) -> gui::status_bar::Configuration {
-            gui::status_bar::Configuration ret(cfg);
+            gui::status_bar::Configuration ret(std::move(cfg));
             ret.setPhoneMode(mode);
             return ret;
         };
@@ -190,7 +189,7 @@ namespace gui
             }
         }
 
-        if ((inputEvent.isShortRelease())) {
+        if (inputEvent.isShortRelease()) {
             switch (inputEvent.getKeyCode()) {
             case KeyCode::HEADSET_VOLUP:
                 [[fallthrough]];

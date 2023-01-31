@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookSearch.hpp"
@@ -48,12 +48,12 @@ namespace gui
             return false;
         }
 
-        std::string searchFilter = utils::trim(inputField->getText());
+        const auto searchFilter = utils::trim(inputField->getText());
         if (searchFilter.empty()) {
             return false;
         }
 
-        auto app = dynamic_cast<app::ApplicationPhonebook *>(application);
+        const auto app = dynamic_cast<app::ApplicationPhonebook *>(application);
         if (app == nullptr) {
             LOG_ERROR("Failed to get phonebook application.");
             return false;
