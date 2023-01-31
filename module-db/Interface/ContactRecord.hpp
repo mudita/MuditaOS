@@ -302,6 +302,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto addOrUpdateRingtone(std::uint32_t contactID, std::uint32_t ringtoneID, const ContactRecord &contact)
         -> std::optional<std::uint32_t>;
 
+    auto matchedNumberRefersToTemporary(const ContactNumberHolder &matchedNumber) -> bool;
+
     /**
      * @brief Changing number table record in place if new number is same as old number but with/without country code
      *
