@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookContactOptions.hpp"
@@ -93,25 +93,30 @@ namespace gui
     auto PhonebookContactOptions::showNotification(NotificationType notificationType) -> bool
     {
         std::string dialogText;
+        std::string icon;
 
         switch (notificationType) {
-        case NotificationType::Block:
+        case NotificationType::Block: {
             dialogText = utils::translate("app_phonebook_options_block_notification");
-            break;
-        case NotificationType::Delete:
-            dialogText = utils::translate("app_phonebook_options_delete_notification");
-            break;
-        case NotificationType::Unblock:
-            dialogText = utils::translate("app_phonebook_options_unblock_notification");
+            icon       = "info_128px_W_G";
             break;
         }
 
+        case NotificationType::Delete: {
+            dialogText = utils::translate("app_phonebook_options_delete_notification");
+            icon       = "success_128px_W_G";
+            break;
+        }
+
+        case NotificationType::Unblock: {
+            dialogText = utils::translate("app_phonebook_options_unblock_notification");
+            icon       = "info_128px_W_G";
+            break;
+        }
+        }
+
         auto metaData                        = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-            contact->getFormattedName(ContactRecord::NameFormatType::Title),
-            "info_128px_W_G",
-            dialogText,
-            "",
-            [=]() -> bool {
+            contact->getFormattedName(ContactRecord::NameFormatType::Title), icon, dialogText, "", [=]() -> bool {
                 if (requestType == PhonebookItemData::RequestType::External) {
                     app::manager::Controller::switchBack(application);
                 }
