@@ -50,6 +50,7 @@
 * Fixed incorrect signal strength displayed in Center
 * Fixed inability to enter text in search field after clicking right arrow
 * Fixed displaying wrong screen after contact removal
+* Fixed improper font weight used in navbar
 
 ### Added
 
