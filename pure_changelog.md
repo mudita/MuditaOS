@@ -53,6 +53,7 @@
 * Fixed improper font weight used in navbar
 * Fix for country code in new contact based on deleted one
 * Fixed the data displayed on snoozed alarms screen
+* Fixed displaying an incorrect window after double ending a phone call
 
 ## [1.5.0 2022-12-20]
 

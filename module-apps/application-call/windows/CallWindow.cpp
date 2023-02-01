@@ -162,13 +162,14 @@ namespace gui
     bool CallWindow::onInput(const InputEvent &inputEvent)
     {
         bool handled = false;
+        const auto keyCode = inputEvent.getKeyCode();
 
         // process only if key is released
         // InputEvent::State::keyReleasedLong is necessary for KeyCode::KEY_RF to properly abort the active call
         if (inputEvent.isKeyRelease()) {
             LOG_INFO("key released");
-            auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
-            switch (inputEvent.getKeyCode()) {
+            const auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
+            switch (keyCode) {
             case KeyCode::KEY_LF:
                 handled = presenter->handleLeftButton();
                 break;
@@ -191,7 +192,7 @@ namespace gui
             return true;
         }
         else {
-            return AppWindow::onInput(inputEvent);
+            return keyCode == KeyCode::KEY_RF ? true : AppWindow::onInput(inputEvent);
         }
     }
 
