@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -46,6 +46,7 @@ namespace gui
 
         list = new gui::ListView(
             this, style::x, style::y, style::w, style::h, smsTemplateModel, listview::ScrollBarType::Fixed);
+        list->setBoundaries(Boundaries::Continuous);
 
         setFocusItem(list);
     }

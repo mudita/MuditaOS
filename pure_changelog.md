@@ -3,7 +3,7 @@
 ## Unreleased
 ### Added
 * Always display network access technology and signal strength on the status bar
-* 
+
 ### Changed / Improved
 * Improved dialog with network via USSD
 * Added serial number and timestamp to crashdump filename
@@ -54,6 +54,7 @@
 * Fix for country code in new contact based on deleted one
 * Fixed the data displayed on snoozed alarms screen
 * Fixed displaying an incorrect window after double ending a phone call
+* Fixed templates list not looping
 
 ## [1.5.0 2022-12-20]
 
