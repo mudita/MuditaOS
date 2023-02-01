@@ -8,7 +8,6 @@
 #include <at/cmd/CSCA.hpp>
 #include <at/cmd/QECCNUM.hpp>
 #include <at/cmd/CFUN.hpp>
-#include <at/cmd/CPBS.hpp>
 #include <at/cmd/CPBR.hpp>
 #include <at/cmd/QNWINFO.hpp>
 #include <at/cmd/QSIMSTAT.hpp>
@@ -421,90 +420,6 @@ TEST_CASE("CFUN set data")
         constexpr auto expectedResult = "AT+CFUN=4,1";
         cmd.setModifier(at::cmd::Modifier::Set);
         cmd.set(at::cfun::Functionality::DisableRF, at::cfun::Reset::ResetTheME);
-        REQUIRE(cmd.getCmd() == expectedResult);
-    }
-}
-
-TEST_CASE("CPBS parser")
-{
-    SECTION("Empty data")
-    {
-        at::cmd::CPBS cmd;
-        at::Result result;
-        auto response = cmd.parseCPBS(result);
-        REQUIRE(!response);
-    }
-
-    SECTION("Failing channel")
-    {
-        at::cmd::CPBS cmd;
-        at::FailingChannel channel;
-        auto base     = channel.cmd(cmd);
-        auto response = cmd.parseCPBS(base);
-        REQUIRE(!response);
-        REQUIRE(response.code == at::Result::Code::ERROR);
-    }
-
-    SECTION("Success - valid token")
-    {
-        at::cmd::CPBS cmd;
-        at::CPBS_successChannel channel;
-        auto base     = channel.cmd(cmd);
-        auto response = cmd.parseCPBS(base);
-        REQUIRE(response.storage == "\"SM\"");
-        REQUIRE(response.used == 2);
-        REQUIRE(response.total == 500);
-    }
-
-    SECTION("Failed - to little tokens")
-    {
-        at::cmd::CPBS cmd;
-        at::CPBS_toLittleTokens channel;
-        auto base     = channel.cmd(cmd);
-        auto response = cmd.parseCPBS(base);
-        REQUIRE(!response);
-        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
-    }
-
-    SECTION("Failed - to many tokens")
-    {
-        at::cmd::CPBS cmd;
-        at::CPBS_toManyTokens channel;
-        auto base     = channel.cmd(cmd);
-        auto response = cmd.parseCPBS(base);
-        REQUIRE(!response);
-        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
-    }
-}
-
-TEST_CASE("CPBS set data")
-{
-    at::cmd::CPBS cmd;
-    SECTION("None modifier set")
-    {
-        constexpr auto expectedResult = "AT+CPBS";
-        REQUIRE(cmd.getCmd() == expectedResult);
-    }
-
-    SECTION("Get modifier set")
-    {
-        constexpr auto expectedResult = "AT+CPBS?";
-        cmd.setModifier(at::cmd::Modifier::Get);
-        REQUIRE(cmd.getCmd() == expectedResult);
-    }
-
-    SECTION("Set modifier set")
-    {
-        constexpr auto expectedResult = "AT+CPBS=";
-        cmd.setModifier(at::cmd::Modifier::Set);
-        REQUIRE(cmd.getCmd() == expectedResult);
-    }
-
-    SECTION("Set commnad")
-    {
-        constexpr auto expectedResult = "AT+CPBS=\"SM\"";
-        cmd                           = at::cmd::CPBS(at::cmd::Modifier::Set);
-        cmd.set();
         REQUIRE(cmd.getCmd() == expectedResult);
     }
 }

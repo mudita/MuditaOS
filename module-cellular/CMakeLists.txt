@@ -35,7 +35,6 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/QECCNUM.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/CLCC.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/CFUN.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/CPBS.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/CPBR.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/QNWINFO.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/QSIMSTAT.cpp

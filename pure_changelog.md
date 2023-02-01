@@ -55,6 +55,7 @@
 * Fixed the data displayed on snoozed alarms screen
 * Fixed displaying an incorrect window after double ending a phone call
 * Fixed templates list not looping
+* Fixed inability to import contacts from Orange SIM cards
 
 ## [1.5.0 2022-12-20]
 
