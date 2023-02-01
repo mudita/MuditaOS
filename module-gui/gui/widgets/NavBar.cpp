@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NavBar.hpp"
@@ -6,7 +6,6 @@
 #include "Margins.hpp"
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
-#include <log/log.hpp>
 
 namespace gui::nav_bar
 {
@@ -43,7 +42,7 @@ namespace gui::nav_bar
         left->setAlignment(Alignment(Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         left->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
         left->setMinimumHeight(widgetArea.h);
-        left->setFont(style::window::font::smallbold);
+        left->setFont(style::window::font::small);
         left->setTextEllipsisType(TextEllipsis::Right);
         left->setVisible(true);
         left->setEdges(RectangleEdge::None);
@@ -62,7 +61,7 @@ namespace gui::nav_bar
         right->setAlignment(Alignment(Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
         right->setPadding({0, 0, 0, style::nav_bar::bottom_padding});
         right->setMinimumHeight(widgetArea.h);
-        right->setFont(style::window::font::smallbold);
+        right->setFont(style::window::font::small);
         right->setTextEllipsisType(TextEllipsis::Right);
         right->setVisible(true);
         right->setEdges(RectangleEdge::None);
