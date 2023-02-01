@@ -301,56 +301,6 @@ namespace at
         }
     };
 
-    /// provides proper CPBS response
-    class CPBS_successChannel : public ChannelMock
-    {
-      public:
-        const std::string storage = "\"SM\"";
-        const std::string used    = "2";
-        const std::string total   = "500";
-        auto ResultMock() -> Result final
-        {
-            auto result     = Result();
-            result.code     = Result::Code::OK;
-            result.response = {"+CPBS: " + storage + "," + used + "," + total, "OK"};
-            return result;
-        }
-    };
-
-    /// provides invalid CPBS response
-    class CPBS_toManyTokens : public ChannelMock
-    {
-      public:
-        const std::string storage    = "\"SM\"";
-        const std::string used       = "2";
-        const std::string total      = "500";
-        const std::string additional = "500";
-
-        auto ResultMock() -> Result final
-        {
-            auto result     = Result();
-            result.code     = Result::Code::OK;
-            result.response = {"+CPBS: " + storage + "," + used + "," + total + "," + additional, "OK"};
-            return result;
-        }
-    };
-
-    /// provides invalid CPBS response
-    class CPBS_toLittleTokens : public ChannelMock
-    {
-      public:
-        const std::string storage = "\"SM\"";
-        const std::string used    = "2";
-
-        auto ResultMock() -> Result final
-        {
-            auto result     = Result();
-            result.code     = Result::Code::OK;
-            result.response = {"+CPBS: " + storage + "," + used, "OK"};
-            return result;
-        }
-    };
-
     /// provides proper CPBR response
     class CPBR_successChannel : public ChannelMock
     {
