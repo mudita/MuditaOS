@@ -1,10 +1,13 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Oscillator.hpp"
 #include "ClockState.hpp"
 #include <fsl_dcdc.h>
+#include <fsl_common.h>
 #include <cstdint>
+
+#define SDK_DEVICE_MAXIMUM_CPU_CLOCK_FREQUENCY 528000000
 
 namespace bsp
 {
@@ -19,6 +22,8 @@ namespace bsp
     {
         if (!IsExternalOscillatorEnabled()) {
             CLOCK_InitExternalClk(0);
+            /* Wait for XTAL stable */
+            SDK_DelayAtLeastUs(200, SDK_DEVICE_MAXIMUM_CPU_CLOCK_FREQUENCY);
             /// Switch DCDC to use DCDC external OSC
             DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
             /// Switch clock source to external OSC.
