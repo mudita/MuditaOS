@@ -6,6 +6,7 @@ target_sources(fsl
         fsl_cache.c
         fsl_clock.c
         fsl_common.c
+        fsl_common_arm.c
         fsl_dcdc.c
         fsl_dmamux.c
         fsl_edma.c
