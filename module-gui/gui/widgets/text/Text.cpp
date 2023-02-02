@@ -62,9 +62,7 @@ namespace gui
 
     Text::~Text()
     {
-        if (inputMode != nullptr) {
-            delete inputMode;
-        }
+        delete inputMode;
     }
 
     void Text::setEditMode(EditMode new_mode)
@@ -180,7 +178,7 @@ namespace gui
             debug_text("Nothing to parse/parser error in rich text: %s", text.c_str());
             return addText(text); // fallback
         }
-        for (auto block : tmp_document->getBlockCursor(0)) {
+        for (const auto &block : tmp_document->getBlockCursor(0)) {
             *cursor << block;
         }
         drawLines();
@@ -312,7 +310,7 @@ namespace gui
 
     bool Text::onFocus(bool state)
     {
-        if (state != focus && state == true) {
+        if (state != focus && state) {
             drawLines();
         }
         showCursor(state);
@@ -323,10 +321,12 @@ namespace gui
     {
         Rect::setRadius(value);
         // if padding are smaller than radius update the padding
-        if (padding.left < value)
+        if (padding.left < value) {
             padding.left = value;
-        if (padding.right < value)
+        }
+        if (padding.right < value) {
             padding.right = value;
+        }
     }
 
     void Text::setColor(Color color)
@@ -355,26 +355,22 @@ namespace gui
 
     void Text::setInputMode(InputMode *&&mode)
     {
-        if (this->inputMode != nullptr) {
-            delete this->inputMode;
-        }
+        delete this->inputMode;
+
         this->inputMode = mode;
     }
 
     std::string Text::getInputModeKeyMap()
     {
-        if (inputMode != nullptr) {
-
-            if (inputMode->is(InputMode::Abc)) {
-                return inputMode->get(detectInputMode());
-            }
-            else {
-                return inputMode->get();
-            }
-        }
-        else {
+        if (inputMode == nullptr) {
             return "";
         }
+
+        if (inputMode->is(InputMode::Abc)) {
+            return inputMode->get(detectInputMode());
+        }
+
+        return inputMode->get();
     }
 
     InputMode::Mode Text::detectInputMode()
@@ -454,7 +450,7 @@ namespace gui
             Length hUsed = padding.top + lines->linesHeight() + padding.bottom;
             Length wUsed = lines->maxWidth() + padding.getSumInAxis(Axis::X);
 
-            if (lines->size() == 0) {
+            if (lines->empty()) {
                 debug_text("No lines to show, try to at least fit in cursor");
                 if (format.getFont() != nullptr &&
                     padding.top + lines->linesHeight() < format.getFont()->info.line_height) {

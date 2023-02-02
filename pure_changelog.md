@@ -56,6 +56,7 @@
 * Fixed displaying an incorrect window after double ending a phone call
 * Fixed templates list not looping
 * Fixed inability to import contacts from Orange SIM cards
+* Fixed improper asterisk button behavior when adding new contact
 
 ## [1.5.0 2022-12-20]
 

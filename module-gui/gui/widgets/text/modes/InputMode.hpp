@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -39,11 +39,7 @@ class InputMode
               std::function<void(const UTF8 &text)> show_type_cb = nullptr,
               std::function<void()> restore_after_show_type_cb   = nullptr,
               std::function<void()> show_special_char_selector   = nullptr);
-    void on_focus(bool focus)
-    {
-        if (!focus)
-            show_restore();
-    }
+
     void next();
     const std::string &get();
     const std::string &get(Mode mode);

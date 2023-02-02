@@ -192,12 +192,10 @@ namespace gui
         if (inputEvent.isShortRelease()) {
             switch (inputEvent.getKeyCode()) {
             case KeyCode::HEADSET_VOLUP:
-                [[fallthrough]];
             case KeyCode::KEY_VOLUP: {
                 return application->increaseCurrentVolume();
             }
             case KeyCode::HEADSET_VOLDN:
-                [[fallthrough]];
             case KeyCode::KEY_VOLDN: {
                 return application->decreaseCurrentVolume();
             }
