@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "time_conversion.hpp"
@@ -14,6 +14,7 @@
 #include <ctime>
 #include <iomanip>
 #include <locale>
+#include <charconv>
 #include "i18n/i18n.hpp"
 
 #include "time_locale.hpp"
@@ -52,6 +53,18 @@ namespace utils::time
             {Duration::DisplayedFormat::FixedH0M0S, {durationFormatH0M0S, durationFormatH0M0S}},
             {Duration::DisplayedFormat::AutoM, {durationFormatM0S, durationFormatH0M0S}},
             {Duration::DisplayedFormat::Auto0M, {durationFormat0M0S, durationFormatH0M0S}}};
+
+        std::string removeLeadingZeroFromHoursIfNeeded(const char *time)
+        {
+            auto hours_colon_position = std::string(time).find(":");
+            if (hours_colon_position == std::string::npos) {
+                return std::string(time);
+            }
+            uint32_t hour            = 99;
+            uint32_t max_hour_length = 2;
+            std::from_chars(time + hours_colon_position - max_hour_length, time + hours_colon_position, hour);
+            return (hour != 0 and hour <= 9) ? std::string(time + 1) : std::string(time);
+        };
     } // namespace
 
     Locale tlocale;
@@ -95,7 +108,7 @@ namespace utils::time
         utils::findAndReplaceAll(fmt, specifiers_replacement, replaceFunc);
         auto data = std::unique_ptr<char[]>(new char[datasize]);
         if (std::strftime(data.get(), datasize, fmt.c_str(), timeInfo) != 0) {
-            datetimestr = UTF8(data.get());
+            datetimestr = UTF8(removeLeadingZeroFromHoursIfNeeded(data.get()));
         }
         return datetimestr;
     }

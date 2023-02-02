@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstring>
@@ -34,9 +34,9 @@ class TimeSettings : public TimeSettingsInterface
     }
 };
 
-const std::regex reg12h("^(0[0-9]|1[0-2]):[0-5][0-9] (A|P)M$");
-const std::regex reg12hShort("^(0[0-9]|1[0-2]):[0-5][0-9]$");
-const std::regex reg24h("^([0-1][0-9]|2[0-4]):[0-5][0-9]$");
+const std::regex reg12h("^(00|[1-9]|1[0-2]):[0-5][0-9] (A|P)M$");
+const std::regex reg12hShort("^(00|[1-9]|1[0-2]):[0-5][0-9]$");
+const std::regex reg24h("^(00|[1-9]|1[0-9]|2[0-4]):[0-5][0-9]$");
 const std::regex regexDDMMYYYY("^([0-2]\\d|3[0-1])\\.(0[1-9]|1[0-2])\\.\\d{4}$");
 const std::regex regexDDMM("^([0-2]\\d|3[0-1])\\.(0[1-9]|1[0-2])$");
 const std::regex regexMMDDYYYY("^(0[1-9]|1[0-2])\\.([0-2]\\d|3[0-1])\\.\\d{4}$");
