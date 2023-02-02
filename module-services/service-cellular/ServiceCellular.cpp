@@ -490,12 +490,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(cellular::AntennaRequestMessage),
             [&](sys::Message *request) -> sys::MessagePointer { return handleCellularSelectAntennaMessage(request); });
 
-    connect(typeid(cellular::SetScanModeMessage),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularSetScanModeMessage(request); });
-
-    connect(typeid(cellular::GetScanModeMessage),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularGetScanModeMessage(request); });
-
     connect(typeid(cellular::GetFirmwareVersionMessage), [&](sys::Message *request) -> sys::MessagePointer {
         return handleCellularGetFirmwareVersionMessage(request);
     });
@@ -1458,40 +1452,6 @@ bool ServiceCellular::handle_ready()
     return true;
 }
 
-bool ServiceCellular::SetScanMode(std::string mode)
-{
-    auto channel = cmux->get(CellularMux::Channel::Commands);
-    if (channel) {
-        auto command = at::factory(at::AT::SET_SCANMODE);
-
-        auto resp = channel->cmd(command.getCmd() + mode + ",1", command.getTimeout(), 1);
-        if (resp.code == at::Result::Code::OK) {
-            return true;
-        }
-    }
-    return false;
-}
-
-std::string ServiceCellular::GetScanMode(void)
-{
-    auto channel = cmux->get(CellularMux::Channel::Commands);
-    if (channel) {
-
-        auto resp = channel->cmd(at::AT::GET_SCANMODE);
-        if (resp.code == at::Result::Code::OK) {
-            auto beg = resp.response[0].find(",");
-            if (beg != std::string::npos) {
-                auto response = resp.response[0].substr(beg + 1, 1);
-                return response;
-            }
-        }
-        else {
-            LOG_ERROR("Unable to get network search mode configuration");
-        }
-    }
-    return {};
-}
-
 bool ServiceCellular::transmitDtmfTone(DTMFCode code)
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
@@ -1975,24 +1935,6 @@ auto ServiceCellular::handleCellularSelectAntennaMessage(sys::Message *msg) -> s
     bus.sendMulticast(notification, sys::BusChannel::AntennaNotifications);
 
     return std::make_shared<cellular::ResponseMessage>(changedAntenna);
-}
-auto ServiceCellular::handleCellularSetScanModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    auto message = static_cast<cellular::SetScanModeMessage *>(msg);
-    bool ret     = SetScanMode(message->data);
-
-    return std::make_shared<cellular::ResponseMessage>(ret);
-}
-auto ServiceCellular::handleCellularGetScanModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    auto mode = GetScanMode();
-    if (mode != "") {
-        auto response = std::make_shared<cellular::RawCommandRespAsync>(CellularMessage::Type::GetScanModeResult);
-        response->data.push_back(mode);
-        bus.sendUnicast(response, msg->sender);
-        return std::make_shared<cellular::ResponseMessage>(true);
-    }
-    return std::make_shared<cellular::ResponseMessage>(false);
 }
 
 auto ServiceCellular::handleCellularGetFirmwareVersionMessage(sys::Message *msg)

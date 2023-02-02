@@ -203,9 +203,6 @@ class ServiceCellular : public sys::Service
 
     bool transmitDtmfTone(DTMFCode code);
 
-    bool SetScanMode(std::string mode);
-    std::string GetScanMode();
-
     uint32_t stateTimeout = 0;
     void startStateTimer(uint32_t timeout);
     void stopStateTimer();

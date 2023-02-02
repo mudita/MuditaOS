@@ -78,8 +78,6 @@ namespace CellularServiceAPI
      */
     bool SelectAntenna(sys::Service *serv, bsp::cellular::antenna antenna);
 
-    bool SetScanMode(sys::Service *serv, std::string mode);
-    bool GetScanMode(sys::Service *serv);
     bool GetFirmwareVersion(sys::Service *serv, std::string &response);
     bool GetCSQ(sys::Service *serv, std::string &response);
     bool GetCREG(sys::Service *serv, std::string &response);

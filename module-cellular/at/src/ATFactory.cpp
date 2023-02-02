@@ -67,8 +67,6 @@ namespace at
             {AT::SIMSTAT_ON, std::make_shared<Cmd>("AT+QSIMSTAT=1")},
             {AT::SET_DEFAULT_SCANMODE, std::make_shared<Cmd>("AT+QCFG=\"nwscanmode\",0")},
             {AT::SET_DEFAULT_SERVICEDOMAIN, std::make_shared<Cmd>("AT+QCFG=\"servicedomain\",2")},
-            {AT::SET_SCANMODE, std::make_shared<Cmd>("AT+QCFG=\"nwscanmode\",")},
-            {AT::GET_SCANMODE, std::make_shared<Cmd>("AT+QCFG=\"nwscanmode\"")},
             {AT::SET_SERVICEDOMAIN, std::make_shared<Cmd>("AT+QCFG=\"servicedomain\",")},
             {AT::GET_SERVICEDOMAIN, std::make_shared<Cmd>("AT+QCFG=\"servicedomain\"")},
             {AT::QGMR, std::make_shared<Cmd>("AT+QGMR")},

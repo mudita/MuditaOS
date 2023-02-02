@@ -72,8 +72,6 @@ namespace at
         SIM_DET_ON, /// enable sim detection
         SIMSTAT_ON, /// enable sim stat urc
         SET_DEFAULT_SCANMODE,
-        SET_SCANMODE,
-        GET_SCANMODE,
         SET_DEFAULT_SERVICEDOMAIN,
         SET_SERVICEDOMAIN,
         GET_SERVICEDOMAIN,

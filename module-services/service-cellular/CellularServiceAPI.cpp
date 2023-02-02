@@ -139,35 +139,6 @@ bool CellularServiceAPI::SelectAntenna(sys::Service *serv, bsp::cellular::antenn
     return false;
 }
 
-bool CellularServiceAPI::SetScanMode(sys::Service *serv, std::string mode)
-{
-    auto msg = std::make_shared<cellular::SetScanModeMessage>(mode);
-    auto ret = serv->bus.sendUnicastSync(msg, ServiceCellular::serviceName, 5000);
-
-    auto *response = dynamic_cast<cellular::ResponseMessage *>(ret.second.get());
-
-    if (response != nullptr) {
-        if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
-            return true;
-        }
-    }
-    return false;
-}
-bool CellularServiceAPI::GetScanMode(sys::Service *serv)
-{
-    auto msg = std::make_shared<cellular::GetScanModeMessage>();
-    auto ret = serv->bus.sendUnicastSync(msg, ServiceCellular::serviceName, 1000);
-
-    auto *response = dynamic_cast<cellular::ResponseMessage *>(ret.second.get());
-
-    if (response != nullptr) {
-        if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool CellularServiceAPI::GetFirmwareVersion(sys::Service *serv, std::string &response)
 {
     auto msg = std::make_shared<cellular::GetFirmwareVersionMessage>();
