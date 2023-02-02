@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -32,7 +32,7 @@ namespace style
             inline constexpr uint32_t leftMargin  = 10;
             inline constexpr uint32_t rightMargin = 10;
 
-            inline constexpr uint32_t timestampWidth             = 120;
+            inline constexpr uint32_t timestampWidth             = 132;
             inline constexpr uint32_t numberImportanceWidth      = 80;
             inline constexpr uint32_t numberImportanceLeftMargin = 10;
             inline constexpr uint32_t snippetLeftMargin          = 5;

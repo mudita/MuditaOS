@@ -154,14 +154,14 @@ namespace utils::time
 
     bool DateTime::isToday() const
     {
-        auto timeinfo       = *std::localtime(&time);
-        auto newer_timeinfo = *std::localtime(&referenceTime);
+        const auto timeinfo       = *std::localtime(&time);
+        const auto newer_timeinfo = *std::localtime(&referenceTime);
         return (newer_timeinfo.tm_yday == timeinfo.tm_yday && isCurrentYear());
     }
 
     bool DateTime::isYesterday() const
     {
-        auto timeinfo       = *std::localtime(&time);
+        const auto timeinfo = *std::localtime(&time);
         auto newer_timeinfo = *std::localtime(&referenceTime);
 
         newer_timeinfo.tm_mday -= 1;
@@ -173,9 +173,21 @@ namespace utils::time
 
     bool DateTime::isCurrentYear() const
     {
+        const auto timeinfo       = *std::localtime(&time);
+        const auto newer_timeinfo = *std::localtime(&referenceTime);
+        return (newer_timeinfo.tm_year == timeinfo.tm_year);
+    }
+
+    bool DateTime::isCurrentWeek() const
+    {
         auto timeinfo       = *std::localtime(&time);
         auto newer_timeinfo = *std::localtime(&referenceTime);
-        return (newer_timeinfo.tm_year == timeinfo.tm_year);
+
+        timeinfo.tm_hour = timeinfo.tm_min = timeinfo.tm_sec = 0;
+        newer_timeinfo.tm_hour = newer_timeinfo.tm_min = newer_timeinfo.tm_sec = 0;
+
+        const auto dayDifference = std::difftime(std::mktime(&newer_timeinfo), std::mktime(&timeinfo)) / secondsInDay;
+        return std::abs(dayDifference) < Locale::num_days;
     }
 
     UTF8 DateTime::str(std::string format) const
@@ -190,6 +202,9 @@ namespace utils::time
         }
         if (isYesterday()) {
             return Locale::yesterday();
+        }
+        if (isCurrentWeek()) {
+            return Timestamp::day();
         }
         if (isCurrentYear()) {
             auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM
