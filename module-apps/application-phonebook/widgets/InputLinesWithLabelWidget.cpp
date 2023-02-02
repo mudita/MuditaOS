@@ -87,8 +87,7 @@ namespace gui
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto result = inputText->onInput(event);
 
-            if (!event.isShortRelease(gui::KeyCode::KEY_AST) &&
-                (!inputText->isEmpty() || Clipboard::getInstance().gotData())) {
+            if (!event.is(KeyCode::KEY_AST) && (!inputText->isEmpty() || Clipboard::getInstance().gotData())) {
                 this->navBarTemporaryMode(utils::translate(style::strings::common::options), false);
             }
 

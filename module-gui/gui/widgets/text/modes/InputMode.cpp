@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputMode.hpp"
 #include <i18n/i18n.hpp>
 #include <map>
 #include <log/log.hpp>
+#include <utility>
 
 /// input mode strings - as these are stored in json (in files...)
 const std::map<InputMode::Mode, std::string> input_mode = {
@@ -36,11 +37,12 @@ InputMode::InputMode(std::list<InputMode::Mode> mode_list,
                      std::function<void(const UTF8 &text)> show_type_cb,
                      std::function<void()> restore_after_show_type_cb,
                      std::function<void()> show_special_char_selector)
-    : input_mode_list(mode_list), show_type_cb(show_type_cb), restore_after_show_type_cb(restore_after_show_type_cb),
-      show_special_char_selector(show_special_char_selector)
+    : input_mode_list(std::move(mode_list)), show_type_cb(std::move(show_type_cb)),
+      restore_after_show_type_cb(std::move(restore_after_show_type_cb)),
+      show_special_char_selector(std::move(show_special_char_selector))
 {
     // failsafe
-    if (input_mode_list.size() == 0) {
+    if (input_mode_list.empty()) {
         input_mode_list.push_back(Mode::digit);
     }
 }
@@ -73,7 +75,7 @@ const std::string &InputMode::get()
 
 const std::string &InputMode::get(InputMode::Mode mode)
 {
-    auto selectedInputMode = input_mode.at(mode);
+    const auto &selectedInputMode = input_mode.at(mode);
     return utils::getInputLanguageFilename(selectedInputMode);
 }
 
