@@ -97,7 +97,10 @@ namespace cellular::internal
         simCard->onUnhandledCME = [this](unsigned int code) {
             owner->bus.sendMulticast<notification::UnhandledCME>(code);
         };
-        simCard->onSimNotPresent = [this]() { owner->bus.sendMulticast<notification::SimNotInserted>(); };
+        simCard->onSimNotPresent = [this]() {
+            owner->cmux->get(CellularMux::Channel::Commands)->cmd(AT::QUERY_SERVING_CELL);
+            owner->bus.sendMulticast<notification::SimNotInserted>();
+        };
         simCard->onSimSelected   = [this]() {
             owner->connectionManager->onPhoneModeChange(owner->phoneModeObserver->getCurrentPhoneMode());
             requestNetworkTimeSettings();

@@ -71,6 +71,7 @@ namespace at
         QSIMSTAT,   /// sim insertion / removal notification in URC
         SIM_DET_ON, /// enable sim detection
         SIMSTAT_ON, /// enable sim stat urc
+        QUERY_SERVING_CELL,
         SET_DEFAULT_SCANMODE,
         SET_DEFAULT_SERVICEDOMAIN,
         SET_SERVICEDOMAIN,

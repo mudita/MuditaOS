@@ -81,3 +81,5 @@ target_link_libraries(${PROJECT_NAME}
 if (${ENABLE_TESTS})
     add_subdirectory( test )
 endif()
+
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/modem/mux/DLCChannel.cpp ${CMAKE_CURRENT_SOURCE_DIR}/modem/mux/CellularMuxData.cpp PROPERTIES COMPILE_OPTIONS "-O0;-fno-omit-frame-pointer;-ggdb3")

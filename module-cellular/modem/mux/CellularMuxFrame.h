@@ -3,11 +3,15 @@
 
 #pragma once
 
+#pragma GCC push_options
+#pragma GCC optimize("O0,no-omit-frame-pointer")
+
 #include "CellularMuxTypes.h"
 #include <inttypes.h>
 #include <vector>
 #include <iostream>
 #include <log/log.hpp>
+#include <cstdio>
 
 #define TS0710_FLAG          0xF9
 #define TS0710_FRAME_HDR_LEN 6 // without extended address byte
@@ -94,8 +98,44 @@ class CellularMuxFrame
             return ret;
         }
 
+        void logFrame(std::vector<uint8_t> const& input)
+        {
+            std::string logStr("\n*********** Frame content:\n\t\t");
+            char buf[3];
+            bool wasHex = false;
+
+            for (auto bb: input) {
+                memset(buf, 0, sizeof(buf));
+                if (std::isprint(bb)) {
+                    if (wasHex) {
+                        logStr += " ";
+                        wasHex = false;
+                    }
+                    sprintf(buf, "%c", bb);
+                    logStr += buf;
+                } else {
+                    sprintf(buf, "%02X", bb);
+                    logStr += " 0x" + std::string(buf);
+                    wasHex = true;
+                }
+            }
+
+            LOG_WARN("%s", logStr.c_str());
+        }
+
+        volatile int dbgBreakCnt_;
         void deserialize(const std::vector<uint8_t> &serData)
         {
+            std::string serDataStr;
+            for (auto bb: serData) {
+                serDataStr.append(1, static_cast<char>(bb));
+            }
+            if (serDataStr.find("servingcell") != serDataStr.npos) {
+                ++dbgBreakCnt_;
+            }
+
+            logFrame(serData);
+
             if (serData.size() < 4) {
                 LOG_ERROR("Trying to deserialize empty frame");
                 Address     = 0;
@@ -288,3 +328,5 @@ class CellularMuxFrame
         return pv_frame.frameStatus;
     }
 };
+
+#pragma GCC pop_options
