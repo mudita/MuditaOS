@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Oscillator.hpp"
 #include "ClockState.hpp"
 #include <fsl_dcdc.h>
+#include <fsl_common.h>
 #include <cstdint>
 
 namespace bsp
@@ -19,6 +20,9 @@ namespace bsp
     {
         if (!IsExternalOscillatorEnabled()) {
             CLOCK_InitExternalClk(0);
+            /// Wait at least 200us for XTAL stable
+            const uint32_t cpuFreqency = CLOCK_GetCpuClkFreq();
+            SDK_DelayAtLeastUs(200, cpuFreqency);
             /// Switch DCDC to use DCDC external OSC
             DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
             /// Switch clock source to external OSC.
