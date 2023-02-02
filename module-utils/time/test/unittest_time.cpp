@@ -41,6 +41,10 @@ const std::regex regexDDMMYYYY("^([0-2]\\d|3[0-1])\\.(0[1-9]|1[0-2])\\.\\d{4}$")
 const std::regex regexDDMM("^([0-2]\\d|3[0-1])\\.(0[1-9]|1[0-2])$");
 const std::regex regexMMDDYYYY("^(0[1-9]|1[0-2])\\.([0-2]\\d|3[0-1])\\.\\d{4}$");
 const std::regex regexMMDD("^(0[1-9]|1[0-2])\\.([0-2]\\d|3[0-1])$");
+const std::regex regexDaysOfWeek("^(sun|Sun|mon|Mon|t(ues|hurs)|(T(ues|hurs))|Fri|"
+                                 "fri)(day|\\.)?$|wed(\\.|nesday)?$|Wed(\\.|nesday)?$|"
+                                 "Sat(\\.|urday)?$|sat(\\.|urday)?$|t((ue?)|(hu?r?))"
+                                 "\\.?$|T((ue?)|(hu?r?))\\.?$");
 
 TEST_CASE("TimeStamp")
 {
@@ -170,7 +174,7 @@ TEST_CASE("TimeStamp")
     }
 }
 
-TEST_CASE("DateTime")
+TEST_CASE("DateTime formatting")
 {
     utils::setDisplayLanguage("English");
     auto timezone = GENERATE("GMTO", "GMT-2", "GMT+2");
@@ -189,9 +193,9 @@ TEST_CASE("DateTime")
     );
     const auto currentTimeTimeinfo = *std::localtime(&currentTime);
 
-    SECTION("isToday")
+    SECTION("boolean operation 'isToday'")
     {
-        SECTION("today")
+        SECTION("test data contained in 'today'")
         {
             auto newTimeTimeinfo    = currentTimeTimeinfo;
             auto i                  = GENERATE(range(0, 23));
@@ -200,10 +204,10 @@ TEST_CASE("DateTime")
             DateTime datetime(timeSettings, newTime, currentTime);
             REQUIRE(datetime.isToday());
         }
-        SECTION("not today")
+        SECTION("test data not contained in 'today'")
         {
             auto newTimeTimeinfo = currentTimeTimeinfo;
-            SECTION("different day")
+            SECTION("for a time other than the present day")
             {
                 for (int i = 1; i <= 31; i++) {
                     newTimeTimeinfo.tm_mday = i;
@@ -215,7 +219,7 @@ TEST_CASE("DateTime")
                     REQUIRE(!datetime.isToday());
                 }
             }
-            SECTION("different month")
+            SECTION("for a time other than the current month")
             {
                 for (int i = 1; i <= 12; i++) {
                     newTimeTimeinfo.tm_mon = i;
@@ -227,7 +231,7 @@ TEST_CASE("DateTime")
                     REQUIRE(!datetime.isToday());
                 }
             }
-            SECTION("previous years")
+            SECTION("for the time last year")
             {
                 auto i                  = GENERATE(range(1, 100));
                 newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year - i;
@@ -235,7 +239,7 @@ TEST_CASE("DateTime")
                 DateTime datetime(timeSettings, newTime, currentTime);
                 REQUIRE(!datetime.isToday());
             }
-            SECTION("next years")
+            SECTION("for time next year")
             {
                 auto i                  = GENERATE(range(1, 100));
                 newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year + i;
@@ -246,10 +250,10 @@ TEST_CASE("DateTime")
         }
     }
 
-    SECTION("isYesterday")
+    SECTION("boolean operation 'isYesterday'")
     {
         auto newTimeTimeinfo = currentTimeTimeinfo;
-        SECTION("yesterday")
+        SECTION("test data contained in 'yesterday'")
         {
             newTimeTimeinfo.tm_mday -= 1;
             for (int i = 0; i < 24; i++) {
@@ -259,9 +263,9 @@ TEST_CASE("DateTime")
                 REQUIRE(datetime.isYesterday());
             }
         }
-        SECTION("not yesterday")
+        SECTION("test data not contained in 'yesterday'")
         {
-            SECTION("different days")
+            SECTION("for a day other than 'yesterday'")
             {
                 for (int i = 1; i < 32; i++) {
                     newTimeTimeinfo.tm_mday = i;
@@ -273,7 +277,7 @@ TEST_CASE("DateTime")
                     REQUIRE(!datetime.isYesterday());
                 }
             }
-            SECTION("different months")
+            SECTION("for time from different months")
             {
                 for (int i = 0; i < 12; i++) {
                     newTimeTimeinfo.tm_mon = i;
@@ -282,7 +286,7 @@ TEST_CASE("DateTime")
                     REQUIRE(!datetime.isYesterday());
                 }
             }
-            SECTION("different years")
+            SECTION("for a time from another year")
             {
                 // previous
                 for (int i = 1; i < 100; i++) {
@@ -297,57 +301,106 @@ TEST_CASE("DateTime")
                     auto newTime            = std::mktime(&newTimeTimeinfo);
                     DateTime datetime(timeSettings, newTime, currentTime);
                     REQUIRE(!datetime.isYesterday());
-                }
-            }
-        }
-
-        SECTION("isCurrentYear")
-        {
-            auto newTimeTimeinfo = currentTimeTimeinfo;
-            SECTION("different days")
-            {
-                for (int i = 1; i < 32; i++) {
-                    newTimeTimeinfo.tm_mday = i;
-                    auto newTime            = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(timeSettings, newTime, currentTime);
-                    REQUIRE(datetime.isCurrentYear());
-                }
-            }
-            SECTION("different months")
-            {
-                for (int i = 0; i < 12; i++) {
-                    newTimeTimeinfo.tm_mon = i;
-                    auto newTime           = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(timeSettings, newTime, currentTime);
-                    REQUIRE(datetime.isCurrentYear());
-                }
-            }
-            SECTION("different years")
-            {
-                // previous
-                for (int i = 1; i < 100; i++) {
-                    newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year - i;
-                    auto newTime            = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(timeSettings, newTime, currentTime);
-                    REQUIRE(!datetime.isCurrentYear());
-                }
-                // forward
-                for (int i = 1; i < 100; i++) {
-                    newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year + i;
-                    auto newTime            = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(timeSettings, newTime, currentTime);
-                    REQUIRE(!datetime.isCurrentYear());
                 }
             }
         }
     }
 
-    SECTION("Display")
+    SECTION("boolean operation 'isCurrentYear'")
+    {
+        auto newTimeTimeinfo = currentTimeTimeinfo;
+        SECTION("for time from different days")
+        {
+            for (int i = 1; i < 32; i++) {
+                newTimeTimeinfo.tm_mday = i;
+                auto newTime            = std::mktime(&newTimeTimeinfo);
+                DateTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(datetime.isCurrentYear());
+            }
+        }
+        SECTION("for time from different months")
+        {
+            for (int i = 0; i < 12; i++) {
+                newTimeTimeinfo.tm_mon = i;
+                auto newTime           = std::mktime(&newTimeTimeinfo);
+                DateTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(datetime.isCurrentYear());
+            }
+        }
+        SECTION("for time from different years")
+        {
+            // previous
+            for (int i = 1; i < 100; i++) {
+                newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year - i;
+                auto newTime            = std::mktime(&newTimeTimeinfo);
+                DateTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(!datetime.isCurrentYear());
+            }
+            // forward
+            for (int i = 1; i < 100; i++) {
+                newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year + i;
+                auto newTime            = std::mktime(&newTimeTimeinfo);
+                DateTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(!datetime.isCurrentYear());
+            }
+        }
+    }
+
+    SECTION("boolean operation 'isCurrentWeek'")
+    {
+        auto newTimeTimeinfo = currentTimeTimeinfo;
+        SECTION("test data contained in 'current week'")
+        {
+            auto i = GENERATE(range(2, 7));
+            newTimeTimeinfo.tm_mday -= i;
+            const auto newTime = std::mktime(&newTimeTimeinfo);
+            DateTime datetime(timeSettings, newTime, currentTime);
+            REQUIRE(datetime.isCurrentWeek());
+        }
+        SECTION("test data not contained in 'current week'")
+        {
+            auto newTimeTimeinfo = currentTimeTimeinfo;
+            SECTION("for days other than the last week")
+            {
+                auto i = GENERATE(range(7, 32));
+                newTimeTimeinfo.tm_mday -= i;
+                auto newTime = std::mktime(&newTimeTimeinfo);
+                DateTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(!datetime.isCurrentWeek());
+            }
+            SECTION("for time from different months")
+            {
+                auto i = GENERATE(range(1, 12));
+                newTimeTimeinfo.tm_mon -= i;
+                auto newTime = std::mktime(&newTimeTimeinfo);
+                DateTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(!datetime.isCurrentWeek());
+            }
+            SECTION("for earlier years")
+            {
+                auto i                  = GENERATE(range(1, 10));
+                newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year - i;
+                auto newTime            = std::mktime(&newTimeTimeinfo);
+                DateTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(!datetime.isCurrentWeek());
+            }
+            SECTION("for the time in the following years")
+            {
+                auto i                  = GENERATE(range(1, 10));
+                newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year + i;
+                auto newTime            = std::mktime(&newTimeTimeinfo);
+                DateTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(!datetime.isCurrentWeek());
+            }
+        }
+    }
+
+    SECTION("Date/time displayed")
     {
         auto newTimeTimeinfo        = currentTimeTimeinfo;
         timeSettings.timeFormat12h  = true;
         timeSettings.dateFormatDDMM = true;
-        SECTION("now")
+        SECTION("for the current time")
         {
             std::regex reg = reg12h;
             auto newTime   = std::mktime(&newTimeTimeinfo);
@@ -359,7 +412,7 @@ TEST_CASE("DateTime")
             REQUIRE(std::regex_match(std::string(datetime.str()), reg));
         }
 
-        SECTION("yesterday")
+        SECTION("for the time yesterday")
         {
             newTimeTimeinfo.tm_mday -= 1;
             auto newTime = std::mktime(&newTimeTimeinfo);
@@ -368,7 +421,15 @@ TEST_CASE("DateTime")
             REQUIRE(datetime.str() == "Yesterday");
         }
 
-        SECTION("same year")
+        SECTION("for a time earlier than yesterday but still in the same week")
+        {
+            newTimeTimeinfo.tm_mday -= 6;
+            const auto newTime = std::mktime(&newTimeTimeinfo);
+            DateTime datetime(timeSettings, newTime, currentTime);
+            REQUIRE(std::regex_match(std::string(datetime.str()), regexDaysOfWeek));
+        }
+
+        SECTION("for a time earlier than a week but still in the same year")
         {
             std::regex regexSameYear = regexDDMM;
             if (newTimeTimeinfo.tm_mon == 0) {
@@ -386,7 +447,7 @@ TEST_CASE("DateTime")
             REQUIRE(std::regex_match(std::string(datetime.str()), regexSameYear));
         }
 
-        SECTION("different year")
+        SECTION("for the time last year")
         {
             std::regex regexPreviousYear = regexDDMMYYYY;
             newTimeTimeinfo.tm_year -= 1;

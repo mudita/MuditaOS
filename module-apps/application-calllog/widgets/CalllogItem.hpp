@@ -22,7 +22,7 @@ namespace gui
 
         namespace timestamp
         {
-            inline constexpr auto min_w = 120;
+            inline constexpr auto min_w = 132;
         }
     } // namespace clItemStyle
 
