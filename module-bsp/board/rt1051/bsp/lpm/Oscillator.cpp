@@ -7,10 +7,11 @@
 #include <fsl_common.h>
 #include <cstdint>
 
-#define SDK_DEVICE_MAXIMUM_CPU_CLOCK_FREQUENCY 528000000
-
 namespace bsp
 {
+    // For RT1051 we can set 600MHz however we use 528MHz in practice
+    inline constexpr std::uint32_t MaxCpuClockFrequency{DEFAULT_SYSTEM_CLOCK};
+
     inline constexpr std::uint8_t OscillatorReadyCounterValue{127};
     inline constexpr std::uint32_t CurrentTuningValueInUseForConfig0{0x4};
     inline constexpr std::uint32_t NegativeHysteresisValue{0x2};
@@ -22,8 +23,8 @@ namespace bsp
     {
         if (!IsExternalOscillatorEnabled()) {
             CLOCK_InitExternalClk(0);
-            /* Wait for XTAL stable */
-            SDK_DelayAtLeastUs(200, SDK_DEVICE_MAXIMUM_CPU_CLOCK_FREQUENCY);
+            /// Wait 200us for XTAL stable
+            SDK_DelayAtLeastUs(200, MaxCpuClockFrequency);
             /// Switch DCDC to use DCDC external OSC
             DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
             /// Switch clock source to external OSC.
