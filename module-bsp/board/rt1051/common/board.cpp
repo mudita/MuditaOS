@@ -17,6 +17,7 @@ extern "C"
 }
 #include "chip.hpp"
 #include "board/irq_gpio.hpp"
+#include "board/brownout.hpp"
 #include <board/debug_console.hpp>
 
 #include <cstdint>
@@ -167,6 +168,7 @@ namespace bsp
 
         board::initDebugConsole();
 
+        Brownout_init();
         irq_gpio_Init();
 
         // SNVS init. is required for proper operation of the RTC when Secure Boot is used

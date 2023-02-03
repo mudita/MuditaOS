@@ -175,7 +175,7 @@ namespace bsp
         DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
     }
 
-    void RT1051LPMCommon::SwitchToRegularModeLDO()
+    void RT1051LPMCommon::RegularLDOMode()
     {
         // Enable regular 2P5 and wait it stable
         PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_LINREG_MASK;
@@ -191,7 +191,7 @@ namespace bsp
         PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
     }
 
-    void RT1051LPMCommon::SwitchToLowPowerModeLDO()
+    void RT1051LPMCommon::LowPowerLDOMode()
     {
         // Enable weak 2P5 and turn off regular 2P5
         PMU->REG_2P5 |= PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;

@@ -26,12 +26,14 @@ target_sources(
         irq_gpio.cpp
         debug_console.cpp
         board.cpp
+        brownout.cpp
 
     PUBLIC
         eink-config.h
         board/pin_mux.h
         board/clock_config.h
         board/irq_gpio.hpp
+        board/brownout.hpp
         board/BoardDefinitions.hpp
 )
 
