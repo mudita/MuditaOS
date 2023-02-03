@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "board/irq_gpio.hpp"
@@ -10,6 +10,7 @@
 #include "fsl_common.h"
 #include <fsl_qtmr.h>
 #include <fsl_gpc.h>
+#include <fsl_pmu.h>
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/key_input/KeyInput.hpp>
@@ -71,6 +72,10 @@ namespace bsp
 
         NVIC_ClearPendingIRQ(RTWDOG_IRQn);
         EnableIRQ(RTWDOG_IRQn);
+
+        // Enable PMU brownout interrupt
+        NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
+        EnableIRQ(ANATOP_EVENT0_IRQn);
     }
 
     extern "C"
@@ -193,6 +198,24 @@ namespace bsp
             // Asserting WDOG_B pin to provide power reset of whole board
             // Way to do it is via WDOG1 built-in assertion, RTWDOG does not provide it
             WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
+        }
+
+        // Enable PMU brownout interrupt
+        void ANATOP_EVENT0_IRQHandler(void)
+        {
+            const uint32_t status = PMU_GetStatusFlags(PMU);
+
+            // If the PMU brownout detects to low voltage
+            // immediately reset the CPU using the WDOG_B pin
+            if (status & kPMU_1P1BrownoutOnOutput) {
+                WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
+            }
+
+            if (status & kPMU_2P5BrownoutOnOutput) {
+                WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
+            }
+
+            NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
         }
     }
 } // namespace bsp
