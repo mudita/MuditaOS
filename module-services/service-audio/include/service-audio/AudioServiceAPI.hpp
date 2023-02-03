@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -104,22 +104,18 @@ namespace AudioServiceAPI
      */
     bool Resume(sys::Service *serv, const audio::Token &token);
     /**
-     * @brief Sends audio event
+     * @brief Sends audio event as multicast
      * @param serv Requesting service.
      * @param evt Event to be sent.
-     * @return True is request has been sent successfully, false otherwise
-     *   Response will come as message AudioSendEventResponse
      */
-    bool SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt);
+    void SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt);
     /**
-     * @brief Sends audio event
+     * @brief Sends audio event as multicast
      * @param serv Requesting service.
      * @param evt Event to be sent.
      * @param state Optional parameter to request.
-     * @return True is request has been sent successfully, false otherwise
-     *   Response will come as message AudioSendEventResponse
      */
-    bool SendEvent(sys::Service *serv,
+    void SendEvent(sys::Service *serv,
                    audio::EventType evt,
                    audio::Event::DeviceState state = audio::Event::DeviceState::Connected);
 

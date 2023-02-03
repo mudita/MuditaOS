@@ -161,7 +161,7 @@ namespace gui
 
     bool CallWindow::onInput(const InputEvent &inputEvent)
     {
-        bool handled = false;
+        bool handled       = false;
         const auto keyCode = inputEvent.getKeyCode();
 
         // process only if key is released
@@ -295,6 +295,38 @@ namespace gui
     void CallWindow::updateNumber(const UTF8 &text)
     {
         numberLabel->setText(text);
+    }
+
+    void CallWindow::handleAudioEvent(const audio::Event &event)
+    {
+
+        switch (event.getType()) {
+        case audio::EventType::BlutoothHFPDeviceState:
+        case audio::EventType::BlutoothHSPDeviceState:
+        case audio::EventType::JackState: {
+            if (event.getDeviceState() == audio::Event::DeviceState::Connected) {
+                devices_connected.insert(event.getType());
+                changeSpeakerIconIfNeeded();
+            }
+            else {
+                devices_connected.erase(event.getType());
+                if (not devices_connected.empty()) {
+                    changeSpeakerIconIfNeeded();
+                }
+            }
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+    }
+
+    void CallWindow::changeSpeakerIconIfNeeded()
+    {
+        if (speakerIcon->get() == SpeakerIconState::SPEAKERON) {
+            speakerIcon->setNext();
+        }
     }
 
 } /* namespace gui */

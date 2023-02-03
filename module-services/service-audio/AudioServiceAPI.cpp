@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AudioMessage.hpp>
@@ -90,16 +90,18 @@ namespace AudioServiceAPI
         return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
-    bool SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt)
+    void SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt)
     {
         auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
-        return serv->bus.sendUnicast(msg, service::name::audio);
+        serv->bus.sendMulticast(msg, sys::BusChannel::ServiceAudioNotifications);
+        // return true;
     }
 
-    bool SendEvent(sys::Service *serv, audio::EventType eType, audio::Event::DeviceState state)
+    void SendEvent(sys::Service *serv, audio::EventType eType, audio::Event::DeviceState state)
     {
         auto msg = std::make_shared<AudioEventRequest>(eType, state);
-        return serv->bus.sendUnicast(msg, service::name::audio);
+        serv->bus.sendMulticast(msg, sys::BusChannel::ServiceAudioNotifications);
+        // return true;
     }
 
     std::string GetSetting(sys::Service *serv, audio::Setting setting, audio::PlaybackType playbackType)

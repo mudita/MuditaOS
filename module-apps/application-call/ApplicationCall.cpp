@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
@@ -33,6 +33,9 @@ namespace app
         : Application(name, parent, statusIndicators, startInBackground, app::call_stack_size)
     {
         using namespace gui::status_bar;
+
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+
         getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
             if (popupParams.getPopupId() == gui::popup::ID::Volume) {
                 return true;
@@ -136,7 +139,7 @@ namespace app
             return retMsg;
         }
         return handleAsyncResponse(resp);
-    } // namespace app
+    }
 
     // Invoked during initialization
     sys::ReturnCodes ApplicationCall::InitHandler()
@@ -170,6 +173,11 @@ namespace app
             callModel->setState(app::call::CallState::Outgoing);
             switchWindow(app::window::name_call);
             return sys::MessageNone{};
+        });
+
+        connect(typeid(AudioEventRequest), [&](sys::Message *request) {
+            auto message = static_cast<AudioEventRequest *>(request);
+            return handleAudioMessageEvent(message);
         });
 
         createUserInterface();
@@ -266,4 +274,13 @@ namespace app
                 this, manager::actions::AddContact, std::move(data), manager::OnSwitchBehaviour::RunInBackground);
         }
     }
+
+    sys::MessagePointer ApplicationCall::handleAudioMessageEvent(AudioEventRequest *message)
+    {
+        if (auto window = getCurrentWindow(); window->getName() == app::window::name_call) {
+            static_cast<gui::CallWindow *>(window)->handleAudioEvent(*message->getEvent().get());
+        }
+        return sys::MessageNone{};
+    }
+
 } // namespace app

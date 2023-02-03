@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -44,6 +44,8 @@ namespace gui
 
         utils::PhoneNumber::View phoneNumber;
 
+        std::set<audio::EventType> devices_connected{};
+
       public:
         CallWindow(app::ApplicationCommon *app,
                    std::unique_ptr<app::call::CallWindowContract::Presenter> &&windowPresenter);
@@ -67,6 +69,8 @@ namespace gui
         void setActiveCallLayout() override;
         void setCallEndedLayout(bool delayedClose = true) override;
         void updateNumber(const UTF8 &text) override;
+        void handleAudioEvent(const audio::Event &event);
+        void changeSpeakerIconIfNeeded();
     };
 
 } /* namespace gui */
