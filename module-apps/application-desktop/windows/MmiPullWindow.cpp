@@ -56,7 +56,7 @@ MmiPullWindow::MmiPullWindow(app::ApplicationCommon *app, const std::string &nam
                                       style::desktop::inputWidget::h);
 
     InputBox->inputText->setInputMode(new InputMode(
-        {InputMode::digit},
+        {InputMode::digit, InputMode::Abc, InputMode::ABC, InputMode::abc},
         [=](const UTF8 &text1) { navBarTemporaryMode(text1); },
         [=]() { navBarRestoreFromTemporaryMode(); },
         [=]() { selectSpecialCharacter(); }));

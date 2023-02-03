@@ -59,6 +59,7 @@
 * Fixed improper asterisk button behavior when adding new contact
 * Fixed for contacts removed and imported from SIM card once again were added to database without names 
 * Fixed (removed) redundant leading zero from time representation unless exactly midnight
+* Fixed inability to type characters other than digits in USSD replies
 
 ## [1.5.0 2022-12-20]
 
