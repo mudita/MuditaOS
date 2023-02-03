@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,6 +10,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <Service/Message.hpp>
+#include <service-audio/AudioMessage.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <AppWindowConstants.hpp>
 #include <products/PurePhone/apps/include/Application.hpp>
@@ -65,6 +66,8 @@ namespace app
         void handleEmergencyCallEvent(const std::string &number) override;
         void handleCallEvent(const std::string &number, ExternalRequest isExternalRequest) override;
         void handleAddContactEvent(const std::string &number) override;
+
+        sys::MessagePointer handleAudioMessageEvent(AudioEventRequest *message);
 
         auto showNotification(std::function<bool()> action, const std::string &icon, const std::string &text) -> bool;
         enum class NotificationType

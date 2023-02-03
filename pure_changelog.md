@@ -63,6 +63,7 @@
 * Fixed (removed) redundant leading zero from time representation unless exactly midnight
 * Fixed inability to type characters other than digits in USSD replies
 * Fixed screen ghosting after emoji selection
+* Fixed incorrect loudspeaker icon in call window when headset was connected during a call
 
 ## [1.5.0 2022-12-20]
 

@@ -126,6 +126,11 @@ ServiceAudio::ServiceAudio()
             [this](sys::Message *msg) -> sys::MessagePointer { return handleMultimediaAudioPause(); });
     connect(typeid(message::bluetooth::AudioStart),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleMultimediaAudioStart(); });
+    connect(typeid(AudioEventRequest), [this](sys::Message *msg) -> sys::MessagePointer {
+        auto message = static_cast<AudioEventRequest *>(msg);
+        HandleSendEvent(message->getEvent());
+        return sys::msgHandled();
+    });
 }
 
 ServiceAudio::~ServiceAudio()
@@ -449,7 +454,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     return std::make_unique<AudioStartRoutingResponse>(RetCode::OperationNotSet, Token::MakeBadToken());
 }
 
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
+sys::MessagePointer ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
     const auto eventType       = evt->getType();
     const auto deviceConnected = evt->getDeviceState() == audio::Event::DeviceState::Connected;
@@ -492,7 +497,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
         input.audio->SendEvent(evt);
     }
 
-    return std::make_unique<AudioEventResponse>(RetCode::Success);
+    return sys::msgHandled();
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
@@ -669,10 +674,6 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (msgType == typeid(AudioResumeRequest)) {
         auto *msg   = static_cast<AudioResumeRequest *>(msgl);
         responseMsg = HandleResume(msg->token);
-    }
-    else if (msgType == typeid(AudioEventRequest)) {
-        auto *msg   = static_cast<AudioEventRequest *>(msgl);
-        responseMsg = HandleSendEvent(msg->getEvent());
     }
     else if (msgType == typeid(AudioKeyPressedRequest)) {
         auto *msg   = static_cast<AudioKeyPressedRequest *>(msgl);
