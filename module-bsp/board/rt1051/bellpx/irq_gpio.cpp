@@ -74,18 +74,7 @@ namespace bsp
         NVIC_ClearPendingIRQ(RTWDOG_IRQn);
         EnableIRQ(RTWDOG_IRQn);
 
-        // Config for PMU
-        PMU_2P5EnableOutput(PMU, true);
-        PMU_2P5SetRegulatorOutputVoltage(PMU, 0x19); // 0x19 = 2.725V, 0x1b = 2.775V
-        PMU_1P1EnableOutput(PMU, true);
-        PMU_1P1SetRegulatorOutputVoltage(PMU, 0x19); // 0x10 = 1.225V, 0x1b = 1.275V
-
-        PMU_1P1EnableBrownout(PMU, true);
-        PMU_1P1SetBrownoutOffsetVoltage(PMU, 0x5); // 5*25mv
-
-        PMU_2P5nableBrownout(PMU, true);
-        PMU_2P5SetBrownoutOffsetVoltage(PMU, 0x5); // 5*25mv
-
+        // Enable PMU brownout interrupt
         NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
         EnableIRQ(ANATOP_EVENT0_IRQn);
     }
@@ -212,10 +201,13 @@ namespace bsp
             WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
         }
 
+        // Enable PMU brownout interrupt
         void ANATOP_EVENT0_IRQHandler(void)
         {
             const uint32_t status = PMU_GetStatusFlags(PMU);
 
+            // If the PMU brownout detects to low voltage
+            // immediately reset the CPU using the WDOG_B pin
             if (status & kPMU_1P1BrownoutOnOutput) {
                 WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
             }

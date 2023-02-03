@@ -30,10 +30,12 @@ target_sources(
         irq_gpio.cpp
         pin_mux.c
         board.cpp
+        brownout.cpp
 
     PUBLIC
         eink-config.h
         board/pin_mux.h
         board/clock_config.h
         board/irq_gpio.hpp
+        board/brownout.hpp
 )
