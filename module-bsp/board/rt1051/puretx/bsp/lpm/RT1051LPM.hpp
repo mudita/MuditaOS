@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,6 +13,9 @@ namespace bsp
         RT1051LPM();
         void EnableDcdcPowerSaveMode() final;
         void DisableDcdcPowerSaveMode() final;
+
+        void SwitchToRegularModeLDO() final;
+        void SwitchToLowPowerModeLDO() final;
 
       private:
         std::shared_ptr<drivers::DriverGPIO> gpio_1;
