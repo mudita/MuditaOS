@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051LPM.hpp"
@@ -41,6 +41,16 @@ namespace bsp
     void RT1051LPM::DisableDcdcPowerSaveMode()
     {
         gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::DCDC_INVERTER_MODE_PIN), 1);
+    }
+
+    void RT1051LPM::SwitchToRegularModeLDO()
+    {
+        RT1051LPMCommon::RegularLDOMode();
+    }
+
+    void RT1051LPM::SwitchToLowPowerModeLDO()
+    {
+        RT1051LPMCommon::LowPowerLDOMode();
     }
 
 } // namespace bsp
