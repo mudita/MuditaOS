@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -51,7 +51,6 @@ namespace gui
         Color color{ColorFullBlack};
         uint8_t penWidth{1};
 
-      public:
         void draw(Context *ctx) const override;
     };
 
@@ -82,7 +81,6 @@ namespace gui
         Color fillColor{ColorFullBlack};
         Color borderColor{ColorFullBlack};
 
-      public:
         void draw(Context *ctx) const override;
     };
 
