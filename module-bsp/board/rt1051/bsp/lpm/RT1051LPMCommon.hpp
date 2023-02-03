@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,8 +24,8 @@ namespace bsp
         void DisconnectInternalLoadResistor() final;
         void ConnectInternalLoadResistor() final;
 
-        void SwitchToRegularModeLDO() final;
-        void SwitchToLowPowerModeLDO() final;
+        void RegularLDOMode();
+        void LowPowerLDOMode();
 
       private:
         CpuFrequencyMHz onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency);
