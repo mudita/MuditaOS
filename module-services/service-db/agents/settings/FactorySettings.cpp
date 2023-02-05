@@ -11,8 +11,8 @@ namespace settings
 
     std::unique_ptr<QueryResult> FactorySettings::getMfgEntries()
     {
-        auto factoryContent                      = readMfgSettings(filePath);
-        std::unique_ptr<QueryResult> factoryData = std::make_unique<QueryResult>();
+        auto factoryData          = std::make_unique<QueryResult>();
+        const auto factoryContent = readMfgSettings(filePath);
 
         for (const auto &[path, value] : factoryContent.object_items()) {
             factoryData->addRow({Field(path.c_str()), Field(value.string_value().c_str())});
@@ -23,32 +23,33 @@ namespace settings
 
     void FactorySettings::initDb(Database *database)
     {
-        auto factoryData = getMfgEntries();
-        if (factoryData->getRowCount()) {
-            do {
+        const auto factoryData = getMfgEntries();
 
-                settings::EntryPath variablePath{"",
-                                                 "",
-                                                 "",
-                                                 settings::factory::entry_key + std::string("/") +
-                                                     (*factoryData)[0].getString(),
-                                                 settings::SettingsScope::Global};
-                auto value = (*factoryData)[1].getString();
-
-                if (!database->execute(
-                        settings::Statements::insertValue, variablePath.to_string().c_str(), value.c_str())) {
-                    break;
-                }
-
-                LOG_INFO("Put factory entry: %s=%s", variablePath.to_string().c_str(), value.c_str());
-
-            } while (factoryData->nextRow());
+        if (factoryData->getRowCount() <= 0) {
+            LOG_FATAL("No EEPROM factory data available!");
+            return;
         }
+
+        do {
+            const auto key        = (*factoryData)[0].getString();
+            const auto value      = (*factoryData)[1].getCString();
+            const auto path       = settings::factory::entry_key + std::string("/") + key;
+            const auto pathString = settings::EntryPath{"", "", "", path, settings::SettingsScope::Global}.to_string();
+
+            if (!database->execute(settings::Statements::insertValue, pathString.c_str(), value)) {
+                LOG_ERROR("Failed to set entry '%s' = '%s'!", pathString.c_str(), value);
+            }
+            else {
+                LOG_INFO("Set entry '%s' = '%s'", pathString.c_str(), value);
+            }
+
+        } while (factoryData->nextRow());
     }
+
     json11::Json FactorySettings::readMfgSettings(const std::string &path)
     {
         std::ifstream file(path.c_str());
-        std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        const std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
         std::string parserError;
         auto factoryObj = json11::Json::parse(content, parserError);

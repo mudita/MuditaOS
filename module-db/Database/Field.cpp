@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Field.hpp"
@@ -8,6 +8,11 @@
 const char *Field::getCString() const
 {
     return mValue.c_str();
+}
+
+const std::string &Field::getString() const
+{
+    return mValue;
 }
 
 template <class T>
@@ -44,47 +49,47 @@ double Field::getDouble() const
     return lget<double>(ret, mValue, [=]() -> double { return std::stod(mValue); });
 }
 
-int8_t Field::getInt8() const
+std::int8_t Field::getInt8() const
 {
-    return !mValue.empty() ? static_cast<int8_t>(atol(mValue.c_str())) : int8_t(0);
+    return !mValue.empty() ? static_cast<std::int8_t>(atol(mValue.c_str())) : static_cast<std::int8_t>(0);
 }
 
-int32_t Field::getInt32() const
+std::int32_t Field::getInt32() const
 {
-    return !mValue.empty() ? static_cast<int32_t>(atol(mValue.c_str())) : int32_t(0);
+    return !mValue.empty() ? static_cast<std::int32_t>(atol(mValue.c_str())) : static_cast<std::int32_t>(0);
 }
 
-uint8_t Field::getUInt8() const
+std::uint8_t Field::getUInt8() const
 {
-    return !mValue.empty() ? static_cast<uint8_t>(atol(mValue.c_str())) : uint8_t(0);
+    return !mValue.empty() ? static_cast<std::uint8_t>(atol(mValue.c_str())) : static_cast<std::uint8_t>(0);
 }
 
-uint16_t Field::getUInt16() const
+std::uint16_t Field::getUInt16() const
 {
-    return !mValue.empty() ? static_cast<uint16_t>(atol(mValue.c_str())) : uint16_t(0);
+    return !mValue.empty() ? static_cast<std::uint16_t>(atol(mValue.c_str())) : static_cast<std::uint16_t>(0);
 }
 
-int16_t Field::getInt16() const
+std::int16_t Field::getInt16() const
 {
-    return !mValue.empty() ? static_cast<int16_t>(atol(mValue.c_str())) : int16_t(0);
+    return !mValue.empty() ? static_cast<std::int16_t>(atol(mValue.c_str())) : static_cast<std::int16_t>(0);
 }
 
-uint32_t Field::getUInt32() const
+std::uint32_t Field::getUInt32() const
 {
-    uint32_t ret;
-    return lget<uint32_t>(ret, mValue, [=]() -> unsigned long { return std::stoul(mValue); });
+    std::uint32_t ret;
+    return lget<std::uint32_t>(ret, mValue, [=]() -> unsigned long { return std::stoul(mValue); });
 }
 
-uint64_t Field::getUInt64() const
+std::uint64_t Field::getUInt64() const
 {
-    uint64_t ret;
-    return lget<uint64_t>(ret, mValue, [=]() -> unsigned long long { return std::stoull(mValue); });
+    std::uint64_t ret;
+    return lget<std::uint64_t>(ret, mValue, [=]() -> unsigned long long { return std::stoull(mValue); });
 }
 
-int64_t Field::getInt64() const
+std::int64_t Field::getInt64() const
 {
-    int64_t ret;
-    return lget<int64_t>(ret, mValue, [=]() -> long long { return std::stoll(mValue); });
+    std::int64_t ret;
+    return lget<std::int64_t>(ret, mValue, [=]() -> long long { return std::stoll(mValue); });
 }
 
 void Field::setValue(const char *value)

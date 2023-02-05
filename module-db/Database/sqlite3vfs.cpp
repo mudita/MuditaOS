@@ -113,9 +113,7 @@
 #include <assert.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/param.h>
 #include <unistd.h>
-#include <time.h>
 #include <errno.h>
 #include <memory>
 #include <cstring>
