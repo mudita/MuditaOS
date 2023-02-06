@@ -7,6 +7,8 @@
 #include "SMSTemplateModel.hpp"
 
 #include <AppWindow.hpp>
+
+#include <Icon.hpp>
 #include <gui/widgets/text/Label.hpp>
 #include <gui/widgets/ListView.hpp>
 
@@ -19,6 +21,7 @@ namespace gui
     {
         std::shared_ptr<SMSTemplateModel> smsTemplateModel;
         gui::ListView *list = nullptr;
+        gui::Icon *emptyListIcon = nullptr;
 
         void smsSendTemplateRequestHandler(const SMSSendTemplateRequest *const switchData);
         void smsTemplateRequestHandler(const SMSTemplateRequest *const switchData);

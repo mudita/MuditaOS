@@ -10,7 +10,11 @@
 #include <service-db/DBServiceAPI.hpp>
 
 SMSTemplateModel::SMSTemplateModel(app::ApplicationCommon *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
-{}
+{
+    /* In the base class DatabaseModel, this is initialised to maximal unsigned int value, but in fact should be 0.
+       Not wanting to tinker with the whole database handling framework, let's correct this here in a smaller scale. */
+    recordsCount = 0;
+}
 
 unsigned int SMSTemplateModel::requestRecordsCount()
 {

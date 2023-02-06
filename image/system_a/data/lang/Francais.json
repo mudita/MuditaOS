@@ -307,6 +307,7 @@
   "app_call_wrong_emergency": "Impossible de faire un appel.\n$NUMBER n'est pas un numéro d'urgence.",
   "app_messages_title_main": "Messages",
   "app_messages_no_messages": "<text align = 'center' color = '4'>Aucun message.<p>Appuyez sur la <b>flèche gauche</b> pour en composer un nouveau.</p></text>",
+  "app_messages_no_templates": "<text align='center'>Pas encore de modèles.<p><b>Créez un nouveau modèle</b> sur Mudita</p><p>Center à utiliser dans votre Pure.</p></text>",
   "app_messages_thread_delete_confirmation": "Supprimer cette conversation ?",
   "app_messages_message_delete_confirmation": "<text align='center'><p>Do you really want to <text weight='bold'>delete</text></p>this message?</text>",
   "app_messages_thread_no_result": "Aucun résultat",

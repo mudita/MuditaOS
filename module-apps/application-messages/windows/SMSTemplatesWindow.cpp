@@ -48,6 +48,16 @@ namespace gui
             this, style::x, style::y, style::w, style::h, smsTemplateModel, listview::ScrollBarType::Fixed);
         list->setBoundaries(Boundaries::Continuous);
 
+        using namespace ::style;
+        emptyListIcon = new Icon(this,
+                                 0,
+                                 window::default_vertical_pos,
+                                 window_width,
+                                 window_height - window::default_vertical_pos - ::style::nav_bar::height,
+                                 "info_128px_W_G",
+                                 utils::translate("app_messages_no_templates"));
+        emptyListIcon->setVisible(false);
+
         setFocusItem(list);
     }
 
@@ -93,6 +103,11 @@ namespace gui
         preventsAutoLock = false;
         if (mode == ShowMode::GUI_SHOW_INIT) {
             list->rebuildList();
+            if (list->isEmpty()) {
+                list->setVisible(false);
+                navBar->setActive(nav_bar::Side::Center, false);
+                emptyListIcon->setVisible(true);
+            }
         }
 
         if (auto switchData = dynamic_cast<SMSTemplateRequest *>(data)) {

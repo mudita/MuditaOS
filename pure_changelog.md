@@ -15,6 +15,7 @@
 * Changed order of starting services, ServiceDesktop moved to the back
 * Shortened duration of phone modes pop-up from 3s to 1s
 * Changed responses in contacts and messages endpoints used to communicate with Center
+* Added SMS template call rejection window for case when no templates are defined
 
 ### Fixed
 
@@ -72,6 +73,7 @@
 * Fixed incorrect loudspeaker icon in call window when headset was connected during a call
 * Fixed invalid screen displayed after missed call
 * Fixed minor issues in the Calculator Application
+* Fixed displaying usual SMS template call rejection window when no templates were defined
 
 ## [1.5.0 2022-12-20]
 

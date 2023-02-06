@@ -330,6 +330,7 @@
   "app_call_wrong_emergency": "Nie można wykonać połączenia.\n$NUMBER nie jest numerem alarmowym.",
   "app_messages_title_main": "Wiadomości",
   "app_messages_no_messages": "<text align='center' color='4'>Nie ma jeszcze żadnych wiadomości.<p>Wciśnij <b>lewą strzałkę</b>, by dodać nową.</p></text>",
+  "app_messages_no_templates": "<text align='center'>Nie ma jeszcze żadnych szablonów.<p><b>Stwórz nowy szablon</b> w Mudita</p><p>Center, aby użyć go w swoim Pure.</p></text>",
   "app_messages_thread_delete_confirmation": "Usunąć tę rozmowę?",
   "app_messages_message_delete_confirmation": "<text align='center'><p>Czy na pewno chcesz <text weight='bold'>usunąć</text></p>tę wiadomość?</text>",
   "app_messages_thread_no_result": "Brak wyników",
