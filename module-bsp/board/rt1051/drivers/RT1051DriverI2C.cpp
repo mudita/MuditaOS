@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverI2C.hpp"
@@ -100,6 +100,16 @@ namespace drivers
             break;
         }
         LPI2C_MasterDeinit(base);
+    }
+
+    void RT1051DriverI2C::ReInit(void)
+    {
+        lpi2c_master_config_t lpi2cConfig = {};
+
+        LPI2C_MasterDeinit(base);
+
+        LPI2C_MasterGetDefaultConfig(&lpi2cConfig);
+        LPI2C_MasterInit(base, &lpi2cConfig, GetPerphSourceClock(PerphClock_I2C));
     }
 
     ssize_t RT1051DriverI2C::Write(const drivers::I2CAddress &addr, const uint8_t *txBuff, const size_t size)

@@ -67,6 +67,13 @@ target_sources(fsl
         fsl_wdog.h    
 )
 
+# define a timeout for fsl_lpi2c driver
+# it needs to be here if the fsl library will be replaced by a newer version
+target_compile_definitions(fsl 
+    PRIVATE 
+    LPI2C_WAIT_TIMEOUT=500000
+)
+
 target_include_directories(fsl
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
