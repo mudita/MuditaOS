@@ -66,6 +66,11 @@ target_sources(fsl
         fsl_wdog.h    
 )
 
+target_compile_definitions(fsl 
+    PRIVATE 
+    LPI2C_WAIT_TIMEOUT=10000
+)
+
 target_include_directories(fsl
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
