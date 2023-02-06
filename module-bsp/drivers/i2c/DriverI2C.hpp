@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_DRIVERI2C_HPP
@@ -56,6 +56,8 @@ namespace drivers
 
         virtual ~DriverI2C()
         {}
+
+        virtual void ReInit(void) = 0;
 
         virtual ssize_t Write(const I2CAddress &addr, const uint8_t *txBuff, const size_t size) = 0;
 
