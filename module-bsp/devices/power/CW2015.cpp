@@ -317,29 +317,35 @@ namespace bsp::devices::power
 
     std::optional<std::uint8_t> CW2015::read(const std::uint8_t reg)
     {
+        constexpr uint8_t maxAttemps               = 5;
         const drivers::I2CAddress fuelGaugeAddress = {ADDRESS, reg, i2c_subaddr_size};
         std::uint8_t ret_val{};
-        if (const auto result = i2c.Read(fuelGaugeAddress, &ret_val, i2c_subaddr_size); result == i2c_subaddr_size) {
-            return ret_val;
-        }
-        else {
-            constexpr uint8_t maxProbes = 5;
-            for (uint8_t i = 0; i < maxProbes; ++i) {
-                if (const auto result = i2c.Read(fuelGaugeAddress, &ret_val, i2c_subaddr_size);
-                    result == i2c_subaddr_size) {
-                    return ret_val;
-                }
-                i2c.ReInit();
-                LOG_INFO("Trying to get I2C data: %d", i);
-                vTaskDelay(pdMS_TO_TICKS(i * 10));
+
+        for (uint8_t i = 0; i < maxAttemps; ++i) {
+            if (const auto result = i2c.Read(fuelGaugeAddress, &ret_val, i2c_subaddr_size);
+                result == i2c_subaddr_size) {
+                return ret_val;
             }
-            return std::nullopt;
+            i2c.ReInit();
+            LOG_INFO("Attempting to read I2C data: %d", i);
+            vTaskDelay(pdMS_TO_TICKS(i * 10));
         }
+        return std::nullopt;
     }
+
     bool CW2015::write(const std::uint8_t reg, const std::uint8_t value)
     {
+        constexpr uint8_t maxAttemps               = 5;
         const drivers::I2CAddress fuelGaugeAddress = {ADDRESS, reg, i2c_subaddr_size};
-        return i2c.Write(fuelGaugeAddress, &value, i2c_subaddr_size) == i2c_subaddr_size;
+        for (uint8_t i = 0; i < maxAttemps; ++i) {
+            if (const auto result = i2c.Write(fuelGaugeAddress, &value, i2c_subaddr_size); result == i2c_subaddr_size) {
+                return true;
+            }
+            i2c.ReInit();
+            LOG_INFO("Attempting to write I2C data: %d", i);
+            vTaskDelay(pdMS_TO_TICKS(i * 10));
+        }
+        return false;
     }
     CW2015::operator bool() const
     {
