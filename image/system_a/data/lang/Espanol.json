@@ -338,6 +338,7 @@
   "app_call_wrong_emergency": "No es posible realizar la llamada.\n$NUMBER no es un número de emergencias.",
   "app_messages_title_main": "Mensajes",
   "app_messages_no_messages": "<text align='center' color='4'>No hay mensajes.<p>Pulsa la <b>flecha izquierda</b> para añadir uno.</p></text>",
+  "app_messages_no_templates": "<text align='center'>Aún no hay plantillas.<p><b>Crea una nueva plantilla</b> en Mudita</p><p>Center para usar en tu Pure.</p></text>",
   "app_messages_thread_delete_confirmation": "¿Eliminar esta conversación?",
   "app_messages_message_delete_confirmation": "<text align='center'><p>¿Seguro que quieres <text weight='bold'>eliminar</text></p> este mensaje?</text>",
   "app_messages_thread_no_result": "No hay resultados",

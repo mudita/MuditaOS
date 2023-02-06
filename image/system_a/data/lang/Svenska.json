@@ -273,6 +273,7 @@
   "app_call_wrong_emergency": "Kan inte ringa..\n$NUMBER är inte ett nödnummer.",
   "app_messages_title_main": "Meddelanden",
   "app_messages_no_messages": "<text align='center' color='4'>Inga meddelanden än.<p>Tryck <b>vänsterpil</b> för att börja skriva ett.</p></text>",
+  "app_messages_no_templates": "<text align='center'>Inga mallar ännu.<p><b>Skapa en ny mall</b> i Mudita</p><p>Center som du kan använda i din Pure.</p></text>",
   "app_messages_thread_delete_confirmation": "Radera konversation?",
   "app_messages_message_delete_confirmation": "<text align='center'><p>Vill du <text weight='bold'>radera</text></p>konversationen?</text>",
   "app_messages_thread_no_result": "Inga resultat",

@@ -309,6 +309,7 @@
   "app_call_wrong_emergency": "Can't make a call.\n$NUMBER is not an emergency number.",
   "app_messages_title_main": "Messages",
   "app_messages_no_messages": "<text align='center' color='4'>No messages yet.<p>Press <b>left arrow</b> to add new.</p></text>",
+  "app_messages_no_templates": "<text align='center'>No templates yet.<p><b>Create a new template</b> in Mudita</p><p>Center to use in your Pure.</p></text>",
   "app_messages_thread_delete_confirmation": "Delete this conversation?",
   "app_messages_message_delete_confirmation": "Delete this message?",
   "app_messages_thread_no_result": "There are no results",
