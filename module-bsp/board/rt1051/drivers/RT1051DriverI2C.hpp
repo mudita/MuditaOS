@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_RT1051DRIVERI2C_HPP
@@ -21,6 +21,8 @@ namespace drivers
         RT1051DriverI2C(const I2CInstances inst, const DriverI2CParams &params);
 
         ~RT1051DriverI2C();
+
+        void ReInit(void) override final;
 
         ssize_t Write(const I2CAddress &addr, const uint8_t *txBuff, const size_t size) override final;
 
