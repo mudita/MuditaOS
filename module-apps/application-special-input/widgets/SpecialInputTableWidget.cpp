@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SpecialInputTableWidget.hpp"
@@ -16,7 +16,7 @@ namespace gui
 
     using namespace specialInputStyle;
 
-    SpecialInputTableWidget::SpecialInputTableWidget(app::ApplicationCommon *app, std::list<Carrier> &&carrier)
+    SpecialInputTableWidget::SpecialInputTableWidget(app::ApplicationCommon *app, std::list<Carrier> &&carriers)
         : application(app)
     {
         setMinimumSize(specialCharacterTableWidget::window_grid_w, specialCharacterTableWidget::window_grid_h);
@@ -28,7 +28,7 @@ namespace gui
                              specialCharacterTableWidget::window_grid_h,
                              {specialCharacterTableWidget::char_grid_w, specialCharacterTableWidget::char_grid_h});
 
-        for (auto &carrier : carrier) {
+        for (auto &carrier : carriers) {
             box->addWidget(carrier.item);
             decorateActionActivated(carrier.item, carrier.val);
         }
@@ -71,12 +71,13 @@ namespace gui
     void SpecialInputTableWidget::decorateActionActivated(Item *it, const std::string &str)
     {
         assert(application);
-        auto app = dynamic_cast<app::ApplicationSpecialInput *>(application);
+        const auto app = dynamic_cast<app::ApplicationSpecialInput *>(application);
         assert(app);
 
         it->activatedCallback = [=](Item &it) {
             setFocusItem(nullptr);
             LOG_INFO("handled special char for %s", application->getCurrentWindow()->getName().c_str());
+
             auto switchData =
                 std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response, app->requester, str);
             return app::manager::Controller::switchBack(
@@ -99,16 +100,16 @@ namespace gui
         return {rect, std::string(&text::newline, 1)};
     }
 
-    auto generateCharSign(uint32_t val) -> Carrier
+    auto generateCharSign(std::uint32_t val) -> Carrier
     {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
-        std::string schar_string = convert.to_bytes(std::u32string(1, val));
-        auto el                  = new gui::Label(
+        const auto scharString = convert.to_bytes(std::u32string(1, val));
+        const auto charLabel   = new gui::Label(
             nullptr, 0, 0, specialCharacterTableWidget::char_label_w, specialCharacterTableWidget::char_label_h);
-        style::window::decorate(el);
-        el->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        el->setFont(style::window::font::medium);
-        el->setText(schar_string);
-        return {el, schar_string};
+        style::window::decorate(charLabel);
+        charLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        charLabel->setFont(style::window::font::medium);
+        charLabel->setText(scharString);
+        return {charLabel, scharString};
     }
 } /* namespace gui */

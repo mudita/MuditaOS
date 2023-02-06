@@ -619,7 +619,7 @@ namespace app
             auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
             if (text != nullptr) {
                 text->addText(ret->getDescription());
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
                 return true;
             }
         }
