@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotePreviewWindow.hpp"
@@ -108,7 +108,7 @@ namespace app::notes
     void NotePreviewWindow::setEditDateText(std::uint32_t timestamp)
     {
         using namespace utils::time;
-        auto dateTime = TimestampFactory().createTimestamp(TimestampType::DateTime, timestamp);
+        auto dateTime = TimestampFactory().createTimestamp(TimestampType::DateOrTime, timestamp);
         auto dt       = dynamic_cast<DateTime *>(dateTime.get());
         if (dt == nullptr) {
             return;

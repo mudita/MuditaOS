@@ -147,12 +147,40 @@ namespace utils
                 return os;
             }
 
-            UTF8 str(std::string fmt = "") const override;
-
             bool isToday() const;
             bool isYesterday() const;
             bool isCurrentYear() const;
             bool isCurrentWeek() const;
+        };
+
+        class DateOrTime : public DateTime
+        {
+          public:
+            /// shows date or time in past in relation to reference value
+            ///
+            /// @val - timestamp to show
+            /// @reference - reference timestamp
+            /// @timeSettings - time settings interface
+            DateOrTime(const TimeSettingsInterface &timeSettings, time_t val, time_t reference = std::time(nullptr))
+                : DateTime(timeSettings, val, reference)
+            {}
+
+            UTF8 str(std::string fmt = "") const override;
+        };
+
+        class DateAndTime : public DateTime
+        {
+          public:
+            /// shows date and time in past in relation to reference value
+            ///
+            /// @val - timestamp to show
+            /// @reference - reference timestamp
+            /// @timeSettings - time settings interface
+            DateAndTime(const TimeSettingsInterface &timeSettings, time_t val, time_t reference = std::time(nullptr))
+                : DateTime(timeSettings, val, reference)
+            {}
+
+            UTF8 str(std::string fmt = "") const override;
         };
 
         class Date : public DateTime

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "time_conversion_factory.hpp"
@@ -23,8 +23,10 @@ namespace utils::time
             return std::make_unique<DateText>(*timeSettings, time);
         case TimestampType::Time:
             return std::make_unique<Time>(*timeSettings, time);
-        case TimestampType::DateTime:
-            return std::make_unique<DateTime>(*timeSettings, time);
+        case TimestampType::DateOrTime:
+            return std::make_unique<DateOrTime>(*timeSettings, time);
+        case TimestampType::DateAndTime:
+            return std::make_unique<DateAndTime>(*timeSettings, time);
         case TimestampType::Clock:
             return std::make_unique<Clock>(*timeSettings, time);
         }

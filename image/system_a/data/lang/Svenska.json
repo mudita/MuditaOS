@@ -75,6 +75,8 @@
   "locale_24hour_min": "%H:%M",
   "locale_date_DD_MM_YYYY": "%d.%m.%Y",
   "locale_date_MM_DD_YYYY": "%m.%d.%Y",
+  "locale_date_DD_MM_YY": "%d.%m.%y",
+  "locale_date_MM_DD_YY": "%m.%d.%y",
   "locale_date_DD_MM": "%d.%m",
   "locale_date_MM_DD": "%m.%d",
   "locale_date_Day_DD_Mon": "%A, %d %b",

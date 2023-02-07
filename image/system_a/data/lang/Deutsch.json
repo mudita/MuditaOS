@@ -90,6 +90,8 @@
   "locale_24hour_min": "%H:%M",
   "locale_date_full": "%d.%m.%Y",
   "locale_date_short": "%d.%m",
+  "locale_date_DD_MM_YY": "%d.%m.%y",
+  "locale_date_MM_DD_YY": "%m.%d.%y",
   "common_AM": "AM",
   "common_PM": "PM",
   "duration_min_0sec": "%M:%0S",

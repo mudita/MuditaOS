@@ -72,7 +72,7 @@ namespace gui
         imageCallType[static_cast<uint32_t>(callType)]->setVisible(true);
 
         using namespace utils::time;
-        timestamp->setText(*TimestampFactory().createTimestamp(TimestampType::DateTime, call->date));
+        timestamp->setText(TimestampFactory().createTimestamp(TimestampType::DateOrTime, call->date)->str());
     }
 
 } /* namespace gui */

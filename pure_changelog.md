@@ -3,7 +3,8 @@
 ## Unreleased
 ### Added
 * Always display network access technology and signal strength on the status bar
-* Add days of the week to the list of SMS, calls and notes
+* Added days of the week to the list of SMS, calls and notes
+* Added date formatting of received/sent SMS
 
 ### Changed / Improved
 * Improved dialog with network via USSD

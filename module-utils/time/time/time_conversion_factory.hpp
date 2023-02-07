@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,12 +11,13 @@ namespace utils::time
     /// Most types are system locale dependant
     enum class TimestampType
     {
-        Timestamp, /// no default formatting, no system locale dependencies
-        Clock,     /// actual time
-        Time,      /// past time
-        DateTime,  /// system date time formatting
-        Date,      /// date
-        DateText,  /// date in textual represnatation
+        Timestamp,   /// no default formatting, no system locale dependencies
+        Clock,       /// actual time
+        Time,        /// past time
+        DateOrTime,  /// system date or time formatting depending on the difference from the reference time
+        DateAndTime, /// system date and time formatting
+        Date,        /// date
+        DateText,    /// date in textual represnatation
     };
     class TimestampFactory
     {

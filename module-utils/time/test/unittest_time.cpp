@@ -38,8 +38,10 @@ const std::regex reg12h("^(00|[1-9]|1[0-2]):[0-5][0-9] (A|P)M$");
 const std::regex reg12hShort("^(00|[1-9]|1[0-2]):[0-5][0-9]$");
 const std::regex reg24h("^(00|[1-9]|1[0-9]|2[0-4]):[0-5][0-9]$");
 const std::regex regexDDMMYYYY("^([0-2]\\d|3[0-1])\\.(0[1-9]|1[0-2])\\.\\d{4}$");
+const std::regex regexDDMMYY("^([0-2]\\d|3[0-1])\\.(0[1-9]|1[0-2])\\.\\d{2}$");
 const std::regex regexDDMM("^([0-2]\\d|3[0-1])\\.(0[1-9]|1[0-2])$");
 const std::regex regexMMDDYYYY("^(0[1-9]|1[0-2])\\.([0-2]\\d|3[0-1])\\.\\d{4}$");
+const std::regex regexMMDDYY("^(0[1-9]|1[0-2])\\.([0-2]\\d|3[0-1])\\.\\d{2}$");
 const std::regex regexMMDD("^(0[1-9]|1[0-2])\\.([0-2]\\d|3[0-1])$");
 const std::regex regexDaysOfWeek("^(sun|Sun|mon|Mon|t(ues|hurs)|(T(ues|hurs))|Fri|"
                                  "fri)(day|\\.)?$|wed(\\.|nesday)?$|Wed(\\.|nesday)?$|"
@@ -108,6 +110,8 @@ TEST_CASE("TimeStamp")
             REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatTime24H)) == "23:41");
             REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_DD_MM_YYYY)) == "14.06.2021");
             REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_MM_DD_YYYY)) == "06.14.2021");
+            REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_DD_MM_YY)) == "14.06.21");
+            REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_MM_DD_YY)) == "06.14.21");
             REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_DD_MM)) == "14.06");
             REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_MM_DD)) == "06.14");
         }
@@ -400,65 +404,171 @@ TEST_CASE("DateTime formatting")
         auto newTimeTimeinfo        = currentTimeTimeinfo;
         timeSettings.timeFormat12h  = true;
         timeSettings.dateFormatDDMM = true;
-        SECTION("for the current time")
+
+        SECTION("Date or time formatting depending on the reference time difference")
         {
-            std::regex reg = reg12h;
-            auto newTime   = std::mktime(&newTimeTimeinfo);
-            DateTime datetime(timeSettings, newTime, currentTime);
+            SECTION("for the current time")
+            {
+                std::regex reg = reg12h;
+                auto newTime   = std::mktime(&newTimeTimeinfo);
+                DateOrTime datetime(timeSettings, newTime, currentTime);
 
-            REQUIRE(std::regex_match(std::string(datetime.str()), reg));
-            timeSettings.timeFormat12h = false;
-            reg                        = reg24h;
-            REQUIRE(std::regex_match(std::string(datetime.str()), reg));
-        }
-
-        SECTION("for the time yesterday")
-        {
-            newTimeTimeinfo.tm_mday -= 1;
-            auto newTime = std::mktime(&newTimeTimeinfo);
-            DateTime datetime(timeSettings, newTime, currentTime);
-
-            REQUIRE(datetime.str() == "Yesterday");
-        }
-
-        SECTION("for a time earlier than yesterday but still in the same week")
-        {
-            newTimeTimeinfo.tm_mday -= 6;
-            const auto newTime = std::mktime(&newTimeTimeinfo);
-            DateTime datetime(timeSettings, newTime, currentTime);
-            REQUIRE(std::regex_match(std::string(datetime.str()), regexDaysOfWeek));
-        }
-
-        SECTION("for a time earlier than a week but still in the same year")
-        {
-            std::regex regexSameYear = regexDDMM;
-            if (newTimeTimeinfo.tm_mon == 0) {
-                newTimeTimeinfo.tm_mon = 1;
+                REQUIRE(std::regex_match(std::string(datetime.str()), reg));
+                timeSettings.timeFormat12h = false;
+                reg                        = reg24h;
+                REQUIRE(std::regex_match(std::string(datetime.str()), reg));
             }
-            else {
-                newTimeTimeinfo.tm_mon -= 1;
-            }
-            auto newTime = std::mktime(&newTimeTimeinfo);
 
-            DateTime datetime(timeSettings, newTime, currentTime);
-            REQUIRE(std::regex_match(std::string(datetime.str()), regexSameYear));
-            timeSettings.dateFormatDDMM = false;
-            regexSameYear               = regexMMDD;
-            REQUIRE(std::regex_match(std::string(datetime.str()), regexSameYear));
+            SECTION("for the time yesterday")
+            {
+                newTimeTimeinfo.tm_mday -= 1;
+                auto newTime = std::mktime(&newTimeTimeinfo);
+                DateOrTime datetime(timeSettings, newTime, currentTime);
+
+                REQUIRE(datetime.str() == "Yesterday");
+            }
+
+            SECTION("for a time earlier than yesterday but still in the same week")
+            {
+                newTimeTimeinfo.tm_mday -= 6;
+                const auto newTime = std::mktime(&newTimeTimeinfo);
+                DateOrTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(std::regex_match(std::string(datetime.str()), regexDaysOfWeek));
+            }
+
+            SECTION("for a time earlier than a week but still in the same year")
+            {
+                std::regex regexSameYear = regexDDMM;
+                if (newTimeTimeinfo.tm_mon == 0) {
+                    newTimeTimeinfo.tm_mon = 1;
+                }
+                else {
+                    newTimeTimeinfo.tm_mon -= 1;
+                }
+                auto newTime = std::mktime(&newTimeTimeinfo);
+
+                DateOrTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(std::regex_match(std::string(datetime.str()), regexSameYear));
+                timeSettings.dateFormatDDMM = false;
+                regexSameYear               = regexMMDD;
+                REQUIRE(std::regex_match(std::string(datetime.str()), regexSameYear));
+            }
+
+            SECTION("for the time last year")
+            {
+                std::regex regexPreviousYear = regexDDMMYYYY;
+                newTimeTimeinfo.tm_year -= 1;
+                auto newTime = std::mktime(&newTimeTimeinfo);
+
+                DateOrTime datetime(timeSettings, newTime, currentTime);
+
+                REQUIRE(std::regex_match(std::string(datetime.str()), regexPreviousYear));
+                timeSettings.dateFormatDDMM = false;
+                regexPreviousYear           = regexMMDDYYYY;
+                REQUIRE(std::regex_match(std::string(datetime.str()), regexPreviousYear));
+            }
         }
 
-        SECTION("for the time last year")
+        SECTION("Date and time formatting")
         {
-            std::regex regexPreviousYear = regexDDMMYYYY;
-            newTimeTimeinfo.tm_year -= 1;
-            auto newTime = std::mktime(&newTimeTimeinfo);
+            SECTION("for the current time")
+            {
+                std::regex reg = reg12h;
+                auto newTime   = std::mktime(&newTimeTimeinfo);
+                DateAndTime datetime(timeSettings, newTime, currentTime);
 
-            DateTime datetime(timeSettings, newTime, currentTime);
+                REQUIRE(std::regex_match(std::string(datetime.str()), reg));
+                timeSettings.timeFormat12h = false;
+                reg                        = reg24h;
+                REQUIRE(std::regex_match(std::string(datetime.str()), reg));
+            }
 
-            REQUIRE(std::regex_match(std::string(datetime.str()), regexPreviousYear));
-            timeSettings.dateFormatDDMM = false;
-            regexPreviousYear           = regexMMDDYYYY;
-            REQUIRE(std::regex_match(std::string(datetime.str()), regexPreviousYear));
+            SECTION("for the time yesterday")
+            {
+                newTimeTimeinfo.tm_mday -= 1;
+                auto newTime = std::mktime(&newTimeTimeinfo);
+                DateAndTime datetime(timeSettings, newTime, currentTime);
+
+                const std::string dateTimeStr = datetime.str();
+                const int pos                 = dateTimeStr.find_first_of('\n');
+                const std::string timeStr = dateTimeStr.substr(pos + 1), dateStr = dateTimeStr.substr(0, pos);
+
+                REQUIRE(dateStr == "Yesterday");
+                REQUIRE(std::regex_match(timeStr, reg12h));
+            }
+
+            SECTION("for a time earlier than yesterday but still in the same week")
+            {
+                newTimeTimeinfo.tm_mday -= 6;
+                const auto newTime = std::mktime(&newTimeTimeinfo);
+                DateAndTime datetime(timeSettings, newTime, currentTime);
+
+                const std::string dateTimeStr = datetime.str();
+                const int pos                 = dateTimeStr.find_first_of('\n');
+                const std::string timeStr = dateTimeStr.substr(pos + 1), dateStr = dateTimeStr.substr(0, pos);
+
+                REQUIRE(std::regex_match(dateStr, regexDaysOfWeek));
+                REQUIRE(std::regex_match(timeStr, reg12h));
+            }
+
+            SECTION("for a time earlier than a week but still in the same year")
+            {
+                std::regex regexSameYear = regexDDMM;
+                if (newTimeTimeinfo.tm_mon == 0) {
+                    newTimeTimeinfo.tm_mon = 1;
+                }
+                else {
+                    newTimeTimeinfo.tm_mon -= 1;
+                }
+                auto newTime = std::mktime(&newTimeTimeinfo);
+
+                DateAndTime datetime(timeSettings, newTime, currentTime);
+
+                std::string dateTimeStr = datetime.str();
+                int pos                 = dateTimeStr.find_first_of('\n');
+                std::string timeStr = dateTimeStr.substr(pos + 1), dateStr = dateTimeStr.substr(0, pos);
+
+                REQUIRE(std::regex_match(dateStr, regexSameYear));
+                REQUIRE(std::regex_match(timeStr, reg12h));
+
+                timeSettings.dateFormatDDMM = false;
+                regexSameYear               = regexMMDD;
+
+                dateTimeStr = datetime.str();
+                pos         = dateTimeStr.find_first_of('\n');
+                timeStr     = dateTimeStr.substr(pos + 1);
+                dateStr     = dateTimeStr.substr(0, pos);
+
+                REQUIRE(std::regex_match(dateStr, regexSameYear));
+                REQUIRE(std::regex_match(timeStr, reg12h));
+            }
+
+            SECTION("for the time last year")
+            {
+                std::regex regexPreviousYear = regexDDMMYY;
+                newTimeTimeinfo.tm_year -= 1;
+                auto newTime = std::mktime(&newTimeTimeinfo);
+
+                DateAndTime datetime(timeSettings, newTime, currentTime);
+
+                std::string dateTimeStr = datetime.str();
+                int pos                 = dateTimeStr.find_first_of('\n');
+                std::string timeStr = dateTimeStr.substr(pos + 1), dateStr = dateTimeStr.substr(0, pos);
+
+                REQUIRE(std::regex_match(dateStr, regexPreviousYear));
+                REQUIRE(std::regex_match(timeStr, reg12h));
+
+                timeSettings.dateFormatDDMM = false;
+                regexPreviousYear           = regexMMDDYY;
+
+                dateTimeStr = datetime.str();
+                pos         = dateTimeStr.find_first_of('\n');
+                timeStr     = dateTimeStr.substr(pos + 1);
+                dateStr     = dateTimeStr.substr(0, pos);
+
+                REQUIRE(std::regex_match(dateStr, regexPreviousYear));
+                REQUIRE(std::regex_match(timeStr, reg12h));
+            }
         }
     }
 }
