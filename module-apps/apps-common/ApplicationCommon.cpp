@@ -91,7 +91,8 @@ namespace app
         popupFilter->attachWindowsStack(windowsStackImpl.get());
         statusBarManager->enableIndicators({gui::status_bar::Indicator::Time,
                                             gui::status_bar::Indicator::Signal,
-                                            gui::status_bar::Indicator::NetworkAccessTechnology});
+                                            gui::status_bar::Indicator::NetworkAccessTechnology,
+                                            gui::status_bar::Indicator::PhoneMode});
 
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 

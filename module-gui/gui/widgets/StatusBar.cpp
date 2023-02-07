@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <iomanip>
@@ -196,12 +196,18 @@ namespace gui::status_bar
             config.disable(Indicator::Time);
         }
 
-        // phone mode and NAT are mutually exclusive.
-        if (config.isEnabled(Indicator::NetworkAccessTechnology)) {
-            config.disable(Indicator::PhoneMode);
-        }
-
+        /*
+         * When phone mode indicator is displayed, do not display NAT indicator
+         * Phone mode indicator is displayed when DND or Offline mode is selected
+         */
         if (config.isEnabled(Indicator::PhoneMode)) {
+            if (const auto mode = config.getPhoneMode();
+                mode == sys::phone_modes::PhoneMode::DoNotDisturb || mode == sys::phone_modes::PhoneMode::Offline) {
+                config.disable(Indicator::NetworkAccessTechnology);
+            }
+            else {
+                config.enable(Indicator::NetworkAccessTechnology);
+            }
             phoneMode->setPhoneMode(config.getPhoneMode());
         }
 
