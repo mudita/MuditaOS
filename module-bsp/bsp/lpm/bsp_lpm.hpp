@@ -26,7 +26,6 @@ namespace bsp
         enum class RebootType
         {
             NormalRestart,
-            GoToUsbMscMode,          // Reboot into USB MSC mode
             GoToRecoveryUpdate,       //! Goto recovery into the update mode
             GoToRecoveryFactoryReset, //! GOto recovery into the factory reset mode
             GoToRecoveryRecovery,     //! Goto to recovery into recovery mode

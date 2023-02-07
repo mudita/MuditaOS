@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051LPMCommon.hpp"
@@ -45,9 +45,6 @@ namespace bsp
             break;
         case RebootType::GoToRecoveryRestore:
             set_boot_reason(boot_reason_code_restore);
-            break;
-        case RebootType::GoToUsbMscMode:
-            set_boot_reason(boot_reason_code_usb_mc_mode);
             break;
         case RebootType::NormalRestart:
             set_boot_reason(boot_reason_code_os);

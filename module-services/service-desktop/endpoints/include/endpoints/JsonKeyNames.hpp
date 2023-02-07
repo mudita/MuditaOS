@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,7 +40,6 @@ namespace sdesktop::endpoints::json
     inline constexpr auto state                  = "state";
     inline constexpr auto success                = "success";
     inline constexpr auto reboot                 = "reboot";
-    inline constexpr auto rebootMode             = "rebootMode";
     inline constexpr auto request                = "request";
     inline constexpr auto restore                = "restore";
     inline constexpr auto finished               = "finished";

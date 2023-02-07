@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SystemManager/cpu/algorithm/FrequencyHold.hpp"
@@ -82,11 +82,6 @@ namespace sys
     int32_t PowerManager::Reboot()
     {
         return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::NormalRestart);
-    }
-
-    int32_t PowerManager::RebootToUsbMscMode()
-    {
-        return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUsbMscMode);
     }
 
     int32_t PowerManager::RebootToRecovery(RecoveryReason reason)

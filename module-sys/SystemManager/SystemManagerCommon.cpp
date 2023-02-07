@@ -133,9 +133,6 @@ namespace sys
         case SystemManagerCommon::State::ShutdownReady:
             LOG_INFO("  ---> SHUTDOWN <--- ");
             break;
-        case SystemManagerCommon::State::RebootToUsbMscMode:
-            LOG_INFO("  ---> REBOOT TO USB MSC Mode <--- ");
-            break;
         case SystemManagerCommon::State::RebootToRecovery:
             LOG_INFO("  ---> REBOOT TO RECOVERY <--- ");
             break;
@@ -156,9 +153,6 @@ namespace sys
             break;
         case State::ShutdownReady:
             powerManager->PowerOff();
-            break;
-        case State::RebootToUsbMscMode:
-            powerManager->RebootToUsbMscMode();
             break;
         case State::RebootToRecovery:
             powerManager->RebootToRecovery(recoveryReason);
@@ -294,13 +288,6 @@ namespace sys
         return true;
     }
 
-    bool SystemManagerCommon::RebootToUsbMscMode(Service *s)
-    {
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::RebootToUsbMscMode, CloseReason::Reboot),
-                           service::name::system_manager);
-        return true;
-    }
-
     bool SystemManagerCommon::RebootToRecovery(Service *s, RecoveryReason recoveryReason)
     {
         s->bus.sendUnicast(
@@ -311,13 +298,13 @@ namespace sys
 
     bool SystemManagerCommon::SuspendService(const std::string &name, sys::Service *caller)
     {
-        auto ret = caller->bus.sendUnicastSync(
+        const auto ret = caller->bus.sendUnicastSync(
             std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::SuspendToRAM),
             name,
             1000);
-        auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+        const auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
-        if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)) {
+        if ((ret.first != ReturnCodes::Success) && (resp->retCode != ReturnCodes::Success)) {
             LOG_FATAL("Service %s failed to enter low-power mode", name.c_str());
         }
         return true;
@@ -325,11 +312,11 @@ namespace sys
 
     bool SystemManagerCommon::ResumeService(const std::string &name, sys::Service *caller)
     {
-        auto ret = caller->bus.sendUnicastSync(
+        const auto ret = caller->bus.sendUnicastSync(
             std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::Active), name, 1000);
-        auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+        const auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
-        if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)) {
+        if ((ret.first != ReturnCodes::Success) && (resp->retCode != ReturnCodes::Success)) {
             LOG_FATAL("Service %s failed to exit low-power mode", name.c_str());
         }
         return true;
@@ -339,14 +326,11 @@ namespace sys
     {
         service->StartService();
 
-        auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Start);
-        auto ret  = caller->bus.sendUnicastSync(msg, service->GetName(), timeout);
-        auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+        const auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Start);
+        const auto ret  = caller->bus.sendUnicastSync(msg, service->GetName(), timeout);
+        const auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
-        if (ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)) {
-            return true;
-        }
-        return false;
+        return ((ret.first == ReturnCodes::Success) && (resp->retCode == ReturnCodes::Success));
     }
 
     bool SystemManagerCommon::RunSystemService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout)
@@ -575,9 +559,6 @@ namespace sys
                 case Code::Reboot:
                     RebootHandler();
                     break;
-                case Code::RebootToUsbMscMode:
-                    RebootToUsbMscModeHandler(State::RebootToUsbMscMode);
-                    break;
                 case Code::RebootToRecovery:
                 case Code::FactoryReset:
                     RebootToRecoveryHandler(data->closeReason, data->recoveryReason);
@@ -597,9 +578,13 @@ namespace sys
             return MessageNone{};
         });
 
+        /* Workaround for hardware issues with power supply. With USB cable connected the phone cannot
+         * restart, so detect such state and perform reboot when right function button is pressed.
+         * This way for the user the behavior looks as if the phone was normally turned on from shutdown
+         * state. */
         connect(sevm::KbdMessage(), [&](Message *) {
-            // we are in shutdown mode - we received that there was red key pressed -> we need to reboot
             if (state == State::Shutdown) {
+                LOG_INFO("Rebooting phone after shutdown with USB connected...");
                 set(State::Reboot);
             }
             return MessageNone{};
@@ -730,7 +715,6 @@ namespace sys
         case CloseReason::RegularPowerDown:
         case CloseReason::SystemBrownout:
         case CloseReason::LowBattery:
-        case CloseReason::RebootToUsbMscMode:
             DestroyServices(sys::state::regularClose::whitelist);
             set(State::Shutdown);
             break;
@@ -771,12 +755,6 @@ namespace sys
     {
         CloseSystemHandler(closeReason);
         this->recoveryReason = recoveryReason;
-    }
-
-    void SystemManagerCommon::RebootToUsbMscModeHandler(State newState)
-    {
-        CloseSystemHandler(CloseReason::RebootToUsbMscMode);
-        set(newState);
     }
 
     void SystemManagerCommon::FreqUpdateTick()
