@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -43,7 +43,6 @@ namespace sys
         Restore,
         Reboot,
         RebootToRecovery,
-        RebootToUsbMscMode,
         FactoryReset,
         None,
     };
@@ -81,8 +80,7 @@ namespace sys
             Shutdown,
             ShutdownReady,
             Reboot,
-            RebootToRecovery,
-            RebootToUsbMscMode
+            RebootToRecovery
         } state = State::Running;
 
         explicit SystemManagerCommon(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
@@ -99,8 +97,6 @@ namespace sys
         static bool FactoryReset(Service *s);
 
         static bool Reboot(Service *s);
-
-        static bool RebootToUsbMscMode(Service *s);
 
         static bool RebootToRecovery(Service *s, RecoveryReason recoveryReason);
 
@@ -186,8 +182,6 @@ namespace sys
 
         void RebootToRecoveryHandler(CloseReason closeReason, RecoveryReason recoveryReason);
 
-        void RebootToUsbMscModeHandler(State newState);
-
         void FreqUpdateTick();
 
         /// used for power management control for the filesystem
@@ -234,8 +228,6 @@ inline const char *c_str(sys::SystemManagerCommon::State state)
         return "Reboot";
     case sys::SystemManagerCommon::State::RebootToRecovery:
         return "RebootToRecovery";
-    case sys::SystemManagerCommon::State::RebootToUsbMscMode:
-        return "RebootToUsbMscModeUpdate";
     case sys::SystemManagerCommon::State::ShutdownReady:
         return "ShutdownReady";
     }

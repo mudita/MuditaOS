@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-desktop/Constants.hpp>
@@ -165,7 +165,7 @@ namespace sdesktop::endpoints
     {
         const auto &body = context.getBody();
 
-        if (!(body[json::update] == true && body[json::reboot] == true)) {
+        if (body[json::update] != true || body[json::reboot] != true) {
             return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
         }
 
@@ -194,17 +194,6 @@ namespace sdesktop::endpoints
         return {sent::no, ResponseContext{.status = http::Code::InternalServerError}};
     }
 
-    auto UpdateHelper::processPut(Context &context) -> ProcessResult
-    {
-        const auto &body = context.getBody();
-        auto code        = http::Code::BadRequest;
-        if (body[json::rebootMode] == json::usbMscMode) {
-            code = sys::SystemManagerCommon::RebootToUsbMscMode(owner) ? http::Code::NoContent
-                                                                       : http::Code::InternalServerError;
-        }
-
-        return {sent::no, ResponseContext{.status = code}};
-    }
     UpdateHelper::UpdateHelper(sys::Service *p)
         : BaseHelper(p), updatePackagePath{purefs::dir::getTemporaryPath() / "update"}, binariesPath{get_binary_dir()}
     {}
