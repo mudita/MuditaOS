@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -35,7 +35,8 @@ namespace gui::model
         {
             using namespace utils::time;
             ret->setContact(threadStruct->contact->getFormattedName());
-            ret->setTimestamp(*TimestampFactory().createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
+            ret->setTimestamp(
+                TimestampFactory().createTimestamp(TimestampType::DateOrTime, threadStruct->thread->date)->str());
             // The only thing that differs with ThreadModel actually - here show what was found
             ret->setPreview(threadStruct->thread->snippet);
         }

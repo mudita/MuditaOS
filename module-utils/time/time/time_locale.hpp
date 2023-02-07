@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,7 +24,7 @@ namespace utils
 
           private:
             static const int num_monts      = 12;
-            static const int num_formatters = 9;
+            static const int num_formatters = 11;
             // imo it would be nicer to have datetime locales in different json with thiny bit nicer and more effective
             // getters
             const std::array<std::string, num_days> daysShort = {
@@ -56,6 +56,8 @@ namespace utils
                                                                        "locale_24hour_min",
                                                                        "locale_date_DD_MM_YYYY",
                                                                        "locale_date_MM_DD_YYYY",
+                                                                       "locale_date_DD_MM_YY",
+                                                                       "locale_date_MM_DD_YY",
                                                                        "locale_date_DD_MM",
                                                                        "locale_date_MM_DD",
                                                                        "locale_date_Day_DD_Mon",
@@ -109,6 +111,8 @@ namespace utils
                 FormatTime24H,      // H:M in 24h format
                 FormatLocaleDate_DD_MM_YYYY,
                 FormatLocaleDate_MM_DD_YYYY,
+                FormatLocaleDate_DD_MM_YY,
+                FormatLocaleDate_MM_DD_YY,
                 FormatLocaleDate_DD_MM,
                 FormatLocaleDate_MM_DD,
                 FormatDate_Day_DD_Month,

@@ -190,13 +190,13 @@ namespace utils::time
         return std::abs(dayDifference) < Locale::num_days;
     }
 
-    UTF8 DateTime::str(std::string format) const
+    UTF8 DateOrTime::str(std::string format) const
     {
         if (format.compare("") != 0) {
             return Timestamp::str(format);
         }
         if (isToday()) {
-            auto localeFormat =
+            const auto localeFormat =
                 timeSettings.isTimeFormat12h() ? Locale::TimeFormat::FormatTime12H : Locale::TimeFormat::FormatTime24H;
             return Timestamp::str(Locale::format(localeFormat));
         }
@@ -207,13 +207,42 @@ namespace utils::time
             return Timestamp::day();
         }
         if (isCurrentYear()) {
-            auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM
-                                                                : Locale::TimeFormat::FormatLocaleDate_MM_DD;
+            const auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM
+                                                                      : Locale::TimeFormat::FormatLocaleDate_MM_DD;
             return Timestamp::str(Locale::format(localeFormat));
         }
-        auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM_YYYY
-                                                            : Locale::TimeFormat::FormatLocaleDate_MM_DD_YYYY;
+        const auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM_YYYY
+                                                                  : Locale::TimeFormat::FormatLocaleDate_MM_DD_YYYY;
         return Timestamp::str(Locale::format(localeFormat));
+    }
+
+    UTF8 DateAndTime::str(std::string format) const
+    {
+        if (!format.empty()) {
+            return Timestamp::str(format);
+        }
+        const auto timeFormat =
+            timeSettings.isTimeFormat12h() ? Locale::TimeFormat::FormatTime12H : Locale::TimeFormat::FormatTime24H;
+        const auto time    = Timestamp::str(Locale::format(timeFormat));
+        const UTF8 newline = "\n";
+
+        if (isToday()) {
+            return time;
+        }
+        if (isYesterday()) {
+            return Locale::yesterday() + newline + time;
+        }
+        if (isCurrentWeek()) {
+            return Timestamp::day(true) + newline + time;
+        }
+        if (isCurrentYear()) {
+            const auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM
+                                                                      : Locale::TimeFormat::FormatLocaleDate_MM_DD;
+            return Timestamp::str(Locale::format(localeFormat)) + newline + time;
+        }
+        const auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM_YY
+                                                                  : Locale::TimeFormat::FormatLocaleDate_MM_DD_YY;
+        return Timestamp::str(Locale::format(localeFormat)) + newline + time;
     }
 
     UTF8 Date::str(std::string format) const

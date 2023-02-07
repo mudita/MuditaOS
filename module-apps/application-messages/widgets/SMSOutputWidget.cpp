@@ -66,6 +66,9 @@ namespace gui
             break;
         }
 
+        smsBubble->setMaximumSize(std::min(style::messages::smsOutput::sms_max_width,
+                                           style::listview::item_width_with_scroll - timeLabel->getTextNeedSpace()),
+                                  style::messages::smsOutput::sms_max_height);
         smsBubble->setText(record->body);
 
         focusChangedCallback = [this]([[maybe_unused]] Item &item) {
@@ -116,7 +119,7 @@ namespace gui
     {
         if (timeLabel != nullptr) {
             timeLabel->setMinimumWidth(timeLabel->getTextNeedSpace());
-            timeLabel->setMinimumHeight(style::messages::smsOutput::default_h);
+            timeLabel->setMinimumHeight(style::messages::smsOutput::sms_label_high);
             uint16_t timeLabelMargin = body->getWidth() - (smsBubble->getWidth() + timeLabel->getTextNeedSpace());
 
             if (body->getReverseOrder()) {
@@ -136,10 +139,13 @@ namespace gui
         timeLabel->activeItem = false;
         timeLabel->setFont(style::window::font::verysmall);
         using namespace utils::time;
-        timeLabel->setText(*TimestampFactory().createTimestamp(TimestampType::Time, timestamp));
+        timeLabel->setText(TimestampFactory().createTimestamp(TimestampType::DateAndTime, timestamp)->str());
         timeLabel->setVisible(false);
-        timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        timeLabel->setAlignment(gui::Alignment(body->getReverseOrder() ? gui::Alignment::Horizontal::Left
+                                                                       : gui::Alignment::Horizontal::Right,
+                                               gui::Alignment::Vertical::Center));
         timeLabel->setEdges(RectangleEdge::None);
+        timeLabel->setTextType(TextType::MultiLine);
     }
 
     void SMSOutputWidget::errorIconBuild()

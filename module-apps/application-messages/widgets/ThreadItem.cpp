@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessagesStyle.hpp"
@@ -51,7 +51,8 @@ namespace gui
 
         setContactName(getNumberImportance());
         using namespace utils::time;
-        timestamp->setText(*TimestampFactory().createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
+        timestamp->setText(
+            TimestampFactory().createTimestamp(TimestampType::DateOrTime, threadStruct->thread->date)->str());
         setPreview();
     }
 
