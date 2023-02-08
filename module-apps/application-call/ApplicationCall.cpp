@@ -161,6 +161,12 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(cellular::CallMissedNotification), [&](sys::Message *request) {
+            callModel->setState(app::call::CallState::Missed);
+            app::manager::Controller::switchBack(this);
+            return sys::MessageNone{};
+        });
+
         connect(typeid(cellular::CallEndedNotification), [&](sys::Message *request) {
             callModel->setState(app::call::CallState::Ended);
             switchWindow(app::window::name_call);

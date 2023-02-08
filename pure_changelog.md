@@ -65,6 +65,7 @@
 * Fixed inability to type characters other than digits in USSD replies
 * Fixed screen ghosting after emoji selection
 * Fixed incorrect loudspeaker icon in call window when headset was connected during a call
+* Fixed invalid screen displayed after missed call
 
 ## [1.5.0 2022-12-20]
 

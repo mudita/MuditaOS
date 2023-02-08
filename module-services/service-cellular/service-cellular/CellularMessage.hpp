@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -970,6 +970,12 @@ namespace cellular
       private:
         utils::PhoneNumber phoneNumber;
         bool isIncoming;
+    };
+
+    class CallMissedNotification : public sys::DataMessage
+    {
+      public:
+        explicit CallMissedNotification() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
     };
 
     class CallEndedNotification : public sys::DataMessage

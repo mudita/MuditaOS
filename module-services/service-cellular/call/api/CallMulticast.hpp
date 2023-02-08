@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,6 +23,7 @@ namespace call::api
         virtual void notifyOutgoingCallAnswered()                                              = 0;
         virtual void notifyCallStarted(const utils::PhoneNumber &number, const CallType &type) = 0;
         virtual void notifyCallEnded()                                                         = 0;
+        virtual void notifyCallMissed()                                                        = 0;
         virtual void notifyCallDurationUpdate(const time_t &duration)                          = 0;
 
         virtual ~Multicast() = default;
@@ -43,5 +44,6 @@ class CallMulticast : public call::api::Multicast
     void notifyOutgoingCallAnswered() override;
     void notifyCallStarted(const utils::PhoneNumber &number, const CallType &type) override;
     void notifyCallEnded() override;
+    void notifyCallMissed() override;
     void notifyCallDurationUpdate(const time_t &duration) override;
 };

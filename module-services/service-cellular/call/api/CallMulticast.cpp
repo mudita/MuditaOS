@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallMulticast.hpp"
@@ -36,6 +36,12 @@ void CallMulticast::notifyCallStarted(const utils::PhoneNumber &number, const Ca
 void CallMulticast::notifyCallEnded()
 {
     owner->bus.sendMulticast(std::make_shared<cellular::CallEndedNotification>(),
+                             sys::BusChannel::ServiceCellularNotifications);
+}
+
+void CallMulticast::notifyCallMissed()
+{
+    owner->bus.sendMulticast(std::make_shared<cellular::CallMissedNotification>(),
                              sys::BusChannel::ServiceCellularNotifications);
 }
 
