@@ -71,6 +71,7 @@
 * Fixed screen ghosting after emoji selection
 * Fixed incorrect loudspeaker icon in call window when headset was connected during a call
 * Fixed invalid screen displayed after missed call
+* Fixed minor issues in the Calculator Application
 
 ## [1.5.0 2022-12-20]
 
