@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/SystemManagerCommon.hpp>
@@ -182,29 +182,51 @@ namespace sys
             processBus();
         }
 
+        LOG_INFO("FLUSH1");
+        Log::Logger::get().flush();
+
         while (state == State::Shutdown) {
             handleShutdown();
         }
-
+        LOG_INFO("FLUSH2");
+        Log::Logger::get().flush();
         DestroySystemService(service::name::evt_manager, this);
+
+        LOG_INFO("FLUSH3");
+        Log::Logger::get().flush();
         CloseService();
+
+        LOG_INFO("FLUSH4");
+        Log::Logger::get().flush();
 
         // it should be called before systemDeinit to make sure this log is dumped to the file
         LogPowerOffReason();
+
+        LOG_INFO("FLUSH5");
+        Log::Logger::get().flush();
 
         if (systemDeinit) {
             systemDeinit();
         }
 
+        LOG_INFO("FLUSH6");
+        Log::Logger::get().flush();
+
         // We disable all uninitialized devices
         deviceManager->DisableAllDevices();
+        LOG_INFO("FLUSH7");
+        Log::Logger::get().flush();
 
         // Power off request (pending)
         PowerOff();
+        LOG_INFO("FLUSH8");
+        Log::Logger::get().flush();
 
         powerManager.reset();
         cpuStatistics.reset();
         deviceManager.reset();
+        LOG_INFO("FLUSH9");
+        Log::Logger::get().flush();
 
         // End of scheduler and back to the main and poweroff
         EndScheduler();
@@ -374,12 +396,16 @@ namespace sys
 
     bool SystemManagerCommon::RequestServiceClose(const std::string &name, Service *caller, TickType_t timeout)
     {
+
         auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Exit);
         auto ret  = caller->bus.sendUnicastSync(msg, name, timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if (ret.first != ReturnCodes::Success) {
-            LOG_ERROR("Service to close: %s did not respond, error code %d", name.c_str(), static_cast<int>(ret.first));
+            LOG_ERROR("Service to close: %s did not respond, error code %d (caller: %s)",
+                      name.c_str(),
+                      static_cast<int>(ret.first),
+                      caller->GetName().c_str());
             return false;
         }
         else if (resp->retCode != ReturnCodes::Success) {
@@ -393,21 +419,28 @@ namespace sys
     template <typename T>
     void SystemManagerCommon::DestroyServices(const T &whitelist)
     {
+        LOG_INFO("FLUSH DestroyServices 1");
+        Log::Logger::get().flush();
         cpp_freertos::LockGuard lck(serviceDestroyMutex);
         for (auto service = servicesList.begin(); service != servicesList.end();) {
             if (sys::state::isOnWhitelist<T>(whitelist, (*service)->GetName())) {
                 LOG_DEBUG("Delay closing %s", (*service)->GetName().c_str());
+                Log::Logger::get().flush();
                 ++service;
             }
             else {
                 LOG_DEBUG("RequestServiceClose %s", (*service)->GetName().c_str());
+                Log::Logger::get().flush();
                 if (!RequestServiceClose((*service)->GetName(), this)) {
                     LOG_ERROR("Service %s did not respond -> to kill", (*service)->GetName().c_str());
+                    Log::Logger::get().flush();
                     kill(*service);
                 }
                 service = servicesList.erase(service);
             }
         }
+        LOG_INFO("FLUSH DestroyServices 2");
+        Log::Logger::get().flush();
     }
 
     bool SystemManagerCommon::DestroySystemService(const std::string &name, Service *caller)
@@ -481,6 +514,9 @@ namespace sys
         serviceCloseTimer = sys::TimerFactory::createSingleShotTimer(
             this, "serviceCloseTimer", serviceCloseResponseTimeout, [this](sys::Timer &) { CloseServices(); });
         serviceCloseTimer.start();
+
+        LOG_INFO("FLUSH close seq");
+        Log::Logger::get().flush();
 
         /// Start the sequence by sending close request to the first service on the list
         bus.sendUnicast(std::make_shared<ServiceCloseReasonMessage>(closeReason), servicesToClose.front());
@@ -699,7 +735,9 @@ namespace sys
 
     void SystemManagerCommon::CloseSystemHandler(CloseReason closeReason)
     {
-        LOG_DEBUG("Invoking closing procedure...");
+        LOG_DEBUG("Invoking closing procedure... %d", static_cast<int>(closeReason));
+        LOG_INFO("FLUSH A1");
+        Log::Logger::get().flush();
 
         cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
 
@@ -715,15 +753,22 @@ namespace sys
             serviceListReversed = true;
         }
         CriticalSection::Exit();
+        LOG_INFO("FLUSH A2");
+        Log::Logger::get().flush();
 
         InitiateSystemCloseSequence(closeReason);
+
+        LOG_INFO("FLUSH A3");
+        Log::Logger::get().flush();
     }
 
     void SystemManagerCommon::CloseServices()
     {
+        LOG_INFO("FLUSH CloseServices1");
         for (const auto &element : servicesToClose) {
             LOG_INFO("Service: %s did not reported before timeout", element.c_str());
         }
+        Log::Logger::get().flush();
         // All delayed messages will be ignored
         servicesToClose.clear();
 
@@ -745,6 +790,8 @@ namespace sys
             set(State::RebootToUpdate);
             break;
         }
+        LOG_INFO("FLUSH CloseServices2");
+        Log::Logger::get().flush();
     }
 
     void SystemManagerCommon::RestoreSystemHandler()

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -49,6 +49,7 @@ namespace Log
         auto dumpToFile(std::filesystem::path logPath) -> int;
         auto diagnosticDump() -> int;
         auto flushLogs() -> int;
+        auto flush() -> int;
 
         static constexpr auto CRIT_STR = "CRIT";
         static constexpr auto IRQ_STR  = "IRQ";

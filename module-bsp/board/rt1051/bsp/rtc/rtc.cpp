@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "rtc_configuration.hpp"
@@ -236,7 +236,7 @@ namespace bsp::rtc
 
     ErrorCode setMinuteAlarm(time_t timestamp)
     {
-        std::uint32_t secondsToMinute = 60 - (timestamp % 60);
+        std::uint32_t secondsToMinute = 10; // 60 - (timestamp % 60);
 
         struct tm date
         {};

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Logger.hpp"
@@ -14,7 +14,7 @@ namespace Log
     Logger *Logger::_logger          = nullptr;
 
     using namespace std::chrono_literals;
-    constexpr std::chrono::minutes writeLogsToFileInterval = 15min;
+    constexpr std::chrono::seconds writeLogsToFileInterval = 3s;
 
     std::ostream &operator<<(std::ostream &stream, const Application &application)
     {
@@ -229,6 +229,13 @@ namespace Log
         writeLogsTimer.stop();
         buffer.nextBuffer();
         return dumpToFile(purefs::dir::getLogsPath() / LOG_FILE_NAME);
+    }
+
+    auto Logger::flush() -> int
+    {
+        return 0;
+        // buffer.nextBuffer();
+        // return dumpToFile(purefs::dir::getLogsPath() / LOG_FILE_NAME);
     }
 
     void Logger::checkBufferState()

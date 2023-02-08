@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Service/Service.hpp>
@@ -20,6 +20,8 @@
 #include <iosfwd>                  // for std
 #include <typeinfo>                // for type_info
 #include <system/Constants.hpp>
+
+#include "Logger.hpp"
 
 // this could use Scoped() class from utils to print execution time too
 void debug_msg(sys::Service *srvc, const sys::Message *ptr)
@@ -274,8 +276,12 @@ namespace sys
             service->SwitchPowerModeHandler(message->powerMode);
             break;
         case SystemMessageType::Exit:
+            // LOG_INFO("FLUSH Exit 1");
+            // Log::Logger::get().flush();
             ret = service->DeinitHandler();
             service->CloseHandler();
+            // LOG_INFO("FLUSH Exit 2 %d", static_cast<int>(ret));
+            // Log::Logger::get().flush();
             break;
         case SystemMessageType::Timer:
             ret = service->TimerHandle(*message);

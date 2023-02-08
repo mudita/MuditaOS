@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ActionsRegistry.hpp"
 
 #include <log/log.hpp>
 #include <magic_enum.hpp>
+#include <Logger.hpp>
 
 #include <cassert>
 #include <stdexcept>
@@ -51,6 +52,9 @@ namespace app::manager
     void ActionsRegistry::enqueue(ActionEntry &&action)
     {
         LOG_INFO("Enqueue action %s", magic_enum::enum_name(action.actionId).data());
+
+        LOG_INFO("FLUSH enqueue");
+        Log::Logger::get().flush();
 
         addAction(std::move(action));
         process();
