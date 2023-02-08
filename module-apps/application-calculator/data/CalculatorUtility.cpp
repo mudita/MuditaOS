@@ -22,7 +22,7 @@ namespace calc
         }
 
         int error;
-        double result = te_interp(source.c_str(), &error);
+        const auto result = te_interp(source.c_str(), &error);
         if (error == 0 && !std::isinf(result) && !std::isnan(result)) {
             auto output = utils::to_string(result);
             if (output.length() > MaxStringLength) {
@@ -49,8 +49,9 @@ namespace calc
         size_t index = 0;
         while (true) {
             index = input.find(from, index);
-            if (index == std::string::npos)
+            if (index == std::string::npos) {
                 break;
+            }
             input.replace(index, from.length(), to);
             index += to.length();
         }
@@ -61,8 +62,8 @@ namespace calc
     {
         using namespace calc::limits;
 
-        auto base   = static_cast<long long>(result);
-        auto length = utils::to_string(base).length();
+        const auto base = static_cast<long long>(result);
+        auto length     = utils::to_string(base).length();
         if (base < 0) {
             length -= 1;
         }

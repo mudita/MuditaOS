@@ -9,15 +9,10 @@ bool calc::InputProcessor::isSymbol(uint32_t code) noexcept
 
     switch (code) {
     case plus:
-        [[fallthrough]];
     case minus:
-        [[fallthrough]];
     case division:
-        [[fallthrough]];
     case multiplication:
-        [[fallthrough]];
     case comma:
-        [[fallthrough]];
     case full_stop:
         return true;
     default:
@@ -31,11 +26,8 @@ bool calc::InputProcessor::isOperation(uint32_t code) noexcept
 
     switch (code) {
     case plus:
-        [[fallthrough]];
     case minus:
-        [[fallthrough]];
     case division:
-        [[fallthrough]];
     case multiplication:
         return true;
     default:

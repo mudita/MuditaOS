@@ -13,7 +13,7 @@ calc::InputProcessorText::InputProcessorText(gsl::strict_not_null<gui::Text *> i
 
 bool calc::InputProcessorText::handle(const gui::InputEvent &event)
 {
-    if (clearInput || inputContainsExponent()) {
+    if (clearInput) {
         clear();
     }
 
@@ -90,7 +90,7 @@ bool calc::InputProcessorText::handle(const gui::InputEvent &event)
         return true;
     }
 
-    if (prohibidInput(event)) {
+    if (prohibitInput(event)) {
         // Consume event to don't allow more decimals
         return true;
     }
@@ -119,13 +119,18 @@ std::optional<uint32_t> calc::InputProcessorText::lastCharacter() const
 bool calc::InputProcessorText::lastCharacterIsSymbol() const
 {
     const auto &c = lastCharacter();
-    return c ? isSymbol(*c) : false;
+    return c && isSymbol(*c);
 }
 
 bool calc::InputProcessorText::lastCharacterIsOperation() const
 {
     const auto &c = lastCharacter();
-    return c ? isOperation(*c) : false;
+    return c && isOperation(*c);
+}
+
+bool calc::InputProcessorText::isThereOnlyOneChar() const
+{
+    return inputField->getText().length() == 1;
 }
 
 std::optional<uint32_t> calc::InputProcessorText::penultimateCharacter() const
@@ -143,13 +148,13 @@ std::optional<uint32_t> calc::InputProcessorText::penultimateCharacter() const
 bool calc::InputProcessorText::penultimateCharacterIsSymbol() const
 {
     const auto &c = penultimateCharacter();
-    return c ? isSymbol(*c) : false;
+    return c && isSymbol(*c);
 }
 
 bool calc::InputProcessorText::penultimateCharacterIsDecimalSeparator() const
 {
     const auto &c = penultimateCharacter();
-    return c ? isDecimalSeparator(*c) : false;
+    return c && isDecimalSeparator(*c);
 }
 
 bool calc::InputProcessorText::shouldComputeBeforeNextOperation() const
@@ -178,7 +183,7 @@ void calc::InputProcessorText::addSymbol(const UTF8 &symbol)
 {
     if (!inputField->getText().empty()) {
 
-        if (lastCharacterIsSymbol() && symbol != symbols::strings::minus) {
+        if (lastCharacterIsSymbol()) {
             if (!penultimateCharacterIsSymbol() && inputField->getText().length() > 1) {
                 inputField->removeChar();
                 inputField->addText(symbol);
@@ -195,19 +200,7 @@ void calc::InputProcessorText::addSymbol(const UTF8 &symbol)
 
 bool calc::InputProcessorText::shouldHideInput(const gui::InputEvent &event) const
 {
-    if (!lastCharacterIsOperation()) {
-        return false;
-    }
-
-    if (!event.isDigit() && !event.is(gui::KeyCode::KEY_DOWN)) {
-        return false;
-    }
-
-    if (inputField->getText() == symbols::strings::minus) {
-        return false;
-    }
-
-    return true;
+    return not isThereOnlyOneChar() and lastCharacterIsOperation() and event.isDigit();
 }
 
 bool calc::InputProcessorText::shouldRestoreInput(const gui::InputEvent &event) const
@@ -263,12 +256,7 @@ bool calc::InputProcessorText::isCurrentNumberDecimal() const
     return false;
 }
 
-bool calc::InputProcessorText::inputContainsExponent() const
-{
-    return std::string{inputField->getText()}.find('e') != std::string::npos;
-}
-
-bool calc::InputProcessorText::prohibidInput(const gui::InputEvent &event) const
+bool calc::InputProcessorText::prohibitInput(const gui::InputEvent &event) const
 {
     if (!event.isDigit()) {
         return false;
@@ -295,16 +283,12 @@ bool calc::InputProcessorText::decimalLimitReached() const
     const auto &txt          = std::string{inputField->getText()};
     const auto separator_pos = txt.find_last_of(symbols::strings::decimal_separator_str());
 
-    if ((txt.size() - separator_pos) > limits::MaxDecimalDigits) {
-        return true;
-    }
-
-    return false;
+    return (txt.size() - separator_pos) > limits::MaxDecimalDigits;
 }
 
 void calc::InputProcessorText::compute()
 {
-    auto result = Calculator().calculate(hiddenPartOfEquation + inputField->getText());
+    const auto result = Calculator().calculate(hiddenPartOfEquation + inputField->getText());
     inputField->setText(result.value);
     hiddenPartOfEquation.clear();
     clearInput = result.isError;

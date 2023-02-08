@@ -25,6 +25,7 @@ namespace calc
         std::optional<std::uint32_t> lastCharacter() const;
         bool lastCharacterIsSymbol() const;
         bool lastCharacterIsOperation() const;
+        bool isThereOnlyOneChar() const;
 
         std::optional<std::uint32_t> penultimateCharacter() const;
         bool penultimateCharacterIsSymbol() const;
@@ -41,9 +42,8 @@ namespace calc
         bool hasHiddenPart() const;
 
         bool isCurrentNumberDecimal() const;
-        bool inputContainsExponent() const;
 
-        bool prohibidInput(const gui::InputEvent &event) const;
+        bool prohibitInput(const gui::InputEvent &event) const;
         bool charactedLimitReached() const;
         bool decimalLimitReached() const;
 

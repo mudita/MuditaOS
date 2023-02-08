@@ -44,7 +44,7 @@ namespace utils
             return path;
         }
 
-        uint getFileNumber(const std::string &filename) const
+        std::size_t getFileNumber(const std::string &filename) const
         {
             const auto position = filename.rfind(".");
             if (position == std::string::npos) {

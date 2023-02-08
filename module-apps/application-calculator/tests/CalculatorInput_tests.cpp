@@ -47,13 +47,15 @@ SCENARIO("Input Processor tests")
         auto passLongKeyPress = [&](KeyCodes code) { passEvent(longPressEvent(code)); };
 
         auto passShortKeyPresses = [&](const std::vector<KeyCodes> &codes) {
-            for (const auto &code : codes)
+            for (const auto &code : codes) {
                 passShortKeyPress(code);
+            }
         };
 
         auto passLongKeyPresses = [&](const std::vector<KeyCodes> &codes) {
-            for (const auto &code : codes)
+            for (const auto &code : codes) {
                 passLongKeyPress(code);
+            }
         };
 
         THEN("The text is empty")
@@ -260,27 +262,6 @@ SCENARIO("Input Processor tests")
             }
         }
 
-        WHEN("We enter a negative number")
-        {
-            passShortKeyPresses({MinusKey, KeyCodes::NumericKey2, KeyCodes::NumericKey3});
-
-            THEN("It is shown")
-            {
-                REQUIRE(inputField.getText() == "-23");
-            }
-
-            AND_WHEN("We try to subtract a negitive number")
-            {
-                passShortKeyPresses(
-                    {MinusKey, MinusKey, KeyCodes::NumericKey1, KeyCodes::NumericKey3, KeyCodes::JoystickEnter});
-
-                THEN("The result is computed properly")
-                {
-                    REQUIRE(inputField.getText() == "-10");
-                }
-            }
-        }
-
         WHEN("We enter a number")
         {
             passShortKeyPresses({KeyCodes::NumericKey1, KeyCodes::NumericKey2, KeyCodes::NumericKey3});
@@ -332,9 +313,9 @@ SCENARIO("Input Processor tests")
                 {
                     passShortKeyPresses({MinusKey, KeyCodes::NumericKey5, KeyCodes::NumericKey6});
 
-                    THEN("Previous input is hidden and negative number is shown")
+                    THEN("Previous input is hidden and typed number is shown")
                     {
-                        REQUIRE(inputField.getText() == "-56");
+                        REQUIRE(inputField.getText() == "56");
                     }
 
                     AND_WHEN("We press enter")
@@ -349,7 +330,7 @@ SCENARIO("Input Processor tests")
 
                     AND_WHEN("We delete the input")
                     {
-                        passShortKeyPresses({3, KeyCodes::NumericKeyPnd});
+                        passShortKeyPresses({2, KeyCodes::NumericKeyPnd});
 
                         THEN("Input is deleted")
                         {
@@ -362,7 +343,7 @@ SCENARIO("Input Processor tests")
 
                             THEN("Previous input is restored")
                             {
-                                REQUIRE(inputField.getText() == "123+");
+                                REQUIRE(inputField.getText() == "123-");
                             }
                         }
                     }
@@ -478,6 +459,26 @@ SCENARIO("Input Processor tests")
                     REQUIRE(inputField.getText() == "56");
                 }
             }
+
+            AND_WHEN("We invoke any operation")
+            {
+                passShortKeyPress(KeyCodes::JoystickUp);
+
+                THEN("We should see")
+                {
+                    REQUIRE(inputField.getText() == "9.9998e9+");
+                }
+
+                AND_WHEN("We proceed to type more input")
+                {
+                    passShortKeyPresses({KeyCodes::NumericKey1, KeyCodes::NumericKey5, KeyCodes::NumericKey6});
+
+                    THEN("We should see")
+                    {
+                        REQUIRE(inputField.getText() == "156");
+                    }
+                }
+            }
         }
 
         WHEN("We enter an equation")
@@ -504,6 +505,61 @@ SCENARIO("Input Processor tests")
                     THEN("The following equation is computed properly")
                     {
                         REQUIRE(inputField.getText() == "333");
+                    }
+                }
+            }
+        }
+
+        WHEN("We enter the minus key")
+        {
+            passShortKeyPress(MinusKey);
+
+            AND_WHEN("We press another minus")
+            {
+                passShortKeyPress(MinusKey);
+
+                THEN("We should see only one minus sign")
+                {
+                    REQUIRE(inputField.getText() == "-");
+                }
+
+                AND_WHEN("We continue inputting minus sign")
+                {
+                    passShortKeyPress(MinusKey);
+
+                    THEN("We still should see only one minus sign")
+                    {
+                        REQUIRE(inputField.getText() == "-");
+                    }
+                }
+            }
+
+            AND_WHEN("We input a number")
+            {
+                passShortKeyPress(KeyCodes::NumericKey5);
+
+                THEN("We should see a '-5' value")
+                {
+                    REQUIRE(inputField.getText() == "-5");
+                }
+
+                AND_WHEN("We input another minus sign")
+                {
+                    passShortKeyPress(MinusKey);
+
+                    THEN("We should see a '-5-' value")
+                    {
+                        REQUIRE(inputField.getText() == "-5-");
+                    }
+
+                    AND_WHEN("We input another minus sign")
+                    {
+                        passShortKeyPress(MinusKey);
+
+                        THEN("We should still see a '-5-' value")
+                        {
+                            REQUIRE(inputField.getText() == "-5-");
+                        }
                     }
                 }
             }
