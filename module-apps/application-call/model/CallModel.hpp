@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,6 +20,7 @@ namespace app::call
         Active,
         Ended,
         Rejected,
+        Missed,
         Disconnecting
     };
 
@@ -37,7 +38,9 @@ namespace app::call
         case CallState::Ended:
             return "Ended";
         case CallState::Rejected:
-            return "Ended";
+            return "Rejected";
+        case CallState::Missed:
+            return "Missed";
         case CallState::Disconnecting:
             return "Disconnecting";
         }

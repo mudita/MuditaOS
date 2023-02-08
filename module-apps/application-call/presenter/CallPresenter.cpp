@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallPresenter.hpp"
@@ -43,7 +43,7 @@ namespace app::call
         switch (callState) {
         case app::call::CallState::Incoming:
             view->updateDuration(utils::translate(callAppStyle::strings::iscalling));
-            view->setIncomingCallLayout(model->getCallerId().empty() ? true : false);
+            view->setIncomingCallLayout(model->getCallerId().empty());
             view->updateNumber(getCallerId());
             break;
         case app::call::CallState::Outgoing:
@@ -62,6 +62,9 @@ namespace app::call
         case app::call::CallState::Ended:
             view->updateDuration(utils::translate(callAppStyle::strings::callended));
             view->setCallEndedLayout();
+            break;
+        case app::call::CallState::Missed:
+            model->setState(CallState::None);
             break;
         case app::call::CallState::Disconnecting:
             view->updateDuration(utils::translate(callAppStyle::strings::endingcall));

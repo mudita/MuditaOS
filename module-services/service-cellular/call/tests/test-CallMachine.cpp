@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "call/CallEvents.hpp"
@@ -49,6 +49,7 @@ namespace mocks
         fakeit::When(Method(multicast, notifyCallAborted)).AlwaysReturn();
         fakeit::When(Method(multicast, notifyCallStarted)).AlwaysReturn();
         fakeit::When(Method(multicast, notifyCallEnded)).AlwaysReturn();
+        fakeit::When(Method(multicast, notifyCallMissed)).AlwaysReturn();
         fakeit::When(Method(multicast, notifyCallDurationUpdate)).AlwaysReturn();
         fakeit::When(Method(multicast, notifyOutgoingCallAnswered)).AlwaysReturn();
         return multicast;

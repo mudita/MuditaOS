@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <boost/sml.hpp>
@@ -257,7 +257,7 @@ namespace call
             call.record.type   = CallType::CT_MISSED;
             call.record.isRead = false;
             di.db->endCall(call.record);
-            di.multicast->notifyCallEnded();
+            di.multicast->notifyCallMissed();
             di.modem->rejectCall();
         };
     } constexpr HandleMissedCall;
@@ -280,7 +280,7 @@ namespace call
     {
         void operator()(Dependencies &di, const call::event::AudioRequest &request)
         {
-            cellular::CallAudioEventRequest::EventType event = request.event;
+            const auto event = request.event;
             switch (event) {
             case cellular::CallAudioEventRequest::EventType::Mute:
                 di.audio->muteCall();
