@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellRelaxation.hpp"
@@ -62,8 +62,8 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             auto tagsFetcher      = std::make_unique<app::music::ServiceAudioTagsFetcher>(app);
-            const auto paths      = std::vector<std::string>{paths::audio::proprietary() / paths::audio::relaxation(),
-                                                        paths::audio::userApp() / paths::audio::relaxation()};
+            const auto paths      = std::vector<std::string>{paths::audio::proprietary() / paths::audio::relaxation()/*,
+                                                        paths::audio::userApp() / paths::audio::relaxation()*/};
             auto soundsRepository = std::make_unique<app::music::SongsRepository>(app, std::move(tagsFetcher), paths);
             auto presenter = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(soundsRepository));
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
