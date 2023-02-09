@@ -8,6 +8,7 @@
 * Added days of the week to the list of SMS, calls and notes
 * Added date formatting of received/sent SMS
 * Added missing translations for EULA in French and Swedish
+* Added meditation parameters to non-volatile memory
 
 ### Changed / Improved
 

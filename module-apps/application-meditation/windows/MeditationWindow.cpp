@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMeditation.hpp"
@@ -16,7 +16,8 @@
 
 namespace gui
 {
-    MeditationWindow::MeditationWindow(app::ApplicationCommon *app) : AppWindow{app, name::window::main_window}
+    MeditationWindow::MeditationWindow(app::ApplicationCommon *app, const MeditationParams params)
+        : AppWindow{app, name::window::main_window}, meditationParams(params)
     {
         MeditationWindow::buildInterface();
     }
@@ -44,6 +45,10 @@ namespace gui
                                        style::meditation::timer::Y,
                                        2 * style::meditation::timer::Radius,
                                        2 * style::meditation::timer::Radius);
+        if (!timeSetter->setTime(meditationParams.meditationDuration.initValue)) {
+            LOG_ERROR("Incorrect meditation duration value! The default value is set.");
+        }
+        timeSetter->setOnChangeCallback(meditationParams.meditationDuration.onChangeCallback);
         timeSetter->setEdges(RectangleEdge::None);
         setFocusItem(timeSetter);
 
@@ -53,6 +58,10 @@ namespace gui
                                       style::meditation::intervalBox::Width,
                                       style::text_spinner_label::h,
                                       timeSetter);
+        if (!intervalBox->setIntervalValue(meditationParams.intervalChime.initValue)) {
+            LOG_ERROR("Incorrect chime interval value! The default value is set.");
+        }
+        intervalBox->setOnChangeCallback(meditationParams.intervalChime.onChangeCallback);
         intervalBox->setEdges(RectangleEdge::None);
 
         intervalBox->setNavigationItem(NavigationDirection::UP, timeSetter);
@@ -78,10 +87,10 @@ namespace gui
                 auto app = dynamic_cast<app::ApplicationMeditation *>(application);
                 assert(app);
 
-                auto timerSwitchData = std::make_unique<MeditationTimerData>(app->state->preparationTime,
+                auto timerSwitchData = std::make_unique<MeditationTimerData>(app->state->getPreparationTime(),
                                                                              timeSetter->getTime(),
                                                                              intervalBox->getIntervalValue(),
-                                                                             app->state->showCounter);
+                                                                             app->state->isCounterVisible());
                 application->switchWindow(app::window::name::meditation_timer, std::move(timerSwitchData));
                 return true;
             }

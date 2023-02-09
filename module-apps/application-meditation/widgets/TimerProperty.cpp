@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Style.hpp"
@@ -7,10 +7,12 @@
 #include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
 #include <Utils.hpp>
+#include <Constants.hpp>
 
 using namespace gui;
 
-TimerProperty::TimerProperty(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h)
+TimerProperty::TimerProperty(
+    Item *parent, const std::uint32_t x, const std::uint32_t y, const std::uint32_t w, const std::uint32_t h)
     : Rect(parent, x, y, w, h)
 {
     build();
@@ -110,12 +112,38 @@ void TimerProperty::setMeditationTime()
     else {
         timeUnitLabel->setText(utils::translate("app_meditation_minutes"));
     }
+    if (onChangeCallback != nullptr) {
+        onChangeCallback(meditationTime);
+    }
 }
 
 std::chrono::minutes TimerProperty::getTime() noexcept
 {
     state.checkBounds();
     return state.getTime();
+}
+
+bool TimerProperty::setTime(std::int32_t newValue)
+{
+    bool result = state.setTime(newValue);
+    setMeditationTime();
+    return result;
+}
+void TimerProperty::setOnChangeCallback(OnChangeCallback callback)
+{
+    onChangeCallback = callback;
+}
+
+bool TimerProperty::State::setTime(int value)
+{
+    const auto it = std::find(
+        std::begin(Constants::Params::meditationDurations), std::end(Constants::Params::meditationDurations), value);
+    if (it != std::end(Constants::Params::meditationDurations)) {
+        timeInMinutes = *it;
+        return true;
+    }
+    timeInMinutes = Constants::Params::defaultMeditationDuration;
+    return false;
 }
 
 void TimerProperty::State::checkBounds() noexcept
@@ -152,8 +180,10 @@ void TimerProperty::State::delNumericValue() noexcept
 
 void TimerProperty::State::increment() noexcept
 {
-    auto it = std::upper_bound(std::begin(timeArr), std::end(timeArr), timeInMinutes);
-    if (it == std::end(timeArr)) {
+    auto it = std::upper_bound(std::begin(Constants::Params::meditationDurations),
+                               std::end(Constants::Params::meditationDurations),
+                               timeInMinutes);
+    if (it == std::end(Constants::Params::meditationDurations)) {
         it--;
     }
     timeInMinutes       = *it;
@@ -162,9 +192,11 @@ void TimerProperty::State::increment() noexcept
 
 void TimerProperty::State::decrement() noexcept
 {
-    auto it =
-        std::upper_bound(std::rbegin(timeArr), std::rend(timeArr), timeInMinutes, [](int a, int b) { return a > b; });
-    if (it == std::rend(timeArr)) {
+    auto it = std::upper_bound(std::rbegin(Constants::Params::meditationDurations),
+                               std::rend(Constants::Params::meditationDurations),
+                               timeInMinutes,
+                               [](int a, int b) { return a > b; });
+    if (it == std::rend(Constants::Params::meditationDurations)) {
         it--;
     }
     timeInMinutes       = *it;

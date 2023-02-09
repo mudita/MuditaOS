@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <application-meditation/OptionsData.hpp>
+#include <application-meditation/data/OptionsData.hpp>
 
 #include <Application.hpp>
 
@@ -28,6 +28,10 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
         std::unique_ptr<gui::OptionsData> state;
+
+      private:
+        template <typename T>
+        T getLocalSettingsValue(const std::string &variableName, T defaultValue);
     };
 
     template <>

@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <AppWindow.hpp>
+#include "MeditationParams.hpp"
 
 namespace gui
 {
@@ -13,7 +14,7 @@ namespace gui
     class MeditationWindow : public AppWindow
     {
       public:
-        explicit MeditationWindow(app::ApplicationCommon *app);
+        MeditationWindow(app::ApplicationCommon *app, const MeditationParams params);
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
 
@@ -25,5 +26,6 @@ namespace gui
         void invalidate() noexcept;
         TimerProperty *timeSetter = nullptr;
         IntervalBox *intervalBox  = nullptr;
+        MeditationParams meditationParams;
     };
 } // namespace gui

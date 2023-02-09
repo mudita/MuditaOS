@@ -20,6 +20,8 @@ target_sources(application-meditation
         ApplicationMeditation.cpp
         data/MeditationTimerData.hpp
         data/Style.hpp
+        data/OptionsData.hpp
+        data/OptionsData.cpp
         widgets/IntervalBox.cpp
         widgets/IntervalBox.hpp
         widgets/MeditationTimer.cpp
@@ -35,7 +37,6 @@ target_sources(application-meditation
         windows/Names.hpp
     PUBLIC
         include/application-meditation/ApplicationMeditation.hpp
-        include/application-meditation/OptionsData.hpp
 )
 
 target_link_libraries(application-meditation
