@@ -84,10 +84,7 @@ namespace sys
 
         namespace update
         {
-            static constexpr std::array whitelist = {service::name::evt_manager,
-                                                     service::name::cellular,
-                                                     service::name::eink,
-                                                     service::name::service_desktop};
+            static constexpr std::array whitelist = {service::name::evt_manager, service::name::cellular};
         }
 
         template <typename T>

@@ -108,23 +108,6 @@
 #include <SEGGER/SEGGER_SYSVIEW.h>
 #endif
 
-void atexit_cleanup_handler()
-{
-    LOG_INFO("Starting clean up");
-}
-
-class Cleanup // TODO is this required? It doesn't seem to do anything productive
-{
-  public:
-    ~Cleanup()
-    {
-        const int result_2 = std::atexit(atexit_cleanup_handler);
-        if (result_2 != 0) {
-            LOG_FATAL("at exit failed");
-        }
-    }
-};
-
 int main()
 {
     constexpr auto ApplicationName = "PurePhone";
@@ -300,7 +283,6 @@ int main()
     LOG_INFO("commit: %s version: %s branch: %s", GIT_REV, VERSION, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
     LOG_INFO("Scheduler is terminated properly");
-    Cleanup cleanup;
 
     return 0;
 }
