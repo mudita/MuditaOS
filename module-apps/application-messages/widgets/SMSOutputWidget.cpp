@@ -3,7 +3,6 @@
 
 #include "ApplicationMessages.hpp"
 #include "MessagesStyle.hpp"
-#include "OptionsMessages.hpp"
 #include "SMSOutputWidget.hpp"
 
 #include <OptionsWindow.hpp>
@@ -39,7 +38,6 @@ namespace gui
         switch (record->type) {
         case SMSType::QUEUED:
             // Handle in the same way as case below. (pending sending display as already sent)
-            [[fallthrough]];
         case SMSType::OUTBOX:
             smsBubble->setYaps(RectangleYap::TopRight);
             body->setReverseOrder(true);
@@ -66,8 +64,9 @@ namespace gui
             break;
         }
 
+        const auto timeLabelTextWidth = (timeLabel != nullptr) ? timeLabel->getTextNeedSpace() : 0;
         smsBubble->setMaximumSize(std::min(style::messages::smsOutput::sms_max_width,
-                                           style::listview::item_width_with_scroll - timeLabel->getTextNeedSpace()),
+                                           style::listview::item_width_with_scroll - timeLabelTextWidth),
                                   style::messages::smsOutput::sms_max_height);
         smsBubble->setText(record->body);
 
@@ -120,7 +119,7 @@ namespace gui
         if (timeLabel != nullptr) {
             timeLabel->setMinimumWidth(timeLabel->getTextNeedSpace());
             timeLabel->setMinimumHeight(style::messages::smsOutput::sms_label_high);
-            uint16_t timeLabelMargin = body->getWidth() - (smsBubble->getWidth() + timeLabel->getTextNeedSpace());
+            const auto timeLabelMargin = body->getWidth() - (smsBubble->getWidth() + timeLabel->getTextNeedSpace());
 
             if (body->getReverseOrder()) {
                 timeLabel->setMargins(Margins(0, 0, timeLabelMargin, 0));
