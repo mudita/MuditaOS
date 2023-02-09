@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -45,9 +45,9 @@ namespace settings
 
     namespace Cellular
     {
-        constexpr inline auto apn_list    = "cl_apn_list";
-        constexpr inline auto offlineMode = "cl_offline_mode";
-        constexpr inline auto currentUID  = "cl_current_uid";
+        constexpr inline auto apn_list     = "cl_apn_list";
+        constexpr inline auto offlineMode  = "cl_offline_mode";
+        constexpr inline auto currentUID   = "cl_current_uid";
         constexpr inline auto volteEnabled = "cl_volte_enabled";
     } // namespace Cellular
 
@@ -84,4 +84,12 @@ namespace settings
         constexpr inline auto invertedMode              = "display_inverted_mode";
         constexpr inline auto lockScreenDeepRefreshRate = "display_lock_screen_deep_refresh_rate";
     } // namespace Display
+
+    namespace Meditation
+    {
+        constexpr inline auto duration        = "meditation_duration";
+        constexpr inline auto intervalChime   = "meditation_interval_chime";
+        constexpr inline auto preparationTime = "meditation_preparation_time";
+        constexpr inline auto showCounter     = "meditation_show_counter";
+    } // namespace Meditation
 };    // namespace settings

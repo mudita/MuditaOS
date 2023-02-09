@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "IntervalBox.hpp"
@@ -7,17 +7,10 @@
 
 #include <gui/input/InputEvent.hpp>
 #include <i18n/i18n.hpp>
-
+#include <Constants.hpp>
 #include <cassert>
 
 using namespace gui;
-
-namespace
-{
-    using minutes = std::chrono::minutes;
-    const std::vector<minutes> chimeIntervals{
-        minutes{2}, minutes{5}, minutes{10}, minutes{15}, minutes{30}, minutes{0}};
-} // namespace
 
 IntervalBox::IntervalBox(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, TimerProperty *timerSetter)
     : HBox(parent, x, y, w, h), timerSetter(timerSetter)
@@ -49,7 +42,7 @@ void IntervalBox::updateIntervals()
     auto setTime = timerSetter->getTime();
 
     std::vector<UTF8> chimeOptions;
-    for (auto chime : chimeIntervals) {
+    for (auto chime : Constants::Params::chimeIntervals) {
         if (chime < setTime) {
             chimeOptions.push_back(intervalToString(chime));
         }
@@ -70,6 +63,33 @@ std::chrono::seconds IntervalBox::getIntervalValue() noexcept
     }
     else {
         return std::chrono::seconds{0};
+    }
+}
+
+bool IntervalBox::setIntervalValue(std::chrono::minutes newValue)
+{
+    bool result = true;
+    const auto it =
+        std::find(std::begin(Constants::Params::chimeIntervals), std::end(Constants::Params::chimeIntervals), newValue);
+    if (it == std::end(Constants::Params::chimeIntervals)) {
+        newValue = Constants::Params::defaultChimeInterval;
+        result   = false;
+    }
+
+    if (const auto setTime = timerSetter->getTime(); newValue < setTime) {
+        chimeSpinner->setCurrentValue(intervalToString(newValue));
+    }
+    return result;
+}
+
+void IntervalBox::setOnChangeCallback(OnChangeCallback &callback)
+{
+    if (chimeSpinner != nullptr) {
+        chimeSpinner->setOnValueChangeCallback([&](const UTF8 &newValue) {
+            if (callback != nullptr) {
+                callback(stringToInterval(newValue));
+            }
+        });
     }
 }
 

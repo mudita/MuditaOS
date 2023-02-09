@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextSpinnerBox.hpp"
@@ -69,5 +69,12 @@ namespace gui
     void TextSpinnerBox::setCurrentValue(UTF8 val)
     {
         spinner->set_value(val);
+    }
+
+    void TextSpinnerBox::setOnValueChangeCallback(OnValueChanged callback)
+    {
+        if (spinner != nullptr) {
+            spinner->onValueChanged = callback;
+        }
     }
 } // namespace gui

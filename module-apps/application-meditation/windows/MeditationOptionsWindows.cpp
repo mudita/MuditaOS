@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMeditation.hpp"
 #include "MeditationOptionsWindows.hpp"
 #include "Names.hpp"
 
+#include <Constants.hpp>
 #include <OptionSetting.hpp>
 #include <i18n/i18n.hpp>
 
@@ -12,9 +13,6 @@ using namespace gui;
 
 namespace
 {
-    using namespace std::chrono_literals;
-    constexpr std::array<std::chrono::seconds, 7> preparationTimes{5s, 10s, 30s, 1min, 2min, 5min, 10min};
-
     std::string toString(std::chrono::seconds duration)
     {
         if (duration.count() >= 60) {
@@ -45,7 +43,7 @@ void MeditationOptionsWindow::addCounterOption(std::list<Option> &options)
     options.emplace_back(std::make_unique<option::OptionSettings>(
         utils::translate("app_meditation_option_show_counter"),
         [=](Item &item) {
-            app->state->showCounter = !app->state->showCounter;
+            app->state->setCounterVisible(!app->state->isCounterVisible());
             refreshOptions(buildOptionsList());
             return true;
         },
@@ -56,7 +54,7 @@ void MeditationOptionsWindow::addCounterOption(std::list<Option> &options)
             return true;
         },
         nullptr,
-        app->state->showCounter ? option::SettingRightItem::On : option::SettingRightItem::Off));
+        app->state->isCounterVisible() ? option::SettingRightItem::On : option::SettingRightItem::Off));
 }
 
 void MeditationOptionsWindow::addPreparationTimeOption(std::list<Option> &options)
@@ -90,7 +88,7 @@ std::list<Option> PreparationTimeWindow::buildOptionsList()
 {
     auto app = static_cast<app::ApplicationMeditation *>(application);
     std::list<Option> options;
-    for (auto &&duration : preparationTimes) {
+    for (auto &&duration : Constants::Params::preparationTimes) {
         addPreparationTimeOption(duration, app, options);
     }
     return options;
@@ -103,14 +101,16 @@ void PreparationTimeWindow::addPreparationTimeOption(std::chrono::seconds durati
     options.emplace_back(std::make_unique<gui::option::OptionSettings>(
         toString(duration),
         [=](const gui::Item &item) {
-            app->state->preparationTime = duration;
+            if (!app->state->setPreparationTime(duration)) {
+                LOG_ERROR("Incorrect preparation time value! The default value is set.");
+            }
             refreshOptions(buildOptionsList());
             return true;
         },
         nullptr,
         this,
-        app->state->preparationTime == duration ? gui::option::SettingRightItem::Checked
-                                                : gui::option::SettingRightItem::Disabled));
+        app->state->getPreparationTime() == duration ? gui::option::SettingRightItem::Checked
+                                                     : gui::option::SettingRightItem::Disabled));
 }
 
 void PreparationTimeWindow::onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data)
@@ -119,14 +119,13 @@ void PreparationTimeWindow::onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe
     refreshOptions(buildOptionsList(), selectedItemIndex);
 }
 
-unsigned int PreparationTimeWindow::getSelectedItemIndex() const
+std::size_t PreparationTimeWindow::getSelectedItemIndex() const
 {
     auto app                = static_cast<app::ApplicationMeditation *>(application);
-    const auto selectedTime = app->state->preparationTime;
-    for (unsigned int i = 0; i < preparationTimes.size(); ++i) {
-        if (selectedTime == preparationTimes[i]) {
-            return i;
-        }
-    }
-    return 0;
+    const auto selectedTime = app->state->getPreparationTime();
+    const auto it           = std::find(
+        std::begin(Constants::Params::preparationTimes), std::end(Constants::Params::preparationTimes), selectedTime);
+    return it == std::end(Constants::Params::preparationTimes)
+               ? 0
+               : std::distance(std::begin(Constants::Params::preparationTimes), it);
 }
