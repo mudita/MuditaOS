@@ -307,8 +307,17 @@ namespace sys
 
     void Worker::close()
     {
+        bool f1 = false, f2 = false;
 
-        if (!stop() || !join()) {
+        if (!stop()) {
+            f1 = true;
+            LOG_INFO("CAN'T STOP!");
+        }
+        if (!join()) {
+            f2 = true;
+            LOG_INFO("CAN'T JOIN!");
+        }
+        if (f1 || f2) {
             kill();
         }
         deinit();
