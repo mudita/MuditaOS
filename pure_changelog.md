@@ -75,6 +75,7 @@
 * Fixed invalid screen displayed after missed call
 * Fixed minor issues in the Calculator Application
 * Fixed displaying usual SMS template call rejection window when no templates were defined
+* Fixed going back to wrong window after confirming or cancelling creation of new contact from call log
 
 ## [1.5.0 2022-12-20]
 

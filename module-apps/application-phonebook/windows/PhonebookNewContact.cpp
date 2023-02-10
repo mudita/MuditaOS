@@ -5,6 +5,7 @@
 
 #include "DialogMetadata.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
+#include <service-appmgr/Controller.hpp>
 
 #include <Dialog.hpp>
 #include <service-db/DBServiceAPI.hpp>
@@ -119,6 +120,16 @@ namespace gui
 
     auto PhonebookNewContact::onInput(const InputEvent &inputEvent) -> bool
     {
+        auto backToCallLogIfCameFromThere = [this]() {
+            // MOS-357: conditionally (@see ApplicationManagerCommon::handleSwitchBack) return to call log
+            return app::manager::Controller::switchBack(
+                application, std::make_unique<app::manager::SwitchBackRequest>("ApplicationCallLog"));
+        };
+
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
+            return backToCallLogIfCameFromThere();
+        }
+
         auto ret = AppWindow::onInput(inputEvent);
 
         setSaveButtonVisible(!newContactModel->emptyData());
@@ -132,7 +143,7 @@ namespace gui
             newContactModel->saveData(contact);
             verifyAndSave();
 
-            return true;
+            return backToCallLogIfCameFromThere();
         }
 
         return ret;
