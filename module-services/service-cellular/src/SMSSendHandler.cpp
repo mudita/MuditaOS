@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSSendHandler.hpp"
@@ -51,7 +51,10 @@ namespace cellular::internal::sms
     {
         handleStateChange(currentState->handle(SMSRecord{}));
     }
-
+    void SMSSendHandler::requestNotSendMessage()
+    {
+        onSendQuery(db::Interface::Name::SMS, std::make_unique<db::query::SMSSearchByType>(SMSType::QUEUED, 0, 1));
+    }
     bool State::isNotification(const std::optional<const SMSRecord> record)
     {
         return !record;
@@ -83,13 +86,19 @@ namespace cellular::internal::sms
             return std::make_unique<IdleState>(context);
         }
 
+        if (context.onGetModemResetInProgress()) {
+            LOG_ERROR("Modem is rebooting, skipping SMS sending attempt");
+            return {};
+        }
+
         if (context.onGetOfflineMode() || context.onSIMNotInitialized()) {
+            LOG_ERROR("Failed to send SMS");
             record->type = SMSType::FAILED;
             context.onSendQuery(db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(*record)));
+            return {};
         }
-        else {
-            context.onSend(*record);
-        }
+
+        context.onSend(*record);
 
         // Check if there are more queued records
         context.onSendQuery(db::Interface::Name::SMS,

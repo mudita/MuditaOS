@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -58,7 +58,6 @@ namespace cellular::internal::sms
     {
       public:
         SMSSendHandler();
-
         /**
          * External action events
          */
@@ -66,6 +65,7 @@ namespace cellular::internal::sms
         void handleIncomingDbRecord(SMSRecord &record, bool onDelay);
         void handleNoMoreDbRecords();
         void sendMessageIfDelayed();
+        void requestNotSendMessage();
 
         /**
          * User defined callbacks/events
@@ -79,6 +79,8 @@ namespace cellular::internal::sms
         std::function<bool()> onGetOfflineMode;
         /// Called when SMSSendHandler wants to check SIM state
         std::function<bool()> onSIMNotInitialized;
+        /// Called when SMSHandler wants to check if modem is rebooting
+        std::function<bool()> onGetModemResetInProgress;
 
       private:
         void handleStateChange(OptionalState state);
