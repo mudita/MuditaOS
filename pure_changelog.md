@@ -81,6 +81,7 @@
 * Fixed crash when pressing button after turning off the phone with USB cable connected
 * Fixed notification on the home screen shouldn't be bolded
 * Fixed long phone shutdown time
+* Fixed missing translation for words "show" and "replace"
 
 ## [1.5.0 2022-12-20]
 
