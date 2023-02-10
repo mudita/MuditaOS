@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceCellularPriv.hpp"
@@ -83,7 +83,6 @@ namespace cellular::internal
                 modemResetHandler->performHardReset();
                 return;
             }
-
             owner->bus.sendMulticast<notification::SimReady>();
         };
         simCard->onNeedPin = [this](unsigned int attempts) {
@@ -241,6 +240,8 @@ namespace cellular::internal
             }
             return ret;
         };
+
+        outSMSHandler.onGetModemResetInProgress = [this]() -> bool { return modemResetHandler->isResetInProgress(); };
     }
 
     bool ServiceCellularPriv::onSendSMS(SMSRecord &record)
@@ -261,6 +262,11 @@ namespace cellular::internal
                 LOG_ERROR("Could not set UCS2 charset mode for TE");
                 channelSetup = false;
             }
+        }
+        else {
+            LOG_ERROR("No channel provided! SMS sending failed");
+            record.type = SMSType::FAILED;
+            return false;
         }
 
         if (channelSetup) {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "endpoints/developerMode/event/ATRequest.hpp"
@@ -632,7 +632,13 @@ void ServiceCellular::registerMessageHandlers()
         if (priv->volteHandler->isFunctionalityResetNeeded()) {
             LOG_INFO("[VoLTE] first run after switching - functionality reset needed");
             priv->modemResetHandler->performFunctionalityReset();
+            return sys::MessageNone{};
         }
+
+        if (priv->state->get() == State::ST::Ready) {
+            priv->outSMSHandler.requestNotSendMessage();
+        }
+
         return sys::MessageNone{};
     });
 }
@@ -941,6 +947,10 @@ bool ServiceCellular::handle_cellular_priv_init()
 }
 auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
 {
+    if (priv->state->get() != State::ST::Ready) {
+        LOG_ERROR("Cellular not ready, skip request");
+        return false;
+    }
     if (response->getResults().empty()) {
         priv->outSMSHandler.handleNoMoreDbRecords();
     }

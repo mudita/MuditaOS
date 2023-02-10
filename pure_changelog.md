@@ -76,6 +76,7 @@
 * Fixed minor issues in the Calculator Application
 * Fixed displaying usual SMS template call rejection window when no templates were defined
 * Fixed going back to wrong window after confirming or cancelling creation of new contact from call log
+* Fixed misleading popup on SMS send when modem is rebooting
 
 ## [1.5.0 2022-12-20]
 
