@@ -1,11 +1,9 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/deviceInfo/DeviceInfoEndpointCommon.hpp>
 #include <endpoints/message/Sender.hpp>
-
 #include <service-desktop/ServiceDesktop.hpp>
-
 #include <sys/statvfs.h>
 
 namespace sdesktop::endpoints
@@ -34,9 +32,9 @@ namespace sdesktop::endpoints
 
             if (!magic_enum::enum_contains<DiagnosticFileType>(diagFileType)) {
                 LOG_ERROR("Bad diagnostic type %d requested", static_cast<unsigned>(diagFileType));
-
                 return http::Code::BadRequest;
             }
+
             return gatherListOfDiagnostics(context, diagFileType);
         }
 
@@ -62,15 +60,12 @@ namespace sdesktop::endpoints
         }
 
         switch (diagDataType) {
-        case DiagnosticFileType::Logs: {
+        case DiagnosticFileType::Logs:
             fileList = listDirectory(purefs::dir::getLogsPath());
             break;
-        }
-
-        case DiagnosticFileType::CrashDumps: {
+        case DiagnosticFileType::CrashDumps:
             fileList = listDirectory(purefs::dir::getCrashDumpsPath());
             break;
-        }
         }
 
         if (!fileList.empty()) {
@@ -121,46 +116,56 @@ namespace sdesktop::endpoints
 
     auto DeviceInfoEndpointCommon::getStorageStats(const std::string &path) -> std::tuple<long, long>
     {
-        std::unique_ptr<struct statvfs> vfstat = std::make_unique<struct statvfs>();
-        if (statvfs(path.c_str(), vfstat.get()) < 0) {
+        constexpr auto bytesInMebibyte = 1024LLU * 1024LLU;
+        struct statvfs vfstat
+        {};
+
+        if (statvfs(path.c_str(), &vfstat) < 0) {
             return {-1, -1};
         }
 
-        unsigned long totalMbytes = (uint64_t(vfstat->f_blocks) * uint64_t(vfstat->f_bsize)) / (1024LLU * 1024LLU);
-        unsigned long freeMbytes  = (uint64_t(vfstat->f_bfree) * uint64_t(vfstat->f_bsize)) / (1024LLU * 1024LLU);
+        const auto totalMbytes = static_cast<long>(
+            (static_cast<std::uint64_t>(vfstat.f_blocks) * static_cast<std::uint64_t>(vfstat.f_bsize)) /
+            bytesInMebibyte);
+        const auto freeMbytes = static_cast<long>(
+            (static_cast<std::uint64_t>(vfstat.f_bfree) * static_cast<std::uint64_t>(vfstat.f_bsize)) /
+            bytesInMebibyte);
 
         return {totalMbytes, freeMbytes};
     }
 
     auto DeviceInfoEndpointCommon::getStorageInfo() -> std::tuple<long, long, long>
     {
-        unsigned long totalDeviceSpaceMiB    = 0;
-        unsigned long reservedSystemSpaceMiB = 0;
-        unsigned long usedUserSpaceMiB       = 0;
+        /* MuditaOS consists of two system partitions: 'system_a' and 'system_b'.
+         * However, only one of them is mounted at the time. The value returned
+         * by the endpoint should take into account space of both of them. */
+        constexpr auto numberOfSystemPartitions = 2;
 
-        const std::array<std::filesystem::path, 1> systemStoragePaths{purefs::dir::getSystemDiskPath()};
-        for (const auto &p : systemStoragePaths) {
-            auto [totalSpace, freeSpace] = getStorageStats(p);
+        long totalDeviceSpaceMiB    = 0;
+        long reservedSystemSpaceMiB = 0;
+        long usedUserSpaceMiB       = 0;
 
-            if (totalSpace < 0 || freeSpace < 0) {
-                LOG_ERROR("Failed to get stats for %s", p.c_str());
-                continue;
-            }
+        /* System partitions stats */
+        const auto systemDiskPath                      = purefs::dir::getSystemDiskPath();
+        const auto [totalSystemSpace, freeSystemSpace] = getStorageStats(systemDiskPath);
 
-            totalDeviceSpaceMiB += totalSpace;
-            reservedSystemSpaceMiB = totalDeviceSpaceMiB;
-        }
-
-        // User partition stats
-        const auto userStoragePath   = purefs::dir::getUserDiskPath();
-        auto [totalSpace, freeSpace] = getStorageStats(userStoragePath);
-
-        if (totalSpace < 0 || freeSpace < 0) {
-            LOG_ERROR("Failed to get stats for %s", userStoragePath.c_str());
+        if ((totalSystemSpace < 0) || (freeSystemSpace < 0)) {
+            LOG_ERROR("Failed to get stats for '%s'", systemDiskPath.c_str());
         }
         else {
-            usedUserSpaceMiB = totalSpace - freeSpace;
-            totalDeviceSpaceMiB += totalSpace;
+            totalDeviceSpaceMiB = reservedSystemSpaceMiB = numberOfSystemPartitions * totalSystemSpace;
+        }
+
+        /* User partition stats */
+        const auto userDiskPath                    = purefs::dir::getUserDiskPath();
+        const auto [totalUserSpace, freeUserSpace] = getStorageStats(userDiskPath);
+
+        if (totalUserSpace < 0 || freeUserSpace < 0) {
+            LOG_ERROR("Failed to get stats for '%s'", userDiskPath.c_str());
+        }
+        else {
+            usedUserSpaceMiB = totalUserSpace - freeUserSpace;
+            totalDeviceSpaceMiB += totalUserSpace;
         }
 
         return {totalDeviceSpaceMiB, reservedSystemSpaceMiB, usedUserSpaceMiB};
