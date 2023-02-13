@@ -53,9 +53,6 @@ namespace app::manager
     {
         LOG_INFO("Enqueue action %s", magic_enum::enum_name(action.actionId).data());
 
-        LOG_INFO("FLUSH enqueue");
-        Log::Logger::get().flush();
-
         addAction(std::move(action));
         process();
     }

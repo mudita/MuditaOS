@@ -12,7 +12,6 @@ extern "C"
     /// @return:   1 - log flush successful
     int diagnosticDumpLogs();
     int shutdownFlushLogs();
-    int loggerFlush();
 
 #ifdef __cplusplus
 }

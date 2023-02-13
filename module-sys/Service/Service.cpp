@@ -276,12 +276,8 @@ namespace sys
             service->SwitchPowerModeHandler(message->powerMode);
             break;
         case SystemMessageType::Exit:
-            // LOG_INFO("FLUSH Exit 1");
-            // Log::Logger::get().flush();
             ret = service->DeinitHandler();
             service->CloseHandler();
-            // LOG_INFO("FLUSH Exit 2 %d", static_cast<int>(ret));
-            // Log::Logger::get().flush();
             break;
         case SystemMessageType::Timer:
             ret = service->TimerHandle(*message);

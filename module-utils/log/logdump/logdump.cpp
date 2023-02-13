@@ -15,8 +15,3 @@ int shutdownFlushLogs()
 {
     return Logger::get().flushLogs();
 }
-
-int loggerFlush()
-{
-    return Logger::get().flush();
-}

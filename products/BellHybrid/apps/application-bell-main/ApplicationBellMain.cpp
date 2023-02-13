@@ -64,7 +64,7 @@ namespace app
         });
 
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
-            // requestShutdownWindow(gui::window::name::bell_battery_shutdown);
+            requestShutdownWindow(gui::window::name::bell_battery_shutdown);
             return actionHandled();
         });
     }

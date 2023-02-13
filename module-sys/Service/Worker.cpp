@@ -206,8 +206,6 @@ namespace sys
     {
         assert(getState() == State::Initiated);
 
-        runnerTask = xTaskGetCurrentTaskHandle();
-
         BaseType_t task_error = 0;
         task_error            = xTaskCreate(
             Worker::taskAdapter, name.c_str(), stackDepth / sizeof(StackType_t), this, priority, &taskHandle);
@@ -222,12 +220,8 @@ namespace sys
 
     bool Worker::stop()
     {
-        if (runnerTask) {
-            assert(xTaskGetCurrentTaskHandle() == runnerTask);
-            assert(getState() == State::Running);
-            return sendControlMessage(ControlMessage::Stop);
-        }
-        return true;
+        assert(getState() == State::Running);
+        return sendControlMessage(ControlMessage::Stop);
     }
 
     bool Worker::sendControlMessage(ControlMessage message)
@@ -243,7 +237,6 @@ namespace sys
 
     bool Worker::send(uint32_t cmd, uint32_t *data)
     {
-        assert(xTaskGetCurrentTaskHandle() == runnerTask);
         assert(getState() == State::Running);
 
         WorkerCommand workerCommand{cmd, data};
@@ -275,15 +268,11 @@ namespace sys
 
     bool Worker::join(TickType_t timeout)
     {
-        if (runnerTask) {
-            assert(xTaskGetCurrentTaskHandle() == runnerTask);
-            assert(getState() == State::Running || getState() == State::Stopped);
-
-            if (xSemaphoreTake(joinSemaphore, timeout) != pdTRUE) {
-                return false;
-            }
-            while (eTaskGetState(taskHandle) != eDeleted) {}
+        assert(getState() == State::Running || getState() == State::Stopped);
+        if (xSemaphoreTake(joinSemaphore, timeout) != pdTRUE) {
+            return false;
         }
+        while (eTaskGetState(taskHandle) != eDeleted) {}
         return true;
     }
 
@@ -307,17 +296,7 @@ namespace sys
 
     void Worker::close()
     {
-        bool f1 = false, f2 = false;
-
-        if (!stop()) {
-            f1 = true;
-            LOG_INFO("CAN'T STOP!");
-        }
-        if (!join()) {
-            f2 = true;
-            LOG_INFO("CAN'T JOIN!");
-        }
-        if (f1 || f2) {
+        if (!stop() || !join()) {
             kill();
         }
         deinit();
