@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerGUI.hpp"
@@ -39,7 +39,9 @@ namespace service::gui
         switch (command) {
         case Signal::Render: {
             auto item = guiService->commandsQueue->dequeue();
-            render(item.commands, item.refreshMode);
+            if (item.has_value()) {
+                render(item->commands, item->refreshMode);
+            }
             break;
         }
         case Signal::ChangeColorScheme: {
@@ -54,13 +56,10 @@ namespace service::gui
     void WorkerGUI::render(DrawCommandsQueue::CommandList &commands, ::gui::RefreshModes refreshMode)
     {
         const auto [contextId, context] = guiService->contextPool->borrowContext(); // Waits for the context.
-
         renderer.render(context, commands);
-
 #if DEBUG_EINK_REFRESH == 1
         LOG_INFO("Render ContextId: %d\n%s", contextId, context->toAsciiScaled().c_str());
 #endif
-
         onRenderingFinished(contextId, refreshMode);
     }
 
@@ -74,4 +73,5 @@ namespace service::gui
         auto msg = std::make_shared<service::gui::RenderingFinished>(contextId, refreshMode);
         guiService->bus.sendUnicast(std::move(msg), guiService->GetName());
     }
+
 } // namespace service::gui
