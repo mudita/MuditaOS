@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Logger.hpp"
@@ -166,19 +166,24 @@ namespace Log
     /// @return: < 0 - error occured during log flush
     /// @return:   0 - log flush did not happen
     /// @return:   1 - log flush successflul
-    auto Logger::dumpToFile(std::filesystem::path logPath) -> int
+    auto Logger::dumpToFile(std::filesystem::path logPath, bool isLoggerRunning) -> int
     {
         std::error_code errorCode;
         auto firstDump = !std::filesystem::exists(logPath, errorCode);
 
         if (errorCode) {
-            LOG_ERROR("Failed to check if file %s exists, error: %d", logPath.c_str(), errorCode.value());
+            if (isLoggerRunning) {
+                LOG_ERROR("Failed to check if file %s exists, error: %d", logPath.c_str(), errorCode.value());
+            }
             return -EIO;
         }
 
         if (const bool maxSizeExceeded = !firstDump && std::filesystem::file_size(logPath) > maxFileSize;
             maxSizeExceeded) {
-            LOG_DEBUG("Max log file size exceeded. Rotating log files...");
+            if (isLoggerRunning) {
+                LOG_DEBUG("Max log file size exceeded. Rotating log files...");
+            }
+
             {
                 LockGuard lock(logFileMutex);
                 rotator.rotateFile(logPath);
@@ -209,7 +214,9 @@ namespace Log
             }
         }
 
-        LOG_DEBUG("Flush ended with status: %d", status);
+        if (isLoggerRunning) {
+            LOG_DEBUG("Flush ended with status: %d", status);
+        }
 
         return status;
     }
@@ -225,10 +232,10 @@ namespace Log
     auto Logger::flushLogs() -> int
     {
         LOG_INFO("Shutdown dump logs");
-        worker->kill();
+        worker->close();
         writeLogsTimer.stop();
         buffer.nextBuffer();
-        return dumpToFile(purefs::dir::getLogsPath() / LOG_FILE_NAME);
+        return dumpToFile(purefs::dir::getLogsPath() / LOG_FILE_NAME, false);
     }
 
     void Logger::checkBufferState()
