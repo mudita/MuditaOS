@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -46,7 +46,7 @@ namespace Log
         auto log(logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
             -> int;
         auto logAssert(const char *fmt, va_list args) -> int;
-        auto dumpToFile(std::filesystem::path logPath) -> int;
+        auto dumpToFile(std::filesystem::path logPath, bool isLoggerRunning = true) -> int;
         auto diagnosticDump() -> int;
         auto flushLogs() -> int;
 

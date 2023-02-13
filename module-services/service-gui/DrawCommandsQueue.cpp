@@ -1,18 +1,16 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DrawCommandsQueue.hpp"
 
+#include <log/log.hpp>
+
+#include <algorithm>
+
 namespace service::gui
 {
-    namespace
-    {
-        constexpr std::chrono::milliseconds WaitTimeout{5000};
-    } // namespace
 
-    DrawCommandsQueue::DrawCommandsQueue(std::size_t expectedSize,
-                                         std::unique_ptr<SynchronizationMechanism> &&synchronization)
-        : synchronization{std::move(synchronization)}
+    DrawCommandsQueue::DrawCommandsQueue(std::size_t expectedSize)
     {
         queue.reserve(expectedSize);
     }
@@ -21,16 +19,16 @@ namespace service::gui
     {
         cpp_freertos::LockGuard lock{queueMutex};
         queue.push_back(std::move(item));
-
-        synchronization->notify();
     }
 
-    auto DrawCommandsQueue::dequeue() -> QueueItem
+    auto DrawCommandsQueue::dequeue() -> std::optional<QueueItem>
     {
+        std::optional<QueueItem> item = std::nullopt;
         cpp_freertos::LockGuard lock{queueMutex};
-        synchronization->wait(queueMutex, WaitTimeout, [this]() { return !queue.empty(); });
-
-        auto item = std::move(queue.front());
+        if (queue.empty()) {
+            return item;
+        }
+        item = std::move(queue.front());
         queue.erase(queue.begin());
         return item;
     }

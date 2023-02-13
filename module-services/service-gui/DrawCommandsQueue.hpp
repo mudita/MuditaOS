@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "SynchronizationMechanism.hpp"
-
 #include <gui/core/DrawCommand.hpp>
+#include <mutex.hpp>
 
 #include <cstdint>
 #include <list>
@@ -25,12 +24,11 @@ namespace service::gui
         };
         using QueueContainer = std::vector<QueueItem>;
 
-        explicit DrawCommandsQueue(
-            std::size_t expectedSize,
-            std::unique_ptr<SynchronizationMechanism> &&synchronization = getFreeRtosSynchronizationMechanism());
+        explicit DrawCommandsQueue(std::size_t expectedSize);
 
         void enqueue(QueueItem &&item);
-        [[nodiscard]] auto dequeue() -> QueueItem;
+        auto stop() -> void;
+        [[nodiscard]] auto dequeue() -> std::optional<QueueItem>;
         [[nodiscard]] auto getMaxRefreshModeAndClear() -> ::gui::RefreshModes;
         void clear();
         [[nodiscard]] auto size() const noexcept -> QueueContainer::size_type;
@@ -39,6 +37,5 @@ namespace service::gui
         QueueContainer queue;
 
         mutable cpp_freertos::MutexStandard queueMutex;
-        std::unique_ptr<SynchronizationMechanism> synchronization;
     };
 } // namespace service::gui
