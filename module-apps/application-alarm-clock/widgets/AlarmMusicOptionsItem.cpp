@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmMusicOptionsItem.hpp"
@@ -47,17 +47,13 @@ namespace gui
             if (player->isInState(SoundsPlayer::State::Playing) && event.isShortRelease(gui::KeyCode::KEY_RF)) {
                 player->stop();
             }
-            auto res = optionSpinner->onInput(event);
 
-            if (res && player->previouslyPlayed(getFilePath(optionSpinner->getCurrentValue())) &&
-                player->isInState(SoundsPlayer::State::Playing)) {
-                this->navBarTemporaryMode(utils::translate(style::strings::common::pause));
+            const auto actionHandled = optionSpinner->onInput(event);
+            if (actionHandled && player->isInState(SoundsPlayer::State::Playing)) {
+                player->play(getFilePath(optionSpinner->getCurrentValue()),
+                             [=]() { this->navBarTemporaryMode(utils::translate(style::strings::common::play)); });
             }
-            else if (res) {
-                this->navBarTemporaryMode(utils::translate(style::strings::common::play));
-            }
-
-            return res;
+            return actionHandled;
         };
 
         focusChangedCallback = [=](Item &item) {
