@@ -193,11 +193,6 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
 void EventManagerCommon::initProductEvents()
 {}
 
-auto EventManagerCommon::createEventWorker() -> std::unique_ptr<WorkerEventCommon>
-{
-    return std::make_unique<WorkerEventCommon>(this);
-}
-
 sys::ReturnCodes EventManagerCommon::DeinitHandler()
 {
     settings->deinit();

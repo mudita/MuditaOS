@@ -40,7 +40,9 @@ namespace
 
 EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &name)
     : EventManagerCommon(logDumpFunction,
-                         {.battery{.critical = constants::criticalThreshold, .shutdown = constants::shutdownThreshold}},
+                         {.battery{.critical = constants::criticalThreshold, .shutdown = constants::shutdownThreshold},
+                          .voltage{.shutdown            = constants::shutdownVoltageThreshold,
+                                   .measurementMaxCount = constants::measurementThreshold}},
                          name),
       backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
 {

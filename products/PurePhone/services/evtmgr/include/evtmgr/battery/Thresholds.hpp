@@ -9,4 +9,7 @@ namespace constants
 {
     static constexpr units::Percent criticalThreshold = 10;
     static constexpr units::Percent shutdownThreshold = 1;
+
+    static constexpr units::Voltage shutdownVoltageThreshold = 3600;
+    static constexpr std::uint8_t measurementThreshold       = 5;
 } // namespace constants

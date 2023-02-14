@@ -1,55 +1,86 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryBrownoutDetector.hpp"
 
-#include <service-evtmgr/BatteryMessages.hpp>
-#include <system/Constants.hpp>
 #include <Timers/TimerFactory.hpp>
-#include <log/log.hpp>
+#include <utility>
 
 namespace
 {
     constexpr std::chrono::milliseconds measurementTickTime{1000};
-    constexpr auto measurementTickName     = "BrtownoutDetectorTick";
-    constexpr unsigned measurementMaxCount = 5;
-    constexpr auto brownoutLevelVoltage    = 3600; // mV
+    constexpr auto measurementTickName = "BrownoutDetectorTick";
 } // namespace
 
-BatteryBrownoutDetector::BatteryBrownoutDetector(sys::Service *service, hal::battery::AbstractBatteryCharger &charger)
-    : parentService(service), charger{charger},
+BatteryBrownoutDetector::BatteryBrownoutDetector(sys::Service *service,
+                                                 hal::battery::AbstractBatteryCharger &charger,
+                                                 Thresholds voltage,
+                                                 Callback callback)
+    : charger{charger}, voltage{voltage}, callback{std::move(callback)},
       measurementTick{sys::TimerFactory::createSingleShotTimer(
-          service, measurementTickName, measurementTickTime, [this](sys::Timer &) { checkBrownout(); })}
+          service, measurementTickName, measurementTickTime, [this](auto &) { tick(); })}
 {}
 
-void BatteryBrownoutDetector::startDetection()
+bool BatteryBrownoutDetector::isVoltageThresholdExceeded()
 {
-    if (detectionOngoing) {
-        return;
-    }
-    LOG_DEBUG("Battery Brownout detection window start");
-    detectionOngoing = true;
-    measurementCount = 0;
-    checkBrownout();
+    return charger.getBatteryVoltage() < voltage.shutdown;
 }
 
-void BatteryBrownoutDetector::checkBrownout()
+void BatteryBrownoutDetector::tick()
 {
-    if (charger.getBatteryVoltage() < brownoutLevelVoltage) {
-        LOG_DEBUG("Battery Brownout detected");
-
-        auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();
-        parentService->bus.sendUnicast(std::move(messageBrownout), service::name::system_manager);
-
-        return;
-    }
-
-    measurementCount++;
-    if (measurementCount <= measurementMaxCount) {
-        measurementTick.start();
+    if (isVoltageThresholdExceeded()) {
+        if (isTimerExpired()) {
+            brownoutDetected();
+        }
     }
     else {
-        LOG_DEBUG("Battery Brownout detection window finish with negative result");
-        detectionOngoing = false;
+        brownoutNotDetected();
     }
+}
+
+bool BatteryBrownoutDetector::isTimerExpired()
+{
+    if (++measurementBrownoutCount < voltage.measurementMaxCount) {
+        measurementTick.start();
+        return false;
+    }
+    return true;
+}
+
+void BatteryBrownoutDetector::brownoutDetected()
+{
+    callback(DetectionResult::eventDetected);
+    clearDetection();
+}
+
+void BatteryBrownoutDetector::brownoutNotDetected()
+{
+    // If count is > 0 it means that detection started but didn't finish
+    if (measurementBrownoutCount > 0) {
+        callback(DetectionResult::detectionNegative);
+    }
+    clearDetection();
+}
+
+void BatteryBrownoutDetector::poll()
+{
+    if (eventDetectionOngoing) {
+        return;
+    }
+    if (isVoltageThresholdExceeded()) {
+        triggerDetection();
+    }
+}
+
+void BatteryBrownoutDetector::clearDetection()
+{
+    measurementBrownoutCount = 0;
+    eventDetectionOngoing    = false;
+}
+
+void BatteryBrownoutDetector::triggerDetection()
+{
+    eventDetectionOngoing    = true;
+    measurementBrownoutCount = 0;
+    measurementTick.start();
 }

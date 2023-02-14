@@ -112,7 +112,7 @@ bool WorkerEventCommon::initCommonHardwareComponents(EventManagerParams params)
     keyInput->init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
     auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBatteryController)]->GetQueueHandle();
 
-    batteryController = std::make_shared<sevm::battery::BatteryController>(service, queueBatteryHandle, params.battery);
+    batteryController = std::make_shared<sevm::battery::BatteryController>(service, queueBatteryHandle, params);
     bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
 
     time_t timestamp;

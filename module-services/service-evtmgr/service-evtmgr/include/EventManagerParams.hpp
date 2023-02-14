@@ -3,9 +3,11 @@
 
 #pragma once
 
-#include <battery/BatteryController.hpp>
+#include <battery/BatteryState.hpp>
+#include <battery/BatteryBrownoutDetector.hpp>
 
 struct EventManagerParams
 {
     BatteryState::Thresholds battery;
+    BatteryBrownoutDetector::Thresholds voltage;
 };

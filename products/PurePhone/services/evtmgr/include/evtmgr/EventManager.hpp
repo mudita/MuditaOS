@@ -17,7 +17,9 @@ class EventManager : public EventManagerCommon
                           const std::string &name         = service::name::evt_manager)
         : EventManagerCommon(
               logDumpFunction,
-              {.battery{.critical = constants::criticalThreshold, .shutdown = constants::shutdownThreshold}},
+              {.battery{.critical = constants::criticalThreshold, .shutdown = constants::shutdownThreshold},
+               .voltage{.shutdown            = constants::shutdownVoltageThreshold,
+                        .measurementMaxCount = constants::measurementThreshold}},
               name),
           vibrator(std::make_unique<vibra_handle::Vibra>(this)), backlightHandler(settings, this),
           userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
+#include "EventManagerParams.hpp"
 #include "BatteryBrownoutDetector.hpp"
 #include "BatteryState.hpp"
 
@@ -20,16 +21,15 @@ namespace sevm::battery
       public:
         using Events          = hal::battery::AbstractBatteryCharger::Events;
         using ChargerPresence = hal::battery::AbstractBatteryCharger::ChargerPresence;
-        BatteryController(sys::Service *service, xQueueHandle notificationChannel, BatteryState::Thresholds thresholds);
-
-        void poll();
+        BatteryController(sys::Service *service, xQueueHandle notificationChannel, EventManagerParams params);
 
         /// Handler for incoming async notifications from the back-end
         void handleNotification(Events);
+        void poll();
 
       private:
         void update();
-        void updateSoC();
+        void updateSoc();
         void printCurrentState();
         void checkChargerPresence();
         units::Voltage getVoltage();

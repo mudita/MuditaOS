@@ -75,11 +75,26 @@ namespace
     }
 } // namespace
 
-BatteryController::BatteryController(sys::Service *service,
-                                     xQueueHandle notificationChannel,
-                                     BatteryState::Thresholds thresholds)
+BatteryController::BatteryController(sys::Service *service, xQueueHandle notificationChannel, EventManagerParams params)
     : service{service}, charger{hal::battery::AbstractBatteryCharger::Factory::create(notificationChannel)},
-      brownoutDetector(service, *charger),
+      brownoutDetector(
+          service,
+          *charger,
+          params.voltage,
+          [this](BatteryBrownoutDetector::DetectionResult result) {
+              using Brownout = BatteryBrownoutDetector::DetectionResult;
+              switch (result) {
+              case Brownout::eventDetected: {
+                  auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();
+                  this->service->bus.sendUnicast(std::move(messageBrownout), service::name::system_manager);
+                  LOG_INFO("Battery brownout %s. Sending message...", magic_enum::enum_name(result).data());
+              } break;
+              case Brownout::detectionNegative:
+              default:
+                  LOG_INFO("Battery brownout detection window finish with negative result");
+                  break;
+              }
+          }),
       batteryState{service,
                    [this](const auto state) {
                        Store::Battery::modify().levelState = transformBatteryState(state);
@@ -87,9 +102,9 @@ BatteryController::BatteryController(sys::Service *service,
                        this->service->bus.sendMulticast(std::move(stateChangeMessage),
                                                         sys::BusChannel::ServiceEvtmgrNotifications);
                    },
-                   thresholds}
+                   params.battery}
 {
-    updateSoC();
+    updateSoc();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
     batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
 
@@ -111,7 +126,7 @@ void sevm::battery::BatteryController::handleNotification(Events evt)
         update();
         break;
     case Events::Brownout:
-        brownoutDetector.startDetection();
+        brownoutDetector.poll();
         break;
     }
 }
@@ -119,6 +134,7 @@ void sevm::battery::BatteryController::handleNotification(Events evt)
 void sevm::battery::BatteryController::poll()
 {
     update();
+    brownoutDetector.poll();
 }
 void sevm::battery::BatteryController::printCurrentState()
 {
@@ -133,7 +149,7 @@ void sevm::battery::BatteryController::update()
     const auto lastSoc   = Store::Battery::get().level;
     const auto lastState = Store::Battery::get().state;
 
-    updateSoC();
+    updateSoc();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
 
     const auto currentSoc   = Store::Battery::get().level;
@@ -150,7 +166,7 @@ void sevm::battery::BatteryController::update()
     printCurrentState();
 }
 
-void sevm::battery::BatteryController::updateSoC()
+void sevm::battery::BatteryController::updateSoc()
 {
     const auto batteryLevel = charger->getSOC();
     if (batteryLevel) {
