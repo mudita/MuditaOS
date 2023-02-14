@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
@@ -19,11 +19,11 @@ namespace hal::battery
         constexpr auto queueTimeoutTicks    = 100;
         constexpr auto taskDelay            = 50;
 
-        constexpr auto dummyBatteryVoltageLevel = 3700;
-
         constexpr auto chargerPlugStateChange = 'p';
         constexpr auto batteryLevelUp         = ']';
         constexpr auto batteryLevelDown       = '[';
+        constexpr auto batteryVoltageUp       = '=';
+        constexpr auto batteryVoltageDown     = '-';
         constexpr auto chargerTypeDcdSDP      = 'l';
         constexpr auto chargerTypeDcdCDP      = ';';
         constexpr auto chargerTypeDcdDCP      = '\'';
@@ -47,6 +47,7 @@ namespace hal::battery
         xQueueHandle notificationChannel = nullptr;
         TaskHandle_t batteryWorkerHandle = nullptr;
         unsigned batteryLevel            = 100;
+        unsigned batteryVoltageLevel     = 3700;
         bool isPlugged                   = false;
         bool shouldRun                   = true;
     };
@@ -76,7 +77,7 @@ namespace hal::battery
 
     AbstractBatteryCharger::Voltage BatteryCharger::getBatteryVoltage() const
     {
-        return dummyBatteryVoltageLevel;
+        return batteryVoltageLevel;
     }
 
     std::optional<AbstractBatteryCharger::SOC> BatteryCharger::getSOC() const
@@ -125,6 +126,14 @@ namespace hal::battery
                     break;
                 case batteryLevelDown:
                     batteryLevel--;
+                    evt = Events::SOC;
+                    break;
+                case batteryVoltageUp:
+                    batteryVoltageLevel += 10;
+                    evt = Events::SOC;
+                    break;
+                case batteryVoltageDown:
+                    batteryVoltageLevel -= 10;
                     evt = Events::SOC;
                     break;
                 case chargerTypeDcdSDP:

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,14 +22,16 @@ namespace sevm::battery
         using ChargerPresence = hal::battery::AbstractBatteryCharger::ChargerPresence;
         explicit BatteryController(sys::Service *service, xQueueHandle notificationChannel);
 
-        void poll();
-
         /// Handler for incoming async notifications from the back-end
         void handleNotification(Events);
+        void poll();
+
+      protected:
+        virtual void update();
+        sys::Service *getService();
 
       private:
-        void update();
-        void updateSoC();
+        void updateSocAndVoltage();
         void printCurrentState();
         void checkChargerPresence();
         sys::Service *service{nullptr};
