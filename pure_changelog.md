@@ -78,6 +78,7 @@
 * Fixed going back to wrong window after confirming or cancelling creation of new contact from call log
 * Fixed misleading popup on SMS send when modem is rebooting
 * Fixed window redirection when clicking SMS icon
+* Fixed navigation through the ringtone preview list to automatically switch playback to the currently selected option
 
 ## [1.5.0 2022-12-20]
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SoundsModel.hpp"
@@ -9,7 +9,6 @@
 
 #include <ListView.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
 #include <tags_fetcher/TagsFetcher.hpp>
 
 SoundsModel::SoundsModel(std::shared_ptr<AbstractSoundsPlayer> soundsPlayer) : soundsPlayer{std::move(soundsPlayer)}
@@ -42,7 +41,7 @@ void SoundsModel::createData(app::ApplicationCommon *app, audio_settings::Abstra
     assert(app);
 
     // configure according to type
-    std::filesystem::path folder = getSoundPath(model);
+    const auto folder = getSoundPath(model);
 
     // iterate through selected folder and collect all sounds names
     std::vector<std::filesystem::path> sounds;
@@ -54,8 +53,9 @@ void SoundsModel::createData(app::ApplicationCommon *app, audio_settings::Abstra
             }
 
             const auto &filePath = entry.path();
-            if (filePath.extension() == ".mp3")
+            if (filePath.extension() == ".mp3") {
                 sounds.push_back(filePath);
+            }
         }
         LOG_INFO("Found %d sounds in folder %s", static_cast<int>(sounds.size()), folder.c_str());
     }
@@ -97,7 +97,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
     auto currentItemIndex  = 0;
     auto selectedItemIndex = 0;
 
-    std::string selectedSound = purefs::dir::getAssetsDirPath() / model->getSound();
+    const auto selectedSound = purefs::dir::getAssetsDirPath() / model->getSound();
     for (const auto &sound : sounds) {
 
         bool isSelected = false;
@@ -122,7 +122,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
         case audio::PlaybackType::TextMessageRingtone:
         case audio::PlaybackType::Notifications:
             item->activatedCallback = [=](gui::Item &) {
-                auto fileRelativePath = sound.lexically_relative(purefs::dir::getSystemDiskPath());
+                const auto fileRelativePath = sound.lexically_relative(purefs::dir::getSystemDiskPath());
                 LOG_INFO("Setting sound to %s", fileRelativePath.c_str());
                 model->setSound(fileRelativePath);
                 soundsPlayer->stop();
@@ -132,28 +132,34 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
 
             // callback to handle preview of the sound
             item->inputCallback = [=](gui::Item &item, const gui::InputEvent &event) {
-                auto fileRelativePath = sound.lexically_relative(purefs::dir::getSystemDiskPath());
+                const auto fileRelativePath = sound.lexically_relative(purefs::dir::getSystemDiskPath());
 
                 if (event.isShortRelease(gui::KeyCode::KEY_RF)) {
                     soundsPlayer->stop();
+                    return false;
                 }
-                else if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
+
+                if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
+                    const auto window = app->getCurrentWindow();
+
                     if (!soundsPlayer->previouslyPlayed(fileRelativePath) ||
                         soundsPlayer->isInState(AbstractSoundsPlayer::State::Stopped)) {
-                        app->getCurrentWindow()->navBarTemporaryMode(
+                        window->navBarTemporaryMode(
                             utils::translate(style::strings::common::pause), gui::nav_bar::Side::Left, false);
                         return soundsPlayer->play(fileRelativePath, [=]() {
-                            app->getCurrentWindow()->navBarTemporaryMode(
+                            window->navBarTemporaryMode(
                                 utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
                         });
                     }
-                    else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
-                        app->getCurrentWindow()->navBarTemporaryMode(
+
+                    if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
+                        window->navBarTemporaryMode(
                             utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
                         return soundsPlayer->pause();
                     }
-                    else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Paused)) {
-                        app->getCurrentWindow()->navBarTemporaryMode(
+
+                    if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Paused)) {
+                        window->navBarTemporaryMode(
                             utils::translate(style::strings::common::pause), gui::nav_bar::Side::Left, false);
                         return soundsPlayer->resume();
                     }
@@ -163,29 +169,26 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
             };
 
             item->focusChangedCallback = [=](gui::Item &item) {
+                const auto window = app->getCurrentWindow();
                 if (!item.focus) {
-                    app->getCurrentWindow()->navBarRestoreFromTemporaryMode();
+                    window->navBarRestoreFromTemporaryMode();
                     return true;
                 }
 
-                auto fileRelativePath = sound.lexically_relative(purefs::dir::getSystemDiskPath());
-                if (!soundsPlayer->previouslyPlayed(fileRelativePath)) {
-                    app->getCurrentWindow()->navBarTemporaryMode(
-                        utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
-                    return true;
-                }
-
-                if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
-                    app->getCurrentWindow()->navBarTemporaryMode(
+                const auto fileRelativePath = sound.lexically_relative(purefs::dir::getSystemDiskPath());
+                if (!soundsPlayer->previouslyPlayed(fileRelativePath) &&
+                    soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
+                    window->navBarTemporaryMode(
                         utils::translate(style::strings::common::pause), gui::nav_bar::Side::Left, false);
-                    return true;
+                    return soundsPlayer->play(fileRelativePath, [=]() {
+                        window->navBarTemporaryMode(
+                            utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
+                    });
                 }
 
-                else {
-                    app->getCurrentWindow()->navBarTemporaryMode(
-                        utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
-                    return true;
-                }
+                window->navBarTemporaryMode(
+                    utils::translate(style::strings::common::play), gui::nav_bar::Side::Left, false);
+                return true;
             };
             break;
 
