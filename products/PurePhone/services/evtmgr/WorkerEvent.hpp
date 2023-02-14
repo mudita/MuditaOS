@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -31,6 +31,9 @@ namespace purephone
         bool handleMessage(std::uint32_t queueID) override;
 
         void handleMagnetometerEvent();
+
+        std::shared_ptr<sevm::battery::BatteryController> createBatteryController(sys::Service *service,
+                                                                                  QueueHandle_t queue) override;
 
         /**
          * @brief This method is responsible for translating a headset key to keyboard key code.
