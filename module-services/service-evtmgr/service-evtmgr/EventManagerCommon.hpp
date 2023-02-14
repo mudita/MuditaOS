@@ -70,7 +70,7 @@ class EventManagerCommon : public sys::Service
     std::function<void(const time_t)> onMinuteTick;
     virtual void handleKeyEvent(sys::Message *msg);
     virtual void initProductEvents();
-    virtual auto createEventWorker() -> std::unique_ptr<WorkerEventCommon>;
+    virtual auto createEventWorker() -> std::unique_ptr<WorkerEventCommon> = 0;
 
     std::shared_ptr<settings::Settings> settings;
     std::unique_ptr<WorkerEventCommon> EventWorker;

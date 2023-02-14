@@ -44,7 +44,6 @@ class WorkerEventCommon : public sys::Worker
   protected:
     virtual void addProductQueues(std::list<sys::WorkerQueueInfo> &queueList);
     virtual void initProductHardware();
-
     virtual void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code);
 
     sys::Service *service = nullptr;
