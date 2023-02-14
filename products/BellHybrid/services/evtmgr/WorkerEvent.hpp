@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,5 +20,7 @@ namespace bell
         bool handleMessage(std::uint32_t queueID) override;
         static constexpr auto rotaryEncoderQueueSize = 64U;
         static constexpr auto rotaryEncoderQueueName = "qRotaryEncoder";
+        std::shared_ptr<sevm::battery::BatteryController> createBatteryController(sys::Service *service,
+                                                                                  QueueHandle_t queue) override;
     };
 } // namespace bell
