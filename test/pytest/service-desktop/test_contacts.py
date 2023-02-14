@@ -39,7 +39,7 @@ class ContactsTester:
         try:
             contact_id = AddContact(contact_record).run(self.harness).id
         except TransactionError:
-            return False
+            return False, -1
         else:
             return True, contact_id
 
@@ -98,6 +98,7 @@ def test_add_single_contact(harness):
     result, retrieved_contact_record = contacts_tester.get_contact_by_id(contact_id)
     assert result, "Failed to get contact by ID!"
     del retrieved_contact_record["id"]
+    contact_record["numbersIDs"] = retrieved_contact_record["numbersIDs"]
     assert contact_record == retrieved_contact_record, "Received contact record is different than expected!"
 
     # Clean up
@@ -189,6 +190,7 @@ def test_edit_contact(harness):
     }
     assert contacts_tester.update_contact(edited_contact_record), "Failed to update contact!"
     result, retrieved_contact_record = contacts_tester.get_contact_by_id(contact_id)
+    edited_contact_record["numbersIDs"] = retrieved_contact_record["numbersIDs"]
     assert result, "Failed to get contact by ID!"
     assert retrieved_contact_record == edited_contact_record
 
@@ -229,6 +231,7 @@ def test_add_and_get_multiple_contacts(harness):
     result, retrieved_contact_record = contacts_tester.get_contact_by_id(first_contact_id)
     assert result, "Failed to get contact by ID!"
     del retrieved_contact_record["id"]
+    first_contact_record["numbersIDs"] = retrieved_contact_record["numbersIDs"]
     assert first_contact_record == retrieved_contact_record, "Received contact record is different than expected!"
     current_number_of_contact_records = initial_number_of_contact_records + 1
 
@@ -252,6 +255,7 @@ def test_add_and_get_multiple_contacts(harness):
     result, retrieved_contact_record = contacts_tester.get_contact_by_id(second_contact_id)
     assert result, "Failed to get contact by ID!"
     del retrieved_contact_record["id"]
+    second_contact_record["numbersIDs"] = retrieved_contact_record["numbersIDs"]
     assert second_contact_record == retrieved_contact_record, "Received contact record is different than expected!"
     current_number_of_contact_records += 1
 
@@ -275,6 +279,7 @@ def test_add_and_get_multiple_contacts(harness):
     result, retrieved_contact_record = contacts_tester.get_contact_by_id(third_contact_id)
     assert result, "Failed to get contact by ID!"
     del retrieved_contact_record["id"]
+    third_contact_record["numbersIDs"] = retrieved_contact_record["numbersIDs"]
     assert third_contact_record == retrieved_contact_record, "Received contact record is different than expected!"
     current_number_of_contact_records += 1
 
@@ -298,6 +303,7 @@ def test_add_and_get_multiple_contacts(harness):
     result, retrieved_contact_record = contacts_tester.get_contact_by_id(fourth_contact_id)
     assert result, "Failed to get contact by ID!"
     del retrieved_contact_record["id"]
+    fourth_contact_record["numbersIDs"] = retrieved_contact_record["numbersIDs"]
     assert fourth_contact_record == retrieved_contact_record, "Received contact record is different than expected!"
     current_number_of_contact_records += 1
 
@@ -311,6 +317,8 @@ def test_add_and_get_multiple_contacts(harness):
         initial_number_of_contact_records, current_number_of_contact_records - initial_number_of_contact_records)
     assert result, "Failed to get contacts with offset and limit!"
 
+    # This section requires to have empty phonebook
+    # TO DO: fix it to work with any number of contacts in phonebook
     for record in returned_contacts:
         print(record)
         del record["id"]
