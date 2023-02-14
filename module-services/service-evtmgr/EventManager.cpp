@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
@@ -192,11 +192,6 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
 
 void EventManagerCommon::initProductEvents()
 {}
-
-auto EventManagerCommon::createEventWorker() -> std::unique_ptr<WorkerEventCommon>
-{
-    return std::make_unique<WorkerEventCommon>(this);
-}
 
 sys::ReturnCodes EventManagerCommon::DeinitHandler()
 {

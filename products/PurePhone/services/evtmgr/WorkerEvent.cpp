@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerEvent.hpp"
@@ -147,6 +147,12 @@ void WorkerEvent::handleMagnetometerEvent()
         LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
         processKeyEvent(bsp::KeyEvents::Moved, *key);
     }
+}
+
+std::shared_ptr<sevm::battery::BatteryController> WorkerEvent::createBatteryController(sys::Service *service,
+                                                                                       QueueHandle_t queue)
+{
+    return std::make_shared<sevm::battery::BatteryController>(service, queue);
 }
 
 bsp::KeyCodes WorkerEvent::headsetKeyToKeyboardKey(std::uint8_t headsetKeyCode)

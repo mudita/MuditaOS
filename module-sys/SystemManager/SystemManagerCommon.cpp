@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/SystemManagerCommon.hpp>
@@ -612,6 +612,12 @@ namespace sys
             return MessageNone{};
         });
 
+        connect(sevm::BatteryLowVoltageShutdownMessage(), [&](Message *) {
+            LOG_INFO("Battery low voltage level reached! Closing system...");
+            CloseSystemHandler(CloseReason::LowVoltage);
+            return MessageNone{};
+        });
+
         connect(app::UserPowerDownRequest(), [&](Message *) {
             CloseSystemHandler(CloseReason::RegularPowerDown);
             return MessageNone{};
@@ -732,6 +738,7 @@ namespace sys
         case CloseReason::FactoryReset:
         case CloseReason::SystemBrownout:
         case CloseReason::LowBattery:
+        case CloseReason::LowVoltage:
         case CloseReason::RebootToUsbMscMode:
             DestroyServices(sys::state::regularClose::whitelist);
             set(State::Shutdown);

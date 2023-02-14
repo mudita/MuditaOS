@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryController.hpp"
@@ -84,13 +84,13 @@ BatteryController::BatteryController(sys::Service *service, xQueueHandle notific
                        this->service->bus.sendUnicast(std::move(stateChangeMessage), service::name::system_manager);
                    }}
 {
-    updateSoC();
+    updateSocAndVoltage();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
     batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
 
     LOG_INFO("Initial charger state:%s", magic_enum::enum_name(Store::Battery::get().state).data());
     LOG_INFO("Initial battery SOC:%d", Store::Battery::get().level);
-    LOG_INFO("Initial battery voltage:%" PRIu32 "mV", charger->getBatteryVoltage());
+    LOG_INFO("Initial battery voltage:%dmV", Store::Battery::get().voltage);
     LOG_INFO("Initial battery state:%s", magic_enum::enum_name(Store::Battery::get().levelState).data());
 }
 
@@ -117,10 +117,10 @@ void sevm::battery::BatteryController::poll()
 }
 void sevm::battery::BatteryController::printCurrentState()
 {
-    LOG_INFO("Charger state:%s Battery SOC %d voltage: %" PRIu32 "mV state: %s",
+    LOG_INFO("Charger state:%s Battery SOC %d voltage: %dmV state: %s",
              magic_enum::enum_name(Store::Battery::get().state).data(),
              Store::Battery::get().level,
-             charger->getBatteryVoltage(),
+             Store::Battery::get().voltage,
              magic_enum::enum_name(Store::Battery::get().levelState).data());
 }
 void sevm::battery::BatteryController::update()
@@ -128,7 +128,7 @@ void sevm::battery::BatteryController::update()
     const auto lastSoc   = Store::Battery::get().level;
     const auto lastState = Store::Battery::get().state;
 
-    updateSoC();
+    updateSocAndVoltage();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
 
     const auto currentSoc   = Store::Battery::get().level;
@@ -145,12 +145,13 @@ void sevm::battery::BatteryController::update()
     printCurrentState();
 }
 
-void sevm::battery::BatteryController::updateSoC()
+void sevm::battery::BatteryController::updateSocAndVoltage()
 {
     auto batteryLevel = charger->getSOC();
     if (batteryLevel.has_value()) {
         Store::Battery::modify().level = batteryLevel.value();
     }
+    Store::Battery::modify().voltage = charger->getBatteryVoltage();
 }
 
 void sevm::battery::BatteryController::checkChargerPresence()
@@ -163,4 +164,9 @@ void sevm::battery::BatteryController::checkChargerPresence()
                                  service::name::service_desktop);
         chargerPresence = newChargerPresence;
     }
+}
+
+sys::Service *sevm::battery::BatteryController::getService()
+{
+    return service;
 }

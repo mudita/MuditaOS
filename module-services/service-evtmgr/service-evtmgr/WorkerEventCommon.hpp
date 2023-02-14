@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -43,6 +43,8 @@ class WorkerEventCommon : public sys::Worker
   protected:
     virtual void addProductQueues(std::list<sys::WorkerQueueInfo> &queueList);
     virtual void initProductHardware();
+    virtual std::shared_ptr<sevm::battery::BatteryController> createBatteryController(sys::Service *service,
+                                                                                      QueueHandle_t queue) = 0;
 
     virtual void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code);
 

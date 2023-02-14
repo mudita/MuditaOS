@@ -13,6 +13,7 @@ target_sources(evtmgr
         screen-light-control/ScreenLightControl.cpp
         backlight-handler/BacklightHandler.cpp
         user-activity-handler/UserActivityHandler.cpp
+        battery/BatteryController.cpp
 
         internal/key_sequences/AbstractKeySequence.hpp
         internal/key_sequences/KeySequenceMgr.hpp
@@ -28,6 +29,7 @@ target_sources(evtmgr
     PUBLIC
         include/evtmgr/EventManager.hpp
         include/evtmgr/api/TemperatureApi.hpp
+        include/evtmgr/battery/BatteryController.hpp
         include/evtmgr/backlight-handler/BacklightHandler.hpp
         include/evtmgr/user-activity-handler/UserActivityHandler.hpp
 )

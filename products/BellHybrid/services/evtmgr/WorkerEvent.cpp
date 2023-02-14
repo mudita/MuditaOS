@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerEvent.hpp"
 
+#include <evtmgr/battery/BatteryController.hpp>
 #include <bsp/eink_frontlight/eink_frontlight.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 
@@ -28,6 +29,12 @@ namespace bell
     void WorkerEvent::deinitProductHardware()
     {
         bsp::eink_frontlight::deinit();
+    }
+
+    std::shared_ptr<sevm::battery::BatteryController> WorkerEvent::createBatteryController(sys::Service *service,
+                                                                                           QueueHandle_t queue)
+    {
+        return std::make_shared<sevm::battery::bell::BatteryController>(service, queue);
     }
 
     void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
