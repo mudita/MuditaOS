@@ -22,7 +22,7 @@ Your commit's subject line should be a single sentence describing what you are c
 - It must start with a verb. This sentence will be a part of the project changelog, so please ensure it will be clear to the non-technical readers. 
 - If you are adding a new feature start with "Add"; start with "Fix" if you are fixing one.
 - Don't use proper names such as names of classes or functions. 
-- Try to be as concise as possible in the limit of 72 characters (including the Jira ticket number - 11 characters). 
+- Try to be as concise as possible in the limit of 100 characters (including the Jira ticket number - 11 characters). 
 - Don't end the subject line with a period. 
 
 Then, in the commit message, you must include a short description of what the commit is changing in the project. You should be clear about

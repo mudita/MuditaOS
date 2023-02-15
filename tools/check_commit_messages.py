@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 '''
 
@@ -35,7 +35,7 @@ def validate_commit(commit):
     errors.append(f'[{commit.hexsha}] commit message should be composed of at least 3 lines: a subject, an empty line and a body')
     return errors
 
-  line_length_limit = 72
+  line_length_limit = 100
   if any(len(line) > line_length_limit for line in lines):
     errors.append(f'[{commit.hexsha}] maximum allowed line length is {line_length_limit}')
 
@@ -43,7 +43,7 @@ def validate_commit(commit):
   empty_line = lines[1]
   body = ''.join(lines[2:]).strip()
 
-  subject_format = r'^(\[(EGD|BH|CP|MOS)-\d+\])+ [A-Z].+[^.]$'
+  subject_format = r'(^Revert ")|(^\[(EGD|BH|CP|MOS)-\d+\])+ [A-Z].+[^.]$'
   if not re.match(subject_format, subject):
     errors.append(f'[{commit.hexsha}] invalid subject "{subject}", should match format "{subject_format}"')
 
