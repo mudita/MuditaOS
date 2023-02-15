@@ -56,6 +56,7 @@ namespace sdesktop::endpoints::json
     inline constexpr auto syncFilePath           = "syncFilePath";
     inline constexpr auto mtpPath                = "mtpPath";
     inline constexpr auto deviceToken            = "deviceToken";
+    inline constexpr auto onboardingState        = "onboardingState";
 
     namespace updateprocess
     {

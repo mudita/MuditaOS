@@ -31,57 +31,20 @@ Parameters:
 - *method* - method type (it’s set to 1, which means **“get”** method) - see code snippets below
 - *uuid* - unique payload id
 
-“*body*” parameter is not needed in this case.
-
-```c++
-enum class EndpointType
-{
-    invalid = 0,
-    deviceInfo,
-    update, 
-    filesystemUpload,
-    backup,
-    restore,
-    factory,
-    contacts,
-    messages,
-    calllog,
-    developerMode,
-};
-```
-
-```c++
-enum class Method
-{
-    get = 1,
-    post, 
-    put,
-    del
-};
-```
-
 **Response Payload Structure**
 
 ```json
 {
   "body": {
-    "accessTechnology": "7",
     "batteryLevel": "68",
     "batteryState": "2",
-    "caseColour": "gray",
-    "currentRTCTime": "1626085629",
-    "deviceToken": "<32-character string"
-    "deviceSpaceTotal": "14945",
-    "systemReservedSpace": "2042",
-    "usedUserSpace": "440",
+    "deviceSpaceTotal": "4005",
+    "systemReservedSpace": "798",
+    "usedUserSpace": "2",
     "gitBranch": "master",
     "gitRevision": "58e3688f6",
     "gitTag": "release-0.73.1-rc1-11-g58e3688f6",
-    "networkOperatorName": "Play",
-    "networkStatus": "1",
-    "selectedSim": "0",
-    "signalStrength": "2",
-    "trayState": "1",
+    "currentRTCTime": "1626085629",
     "version": "0.73.1",
     "serialNumber": "12345678901234",
     "recoveryStatusFilePath": "path/to/recovery_status",
@@ -100,10 +63,8 @@ enum class Method
 Parameters:
 
 - *body*  - actual response from endpoint in response message
-- *accessTechnology* - network access technology - see code snippets below
 - *batteryLevel* - battery level (in percentage)
 - *batteryState* - battery state - see code snippets below
-- *caseColour* - colour of the Pure’s case (gray or black)
 - *currentRTCTime* - current timestamp from RTC (in seconds)
 - *deviceToken* - unique device token
 - *deviceSpaceTotal* - total storage space on the device (in Mebibytes)
@@ -112,11 +73,6 @@ Parameters:
 - *gitBranch* - git branch from which the system was built
 - *gitRevision* - git commit sha from which the system was built
 - *gitTag* - git tag from which the system was built
-- *networkOperatorName* - current network operator name
-- *networkStatus* - current status of network - see code snippets below
-- *selectedSim* - selected SIM status - see code snippets below
-- *signalStrength* - number of signal strength indicator bars - from 0 to 4
-- *trayState* - state of SIM tray - see code snippets below
 - *endpoint* - endpoint type (it’s set to 1, which means “deviceInfo” type)
 - *status* - http like status code - see code snippets below
 - *uuid* - unique payload id, same as in request message
@@ -130,33 +86,6 @@ Parameters:
 - *onboardingState* - information about current onboarding state
 
 ```c++
-struct Network
-{
-    enum class Status
-    {
-        NotRegistered,
-        RegisteredHomeNetwork,
-        Searching,
-        RegistrationDenied,
-        Unknown,
-        RegisteredRoaming
-    }
-
-    enum class AccessTechnology
-    {
-        Gsm   = 0x00,
-        Utran = 0x02,
-        GsmWEgprs,
-        UtranWHsdpa,
-        UtranWHsupa,
-        UtranWHsdpaAndWHsupa,
-        EUtran, // 7
-        Unknown = 0xFF
-    }
-};
-```
-
-```c++
 struct Battery
 {
     enum class State
@@ -166,25 +95,6 @@ struct Battery
         PluggedNotCharging,
     }
 };
-```
-
-```c++
-enum class SIM
-{
-    SIM1 = 0,
-    SIM2,
-    SIM_FAIL,
-    SIM_UNKNOWN,
-    NONE,
-}
-```
-
-```c++
-enum class Tray
-{
-    OUT = 0,
-    IN
-}
 ```
 
 ```c++

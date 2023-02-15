@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationManagerCommon.hpp"
@@ -481,14 +481,16 @@ namespace app::manager
 
     auto ApplicationManagerCommon::handleOnBoardingFinalize() -> sys::MessagePointer
     {
-        settings->setValue(settings::SystemProperties::onboardingDone, utils::to_string(true));
+        settings->setValue(
+            settings::SystemProperties::onboardingDone, utils::to_string(true), settings::SettingsScope::Global);
         app::manager::Controller::sendAction(this, app::manager::actions::Home);
         return sys::msgHandled();
     }
 
     auto ApplicationManagerCommon::checkOnBoarding() -> bool
     {
-        return not utils::getNumericValue<bool>(settings->getValue(settings::SystemProperties::onboardingDone));
+        return not utils::getNumericValue<bool>(
+            settings->getValue(settings::SystemProperties::onboardingDone, settings::SettingsScope::Global));
     }
 
     auto ApplicationManagerCommon::handleLaunchAction(ActionEntry &action) -> ActionProcessStatus

@@ -10,6 +10,7 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <system/messages/TetheringStateRequest.hpp>
 #include <Timers/TimerFactory.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 ServiceDesktop::ServiceDesktop(const std::filesystem::path &mtpRootPath)
     : sys::Service(service::name::service_desktop, "", sdesktop::service_stack),
@@ -366,4 +367,10 @@ auto ServiceDesktop::handle(sevm::USBPlugEvent *msg) -> std::shared_ptr<sys::Mes
 auto ServiceDesktop::getMtpPath() const noexcept -> std::filesystem::path
 {
     return mtpRootPath;
+}
+
+auto ServiceDesktop::getOnboardingState() const -> sdesktop::endpoints::OnboardingState
+{
+    return static_cast<sdesktop::endpoints::OnboardingState>(utils::getNumericValue<int>(
+        settings->getValue(settings::SystemProperties::onboardingDone, settings::SettingsScope::Global)));
 }
