@@ -19,6 +19,7 @@
 * Changed tethering icon on status bar
 * Unified grey color tones used while displaying texts
 * Replaced English labels occuring in French translation with French ones
+* Added new field to deviceInfo endpoint
 
 ### Fixed
 
@@ -69,13 +70,16 @@
 ## [1.6.0 2023-02-27]
 
 ### Changed / Improved
+
 * Changed filesystem to ext4
 * Improved update/restore/backup processes
 * Changed updater utility
 * Improved dialog with network via USSD
 * Added serial number and timestamp to crashdump filename
 * Changed order of starting services, ServiceDesktop moved to the back
+
 ### Fixed
+
 * Fixed disappearing "confirm" button in PIN entering screen
 * Fixed looping on the SIM card selection screen
 * Fixed notes paste option showing for empty clipboard
@@ -105,7 +109,9 @@
 * Fixed navigation through the ringtone preview list to automatically switch playback to the currently selected option
 
 ## [1.5.1 2023-02-27]
+
 ### Added
+
 * Added bootstrapped utilities to allow performing next (1.6.0) update
 
 ## [1.5.0 2022-12-20]
