@@ -23,6 +23,7 @@
 #include <module-db/queries/messages/sms/QuerySMSRemove.hpp>
 #include <module-db/queries/messages/sms/QuerySMSUpdate.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByID.hpp>
+#include <module-db/queries/messages/threads/QueryThreadGetByNumber.hpp>
 #include <module-db/queries/messages/threads/QueryThreadRemove.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByNumberID.hpp>
 #include <module-db/queries/notifications/QueryNotificationsDecrement.hpp>
@@ -49,10 +50,8 @@ namespace app
           AsyncCallbackReceiver{this}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
-        addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
-            switchWindow(gui::name::window::new_sms, std::move(data));
-            return actionHandled();
-        });
+        addActionReceiver(manager::actions::CreateSms,
+                          [this](auto &&data) { return handleCreateSmsAction(std::move(data)); });
         addActionReceiver(manager::actions::ShowSmsTemplates, [this](auto &&data) {
             switchWindow(gui::name::window::sms_templates, std::move(data));
             return actionHandled();
@@ -433,6 +432,41 @@ namespace app
         auto opts = std::make_unique<gui::OptionsWindowOptions>(newMessageWindowOptions(this, requestingWindow, text));
         switchWindow(window::name::option_window, std::move(opts));
         return true;
+    }
+
+    ActionResult ApplicationMessages::handleCreateSmsAction(std::unique_ptr<gui::SwitchData> data)
+    {
+        if (auto sendRequest = dynamic_cast<SMSSendRequest *>(data.get()); sendRequest != nullptr) {
+            const auto phoneNumber = sendRequest->getPhoneNumber();
+            auto query             = std::make_unique<db::query::ThreadGetByNumber>(phoneNumber);
+            auto task              = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+
+            auto queryCallback = [this, capturedData = std::move(data)](auto response) mutable {
+                const auto result = dynamic_cast<db::query::ThreadGetByNumberResult *>(response);
+                if (result == nullptr) {
+                    switchWindow(gui::name::window::new_sms, std::move(capturedData));
+                    return false;
+                }
+
+                const auto &thread = result->getThread();
+                if (!thread.isValid()) {
+                    switchWindow(gui::name::window::new_sms, std::move(capturedData));
+                }
+                else {
+                    auto switchData = std::make_unique<SMSThreadData>(std::make_unique<ThreadRecord>(thread));
+                    switchData->ignoreCurrentWindowOnStack = true;
+                    switchWindow(gui::name::window::thread_view, std::move(switchData));
+                }
+
+                return true;
+            };
+
+            task->setCallback([callback = std::make_shared<decltype(queryCallback)>(std::move(queryCallback))](
+                                  auto response) { return (*callback)(response); });
+            task->execute(this, this);
+            return actionHandled();
+        }
+        return actionNotHandled();
     }
 
 } /* namespace app */
