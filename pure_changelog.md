@@ -17,6 +17,7 @@
 * Changed responses in contacts and messages endpoints used to communicate with Center
 * Added SMS template call rejection window for case when no templates are defined
 * Changed unknown character glyph to the one matching the design
+* Changed tethering icon on status bar
 
 ### Fixed
 

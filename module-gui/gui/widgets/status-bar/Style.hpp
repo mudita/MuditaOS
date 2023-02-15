@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,7 @@ namespace style::status_bar
         inline constexpr auto iconBottom = 4u;
         inline constexpr auto textBottom = 4u;
         inline constexpr auto between    = 10u;
+        inline constexpr auto tethering  = 2u;
     }; // namespace margins
     namespace time
     {
@@ -35,11 +36,6 @@ namespace style::status_bar
         inline constexpr auto maxX = 157u;
         inline constexpr auto font = style::window::font::verysmall;
     }; // namespace phonemode
-    namespace tethering
-    {
-        inline constexpr auto maxX = 180u;
-        inline constexpr auto font = style::window::font::verysmall;
-    }; // namespace tethering
     namespace signal
     {
         inline constexpr auto font = style::window::font::verysmall;

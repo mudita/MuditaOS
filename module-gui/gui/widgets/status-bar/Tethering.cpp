@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Tethering.hpp"
@@ -11,13 +11,10 @@
 
 namespace gui::status_bar
 {
-    Tethering::Tethering(Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h)
-        : StatusBarWidgetBase(parent, x, y, w, h)
+    constexpr auto tethering_status = "tethering_status";
+
+    Tethering::Tethering(Item *parent, std::uint32_t x, std::uint32_t y) : StatusBarWidgetBase(parent, x, y, 0, 0)
     {
-        setEdges(RectangleEdge::None);
-        setFont(style::status_bar::tethering::font);
-        setTextEllipsisType(TextEllipsis::Right);
-        setText(utils::translate("statusbar_tethering"));
-        setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        set(tethering_status, style::status_bar::imageTypeSpecifier);
     }
 } // namespace gui::status_bar
