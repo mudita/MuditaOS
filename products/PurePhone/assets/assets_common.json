@@ -99,6 +99,7 @@
         {"name":"release.tgz", "tarfile": "./image/assets/images/status-bar/bt_status_W_G.vpi", "output": "system_a/assets/images/status-bar/bt_status_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/status-bar/alarmclock_status_W_G.vpi", "output": "system_a/assets/images/status-bar/alarmclock_status_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/status-bar/bt_status_W_M.vpi", "output": "system_a/assets/images/status-bar/bt_status_W_M.vpi" },
+        {"name":"release.tgz", "tarfile": "./image/assets/images/status-bar/tethering_status_W_G.vpi", "output": "system_a/assets/images/status-bar/tethering_status_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/dot_12px_hard_alpha_W_G.vpi", "output": "system_a/assets/images/dot_12px_hard_alpha_W_G.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/arrow_left_20px_W_M.vpi", "output": "system_a/assets/images/arrow_left_20px_W_M.vpi" },
         {"name":"release.tgz", "tarfile": "./image/assets/images/arrow_right_empty_32px_W_G.vpi", "output": "system_a/assets/images/arrow_right_empty_32px_W_G.vpi" },

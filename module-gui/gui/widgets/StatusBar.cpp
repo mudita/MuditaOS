@@ -146,10 +146,8 @@ namespace gui::status_bar
         phoneMode->setMaximumSize(phonemode::maxX, this->drawArea.h);
         phoneMode->setMargins(gui::Margins(margins::between, 0, 0, margins::textBottom));
         phoneMode->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
-        tethering = new Tethering(leftBox, 0, 0, 0, 0);
-        tethering->setMaximumSize(tethering::maxX, this->drawArea.h);
-        tethering->setMargins(gui::Margins(margins::between, 0, 0, margins::textBottom));
-        tethering->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
+        tethering = new Tethering(leftBox, 0, 0);
+        tethering->setMargins(gui::Margins(margins::between, 0, 0, margins::tethering));
 
         // center
         centralBox = new HBox(this, 0, 0, 0, 0);
@@ -394,11 +392,15 @@ namespace gui::status_bar
     {
         if (tetheringEnabled && configuration.getTetheringState() != sys::phone_modes::Tethering::Off) {
             phoneMode->hide();
+            signal->hide();
+            networkAccessTechnology->hide();
             tethering->show();
         }
         else {
             tethering->hide();
+            signal->show();
             phoneModeEnabled ? phoneMode->show() : phoneMode->hide();
+            showNetworkAccessTechnology(configuration.isEnabled(Indicator::NetworkAccessTechnology));
         }
     }
 
