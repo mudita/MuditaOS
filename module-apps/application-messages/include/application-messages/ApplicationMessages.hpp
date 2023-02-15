@@ -66,6 +66,9 @@ namespace app
 
         // used by sms template items
         std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;
+
+      private:
+        ActionResult handleCreateSmsAction(std::unique_ptr<gui::SwitchData> data);
     };
 
     template <>
