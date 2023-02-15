@@ -20,7 +20,7 @@ namespace tags::fetcher
 
         std::optional<Tags> fetchTagsInternal(const std::string &filePath)
         {
-            const TagLib::FileRef tagReader(filePath.c_str());
+            const TagLib::ConstFileRef tagReader(filePath.c_str());
             const auto tags = tagReader.tag();
             if (!tagReader.isNull() && (tags != nullptr)) {
                 const auto properties = tagReader.audioProperties();
@@ -66,7 +66,7 @@ namespace tags::fetcher
 
             return {};
         }
-    }
+    } // namespace
 
     Tags fetchTags(const std::string &filePath)
     {
