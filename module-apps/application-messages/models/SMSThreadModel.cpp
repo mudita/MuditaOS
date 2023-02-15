@@ -150,10 +150,10 @@ void SMSThreadModel::markCurrentThreadAsRead()
                 db::Interface::Name::SMSThread,
                 std::make_unique<db::query::MarkAsRead>(smsThreadID, db::query::MarkAsRead::Read::True));
 
-            DBServiceAPI::GetQuery(application,
-                                   db::Interface::Name::Notifications,
-                                   std::make_unique<db::query::notifications::Decrement>(
-                                       NotificationsRecord::Key::Sms, numberID, unreadMsgCount));
+            DBServiceAPI::GetQuery(
+                application,
+                db::Interface::Name::Notifications,
+                std::make_unique<db::query::notifications::Decrement>(NotificationsRecord::Key::Sms, unreadMsgCount));
         }
     }
 }

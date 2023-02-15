@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Database.hpp"
@@ -166,6 +166,7 @@ std::unique_ptr<QueryResult> Database::query(const char *format, ...)
     va_start(ap, format);
     sqlite3_vsnprintf(maxQueryLen, queryStatementBuffer, format, ap);
     va_end(ap);
+
     auto queryResult = std::make_unique<QueryResult>();
     if (const int result = sqlite3_exec(dbConnection, queryStatementBuffer, queryCallback, queryResult.get(), nullptr);
         result != SQLITE_OK) {

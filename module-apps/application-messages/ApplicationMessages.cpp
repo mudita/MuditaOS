@@ -175,10 +175,10 @@ namespace app
             this, db::Interface::Name::SMSThread, std::make_unique<MarkAsRead>(record->ID, MarkAsRead::Read::True));
 
         if (record->unreadMsgCount) {
-            DBServiceAPI::GetQuery(this,
-                                   db::Interface::Name::Notifications,
-                                   std::make_unique<notifications::Decrement>(
-                                       NotificationsRecord::Key::Sms, record->numberID, record->unreadMsgCount));
+            DBServiceAPI::GetQuery(
+                this,
+                db::Interface::Name::Notifications,
+                std::make_unique<notifications::Decrement>(NotificationsRecord::Key::Sms, record->unreadMsgCount));
         }
         return true;
     }
@@ -230,23 +230,21 @@ namespace app
 
         auto query = std::make_unique<ThreadRemove>(record.ID);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
-        task->setCallback(
-            [this, threadId = record.ID, unreadMsgCount = record.unreadMsgCount, numberID = record.numberID](
-                auto response) {
-                const auto result = dynamic_cast<ThreadRemoveResult *>(response);
-                if ((result != nullptr) && result->success()) {
-                    if (unreadMsgCount) {
-                        DBServiceAPI::GetQuery(this,
-                                               db::Interface::Name::Notifications,
-                                               std::make_unique<db::query::notifications::Decrement>(
-                                                   NotificationsRecord::Key::Sms, numberID, unreadMsgCount));
-                    }
-                    switchWindow(gui::name::window::main_window);
-                    return true;
+        task->setCallback([this, threadId = record.ID, unreadMsgCount = record.unreadMsgCount](auto response) {
+            const auto result = dynamic_cast<ThreadRemoveResult *>(response);
+            if ((result != nullptr) && result->success()) {
+                if (unreadMsgCount) {
+                    DBServiceAPI::GetQuery(this,
+                                           db::Interface::Name::Notifications,
+                                           std::make_unique<db::query::notifications::Decrement>(
+                                               NotificationsRecord::Key::Sms, unreadMsgCount));
                 }
-                LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", threadId);
-                return false;
-            });
+                switchWindow(gui::name::window::main_window);
+                return true;
+            }
+            LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", threadId);
+            return false;
+        });
         task->execute(this, this);
         return true;
     }

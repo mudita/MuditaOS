@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -84,7 +84,6 @@ class NotificationsRecordInterface : public RecordInterface<NotificationsRecord,
   private:
     NotificationsDB *notificationsDb   = nullptr;
     ContactRecordInterface *contactsDb = nullptr;
-    std::vector<std::uint32_t> unreadMsgNumberIDs;
 
     std::optional<ContactRecord> getContactRecord(uint32_t id) const;
     std::unique_ptr<db::query::notifications::GetResult> runQueryImpl(const db::query::notifications::Get *query);
@@ -99,5 +98,5 @@ class NotificationsRecordInterface : public RecordInterface<NotificationsRecord,
     [[nodiscard]] bool processIncrement(NotificationsRecord::Key key,
                                         std::optional<utils::PhoneNumber::View> &&number,
                                         size_t size);
-    [[nodiscard]] bool processDecrement(NotificationsRecord::Key key, std::uint32_t numberID, size_t size);
+    [[nodiscard]] bool processDecrement(NotificationsRecord::Key key, size_t size);
 };
