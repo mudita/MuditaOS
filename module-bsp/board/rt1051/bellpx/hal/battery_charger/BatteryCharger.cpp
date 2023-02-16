@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryChargerIRQ.hpp"
@@ -148,7 +148,14 @@ namespace hal::battery
 
     std::optional<AbstractBatteryCharger::SOC> BellBatteryCharger::getSOC() const
     {
-        return fetchBatterySOC();
+        static int idx                        = 0;
+        const AbstractBatteryCharger::SOC soc = 0;
+        if (++idx < 3) {
+            return fetchBatterySOC();
+        }
+        else {
+            return soc;
+        }
     }
 
     AbstractBatteryCharger::ChargingStatus BellBatteryCharger::getChargingStatus() const
