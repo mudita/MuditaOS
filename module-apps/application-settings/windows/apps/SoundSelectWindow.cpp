@@ -4,7 +4,6 @@
 #include "SoundSelectWindow.hpp"
 
 #include <application-settings/data/SoundSelectData.hpp>
-#include <application-settings/models/apps/SoundsModel.hpp>
 
 #include <ListView.hpp>
 #include <i18n/i18n.hpp>
@@ -14,7 +13,7 @@ namespace gui
     SoundSelectWindow::SoundSelectWindow(app::ApplicationCommon *app,
                                          std::string name,
                                          std::shared_ptr<AbstractSoundsModel> model)
-        : AppWindow(app, name), mSoundsModel{std::move(model)}
+        : AppWindow(app, std::move(name)), mSoundsModel{std::move(model)}
     {
         buildInterface();
     }
@@ -51,7 +50,7 @@ namespace gui
 
     void SoundSelectWindow::onBeforeShow([[maybe_unused]] ShowMode mode, SwitchData *data)
     {
-        auto info = dynamic_cast<SoundSelectData *>(data);
+        const auto info = dynamic_cast<SoundSelectData *>(data);
         if (info == nullptr) {
             LOG_ERROR("Null switch data pointer!");
             return;
