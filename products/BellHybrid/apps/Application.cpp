@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Application.hpp>
@@ -78,9 +78,13 @@ namespace app
                                           return std::make_unique<gui::BellTurnOffWindow>(
                                               app, std::make_unique<gui::BellPowerOffPresenter>(app));
                                       });
-                windowsFactory.attach(gui::BellWelcomeWindow::defaultName,
+                windowsFactory.attach(gui::BellWelcomeWindow::name,
                                       [](ApplicationCommon *app, const std::string &name) {
                                           return std::make_unique<gui::BellWelcomeWindow>(app);
+                                      });
+                windowsFactory.attach(gui::BellChargeWelcomeWindow::name,
+                                      [](ApplicationCommon *app, const std::string &name) {
+                                          return std::make_unique<gui::BellChargeWelcomeWindow>(app);
                                       });
                 break;
             case ID::Reboot:
