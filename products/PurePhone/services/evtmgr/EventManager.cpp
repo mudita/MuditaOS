@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <evtmgr/EventManager.hpp>
@@ -130,7 +130,7 @@ void EventManager::toggleTorchColor()
 
 void EventManager::ProcessCloseReason([[maybe_unused]] sys::CloseReason closeReason)
 {
-    backlightHandler.turnOffScreenLight();
+    backlightHandler.deinit();
 }
 
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -170,7 +170,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
 {
     EventManagerCommon::handleKeyEvent(msg);
 
-    auto kbdMessage = dynamic_cast<sevm::KbdMessage *>(msg);
+    const auto kbdMessage = dynamic_cast<sevm::KbdMessage *>(msg);
     if (kbdMessage->key.state == RawKey::State::Pressed) {
         if (kbdMessage->key.keyCode == bsp::KeyCodes::FnRight) {
             // Power key notification

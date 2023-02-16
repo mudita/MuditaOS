@@ -99,9 +99,7 @@ sys::MessagePointer EventManagerCommon::DataReceivedHandler(sys::DataMessage *ms
     if (handled) {
         return std::make_shared<sys::ResponseMessage>();
     }
-    else {
-        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-    }
+    return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
 
 // Invoked during initialization
@@ -206,7 +204,6 @@ sys::ReturnCodes EventManagerCommon::DeinitHandler()
 
     EventWorker->close();
     EventWorker.reset();
-    EventWorker = nullptr;
 
     return sys::ReturnCodes::Success;
 }

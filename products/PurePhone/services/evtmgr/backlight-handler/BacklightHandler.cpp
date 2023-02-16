@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <evtmgr/BacklightHandler.hpp>
@@ -42,7 +42,7 @@ namespace backlight
                         parent,
                         [this](sys::Timer &t) { handleScreenLightTimeout(); }),
           keypadLightTimer{sys::TimerFactory::createSingleShotTimer(
-              parent, timers::keypadLightTimerName, timers::lightTimerTimeoutUnlocked, [this](sys::Timer &) {
+              parent, timers::keypadLightTimerName, timers::lightTimerTimeoutUnlocked, [](sys::Timer &) {
                   bsp::keypad_backlight::shutdown();
               })}
     {
@@ -66,7 +66,7 @@ namespace backlight
         using namespace screen_light_control;
 
         settings->registerValueChange(settings::Brightness::brightnessLevel, [&](const std::string &value) {
-            ManualModeParameters params{utils::getNumericValue<float>(value)};
+            const ManualModeParameters params{utils::getNumericValue<float>(value)};
             screenLightController->processRequest(Action::setManualModeBrightness, Parameters(params));
         });
 
@@ -83,6 +83,8 @@ namespace backlight
             }
             screenLightController->processRequest(action);
         });
+
+        isInitialized = true;
     }
 
     void Handler::turnOffScreenLight()
@@ -92,6 +94,9 @@ namespace backlight
 
     void Handler::handleKeyPressed(bsp::KeyCodes key)
     {
+        if (!isInitialized) {
+            return;
+        }
         if (!isKeyOnExclusionList(key)) {
             handleKeypadLightRefresh();
             handleScreenLightRefresh();
@@ -233,4 +238,14 @@ namespace backlight
         }
     }
 
+    void Handler::deinit()
+    {
+        keypadLightTimer.stop();
+        getScreenLightTimer()->stop();
+
+        turnOffScreenLight();
+        bsp::keypad_backlight::shutdown();
+
+        isInitialized = false;
+    }
 } // namespace backlight
