@@ -40,6 +40,7 @@ namespace gui
         setTitle(utils::translate("app_messages_templates"));
 
         navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::use));
+        navBar->setActive(nav_bar::Side::Center, false);
         navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         namespace style = style::messages::templates::list;
@@ -103,11 +104,11 @@ namespace gui
         preventsAutoLock = false;
         if (mode == ShowMode::GUI_SHOW_INIT) {
             list->rebuildList();
-            if (list->isEmpty()) {
-                list->setVisible(false);
-                navBar->setActive(nav_bar::Side::Center, false);
-                emptyListIcon->setVisible(true);
-            }
+        }
+
+        if (list->isEmpty()) {
+            navBar->setActive(nav_bar::Side::Center, false);
+            emptyListIcon->setVisible(true);
         }
 
         if (auto switchData = dynamic_cast<SMSTemplateRequest *>(data)) {
