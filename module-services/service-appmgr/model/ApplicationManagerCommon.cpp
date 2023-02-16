@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationManagerCommon.hpp"
@@ -38,7 +38,8 @@ namespace app::manager
         {
             return action == app::manager::actions::DisplayFactoryResetInProgressScreen ||
                    action == app::manager::actions::DisplayLogoAtExit ||
-                   action == app::manager::actions::SystemBrownout;
+                   action == app::manager::actions::SystemBrownout ||
+                   action == app::manager::actions::DisplayChargeAtExit;
         }
 
         ActionRequest getCloseableAction(const app::ApplicationName &senderName, const sys::CloseReason closeReason)
@@ -46,9 +47,12 @@ namespace app::manager
             switch (closeReason) {
             case sys::CloseReason::SystemBrownout:
             case sys::CloseReason::LowBattery:
+            case sys::CloseReason::LowVoltage:
                 return ActionRequest{senderName, app::manager::actions::SystemBrownout, nullptr};
             case sys::CloseReason::FactoryReset:
                 return ActionRequest{senderName, app::manager::actions::DisplayFactoryResetInProgressScreen, nullptr};
+            case sys::CloseReason::OnboardingPowerDown:
+                return ActionRequest{senderName, app::manager::actions::DisplayChargeAtExit, nullptr};
             default:
                 return ActionRequest{senderName, app::manager::actions::DisplayLogoAtExit, nullptr};
             }
