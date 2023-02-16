@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingOnOffWindow.hpp"
@@ -116,7 +116,7 @@ namespace gui
     void OnBoardingOnOffWindow::registerCallbacks()
     {
         timerCallback = [this](Item &, sys::Timer &timer) {
-            presenter->powerOff();
+            presenter->powerOff(sys::CloseReason::OnboardingPowerDown);
             return true;
         };
     }
@@ -128,7 +128,7 @@ namespace gui
             return true;
         }
         else if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            presenter->powerOff();
+            presenter->powerOff(sys::CloseReason::OnboardingPowerDown);
             return false;
         }
         return false;
