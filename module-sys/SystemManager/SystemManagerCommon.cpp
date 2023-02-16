@@ -16,6 +16,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/EVMessages.hpp>
+#include <service-appmgr/messages/OnboardingPowerDownRequest.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-appmgr/Constants.hpp>
@@ -623,6 +624,11 @@ namespace sys
             return MessageNone{};
         });
 
+        connect(app::OnboardingPowerDownRequest(), [&](Message *) {
+            CloseSystemHandler(CloseReason::OnboardingPowerDown);
+            return MessageNone{};
+        });
+
         connect(ReadyToCloseMessage(), [&](Message *msg) {
             ServiceReadyToCloseHandler(msg);
             return MessageNone{};
@@ -735,6 +741,7 @@ namespace sys
 
         switch (closeReason) {
         case CloseReason::RegularPowerDown:
+        case CloseReason::OnboardingPowerDown:
         case CloseReason::FactoryReset:
         case CloseReason::SystemBrownout:
         case CloseReason::LowBattery:

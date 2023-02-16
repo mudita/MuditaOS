@@ -638,7 +638,6 @@
   "app_bell_meditation_interval_none": "None",
   "app_bell_meditation_put_down_and_wait": "<text>Put down Mudita Harmony<br>and wait for the gong</text>",
   "app_bell_meditation_thank_you_for_session": "<text>Thank you for<br>the session</text>",
-  "app_bell_onboarding_welcome_message": "<text>Mudita Harmony<br/>is switched OFF</text>",
   "app_bell_onboarding_info_rotate": "<text weight='regular' size='38'>Rotate </text><text weight='light' size='38'>to select</text>",
   "app_bell_onboarding_info_light_click": "<text weight='regular' size='38'>Light click </text><text weight='light' size='38'>to continue</text>",
   "app_bell_onboarding_info_deep_click_warning": "<text weight='light' size='38'>You've </text><text weight='regular' size='38'>deep pressed</text>",
@@ -712,6 +711,8 @@
   "app_bell_turn_off_question": "Turn off Mudita Harmony?",
   "app_bell_goodbye": "Goodbye",
   "app_bell_reset_message": "<text>Resetting Mudita<br />Harmony</text>",
+  "app_bell_welcome_message": "<text>Mudita Harmony<br/>is switched OFF</text>",
+  "app_bell_welcome_charge_message": "<text>Charge Harmony and<br/>press Light Click</text>",
   "app_bell_greeting_msg": [
     "<text>Good Morning!<br />It's a Beautiful Day!</text>",
     "<text>Rise and shine!<br />Seize the day</text>",

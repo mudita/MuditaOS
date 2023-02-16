@@ -48,6 +48,7 @@ namespace sys
     enum class CloseReason
     {
         RegularPowerDown,
+        OnboardingPowerDown,
         Reboot,
         RebootToUpdate,
         RebootToUsbMscMode,

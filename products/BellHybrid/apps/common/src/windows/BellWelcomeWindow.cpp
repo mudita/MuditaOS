@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "windows/BellWelcomeWindow.hpp"
@@ -11,13 +11,17 @@
 
 namespace gui
 {
-    BellWelcomeWindow::BellWelcomeWindow(app::ApplicationCommon *app, const std::string &name, Callback onAction)
-        : AppWindow(app, name), onAction{onAction}
+    BellWelcomeWindowBase::BellWelcomeWindowBase(app::ApplicationCommon *app,
+                                                 const std::string &name,
+                                                 const std::string &icon,
+                                                 const std::string &message,
+                                                 Callback onAction)
+        : AppWindow(app, name), icon(icon), message(message), onAction{onAction}
     {
         buildInterface();
     }
 
-    void BellWelcomeWindow::buildInterface()
+    void BellWelcomeWindowBase::buildInterface()
     {
         AppWindow::buildInterface();
         statusBar->setVisible(false);
@@ -26,7 +30,7 @@ namespace gui
 
         body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, false);
 
-        auto muditaLogo = new ImageBox(body->firstBox, new Image("bell_mudita_logo", ImageTypeSpecifier::W_G));
+        auto muditaLogo = new ImageBox(body->firstBox, new Image(this->icon, ImageTypeSpecifier::W_G));
         muditaLogo->setMinimumSizeToFitImage();
 
         auto welcomeText = new TextFixedSize(body->centerBox);
@@ -35,7 +39,7 @@ namespace gui
         welcomeText->setFont(style::window::font::largelight);
         welcomeText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         welcomeText->drawUnderline(false);
-        welcomeText->setRichText(utils::translate("app_bell_onboarding_welcome_message"));
+        welcomeText->setRichText(utils::translate(this->message));
 
         auto midLine = new Rect(body->centerBox, 0, 0, 0, 0);
         midLine->setMinimumSize(midline_w, midline_h);
@@ -55,7 +59,7 @@ namespace gui
         body->resize();
     }
 
-    bool BellWelcomeWindow::onInput(const InputEvent &inputEvent)
+    bool BellWelcomeWindowBase::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isKeyRelease(KeyCode::KEY_ENTER)) {
             if (onAction) {
@@ -64,5 +68,14 @@ namespace gui
         }
         return false;
     }
+
+    BellWelcomeWindow::BellWelcomeWindow(app::ApplicationCommon *app, Callback onAction)
+        : BellWelcomeWindowBase(app, BellWelcomeWindow::name, "bell_mudita_logo", "app_bell_welcome_message", onAction)
+    {}
+
+    BellChargeWelcomeWindow::BellChargeWelcomeWindow(app::ApplicationCommon *app, Callback onAction)
+        : BellWelcomeWindowBase(
+              app, BellChargeWelcomeWindow::name, "bell_welcome_battery", "app_bell_welcome_charge_message", onAction)
+    {}
 
 } /* namespace gui */

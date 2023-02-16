@@ -618,7 +618,6 @@
   "app_bell_settings_time_units_time_fmt_top_message": "Format de l'heure",
   "app_bell_settings_time_units_time_message": "Heure",
   "app_bell_settings_temp_scale": "Échelle de température",
-  "app_bell_onboarding_welcome_message": "<text>Mudita Harmony<br/>est désactivé</text>",
   "app_bell_onboarding_info_rotate": "<text weight='regular' size='38'>Tourner </text><text weight='light' size='38'>pour sélectionner</text>",
   "app_bell_onboarding_info_light_click": "<text weight='regular' size='38'>Cliquer doucement </text><text weight='light' size='38'>pour continuer</text>",
   "app_bell_onboarding_info_deep_click_warning": "<text weight='light' size='38'>Vous avez </text><text weight='regular' size='38'>appuyé fort</text>",
@@ -706,5 +705,7 @@
   "app_meditation_countdown_desc": "Début dans",
   "app_meditation_summary_total": "<text>Total :<br /><token>$VALUE</token></text>",
   "app_meditation_summary_average": "Moyenne/jour :",
-  "app_meditation_summary_title": "<text>Derniers <token>$VALUE</token> jours</text>"
+  "app_meditation_summary_title": "<text>Derniers <token>$VALUE</token> jours</text>",
+  "app_bell_welcome_message": "<text>Mudita Harmony<br/>est désactivé</text>",
+  "app_bell_welcome_charge_message": "<text>Mudita Harmony<br/>est désactivé</text>"
 }

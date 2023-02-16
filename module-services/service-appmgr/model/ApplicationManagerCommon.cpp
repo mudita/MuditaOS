@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationManagerCommon.hpp"
@@ -39,7 +39,8 @@ namespace app::manager
         bool checkIfCloseableAction(const actions::Action action)
         {
             return action == app::manager::actions::DisplayLogoAtExit or
-                   action == app::manager::actions::SystemBrownout;
+                   action == app::manager::actions::SystemBrownout or
+                   action == app::manager::actions::DisplayChargeAtExit;
         }
 
         ActionRequest getCloseableAction(const app::ApplicationName &senderName, const sys::CloseReason closeReason)
@@ -47,7 +48,11 @@ namespace app::manager
             switch (closeReason) {
             case sys::CloseReason::SystemBrownout:
             case sys::CloseReason::LowBattery:
+            case sys::CloseReason::LowVoltage:
                 return ActionRequest{senderName, app::manager::actions::SystemBrownout, nullptr};
+            case sys::CloseReason::FactoryReset:
+            case sys::CloseReason::OnboardingPowerDown:
+                return ActionRequest{senderName, app::manager::actions::DisplayChargeAtExit, nullptr};
             default:
                 return ActionRequest{senderName, app::manager::actions::DisplayLogoAtExit, nullptr};
             }

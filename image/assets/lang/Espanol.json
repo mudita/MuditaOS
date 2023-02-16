@@ -643,7 +643,6 @@
   "app_bell_settings_time_units_time_fmt_top_message": "Formato de hora",
   "app_bell_settings_time_units_time_message": "Hora",
   "app_bell_settings_temp_scale": "Escala de temperatura",
-  "app_bell_onboarding_welcome_message": "<text>Mudita Harmony<br/>está apagado</text>",
   "app_bell_onboarding_info_rotate": "<text weight='regular' size='38'>Girar </text><text weight='light' size='38'>para seleccionar</text>",
   "app_bell_onboarding_info_light_click": "<text weight='regular' size='38'>Click ligeramente </text><text weight='light' size='38'>para continuar</text>",
   "app_bell_onboarding_info_deep_click_warning": "<text weight='light' size='38'>Has presionado </text><text weight='regular' size='38'>muy profundo</text>",
@@ -735,5 +734,7 @@
   "app_meditation_countdown_desc": "Empieza en",
   "app_meditation_summary_total": "<text>Total:<br /><token>$VALUE</token></text>",
   "app_meditation_summary_average": "Promedio/por día:",
-  "app_meditation_summary_title": "<text>Últimos <token>$VALUE</token> días</text>"
+  "app_meditation_summary_title": "<text>Últimos <token>$VALUE</token> días</text>",
+  "app_bell_welcome_message": "<text>Mudita Harmony<br/>está apagado</text>",
+  "app_bell_welcome_charge_message": "<text>Mudita Harmony<br/>está apagado</text>"
 }
