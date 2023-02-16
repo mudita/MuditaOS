@@ -97,7 +97,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
     auto currentItemIndex  = 0;
     auto selectedItemIndex = 0;
 
-    const auto selectedSound = purefs::dir::getAssetsDirPath() / model->getSound();
+    const auto selectedSound = purefs::dir::getSystemDiskPath() / model->getSound();
     for (const auto &sound : sounds) {
 
         bool isSelected = false;
