@@ -666,11 +666,10 @@
   "app_bell_relaxation_looped": "geschlungen",
   "app_bell_relaxation_loop_description": "der Titel wird abgespielt, bis Sie ihn ausschalten",
   "app_bell_relaxation_error_message": "Nicht unterstütztes Dateiformat",
-  "app_bell_onboarding_welcome_message": "<text>Mudita Harmony<br/>ist ausgeschaltet</text>",
-  "app_bell_onboarding_info_rotate": "<text weight='regular' size='38'>Drehen </text><text weight='light' size='38'>um auszuwählen</text>",
-  "app_bell_onboarding_info_light_click": "<text weight='regular' size='38'>Leichter Klick </text><text weight='light' size='38'>um fortzufahren</text>",
-  "app_bell_onboarding_info_deep_click_warning": "<text weight='light' size='38'>Sie haben </text><text weight='regular' size='38'>tief gedrückt</text>",
-  "app_bell_onboarding_info_deep_click_correction": "<text weight='light' size='38'>Seien Sie sanfter,<br></br>versuchen </text><text weight='regular' size='38'>Sie diesmal </text><text weight='light' size='38'>leicht klicken</text>",
+  "app_bell_onboarding_info_rotate": "Drehen um auszuwählen",
+  "app_bell_onboarding_info_light_click": "Leichter Klick um fortzufahren",
+  "app_bell_onboarding_info_deep_click_warning": "Sie haben tief gedrückt",
+  "app_bell_onboarding_info_deep_click_correction": "<text>Seien Sie sanfter,<br />versuchen Sie diesmal leicht klicken</text>",
   "app_bell_onboarding_welcome": "Willkommen",
   "app_bell_onboarding_shortcuts_question": "Möchten Sie sich die Anleitung für die Kurzbefehle ansehen?",
   "app_bell_onboarding_shortcuts_start": "Start",
@@ -744,5 +743,7 @@
   "app_meditation_countdown_desc": "Beginnt in",
   "app_meditation_summary_total": "<text>Gesamt:<br /><token>$VALUE</token></text>",
   "app_meditation_summary_average": "Durchschnitt/tag:",
-  "app_meditation_summary_title": "<text>Letzte <token>$VALUE</token> tage</text>"
+  "app_meditation_summary_title": "<text>Letzte <token>$VALUE</token> tage</text>",
+  "app_bell_welcome_message": "<text>Mudita Harmony<br/>ist ausgeschaltet</text>",
+  "app_bell_welcome_charge_message": "<text>Charge Harmony<br/>und leicht drücken</text>"
 }
