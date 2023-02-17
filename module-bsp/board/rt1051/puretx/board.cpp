@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp.hpp"
@@ -8,7 +8,7 @@
 
 namespace
 {
-    void board_power_off()
+    void board_shutdown()
     {
         /// No memory allocation here as this specific GPIO was initialized at the startup. We are just grabbing here a
         /// reference to the already existing object.
@@ -32,7 +32,7 @@ namespace bsp
         case rebootState::none:
             break;
         case rebootState::poweroff:
-            board_power_off();
+            board_shutdown();
             break;
         case rebootState::reboot:
             board_reset();

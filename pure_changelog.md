@@ -81,6 +81,7 @@
 * Fixed navigation through the ringtone preview list to automatically switch playback to the currently selected option
 * Fixed crash when pressing button after turning off the phone with USB cable connected
 * Fixed notification on the home screen shouldn't be bolded
+* Fixed long phone shutdown time
 
 ## [1.5.0 2022-12-20]
 
