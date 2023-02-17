@@ -33,6 +33,8 @@
 * Fixed problem with track info not being displayed correctly
 * Fixed crash when trying to play 96kHz FLAC with USB cable connected
 * Fixed broken French translation on 'Configure passcode' screen in Onboarding
+* Fixed navigation through the ringtone preview list to automatically switch playback to the currently selected option
+
 ### Added
 
 ## [1.5.0 2022-12-20]
