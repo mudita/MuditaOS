@@ -592,6 +592,7 @@
   "app_phonebook_uncheck": "DESMARCAR",
   "app_phonebook_multiple_numbers_first": "Número",
   "app_phonebook_multiple_numbers_second": "Número alternativo",
+  "app_phonebook_contact_deleted": "<text>Se ha eliminado el contacto.<br></br>No es posible editar.</text>",
   "app_meditation_title_main": "Temporizador de meditación",
   "app_meditation_preparation_time": "Tiempo de preparación",
   "app_meditation_put_down_phone_and_wait": "<text>Deja a un lado el teléfono<br>y espera a que suene el gong.</text>",

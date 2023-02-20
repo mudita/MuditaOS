@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -39,6 +39,8 @@ namespace gui
                                         const std::uint32_t duplicatedNumberContactID = 0u);
         void showDialogDuplicatedSpeedDialNumber();
         void setSaveButtonVisible(bool visible);
+        void showContactDeletedNotification();
+        bool checkIfContactWasDeletedDuringEditProcess() const;
 
         std::shared_ptr<ContactRecord> contact           = nullptr;
         std::shared_ptr<NewContactModel> newContactModel = nullptr;

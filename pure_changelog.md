@@ -88,6 +88,8 @@
 * Fixed incorrectly displayed Swedish translations in Onboarding
 * Fixed going back to wrong window after confirming or cancelling creation of new contact from call log
 * Fixed missing "No calls yet" text in call log
+* Fixed phonebook is not handling database notification about contacts action done by Center
+* Fixed contact deleted via Center cannot be edited by Phonebook app and saved again
 
 ## [1.5.0 2022-12-20]
 
