@@ -83,6 +83,7 @@
 * Fixed notification on the home screen shouldn't be bolded
 * Fixed long phone shutdown time
 * Fixed missing translation for words "show" and "replace"
+* Fixed music playback disablement after currently played audio file gets deleted
 
 ## [1.5.0 2022-12-20]
 

@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define DR_MP3_IMPLEMENTATION
 #define DR_MP3_NO_STDIO
 
+#include "decoderCommon.hpp"
 #include "decoderMP3.hpp"
 #include <cstdio>
 
@@ -59,7 +60,9 @@ namespace audio
     size_t decoderMP3::drmp3_read(void *pUserData, void *pBufferOut, size_t bytesToRead)
     {
         const auto decoderContext = reinterpret_cast<decoderMP3 *>(pUserData);
-        return std::fread(pBufferOut, 1, bytesToRead, decoderContext->fd);
+        return !statFd(decoderContext->fd, "MP3 audio file deleted by user!")
+                   ? 0
+                   : std::fread(pBufferOut, 1, bytesToRead, decoderContext->fd);
     }
 
     drmp3_bool32 decoderMP3::drmp3_seek(void *pUserData, int offset, drmp3_seek_origin origin)
