@@ -591,6 +591,7 @@
   "app_phonebook_uncheck": "AUSWAHL ENTFERNEN",
   "app_phonebook_multiple_numbers_first": "Nummer",
   "app_phonebook_multiple_numbers_second": "Zweite nummer",
+  "app_phonebook_contact_deleted": "<text>Der Kontakt wurde gelöscht.<br></br>Die Bearbeitung ist nicht möglich.</text>",
   "app_meditation_title_main": "Meditationstimer",
   "app_meditation_preparation_time": "Vorbereitungstimer",
   "app_meditation_put_down_phone_and_wait": "<text>Legen Sie das Telefon weg<br>und warten Sie auf den Gong.</text>",

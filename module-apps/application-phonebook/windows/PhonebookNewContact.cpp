@@ -4,6 +4,7 @@
 #include "PhonebookNewContact.hpp"
 
 #include "DialogMetadata.hpp"
+#include "DialogMetadataMessage.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 
 #include <Dialog.hpp>
@@ -177,7 +178,6 @@ namespace gui
         else {
             contact->removeFromGroup(ContactsDB::temporaryGroupId());
         }
-
         // perform actual add/update operation
         if (contactAction == ContactAction::Add) {
             auto returnedContact = DBServiceAPI::ContactAdd(application, *contact);
@@ -189,7 +189,12 @@ namespace gui
         }
         else if (contactAction == ContactAction::Edit || contactAction == ContactAction::EditTemporary) {
             contact->groups.erase(ContactsDB::temporaryGroupId());
-            if (!DBServiceAPI::ContactUpdate(application, *contact)) {
+            if (checkIfContactWasDeletedDuringEditProcess()) {
+                LOG_WARN("Contact removed while editing by external resources.");
+                showContactDeletedNotification();
+                return false;
+            }
+            else if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return false;
             }
@@ -266,4 +271,30 @@ namespace gui
             }});
         application->switchWindow(gui::window::name::dialog_yes_no_icon_txt, std::move(metaData));
     }
+
+    void PhonebookNewContact::showContactDeletedNotification()
+    {
+        auto icon = "info_128px_W_G";
+        auto text = utils::translate("app_phonebook_contact_deleted");
+
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+            contact->getFormattedName(ContactRecord::NameFormatType::Title), icon, text, "", [=]() -> bool {
+                std::unique_ptr<gui::SwitchData> data =
+                    std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
+                this->application->switchWindow(gui::name::window::main_window, std::move(data));
+
+                return true;
+            }});
+        application->switchWindow(gui::window::name::dialog_confirm, std::move(metaData));
+    }
+
+    bool PhonebookNewContact::checkIfContactWasDeletedDuringEditProcess() const
+    {
+        const auto contactByID = DBServiceAPI::ContactGetByID(application, contact->ID);
+
+        return contactByID->size() == 1 and contactByID->front().ID == 0 and
+               contactByID->front().primaryName.empty() and contactByID->front().alternativeName.empty() and
+               contactByID->front().numbers.empty();
+    }
+
 } // namespace gui
