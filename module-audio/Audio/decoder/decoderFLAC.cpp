@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp>
 #include "decoderFLAC.hpp"
 #include "flac/flacfile.h"
+#include "decoderCommon.hpp"
 
 #define DR_FLAC_IMPLEMENTATION
 #define DR_FLAC_NO_STDIO
@@ -76,7 +77,9 @@ namespace audio
     size_t decoderFLAC::drflac_read(void *pUserData, void *pBufferOut, size_t bytesToRead)
     {
         const auto decoderContext = reinterpret_cast<decoderFLAC *>(pUserData);
-        return std::fread(pBufferOut, 1, bytesToRead, decoderContext->fd);
+        return !statFd(decoderContext->fd, "FLAC audio file deleted by user!")
+                   ? 0
+                   : std::fread(pBufferOut, 1, bytesToRead, decoderContext->fd);
     }
 
     drflac_bool32 decoderFLAC::drflac_seek(void *pUserData, int offset, drflac_seek_origin origin)
