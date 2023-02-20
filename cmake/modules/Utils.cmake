@@ -21,9 +21,15 @@ macro(print_var VARIABLE)
 endmacro()
 
 function(strip_executable TARGET)
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        set(STRIP_PARAMS "-S")
+    else()
+        set(STRIP_PARAMS --strip-debug --strip-unneeded)
+    endif ()
+
     if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
         add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_STRIP} --strip-debug --strip-unneeded $<TARGET_FILE:${TARGET}>
+            COMMAND ${CMAKE_STRIP} ${STRIP_PARAMS} $<TARGET_FILE:${TARGET}>
             COMMENT "Striping  ${TARGET}"
             )
     endif()
@@ -33,7 +39,7 @@ function(strip_executable TARGET)
             COMMAND ${CMAKE_OBJCOPY} --only-keep-debug
                     $<TARGET_FILE:${TARGET}>
                     $<TARGET_FILE:${TARGET}>.debug
-            COMMAND ${CMAKE_STRIP} --strip-debug --strip-unneeded $<TARGET_FILE:${TARGET}>
+            COMMAND ${CMAKE_STRIP} ${STRIP_PARAMS} $<TARGET_FILE:${TARGET}>
             COMMAND ${CMAKE_OBJCOPY} --add-gnu-debuglink=$<TARGET_FILE:${TARGET}>.debug
                     $<TARGET_FILE:${TARGET}>
             COMMENT "Striping  ${TARGET}"
