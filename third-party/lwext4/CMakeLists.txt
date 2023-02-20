@@ -16,6 +16,7 @@ target_include_directories(lwext4
 target_compile_options(lwext4
     PRIVATE
     -Wno-format
+    -Wno-stringop-truncation
 )
 
 target_sources(lwext4
