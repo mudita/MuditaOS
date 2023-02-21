@@ -69,7 +69,7 @@ target_sources(fsl
 
 target_compile_definitions(fsl 
     PRIVATE 
-    LPI2C_WAIT_TIMEOUT=10000
+    LPI2C_WAIT_TIMEOUT=500000
 )
 
 target_include_directories(fsl
