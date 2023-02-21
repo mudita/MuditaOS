@@ -590,6 +590,12 @@ namespace app::manager
             return false;
         }
 
+        if (msg->dontSwitchBackWhenRequestedAppNameDoesntMatch && previousApp->name() != msg->getSenderName()) {
+            LOG_INFO("Requested to switch back only if to [%s] - discarding as doesn't match",
+                     previousApp->name().c_str());
+            return false;
+        }
+
         auto currentlyFocusedApp = getFocusedApplication();
         if (currentlyFocusedApp == nullptr) {
             LOG_INFO("No focused application at the moment. Starting previous application...");

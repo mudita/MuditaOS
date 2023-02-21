@@ -5,8 +5,11 @@
 
 namespace app::manager
 {
-    SwitchBackRequest::SwitchBackRequest(const ApplicationName &name, std::unique_ptr<gui::SwitchData> data)
-        : BaseMessage(MessageType::APMSwitchPrevApp, name), data{std::move(data)}
+    SwitchBackRequest::SwitchBackRequest(const ApplicationName &name,
+                                         std::unique_ptr<gui::SwitchData> data,
+                                         bool dontSwitchBackWhenRequestedAppNameDoesntMatch)
+        : BaseMessage(MessageType::APMSwitchPrevApp, name), data{std::move(data)},
+          dontSwitchBackWhenRequestedAppNameDoesntMatch{dontSwitchBackWhenRequestedAppNameDoesntMatch}
     {}
 
     [[nodiscard]] auto SwitchBackRequest::getData() noexcept -> std::unique_ptr<gui::SwitchData> &
