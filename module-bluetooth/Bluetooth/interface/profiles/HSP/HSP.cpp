@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log/log.hpp>
@@ -158,12 +158,12 @@ namespace bluetooth
             if (hsp_subevent_rfcomm_connection_complete_get_status(event) != 0u) {
                 LOG_DEBUG("RFCOMM connection establishement failed with status %u\n",
                           hsp_subevent_rfcomm_connection_complete_get_status(event));
-                sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
+                sendAudioEvent(audio::EventType::BluetoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
                 isConnected = false;
                 break;
             }
             LOG_DEBUG("RFCOMM connection established.\n");
-            sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Connected);
+            sendAudioEvent(audio::EventType::BluetoothHSPDeviceState, audio::Event::DeviceState::Connected);
             {
                 auto &busProxy     = const_cast<sys::Service *>(ownerService)->bus;
                 device.deviceState = DeviceState::ConnectedVoice;
@@ -174,7 +174,7 @@ namespace bluetooth
             break;
         case HSP_SUBEVENT_RFCOMM_DISCONNECTION_COMPLETE: {
             LOG_DEBUG("RFCOMM disconnected.\n");
-            sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
+            sendAudioEvent(audio::EventType::BluetoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
             auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
             busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device),
                                  service::name::bluetooth);
@@ -200,7 +200,7 @@ namespace bluetooth
             LOG_DEBUG("Audio connection released.\n\n");
             scoHandle    = HCI_CON_HANDLE_INVALID;
             callAnswered = false;
-            sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
+            sendAudioEvent(audio::EventType::BluetoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
             break;
         case HSP_SUBEVENT_MICROPHONE_GAIN_CHANGED:
             LOG_DEBUG("Received microphone gain change %d\n", hsp_subevent_microphone_gain_changed_get_gain(event));

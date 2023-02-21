@@ -90,18 +90,16 @@ namespace AudioServiceAPI
         return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
-    void SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt)
+    bool SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt)
     {
         auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
-        serv->bus.sendMulticast(msg, sys::BusChannel::ServiceAudioNotifications);
-        // return true;
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
-    void SendEvent(sys::Service *serv, audio::EventType eType, audio::Event::DeviceState state)
+    bool SendEvent(sys::Service *serv, audio::EventType eType, audio::Event::DeviceState state)
     {
         auto msg = std::make_shared<AudioEventRequest>(eType, state);
-        serv->bus.sendMulticast(msg, sys::BusChannel::ServiceAudioNotifications);
-        // return true;
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     std::string GetSetting(sys::Service *serv, audio::Setting setting, audio::PlaybackType playbackType)
@@ -251,4 +249,5 @@ namespace AudioServiceAPI
     {
         return serv->bus.sendUnicast(std::make_shared<HFPDeviceVolumeChanged>(volume), service::name::audio);
     }
+
 } // namespace AudioServiceAPI

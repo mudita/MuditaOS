@@ -126,11 +126,6 @@ ServiceAudio::ServiceAudio()
             [this](sys::Message *msg) -> sys::MessagePointer { return handleMultimediaAudioPause(); });
     connect(typeid(message::bluetooth::AudioStart),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleMultimediaAudioStart(); });
-    connect(typeid(AudioEventRequest), [this](sys::Message *msg) -> sys::MessagePointer {
-        auto message = static_cast<AudioEventRequest *>(msg);
-        HandleSendEvent(message->getEvent());
-        return sys::msgHandled();
-    });
 }
 
 ServiceAudio::~ServiceAudio()
@@ -454,13 +449,13 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     return std::make_unique<AudioStartRoutingResponse>(RetCode::OperationNotSet, Token::MakeBadToken());
 }
 
-sys::MessagePointer ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
+std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
     const auto eventType       = evt->getType();
     const auto deviceConnected = evt->getDeviceState() == audio::Event::DeviceState::Connected;
 
     switch (eventType) {
-    case EventType::BlutoothA2DPDeviceState: {
+    case EventType::BluetoothA2DPDeviceState: {
         LOG_DEBUG("Bluetooth A2DP connection status changed: %s", deviceConnected ? "connected" : "disconnected");
 
         if (!deviceConnected) {
@@ -474,8 +469,8 @@ sys::MessagePointer ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
         HandleStop(playbacksToBeStopped, audio::Token());
     } break;
 
-    case EventType::BlutoothHSPDeviceState:
-    case EventType::BlutoothHFPDeviceState: {
+    case EventType::BluetoothHSPDeviceState:
+    case EventType::BluetoothHFPDeviceState: {
         if (deviceConnected != bluetoothVoiceProfileConnected) {
             LOG_DEBUG("Bluetooth voice connection status changed: %s", deviceConnected ? "connected" : "disconnected");
             bluetoothVoiceProfileConnected = deviceConnected;
@@ -497,7 +492,9 @@ sys::MessagePointer ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
         input.audio->SendEvent(evt);
     }
 
-    return sys::msgHandled();
+    notifyAboutNewRoutingIfRouterAvailable();
+
+    return std::make_unique<AudioEventResponse>(RetCode::Success);
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
@@ -674,6 +671,10 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (msgType == typeid(AudioResumeRequest)) {
         auto *msg   = static_cast<AudioResumeRequest *>(msgl);
         responseMsg = HandleResume(msg->token);
+    }
+    else if (msgType == typeid(AudioEventRequest)) {
+        auto *msg   = static_cast<AudioEventRequest *>(msgl);
+        responseMsg = HandleSendEvent(msg->getEvent());
     }
     else if (msgType == typeid(AudioKeyPressedRequest)) {
         auto *msg   = static_cast<AudioKeyPressedRequest *>(msgl);
@@ -895,4 +896,15 @@ auto ServiceAudio::handleMultimediaAudioStart() -> sys::MessagePointer
                           sys::BusChannel::ServiceAudioNotifications);
     }
     return sys::msgHandled();
+}
+
+void ServiceAudio::notifyAboutNewRoutingIfRouterAvailable()
+{
+    for (auto &input : audioMux.GetAllInputs()) {
+        if (input.audio->GetCurrentOperation().GetOperationType() == audio::Operation::Type::Router) {
+            bus.sendMulticast(
+                std::make_shared<AudioRoutingNotification>(input.audio->GetCurrentOperation().GetProfile()->GetType()),
+                sys::BusChannel::ServiceAudioNotifications);
+        }
+    }
 }

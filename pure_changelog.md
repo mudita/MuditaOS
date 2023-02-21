@@ -72,7 +72,7 @@
 * Fixed (removed) redundant leading zero from time representation unless exactly midnight
 * Fixed inability to type characters other than digits in USSD replies
 * Fixed screen ghosting after emoji selection
-* Fixed incorrect loudspeaker icon in call window when headset was connected during a call
+* Fixed incorrect loudspeaker icon in call window when headset was connected or disconnected during a call
 * Fixed invalid screen displayed after missed call
 * Fixed minor issues in the Calculator Application
 * Fixed displaying usual SMS template call rejection window when no templates were defined

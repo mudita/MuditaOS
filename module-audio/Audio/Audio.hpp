@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -89,7 +89,7 @@ namespace audio
             if (audioSinkState.isConnected(EventType::JackState)) {
                 return Profile::Type::PlaybackHeadphones;
             }
-            if (audioSinkState.isConnected(EventType::BlutoothA2DPDeviceState)) {
+            if (audioSinkState.isConnected(EventType::BluetoothA2DPDeviceState)) {
                 return Profile::Type::PlaybackBluetoothA2DP;
             }
             return Profile::Type::PlaybackLoudspeaker;

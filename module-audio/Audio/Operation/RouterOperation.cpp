@@ -143,11 +143,11 @@ namespace audio
             setInputPathForHeadset(headsetHasMicrophone);
             SwitchToPriorityProfile();
         } break;
-        case EventType::BlutoothHSPDeviceState:
+        case EventType::BluetoothHSPDeviceState:
             SetProfileAvailability({Profile::Type::RoutingBluetoothHSP}, isAvailable);
             SwitchToPriorityProfile();
             break;
-        case EventType::BlutoothHFPDeviceState:
+        case EventType::BluetoothHFPDeviceState:
             SetProfileAvailability({Profile::Type::RoutingBluetoothHFP}, isAvailable);
             SwitchToPriorityProfile();
             break;

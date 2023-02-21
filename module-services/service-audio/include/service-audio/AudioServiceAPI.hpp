@@ -104,18 +104,22 @@ namespace AudioServiceAPI
      */
     bool Resume(sys::Service *serv, const audio::Token &token);
     /**
-     * @brief Sends audio event as multicast
+     * @brief Sends audio event.
      * @param serv Requesting service.
      * @param evt Event to be sent.
+     * @return True if request has been sent successfully, false otherwise
+     *   Response will come as message AudioSendEventResponse
      */
-    void SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt);
+    bool SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt);
     /**
-     * @brief Sends audio event as multicast
+     * @brief Sends audio event.
      * @param serv Requesting service.
      * @param evt Event to be sent.
      * @param state Optional parameter to request.
+     * @return True if request has been sent successfully, false otherwise
+     *   Response will come as message AudioSendEventResponse
      */
-    void SendEvent(sys::Service *serv,
+    bool SendEvent(sys::Service *serv,
                    audio::EventType evt,
                    audio::Event::DeviceState state = audio::Event::DeviceState::Connected);
 

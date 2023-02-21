@@ -4,7 +4,7 @@
 #pragma once
 
 #include <application-call/model/CallModel.hpp>
-
+#include <application-call/presenter/CallPresenter.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -67,7 +67,7 @@ namespace app
         void handleCallEvent(const std::string &number, ExternalRequest isExternalRequest) override;
         void handleAddContactEvent(const std::string &number) override;
 
-        sys::MessagePointer handleAudioMessageEvent(AudioEventRequest *message);
+        sys::MessagePointer handleRoutingNotification(AudioRoutingNotification *message);
 
         auto showNotification(std::function<bool()> action, const std::string &icon, const std::string &text) -> bool;
         enum class NotificationType
@@ -78,7 +78,8 @@ namespace app
         auto showNotificationAndRestartCallFlow(NotificationType type, const std::string &text) -> bool;
 
       private:
-        std::shared_ptr<app::call::AbstractCallModel> callModel;
+        std::shared_ptr<call::AbstractCallModel> callModel;
+        std::unique_ptr<call::CallWindowContract::Presenter> callPresenter;
 
       protected:
         ExternalRequest externalRequest = ExternalRequest::False;

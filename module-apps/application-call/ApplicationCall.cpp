@@ -6,6 +6,7 @@
 #include "CallWindow.hpp"
 #include "EmergencyCallWindow.hpp"
 #include "EnterNumberWindow.hpp"
+#include "presenter/CallPresenter.hpp"
 
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
@@ -19,6 +20,7 @@
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 #include <WindowsPopupFilter.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 
 #include <cassert>
 #include <memory>
@@ -114,7 +116,8 @@ namespace app
             return actionHandled();
         });
 
-        callModel = std::make_shared<app::call::CallModel>(this);
+        callModel     = std::make_shared<app::call::CallModel>(this);
+        callPresenter = std::make_unique<call::CallWindowContract::Presenter>(this->callModel);
     }
 
     bool ApplicationCall::conditionalReturnToPreviousView()
@@ -181,9 +184,9 @@ namespace app
             return sys::MessageNone{};
         });
 
-        connect(typeid(AudioEventRequest), [&](sys::Message *request) {
-            auto message = static_cast<AudioEventRequest *>(request);
-            return handleAudioMessageEvent(message);
+        connect(typeid(AudioRoutingNotification), [this](sys::Message *request) {
+            auto message = static_cast<AudioRoutingNotification *>(request);
+            return handleRoutingNotification(message);
         });
 
         createUserInterface();
@@ -197,8 +200,7 @@ namespace app
             return std::make_unique<gui::EnterNumberWindow>(app, static_cast<ApplicationCall *>(app));
         });
         windowsFactory.attach(app::window::name_call, [this](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::CallWindow>(
-                app, std::make_unique<app::call::CallWindowContract::Presenter>(this->callModel));
+            return std::make_unique<gui::CallWindow>(app, *callPresenter);
         });
         windowsFactory.attach(app::window::name_emergencyCall, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::EmergencyCallWindow>(app, static_cast<ApplicationCall *>(app));
@@ -281,10 +283,11 @@ namespace app
         }
     }
 
-    sys::MessagePointer ApplicationCall::handleAudioMessageEvent(AudioEventRequest *message)
+    sys::MessagePointer ApplicationCall::handleRoutingNotification(AudioRoutingNotification *message)
     {
         if (auto window = getCurrentWindow(); window->getName() == app::window::name_call) {
-            static_cast<gui::CallWindow *>(window)->handleAudioEvent(*message->getEvent().get());
+            const auto currentRouting = message->profileType;
+            callPresenter->processCurrentRouting(currentRouting);
         }
         return sys::MessageNone{};
     }

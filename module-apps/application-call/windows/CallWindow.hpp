@@ -26,8 +26,7 @@ namespace gui
         {
             return callDelayedStopTime;
         }
-
-        std::unique_ptr<app::call::CallWindowContract::Presenter> presenter;
+        app::call::CallWindowContract::Presenter &presenter;
 
       protected:
         // used to display both number and name of contact
@@ -44,11 +43,9 @@ namespace gui
 
         utils::PhoneNumber::View phoneNumber;
 
-        std::set<audio::EventType> devices_connected{};
-
       public:
-        CallWindow(app::ApplicationCommon *app,
-                   std::unique_ptr<app::call::CallWindowContract::Presenter> &&windowPresenter);
+        CallWindow(app::ApplicationCommon *app, app::call::CallWindowContract::Presenter &presenter);
+        ~CallWindow() noexcept override;
 
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -69,8 +66,8 @@ namespace gui
         void setActiveCallLayout() override;
         void setCallEndedLayout(bool delayedClose = true) override;
         void updateNumber(const UTF8 &text) override;
-        void handleAudioEvent(const audio::Event &event);
-        void changeSpeakerIconIfNeeded();
+        gui::SpeakerIconState getSpeakerIconState() override;
+        void setSpeakerIconState(const gui::SpeakerIconState &icon) override;
     };
 
 } /* namespace gui */

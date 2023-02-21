@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -524,14 +524,14 @@ SCENARIO("Profile playback priorities tests")
         WHEN("All audio devices are connected")
         {
             audio.setConnected(EventType::JackState);
-            audio.setConnected(EventType::BlutoothA2DPDeviceState);
+            audio.setConnected(EventType::BluetoothA2DPDeviceState);
             THEN("Headphones are prioritized")
             {
                 REQUIRE(audio.GetPriorityPlaybackProfile() == Profile::Type::PlaybackHeadphones);
             }
             AND_WHEN("Bluetooth is disconnected")
             {
-                audio.setDisconnected(EventType::BlutoothA2DPDeviceState);
+                audio.setDisconnected(EventType::BluetoothA2DPDeviceState);
                 THEN("Headphones are prioritized")
                 {
                     REQUIRE(audio.GetPriorityPlaybackProfile() == Profile::Type::PlaybackHeadphones);
@@ -548,7 +548,7 @@ SCENARIO("Profile playback priorities tests")
         }
         WHEN("Only bluetooth device is connected")
         {
-            audio.setConnected(EventType::BlutoothA2DPDeviceState);
+            audio.setConnected(EventType::BluetoothA2DPDeviceState);
             THEN("Bluetooth is prioritized")
             {
                 REQUIRE(audio.GetPriorityPlaybackProfile() == Profile::Type::PlaybackBluetoothA2DP);
@@ -598,7 +598,7 @@ SCENARIO("Router playback priorities tests")
         WHEN("All audio devices are connected, loudspeaker is off")
         {
             routerOperation.SendEvent(
-                std::make_shared<Event>(audio::EventType::BlutoothHSPDeviceState, Event::DeviceState::Connected));
+                std::make_shared<Event>(audio::EventType::BluetoothHSPDeviceState, Event::DeviceState::Connected));
             routerOperation.SendEvent(
                 std::make_shared<Event>(audio::EventType::JackState, Event::DeviceState::Connected));
             routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOff));
@@ -641,7 +641,7 @@ SCENARIO("Router playback priorities tests")
         WHEN("Only bluetooth HSP is connected, loudspeaker is off")
         {
             routerOperation.SendEvent(
-                std::make_shared<Event>(audio::EventType::BlutoothHSPDeviceState, Event::DeviceState::Connected));
+                std::make_shared<Event>(audio::EventType::BluetoothHSPDeviceState, Event::DeviceState::Connected));
             routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOff));
 
             THEN("Bluetooth HSP is prioritized")
