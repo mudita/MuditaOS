@@ -85,6 +85,7 @@
 * Fixed missing translation for words "show" and "replace"
 * Fixed music playback disablement after currently played audio file gets deleted
 * Fixed incorrectly displayed Swedish translations in Onboarding
+* Fixed going back to wrong window after confirming or cancelling creation of new contact from call log
 
 ## [1.5.0 2022-12-20]
 

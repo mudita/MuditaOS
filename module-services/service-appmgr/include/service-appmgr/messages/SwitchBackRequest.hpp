@@ -11,12 +11,14 @@ namespace app::manager
 {
     class SwitchBackRequest : public BaseMessage
     {
+        std::unique_ptr<gui::SwitchData> data;
+
       public:
-        SwitchBackRequest(const ApplicationName &name, std::unique_ptr<gui::SwitchData> data = nullptr);
+        SwitchBackRequest(const ApplicationName &name,
+                          std::unique_ptr<gui::SwitchData> data              = nullptr,
+                          bool dontSwitchBackWhenRequestedAppNameDoesntMatch = false);
 
         [[nodiscard]] auto getData() noexcept -> std::unique_ptr<gui::SwitchData> &;
-
-      private:
-        std::unique_ptr<gui::SwitchData> data;
+        bool dontSwitchBackWhenRequestedAppNameDoesntMatch;
     };
 } // namespace app::manager
