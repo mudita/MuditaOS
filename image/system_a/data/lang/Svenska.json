@@ -291,6 +291,7 @@
   "app_onboarding_configuration_successful": "<text> Din Mudita Pure <br> </br> är klar att använda. </text>",
   "app_onboarding_no_configuration": "<text> Din Mudita Pure har inte konfigurerats. </br> Du kan gå till <br> </br> Inställningar för att konfigurera den. </text>",
   "app_onboarding_update_info": "<text> Den nuvarande versionen av MuditaOS är <br> </br> <token> $ VERSION </token>. Uppdateringar med nya <br> </br> funktioner och korrigeringar visas ofta. <br> </br> För att uppdatera din telefon vänligen <br> </br> besök: </text> <text weight = 'bold' size = '27 '> www.mudita.com/updateos </text > <br> </br> <text> och följ instruktionerna. </text> ",
+  "app_onboarding_eula_license": "Licensavtal (EULA)",
   "app_settings_title_main": "Inställningar",
   "app_settings_advanced": "Avancerad",
   "app_settings_bt": "Bluetooth",
