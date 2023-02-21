@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,6 +24,8 @@ namespace app::call
             virtual void setActiveCallLayout()                                   = 0;
             virtual void setCallEndedLayout(bool delayedClose = true)            = 0;
             virtual void updateNumber(const UTF8 &text)                          = 0;
+            virtual gui::SpeakerIconState getSpeakerIconState()                  = 0;
+            virtual void setSpeakerIconState(const gui::SpeakerIconState &icon)  = 0;
 
             virtual ~View() noexcept = default;
         };
@@ -52,6 +54,10 @@ namespace app::call
             utils::PhoneNumber getPhoneNumber();
 
             void handleDelayedViewClose();
+
+            void processCurrentRouting(const audio::Profile::Type &routingType);
+            void attachCallbacks();
+            void clearModel();
 
           private:
             std::shared_ptr<app::call::AbstractCallModel> model;

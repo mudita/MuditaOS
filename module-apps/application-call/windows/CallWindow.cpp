@@ -26,12 +26,16 @@ namespace gui
     using namespace callAppStyle::callWindow;
     using namespace app::call;
 
-    CallWindow::CallWindow(app::ApplicationCommon *app,
-                           std::unique_ptr<app::call::CallWindowContract::Presenter> &&windowPresenter)
-        : gui::AppWindow{app, app::window::name_call}, presenter{std::move(windowPresenter)}
+    CallWindow::CallWindow(app::ApplicationCommon *app, app::call::CallWindowContract::Presenter &presenter)
+        : gui::AppWindow{app, app::window::name_call}, presenter{presenter}
     {
-        presenter->attach(this);
+        presenter.attach(this);
+        presenter.attachCallbacks();
         buildInterface();
+    }
+    CallWindow::~CallWindow() noexcept
+    {
+        presenter.clearModel();
     }
 
     void CallWindow::rebuild()
@@ -78,7 +82,7 @@ namespace gui
             microphoneIcon->setNext();
             LOG_INFO("Microphone %s", static_cast<bool>(microphoneIcon->get()) ? "activated" : "deactivated");
 
-            microphoneIcon->get() == MicrophoneIconState::MUTED ? presenter->muteCall() : presenter->unmuteCall();
+            microphoneIcon->get() == MicrophoneIconState::MUTED ? presenter.muteCall() : presenter.unmuteCall();
 
             return true;
         };
@@ -90,10 +94,10 @@ namespace gui
 
             switch (speakerIcon->get()) {
             case SpeakerIconState::SPEAKER: {
-                presenter->turnLoudspeakerOff();
+                presenter.turnLoudspeakerOff();
             } break;
             case SpeakerIconState::SPEAKERON: {
-                presenter->turnLoudspeakerOn();
+                presenter.turnLoudspeakerOn();
             } break;
             // case SpeakerIconState::BLUETOOTH: {
             //     // TODO: need implementation
@@ -109,7 +113,7 @@ namespace gui
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("Send message template and reject the call");
             constexpr auto preventAutoLock = true;
-            auto msg = std::make_unique<SMSSendTemplateRequest>(presenter->getPhoneNumber().getView(), preventAutoLock);
+            auto msg = std::make_unique<SMSSendTemplateRequest>(presenter.getPhoneNumber().getView(), preventAutoLock);
             msg->ignoreCurrentWindowOnStack = true;
             return app::manager::Controller::sendAction(application,
                                                         app::manager::actions::ShowSmsTemplates,
@@ -150,11 +154,11 @@ namespace gui
 
     void CallWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        presenter->buildLayout();
+        presenter.buildLayout();
 
         if (auto switchData = dynamic_cast<SMSTemplateSent *>(data); switchData != nullptr) {
-            presenter->hangUpCall();
-            presenter->sendSms(switchData->getText());
+            presenter.hangUpCall();
+            presenter.sendSms(switchData->getText());
             return;
         }
     }
@@ -171,19 +175,19 @@ namespace gui
             const auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
             switch (keyCode) {
             case KeyCode::KEY_LF:
-                handled = presenter->handleLeftButton();
+                handled = presenter.handleLeftButton();
                 break;
             case KeyCode::KEY_RF:
-                handled = presenter->handleRightButton();
+                handled = presenter.handleRightButton();
                 break;
             case KeyCode::HEADSET_OK:
-                handled = presenter->handleHeadsetOk();
+                handled = presenter.handleHeadsetOk();
                 break;
             default:
                 break;
             }
             if (!handled && code != 0) {
-                handled = presenter->handleDigitButton(code);
+                handled = presenter.handleDigitButton(code);
             }
         }
 
@@ -200,7 +204,7 @@ namespace gui
     {
         timerCallback = [this](Item &, sys::Timer &timer) {
             LOG_DEBUG("Delayed exit timer callback");
-            presenter->handleDelayedViewClose();
+            presenter.handleDelayedViewClose();
             application->popCurrentWindow();
             app::manager::Controller::switchBack(application);
             return true;
@@ -297,36 +301,14 @@ namespace gui
         numberLabel->setText(text);
     }
 
-    void CallWindow::handleAudioEvent(const audio::Event &event)
+    gui::SpeakerIconState CallWindow::getSpeakerIconState()
     {
-
-        switch (event.getType()) {
-        case audio::EventType::BlutoothHFPDeviceState:
-        case audio::EventType::BlutoothHSPDeviceState:
-        case audio::EventType::JackState: {
-            if (event.getDeviceState() == audio::Event::DeviceState::Connected) {
-                devices_connected.insert(event.getType());
-                changeSpeakerIconIfNeeded();
-            }
-            else {
-                devices_connected.erase(event.getType());
-                if (not devices_connected.empty()) {
-                    changeSpeakerIconIfNeeded();
-                }
-            }
-            break;
-        }
-        default: {
-            break;
-        }
-        }
+        return speakerIcon->get();
     }
 
-    void CallWindow::changeSpeakerIconIfNeeded()
+    void CallWindow::setSpeakerIconState(const gui::SpeakerIconState &icon)
     {
-        if (speakerIcon->get() == SpeakerIconState::SPEAKERON) {
-            speakerIcon->setNext();
-        }
+        speakerIcon->set(icon);
     }
 
 } /* namespace gui */

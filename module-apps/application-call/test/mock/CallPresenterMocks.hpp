@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -31,7 +31,7 @@ namespace app::call
         {
             layoutShowed = LayoutShowed::Active;
         };
-        ;
+
         void setCallEndedLayout(bool delayedClose = true) override
         {
             layoutShowed = LayoutShowed::Ended;
@@ -41,6 +41,12 @@ namespace app::call
         {
             number = text;
         };
+        gui::SpeakerIconState getSpeakerIconState() override
+        {
+            return gui::SpeakerIconState::SPEAKER;
+        }
+        void setSpeakerIconState(const gui::SpeakerIconState &icon) override
+        {}
 
         bool windowRefreshed = false;
 
@@ -85,7 +91,6 @@ namespace app::call
         {
             return callerId;
         };
-
         void hangUpCall() override
         {
             hangupCallCalled = true;

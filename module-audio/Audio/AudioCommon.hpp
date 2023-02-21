@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -103,11 +103,11 @@ namespace audio
     enum class EventType
     {
         // HW state change notifications
-        JackState,               //!< Jack input plugged / unplugged event
-        MicrophoneState,         //!< Microphone presence in headset (3-pole w/o microphone or 4-pole with microphone)
-        BlutoothHSPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
-        BlutoothHFPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
-        BlutoothA2DPDeviceState, //!< BT device connected / disconnected event (Advanced Audio Distribution Profile)
+        JackState,                //!< Jack input plugged / unplugged event
+        MicrophoneState,          //!< Microphone presence in headset (3-pole w/o microphone or 4-pole with microphone)
+        BluetoothHSPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
+        BluetoothHFPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
+        BluetoothA2DPDeviceState, //!< BT device connected / disconnected event (Advanced Audio Distribution Profile)
 
         // call control
         CallMute,
@@ -116,7 +116,7 @@ namespace audio
         CallLoudspeakerOff,
     };
 
-    constexpr auto hwStateUpdateMaxEvent = magic_enum::enum_index(EventType::BlutoothA2DPDeviceState);
+    constexpr auto hwStateUpdateMaxEvent = magic_enum::enum_index(EventType::BluetoothA2DPDeviceState);
 
     class Event
     {

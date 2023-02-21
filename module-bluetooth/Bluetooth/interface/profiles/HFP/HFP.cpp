@@ -248,13 +248,13 @@ namespace bluetooth
             status = hfp_subevent_service_level_connection_established_get_status(event);
             if (status) {
                 LOG_DEBUG("Connection failed, status 0x%02x", status);
-                sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
+                sendAudioEvent(audio::EventType::BluetoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
                 break;
             }
             aclHandle = hfp_subevent_service_level_connection_established_get_acl_handle(event);
             hfp_subevent_service_level_connection_established_get_bd_addr(event, device.address);
             LOG_DEBUG("Service level connection established to %s", bd_addr_to_str(device.address));
-            sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Connected);
+            sendAudioEvent(audio::EventType::BluetoothHFPDeviceState, audio::Event::DeviceState::Connected);
             {
                 auto &busProxy     = const_cast<sys::Service *>(ownerService)->bus;
                 device.deviceState = DeviceState::ConnectedVoice;
@@ -269,7 +269,7 @@ namespace bluetooth
         case HFP_SUBEVENT_SERVICE_LEVEL_CONNECTION_RELEASED:
             LOG_DEBUG("Service level connection released");
             aclHandle = HCI_CON_HANDLE_INVALID;
-            sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
+            sendAudioEvent(audio::EventType::BluetoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
             {
                 auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
                 busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device),

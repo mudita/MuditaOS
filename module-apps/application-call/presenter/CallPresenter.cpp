@@ -8,6 +8,9 @@ namespace app::call
 {
 
     CallWindowContract::Presenter::Presenter(std::shared_ptr<app::call::AbstractCallModel> callModel) : model(callModel)
+    {}
+
+    void CallWindowContract::Presenter::Presenter::attachCallbacks()
     {
         model->attachCallStateChangeCallback([this]() { this->handleCallStateChange(); });
         model->attachDurationChangeCallback([this]() { this->handleCallDurationChange(); });
@@ -41,38 +44,46 @@ namespace app::call
         auto callState = model->getState();
 
         switch (callState) {
-        case app::call::CallState::Incoming:
+        case app::call::CallState::Incoming: {
             view->updateDuration(utils::translate(callAppStyle::strings::iscalling));
             view->setIncomingCallLayout(model->getCallerId().empty());
             view->updateNumber(getCallerId());
             break;
-        case app::call::CallState::Outgoing:
+        }
+        case app::call::CallState::Outgoing: {
             view->updateDuration(utils::translate(callAppStyle::strings::calling));
             view->updateNumber(getCallerId());
             view->setActiveCallLayout();
             break;
-        case app::call::CallState::Active:
+        }
+        case app::call::CallState::Active: {
             view->updateDuration(utils::time::Duration(model->getTime()).str());
             view->setActiveCallLayout();
             break;
-        case app::call::CallState::Rejected:
+        }
+        case app::call::CallState::Rejected: {
             view->updateDuration(utils::translate(callAppStyle::strings::callrejected));
             view->setCallEndedLayout();
             break;
-        case app::call::CallState::Ended:
+        }
+        case app::call::CallState::Ended: {
             view->updateDuration(utils::translate(callAppStyle::strings::callended));
             view->setCallEndedLayout();
             break;
-        case app::call::CallState::Missed:
+        }
+        case app::call::CallState::Missed: {
             model->setState(CallState::None);
             break;
-        case app::call::CallState::Disconnecting:
+        }
+        case app::call::CallState::Disconnecting: {
             view->updateDuration(utils::translate(callAppStyle::strings::endingcall));
             view->setCallEndedLayout(false);
             break;
-        case app::call::CallState::None:
+        }
+        case app::call::CallState::None: {
             view->clearNavBar();
             break;
+        }
         }
     }
 
@@ -179,4 +190,19 @@ namespace app::call
     {
         model->setState(CallState::None);
     }
+
+    void CallWindowContract::Presenter::processCurrentRouting(const audio::Profile::Type &routingType)
+    {
+        if (routingType == audio::Profile::Type::RoutingLoudspeaker) {
+            getView()->setSpeakerIconState(gui::SpeakerIconState::SPEAKERON);
+        }
+        else {
+            getView()->setSpeakerIconState(gui::SpeakerIconState::SPEAKER);
+        }
+    }
+    void CallWindowContract::Presenter::clearModel()
+    {
+        model->clear();
+    }
+
 } // namespace app::call

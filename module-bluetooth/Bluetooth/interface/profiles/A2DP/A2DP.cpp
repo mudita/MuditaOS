@@ -452,7 +452,7 @@ namespace bluetooth
 
             sourceQueue = xQueueCreate(5, sizeof(AudioData_t));
             if (sourceQueue != nullptr) {
-                sendAudioEvent(audio::EventType::BlutoothA2DPDeviceState, audio::Event::DeviceState::Connected);
+                sendAudioEvent(audio::EventType::BluetoothA2DPDeviceState, audio::Event::DeviceState::Connected);
             }
             else {
                 LOG_ERROR("failed to create queue!");
@@ -528,7 +528,7 @@ namespace bluetooth
                 cid,
                 AVRCP::mediaTracker.local_seid,
                 local_seid);
-            sendAudioEvent(audio::EventType::BlutoothA2DPDeviceState, audio::Event::DeviceState::Disconnected);
+            sendAudioEvent(audio::EventType::BluetoothA2DPDeviceState, audio::Event::DeviceState::Disconnected);
             if (cid == AVRCP::mediaTracker.a2dp_cid) {
                 AVRCP::mediaTracker.stream_opened = 0;
                 LOG_INFO("A2DP Source: Stream released");

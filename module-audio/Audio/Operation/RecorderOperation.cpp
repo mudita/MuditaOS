@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RecorderOperation.hpp"
@@ -132,7 +132,7 @@ namespace audio
             SetProfileAvailability({Profile::Type::RecordingHeadphones}, isAvailable);
             SwitchToPriorityProfile();
             break;
-        case EventType::BlutoothHSPDeviceState:
+        case EventType::BluetoothHSPDeviceState:
             SetProfileAvailability({Profile::Type::RecordingBluetoothHSP}, isAvailable);
             SwitchToPriorityProfile();
             break;

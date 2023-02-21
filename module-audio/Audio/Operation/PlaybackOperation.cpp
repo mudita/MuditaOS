@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlaybackOperation.hpp"
@@ -164,7 +164,7 @@ namespace audio
             SetProfileAvailability({Profile::Type::PlaybackHeadphones}, isAvailable);
             Operation::SwitchToPriorityProfile();
             break;
-        case EventType::BlutoothA2DPDeviceState:
+        case EventType::BluetoothA2DPDeviceState:
             SetProfileAvailability({Profile::Type::PlaybackBluetoothA2DP}, isAvailable);
             Operation::SwitchToPriorityProfile();
             break;

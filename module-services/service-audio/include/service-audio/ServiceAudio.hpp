@@ -78,7 +78,7 @@ class ServiceAudio : public sys::Service
     };
 
     auto StopInput(audio::AudioMux::Input *input, StopReason stopReason = StopReason::Other) -> audio::RetCode;
-    auto HandleSendEvent(std::shared_ptr<audio::Event> evt) -> sys::MessagePointer;
+    auto HandleSendEvent(std::shared_ptr<audio::Event> evt) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(std::optional<audio::AudioMux::Input *> input) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleResume(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
@@ -127,6 +127,8 @@ class ServiceAudio : public sys::Service
     auto handleHFPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleMultimediaAudioPause() -> sys::MessagePointer;
     auto handleMultimediaAudioStart() -> sys::MessagePointer;
+
+    void notifyAboutNewRoutingIfRouterAvailable();
 };
 
 namespace sys
