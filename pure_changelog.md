@@ -19,6 +19,7 @@
 * Added SMS template call rejection window for case when no templates are defined
 * Changed unknown character glyph to the one matching the design
 * Changed tethering icon on status bar
+* Unified grey color tones used while displaying texts
 
 ### Fixed
 
@@ -86,6 +87,7 @@
 * Fixed music playback disablement after currently played audio file gets deleted
 * Fixed incorrectly displayed Swedish translations in Onboarding
 * Fixed going back to wrong window after confirming or cancelling creation of new contact from call log
+* Fixed missing "No calls yet" text in call log
 
 ## [1.5.0 2022-12-20]
 

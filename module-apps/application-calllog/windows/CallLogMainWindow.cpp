@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallLogMainWindow.hpp"
@@ -80,13 +80,13 @@ namespace gui
 
         Text *noCallsInfo = new Text(emptyLayout, 0, 0, 0, 0);
         noCallsInfo->setMinimumSize(mainWindow::w, MyStyle::infoHeight);
-        noCallsInfo->setTextType(TextType::SingleLine);
-        noCallsInfo->setEditMode(EditMode::Browse);
-        noCallsInfo->setEdges(RectangleEdge::None);
+        noCallsInfo->setMargins(gui::Margins(0, MyStyle::infoTopMargin, 0, 0));
         noCallsInfo->setFont(style::window::font::medium);
+        noCallsInfo->setEditMode(EditMode::Browse);
+        noCallsInfo->setTextType(TextType::SingleLine);
+        noCallsInfo->setEdges(RectangleEdge::None);
         noCallsInfo->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         noCallsInfo->setRichText(utils::translate("app_calllog_no_calls"));
-        noCallsInfo->setMargins(gui::Margins(0, MyStyle::infoTopMargin, 0, 0));
 
         Rect *divLine = new Rect(emptyLayout, 0, 0, style::window_width, 1);
         divLine->setBorderColor(ColorGrey);
@@ -109,7 +109,7 @@ namespace gui
         noCallsIcons->setEdges(RectangleEdge::None);
         noCallsIcons->setMinimumSize(MyStyle::descriptionSize, MyStyle::bottomBoxHeight);
         noCallsIcons->setMargins(Margins(MyStyle::descriptionLeftMargin, 0, 0, 0));
-        auto imgLambda = [&](const UTF8 imageName) {
+        const auto imgLambda = [&](const UTF8 &imageName) {
             VBox *box = new VBox(noCallsIcons);
             box->setEdges(RectangleEdge::None);
             box->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -128,7 +128,7 @@ namespace gui
         noCallsDescriptions->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         noCallsDescriptions->setEdges(RectangleEdge::None);
         noCallsDescriptions->setMinimumSize(MyStyle::descriptionTextWidth, MyStyle::bottomBoxHeight);
-        auto descLambda = [&](const UTF8 descText) {
+        const auto descLambda = [&](const UTF8 &descText) {
             VBox *box = new VBox(noCallsDescriptions);
             box->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
             box->setEdges(RectangleEdge::None);
