@@ -7,8 +7,8 @@
 * Always display network access technology and signal strength on the status bar
 * Added days of the week to the list of SMS, calls and notes
 * Added date formatting of received/sent SMS
-* Added missing translations for EULA in French and Swedish
 * Added meditation parameters to non-volatile memory
+* Added missing translations for EULA in French, Spanish and Swedish
 
 ### Changed / Improved
 
