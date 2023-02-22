@@ -84,6 +84,7 @@
 * Fixed long phone shutdown time
 * Fixed missing translation for words "show" and "replace"
 * Fixed music playback disablement after currently played audio file gets deleted
+* Fixed incorrectly displayed Swedish translations in Onboarding
 
 ## [1.5.0 2022-12-20]
 
