@@ -38,6 +38,7 @@ namespace bsp::devices::power
     {
         // Only higher byte of SOC register pair is needed here. Accuracy will be enough
         if (const auto result = read(SOC::ADDRESS_H)) {
+            i2c.Stats();
             return *result;
         }
         else {

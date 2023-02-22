@@ -59,6 +59,8 @@ namespace drivers
 
         virtual void ReInit(void) = 0;
 
+        virtual void Stats(void) = 0;
+
         virtual ssize_t Write(const I2CAddress &addr, const uint8_t *txBuff, const size_t size) = 0;
 
         virtual ssize_t Read(const I2CAddress &addr, uint8_t *rxBuff, const size_t size) = 0;

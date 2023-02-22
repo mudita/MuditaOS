@@ -165,6 +165,11 @@ namespace drivers
         }
     }
 
+    void RT1051DriverI2C::Stats(void)
+    {
+        LOG_INFO("I2C timeouts min: %ld max: %ld", getMinTimeout(), getMaxTimeout());
+    }
+
     status_t RT1051DriverI2C::BOARD_LPI2C_Send(LPI2C_Type *base,
                                                uint8_t deviceAddress,
                                                uint32_t subAddress,

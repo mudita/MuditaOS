@@ -24,6 +24,8 @@ namespace drivers
 
         void ReInit(void) override final;
 
+        void Stats(void) override final;
+
         ssize_t Write(const I2CAddress &addr, const uint8_t *txBuff, const size_t size) override final;
 
         ssize_t Read(const I2CAddress &addr, uint8_t *rxBuff, const size_t size) override final;

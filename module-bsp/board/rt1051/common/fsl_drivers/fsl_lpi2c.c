@@ -45,6 +45,37 @@
 #define FSL_COMPONENT_ID "platform.drivers.lpi2c"
 #endif
 
+uint32_t minTimeout = UINT32_MAX;
+uint32_t maxTimeout = 0;
+
+static void minMaxTimeout(uint32_t timeout) 
+{
+    const uint32_t waitTimeout = LPI2C_WAIT_TIMEOUT;
+    const uint32_t tmp = waitTimeout - timeout;
+
+    if (tmp < minTimeout) {
+        minTimeout = tmp;
+    }
+
+    if (tmp > maxTimeout) {
+        maxTimeout = tmp;
+    }
+}
+
+uint32_t getMaxTimeout() 
+{
+    const uint32_t tmp = maxTimeout;
+    maxTimeout = 0;
+    return tmp;
+}
+
+uint32_t getMinTimeout() 
+{
+    const uint32_t tmp = minTimeout;
+    minTimeout = UINT32_MAX;
+    return tmp;
+}
+
 /*! @brief Common sets of flags used by the driver. */
 enum _lpi2c_flag_constants
 {
@@ -299,11 +330,12 @@ static status_t LPI2C_MasterWaitForTxReady(LPI2C_Type *base)
         status = LPI2C_MasterGetStatusFlags(base);
         result = LPI2C_MasterCheckAndClearError(base, status);
         if (result) {
+            minMaxTimeout(waitTimes);
             return result;
         }
 #if LPI2C_WAIT_TIMEOUT
     } while ((!txCount) && (--waitTimes));
-
+    minMaxTimeout(waitTimes);
     if (waitTimes == 0) {
         return kStatus_LPI2C_Timeout;
     }
@@ -598,7 +630,7 @@ status_t LPI2C_MasterStop(LPI2C_Type *base)
             break;
         }
     }
-
+    minMaxTimeout(waitTimes);
 #if LPI2C_WAIT_TIMEOUT
     if (waitTimes == 0) {
         return kStatus_LPI2C_Timeout;
@@ -644,12 +676,14 @@ status_t LPI2C_MasterReceive(LPI2C_Type *base, void *rxBuff, size_t rxSize)
             /* Check for errors. */
             result = LPI2C_MasterCheckAndClearError(base, LPI2C_MasterGetStatusFlags(base));
             if (result) {
+                minMaxTimeout(waitTimes);
                 return result;
             }
 
             value = base->MRDR;
 #if LPI2C_WAIT_TIMEOUT
         } while ((value & LPI2C_MRDR_RXEMPTY_MASK) && (--waitTimes));
+        minMaxTimeout(waitTimes);
         if (waitTimes == 0) {
             return kStatus_LPI2C_Timeout;
         }
@@ -1303,12 +1337,14 @@ status_t LPI2C_SlaveSend(LPI2C_Type *base, const void *txBuff, size_t txSize, si
                 if (actualTxSize) {
                     *actualTxSize = txSize - remaining;
                 }
+                minMaxTimeout(waitTimes);
                 return result;
             }
 #if LPI2C_WAIT_TIMEOUT
         } while (
             (!(flags & (kLPI2C_SlaveTxReadyFlag | kLPI2C_SlaveStopDetectFlag | kLPI2C_SlaveRepeatedStartDetectFlag))) &&
             (--waitTimes));
+        minMaxTimeout(waitTimes);
         if (waitTimes == 0) {
             return kStatus_LPI2C_Timeout;
         }
@@ -1361,12 +1397,14 @@ status_t LPI2C_SlaveReceive(LPI2C_Type *base, void *rxBuff, size_t rxSize, size_
                 if (actualRxSize) {
                     *actualRxSize = rxSize - remaining;
                 }
+                minMaxTimeout(waitTimes);
                 return result;
             }
 #if LPI2C_WAIT_TIMEOUT
         } while (
             (!(flags & (kLPI2C_SlaveRxReadyFlag | kLPI2C_SlaveStopDetectFlag | kLPI2C_SlaveRepeatedStartDetectFlag))) &&
             (--waitTimes));
+        minMaxTimeout(waitTimes);
         if (waitTimes == 0) {
             return kStatus_LPI2C_Timeout;
         }

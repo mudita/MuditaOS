@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "battery_charger.hpp"
@@ -800,6 +800,7 @@ namespace bsp::battery_charger
             LOG_WARN("Raw SOC value has been truncated (read value: %d)", soc);
             soc = fullyChargedSOC;
         }
+        i2c->Stats();
         return soc;
     }
 

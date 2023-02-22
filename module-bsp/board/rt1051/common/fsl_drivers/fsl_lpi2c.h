@@ -1285,6 +1285,9 @@ extern "C"
 
     /*! @} */
 
+    uint32_t getMaxTimeout();
+    uint32_t getMinTimeout();
+
 #if defined(__cplusplus)
 }
 #endif
