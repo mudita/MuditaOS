@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,8 +20,10 @@ namespace gui
     class SMSTemplatesWindow : public AppWindow
     {
         std::shared_ptr<SMSTemplateModel> smsTemplateModel;
-        gui::ListView *list = nullptr;
-        gui::Icon *emptyListIcon = nullptr;
+        gui::ListView *list                                     = nullptr;
+        gui::Icon *emptyListIcon                                = nullptr;
+        bool ignoreWindowsOfThisAppOnSwitchBack                 = false;
+        std::optional<app::ApplicationName> appNameToSwitchBack = std::nullopt;
 
         void smsSendTemplateRequestHandler(const SMSSendTemplateRequest *const switchData);
         void smsTemplateRequestHandler(const SMSTemplateRequest *const switchData);
@@ -32,6 +34,7 @@ namespace gui
         virtual ~SMSTemplatesWindow();
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onInput(const InputEvent &inputEvent) override;
 
         void rebuild() override;
         void buildInterface() override;

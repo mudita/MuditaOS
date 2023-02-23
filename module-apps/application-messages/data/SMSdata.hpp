@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,6 +9,7 @@
 #include <ThreadRecord.hpp>
 #include <SMSRecord.hpp>
 #include <Database/Database.hpp>
+#include <ApplicationCommon.hpp>
 #include <memory>
 #include <string>
 #include <utility>
@@ -71,8 +72,10 @@ class SMSSendRequest : public SMSRequest
 class SMSSendTemplateRequest : public SMSRequest
 {
   public:
-    SMSSendTemplateRequest(const utils::PhoneNumber::View &phoneNumber, bool preventAutoLock = false)
-        : SMSRequest(phoneNumber), preventAutoLock(preventAutoLock)
+    explicit SMSSendTemplateRequest(const utils::PhoneNumber::View &phoneNumber,
+                                    bool preventAutoLock                                = false,
+                                    std::optional<app::ApplicationName> nameOfSenderApp = std::nullopt)
+        : SMSRequest(phoneNumber), preventAutoLock(preventAutoLock), nameOfSenderApp(nameOfSenderApp)
     {}
     ~SMSSendTemplateRequest() override = default;
 
@@ -81,8 +84,14 @@ class SMSSendTemplateRequest : public SMSRequest
         return preventAutoLock;
     }
 
+    [[nodiscard]] auto getNameOfSenderApp() const -> std::optional<app::ApplicationName>
+    {
+        return nameOfSenderApp;
+    }
+
   private:
     bool preventAutoLock;
+    std::optional<app::ApplicationName> nameOfSenderApp;
 };
 
 class SMSTemplateSent : public gui::SwitchData
