@@ -154,6 +154,11 @@ namespace gui
 
     void CallWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        if (!presenter.isIncomingCall() && !presenter.isCallInProgress()) {
+            app::manager::Controller::switchBack(application);
+            return;
+        }
+
         presenter.buildLayout();
 
         if (auto switchData = dynamic_cast<SMSTemplateSent *>(data); switchData != nullptr) {

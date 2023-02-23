@@ -59,11 +59,12 @@ namespace app::call
             void attachCallbacks();
             void clearModel();
 
+            bool isIncomingCall();
+            bool isCallInProgress();
+
           private:
             std::shared_ptr<app::call::AbstractCallModel> model;
             UTF8 getCallerId();
-            bool isIncomingCall();
-            bool isCallInProgress();
         };
     };
 } // namespace app::call
