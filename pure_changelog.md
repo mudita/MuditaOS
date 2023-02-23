@@ -90,6 +90,7 @@
 * Fixed missing "No calls yet" text in call log
 * Fixed phonebook is not handling database notification about contacts action done by Center
 * Fixed contact deleted via Center cannot be edited by Phonebook app and saved again
+* Fixed returning to call screen from message template
 
 ## [1.5.0 2022-12-20]
 

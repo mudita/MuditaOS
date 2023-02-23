@@ -40,7 +40,6 @@ namespace gui
         setTitle(utils::translate("app_messages_templates"));
 
         navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::use));
-        navBar->setActive(nav_bar::Side::Center, false);
         navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         namespace style = style::messages::templates::list;
@@ -116,8 +115,20 @@ namespace gui
         }
 
         if (auto switchData = dynamic_cast<SMSSendTemplateRequest *>(data); switchData != nullptr) {
+            ignoreWindowsOfThisAppOnSwitchBack = data->ignoreCurrentWindowOnStack;
+            appNameToSwitchBack                = switchData->getNameOfSenderApp();
             smsSendTemplateRequestHandler(switchData);
         }
     }
 
+    bool SMSTemplatesWindow::onInput(const InputEvent &inputEvent)
+    {
+        if (!inputEvent.isShortRelease(KeyCode::KEY_RF) || !ignoreWindowsOfThisAppOnSwitchBack ||
+            !appNameToSwitchBack.has_value()) {
+            return AppWindow::onInput(inputEvent);
+        }
+
+        return app::manager::Controller::switchBack(
+            application, std::make_unique<app::manager::SwitchBackRequest>(appNameToSwitchBack.value(), nullptr, true));
+    }
 } /* namespace gui */
