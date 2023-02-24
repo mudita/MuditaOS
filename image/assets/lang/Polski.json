@@ -661,10 +661,10 @@
   "app_bellmain_relaxation": "Relaks",
   "app_bellmain_settings": "Ustawienia",
   "app_bellmain_main_window_title": "Mudita Harmony",
-  "app_bell_onboarding_info_rotate": "<text weight='regular' size='38'>Obróć, </text><text weight='light' size='38'>aby wybrać</text>",
-  "app_bell_onboarding_info_light_click": "<text weight='regular' size='38'>Kliknij lekko, </text><text weight='light' size='38'>aby kontynuować</text>",
-  "app_bell_onboarding_info_deep_click_warning": "<text weight='light' size='38'>Głęboko </text><text weight='regular' size='38'>wciśnięty</text>",
-  "app_bell_onboarding_info_deep_click_correction": "<text weight='light' size='38'>Bądź bardziej delikatny,<br></br>spróbuj </text><text weight='regular' size='38'>tym razem<br></br></text><text weight='light' size='38'>lekko kliknąć</text>",
+  "app_bell_onboarding_info_rotate": "Obróć, aby wybrać",
+  "app_bell_onboarding_info_light_click": "Kliknij lekko, aby kontynuować",
+  "app_bell_onboarding_info_deep_click_warning": "Głęboko wciśnięty",
+  "app_bell_onboarding_info_deep_click_correction": "<text>Delikatniej, tym razem<br />spróbuj lekko kliknąć</text>",
   "app_bell_onboarding_welcome": "Witamy",
   "app_bell_onboarding_shortcuts_question": "Czy chcesz zobaczyć instrukcję Skrótów?",
   "app_bell_onboarding_shortcuts_start": "Start",
@@ -756,5 +756,5 @@
   "app_meditation_summary_average": "Średnia/dzień:",
   "app_meditation_summary_title": "<text>Ostatnie <token>$VALUE</token> dni</text>",
   "app_bell_welcome_message": "<text>Mudita Harmony<br/>jest wyłączony</text>",
-  "app_bell_welcome_charge_message": "<text>Naładuj Harmony<br/>i Kliknij lekko</text>"
+  "app_bell_welcome_charge_message": "<text>Naładuj Harmony<br/>i kliknij lekko</text>"
 }
