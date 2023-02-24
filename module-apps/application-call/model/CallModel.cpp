@@ -34,7 +34,8 @@ namespace app::call
             LOG_INFO("Dropping call state change");
         }
 
-        if (callState == CallState::Incoming && newState == CallState::Ended && callWasRejected) {
+        if (((callState == CallState::Incoming) || (callState == CallState::Disconnecting)) &&
+            (newState == CallState::Ended) && callWasRejected) {
             callWasRejected = false;
             callState       = CallState::Rejected;
         }

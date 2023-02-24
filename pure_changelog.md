@@ -91,6 +91,7 @@
 * Fixed phonebook is not handling database notification about contacts action done by Center
 * Fixed contact deleted via Center cannot be edited by Phonebook app and saved again
 * Fixed returning to call screen from message template
+* Fixed displaying wrong information on screen after rejecting call with SMS template
 
 ## [1.5.0 2022-12-20]
 
