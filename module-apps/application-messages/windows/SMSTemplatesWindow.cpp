@@ -105,10 +105,8 @@ namespace gui
             list->rebuildList();
         }
 
-        if (list->isEmpty()) {
-            navBar->setActive(nav_bar::Side::Center, false);
-            emptyListIcon->setVisible(true);
-        }
+        navBar->setActive(nav_bar::Side::Center, !list->isEmpty());
+        emptyListIcon->setVisible(list->isEmpty());
 
         if (auto switchData = dynamic_cast<SMSTemplateRequest *>(data)) {
             smsTemplateRequestHandler(switchData);
