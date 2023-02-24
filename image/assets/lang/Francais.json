@@ -618,10 +618,10 @@
   "app_bell_settings_time_units_time_fmt_top_message": "Format de l'heure",
   "app_bell_settings_time_units_time_message": "Heure",
   "app_bell_settings_temp_scale": "Échelle de température",
-  "app_bell_onboarding_info_rotate": "<text weight='regular' size='38'>Tourner </text><text weight='light' size='38'>pour sélectionner</text>",
-  "app_bell_onboarding_info_light_click": "<text weight='regular' size='38'>Cliquer doucement </text><text weight='light' size='38'>pour continuer</text>",
-  "app_bell_onboarding_info_deep_click_warning": "<text weight='light' size='38'>Vous avez </text><text weight='regular' size='38'>appuyé fort</text>",
-  "app_bell_onboarding_info_deep_click_correction": "<text weight='light' size='38'>Soyez plus doux, <br></br>essayez </text><text weight='regular' size='38'>de cliquer plus </text><text weight='light' size='38'>légèrement cette fois</text>",
+  "app_bell_onboarding_info_rotate": "Tourner pour<br />sélectionner",
+  "app_bell_onboarding_info_light_click": "Cliquer doucement pour continuer",
+  "app_bell_onboarding_info_deep_click_warning": "Vous avez appuyé fort",
+  "app_bell_onboarding_info_deep_click_correction": "<text>Soyez plus doux,<br />essayez de cliquer plus légèrement cette fois</text>",
   "app_bell_onboarding_welcome": "Bienvenu",
   "app_bell_onboarding_shortcuts_question": "Voulez-vous voir les instructions sur les raccourcis ?",
   "app_bell_onboarding_shortcuts_start": "Commencer",
@@ -707,5 +707,5 @@
   "app_meditation_summary_average": "Moyenne/jour :",
   "app_meditation_summary_title": "<text>Derniers <token>$VALUE</token> jours</text>",
   "app_bell_welcome_message": "<text>Mudita Harmony<br/>est désactivé</text>",
-  "app_bell_welcome_charge_message": "<text>Mudita Harmony<br/>est désactivé</text>"
+  "app_bell_welcome_charge_message": "<text>Rechargez Harmony<br/>et appuyez légèrement</text>"
 }
