@@ -92,6 +92,7 @@
 * Fixed contact deleted via Center cannot be edited by Phonebook app and saved again
 * Fixed returning to call screen from message template
 * Fixed displaying wrong information on screen after rejecting call with SMS template
+* Fixed lack of contact search list update when returning to list after contact edition
 
 ## [1.5.0 2022-12-20]
 
