@@ -192,8 +192,9 @@ add_directories(
 # Create and initialize product-specific databases
 add_databases_target(
         TARGET create_product_databases
-        COMMON_DIR ${CMAKE_SOURCE_DIR}/module-db/databases
-        PRODUCT_DIR ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases
+        DB_SET ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases/databases.json
+        COMMON_DIR ${CMAKE_SOURCE_DIR}/module-db/databases/migration
+        PRODUCT_DIR ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases/migration
         DEST_DIR ${SYSROOT_PATH}/system_a/db
         DEVEL ${WITH_DEVELOPMENT_FEATURES}
 )
@@ -207,8 +208,9 @@ add_scripts_target(
 # Create and initialize product-specific databases for tests
 add_databases_target(
         TARGET create_test_product_databases
-        COMMON_DIR ${CMAKE_SOURCE_DIR}/module-db/databases
-        PRODUCT_DIR ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases
+        DB_SET ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases/databases.json
+        COMMON_DIR ${CMAKE_SOURCE_DIR}/module-db/databases/migration
+        PRODUCT_DIR ${CMAKE_SOURCE_DIR}/products/${PRODUCT}/services/db/databases/migration
         DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/system_a/db
         DEVEL ${WITH_DEVELOPMENT_FEATURES}
 )
