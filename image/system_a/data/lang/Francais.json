@@ -621,7 +621,7 @@
   "app_bell_settings_time_units_time_fmt_top_message": "Format de l'heure",
   "app_bell_settings_time_units_time_message": "Heure",
   "app_bell_settings_temp_scale": "Échelle de température",
-  "app_bell_onboarding_info_rotate": "Tourner pour<br />sélectionner",
+  "app_bell_onboarding_info_rotate": "<text>Tourner pour<br />sélectionner</text>",
   "app_bell_onboarding_info_light_click": "Cliquer doucement pour continuer",
   "app_bell_onboarding_info_deep_click_warning": "Vous avez appuyé fort",
   "app_bell_onboarding_info_deep_click_correction": "<text>Soyez plus doux,<br />essayez de cliquer plus légèrement cette fois</text>",
