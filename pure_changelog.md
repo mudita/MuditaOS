@@ -12,9 +12,6 @@
 
 ### Changed / Improved
 
-* Improved dialog with network via USSD
-* Added serial number and timestamp to crashdump filename
-* Changed order of starting services, ServiceDesktop moved to the back
 * Shortened duration of phone modes pop-up from 3s to 1s
 * Changed responses in contacts and messages endpoints used to communicate with Center
 * Added SMS template call rejection window for case when no templates are defined
@@ -25,37 +22,11 @@
 ### Fixed
 
 * Fixed not marking thread as read when new message arrives in the opened thread
-* Fixed disappearing "confirm" button in PIN entering screen
-* Fixed looping on the SIM card selection screen
-* Fixed notes paste option showing for empty clipboard
-* Fixed notes window title
-* Fixed adding and deleting country code prefix to existing contact
-* Fixed French translation for SIM cards texts
-* Fixed crash on music file with invalid tags
-* Fixed backspace behavior in text edit
-* Fixed text not showing when adding/editing contact if text began with 'j' glyph
-* Fixed VoLTE switch availability after taking out SIM card
-* Fixed improper message text displaying after pasting from clipboard
-* Fixed USSD handling crash
-* Fixed calls to emergency contact when typed manually
-* Fixed message content being deleted when phone mode changed on new message window
-* Fixed wrong navigation bar state after exit from custom repeat window
-* Fixed OS crash when editing contact by adding country prefix to number
-* Fixed unwanted Mudita Center passcode prompt after long press '#' while dialing
-* Fixed inability to unblock SIM card when previously ejected during slot switching
-* Fixed French translations for Ulock Screen
-* Fixed crash when syncing with Mudita Center
-* Fixed inactive alarms after timezone change and reboot
-* Fixed no sound when Bluetooth audio device connected/disconnected during call
-* Fixed full filesystem path displayed in music player for invalid files instead of just filename
-* Fixed problem with track info not being displayed correctly
 * Fixed alarm rings on the low battery screen
-* Fixed crash when trying to play 96kHz FLAC with USB cable connected
 * Fixed the notification of unread messages are not deleted with the thread
 * Fixed several MTP issues
 * Fixed notifications of unread SMS threads on the home screen
 * Fixed false dotted notification above Calls app in case of answered call
-* Fixed broken French translation on 'Configure passcode' screen in Onboarding
 * Fixed time disappearing in SMS thread
 * Fixed scrollbar behavior in call log view
 * Fixed contacts imported from SIM not showing up in Mudita Center
@@ -80,7 +51,6 @@
 * Fixed displaying usual SMS template call rejection window when no templates were defined
 * Fixed misleading popup on SMS send when modem is rebooting
 * Fixed window redirection when clicking SMS icon
-* Fixed navigation through the ringtone preview list to automatically switch playback to the currently selected option
 * Fixed crash when pressing button after turning off the phone with USB cable connected
 * Fixed notification on the home screen shouldn't be bolded
 * Fixed long phone shutdown time
@@ -93,6 +63,48 @@
 * Fixed returning to call screen from message template
 * Fixed displaying wrong information on screen after rejecting call with SMS template
 * Fixed lack of contact search list update when returning to list after contact edition
+
+## [1.6.0 2023-02-27]
+
+### Changed / Improved
+* Changed filesystem to ext4
+* Improved update/restore/backup processes
+* Changed updater utility
+* Improved dialog with network via USSD
+* Added serial number and timestamp to crashdump filename
+* Changed order of starting services, ServiceDesktop moved to the back
+### Fixed
+* Fixed disappearing "confirm" button in PIN entering screen
+* Fixed looping on the SIM card selection screen
+* Fixed notes paste option showing for empty clipboard
+* Fixed notes window title
+* Fixed adding and deleting country code prefix to existing contact
+* Fixed French translation for SIM cards texts
+* Fixed crash on music file with invalid tags
+* Fixed backspace behavior in text edit
+* Fixed text not showing when adding/editing contact if text began with 'j' glyph
+* Fixed VoLTE switch availability after taking out SIM card
+* Fixed improper message text displaying after pasting from clipboard
+* Fixed USSD handling crash
+* Fixed calls to emergency contact when typed manually
+* Fixed message content being deleted when phone mode changed on new message window
+* Fixed wrong navigation bar state after exit from custom repeat window
+* Fixed OS crash when editing contact by adding country prefix to number
+* Fixed unwanted Mudita Center passcode prompt after long press '#' while dialing
+* Fixed inability to unblock SIM card when previously ejected during slot switching
+* Fixed French translations for Unlock Screen
+* Fixed crash when syncing with Mudita Center
+* Fixed inactive alarms after timezone change and reboot
+* Fixed no sound when Bluetooth audio device connected/disconnected during call
+* Fixed full filesystem path displayed in music player for invalid files instead of just filename
+* Fixed problem with track info not being displayed correctly
+* Fixed crash when trying to play 96kHz FLAC with USB cable connected
+* Fixed broken French translation on 'Configure passcode' screen in Onboarding
+* Fixed navigation through the ringtone preview list to automatically switch playback to the currently selected option
+
+## [1.5.1 2023-02-27]
+### Added
+* Added bootstrapped utilities to allow performing next (1.6.0) update
 
 ## [1.5.0 2022-12-20]
 
