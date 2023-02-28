@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+
 * Fixed displayed device name when connected to Windows
 * Fixed the wrong front light on back action in alarms
 * Fixed the pause deactivation by a deep press in relaxation
@@ -12,7 +13,10 @@
 
 ### Added
 
+* Added error handling for incorrect audio formats and corrupted files inside Relaxation app
+
 ### Changed
+
 * Added serial number and timestamp to crashdump filename
 
 ## [1.8.0 2022-12-14]
@@ -20,37 +24,47 @@
 ### Added
 
 #### Home Screen:
+
 * Font size increased.
 * Clock faces with dates.
 
 #### General:
+
 * Bedside lamp mode.
 
 #### UI/UX:
+
 * Improve refreshing of the display.
 
 #### Onboarding
+
 * Shortcuts instruction.
 
 #### Alarm
+
 * Front light intensity during the main alarm and pre-wake up
 
 ### Changed
 
 #### Home Screen:
+
 * Placement of battery and time format indicators.
 
 #### Relaxation:
+
 * New circular progress bar
 * Add loop mode
 
 ### Fixed
+
 * Brightness calculation for alarms
 
 #### Home Screen:
+
 * Centering of battery indicator.
 
 #### Settings:
+
 * Incorrect time format of the alarm in clock face settings.
 
 ## [1.7.0 2022-11-14]
@@ -58,52 +72,65 @@
 ### Added
 
 #### Home Screen:
+
 * Battery status icon.
 
 #### Meditation:
-* Option to see Meditation statistics from the last 7, 30, and 365 days. 
+
+* Option to see Meditation statistics from the last 7, 30, and 365 days.
 * Preview a countdown before the Meditation starts.
 * New meditation progress layout.
 * Additional start delay interval - up to 90s.
 
 #### PowerNap:
+
 * New circular progress bar
 * Ringing bell image at the end of the Power Nap
 
 #### Settings:
+
 * Option to set date.
 
 ### Fixed
 
 #### Mudita Center:
+
 * Fixed problem with errors while connecting the device to Mudita Center.
 
 #### Snooze:
+
 * Fixed the problem with the alarm light flashing during snooze time.
 
 #### Bedtime reminder:
+
 * Fixed an issue with not pausing music notifications at bedtime.
 
 #### Alarm:
+
 * Fixed problem with wrong alarm status message when setting alarm from the menu.
 * Fixed the spelling of the titles of two soundtracks in the alarms application.
 * Fixed the issue with the welcome message not being displayed when the alarm is turned off.
 
 #### Meditation:
+
 * Fixed view of diacritic signs.
 * Fixed resetting meditation settings with deep press.
 * Fixed an issue with saving meditation settings before going through the entire setup process.
 
 #### Relaxation:
+
 * Fixed the navigation of the back button during relaxation.
 
 #### General:
+
 * Fixed inconsistencies in welcome messages.
 
 #### UX/UI:
+
 * Updated screens according to design.
 
 #### Translations:
+
 * Fixed gaps in translations.
 
 ## [1.6.0 2022-06-14]
@@ -111,18 +138,23 @@
 ### Added
 
 #### Home Screen:
+
 * Possibility to choose Clock Face from 8 options (3 for 24h format, 5 for 12h format).
 
 #### Meditation:
+
 * Possibility to set a Meditation Timer start delay.
 
 #### UI/UX:
+
 * UI update (Home Screen settings).
 
 #### Translations:
+
 * Completed missing translations.
 
 ### Fixed
+
 * Fixed problem with confirmation of language change action.
 * Fixed problem with mixed translations appearing after language change.
 * Fixed missing texts.
@@ -136,6 +168,7 @@
 ## [1.5.1 2022-04-07]
 
 ### Fixed
+
 * Fixed issue with the device appearing in service mode when connected via USB.
 * Fixed problems with clock desynchronization.
 
@@ -144,15 +177,18 @@
 ### Added
 
 #### Settings:
+
 * Ability to scroll between Harmony settings.
 * The order of alarm sounds has been defined.
 
 ### Changed / Improved
+
 * The default alarm volume has been changed.
 * Updated alarm sounds.
 * The welcome screen has been updated.
 
 ### Fixed
+
 * Fixed problem with Pre wake-up light.
 * Fixed problems with turning on the device despite high battery level.
 * Fixed problems with incorrect display of battery charge status.
@@ -167,13 +203,17 @@
 ## [1.4.0 2022-02-01]
 
 ### Added
+
 #### General:
+
 * Transportation mode.
 
 #### PowerNap:
+
 * Add front light functionality to PowerNap app.
 
 ### Changed/Improved
+
 #### UI/UX:
 
 * Changed exit screen with instruction to turn on.
@@ -196,6 +236,7 @@
 * Corrected mistakes in translations.
 
 ### Fixed
+
 * Fixed errors in the translation of the incoming alarm message.
 * Fixed the operation of the alarm when using other alarm clock functions.
 * Fixed problem with the truncated relaxation screen.

@@ -2,16 +2,16 @@ add_library(application-bell-relaxation STATIC)
 add_library(bell::app-relaxation ALIAS application-bell-relaxation)
 
 target_include_directories(application-bell-relaxation
-    PRIVATE
+        PRIVATE
         $<BUILD_INTERFACE:
-            include/application-bell-relaxation
+        include/application-bell-relaxation
         >
-    PUBLIC
+        PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-)
+        )
 
 target_sources(application-bell-relaxation
-    PRIVATE
+        PRIVATE
         ApplicationBellRelaxation.cpp
         presenter/RelaxationMainWindowPresenter.cpp
         presenter/RelaxationRunningProgressPresenter.cpp
@@ -21,6 +21,7 @@ target_sources(application-bell-relaxation
         presenter/RelaxationPausedPresenter.cpp
         presenter/RelaxationEndedPresenter.cpp
         presenter/RelaxationLowBatteryPresenter.cpp
+        presenter/RelaxationErrorPresenter.cpp
         widgets/RelaxationPlayer.cpp
         windows/RelaxationMainWindow.cpp
         windows/RelaxationPausedWindow.cpp
@@ -30,6 +31,7 @@ target_sources(application-bell-relaxation
         windows/RelaxationVolumeWindow.cpp
         windows/RelaxationEndedWindow.cpp
         windows/RelaxationLowBatteryWindow.cpp
+        windows/RelaxationErrorWindow.cpp
 
         data/RelaxationCommon.hpp
         data/RelaxationStyle.hpp
@@ -45,6 +47,7 @@ target_sources(application-bell-relaxation
         presenter/RelaxationPausedPresenter.hpp
         presenter/RelaxationEndedPresenter.hpp
         presenter/RelaxationLowBatteryPresenter.hpp
+        presenter/RelaxationErrorPresenter.cpp
         windows/RelaxationMainWindow.hpp
         windows/RelaxationPausedWindow.hpp
         windows/RelaxationRunningProgressWindow.hpp
@@ -53,13 +56,14 @@ target_sources(application-bell-relaxation
         windows/RelaxationVolumeWindow.hpp
         windows/RelaxationEndedWindow.hpp
         windows/RelaxationLowBatteryWindow.hpp
+        windows/RelaxationErrorWindow.hpp
 
-    PUBLIC
+        PUBLIC
         include/application-bell-relaxation/ApplicationBellRelaxation.hpp
-)
+        )
 
 target_link_libraries(application-bell-relaxation
-    PRIVATE
+        PRIVATE
         apps-common
         bell::app-main
         bell::audio
@@ -67,7 +71,7 @@ target_link_libraries(application-bell-relaxation
         bell::paths
         Microsoft.GSL::GSL
 
-    PUBLIC
+        PUBLIC
         module-gui
         bell::app-common
-)
+        )

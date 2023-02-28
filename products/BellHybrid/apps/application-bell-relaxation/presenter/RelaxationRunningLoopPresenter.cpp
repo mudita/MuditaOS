@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationRunningLoopPresenter.hpp"
@@ -36,12 +36,25 @@ namespace app::relaxation
             mode = AbstractRelaxationPlayer::PlaybackMode::Looped;
         }
         else {
-            timer->reset(std::chrono::seconds{song.audioProperties.songLength});
-            mode = AbstractRelaxationPlayer::PlaybackMode::SingleShot;
+            const auto songLength = std::chrono::seconds{song.audioProperties.songLength};
+            mode                  = AbstractRelaxationPlayer::PlaybackMode::SingleShot;
+
+            if (songLength > std::chrono::seconds::zero()) {
+                timer->reset(songLength);
+            }
+            else {
+                getView()->handleError();
+                return;
+            }
         }
+
         auto onStartCallback = [this](audio::RetCode retCode) {
             if (retCode == audio::RetCode::Success) {
                 timer->start();
+            }
+            else {
+                getView()->handleError();
+                return;
             }
         };
         player.start(song.fileInfo.path, mode, std::move(onStartCallback));
