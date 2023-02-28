@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellRelaxation.hpp"
@@ -10,6 +10,7 @@
 #include "presenter/RelaxationPausedPresenter.hpp"
 #include "presenter/RelaxationEndedPresenter.hpp"
 #include "presenter/RelaxationLowBatteryPresenter.hpp"
+#include "presenter/RelaxationErrorPresenter.hpp"
 #include "windows/RelaxationMainWindow.hpp"
 #include "windows/RelaxationPausedWindow.hpp"
 #include "windows/RelaxationRunningProgressWindow.hpp"
@@ -18,6 +19,7 @@
 #include "windows/RelaxationVolumeWindow.hpp"
 #include "windows/RelaxationEndedWindow.hpp"
 #include "windows/RelaxationLowBatteryWindow.hpp"
+#include "windows/RelaxationErrorWindow.hpp"
 #include "widgets/RelaxationPlayer.hpp"
 #include <Paths.hpp>
 #include <apps-common/messages/AppMessage.hpp>
@@ -113,6 +115,11 @@ namespace app
                                   auto presenter = std::make_unique<relaxation::RelaxationLowBatteryPresenter>(app);
                                   return std::make_unique<gui::RelaxationLowBatteryWindow>(app, std::move(presenter));
                               });
+
+        windowsFactory.attach(gui::window::name::relaxationError, [](ApplicationCommon *app, const std::string &name) {
+            auto presenter = std::make_unique<relaxation::RelaxationErrorPresenter>(app);
+            return std::make_unique<gui::RelaxationErrorWindow>(app, std::move(presenter));
+        });
 
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,

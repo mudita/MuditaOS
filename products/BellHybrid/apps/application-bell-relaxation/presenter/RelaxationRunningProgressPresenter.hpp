@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -39,6 +39,7 @@ namespace app::relaxation
             virtual void resume()                                           = 0;
             virtual void setTime(std::time_t newTime)                       = 0;
             virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
+            virtual void handleError()                                      = 0;
         };
 
         class Presenter : public BasePresenter<RelaxationRunningProgressContract::View>
