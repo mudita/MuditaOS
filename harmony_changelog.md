@@ -3,13 +3,27 @@
 ## Unreleased
 
 ### Fixed
-* Fixed displayed device name when connected to Windows
-* Fixed the wrong front light on back action in alarms
-* Fixed the pause deactivation by a deep press in relaxation
 
 ### Added
 
 ### Changed
+
+## [1.9.0 2023-03-20]
+
+### Fixed
+
+#### Relaxation:
+* Fixed a problem with the pause function not working correctly during relaxation.
+
+#### Pre-wake up:
+* Fixed problems with the intensity of the frontlight - the brightness of the backlight differs from that indicated digitally.
+
+#### General:
+* Fixed displayed device name when connected to Windows
+
+### Added
+
+#### General:
 * Added serial number and timestamp to crashdump filename
 
 ## [1.8.1 2023-03-06]
