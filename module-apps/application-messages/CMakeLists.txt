@@ -87,3 +87,5 @@ option(MESSAGE_TEXT_SEARCH "Enable message text search functionality" OFF)
 if(${MESSAGE_TEXT_SEARCH})
     target_compile_definitions(application-messages PRIVATE MESSAGE_TEXT_SEARCH=1)
 endif()
+
+set_source_files_properties(windows/SMSThreadViewWindow.cpp PROPERTIES COMPILE_OPTIONS "-O0;-fno-omit-frame-pointer;-ggdb3")
