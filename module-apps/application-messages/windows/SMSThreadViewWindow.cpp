@@ -31,6 +31,17 @@ namespace gui
         navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::options));
         navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
+        // TODO: make these values relative to the screen dimensions
+        smsArrivedBubble = new TextBubble(this, 140, 480, 230, 38);
+        // TODO: provide i18n
+        // TODO: introduce the down arrow
+        smsArrivedBubble->setRichText("<text align='center' size='35' weight='bold' color='15'>New messages</text>");
+        // TODO: still not rounded
+        smsArrivedBubble->setEditMode(EditMode::Print);
+        smsArrivedBubble->setFillColor(ColorFullBlack);
+        smsArrivedBubble->setAlignment(Alignment::Vertical::Center);
+        smsArrivedBubble->activeItem = false;
+
         smsList = new gui::ListView(this,
                                     style::messages::smsList::x,
                                     style::messages::smsList::y,
@@ -45,7 +56,7 @@ namespace gui
 
     void SMSThreadViewWindow::rebuild()
     {
-        smsList->rebuildList();
+        smsList->rebuildList(listview::RebuildType::OnPageElement);
     }
 
     void SMSThreadViewWindow::buildInterface()

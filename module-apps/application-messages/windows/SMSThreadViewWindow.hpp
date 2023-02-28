@@ -7,6 +7,7 @@
 
 #include <AppWindow.hpp>
 #include <ListView.hpp>
+#include <TextBubble.hpp>
 #include <PhoneNumber.hpp>
 
 #include <functional>
@@ -19,6 +20,7 @@ namespace gui
       private:
         std::shared_ptr<SMSThreadModel> smsModel;
         gui::ListView *smsList = nullptr;
+        gui::TextBubble *smsArrivedBubble = nullptr;
 
         auto requestContact(unsigned int numberID) -> void;
         auto handleContactQueryResponse(db::QueryResult *) -> bool;
