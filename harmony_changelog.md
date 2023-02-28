@@ -8,6 +8,20 @@
 
 ### Fixed
 
+## [1.8.1 2023-03-07]
+
+### Added
+
+#### UI/UX:
+* Added notification that the device needs to be charged before first use.
+
+### Fixed
+
+#### General:
+* Fixed an issue where Harmony could not be switched off when the battery was low.
+* Fixed a problem with Harmony's power management, causing the alarm clock to discharge in several hours.
+* Fixed a problem with Harmony permanently freezing.
+
 ## [1.8.0 2022-12-14]
 
 ### Added
