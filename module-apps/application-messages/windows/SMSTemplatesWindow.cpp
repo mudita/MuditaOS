@@ -16,8 +16,8 @@
 
 namespace gui
 {
-    SMSTemplatesWindow::SMSTemplatesWindow(app::ApplicationCommon *app)
-        : AppWindow(app, name::window::sms_templates), smsTemplateModel{std::make_shared<SMSTemplateModel>(app)}
+    SMSTemplatesWindow::SMSTemplatesWindow(app::ApplicationCommon *app, const std::string &windowName)
+        : AppWindow(app, windowName), smsTemplateModel{std::make_shared<SMSTemplateModel>(app)}
     {
         buildInterface();
     }

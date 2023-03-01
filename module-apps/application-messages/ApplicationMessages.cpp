@@ -13,13 +13,8 @@
 #include "ThreadWindowOptions.hpp"
 
 #include <Dialog.hpp>
-#include <DialogMetadata.hpp>
 #include <DialogMetadataMessage.hpp>
-#include <i18n/i18n.hpp>
-#include <memory>
 #include <messages/OptionsWindow.hpp>
-#include <MessageType.hpp>
-#include <module-db/queries/messages/sms/QuerySMSAdd.hpp>
 #include <module-db/queries/messages/sms/QuerySMSRemove.hpp>
 #include <module-db/queries/messages/sms/QuerySMSUpdate.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByID.hpp>
@@ -27,16 +22,9 @@
 #include <module-db/queries/messages/threads/QueryThreadRemove.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByNumberID.hpp>
 #include <module-db/queries/notifications/QueryNotificationsDecrement.hpp>
-#include <OptionsWindow.hpp>
-#include <OptionWindow.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
-#include <service-db/DBServiceAPI.hpp>
-#include <service-db/QueryMessage.hpp>
-
-#include <cassert>
-#include <ctime>
-#include <utility>
+#include <service-appmgr/Controller.hpp>
 
 namespace app
 {
@@ -53,7 +41,7 @@ namespace app
         addActionReceiver(manager::actions::CreateSms,
                           [this](auto &&data) { return handleCreateSmsAction(std::move(data)); });
         addActionReceiver(manager::actions::ShowSmsTemplates, [this](auto &&data) {
-            switchWindow(gui::name::window::sms_templates, std::move(data));
+            switchWindow(gui::name::window::call_sms_templates, std::move(data));
             return actionHandled();
         });
         addActionReceiver(manager::actions::SmsRejectNoSim, [this](auto &&data) {
@@ -74,6 +62,13 @@ namespace app
             showNotification(action, notification);
 
             return actionHandled();
+        });
+
+        connect(typeid(cellular::CallMissedNotification), [&](sys::Message *request) {
+            if (getCurrentWindow()->getName() == gui::name::window::call_sms_templates) {
+                app::manager::Controller::switchBack(this);
+            }
+            return sys::MessageNone{};
         });
     }
 
@@ -148,6 +143,10 @@ namespace app
         windowsFactory.attach(gui::name::window::sms_templates, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SMSTemplatesWindow>(app);
         });
+        windowsFactory.attach(gui::name::window::call_sms_templates,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::SMSTemplatesWindow>(app);
+                              });
         windowsFactory.attach(gui::name::window::search_results, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SearchResults>(app);
         });
