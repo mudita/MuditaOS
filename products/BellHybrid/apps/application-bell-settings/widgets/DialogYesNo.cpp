@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DialogYesNo.hpp"
@@ -15,7 +15,7 @@ using namespace gui;
 BellDialogYesNo::BellDialogYesNo(app::ApplicationCommon *app, const std::string &name)
     : BellShortOptionWindow(app, name)
 {
-    optionsList->setBoundaries(Boundaries::Continuous);
+    optionsList->setBoundaries(Boundaries::Fixed);
 
     statusBar->setVisible(false);
     header->setTitleVisibility(true);

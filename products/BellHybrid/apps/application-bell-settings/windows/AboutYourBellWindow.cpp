@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AboutYourBellWindow.hpp"
@@ -9,6 +9,11 @@
 
 namespace gui
 {
+    namespace
+    {
+        static constexpr auto top_margin = 41U;
+    }
+
     AboutYourBellWindow::AboutYourBellWindow(
         app::ApplicationCommon *app,
         std::shared_ptr<app::bell_settings::AboutYourBellWindowContract::Presenter> technicalPresenter)
@@ -29,8 +34,8 @@ namespace gui
         list = new ListView(this,
                             style::window::default_left_margin,
                             top_margin,
-                            width,
-                            height,
+                            style::window::default_body_width,
+                            style::window::default_body_height,
                             presenter->getPagesProvider(),
                             listview::ScrollBarType::Fixed);
         list->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
