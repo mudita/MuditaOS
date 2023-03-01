@@ -7,6 +7,8 @@
 * Fixed the wrong front light on back action in alarms
 * Fixed the pause deactivation by a deep press in relaxation
 * Fixed canceling of alarm editing after 10s of inactivity
+* Fixed yes/no behavior in factory reset window
+* Fixed missing software version in French language
 
 ### Added
 
