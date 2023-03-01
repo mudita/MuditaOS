@@ -1,12 +1,15 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <string>
+#include <optional>
+#include <log/log.hpp>
 
 namespace gui
 {
+    using NameOfApplication = std::optional<std::string>;
 
     /// base class storing information sent along with switch message
     /// for extended use with windows please inherit from this class to extend it
@@ -45,6 +48,9 @@ namespace gui
         /// requesting getting back in WinC will result in:
         /// `WinC => WinA`
         bool ignoreCurrentWindowOnStack = false;
+        /// This can store name of Application when message came from
+        /// This is helpful when going back to the previous Application (sender Application)
+        NameOfApplication nameOfSenderApplication = std::nullopt;
     };
 
     class SwitchSpecialChar : public SwitchData
@@ -60,6 +66,28 @@ namespace gui
             : SwitchData(description), requester(requester), type(type)
         {}
         virtual ~SwitchSpecialChar() = default;
+    };
+
+    /// class storing information for Window type class to switch bask to proper Application
+    struct InfoAboutPreviousAppWhereWeComeFrom
+    {
+        NameOfApplication nameOfPreviousApplication = std::nullopt;
+        bool ignoreCurrentApplicationOnSwitchBack   = false;
+
+        // save info about Application where we come from and if we should switch back to this Application
+        void saveInfoAboutPreviousAppForProperSwitchBack(const SwitchData *memo)
+        {
+            if (memo == nullptr) {
+                LOG_ERROR("Empty pointer to SwitchData");
+                return;
+            }
+            nameOfPreviousApplication            = memo->nameOfSenderApplication;
+            ignoreCurrentApplicationOnSwitchBack = memo->ignoreCurrentWindowOnStack;
+        }
+        bool shouldCurrentAppBeIgnoredOnSwitchBack()
+        {
+            return ignoreCurrentApplicationOnSwitchBack && nameOfPreviousApplication.has_value();
+        }
     };
 
 } /* namespace gui */

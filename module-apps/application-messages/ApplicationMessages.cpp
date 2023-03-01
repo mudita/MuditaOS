@@ -452,6 +452,7 @@ namespace app
                 else {
                     auto switchData = std::make_unique<SMSThreadData>(std::make_unique<ThreadRecord>(thread));
                     switchData->ignoreCurrentWindowOnStack = true;
+                    switchData->nameOfSenderApplication    = capturedData->nameOfSenderApplication;
                     switchWindow(gui::name::window::thread_view, std::move(switchData));
                 }
 

@@ -5,6 +5,7 @@
 #include "MessagesStyle.hpp"
 #include "SMSdata.hpp"
 #include "SMSThreadViewWindow.hpp"
+#include "service-appmgr/Controller.hpp"
 
 #include <log/log.hpp>
 #include <module-db/queries/notifications/QueryNotificationsDecrement.hpp>
@@ -65,6 +66,7 @@ namespace gui
     {
         if (auto pdata = dynamic_cast<SMSThreadData *>(data); pdata) {
             LOG_INFO("Thread data received: %" PRIu32, pdata->thread->ID);
+            saveInfoAboutPreviousAppForProperSwitchBack(data);
             requestContact(pdata->thread->numberID);
 
             // Mark thread as Read
@@ -102,6 +104,11 @@ namespace gui
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             onClose(CloseReason::WindowSwitch);
+            if (shouldCurrentAppBeIgnoredOnSwitchBack()) {
+                return app::manager::Controller::switchBack(application,
+                                                            std::make_unique<app::manager::SwitchBackRequest>(
+                                                                nameOfPreviousApplication.value(), nullptr, true));
+            }
         }
         return AppWindow::onInput(inputEvent);
     }

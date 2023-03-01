@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ActiveIconFactory.hpp"
@@ -45,6 +45,7 @@ auto ActiveIconFactory::makeSMSIcon(const utils::PhoneNumber::View &number) -> I
         [application = app, number](gui::Item &item) {
             auto data                        = std::make_unique<SMSSendRequest>(number, std::string{});
             data->ignoreCurrentWindowOnStack = true;
+            data->nameOfSenderApplication    = application->GetName();
             return app::manager::Controller::sendAction(application,
                                                         app::manager::actions::CreateSms,
                                                         std::move(data),

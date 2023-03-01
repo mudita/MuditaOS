@@ -59,7 +59,13 @@ namespace gui
 
     bool NewMessageWindow::onInput(const InputEvent &inputEvent)
     {
-        return AppWindow::onInput(inputEvent);
+        if (!inputEvent.isShortRelease(KeyCode::KEY_RF) || !shouldCurrentAppBeIgnoredOnSwitchBack()) {
+            return AppWindow::onInput(inputEvent);
+        }
+
+        return app::manager::Controller::switchBack(
+            application,
+            std::make_unique<app::manager::SwitchBackRequest>(nameOfPreviousApplication.value(), nullptr, true));
     }
 
     void NewMessageWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -71,6 +77,7 @@ namespace gui
 
         if (auto searchRequest = dynamic_cast<PhonebookSearchRequest *>(data); searchRequest != nullptr) {
             LOG_INFO("Received search results");
+            saveInfoAboutPreviousAppForProperSwitchBack(data);
             contact        = searchRequest->result;
             selectedNumber = searchRequest->selectedNumber;
             recipient->setText(contact->getFormattedName());
@@ -88,6 +95,7 @@ namespace gui
         }
         else if (auto sendRequest = dynamic_cast<SMSSendRequest *>(data); sendRequest != nullptr) {
             LOG_INFO("Received sms send request");
+            saveInfoAboutPreviousAppForProperSwitchBack(data);
             phoneNumber = sendRequest->getPhoneNumber();
             contact     = DBServiceAPI::MatchContactByPhoneNumber(application, phoneNumber);
             if (!contact || contact->isTemporary()) {
@@ -158,6 +166,7 @@ namespace gui
             const auto &thread = result->getThread();
             auto switchData    = std::make_unique<SMSThreadData>(std::make_unique<ThreadRecord>(thread));
             switchData->ignoreCurrentWindowOnStack = true;
+            switchData->nameOfSenderApplication    = nameOfPreviousApplication;
             application->switchWindow(gui::name::window::thread_view, std::move(switchData));
             return true;
         });
