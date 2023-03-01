@@ -14,13 +14,11 @@
 
 namespace gui
 {
-    class SMSTemplatesWindow : public AppWindow
+    class SMSTemplatesWindow : public AppWindow, public InfoAboutPreviousAppWhereWeComeFrom
     {
         std::shared_ptr<SMSTemplateModel> smsTemplateModel;
-        gui::ListView *list                                     = nullptr;
-        gui::Icon *emptyListIcon                                = nullptr;
-        bool ignoreWindowsOfThisAppOnSwitchBack                 = false;
-        std::optional<app::ApplicationName> appNameToSwitchBack = std::nullopt;
+        gui::ListView *list      = nullptr;
+        gui::Icon *emptyListIcon = nullptr;
 
         void smsSendTemplateRequestHandler(const SMSSendTemplateRequest *const switchData);
         void smsTemplateRequestHandler(const SMSTemplateRequest *const switchData);

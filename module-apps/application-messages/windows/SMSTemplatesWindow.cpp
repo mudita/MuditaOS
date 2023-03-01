@@ -113,20 +113,19 @@ namespace gui
         }
 
         if (auto switchData = dynamic_cast<SMSSendTemplateRequest *>(data); switchData != nullptr) {
-            ignoreWindowsOfThisAppOnSwitchBack = data->ignoreCurrentWindowOnStack;
-            appNameToSwitchBack                = switchData->getNameOfSenderApp();
+            saveInfoAboutPreviousAppForProperSwitchBack(data);
             smsSendTemplateRequestHandler(switchData);
         }
     }
 
     bool SMSTemplatesWindow::onInput(const InputEvent &inputEvent)
     {
-        if (!inputEvent.isShortRelease(KeyCode::KEY_RF) || !ignoreWindowsOfThisAppOnSwitchBack ||
-            !appNameToSwitchBack.has_value()) {
+        if (!inputEvent.isShortRelease(KeyCode::KEY_RF) || !shouldCurrentAppBeIgnoredOnSwitchBack()) {
             return AppWindow::onInput(inputEvent);
         }
 
         return app::manager::Controller::switchBack(
-            application, std::make_unique<app::manager::SwitchBackRequest>(appNameToSwitchBack.value(), nullptr, true));
+            application,
+            std::make_unique<app::manager::SwitchBackRequest>(nameOfPreviousApplication.value(), nullptr, true));
     }
 } /* namespace gui */
