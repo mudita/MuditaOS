@@ -7,13 +7,10 @@
 #include "SMSTemplateModel.hpp"
 
 #include <AppWindow.hpp>
+#include <Constants.hpp>
 
 #include <Icon.hpp>
-#include <gui/widgets/text/Label.hpp>
 #include <gui/widgets/ListView.hpp>
-
-#include <functional>
-#include <string>
 
 namespace gui
 {
@@ -30,7 +27,8 @@ namespace gui
 
       public:
         SMSTemplatesWindow() = delete;
-        SMSTemplatesWindow(app::ApplicationCommon *app);
+        explicit SMSTemplatesWindow(app::ApplicationCommon *app,
+                                    const std::string &windowName = name::window::sms_templates);
         virtual ~SMSTemplatesWindow();
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

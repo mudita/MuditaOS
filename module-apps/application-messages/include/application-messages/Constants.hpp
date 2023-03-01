@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,7 @@ namespace gui::name::window
     inline constexpr auto thread_options    = "ThreadOptions";
     inline constexpr auto sms_options       = "SMSOptions";
     inline constexpr auto sms_templates     = "SMSTemplates";
+    inline constexpr auto call_sms_templates = "CallSMSTemplates";
     inline constexpr auto thread_view       = "ThreadViewWindow";
 
 } // namespace gui::name::window

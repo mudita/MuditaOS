@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -8,6 +8,7 @@
 #include <ListView.hpp>
 #include <module-db/queries/messages/templates/QuerySMSTemplateGetForList.hpp>
 #include <service-db/DBServiceAPI.hpp>
+#include <AppWindow.hpp>
 
 SMSTemplateModel::SMSTemplateModel(app::ApplicationCommon *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {}
@@ -77,6 +78,8 @@ auto SMSTemplateModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     }
 
     // refreshWindow(...) does too few in this case
-    application->switchWindow(gui::name::window::sms_templates);
+    const auto currentWindow = application->getCurrentWindow();
+    application->switchWindow(currentWindow->getName());
+
     return false;
 }
