@@ -7,6 +7,7 @@
 
 #include <string>
 #include <application-phonebook/models/SearchRequestModel.hpp>
+#include <application-phonebook/models/PhonebookModel.hpp>
 
 namespace gui::window::name
 {
@@ -33,6 +34,7 @@ namespace app
     class ApplicationPhonebook : public app::Application
     {
         std::shared_ptr<SearchRequestModel> searchRequestModel;
+        std::shared_ptr<PhonebookModel> phonebookModel;
 
       public:
         explicit ApplicationPhonebook(std::string name                    = name_phonebook,
@@ -53,7 +55,6 @@ namespace app
         void destroyUserInterface() override;
 
         void onSearchRequest(const std::string &searchFilter);
-        bool searchEmpty(const std::string &query);
     };
 
     template <>

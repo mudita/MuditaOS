@@ -16,9 +16,11 @@
 
 namespace gui
 {
-    PhonebookMainWindow::PhonebookMainWindow(app::ApplicationCommon *app, std::shared_ptr<SearchRequestModel> model)
+    PhonebookMainWindow::PhonebookMainWindow(app::ApplicationCommon *app,
+                                             std::shared_ptr<SearchRequestModel> model,
+                                             std::shared_ptr<PhonebookModel> phonebookModel)
         : AppWindow(app, gui::name::window::main_window),
-          model(std::move(model)), phonebookModel{std::make_shared<PhonebookModel>(this->application)}
+          model(std::move(model)), phonebookModel{std::move(phonebookModel)}
     {
         buildInterface();
     }
@@ -91,7 +93,6 @@ namespace gui
         model->setRequested(contactRequest != nullptr);
         if (model->requestedSearch()) {
             enableNewContact = false;
-            phonebookModel->activateContactSelectCallback();
 
             navBar->setActive(nav_bar::Side::Left, false);
             navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::add));

@@ -36,7 +36,9 @@ namespace gui
         void onListFilled();
 
       public:
-        PhonebookMainWindow(app::ApplicationCommon *app, std::shared_ptr<SearchRequestModel> model);
+        PhonebookMainWindow(app::ApplicationCommon *app,
+                            std::shared_ptr<SearchRequestModel> model,
+                            std::shared_ptr<PhonebookModel> phonebookModel);
         virtual ~PhonebookMainWindow();
 
         // virtual methods

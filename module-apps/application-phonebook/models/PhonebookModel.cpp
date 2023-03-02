@@ -22,12 +22,7 @@
 
 const static std::uint32_t phonebookModelTimeout = 1000;
 
-PhonebookModel::PhonebookModel(app::ApplicationCommon *app,
-                               std::string filter,
-                               std::uint32_t groupFilter,
-                               std::uint32_t displayMode)
-    : DatabaseModel(app), app::AsyncCallbackReceiver{app}, queryFilter(std::move(filter)),
-      queryGroupFilter(std::move(groupFilter)), queryDisplayMode(std::move(displayMode))
+PhonebookModel::PhonebookModel(app::ApplicationCommon *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {}
 
 auto PhonebookModel::requestRecordsCount() -> unsigned int
@@ -60,7 +55,7 @@ auto PhonebookModel::requestRecordsCount() -> unsigned int
     return recordsCount;
 }
 
-void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
+void PhonebookModel::requestRecords(const std::uint32_t offset, const std::uint32_t limit)
 {
     auto query =
         std::make_unique<db::query::ContactGet>(limit, offset, queryFilter, queryGroupFilter, queryDisplayMode);
@@ -109,7 +104,7 @@ auto PhonebookModel::getMinimalItemSpaceRequired() const -> unsigned int
 auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
 {
 
-    std::shared_ptr<ContactRecord> contact = getRecord(order);
+    const auto contact = getRecord(order);
 
     if (contact == nullptr) {
         return nullptr;
@@ -120,20 +115,15 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
     item->setContact(contact);
     item->setLabelMarkerDisplayMode(getLabelMarkerDisplayMode(contact->contactPosOnList));
     item->activatedCallback = [this, item, contact](gui::Item &) {
-        if (contactSelectCallback && contactSelectCallback(item)) {
-            return true;
+        if (customContactActivationCallback) {
+            return customContactActivationCallback(item);
         }
 
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-
-        application->switchWindow(gui::window::name::contact, std::move(data));
+        application->switchWindow(gui::window::name::contact, std::make_unique<PhonebookItemData>(contact));
         return true;
     };
 
     item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
-        if (contactSelectCallback) {
-            return false;
-        }
         if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
             if (item->contact && !item->contact->numbers.empty()) {
                 const auto phoneNumber = item->contact->numbers.front().number;
@@ -184,23 +174,9 @@ auto PhonebookModel::getLabelMarkerDisplayMode(uint32_t posOnList) -> LabelMarke
     }
 }
 
-void PhonebookModel::activateContactSelectCallback()
+void PhonebookModel::setFilter(std::string filter, const std::uint32_t groupFilter, const std::uint32_t displayMode)
 {
-    contactSelectCallback = [=](gui::PhonebookItem *item) {
-        if (item->contact->numbers.size() > 1) {
-            std::unique_ptr<PhonebookMultipleNumbersRequest> data =
-                std::make_unique<PhonebookMultipleNumbersRequest>("PhonebookMultipleNumbersRequest", item->contact);
-
-            application->switchWindow(gui::window::name::multiple_numbers_select, std::move(data));
-            return true;
-        }
-        else {
-            std::unique_ptr<PhonebookSearchRequest> data = std::make_unique<PhonebookSearchRequest>();
-            data->result                                 = item->contact;
-            data->setDescription("PhonebookSearchRequest");
-            return app::manager::Controller::switchBack(
-                application,
-                std::make_unique<app::manager::SwitchBackRequest>(application->GetName(), std::move(data)));
-        }
-    };
+    queryFilter      = std::move(filter);
+    queryGroupFilter = groupFilter;
+    queryDisplayMode = displayMode;
 }

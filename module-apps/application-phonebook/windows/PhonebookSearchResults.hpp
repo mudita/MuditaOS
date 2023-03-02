@@ -7,6 +7,7 @@
 #include "application-phonebook/models/PhonebookModel.hpp"
 #include "application-phonebook/widgets/PhonebookListView.hpp"
 #include <AppWindow.hpp>
+#include <Icon.hpp>
 
 namespace gui
 {
@@ -22,9 +23,11 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto handleSwitchData(SwitchData *data) -> bool override;
         void rebuild() override;
+        void handleContentUpdate();
 
         std::shared_ptr<PhonebookModel> searchResultsModel;
         PhonebookListView *searchResultList = nullptr;
+        Icon *icon                          = nullptr;
     };
 
 } /* namespace gui */

@@ -67,6 +67,7 @@
 * Fixed lack of contact search list update when returning to list after contact edition
 * Fixed wrong USSD flow when user closed USSD popup with back button
 * Fixed broken abbreviating of multiline text messages content in deletion window
+* Fixed misleading labels in the Phonebook application when using search engine
 
 ## [1.6.0 2023-02-27]
 
