@@ -21,6 +21,8 @@ set(SOURCES
     src/volte/VolteAllowedUSList.cpp
     src/volte/VolteCapabilityHandlerCellular.cpp
 
+    src/ussd/USSDHandler.cpp
+
     DTMFCode.cpp
 
     CellularServiceAPI.cpp

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -96,7 +96,8 @@ class ServiceCellular : public sys::Service
     bool getIMSI(std::string &destination, bool fullNumber = false);
     std::vector<std::string> getNetworkInfo();
 
-    auto areCallsFromFavouritesEnabled() -> bool;
+    void externalUSSDRequestHandled();
+    bool handleUSSDURC();
 
   private:
     at::ATURCStream atURCStream;
@@ -135,8 +136,6 @@ class ServiceCellular : public sys::Service
 
     std::unique_ptr<call::Call> ongoingCall;
     std::vector<CalllogRecord> tetheringCalllog;
-
-    ussd::State ussdState = ussd::State::none;
 
     cellular::service::URCCounter csqCounter;
 
@@ -214,14 +213,7 @@ class ServiceCellular : public sys::Service
     // db response handlers
     auto handle(db::query::SMSSearchByTypeResult *response) -> bool;
 
-    // ussd handlers
-    uint32_t ussdTimeout = 0;
-    void setUSSDTimer();
-    bool handleUSSDRequest(cellular::USSDMessage::RequestType requestType, const std::string &request = "");
     bool handleIMEIRequest();
-
-    bool handleUSSDURC();
-    void handleUSSDTimer();
 
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         cellular::StartOperatorsScanMessage *msg);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/CellularRequestHandler.hpp"
@@ -21,6 +21,9 @@
 #include "service-cellular/requests/ClipRequest.hpp"
 #include "service-cellular/requests/CallWaitingRequest.hpp"
 #include "service-cellular/requests/RejectRequest.hpp"
+
+#include <service-cellular/src/ServiceCellularPriv.hpp>
+#include <service-cellular/src/ussd/USSDHandler.hpp>
 
 #include <service-appmgr/Constants.hpp>
 
@@ -53,8 +56,7 @@ void CellularRequestHandler::handle(cellular::UssdRequest &request, at::Result &
     auto requestHandled = request.checkModemResponse(result);
 
     if (requestHandled) {
-        cellular.ussdState = ussd::State::pullRequestSent;
-        cellular.setUSSDTimer();
+        cellular.externalUSSDRequestHandled();
     }
     else {
         sendMmiResult(requestHandled);

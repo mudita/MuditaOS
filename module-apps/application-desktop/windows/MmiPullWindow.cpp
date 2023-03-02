@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DesktopInputWidget.hpp"
@@ -7,6 +7,7 @@
 
 #include <i18n/i18n.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 
 #include <string>
 
@@ -76,6 +77,17 @@ void MmiPullWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 
 bool MmiPullWindow::onInput(const InputEvent &inputEvent)
 {
+    if (inputEvent.isShortRelease()) {
+        switch (inputEvent.getKeyCode()) {
+        case KeyCode::KEY_RF: {
+            CellularServiceAPI::USSDRequest(this->application, cellular::USSDMessage::RequestType::abortSession, "");
+            application->returnToPreviousWindow();
+            return true;
+        }
+        default:
+            break;
+        }
+    }
     return AppWindow::onInput(inputEvent);
 }
 

@@ -143,7 +143,7 @@ ServiceCellular::ServiceCellular()
     stateTimer = sys::TimerFactory::createPeriodicTimer(
         this, "state", std::chrono::milliseconds{1000}, [&](sys::Timer &) { handleStateTimer(); });
     ussdTimer = sys::TimerFactory::createPeriodicTimer(
-        this, "ussd", std::chrono::milliseconds{1000}, [this](sys::Timer &) { handleUSSDTimer(); });
+        this, "ussd", std::chrono::milliseconds{1000}, [this](sys::Timer &) { priv->ussdHandler->handleUSSDTimer(); });
     sleepTimer = sys::TimerFactory::createSingleShotTimer(
         this, "sleep", constants::sleepTimerInterval, [this](sys::Timer &) { SleepTimerHandler(); });
     connectionTimer =
@@ -162,6 +162,9 @@ ServiceCellular::ServiceCellular()
         priv->csqHandler->handleTimerTick();
         csqCounter.clearCounter();
     });
+
+    priv->ussdHandler->setTimerStartCallback([this]() { ussdTimer.start(); });
+    priv->ussdHandler->setTimerStopCallback([this]() { ussdTimer.stop(); });
 
     notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
@@ -1208,6 +1211,16 @@ std::vector<std::string> ServiceCellular::getNetworkInfo()
     return data;
 }
 
+void ServiceCellular::externalUSSDRequestHandled()
+{
+    priv->ussdHandler->externalRequestHandled();
+}
+
+bool ServiceCellular::handleUSSDURC()
+{
+    return priv->ussdHandler->handleURC();
+}
+
 std::vector<std::string> get_last_AT_error(DLCChannel *channel)
 {
     auto ret = channel->cmd(at::AT::CEER);
@@ -1599,76 +1612,6 @@ void ServiceCellular::handle_power_state_change()
             priv->state->set(State::ST::PowerDownWaiting);
         }
     }
-}
-
-bool ServiceCellular::handleUSSDRequest(cellular::USSDMessage::RequestType requestType, const std::string &request)
-{
-    constexpr uint32_t commandTimeout = 120000;
-
-    auto channel = cmux->get(CellularMux::Channel::Commands);
-    if (channel != nullptr) {
-        if (requestType == cellular::USSDMessage::RequestType::pullSessionRequest) {
-            channel->cmd(at::AT::SMS_GSM);
-            std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15";
-            auto result         = channel->cmd(command, std::chrono::milliseconds(commandTimeout));
-            if (result.code == at::Result::Code::OK) {
-                ussdState = ussd::State::pullRequestSent;
-                setUSSDTimer();
-            }
-        }
-        else if (requestType == cellular::USSDMessage::RequestType::abortSession) {
-
-            ussdState   = ussd::State::sessionAborted;
-            auto result = channel->cmd(at::AT::CUSD_CLOSE_SESSION);
-            if (result.code == at::Result::Code::OK) {
-                CellularServiceAPI::USSDRequest(this, cellular::USSDMessage::RequestType::pushSessionRequest);
-            }
-            else {
-                CellularServiceAPI::USSDRequest(this, cellular::USSDMessage::RequestType::abortSession);
-            }
-        }
-        else if (requestType == cellular::USSDMessage::RequestType::pushSessionRequest) {
-
-            ussdState   = ussd::State::pushSession;
-            auto result = channel->cmd(at::AT::CUSD_OPEN_SESSION);
-            if (result.code == at::Result::Code::OK) {}
-        }
-        return true;
-    }
-    return false;
-}
-
-void ServiceCellular::handleUSSDTimer(void)
-{
-    if (ussdTimeout > 0) {
-        ussdTimeout -= 1;
-    }
-    else {
-        LOG_WARN("USSD timeout occurred, aborting current session");
-        ussdTimer.stop();
-        CellularServiceAPI::USSDRequest(this, cellular::USSDMessage::RequestType::abortSession);
-    }
-}
-void ServiceCellular::setUSSDTimer(void)
-{
-    switch (ussdState) {
-    case ussd::State::pullRequestSent:
-        ussdTimeout = ussd::pullResponseTimeout;
-        break;
-    case ussd::State::pullResponseReceived:
-        ussdTimeout = ussd::pullSesionTimeout;
-        break;
-    case ussd::State::pushSession:
-    case ussd::State::sessionAborted:
-    case ussd::State::none:
-        ussdTimeout = ussd::noTimeout;
-        break;
-    }
-    if (ussdTimeout == ussd::noTimeout) {
-        ussdTimer.stop();
-        return;
-    }
-    ussdTimer.start();
 }
 
 std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularStartOperatorsScan(
@@ -2091,7 +2034,8 @@ auto ServiceCellular::handleCellularDtmfRequestMessage(sys::Message *msg) -> std
 auto ServiceCellular::handleCellularUSSDMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto message = static_cast<cellular::USSDMessage *>(msg);
-    return std::make_shared<cellular::ResponseMessage>(handleUSSDRequest(message->type, message->data));
+    return std::make_shared<cellular::ResponseMessage>(
+        priv->ussdHandler->handleUSSDRequest(message->type, message->data));
 }
 
 auto ServiceCellular::handleStateRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>

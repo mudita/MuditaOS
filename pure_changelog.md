@@ -63,6 +63,7 @@
 * Fixed returning to call screen from message template
 * Fixed displaying wrong information on screen after rejecting call with SMS template
 * Fixed lack of contact search list update when returning to list after contact edition
+* Fixed wrong USSD flow when user closed USSD popup with back button
 
 ## [1.6.0 2023-02-27]
 
