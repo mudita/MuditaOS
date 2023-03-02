@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,9 +17,11 @@
 #include "ModemResetHandler.hpp"
 #include "CSQHandler.hpp"
 #include "volte/VolteCapabilityHandler.hpp"
+#include "ussd/USSDHandler.hpp"
 
 namespace cellular::internal
 {
+    using cellular::ussd::USSDHandler;
     using service::CSQHandler;
     using service::ModemResetHandler;
     using service::NetworkTime;
@@ -29,7 +31,6 @@ namespace cellular::internal
     using service::TetheringHandler;
     using service::VolteCapabilityHandler;
     using service::VolteHandler;
-
     class ServiceCellularPriv
     {
         ServiceCellular *owner;
@@ -45,6 +46,7 @@ namespace cellular::internal
         std::unique_ptr<ModemResetHandler> modemResetHandler;
         std::unique_ptr<CSQHandler> csqHandler;
         std::unique_ptr<VolteCapabilityHandler> volteCapability;
+        std::unique_ptr<USSDHandler> ussdHandler;
 
         State::PowerState nextPowerState = State::PowerState::Off;
         std::uint8_t multiPartSMSUID     = 0;
@@ -71,6 +73,7 @@ namespace cellular::internal
         void initTetheringHandler();
         void initModemResetHandler();
         void initCSQHandler();
+        void initUSSDHandler();
 
         /** Send SMS action used by the SMSSendHandler
          * \param record SMS record to send

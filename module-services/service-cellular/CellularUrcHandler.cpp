@@ -1,8 +1,11 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularUrcHandler.hpp"
 #include "messages.hpp"
+
+#include "service-cellular/src/ServiceCellularPriv.hpp"
+#include "service-cellular/src/ussd/USSDHandler.hpp"
 
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-appmgr/Constants.hpp>
@@ -90,25 +93,14 @@ void CellularUrcHandler::Handle(Cusd &urc)
     urc.setHandled(true);
 
     if (urc.isActionNeeded()) {
-        switch (cellularService.ussdState) {
-        case ussd::State::pullRequestSent:
-            cellularService.ussdState = ussd::State::pullResponseReceived;
-            [[fallthrough]];
-        case ussd::State::pushSession: {
-            cellularService.setUSSDTimer();
+        if (cellularService.handleUSSDURC()) {
             auto msg = std::make_shared<cellular::MMIResponseMessage>(*message);
             cellularService.bus.sendUnicast(msg, service::name::appmgr);
-            return;
-        }
-        default:
-            LOG_WARN("unexpected URC handling state: %s", magic_enum::enum_name(cellularService.ussdState).data());
             return;
         }
     }
 
     CellularServiceAPI::USSDRequest(&cellularService, cellular::USSDMessage::RequestType::abortSession);
-    cellularService.ussdState = ussd::State::sessionAborted;
-    cellularService.setUSSDTimer();
     auto msg = std::make_shared<cellular::MMIPushMessage>(*message);
     cellularService.bus.sendUnicast(msg, service::name::appmgr);
 }

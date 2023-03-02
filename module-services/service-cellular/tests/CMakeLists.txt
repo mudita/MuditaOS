@@ -122,3 +122,12 @@ add_catch2_executable(
         LIBS
         module-cellular
 )
+
+add_catch2_executable(
+        NAME
+        cellular-ussd-handler
+        SRCS
+        unittest_ussdHandler.cpp
+        LIBS
+        module-cellular
+)
