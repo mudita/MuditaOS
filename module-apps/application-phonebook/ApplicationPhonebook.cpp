@@ -4,7 +4,6 @@
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
-#include "models/PhonebookModel.hpp"
 #include "models/MultipleNumbersModel.hpp"
 #include "windows/PhonebookContactDetails.hpp"
 #include "windows/PhonebookContactOptions.hpp"
@@ -16,7 +15,6 @@
 #include "windows/PhonebookSearchResults.hpp"
 #include "windows/PhonebookIceContacts.hpp"
 #include "windows/PhonebookInputOptions.hpp"
-#include <service-appmgr/Controller.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <utility>
@@ -31,6 +29,19 @@ namespace app
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowContacts, [this](auto &&data) {
+            /// Phonebook's contact entries should present different content when the ApplicationPhonebook is invoked
+            /// by external application request
+            phonebookModel->customContactActivationCallback = [this](const auto &item) {
+                if (item->contact->numbers.size() > 1) {
+                    std::unique_ptr<PhonebookMultipleNumbersRequest> data =
+                        std::make_unique<PhonebookMultipleNumbersRequest>("PhonebookMultipleNumbersRequest",
+                                                                          item->contact);
+
+                    switchWindow(gui::window::name::multiple_numbers_select, std::move(data));
+                    return true;
+                }
+                return false;
+            };
             switchWindow(gui::name::window::main_window, std::move(data));
             return actionHandled();
         });
@@ -82,10 +93,11 @@ namespace app
     auto ApplicationPhonebook::InitHandler() -> sys::ReturnCodes
     {
 
-        auto ret = Application::InitHandler();
+        const auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
+        phonebookModel = std::make_shared<PhonebookModel>(this);
 
         createUserInterface();
 
@@ -96,7 +108,7 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [&](ApplicationCommon *app, const std::string &name) {
             searchRequestModel = std::make_shared<SearchRequestModel>();
-            return std::make_unique<gui::PhonebookMainWindow>(app, searchRequestModel);
+            return std::make_unique<gui::PhonebookMainWindow>(app, searchRequestModel, phonebookModel);
         });
         windowsFactory.attach(gui::window::name::contact, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookContactDetails>(app);
@@ -155,37 +167,10 @@ namespace app
 
     void ApplicationPhonebook::onSearchRequest(const std::string &searchFilter)
     {
-        auto phonebookModel = std::make_unique<PhonebookModel>(this, searchFilter);
-
-        LOG_DEBUG("Search results count: %d", phonebookModel->requestRecordsCount());
-        if (not searchRequestModel) {
-            LOG_ERROR("application not build, model not available");
-            assert(0);
-        }
-        if (phonebookModel->requestRecordsCount() > 0) {
-            if (searchRequestModel->requestedSearch()) {
-                phonebookModel->activateContactSelectCallback();
-            }
-            LOG_DEBUG("Switching to search results window.");
-            auto data = std::make_unique<PhonebookSearchResultsData>(std::move(phonebookModel));
-            switchWindow("SearchResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        }
-        else {
-            searchEmpty(searchFilter);
-        }
-    }
-
-    bool ApplicationPhonebook::searchEmpty(const std::string &query)
-    {
-        gui::DialogMetadata meta;
-        meta.icon                        = "search_128px_W_G";
-        meta.text                        = utils::translate("app_phonebook_search_no_results");
-        meta.title                       = utils::translate("common_results_prefix") + "\"" + query + "\"";
-        auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
-        data->ignoreCurrentWindowOnStack = true;
-        LOG_DEBUG("Switching to app_phonebook_search_no_results window.");
-        switchWindow(gui::window::name::dialog, std::move(data));
-        return true;
+        phonebookModel->setFilter(searchFilter);
+        LOG_DEBUG("Switching to search results window.");
+        auto data = std::make_unique<PhonebookSearchResultsData>(phonebookModel);
+        switchWindow(gui::window::name::search_results, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
     }
 
 } /* namespace app */

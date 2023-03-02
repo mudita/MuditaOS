@@ -25,18 +25,14 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>,
     std::string queryFilter;
     std::uint32_t queryGroupFilter;
     std::uint32_t queryDisplayMode;
-    std::uint32_t lastRequestedOffset = 0;
 
   public:
     ContactsMapData letterMap;
-    PhonebookModel(app::ApplicationCommon *app,
-                   std::string filter        = "",
-                   std::uint32_t groupFilter = 0,
-                   std::uint32_t displayMode = 0);
+    explicit PhonebookModel(app::ApplicationCommon *app);
 
     // virtual methods from DatabaseModel
     auto updateRecords(std::vector<ContactRecord> records) -> bool override;
-    void requestRecords(const uint32_t offset, const uint32_t limit) override;
+    void requestRecords(std::uint32_t offset, std::uint32_t limit) override;
     auto requestLetterMap() -> ContactsMapData;
 
     // virtual methods for ListViewProvider
@@ -47,14 +43,13 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>,
 
     [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
 
+    auto setFilter(std::string filter, std::uint32_t groupFilter = 0, std::uint32_t displayMode = 0) -> void;
     [[nodiscard]] auto getFilter() const -> const std::string &;
 
     void setDisplayMode(std::uint32_t displayMode);
     auto getDisplayMode() -> std::uint32_t;
-    auto getLastRequestedOffset() -> std::uint32_t;
     auto getLabelMarkerDisplayMode(uint32_t posOnList) -> LabelMarkerDisplayMode;
 
-    void activateContactSelectCallback();
-    // onClick callback to register
-    std::function<bool(gui::PhonebookItem *item)> contactSelectCallback = nullptr;
+    /// User can define custom action that will be executed when a contact item is activated
+    std::function<bool(gui::PhonebookItem *item)> customContactActivationCallback = nullptr;
 };

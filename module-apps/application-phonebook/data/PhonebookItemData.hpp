@@ -42,18 +42,9 @@ class PhonebookSearchResultsData : public gui::SwitchData
 {
   public:
     PhonebookSearchResultsData() = delete;
-    PhonebookSearchResultsData(std::unique_ptr<PhonebookModel> model) : model(std::move(model)){};
+    PhonebookSearchResultsData(std::shared_ptr<PhonebookModel> model) : model(std::move(model)){};
 
-    std::unique_ptr<PhonebookModel> consumeSearchResultsModel()
-    {
-        assert(!consumed);
-        consumed = true;
-        return std::move(model);
-    }
-
-  protected:
-    std::unique_ptr<PhonebookModel> model;
-    bool consumed = false;
+    std::shared_ptr<PhonebookModel> model;
 };
 
 class PhonebookSearchRequest : public gui::SwitchData

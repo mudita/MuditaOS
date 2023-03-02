@@ -4,7 +4,6 @@
 #include "PhonebookSearchResults.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
-#include "application-phonebook/widgets/PhonebookItem.hpp"
 
 #include <service-db/QueryMessage.hpp>
 #include <queries/phonebook/QueryContactGet.hpp>
@@ -41,6 +40,20 @@ namespace gui
         navBar->setActive(nav_bar::Side::Right, true);
         navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
+        icon = new Icon(this,
+                        style::window::default_left_margin,
+                        style::window::default_vertical_pos,
+                        style::window::default_body_width,
+                        style::window::default_body_height,
+                        "",
+                        "");
+
+        icon->text->addRichText(utils::translate("app_phonebook_search_no_results"));
+        icon->image->set("search_128px_W_G");
+        icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        icon->image->setMargins(Margins(0, icon::image_top_margin, 0, icon::image_bottom_margin));
+        icon->setVisible(false);
+
         setTitle(utils::translate("common_results_prefix"));
     }
 
@@ -56,6 +69,10 @@ namespace gui
 
     void PhonebookSearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        // Model's data might have changed between calls
+        if (mode == ShowMode::GUI_SHOW_RETURN) {
+            handleContentUpdate();
+        }
         searchResultList->rebuildList();
     }
 
@@ -65,25 +82,31 @@ namespace gui
             return false;
         }
 
-        auto searchResultsData = dynamic_cast<PhonebookSearchResultsData *>(data);
+        const auto searchResultsData = dynamic_cast<PhonebookSearchResultsData *>(data);
         assert(searchResultsData != nullptr);
 
-        searchResultsModel = searchResultsData->consumeSearchResultsModel();
-        setTitle(utils::translate("common_results_prefix") + "\"" + searchResultsModel->getFilter() + "\"");
+        searchResultsModel = searchResultsData->model;
         searchResultList->setProvider(searchResultsModel);
-
-        if (searchResultsModel->contactSelectCallback) {
-            navBar->setActive(nav_bar::Side::Left, false);
-            navBar->setText(nav_bar::Side::Left, "");
-            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
-        }
-        else {
-            navBar->setActive(nav_bar::Side::Left, true);
-            navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
-            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
-        }
+        handleContentUpdate();
 
         return true;
+    }
+    void PhonebookSearchResults::handleContentUpdate()
+    {
+        setTitle(utils::translate("common_results_prefix") + "\"" + searchResultsModel->getFilter() + "\"");
+
+        if (searchResultsModel->requestRecordsCount() > 0) {
+            navBar->setActive(nav_bar::Side::Left, true);
+            navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
+            navBar->setActive(nav_bar::Side::Center, true);
+            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
+            setFocusItem(searchResultList);
+        }
+        else {
+            navBar->setActive(nav_bar::Side::Left, false);
+            navBar->setActive(nav_bar::Side::Center, false);
+            setFocusItem(icon);
+        }
     }
 
 } /* namespace gui */
