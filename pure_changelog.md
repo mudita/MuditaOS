@@ -18,6 +18,7 @@
 * Changed unknown character glyph to the one matching the design
 * Changed tethering icon on status bar
 * Unified grey color tones used while displaying texts
+* Replaced English labels occuring in French translation with French ones
 
 ### Fixed
 
