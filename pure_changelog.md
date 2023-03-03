@@ -1,7 +1,12 @@
 # MuditaOS changelog - PurePhone
 
 ## Unreleased
+### Added
+### Changed / Improved
+### Fixed
 
+
+## [1.7.0 2023-XX-XX]
 ### Added
 
 * Always display network access technology and signal strength on the status bar
