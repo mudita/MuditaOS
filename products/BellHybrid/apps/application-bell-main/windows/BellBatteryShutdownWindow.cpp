@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "windows/BellBatteryShutdownWindow.hpp"
@@ -24,7 +24,8 @@ namespace gui
 
         auto icon =
             new Icon(this, 0, 0, style::window_width, style::window_height, "bell_battery_status_empty_W_M", {});
-        icon->text->setFont(style::window::font::verybiglight);
+        icon->text->setVisible(false);
+        icon->resizeItems();
     }
     bool BellBatteryShutdownWindow::onInput(const InputEvent &)
     {
