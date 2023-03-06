@@ -64,6 +64,8 @@ namespace app::manager
             ShowPopup,
             AbortPopup,
             ChangeHomescreenLayout,
+            FileTransferStarted,
+            FileTransferFinished,
             UserAction // The last enumerator in the Action enum.
                        // All user-defined actions shall have values greater than UserAction.
                        // All system-wide actions shall have values lesser than UserAction.

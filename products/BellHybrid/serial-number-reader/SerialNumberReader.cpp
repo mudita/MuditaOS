@@ -4,6 +4,7 @@
 #include <purefs/vfs_subsystem.hpp>
 
 #include <serial-number-reader/SerialNumberReader.hpp>
+#include <log/log.hpp>
 
 namespace
 {
@@ -20,11 +21,17 @@ namespace
         buffer[EMMC_SN_LENGTH] = '\0';
         return std::string(buffer);
     }
+
+    std::string serialNumber{};
 } // namespace
 namespace serial_number_reader
 {
-    std::string readSerialNumber()
+    std::string &readSerialNumber()
     {
-        return readSerialNumberFromEmmc();
+        if (serialNumber.empty()) {
+            LOG_ERROR("SAVING SERIAL NUMBER TO VARAIBLE");
+            serialNumber = readSerialNumberFromEmmc();
+        }
+        return serialNumber;
     }
 } // namespace serial_number_reader

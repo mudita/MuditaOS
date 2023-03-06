@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlatformFactory.hpp"
@@ -13,6 +13,7 @@
 #include <application-bell-meditation-timer/MeditationTimer.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
+#include <application-bell-file-transfer/ApplicationBellFileTransfer.hpp>
 
 // modules
 #include <module-db/databases/MultimediaFilesDB.hpp>
@@ -104,10 +105,6 @@ int main()
             }
 
             Log::Logger::get().init(Log::Application{ApplicationName, GIT_REV, VERSION, GIT_BRANCH});
-            /// force initialization of PhonenumberUtil because of its stack usage
-            /// otherwise we would end up with an init race and PhonenumberUtil could
-            /// be initiated in a task with stack not big enough to handle it
-            i18n::phonenumbers::PhoneNumberUtil::GetInstance();
             return true;
         },
         [sysmgr]() {
@@ -124,6 +121,9 @@ int main()
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellRelaxation>(app::applicationBellRelaxationName));
             applications.push_back(app::CreateLauncher<app::MeditationTimer>(app::MeditationTimer::defaultName));
+            applications.push_back(
+                app::CreateLauncher<app::ApplicationBellFileTransfer>(app::applicationBellFileTransferName));
+
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(

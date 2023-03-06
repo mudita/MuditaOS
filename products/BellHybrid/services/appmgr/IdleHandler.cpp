@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <appmgr/IdleHandler.hpp>
 #include <appmgr/messages/IdleTimerMessage.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 
 #include <service-appmgr/Controller.hpp>
 #include <Timers/TimerFactory.hpp>
@@ -38,4 +39,33 @@ namespace app::manager
         idleTimer.stop();
         app::manager::Controller::sendAction(serv, app::manager::actions::Home);
     }
+
+    //    void IdleHandler::handleFileTransferMessage(sys::Message *request)
+    //    {
+    //        using FileTransferAction = sdesktop::fileTransfer::FileTransferAction;
+    //        auto message             = static_cast<sdesktop::fileTransfer::FileTransferMessage *>(request);
+    //        idleTimer.stop();
+    //
+    //        const auto action = message->getCurrentFileTransferAction();
+    //
+    //        LOG_ERROR("File transfer: %s, %d",
+    //                  (static_cast<int>(action) == 0 ? "Started" : "Finished"),
+    //                  static_cast<int>(action));
+    //
+    //        switch (action) {
+    //
+    //        case FileTransferAction::Started: {
+    //            app::manager::Controller::sendAction(serv, app::manager::actions::FileTransferStarted);
+    //            break;
+    //        }
+    //        case FileTransferAction::Finished: {
+    //            app::manager::Controller::sendAction(serv, app::manager::actions::FileTransferFinished);
+    //            break;
+    //        }
+    //        default: {
+    //            LOG_ERROR("INVALID");
+    //            break;
+    //        }
+    //        }
+    //    }
 } // namespace app::manager

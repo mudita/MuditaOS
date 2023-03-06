@@ -54,6 +54,7 @@ target_link_libraries(BellHybrid
         bell::app-main
         bell::app-meditation-timer
         bell::app-powernap
+        bell::app-file-transfer
         bell::app-settings
         bell::db
         bell::audio

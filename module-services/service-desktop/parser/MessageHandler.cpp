@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHandler.hpp"
@@ -32,7 +32,7 @@ namespace sdesktop::endpoints
     {
         auto context = ContextFactory::create(messageJson);
 
-        LOG_DEBUG("[MsgHandler]\nmethod: %s\nendpoint: %s\nuuid: %d\n",
+        LOG_DEBUG("[MsgHandler]\nmethod: %s\nendpoint: %s\nuuid: %d",
                   magic_enum::enum_name(context->getMethod()).data(),
                   magic_enum::enum_name(context->getEndpoint()).data(),
                   context->getUuid());

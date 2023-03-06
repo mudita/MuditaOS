@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,5 +26,7 @@ namespace app::manager
         auto startApplication(ApplicationHandle &app) -> bool override;
         auto resolveHomeApplication() -> std::string override;
         auto registerMessageHandlers() -> void override;
+        auto handleFileTransferStarted(ActionEntry &action) -> ActionProcessStatus;
+        auto handleFileTransferFinished(ActionEntry &action) -> ActionProcessStatus;
     };
 } // namespace app::manager

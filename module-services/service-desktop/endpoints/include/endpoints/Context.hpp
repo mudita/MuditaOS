@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -156,7 +156,7 @@ namespace sdesktop::endpoints
         {
             auto elemsCount = responseContext.body.array_items().size();
             auto newBody    = json11::Json::object{{entryTitle, responseContext.body},
-                                                {json::totalCount, static_cast<int>(totalCount)}};
+                                                   {json::totalCount, static_cast<int>(totalCount)}};
             if (requestedLimit > elemsCount) {
                 std::size_t offset = requestedOffset + elemsCount;
                 if (offset < totalCount) {

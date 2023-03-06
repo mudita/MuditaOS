@@ -477,6 +477,15 @@ namespace app::manager
         return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 
+    auto ApplicationManagerCommon::handleFileTransferAction(ActionEntry &action) -> ActionProcessStatus
+    {
+        const auto appName = "ApplicationBellFileTransfer";
+        action.setTargetApplication(appName);
+
+        SwitchRequest switchRequest(service::name::appmgr, appName, resolveHomeWindow(), std::move(action.params));
+        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
+    }
+
     auto ApplicationManagerCommon::resolveHomeWindow() -> std::string
     {
         return gui::name::window::main_window;
@@ -777,6 +786,8 @@ namespace app::manager
         }
 
         switch (action->actionId) {
+        case actions::FileTransferStarted:
+            [[fallthrough]];
         case actions::Home:
             [[fallthrough]];
         case actions::Launch:

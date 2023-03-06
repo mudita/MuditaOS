@@ -22,9 +22,11 @@
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 #include <appmgr/messages/ChangeHomescreenLayoutParams.hpp>
 #include <system/messages/SystemManagerMessage.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
 #include <WindowsStack.hpp>
 #include <popups/Popups.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace app
 {
@@ -46,6 +48,7 @@ namespace app
         });
 
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        //        bus.channels.push_back(sys::BusChannel::System);
 
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
@@ -86,6 +89,22 @@ namespace app
         temperatureModel    = std::make_unique<app::home_screen::TemperatureModel>(this);
         homeScreenPresenter = std::make_shared<app::home_screen::HomeScreenPresenter>(
             this, *alarmModel, *batteryModel, *temperatureModel, *timeModel);
+
+        //        connect(typeid(sdesktop::fileTransfer::FileTransferMessage), [this](sys::Message *request) {
+        //            auto message = static_cast<sdesktop::fileTransfer::FileTransferMessage *>(request);
+        //            //            return handleRoutingNotification(message);
+        //            LOG_ERROR("File transfer Action: %s",
+        //                      (static_cast<int>(message->getCurrentFileTransferAction()) == 0 ? "Started" :
+        //                      "Finished"));
+        //            if (message->getCurrentFileTransferAction() ==
+        //            sdesktop::fileTransfer::FileTransferAction::Started) {
+        //                app::manager::Controller::sendAction(
+        //                    this,
+        //                    app::manager::actions::Launch,
+        //                    std::make_unique<app::ApplicationLaunchData>("ApplicationBellFileTransfer"));
+        //            }
+        //            return sys::MessageNone{};
+        //        });
 
         createUserInterface();
 

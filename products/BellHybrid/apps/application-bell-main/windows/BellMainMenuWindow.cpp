@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellMainMenuWindow.hpp"
@@ -10,6 +10,7 @@
 #include <application-bell-meditation-timer/MeditationTimer.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
+#include <application-bell-file-transfer/ApplicationBellFileTransfer.hpp>
 
 #include <Dialog.hpp>
 #include <DialogMetadataMessage.hpp>
@@ -52,6 +53,7 @@ namespace gui
         addAppMenu(utils::translate("app_bellmain_meditation_timer"), app::MeditationTimer::defaultName);
         addAppMenu(utils::translate("app_bellmain_bedtime"), app::applicationBellBedtimeName);
         addAppMenu(utils::translate("app_bellmain_settings"), app::applicationBellSettingsName);
+        addAppMenu(utils::translate("TEST"), app::applicationBellFileTransferName);
 
         return menuOptionList;
     }

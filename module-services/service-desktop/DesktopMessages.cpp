@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-desktop/DesktopMessages.hpp"
@@ -53,5 +53,16 @@ namespace sdesktop
             return configurationType;
         }
     } // namespace usb
+
+    namespace fileTransfer
+    {
+        FileTransferMessage::FileTransferMessage(FileTransferAction fileTransferAction)
+            : fileTransferAction(fileTransferAction)
+        {}
+        FileTransferAction FileTransferMessage::getCurrentFileTransferAction() const noexcept
+        {
+            return fileTransferAction;
+        }
+    } // namespace fileTransfer
 
 } // namespace sdesktop

@@ -10,20 +10,21 @@ namespace sdesktop::endpoints
 {
     namespace json::fs
     {
-        inline constexpr auto removeFile   = "removeFile";
-        inline constexpr auto renameFile   = "renameFile";
-        inline constexpr auto destFilename = "destFilename";
-        inline constexpr auto listDir      = "listDir";
-        inline constexpr auto path         = "path";
-        inline constexpr auto fileName     = "fileName";
-        inline constexpr auto fileSize     = "fileSize";
-        inline constexpr auto type         = "type";
-        inline constexpr auto fileCrc32    = "fileCrc32";
-        inline constexpr auto chunkSize    = "chunkSize";
-        inline constexpr auto chunkNo      = "chunkNo";
-        inline constexpr auto data         = "data";
-        inline constexpr auto rxID         = "rxID";
-        inline constexpr auto txID         = "txID";
+        inline constexpr auto removeFile         = "removeFile";
+        inline constexpr auto renameFile         = "renameFile";
+        inline constexpr auto destFilename       = "destFilename";
+        inline constexpr auto listDir            = "listDir";
+        inline constexpr auto path               = "path";
+        inline constexpr auto fileName           = "fileName";
+        inline constexpr auto fileSize           = "fileSize";
+        inline constexpr auto type               = "type";
+        inline constexpr auto fileCrc32          = "fileCrc32";
+        inline constexpr auto chunkSize          = "chunkSize";
+        inline constexpr auto chunkNo            = "chunkNo";
+        inline constexpr auto data               = "data";
+        inline constexpr auto rxID               = "rxID";
+        inline constexpr auto txID               = "txID";
+        inline constexpr auto fileTransferStatus = "fileTransferStatus";
 
         inline constexpr auto fileDoesNotExist = "file does not exist";
     } // namespace json::fs

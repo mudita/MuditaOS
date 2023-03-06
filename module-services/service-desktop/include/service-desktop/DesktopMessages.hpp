@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -115,4 +115,24 @@ namespace sdesktop
             explicit ScreenlockCheckEvent(bool isLocked);
         };
     } // namespace developerMode
+
+    namespace fileTransfer
+    {
+        enum class FileTransferAction
+        {
+            Started = 0,
+            Finished
+        };
+
+        class FileTransferMessage : public sys::DataMessage
+        {
+          public:
+            explicit FileTransferMessage(FileTransferAction fileTransferAction);
+            ~FileTransferMessage() override = default;
+            FileTransferAction getCurrentFileTransferAction() const noexcept;
+
+          private:
+            FileTransferAction fileTransferAction;
+        };
+    } // namespace fileTransfer
 } // namespace sdesktop

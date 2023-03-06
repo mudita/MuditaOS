@@ -5,10 +5,12 @@
 #include <appmgr/messages/AlarmMessage.hpp>
 #include <appmgr/messages/IdleTimerMessage.hpp>
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace app::manager
 {
@@ -40,6 +42,10 @@ namespace app::manager
     ActionProcessStatus ApplicationManager::handleAction(ActionEntry &action)
     {
         switch (action.actionId) {
+        case actions::FileTransferStarted:
+            return handleFileTransferStarted(action);
+        case actions::FileTransferFinished:
+            return ApplicationManagerCommon::handleActionOnFocusedApp(action);
         default:
             return ApplicationManagerCommon::handleAction(action);
         }
@@ -86,5 +92,31 @@ namespace app::manager
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
         connect(typeid(BedtimeNotification), convertibleToActionHandler);
         connect(typeid(ChangeHomescreenLayoutMessage), convertibleToActionHandler);
+        //        connect(typeid(sdesktop::fileTransfer::FileTransferMessage), [this](sys::Message *request) {
+        //            handleFileTransferMessage(request);
+        //            return sys::msgHandled();
+        //        });
+    }
+    auto ApplicationManager::handleFileTransferStarted(ActionEntry &action) -> ActionProcessStatus
+    {
+        LOG_ERROR("XXX handleFileTransferStarted: ");
+        const auto appName = "ApplicationBellFileTransfer";
+        action.setTargetApplication(appName);
+
+        SwitchRequest switchRequest(service::name::appmgr, appName, resolveHomeWindow(), std::move(action.params));
+        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
+        //        return ActionProcessStatus::Accepted;
+    }
+    auto ApplicationManager::handleFileTransferFinished(ActionEntry &action) -> ActionProcessStatus
+    {
+        //        LOG_ERROR("XXX handleFileTransferFinished: ");
+        //        //        const auto appName = "ApplicationBellFileTransfer";
+        //        action.setTargetApplication(rootApplicationName);
+        //
+        //        SwitchRequest switchRequest(
+        //            service::name::appmgr, rootApplicationName, resolveHomeWindow(), std::move(action.params));
+        //        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted :
+        //        ActionProcessStatus::Dropped;
+        return ActionProcessStatus::Accepted;
     }
 } // namespace app::manager

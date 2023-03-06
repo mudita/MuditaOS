@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/filesystem/FileOperations.hpp>
@@ -115,15 +115,13 @@ auto FileOperations::encodeDataAsBase64(const std::vector<std::uint8_t> &binaryD
     return encodedData;
 }
 
-auto FileOperations::decodeDataFromBase64(const std::string &encodedData) const -> std::vector<std::uint8_t>
+auto FileOperations::decodeDataFromBase64(const std::string &encodedData) -> void
 {
     const auto decodedDataSize = decodedSize(encodedData.length());
-
-    std::vector<std::uint8_t> decodedData(decodedDataSize, 0);
-
-    b64tobin(decodedData.data(), encodedData.data());
-
-    return decodedData;
+    if (decodedDataSize != fileData->size()) {
+        fileData->resize(decodedDataSize, 0);
+    }
+    b64tobin(fileData->data(), encodedData.data());
 }
 
 auto FileOperations::getDataForReceiveID(transfer_id rxID, std::uint32_t chunkNo) -> DataWithCrc32
@@ -176,6 +174,7 @@ auto FileOperations::createTransmitIDForFile(const std::filesystem::path &file,
     LOG_DEBUG("Creating txID %u", static_cast<unsigned>(txID));
 
     createFileWriteContextFor(file, size, Crc32, txID);
+    fileData = std::make_unique<std::vector<uint8_t>>(SingleChunkSize, 0);
 
     return txID;
 }
@@ -205,23 +204,24 @@ auto FileOperations::sendDataForTransmitID(transfer_id txID, std::uint32_t chunk
         return sys::ReturnCodes::Failure;
     }
 
-    auto binaryData = decodeDataFromBase64(data);
+    decodeDataFromBase64(data);
 
-    fileCtx->write(binaryData);
+    fileCtx->write(*fileData);
 
     if (fileCtx->reachedEOF()) {
         LOG_INFO("Reached EOF for txID %u", static_cast<unsigned>(txID));
-
         auto fileOK = fileCtx->crc32Matches();
 
         if (!fileOK) {
             LOG_ERROR("File CRC32 mismatch");
             fileCtx->removeFile();
             writeTransfers.erase(txID);
+            fileData.reset(nullptr);
 
             throw std::runtime_error("File CRC32 mismatch");
         }
         writeTransfers.erase(txID);
+        fileData.reset(nullptr);
     }
 
     return returnCode;

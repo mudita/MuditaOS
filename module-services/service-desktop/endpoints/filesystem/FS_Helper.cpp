@@ -6,6 +6,8 @@
 #include <endpoints/message/Sender.hpp>
 
 #include <sys/statvfs.h>
+#include "service-appmgr/Constants.hpp"
+#include <service-appmgr/Controller.hpp>
 
 namespace sdesktop::endpoints
 {
@@ -81,10 +83,42 @@ namespace sdesktop::endpoints
         const auto &body = context.getBody();
         auto code        = http::Code::BadRequest;
         ResponseContext response{};
+        if (body[json::fs::fileTransferStatus].is_number()) {
 
-        if (body[json::fs::fileName].is_string() && body[json::fs::fileSize].is_number() &&
-            body[json::fs::fileCrc32].is_string()) {
+            using FileTransferAction = sdesktop::fileTransfer::FileTransferAction;
+            const auto action =
+                static_cast<sdesktop::fileTransfer::FileTransferAction>(body[json::fs::fileTransferStatus].int_value());
+            response = ResponseContext{.status = http::Code::OK};
+            LOG_ERROR("XXXXXXXXXReceived Action: %s", (static_cast<int>(action) == 0 ? "Started" : "Finished"));
+
+            switch (action) {
+
+            case FileTransferAction::Started: {
+                //                app::manager::Controller::sendAction(owner,
+                //                app::manager::actions::FileTransferStarted, nullptr);
+                break;
+            }
+            case FileTransferAction::Finished: {
+                //                app::manager::Controller::sendAction(owner,
+                //                app::manager::actions::FileTransferFinished, nullptr);
+                break;
+            }
+            default: {
+                response = ResponseContext{.status = http::Code::BadRequest};
+                break;
+            }
+            }
+        }
+
+        else if (body[json::fs::fileName].is_string() && body[json::fs::fileSize].is_number() &&
+                 body[json::fs::fileCrc32].is_string()) {
+            //            app::manager::Controller::sendAction(owner, app::manager::actions::FileTransferStarted,
+            //            nullptr);
             response = startSendFile(context);
+            //            auto msg =
+            //            std::make_shared<fileTransfer::FileTransferMessage>(fileTransfer::FileTransferAction::Started);
+            //            owner->bus.sendMulticast(std::move(msg), sys::BusChannel::System);
+            //            owner->bus.sendUnicast(std::move(msg), service::name::appmgr);
         }
         else if (body[json::fs::txID].is_number() && body[json::fs::chunkNo].is_number() &&
                  body[json::fs::data].is_string()) {
@@ -228,11 +262,11 @@ namespace sdesktop::endpoints
 
     auto FS_Helper::startSendFile(Context &context) const -> ResponseContext
     {
-        const auto &body               = context.getBody();
-        const auto filePath            = body[json::fs::fileName].string_value();
-        const uint32_t fileSize        = body[json::fs::fileSize].int_value();
-        const auto fileCrc32           = body[json::fs::fileCrc32].string_value();
-        auto code                      = http::Code::BadRequest;
+        const auto &body        = context.getBody();
+        const auto filePath     = body[json::fs::fileName].string_value();
+        const uint32_t fileSize = body[json::fs::fileSize].int_value();
+        const auto fileCrc32    = body[json::fs::fileCrc32].string_value();
+        auto code               = http::Code::BadRequest;
 
         LOG_DEBUG("Start sending of file: %s", filePath.c_str());
 
@@ -289,7 +323,7 @@ namespace sdesktop::endpoints
         const auto &body   = context.getBody();
         const auto txID    = body[json::fs::txID].int_value();
         const auto chunkNo = body[json::fs::chunkNo].int_value();
-        const auto data    = body[json::fs::data].string_value();
+        const auto &data   = body[json::fs::data].string_value();
 
         if (data.empty()) {
             std::ostringstream errorReason;
@@ -320,8 +354,6 @@ namespace sdesktop::endpoints
         auto code = http::Code::OK;
 
         if (returnCode == sys::ReturnCodes::Success) {
-            LOG_DEBUG("FileOperations::sendDataForTransmitID success");
-
             response = json11::Json::object(
                 {{json::fs::txID, static_cast<int>(txID)}, {json::fs::chunkNo, static_cast<int>(chunkNo)}});
         }

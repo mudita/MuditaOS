@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -125,6 +125,7 @@ namespace app::manager
         // Message handlers
         void handleActionRequest(ActionRequest *actionMsg);
         auto handleHomeAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handleFileTransferAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleOnBoardingFinalize() -> sys::MessagePointer;
         auto handleLaunchAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
