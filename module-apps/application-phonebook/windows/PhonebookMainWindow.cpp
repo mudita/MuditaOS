@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookMainWindow.hpp"
@@ -87,8 +87,6 @@ namespace gui
 
     void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        LOG_INFO("onBeforeShow");
-
         auto contactRequest = dynamic_cast<PhonebookSearchRequest *>(data);
         model->setRequested(contactRequest != nullptr);
         if (model->requestedSearch()) {
