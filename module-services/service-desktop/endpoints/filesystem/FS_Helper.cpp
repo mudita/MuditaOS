@@ -81,7 +81,6 @@ namespace sdesktop::endpoints
         const auto &body = context.getBody();
         auto code        = http::Code::BadRequest;
         ResponseContext response{};
-
         if (body[json::fs::fileName].is_string() && body[json::fs::fileSize].is_number() &&
             body[json::fs::fileCrc32].is_string()) {
             response = startSendFile(context);
@@ -228,11 +227,11 @@ namespace sdesktop::endpoints
 
     auto FS_Helper::startSendFile(Context &context) const -> ResponseContext
     {
-        const auto &body               = context.getBody();
-        const auto filePath            = body[json::fs::fileName].string_value();
-        const uint32_t fileSize        = body[json::fs::fileSize].int_value();
-        const auto fileCrc32           = body[json::fs::fileCrc32].string_value();
-        auto code                      = http::Code::BadRequest;
+        const auto &body        = context.getBody();
+        const auto &filePath    = body[json::fs::fileName].string_value();
+        const uint32_t fileSize = body[json::fs::fileSize].int_value();
+        const auto &fileCrc32   = body[json::fs::fileCrc32].string_value();
+        auto code               = http::Code::BadRequest;
 
         LOG_DEBUG("Start sending of file: %s", filePath.c_str());
 
@@ -289,7 +288,7 @@ namespace sdesktop::endpoints
         const auto &body   = context.getBody();
         const auto txID    = body[json::fs::txID].int_value();
         const auto chunkNo = body[json::fs::chunkNo].int_value();
-        const auto data    = body[json::fs::data].string_value();
+        const auto &data   = body[json::fs::data].string_value();
 
         if (data.empty()) {
             std::ostringstream errorReason;
@@ -320,8 +319,6 @@ namespace sdesktop::endpoints
         auto code = http::Code::OK;
 
         if (returnCode == sys::ReturnCodes::Success) {
-            LOG_DEBUG("FileOperations::sendDataForTransmitID success");
-
             response = json11::Json::object(
                 {{json::fs::txID, static_cast<int>(txID)}, {json::fs::chunkNo, static_cast<int>(chunkNo)}});
         }

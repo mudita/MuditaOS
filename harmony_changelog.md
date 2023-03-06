@@ -12,6 +12,7 @@
 * Fixed missing software version in French language
 * Fixed problems with displaying file names in Relaxation
 * Fixed polish Meditation summary text
+* Fixed problems with copying files via Mudita Center to Relaxation
 
 ### Added
 
