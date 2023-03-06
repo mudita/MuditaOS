@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ListViewEngine.hpp"
@@ -20,7 +20,7 @@ namespace gui
 
     void ListViewEngine::setElementsCount(unsigned int count)
     {
-        if (elementsCount != count || elementsCount == 0) {
+        if ((elementsCount != count) || (elementsCount == listview::nPos)) {
             onElementsCountChanged(count);
         }
     }

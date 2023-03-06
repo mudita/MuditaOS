@@ -70,6 +70,7 @@
 * Fixed broken abbreviating of multiline text messages content in deletion window
 * Fixed misleading labels in the Phonebook application when using search engine
 * Fixed text pasting in new contact window when some text is already present there
+* Fixed unnecessary deep refresh when pressing up arrow in empty list view
 
 ## [1.6.0 2023-02-27]
 

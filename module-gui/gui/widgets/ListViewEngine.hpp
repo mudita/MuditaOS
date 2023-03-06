@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -109,7 +109,7 @@ namespace gui
         [[nodiscard]] unsigned int getFocusItemIndex();
 
         /// Total provider elements count
-        unsigned int elementsCount = 0;
+        unsigned int elementsCount = listview::nPos;
         void setElementsCount(unsigned int count);
         void onElementsCountChanged(unsigned int count);
         bool shouldCallEmptyListCallbacks = false;
