@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,6 +25,7 @@ class FileOperations
 
     std::atomic<transfer_id> runningRxId{0};
     std::atomic<transfer_id> runningTxId{0};
+    std::unique_ptr<std::vector<std::uint8_t>> fileData{};
 
     auto createFileReadContextFor(const std::filesystem::path &file, std::size_t fileSize, transfer_id xfrId) -> void;
 
@@ -35,7 +36,7 @@ class FileOperations
 
     auto encodeDataAsBase64(const std::vector<std::uint8_t> &binaryData) const -> std::string;
 
-    auto decodeDataFromBase64(const std::string &encodedData) const -> std::vector<std::uint8_t>;
+    auto decodeDataFromBase64(const std::string &encodedData) -> void;
 
     auto encodedSize(std::size_t binarySize) const -> std::size_t;
 

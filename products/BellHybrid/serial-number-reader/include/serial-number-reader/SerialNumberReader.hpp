@@ -6,5 +6,5 @@
 
 namespace serial_number_reader
 {
-    std::string readSerialNumber();
+    const std::string &readSerialNumber();
 } // namespace serial_number_reader

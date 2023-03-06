@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/filesystem/FileContext.hpp>
@@ -34,7 +34,8 @@ FileWriteContext::FileWriteContext(const std::filesystem::path &path,
                                    std::size_t chunkSize,
                                    std::string crc32Digest,
                                    std::size_t offset)
-    : FileContext(path, size, chunkSize, offset), crc32Digest(std::move(crc32Digest))
+    : FileContext(path, size, chunkSize, offset), crc32Digest(std::move(crc32Digest)),
+      file(path, std::ios::binary | std::ios::app)
 {}
 
 FileWriteContext::~FileWriteContext()
@@ -113,16 +114,10 @@ auto FileReadContext::read() -> std::vector<std::uint8_t>
 
 auto FileWriteContext::write(const std::vector<std::uint8_t> &data) -> void
 {
-    LOG_DEBUG("Sending file data");
-
-    std::ofstream file(path, std::ios::binary | std::ios::app);
-
     if (!file.is_open() || file.fail()) {
         LOG_ERROR("File %s open error", path.c_str());
         throw std::runtime_error("File open error");
     }
-
-    file.seekp(offset);
 
     auto dataLeft = std::min(static_cast<std::size_t>(chunkSize), (size - offset));
 
@@ -135,8 +130,6 @@ auto FileWriteContext::write(const std::vector<std::uint8_t> &data) -> void
     }
 
     runningCrc32Digest.add(data.data(), dataLeft);
-
-    LOG_DEBUG("Written %u bytes", static_cast<unsigned int>(dataLeft));
 
     advanceFileOffset(dataLeft);
 
