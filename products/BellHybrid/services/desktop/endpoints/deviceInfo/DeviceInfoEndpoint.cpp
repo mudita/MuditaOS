@@ -22,7 +22,7 @@
 namespace sdesktop::endpoints
 {
 
-    auto DeviceInfoEndpoint::getSerialNumber() -> std::string
+    auto DeviceInfoEndpoint::getSerialNumber() -> const std::string &
     {
         return serial_number_reader::readSerialNumber();
     }
