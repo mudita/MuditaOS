@@ -30,7 +30,12 @@ Dialog::Dialog(app::ApplicationCommon *app, const std::string &name) : gui::AppW
 void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
-        setTitle(metadata->get().title);
+        auto title = metadata->get().title;
+        if (size_t crLfPos = title.find_first_of("\r\n"); crLfPos != title.npos) {
+            auto lengthToReplace = title.size() - crLfPos;
+            title.replace(crLfPos, lengthToReplace, "...");
+        }
+        setTitle(title);
         icon->text->setRichText(metadata->get().text);
         icon->image->set(metadata->get().icon);
         icon->resizeItems();
