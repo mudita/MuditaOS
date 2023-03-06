@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookInputOptions.hpp"
@@ -15,7 +15,7 @@ namespace gui
 
     void PhonebookInputOptions::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (auto message = dynamic_cast<PhonebookInputOptionData *>(data)) {
+        if (const auto message = dynamic_cast<PhonebookInputOptionData *>(data)) {
             addOptions(inputOptionsList(message->getInputText()));
             optionsList->rebuildList();
         }
@@ -35,7 +35,10 @@ namespace gui
 
         if (Clipboard::getInstance().gotData()) {
             options.emplace_back(utils::translate("common_text_paste"), [=](gui::Item &item) {
-                text->addText(Clipboard::getInstance().paste(), AdditionType::perBlock);
+                /* Single line text ellipsis implementation doesn't properly support
+                 * text that consists of multiple blocks - use character addition
+                 * type, so that whole text is stored in one block. */
+                text->addText(Clipboard::getInstance().paste(), AdditionType::perChar);
                 application->returnToPreviousWindow();
                 return true;
             });
