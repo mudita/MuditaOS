@@ -52,6 +52,7 @@ namespace app::onBoarding
         eulaText->setPenWidth(::style::window::default_border_rect_no_focus);
         eulaText->setEditMode(gui::EditMode::Scroll);
         eulaText->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
+        eulaText->setScrollLeap(4);
 
         navBar->setActive(gui::nav_bar::Side::Left, true);
 

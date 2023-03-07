@@ -586,18 +586,26 @@ namespace gui
         }
 
         if (isMode(EditMode::Scroll) && textType == TextType::MultiLine) {
-
             debug_text("Text in scroll mode ignores left/right navigation");
             if (inputEvent.is(KeyCode::KEY_LEFT) || inputEvent.is(KeyCode::KEY_RIGHT)) {
                 return false;
             }
 
+            auto scroll_ = [this](auto activity) {
+                bool notAtEdge = true;
+                for (size_t ii = 0; ii < scrollLeap && notAtEdge; ++ii) {
+                    notAtEdge &= activity();
+                }
+                return notAtEdge;
+            };
+            auto cursor_ = static_cast<TextLinesCursor *>(cursor);
+
             if (inputEvent.is(KeyCode::KEY_DOWN)) {
-                return cursor->handleNextLine();
+                return scroll_(std::bind(&TextLinesCursor::displayNextLine, cursor_));
             }
 
             if (inputEvent.is(KeyCode::KEY_UP)) {
-                return cursor->handlePreviousLine();
+                return scroll_(std::bind(&TextLinesCursor::displayPreviousLine, cursor_));
             }
         }
 
