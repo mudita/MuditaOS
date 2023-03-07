@@ -36,7 +36,7 @@ namespace gui
                                       musicPlayerStyle::allSongsWindow::w,
                                       musicPlayerStyle::allSongsWindow::h,
                                       presenter->getMusicPlayerModelInterface(),
-                                      listview::ScrollBarType::Fixed);
+                                      ScrollBarType::Fixed);
         songsList->setBoundaries(Boundaries::Continuous);
 
         emptyListIcon = new gui::Icon(this,

@@ -34,7 +34,7 @@ namespace gui
                             style::listview::body_width_with_scroll,
                             style::window::default_body_height,
                             presenter->getTechnicalInformationProvider(),
-                            listview::ScrollBarType::Fixed);
+                            ScrollBarType::Fixed);
 
         setFocusItem(list);
         list->rebuildList();

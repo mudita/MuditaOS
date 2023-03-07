@@ -62,7 +62,7 @@ namespace gui
                                  mainWindow::w,
                                  mainWindow::h,
                                  calllogModel,
-                                 gui::listview::ScrollBarType::Fixed);
+                                 gui::ScrollBarType::Fixed);
         list->setBoundaries(Boundaries::Continuous);
         setFocusItem(list);
 

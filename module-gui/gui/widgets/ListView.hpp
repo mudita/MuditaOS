@@ -6,40 +6,16 @@
 #include "ListViewEngine.hpp"
 #include "ListItemProvider.hpp"
 #include "BoxLayout.hpp"
+#include "ScrollBar.hpp"
 
 namespace gui
 {
-
-    class ListViewScroll : public Rect
-    {
-      private:
-        unsigned int storedStartIndex = 0;
-        unsigned int currentPage      = listview::nPos;
-        unsigned int pagesCount       = 0;
-        int topMargin                 = style::margins::big;
-
-        void updateProportional(const ListViewScrollUpdateData &data);
-        void updateFixed(const ListViewScrollUpdateData &data);
-        void updatePreRendered(const ListViewScrollUpdateData &data);
-
-      public:
-        listview::ScrollBarType type = listview::ScrollBarType::None;
-
-        ListViewScroll(
-            Item *parent, unsigned int x, unsigned int y, unsigned int w, unsigned int h, listview::ScrollBarType type);
-
-        bool shouldShowScroll(unsigned int listPageSize, unsigned int elementsCount);
-        void updateStartConditions(const ListViewScrollSetupData &data);
-        void update(const ListViewScrollUpdateData &data);
-        void setTopMargin(int _topMargin);
-    };
-
     class ListView : public Rect, public ListViewEngine
     {
       protected:
-        ListViewScroll *scroll = nullptr;
+        ListScrollBar *scroll = nullptr;
         void applyScrollCallbacks();
-        void determineFetchType(listview::ScrollBarType scrollType);
+        void determineFetchType(ScrollBarType scrollType);
         void setFocus() override;
 
       public:
@@ -49,7 +25,7 @@ namespace gui
                  unsigned int w,
                  unsigned int h,
                  std::shared_ptr<ListItemProvider> prov,
-                 listview::ScrollBarType scrollType = listview::ScrollBarType::Proportional);
+                 ScrollBarType scrollType = ScrollBarType::Proportional);
 
         void setScrollTopMargin(int value);
         void clear() override;

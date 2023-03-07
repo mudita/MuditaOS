@@ -209,7 +209,7 @@ namespace gui
         setFocus();
 
         if (updateScrollCallback) {
-            updateScrollCallback(ListViewScrollUpdateData{startIndex,
+            updateScrollCallback(ListViewScrollBarUpdateData{startIndex,
                                                           currentPageSize,
                                                           elementsCount,
                                                           provider->getMinimalItemSpaceRequired(),

@@ -183,7 +183,7 @@ namespace gui
                                    option::window::optionsListW,
                                    musicLibraryScreen::optionListHeight,
                                    optionsModel,
-                                   listview::ScrollBarType::None);
+                                   ScrollBarType::None);
         optionsList->prepareRebuildCallback = [this]() { recreateOptions(); };
         optionsModel->createData(options);
         optionsList->rebuildList(listview::RebuildType::InPlace);

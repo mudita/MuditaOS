@@ -33,7 +33,7 @@ namespace gui
                                  style::window::date_and_time::listView_w,
                                  style::window::date_and_time::listView_h,
                                  dateAndTimeModel,
-                                 gui::listview::ScrollBarType::PreRendered);
+                                 gui::ScrollBarType::PreRendered);
         setFocusItem(list);
 
         fromTillDate       = std::make_shared<utils::time::FromTillDate>();

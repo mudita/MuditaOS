@@ -15,7 +15,7 @@ namespace gui
                                          uint32_t w,
                                          uint32_t h,
                                          std::shared_ptr<ListItemProvider> prov,
-                                         listview::ScrollBarType scrollBarType)
+                                         ScrollBarType scrollBarType)
         : ListView(parent, x, y, w, h, prov, scrollBarType), app{application}
     {
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {

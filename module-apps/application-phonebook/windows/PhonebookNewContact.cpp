@@ -41,7 +41,7 @@ namespace gui
                                  phonebookStyle::newContactWindow::newContactsList::w,
                                  phonebookStyle::newContactWindow::newContactsList::h,
                                  newContactModel,
-                                 listview::ScrollBarType::PreRendered);
+                                 ScrollBarType::PreRendered);
         list->setBoundaries(Boundaries::Continuous);
         newContactModel->createData();
 

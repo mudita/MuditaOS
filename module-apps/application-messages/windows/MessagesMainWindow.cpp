@@ -51,7 +51,7 @@ namespace gui
                                  msgThreadStyle::listWidth,
                                  msgThreadStyle::listHeight,
                                  threadsModel,
-                                 listview::ScrollBarType::Fixed);
+                                 ScrollBarType::Fixed);
         list->setBoundaries(Boundaries::Continuous);
         list->setScrollTopMargin(style::margins::small);
 

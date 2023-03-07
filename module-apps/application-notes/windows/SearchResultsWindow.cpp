@@ -40,7 +40,7 @@ namespace app::notes
                                  style::list::Width,
                                  style::list::Height,
                                  presenter->getNotesItemProvider(),
-                                 gui::listview::ScrollBarType::Fixed);
+                                 gui::ScrollBarType::Fixed);
         list->setBoundaries(gui::Boundaries::Continuous);
         list->setScrollTopMargin(::style::margins::small);
         list->emptyListCallback = [&]() { onNothingFound(presenter->getSearchText()); };

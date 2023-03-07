@@ -35,7 +35,7 @@ namespace app::alarmClock
                                  style::alarmClock::window::listView_w,
                                  style::alarmClock::window::listView_h,
                                  presenter->getItemProvider(),
-                                 gui::listview::ScrollBarType::None);
+                                 gui::ScrollBarType::None);
         setFocusItem(list);
     }
 

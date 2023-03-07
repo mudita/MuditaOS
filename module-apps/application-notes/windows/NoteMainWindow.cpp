@@ -60,7 +60,7 @@ namespace app::notes
                                  listStyle::Width,
                                  listStyle::Height,
                                  presenter->getNotesItemProvider(),
-                                 gui::listview::ScrollBarType::Fixed);
+                                 gui::ScrollBarType::Fixed);
         list->setBoundaries(gui::Boundaries::Continuous);
         list->setPenWidth(listStyle::PenWidth);
         list->setPenFocusWidth(listStyle::FocusedPenWidth);

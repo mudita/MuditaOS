@@ -3,6 +3,7 @@
 
 #include "ListViewWithArrows.hpp"
 #include "TextFixedSize.hpp"
+#include "ScrollBar.hpp"
 #include <InputEvent.hpp>
 
 namespace gui
@@ -142,7 +143,7 @@ namespace gui
 
     void ListViewWithArrows::applyScrollCallbacks()
     {
-        updateScrollCallback = [this](ListViewScrollUpdateData data) {
+        updateScrollCallback = [this](ListViewScrollBarUpdateData const& data) {
             auto elementsOnPage = listOverlay->centerBox->widgetArea.h / data.elementMinimalSpaceRequired;
 
             if (boundaries == Boundaries::Continuous) {

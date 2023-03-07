@@ -37,7 +37,7 @@ namespace gui
                             style::window::default_body_width,
                             style::window::default_body_height,
                             presenter->getPagesProvider(),
-                            listview::ScrollBarType::Fixed);
+                            ScrollBarType::Fixed);
         list->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         list->rebuildList();

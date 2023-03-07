@@ -5,6 +5,7 @@
 #include "InputEvent.hpp"
 #include "SideListView.hpp"
 #include "Style.hpp"
+#include "SideListView.hpp"
 
 namespace gui
 {
@@ -75,7 +76,7 @@ namespace gui
 
     auto SideListView::applyScrollCallbacks() -> void
     {
-        updateScrollCallback = [this](ListViewScrollUpdateData data) {
+        updateScrollCallback = [this](ListViewScrollBarUpdateData const& data) {
             if (pageBar != nullptr) {
                 auto elementsOnPage = body->widgetArea.w / data.elementMinimalSpaceRequired;
                 auto pagesCount     = data.elementsCount % elementsOnPage == 0 ? data.elementsCount / elementsOnPage

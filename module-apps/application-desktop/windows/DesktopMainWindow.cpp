@@ -50,7 +50,7 @@ namespace gui
                                          style::notifications::model::w,
                                          style::notifications::model::h,
                                          notificationsListPresenter,
-                                         listview::ScrollBarType::Fixed);
+                                         ScrollBarType::Fixed);
         notificationsList->emptyListCallback = [this]() {
             setFocusItem(nullptr);
             setActiveState();

@@ -37,7 +37,7 @@ namespace gui
                                         style::window_height - style::window::default_vertical_pos + 1 -
                                             style::nav_bar::height + style::margins::small,
                                         mSoundsModel,
-                                        listview::ScrollBarType::Proportional);
+                                        ScrollBarType::Proportional);
         mSoundsList->setBoundaries(Boundaries::Continuous);
 
         setFocusItem(mSoundsList);

@@ -45,7 +45,7 @@ namespace gui
                                  style::quotes::list::Width,
                                  style::quotes::list::Height,
                                  quotesModel,
-                                 gui::listview::ScrollBarType::Fixed);
+                                 gui::ScrollBarType::Fixed);
 
         list->emptyListCallback = [this]() {
             navBar->setActive(nav_bar::Side::Left, false);

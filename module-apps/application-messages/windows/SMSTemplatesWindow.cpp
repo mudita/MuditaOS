@@ -45,7 +45,7 @@ namespace gui
         namespace style = style::messages::templates::list;
 
         list = new gui::ListView(
-            this, style::x, style::y, style::w, style::h, smsTemplateModel, listview::ScrollBarType::Fixed);
+            this, style::x, style::y, style::w, style::h, smsTemplateModel, ScrollBarType::Fixed);
         list->setBoundaries(Boundaries::Continuous);
 
         using namespace ::style;

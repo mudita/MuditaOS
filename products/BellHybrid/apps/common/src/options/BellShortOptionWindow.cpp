@@ -38,7 +38,7 @@ namespace gui
         body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, false);
         body->setEdges(RectangleEdge::None);
 
-        optionsList = new gui::ListView(body->centerBox, 0, 0, 0, 0, optionsModel, listview::ScrollBarType::None);
+        optionsList = new gui::ListView(body->centerBox, 0, 0, 0, 0, optionsModel, ScrollBarType::None);
         optionsList->setAlignment(Alignment(Alignment::Vertical::Bottom));
         optionsList->setMinimumSize(style::bell_options::default_text_width, style::bell_base_layout::center_layout_h);
         optionsList->setEdges(RectangleEdge::None);

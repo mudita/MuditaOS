@@ -46,7 +46,7 @@ namespace app::alarmClock
                                        style::alarmClock::window::listView_w,
                                        style::alarmClock::window::listView_h,
                                        presenter->getAlarmsItemProvider(),
-                                       gui::listview::ScrollBarType::Fixed);
+                                       gui::ScrollBarType::Fixed);
         alarmsList->setBoundaries(gui::Boundaries::Continuous);
 
         alarmsList->focusChangedCallback = [this](gui::Item &) {

@@ -18,7 +18,7 @@ namespace gui
                                          style::notifications::model::w,
                                          style::notifications::model::h,
                                          notificationsListPresenter,
-                                         listview::ScrollBarType::None);
+                                         ScrollBarType::None);
         hide();
     }
 

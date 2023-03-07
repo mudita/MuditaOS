@@ -42,7 +42,7 @@ namespace gui
                                         option::window::optionsListW,
                                         option::window::optionsListH,
                                         optionsModel,
-                                        listview::ScrollBarType::None);
+                                        ScrollBarType::None);
         optionsList->setBoundaries(Boundaries::Continuous);
         optionsList->prepareRebuildCallback = [this]() { recreateOptions(); };
 

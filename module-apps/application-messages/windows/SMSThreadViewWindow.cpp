@@ -35,7 +35,7 @@ namespace gui
                                     style::messages::smsList::w,
                                     style::messages::smsList::h,
                                     smsModel,
-                                    listview::ScrollBarType::Proportional);
+                                    ScrollBarType::Proportional);
         smsList->setOrientation(listview::Orientation::BottomTop);
 
         setFocusItem(smsList);

@@ -25,6 +25,6 @@ namespace gui
                           uint32_t w,
                           uint32_t h,
                           std::shared_ptr<ListItemProvider> prov,
-                          listview::ScrollBarType scrollType = listview::ScrollBarType::Proportional);
+                          ScrollBarType scrollType = ScrollBarType::Proportional);
     };
 } // namespace gui

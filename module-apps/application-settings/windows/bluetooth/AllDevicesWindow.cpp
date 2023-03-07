@@ -32,7 +32,7 @@ namespace gui
                                         option::window::optionsListW,
                                         option::window::optionsListH,
                                         optionsModel,
-                                        listview::ScrollBarType::Proportional);
+                                        ScrollBarType::Proportional);
 
         optionsList->prepareRebuildCallback = [this]() { recreateOptions(); };
         optionsModel->createData(options);

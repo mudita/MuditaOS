@@ -5,19 +5,15 @@
 
 #include <ListItemProvider.hpp>
 #include <BoxLayout.hpp>
+#include <ScrollBar.hpp>
 
 namespace gui
 {
+    struct ListViewScrollBarUpdateData;
+
     namespace listview
     {
         inline constexpr auto nPos = std::numeric_limits<unsigned>::max();
-
-        /// Possible List scrolling directions
-        enum class Direction
-        {
-            Top,
-            Bottom
-        };
 
         /// Possible List rebuild types
         enum class RebuildType
@@ -27,19 +23,6 @@ namespace gui
             OnPageElement, ///< OnPageElement rebuild - focus on provided element index and calculated page.
             OnOffset       ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
                            ///< offset.
-        };
-
-        /// Possible List ScrollBar types
-        enum class ScrollBarType
-        {
-            None,         ///< None - list without scroll bar (but with scrolling).
-            Proportional, ///< Proportional - scroll bar size calculated based on elements count in model and currently
-                          ///< displayed number of elements. Use with large unequal heights lists elements.
-            Fixed,        ///< Fixed - scroll bar size calculated based on fixed equal elements sizes in list.
-                          ///< Use when all elements have equal heights.
-            PreRendered   ///< PreRendered - scroll bar size calculated based on pre rendered pages on whole list. Use
-                          ///< when elements are not equal heights but there are few of them as its renders whole
-                          ///< context and can be time consuming.
         };
 
         /// Possible page fill types
@@ -62,16 +45,6 @@ namespace gui
         const unsigned storedStartIndex;
         const unsigned currentPage;
         const unsigned pagesCount;
-    };
-
-    struct ListViewScrollUpdateData
-    {
-        const unsigned startIndex;
-        const unsigned listPageSize;
-        const unsigned elementsCount;
-        const unsigned elementMinimalSpaceRequired;
-        const listview::Direction direction;
-        const Boundaries boundaries;
     };
 
     class ListItemProvider;
@@ -131,7 +104,7 @@ namespace gui
         BoxLayout *body = nullptr;
 
         /// Scroll handling callbacks
-        std::function<void(const ListViewScrollUpdateData &data)> updateScrollCallback;
+        std::function<void(const ListViewScrollBarUpdateData &data)> updateScrollCallback;
         std::function<void(const ListViewScrollSetupData &data)> setupScrollCallback;
         std::function<void()> resizeScrollCallback;
 
