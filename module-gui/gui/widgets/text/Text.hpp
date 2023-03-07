@@ -134,6 +134,14 @@ namespace gui
         void setTextLimitType(TextLimitType limitType, unsigned int val = 0);
         void clearTextLimits();
         void drawUnderline(bool val);
+        size_t getScrollLeap() const
+        {
+            return scrollLeap;
+        }
+        void setScrollLeap(size_t leap)
+        {
+            scrollLeap = leap;
+        }
 
         TextBackup backupText() const;
         void restoreFrom(const TextBackup &backup);
@@ -182,6 +190,7 @@ namespace gui
 
       private:
         gui::KeyInputMappedTranslation translator;
+        size_t scrollLeap = 1;
 
       public:
         /// Callback when text changed

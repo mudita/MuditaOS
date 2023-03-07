@@ -20,6 +20,7 @@
 * Unified grey color tones used while displaying texts
 * Replaced English labels occuring in French translation with French ones
 * Added new field to deviceInfo endpoint
+* Made EULA window scroll by a few lines at once
 
 ### Fixed
 
