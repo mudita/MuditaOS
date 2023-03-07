@@ -26,7 +26,12 @@
 #### General:
 * Added serial number and timestamp to crashdump filename
 
-## [1.8.1 2023-03-06]
+## [1.8.1 2023-03-07]
+
+### Added
+
+#### UI/UX:
+* Added notification that the device needs to be charged before first use.
 
 ### Fixed
 
