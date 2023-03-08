@@ -10,7 +10,7 @@ namespace gui
 {
     namespace listview
     {
-        inline constexpr auto nPos = std::numeric_limits<unsigned int>::max();
+        inline constexpr auto nPos = std::numeric_limits<unsigned>::max();
 
         /// Possible List scrolling directions
         enum class Direction
@@ -59,24 +59,24 @@ namespace gui
 
     struct ListViewScrollSetupData
     {
-        const unsigned int storedStartIndex;
-        const unsigned int currentPage;
-        const unsigned int pagesCount;
+        const unsigned storedStartIndex;
+        const unsigned currentPage;
+        const unsigned pagesCount;
     };
 
     struct ListViewScrollUpdateData
     {
-        const unsigned int startIndex;
-        const unsigned int listPageSize;
-        const unsigned int elementsCount;
-        const unsigned int elementMinimalSpaceRequired;
+        const unsigned startIndex;
+        const unsigned listPageSize;
+        const unsigned elementsCount;
+        const unsigned elementMinimalSpaceRequired;
         const listview::Direction direction;
         const Boundaries boundaries;
     };
 
     class ListItemProvider;
 
-    using rebuildRequest = std::pair<listview::RebuildType, unsigned int>;
+    using rebuildRequest = std::pair<listview::RebuildType, unsigned>;
 
     class ListViewEngine
     {
@@ -85,15 +85,15 @@ namespace gui
         virtual ~ListViewEngine();
 
         /// First requested index from provider
-        unsigned int startIndex = 0;
+        unsigned startIndex = 0;
         void setStartIndex();
         /// Recalculating startIndex if list internal conditions (i.e. size has changed).
         void recalculateStartIndex();
         /// Calculate max items on page based on provided minimal item in axis size from provider.
         /// That method is used when full list render can be omitted.
-        unsigned int calculateMaxItemsOnPage();
+        unsigned calculateMaxItemsOnPage();
         /// Calculates request elements count to full next request page with small excess
-        unsigned int calculateLimit(listview::Direction value = listview::Direction::Bottom);
+        unsigned calculateLimit(listview::Direction value = listview::Direction::Bottom);
         /// Recalculate startIndex on body resize requests
         void recalculateOnBoxRequestedResize();
 
@@ -105,13 +105,13 @@ namespace gui
         void fillFirstPage();
 
         /// Stored index of focused element before new data request
-        unsigned int storedFocusIndex = listview::nPos;
-        [[nodiscard]] unsigned int getFocusItemIndex();
+        unsigned storedFocusIndex = listview::nPos;
+        [[nodiscard]] unsigned getFocusItemIndex();
 
         /// Total provider elements count
         unsigned int elementsCount = listview::nPos;
-        void setElementsCount(unsigned int count);
-        void onElementsCountChanged(unsigned int count);
+        void setElementsCount(unsigned count);
+        void onElementsCountChanged(unsigned count);
         bool shouldCallEmptyListCallbacks = false;
         void checkEmptyListCallbacks();
 
@@ -119,7 +119,7 @@ namespace gui
         std::shared_ptr<ListItemProvider> provider = nullptr;
 
         /// Count of elements displayed on current page
-        unsigned int currentPageSize = 0;
+        unsigned currentPageSize = 0;
         /// Flag indicating that page has been loaded
         bool pageLoaded = true;
         /// Handle focusing method
@@ -145,11 +145,11 @@ namespace gui
         /// Stored last executed rebuildRequest
         rebuildRequest lastRebuildRequest = {listview::RebuildType::Full, 0};
         /// Setup method for list rebuild request
-        void setup(listview::RebuildType rebuildType, unsigned int dataOffset = 0);
+        void setup(listview::RebuildType rebuildType, unsigned dataOffset = 0);
         void prepareFullRebuild();
-        void prepareOnOffsetRebuild(unsigned int dataOffset);
+        void prepareOnOffsetRebuild(unsigned dataOffset);
         void prepareInPlaceRebuild();
-        void prepareOnPageElementRebuild(unsigned int dataOffset);
+        void prepareOnPageElementRebuild(unsigned dataOffset);
 
         /// List boundaries types
         Boundaries boundaries = Boundaries::Fixed;
@@ -179,7 +179,7 @@ namespace gui
 
         /// send list rebuild request
         void rebuildList(listview::RebuildType rebuildType = listview::RebuildType::Full,
-                         unsigned int dataOffset           = 0,
+                         unsigned dataOffset               = 0,
                          bool forceRebuild                 = false);
         /// In case of elements count change there can be a need to resend request in case of having one async query for
         /// count and records.

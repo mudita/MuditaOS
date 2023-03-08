@@ -18,7 +18,7 @@ namespace gui
         clear();
     }
 
-    void ListViewEngine::setElementsCount(unsigned int count)
+    void ListViewEngine::setElementsCount(unsigned count)
     {
         if ((elementsCount != count) || (elementsCount == listview::nPos)) {
             onElementsCountChanged(count);
@@ -55,7 +55,7 @@ namespace gui
         return elementsCount == 0;
     }
 
-    void ListViewEngine::rebuildList(listview::RebuildType rebuildType, unsigned int dataOffset, bool forceRebuild)
+    void ListViewEngine::rebuildList(listview::RebuildType rebuildType, unsigned dataOffset, bool forceRebuild)
     {
         if (pageLoaded || forceRebuild) {
 
@@ -87,7 +87,7 @@ namespace gui
         storedFocusIndex = listview::nPos;
     }
 
-    void ListViewEngine::prepareOnOffsetRebuild(unsigned int dataOffset)
+    void ListViewEngine::prepareOnOffsetRebuild(unsigned dataOffset)
     {
         if (dataOffset < elementsCount) {
             startIndex       = dataOffset;
@@ -105,13 +105,14 @@ namespace gui
         }
     }
 
-    void ListViewEngine::prepareOnPageElementRebuild(unsigned int dataOffset)
+    void ListViewEngine::prepareOnPageElementRebuild(unsigned dataOffset)
     {
-        startIndex       = (dataOffset / calculateMaxItemsOnPage()) * calculateMaxItemsOnPage();
-        storedFocusIndex = dataOffset % calculateMaxItemsOnPage();
+        const auto maxItemsOnPage = calculateMaxItemsOnPage();
+        startIndex                = (dataOffset / maxItemsOnPage) * maxItemsOnPage;
+        storedFocusIndex          = dataOffset % maxItemsOnPage;
     }
 
-    void ListViewEngine::setup(listview::RebuildType rebuildType, unsigned int dataOffset)
+    void ListViewEngine::setup(listview::RebuildType rebuildType, unsigned dataOffset)
     {
         switch (rebuildType) {
         case listview::RebuildType::Full:
@@ -147,12 +148,12 @@ namespace gui
         clear();
     }
 
-    unsigned int ListViewEngine::getFocusItemIndex()
+    unsigned ListViewEngine::getFocusItemIndex()
     {
         auto index = body->getFocusItemIndex();
 
         if (direction == listview::Direction::Top) {
-            int position = currentPageSize - 1 - index;
+            const int position = currentPageSize - 1 - index;
             index        = std::abs(position);
         }
 
@@ -176,7 +177,7 @@ namespace gui
     {
         body->setFocusItem(nullptr);
 
-        while (auto el = body->children.back()) {
+        while (const auto el = body->children.back()) {
 
             if (el->type == ItemType::LIST_ITEM) {
 
@@ -187,8 +188,9 @@ namespace gui
                     body->erase(el);
                 }
             }
-            else
+            else {
                 body->erase(el);
+            }
         }
     }
 
@@ -242,16 +244,18 @@ namespace gui
 
     Order ListViewEngine::getOrderFromDirection() const noexcept
     {
-        if (direction == listview::Direction::Bottom)
+        if (direction == listview::Direction::Bottom) {
             return Order::Next;
+        }
 
         return Order::Previous;
     }
 
     Order ListViewEngine::getOppositeOrderFromDirection() const noexcept
     {
-        if (direction == listview::Direction::Bottom)
+        if (direction == listview::Direction::Bottom) {
             return Order::Previous;
+        }
 
         return Order::Next;
     }
@@ -306,9 +310,7 @@ namespace gui
     {
         currentPageSize = 0;
 
-        ListItem *item = nullptr;
-
-        while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
+        while (const auto item = provider->getItem(getOrderFromDirection())) {
 
             body->addWidget(item);
 
@@ -340,7 +342,7 @@ namespace gui
 
         if (requestCompleteData) {
 
-            unsigned int page   = 0;
+            unsigned page       = 0;
             auto pageStartIndex = 0;
 
             clear();
@@ -401,7 +403,7 @@ namespace gui
         }
     }
 
-    void ListViewEngine::onElementsCountChanged(unsigned int count)
+    void ListViewEngine::onElementsCountChanged(unsigned count)
     {
         if (elementsCount == 0 || count == 0) {
             shouldCallEmptyListCallbacks = true;
@@ -433,9 +435,9 @@ namespace gui
     {
         if (currentPageSize != body->getVisibleChildrenCount()) {
 
-            unsigned int diff = currentPageSize < body->getVisibleChildrenCount()
-                                    ? 0
-                                    : currentPageSize - body->getVisibleChildrenCount();
+            const unsigned diff = currentPageSize < body->getVisibleChildrenCount()
+                                      ? 0
+                                      : currentPageSize - body->getVisibleChildrenCount();
             currentPageSize   = body->getVisibleChildrenCount();
 
             if (direction == listview::Direction::Top) {
@@ -453,24 +455,21 @@ namespace gui
         }
     }
 
-    unsigned int ListViewEngine::calculateMaxItemsOnPage()
+    unsigned ListViewEngine::calculateMaxItemsOnPage()
     {
         assert(provider->getMinimalItemSpaceRequired() != 0);
-        auto count = body->getPrimarySize() / provider->getMinimalItemSpaceRequired();
-
+        const auto count = body->getPrimarySize() / provider->getMinimalItemSpaceRequired();
         return count;
     }
 
-    unsigned int ListViewEngine::calculateLimit(listview::Direction value)
+    unsigned ListViewEngine::calculateLimit(listview::Direction value)
     {
-        auto minLimit =
-            (2 * currentPageSize > calculateMaxItemsOnPage() ? 2 * currentPageSize : calculateMaxItemsOnPage());
+        const auto minLimit = std::max(2 * currentPageSize, calculateMaxItemsOnPage());
+
         if (value == listview::Direction::Bottom) {
-            return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
+            return (minLimit + startIndex <= elementsCount) ? minLimit : (elementsCount - startIndex);
         }
-        else {
-            return minLimit < startIndex ? minLimit : startIndex;
-        }
+        return std::min(minLimit, startIndex);
     }
 
     bool ListViewEngine::requestNextPage()
