@@ -15,6 +15,8 @@
 #include "windows/PhonebookSearchResults.hpp"
 #include "windows/PhonebookIceContacts.hpp"
 #include "windows/PhonebookInputOptions.hpp"
+#include "service-appmgr/messages/SwitchBackRequest.hpp"
+#include "service-appmgr/Controller.hpp"
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <utility>
@@ -38,9 +40,15 @@ namespace app
                                                                           item->contact);
 
                     switchWindow(gui::window::name::multiple_numbers_select, std::move(data));
-                    return true;
                 }
-                return false;
+                else {
+                    std::unique_ptr<PhonebookSearchRequest> data = std::make_unique<PhonebookSearchRequest>();
+                    data->result                                 = item->contact;
+                    data->setDescription("PhonebookSearchRequest");
+                    return app::manager::Controller::switchBack(
+                        this, std::make_unique<app::manager::SwitchBackRequest>(GetName(), std::move(data)));
+                }
+                return true;
             };
             switchWindow(gui::name::window::main_window, std::move(data));
             return actionHandled();
