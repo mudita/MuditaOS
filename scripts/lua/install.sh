@@ -32,12 +32,6 @@ if validate_product_selection; then
     cp -r share ${DESTINATION}/share
     cp -r migration/migration.lua ${DESTINATION}/share
     cp *.lua ${DESTINATION}
-
-    if [ -n "$3" ]; then
-        echo "Generating UDM update package"
-        cp update_udm.lua ${DESTINATION}/update.lua
-        cp products/${PRODUCT}/update_product.lua ${DESTINATION}
-    fi
     rm ${DESTINATION}/update_udm.lua
     cd -
 fi
