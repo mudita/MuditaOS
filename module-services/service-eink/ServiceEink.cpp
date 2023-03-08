@@ -28,8 +28,13 @@ namespace service::eink
 {
     namespace
     {
+        #if PROJECT==BellHybrid
+            constexpr std::chrono::milliseconds displayPowerOffTimeout{200};
+        #else
+            constexpr std::chrono::milliseconds displayPowerOffTimeout{2000};
+        #endif
+
         constexpr auto ServceEinkStackDepth = 4096U;
-        constexpr std::chrono::milliseconds displayPowerOffTimeout{2000};
 
         std::string toSettingString(const EinkModeMessage::Mode mode)
         {
