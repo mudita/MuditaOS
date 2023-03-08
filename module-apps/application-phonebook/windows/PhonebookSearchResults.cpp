@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookSearchResults.hpp"
+#include <Icon.hpp>
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
@@ -99,7 +100,13 @@ namespace gui
             navBar->setActive(nav_bar::Side::Left, true);
             navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
             navBar->setActive(nav_bar::Side::Center, true);
-            navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
+            if (searchResultsModel->customContactActivationCallback) {
+                navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
+            }
+            else {
+                navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::open));
+            }
+
             setFocusItem(searchResultList);
         }
         else {
