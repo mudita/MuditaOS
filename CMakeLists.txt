@@ -96,7 +96,8 @@ add_compile_definitions(FSL_RTOS_FREE_RTOS
     __USE_CMSIS
     __NEWLIB__
     SKIP_SYSCLK_INIT
-    _GNU_SOURCE)
+    _GNU_SOURCE
+    PROJECT=${PRODUCT})
 
 add_compile_options(
     $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
