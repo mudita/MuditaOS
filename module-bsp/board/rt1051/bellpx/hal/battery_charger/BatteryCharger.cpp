@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryChargerIRQ.hpp"
@@ -55,7 +55,7 @@ namespace hal::battery
         explicit BellBatteryCharger(xQueueHandle irqQueueHandle);
         ~BellBatteryCharger();
 
-        Voltage getBatteryVoltage() const final;
+        std::optional<Voltage> getBatteryVoltage() const final;
         std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
         ChargerPresence getChargerPresence() const final;
@@ -63,8 +63,10 @@ namespace hal::battery
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
       private:
+        template <typename Invokable, typename... Params>
+        auto attemptToGetData(Invokable &&invokable, Params &&...params) const;
+
         void sendNotification(Events event);
-        std::optional<SOC> fetchBatterySOC() const;
         void pollFuelGauge();
         bool tryEnableCharging();
 
@@ -135,20 +137,30 @@ namespace hal::battery
         fuel_gauge.init_irq_pin(fuel_gauge_gpio, fuel_gauge_irq_pin);
     }
 
-    AbstractBatteryCharger::Voltage BellBatteryCharger::getBatteryVoltage() const
+    template <typename Invokable, typename... Params>
+    auto BellBatteryCharger::attemptToGetData(Invokable &&invokable, Params &&...params) const
     {
-        if (const auto result = fuel_gauge.get_battery_voltage()) {
-            return *result;
+        constexpr std::uint8_t maxAttempts = 5;
+        for (std::uint8_t i = 0; i < maxAttempts; ++i) {
+            if (const auto result = std::invoke(invokable, std::forward<Params>(params)...)) {
+                return result;
+            }
+            i2c->ReInit();
+            LOG_INFO("Attempting to get I2C data: %d", i);
+            vTaskDelay(pdMS_TO_TICKS(i * 10));
         }
-        else {
-            LOG_ERROR("Error during fetching battery voltage");
-            return 0;
-        }
+        LOG_ERROR("Error during fetching I2C data");
+        return std::result_of_t<Invokable(Params...)>{};
+    }
+
+    std::optional<AbstractBatteryCharger::Voltage> BellBatteryCharger::getBatteryVoltage() const
+    {
+        return attemptToGetData(&bsp::devices::power::CW2015::get_battery_voltage, fuel_gauge);
     }
 
     std::optional<AbstractBatteryCharger::SOC> BellBatteryCharger::getSOC() const
     {
-        return fetchBatterySOC();
+        return attemptToGetData(&bsp::devices::power::CW2015::get_battery_soc, fuel_gauge);
     }
 
     AbstractBatteryCharger::ChargingStatus BellBatteryCharger::getChargingStatus() const
@@ -158,7 +170,7 @@ namespace hal::battery
         /// the current state of SOC.
 
         const auto charger_status = charger.get_charge_status();
-        const auto current_soc    = fetchBatterySOC();
+        const auto current_soc    = getSOC();
 
         if (charger_status == MP2639B::ChargingStatus::Complete && current_soc >= 100) {
             return ChargingStatus::ChargingDone;
@@ -187,16 +199,6 @@ namespace hal::battery
                                                                   : AbstractBatteryCharger::ChargerPresence::PluggedIn;
     }
 
-    std::optional<AbstractBatteryCharger::SOC> BellBatteryCharger::fetchBatterySOC() const
-    {
-        if (const auto soc = fuel_gauge.get_battery_soc(); const auto scaled_soc = scale_soc(*soc)) {
-            return scaled_soc;
-        }
-        else {
-            LOG_ERROR("Error during fetching battery level");
-            return std::nullopt;
-        }
-    }
     BellBatteryCharger::BatteryWorkerQueue &BellBatteryCharger::getWorkerQueueHandle()
     {
         return *worker_queue;
