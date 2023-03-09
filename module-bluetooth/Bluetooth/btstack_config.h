@@ -38,14 +38,15 @@
 
 // BTstack configuration. buffers, sizes, ...
 #define HCI_INCOMING_PRE_BUFFER_SIZE 14 // sizeof benep heade, avoid memcpy
-//#define HCI_ACL_PAYLOAD_SIZE         (1691 + 4)
-#define HCI_ACL_PAYLOAD_SIZE         (1021+4)
+#define HCI_ACL_PAYLOAD_SIZE         (1691 + 4)
+//#define HCI_ACL_PAYLOAD_SIZE         (1021+4)
 
 #define ENABLE_GATT_CLIENT_PAIRING
 #define ENABLE_L2CAP_ENHANCED_RETRANSMISSION_MODE
 #define ENABLE_CC256X_BAUDRATE_CHANGE_FLOWCONTROL_BUG_WORKAROUND
 //#define HAVE_EMBEDDED_TIME_MS
 
+#define MAX_NR_HFP_CONNECTIONS 1
 //#define MAX_NR_HCI_CONNECTIONS                    4
 //#define MAX_NR_L2CAP_SERVICES                     5
 //#define MAX_NR_L2CAP_CHANNELS                     6

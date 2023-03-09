@@ -21,6 +21,7 @@
 * Replaced English labels occuring in French translation with French ones
 * Added new field to deviceInfo endpoint
 * Made EULA window scroll by a few lines at once
+* Updated Bluetooth stack
 
 ### Fixed
 
@@ -72,6 +73,7 @@
 * Fixed text pasting in new contact window when some text is already present there
 * Fixed unnecessary deep refresh when pressing up arrow in empty list view
 * Fixed going back to Messages instead of Contacts in case message thread was previously opened from Contacts
+* Fixed autoconnecting other BT devices when another one is already connected
 
 ## [1.6.0 2023-02-27]
 
