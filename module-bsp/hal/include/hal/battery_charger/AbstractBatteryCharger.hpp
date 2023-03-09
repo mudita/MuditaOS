@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -47,7 +47,7 @@ namespace hal::battery
 
         virtual ~AbstractBatteryCharger() = default;
 
-        virtual Voltage getBatteryVoltage() const          = 0;
+        virtual std::optional<Voltage> getBatteryVoltage() const = 0;
         virtual std::optional<SOC> getSOC() const          = 0;
         virtual ChargingStatus getChargingStatus() const   = 0;
         virtual ChargerPresence getChargerPresence() const = 0;

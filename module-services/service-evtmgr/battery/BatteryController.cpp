@@ -95,7 +95,7 @@ BatteryController::BatteryController(sys::Service *service,
 
     LOG_INFO("Initial charger state:%s", magic_enum::enum_name(Store::Battery::get().state).data());
     LOG_INFO("Initial battery SOC:%d", Store::Battery::get().level);
-    LOG_INFO("Initial battery voltage:%" PRIu32 "mV", charger->getBatteryVoltage());
+    LOG_INFO("Initial battery voltage:%" PRIu32 "mV", getVoltage());
     LOG_INFO("Initial battery state:%s", magic_enum::enum_name(Store::Battery::get().levelState).data());
 }
 
@@ -125,7 +125,7 @@ void sevm::battery::BatteryController::printCurrentState()
     LOG_INFO("Charger state:%s Battery SOC %d voltage: %" PRIu32 "mV state: %s",
              magic_enum::enum_name(Store::Battery::get().state).data(),
              Store::Battery::get().level,
-             charger->getBatteryVoltage(),
+             getVoltage(),
              magic_enum::enum_name(Store::Battery::get().levelState).data());
 }
 void sevm::battery::BatteryController::update()
@@ -152,10 +152,20 @@ void sevm::battery::BatteryController::update()
 
 void sevm::battery::BatteryController::updateSoC()
 {
-    auto batteryLevel = charger->getSOC();
-    if (batteryLevel.has_value()) {
+    const auto batteryLevel = charger->getSOC();
+    if (batteryLevel) {
         Store::Battery::modify().level = batteryLevel.value();
     }
+}
+
+units::Voltage sevm::battery::BatteryController::getVoltage()
+{
+    const auto voltage = charger->getBatteryVoltage();
+    if (voltage) {
+        return *voltage;
+    }
+    LOG_ERROR("Can't get the voltage");
+    return 0;
 }
 
 void sevm::battery::BatteryController::checkChargerPresence()
