@@ -10,6 +10,7 @@
 * Fixed canceling of alarm editing after 10s of inactivity
 * Fixed yes/no behavior in factory reset window
 * Fixed missing software version in French language
+* Fixed problems with displaying file names in Relaxation
 
 ### Added
 
