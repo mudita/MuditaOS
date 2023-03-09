@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,9 +11,6 @@
 
 class ServiceDBCommon : public sys::Service
 {
-  private:
-    void factoryReset() const;
-
   protected:
     virtual db::Interface *getInterface(db::Interface::Name interface);
     std::set<std::unique_ptr<DatabaseAgent>> databaseAgents;
@@ -27,9 +24,7 @@ class ServiceDBCommon : public sys::Service
 
     sys::ReturnCodes DeinitHandler() override;
 
-    void ProcessCloseReason(sys::CloseReason closeReason) override;
-
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) final;
+    sys::ReturnCodes SwitchPowerModeHandler(sys::ServicePowerMode mode) final;
 
     void sendUpdateNotification(db::Interface::Name interface, db::Query::Type type, std::optional<uint32_t> recordId);
 };
