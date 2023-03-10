@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -1066,8 +1066,7 @@ uint32_t GetPerphSourceClock(PerphClock_t clock)
 
 void PrintSystemClocks()
 {
-
-    const char *_PLLNames[22] = {
+    const char *PLLNames[] = {
         "kCLOCK_CpuClk",  /*!< CPU clock */
         "kCLOCK_AhbClk",  /*!< AHB clock */
         "kCLOCK_SemcClk", /*!< SEMC clock */
@@ -1098,18 +1097,17 @@ void PrintSystemClocks()
         "kCLOCK_AudioPllClk", /*!< Audio PLLCLK. */
         "kCLOCK_VideoPllClk", /*!< Video PLLCLK. */
     };
-    int i;
 
-    for (i = 0; i < 22; i++) {
-        LOG_PRINTF("%s: %lu Hz\r\n", _PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
+    for (size_t i = 0; i < ARRAY_SIZE(PLLNames); i++) {
+        LOG_PRINTF("%s: %lu Hz", PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
     }
 
-    LOG_PRINTF("PerphSourceClock_I2C: %lu\r\n", GetPerphSourceClock(PerphClock_I2C));
-    LOG_PRINTF("PerphSourceClock_LPSPI: %lu\r\n", GetPerphSourceClock(PerphClock_LPSPI));
-    LOG_PRINTF("PerphSourceClock_LPUART: %lu\r\n", GetPerphSourceClock(PerphClock_LPUART));
-    LOG_PRINTF("PerphSourceClock_SAI1: %lu\r\n", GetPerphSourceClock(PerphClock_SAI1));
-    LOG_PRINTF("PerphSourceClock_SAI2: %lu\r\n", GetPerphSourceClock(PerphClock_SAI2));
-    LOG_PRINTF("PerphSourceClock_USDHC2: %lu\r\n", GetPerphSourceClock(PerphClock_USDHC2));
+    LOG_PRINTF("PerphSourceClock_I2C: %lu", GetPerphSourceClock(PerphClock_I2C));
+    LOG_PRINTF("PerphSourceClock_LPSPI: %lu", GetPerphSourceClock(PerphClock_LPSPI));
+    LOG_PRINTF("PerphSourceClock_LPUART: %lu", GetPerphSourceClock(PerphClock_LPUART));
+    LOG_PRINTF("PerphSourceClock_SAI1: %lu", GetPerphSourceClock(PerphClock_SAI1));
+    LOG_PRINTF("PerphSourceClock_SAI2: %lu", GetPerphSourceClock(PerphClock_SAI2));
+    LOG_PRINTF("PerphSourceClock_USDHC2: %lu", GetPerphSourceClock(PerphClock_USDHC2));
 }
 
 #define CLOCK_CCM_HANDSHAKE_WAIT()                                                                                     \
@@ -1122,7 +1120,7 @@ void PrintSystemClocks()
 #define LPM_DELAY(value)                                                                                               \
                                                                                                                        \
     do {                                                                                                               \
-        for (uint32_t i = 0; i < 5 * value; i++) {                                                                     \
+        for (uint32_t i = 0; i < 5 * (value); i++) {                                                                   \
             __NOP();                                                                                                   \
         }                                                                                                              \
                                                                                                                        \
