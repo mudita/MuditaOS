@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,6 +22,7 @@ namespace app::relaxation
             virtual ~View() = default;
 
             virtual void setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> songs) = 0;
+            virtual void handleError()                                                                 = 0;
         };
 
         class Presenter : public BasePresenter<RelaxationMainWindowContract::View>
