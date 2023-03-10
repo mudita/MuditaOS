@@ -55,7 +55,7 @@ namespace hal::battery
         explicit BellBatteryCharger(xQueueHandle irqQueueHandle);
         ~BellBatteryCharger();
 
-        Voltage getBatteryVoltage() const final;
+        std::optional<Voltage> getBatteryVoltage() const final;
         std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
         ChargerPresence getChargerPresence() const final;
@@ -63,6 +63,9 @@ namespace hal::battery
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
       private:
+        template <typename T>
+        std::optional<T> AttemptToSendData(std::function<std::optional<T>()> data) const;
+
         void sendNotification(Events event);
         void pollFuelGauge();
         bool tryEnableCharging();
@@ -134,36 +137,38 @@ namespace hal::battery
         fuel_gauge.init_irq_pin(fuel_gauge_gpio, fuel_gauge_irq_pin);
     }
 
-    AbstractBatteryCharger::Voltage BellBatteryCharger::getBatteryVoltage() const
+    std::optional<AbstractBatteryCharger::Voltage> BellBatteryCharger::getBatteryVoltage() const
     {
-        constexpr std::uint8_t maxAttemps = 5;
-
-        for (std::uint8_t i = 0; i < maxAttemps; ++i) {
-            if (const auto result = fuel_gauge.get_battery_voltage()) {
-                return *result;
-            }
-            i2c->ReInit();
-            LOG_INFO("Attempting to get SoC data: %d", i);
-            vTaskDelay(pdMS_TO_TICKS(i * 10));
-        }
-        LOG_ERROR("Error during fetching battery voltage");
-        return 0;
+        return AttemptToSendData<AbstractBatteryCharger::Voltage>([=]() { return fuel_gauge.get_battery_voltage(); });
     }
 
     std::optional<AbstractBatteryCharger::SOC> BellBatteryCharger::getSOC() const
     {
-        constexpr std::uint8_t maxAttemps = 5;
+        const auto result =
+            AttemptToSendData<AbstractBatteryCharger::SOC>([=]() { return fuel_gauge.get_battery_soc(); });
 
+        if (result.has_value()) {
+            const auto scaled_soc = scale_soc(*result);
+            return *scaled_soc;
+        }
+        else {
+            return std::nullopt;
+        }
+    }
+
+    template <typename T>
+    std::optional<T> BellBatteryCharger::AttemptToSendData(std::function<std::optional<T>()> data) const
+    {
+        constexpr std::uint8_t maxAttemps = 5;
         for (std::uint8_t i = 0; i < maxAttemps; ++i) {
-            if (const auto result = fuel_gauge.get_battery_soc()) {
-                const auto scaled_soc = scale_soc(*result);
-                return *scaled_soc;
+            if (const auto result = data()) {
+                return result;
             }
             i2c->ReInit();
-            LOG_INFO("Attempting to get SoC data: %d", i);
+            LOG_INFO("Attempting to get I2C data: %d", i);
             vTaskDelay(pdMS_TO_TICKS(i * 10));
         }
-        LOG_ERROR("Error during fetching battery SoC");
+        LOG_ERROR("Error during fetching I2C data");
         return std::nullopt;
     }
 

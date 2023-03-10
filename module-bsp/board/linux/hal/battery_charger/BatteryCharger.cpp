@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
@@ -36,7 +36,7 @@ namespace hal::battery
         explicit BatteryCharger(xQueueHandle irqQueueHandle);
         ~BatteryCharger();
 
-        Voltage getBatteryVoltage() const final;
+        std::optional<Voltage> getBatteryVoltage() const final;
         std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
         ChargerPresence getChargerPresence() const final;
