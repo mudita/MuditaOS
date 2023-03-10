@@ -37,6 +37,7 @@ target_sources(application-bell-relaxation
         data/RelaxationStyle.hpp
         data/RelaxationAudioData.hpp
         data/RelaxationSwitchData.hpp
+        data/RelaxationErrorData.hpp
         widgets/RelaxationPlayer.hpp
         windows/RelaxationMainWindow.hpp
         presenter/RelaxationMainWindowPresenter.hpp

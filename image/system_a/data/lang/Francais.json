@@ -653,6 +653,7 @@
   "app_bell_relaxation_looped": "en boucle",
   "app_bell_relaxation_loop_description": "le morceau sera lu jusqu'à ce que vous l'éteigniez",
   "app_bell_relaxation_error_message": "<text>Format de fichier non pris en<br></br>charge</text>",
+  "app_bell_relaxation_limit_error_message": "<text>Limite de fichiers excédée.<br />Risque de problèmes<br />d'affichage</text>",
   "app_bell_settings_home_view": "Écran d'accueil",
   "app_bell_settings_alarm_settings": "Alarme",
   "app_bell_settings_alarm_settings_title": "Alarme",
