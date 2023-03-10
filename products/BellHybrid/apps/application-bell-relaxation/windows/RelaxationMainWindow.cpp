@@ -3,6 +3,7 @@
 
 #include "RelaxationMainWindow.hpp"
 #include <data/RelaxationAudioData.hpp>
+#include <data/RelaxationErrorData.hpp>
 #include <ApplicationBellRelaxation.hpp>
 
 #include <common/options/OptionBellMenu.hpp>
@@ -41,7 +42,6 @@ namespace gui
         for (const auto &sound : sounds) {
             addRecord(sound);
         }
-
         addOptions(std::move(menuOptionList));
     }
 
@@ -56,6 +56,12 @@ namespace gui
         auto audioContext = std::make_unique<RelaxationAudioContext>(selectedSound);
         auto switchData   = std::make_unique<RelaxationSwitchData>(std::move(audioContext));
         application->switchWindow(gui::window::name::relaxationTimerSelect, std::move(switchData));
+    }
+
+    void RelaxationMainWindow::handleError()
+    {
+        auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::FilesLimitExceeded);
+        application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
     }
 
 } // namespace gui

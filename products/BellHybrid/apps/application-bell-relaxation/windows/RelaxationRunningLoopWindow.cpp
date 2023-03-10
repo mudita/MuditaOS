@@ -4,6 +4,7 @@
 #include "RelaxationRunningLoopWindow.hpp"
 #include <data/RelaxationStyle.hpp>
 #include <data/RelaxationSwitchData.hpp>
+#include <data/RelaxationErrorData.hpp>
 
 #include <ApplicationBellRelaxation.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
@@ -224,6 +225,7 @@ namespace gui
     }
     void RelaxationRunningLoopWindow::handleError()
     {
-        application->switchWindow(gui::window::name::relaxationError);
+        auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::UnsupportedMediaType);
+        application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
     }
 } // namespace gui

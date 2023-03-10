@@ -683,6 +683,7 @@
   "app_bell_relaxation_looped": "en bucle",
   "app_bell_relaxation_loop_description": "la canción se reproducirá hasta que la apagues",
   "app_bell_relaxation_error_message": "Formato de archivo no admitido",
+  "app_bell_relaxation_limit_error_message": "<text>Límite de archivos alcanzado,<br />pueden producirse errores.</text>",
   "app_bell_settings_home_view": "Vista de inicio",
   "app_bell_settings_alarm_settings": "Ajustes de alarma",
   "app_bell_settings_alarm_settings_title": "Ajustes de alarma",

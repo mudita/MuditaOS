@@ -4,6 +4,7 @@
 #include "RelaxationRunningProgressWindow.hpp"
 #include <data/RelaxationStyle.hpp>
 #include <data/RelaxationSwitchData.hpp>
+#include <data/RelaxationErrorData.hpp>
 
 #include <ApplicationBellRelaxation.hpp>
 #include <audio/AudioMessage.hpp>
@@ -174,7 +175,8 @@ namespace gui
 
     void RelaxationRunningProgressWindow::handleError()
     {
-        application->switchWindow(gui::window::name::relaxationError);
+        auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::UnsupportedMediaType);
+        application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
     }
 
 } // namespace gui
