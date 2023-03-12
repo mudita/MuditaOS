@@ -246,6 +246,35 @@ status_t BSP_EinkChangeSpiFrequency(uint32_t frequencyHz)
 
     return 0;
 }
+#if PROJECT==BellHybrid
+void BSP_EinkLogicPowerOff(void)
+{
+	/* gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::EINK_BELL_PWR_PIN), 0);
+     * WritePin does not work
+     */
+	auto gpio_pwren =
+	drivers::DriverGPIO::Create(static_cast<drivers::GPIOInstances>(BoardDefinitions::EINK_BELL_PWR_GPIO), drivers::DriverGPIOParams{});
+
+	gpio_pwren->ConfPin(drivers::DriverGPIOPinParams{.dir      = drivers::DriverGPIOPinParams::Direction::Output,
+	.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::NoIntmode,
+	.defLogic = 0,
+	.pin = static_cast<uint32_t>(BoardDefinitions::EINK_BELL_PWR_PIN)});
+}
+
+void BSP_EinkLogicPowerOn(void)
+{
+	/* gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::EINK_BELL_PWR_PIN), 1);
+     * WritePin does not work
+     */
+	auto gpio_pwren =
+	drivers::DriverGPIO::Create(static_cast<drivers::GPIOInstances>(BoardDefinitions::EINK_BELL_PWR_GPIO), drivers::DriverGPIOParams{});
+
+	gpio_pwren->ConfPin(drivers::DriverGPIOPinParams{.dir      = drivers::DriverGPIOPinParams::Direction::Output,
+	.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::NoIntmode,
+	.defLogic = 1,
+	.pin = static_cast<uint32_t>(BoardDefinitions::EINK_BELL_PWR_PIN)});
+}
+#endif
 
 void BSP_EinkDeinit(void)
 {

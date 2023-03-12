@@ -83,6 +83,9 @@ namespace bsp
             // Add intermediate step in frequency
             if (newFrequency > CpuFrequencyMHz::Level_4)
                 return CpuFrequencyMHz::Level_4;
+#if PROJECT==BellHybrid
+            readyToSleep = false;
+#endif
         }
         return newFrequency;
     }
@@ -90,7 +93,6 @@ namespace bsp
     void RT1051LPMCommon::onChangeDown(CpuFrequencyMHz newFrequency)
     {
         if (newFrequency <= bsp::CpuFrequencyMHz::Level_1) {
-            // Enable weak 2P5 and 1P1 LDO and Turn off regular 2P5 and 1P1 LDO
             SwitchToLowPowerModeLDO();
             // then switch osc source
             SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
@@ -98,9 +100,10 @@ namespace bsp
             if (driverSEMC) {
                 driverSEMC->SwitchToPeripheralClockSource();
             }
-
-            // disconnect internal the load resistor
             DisconnectInternalLoadResistor();
+#if PROJECT==BellHybrid
+            readyToSleep = true;
+#endif
         }
     }
 
@@ -203,5 +206,15 @@ namespace bsp
         PMU->REG_1P1 |= PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
         PMU->REG_1P1 &= ~PMU_REG_1P1_ENABLE_LINREG_MASK;
     }
+#if PROJECT==BellHybrid
+    bool RT1051LPMCommon::ReadyToSleep(void)
+    {
+        return readyToSleep;
+    }
 
+    void RT1051LPMCommon::ResetSleep(void)
+    {
+        readyToSleep = false;
+    }
+#endif
 } // namespace bsp

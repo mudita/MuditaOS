@@ -804,6 +804,9 @@ namespace sys
 
         auto ret = powerManager->UpdateCpuFrequency();
         cpuStatistics->TrackChange(ret);
+#if PROJECT==BellHybrid
+        powerManager->PowerManager_GoToWFIifReady();
+#endif
     }
 
     void SystemManagerCommon::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency)

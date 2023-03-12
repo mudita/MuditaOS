@@ -70,9 +70,10 @@ namespace sys
         bool IsCpuPernamentFrequency();
         void SetPernamentFrequency(bsp::CpuFrequencyMHz freq);
         void ResetPernamentFrequency();
-
         void LogPowerManagerStatistics();
-
+#if PROJECT==BellHybrid
+        void PowerManager_GoToWFIifReady();
+#endif
       private:
         void ResetFrequencyShiftCounter();
         void SetCpuFrequency(bsp::CpuFrequencyMHz freq);
