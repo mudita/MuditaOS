@@ -19,19 +19,24 @@ namespace bsp
         void SetHighestCoreVoltage() final;
         [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
-
         void DisconnectInternalLoadResistor() final;
         void ConnectInternalLoadResistor() final;
 
         void RegularLDOMode();
         void LowPowerLDOMode();
-
+#if PROJECT==BellHybrid
+        bool ReadyToSleep(void);
+        void ResetSleep(void);
+#endif
       private:
         CpuFrequencyMHz onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency);
         void onChangeDown(bsp::CpuFrequencyMHz freq);
 
         std::unique_ptr<bsp::CpuFreqLPM> CpuFreq;
         std::shared_ptr<drivers::DriverSEMC> driverSEMC;
+#if PROJECT==BellHybrid
+        bool readyToSleep;
+#endif
     };
 
 } // namespace bsp

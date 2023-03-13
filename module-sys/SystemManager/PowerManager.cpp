@@ -11,7 +11,9 @@
 #include <gsl/util>
 #include <log/log.hpp>
 #include <Utils.hpp>
-
+#if PROJECT==BellHybrid
+#include "bsp/eink/bsp_eink.h"
+#endif
 namespace sys
 {
     namespace
@@ -127,8 +129,9 @@ namespace sys
         if (result.change == cpu::algorithm::Change::NoChange or result.change == cpu::algorithm::Change::Hold) {
             return retval;
         }
-        SetCpuFrequency(result.value);
+
         cpuAlgorithms->reset(algorithms);
+        SetCpuFrequency(result.value);
         return retval;
     }
 
@@ -222,4 +225,16 @@ namespace sys
         taskStatistics.Update();
         taskStatistics.LogCpuUsage();
     }
+#if PROJECT==BellHybrid
+    void PowerManager::PowerManager_GoToWFIifReady()
+    {
+        if(lowPowerControl->ReadyToSleep())
+        {
+            BSP_EinkLogicPowerOff();
+            __WFI();
+            lowPowerControl->ResetSleep();
+            BSP_EinkLogicPowerOn();
+        }
+    }
+#endif
 } // namespace sys

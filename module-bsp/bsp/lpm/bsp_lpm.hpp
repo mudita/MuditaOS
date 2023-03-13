@@ -58,7 +58,10 @@ namespace bsp
 
         virtual void SwitchToRegularModeLDO()  = 0;
         virtual void SwitchToLowPowerModeLDO() = 0;
-
+#if PROJECT==BellHybrid
+        virtual bool ReadyToSleep(void) =0;
+        virtual void ResetSleep(void) =0;
+#endif
       protected:
         CpuFrequencyMHz currentFrequency = CpuFrequencyMHz::Level_6;
     };

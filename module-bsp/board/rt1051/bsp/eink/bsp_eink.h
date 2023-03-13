@@ -31,6 +31,10 @@ extern "C"
 
     status_t BSP_EinkInit(bsp_eink_BusyEvent event);
     void BSP_EinkDeinit(void);
+#if PROJECT==BellHybrid
+    void BSP_EinkLogicPowerOff(void);
+    void BSP_EinkLogicPowerOn(void);
+#endif
     void BSP_EinkWriteCS(bsp_eink_cs_ctrl_t ctrl);
     uint8_t BSP_EinkWaitUntilDisplayBusy(uint32_t timeout);
     void BSP_EinkResetDisplayController(void);

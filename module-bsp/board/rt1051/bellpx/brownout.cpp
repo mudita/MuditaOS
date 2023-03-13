@@ -18,6 +18,8 @@ namespace bsp
 
     void Brownout_init()
     {
+    	/* Disable initialization, IRQ 61 always pending */
+#if PROJECT!=BellHybrid
         // Config LDO Regulators
         PMU_1P1EnableOutput(PMU, true);
         PMU_1P1SetRegulatorOutputVoltage(PMU, OutputVoltage1P1);
@@ -31,6 +33,7 @@ namespace bsp
 
         PMU_2P5nableBrownout(PMU, true);
         PMU_2P5SetBrownoutOffsetVoltage(PMU, OffsetVoltage2P5);
+#endif
     }
 
 } // namespace bsp
