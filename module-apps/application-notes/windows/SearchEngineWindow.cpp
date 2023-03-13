@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SearchEngineWindow.hpp"
@@ -35,6 +35,14 @@ namespace app::notes
         navBar->setText(gui::nav_bar::Side::Right, utils::translate(style::strings::common::back));
 
         input = gui::inputBox(this, utils::translate("common_search_uc"), "search_32px_W_G");
+        input->setInputMode(new InputMode(
+            {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &text) { application->getCurrentWindow()->navBarTemporaryMode(text); },
+            [=]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+            [=]() { application->getCurrentWindow()->selectSpecialCharacter(); },
+            [=](std::function<void()> restoreFunction) {
+                application->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+            }));
         setFocusItem(input);
     }
 

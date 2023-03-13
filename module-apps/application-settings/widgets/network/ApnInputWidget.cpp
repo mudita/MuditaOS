@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApnInputWidget.hpp"
@@ -11,12 +11,13 @@
 namespace gui
 {
     ApnInputWidget::ApnInputWidget(settingsInternals::ListItemName listItemName,
-                                   std::function<void(const UTF8 &)> navBarTemporaryMode,
-                                   std::function<void()> navBarRestoreFromTemporaryMode,
-                                   std::function<void()> selectSpecialCharacter,
-                                   std::function<void(const std::string &text)> contentChanged,
+                                   const std::function<void(const UTF8 &)> &navBarTemporaryMode,
+                                   const std::function<void()> &navBarRestoreFromTemporaryMode,
+                                   const std::function<void()> &selectSpecialCharacter,
+                                   const std::function<void(std::function<void()> restoreFunction)> &restoreInputMode,
+                                   const std::function<void(const std::string &text)> &contentChanged,
                                    unsigned int lines)
-        : listItemName(listItemName), checkTextContent(std::move(contentChanged))
+        : listItemName(listItemName), checkTextContent(contentChanged)
     {
         setMinimumSize(style::settings::widget::apnInputWidget::w,
                        style::settings::widget::apnInputWidget::title_label_h +
@@ -49,7 +50,8 @@ namespace gui
             {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { navBarTemporaryMode(text); },
             [=]() { navBarRestoreFromTemporaryMode(); },
-            [=]() { selectSpecialCharacter(); }));
+            [=]() { selectSpecialCharacter(); },
+            [=](std::function<void()> restoreFunction) { restoreInputMode(std::move(restoreFunction)); }));
         inputText->setPenFocusWidth(style::window::default_border_focus_w);
         inputText->setPenWidth(style::window::default_border_no_focus_w);
         inputText->setEditMode(EditMode::Edit);

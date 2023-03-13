@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,12 +16,14 @@ namespace gui
         settingsInternals::ListItemName listItemName;
 
       public:
-        ApnInputWidget(settingsInternals::ListItemName listItemName,
-                       std::function<void(const UTF8 &text)> navBarTemporaryMode   = nullptr,
-                       std::function<void()> navBarRestoreFromTemporaryMode        = nullptr,
-                       std::function<void()> selectSpecialCharacter                = nullptr,
-                       std::function<void(const std::string &text)> contentChanged = nullptr,
-                       unsigned int lines                                          = 1);
+        explicit ApnInputWidget(
+            settingsInternals::ListItemName listItemName,
+            const std::function<void(const UTF8 &)> &navBarTemporaryMode                       = nullptr,
+            const std::function<void()> &navBarRestoreFromTemporaryMode                        = nullptr,
+            const std::function<void()> &selectSpecialCharacter                                = nullptr,
+            const std::function<void(std::function<void()> restoreFunction)> &restoreInputMode = nullptr,
+            const std::function<void(const std::string &text)> &contentChanged                 = nullptr,
+            unsigned int lines                                                                 = 1);
 
       private:
         VBox *vBox                                                    = nullptr;

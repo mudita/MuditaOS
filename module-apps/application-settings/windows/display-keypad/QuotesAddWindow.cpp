@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesAddWindow.hpp"
@@ -78,7 +78,10 @@ namespace gui
             {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { navBarTemporaryMode(text); },
             [=]() { navBarRestoreFromTemporaryMode(); },
-            [=]() { selectSpecialCharacter(); }));
+            [=]() { selectSpecialCharacter(); },
+            [=](std::function<void()> restoreFunction) {
+                application->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+            }));
         authorText->setTextLimitType(gui::TextLimitType::MaxSignsCount, maxAuthorCharactersCount);
 
         auto quoteHeader = new HBox(vBox, 0, 0, 0, 0);

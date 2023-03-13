@@ -1,16 +1,13 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UITestWindow.hpp"
-
-#include <application-settings/windows/WindowNames.hpp>
-
 #include <Font.hpp>
 #include <i18n/i18n.hpp>
+#include <Application.hpp>
 
 namespace gui
 {
-
     UiTestWindow::UiTestWindow(app::ApplicationCommon *app) : AppWindow(app, "TEST_UI")
     {
         AppWindow::buildInterface();
@@ -55,9 +52,12 @@ namespace gui
         text->addText(TextBlock("special chars too", Font(27).raw(), TextBlock::End::None));
         text->setInputMode(new InputMode(
             {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) { navBarTemporaryMode(text); },
+            [=](const UTF8 &temporaryText) { navBarTemporaryMode(temporaryText); },
             [=]() { navBarRestoreFromTemporaryMode(); },
-            [=]() { selectSpecialCharacter(); }));
+            [=]() { selectSpecialCharacter(); },
+            [=](std::function<void()> restoreFunction) {
+                application->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+            }));
         text->setPenFocusWidth(0);
         setFocusItem(text);
     }

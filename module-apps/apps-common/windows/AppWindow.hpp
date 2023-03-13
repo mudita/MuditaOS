@@ -10,6 +10,7 @@
 #include <Service/Service.hpp>
 #include <Service/Message.hpp>
 #include "AppWindowConstants.hpp"
+#include <Timers/TimerFactory.hpp>
 
 namespace app
 {
@@ -53,6 +54,9 @@ namespace gui
         bool preventsAutoLock      = false;
         bool preventsLongPressLock = false;
 
+        const std::chrono::milliseconds inputModeRestoreTimeout = std::chrono::seconds{3};
+        sys::TimerHandle inputModeRestoreTimer;
+
       public:
         AppWindow() = delete;
         AppWindow(app::ApplicationCommon *app, std::string name);
@@ -73,7 +77,7 @@ namespace gui
         bool updateSignalStrength();
         bool updateNetworkAccessTechnology();
         void updatePhoneMode(sys::phone_modes::PhoneMode mode);
-        bool updateTethering(const sys::phone_modes::Tethering state);
+        bool updateTethering(sys::phone_modes::Tethering state);
         [[nodiscard]] bool preventsAutoLocking() const noexcept;
         virtual RefreshModes updateTime();
 
@@ -115,6 +119,8 @@ namespace gui
         /// @note it would be much better to just have "body item" instead
         /// but it would mean not insignificant refactor
         BoundingBox bodySize();
+
+        void startInputModeRestoreTimer(std::function<void()> inputModeRestoreFunction = nullptr);
     };
 
 } /* namespace gui */

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewApnModel.hpp"
@@ -43,43 +43,64 @@ void NewApnModel::createData()
         [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        },
         [this](const std::string &text) { this->apnNameChanged(text); }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::APN,
         [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::Username,
         [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::Password,
         [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::AuthType,
         [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::ApnType,
         [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        }));
 
     internalData.emplace_back(new gui::ApnInputWidget(
         settingsInternals::ListItemName::ApnProtocol,
         [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        }));
 
     for (auto item : internalData) {
         item->deleteByList = false;

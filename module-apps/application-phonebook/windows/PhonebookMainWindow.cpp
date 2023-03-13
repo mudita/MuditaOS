@@ -11,7 +11,6 @@
 #include <header/AddElementAction.hpp>
 #include <header/SearchAction.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 
 namespace gui
@@ -64,15 +63,18 @@ namespace gui
         contactsList->emptyListCallback    = [this]() { onEmptyList(); };
         contactsList->notEmptyListCallback = [this]() { onListFilled(); };
 
-        phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
+        phonebookModel->setDisplayMode(static_cast<std::uint32_t>(ContactDisplayMode::SortedByLetter));
         contactsList->rebuildList(gui::listview::RebuildType::Full);
 
-        auto app  = application;
-        inputMode = std::make_unique<InputMode>(
+        const auto app = application;
+        inputMode      = std::make_unique<InputMode>(
             std::list<InputMode::Mode>{InputMode::ABC, InputMode::abc},
             [app](const UTF8 &text) { app->getCurrentWindow()->navBarTemporaryMode(text); },
             [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
-            [app]() { app->getCurrentWindow()->selectSpecialCharacter(); });
+            [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+            [app](std::function<void()> restoreFunction) {
+                app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+            });
     }
 
     void PhonebookMainWindow::destroyInterface()

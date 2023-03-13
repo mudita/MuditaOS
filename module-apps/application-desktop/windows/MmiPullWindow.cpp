@@ -60,7 +60,10 @@ MmiPullWindow::MmiPullWindow(app::ApplicationCommon *app, const std::string &nam
         {InputMode::digit, InputMode::Abc, InputMode::ABC, InputMode::abc},
         [=](const UTF8 &text1) { navBarTemporaryMode(text1); },
         [=]() { navBarRestoreFromTemporaryMode(); },
-        [=]() { selectSpecialCharacter(); }));
+        [=]() { selectSpecialCharacter(); },
+        [=](std::function<void()> restoreFunction) {
+            application->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        }));
 
     addWidget(InputBox);
 }

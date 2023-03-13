@@ -14,11 +14,14 @@ namespace gui
         phonebookInternals::ListItemName listItemName,
         const std::function<void(const UTF8 &text, bool emptyOthers)> &navBarTemporaryMode,
         const std::function<void()> &navBarRestoreFromTemporaryMode,
+        const std::function<void(const UTF8 &text, bool active)> &navBarSetOptionsLabel,
         const std::function<void()> &selectSpecialCharacter,
+        const std::function<void(std::function<void()> restoreFunction)> &restoreInputMode,
         const std::function<void(Text *text)> &inputOptions,
         unsigned int lines)
         : listItemName(listItemName), navBarTemporaryMode(navBarTemporaryMode),
-          navBarRestoreFromTemporaryMode(navBarRestoreFromTemporaryMode), inputOptions(inputOptions)
+          navBarRestoreFromTemporaryMode(navBarRestoreFromTemporaryMode), navBarSetOptionsLabel(navBarSetOptionsLabel),
+          inputOptions(inputOptions)
     {
         setMinimumSize(phonebookStyle::inputLinesWithLabelWidget::w,
                        phonebookStyle::inputLinesWithLabelWidget::title_label_h +
@@ -55,7 +58,8 @@ namespace gui
             {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { this->navBarTemporaryMode(text, true); },
             [=]() { this->navBarRestoreFromTemporaryMode(); },
-            [=]() { selectSpecialCharacter(); }));
+            [=]() { selectSpecialCharacter(); },
+            [=](std::function<void()> restoreFunction) { restoreInputMode(std::move(restoreFunction)); }));
         inputText->setPenFocusWidth(style::window::default_border_focus_w);
         inputText->setPenWidth(style::window::default_border_no_focus_w);
         inputText->setEditMode(EditMode::Edit);
@@ -70,8 +74,9 @@ namespace gui
                 inputText->setUnderlineThickness(style::window::default_border_focus_w);
                 inputText->setFont(style::window::font::mediumbold);
 
-                if (!inputText->isEmpty() || Clipboard::getInstance().gotData()) {
-                    this->navBarTemporaryMode(utils::translate(style::strings::common::options), false);
+                if (this->navBarSetOptionsLabel) {
+                    const auto optionsLabelState = !inputText->isEmpty() || Clipboard::getInstance().gotData();
+                    this->navBarSetOptionsLabel(utils::translate(style::strings::common::options), optionsLabelState);
                 }
             }
             else {
@@ -79,16 +84,19 @@ namespace gui
                 inputText->setUnderlineThickness(style::window::default_border_rect_no_focus);
                 inputText->setFont(style::window::font::medium);
 
-                this->navBarRestoreFromTemporaryMode();
+                if (this->navBarSetOptionsLabel) {
+                    this->navBarSetOptionsLabel(utils::translate(style::strings::common::options), false);
+                }
             }
             return true;
         };
 
         inputCallback = [&](Item &item, const InputEvent &event) {
-            auto result = inputText->onInput(event);
+            const auto result = inputText->onInput(event);
 
-            if (!event.is(KeyCode::KEY_AST) && (!inputText->isEmpty() || Clipboard::getInstance().gotData())) {
-                this->navBarTemporaryMode(utils::translate(style::strings::common::options), false);
+            if (!event.is(KeyCode::KEY_AST) && this->navBarSetOptionsLabel) {
+                const auto optionsLabelState = !inputText->isEmpty() || Clipboard::getInstance().gotData();
+                this->navBarSetOptionsLabel(utils::translate(style::strings::common::options), optionsLabelState);
             }
 
             if (event.isShortRelease(gui::KeyCode::KEY_LF) &&
