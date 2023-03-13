@@ -309,4 +309,16 @@ namespace gui
         return application->GetName() + separator + getName();
     }
 
+    void AppWindow::startInputModeRestoreTimer(std::function<void()> inputModeRestoreFunction)
+    {
+        if (inputModeRestoreFunction == nullptr) {
+            return;
+        }
+
+        inputModeRestoreTimer = sys::TimerFactory::createSingleShotTimer(
+            application, gui::name::timer::input_mode_timer, inputModeRestoreTimeout, [=](sys::Timer &) {
+                inputModeRestoreFunction();
+            });
+        inputModeRestoreTimer.start();
+    }
 } /* namespace gui */

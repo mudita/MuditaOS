@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -23,12 +23,16 @@ namespace gui
         body = new gui::Item();
         body->setBoundingBox(bodySize());
         addWidget(body);
-        auto text = inputBox(this, utils::translate("common_search_uc"), "search_32px_W_G");
+
+        const auto text = inputBox(this, utils::translate("common_search_uc"), "search_32px_W_G");
         text->setInputMode(new InputMode(
             {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &Text) { application->getCurrentWindow()->navBarTemporaryMode(Text); },
             [=]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
-            [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
+            [=]() { application->getCurrentWindow()->selectSpecialCharacter(); },
+            [=](std::function<void()> restoreFunction) {
+                application->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+            }));
 
         inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);

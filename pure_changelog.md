@@ -9,6 +9,7 @@
 * Added date formatting of received/sent SMS
 * Added meditation parameters to non-volatile memory
 * Added missing translations for EULA in French, Spanish and Swedish
+* Added input mode selection display timeout
 
 ### Changed / Improved
 

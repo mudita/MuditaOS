@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewContactModel.hpp"
@@ -24,7 +24,7 @@ auto NewContactModel::getMinimalItemSpaceRequired() const -> unsigned int
     return phonebookStyle::inputLinesWithLabelWidget::h;
 }
 
-void NewContactModel::requestRecords(const uint32_t offset, const uint32_t limit)
+void NewContactModel::requestRecords(const std::uint32_t offset, const std::uint32_t limit)
 {
     setupModel(offset, limit);
     list->onProviderDataUpdate();
@@ -37,41 +37,77 @@ auto NewContactModel::getItem(gui::Order order) -> gui::ListItem *
 
 void NewContactModel::createData()
 {
+    constexpr auto navBarOptionsLabelSide = gui::nav_bar::Side::Left;
     auto app = application;
 
     internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::FirstName,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text, bool active) {
+            app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
+            app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
+        },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        },
         [&](gui::Text *text) { openTextOptions(text); }));
 
     internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::SecondName,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text, bool active) {
+            app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
+            app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
+        },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        },
         [&](gui::Text *text) { openTextOptions(text); }));
 
     internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::Number,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text, bool active) {
+            app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
+            app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
+        },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        },
         [&](gui::Text *text) { openTextOptions(text); }));
 
     internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::SecondNumber,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text, bool active) {
+            app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
+            app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
+        },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        },
         [&](gui::Text *text) { openTextOptions(text); }));
 
     internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::Email,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text, bool active) {
+            app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
+            app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
+        },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        },
         [&](gui::Text *text) { openTextOptions(text); }));
 
     internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(
@@ -93,7 +129,14 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::Address,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text, bool active) {
+            app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
+            app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
+        },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        },
         [&](gui::Text *text) { openTextOptions(text); },
         2));
 
@@ -101,7 +144,14 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::Note,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app](const UTF8 &text, bool active) {
+            app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
+            app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
+        },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        [app](std::function<void()> restoreFunction) {
+            app->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+        },
         [&](gui::Text *text) { openTextOptions(text); },
         2));
 
@@ -118,7 +168,7 @@ void NewContactModel::clearData()
 
 bool NewContactModel::verifyData()
 {
-    for (auto item : internalData) {
+    for (const auto &item : internalData) {
         if (item->onVerifyCallback) {
             std::string errorMessage;
             if (!item->onVerifyCallback(errorMessage)) {
@@ -143,7 +193,7 @@ bool NewContactModel::verifyData()
 
 void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)
 {
-    for (auto item : internalData) {
+    for (const auto &item : internalData) {
         if (item->onSaveCallback) {
             item->onSaveCallback(contactRecord);
         }
@@ -152,20 +202,20 @@ void NewContactModel::saveData(std::shared_ptr<ContactRecord> contactRecord)
 
 void NewContactModel::loadData(std::shared_ptr<ContactRecord> contactRecord, gui::SwitchData *data)
 {
-    for (auto item : internalData) {
+    for (const auto &item : internalData) {
         if (item->onLoadCallback) {
             item->onLoadCallback(contactRecord);
         }
     }
 
-    if (auto message = dynamic_cast<PhonebookItemData *>(data); message != nullptr) {
+    if (const auto message = dynamic_cast<PhonebookItemData *>(data); message != nullptr) {
         requestType = message->getRequestType();
     }
 }
 
 bool NewContactModel::emptyData()
 {
-    for (auto item : internalData) {
+    for (const auto &item : internalData) {
         if (item->onEmptyCallback) {
             if (!item->onEmptyCallback()) {
                 return false;
@@ -182,6 +232,6 @@ bool NewContactModel::emptyData()
 
 void NewContactModel::openTextOptions(gui::Text *text)
 {
-    std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookInputOptionData>(text);
+    auto data = std::make_unique<PhonebookInputOptionData>(text);
     application->switchWindow(gui::window::name::input_options, std::move(data));
 }

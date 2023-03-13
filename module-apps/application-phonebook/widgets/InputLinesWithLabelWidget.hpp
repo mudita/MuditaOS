@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,7 +20,9 @@ namespace gui
             phonebookInternals::ListItemName listItemName,
             const std::function<void(const UTF8 &text, bool emptyOthers)> &navBarTemporaryMode = nullptr,
             const std::function<void()> &navBarRestoreFromTemporaryMode                        = nullptr,
+            const std::function<void(const UTF8 &text, bool active)> &navBarSetOptionsLabel    = nullptr,
             const std::function<void()> &selectSpecialCharacter                                = nullptr,
+            const std::function<void(std::function<void()> restoreFunction)> &restoreInputMode = nullptr,
             const std::function<void(Text *text)> &inputOptions                                = nullptr,
             unsigned int lines                                                                 = 1);
 
@@ -34,6 +36,7 @@ namespace gui
 
         std::function<void(const UTF8 &text, bool emptyOthers)> navBarTemporaryMode = nullptr;
         std::function<void()> navBarRestoreFromTemporaryMode                        = nullptr;
+        std::function<void(const UTF8 &text, bool active)> navBarSetOptionsLabel    = nullptr;
         std::function<void(Text *text)> inputOptions                                = nullptr;
 
         void firstNameHandler();

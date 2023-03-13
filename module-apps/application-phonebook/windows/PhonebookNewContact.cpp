@@ -90,7 +90,7 @@ namespace gui
             return false;
         }
 
-        auto *item = dynamic_cast<PhonebookItemData *>(data);
+        const auto item = dynamic_cast<PhonebookItemData *>(data);
         if (item == nullptr) {
             return false;
         }
@@ -146,7 +146,6 @@ namespace gui
 
     auto PhonebookNewContact::verifyAndSave() -> bool
     {
-        LOG_DEBUG("%s", __FUNCTION__);
         if (!contact->isTemporary()) {
             auto result = DBServiceAPI::verifyContact(application, *contact);
             switch (result) {
@@ -194,8 +193,7 @@ namespace gui
             }
         }
 
-        std::unique_ptr<gui::SwitchData> data =
-            std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
+        auto data = std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
         data->ignoreCurrentWindowOnStack = true;
         application->switchWindow(gui::window::name::contact, std::move(data));
         return true;
@@ -273,8 +271,7 @@ namespace gui
 
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
             contact->getFormattedName(ContactRecord::NameFormatType::Title), icon, text, "", [=]() -> bool {
-                std::unique_ptr<gui::SwitchData> data =
-                    std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
+                auto data = std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
                 this->application->switchWindow(gui::name::window::main_window, std::move(data));
 
                 return true;

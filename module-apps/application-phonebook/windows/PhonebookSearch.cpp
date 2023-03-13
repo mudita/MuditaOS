@@ -24,7 +24,10 @@ namespace gui
             {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &Text) { application->getCurrentWindow()->navBarTemporaryMode(Text); },
             [=]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
-            [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
+            [=]() { application->getCurrentWindow()->selectSpecialCharacter(); },
+            [=](std::function<void()> restoreFunction) {
+                application->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+            }));
 
         navBar->setActive(nav_bar::Side::Left, false);
         navBar->setActive(nav_bar::Side::Center, true);

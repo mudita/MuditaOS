@@ -25,20 +25,22 @@ class InputMode
     InputMode() = delete;
     // list of enabled input modes
     std::list<Mode> input_mode_list                    = {};
-    uint32_t input_mode_list_pos                       = 0;
-    std::function<void(const UTF8 &text)> show_type_cb = nullptr;
-    std::function<void()> restore_after_show_type_cb   = nullptr;
+    std::uint32_t input_mode_list_pos                                                  = 0;
+    std::function<void(const UTF8 &text)> show_type_callback                           = nullptr;
+    std::function<void()> restore_after_show_type_callback                             = nullptr;
     std::function<void()> show_special_char_selector   = nullptr;
+    std::function<void(std::function<void()> restore_function)> restore_timer_callback = nullptr;
     Mode modeNow() const;
 
     void show_input_type();
 
   public:
     void show_restore();
-    InputMode(std::list<InputMode::Mode> mode_list,
-              std::function<void(const UTF8 &text)> show_type_cb = nullptr,
-              std::function<void()> restore_after_show_type_cb   = nullptr,
-              std::function<void()> show_special_char_selector   = nullptr);
+    explicit InputMode(std::list<InputMode::Mode> mode_list,
+                       std::function<void(const UTF8 &text)> show_type_callback                           = nullptr,
+                       std::function<void()> restore_after_show_type_callback                             = nullptr,
+                       std::function<void()> show_special_char_selector                                   = nullptr,
+                       std::function<void(std::function<void()> restore_function)> restore_timer_callback = nullptr);
 
     void next();
     const std::string &get();

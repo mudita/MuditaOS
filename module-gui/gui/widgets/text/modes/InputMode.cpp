@@ -34,12 +34,14 @@ static std::string getInputName(InputMode::Mode m)
 }
 
 InputMode::InputMode(std::list<InputMode::Mode> mode_list,
-                     std::function<void(const UTF8 &text)> show_type_cb,
-                     std::function<void()> restore_after_show_type_cb,
-                     std::function<void()> show_special_char_selector)
-    : input_mode_list(std::move(mode_list)), show_type_cb(std::move(show_type_cb)),
-      restore_after_show_type_cb(std::move(restore_after_show_type_cb)),
-      show_special_char_selector(std::move(show_special_char_selector))
+                     std::function<void(const UTF8 &text)> show_type_callback,
+                     std::function<void()> restore_after_show_type_callback,
+                     std::function<void()> show_special_char_selector,
+                     std::function<void(std::function<void()> restore_function)> restore_timer_callback)
+    : input_mode_list(std::move(mode_list)), show_type_callback(std::move(show_type_callback)),
+      restore_after_show_type_callback(std::move(restore_after_show_type_callback)),
+      show_special_char_selector(std::move(show_special_char_selector)),
+      restore_timer_callback(std::move(restore_timer_callback))
 {
     // failsafe
     if (input_mode_list.empty()) {
@@ -82,22 +84,26 @@ const std::string &InputMode::get(InputMode::Mode mode)
 void InputMode::show_input_type()
 {
     LOG_INFO("Mode: %d", modeNow());
-    if (show_type_cb) {
-        show_type_cb(getInputName(modeNow()));
+    if (show_type_callback) {
+        show_type_callback(getInputName(modeNow()));
+    }
+
+    if (restore_timer_callback) {
+        restore_timer_callback([this]() { show_restore(); });
     }
 }
 
 void InputMode::show_restore()
 {
-    if (restore_after_show_type_cb) {
-        restore_after_show_type_cb();
+    if (restore_after_show_type_callback) {
+        restore_after_show_type_callback();
     }
 }
 
 void InputMode::select_special_char()
 {
-    LOG_INFO("Special character selector");
     if (show_special_char_selector) {
+        LOG_INFO("Special character selector");
         show_special_char_selector();
     }
 }

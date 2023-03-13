@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneNameWindow.hpp"
@@ -25,6 +25,14 @@ namespace gui
         setTitle(utils::translate("app_settings_bluetooth_phone_name"));
 
         inputField = inputBox(this, utils::translate("app_settings_bluetooth_phone_name"));
+        inputField->setInputMode(new InputMode(
+            {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &text) { application->getCurrentWindow()->navBarTemporaryMode(text); },
+            [=]() { application->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+            nullptr,
+            [=](std::function<void()> restoreFunction) {
+                application->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+            }));
         navBar->setActive(nav_bar::Side::Left, false);
         navBar->setActive(nav_bar::Side::Center, true);
         navBar->setActive(nav_bar::Side::Right, true);

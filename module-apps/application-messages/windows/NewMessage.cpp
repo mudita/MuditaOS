@@ -264,7 +264,10 @@ namespace gui
             {InputMode::Abc, InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &text) { navBarTemporaryMode(text); },
             [=]() { navBarRestoreFromTemporaryMode(); },
-            [=]() { selectSpecialCharacter(); }));
+            [=]() { selectSpecialCharacter(); },
+            [=](std::function<void()> restoreFunction) {
+                application->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
+            }));
         message->setPenFocusWidth(style::window::default_border_focus_w);
         message->setPenWidth(style::window::default_border_rect_no_focus);
         message->setFont(style::window::font::medium);
