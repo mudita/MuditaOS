@@ -85,6 +85,22 @@ namespace hal::battery
         mutable bsp::devices::power::CW2015 fuel_gauge;
     };
 
+    template <typename Invokable, typename... Params>
+    auto BellBatteryCharger::AttemptToSendData(Invokable &&invokable, Params &&...params) const
+    {
+        constexpr std::uint8_t maxAttempts = 5;
+        for (std::uint8_t i = 0; i < maxAttempts; ++i) {
+            if (const auto result = std::invoke(invokable, std::forward<Params>(params)...)) {
+                return result;
+            }
+            i2c->ReInit();
+            LOG_INFO("Attempting to get I2C data: %d", i);
+            vTaskDelay(pdMS_TO_TICKS(i * 10));
+        }
+        LOG_ERROR("Error during fetching I2C data");
+        return std::result_of_t<Invokable(Params...)>{};
+    }
+
     BellBatteryCharger::BellBatteryCharger(xQueueHandle irqQueueHandle)
         : notification_channel{irqQueueHandle}, i2c{drivers::DriverI2C::Create(i2c_instance, i2c_params)},
           charger_gpio_chgok{drivers::DriverGPIO::Create(charger_irq_gpio_chgok, {})},
@@ -141,39 +157,12 @@ namespace hal::battery
 
     std::optional<AbstractBatteryCharger::Voltage> BellBatteryCharger::getBatteryVoltage() const
     {
-        return AttemptToSendData(
-            [=]() -> std::optional<AbstractBatteryCharger::Voltage> { return fuel_gauge.get_battery_voltage(); });
+        return AttemptToSendData(&bsp::devices::power::CW2015::get_battery_voltage,fuel_gauge);
     }
 
     std::optional<AbstractBatteryCharger::SOC> BellBatteryCharger::getSOC() const
     {
-        // const auto result =
-        //     AttemptToSendData<AbstractBatteryCharger::SOC>([=]() { return fuel_gauge.get_battery_soc(); });
-
-        // if (result.has_value()) {
-        //     const auto scaled_soc = scale_soc(*result);
-        //     return *scaled_soc;
-        // }
-        // else {
-        //     return std::nullopt;
-        // }
-        return std::nullopt;
-    }
-
-    template <typename Invokable, typename... Params>
-    auto BellBatteryCharger::AttemptToSendData(Invokable &&invokable, Params &&...params) const
-    {
-        constexpr std::uint8_t maxAttempts = 5;
-        for (std::uint8_t i = 0; i < maxAttempts; ++i) {
-            if (const auto result = std::invoke(invokable, std::forward<Params>(params)...)) {
-                return result;
-            }
-            i2c->ReInit();
-            LOG_INFO("Attempting to get I2C data: %d", i);
-            vTaskDelay(pdMS_TO_TICKS(i * 10));
-        }
-        LOG_ERROR("Error during fetching I2C data");
-        return std::result_of_t<Invokable(Params...)>{};
+        return AttemptToSendData(&bsp::devices::power::CW2015::get_battery_soc,fuel_gauge);
     }
 
     AbstractBatteryCharger::ChargingStatus BellBatteryCharger::getChargingStatus() const
