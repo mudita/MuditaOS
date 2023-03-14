@@ -16,8 +16,9 @@ namespace Constants
         constexpr std::array<minutes, 6> chimeIntervals{
             minutes{2}, minutes{5}, minutes{10}, minutes{15}, minutes{30}, minutes{0}};
 
-        constexpr int defaultMeditationDuration                = 15;
-        constexpr std::array<const int, 4> meditationDurations = {15, 30, 60, 90};
+        constexpr int defaultMeditationDuration = 15;
+        constexpr int minimalMeditationDuration = 1;
+        constexpr int maximalMeditationDuration = 99;
 
         using namespace std::chrono_literals;
         constexpr auto defaultPreparationTime{5s};
