@@ -15,6 +15,8 @@
 #include <board/BoardDefinitions.hpp>
 #include <log/log.hpp>
 
+#include <functional>
+
 namespace
 {
     using namespace bsp::devices::power;
@@ -63,8 +65,8 @@ namespace hal::battery
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
       private:
-        template <typename T>
-        std::optional<T> AttemptToSendData(std::function<std::optional<T>()> data) const;
+        template <typename Invokable, typename... Params>
+        auto AttemptToSendData(Invokable &&invokable, Params &&...params) const;
 
         void sendNotification(Events event);
         void pollFuelGauge();
@@ -139,29 +141,31 @@ namespace hal::battery
 
     std::optional<AbstractBatteryCharger::Voltage> BellBatteryCharger::getBatteryVoltage() const
     {
-        return AttemptToSendData<AbstractBatteryCharger::Voltage>([=]() { return fuel_gauge.get_battery_voltage(); });
+        return AttemptToSendData(
+            [=]() -> std::optional<AbstractBatteryCharger::Voltage> { return fuel_gauge.get_battery_voltage(); });
     }
 
     std::optional<AbstractBatteryCharger::SOC> BellBatteryCharger::getSOC() const
     {
-        const auto result =
-            AttemptToSendData<AbstractBatteryCharger::SOC>([=]() { return fuel_gauge.get_battery_soc(); });
+        // const auto result =
+        //     AttemptToSendData<AbstractBatteryCharger::SOC>([=]() { return fuel_gauge.get_battery_soc(); });
 
-        if (result.has_value()) {
-            const auto scaled_soc = scale_soc(*result);
-            return *scaled_soc;
-        }
-        else {
-            return std::nullopt;
-        }
+        // if (result.has_value()) {
+        //     const auto scaled_soc = scale_soc(*result);
+        //     return *scaled_soc;
+        // }
+        // else {
+        //     return std::nullopt;
+        // }
+        return std::nullopt;
     }
 
-    template <typename T>
-    std::optional<T> BellBatteryCharger::AttemptToSendData(std::function<std::optional<T>()> data) const
+    template <typename Invokable, typename... Params>
+    auto BellBatteryCharger::AttemptToSendData(Invokable &&invokable, Params &&...params) const
     {
-        constexpr std::uint8_t maxAttemps = 5;
-        for (std::uint8_t i = 0; i < maxAttemps; ++i) {
-            if (const auto result = data()) {
+        constexpr std::uint8_t maxAttempts = 5;
+        for (std::uint8_t i = 0; i < maxAttempts; ++i) {
+            if (const auto result = std::invoke(invokable, std::forward<Params>(params)...)) {
                 return result;
             }
             i2c->ReInit();
@@ -169,7 +173,7 @@ namespace hal::battery
             vTaskDelay(pdMS_TO_TICKS(i * 10));
         }
         LOG_ERROR("Error during fetching I2C data");
-        return std::nullopt;
+        return std::result_of_t<Invokable(Params...)>{};
     }
 
     AbstractBatteryCharger::ChargingStatus BellBatteryCharger::getChargingStatus() const
