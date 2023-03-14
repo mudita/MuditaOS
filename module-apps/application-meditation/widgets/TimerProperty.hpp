@@ -16,9 +16,8 @@ namespace gui
     {
         class State
         {
-            static constexpr int counterMaxDigits             = 2;
-            static constexpr int minimalValue                 = 1;
-            static constexpr int maximalValue                 = 99;
+            static constexpr int counterMaxDigits               = 2;
+            static constexpr std::array<const int, 4> timeArray = {15, 30, 60, 90};
 
             bool resetValueOnNumeric = true;
             int timeInMinutes;

@@ -136,19 +136,15 @@ void TimerProperty::setOnChangeCallback(OnChangeCallback callback)
 
 bool TimerProperty::State::setTime(int value)
 {
-    const auto it = std::find(
-        std::begin(Constants::Params::meditationDurations), std::end(Constants::Params::meditationDurations), value);
-    if (it != std::end(Constants::Params::meditationDurations)) {
-        timeInMinutes = *it;
-        return true;
-    }
-    timeInMinutes = Constants::Params::defaultMeditationDuration;
-    return false;
+    timeInMinutes =
+        std::clamp(value, Constants::Params::minimalMeditationDuration, Constants::Params::maximalMeditationDuration);
+    return true;
 }
 
 void TimerProperty::State::checkBounds() noexcept
 {
-    timeInMinutes       = std::clamp(timeInMinutes, minimalValue, maximalValue);
+    timeInMinutes = std::clamp(
+        timeInMinutes, Constants::Params::minimalMeditationDuration, Constants::Params::maximalMeditationDuration);
     resetValueOnNumeric = true;
 }
 
@@ -159,7 +155,7 @@ void TimerProperty::State::putNumericValue(int digit) noexcept
         resetValueOnNumeric = false;
     }
     if (timeInMinutes == 0 && digit == 0) {
-        digit = minimalValue;
+        digit = Constants::Params::minimalMeditationDuration;
     }
     timeInMinutes = 10 * timeInMinutes + digit;
     if (timeInMinutes >= 10 * (counterMaxDigits - 1)) {
@@ -169,8 +165,8 @@ void TimerProperty::State::putNumericValue(int digit) noexcept
 void TimerProperty::State::delNumericValue() noexcept
 {
     timeInMinutes = timeInMinutes / 10;
-    if (timeInMinutes < minimalValue) {
-        timeInMinutes       = minimalValue;
+    if (timeInMinutes < Constants::Params::minimalMeditationDuration) {
+        timeInMinutes       = Constants::Params::minimalMeditationDuration;
         resetValueOnNumeric = true;
     }
     else {
@@ -180,10 +176,8 @@ void TimerProperty::State::delNumericValue() noexcept
 
 void TimerProperty::State::increment() noexcept
 {
-    auto it = std::upper_bound(std::begin(Constants::Params::meditationDurations),
-                               std::end(Constants::Params::meditationDurations),
-                               timeInMinutes);
-    if (it == std::end(Constants::Params::meditationDurations)) {
+    auto it = std::upper_bound(std::begin(timeArray), std::end(timeArray), timeInMinutes);
+    if (it == std::end(timeArray)) {
         it--;
     }
     timeInMinutes       = *it;
@@ -192,11 +186,9 @@ void TimerProperty::State::increment() noexcept
 
 void TimerProperty::State::decrement() noexcept
 {
-    auto it = std::upper_bound(std::rbegin(Constants::Params::meditationDurations),
-                               std::rend(Constants::Params::meditationDurations),
-                               timeInMinutes,
-                               [](int a, int b) { return a > b; });
-    if (it == std::rend(Constants::Params::meditationDurations)) {
+    auto it = std::upper_bound(
+        std::rbegin(timeArray), std::rend(timeArray), timeInMinutes, [](int a, int b) { return a > b; });
+    if (it == std::rend(timeArray)) {
         it--;
     }
     timeInMinutes       = *it;
