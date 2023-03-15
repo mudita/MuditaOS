@@ -74,6 +74,7 @@
 * Fixed unnecessary deep refresh when pressing up arrow in empty list view
 * Fixed going back to Messages instead of Contacts in case message thread was previously opened from Contacts
 * Fixed autoconnecting other BT devices when another one is already connected
+* Fixed going to Calls instead of Contacts after aborted or confirmed attempt to create contact from Calls
 
 ## [1.6.0 2023-02-27]
 

@@ -8,8 +8,8 @@
 #include "application-phonebook/ApplicationPhonebook.hpp"
 
 #include <Dialog.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-db/DBServiceAPI.hpp>
-#include <messages/DialogMetadataMessage.hpp>
 
 namespace gui
 {
@@ -55,6 +55,8 @@ namespace gui
 
     void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        saveInfoAboutPreviousAppForProperSwitchBack(data);
+
         if (mode == ShowMode::GUI_SHOW_INIT && data != nullptr) {
             newContactModel->loadData(contact, data);
             list->rebuildList();
@@ -120,8 +122,6 @@ namespace gui
 
     auto PhonebookNewContact::onInput(const InputEvent &inputEvent) -> bool
     {
-        auto ret = AppWindow::onInput(inputEvent);
-
         setSaveButtonVisible(!newContactModel->emptyData());
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER) && !newContactModel->emptyData() &&
@@ -132,11 +132,16 @@ namespace gui
 
             newContactModel->saveData(contact);
             verifyAndSave();
-
-            return true;
+        }
+        else if (!inputEvent.isShortRelease(KeyCode::KEY_RF) || !shouldCurrentAppBeIgnoredOnSwitchBack()) {
+            return AppWindow::onInput(inputEvent);
         }
 
-        return ret;
+        return shouldCurrentAppBeIgnoredOnSwitchBack()
+                   ? app::manager::Controller::switchBack(
+                         application,
+                         std::make_unique<app::manager::SwitchBackRequest>(nameOfPreviousApplication.value()))
+                   : true;
     }
 
     auto PhonebookNewContact::verifyAndSave() -> bool

@@ -47,6 +47,7 @@ namespace gui::option
 
         switch (contactOperation) {
         case ContactOperation::Add: {
+            data->nameOfSenderApplication    = app->GetName();
             data->ignoreCurrentWindowOnStack = true;
             return app::manager::Controller::sendAction(app,
                                                         app::manager::actions::AddContact,
