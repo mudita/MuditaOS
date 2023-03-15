@@ -12,7 +12,7 @@
 
 namespace gui
 {
-    class PhonebookNewContact : public AppWindow
+    class PhonebookNewContact : public AppWindow, public InfoAboutPreviousAppWhereWeComeFrom
     {
       public:
         explicit PhonebookNewContact(app::ApplicationCommon *app);
