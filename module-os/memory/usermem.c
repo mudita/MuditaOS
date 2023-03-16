@@ -104,9 +104,15 @@ static BlockLink_t userxStart, *userpxEnd = NULL;
 
 /* Keeps track of the number of free bytes remaining, but says nothing about
 fragmentation. */
-static size_t xFreeBytesRemaining = 0U;
-static size_t xMinimumEverFreeBytesRemaining = 0U;
+static size_t userxFreeBytesRemaining = 0U;
+static size_t userxMinimumEverFreeBytesRemaining = 0U;
 
+/* Allocation statistics */
+static size_t xAllocationsCount = 0;
+static size_t xDeallocationsCount = 0;
+static size_t xAllocatedMin = SIZE_MAX;
+static size_t xAllocatedMax = 0;
+static size_t xAllocatedSum = 0;
 
 /* Gets set to the top bit of an size_t type.  When this bit in the xBlockSize
 member of an BlockLink_t structure is set then the block belongs to the
@@ -167,7 +173,7 @@ void *usermalloc(size_t xWantedSize)
 					mtCOVERAGE_TEST_MARKER();
 				}
 
-				if( ( xWantedSize > 0 ) && ( xWantedSize <= xFreeBytesRemaining ) )
+				if( ( xWantedSize > 0 ) && ( xWantedSize <= userxFreeBytesRemaining ) )
 				{
 					/* Traverse the list from the start	(lowest address) block until
 					one	of adequate size is found. */
@@ -222,11 +228,19 @@ void *usermalloc(size_t xWantedSize)
 							mtCOVERAGE_TEST_MARKER();
 						}
 
-						xFreeBytesRemaining -= pxBlock->xBlockSize;
+						/* Allocation statistics */
+#if DEBUG_HEAP_ALLOCATIONS == 1
+						++xAllocationsCount;
+						if (pxBlock->xBlockSize < xAllocatedMin) xAllocatedMin = pxBlock->xBlockSize;
+						if (pxBlock->xBlockSize > xAllocatedMax) xAllocatedMax = pxBlock->xBlockSize;
+						xAllocatedSum += pxBlock->xBlockSize;
+#endif
 
-						if( xFreeBytesRemaining < xMinimumEverFreeBytesRemaining )
+						userxFreeBytesRemaining -= pxBlock->xBlockSize;
+
+						if( userxFreeBytesRemaining < userxMinimumEverFreeBytesRemaining )
 						{
-							xMinimumEverFreeBytesRemaining = xFreeBytesRemaining;
+							userxMinimumEverFreeBytesRemaining = userxFreeBytesRemaining;
 						}
 						else
 						{
@@ -329,8 +343,14 @@ void userfree(void *pv)
 
 					vTaskSuspendAll();
 					{
+						/* Allocation statistics */
+#if DEBUG_HEAP_ALLOCATIONS == 1
+						++xDeallocationsCount;
+						xAllocatedSum -= pxLink->xBlockSize;
+#endif
+
 						/* Add this block to the list of free blocks. */
-						xFreeBytesRemaining += pxLink->xBlockSize;
+						userxFreeBytesRemaining += pxLink->xBlockSize;
 						traceFREE( pv, pxLink->xBlockSize );
 						prvInsertBlockIntoFreeList( ( ( BlockLink_t * ) pxLink ) );
 					}
@@ -397,16 +417,46 @@ void *userrealloc(void *pv, size_t xWantedSize) {
 
 size_t usermemGetFreeHeapSize( void )
 {
-    return xFreeBytesRemaining;
+    return userxFreeBytesRemaining;
 }
 /*-----------------------------------------------------------*/
 
 size_t usermemGetMinimumEverFreeHeapSize( void )
 {
-    return xMinimumEverFreeBytesRemaining;
+    return userxMinimumEverFreeBytesRemaining;
 }
 /*-----------------------------------------------------------*/
 
+void usermemResetStatistics(void)
+{
+	xAllocationsCount = 0;
+	xDeallocationsCount = 0;
+	xAllocatedMin = SIZE_MAX;
+	xAllocatedMax = 0;
+	xAllocatedSum = 0;
+}
+size_t usermemGetAllocationsCount(void)
+{
+	return xAllocationsCount;
+}
+size_t usermemGetDeallocationsCount(void)
+{
+	return xDeallocationsCount;
+}
+size_t usermemGetAllocatedMin(void)
+{
+	return xAllocatedMin;
+}
+size_t usermemGetAllocatedMax(void)
+{
+	return xAllocatedMax;
+}
+size_t usermemGetAllocatedSum(void)
+{
+	return xAllocatedSum;
+}
+
+/*-----------------------------------------------------------*/
 
 static void prvHeapInit( void )
 {
@@ -462,8 +512,8 @@ size_t xTotalHeapSize = USERMEM_TOTAL_HEAP_SIZE;
     #endif
 
 	/* Only one block exists - and it covers the entire usable heap space. */
-	xMinimumEverFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
-	xFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
+	userxMinimumEverFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
+	userxFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
 
 	/* Work out the position of the top bit in a size_t variable. */
 	xBlockAllocatedBit = ( ( size_t ) 1 ) << ( ( sizeof( size_t ) * heapBITS_PER_BYTE ) - 1 );

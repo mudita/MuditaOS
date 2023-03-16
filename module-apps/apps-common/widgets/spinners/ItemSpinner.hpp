@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,6 +21,7 @@ namespace gui
                              range range,
                              Boundaries boundaries   = Boundaries::Continuous,
                              Orientation orientation = Orientation::Vertical);
+        ~ItemSpinner();
 
         [[nodiscard]] value_type getCurrentValue() const noexcept;
         void setCurrentValue(value_type val);
@@ -67,6 +68,16 @@ namespace gui
         this->parent = parent;
         if (parent != nullptr) {
             parent->addWidget(this);
+        }
+    }
+
+    template <typename Container>
+    ItemSpinner<Container>::~ItemSpinner()
+    {
+        for (Item *layout : container) {
+            if (layout != currentLayout) {
+                delete layout;
+            }
         }
     }
 

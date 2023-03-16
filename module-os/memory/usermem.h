@@ -24,6 +24,13 @@ size_t usermemGetFreeHeapSize(void);
 
 size_t usermemGetMinimumEverFreeHeapSize(void);
 
+void usermemResetStatistics(void);
+size_t usermemGetAllocationsCount(void);
+size_t usermemGetDeallocationsCount(void);
+size_t usermemGetAllocatedMin(void);
+size_t usermemGetAllocatedMax(void);
+size_t usermemGetAllocatedSum(void);
+
 void *userrealloc(void *pv, size_t xWantedSize);
 
 #ifdef __cplusplus
