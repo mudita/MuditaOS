@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlatformFactory.hpp"
@@ -104,10 +104,6 @@ int main()
             }
 
             Log::Logger::get().init(Log::Application{ApplicationName, GIT_REV, VERSION, GIT_BRANCH});
-            /// force initialization of PhonenumberUtil because of its stack usage
-            /// otherwise we would end up with an init race and PhonenumberUtil could
-            /// be initiated in a task with stack not big enough to handle it
-            i18n::phonenumbers::PhoneNumberUtil::GetInstance();
             return true;
         },
         [sysmgr]() {

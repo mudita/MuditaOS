@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,6 +13,7 @@
 #define DEBUG_GUI_TEXT               0 /// show basic debug messages for gui::Text - warning this can be hard on cpu
 #define DEBUG_GUI_TEXT_LINES         0 /// show extended debug messages for gui::Text - lines building
 #define DEBUG_GUI_TEXT_CURSOR        0 /// show extended debug messages for gui::Text - cursor handling
+#define DEBUG_HEAP_ALLOCATIONS       0 /// gather heap allocations statictics
 #define DEBUG_INPUT_EVENTS           0 /// show input events prints in system
 #define DEBUG_MISSING_ASSETS         0 /// show debug concerning missing assets
 #define DEBUG_SCOPED_TIMINGS         0 /// show timings in measured functions

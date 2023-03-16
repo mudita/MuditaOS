@@ -88,7 +88,10 @@
         "assert": "cpp",
         "narrow": "cpp",
         "util": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "byte": "cpp"
     },
     "favorites.sortDirection": "ASC",
 }

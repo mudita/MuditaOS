@@ -55,6 +55,7 @@
                 "bell",
                 "linux",
                 "Debug",
+                //"-DLINUX_ENABLE_SANITIZER=OFF",
                 "-G",
                 "Ninja"
             ],
