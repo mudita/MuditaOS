@@ -107,6 +107,12 @@ fragmentation. */
 static size_t userxFreeBytesRemaining = 0U;
 static size_t userxMinimumEverFreeBytesRemaining = 0U;
 
+/* Allocation statistics */
+static size_t xAllocationsCount = 0;
+static size_t xDeallocationsCount = 0;
+static size_t xAllocatedMin = SIZE_MAX;
+static size_t xAllocatedMax = 0;
+static size_t xAllocatedSum = 0;
 
 /* Gets set to the top bit of an size_t type.  When this bit in the xBlockSize
 member of an BlockLink_t structure is set then the block belongs to the
@@ -222,6 +228,14 @@ void *usermalloc(size_t xWantedSize)
 							mtCOVERAGE_TEST_MARKER();
 						}
 
+						/* Allocation statistics */
+#if DEBUG_HEAP_ALLOCATIONS == 1
+						++xAllocationsCount;
+						if (pxBlock->xBlockSize < xAllocatedMin) xAllocatedMin = pxBlock->xBlockSize;
+						if (pxBlock->xBlockSize > xAllocatedMax) xAllocatedMax = pxBlock->xBlockSize;
+						xAllocatedSum += pxBlock->xBlockSize;
+#endif
+
 						userxFreeBytesRemaining -= pxBlock->xBlockSize;
 
 						if( userxFreeBytesRemaining < userxMinimumEverFreeBytesRemaining )
@@ -329,6 +343,12 @@ void userfree(void *pv)
 
 					vTaskSuspendAll();
 					{
+						/* Allocation statistics */
+#if DEBUG_HEAP_ALLOCATIONS == 1
+						++xDeallocationsCount;
+						xAllocatedSum -= pxLink->xBlockSize;
+#endif
+
 						/* Add this block to the list of free blocks. */
 						userxFreeBytesRemaining += pxLink->xBlockSize;
 						traceFREE( pv, pxLink->xBlockSize );
@@ -407,6 +427,36 @@ size_t usermemGetMinimumEverFreeHeapSize( void )
 }
 /*-----------------------------------------------------------*/
 
+void usermemResetStatistics(void)
+{
+	xAllocationsCount = 0;
+	xDeallocationsCount = 0;
+	xAllocatedMin = SIZE_MAX;
+	xAllocatedMax = 0;
+	xAllocatedSum = 0;
+}
+size_t usermemGetAllocationsCount(void)
+{
+	return xAllocationsCount;
+}
+size_t usermemGetDeallocationsCount(void)
+{
+	return xDeallocationsCount;
+}
+size_t usermemGetAllocatedMin(void)
+{
+	return xAllocatedMin;
+}
+size_t usermemGetAllocatedMax(void)
+{
+	return xAllocatedMax;
+}
+size_t usermemGetAllocatedSum(void)
+{
+	return xAllocatedSum;
+}
+
+/*-----------------------------------------------------------*/
 
 static void prvHeapInit( void )
 {

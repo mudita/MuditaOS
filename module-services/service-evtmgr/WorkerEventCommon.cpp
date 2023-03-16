@@ -25,6 +25,7 @@
 #include <optional>
 
 #include <log/log.hpp>
+#include <memory/usermem.h>
 
 WorkerEventCommon::WorkerEventCommon(sys::Service *service)
     : sys::Worker(service, stackDepthBytes),
@@ -33,6 +34,10 @@ WorkerEventCommon::WorkerEventCommon(sys::Service *service)
 
 bool WorkerEventCommon::handleMessage(uint32_t queueID)
 {
+#if DEBUG_HEAP_ALLOCATIONS == 1
+    LOG_INFO("Free space: %zu", usermemGetFreeHeapSize());
+#endif
+
     auto &queue = queues[queueID];
 
     // service queue
