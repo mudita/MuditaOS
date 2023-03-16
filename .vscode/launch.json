@@ -115,6 +115,8 @@
             "jlinkscript": "${workspaceFolder}/evkbimxrt1050_sdram_init_T6.jlinkscript",
             "rtos": "FreeRTOS",
             "overrideLaunchCommands": [
+                "source tools/gdb_crash_extend.py",
+                "source tools/misc/puregdb/puregdb.py",
                 "monitor reset 0",
                 "monitor halt",
                 "monitor memU32 0x401BC000 = 128;",
