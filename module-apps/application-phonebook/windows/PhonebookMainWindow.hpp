@@ -28,7 +28,6 @@ namespace gui
         gui::Icon *emptyListIcon                       = nullptr;
 
         bool enableNewContact = true;
-        bool requestedSearch  = false;
         std::unique_ptr<InputMode> inputMode;
         gui::KeyInputMappedTranslation translator;
 

@@ -33,7 +33,7 @@ namespace gui
                                                       phonebookStyle::searchResultsWindow::searchResultList::y,
                                                       phonebookStyle::searchResultsWindow::searchResultList::w,
                                                       phonebookStyle::searchResultsWindow::searchResultList::h,
-                                                      searchResultsModel);
+                                                      phonebookModel);
         searchResultList->setBoundaries(Boundaries::Continuous);
         setFocusItem(searchResultList);
 
@@ -86,21 +86,22 @@ namespace gui
         const auto searchResultsData = dynamic_cast<PhonebookSearchResultsData *>(data);
         assert(searchResultsData != nullptr);
 
-        searchResultsModel = searchResultsData->model;
-        searchResultList->setProvider(searchResultsModel);
+        phonebookModel     = searchResultsData->phonebookModel;
+        searchRequestModel = searchResultsData->searchRequestModel;
+        searchResultList->setProvider(phonebookModel);
         handleContentUpdate();
 
         return true;
     }
     void PhonebookSearchResults::handleContentUpdate()
     {
-        setTitle(utils::translate("common_results_prefix") + "\"" + searchResultsModel->getFilter() + "\"");
+        setTitle(utils::translate("common_results_prefix") + "\"" + phonebookModel->getFilter() + "\"");
 
-        if (searchResultsModel->requestRecordsCount() > 0) {
+        if (phonebookModel->requestRecordsCount() > 0) {
             navBar->setActive(nav_bar::Side::Left, true);
             navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
             navBar->setActive(nav_bar::Side::Center, true);
-            if (searchResultsModel->customContactActivationCallback) {
+            if (searchRequestModel->requestedSearch()) {
                 navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::select));
             }
             else {

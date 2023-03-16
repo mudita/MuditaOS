@@ -4,11 +4,9 @@
 #pragma once
 
 #include <application-phonebook/models/PhonebookModel.hpp>
+#include <application-phonebook/models/SearchRequestModel.hpp>
 #include <ContactRecord.hpp>
 #include <SwitchData.hpp>
-
-#include <memory>
-#include <string>
 
 class PhonebookItemData : public gui::SwitchData
 {
@@ -42,9 +40,12 @@ class PhonebookSearchResultsData : public gui::SwitchData
 {
   public:
     PhonebookSearchResultsData() = delete;
-    PhonebookSearchResultsData(std::shared_ptr<PhonebookModel> model) : model(std::move(model)){};
+    PhonebookSearchResultsData(std::shared_ptr<PhonebookModel> phonebookModel,
+                               std::shared_ptr<SearchRequestModel> searchRequestModel)
+        : phonebookModel(std::move(phonebookModel)), searchRequestModel(std::move(searchRequestModel)){};
 
-    std::shared_ptr<PhonebookModel> model;
+    std::shared_ptr<PhonebookModel> phonebookModel;
+    std::shared_ptr<SearchRequestModel> searchRequestModel;
 };
 
 class PhonebookSearchRequest : public gui::SwitchData
