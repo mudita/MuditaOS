@@ -95,7 +95,7 @@ namespace cellular::internal::sms
             LOG_ERROR("Failed to send SMS");
             record->type = SMSType::FAILED;
             context.onSendQuery(db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(*record)));
-            return {};
+            return std::make_unique<IdleState>(context);
         }
 
         context.onSend(*record);
