@@ -175,9 +175,10 @@ namespace app
 
     void ApplicationPhonebook::onSearchRequest(const std::string &searchFilter)
     {
-        phonebookModel->setFilter(searchFilter);
+        auto model = std::make_shared<PhonebookModel>(*phonebookModel);
+        model->setFilter(searchFilter);
         LOG_DEBUG("Switching to search results window.");
-        auto data = std::make_unique<PhonebookSearchResultsData>(phonebookModel);
+        auto data = std::make_unique<PhonebookSearchResultsData>(model, searchRequestModel);
         switchWindow(gui::window::name::search_results, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
     }
 

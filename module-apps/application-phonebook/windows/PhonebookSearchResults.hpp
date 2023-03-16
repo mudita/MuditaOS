@@ -26,7 +26,8 @@ namespace gui
         void rebuild() override;
         void handleContentUpdate();
 
-        std::shared_ptr<PhonebookModel> searchResultsModel;
+        std::shared_ptr<PhonebookModel> phonebookModel;
+        std::shared_ptr<SearchRequestModel> searchRequestModel;
         PhonebookListView *searchResultList = nullptr;
         Icon *icon                          = nullptr;
     };
