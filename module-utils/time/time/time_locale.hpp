@@ -23,8 +23,8 @@ namespace utils
             static constexpr int num_days = 7;
 
           private:
-            static const int num_monts      = 12;
-            static const int num_formatters = 11;
+            static constexpr int num_months     = 12;
+            static constexpr int num_formatters = 11;
             // imo it would be nicer to have datetime locales in different json with thiny bit nicer and more effective
             // getters
             const std::array<std::string, num_days> daysShort = {
@@ -38,18 +38,18 @@ namespace utils
                                                             "common_friday",
                                                             "common_saturday"};
 
-            const std::array<std::string, num_monts> months = {"common_january",
-                                                               "common_february",
-                                                               "common_march",
-                                                               "common_april",
-                                                               "common_may",
-                                                               "common_june",
-                                                               "common_july",
-                                                               "common_august",
-                                                               "common_september",
-                                                               "common_october",
-                                                               "common_november",
-                                                               "common_december"};
+            const std::array<std::string, num_months> months = {"common_january",
+                                                                "common_february",
+                                                                "common_march",
+                                                                "common_april",
+                                                                "common_may",
+                                                                "common_june",
+                                                                "common_july",
+                                                                "common_august",
+                                                                "common_september",
+                                                                "common_october",
+                                                                "common_november",
+                                                                "common_december"};
 
             const std::array<std::string, num_formatters> time_formats{"locale_12hour_min",
                                                                        "locale_12hour_min_short",
@@ -184,7 +184,7 @@ namespace utils
 
             static const UTF8 get_month(enum Month mon)
             {
-                if (mon >= num_monts) {
+                if (mon >= num_months) {
                     LOG_ERROR("Bad value %d", mon);
                     return "";
                 }

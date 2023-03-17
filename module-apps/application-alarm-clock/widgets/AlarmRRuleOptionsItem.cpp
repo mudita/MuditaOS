@@ -37,7 +37,7 @@ namespace gui
         focusChangedCallback = [&](Item &item) {
             setFocusItem(focus ? optionSpinner : nullptr);
 
-            if (getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom) {
+            if (focus && (getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom)) {
                 this->navBarTemporaryMode(utils::translate(style::strings::common::edit));
             }
             else {
@@ -79,12 +79,13 @@ namespace gui
 
     void AlarmRRuleOptionsItem::checkCustomOption(const std::string &selectedOption)
     {
-        if (rRuleOptions.back().second != "Custom")
+        if (rRuleOptions.back().second != utils::translate("app_alarm_clock_repeat_custom")) {
             if (const auto days = getPresenter()->getCustomDays();
                 std::none_of(days.cbegin(), days.cend(), [](const auto &day) { return day.second; })) {
-                rRuleOptions.back().second = "Custom";
+                rRuleOptions.back().second = utils::translate("app_alarm_clock_repeat_custom");
                 printOptions();
             }
+        }
 
         for (auto const &option : rRuleOptions) {
             if (selectedOption.empty() || option.second == selectedOption) {
