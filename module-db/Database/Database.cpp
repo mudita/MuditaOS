@@ -79,6 +79,8 @@ Database::Database(const char *name, bool readOnly)
     }
     sqlite3_extended_result_codes(dbConnection, enabled);
     initQueryStatementBuffer();
+    // TODO: MP add all the required and supported locale by pure
+    query("SELECT icu_load_collation('pl', 'polish');");
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
 

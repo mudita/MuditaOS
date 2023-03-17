@@ -1,0 +1,62 @@
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#pragma once
+
+#include <atomic>
+
+namespace std
+{
+    class mutex
+    {
+      public:
+#ifdef __GTHREAD_MUTEX_INIT
+        constexpr
+#endif
+            mutex() noexcept = default;
+        ~mutex()             = default;
+
+        mutex(const mutex &)            = delete;
+        mutex &operator=(const mutex &) = delete;
+
+        void lock()
+        {}
+
+        bool try_lock() noexcept
+        {
+            return true;
+        }
+
+        void unlock()
+        {}
+    };
+
+    /// Flag type used by std::call_once
+    struct once_flag
+    {
+      private:
+        std::atomic_bool _M_has_run;
+      public:
+        /// Constructor
+        once_flag() noexcept = default;
+
+        /// Deleted copy constructor
+        once_flag(const once_flag &) = delete;
+        /// Deleted assignment operator
+        once_flag &operator=(const once_flag &) = delete;
+
+        template<typename _Callable, typename... _Args>
+        friend void
+        call_once(once_flag& __once, _Callable&& __f, _Args&&... __args);
+    };
+
+    /// Invoke a callable and synchronize with other calls using the same flag
+    template <typename _Callable, typename... _Args>
+    void call_once(once_flag &__once, _Callable &&__f, _Args &&...__args)
+    {
+        // Early exit without locking
+        if(__once._M_has_run) return;
+        __f(std::forward<_Args>(__args)...);
+        __once._M_has_run = true;
+    }
+} // namespace std

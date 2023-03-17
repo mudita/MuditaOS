@@ -196,7 +196,7 @@ namespace db::multimedia_files
     std::vector<TableRow> MultimediaFilesTable::getLimitOffset(uint32_t offset, uint32_t limit)
     {
         auto retQuery =
-            db->query("SELECT * from files ORDER BY title ASC LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
+            db->query("SELECT * from files ORDER BY title COLLATE polish ASC LIMIT " u32_ " OFFSET " u32_ ";", limit, offset);
 
         return retQueryUnpack(std::move(retQuery));
     }
@@ -348,15 +348,19 @@ namespace db::multimedia_files
 
         return (*queryRet)[0].getUInt32();
     }
-
+#include <FreeRTOS.h>
+#include <task.h>
     auto MultimediaFilesTable::getLimitOffsetByPaths(const std::vector<std::string> &paths,
                                                      uint32_t offset,
                                                      uint32_t limit) -> std::vector<TableRow>
     {
         const std::string query = "SELECT * FROM files WHERE " + constructMatchPattern(paths) +
-                                  " ORDER BY title ASC LIMIT " + std::to_string(limit) + " OFFSET " +
+                                  " ORDER BY title COLLATE polish ASC LIMIT " + std::to_string(limit) + " OFFSET " +
                                   std::to_string(offset) + ";";
+        const auto t1 = xTaskGetTickCount();
+
         std::unique_ptr<QueryResult> retQuery = db->query(query.c_str());
+        LOG_FATAL("query took: %lums", (unsigned long)xTaskGetTickCount() - t1);
         return retQueryUnpack(std::move(retQuery));
     }
 

@@ -1,0 +1,15 @@
+{
+  "localeFilter": {
+    "filterType": "locale",
+    "includeScripts": false,
+    "includeChildren": false,
+    "includelist": [
+      "en",
+      "pl",
+      "de",
+      "fr",
+      "es",
+      "sv"
+    ]
+  }
+}

@@ -8,6 +8,7 @@
 
 #include <purefs/filesystem_paths.hpp>
 #include <log/log.hpp>
+#include <unicode/putil.h>
 
 namespace
 {
@@ -17,6 +18,7 @@ namespace
 ServiceDBCommon::ServiceDBCommon() : sys::Service(service::name::db, "", serviceDbStackSize, sys::ServicePriority::Idle)
 {
     LOG_INFO("[ServiceDB] Initializing");
+    u_setDataDirectory((purefs::dir::getSystemDataDirPath() / "icu").c_str());
 }
 
 db::Interface *ServiceDBCommon::getInterface(db::Interface::Name interface)

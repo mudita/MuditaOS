@@ -116,3 +116,6 @@
 [submodule "third-party/fakeit/FakeIt"]
 	path = third-party/fakeit/FakeIt
 	url = https://github.com/eranpeer/FakeIt.git
+[submodule "third-party/icu/src"]
+	path = third-party/icu/src
+	url = git@github.com:mudita/icu.git

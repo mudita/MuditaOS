@@ -1,0 +1,24 @@
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#pragma once
+
+#include "mutex"
+#include_next <mutex>
+
+namespace std{
+    class condition_variable
+    {
+      public:
+        condition_variable() noexcept = default;
+
+        condition_variable(const condition_variable &)            = delete;
+        condition_variable &operator=(const condition_variable &) = delete;
+
+        void notify_one() noexcept{}
+
+        void notify_all() noexcept{}
+
+        void wait( std::unique_lock<std::mutex>& lock ){}
+    };
+}

@@ -63,7 +63,7 @@ endif ()
 target_link_libraries(${PROJECT_NAME} PUBLIC log-api board-config freertos_kernel)
 
 
-add_library(freertos-app application.c trace/DeletedTasks.cpp)
+add_library(freertos-app application.c)
 target_link_libraries(freertos-app PRIVATE freertos_kernel log-api)
 
 if (${ENABLE_TESTS})

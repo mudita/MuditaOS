@@ -36,6 +36,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         module-db
         json::json
+        icu
     PUBLIC
         utf8
 )

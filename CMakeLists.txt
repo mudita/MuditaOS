@@ -215,6 +215,16 @@ add_databases_target(
         DEVEL ${WITH_DEVELOPMENT_FEATURES}
 )
 
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    set(ICU_CROSS_COMPILATION "CROSS")
+endif()
+add_icu(
+        DIR ${CMAKE_CURRENT_SOURCE_DIR}/third-party/icu
+        FILTER ${CMAKE_CURRENT_SOURCE_DIR}/third-party/icu/filters.json
+        INSTALL ${SYSROOT_PATH}/system_a/data/icu
+        ${ICU_CROSS_COMPILATION}
+)
+
 add_library(version-header INTERFACE)
 target_include_directories(version-header INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/source/include>)
 add_dependencies(version-header version)

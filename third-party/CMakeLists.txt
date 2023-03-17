@@ -29,6 +29,7 @@ add_subdirectory(utz)
 add_subdirectory(dr_libs)
 add_subdirectory(msgpack11)
 add_subdirectory(freeRTOS-kernel)
+add_subdirectory(icu)
 
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")

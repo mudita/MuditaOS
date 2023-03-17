@@ -134,9 +134,12 @@ set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Tables/NotesTable.cpp PR
 
 target_compile_definitions(${PROJECT_NAME}
 
-        PUBLIC
+        PRIVATE
 
-        -D_HAVE_SQLITE_CONFIG_H
+        _HAVE_SQLITE_CONFIG_H
+        SQLITE_CORE
+        SQLITE_ENABLE_ICU
+        SQLITE_ENABLE_ICU_COLLATIONS
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -172,6 +175,7 @@ target_link_libraries(${PROJECT_NAME}
         Microsoft.GSL::GSL
         rrule
         board
+        icu
 )
 
 # Host target configuration(mainly used for unit testing)
