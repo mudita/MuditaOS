@@ -11,6 +11,7 @@
 * Fixed yes/no behavior in factory reset window
 * Fixed missing software version in French language
 * Fixed problems with displaying file names in Relaxation
+* Fixed polish Meditation summary text
 
 ### Added
 
