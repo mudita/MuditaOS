@@ -30,18 +30,20 @@ namespace gui
             state = std::make_unique<TextBackup>(_state->backupText());
         }
 
-        void getState(gui::Text *_state)
+        void restoreState(gui::Text *_state)
         {
             assert(_state);
-            if (!state) {
+            if (state == nullptr) {
                 return;
             }
-            auto currentText = _state->getText();
+
+            const auto currentText = _state->getText();
             _state->restoreFrom(*state);
             if (!currentText.empty()) {
                 _state->addText(currentText);
             }
-            state = nullptr;
+
+            state.reset();
         }
 
       private:
@@ -70,7 +72,7 @@ namespace gui
 
     void NewMessageWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        memento->getState(message);
+        memento->restoreState(message);
         if (data == nullptr) {
             return;
         }
@@ -139,7 +141,7 @@ namespace gui
     auto NewMessageWindow::getPhoneNumber() const -> utils::PhoneNumber
     {
         if (phoneNumber.getEntered().empty()) {
-            if (contact && !(contact->numbers.empty())) {
+            if (contact && !contact->numbers.empty()) {
                 return contact->numbers.at(selectedNumber).number;
             }
             return utils::PhoneNumber{recipient->getText()};
@@ -315,7 +317,7 @@ namespace gui
             return;
         }
 
-        if ((reason == CloseReason::PhoneLock) || (reason == CloseReason::Popup)) {
+        if (reason != CloseReason::ApplicationClose) {
             memento->setState(message);
             message->clear();
             return;
