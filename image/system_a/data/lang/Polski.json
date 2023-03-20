@@ -740,7 +740,7 @@
   "app_bell_meditation_start_delay": "Opóźnienie startu",
   "app_bell_meditation_chime_interval_bottom": "medytacji",
   "app_bell_meditation_chime_volume": "Głośność dzwonka interwału",
-  "app_meditation_summary": "<text>Medytowałeś przez<br />",
+  "app_meditation_summary": "<text>Medytacja trwała<br />",
   "app_meditation_countdown_desc": "Startuje za",
   "app_meditation_summary_total": "<text>Suma:<br /><token>$VALUE</token></text>",
   "app_meditation_summary_average": "Średnia/dzień:",
