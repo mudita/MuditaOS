@@ -8,12 +8,9 @@
 #include "service-appmgr/Controller.hpp"
 
 #include <log/log.hpp>
-#include <module-db/queries/notifications/QueryNotificationsDecrement.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByNumberID.hpp>
 #include <module-db/queries/phonebook/QueryNumberGetByID.hpp>
-#include <OptionsMessages.hpp>
 #include <service-db/DBNotificationMessage.hpp>
-#include <service-db/DBServiceAPI.hpp>
 #include <Service/Message.hpp>
 #include <Style.hpp>
 #include <TextBubble.hpp>
@@ -85,11 +82,14 @@ namespace gui
             requestContact(smsModel->numberID);
         }
 
-        if (auto pdata = dynamic_cast<SMSTextData *>(data); pdata) {
-            auto txt = pdata->text;
+        if (const auto pdata = dynamic_cast<SMSTextData *>(data); pdata != nullptr) {
             LOG_INFO("received sms templates data");
-            pdata->concatenate == SMSTextData::Concatenate::True ? smsModel->smsInput->inputText->addText(txt)
-                                                                 : smsModel->smsInput->inputText->setText(txt);
+            if (pdata->concatenate == SMSTextData::Concatenate::True) {
+                smsModel->smsInput->inputText->addText(pdata->text);
+            }
+            else {
+                smsModel->smsInput->inputText->setText(pdata->text);
+            }
         }
     }
 
@@ -120,20 +120,15 @@ namespace gui
 
     bool SMSThreadViewWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
+        const auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msg != nullptr) {
-            if (msg->interface == db::Interface::Name::SMS) {
-                if (msg->dataModified()) {
-                    rebuild();
-                    return true;
-                }
+            if ((msg->interface == db::Interface::Name::SMS) && msg->dataModified()) {
+                rebuild();
+                return true;
             }
-            if (msg->interface == db::Interface::Name::SMSThread) {
-                if (msg->type == db::Query::Type::Delete) {
-                    if (this == application->getCurrentWindow()) {
-                        application->switchWindow(gui::name::window::main_window);
-                    }
-                }
+            if ((msg->interface == db::Interface::Name::SMSThread) && (msg->type == db::Query::Type::Delete) &&
+                (this == application->getCurrentWindow())) {
+                application->switchWindow(gui::name::window::main_window);
             }
         }
         return false;

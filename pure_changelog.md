@@ -75,7 +75,8 @@
 * Fixed going back to Messages instead of Contacts in case message thread was previously opened from Contacts
 * Fixed autoconnecting other BT devices when another one is already connected
 * Fixed going to Calls instead of Contacts after aborted or confirmed attempt to create contact from Calls
-* Fix misleading "Nie" abbreviation for word "Niedziela" (Sunday) in new alarm window
+* Fixed misleading "Nie" abbreviation for word "Niedziela" (Sunday) in new alarm window
+* Fixed automatic message pasting into content field in thread view after message forwarding
 
 ## [1.6.0 2023-02-27]
 

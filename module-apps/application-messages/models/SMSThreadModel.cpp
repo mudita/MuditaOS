@@ -33,7 +33,7 @@ unsigned int SMSThreadModel::getMinimalItemSpaceRequired() const
 
 gui::ListItem *SMSThreadModel::getItem(gui::Order order)
 {
-    std::shared_ptr<SMSRecord> sms = getRecord(order);
+    const auto sms = getRecord(order);
 
     if (sms == nullptr) {
         return nullptr;

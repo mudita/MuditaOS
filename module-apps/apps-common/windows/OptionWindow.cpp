@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OptionWindow.hpp"
@@ -60,8 +60,7 @@ namespace gui
 
     void OptionWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (auto message = dynamic_cast<gui::OptionsWindowOptions *>(data)) {
-            LOG_DEBUG("Options load!");
+        if (const auto message = dynamic_cast<gui::OptionsWindowOptions *>(data); message != nullptr) {
             options = message->takeOptions();
         }
 
