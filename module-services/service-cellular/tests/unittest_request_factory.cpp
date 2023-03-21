@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -160,7 +160,7 @@ TEST_CASE("MMI requests")
 
     std::vector<TestCase> testCases = {
         /// USSD
-        /*{R"(*100*#)", R"(AT+CUSD=1,*100*#,15)", typeid(UssdRequest)},
+        {R"(*100*#)", R"(AT+CUSD=1,*100*#,15)", typeid(UssdRequest)},
 
         /// ImeiRequest
         {R"(*#06#)", R"(AT+GSN)", typeid(ImeiRequest)},
@@ -408,9 +408,9 @@ TEST_CASE("MMI requests")
         // bad procedure type * fallback to UUSD
         {R"(*#03*353*1234*4321*4321#)", R"(AT+CUSD=1,*#03*353*1234*4321*4321#,15)", typeid(UssdRequest)},
         // bad procedure type ##
-        {R"(##03*353*1234*4321*4321#)", std::string(), typeid(CallRequest)},
+        {R"(##03*353*1234*4321*4321#)", std::string(), typeid(UssdRequest)},
         // bad procedure type #
-        {R"(#03*353*1234*4321*4321#)", std::string(), typeid(CallRequest)},
+        {R"(#03*353*1234*4321*4321#)", std::string(), typeid(UssdRequest)},
         // no password
         {R"(**03*353***#)", std::string(), typeid(PasswordRegistrationRequest), false},
         // no password
@@ -434,9 +434,9 @@ TEST_CASE("MMI requests")
         // bad procedure type *
         {R"(*042*00002*11112*11112#)", std::string(), typeid(UssdRequest)},
         // bad procedure type ##
-        {R"(##042*00002*11112*11112#)", std::string(), typeid(CallRequest)},
+        {R"(##042*00002*11112*11112#)", std::string(), typeid(UssdRequest)},
         // bad procedure type #
-        {R"(#042*00002*11112*11112#)", std::string(), typeid(CallRequest)},
+        {R"(#042*00002*11112*11112#)", std::string(), typeid(UssdRequest)},
         // bad procedure type *#
         {R"(*#042*00002*11112*11112#)", std::string(), typeid(UssdRequest)},
         // no password
@@ -448,7 +448,7 @@ TEST_CASE("MMI requests")
         // no password
         {R"(**042**11112*#)", std::string(), typeid(PinChangeRequest), false},
         // password does not match
-        {R"(**042*0000*1111*2222#)", std::string(), typeid(PinChangeRequest), false},*/
+        {R"(**042*0000*1111*2222#)", std::string(), typeid(PinChangeRequest), false},
 
         /// call
         {R"(666555777)", std::string(), typeid(CallRequest)},
