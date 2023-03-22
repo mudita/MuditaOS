@@ -205,6 +205,7 @@ namespace gui
         std::vector<std::string> ext1MapFiles;
         std::vector<std::string> ext2MapFiles;
 
+        mapFolder = "/home/marcin/dev/MuditaOS/build-PurePhone-linux-Debug/sysroot/system_a/assets/images";
         LOG_INFO("Scanning %s  %s images folder: %s", ext1.c_str(), ext2.c_str(), mapFolder.c_str());
 
         for (const auto &entry : std::filesystem::recursive_directory_iterator(mapFolder)) {
