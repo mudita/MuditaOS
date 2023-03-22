@@ -528,6 +528,9 @@ namespace cellular::internal
         csqHandler->onInvalidCSQ = [this]() { AntennaServiceAPI::InvalidCSQNotification(owner); };
 
         csqHandler->onRetrySwitchMode = [this](service::CSQMode newMode) {
+            if (state->get() != State::ST::URCReady) {
+                return;
+            }
             switch (newMode) {
             case service::CSQMode::PermanentReporting:
                 owner->bus.sendUnicast(

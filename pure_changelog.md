@@ -77,6 +77,7 @@
 * Fixed going to Calls instead of Contacts after aborted or confirmed attempt to create contact from Calls
 * Fixed misleading "Nie" abbreviation for word "Niedziela" (Sunday) in new alarm window
 * Fixed automatic message pasting into content field in thread view after message forwarding
+* Fixed redundant logs about CSQ reporting mode
 
 ## [1.6.0 2023-02-27]
 
