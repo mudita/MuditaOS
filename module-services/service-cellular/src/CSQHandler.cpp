@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CSQHandler.hpp"
@@ -65,9 +65,9 @@ namespace cellular::service
 
     bool CSQHandler::switchToPermanentReportMode()
     {
-        LOG_INFO("Switch to permanent report mode.");
         if (onEnableCsqReporting != nullptr && onEnableCsqReporting()) {
             currentMode = CSQMode::PermanentReporting;
+            LOG_INFO("Switch to permanent report mode.");
             return true;
         }
 
@@ -80,9 +80,9 @@ namespace cellular::service
 
     bool CSQHandler::switchToHybridReportMode()
     {
-        LOG_INFO("Switch to hybrid report mode.");
         if (onEnableCsqReporting != nullptr && onEnableCsqReporting()) {
             currentMode = CSQMode::HybridReporting;
+            LOG_INFO("Switch to hybrid report mode.");
             return true;
         }
 
@@ -95,10 +95,10 @@ namespace cellular::service
 
     bool CSQHandler::switchToHybridPollMode()
     {
-        LOG_INFO("Too many signal strength updates, switch to hybrid poll mode.");
         if (onDisableCsqReporting != nullptr && onDisableCsqReporting()) {
             currentMode               = CSQMode::HybridPolling;
             switchToPollModeTimestamp = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
+            LOG_INFO("Too many signal strength updates, switch to hybrid poll mode.");
             return true;
         }
 
