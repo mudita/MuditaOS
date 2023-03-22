@@ -27,8 +27,10 @@ namespace utils
         Language inputLanguage        = fallbackLanguageName;
         Language inputLanguageFilename;
         Language currentDisplayLanguage;
-        std::filesystem::path InputLanguageDirPath   = purefs::dir::getSystemDataDirPath() / "profiles";
-        std::filesystem::path DisplayLanguageDirPath = purefs::dir::getSystemDataDirPath() / "lang";
+        std::filesystem::path InputLanguageDirPath =
+            "/home/marcin/dev/MuditaOS/build-PurePhone-linux-Debug/sysroot/system_a/data/profiles";
+        std::filesystem::path DisplayLanguageDirPath =
+            "/home/marcin/dev/MuditaOS/build-PurePhone-linux-Debug/sysroot/system_a/data/lang";
         cpp_freertos::MutexStandard mutex;
         std::vector<LanguageMetadata> metadata;
 
