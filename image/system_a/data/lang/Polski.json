@@ -500,7 +500,7 @@
   "phone_lock_unlock": "<text>Wprowadź kod,<br></br>by odblokować:</text>",
   "phone_lock_blocked_information": "<text>Błędny kod.<br></br>Spróbuj ponownie za <token>$TIME</token>.</text>",
   "phone_lock_blocked_information_seconds": " sekund",
-  "phone_lock_blocked_information_minute": "minute",
+  "phone_lock_blocked_information_minute": "minutę",
   "phone_lock_blocked_information_minutes": " minuty",
   "phone_lock_unlock_invalid": "<text>Błędny kod.<br></br>Spróbuj ponownie.</text>",
   "phone_lock_blocked": "Przykro nam, telefon zablokowany",
