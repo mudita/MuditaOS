@@ -3,14 +3,32 @@
 ## Unreleased
 
 ### Added
-
-* Always display network access technology and signal strength on the status bar
-* Added days of the week to the list of SMS, calls and notes
-* Added date formatting of received/sent SMS
-* Added meditation parameters to non-volatile memory
-* Added missing translations for EULA in French, Spanish and Swedish
 * Added input mode selection display timeout
 
+### Changed / Improved
+
+* Replaced English labels occuring in French translation with French ones
+* Added new field to deviceInfo endpoint
+* Made EULA window scroll by a few lines at once
+* Updated Bluetooth stack
+
+
+### Fixed
+
+* Fixed wrong USSD flow when user closed USSD popup with back button
+* Fixed broken abbreviating of multiline text messages content in deletion window
+* Fixed misleading labels in the Phonebook application when using search engine
+* Fixed text pasting in new contact window when some text is already present there
+* Fixed unnecessary deep refresh when pressing up arrow in empty list view
+* Fixed going back to Messages instead of Contacts in case message thread was previously opened from Contacts
+* Fixed autoconnecting other BT devices when another one is already connected
+* Fixed going to Calls instead of Contacts after aborted or confirmed attempt to create contact from Calls
+* Fixed misleading "Nie" abbreviation for word "Niedziela" (Sunday) in new alarm window
+* Fixed automatic message pasting into content field in thread view after message forwarding
+* Fixed redundant logs about CSQ reporting mode
+
+
+## [1.7.0 2023-03-23]
 ### Changed / Improved
 
 * Shortened duration of phone modes pop-up from 3s to 1s
@@ -19,10 +37,11 @@
 * Changed unknown character glyph to the one matching the design
 * Changed tethering icon on status bar
 * Unified grey color tones used while displaying texts
-* Replaced English labels occuring in French translation with French ones
-* Added new field to deviceInfo endpoint
-* Made EULA window scroll by a few lines at once
-* Updated Bluetooth stack
+* Always display network access technology and signal strength on the status bar
+* Added days of the week to the list of SMS, calls and notes
+* Added date formatting of received/sent SMS
+* Added meditation parameters to non-volatile memory
+* Added missing translations for legal documents in French, Spanish and Swedish
 
 ### Fixed
 
@@ -68,17 +87,6 @@
 * Fixed returning to call screen from message template
 * Fixed displaying wrong information on screen after rejecting call with SMS template
 * Fixed lack of contact search list update when returning to list after contact edition
-* Fixed wrong USSD flow when user closed USSD popup with back button
-* Fixed broken abbreviating of multiline text messages content in deletion window
-* Fixed misleading labels in the Phonebook application when using search engine
-* Fixed text pasting in new contact window when some text is already present there
-* Fixed unnecessary deep refresh when pressing up arrow in empty list view
-* Fixed going back to Messages instead of Contacts in case message thread was previously opened from Contacts
-* Fixed autoconnecting other BT devices when another one is already connected
-* Fixed going to Calls instead of Contacts after aborted or confirmed attempt to create contact from Calls
-* Fixed misleading "Nie" abbreviation for word "Niedziela" (Sunday) in new alarm window
-* Fixed automatic message pasting into content field in thread view after message forwarding
-* Fixed redundant logs about CSQ reporting mode
 
 ## [1.6.0 2023-02-27]
 
