@@ -6,15 +6,7 @@
 ### Fixed
 
 
-## [1.7.0 2023-XX-XX]
-### Added
-
-* Always display network access technology and signal strength on the status bar
-* Added days of the week to the list of SMS, calls and notes
-* Added date formatting of received/sent SMS
-* Added meditation parameters to non-volatile memory
-* Added missing translations for EULA in French, Spanish and Swedish
-
+## [1.7.0 2023-03-23]
 ### Changed / Improved
 
 * Shortened duration of phone modes pop-up from 3s to 1s
@@ -23,11 +15,16 @@
 * Changed unknown character glyph to the one matching the design
 * Changed tethering icon on status bar
 * Unified grey color tones used while displaying texts
+* Always display network access technology and signal strength on the status bar
+* Added days of the week to the list of SMS, calls and notes
+* Added date formatting of received/sent SMS
+* Added meditation parameters to non-volatile memory
+* Added missing translations for legal documents in French, Spanish and Swedish
 
 ### Fixed
 
 * Fixed not marking thread as read when new message arrives in the opened thread
-* Fixed alarm rings on the low battery screen
+* Fixed alarm rings on the low battery screen log
 * Fixed the notification of unread messages are not deleted with the thread
 * Fixed several MTP issues
 * Fixed notifications of unread SMS threads on the home screen
