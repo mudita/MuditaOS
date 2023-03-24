@@ -11,7 +11,7 @@
 * Added new field to deviceInfo endpoint
 * Made EULA window scroll by a few lines at once
 * Updated Bluetooth stack
-
+* Unified GUI flow for adding contact with number already present in another contact
 
 ### Fixed
 
