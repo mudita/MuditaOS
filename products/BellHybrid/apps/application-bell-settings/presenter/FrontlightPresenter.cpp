@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FrontlightPresenter.hpp"
@@ -17,9 +17,7 @@ namespace app::bell_settings
     }
 
     FrontlightPresenter::~FrontlightPresenter()
-    {
-        revertUnsavedChanges();
-    }
+    {}
 
     auto FrontlightPresenter::getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider>
     {
@@ -31,13 +29,23 @@ namespace app::bell_settings
         provider->clearData();
     }
 
-    void FrontlightPresenter::saveChanges()
+    void FrontlightPresenter::saveConfig()
     {
-        frontlightModel->setChangesSaved();
+        frontlightModel->saveConfig();
     }
 
-    void FrontlightPresenter::revertUnsavedChanges()
+    void FrontlightPresenter::revertConfig()
     {
-        frontlightModel->revertUnsavedChanges();
+        frontlightModel->revertConfig();
+    }
+
+    void FrontlightPresenter::setBacklight()
+    {
+        frontlightModel->setBacklight(BacklightState::On);
+    }
+
+    bool FrontlightPresenter::isConfigSaved()
+    {
+        return frontlightModel->isConfigSaved();
     }
 } // namespace app::bell_settings

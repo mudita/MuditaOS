@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapProgressPresenter.hpp"
@@ -89,7 +89,7 @@ namespace app::powernap
                                         ? screen_light_control::ScreenLightMode::Automatic
                                         : screen_light_control::ScreenLightMode::Manual);
             frontLightModel.setBrightness(frontLightModel.getBrightnessModel().getValue());
-            frontLightModel.setStatus(true);
+            frontLightModel.setBacklight(bell_settings::BacklightState::On);
         }
 
         const auto filePath = soundsRepository->titleToPath(

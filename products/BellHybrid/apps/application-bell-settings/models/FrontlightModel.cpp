@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/models/FrontlightModel.hpp>
@@ -19,12 +19,14 @@ namespace app::bell_settings
         const auto responseCallback = [this](const auto response) -> bool {
             const auto resp = dynamic_cast<sevm::ScreenLightControlParametersResponse *>(response);
             if (resp) {
-                this->brightnessAdapter->update(
-                    frontlight_utils::percentageToFixedVal(resp->getParams().manualModeBrightness));
+                const auto brightness = frontlight_utils::percentageToFixedVal(resp->getParams().manualModeBrightness);
+                this->brightnessAdapter->update(brightness);
                 this->modeAdapter->update(
                     resp->getMode() == screen_light_control::ScreenLightMode::Automatic ? autoStr : onDemandStr);
                 if (this->onReady) {
                     this->onReady();
+                    setBacklight(BacklightState::On);
+                    setBrightness(brightness);
                 }
             }
             return true;
@@ -33,10 +35,11 @@ namespace app::bell_settings
                                                        service::name::evt_manager);
         request->execute(app, this, responseCallback);
     }
-    void FrontlightModel::setStatus(bool onOff)
+    void FrontlightModel::setBacklight(BacklightState state)
     {
         app->bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
-                                 onOff ? screen_light_control::Action::turnOn : screen_light_control::Action::turnOff),
+                                 state == BacklightState::On ? screen_light_control::Action::turnOn
+                                                             : screen_light_control::Action::turnOff),
                              service::name::evt_manager);
     }
     void FrontlightModel::setMode(screen_light_control::ScreenLightMode mode)
@@ -49,7 +52,6 @@ namespace app::bell_settings
     }
     void FrontlightModel::setBrightness(frontlight_utils::Brightness value)
     {
-        hasUnsavedChanges = true;
         screen_light_control::ConstLinearProgressModeParameters parameters{
             frontlight_utils::fixedValToPercentage(value)};
         app->bus.sendUnicast(std::make_shared<sevm::ScreenLightSetConstLinearModeParams>(parameters),
@@ -64,19 +66,20 @@ namespace app::bell_settings
         return *modeAdapter;
     }
 
-    void FrontlightModel::revertUnsavedChanges()
+    void FrontlightModel::revertConfig()
     {
-        if (!hasUnsavedChanges) {
-            return;
-        }
         setMode(modeAdapter->getValue() == autoStr ? screen_light_control::ScreenLightMode::Automatic
                                                    : screen_light_control::ScreenLightMode::Manual);
         setBrightness(brightnessAdapter->getValue());
-        setStatus(true);
     }
 
-    void FrontlightModel::setChangesSaved()
+    void FrontlightModel::saveConfig()
     {
-        hasUnsavedChanges = false;
+        configSaved = true;
+    }
+
+    bool FrontlightModel::isConfigSaved()
+    {
+        return configSaved;
     }
 } // namespace app::bell_settings

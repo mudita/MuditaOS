@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,15 +15,22 @@ namespace app
 
 namespace app::bell_settings
 {
+    enum class BacklightState
+    {
+        On,
+        Off
+    };
+
     class AbstractFrontlightModel
     {
       public:
         virtual ~AbstractFrontlightModel()                               = default;
         virtual void setBrightness(frontlight_utils::Brightness value)   = 0;
         virtual void setMode(screen_light_control::ScreenLightMode mode) = 0;
-        virtual void setStatus(bool onOff)                               = 0;
-        virtual void revertUnsavedChanges()                              = 0;
-        virtual void setChangesSaved()                                   = 0;
+        virtual void setBacklight(BacklightState state)                  = 0;
+        virtual void revertConfig()                                      = 0;
+        virtual void saveConfig()                                        = 0;
+        virtual bool isConfigSaved()                                     = 0;
 
         virtual gui::AbstractSettingsModel<std::uint8_t> &getBrightnessModel() = 0;
         virtual gui::AbstractSettingsModel<UTF8> &getModeModel()               = 0;
@@ -41,9 +48,10 @@ namespace app::bell_settings
 
         void setBrightness(frontlight_utils::Brightness value) override;
         void setMode(screen_light_control::ScreenLightMode mode) override;
-        void setStatus(bool onOff) override;
-        void revertUnsavedChanges() override;
-        void setChangesSaved() override;
+        void setBacklight(BacklightState state) override;
+        void revertConfig() override;
+        void saveConfig() override;
+        bool isConfigSaved() override;
 
       private:
         template <typename ValueT>
@@ -70,7 +78,7 @@ namespace app::bell_settings
         std::unique_ptr<BrightnessAdapter> brightnessAdapter;
         std::unique_ptr<ModeAdapter> modeAdapter;
         ApplicationCommon *app{};
-        bool hasUnsavedChanges{false};
+        bool configSaved{false};
         const std::string autoStr;
         const std::string onDemandStr;
     };

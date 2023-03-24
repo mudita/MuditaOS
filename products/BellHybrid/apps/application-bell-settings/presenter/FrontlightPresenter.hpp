@@ -1,5 +1,5 @@
 
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -32,8 +32,10 @@ namespace app::bell_settings
         virtual ~AbstractFrontlightPresenter()                                          = default;
         virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
         virtual void eraseProviderData()                                                = 0;
-        virtual void saveChanges()                                                      = 0;
-        virtual void revertUnsavedChanges()                                             = 0;
+        virtual void saveConfig()                                                       = 0;
+        virtual void setBacklight()                                                     = 0;
+        virtual void revertConfig()                                                     = 0;
+        virtual bool isConfigSaved()                                                    = 0;
     };
 
     class FrontlightPresenter : public AbstractFrontlightPresenter
@@ -45,8 +47,10 @@ namespace app::bell_settings
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         void eraseProviderData() override;
-        void saveChanges() override;
-        void revertUnsavedChanges() override;
+        void saveConfig() override;
+        void setBacklight() override;
+        void revertConfig() override;
+        bool isConfigSaved() override;
 
       private:
         std::shared_ptr<FrontlightListItemProvider> provider;
