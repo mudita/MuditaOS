@@ -11,6 +11,7 @@
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
 #include <apps-common/windows/DialogMetadata.hpp>
+#include <apps-common/WindowsStack.hpp>
 #include <log/log.hpp>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
 
@@ -21,6 +22,8 @@
 #include <time/time_conversion.hpp>
 #include <WindowsPopupFilter.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
+#include <service-db/Settings.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 #include <cassert>
 #include <memory>
@@ -127,6 +130,14 @@ namespace app
             app::manager::Controller::switchBack(this);
             return true;
         }
+
+        // Onboarding app should not have access to main screen so if onboarding is in progress, we pop the main window
+        // from the stack
+        if (!utils::getNumericValue<bool>(
+                settings->getValue(settings::SystemProperties::onboardingDone, settings::SettingsScope::Global))) {
+            ApplicationCommon::popWindow(gui::name::window::main_window);
+        }
+
         returnToPreviousWindow();
         return true;
     }
