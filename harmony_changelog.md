@@ -14,6 +14,8 @@
 * Fixed polish Meditation summary text
 * Fixed problems with copying files via Mudita Center to Relaxation
 * Fixed problem with long Relaxation loading when titles were too long
+* Fixed backlight behavior after returning to the main window
+* Fixed settings frontlight intensity in on demand mode
 
 ### Added
 

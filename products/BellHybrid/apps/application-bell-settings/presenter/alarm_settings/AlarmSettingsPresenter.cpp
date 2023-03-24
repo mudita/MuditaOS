@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmSettingsPresenter.hpp"
@@ -32,13 +32,16 @@ namespace app::bell_settings
         };
 
         auto setBrightness = [this](const auto &brightness) {
-            this->frontlight->setStatus(true);
+            this->frontlight->setBacklight(BacklightState::On);
             this->frontlight->setBrightness(brightness);
         };
 
         this->provider->onFrontlightEnter  = setBrightness;
         this->provider->onFrontlightChange = setBrightness;
-        this->provider->onFrontlightExit   = [this]() { this->frontlight->revertUnsavedChanges(); };
+        this->provider->onFrontlightExit   = [this]() {
+            this->frontlight->revertConfig();
+            this->frontlight->setBacklight(BacklightState::On);
+        };
     }
 
     auto AlarmSettingsPresenter::saveData() -> void

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FrontlightListItemProvider.hpp"
@@ -22,7 +22,7 @@ namespace app::bell_settings
             model.getBrightnessModel(),
             utils::translate("app_bell_settings_frontlight_top_message"));
         brightness->set_on_value_change_cb([this](const auto val) {
-            model.setStatus(true);
+            model.setBacklight(BacklightState::On);
             model.setBrightness(val);
         });
         internalData.emplace_back(brightness);

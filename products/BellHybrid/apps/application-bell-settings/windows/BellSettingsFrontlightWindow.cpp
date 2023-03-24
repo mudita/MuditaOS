@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
@@ -56,14 +56,15 @@ namespace gui
         }
 
         if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            presenter->revertUnsavedChanges();
+            presenter->revertConfig();
+            presenter->setBacklight();
         }
 
         return AppWindow::onInput(inputEvent);
     }
     void BellSettingsFrontlightWindow::exit()
     {
-        presenter->saveChanges();
+        presenter->saveConfig();
         application->switchWindow(
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", window::name::bellSettings));
@@ -71,6 +72,9 @@ namespace gui
     void BellSettingsFrontlightWindow::onClose(Window::CloseReason reason)
     {
         if (reason != CloseReason::Popup) {
+            if (!presenter->isConfigSaved()) {
+                presenter->revertConfig();
+            }
             presenter->eraseProviderData();
         }
     }
