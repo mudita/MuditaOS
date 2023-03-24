@@ -58,6 +58,7 @@ namespace gui
             storedStartIndex_ = storedStartIndex;
             currentPage_      = currentPage;
             pagesCount_       = pagesCount;
+            if (pagesCount_ == 0) pagesCount_ = 1;
         }
 
         void update(UpdateData const& data)
@@ -86,7 +87,7 @@ namespace gui
       protected:
         size_t storedStartIndex_ = 0;
         size_t currentPage_      = std::numeric_limits<size_t>::max();
-        size_t pagesCount_       = 0;
+        size_t pagesCount_       = 1;
         int topMargin_           = style::margins::big;
 
         static inline constexpr auto radius      = 2U;
@@ -112,6 +113,7 @@ namespace gui
 
             pagesCount_ = (data.elementsCount % elementsOnPage == 0) ? data.elementsCount / elementsOnPage
                                                                      : data.elementsCount / elementsOnPage + 1;
+            if (pagesCount_ == 0) pagesCount_ = 1;
 
             currentPage_ = data.startIndex / elementsOnPage;
 
