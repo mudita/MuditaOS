@@ -193,18 +193,19 @@ namespace gui
             }
         }
 
-        auto data = std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
-        data->ignoreCurrentWindowOnStack = true;
-        application->switchWindow(gui::window::name::contact, std::move(data));
+        auto switchData = std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
+        switchData->ignoreCurrentWindowOnStack = true;
+        application->switchWindow(gui::window::name::contact, std::move(switchData));
         return true;
     } // namespace gui
 
     void PhonebookNewContact::showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber,
                                                          const std::uint32_t duplicatedNumberContactID)
     {
-        auto matchedContact =
+        const auto matchedContact =
             DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber, duplicatedNumberContactID);
-        auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
+        const auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
+
         auto metaData         = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{duplicatedNumber.getFormatted(),
                                 "info_128px_W_G",
@@ -223,7 +224,18 @@ namespace gui
                                         LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
                                         return false;
                                     }
-                                    application->switchWindow(gui::name::window::main_window);
+
+                                    /* Pop "Add contact" window from the stack so that clicking
+                                     * back button after saving the modified contact returns to
+                                     * contacts list, not to the "Add contact" window. */
+                                    application->popWindow(gui::window::name::new_contact);
+
+                                    /* Switch to contact details */
+                                    auto switchData =
+                                        std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
+                                    switchData->ignoreCurrentWindowOnStack = true;
+                                    application->switchWindow(gui::window::name::contact, std::move(switchData));
+
                                     return true;
                                 }});
         application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
@@ -231,8 +243,8 @@ namespace gui
 
     void PhonebookNewContact::showDialogDuplicatedSpeedDialNumber()
     {
-        auto contactRecordsPtr = DBServiceAPI::ContactGetBySpeeddial(application, contact->speeddial);
-        auto oldContactRecord  = !contactRecordsPtr->empty() ? contactRecordsPtr->front() : ContactRecord{};
+        const auto contactRecordsPtr = DBServiceAPI::ContactGetBySpeeddial(application, contact->speeddial);
+        const auto oldContactRecord  = !contactRecordsPtr->empty() ? contactRecordsPtr->front() : ContactRecord{};
 
         if (contactAction == ContactAction::Add) {
             contact->ID = oldContactRecord.ID;
@@ -266,13 +278,14 @@ namespace gui
 
     void PhonebookNewContact::showContactDeletedNotification()
     {
-        auto icon = "info_128px_W_G";
-        auto text = utils::translate("app_phonebook_contact_deleted");
-
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-            contact->getFormattedName(ContactRecord::NameFormatType::Title), icon, text, "", [=]() -> bool {
-                auto data = std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
-                this->application->switchWindow(gui::name::window::main_window, std::move(data));
+            contact->getFormattedName(ContactRecord::NameFormatType::Title),
+            "info_128px_W_G",
+            utils::translate("app_phonebook_contact_deleted"),
+            "",
+            [=]() -> bool {
+                auto switchData = std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
+                application->switchWindow(gui::name::window::main_window, std::move(switchData));
 
                 return true;
             }});
