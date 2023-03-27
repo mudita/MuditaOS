@@ -8,6 +8,11 @@
 #include <common/options/OptionBellMenu.hpp>
 #include <i18n/i18n.hpp>
 
+namespace
+{
+    constexpr auto maxDisplayedTitleLength = 30U;
+}
+
 namespace gui
 {
     RelaxationMainWindow::RelaxationMainWindow(
@@ -25,7 +30,7 @@ namespace gui
         std::list<gui::Option> menuOptionList;
         auto addRecord = [&](const db::multimedia_files::MultimediaFilesRecord &sound) {
             menuOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
-                sound.tags.title,
+                sound.tags.title.substr(0, maxDisplayedTitleLength),
                 [=](gui::Item &item) {
                     onActivated(sound);
                     return true;
