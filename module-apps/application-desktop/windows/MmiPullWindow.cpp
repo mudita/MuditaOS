@@ -4,6 +4,7 @@
 #include "DesktopInputWidget.hpp"
 #include "Mmi.hpp"
 #include "MmiPullWindow.hpp"
+#include "Names.hpp"
 
 #include <i18n/i18n.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
@@ -84,7 +85,7 @@ bool MmiPullWindow::onInput(const InputEvent &inputEvent)
         switch (inputEvent.getKeyCode()) {
         case KeyCode::KEY_RF: {
             CellularServiceAPI::USSDRequest(this->application, cellular::USSDMessage::RequestType::abortSession, "");
-            application->returnToPreviousWindow();
+            application->switchWindow(app::window::name::desktop_main_window);
             return true;
         }
         default:

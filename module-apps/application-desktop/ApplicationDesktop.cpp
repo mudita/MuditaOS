@@ -10,6 +10,7 @@
 #include "MmiInternalMsgWindow.hpp"
 #include "MmiPullWindow.hpp"
 #include "WindowsPopupFilter.hpp"
+#include "MmiConfirmationWindow.hpp"
 
 #include <apps-common/messages/AppMessage.hpp>
 #include <module-gui/gui/widgets/status-bar/SIM.hpp>
@@ -47,6 +48,11 @@ namespace app
 
         addActionReceiver(app::manager::actions::ShowMMIResult, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_internal, std::move(data));
+            return actionHandled();
+        });
+
+        addActionReceiver(app::manager::actions::ShowMMIConfirmation, [this](auto &&data) {
+            switchWindow(app::window::name::desktop_mmi_confirmation, std::move(data));
             return actionHandled();
         });
 
@@ -166,7 +172,9 @@ namespace app
             gui::popup::window::tethering_off_window, [](ApplicationCommon *app, const std::string &name) {
                 return std::make_unique<gui::TetheringOffPopup>(app, gui::popup::window::tethering_off_window);
             });
-
+        windowsFactory.attach(desktop_mmi_confirmation, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::MmiConfirmationWindow>(app, name);
+        });
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
                       gui::popup::ID::BluetoothAuthenticate,

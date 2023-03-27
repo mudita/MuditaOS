@@ -433,6 +433,19 @@ namespace cellular
         }
     };
 
+    class MMIConfirmationMessage : public sys::DataMessage, public app::manager::actions::ConvertibleToAction
+    {
+      public:
+        MMIConfirmationMessage()
+        {}
+
+        [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+        {
+            return std::make_unique<app::manager::ActionRequest>(
+                sender, app::manager::actions::ShowMMIConfirmation, nullptr);
+        }
+    };
+
     class SetOperatorAutoSelectResponse : public ResponseMessage
     {
       public:

@@ -211,6 +211,7 @@
   "app_desktop_info_mmi_imei": "IMEI-nummer (MEID)",
   "app_desktop_info_mmi_result_success": "Lyckades",
   "app_desktop_info_mmi_result_failed": "Misslyckades",
+  "app_desktop_info_mmi_confirmation": "<text>Var god vänta...<br></br> Bearbetar MMI/USSD-kod.</text>",
   "sim_header_setup": "<text><token>$SIM</token>-inställningar</text>",
   "sim_enter_pin_unlock": "Den förra PIN-koden:",
   "sim_change_pin": "Ändra PIN-koden",

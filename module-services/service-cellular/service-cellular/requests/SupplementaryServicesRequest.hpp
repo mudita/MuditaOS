@@ -28,7 +28,7 @@ namespace cellular
         SupInfoC     //! (?:\*([^\*\#]+))  - Supplementary Information C (optional)
     };
 
-    class SupplementaryServicesRequest : public Request
+    class SupplementaryServicesRequest : public ConfirmingRequest
     {
       public:
         static std::unique_ptr<SupplementaryServicesRequest> create(const std::string &data, GroupMatch matchGroups);

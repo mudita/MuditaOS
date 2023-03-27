@@ -225,6 +225,7 @@
   "app_desktop_info_mmi_imei": "IMEI (MEID)",
   "app_desktop_info_mmi_result_success": "Success",
   "app_desktop_info_mmi_result_failed": "Failed",
+  "app_desktop_info_mmi_confirmation": "<text>Please wait...<br></br> Processing USSD code.</text>",
   "sim_header_setup": "<text><token>$SIM</token> setup</text>",
   "sim_enter_pin_unlock": "<text>Enter the PIN code to set up <br></br> the <token>$PINTYPE</token> card:</text>",
   "sim_enter_enter_current": "<text>Type current PIN code:</text>",

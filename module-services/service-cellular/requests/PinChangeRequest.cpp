@@ -27,7 +27,8 @@ namespace cellular
 {
 
     PinChangeRequest::PinChangeRequest(const std::string &data, GroupMatch matchGroups)
-        : Request(data), requestOldPinOrPuk(matchGroups[magic_enum::enum_integer(PinChangeRegexGroups::OldPassword)]),
+        : ConfirmingRequest(data),
+          requestOldPinOrPuk(matchGroups[magic_enum::enum_integer(PinChangeRegexGroups::OldPassword)]),
           requestNewPin(matchGroups[magic_enum::enum_integer(PinChangeRegexGroups::NewPassword)]),
           requestNewPinRepeat(matchGroups[magic_enum::enum_integer(PinChangeRegexGroups::NewPasswordRepeat)])
     {

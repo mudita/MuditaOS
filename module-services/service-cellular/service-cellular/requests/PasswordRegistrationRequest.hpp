@@ -25,11 +25,11 @@ namespace cellular
         NewPasswordRepeat   //! (?:\*([0-9]*)
     };
 
-    class PasswordRegistrationRequest : public Request
+    class PasswordRegistrationRequest : public ConfirmingRequest
     {
       public:
         PasswordRegistrationRequest(const std::string &data, GroupMatch matchGroups)
-            : Request(data),
+            : ConfirmingRequest(data),
               requestBarringService(
                   matchGroups[magic_enum::enum_integer(PasswordRegistrationRegexGroups::BarringServiceCode)]),
               requestOldPassword(matchGroups[magic_enum::enum_integer(PasswordRegistrationRegexGroups::OldPassword)]),

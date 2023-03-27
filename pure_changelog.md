@@ -4,6 +4,7 @@
 
 ### Added
 * Added input mode selection display timeout
+* Added MMI/USSD code confirmation
 
 ### Changed / Improved
 
