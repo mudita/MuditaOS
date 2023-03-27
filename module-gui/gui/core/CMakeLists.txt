@@ -39,3 +39,5 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/ImageMap.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/VecMap.hpp"
 )
+
+set_source_files_properties("${CMAKE_CURRENT_LIST_DIR}/DrawCommand.cpp" "${CMAKE_CURRENT_LIST_DIR}/DrawCommand.hpp" "${CMAKE_CURRENT_LIST_DIR}/Context.cpp" "${CMAKE_CURRENT_LIST_DIR}/Context.hpp" PROPERTIES COMPILE_OPTIONS "-O0;-fno-omit-frame-pointer;-ggdb3")
