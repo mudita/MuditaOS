@@ -32,6 +32,11 @@ namespace cellular
         return true;
     }
 
+    std::shared_ptr<sys::DataMessage> Request::confirmRequest() const noexcept
+    {
+        return sys::MessageNone{};
+    }
+
     at::Cmd Request::buildCommand(at::AT atCommand,
                                   const std::vector<commandBuilderFunc> &builderFunctions,
                                   bool trim) const
@@ -53,5 +58,10 @@ namespace cellular
         }
 
         return cmd;
+    }
+
+    std::shared_ptr<sys::DataMessage> ConfirmingRequest::confirmRequest() const noexcept
+    {
+        return std::make_shared<cellular::MMIConfirmationMessage>();
     }
 }; // namespace cellular

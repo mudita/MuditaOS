@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <service-cellular/CellularMessage.hpp>
 #include <at/Result.hpp>
 #include <at/Commands.hpp>
 #include "service-cellular/RequestHandler.hpp"
@@ -21,19 +22,21 @@ namespace cellular
         virtual void setHandled(bool handled)                      = 0;
         virtual bool checkModemResponse(const at::Result &result)  = 0;
         [[nodiscard]] virtual bool isHandled() const noexcept      = 0;
-        [[nodiscard]] virtual bool isValid() const noexcept        = 0;
+        [[nodiscard]] virtual bool isValid() const noexcept                       = 0;
+        virtual std::shared_ptr<sys::DataMessage> confirmRequest() const noexcept = 0;
         virtual ~IRequest(){};
     };
 
     class Request : public IRequest
     {
       public:
-        Request(const std::string &data) : request(data){};
+        explicit Request(const std::string &data) : request(data){};
 
         void setHandled(bool handled) final;
         bool isHandled() const noexcept final;
         bool checkModemResponse(const at::Result &result) final;
         bool isValid() const noexcept override;
+        std::shared_ptr<sys::DataMessage> confirmRequest() const noexcept override;
 
       protected:
         using commandBuilderFunc = std::function<std::string()>;
@@ -49,5 +52,12 @@ namespace cellular
                           bool trim = true) const -> at::Cmd;
         bool isRequestHandled = false;
         std::string request;
+    };
+
+    class ConfirmingRequest : public Request
+    {
+      public:
+        explicit ConfirmingRequest(const std::string &data) : Request(data){};
+        std::shared_ptr<sys::DataMessage> confirmRequest() const noexcept final;
     };
 }; // namespace cellular

@@ -42,6 +42,7 @@ target_sources(application-desktop
 		windows/MmiPullWindow.hpp
 		windows/MmiPushWindow.cpp
 		windows/MmiPushWindow.hpp
+		windows/MmiConfirmationWindow.cpp
 	PUBLIC
 		include/application-desktop/ApplicationDesktop.hpp
 		include/application-desktop/Constants.hpp

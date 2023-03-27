@@ -252,6 +252,7 @@
   "app_desktop_info_mmi_imei": "IMEI (MEID)",
   "app_desktop_info_mmi_result_success": "Udało się",
   "app_desktop_info_mmi_result_failed": "Nie udało się",
+  "app_desktop_info_mmi_confirmation": "<text>Proszę czekać...<br></br> Przetwarzanie kodu MMI/USSD.</text>",
   "sim_header_setup": "<text>Konfiguracja <token>$SIM</token></text>",
   "sim_enter_pin_unlock": "<text>Wprowadź kod PIN, by skonfigurować <br></br>kartę <token>$PINTYPE</token>:</text>",
   "sim_enter_enter_current": "<text>Wprowadź aktualny kod PIN:</text>",

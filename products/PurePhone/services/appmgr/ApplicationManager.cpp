@@ -399,6 +399,7 @@ namespace app::manager
         connect(typeid(cellular::MMIResultMessage), convertibleToActionHandler);
         connect(typeid(cellular::MMIResponseMessage), convertibleToActionHandler);
         connect(typeid(cellular::MMIPushMessage), convertibleToActionHandler);
+        connect(typeid(cellular::MMIConfirmationMessage), convertibleToActionHandler);
         connect(typeid(cellular::NoSimNotification), convertibleToActionHandler);
         connect(typeid(cellular::NotAnEmergencyNotification), convertibleToActionHandler);
         connect(typeid(cellular::NoNetworkConenctionNotification), convertibleToActionHandler);

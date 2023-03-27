@@ -31,7 +31,7 @@ namespace
 namespace cellular
 {
     SupplementaryServicesRequest::SupplementaryServicesRequest(const std::string &data, GroupMatch matchGroups)
-        : Request(data),
+        : ConfirmingRequest(data),
           serviceCode(matchGroups[magic_enum::enum_integer(SupplementaryServicesRegexGroups::ServiceCode)]),
           supplementaryInfoA(matchGroups[magic_enum::enum_integer(SupplementaryServicesRegexGroups::SupInfoA)]),
           supplementaryInfoB(matchGroups[magic_enum::enum_integer(SupplementaryServicesRegexGroups::SupInfoB)]),

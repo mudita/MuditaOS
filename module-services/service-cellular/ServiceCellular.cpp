@@ -1793,12 +1793,17 @@ auto ServiceCellular::handleCellularCallRequestMessage(cellular::CallRequestMess
 
     auto request = factory.create();
     CellularRequestHandler handler(*this);
+    const auto confirmation = request->confirmRequest();
+    if (confirmation) {
+        bus.sendUnicast(confirmation, ::service::name::appmgr);
+    }
     auto result = channel->cmd(request->command());
     request->handle(handler, result);
     if (!result) {
         log_last_AT_error(channel);
     }
     LOG_INFO("isHandled %d, %s", static_cast<int>(request->isHandled()), utils::enumToString(result.code).c_str());
+
     if (!request->isHandled()) {
         cellular::CallRequestGeneralError::ErrorType errorType = translate(result.code);
         auto message = std::make_shared<cellular::CallRequestGeneralError>(errorType);

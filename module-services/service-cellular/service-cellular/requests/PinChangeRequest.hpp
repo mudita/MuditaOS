@@ -20,7 +20,7 @@ namespace cellular
         NewPasswordRepeat //! (?:\*([0-9]*))
     };
 
-    class PinChangeRequest : public Request
+    class PinChangeRequest : public ConfirmingRequest
     {
       public:
         enum class PassChangeType

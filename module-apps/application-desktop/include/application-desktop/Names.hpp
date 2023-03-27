@@ -20,4 +20,5 @@ namespace app::window::name
     inline constexpr auto desktop_mmi_pull           = "MmiPullWindow";
     inline constexpr auto desktop_mmi_push           = "MmiPushWindow";
     inline constexpr auto desktop_mmi_internal       = "MmiInternalMsgWindow";
+    inline constexpr auto desktop_mmi_confirmation   = "MmiConfirmationWindow";
 }; // namespace app::window::name

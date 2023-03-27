@@ -59,6 +59,7 @@ namespace app
                      manager::actions::ShowMMIResponse,
                      manager::actions::ShowMMIPush,
                      manager::actions::ShowMMIResult,
+                     manager::actions::ShowMMIConfirmation,
                      manager::actions::DisplayLowBatteryScreen,
                      manager::actions::SystemBrownout,
                      manager::actions::DisplayLogoAtExit,

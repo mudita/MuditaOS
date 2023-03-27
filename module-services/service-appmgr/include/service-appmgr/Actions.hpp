@@ -48,6 +48,7 @@ namespace app::manager
             ShowMMIResult,
             ShowMMIResponse,
             ShowMMIPush,
+            ShowMMIConfirmation,
             SmsRejectNoSim,
             DisplayLowBatteryScreen,
             SystemBrownout,

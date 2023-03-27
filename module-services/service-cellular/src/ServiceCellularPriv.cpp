@@ -587,8 +587,12 @@ namespace cellular::internal
 
             channel->cmd(at::AT::SMS_GSM);
             std::string command = at::factory(at::AT::CUSD_SEND) + request + commandDcs;
-            auto result         = channel->cmd(command, std::chrono::seconds(120));
-            return result.code == at::Result::Code::OK;
+            const auto result   = channel->cmd(command, std::chrono::seconds(120));
+            if (result.code == at::Result::Code::OK) {
+                owner->bus.sendUnicast(std::make_shared<cellular::MMIConfirmationMessage>(), ::service::name::appmgr);
+                return true;
+            }
+            return false;
         };
 
         ussdHandler->onRequestAbortSession = [this]() {

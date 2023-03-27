@@ -12,10 +12,10 @@ namespace cellular
 {
     constexpr inline auto UssdRegex = "^[\\*\\#].*[\\#]$";
 
-    class UssdRequest : public Request
+    class UssdRequest : public ConfirmingRequest
     {
       public:
-        UssdRequest(const std::string &data) : Request(data){};
+        explicit UssdRequest(const std::string &data) : ConfirmingRequest(data){};
         auto command() -> at::Cmd final;
 
         static auto create(const std::string &data, GroupMatch) -> std::unique_ptr<UssdRequest>;
