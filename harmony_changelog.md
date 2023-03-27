@@ -13,6 +13,7 @@
 * Fixed problems with displaying file names in Relaxation
 * Fixed polish Meditation summary text
 * Fixed problems with copying files via Mudita Center to Relaxation
+* Fixed problem with long Relaxation loading when titles were too long
 
 ### Added
 
