@@ -12,6 +12,7 @@
 * Made EULA window scroll by a few lines at once
 * Updated Bluetooth stack
 * Unified GUI flow for adding contact with number already present in another contact
+* Decrease critical battery level from 10% to 5%
 
 ### Fixed
 

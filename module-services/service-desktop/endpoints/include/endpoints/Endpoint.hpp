@@ -20,7 +20,8 @@ namespace sdesktop::endpoints
     {
         NoReason,
         DeviceLocked,
-        EulaNotAccepted
+        EulaNotAccepted,
+        BatteryCriticalLevel
     };
 
     enum class OnboardingState

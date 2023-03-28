@@ -67,6 +67,9 @@ namespace sdesktop::endpoints
             case BlockReason::EulaNotAccepted:
                 result = http::Code::Locked;
                 break;
+            case BlockReason::BatteryCriticalLevel:
+                result = http::Code::Locked;
+                break;
             }
         }
         return result;

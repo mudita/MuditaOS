@@ -6,6 +6,7 @@
 #include "Service/Service.hpp"
 #include "service-desktop/DesktopMessages.hpp"
 #include "service-desktop/WorkerDesktop.hpp"
+#include <EventStore.hpp>
 
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
@@ -50,17 +51,26 @@ namespace sdesktop
             settings->getValue(settings::SystemProperties::eulaAccepted, settings::SettingsScope::Global));
     }
 
+    auto USBSecurityModel::isBatteryLevelCritical() const -> bool
+    {
+        using LevelState = Store::Battery::LevelState;
+
+        return Store::Battery::get().levelState == LevelState::CriticalCharging or
+               Store::Battery::get().levelState == LevelState::CriticalNotCharging;
+    }
+
     auto USBSecurityModel::getEndpointSecurity() const -> endpointSecurity_t
     {
+        if (isBatteryLevelCritical()) {
+            return {EndpointSecurity::Block, BlockReason::BatteryCriticalLevel};
+        }
         if (!isEulaAccepted()) {
             return {EndpointSecurity::Block, BlockReason::EulaNotAccepted};
         }
-        else if (isSecurityEnabled()) {
+        if (isSecurityEnabled()) {
             return {EndpointSecurity::Block, BlockReason::DeviceLocked};
         }
-        else {
-            return {EndpointSecurity::Allow, BlockReason::NoReason};
-        }
+        return {EndpointSecurity::Allow, BlockReason::NoReason};
     }
 
     auto USBSecurityModel::updatePhoneLockTime(const time_t newPhoneLockTime) -> void
