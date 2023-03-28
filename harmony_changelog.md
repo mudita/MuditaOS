@@ -22,7 +22,6 @@
 ### Changed
 
 * Added serial number and timestamp to crashdump filename
-* Added new field to deviceInfo endpoint
 
 ## [1.8.1 2023-03-07]
 

@@ -484,16 +484,14 @@ namespace app::manager
 
     auto ApplicationManagerCommon::handleOnBoardingFinalize() -> sys::MessagePointer
     {
-        settings->setValue(
-            settings::SystemProperties::onboardingDone, utils::to_string(true), settings::SettingsScope::Global);
+        settings->setValue(settings::SystemProperties::onboardingDone, utils::to_string(true));
         app::manager::Controller::sendAction(this, app::manager::actions::Home);
         return sys::msgHandled();
     }
 
     auto ApplicationManagerCommon::checkOnBoarding() -> bool
     {
-        return not utils::getNumericValue<bool>(
-            settings->getValue(settings::SystemProperties::onboardingDone, settings::SettingsScope::Global));
+        return not utils::getNumericValue<bool>(settings->getValue(settings::SystemProperties::onboardingDone));
     }
 
     auto ApplicationManagerCommon::handleLaunchAction(ActionEntry &action) -> ActionProcessStatus

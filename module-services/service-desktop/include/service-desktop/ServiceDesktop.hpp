@@ -81,7 +81,6 @@ class ServiceDesktop : public sys::Service
     auto getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>;
     void removeNotificationEntries(const std::vector<uint32_t> &);
     auto getMtpPath() const noexcept -> std::filesystem::path;
-    auto getOnboardingState() const -> sdesktop::endpoints::OnboardingState;
 
   private:
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;

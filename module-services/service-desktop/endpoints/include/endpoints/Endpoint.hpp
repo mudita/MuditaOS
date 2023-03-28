@@ -23,12 +23,6 @@ namespace sdesktop::endpoints
         EulaNotAccepted
     };
 
-    enum class OnboardingState
-    {
-        InProgress,
-        Finished
-    };
-
     class Endpoint
     {
       public:

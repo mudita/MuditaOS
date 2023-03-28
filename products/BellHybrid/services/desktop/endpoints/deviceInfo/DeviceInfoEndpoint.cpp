@@ -11,7 +11,10 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
+#include <sys/statvfs.h>
 #include <purefs/filesystem_paths.hpp>
+#include <purefs/vfs_subsystem.hpp>
 #include <serial-number-reader/SerialNumberReader.hpp>
 
 #include <ctime>
@@ -22,11 +25,6 @@ namespace sdesktop::endpoints
     auto DeviceInfoEndpoint::getSerialNumber() -> const std::string &
     {
         return serial_number_reader::readSerialNumber();
-    }
-
-    auto DeviceInfoEndpoint::getOnboardingState() -> OnboardingState
-    {
-        return static_cast<ServiceDesktop *>(ownerServicePtr)->getOnboardingState();
     }
 
     auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> http::Code
@@ -49,8 +47,7 @@ namespace sdesktop::endpoints
              {json::updateFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename).string()},
              {json::backupFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::backupFilename).string()},
              {json::syncFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename).string()},
-             {json::mtpPath, getMtpPath().string()},
-             {json::onboardingState, std::to_string(static_cast<int>(getOnboardingState()))}}));
+             {json::mtpPath, getMtpPath().string()}}));
 
         return http::Code::OK;
     }

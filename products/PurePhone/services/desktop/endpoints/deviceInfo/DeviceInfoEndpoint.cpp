@@ -11,6 +11,8 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
+#include <sys/statvfs.h>
 #include <purefs/filesystem_paths.hpp>
 
 #include <ctime>
@@ -30,11 +32,6 @@ namespace sdesktop::endpoints
     auto DeviceInfoEndpoint::getDeviceToken() -> std::string
     {
         return static_cast<ServiceDesktop *>(ownerServicePtr)->getDeviceToken();
-    }
-
-    auto DeviceInfoEndpoint::getOnboardingState() -> OnboardingState
-    {
-        return static_cast<ServiceDesktop *>(ownerServicePtr)->getOnboardingState();
     }
 
     auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> http::Code
@@ -74,8 +71,7 @@ namespace sdesktop::endpoints
              {json::backupFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::backupFilename).string()},
              {json::syncFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename).string()},
              {json::mtpPath, getMtpPath().string()},
-             {json::deviceToken, getDeviceToken()},
-             {json::onboardingState, std::to_string(static_cast<int>(getOnboardingState()))}}));
+             {json::deviceToken, getDeviceToken()}}));
 
         return http::Code::OK;
     }

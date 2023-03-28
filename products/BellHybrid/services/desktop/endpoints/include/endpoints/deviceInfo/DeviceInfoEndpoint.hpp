@@ -15,7 +15,6 @@ namespace sdesktop::endpoints
         {}
 
         auto getSerialNumber() -> const std::string &;
-        auto getOnboardingState() -> OnboardingState;
         auto getDeviceInfo(Context &context) -> http::Code override;
     };
 

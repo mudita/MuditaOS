@@ -22,7 +22,6 @@ namespace sdesktop::endpoints
         auto getSerialNumber() -> std::string;
         auto getCaseColour() -> std::string;
         auto getDeviceToken() -> std::string;
-        auto getOnboardingState() -> OnboardingState;
 
         auto getDeviceInfo(Context &context) -> http::Code override;
     };
