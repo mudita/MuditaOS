@@ -78,8 +78,9 @@ namespace bsp
                 driverSEMC->SwitchToPLL2ClockSource();
             }
             // Add intermediate step in frequency
-            if (newFrequency > CpuFrequencyMHz::Level_4)
+            if (newFrequency > CpuFrequencyMHz::Level_4) {
                 return CpuFrequencyMHz::Level_4;
+            }
         }
         return newFrequency;
     }
@@ -200,5 +201,4 @@ namespace bsp
         PMU->REG_1P1 |= PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
         PMU->REG_1P1 &= ~PMU_REG_1P1_ENABLE_LINREG_MASK;
     }
-
 } // namespace bsp

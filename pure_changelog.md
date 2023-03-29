@@ -14,6 +14,7 @@
 * Updated Bluetooth stack
 * Unified GUI flow for adding contact with number already present in another contact
 * Decrease critical battery level from 10% to 5%
+* Optimized E-Ink energy consumption
 
 ### Fixed
 
