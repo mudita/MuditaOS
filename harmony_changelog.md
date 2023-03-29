@@ -21,10 +21,11 @@
 * Added error handling for incorrect audio formats and corrupted files inside Relaxation app
 * Added error message when files limit is exceeded in Relaxation app
 
-### Changed
+### Changed / Improved
 
 * Added new field to deviceInfo endpoint
 * Changed order in which files are displayed in Relaxation
+* Optimized E-Ink energy consumption
 
 ## [1.9.0 2023-04-03]
 

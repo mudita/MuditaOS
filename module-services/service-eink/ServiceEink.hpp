@@ -60,6 +60,7 @@ namespace service::eink
 
         void setState(State state) noexcept;
         bool isInState(State state) const noexcept;
+        void restartDisplayPowerOffTimer();
 
         void enterActiveMode();
         void suspend();

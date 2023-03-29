@@ -31,7 +31,6 @@ namespace bsp
             GoToRecoveryRecovery,     //! Goto to recovery into recovery mode
             GoToRecoveryBackup,       //! Goto to recovery into backup mode
             GoToRecoveryRestore       //! Goto to recovery into restore mode
-
         };
 
         LowPowerMode()          = default;
