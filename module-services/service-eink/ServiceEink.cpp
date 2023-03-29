@@ -18,15 +18,14 @@
 
 #include <cstring>
 #include <memory>
-#include <gsl/util>
 #include "Utils.hpp"
 
 namespace service::eink
 {
     namespace
     {
-        constexpr auto ServceEinkStackDepth = 4096U;
-        constexpr std::chrono::milliseconds displayPowerOffTimeout{2000};
+        constexpr auto ServiceEinkStackDepth = 1024 * 4;
+        constexpr std::chrono::milliseconds displayPowerOffTimeout{200};
 
         std::string toSettingString(const EinkModeMessage::Mode mode)
         {
@@ -50,7 +49,7 @@ namespace service::eink
     } // namespace
 
     ServiceEink::ServiceEink(ExitAction exitAction, const std::string &name, std::string parent)
-        : sys::Service(name, std::move(parent), ServceEinkStackDepth), exitAction{exitAction},
+        : sys::Service(name, std::move(parent), ServiceEinkStackDepth), exitAction{exitAction},
           currentState{State::Running}, display{hal::eink::AbstractEinkDisplay::Factory::create(
                                             hal::eink::FrameSize{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y})},
           settings{std::make_unique<settings::Settings>()}
@@ -78,14 +77,15 @@ namespace service::eink
         eInkSentinel = std::make_shared<EinkSentinel>(name::eink, this);
     }
 
-    sys::MessagePointer ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *response)
+    sys::MessagePointer ServiceEink::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msgl,
+                                                         [[maybe_unused]] sys::ResponseMessage *response)
     {
         return std::make_shared<sys::ResponseMessage>();
     }
 
     sys::ReturnCodes ServiceEink::InitHandler()
     {
-        LOG_INFO("Initializing");
+        LOG_INFO("Initializing Eink");
         if (const auto status = display->resetAndInit(); status != hal::eink::EinkStatus::EinkOK) {
             LOG_FATAL("Error: Could not initialize Eink display!");
             return sys::ReturnCodes::Failure;
@@ -94,10 +94,10 @@ namespace service::eink
         settings->init(service::ServiceProxy(shared_from_this()));
         initStaticData();
 
-        auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display->getDevice());
+        const auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display->getDevice());
         bus.sendUnicast(deviceRegistrationMsg, service::name::system_manager);
 
-        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(eInkSentinel);
+        const auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(eInkSentinel);
         bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
         display->powerOn();
@@ -110,7 +110,7 @@ namespace service::eink
     {
         const auto invertedModeSetting   = settings->getValue(settings::Display::invertedMode);
         const auto isInvertedModeEnabled = utils::toNumeric(invertedModeSetting);
-        const auto mode = isInvertedModeEnabled == 0 ? EinkModeMessage::Mode::Normal : EinkModeMessage::Mode::Invert;
+        const auto mode = (isInvertedModeEnabled == 0) ? EinkModeMessage::Mode::Normal : EinkModeMessage::Mode::Invert;
         setDisplayMode(mode);
     }
 
@@ -150,7 +150,6 @@ namespace service::eink
             enterActiveMode();
             break;
         case sys::ServicePowerMode::SuspendToRAM:
-            [[fallthrough]];
         case sys::ServicePowerMode::SuspendToNVM:
             suspend();
             break;
@@ -188,7 +187,7 @@ namespace service::eink
 
     void ServiceEink::setDisplayMode(EinkModeMessage::Mode mode)
     {
-        auto invertedModeRequested = mode == EinkModeMessage::Mode::Invert;
+        const auto invertedModeRequested = (mode == EinkModeMessage::Mode::Invert);
         if (invertedModeRequested) {
             display->setMode(hal::eink::EinkDisplayColorMode::EinkDisplayColorModeInverted);
         }
@@ -229,8 +228,9 @@ namespace service::eink
     inline auto mergeBoundingBoxes(const BoxesContainer &boxes, std::uint16_t gapThreshold)
     {
         std::vector<gui::BoundingBox> mergedBoxes;
-        if (boxes.empty())
+        if (boxes.empty()) {
             return mergedBoxes;
+        }
         mergedBoxes.reserve(boxes.size());
         gui::BoundingBox merged = boxes.front();
         for (std::size_t i = 1; i < boxes.size(); ++i) {
@@ -253,8 +253,9 @@ namespace service::eink
     inline auto makeAlignedFrames(const BoxesContainer &boxes, std::uint16_t alignment)
     {
         std::vector<hal::eink::EinkFrame> frames;
-        if (boxes.empty())
+        if (boxes.empty()) {
             return frames;
+        }
         frames.reserve(boxes.size());
         auto a = alignment;
         for (const auto &bb : boxes) {
@@ -322,9 +323,6 @@ namespace service::eink
             return sys::MessageNone{};
         }
 
-        displayPowerOffTimer.stop();
-        auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer.start(); });
-
         const gui::Context &ctx = *message->getContext();
         auto refreshMode        = translateToEinkRefreshMode(message->getRefreshMode());
 
@@ -365,7 +363,7 @@ namespace service::eink
 
             eInkSentinel->HoldMinimumFrequency();
 
-            auto status = display->showImageUpdate(updateFrames, ctx.getData());
+            const auto status = display->showImageUpdate(updateFrames, ctx.getData());
             if (status == hal::eink::EinkStatus::EinkOK) {
                 isImageUpdated = true;
             }
@@ -400,13 +398,15 @@ namespace service::eink
                 expandFrame(refreshFramesSum, refreshFrame);
             }
             einkDisplayState = EinkDisplayState::NeedRefresh;
-            auto msg         = std::make_shared<service::eink::RefreshMessage>(
+            const auto msg   = std::make_shared<service::eink::RefreshMessage>(
                 message->getContextId(), refreshFrame, refreshMode, message->sender);
             bus.sendUnicast(msg, this->GetName());
+
             return sys::MessageNone{};
         }
         else {
             einkDisplayState = EinkDisplayState::Idle;
+            restartDisplayPowerOffTimer();
             return std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
         }
     }
@@ -437,7 +437,9 @@ namespace service::eink
         LOG_INFO("Time to refresh: %d", (int)(tick3 - tick1));
 #endif
 
-        auto msg = std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
+        restartDisplayPowerOffTimer();
+
+        const auto msg = std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
         bus.sendUnicast(msg, message->getOriginalSender());
 
         return sys::MessageNone{};
@@ -449,8 +451,9 @@ namespace service::eink
         LOG_INFO("Refresh cancel");
 #endif
 
-        if (einkDisplayState == EinkDisplayState::NeedRefresh)
+        if (einkDisplayState == EinkDisplayState::NeedRefresh) {
             einkDisplayState = EinkDisplayState::Canceled;
+        }
         return sys::MessageNone{};
     }
 
@@ -472,4 +475,11 @@ namespace service::eink
         return currentState == state;
     }
 
+    void ServiceEink::restartDisplayPowerOffTimer()
+    {
+        if (displayPowerOffTimer.isActive()) {
+            displayPowerOffTimer.stop();
+        }
+        displayPowerOffTimer.start();
+    }
 } // namespace service::eink
