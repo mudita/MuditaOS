@@ -176,3 +176,5 @@ add_subdirectory(paths)
 option(CONFIG_ENABLE_TEMP "Enable displaying temperature" OFF)
 option(CONFIG_SHOW_MEMORY_INFO "Enable displaying memory info" OFF)
 configure_file(config/ProductConfig.in.hpp ${CMAKE_BINARY_DIR}/ProductConfig.hpp  @ONLY)
+
+target_compile_definitions(tagsfetcher PRIVATE TAGSFETCHER_MAX_TAG_SIZE=204800)

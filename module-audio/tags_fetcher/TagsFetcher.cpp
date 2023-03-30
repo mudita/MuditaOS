@@ -20,7 +20,7 @@ namespace tags::fetcher
 
         std::optional<Tags> fetchTagsInternal(const std::string &filePath)
         {
-            const TagLib::ConstFileRef tagReader(filePath.c_str());
+            const TagLib::ConstMemoryConstrainedFileRef tagReader(filePath.c_str(), TAGSFETCHER_MAX_TAG_SIZE);
             const auto tags = tagReader.tag();
             if (!tagReader.isNull() && (tags != nullptr)) {
                 const auto properties = tagReader.audioProperties();
