@@ -12,6 +12,7 @@
 * Made EULA window scroll by a few lines at once
 * Updated Bluetooth stack
 * Unified GUI flow for adding contact with number already present in another contact
+* Decrease critical battery level from 10% to 5%
 
 ### Fixed
 
@@ -26,6 +27,7 @@
 * Fixed misleading "Nie" abbreviation for word "Niedziela" (Sunday) in new alarm window
 * Fixed automatic message pasting into content field in thread view after message forwarding
 * Fixed redundant logs about CSQ reporting mode
+* Fixed adding USSD codes to phonebook
 
 
 ## [1.7.0 2023-03-23]
