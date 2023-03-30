@@ -99,7 +99,7 @@ namespace utils
 
     static inline bool is_phone_number(const std::string &s)
     {
-        return s.find_first_not_of(" +-.#()0123456789") == std::string::npos;
+        return s.find_first_not_of(" +-.*#()0123456789") == std::string::npos;
     }
 
     static inline std::string ltrim(const std::string &s)

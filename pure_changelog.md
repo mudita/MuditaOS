@@ -26,6 +26,7 @@
 * Fixed misleading "Nie" abbreviation for word "Niedziela" (Sunday) in new alarm window
 * Fixed automatic message pasting into content field in thread view after message forwarding
 * Fixed redundant logs about CSQ reporting mode
+* Fixed adding USSD codes to phonebook
 
 
 ## [1.7.0 2023-03-23]
