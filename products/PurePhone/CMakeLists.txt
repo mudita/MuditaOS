@@ -196,3 +196,5 @@ add_subdirectory(sys)
 if (${ENABLE_TESTS})
     add_subdirectory(test)
 endif ()
+
+target_compile_definitions(tagsfetcher PRIVATE TAGSFETCHER_MAX_TAG_SIZE=SIZE_MAX)
