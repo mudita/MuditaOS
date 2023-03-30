@@ -9,7 +9,7 @@
 
 namespace gui
 {
-    VolumeWindow::VolumeWindow(app::ApplicationCommon *app, const std::string &name) : WindowWithTimer(app, name)
+    VolumeWindow::VolumeWindow(app::ApplicationCommon *app, const std::string &name) : WindowWithTimer(app, name,std::chrono::milliseconds(1000))
     {
         buildInterface();
     }
