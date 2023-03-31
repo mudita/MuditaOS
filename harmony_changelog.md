@@ -4,9 +4,6 @@
 
 ### Fixed
 
-* Fixed displayed device name when connected to Windows
-* Fixed the wrong front light on back action in alarms
-* Fixed the pause deactivation by a deep press in relaxation
 * Fixed canceling of alarm editing after 10s of inactivity
 * Fixed yes/no behavior in factory reset window
 * Fixed missing software version in French language
@@ -23,8 +20,45 @@
 
 ### Changed
 
-* Added serial number and timestamp to crashdump filename
 * Added new field to deviceInfo endpoint
+
+## [1.9.0 2023-04-03]
+
+### Changed / Improved
+
+#### General:
+
+* Changed filesystem to ext4
+* Improved update processes
+* Changed updater utility
+
+### Fixed
+
+#### Relaxation:
+
+* Fixed a problem with the pause function not working correctly during relaxation.
+
+#### Pre-wake up:
+
+* Fixed problems with the intensity of the frontlight - the brightness of the backlight differs from that indicated digitally.
+
+#### General:
+
+* Fixed displayed device name when connected to Windows
+
+#### UI/UX:
+
+* Added missing translations in French.
+
+#### General:
+
+* Minor firmware fixes/optimizations.
+
+## [1.8.2 2023-04-03]
+
+### Added
+
+* Changes introduced in this release are enablers to the release Mudita Harmony 1.9.0.
 
 ## [1.8.1 2023-03-07]
 
