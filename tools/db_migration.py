@@ -79,13 +79,15 @@ class ConstRevisionEntry:
         self.metadata = RevisionMetadata.from_file(dir / RevisionMetadata.file_name)
 
     def read_sql(self):
+        lines_to_skip = license_header.count('\n')
+
         with open(self.dir / up_script) as f:
-            up = f.read()
+            up = ''.join(f.readlines()[lines_to_skip:])
         with open(self.dir / down_script) as f:
-            down = f.read()
+            down = ''.join(f.readlines()[lines_to_skip:])
         try:
             with open(self.dir / devel_script) as f:
-                devel = f.read()
+                devel = ''.join(f.readlines()[lines_to_skip:])
         except OSError:
             devel = None
         return up, down, devel
@@ -109,13 +111,13 @@ class RevisionEntry:
 
     def _build_sql_template(self):
         with (self.dir / up_script).open('w') as file:
-            file.write(self._sql_header())
+            file.write(license_header + self._sql_header())
 
         with (self.dir / down_script).open('w') as file:
-            file.write(self._sql_header())
+            file.write(license_header + self._sql_header())
 
         with (self.dir / devel_script).open('w') as file:
-            file.write(self._sql_header())
+            file.write(license_header + self._sql_header())
 
     def _sql_header(self):
         return f'-- Message: {self.message}\n' \
@@ -336,18 +338,22 @@ def merge_sql_from_dir(directory: Path, out: Path):
     revisions = build_revision_entries(directory)
 
     # Merge up/down.sql
-    with open(out / up_script, 'w') as up_file, open(out / down_script, 'w') as down_file, open(out / devel_script,
-                                                                                                'w') as devel_file:
+    with open(out / up_script, 'w') as up_file, open(out / down_script, 'w') as down_file:
         up_file.write(license_header)
         down_file.write(license_header)
-        devel_file.write(license_header)
+
         for rev in revisions:
             print(f"->Merging revision: {rev.metadata.id()}")
             sql_up, _, sql_devel = rev.read_sql()
             up_file.write(sql_up + '\n')
 
             if sql_devel:
-                devel_file.write(sql_devel + '\n')
+                if not (out / devel_script).exists():
+                    with open(out / devel_script, 'w') as devel_file:
+                        devel_file.write(license_header)
+
+                with open(out / devel_script, 'a+') as devel_file:
+                    devel_file.write(sql_devel + '\n')
 
         # Down scripts need to be merged in reversed order
         for rev in reversed(revisions):
