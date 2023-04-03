@@ -32,16 +32,44 @@ Security endpoint (13)
 
 ```json
 {
-  "endpoint":13,
-  "status":204,
-  "uuid":123
+  "endpoint": 13,
+  "status": 204,
+  "uuid": 123
 }
 ```
 
 Parameters:
- - *status* - 423 when the EULA is not accepted or battery level is critical otherwise 204 when phone is unlocked or 403 when phone is locked
+
+- *status* - 204 when phone is unlocked or 403 when phone is locked
+
+**Response Payload Structure**
+
+```json
+{
+  "endpoint": 13,
+  "body": {
+    "reason": "2"
+  },
+  "status": 423,
+  "uuid": 123
+}
+```
+
+Parameters:
+
+- *status* - 423 when phone is unlocked or 403 when phone is locked
+- *reason* - block reason, see code snippets below
+
+```c++
+    enum class BlockReason
+    {
+        EulaNotAccepted = 2,
+        BatteryCriticalLevel
+    };
+```
 
 Access to all edpoints is blocked when:
+
 - device is locked - 403 status is returned
 - EULA is not accepted - 423 status is returned
 - Critical battery level - 423 status is returned

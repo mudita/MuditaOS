@@ -29,7 +29,7 @@ namespace sdesktop::endpoints
     auto SecurityEndpointHelper::processGet(Context &context) -> ProcessResult
     {
         if (context.getBody()[json::messages::category].string_value() == json::usb::phoneLockStatus) {
-            return {sent::no, ResponseContext{.status = processStatus(context)}};
+            return {sent::no, processStatus(context)};
         }
         if (context.getBody()[json::messages::category].string_value() == json::usb::phoneLockTime) {
             if (auto phoneLockTime = getPhoneLockTime(context); phoneLockTime > std::time(nullptr)) {
@@ -48,31 +48,31 @@ namespace sdesktop::endpoints
         return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
     }
 
-    auto SecurityEndpointHelper::processStatus(Context & /*context*/) -> http::Code
+    auto SecurityEndpointHelper::processStatus(Context & /*context*/) -> ResponseContext
     {
-        auto result         = http::Code::NoContent;
         auto desktopService = dynamic_cast<ServiceDesktop *>(owner);
         auto security       = desktopService->getSecurity()->getEndpointSecurity();
+        ResponseContext responseContext{};
 
         if (security.access == EndpointSecurity::Allow) {
             preventBlockingDevice();
-            result = http::Code::NoContent;
+            responseContext.status = http::Code::NoContent;
         }
         else {
             switch (security.reason) {
             case BlockReason::NoReason:
             case BlockReason::DeviceLocked:
-                result = http::Code::Forbidden;
+                responseContext.status = http::Code::Forbidden;
                 break;
             case BlockReason::EulaNotAccepted:
-                result = http::Code::Locked;
-                break;
             case BlockReason::BatteryCriticalLevel:
-                result = http::Code::Locked;
+                responseContext.status = http::Code::Locked;
+                responseContext.body =
+                    json11::Json::object({{json::reason, std::to_string(static_cast<int>(security.reason))}});
                 break;
             }
         }
-        return result;
+        return responseContext;
     }
 
     auto SecurityEndpointHelper::getPhoneLockTime(Context & /*context*/) -> time_t

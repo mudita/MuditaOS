@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,7 +23,7 @@ namespace sdesktop::endpoints
         auto processPut(Context &context) -> ProcessResult final;
         auto processGet(Context &context) -> ProcessResult final;
 
-        auto processStatus(Context &context) -> http::Code;
+        auto processStatus(Context &context) -> ResponseContext;
         auto getPhoneLockTime(Context &context) -> time_t;
         auto processConfiguration(Context &context) -> http::Code;
 
