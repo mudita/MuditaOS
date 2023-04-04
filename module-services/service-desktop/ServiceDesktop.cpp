@@ -184,10 +184,11 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
                                                     caseColour,
                                                     mtpRootPath);
 
-    initialized =
-        desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
-                             {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size},
-                             {sdesktop::IRQ_QUEUE_BUFFER_NAME, 1, sdesktop::irq_queue_object_size}});
+    initialized = desktopWorker->init(
+        {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdcReceiveQueueLength},
+         {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdcSendQueueLength},
+         {sdesktop::IRQ_QUEUE_BUFFER_NAME, sdesktop::irqQueueSize, sdesktop::irqQueueLength},
+         {sdesktop::SIGNALLING_QUEUE_BUFFER_NAME, sizeof(WorkerDesktop::Signal), sdesktop::signallingQueueLength}});
 
     if (!initialized) {
         LOG_ERROR("!!! service-desktop usbWorkerInit failed to initialize worker, service-desktop won't work");
@@ -247,6 +248,7 @@ auto ServiceDesktop::handle(locks::UnlockedPhone * /*msg*/) -> std::shared_ptr<s
         bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
                         service::name::system_manager);
         isPlugEventUnhandled = false;
+        desktopWorker->notify(WorkerDesktop::Signal::unlockMTP);
     }
 
     return sys::MessageNone{};
@@ -324,13 +326,14 @@ auto ServiceDesktop::handle(sdesktop::usb::USBConfigured *msg) -> std::shared_pt
     isUsbConfigured = true;
     if (usbSecurityModel->isSecurityEnabled()) {
         LOG_INFO("Endpoint security enabled, requesting passcode");
-        bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), service::name::appmgr);
+        bus.sendUnicast(std::make_shared<locks::UnlockPhoneForMTP>(), service::name::appmgr);
     }
     else {
         if (isPlugEventUnhandled) {
             bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
                             service::name::system_manager);
             isPlugEventUnhandled = false;
+            desktopWorker->notify(WorkerDesktop::Signal::unlockMTP);
         }
     }
 

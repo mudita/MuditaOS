@@ -835,11 +835,20 @@ namespace app
             assert(0 && "invalid popup data received");
             return;
         }
+
         // two lines below is to **not** loose data on copy on dynamic_cast, but to move the data
         (void)params.release();
-        auto data      = std::unique_ptr<gui::PopupRequestParams>(rdata);
-        auto id        = data->getPopupId();
-        auto blueprint = popupBlueprint.getBlueprint(id);
+        auto data                    = std::unique_ptr<gui::PopupRequestParams>(rdata);
+        auto id                      = data->getPopupId();
+        auto blueprint               = popupBlueprint.getBlueprint(id);
+        auto appNameWhichAskForPopup = data->nameOfSenderApplication;
+
+        auto topOfWindowsStackId = windowsStack().getWindowData(app::topWindow)->disposition.id;
+        if (data->ignoreIfTheSamePopupIsOnTopOfTheStack && id == topOfWindowsStackId) {
+            LOG_WARN("ignoring popup because the same is already on the top of the stack");
+            return;
+        }
+
         if (!blueprint) {
             LOG_ERROR("no blueprint to handle %s popup - fallback", std::string(magic_enum::enum_name(id)).c_str());
             blueprint = popupBlueprintFallback(id);

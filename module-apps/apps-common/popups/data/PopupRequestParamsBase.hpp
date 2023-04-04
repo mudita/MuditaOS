@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,8 @@ namespace gui
         [[nodiscard]] gui::popup::ID getPopupId() const noexcept;
         [[nodiscard]] const popup::Disposition &getDisposition() const noexcept;
         void setDisposition(const popup::Disposition &d);
+
+        bool ignoreIfTheSamePopupIsOnTopOfTheStack = false;
 
       private:
         gui::popup::ID popupId;

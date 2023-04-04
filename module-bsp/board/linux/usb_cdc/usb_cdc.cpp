@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/usb/usb.hpp"
@@ -154,6 +154,11 @@ namespace bsp
         std::remove(ptsFileName);
         if (taskHandleReceive)
             vTaskDelete(taskHandleReceive);
+    }
+
+    void usbUnlockMTP()
+    {
+        LOG_INFO("mtpUnlock");
     }
 
     int usbInit(const bsp::usbInitParams &initParams)
