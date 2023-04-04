@@ -42,6 +42,7 @@
 * Fixed Template window clearing after all templates are removed.
 * Fixed wrong notification about multiple unread messages in case there's only one unread left
 * Fixed missing notification about new SMS when phone was locked on application Messages
+* Fixed MTP availability only after phone unlocked
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved

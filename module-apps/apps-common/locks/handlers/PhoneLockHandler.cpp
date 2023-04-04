@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneLockHandler.hpp"
@@ -115,9 +115,12 @@ namespace locks
                 std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLockInfo));
         }
 
-        app::manager::Controller::sendAction(owner,
-                                             app::manager::actions::AbortPopup,
-                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLockInput));
+        if (lock.inputValue.empty()) {
+            app::manager::Controller::sendAction(
+                owner,
+                app::manager::actions::AbortPopup,
+                std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLockInput));
+        }
     }
 
     void PhoneLockHandler::phoneUnlockAction()
@@ -127,12 +130,13 @@ namespace locks
         owner->bus.sendMulticast(std::make_shared<locks::UnlockedPhone>(), sys::BusChannel::PhoneLockChanges);
     }
 
-    void PhoneLockHandler::phoneInputRequiredAction()
+    void PhoneLockHandler::phoneInputRequiredAction(ReasonForRequest reqReason)
     {
-        app::manager::Controller::sendAction(owner,
-                                             app::manager::actions::ShowPopup,
-                                             std::make_unique<gui::PhoneUnlockInputRequestParams>(
-                                                 gui::popup::ID::PhoneLockInput, lock, phoneLockInputTypeAction));
+        auto data = std::make_unique<gui::PhoneUnlockInputRequestParams>(
+            gui::popup::ID::PhoneLockInput, lock, phoneLockInputTypeAction);
+        // If it's for MTP, don't show the input passcode popup if it's already on the screen
+        data->ignoreIfTheSamePopupIsOnTopOfTheStack = (reqReason == ReasonForRequest::MTPUnlock);
+        app::manager::Controller::sendAction(owner, app::manager::actions::ShowPopup, std::move(data));
     }
 
     void PhoneLockHandler::phoneLockEnableAction()
@@ -249,7 +253,7 @@ namespace locks
         saveNoLockTimeAttemptsLeft();
     }
 
-    sys::MessagePointer PhoneLockHandler::handleUnlockRequest()
+    sys::MessagePointer PhoneLockHandler::handleUnlockRequest(ReasonForRequest reqReason)
     {
         setPhoneLockInputTypeAction(PhoneLockInputTypeAction::Unlock);
 
@@ -262,11 +266,11 @@ namespace locks
             if (lockedFor == 0) {
                 lock.lockState = Lock::LockState::InputRequired;
             }
-            phoneInputRequiredAction();
+            phoneInputRequiredAction(reqReason);
         }
         else if (!lock.isState(Lock::LockState::Unlocked)) {
             lock.lockState = Lock::LockState::InputRequired;
-            phoneInputRequiredAction();
+            phoneInputRequiredAction(reqReason);
         }
 
         return sys::msgHandled();

@@ -95,9 +95,6 @@ namespace app
                 return false;
             }
 
-            popupParams->setDisposition(gui::popup::Disposition{gui::popup::Disposition::Priority::Normal,
-                                                                gui::popup::Disposition::WindowType::Popup,
-                                                                params->getPopupId()});
             switchWindowPopup(
                 gui::popup::resolveWindowName(id),
                 popupParams->getDisposition(),

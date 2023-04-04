@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,6 +20,13 @@ namespace locks
 
     class PhoneLockHandler
     {
+      public:
+        enum class ReasonForRequest
+        {
+            Default = 0, // For default behaviors
+            MTPUnlock
+        };
+
       private:
         enum class PhoneState
         {
@@ -65,7 +72,7 @@ namespace locks
         void phoneLockDisableAction();
         void phoneLockChangeAction();
         void phoneLockSetAction();
-        void phoneInputRequiredAction();
+        void phoneInputRequiredAction(ReasonForRequest reqReason = ReasonForRequest::Default);
         void phoneUnlockPopupsCloseAction();
         void phoneLockChangeInfoAction();
         void phoneExternalUnlockInfoAction();
@@ -82,7 +89,7 @@ namespace locks
         explicit PhoneLockHandler(sys::Service *owner, std::shared_ptr<settings::Settings> settings);
 
         sys::MessagePointer handleLockRequest();
-        sys::MessagePointer handleUnlockRequest();
+        sys::MessagePointer handleUnlockRequest(ReasonForRequest reqReason = ReasonForRequest::Default);
         sys::MessagePointer handleUnlockCancelRequest();
         sys::MessagePointer handleEnablePhoneLock();
         sys::MessagePointer handleDisablePhoneLock();

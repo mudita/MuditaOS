@@ -185,6 +185,9 @@ namespace app::manager
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
         connect(typeid(locks::UnlockPhone),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleUnlockRequest(); });
+        connect(typeid(locks::UnlockPhoneForMTP), [&](sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleUnlockRequest(locks::PhoneLockHandler::ReasonForRequest::MTPUnlock);
+        });
         connect(typeid(locks::CancelUnlockPhone), [&](sys::Message *request) -> sys::MessagePointer {
             return phoneLockHandler.handleUnlockCancelRequest();
         });
@@ -527,7 +530,8 @@ namespace app::manager
             autoLockTimer.stop();
             return;
         }
-        if (const auto focusedApp = getFocusedApplication(); (focusedApp == nullptr) || focusedApp->preventsAutoLocking()) {
+        if (const auto focusedApp = getFocusedApplication();
+            (focusedApp == nullptr) || focusedApp->preventsAutoLocking()) {
             autoLockTimer.start();
             return;
         }
@@ -552,7 +556,7 @@ namespace app::manager
 
             LOG_INFO("Starting application %s", app.name().c_str());
             StatusIndicators statusIndicators;
-            statusIndicators.phoneMode        = phoneModeObserver->getCurrentPhoneMode();
+            statusIndicators.phoneMode = phoneModeObserver->getCurrentPhoneMode();
             statusIndicators.tetheringState =
                 phoneModeObserver->isTetheringOn() ? sys::phone_modes::Tethering::On : sys::phone_modes::Tethering::Off;
             statusIndicators.bluetoothMode    = bluetoothMode;
