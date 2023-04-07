@@ -45,7 +45,6 @@ namespace bsp
     int usbCDCSend(std::string *sendMsg);
     int usbCDCSendRaw(const char *dataPtr, size_t dataLen);
     void usbDeinit();
-    void usbReinit(const std::string &rootPath);
     void usbSuspend();
     void usbHandleDataReceived();
 
