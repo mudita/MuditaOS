@@ -136,7 +136,10 @@ namespace hal::battery
     void PureBatteryCharger::setChargingCurrentLimit(std::uint8_t usbType)
     {
         using namespace bsp::battery_charger;
-        switch (static_cast<batteryChargerType>(usbType)) {
+        const auto event = static_cast<batteryChargerType>(usbType);
+        LOG_INFO("USB charging port discovery result: %s", std::string{magic_enum::enum_name(event)}.c_str());
+
+        switch (event) {
         case batteryChargerType::DcdTimeOut:
         case batteryChargerType::DcdUnknownType:
         case batteryChargerType::DcdError:

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -28,7 +28,6 @@ class WorkerDesktop : public sys::Worker
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     void closeWorker();
-    bool reinit(const std::filesystem::path &path);
 
     bool handleMessage(std::uint32_t queueID) override final;
 

@@ -90,16 +90,6 @@ void WorkerDesktop::closeWorker(void)
     LOG_DEBUG("deinit end");
 }
 
-bool WorkerDesktop::reinit(const std::filesystem::path &path)
-{
-    LOG_DEBUG("Reinit USB begin");
-
-    bsp::usbReinit(path);
-
-    LOG_DEBUG("Reinit USB end");
-    return true;
-}
-
 void WorkerDesktop::reset()
 {
     initialized = false;
