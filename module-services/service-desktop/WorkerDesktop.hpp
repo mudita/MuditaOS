@@ -28,7 +28,6 @@ class WorkerDesktop : public sys::Worker
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     void closeWorker();
-    bool reinit(const std::filesystem::path &path);
 
     bool handleMessage(std::uint32_t queueID) override final;
 

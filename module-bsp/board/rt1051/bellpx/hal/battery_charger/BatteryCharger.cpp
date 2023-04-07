@@ -15,6 +15,8 @@
 #include <board/BoardDefinitions.hpp>
 #include <log/log.hpp>
 
+#include <variant>
+
 namespace
 {
     using namespace bsp::devices::power;
@@ -38,6 +40,13 @@ namespace
     constexpr auto charger_irq_gpio_chgok =
         static_cast<drivers::GPIOInstances>(BoardDefinitions::BELL_BATTERY_CHARGER_CHGOK_GPIO);
 
+    template <class... Ts>
+    struct overloaded : Ts...
+    {
+        using Ts::operator()...;
+    };
+    template <class... Ts>
+    overloaded(Ts...) -> overloaded<Ts...>;
 } // namespace
 
 namespace hal::battery
@@ -45,11 +54,23 @@ namespace hal::battery
     class BellBatteryCharger : public AbstractBatteryCharger
     {
       public:
-        enum class IrqEvents : std::uint8_t
+        struct events
         {
-            Charger,
-            FuelGauge
+            enum class DCD : std::uint8_t
+            {
+                Timeout = 0x00U,
+                UnknownType,
+                Error, /// VBUS is coming from a dedicated power supply
+                SDP,   /// Standard downstream port, up to 500mA
+                CDP,   /// Charging downstream port, up to 1.5A
+                DCP,   /// Dedicated charging port(wall warts and auto adapters without enumeration), up to 1.5A
+            };
+            struct Charger
+            {};
+            struct FuelGauge
+            {};
         };
+        using IrqEvents          = std::variant<events::DCD, events::Charger, events::FuelGauge>;
         using BatteryWorkerQueue = WorkerQueue<IrqEvents>;
 
         explicit BellBatteryCharger(xQueueHandle irqQueueHandle);
@@ -68,7 +89,9 @@ namespace hal::battery
 
         void sendNotification(Events event);
         void pollFuelGauge();
-        bool tryEnableCharging();
+
+        void handleIrqEvents(IrqEvents event);
+        void handleChargerEvents(MP2639B::ChargingStatus status);
 
         xTimerHandle reinit_timer;
         xQueueHandle notification_channel;
@@ -93,17 +116,8 @@ namespace hal::battery
                                                                                charger_irq_pin_acok,
                                                                                charger_gpio_chgok,
                                                                                charger_irq_pin_chgok,
-                                                                               [this](const auto) {
-                                                                                   /// Due to this layer performing
-                                                                                   /// charging control automatically,
-                                                                                   /// there is no need to notify higher
-                                                                                   /// layers about \ref
-                                                                                   /// MP2639B::ChargingStatus::PluggedNotCharging
-                                                                                   /// event.
-                                                                                   if (not tryEnableCharging()) {
-                                                                                       sendNotification(
-                                                                                           Events::Charger);
-                                                                                   }
+                                                                               [this](const auto event) {
+                                                                                   handleChargerEvents(event);
                                                                                }}},
 
           fuel_gauge_gpio{drivers::DriverGPIO::Create(fuel_gauge_irq_gpio_instance, {})},
@@ -116,20 +130,8 @@ namespace hal::battery
             inst->pollFuelGauge();
         });
 
-        worker_queue = std::make_unique<BatteryWorkerQueue>("battery_charger", [this](const auto &msg) {
-            switch (msg) {
-            case IrqEvents::Charger: {
-                charger.handle_irq();
-            } break;
-
-            case IrqEvents::FuelGauge: {
-                fuel_gauge.irq_handler();
-                sendNotification(Events::SOC);
-            } break;
-            }
-        });
-
-        tryEnableCharging();
+        worker_queue = std::make_unique<BatteryWorkerQueue>(
+            "battery_charger", [this](const auto &msg) { handleIrqEvents(msg); }, 1024);
 
         pollFuelGauge();
 
@@ -227,29 +229,46 @@ namespace hal::battery
             LOG_INFO("Fuel gauge initialization success");
         }
     }
-
-    bool BellBatteryCharger::tryEnableCharging()
+    void BellBatteryCharger::handleIrqEvents(const IrqEvents event)
     {
-        if (charger.get_charge_status() == MP2639B::ChargingStatus::PluggedNotCharging) {
-            charger.enable_charging(true);
-            return true;
-        }
-
-        return false;
+        std::visit(overloaded{[this](const events::Charger) { charger.handle_irq(); },
+                              [this](const events::FuelGauge) {
+                                  fuel_gauge.irq_handler();
+                                  sendNotification(Events::SOC);
+                              },
+                              [this](const events::DCD evt) {
+                                  LOG_INFO("USB charging port discovery result: %s",
+                                           std::string{magic_enum::enum_name(evt)}.c_str());
+                                  switch (evt) {
+                                  case events::DCD::DCP:
+                                  case events::DCD::CDP:
+                                  case events::DCD::Timeout:
+                                      LOG_INFO("Valid charger detected, enabling charging");
+                                      charger.enable_charging(true);
+                                      break;
+                                  default:
+                                      charger.enable_charging(false);
+                                  }
+                              }},
+                   event);
+    }
+    void BellBatteryCharger::handleChargerEvents(const MP2639B::ChargingStatus)
+    {
+        sendNotification(Events::Charger);
     }
 
     BaseType_t charger_irq()
     {
-        return BellBatteryCharger::getWorkerQueueHandle().post(BellBatteryCharger::IrqEvents::Charger);
+        return BellBatteryCharger::getWorkerQueueHandle().post({BellBatteryCharger::events::Charger{}});
     }
     BaseType_t fuel_gauge_irq()
     {
-        return BellBatteryCharger::getWorkerQueueHandle().post(BellBatteryCharger::IrqEvents::FuelGauge);
+        return BellBatteryCharger::getWorkerQueueHandle().post({BellBatteryCharger::events::FuelGauge{}});
     }
 
-    extern "C" void USB_ChargerDetectedCB(std::uint8_t /*unused*/)
+    extern "C" void USB_ChargerDetectedCB(std::uint8_t raw_type)
     {
-        /// It needs to be defined even if it is not used.
+        BellBatteryCharger::getWorkerQueueHandle().post({BellBatteryCharger::events::DCD{raw_type}});
     }
 
     std::unique_ptr<AbstractBatteryCharger> AbstractBatteryCharger::Factory::create(xQueueHandle irqQueueHandle)

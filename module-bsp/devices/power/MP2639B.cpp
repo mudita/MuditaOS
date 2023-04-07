@@ -14,7 +14,9 @@ namespace bsp::devices::power
                 if (not inst->is_valid_voltage()) {
                     inst->enable_charging(false);
                 }
-                inst->configuration.notification(inst->get_charge_status());
+                if (inst->configuration.notification) {
+                    inst->configuration.notification(inst->get_charge_status());
+                }
             });
 
         drivers::DriverGPIOPinParams mode_pin_params{};
@@ -54,7 +56,6 @@ namespace bsp::devices::power
         else if (valid_voltage and not is_charging_enabled()) {
             status = ChargingStatus::PluggedNotCharging;
         }
-        // TODO: add error condition, i.e when chgok blinks at 1Hz
         return status;
     }
     void MP2639B::enable_charging(bool ctrl)
@@ -89,7 +90,7 @@ namespace bsp::devices::power
     void MP2639B::handle_irq()
     {
         if (xTimerIsTimerActive(irq_filter_timer) == pdFALSE) {
-            xTimerStart(irq_filter_timer, pdMS_TO_TICKS(100));
+            xTimerStart(irq_filter_timer, pdMS_TO_TICKS(500));
         }
     }
     bool MP2639B::is_charging_enabled() const
