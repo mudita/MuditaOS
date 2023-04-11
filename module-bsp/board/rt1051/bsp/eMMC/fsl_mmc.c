@@ -1621,20 +1621,21 @@ static void MMC_DecodeCid(mmc_card_t *card, uint32_t *rawCid)
 
     cid                 = &(card->cid);
     cid->manufacturerID = (uint8_t)((rawCid[3U] & 0xFF000000U) >> 24U);
-    cid->applicationID  = (uint16_t)((rawCid[3U] & 0xFFFF00U) >> 8U);
+    cid->applicationID  = (uint16_t)((rawCid[3U] & 0x00FFFF00U) >> 8U);
 
-    cid->productName[0U] = (uint8_t)((rawCid[3U] & 0xFFU));
+    cid->productName[0U] = (uint8_t)((rawCid[3U] & 0x000000FFU));
     cid->productName[1U] = (uint8_t)((rawCid[2U] & 0xFF000000U) >> 24U);
-    cid->productName[2U] = (uint8_t)((rawCid[2U] & 0xFF0000U) >> 16U);
-    cid->productName[3U] = (uint8_t)((rawCid[2U] & 0xFF00U) >> 8U);
-    cid->productName[4U] = (uint8_t)((rawCid[2U] & 0xFFU));
+    cid->productName[2U] = (uint8_t)((rawCid[2U] & 0x00FF0000U) >> 16U);
+    cid->productName[3U] = (uint8_t)((rawCid[2U] & 0x0000FF00U) >> 8U);
+    cid->productName[4U] = (uint8_t)((rawCid[2U] & 0x000000FFU));
+    cid->productName[5U] = (uint8_t)((rawCid[1U] & 0xFF000000U) >> 24U);
 
-    cid->productVersion = (uint8_t)((rawCid[1U] & 0xFF000000U) >> 24U);
+    cid->productVersion = (uint8_t)((rawCid[1U] & 0x00FF0000U) >> 16U);
 
-    cid->productSerialNumber = (uint32_t)((rawCid[1U] & 0xFFFFFFU) << 8U);
-    cid->productSerialNumber |= (uint32_t)((rawCid[0U] & 0xFF000000U) >> 24U);
+    cid->productSerialNumber = (uint32_t)((rawCid[1U] & 0x0000FFFFU) << 16U);
+    cid->productSerialNumber |= (uint32_t)((rawCid[0U] & 0xFFFF0000U) >> 16U);
 
-    cid->manufacturerData = (uint16_t)((rawCid[0U] & 0xFFF00U) >> 8U);
+    cid->manufacturerData = (uint8_t)((rawCid[0U] & 0x0000FF00U) >> 8U);
 }
 
 static status_t MMC_AllSendCid(mmc_card_t *card)
