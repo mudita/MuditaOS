@@ -35,7 +35,7 @@ FileWriteContext::FileWriteContext(const std::filesystem::path &path,
                                    std::string crc32Digest,
                                    std::size_t offset)
     : FileContext(path, size, chunkSize, offset), crc32Digest(std::move(crc32Digest)),
-      file(path, std::ios::binary | std::ios::app)
+      file(path, std::ios::binary | std::ios::out)
 {}
 
 FileWriteContext::~FileWriteContext()
