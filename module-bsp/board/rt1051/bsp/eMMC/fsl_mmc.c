@@ -2194,9 +2194,9 @@ status_t MMC_ReadBlocks(mmc_card_t *card, uint8_t *buffer, uint32_t startBlock, 
 
     return kStatus_Success;
 }
-
+#include <log/log.hpp>
 status_t MMC_WriteBlocks(mmc_card_t *card, const uint8_t *buffer, uint32_t startBlock, uint32_t blockCount)
-{
+{//LOG_ERROR("*** startBlock: %ld blockCount: %ld ***", startBlock, blockCount);
     assert(card);
     assert(buffer);
     assert(blockCount);

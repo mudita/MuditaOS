@@ -25,6 +25,103 @@
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
 #include <switches/LatchState.hpp>
 
+namespace test
+{
+    std::vector<std::string> filesToCopy = {"Ancient_Greek.mp3",
+                                            "Forest_Creek.mp3",
+                                            "Rhythmic_Lullaby.mp3",
+                                            "Autumnal_Sea.mp3",
+                                            "Mountain_Lagoon.mp3",
+                                            "Seaside_Symphony.mp3",
+                                            "Bubbling_Brook.mp3",
+                                            "Mystic_Nature.mp3",
+                                            "Under_the_Water.mp3",
+                                            "Charming_Bells.mp3",
+                                            "Natures_Harmony.mp3",
+                                            "Woodland_Ambiance.mp3"};
+    std::filesystem::path proprietary() noexcept
+    {
+        return purefs::dir::getAssetsDirPath() / "audio";
+    }
+    std::filesystem::path relaxation() noexcept
+    {
+        return "relaxation";
+    }
+
+    void copyFile(std::string sourcePath, std::string destinyPath)
+    {
+        auto src_fd = std::fopen(sourcePath.c_str(), "r");
+        if (!src_fd) {
+            LOG_ERROR("Failed to open file %s to read", sourcePath.c_str());
+            // ret = 1;
+            // break;
+        }
+
+        auto dst_fd = std::fopen(destinyPath.c_str(), "w");
+        if (!dst_fd) {
+            std::fclose(src_fd);
+            LOG_ERROR("Failed to open file %s to write", destinyPath.c_str());
+            // ret = 1;
+            // break;
+        }
+
+        std::size_t buffer_size = 1024 * 1024;
+        char *buffer            = new char[buffer_size]; // 1MiB
+        if (buffer == NULL) {
+            std::fclose(dst_fd);
+            std::fclose(src_fd);
+            LOG_ERROR("Failed to allocate copy buffer");
+            // ret = 1;
+            // break;
+        }
+
+        std::size_t bytes_read;
+        std::size_t bytes_left = std::fseek(src_fd, 0, SEEK_END);
+        std::fseek(src_fd, 0, SEEK_SET);
+
+        do {
+            bytes_read = std::fread(buffer, 1, buffer_size, src_fd);
+            if (bytes_read != buffer_size) {
+                LOG_ERROR("Read size: %d\n", bytes_read);
+                // ret = 1;
+                break;
+            }
+            if (std::fwrite(buffer, sizeof(*buffer), bytes_read, dst_fd) != bytes_read) {
+                LOG_ERROR("Failed to write to destination file\n");
+                // ret = 1;
+                break;
+            }
+            bytes_left -= bytes_read;
+        } while (bytes_left > 0);
+
+        free(buffer);
+        std::fclose(dst_fd);
+        std::fclose(src_fd);
+    }
+
+    void start()
+    {
+        LOG_ERROR("*** test start ***");
+
+        // const auto sourcePath = std::string(proprietary() / relaxation() / "Woodland_Ambiance.mp3");
+        const auto destinyFolder = std::string(proprietary() / "relaxation_test");
+        // const auto destinyPath = std::string(proprietary() / "relaxation_test" / "Woodland_Ambiance.mp3" );
+
+        std::filesystem::remove_all(destinyFolder);
+        std::filesystem::create_directory(destinyFolder);
+        // std::filesystem::copy(sourcePath, destinyPath);
+
+        for (auto file : filesToCopy) {
+            const auto sourcePath  = std::string(proprietary() / relaxation() / file);
+            const auto destinyPath = destinyFolder + "/" + file;
+            LOG_ERROR("copying the file %s", file.c_str());
+            copyFile(sourcePath, destinyPath);
+        }
+
+        LOG_ERROR("*** test end ***");
+    }
+} // namespace test
+
 namespace
 {
     auto updateTemperature = [](hal::temperature::AbstractTemperatureSource &source) {
@@ -71,6 +168,11 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     if (kbdMessage->key.state == RawKey::State::Pressed || kbdMessage->key.state == RawKey::State::Moved) {
         userActivityHandler.handleUserInput();
         backlightHandler.handleKeyPressed(static_cast<int>(mapKey(static_cast<gui::KeyCode>(kbdMessage->key.keyCode))));
+        LOG_ERROR("*** keyCode: %s ***", magic_enum::enum_name(kbdMessage->key.keyCode).data());
+
+        if (kbdMessage->key.keyCode == bsp::KeyCodes::JoystickDown) {
+            test::start();
+        }
     }
 
     keySequenceMgr->process(kbdMessage->key);
