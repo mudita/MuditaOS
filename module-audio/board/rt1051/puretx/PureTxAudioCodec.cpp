@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PureTxAudioCodec.hpp"
@@ -185,20 +185,18 @@ namespace audio
 
     void PureTxAudioCodec::InStart()
     {
-        sai_transfer_format_t sai_format;
+        sai_transfer_format_t sai_format = {};
         auto audioCfg = bsp::audio::AudioConfig::get();
+        constexpr auto supportedChannel  = 0U;
 
         /* Configure the audio format */
         sai_format.bitWidth           = saiInFormat.bitWidth;
-        sai_format.channel            = 0U;
+        sai_format.channel            = supportedChannel;
+        sai_format.channelMask        = 1 << supportedChannel;
         sai_format.sampleRate_Hz      = saiInFormat.sampleRate_Hz;
-        sai_format.masterClockHz      = audioCfg->mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol           = audioCfg->config.protocol;
         sai_format.stereo             = saiInFormat.stereo;
-#if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
-        sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
-#endif
 
         SAI_TransferRxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx,
                                        &rxHandle,
@@ -217,20 +215,18 @@ namespace audio
 
     void PureTxAudioCodec::OutStart()
     {
-        sai_transfer_format_t sai_format;
+        sai_transfer_format_t sai_format = {};
         auto audioCfg = bsp::audio::AudioConfig::get();
+        constexpr auto supportedChannel  = 0U;
 
         /* Configure the audio format */
         sai_format.bitWidth           = saiOutFormat.bitWidth;
-        sai_format.channel            = 0U;
+        sai_format.channel            = supportedChannel;
+        sai_format.channelMask        = 1 << supportedChannel;
         sai_format.sampleRate_Hz      = saiOutFormat.sampleRate_Hz;
-        sai_format.masterClockHz      = audioCfg->mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol           = audioCfg->config.protocol;
         sai_format.stereo             = saiOutFormat.stereo;
-#if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
-        sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
-#endif
 
         SAI_TransferTxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx,
                                        &txHandle,

@@ -1,41 +1,16 @@
 /*
- * The Clear BSD License
- * Copyright 2017 NXP
+ * Copyright 2017-2023 NXP
  * All rights reserved.
  *
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _FSL_FLEXRAM_H_
 #define _FSL_FLEXRAM_H_
 
 #include "fsl_common.h"
+#include "fsl_flexram_allocate.h"
 
 /*!
  * @addtogroup flexram
@@ -48,36 +23,73 @@
 
 /*! @name Driver version */
 /*@{*/
-/*! @brief Driver version 2.0.2. */
-#define FSL_FLEXRAM_DRIVER_VERSION (MAKE_VERSION(2U, 0U, 2U))
+/*! @brief Driver version. */
+#define FSL_FLEXRAM_DRIVER_VERSION (MAKE_VERSION(2U, 3U, 0U))
 /*@}*/
 
-/*! @brief flexram write read sel */
-enum _flexram_wr_rd_sel
+/*! @brief Get ECC error detailed information. */
+#ifndef FLEXRAM_ECC_ERROR_DETAILED_INFO
+#define FLEXRAM_ECC_ERROR_DETAILED_INFO \
+    0U /* Define to zero means get raw ECC error information, which needs parse it by user. */
+#endif
+
+/*! @brief Flexram write/read selection. */
+enum
 {
     kFLEXRAM_Read  = 0U, /*!< read */
     kFLEXRAM_Write = 1U, /*!< write */
 };
 
 /*! @brief Interrupt status flag mask */
-enum _flexram_interrupt_status
+enum
 {
-    kFLEXRAM_OCRAMAccessError    = FLEXRAM_INT_STATUS_OCRAM_ERR_STATUS_MASK, /*!< ocram access unallocated address */
-    kFLEXRAM_DTCMAccessError     = FLEXRAM_INT_STATUS_DTCM_ERR_STATUS_MASK,  /*!< dtcm access unallocated address */
-    kFLEXRAM_ITCMAccessError     = FLEXRAM_INT_STATUS_ITCM_ERR_STATUS_MASK,  /*!< itcm access unallocated address */
-    kFLEXRAM_OCRAMMagicAddrMatch = FLEXRAM_INT_STATUS_OCRAM_MAM_STATUS_MASK, /*!< ocram maigc address match */
-    kFLEXRAM_DTCMMagicAddrMatch  = FLEXRAM_INT_STATUS_DTCM_MAM_STATUS_MASK,  /*!< dtcm maigc address match */
-    kFLEXRAM_ITCMMagicAddrMatch  = FLEXRAM_INT_STATUS_ITCM_MAM_STATUS_MASK,  /*!< itcm maigc address match */
+    kFLEXRAM_OCRAMAccessError = FLEXRAM_INT_STATUS_OCRAM_ERR_STATUS_MASK, /*!< OCRAM accesses unallocated address */
+    kFLEXRAM_DTCMAccessError  = FLEXRAM_INT_STATUS_DTCM_ERR_STATUS_MASK,  /*!< DTCM accesses unallocated address */
+    kFLEXRAM_ITCMAccessError  = FLEXRAM_INT_STATUS_ITCM_ERR_STATUS_MASK,  /*!< ITCM accesses unallocated address */
 
-    kFLEXRAM_InterruptStatusAll = 0x3FU, /*!< all the interrupt status mask */
+#if defined(FSL_FEATURE_FLEXRAM_HAS_MAGIC_ADDR) && FSL_FEATURE_FLEXRAM_HAS_MAGIC_ADDR
+    kFLEXRAM_OCRAMMagicAddrMatch = FLEXRAM_INT_STATUS_OCRAM_MAM_STATUS_MASK, /*!< OCRAM magic address match */
+    kFLEXRAM_DTCMMagicAddrMatch  = FLEXRAM_INT_STATUS_DTCM_MAM_STATUS_MASK,  /*!< DTCM magic address match */
+    kFLEXRAM_ITCMMagicAddrMatch  = FLEXRAM_INT_STATUS_ITCM_MAM_STATUS_MASK,  /*!< ITCM magic address match */
+
+#if defined(FSL_FEATURE_FLEXRAM_HAS_ECC) && FSL_FEATURE_FLEXRAM_HAS_ECC
+    kFLEXRAM_OCRAMECCMultiError  = FLEXRAM_INT_STATUS_OCRAM_ECC_ERRM_INT_MASK,
+    kFLEXRAM_OCRAMECCSingleError = FLEXRAM_INT_STATUS_OCRAM_ECC_ERRS_INT_MASK,
+    kFLEXRAM_ITCMECCMultiError   = FLEXRAM_INT_STATUS_ITCM_ECC_ERRM_INT_MASK,
+    kFLEXRAM_ITCMECCSingleError  = FLEXRAM_INT_STATUS_ITCM_ECC_ERRS_INT_MASK,
+    kFLEXRAM_D0TCMECCMultiError  = FLEXRAM_INT_STATUS_D0TCM_ECC_ERRM_INT_MASK,
+    kFLEXRAM_D0TCMECCSingleError = FLEXRAM_INT_STATUS_D0TCM_ECC_ERRS_INT_MASK,
+    kFLEXRAM_D1TCMECCMultiError  = FLEXRAM_INT_STATUS_D1TCM_ECC_ERRM_INT_MASK,
+    kFLEXRAM_D1TCMECCSingleError = FLEXRAM_INT_STATUS_D1TCM_ECC_ERRS_INT_MASK,
+
+    kFLEXRAM_InterruptStatusAll =
+        FLEXRAM_INT_STATUS_OCRAM_ERR_STATUS_MASK | FLEXRAM_INT_STATUS_DTCM_ERR_STATUS_MASK |
+        FLEXRAM_INT_STATUS_ITCM_ERR_STATUS_MASK | FLEXRAM_INT_STATUS_OCRAM_MAM_STATUS_MASK |
+        FLEXRAM_INT_STATUS_DTCM_MAM_STATUS_MASK | FLEXRAM_INT_STATUS_ITCM_MAM_STATUS_MASK |
+        FLEXRAM_INT_STATUS_OCRAM_ECC_ERRM_INT_MASK | FLEXRAM_INT_STATUS_OCRAM_ECC_ERRS_INT_MASK |
+        FLEXRAM_INT_STATUS_ITCM_ECC_ERRM_INT_MASK | FLEXRAM_INT_STATUS_ITCM_ECC_ERRS_INT_MASK |
+        FLEXRAM_INT_STATUS_D0TCM_ECC_ERRM_INT_MASK | FLEXRAM_INT_STATUS_D0TCM_ECC_ERRS_INT_MASK |
+        FLEXRAM_INT_STATUS_D1TCM_ECC_ERRM_INT_MASK | FLEXRAM_INT_STATUS_D1TCM_ECC_ERRS_INT_MASK,
+#else
+    kFLEXRAM_InterruptStatusAll = FLEXRAM_INT_STATUS_OCRAM_ERR_STATUS_MASK | FLEXRAM_INT_STATUS_DTCM_ERR_STATUS_MASK |
+                                  FLEXRAM_INT_STATUS_ITCM_ERR_STATUS_MASK | FLEXRAM_INT_STATUS_OCRAM_MAM_STATUS_MASK |
+                                  FLEXRAM_INT_STATUS_DTCM_MAM_STATUS_MASK | FLEXRAM_INT_STATUS_ITCM_MAM_STATUS_MASK,
+#endif /* FSL_FEATURE_FLEXRAM_HAS_ECC */
+
+/*!< all the interrupt status mask */
+#else
+    kFLEXRAM_InterruptStatusAll = FLEXRAM_INT_STATUS_OCRAM_ERR_STATUS_MASK | FLEXRAM_INT_STATUS_DTCM_ERR_STATUS_MASK |
+                                  FLEXRAM_INT_STATUS_ITCM_ERR_STATUS_MASK, /*!< all the interrupt status mask */
+#endif /* FSL_FEATURE_FLEXRAM_HAS_MAGIC_ADDR */
+
 };
 
-/*! @brief FLEXRAM TCM access mode
- * Fast access mode expected to be finished in 1-cycle
- * Wait access mode expected to be finished in 2-cycle
+/*! @brief FLEXRAM TCM access mode.
+ * Fast access mode expected to be finished in 1-cycle;
+ * Wait access mode expected to be finished in 2-cycle.
  * Wait access mode is a feature of the flexram and it should be used when
- * the cpu clock too fast to finish tcm access in 1-cycle.
- * Normally, fast mode is the default mode, the efficiency of the tcm access will better.
+ * the CPU clock is too fast to finish TCM access in 1-cycle.
+ * Normally, fast mode is the default mode, the efficiency of the TCM access will better.
  */
 typedef enum _flexram_tcm_access_mode
 {
@@ -85,41 +97,167 @@ typedef enum _flexram_tcm_access_mode
     kFLEXRAM_TCMAccessWaitMode = 1U, /*!< wait access mode */
 } flexram_tcm_access_mode_t;
 
-/*! @brief FLEXRAM bank type */
-enum _flexram_bank_type
+/*! @brief FLEXRAM TCM support size */
+enum
 {
-    kFLEXRAM_BankNotUsed = 0U, /*!< bank is not used */
-    kFLEXRAM_BankOCRAM   = 1U, /*!< bank is OCRAM */
-    kFLEXRAM_BankDTCM    = 2U, /*!< bank is DTCM */
-    kFLEXRAM_BankITCM    = 3U, /*!< bank is ITCM */
+    kFLEXRAM_TCMSize32KB  = 32 * 1024U,  /*!< TCM total size be 32KB */
+    kFLEXRAM_TCMSize64KB  = 64 * 1024U,  /*!< TCM total size be 64KB */
+    kFLEXRAM_TCMSize128KB = 128 * 1024U, /*!< TCM total size be 128KB */
+    kFLEXRAM_TCMSize256KB = 256 * 1024U, /*!< TCM total size be 256KB */
+    kFLEXRAM_TCMSize512KB = 512 * 1024U, /*!< TCM total size be 512KB */
 };
 
-/*! @brief FLEXRAM tcm support size */
-enum _flexram_tcm_size
+#if (defined(FSL_FEATURE_FLEXRAM_HAS_ECC) && FSL_FEATURE_FLEXRAM_HAS_ECC)
+/*! @brief FLEXRAM memory type, such as OCRAM/ITCM/D0TCM/D1TCM */
+typedef enum _flexram_memory_type
 {
-    kFLEXRAM_TCMSize32KB  = 32 * 1024U,  /*!< TCM total size 32KB */
-    kFLEXRAM_TCMSize64KB  = 64 * 1024U,  /*!< TCM total size 64KB */
-    kFLEXRAM_TCMSize128KB = 128 * 1024U, /*!< TCM total size 128KB */
-    kFLEXRAM_TCMSize256KB = 256 * 1024U, /*!< TCM total size 256KB */
-    kFLEXRAM_TCMSize512KB = 512 * 1024U, /*!< TCM total size 512KB */
-};
+    kFLEXRAM_OCRAM = 0U, /*!< Memory type OCRAM */
+    kFLEXRAM_ITCM  = 1U, /*!< Memory type ITCM */
+    kFLEXRAM_D0TCM = 2U, /*!< Memory type D0TCM */
+    kFLEXRAM_D1TCM = 3U, /*!< Memory type D1TCM */
+} flexram_memory_type_t;
 
-/*! @brief FLEXRAM bank allocate source */
-typedef enum _flexram_bank_allocate_src
+/*! @brief FLEXRAM error type, such as single bit error position, multi-bit error position */
+typedef struct _flexram_ecc_error_type
 {
-    kFLEXRAM_BankAllocateThroughHardwareFuse = 0U, /*!< allocate ram through hardware fuse value */
-    kFLEXRAM_BankAllocateThroughBankCfg      = 1U, /*!< allocate ram through FLEXRAM_BANK_CFG */
-} flexram_bank_allocate_src_t;
+    uint8_t SingleBitPos;          /*!< Bit position of the bit to inject ECC Error. */
+    uint8_t SecondBitPos;          /*!< Bit position of the second bit to inject multi-bit ECC Error */
+    bool Fource1BitDataInversion;  /*!< Force One 1-Bit Data Inversion (single-bit ECC error) on memory write access */
+    bool FourceOneNCDataInversion; /*!< Force One Non-correctable Data Inversion(multi-bit ECC error) on memory write
+                                      access */
+    bool FourceConti1BitDataInversion; /*!< Force Continuous 1-Bit Data Inversions (single-bit ECC error) on memory
+                                          write access */
+    bool FourceContiNCDataInversion;   /*!< Force Continuous Non-correctable Data Inversions (multi-bit ECC error) on
+                                          memory write access */
+} flexram_ecc_error_type_t;
 
-/*! @brief FLEXRAM allocate ocram, itcm, dtcm size */
-typedef struct _flexram_allocate_ram
+/*! @brief FLEXRAM ocram ecc single error information, including single error information, error address, error data */
+typedef struct _flexram_ocram_ecc_single_error_info
 {
-    const uint8_t ocramBankNum; /*!< ocram banknumber which the SOC support */
-    const uint8_t dtcmBankNum;  /*!< dtcm bank number to allocate, the number should be power of 2 */
-    const uint8_t itcmBankNum;  /*!< itcm bank number to allocate, the number should be power of 2 */
-} flexram_allocate_ram_t;
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    uint8_t OcramSingleErrorECCCipher;   /*!< OCRAM corresponding ECC cipher of OCRAM single-bit ECC error. */
+    uint8_t OcramSingleErrorECCSyndrome; /*!< OCRAM corresponding ECC syndrome of OCRAM single-bit ECC error,
+                                              which can be used to locate the Error bit using a look-up table. */
+#else
+    uint32_t OcramSingleErrorInfo; /*!< Ocram single error information, user should parse it by themself. */
+#endif                                /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+    uint32_t OcramSingleErrorAddr;    /*!< Ocram single error address */
+    uint32_t OcramSingleErrorDataLSB; /*!< Ocram single error data LSB */
+    uint32_t OcramSingleErrorDataMSB; /*!< Ocram single error data MSB */
+} flexram_ocram_ecc_single_error_info_t;
+
+/*! @brief FLEXRAM ocram ecc multiple error information, including multiple error information, error address, error data
+ */
+typedef struct _flexram_ocram_ecc_multi_error_info
+{
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    uint8_t OcramMultiErrorECCCipher; /*!< OCRAM corresponding ECC cipher of OCRAM multi-bit ECC error. */
+#else
+    uint32_t OcramMultiErrorInfo;  /*!< Ocram single error information, user should parse it by themself. */
+#endif                               /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+    uint32_t OcramMultiErrorAddr;    /*!< Ocram multiple error address */
+    uint32_t OcramMultiErrorDataLSB; /*!< Ocram multiple error data LSB */
+    uint32_t OcramMultiErrorDataMSB; /*!< Ocram multiple error data MSB */
+} flexram_ocram_ecc_multi_error_info_t;
+
+/*! @brief FLEXRAM itcm ecc single error information, including single error information, error address, error data */
+typedef struct _flexram_itcm_ecc_single_error_info
+{
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    uint8_t ItcmSingleErrorTCMWriteRead;  /*!< itcm single-bit ECC error corresponding tcm_wr value, which is to tell
+                                               whether it is a write access(0x01) or a read access(0x00). */
+    uint8_t ItcmSingleErrorTCMAccessSize; /*!< itcm single-bit ECC error corresponding tcm access size,
+                                               which should be 3 (64bit). */
+    uint8_t ItcmSingleErrorTCMMaster;     /*!< itcm single-bit ECC error corresponding tcm_master,
+                                               which is to tell the requester of the current access. */
+    uint8_t ItcmSingleErrorTCMPrivilege;  /*!< itcm single-bit ECC error corresponding tcm_priv,
+                                               which is to tell the privilege level of access. */
+    uint8_t ItcmSingleErrorBitPostion;    /*!< itcm single-bit ECC error corresponding bit postion. */
+#else
+    uint32_t ItcmSingleErrorInfo;  /*!< itcm single error information, user should parse it by themself. */
+#endif                               /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+    uint32_t ItcmSingleErrorAddr;    /*!< itcm single error address */
+    uint32_t ItcmSingleErrorDataLSB; /*!< itcm single error data LSB */
+    uint32_t ItcmSingleErrorDataMSB; /*!< itcm single error data MSB */
+} flexram_itcm_ecc_single_error_info_t;
+
+/*! @brief FLEXRAM itcm ecc multiple error information, including multiple error information, error address, error data
+ */
+typedef struct _flexram_itcm_ecc_multi_error_info
+{
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    uint8_t ItcmMultiErrorTCMWriteRead;  /*!< itcm multiple-bit ECC error corresponding tcm_wr value, which is to tell
+                                              whether it is a write access(0x01) or a read access(0x00). */
+    uint8_t ItcmMultiErrorTCMAccessSize; /*!< itcm multiple-bit ECC error corresponding tcm access size,
+                                              which should be 3 (64bit). */
+    uint8_t ItcmMultiErrorTCMMaster;     /*!< itcm multiple-bit ECC error corresponding tcm_master,
+                                              which is to tell the requester of the current access. */
+    uint8_t ItcmMultiErrorTCMPrivilege;  /*!< itcm multiple-bit ECC error corresponding tcm_priv,
+                                              which is to tell the privilege level of access. */
+    uint8_t ItcmMultiErrorECCSyndrome;   /*!< itcm multiple-bit ECC error corresponding syndrome,
+                                              which can not be used to locate the Error bit using a look-up table. */
+#else
+    uint32_t ItcmMultiErrorInfo;   /*!< itcm multiple error information, user should parse it by themself. */
+#endif                              /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+    uint32_t ItcmMultiErrorAddr;    /*!< itcm multiple error address */
+    uint32_t ItcmMultiErrorDataLSB; /*!< itcm multiple error data LSB */
+    uint32_t ItcmMultiErrorDataMSB; /*!< itcm multiple error data MSB */
+} flexram_itcm_ecc_multi_error_info_t;
+
+/*! @brief FLEXRAM dtcm ecc single error information, including single error information, error address, error data */
+typedef struct _flexram_dtcm_ecc_single_error_info
+{
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    uint8_t DtcmSingleErrorTCMWriteRead;  /*!< dtcm single-bit ECC error corresponding tcm_wr value, which is to tell
+                                               whether it is a write access(0x01) or a read access(0x00). */
+    uint8_t DtcmSingleErrorTCMAccessSize; /*!< dtcm single-bit ECC error corresponding tcm access size,
+                                               which should be 2 (32bit). */
+    uint8_t DtcmSingleErrorTCMMaster;     /*!< dtcm single-bit ECC error corresponding tcm_master,
+                                               which is to tell the requester of the current access. */
+    uint8_t DtcmSingleErrorTCMPrivilege;  /*!< dtcm single-bit ECC error corresponding tcm_priv,
+                                               which is to tell the privilege level of access. */
+    uint8_t DtcmSingleErrorBitPostion;    /*!< dtcm single-bit ECC error corresponding bit postion. */
+#else
+    uint32_t DtcmSingleErrorInfo;  /*!< dtcm single error information, user should parse it by themself. */
+#endif                            /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+    uint32_t DtcmSingleErrorAddr; /*!< dtcm single error address */
+    uint32_t DtcmSingleErrorData; /*!< dtcm single error data */
+} flexram_dtcm_ecc_single_error_info_t;
+
+/*! @brief FLEXRAM dtcm ecc multiple error information, including multiple error information, error address, error data
+ */
+typedef struct _flexram_dtcm_ecc_multi_error_info
+{
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    uint8_t DtcmMultiErrorTCMWriteRead;  /*!< dtcm multiple-bit ECC error corresponding tcm_wr value, which is to tell
+                                              whether it is a write access(0x01) or a read access(0x00). */
+    uint8_t DtcmMultiErrorTCMAccessSize; /*!< dtcm multiple-bit ECC error corresponding tcm access size,
+                                              which should be 3 (64bit). */
+    uint8_t DtcmMultiErrorTCMMaster;     /*!< dtcm multiple-bit ECC error corresponding tcm_master,
+                                              which is to tell the requester of the current access. */
+    uint8_t DtcmMultiErrorTCMPrivilege;  /*!< dtcm multiple-bit ECC error corresponding tcm_priv,
+                                              which is to tell the privilege level of access. */
+    uint8_t DtcmMultiErrorECCSyndrome;   /*!< dtcm multiple-bit ECC error corresponding syndrome,
+                                              which can not be used to locate the Error bit using a look-up table. */
+#else
+    uint32_t DtcmMultiErrorInfo;   /*!< dtcm multiple error information, user should parse it by themself. */
+#endif                           /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+    uint32_t DtcmMultiErrorAddr; /*!< dtcm multiple error address */
+    uint32_t DtcmMultiErrorData; /*!< dtcm multiple error data */
+} flexram_dtcm_ecc_multi_error_info_t;
+
+#endif /* FSL_FEATURE_FLEXRAM_HAS_ECC */
+
+/*******************************************************************************
+ * APIs
+ ******************************************************************************/
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 /*!
- * @name Initialization and deinitialization
+ * @name Initialization and de-initialization
  * @{
  */
 
@@ -131,10 +269,10 @@ typedef struct _flexram_allocate_ram
 void FLEXRAM_Init(FLEXRAM_Type *base);
 
 /*!
- * @brief Deinitializes the FLEXRAM.
+ * @brief De-initializes the FLEXRAM.
  *
  */
-void FLEXRAN_Deinit(FLEXRAM_Type *base);
+void FLEXRAM_Deinit(FLEXRAM_Type *base);
 
 /* @} */
 
@@ -143,20 +281,20 @@ void FLEXRAN_Deinit(FLEXRAM_Type *base);
  * @{
  */
 /*!
- * @brief FLEXRAM module get interrupt status.
+ * @brief FLEXRAM module gets interrupt status.
  *
  * @param base FLEXRAM base address.
  */
 static inline uint32_t FLEXRAM_GetInterruptStatus(FLEXRAM_Type *base)
 {
-    return base->INT_STATUS & kFLEXRAM_InterruptStatusAll;
+    return base->INT_STATUS & (uint32_t)kFLEXRAM_InterruptStatusAll;
 }
 
 /*!
- * @brief FLEXRAM module clear interrupt status.
+ * @brief FLEXRAM module clears interrupt status.
  *
  * @param base FLEXRAM base address.
- * @param status status to clear.
+ * @param status Status to be cleared.
  */
 static inline void FLEXRAM_ClearInterruptStatus(FLEXRAM_Type *base, uint32_t status)
 {
@@ -164,10 +302,10 @@ static inline void FLEXRAM_ClearInterruptStatus(FLEXRAM_Type *base, uint32_t sta
 }
 
 /*!
- * @brief FLEXRAM module enable interrupt status.
+ * @brief FLEXRAM module enables interrupt status.
  *
  * @param base FLEXRAM base address.
- * @param status status to enable.
+ * @param status Status to be enabled.
  */
 static inline void FLEXRAM_EnableInterruptStatus(FLEXRAM_Type *base, uint32_t status)
 {
@@ -178,7 +316,7 @@ static inline void FLEXRAM_EnableInterruptStatus(FLEXRAM_Type *base, uint32_t st
  * @brief FLEXRAM module disable interrupt status.
  *
  * @param base FLEXRAM base address.
- * @param status status to disable.
+ * @param status Status to be disabled.
  */
 static inline void FLEXRAM_DisableInterruptStatus(FLEXRAM_Type *base, uint32_t status)
 {
@@ -193,10 +331,10 @@ static inline void FLEXRAM_DisableInterruptStatus(FLEXRAM_Type *base, uint32_t s
  */
 
 /*!
- * @brief FLEXRAM module enable interrupt.
+ * @brief FLEXRAM module enables interrupt.
  *
  * @param base FLEXRAM base address.
- * @param status status interrupt to enable.
+ * @param status Status interrupt to be enabled.
  */
 static inline void FLEXRAM_EnableInterruptSignal(FLEXRAM_Type *base, uint32_t status)
 {
@@ -204,10 +342,10 @@ static inline void FLEXRAM_EnableInterruptSignal(FLEXRAM_Type *base, uint32_t st
 }
 
 /*!
- * @brief FLEXRAM module disable interrupt.
+ * @brief FLEXRAM module disables interrupt.
  *
  * @param base FLEXRAM base address.
- * @param status status interrupt to disable.
+ * @param status Status interrupt to be disabled.
  */
 static inline void FLEXRAM_DisableInterruptSignal(FLEXRAM_Type *base, uint32_t status)
 {
@@ -216,105 +354,156 @@ static inline void FLEXRAM_DisableInterruptSignal(FLEXRAM_Type *base, uint32_t s
 /* @} */
 
 /*!
- * @name functional
- * @{
- */
-
-/*!
- * @brief FLEXRAM module set TCM read access mode
+ * @brief FLEXRAM module sets TCM read access mode
  *
  * @param base  FLEXRAM base address.
- * @param mode  access mode.
+ * @param mode  Access mode.
  */
 static inline void FLEXRAM_SetTCMReadAccessMode(FLEXRAM_Type *base, flexram_tcm_access_mode_t mode)
 {
     base->TCM_CTRL &= ~FLEXRAM_TCM_CTRL_TCM_RWAIT_EN_MASK;
-    base->TCM_CTRL |= mode;
+    base->TCM_CTRL |= (uint32_t)mode;
 }
 
 /*!
  * @brief FLEXRAM module set TCM write access mode
  *
  * @param base  FLEXRAM base address.
- * @param mode  access mode.
+ * @param mode  Access mode.
  */
 static inline void FLEXRAM_SetTCMWriteAccessMode(FLEXRAM_Type *base, flexram_tcm_access_mode_t mode)
 {
     base->TCM_CTRL &= ~FLEXRAM_TCM_CTRL_TCM_WWAIT_EN_MASK;
-    base->TCM_CTRL |= mode;
+    base->TCM_CTRL |= (uint32_t)mode;
 }
 
 /*!
  * @brief FLEXRAM module force ram clock on
  *
  * @param base  FLEXRAM base address.
- * @param enable enable or disable clock force on.
+ * @param enable Enable or disable clock force on.
  */
 static inline void FLEXRAM_EnableForceRamClockOn(FLEXRAM_Type *base, bool enable)
 {
-    if (enable) {
+    if (enable)
+    {
         base->TCM_CTRL |= FLEXRAM_TCM_CTRL_FORCE_CLK_ON_MASK;
     }
-    else {
+    else
+    {
         base->TCM_CTRL &= ~FLEXRAM_TCM_CTRL_FORCE_CLK_ON_MASK;
     }
 }
 
+#if defined(FSL_FEATURE_FLEXRAM_HAS_MAGIC_ADDR) && FSL_FEATURE_FLEXRAM_HAS_MAGIC_ADDR
 /*!
- * @brief FLEXRAM OCRAM magic addr configuration
- * When read/write access hit magic address, it will generate interrupt
- * @param magicAddr magic address.
- * @param rwsel read write select, 0 read access , 1 write access
+ * @brief FLEXRAM OCRAM magic addr configuration.
+ * When read/write access hit magic address, it will generate interrupt.
+ * @param base  FLEXRAM base address.
+ * @param magicAddr Magic address, the actual address bits [18:3] is corresponding to the register field [16:1].
+ * @param rwSel Read/write selection. 0 for read access while 1 for write access.
  */
 static inline void FLEXRAM_SetOCRAMMagicAddr(FLEXRAM_Type *base, uint16_t magicAddr, uint32_t rwSel)
 {
-    base->OCRAM_MAGIC_ADDR =
-        FLEXRAM_OCRAM_MAGIC_ADDR_OCRAM_WR_RD_SEL(rwSel) | FLEXRAM_OCRAM_MAGIC_ADDR_OCRAM_MAGIC_ADDR(magicAddr >> 3U);
+    base->OCRAM_MAGIC_ADDR = FLEXRAM_OCRAM_MAGIC_ADDR_OCRAM_WR_RD_SEL(rwSel) |
+                             FLEXRAM_OCRAM_MAGIC_ADDR_OCRAM_MAGIC_ADDR((uint32_t)magicAddr >> 3);
 }
 
 /*!
- * @brief FLEXRAM DTCM magic addr configuration
- * When read/write access hit magic address, it will generate interrupt
- * @param magicAddr magic address.
- * @param rwsel read write select, 0 read access , 1 write access
+ * @brief FLEXRAM DTCM magic addr configuration.
+ * When read/write access hits magic address, it will generate interrupt.
+ * @param base  FLEXRAM base address.
+ * @param magicAddr Magic address, the actual address bits [18:3] is corresponding to the register field [16:1].
+ * @param rwSel Read/write selection. 0 for read access while 1 write access.
  */
 static inline void FLEXRAM_SetDTCMMagicAddr(FLEXRAM_Type *base, uint16_t magicAddr, uint32_t rwSel)
 {
-    base->DTCM_MAGIC_ADDR =
-        FLEXRAM_DTCM_MAGIC_ADDR_DTCM_WR_RD_SEL(rwSel) | FLEXRAM_DTCM_MAGIC_ADDR_DTCM_MAGIC_ADDR(magicAddr >> 3U);
+    base->DTCM_MAGIC_ADDR = FLEXRAM_DTCM_MAGIC_ADDR_DTCM_WR_RD_SEL(rwSel) |
+                            FLEXRAM_DTCM_MAGIC_ADDR_DTCM_MAGIC_ADDR((uint32_t)magicAddr >> 3);
 }
 
 /*!
- * @brief FLEXRAM ITCM magic addr configuration
- * When read/write access hit magic address, it will generate interrupt
- * @param magicAddr magic address.
- * @param rwsel read write select, 0 read access , 1 write access
+ * @brief FLEXRAM ITCM magic addr configuration.
+ * When read/write access hits magic address, it will generate interrupt.
+ * @param base  FLEXRAM base address.
+ * @param magicAddr Magic address, the actual address bits [18:3] is corresponding to the register field [16:1].
+ * @param rwSel Read/write selection. 0 for read access while 1 for write access.
  */
 static inline void FLEXRAM_SetITCMMagicAddr(FLEXRAM_Type *base, uint16_t magicAddr, uint32_t rwSel)
 {
-    base->ITCM_MAGIC_ADDR =
-        FLEXRAM_ITCM_MAGIC_ADDR_ITCM_WR_RD_SEL(rwSel) | FLEXRAM_ITCM_MAGIC_ADDR_ITCM_MAGIC_ADDR(magicAddr >> 3U);
+    base->ITCM_MAGIC_ADDR = FLEXRAM_ITCM_MAGIC_ADDR_ITCM_WR_RD_SEL(rwSel) |
+                            FLEXRAM_ITCM_MAGIC_ADDR_ITCM_MAGIC_ADDR((uint32_t)magicAddr >> 3);
 }
+#endif /* FSL_FEATURE_FLEXRAM_HAS_MAGIC_ADDR */
+
+#if (defined(FSL_FEATURE_FLEXRAM_HAS_ECC) && FSL_FEATURE_FLEXRAM_HAS_ECC)
+/*!
+ * @brief FLEXRAM get ocram ecc single error information.
+ * @param base  FLEXRAM base address.
+ * @param OcramECCEnable ocram ecc enablement.
+ * @param TcmECCEnable tcm(itcm/d0tcm/d1tcm) ecc enablement.
+ */
+void FLEXRAM_EnableECC(FLEXRAM_Type *base, bool OcramECCEnable, bool TcmECCEnable);
+
+#if (defined(FSL_FEATURE_FLEXRAM_HAS_ECC_ERROR_INJECTION) && (FSL_FEATURE_FLEXRAM_HAS_ECC_ERROR_INJECTION))
+/*!
+ * @brief FLEXRAM ECC error injection.
+ * @param base  FLEXRAM base address.
+ * @param memory memory type, such as OCRAM/ITCM/DTCM.
+ * @param error ECC error type.
+ */
+void FLEXRAM_ErrorInjection(FLEXRAM_Type *base, flexram_memory_type_t memory, flexram_ecc_error_type_t *error);
+#endif /* FSL_FEATURE_FLEXRAM_HAS_ECC_ERROR_INJECTION */
 
 /*!
- * @brief FLEXRAM allocate on-chip ram for OCRAM,ITCM,DTCM
- * This function is independent of FLEXRAM_Init, it can be called directly if ram re-allocate
- * is needed.
- * @param config allocate configuration.
- * @retval kStatus_InvalidArgument the argument is invalid
- * 		   kStatus_Success allocate success
+ * @brief FLEXRAM get ocram ecc single error information.
+ * @param base  FLEXRAM base address.
+ * @param info ecc error information.
  */
-status_t FLEXRAM_AllocateRam(flexram_allocate_ram_t *config);
+void FLEXRAM_GetOcramSingleErroInfo(FLEXRAM_Type *base, flexram_ocram_ecc_single_error_info_t *info);
 
 /*!
- * @brief FLEXRAM set allocate on-chip ram source
- * @param src bank config source select value.
+ * @brief FLEXRAM get ocram ecc multiple error information.
+ * @param base  FLEXRAM base address.
+ * @param info ecc error information.
  */
-static inline void FLEXRAM_SetAllocateRamSrc(flexram_bank_allocate_src_t src)
-{
-    IOMUXC_GPR->GPR16 &= ~IOMUXC_GPR_GPR16_FLEXRAM_BANK_CFG_SEL_MASK;
-    IOMUXC_GPR->GPR16 |= IOMUXC_GPR_GPR16_FLEXRAM_BANK_CFG_SEL(src);
+void FLEXRAM_GetOcramMultiErroInfo(FLEXRAM_Type *base, flexram_ocram_ecc_multi_error_info_t *info);
+
+/*!
+ * @brief FLEXRAM get itcm ecc single error information.
+ * @param base  FLEXRAM base address.
+ * @param info ecc error information.
+ */
+void FLEXRAM_GetItcmSingleErroInfo(FLEXRAM_Type *base, flexram_itcm_ecc_single_error_info_t *info);
+
+/*!
+ * @brief FLEXRAM get itcm ecc multiple error information.
+ * @param base  FLEXRAM base address.
+ * @param info ecc error information.
+ */
+void FLEXRAM_GetItcmMultiErroInfo(FLEXRAM_Type *base, flexram_itcm_ecc_multi_error_info_t *info);
+
+/*!
+ * @brief FLEXRAM get d0tcm ecc single error information.
+ * @param base  FLEXRAM base address.
+ * @param info ecc error information.
+ * @param bank DTCM bank, 0 is D0TCM, 1 is D1TCM.
+ */
+void FLEXRAM_GetDtcmSingleErroInfo(FLEXRAM_Type *base, flexram_dtcm_ecc_single_error_info_t *info, uint8_t bank);
+
+/*!
+ * @brief FLEXRAM get d0tcm ecc multiple error information.
+ * @param base  FLEXRAM base address.
+ * @param info ecc error information.
+ * @param bank DTCM bank, 0 is D0TCM, 1 is D1TCM.
+ */
+void FLEXRAM_GetDtcmMultiErroInfo(FLEXRAM_Type *base, flexram_dtcm_ecc_multi_error_info_t *info, uint8_t bank);
+
+#endif /* FSL_FEATURE_FLEXRAM_HAS_ECC */
+
+#if defined(__cplusplus)
 }
+#endif
 
 /*! @}*/
 

@@ -1,35 +1,9 @@
 /*
- * The Clear BSD License
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2022 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 #ifndef _FSL_LPSPI_H_
 #define _FSL_LPSPI_H_
@@ -47,8 +21,8 @@
 
 /*! @name Driver version */
 /*@{*/
-/*! @brief LPSPI driver version 2.0.1. */
-#define FSL_LPSPI_DRIVER_VERSION (MAKE_VERSION(2, 0, 2))
+/*! @brief LPSPI driver version. */
+#define FSL_LPSPI_DRIVER_VERSION (MAKE_VERSION(2, 4, 5))
 /*@}*/
 
 #ifndef LPSPI_DUMMY_DATA
@@ -56,16 +30,22 @@
 #define LPSPI_DUMMY_DATA (0x00U) /*!< Dummy data used for tx if there is not txData. */
 #endif
 
+/*! @brief Retry times for waiting flag. */
+#ifndef SPI_RETRY_TIMES
+#define SPI_RETRY_TIMES 0U /* Define to zero means keep waiting until the flag is assert/deassert. */
+#endif
+
 /*! @brief Global variable for dummy data value setting. */
 extern volatile uint8_t g_lpspiDummyData[];
 
 /*! @brief Status for the LPSPI driver.*/
-enum _lpspi_status
+enum
 {
     kStatus_LPSPI_Busy       = MAKE_STATUS(kStatusGroup_LPSPI, 0), /*!< LPSPI transfer is busy.*/
     kStatus_LPSPI_Error      = MAKE_STATUS(kStatusGroup_LPSPI, 1), /*!< LPSPI driver error. */
     kStatus_LPSPI_Idle       = MAKE_STATUS(kStatusGroup_LPSPI, 2), /*!< LPSPI is idle.*/
-    kStatus_LPSPI_OutOfRange = MAKE_STATUS(kStatusGroup_LPSPI, 3)  /*!< LPSPI transfer out Of range. */
+    kStatus_LPSPI_OutOfRange = MAKE_STATUS(kStatusGroup_LPSPI, 3), /*!< LPSPI transfer out Of range. */
+    kStatus_LPSPI_Timeout    = MAKE_STATUS(kStatusGroup_LPSPI, 4)  /*!< LPSPI timeout polling status flags. */
 };
 
 /*! @brief LPSPI status flags in SPIx_SR register.*/
@@ -301,6 +281,8 @@ typedef struct _lpspi_master_config
 
     lpspi_data_out_config_t dataOutConfig; /*!< Configures if the output data is tristated
                                             * between accesses (LPSPI_PCS is negated). */
+    bool enableInputDelay; /*!< Enable master to sample the input data on a delayed SCK. This can help improve slave
+                              setup time. Refer to device data sheet for specific time length. */
 } lpspi_master_config_t;
 
 /*! @brief LPSPI slave configuration structure.*/
@@ -375,7 +357,9 @@ struct _lpspi_master_handle
     volatile bool isPcsContinuous; /*!< Is PCS continuous in transfer. */
     volatile bool writeTcrInIsr;   /*!< A flag that whether should write TCR in ISR. */
 
-    volatile bool isByteSwap; /*!< A flag that whether should byte swap. */
+    volatile bool isByteSwap;        /*!< A flag that whether should byte swap. */
+    volatile bool isTxMask;          /*!< A flag that whether TCR[TXMSK] is set. */
+    volatile uint16_t bytesPerFrame; /*!< Number of bytes in each frame */
 
     volatile uint8_t fifoSize; /*!< FIFO dataSize. */
 
@@ -437,706 +421,745 @@ struct _lpspi_slave_handle
  * API
  *********************************************************************************************************************/
 #if defined(__cplusplus)
-extern "C"
-{
+extern "C" {
 #endif /*_cplusplus*/
 
-    /*!
-     * @name Initialization and deinitialization
-     * @{
-     */
+/*!
+ * @name Initialization and deinitialization
+ * @{
+ */
 
-    /*!
-     * @brief Initializes the LPSPI master.
-     *
-     * @param base LPSPI peripheral address.
-     * @param masterConfig Pointer to structure lpspi_master_config_t.
-     * @param srcClock_Hz Module source input clock in Hertz
-     */
-    void LPSPI_MasterInit(LPSPI_Type *base, const lpspi_master_config_t *masterConfig, uint32_t srcClock_Hz);
+/*!
+ * @brief Initializes the LPSPI master.
+ *
+ * @param base LPSPI peripheral address.
+ * @param masterConfig Pointer to structure lpspi_master_config_t.
+ * @param srcClock_Hz Module source input clock in Hertz
+ */
+void LPSPI_MasterInit(LPSPI_Type *base, const lpspi_master_config_t *masterConfig, uint32_t srcClock_Hz);
 
-    /*!
-     * @brief Sets the lpspi_master_config_t structure to default values.
-     *
-     * This API initializes the configuration structure  for LPSPI_MasterInit().
-     * The initialized structure can remain unchanged in LPSPI_MasterInit(), or can be modified
-     * before calling the LPSPI_MasterInit().
-     * Example:
-     * @code
-     *  lpspi_master_config_t  masterConfig;
-     *  LPSPI_MasterGetDefaultConfig(&masterConfig);
-     * @endcode
-     * @param masterConfig pointer to lpspi_master_config_t structure
-     */
-    void LPSPI_MasterGetDefaultConfig(lpspi_master_config_t *masterConfig);
+/*!
+ * @brief Sets the lpspi_master_config_t structure to default values.
+ *
+ * This API initializes the configuration structure  for LPSPI_MasterInit().
+ * The initialized structure can remain unchanged in LPSPI_MasterInit(), or can be modified
+ * before calling the LPSPI_MasterInit().
+ * Example:
+ * @code
+ *  lpspi_master_config_t  masterConfig;
+ *  LPSPI_MasterGetDefaultConfig(&masterConfig);
+ * @endcode
+ * @param masterConfig pointer to lpspi_master_config_t structure
+ */
+void LPSPI_MasterGetDefaultConfig(lpspi_master_config_t *masterConfig);
 
-    /*!
-     * @brief LPSPI slave configuration.
-     *
-     * @param base LPSPI peripheral address.
-     * @param slaveConfig Pointer to a structure lpspi_slave_config_t.
-     */
-    void LPSPI_SlaveInit(LPSPI_Type *base, const lpspi_slave_config_t *slaveConfig);
+/*!
+ * @brief LPSPI slave configuration.
+ *
+ * @param base LPSPI peripheral address.
+ * @param slaveConfig Pointer to a structure lpspi_slave_config_t.
+ */
+void LPSPI_SlaveInit(LPSPI_Type *base, const lpspi_slave_config_t *slaveConfig);
 
-    /*!
-     * @brief Sets the lpspi_slave_config_t structure to default values.
-     *
-     * This API initializes the configuration structure for LPSPI_SlaveInit().
-     * The initialized structure can remain unchanged in LPSPI_SlaveInit() or can be modified
-     * before calling the LPSPI_SlaveInit().
-     * Example:
-     * @code
-     *  lpspi_slave_config_t  slaveConfig;
-     *  LPSPI_SlaveGetDefaultConfig(&slaveConfig);
-     * @endcode
-     * @param slaveConfig pointer to lpspi_slave_config_t structure.
-     */
-    void LPSPI_SlaveGetDefaultConfig(lpspi_slave_config_t *slaveConfig);
+/*!
+ * @brief Sets the lpspi_slave_config_t structure to default values.
+ *
+ * This API initializes the configuration structure for LPSPI_SlaveInit().
+ * The initialized structure can remain unchanged in LPSPI_SlaveInit() or can be modified
+ * before calling the LPSPI_SlaveInit().
+ * Example:
+ * @code
+ *  lpspi_slave_config_t  slaveConfig;
+ *  LPSPI_SlaveGetDefaultConfig(&slaveConfig);
+ * @endcode
+ * @param slaveConfig pointer to lpspi_slave_config_t structure.
+ */
+void LPSPI_SlaveGetDefaultConfig(lpspi_slave_config_t *slaveConfig);
 
-    /*!
-     * @brief De-initializes the LPSPI peripheral. Call this API to disable the LPSPI clock.
-     * @param base LPSPI peripheral address.
-     */
-    void LPSPI_Deinit(LPSPI_Type *base);
+/*!
+ * @brief De-initializes the LPSPI peripheral. Call this API to disable the LPSPI clock.
+ * @param base LPSPI peripheral address.
+ */
+void LPSPI_Deinit(LPSPI_Type *base);
 
-    /*!
-     * @brief Restores the LPSPI peripheral to reset state. Note that this function
-     * sets all registers to reset state. As a result, the LPSPI module can't work after calling
-     * this API.
-     * @param base LPSPI peripheral address.
-     */
-    void LPSPI_Reset(LPSPI_Type *base);
+/*!
+ * @brief Restores the LPSPI peripheral to reset state. Note that this function
+ * sets all registers to reset state. As a result, the LPSPI module can't work after calling
+ * this API.
+ * @param base LPSPI peripheral address.
+ */
+void LPSPI_Reset(LPSPI_Type *base);
 
-    /*!
-     * @brief Enables the LPSPI peripheral and sets the MCR MDIS to 0.
-     *
-     * @param base LPSPI peripheral address.
-     * @param enable Pass true to enable module, false to disable module.
-     */
-    static inline void LPSPI_Enable(LPSPI_Type *base, bool enable)
+/*!
+ * @brief Get the LPSPI instance from peripheral base address.
+ *
+ * @param base LPSPI peripheral base address.
+ * @return LPSPI instance.
+ */
+uint32_t LPSPI_GetInstance(LPSPI_Type *base);
+
+/*!
+ * @brief Enables the LPSPI peripheral and sets the MCR MDIS to 0.
+ *
+ * @param base LPSPI peripheral address.
+ * @param enable Pass true to enable module, false to disable module.
+ */
+static inline void LPSPI_Enable(LPSPI_Type *base, bool enable)
+{
+    if (enable)
     {
-        if (enable) {
-            base->CR |= LPSPI_CR_MEN_MASK;
-        }
-        else {
-            base->CR &= ~LPSPI_CR_MEN_MASK;
-        }
+        base->CR |= LPSPI_CR_MEN_MASK;
     }
-
-    /*!
-     *@}
-     */
-
-    /*!
-     * @name Status
-     * @{
-     */
-
-    /*!
-     * @brief Gets the LPSPI status flag state.
-     * @param base LPSPI peripheral address.
-     * @return The LPSPI status(in SR register).
-     */
-    static inline uint32_t LPSPI_GetStatusFlags(LPSPI_Type *base)
+    else
     {
-        return (base->SR);
+        base->CR &= ~LPSPI_CR_MEN_MASK;
     }
-
-    /*!
-     * @brief Gets the LPSPI Tx FIFO size.
-     * @param base LPSPI peripheral address.
-     * @return The LPSPI Tx FIFO size.
-     */
-    static inline uint32_t LPSPI_GetTxFifoSize(LPSPI_Type *base)
+    /* ERRATA051472: The SR[REF] would assert if software disables the LPSPI module 
+       after receiving some data and then enabled the LPSPI again without performing a software reset.
+       Clear SR[REF] flag after LPSPI module enabled*/
+    if ((base->SR & (uint32_t)kLPSPI_ReceiveErrorFlag) != 0U)
     {
-        return (1U << ((base->PARAM & LPSPI_PARAM_TXFIFO_MASK) >> LPSPI_PARAM_TXFIFO_SHIFT));
+        base->SR = (uint32_t)kLPSPI_ReceiveErrorFlag;
     }
+}
 
-    /*!
-     * @brief Gets the LPSPI Rx FIFO size.
-     * @param base LPSPI peripheral address.
-     * @return The LPSPI Rx FIFO size.
-     */
-    static inline uint32_t LPSPI_GetRxFifoSize(LPSPI_Type *base)
+/*!
+ *@}
+ */
+
+/*!
+ * @name Status
+ * @{
+ */
+
+/*!
+ * @brief Gets the LPSPI status flag state.
+ * @param base LPSPI peripheral address.
+ * @return The LPSPI status(in SR register).
+ */
+static inline uint32_t LPSPI_GetStatusFlags(LPSPI_Type *base)
+{
+    return (base->SR);
+}
+
+/*!
+ * @brief Gets the LPSPI Tx FIFO size.
+ * @param base LPSPI peripheral address.
+ * @return The LPSPI Tx FIFO size.
+ */
+static inline uint8_t LPSPI_GetTxFifoSize(LPSPI_Type *base)
+{
+    return (1U << ((base->PARAM & LPSPI_PARAM_TXFIFO_MASK) >> LPSPI_PARAM_TXFIFO_SHIFT));
+}
+
+/*!
+ * @brief Gets the LPSPI Rx FIFO size.
+ * @param base LPSPI peripheral address.
+ * @return The LPSPI Rx FIFO size.
+ */
+static inline uint8_t LPSPI_GetRxFifoSize(LPSPI_Type *base)
+{
+    return (1U << ((base->PARAM & LPSPI_PARAM_RXFIFO_MASK) >> LPSPI_PARAM_RXFIFO_SHIFT));
+}
+
+/*!
+ * @brief Gets the LPSPI Tx FIFO count.
+ * @param base LPSPI peripheral address.
+ * @return The number of words in the transmit FIFO.
+ */
+static inline uint32_t LPSPI_GetTxFifoCount(LPSPI_Type *base)
+{
+    return ((base->FSR & LPSPI_FSR_TXCOUNT_MASK) >> LPSPI_FSR_TXCOUNT_SHIFT);
+}
+
+/*!
+ * @brief Gets the LPSPI Rx FIFO count.
+ * @param base LPSPI peripheral address.
+ * @return The number of words in the receive FIFO.
+ */
+static inline uint32_t LPSPI_GetRxFifoCount(LPSPI_Type *base)
+{
+    return ((base->FSR & LPSPI_FSR_RXCOUNT_MASK) >> LPSPI_FSR_RXCOUNT_SHIFT);
+}
+
+/*!
+ * @brief Clears the LPSPI status flag.
+ *
+ * This function  clears the desired status bit by using a write-1-to-clear. The user passes in the base and the
+ * desired status flag bit to clear.  The list of status flags is defined in the _lpspi_flags.
+ * Example usage:
+ * @code
+ *  LPSPI_ClearStatusFlags(base, kLPSPI_TxDataRequestFlag|kLPSPI_RxDataReadyFlag);
+ * @endcode
+ *
+ * @param base LPSPI peripheral address.
+ * @param statusFlags The status flag used from type _lpspi_flags.
+ */
+static inline void LPSPI_ClearStatusFlags(LPSPI_Type *base, uint32_t statusFlags)
+{
+    base->SR = statusFlags; /*!< The status flags are cleared by writing 1 (w1c).*/
+}
+
+/*!
+ *@}
+ */
+
+/*!
+ * @name Interrupts
+ * @{
+ */
+
+/*!
+ * @brief Enables the LPSPI interrupts.
+ *
+ * This function configures the various interrupt masks of the LPSPI.  The parameters are base and an interrupt mask.
+ * Note that, for Tx fill and Rx FIFO drain requests, enabling the interrupt request disables the DMA request.
+ *
+ * @code
+ *  LPSPI_EnableInterrupts(base, kLPSPI_TxInterruptEnable | kLPSPI_RxInterruptEnable );
+ * @endcode
+ *
+ * @param base LPSPI peripheral address.
+ * @param mask The interrupt mask; Use the enum _lpspi_interrupt_enable.
+ */
+static inline void LPSPI_EnableInterrupts(LPSPI_Type *base, uint32_t mask)
+{
+    base->IER |= mask;
+}
+
+/*!
+ * @brief Disables the LPSPI interrupts.
+ *
+ * @code
+ *  LPSPI_DisableInterrupts(base, kLPSPI_TxInterruptEnable | kLPSPI_RxInterruptEnable );
+ * @endcode
+ *
+ * @param base LPSPI peripheral address.
+ * @param mask The interrupt mask; Use the enum _lpspi_interrupt_enable.
+ */
+static inline void LPSPI_DisableInterrupts(LPSPI_Type *base, uint32_t mask)
+{
+    base->IER &= ~mask;
+}
+
+/*!
+ *@}
+ */
+
+/*!
+ * @name DMA Control
+ * @{
+ */
+
+/*!
+ * @brief Enables the LPSPI DMA request.
+ *
+ * This function configures the Rx and Tx DMA mask of the LPSPI. The parameters are base and a DMA mask.
+ * @code
+ *  LPSPI_EnableDMA(base, kLPSPI_TxDmaEnable | kLPSPI_RxDmaEnable);
+ * @endcode
+ *
+ * @param base LPSPI peripheral address.
+ * @param mask The interrupt mask; Use the enum _lpspi_dma_enable.
+ */
+static inline void LPSPI_EnableDMA(LPSPI_Type *base, uint32_t mask)
+{
+    base->DER |= mask;
+}
+
+/*!
+ * @brief Disables the LPSPI DMA request.
+ *
+ * This function configures the Rx and Tx DMA mask of the LPSPI.  The parameters are base and a DMA mask.
+ * @code
+ *  SPI_DisableDMA(base, kLPSPI_TxDmaEnable | kLPSPI_RxDmaEnable);
+ * @endcode
+ *
+ * @param base LPSPI peripheral address.
+ * @param mask The interrupt mask; Use the enum _lpspi_dma_enable.
+ */
+static inline void LPSPI_DisableDMA(LPSPI_Type *base, uint32_t mask)
+{
+    base->DER &= ~mask;
+}
+
+/*!
+ * @brief Gets the LPSPI Transmit Data Register address for a DMA operation.
+ *
+ * This function gets the LPSPI Transmit Data Register address because this value is needed
+ * for the DMA operation.
+ * This function can be used for either master or slave mode.
+ *
+ * @param base LPSPI peripheral address.
+ * @return The LPSPI Transmit Data Register address.
+ */
+static inline uint32_t LPSPI_GetTxRegisterAddress(LPSPI_Type *base)
+{
+    return (uint32_t) & (base->TDR);
+}
+
+/*!
+ * @brief Gets the LPSPI Receive Data Register address for a DMA operation.
+ *
+ * This function gets the LPSPI Receive Data Register address because this value is needed
+ * for the DMA operation.
+ * This function can be used for either master or slave mode.
+ *
+ * @param base LPSPI peripheral address.
+ * @return The LPSPI Receive Data Register address.
+ */
+static inline uint32_t LPSPI_GetRxRegisterAddress(LPSPI_Type *base)
+{
+    return (uint32_t) & (base->RDR);
+}
+
+/*!
+ *@}
+ */
+
+/*!
+ * @name Bus Operations
+ * @{
+ */
+
+/*!
+ * @brief Check the argument for transfer .
+ *
+ * @param base LPSPI peripheral address.
+ * @param transfer the transfer struct to be used.
+ * @param isEdma True to check for EDMA transfer, false to check interrupt non-blocking transfer
+ * @return Return true for right and false for wrong.
+ */
+bool LPSPI_CheckTransferArgument(LPSPI_Type *base, lpspi_transfer_t *transfer, bool isEdma);
+
+/*!
+ * @brief Configures the LPSPI for either master or slave.
+ *
+ * Note that the CFGR1 should only be written when the LPSPI is disabled (LPSPIx_CR_MEN = 0).
+ *
+ * @param base LPSPI peripheral address.
+ * @param mode Mode setting (master or slave) of type lpspi_master_slave_mode_t.
+ */
+static inline void LPSPI_SetMasterSlaveMode(LPSPI_Type *base, lpspi_master_slave_mode_t mode)
+{
+    base->CFGR1 = (base->CFGR1 & (~LPSPI_CFGR1_MASTER_MASK)) | LPSPI_CFGR1_MASTER(mode);
+}
+
+/*!
+ * @brief Configures the peripheral chip select used for the transfer.
+ *
+ * @param base LPSPI peripheral address.
+ * @param select LPSPI Peripheral Chip Select (PCS) configuration.
+ */
+static inline void LPSPI_SelectTransferPCS(LPSPI_Type *base, lpspi_which_pcs_t select)
+{
+    base->TCR = (base->TCR & (~LPSPI_TCR_PCS_MASK)) | LPSPI_TCR_PCS((uint8_t)select);
+}
+
+/*!
+ * @brief Set the PCS signal to continuous or uncontinuous mode.
+ *
+ * @note In master mode, continuous transfer will keep the PCS asserted at the end of the frame size, until a command
+ * word is received that starts a new frame. So PCS must be set back to uncontinuous when transfer finishes.
+ * In slave mode, when continuous transfer is enabled, the LPSPI will only transmit the first frame size bits, after
+ * that the LPSPI will transmit received data back (assuming a 32-bit shift register).
+ *
+ * @param base LPSPI peripheral address.
+ * @param IsContinous True to set the transfer PCS to continuous mode, false to set to uncontinuous mode.
+ */
+static inline void LPSPI_SetPCSContinous(LPSPI_Type *base, bool IsContinous)
+{
+    if (IsContinous)
     {
-        return (1U << ((base->PARAM & LPSPI_PARAM_RXFIFO_MASK) >> LPSPI_PARAM_RXFIFO_SHIFT));
+        base->TCR |= LPSPI_TCR_CONT_MASK;
     }
-
-    /*!
-     * @brief Gets the LPSPI Tx FIFO count.
-     * @param base LPSPI peripheral address.
-     * @return The number of words in the transmit FIFO.
-     */
-    static inline uint32_t LPSPI_GetTxFifoCount(LPSPI_Type *base)
+    else
     {
-        return ((base->FSR & LPSPI_FSR_TXCOUNT_MASK) >> LPSPI_FSR_TXCOUNT_SHIFT);
+        base->TCR &= ~LPSPI_TCR_CONT_MASK;
     }
+}
 
-    /*!
-     * @brief Gets the LPSPI Rx FIFO count.
-     * @param base LPSPI peripheral address.
-     * @return The number of words in the receive FIFO.
-     */
-    static inline uint32_t LPSPI_GetRxFifoCount(LPSPI_Type *base)
-    {
-        return ((base->FSR & LPSPI_FSR_RXCOUNT_MASK) >> LPSPI_FSR_RXCOUNT_SHIFT);
-    }
+/*!
+ * @brief Returns whether the LPSPI module is in master mode.
+ *
+ * @param base LPSPI peripheral address.
+ * @return Returns true if the module is in master mode or false if the module is in slave mode.
+ */
+static inline bool LPSPI_IsMaster(LPSPI_Type *base)
+{
+    return (bool)((base->CFGR1) & LPSPI_CFGR1_MASTER_MASK);
+}
 
-    /*!
-     * @brief Clears the LPSPI status flag.
-     *
-     * This function  clears the desired status bit by using a write-1-to-clear. The user passes in the base and the
-     * desired status flag bit to clear.  The list of status flags is defined in the _lpspi_flags.
-     * Example usage:
-     * @code
-     *  LPSPI_ClearStatusFlags(base, kLPSPI_TxDataRequestFlag|kLPSPI_RxDataReadyFlag);
-     * @endcode
-     *
-     * @param base LPSPI peripheral address.
-     * @param statusFlags The status flag used from type _lpspi_flags.
-     */
-    static inline void LPSPI_ClearStatusFlags(LPSPI_Type *base, uint32_t statusFlags)
-    {
-        base->SR = statusFlags; /*!< The status flags are cleared by writing 1 (w1c).*/
-    }
+/*!
+ * @brief Flushes the LPSPI FIFOs.
+ *
+ * @param base LPSPI peripheral address.
+ * @param flushTxFifo Flushes (true) the Tx FIFO, else do not flush (false) the Tx FIFO.
+ * @param flushRxFifo Flushes (true) the Rx FIFO, else do not flush (false) the Rx FIFO.
+ */
+static inline void LPSPI_FlushFifo(LPSPI_Type *base, bool flushTxFifo, bool flushRxFifo)
+{
+    base->CR |= ((uint32_t)flushTxFifo << LPSPI_CR_RTF_SHIFT) | ((uint32_t)flushRxFifo << LPSPI_CR_RRF_SHIFT);
+}
 
-    /*!
-     *@}
-     */
+/*!
+ * @brief Sets the transmit and receive FIFO watermark values.
+ *
+ * This function allows the user to set the receive and transmit FIFO watermarks. The function
+ * does not compare the watermark settings to the FIFO size. The FIFO watermark should not be
+ * equal to or greater than the FIFO size.  It is up to the higher level driver to make this check.
+ *
+ * @param base LPSPI peripheral address.
+ * @param txWater The TX FIFO watermark value. Writing a value equal or greater than the FIFO size is truncated.
+ * @param rxWater The RX FIFO watermark value. Writing a value equal or greater than the FIFO size is truncated.
+ */
+static inline void LPSPI_SetFifoWatermarks(LPSPI_Type *base, uint32_t txWater, uint32_t rxWater)
+{
+    base->FCR = LPSPI_FCR_TXWATER(txWater) | LPSPI_FCR_RXWATER(rxWater);
+}
 
-    /*!
-     * @name Interrupts
-     * @{
-     */
+/*!
+ * @brief Configures all LPSPI peripheral chip select polarities simultaneously.
+ *
+ * Note that the CFGR1 should only be written when the LPSPI is disabled (LPSPIx_CR_MEN = 0).
+ *
+ * This is an example:  PCS0 and PCS1 set to active low and other PCSs set to active high. Note that the number of
+ * PCS is device-specific.
+ * @code
+ *  LPSPI_SetAllPcsPolarity(base, kLPSPI_Pcs0ActiveLow | kLPSPI_Pcs1ActiveLow);
+ * @endcode
+ *
+ * @param base LPSPI peripheral address.
+ * @param mask The PCS polarity mask; Use the enum _lpspi_pcs_polarity.
+ */
+static inline void LPSPI_SetAllPcsPolarity(LPSPI_Type *base, uint32_t mask)
+{
+    base->CFGR1 = (base->CFGR1 & ~LPSPI_CFGR1_PCSPOL_MASK) | LPSPI_CFGR1_PCSPOL(~mask);
+}
 
-    /*!
-     * @brief Enables the LPSPI interrupts.
-     *
-     * This function configures the various interrupt masks of the LPSPI.  The parameters are base and an interrupt
-     * mask. Note that, for Tx fill and Rx FIFO drain requests, enabling the interrupt request disables the DMA request.
-     *
-     * @code
-     *  LPSPI_EnableInterrupts(base, kLPSPI_TxInterruptEnable | kLPSPI_RxInterruptEnable );
-     * @endcode
-     *
-     * @param base LPSPI peripheral address.
-     * @param mask The interrupt mask; Use the enum _lpspi_interrupt_enable.
-     */
-    static inline void LPSPI_EnableInterrupts(LPSPI_Type *base, uint32_t mask)
-    {
-        base->IER |= mask;
-    }
+/*!
+ * @brief Configures the frame size.
+ *
+ * The minimum frame size is 8-bits and the maximum frame size is 4096-bits. If the frame size is less than or equal
+ * to 32-bits, the word size and frame size are identical. If the frame size is greater than 32-bits, the word
+ * size is 32-bits for each word except the last (the last word contains the remainder bits if the frame size is not
+ * divisible by 32). The minimum word size is 2-bits. A frame size of 33-bits (or similar) is not supported.
+ *
+ * Note 1: The transmit command register should be initialized before enabling the LPSPI in slave mode, although
+ * the command register does not update until after the LPSPI is enabled. After it is enabled, the transmit command
+ * register
+ * should only be changed if the LPSPI is idle.
+ *
+ * Note 2: The transmit and command FIFO is a combined FIFO that includes both transmit data and command words. That
+ * means the TCR register should be written to when the Tx FIFO is not full.
+ *
+ * @param base LPSPI peripheral address.
+ * @param frameSize The frame size in number of bits.
+ */
+static inline void LPSPI_SetFrameSize(LPSPI_Type *base, uint32_t frameSize)
+{
+    base->TCR = (base->TCR & ~LPSPI_TCR_FRAMESZ_MASK) | LPSPI_TCR_FRAMESZ(frameSize - 1U);
+}
 
-    /*!
-     * @brief Disables the LPSPI interrupts.
-     *
-     * @code
-     *  LPSPI_DisableInterrupts(base, kLPSPI_TxInterruptEnable | kLPSPI_RxInterruptEnable );
-     * @endcode
-     *
-     * @param base LPSPI peripheral address.
-     * @param mask The interrupt mask; Use the enum _lpspi_interrupt_enable.
-     */
-    static inline void LPSPI_DisableInterrupts(LPSPI_Type *base, uint32_t mask)
-    {
-        base->IER &= ~mask;
-    }
+/*!
+ * @brief Sets the LPSPI baud rate in bits per second.
+ *
+ * This function takes in the desired bitsPerSec (baud rate) and calculates the nearest
+ * possible baud rate without exceeding the desired baud rate and returns the
+ * calculated baud rate in bits-per-second. It requires the caller to provide
+ * the frequency of the module source clock (in Hertz). Note that the baud rate
+ * does not go into effect until the Transmit Control Register (TCR) is programmed
+ * with the prescale value. Hence, this function returns the prescale tcrPrescaleValue
+ * parameter for later programming in the TCR.  The higher level
+ * peripheral driver should alert the user of an out of range baud rate input.
+ *
+ * Note that the LPSPI module must first be disabled before configuring this.
+ * Note that the LPSPI module must be configured for master mode before configuring this.
+ *
+ * @param base LPSPI peripheral address.
+ * @param baudRate_Bps The desired baud rate in bits per second.
+ * @param srcClock_Hz Module source input clock in Hertz.
+ * @param tcrPrescaleValue The TCR prescale value needed to program the TCR.
+ * @return  The actual calculated baud rate. This function may also return a "0" if the
+ *          LPSPI is not configured for master mode or if the LPSPI module is not disabled.
+ */
 
-    /*!
-     *@}
-     */
+uint32_t LPSPI_MasterSetBaudRate(LPSPI_Type *base,
+                                 uint32_t baudRate_Bps,
+                                 uint32_t srcClock_Hz,
+                                 uint32_t *tcrPrescaleValue);
 
-    /*!
-     * @name DMA Control
-     * @{
-     */
+/*!
+ * @brief Manually configures a specific LPSPI delay parameter (module must be disabled to
+ *        change the delay values).
+ *
+ * This function configures the following:
+ * SCK to PCS delay, or
+ * PCS to SCK delay, or
+ * The configurations must occur between the transfer delay.
+ *
+ * The delay names are available in type lpspi_delay_type_t.
+ *
+ * The user passes the desired delay along with the delay value.
+ * This allows the user to directly set the delay values if they have
+ * pre-calculated them or if they simply wish to manually increment the value.
+ *
+ * Note that the LPSPI module must first be disabled before configuring this.
+ * Note that the LPSPI module must be configured for master mode before configuring this.
+ *
+ * @param base LPSPI peripheral address.
+ * @param scaler The 8-bit delay value 0x00 to 0xFF (255).
+ * @param whichDelay The desired delay to configure, must be of type lpspi_delay_type_t.
+ */
+void LPSPI_MasterSetDelayScaler(LPSPI_Type *base, uint32_t scaler, lpspi_delay_type_t whichDelay);
 
-    /*!
-     * @brief Enables the LPSPI DMA request.
-     *
-     * This function configures the Rx and Tx DMA mask of the LPSPI. The parameters are base and a DMA mask.
-     * @code
-     *  LPSPI_EnableDMA(base, kLPSPI_TxDmaEnable | kLPSPI_RxDmaEnable);
-     * @endcode
-     *
-     * @param base LPSPI peripheral address.
-     * @param mask The interrupt mask; Use the enum _lpspi_dma_enable.
-     */
-    static inline void LPSPI_EnableDMA(LPSPI_Type *base, uint32_t mask)
-    {
-        base->DER |= mask;
-    }
+/*!
+ * @brief Calculates the delay based on the desired delay input in nanoseconds (module must be
+ *        disabled to change the delay values).
+ *
+ * This function calculates the values for the following:
+ * SCK to PCS delay, or
+ * PCS to SCK delay, or
+ * The configurations must occur between the transfer delay.
+ *
+ * The delay names are available in type lpspi_delay_type_t.
+ *
+ * The user passes the desired delay and the desired delay value in
+ * nano-seconds.  The function calculates the value needed for the desired delay parameter
+ * and returns the actual calculated delay because an exact delay match may not be possible. In this
+ * case, the closest match is calculated without going below the desired delay value input.
+ * It is possible to input a very large delay value that exceeds the capability of the part, in
+ * which case the maximum supported delay is returned. It is up to the higher level
+ * peripheral driver to alert the user of an out of range delay input.
+ *
+ * Note that the LPSPI module must be configured for master mode before configuring this. And note that
+ * the delayTime = LPSPI_clockSource / (PRESCALE * Delay_scaler).
+ *
+ * @param base LPSPI peripheral address.
+ * @param delayTimeInNanoSec The desired delay value in nano-seconds.
+ * @param whichDelay The desired delay to configuration, which must be of type lpspi_delay_type_t.
+ * @param srcClock_Hz  Module source input clock in Hertz.
+ * @return actual Calculated delay value in nano-seconds.
+ */
+uint32_t LPSPI_MasterSetDelayTimes(LPSPI_Type *base,
+                                   uint32_t delayTimeInNanoSec,
+                                   lpspi_delay_type_t whichDelay,
+                                   uint32_t srcClock_Hz);
 
-    /*!
-     * @brief Disables the LPSPI DMA request.
-     *
-     * This function configures the Rx and Tx DMA mask of the LPSPI.  The parameters are base and a DMA mask.
-     * @code
-     *  SPI_DisableDMA(base, kLPSPI_TxDmaEnable | kLPSPI_RxDmaEnable);
-     * @endcode
-     *
-     * @param base LPSPI peripheral address.
-     * @param mask The interrupt mask; Use the enum _lpspi_dma_enable.
-     */
-    static inline void LPSPI_DisableDMA(LPSPI_Type *base, uint32_t mask)
-    {
-        base->DER &= ~mask;
-    }
+/*!
+ * @brief Writes data into the transmit data buffer.
+ *
+ * This function writes data passed in by the user to the Transmit Data Register (TDR).
+ * The user can pass up to 32-bits of data to load into the TDR. If the frame size exceeds 32-bits,
+ * the user has to manage sending the data one 32-bit word at a time.
+ * Any writes to the TDR result in an immediate push to the transmit FIFO.
+ * This function can be used for either master or slave modes.
+ *
+ * @param base LPSPI peripheral address.
+ * @param data The data word to be sent.
+ */
+static inline void LPSPI_WriteData(LPSPI_Type *base, uint32_t data)
+{
+    base->TDR = data;
+}
 
-    /*!
-     * @brief Gets the LPSPI Transmit Data Register address for a DMA operation.
-     *
-     * This function gets the LPSPI Transmit Data Register address because this value is needed
-     * for the DMA operation.
-     * This function can be used for either master or slave mode.
-     *
-     * @param base LPSPI peripheral address.
-     * @return The LPSPI Transmit Data Register address.
-     */
-    static inline uint32_t LPSPI_GetTxRegisterAddress(LPSPI_Type *base)
-    {
-        return (uint32_t) & (base->TDR);
-    }
+/*!
+ * @brief Reads data from the data buffer.
+ *
+ * This function reads the data from the Receive Data Register (RDR).
+ * This function can be used for either master or slave mode.
+ *
+ * @param base LPSPI peripheral address.
+ * @return The data read from the data buffer.
+ */
+static inline uint32_t LPSPI_ReadData(LPSPI_Type *base)
+{
+    return (base->RDR);
+}
 
-    /*!
-     * @brief Gets the LPSPI Receive Data Register address for a DMA operation.
-     *
-     * This function gets the LPSPI Receive Data Register address because this value is needed
-     * for the DMA operation.
-     * This function can be used for either master or slave mode.
-     *
-     * @param base LPSPI peripheral address.
-     * @return The LPSPI Receive Data Register address.
-     */
-    static inline uint32_t LPSPI_GetRxRegisterAddress(LPSPI_Type *base)
-    {
-        return (uint32_t) & (base->RDR);
-    }
+/*!
+ * @brief Set up the dummy data.
+ *
+ * @param base LPSPI peripheral address.
+ * @param dummyData Data to be transferred when tx buffer is NULL.
+ * Note:
+ *      This API has no effect when LPSPI in slave interrupt mode, because driver
+ *      will set the TXMSK bit to 1 if txData is NULL, no data is loaded from transmit
+ *      FIFO and output pin is tristated.
+ */
+void LPSPI_SetDummyData(LPSPI_Type *base, uint8_t dummyData);
 
-    /*!
-     *@}
-     */
+/*!
+ *@}
+ */
 
-    /*!
-     * @name Bus Operations
-     * @{
-     */
+/*!
+ * @name Transactional
+ * @{
+ */
+/*Transactional APIs*/
 
-    /*!
-     * @brief Get instance number for LPSPI module.
-     *
-     * @param base LPSPI peripheral base address.
-     * @return Return the value of LPSPI instance.
-     */
-    uint32_t LPSPI_GetInstance(LPSPI_Type *base);
+/*!
+ * @brief Initializes the LPSPI master handle.
+ *
+ * This function initializes the LPSPI handle, which can be used for other LPSPI transactional APIs.  Usually, for a
+ * specified LPSPI instance, call this API once to get the initialized handle.
 
-    /*!
-     * @brief Check the argument for transfer .
-     *
-     * @param transfer the transfer struct to be used.
-     * @param bitPerFrame The bit size of one frame.
-     * @param bytePerFrame The byte size of one frame.
-     * @return Return true for right and false for wrong.
-     */
-    bool LPSPI_CheckTransferArgument(lpspi_transfer_t *transfer, uint32_t bitsPerFrame, uint32_t bytesPerFrame);
+ * @param base LPSPI peripheral address.
+ * @param handle LPSPI handle pointer to lpspi_master_handle_t.
+ * @param callback DSPI callback.
+ * @param userData callback function parameter.
+ */
+void LPSPI_MasterTransferCreateHandle(LPSPI_Type *base,
+                                      lpspi_master_handle_t *handle,
+                                      lpspi_master_transfer_callback_t callback,
+                                      void *userData);
 
-    /*!
-     * @brief Configures the LPSPI for either master or slave.
-     *
-     * Note that the CFGR1 should only be written when the LPSPI is disabled (LPSPIx_CR_MEN = 0).
-     *
-     * @param base LPSPI peripheral address.
-     * @param mode Mode setting (master or slave) of type lpspi_master_slave_mode_t.
-     */
-    static inline void LPSPI_SetMasterSlaveMode(LPSPI_Type *base, lpspi_master_slave_mode_t mode)
-    {
-        base->CFGR1 = (base->CFGR1 & (~LPSPI_CFGR1_MASTER_MASK)) | LPSPI_CFGR1_MASTER(mode);
-    }
+/*!
+ * @brief LPSPI master transfer data using a polling method.
+ *
+ * This function transfers data using a  polling method. This is a blocking function, which does not return until all
+ * transfers have been
+ * completed.
+ *
+ * Note:
+ * The transfer data size should be integer multiples of bytesPerFrame if bytesPerFrame is less than or equal to 4.
+ * For bytesPerFrame greater than 4:
+ * The transfer data size should be equal to bytesPerFrame if the bytesPerFrame is not integer multiples of 4.
+ * Otherwise, the transfer data size can be an integer multiple of bytesPerFrame.
+ *
+ * @param base LPSPI peripheral address.
+ * @param transfer pointer to lpspi_transfer_t structure.
+ * @return status of status_t.
+ */
+status_t LPSPI_MasterTransferBlocking(LPSPI_Type *base, lpspi_transfer_t *transfer);
 
-    /*!
-     * @brief Returns whether the LPSPI module is in master mode.
-     *
-     * @param base LPSPI peripheral address.
-     * @return Returns true if the module is in master mode or false if the module is in slave mode.
-     */
-    static inline bool LPSPI_IsMaster(LPSPI_Type *base)
-    {
-        return (bool)((base->CFGR1) & LPSPI_CFGR1_MASTER_MASK);
-    }
+/*!
+ * @brief LPSPI master transfer data using an interrupt method.
+ *
+ * This function transfers data using an interrupt method. This is a non-blocking function, which returns right away.
+ * When all data is transferred, the callback function is called.
+ *
+ * Note:
+ * The transfer data size should be integer multiples of bytesPerFrame if bytesPerFrame is less than or equal to 4.
+ * For bytesPerFrame greater than 4:
+ * The transfer data size should be equal to bytesPerFrame if the bytesPerFrame is not integer multiples of 4.
+ * Otherwise, the transfer data size can be an integer multiple of bytesPerFrame.
+ *
+ * @param base LPSPI peripheral address.
+ * @param handle pointer to lpspi_master_handle_t structure which stores the transfer state.
+ * @param transfer pointer to lpspi_transfer_t structure.
+ * @return status of status_t.
+ */
+status_t LPSPI_MasterTransferNonBlocking(LPSPI_Type *base, lpspi_master_handle_t *handle, lpspi_transfer_t *transfer);
 
-    /*!
-     * @brief Flushes the LPSPI FIFOs.
-     *
-     * @param base LPSPI peripheral address.
-     * @param flushTxFifo Flushes (true) the Tx FIFO, else do not flush (false) the Tx FIFO.
-     * @param flushRxFifo Flushes (true) the Rx FIFO, else do not flush (false) the Rx FIFO.
-     */
-    static inline void LPSPI_FlushFifo(LPSPI_Type *base, bool flushTxFifo, bool flushRxFifo)
-    {
-        base->CR |= ((uint32_t)flushTxFifo << LPSPI_CR_RTF_SHIFT) | ((uint32_t)flushRxFifo << LPSPI_CR_RRF_SHIFT);
-    }
+/*!
+ * @brief Gets the master transfer remaining bytes.
+ *
+ * This function gets the master transfer remaining bytes.
+ *
+ * @param base LPSPI peripheral address.
+ * @param handle pointer to lpspi_master_handle_t structure which stores the transfer state.
+ * @param count Number of bytes transferred so far by the non-blocking transaction.
+ * @return status of status_t.
+ */
+status_t LPSPI_MasterTransferGetCount(LPSPI_Type *base, lpspi_master_handle_t *handle, size_t *count);
 
-    /*!
-     * @brief Sets the transmit and receive FIFO watermark values.
-     *
-     * This function allows the user to set the receive and transmit FIFO watermarks. The function
-     * does not compare the watermark settings to the FIFO size. The FIFO watermark should not be
-     * equal to or greater than the FIFO size.  It is up to the higher level driver to make this check.
-     *
-     * @param base LPSPI peripheral address.
-     * @param txWater The TX FIFO watermark value. Writing a value equal or greater than the FIFO size is truncated.
-     * @param rxWater The RX FIFO watermark value. Writing a value equal or greater than the FIFO size is truncated.
-     */
-    static inline void LPSPI_SetFifoWatermarks(LPSPI_Type *base, uint32_t txWater, uint32_t rxWater)
-    {
-        base->FCR = LPSPI_FCR_TXWATER(txWater) | LPSPI_FCR_RXWATER(rxWater);
-    }
+/*!
+ * @brief LPSPI master abort transfer which uses an interrupt method.
+ *
+ * This function aborts a transfer which uses an interrupt method.
+ *
+ * @param base LPSPI peripheral address.
+ * @param handle pointer to lpspi_master_handle_t structure which stores the transfer state.
+ */
+void LPSPI_MasterTransferAbort(LPSPI_Type *base, lpspi_master_handle_t *handle);
 
-    /*!
-     * @brief Configures all LPSPI peripheral chip select polarities simultaneously.
-     *
-     * Note that the CFGR1 should only be written when the LPSPI is disabled (LPSPIx_CR_MEN = 0).
-     *
-     * This is an example:  PCS0 and PCS1 set to active low and other PCSs set to active high. Note that the number of
-     * PCS is device-specific.
-     * @code
-     *  LPSPI_SetAllPcsPolarity(base, kLPSPI_Pcs0ActiveLow | kLPSPI_Pcs1ActiveLow);
-     * @endcode
-     *
-     * @param base LPSPI peripheral address.
-     * @param mask The PCS polarity mask; Use the enum _lpspi_pcs_polarity.
-     */
-    static inline void LPSPI_SetAllPcsPolarity(LPSPI_Type *base, uint32_t mask)
-    {
-        base->CFGR1 = (base->CFGR1 & ~LPSPI_CFGR1_PCSPOL_MASK) | LPSPI_CFGR1_PCSPOL(~mask);
-    }
+/*!
+ * @brief LPSPI Master IRQ handler function.
+ *
+ * This function processes the LPSPI transmit and receive IRQ.
+ *
+ * @param base LPSPI peripheral address.
+ * @param handle pointer to lpspi_master_handle_t structure which stores the transfer state.
+ */
+void LPSPI_MasterTransferHandleIRQ(LPSPI_Type *base, lpspi_master_handle_t *handle);
 
-    /*!
-     * @brief Configures the frame size.
-     *
-     * The minimum frame size is 8-bits and the maximum frame size is 4096-bits. If the frame size is less than or equal
-     * to 32-bits, the word size and frame size are identical. If the frame size is greater than 32-bits, the word
-     * size is 32-bits for each word except the last (the last word contains the remainder bits if the frame size is not
-     * divisible by 32). The minimum word size is 2-bits. A frame size of 33-bits (or similar) is not supported.
-     *
-     * Note 1: The transmit command register should be initialized before enabling the LPSPI in slave mode, although
-     * the command register does not update until after the LPSPI is enabled. After it is enabled, the transmit command
-     * register
-     * should only be changed if the LPSPI is idle.
-     *
-     * Note 2: The transmit and command FIFO is a combined FIFO that includes both transmit data and command words. That
-     * means the TCR register should be written to when the Tx FIFO is not full.
-     *
-     * @param base LPSPI peripheral address.
-     * @param frameSize The frame size in number of bits.
-     */
-    static inline void LPSPI_SetFrameSize(LPSPI_Type *base, uint32_t frameSize)
-    {
-        base->TCR = (base->TCR & ~LPSPI_TCR_FRAMESZ_MASK) | LPSPI_TCR_FRAMESZ(frameSize - 1);
-    }
+/*!
+ * @brief Initializes the LPSPI slave handle.
+ *
+ * This function initializes the LPSPI handle, which can be used for other LPSPI transactional APIs.  Usually, for a
+ * specified LPSPI instance, call this API once to get the initialized handle.
+ *
+ * @param base LPSPI peripheral address.
+ * @param handle LPSPI handle pointer to lpspi_slave_handle_t.
+ * @param callback DSPI callback.
+ * @param userData callback function parameter.
+ */
+void LPSPI_SlaveTransferCreateHandle(LPSPI_Type *base,
+                                     lpspi_slave_handle_t *handle,
+                                     lpspi_slave_transfer_callback_t callback,
+                                     void *userData);
 
-    /*!
-     * @brief Sets the LPSPI baud rate in bits per second.
-     *
-     * This function takes in the desired bitsPerSec (baud rate) and calculates the nearest
-     * possible baud rate without exceeding the desired baud rate and returns the
-     * calculated baud rate in bits-per-second. It requires the caller to provide
-     * the frequency of the module source clock (in Hertz). Note that the baud rate
-     * does not go into effect until the Transmit Control Register (TCR) is programmed
-     * with the prescale value. Hence, this function returns the prescale tcrPrescaleValue
-     * parameter for later programming in the TCR.  The higher level
-     * peripheral driver should alert the user of an out of range baud rate input.
-     *
-     * Note that the LPSPI module must first be disabled before configuring this.
-     * Note that the LPSPI module must be configured for master mode before configuring this.
-     *
-     * @param base LPSPI peripheral address.
-     * @param baudRate_Bps The desired baud rate in bits per second.
-     * @param srcClock_Hz Module source input clock in Hertz.
-     * @param tcrPrescaleValue The TCR prescale value needed to program the TCR.
-     * @return  The actual calculated baud rate. This function may also return a "0" if the
-     *          LPSPI is not configured for master mode or if the LPSPI module is not disabled.
-     */
+/*!
+ * @brief LPSPI slave transfer data using an interrupt method.
+ *
+ * This function transfer data using an interrupt method. This is a non-blocking function, which returns right away.
+ * When all data is transferred, the callback function is called.
+ *
+ * Note:
+ * The transfer data size should be integer multiples of bytesPerFrame if bytesPerFrame is less than or equal to 4.
+ * For bytesPerFrame greater than 4:
+ * The transfer data size should be equal to bytesPerFrame if the bytesPerFrame is not an integer multiple of 4.
+ * Otherwise, the transfer data size can be an integer multiple of bytesPerFrame.
+ *
+ * @param base LPSPI peripheral address.
+ * @param handle pointer to lpspi_slave_handle_t structure which stores the transfer state.
+ * @param transfer pointer to lpspi_transfer_t structure.
+ * @return status of status_t.
+ */
+status_t LPSPI_SlaveTransferNonBlocking(LPSPI_Type *base, lpspi_slave_handle_t *handle, lpspi_transfer_t *transfer);
 
-    uint32_t LPSPI_MasterSetBaudRate(LPSPI_Type *base,
-                                     uint32_t baudRate_Bps,
-                                     uint32_t srcClock_Hz,
-                                     uint32_t *tcrPrescaleValue);
+/*!
+ * @brief Gets the slave transfer remaining bytes.
+ *
+ * This function gets the slave transfer remaining bytes.
+ *
+ * @param base LPSPI peripheral address.
+ * @param handle pointer to lpspi_slave_handle_t structure which stores the transfer state.
+ * @param count Number of bytes transferred so far by the non-blocking transaction.
+ * @return status of status_t.
+ */
+status_t LPSPI_SlaveTransferGetCount(LPSPI_Type *base, lpspi_slave_handle_t *handle, size_t *count);
 
-    /*!
-     * @brief Manually configures a specific LPSPI delay parameter (module must be disabled to
-     *        change the delay values).
-     *
-     * This function configures the following:
-     * SCK to PCS delay, or
-     * PCS to SCK delay, or
-     * The configurations must occur between the transfer delay.
-     *
-     * The delay names are available in type lpspi_delay_type_t.
-     *
-     * The user passes the desired delay along with the delay value.
-     * This allows the user to directly set the delay values if they have
-     * pre-calculated them or if they simply wish to manually increment the value.
-     *
-     * Note that the LPSPI module must first be disabled before configuring this.
-     * Note that the LPSPI module must be configured for master mode before configuring this.
-     *
-     * @param base LPSPI peripheral address.
-     * @param scaler The 8-bit delay value 0x00 to 0xFF (255).
-     * @param whichDelay The desired delay to configure, must be of type lpspi_delay_type_t.
-     */
-    void LPSPI_MasterSetDelayScaler(LPSPI_Type *base, uint32_t scaler, lpspi_delay_type_t whichDelay);
+/*!
+ * @brief LPSPI slave aborts a transfer which uses an interrupt method.
+ *
+ * This function aborts a transfer which uses an interrupt method.
+ *
+ * @param base LPSPI peripheral address.
+ * @param handle pointer to lpspi_slave_handle_t structure which stores the transfer state.
+ */
+void LPSPI_SlaveTransferAbort(LPSPI_Type *base, lpspi_slave_handle_t *handle);
 
-    /*!
-     * @brief Calculates the delay based on the desired delay input in nanoseconds (module must be
-     *        disabled to change the delay values).
-     *
-     * This function calculates the values for the following:
-     * SCK to PCS delay, or
-     * PCS to SCK delay, or
-     * The configurations must occur between the transfer delay.
-     *
-     * The delay names are available in type lpspi_delay_type_t.
-     *
-     * The user passes the desired delay and the desired delay value in
-     * nano-seconds.  The function calculates the value needed for the desired delay parameter
-     * and returns the actual calculated delay because an exact delay match may not be possible. In this
-     * case, the closest match is calculated without going below the desired delay value input.
-     * It is possible to input a very large delay value that exceeds the capability of the part, in
-     * which case the maximum supported delay is returned. It is up to the higher level
-     * peripheral driver to alert the user of an out of range delay input.
-     *
-     * Note that the LPSPI module must be configured for master mode before configuring this. And note that
-     * the delayTime = LPSPI_clockSource / (PRESCALE * Delay_scaler).
-     *
-     * @param base LPSPI peripheral address.
-     * @param delayTimeInNanoSec The desired delay value in nano-seconds.
-     * @param whichDelay The desired delay to configuration, which must be of type lpspi_delay_type_t.
-     * @param srcClock_Hz  Module source input clock in Hertz.
-     * @return actual Calculated delay value in nano-seconds.
-     */
-    uint32_t LPSPI_MasterSetDelayTimes(LPSPI_Type *base,
-                                       uint32_t delayTimeInNanoSec,
-                                       lpspi_delay_type_t whichDelay,
-                                       uint32_t srcClock_Hz);
+/*!
+ * @brief LPSPI Slave IRQ handler function.
+ *
+ * This function processes the LPSPI transmit and receives an IRQ.
+ *
+ * @param base LPSPI peripheral address.
+ * @param handle pointer to lpspi_slave_handle_t structure which stores the transfer state.
+ */
+void LPSPI_SlaveTransferHandleIRQ(LPSPI_Type *base, lpspi_slave_handle_t *handle);
 
-    /*!
-     * @brief Writes data into the transmit data buffer.
-     *
-     * This function writes data passed in by the user to the Transmit Data Register (TDR).
-     * The user can pass up to 32-bits of data to load into the TDR. If the frame size exceeds 32-bits,
-     * the user has to manage sending the data one 32-bit word at a time.
-     * Any writes to the TDR result in an immediate push to the transmit FIFO.
-     * This function can be used for either master or slave modes.
-     *
-     * @param base LPSPI peripheral address.
-     * @param data The data word to be sent.
-     */
-    static inline void LPSPI_WriteData(LPSPI_Type *base, uint32_t data)
-    {
-        base->TDR = data;
-    }
-
-    /*!
-     * @brief Reads data from the data buffer.
-     *
-     * This function reads the data from the Receive Data Register (RDR).
-     * This function can be used for either master or slave mode.
-     *
-     * @param base LPSPI peripheral address.
-     * @return The data read from the data buffer.
-     */
-    static inline uint32_t LPSPI_ReadData(LPSPI_Type *base)
-    {
-        return (base->RDR);
-    }
-
-    /*!
-     * @brief Set up the dummy data.
-     *
-     * @param base LPSPI peripheral address.
-     * @param dummyData Data to be transferred when tx buffer is NULL.
-     * Note:
-     *      This API has no effect when LPSPI in slave interrupt mode, because driver
-     *      will set the TXMSK bit to 1 if txData is NULL, no data is loaded from transmit
-     *      FIFO and output pin is tristated.
-     */
-    void LPSPI_SetDummyData(LPSPI_Type *base, uint8_t dummyData);
-
-    /*!
-     *@}
-     */
-
-    /*!
-     * @name Transactional
-     * @{
-     */
-    /*Transactional APIs*/
-
-    /*!
-     * @brief Initializes the LPSPI master handle.
-     *
-     * This function initializes the LPSPI handle, which can be used for other LPSPI transactional APIs.  Usually, for a
-     * specified LPSPI instance, call this API once to get the initialized handle.
-
-     * @param base LPSPI peripheral address.
-     * @param handle LPSPI handle pointer to lpspi_master_handle_t.
-     * @param callback DSPI callback.
-     * @param userData callback function parameter.
-     */
-    void LPSPI_MasterTransferCreateHandle(LPSPI_Type *base,
-                                          lpspi_master_handle_t *handle,
-                                          lpspi_master_transfer_callback_t callback,
-                                          void *userData);
-
-    /*!
-     * @brief LPSPI master transfer data using a polling method.
-     *
-     * This function transfers data using a  polling method. This is a blocking function, which does not return until
-     * all transfers have been completed.
-     *
-     * Note:
-     * The transfer data size should be integer multiples of bytesPerFrame if bytesPerFrame is less than or equal to 4.
-     * For bytesPerFrame greater than 4:
-     * The transfer data size should be equal to bytesPerFrame if the bytesPerFrame is not integer multiples of 4.
-     * Otherwise, the transfer data size can be an integer multiple of bytesPerFrame.
-     *
-     * @param base LPSPI peripheral address.
-     * @param transfer pointer to lpspi_transfer_t structure.
-     * @return status of status_t.
-     */
-    status_t LPSPI_MasterTransferBlocking(LPSPI_Type *base, lpspi_transfer_t *transfer);
-
-    /*!
-     * @brief LPSPI master transfer data using an interrupt method.
-     *
-     * This function transfers data using an interrupt method. This is a non-blocking function, which returns right
-     * away. When all data is transferred, the callback function is called.
-     *
-     * Note:
-     * The transfer data size should be integer multiples of bytesPerFrame if bytesPerFrame is less than or equal to 4.
-     * For bytesPerFrame greater than 4:
-     * The transfer data size should be equal to bytesPerFrame if the bytesPerFrame is not integer multiples of 4.
-     * Otherwise, the transfer data size can be an integer multiple of bytesPerFrame.
-     *
-     * @param base LPSPI peripheral address.
-     * @param handle pointer to lpspi_master_handle_t structure which stores the transfer state.
-     * @param transfer pointer to lpspi_transfer_t structure.
-     * @return status of status_t.
-     */
-    status_t LPSPI_MasterTransferNonBlocking(LPSPI_Type *base,
-                                             lpspi_master_handle_t *handle,
-                                             lpspi_transfer_t *transfer);
-
-    /*!
-     * @brief Gets the master transfer remaining bytes.
-     *
-     * This function gets the master transfer remaining bytes.
-     *
-     * @param base LPSPI peripheral address.
-     * @param handle pointer to lpspi_master_handle_t structure which stores the transfer state.
-     * @param count Number of bytes transferred so far by the non-blocking transaction.
-     * @return status of status_t.
-     */
-    status_t LPSPI_MasterTransferGetCount(LPSPI_Type *base, lpspi_master_handle_t *handle, size_t *count);
-
-    /*!
-     * @brief LPSPI master abort transfer which uses an interrupt method.
-     *
-     * This function aborts a transfer which uses an interrupt method.
-     *
-     * @param base LPSPI peripheral address.
-     * @param handle pointer to lpspi_master_handle_t structure which stores the transfer state.
-     */
-    void LPSPI_MasterTransferAbort(LPSPI_Type *base, lpspi_master_handle_t *handle);
-
-    /*!
-     * @brief LPSPI Master IRQ handler function.
-     *
-     * This function processes the LPSPI transmit and receive IRQ.
-     *
-     * @param base LPSPI peripheral address.
-     * @param handle pointer to lpspi_master_handle_t structure which stores the transfer state.
-     */
-    void LPSPI_MasterTransferHandleIRQ(LPSPI_Type *base, lpspi_master_handle_t *handle);
-
-    /*!
-     * @brief Initializes the LPSPI slave handle.
-     *
-     * This function initializes the LPSPI handle, which can be used for other LPSPI transactional APIs.  Usually, for a
-     * specified LPSPI instance, call this API once to get the initialized handle.
-     *
-     * @param base LPSPI peripheral address.
-     * @param handle LPSPI handle pointer to lpspi_slave_handle_t.
-     * @param callback DSPI callback.
-     * @param userData callback function parameter.
-     */
-    void LPSPI_SlaveTransferCreateHandle(LPSPI_Type *base,
-                                         lpspi_slave_handle_t *handle,
-                                         lpspi_slave_transfer_callback_t callback,
-                                         void *userData);
-
-    /*!
-     * @brief LPSPI slave transfer data using an interrupt method.
-     *
-     * This function transfer data using an interrupt method. This is a non-blocking function, which returns right away.
-     * When all data
-     * is transferred, the callback function is called.
-     *
-     * Note:
-     * The transfer data size should be integer multiples of bytesPerFrame if bytesPerFrame is less than or equal to 4.
-     * For bytesPerFrame greater than 4:
-     * The transfer data size should be equal to bytesPerFrame if the bytesPerFrame is not an integer multiple of 4.
-     * Otherwise, the transfer data size can be an integer multiple of bytesPerFrame.
-     *
-     * @param base LPSPI peripheral address.
-     * @param handle pointer to lpspi_slave_handle_t structure which stores the transfer state.
-     * @param transfer pointer to lpspi_transfer_t structure.
-     * @return status of status_t.
-     */
-    status_t LPSPI_SlaveTransferNonBlocking(LPSPI_Type *base, lpspi_slave_handle_t *handle, lpspi_transfer_t *transfer);
-
-    /*!
-     * @brief Gets the slave transfer remaining bytes.
-     *
-     * This function gets the slave transfer remaining bytes.
-     *
-     * @param base LPSPI peripheral address.
-     * @param handle pointer to lpspi_slave_handle_t structure which stores the transfer state.
-     * @param count Number of bytes transferred so far by the non-blocking transaction.
-     * @return status of status_t.
-     */
-    status_t LPSPI_SlaveTransferGetCount(LPSPI_Type *base, lpspi_slave_handle_t *handle, size_t *count);
-
-    /*!
-     * @brief LPSPI slave aborts a transfer which uses an interrupt method.
-     *
-     * This function aborts a transfer which uses an interrupt method.
-     *
-     * @param base LPSPI peripheral address.
-     * @param handle pointer to lpspi_slave_handle_t structure which stores the transfer state.
-     */
-    void LPSPI_SlaveTransferAbort(LPSPI_Type *base, lpspi_slave_handle_t *handle);
-
-    /*!
-     * @brief LPSPI Slave IRQ handler function.
-     *
-     * This function processes the LPSPI transmit and receives an IRQ.
-     *
-     * @param base LPSPI peripheral address.
-     * @param handle pointer to lpspi_slave_handle_t structure which stores the transfer state.
-     */
-    void LPSPI_SlaveTransferHandleIRQ(LPSPI_Type *base, lpspi_slave_handle_t *handle);
-
-    /*!
-     *@}
-     */
+/*!
+ *@}
+ */
 
 #if defined(__cplusplus)
 }
-#endif /*_cplusplus*/
-       /*!
-        *@}
-        */
+#endif
+
+/*! @}*/
 
 #endif /*_FSL_LPSPI_H_*/

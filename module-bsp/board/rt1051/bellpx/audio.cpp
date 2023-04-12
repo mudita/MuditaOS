@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "audio.hpp"
@@ -73,16 +73,7 @@ void bsp::audio::init(const std::uint32_t sampleRate)
 
     audioConfig.mclkSourceClockHz = GetPerphSourceClock(PerphClock_SAI1);
 
-    // Initialize SAI Tx module
-    SAI_TxGetDefaultConfig(&audioConfig.config);
-    audioConfig.config.masterSlave = kSAI_Master;
-    SAI_TxInit(BELL_AUDIOCODEC_SAIx, &audioConfig.config);
-
-    // Initialize SAI Rx module
-    SAI_RxGetDefaultConfig(&audioConfig.config);
-
-    audioConfig.config.masterSlave = kSAI_Master;
-    SAI_RxInit(BELL_AUDIOCODEC_SAIx, &audioConfig.config);
+    SAI_Init(BELL_AUDIOCODEC_SAIx);
 }
 
 void bsp::audio::deinit()

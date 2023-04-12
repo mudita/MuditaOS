@@ -8,7 +8,7 @@
 * Added new 32px and 170px fonts
 
 ### Changed / Improved
-
+* Updated FSL drivers from NXP
 
 ## [2.5.0 2024-02-09]
 
@@ -28,7 +28,6 @@
 * Added switching SDRAM to self-refresh before entering WFI for further power consumption reduction
 * Added watchdog protection to WFI mode
 * Added low battery warning when the alarm is activated
-
 
 ## [2.4.0 2024-01-11]
 

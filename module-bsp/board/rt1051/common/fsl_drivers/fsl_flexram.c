@@ -1,35 +1,9 @@
 /*
- * The Clear BSD License
- * Copyright 2017 NXP
+ * Copyright 2017-2023 NXP
  * All rights reserved.
  *
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "fsl_flexram.h"
@@ -55,23 +29,6 @@
  */
 static uint32_t FLEXRAM_GetInstance(FLEXRAM_Type *base);
 
-/*!
- * @brief FLEXRAM map TCM size to register value
- *
- * @param tcmBankNum tcm banknumber
- * @retval register value correspond to the tcm size
- */
-static uint8_t FLEXRAM_MapTcmSizeToRegister(uint8_t tcmBankNum);
-
-/*!
- * @brief FLEXRAM configure TCM size
- * This function  is used to set the TCM to the actual size.When access to the TCM memory boundary ,hardfault will
- * raised by core.
- * @param itcmBankNum itcm bank number to allocate
- * @param dtcmBankNum dtcm bank number to allocate
- */
-static status_t FLEXRAM_SetTCMSize(uint8_t itcmBankNum, uint8_t dtcmBankNum);
-
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -83,6 +40,19 @@ static FLEXRAM_Type *const s_flexramBases[] = FLEXRAM_BASE_PTRS;
 static const clock_ip_name_t s_flexramClocks[] = FLEXRAM_CLOCKS;
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
 
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+/*! Look-up table to calculate single-bit error bit position for ITCM. */
+static const uint8_t ItcmLookUpTable[64] = {
+    0xC1, 0x43, 0x9E, 0x83, 0x15, 0x4C, 0x4A, 0x8C, 0x31, 0x1C, 0xA2, 0xE0, 0x51, 0x2C, 0xC2, 0xD0,
+    0x19, 0x1A, 0x26, 0xEA, 0x29, 0x94, 0x16, 0x64, 0x37, 0xA4, 0x0D, 0xC4, 0x75, 0x38, 0x4F, 0x58,
+    0x46, 0x91, 0x86, 0x61, 0x49, 0x98, 0x89, 0x68, 0x32, 0x34, 0x07, 0xC8, 0x92, 0xA8, 0xA7, 0x54,
+    0xA1, 0xD9, 0x25, 0xF8, 0x0E, 0x0B, 0x8A, 0x2A, 0x52, 0x45, 0x13, 0x85, 0x62, 0x70, 0x23, 0xB0};
+/*! Look-up table to calculate single-bit error bit position for DTCM. */
+static const uint8_t DtcmLookUpTable[32] = {0x61, 0x51, 0x19, 0x45, 0x43, 0x31, 0x29, 0x13, 0x62, 0x52, 0x4A,
+                                            0x46, 0x32, 0x2A, 0x23, 0x1A, 0x2C, 0x64, 0x26, 0x25, 0x34, 0x16,
+                                            0x15, 0x54, 0x0B, 0x58, 0x1C, 0x4C, 0x38, 0x0E, 0x0D, 0x49};
+#endif /* FLEXRAM_ECC_ERROR_DETAILED_INFO */
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -91,8 +61,10 @@ static uint32_t FLEXRAM_GetInstance(FLEXRAM_Type *base)
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0; instance < ARRAY_SIZE(s_flexramBases); instance++) {
-        if (s_flexramBases[instance] == base) {
+    for (instance = 0; instance < ARRAY_SIZE(s_flexramBases); instance++)
+    {
+        if (s_flexramBases[instance] == base)
+        {
             break;
         }
     }
@@ -102,6 +74,11 @@ static uint32_t FLEXRAM_GetInstance(FLEXRAM_Type *base)
     return instance;
 }
 
+/*!
+ * brief FLEXRAM module initialization function.
+ *
+ * param base FLEXRAM base address.
+ */
 void FLEXRAM_Init(FLEXRAM_Type *base)
 {
 #if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
@@ -110,14 +87,18 @@ void FLEXRAM_Init(FLEXRAM_Type *base)
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
 
     /* enable all the interrupt status */
-    base->INT_STAT_EN |= kFLEXRAM_InterruptStatusAll;
+    base->INT_STAT_EN |= (uint32_t)kFLEXRAM_InterruptStatusAll;
     /* clear all the interrupt status */
-    base->INT_STATUS |= kFLEXRAM_InterruptStatusAll;
+    base->INT_STATUS |= (uint32_t)kFLEXRAM_InterruptStatusAll;
     /* disable all the interrpt */
     base->INT_SIG_EN = 0U;
 }
 
-void FLEXRAN_Deinit(FLEXRAM_Type *base)
+/*!
+ * brief Deinitializes the FLEXRAM.
+ *
+ */
+void FLEXRAM_Deinit(FLEXRAM_Type *base)
 {
 #if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
     /* Ungate ENET clock. */
@@ -125,97 +106,320 @@ void FLEXRAN_Deinit(FLEXRAM_Type *base)
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
 }
 
-static uint8_t FLEXRAM_MapTcmSizeToRegister(uint8_t tcmBankNum)
+#if (defined(FSL_FEATURE_FLEXRAM_HAS_ECC) && FSL_FEATURE_FLEXRAM_HAS_ECC)
+void FLEXRAM_EnableECC(FLEXRAM_Type *base, bool OcramECCEnable, bool TcmECCEnable)
 {
-    uint8_t tcmSizeConfig = 0U;
-
-    switch (tcmBankNum * FSL_FEATURE_FLEXRAM_INTERNAL_RAM_BANK_SIZE) {
-    case kFLEXRAM_TCMSize32KB:
-        tcmSizeConfig = 6U;
-        break;
-
-    case kFLEXRAM_TCMSize64KB:
-        tcmSizeConfig = 7U;
-        break;
-
-    case kFLEXRAM_TCMSize128KB:
-        tcmSizeConfig = 8U;
-        break;
-
-    case kFLEXRAM_TCMSize256KB:
-        tcmSizeConfig = 9U;
-        break;
-
-    case kFLEXRAM_TCMSize512KB:
-        tcmSizeConfig = 10U;
-        break;
-
-    default:
-        break;
+    if (true == OcramECCEnable)
+    {
+        base->FLEXRAM_CTRL |= FLEXRAM_FLEXRAM_CTRL_OCRAM_ECC_EN_MASK;
+    }
+    else
+    {
+        base->FLEXRAM_CTRL &= ~FLEXRAM_FLEXRAM_CTRL_OCRAM_ECC_EN_MASK;
     }
 
-    return tcmSizeConfig;
+    if (true == TcmECCEnable)
+    {
+        base->FLEXRAM_CTRL |= FLEXRAM_FLEXRAM_CTRL_TCM_ECC_EN_MASK;
+    }
+    else
+    {
+        base->FLEXRAM_CTRL &= ~FLEXRAM_FLEXRAM_CTRL_TCM_ECC_EN_MASK;
+    }
 }
 
-static status_t FLEXRAM_SetTCMSize(uint8_t itcmBankNum, uint8_t dtcmBankNum)
+#if (defined(FSL_FEATURE_FLEXRAM_HAS_ECC_ERROR_INJECTION) && (FSL_FEATURE_FLEXRAM_HAS_ECC_ERROR_INJECTION))
+void FLEXRAM_ErrorInjection(FLEXRAM_Type *base, flexram_memory_type_t memory, flexram_ecc_error_type_t *error)
 {
-    /* dtcm configuration */
-    if (dtcmBankNum != 0U) {
-        IOMUXC_GPR->GPR14 &= ~IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ_MASK;
-        IOMUXC_GPR->GPR14 |= IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ(FLEXRAM_MapTcmSizeToRegister(dtcmBankNum));
-        IOMUXC_GPR->GPR16 |= IOMUXC_GPR_GPR16_INIT_DTCM_EN_MASK;
-    }
-    else {
-        IOMUXC_GPR->GPR16 &= ~IOMUXC_GPR_GPR16_INIT_DTCM_EN_MASK;
-    }
-    /* itcm configuration */
-    if (itcmBankNum != 0U) {
-        IOMUXC_GPR->GPR14 &= ~IOMUXC_GPR_GPR14_CM7_CFGITCMSZ_MASK;
-        IOMUXC_GPR->GPR14 |= IOMUXC_GPR_GPR14_CM7_CFGITCMSZ(FLEXRAM_MapTcmSizeToRegister(itcmBankNum));
-        IOMUXC_GPR->GPR16 |= IOMUXC_GPR_GPR16_INIT_ITCM_EN_MASK;
-    }
-    else {
-        IOMUXC_GPR->GPR16 &= ~IOMUXC_GPR_GPR16_INIT_ITCM_EN_MASK;
+    assert(error != NULL);
+
+    switch (memory)
+    {
+        case kFLEXRAM_OCRAM:
+            base->OCRAM_ECC_ERROR_INJEC =
+                FLEXRAM_OCRAM_ECC_ERROR_INJEC_OCRAM_ERR1BIT(error->SingleBitPos) |
+                FLEXRAM_OCRAM_ECC_ERROR_INJEC_OCRAM_ERR2BIT(error->SecondBitPos) |
+                FLEXRAM_OCRAM_ECC_ERROR_INJEC_OCRAM_FR11BI(error->Fource1BitDataInversion) |
+                FLEXRAM_OCRAM_ECC_ERROR_INJEC_OCRAM_FR1NCI(error->FourceOneNCDataInversion) |
+                FLEXRAM_OCRAM_ECC_ERROR_INJEC_OCRAM_FRC1BI(error->FourceConti1BitDataInversion) |
+                FLEXRAM_OCRAM_ECC_ERROR_INJEC_OCRAM_FRCNCI(error->FourceContiNCDataInversion);
+            break;
+        case kFLEXRAM_ITCM:
+            base->ITCM_ECC_ERROR_INJEC = FLEXRAM_ITCM_ECC_ERROR_INJEC_ITCM_ERR1BIT(error->SingleBitPos) |
+                                         FLEXRAM_ITCM_ECC_ERROR_INJEC_ITCM_ERR2BIT(error->SecondBitPos) |
+                                         FLEXRAM_ITCM_ECC_ERROR_INJEC_ITCM_FR11BI(error->Fource1BitDataInversion) |
+                                         FLEXRAM_ITCM_ECC_ERROR_INJEC_ITCM_FR1NCI(error->FourceOneNCDataInversion) |
+                                         FLEXRAM_ITCM_ECC_ERROR_INJEC_ITCM_FRC1BI(error->FourceConti1BitDataInversion) |
+                                         FLEXRAM_ITCM_ECC_ERROR_INJEC_ITCM_FRCNCI(error->FourceContiNCDataInversion);
+            break;
+        case kFLEXRAM_D0TCM:
+            base->D0TCM_ECC_ERROR_INJEC =
+                FLEXRAM_D0TCM_ECC_ERROR_INJEC_D0TCM_ERR1BIT(error->SingleBitPos) |
+                FLEXRAM_D0TCM_ECC_ERROR_INJEC_D0TCM_ERR2BIT(error->SecondBitPos) |
+                FLEXRAM_D0TCM_ECC_ERROR_INJEC_D0TCM_FR11BI(error->Fource1BitDataInversion) |
+                FLEXRAM_D0TCM_ECC_ERROR_INJEC_D0TCM_FR1NCI(error->FourceOneNCDataInversion) |
+                FLEXRAM_D0TCM_ECC_ERROR_INJEC_D0TCM_FRC1BI(error->FourceConti1BitDataInversion) |
+                FLEXRAM_D0TCM_ECC_ERROR_INJEC_D0TCM_FRCNCI(error->FourceContiNCDataInversion);
+            break;
+        case kFLEXRAM_D1TCM:
+            base->D1TCM_ECC_ERROR_INJEC =
+                FLEXRAM_D1TCM_ECC_ERROR_INJEC_D1TCM_ERR1BIT(error->SingleBitPos) |
+                FLEXRAM_D1TCM_ECC_ERROR_INJEC_D1TCM_ERR2BIT(error->SecondBitPos) |
+                FLEXRAM_D1TCM_ECC_ERROR_INJEC_D1TCM_FR11BI(error->Fource1BitDataInversion) |
+                FLEXRAM_D1TCM_ECC_ERROR_INJEC_D1TCM_FR1NCI(error->FourceOneNCDataInversion) |
+                FLEXRAM_D1TCM_ECC_ERROR_INJEC_D1TCM_FRC1BI(error->FourceConti1BitDataInversion) |
+                FLEXRAM_D1TCM_ECC_ERROR_INJEC_D1TCM_FRCNCI(error->FourceContiNCDataInversion);
+            break;
+        default:
+            assert(NULL);
+            break;
     }
 
-    return kStatus_Success;
+    __DSB();
+}
+#endif /* FSL_FEATURE_FLEXRAM_HAS_ECC_ERROR_INJECTION */
+
+void FLEXRAM_GetOcramSingleErroInfo(FLEXRAM_Type *base, flexram_ocram_ecc_single_error_info_t *info)
+{
+    assert(NULL != info);
+
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    info->OcramSingleErrorECCCipher =
+        (uint8_t)((base->OCRAM_ECC_SINGLE_ERROR_INFO & FLEXRAM_OCRAM_ECC_SINGLE_ERROR_INFO_OCRAM_ECCS_ERRED_ECC_MASK) >>
+                  FLEXRAM_OCRAM_ECC_SINGLE_ERROR_INFO_OCRAM_ECCS_ERRED_ECC_SHIFT);
+    info->OcramSingleErrorECCSyndrome =
+        (uint8_t)((base->OCRAM_ECC_SINGLE_ERROR_INFO & FLEXRAM_OCRAM_ECC_SINGLE_ERROR_INFO_OCRAM_ECCS_ERRED_SYN_MASK) >>
+                  FLEXRAM_OCRAM_ECC_SINGLE_ERROR_INFO_OCRAM_ECCS_ERRED_SYN_SHIFT);
+#else
+    info->OcramSingleErrorInfo = base->OCRAM_ECC_SINGLE_ERROR_INFO;
+#endif /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+
+    info->OcramSingleErrorAddr    = base->OCRAM_ECC_SINGLE_ERROR_ADDR;
+    info->OcramSingleErrorDataLSB = base->OCRAM_ECC_SINGLE_ERROR_DATA_LSB;
+    info->OcramSingleErrorDataMSB = base->OCRAM_ECC_SINGLE_ERROR_DATA_MSB;
 }
 
-status_t FLEXRAM_AllocateRam(flexram_allocate_ram_t *config)
+void FLEXRAM_GetOcramMultiErroInfo(FLEXRAM_Type *base, flexram_ocram_ecc_multi_error_info_t *info)
 {
-    uint8_t dtcmBankNum  = config->dtcmBankNum;
-    uint8_t itcmBankNum  = config->itcmBankNum;
-    uint8_t ocramBankNum = config->ocramBankNum;
-    uint32_t bankCfg = 0U, i = 0U;
+    assert(NULL != info);
 
-    /* check the arguments */
-    if ((FSL_FEATURE_FLEXRAM_INTERNAL_RAM_TOTAL_BANK_NUMBERS < (dtcmBankNum + itcmBankNum + ocramBankNum)) ||
-        ((dtcmBankNum != 0U) && ((dtcmBankNum & (dtcmBankNum - 1u)) != 0U)) ||
-        ((itcmBankNum != 0U) && ((itcmBankNum & (itcmBankNum - 1u)) != 0U))) {
-        return kStatus_InvalidArgument;
-    }
-    /* flexram bank config value */
-    for (i = 0U; i < FSL_FEATURE_FLEXRAM_INTERNAL_RAM_TOTAL_BANK_NUMBERS; i++) {
-        if (i < ocramBankNum) {
-            bankCfg |= ((uint32_t)kFLEXRAM_BankOCRAM) << (i * 2);
-            continue;
-        }
-
-        if (i < (dtcmBankNum + ocramBankNum)) {
-            bankCfg |= ((uint32_t)kFLEXRAM_BankDTCM) << (i * 2);
-            continue;
-        }
-
-        if (i < (uint32_t)(dtcmBankNum + ocramBankNum + itcmBankNum)) {
-            bankCfg |= ((uint32_t)kFLEXRAM_BankITCM) << (i * 2);
-            continue;
-        }
-    }
-    IOMUXC_GPR->GPR17 = bankCfg;
-    /* set TCM size */
-    FLEXRAM_SetTCMSize(itcmBankNum, dtcmBankNum);
-    /* select ram allocate source from FLEXRAM_BANK_CFG */
-    FLEXRAM_SetAllocateRamSrc(kFLEXRAM_BankAllocateThroughBankCfg);
-
-    return kStatus_Success;
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    info->OcramMultiErrorECCCipher =
+        (uint8_t)((base->OCRAM_ECC_MULTI_ERROR_INFO & FLEXRAM_OCRAM_ECC_MULTI_ERROR_INFO_OCRAM_ECCM_ERRED_ECC_MASK) >>
+                  FLEXRAM_OCRAM_ECC_MULTI_ERROR_INFO_OCRAM_ECCM_ERRED_ECC_SHIFT);
+#else
+    info->OcramMultiErrorInfo  = base->OCRAM_ECC_MULTI_ERROR_INFO;
+#endif /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+    info->OcramMultiErrorAddr    = base->OCRAM_ECC_MULTI_ERROR_ADDR;
+    info->OcramMultiErrorDataLSB = base->OCRAM_ECC_MULTI_ERROR_DATA_LSB;
+    info->OcramMultiErrorDataMSB = base->OCRAM_ECC_MULTI_ERROR_DATA_MSB;
 }
+
+void FLEXRAM_GetItcmSingleErroInfo(FLEXRAM_Type *base, flexram_itcm_ecc_single_error_info_t *info)
+{
+    assert(NULL != info);
+
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    /* ECC error corresponding syndrome, which can be used to locate the Error bit using a look-up table. */
+    uint8_t singleErrorECCSyndrome = 0x00U;
+
+    info->ItcmSingleErrorTCMWriteRead =
+        (uint8_t)((base->ITCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFW_MASK) >>
+                  FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFW_SHIFT);
+    info->ItcmSingleErrorTCMAccessSize =
+        (uint8_t)((base->ITCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFSIZ_MASK) >>
+                  FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFSIZ_SHIFT);
+    info->ItcmSingleErrorTCMMaster =
+        (uint8_t)((base->ITCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFMST_MASK) >>
+                  FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFMST_SHIFT);
+    info->ItcmSingleErrorTCMPrivilege =
+        (uint8_t)((base->ITCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFPRT_MASK) >>
+                  FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFPRT_SHIFT);
+    singleErrorECCSyndrome =
+        (uint8_t)((base->ITCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFSYN_MASK) >>
+                  FLEXRAM_ITCM_ECC_SINGLE_ERROR_INFO_ITCM_ECCS_EFSYN_SHIFT);
+
+    for (uint8_t i = 0x00U; i < sizeof(ItcmLookUpTable) / sizeof(ItcmLookUpTable[0]); i++)
+    {
+        if (singleErrorECCSyndrome == ItcmLookUpTable[i])
+        {
+            info->ItcmSingleErrorBitPostion = i;
+            break;
+        }
+    }
+#else
+    info->ItcmSingleErrorInfo  = base->ITCM_ECC_SINGLE_ERROR_INFO;
+#endif /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+
+    info->ItcmSingleErrorAddr    = base->ITCM_ECC_SINGLE_ERROR_ADDR;
+    info->ItcmSingleErrorDataLSB = base->ITCM_ECC_SINGLE_ERROR_DATA_LSB;
+    info->ItcmSingleErrorDataMSB = base->ITCM_ECC_SINGLE_ERROR_DATA_MSB;
+}
+
+void FLEXRAM_GetItcmMultiErroInfo(FLEXRAM_Type *base, flexram_itcm_ecc_multi_error_info_t *info)
+{
+    assert(NULL != info);
+
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+    info->ItcmMultiErrorTCMWriteRead =
+        (uint8_t)((base->ITCM_ECC_MULTI_ERROR_INFO & FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFW_MASK) >>
+                  FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFW_SHIFT);
+    info->ItcmMultiErrorTCMAccessSize =
+        (uint8_t)((base->ITCM_ECC_MULTI_ERROR_INFO & FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFSIZ_MASK) >>
+                  FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFSIZ_SHIFT);
+    info->ItcmMultiErrorTCMMaster =
+        (uint8_t)((base->ITCM_ECC_MULTI_ERROR_INFO & FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFMST_MASK) >>
+                  FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFMST_SHIFT);
+    info->ItcmMultiErrorTCMPrivilege =
+        (uint8_t)((base->ITCM_ECC_MULTI_ERROR_INFO & FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFPRT_MASK) >>
+                  FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFPRT_SHIFT);
+    info->ItcmMultiErrorECCSyndrome =
+        (uint8_t)((base->ITCM_ECC_MULTI_ERROR_INFO & FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFSYN_MASK) >>
+                  FLEXRAM_ITCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFSYN_SHIFT);
+#else
+    info->ItcmMultiErrorInfo   = base->ITCM_ECC_MULTI_ERROR_INFO;
+#endif /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+
+    info->ItcmMultiErrorAddr    = base->ITCM_ECC_MULTI_ERROR_ADDR;
+    info->ItcmMultiErrorDataLSB = base->ITCM_ECC_MULTI_ERROR_DATA_LSB;
+    info->ItcmMultiErrorDataMSB = base->ITCM_ECC_MULTI_ERROR_DATA_MSB;
+}
+
+void FLEXRAM_GetDtcmSingleErroInfo(FLEXRAM_Type *base, flexram_dtcm_ecc_single_error_info_t *info, uint8_t bank)
+{
+    assert(NULL != info);
+    assert((0x00U == bank) || (0x01U == bank));
+
+    if (0x00U == bank)
+    {
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+        /* ECC error corresponding syndrome, which can be used to locate the Error bit using a look-up table. */
+        uint8_t singleErrorECCSyndrome = 0x00U;
+
+        info->DtcmSingleErrorTCMWriteRead =
+            (uint8_t)((base->D0TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFW_MASK) >>
+                      FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFW_SHIFT);
+        info->DtcmSingleErrorTCMAccessSize =
+            (uint8_t)((base->D0TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFSIZ_MASK) >>
+                      FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFSIZ_SHIFT);
+        info->DtcmSingleErrorTCMMaster =
+            (uint8_t)((base->D0TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFMST_MASK) >>
+                      FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFMST_SHIFT);
+        info->DtcmSingleErrorTCMPrivilege =
+            (uint8_t)((base->D0TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFPRT_MASK) >>
+                      FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFPRT_SHIFT);
+        singleErrorECCSyndrome =
+            (uint8_t)((base->D0TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFSYN_MASK) >>
+                      FLEXRAM_D0TCM_ECC_SINGLE_ERROR_INFO_D0TCM_ECCS_EFSYN_SHIFT);
+
+        for (uint8_t i = 0x00U; i < sizeof(ItcmLookUpTable) / sizeof(ItcmLookUpTable[0]); i++)
+        {
+            if (singleErrorECCSyndrome == ItcmLookUpTable[i])
+            {
+                info->DtcmSingleErrorBitPostion = i;
+                break;
+            }
+        }
+#else
+        info->DtcmSingleErrorInfo = base->D0TCM_ECC_SINGLE_ERROR_INFO;
+#endif /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+
+        info->DtcmSingleErrorAddr = base->D0TCM_ECC_SINGLE_ERROR_ADDR;
+        info->DtcmSingleErrorData = base->D0TCM_ECC_SINGLE_ERROR_DATA;
+    }
+    else
+    {
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+        /* ECC error corresponding syndrome, which can be used to locate the Error bit using a look-up table. */
+        uint8_t singleErrorECCSyndrome = 0x00U;
+
+        info->DtcmSingleErrorTCMWriteRead =
+            (uint8_t)((base->D1TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFW_MASK) >>
+                      FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFW_SHIFT);
+        info->DtcmSingleErrorTCMAccessSize =
+            (uint8_t)((base->D1TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFSIZ_MASK) >>
+                      FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFSIZ_SHIFT);
+        info->DtcmSingleErrorTCMMaster =
+            (uint8_t)((base->D1TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFMST_MASK) >>
+                      FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFMST_SHIFT);
+        info->DtcmSingleErrorTCMPrivilege =
+            (uint8_t)((base->D1TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFPRT_MASK) >>
+                      FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFPRT_SHIFT);
+        singleErrorECCSyndrome =
+            (uint8_t)((base->D1TCM_ECC_SINGLE_ERROR_INFO & FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFSYN_MASK) >>
+                      FLEXRAM_D1TCM_ECC_SINGLE_ERROR_INFO_D1TCM_ECCS_EFSYN_SHIFT);
+
+        for (uint8_t i = 0x00U; i < sizeof(DtcmLookUpTable) / sizeof(DtcmLookUpTable[0]); i++)
+        {
+            if (singleErrorECCSyndrome == DtcmLookUpTable[i])
+            {
+                info->DtcmSingleErrorBitPostion = i;
+                break;
+            }
+        }
+#else
+        info->DtcmSingleErrorInfo = base->D1TCM_ECC_SINGLE_ERROR_INFO;
+#endif /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+
+        info->DtcmSingleErrorAddr = base->D1TCM_ECC_SINGLE_ERROR_ADDR;
+        info->DtcmSingleErrorData = base->D1TCM_ECC_SINGLE_ERROR_DATA;
+    }
+}
+
+void FLEXRAM_GetDtcmMultiErroInfo(FLEXRAM_Type *base, flexram_dtcm_ecc_multi_error_info_t *info, uint8_t bank)
+{
+    assert(NULL != info);
+    assert((0x00U == bank) || (0x01U == bank));
+
+    if (0x00U == bank)
+    {
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+        info->DtcmMultiErrorTCMWriteRead =
+            (uint8_t)((base->D0TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFW_MASK) >>
+                      FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFW_SHIFT);
+        info->DtcmMultiErrorTCMAccessSize =
+            (uint8_t)((base->D0TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFSIZ_MASK) >>
+                      FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFSIZ_SHIFT);
+        info->DtcmMultiErrorTCMMaster =
+            (uint8_t)((base->D0TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFMST_MASK) >>
+                      FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFMST_SHIFT);
+        info->DtcmMultiErrorTCMPrivilege =
+            (uint8_t)((base->D0TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFPRT_MASK) >>
+                      FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFPRT_SHIFT);
+        info->DtcmMultiErrorECCSyndrome =
+            (uint8_t)((base->D0TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFSYN_MASK) >>
+                      FLEXRAM_D0TCM_ECC_MULTI_ERROR_INFO_D0TCM_ECCS_EFSYN_SHIFT);
+#else
+        info->DtcmMultiErrorInfo  = base->D0TCM_ECC_MULTI_ERROR_INFO;
+#endif /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+
+        info->DtcmMultiErrorAddr = base->D0TCM_ECC_MULTI_ERROR_ADDR;
+        info->DtcmMultiErrorData = base->D0TCM_ECC_MULTI_ERROR_DATA;
+    }
+    else
+    {
+#if defined(FLEXRAM_ECC_ERROR_DETAILED_INFO) && FLEXRAM_ECC_ERROR_DETAILED_INFO
+        info->DtcmMultiErrorTCMWriteRead =
+            (uint8_t)((base->D1TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFW_MASK) >>
+                      FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_D1TCM_ECCS_EFW_SHIFT);
+        info->DtcmMultiErrorTCMAccessSize =
+            (uint8_t)((base->D1TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFSIZ_MASK) >>
+                      FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_D1TCM_ECCS_EFSIZ_SHIFT);
+        info->DtcmMultiErrorTCMMaster =
+            (uint8_t)((base->D1TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFMST_MASK) >>
+                      FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_D1TCM_ECCS_EFMST_SHIFT);
+        info->DtcmMultiErrorTCMPrivilege =
+            (uint8_t)((base->D1TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFPRT_MASK) >>
+                      FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_D1TCM_ECCS_EFPRT_SHIFT);
+        info->DtcmMultiErrorECCSyndrome =
+            (uint8_t)((base->D1TCM_ECC_MULTI_ERROR_INFO & FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_ITCM_ECCS_EFSYN_MASK) >>
+                      FLEXRAM_D1TCM_ECC_MULTI_ERROR_INFO_D1TCM_ECCS_EFSYN_SHIFT);
+#else
+        info->DtcmMultiErrorInfo  = base->D1TCM_ECC_MULTI_ERROR_INFO;
+#endif /*FLEXRAM_ECC_ERROR_DETAILED_INFO*/
+
+        info->DtcmMultiErrorAddr = base->D1TCM_ECC_MULTI_ERROR_ADDR;
+        info->DtcmMultiErrorData = base->D1TCM_ECC_MULTI_ERROR_DATA;
+    }
+}
+#endif /* FSL_FEATURE_FLEXRAM_HAS_ECC */

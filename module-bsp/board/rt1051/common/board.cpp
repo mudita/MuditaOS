@@ -44,7 +44,7 @@ namespace bsp
         {
             void (*func)();
         };
-        unsigned short registeredObjectsCount      = 0;
+        unsigned short registeredObjectsCount    = 0;
         constexpr auto maxRegisteredObjectsCount = 16U;
 
         PlatformExitObject exitObjects[maxRegisteredObjectsCount];
@@ -74,26 +74,25 @@ namespace bsp
              * Use ARM_MPU_RASR(DisableExec, AccessPermission, TypeExtField, IsShareable, IsCacheable, IsBufferable,
              * SubRegionDisable, Size) API in core_cm7.h. param DisableExec       Instruction access (XN) disable
              * bit,0=instruction fetches enabled, 1=instruction fetches disabled. param AccessPermission  Data access
-             * permissions, allows you to configure read/write access for User and Privileged mode. Use MACROS defined in
-             * core_cm7.h: ARM_MPU_AP_NONE/ARM_MPU_AP_PRIV/ARM_MPU_AP_URO/ARM_MPU_AP_FULL/ARM_MPU_AP_PRO/ARM_MPU_AP_RO
-             * Combine TypeExtField/IsShareable/IsCacheable/IsBufferable to configure MPU memory access attributes.
-             *  TypeExtField  IsShareable  IsCacheable  IsBufferable   Memory Attribtue    Shareability        Cache
-             *     0             x           0           0             Strongly Ordered    shareable
-             *     0             x           0           1              Device             shareable
-             *     0             0           1           0              Normal             not shareable   Outer and inner
-             * write through no write allocate 0             0           1           1              Normal             not
+             * permissions, allows you to configure read/write access for User and Privileged mode. Use MACROS defined
+             * in core_cm7.h:
+             * ARM_MPU_AP_NONE/ARM_MPU_AP_PRIV/ARM_MPU_AP_URO/ARM_MPU_AP_FULL/ARM_MPU_AP_PRO/ARM_MPU_AP_RO Combine
+             * TypeExtField/IsShareable/IsCacheable/IsBufferable to configure MPU memory access attributes. TypeExtField
+             * IsShareable  IsCacheable  IsBufferable   Memory Attribtue    Shareability        Cache 0             x 0
+             * 0             Strongly Ordered    shareable 0             x           0           1              Device
+             * shareable 0             0           1           0              Normal             not shareable   Outer
+             * and inner write through no write allocate 0             0           1           1              Normal not
              * shareable   Outer and inner write back no write allocate 0             1           1           0 Normal
              * shareable       Outer and inner write through no write allocate 0             1           1           1
-             * Normal             shareable       Outer and inner write back no write allocate 1             0           0
-             * 0              Normal             not shareable   outer and inner noncache 1             1           0 0
-             * Normal             shareable       outer and inner noncache 1             0           1           1 Normal
-             * not shareable   outer and inner write back write/read acllocate 1             1           1           1
-             * Normal             shareable       outer and inner write back write/read acllocate 2             x 0 0 Device
-             * not shareable Above are normal use settings, if your want to see more details or want to config different
-             * inner/outter cache policy. please refer to Table 4-55 /4-56 in arm cortex-M7 generic user guide
-             * <dui0646b_cortex_m7_dgug.pdf> param SubRegionDisable  Sub-region disable field. 0=sub-region is enabled,
-             * 1=sub-region is disabled. param Size              Region size of the region to be configured. use
-             * ARM_MPU_REGION_SIZE_xxx MACRO in core_cm7.h.
+             * Normal             shareable       Outer and inner write back no write allocate 1             0 0 0
+             * Normal             not shareable   outer and inner noncache 1             1           0 0 Normal
+             * shareable       outer and inner noncache 1             0           1           1 Normal not shareable
+             * outer and inner write back write/read acllocate 1             1           1           1 Normal shareable
+             * outer and inner write back write/read acllocate 2             x 0 0 Device not shareable Above are normal
+             * use settings, if your want to see more details or want to config different inner/outter cache policy.
+             * please refer to Table 4-55 /4-56 in arm cortex-M7 generic user guide <dui0646b_cortex_m7_dgug.pdf> param
+             * SubRegionDisable  Sub-region disable field. 0=sub-region is enabled, 1=sub-region is disabled. param Size
+             * Region size of the region to be configured. use ARM_MPU_REGION_SIZE_xxx MACRO in core_cm7.h.
              */
 
             /* Region 0 setting: Memory with Device type, not shareable, non-cacheable. */
@@ -198,8 +197,7 @@ namespace bsp
         board_configure();
 
         if (SNVS->LPGPR[1] != 0) {
-            LOG_INFO("Device seems to have been reset by RTWDOG! Last instruction address: 0x%08lX",
-                     SNVS->LPGPR[1]);
+            LOG_INFO("Device seems to have been reset by RTWDOG! Last instruction address: 0x%08lX", SNVS->LPGPR[1]);
             SNVS->LPGPR[1] = 0;
         }
     }
@@ -231,5 +229,45 @@ namespace bsp
     {
         call_platform_exit_functions();
         bsp::board_exit(rebootProgress);
+    }
+
+    /* This function is invoked at the end of the SystemInit() function.
+     * This can be used when an application specific code needs
+     * to be called as close to the reset entry as possible.
+     * NOTE: No global r/w variables can be used in this hook function because the
+     * initialization of these variables happens after this function.
+     */
+    extern "C" void SystemInitHook(void)
+    {
+#if defined(__DCACHE_PRESENT) && __DCACHE_PRESENT
+        if (SCB_CCR_DC_Msk != (SCB_CCR_DC_Msk & SCB->CCR)) {
+            SCB_EnableDCache();
+        }
+#endif
+
+        // Disable WDOGx watchdogs timers
+        if ((WDOG1->WCR & WDOG_WCR_WDE_MASK) != 0U) {
+            WDOG1->WCR &= ~(uint16_t)WDOG_WCR_WDE_MASK;
+        }
+        if ((WDOG2->WCR & WDOG_WCR_WDE_MASK) != 0U) {
+            WDOG2->WCR &= ~(uint16_t)WDOG_WCR_WDE_MASK;
+        }
+#if (!DISABLE_WDOG)
+        /* Perform preliminary RTWDOG configuration */
+        /* Write RTWDOG update key to unlock */
+        if ((RTWDOG->CS & RTWDOG_CS_CMD32EN_MASK) != 0U) {
+            RTWDOG->CNT = 0xD928C520U;
+        }
+        else {
+            RTWDOG->CNT = 0xC520;
+            RTWDOG->CNT = 0xD928;
+        }
+        /* Set timeout value to 16s (assuming 128Hz clock - 32.768kHz from LPO_CLK, with 256 prescaler) */
+        RTWDOG->TOVAL = 16 * 128;
+
+        /* Enable RTWDOG, set 256 clock prescaler and allow configuration updates, wait until config is applied */
+        RTWDOG->CS |= (RTWDOG_CS_EN_MASK | RTWDOG_CS_PRES_MASK | RTWDOG_CS_UPDATE_MASK);
+        while ((RTWDOG->CS & RTWDOG_CS_RCS_MASK) == 0U) {}
+#endif // (DISABLE_WDOG)
     }
 } // namespace bsp

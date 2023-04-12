@@ -38,7 +38,7 @@ namespace sys
 
     bool SystemWatchdog::init()
     {
-#ifdef DISABLE_WATCHDOG
+#if (DISABLE_WDOG)
         return true;
 #else
         if (!bsp::watchdog::init(watchdogTimeoutPeriod)) {
@@ -59,7 +59,7 @@ namespace sys
 
     void SystemWatchdog::refresh()
     {
-#ifndef DISABLE_WATCHDOG
+#if (!DISABLE_WDOG)
         // Critical section not required (atomic 32-bit writes)
         lastRefreshTimestamp = Ticks::GetTicks();
 #endif
@@ -91,7 +91,7 @@ namespace sys
 
     void SystemWatchdog::deinit()
     {
-#ifndef DISABLE_WATCHDOG
+#if (!DISABLE_WDOG)
         enableRunLoop = false;
         xTaskAbortDelay(GetHandle());
         if (!taskEndedSem.Take(closurePeriod)) {

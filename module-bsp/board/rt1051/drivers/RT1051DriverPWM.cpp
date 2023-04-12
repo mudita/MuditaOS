@@ -149,6 +149,7 @@ namespace drivers
         pwmSignalsConfig[currentInstance].level            = kPWM_HighTrue;
         pwmSignalsConfig[currentInstance].deadtimeValue    = 0;
         pwmSignalsConfig[currentInstance].faultState       = kPWM_PwmFaultState0;
+        pwmSignalsConfig[currentInstance].pwmchannelenable = true;
 
         pwmModuleClockFrequency = getCurrentPwmSourceFrequency();
         SetupPWMInstance(&pwmSignalsConfig[currentInstance], 1, pwmModuleClockFrequency);

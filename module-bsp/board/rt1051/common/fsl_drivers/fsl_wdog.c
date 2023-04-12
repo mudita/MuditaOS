@@ -32,8 +32,10 @@ static uint32_t WDOG_GetInstance(WDOG_Type *base)
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0; instance < ARRAY_SIZE(s_wdogBases); instance++) {
-        if (s_wdogBases[instance] == base) {
+    for (instance = 0; instance < ARRAY_SIZE(s_wdogBases); instance++)
+    {
+        if (s_wdogBases[instance] == base)
+        {
             break;
         }
     }
@@ -121,7 +123,8 @@ void WDOG_Init(WDOG_Type *base, const wdog_config_t *config)
     base->WMCR   = WDOG_WMCR_PDE(config->enablePowerDown);
     base->WCR    = value;
     EnableGlobalIRQ(primaskValue);
-    if (config->enableInterrupt) {
+    if (config->enableInterrupt)
+    {
         (void)EnableIRQ(s_wdogIRQ[WDOG_GetInstance(base)]);
     }
 }
@@ -136,7 +139,8 @@ void WDOG_Init(WDOG_Type *base, const wdog_config_t *config)
  */
 void WDOG_Deinit(WDOG_Type *base)
 {
-    if (0U != (base->WCR & WDOG_WCR_WDBG_MASK)) {
+    if (0U != (base->WCR & WDOG_WCR_WDBG_MASK))
+    {
         WDOG_Disable(base);
     }
 }
@@ -184,7 +188,8 @@ uint16_t WDOG_GetStatusFlags(WDOG_Type *base)
  */
 void WDOG_ClearInterruptStatus(WDOG_Type *base, uint16_t mask)
 {
-    if (0U != (mask & (uint16_t)kWDOG_InterruptFlag)) {
+    if (0U != (mask & (uint16_t)kWDOG_InterruptFlag))
+    {
         base->WICR |= WDOG_WICR_WTIS_MASK;
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_RT1051CELLULARAUDIO_HPP
@@ -46,6 +46,7 @@ namespace audio
         static constexpr auto supportedSampleRate = 16000U;
         static constexpr auto supportedBitWidth   = 16U;
         static constexpr auto supportedChannels   = 1U;
+        static constexpr auto supportedChannel    = 0U;
 
         enum class State
         {

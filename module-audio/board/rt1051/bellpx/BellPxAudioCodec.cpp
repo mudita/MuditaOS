@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellPxAudioCodec.hpp"
@@ -55,24 +55,24 @@ namespace audio
         saiOutFormat.bitWidth      = currentFormat.bitWidth;
         saiOutFormat.sampleRate_Hz = currentFormat.sampleRate_Hz;
 
-        if (currentFormat.flags & static_cast<uint32_t>(audio::codec::Flags::InputLeft)) {
+        if (currentFormat.flags & static_cast<std::uint32_t>(audio::codec::Flags::InputLeft)) {
             saiInFormat.stereo = kSAI_MonoLeft;
             InStart();
         }
-        else if (currentFormat.flags & static_cast<uint32_t>(audio::codec::Flags::InputRight)) {
+        else if (currentFormat.flags & static_cast<std::uint32_t>(audio::codec::Flags::InputRight)) {
             saiInFormat.stereo = kSAI_MonoRight;
             InStart();
         }
-        else if (currentFormat.flags & static_cast<uint32_t>(audio::codec::Flags::InputStereo)) {
+        else if (currentFormat.flags & static_cast<std::uint32_t>(audio::codec::Flags::InputStereo)) {
             saiInFormat.stereo = kSAI_Stereo;
             InStart();
         }
 
-        if (currentFormat.flags & static_cast<uint32_t>(audio::codec::Flags::OutputMono)) {
+        if (currentFormat.flags & static_cast<std::uint32_t>(audio::codec::Flags::OutputMono)) {
             saiOutFormat.stereo = kSAI_MonoLeft;
             OutStart();
         }
-        else if (currentFormat.flags & static_cast<uint32_t>(audio::codec::Flags::OutputStereo)) {
+        else if (currentFormat.flags & static_cast<std::uint32_t>(audio::codec::Flags::OutputStereo)) {
             saiOutFormat.stereo = kSAI_Stereo;
             OutStart();
         }
@@ -124,67 +124,50 @@ namespace audio
 
     void BellPxAudioCodec::InStart()
     {
-        sai_transfer_format_t sai_format;
+        sai_transceiver_t saiConfig;
         auto audioCfg = bsp::audio::AudioConfig::get();
-
-        /* Configure the audio format */
-        sai_format.bitWidth           = saiInFormat.bitWidth;
-        sai_format.channel            = 0U;
-        sai_format.sampleRate_Hz      = saiInFormat.sampleRate_Hz;
-        sai_format.masterClockHz      = audioCfg->mclkSourceClockHz;
-        sai_format.isFrameSyncCompact = false;
-        sai_format.protocol           = audioCfg->config.protocol;
-        sai_format.stereo             = saiInFormat.stereo;
-#if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
-        sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
-#endif
 
         SAI_TransferRxCreateHandleEDMA(BELL_AUDIOCODEC_SAIx,
                                        &rxHandle,
                                        rxAudioCodecCallback,
                                        this,
                                        reinterpret_cast<edma_handle_t *>(audioCfg->rxDMAHandle->GetHandle()));
-
-        SAI_TransferRxSetFormatEDMA(
-            BELL_AUDIOCODEC_SAIx, &rxHandle, &sai_format, audioCfg->mclkSourceClockHz, audioCfg->mclkSourceClockHz);
-
-        DisableIRQ(BELL_AUDIOCODEC_SAIx_RX_IRQ);
-
-        /* Reset SAI Rx internal logic */
-        SAI_RxSoftwareReset(BELL_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
+        /* I2S mode configurations */
+        SAI_GetClassicI2SConfig(
+            &saiConfig, static_cast<sai_word_width_t>(saiInFormat.bitWidth), saiInFormat.stereo, 0U);
+        saiConfig.syncMode    = kSAI_ModeSync;
+        saiConfig.masterSlave = kSAI_Slave;
+        SAI_TransferRxSetConfigEDMA(BELL_AUDIOCODEC_SAIx, &txHandle, &saiConfig);
+        const auto channelNumbers = saiInFormat.stereo == kSAI_Stereo ? 2U : 1U;
+        /* set bit clock divider */
+        SAI_RxSetBitClockRate(BELL_AUDIOCODEC_SAIx,
+                              audioCfg->mclkSourceClockHz,
+                              saiInFormat.sampleRate_Hz,
+                              saiInFormat.bitWidth,
+                              channelNumbers);
     }
 
     void BellPxAudioCodec::OutStart()
     {
-        sai_transfer_format_t sai_format;
+        sai_transceiver_t saiConfig;
         auto audioCfg = bsp::audio::AudioConfig::get();
-
-        /* Configure the audio format */
-        sai_format.bitWidth           = saiOutFormat.bitWidth;
-        sai_format.channel            = 0U;
-        sai_format.sampleRate_Hz      = saiOutFormat.sampleRate_Hz;
-        sai_format.masterClockHz      = audioCfg->mclkSourceClockHz;
-        sai_format.isFrameSyncCompact = true;
-        sai_format.protocol           = audioCfg->config.protocol;
-        sai_format.stereo             = saiOutFormat.stereo;
-#if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
-        sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
-#endif
 
         SAI_TransferTxCreateHandleEDMA(BELL_AUDIOCODEC_SAIx,
                                        &txHandle,
                                        txAudioCodecCallback,
                                        this,
                                        reinterpret_cast<edma_handle_t *>(audioCfg->txDMAHandle->GetHandle()));
-        SAI_TransferTxSetFormatEDMA(
-            BELL_AUDIOCODEC_SAIx, &txHandle, &sai_format, audioCfg->mclkSourceClockHz, audioCfg->mclkSourceClockHz);
-
-        SAI_TxSetBitClockPolarity(BELL_AUDIOCODEC_SAIx, kSAI_PolarityActiveLow);
-
-        DisableIRQ(BELL_AUDIOCODEC_SAIx_TX_IRQ);
-
-        /* Reset SAI Tx internal logic */
-        SAI_TxSoftwareReset(BELL_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
+        /* I2S mode configurations */
+        SAI_GetClassicI2SConfig(
+            &saiConfig, static_cast<sai_word_width_t>(saiOutFormat.bitWidth), saiOutFormat.stereo, 0U);
+        SAI_TransferTxSetConfigEDMA(BELL_AUDIOCODEC_SAIx, &txHandle, &saiConfig);
+        const auto channelNumbers = saiOutFormat.stereo == kSAI_Stereo ? 2U : 1U;
+        /* set bit clock divider */
+        SAI_TxSetBitClockRate(BELL_AUDIOCODEC_SAIx,
+                              audioCfg->mclkSourceClockHz,
+                              saiOutFormat.sampleRate_Hz,
+                              saiOutFormat.bitWidth,
+                              channelNumbers);
     }
 
     void BellPxAudioCodec::OutStop()

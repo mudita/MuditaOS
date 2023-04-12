@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -168,7 +168,7 @@ void BOARD_BootClockRUN(void)
     CLOCK_SetMux(kCLOCK_Usdhc1Mux, 0); // CSCMR1  (16) 0 - PLL2_PFD2, 1 - PLL2_PFD0
 
     /* Set USDHC2_PODF. */
-    CLOCK_SetDiv(kCLOCK_Usdhc2Div, 2); // CSCDR1
+    CLOCK_SetDiv(kCLOCK_Usdhc2Div, 3); // CSCDR1 Div by 4 (3 + 1) to get ~82MHz clock
     /* Set Usdhc2 clock source. */
     /* PLL2_PFD2/3 = 396MHz/3 = 132MHz */
     CLOCK_SetMux(kCLOCK_Usdhc2Mux, 0); // CSCMR1  (17) 0 - PLL2_PFD2, 1 - PLL2_PFD0
