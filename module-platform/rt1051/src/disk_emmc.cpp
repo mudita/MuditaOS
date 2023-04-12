@@ -1,27 +1,59 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "disk_emmc.hpp"
 
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #include "board/BoardDefinitions.hpp"
+#include "board/pin_mux.h"
 #include <log/log.hpp>
 #include <Utils.hpp>
 
 #include <cstring>
 #include <task.h>
 
+namespace
+{
+    constexpr std::uint32_t BOARD_SDMMC_MMC_HOST_SUPPORT_HS200_FREQ = 180000000U;
+    constexpr std::uint32_t DMA_BUFFER_WORD_SIZE                    = 1024U;
+    constexpr std::uint32_t USDHC_IRQ_PRIORITY                      = 6U;
+} // namespace
+
 namespace purefs::blkdev
 {
-    disk_emmc::disk_emmc() : initStatus(kStatus_Success), mmcCard(std::make_unique<_mmc_card>())
+    AT_NONCACHEABLE_SECTION_ALIGN(std::uint32_t s_sdmmcHostDmaBuffer[DMA_BUFFER_WORD_SIZE],
+                                  SDMMCHOST_DMA_DESCRIPTOR_BUFFER_ALIGN_SIZE);
+
+    disk_emmc::disk_emmc()
+        : initStatus(kStatus_Success), mmcCard(std::make_unique<_mmc_card>()), mmcHost(std::make_unique<sdmmchost_t>())
     {
         assert(mmcCard.get());
+        assert(mmcHost.get());
         std::memset(mmcCard.get(), 0, sizeof(_mmc_card));
+        std::memset(mmcHost.get(), 0, sizeof(sdmmchost_t));
+        mmcCard->host = mmcHost.get();
+
+        mmcHost->dmaDesBuffer         = s_sdmmcHostDmaBuffer;
+        mmcHost->dmaDesBufferWordsNum = DMA_BUFFER_WORD_SIZE;
+        mmcHost->enableCacheControl   = kSDMMCHOST_CacheControlRWBuffer;
+#if defined SDmmc_host_ENABLE_CACHE_LINE_ALIGN_TRANSFER && SDmmc_host_ENABLE_CACHE_LINE_ALIGN_TRANSFER
+        mmcHost->cacheAlignBuffer     = s_sdmmcCacheLineAlignBuffer;
+        mmcHost->cacheAlignBufferSize = BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U;
+#endif
         mmcCard->busWidth                   = kMMC_DataBusWidth8bit;
-        mmcCard->busTiming                  = kMMC_HighSpeedTiming;
+        mmcCard->busTiming                  = kMMC_HighSpeed200Timing;
         mmcCard->enablePreDefinedBlockCount = true;
-        mmcCard->host.base                  = USDHC2;
-        mmcCard->host.sourceClock_Hz        = GetPerphSourceClock(PerphClock_USDHC2);
+        mmcCard->host->hostController.base  = USDHC2;
+        mmcCard->host->hostController.sourceClock_Hz =
+            CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
+        mmcCard->usrParam.ioStrength   = emmc_pin_config;
+        mmcCard->usrParam.maxFreq      = BOARD_SDMMC_MMC_HOST_SUPPORT_HS200_FREQ;
+        mmcCard->hostVoltageWindowVCCQ = kMMC_VoltageWindow120;
+        mmcCard->hostVoltageWindowVCC  = kMMC_VoltageWindow170to195;
+        /* card detect type */
+#if defined DEMO_SDCARD_POWER_CTRL_FUNCTION_EXIST
+        g_sd.usrParam.pwr = &s_sdCardPwrCtrl;
+#endif
 
         driverUSDHC = drivers::DriverUSDHC::Create(
             "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));
@@ -38,7 +70,7 @@ namespace purefs::blkdev
             initStatus = err;
             return initStatus;
         }
-
+        NVIC_SetPriority(USDHC2_IRQn, USDHC_IRQ_PRIORITY);
         LOG_INFO("\neMMC card info:\n%s", get_emmc_info_str().c_str());
 
         return statusBlkDevSuccess;
@@ -105,18 +137,21 @@ namespace purefs::blkdev
         if (!mmcCard->isHostReady) {
             return statusBlkDevFail;
         }
-        // Wait for the card's buffer to become empty
-        while ((GET_SDMMCHOST_STATUS(mmcCard->host.base) & CARD_DATA0_STATUS_MASK) != CARD_DATA0_NOT_BUSY) {
-            taskYIELD();
+        status_t error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
+        if (kStatus_SDMMC_CardStatusIdle != error) {
+            SDMMC_LOG("Error : read failed with wrong card status\r\n");
+            return kStatus_SDMMC_PollingCardIdleFailed;
         }
+
         if (pmState == pm_state::suspend) {
             driverUSDHC->Enable();
         }
-        auto err = MMC_WaitWriteComplete(mmcCard.get());
+
+        error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
         if (pmState == pm_state::suspend) {
             driverUSDHC->Disable();
         }
-        if (err != kStatus_Success) {
+        if (error != kStatus_Success) {
             return kStatus_SDMMC_WaitWriteCompleteFailed;
         }
         return statusBlkDevSuccess;
@@ -145,13 +180,13 @@ namespace purefs::blkdev
             return mmcCard->blockSize;
         case info_type::sector_count:
             switch (hwpart) {
-            case kMMC_AccessPartitionUserArea:
+            case kMMC_AccessPartitionUserAera:
                 return mmcCard->userPartitionBlocks;
             case kMMC_AccessPartitionBoot1:
             case kMMC_AccessPartitionBoot2:
                 return mmcCard->bootPartitionBlocks;
             default:
-                return mmcCard->systemPartitionBlocks;
+                return mmcCard->bootPartitionBlocks;
             }
         case info_type::erase_block:
             // not supported

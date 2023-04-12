@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "software_watchdog.hpp"
@@ -20,7 +20,7 @@ namespace bsp::watchdog
 
     bool SoftwareWatchdog::init(TickType_t timeoutPeriodMs)
     {
-#ifdef DISABLE_WATCHDOG
+#if (DISABLE_WDOG)
         return true;
 #else
         timeoutPeriod      = pdMS_TO_TICKS(timeoutPeriodMs);
@@ -36,7 +36,7 @@ namespace bsp::watchdog
 
     void SoftwareWatchdog::refresh()
     {
-#ifndef DISABLE_WATCHDOG
+#if (!DISABLE_WDOG)
         // Critical section not required (atomic 32-bit writes)
         lastRefreshTimestamp = Ticks::GetTicks();
 #endif

@@ -28,7 +28,7 @@ namespace bsp
         DisableIRQ(GPIO5_Combined_0_15_IRQn);
         DisableIRQ(TMR3_IRQn);
         DisableIRQ(RTWDOG_IRQn);
-        DisableIRQ(ANATOP_EVENT0_IRQn);
+        DisableIRQ(PMU_EVENT_IRQn);
 
         GPIO_PortDisableInterrupts(GPIO1, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO2, UINT32_MAX);
@@ -71,8 +71,8 @@ namespace bsp
         NVIC_EnableIRQ(RTWDOG_IRQn);
 
         // Enable PMU brownout interrupt
-        NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
-        NVIC_EnableIRQ(ANATOP_EVENT0_IRQn);
+        NVIC_ClearPendingIRQ(PMU_EVENT_IRQn);
+        NVIC_EnableIRQ(PMU_EVENT_IRQn);
     }
 
     extern "C"
@@ -240,7 +240,7 @@ namespace bsp
                 WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
             }
 
-            NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
+            NVIC_ClearPendingIRQ(PMU_EVENT_IRQn);
         }
     }
 } // namespace bsp

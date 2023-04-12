@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2022 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -18,14 +18,15 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-
 /*! @name Driver version */
 /*@{*/
-#define FSL_PWM_DRIVER_VERSION (MAKE_VERSION(2, 2, 1)) /*!< Version 2.2.1 */
+#define FSL_PWM_DRIVER_VERSION (MAKE_VERSION(2, 6, 1)) /*!< Version 2.6.1 */
 /*@}*/
 
 /*! Number of bits per submodule for software output control */
 #define PWM_SUBMODULE_SWCONTROL_WIDTH 2
+/*! Because setting the pwm duty cycle doesn't support PWMX, getting the pwm duty cycle also doesn't support PWMX. */
+#define PWM_SUBMODULE_CHANNEL 2
 
 /*! @brief List of PWM submodules */
 typedef enum _pwm_submodule
@@ -100,6 +101,16 @@ typedef enum _pwm_force_output_trigger
     kPWM_Force_External,     /*!< The external force signal, EXT_FORCE, from outside the PWM module causes updates */
     kPWM_Force_ExternalSync  /*!< The external sync signal, EXT_SYNC, from outside the PWM module causes updates */
 } pwm_force_output_trigger_t;
+
+/*! @brief PWM channel output status */
+typedef enum _pwm_output_state
+{
+    kPWM_HighState = 0, /*!< The output state of PWM channel is high */
+    kPWM_LowState,      /*!< The output state of PWM channel is low */
+    kPWM_NormalState,   /*!< The output state of PWM channel is normal */
+    kPWM_InvertState,   /*!< The output state of PWM channel is invert */
+    kPWM_MaskState      /*!< The output state of PWM channel is mask */
+} pwm_output_state_t;
 
 /*! @brief PWM counter initialization options */
 typedef enum _pwm_init_source
@@ -334,6 +345,7 @@ typedef struct _pwm_signal_param
     pwm_level_select_t level;  /*!< PWM output active level select */
     uint16_t deadtimeValue;    /*!< The deadtime value; only used if channel pair is operating in complementary mode */
     pwm_fault_state_t faultState; /*!< PWM output fault status */
+    bool pwmchannelenable;        /*!< Enable PWM output */
 } pwm_signal_param_t;
 
 /*!
@@ -347,10 +359,12 @@ typedef struct _pwm_signal_param
  */
 typedef struct _pwm_config
 {
-    bool enableDebugMode;                    /*!< true: PWM continues to run in debug mode;
-                                                  false: PWM is paused in debug mode */
+    bool enableDebugMode; /*!< true: PWM continues to run in debug mode;
+                               false: PWM is paused in debug mode */
+#if !defined(FSL_FEATURE_PWM_HAS_NO_WAITEN) || (!FSL_FEATURE_PWM_HAS_NO_WAITEN)
     bool enableWait;                         /*!< true: PWM continues to run in WAIT mode;
                                                   false: PWM is paused in WAIT mode */
+#endif                                       /* FSL_FEATURE_PWM_HAS_NO_WAITEN */
     pwm_init_source_t initializationControl; /*!< Option to initialize the counter */
     pwm_clock_source_t clockSource;          /*!< Clock source for the counter */
     pwm_clock_prescale_t prescale;           /*!< Pre-scaler to divide down the clock */
@@ -469,14 +483,14 @@ void PWM_GetDefaultConfig(pwm_config_t *config);
  *
  * @param base        PWM peripheral base address
  * @param subModule   PWM submodule to configure
- * @param chnlParams  Array of PWM channel parameters to configure the channel(s)
+ * @param chnlParams  Array of PWM channel parameters to configure the channel(s), PWMX submodule is not supported.
  * @param numOfChnls  Number of channels to configure, this should be the size of the array passed in.
  *                    Array size should not be more than 2 as each submodule has 2 pins to output PWM
  * @param mode        PWM operation mode, options available in enumeration ::pwm_mode_t
  * @param pwmFreq_Hz  PWM signal frequency in Hz
  * @param srcClock_Hz PWM main counter clock in Hz.
  *
- * @return Returns kStatusFail if there was error setting up the signal; kStatusSuccess otherwise
+ * @return Returns kStatus_Fail if there was error setting up the signal; kStatus_Success otherwise
  */
 status_t PWM_SetupPwm(PWM_Type *base,
                       pwm_submodule_t subModule,
@@ -485,6 +499,28 @@ status_t PWM_SetupPwm(PWM_Type *base,
                       pwm_mode_t mode,
                       uint32_t pwmFreq_Hz,
                       uint32_t srcClock_Hz);
+
+/*!
+ * @brief Set PWM phase shift for PWM channel running on channel PWM_A, PWM_B which with 50% duty cycle..
+ *
+ * @param base        PWM peripheral base address
+ * @param subModule   PWM submodule to configure
+ * @param pwmChannel  PWM channel to configure
+ * @param pwmFreq_Hz  PWM signal frequency in Hz
+ * @param srcClock_Hz PWM main counter clock in Hz.
+ * @param shiftvalue  Phase shift value
+ * @param doSync      true: Set LDOK bit for the submodule list;
+ *                    false: LDOK bit don't set, need to call PWM_SetPwmLdok to sync update.
+ *
+ * @return Returns kStatus_Fail if there was error setting up the signal; kStatus_Success otherwise
+ */
+status_t PWM_SetupPwmPhaseShift(PWM_Type *base,
+                                pwm_submodule_t subModule,
+                                pwm_channels_t pwmChannel,
+                                uint32_t pwmFreq_Hz,
+                                uint32_t srcClock_Hz,
+                                uint8_t shiftvalue,
+                                bool doSync);
 
 /*!
  * @brief Updates the PWM signal's dutycycle.
@@ -789,6 +825,90 @@ static inline void PWM_StopTimer(PWM_Type *base, uint8_t subModulesToStop)
 /*! @}*/
 
 /*!
+ * @brief Set the PWM VALx registers.
+ *
+ * This function allows the user to write value into VAL registers directly. And it will destroying the PWM clock period
+ * set by the PWM_SetupPwm()/PWM_SetupPwmPhaseShift() functions.
+ * Due to VALx registers are bufferd, the new value will not active uless call PWM_SetPwmLdok() and the reload point is
+ * reached.
+ *
+ * @param base          PWM peripheral base address
+ * @param subModule     PWM submodule to configure
+ * @param valueRegister VALx register that will be writen new value
+ * @param value         Value that will been write into VALx register
+ */
+static inline void PWM_SetVALxValue(PWM_Type *base,
+                                    pwm_submodule_t subModule,
+                                    pwm_value_register_t valueRegister,
+                                    uint16_t value)
+{
+    switch (valueRegister)
+    {
+        case kPWM_ValueRegister_0:
+            base->SM[subModule].VAL0 = value;
+            break;
+        case kPWM_ValueRegister_1:
+            base->SM[subModule].VAL1 = value;
+            break;
+        case kPWM_ValueRegister_2:
+            base->SM[subModule].VAL2 = value;
+            break;
+        case kPWM_ValueRegister_3:
+            base->SM[subModule].VAL3 = value;
+            break;
+        case kPWM_ValueRegister_4:
+            base->SM[subModule].VAL4 = value;
+            break;
+        case kPWM_ValueRegister_5:
+            base->SM[subModule].VAL5 = value;
+            break;
+        default:
+            assert(false);
+            break;
+    }
+}
+
+/*!
+ * @brief Get the PWM VALx registers.
+ *
+ * @param base          PWM peripheral base address
+ * @param subModule     PWM submodule to configure
+ * @param valueRegister VALx register that will be read value
+ * @return The VALx register value
+ */
+static inline uint16_t PWM_GetVALxValue(PWM_Type *base, pwm_submodule_t subModule, pwm_value_register_t valueRegister)
+{
+    uint16_t temp = 0U;
+
+    switch (valueRegister)
+    {
+        case kPWM_ValueRegister_0:
+            temp = base->SM[subModule].VAL0;
+            break;
+        case kPWM_ValueRegister_1:
+            temp = base->SM[subModule].VAL1;
+            break;
+        case kPWM_ValueRegister_2:
+            temp = base->SM[subModule].VAL2;
+            break;
+        case kPWM_ValueRegister_3:
+            temp = base->SM[subModule].VAL3;
+            break;
+        case kPWM_ValueRegister_4:
+            temp = base->SM[subModule].VAL4;
+            break;
+        case kPWM_ValueRegister_5:
+            temp = base->SM[subModule].VAL5;
+            break;
+        default:
+            assert(false);
+            break;
+    }
+
+    return temp;
+}
+
+/*!
  * @brief Enables or disables the PWM output trigger.
  *
  * This function allows the user to enable or disable the PWM trigger. The PWM has 2 triggers. Trigger 0
@@ -977,6 +1097,207 @@ static inline void PWM_SetupFaultDisableMap(PWM_Type *base,
     }
     base->SM[subModule].DISMAP[pwm_fault_channels] = reg;
 }
+
+/*!
+ * @brief Set PWM output enable
+ *
+ * This feature allows the user to enable the PWM Output.
+ *
+ * @param base               PWM peripheral base address
+ * @param pwmChannel         PWM channel to configure
+ * @param subModule          PWM submodule to configure
+ */
+static inline void PWM_OutputEnable(PWM_Type *base, pwm_channels_t pwmChannel, pwm_submodule_t subModule)
+{
+    /* Set PWM output */
+    switch (pwmChannel)
+    {
+        case kPWM_PwmA:
+            base->OUTEN |= ((uint16_t)1U << ((uint16_t)PWM_OUTEN_PWMA_EN_SHIFT + (uint16_t)subModule));
+            break;
+        case kPWM_PwmB:
+            base->OUTEN |= ((uint16_t)1U << ((uint16_t)PWM_OUTEN_PWMB_EN_SHIFT + (uint16_t)subModule));
+            break;
+        case kPWM_PwmX:
+            base->OUTEN |= ((uint16_t)1U << ((uint16_t)PWM_OUTEN_PWMX_EN_SHIFT + (uint16_t)subModule));
+            break;
+        default:
+            assert(false);
+            break;
+    }
+}
+
+/*!
+ * @brief Set PWM output disable
+ *
+ *This feature allows the user to disable the PWM output.
+ *
+ * @param base               PWM peripheral base address
+ * @param pwmChannel         PWM channel to configure
+ * @param subModule          PWM submodule to configure
+ */
+static inline void PWM_OutputDisable(PWM_Type *base, pwm_channels_t pwmChannel, pwm_submodule_t subModule)
+{
+    switch (pwmChannel)
+    {
+        case kPWM_PwmA:
+            base->OUTEN &= ~((uint16_t)1U << ((uint16_t)PWM_OUTEN_PWMA_EN_SHIFT + (uint16_t)subModule));
+            break;
+        case kPWM_PwmB:
+            base->OUTEN &= ~((uint16_t)1U << ((uint16_t)PWM_OUTEN_PWMB_EN_SHIFT + (uint16_t)subModule));
+            break;
+        case kPWM_PwmX:
+            base->OUTEN &= ~((uint16_t)1U << ((uint16_t)PWM_OUTEN_PWMX_EN_SHIFT + (uint16_t)subModule));
+            break;
+        default:
+            assert(false);
+            break;
+    }
+}
+
+/*!
+ * @brief Get the dutycycle value.
+ *
+ * @param base        PWM peripheral base address
+ * @param subModule   PWM submodule to configure
+ * @param pwmChannel  PWM channel to configure
+ *
+ * @return Current channel dutycycle value.
+ */
+uint8_t PWM_GetPwmChannelState(PWM_Type *base, pwm_submodule_t subModule, pwm_channels_t pwmChannel);
+
+/*!
+ * @brief Set PWM output in idle status (high or low).
+ *
+ * @note This API should call after PWM_SetupPwm() APIs, and PWMX submodule is not supported.
+ *
+ * @param base               PWM peripheral base address
+ * @param pwmChannel         PWM channel to configure
+ * @param subModule          PWM submodule to configure
+ * @param idleStatus         True: PWM output is high in idle status; false: PWM output is low in idle status.
+ *
+ * @return kStatus_Fail if there was error setting up the signal; kStatus_Success if set output idle success
+ */
+status_t PWM_SetOutputToIdle(PWM_Type *base, pwm_channels_t pwmChannel, pwm_submodule_t subModule, bool idleStatus);
+
+/*!
+ * @brief Set the pwm submodule prescaler.
+ *
+ * @param base               PWM peripheral base address
+ * @param subModule          PWM submodule to configure
+ * @param prescaler          Set prescaler value
+ */
+void PWM_SetClockMode(PWM_Type *base, pwm_submodule_t subModule, pwm_clock_prescale_t prescaler);
+
+/*!
+ * @brief This function enables-disables the forcing of the output of a given eFlexPwm channel to logic 0.
+ *
+ * @param base               PWM peripheral base address
+ * @param pwmChannel         PWM channel to configure
+ * @param subModule          PWM submodule to configure
+ * @param forcetozero        True: Enable the pwm force output to zero; False: Disable the pwm output resumes normal
+ *                           function.
+ */
+void PWM_SetPwmForceOutputToZero(PWM_Type *base,
+                                 pwm_submodule_t subModule,
+                                 pwm_channels_t pwmChannel,
+                                 bool forcetozero);
+
+/*!
+ * @brief This function set the output state of the PWM pin as requested for the current cycle.
+ *
+ * @param base               PWM peripheral base address
+ * @param subModule          PWM submodule to configure
+ * @param pwmChannel         PWM channel to configure
+ * @param outputstate        Set pwm output state, see @ref pwm_output_state_t.
+ */
+void PWM_SetChannelOutput(PWM_Type *base,
+                          pwm_submodule_t subModule,
+                          pwm_channels_t pwmChannel,
+                          pwm_output_state_t outputstate);
+
+#if defined(FSL_FEATURE_PWM_HAS_PHASE_DELAY) && FSL_FEATURE_PWM_HAS_PHASE_DELAY
+/*!
+ * @brief This function set the phase delay from the master sync signal of submodule 0.
+ *
+ * @param base               PWM peripheral base address
+ * @param subModule          PWM submodule to configure
+ * @param pwmChannel         PWM channel to configure
+ * @param delayCycles        Number of cycles delayed from submodule 0.
+ *
+ * @return kStatus_Fail if the number of delay cycles is set larger than the period defined in submodule 0;
+ *        kStatus_Success if set phase delay success
+ */
+status_t PWM_SetPhaseDelay(PWM_Type *base, pwm_channels_t pwmChannel, pwm_submodule_t subModule, uint16_t delayCycles);
+#endif
+
+#if defined(FSL_FEATURE_PWM_HAS_INPUT_FILTER_CAPTURE) && FSL_FEATURE_PWM_HAS_INPUT_FILTER_CAPTURE
+/*!
+ * @brief This function set the number of consecutive samples that must agree prior to the input filter.
+ *
+ * @param base               PWM peripheral base address
+ * @param subModule          PWM submodule to configure
+ * @param pwmChannel         PWM channel to configure
+ * @param filterSampleCount  Number of consecutive samples.
+ */
+static inline void PWM_SetFilterSampleCount(PWM_Type *base,
+                                             pwm_channels_t pwmChannel,
+                                             pwm_submodule_t subModule,
+                                             uint8_t filterSampleCount)
+{
+    switch(pwmChannel)
+    {
+        case kPWM_PwmA:
+            base->SM[subModule].CAPTFILTA &= ~((uint16_t)PWM_CAPTFILTA_CAPTA_FILT_CNT_MASK);
+            base->SM[subModule].CAPTFILTA |= PWM_CAPTFILTA_CAPTA_FILT_CNT(filterSampleCount);
+            break;
+        case kPWM_PwmB:
+            base->SM[subModule].CAPTFILTB &= ~((uint16_t)PWM_CAPTFILTB_CAPTB_FILT_CNT_MASK);
+            base->SM[subModule].CAPTFILTB |= PWM_CAPTFILTB_CAPTB_FILT_CNT(filterSampleCount);
+            break;
+        case kPWM_PwmX:
+            base->SM[subModule].CAPTFILTX &= ~((uint16_t)PWM_CAPTFILTX_CAPTX_FILT_CNT_MASK);
+            base->SM[subModule].CAPTFILTX |= PWM_CAPTFILTX_CAPTX_FILT_CNT(filterSampleCount);
+            break;
+        default:
+            assert(false);
+            break;
+    }
+}
+
+/*!
+ * @brief This function set the sampling period of the fault pin input filter.
+ *
+ * @param base                 PWM peripheral base address
+ * @param subModule            PWM submodule to configure
+ * @param pwmChannel           PWM channel to configure
+ * @param filterSamplePeriod   Sampling period of input filter.
+ */
+static inline void PWM_SetFilterSamplePeriod(PWM_Type *base,
+                                             pwm_channels_t pwmChannel,
+                                             pwm_submodule_t subModule,
+                                             uint8_t filterSamplePeriod)
+{
+    switch(pwmChannel)
+    {
+        case kPWM_PwmA:
+            base->SM[subModule].CAPTFILTA &= ~((uint16_t)PWM_CAPTFILTA_CAPTA_FILT_PER_MASK);
+            base->SM[subModule].CAPTFILTA |= PWM_CAPTFILTA_CAPTA_FILT_PER(filterSamplePeriod);
+            break;
+        case kPWM_PwmB:
+            base->SM[subModule].CAPTFILTB &= ~((uint16_t)PWM_CAPTFILTB_CAPTB_FILT_PER_MASK);
+            base->SM[subModule].CAPTFILTB |= PWM_CAPTFILTB_CAPTB_FILT_PER(filterSamplePeriod);
+            break;
+        case kPWM_PwmX:
+            base->SM[subModule].CAPTFILTX &= ~((uint16_t)PWM_CAPTFILTX_CAPTX_FILT_PER_MASK);
+            base->SM[subModule].CAPTFILTX |= PWM_CAPTFILTX_CAPTX_FILT_PER(filterSamplePeriod);
+            break;
+        default:
+            assert(false);
+            break;
+    }
+}
+#endif
 
 #if defined(__cplusplus)
 }

@@ -33,15 +33,15 @@ namespace bsp::ldo
         cpp_freertos::CriticalSection::Exit();
 
 #if BOARD_BellHybrid == 1
-        NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
-        EnableIRQ(ANATOP_EVENT0_IRQn);
+        NVIC_ClearPendingIRQ(PMU_EVENT_IRQn);
+        EnableIRQ(PMU_EVENT_IRQn);
 #endif
     }
 
     void SwitchToLowPowerMode()
     {
 #if BOARD_BellHybrid == 1
-        DisableIRQ(ANATOP_EVENT0_IRQn);
+        DisableIRQ(PMU_EVENT_IRQn);
 #endif
 
         cpp_freertos::CriticalSection::Enter();

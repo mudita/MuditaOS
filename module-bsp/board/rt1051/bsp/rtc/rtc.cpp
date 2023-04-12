@@ -104,7 +104,7 @@ namespace bsp::rtc
         // (4173_6166h) into LPPGDR(LPLVDR) and should then clear
         // the low-voltage event record in the LP status register
         constexpr std::uint32_t LvdMagicNumber = 0x41736166;
-        SNVS->LPPGDR                           = LvdMagicNumber;
+        SNVS->LPLVDR                           = LvdMagicNumber;
 
         // Enable again LP SRTC after resetting the LP. It is mandatory!
         SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;

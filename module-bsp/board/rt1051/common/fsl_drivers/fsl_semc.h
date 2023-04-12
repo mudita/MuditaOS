@@ -1,34 +1,8 @@
 /*
- * The Clear BSD License
- * Copyright 2017 NXP
+ * Copyright 2017-2023 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- * that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 #ifndef _FSL_SEMC_H_
 #define _FSL_SEMC_H_
@@ -46,25 +20,26 @@
 
 /*! @name Driver version */
 /*@{*/
-/*! @brief SEMC driver version 2.0.1. */
-#define FSL_SEMC_DRIVER_VERSION (MAKE_VERSION(2, 0, 2))
+/*! @brief SEMC driver version. */
+#define FSL_SEMC_DRIVER_VERSION (MAKE_VERSION(2, 6, 0))
 /*@}*/
 
-/*! @brief SEMC status. */
-enum _semc_status
+/*! @brief SEMC status, _semc_status. */
+enum
 {
-    kStatus_SEMC_InvalidDeviceType            = MAKE_STATUS(kStatusGroup_SEMC, 0),
-    kStatus_SEMC_IpCommandExecutionError      = MAKE_STATUS(kStatusGroup_SEMC, 1),
-    kStatus_SEMC_AxiCommandExecutionError     = MAKE_STATUS(kStatusGroup_SEMC, 2),
-    kStatus_SEMC_InvalidMemorySize            = MAKE_STATUS(kStatusGroup_SEMC, 3),
-    kStatus_SEMC_InvalidIpcmdDataSize         = MAKE_STATUS(kStatusGroup_SEMC, 4),
-    kStatus_SEMC_InvalidAddressPortWidth      = MAKE_STATUS(kStatusGroup_SEMC, 5),
-    kStatus_SEMC_InvalidDataPortWidth         = MAKE_STATUS(kStatusGroup_SEMC, 6),
-    kStatus_SEMC_InvalidSwPinmuxSelection     = MAKE_STATUS(kStatusGroup_SEMC, 7),
-    kStatus_SEMC_InvalidBurstLength           = MAKE_STATUS(kStatusGroup_SEMC, 8),
+    kStatus_SEMC_InvalidDeviceType        = MAKE_STATUS(kStatusGroup_SEMC, 0), /*!< Invalid device type. */
+    kStatus_SEMC_IpCommandExecutionError  = MAKE_STATUS(kStatusGroup_SEMC, 1), /*!< IP command execution error. */
+    kStatus_SEMC_AxiCommandExecutionError = MAKE_STATUS(kStatusGroup_SEMC, 2), /*!< AXI command execution error. */
+    kStatus_SEMC_InvalidMemorySize        = MAKE_STATUS(kStatusGroup_SEMC, 3), /*!< Invalid memory sie. */
+    kStatus_SEMC_InvalidIpcmdDataSize     = MAKE_STATUS(kStatusGroup_SEMC, 4), /*!< Invalid IP command data size. */
+    kStatus_SEMC_InvalidAddressPortWidth  = MAKE_STATUS(kStatusGroup_SEMC, 5), /*!< Invalid address port width. */
+    kStatus_SEMC_InvalidDataPortWidth     = MAKE_STATUS(kStatusGroup_SEMC, 6), /*!< Invalid data port width. */
+    kStatus_SEMC_InvalidSwPinmuxSelection = MAKE_STATUS(kStatusGroup_SEMC, 7), /*!< Invalid SW pinmux selection. */
+    kStatus_SEMC_InvalidBurstLength       = MAKE_STATUS(kStatusGroup_SEMC, 8), /*!< Invalid burst length */
+    /*! Invalid column address bit width. */
     kStatus_SEMC_InvalidColumnAddressBitWidth = MAKE_STATUS(kStatusGroup_SEMC, 9),
-    kStatus_SEMC_InvalidBaseAddress           = MAKE_STATUS(kStatusGroup_SEMC, 10),
-    kStatus_SEMC_InvalidTimerSetting          = MAKE_STATUS(kStatusGroup_SEMC, 11),
+    kStatus_SEMC_InvalidBaseAddress           = MAKE_STATUS(kStatusGroup_SEMC, 10), /*!< Invalid base address. */
+    kStatus_SEMC_InvalidTimerSetting          = MAKE_STATUS(kStatusGroup_SEMC, 11), /*!< Invalid timer setting. */
 };
 
 /*! @brief SEMC memory device type. */
@@ -93,11 +68,24 @@ typedef enum _semc_sdram_cs
     kSEMC_SDRAM_CS3      /*!< SEMC SDRAM CS3. */
 } semc_sdram_cs_t;
 
+/*! @brief SEMC SRAM Chip selection . */
+typedef enum _semc_sram_cs
+{
+#if defined(FSL_FEATURE_SEMC_SUPPORT_SRAM_COUNT) && (FSL_FEATURE_SEMC_SUPPORT_SRAM_COUNT == 0x04U)
+    kSEMC_SRAM_CS0 = 0, /*!< SEMC SRAM CS0. */
+    kSEMC_SRAM_CS1,     /*!< SEMC SRAM CS1. */
+    kSEMC_SRAM_CS2,     /*!< SEMC SRAM CS2. */
+    kSEMC_SRAM_CS3      /*!< SEMC SRAM CS3. */
+#else
+    kSEMC_SRAM_CS0        = 0, /*!< SEMC SRAM CS0. */
+#endif /* FSL_FEATURE_SEMC_SUPPORT_SRAM_COUNT */
+} semc_sram_cs_t;
+
 /*! @brief SEMC NAND device type. */
 typedef enum _semc_nand_access_type
 {
-    kSEMC_NAND_ACCESS_BY_AXI = 0,
-    kSEMC_NAND_ACCESS_BY_IPCMD,
+    kSEMC_NAND_ACCESS_BY_AXI = 0, /*!< Access to NAND flash by AXI bus. */
+    kSEMC_NAND_ACCESS_BY_IPCMD,   /*!< Access to NAND flash by IP bus. */
 } semc_nand_access_type_t;
 
 /*! @brief SEMC interrupts . */
@@ -141,15 +129,24 @@ typedef enum _semc_sdram_column_bit_num
     kSEMC_SdramColunm_11bit,        /*!< 11 bit. */
     kSEMC_SdramColunm_10bit,        /*!< 10 bit. */
     kSEMC_SdramColunm_9bit,         /*!< 9 bit. */
+#if defined(FSL_FEATURE_SEMC_SDRAM_SUPPORT_COLUMN_ADDRESS_8BIT) && (FSL_FEATURE_SEMC_SDRAM_SUPPORT_COLUMN_ADDRESS_8BIT)
+    kSEMC_SdramColunm_8bit, /*!< 8 bit. */
+#endif                      /* FSL_FEATURE_SEMC_SDRAM_SUPPORT_COLUMN_ADDRESS_8BIT */
 } semc_sdram_column_bit_num_t;
 
 /*! @brief SEMC sdram burst length. */
 typedef enum _semc_sdram_burst_len
 {
+/*! According to ERR050577, Auto-refresh command may possibly fail to be triggered during
+    long time back-to-back write (or read) when SDRAM controller's burst length is greater than 1. */
+#if defined(FSL_FEATURE_SEMC_ERRATA_050577) && (FSL_FEATURE_SEMC_ERRATA_050577 == 0x01U)
+    kSEMC_Sdram_BurstLen1 = 0, /*!< Burst length 1*/
+#else
     kSEMC_Sdram_BurstLen1 = 0, /*!< Burst length 1*/
     kSEMC_Sdram_BurstLen2,     /*!< Burst length 2*/
     kSEMC_Sdram_BurstLen4,     /*!< Burst length 4*/
     kSEMC_Sdram_BurstLen8      /*!< Burst length 8*/
+#endif /* FSL_FEATURE_SEMC_ERRATA_050577 */
 } sem_sdram_burst_len_t;
 
 /*! @brief SEMC nand column address bit number. */
@@ -256,7 +253,10 @@ typedef enum _semc_iomux_nora27_pin
 typedef enum _semc_port_size
 {
     kSEMC_PortSize8Bit = 0, /*!< 8-Bit port size. */
-    kSEMC_PortSize16Bit     /*!< 16-Bit port size. */
+    kSEMC_PortSize16Bit,    /*!< 16-Bit port size. */
+#if defined(FSL_FEATURE_SEMC_SUPPORT_SDRAM_PS_BITWIDTH) && (FSL_FEATURE_SEMC_SUPPORT_SDRAM_PS_BITWIDTH == 0x02U)
+    kSEMC_PortSize32Bit /*!< 32-Bit port size. */
+#endif                  /* FSL_FEATURE_SEMC_SUPPORT_SDRAM_PS_BITWIDTH */
 } smec_port_size_t;
 
 /*! @brief SEMC address mode. */
@@ -278,8 +278,22 @@ typedef enum _semc_dqs_mode
 typedef enum _semc_adv_polarity
 {
     kSEMC_AdvActiveLow = 0, /*!< Adv active low. */
-    kSEMC_AdvActivehigh,    /*!< Adv active low. */
+    kSEMC_AdvActiveHigh,    /*!< Adv active high. */
 } semc_adv_polarity_t;
+
+/*! @brief SEMC sync mode. */
+typedef enum _semc_sync_mode
+{
+    kSEMC_AsyncMode = 0, /*!< Async mode. */
+    kSEMC_SyncMode,      /*!< Sync mode. */
+} semc_sync_mode_t;
+
+/*! @brief SEMC ADV signal level control. */
+typedef enum _semc_adv_level_control
+{
+    kSEMC_AdvHigh = 0, /*!< Adv is high during address hold state. */
+    kSEMC_AdvLow,      /*!< Adv is low during address hold state. */
+} semc_adv_level_control_t;
 
 /*! @brief SEMC RDY signal active polarity. */
 typedef enum _semc_rdy_polarity
@@ -389,6 +403,10 @@ typedef struct _semc_sdram_config
     uint32_t refreshPeriod_nsPerRow; /*!< Refresh timer period like 64ms * 1000000/8192 . */
     uint32_t refreshUrgThreshold;    /*!< Refresh urgent threshold. */
     uint8_t refreshBurstLen;         /*!< Refresh burst length. */
+#if defined(FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL) && (FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL)
+    uint8_t delayChain; /*!< Delay chain, which adds delays on DQS clock to compensate timings while DQS is faster than
+                           read data. */
+#endif                  /* FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL */
 } semc_sdram_config_t;
 
 /*! @brief SEMC NAND device timing configuration structure. */
@@ -451,10 +469,22 @@ typedef struct _semc_nor_config
     uint8_t tReHigh_Ns;                             /*!< RE high time for async mode. */
     uint8_t tTurnAround_Ns;                         /*!< Turnaround time for async mode. */
     uint8_t tAddr2WriteHold_Ns;                     /*!< Address to write data hold time for async mode. */
-    uint8_t tWriteSetup_Ns;                         /*!< Write data setup time for sync mode.*/
-    uint8_t tWriteHold_Ns;                          /*!< Write hold time for sync mode. */
-    uint8_t latencyCount;                           /*!< Latency count for sync mode. */
-    uint8_t readCycle;                              /*!< Read cycle time for sync mode. */
+#if defined(FSL_FEATURE_SEMC_HAS_NOR_WDS_TIME) && (FSL_FEATURE_SEMC_HAS_NOR_WDS_TIME)
+    uint8_t tWriteSetup_Ns; /*!< Write data setup time for sync mode.*/
+#endif
+#if defined(FSL_FEATURE_SEMC_HAS_NOR_WDH_TIME) && (FSL_FEATURE_SEMC_HAS_NOR_WDH_TIME)
+    uint8_t tWriteHold_Ns; /*!< Write hold time for sync mode. */
+#endif
+#if defined(FSL_FEATURE_SEMC_HAS_NOR_LC_TIME) && (FSL_FEATURE_SEMC_HAS_NOR_LC_TIME)
+    uint8_t latencyCount; /*!< Latency count for sync mode. */
+#endif
+#if defined(FSL_FEATURE_SEMC_HAS_NOR_RD_TIME) && (FSL_FEATURE_SEMC_HAS_NOR_RD_TIME)
+    uint8_t readCycle; /*!< Read cycle time for sync mode. */
+#endif
+#if defined(FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL) && (FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL)
+    uint8_t delayChain; /*!< Delay chain, which adds delays on DQS clock to compensate timings while DQS is faster than
+                           read data. */
+#endif                  /* FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL */
 } semc_nor_config_t;
 
 /*! @brief SEMC SRAM  configuration structure. */
@@ -469,21 +499,48 @@ typedef struct _semc_sram_config
     semc_addr_mode_t addrMode;             /*!< Address mode. */
     sem_norsram_burst_len_t burstLen;      /*!< Burst length. */
     smec_port_size_t portSize;             /*!< Port size. */
+#if defined(FSL_FEATURE_SEMC_HAS_SRAM_SYNCEN) && (FSL_FEATURE_SEMC_HAS_SRAM_SYNCEN)
+    semc_sync_mode_t syncMode; /*!< Sync mode. */
+#endif                         /* FSL_FEATURE_SEMC_HAS_SRAM_SYNCEN */
+#if defined(FSL_FEATURE_SEMC_HAS_SRAM_WAITEN) && (FSL_FEATURE_SEMC_HAS_SRAM_WAITEN)
+    bool waitEnable; /*!< Wait enable. */
+#endif               /* FSL_FEATURE_SEMC_HAS_SRAM_WAITEN */
+#if defined(FSL_FEATURE_SEMC_HAS_SRAM_WAITSP) && (FSL_FEATURE_SEMC_HAS_SRAM_WAITSP)
+    uint8_t waitSample; /*!< Wait sample. */
+#endif                  /* FSL_FEATURE_SEMC_HAS_SRAM_WAITSP */
+#if defined(FSL_FEATURE_SEMC_HAS_SRAM_ADVH) && (FSL_FEATURE_SEMC_HAS_SRAM_ADVH)
+    semc_adv_level_control_t advLevelCtrl; /*!< ADV# level control during address hold state, 1: low, 0: high. */
+#endif                                     /* FSL_FEATURE_SEMC_HAS_SRAM_ADVH */
     uint8_t tCeSetup_Ns;                   /*!< The CE setup time. */
     uint8_t tCeHold_Ns;                    /*!< The CE hold time. */
     uint8_t tCeInterval_Ns;                /*!< CE interval minimum time. */
-    uint8_t tAddrSetup_Ns;                 /*!< The address setup time. */
-    uint8_t tAddrHold_Ns;                  /*!< The address hold time. */
-    uint8_t tWeLow_Ns;                     /*!< WE low time for async mode. */
-    uint8_t tWeHigh_Ns;                    /*!< WE high time for async mode. */
-    uint8_t tReLow_Ns;                     /*!< RE low time for async mode. */
-    uint8_t tReHigh_Ns;                    /*!< RE high time for async mode. */
-    uint8_t tTurnAround_Ns;                /*!< Turnaround time for async mode. */
-    uint8_t tAddr2WriteHold_Ns;            /*!< Address to write data hold time for async mode. */
-    uint8_t tWriteSetup_Ns;                /*!< Write data setup time for sync mode.*/
-    uint8_t tWriteHold_Ns;                 /*!< Write hold time for sync mode. */
-    uint8_t latencyCount;                  /*!< Latency count for sync mode. */
-    uint8_t readCycle;                     /*!< Read cycle time for sync mode. */
+#if defined(FSL_FEATURE_SEMC_HAS_SRAM_RDH_TIME) && (FSL_FEATURE_SEMC_HAS_SRAM_RDH_TIME)
+    uint8_t readHoldTime_Ns;    /*!< read hold time. */
+#endif                          /* FSL_FEATURE_SEMC_HAS_SRAM_RDH_TIME */
+    uint8_t tAddrSetup_Ns;      /*!< The address setup time. */
+    uint8_t tAddrHold_Ns;       /*!< The address hold time. */
+    uint8_t tWeLow_Ns;          /*!< WE low time for async mode. */
+    uint8_t tWeHigh_Ns;         /*!< WE high time for async mode. */
+    uint8_t tReLow_Ns;          /*!< RE low time for async mode. */
+    uint8_t tReHigh_Ns;         /*!< RE high time for async mode. */
+    uint8_t tTurnAround_Ns;     /*!< Turnaround time for async mode. */
+    uint8_t tAddr2WriteHold_Ns; /*!< Address to write data hold time for async mode. */
+#if defined(FSL_FEATURE_SEMC_HAS_SRAM_WDS_TIME) && (FSL_FEATURE_SEMC_HAS_SRAM_WDS_TIME)
+    uint8_t tWriteSetup_Ns; /*!<Write data setup time for sync mode. */
+#endif
+#if defined(FSL_FEATURE_SEMC_HAS_SRAM_WDH_TIME) && (FSL_FEATURE_SEMC_HAS_SRAM_WDH_TIME)
+    uint8_t tWriteHold_Ns; /*!<Write hold time for sync mode. */
+#endif
+#if defined(FSL_FEATURE_SEMC_HAS_SRAM_LC_TIME) && (FSL_FEATURE_SEMC_HAS_SRAM_LC_TIME)
+    uint8_t latencyCount; /*!<Latency count for sync mode. */
+#endif
+#if defined(FSL_FEATURE_SEMC_HAS_SRAM_RD_TIME) && (FSL_FEATURE_SEMC_HAS_SRAM_RD_TIME)
+    uint8_t readCycle; /*!<Read cycle time for sync mode. */
+#endif
+#if defined(FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL) && (FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL)
+    uint8_t delayChain; /*!< Delay chain, which adds delays on DQS clock to compensate timings while DQS is faster than
+                           read data. */
+#endif                  /* FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL */
 } semc_sram_config_t;
 
 /*! @brief SEMC DBI configuration structure. */
@@ -504,29 +561,45 @@ typedef struct _semc_dbi_config
     uint8_t tCsxInterval_Ns;                    /*!< Write data setup time.*/
 } semc_dbi_config_t;
 
-/*! @brief SEMC AXI queue a weight setting. */
-typedef struct _semc_queuea_weight
+/*! @brief SEMC AXI queue a weight setting structure. */
+typedef struct _semc_queuea_weight_struct
 {
     uint32_t qos : 4;              /*!< weight of qos for queue 0 . */
     uint32_t aging : 4;            /*!< weight of aging for queue 0.*/
-    uint32_t slaveHitSwith : 8;    /*!< weight of read/write switch for queue 0.*/
     uint32_t slaveHitNoswitch : 8; /*!< weight of read/write no switch for queue 0  .*/
+    uint32_t slaveHitSwitch : 8;   /*!< weight of read/write switch for queue 0.*/
+} semc_queuea_weight_struct_t;
+
+/*! @brief SEMC AXI queue a weight setting union. */
+typedef union _semc_queuea_weight
+{
+    semc_queuea_weight_struct_t queueaConfig; /*!< Structure configuration for queueA. */
+    uint32_t queueaValue; /*!< Configuration value for queueA which could directly write to the reg. */
 } semc_queuea_weight_t;
 
-/*! @brief SEMC AXI queue b weight setting. */
-typedef struct _semc_queueb_weight
+/*! @brief SEMC AXI queue b weight setting structure. */
+typedef struct _semc_queueb_weight_struct
 {
-    uint32_t qos : 4;           /*!< weight of qos for queue 1. */
-    uint32_t aging : 4;         /*!< weight of aging for queue 1.*/
-    uint32_t slaveHitSwith : 8; /*!< weight of read/write switch for queue 1.*/
-    uint32_t weightPagehit : 8; /*!< weight of page hit for queue 1 only .*/
-    uint32_t bankRotation : 8;  /*!< weight of bank rotation for queue 1 only .*/
+    uint32_t qos : 4;              /*!< weight of qos for queue 1. */
+    uint32_t aging : 4;            /*!< weight of aging for queue 1.*/
+    uint32_t weightPagehit : 8;    /*!< weight of page hit for queue 1 only .*/
+    uint32_t slaveHitNoswitch : 8; /*!< weight of read/write no switch for queue 1.*/
+    uint32_t bankRotation : 8;     /*!< weight of bank rotation for queue 1 only .*/
+} semc_queueb_weight_struct_t;
+
+/*! @brief SEMC AXI queue b weight setting union. */
+typedef union _semc_queueb_weight
+{
+    semc_queueb_weight_struct_t queuebConfig; /*!< Structure configuration for queueB. */
+    uint32_t queuebValue; /*!< Configuration value for queueB which could directly write to the reg. */
 } semc_queueb_weight_t;
 
 /*! @brief SEMC AXI queue weight setting. */
 typedef struct _semc_axi_queueweight
 {
+    bool queueaEnable;                 /*!< Enable queue a. */
     semc_queuea_weight_t queueaWeight; /*!< Weight settings for queue a. */
+    bool queuebEnable;                 /*!< Enable queue b. */
     semc_queueb_weight_t queuebWeight; /*!< Weight settings for queue b. */
 } semc_axi_queueweight_t;
 
@@ -551,280 +624,296 @@ typedef struct _semc_config_t
  ******************************************************************************/
 
 #if defined(__cplusplus)
-extern "C"
-{
+extern "C" {
 #endif
 
-    /*!
-     * @name SEMC Initialization and De-initialization
-     * @{
-     */
+/*!
+ * @name SEMC Initialization and De-initialization
+ * @{
+ */
 
-    /*!
-     * @brief Gets the SEMC default basic configuration structure.
-     *
-     * The purpose of this API is to get the default SEMC
-     * configure structure for SEMC_Init(). User may use the initialized
-     * structure unchanged in SEMC_Init(), or modify some fields of the
-     * structure before calling SEMC_Init().
-     * Example:
-       @code
-       semc_config_t config;
-       SEMC_GetDefaultConfig(&config);
-       @endcode
-     * @param config The SEMC configuration structure pointer.
-     */
-    void SEMC_GetDefaultConfig(semc_config_t *config);
+/*!
+ * @brief Gets the SEMC default basic configuration structure.
+ *
+ * The purpose of this API is to get the default SEMC
+ * configure structure for SEMC_Init(). User may use the initialized
+ * structure unchanged in SEMC_Init(), or modify some fields of the
+ * structure before calling SEMC_Init().
+ * Example:
+   @code
+   semc_config_t config;
+   SEMC_GetDefaultConfig(&config);
+   @endcode
+ * @param config The SEMC configuration structure pointer.
+ */
+void SEMC_GetDefaultConfig(semc_config_t *config);
 
-    /*!
-     * @brief Initializes SEMC.
-     * This function ungates the SEMC clock and initializes SEMC.
-     * This function must be called before calling any other SEMC driver functions.
-     *
-     * @param base SEMC peripheral base address.
-     * @param configure The SEMC configuration structure pointer.
-     */
-    void SEMC_Init(SEMC_Type *base, semc_config_t *configure);
+/*!
+ * @brief Initializes SEMC.
+ * This function ungates the SEMC clock and initializes SEMC.
+ * This function must be called before calling any other SEMC driver functions.
+ *
+ * @param base SEMC peripheral base address.
+ * @param configure The SEMC configuration structure pointer.
+ */
+void SEMC_Init(SEMC_Type *base, semc_config_t *configure);
 
-    /*!
-     * @brief Deinitializes the SEMC module and gates the clock.
-     * This function gates the SEMC clock. As a result, the SEMC
-     * module doesn't work after calling this function.
-     *
-     * @param base SEMC peripheral base address.
-     */
-    void SEMC_Deinit(SEMC_Type *base);
+/*!
+ * @brief Deinitializes the SEMC module and gates the clock.
+ *
+ * This function gates the SEMC clock. As a result, the SEMC module doesn't work after
+ * calling this function, for some IDE, calling this API may cause the next downloading
+ * operation failed. so, please call this API cautiously. Additional, users can
+ * using "#define FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL (1)" to disable the clock control
+ * operation in drivers.
+ *
+ * @param base SEMC peripheral base address.
+ */
+void SEMC_Deinit(SEMC_Type *base);
 
-    /* @} */
+/* @} */
 
-    /*!
-     * @name SEMC Configuration Operation For Each Memory Type
-     * @{
-     */
+/*!
+ * @name SEMC Configuration Operation For Each Memory Type
+ * @{
+ */
 
-    /*!
-     * @brief Configures SDRAM controller in SEMC.
-     *
-     * @param base SEMC peripheral base address.
-     * @param cs The chip selection.
-     * @param config The sdram configuration.
-     * @param clkSrc_Hz The SEMC clock frequency.
-     */
-    status_t SEMC_ConfigureSDRAM(SEMC_Type *base, semc_sdram_cs_t cs, semc_sdram_config_t *config, uint32_t clkSrc_Hz);
+/*!
+ * @brief Configures SDRAM controller in SEMC.
+ *
+ * @param base SEMC peripheral base address.
+ * @param cs The chip selection.
+ * @param config The sdram configuration.
+ * @param clkSrc_Hz The SEMC clock frequency.
+ */
+status_t SEMC_ConfigureSDRAM(SEMC_Type *base, semc_sdram_cs_t cs, semc_sdram_config_t *config, uint32_t clkSrc_Hz);
 
-    /*!
-     * @brief Configures NAND controller in SEMC.
-     *
-     * @param base SEMC peripheral base address.
-     * @param config The nand configuration.
-     * @param clkSrc_Hz The SEMC clock frequency.
-     */
-    status_t SEMC_ConfigureNAND(SEMC_Type *base, semc_nand_config_t *config, uint32_t clkSrc_Hz);
+/*!
+ * @brief Configures NAND controller in SEMC.
+ *
+ * @param base SEMC peripheral base address.
+ * @param config The nand configuration.
+ * @param clkSrc_Hz The SEMC clock frequency.
+ */
+status_t SEMC_ConfigureNAND(SEMC_Type *base, semc_nand_config_t *config, uint32_t clkSrc_Hz);
 
-    /*!
-     * @brief Configures NOR controller in SEMC.
-     *
-     * @param base SEMC peripheral base address.
-     * @param config The nor configuration.
-     * @param clkSrc_Hz The SEMC clock frequency.
-     */
-    status_t SEMC_ConfigureNOR(SEMC_Type *base, semc_nor_config_t *config, uint32_t clkSrc_Hz);
+/*!
+ * @brief Configures NOR controller in SEMC.
+ *
+ * @param base SEMC peripheral base address.
+ * @param config The nor configuration.
+ * @param clkSrc_Hz The SEMC clock frequency.
+ */
+status_t SEMC_ConfigureNOR(SEMC_Type *base, semc_nor_config_t *config, uint32_t clkSrc_Hz);
 
-    /*!
-     * @brief Configures SRAM controller in SEMC.
-     *
-     * @param base SEMC peripheral base address.
-     * @param config The sram configuration.
-     * @param clkSrc_Hz The SEMC clock frequency.
-     */
-    status_t SEMC_ConfigureSRAM(SEMC_Type *base, semc_sram_config_t *config, uint32_t clkSrc_Hz);
+/*!
+ * @brief Configures SRAM controller in SEMC.
+ *
+ * @param base SEMC peripheral base address.
+ * @param cs The chip selection.
+ * @param config The sram configuration.
+ * @param clkSrc_Hz The SEMC clock frequency.
+ */
+status_t SEMC_ConfigureSRAMWithChipSelection(SEMC_Type *base,
+                                             semc_sram_cs_t cs,
+                                             semc_sram_config_t *config,
+                                             uint32_t clkSrc_Hz);
 
-    /*!
-     * @brief Configures DBI controller in SEMC.
-     *
-     * @param base SEMC peripheral base address.
-     * @param config The dbi configuration.
-     * @param clkSrc_Hz The SEMC clock frequency.
-     */
-    status_t SEMC_ConfigureDBI(SEMC_Type *base, semc_dbi_config_t *config, uint32_t clkSrc_Hz);
+/*!
+ * @brief Configures SRAM controller in SEMC.
+ * @deprecated Do not use this function. It has been superceded by @ref SEMC_ConfigureSRAMWithChipSelection.
+ * @param base SEMC peripheral base address.
+ * @param config The sram configuration.
+ * @param clkSrc_Hz The SEMC clock frequency.
+ */
+status_t SEMC_ConfigureSRAM(SEMC_Type *base, semc_sram_config_t *config, uint32_t clkSrc_Hz);
 
-    /* @} */
+/*!
+ * @brief Configures DBI controller in SEMC.
+ *
+ * @param base SEMC peripheral base address.
+ * @param config The dbi configuration.
+ * @param clkSrc_Hz The SEMC clock frequency.
+ */
+status_t SEMC_ConfigureDBI(SEMC_Type *base, semc_dbi_config_t *config, uint32_t clkSrc_Hz);
 
-    /*!
-     * @name SEMC Interrupt Operation
-     * @{
-     */
+/* @} */
 
-    /*!
-     * @brief Enables the SEMC interrupt.
-     *
-     * This function enables the SEMC interrupts according to the provided mask. The mask
-     * is a logical OR of enumeration members. See @ref semc_interrupt_enable_t.
-     * For example, to enable the IP command done and error interrupt, do the following.
-     * @code
-     *     SEMC_EnableInterrupts(ENET, kSEMC_IPCmdDoneInterrupt | kSEMC_IPCmdErrInterrupt);
-     * @endcode
-     *
-     * @param base  SEMC peripheral base address.
-     * @param mask  SEMC interrupts to enable. This is a logical OR of the
-     *             enumeration :: semc_interrupt_enable_t.
-     */
-    static inline void SEMC_EnableInterrupts(SEMC_Type *base, uint32_t mask)
-    {
-        base->INTEN |= mask;
-    }
+/*!
+ * @name SEMC Interrupt Operation
+ * @{
+ */
 
-    /*!
-     * @brief Disables the SEMC interrupt.
-     *
-     * This function disables the SEMC interrupts according to the provided mask. The mask
-     * is a logical OR of enumeration members. See @ref semc_interrupt_enable_t.
-     * For example, to disable the IP command done and error interrupt, do the following.
-     * @code
-     *     SEMC_DisableInterrupts(ENET, kSEMC_IPCmdDoneInterrupt | kSEMC_IPCmdErrInterrupt);
-     * @endcode
-     *
-     * @param base  SEMC peripheral base address.
-     * @param mask  SEMC interrupts to disable. This is a logical OR of the
-     *             enumeration :: semc_interrupt_enable_t.
-     */
-    static inline void SEMC_DisableInterrupts(SEMC_Type *base, uint32_t mask)
-    {
-        base->INTEN &= ~mask;
-    }
+/*!
+ * @brief Enables the SEMC interrupt.
+ *
+ * This function enables the SEMC interrupts according to the provided mask. The mask
+ * is a logical OR of enumeration members. See @ref semc_interrupt_enable_t.
+ * For example, to enable the IP command done and error interrupt, do the following.
+ * @code
+ *     SEMC_EnableInterrupts(ENET, kSEMC_IPCmdDoneInterrupt | kSEMC_IPCmdErrInterrupt);
+ * @endcode
+ *
+ * @param base  SEMC peripheral base address.
+ * @param mask  SEMC interrupts to enable. This is a logical OR of the
+ *             enumeration :: semc_interrupt_enable_t.
+ */
+static inline void SEMC_EnableInterrupts(SEMC_Type *base, uint32_t mask)
+{
+    base->INTEN |= mask;
+}
 
-    /*!
-     * @brief Gets the SEMC status.
-     *
-     * This function gets the SEMC interrupts event status.
-     * User can use the a logical OR of enumeration member as a mask.
-     * See @ref semc_interrupt_enable_t.
-     *
-     * @param base  SEMC peripheral base address.
-     * @return status flag, use status flag in semc_interrupt_enable_t to get the related status.
-     */
-    static inline bool SEMC_GetStatusFlag(SEMC_Type *base)
-    {
-        return base->INTR;
-    }
+/*!
+ * @brief Disables the SEMC interrupt.
+ *
+ * This function disables the SEMC interrupts according to the provided mask. The mask
+ * is a logical OR of enumeration members. See @ref semc_interrupt_enable_t.
+ * For example, to disable the IP command done and error interrupt, do the following.
+ * @code
+ *     SEMC_DisableInterrupts(ENET, kSEMC_IPCmdDoneInterrupt | kSEMC_IPCmdErrInterrupt);
+ * @endcode
+ *
+ * @param base  SEMC peripheral base address.
+ * @param mask  SEMC interrupts to disable. This is a logical OR of the
+ *             enumeration :: semc_interrupt_enable_t.
+ */
+static inline void SEMC_DisableInterrupts(SEMC_Type *base, uint32_t mask)
+{
+    base->INTEN &= ~mask;
+}
 
-    /*!
-     * @brief Clears the SEMC status flag state.
-     *
-     * The following status register flags can be cleared SEMC interrupt status.
-     *
-     * @param base SEMC base pointer
-     * @param mask The status flag mask, a logical OR of enumeration member @ref semc_interrupt_enable_t.
-     */
-    static inline void SEMC_ClearStatusFlags(SEMC_Type *base, uint32_t mask)
-    {
-        base->INTR |= mask;
-    }
+/*!
+ * @brief Gets the SEMC status.
+ *
+ * This function gets the SEMC interrupts event status.
+ * User can use the a logical OR of enumeration member as a mask.
+ * See @ref semc_interrupt_enable_t.
+ *
+ * @param base  SEMC peripheral base address.
+ * @return status flag, use status flag in semc_interrupt_enable_t to get the related status.
+ */
+static inline bool SEMC_GetStatusFlag(SEMC_Type *base)
+{
+    return (base->INTR != 0x00U) ? true : false;
+}
 
-    /* @} */
+/*!
+ * @brief Clears the SEMC status flag state.
+ *
+ * The following status register flags can be cleared SEMC interrupt status.
+ *
+ * @param base SEMC base pointer
+ * @param mask The status flag mask, a logical OR of enumeration member @ref semc_interrupt_enable_t.
+ */
+static inline void SEMC_ClearStatusFlags(SEMC_Type *base, uint32_t mask)
+{
+    base->INTR |= mask;
+}
 
-    /*!
-     * @name SEMC Memory Access Operation
-     * @{
-     */
+/* @} */
 
-    /*!
-     * @brief Check if SEMC is in idle.
-     *
-     * @param base  SEMC peripheral base address.
-     * @return  True SEMC is in idle, false is not in idle.
-     */
-    static inline bool SEMC_IsInIdle(SEMC_Type *base)
-    {
-        return (base->STS0 & SEMC_STS0_IDLE_MASK) ? true : false;
-    }
+/*!
+ * @name SEMC Memory Access Operation
+ * @{
+ */
 
-    /*!
-     * @brief SEMC IP command access.
-     *
-     * @param base  SEMC peripheral base address.
-     * @param type  SEMC memory type. refer to "semc_mem_type_t"
-     * @param address  SEMC device address.
-     * @param command  SEMC IP command.
-     * For NAND device, we should use the SEMC_BuildNandIPCommand to get the right nand command.
-     * For NOR/DBI device, take refer to "semc_ipcmd_nor_dbi_t".
-     * For SRAM device, take refer to "semc_ipcmd_sram_t".
-     * For SDRAM device, take refer to "semc_ipcmd_sdram_t".
-     * @param write  Data for write access.
-     * @param read   Data pointer for read data out.
-     */
-    status_t SEMC_SendIPCommand(
-        SEMC_Type *base, semc_mem_type_t type, uint32_t address, uint16_t command, uint32_t write, uint32_t *read);
+/*!
+ * @brief Check if SEMC is in idle.
+ *
+ * @param base  SEMC peripheral base address.
+ * @return  True SEMC is in idle, false is not in idle.
+ */
+static inline bool SEMC_IsInIdle(SEMC_Type *base)
+{
+    return ((base->STS0 & SEMC_STS0_IDLE_MASK) != 0x00U) ? true : false;
+}
 
-    /*!
-     * @brief Build SEMC IP command for NAND.
-     *
-     * This function build SEMC NAND IP command. The command is build of user command code,
-     * SEMC address mode and SEMC command mode.
-     *
-     * @param userCommand  NAND device normal command.
-     * @param addrMode  NAND address mode. Refer to "semc_ipcmd_nand_addrmode_t".
-     * @param cmdMode   NAND command mode. Refer to "semc_ipcmd_nand_cmdmode_t".
-     */
-    static inline uint16_t SEMC_BuildNandIPCommand(uint8_t userCommand,
-                                                   semc_ipcmd_nand_addrmode_t addrMode,
-                                                   semc_ipcmd_nand_cmdmode_t cmdMode)
-    {
-        return (uint16_t)((uint16_t)userCommand << 8) | (uint16_t)(addrMode << 4) | ((uint8_t)cmdMode & 0x0Fu);
-    }
+/*!
+ * @brief SEMC IP command access.
+ *
+ * @param base  SEMC peripheral base address.
+ * @param memType  SEMC memory type. refer to "semc_mem_type_t"
+ * @param address  SEMC device address.
+ * @param command  SEMC IP command.
+ * For NAND device, we should use the SEMC_BuildNandIPCommand to get the right nand command.
+ * For NOR/DBI device, take refer to "semc_ipcmd_nor_dbi_t".
+ * For SRAM device, take refer to "semc_ipcmd_sram_t".
+ * For SDRAM device, take refer to "semc_ipcmd_sdram_t".
+ * @param write  Data for write access.
+ * @param read   Data pointer for read data out.
+ */
+status_t SEMC_SendIPCommand(
+    SEMC_Type *base, semc_mem_type_t memType, uint32_t address, uint32_t command, uint32_t write, uint32_t *read);
 
-    /*!
-     * @brief Check if the NAND device is ready.
-     *
-     * @param base  SEMC peripheral base address.
-     * @return  True NAND is ready, false NAND is not ready.
-     */
-    static inline bool SEMC_IsNandReady(SEMC_Type *base)
-    {
-        return (base->STS0 & SEMC_STS0_NARDY_MASK) ? true : false;
-    }
+/*!
+ * @brief Build SEMC IP command for NAND.
+ *
+ * This function build SEMC NAND IP command. The command is build of user command code,
+ * SEMC address mode and SEMC command mode.
+ *
+ * @param userCommand  NAND device normal command.
+ * @param addrMode  NAND address mode. Refer to "semc_ipcmd_nand_addrmode_t".
+ * @param cmdMode   NAND command mode. Refer to "semc_ipcmd_nand_cmdmode_t".
+ */
+static inline uint16_t SEMC_BuildNandIPCommand(uint8_t userCommand,
+                                               semc_ipcmd_nand_addrmode_t addrMode,
+                                               semc_ipcmd_nand_cmdmode_t cmdMode)
+{
+    return ((uint16_t)userCommand << 8U) | ((uint16_t)addrMode << 4U) | ((uint16_t)cmdMode & 0x000FU);
+}
 
-    /*!
-     * @brief SEMC NAND device memory write through IP command.
-     *
-     * @param base  SEMC peripheral base address.
-     * @param address  SEMC NAND device address.
-     * @param data  Data for write access.
-     * @param size_bytes   Data length.
-     */
-    status_t SEMC_IPCommandNandWrite(SEMC_Type *base, uint32_t address, uint8_t *data, uint32_t size_bytes);
+/*!
+ * @brief Check if the NAND device is ready.
+ *
+ * @param base  SEMC peripheral base address.
+ * @return  True NAND is ready, false NAND is not ready.
+ */
+static inline bool SEMC_IsNandReady(SEMC_Type *base)
+{
+    return ((base->STS0 & SEMC_STS0_NARDY_MASK) != 0x00U) ? true : false;
+}
 
-    /*!
-     * @brief SEMC NAND device memory read through IP command.
-     *
-     * @param base  SEMC peripheral base address.
-     * @param address  SEMC NAND device address.
-     * @param data  Data pointer for data read out.
-     * @param size_bytes   Data length.
-     */
-    status_t SEMC_IPCommandNandRead(SEMC_Type *base, uint32_t address, uint8_t *data, uint32_t size_bytes);
+/*!
+ * @brief SEMC NAND device memory write through IP command.
+ *
+ * @param base  SEMC peripheral base address.
+ * @param address  SEMC NAND device address.
+ * @param data  Data for write access.
+ * @param size_bytes   Data length.
+ */
+status_t SEMC_IPCommandNandWrite(SEMC_Type *base, uint32_t address, uint8_t *data, uint32_t size_bytes);
 
-    /*!
-     * @brief SEMC NOR device memory write through IP command.
-     *
-     * @param base  SEMC peripheral base address.
-     * @param address  SEMC NOR device address.
-     * @param data  Data for write access.
-     * @param size_bytes   Data length.
-     */
-    status_t SEMC_IPCommandNorWrite(SEMC_Type *base, uint32_t address, uint8_t *data, uint32_t size_bytes);
+/*!
+ * @brief SEMC NAND device memory read through IP command.
+ *
+ * @param base  SEMC peripheral base address.
+ * @param address  SEMC NAND device address.
+ * @param data  Data pointer for data read out.
+ * @param size_bytes   Data length.
+ */
+status_t SEMC_IPCommandNandRead(SEMC_Type *base, uint32_t address, uint8_t *data, uint32_t size_bytes);
 
-    /*!
-     * @brief SEMC NOR device memory read through IP command.
-     *
-     * @param base  SEMC peripheral base address.
-     * @param address  SEMC NOR device address.
-     * @param data  Data pointer for data read out.
-     * @param size_bytes   Data length.
-     */
-    status_t SEMC_IPCommandNorRead(SEMC_Type *base, uint32_t address, uint8_t *data, uint32_t size_bytes);
+/*!
+ * @brief SEMC NOR device memory write through IP command.
+ *
+ * @param base  SEMC peripheral base address.
+ * @param address  SEMC NOR device address.
+ * @param data  Data for write access.
+ * @param size_bytes   Data length.
+ */
+status_t SEMC_IPCommandNorWrite(SEMC_Type *base, uint32_t address, uint8_t *data, uint32_t size_bytes);
 
-    /* @} */
+/*!
+ * @brief SEMC NOR device memory read through IP command.
+ *
+ * @param base  SEMC peripheral base address.
+ * @param address  SEMC NOR device address.
+ * @param data  Data pointer for data read out.
+ * @param size_bytes   Data length.
+ */
+status_t SEMC_IPCommandNorRead(SEMC_Type *base, uint32_t address, uint8_t *data, uint32_t size_bytes);
+
+/* @} */
 
 #if defined(__cplusplus)
 }

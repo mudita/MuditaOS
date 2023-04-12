@@ -1,35 +1,9 @@
 /*
- * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _FSL_ADC_H_
@@ -46,7 +20,7 @@
  * Definitions
  ******************************************************************************/
 /*! @brief ADC driver version */
-#define FSL_ADC_DRIVER_VERSION (MAKE_VERSION(2, 0, 0)) /*!< Version 2.0.0. */
+#define FSL_ADC_DRIVER_VERSION (MAKE_VERSION(2, 0, 4)) /*!< Version 2.0.4. */
 
 /*!
  * @brief Converter's status flags.
@@ -56,7 +30,7 @@ typedef enum _adc_status_flags
     kADC_ConversionActiveFlag  = ADC_GS_ADACT_MASK, /*!< Conversion is active,not support w1c. */
     kADC_CalibrationFailedFlag = ADC_GS_CALF_MASK,  /*!< Calibration is failed,support w1c. */
     kADC_AsynchronousWakeupInterruptFlag =
-        ADC_GS_AWKST_MASK, /*!< Asynchronous wakeup interrupt occured, support w1c. */
+        ADC_GS_AWKST_MASK, /*!< Asynchronous wakeup interrupt occurred, support w1c. */
 } adc_status_flags_t;
 
 /*!
@@ -217,159 +191,159 @@ typedef struct _adc_channel_config
  * API
  ******************************************************************************/
 #if defined(__cplusplus)
-extern "C"
-{
+extern "C" {
 #endif
 
-    /*!
-     * @name Initialization
-     * @{
-     */
+/*!
+ * @name Initialization
+ * @{
+ */
 
-    /*!
-     * @brief Initialize the ADC module.
-     *
-     * @param base ADC peripheral base address.
-     * @param config Pointer to "adc_config_t" structure.
-     */
-    void ADC_Init(ADC_Type *base, const adc_config_t *config);
+/*!
+ * @brief Initialize the ADC module.
+ *
+ * @param base ADC peripheral base address.
+ * @param config Pointer to "adc_config_t" structure.
+ */
+void ADC_Init(ADC_Type *base, const adc_config_t *config);
 
-    /*!
-     * @brief De-initializes the ADC module.
-     *
-     * @param base ADC peripheral base address.
-     */
-    void ADC_Deinit(ADC_Type *base);
+/*!
+ * @brief De-initializes the ADC module.
+ *
+ * @param base ADC peripheral base address.
+ */
+void ADC_Deinit(ADC_Type *base);
 
-    /*!
-     * @brief Gets an available pre-defined settings for the converter's configuration.
-     *
-     * This function initializes the converter configuration structure with available settings. The default values are:
-     * @code
-     *  config->enableAsynchronousClockOutput = true;
-     *  config->enableOverWrite =               false;
-     *  config->enableContinuousConversion =    false;
-     *  config->enableHighSpeed =               false;
-     *  config->enableLowPower =                false;
-     *  config->enableLongSample =              false;
-     *  config->referenceVoltageSource =        kADC_ReferenceVoltageSourceAlt0;
-     *  config->samplePeriodMode =              kADC_SamplePeriod2or12Clocks;
-     *  config->clockSource =                   kADC_ClockSourceAD;
-     *  config->clockDriver =                   kADC_ClockDriver1;
-     *  config->resolution =                    kADC_Resolution12Bit;
-     * @endcode
-     * @param base   ADC peripheral base address.
-     * @param config Pointer to the configuration structure.
-     */
-    void ADC_GetDefaultConfig(adc_config_t *config);
+/*!
+ * @brief Gets an available pre-defined settings for the converter's configuration.
+ *
+ * This function initializes the converter configuration structure with available settings. The default values are:
+ * @code
+ *  config->enableAsynchronousClockOutput = true;
+ *  config->enableOverWrite =               false;
+ *  config->enableContinuousConversion =    false;
+ *  config->enableHighSpeed =               false;
+ *  config->enableLowPower =                false;
+ *  config->enableLongSample =              false;
+ *  config->referenceVoltageSource =        kADC_ReferenceVoltageSourceAlt0;
+ *  config->samplePeriodMode =              kADC_SamplePeriod2or12Clocks;
+ *  config->clockSource =                   kADC_ClockSourceAD;
+ *  config->clockDriver =                   kADC_ClockDriver1;
+ *  config->resolution =                    kADC_Resolution12Bit;
+ * @endcode
+ * @param config Pointer to the configuration structure.
+ */
+void ADC_GetDefaultConfig(adc_config_t *config);
 
-    /*!
-     * @brief Configures the conversion channel.
-     *
-     * This operation triggers the conversion when in software trigger mode. When in hardware trigger mode, this API
-     * configures the channel while the external trigger source helps to trigger the conversion.
-     *
-     * Note that the "Channel Group" has a detailed description.
-     * To allow sequential conversions of the ADC to be triggered by internal peripherals, the ADC has more than one
-     * group of status and control registers, one for each conversion. The channel group parameter indicates which group
-     * of registers are used, for example channel group 0 is for Group A registers and channel group 1 is for Group B
-     * registers. The
-     * channel groups are used in a "ping-pong" approach to control the ADC operation.  At any point, only one of
-     * the channel groups is actively controlling ADC conversions. The channel group 0 is used for both software and
-     * hardware
-     * trigger modes. Channel groups 1 and greater indicate potentially multiple channel group registers for
-     * use only in hardware trigger mode. See the chip configuration information in the appropriate MCU reference manual
-     * about the
-     * number of SC1n registers (channel groups) specific to this device.  None of the channel groups 1 or greater are
-     * used for software trigger operation. Therefore, writing to these channel groups does not initiate a new
-     * conversion. Updating the channel group 0 while a different channel group is actively controlling a conversion is
-     * allowed and vice versa. Writing any of the channel group registers while that specific channel group is actively
-     * controlling a conversion aborts the current conversion.
-     *
-     * @param base          ADC peripheral base address.
-     * @param channelGroup  Channel group index.
-     * @param config        Pointer to the "adc_channel_config_t" structure for the conversion channel.
-     */
-    void ADC_SetChannelConfig(ADC_Type *base, uint32_t channelGroup, const adc_channel_config_t *config);
+/*!
+ * @brief Configures the conversion channel.
+ *
+ * This operation triggers the conversion when in software trigger mode. When in hardware trigger mode, this API
+ * configures the channel while the external trigger source helps to trigger the conversion.
+ *
+ * Note that the "Channel Group" has a detailed description.
+ * To allow sequential conversions of the ADC to be triggered by internal peripherals, the ADC has more than one
+ * group of status and control registers, one for each conversion. The channel group parameter indicates which group of
+ * registers are used, for example channel group 0 is for Group A registers and channel group 1 is for Group B
+ * registers. The
+ * channel groups are used in a "ping-pong" approach to control the ADC operation.  At any point, only one of
+ * the channel groups is actively controlling ADC conversions. The channel group 0 is used for both software and
+ * hardware
+ * trigger modes. Channel groups 1 and greater indicate potentially multiple channel group registers for
+ * use only in hardware trigger mode. See the chip configuration information in the appropriate MCU reference manual
+ * about the
+ * number of SC1n registers (channel groups) specific to this device.  None of the channel groups 1 or greater are used
+ * for software trigger operation. Therefore, writing to these channel groups does not initiate a new conversion.
+ * Updating the channel group 0 while a different channel group is actively controlling a conversion is allowed and
+ * vice versa. Writing any of the channel group registers while that specific channel group is actively controlling a
+ * conversion aborts the current conversion.
+ *
+ * @param base          ADC peripheral base address.
+ * @param channelGroup  Channel group index.
+ * @param config        Pointer to the "adc_channel_config_t" structure for the conversion channel.
+ */
+void ADC_SetChannelConfig(ADC_Type *base, uint32_t channelGroup, const adc_channel_config_t *config);
 
-    /*!
-     * @brief  Gets the conversion value.
-     *
-     * @param  base         ADC peripheral base address.
-     * @param  channelGroup Channel group index.
-     *
-     * @return              Conversion value.
-     */
-    static inline uint32_t ADC_GetChannelConversionValue(ADC_Type *base, uint32_t channelGroup)
+/*!
+ * @brief  Gets the conversion value.
+ *
+ * @param  base         ADC peripheral base address.
+ * @param  channelGroup Channel group index.
+ *
+ * @return              Conversion value.
+ */
+static inline uint32_t ADC_GetChannelConversionValue(ADC_Type *base, uint32_t channelGroup)
+{
+    assert(channelGroup < (uint32_t)FSL_FEATURE_ADC_CONVERSION_CONTROL_COUNT);
+
+    return base->R[channelGroup];
+}
+
+/*!
+ * @brief Gets the status flags of channel.
+ *
+ * A conversion is completed when the result of the conversion is transferred into the data
+ * result registers. (provided the compare function & hardware averaging is disabled), this is
+ * indicated by the setting of COCOn. If hardware averaging is enabled, COCOn sets only,
+ * if the last of the selected number of conversions is complete. If the compare function is
+ * enabled, COCOn sets and conversion result data is transferred only if the compare
+ * condition is true. If both hardware averaging and compare functions are enabled, then
+ * COCOn sets only if the last of the selected number of conversions is complete and the
+ * compare condition is true.
+ *
+ * @param base         ADC peripheral base address.
+ * @param channelGroup Channel group index.
+ *
+ * @return             Status flags of channel.return 0 means COCO flag is 0,return 1 means COCOflag is 1.
+ */
+static inline uint32_t ADC_GetChannelStatusFlags(ADC_Type *base, uint32_t channelGroup)
+{
+    assert(channelGroup < (uint32_t)FSL_FEATURE_ADC_CONVERSION_CONTROL_COUNT);
+
+    /* If flag is set,return 1,otherwise, return 0. */
+    return (((base->HS) & (1UL << channelGroup)) >> channelGroup);
+}
+
+/*!
+ * @brief  Automates the hardware calibration.
+ *
+ * This auto calibration helps to adjust the plus/minus side gain automatically.
+ * Execute the calibration before using the converter. Note that the software trigger should be used
+ * during calibration.
+ *
+ * @param  base ADC peripheral base address.
+ *
+ * @return                 Execution status.
+ * @retval kStatus_Success Calibration is done successfully.
+ * @retval kStatus_Fail    Calibration has failed.
+ */
+status_t ADC_DoAutoCalibration(ADC_Type *base);
+
+/*!
+ * @brief Set user defined offset.
+ *
+ * @param base   ADC peripheral base address.
+ * @param config Pointer to "adc_offest_config_t" structure.
+ */
+void ADC_SetOffsetConfig(ADC_Type *base, const adc_offest_config_t *config);
+
+/*!
+ * @brief Enables generating the DMA trigger when the conversion is complete.
+ *
+ * @param base   ADC peripheral base address.
+ * @param enable Switcher of the DMA feature. "true" means enabled, "false" means not enabled.
+ */
+static inline void ADC_EnableDMA(ADC_Type *base, bool enable)
+{
+    if (enable)
     {
-        assert(channelGroup < ADC_R_COUNT);
-
-        return base->R[channelGroup];
+        base->GC |= ADC_GC_DMAEN_MASK;
     }
-
-    /*!
-     * @brief Gets the status flags of channel.
-     *
-     * A conversion is completed when the result of the conversion is transferred into the data
-     * result registers. (provided the compare function & hardware averaging is disabled), this is
-     * indicated by the setting of COCOn. If hardware averaging is enabled, COCOn sets only,
-     * if the last of the selected number of conversions is complete. If the compare function is
-     * enabled, COCOn sets and conversion result data is transferred only if the compare
-     * condition is true. If both hardware averaging and compare functions are enabled, then
-     * COCOn sets only if the last of the selected number of conversions is complete and the
-     * compare condition is true.
-     *
-     * @param base         ADC peripheral base address.
-     * @param channelGroup Channel group index.
-     *
-     * @return             Status flags of channel.return 0 means COCO flag is 0,return 1 means COCOflag is 1.
-     */
-    static inline uint32_t ADC_GetChannelStatusFlags(ADC_Type *base, uint32_t channelGroup)
+    else
     {
-        assert(channelGroup < ADC_HC_COUNT);
-
-        /* If flag is set,return 1,otherwise, return 0. */
-        return (((base->HS) & (1U << channelGroup)) >> channelGroup);
+        base->GC &= ~ADC_GC_DMAEN_MASK;
     }
-
-    /*!
-     * @brief  Automates the hardware calibration.
-     *
-     * This auto calibration helps to adjust the plus/minus side gain automatically.
-     * Execute the calibration before using the converter. Note that the software trigger should be used
-     * during calibration.
-     *
-     * @param  base ADC peripheral base address.
-     *
-     * @return                 Execution status.
-     * @retval kStatus_Success Calibration is done successfully.
-     * @retval kStatus_Fail    Calibration has failed.
-     */
-    status_t ADC_DoAutoCalibration(ADC_Type *base);
-
-    /*!
-     * @brief Set user defined offset.
-     *
-     * @param base   ADC peripheral base address.
-     * @param config Pointer to "adc_offest_config_t" structure.
-     */
-    void ADC_SetOffsetConfig(ADC_Type *base, const adc_offest_config_t *config);
-
-    /*!
-     * @brief Enables generating the DMA trigger when the conversion is complete.
-     *
-     * @param base   ADC peripheral base address.
-     * @param enable Switcher of the DMA feature. "true" means enabled, "false" means not enabled.
-     */
-    static inline void ADC_EnableDMA(ADC_Type *base, bool enable)
-    {
-        if (enable) {
-            base->GC |= ADC_GC_DMAEN_MASK;
-        }
-        else {
-            base->GC &= ~ADC_GC_DMAEN_MASK;
-        }
-    }
+}
 
 /*!
  * @brief Enables the hardware trigger mode.
@@ -378,64 +352,76 @@ extern "C"
  * @param enable Switcher of the trigger mode. "true" means hardware tirgger mode,"false" means software mode.
  */
 #if !(defined(FSL_FEATURE_ADC_SUPPORT_HARDWARE_TRIGGER_REMOVE) && FSL_FEATURE_ADC_SUPPORT_HARDWARE_TRIGGER_REMOVE)
-    static inline void ADC_EnableHardwareTrigger(ADC_Type *base, bool enable)
+static inline void ADC_EnableHardwareTrigger(ADC_Type *base, bool enable)
+{
+    if (enable)
     {
-        if (enable) {
-            base->CFG |= ADC_CFG_ADTRG_MASK;
-        }
-        else {
-            base->CFG &= ~ADC_CFG_ADTRG_MASK;
-        }
+        base->CFG |= ADC_CFG_ADTRG_MASK;
     }
+    else
+    {
+        base->CFG &= ~ADC_CFG_ADTRG_MASK;
+    }
+}
 #endif
 
-    /*!
-     * @brief Configures the hardware compare mode.
-     *
-     * The hardware compare mode provides a way to process the conversion result automatically by using hardware. Only
-     * the result in the compare range is available. To compare the range, see "adc_hardware_compare_mode_t" or the
-     * appopriate reference manual for more information.
-     *
-     * @param base ADC peripheral base address.
-     * @param Pointer to "adc_hardware_compare_config_t" structure.
-     *
-     */
-    void ADC_SetHardwareCompareConfig(ADC_Type *base, const adc_hardware_compare_config_t *config);
+/*!
+ * @brief Configures the hardware compare mode.
+ *
+ * The hardware compare mode provides a way to process the conversion result automatically by using hardware. Only the
+ * result
+ * in the compare range is available. To compare the range, see "adc_hardware_compare_mode_t" or the appopriate
+ * reference
+ * manual for more information.
+ *
+ * @param base ADC peripheral base address.
+ * @param config Pointer to "adc_hardware_compare_config_t" structure.
+ *
+ */
+void ADC_SetHardwareCompareConfig(ADC_Type *base, const adc_hardware_compare_config_t *config);
 
-    /*!
-     * @brief Configures the hardware average mode.
-     *
-     * The hardware average mode provides a way to process the conversion result automatically by using hardware. The
-     * multiple
-     * conversion results are accumulated and averaged internally making them easier to read.
-     *
-     * @param base ADC peripheral base address.
-     * @param mode Setting the hardware average mode. See "adc_hardware_average_mode_t".
-     */
-    void ADC_SetHardwareAverageConfig(ADC_Type *base, adc_hardware_average_mode_t mode);
+/*!
+ * @brief Configures the hardware average mode.
+ *
+ * The hardware average mode provides a way to process the conversion result automatically by using hardware. The
+ * multiple
+ * conversion results are accumulated and averaged internally making them easier to read.
+ *
+ * @param base ADC peripheral base address.
+ * @param mode Setting the hardware average mode. See "adc_hardware_average_mode_t".
+ */
+void ADC_SetHardwareAverageConfig(ADC_Type *base, adc_hardware_average_mode_t mode);
 
-    /*!
-     * @brief Gets the converter's status flags.
-     *
-     * @param base ADC peripheral base address.
-     *
-     * @return Flags' mask if indicated flags are asserted. See "adc_status_flags_t".
-     */
-    static inline uint32_t ADC_GetStatusFlags(ADC_Type *base)
-    {
-        return base->GS;
-    }
+/*!
+ * @brief Gets the converter's status flags.
+ *
+ * @param base ADC peripheral base address.
+ *
+ * @return Flags' mask if indicated flags are asserted. See "adc_status_flags_t".
+ */
+static inline uint32_t ADC_GetStatusFlags(ADC_Type *base)
+{
+    return base->GS;
+}
 
-    /*!
-     * @brief Clears the converter's status falgs.
-     *
-     * @param base ADC peripheral base address.
-     * @param mask Mask value for the cleared flags. See "adc_status_flags_t".
-     */
-    void ADC_ClearStatusFlags(ADC_Type *base, uint32_t mask);
+/*!
+ * @brief Clears the converter's status falgs.
+ *
+ * @param base ADC peripheral base address.
+ * @param mask Mask value for the cleared flags. See "adc_status_flags_t".
+ */
+void ADC_ClearStatusFlags(ADC_Type *base, uint32_t mask);
+
+/*!
+ *@}
+ */
 
 #if defined(__cplusplus)
 }
 #endif
+
+/*!
+ *@}
+ */
 
 #endif /* _FSL_ADC_H_ */

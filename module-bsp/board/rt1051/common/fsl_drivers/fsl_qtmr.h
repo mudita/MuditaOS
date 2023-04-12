@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 NXP
+ * Copyright 2017-2022 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -17,10 +17,17 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+#ifndef TMR_CSCTRL_OFLAG_MASK
+#define TMR_CSCTRL_OFLAG_MASK (0x100UL)
+#endif
+
+#ifndef TMR_CSCTRL_OFLAG_SHIFT
+#define TMR_CSCTRL_OFLAG_SHIFT (8UL)
+#endif
 
 /*! @name Driver version */
 /*@{*/
-#define FSL_QTMR_DRIVER_VERSION (MAKE_VERSION(2, 0, 2)) /*!< Version */
+#define FSL_QTMR_DRIVER_VERSION (MAKE_VERSION(2, 2, 2)) /*!< Version */
 /*@}*/
 
 /*! @brief Quad Timer primary clock source selection*/
@@ -57,7 +64,7 @@ typedef enum _qtmr_input_source
 typedef enum _qtmr_counting_mode
 {
     kQTMR_NoOperation = 0,          /*!< No operation */
-    kQTMR_PriSrcRiseEdge,           /*!< Count rising edges or primary source */
+    kQTMR_PriSrcRiseEdge,           /*!< Count rising edges of primary source */
     kQTMR_PriSrcRiseAndFallEdge,    /*!< Count rising and falling edges of primary source */
     kQTMR_PriSrcRiseEdgeSecInpHigh, /*!< Count rise edges of pri SRC while sec inp high active */
     kQTMR_QuadCountMode,            /*!< Quadrature count mode, uses pri and sec sources */
@@ -65,6 +72,13 @@ typedef enum _qtmr_counting_mode
     kQTMR_SecSrcTrigPriCnt,         /*!< Edge of sec SRC trigger primary count until compare*/
     kQTMR_CascadeCount              /*!< Cascaded count mode (up/down) */
 } qtmr_counting_mode_t;
+
+/*! @brief Quad Timer PWM output state */
+typedef enum _qtmr_pwm_out_state
+{
+    kQTMR_PwmLow = 0, /*!< The output state of PWM channel is low */
+    kQTMR_PwmHigh,    /*!< The output state of PWM channel is low  */
+} qtmr_pwm_out_state_t;
 
 /*! @brief Quad Timer output mode selection*/
 typedef enum _qtmr_output_mode
@@ -349,6 +363,32 @@ void QTMR_ClearStatusFlags(TMR_Type *base, qtmr_channel_selection_t channel, uin
 void QTMR_SetTimerPeriod(TMR_Type *base, qtmr_channel_selection_t channel, uint16_t ticks);
 
 /*!
+ * @brief Set compare value.
+ *
+ * This function sets the value used for comparison with the counter value.
+ *
+ * @param base     Quad Timer peripheral base address
+ * @param channel  Quad Timer channel number
+ * @param ticks    Timer period in units of ticks.
+ */
+void QTMR_SetCompareValue(TMR_Type *base, qtmr_channel_selection_t channel, uint16_t ticks);
+
+/*!
+ * @brief Set load value.
+ *
+ * This function sets the value used to initialize the counter after a counter comparison.
+ *
+ * @param base     Quad Timer peripheral base address
+ * @param channel  Quad Timer channel number
+ * @param value    Load register initialization value.
+ */
+static inline void QTMR_SetLoadValue(TMR_Type *base, qtmr_channel_selection_t channel, uint16_t value)
+{
+    base->CHANNEL[channel].LOAD &= (uint16_t)(~TMR_LOAD_LOAD_MASK);
+    base->CHANNEL[channel].LOAD = value;
+}
+
+/*!
  * @brief Reads the current timer counting value.
  *
  * This function returns the real-time timer counting value, in a range from 0 to a
@@ -427,6 +467,56 @@ void QTMR_EnableDma(TMR_Type *base, qtmr_channel_selection_t channel, uint32_t m
  *                  enumeration ::qtmr_dma_enable_t
  */
 void QTMR_DisableDma(TMR_Type *base, qtmr_channel_selection_t channel, uint32_t mask);
+
+/*!
+ * @brief Set PWM output in idle status (high or low).
+ *
+ * @note When the PWM is set again, the counting needs to be restarted.
+ *
+ * @param base     Quad Timer peripheral base address
+ * @param channel  Quad Timer channel number
+ * @param idleStatus   True: PWM output is high in idle status; false: PWM output is low in idle status.
+ */
+void QTMR_SetPwmOutputToIdle(TMR_Type *base, qtmr_channel_selection_t channel, bool idleStatus);
+
+/*!
+ * @brief Get the channel output status
+ *
+ * @param base     Quad Timer peripheral base address
+ * @param channel  Quad Timer channel number
+ *
+ * @return Current channel output status.
+ */
+static inline qtmr_pwm_out_state_t QTMR_GetPwmOutputStatus(TMR_Type *base, qtmr_channel_selection_t channel)
+{
+    if (0U != ((base->CHANNEL[channel].CSCTRL) & TMR_CSCTRL_OFLAG_MASK))
+    {
+        return kQTMR_PwmHigh;
+    }
+    else
+    {
+        return kQTMR_PwmLow;
+    }
+}
+
+/*!
+ * @brief Get the PWM channel dutycycle value.
+ *
+ * @param base     Quad Timer peripheral base address
+ * @param channel  Quad Timer channel number
+ *
+ * @return Current channel dutycycle value.
+ */
+uint8_t QTMR_GetPwmChannelStatus(TMR_Type *base, qtmr_channel_selection_t channel);
+
+/*!
+ * @brief This function set the value of the prescaler on QTimer channels.
+ *
+ * @param base         Quad Timer peripheral base address
+ * @param channel      Quad Timer channel number
+ * @param prescaler    Set prescaler value
+ */
+void QTMR_SetPwmClockMode(TMR_Type *base, qtmr_channel_selection_t channel, qtmr_primary_count_source_t prescaler);
 
 /*! @}*/
 

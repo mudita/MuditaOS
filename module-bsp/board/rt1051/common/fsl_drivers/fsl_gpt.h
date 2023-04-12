@@ -1,35 +1,9 @@
 /*
- * The Clear BSD License
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _FSL_GPT_H_
@@ -48,8 +22,8 @@
 
 /*! @name Driver version */
 /*@{*/
-#define FSL_GPT_DRIVER_VERSION (MAKE_VERSION(2, 0, 0)) /*!< Version 2.0.0 */
-                                                       /*@}*/
+#define FSL_GPT_DRIVER_VERSION (MAKE_VERSION(2, 0, 4))
+/*@}*/
 
 /*!
  * @brief List of clock sources
@@ -140,387 +114,391 @@ typedef struct _gpt_init_config
  ******************************************************************************/
 
 #if defined(__cplusplus)
-extern "C"
-{
+extern "C" {
 #endif
 
-    /*!
-     * @name Initialization and deinitialization
-     * @{
-     */
+/*!
+ * @name Initialization and deinitialization
+ * @{
+ */
 
-    /*!
-     * @brief Initialize GPT to reset state and initialize running mode.
-     *
-     * @param base GPT peripheral base address.
-     * @param initConfig GPT mode setting configuration.
-     */
-    void GPT_Init(GPT_Type *base, const gpt_config_t *initConfig);
+/*!
+ * @brief Initialize GPT to reset state and initialize running mode.
+ *
+ * @param base GPT peripheral base address.
+ * @param initConfig GPT mode setting configuration.
+ */
+void GPT_Init(GPT_Type *base, const gpt_config_t *initConfig);
 
-    /*!
-     * @brief Disables the module and gates the GPT clock.
-     *
-     * @param base GPT peripheral base address.
-     */
-    void GPT_Deinit(GPT_Type *base);
+/*!
+ * @brief Disables the module and gates the GPT clock.
+ *
+ * @param base GPT peripheral base address.
+ */
+void GPT_Deinit(GPT_Type *base);
 
-    /*!
-     * @brief Fills in the GPT configuration structure with default settings.
-     *
-     * The default values are:
-     * @code
-     *    config->clockSource = kGPT_ClockSource_Periph;
-     *    config->divider = 1U;
-     *    config->enableRunInStop = true;
-     *    config->enableRunInWait = true;
-     *    config->enableRunInDoze = false;
-     *    config->enableRunInDbg = false;
-     *    config->enableFreeRun = true;
-     *    config->enableMode  = true;
-     * @endcode
-     * @param config Pointer to the user configuration structure.
-     */
-    void GPT_GetDefaultConfig(gpt_config_t *config);
+/*!
+ * @brief Fills in the GPT configuration structure with default settings.
+ *
+ * The default values are:
+ * @code
+ *    config->clockSource = kGPT_ClockSource_Periph;
+ *    config->divider = 1U;
+ *    config->enableRunInStop = true;
+ *    config->enableRunInWait = true;
+ *    config->enableRunInDoze = false;
+ *    config->enableRunInDbg = false;
+ *    config->enableFreeRun = false;
+ *    config->enableMode  = true;
+ * @endcode
+ * @param config Pointer to the user configuration structure.
+ */
+void GPT_GetDefaultConfig(gpt_config_t *config);
 
-    /*!
-     * @name Software Reset
-     * @{
-     */
+/*!
+ * @name Software Reset
+ * @{
+ */
 
-    /*!
-     * @brief Software reset of GPT module.
-     *
-     * @param base GPT peripheral base address.
-     */
-    static inline void GPT_SoftwareReset(GPT_Type *base)
+/*!
+ * @brief Software reset of GPT module.
+ *
+ * @param base GPT peripheral base address.
+ */
+static inline void GPT_SoftwareReset(GPT_Type *base)
+{
+    base->CR |= GPT_CR_SWR_MASK;
+    /* Wait reset finished. */
+    while ((base->CR & GPT_CR_SWR_MASK) == GPT_CR_SWR_MASK)
     {
-        base->CR |= GPT_CR_SWR_MASK;
-        /* Wait reset finished. */
-        while ((base->CR & GPT_CR_SWR_MASK) == GPT_CR_SWR_MASK) {}
     }
+}
 
-    /*!
-     * @name Clock source and frequency control
-     * @{
-     */
+/*!
+ * @name Clock source and frequency control
+ * @{
+ */
 
-    /*!
-     * @brief Set clock source of GPT.
-     *
-     * @param base GPT peripheral base address.
-     * @param source Clock source (see @ref gpt_clock_source_t typedef enumeration).
-     */
-    static inline void GPT_SetClockSource(GPT_Type *base, gpt_clock_source_t source)
+/*!
+ * @brief Set clock source of GPT.
+ *
+ * @param base GPT peripheral base address.
+ * @param gptClkSource Clock source (see @ref gpt_clock_source_t typedef enumeration).
+ */
+static inline void GPT_SetClockSource(GPT_Type *base, gpt_clock_source_t gptClkSource)
+{
+    if (gptClkSource == kGPT_ClockSource_Osc)
     {
-        if (source == kGPT_ClockSource_Osc) {
-            base->CR = (base->CR & ~GPT_CR_CLKSRC_MASK) | GPT_CR_EN_24M_MASK | GPT_CR_CLKSRC(source);
-        }
-        else {
-            base->CR = (base->CR & ~(GPT_CR_CLKSRC_MASK | GPT_CR_EN_24M_MASK)) | GPT_CR_CLKSRC(source);
-        }
+        base->CR = (base->CR & ~GPT_CR_CLKSRC_MASK) | GPT_CR_EN_24M_MASK | GPT_CR_CLKSRC(gptClkSource);
     }
-
-    /*!
-     * @brief Get clock source of GPT.
-     *
-     * @param base GPT peripheral base address.
-     * @return clock source (see @ref gpt_clock_source_t typedef enumeration).
-     */
-    static inline gpt_clock_source_t GPT_GetClockSource(GPT_Type *base)
+    else
     {
-        return (gpt_clock_source_t)((base->CR & GPT_CR_CLKSRC_MASK) >> GPT_CR_CLKSRC_SHIFT);
+        base->CR = (base->CR & ~(GPT_CR_CLKSRC_MASK | GPT_CR_EN_24M_MASK)) | GPT_CR_CLKSRC(gptClkSource);
     }
+}
 
-    /*!
-     * @brief Set pre scaler of GPT.
-     *
-     * @param base GPT peripheral base address.
-     * @param divider Divider of GPT (1-4096).
-     */
-    static inline void GPT_SetClockDivider(GPT_Type *base, uint32_t divider)
-    {
-        assert(divider - 1 <= GPT_PR_PRESCALER_MASK);
+/*!
+ * @brief Get clock source of GPT.
+ *
+ * @param base GPT peripheral base address.
+ * @return clock source (see @ref gpt_clock_source_t typedef enumeration).
+ */
+static inline gpt_clock_source_t GPT_GetClockSource(GPT_Type *base)
+{
+    return (gpt_clock_source_t)(uint8_t)((base->CR & GPT_CR_CLKSRC_MASK) >> GPT_CR_CLKSRC_SHIFT);
+}
 
-        base->PR = (base->PR & ~GPT_PR_PRESCALER_MASK) | GPT_PR_PRESCALER(divider - 1);
-    }
+/*!
+ * @brief Set pre scaler of GPT.
+ *
+ * @param base GPT peripheral base address.
+ * @param divider Divider of GPT (1-4096).
+ */
+static inline void GPT_SetClockDivider(GPT_Type *base, uint32_t divider)
+{
+    assert(divider - 1U <= GPT_PR_PRESCALER_MASK);
 
-    /*!
-     * @brief Get clock divider in GPT module.
-     *
-     * @param base GPT peripheral base address.
-     * @return clock divider in GPT module (1-4096).
-     */
-    static inline uint32_t GPT_GetClockDivider(GPT_Type *base)
-    {
-        return ((base->PR & GPT_PR_PRESCALER_MASK) >> GPT_PR_PRESCALER_SHIFT) + 1;
-    }
+    base->PR = (base->PR & ~GPT_PR_PRESCALER_MASK) | GPT_PR_PRESCALER(divider - 1U);
+}
 
-    /*!
-     * @brief OSC 24M pre-scaler before selected by clock source.
-     *
-     * @param base GPT peripheral base address.
-     * @param divider OSC Divider(1-16).
-     */
-    static inline void GPT_SetOscClockDivider(GPT_Type *base, uint32_t divider)
-    {
-        assert(divider - 1 <= (GPT_PR_PRESCALER24M_MASK >> GPT_PR_PRESCALER24M_SHIFT));
+/*!
+ * @brief Get clock divider in GPT module.
+ *
+ * @param base GPT peripheral base address.
+ * @return clock divider in GPT module (1-4096).
+ */
+static inline uint32_t GPT_GetClockDivider(GPT_Type *base)
+{
+    return ((base->PR & GPT_PR_PRESCALER_MASK) >> GPT_PR_PRESCALER_SHIFT) + 1U;
+}
 
-        base->PR = (base->PR & ~GPT_PR_PRESCALER24M_MASK) | GPT_PR_PRESCALER24M(divider - 1);
-    }
+/*!
+ * @brief OSC 24M pre-scaler before selected by clock source.
+ *
+ * @param base GPT peripheral base address.
+ * @param divider OSC Divider(1-16).
+ */
+static inline void GPT_SetOscClockDivider(GPT_Type *base, uint32_t divider)
+{
+    assert(divider - 1U <= (GPT_PR_PRESCALER24M_MASK >> GPT_PR_PRESCALER24M_SHIFT));
 
-    /*!
-     * @brief Get OSC 24M clock divider in GPT module.
-     *
-     * @param base GPT peripheral base address.
-     * @return OSC clock divider in GPT module (1-16).
-     */
-    static inline uint32_t GPT_GetOscClockDivider(GPT_Type *base)
-    {
-        return ((base->PR & GPT_PR_PRESCALER24M_MASK) >> GPT_PR_PRESCALER24M_SHIFT) + 1;
-    }
+    base->PR = (base->PR & ~GPT_PR_PRESCALER24M_MASK) | GPT_PR_PRESCALER24M(divider - 1U);
+}
 
-    /*! @}*/
+/*!
+ * @brief Get OSC 24M clock divider in GPT module.
+ *
+ * @param base GPT peripheral base address.
+ * @return OSC clock divider in GPT module (1-16).
+ */
+static inline uint32_t GPT_GetOscClockDivider(GPT_Type *base)
+{
+    return ((base->PR & GPT_PR_PRESCALER24M_MASK) >> GPT_PR_PRESCALER24M_SHIFT) + 1U;
+}
 
-    /*!
-     * @name Timer Start and Stop
-     * @{
-     */
-    /*!
-     * @brief Start GPT timer.
-     *
-     * @param base GPT peripheral base address.
-     */
-    static inline void GPT_StartTimer(GPT_Type *base)
-    {
-        base->CR |= GPT_CR_EN_MASK;
-    }
+/*! @}*/
 
-    /*!
-     * @brief Stop GPT timer.
-     *
-     * @param base GPT peripheral base address.
-     */
-    static inline void GPT_StopTimer(GPT_Type *base)
-    {
-        base->CR &= ~GPT_CR_EN_MASK;
-    }
+/*!
+ * @name Timer Start and Stop
+ * @{
+ */
+/*!
+ * @brief Start GPT timer.
+ *
+ * @param base GPT peripheral base address.
+ */
+static inline void GPT_StartTimer(GPT_Type *base)
+{
+    base->CR |= GPT_CR_EN_MASK;
+}
 
-    /*!
-     * @name Read the timer period
-     * @{
-     */
+/*!
+ * @brief Stop GPT timer.
+ *
+ * @param base GPT peripheral base address.
+ */
+static inline void GPT_StopTimer(GPT_Type *base)
+{
+    base->CR &= ~GPT_CR_EN_MASK;
+}
 
-    /*!
-     * @brief Reads the current GPT counting value.
-     *
-     * @param base GPT peripheral base address.
-     * @return Current GPT counter value.
-     */
-    static inline uint32_t GPT_GetCurrentTimerCount(GPT_Type *base)
-    {
-        return base->CNT;
-    }
+/*!
+ * @name Read the timer period
+ * @{
+ */
 
-    /*@}*/
+/*!
+ * @brief Reads the current GPT counting value.
+ *
+ * @param base GPT peripheral base address.
+ * @return Current GPT counter value.
+ */
+static inline uint32_t GPT_GetCurrentTimerCount(GPT_Type *base)
+{
+    return base->CNT;
+}
 
-    /*!
-     * @name GPT Input/Output Signal Control
-     * @{
-     */
+/*@}*/
 
-    /*!
-     * @brief Set GPT operation mode of input capture channel.
-     *
-     * @param base GPT peripheral base address.
-     * @param channel GPT capture channel (see @ref gpt_input_capture_channel_t typedef enumeration).
-     * @param mode GPT input capture operation mode (see @ref gpt_input_operation_mode_t typedef enumeration).
-     */
-    static inline void GPT_SetInputOperationMode(GPT_Type *base,
-                                                 gpt_input_capture_channel_t channel,
-                                                 gpt_input_operation_mode_t mode)
-    {
-        assert(channel <= kGPT_InputCapture_Channel2);
+/*!
+ * @name GPT Input/Output Signal Control
+ * @{
+ */
 
-        base->CR = (base->CR & ~(GPT_CR_IM1_MASK << (channel * 2))) | (GPT_CR_IM1(mode) << (channel * 2));
-    }
+/*!
+ * @brief Set GPT operation mode of input capture channel.
+ *
+ * @param base GPT peripheral base address.
+ * @param channel GPT capture channel (see @ref gpt_input_capture_channel_t typedef enumeration).
+ * @param mode GPT input capture operation mode (see @ref gpt_input_operation_mode_t typedef enumeration).
+ */
+static inline void GPT_SetInputOperationMode(GPT_Type *base,
+                                             gpt_input_capture_channel_t channel,
+                                             gpt_input_operation_mode_t mode)
+{
+    assert(channel <= kGPT_InputCapture_Channel2);
 
-    /*!
-     * @brief Get GPT operation mode of input capture channel.
-     *
-     * @param base GPT peripheral base address.
-     * @param channel GPT capture channel (see @ref gpt_input_capture_channel_t typedef enumeration).
-     * @return GPT input capture operation mode (see @ref gpt_input_operation_mode_t typedef enumeration).
-     */
-    static inline gpt_input_operation_mode_t GPT_GetInputOperationMode(GPT_Type *base,
-                                                                       gpt_input_capture_channel_t channel)
-    {
-        assert(channel <= kGPT_InputCapture_Channel2);
+    base->CR =
+        (base->CR & ~(GPT_CR_IM1_MASK << ((uint32_t)channel * 2UL))) | (GPT_CR_IM1(mode) << ((uint32_t)channel * 2UL));
+}
 
-        return (gpt_input_operation_mode_t)((base->CR >> (GPT_CR_IM1_SHIFT + channel * 2)) &
-                                            (GPT_CR_IM1_MASK >> GPT_CR_IM1_SHIFT));
-    }
+/*!
+ * @brief Get GPT operation mode of input capture channel.
+ *
+ * @param base GPT peripheral base address.
+ * @param channel GPT capture channel (see @ref gpt_input_capture_channel_t typedef enumeration).
+ * @return GPT input capture operation mode (see @ref gpt_input_operation_mode_t typedef enumeration).
+ */
+static inline gpt_input_operation_mode_t GPT_GetInputOperationMode(GPT_Type *base, gpt_input_capture_channel_t channel)
+{
+    assert(channel <= kGPT_InputCapture_Channel2);
 
-    /*!
-     * @brief Get GPT input capture value of certain channel.
-     *
-     * @param base GPT peripheral base address.
-     * @param channel GPT capture channel (see @ref gpt_input_capture_channel_t typedef enumeration).
-     * @return GPT input capture value.
-     */
-    static inline uint32_t GPT_GetInputCaptureValue(GPT_Type *base, gpt_input_capture_channel_t channel)
-    {
-        assert(channel <= kGPT_InputCapture_Channel2);
+    return (gpt_input_operation_mode_t)(uint8_t)((base->CR >> (GPT_CR_IM1_SHIFT + (uint32_t)channel * 2UL)) &
+                                                 (GPT_CR_IM1_MASK >> GPT_CR_IM1_SHIFT));
+}
 
-        return *(&base->ICR[0] + channel);
-    }
+/*!
+ * @brief Get GPT input capture value of certain channel.
+ *
+ * @param base GPT peripheral base address.
+ * @param channel GPT capture channel (see @ref gpt_input_capture_channel_t typedef enumeration).
+ * @return GPT input capture value.
+ */
+static inline uint32_t GPT_GetInputCaptureValue(GPT_Type *base, gpt_input_capture_channel_t channel)
+{
+    assert(channel <= kGPT_InputCapture_Channel2);
 
-    /*!
-     * @brief Set GPT operation mode of output compare channel.
-     *
-     * @param base GPT peripheral base address.
-     * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
-     * @param mode GPT output operation mode (see @ref gpt_output_operation_mode_t typedef enumeration).
-     */
-    static inline void GPT_SetOutputOperationMode(GPT_Type *base,
-                                                  gpt_output_compare_channel_t channel,
-                                                  gpt_output_operation_mode_t mode)
-    {
-        assert(channel <= kGPT_OutputCompare_Channel3);
+    return base->ICR[(uint32_t)channel];
+}
 
-        base->CR = (base->CR & ~(GPT_CR_OM1_MASK << (channel * 3))) | (GPT_CR_OM1(mode) << (channel * 3));
-    }
+/*!
+ * @brief Set GPT operation mode of output compare channel.
+ *
+ * @param base GPT peripheral base address.
+ * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
+ * @param mode GPT output operation mode (see @ref gpt_output_operation_mode_t typedef enumeration).
+ */
+static inline void GPT_SetOutputOperationMode(GPT_Type *base,
+                                              gpt_output_compare_channel_t channel,
+                                              gpt_output_operation_mode_t mode)
+{
+    assert(channel <= kGPT_OutputCompare_Channel3);
 
-    /*!
-     * @brief Get GPT operation mode of output compare channel.
-     *
-     * @param base GPT peripheral base address.
-     * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
-     * @return GPT output operation mode (see @ref gpt_output_operation_mode_t typedef enumeration).
-     */
-    static inline gpt_output_operation_mode_t GPT_GetOutputOperationMode(GPT_Type *base,
-                                                                         gpt_output_compare_channel_t channel)
-    {
-        assert(channel <= kGPT_OutputCompare_Channel3);
+    base->CR =
+        (base->CR & ~(GPT_CR_OM1_MASK << ((uint32_t)channel * 3UL))) | (GPT_CR_OM1(mode) << ((uint32_t)channel * 3UL));
+}
 
-        return (gpt_output_operation_mode_t)((base->CR >> (GPT_CR_OM1_SHIFT + channel * 3)) &
-                                             (GPT_CR_OM1_MASK >> GPT_CR_OM1_SHIFT));
-    }
+/*!
+ * @brief Get GPT operation mode of output compare channel.
+ *
+ * @param base GPT peripheral base address.
+ * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
+ * @return GPT output operation mode (see @ref gpt_output_operation_mode_t typedef enumeration).
+ */
+static inline gpt_output_operation_mode_t GPT_GetOutputOperationMode(GPT_Type *base,
+                                                                     gpt_output_compare_channel_t channel)
+{
+    assert(channel <= kGPT_OutputCompare_Channel3);
 
-    /*!
-     * @brief Set GPT output compare value of output compare channel.
-     *
-     * @param base GPT peripheral base address.
-     * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
-     * @param value GPT output compare value.
-     */
-    static inline void GPT_SetOutputCompareValue(GPT_Type *base, gpt_output_compare_channel_t channel, uint32_t value)
-    {
-        assert(channel <= kGPT_OutputCompare_Channel3);
+    return (gpt_output_operation_mode_t)(uint8_t)((base->CR >> (GPT_CR_OM1_SHIFT + (uint32_t)channel * 3UL)) &
+                                                  (GPT_CR_OM1_MASK >> GPT_CR_OM1_SHIFT));
+}
 
-        *(&base->OCR[0] + channel) = value;
-    }
+/*!
+ * @brief Set GPT output compare value of output compare channel.
+ *
+ * @param base GPT peripheral base address.
+ * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
+ * @param value GPT output compare value.
+ */
+static inline void GPT_SetOutputCompareValue(GPT_Type *base, gpt_output_compare_channel_t channel, uint32_t value)
+{
+    assert(channel <= kGPT_OutputCompare_Channel3);
 
-    /*!
-     * @brief Get GPT output compare value of output compare channel.
-     *
-     * @param base GPT peripheral base address.
-     * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
-     * @return GPT output compare value.
-     */
-    static inline uint32_t GPT_GetOutputCompareValue(GPT_Type *base, gpt_output_compare_channel_t channel)
-    {
-        assert(channel <= kGPT_OutputCompare_Channel3);
+    base->OCR[(uint32_t)channel] = value;
+}
 
-        return *(&base->OCR[0] + channel);
-    }
+/*!
+ * @brief Get GPT output compare value of output compare channel.
+ *
+ * @param base GPT peripheral base address.
+ * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
+ * @return GPT output compare value.
+ */
+static inline uint32_t GPT_GetOutputCompareValue(GPT_Type *base, gpt_output_compare_channel_t channel)
+{
+    assert(channel <= kGPT_OutputCompare_Channel3);
 
-    /*!
-     * @brief Force GPT output action on output compare channel, ignoring comparator.
-     *
-     * @param base GPT peripheral base address.
-     * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
-     */
-    static inline void GPT_ForceOutput(GPT_Type *base, gpt_output_compare_channel_t channel)
-    {
-        assert(channel <= kGPT_OutputCompare_Channel3);
+    return base->OCR[(uint32_t)channel];
+}
 
-        base->CR |= (GPT_CR_FO1_MASK << channel);
-    }
+/*!
+ * @brief Force GPT output action on output compare channel, ignoring comparator.
+ *
+ * @param base GPT peripheral base address.
+ * @param channel GPT output compare channel (see @ref gpt_output_compare_channel_t typedef enumeration).
+ */
+static inline void GPT_ForceOutput(GPT_Type *base, gpt_output_compare_channel_t channel)
+{
+    assert(channel <= kGPT_OutputCompare_Channel3);
 
-    /*@}*/
+    base->CR |= (GPT_CR_FO1_MASK << (uint32_t)channel);
+}
 
-    /*!
-     * @name GPT Interrupt and Status Interface
-     * @{
-     */
+/*@}*/
 
-    /*!
-     * @brief Enables the selected GPT interrupts.
-     *
-     * @param base GPT peripheral base address.
-     * @param mask The interrupts to enable. This is a logical OR of members of the
-     *             enumeration ::gpt_interrupt_enable_t
-     */
-    static inline void GPT_EnableInterrupts(GPT_Type *base, uint32_t mask)
-    {
-        base->IR |= mask;
-    }
+/*!
+ * @name GPT Interrupt and Status Interface
+ * @{
+ */
 
-    /*!
-     * @brief Disables the selected GPT interrupts.
-     *
-     * @param base    GPT peripheral base address
-     * @param mask    The interrupts to disable. This is a logical OR of members of the
-     *                enumeration ::gpt_interrupt_enable_t
-     */
-    static inline void GPT_DisableInterrupts(GPT_Type *base, uint32_t mask)
-    {
-        base->IR &= ~mask;
-    }
+/*!
+ * @brief Enables the selected GPT interrupts.
+ *
+ * @param base GPT peripheral base address.
+ * @param mask The interrupts to enable. This is a logical OR of members of the
+ *             enumeration ::gpt_interrupt_enable_t
+ */
+static inline void GPT_EnableInterrupts(GPT_Type *base, uint32_t mask)
+{
+    base->IR |= mask;
+}
 
-    /*!
-     * @brief Gets the enabled GPT interrupts.
-     *
-     * @param base    GPT peripheral base address
-     *
-     * @return The enabled interrupts. This is the logical OR of members of the
-     *         enumeration ::gpt_interrupt_enable_t
-     */
-    static inline uint32_t GPT_GetEnabledInterrupts(GPT_Type *base)
-    {
-        return (base->IR & (GPT_IR_OF1IE_MASK | GPT_IR_OF2IE_MASK | GPT_IR_OF3IE_MASK | GPT_IR_IF1IE_MASK |
-                            GPT_IR_IF2IE_MASK | GPT_IR_ROVIE_MASK));
-    }
+/*!
+ * @brief Disables the selected GPT interrupts.
+ *
+ * @param base    GPT peripheral base address
+ * @param mask    The interrupts to disable. This is a logical OR of members of the
+ *                enumeration ::gpt_interrupt_enable_t
+ */
+static inline void GPT_DisableInterrupts(GPT_Type *base, uint32_t mask)
+{
+    base->IR &= ~mask;
+}
 
-    /*!
-     * @name Status Interface
-     * @{
-     */
+/*!
+ * @brief Gets the enabled GPT interrupts.
+ *
+ * @param base    GPT peripheral base address
+ *
+ * @return The enabled interrupts. This is the logical OR of members of the
+ *         enumeration ::gpt_interrupt_enable_t
+ */
+static inline uint32_t GPT_GetEnabledInterrupts(GPT_Type *base)
+{
+    return (base->IR & (GPT_IR_OF1IE_MASK | GPT_IR_OF2IE_MASK | GPT_IR_OF3IE_MASK | GPT_IR_IF1IE_MASK |
+                        GPT_IR_IF2IE_MASK | GPT_IR_ROVIE_MASK));
+}
 
-    /*!
-     * @brief Get GPT status flags.
-     *
-     * @param base GPT peripheral base address.
-     * @param flags GPT status flag mask (see @ref gpt_status_flag_t for bit definition).
-     * @return GPT status, each bit represents one status flag.
-     */
-    static inline uint32_t GPT_GetStatusFlags(GPT_Type *base, gpt_status_flag_t flags)
-    {
-        return base->SR & flags;
-    }
+/*!
+ * @name Status Interface
+ * @{
+ */
 
-    /*!
-     * @brief Clears the GPT status flags.
-     *
-     * @param base GPT peripheral base address.
-     * @param flags GPT status flag mask (see @ref gpt_status_flag_t for bit definition).
-     */
-    static inline void GPT_ClearStatusFlags(GPT_Type *base, gpt_status_flag_t flags)
-    {
-        base->SR = flags;
-    }
+/*!
+ * @brief Get GPT status flags.
+ *
+ * @param base GPT peripheral base address.
+ * @param flags GPT status flag mask (see @ref gpt_status_flag_t for bit definition).
+ * @return GPT status, each bit represents one status flag.
+ */
+static inline uint32_t GPT_GetStatusFlags(GPT_Type *base, gpt_status_flag_t flags)
+{
+    return base->SR & (uint32_t)flags;
+}
 
-    /*@}*/
+/*!
+ * @brief Clears the GPT status flags.
+ *
+ * @param base GPT peripheral base address.
+ * @param flags GPT status flag mask (see @ref gpt_status_flag_t for bit definition).
+ */
+static inline void GPT_ClearStatusFlags(GPT_Type *base, gpt_status_flag_t flags)
+{
+    base->SR = (uint32_t)flags;
+}
+
+/*@}*/
 
 #if defined(__cplusplus)
 }

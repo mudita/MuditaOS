@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2017-2020, NXP
+ * Copyright 2017-2022, NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -22,7 +22,7 @@
 
 /*! @name Driver version */
 /*@{*/
-#define FSL_SNVS_HP_DRIVER_VERSION (MAKE_VERSION(2, 2, 0)) /*!< Version 2.2.0 */
+#define FSL_SNVS_HP_DRIVER_VERSION (MAKE_VERSION(2, 3, 2)) /*!< Version 2.3.2 */
 /*@}*/
 
 /*! @brief List of SNVS interrupts */
@@ -41,6 +41,27 @@ typedef enum _snvs_hp_status_flags
     kSNVS_OTPMK_ZeroFlag            = SNVS_HPSR_OTPMK_ZERO_MASK,    /*!< The OTPMK is zero */
 } snvs_hp_status_flags_t;
 
+/* Re-map Security Violation for RT11xx specific violation*/
+#ifndef SNVS_HPSVSR_SV0_MASK
+#define SNVS_HPSVSR_SV0_MASK SNVS_HPSVSR_CAAM_MASK
+#endif
+
+#ifndef SNVS_HPSVSR_SV1_MASK
+#define SNVS_HPSVSR_SV1_MASK SNVS_HPSVSR_JTAGC_MASK
+#endif
+
+#ifndef SNVS_HPSVSR_SV2_MASK
+#define SNVS_HPSVSR_SV2_MASK SNVS_HPSVSR_WDOG2_MASK
+#endif
+
+#ifndef SNVS_HPSVSR_SV4_MASK
+#define SNVS_HPSVSR_SV4_MASK SNVS_HPSVSR_SRC_MASK
+#endif
+
+#ifndef SNVS_HPSVSR_SV5_MASK
+#define SNVS_HPSVSR_SV5_MASK SNVS_HPSVSR_OCOTP_MASK
+#endif
+
 /*! @brief List of SNVS security violation flags */
 typedef enum _snvs_hp_sv_status_flags
 {
@@ -53,9 +74,11 @@ typedef enum _snvs_hp_sv_status_flags
     kSNVS_Violation0Flag             = SNVS_HPSVSR_SV0_MASK,     /*!< Security Violation 0 */
     kSNVS_Violation1Flag             = SNVS_HPSVSR_SV1_MASK,     /*!< Security Violation 1 */
     kSNVS_Violation2Flag             = SNVS_HPSVSR_SV2_MASK,     /*!< Security Violation 2 */
-    kSNVS_Violation3Flag             = SNVS_HPSVSR_SV3_MASK,     /*!< Security Violation 3 */
-    kSNVS_Violation4Flag             = SNVS_HPSVSR_SV4_MASK,     /*!< Security Violation 4 */
-    kSNVS_Violation5Flag             = SNVS_HPSVSR_SV5_MASK,     /*!< Security Violation 5 */
+#if defined(SNVS_HPSVSR_SV3_MASK)
+    kSNVS_Violation3Flag = SNVS_HPSVSR_SV3_MASK, /*!< Security Violation 3 */
+#endif                                           /* SNVS_HPSVSR_SV3_MASK */
+    kSNVS_Violation4Flag = SNVS_HPSVSR_SV4_MASK, /*!< Security Violation 4 */
+    kSNVS_Violation5Flag = SNVS_HPSVSR_SV5_MASK, /*!< Security Violation 5 */
 } snvs_hp_sv_status_flags_t;
 
 /*!
@@ -176,28 +199,6 @@ void SNVS_HP_RTC_GetDefaultConfig(snvs_hp_rtc_config_t *config);
  */
 
 /*!
- * @brief Returns RTC time in seconds.
- *
- * This function is used internally to get actual RTC time in seconds.
- *
- * @param base SNVS peripheral base address
- *
- * @return RTC time in seconds
- */
-uint32_t SNVS_HP_RTC_GetSeconds(SNVS_Type *base);
-
-/*!
- * @brief Sets the SNVS SRTC date and time provided in seconds.
- *
- * @param base     SNVS peripheral base address
- * @param seconds  Date and time in seconds.
- *
- * @return kStatus_Success: Success in setting the time and starting the SNVS SRTC
- *         kStatus_InvalidArgument: Error because the datetime format is incorrect
- */
-status_t SNVS_LP_SRTC_SetSeconds(SNVS_Type *base, uint32_t seconds);
-
-/*!
  * @brief Sets the SNVS RTC date and time according to the given time structure.
  *
  * @param base     SNVS peripheral base address
@@ -215,28 +216,6 @@ status_t SNVS_HP_RTC_SetDatetime(SNVS_Type *base, const snvs_hp_rtc_datetime_t *
  * @param datetime Pointer to the structure where the date and time details are stored.
  */
 void SNVS_HP_RTC_GetDatetime(SNVS_Type *base, snvs_hp_rtc_datetime_t *datetime);
-
-/*!
- * @brief Returns the SNVS RTC alarm time in seconds.
- *
- * @param base     SNVS peripheral base address
- */
-uint32_t SNVS_HP_RTC_GetAlarmSeconds(SNVS_Type *base);
-
-/*!
- * @brief Sets the SNVS RTC alarm time in seconds.
- *
- * The function sets the RTC alarm. It also checks whether the specified alarm time
- * is greater than the present time. If not, the function does not set the alarm
- * and returns an error.
- *
- * @param base      SNVS peripheral base address
- * @param alarmTime Alarm time in seconds
- *
- * @return kStatus_Success: success in setting the SNVS RTC alarm
- *         kStatus_Fail: Error because the alarm time has already passed
- */
-status_t SNVS_HP_RTC_SetAlarmSeconds(SNVS_Type *base, uint32_t alarmSeconds);
 
 /*!
  * @brief Sets the SNVS RTC alarm time.
@@ -639,7 +618,7 @@ static inline uint32_t SNVS_HP_GetSecurityViolationStatusFlags(SNVS_Type *base)
  *  - @ref kSNVS_Violation0Flag
  *  - @ref kSNVS_Violation1Flag
  *  - @ref kSNVS_Violation2Flag
- *  - @ref kSNVS_Violation3Flag
+ *  - kSNVS_Violation3Flag
  *  - @ref kSNVS_Violation4Flag
  *  - @ref kSNVS_Violation5Flag
  *
@@ -660,6 +639,39 @@ static inline void SNVS_HP_ClearSecurityViolationStatusFlags(SNVS_Type *base, ui
  */
 void SNVS_HP_SetLocks(SNVS_Type *base);
 #endif /* FSL_FEATURE_SNVS_HAS_SET_LOCK */
+
+/*!
+ * @brief Returns RTC time in seconds.
+ *
+ * This function is used internally to get actual RTC time in seconds.
+ *
+ * @param base SNVS peripheral base address
+ *
+ * @return RTC time in seconds
+ */
+uint32_t SNVS_HP_RTC_GetSeconds(SNVS_Type *base);
+
+/*!
+ * @brief Sets the SNVS RTC alarm time in seconds.
+ *
+ * The function sets the RTC alarm. It also checks whether the specified alarm time
+ * is greater than the present time. If not, the function does not set the alarm
+ * and returns an error.
+ *
+ * @param base      SNVS peripheral base address
+ * @param alarmTime Alarm time in seconds
+ *
+ * @return kStatus_Success: success in setting the SNVS RTC alarm
+ *         kStatus_Fail: Error because the alarm time has already passed
+ */
+status_t SNVS_HP_RTC_SetAlarmSeconds(SNVS_Type *base, uint32_t alarmSeconds);
+
+/*!
+ * @brief Returns the SNVS RTC alarm time in seconds.
+ *
+ * @param base     SNVS peripheral base address
+ */
+uint32_t SNVS_HP_RTC_GetAlarmSeconds(SNVS_Type *base);
 
 #if defined(__cplusplus)
 }

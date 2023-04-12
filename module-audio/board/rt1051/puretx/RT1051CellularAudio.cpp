@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051CellularAudio.hpp"
@@ -116,15 +116,12 @@ namespace audio
 
         /* Configure the audio format */
         sai_format.bitWidth           = supportedBitWidth;
-        sai_format.channel            = 0U;
+        sai_format.channel            = supportedChannel;
+        sai_format.channelMask        = 1 << supportedChannel;
         sai_format.sampleRate_Hz      = supportedSampleRate;
-        sai_format.masterClockHz      = mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol           = config.protocol;
         sai_format.stereo             = kSAI_MonoLeft;
-#if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
-        sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
-#endif
 
         SAI_TransferRxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx,
                                        &rxHandle,
@@ -143,19 +140,16 @@ namespace audio
 
     void RT1051CellularAudio::OutStart()
     {
-        sai_transfer_format_t sai_format;
+        sai_transfer_format_t sai_format = {};
 
         /* Configure the audio format */
         sai_format.bitWidth           = supportedBitWidth;
-        sai_format.channel            = 0U;
+        sai_format.channel            = supportedChannel;
+        sai_format.channelMask        = 1 << supportedChannel;
         sai_format.sampleRate_Hz      = supportedSampleRate;
-        sai_format.masterClockHz      = mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol           = config.protocol;
         sai_format.stereo             = kSAI_MonoLeft;
-#if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
-        sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
-#endif
 
         SAI_TransferTxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx,
                                        &txHandle,
