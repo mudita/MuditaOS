@@ -13,6 +13,7 @@
 * Fixed problem with long Relaxation loading when titles were too long
 * Fixed backlight behavior after returning to the main window
 * Fixed settings frontlight intensity in on demand mode
+* Fixed problem that UI could be occasionally broken
 
 ### Added
 
