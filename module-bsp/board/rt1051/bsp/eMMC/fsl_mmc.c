@@ -35,6 +35,8 @@
 #include <string.h>
 #include "fsl_mmc.h"
 
+#include <log/log.hpp>
+
 /*******************************************************************************
  * Definitons
  ******************************************************************************/
@@ -2145,11 +2147,14 @@ status_t MMC_ReadBlocks(mmc_card_t *card, uint8_t *buffer, uint32_t startBlock, 
     assert(buffer);
     assert(blockCount);
 
+    const uint8_t maxAttempts = 5;
     uint32_t blockCountOneTime; /* The block count can be erased in one time sending READ_BLOCKS command. */
     uint32_t blockDone;         /* The blocks has been read. */
     uint32_t blockLeft;         /* Left blocks to be read. */
     uint8_t *nextBuffer;
     bool dataAddrAlign = true;
+    bool errorOccured  = false;
+    bool isWriteOk     = false;
 
     blockLeft = blockCount;
     blockDone = 0U;
@@ -2176,11 +2181,37 @@ status_t MMC_ReadBlocks(mmc_card_t *card, uint8_t *buffer, uint32_t startBlock, 
             }
         }
 
-        if (kStatus_Success != MMC_Read(card,
-                                        dataAddrAlign ? nextBuffer : (uint8_t *)g_sdmmc,
-                                        (startBlock + blockDone),
-                                        FSL_SDMMC_DEFAULT_BLOCK_SIZE,
-                                        blockCountOneTime)) {
+        for (uint8_t i = 0; i < maxAttempts; i++)
+        {
+            if (errorOccured) 
+            {
+                if (MMC_Init(card) == kStatus_Success)
+                {
+                    LOG_ERROR("MMC reinit OK\n");
+                    errorOccured = false;
+                }
+                else
+                {
+                    LOG_ERROR("MMC reinit error\n");
+                    continue;
+                } 
+            }
+
+            if (kStatus_Success != MMC_Read(card, dataAddrAlign ? nextBuffer : (uint8_t *)g_sdmmc, (startBlock + blockDone),
+                                        FSL_SDMMC_DEFAULT_BLOCK_SIZE, blockCountOneTime))
+            {
+                LOG_ERROR("MMC_Read transfer failed\n");
+                errorOccured = true;
+            }
+            else
+            {
+                isWriteOk = true;
+                break;
+            }
+        }
+
+        if (!isWriteOk) 
+        {
             return kStatus_SDMMC_TransferFailed;
         }
 
@@ -2200,11 +2231,14 @@ status_t MMC_WriteBlocks(mmc_card_t *card, const uint8_t *buffer, uint32_t start
     assert(buffer);
     assert(blockCount);
 
+    const uint8_t maxAttempts = 5;
     uint32_t blockCountOneTime;
     uint32_t blockLeft;
     uint32_t blockDone;
     const uint8_t *nextBuffer;
     bool dataAddrAlign = true;
+    bool errorOccured  = false;
+    bool isWriteOk     = false;
 
     blockLeft = blockCount;
     blockDone = 0U;
@@ -2232,13 +2266,40 @@ status_t MMC_WriteBlocks(mmc_card_t *card, const uint8_t *buffer, uint32_t start
             }
         }
 
-        if (kStatus_Success != MMC_Write(card,
-                                         dataAddrAlign ? nextBuffer : (uint8_t *)g_sdmmc,
-                                         (startBlock + blockDone),
-                                         FSL_SDMMC_DEFAULT_BLOCK_SIZE,
-                                         blockCountOneTime)) {
+        for (uint8_t i = 0; i < maxAttempts; i++)
+        {
+            if (errorOccured) 
+            {
+                if (MMC_Init(card) == kStatus_Success)
+                {
+                    LOG_ERROR("MMC reinit OK\n");
+                    errorOccured = false;
+                }
+                else
+                {
+                    LOG_ERROR("MMC reinit error\n");
+                    continue;
+                } 
+            }
+
+            if (kStatus_Success != MMC_Write(card, dataAddrAlign ? nextBuffer : (uint8_t *)g_sdmmc,
+                                            (startBlock + blockDone), FSL_SDMMC_DEFAULT_BLOCK_SIZE, blockCountOneTime))
+            {
+                LOG_ERROR("MMC_Write transfer failed\n");
+                errorOccured = true;
+            }
+            else
+            {
+                isWriteOk = true;
+                break;
+            }
+        }
+
+        if (!isWriteOk) 
+        {
             return kStatus_SDMMC_TransferFailed;
         }
+
 
         blockDone += blockCountOneTime;
         if (!card->noInteralAlign) {
