@@ -10,8 +10,7 @@
 
 #include <service-db/agents/settings/SystemSettings.hpp>
 
-#include <volte/ImsiParserUS.hpp>
-#include <volte/VolteAllowedUSList.hpp>
+#include <volte/VolteAllowedList.hpp>
 #include <volte/VolteCapabilityHandlerCellular.hpp>
 
 #include <service-evtmgr/EVMessages.hpp>
@@ -47,8 +46,7 @@ namespace cellular::internal
               std::make_unique<CSQHandler>(),
           },
           volteCapability{
-              std::make_unique<VolteCapabilityHandler>(std::make_unique<cellular::service::ImsiParserUS>(),
-                                                       std::make_unique<cellular::service::VolteAllowedUSList>(),
+              std::make_unique<VolteCapabilityHandler>(std::make_unique<cellular::service::VolteAllowedList>(),
                                                        std::make_unique<cellular::service::VolteCapabilityCellular>())},
           ussdHandler{std::make_unique<USSDHandler>()}
     {

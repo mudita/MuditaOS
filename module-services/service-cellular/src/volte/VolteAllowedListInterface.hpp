@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "OperatorInfo.hpp"
 #include <string>
 
 namespace cellular::service
@@ -13,6 +12,6 @@ namespace cellular::service
       public:
         virtual ~VolteAllowedListInterface() = default;
 
-        auto virtual isVolteAllowed(const OperatorInfo &operatorInfo) -> bool = 0;
+        auto virtual isVolteAllowed(const std::string &imsi) const -> bool = 0;
     };
 } // namespace cellular::service
