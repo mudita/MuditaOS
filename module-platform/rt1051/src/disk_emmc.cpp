@@ -20,8 +20,10 @@ namespace purefs::blkdev
         mmcCard->busWidth                   = kMMC_DataBusWidth8bit;
         mmcCard->busTiming                  = kMMC_HighSpeedTiming;
         mmcCard->enablePreDefinedBlockCount = true;
-        mmcCard->host.base                  = USDHC2;
-        mmcCard->host.sourceClock_Hz        = GetPerphSourceClock(PerphClock_USDHC2);
+        mmcCard->host->hostController.base  = USDHC2;
+        mmcCard->host->hostController.sourceClock_Hz =
+            CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) /
+            (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U); // GetPerphSourceClock(PerphClock_USDHC2);
 
         driverUSDHC = drivers::DriverUSDHC::Create(
             "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));
@@ -106,19 +108,20 @@ namespace purefs::blkdev
             return statusBlkDevFail;
         }
         // Wait for the card's buffer to become empty
-        while ((GET_SDMMCHOST_STATUS(mmcCard->host.base) & CARD_DATA0_STATUS_MASK) != CARD_DATA0_NOT_BUSY) {
-            taskYIELD();
-        }
+        // while ((GET_SDMMCHOST_STATUS(mmcCard->host->hostController.base) & CARD_DATA0_STATUS_MASK) !=
+        // CARD_DATA0_NOT_BUSY) {
+        //     taskYIELD();
+        // }
         if (pmState == pm_state::suspend) {
             driverUSDHC->Enable();
         }
-        auto err = MMC_WaitWriteComplete(mmcCard.get());
+        // auto err = MMC_WaitWriteComplete(mmcCard.get());
         if (pmState == pm_state::suspend) {
             driverUSDHC->Disable();
         }
-        if (err != kStatus_Success) {
-            return kStatus_SDMMC_WaitWriteCompleteFailed;
-        }
+        // if (err != kStatus_Success) {
+        //     return kStatus_SDMMC_WaitWriteCompleteFailed;
+        // }
         return statusBlkDevSuccess;
     }
     auto disk_emmc::status() const -> media_status
@@ -145,13 +148,13 @@ namespace purefs::blkdev
             return mmcCard->blockSize;
         case info_type::sector_count:
             switch (hwpart) {
-            case kMMC_AccessPartitionUserArea:
-                return mmcCard->userPartitionBlocks;
+            // case kMMC_AccessPartitionUserArea:
+            //     return mmcCard->userPartitionBlocks;
             case kMMC_AccessPartitionBoot1:
             case kMMC_AccessPartitionBoot2:
                 return mmcCard->bootPartitionBlocks;
             default:
-                return mmcCard->systemPartitionBlocks;
+                return mmcCard->bootPartitionBlocks;
             }
         case info_type::erase_block:
             // not supported

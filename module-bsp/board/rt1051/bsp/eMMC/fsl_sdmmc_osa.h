@@ -11,6 +11,16 @@
 #include "fsl_common.h"
 // #include "fsl_os_abstraction.h"
 
+/****************/
+#define osaWaitForever_c         ((uint32_t)(-1))
+#define OSA_SEM_HANDLE_SIZE   (4U)
+#define OSA_MUTEX_HANDLE_SIZE (4U)
+#define OSA_SEMAPHORE_HANDLE_DEFINE(name) \
+    uint32_t name[(OSA_SEM_HANDLE_SIZE + sizeof(uint32_t) - 1U) / sizeof(uint32_t)]
+#define OSA_MUTEX_HANDLE_DEFINE(name) uint32_t name[(OSA_MUTEX_HANDLE_SIZE + sizeof(uint32_t) - 1U) / sizeof(uint32_t)]
+
+/****************/
+
 /*!
  * @addtogroup sdmmc_osa SDMMC OSA
  * @ingroup card
