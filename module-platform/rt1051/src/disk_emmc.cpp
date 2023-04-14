@@ -13,17 +13,29 @@
 
 namespace purefs::blkdev
 {
-    disk_emmc::disk_emmc() : initStatus(kStatus_Success), mmcCard(std::make_unique<_mmc_card>())
+    AT_NONCACHEABLE_SECTION_ALIGN(uint32_t s_sdmmcHostDmaBuffer[32U], SDMMCHOST_DMA_DESCRIPTOR_BUFFER_ALIGN_SIZE);
+
+    disk_emmc::disk_emmc()
+        : initStatus(kStatus_Success), mmcCard(std::make_unique<_mmc_card>()), mmcHost(std::make_unique<sdmmchost_t>())
     {
         assert(mmcCard.get());
         std::memset(mmcCard.get(), 0, sizeof(_mmc_card));
+        mmcCard->host = mmcHost.get();
+
+        mmcHost->dmaDesBuffer         = s_sdmmcHostDmaBuffer;
+        mmcHost->dmaDesBufferWordsNum = 32U;
+        mmcHost->enableCacheControl   = kSDMMCHOST_CacheControlRWBuffer;
+#if defined SDMMCHOST_ENABLE_CACHE_LINE_ALIGN_TRANSFER && SDMMCHOST_ENABLE_CACHE_LINE_ALIGN_TRANSFER
+        s_host.cacheAlignBuffer     = s_sdmmcCacheLineAlignBuffer;
+        s_host.cacheAlignBufferSize = BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U;
+#endif
+
         mmcCard->busWidth                   = kMMC_DataBusWidth8bit;
         mmcCard->busTiming                  = kMMC_HighSpeedTiming;
         mmcCard->enablePreDefinedBlockCount = true;
         mmcCard->host->hostController.base  = USDHC2;
         mmcCard->host->hostController.sourceClock_Hz =
-            CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) /
-            (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U); // GetPerphSourceClock(PerphClock_USDHC2);
+            CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
 
         driverUSDHC = drivers::DriverUSDHC::Create(
             "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));
@@ -112,14 +124,22 @@ namespace purefs::blkdev
         // CARD_DATA0_NOT_BUSY) {
         //     taskYIELD();
         // }
+        // status_t error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
+        // if (kStatus_SDMMC_CardStatusIdle != error)
+        // {
+        //     SDMMC_LOG("Error : read failed with wrong card status\r\n");
+        //     return kStatus_SDMMC_PollingCardIdleFailed;
+        // }
+
         if (pmState == pm_state::suspend) {
             driverUSDHC->Enable();
         }
         // auto err = MMC_WaitWriteComplete(mmcCard.get());
+        // error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
         if (pmState == pm_state::suspend) {
             driverUSDHC->Disable();
         }
-        // if (err != kStatus_Success) {
+        // if (error != kStatus_Success) {
         //     return kStatus_SDMMC_WaitWriteCompleteFailed;
         // }
         return statusBlkDevSuccess;

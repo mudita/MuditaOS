@@ -4,6 +4,7 @@
 #pragma once
 
 #include "drivers/usdhc/DriverUSDHC.hpp"
+#include "board/rt1051/bsp/eMMC/fsl_sdmmc_host.h"
 #include <purefs/blkdev/disk.hpp>
 #include <mutex.hpp>
 #include <memory>
@@ -63,6 +64,7 @@ namespace purefs::blkdev
         std::atomic<hwpart_t> currHwPart{0};
 
         std::unique_ptr<_mmc_card> mmcCard;
+        std::unique_ptr<sdmmchost_t> mmcHost;
         std::shared_ptr<drivers::DriverUSDHC> driverUSDHC;
 
         /* Read from datasheets */
