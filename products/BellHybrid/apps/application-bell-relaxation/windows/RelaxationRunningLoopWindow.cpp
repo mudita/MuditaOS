@@ -17,6 +17,7 @@ namespace
     inline constexpr std::chrono::seconds timerTick{1};
     inline constexpr units::SOC dischargingLevelShowTop = 20;
     inline constexpr units::SOC dischargingLowBattery   = 10;
+    inline constexpr auto maxPossibleCharsToDisplay     = 25U;
 
     bool isBatteryCharging(const Store::Battery::State state)
     {
@@ -69,6 +70,17 @@ namespace
         battery->setVisible(false);
         return battery;
     }
+
+    std::string adjustDisplayedTitle(const std::string &title)
+    {
+        if (title.length() <= maxPossibleCharsToDisplay) {
+            return title;
+        }
+        std::string newTittle = title.substr(0, maxPossibleCharsToDisplay - 2);
+        newTittle.append("...");
+
+        return newTittle;
+    }
 } // namespace
 
 namespace gui
@@ -94,11 +106,11 @@ namespace gui
         }
 
         if (data && typeid(*data) == typeid(RelaxationSwitchData)) {
-            const auto battery    = presenter->handleBatteryStatus();
-            auto *audioSwitchData = static_cast<RelaxationSwitchData *>(data);
-            audioContext          = audioSwitchData->getAudioContext();
-            title->setText(audioContext->getSound().tags.title);
-            if (battery.level > dischargingLowBattery) {
+            const auto batteryStatus = presenter->handleBatteryStatus();
+            auto *audioSwitchData    = static_cast<RelaxationSwitchData *>(data);
+            audioContext             = audioSwitchData->getAudioContext();
+            title->setText(adjustDisplayedTitle(audioContext->getSound().tags.title));
+            if (batteryStatus.level > dischargingLowBattery) {
                 presenter->activate(audioContext->getSound());
             }
         }
