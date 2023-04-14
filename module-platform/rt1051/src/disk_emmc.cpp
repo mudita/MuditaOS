@@ -148,8 +148,8 @@ namespace purefs::blkdev
             return mmcCard->blockSize;
         case info_type::sector_count:
             switch (hwpart) {
-            // case kMMC_AccessPartitionUserArea:
-            //     return mmcCard->userPartitionBlocks;
+            case kMMC_AccessPartitionUserAera:
+                return mmcCard->userPartitionBlocks;
             case kMMC_AccessPartitionBoot1:
             case kMMC_AccessPartitionBoot2:
                 return mmcCard->bootPartitionBlocks;
