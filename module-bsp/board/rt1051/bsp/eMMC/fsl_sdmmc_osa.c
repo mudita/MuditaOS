@@ -61,7 +61,7 @@ status_t SDMMC_OSAEventWait(void *eventHandle, uint32_t eventType, uint32_t time
 {
     assert(eventHandle != NULL);
 
-    osa_status_t status = KOSA_StatusError;
+//    osa_status_t status = KOSA_StatusError;
 
 // #if defined(SDMMC_OSA_POLLING_EVENT_BY_SEMPHORE) && SDMMC_OSA_POLLING_EVENT_BY_SEMPHORE
 //     while (true)
@@ -265,8 +265,8 @@ void SDMMC_OSADelay(uint32_t milliseconds)
 uint32_t SDMMC_OSADelayUs(uint32_t microseconds)
 {
 // #if (defined FSL_OSA_BM_TIMER_CONFIG) && (FSL_OSA_BM_TIMER_CONFIG == FSL_OSA_BM_TIMER_NONE)
-//     SDK_DelayAtLeastUs(microseconds, SDK_DEVICE_MAXIMUM_CPU_CLOCK_FREQUENCY);
-//     return microseconds;
+     SDK_DelayAtLeastUs(microseconds, CLOCK_GetCpuClkFreq());
+     return microseconds;
 // #else
 //     uint32_t milliseconds = microseconds / 1000U + ((microseconds % 1000U) == 0U ? 0U : 1U);
 //     OSA_TimeDelay(milliseconds);

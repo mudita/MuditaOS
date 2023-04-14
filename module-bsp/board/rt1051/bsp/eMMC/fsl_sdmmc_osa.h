@@ -19,6 +19,28 @@
     uint32_t name[(OSA_SEM_HANDLE_SIZE + sizeof(uint32_t) - 1U) / sizeof(uint32_t)]
 #define OSA_MUTEX_HANDLE_DEFINE(name) uint32_t name[(OSA_MUTEX_HANDLE_SIZE + sizeof(uint32_t) - 1U) / sizeof(uint32_t)]
 
+/*! @brief Defines the return status of OSA's functions */
+#if (defined(SDK_COMPONENT_DEPENDENCY_FSL_COMMON) && (SDK_COMPONENT_DEPENDENCY_FSL_COMMON > 0U))
+typedef enum _osa_status
+{
+    KOSA_StatusSuccess = kStatus_Success,                  /*!< Success */
+    KOSA_StatusError   = MAKE_STATUS(kStatusGroup_OSA, 1), /*!< Failed */
+    KOSA_StatusTimeout = MAKE_STATUS(kStatusGroup_OSA, 2), /*!< Timeout occurs while waiting */
+    KOSA_StatusIdle    = MAKE_STATUS(kStatusGroup_OSA, 3), /*!< Used for bare metal only, the wait object is not ready
+                                                                 and timeout still not occur */
+} osa_status_t;
+#else
+typedef enum _osa_status
+{
+    KOSA_StatusSuccess = 0, /*!< Success */
+    KOSA_StatusError   = 1, /*!< Failed */
+    KOSA_StatusTimeout = 2, /*!< Timeout occurs while waiting */
+    KOSA_StatusIdle    = 3, /*!< Used for bare metal only, the wait object is not ready
+                                                and timeout still not occur */
+} osa_status_t;
+
+#endif
+
 /****************/
 
 /*!
