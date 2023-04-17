@@ -36,6 +36,8 @@ namespace purefs::blkdev
         mmcCard->host->hostController.base  = USDHC2;
         mmcCard->host->hostController.sourceClock_Hz =
             CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
+        mmcCard->hostVoltageWindowVCC  = kMMC_VoltageWindows270to360;
+        mmcCard->hostVoltageWindowVCCQ = kMMC_VoltageWindows270to360;
 
         driverUSDHC = drivers::DriverUSDHC::Create(
             "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));
