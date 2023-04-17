@@ -9,6 +9,12 @@
 #include <string.h>
 #include "fsl_mmc.h"
 
+// ============== only for debug purposes ============
+#include <log/log.hpp>
+#include "FreeRTOS.h"
+#include "task.h"
+// ===================================================
+
 /*******************************************************************************
  * Definitons
  ******************************************************************************/
@@ -2476,6 +2482,8 @@ status_t MMC_WriteBlocks(mmc_card_t *card, const uint8_t *buffer, uint32_t start
     }
     else
     {
+        uint32_t startTime = xTaskGetTickCount();
+
         while (blockLeft != 0U)
         {
             nextBuffer = (uint8_t *)((uint32_t)buffer + blockDone * FSL_SDMMC_DEFAULT_BLOCK_SIZE);
@@ -2513,6 +2521,8 @@ status_t MMC_WriteBlocks(mmc_card_t *card, const uint8_t *buffer, uint32_t start
                 (void)memset(alignBuffer, 0, FSL_SDMMC_DEFAULT_BLOCK_SIZE);
             }
         }
+
+        LOG_INFO("write block size: %ld ticks: %ld", blockCount, xTaskGetTickCount() - startTime);
     }
 
     (void)SDMMC_OSAMutexUnlock(&card->lock);
