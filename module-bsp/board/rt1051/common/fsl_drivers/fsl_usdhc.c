@@ -2465,7 +2465,7 @@ void USDHC1_DriverIRQHandler(void);
 void USDHC1_DriverIRQHandler(void)
 {
     s_usdhcIsr(s_usdhcBase[1U], s_usdhcHandle[1U]);
-    // SDK_ISR_EXIT_BARRIER;
+    SDK_ISR_EXIT_BARRIER;
 }
 #endif
 
@@ -2474,7 +2474,7 @@ void USDHC2_DriverIRQHandler(void);
 void USDHC2_DriverIRQHandler(void)
 {
     s_usdhcIsr(s_usdhcBase[2U], s_usdhcHandle[2U]);
-    // SDK_ISR_EXIT_BARRIER;
+    SDK_ISR_EXIT_BARRIER;
 }
 
 #endif
