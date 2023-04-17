@@ -126,24 +126,23 @@ namespace purefs::blkdev
         // CARD_DATA0_NOT_BUSY) {
         //     taskYIELD();
         // }
-        // status_t error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
-        // if (kStatus_SDMMC_CardStatusIdle != error)
-        // {
-        //     SDMMC_LOG("Error : read failed with wrong card status\r\n");
-        //     return kStatus_SDMMC_PollingCardIdleFailed;
-        // }
+        status_t error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
+        if (kStatus_SDMMC_CardStatusIdle != error) {
+            SDMMC_LOG("Error : read failed with wrong card status\r\n");
+            return kStatus_SDMMC_PollingCardIdleFailed;
+        }
 
         if (pmState == pm_state::suspend) {
             driverUSDHC->Enable();
         }
         // auto err = MMC_WaitWriteComplete(mmcCard.get());
-        // error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
+        error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
         if (pmState == pm_state::suspend) {
             driverUSDHC->Disable();
         }
-        // if (error != kStatus_Success) {
-        //     return kStatus_SDMMC_WaitWriteCompleteFailed;
-        // }
+        if (error != kStatus_Success) {
+            return kStatus_SDMMC_WaitWriteCompleteFailed;
+        }
         return statusBlkDevSuccess;
     }
     auto disk_emmc::status() const -> media_status
