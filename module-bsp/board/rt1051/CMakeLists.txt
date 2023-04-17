@@ -21,7 +21,8 @@ target_sources(module-bsp
 		bsp/eMMC/fsl_sdmmc_event.c
 		bsp/eMMC/fsl_sdmmc_host.c
 		bsp/eMMC/fsl_sdmmc_osa.c
-		bsp/eMMC/fsl_os_abstraction.c
+		bsp/eMMC/fsl_os_abstraction_free_rtos.c
+		bsp/eMMC/fsl_component_generic_list.c
 		bsp/headset/headset.cpp
 		bsp/keypad_backlight/keypad_backlight.cpp
 		bsp/light_sensor/light_sensor.cpp
