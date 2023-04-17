@@ -47,6 +47,10 @@ namespace test
     {
         return "relaxation";
     }
+    std::filesystem::path destinyFolder() noexcept
+    {
+        return purefs::dir::getUserMediaPath() / "app/relaxation_test";
+    }
 
     void copyFile(std::string sourcePath, std::string destinyPath)
     {
@@ -104,16 +108,16 @@ namespace test
         LOG_ERROR("*** test start ***");
 
         // const auto sourcePath = std::string(proprietary() / relaxation() / "Woodland_Ambiance.mp3");
-        const auto destinyFolder = std::string(proprietary() / "relaxation_test");
+        // const auto destinyFolder = std::string(proprietary() / "relaxation_test");
         // const auto destinyPath = std::string(proprietary() / "relaxation_test" / "Woodland_Ambiance.mp3" );
 
-        std::filesystem::remove_all(destinyFolder);
-        std::filesystem::create_directory(destinyFolder);
+        std::filesystem::remove_all(destinyFolder());
+        std::filesystem::create_directory(destinyFolder());
         // std::filesystem::copy(sourcePath, destinyPath);
 
         for (auto file : filesToCopy) {
             const auto sourcePath  = std::string(proprietary() / relaxation() / file);
-            const auto destinyPath = destinyFolder + "/" + file;
+            const auto destinyPath = std::string(destinyFolder() / file);
             LOG_ERROR("copying the file %s", file.c_str());
             copyFile(sourcePath, destinyPath);
         }
