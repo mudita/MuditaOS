@@ -52,7 +52,7 @@ namespace test
         return purefs::dir::getUserMediaPath() / "app/relaxation_test";
     }
 
-    void copyFile(std::string sourcePath, std::string destinyPath)
+    bool copyFile(std::string sourcePath, std::string destinyPath)
     {
         auto src_fd = std::fopen(sourcePath.c_str(), "r");
         if (!src_fd) {
@@ -80,16 +80,17 @@ namespace test
         }
 
         std::size_t bytes_read;
-        std::size_t bytes_left = std::fseek(src_fd, 0, SEEK_END);
+        std::fseek(src_fd, 0, SEEK_END);
+        std::size_t bytes_left = std::ftell(src_fd);
         std::fseek(src_fd, 0, SEEK_SET);
 
         do {
             bytes_read = std::fread(buffer, 1, buffer_size, src_fd);
-            if (bytes_read != buffer_size) {
-                LOG_ERROR("Read size: %d\n", bytes_read);
-                // ret = 1;
-                break;
-            }
+            // if (bytes_read != buffer_size) {
+            //     LOG_ERROR("Read size: %d", bytes_read);
+            //     // ret = 1;
+            //     break;
+            // }
             if (std::fwrite(buffer, sizeof(*buffer), bytes_read, dst_fd) != bytes_read) {
                 LOG_ERROR("Failed to write to destination file\n");
                 // ret = 1;
@@ -101,29 +102,45 @@ namespace test
         free(buffer);
         std::fclose(dst_fd);
         std::fclose(src_fd);
+
+        return bytes_left == 0 ? true : false;
     }
 
     void start()
     {
         LOG_ERROR("*** test start ***");
 
-        // const auto sourcePath = std::string(proprietary() / relaxation() / "Woodland_Ambiance.mp3");
-        // const auto destinyFolder = std::string(proprietary() / "relaxation_test");
-        // const auto destinyPath = std::string(proprietary() / "relaxation_test" / "Woodland_Ambiance.mp3" );
-
         std::filesystem::remove_all(destinyFolder());
         std::filesystem::create_directory(destinyFolder());
-        // std::filesystem::copy(sourcePath, destinyPath);
 
         for (auto file : filesToCopy) {
             const auto sourcePath  = std::string(proprietary() / relaxation() / file);
             const auto destinyPath = std::string(destinyFolder() / file);
             LOG_ERROR("copying the file %s", file.c_str());
-            copyFile(sourcePath, destinyPath);
+            const bool result = copyFile(sourcePath, destinyPath);
+            if (!result) {
+                LOG_ERROR("*** file copy failed !!! ***");
+            }
         }
 
         LOG_ERROR("*** test end ***");
     }
+
+    void vTaskCode(void *pvParameters)
+    {
+        configASSERT(((uint32_t)pvParameters) == 1);
+
+        LOG_ERROR("*** test task start ***");
+
+        for (;;) {
+            /* Task code goes here. */
+            if (xTaskGetTickCount() > 30000) {
+                start();
+            }
+            vTaskDelay(10000);
+        }
+    }
+
 } // namespace test
 
 namespace
@@ -174,18 +191,39 @@ void EventManager::handleKeyEvent(sys::Message *msg)
         backlightHandler.handleKeyPressed(static_cast<int>(mapKey(static_cast<gui::KeyCode>(kbdMessage->key.keyCode))));
         LOG_ERROR("*** keyCode: %s ***", magic_enum::enum_name(kbdMessage->key.keyCode).data());
 
-        if (kbdMessage->key.keyCode == bsp::KeyCodes::JoystickDown) {
-            test::start();
-        }
+        // if (kbdMessage->key.keyCode == bsp::KeyCodes::JoystickDown) {
+        //     test::start();
+        // }
     }
 
     keySequenceMgr->process(kbdMessage->key);
+}
+
+EventManager::~EventManager()
+{
+    if (test_taskHandle) {
+        /* The task was created.  Use the task's handle to delete the task. */
+        vTaskDelete(test_taskHandle);
+    }
 }
 
 sys::ReturnCodes EventManager::InitHandler()
 {
     auto ret    = EventManagerCommon::InitHandler();
     latchStatus = bsp::bell_switches::isLatchPressed() ? sevm::LatchStatus::PRESSED : sevm::LatchStatus::RELEASED;
+
+    /* Create the task, storing the handle. */
+    BaseType_t xReturned = xTaskCreate(test::vTaskCode,   /* Function that implements the task. */
+                                       "eMMC test",       /* Text name for the task. */
+                                       1024 * 2,          /* Stack size in words, not bytes. */
+                                       (void *)1,         /* Parameter passed into the task. */
+                                       tskIDLE_PRIORITY,  /* Priority at which the task is created. */
+                                       &test_taskHandle); /* Used to pass out the created task's handle. */
+
+    if (xReturned != pdPASS) {
+        LOG_ERROR("*** test task not created! ***");
+    }
+
     return ret;
 }
 

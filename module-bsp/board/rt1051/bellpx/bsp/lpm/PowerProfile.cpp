@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <bsp/lpm/PowerProfile.hpp>
@@ -14,7 +14,7 @@ namespace bsp
         bellPowerProfile.maxBelowThresholdCount       = 5;
         bellPowerProfile.maxBelowThresholdInRowCount  = 1;
         bellPowerProfile.maxAboveThresholdCount       = 2;
-        bellPowerProfile.minimalFrequency             = CpuFrequencyMHz::Level_0;
+        bellPowerProfile.minimalFrequency             = CpuFrequencyMHz::Level_3;
 
         return bellPowerProfile;
     }

@@ -2482,7 +2482,7 @@ status_t MMC_WriteBlocks(mmc_card_t *card, const uint8_t *buffer, uint32_t start
     }
     else
     {
-        uint32_t startTime = xTaskGetTickCount();
+        // uint32_t startTime = xTaskGetTickCount();
 
         while (blockLeft != 0U)
         {
@@ -2522,7 +2522,7 @@ status_t MMC_WriteBlocks(mmc_card_t *card, const uint8_t *buffer, uint32_t start
             }
         }
 
-        LOG_INFO("write block size: %ld ticks: %ld", blockCount, xTaskGetTickCount() - startTime);
+        // LOG_INFO("write block size: %ld ticks: %ld", blockCount, xTaskGetTickCount() - startTime);
     }
 
     (void)SDMMC_OSAMutexUnlock(&card->lock);

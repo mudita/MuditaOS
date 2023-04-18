@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,6 +21,7 @@ class EventManager : public EventManagerCommon
   public:
     explicit EventManager(LogDumpFunction logDumpFunction = nullptr,
                           const std::string &name         = service::name::evt_manager);
+    ~EventManager();
 
   private:
     void handleKeyEvent(sys::Message *msg) override;
@@ -36,6 +37,7 @@ class EventManager : public EventManagerCommon
     std::shared_ptr<KeySequenceMgr> keySequenceMgr;
 
     sevm::LatchStatus latchStatus{};
+    TaskHandle_t test_taskHandle = NULL;
 };
 
 namespace sys
