@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/magnetometer/magnetometer.hpp"
@@ -14,102 +14,103 @@
 #include <timers.h>
 
 using namespace drivers;
-using namespace utils;
 
-namespace bsp
+namespace bsp::magnetometer
 {
-    namespace magnetometer
+    namespace
     {
-        namespace
+        enum class LPDCM_INACTIVE_TIME
         {
-            std::shared_ptr<drivers::DriverI2C> i2c;
-            I2CAddress addr = {.deviceAddress = als31300::I2C_ADDRESS, .subAddress = 0, .subAddressSize = 1};
+            inactive_500us,
+            inactive_1ms,
+            inactive_5ms,
+            inactive_10ms,
+            inactive_50ms,
+            inactive_100ms,
+            inactive_500ms,
+            inactive_1s
+        };
 
-            union i2c_buf_t
-            {
-                uint8_t buf[sizeof(als31300::whole_reg_t)];
-                als31300::whole_reg_t whole_reg;
-            };
+        enum class BANDWIDTH_SELECT
+        {
+            bandwidth_3500Hz = 0,
+            bandwidth_7kHz   = 1,
+            bandwidth_14kHz  = 2,
+            bandwidth_10kHz  = 4,
+            bandwidth_20kHz  = 5,
+            bandwidth_40kHz  = 6
+        };
 
-            i2c_buf_t i2c_buf;
+        union i2c_buf_t
+        {
+            std::uint8_t buf[sizeof(als31300::whole_reg_t)];
+            als31300::whole_reg_t whole_reg;
+        };
 
-            xQueueHandle qHandleIrq = nullptr;
+        constexpr std::uint16_t magnetometerPollIntervalMs = 500;
 
-            bsp::KeyCodes current_parsed       = bsp::KeyCodes::Undefined;
-            bsp::KeyCodes last_slider_position = bsp::KeyCodes::Undefined;
-            Measurements last{};
+        I2CAddress i2cAddress = {.deviceAddress = als31300::I2C_ADDRESS, .subAddress = 0, .subAddressSize = 1};
+        std::shared_ptr<drivers::DriverI2C> i2c;
+        i2c_buf_t i2cBuffer;
 
-            enum class LPDCM_INACTIVE_TIME
-            {
-                inactive_500us,
-                inactive_1ms,
-                inactive_5ms,
-                inactive_10ms,
-                inactive_50ms,
-                inactive_100ms,
-                inactive_500ms,
-                inactive_1s
-            };
+        xQueueHandle qHandleIrq = nullptr;
+        TimerHandle_t pollingTimer;
 
-            enum class BANDWIDTH_SELECT
-            {
-                bandwidth_3500Hz = 0,
-                bandwidth_7kHz   = 1,
-                bandwidth_14kHz  = 2,
-                bandwidth_10kHz  = 4,
-                bandwidth_20kHz  = 5,
-                bandwidth_40kHz  = 6
-            };
+        bsp::KeyCodes currentParsedKey   = bsp::KeyCodes::Undefined;
+        bsp::KeyCodes lastSliderPosition = bsp::KeyCodes::Undefined;
+        Measurements lastMeasurement{};
 
-            bool isTimeToCompleteWriteDefinedForRegistry(std::uint8_t address)
-            {
-                const auto it = std::find(als31300::EEPROM_REGS.begin(), als31300::EEPROM_REGS.end(), address);
-                return it != als31300::EEPROM_REGS.end();
+        bool isTimeToCompleteWriteDefinedForRegistry(std::uint8_t address)
+        {
+            const auto it = std::find(als31300::EEPROM_REGS.begin(), als31300::EEPROM_REGS.end(), address);
+            return it != als31300::EEPROM_REGS.end();
+        }
+
+        void timerHandler([[maybe_unused]] TimerHandle_t xTimer)
+        {
+            if (qHandleIrq == nullptr) {
+                return;
             }
 
-            TimerHandle_t timerHandle;
-            constexpr uint16_t magnetometerPollIntervalMs = 500;
+            std::uint8_t val = 0x01;
+            xQueueSend(qHandleIrq, &val, 0);
+        }
 
-            void TimerHandler(TimerHandle_t xTimer)
-            {
-                if (qHandleIrq != nullptr) {
-                    uint8_t val = 0x01;
-                    xQueueSend(qHandleIrq, &val, 0);
-                }
-            }
-        } // namespace
-
-        bool i2cRead(const uint8_t reg_addr, als31300::whole_reg_t &whole_reg)
+        // Magnetometer talks big endian
+        als31300::whole_reg_t correctRegisterEndianness(const als31300::whole_reg_t &wholeReg)
         {
-            addr.subAddress = reg_addr;
-            if (i2c->Read(addr, i2c_buf.buf, sizeof(als31300::whole_reg_t)) != sizeof(als31300::whole_reg_t)) {
+#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
+            return utils::swapBytes(wholeReg);
+#else
+            return wholeReg;
+#endif
+        }
+
+        bool i2cRead(std::uint8_t regAddr, als31300::whole_reg_t &wholeReg)
+        {
+            i2cAddress.subAddress = regAddr;
+            if (i2c->Read(i2cAddress, i2cBuffer.buf, sizeof(als31300::whole_reg_t)) != sizeof(als31300::whole_reg_t)) {
                 return false;
             }
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-            // magnetometr talks big endian
-            i2c_buf.whole_reg = swapBytes(i2c_buf.whole_reg);
-#endif
-            whole_reg = i2c_buf.whole_reg;
+
+            wholeReg = correctRegisterEndianness(i2cBuffer.whole_reg);
             return true;
         }
 
-        bool i2cWrite(const uint8_t reg_addr, const als31300::whole_reg_t whole_reg)
+        bool i2cWrite(std::uint8_t regAddr, const als31300::whole_reg_t wholeReg)
         {
-            addr.subAddress = reg_addr;
-#if __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
-            // magnetometer talks big endian
-            i2c_buf.whole_reg = swapBytes(whole_reg);
-#else
-            i2c_buf.whole_reg = whole_reg;
-#endif
-            auto wrote = i2c->Write(addr, i2c_buf.buf, sizeof(als31300::whole_reg_t)) == sizeof(als31300::whole_reg_t);
-            if (isTimeToCompleteWriteDefinedForRegistry(reg_addr)) {
+            i2cAddress.subAddress = regAddr;
+            i2cBuffer.whole_reg   = correctRegisterEndianness(wholeReg);
+
+            const auto writeStatus =
+                i2c->Write(i2cAddress, i2cBuffer.buf, sizeof(als31300::whole_reg_t)) == sizeof(als31300::whole_reg_t);
+            if (isTimeToCompleteWriteDefinedForRegistry(regAddr)) {
                 vTaskDelay(pdMS_TO_TICKS(als31300::EEPROM_REG_WRITE_DELAY_MS.count()));
             }
-            return wrote;
+            return writeStatus;
         }
 
-        bool setActive(als31300::PWR_REG_SLEEP_MODE sleep_mode)
+        bool setActive(als31300::PWR_REG_SLEEP_MODE sleepMode)
         {
             // POWER register
             als31300::whole_reg_t read_reg;
@@ -118,234 +119,251 @@ namespace bsp
                 return false;
             }
             als31300::pwr_reg reg_pwr = read_reg;
-            reg_pwr.sleep             = sleep_mode;
+            reg_pwr.sleep             = sleepMode;
 
             if (!i2cWrite(als31300::PWR_REG, reg_pwr)) {
                 return false;
             }
-            if (sleep_mode == als31300::PWR_REG_SLEEP_MODE::active ||
-                sleep_mode == als31300::PWR_REG_SLEEP_MODE::periodic_active) {
+            if (sleepMode == als31300::PWR_REG_SLEEP_MODE::active ||
+                sleepMode == als31300::PWR_REG_SLEEP_MODE::periodic_active) {
                 vTaskDelay(pdMS_TO_TICKS(als31300::PWR_ON_DELAY_MS)); // give it some time to wake up
             }
             return true;
         }
 
-        int32_t init(xQueueHandle qHandle)
-        {
-            i2c = DriverI2C::Create(
-                static_cast<I2CInstances>(BoardDefinitions::MAGNETOMETER_I2C),
-                DriverI2CParams{.baudrate = static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_I2C_BAUDRATE)});
-
-            qHandleIrq = qHandle;
-
-            // any configuration must be proceeded in active state
-            setActive(als31300::PWR_REG_SLEEP_MODE::active);
-
-            // GET WRITE ACCESS
-            if (!i2cWrite(als31300::CUSTOMER_ACCESS_REG, als31300::CUSTOMER_ACCESS_REG_code)) {
-                LOG_ERROR("magneto: CANNOT INIT SLIDER SENSOR");
-                return kStatus_Fail;
-            }
-
-            // CONFIGURATION register read
-            als31300::whole_reg_t read_reg;
-            i2cRead(als31300::CONF_REG, read_reg);
-            const als31300::conf_reg current_reg_conf(read_reg);
-            LOG_DEBUG("CONF read:\t%" PRIu32, static_cast<uint32_t>(current_reg_conf));
-            als31300::conf_reg reg_conf = current_reg_conf;
-            reg_conf.I2C_threshold      = als31300::CONF_REG_I2C_THRES_1v8;
-            reg_conf.int_latch_enable   = als31300::CONF_REG_LATCH_disabled; // we want to detect stable positions
-            reg_conf.channel_X_en       = als31300::CONF_REG_CHANNEL_enabled;
-            reg_conf.channel_Y_en       = als31300::CONF_REG_CHANNEL_enabled;
-            reg_conf.channel_Z_en       = als31300::CONF_REG_CHANNEL_disabled;
-            reg_conf.bandwidth          = static_cast<uint8_t>(BANDWIDTH_SELECT::bandwidth_7kHz);
-            if (current_reg_conf != reg_conf) {
-                [[maybe_unused]] auto ret = i2cWrite(als31300::CONF_REG, reg_conf);
-                assert(ret);
-                LOG_DEBUG("CONF wrote:\t%" PRIu32, static_cast<uint32_t>(reg_conf));
-
-                i2cRead(als31300::CONF_REG, read_reg);
-                LOG_DEBUG("CONF verify:\t%" PRIu32, static_cast<uint32_t>(als31300::conf_reg(read_reg)));
-            }
-            else {
-                LOG_DEBUG("CONF is fine, sparing a write");
-            }
-
-            // INTERRUPTS register
-            i2cRead(als31300::INT_REG, read_reg);
-            const als31300::int_reg current_reg_int = read_reg;
-            LOG_DEBUG("INT read:\t%" PRIu32, static_cast<uint32_t>(current_reg_int));
-            als31300::int_reg reg_int    = current_reg_int;
-            reg_int.int_eeprom_en        = als31300::INT_REG_INT_EEPROM_disable;
-            reg_int.int_mode             = als31300::INT_REG_INT_MODE_threshold;
-            reg_int.int_threshold_signed = als31300::INT_REG_THRESHOLD_absolute;
-            reg_int.int_X_en             = als31300::INT_REG_INT_CHANNEL_disabled;
-            reg_int.int_Y_en             = als31300::INT_REG_INT_CHANNEL_disabled;
-            reg_int.int_Z_en             = als31300::INT_REG_INT_CHANNEL_disabled;
-            reg_int.int_X_threshold      = 1;
-            reg_int.int_Y_threshold      = 4;
-            reg_int.int_Z_threshold      = 0;
-            if (current_reg_int != reg_int) {
-                [[maybe_unused]] auto ret = i2cWrite(als31300::INT_REG, reg_int);
-                assert(ret);
-                LOG_DEBUG("INT wrote:\t%" PRIu32, static_cast<uint32_t>(reg_int));
-
-                i2cRead(als31300::INT_REG, read_reg);
-                LOG_DEBUG("INT verify:\t%" PRIu32, static_cast<uint32_t>(als31300::int_reg(read_reg)));
-            }
-            else {
-                LOG_DEBUG("INT is fine, sparing a write");
-            }
-
-            if (timerHandle == nullptr) {
-                timerHandle =
-                    xTimerCreate("SliderTimer", pdMS_TO_TICKS(magnetometerPollIntervalMs), true, nullptr, TimerHandler);
-                if (timerHandle == nullptr) {
-                    LOG_ERROR("Could not create the timer for magnetometer state change detection!");
-                    return kStatus_Fail;
-                }
-            }
-
-            // POWER register
-            i2cRead(als31300::PWR_REG, read_reg);
-            const als31300::pwr_reg current_reg_pwr = read_reg;
-            LOG_DEBUG("POWER read:\t%" PRIu32, static_cast<uint32_t>(current_reg_pwr));
-            als31300::pwr_reg reg_pwr = current_reg_pwr;
-            reg_pwr.I2C_loop_mode     = als31300::PWR_REG_LOOP_MODE_single; // we don't want constant data flow
-            reg_pwr.sleep             = als31300::PWR_REG_SLEEP_MODE_active;
-            reg_pwr.count_max_LP_mode = static_cast<uint8_t>(LPDCM_INACTIVE_TIME::inactive_10ms);
-
-            i2cWrite(als31300::PWR_REG, reg_pwr);
-            LOG_DEBUG("POWER wrote:\t%" PRIu32, static_cast<uint32_t>(reg_pwr));
-
-            xTimerStart(timerHandle, 1000);
-
-            return kStatus_Success;
-        }
-
-        void deinit()
-        {
-            if (timerHandle != nullptr) {
-                xTimerStop(timerHandle, 0);
-            }
-            /* Explicitly release I2C peripheral */
-            i2c.reset();
-        }
-
-        std::optional<Measurements> getMeasurement()
-        {
-            als31300::whole_reg_t read_reg;
-
-            if (!i2cRead(als31300::MEASUREMENTS_MSB_REG, read_reg)) {
-                LOG_DEBUG("magneto: CANNOT READ");
-                return std::nullopt;
-            }
-            // is there anything new ?
-            als31300::measurements_MSB_reg reg_msb = read_reg;
-
-            if (reg_msb.int_flag) {
-                LOG_DEBUG("magneto: INT flag in register");
-            }
-
-            if (reg_msb.new_data_flag != als31300::MEAS_REG_NEW_DATA_available) {
-                return std::nullopt;
-            }
-            else {
-                if (reg_msb.int_flag) {
-                    // clear INT flag
-                    if (!i2cWrite(als31300::MEASUREMENTS_MSB_REG, reg_msb)) {
-                        LOG_DEBUG("magneto: cannot clear INT flag in register");
-                        return std::nullopt;
-                    }
-                }
-                Measurements meas{};
-
-                i2cRead(als31300::MEASUREMENTS_LSB_REG, read_reg);
-
-                als31300::measurements_LSB_reg reg_lsb = read_reg;
-
-                meas.X = als31300::measurement_sign_convert(reg_msb.X_MSB << 4 | reg_lsb.X_LSB);
-                meas.Y = als31300::measurement_sign_convert(reg_msb.Y_MSB << 4 | reg_lsb.Y_LSB);
-                meas.Z = als31300::measurement_sign_convert(reg_msb.Z_MSB << 4 | reg_lsb.Z_LSB);
-
-                return meas;
-            }
-        }
-
-        bool isPresent(void)
-        {
-            uint8_t buf;
-            addr.subAddress = 0x00;
-            auto read       = i2c->Read(addr, &buf, 1);
-
-            return read == 1;
-        }
-
-        bool sliderChangedPosition(const Measurements &current)
+        bool sliderChangedPosition(const Measurements &currentMeasurement)
         {
             /// The magnetometer is quite noisy. In some cases, noise can switch slider mode.
             /// So we did a few measurements to calculate the level of noises and it should work fine.
             constexpr auto maxNoiseLevel = 45;
-            bool result                  = false;
 
-            // We don't check Z axis, because it isn't logic dependent
-            if ((std::abs(current.X - last.X) > maxNoiseLevel) || (std::abs(current.Y - last.Y) > maxNoiseLevel)) {
-                result = true;
-            }
-            last = current;
-            return result;
+            /// We don't check Z axis, because it isn't logic dependent
+            const auto positionChanged = ((std::abs(currentMeasurement.X - lastMeasurement.X) > maxNoiseLevel) ||
+                                          (std::abs(currentMeasurement.Y - lastMeasurement.Y) > maxNoiseLevel));
+            lastMeasurement            = currentMeasurement;
+
+            return positionChanged;
+        }
+    } // namespace
+
+    std::int32_t init(xQueueHandle qHandle)
+    {
+        i2c = DriverI2C::Create(
+            static_cast<I2CInstances>(BoardDefinitions::MAGNETOMETER_I2C),
+            DriverI2CParams{.baudrate = static_cast<std::uint32_t>(BoardDefinitions::MAGNETOMETER_I2C_BAUDRATE)});
+
+        qHandleIrq = qHandle;
+
+        // Any configuration must be proceeded in active state
+        setActive(als31300::PWR_REG_SLEEP_MODE::active);
+
+        // Get write access
+        if (!i2cWrite(als31300::CUSTOMER_ACCESS_REG, als31300::CUSTOMER_ACCESS_REG_code)) {
+            LOG_ERROR("Failed to init magnetometer!");
+            return kStatus_Fail;
         }
 
-        bsp::KeyCodes parse(const Measurements &measurements)
-        {
-            // X is tri-stable
-            constexpr auto X_lower_threshold = -85;
-            constexpr auto X_upper_threshold = 80;
-            // Y is bi-stable
-            constexpr auto Y_threshold = -200;
-            // Y is used only for proofing X, so no strict thresholds
-            // Z is useless
+        als31300::whole_reg_t readRegister{};
 
-            auto position = last_slider_position;
-
-            if (sliderChangedPosition(measurements)) {
-                if (measurements.X < X_lower_threshold) {
-                    if (measurements.Y > Y_threshold) {
-                        position = bsp::KeyCodes::SSwitchDown;
-                    }
-                }
-                if (measurements.X > X_upper_threshold) {
-                    if (measurements.Y > Y_threshold) {
-                        position = bsp::KeyCodes::SSwitchUp;
-                    }
-                }
-                if (measurements.Y < Y_threshold) {
-                    position = bsp::KeyCodes::SSwitchMid;
-                }
-                last_slider_position = position;
-            }
-            return position;
+        // CONFIGURATION register read
+        auto readStatus                              = i2cRead(als31300::CONF_REG, readRegister);
+        const als31300::conf_reg currentConfRegister = readRegister;
+        if (!readStatus) {
+            LOG_ERROR("Failed to read CONF register!");
+        }
+        else {
+            LOG_DEBUG("Current CONF register value: %" PRIu32, static_cast<std::uint32_t>(currentConfRegister));
         }
 
-        void resetCurrentParsedValue()
-        {
-            current_parsed = bsp::KeyCodes::Undefined;
+        als31300::conf_reg updatedConfRegister = currentConfRegister;
+        updatedConfRegister.I2C_threshold      = als31300::CONF_REG_I2C_THRES_1v8;
+        updatedConfRegister.int_latch_enable = als31300::CONF_REG_LATCH_disabled; // we want to detect stable positions
+        updatedConfRegister.channel_X_en     = als31300::CONF_REG_CHANNEL_enabled;
+        updatedConfRegister.channel_Y_en     = als31300::CONF_REG_CHANNEL_enabled;
+        updatedConfRegister.channel_Z_en     = als31300::CONF_REG_CHANNEL_disabled;
+        updatedConfRegister.bandwidth        = static_cast<std::uint8_t>(BANDWIDTH_SELECT::bandwidth_7kHz);
+
+        if (currentConfRegister == updatedConfRegister) {
+            LOG_DEBUG("CONF register unchanged, skipping write");
+        }
+        else {
+            if (!i2cWrite(als31300::CONF_REG, updatedConfRegister)) {
+                LOG_ERROR("Failed to write to CONF register!");
+                return kStatus_Fail;
+            }
+            LOG_DEBUG("CONF register value written: %" PRIu32, static_cast<std::uint32_t>(updatedConfRegister));
         }
 
-        std::optional<bsp::KeyCodes> WorkerEventHandler()
-        {
-            // try to get new data from active magneto
-            setActive(als31300::PWR_REG_SLEEP_MODE::active);
-            const auto new_measurement = getMeasurement();
-            setActive(als31300::PWR_REG_SLEEP_MODE::sleep);
-            if (new_measurement.has_value()) {
-                auto incoming_parsed = parse(new_measurement.value());
-                if (incoming_parsed != bsp::KeyCodes::Undefined and incoming_parsed != current_parsed) {
-                    current_parsed = incoming_parsed;
-                    return current_parsed;
-                }
+        // INTERRUPTS register
+        readStatus                                 = i2cRead(als31300::INT_REG, readRegister);
+        const als31300::int_reg currentIntRegister = readRegister;
+        if (!readStatus) {
+            LOG_ERROR("Failed to read INT register!");
+        }
+        else {
+            LOG_DEBUG("Current INT register value: %" PRIu32, static_cast<std::uint32_t>(currentIntRegister));
+        }
+
+        als31300::int_reg updatedIntRegister    = currentIntRegister;
+        updatedIntRegister.int_eeprom_en        = als31300::INT_REG_INT_EEPROM_disable;
+        updatedIntRegister.int_mode             = als31300::INT_REG_INT_MODE_threshold;
+        updatedIntRegister.int_threshold_signed = als31300::INT_REG_THRESHOLD_absolute;
+        updatedIntRegister.int_X_en             = als31300::INT_REG_INT_CHANNEL_disabled;
+        updatedIntRegister.int_Y_en             = als31300::INT_REG_INT_CHANNEL_disabled;
+        updatedIntRegister.int_Z_en             = als31300::INT_REG_INT_CHANNEL_disabled;
+        updatedIntRegister.int_X_threshold      = 1;
+        updatedIntRegister.int_Y_threshold      = 4;
+        updatedIntRegister.int_Z_threshold      = 0;
+
+        if (currentIntRegister == updatedIntRegister) {
+            LOG_DEBUG("INT register unchanged, skipping write");
+        }
+        else {
+            if (!i2cWrite(als31300::INT_REG, updatedIntRegister)) {
+                LOG_ERROR("Failed to write to INT register!");
+                return kStatus_Fail;
             }
+            LOG_DEBUG("INT register value written: %" PRIu32, static_cast<std::uint32_t>(updatedIntRegister));
+        }
+
+        if (pollingTimer == nullptr) {
+            pollingTimer = xTimerCreate(
+                "MagnetometerPollingTimer", pdMS_TO_TICKS(magnetometerPollIntervalMs), pdTRUE, nullptr, timerHandler);
+            if (pollingTimer == nullptr) {
+                LOG_ERROR("Failed to create magnetometer polling timer!");
+                return kStatus_Fail;
+            }
+        }
+
+        // POWER register
+        readStatus                    = i2cRead(als31300::PWR_REG, readRegister);
+        als31300::pwr_reg pwrRegister = readRegister;
+        if (!readStatus) {
+            LOG_ERROR("Failed to read POWER register!");
+        }
+        else {
+            LOG_DEBUG("Current POWER register value: %" PRIu32, static_cast<std::uint32_t>(pwrRegister));
+        }
+
+        pwrRegister.I2C_loop_mode     = als31300::PWR_REG_LOOP_MODE_single; // We don't want constant data flow
+        pwrRegister.sleep             = als31300::PWR_REG_SLEEP_MODE_active;
+        pwrRegister.count_max_LP_mode = static_cast<std::uint8_t>(LPDCM_INACTIVE_TIME::inactive_10ms);
+
+        if (!i2cWrite(als31300::PWR_REG, pwrRegister)) {
+            LOG_ERROR("Failed to write to POWER register!");
+            return kStatus_Fail;
+        }
+        LOG_DEBUG("POWER register value written: %" PRIu32, static_cast<std::uint32_t>(pwrRegister));
+
+        xTimerStart(pollingTimer, 1000);
+        return kStatus_Success;
+    }
+
+    void deinit()
+    {
+        if (pollingTimer != nullptr) {
+            xTimerStop(pollingTimer, 0);
+        }
+
+        i2c.reset();
+    }
+
+    bool isPresent()
+    {
+        std::uint8_t dummy;
+        i2cAddress.subAddress = 0x00;
+
+        const auto readStatus = i2c->Read(i2cAddress, &dummy, sizeof(std::uint8_t)) == sizeof(std::uint8_t);
+        return readStatus;
+    }
+
+    std::optional<Measurements> getMeasurement()
+    {
+        als31300::whole_reg_t readRegister;
+
+        if (!i2cRead(als31300::MEASUREMENTS_MSB_REG, readRegister)) {
+            LOG_ERROR("Failed to read measurements MSB register!");
             return std::nullopt;
         }
-    } // namespace magnetometer
-} // namespace bsp
+        const als31300::measurements_MSB_reg measurementsMsb = readRegister;
+
+        if (measurementsMsb.int_flag) {
+            LOG_DEBUG("INT flag in register is set");
+        }
+
+        if (measurementsMsb.new_data_flag != als31300::MEAS_REG_NEW_DATA_available) {
+            return std::nullopt;
+        }
+
+        if (measurementsMsb.int_flag) {
+            if (!i2cWrite(als31300::MEASUREMENTS_MSB_REG, measurementsMsb)) {
+                LOG_ERROR("Failed to clear INT flag in register");
+                return std::nullopt;
+            }
+        }
+
+        if (!i2cRead(als31300::MEASUREMENTS_LSB_REG, readRegister)) {
+            LOG_ERROR("Failed to read measurements LSB register!");
+            return std::nullopt;
+        }
+        const als31300::measurements_LSB_reg measurementsLsb = readRegister;
+
+        const Measurements measurement{
+            .X = als31300::measurement_sign_convert(measurementsMsb.X_MSB << 4 | measurementsLsb.X_LSB),
+            .Y = als31300::measurement_sign_convert(measurementsMsb.Y_MSB << 4 | measurementsLsb.Y_LSB),
+            .Z = als31300::measurement_sign_convert(measurementsMsb.Z_MSB << 4 | measurementsLsb.Z_LSB)};
+        return measurement;
+    }
+
+    bsp::KeyCodes parse(const Measurements &measurements)
+    {
+        // X is tri-stable
+        constexpr auto X_lower_threshold = -85;
+        constexpr auto X_upper_threshold = 80;
+        // Y is bi-stable
+        constexpr auto Y_threshold = -200;
+        // Y is used only for proofing X, so no strict thresholds
+        // Z is useless
+
+        auto position = lastSliderPosition;
+
+        if (sliderChangedPosition(measurements)) {
+            if ((measurements.X < X_lower_threshold) && (measurements.Y > Y_threshold)) {
+                position = bsp::KeyCodes::SSwitchDown;
+            }
+            else if ((measurements.X > X_upper_threshold) && (measurements.Y > Y_threshold)) {
+                position = bsp::KeyCodes::SSwitchUp;
+            }
+            else if (measurements.Y < Y_threshold) {
+                position = bsp::KeyCodes::SSwitchMid;
+            }
+            lastSliderPosition = position;
+        }
+        return position;
+    }
+
+    void resetCurrentParsedValue()
+    {
+        currentParsedKey = bsp::KeyCodes::Undefined;
+    }
+
+    std::optional<bsp::KeyCodes> WorkerEventHandler()
+    {
+        // Try to get new data from active magneto
+        setActive(als31300::PWR_REG_SLEEP_MODE::active);
+        const auto measurement = getMeasurement();
+        setActive(als31300::PWR_REG_SLEEP_MODE::sleep);
+
+        if (!measurement.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto incomingParsedKey = parse(measurement.value());
+        if ((incomingParsedKey == bsp::KeyCodes::Undefined) || (incomingParsedKey == currentParsedKey)) {
+            return std::nullopt;
+        }
+
+        currentParsedKey = incomingParsedKey;
+        return currentParsedKey;
+    }
+} // namespace bsp::magnetometer
