@@ -1,6 +1,6 @@
 # MuditaOS changelog - Harmony
 
-## [1.9.0 2023-04-03]
+## [1.9.0 2023-04-18]
 
 ### Changed / Improved
 
@@ -23,14 +23,12 @@
 #### General:
 
 * Fixed displayed device name when connected to Windows
+* Minor firmware fixes/optimizations.
+* Reinitialization of eMMC driver after failure
 
 #### UI/UX:
 
 * Added missing translations in French.
-
-#### General:
-
-* Minor firmware fixes/optimizations.
 
 ## [1.8.2 2023-04-03]
 
