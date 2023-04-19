@@ -88,6 +88,10 @@ namespace bsp::magnetometer
 
         bool i2cRead(std::uint8_t regAddr, als31300::whole_reg_t &wholeReg)
         {
+            if (i2c == nullptr) {
+                return false;
+            }
+
             i2cAddress.subAddress = regAddr;
             if (i2c->Read(i2cAddress, i2cBuffer.buf, sizeof(als31300::whole_reg_t)) != sizeof(als31300::whole_reg_t)) {
                 return false;
@@ -99,6 +103,10 @@ namespace bsp::magnetometer
 
         bool i2cWrite(std::uint8_t regAddr, const als31300::whole_reg_t wholeReg)
         {
+            if (i2c == nullptr) {
+                return false;
+            }
+
             i2cAddress.subAddress = regAddr;
             i2cBuffer.whole_reg   = correctRegisterEndianness(wholeReg);
 
@@ -273,8 +281,13 @@ namespace bsp::magnetometer
         std::uint8_t dummy;
         i2cAddress.subAddress = 0x00;
 
-        const auto readStatus = i2c->Read(i2cAddress, &dummy, sizeof(std::uint8_t)) == sizeof(std::uint8_t);
-        return readStatus;
+        if (i2c == nullptr) {
+            return false;
+        }
+        if (i2c->Read(i2cAddress, &dummy, sizeof(dummy)) != sizeof(dummy)) {
+            return false;
+        }
+        return true;
     }
 
     std::optional<Measurements> getMeasurement()
