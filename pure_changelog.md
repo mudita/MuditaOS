@@ -5,6 +5,7 @@
 ### Added
 * Added input mode selection display timeout
 * Added MMI/USSD code confirmation
+* Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
 
 ### Changed / Improved
 
@@ -14,6 +15,7 @@
 * Updated Bluetooth stack
 * Unified GUI flow for adding contact with number already present in another contact
 * Decrease critical battery level from 10% to 5%
+* Optimized E-Ink energy consumption
 
 ### Fixed
 
@@ -29,6 +31,7 @@
 * Fixed automatic message pasting into content field in thread view after message forwarding
 * Fixed redundant logs about CSQ reporting mode
 * Fixed adding USSD codes to phonebook
+* Fixed slider-related crash on phone turn off
 
 
 ## [1.7.0 2023-03-23]

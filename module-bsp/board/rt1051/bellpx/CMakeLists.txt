@@ -17,7 +17,7 @@ target_sources(
         bsp/audio/AW8898driver.cpp
         bsp/audio/CodecAW8898.cpp
 
-        bsp/eink/eink_pin_config.cpp
+        bsp/eink/eink_gpio.cpp
         bsp/lpm/PowerProfile.cpp
         bsp/lpm/RT1051LPM.cpp
         bsp/rotary_encoder/rotary_encoder.cpp

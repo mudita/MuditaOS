@@ -14,28 +14,26 @@ extern "C"
 
 #include "../common.hpp"
 
-namespace bsp
+namespace bsp::magnetometer
 {
-    namespace magnetometer
+    /// unit: 4 LSB/Gauss
+    struct Measurements
     {
-        int32_t init(xQueueHandle qHandle);
-        void deinit();
+        std::int16_t X;
+        std::int16_t Y;
+        std::int16_t Z;
+    };
 
-        bool isPresent(void);
+    std::int32_t init(xQueueHandle qHandle);
+    void deinit();
 
-        /// unit: 4 LSB/Gauss
-        struct Measurements
-        {
-            int16_t X;
-            int16_t Y;
-            int16_t Z;
-        };
+    bool isPresent();
 
-        /// returns new data readout if it is available
-        std::optional<Measurements> getMeasurement();
+    /// returns new data readout if it is available
+    std::optional<Measurements> getMeasurement();
 
-        bsp::KeyCodes parse(const Measurements &measurements);
-        std::optional<bsp::KeyCodes> WorkerEventHandler();
-        void resetCurrentParsedValue();
-    } // namespace magnetometer
-} // namespace bsp
+    bsp::KeyCodes parse(const Measurements &measurements);
+    void resetCurrentParsedValue();
+
+    std::optional<bsp::KeyCodes> WorkerEventHandler();
+}

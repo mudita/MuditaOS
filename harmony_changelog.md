@@ -13,16 +13,19 @@
 * Fixed problem with long Relaxation loading when titles were too long
 * Fixed backlight behavior after returning to the main window
 * Fixed settings frontlight intensity in on demand mode
+* Fixed problem that UI could be occasionally broken
+* Fixed problem with displaying end of title when playing song in loop was selected.
 
 ### Added
 
 * Added error handling for incorrect audio formats and corrupted files inside Relaxation app
 * Added error message when files limit is exceeded in Relaxation app
 
-### Changed
+### Changed / Improved
 
 * Added new field to deviceInfo endpoint
 * Changed order in which files are displayed in Relaxation
+* Optimized E-Ink energy consumption
 
 ## [1.9.0 2023-04-03]
 
@@ -47,14 +50,12 @@
 #### General:
 
 * Fixed displayed device name when connected to Windows
+* Minor firmware fixes/optimizations.
+* Reinitialization of eMMC driver after failure
 
 #### UI/UX:
 
 * Added missing translations in French.
-
-#### General:
-
-* Minor firmware fixes/optimizations.
 
 ## [1.8.2 2023-04-03]
 
