@@ -166,12 +166,6 @@ void BOARD_BootClockRUN(void)
     /* PLL2_PFD2/2 = 396MHz/2 = 198MHz */
     CLOCK_SetMux(kCLOCK_Usdhc1Mux, 0); // CSCMR1  (16) 0 - PLL2_PFD2, 1 - PLL2_PFD0
 
-    /* Set USDHC2_PODF. */
-    CLOCK_SetDiv(kCLOCK_Usdhc2Div, 2); // CSCDR1
-    /* Set Usdhc2 clock source. */
-    /* PLL2_PFD2/3 = 396MHz/3 = 132MHz */
-    CLOCK_SetMux(kCLOCK_Usdhc2Mux, 0); // CSCMR1  (17) 0 - PLL2_PFD2, 1 - PLL2_PFD0
-
     /* Set FLEXSPI_PODF. */
     CLOCK_SetDiv(kCLOCK_FlexspiDiv, 0); // CSCMR1
     /* Set Flexspi clock source. */
@@ -361,9 +355,17 @@ void BOARD_BootClockRUN(void)
      * ------------------------------------------------------------------
      */
     /* Deinit System pfd0. */
-    clkPLL2_PFD0setup(CLK_DISABLE);
+    clkPLL2_PFD0setup(CLK_ENABLE);
+    CLOCK_InitSysPfd(kCLOCK_Pfd0, 33);
+
     clkPLL2_PFD1setup(CLK_DISABLE);
     clkPLL2_PFD3setup(CLK_DISABLE);
+
+    /* Set USDHC2_PODF. */
+    CLOCK_SetDiv(kCLOCK_Usdhc2Div, 4); // CSCDR1
+    /* Set Usdhc2 clock source. */
+    /* PLL2_PFD2/3 = 396MHz/3 = 132MHz */
+    CLOCK_SetMux(kCLOCK_Usdhc2Mux, 1); // CSCMR1  (17) 0 - PLL2_PFD2, 1 - PLL2_PFD0
 
     /* Disable pfd offset. */
     // CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_PFD_OFFSET_EN_MASK;
@@ -1053,7 +1055,7 @@ uint32_t GetPerphSourceClock(PerphClock_t clock)
         return CLOCK_GetFreq(kCLOCK_AudioPllClk) / (CLOCK_GetDiv(kCLOCK_Sai2Div) + 1) /
                (CLOCK_GetDiv(kCLOCK_Sai2PreDiv) + 1);
     case PerphClock_USDHC2:
-        return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
+        return CLOCK_GetFreq(kCLOCK_SysPllPfd0Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
     default:
         return 0;
     }

@@ -20,24 +20,20 @@ namespace purefs::blkdev
     {
         assert(mmcCard.get());
         std::memset(mmcCard.get(), 0, sizeof(_mmc_card));
-        mmcCard->host = mmcHost.get();
+        std::memset(mmcHost.get(), 0, sizeof(sdmmchost_t));
 
-        mmcHost->dmaDesBuffer         = s_sdmmcHostDmaBuffer;
-        mmcHost->dmaDesBufferWordsNum = 32U;
-        mmcHost->enableCacheControl   = kSDMMCHOST_CacheControlRWBuffer;
-#if defined SDMMCHOST_ENABLE_CACHE_LINE_ALIGN_TRANSFER && SDMMCHOST_ENABLE_CACHE_LINE_ALIGN_TRANSFER
-        s_host.cacheAlignBuffer     = s_sdmmcCacheLineAlignBuffer;
-        s_host.cacheAlignBufferSize = BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U;
-#endif
-
+        mmcHost->dmaDesBuffer               = s_sdmmcHostDmaBuffer;
+        mmcHost->dmaDesBufferWordsNum       = 32U;
+        mmcHost->enableCacheControl         = kSDMMCHOST_CacheControlRWBuffer;
+        mmcCard->host                       = mmcHost.get();
         mmcCard->busWidth                   = kMMC_DataBusWidth8bit;
-        mmcCard->busTiming                  = kMMC_HighSpeedTiming;
+        mmcCard->busTiming                  = kMMC_HighSpeed200Timing; // kMMC_HighSpeedTiming;
         mmcCard->enablePreDefinedBlockCount = true;
         mmcCard->host->hostController.base  = USDHC2;
         mmcCard->host->hostController.sourceClock_Hz =
             CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
         mmcCard->hostVoltageWindowVCC  = kMMC_VoltageWindows270to360;
-        mmcCard->hostVoltageWindowVCCQ = kMMC_VoltageWindows270to360;
+        mmcCard->hostVoltageWindowVCCQ = kMMC_VoltageWindow170to195; // kMMC_VoltageWindows270to360;
 
         driverUSDHC = drivers::DriverUSDHC::Create(
             "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));

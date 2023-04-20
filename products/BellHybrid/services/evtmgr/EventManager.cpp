@@ -25,6 +25,8 @@
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
 #include <switches/LatchState.hpp>
 
+#include <gsl/util>
+
 namespace test
 {
     std::vector<std::string> filesToCopy = {"Ancient_Greek.mp3",
@@ -54,65 +56,57 @@ namespace test
 
     bool copyFile(std::string sourcePath, std::string destinyPath)
     {
-        auto src_fd = std::fopen(sourcePath.c_str(), "r");
+        constexpr std::size_t buffer_size = 1024 * 1024;
+        char *buffer                      = new char[buffer_size]; // 1MiB
+        FILE *src_fd                      = NULL;
+        FILE *dst_fd                      = NULL;
+        std::size_t bytes_read;
+        auto _ = gsl::finally([buffer, src_fd, dst_fd] {
+            if (buffer) {
+                free(buffer);
+            }
+            if (dst_fd) {
+                std::fclose(dst_fd);
+            }
+            if (src_fd) {
+                std::fclose(src_fd);
+            }
+        });
+        src_fd = std::fopen(sourcePath.c_str(), "r");
         if (!src_fd) {
             LOG_ERROR("Failed to open file %s to read", sourcePath.c_str());
-            // ret = 1;
-            // break;
+            return false;
         }
-
-        auto dst_fd = std::fopen(destinyPath.c_str(), "w");
+        dst_fd = std::fopen(destinyPath.c_str(), "w");
         if (!dst_fd) {
-            std::fclose(src_fd);
             LOG_ERROR("Failed to open file %s to write", destinyPath.c_str());
-            // ret = 1;
-            // break;
+            return false;
         }
 
-        std::size_t buffer_size = 1024 * 1024;
-        char *buffer            = new char[buffer_size]; // 1MiB
         if (buffer == NULL) {
-            std::fclose(dst_fd);
-            std::fclose(src_fd);
             LOG_ERROR("Failed to allocate copy buffer");
-            // ret = 1;
-            // break;
+            return false;
         }
-
-        std::size_t bytes_read;
         std::fseek(src_fd, 0, SEEK_END);
         std::size_t bytes_left = std::ftell(src_fd);
         std::fseek(src_fd, 0, SEEK_SET);
-
         do {
             bytes_read = std::fread(buffer, 1, buffer_size, src_fd);
-            // if (bytes_read != buffer_size) {
-            //     LOG_ERROR("Read size: %d", bytes_read);
-            //     // ret = 1;
-            //     break;
-            // }
             if (std::fwrite(buffer, sizeof(*buffer), bytes_read, dst_fd) != bytes_read) {
                 LOG_ERROR("Failed to write to destination file\n");
-                // ret = 1;
-                break;
+                return false;
             }
             bytes_left -= bytes_read;
         } while (bytes_left > 0);
-
-        free(buffer);
-        std::fclose(dst_fd);
-        std::fclose(src_fd);
-
         return bytes_left == 0 ? true : false;
     }
 
     void start()
     {
         LOG_ERROR("*** test start ***");
-
         std::filesystem::remove_all(destinyFolder());
         std::filesystem::create_directory(destinyFolder());
-
+        const auto startTime = xTaskGetTickCount();
         for (auto file : filesToCopy) {
             const auto sourcePath  = std::string(proprietary() / relaxation() / file);
             const auto destinyPath = std::string(destinyFolder() / file);
@@ -121,9 +115,11 @@ namespace test
             if (!result) {
                 LOG_ERROR("*** file copy failed !!! ***");
             }
+            // test::logBuffers();
+            // test::clearBuffers();
         }
-
-        LOG_ERROR("*** test end ***");
+        const auto endTime = xTaskGetTickCount();
+        LOG_ERROR("*** test end in %ld seconds ***", (endTime - startTime) / 1000);
     }
 
     void vTaskCode(void *pvParameters)

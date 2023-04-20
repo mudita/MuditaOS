@@ -1570,6 +1570,8 @@ static status_t MMC_SwitchToHS200(mmc_card_t *card, uint32_t freq)
         return kStatus_SDMMC_PollingCardIdleFailed;
     }
 
+    LOG_INFO("--- FLAG: %d %d", SDMMCHOST_SUPPORT_HS200, SDMMCHOST_SUPPORT_SDR50);
+
     return kStatus_Success;
 }
 
