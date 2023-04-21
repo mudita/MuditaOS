@@ -2,27 +2,23 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "board/irq_gpio.hpp"
-#include <Utils.hpp>
 
 #include "board.h"
 #include "FreeRTOS.h"
-#include "queue.h"
-#include "fsl_common.h"
+#include <fsl_common.h>
 #include <fsl_qtmr.h>
 #include <fsl_gpc.h>
 #include <fsl_pmu.h>
+#include <fsl_rtwdog.h>
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/key_input/KeyInput.hpp>
 #include <hal/battery_charger/BatteryChargerIRQ.hpp>
 #include "board/BoardDefinitions.hpp"
-#include "bsp/light_sensor/light_sensor.hpp"
-#include <bsp/lpm/RT1051LPM.hpp>
 
 namespace bsp
 {
-
-    void irq_gpio_Init(void)
+    void irq_gpio_Init()
     {
         DisableIRQ(GPIO1_Combined_0_15_IRQn);
         DisableIRQ(GPIO1_Combined_16_31_IRQn);
@@ -32,6 +28,7 @@ namespace bsp
         DisableIRQ(GPIO5_Combined_0_15_IRQn);
         DisableIRQ(TMR3_IRQn);
         DisableIRQ(RTWDOG_IRQn);
+        DisableIRQ(ANATOP_EVENT0_IRQn);
 
         GPIO_PortDisableInterrupts(GPIO1, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO2, UINT32_MAX);
@@ -71,16 +68,15 @@ namespace bsp
         NVIC_SetPriority(TMR3_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
 
         NVIC_ClearPendingIRQ(RTWDOG_IRQn);
-        EnableIRQ(RTWDOG_IRQn);
+        NVIC_EnableIRQ(RTWDOG_IRQn);
 
         // Enable PMU brownout interrupt
         NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
-        EnableIRQ(ANATOP_EVENT0_IRQn);
+        NVIC_EnableIRQ(ANATOP_EVENT0_IRQn);
     }
 
     extern "C"
     {
-
         void GPIO1_Combined_0_15_IRQHandler(void)
         {
             BaseType_t xHigherPriorityTaskWoken = 0;
@@ -117,14 +113,6 @@ namespace bsp
             BaseType_t xHigherPriorityTaskWoken = 0;
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO2);
 
-            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {}
-
-            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
-
-            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INTB_PIN)) {
-                xHigherPriorityTaskWoken |= hal::battery::charger_irq();
-            }
-
             // Clear all IRQs
             GPIO_PortClearInterruptFlags(GPIO2, irq_mask);
 
@@ -160,7 +148,6 @@ namespace bsp
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO3);
 
             if (irq_mask & (1 << BOARD_EINK_BUSY_GPIO_PIN)) {
-
                 xHigherPriorityTaskWoken |= BSP_EinkBusyPinStateChangeHandler();
             }
 
@@ -193,10 +180,18 @@ namespace bsp
             hal::key_input::EncoderIRQHandler();
         }
 
+        /* RTWDOG's timeout asserts IRQ, then 255 bus clocks after interrupt vector fetch
+         * forces CPU reset (see RT1050 RM, p.3120). However, this forced reset only
+         * affects the CPU, it won't reset any external ICs. To resolve this limitation,
+         * WDOG_B pin, which controls board's main DCDC converter, is asserted in RTWDOG
+         * IRQ handler. Converter will be momentarily switched off and the whole board will
+         * be power reset.
+         *
+         * The simplest way to do it is to configure the pin as WDOG_B and use WDOG1 built-in
+         * assertion. */
         void RTWDOG_IRQHandler(void)
         {
-            // Asserting WDOG_B pin to provide power reset of whole board
-            // Way to do it is via WDOG1 built-in assertion, RTWDOG does not provide it
+            RTWDOG_ClearStatusFlags(RTWDOG, kRTWDOG_InterruptFlag);
             WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
         }
 
@@ -205,8 +200,10 @@ namespace bsp
         {
             const uint32_t status = PMU_GetStatusFlags(PMU);
 
-            // If the PMU brownout detects to low voltage
-            // immediately reset the CPU using the WDOG_B pin
+            /* If the PMU brownout detects too low voltage
+             * immediately reset board's main DCDC converter
+             * using the WDOG_B pin. This will reset the
+             * whole board. */
             if (status & kPMU_1P1BrownoutOnOutput) {
                 WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
             }
