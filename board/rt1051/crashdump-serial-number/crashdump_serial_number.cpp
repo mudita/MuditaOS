@@ -3,19 +3,20 @@
 
 #include <crashdump-serial-number/crashdump_serial_number.hpp>
 
-namespace
-{
-    std::string serial_number = "0000000000000";
-}
 namespace crashdump
 {
-    void setSerialNumber(const std::string &sn)
+    namespace
     {
-        serial_number = sn;
-    }
-    std::string getSerialNumber()
-    {
-        return serial_number;
+        std::string serialNumber{};
     }
 
+    void setSerialNumber(const std::string &sn)
+    {
+        serialNumber = sn;
+    }
+
+    const std::string &getSerialNumber()
+    {
+        return serialNumber;
+    }
 } // namespace crashdump

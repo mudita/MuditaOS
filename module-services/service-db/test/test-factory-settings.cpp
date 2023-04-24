@@ -1,18 +1,19 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
 #include <Helpers.hpp>
-#include <service-db/agents/settings/FactorySettings.hpp>
 #include <service-db/EntryPath.hpp>
+#include <db/PureFactorySettings.hpp>
+#include <service-db/agents/settings/Settings_queries.hpp>
 
 const std::string valid_json   = "{\"serial\" : \"00000000000000\", \"case_colour\" : \"nocase\"}";
 const std::string invalid_json = "{\"serial\" : \"00000000000000\", \"case_colour\" : \"nocase\"}}";
 
 constexpr auto schema = "CREATE TABLE IF NOT EXISTS settings_tab ( path TEXT NOT NULL UNIQUE PRIMARY KEY,value TEXT);";
 
-const auto valid_path   = "valid.json";
-const auto invalid_path = "invalid.json";
+constexpr auto valid_path   = "valid.json";
+constexpr auto invalid_path = "invalid.json";
 
 namespace
 {
@@ -35,7 +36,7 @@ TEST_CASE("Factory Settings")
     {
         spawnAndFillFile(valid_path, valid_json);
 
-        settings::FactorySettings factory{valid_path};
+        settings::PureFactorySettings factory{valid_path};
         auto entries = factory.getMfgEntries();
         REQUIRE(entries->getRowCount() == 2);
         REQUIRE(entries->getFieldCount() == 2);
@@ -47,7 +48,7 @@ TEST_CASE("Factory Settings")
     {
         spawnAndFillFile(invalid_path, invalid_json);
 
-        settings::FactorySettings factory{invalid_path};
+        settings::PureFactorySettings factory{invalid_path};
         auto entries = factory.getMfgEntries();
         REQUIRE(entries->getRowCount() == 0);
     }
@@ -62,7 +63,7 @@ TEST_CASE("Factory Settings Init")
     {
         spawnAndFillFile(valid_path, valid_json);
 
-        settings::FactorySettings factory{valid_path};
+        settings::PureFactorySettings factory{valid_path};
         factory.initDb(&db.get());
 
         settings::EntryPath variablePath{

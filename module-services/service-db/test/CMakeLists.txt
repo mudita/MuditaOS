@@ -7,6 +7,7 @@ add_catch2_executable(
             test-service-db-settings-messages.cpp
             test-service-db-quotes.cpp
             test-factory-settings.cpp
+            ${CMAKE_SOURCE_DIR}/products/PurePhone/services/db/PureFactorySettings.cpp
         LIBS
             module-db::test::helpers
             module-audio
@@ -16,6 +17,8 @@ add_catch2_executable(
             module-vfs
             service-audio
             service-cellular
+        INCLUDE
+            ${CMAKE_SOURCE_DIR}/products/PurePhone/services/db/include/
 )
 
 add_catch2_executable(

@@ -1,32 +1,31 @@
 // Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "FactorySettings.hpp"
-
+#include <db/BellFactorySettings.hpp>
 #include <log/log.hpp>
 #include <service-db/SettingsMessages.hpp>
+#include <service-db/agents/settings/Settings_queries.hpp>
+#include <serial-number-parser/SerialNumberParser.hpp>
 
 namespace settings
 {
-
-    std::unique_ptr<QueryResult> FactorySettings::getMfgEntries()
+    auto BellFactorySettings::getMfgEntries() const -> std::unique_ptr<QueryResult>
     {
-        auto factoryData          = std::make_unique<QueryResult>();
-        const auto factoryContent = readMfgSettings(filePath);
+        const auto [serialNumber, colour] = serial_number_parser::getDeviceMetadata();
+        auto factoryData                  = std::make_unique<QueryResult>();
 
-        for (const auto &[path, value] : factoryContent.object_items()) {
-            factoryData->addRow({Field(path.c_str()), Field(value.string_value().c_str())});
-        }
+        factoryData->addRow({Field(factory::serial_number_key), Field(serialNumber.c_str())});
+        factoryData->addRow({Field(factory::case_colour_key), Field(colour.c_str())});
 
         return factoryData;
     }
 
-    void FactorySettings::initDb(Database *database)
+    auto BellFactorySettings::initDb(Database *database) const -> void
     {
         const auto factoryData = getMfgEntries();
 
         if (factoryData->getRowCount() <= 0) {
-            LOG_FATAL("No EEPROM factory data available!");
+            LOG_FATAL("No eMMC factory data available!");
             return;
         }
 
@@ -44,20 +43,5 @@ namespace settings
             }
 
         } while (factoryData->nextRow());
-    }
-
-    json11::Json FactorySettings::readMfgSettings(const std::string &path)
-    {
-        std::ifstream file(path.c_str());
-        const std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-        std::string parserError;
-        auto factoryObj = json11::Json::parse(content, parserError);
-
-        if (!parserError.empty()) {
-            LOG_FATAL("Factory data parse error: %s", parserError.c_str());
-        }
-
-        return factoryObj;
     }
 } // namespace settings

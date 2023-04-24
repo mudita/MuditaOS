@@ -170,7 +170,7 @@ add_subdirectory(apps)
 add_subdirectory(keymap)
 add_subdirectory(services)
 add_subdirectory(sys)
-add_subdirectory(serial-number-reader)
+add_subdirectory(serial-number-parser)
 add_subdirectory(paths)
 
 option(CONFIG_ENABLE_TEMP "Enable displaying temperature" OFF)

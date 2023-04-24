@@ -2,10 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <db/ServiceDB.hpp>
+#include <db/PureFactorySettings.hpp>
 
 #include <module-db/databases/EventsDB.hpp>
 #include <module-db/databases/MultimediaFilesDB.hpp>
-#include "module-db/databases/NotificationsDB.hpp"
+#include <module-db/databases/NotificationsDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/CalllogRecord.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
@@ -23,10 +24,6 @@
 #include <time/ScopedTime.hpp>
 #include <crashdump-serial-number/crashdump_serial_number.hpp>
 
-namespace
-{
-    constexpr auto serial_number_path = "factory_data/serial";
-}
 ServiceDB::~ServiceDB()
 {
     eventsDB.reset();
@@ -266,7 +263,10 @@ sys::ReturnCodes ServiceDB::InitHandler()
         std::make_unique<NotificationsRecordInterface>(notificationsDB.get(), contactRecordInterface.get());
     multimediaFilesRecordInterface =
         std::make_unique<db::multimedia_files::MultimediaFilesRecordInterface>(multimediaFilesDB.get());
-    databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_v2.db"));
+
+    const auto factorySettings =
+        std::make_unique<settings::PureFactorySettings>(purefs::dir::getMfgConfPath() / "personalization.json");
+    databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_v2.db", factorySettings.get()));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->registerMessages();
@@ -275,8 +275,10 @@ sys::ReturnCodes ServiceDB::InitHandler()
     auto settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
 
-    // Saving serial number for crashdump generation purpose.
-    crashdump::setSerialNumber(settings->getValue(serial_number_path, settings::SettingsScope::Global));
+    // Save serial number for crashdump generation purpose
+    const auto serialNumberPath =
+        settings::factory::entry_key + std::string("/") + settings::factory::serial_number_key;
+    crashdump::setSerialNumber(settings->getValue(serialNumberPath, settings::SettingsScope::Global));
 
     quotesRecordInterface =
         std::make_unique<Quotes::QuotesAgent>(predefinedQuotesDB.get(), customQuotesDB.get(), std::move(settings));

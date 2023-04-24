@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <db/ServiceDB.hpp>
+#include <db/BellFactorySettings.hpp>
 
 #include "agents/MeditationStatsAgent.hpp"
 
@@ -13,11 +14,11 @@
 
 #include <service-db/DBServiceMessage.hpp>
 #include <service-db/agents/settings/SettingsAgent.hpp>
+#include <service-db/Settings.hpp>
 #include <time/ScopedTime.hpp>
 
 #include <purefs/filesystem_paths.hpp>
 
-#include <serial-number-reader/SerialNumberReader.hpp>
 #include <crashdump-serial-number/crashdump_serial_number.hpp>
 
 ServiceDB::~ServiceDB()
@@ -58,17 +59,21 @@ sys::ReturnCodes ServiceDB::InitHandler()
     multimediaFilesRecordInterface =
         std::make_unique<db::multimedia_files::MultimediaFilesRecordInterface>(multimediaFilesDB.get());
 
-    databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_bell.db"));
+    const auto factorySettings = std::make_unique<settings::BellFactorySettings>();
+    databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_bell.db", factorySettings.get()));
     databaseAgents.emplace(std::make_unique<service::db::agents::MeditationStats>(this, "meditation_stats.db"));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->registerMessages();
     }
 
-    LOG_INFO("Serial number: %s", serial_number_reader::readSerialNumber().c_str());
+    const auto settings = std::make_unique<settings::Settings>();
+    settings->init(service::ServiceProxy(shared_from_this()));
 
-    // Saving serial number for crashdump generation purpose.
-    crashdump::setSerialNumber(serial_number_reader::readSerialNumber());
+    // Save serial number for crashdump generation purpose
+    const auto serialNumberPath =
+        settings::factory::entry_key + std::string("/") + settings::factory::serial_number_key;
+    crashdump::setSerialNumber(settings->getValue(serialNumberPath, settings::SettingsScope::Global));
 
     return sys::ReturnCodes::Success;
 }

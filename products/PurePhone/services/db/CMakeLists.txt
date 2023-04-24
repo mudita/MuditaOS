@@ -3,8 +3,10 @@ add_library(db STATIC)
 target_sources(db
     PRIVATE
         ServiceDB.cpp
+        PureFactorySettings.cpp
     PUBLIC
         include/db/ServiceDB.hpp
+        include/db/PureFactorySettings.hpp
 )
 
 target_include_directories(db

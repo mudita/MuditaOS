@@ -26,6 +26,7 @@
 * Added error message when files limit is exceeded in Relaxation app
 * Added label informing about PC connection.
 * Added serial number to About section
+* Added possibility to detect device's case colour
 
 ### Changed / Improved
 

@@ -127,7 +127,6 @@ target_link_libraries(application-bell-settings
         bell::appmgr
         service-appmgr
         apps-common
-        serial-number-reader
     PUBLIC
         module-gui
         bell::app-common

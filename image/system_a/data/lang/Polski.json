@@ -61,6 +61,7 @@
     "app_bell_relaxation_timer_title": "Wy\u0142\u0105cznik czasowy",
     "app_bell_settings_about": "O produkcie",
     "app_bell_settings_about_info_text": "www.mudita.com",
+    "app_bell_settings_about_serial_number": "Numer seryjny",
     "app_bell_settings_about_info_title": "Instrukcja i informacje dot. certyfikacji",
     "app_bell_settings_about_product": "Mudita Harmony",
     "app_bell_settings_about_storage_text": "<text>Zu\u017cyto <token>$USED_MEMORY</token>MB z <token>$TOTAL_MEMORY</token>MB</text>",
