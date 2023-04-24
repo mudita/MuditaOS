@@ -1,6 +1,9 @@
 // Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#pragma GCC push_options
+#pragma GCC optimize("O0,no-omit-frame-pointer")
+
 #include <iomanip>
 #include "Label.hpp"
 #include "Image.hpp"
@@ -20,6 +23,7 @@
 #include "status-bar/Time.hpp"
 #include "status-bar/Lock.hpp"
 #include <EventStore.hpp>
+#include <log/Logger.hpp>
 
 #if DEVELOPER_SETTINGS_OPTIONS == 1
 gui::ImageTypeSpecifier style::status_bar::imageTypeSpecifier = gui::ImageTypeSpecifier::W_G;
@@ -407,6 +411,9 @@ namespace gui::status_bar
     bool StatusBar::updateNetworkAccessTechnology()
     {
         if (networkAccessTechnology == nullptr) {
+            if (isApp("ApplicationCall")) {
+                LOG_INFO("MOS-982: 'networkAccessTechnology' is nullptr --> returning false");
+            }
             return false;
         }
         showNetworkAccessTechnology(configuration.isEnabled(Indicator::NetworkAccessTechnology));
@@ -416,6 +423,9 @@ namespace gui::status_bar
     void StatusBar::showNetworkAccessTechnology(bool enabled)
     {
         networkAccessTechnology->update(Store::GSM::get()->getNetwork().accessTechnology);
+        if (!enabled && isApp("ApplicationCall")) {
+            LOG_INFO("MOS-982: 'enabled' is false --> hiding network access technology");
+        }
         enabled ? networkAccessTechnology->show() : networkAccessTechnology->hide();
     }
 
@@ -477,3 +487,5 @@ namespace gui::status_bar
         visitor.visit(*this);
     }
 } // namespace gui::status_bar
+
+#pragma GCC pop_options

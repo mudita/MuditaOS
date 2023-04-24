@@ -1,6 +1,9 @@
 ﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#pragma GCC push_options
+#pragma GCC optimize("O0,no-omit-frame-pointer")
+
 #include "ApplicationCall.hpp"
 #include "CallAppStyle.hpp"
 #include "CallSwitchData.hpp"
@@ -313,3 +316,5 @@ namespace gui
     }
 
 } /* namespace gui */
+
+#pragma GCC pop_options

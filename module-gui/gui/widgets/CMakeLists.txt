@@ -85,3 +85,5 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/visitor/DepthFirstItemTree.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/screen.hpp"
 )
+
+set_source_files_properties("${CMAKE_CURRENT_LIST_DIR}/StatusBar.cpp" "${CMAKE_CURRENT_LIST_DIR}/status-bar/NetworkAccessTechnology.cpp" PROPERTIES COMPILE_OPTIONS "-O0;-fno-omit-frame-pointer;-ggdb3")

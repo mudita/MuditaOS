@@ -142,7 +142,9 @@ void CellularUrcHandler::Handle(Qind &urc)
     if (urc.isAct()) {
         auto nat     = urc.getAccessTechnology();
         auto network = Store::GSM::get()->getNetwork();
+        LOG_INFO("MOS-982: URC arrived - Network Access Technology is %s", magic_enum::enum_name(nat).data());
         if (network.accessTechnology != nat) {
+            LOG_INFO("MOS-982: Network Access Technology didn't match - updated to %s", magic_enum::enum_name(nat).data());
             network.accessTechnology = nat;
             Store::GSM::get()->setNetwork(network);
             response = std::make_unique<cellular::NetworkStatusUpdateNotification>();

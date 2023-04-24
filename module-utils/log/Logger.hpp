@@ -15,6 +15,7 @@
 
 #include <assert.h>
 #include <map>
+#include <string>
 
 namespace Log
 {
@@ -104,3 +105,9 @@ namespace Log
 
     const char *getTaskDesc();
 } // namespace Log
+
+inline bool isApp(char const *name)
+{
+    std::string appName(Log::getTaskDesc());
+    return appName == name;
+}

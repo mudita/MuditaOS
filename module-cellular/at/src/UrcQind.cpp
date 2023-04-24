@@ -167,5 +167,7 @@ namespace
     if (it != technologyMap.end()) {
         return it->second;
     }
+
+    LOG_INFO("MOS-982: got URC with unrecognized Network Access Technology: %s - thus, set Unknown", act.c_str());
     return Store::Network::AccessTechnology::Unknown;
 }

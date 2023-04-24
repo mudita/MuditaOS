@@ -1,9 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#pragma GCC push_options
+#pragma GCC optimize("O0,no-omit-frame-pointer")
+
 #include "NetworkAccessTechnology.hpp"
 #include "Item.hpp"
 #include "Style.hpp"
+#include <log/Logger.hpp>
 
 namespace gui::status_bar
 {
@@ -39,8 +43,13 @@ namespace gui::status_bar
             setText(textLte);
             break;
         case Store::Network::AccessTechnology::Unknown:
+            if (isApp("ApplicationCall")) {
+                LOG_INFO("MOS-982: 'accessTechnology' is Store::Network::AccessTechnology::Unknown --> clearing label");
+            }
             setText("");
             break;
         }
     }
 } // namespace gui::status_bar
+
+#pragma GCC pop_options
