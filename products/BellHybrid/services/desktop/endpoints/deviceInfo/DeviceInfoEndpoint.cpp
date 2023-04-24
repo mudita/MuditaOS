@@ -12,16 +12,19 @@
 #include <cstdint>
 #include <string>
 #include <purefs/filesystem_paths.hpp>
-#include <serial-number-reader/SerialNumberReader.hpp>
 
 #include <ctime>
 
 namespace sdesktop::endpoints
 {
-
-    auto DeviceInfoEndpoint::getSerialNumber() -> const std::string &
+    auto DeviceInfoEndpoint::getSerialNumber() -> std::string
     {
-        return serial_number_reader::readSerialNumber();
+        return static_cast<ServiceDesktop *>(ownerServicePtr)->getSerialNumber();
+    }
+
+    auto DeviceInfoEndpoint::getCaseColour() -> std::string
+    {
+        return static_cast<ServiceDesktop *>(ownerServicePtr)->getCaseColour();
     }
 
     auto DeviceInfoEndpoint::getOnboardingState() -> OnboardingState
@@ -31,7 +34,7 @@ namespace sdesktop::endpoints
 
     auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> http::Code
     {
-        auto [totalDeviceSpaceMiB, reservedSystemSpaceMiB, usedUserSpaceMiB] = getStorageInfo();
+        const auto [totalDeviceSpaceMiB, reservedSystemSpaceMiB, usedUserSpaceMiB] = getStorageInfo();
 
         context.setResponseBody(json11::Json::object(
             {{json::batteryLevel, std::to_string(Store::Battery::get().level)},
@@ -39,11 +42,12 @@ namespace sdesktop::endpoints
              {json::deviceSpaceTotal, std::to_string(totalDeviceSpaceMiB)},
              {json::systemReservedSpace, std::to_string(reservedSystemSpaceMiB)},
              {json::usedUserSpace, std::to_string(usedUserSpaceMiB)},
-             {json::gitRevision, (std::string)(GIT_REV)},
-             {json::gitBranch, (std::string)GIT_BRANCH},
-             {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
+             {json::gitRevision, std::string(GIT_REV)},
+             {json::gitBranch, std::string(GIT_BRANCH)},
+             {json::currentRTCTime, std::to_string(static_cast<std::uint32_t>(std::time(nullptr)))},
              {json::version, std::string(VERSION)},
              {json::serialNumber, getSerialNumber()},
+             {json::caseColour, getCaseColour()},
              {json::recoveryStatusFilePath,
               (purefs::dir::getTemporaryPath() / sdesktop::paths::recoveryStatusFilename).string()},
              {json::updateFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename).string()},

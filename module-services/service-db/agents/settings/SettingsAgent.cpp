@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsAgent.hpp"
 #include "Settings_queries.hpp"
+#include "FactorySettings.hpp"
 
 #include <Database/Database.hpp>
 #include <Service/Service.hpp>
@@ -10,18 +11,11 @@
 #include <service-db/SettingsCache.hpp>
 #include <log/log.hpp>
 
-namespace settings
-{
-    namespace factory
-    {
-        constexpr auto data_file         = "personalization.json";
-        const std::filesystem::path path = purefs::dir::getMfgConfPath() / data_file;
-    } // namespace factory
-
-} // namespace settings
-
-SettingsAgent::SettingsAgent(sys::Service *parentService, const std::string dbName, settings::SettingsCache *cache)
-    : DatabaseAgent(parentService), cache(cache), factorySettings(settings::factory::path), dbName{dbName}
+SettingsAgent::SettingsAgent(sys::Service *parentService,
+                             const std::string &dbName,
+                             settings::FactorySettings *factorySettings,
+                             settings::SettingsCache *cache)
+    : DatabaseAgent(parentService), cache(cache), dbName{dbName}
 {
     if (nullptr == cache) {
         this->cache = settings::SettingsCache::getInstance();
@@ -29,7 +23,7 @@ SettingsAgent::SettingsAgent(sys::Service *parentService, const std::string dbNa
 
     database = std::make_unique<Database>((purefs::dir::getDatabasesPath() / dbName).c_str());
 
-    factorySettings.initDb(database.get());
+    factorySettings->initDb(database.get());
 
     // first approach -> take care about big amount of variables
     auto allVars = database->query(settings::Statements::getAllValues);

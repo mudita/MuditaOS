@@ -8,7 +8,6 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <endpoints/message/Sender.hpp>
 #include <MessageHandler.hpp>
-#include "Timers/TimerFactory.hpp"
 
 #include <bsp/usb/usb.hpp>
 #include <log/log.hpp>
@@ -16,10 +15,7 @@
 
 #include <utility>
 #include <vector>
-#include <filesystem>
 #include "system/messages/SentinelRegistrationMessage.hpp"
-
-inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr,
                              std::function<void()> messageProcessedCallback,

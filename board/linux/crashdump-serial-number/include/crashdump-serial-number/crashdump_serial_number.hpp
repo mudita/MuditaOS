@@ -4,10 +4,11 @@
 // Dummy file to keep linux variant compiling.
 
 #pragma once
+
 #include <string>
+
 namespace crashdump
 {
     void setSerialNumber(const std::string &sn);
-    std::string getSerialNumber();
-
+    const std::string &getSerialNumber();
 } // namespace crashdump

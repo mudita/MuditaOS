@@ -109,7 +109,7 @@ auto ServiceDesktop::requestLogsFlush() -> void
         if ((responseMsg != nullptr) && responseMsg->retCode) {
             response = responseMsg->data;
 
-            LOG_DEBUG("Respone data: %d", response);
+            LOG_DEBUG("Response data: %d", response);
         }
     }
     if (ret.first == sys::ReturnCodes::Failure || response < 0) {
@@ -172,10 +172,10 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
     if (initialized) {
         return sys::ReturnCodes::Success;
     }
-
     auto serialNumber = getSerialNumber();
     auto caseColour   = getCaseColour();
-    LOG_DEBUG("usbWorkerInit Serial Number: %s, Case Colour: %s", serialNumber.c_str(), caseColour.c_str());
+
+    LOG_DEBUG("Initializing USB worker, serial number: %s, case colour: %s", serialNumber.c_str(), caseColour.c_str());
 
     desktopWorker = std::make_unique<WorkerDesktop>(this,
                                                     std::bind(&ServiceDesktop::restartConnectionActiveTimer, this),
@@ -191,13 +191,12 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
          {sdesktop::SIGNALLING_QUEUE_BUFFER_NAME, sizeof(WorkerDesktop::Signal), sdesktop::signallingQueueLength}});
 
     if (!initialized) {
-        LOG_ERROR("!!! service-desktop usbWorkerInit failed to initialize worker, service-desktop won't work");
+        LOG_FATAL("Failed to initialize USB worker, ServiceDesktop won't work!");
         return sys::ReturnCodes::Failure;
     }
-    else {
-        desktopWorker->run();
-        return sys::ReturnCodes::Success;
-    }
+
+    desktopWorker->run();
+    return sys::ReturnCodes::Success;
 }
 
 auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes

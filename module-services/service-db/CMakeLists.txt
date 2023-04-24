@@ -17,7 +17,6 @@ set(SOURCES
     agents/settings/Settings.cpp
     agents/settings/SettingsProxy.cpp
     agents/settings/SettingsCache.cpp
-    agents/settings/FactorySettings.cpp
     agents/quotes/QuotesAgent.cpp
     agents/quotes/RandomizedQuoteModel.cpp
     agents/quotes/QuotesSettingsSerializer.cpp

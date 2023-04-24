@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/fs/filesystem.hpp>
 #include <errno.h>
@@ -153,7 +153,7 @@ namespace purefs::fs
         const auto abspath     = absolute_path(path);
         auto [mountp, pathpos] = find_mount_point(abspath);
         if (!mountp) {
-            LOG_ERROR("VFS: Unable to find specified mount point");
+            LOG_ERROR("VFS: Unable to find specified mount point '%s'", abspath.c_str());
             return -ENOENT;
         }
         auto fsops = mountp->fs_ops();

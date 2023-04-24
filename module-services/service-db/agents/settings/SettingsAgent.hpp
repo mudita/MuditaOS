@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,7 @@ namespace settings
     struct EntryPath;
     class SettingsCache;
 } // namespace settings
+
 namespace sys
 {
     class Service;
@@ -26,7 +27,10 @@ namespace sys
 class SettingsAgent : public DatabaseAgent
 {
   public:
-    SettingsAgent(sys::Service *parentService, std::string dbName, settings::SettingsCache *cache = nullptr);
+    SettingsAgent(sys::Service *parentService,
+                  const std::string &dbName,
+                  settings::FactorySettings *factorySettings,
+                  settings::SettingsCache *cache = nullptr);
     ~SettingsAgent() = default;
 
     void registerMessages() override;
@@ -34,8 +38,7 @@ class SettingsAgent : public DatabaseAgent
     auto getAgentName() -> const std::string override;
 
   private:
-    settings::SettingsCache *cache;
-    settings::FactorySettings factorySettings;
+    settings::SettingsCache *cache = nullptr;
 
     using MapOfRecipentsToBeNotified = std::map<std::string, std::set<settings::EntryPath>>;
     MapOfRecipentsToBeNotified variableChangeRecipients;

@@ -6,10 +6,12 @@ add_subdirectory(databases)
 target_sources(databases
     PRIVATE
         ServiceDB.cpp
+        BellFactorySettings.cpp
         agents/MeditationStatsAgent.cpp
     PUBLIC
         include/db/ServiceDB.hpp
         include/db/SystemSettings.hpp
+        include/db/BellFactorySettings.hpp
 )
 
 target_include_directories(databases
@@ -21,7 +23,7 @@ target_link_libraries(databases
    PRIVATE
         bell::db::meditation_stats
         service-db
-        serial-number-reader
+        serial-number-parser
         crashdump-serial-number
 )
 

@@ -5,11 +5,19 @@
 
 namespace crashdump
 {
-    void setSerialNumber(const std::string &)
-    {}
-    std::string getSerialNumber()
+    namespace
     {
-        return "";
+        std::string serialNumber{};
+    }
+
+    void setSerialNumber(const std::string &sn)
+    {
+        serialNumber = sn;
+    }
+
+    const std::string &getSerialNumber()
+    {
+        return serialNumber;
     }
 
 } // namespace crashdump
