@@ -61,6 +61,10 @@ namespace gui
 
     void SMSThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        if (mode == ShowMode::GUI_SHOW_RETURN) {
+            smsList->rebuildList();
+        }
+
         if (auto pdata = dynamic_cast<SMSThreadData *>(data); pdata) {
             LOG_INFO("Thread data received: %" PRIu32, pdata->thread->ID);
             saveInfoAboutPreviousAppForProperSwitchBack(data);

@@ -25,7 +25,7 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-appmgr/Controller.hpp>
-
+#include <apps-common/locks/data/PhoneLockMessages.hpp>
 namespace app
 {
     static constexpr auto messagesStackDepth = 1024 * 6; // 6Kb stack size
@@ -38,6 +38,8 @@ namespace app
           AsyncCallbackReceiver{this}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
+
         addActionReceiver(manager::actions::CreateSms,
                           [this](auto &&data) { return handleCreateSmsAction(std::move(data)); });
         addActionReceiver(manager::actions::ShowSmsTemplates, [this](auto &&data) {
@@ -70,6 +72,16 @@ namespace app
             }
             return sys::MessageNone{};
         });
+
+        connect(typeid(locks::UnlockedPhone), [&](sys::Message *msg) -> sys::MessagePointer {
+            phoneLockState = PhoneLockState::Unlocked;
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(locks::LockedPhone), [&](sys::Message *msg) -> sys::MessagePointer {
+            phoneLockState = PhoneLockState::Locked;
+            return sys::MessageNone{};
+        });
     }
 
     // Invoked upon receiving data message
@@ -85,6 +97,9 @@ namespace app
             if (msg != nullptr) {
                 userInterfaceDBNotification(msgl,
                                             [&]([[maybe_unused]] sys::Message *, [[maybe_unused]] const std::string &) {
+                                                if (phoneLockState == PhoneLockState::Locked) {
+                                                    return false;
+                                                }
                                                 return msg->interface == db::Interface::Name::SMSThread ||
                                                        msg->interface == db::Interface::Name::SMS ||
                                                        msg->interface == db::Interface::Name::SMSTemplate;

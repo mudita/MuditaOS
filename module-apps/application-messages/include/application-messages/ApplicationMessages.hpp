@@ -69,6 +69,13 @@ namespace app
 
       private:
         ActionResult handleCreateSmsAction(std::unique_ptr<gui::SwitchData> data);
+
+        enum class PhoneLockState
+        {
+            Locked,
+            Unlocked
+        };
+        PhoneLockState phoneLockState = PhoneLockState::Unlocked;
     };
 
     template <>
