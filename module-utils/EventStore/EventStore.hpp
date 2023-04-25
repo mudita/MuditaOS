@@ -102,6 +102,7 @@ namespace Store
             UtranWHsdpaAndWHsupa,
             EUtran,
             Cdma    = 100,
+            Wcdma,
             Unknown = 255
         } accessTechnology = AccessTechnology::Unknown;
 
