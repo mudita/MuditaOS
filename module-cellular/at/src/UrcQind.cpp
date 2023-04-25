@@ -134,13 +134,13 @@ namespace
 {
     constexpr auto gsm           = "GSM";
     constexpr auto egprs         = "EGPRS";
-    constexpr auto wcdma         = "WCDMA ";
     constexpr auto hsdpa         = "HSDPA";
     constexpr auto hsupa         = "HSUPA";
     constexpr auto hsdpaAndHsupa = "HSDPA&HSUPA";
     constexpr auto lte           = "LTE";
     constexpr auto tdScdma       = "TD-SCDMA";
     constexpr auto cdma          = "CDMA";
+    constexpr auto wcdma         = "WCDMA";
     constexpr auto hdr           = "HDR";
     constexpr auto evdo          = "EVDO";
     constexpr auto unknown       = "UNKNOWN";
@@ -155,6 +155,7 @@ namespace
         {lte, Store::Network::AccessTechnology::EUtran},
         {tdScdma, Store::Network::AccessTechnology::Utran},
         {cdma, Store::Network::AccessTechnology::Cdma},
+        {wcdma, Store::Network::AccessTechnology::Wcdma},
         {hdr, Store::Network::AccessTechnology::Utran},
         {evdo, Store::Network::AccessTechnology::Utran},
         {unknown, Store::Network::AccessTechnology::Unknown}};
