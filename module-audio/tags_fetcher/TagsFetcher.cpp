@@ -3,12 +3,28 @@
 
 #include "TagsFetcher.hpp"
 #include <Utils.hpp>
+#include <riff/wav/wavproperties.h>
 #include "fileref.h"
 
 namespace tags::fetcher
 {
     namespace
     {
+        bool isFormatSupported(TagLib::AudioProperties *properties)
+        {
+            /* WAV formats from taglib wav properties :
+             * 0 for unknown, 1 for PCM, 2 for ADPCM, 3 for 32/64-bit IEEE754
+             *
+             * MuditaOS does not support WAV ADPCM encoding
+             * */
+            constexpr auto WAV_ADPCM = 2;
+            auto wav_properties      = dynamic_cast<const TagLib::RIFF::WAV::Properties *>(properties);
+            if (wav_properties == nullptr) {
+                return true;
+            }
+            return wav_properties->format() != WAV_ADPCM;
+        }
+
         std::string getTitleFromFilePath(const std::string &path)
         {
             const auto pos = path.rfind('/');
@@ -24,6 +40,10 @@ namespace tags::fetcher
             const auto tags = tagReader.tag();
             if (!tagReader.isNull() && (tags != nullptr)) {
                 const auto properties = tagReader.audioProperties();
+
+                if (!isFormatSupported(properties)) {
+                    return std::nullopt;
+                }
 
                 constexpr bool unicode = true;
 
