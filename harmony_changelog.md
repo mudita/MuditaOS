@@ -15,6 +15,7 @@
 * Fixed settings frontlight intensity in on demand mode
 * Fixed problem that UI could be occasionally broken
 * Fixed problem with displaying end of title when playing song in loop was selected.
+* Fixed problem with an unresponding device after playing specific WAV files.
 
 ### Added
 

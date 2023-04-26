@@ -34,6 +34,7 @@
 * Fixed redundant logs about CSQ reporting mode
 * Fixed adding USSD codes to phonebook
 * Fixed slider-related crash on phone turn off
+* Fixed problem with an unresponding device after playing specific WAV files.
 
 
 ## [1.7.0 2023-03-23]
