@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-gui/gui/input/InputEvent.hpp>
@@ -7,9 +7,15 @@
 #include "VolumeWindow.hpp"
 #include "popups/data/PopupData.hpp"
 
+namespace
+{
+    constexpr auto oneSecondTimeout = std::chrono::seconds{1};
+}
+
 namespace gui
 {
-    VolumeWindow::VolumeWindow(app::ApplicationCommon *app, const std::string &name) : WindowWithTimer(app, name)
+    VolumeWindow::VolumeWindow(app::ApplicationCommon *app, const std::string &name)
+        : WindowWithTimer(app, name, oneSecondTimeout)
     {
         buildInterface();
     }
