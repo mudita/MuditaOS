@@ -6,6 +6,7 @@
 #include "SMSTemplateItem.hpp"
 #include "SMSTemplatesWindow.hpp"
 
+#include <service-db/DBNotificationMessage.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -29,8 +30,10 @@ namespace gui
 
     void SMSTemplatesWindow::rebuild()
     {
-        destroyInterface();
-        buildInterface();
+        if (list == nullptr) {
+            return;
+        }
+        list->rebuildList(gui::listview::RebuildType::InPlace);
     }
 
     void SMSTemplatesWindow::buildInterface()
@@ -127,5 +130,16 @@ namespace gui
         return app::manager::Controller::switchBack(
             application,
             std::make_unique<app::manager::SwitchBackRequest>(nameOfPreviousApplication.value(), nullptr, true));
+    }
+
+    bool SMSTemplatesWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        const auto msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msgNotification != nullptr && msgNotification->interface == db::Interface::Name::SMSTemplate &&
+            msgNotification->dataModified()) {
+            rebuild();
+            return true;
+        }
+        return false;
     }
 } /* namespace gui */

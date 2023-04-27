@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuerySMSTemplateAdd.hpp"
@@ -8,7 +8,7 @@
 
 using namespace db::query;
 
-SMSTemplateAdd::SMSTemplateAdd(const SMSTemplateRecord &rec) : Query(Query::Type::Read), rec(rec)
+SMSTemplateAdd::SMSTemplateAdd(const SMSTemplateRecord &rec) : Query(Query::Type::Create), rec(rec)
 {}
 
 SMSTemplateAddResult::SMSTemplateAddResult(bool result, unsigned int id) : result(result), id(id)

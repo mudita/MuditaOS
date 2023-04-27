@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuerySMSTemplateRemove.hpp"
 
 namespace db::query
 {
-    SMSTemplateRemove::SMSTemplateRemove(unsigned int id) : Query(Query::Type::Read), id(id)
+    SMSTemplateRemove::SMSTemplateRemove(unsigned int id) : Query(Query::Type::Delete), id(id)
     {}
 
     auto SMSTemplateRemove::debugInfo() const -> std::string

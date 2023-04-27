@@ -31,6 +31,7 @@ namespace gui
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
+        bool onDatabaseMessage(sys::Message *msgl) override;
 
         void rebuild() override;
         void buildInterface() override;

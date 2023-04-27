@@ -36,7 +36,7 @@
 * Fixed adding USSD codes to phonebook
 * Fixed slider-related crash on phone turn off
 * Fixed problem with an unresponsive device after playing specific WAV files.
-
+* Fixed unresponsive Templates window for user input after templates were changed via MC.
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved
