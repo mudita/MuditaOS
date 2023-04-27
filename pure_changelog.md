@@ -18,6 +18,7 @@
 * Unified GUI flow for adding contact with number already present in another contact
 * Decrease critical battery level from 10% to 5%
 * Optimized E-Ink energy consumption
+* Changed volume popup timeout to match phone modes popup
 
 ### Fixed
 
@@ -34,7 +35,7 @@
 * Fixed redundant logs about CSQ reporting mode
 * Fixed adding USSD codes to phonebook
 * Fixed slider-related crash on phone turn off
-* Fixed problem with an unresponding device after playing specific WAV files.
+* Fixed problem with an unresponsive device after playing specific WAV files.
 
 
 ## [1.7.0 2023-03-23]
