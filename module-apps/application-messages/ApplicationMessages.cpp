@@ -86,7 +86,8 @@ namespace app
                 userInterfaceDBNotification(msgl,
                                             [&]([[maybe_unused]] sys::Message *, [[maybe_unused]] const std::string &) {
                                                 return msg->interface == db::Interface::Name::SMSThread ||
-                                                       msg->interface == db::Interface::Name::SMS;
+                                                       msg->interface == db::Interface::Name::SMS ||
+                                                       msg->interface == db::Interface::Name::SMSTemplate;
                                             });
                 return std::make_shared<sys::ResponseMessage>();
             }
