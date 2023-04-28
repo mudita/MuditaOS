@@ -114,7 +114,7 @@ namespace sdesktop::endpoints
         return entries;
     }
 
-    auto DeviceInfoEndpointCommon::getStorageStats(const std::string &path) -> std::tuple<long, long>
+    auto DeviceInfoEndpointCommon::getStorageStats(const std::string &path) -> std::tuple<float, float>
     {
         constexpr auto bytesInMebibyte = 1024LLU * 1024LLU;
         struct statvfs vfstat
@@ -124,26 +124,22 @@ namespace sdesktop::endpoints
             return {-1, -1};
         }
 
-        const auto totalMbytes = static_cast<long>(
-            (static_cast<std::uint64_t>(vfstat.f_blocks) * static_cast<std::uint64_t>(vfstat.f_bsize)) /
-            bytesInMebibyte);
-        const auto freeMbytes = static_cast<long>(
-            (static_cast<std::uint64_t>(vfstat.f_bfree) * static_cast<std::uint64_t>(vfstat.f_bsize)) /
-            bytesInMebibyte);
+        const auto totalMbytes = static_cast<float>(vfstat.f_blocks * vfstat.f_bsize) / bytesInMebibyte;
+        const auto freeMbytes  = static_cast<float>(vfstat.f_bfree * vfstat.f_bsize) / bytesInMebibyte;
 
         return {totalMbytes, freeMbytes};
     }
 
-    auto DeviceInfoEndpointCommon::getStorageInfo() -> std::tuple<long, long, long>
+    auto DeviceInfoEndpointCommon::getStorageInfo() -> std::tuple<float, float, float>
     {
         /* MuditaOS consists of two system partitions: 'system_a' and 'system_b'.
          * However, only one of them is mounted at the time. The value returned
          * by the endpoint should take into account space of both of them. */
         constexpr auto numberOfSystemPartitions = 2;
 
-        long totalDeviceSpaceMiB    = 0;
-        long reservedSystemSpaceMiB = 0;
-        long usedUserSpaceMiB       = 0;
+        float totalDeviceSpaceMiB    = 0;
+        float reservedSystemSpaceMiB = 0;
+        float usedUserSpaceMiB       = 0;
 
         /* System partitions stats */
         const auto systemDiskPath                      = purefs::dir::getSystemDiskPath();

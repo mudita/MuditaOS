@@ -19,6 +19,7 @@
 * Decrease critical battery level from 10% to 5%
 * Optimized E-Ink energy consumption
 * Changed volume popup timeout to match phone modes popup
+* Information about device memory is now sent to MC in floating points numbers
 
 ### Fixed
 

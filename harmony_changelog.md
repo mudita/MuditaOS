@@ -15,7 +15,7 @@
 * Fixed settings frontlight intensity in on demand mode
 * Fixed problem that UI could be occasionally broken
 * Fixed problem with displaying end of title when playing song in loop was selected.
-* Fixed problem with an unresponding device after playing specific WAV files.
+* Fixed problem with an unresponsive device after playing specific WAV files.
 * Fixed USB charging port detection.
 
 ### Added
@@ -28,6 +28,7 @@
 * Added new field to deviceInfo endpoint
 * Changed order in which files are displayed in Relaxation
 * Optimized E-Ink energy consumption
+* Information about device memory is now sent to MC in floating points numbers
 
 ## [1.9.0 2023-04-03]
 

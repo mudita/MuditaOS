@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -28,8 +28,8 @@ namespace sdesktop::endpoints
         auto listDirectory(const std::string &path) -> std::vector<std::string>;
         auto fileListToJsonObject(const std::vector<std::string> &fileList) const -> json11::Json::object const;
         auto requestLogsFlush() const -> void;
-        auto getStorageStats(const std::string &path) -> std::tuple<long, long>;
-        auto getStorageInfo() -> std::tuple<long, long, long>;
+        auto getStorageStats(const std::string &path) -> std::tuple<float, float>;
+        auto getStorageInfo() -> std::tuple<float, float, float>;
         auto getMtpPath() const -> std::filesystem::path;
 
         explicit DeviceInfoEndpointCommon(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
