@@ -240,12 +240,13 @@ namespace hal::battery
                                   LOG_INFO("USB charging port discovery result: %s",
                                            std::string{magic_enum::enum_name(evt)}.c_str());
                                   switch (evt) {
-                                  case events::DCD::DCP:
-                                  case events::DCD::CDP:
                                   case events::DCD::Timeout:
+                                  case events::DCD::DCP:
                                       LOG_INFO("Valid charger detected, enabling charging");
                                       charger.enable_charging(true);
                                       break;
+                                  case events::DCD::CDP:
+                                  case events::DCD::SDP:
                                   default:
                                       charger.enable_charging(false);
                                   }
