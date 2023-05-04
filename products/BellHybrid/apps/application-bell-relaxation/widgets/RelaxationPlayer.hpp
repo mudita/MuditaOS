@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,15 +25,16 @@ namespace app::relaxation
             SingleShot
         };
 
-        virtual ~AbstractRelaxationPlayer()                                       = default;
+        virtual ~AbstractRelaxationPlayer()                                                   = default;
         virtual void start(const std::string &filePath,
                            PlaybackMode mode,
-                           AbstractAudioModel::OnStateChangeCallback &&callback)  = 0;
-        virtual void stop(AbstractAudioModel::OnStateChangeCallback &&callback)   = 0;
-        virtual void pause(AbstractAudioModel::OnStateChangeCallback &&callback)  = 0;
-        virtual void resume(AbstractAudioModel::OnStateChangeCallback &&callback) = 0;
-        virtual PlaybackMode getCurrentMode() const noexcept                      = 0;
-        virtual bool isPaused()                                                   = 0;
+                           AbstractAudioModel::OnStateChangeCallback &&callback,
+                           AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback) = 0;
+        virtual void stop(AbstractAudioModel::OnStateChangeCallback &&callback)               = 0;
+        virtual void pause(AbstractAudioModel::OnStateChangeCallback &&callback)              = 0;
+        virtual void resume(AbstractAudioModel::OnStateChangeCallback &&callback)             = 0;
+        virtual PlaybackMode getCurrentMode() const noexcept                                  = 0;
+        virtual bool isPaused()                                                               = 0;
     };
 
     class RelaxationPlayer : public AbstractRelaxationPlayer
@@ -44,7 +45,8 @@ namespace app::relaxation
       private:
         void start(const std::string &filePath,
                    PlaybackMode mode,
-                   AbstractAudioModel::OnStateChangeCallback &&callback) override;
+                   AbstractAudioModel::OnStateChangeCallback &&callback,
+                   AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback) override;
         void stop(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         void pause(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         void resume(AbstractAudioModel::OnStateChangeCallback &&callback) override;

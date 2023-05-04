@@ -52,6 +52,7 @@
     "app_bell_onboarding_shortcuts_step_turn_off": "Zum Ausstellen des Ger\u00e4ts R\u00fcckseite 10 Sek. dr\u00fccken",
     "app_bell_relaxation_error_message": "Nicht unterst\u00fctztes Dateiformat",
     "app_bell_relaxation_limit_error_message": "<text>Datenlimit \u00fcberschritten.<br />Es k\u00f6nnte zu Fehlern kommen.</text>",
+    "app_bell_relaxation_file_deleted_message": "<text>Die Datei wurde gelöscht.</text>",
     "app_bell_relaxation_loop": "endlos",
     "app_bell_relaxation_loop_description": "der Titel wird abgespielt, bis Sie ihn ausschalten",
     "app_bell_relaxation_looped": "geschlungen",

@@ -17,6 +17,7 @@
 * Fixed problem with displaying end of title when playing song in loop was selected.
 * Fixed problem with an unresponsive device after playing specific WAV files.
 * Fixed USB charging port detection.
+* Fixed problem with deleting files during Relaxation session.
 
 ### Added
 

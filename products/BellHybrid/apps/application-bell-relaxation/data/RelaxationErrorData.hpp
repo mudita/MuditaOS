@@ -10,8 +10,9 @@ namespace gui
     enum class RelaxationErrorType
     {
         UnsupportedMediaType,
-        FilesLimitExceeded
-
+        FilesLimitExceeded,
+        FileDeleted,
+        Unknown
     };
 
     class RelaxationErrorData : public SwitchData

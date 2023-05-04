@@ -240,4 +240,10 @@ namespace gui
         auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::UnsupportedMediaType);
         application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
     }
+
+    void RelaxationRunningLoopWindow::handleDeletedFile()
+    {
+        auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::FileDeleted);
+        application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
+    }
 } // namespace gui

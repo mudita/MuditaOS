@@ -42,6 +42,7 @@ namespace gui
         void resume() override;
         RefreshModes updateTime() override;
         void handleError() override;
+        void handleDeletedFile() override;
 
         void buildLayout();
         void configureTimer();

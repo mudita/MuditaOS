@@ -57,7 +57,9 @@ namespace app::relaxation
                 return;
             }
         };
-        player.start(song.fileInfo.path, mode, std::move(onStartCallback));
+        auto onErrorCallback = [this]() { getView()->handleDeletedFile(); };
+
+        player.start(song.fileInfo.path, mode, std::move(onStartCallback), std::move(onErrorCallback));
     }
 
     void RelaxationRunningLoopPresenter::stop()

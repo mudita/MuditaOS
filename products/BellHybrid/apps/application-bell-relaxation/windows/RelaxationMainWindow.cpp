@@ -64,4 +64,9 @@ namespace gui
         application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
     }
 
+    void RelaxationMainWindow::rebuild()
+    {
+        presenter->loadAudioRecords();
+    }
+
 } // namespace gui

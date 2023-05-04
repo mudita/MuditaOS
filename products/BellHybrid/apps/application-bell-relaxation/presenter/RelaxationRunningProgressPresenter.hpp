@@ -40,6 +40,7 @@ namespace app::relaxation
             virtual void setTime(std::time_t newTime)                       = 0;
             virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
             virtual void handleError()                                      = 0;
+            virtual void handleDeletedFile()                                = 0;
         };
 
         class Presenter : public BasePresenter<RelaxationRunningProgressContract::View>
