@@ -171,7 +171,6 @@ namespace bsp
         Brownout_init();
         irq_gpio_Init();
 
-        // SNVS init. is required for proper operation of the RTC when Secure Boot is used
         SNVS_LP_Init(SNVS);
         SNVS_HP_Init(SNVS);
         SNVS_HP_ChangeSSMState(SNVS);
@@ -210,8 +209,10 @@ namespace bsp
 
     int register_exit_functions(void (*func)())
     {
-        if (iObject >= sizeof(objects))
+        if (iObject >= sizeof(objects)) {
             return -1;
+        }
+
         objects[iObject].func = func;
         ++iObject;
         return 0;
