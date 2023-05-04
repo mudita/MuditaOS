@@ -8,7 +8,8 @@
 #include <ctime>
 #include <cstdint>
 
-namespace bsp::rtc {
+namespace bsp::rtc
+{
 	enum class IrqNotification
     {
         AlarmOccurred = 0x01
