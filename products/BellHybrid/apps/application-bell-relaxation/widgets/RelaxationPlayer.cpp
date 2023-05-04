@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationPlayer.hpp"
@@ -14,16 +14,28 @@ namespace app::relaxation
     {}
     void RelaxationPlayer::start(const std::string &filePath,
                                  AbstractRelaxationPlayer::PlaybackMode mode,
-                                 AbstractAudioModel::OnStateChangeCallback &&callback)
+                                 AbstractAudioModel::OnStateChangeCallback &&callback,
+                                 AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback)
     {
         recentFilePath = filePath;
         playbackMode   = mode;
         audioModel.play(filePath, AbstractAudioModel::PlaybackType::Multimedia, std::move(callback));
-        audioModel.setPlaybackFinishedCb([&]() {
+
+        auto finishedCb = [_callback = finishedCallback, this]() {
+            auto cb = [&](audio::RetCode retCode) {
+                if (retCode != audio::RetCode::Success) {
+                    _callback();
+                }
+            };
             if (playbackMode == PlaybackMode::Looped) {
-                audioModel.play(recentFilePath, AbstractAudioModel::PlaybackType::Multimedia, {});
+                audioModel.play(recentFilePath, AbstractAudioModel::PlaybackType::Multimedia, std::move(cb));
             }
-        });
+            else {
+                _callback();
+            }
+        };
+
+        audioModel.setPlaybackFinishedCb(std::move(finishedCb));
     }
     void RelaxationPlayer::stop(AbstractAudioModel::OnStateChangeCallback &&callback)
     {

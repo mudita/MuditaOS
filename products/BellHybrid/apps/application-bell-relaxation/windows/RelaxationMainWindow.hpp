@@ -20,6 +20,7 @@ namespace gui
 
         void buildInterface() override;
         void handleError() override;
+        void rebuild() override;
         void setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> soundsTags);
         void onActivated(const db::multimedia_files::MultimediaFilesRecord &selectedSound);
     };

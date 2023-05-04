@@ -52,6 +52,7 @@
     "app_bell_onboarding_shortcuts_step_turn_off": "Przytrzymaj przycisk wstecz przez 10s aby wy\u0142\u0105czy\u0107 urz\u0105dzenie",
     "app_bell_relaxation_error_message": "Nieobs\u0142ugiwany format pliku",
     "app_bell_relaxation_limit_error_message": "<text>Przekroczono limit plik\u00f3w.<br />Nie wszystkie pliki mog\u0105 by\u0107<br />wy\u015bwietlone poprawnie</text>",
+    "app_bell_relaxation_file_deleted_message": "<text>Plik został usunięty.</text>",
     "app_bell_relaxation_loop": "w p\u0119tli",
     "app_bell_relaxation_loop_description": "utw\u00f3r b\u0119dzie odtwarzany do momentu wy\u0142\u0105czenia go",
     "app_bell_relaxation_looped": "zap\u0119tlony",

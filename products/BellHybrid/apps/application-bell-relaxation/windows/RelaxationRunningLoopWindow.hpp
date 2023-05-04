@@ -41,6 +41,7 @@ namespace gui
         void resume() override;
         bool updateBatteryStatus() override;
         void handleError() override;
+        void handleDeletedFile() override;
 
         void buildLayout();
         void configureTimer();

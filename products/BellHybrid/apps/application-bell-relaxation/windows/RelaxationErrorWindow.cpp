@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationErrorWindow.hpp"
-#include <data/RelaxationErrorData.hpp>
 #include <data/RelaxationStyle.hpp>
 #include <ApplicationBellRelaxation.hpp>
 
@@ -12,6 +11,9 @@ namespace
 {
     constexpr auto unsupportedMediaMessage   = "app_bell_relaxation_error_message";
     constexpr auto exceededFilesLimitMessage = "app_bell_relaxation_limit_error_message";
+    constexpr auto fileDeletedMessage        = "app_bell_relaxation_file_deleted_message";
+    constexpr auto emptyErrorMessage         = "";
+
 } // namespace
 
 namespace gui
@@ -51,6 +53,9 @@ namespace gui
     {
         timerCallback = [this](Item &, sys::Timer &timer) {
             application->switchWindow(gui::name::window::main_window);
+            if (errorType == RelaxationErrorType::FileDeleted) {
+                application->getWindow(gui::name::window::main_window)->rebuild();
+            }
             return true;
         };
     }
@@ -59,16 +64,22 @@ namespace gui
     {
         if (data && typeid(*data) == typeid(RelaxationErrorData)) {
             auto *errorData = static_cast<RelaxationErrorData *>(data);
-            switch (errorData->getErrorType()) {
+            errorType       = errorData->getErrorType();
+            switch (errorType) {
             case RelaxationErrorType::UnsupportedMediaType: {
                 icon->text->setRichText(utils::translate(unsupportedMediaMessage));
                 break;
             }
-
             case RelaxationErrorType::FilesLimitExceeded: {
                 icon->text->setRichText(utils::translate(exceededFilesLimitMessage));
                 break;
             }
+            case RelaxationErrorType::FileDeleted: {
+                icon->text->setRichText(utils::translate(fileDeletedMessage));
+                break;
+            }
+            default:
+                icon->text->setRichText(utils::translate(emptyErrorMessage));
             }
         }
         WindowWithTimer::onBeforeShow(mode, data);
@@ -78,6 +89,9 @@ namespace gui
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             application->switchWindow(gui::name::window::main_window);
+            if (errorType == RelaxationErrorType::FileDeleted) {
+                application->getWindow(gui::name::window::main_window)->rebuild();
+            }
             return true;
         }
         return true;

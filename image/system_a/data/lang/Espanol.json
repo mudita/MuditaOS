@@ -51,6 +51,7 @@
     "app_bell_onboarding_shortcuts_step_turn_off": "Pulsa Volver atr\u00e1s 10 s para apagar el dispositivo",
     "app_bell_relaxation_error_message": "Formato de archivo no admitido",
     "app_bell_relaxation_limit_error_message": "<text>L\u00edmite de archivos alcanzado,<br />pueden producirse errores.</text>",
+    "app_bell_relaxation_file_deleted_message": "<text>Se ha eliminado el archivo.</text>",
     "app_bell_relaxation_loop": "bucle",
     "app_bell_relaxation_loop_description": "la canci\u00f3n se reproducir\u00e1 hasta que la apagues",
     "app_bell_relaxation_looped": "en bucle",
