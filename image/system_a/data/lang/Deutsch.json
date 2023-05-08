@@ -274,6 +274,7 @@
     "app_desktop_tools_title": "Werkzeuge",
     "app_desktop_unlock": "ENTSPERREN",
     "app_desktop_unread_messages": "<text>Ungelesene Nachrichten</text>",
+    "app_desktop_unread_single_message": "<text>Ungelesene Nachricht</text>",
     "app_emoji_input_window": "Emoji",
     "app_meditation_countdown_desc": "Beginnt in",
     "app_meditation_interval_chime": "Glocken-Intervall",

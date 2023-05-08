@@ -144,6 +144,7 @@
     "app_desktop_tools_title": "Verktyg",
     "app_desktop_unlock": "L\u00c5S UPP",
     "app_desktop_unread_messages": "<text>Ol\u00e4sta meddelanden</text>",
+    "app_desktop_unread_single_message": "<text>Ol\u00e4st meddelande</text>",
     "app_emoji_input_window": "Emoji",
     "app_meditation_interval_chime": "Klinga d\u00e5 och d\u00e5",
     "app_meditation_interval_every_x_minutes": "Var %0:e minut",
