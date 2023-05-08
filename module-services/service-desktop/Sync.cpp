@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-desktop/Sync.hpp>
@@ -57,6 +57,16 @@ Sync::CompletionCode Sync::PrepareSyncPackage(sys::Service *ownerService, std::f
 bool Sync::RemoveSyncDir(const std::filesystem::path &path)
 {
     /* prepare directories */
+    const auto tempPath = purefs::dir::getTemporaryPath();
+    if (std::filesystem::exists(tempPath) and !std::filesystem::is_directory(tempPath)) {
+        LOG_WARN("%s should be a directory, removing...", tempPath.c_str());
+        if (!std::filesystem::remove(tempPath)) {
+            LOG_ERROR("Failed to remove %s!", tempPath.c_str());
+            return false;
+        }
+        return true;
+    }
+
     if (std::filesystem::is_directory(path)) {
         LOG_INFO("Removing sync directory %s...", path.c_str());
         std::error_code errorCode;
