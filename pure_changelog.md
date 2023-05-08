@@ -40,6 +40,7 @@
 * Fixed unresponsive Templates window for user input after templates were changed via MC.
 * Fixed USB charging port detection.
 * Fixed Template window clearing after all templates are removed.
+* Fixed wrong notification about multiple unread messages in case there's only one unread left
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved

@@ -77,7 +77,10 @@ auto NotificationsListPresenter::create(const notifications::NotSeenSMSNotificat
     -> NotificationListItem *
 {
     auto item = new NotificationWithEventCounter(notifications::NotificationType::NotSeenSms, notification->getValue());
-    setNotificationText(item, notification, "app_desktop_unread_messages");
+    setNotificationText(item,
+                        notification,
+                        (notification->getValue() == 1) ? "app_desktop_unread_single_message"
+                                                        : "app_desktop_unread_messages");
     item->deleteByList = false;
     return item;
 }

@@ -277,6 +277,7 @@
     "app_desktop_tools_title": "Tools",
     "app_desktop_unlock": "UNLOCK",
     "app_desktop_unread_messages": "<text>Unread messages</text>",
+    "app_desktop_unread_single_message": "<text>Unread message</text>",
     "app_emoji_input_window": "Emoji",
     "app_meditation_countdown_desc": "Starts in",
     "app_meditation_interval_chime": "Interval chime",
