@@ -108,6 +108,10 @@ namespace gui
             list->rebuildList();
         }
 
+        if (list->isEmpty()) {
+            list->clear();
+        }
+
         navBar->setActive(nav_bar::Side::Center, !list->isEmpty());
         emptyListIcon->setVisible(list->isEmpty());
 

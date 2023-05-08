@@ -39,6 +39,7 @@
 * Fixed problem with an unresponsive device after playing specific WAV files.
 * Fixed unresponsive Templates window for user input after templates were changed via MC.
 * Fixed USB charging port detection.
+* Fixed Template window clearing after all templates are removed.
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved
