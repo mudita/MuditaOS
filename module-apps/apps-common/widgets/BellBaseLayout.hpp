@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,6 +11,11 @@ namespace style::bell_base_layout
     constexpr inline auto w                   = style::window_width;
     constexpr inline auto h                   = style::window_height;
     constexpr inline auto first_layout_min_h  = 30U;
+    constexpr inline auto first_top_margin    = 38U;
+    constexpr inline auto first_layout_w      = 448U;
+    constexpr inline auto first_layout_h      = 102U;
+    constexpr inline auto last_layout_w       = 448U;
+    constexpr inline auto last_layout_h       = 127U;
     constexpr inline auto outer_layouts_w     = 448U;
     constexpr inline auto outer_layouts_h     = 102U;
     constexpr inline auto center_layout_w     = w;

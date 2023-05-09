@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellBaseLayout.hpp"
@@ -10,25 +10,26 @@ namespace gui
         : VThreeBox(parent, x, y, w, h)
     {
         setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::h);
-        setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        setEdges(RectangleEdge::None);
+        setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        setEdges(RectangleEdge::All);
 
         firstBox = new VBox(this);
-        firstBox->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::first_layout_min_h);
-        firstBox->setMaximumHeight(style::bell_base_layout::outer_layouts_h);
+        firstBox->setMinimumSize(style::bell_base_layout::first_layout_w, style::bell_base_layout::first_layout_min_h);
+        firstBox->setMargins(Margins(0U, style::bell_base_layout::first_top_margin, 0U, 0U));
+        firstBox->setMaximumHeight(style::bell_base_layout::first_layout_h);
         firstBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
-        firstBox->setEdges(RectangleEdge::None);
+        firstBox->setEdges(RectangleEdge::All);
         firstBox->activeItem = false;
 
         centerBox = new VBox(this);
-        centerBox->setEdges(RectangleEdge::None);
+        centerBox->setEdges(RectangleEdge::All);
         centerBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         centerBox->setMinimumSize(style::bell_base_layout::center_layout_w, style::bell_base_layout::center_layout_h);
 
         lastBox = new VBox(this);
-        lastBox->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        lastBox->setMinimumSize(style::bell_base_layout::last_layout_w, style::bell_base_layout::last_layout_h);
         lastBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
-        lastBox->setEdges(RectangleEdge::None);
+        lastBox->setEdges(RectangleEdge::All);
         lastBox->activeItem = false;
 
         resizeItems();

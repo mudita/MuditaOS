@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "widgets/LayoutVertical.hpp"
@@ -28,27 +28,27 @@ namespace gui
 
         setMinimumSize(style::window_width, style::window_height);
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        setEdges(RectangleEdge::None);
+        setEdges(RectangleEdge::All);
 
         // Main Screen
         mainScreen = new HBox(this);
         mainScreen->setMinimumSize(style::window_width, style::window_height);
-        mainScreen->setEdges(RectangleEdge::None);
+        mainScreen->setEdges(RectangleEdge::All);
 
         leftBox = new VBox(mainScreen, 0, 0, 0, 0);
         leftBox->setMinimumSize(style::homescreen_vertical::side_box_w, style::window_height);
-        leftBox->setEdges(RectangleEdge::None);
+        leftBox->setEdges(RectangleEdge::All);
         leftBox->setMargins(Margins({style::homescreen_vertical::leftMargin, 0, 0, 0}));
 
         auto centerBox = new VBox(mainScreen, 0, 0, 0, 0);
         centerBox->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
-        centerBox->setEdges(RectangleEdge::None);
+        centerBox->setEdges(RectangleEdge::All);
         centerBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         time = new ClockVertical(centerBox);
         time->setFont(style::window::font::colossal);
         time->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
-        time->setEdges(RectangleEdge::None);
+        time->setEdges(RectangleEdge::All);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         rightBox = new VBox(mainScreen, 0, 0, 0, 0);
