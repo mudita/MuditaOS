@@ -27,7 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-void Clock_Init() 
+void Clock_Init(void)
 {
     unsigned int CCM_CCGR0;
     unsigned int CCM_CCGR1;
@@ -82,10 +82,10 @@ void Clock_Init()
      * set PERIPH_CLK2_PODF divider to 1 */
     MEM_WriteU32(CCM_CBCDR, 0x00010D40);
 
-    JLINK_SYS_Report("Clock Init Done");
+    JLINK_SYS_Report("Clocks initialized");
 }
 
-void SDRAM_WaitIpCmdDone(void) 
+void SDRAM_WaitIpCmdDone(void)
 {
     unsigned int SEMC_INTR;
     unsigned int reg_val;
@@ -95,14 +95,14 @@ void SDRAM_WaitIpCmdDone(void)
     do
     {
         reg_val = MEM_ReadU32(SEMC_INTR);
-    } while((reg_val & 0x00000003) == 0);
+    } while ((reg_val & 0x00000003) == 0);
 
     MEM_WriteU32(SEMC_INTR, 0x00000003); // Clear IPCMDERR and IPCMDDONE bits
 }
 
-void SDRAM_Init()
+void SDRAM_IO_Init(void)
 {
-    // Config IOMUX for SDRAM
+    /* Configure SDRAM IOMUX */
     MEM_WriteU32(0x401F8014, 0x00000000); // EMC_00
     MEM_WriteU32(0x401F8018, 0x00000000); // EMC_01
     MEM_WriteU32(0x401F801C, 0x00000000); // EMC_02
@@ -144,9 +144,9 @@ void SDRAM_Init()
     MEM_WriteU32(0x401F80AC, 0x00000000); // EMC_38
     MEM_WriteU32(0x401F80B0, 0x00000010); // EMC_39
 
-    // PAD ctrl
-    // drive strength = 0x7 to increase drive strength
-    // otherwise the data7 bit may fail.
+    /* Configure SDRAM PAD. Drive strength = 0x7
+     * to increase drive strength, otherwise data7
+     * bit may fail. */
     MEM_WriteU32(0x401F8204, 0x000110F9); // EMC_00
     MEM_WriteU32(0x401F8208, 0x000110F9); // EMC_01
     MEM_WriteU32(0x401F820C, 0x000110F9); // EMC_02
@@ -187,34 +187,134 @@ void SDRAM_Init()
     MEM_WriteU32(0x401F8298, 0x000110F9); // EMC_37
     MEM_WriteU32(0x401F829C, 0x000110F9); // EMC_38
     MEM_WriteU32(0x401F82A0, 0x000110F9); // EMC_39
-
-    // Config SDR Controller Registers
-    MEM_WriteU32(0x402F0000, 0x10000004); // MCR
-    MEM_WriteU32(0x402F0008, 0x00030524); // BMCR0
-    MEM_WriteU32(0x402F000C, 0x06030524); // BMCR1
-    MEM_WriteU32(0x402F0010, 0x80000019); // BR0, 16MB OK
-    MEM_WriteU32(0x402F0040, 0x00000F31); // SDRAMCR0 OK
-    MEM_WriteU32(0x402F0044, 0x00652922); // SDRAMCR1
-    MEM_WriteU32(0x402F0048, 0x000a0b0d); // SDRAMCR2
-    MEM_WriteU32(0x402F004C, 0x0f0f0a00); // SDRAMCR3
-    MEM_WriteU32(0x402F0090, 0x80000000); // IPCR0 OK
-    MEM_WriteU32(0x402F0094, 0x00000002); // IPCR1 OK
-    MEM_WriteU32(0x402F0098, 0x00000000); // IPCR2 OK
-    MEM_WriteU32(0x402F009C, 0xA55A000F); // IPCMD, SD_CC_IPREA
-    SDRAM_WaitIpCmdDone();
-    MEM_WriteU32(0x402F009C, 0xA55A000C); // SD_CC_IAF
-    SDRAM_WaitIpCmdDone();
-    MEM_WriteU32(0x402F009C, 0xA55A000C); // SD_CC_IAF
-    SDRAM_WaitIpCmdDone();
-    MEM_WriteU32(0x402F00A0, 0x00000033); // IPTXDAT OK
-    MEM_WriteU32(0x402F009C, 0xA55A000A); // SD_CC_IMS
-    SDRAM_WaitIpCmdDone();
-    MEM_WriteU32(0x402F004C, 0x08080A01); // enable sdram self refresh again after initialization done.
-
-    JLINK_SYS_Report("SDRAM Init Done");
 }
 
-void INTRAM_Init()
+void SDRAM_SEMC_Init(void)
+{
+    unsigned int SEMC_MCR;
+    unsigned int SEMC_BMCR0;
+    unsigned int SEMC_BMCR1;
+    unsigned int SEMC_BR0;
+    unsigned int SEMC_SDRAMCR0;
+    unsigned int SEMC_SDRAMCR1;
+    unsigned int SEMC_SDRAMCR2;
+    unsigned int SEMC_SDRAMCR3;
+    unsigned int SEMC_IPCR0;
+    unsigned int SEMC_IPCR1;
+    unsigned int SEMC_IPCR2;
+    unsigned int SEMC_IPCMD;
+    unsigned int SEMC_IPTXDAT;
+    unsigned int SEMC_IPCMDMAGICKEY;
+    unsigned int SEMC_IPCMDMODESET;
+    unsigned int SEMC_IPCMDAUTOREFRESH;
+    unsigned int SEMC_IPCMDPRECHARGEALL;
+    unsigned int sdram_address;
+    unsigned int reg_val;
+
+    SEMC_MCR = 0x402F0000;
+    SEMC_BMCR0 = 0x402F0008;
+    SEMC_BMCR1 = 0x402F000C;
+    SEMC_BR0 = 0x402F0010;
+    SEMC_SDRAMCR0 = 0x402F0040;
+    SEMC_SDRAMCR1 = 0x402F0044;
+    SEMC_SDRAMCR2 = 0x402F0048;
+    SEMC_SDRAMCR3 = 0x402F004C;
+    SEMC_IPCR0 = 0x402F0090;
+    SEMC_IPCR1 = 0x402F0094;
+    SEMC_IPCR2 = 0x402F0098;
+    SEMC_IPCMD = 0x402F009C;
+    SEMC_IPTXDAT = 0x402F00A0;
+
+    /* SDRAM address in MCU memory map */
+    sdram_address = 0x80000000;
+
+    /* IP commands codes and magic key */
+    SEMC_IPCMDMAGICKEY = 0xA55A0000;
+    SEMC_IPCMDMODESET = 0x0000000A;
+    SEMC_IPCMDAUTOREFRESH = 0x0000000C;
+    SEMC_IPCMDPRECHARGEALL = 0x0000000F;
+
+    /* Disable SEMC module */
+    reg_val = MEM_ReadU32(SEMC_MCR);
+    reg_val |= 0x00000002;
+    MEM_WriteU32(SEMC_MCR, reg_val);
+
+    /* Configure queues for AXI bus:
+     * Queue A:
+     * WQOS = 4;
+     * WAGE = 2;
+     * WSH = 3;
+     * WRWS = 5 */
+    MEM_WriteU32(SEMC_BMCR0, 0x00030524);
+
+    /* Queue B:
+     * WQOS = 4;
+     * WAGE = 2;
+     * WPH = 3;
+     * WRWS = 5;
+     * WBR = 6 */
+    MEM_WriteU32(SEMC_BMCR1, 0x06050324);
+
+    /* Configure MCR:
+     * set bus timeout cycles to 0x10;
+     * set DQS mode to loopback from DQS pad for more accurate timings;
+     * enable SEMC module. */
+    MEM_WriteU32(SEMC_MCR, 0x10000004);
+
+    /* Configure BR0:
+     * set SDRAM address;
+     * set memory size to 16MB;
+     * mark config as valid. */
+    MEM_WriteU32(SEMC_BR0, (sdram_address | 0x00000019));
+
+    /* Configure SDRAMCR0:
+     * set port size to 16 bits;
+     * set burst length to 1 (see IMXRT1050CE document, ERR050577, p.36);
+     * set column address bit number to 9;
+     * set CAS latency to 3 cycles. */
+    MEM_WriteU32(SEMC_SDRAMCR0, 0x00000F01);
+
+    /* Configure SDRAMCR1-3: SDRAM timings. The values
+     * were obtained by feeding SEMC_ConfigureSDRAM() with
+     * proper data from Winbond W987D6HBGX6I datasheet. */
+    MEM_WriteU32(SEMC_SDRAMCR1, 0x00665222);
+    MEM_WriteU32(SEMC_SDRAMCR2, 0x000A0C12);
+    MEM_WriteU32(SEMC_SDRAMCR3, 0x10100A00);    // Disable SDRAM self-refresh
+
+    /* Prepare to send IP commands */
+    MEM_WriteU32(SEMC_IPCR0, sdram_address);    // Set SDRAM address
+    MEM_WriteU32(SEMC_IPCR1, 0x00000002);       // Set 2-byte data size
+    MEM_WriteU32(SEMC_IPCR2, 0x00000000);       // Unmask all IPTXDAT command bytes
+
+    /* Standard SDRAM init procedure - PRECHARGE followed by AUTO REFRESH twice */
+    MEM_WriteU32(SEMC_IPCMD, (SEMC_IPCMDMAGICKEY | SEMC_IPCMDPRECHARGEALL));
+    SDRAM_WaitIpCmdDone();
+    MEM_WriteU32(SEMC_IPCMD, (SEMC_IPCMDMAGICKEY | SEMC_IPCMDAUTOREFRESH));
+    SDRAM_WaitIpCmdDone();
+    MEM_WriteU32(SEMC_IPCMD, (SEMC_IPCMDMAGICKEY | SEMC_IPCMDAUTOREFRESH));
+    SDRAM_WaitIpCmdDone();
+
+    /* Set SDRAM mode:
+     * set CAS latency to 3 cycles;
+     * set burst length to 1. */
+    MEM_WriteU32(SEMC_IPTXDAT, 0x00000030);
+    MEM_WriteU32(SEMC_IPCMD, (SEMC_IPCMDMAGICKEY | SEMC_IPCMDMODESET));
+    SDRAM_WaitIpCmdDone();
+
+    /* Re-enable SDRAM self-refresh */
+    reg_val = MEM_ReadU32(SEMC_SDRAMCR3);
+    reg_val |= 0x00000001;
+    MEM_WriteU32(SEMC_SDRAMCR3, reg_val);
+}
+
+void SDRAM_Init(void)
+{
+    SDRAM_IO_Init();
+    SDRAM_SEMC_Init();
+    JLINK_SYS_Report("SDRAM initialized");
+}
+
+void INTRAM_Init(void)
 {
     unsigned int IOMUXC_GPR_GPR14;
     unsigned int IOMUXC_GPR_GPR16;
@@ -239,16 +339,18 @@ void INTRAM_Init()
     reg_val |= 0x00A00000;  // Set DTCM size to 512KBytes
     MEM_WriteU32(IOMUXC_GPR_GPR14, reg_val);
 
-    JLINK_SYS_Report("INTRAM Init Done");
+    JLINK_SYS_Report("INTRAM initialized");
 }
 
-void WDOG_Disable()
+void WDOG_Disable(void)
 {
     unsigned int MUX_CTL_PAD_GPIO_B1_13;
     MUX_CTL_PAD_GPIO_B1_13 = 0x401F81B0;
 
     /* Change pin mux from WDOG_B to GPIO to prevent resetting */
     MEM_WriteU32(MUX_CTL_PAD_GPIO_B1_13, 0x00000005);
+
+    JLINK_SYS_Report("Watchdog disabled");
 }
 
 void SNVS_SSM_Init(void)
@@ -264,6 +366,8 @@ void SNVS_SSM_Init(void)
     reg_val = MEM_ReadU32(SNVS_HPCOMR);
     reg_val |= SNVS_HPCOMR_SW_SV_MASK;
     MEM_WriteU32(SNVS_HPCOMR, reg_val);
+
+    JLINK_SYS_Report("SSM initialized");
 }
 
 /* SetupTarget */
