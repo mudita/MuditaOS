@@ -30,3 +30,5 @@ target_link_libraries(appmgr
         service-evtmgr
         sys
 )
+
+set_source_files_properties(ApplicationManager.cpp PROPERTIES COMPILE_OPTIONS "-O0;-fno-omit-frame-pointer;-ggdb3")

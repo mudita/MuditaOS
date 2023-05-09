@@ -97,3 +97,5 @@ target_include_directories(service-appmgr
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
 endif()
+
+set_source_files_properties(model/ApplicationManagerCommon.cpp PROPERTIES COMPILE_OPTIONS "-O0;-fno-omit-frame-pointer;-ggdb3")

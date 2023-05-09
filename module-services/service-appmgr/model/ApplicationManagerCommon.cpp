@@ -421,10 +421,6 @@ namespace app::manager
                                                        std::unique_ptr<gui::SwitchData> &&data,
                                                        std::string targetWindow)
     {
-        if (nextApp.name() == rootApplicationName) {
-            stack.clear();
-        }
-
         stack.push({nextApp.name(), true});
         nextApp.switchData   = std::move(data);
         nextApp.switchWindow = std::move(targetWindow);
@@ -507,7 +503,7 @@ namespace app::manager
         targetApp->startupReason = StartupReason::Launch;
         action.setTargetApplication(targetApp->name());
         SwitchRequest switchRequest(service::name::appmgr, targetApp->name(), gui::name::window::main_window, nullptr);
-        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
+        return handleSwitchApplication(&switchRequest, !launchParams->disableAppClose) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 
     auto ApplicationManagerCommon::handleActionOnActiveApps(ActionEntry &action) -> ActionProcessStatus

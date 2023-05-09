@@ -466,7 +466,9 @@ namespace app::manager
     void ApplicationManager::handleTetheringChanged(sys::phone_modes::Tethering tethering)
     {
         notificationProvider.handle(tethering);
+
         for (const auto app : getStackedApplications()) {
+            LOG_INFO("********************@ app name:\t\t%s", app->name().c_str());
             changeTetheringState(tethering, app);
         }
     }

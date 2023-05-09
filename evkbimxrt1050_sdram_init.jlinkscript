@@ -261,7 +261,7 @@ void WDOG_Disable(){
 }
 
 /* SetupTarget */
-int AfterResetTarget(void) {
+void AfterResetTarget(void) {
   JLINK_SYS_Report("Enabling i.MXRT SDRAM");
   /*Load_Dcdc_Trim();*/
   WDOG_Disable();

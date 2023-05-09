@@ -143,3 +143,5 @@ target_compile_options(apps-common
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
 
 )
+
+set_source_files_properties(ApplicationCommon.cpp PROPERTIES COMPILE_OPTIONS "-O0;-fno-omit-frame-pointer;-ggdb3")

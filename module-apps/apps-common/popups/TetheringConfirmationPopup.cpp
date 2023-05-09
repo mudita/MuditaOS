@@ -23,7 +23,10 @@ namespace gui
         metadata.action = [this]() {
             application->bus.sendUnicast(std::make_shared<sys::TetheringEnabledResponse>(),
                                          service::name::system_manager);
-            app::manager::Controller::sendAction(application, app::manager::actions::Home);
+            auto appLaunchData = std::make_unique<app::ApplicationLaunchData>("ApplicationDesktop");
+            appLaunchData->disableAppClose = true;
+            app::manager::Controller::sendAction(
+                this->application, app::manager::actions::Launch, std::move(appLaunchData));
             return true;
         };
         auto msg = std::make_unique<DialogMetadataMessage>(std::move(metadata));
