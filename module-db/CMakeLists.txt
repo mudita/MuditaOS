@@ -119,6 +119,7 @@ set(SOURCES
         queries/phonebook/QueryContactUpdate.cpp
         queries/phonebook/QueryMergeContactsList.cpp
         queries/phonebook/QueryNumberGetByID.cpp
+        queries/phonebook/QueryNumbersGetByIDs.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

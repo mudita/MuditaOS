@@ -81,9 +81,6 @@ See: [Pagination](../../protocol_description/pagination.md)
         "favourite": true,
         "ice": true,
         "id": 1,
-        "numbers": [
-          "123456789"
-        ],
         "numbersIDs": [
           "1"
         ],
@@ -99,11 +96,8 @@ See: [Pagination](../../protocol_description/pagination.md)
         "favourite": true,
         "ice": true,
         "id": 3,
-        "numbers": [
-          "123456789"
-        ],
         "numbersIDs": [
-          "1"
+          "3"
         ],
         "speedDial": "7",
         "priName": "Charles",
@@ -161,11 +155,8 @@ Parameters:
     "favourite": false,
     "ice": true,
     "id": 5,
-    "numbers": [
-      "123456789"
-    ],
     "numbersIDs": [
-      "1"
+      "5"
     ],
     "speedDial": "6",
     "priName": "Donna",

@@ -23,6 +23,7 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <queries/phonebook/QueryNumbersGetByIDs.hpp>
 
 namespace
 {
@@ -445,6 +446,9 @@ auto ContactRecordInterface::runQuery(std::shared_ptr<db::Query> query) -> std::
     else if (typeid(*query) == typeid(db::query::NumberGetByID)) {
         return numberGetByIdQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::NumbersGetByIDs)) {
+        return numbersGetByIdsQuery(query);
+    }
     else if (typeid(*query) == typeid(db::query::MergeContactsList)) {
         return mergeContactsListQuery(query);
     }
@@ -682,6 +686,20 @@ auto ContactRecordInterface::numberGetByIdQuery(const std::shared_ptr<db::Query>
     auto numberQuery = static_cast<db::query::NumberGetByID *>(query.get());
     auto result      = ContactRecordInterface::GetNumberById(numberQuery->getID());
     auto response    = std::make_unique<db::query::NumberGetByIDResult>(result);
+    response->setRequestQuery(query);
+    return response;
+}
+
+auto ContactRecordInterface::numbersGetByIdsQuery(const std::shared_ptr<db::Query> &query)
+    -> const std::unique_ptr<db::QueryResult>
+{
+    auto numberQuery     = static_cast<db::query::NumbersGetByIDs *>(query.get());
+    const auto numberIDs = numberQuery->getIDs();
+    std::map<std::uint32_t, utils::PhoneNumber::View> results{};
+    for (const auto id : numberIDs) {
+        results[id] = ContactRecordInterface::GetNumberById(id);
+    }
+    auto response = std::make_unique<db::query::NumbersGetByIDsResult>(results);
     response->setRequestQuery(query);
     return response;
 }

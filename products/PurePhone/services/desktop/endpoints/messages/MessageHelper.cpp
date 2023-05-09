@@ -62,21 +62,7 @@ namespace sdesktop::endpoints
 
     auto MessageHelper::toJson(const ThreadRecord &thread) -> json11::Json
     {
-
-        auto recordEntry = json11::Json::object{{json::messages::lastUpdatedAt, static_cast<int>(thread.date)},
-                                                {json::messages::messageCount, static_cast<int>(thread.msgCount)},
-                                                {json::messages::threadID, static_cast<int>(thread.ID)},
-                                                {json::messages::messageSnippet, thread.snippet.c_str()},
-                                                {json::messages::isUnread, thread.isUnread()},
-                                                {json::messages::messageType, static_cast<int>(thread.type)}};
-        return recordEntry;
-    }
-
-    auto MessageHelper::toJson(const ThreadRecord &thread, const utils::PhoneNumber::View &number) -> json11::Json
-    {
-
-        auto recordEntry = json11::Json::object{{json::messages::number, number.getFormatted()},
-                                                {json::messages::numberID, std::to_string(thread.numberID).c_str()},
+        auto recordEntry = json11::Json::object{{json::messages::numberID, std::to_string(thread.numberID).c_str()},
                                                 {json::messages::lastUpdatedAt, static_cast<int>(thread.date)},
                                                 {json::messages::messageCount, static_cast<int>(thread.msgCount)},
                                                 {json::messages::threadID, static_cast<int>(thread.ID)},
@@ -536,10 +522,9 @@ namespace sdesktop::endpoints
                     if (auto threadsResults = dynamic_cast<db::query::ThreadsGetForListResults *>(result)) {
                         json11::Json::array threadsArray;
                         const auto threads = threadsResults->getResults();
-                        const auto numbers = threadsResults->getNumbers();
                         threadsArray.reserve(threads.size());
                         for (std::size_t i = 0; i < threads.size(); ++i) {
-                            threadsArray.emplace_back(MessageHelper::toJson(threads[i], numbers[i]));
+                            threadsArray.emplace_back(MessageHelper::toJson(threads[i]));
                         }
                         context.setResponseBody(std::move(threadsArray));
                         context.setTotalCount(threadsResults->getCount());

@@ -14,7 +14,9 @@ target_sources(
         messages/MessagesEndpoint.cpp
         outbox/OutboxHelper.cpp
         outbox/OutboxEndpoint.cpp
-    PUBLIC
+        phoneNumber/PhoneNumberHelper.cpp
+        phoneNumber/PhoneNumbersEndpoint.cpp
+        PUBLIC
         include/endpoints/calllog/CalllogEndpoint.hpp
         include/endpoints/calllog/CalllogHelper.hpp
         include/endpoints/contacts/ContactHelper.hpp
@@ -24,8 +26,9 @@ target_sources(
         include/endpoints/messages/MessagesEndpoint.hpp
         include/endpoints/outbox/OutboxHelper.hpp
         include/endpoints/outbox/OutboxEndpoint.hpp
+        include/endpoints/phoneNumber/PhoneNumberHelper.hpp
+        include/endpoints/phoneNumber/PhoneNumbersEndpoint.hpp
 )
-
 target_include_directories(
         desktop-endpoints-product
     PUBLIC

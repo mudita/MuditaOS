@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EndpointFactoryPure.hpp"
@@ -17,6 +17,7 @@
 #include <endpoints/restore/RestoreEndpoint.hpp>
 #include <endpoints/security/SecurityEndpoint.hpp>
 #include <endpoints/update/UpdateEndpoint.hpp>
+#include <endpoints/phoneNumber/PhoneNumbersEndpoint.hpp>
 
 namespace sdesktop::endpoints
 {
@@ -53,6 +54,8 @@ namespace sdesktop::endpoints
             return std::make_unique<SecurityEndpoint>(ownerServicePtr);
         case EndpointType::outbox:
             return std::make_unique<OutboxEndpoint>(ownerServicePtr);
+        case EndpointType::phoneNumber:
+            return std::make_unique<PhoneNumbersEndpoint>(ownerServicePtr);
         default:
             return std::make_unique<NullEndpoint>(ownerServicePtr);
         }

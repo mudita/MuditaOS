@@ -68,7 +68,6 @@ See: [Pagination](../../protocol_description/pagination.md)
         "messageCount": 6,
         "messageSnippet": "Wiadomo<0xc5><0x9b><0xc4><0x87> testowa.",
         "messageType": 1,
-        "number": "123456789",
         "numberID": "1",
         "threadID": 1
       },
@@ -78,7 +77,6 @@ See: [Pagination](../../protocol_description/pagination.md)
         "messageCount": 1,
         "messageSnippet": "Lorem ipsum dolor sit amet, consectetur adipiscing",
         "messageType": 16,
-        "number": "123456789",
         "numberID": "1",
         "threadID": 5
       },
@@ -88,7 +86,6 @@ See: [Pagination](../../protocol_description/pagination.md)
         "messageCount": 1,
         "messageSnippet": "cos tam",
         "messageType": 8,
-        "number": "123456789",
         "numberID": "1",
         "threadID": 6
       }
@@ -154,7 +151,8 @@ request was completed within the current page.
     "messageCount": 1,
     "messageSnippet": "Hello",
     "messageType": 1,
-    "threadID": 8
+    "threadID": 8,
+    "numberID": 1
   },
   "endpoint": 8,
   "status": 200,
