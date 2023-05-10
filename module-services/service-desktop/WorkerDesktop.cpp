@@ -48,10 +48,10 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     ownerService->bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
-    bsp::usbInitParams initParams = {
+    const bsp::usbInitParams initParams = {
         receiveQueue, irqQueue, serialNumber, device_colour::getColourVersion(caseColour), rootPath};
 
-    initialized = bsp::usbInit(initParams) >= 0;
+    initialized = bsp::usbInit(initParams) == 0;
 
     cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_4);
 
@@ -202,18 +202,8 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
         usbStatus = bsp::USBDeviceStatus::Connected;
     }
     else if (notification == bsp::USBDeviceStatus::Configured) {
-        if (usbStatus == bsp::USBDeviceStatus::Connected) {
-            LOG_DEBUG("USB status: First configuration");
-            ownerService->bus.sendUnicast(
-                std::make_shared<sdesktop::usb::USBConfigured>(sdesktop::usb::USBConfigurationType::firstConfiguration),
-                service::name::service_desktop);
-        }
-        else {
-            LOG_DEBUG("USB status: Reconfiguration");
-            ownerService->bus.sendUnicast(
-                std::make_shared<sdesktop::usb::USBConfigured>(sdesktop::usb::USBConfigurationType::reconfiguration),
-                service::name::service_desktop);
-        }
+        LOG_DEBUG("USB status: Configured");
+        ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConfigured>(), service::name::service_desktop);
         usbStatus = bsp::USBDeviceStatus::Configured;
     }
     else if (notification == bsp::USBDeviceStatus::Disconnected) {
@@ -227,14 +217,6 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
     }
     else if (notification == bsp::USBDeviceStatus::Reset) {
         LOG_DEBUG("USB status: Reset");
-        if (usbStatus == bsp::USBDeviceStatus::Configured) {
-            reset();
-        }
     }
     return true;
-}
-
-void WorkerDesktop::suspendUsb()
-{
-    bsp::usbSuspend();
 }
