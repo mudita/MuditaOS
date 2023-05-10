@@ -327,9 +327,7 @@ auto ServiceDesktop::handle(sdesktop::usb::USBConfigured *msg) -> std::shared_pt
         bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), service::name::appmgr);
     }
     else {
-        auto message = static_cast<sdesktop::usb::USBConfigured *>(msg);
-        if (message->getConfigurationType() == sdesktop::usb::USBConfigurationType::firstConfiguration &&
-            isPlugEventUnhandled) {
+        if (isPlugEventUnhandled) {
             bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
                             service::name::system_manager);
             isPlugEventUnhandled = false;
