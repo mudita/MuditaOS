@@ -27,6 +27,7 @@
 * Added new field to deviceInfo endpoint
 * Changed order in which files are displayed in Relaxation
 * Optimized E-Ink energy consumption
+* Changed the layout of the battery status
 
 ## [1.9.0 2023-04-03]
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,7 +6,6 @@
 #include <Units.hpp>
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Image.hpp>
-#include <gui/widgets/text/TextFixedSize.hpp>
 
 namespace gui
 {
@@ -14,7 +13,7 @@ namespace gui
     namespace battery
     {
         constexpr auto font_small         = style::window::font::largelight;
-        constexpr auto image_right_margin = 5U;
+        constexpr auto image_left_margin  = 8U;
         constexpr auto percent_h          = 102U;
         constexpr auto percent_w          = 106U;
         constexpr auto battery_widget_h   = 64U;
