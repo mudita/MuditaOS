@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/data/BatteryUtils.hpp>
 #include <common/widgets/BellBattery.hpp>
-#include <Image.hpp>
+#include <gui/widgets/text/TextFixedSize.hpp>
 
 namespace
 {
@@ -22,9 +22,6 @@ namespace gui
 {
     BellBattery::BellBattery(Item *parent, BatteryWidthMode widthMode) : HBox(parent), widthMode(widthMode)
     {
-        img = new Image(this, battery_low, gui::ImageTypeSpecifier::W_M);
-        img->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-
         percentText = new Text(this);
         percentText->setMaximumSize(battery::percent_w, battery::percent_h);
         percentText->setFont(battery::font_small);
@@ -35,6 +32,9 @@ namespace gui
         percentText->drawUnderline(false);
         percentText->setText("000%");
         percentText->setVisible(false);
+
+        img = new Image(this, battery_low, gui::ImageTypeSpecifier::W_M);
+        img->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
     }
 
     void BellBattery::setFont(const UTF8 &fontName)
@@ -70,7 +70,7 @@ namespace gui
     {
         batteryPercentMode = mode;
         if (batteryPercentMode == BatteryPercentMode::Show) {
-            img->setMargins(gui::Margins(0, 0, battery::image_right_margin, 0));
+            img->setMargins(gui::Margins(battery::image_left_margin, 0, 0, 0));
             percentText->setVisible(true);
         }
         else {
@@ -86,7 +86,7 @@ namespace gui
 
     void BellBattery::setWidthsToFitContent()
     {
-        auto width = img->widgetMinimumArea.w + img->getMargins().right;
+        auto width = img->widgetMinimumArea.w + img->getMargins().left;
         if (percentText->visible) {
             percentText->setMinimumWidthToFitText();
             width += percentText->widgetMinimumArea.w;
