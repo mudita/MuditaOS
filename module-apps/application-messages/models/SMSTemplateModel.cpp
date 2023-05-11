@@ -20,11 +20,9 @@ unsigned int SMSTemplateModel::requestRecordsCount()
 
 bool SMSTemplateModel::updateRecords(std::vector<SMSTemplateRecord> records)
 {
-    if (DatabaseModel::updateRecords(std::move(records))) {
-        list->onProviderDataUpdate();
-        return true;
-    }
-    return false;
+    DatabaseModel::updateRecords(std::move(records));
+    list->onProviderDataUpdate();
+    return true;
 }
 
 unsigned int SMSTemplateModel::getMinimalItemSpaceRequired() const

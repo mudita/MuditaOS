@@ -44,6 +44,7 @@ namespace gui
 
         navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::use));
         navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
+        navBar->setActive(nav_bar::Side::Right, true);
 
         namespace style = style::messages::templates::list;
 
@@ -61,6 +62,19 @@ namespace gui
                                  utils::translate("app_messages_no_templates"));
         emptyListIcon->setVisible(false);
 
+        list->setVisible(true);
+
+        list->emptyListCallback = [this]() {
+            emptyListIcon->setVisible(true);
+            navBar->setActive(nav_bar::Side::Center, false);
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        };
+
+        list->notEmptyListCallback = [this]() {
+            emptyListIcon->setVisible(false);
+            navBar->setActive(nav_bar::Side::Center, true);
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        };
         setFocusItem(list);
     }
 
@@ -104,16 +118,6 @@ namespace gui
     void SMSTemplatesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         preventsAutoLock = false;
-        if (mode == ShowMode::GUI_SHOW_INIT) {
-            list->rebuildList();
-        }
-
-        if (list->isEmpty()) {
-            list->clear();
-        }
-
-        navBar->setActive(nav_bar::Side::Center, !list->isEmpty());
-        emptyListIcon->setVisible(list->isEmpty());
 
         if (auto switchData = dynamic_cast<SMSTemplateRequest *>(data)) {
             smsTemplateRequestHandler(switchData);
@@ -123,6 +127,8 @@ namespace gui
             saveInfoAboutPreviousAppForProperSwitchBack(data);
             smsSendTemplateRequestHandler(switchData);
         }
+
+        list->rebuildList(listview::RebuildType::InPlace);
     }
 
     bool SMSTemplatesWindow::onInput(const InputEvent &inputEvent)
