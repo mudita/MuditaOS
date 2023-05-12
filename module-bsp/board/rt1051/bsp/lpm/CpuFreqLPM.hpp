@@ -7,6 +7,7 @@
 
 namespace bsp
 {
+    inline constexpr std::uint32_t VDDRun_950_mV  = 0x06;
     inline constexpr std::uint32_t VDDRun_975_mV  = 0x07;
     inline constexpr std::uint32_t VDDRun_1050_mV = 0x0A;
     inline constexpr std::uint32_t VDDRun_1075_mV = 0x0B;
@@ -31,9 +32,27 @@ namespace bsp
             CpuClock_Pll2_528_Mhz
         };
 
+        /* Plain enums to avoid casting when passing to FSL functions */
+        enum AhbDivValues
+        {
+            AhbDiv1 = 0,
+            AhbDiv2,
+            AhbDiv3,
+            AhbDiv4,
+            AhbDiv5,
+            AhbDiv6,
+            AhbDiv7,
+            AhbDiv8
+        };
+
+        enum PeriphMuxSources
+        {
+            PeriphMuxSourcePll2_528MHz = 0,
+            PeriphMuxSourceOsc_24MHz
+        };
+
         CpuFreqLPM();
         void SetCpuFrequency(CpuClock freq);
         void SetHighestCoreVoltage();
     };
 } // namespace bsp
-
