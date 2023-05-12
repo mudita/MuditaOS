@@ -1,8 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverPLL2.hpp"
 #include "board/rt1051/bsp/lpm/ClockState.hpp"
+#include "board/rt1051/bsp/lpm/CpuFreqLPM.hpp"
+#include "fsl_dcdc.h"
 
 namespace drivers
 {
@@ -14,6 +16,8 @@ namespace drivers
     RT1051DriverPLL2::RT1051DriverPLL2() noexcept
     {
         if (!IsPLL2Enabled()) {
+            // Set VDD_SOC_IN required to safely start PLL2
+            DCDC_AdjustTargetVoltage(DCDC, bsp::VDDRun_1150_mV, bsp::VDDStandby_925_mV);
             // Turn on regular band gap and wait for stable
             CCM_ANALOG->MISC0_CLR = CCM_ANALOG_MISC0_REFTOP_PWD_MASK;
             // It is recommended to wait for stabilization (documentation Low Power AN12085)
@@ -39,6 +43,9 @@ namespace drivers
             PMU->MISC0_SET              = constants::REFTOP_LOWPOWER_FLAG;
             XTALOSC24M->LOWPWR_CTRL_SET = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
             PMU->MISC0_SET              = CCM_ANALOG_MISC0_REFTOP_PWD_MASK;
+
+            // After turning off PLL2 and with CPU @4MHZ VDD_SOC_IN can be set to 950mV, 975mV to be safe
+            DCDC_AdjustTargetVoltage(DCDC, bsp::VDDRun_975_mV, bsp::VDDStandby_925_mV);
         }
     }
 
