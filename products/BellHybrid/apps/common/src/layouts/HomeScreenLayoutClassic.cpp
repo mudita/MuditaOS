@@ -69,9 +69,15 @@ namespace gui
         statusBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         statusBox->setVisible(true);
 
-        batteryBox = new VBox(statusBox);
-        batteryBox->setMinimumSize(style::homescreen_classic::status_box_layout_w,
-                                   style::bell_base_layout::last_layout_h);
+        widgetBox = new VBox(statusBox);
+        widgetBox->setMinimumSize(style::homescreen_classic::status_box_layout_w,
+                                  style::bell_base_layout::last_layout_h);
+        widgetBox->setEdges(RectangleEdge::All);
+        widgetBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        widgetBox->setVisible(true);
+
+        batteryBox = new HBox(widgetBox);
+        batteryBox->setMinimumSize(style::homescreen_classic::status_box_layout_w, 70U);
         batteryBox->setEdges(RectangleEdge::All);
         batteryBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         batteryBox->setVisible(true);
@@ -79,22 +85,22 @@ namespace gui
         battery = new BellBattery(batteryBox, gui::BatteryWidthMode::FitToContent);
         battery->setMargins(Margins(0U, 18U, 0U, 0U));
         battery->setMaximumSize(battery::battery_widget_w, battery::battery_widget_h);
-        battery->setEdges(RectangleEdge::None);
+        battery->setEdges(RectangleEdge::All);
         battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        battery->setVisible(true);
+        battery->setVisible(false);
         battery->setBatteryPercentMode(BatteryPercentMode::Show);
 
-        // connectionBox = new VBox(statusBox);
-        // connectionBox->setMinimumSize(style::homescreen_classic::status_box_layout_w, 57U);
-        // connectionBox->setEdges(RectangleEdge::All);
-        // connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        // connectionBox->setVisible(true);
+        connectionBox = new HBox(widgetBox);
+        connectionBox->setMinimumSize(style::homescreen_classic::status_box_layout_w, 44U);
+        connectionBox->setEdges(RectangleEdge::All);
+        connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        connectionBox->setVisible(true);
 
-        statusText = new Text(batteryBox);
+        statusText = new Text(connectionBox);
         statusText->setMaximumSize(350U, battery::percent_h);
         statusText->setFont(style::window::font::veryverybiglight);
-        statusText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
-        statusText->setEdges(RectangleEdge::None);
+        statusText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        statusText->setEdges(RectangleEdge::All);
         statusText->setEditMode(EditMode::Browse);
         statusText->activeItem = false;
         statusText->drawUnderline(false);

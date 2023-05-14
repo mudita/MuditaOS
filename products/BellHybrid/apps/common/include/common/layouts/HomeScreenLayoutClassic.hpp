@@ -66,8 +66,9 @@ namespace gui
         HBox *timeHBox            = nullptr;
         TimeSetFmtSpinner *time   = nullptr;
         HBox *statusBox           = nullptr;
-        VBox *batteryBox          = nullptr;
-        VBox *connectionBox       = nullptr;
+        HBox *batteryBox          = nullptr;
+        HBox *connectionBox       = nullptr;
+        VBox *widgetBox           = nullptr;
         BellBattery *battery      = nullptr;
         Text *statusText          = nullptr;
         TextFixedSize *bottomText = nullptr;
