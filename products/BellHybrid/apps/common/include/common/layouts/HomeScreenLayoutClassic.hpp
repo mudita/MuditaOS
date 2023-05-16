@@ -20,6 +20,7 @@ namespace gui
     class TimeSetFmtSpinner;
     class SnoozeTimer;
     class BellBattery;
+    class BellConnectionStatus;
     class DuoHBox;
 
     enum class LayoutClassicVersion
@@ -53,6 +54,7 @@ namespace gui
         auto getAlarmTime() const -> std::time_t override;
         auto setAlarmTime(std::time_t newTime) -> void override;
         auto setSnoozeTime(std::time_t newTime) -> void override;
+        //        auto setConnectionStatus(const Store::Battery &batteryContext) -> void override;
 
         auto getSnoozeTimer() -> SnoozeTimer * override;
         auto getLayout() -> Item * override;
@@ -63,14 +65,15 @@ namespace gui
         virtual bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext);
         void removeTextDescription();
 
-        HBox *timeHBox            = nullptr;
-        TimeSetFmtSpinner *time   = nullptr;
-        HBox *statusBox           = nullptr;
-        HBox *batteryBox          = nullptr;
-        HBox *connectionBox       = nullptr;
-        VBox *widgetBox           = nullptr;
-        BellBattery *battery      = nullptr;
-        Text *statusText          = nullptr;
+        VBox *widgetBox                        = nullptr;
+        HBox *timeHBox                         = nullptr;
+        TimeSetFmtSpinner *time                = nullptr;
+        HBox *statusBox                        = nullptr;
+        HBox *infoBox                          = nullptr;
+        HBox *connectionBox                    = nullptr;
+        BellBattery *battery                   = nullptr;
+        BellConnectionStatus *connectionStatus = nullptr;
+        //        Text *statusText                       = nullptr;
         TextFixedSize *bottomText = nullptr;
         AlarmSetSpinner *alarm    = nullptr;
         SnoozeTimer *snoozeTimer  = nullptr;

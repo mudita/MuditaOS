@@ -21,6 +21,8 @@ namespace style::bell_base_layout
     constexpr inline auto center_layout_w     = w;
     constexpr inline auto center_layout_h     = 200U;
     constexpr inline auto arrows_layout_w     = 504U;
+    constexpr inline auto info_box_top_margin = 18U;
+
 } // namespace style::bell_base_layout
 
 namespace gui

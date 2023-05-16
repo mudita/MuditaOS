@@ -47,9 +47,32 @@ namespace gui
 
         time = new ClockVertical(centerBox);
         time->setFont(style::window::font::colossal);
-        time->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
+        time->setMinimumSize(style::homescreen_vertical::center_box_w, 400);
         time->setEdges(RectangleEdge::All);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
+        //        connectionBox = new gui::HBox(centerBox, 0, 0, style::homescreen_vertical::center_box_w, 0);
+        //        connectionBox->setEdges(gui::RectangleEdge::All);
+        //        connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        //        connectionBox->setMargins(gui::Margins(0, 200, 0, 0));
+        //        connectionBox->setMinimumSize(style::homescreen_vertical::center_box_w,
+        //                                      style::homescreen_vertical::center_box_h);
+
+        connectionBox = new HBox(centerBox);
+        connectionBox->setMinimumSize(350, 44U);
+        connectionBox->setEdges(RectangleEdge::All);
+        connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        connectionBox->setVisible(true);
+
+        connectionStatus = new Text(connectionBox);
+        connectionStatus->setMaximumSize(350U, 102);
+        connectionStatus->setFont(style::window::font::veryverybiglight);
+        connectionStatus->setEdges(RectangleEdge::All);
+        connectionStatus->setEditMode(EditMode::Browse);
+        connectionStatus->activeItem = false;
+        connectionStatus->drawUnderline(false);
+        connectionStatus->setText("Connected");
+        connectionStatus->setVisible(true);
 
         rightBox = new VBox(mainScreen, 0, 0, 0, 0);
         rightBox->setMinimumSize(style::homescreen_vertical::side_box_w, style::window_height);

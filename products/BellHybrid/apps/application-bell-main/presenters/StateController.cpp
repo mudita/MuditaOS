@@ -84,6 +84,9 @@ namespace app::home_screen
             auto updateBatteryStatus = [](AbstractView &view, AbstractBatteryModel &batteryModel) {
                 view.setBatteryLevelState(batteryModel.getLevelState());
             };
+            //            auto updateConnectionStatus = [](AbstractView &view, AbstractBatteryModel &batteryModel) {
+            //                // view.setConnectionStatus(batteryModel.getLevelState());
+            //            };
 
         } // namespace Helpers
 
@@ -115,6 +118,8 @@ namespace app::home_screen
             {};
             struct BatteryUpdate
             {};
+            //            struct ConnectionStatusUpdate
+            //            {};
         } // namespace Events
 
         namespace Init
@@ -127,6 +132,7 @@ namespace app::home_screen
                 alarmModel.update([&]() { presenter.handleAlarmModelReady(); });
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setBatteryLevelState(batteryModel.getLevelState());
+                // view.setConnectionStatus(batteryModel.getLevelState());
             };
         } // namespace Init
 
@@ -140,6 +146,7 @@ namespace app::home_screen
                 view.setViewState(ViewState::Deactivated);
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setBatteryLevelState(batteryModel.getLevelState());
+                // view.setConnectionStatus(batteryModel.getLevelState());
             };
         } // namespace Deactivated
 
@@ -218,6 +225,7 @@ namespace app::home_screen
                 view.setViewState(ViewState::Activated);
                 view.setAlarmTime(alarmModel.getAlarmTime());
                 view.setBatteryLevelState(batteryModel.getLevelState());
+                // view.setConnectionStatus(batteryModel.getLevelState());
             };
         } // namespace Activated
 
@@ -267,6 +275,7 @@ namespace app::home_screen
                 view.setSnoozeTime(Clock::to_time_t(alarmModel.getTimeOfNextSnooze()));
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setBatteryLevelState(batteryModel.getLevelState());
+                // view.setConnectionStatus(batteryModel.getLevelState());
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.stopSnoozeTimer(); };
         } // namespace AlarmSnoozed
@@ -292,6 +301,7 @@ namespace app::home_screen
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
                                              "Deactivated"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus,
                                              "Deactivated"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
+//                                             "Deactivated"_s + event<Events::ConnectionStatusUpdate>  / Helpers::updateConnectionStatus,
 
                                              "DeactivatedWait"_s + sml::on_entry<_> / DeactivatedWait::entry,
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
@@ -312,6 +322,7 @@ namespace app::home_screen
                                              "DeactivatedEdit"_s + event<Events::LightPress> / Helpers::setNewAlarmTime = "WaitForConfirmation"_s,
                                              "DeactivatedEdit"_s + event<Events::BackPress> / AlarmEdit::revertChanges = "Deactivated"_s,
                                              "DeactivatedEdit"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
+//                                             "DeactivatedEdit"_s + event<Events::ConnectionStatusUpdate>  / Helpers::updateConnectionStatus,
 
                                              "WaitForConfirmation"_s + sml::on_entry<_> / WaitForConfirmation::entry,
                                              "WaitForConfirmation"_s + sml::on_exit<_> / WaitForConfirmation::exit,
@@ -342,6 +353,7 @@ namespace app::home_screen
                                              "Activated"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
                                              "Activated"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus,
                                              "Activated"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
+//                                             "Activated"_s + event<Events::ConnectionStatusUpdate>  / Helpers::updateConnectionStatus,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
@@ -353,6 +365,7 @@ namespace app::home_screen
                                              "ActivatedEdit"_s + event<Events::BackPress> / AlarmEdit::revertChanges = "Activated"_s,
                                              "ActivatedEdit"_s + event<Events::DeepDownPress> / AlarmEdit::revertChanges = "DeactivatedWait"_s,
                                              "ActivatedEdit"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
+//                                             "ActivatedEdit"_s + event<Events::ConnectionStatusUpdate>  / Helpers::updateConnectionStatus,
 
                                              "AlarmRinging"_s + sml::on_entry<_> / AlarmRinging::entry,
                                              "AlarmRinging"_s + sml::on_exit<_> / AlarmRinging::exit,
@@ -393,6 +406,7 @@ namespace app::home_screen
                                              "AlarmSnoozed"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
                                              "AlarmSnoozed"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
                                              "AlarmSnoozed"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus
+//                                             "AlarmSnoozed"_s + event<Events::ConnectionStatusUpdate>  / Helpers::updateConnectionStatus
                     );
                 // clang-format on
             }
@@ -554,6 +568,8 @@ namespace app::home_screen
     bool StateController::handleBatteryStatus()
     {
         pimpl->sm->process_event(Events::BatteryUpdate{});
+        //        pimpl->sm->process_event(Events::ConnectionStatusUpdate{});
+
         return true;
     }
 

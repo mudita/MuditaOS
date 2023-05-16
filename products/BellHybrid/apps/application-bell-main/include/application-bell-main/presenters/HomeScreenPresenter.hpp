@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -63,6 +63,7 @@ namespace app::home_screen
         virtual void setTemperature(utils::temperature::Temperature newTemp)    = 0;
         virtual void setTextDescription(const UTF8 &desc)                       = 0;
         virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
+        //        virtual void setConnectionStatus(const Store::Battery &batteryContext)  = 0;
 
         /// Various
         virtual void setLayout(gui::LayoutGenerator layoutGenerator) = 0;

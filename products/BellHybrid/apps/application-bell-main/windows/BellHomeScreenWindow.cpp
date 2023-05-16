@@ -94,6 +94,13 @@ namespace gui
         }
     }
 
+    //    void BellHomeScreenWindow::setConnectionStatus(const Store::Battery &batteryContext)
+    //    {
+    //        if (currentLayout) {
+    //            currentLayout->setConnectionStatus(batteryContext);
+    //        }
+    //    }
+
     void BellHomeScreenWindow::setTime(std::time_t newTime)
     {
         if (currentLayout) {

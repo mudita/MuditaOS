@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -35,6 +35,7 @@ namespace gui
         void setTemperature(utils::temperature::Temperature newTemp) override;
         void setTextDescription(const UTF8 &desc) override;
         void setBatteryLevelState(const Store::Battery &batteryContext) override;
+        //        void setConnectionStatus(const Store::Battery &batteryContext) override;
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
         void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) override;
