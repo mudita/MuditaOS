@@ -16,6 +16,7 @@
 * Fixed problem that UI could be occasionally broken
 * Fixed problem with displaying end of title when playing song in loop was selected.
 * Fixed USB charging port detection.
+* Fixed occasional crash on system startup.
 
 ### Added
 
