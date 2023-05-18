@@ -17,6 +17,7 @@
 #include <widgets/AlarmIcon.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/ClockVertical.hpp>
+#include <widgets/BellConnectionStatus.hpp>
 
 namespace gui
 {
@@ -28,51 +29,41 @@ namespace gui
 
         setMinimumSize(style::window_width, style::window_height);
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        setEdges(RectangleEdge::All);
+        setEdges(RectangleEdge::None);
 
         // Main Screen
         mainScreen = new HBox(this);
         mainScreen->setMinimumSize(style::window_width, style::window_height);
-        mainScreen->setEdges(RectangleEdge::All);
+        mainScreen->setEdges(RectangleEdge::None);
 
         leftBox = new VBox(mainScreen, 0, 0, 0, 0);
         leftBox->setMinimumSize(style::homescreen_vertical::side_box_w, style::window_height);
-        leftBox->setEdges(RectangleEdge::All);
+        leftBox->setEdges(RectangleEdge::None);
         leftBox->setMargins(Margins({style::homescreen_vertical::leftMargin, 0, 0, 0}));
 
         auto centerBox = new VBox(mainScreen, 0, 0, 0, 0);
         centerBox->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
-        centerBox->setEdges(RectangleEdge::All);
+        centerBox->setEdges(RectangleEdge::None);
         centerBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         time = new ClockVertical(centerBox);
         time->setFont(style::window::font::colossal);
-        time->setMinimumSize(style::homescreen_vertical::center_box_w, 400);
-        time->setEdges(RectangleEdge::All);
+        time->setMinimumSize(style::homescreen_vertical::center_box_w,
+                             style::window_height - style::homescreen_vertical::connectionBoxSize);
+        time->setEdges(RectangleEdge::None);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-
-        //        connectionBox = new gui::HBox(centerBox, 0, 0, style::homescreen_vertical::center_box_w, 0);
-        //        connectionBox->setEdges(gui::RectangleEdge::All);
-        //        connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        //        connectionBox->setMargins(gui::Margins(0, 200, 0, 0));
-        //        connectionBox->setMinimumSize(style::homescreen_vertical::center_box_w,
-        //                                      style::homescreen_vertical::center_box_h);
+        time->setMargins(Margins(0, 0, 0, -30));
 
         connectionBox = new HBox(centerBox);
-        connectionBox->setMinimumSize(350, 44U);
-        connectionBox->setEdges(RectangleEdge::All);
+        connectionBox->setMinimumSize(style::homescreen_vertical::center_box_w,
+                                      style::homescreen_vertical::connectionBoxSize);
+        connectionBox->setEdges(RectangleEdge::None);
         connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         connectionBox->setVisible(true);
 
-        connectionStatus = new Text(connectionBox);
-        connectionStatus->setMaximumSize(350U, 102);
-        connectionStatus->setFont(style::window::font::veryverybiglight);
-        connectionStatus->setEdges(RectangleEdge::All);
-        connectionStatus->setEditMode(EditMode::Browse);
-        connectionStatus->activeItem = false;
-        connectionStatus->drawUnderline(false);
-        connectionStatus->setText("Connected");
-        connectionStatus->setVisible(true);
+        leftBox->setMargins(Margins({style::homescreen_vertical::leftMargin, 0, 0, 0}));
+
+        connectionStatus = new BellConnectionStatus(connectionBox);
 
         rightBox = new VBox(mainScreen, 0, 0, 0, 0);
         rightBox->setMinimumSize(style::homescreen_vertical::side_box_w, style::window_height);

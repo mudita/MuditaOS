@@ -6,6 +6,7 @@
 #include "widgets/BellBattery.hpp"
 #include "widgets/DuoHBox.hpp"
 #include "widgets/SnoozeTimer.hpp"
+#include "widgets/BellConnectionStatus.hpp"
 
 #include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/widgets/Icon.hpp>
@@ -149,6 +150,8 @@ namespace gui
     void HomeScreenLayoutVertical::setBatteryLevelState(const Store::Battery &batteryContext)
     {
         battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
+        connectionStatus->update(batteryContext.state);
+
         if (isBatteryVisibilityAllowed(batteryContext)) {
             battery->setVisible(true);
         }
@@ -156,10 +159,8 @@ namespace gui
             battery->setVisible(false);
         }
         battery->informContentChanged();
+        connectionStatus->informContentChanged();
     }
-
-    //    void HomeScreenLayoutVertical::setConnectionStatus(const Store::Battery & /*batteryContext*/)
-    //    {}
 
     void HomeScreenLayoutVertical::setTime(std::time_t newTime)
     {

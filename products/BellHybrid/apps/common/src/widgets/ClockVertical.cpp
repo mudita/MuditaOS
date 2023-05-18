@@ -21,22 +21,22 @@ namespace gui
         using namespace utils;
 
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        setEdges(RectangleEdge::All);
+        setEdges(RectangleEdge::None);
 
         hBoxHours = new gui::HBox(this, 0, 0, style::homescreen_vertical::center_box_w, 0);
-        hBoxHours->setEdges(gui::RectangleEdge::All);
+        hBoxHours->setEdges(gui::RectangleEdge::None);
         hBoxHours->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         hBoxHours->setMinimumSize(style::homescreen_vertical::center_box_w, style::homescreen_vertical::center_box_h);
         hBoxHours->setMargins(gui::Margins(0, 0, 0, style::homescreen_vertical::topNegativeMargin));
 
         hBoxHoursLeft = new gui::HBox(hBoxHours, 0, 0, 0, 0);
-        hBoxHoursLeft->setEdges(gui::RectangleEdge::All);
+        hBoxHoursLeft->setEdges(gui::RectangleEdge::None);
         hBoxHoursLeft->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         hBoxHoursLeft->setMaximumSize(style::homescreen_vertical::digit_box_w,
                                       style::homescreen_vertical::center_box_h);
 
         hBoxHoursRight = new gui::HBox(hBoxHours, 0, 0, 0, 0);
-        hBoxHoursRight->setEdges(gui::RectangleEdge::All);
+        hBoxHoursRight->setEdges(gui::RectangleEdge::None);
         hBoxHoursRight->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         hBoxHoursRight->setMaximumSize(style::homescreen_vertical::digit_box_w,
                                        style::homescreen_vertical::center_box_h);
@@ -45,7 +45,7 @@ namespace gui
         updateFont(hourFirst, fontName);
 
         hourFirst->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
-        hourFirst->setEdges(RectangleEdge::All);
+        hourFirst->setEdges(RectangleEdge::None);
         hourFirst->setText("0");
         hourFirst->drawUnderline(false);
 
@@ -53,24 +53,24 @@ namespace gui
         updateFont(hourSecond, fontName);
 
         hourSecond->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
-        hourSecond->setEdges(RectangleEdge::All);
+        hourSecond->setEdges(RectangleEdge::None);
         hourSecond->setText("0");
         hourSecond->drawUnderline(false);
 
         hBoxMinutes = new gui::HBox(this, 0, 0, style::homescreen_vertical::center_box_w, 0);
-        hBoxMinutes->setEdges(gui::RectangleEdge::All);
-        hBoxMinutes->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        hBoxMinutes->setEdges(gui::RectangleEdge::None);
+        hBoxMinutes->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         hBoxMinutes->setMargins(gui::Margins(0, 0, 0, 0));
         hBoxMinutes->setMinimumSize(style::homescreen_vertical::center_box_w, style::homescreen_vertical::center_box_h);
 
         hBoxMinutesLeft = new gui::HBox(hBoxMinutes, 0, 0, 0, 0);
-        hBoxMinutesLeft->setEdges(gui::RectangleEdge::All);
+        hBoxMinutesLeft->setEdges(gui::RectangleEdge::None);
         hBoxMinutesLeft->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         hBoxMinutesLeft->setMaximumSize(style::homescreen_vertical::digit_box_w,
                                         style::homescreen_vertical::center_box_h);
 
         hBoxMinutesRight = new gui::HBox(hBoxMinutes, 0, 0, 0, 0);
-        hBoxMinutesRight->setEdges(gui::RectangleEdge::All);
+        hBoxMinutesRight->setEdges(gui::RectangleEdge::None);
         hBoxMinutesRight->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         hBoxMinutesRight->setMaximumSize(style::homescreen_vertical::digit_box_w,
                                          style::homescreen_vertical::center_box_h);
@@ -79,7 +79,7 @@ namespace gui
         updateFont(minuteFirst, fontName);
 
         minuteFirst->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        minuteFirst->setEdges(RectangleEdge::All);
+        minuteFirst->setEdges(RectangleEdge::None);
         minuteFirst->setText("0");
         minuteFirst->drawUnderline(false);
 
@@ -87,7 +87,7 @@ namespace gui
         updateFont(minuteSecond, fontName);
 
         minuteSecond->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        minuteSecond->setEdges(RectangleEdge::All);
+        minuteSecond->setEdges(RectangleEdge::None);
         minuteSecond->setText("0");
         minuteSecond->drawUnderline(false);
 

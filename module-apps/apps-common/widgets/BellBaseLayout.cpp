@@ -11,25 +11,25 @@ namespace gui
     {
         setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        setEdges(RectangleEdge::All);
+        setEdges(RectangleEdge::None);
 
         firstBox = new VBox(this);
         firstBox->setMinimumSize(style::bell_base_layout::first_layout_w, style::bell_base_layout::first_layout_min_h);
         firstBox->setMargins(Margins(0U, style::bell_base_layout::first_top_margin, 0U, 0U));
         firstBox->setMaximumHeight(style::bell_base_layout::first_layout_h);
         firstBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
-        firstBox->setEdges(RectangleEdge::All);
+        firstBox->setEdges(RectangleEdge::None);
         firstBox->activeItem = false;
 
         centerBox = new VBox(this);
-        centerBox->setEdges(RectangleEdge::All);
+        centerBox->setEdges(RectangleEdge::None);
         centerBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         centerBox->setMinimumSize(style::bell_base_layout::center_layout_w, style::bell_base_layout::center_layout_h);
 
         lastBox = new VBox(this);
         lastBox->setMinimumSize(style::bell_base_layout::last_layout_w, style::bell_base_layout::last_layout_h);
         lastBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
-        lastBox->setEdges(RectangleEdge::All);
+        lastBox->setEdges(RectangleEdge::None);
         lastBox->activeItem = false;
 
         resizeItems();

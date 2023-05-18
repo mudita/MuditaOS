@@ -15,8 +15,9 @@ namespace style::homescreen_vertical
     constexpr inline auto digit_box_w       = 125U;
     constexpr inline auto leftMargin        = 60U;
     constexpr inline auto rightMargin       = 60U;
-    constexpr inline auto topNegativeMargin = -35;
+    constexpr inline auto topNegativeMargin = -10;
     constexpr inline auto info_line_h       = 44U;
+    constexpr inline auto connectionBoxSize = 44U;
 } // namespace style::homescreen_vertical
 
 namespace gui
@@ -31,6 +32,7 @@ namespace gui
     class BellBattery;
     class DuoHBox;
     class Icon;
+    class BellConnectionStatus;
 
     class LayoutVertical : public HBox
     {
@@ -55,6 +57,6 @@ namespace gui
         AlarmIcon *alarmTopIcon               = nullptr;
         TimeSetFmtSpinner *setAlarmFmtSpinner = nullptr;
 
-        Text *connectionStatus = nullptr;
+        BellConnectionStatus *connectionStatus = nullptr;
     };
 }; // namespace gui

@@ -27,24 +27,16 @@ namespace gui
         Hide  // Otherwise
     };
 
-    enum class LayoutMode
-    {
-        Classic,
-        Vertical
-    };
-
     class BellConnectionStatus : public gui::HBox
     {
       public:
-        BellConnectionStatus(Item *parent, LayoutMode widthMode);
+        BellConnectionStatus(Item *parent);
         void setFont(const UTF8 &fontName);
         void update(const Store::Battery::State& state);
 
       private:
-        void setPositionToFitContent();
 
         ConnectionStatusMode connectionStatusMode = ConnectionStatusMode::Hide;
         Text *statusText                     = nullptr;
-        LayoutMode widthMode            = LayoutMode::Classic;
     };
 } // namespace gui

@@ -4,28 +4,27 @@
 #include <EventStore.hpp>
 #include <common/widgets/BellConnectionStatus.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
+#include "i18n/i18n.hpp"
 
 namespace
 {
-    constexpr auto connected_message      = "bell_connected-message";
+    constexpr auto usb_connected_status = "app_bellmain_usb_status_connected";
 } // namespace
 
 namespace gui
 {
-    BellConnectionStatus::BellConnectionStatus(Item *parent, LayoutMode widthMode) : HBox(parent), widthMode(widthMode)
+    BellConnectionStatus::BellConnectionStatus(Item *parent) : HBox(parent)
     {
-
         statusText = new Text(parent);
-        statusText->setMaximumSize(350U, connected::status_h);
-        statusText->setFont(style::window::font::veryverybiglight);
-        statusText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        statusText->setEdges(RectangleEdge::All);
+        statusText->setMaximumSize(350U, 102);
+        statusText->setFont(style::window::font::verybiglight);
+        statusText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        statusText->setEdges(RectangleEdge::None);
         statusText->setEditMode(EditMode::Browse);
         statusText->activeItem = false;
         statusText->drawUnderline(false);
-        statusText->setText("Connected");
+        statusText->setText(utils::translate(usb_connected_status));
         statusText->setVisible(false);
-
     }
 
     void BellConnectionStatus::setFont(const UTF8 &fontName)
@@ -35,37 +34,12 @@ namespace gui
 
     void BellConnectionStatus::update(const Store::Battery::State& state)
     {
-        if (state != Store::Battery::State::Discharging) { // to be changed
-            // Without this the text is not set properly if percentText was hidden
+        if (state == Store::Battery::State::PluggedNotCharging) {
             statusText->setVisible(true);
         }
-        else{
+        else {
             statusText->setVisible(false);
         }
     }
 
-//    void BellConnectionStatus::setBatteryPercentMode(BatteryPercentMode mode)
-//    {
-//        batteryPercentMode = mode;
-//        if (batteryPercentMode == BatteryPercentMode::Show) {
-//            connectedText->setVisible(true);
-//        }
-//        else {
-//            connectedText->setVisible(false);
-//        }
-//
-////        if (widthMode == BatteryWidthMode::FitToContent) {
-////            setWidthsToFitContent();
-////        }
-//    }
-
-    void BellConnectionStatus::setPositionToFitContent()
-    {
-//        if (connectedText->visible) {
-//            connectedText->setMinimumWidthToFitText();
-//            width += connectedText->widgetMinimumArea.w;
-//        }
-//        setMinimumWidth(width);
-//        setMaximumWidth(width);
-    }
 } // namespace gui

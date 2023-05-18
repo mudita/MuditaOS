@@ -54,7 +54,7 @@ namespace gui
         timeHBox = new HBox(this->centerBox);
         timeHBox->setMaximumSize(style::bell_base_layout::center_layout_w, style::bell_base_layout::center_layout_h);
         timeHBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        timeHBox->setEdges(RectangleEdge::All);
+        timeHBox->setEdges(RectangleEdge::None);
 
         time = new TimeSetFmtSpinner(timeHBox);
         time->setMaximumSize(style::bell_base_layout::center_layout_w, style::bell_base_layout::center_layout_h);
@@ -66,49 +66,38 @@ namespace gui
         statusBox = new HBox(this->lastBox);
         statusBox->setMinimumSize(style::homescreen_classic::status_box_layout_w,
                                   style::bell_base_layout::last_layout_h);
-        statusBox->setEdges(RectangleEdge::All);
+        statusBox->setEdges(RectangleEdge::None);
         statusBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         statusBox->setVisible(true);
 
         widgetBox = new VBox(statusBox);
         widgetBox->setMinimumSize(style::homescreen_classic::status_box_layout_w,
                                   style::bell_base_layout::last_layout_h);
-        widgetBox->setEdges(RectangleEdge::All);
+        widgetBox->setEdges(RectangleEdge::None);
         widgetBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         widgetBox->setVisible(true);
 
         infoBox = new HBox(widgetBox);
         infoBox->setMinimumSize(style::homescreen_classic::status_box_layout_w, 70U);
-        infoBox->setEdges(RectangleEdge::All);
+        infoBox->setEdges(RectangleEdge::None);
         infoBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         infoBox->setVisible(true);
 
         connectionBox = new HBox(widgetBox);
         connectionBox->setMinimumSize(style::homescreen_classic::status_box_layout_w, 44U);
-        connectionBox->setEdges(RectangleEdge::All);
+        connectionBox->setEdges(RectangleEdge::None);
         connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         connectionBox->setVisible(true);
 
         battery = new BellBattery(infoBox, gui::BatteryWidthMode::FitToContent);
         battery->setMargins(Margins(0U, style::bell_base_layout::info_box_top_margin, 0U, 0U));
         battery->setMaximumSize(battery::battery_widget_w, battery::battery_widget_h);
-        battery->setEdges(RectangleEdge::All);
+        battery->setEdges(RectangleEdge::None);
         battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         battery->setVisible(false);
         battery->setBatteryPercentMode(BatteryPercentMode::Show);
 
-        //        statusText = new Text(connectionBox);
-        //        statusText->setMaximumSize(350U, battery::percent_h);
-        //        statusText->setFont(style::window::font::veryverybiglight);
-        //        statusText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        //        statusText->setEdges(RectangleEdge::All);
-        //        statusText->setEditMode(EditMode::Browse);
-        //        statusText->activeItem = false;
-        //        statusText->drawUnderline(false);
-        //        statusText->setText("Connected");
-        //        statusText->setVisible(true);
-
-        connectionStatus = new BellConnectionStatus(connectionBox, gui::LayoutMode::Classic);
+        connectionStatus = new BellConnectionStatus(connectionBox);
 
         bottomText = new TextFixedSize(this->lastBox, 0, 0, 0, 0);
         bottomText->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
@@ -253,25 +242,6 @@ namespace gui
         }
         else {
             battery->setVisible(false);
-            //            infoBox->removeWidget(battery);
-            //            connectionBox->removeWidget(connectionStatus);
-            //            connectionBox->setVisible(false);
-            //            infoBox->addWidget(connectionStatus);
-
-            //            infoBox->addWidget(connectionStatus);
-            //            widgetBox->removeWidget(infoBox);
-            //            widgetBox->removeWidget(connectionBox);
-            //            connectionBox->setMinimumSize(style::homescreen_classic::status_box_layout_w, 70U);
-            //            connectionBox->removeWidget(connectionStatus);
-            //            connectionStatus->setMargins(Margins(0U, style::bell_base_layout::info_box_top_margin, 0U,
-            //            0U)); connectionBox->addWidget(connectionStatus);
-            //
-            //            infoBox->setMinimumSize(style::homescreen_classic::status_box_layout_w, 44U);
-            //
-            //            widgetBox->addWidget(connectionBox);
-            //            widgetBox->addWidget(infoBox);
-            //
-            //            infoBox->setMinimumSize(style::homescreen_classic::status_box_layout_w, 0U);
         }
         battery->informContentChanged();
         connectionStatus->informContentChanged();
