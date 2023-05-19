@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellBaseLayout.hpp"
@@ -14,8 +14,9 @@ namespace gui
         setEdges(RectangleEdge::None);
 
         firstBox = new VBox(this);
-        firstBox->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::first_layout_min_h);
-        firstBox->setMaximumHeight(style::bell_base_layout::outer_layouts_h);
+        firstBox->setMinimumSize(style::bell_base_layout::first_layout_w, style::bell_base_layout::first_layout_min_h);
+        firstBox->setMargins(Margins(0U, style::bell_base_layout::first_top_margin, 0U, 0U));
+        firstBox->setMaximumHeight(style::bell_base_layout::first_layout_h);
         firstBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
         firstBox->setEdges(RectangleEdge::None);
         firstBox->activeItem = false;
@@ -26,7 +27,7 @@ namespace gui
         centerBox->setMinimumSize(style::bell_base_layout::center_layout_w, style::bell_base_layout::center_layout_h);
 
         lastBox = new VBox(this);
-        lastBox->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        lastBox->setMinimumSize(style::bell_base_layout::last_layout_w, style::bell_base_layout::last_layout_h);
         lastBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
         lastBox->setEdges(RectangleEdge::None);
         lastBox->activeItem = false;
