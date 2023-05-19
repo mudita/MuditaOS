@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,7 +9,10 @@
 
 namespace style::homescreen_classic
 {
-    constexpr inline auto status_box_layout_w = 350U;
+    constexpr inline auto status_box_layout_w     = 350U;
+    constexpr inline auto info_box_layout_h       = 70U;
+    constexpr inline auto connection_box_layout_h = 44U;
+
 } // namespace style::homescreen_classic
 namespace gui
 {
@@ -20,6 +23,7 @@ namespace gui
     class TimeSetFmtSpinner;
     class SnoozeTimer;
     class BellBattery;
+    class BellConnectionStatus;
     class DuoHBox;
 
     enum class LayoutClassicVersion
@@ -53,6 +57,7 @@ namespace gui
         auto getAlarmTime() const -> std::time_t override;
         auto setAlarmTime(std::time_t newTime) -> void override;
         auto setSnoozeTime(std::time_t newTime) -> void override;
+        auto setUSBStatusConnected() -> void override;
 
         auto getSnoozeTimer() -> SnoozeTimer * override;
         auto getLayout() -> Item * override;
@@ -63,11 +68,15 @@ namespace gui
         virtual bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext);
         void removeTextDescription();
 
-        HBox *timeHBox            = nullptr;
-        TimeSetFmtSpinner *time   = nullptr;
-        HBox *statusBox           = nullptr;
-        BellBattery *battery      = nullptr;
-        TextFixedSize *bottomText = nullptr;
+        VBox *widgetBox                        = nullptr;
+        HBox *timeHBox                         = nullptr;
+        TimeSetFmtSpinner *time                = nullptr;
+        HBox *statusBox                        = nullptr;
+        HBox *infoBox                          = nullptr;
+        HBox *connectionBox                    = nullptr;
+        BellBattery *battery                   = nullptr;
+        BellConnectionStatus *connectionStatus = nullptr;
+        TextFixedSize *bottomText              = nullptr;
         AlarmSetSpinner *alarm    = nullptr;
         SnoozeTimer *snoozeTimer  = nullptr;
     };

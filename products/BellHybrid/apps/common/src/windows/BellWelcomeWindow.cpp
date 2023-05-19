@@ -46,8 +46,7 @@ namespace gui
         midLine->setEdges(RectangleEdge::Bottom);
 
         auto informationBody = new HBox(body->lastBox);
-        informationBody->setMinimumSize(style::bell_base_layout::outer_layouts_w,
-                                        style::bell_base_layout::outer_layouts_h);
+        informationBody->setMinimumSize(style::bell_base_layout::last_layout_w, style::bell_base_layout::last_layout_h);
         informationBody->setEdges(RectangleEdge::None);
         informationBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 

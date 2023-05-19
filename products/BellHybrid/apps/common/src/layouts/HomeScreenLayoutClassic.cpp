@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/HomeScreenLayoutClassic.hpp"
 #include "data/BellMainStyle.hpp"
 #include "widgets/BellBattery.hpp"
+#include "widgets/BellConnectionStatus.hpp"
 #include "widgets/DuoHBox.hpp"
 #include "widgets/SnoozeTimer.hpp"
 
@@ -64,17 +65,41 @@ namespace gui
 
         statusBox = new HBox(this->lastBox);
         statusBox->setMinimumSize(style::homescreen_classic::status_box_layout_w,
-                                  style::bell_base_layout::outer_layouts_h);
+                                  style::bell_base_layout::last_layout_h);
         statusBox->setEdges(RectangleEdge::None);
         statusBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         statusBox->setVisible(true);
 
-        battery = new BellBattery(statusBox, gui::BatteryWidthMode::FitToContent);
+        widgetBox = new VBox(statusBox);
+        widgetBox->setMinimumSize(style::homescreen_classic::status_box_layout_w,
+                                  style::bell_base_layout::last_layout_h);
+        widgetBox->setEdges(RectangleEdge::None);
+        widgetBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        widgetBox->setVisible(true);
+
+        infoBox = new HBox(widgetBox);
+        infoBox->setMinimumSize(style::homescreen_classic::status_box_layout_w,
+                                style::homescreen_classic::info_box_layout_h);
+        infoBox->setEdges(RectangleEdge::None);
+        infoBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        infoBox->setVisible(true);
+
+        connectionBox = new HBox(widgetBox);
+        connectionBox->setMinimumSize(style::homescreen_classic::status_box_layout_w,
+                                      style::homescreen_classic::connection_box_layout_h);
+        connectionBox->setEdges(RectangleEdge::None);
+        connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        connectionBox->setVisible(true);
+
+        battery = new BellBattery(infoBox, gui::BatteryWidthMode::FitToContent);
+        battery->setMargins(Margins(0U, style::bell_base_layout::info_box_top_margin, 0U, 0U));
         battery->setMaximumSize(battery::battery_widget_w, battery::battery_widget_h);
         battery->setEdges(RectangleEdge::None);
         battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        battery->setVisible(true);
+        battery->setVisible(false);
         battery->setBatteryPercentMode(BatteryPercentMode::Show);
+
+        connectionStatus = new BellConnectionStatus(connectionBox);
 
         bottomText = new TextFixedSize(this->lastBox, 0, 0, 0, 0);
         bottomText->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
@@ -212,6 +237,8 @@ namespace gui
     void HomeScreenLayoutClassic::setBatteryLevelState(const Store::Battery &batteryContext)
     {
         battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
+        connectionStatus->checkIfConnected(batteryContext.state);
+
         if (isBatteryVisibilityAllowed(batteryContext)) {
             battery->setVisible(true);
         }
@@ -219,6 +246,7 @@ namespace gui
             battery->setVisible(false);
         }
         battery->informContentChanged();
+        connectionStatus->informContentChanged();
     }
 
     void HomeScreenLayoutClassic::setTime(std::time_t newTime)
@@ -267,5 +295,10 @@ namespace gui
     auto HomeScreenLayoutClassic::getLayout() -> Item *
     {
         return this;
+    }
+    auto HomeScreenLayoutClassic::setUSBStatusConnected() -> void
+    {
+        connectionStatus->setConnected();
+        connectionStatus->informContentChanged();
     }
 }; // namespace gui

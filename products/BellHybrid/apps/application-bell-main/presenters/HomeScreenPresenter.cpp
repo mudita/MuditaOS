@@ -259,4 +259,10 @@ namespace app::home_screen
         std::uniform_int_distribution<std::mt19937::result_type> dist(0, greetingCollection.size() - 1);
         return greetingCollection[dist(*rngEngine)];
     };
+
+    void HomeScreenPresenter::setUSBStatusConnected()
+    {
+        getView()->setUSBStatusConnected();
+    }
+
 } // namespace app::home_screen
