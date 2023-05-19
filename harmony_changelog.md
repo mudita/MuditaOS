@@ -24,6 +24,7 @@
 
 * Added error handling for incorrect audio formats and corrupted files inside Relaxation app
 * Added error message when files limit is exceeded in Relaxation app
+* Added label informing about PC connection.
 
 ### Changed / Improved
 

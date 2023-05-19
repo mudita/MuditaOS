@@ -41,6 +41,7 @@ target_sources(application-bell-common
         src/widgets/AlarmIcon.cpp
         src/widgets/ListItems.cpp
         src/widgets/BellBattery.cpp
+        src/widgets/BellConnectionStatus.cpp
         src/widgets/BellStatusClock.cpp
         src/widgets/DuoHBox.cpp
         src/widgets/ProgressTimerWithSnoozeTimer.cpp
@@ -99,6 +100,7 @@ target_sources(application-bell-common
         include/common/popups/BellRebootWindow.hpp
         include/common/widgets/AlarmIcon.hpp
         include/common/widgets/BellBattery.hpp
+        include/common/widgets/BellConnectionStatus.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
         include/common/widgets/BellStatusClock.hpp
         include/common/widgets/DuoHBox.hpp

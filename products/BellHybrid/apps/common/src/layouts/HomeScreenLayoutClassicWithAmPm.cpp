@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/HomeScreenLayoutClassicWithAmPm.hpp"
@@ -23,7 +23,7 @@ namespace gui
 
         battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        fmt = new TextFixedSize(statusBox);
+        fmt = new TextFixedSize(infoBox);
         fmt->setMaximumSize(style::homescreen_classic::status_box_layout_w, style::bell_base_layout::outer_layouts_h);
         fmt->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         fmt->setFont(mainWindow::bottomDescription::font_normal);
@@ -31,6 +31,7 @@ namespace gui
         fmt->activeItem = false;
         fmt->drawUnderline(false);
         fmt->setText("");
+        fmt->setMargins({0, style::bell_base_layout::info_box_top_margin, 0, 0});
     }
 
     auto HomeScreenLayoutClassicWithAmPm::setTime(std::time_t newTime) -> void
@@ -53,10 +54,10 @@ namespace gui
     void HomeScreenLayoutClassicWithAmPm::handleContentChanged()
     {
         if (battery->visible) {
-            fmt->setMargins({20, 0, 0, 0});
+            fmt->setMargins({20, style::bell_base_layout::info_box_top_margin, 0, 0});
         }
         else {
-            fmt->setMargins({0, 0, 0, 0});
+            fmt->setMargins({0, style::bell_base_layout::info_box_top_margin, 0, 0});
         }
         HomeScreenLayoutClassic::handleContentChanged();
     }

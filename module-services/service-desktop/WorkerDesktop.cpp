@@ -213,7 +213,8 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
     }
     else if (notification == bsp::USBDeviceStatus::Configured) {
         LOG_DEBUG("USB status: Configured");
-        ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConfigured>(), service::name::service_desktop);
+        ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConfigured>(),
+                                        sys::BusChannel::USBNotifications);
         usbStatus = bsp::USBDeviceStatus::Configured;
     }
     else if (notification == bsp::USBDeviceStatus::Disconnected) {
