@@ -16,13 +16,15 @@ namespace bsp
     inline constexpr std::uint32_t CurrentTuningValueInUseForConfig1{0x40};
     inline constexpr std::uint32_t TargetCountUsedToTune{0x2DC};
 
+    inline constexpr std::uint32_t XtalStabilizationTimeUs{200};
+    inline constexpr std::uint32_t RcOscStabilizationTimeUs{4000};
+
     void EnableExternalOscillator()
     {
         if (!IsExternalOscillatorEnabled()) {
-            CLOCK_InitExternalClk(0);
-            /// Wait at least 200us for XTAL stable
-            const uint32_t cpuFreqency = CLOCK_GetCpuClkFreq();
-            SDK_DelayAtLeastUs(200, cpuFreqency);
+            CLOCK_InitExternalClk(false);
+            /// Wait for XTAL to become stable
+            SDK_DelayAtLeastUs(XtalStabilizationTimeUs, CLOCK_GetCpuClkFreq());
             /// Switch DCDC to use DCDC external OSC
             DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
             /// Switch clock source to external OSC.
@@ -43,9 +45,9 @@ namespace bsp
                 return;
             }
 
-            // Enable RC OSC. It needs at least 4ms to be stable, so self tuning need to be enabled.
+            /// Enable RC OSC. It needs at least 4ms to be stable, so self tuning need to be enabled.
             XTALOSC24M->LOWPWR_CTRL |= XTALOSC24M_LOWPWR_CTRL_RC_OSC_EN_MASK;
-            // Configure self-tuning for RC OSC
+            /// Configure self-tuning for RC OSC
             XTALOSC24M->OSC_CONFIG0 = XTALOSC24M_OSC_CONFIG0_RC_OSC_PROG_CUR(bsp::CurrentTuningValueInUseForConfig0) |
                                       XTALOSC24M_OSC_CONFIG0_SET_HYST_MINUS(bsp::NegativeHysteresisValue) |
                                       XTALOSC24M_OSC_CONFIG0_RC_OSC_PROG(bsp::TuningValue) |
@@ -53,10 +55,13 @@ namespace bsp
             XTALOSC24M->OSC_CONFIG1 = XTALOSC24M_OSC_CONFIG1_COUNT_RC_CUR(bsp::CurrentTuningValueInUseForConfig1) |
                                       XTALOSC24M_OSC_CONFIG1_COUNT_RC_TRG(bsp::TargetCountUsedToTune);
 
+            /// Wait for RC OSC to become stable
+            SDK_DelayAtLeastUs(RcOscStabilizationTimeUs, CLOCK_GetCpuClkFreq());
             /// Switch DCDC to use DCDC internal OSC
             DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
             /// Switch clock source to internal RC
             CLOCK_SwitchOsc(kCLOCK_RcOsc);
+            /// Deinit external oscillator
             CLOCK_DeinitExternalClk();
             /// Wait CCM operation finishes
             while (CCM->CDHIPR != 0) {}
