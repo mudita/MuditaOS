@@ -225,7 +225,9 @@ Parameters:
 ```json
 {
   "body": {
-    "id": 76
+    "duplicatedNumbers": [
+      "123456789"
+    ]
   },
   "endpoint": 7,
   "status": 409,
@@ -235,7 +237,7 @@ Parameters:
 
 Parameters:
 
-- *id*  - id of duplicated contact
+- *duplicatedNumbers*  - list of duplicated numbers
 
 ### Update a contact
 

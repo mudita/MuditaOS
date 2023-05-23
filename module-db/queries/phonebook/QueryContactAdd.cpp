@@ -11,8 +11,10 @@ using namespace db::query;
 ContactAdd::ContactAdd(const ContactRecord &rec) : Query(Query::Type::Create), rec(rec)
 {}
 
-ContactAddResult::ContactAddResult(bool result, unsigned int id, bool duplicated)
-    : result(result), duplicated(duplicated), id(id)
+ContactAddResult::ContactAddResult(bool result,
+                                   unsigned int id,
+                                   const std::vector<utils::PhoneNumber::View> &duplicates)
+    : result(result), duplicates(duplicates), id(id)
 {}
 
 [[nodiscard]] auto ContactAdd::debugInfo() const -> std::string

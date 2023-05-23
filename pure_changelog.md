@@ -20,6 +20,7 @@
 * Optimized E-Ink energy consumption
 * Changed volume popup timeout to match phone modes popup
 * Information about device memory is now sent to MC in floating points numbers
+* Changed a way of returning information to Center about number duplications
 
 ### Fixed
 

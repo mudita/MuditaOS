@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,14 +24,18 @@ namespace db::query
     class ContactAddResult : public QueryResult
     {
       public:
-        ContactAddResult(bool result, unsigned int id, bool duplicated = false);
+        ContactAddResult(bool result, unsigned int id, const std::vector<utils::PhoneNumber::View> &duplicates);
         [[nodiscard]] auto getResult() const noexcept -> bool
         {
             return result;
         }
-        [[nodiscard]] auto isDuplicated() const noexcept -> bool
+        [[nodiscard]] auto hasDuplicates() const noexcept -> bool
         {
-            return duplicated;
+            return !duplicates.empty();
+        }
+        [[nodiscard]] auto getDuplicates() const noexcept -> std::vector<utils::PhoneNumber::View>
+        {
+            return duplicates;
         }
         [[nodiscard]] auto getID() const noexcept -> unsigned int
         {
@@ -41,7 +45,7 @@ namespace db::query
 
       private:
         bool result;
-        bool duplicated;
+        std::vector<utils::PhoneNumber::View> duplicates;
         unsigned int id;
     };
 
