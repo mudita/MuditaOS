@@ -248,7 +248,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
      * @param record single contact record to be verified
      * @return true if contact can be considered as a duplicate in DB
      */
-    auto verifyDuplicate(ContactRecord &record) -> bool;
+    auto verifyDuplicate(ContactRecord &record) -> std::vector<utils::PhoneNumber::View>;
 
     /**
      * @brief Verify if single contact record can be considered as an existing temporary contact in DB

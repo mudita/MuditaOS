@@ -695,7 +695,7 @@ TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
             ContactRecord::Number("600123451", "+48600123451", ContactNumberType::HOME),
         });
 
-        REQUIRE(records.verifyDuplicate(noDuplicateContactRecord) == false);
+        REQUIRE(records.verifyDuplicate(noDuplicateContactRecord).empty());
     }
 
     SECTION("Duplicate")
@@ -708,7 +708,7 @@ TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
             ContactRecord::Number("600123456", "+48600123456", ContactNumberType::HOME),
         });
 
-        REQUIRE(records.verifyDuplicate(duplicateContactRecord) == true);
+        REQUIRE(!records.verifyDuplicate(duplicateContactRecord).empty());
     }
 }
 

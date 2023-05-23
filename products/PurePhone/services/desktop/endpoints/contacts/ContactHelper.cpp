@@ -172,17 +172,26 @@ namespace sdesktop::endpoints
             [](db::QueryResult *result, Context context) {
                 if (auto contactResult = dynamic_cast<db::query::ContactAddResult *>(result)) {
 
-                    context.setResponseBody(
-                        json11::Json::object({{json::contacts::id, static_cast<int>(contactResult->getID())}}));
-                    if (contactResult->getResult()) {
-                        context.setResponseStatus(http::Code::OK);
-                    }
-                    else if (contactResult->isDuplicated()) {
+                    if (contactResult->hasDuplicates()) {
+                        auto numberDuplicates = json11::Json::array();
+                        for (const auto &number : contactResult->getDuplicates()) {
+                            numberDuplicates.emplace_back(number.getEntered().c_str());
+                        }
+                        context.setResponseBody(
+                            json11::Json::object({{json::contacts::duplicateNumbers, numberDuplicates}}));
                         context.setResponseStatus(http::Code::Conflict);
                     }
                     else {
-                        context.setResponseStatus(http::Code::InternalServerError);
+                        context.setResponseBody(
+                            json11::Json::object({{json::contacts::id, static_cast<int>(contactResult->getID())}}));
+                        if (contactResult->getResult()) {
+                            context.setResponseStatus(http::Code::OK);
+                        }
+                        else {
+                            context.setResponseStatus(http::Code::InternalServerError);
+                        }
                     }
+
                     putToSendQueue(context.createSimpleResponse());
 
                     return true;
