@@ -180,6 +180,11 @@ namespace app
 #if DEBUG_APPLICATION_MANAGEMENT == 1
         LOG_DEBUG("[%s] (%s) -> (%s)", GetName().c_str(), stateStr(state), stateStr(st));
 #endif
+        // To prevent handling of key presses event from other state of application as a longPress
+        if (state != st) {
+            keyTranslator->resetPreviousKeyPress();
+            longPressTimer.stop();
+        }
         state = st;
     }
 
