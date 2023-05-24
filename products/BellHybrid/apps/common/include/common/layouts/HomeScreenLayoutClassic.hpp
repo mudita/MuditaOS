@@ -9,9 +9,11 @@
 
 namespace style::homescreen_classic
 {
-    constexpr inline auto status_box_layout_w     = 350U;
-    constexpr inline auto info_box_layout_h       = 70U;
-    constexpr inline auto connection_box_layout_h = 44U;
+    constexpr inline auto status_box_layout_w          = 350U;
+    constexpr inline auto info_box_layout_h            = 70U;
+    constexpr inline auto connection_box_layout_h      = 44U;
+    constexpr inline auto connection_box_top_margin    = 20U;
+    constexpr inline auto connection_box_bottom_margin = -20;
 
 } // namespace style::homescreen_classic
 namespace gui
@@ -68,6 +70,10 @@ namespace gui
         virtual bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext);
         void removeTextDescription();
 
+      private:
+        void adjustConnectionStatusPosition();
+
+      protected:
         VBox *widgetBox                        = nullptr;
         HBox *timeHBox                         = nullptr;
         TimeSetFmtSpinner *time                = nullptr;

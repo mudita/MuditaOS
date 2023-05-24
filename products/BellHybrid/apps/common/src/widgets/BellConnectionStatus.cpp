@@ -37,7 +37,7 @@ namespace gui
 
     void BellConnectionStatus::checkIfConnected(const Store::Battery::State &state)
     {
-        if (state == Store::Battery::State::Discharging) {
+        if (state != Store::Battery::State::PluggedNotCharging) {
             statusText->setVisible(false);
         }
     }

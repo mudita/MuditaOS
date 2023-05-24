@@ -23,7 +23,7 @@ namespace gui
 
         battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        fmt = new TextFixedSize(infoBox);
+        fmt = new TextFixedSize(nullptr);
         fmt->setMaximumSize(style::homescreen_classic::status_box_layout_w, style::bell_base_layout::outer_layouts_h);
         fmt->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         fmt->setFont(mainWindow::bottomDescription::font_normal);
@@ -32,6 +32,10 @@ namespace gui
         fmt->drawUnderline(false);
         fmt->setText("");
         fmt->setMargins({0, style::bell_base_layout::info_box_top_margin, 0, 0});
+
+        infoBox->removeWidget(battery);
+        infoBox->addWidget(battery);
+        infoBox->addWidget(fmt);
     }
 
     auto HomeScreenLayoutClassicWithAmPm::setTime(std::time_t newTime) -> void
