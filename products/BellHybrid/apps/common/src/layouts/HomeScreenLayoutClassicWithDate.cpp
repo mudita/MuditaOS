@@ -30,11 +30,11 @@ namespace gui
         date->activeItem = false;
         date->drawUnderline(false);
         date->setText("00/00");
-        date->setMargins({0, style::bell_base_layout::info_box_top_margin, 20, 0});
+        date->setMargins({20U, style::bell_base_layout::info_box_top_margin, 0, 0});
 
         infoBox->removeWidget(battery);
-        infoBox->addWidget(date);
         infoBox->addWidget(battery);
+        infoBox->addWidget(date);
 
         // Assume format is 12h
         time->setMargins({style::homescreen_classic::ampm_time_margin_w, 0, 0, 0});
