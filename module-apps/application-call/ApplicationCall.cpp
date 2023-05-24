@@ -205,6 +205,12 @@ namespace app
         return ret;
     }
 
+    sys::MessagePointer ApplicationCall::handleAppClose(sys::Message *msgl)
+    {
+        callModel->hangUpCall();
+        return ApplicationCommon::handleAppClose(msgl);
+    }
+
     void ApplicationCall::createUserInterface()
     {
         windowsFactory.attach(app::window::name_enterNumber, [](ApplicationCommon *app, const std::string &name) {

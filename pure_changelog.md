@@ -43,6 +43,7 @@
 * Fixed wrong notification about multiple unread messages in case there's only one unread left
 * Fixed missing notification about new SMS when phone was locked on application Messages
 * Fixed MTP availability only after phone unlocked
+* Fixed a ghost call after quick click back key to end a call after start a call
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved
