@@ -123,6 +123,7 @@ target_sources(application-bell-common
         include/common/layouts/HomeScreenLayoutVerticalSimple.hpp
         include/common/layouts/HomeScreenLayoutVerticalWithAmPm.hpp
         include/common/layouts/HomeScreenLayoutVerticalWithDate.hpp
+        include/common/layouts/HomeScreenLayoutNames.hpp
 )
 
 target_link_libraries(application-bell-common

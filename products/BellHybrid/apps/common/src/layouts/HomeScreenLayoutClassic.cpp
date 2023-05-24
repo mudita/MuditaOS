@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/HomeScreenLayoutClassic.hpp"
+#include "layouts/HomeScreenLayoutNames.hpp"
 #include "data/BellMainStyle.hpp"
 #include "widgets/BellBattery.hpp"
 #include "widgets/BellConnectionStatus.hpp"
@@ -247,6 +248,7 @@ namespace gui
         }
         battery->informContentChanged();
         connectionStatus->informContentChanged();
+        adjustConnectionStatusPosition();
     }
 
     void HomeScreenLayoutClassic::setTime(std::time_t newTime)
@@ -300,5 +302,28 @@ namespace gui
     {
         connectionStatus->setConnected();
         connectionStatus->informContentChanged();
+    }
+
+    auto HomeScreenLayoutClassic::adjustConnectionStatusPosition() -> void
+    {
+        if (getName() == gui::layout::Classic) {
+            if (battery->visible) {
+                widgetBox->removeWidget(infoBox);
+                widgetBox->removeWidget(connectionBox);
+                connectionBox->setMargins(Margins(0, 0, 0, 0));
+                widgetBox->addWidget(infoBox);
+                widgetBox->addWidget(connectionBox);
+            }
+            else {
+                widgetBox->removeWidget(infoBox);
+                widgetBox->removeWidget(connectionBox);
+                connectionBox->setMargins(Margins(0,
+                                                  style::homescreen_classic::connection_box_top_margin,
+                                                  0,
+                                                  style::homescreen_classic::connection_box_bottom_margin));
+                widgetBox->addWidget(connectionBox);
+                widgetBox->addWidget(infoBox);
+            }
+        }
     }
 }; // namespace gui

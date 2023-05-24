@@ -1,7 +1,8 @@
 
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <common/layouts/HomeScreenLayoutNames.hpp>
 #include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/layouts/HomeScreenLayoutClassic.hpp>
 #include <common/layouts/HomeScreenLayoutClassicWithAmPm.hpp>
@@ -21,17 +22,22 @@ namespace gui::factory
     {
         return
         {
-            {"Classic", []() { return new HomeScreenLayoutClassic("Classic"); }},
-                {"ClassicWithBattery", []() { return new HomeScreenLayoutClassicWithBattery("ClassicWithBattery"); }},
-                {"ClassicWithDate", []() { return new HomeScreenLayoutClassicWithDate("ClassicWithDate"); }},
-                {"VerticalSimple", []() { return new HomeScreenLayoutVerticalSimple("VerticalSimple"); }},
+            {gui::layout::Classic, []() { return new HomeScreenLayoutClassic(gui::layout::Classic); }},
+                {gui::layout::ClassicWithBattery,
+                 []() { return new HomeScreenLayoutClassicWithBattery(gui::layout::ClassicWithBattery); }},
+                {gui::layout::ClassicWithDate,
+                 []() { return new HomeScreenLayoutClassicWithDate(gui::layout::ClassicWithDate); }},
+                {gui::layout::VerticalSimple,
+                 []() { return new HomeScreenLayoutVerticalSimple(gui::layout::VerticalSimple); }},
             {
-                "VerticalWithDate", []() { return new HomeScreenLayoutVerticalWithDate("VerticalWithDate"); }
+                gui::layout::VerticalWithDate,
+                    []() { return new HomeScreenLayoutVerticalWithDate(gui::layout::VerticalWithDate); }
             }
 #if CONFIG_ENABLE_TEMP == 1
             ,
             {
-                "ClassicWithTemp", []() { return new HomeScreenLayoutClassicWithTemp("ClassicWithTemp"); }
+                gui::layout::ClassicWithTemp,
+                    []() { return new HomeScreenLayoutClassicWithTemp(gui::layout::ClassicWithTemp); }
             }
 #endif
         };
@@ -41,14 +47,20 @@ namespace gui::factory
     {
         return
         {
-            {"Classic", []() { return new HomeScreenLayoutClassic("Classic"); }},
-                {"ClassicWithAmPm", []() { return new HomeScreenLayoutClassicWithAmPm("ClassicWithAmPm"); }},
-                {"ClassicWithBattery", []() { return new HomeScreenLayoutClassicWithBattery("ClassicWithBattery"); }},
-                {"ClassicWithDate", []() { return new HomeScreenLayoutClassicWithDate("ClassicWithDateAmPm"); }},
-                {"VerticalSimple", []() { return new HomeScreenLayoutVerticalSimple("VerticalSimple"); }},
-                {"VerticalWithAmPm", []() { return new HomeScreenLayoutVerticalWithAmPm("VerticalWithAmPm"); }},
+            {gui::layout::Classic, []() { return new HomeScreenLayoutClassic(gui::layout::Classic); }},
+                {gui::layout::ClassicWithAmPm,
+                 []() { return new HomeScreenLayoutClassicWithAmPm(gui::layout::ClassicWithAmPm); }},
+                {gui::layout::ClassicWithBattery,
+                 []() { return new HomeScreenLayoutClassicWithBattery(gui::layout::ClassicWithBattery); }},
+                {gui::layout::ClassicWithDate,
+                 []() { return new HomeScreenLayoutClassicWithDate(gui::layout::ClassicWithDate); }},
+                {gui::layout::VerticalSimple,
+                 []() { return new HomeScreenLayoutVerticalSimple(gui::layout::VerticalSimple); }},
+                {gui::layout::VerticalWithAmPm,
+                 []() { return new HomeScreenLayoutVerticalWithAmPm(gui::layout::VerticalWithAmPm); }},
             {
-                "VerticalWithDate", []() { return new HomeScreenLayoutVerticalWithDate("VerticalWithDateAmPm"); }
+                gui::layout::VerticalWithDate,
+                    []() { return new HomeScreenLayoutVerticalWithDate(gui::layout::VerticalWithDateAmPm); }
             }
 #if CONFIG_ENABLE_TEMP == 1
             ,
@@ -66,7 +78,7 @@ namespace gui::factory
 
     std::string getDefaultLayout()
     {
-        return "ClassicWithBattery";
+        return gui::layout::ClassicWithBattery;
     }
 
 } // namespace gui::factory
