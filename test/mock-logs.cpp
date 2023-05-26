@@ -4,7 +4,7 @@
 #include <log/log.hpp>
 #include <cstdarg>
 __attribute__((weak)) int log_Log(
-    logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
+    LoggerLevel level, const char *file, int line, const char *function, const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);

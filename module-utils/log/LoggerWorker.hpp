@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,9 +21,9 @@ namespace Log
 
         static constexpr auto SignalQueueName   = "LoggerSignal";
         static constexpr auto SignalSize        = sizeof(Signal);
-        static constexpr auto SignalQueueLenght = 1;
+        static constexpr auto SignalQueueLength = 1;
 
-        explicit LoggerWorker(const std::string name);
+        explicit LoggerWorker(const std::string &name);
         void notify(Signal command);
         bool handleMessage(std::uint32_t queueID) override;
         void handleCommand(Signal command);

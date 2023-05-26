@@ -23,29 +23,29 @@ namespace Log
         return stream;
     }
 
-    Logger::Logger() : buffer{}, rotator{".log"}
+    Logger::Logger() : rotator{".log"}, streamBuffer{std::make_unique<char[]>(streamBufferSize)}
     {
         filtered = {
-            {"ApplicationManager", logger_level::LOGINFO},
-            {"CellularMux", logger_level::LOGINFO},
+            {"ApplicationManager", LoggerLevel::LOGINFO},
+            {"CellularMux", LoggerLevel::LOGINFO},
 #if (!LOG_SENSITIVE_DATA_ENABLED)
-            {"ServiceCellular", logger_level::LOGINFO},
+            {"ServiceCellular", LoggerLevel::LOGINFO},
 #endif
-            {"ServiceAntenna", logger_level::LOGERROR},
-            {"ServiceAudio", logger_level::LOGINFO},
-            {"ServiceBluetooth", logger_level::LOGINFO},
-            {"ServiceBluetooth_w1", logger_level::LOGINFO},
-            {"ServiceFota", logger_level::LOGINFO},
-            {"ServiceEink", logger_level::LOGINFO},
-            {"ServiceDB", logger_level::LOGINFO},
-            {CRIT_STR, logger_level::LOGTRACE},
-            {IRQ_STR, logger_level::LOGTRACE},
-            {"FileIndexer", logger_level::LOGINFO},
-            {"EventManager", logger_level::LOGINFO}
+            {"ServiceAntenna", LoggerLevel::LOGERROR},
+            {"ServiceAudio", LoggerLevel::LOGINFO},
+            {"ServiceBluetooth", LoggerLevel::LOGINFO},
+            {"ServiceBluetooth_w1", LoggerLevel::LOGINFO},
+            {"ServiceFota", LoggerLevel::LOGINFO},
+            {"ServiceEink", LoggerLevel::LOGINFO},
+            {"ServiceDB", LoggerLevel::LOGINFO},
+            {CRIT_STR, LoggerLevel::LOGTRACE},
+            {IRQ_STR, LoggerLevel::LOGTRACE},
+            {"FileIndexer", LoggerLevel::LOGINFO},
+            {"EventManager", LoggerLevel::LOGINFO}
         };
 
-        std::list<sys::WorkerQueueInfo> queueInfo{
-            {LoggerWorker::SignalQueueName, LoggerWorker::SignalSize, LoggerWorker::SignalQueueLenght}};
+        const std::list<sys::WorkerQueueInfo> queueInfo{
+            {LoggerWorker::SignalQueueName, LoggerWorker::SignalSize, LoggerWorker::SignalQueueLength}};
         worker = std::make_unique<LoggerWorker>(Log::workerName);
         worker->init(queueInfo);
         worker->run();
@@ -65,38 +65,38 @@ namespace Log
 
     void Logger::destroyInstance()
     {
-
         delete _logger;
         _logger = nullptr;
     }
 
     Logger &Logger::get()
     {
-        static auto *logger = new Logger;
-        _logger             = logger;
-        return *logger;
+        if (_logger == nullptr) {
+            _logger = new Logger;
+        }
+        return *_logger;
     }
 
-    auto Logger::getLogLevel(const std::string &name) -> logger_level
+    LoggerLevel Logger::getLogLevel(const std::string &name)
     {
         return filtered[name];
     }
 
-    auto Logger::getLogs() -> std::string
+    std::string Logger::getLogs()
     {
         LockGuard lock(mutex);
 
         std::string logs;
         while (!buffer.getFlushBuffer()->isEmpty()) {
-            const auto [result, msg] = buffer.getFlushBuffer()->get();
-            if (result) {
-                logs += msg;
+            const auto msg = buffer.getFlushBuffer()->get();
+            if (msg.has_value()) {
+                logs += msg.value();
             }
         }
         return logs;
     }
 
-    void Logger::init(Application app, size_t fileSize)
+    void Logger::init(Application app, std::size_t fileSize)
     {
         application = std::move(app);
         maxFileSize = fileSize;
@@ -117,70 +117,80 @@ namespace Log
         writeLogsTimer.start();
     }
 
-    auto Logger::log(Device device, const char *fmt, va_list args) -> int
+    int Logger::log(Device device, const char *fmt, va_list args)
     {
         LockGuard lock(mutex);
-        loggerBufferCurrentPos = 0;
+        lineBufferCurrentPos = 0;
         return writeLog(device, fmt, args);
     }
 
-    auto Logger::log(
-        logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args) -> int
+    int Logger::log(LoggerLevel level, const char *file, int line, const char *function, const char *fmt, va_list args)
     {
         if (!filterLogs(level)) {
             return -1;
         }
         LockGuard lock(mutex);
-        loggerBufferCurrentPos = 0;
+        lineBufferCurrentPos = 0;
         addLogHeader(level, file, line, function);
         return writeLog(Device::DEFAULT, fmt, args);
     }
 
-    auto Logger::writeLog(Device device, const char *fmt, va_list args) -> int
+    [[nodiscard]] std::size_t Logger::lineBufferSizeLeft() const noexcept
     {
-        const auto sizeLeft = loggerBufferSizeLeft();
-        const auto result   = vsnprintf(&loggerBuffer[loggerBufferCurrentPos], sizeLeft, fmt, args);
-        if (0 <= result) {
-            const auto numOfBytesAddedToBuffer = static_cast<size_t>(result);
-            loggerBufferCurrentPos += (numOfBytesAddedToBuffer < sizeLeft) ? numOfBytesAddedToBuffer : (sizeLeft - 1);
-            loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), "\n");
+        const auto sizeLeft = LINE_BUFFER_SIZE - lineBufferCurrentPos;
+        assert(sizeLeft > 0);
+        return sizeLeft;
+    }
 
-            logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
-            buffer.getCurrentBuffer()->put(std::string(loggerBuffer, loggerBufferCurrentPos));
+    int Logger::writeLog(Device device, const char *fmt, va_list args)
+    {
+        constexpr auto lineTerminationString = "\n";
+        constexpr auto lineTerminationLength = 2; // '\n' + null-terminator
+
+        const auto bufferSizeLeft = lineBufferSizeLeft();
+        const auto bytesParsed    = vsnprintf(&lineBuffer[lineBufferCurrentPos], bufferSizeLeft, fmt, args);
+        if (bytesParsed >= 0) {
+            /* Leave space for line termination */
+            lineBufferCurrentPos +=
+                std::min(bufferSizeLeft - lineTerminationLength, static_cast<std::size_t>(bytesParsed));
+            /* Terminate the line */
+            lineBufferCurrentPos +=
+                snprintf(&lineBuffer[lineBufferCurrentPos], lineBufferSizeLeft(), lineTerminationString);
+            /* Write the line to device and to the buffer */
+            logToDevice(Device::DEFAULT, lineBuffer, lineBufferCurrentPos);
+            buffer.getCurrentBuffer()->put(std::string(lineBuffer, lineBufferCurrentPos));
             checkBufferState();
-            return loggerBufferCurrentPos;
+            return lineBufferCurrentPos;
         }
         return -1;
     }
 
-    auto Logger::logAssert(const char *fmt, va_list args) -> int
+    int Logger::logAssert(const char *fmt, va_list args)
     {
         LockGuard lock(mutex);
-
         logToDevice(fmt, args);
-
-        return loggerBufferCurrentPos;
+        return lineBufferCurrentPos;
     }
 
     /// @param logPath: file path to store the log
     /// @return: < 0 - error occured during log flush
     /// @return:   0 - log flush did not happen
     /// @return:   1 - log flush successflul
-    auto Logger::dumpToFile(std::filesystem::path logPath, bool isLoggerRunning) -> int
+    int Logger::dumpToFile(const std::filesystem::path &logPath, LoggerState loggerState)
     {
         std::error_code errorCode;
         auto firstDump = !std::filesystem::exists(logPath, errorCode);
 
         if (errorCode) {
-            if (isLoggerRunning) {
-                LOG_ERROR("Failed to check if file %s exists, error: %d", logPath.c_str(), errorCode.value());
+            if (loggerState == LoggerState::RUNNING) {
+                LOG_ERROR("Failed to check if file '%s' exists, error: %d!", logPath.c_str(), errorCode.value());
             }
             return -EIO;
         }
 
-        if (const bool maxSizeExceeded = !firstDump && std::filesystem::file_size(logPath) > maxFileSize;
+        if (const auto maxSizeExceeded = (!firstDump && (std::filesystem::file_size(logPath) > maxFileSize));
             maxSizeExceeded) {
-            if (isLoggerRunning) {
+            if (loggerState == LoggerState::RUNNING) {
                 LOG_DEBUG("Max log file size exceeded. Rotating log files...");
             }
 
@@ -191,56 +201,62 @@ namespace Log
             firstDump = true;
         }
 
-        int status = 1;
         {
             const auto &logs = getLogs();
 
             LockGuard lock(logFileMutex);
-            std::ofstream logFile(logPath, std::fstream::out | std::fstream::app);
-            if (!logFile.good()) {
-                status = -EIO;
-            }
+            std::ofstream logFile;
 
-            constexpr size_t streamBufferSize = 64 * 1024;
-            auto streamBuffer                 = std::make_unique<char[]>(streamBufferSize);
+            /* In some implementations pubsetbuf has to be called before opening a stream to be effective */
             logFile.rdbuf()->pubsetbuf(streamBuffer.get(), streamBufferSize);
+
+            logFile.open(logPath, std::fstream::out | std::fstream::app);
+            if (!logFile.good()) {
+                if (loggerState == LoggerState::RUNNING) {
+                    LOG_ERROR("Failed to open log file '%s'!", logPath.c_str());
+                }
+                return -EIO;
+            }
 
             if (firstDump) {
                 addFileHeader(logFile);
             }
             logFile.write(logs.data(), logs.size());
             if (logFile.bad()) {
-                status = -EIO;
+                if (loggerState == LoggerState::RUNNING) {
+                    LOG_ERROR("Failed to flush logs to file '%s'!", logPath.c_str());
+                }
+                return -EIO;
             }
         }
 
-        if (isLoggerRunning) {
-            LOG_DEBUG("Flush ended with status: %d", status);
+        if (loggerState == LoggerState::RUNNING) {
+            LOG_DEBUG("Flush to file '%s' ended successfully!", logPath.c_str());
         }
 
-        return status;
+        return statusSuccess;
     }
 
-    auto Logger::diagnosticDump() -> int
+    int Logger::diagnosticDump()
     {
         buffer.nextBuffer();
         worker->notify(LoggerWorker::Signal::DumpDiagnostic);
         writeLogsTimer.restart(writeLogsToFileInterval);
-        return 1;
+        return statusSuccess;
     }
 
-    auto Logger::flushLogs() -> int
+    int Logger::flushLogs()
     {
         LOG_INFO("Shutdown dump logs");
         worker->close();
         writeLogsTimer.stop();
         buffer.nextBuffer();
-        return dumpToFile(purefs::dir::getLogsPath() / LOG_FILE_NAME, false);
+        return dumpToFile(purefs::dir::getLogsPath() / LOG_FILE_NAME, LoggerState::STOPPED);
     }
 
     void Logger::checkBufferState()
     {
-        auto size = buffer.getCurrentBuffer()->getSize();
+        const auto size = buffer.getCurrentBuffer()->getSize();
 
         if (size >= buffer.getCircularBufferSize()) {
             worker->notify(LoggerWorker::Signal::DumpFilledBuffer);
@@ -256,35 +272,46 @@ namespace Log
 
     const char *getTaskDesc()
     {
-        return xTaskGetCurrentTaskHandle() == nullptr ? Log::Logger::CRIT_STR
-               : xPortIsInsideInterrupt()             ? Log::Logger::IRQ_STR
-                                                      : pcTaskGetName(xTaskGetCurrentTaskHandle());
+        if (xTaskGetCurrentTaskHandle() == nullptr) {
+            return Log::Logger::CRIT_STR;
+        }
+        if (xPortIsInsideInterrupt() == pdTRUE) {
+            return Log::Logger::IRQ_STR;
+        }
+        return pcTaskGetName(xTaskGetCurrentTaskHandle());
     }
 
-    bool Logger::filterLogs(logger_level level)
+    bool Logger::filterLogs(LoggerLevel level)
     {
         return getLogLevel(getTaskDesc()) <= level;
     }
 
-    void Logger::addLogHeader(logger_level level, const char *file, int line, const char *function)
+    void Logger::addLogHeader(LoggerLevel level, const char *file, int line, const char *function)
     {
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
-                                           LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
-                                           "%" PRIu32 " ms ",
-                                           cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+        auto bufferSizeLeft = lineBufferSizeLeft();
+        auto bytesParsed    = snprintf(&lineBuffer[lineBufferCurrentPos],
+                                    bufferSizeLeft,
+                                    "%" PRIu32 " ms ",
+                                    cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+        if (bytesParsed >= 0) {
+            lineBufferCurrentPos += std::min(bufferSizeLeft, static_cast<std::size_t>(bytesParsed));
+        }
 
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
-                                           LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
-                                           "%s%-5s %s[%s] %s%s:%s:%d:%s ",
-                                           logColors->levelColors[level].data(),
-                                           levelNames[level],
-                                           logColors->serviceNameColor.data(),
-                                           getTaskDesc(),
-                                           logColors->callerInfoColor.data(),
-                                           file,
-                                           function,
-                                           line,
-                                           logColors->resetColor.data());
+        bufferSizeLeft = lineBufferSizeLeft();
+        bytesParsed    = snprintf(&lineBuffer[lineBufferCurrentPos],
+                               bufferSizeLeft,
+                               "%s%-5s %s[%s] %s%s:%s:%d:%s ",
+                               logColors->levelColors[level].data(),
+                               levelNames[level],
+                               logColors->serviceNameColor.data(),
+                               getTaskDesc(),
+                               logColors->callerInfoColor.data(),
+                               file,
+                               function,
+                               line,
+                               logColors->resetColor.data());
+        if (bytesParsed >= 0) {
+            lineBufferCurrentPos += std::min(bufferSizeLeft, static_cast<std::size_t>(bytesParsed));
+        }
     }
-
 } // namespace Log

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -38,39 +38,39 @@ TEST_CASE("LoggerBuffer tests")
 
     auto putMsgFunc = [&](const auto &msg) { buffer.put(msg); };
     auto getMsgFunc = [&](const auto &originalMsg) {
-        const auto [result, msg] = buffer.get();
-        REQUIRE(result);
-        REQUIRE(msg == originalMsg);
+        const auto msg = buffer.get();
+        REQUIRE(msg.has_value());
+        REQUIRE(msg.value() == originalMsg);
     };
     auto putAllMsgsFunc = [&](const vector<string> &msgs) { for_each(msgs.begin(), msgs.end(), putMsgFunc); };
     auto getAllMsgsFunc = [&](const vector<string> &msgs) { for_each(msgs.begin(), msgs.end(), getMsgFunc); };
     auto checkLostBytes = [&](size_t numOfBytes, const string &originalMsg) {
-        const auto [result, msg] = buffer.get();
-        REQUIRE(result);
-        REQUIRE(msg.find(originalMsg) != string::npos);
-        REQUIRE(msg.find(to_string(numOfBytes)) != string::npos);
-        REQUIRE(msg.find(LoggerBuffer::lostBytesMessage) != string::npos);
+        const auto msg = buffer.get();
+        REQUIRE(msg.has_value());
+        REQUIRE(msg.value().find(originalMsg) != string::npos);
+        REQUIRE(msg.value().find(to_string(numOfBytes)) != string::npos);
+        REQUIRE(msg.value().find(LoggerBuffer::lostBytesMessage) != string::npos);
     };
 
     SECTION("calling get on empty buffer should return false")
     {
-        const auto [result, _] = buffer.get();
-        REQUIRE(!result);
+        const auto msg = buffer.get();
+        REQUIRE(!msg.has_value());
         TestBuffer(buffer, capacity, 0);
     }
 
     SECTION("after putting one msg in buffer, get should return this msg")
     {
-        const string originalMsg = randomStringGenerator.getRandomString();
+        const auto originalMsg = randomStringGenerator.getRandomString();
         buffer.put(originalMsg);
         TestBuffer(buffer, capacity, 1);
-        const auto [result, msg] = buffer.get();
-        REQUIRE(result);
-        REQUIRE(msg == originalMsg);
+        const auto msg = buffer.get();
+        REQUIRE(msg.has_value());
+        REQUIRE(msg.value() == originalMsg);
         TestBuffer(buffer, capacity, 0);
     }
 
-    SECTION("after filling whole buffer with msgs, caliling get repeatedly should return all these msgs back")
+    SECTION("after filling whole buffer with msgs, calling get repeatedly should return all these msgs back")
     {
         const auto msgs = randomStringGenerator.createRandomStringVector(capacity);
         putAllMsgsFunc(msgs);

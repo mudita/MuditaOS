@@ -24,6 +24,12 @@ namespace Log
         SEGGER_RTT
     };
 
+    enum class LoggerState
+    {
+        STOPPED,
+        RUNNING
+    };
+
     struct Application
     {
         std::string name;
@@ -36,19 +42,18 @@ namespace Log
     class Logger
     {
       public:
-        void enableColors(bool enable);
         [[nodiscard]] static Logger &get();
+        void enableColors(bool enable);
         static void destroyInstance();
-        auto getLogs() -> std::string;
-        void init(Application app, size_t fileSize = MAX_LOG_FILE_SIZE);
+        std::string getLogs();
+        void init(Application app, std::size_t fileSize = MAX_LOG_FILE_SIZE);
         void createTimer(sys::Service *parent);
-        auto log(Device device, const char *fmt, va_list args) -> int;
-        auto log(logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
-            -> int;
-        auto logAssert(const char *fmt, va_list args) -> int;
-        auto dumpToFile(std::filesystem::path logPath, bool isLoggerRunning = true) -> int;
-        auto diagnosticDump() -> int;
-        auto flushLogs() -> int;
+        int log(Device device, const char *fmt, va_list args);
+        int log(LoggerLevel level, const char *file, int line, const char *function, const char *fmt, va_list args);
+        int logAssert(const char *fmt, va_list args);
+        int dumpToFile(const std::filesystem::path &logPath, LoggerState loggerState = LoggerState::RUNNING);
+        int diagnosticDump();
+        int flushLogs();
 
         static constexpr auto CRIT_STR = "CRIT";
         static constexpr auto IRQ_STR  = "IRQ";
@@ -56,37 +61,29 @@ namespace Log
       private:
         Logger();
 
-        void addLogHeader(logger_level level,
-                          const char *file     = nullptr,
-                          int line             = -1,
-                          const char *function = nullptr);
-        [[nodiscard]] bool filterLogs(logger_level level);
+        void addLogHeader(LoggerLevel level, const char *file = nullptr, int line = -1, const char *function = nullptr);
+        [[nodiscard]] bool filterLogs(LoggerLevel level);
         /// Filter out not interesting logs via thread Name
         /// its' using fact that:
         /// - TRACE is level 0, for unedfined lookups it will be alvways trace
         /// - it will be one time init for apps which doesn't tell what level they should have
         /// - for others it will be o1 lookup so it's fine
-        [[nodiscard]] auto getLogLevel(const std::string &name) -> logger_level;
+        [[nodiscard]] LoggerLevel getLogLevel(const std::string &name);
         void logToDevice(const char *fmt, va_list args);
-        void logToDevice(Device device, std::string_view logMsg, size_t length);
-        auto writeLog(Device device, const char *fmt, va_list args) -> int;
-        [[nodiscard]] size_t loggerBufferSizeLeft() const noexcept
-        {
-            const auto sizeLeft = LOGGER_BUFFER_SIZE - loggerBufferCurrentPos;
-            assert(sizeLeft > 0);
-            return sizeLeft;
-        }
+        void logToDevice(Device device, const char *logMsg, std::size_t length);
+        int writeLog(Device device, const char *fmt, va_list args);
+        std::size_t lineBufferSizeLeft() const noexcept;
 
         void addFileHeader(std::ofstream &file) const;
         void checkBufferState();
 
         cpp_freertos::MutexStandard mutex;
         cpp_freertos::MutexStandard logFileMutex;
-        logger_level level{LOGTRACE};
+        LoggerLevel loggerLevel{LOGTRACE};
         const LogColors *logColors            = &logColorsOff;
-        char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
-        size_t loggerBufferCurrentPos         = 0;
-        size_t maxFileSize                    = MAX_LOG_FILE_SIZE;
+        char lineBuffer[LINE_BUFFER_SIZE]     = {0};
+        std::size_t lineBufferCurrentPos      = 0;
+        std::size_t maxFileSize               = MAX_LOG_FILE_SIZE;
 
         Application application;
 
@@ -97,9 +94,14 @@ namespace Log
         sys::TimerHandle writeLogsTimer;
 
         static const char *levelNames[];
-        std::map<std::string, logger_level> filtered;
+        std::map<std::string, LoggerLevel> filtered;
         static Logger *_logger;
         std::unique_ptr<LoggerWorker> worker;
+
+        static constexpr int statusSuccess = 1;
+
+        static constexpr std::size_t streamBufferSize = 64 * 1024;
+        std::unique_ptr<char[]> streamBuffer;
     };
 
     const char *getTaskDesc();

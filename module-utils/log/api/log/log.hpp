@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -53,14 +53,14 @@ extern "C"
         LOGWARN,
         LOGERROR,
         LOGFATAL
-    } logger_level;
+    } LoggerLevel;
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
     /**
      * Forward declarations
      */
-    int log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
+    int log_Log(LoggerLevel level, const char *file, int line, const char *function, const char *fmt, ...)
         __attribute__((format(printf, 5, 6)));
 #ifdef LOG_IGNORE_ALL
     int log_ignore(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
@@ -103,7 +103,7 @@ extern "C"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-static const size_t LOGGER_BUFFER_SIZE = 8192;
+static const size_t LINE_BUFFER_SIZE   = 2048;
 static const char *LOG_FILE_NAME       = "MuditaOS.log";
 static const int MAX_LOG_FILES_COUNT   = 3;
 static const size_t MAX_LOG_FILE_SIZE  = 1024 * 1024 * 15; // 15 MB

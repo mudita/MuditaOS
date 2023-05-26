@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <memory>
 #include <string>
+#include <optional>
 
 class StringCircularBuffer
 {
@@ -19,7 +20,7 @@ class StringCircularBuffer
     {
         return size == 0;
     }
-    [[nodiscard]] virtual std::pair<bool, std::string> get();
+    [[nodiscard]] virtual std::optional<std::string> get();
     [[nodiscard]] size_t getSize() const noexcept
     {
         return size;

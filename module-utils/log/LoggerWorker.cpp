@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LoggerWorker.hpp"
@@ -9,7 +9,7 @@
 
 namespace Log
 {
-    LoggerWorker::LoggerWorker(const std::string name) : Worker(name, priority)
+    LoggerWorker::LoggerWorker(const std::string &name) : Worker(name, priority)
     {}
 
     void LoggerWorker::notify(Signal command)
