@@ -1,8 +1,6 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <board.h>
-#include <critical.hpp>
 #include <macros.h>
 #include <log/log.hpp>
 #include <Logger.hpp>
@@ -13,31 +11,45 @@ namespace Log
 {
     void Logger::logToDevice(const char *fmt, va_list args)
     {
-        loggerBufferCurrentPos = 0;
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
-                                           loggerBufferSizeLeft(),
-                                           "%lu ms ",
-                                           cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+        lineBufferCurrentPos = 0;
 
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
-                                           loggerBufferSizeLeft(),
-                                           "%-5s [%-10s] \x1b[31mASSERTION ",
-                                           levelNames[LOGFATAL],
-                                           getTaskDesc());
+        auto bufferSizeLeft = lineBufferSizeLeft();
+        auto bytesParsed    = snprintf(&lineBuffer[lineBufferCurrentPos],
+                                    bufferSizeLeft,
+                                    "%lu ms ",
+                                    cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+        if (bytesParsed >= 0) {
+            lineBufferCurrentPos += std::min(bufferSizeLeft, static_cast<std::size_t>(bytesParsed));
+        }
 
-        loggerBufferCurrentPos += vsnprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), fmt, args);
-        logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
-        buffer.getCurrentBuffer()->put(std::string(loggerBuffer, loggerBufferCurrentPos));
+        bufferSizeLeft = lineBufferSizeLeft();
+        bytesParsed    = snprintf(&lineBuffer[lineBufferCurrentPos],
+                               bufferSizeLeft,
+                               "%-5s [%-10s] \x1b[31mASSERTION ",
+                               levelNames[LOGFATAL],
+                               getTaskDesc());
+        if (bytesParsed >= 0) {
+            lineBufferCurrentPos += std::min(bufferSizeLeft, static_cast<std::size_t>(bytesParsed));
+        }
+
+        bufferSizeLeft = lineBufferSizeLeft();
+        bytesParsed    = vsnprintf(&lineBuffer[lineBufferCurrentPos], bufferSizeLeft, fmt, args);
+        if (bytesParsed >= 0) {
+            lineBufferCurrentPos += std::min(bufferSizeLeft, static_cast<std::size_t>(bytesParsed));
+        }
+
+        logToDevice(Device::DEFAULT, lineBuffer, lineBufferCurrentPos);
+        buffer.getCurrentBuffer()->put(std::string(lineBuffer, lineBufferCurrentPos));
     }
 
-    void Logger::logToDevice(Device device, std::string_view logMsg, size_t length)
+    void Logger::logToDevice(Device device, const char *logMsg, std::size_t length)
     {
         switch (device) {
         case Device::DEFAULT:
-            log_WriteToDevice(reinterpret_cast<const uint8_t *>(logMsg.data()), length);
+            log_WriteToDevice(reinterpret_cast<const uint8_t *>(logMsg), length);
             break;
         case Device::SEGGER_RTT:
-            SEGGER_RTT_Write(0, reinterpret_cast<const void *>(logMsg.data()), length);
+            SEGGER_RTT_Write(0, logMsg, length);
             break;
         default:
             break;

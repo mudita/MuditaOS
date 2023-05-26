@@ -1,19 +1,19 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LoggerBuffer.hpp"
 
-std::pair<bool, std::string> LoggerBuffer::get()
+std::optional<std::string> LoggerBuffer::get()
 {
-    auto [result, logMsg] = StringCircularBuffer::get();
-    if (!result) {
-        return {result, logMsg};
+    auto logMsg = StringCircularBuffer::get();
+    if (!logMsg.has_value()) {
+        return std::nullopt;
     }
     if (numOfLostBytes > 0) {
-        logMsg         = std::to_string(numOfLostBytes) + " " + lostBytesMessage + "\n" + logMsg;
+        logMsg         = std::to_string(numOfLostBytes) + " " + lostBytesMessage + "\n" + logMsg.value();
         numOfLostBytes = 0;
     }
-    return {true, logMsg};
+    return logMsg;
 }
 
 void LoggerBuffer::put(const std::string &logMsg)
@@ -30,8 +30,12 @@ void LoggerBuffer::put(std::string &&logMsg)
 
 void LoggerBuffer::updateNumOfLostBytes()
 {
-    if (StringCircularBuffer::isFull()) {
-        auto [_, lostMsg] = StringCircularBuffer::get();
-        numOfLostBytes += lostMsg.length();
+    if (!StringCircularBuffer::isFull()) {
+        return;
+    }
+
+    const auto lostMsg = StringCircularBuffer::get();
+    if (lostMsg.has_value()) {
+        numOfLostBytes += lostMsg.value().length();
     }
 }

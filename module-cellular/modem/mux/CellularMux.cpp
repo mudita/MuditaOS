@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularMux.h"
@@ -554,7 +554,6 @@ void CellularMux::processData(bsp::cellular::CellularDMAResultStruct &result)
             LOG_DEBUG("DMA buffer full");
             [[fallthrough]];
         case bsp::cellular::CellularResultCode::ReceivedAfterFull:
-            [[fallthrough]];
         case bsp::cellular::CellularResultCode::ReceivedAndIdle:
             inst->processData(result);
             break;
@@ -562,9 +561,7 @@ void CellularMux::processData(bsp::cellular::CellularDMAResultStruct &result)
             LOG_DEBUG("DMA uninitialized");
             [[fallthrough]];
         case bsp::cellular::CellularResultCode::ReceivingNotStarted:
-            [[fallthrough]];
         case bsp::cellular::CellularResultCode::TransmittingNotStarted:
-            [[fallthrough]];
         case bsp::cellular::CellularResultCode::CMUXFrameError:
             LOG_DEBUG("CellularResult Error: %s", c_str(result.resultCode));
             inst->processError(result);
@@ -792,7 +789,7 @@ void CellularMux::closeChannels()
 bool CellularMux::searchATCommandResponse(const std::vector<std::string> &response,
                                           const std::string &str,
                                           size_t numberOfExpectedTokens,
-                                          logger_level level)
+                                          LoggerLevel level)
 {
     const size_t numberOfTokens = response.size();
     if (searchForString(response, str) && (numberOfExpectedTokens == 0 || numberOfTokens == numberOfExpectedTokens)) {
@@ -838,7 +835,7 @@ const std::unique_ptr<ATParser> &CellularMux::getParser() const
     return parser;
 }
 
-bool CellularMux::checkATCommandPrompt(const std::vector<std::string> &response, logger_level level)
+bool CellularMux::checkATCommandPrompt(const std::vector<std::string> &response, LoggerLevel level)
 {
     return searchATCommandResponse(response, ">", 0, level);
 }

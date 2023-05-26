@@ -1,20 +1,21 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StringCircularBuffer.hpp"
 
-std::pair<bool, std::string> StringCircularBuffer::get()
+std::optional<std::string> StringCircularBuffer::get()
 {
     if (isEmpty()) {
-        return {false, ""};
+        return std::nullopt;
     }
 
-    const std::string val = buffer[tail];
+    const auto val = buffer[tail];
+
     full                  = false;
     tail                  = (tail + 1) % capacity;
     --size;
 
-    return {true, val};
+    return val;
 }
 
 void StringCircularBuffer::put(const std::string &item)

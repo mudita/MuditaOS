@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <log/log.hpp>
 #include <Logger.hpp>
 #include <iostream>
-#include <string_view>
 #include <ticks.hpp>
 
 namespace Log
@@ -14,7 +12,7 @@ namespace Log
         assert(false && "Not implemented");
     }
 
-    void Logger::logToDevice(Device, std::string_view logMsg, size_t)
+    void Logger::logToDevice(Device, const char *logMsg, size_t)
     {
         std::cout << logMsg;
     }

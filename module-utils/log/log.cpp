@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log/log.hpp>
@@ -23,7 +23,7 @@ int log_Printf(const char *fmt, ...)
     return result;
 }
 
-int log_ignore(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
+int log_ignore(LoggerLevel level, const char *file, int line, const char *function, const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -31,7 +31,7 @@ int log_ignore(logger_level level, const char *file, int line, const char *funct
     return 0;
 }
 
-int log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
+int log_Log(LoggerLevel level, const char *file, int line, const char *function, const char *fmt, ...)
 {
     va_list args;
 

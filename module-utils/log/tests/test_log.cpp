@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -10,17 +10,16 @@ using namespace std;
 
 TEST_CASE("Log tests")
 {
-    int value                     = -423;
+    const int value                   = -423;
     const char *carray            = "carray";
-    string str                    = "string";
-    double double_value           = 6.5323;
-    unsigned int unsigned_value   = 7821;
-    constexpr auto big_array_size = LOGGER_BUFFER_SIZE + 2;
-    char big_array[big_array_size];
-    memset(big_array, 'X', big_array_size);
-    big_array[big_array_size - 1] = '\0';
+    const string str                  = "string";
+    const double double_value         = 6.5323;
+    const unsigned int unsigned_value = 7821;
+    char big_array[LINE_BUFFER_SIZE + 2];
+    memset(big_array, 'X', sizeof(big_array));
+    big_array[sizeof(big_array) - 1] = '\0';
 
-    int loggerBufferSize = static_cast<int>(LOGGER_BUFFER_SIZE);
+    const auto loggerBufferSize = static_cast<int>(LINE_BUFFER_SIZE);
     int result           = LOG_TRACE("value: %d", value);
     REQUIRE(0 < result);
     REQUIRE(result <= loggerBufferSize);

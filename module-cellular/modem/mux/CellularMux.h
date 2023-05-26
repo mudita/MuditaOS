@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -323,7 +323,7 @@ class CellularMux
     bool searchATCommandResponse(const std::vector<std::string> &response,
                                  const std::string &str,
                                  size_t numberOfExpectedTokens,
-                                 logger_level level);
+                                 LoggerLevel level);
     bool searchForString(const std::vector<std::string> &response, const std::string &str);
 
     /// @brief It is serching the resposne for ">" string
@@ -333,7 +333,7 @@ class CellularMux
     /// @param response - tokenized resposne
     /// @param level - determine how the errors are logged
     /// @return true - str string is found, false - otherwise
-    bool checkATCommandPrompt(const std::vector<std::string> &response, logger_level level = LOGERROR);
+    bool checkATCommandPrompt(const std::vector<std::string> &response, LoggerLevel level = LOGERROR);
 
     void selectAntenna(bsp::cellular::antenna antenna);
     [[nodiscard]] bsp::cellular::antenna getAntenna();
