@@ -37,4 +37,5 @@ namespace bsp::rtc
 	ErrorCode setAlarmInSecondsFromNow(std::uint32_t secs);
 	ErrorCode getAlarmTimestamp(std::uint32_t* secs);
 	ErrorCode setMinuteAlarm(time_t timestamp);
+	void printCurrentDataTime();
 }
