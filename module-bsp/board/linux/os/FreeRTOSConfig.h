@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -171,6 +171,7 @@ standard names. */
 #ifdef DEBUG_FREERTOS
 #define configSYSTEM_HEAP_STATS              (1)
 #define configUSER_HEAP_STATS                (1)
+#define configUSER_HEAP_EXTENDED_STATS       (0)
 #define configSYSTEM_HEAP_INTEGRITY_CHECK    (1)
 #define PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS (1)
 #endif

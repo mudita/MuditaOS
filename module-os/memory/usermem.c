@@ -72,7 +72,10 @@ typedef struct A_BLOCK_LINK
 #if (configUSER_HEAP_STATS == 1)
     TaskHandle_t xAllocatingTask; /*<< The task allocating the memory block. */
     TickType_t xTimeAllocated;    /*<< The timestamp of memory block allocation. */
-#endif
+#if (configUSER_HEAP_EXTENDED_STATS == 1)
+	struct A_BLOCK_LINK *pxNextTakenBlock, *pxPrevTakenBlock;
+#endif // configUSER_HEAP_EXTENDED_STATS
+#endif // configUSER_HEAP_STATS
 } BlockLink_t;
 
 /*-----------------------------------------------------------*/
@@ -100,12 +103,22 @@ static const size_t xHeapStructSize = (sizeof(BlockLink_t)
         & ~((size_t) usermemBYTE_ALIGNMENT_MASK);
 
 /* Create a couple of list links to mark the start and end of the list. */
-static BlockLink_t userxStart, *userpxEnd = NULL;
+static BlockLink_t xUserStart, *pxUserEnd = NULL;
+
+/* Start/end of used blocks list */
+#if (configUSER_HEAP_STATS == 1 && configUSER_HEAP_EXTENDED_STATS == 1)
+static BlockLink_t xUserTakenEnd;
+#endif
 
 /* Keeps track of the number of free bytes remaining, but says nothing about
 fragmentation. */
-static size_t userxFreeBytesRemaining = 0U;
-static size_t userxMinimumEverFreeBytesRemaining = 0U;
+static size_t xUserFreeBytesRemaining = 0U;
+static size_t xUserMinimumEverFreeBytesRemaining = 0U;
+
+#if (configUSER_HEAP_STATS == 1 && configUSER_HEAP_EXTENDED_STATS == 1)
+static size_t xUserNumberOfSuccessfulAllocations = 0U;
+static size_t xUserNumberOfSuccessfulFrees = 0U;
+#endif
 
 /* Allocation statistics */
 static size_t xAllocationsCount = 0;
@@ -134,7 +147,7 @@ void *usermalloc(size_t xWantedSize)
 		{
 			/* If this is the first call to malloc then the heap will require
 			initialisation to setup the list of free blocks. */
-			if( userpxEnd == NULL )
+			if( pxUserEnd == NULL )
 			{
 				prvHeapInit();
 			}
@@ -173,12 +186,12 @@ void *usermalloc(size_t xWantedSize)
 					mtCOVERAGE_TEST_MARKER();
 				}
 
-				if( ( xWantedSize > 0 ) && ( xWantedSize <= userxFreeBytesRemaining ) )
+				if( ( xWantedSize > 0 ) && ( xWantedSize <= xUserFreeBytesRemaining ) )
 				{
 					/* Traverse the list from the start	(lowest address) block until
 					one	of adequate size is found. */
-					pxPreviousBlock = &userxStart;
-					pxBlock = userxStart.pxNextFreeBlock;
+					pxPreviousBlock = &xUserStart;
+					pxBlock = xUserStart.pxNextFreeBlock;
 					while( ( pxBlock->xBlockSize < xWantedSize ) && ( pxBlock->pxNextFreeBlock != NULL ) )
 					{
 						pxPreviousBlock = pxBlock;
@@ -187,7 +200,7 @@ void *usermalloc(size_t xWantedSize)
 
 					/* If the end marker was reached then a block of adequate size
 					was	not found. */
-					if( pxBlock != userpxEnd )
+					if( pxBlock != pxUserEnd )
 					{
 						/* Return the memory space pointed to - jumping over the
 						BlockLink_t structure at its start. */
@@ -236,11 +249,11 @@ void *usermalloc(size_t xWantedSize)
 						xAllocatedSum += pxBlock->xBlockSize;
 #endif
 
-						userxFreeBytesRemaining -= pxBlock->xBlockSize;
+						xUserFreeBytesRemaining -= pxBlock->xBlockSize;
 
-						if( userxFreeBytesRemaining < userxMinimumEverFreeBytesRemaining )
+						if( xUserFreeBytesRemaining < xUserMinimumEverFreeBytesRemaining )
 						{
-							userxMinimumEverFreeBytesRemaining = userxFreeBytesRemaining;
+							xUserMinimumEverFreeBytesRemaining = xUserFreeBytesRemaining;
 						}
 						else
 						{
@@ -251,9 +264,16 @@ void *usermalloc(size_t xWantedSize)
 						by the application and has no "next" block. */
 						pxBlock->xBlockSize |= xBlockAllocatedBit;
 #if (configUSER_HEAP_STATS == 1)
+#if (configUSER_HEAP_EXTENDED_STATS == 1)
+                        /* Push taken block at the end of the taken list */
+                        xUserTakenEnd.pxPrevTakenBlock->pxNextTakenBlock = pxBlock;
+                        pxBlock->pxPrevTakenBlock                   	 = xUserTakenEnd.pxPrevTakenBlock;
+                        pxBlock->pxNextTakenBlock                    	 = &xUserTakenEnd;
+                        xUserTakenEnd.pxPrevTakenBlock                   = pxBlock;
+#endif // configUSER_HEAP_EXTENDED_STATS
                         pxBlock->xAllocatingTask = xTaskGetCurrentTaskHandle();
                         pxBlock->xTimeAllocated  = xTaskGetTickCount();
-#endif
+#endif // configUSER_HEAP_STATS
 
 #if (PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS != 0)
                     	{
@@ -265,6 +285,9 @@ void *usermalloc(size_t xWantedSize)
                     	#endif
 
 						pxBlock->pxNextFreeBlock = NULL;
+#if (configUSER_HEAP_STATS == 1 && configUSER_HEAP_EXTENDED_STATS == 1)
+						xUserNumberOfSuccessfulAllocations++;
+#endif						
 					}
 					else
 					{
@@ -350,9 +373,17 @@ void userfree(void *pv)
 #endif
 
 						/* Add this block to the list of free blocks. */
-						userxFreeBytesRemaining += pxLink->xBlockSize;
+						xUserFreeBytesRemaining += pxLink->xBlockSize;
 						traceFREE( pv, pxLink->xBlockSize );
 						prvInsertBlockIntoFreeList( ( ( BlockLink_t * ) pxLink ) );
+#if (configUSER_HEAP_STATS == 1 && configUSER_HEAP_EXTENDED_STATS == 1)
+						xUserNumberOfSuccessfulFrees++;
+                        /* Update taken list */
+                        pxLink->pxPrevTakenBlock->pxNextTakenBlock = pxLink->pxNextTakenBlock;
+                        pxLink->pxNextTakenBlock->pxPrevTakenBlock = pxLink->pxPrevTakenBlock;
+                        pxLink->pxPrevTakenBlock                   = NULL;
+                        pxLink->pxNextTakenBlock                   = NULL;
+#endif						
 					}
 					( void ) xTaskResumeAll();
 				}
@@ -417,13 +448,13 @@ void *userrealloc(void *pv, size_t xWantedSize) {
 
 size_t usermemGetFreeHeapSize( void )
 {
-    return userxFreeBytesRemaining;
+    return xUserFreeBytesRemaining;
 }
 /*-----------------------------------------------------------*/
 
 size_t usermemGetMinimumEverFreeHeapSize( void )
 {
-    return userxMinimumEverFreeBytesRemaining;
+    return xUserMinimumEverFreeBytesRemaining;
 }
 /*-----------------------------------------------------------*/
 
@@ -478,33 +509,45 @@ size_t xTotalHeapSize = USERMEM_TOTAL_HEAP_SIZE;
 
 	pucAlignedHeap = ( uint8_t * ) uxAddress;
 
-	/* userxStart is used to hold a pointer to the first item in the list of free
+	/* xUserStart is used to hold a pointer to the first item in the list of free
 	blocks.  The void cast is used to prevent compiler warnings. */
-	userxStart.pxNextFreeBlock = ( void * ) pucAlignedHeap;
-	userxStart.xBlockSize = ( size_t ) 0;
+	xUserStart.pxNextFreeBlock = ( void * ) pucAlignedHeap;
+	xUserStart.xBlockSize = ( size_t ) 0;
 #if (configUSER_HEAP_STATS == 1)
-    userxStart.xTimeAllocated  = 0;
-    userxStart.xAllocatingTask = 0;
-#endif
+    xUserStart.xTimeAllocated  = 0;
+    xUserStart.xAllocatingTask = 0;
 
-    /* userpxEnd is used to mark the end of the list of free blocks and is inserted
+#if (configUSER_HEAP_EXTENDED_STATS == 1)
+    xUserStart.pxNextTakenBlock = &xUserTakenEnd;
+    xUserStart.pxPrevTakenBlock = NULL;
+
+	xUserTakenEnd.pxNextFreeBlock  = NULL;
+    xUserTakenEnd.xBlockSize	   = 0;
+    xUserTakenEnd.pxNextTakenBlock = NULL;
+    xUserTakenEnd.pxPrevTakenBlock = &xUserStart;
+    xUserTakenEnd.xTimeAllocated   = 0;
+    xUserTakenEnd.xAllocatingTask  = 0;
+#endif // configUSER_HEAP_EXTENDED_STATS
+#endif // configUSER_HEAP_STATS
+
+    /* pxUserEnd is used to mark the end of the list of free blocks and is inserted
 	at the end of the heap space. */
 	uxAddress = ( ( size_t ) pucAlignedHeap ) + xTotalHeapSize;
 	uxAddress -= xHeapStructSize;
 	uxAddress &= ~( ( size_t ) usermemBYTE_ALIGNMENT_MASK );
-	userpxEnd = ( void * ) uxAddress;
-	userpxEnd->xBlockSize = 0;
-	userpxEnd->pxNextFreeBlock = NULL;
+	pxUserEnd = ( void * ) uxAddress;
+	pxUserEnd->xBlockSize = 0;
+	pxUserEnd->pxNextFreeBlock = NULL;
 #if (configUSER_HEAP_STATS == 1)
-    userpxEnd->xTimeAllocated  = 0;
-    userpxEnd->xAllocatingTask = 0;
+    pxUserEnd->xTimeAllocated  = 0;
+    pxUserEnd->xAllocatingTask = 0;
 #endif
 
     /* To start with there is a single free block that is sized to take up the
-	entire heap space, minus the space taken by userpxEnd. */
+	entire heap space, minus the space taken by pxUserEnd. */
 	pxFirstFreeBlock = ( void * ) pucAlignedHeap;
 	pxFirstFreeBlock->xBlockSize = uxAddress - ( size_t ) pxFirstFreeBlock;
-	pxFirstFreeBlock->pxNextFreeBlock = userpxEnd;
+	pxFirstFreeBlock->pxNextFreeBlock = pxUserEnd;
 	#if( PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS != 0 )
     {
         pxFirstFreeBlock->ulStamp = INTEGRITY_STAMP_FREE;
@@ -512,8 +555,8 @@ size_t xTotalHeapSize = USERMEM_TOTAL_HEAP_SIZE;
     #endif
 
 	/* Only one block exists - and it covers the entire usable heap space. */
-	userxMinimumEverFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
-	userxFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
+	xUserMinimumEverFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
+	xUserFreeBytesRemaining = pxFirstFreeBlock->xBlockSize;
 
 	/* Work out the position of the top bit in a size_t variable. */
 	xBlockAllocatedBit = ( ( size_t ) 1 ) << ( ( sizeof( size_t ) * heapBITS_PER_BYTE ) - 1 );
@@ -527,7 +570,7 @@ uint8_t *puc;
 
 	/* Iterate through the list until a block is found that has a higher address
 	than the block being inserted. */
-	for( pxIterator = &userxStart; pxIterator->pxNextFreeBlock < pxBlockToInsert; pxIterator = pxIterator->pxNextFreeBlock )
+	for( pxIterator = &xUserStart; pxIterator->pxNextFreeBlock < pxBlockToInsert; pxIterator = pxIterator->pxNextFreeBlock )
 	{
 		/* Nothing to do here, just iterate to the right position. */
 	}
@@ -550,7 +593,7 @@ uint8_t *puc;
 	puc = ( uint8_t * ) pxBlockToInsert;
 	if( ( puc + pxBlockToInsert->xBlockSize ) == ( uint8_t * ) pxIterator->pxNextFreeBlock )
 	{
-		if( pxIterator->pxNextFreeBlock != userpxEnd )
+		if( pxIterator->pxNextFreeBlock != pxUserEnd )
 		{
 			/* Form one big block from the two blocks. */
 			pxBlockToInsert->xBlockSize += pxIterator->pxNextFreeBlock->xBlockSize;
@@ -558,7 +601,7 @@ uint8_t *puc;
 		}
 		else
 		{
-			pxBlockToInsert->pxNextFreeBlock = userpxEnd;
+			pxBlockToInsert->pxNextFreeBlock = pxUserEnd;
 		}
 	}
 	else
