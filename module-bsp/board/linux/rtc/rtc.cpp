@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <bsp/rtc/rtc.hpp>
@@ -6,14 +6,16 @@
 #include <task.h>
 #include <queue.h>
 #include <time.h>
+#include <log/log.hpp>
 
 namespace
 {
     time_t timestampOffset;
     time_t timestampAlarm;
     time_t localOffset;
-    xQueueHandle qHandleRtcIrq   = NULL;
-    TaskHandle_t rtcWorkerHandle = NULL;
+    xQueueHandle qHandleRtcIrq         = nullptr;
+    TaskHandle_t rtcWorkerHandle       = nullptr;
+    constexpr std::uint16_t stackDepth = 512;
 
     void rtcWorker(void *pvp)
     {
@@ -39,13 +41,27 @@ namespace bsp::rtc
         timestampOffset = 0;
         timestampAlarm  = 0;
 
-        xTaskCreate(rtcWorker, "rtc_worker", 512, qHandle, 0, &rtcWorkerHandle);
+        xTaskCreate(rtcWorker, "rtc_worker", stackDepth, qHandle, 0, &rtcWorkerHandle);
+        printCurrentDataTime();
         return ErrorCode::OK;
+    }
+
+    void printCurrentDataTime()
+    {
+        struct tm datatime;
+        getCurrentDateTime(&datatime);
+        LOG_INFO("Startup date: %04d/%02d/%02d time: %02d:%02d:%02d",
+                 1900 + datatime.tm_year,
+                 1 + datatime.tm_mon,
+                 datatime.tm_mday,
+                 datatime.tm_hour,
+                 datatime.tm_min,
+                 datatime.tm_sec);
     }
 
     ErrorCode setDateTimeFromTimestamp(time_t timestamp)
     {
-        time_t current   = time(NULL);
+        time_t current   = time(nullptr);
         struct tm *local = localtime(&current);
 
         localOffset = local->tm_gmtoff;
@@ -57,7 +73,7 @@ namespace bsp::rtc
     ErrorCode setDateTime(struct tm *tim)
     {
 
-        time_t current   = time(NULL);
+        time_t current   = time(nullptr);
         time_t timestamp = mktime(tim);
 
         timestampOffset = timestamp - current;
@@ -66,7 +82,7 @@ namespace bsp::rtc
 
     ErrorCode getCurrentDateTime(struct tm *datetime)
     {
-        time_t t = time(NULL);
+        time_t t = time(nullptr);
         t += timestampOffset;
         *datetime = *gmtime(&t);
 
@@ -75,14 +91,14 @@ namespace bsp::rtc
 
     ErrorCode getCurrentTimestamp(time_t *timestamp)
     {
-        *timestamp = time(NULL) + timestampOffset;
+        *timestamp = time(nullptr) + timestampOffset;
 
         return ErrorCode::OK;
     }
 
     ErrorCode setAlarmOnDate(struct tm *datetime)
     {
-        if (datetime == NULL) {
+        if (datetime == nullptr) {
             return ErrorCode::Error;
         }
 
@@ -111,7 +127,7 @@ namespace bsp::rtc
 
     ErrorCode getAlarmTimestamp(std::uint32_t *secs)
     {
-        if (secs == NULL) {
+        if (secs == nullptr) {
             return ErrorCode::Error;
         }
 
@@ -120,12 +136,6 @@ namespace bsp::rtc
 
     ErrorCode enableAlarmIrq()
     {
-        std::uint32_t cnt = 100000;
-
-        if (cnt == 0) {
-            return ErrorCode::Error;
-        }
-
         return ErrorCode::OK;
     }
 

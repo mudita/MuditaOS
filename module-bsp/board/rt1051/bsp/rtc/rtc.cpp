@@ -63,8 +63,23 @@ namespace bsp::rtc
         /* Enable HP RTC */
         SNVS_HP_RTC_StartTimer(SNVS);
 
+        printCurrentDataTime();
+
         LOG_INFO("RTC configured successfully");
         return ErrorCode::OK;
+    }
+
+    void printCurrentDataTime()
+    {
+        struct tm datatime;
+        getCurrentDateTime(&datatime);
+        LOG_INFO("Startup RTC date: %04d/%02d/%02d time: %02d:%02d:%02d",
+                 1900 + datatime.tm_year,
+                 1 + datatime.tm_mon,
+                 datatime.tm_mday,
+                 datatime.tm_hour,
+                 datatime.tm_min,
+                 datatime.tm_sec);
     }
 
     ErrorCode setDateTimeFromTimestamp(time_t timestamp)
