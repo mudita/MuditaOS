@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AboutYourBellModel.hpp"
@@ -7,6 +7,7 @@
 #include <widgets/AboutYourBellListItem.hpp>
 #include <ProductConfig.hpp>
 
+#include <serial-number-reader/SerialNumberReader.hpp>
 #include <ListView.hpp>
 #include <product/version.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -46,6 +47,9 @@ namespace app::bell_settings
             new gui::AboutYourBellListItem(utils::translate("app_bell_settings_about_product"),
                                            utils::translate("app_bell_settings_about_version"),
                                            gui::AboutYourBellListItem::TokenMap({{"$VERSION", std::string(VERSION)}})));
+
+        internalData.push_back(new gui::AboutYourBellListItem(utils::translate("app_settings_tech_info_serial_number"),
+                                                              serial_number_reader::readSerialNumber()));
 
 #if CONFIG_SHOW_MEMORY_INFO == 1
         struct statvfs stat;
