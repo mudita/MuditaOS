@@ -38,6 +38,7 @@ namespace bsp
         std::string serialNumber;
         std::uint16_t deviceVersion;
         std::string rootPath;
+        bool mtpLockedAtInit;
     };
 
     int usbInit(const usbInitParams &initParams);
