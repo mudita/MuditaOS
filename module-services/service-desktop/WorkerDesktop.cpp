@@ -48,8 +48,12 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     ownerService->bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
-    const bsp::usbInitParams initParams = {
-        receiveQueue, irqQueue, serialNumber, device_colour::getColourVersion(caseColour), rootPath};
+    const bsp::usbInitParams initParams = {receiveQueue,
+                                           irqQueue,
+                                           serialNumber,
+                                           device_colour::getColourVersion(caseColour),
+                                           rootPath,
+                                           securityModel.isSecurityEnabled()};
 
     initialized = bsp::usbInit(initParams) == 0;
 
@@ -96,9 +100,15 @@ void WorkerDesktop::reset()
     usbStatus   = bsp::USBDeviceStatus::Disconnected;
     bsp::usbDeinit();
 
-    bsp::usbInitParams initParams = {
-        receiveQueue, irqQueue, serialNumber, device_colour::getColourVersion(caseColour), rootPath};
-    initialized = bsp::usbInit(initParams) >= 0;
+    const bsp::usbInitParams initParams = {receiveQueue,
+                                           irqQueue,
+                                           serialNumber,
+                                           device_colour::getColourVersion(caseColour),
+                                           rootPath,
+                                           securityModel.isSecurityEnabled()};
+
+    initialized = bsp::usbInit(initParams) == 0;
+
     if (initialized) {
         usbStatus = bsp::USBDeviceStatus::Connected;
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),

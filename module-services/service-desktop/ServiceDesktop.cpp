@@ -172,9 +172,9 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
     if (initialized) {
         return sys::ReturnCodes::Success;
     }
+
     auto serialNumber = getSerialNumber();
     auto caseColour   = getCaseColour();
-
     LOG_DEBUG("usbWorkerInit Serial Number: %s, Case Colour: %s", serialNumber.c_str(), caseColour.c_str());
 
     desktopWorker = std::make_unique<WorkerDesktop>(this,

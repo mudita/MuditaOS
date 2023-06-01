@@ -44,7 +44,6 @@ class WorkerDesktop : public sys::Worker
 
   private:
     void reset();
-    void suspendUsb();
 
     bool handleReceiveQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
     bool handleSendQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
