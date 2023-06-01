@@ -283,8 +283,8 @@ namespace app
 
         auto numberView    = utils::PhoneNumber(number).getView();
         auto searchResults = DBServiceAPI::MatchContactByPhoneNumber(this, numberView);
-        if (searchResults != nullptr) {
-            LOG_INFO("Found contact matching search num : contact ID %" PRIu32, searchResults->ID);
+        if (searchResults != nullptr && !searchResults->isTemporary()) {
+            LOG_INFO("Found contact matching (non temporary) search num : contact ID %" PRIu32, searchResults->ID);
             app::manager::Controller::sendAction(this,
                                                  app::manager::actions::EditContact,
                                                  std::make_unique<PhonebookItemData>(std::move(searchResults)));
