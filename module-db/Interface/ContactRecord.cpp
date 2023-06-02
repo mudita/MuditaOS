@@ -626,13 +626,12 @@ auto ContactRecordInterface::addQuery(const std::shared_ptr<db::Query> &query) -
     if (duplicates.empty()) {
         result = ContactRecordInterface::Add(addQuery->rec);
     }
-    else {
-        addQuery->rec.ID = DB_ID_NONE;
-    }
 
     auto response = std::make_unique<db::query::ContactAddResult>(result, addQuery->rec.ID, duplicates);
     response->setRequestQuery(query);
-    response->setRecordID(addQuery->rec.ID);
+    if (addQuery->rec.ID != DB_ID_NONE) {
+        response->setRecordID(addQuery->rec.ID);
+    }
     return response;
 }
 
