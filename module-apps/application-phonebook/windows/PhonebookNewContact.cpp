@@ -132,6 +132,7 @@ namespace gui
 
             newContactModel->saveData(contact);
             verifyAndSave();
+            return true;
         }
         else if (!inputEvent.isShortRelease(KeyCode::KEY_RF) || !shouldCurrentAppBeIgnoredOnSwitchBack()) {
             return AppWindow::onInput(inputEvent);

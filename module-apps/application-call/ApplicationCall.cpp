@@ -285,15 +285,16 @@ namespace app
         auto searchResults = DBServiceAPI::MatchContactByPhoneNumber(this, numberView);
         if (searchResults != nullptr && !searchResults->isTemporary()) {
             LOG_INFO("Found contact matching (non temporary) search num : contact ID %" PRIu32, searchResults->ID);
-            app::manager::Controller::sendAction(this,
-                                                 app::manager::actions::EditContact,
-                                                 std::make_unique<PhonebookItemData>(std::move(searchResults)));
+            auto data                     = std::make_unique<PhonebookItemData>(std::move(searchResults));
+            data->nameOfSenderApplication = GetName();
+            app::manager::Controller::sendAction(this, app::manager::actions::EditContact, std::move(data));
         }
         else {
             auto contactRecord = std::make_shared<ContactRecord>();
             contactRecord->numbers.emplace_back(std::move(numberView));
 
             auto data                        = std::make_unique<PhonebookItemData>(std::move(contactRecord));
+            data->nameOfSenderApplication    = GetName();
             data->ignoreCurrentWindowOnStack = true;
             app::manager::Controller::sendAction(
                 this, manager::actions::AddContact, std::move(data), manager::OnSwitchBehaviour::RunInBackground);
