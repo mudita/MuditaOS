@@ -188,11 +188,43 @@ namespace bsp
          * be power reset.
          *
          * The simplest way to do it is to configure the pin as WDOG_B and use WDOG1 built-in
-         * assertion. */
-        void RTWDOG_IRQHandler(void)
+         * assertion.
+         *
+         * Before proceeding to exception handler, CPU pushes the following registers
+         * to the active stack:
+         * r0,       offset 0 (in words),
+         * r1        offset 1,
+         * r2,       offset 2,
+         * r3,       offset 3,
+         * r12,      offset 4,
+         * r14 (LR), offset 5,
+         * r15 (PC), offset 6,
+         * xPSR,     offset 7.
+         * Get the value of last PC state and store in non-volatile SNVS register
+         * to have any data that can be used to debug if program died in IRQ or
+         * critical section and neither log nor crashdump was created. */
+        __attribute__((used, noreturn)) void RTWDOG_Handler(const uint32_t *sp)
         {
             RTWDOG_ClearStatusFlags(RTWDOG, kRTWDOG_InterruptFlag);
+
+            const uint32_t pc = sp[6];
+            SNVS->LPGPR[1]    = pc;
+
             WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
+            while (true) {}; // Execution should never reach this point, but just in case
+        }
+
+        /* This has to be done as naked function to be able to easily extract last
+         * PC value before RTWDOG handler was called without having to deal with
+         * function prologue. */
+        __attribute__((naked)) void RTWDOG_IRQHandler(void)
+        {
+            __asm__ __volatile__("tst lr, #4\n" // Determine which stack was used
+                                 "ite eq\n"
+                                 "mrseq r0, msp\n"
+                                 "mrsne r0, psp\n"
+                                 "b RTWDOG_Handler\n" // Jump to real handler
+            );
         }
 
         // Enable PMU brownout interrupt

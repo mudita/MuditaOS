@@ -20,7 +20,7 @@ extern "C"
 #include "board/brownout.hpp"
 #include <board/debug_console.hpp>
 
-#include <cstdint>
+#include <log/log.hpp>
 
 extern std::uint32_t __sdram_cached_start[];
 
@@ -187,6 +187,12 @@ namespace bsp
 
         PrintSystemClocks();
         clearAndPrintBootReason();
+
+        if (SNVS->LPGPR[1] != 0) {
+            LOG_INFO("Device seems to have been reset by RTWDOG! Last instruction address: 0x%08lX",
+                     SNVS->LPGPR[1]);
+            SNVS->LPGPR[1] = 0;
+        }
     }
 
     //! Board PowerOff function by cutdown power
