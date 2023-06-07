@@ -47,6 +47,7 @@
 * Fixed a ghost call after quick click back key to end a call after start a call
 * Fixed autofill data during adding previously deleted phone number from dialing window
 * Fixed redirection to dial number view by pressing BACK from add new number view
+* Fixed occasional USB crash when USB cable was disconnected during files upload
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved

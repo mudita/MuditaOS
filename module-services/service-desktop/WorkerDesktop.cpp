@@ -124,7 +124,6 @@ bool WorkerDesktop::handleMessage(std::uint32_t queueID)
     bool result       = false;
     auto &queue       = queues[queueID];
     const auto &qname = queue->GetQueueName();
-
     if (qname == sdesktop::RECEIVE_QUEUE_BUFFER_NAME) {
         result = handleReceiveQueueMessage(queue);
     }
@@ -179,7 +178,11 @@ bool WorkerDesktop::handleSendQueueMessage(std::shared_ptr<sys::WorkerQueue> &qu
         return false;
     }
 
-    bsp::usbCDCSend(sendMsg);
+    const std::uint32_t dataSent = bsp::usbCDCSend(sendMsg);
+    if (dataSent != sendMsg->length()) {
+        LOG_ERROR("Data not sent! Data sent: %" PRIu32 "B, Msg length: %zuB", dataSent, sendMsg->length());
+    }
+
     delete sendMsg;
     return true;
 }

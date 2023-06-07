@@ -19,6 +19,7 @@
 * Fixed USB charging port detection.
 * Fixed problem with deleting files during Relaxation session.
 * Fixed occasional crash on system startup.
+* Fixed occasional USB crash when USB cable was disconnected during files upload
 
 ### Added
 
