@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/AlarmModel.hpp"
@@ -56,6 +56,12 @@ namespace app
         if (!alarmEventPtr) {
             return;
         }
+
+        if (alarmStatus == alarms::AlarmStatus::Snoozed) {
+            disableSnooze(*alarmEventPtr);
+            alarmStatus = alarms::AlarmStatus::Activated;
+        }
+
         auto clockTime = std::localtime(&time);
         alarmEventPtr->alarmTime =
             AlarmTime{std::chrono::hours{clockTime->tm_hour}, std::chrono::minutes{clockTime->tm_min}};
