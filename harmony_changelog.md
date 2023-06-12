@@ -20,6 +20,7 @@
 * Fixed problem with deleting files during Relaxation session.
 * Fixed occasional crash on system startup.
 * Fixed occasional USB crash when USB cable was disconnected during files upload
+* Fixed back button power off timer changed to 10s 
 
 ### Added
 
