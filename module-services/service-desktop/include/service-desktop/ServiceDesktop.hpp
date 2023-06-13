@@ -16,34 +16,44 @@
 #include <service-desktop/Sync.hpp>
 #include <service-desktop/OutboxNotifications.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
+#include <service-desktop/WorkerDesktop.hpp>
 
 namespace settings
 {
     class Settings;
 }
 
-class WorkerDesktop;
-
 namespace sdesktop
 {
-    inline constexpr auto service_stack                = 8192;
-    inline constexpr auto worker_stack                 = 8704;
-    inline constexpr auto cdcReceiveQueueLength        = 1024;
-    inline constexpr auto cdcSendQueueLength           = 1024;
-    inline constexpr auto signallingQueueLength        = 4;
-    inline constexpr auto irqQueueLength               = 4;
-    inline constexpr auto irqQueueSize                 = sizeof(bsp::USBDeviceStatus);
-    constexpr auto connectionActiveTimerName           = "connectionActiveTimer";
-    constexpr auto connectionActiveTimerDelayMs        = std::chrono::milliseconds{1000 * 20};
-    inline constexpr auto RECEIVE_QUEUE_BUFFER_NAME    = "receiveQueueBuffer";
-    inline constexpr auto SEND_QUEUE_BUFFER_NAME       = "sendQueueBuffer";
-    inline constexpr auto IRQ_QUEUE_BUFFER_NAME        = "irqQueueBuffer";
-    inline constexpr auto SIGNALLING_QUEUE_BUFFER_NAME = "signallingQueueBuffer";
-    inline constexpr auto DeviceUniqueIdLength         = 32;
-    inline constexpr auto DeviceUniqueIdName           = "sd_device_unique_id";
-    constexpr auto pathFactoryDataSerial               = "factory_data/serial";
-    constexpr auto pathFactoryDataCaseColour           = "factory_data/case_colour";
+    using namespace std::chrono_literals;
 
+    inline constexpr auto serviceStackSize = 1024 * 8;
+    inline constexpr auto workerStackSize  = 1024 * 9;
+
+    inline constexpr auto cdcReceiveQueueName          = "cdcReceiveQueueBuffer";
+    inline constexpr auto cdcReceiveQueueItemSize      = sizeof(std::string *);
+    inline constexpr auto cdcReceiveQueueLength        = 1024;
+
+    inline constexpr auto cdcSendQueueName             = "cdcSendQueueBuffer";
+    inline constexpr auto cdcSendQueueItemSize         = sizeof(std::string *);
+    inline constexpr auto cdcSendQueueLength           = 1024;
+
+    inline constexpr auto irqQueueName     = "irqQueueBuffer";
+    inline constexpr auto irqQueueItemSize = sizeof(bsp::USBDeviceStatus);
+    inline constexpr auto irqQueueLength   = 1;
+
+    inline constexpr auto signallingQueueName     = "signallingQueueBuffer";
+    inline constexpr auto signallingQueueItemSize = sizeof(WorkerDesktop::Signal);
+    inline constexpr auto signallingQueueLength   = 1;
+
+    inline constexpr auto connectionActiveTimerName    = "connectionActiveTimer";
+    inline constexpr auto connectionActiveTimerDelayMs = 20s;
+
+    inline constexpr auto deviceUniqueIdName   = "sd_device_unique_id";
+    inline constexpr auto deviceUniqueIdLength = 32;
+
+    inline constexpr auto pathFactoryDataSerial     = "factory_data/serial";
+    inline constexpr auto pathFactoryDataCaseColour = "factory_data/case_colour";
 }; // namespace sdesktop
 
 namespace sdesktop::bluetooth

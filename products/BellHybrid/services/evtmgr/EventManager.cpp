@@ -94,9 +94,12 @@ void EventManager::initProductEvents()
 
     connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
         auto *m           = static_cast<sevm::ScreenLightControlMessage *>(msgl);
-        const auto params = m->getParams();
-        backlightHandler.processRequest(
-            m->getAction(), params.value_or(screen_light_control::Parameters()), m->getSender());
+        const auto receivedParams = m->getParams();
+
+        /* Required to avoid false positive maybe-uninitialized on value_or due to GCC bug */
+        const auto params = receivedParams.has_value() ? receivedParams.value() : screen_light_control::Parameters();
+        backlightHandler.processRequest(m->getAction(), params, m->getSender());
+
         return sys::msgHandled();
     });
 
@@ -125,13 +128,13 @@ void EventManager::initProductEvents()
     });
 
     connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
-        screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
+        const screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
         auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
         return msg;
     });
 
-    connect(sevm::LatchStatusRequest(), [&](sys::Message *msgl) {
+    connect(sevm::LatchStatusRequest(), [&]([[maybe_unused]] sys::Message *msgl) {
         auto msg = std::make_shared<sevm::LatchStatusResponse>(latchStatus);
         return msg;
     });
@@ -139,7 +142,6 @@ void EventManager::initProductEvents()
 
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
-
     auto responseMessage =
         std::static_pointer_cast<sys::ResponseMessage>(EventManagerCommon::DataReceivedHandler(msgl, resp));
 

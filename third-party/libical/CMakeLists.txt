@@ -10,4 +10,7 @@ include(libical/cmake/modules/LibIcalMacrosInternal.cmake)
 libical_add_cflag(-Wno-format-truncation NO_FORMAT_TRUNCATION)
 libical_add_cflag(-Wno-stringop-truncation NO_STRINGOP_TRUNCATION)
 
+# Turn off false positive errors for debug build.
+libical_add_cflag(-Wno-maybe-uninitialized NO_MAYBE_UNINITIALIZED)
+
 add_subdirectory(libical)

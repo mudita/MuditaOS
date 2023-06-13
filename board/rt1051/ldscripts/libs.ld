@@ -9,13 +9,13 @@
  */
 
 GROUP (
-  "libgcc.a"
-  "libc.a"
-  "libstdc++.a"
-  "libm.a"
-  "libnosys.a"
-  "crti.o"
-  "crtn.o"
-  "crtbegin.o"
-  "crtend.o"
+    "libstdc++.a"
+    "libm.a"
+    "libc.a"
+    "libgcc.a"
+    "libnosys.a"
+    "crti.o"
+    "crtn.o"
+    "crtbegin.o"
+    "crtend.o"
 )

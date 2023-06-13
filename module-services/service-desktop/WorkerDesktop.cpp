@@ -23,8 +23,8 @@ WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr,
                              const std::string &serialNumber,
                              const std::string &caseColour,
                              const std::string &rootPath)
-    : sys::Worker(ownerServicePtr, sdesktop::worker_stack), securityModel(securityModel), serialNumber(serialNumber),
-      caseColour(caseColour), rootPath{rootPath}, ownerService(ownerServicePtr), parser(ownerServicePtr),
+    : sys::Worker(ownerServicePtr, sdesktop::workerStackSize), securityModel(securityModel), serialNumber(serialNumber),
+      caseColour(caseColour), rootPath(rootPath), ownerService(ownerServicePtr), parser(ownerServicePtr),
       messageProcessedCallback(std::move(messageProcessedCallback))
 {}
 
@@ -36,13 +36,13 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 
     Worker::init(queues);
 
-    irqQueue     = Worker::getQueueHandleByName(sdesktop::IRQ_QUEUE_BUFFER_NAME);
-    receiveQueue = Worker::getQueueHandleByName(sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
-    sdesktop::endpoints::sender::setSendQueueHandle(Worker::getQueueHandleByName(sdesktop::SEND_QUEUE_BUFFER_NAME));
+    irqQueue     = Worker::getQueueHandleByName(sdesktop::irqQueueName);
+    receiveQueue = Worker::getQueueHandleByName(sdesktop::cdcReceiveQueueName);
+    sdesktop::endpoints::sender::setSendQueueHandle(Worker::getQueueHandleByName(sdesktop::cdcSendQueueName));
 
     cpuSentinel                  = std::make_shared<sys::CpuSentinel>("WorkerDesktop", ownerService);
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
-    ownerService->bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+    ownerService->bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
 
     const bsp::usbInitParams initParams = {receiveQueue,
                                            irqQueue,
@@ -93,7 +93,6 @@ void WorkerDesktop::closeWorker(void)
 void WorkerDesktop::reset()
 {
     initialized = false;
-    usbStatus   = bsp::USBDeviceStatus::Disconnected;
     bsp::usbDeinit();
 
     const bsp::usbInitParams initParams = {receiveQueue,
@@ -106,7 +105,6 @@ void WorkerDesktop::reset()
     initialized = bsp::usbInit(initParams) == 0;
 
     if (initialized) {
-        usbStatus = bsp::USBDeviceStatus::Connected;
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
                                         sys::BusChannel::USBNotifications);
     }
@@ -114,8 +112,8 @@ void WorkerDesktop::reset()
 
 void WorkerDesktop::notify(Signal command)
 {
-    if (auto queue = getQueueByName(sdesktop::SIGNALLING_QUEUE_BUFFER_NAME); !queue->Overwrite(&command)) {
-        LOG_ERROR("Unable to overwrite the command in the commands queue.");
+    if (auto queue = getQueueByName(sdesktop::signallingQueueName); !queue->Overwrite(&command)) {
+        LOG_ERROR("Unable to overwrite the command in the commands queue '%s'.", sdesktop::signallingQueueName);
     }
 }
 
@@ -124,23 +122,24 @@ bool WorkerDesktop::handleMessage(std::uint32_t queueID)
     bool result       = false;
     auto &queue       = queues[queueID];
     const auto &qname = queue->GetQueueName();
-    if (qname == sdesktop::RECEIVE_QUEUE_BUFFER_NAME) {
+
+    if (qname == sdesktop::cdcReceiveQueueName) {
         result = handleReceiveQueueMessage(queue);
     }
-    else if (qname == sdesktop::SEND_QUEUE_BUFFER_NAME) {
+    else if (qname == sdesktop::cdcSendQueueName) {
         result = handleSendQueueMessage(queue);
     }
     else if (qname == SERVICE_QUEUE_NAME) {
         result = handleServiceQueueMessage(queue);
     }
-    else if (qname == sdesktop::IRQ_QUEUE_BUFFER_NAME) {
+    else if (qname == sdesktop::irqQueueName) {
         result = handleIrqQueueMessage(queue);
     }
-    else if (qname == sdesktop::SIGNALLING_QUEUE_BUFFER_NAME) {
+    else if (qname == sdesktop::signallingQueueName) {
         result = handleSignallingQueueMessage(queue);
     }
     else {
-        LOG_INFO("handeMessage got message on an unhandled queue");
+        LOG_INFO("handleMessage got message on an unhandled queue '%s'!", qname.c_str());
     }
 
     return result;
@@ -153,7 +152,7 @@ bool WorkerDesktop::handleReceiveQueueMessage(std::shared_ptr<sys::WorkerQueue> 
     }
     std::string *receivedMsg = nullptr;
     if (!queue->Dequeue(&receivedMsg, 0)) {
-        LOG_ERROR("handleMessage failed to receive from \"%s\"", sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
+        LOG_ERROR("handleMessage xQueueReceive failed for '%s'.", sdesktop::cdcReceiveQueueName);
         return false;
     }
 
@@ -174,7 +173,7 @@ bool WorkerDesktop::handleSendQueueMessage(std::shared_ptr<sys::WorkerQueue> &qu
     }
     std::string *sendMsg = nullptr;
     if (!queue->Dequeue(&sendMsg, 0)) {
-        LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::SEND_QUEUE_BUFFER_NAME);
+        LOG_ERROR("handleMessage xQueueReceive failed for '%s'.", sdesktop::cdcSendQueueName);
         return false;
     }
 
@@ -192,8 +191,8 @@ bool WorkerDesktop::handleServiceQueueMessage(std::shared_ptr<sys::WorkerQueue> 
         return false;
     }
     auto &serviceQueue = getServiceQueue();
-    sys::WorkerCommand cmd;
 
+    sys::WorkerCommand cmd;
     if (serviceQueue.Dequeue(&cmd, 0)) {
         LOG_DEBUG("Received cmd: %d", static_cast<int>(cmd.command));
 #if defined(DEBUG)
@@ -201,7 +200,7 @@ bool WorkerDesktop::handleServiceQueueMessage(std::shared_ptr<sys::WorkerQueue> 
 #endif
     }
     else {
-        LOG_ERROR("handleMessage xQueueReceive failed for %s.", SERVICE_QUEUE_NAME.c_str());
+        LOG_ERROR("handleMessage xQueueReceive failed for '%s'.", SERVICE_QUEUE_NAME.c_str());
         return false;
     }
     return true;
@@ -210,34 +209,42 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
 {
     bsp::USBDeviceStatus notification = bsp::USBDeviceStatus::Disconnected;
     if (!queue->Dequeue(&notification, 0)) {
-        LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::IRQ_QUEUE_BUFFER_NAME);
+        LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::irqQueueName);
         return false;
     }
 
-    if (notification == bsp::USBDeviceStatus::Connected) {
+    switch (notification) {
+    case bsp::USBDeviceStatus::Connected:
         LOG_DEBUG("USB status: Connected");
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
                                         sys::BusChannel::USBNotifications);
-        usbStatus = bsp::USBDeviceStatus::Connected;
-    }
-    else if (notification == bsp::USBDeviceStatus::Configured) {
+        break;
+
+    case bsp::USBDeviceStatus::Configured:
         LOG_DEBUG("USB status: Configured");
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConfigured>(),
                                         sys::BusChannel::USBNotifications);
-        usbStatus = bsp::USBDeviceStatus::Configured;
-    }
-    else if (notification == bsp::USBDeviceStatus::Disconnected) {
+        break;
+
+    case bsp::USBDeviceStatus::Disconnected:
         LOG_DEBUG("USB status: Disconnected");
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBDisconnected>(),
                                         sys::BusChannel::USBNotifications);
-        usbStatus = bsp::USBDeviceStatus::Disconnected;
-    }
-    else if (notification == bsp::USBDeviceStatus::DataReceived) {
+        break;
+
+    case bsp::USBDeviceStatus::DataReceived:
         bsp::usbHandleDataReceived();
-    }
-    else if (notification == bsp::USBDeviceStatus::Reset) {
+        break;
+
+    case bsp::USBDeviceStatus::Reset:
         LOG_DEBUG("USB status: Reset");
+        break;
+
+    default:
+        LOG_ERROR("Notification not valid.");
+        return false;
     }
+
     return true;
 }
 
@@ -246,13 +253,14 @@ bool WorkerDesktop::handleSignallingQueueMessage(std::shared_ptr<sys::WorkerQueu
     if (!initialized) {
         return false;
     }
-    sys::WorkerCommand command;
-    if (!queue->Dequeue(&command, 0)) {
-        LOG_ERROR("handleMessage failed to receive from \"%s\"", sdesktop::SIGNALLING_QUEUE_BUFFER_NAME);
+
+    sys::WorkerCommand cmd;
+    if (!queue->Dequeue(&cmd, 0)) {
+        LOG_ERROR("handleMessage xQueueReceive failed for '%s'.", sdesktop::signallingQueueName);
         return false;
     }
 
-    switch (static_cast<Signal>(command.command)) {
+    switch (static_cast<Signal>(cmd.command)) {
     case Signal::unlockMTP:
         bsp::usbUnlockMTP();
         break;

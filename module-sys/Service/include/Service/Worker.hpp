@@ -13,7 +13,6 @@
 
 namespace sys
 {
-
     class WorkerQueueInfo
     {
       public:
@@ -48,8 +47,8 @@ namespace sys
 
     struct WorkerCommand
     {
-        uint32_t command = 0;
-        uint32_t *data   = NULL;
+        std::uint32_t command = 0;
+        std::uint32_t *data   = nullptr;
     };
 
     /*
@@ -98,8 +97,8 @@ namespace sys
         std::string getControlQueueName() const;
         size_t addQueue(const std::string &queueName, UBaseType_t maxItems, UBaseType_t itemSize);
 
-        std::optional<size_t> controlQueueIndex;
-        std::optional<size_t> serviceQueueIndex;
+        std::optional<std::size_t> controlQueueIndex;
+        std::optional<std::size_t> serviceQueueIndex;
         WorkerQueue &getControlQueue() const;
 
         static constexpr std::size_t controlMessagesCount = static_cast<std::size_t>(ControlMessage::MessageCount);
@@ -116,7 +115,7 @@ namespace sys
         State state = State::New;
 
       protected:
-        virtual bool handleMessage(uint32_t queueID) = 0;
+        virtual bool handleMessage(std::uint32_t queueID) = 0;
 
         WorkerQueue &getServiceQueue() const;
 
@@ -127,12 +126,12 @@ namespace sys
         bool sendCommand(WorkerCommand command);
         State getState() const;
 
-        const static uint32_t SERVICE_QUEUE_LENGTH = 10;
-        const static uint32_t CONTROL_QUEUE_LENGTH = 4;
-        const static uint32_t SERVICE_QUEUE_SIZE   = sizeof(WorkerCommand);
+        static constexpr std::uint32_t SERVICE_QUEUE_LENGTH = 10;
+        static constexpr std::uint32_t CONTROL_QUEUE_LENGTH = 4;
+        static constexpr std::uint32_t SERVICE_QUEUE_SIZE   = sizeof(WorkerCommand);
         const std::string SERVICE_QUEUE_NAME       = "ServiceQueue";
 
-        static unsigned int count;
+        static std::uint32_t count;
         const UBaseType_t priority;
         std::uint16_t stackDepth = defaultStackSize;
 
@@ -140,8 +139,8 @@ namespace sys
         std::vector<std::shared_ptr<WorkerQueue>> queues;
 
       public:
-        Worker(sys::Service *service, std::uint16_t stackDepth = defaultStackSize);
-        Worker(std::string workerNamePrefix, const UBaseType_t priority, std::uint16_t stackDepth = defaultStackSize);
+        explicit Worker(sys::Service *service, std::uint16_t stackDepth = defaultStackSize);
+        Worker(std::string workerNamePrefix, UBaseType_t priority, std::uint16_t stackDepth = defaultStackSize);
 
         virtual ~Worker();
 
@@ -172,7 +171,7 @@ namespace sys
         /**
          * @brief Sends command and pointer to data to worker
          */
-        virtual bool send(uint32_t cmd, uint32_t *data);
+        virtual bool send(std::uint32_t cmd, std::uint32_t *data);
         /**
          * @brief Closes worker by combining stop, join and deinit operations in a single call.
          * If it is not possible to close the worker gently it would kill it forcibly.

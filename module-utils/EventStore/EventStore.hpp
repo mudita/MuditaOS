@@ -64,7 +64,7 @@ namespace Store
         two   = 2,
         three = 3,
         four  = 4,
-        noOfSupprtedBars
+        noOfSupportedBars
     };
 
     struct SignalStrength

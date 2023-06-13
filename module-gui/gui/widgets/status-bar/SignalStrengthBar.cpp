@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SignalStrengthBar.hpp"
 #include "Style.hpp"
 #include <string>
 #include <Image.hpp>
-#include <unordered_map>
+#include <map>
 
 namespace gui::status_bar
 {
@@ -25,7 +25,7 @@ namespace gui::status_bar
         constexpr auto signal3_roaming = "gsm_3_roaming";
         constexpr auto signal4_roaming = "gsm_4_roaming";
 
-        using SignalMap = std::unordered_map<Store::RssiBar, std::string>;
+        using SignalMap = std::map<Store::RssiBar, std::string>;
 
         const SignalMap signalMapHomeCon = {{Store::RssiBar::zero, signal0},
                                             {Store::RssiBar::one, signal1},

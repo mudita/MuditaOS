@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 //*****************************************************************************
@@ -457,12 +457,6 @@ extern "C"
 #endif
 
 #include "MIMXRT1051.h"
-#include "macros.h"
-#include <log/log.hpp>
-#include <cinttypes>
-#include <cstdlib>
-#include <cstdint>
-#include <string>
 
 //*****************************************************************************
 // The vector table.
@@ -666,16 +660,18 @@ __attribute__((section(".after_vectors.init_data"))) void data_init(unsigned int
     unsigned int *pulDest = (unsigned int *)start;
     unsigned int *pulSrc  = (unsigned int *)romstart;
     unsigned int loop;
-    for (loop = 0; loop < len; loop = loop + 4)
+    for (loop = 0; loop < len; loop = loop + 4) {
         *pulDest++ = *pulSrc++;
+    }
 }
 
 __attribute__((section(".after_vectors.init_bss"))) void bss_init(unsigned int start, unsigned int len)
 {
     unsigned int *pulDest = (unsigned int *)start;
     unsigned int loop;
-    for (loop = 0; loop < len; loop = loop + 4)
+    for (loop = 0; loop < len; loop = loop + 4) {
         *pulDest++ = 0;
+    }
 }
 
 //*****************************************************************************
@@ -692,9 +688,6 @@ extern unsigned int __data_section_table_end;
 extern unsigned int __bss_section_table;
 extern unsigned int __bss_section_table_end;
 
-__attribute__((section(".sdram"))) volatile unsigned int LoadAddr, ExeAddr, SectionLen;
-__attribute__((section(".sdram"))) volatile unsigned int *SectionTableAddr;
-
 //*****************************************************************************
 // Reset entry point for your code.
 // Sets up a simple runtime environment and initializes the C/C++
@@ -702,7 +695,6 @@ __attribute__((section(".sdram"))) volatile unsigned int *SectionTableAddr;
 //*****************************************************************************
 __attribute__((section(".after_vectors.reset"))) void ResetISR(void)
 {
-
     // Disable interrupts
     __asm volatile("cpsid i");
 
