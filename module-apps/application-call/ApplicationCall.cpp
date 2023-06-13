@@ -225,8 +225,11 @@ namespace app
         windowsFactory.attach(app::window::name_dialogConfirm, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::SimLock});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::SimLock,
+                      gui::popup::ID::Alarm}); // Alarm pop-up is blocked during phone call - logic is on Alarm side
     }
 
     bool ApplicationCall::showNotification(std::function<bool()> action,

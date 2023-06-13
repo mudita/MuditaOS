@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -56,8 +56,13 @@ struct SingleEventRecord : public Record, public EventInfo
     virtual ~SingleEventRecord() = default;
 
     SingleEventRecord() = default;
-    SingleEventRecord(std::shared_ptr<EventRecord> parent, TimePoint startDate, TimePoint endDate)
-        : EventInfo{startDate, endDate}, parent{parent} {};
+    SingleEventRecord(std::shared_ptr<EventRecord> parent,
+                      TimePoint startDate,
+                      TimePoint endDate,
+                      bool wasHandledDuringCall = false)
+        : EventInfo{startDate, endDate}, parent{parent}, wasHandledDuringPhoneCall(wasHandledDuringCall){};
 
     auto isValid() const -> bool;
+
+    bool wasHandledDuringPhoneCall;
 };

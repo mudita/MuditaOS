@@ -32,6 +32,8 @@ namespace alarms
         using OnSnoozedAlarmsCountChange    = std::function<void(unsigned)>;
         using OnActiveAlarmCountChange      = std::function<void(bool)>;
         using OnToggleAllProcessed          = std::function<void(bool)>;
+        using CheckIfPhoneCallIsOngoing     = std::function<bool(void)>;
+        using OnAlarmDuringPhoneCall        = std::function<void(void)>;
 
         virtual ~IAlarmOperations() noexcept = default;
 
@@ -66,6 +68,8 @@ namespace alarms
         virtual void getSnoozedAlarms(OnGetSnoozedAlarms callback)                                           = 0;
         virtual void handleCriticalBatteryLevel()                                                            = 0;
         virtual void handleNormalBatteryLevel()                                                              = 0;
+        virtual void addCheckIfPhoneCallIsOngoingCallback(CheckIfPhoneCallIsOngoing)                         = 0;
+        virtual void addAlarmDuringPhoneCallCallback(OnAlarmDuringPhoneCall)                                 = 0;
     };
 
     class IAlarmOperationsFactory
@@ -112,6 +116,8 @@ namespace alarms
         void getSnoozedAlarms(OnGetSnoozedAlarms callback) override;
         void handleCriticalBatteryLevel() override;
         void handleNormalBatteryLevel() override;
+        void addCheckIfPhoneCallIsOngoingCallback(CheckIfPhoneCallIsOngoing callback) override;
+        void addAlarmDuringPhoneCallCallback(OnAlarmDuringPhoneCall callback) override;
 
       protected:
         std::unique_ptr<AbstractAlarmEventsRepository> alarmEventsRepo;
@@ -132,6 +138,8 @@ namespace alarms
         GetCurrentTime getCurrentTimeCallback;
         OnSnoozedAlarmsCountChange onSnoozedAlarmsCountChangeCallback = nullptr;
         OnActiveAlarmCountChange onActiveAlarmCountChangeCallback     = nullptr;
+        CheckIfPhoneCallIsOngoing onCheckIfPhoneCallIsOngoingCallback = nullptr;
+        OnAlarmDuringPhoneCall onAlarmDuringPhoneCallCallback         = nullptr;
 
         // Max 100 alarms for one minute seems reasonable, next events will be dropped
         constexpr static auto getNextSingleEventsOffset = 0;

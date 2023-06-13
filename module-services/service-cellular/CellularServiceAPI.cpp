@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/CellularMessage.hpp"
@@ -232,6 +232,21 @@ bool CellularServiceAPI::GetAntenna(sys::Service *serv, bsp::cellular::antenna &
         auto responseMsg = std::dynamic_pointer_cast<cellular::AntennaResponseMessage>(ret.second);
         if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
             response = responseMsg->antenna;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CellularServiceAPI::IsCallInProgress(sys::Service *serv, bool &response)
+{
+    auto msg = std::make_shared<cellular::IsCallActive>();
+    auto ret = serv->bus.sendUnicastSync(msg, ServiceCellular::serviceName, 1000);
+    if (ret.first == sys::ReturnCodes::Success) {
+        auto celResponse = std::dynamic_pointer_cast<cellular::IsCallActiveResponse>(ret.second);
+        if ((celResponse != nullptr) && (celResponse->retCode == sys::ReturnCodes::Success)) {
+            LOG_DEBUG("Is Call in progress: %d", celResponse->active);
+            response = celResponse->active;
             return true;
         }
     }

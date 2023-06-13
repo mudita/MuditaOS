@@ -2,11 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTime.hpp"
+#include "service-evtmgr/Constants.hpp"
+#include "service-evtmgr/EVMessages.hpp"
 #include <service-time/internal/StaticData.hpp>
 #include <service-time/RTCCommand.hpp>
 #include <service-time/TimeMessage.hpp>
 #include <service-time/TimeSettings.hpp>
 #include <service-time/TimezoneHandler.hpp>
+#include <service-audio/AudioServiceName.hpp>
+#include <service-audio/AudioMessage.hpp>
 
 #include <service-cellular/ServiceCellular.hpp>
 #include <time/TimeZone.hpp>
@@ -45,6 +49,15 @@ namespace stm
         auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
         auto alarmOperations = alarmOperationsFactory->create(this, std::move(alarmEventsRepo), TimePointNow);
         alarmOperations->updateEventsCache(TimePointNow());
+        alarmOperations->addCheckIfPhoneCallIsOngoingCallback([this]() -> bool {
+            bool isPhoneCallInProgress = false;
+            if (!CellularServiceAPI::IsCallInProgress(this, isPhoneCallInProgress)) {
+                LOG_ERROR("Unable to check if the Call is in progress");
+            }
+            return isPhoneCallInProgress;
+        });
+        alarmOperations->addAlarmDuringPhoneCallCallback(
+            [this]() { this->bus.sendUnicast(std::make_shared<SingleVibrationStart>(), service::name::audio); });
         alarmMessageHandler = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
         registerMessageHandlers();
         return sys::ReturnCodes::Success;

@@ -321,3 +321,10 @@ class HFPDeviceVolumeChanged : public BluetoothDeviceVolumeChanged
     HFPDeviceVolumeChanged(std::uint8_t volume) : BluetoothDeviceVolumeChanged{volume}
     {}
 };
+
+class SingleVibrationStart : public AudioMessage
+{
+  public:
+    SingleVibrationStart()
+    {}
+};
