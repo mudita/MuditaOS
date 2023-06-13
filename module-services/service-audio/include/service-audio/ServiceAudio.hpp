@@ -55,7 +55,10 @@ class ServiceAudio : public sys::Service
     std::map<VibrationType, std::list<audio::PlaybackType>> vibrationMap = {
         {VibrationType::None, {}},
         {VibrationType::Continuous, {audio::PlaybackType::CallRingtone, audio::PlaybackType::Alarm}},
-        {VibrationType::OneShot, {audio::PlaybackType::Notifications, audio::PlaybackType::TextMessageRingtone}}};
+        {VibrationType::OneShot,
+         {audio::PlaybackType::Notifications,
+          audio::PlaybackType::TextMessageRingtone,
+          audio::PlaybackType::SingleVibration}}};
 
     auto IsVibrationMotorOn()
     {
@@ -127,6 +130,7 @@ class ServiceAudio : public sys::Service
     auto handleHFPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleMultimediaAudioPause() -> sys::MessagePointer;
     auto handleMultimediaAudioStart() -> sys::MessagePointer;
+    auto handleSingleVibrationStart() -> sys::MessagePointer;
 
     void notifyAboutNewRoutingIfRouterAvailable();
 };

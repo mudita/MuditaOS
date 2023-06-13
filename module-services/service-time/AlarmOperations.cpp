@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmOperations.hpp"
+#include "service-evtmgr/EVMessages.hpp"
 
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/EventRecord.hpp>
@@ -167,7 +168,6 @@ namespace alarms
             callback(false);
             return;
         }
-
         auto newSnoozed = std::make_unique<SnoozedAlarmEventRecord>((*found).get());
 
         if (typeid(*(*found)) == typeid(SnoozedAlarmEventRecord)) {
@@ -193,7 +193,9 @@ namespace alarms
         newSnoozed->startDate = nextAlarmTime;
         snoozedSingleEvents.push_back(std::move(newSnoozed));
 
-        switchAlarmExecution(*(*found), false);
+        if ((*found)->wasHandledDuringPhoneCall == false) {
+            switchAlarmExecution(*(*found), false);
+        }
         ongoingSingleEvents.erase(found);
 
         processOngoingEvents();
@@ -292,11 +294,32 @@ namespace alarms
 
     void AlarmOperationsCommon::processOngoingEvents()
     {
-        if (!ongoingSingleEvents.empty()) {
-            switchAlarmExecution(*(ongoingSingleEvents.front()), true);
-            handleActiveAlarmsCountChange();
-            handleSnoozedAlarmsCountChange();
+        if (ongoingSingleEvents.empty()) {
+            return;
         }
+
+        if (onCheckIfPhoneCallIsOngoingCallback && onCheckIfPhoneCallIsOngoingCallback()) {
+
+            // Handle once during a phone call
+            if (!ongoingSingleEvents.front()->wasHandledDuringPhoneCall && onAlarmDuringPhoneCallCallback) {
+                onAlarmDuringPhoneCallCallback();
+                ongoingSingleEvents.front()->wasHandledDuringPhoneCall = true;
+            }
+
+            // Snooze Alarm during a phone call
+            OnSnoozeRingingAlarm onSnoozeRingingAlarmCallback = [](bool success) {
+                success ? LOG_DEBUG("Alarm snoozed during a phone call ") : LOG_ERROR("Unable to snooze alarm!");
+            };
+            snoozeRingingAlarm(ongoingSingleEvents.front()->parent->ID,
+                               std::chrono::floor<std::chrono::minutes>(TimePointNow()) + std::chrono::minutes(1),
+                               onSnoozeRingingAlarmCallback);
+            return;
+        }
+
+        ongoingSingleEvents.front()->wasHandledDuringPhoneCall = false;
+        switchAlarmExecution(*(ongoingSingleEvents.front()), true);
+        handleActiveAlarmsCountChange();
+        handleSnoozedAlarmsCountChange();
     }
 
     void AlarmOperationsCommon::addAlarmExecutionHandler(const alarms::AlarmType type,
@@ -476,5 +499,15 @@ namespace alarms
         return std::find_if(events.begin(), events.end(), [id](const std::unique_ptr<SnoozedAlarmEventRecord> &event) {
             return id == event->parent->ID;
         });
+    }
+
+    auto AlarmOperationsCommon::addCheckIfPhoneCallIsOngoingCallback(CheckIfPhoneCallIsOngoing callback) -> void
+    {
+        onCheckIfPhoneCallIsOngoingCallback = callback;
+    }
+
+    auto AlarmOperationsCommon::addAlarmDuringPhoneCallCallback(OnAlarmDuringPhoneCall callback) -> void
+    {
+        onAlarmDuringPhoneCallCallback = callback;
     }
 } // namespace alarms

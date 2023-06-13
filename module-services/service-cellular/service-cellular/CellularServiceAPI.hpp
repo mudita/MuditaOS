@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -85,6 +85,7 @@ namespace CellularServiceAPI
     bool GetCREG(sys::Service *serv, std::string &response);
     bool GetQNWINFO(sys::Service *serv, std::string &response);
     bool GetAntenna(sys::Service *serv, bsp::cellular::antenna &response);
+    bool IsCallInProgress(sys::Service *serv, bool &response);
     /**
      * @brief Transmits DTMF tone
      * @param serv

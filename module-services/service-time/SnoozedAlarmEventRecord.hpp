@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,8 +12,11 @@ struct SnoozedAlarmEventRecord : public SingleEventRecord
     TimePoint snoozeStart     = TIME_POINT_INVALID;
 
     explicit SnoozedAlarmEventRecord(SingleEventRecord *singleAlarm)
-        : SingleEventRecord(singleAlarm->parent, singleAlarm->startDate, singleAlarm->endDate), snoozeStart{
-                                                                                                    TimePointNow()} {};
+        : SingleEventRecord(singleAlarm->parent,
+                            singleAlarm->startDate,
+                            singleAlarm->endDate,
+                            singleAlarm->wasHandledDuringPhoneCall),
+          snoozeStart{TimePointNow()} {};
 
     std::uint32_t snooze() noexcept
     {

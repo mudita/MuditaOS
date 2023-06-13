@@ -52,6 +52,7 @@
 * Fixed unsupported character in several quotes
 * Fixed marking new message as read in Messages app main window
 * Fixed unwanted autolock on template selection window while rejecting call
+* Fixed scenario when Alarm not being handled properly during a phone call
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved

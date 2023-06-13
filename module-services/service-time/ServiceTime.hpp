@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,6 +11,7 @@
 #include "service-time/ServiceTime.hpp"
 
 #include <service-db/DBServiceName.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 
 #include <MessageType.hpp>
 #include <system/Common.hpp>

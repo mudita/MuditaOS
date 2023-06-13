@@ -126,6 +126,8 @@ ServiceAudio::ServiceAudio()
             [this](sys::Message *msg) -> sys::MessagePointer { return handleMultimediaAudioPause(); });
     connect(typeid(message::bluetooth::AudioStart),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleMultimediaAudioStart(); });
+    connect(typeid(SingleVibrationStart),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleSingleVibrationStart(); });
 }
 
 ServiceAudio::~ServiceAudio()
@@ -895,6 +897,12 @@ auto ServiceAudio::handleMultimediaAudioStart() -> sys::MessagePointer
         bus.sendMulticast(std::make_shared<AudioResumedNotification>((*input)->token),
                           sys::BusChannel::ServiceAudioNotifications);
     }
+    return sys::msgHandled();
+}
+
+auto ServiceAudio::handleSingleVibrationStart() -> sys::MessagePointer
+{
+    VibrationUpdate(audio::PlaybackType::SingleVibration);
     return sys::msgHandled();
 }
 
