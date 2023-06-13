@@ -35,7 +35,6 @@
 * Fixed misleading "Nie" abbreviation for word "Niedziela" (Sunday) in new alarm window
 * Fixed automatic message pasting into content field in thread view after message forwarding
 * Fixed redundant logs about CSQ reporting mode
-* Fixed adding USSD codes to phonebook
 * Fixed slider-related crash on phone turn off
 * Fixed problem with an unresponsive device after playing specific WAV files.
 * Fixed unresponsive Templates window for user input after templates were changed via MC.
