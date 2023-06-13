@@ -7,7 +7,7 @@
 #include <Service/Service.hpp>
 #include <Service/Worker.hpp>
 #include <SystemManager/CpuSentinel.hpp>
-#include <ParserFSM.hpp>
+#include <service-desktop/parser/ParserFSM.hpp>
 #include <bsp/usb/usb.hpp>
 #include <service-desktop/USBSecurityModel.hpp>
 
@@ -37,11 +37,6 @@ class WorkerDesktop : public sys::Worker
     bool handleMessage(std::uint32_t queueID) override final;
     void notify(Signal command);
 
-    xQueueHandle getReceiveQueue()
-    {
-        return receiveQueue;
-    }
-
   private:
     void reset();
 
@@ -61,7 +56,6 @@ class WorkerDesktop : public sys::Worker
     std::string rootPath;
     sys::Service *ownerService = nullptr;
     sdesktop::endpoints::StateMachine parser;
-    bsp::USBDeviceStatus usbStatus = bsp::USBDeviceStatus::Disconnected;
 
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     std::function<void()> messageProcessedCallback;

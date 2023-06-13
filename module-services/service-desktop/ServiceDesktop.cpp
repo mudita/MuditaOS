@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-desktop/ServiceDesktop.hpp>
-#include <service-desktop/WorkerDesktop.hpp>
 #include <endpoints/EndpointFactory.hpp>
 #include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
 #include <service-appmgr/Constants.hpp>
@@ -13,7 +12,7 @@
 #include <service-db/agents/settings/SystemSettings.hpp>
 
 ServiceDesktop::ServiceDesktop(const std::filesystem::path &mtpRootPath)
-    : sys::Service(service::name::service_desktop, "", sdesktop::service_stack),
+    : sys::Service(service::name::service_desktop, "", sdesktop::serviceStackSize),
       btMsgHandler(std::make_unique<sdesktop::bluetooth::BluetoothMessagesHandler>(this)),
       connectionActiveTimer{sys::TimerFactory::createSingleShotTimer(
           this,
@@ -152,19 +151,19 @@ void ServiceDesktop::removeNotificationEntries(const std::vector<uint32_t> &uids
 
 auto ServiceDesktop::generateDeviceUniqueId() -> void
 {
-    const auto deviceUniqueId = utils::generateRandomId(sdesktop::DeviceUniqueIdLength);
+    const auto deviceUniqueId = utils::generateRandomId(sdesktop::deviceUniqueIdLength);
     LOG_SENSITIVE(LOGINFO, "Device unique id: %s", deviceUniqueId.c_str());
     setDeviceUniqueId(deviceUniqueId);
 }
 
 auto ServiceDesktop::getDeviceUniqueId() const -> std::string
 {
-    return settings->getValue(sdesktop::DeviceUniqueIdName);
+    return settings->getValue(sdesktop::deviceUniqueIdName);
 }
 
 auto ServiceDesktop::setDeviceUniqueId(const std::string &token) -> void
 {
-    return settings->setValue(sdesktop::DeviceUniqueIdName, token);
+    return settings->setValue(sdesktop::deviceUniqueIdName, token);
 }
 
 auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
@@ -185,10 +184,10 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
                                                     mtpRootPath);
 
     initialized = desktopWorker->init(
-        {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdcReceiveQueueLength},
-         {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdcSendQueueLength},
-         {sdesktop::IRQ_QUEUE_BUFFER_NAME, sdesktop::irqQueueSize, sdesktop::irqQueueLength},
-         {sdesktop::SIGNALLING_QUEUE_BUFFER_NAME, sizeof(WorkerDesktop::Signal), sdesktop::signallingQueueLength}});
+        {{sdesktop::cdcReceiveQueueName, sdesktop::cdcReceiveQueueItemSize, sdesktop::cdcReceiveQueueLength},
+         {sdesktop::cdcSendQueueName, sdesktop::cdcSendQueueItemSize, sdesktop::cdcSendQueueLength},
+         {sdesktop::irqQueueName, sdesktop::irqQueueItemSize, sdesktop::irqQueueLength},
+         {sdesktop::signallingQueueName, sdesktop::signallingQueueItemSize, sdesktop::signallingQueueLength}});
 
     if (!initialized) {
         LOG_FATAL("Failed to initialize USB worker, ServiceDesktop won't work!");

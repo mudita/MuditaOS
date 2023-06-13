@@ -14,7 +14,7 @@
 
 namespace sys
 {
-    unsigned int Worker::count = 0;
+    std::uint32_t Worker::count = 0;
 
     void Worker::taskAdapter(void *taskParam)
     {
@@ -31,15 +31,13 @@ namespace sys
         assert(receivedMessage < controlMessagesCount);
 
         switch (static_cast<Worker::ControlMessage>(receivedMessage)) {
-        // stop the thread
-        case ControlMessage::Stop: {
+        case ControlMessage::Stop: // stop the thread
             setState(State::Stopping);
-        } break;
+            break;
 
-        default: {
+        default:
             LOG_FATAL("Unexpected control message %d received", receivedMessage);
             return false;
-        } break;
         }
 
         return true;
@@ -60,7 +58,7 @@ namespace sys
             }
 
             // find id of the queue that was activated
-            for (uint32_t i = 0; i < queues.size(); i++) {
+            for (std::uint32_t i = 0; i < queues.size(); i++) {
                 if (queues[i]->GetQueueHandle() == activeMember) {
                     handleMessage(i);
                 }
@@ -159,7 +157,7 @@ namespace sys
         };
 
         // iterate over all user queues and add them to set
-        for (uint32_t i = 0; i < queues.size(); ++i) {
+        for (std::uint32_t i = 0; i < queues.size(); ++i) {
             if (xQueueAddToSet(queues[i]->GetQueueHandle(), queueSet) != pdPASS) {
                 state = State::Invalid;
                 deinit();
@@ -189,7 +187,7 @@ namespace sys
         queues.clear();
 
         // delete queues set
-        vQueueDelete((QueueHandle_t)queueSet);
+        vQueueDelete(static_cast<QueueHandle_t>(queueSet));
 
         vSemaphoreDelete(joinSemaphore);
         vSemaphoreDelete(stateMutex);
@@ -235,15 +233,12 @@ namespace sys
         return getServiceQueue().Enqueue(&command);
     }
 
-    bool Worker::send(uint32_t cmd, uint32_t *data)
+    bool Worker::send(std::uint32_t cmd, std::uint32_t *data)
     {
         assert(getState() == State::Running);
 
         WorkerCommand workerCommand{cmd, data};
-        if (getServiceQueue().Enqueue(&workerCommand, portMAX_DELAY)) {
-            return true;
-        }
-        return false;
+        return getServiceQueue().Enqueue(&workerCommand, portMAX_DELAY);
     }
 
     xQueueHandle Worker::getQueueHandleByName(const std::string &qname) const

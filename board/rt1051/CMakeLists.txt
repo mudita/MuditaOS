@@ -8,7 +8,7 @@ if (${MEMORY_LINKER_FILE_PATH} STREQUAL "")
     message(FATAL_ERROR "Linker RAM layout not provided")
 endif()
 
-set (CMAKE_EXE_LINKER_FLAGS "-nostdlib -Xlinker --gc-sections -Xlinker --sort-section=alignment -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Xlinker -print-memory-usage -T ${LDSCRIPTSDIR}/libs.ld -T ${MEMORY_LINKER_FILE_PATH} -T ${LDSCRIPTSDIR}/sections.ld -nostartfiles" CACHE INTERNAL "")
+set (CMAKE_EXE_LINKER_FLAGS "-nostdlib -Xlinker --gc-sections -Xlinker --sort-section=alignment -mcpu=cortex-m7 -mthumb -mfpu=fpv5-sp-d16 -mfloat-abi=hard -Xlinker -print-memory-usage -T ${LDSCRIPTSDIR}/libs.ld -T ${MEMORY_LINKER_FILE_PATH} -T ${LDSCRIPTSDIR}/sections.ld -nostartfiles" CACHE INTERNAL "")
 
 if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 12))
     set(GCC_CXX_DIR_ITERATOR "newlib/gcc11/fs_dir.cc")
