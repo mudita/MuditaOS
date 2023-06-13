@@ -11,6 +11,6 @@ class PowerOffSequence : public GenericLongPressSequence<KeyMap::Back>
   public:
     explicit PowerOffSequence(sys::Service &service)
         : GenericLongPressSequence<KeyMap::Back>{sys::TimerFactory::createSingleShotTimer(
-              &service, "poffseq", std::chrono::milliseconds{9000}, [this](auto &) { handleTimer(); })}
+              &service, "poffseq", std::chrono::milliseconds{10000}, [this](auto &) { handleTimer(); })}
     {}
 };
