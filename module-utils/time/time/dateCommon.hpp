@@ -1,16 +1,13 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef DATECOMMON_H
-#define DATECOMMON_H
+#pragma once
 
 #include "time_conversion_factory.hpp"
-
 #include <Utils.hpp>
-
 #include <date/date.h>
-
 #include <random>
+#include <bsp/trng/trng.hpp>
 
 using Clock     = std::chrono::system_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -380,19 +377,17 @@ inline TimePoint nextTimePointFromHHMM(std::chrono::hours hours, std::chrono::mi
 
 inline std::string createUID()
 {
-    constexpr uint32_t bufferLimit = 16;
-    char Buffer[bufferLimit];
-    utils::time::Timestamp timestamp(std::time(nullptr));
+    constexpr auto bufferSize = 16;
+    char buffer[bufferSize];
+    const utils::time::Timestamp timestamp(std::time(nullptr));
+
     std::string UID{timestamp.str("%Y%m%dT%H%M%S")};
     UID += '-';
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(1, 100);
-    sprintf(Buffer, "%d", distrib(gen));
-    UID += Buffer;
 
+    const auto gen = std::make_unique<std::mt19937>(bsp::trng::getRandomValue());
+    std::uniform_int_distribution<> distrib(1, 100);
+    snprintf(buffer, sizeof(buffer), "%d", distrib(*gen));
+
+    UID += buffer;
     return UID;
 }
-
-#endif
-// DATECOMMON_H

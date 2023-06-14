@@ -29,6 +29,8 @@ target_sources(module-bsp
 		bsp/lpm/RT1051LPMCommon.cpp
 		bsp/magnetometer/ALS31300.cpp
 		bsp/pit/pit.cpp
+		bsp/trng/trng.cpp
+		bsp/trng/RT1051Trng.cpp
 		bsp/rtc/rtc.cpp
 		bsp/torch/torch.cpp
 		bsp/vibrator/vibrator.cpp

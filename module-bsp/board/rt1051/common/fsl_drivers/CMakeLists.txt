@@ -30,6 +30,7 @@ target_sources(fsl
         fsl_snvs_hp.c
         fsl_snvs_lp.c
         fsl_src.c
+        fsl_trng.c
         fsl_usdhc.c
         fsl_wdog.c
     
@@ -63,6 +64,7 @@ target_sources(fsl
         fsl_snvs_hp.h
         fsl_snvs_lp.h
         fsl_src.h
+        fsl_trng.h
         fsl_usdhc.h
         fsl_wdog.h    
 )
