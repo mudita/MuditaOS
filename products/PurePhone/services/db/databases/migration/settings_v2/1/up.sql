@@ -8,3 +8,4 @@
 UPDATE OR IGNORE settings_tab
 SET path = 'gs_onboarding_done'
 WHERE path='\ApplicationManager\\gs_onboarding_done';
+

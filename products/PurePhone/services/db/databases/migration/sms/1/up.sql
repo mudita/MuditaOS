@@ -5,5 +5,7 @@
 -- Revision: 111a2d1b-dc32-40a3-9a2a-02a9e186bcac
 -- Create Date: 2023-03-23 10:11:44
 
-ALTER TABLE templates
-DROP COLUMN rowOrder;
+ALTER TABLE templates ADD rowOrder INTEGER;
+
+UPDATE OR IGNORE templates SET rowOrder = _id;
+
