@@ -20,6 +20,7 @@ target_sources(module-bsp
                 magnetometer/magnetometer.cpp
                 rtc/rtc.cpp
                 torch/torch.cpp
+                trng/trng.cpp
                 usb_cdc/usb_cdc.cpp
                 vibrator/vibrator.cpp
                 watchdog/software_watchdog.cpp

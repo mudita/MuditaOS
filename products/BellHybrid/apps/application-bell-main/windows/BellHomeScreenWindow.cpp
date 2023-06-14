@@ -3,25 +3,20 @@
 
 #include "BellHomeScreenWindow.hpp"
 #include "BellBatteryStatusWindow.hpp"
-#include "ProductConfig.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/actions/AlarmRingingData.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
-#include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/widgets/SnoozeTimer.hpp>
 #include <common/widgets/ProgressTimerWithSnoozeTimer.hpp>
 #include <gui/input/InputEvent.hpp>
-#include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
-#include <i18n/i18n.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
-#include <time/time_constants.hpp>
-#include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/TimeSetFmtSpinner.hpp>
 
 #include <chrono>
+
 namespace
 {
     inline constexpr auto snoozeTimerName = "SnoozeTimer";
@@ -32,7 +27,7 @@ namespace gui
 {
     BellHomeScreenWindow::BellHomeScreenWindow(app::ApplicationCommon *app,
                                                std::shared_ptr<app::home_screen::AbstractPresenter> presenter)
-        : AppWindow(app, name::window::main_window), presenter{presenter}
+        : AppWindow(app, name::window::main_window), presenter{std::move(presenter)}
     {
         buildInterface();
         this->presenter->attach(this);
@@ -127,9 +122,7 @@ namespace gui
         if (currentLayout) {
             return currentLayout->getAlarmTime();
         }
-        else {
-            return {};
-        }
+        return {};
     }
 
     void BellHomeScreenWindow::setAlarmTime(std::time_t newTime)

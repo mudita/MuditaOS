@@ -92,7 +92,7 @@ class ServiceDesktop : public sys::Service
     auto getDeviceToken() -> std::string;
 
     auto getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>;
-    void removeNotificationEntries(const std::vector<uint32_t> &);
+    void removeNotificationEntries(const std::vector<std::uint32_t> &);
     auto getMtpPath() const noexcept -> std::filesystem::path;
     auto getOnboardingState() const -> sdesktop::endpoints::OnboardingState;
 

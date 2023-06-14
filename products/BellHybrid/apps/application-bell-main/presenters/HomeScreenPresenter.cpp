@@ -15,10 +15,11 @@
 #include <common/widgets/ProgressTimerWithSnoozeTimer.hpp>
 #include <Timers/SystemTimer.hpp>
 #include <Timers/TimerFactory.hpp>
-#include <time/time_constants.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <switches/LatchStatusRequest.hpp>
+
+#include <bsp/trng/trng.hpp>
 
 namespace
 {
@@ -66,7 +67,8 @@ namespace
             tm.tm_min--;
         }
     }
-}; // namespace
+} // namespace
+
 namespace app::home_screen
 {
     HomeScreenPresenter::HomeScreenPresenter(ApplicationCommon *app,
@@ -75,7 +77,7 @@ namespace app::home_screen
                                              AbstractTemperatureModel &temperatureModel,
                                              AbstractTimeModel &timeModel)
         : app{app}, alarmModel{alarmModel}, batteryModel{batteryModel}, temperatureModel{temperatureModel},
-          timeModel{timeModel}, rngEngine{std::make_unique<std::mt19937>(std::random_device{}())}
+          timeModel{timeModel}, rngEngine{std::make_unique<std::mt19937>(bsp::trng::getRandomValue())}
     {}
 
     gui::RefreshModes HomeScreenPresenter::handleUpdateTimeEvent()

@@ -144,7 +144,7 @@ auto ServiceDesktop::getNotificationEntries() const -> std::vector<Outbox::Notif
     return outboxNotifications.getNotificationEntries();
 }
 
-void ServiceDesktop::removeNotificationEntries(const std::vector<uint32_t> &uidsOfNotificationsToBeRemoved)
+void ServiceDesktop::removeNotificationEntries(const std::vector<std::uint32_t> &uidsOfNotificationsToBeRemoved)
 {
     outboxNotifications.removeNotificationEntries(uidsOfNotificationsToBeRemoved);
 }
