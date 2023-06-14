@@ -22,6 +22,7 @@
 * Fixed occasional USB crash when USB cable was disconnected during files upload
 * Fixed back button power off timer changed to 10s
 * Fixed alarm problems when it was re-set while snooze was still active
+* Fixed the problem with the not appearing system closing window in some cases
 
 ### Added
 

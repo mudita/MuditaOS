@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceGUI.hpp"
@@ -234,15 +234,13 @@ namespace service::gui
         contextPool->returnContext(contextId);
         contextReleaseTimer.stop();
 
-        if (isClosing) {
-            sendCloseReadyMessage(this);
+        // Even if the next render is already cached, if any context in the pool is currently being processed, then
+        // we better wait for it.
+        if (isNextFrameReady() and not isAnyFrameBeingRenderedOrDisplayed()) {
+            trySendNextFrame();
         }
-        else {
-            // Even if the next render is already cached, if any context in the pool is currently being processed, then
-            // we better wait for it.
-            if (isNextFrameReady() and not isAnyFrameBeingRenderedOrDisplayed()) {
-                trySendNextFrame();
-            }
+        else if (isClosing) {
+            sendCloseReadyMessage(this);
         }
         return sys::MessageNone{};
     }
