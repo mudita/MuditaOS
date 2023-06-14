@@ -39,11 +39,11 @@
    },
    {
     "name": "settings_v2",
-    "version": "0"
+    "version": "1"
    },
    {
     "name": "sms",
-    "version": "0"
+    "version": "1"
    }
   ]
  }
