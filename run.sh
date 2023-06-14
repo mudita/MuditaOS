@@ -1,11 +1,11 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 source config/common.sh
 
 BIN_DIR="build-rt1051-Debug"
-GDB_ARM=$( hash arm-none-eabi-gdb-py 2> /dev/null && echo "arm-none-eabi-gdb-py" || echo "arm-none-eabi-gdb" )
+GDB_ARM=$( hash arm-none-eabi-gdb-py3 2> /dev/null && echo "arm-none-eabi-gdb-py3" || echo "arm-none-eabi-gdb" )
 
 help() 
 {
