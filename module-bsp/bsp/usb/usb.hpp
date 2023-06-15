@@ -22,7 +22,7 @@ inline constexpr auto SERIAL_BAUDRATE   = 115200;
 
 namespace bsp
 {
-    enum class USBDeviceStatus : uint32_t
+    enum class USBDeviceStatus : std::uint32_t
     {
         Disconnected,
         Connected,
@@ -43,10 +43,9 @@ namespace bsp
 
     int usbInit(const usbInitParams &initParams);
     int usbCDCReceive(void *ptr);
-    int usbCDCSend(std::string *sendMsg);
-    int usbCDCSendRaw(const char *dataPtr, size_t dataLen);
+    std::size_t usbCDCSend(std::string *sendMsg);
+    std::size_t usbCDCSendRaw(const char *dataPtr, std::size_t dataLen);
     void usbDeinit();
     void usbHandleDataReceived();
     void usbUnlockMTP();
-
 } // namespace bsp
