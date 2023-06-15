@@ -7,7 +7,6 @@
 #include <fstream>
 #include <string>
 #include <sys/inotify.h>
-#include <array>
 #include <limits.h>
 
 #ifndef DEUBG_USB
@@ -74,7 +73,7 @@ namespace bsp
         }
     }
 
-    int usbCDCReceive(void *)
+    int usbCDCReceive([[maybe_unused]] void *ptr)
     {
         LOG_INFO("[ServiceDesktop:BSP_Driver] Start reading on fd:%d", fd);
         char inputData[SERIAL_BUFFER_LEN];
@@ -86,7 +85,7 @@ namespace bsp
             if (uxQueueSpacesAvailable(USBReceiveQueue) != 0) {
                 memset(inputData, 0, SERIAL_BUFFER_LEN);
 
-                ssize_t length = read(fd, &inputData[0], SERIAL_BUFFER_LEN);
+                const auto length = read(fd, &inputData[0], SERIAL_BUFFER_LEN);
                 if (length > 0) {
                     LOG_DEBUG("[ServiceDesktop:BSP_Driver] Received: %d signs", static_cast<int>(length));
 #if USBCDC_ECHO_ENABLED
@@ -123,14 +122,14 @@ namespace bsp
         }
     }
 
-    int usbCDCSend(std::string *sendMsg)
+    std::size_t usbCDCSend(std::string *sendMsg)
     {
         return usbCDCSendRaw(sendMsg->c_str(), sendMsg->length());
     }
 
-    int usbCDCSendRaw(const char *dataPtr, size_t dataLen)
+    std::size_t usbCDCSendRaw(const char *dataPtr, std::size_t dataLen)
     {
-        ssize_t t = write(fd, dataPtr, dataLen);
+        const auto t = write(fd, dataPtr, dataLen);
         if (t >= 0) {
             LOG_DEBUG("[ServiceDesktop:BSP_Driver] Sent: %d", static_cast<int>(t));
             return 0;
@@ -141,19 +140,20 @@ namespace bsp
         }
     }
 
-    void writePtsToFile(const char *pts_name)
+    void writePtsToFile(const char *ptsname)
     {
         std::ofstream ptsNameFile;
         ptsNameFile.open(ptsFileName, std::ios::out | std::ios::trunc);
-        ptsNameFile << pts_name;
+        ptsNameFile << ptsname;
     }
 
     void usbDeinit()
     {
         LOG_INFO("usbDeinit removing file %s", ptsFileName);
         std::remove(ptsFileName);
-        if (taskHandleReceive)
+        if (taskHandleReceive != nullptr) {
             vTaskDelete(taskHandleReceive);
+        }
     }
 
     void usbUnlockMTP()
@@ -163,7 +163,6 @@ namespace bsp
 
     int usbInit(const bsp::usbInitParams &initParams)
     {
-
         fd = 0;
         fd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
         if (fd == -1) {
@@ -185,9 +184,11 @@ namespace bsp
 
         writePtsToFile(pts_name);
         LOG_INFO("bsp::usbInit linux ptsname: %s", pts_name);
-        struct termios newtio;
+        struct termios newtio
+        {};
         memset(&newtio, 0, sizeof(newtio));
-        struct termios oldtio;
+        struct termios oldtio
+        {};
         tcgetattr(fd, &oldtio);
 
         newtio             = oldtio;
@@ -206,7 +207,7 @@ namespace bsp
         USBReceiveQueue = initParams.queueHandle;
         USBIrqQueue     = initParams.irqQueueHandle;
 
-        BaseType_t task_error = xTaskCreate(&bsp::usbDeviceTask,
+        const auto task_error = xTaskCreate(&bsp::usbDeviceTask,
                                             "USBLinuxReceive",
                                             SERIAL_BUFFER_LEN * 8,
                                             nullptr,
