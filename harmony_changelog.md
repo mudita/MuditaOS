@@ -17,6 +17,7 @@
 * Fixed problem with displaying end of title when playing song in loop was selected.
 * Fixed USB charging port detection.
 * Fixed occasional crash on system startup.
+* Fixed the buttons sometimes don't respond on press or release
 
 ### Added
 
