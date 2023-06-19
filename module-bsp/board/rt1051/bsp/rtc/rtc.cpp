@@ -50,6 +50,9 @@ namespace bsp::rtc
         while ((SNVS->LPCR & SNVS_LPCR_SRTC_ENV_MASK) == 0) {
             if ((cpp_freertos::Ticks::GetTicks() - initialTicks) > cpp_freertos::Ticks::MsToTicks(timeoutMs)) {
                 LOG_ERROR("RTC init timeout!");
+                LOG_ERROR("SSM state: 0x%02lX", static_cast<std::uint32_t>(SNVS_HP_GetSSMState(SNVS)));
+                LOG_ERROR("LPCR: 0x%08lX LPLR: 0x%08lX LPSR: 0x%08lX", SNVS->LPCR, SNVS->LPLR, SNVS->LPSR);
+                LOG_ERROR("HPCR: 0x%08lX HPLR: 0x%08lX HPSR: 0x%08lX", SNVS->HPCR, SNVS->HPLR, SNVS->HPSR);
                 return ErrorCode::Error;
             }
             vTaskDelay(retryDelayMs);
