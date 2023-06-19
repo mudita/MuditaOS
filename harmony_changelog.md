@@ -23,6 +23,7 @@
 * Fixed back button power off timer changed to 10s
 * Fixed alarm problems when it was re-set while snooze was still active
 * Fixed the problem with the not appearing system closing window in some cases
+* Fixed the buttons sometimes don't respond on press or release
 
 ### Added
 
