@@ -36,7 +36,6 @@
 #include <logdump/logdump.h>
 #include <task.h>
 #include <macros.h>
-#include <stdbool.h>
 #include <string.h>
 #include <exit_backtrace.h>
 #include <purefs/vfs_subsystem.hpp>
@@ -60,7 +59,7 @@ static void __attribute__((noreturn)) stop_system(void)
     LOG_INFO("Restarting the system...");
     NVIC_SystemReset();
     // waiting for system reset
-    while (1) {
+    while (true) {
 #ifndef DEBUG
         __asm volatile("wfi\n");
 #endif

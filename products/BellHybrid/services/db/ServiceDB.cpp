@@ -18,8 +18,8 @@
 #include <time/ScopedTime.hpp>
 
 #include <purefs/filesystem_paths.hpp>
-
-#include <crashdump-serial-number/crashdump_serial_number.hpp>
+#include <CrashdumpMetadataStore.hpp>
+#include <product/version.hpp>
 
 ServiceDB::~ServiceDB()
 {
@@ -70,10 +70,14 @@ sys::ReturnCodes ServiceDB::InitHandler()
     const auto settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
 
-    // Save serial number for crashdump generation purpose
+    /* Save metadata for crashdump generation purpose */
     const auto serialNumberPath =
         settings::factory::entry_key + std::string("/") + settings::factory::serial_number_key;
-    crashdump::setSerialNumber(settings->getValue(serialNumberPath, settings::SettingsScope::Global));
+    Store::CrashdumpMetadata::getInstance().setSerialNumber(
+        settings->getValue(serialNumberPath, settings::SettingsScope::Global));
+    Store::CrashdumpMetadata::getInstance().setCommitHash(GIT_REV);
+    Store::CrashdumpMetadata::getInstance().setOsVersion(VERSION);
+    Store::CrashdumpMetadata::getInstance().setProductName("BellHybrid");
 
     return sys::ReturnCodes::Success;
 }

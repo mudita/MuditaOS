@@ -16,7 +16,6 @@ namespace purefs::fs
 
 namespace crashdump
 {
-    constexpr inline auto maxRotationFilesCount = 5;
     class CrashDumpWriterVFS
     {
       public:
@@ -30,6 +29,7 @@ namespace crashdump
         void writeWords(const std::uint32_t *buff, std::size_t size);
 
       private:
+        static constexpr auto maxRotationFilesCount = 5;
         utils::Rotator<maxRotationFilesCount> rotator;
         std::FILE *file{};
     };

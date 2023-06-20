@@ -8,6 +8,7 @@
 * Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
 * Added translations for Bluetooth conenction status label
 * Added WCDMA recognition as 3G in status bar
+* Added extended information to crashdump filename
 
 ### Changed / Improved
 

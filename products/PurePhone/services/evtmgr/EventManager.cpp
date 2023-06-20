@@ -40,7 +40,7 @@ void EventManager::initProductEvents()
     });
 
     connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
-        auto *m = dynamic_cast<sevm::ScreenLightControlMessage *>(msgl);
+        auto *m = static_cast<sevm::ScreenLightControlMessage *>(msgl);
         backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters());
         return sys::msgHandled();
     });
@@ -57,8 +57,8 @@ void EventManager::initProductEvents()
         return sys::msgHandled();
     });
 
-    connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
-        screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
+    connect(sevm::ScreenLightControlRequestParameters(), [&]([[maybe_unused]] sys::Message *msgl) {
+        const screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
         auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
         return msg;
@@ -76,7 +76,7 @@ void EventManager::initProductEvents()
         return sys::msgHandled();
     });
 
-    connect(typeid(sevm::SIMTrayMessage), [&](sys::Message *) {
+    connect(typeid(sevm::SIMTrayMessage), [&]([[maybe_unused]] sys::Message *msg) {
         bus.sendUnicast(std::make_shared<sevm::SIMTrayMessage>(), ServiceCellular::serviceName);
         return sys::MessageNone{};
     });
@@ -99,7 +99,7 @@ void EventManager::initProductEvents()
         return sys::MessageNone{};
     });
 
-    connect(typeid(sevm::TurnOffTorchRequest), [&](sys::Message *msg) {
+    connect(typeid(sevm::TurnOffTorchRequest), [&]([[maybe_unused]] sys::Message *msg) {
         toggleTorchOff();
         return sys::MessageNone{};
     });
@@ -135,7 +135,6 @@ void EventManager::ProcessCloseReason([[maybe_unused]] sys::CloseReason closeRea
 
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
-
     auto responseMessage =
         std::static_pointer_cast<sys::ResponseMessage>(EventManagerCommon::DataReceivedHandler(msgl, resp));
 
@@ -161,9 +160,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
     if (handled) {
         return std::make_shared<sys::ResponseMessage>();
     }
-    else {
-        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-    }
+    return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
 
 void EventManager::handleKeyEvent(sys::Message *msg)

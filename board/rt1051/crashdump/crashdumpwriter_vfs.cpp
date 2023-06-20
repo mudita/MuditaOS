@@ -2,90 +2,86 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "crashdumpwriter_vfs.hpp"
-#include <crashdump-serial-number/crashdump_serial_number.hpp>
 #include <cstdio>
 #include <fcntl.h>
-#include "purefs/vfs_subsystem.hpp"
 #include <purefs/filesystem_paths.hpp>
 #include <exit_backtrace.h>
+#include <CrashdumpMetadataStore.hpp>
 
 #include <log/log.hpp>
 #include <filesystem>
-#include <stdint.h>
 #include <unistd.h>
-#include <chrono>
-#include <set>
+
+/* Crashdump filename pattern:
+ * crashdump_[os-metadata]_[timestamp-in-seconds].hex.[index]
+ * where [os-metadata] is in [product]_[os-version]_[commit-hash]-[serial-number] form.
+ * [index] was added to ensure resistance to the device date retraction.
+ */
 
 namespace
 {
-    constexpr inline auto suffix     = "_crashdump.hex";
-    constexpr inline auto file_index = ".1";
+    inline constexpr auto prefix     = "crashdump";
+    inline constexpr auto extension  = ".hex";
+    inline constexpr auto file_index = ".1";
+    inline constexpr auto separator  = "_";
 
-    // Crashdump filename pattern:
-    // [serial-number]_[timestamp-in-seconds]_crashdump.hex.[index]
-    // [index] was added to ensure resistance to the device date retraction
-
-    inline std::string generate_crashdump_filename()
+    inline std::string generateCrashdumpFilename()
     {
-        const auto crash_time =
-            std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch())
-                .count();
-        auto filename =
-            std::string("/") + crashdump::getSerialNumber() + "_" + std::to_string(crash_time) + suffix + file_index;
-        return filename;
+        const auto crashTime   = std::time(nullptr);
+        const auto &osMetadata = Store::CrashdumpMetadata::getInstance().getMetadataString();
+        return (std::string(prefix) + separator + osMetadata + separator + std::to_string(crashTime) + extension +
+                file_index);
     }
-
 } // namespace
 
 namespace crashdump
 {
-
     void CrashDumpWriterVFS::openDump()
     {
-        const auto crashDumpFilePath = purefs::dir::getCrashDumpsPath().string() + generate_crashdump_filename();
+        const auto crashdumpFilePath = purefs::dir::getCrashDumpsPath() / generateCrashdumpFilename();
 
-        LOG_INFO("Crash dump %s preparing ...", crashDumpFilePath.c_str());
+        LOG_INFO("Preparing crashdump '%s'...", crashdumpFilePath.c_str());
         if (!rotator.rotateFiles(purefs::dir::getCrashDumpsPath())) {
-            LOG_FATAL("Failed to rotate crash dumps errno: %i", errno);
+            LOG_FATAL("Failed to rotate crashdump, errno: %d", errno);
             _exit_backtrace(-1, false);
         }
-        file = std::fopen(crashDumpFilePath.c_str(), "w");
-        if (!file) {
-            LOG_FATAL("Failed to open crash dump file errno %i", errno);
+
+        file = std::fopen(crashdumpFilePath.c_str(), "w");
+        if (file == nullptr) {
+            LOG_FATAL("Failed to open crashdump file '%s', errno: %d", crashdumpFilePath.c_str(), errno);
             _exit_backtrace(-1, false);
         }
     }
 
     void CrashDumpWriterVFS::saveDump()
     {
-        LOG_INFO("Crash dump create finished.");
-        fflush(file);
+        LOG_INFO("Crashdump created successfully!");
+        std::fflush(file);
         fsync(fileno(file));
         std::fclose(file);
     }
 
-    void CrashDumpWriterVFS::writeBytes(const uint8_t *buff, std::size_t size)
+    void CrashDumpWriterVFS::writeBytes(const std::uint8_t *buff, std::size_t size)
     {
         if (std::fwrite(buff, sizeof(*buff), size, file) != size) {
-            LOG_FATAL("Unable to write crash dump errno: %i", errno);
+            LOG_FATAL("Unable to write crashdump, errno: %d", errno);
             _exit_backtrace(-1, false);
         }
     }
 
-    void CrashDumpWriterVFS::writeHalfWords(const uint16_t *buff, std::size_t size)
+    void CrashDumpWriterVFS::writeHalfWords(const std::uint16_t *buff, std::size_t size)
     {
         if (std::fwrite(buff, sizeof(*buff), size, file) != size) {
-            LOG_FATAL("Unable to write crash dump errno: %i", errno);
+            LOG_FATAL("Unable to write crashdump, errno: %d", errno);
             _exit_backtrace(-1, false);
         }
     }
 
-    void CrashDumpWriterVFS::writeWords(const uint32_t *buff, std::size_t size)
+    void CrashDumpWriterVFS::writeWords(const std::uint32_t *buff, std::size_t size)
     {
         if (std::fwrite(buff, sizeof(*buff), size, file) != size) {
-            LOG_FATAL("Unable to write crash dump errno: %i", errno);
+            LOG_FATAL("Unable to write crashdump, errno: %d", errno);
             _exit_backtrace(-1, false);
         }
     }
-
 } // namespace crashdump
