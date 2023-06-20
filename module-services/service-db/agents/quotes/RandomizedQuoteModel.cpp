@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RandomizedQuoteModel.hpp"
@@ -6,27 +6,26 @@
 
 #include "log/log.hpp"
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <algorithm> // std::random_shuffle
 #include <memory>
 #include <sstream>
+#include <bsp/trng/trng.hpp>
 
 namespace Quotes
 {
-    constexpr inline auto zeroOffset = 0;
-    constexpr inline auto maxLimit   = std::numeric_limits<unsigned int>().max();
     RandomizedQuoteModel::RandomizedQuoteModel(std::unique_ptr<settings::Settings> settings,
                                                Database *predefinedQuotesDB,
                                                Database *customQuotesDB)
         : settings(std::move(settings)), predefinedQuotesDB(predefinedQuotesDB), customQuotesDB(customQuotesDB),
-          serializer(std::make_unique<QuotesSettingsSerializer>())
+          serializer(std::make_unique<QuotesSettingsSerializer>()), rngEngine{std::make_unique<std::mt19937>(
+                                                                        bsp::trng::getRandomValue())}
     {}
 
     void RandomizedQuoteModel::randomize(IdList &list)
     {
-        srand(time(NULL));
-        std::random_shuffle(std::begin(list), std::end(list));
+        std::shuffle(std::begin(list), std::end(list), *rngEngine);
     }
-    void RandomizedQuoteModel::updateList(bool forced)
+
+    void RandomizedQuoteModel::updateList(ListUpdateMode updateMode)
     {
         auto queryResult      = customQuotesDB->query(Queries::getEnabledCustomQuotes);
         auto customQuotesList = getList<QuotesList, QuoteRecord>(zeroOffset, maxLimit, std::move(queryResult));
@@ -34,11 +33,12 @@ namespace Quotes
         queryResult =
             predefinedQuotesDB->query(Queries::getEnabledPredefinedQuotes, utils::getDisplayLanguage().c_str());
         auto predefinedQuotesList = getList<QuotesList, QuoteRecord>(zeroOffset, maxLimit, std::move(queryResult));
-        populateList(std::move(predefinedQuotesList), std::move(customQuotesList), forced);
+        populateList(std::move(predefinedQuotesList), std::move(customQuotesList), updateMode);
     }
+
     void RandomizedQuoteModel::populateList(std::unique_ptr<QuotesList> predefinedQuotesList,
                                             std::unique_ptr<QuotesList> customQuotesList,
-                                            bool forcedUpdate)
+                                            ListUpdateMode updateMode)
     {
         IdList list;
         for (const auto &item : predefinedQuotesList->data) {
@@ -49,7 +49,7 @@ namespace Quotes
         }
 
         randomize(list);
-        if (not forcedUpdate) {
+        if (updateMode == ListUpdateMode::Normal) {
             auto settingsList = settings->getValue(settings::Quotes::randomQuotesList, settings::SettingsScope::Global);
             if (not settingsList.empty()) {
                 return;
@@ -57,7 +57,7 @@ namespace Quotes
         }
         settings->setValue(
             settings::Quotes::randomQuotesList, serializer->serialize(list), settings::SettingsScope::Global);
-        LOG_ERROR("ID queue length: %zu", list.size());
+        LOG_INFO("ID queue length: %zu", list.size());
     }
 
     auto RandomizedQuoteModel::getId() -> QuoteID
@@ -81,7 +81,7 @@ namespace Quotes
         }
 
         if (list.empty()) {
-            updateList(true);
+            updateList(ListUpdateMode::Forced);
         }
         else {
             settings->setValue(
@@ -94,9 +94,9 @@ namespace Quotes
     }
     auto RandomizedQuoteModel::isIdExpired() -> bool
     {
-        auto lastTimestampString =
+        const auto lastTimestampString =
             settings->getValue(settings::Quotes::randomQuoteIDUpdateTime, settings::SettingsScope::Global);
-        long lastTimestamp;
+        time_t lastTimestamp;
 
         try {
             lastTimestamp = stol(lastTimestampString);
@@ -106,7 +106,7 @@ namespace Quotes
             lastTimestamp = 0;
         }
 
-        auto currentTimestamp = std::time(nullptr);
+        const auto currentTimestamp = std::time(nullptr);
         if ((currentTimestamp - lastTimestamp) >= quotesChangingInterval) {
             lastTimestamp = currentTimestamp;
             settings->setValue(settings::Quotes::randomQuoteIDUpdateTime,
