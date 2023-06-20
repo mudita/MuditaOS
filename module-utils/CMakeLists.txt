@@ -4,6 +4,7 @@ add_library(module-utils INTERFACE)
 
 add_subdirectory(tar)
 add_subdirectory(Clipboard)
+add_subdirectory(CrashdumpMetadataStore)
 add_subdirectory(EventStore)
 add_subdirectory(i18n)
 add_subdirectory(locale)

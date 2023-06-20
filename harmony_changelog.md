@@ -34,6 +34,7 @@
 * Added label informing about PC connection.
 * Added serial number to About section
 * Added possibility to detect device's case colour
+* Added extended information to crashdump filename
 
 ### Changed / Improved
 

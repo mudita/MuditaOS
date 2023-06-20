@@ -24,7 +24,7 @@ target_link_libraries(databases
         bell::db::meditation_stats
         service-db
         serial-number-parser
-        crashdump-serial-number
+        crashdump-metadata-store
 )
 
 if (${ENABLE_TESTS})

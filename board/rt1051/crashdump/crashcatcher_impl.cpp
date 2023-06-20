@@ -16,17 +16,17 @@ namespace
     crashdump::CrashDumpWriterVFS cwrite;
 }
 
-const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions(void)
+const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions()
 {
     /* board/rt1051/ldscripts/memory.ld
-     * NOTE: Text section and stacks sections are intentionally ommited
-     * because can cause throubles in the running system
+     * NOTE: Text section and stacks sections are intentionally omitted
+     * because can cause troubles in the running system
      */
     static const CrashCatcherMemoryRegion regions[] = {
         // SRAM_OC
-        {0x20200000, 0x20210000, CRASH_CATCHER_WORD},
+        {0x20200000, 0x20200000 + 0x10000, CRASH_CATCHER_WORD},
         // SRAM_DTC
-        {0x20000000, 0x20070000, CRASH_CATCHER_WORD},
+        {0x20000000, 0x20000000 + 0x70000, CRASH_CATCHER_WORD},
         // intentionally skip text section
         // intentionally skip the heap section
         // end tag
@@ -57,7 +57,7 @@ void CrashCatcher_DumpMemory(const void *pvMemory, CrashCatcherElementSizes elem
     }
 }
 
-CrashCatcherReturnCodes CrashCatcher_DumpEnd(void)
+CrashCatcherReturnCodes CrashCatcher_DumpEnd()
 {
     cwrite.saveDump();
     _exit_backtrace(-1, false);
