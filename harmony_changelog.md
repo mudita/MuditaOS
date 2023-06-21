@@ -25,6 +25,7 @@
 * Fixed the problem with the not appearing system closing window in some cases
 * Fixed the buttons sometimes don't respond on press or release
 * Fixed no clock update
+* Fixed problem with displaying some filenames in Relaxation
 
 ### Added
 

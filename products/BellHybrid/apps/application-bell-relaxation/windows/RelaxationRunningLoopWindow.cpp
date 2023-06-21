@@ -18,6 +18,7 @@ namespace
     inline constexpr units::SOC dischargingLevelShowTop = 20;
     inline constexpr units::SOC dischargingLowBattery   = 10;
     inline constexpr auto maxPossibleCharsToDisplay     = 25U;
+    inline constexpr auto incompleteSequenceCharCode    = '\342';
 
     bool isBatteryCharging(const Store::Battery::State state)
     {
@@ -77,6 +78,9 @@ namespace
             return title;
         }
         std::string newTittle = title.substr(0, maxPossibleCharsToDisplay - 2);
+        if (newTittle.back() == incompleteSequenceCharCode) {
+            newTittle.pop_back();
+        }
         newTittle.append("...");
 
         return newTittle;

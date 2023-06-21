@@ -11,8 +11,9 @@
 
 namespace
 {
-    constexpr auto maxDisplayedTitleLength = 30U;
-}
+    constexpr auto maxDisplayedTitleLength    = 30U;
+    constexpr auto incompleteSequenceCharCode = '\342';
+} // namespace
 
 namespace gui
 {
@@ -28,10 +29,18 @@ namespace gui
 
     void RelaxationMainWindow::setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> sounds)
     {
+        auto trimTittle = [](const std::string &title) {
+            std::string shortTittle = title.substr(0, maxDisplayedTitleLength);
+            if (shortTittle.back() == incompleteSequenceCharCode) {
+                shortTittle.pop_back();
+            }
+            return shortTittle;
+        };
+
         std::list<gui::Option> menuOptionList;
         auto addRecord = [&](const db::multimedia_files::MultimediaFilesRecord &sound) {
             menuOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
-                sound.tags.title.substr(0, maxDisplayedTitleLength),
+                trimTittle(sound.tags.title),
                 [=](gui::Item &item) {
                     onActivated(sound);
                     return true;
