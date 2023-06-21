@@ -6,20 +6,20 @@
 #include <log/log.hpp>
 #include <string>
 
-using namespace std;
-
 TEST_CASE("Log tests")
 {
+    const auto lineBufferSize = log_getMaxLineLength();
+
     const int value                   = -423;
     const char *carray            = "carray";
-    const string str                  = "string";
+    const std::string str             = "string";
     const double double_value         = 6.5323;
     const unsigned int unsigned_value = 7821;
-    char big_array[LINE_BUFFER_SIZE + 2];
+    char big_array[lineBufferSize + 2];
     memset(big_array, 'X', sizeof(big_array));
     big_array[sizeof(big_array) - 1] = '\0';
 
-    const auto loggerBufferSize = static_cast<int>(LINE_BUFFER_SIZE);
+    const auto loggerBufferSize = static_cast<int>(lineBufferSize);
     int result           = LOG_TRACE("value: %d", value);
     REQUIRE(0 < result);
     REQUIRE(result <= loggerBufferSize);

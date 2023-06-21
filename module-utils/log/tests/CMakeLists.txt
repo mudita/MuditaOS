@@ -36,3 +36,13 @@ add_catch2_executable(
         module-utils
         log
 )
+
+# Logger buffer container tests
+add_catch2_executable(
+    NAME
+        utils-loggerbuffercontainer
+    SRCS
+        test_LoggerBufferContainer.cpp
+    LIBS
+        log
+)

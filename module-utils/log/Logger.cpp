@@ -5,8 +5,17 @@
 #include "LockGuard.hpp"
 #include <ticks.hpp>
 #include <purefs/filesystem_paths.hpp>
-
 #include <fstream>
+#include <CrashdumpMetadataStore.hpp>
+
+namespace
+{
+    inline constexpr int statusSuccess         = 1;
+    inline constexpr auto streamBufferSize     = 64 * 1024;
+    inline constexpr auto logFileNamePrefix    = "MuditaOS";
+    inline constexpr auto logFileNameExtension = ".log";
+    inline constexpr auto logFileNameSeparator = "_";
+} // namespace
 
 namespace Log
 {
@@ -23,7 +32,7 @@ namespace Log
         return stream;
     }
 
-    Logger::Logger() : rotator{".log"}, streamBuffer{std::make_unique<char[]>(streamBufferSize)}
+    Logger::Logger() : streamBuffer{std::make_unique<char[]>(streamBufferSize)}, rotator{logFileNameExtension}
     {
         filtered = {
             {"ApplicationManager", LoggerLevel::LOGINFO},
@@ -137,12 +146,12 @@ namespace Log
 
     [[nodiscard]] std::size_t Logger::lineBufferSizeLeft() const noexcept
     {
-        const auto sizeLeft = LINE_BUFFER_SIZE - lineBufferCurrentPos;
+        const auto sizeLeft = lineBufferSize - lineBufferCurrentPos;
         assert(sizeLeft > 0);
         return sizeLeft;
     }
 
-    int Logger::writeLog(Device device, const char *fmt, va_list args)
+    int Logger::writeLog([[maybe_unused]] Device device, const char *fmt, va_list args)
     {
         constexpr auto lineTerminationString = "\n";
         constexpr auto lineTerminationLength = 2; // '\n' + null-terminator
@@ -176,19 +185,26 @@ namespace Log
     /// @return: < 0 - error occured during log flush
     /// @return:   0 - log flush did not happen
     /// @return:   1 - log flush successflul
-    int Logger::dumpToFile(const std::filesystem::path &logPath, LoggerState loggerState)
+    int Logger::dumpToFile(const std::filesystem::path &logDirectoryPath, LoggerState loggerState)
     {
+        if (logFileName.empty()) {
+            const auto &osMetadata = Store::CrashdumpMetadata::getInstance().getMetadataString();
+            logFileName = std::string(logFileNamePrefix) + logFileNameSeparator + osMetadata + logFileNameExtension;
+        }
+
+        const auto logFilePath = logDirectoryPath / logFileName;
+
         std::error_code errorCode;
-        auto firstDump = !std::filesystem::exists(logPath, errorCode);
+        auto firstDump = !std::filesystem::exists(logFilePath, errorCode);
 
         if (errorCode) {
             if (loggerState == LoggerState::RUNNING) {
-                LOG_ERROR("Failed to check if file '%s' exists, error: %d!", logPath.c_str(), errorCode.value());
+                LOG_ERROR("Failed to check if file '%s' exists, error: %d!", logFilePath.c_str(), errorCode.value());
             }
             return -EIO;
         }
 
-        if (const auto maxSizeExceeded = (!firstDump && (std::filesystem::file_size(logPath) > maxFileSize));
+        if (const auto maxSizeExceeded = (!firstDump && (std::filesystem::file_size(logFilePath) > maxFileSize));
             maxSizeExceeded) {
             if (loggerState == LoggerState::RUNNING) {
                 LOG_DEBUG("Max log file size exceeded. Rotating log files...");
@@ -196,7 +212,7 @@ namespace Log
 
             {
                 LockGuard lock(logFileMutex);
-                rotator.rotateFile(logPath);
+                rotator.rotateFile(logFilePath);
             }
             firstDump = true;
         }
@@ -210,10 +226,10 @@ namespace Log
             /* In some implementations pubsetbuf has to be called before opening a stream to be effective */
             logFile.rdbuf()->pubsetbuf(streamBuffer.get(), streamBufferSize);
 
-            logFile.open(logPath, std::fstream::out | std::fstream::app);
+            logFile.open(logFilePath, std::fstream::out | std::fstream::app);
             if (!logFile.good()) {
                 if (loggerState == LoggerState::RUNNING) {
-                    LOG_ERROR("Failed to open log file '%s'!", logPath.c_str());
+                    LOG_ERROR("Failed to open log file '%s'!", logFilePath.c_str());
                 }
                 return -EIO;
             }
@@ -224,14 +240,14 @@ namespace Log
             logFile.write(logs.data(), logs.size());
             if (logFile.bad()) {
                 if (loggerState == LoggerState::RUNNING) {
-                    LOG_ERROR("Failed to flush logs to file '%s'!", logPath.c_str());
+                    LOG_ERROR("Failed to flush logs to file '%s'!", logFilePath.c_str());
                 }
                 return -EIO;
             }
         }
 
         if (loggerState == LoggerState::RUNNING) {
-            LOG_DEBUG("Flush to file '%s' ended successfully!", logPath.c_str());
+            LOG_DEBUG("Flush to file '%s' ended successfully!", logFilePath.c_str());
         }
 
         return statusSuccess;
@@ -251,7 +267,7 @@ namespace Log
         worker->close();
         writeLogsTimer.stop();
         buffer.nextBuffer();
-        return dumpToFile(purefs::dir::getLogsPath() / LOG_FILE_NAME, LoggerState::STOPPED);
+        return dumpToFile(purefs::dir::getLogsPath(), LoggerState::STOPPED);
     }
 
     void Logger::checkBufferState()
@@ -313,5 +329,10 @@ namespace Log
         if (bytesParsed >= 0) {
             lineBufferCurrentPos += std::min(bufferSizeLeft, static_cast<std::size_t>(bytesParsed));
         }
+    }
+
+    std::size_t Logger::getMaxLineLength()
+    {
+        return lineBufferSize;
     }
 } // namespace Log
