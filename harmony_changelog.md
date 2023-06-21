@@ -18,6 +18,7 @@
 * Fixed USB charging port detection.
 * Fixed occasional crash on system startup.
 * Fixed the buttons sometimes don't respond on press or release
+* Fixed no clock update
 
 ### Added
 

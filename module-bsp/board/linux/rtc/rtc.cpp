@@ -46,6 +46,11 @@ namespace bsp::rtc
         return ErrorCode::OK;
     }
 
+    ErrorCode enableLpSrtc()
+    {
+        return ErrorCode::OK;
+    }
+
     void printCurrentDataTime()
     {
         struct tm datatime;

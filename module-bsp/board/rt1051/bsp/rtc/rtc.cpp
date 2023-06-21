@@ -15,6 +15,29 @@ namespace
 {
     constexpr std::uint32_t hpTimeAlarmIrqEnableTimeout = 100000;
     xQueueHandle qHandleRtcIrq                          = nullptr;
+
+    bool isSrtcOperational()
+    {
+        constexpr auto timeoutMs    = utils::time::milisecondsInSecond;
+        constexpr auto retryDelayMs = 10;
+        const auto initialTicks     = cpp_freertos::Ticks::GetTicks();
+
+        /* Wait until LP SRTC is operational */
+        while ((SNVS->LPCR & SNVS_LPCR_SRTC_ENV_MASK) == 0) {
+            if ((cpp_freertos::Ticks::GetTicks() - initialTicks) > cpp_freertos::Ticks::MsToTicks(timeoutMs)) {
+                return false;
+            }
+            vTaskDelay(retryDelayMs);
+        }
+        return true;
+    }
+
+    void logRegisters()
+    {
+        LOG_INFO("SSM state: 0x%02lX", static_cast<std::uint32_t>(SNVS_HP_GetSSMState(SNVS)));
+        LOG_INFO("LPCR: 0x%08lX LPLR: 0x%08lX LPSR: 0x%08lX", SNVS->LPCR, SNVS->LPLR, SNVS->LPSR);
+        LOG_INFO("HPCR: 0x%08lX HPLR: 0x%08lX HPSR: 0x%08lX", SNVS->HPCR, SNVS->HPLR, SNVS->HPSR);
+    }
 } // namespace
 
 namespace bsp::rtc
@@ -39,23 +62,9 @@ namespace bsp::rtc
         SNVS_LP_SRTC_GetDefaultConfig(&lpRtcConfig);
         SNVS_LP_SRTC_Init(SNVS, &lpRtcConfig);
 
-        constexpr auto timeoutMs    = utils::time::milisecondsInSecond;
-        constexpr auto retryDelayMs = 10;
-        const auto initialTicks     = cpp_freertos::Ticks::GetTicks();
-
-        /* Enable LP SRTC */
-        SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
-
-        /* Wait until LP SRTC enabled */
-        while ((SNVS->LPCR & SNVS_LPCR_SRTC_ENV_MASK) == 0) {
-            if ((cpp_freertos::Ticks::GetTicks() - initialTicks) > cpp_freertos::Ticks::MsToTicks(timeoutMs)) {
-                LOG_ERROR("RTC init timeout!");
-                LOG_ERROR("SSM state: 0x%02lX", static_cast<std::uint32_t>(SNVS_HP_GetSSMState(SNVS)));
-                LOG_ERROR("LPCR: 0x%08lX LPLR: 0x%08lX LPSR: 0x%08lX", SNVS->LPCR, SNVS->LPLR, SNVS->LPSR);
-                LOG_ERROR("HPCR: 0x%08lX HPLR: 0x%08lX HPSR: 0x%08lX", SNVS->HPCR, SNVS->HPLR, SNVS->HPSR);
-                return ErrorCode::Error;
-            }
-            vTaskDelay(retryDelayMs);
+        if (enableLpSrtc() == ErrorCode::Error) {
+            LOG_ERROR("LP SRTC init timeout!");
+            return ErrorCode::Error;
         }
 
         SNVS_HP_RTC_TimeSynchronize(SNVS);
@@ -70,6 +79,46 @@ namespace bsp::rtc
 
         LOG_INFO("RTC configured successfully");
         return ErrorCode::OK;
+    }
+
+    ErrorCode enableLpSrtc()
+    {
+        // Enable LP SRTC
+        SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
+
+        if (isSrtcOperational()) {
+            return ErrorCode::OK;
+        }
+
+        // The LP SRTC doesn't start so reset LP registers and try again
+
+        // Dump LP/HP registers
+        logRegisters();
+
+        // Reset the LP section except SRTC and Time alarm.
+        SNVS_HP_ResetLP(SNVS);
+        // Digital low-voltage detection is always enabled and cannot be disabled. At LP POR this
+        // register is reset to all 0's, so the hardwired comparison fails and a low-voltage violation is
+        // reported. Therefore, before programming any feature in the SNVS the low-voltage
+        // violation should be cleared. The initialization software should write the proper value
+        // (4173_6166h) into LPPGDR(LPLVDR) and should then clear
+        // the low-voltage event record in the LP status register
+        constexpr std::uint32_t LvdMagicNumber = 0x41736166;
+        SNVS->LPPGDR                           = LvdMagicNumber;
+
+        // Enable again LP SRTC after resetting the LP. It is mandatory!
+        SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
+
+        if (isSrtcOperational()) {
+            LOG_INFO("LP SRTC reinit success!");
+            return ErrorCode::OK;
+        }
+
+        // Resetting LP and LVD don't help
+        // Dump registers and return an error
+        logRegisters();
+
+        return ErrorCode::Error;
     }
 
     void printCurrentDataTime()
