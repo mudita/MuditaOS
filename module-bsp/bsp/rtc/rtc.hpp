@@ -28,6 +28,7 @@ namespace bsp::rtc
 	ErrorCode disableAlarmIrq();
 	ErrorCode maskAlarmIrq();
 	ErrorCode unmaskAlarmIrq();
+	ErrorCode enableLpSrtc();
 	ErrorCode setDateTimeFromTimestamp(time_t timestamp);
 	ErrorCode setDateTime(struct tm* time);
 	ErrorCode getCurrentDateTime(struct tm* datetime);
