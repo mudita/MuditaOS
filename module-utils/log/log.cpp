@@ -3,7 +3,6 @@
 
 #include <log/log.hpp>
 #include <Logger.hpp>
-#include <ticks.hpp>
 #include <macros.h>
 
 using Log::Logger;
@@ -44,6 +43,11 @@ int log_Log(LoggerLevel level, const char *file, int line, const char *function,
     const int result = Logger::get().log(level, file, line, function, fmt, args);
     va_end(args);
     return result;
+}
+
+size_t log_getMaxLineLength()
+{
+    return Logger::get().getMaxLineLength();
 }
 
 extern "C"

@@ -35,6 +35,7 @@
 * Added serial number to About section
 * Added possibility to detect device's case colour
 * Added extended information to crashdump filename
+* Added extended information to log filename
 
 ### Changed / Improved
 

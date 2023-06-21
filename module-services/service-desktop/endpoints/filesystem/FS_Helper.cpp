@@ -48,9 +48,6 @@ namespace sdesktop::endpoints
         }
     } // namespace
 
-    using sender::putToSendQueue;
-    namespace fs = std::filesystem;
-
     auto FS_Helper::processGet(Context &context) -> ProcessResult
     {
         LOG_DEBUG("Handling GET");
@@ -68,7 +65,7 @@ namespace sdesktop::endpoints
             response        = requestListDir(dir);
         }
         else {
-            LOG_ERROR("unknown request");
+            LOG_ERROR("Unknown request");
             response = {.status = http::Code::BadRequest};
         }
 
@@ -116,7 +113,7 @@ namespace sdesktop::endpoints
                 code = requestFileRemoval(fileName) ? http::Code::NoContent : http::Code::NotFound;
             }
             catch (const std::filesystem::filesystem_error &ex) {
-                LOG_ERROR("Can't remove requested file, error: %d", ex.code().value());
+                LOG_ERROR("Can't remove requested file %s, error: %d", fileName.c_str(), ex.code().value());
                 code = http::Code::InternalServerError;
             }
         }
@@ -149,7 +146,7 @@ namespace sdesktop::endpoints
         }
 
         if (!std::filesystem::exists(filePath)) {
-            LOG_ERROR("file not found");
+            LOG_ERROR("File %s not found", filePath.c_str());
 
             json11::Json::object response({{json::reason, json::fs::fileDoesNotExist}});
             return ResponseContext{.status = http::Code::NotFound, .body = response};

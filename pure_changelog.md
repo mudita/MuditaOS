@@ -9,6 +9,7 @@
 * Added translations for Bluetooth conenction status label
 * Added WCDMA recognition as 3G in status bar
 * Added extended information to crashdump filename
+* Added extended information to log filename
 
 ### Changed / Improved
 

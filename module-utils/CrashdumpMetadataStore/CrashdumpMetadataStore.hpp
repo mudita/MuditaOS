@@ -13,21 +13,21 @@ namespace Store
         CrashdumpMetadata(const CrashdumpMetadata &) = delete;
         CrashdumpMetadata &operator=(const CrashdumpMetadata &) = delete;
 
-        static CrashdumpMetadata &getInstance();
+        [[nodiscard]] static CrashdumpMetadata &getInstance();
 
         void setSerialNumber(const std::string &serialNumber);
-        const std::string &getSerialNumber();
+        [[nodiscard]] const std::string &getSerialNumber();
 
         void setProductName(const std::string &product);
-        const std::string &getProductName();
+        [[nodiscard]] const std::string &getProductName();
 
         void setOsVersion(const std::string &osVersion);
-        const std::string &getOsVersion();
+        [[nodiscard]] const std::string &getOsVersion();
 
         void setCommitHash(const std::string &hash);
-        const std::string &getCommitHash();
+        [[nodiscard]] const std::string &getCommitHash();
 
-        std::string getMetadataString();
+        [[nodiscard]] std::string getMetadataString();
 
       private:
         CrashdumpMetadata();

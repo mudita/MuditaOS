@@ -36,7 +36,7 @@ namespace Log
         case Signal::DumpIntervalBuffer:
         case Signal::DumpDiagnostic:
             LOG_INFO("Received signal: %s", magic_enum::enum_name(command).data());
-            Log::Logger::get().dumpToFile(purefs::dir::getLogsPath() / LOG_FILE_NAME);
+            Log::Logger::get().dumpToFile(purefs::dir::getLogsPath());
             break;
         default:
             LOG_ERROR("Command not valid: %d", static_cast<int>(command));

@@ -19,10 +19,11 @@ target_link_libraries(log
     PRIVATE
         utility
         purefs-paths
+        crashdump-metadata-store
     PUBLIC
         module-os
         log-api
-        utils-rotator    
+        utils-rotator
         sys-service
 )
 
