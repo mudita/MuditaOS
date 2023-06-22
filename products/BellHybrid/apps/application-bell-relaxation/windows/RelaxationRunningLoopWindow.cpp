@@ -17,8 +17,10 @@ namespace
     inline constexpr std::chrono::seconds timerTick{1};
     inline constexpr units::SOC dischargingLevelShowTop = 20;
     inline constexpr units::SOC dischargingLowBattery   = 10;
-    inline constexpr auto maxPossibleCharsToDisplay     = 25U;
-    inline constexpr auto incompleteSequenceCharCode    = '\342';
+    inline constexpr auto ellipsisSpace                 = 2u;
+    inline constexpr auto ellipsis                      = "...";
+    /* charsMultiplier is set a little bit less than max lines which is 2, because of final text formatting */
+    inline constexpr auto charsMultiplier = 1.8f;
 
     bool isBatteryCharging(const Store::Battery::State state)
     {
@@ -72,16 +74,15 @@ namespace
         return battery;
     }
 
-    std::string adjustDisplayedTitle(const std::string &title)
+    std::string adjustDisplayedTitle(const UTF8 &title, const std::uint32_t maxCharsInLine)
     {
-        if (title.length() <= maxPossibleCharsToDisplay) {
+        const auto maxTitleLength =
+            static_cast<std::uint32_t>(std::round(static_cast<float>(maxCharsInLine) * charsMultiplier));
+        if (title.length() <= maxTitleLength) {
             return title;
         }
-        std::string newTittle = title.substr(0, maxPossibleCharsToDisplay - 2);
-        if (newTittle.back() == incompleteSequenceCharCode) {
-            newTittle.pop_back();
-        }
-        newTittle.append("...");
+        auto newTittle = title.substr(0, maxTitleLength - ellipsisSpace);
+        newTittle += ellipsis;
 
         return newTittle;
     }
@@ -110,10 +111,12 @@ namespace gui
         }
 
         if (data && typeid(*data) == typeid(RelaxationSwitchData)) {
-            const auto batteryStatus = presenter->handleBatteryStatus();
-            auto *audioSwitchData    = static_cast<RelaxationSwitchData *>(data);
-            audioContext             = audioSwitchData->getAudioContext();
-            title->setText(adjustDisplayedTitle(audioContext->getSound().tags.title));
+            const auto batteryStatus  = presenter->handleBatteryStatus();
+            auto *audioSwitchData     = static_cast<RelaxationSwitchData *>(data);
+            audioContext              = audioSwitchData->getAudioContext();
+            const auto maxCharsInLine = title->getTextFormat().getFont()->getCharCountInSpace(
+                audioContext->getSound().tags.title, title->getWidth());
+            title->setText(adjustDisplayedTitle(audioContext->getSound().tags.title, maxCharsInLine));
             if (batteryStatus.level > dischargingLowBattery) {
                 presenter->activate(audioContext->getSound());
             }
