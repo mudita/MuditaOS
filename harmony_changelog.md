@@ -24,6 +24,7 @@
 ### Changed / Improved
 
 * Information about device memory is now sent to MC in floating points numbers
+* General improvement in Eink display and error handling
 
 ## [2.0.0 2023-06-29]
 

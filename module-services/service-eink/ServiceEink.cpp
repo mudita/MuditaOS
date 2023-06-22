@@ -56,7 +56,9 @@ namespace service::eink
     {
         displayPowerOffTimer = sys::TimerFactory::createSingleShotTimer(
             this, "einkDisplayPowerOff", displayPowerOffTimeout, [this](sys::Timer &) {
-                display->powerOff();
+                if (display->shutdown() != hal::eink::EinkStatus::EinkOK) {
+                    LOG_ERROR("Error during display powerOff.");
+                }
                 eInkSentinel->ReleaseMinimumFrequency();
             });
         connect(typeid(EinkModeMessage),
@@ -86,7 +88,7 @@ namespace service::eink
     sys::ReturnCodes ServiceEink::InitHandler()
     {
         LOG_INFO("Initializing Eink");
-        if (const auto status = display->resetAndInit(); status != hal::eink::EinkStatus::EinkOK) {
+        if (const auto status = display->reinitAndPowerOn(); status != hal::eink::EinkStatus::EinkOK) {
             LOG_FATAL("Error: Could not initialize Eink display!");
             return sys::ReturnCodes::Failure;
         }
@@ -100,7 +102,6 @@ namespace service::eink
         const auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(eInkSentinel);
         bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
-        display->powerOn();
         eInkSentinel->HoldMinimumFrequency();
 
         return sys::ReturnCodes::Success;
@@ -117,7 +118,7 @@ namespace service::eink
     sys::ReturnCodes ServiceEink::DeinitHandler()
     {
         // Eink must be turned on before wiping out the display
-        display->powerOn();
+        display->reinitAndPowerOn();
 
         if ((exitAction == ExitAction::WipeOut) ||
             ((display->getMode() == hal::eink::EinkDisplayColorMode::EinkDisplayColorModeInverted) &&
@@ -160,20 +161,11 @@ namespace service::eink
     void ServiceEink::enterActiveMode()
     {
         setState(State::Running);
-
-        if (const auto status = display->resetAndInit(); status != hal::eink::EinkStatus::EinkOK) {
-            LOG_FATAL("Error: Could not initialize Eink display!");
-        }
-        eInkSentinel->HoldMinimumFrequency();
-        display->powerOn();
-        display->powerOff();
-        eInkSentinel->ReleaseMinimumFrequency();
     }
 
     void ServiceEink::suspend()
     {
         setState(State::Suspended);
-        display->shutdown();
     }
 
     sys::MessagePointer ServiceEink::handleEinkModeChangedMessage(sys::Message *message)
@@ -351,6 +343,9 @@ namespace service::eink
                 previousContext->insert(0, 0, ctx);
             }
         }
+        if (previousRefreshStatus == RefreshStatus::Failed) {
+            updateFrames.front() = {0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y};
+        }
 
         // If parts of the screen were changed, update eink
         bool isImageUpdated = false;
@@ -416,11 +411,16 @@ namespace service::eink
         const auto message = static_cast<service::eink::RefreshMessage *>(request);
 
         if (einkDisplayState == EinkDisplayState::NeedRefresh) {
+            if (previousRefreshStatus == RefreshStatus::Failed) {
+                refreshModeSum        = hal::eink::EinkRefreshMode::REFRESH_DEEP;
+                previousRefreshStatus = RefreshStatus::Success;
+            }
             const auto status = display->showImageRefresh(refreshFramesSum, refreshModeSum);
             if (status != hal::eink::EinkStatus::EinkOK) {
                 previousContext.reset();
                 previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
                 LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
+                previousRefreshStatus = RefreshStatus::Failed;
             }
 
             einkDisplayState        = EinkDisplayState::Idle;

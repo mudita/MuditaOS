@@ -1,8 +1,7 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_DRIVERPLL_HPP
-#define PUREPHONE_DRIVERPLL_HPP
+#pragma once
 
 #include <memory>
 #include <cstdint>
@@ -44,9 +43,8 @@ namespace drivers
         const DriverPLLParams parameters;
 
       private:
-        static std::weak_ptr<DriverPLL> singleton[static_cast<uint32_t>(PLLInstances::COUNT)];
+        static std::weak_ptr<DriverPLL> singleton[static_cast<std::uint32_t>(PLLInstances::COUNT)];
     };
 
 } // namespace drivers
 
-#endif // PUREPHONE_DRIVERPLL_HPP

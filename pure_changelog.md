@@ -3,9 +3,14 @@
 ## Unreleased
 
 ### Added
+
 * Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
 * Added extended information to crashdump filename
 * Added extended information to log filename
+
+### Changed / Improved
+
+* General improvement in Eink display and error handling
 
 ### Fixed
 
