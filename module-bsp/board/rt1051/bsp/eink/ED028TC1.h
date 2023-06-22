@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /**
@@ -14,10 +14,6 @@
 #ifndef __ED028TC1_H
 #define __ED028TC1_H
 
-/* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdbool.h>
-#include <functional>
 #include "FreeRTOS.h"
 #include "semphr.h"
 
@@ -328,22 +324,22 @@ extern "C"
      * This function returns the state of the EPD siplay powe
      * @return 1 if is currently powered on, 0 otherwise
      */
-    uint8_t EinkIsPoweredOn();
+    bool EinkIsPoweredOn();
 
     /**
      * This function powers on the display. Needed for refreshing, measuring the temperature
      */
-    void EinkPowerOn();
+    EinkStatus_e EinkPowerOn();
 
     /**
      * This functions powers off the display
      */
-    void EinkPowerOff();
+    EinkStatus_e EinkPowerOff();
 
     /**
      * @brief This function is responsible for turning eink of and releasing all resources.
      */
-    void EinkPowerDown(void);
+    EinkStatus_e EinkPowerDown(void);
 
     /**
      * This function measures the ambient temperature using the ED028TC1 display internal temperature sensor.
@@ -433,6 +429,10 @@ extern "C"
      */
     void EinkARGBToLuminance(const uint8_t *dataIn, uint8_t *dataOut, uint32_t displayWidth, uint32_t displayHeight);
 
+    /**
+     * This function gets resolutions settings from EINK display
+     */
+    EinkStatus_e EinkGetResolutionSettings();
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */

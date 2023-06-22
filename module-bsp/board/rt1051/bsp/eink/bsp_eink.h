@@ -4,7 +4,7 @@
 #ifndef EINK_BSP_EINK_H_
 #define EINK_BSP_EINK_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include "fsl_common.h"
 #include "FreeRTOS.h"
 
@@ -36,7 +36,7 @@ extern "C"
     void BSP_EinkLogicPowerOff();
 
     void BSP_EinkWriteCS(bsp_eink_cs_ctrl_t ctrl);
-    uint8_t BSP_EinkWaitUntilDisplayBusy(uint32_t timeout);
+    std::uint8_t BSP_EinkWaitUntilDisplayBusy(std::uint32_t timeout);
     void BSP_EinkResetDisplayController(void);
 
     status_t BSP_EinkChangeSpiFrequency(uint32_t frequencyHz);

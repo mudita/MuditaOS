@@ -136,7 +136,9 @@ namespace hal::eink
 
     EinkStatus EinkDisplay::prepareDisplay(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour)
     {
-        powerOn();
+        if (const auto status = reinitAndPowerOn(); status != EinkStatus::EinkOK) {
+            return status;
+        }
 
         const auto temperature =
             behaviour == WaveformTemperature::KEEP_CURRENT ? getLastTemperature() : EinkGetTemperatureInternal();
@@ -144,7 +146,9 @@ namespace hal::eink
         if (refreshMode == EinkRefreshMode::REFRESH_DEEP) {
             auto status = setWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
             if (status == EinkStatus::EinkOK) {
-                dither();
+                if (const auto ditherStatus = dither(); ditherStatus != EinkStatus::EinkOK) {
+                    return ditherStatus;
+                }
             }
             return status;
         }
@@ -173,7 +177,9 @@ namespace hal::eink
 
     EinkStatus EinkDisplay::showImageUpdate(const std::vector<EinkFrame> &updateFrames, const std::uint8_t *frameBuffer)
     {
-        powerOn();
+        if (const auto status = reinitAndPowerOn(); status != EinkStatus::EinkOK) {
+            return status;
+        }
 
         for (const EinkFrame &frame : updateFrames) {
             const std::uint8_t *buffer = frameBuffer + frame.pos_y * frame.size.width;
@@ -233,35 +239,43 @@ namespace hal::eink
         return translateStatus(EinkResetAndInitialize());
     }
 
-    void EinkDisplay::dither()
+    EinkStatus EinkDisplay::dither()
     {
-        EinkDitherDisplay();
+        return translateStatus(EinkDitherDisplay());
     }
 
-    void EinkDisplay::powerOn()
+    EinkStatus EinkDisplay::powerOn()
     {
         if (driverLPSPI) {
             driverLPSPI->Enable();
         }
-        EinkPowerOn();
+        return translateStatus(EinkPowerOn());
     }
 
-    void EinkDisplay::powerOff()
+    EinkStatus EinkDisplay::powerOff()
     {
-        EinkPowerOff();
+        const auto status = translateStatus(EinkPowerOff());
         if (driverLPSPI) {
             driverLPSPI->Disable();
         }
+        return status;
     }
 
-    void EinkDisplay::shutdown()
+    EinkStatus EinkDisplay::shutdown()
     {
-        EinkPowerDown();
+        const auto status = translateStatus(EinkPowerDown());
+        if (driverLPSPI) {
+            driverLPSPI->Disable();
+        }
+        return status;
     }
 
-    void EinkDisplay::wipeOut()
+    EinkStatus EinkDisplay::wipeOut()
     {
-        EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite);
+        if (const auto status = reinitAndPowerOn(); status != EinkStatus::EinkOK) {
+            return status;
+        }
+        return translateStatus(EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite));
     }
 
     EinkBpp_e EinkDisplay::getCurrentBitsPerPixelFormat() const noexcept
@@ -303,6 +317,7 @@ namespace hal::eink
     EinkStatus EinkDisplay::setWaveform(const EinkWaveforms_e mode, const std::int32_t temperature)
     {
         if (!isNewWaveformNeeded(mode, temperature)) {
+            EinkUpdateWaveform(&currentWaveform);
             return EinkStatus::EinkOK;
         }
 
@@ -380,6 +395,20 @@ namespace hal::eink
     std::unique_ptr<AbstractEinkDisplay> AbstractEinkDisplay::Factory::create(FrameSize size)
     {
         return std::make_unique<EinkDisplay>(size);
+    }
+
+    EinkStatus EinkDisplay::reinitAndPowerOn()
+    {
+        if (EinkIsPoweredOn()) {
+            return EinkStatus::EinkOK;
+        }
+        if (resetAndInit() != EinkStatus::EinkOK) {
+            return EinkStatus::EinkError;
+        }
+        if (powerOn() != EinkStatus::EinkOK) {
+            return EinkStatus::EinkError;
+        }
+        return EinkStatus::EinkOK;
     }
 
 } // namespace hal::eink
