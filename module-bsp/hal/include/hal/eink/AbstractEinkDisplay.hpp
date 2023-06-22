@@ -77,14 +77,15 @@ namespace hal::eink
                                      const EinkFrame &refreshFrame,
                                      const std::uint8_t *frameBuffer,
                                      const EinkRefreshMode refreshMode)                                       = 0;
-        virtual void prepareEarlyRequest(EinkRefreshMode refreshMode, const WaveformTemperature behaviour) = 0;
+        virtual void prepareEarlyRequest(EinkRefreshMode refreshMode, const WaveformTemperature behaviour)    = 0;
 
-        virtual void dither()                                               = 0;
-        virtual void powerOn()                                              = 0;
-        virtual void powerOff()                                             = 0;
-        virtual void shutdown()                                             = 0;
+        virtual EinkStatus dither()                                         = 0;
+        virtual EinkStatus powerOn()                                        = 0;
+        virtual EinkStatus powerOff()                                       = 0;
+        virtual EinkStatus shutdown()                                       = 0;
         virtual void wipeOut()                                              = 0;
         virtual EinkStatus resetAndInit()                                   = 0;
         virtual std::shared_ptr<devices::Device> getDevice() const noexcept = 0;
+        virtual EinkStatus reinitAndPowerOn()                               = 0;
     };
 } // namespace hal::eink

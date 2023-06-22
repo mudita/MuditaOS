@@ -1,6 +1,7 @@
 // Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <log/log.hpp>
 #include "bsp_eink.h"
 #include "board.h"
 #include "fsl_lpspi.h"
@@ -287,7 +288,7 @@ status_t BSP_EinkChangeSpiFrequency(uint32_t frequencyHz)
 status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs)
 {
     const uint32_t TX_TIMEOUT_MS = 2000;
-    status_t tx_status           = 0;
+    status_t tx_status           = -1;
     status_t status;
     lpspi_transfer_t xfer = {};
 
@@ -332,6 +333,7 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
         SCB_CleanInvalidateDCache();
         status = LPSPI_MasterTransferEDMA(
             BSP_EINK_LPSPI_EdmaDriverState.resource->base, BSP_EINK_LPSPI_EdmaDriverState.handle, &xfer);
+        //        LOG_ERROR("STATUS: %ld", status);
 
         if (status != kStatus_Success) {
             // in case of error just flush transfer complete queue
@@ -368,7 +370,7 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
 status_t BSP_EinkReadData(void *rxBuffer, uint32_t len, eink_spi_cs_config_e cs)
 {
     const int RX_TIMEOUT_MS = 2000;
-    status_t tx_status      = 0;
+    status_t tx_status      = -1;
     status_t status;
     lpspi_transfer_t xfer = {};
 

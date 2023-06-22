@@ -78,21 +78,27 @@ namespace hal::eink
                                                [[maybe_unused]] const WaveformTemperature behaviour)
     {}
 
-    void LinuxEinkDisplay::dither()
-    {}
+    EinkStatus LinuxEinkDisplay::dither()
+    {
+        return EinkStatus::EinkOK;
+    }
 
-    void LinuxEinkDisplay::powerOn()
+    EinkStatus LinuxEinkDisplay::powerOn()
     {
         EinkPowerOn();
+        return EinkStatus::EinkOK;
     }
 
-    void LinuxEinkDisplay::powerOff()
+    EinkStatus LinuxEinkDisplay::powerOff()
     {
         EinkPowerOff();
+        return EinkStatus::EinkOK;
     }
 
-    void LinuxEinkDisplay::shutdown()
-    {}
+    EinkStatus LinuxEinkDisplay::shutdown()
+    {
+        return EinkStatus::EinkOK;
+    }
 
     void LinuxEinkDisplay::wipeOut()
     {

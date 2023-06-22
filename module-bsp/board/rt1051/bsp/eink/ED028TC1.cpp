@@ -521,51 +521,59 @@ void EinkChangeDisplayUpdateTimings(EinkDisplayTimingsMode_e timingsMode)
     }
 }
 
-uint8_t EinkIsPoweredOn()
+bool EinkIsPoweredOn()
 {
     return s_einkIsPoweredOn;
 }
 
-void EinkPowerOn()
+EinkStatus_e EinkPowerOn()
 {
     if (s_einkIsPoweredOn) {
-        return;
+        return EinkOK;
     }
 
-    BSP_EinkLogicPowerOn();
 
     uint8_t cmd = EinkPowerON; // 0x04
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
         EinkResetAndInitialize();
-        return;
+        return EinkSPIErr;
     }
-    BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
+    //    LOG_ERROR("Wait busy: %u", BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)));
+
+    if (BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)) == 0) {
+        return EinkSPIErr;
+    }
 
     s_einkIsPoweredOn = true;
+    return EinkOK;
 }
 
-void EinkPowerOff()
+EinkStatus_e EinkPowerOff()
 {
     if (!s_einkIsPoweredOn) {
-        return;
+        return EinkOK;
     }
 
     uint8_t cmd = EinkPowerOFF; // 0x02
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
         EinkResetAndInitialize();
-        return;
+        return EinkSPIErr;
     }
-    BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
 
+    const auto ret = BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)) == 1 ? EinkOK : EinkSPIErr;
+
+    // continue procedure regardless result
     BSP_EinkLogicPowerOff();
 
     s_einkIsPoweredOn = false;
+    return ret;
 }
 
-void EinkPowerDown(void)
+EinkStatus_e EinkPowerDown(void)
 {
-    EinkPowerOff();
+    const auto powerOffStatus = EinkPowerOff();
     BSP_EinkDeinit();
+    return powerOffStatus;
 }
 
 int16_t EinkGetTemperatureInternal()
@@ -583,7 +591,9 @@ int16_t EinkGetTemperatureInternal()
         return -1;
     }
 
-    BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
+    if (BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)) == 0) {
+        return -1;
+    }
 
     if (BSP_EinkReadData(temp, sizeof(temp), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
@@ -712,6 +722,8 @@ static void s_EinkSetInitialConfig()
 
 EinkStatus_e EinkResetAndInitialize()
 {
+    BSP_EinkLogicPowerOn();
+
     // Initialize the synchronization resources, SPI and GPIOs for the Eink BSP
     BSP_EinkInit(NULL);
     // Reset the display
@@ -726,6 +738,7 @@ EinkStatus_e EinkResetAndInitialize()
 
 EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
 {
+    auto startTicks = xTaskGetTickCount();
     /// LUTD
     if (BSP_EinkWriteData(settings->LUTDData, settings->LUTDSize, SPI_AUTOMATIC_CS) != 0) {
         EinkResetAndInitialize();
@@ -739,6 +752,8 @@ EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
     }
 
     s_einkConfiguredWaveform = settings->mode;
+
+    LOG_ERROR("Total time of EinkUpdateWaveform: %lu", xTaskGetTickCount() - startTicks);
 
     return EinkOK;
 }
@@ -782,6 +797,7 @@ EinkStatus_e EinkWaitTillPipelineBusy()
 
 EinkStatus_e EinkDitherDisplay()
 {
+
     uint8_t cmdWithArgs[2] = {EinkDPC, EINK_DITHER_4BPP_MODE | EINK_DITHER_START};
 
     if (BSP_EinkWriteData(cmdWithArgs, sizeof(cmdWithArgs), SPI_AUTOMATIC_CS) != 0) {
@@ -793,10 +809,9 @@ EinkStatus_e EinkDitherDisplay()
 
     s_EinkReadFlagsRegister(&flags);
 
-    // Wait for the dither operation finish
-    while (flags & EINK_FLAG_DITHER_IN_PROGRESS) {
-        vTaskDelay(pdMS_TO_TICKS(1));
-        s_EinkReadFlagsRegister(&flags);
+    if ((flags & EINK_FLAG_DITHER_IN_PROGRESS)) {
+        EinkResetAndInitialize();
+        return EinkSPIErr;
     }
 
     return EinkOK;
@@ -864,33 +879,34 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
         }
     }
 
-    buf[0] = EinkDataStartTransmissionWindow; // set display window
+    buf[0] = EinkDataStartTransmissionWindow;      // set display window
     buf[1] = static_cast<uint8_t>(hal::eink::getDisplayXAxis(frame) >>
-                                  8); // MSB of the X axis in the EPD display. Value converted
-                                      // from the standard GUI coords system to the ED028TC1 one
+                                  8);              // MSB of the X axis in the EPD display. Value converted
+                                                   // from the standard GUI coords system to the ED028TC1 one
     buf[2] = static_cast<uint8_t>(
-        hal::eink::getDisplayXAxis(frame)); // LSB of the X axis in the EPD display. Value converted from
-                                            // the standard GUI coords system to the ED028TC1 one
+        hal::eink::getDisplayXAxis(frame));        // LSB of the X axis in the EPD display. Value converted from
+                                                   // the standard GUI coords system to the ED028TC1 one
     buf[3] = static_cast<uint8_t>(hal::eink::getDisplayYAxis(frame) >>
-                                  8); // MSB of the Y axis in the EPD display. Value converted
-                                      // from the standard GUI coords system to the ED028TC1 one
+                                  8);              // MSB of the Y axis in the EPD display. Value converted
+                                                   // from the standard GUI coords system to the ED028TC1 one
     buf[4] = static_cast<uint8_t>(
-        hal::eink::getDisplayYAxis(frame)); // LSB of the Y axis in the EPD display. Value converted from
-                                            // the standard GUI coords system to the ED028TC1 one
+        hal::eink::getDisplayYAxis(frame));        // LSB of the Y axis in the EPD display. Value converted from
+                                                   // the standard GUI coords system to the ED028TC1 one
     buf[5] = static_cast<uint8_t>(hal::eink::getDisplayWindowWidth(frame) >>
-                                  8); // MSB of the window height in the EPD display. Value converted
-                                      // from the standard GUI coords system to the ED028TC1 one
+                                  8);              // MSB of the window height in the EPD display. Value converted
+                                                   // from the standard GUI coords system to the ED028TC1 one
     buf[6] = static_cast<uint8_t>(
-        hal::eink::getDisplayWindowWidth(frame)); // LSB of the window height in the EPD display. Value converted from
-                                                  // the standard GUI coords system to the ED028TC1 one
+        hal::eink::getDisplayWindowWidth(frame));  // LSB of the window height in the EPD display. Value converted from
+                                                   // the standard GUI coords system to the ED028TC1 one
     buf[7] = static_cast<uint8_t>(hal::eink::getDisplayWindowHeight(frame) >>
-                                  8); // MSB of the window width in the EPD display. Value converted
-                                      // from the standard GUI coords system to the ED028TC1 one
+                                  8);              // MSB of the window width in the EPD display. Value converted
+                                                   // from the standard GUI coords system to the ED028TC1 one
     buf[8] = static_cast<uint8_t>(
         hal::eink::getDisplayWindowHeight(frame)); // LSB of the window width in the EPD display. Value converted from
-                                                   // the standard GUI coords system to the ED028TC1 one
+    // the standard GUI coords system to the ED028TC1 one
 
-    if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
+    auto status = BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS);
+    if (status != 0) {
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -966,6 +982,7 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 
 EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refreshTimingsMode)
 {
+    LOG_ERROR("frame: h: %u, w: %u, x: %u, y: %u", frame.height, frame.width, frame.pos_x, frame.pos_y);
     EinkChangeDisplayUpdateTimings(refreshTimingsMode);
 
     s_EinkSetGateOrder();
@@ -976,36 +993,41 @@ EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refres
     buf[1] = UPD_CPY_TO_PRE;
 
     buf[2] = static_cast<uint8_t>(hal::eink::getDisplayXAxis(frame) >>
-                                  8); // MSB of the X axis in the EPD display. Value converted
-                                      // from the standard GUI coords system to the ED028TC1 one
+                                  8);              // MSB of the X axis in the EPD display. Value converted
+                                                   // from the standard GUI coords system to the ED028TC1 one
     buf[3] = static_cast<uint8_t>(
-        hal::eink::getDisplayXAxis(frame)); // LSB of the X axis in the EPD display. Value converted from
-                                            // the standard GUI coords system to the ED028TC1 one
+        hal::eink::getDisplayXAxis(frame));        // LSB of the X axis in the EPD display. Value converted from
+                                                   // the standard GUI coords system to the ED028TC1 one
     buf[4] = static_cast<uint8_t>(hal::eink::getDisplayYAxis(frame) >>
-                                  8); // MSB of the Y axis in the EPD display. Value converted
-                                      // from the standard GUI coords system to the ED028TC1 one
+                                  8);              // MSB of the Y axis in the EPD display. Value converted
+                                                   // from the standard GUI coords system to the ED028TC1 one
     buf[5] = static_cast<uint8_t>(
-        hal::eink::getDisplayYAxis(frame)); // LSB of the Y axis in the EPD display. Value converted from
-                                            // the standard GUI coords system to the ED028TC1 one
+        hal::eink::getDisplayYAxis(frame));        // LSB of the Y axis in the EPD display. Value converted from
+                                                   // the standard GUI coords system to the ED028TC1 one
     buf[6] = static_cast<uint8_t>(hal::eink::getDisplayWindowWidth(frame) >>
-                                  8); // MSB of the window height in the EPD display. Value converted
-                                      // from the standard GUI coords system to the ED028TC1 one
+                                  8);              // MSB of the window height in the EPD display. Value converted
+                                                   // from the standard GUI coords system to the ED028TC1 one
     buf[7] = static_cast<uint8_t>(
-        hal::eink::getDisplayWindowWidth(frame)); // LSB of the window height in the EPD display. Value converted from
-                                                  // the standard GUI coords system to the ED028TC1 one
+        hal::eink::getDisplayWindowWidth(frame));  // LSB of the window height in the EPD display. Value converted from
+                                                   // the standard GUI coords system to the ED028TC1 one
     buf[8] = static_cast<uint8_t>(hal::eink::getDisplayWindowHeight(frame) >>
-                                  8); // MSB of the window width in the EPD display. Value converted
-                                      // from the standard GUI coords system to the ED028TC1 one
+                                  8);              // MSB of the window width in the EPD display. Value converted
+                                                   // from the standard GUI coords system to the ED028TC1 one
     buf[9] = static_cast<uint8_t>(
         hal::eink::getDisplayWindowHeight(frame)); // LSB of the window width in the EPD display. Value converted from
-                                                   // the standard GUI coords system to the ED028TC1 one
+    // the standard GUI coords system to the ED028TC1 one
 
-    if (BSP_EinkWriteData(buf, sizeof(buf), SPI_AUTOMATIC_CS) != 0) {
+    auto status = BSP_EinkWriteData(buf, sizeof(buf), SPI_AUTOMATIC_CS);
+    LOG_ERROR("status: %ld", status);
+    if (status != 0) {
+        LOG_ERROR("ERROR: BSP_EinkWriteData");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
-    BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
+    if (BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)) == 0) {
+        return EinkSPIErr;
+    }
 
     return EinkOK;
 }

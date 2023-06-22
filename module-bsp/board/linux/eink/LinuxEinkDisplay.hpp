@@ -26,10 +26,10 @@ namespace hal::eink
                              const EinkRefreshMode refreshMode) override;
         void prepareEarlyRequest(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour) override;
 
-        void dither() override;
-        void powerOn() override;
-        void powerOff() override;
-        void shutdown() override;
+        EinkStatus dither() override;
+        EinkStatus powerOn() override;
+        EinkStatus powerOff() override;
+        EinkStatus shutdown() override;
         void wipeOut() override;
         EinkStatus resetAndInit() override;
         [[nodiscard]] std::shared_ptr<devices::Device> getDevice() const noexcept override;
