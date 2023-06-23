@@ -93,5 +93,8 @@
         "semaphore": "cpp",
         "byte": "cpp"
     },
-    "favorites.sortDirection": "ASC",
+    "terminal.integrated.env.linux": {
+        "GTK_PATH": ""
+    },
+    "favorites.sortDirection": "ASC"
 }
