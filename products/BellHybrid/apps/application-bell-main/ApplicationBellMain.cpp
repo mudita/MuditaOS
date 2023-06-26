@@ -26,6 +26,7 @@
 #include <WindowsStack.hpp>
 #include <popups/Popups.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <appmgr/messages/AlarmMessage.hpp>
 
 namespace app
 {
@@ -48,6 +49,7 @@ namespace app
 
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         bus.channels.push_back(sys::BusChannel::USBNotifications);
+        bus.channels.push_back(sys::BusChannel::AlarmNotifications);
 
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
@@ -77,6 +79,10 @@ namespace app
 
         connect(typeid(sdesktop::usb::USBConfigured), [&](sys::Message *msg) -> sys::MessagePointer {
             homeScreenPresenter->setUSBStatusConnected();
+            return sys::msgHandled();
+        });
+        connect(typeid(AlarmDeactivated), [this](sys::Message *request) -> sys::MessagePointer {
+            alarmModel->turnOff();
             return sys::msgHandled();
         });
     }
