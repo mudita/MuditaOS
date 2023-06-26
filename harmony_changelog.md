@@ -4,6 +4,30 @@
 
 ### Fixed
 
+* Fixed problem with an unresponsive device after playing specific WAV files.
+* Fixed problem with deleting files during Relaxation session.
+* Fixed occasional USB crash when USB cable was disconnected during files upload
+* Fixed back button power off timer changed to 10s
+* Fixed alarm problems when it was re-set while snooze was still active
+* Fixed the problem with the not appearing system closing window in some cases
+* Fixed problem with displaying some filenames in Relaxation
+* Fixed disabling the alarm on the system shutdown screen
+
+### Added
+
+* Added serial number to About section
+* Added possibility to detect device's case colour
+* Added extended information to crashdump filename
+* Added extended information to log filename
+
+### Changed / Improved
+
+* Information about device memory is now sent to MC in floating points numbers
+
+## [2.0.0 2023-06-29]
+
+### Fixed
+
 * Fixed canceling of alarm editing after 10s of inactivity
 * Fixed yes/no behavior in factory reset window
 * Fixed missing software version in French language
@@ -15,35 +39,22 @@
 * Fixed settings frontlight intensity in on demand mode
 * Fixed problem that UI could be occasionally broken
 * Fixed problem with displaying end of title when playing song in loop was selected.
-* Fixed problem with an unresponsive device after playing specific WAV files.
 * Fixed USB charging port detection.
-* Fixed problem with deleting files during Relaxation session.
 * Fixed occasional crash on system startup.
-* Fixed occasional USB crash when USB cable was disconnected during files upload
-* Fixed back button power off timer changed to 10s
-* Fixed alarm problems when it was re-set while snooze was still active
-* Fixed the problem with the not appearing system closing window in some cases
 * Fixed the buttons sometimes don't respond on press or release
 * Fixed no clock update
-* Fixed problem with displaying some filenames in Relaxation
-* Fixed disabling the alarm on the system shutdown screen
 
 ### Added
 
 * Added error handling for incorrect audio formats and corrupted files inside Relaxation app
 * Added error message when files limit is exceeded in Relaxation app
 * Added label informing about PC connection.
-* Added serial number to About section
-* Added possibility to detect device's case colour
-* Added extended information to crashdump filename
-* Added extended information to log filename
 
 ### Changed / Improved
 
 * Added new field to deviceInfo endpoint
 * Changed order in which files are displayed in Relaxation
 * Optimized E-Ink energy consumption
-* Information about device memory is now sent to MC in floating points numbers
 * Changed the layout of the battery status
 
 ## [1.9.0 2023-04-03]
