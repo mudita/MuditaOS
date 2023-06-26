@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -316,7 +316,7 @@ TEST_CASE("Corefs: Read only filesystem")
         {};
         ret = fscore.stat("/sys/assets", st);
         REQUIRE(ret == 0);
-        REQUIRE(st.st_mode & S_IFDIR);
+        REQUIRE((st.st_mode & S_IFDIR) != 0);
         REQUIRE((st.st_mode & (S_IWGRP | S_IWUSR | S_IWOTH)) == 0);
     }
     REQUIRE(fscore.umount("/sys") == 0);
@@ -353,8 +353,8 @@ TEST_CASE("Corefs: Remount filesystem from RO to RW and to RO")
         {};
         ret = fscore->stat("/sys/assets", st);
         REQUIRE(ret == 0);
-        REQUIRE(st.st_mode & S_IFDIR);
-        REQUIRE(st.st_mode & (S_IWGRP | S_IWUSR | S_IWOTH));
+        REQUIRE((st.st_mode & S_IFDIR) != 0);
+        REQUIRE((st.st_mode & (S_IWGRP | S_IWUSR)) == (S_IWGRP | S_IWUSR));
     }
     REQUIRE(fscore->umount("/sys") == 0);
 }
@@ -412,7 +412,7 @@ TEST_CASE("Corefs: stat extended")
     REQUIRE(fs_core.stat("/sys", st) == 0);
     REQUIRE(S_ISFIFO(st.st_mode) == 0);
     REQUIRE(S_ISCHR(st.st_mode) == 0);
-    REQUIRE(S_ISDIR(st.st_mode));
+    REQUIRE(S_ISDIR(st.st_mode) != 0);
     REQUIRE(S_ISBLK(st.st_mode) == 0);
     REQUIRE(S_ISLNK(st.st_mode) == 0);
     REQUIRE(S_ISSOCK(st.st_mode) == 0);
@@ -422,7 +422,7 @@ TEST_CASE("Corefs: stat extended")
     REQUIRE(fs_core.stat(dir, st) == 0);
     REQUIRE(S_ISFIFO(st.st_mode) == 0);
     REQUIRE(S_ISCHR(st.st_mode) == 0);
-    REQUIRE(S_ISDIR(st.st_mode));
+    REQUIRE(S_ISDIR(st.st_mode) != 0);
     REQUIRE(S_ISBLK(st.st_mode) == 0);
     REQUIRE(S_ISLNK(st.st_mode) == 0);
     REQUIRE(S_ISSOCK(st.st_mode) == 0);
@@ -437,7 +437,7 @@ TEST_CASE("Corefs: stat extended")
     REQUIRE(S_ISBLK(st.st_mode) == 0);
     REQUIRE(S_ISLNK(st.st_mode) == 0);
     REQUIRE(S_ISSOCK(st.st_mode) == 0);
-    REQUIRE(S_ISREG(st.st_mode));
+    REQUIRE(S_ISREG(st.st_mode) != 0);
 
     // Final cleanup
     REQUIRE(0 == fs_core.unlink(fil));

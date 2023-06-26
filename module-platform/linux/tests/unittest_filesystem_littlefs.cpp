@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -113,7 +113,7 @@ TEST_CASE("littlefs: Read tests")
     {
         struct stat st;
         REQUIRE(fs_core->fstat(fd, st) == 0);
-        REQUIRE(st.st_mode & S_IFREG);
+        REQUIRE((st.st_mode & S_IFREG) != 0);
         REQUIRE((st.st_mode & (S_IRUSR | S_IRGRP | S_IROTH)) == (S_IRUSR | S_IRGRP | S_IROTH));
     }
 
@@ -165,7 +165,7 @@ TEST_CASE("littlefs: Read-only filesystem tests")
 
         struct stat st;
         REQUIRE(fs_core->fstat(fd, st) == 0);
-        REQUIRE(st.st_mode & S_IFREG);
+        REQUIRE((st.st_mode & S_IFREG) != 0);
         REQUIRE((st.st_mode & (S_IRUSR | S_IRGRP | S_IROTH)) == (S_IRUSR | S_IRGRP | S_IROTH));
         REQUIRE((st.st_mode & (S_IWUSR | S_IWGRP | S_IWOTH)) == 0);
 

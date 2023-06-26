@@ -6,7 +6,8 @@ TEST_CASE("json11 - custom types test")
     std::string err{};
     std::string dumpString{};
 
-    SECTION("signed"){
+    SECTION("signed")
+    {
         SECTION("intmax_t - max")
         {
             intmax_t value = INTMAX_MAX;
@@ -20,6 +21,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("intmax_t - min")
         {
             intmax_t value = INTMAX_MIN;
@@ -33,6 +35,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("int64_t - max")
         {
             int64_t value = INT64_MAX;
@@ -46,6 +49,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("int64_t - min")
         {
             int64_t value = INT64_MIN;
@@ -59,6 +63,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("int32_t - max")
         {
             int32_t value = INT32_MAX;
@@ -72,6 +77,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("int32_t - min")
         {
             int32_t value = INT32_MIN;
@@ -85,6 +91,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("int16_t - min")
         {
             int16_t value = INT16_MAX;
@@ -98,6 +105,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("int16_t - max")
         {
             int16_t value = INT16_MIN;
@@ -111,6 +119,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("int8_t - min")
         {
             int8_t value = INT8_MAX;
@@ -124,6 +133,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("int8_t - max")
         {
             int8_t value = INT8_MIN;
@@ -139,7 +149,8 @@ TEST_CASE("json11 - custom types test")
         }
     }
 
-    SECTION("unsigned"){
+    SECTION("unsigned")
+    {
         SECTION("uintmax_t")
         {
             uintmax_t value = UINTMAX_MAX;
@@ -153,6 +164,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("uint64_t")
         {
             uint64_t value = UINT64_MAX;
@@ -179,6 +191,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("uint16_t")
         {
             uint16_t value = UINT16_MAX;
@@ -192,6 +205,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("uint8_t")
         {
             uint8_t value = UINT8_MAX;
@@ -205,6 +219,7 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson == json);
             REQUIRE(newJson["test"] == value);
         }
+
         SECTION("size_t")
         {
             size_t value = SIZE_MAX;
@@ -219,6 +234,4 @@ TEST_CASE("json11 - custom types test")
             REQUIRE(newJson["test"] == value);
         }
     }
-
 }
-

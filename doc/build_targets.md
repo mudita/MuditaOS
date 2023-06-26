@@ -21,20 +21,20 @@ Some build targets are enabled/disabled based on the selected target architectur
 For each product there are targets:
 
 
-| Arch | Name | Alias | Description |
-|------|------|-------|-------------|
-|common| doc                            |                                                   | Target to build doxygen documentation, [documentation](generate_doxygen.md) |
-|common| \<Product\>                    |                                                   | Binary target for the product |
-|common| \<Product\>-disk-img           | \<Product\>.img                                   | Disk image for the product    |
-|RT1051| \<Product\>-StandaloneImage    | PurePhone-\<version\>-RT1051-package-standalone   | Creates image that can be `dd` or `pureflash` to the device|
-|RT1051| \<Product>\-UpdatePackage      | PurePhone-\<version\>-RT1051-Update.tar           | Creates Update package, that can be used by Mudita Center or an update script|
-|linux | check                          |                                                   | build and run unittests |
-|common| json-common-target             |                                                   | Mudita company public assets common between community and proprietary builds |
-|common| json-community-target          |                                                   | Mudita company public assets for community build |
-|common| json-proprietary-target        |                                                   | Mudita company private assets proprietary build |
-|RT1051| json-rt1051-assets             |                                                   | Mudita company RT1051 specific assets |
-|RT1051| ecoboot.bin                    |                                                   | OS bootloader |
-|RT1051| updater.bin                    |                                                   | OS updater |
+| Arch   | Name                        | Alias                                           | Description                                                                   |
+|--------|-----------------------------|-------------------------------------------------|-------------------------------------------------------------------------------|
+| common | doc                         |                                                 | Target to build doxygen documentation, [documentation](generate_doxygen.md)   |
+| common | \<Product\>                 |                                                 | Binary target for the product                                                 |
+| common | \<Product\>-disk-img        | \<Product\>.img                                 | Disk image for the product                                                    |
+| RT1051 | \<Product\>-StandaloneImage | PurePhone-\<version\>-RT1051-package-standalone | Creates image that can be `dd` or `pureflash` to the device                   |
+| RT1051 | \<Product>\-UpdatePackage   | PurePhone-\<version\>-RT1051-Update.tar         | Creates Update package, that can be used by Mudita Center or an update script |
+| linux  | check                       |                                                 | build and run unittests                                                       |
+| common | json-common-target          |                                                 | Mudita company public assets common between community and proprietary builds  |
+| common | json-community-target       |                                                 | Mudita company public assets for community build                              |
+| common | json-proprietary-target     |                                                 | Mudita company private assets proprietary build                               |
+| RT1051 | json-rt1051-assets          |                                                 | Mudita company RT1051 specific assets                                         |
+| RT1051 | ecoboot.bin-target          |                                                 | OS bootloader                                                                 |
+| RT1051 | recovery.bin-target         |                                                 | OS recovery utility                                                           |
 
 ## Product binary target
 
@@ -110,15 +110,14 @@ These are distributed with the image and update targets available for each produ
 Downloads Mudita private RT1051 specific assets with [download_assets](./download_assets.md) that company is either not eligible or capable of sharing publicly.
 These are distributed with the image and update targets available for each product.
 
-## ecoboot.bin
+## ecoboot.bin-target
 
 Downloads the bootloader with [download_assets](download_assets.md).
 
-OS bootloader, used to pre-init hardware and launch either OS or updater utility.
+OS bootloader, used to pre-init hardware and launch either OS or recovery utility.
 
-## updater.bin
+## recovery.bin-target
 
 Downloads the updater with [download_assets](download_assets.md).
 
-Updater is used to perform the firmware upgrade via update packages. 
-
+PureRecovery is an auxiliary application which is responsible for various tasks including performing update process, backup, restore, etc. 

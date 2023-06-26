@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define CATCH_CONFIG_MAIN
@@ -74,7 +74,8 @@ TEST_CASE("reedgefs: Basic API test")
     ret = fscore.mount("emmc0part0", "/sys", "reedgefs");
     REQUIRE(ret == 0);
     {
-        struct statvfs ssv;
+        struct statvfs ssv
+        {};
         ret = fscore.stat_vfs("/sys/", ssv);
         REQUIRE(ret == 0);
     }
@@ -95,7 +96,8 @@ TEST_CASE("reedgefs: Basic API test")
         int hwnd = fscore.open("/sys/.boot.json", 0, 0);
         REQUIRE(hwnd >= 3);
         std::cout << "File open handle " << hwnd << std::endl;
-        struct stat st;
+        struct stat st
+        {};
         ret = fscore.fstat(hwnd, st);
         REQUIRE(ret == 0);
         std::cout << "File size " << st.st_size << std::endl;
@@ -242,7 +244,8 @@ TEST_CASE("reedgefs: Directory operations")
 
     SECTION("Null pointer handle dirnext")
     {
-        struct stat st;
+        struct stat st
+        {};
         std::string fnm;
         REQUIRE(fscore.dirnext(nullptr, fnm, st) == -ENXIO);
         REQUIRE(fscore.dirclose(dirhandle) == 0);
@@ -258,7 +261,8 @@ TEST_CASE("reedgefs: Directory operations")
 
     SECTION("Directory reset")
     {
-        struct stat st;
+        struct stat st
+        {};
         std::vector<std::tuple<std::string, struct stat>> vec;
         for (std::string fnm;;) {
             if (fscore.dirnext(dirhandle, fnm, st) != 0) {
@@ -310,16 +314,18 @@ TEST_CASE("reedgefs: Read only filesystem")
     }
     SECTION("Check function which not modify fs")
     {
-        struct statvfs ssv;
+        struct statvfs ssv
+        {};
         ret = fscore.stat_vfs("/sys/", ssv);
         REQUIRE(ret == 0);
     }
     SECTION("Check stat to not set S_IW...")
     {
-        struct stat st;
+        struct stat st
+        {};
         ret = fscore.stat("/sys", st);
         REQUIRE(ret == 0);
-        REQUIRE(st.st_mode & S_IFDIR);
+        REQUIRE((st.st_mode & S_IFDIR) != 0);
         REQUIRE((st.st_mode & (S_IWGRP | S_IWUSR | S_IWOTH)) == 0);
     }
     REQUIRE(fscore.umount("/sys") == 0);
@@ -353,27 +359,13 @@ TEST_CASE("reedgefs: Remount filesystem from RO to RW and to RO")
     }
     {
         REQUIRE(fscore->mkdir("/sys/current", 0660) == 0);
-        struct stat st;
+        struct stat st
+        {};
         ret = fscore->stat("/sys", st);
         REQUIRE(ret == 0);
-        REQUIRE(st.st_mode & S_IFDIR);
-        REQUIRE(st.st_mode & (S_IWGRP | S_IWUSR | S_IWOTH));
+        REQUIRE((st.st_mode & S_IFDIR) != 0);
+        REQUIRE((st.st_mode & (S_IWGRP | S_IWUSR | S_IWOTH)) == (S_IWGRP | S_IWUSR | S_IWOTH));
     }
     REQUIRE(fscore->umount("/sys") == 0);
 }
 
-// TEST_CASE("reedgefs: Autodetect filesystems")
-// {
-//     using namespace purefs;
-//     auto dm   = std::make_shared<blkdev::disk_manager>();
-//     auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
-//     REQUIRE(disk);
-//     REQUIRE(dm->register_device(disk, "emmc0") == 0);
-//     auto fscore         = std::make_shared<purefs::fs::filesystem>(dm);
-//     const auto vfs_reedgefs = std::make_shared<fs::drivers::filesystem_reedgefs>();
-//     REQUIRE(vfs_reedgefs->mount_count() == 0);
-//     auto ret = fscore->register_filesystem("reedgefs", vfs_reedgefs);
-//     REQUIRE(ret == 0);
-//     REQUIRE(fscore->mount("emmc0part0", "/sys", "auto") == 0);
-//     REQUIRE(fscore->umount("/sys") == 0);
-// }
