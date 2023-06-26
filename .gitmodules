@@ -20,7 +20,7 @@
 	branch = 703bd9caab50b139428cea1aaff9974ebee5742e
 [submodule "Catch2"]
 	path = test/Catch2
-	url = https://github.com/catchorg/Catch2
+	url = ../Catch2.git
 [submodule "date"]
 	path = third-party/date
 	url = ../date.git

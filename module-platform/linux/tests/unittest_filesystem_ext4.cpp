@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -61,7 +61,8 @@ TEST_CASE("ext4: Basic mount and functionality")
     REQUIRE(fscore.umount("/ala") == -ENOENT);
     REQUIRE(fscore.mount("emmc0part0", "/sys", "vfat") == -EBUSY);
     REQUIRE(fscore.mount("emmc0part0", "/path", "vfat") == -EBUSY);
-    struct statvfs ssv;
+    struct statvfs ssv
+    {};
     REQUIRE(fscore.stat_vfs("/sys/", ssv) == 0);
     REQUIRE(fscore.stat_vfs("/sys", ssv) == 0);
 
@@ -89,9 +90,10 @@ TEST_CASE("ext4: Read tests")
     REQUIRE(fs_core->seek(fd, 4, SEEK_SET) == 4);
     REQUIRE(fs_core->read(fd, buf, 8) == 8);
     REQUIRE(memcmp(buf, "456789AB", 8) == 0);
-    struct stat st;
+    struct stat st
+    {};
     REQUIRE(fs_core->fstat(fd, st) == 0);
-    REQUIRE(st.st_mode & S_IFREG);
+    REQUIRE((st.st_mode & S_IFREG) != 0);
     REQUIRE((st.st_mode & (S_IRUSR | S_IRGRP | S_IROTH)) == (S_IRUSR | S_IRGRP | S_IROTH));
 
     REQUIRE(fs_core->close(fd) == 0);
@@ -130,9 +132,10 @@ TEST_CASE("ext4: Write tests")
     REQUIRE(fd >= 3);
     REQUIRE(fs_core->ftruncate(fd, trunc_fsize) == 0);
     REQUIRE(fs_core->close(fd) == 0);
-    struct stat st;
+    struct stat st
+    {};
     REQUIRE(fs_core->stat(trunc_fname, st) == 0);
-    REQUIRE(st.st_mode & S_IFREG);
+    REQUIRE((st.st_mode & S_IFREG) != 0);
     REQUIRE(st.st_size == trunc_fsize);
     REQUIRE(fs_core->unlink(trunc_fname) == 0);
 
@@ -148,9 +151,10 @@ TEST_CASE("ext4: Read-only filesystem tests")
     const auto fd = fs_core->open("/sys/test_read_1.txt", O_RDONLY, 0);
     REQUIRE(fd >= 3);
 
-    struct stat st;
+    struct stat st
+    {};
     REQUIRE(fs_core->fstat(fd, st) == 0);
-    REQUIRE(st.st_mode & S_IFREG);
+    REQUIRE((st.st_mode & S_IFREG) != 0);
     REQUIRE((st.st_mode & (S_IRUSR | S_IRGRP | S_IROTH)) == (S_IRUSR | S_IRGRP | S_IROTH));
     REQUIRE((st.st_mode & (S_IWUSR | S_IWGRP | S_IWOTH)) == 0);
 
@@ -189,7 +193,8 @@ TEST_CASE("ext4: Directory tests")
             int dir_status = 0;
             for (;;) {
                 std::string fn;
-                struct stat st;
+                struct stat st
+                {};
                 dir_status = fs_core->dirnext(dh, fn, st);
 
                 if (dir_status == 0) {
@@ -209,12 +214,12 @@ TEST_CASE("ext4: Directory tests")
         {
             const auto dh = fs_core->diropen(path);
             REQUIRE(dh);
-            struct stat st;
+            struct stat st
+            {};
             std::string first_fn;
             REQUIRE(fs_core->dirnext(dh, first_fn, st) == 0);
 
-            for (std::string tmp_fn; fs_core->dirnext(dh, tmp_fn, st) == 0;)
-                ;
+            for (std::string tmp_fn; fs_core->dirnext(dh, tmp_fn, st) == 0;) {}
             REQUIRE(fs_core->dirreset(dh) == 0);
 
             std::string reset_fn;
@@ -283,7 +288,8 @@ TEST_CASE("ext4: stat extended")
     REQUIRE(fs_core);
     REQUIRE(fs_core->mount("emmc0part0", "/sys", "ext4") == 0);
     // Check if it is a directory
-    struct stat st;
+    struct stat st
+    {};
     REQUIRE(fs_core->stat("/sys", st) == 0);
     REQUIRE(S_ISDIR(st.st_mode));
     REQUIRE(fs_core->stat("/sys/", st) == 0);
