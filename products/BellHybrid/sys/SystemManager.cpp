@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <sys/SystemManager.hpp>
@@ -35,7 +35,7 @@ namespace sys
             bus.sendUnicast(std::make_shared<AlarmActivated>(), service::name::appmgr);
             break;
         case AlarmActivationStatus::DEACTIVATED:
-            bus.sendUnicast(std::make_shared<AlarmDeactivated>(), service::name::appmgr);
+            bus.sendMulticast(std::make_shared<AlarmDeactivated>(), sys::BusChannel::AlarmNotifications);
             break;
         }
         return MessageNone{};

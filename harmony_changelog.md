@@ -26,6 +26,7 @@
 * Fixed the buttons sometimes don't respond on press or release
 * Fixed no clock update
 * Fixed problem with displaying some filenames in Relaxation
+* Fixed disabling the alarm on the system shutdown screen
 
 ### Added
 

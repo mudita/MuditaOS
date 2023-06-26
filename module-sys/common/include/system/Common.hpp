@@ -26,7 +26,8 @@ namespace sys
         PhoneModeChanges,
         PhoneLockChanges,
         BluetoothModeChanges,
-        BluetoothNotifications
+        BluetoothNotifications,
+        AlarmNotifications
     };
 
     enum class ServicePriority
@@ -135,6 +136,8 @@ inline const char *c_str(sys::BusChannel channel)
         return "BluetoothNotifications";
     case sys::BusChannel::PhoneLockChanges:
         return "PhoneLockChanges";
+    case sys::BusChannel::AlarmNotifications:
+        return "AlarmNotifications";
     }
     return "";
 }
