@@ -1,6 +1,6 @@
 # MuditaOS changelog - Harmony
 
-## Unreleased
+## [2.0.0 2023-06-23]
 
 ### Fixed
 
