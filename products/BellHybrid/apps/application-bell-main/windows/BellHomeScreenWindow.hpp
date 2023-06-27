@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,6 +40,7 @@ namespace gui
         void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) override;
         void setSnoozeFormat(utils::time::Locale::TimeFormat fmt) override;
         bool updateBatteryStatus() override;
+        void setUSBStatusConnected() override;
 
         std::shared_ptr<app::home_screen::AbstractPresenter> presenter;
 

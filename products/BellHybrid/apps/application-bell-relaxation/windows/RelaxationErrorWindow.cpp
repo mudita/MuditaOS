@@ -2,12 +2,17 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationErrorWindow.hpp"
-#include <data/RelaxationSwitchData.hpp>
+#include <data/RelaxationErrorData.hpp>
 #include <data/RelaxationStyle.hpp>
 #include <ApplicationBellRelaxation.hpp>
-#include <gui/widgets/Icon.hpp>
 
 #include <apps-common/widgets/BellBaseLayout.hpp>
+
+namespace
+{
+    constexpr auto unsupportedMediaMessage   = "app_bell_relaxation_error_message";
+    constexpr auto exceededFilesLimitMessage = "app_bell_relaxation_limit_error_message";
+} // namespace
 
 namespace gui
 {
@@ -30,14 +35,8 @@ namespace gui
     {
         statusBar->setVisible(false);
 
-        auto icon = new Icon(this,
-                             0,
-                             0,
-                             style::window_width,
-                             style::window_height,
-                             "big_information",
-                             utils::translate("app_bell_relaxation_error_message"),
-                             ImageTypeSpecifier::W_G);
+        icon = new Icon(
+            this, 0, 0, style::window_width, style::window_height, "big_information", "", ImageTypeSpecifier::W_G);
         icon->image->setMargins({0, gui::relaxationStyle::error::imageMarginTop, 0, 0});
         icon->text->setFont(style::window::font::verybiglight);
         const auto textPadding = icon->text->getPadding();
@@ -45,7 +44,6 @@ namespace gui
             {textPadding.left, gui::relaxationStyle::error::textPaddingTop, textPadding.right, textPadding.bottom});
         icon->text->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-
         icon->resizeItems();
     }
 
@@ -55,6 +53,25 @@ namespace gui
             application->switchWindow(gui::name::window::main_window);
             return true;
         };
+    }
+
+    void RelaxationErrorWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        if (data && typeid(*data) == typeid(RelaxationErrorData)) {
+            auto *errorData = static_cast<RelaxationErrorData *>(data);
+            switch (errorData->getErrorType()) {
+            case RelaxationErrorType::UnsupportedMediaType: {
+                icon->text->setRichText(utils::translate(unsupportedMediaMessage));
+                break;
+            }
+
+            case RelaxationErrorType::FilesLimitExceeded: {
+                icon->text->setRichText(utils::translate(exceededFilesLimitMessage));
+                break;
+            }
+            }
+        }
+        WindowWithTimer::onBeforeShow(mode, data);
     }
 
     bool RelaxationErrorWindow::onInput(const InputEvent &inputEvent)

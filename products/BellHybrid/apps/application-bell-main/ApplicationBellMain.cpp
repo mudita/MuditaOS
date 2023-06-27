@@ -25,6 +25,7 @@
 #include <apps-common/WindowsPopupFilter.hpp>
 #include <WindowsStack.hpp>
 #include <popups/Popups.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 
 namespace app
 {
@@ -46,6 +47,7 @@ namespace app
         });
 
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::USBNotifications);
 
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
@@ -71,6 +73,11 @@ namespace app
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
             requestShutdownWindow(gui::window::name::bell_battery_shutdown);
             return actionHandled();
+        });
+
+        connect(typeid(sdesktop::usb::USBConfigured), [&](sys::Message *msg) -> sys::MessagePointer {
+            homeScreenPresenter->setUSBStatusConnected();
+            return sys::msgHandled();
         });
     }
 

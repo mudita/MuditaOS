@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp_eink.h"
@@ -7,7 +7,7 @@
 #include "fsl_lpspi_edma.h"
 #include "fsl_common.h"
 #include "dma_config.h"
-#include "bsp/eink/eink_pin_config.hpp"
+#include "bsp/eink/eink_gpio.hpp"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
@@ -180,7 +180,7 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
 
     gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::EINK_GPIO), DriverGPIOParams{});
 
-    bsp::eink::eink_configure_gpio_pins();
+    bsp::eink::eink_gpio_configure();
 
     s_eink_lpspi_master_config.baudRate     = BSP_EINK_TRANSFER_WRITE_CLOCK;
     s_eink_lpspi_master_config.bitsPerFrame = 8;
@@ -229,24 +229,6 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     return kStatus_Success;
 }
 
-status_t BSP_EinkChangeSpiFrequency(uint32_t frequencyHz)
-{
-    uint32_t tcrPrescalerValue = 0;
-
-    LPSPI_Enable(BSP_EINK_LPSPI_BASE, false);
-    LPSPI_MasterSetBaudRate(
-        BSP_EINK_LPSPI_BASE, frequencyHz, GetPerphSourceClock(PerphClock_LPSPI), &tcrPrescalerValue);
-
-    s_eink_lpspi_master_config.baudRate = frequencyHz;
-    BSP_EINK_LPSPI_BASE->TCR =
-        LPSPI_TCR_CPOL(s_eink_lpspi_master_config.cpol) | LPSPI_TCR_CPHA(s_eink_lpspi_master_config.cpha) |
-        LPSPI_TCR_LSBF(s_eink_lpspi_master_config.direction) |
-        LPSPI_TCR_FRAMESZ(s_eink_lpspi_master_config.bitsPerFrame - 1) | LPSPI_TCR_PRESCALE(tcrPrescalerValue) |
-        LPSPI_TCR_PCS(s_eink_lpspi_master_config.whichPcs);
-
-    return 0;
-}
-
 void BSP_EinkDeinit(void)
 {
     LPSPI_Enable(BSP_EINK_LPSPI_BASE, false);
@@ -272,8 +254,34 @@ void BSP_EinkDeinit(void)
     gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
     gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
     gpio.reset();
+}
 
-    // pll.reset(); TODO:M.P
+void BSP_EinkLogicPowerOn()
+{
+    bsp::eink::eink_gpio_power_on();
+}
+
+void BSP_EinkLogicPowerOff()
+{
+    bsp::eink::eink_gpio_power_off();
+}
+
+status_t BSP_EinkChangeSpiFrequency(uint32_t frequencyHz)
+{
+    uint32_t tcrPrescalerValue = 0;
+
+    LPSPI_Enable(BSP_EINK_LPSPI_BASE, false);
+    LPSPI_MasterSetBaudRate(
+        BSP_EINK_LPSPI_BASE, frequencyHz, GetPerphSourceClock(PerphClock_LPSPI), &tcrPrescalerValue);
+
+    s_eink_lpspi_master_config.baudRate = frequencyHz;
+    BSP_EINK_LPSPI_BASE->TCR =
+        LPSPI_TCR_CPOL(s_eink_lpspi_master_config.cpol) | LPSPI_TCR_CPHA(s_eink_lpspi_master_config.cpha) |
+        LPSPI_TCR_LSBF(s_eink_lpspi_master_config.direction) |
+        LPSPI_TCR_FRAMESZ(s_eink_lpspi_master_config.bitsPerFrame - 1) | LPSPI_TCR_PRESCALE(tcrPrescalerValue) |
+        LPSPI_TCR_PCS(s_eink_lpspi_master_config.whichPcs);
+
+    return 0;
 }
 
 status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs)
@@ -287,7 +295,7 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
         BSP_EinkWriteCS(BSP_Eink_CS_Clr);
     }
 
-    uint8_t loopCnt    = (len / (DMA_MAX_SINGLE_TRANSACTION_PAYLOAD + 1)) + 1;
+    const uint8_t loopCnt = (len / (DMA_MAX_SINGLE_TRANSACTION_PAYLOAD + 1)) + 1;
     uint32_t frameSize = 0;
     uint32_t bytesSent = 0;
 
@@ -452,9 +460,6 @@ void BSP_EinkWriteCS(bsp_eink_cs_ctrl_t ctrl)
     }
     else if (ctrl == BSP_Eink_CS_Set) {
         gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::EINK_CS_PIN), 1);
-    }
-    else {
-        return;
     }
 }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef EINK_BSP_EINK_H_
@@ -31,6 +31,10 @@ extern "C"
 
     status_t BSP_EinkInit(bsp_eink_BusyEvent event);
     void BSP_EinkDeinit(void);
+
+    void BSP_EinkLogicPowerOn();
+    void BSP_EinkLogicPowerOff();
+
     void BSP_EinkWriteCS(bsp_eink_cs_ctrl_t ctrl);
     uint8_t BSP_EinkWaitUntilDisplayBusy(uint32_t timeout);
     void BSP_EinkResetDisplayController(void);

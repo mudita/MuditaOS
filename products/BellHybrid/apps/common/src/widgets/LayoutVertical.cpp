@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "widgets/LayoutVertical.hpp"
@@ -17,6 +17,7 @@
 #include <widgets/AlarmIcon.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/ClockVertical.hpp>
+#include <widgets/BellConnectionStatus.hpp>
 
 namespace gui
 {
@@ -47,9 +48,22 @@ namespace gui
 
         time = new ClockVertical(centerBox);
         time->setFont(style::window::font::colossal);
-        time->setMinimumSize(style::homescreen_vertical::center_box_w, style::window_height);
+        time->setMinimumSize(style::homescreen_vertical::center_box_w,
+                             style::window_height - style::homescreen_vertical::connectionBoxSize);
         time->setEdges(RectangleEdge::None);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        time->setMargins(Margins(0, 0, 0, -30));
+
+        connectionBox = new HBox(centerBox);
+        connectionBox->setMinimumSize(style::homescreen_vertical::center_box_w,
+                                      style::homescreen_vertical::connectionBoxSize);
+        connectionBox->setEdges(RectangleEdge::None);
+        connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        connectionBox->setVisible(true);
+
+        leftBox->setMargins(Margins({style::homescreen_vertical::leftMargin, 0, 0, 0}));
+
+        connectionStatus = new BellConnectionStatus(connectionBox);
 
         rightBox = new VBox(mainScreen, 0, 0, 0, 0);
         rightBox->setMinimumSize(style::homescreen_vertical::side_box_w, style::window_height);

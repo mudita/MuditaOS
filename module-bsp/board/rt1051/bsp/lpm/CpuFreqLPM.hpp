@@ -1,22 +1,16 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_CPUFREQLPM_HPP
-#define PUREPHONE_CPUFREQLPM_HPP
+#pragma once
 
 #include <cstdint>
 
 namespace bsp
 {
-    inline constexpr uint32_t VDDRun_900_mV  = 0x4;
-    inline constexpr uint32_t VDDRun_1050_mV = 0xa;
-    inline constexpr uint32_t VDDRun_1075_mV = 0xb;
-    inline constexpr uint32_t VDDRun_1100_mV = 0xc;
-    inline constexpr uint32_t VDDRun_1125_mV = 0xd;
-    inline constexpr uint32_t VDDRun_1150_mV = 0xe;
-    inline constexpr uint32_t VDDRun_1275_mV = 0x13;
+    inline constexpr std::uint32_t VDDRun_950_mV  = 0x06;
+    inline constexpr std::uint32_t VDDRun_1150_mV = 0x0E;
 
-    inline constexpr uint32_t VDDStandby_925_mV = 0x1;
+    inline constexpr std::uint32_t VDDStandby_925_mV = 0x01;
 
     class CpuFreqLPM
     {
@@ -32,10 +26,26 @@ namespace bsp
             CpuClock_Pll2_528_Mhz
         };
 
+        /* Plain enums to avoid casting when passing to FSL functions */
+        enum AhbDivValues
+        {
+            AhbDiv1 = 0,
+            AhbDiv2,
+            AhbDiv3,
+            AhbDiv4,
+            AhbDiv5,
+            AhbDiv6,
+            AhbDiv7,
+            AhbDiv8
+        };
+
+        enum PeriphMuxSources
+        {
+            PeriphMuxSourcePll2_528MHz = 0,
+            PeriphMuxSourceOsc_24MHz
+        };
+
         CpuFreqLPM();
         void SetCpuFrequency(CpuClock freq);
-        void SetHighestCoreVoltage();
     };
 } // namespace bsp
-
-#endif // PUREPHONE_CPUFREQLPM_HPP

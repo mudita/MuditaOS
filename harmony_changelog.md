@@ -1,6 +1,6 @@
 # MuditaOS changelog - Harmony
 
-## Unreleased
+## [2.0.0 2023-06-23]
 
 ### Fixed
 
@@ -13,14 +13,25 @@
 * Fixed problem with long Relaxation loading when titles were too long
 * Fixed backlight behavior after returning to the main window
 * Fixed settings frontlight intensity in on demand mode
+* Fixed problem that UI could be occasionally broken
+* Fixed problem with displaying end of title when playing song in loop was selected.
+* Fixed USB charging port detection.
+* Fixed occasional crash on system startup.
+* Fixed the buttons sometimes don't respond on press or release
+* Fixed no clock update
 
 ### Added
 
 * Added error handling for incorrect audio formats and corrupted files inside Relaxation app
+* Added error message when files limit is exceeded in Relaxation app
+* Added label informing about PC connection.
 
-### Changed
+### Changed / Improved
 
 * Added new field to deviceInfo endpoint
+* Changed order in which files are displayed in Relaxation
+* Optimized E-Ink energy consumption
+* Changed the layout of the battery status
 
 ## [1.9.0 2023-04-03]
 

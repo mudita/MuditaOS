@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/TemperatureUnitModel.hpp"
@@ -6,9 +6,17 @@
 
 #include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/models/LayoutModel.hpp>
+#include <common/layouts/HomeScreenLayoutNames.hpp>
 
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 #include <service-appmgr/Constants.hpp>
+
+namespace
+{
+    constexpr auto classicPrefix  = "Classic";
+    constexpr auto verticalPrefix = "Vertical";
+
+} // namespace
 
 namespace app::bell_settings
 {
@@ -48,11 +56,11 @@ namespace app::bell_settings
             }
             if (isCurrentLayout12h) {
                 std::string fallbackLayout;
-                if (currentLayout->rfind("Classic", 0) == 0) {
-                    fallbackLayout = "Classic";
+                if (currentLayout->rfind(classicPrefix, 0) == 0) {
+                    fallbackLayout = gui::layout::Classic;
                 }
-                else if (currentLayout->rfind("Vertical", 0) == 0) {
-                    fallbackLayout = "VerticalSimple";
+                else if (currentLayout->rfind(verticalPrefix, 0) == 0) {
+                    fallbackLayout = gui::layout::VerticalSimple;
                 }
                 auto layoutChangeRequest = std::make_shared<ChangeHomescreenLayoutMessage>(fallbackLayout);
                 app->bus.sendUnicast(layoutChangeRequest, service::name::appmgr);

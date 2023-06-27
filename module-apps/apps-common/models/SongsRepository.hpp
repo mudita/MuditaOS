@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -50,12 +50,15 @@ namespace app::music
 
         virtual ~AbstractSongsRepository() noexcept = default;
 
-        virtual void initCache()                                                    = 0;
-        virtual void getMusicFilesList(std::uint32_t offset,
-                                       std::uint32_t limit,
-                                       const OnGetMusicFilesListCallback &callback) = 0;
-        virtual std::string getNextFilePath(const std::string &filePath) const      = 0;
-        virtual std::string getPreviousFilePath(const std::string &filePath) const  = 0;
+        virtual void initCache()                                                           = 0;
+        virtual void getMusicFilesList(uint32_t offset,
+                                       uint32_t limit,
+                                       const OnGetMusicFilesListCallback &callback)        = 0;
+        virtual void getMusicFilesListByPaths(std::uint32_t offset,
+                                              std::uint32_t limit,
+                                              const OnGetMusicFilesListCallback &callback) = 0;
+        virtual std::string getNextFilePath(const std::string &filePath) const             = 0;
+        virtual std::string getPreviousFilePath(const std::string &filePath) const         = 0;
         virtual std::optional<db::multimedia_files::MultimediaFilesRecord> getRecord(
             const std::string &filePath) const                     = 0;
         virtual void updateRepository(const std::string &filePath) = 0;
@@ -68,8 +71,11 @@ namespace app::music
                         std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
                         const std::vector<std::string> &pathPrefixes);
 
-        void initCache();
-        void getMusicFilesList(std::uint32_t offset, std::uint32_t limit, const OnGetMusicFilesListCallback &callback);
+        void initCache() override;
+        void getMusicFilesList(uint32_t offset, uint32_t limit, const OnGetMusicFilesListCallback &callback) override;
+        void getMusicFilesListByPaths(std::uint32_t offset,
+                                      std::uint32_t limit,
+                                      const OnGetMusicFilesListCallback &callback) override;
         std::string getNextFilePath(const std::string &filePath) const override;
         std::string getPreviousFilePath(const std::string &filePath) const override;
         std::optional<db::multimedia_files::MultimediaFilesRecord> getRecord(
@@ -124,5 +130,10 @@ namespace app::music
         bool newFrontDataCallback(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
                                   unsigned int repoRecordsCount,
                                   std::uint32_t offset);
+
+        void getMusicFilesList(const std::vector<std::string> &paths,
+                               std::uint32_t offset,
+                               std::uint32_t limit,
+                               const OnGetMusicFilesListCallback &callback);
     };
 } // namespace app::music

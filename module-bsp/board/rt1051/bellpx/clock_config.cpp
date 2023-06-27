@@ -140,6 +140,7 @@ void BOARD_BootClockRUN(void)
     /* OSC_CLK (24M) */
     CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
                  1); // CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+    CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0); // No division
     /* PERIPH_CLK2_SEL */
     CLOCK_SetMux(kCLOCK_PeriphMux, 1); // CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
 

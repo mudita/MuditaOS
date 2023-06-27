@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "dma_config.h"
@@ -62,18 +62,13 @@
 
 #define ED028TC1_BUSY_STATE_TIMEOUT_MS 2000 // Time after the display should for sure exit the busy state
 
-#define _delay_ms(ms) vTaskDelay(pdMS_TO_TICKS(ms))
-
-/// This is DMA handle for internal frame buffer memory-to-memory copying operation
-static edma_handle_t s_einkMemcpyDma_handle __attribute__((used));
-
 using namespace drivers;
 using namespace magic_enum;
 static std::shared_ptr<drivers::DriverDMA> dma;
 static std::shared_ptr<drivers::DriverDMAMux> dmamux;
 
 /* Internal variable definitions */
-static uint8_t s_einkIsPoweredOn = false; //  Variable which contains the state of the power of the EPD display
+static bool s_einkIsPoweredOn = false; //  Variable which contains the state of the power of the EPD display
 
 static EinkWaveforms_e s_einkConfiguredWaveform =
     EinkWaveformGC16; //  This variable contains the current waveform set in the display
@@ -533,30 +528,38 @@ uint8_t EinkIsPoweredOn()
 
 void EinkPowerOn()
 {
-    if (!s_einkIsPoweredOn) {
-        uint8_t cmd = EinkPowerON; // 0x04
-        if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-            EinkResetAndInitialize();
-            return;
-        }
-
-        BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
-        s_einkIsPoweredOn = true;
+    if (s_einkIsPoweredOn) {
+        return;
     }
+
+    BSP_EinkLogicPowerOn();
+
+    uint8_t cmd = EinkPowerON; // 0x04
+    if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
+        EinkResetAndInitialize();
+        return;
+    }
+    BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
+
+    s_einkIsPoweredOn = true;
 }
 
 void EinkPowerOff()
 {
-    if (s_einkIsPoweredOn) {
-        uint8_t cmd = EinkPowerOFF; // 0x02
-        if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-            EinkResetAndInitialize();
-            return;
-        }
-
-        BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
-        s_einkIsPoweredOn = false;
+    if (!s_einkIsPoweredOn) {
+        return;
     }
+
+    uint8_t cmd = EinkPowerOFF; // 0x02
+    if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
+        EinkResetAndInitialize();
+        return;
+    }
+    BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
+
+    BSP_EinkLogicPowerOff();
+
+    s_einkIsPoweredOn = false;
 }
 
 void EinkPowerDown(void)

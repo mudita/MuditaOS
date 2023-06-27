@@ -114,17 +114,17 @@ namespace gui
     std::uint32_t RawFont::getCharCountInSpace(const UTF8 &str, const std::uint32_t space) const
     {
         std::uint32_t availableSpace = space;
+        std::uint32_t textSpace      = 0;
         std::uint32_t count          = 0;
         std::uint32_t current        = 0;
         std::uint32_t previous       = none_char_id;
 
         for (std::uint32_t i = 0; i < str.length(); ++i, ++count) {
-            current               = str[i];
-            const auto char_pixel_width = getCharPixelWidth(current, previous);
-            if (availableSpace < char_pixel_width) {
-                return count;
+            current = str[i];
+            textSpace += getCharPixelWidth(current, previous);
+            if (availableSpace < textSpace) {
+                return count - 1;
             }
-            availableSpace -= char_pixel_width;
             previous = current;
         }
         return count;

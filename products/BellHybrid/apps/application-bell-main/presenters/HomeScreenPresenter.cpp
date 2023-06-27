@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
@@ -259,4 +259,10 @@ namespace app::home_screen
         std::uniform_int_distribution<std::mt19937::result_type> dist(0, greetingCollection.size() - 1);
         return greetingCollection[dist(*rngEngine)];
     };
+
+    void HomeScreenPresenter::setUSBStatusConnected()
+    {
+        getView()->setUSBStatusConnected();
+    }
+
 } // namespace app::home_screen

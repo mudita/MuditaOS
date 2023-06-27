@@ -156,16 +156,6 @@ namespace bsp
             vTaskDelete(taskHandleReceive);
     }
 
-    void usbReinit(const std::string &)
-    {
-        LOG_INFO("usbReinit");
-    }
-
-    void usbSuspend()
-    {
-        LOG_INFO("usbSuspend");
-    }
-
     int usbInit(const bsp::usbInitParams &initParams)
     {
 

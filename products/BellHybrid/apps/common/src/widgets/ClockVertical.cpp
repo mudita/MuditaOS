@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/widgets/ClockVertical.hpp>
@@ -59,7 +59,7 @@ namespace gui
 
         hBoxMinutes = new gui::HBox(this, 0, 0, style::homescreen_vertical::center_box_w, 0);
         hBoxMinutes->setEdges(gui::RectangleEdge::None);
-        hBoxMinutes->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        hBoxMinutes->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         hBoxMinutes->setMargins(gui::Margins(0, 0, 0, 0));
         hBoxMinutes->setMinimumSize(style::homescreen_vertical::center_box_w, style::homescreen_vertical::center_box_h);
 

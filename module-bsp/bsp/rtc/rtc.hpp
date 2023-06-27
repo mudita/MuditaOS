@@ -8,7 +8,8 @@
 #include <ctime>
 #include <cstdint>
 
-namespace bsp::rtc {
+namespace bsp::rtc
+{
 	enum class IrqNotification
     {
         AlarmOccurred = 0x01
@@ -27,6 +28,7 @@ namespace bsp::rtc {
 	ErrorCode disableAlarmIrq();
 	ErrorCode maskAlarmIrq();
 	ErrorCode unmaskAlarmIrq();
+	ErrorCode enableLpSrtc();
 	ErrorCode setDateTimeFromTimestamp(time_t timestamp);
 	ErrorCode setDateTime(struct tm* time);
 	ErrorCode getCurrentDateTime(struct tm* datetime);
@@ -36,4 +38,5 @@ namespace bsp::rtc {
 	ErrorCode setAlarmInSecondsFromNow(std::uint32_t secs);
 	ErrorCode getAlarmTimestamp(std::uint32_t* secs);
 	ErrorCode setMinuteAlarm(time_t timestamp);
+	void printCurrentDataTime();
 }

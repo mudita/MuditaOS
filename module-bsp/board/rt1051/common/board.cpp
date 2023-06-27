@@ -20,7 +20,7 @@ extern "C"
 #include "board/brownout.hpp"
 #include <board/debug_console.hpp>
 
-#include <cstdint>
+#include <log/log.hpp>
 
 extern std::uint32_t __sdram_cached_start[];
 
@@ -171,7 +171,6 @@ namespace bsp
         Brownout_init();
         irq_gpio_Init();
 
-        // SNVS init. is required for proper operation of the RTC when Secure Boot is used
         SNVS_LP_Init(SNVS);
         SNVS_HP_Init(SNVS);
         SNVS_HP_ChangeSSMState(SNVS);
@@ -180,11 +179,20 @@ namespace bsp
         //        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
         // TODO: Here we can implement boot-time fail detection
 
-        // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
-        DCDC_BootIntoDCM(DCDC);
+        // Set internal DCDC to CCM mode, DCM is allowed ONLY in low power modes (see AN12085, 5.3.9, p.33)
+        DCDC_BootIntoCCM(DCDC);
+
+        // Disconnect DCDC internal load resistor
+        DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
 
         PrintSystemClocks();
         clearAndPrintBootReason();
+
+        if (SNVS->LPGPR[1] != 0) {
+            LOG_INFO("Device seems to have been reset by RTWDOG! Last instruction address: 0x%08lX",
+                     SNVS->LPGPR[1]);
+            SNVS->LPGPR[1] = 0;
+        }
     }
 
     //! Board PowerOff function by cutdown power
@@ -210,8 +218,10 @@ namespace bsp
 
     int register_exit_functions(void (*func)())
     {
-        if (iObject >= sizeof(objects))
+        if (iObject >= sizeof(objects)) {
             return -1;
+        }
+
         objects[iObject].func = func;
         ++iObject;
         return 0;

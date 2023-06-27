@@ -11,6 +11,7 @@
 #include <fsl_qtmr.h>
 #include <fsl_gpc.h>
 #include <fsl_pmu.h>
+#include <fsl_rtwdog.h>
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/key_input/KeyInput.hpp>
@@ -193,11 +194,51 @@ namespace bsp
             hal::key_input::EncoderIRQHandler();
         }
 
-        void RTWDOG_IRQHandler(void)
+        /* RTWDOG's timeout asserts IRQ, then 255 bus clocks after interrupt vector fetch
+         * forces CPU reset (see RT1050 RM, p.3120). However, this forced reset only
+         * affects the CPU, it won't reset any external ICs. To resolve this limitation,
+         * WDOG_B pin, which controls board's main DCDC converter, is asserted in RTWDOG
+         * IRQ handler. Converter will be momentarily switched off and the whole board will
+         * be power reset.
+         *
+         * The simplest way to do it is to configure the pin as WDOG_B and use WDOG1 built-in
+         * assertion.
+         *
+         * Before proceeding to exception handler, CPU pushes the following registers
+         * to the active stack:
+         * r0,       offset 0 (in words),
+         * r1        offset 1,
+         * r2,       offset 2,
+         * r3,       offset 3,
+         * r12,      offset 4,
+         * r14 (LR), offset 5,
+         * r15 (PC), offset 6,
+         * xPSR,     offset 7.
+         * Get the value of last PC state and store in non-volatile SNVS register
+         * to have any data that can be used to debug if program died in IRQ or
+         * critical section and neither log nor crashdump was created. */
+        __attribute__((used, noreturn)) void RTWDOG_Handler(const uint32_t *sp)
         {
-            // Asserting WDOG_B pin to provide power reset of whole board
-            // Way to do it is via WDOG1 built-in assertion, RTWDOG does not provide it
+            RTWDOG_ClearStatusFlags(RTWDOG, kRTWDOG_InterruptFlag);
+
+            const uint32_t pc = sp[6];
+            SNVS->LPGPR[1]    = pc;
+
             WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
+            while (true) {}; // Execution should never reach this point, but just in case
+        }
+
+        /* This has to be done as naked function to be able to easily extract last
+         * PC value before RTWDOG handler was called without having to deal with
+         * function prologue. */
+        __attribute__((naked)) void RTWDOG_IRQHandler(void)
+        {
+            __asm__ __volatile__("tst lr, #4\n" // Determine which stack was used
+                                 "ite eq\n"
+                                 "mrseq r0, msp\n"
+                                 "mrsne r0, psp\n"
+                                 "b RTWDOG_Handler\n" // Jump to real handler
+            );
         }
 
         // Enable PMU brownout interrupt

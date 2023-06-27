@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp> // for byte conversion functions. it is included first because of magic enum define
@@ -63,7 +63,7 @@ namespace bsp::bell_switches
     static struct LatchEventFlag
     {
       private:
-        static constexpr std::chrono::milliseconds latchPressEventTimeout = 1000ms;
+        static constexpr std::chrono::milliseconds latchPressEventTimeout{1000ms};
         cpp_freertos::MutexStandard latchFlagMutex;
         bool pressed    = false;
         bool changeFlag = false;
@@ -164,7 +164,7 @@ namespace bsp::bell_switches
 
         auto currentState = timerState->gpio->ReadPin(static_cast<uint32_t>(timerState->pin)) ? KeyEvents::Released
                                                                                               : KeyEvents::Pressed;
-        if (currentState == timerState->lastState && qHandleIrq != nullptr) {
+        if (currentState == timerState->lastState) {
             if (timerState->id == KeyId::latchSwitch) {
                 if (currentState == KeyEvents::Pressed) {
                     latchEventFlag.setPressed();
@@ -173,8 +173,6 @@ namespace bsp::bell_switches
                     latchEventFlag.setReleased();
                 }
             }
-            auto val = static_cast<std::uint16_t>(getNotificationSource(timerState->id, currentState));
-            xQueueSend(qHandleIrq, &val, 0);
         }
         else {
             /** Even if we did not change the state of latch, the IRQ was called,
@@ -183,6 +181,11 @@ namespace bsp::bell_switches
             if (timerState->id == KeyId::latchSwitch) {
                 latchEventFlag.setChanged();
             }
+        }
+
+        const auto val = static_cast<std::uint16_t>(getNotificationSource(timerState->id, currentState));
+        if (qHandleIrq != nullptr) {
+            xQueueSend(qHandleIrq, &val, 0);
         }
 
         timerState->gpio->EnableInterrupt(1U << static_cast<uint32_t>(timerState->pin));
@@ -203,14 +206,15 @@ namespace bsp::bell_switches
             }
         }
 
-        timerState->gpio->ClearPortInterrupts(1U << static_cast<uint32_t>(timerState->pin));
-        timerState->gpio->EnableInterrupt(1U << static_cast<uint32_t>(timerState->pin));
+        timerState->gpio->ClearPortInterrupts(1U << static_cast<std::uint32_t>(timerState->pin));
+        timerState->gpio->EnableInterrupt(1U << static_cast<std::uint32_t>(timerState->pin));
     }
 
     KeyEvents getLatchState()
     {
-        return (gpio_sw->ReadPin(static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH)) ? KeyEvents::Released
-                                                                                               : KeyEvents::Pressed);
+        return (gpio_sw->ReadPin(static_cast<std::uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH))
+                    ? KeyEvents::Released
+                    : KeyEvents::Pressed);
     }
 
     void addDebounceTimer(DebounceTimerState timerState)
@@ -250,7 +254,7 @@ namespace bsp::bell_switches
         gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
                                           .irqMode  = mode,
                                           .defLogic = 1,
-                                          .pin      = static_cast<uint32_t>(boardSwitch)});
+                                          .pin      = static_cast<std::uint32_t>(boardSwitch)});
     }
 
     int32_t init(xQueueHandle qHandle)
@@ -311,7 +315,6 @@ namespace bsp::bell_switches
     void getDebounceTimer(BaseType_t xHigherPriorityTaskWoken, KeyId timerId)
     {
         if (debounceTimers.find(timerId) == debounceTimers.end()) {
-            LOG_ERROR("Could not find debouncer timer for: %s", magic_enum::enum_name(timerId).data());
             return;
         }
         DebounceTimerState &debounceTimerState = debounceTimers.at(timerId);
@@ -324,7 +327,7 @@ namespace bsp::bell_switches
         }
     }
 
-    BaseType_t GPIO2SwitchesIRQHandler(uint32_t mask)
+    BaseType_t GPIO2SwitchesIRQHandler(std::uint32_t mask)
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         auto timerId                        = KeyId::Invalid;
@@ -344,7 +347,7 @@ namespace bsp::bell_switches
         return xHigherPriorityTaskWoken;
     }
 
-    BaseType_t GPIO5SwitchesIRQHandler(uint32_t mask)
+    BaseType_t GPIO5SwitchesIRQHandler(std::uint32_t mask)
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         auto keyID                          = KeyId::Invalid;
@@ -358,18 +361,18 @@ namespace bsp::bell_switches
 
     void enableIRQ()
     {
-        gpio_center->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_CENTER_SWITCH));
-        gpio_sw->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT));
-        gpio_sw->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT));
-        gpio_sw->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
+        gpio_center->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_CENTER_SWITCH));
+        gpio_sw->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT));
+        gpio_sw->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT));
+        gpio_sw->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
     }
 
     void disableIRQ()
     {
-        gpio_center->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_CENTER_SWITCH));
-        gpio_sw->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT));
-        gpio_sw->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT));
-        gpio_sw->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
+        gpio_center->DisableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_CENTER_SWITCH));
+        gpio_sw->DisableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT));
+        gpio_sw->DisableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT));
+        gpio_sw->DisableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
     }
 
     std::vector<KeyEvent> getKeyEvents(NotificationSource notification)
@@ -430,7 +433,7 @@ namespace bsp::bell_switches
     void clearStartupLatchInterrupt()
     {
         // Knob sets up interrupt on startup because of hw design
-        gpio_sw->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
+        gpio_sw->ClearPortInterrupts(1 << static_cast<std::uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH));
     }
 
 } // namespace bsp::bell_switches

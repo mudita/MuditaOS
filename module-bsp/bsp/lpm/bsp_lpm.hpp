@@ -31,7 +31,6 @@ namespace bsp
             GoToRecoveryRecovery,     //! Goto to recovery into recovery mode
             GoToRecoveryBackup,       //! Goto to recovery into backup mode
             GoToRecoveryRestore       //! Goto to recovery into restore mode
-
         };
 
         LowPowerMode()          = default;
@@ -43,7 +42,6 @@ namespace bsp
         virtual int32_t Reboot(RebootType reason) = 0;
 
         virtual void SetCpuFrequency(CpuFrequencyMHz freq) = 0;
-        virtual void SetHighestCoreVoltage()               = 0;
         [[nodiscard]] CpuFrequencyMHz GetCurrentFrequencyLevel() const noexcept;
         [[nodiscard]] virtual uint32_t GetCpuFrequency() const noexcept = 0;
 
@@ -51,9 +49,6 @@ namespace bsp
 
         virtual void EnableDcdcPowerSaveMode()  = 0;
         virtual void DisableDcdcPowerSaveMode() = 0;
-
-        virtual void DisconnectInternalLoadResistor() = 0;
-        virtual void ConnectInternalLoadResistor()    = 0;
 
         virtual void SwitchToRegularModeLDO()  = 0;
         virtual void SwitchToLowPowerModeLDO() = 0;

@@ -39,7 +39,7 @@ function(add_standalone_image SOURCE_TARGET)
         # please do not:
         # 1. change compression to -9 (or higher) as i will have detrimental effects on compression times with not much gain
         # 2. change -T parameter to explicit thread count - xz with T0 will adjust thread count to your machine capatibilies
-        COMMAND tar -I 'xz -T0' -Scf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
+        COMMAND tar Scf - ${SOURCE_TARGET}.img | xz -T0 > ${STANDALONE_PKG}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         DEPENDS ${BIN_FILE}
         DEPENDS json-common-target

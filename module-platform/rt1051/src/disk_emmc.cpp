@@ -1,19 +1,18 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "disk_emmc.hpp"
 
-#include <bsp/common.hpp>
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #include "board/BoardDefinitions.hpp"
 #include <log/log.hpp>
+#include <Utils.hpp>
 
 #include <cstring>
 #include <task.h>
 
 namespace purefs::blkdev
 {
-
     disk_emmc::disk_emmc() : initStatus(kStatus_Success), mmcCard(std::make_unique<_mmc_card>())
     {
         assert(mmcCard.get());
@@ -31,14 +30,16 @@ namespace purefs::blkdev
     disk_emmc::~disk_emmc()
     {}
 
-    auto disk_emmc::probe(unsigned int flags) -> int
+    auto disk_emmc::probe([[maybe_unused]] unsigned int flags) -> int
     {
         cpp_freertos::LockGuard lock(mutex);
-        auto err = MMC_Init(mmcCard.get());
+        const auto err = MMC_Init(mmcCard.get());
         if (err != kStatus_Success) {
             initStatus = err;
             return initStatus;
         }
+
+        LOG_INFO("\neMMC card info:\n%s", get_emmc_info_str().c_str());
 
         return statusBlkDevSuccess;
     }
@@ -167,6 +168,7 @@ namespace purefs::blkdev
         if (newpart > kMMC_AccessGeneralPurposePartition4) {
             return -ERANGE;
         }
+
         int ret{};
         if (newpart != currHwPart) {
             if (pmState == pm_state::suspend) {
@@ -209,4 +211,65 @@ namespace purefs::blkdev
         return kStatus_Success;
     }
 
+    auto disk_emmc::get_emmc_manufacturer() const -> std::string
+    {
+        const std::uint8_t manufacturerId = mmcCard->cid.manufacturerID;
+        const auto manufacturer           = mmcManufacturersMap.find(manufacturerId);
+        if (manufacturer != mmcManufacturersMap.end()) {
+            return manufacturer->second;
+        }
+        return "unknown (0x" + utils::byteToHex(manufacturerId) + ")";
+    }
+
+    auto disk_emmc::get_emmc_info() const -> disk_emmc_info
+    {
+        disk_emmc_info emmcInfo{};
+        emmcInfo.manufacturer = get_emmc_manufacturer();
+        emmcInfo.blocksCount  = mmcCard->userPartitionBlocks; // Not to be confused with ext4 partition labeled 'user'!
+        emmcInfo.blockSize    = mmcCard->blockSize;
+        emmcInfo.capacity =
+            static_cast<std::uint64_t>(emmcInfo.blocksCount) * static_cast<std::uint64_t>(emmcInfo.blockSize);
+        emmcInfo.name =
+            std::string(reinterpret_cast<const char *>(mmcCard->cid.productName), sizeof(mmcCard->cid.productName));
+        emmcInfo.versionMajor    = (mmcCard->cid.productVersion >> 4) & 0x0F;
+        emmcInfo.versionMinor    = mmcCard->cid.productVersion & 0x0F;
+        emmcInfo.serialNumber    = mmcCard->cid.productSerialNumber;
+        emmcInfo.productionMonth = (mmcCard->cid.manufacturerData >> 4) & 0x0F;
+
+        /* See JESD84-B51, p.163, Table 77 */
+        emmcInfo.productionYear = mmcCard->cid.manufacturerData & 0x0F;
+        if ((mmcCard->extendedCsd.extendecCsdVersion > 4) && (emmcInfo.productionYear <= 0b1100)) {
+            emmcInfo.productionYear += 2013;
+        }
+        else {
+            emmcInfo.productionYear += 1997;
+        }
+
+        return emmcInfo;
+    }
+
+    auto disk_emmc::get_emmc_info_str() const -> std::string
+    {
+        constexpr auto bytesPerGB  = 1000UL * 1000UL * 1000UL;
+        constexpr auto bytesPerGiB = 1024UL * 1024UL * 1024UL;
+
+        const disk_emmc_info emmcInfo = get_emmc_info();
+        const auto capacityGB         = static_cast<float>(emmcInfo.capacity) / static_cast<float>(bytesPerGB);
+        const auto capacityGiB        = static_cast<float>(emmcInfo.capacity) / static_cast<float>(bytesPerGiB);
+
+        std::stringstream ss;
+        ss << "\t> Manufacturer: " << emmcInfo.manufacturer << std::endl;
+        ss << "\t> Blocks count: " << emmcInfo.blocksCount << std::endl;
+        ss << "\t> Block size: " << emmcInfo.blockSize << std::endl;
+        ss << "\t> Capacity: " << std::fixed << std::setprecision(2) << capacityGB << "GB/" << capacityGiB << "GiB"
+           << std::endl;
+        ss << "\t> Name: " << emmcInfo.name << std::endl;
+        ss << "\t> Version: " << std::to_string(emmcInfo.versionMajor) << "." << std::to_string(emmcInfo.versionMinor)
+           << std::endl;
+        ss << "\t> SN: " << emmcInfo.serialNumber << std::endl;
+        ss << "\t> Production date: " << std::setfill('0') << std::setw(2) << std::to_string(emmcInfo.productionMonth)
+           << "/" << emmcInfo.productionYear;
+
+        return ss.str();
+    }
 } // namespace purefs::blkdev

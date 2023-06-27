@@ -33,7 +33,7 @@ namespace hal::battery
             Brownout
         };
 
-        enum class ChargerPresence
+        enum class ChargerPresence : std::uint8_t
         {
             Undefined,
             PluggedIn,
@@ -48,9 +48,9 @@ namespace hal::battery
         virtual ~AbstractBatteryCharger() = default;
 
         virtual std::optional<Voltage> getBatteryVoltage() const = 0;
-        virtual std::optional<SOC> getSOC() const          = 0;
-        virtual ChargingStatus getChargingStatus() const   = 0;
-        virtual ChargerPresence getChargerPresence() const = 0;
+        virtual std::optional<SOC> getSOC() const                = 0;
+        virtual ChargingStatus getChargingStatus() const         = 0;
+        virtual ChargerPresence getChargerPresence() const       = 0;
 
         static_assert(sizeof(Events) == sizeof(std::uint8_t),
                       "All events processed by event manager ought to have size of std::uint8_t");

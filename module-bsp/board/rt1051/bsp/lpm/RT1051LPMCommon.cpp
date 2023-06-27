@@ -5,6 +5,7 @@
 
 #include <log/log.hpp>
 #include <fsl_clock.h>
+#include <fsl_dcdc.h>
 #include <bsp/bsp.hpp>
 #include "Oscillator.hpp"
 #include "critical.hpp"
@@ -13,7 +14,6 @@
 
 namespace bsp
 {
-
     using namespace drivers;
 
     RT1051LPMCommon::RT1051LPMCommon()
@@ -65,21 +65,16 @@ namespace bsp
     CpuFrequencyMHz RT1051LPMCommon::onChangeUp(CpuFrequencyMHz freq, bsp::CpuFrequencyMHz newFrequency)
     {
         if ((freq <= CpuFrequencyMHz::Level_1) && (newFrequency > CpuFrequencyMHz::Level_1)) {
-            // connect internal the load resistor
-            ConnectInternalLoadResistor();
-            // Switch DCDC to full throttle during oscillator switch
-            SetHighestCoreVoltage();
-            // Enable regular 2P5 and 1P1 LDO and Turn off weak 2P5 and 1P1 LDO
-            SwitchToRegularModeLDO();
-            // switch oscillator source
-            SwitchOscillatorSource(LowPowerMode::OscillatorSource::External);
-            // then switch external RAM clock source
+            // Switch DCDC to CCM mode to improve stability
+            DCDC_BootIntoCCM(DCDC);
+            // Switch external RAM clock source to PLL2
             if (driverSEMC) {
                 driverSEMC->SwitchToPLL2ClockSource();
             }
-            // Add intermediate step in frequency
-            if (newFrequency > CpuFrequencyMHz::Level_4)
-                return CpuFrequencyMHz::Level_4;
+            // Enable regular 2P5 and 1P1 LDO, turn off weak 2P5 and 1P1 LDO
+            SwitchToRegularModeLDO();
+            // Switch to external crystal oscillator
+            SwitchOscillatorSource(LowPowerMode::OscillatorSource::External);
         }
         return newFrequency;
     }
@@ -87,17 +82,16 @@ namespace bsp
     void RT1051LPMCommon::onChangeDown(CpuFrequencyMHz newFrequency)
     {
         if (newFrequency <= bsp::CpuFrequencyMHz::Level_1) {
-            // Enable weak 2P5 and 1P1 LDO and Turn off regular 2P5 and 1P1 LDO
-            SwitchToLowPowerModeLDO();
-            // then switch osc source
+            // Switch to internal RC oscillator
             SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
-            // and switch external RAM clock source
+            // Enable weak 2P5 and 1P1 LDO, turn off regular 2P5 and 1P1 LDO
+            SwitchToLowPowerModeLDO();
+            // Switch external RAM clock source to OSC
             if (driverSEMC) {
                 driverSEMC->SwitchToPeripheralClockSource();
             }
-
-            // disconnect internal the load resistor
-            DisconnectInternalLoadResistor();
+            // Switch DCDC to DCM mode to reduce current consumption
+            DCDC_BootIntoDCM(DCDC);
         }
     }
 
@@ -106,7 +100,7 @@ namespace bsp
         if (currentFrequency == freq) {
             return;
         }
-        Change change = currentFrequency < freq ? Change::Up : Change::Down;
+        const Change change = (currentFrequency < freq) ? Change::Up : Change::Down;
         if (Change::Up == change) {
             freq = onChangeUp(currentFrequency, freq);
         }
@@ -141,11 +135,6 @@ namespace bsp
         currentFrequency = freq;
     }
 
-    void RT1051LPMCommon::SetHighestCoreVoltage()
-    {
-        CpuFreq->SetHighestCoreVoltage();
-    }
-
     uint32_t RT1051LPMCommon::GetCpuFrequency() const noexcept
     {
         return CLOCK_GetCpuClkFreq();
@@ -165,40 +154,32 @@ namespace bsp
         }
     }
 
-    void RT1051LPMCommon::DisconnectInternalLoadResistor()
-    {
-        DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
-    }
-
-    void RT1051LPMCommon::ConnectInternalLoadResistor()
-    {
-        DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
-    }
-
     void RT1051LPMCommon::RegularLDOMode()
     {
-        // Enable regular 2P5 and wait it stable
+        // Enable regular 2P5 and 1P1 LDO
         PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_LINREG_MASK;
-        // It is recommended to wait for stabilization (documentation Low Power AN12085)
-        while ((PMU->REG_2P5 & PMU_REG_2P5_OK_VDD2P5_MASK) == 0) {}
-        // Turn off weak 2P5
-        PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
-        // Enable regular 1P1 and wait for stable
         PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_LINREG_MASK;
-        // It is recommended to wait for stabilization (documentation Low Power AN12085)
+
+        // Wait for regular LDOs to become stable (documentation Low Power AN12085)
+        while ((PMU->REG_2P5 & PMU_REG_2P5_OK_VDD2P5_MASK) == 0) {}
         while ((PMU->REG_1P1 & PMU_REG_1P1_OK_VDD1P1_MASK) == 0) {}
-        // Turn off weak 1P1
+
+        // Turn off weak 2P5 and 1P1 LDO
+        PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
         PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
     }
 
     void RT1051LPMCommon::LowPowerLDOMode()
     {
-        // Enable weak 2P5 and turn off regular 2P5
-        PMU->REG_2P5 |= PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
-        PMU->REG_2P5 &= ~PMU_REG_2P5_ENABLE_LINREG_MASK;
-        // Enable weak 1P1 and turn off regular 1P1
-        PMU->REG_1P1 |= PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
-        PMU->REG_1P1 &= ~PMU_REG_1P1_ENABLE_LINREG_MASK;
-    }
+        // Enable weak 2P5 and 1P1 LDO
+        PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
+        PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
 
+        // Wait for 40us for weak LDOs to stabilize
+        SDK_DelayAtLeastUs(40, CLOCK_GetCpuClkFreq());
+
+        // Disable regular 2P5 and 1P1 LDO
+        PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_LINREG_MASK;
+        PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_LINREG_MASK;
+    }
 } // namespace bsp

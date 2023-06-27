@@ -5,6 +5,7 @@
 
 #include "presenter/RelaxationErrorPresenter.hpp"
 #include <apps-common/popups/WindowWithTimer.hpp>
+#include <gui/widgets/Icon.hpp>
 #include <memory>
 
 namespace gui
@@ -19,10 +20,13 @@ namespace gui
 
       private:
         std::unique_ptr<app::relaxation::RelaxationErrorContract::Presenter> presenter;
+        std::string errorText;
+        gui::Icon *icon = nullptr;
 
         void buildInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
         void registerCallbacks();
         void buildLayout();
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 } // namespace gui

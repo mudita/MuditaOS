@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <bsp/rtc/rtc.hpp>
+#include <cstdint>
 
 namespace
 {
-    static constexpr uint32_t RTC_CALIBRATION_VALUE = 0;
+    constexpr std::uint32_t RTC_CALIBRATION_VALUE = 0;
 }
 
 namespace bsp::rtc
 {
-    uint32_t getRtcCalibrationValue()
+    std::uint32_t getRtcCalibrationValue()
     {
         return RTC_CALIBRATION_VALUE;
     }

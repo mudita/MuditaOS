@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/HomeScreenLayoutVertical.hpp"
@@ -6,6 +6,7 @@
 #include "widgets/BellBattery.hpp"
 #include "widgets/DuoHBox.hpp"
 #include "widgets/SnoozeTimer.hpp"
+#include "widgets/BellConnectionStatus.hpp"
 
 #include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/widgets/Icon.hpp>
@@ -149,6 +150,8 @@ namespace gui
     void HomeScreenLayoutVertical::setBatteryLevelState(const Store::Battery &batteryContext)
     {
         battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
+        connectionStatus->checkIfConnected(batteryContext.state);
+
         if (isBatteryVisibilityAllowed(batteryContext)) {
             battery->setVisible(true);
         }
@@ -156,6 +159,7 @@ namespace gui
             battery->setVisible(false);
         }
         battery->informContentChanged();
+        connectionStatus->informContentChanged();
     }
 
     void HomeScreenLayoutVertical::setTime(std::time_t newTime)
@@ -194,4 +198,10 @@ namespace gui
     {
         return this;
     }
+    auto HomeScreenLayoutVertical::setUSBStatusConnected() -> void
+    {
+        connectionStatus->setConnected();
+        connectionStatus->informContentChanged();
+    }
+
 }; // namespace gui

@@ -41,17 +41,4 @@ namespace sdesktop
             context.setResponseBody(json11::Json::object{{json::developerMode::cellularSleepModeInfo, isInSleepMode}});
         }
     } // namespace developerMode
-
-    namespace usb
-    {
-        USBConfigured::USBConfigured(USBConfigurationType configurationType)
-            : sys::DataMessage(MessageType::USBConfigured), configurationType(configurationType)
-        {}
-
-        USBConfigurationType USBConfigured::getConfigurationType() const noexcept
-        {
-            return configurationType;
-        }
-    } // namespace usb
-
 } // namespace sdesktop

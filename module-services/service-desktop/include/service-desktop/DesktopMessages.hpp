@@ -46,12 +46,6 @@ namespace sdesktop
 
     namespace usb
     {
-        enum class USBConfigurationType
-        {
-            firstConfiguration,
-            reconfiguration
-        };
-
         class USBConnected : public sys::DataMessage
         {
           public:
@@ -63,13 +57,9 @@ namespace sdesktop
         class USBConfigured : public sys::DataMessage
         {
           public:
-            explicit USBConfigured(
-                USBConfigurationType configurationType = sdesktop::usb::USBConfigurationType::firstConfiguration);
+            USBConfigured() : sys::DataMessage(MessageType::USBConfigured)
+            {}
             ~USBConfigured() override = default;
-            USBConfigurationType getConfigurationType() const noexcept;
-
-          private:
-            USBConfigurationType configurationType;
         };
 
         class USBDisconnected : public sys::DataMessage

@@ -2,85 +2,151 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "rtc_configuration.hpp"
-
 #include <bsp/rtc/rtc.hpp>
 #include <fsl_snvs_hp.h>
 #include <fsl_snvs_lp.h>
-#include <module-os/RTOSWrapper/include/ticks.hpp>
+#include <ticks.hpp>
+#include <critical.hpp>
 #include <time/time_constants.hpp>
 #include <time.h>
 #include <log/log.hpp>
 
 namespace
 {
-    constexpr std::uint32_t irqTimeout = 100000;
+    constexpr std::uint32_t hpTimeAlarmIrqEnableTimeout = 100000;
+    xQueueHandle qHandleRtcIrq                          = nullptr;
 
-    xQueueHandle qHandleRtcIrq = NULL;
-    snvs_hp_rtc_config_t s_rtcConfig;
+    bool isSrtcOperational()
+    {
+        constexpr auto timeoutMs    = utils::time::milisecondsInSecond;
+        constexpr auto retryDelayMs = 10;
+        const auto initialTicks     = cpp_freertos::Ticks::GetTicks();
+
+        /* Wait until LP SRTC is operational */
+        while ((SNVS->LPCR & SNVS_LPCR_SRTC_ENV_MASK) == 0) {
+            if ((cpp_freertos::Ticks::GetTicks() - initialTicks) > cpp_freertos::Ticks::MsToTicks(timeoutMs)) {
+                return false;
+            }
+            vTaskDelay(retryDelayMs);
+        }
+        return true;
+    }
+
+    void logRegisters()
+    {
+        LOG_INFO("SSM state: 0x%02lX", static_cast<std::uint32_t>(SNVS_HP_GetSSMState(SNVS)));
+        LOG_INFO("LPCR: 0x%08lX LPLR: 0x%08lX LPSR: 0x%08lX", SNVS->LPCR, SNVS->LPLR, SNVS->LPSR);
+        LOG_INFO("HPCR: 0x%08lX HPLR: 0x%08lX HPSR: 0x%08lX", SNVS->HPCR, SNVS->HPLR, SNVS->HPSR);
+    }
 } // namespace
 
 namespace bsp::rtc
 {
-
     ErrorCode init(xQueueHandle qHandle)
     {
         qHandleRtcIrq = qHandle;
+
+        /* Enable HP and LP clocking */
+        CLOCK_EnableClock(kCLOCK_SnvsHp);
         CLOCK_EnableClock(kCLOCK_SnvsLp);
-        SNVS_HP_RTC_GetDefaultConfig(&s_rtcConfig);
 
-        s_rtcConfig.rtcCalValue  = getRtcCalibrationValue();
-        s_rtcConfig.rtcCalEnable = true;
-        SNVS_HP_RTC_Init(SNVS, &s_rtcConfig);
+        /* Init HP RTC */
+        snvs_hp_rtc_config_t hpRtcConfig;
+        SNVS_HP_RTC_GetDefaultConfig(&hpRtcConfig);
+        hpRtcConfig.rtcCalValue  = getRtcCalibrationValue();
+        hpRtcConfig.rtcCalEnable = true;
+        SNVS_HP_RTC_Init(SNVS, &hpRtcConfig);
 
-        (void)SNVS_LPCR_LPTA_EN(1);
+        /* Init LP SRTC */
+        snvs_lp_srtc_config_t lpRtcConfig;
+        SNVS_LP_SRTC_GetDefaultConfig(&lpRtcConfig);
+        SNVS_LP_SRTC_Init(SNVS, &lpRtcConfig);
 
-        bool timedOut     = false;
-        auto timeoutTicks = cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(utils::time::milisecondsInSecond);
-        const auto delay  = 10;
-
-        SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
-        while (!timedOut) {
-            if ((SNVS->LPCR & SNVS_LPCR_SRTC_ENV_MASK)) {
-                break;
-            }
-            timedOut = cpp_freertos::Ticks::GetTicks() > timeoutTicks;
-            if (timedOut) {
-                LOG_ERROR("RTC init timeout");
-                return ErrorCode::Error;
-            }
-            vTaskDelay(delay);
+        if (enableLpSrtc() == ErrorCode::Error) {
+            LOG_ERROR("LP SRTC init timeout!");
+            return ErrorCode::Error;
         }
 
         SNVS_HP_RTC_TimeSynchronize(SNVS);
 
         NVIC_SetPriority(SNVS_HP_WRAPPER_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
-        // Enable at the NVIC
         NVIC_EnableIRQ(SNVS_HP_WRAPPER_IRQn);
 
-        // Start the timer
+        /* Enable HP RTC */
         SNVS_HP_RTC_StartTimer(SNVS);
+
+        printCurrentDataTime();
 
         LOG_INFO("RTC configured successfully");
         return ErrorCode::OK;
     }
 
+    ErrorCode enableLpSrtc()
+    {
+        // Enable LP SRTC
+        SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
+
+        if (isSrtcOperational()) {
+            return ErrorCode::OK;
+        }
+
+        // The LP SRTC doesn't start so reset LP registers and try again
+
+        // Dump LP/HP registers
+        logRegisters();
+
+        // Reset the LP section except SRTC and Time alarm.
+        SNVS_HP_ResetLP(SNVS);
+        // Digital low-voltage detection is always enabled and cannot be disabled. At LP POR this
+        // register is reset to all 0's, so the hardwired comparison fails and a low-voltage violation is
+        // reported. Therefore, before programming any feature in the SNVS the low-voltage
+        // violation should be cleared. The initialization software should write the proper value
+        // (4173_6166h) into LPPGDR(LPLVDR) and should then clear
+        // the low-voltage event record in the LP status register
+        constexpr std::uint32_t LvdMagicNumber = 0x41736166;
+        SNVS->LPPGDR                           = LvdMagicNumber;
+
+        // Enable again LP SRTC after resetting the LP. It is mandatory!
+        SNVS->LPCR |= SNVS_LPCR_SRTC_ENV_MASK;
+
+        if (isSrtcOperational()) {
+            LOG_INFO("LP SRTC reinit success!");
+            return ErrorCode::OK;
+        }
+
+        // Resetting LP and LVD don't help
+        // Dump registers and return an error
+        logRegisters();
+
+        return ErrorCode::Error;
+    }
+
+    void printCurrentDataTime()
+    {
+        struct tm datatime;
+        getCurrentDateTime(&datatime);
+        LOG_INFO("Startup RTC date: %04d/%02d/%02d time: %02d:%02d:%02d",
+                 1900 + datatime.tm_year,
+                 1 + datatime.tm_mon,
+                 datatime.tm_mday,
+                 datatime.tm_hour,
+                 datatime.tm_min,
+                 datatime.tm_sec);
+    }
+
     ErrorCode setDateTimeFromTimestamp(time_t timestamp)
     {
-        portENTER_CRITICAL();
-
-        SNVS_LP_SRTC_StopTimer(SNVS);
+        cpp_freertos::CriticalSection::Enter();
         SNVS_LP_SRTC_SetSeconds(SNVS, static_cast<std::uint32_t>(timestamp));
-        SNVS_LP_SRTC_StartTimer(SNVS);
         SNVS_HP_RTC_TimeSynchronize(SNVS);
-
-        portEXIT_CRITICAL();
+        cpp_freertos::CriticalSection::Exit();
 
         return ErrorCode::OK;
     }
 
     ErrorCode setDateTime(struct tm *time)
     {
-        if (time == NULL) {
+        if (time == nullptr) {
             return ErrorCode::Error;
         }
 
@@ -93,19 +159,17 @@ namespace bsp::rtc
         rtcDate.minute = time->tm_min;
         rtcDate.second = time->tm_sec;
 
-        portENTER_CRITICAL();
-        SNVS_LP_SRTC_StopTimer(SNVS);
+        cpp_freertos::CriticalSection::Enter();
         SNVS_LP_SRTC_SetDatetime(SNVS, &rtcDate);
-        SNVS_LP_SRTC_StartTimer(SNVS);
         SNVS_HP_RTC_TimeSynchronize(SNVS);
-        portEXIT_CRITICAL();
+        cpp_freertos::CriticalSection::Exit();
 
         return ErrorCode::OK;
     }
 
     ErrorCode getCurrentDateTime(struct tm *datetime)
     {
-        if (datetime == NULL) {
+        if (datetime == nullptr) {
             return ErrorCode::Error;
         }
 
@@ -125,18 +189,18 @@ namespace bsp::rtc
 
     ErrorCode getCurrentTimestamp(time_t *timestamp)
     {
-        if (timestamp == NULL) {
+        if (timestamp == nullptr) {
             return ErrorCode::Error;
         }
 
-        *timestamp = static_cast<time_t>(SNVS_HP_RTC_GetSeconds(SNVS));
+        *timestamp = static_cast<std::time_t>(SNVS_HP_RTC_GetSeconds(SNVS));
 
         return ErrorCode::OK;
     }
 
     ErrorCode setAlarmOnDate(struct tm *datetime)
     {
-        if (datetime == NULL) {
+        if (datetime == nullptr) {
             return ErrorCode::Error;
         }
 
@@ -149,10 +213,11 @@ namespace bsp::rtc
         rtcDate.minute = datetime->tm_min;
         rtcDate.second = datetime->tm_sec;
 
-        enableAlarmIrq();
-        SNVS_HP_RTC_SetAlarm(SNVS, &rtcDate);
+        if (SNVS_HP_RTC_SetAlarm(SNVS, &rtcDate) != kStatus_Success) {
+            return ErrorCode::Error;
+        }
 
-        return ErrorCode::OK;
+        return enableAlarmIrq();
     }
 
     ErrorCode setAlarmOnTimestamp(std::uint32_t secs)
@@ -161,9 +226,7 @@ namespace bsp::rtc
             return ErrorCode::Error;
         }
 
-        enableAlarmIrq();
-
-        return ErrorCode::OK;
+        return enableAlarmIrq();
     }
 
     ErrorCode setAlarmInSecondsFromNow(std::uint32_t secs)
@@ -171,18 +234,16 @@ namespace bsp::rtc
         std::uint32_t seconds = SNVS_HP_RTC_GetSeconds(SNVS);
         seconds += secs;
 
-        enableAlarmIrq();
-
         if (SNVS_HP_RTC_SetAlarmSeconds(SNVS, seconds) != kStatus_Success) {
             return ErrorCode::Error;
         }
 
-        return ErrorCode::OK;
+        return enableAlarmIrq();
     }
 
     ErrorCode getAlarmTimestamp(std::uint32_t *secs)
     {
-        if (secs == NULL) {
+        if (secs == nullptr) {
             return ErrorCode::Error;
         }
 
@@ -193,14 +254,15 @@ namespace bsp::rtc
 
     ErrorCode enableAlarmIrq()
     {
-        std::uint32_t cnt = irqTimeout;
-        SNVS->HPCR |= SNVS_HPCR_HPTA_EN_MASK;
-        while ((!(SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK)) && cnt) {
-            cnt--;
-        }
+        std::uint32_t timeout = hpTimeAlarmIrqEnableTimeout;
 
-        if (cnt == 0) {
-            return ErrorCode::Error;
+        SNVS->HPCR |= SNVS_HPCR_HPTA_EN_MASK;
+        while ((SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK) == 0) {
+            --timeout;
+            if (timeout == 0) {
+                LOG_ERROR("Failed to enable alarm IRQ!");
+                return ErrorCode::Error;
+            }
         }
 
         return ErrorCode::OK;
@@ -208,15 +270,15 @@ namespace bsp::rtc
 
     ErrorCode disableAlarmIrq()
     {
-        std::uint32_t cnt = irqTimeout;
+        std::uint32_t timeout = hpTimeAlarmIrqEnableTimeout;
 
         SNVS->HPCR &= ~SNVS_HPCR_HPTA_EN_MASK;
-        while ((SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK) && cnt) {
-            cnt--;
-        }
-
-        if (cnt == 0) {
-            return ErrorCode::Error;
+        while ((SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK) != 0) {
+            --timeout;
+            if (timeout == 0) {
+                LOG_ERROR("Failed to disable alarm IRQ!");
+                return ErrorCode::Error;
+            }
         }
 
         return ErrorCode::OK;
@@ -236,7 +298,7 @@ namespace bsp::rtc
 
     ErrorCode setMinuteAlarm(time_t timestamp)
     {
-        std::uint32_t secondsToMinute = 60 - (timestamp % 60);
+        const auto secondsToMinute = 60 - (timestamp % 60);
 
         struct tm date
         {};

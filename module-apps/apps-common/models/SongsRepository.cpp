@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SongsRepository.hpp"
@@ -56,33 +56,23 @@ namespace app::music
         task->execute(application, this);
     }
 
-    void SongsRepository::getMusicFilesList(std::uint32_t offset,
-                                            std::uint32_t limit,
+    void SongsRepository::getMusicFilesList(const std::uint32_t offset,
+                                            const std::uint32_t limit,
                                             const OnGetMusicFilesListCallback &callback)
     {
-        auto query = std::make_unique<db::multimedia_files::query::GetLimitedByPaths>(pathPrefixes, offset, limit);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::MultimediaFiles);
+        musicFilesViewCache.records.clear();
+        getMusicFilesList(pathPrefixes, offset, limit, callback);
+    }
 
-        task->setCallback([this, callback, offset](auto response) {
-            auto result = dynamic_cast<db::multimedia_files::query::GetLimitedResult *>(response);
-            musicFilesViewCache.records.clear();
+    void SongsRepository::getMusicFilesListByPaths(const std::uint32_t offset,
+                                                   const std::uint32_t limit,
+                                                   const OnGetMusicFilesListCallback &callback)
+    {
 
-            if (result == nullptr) {
-                return false;
-            }
-
-            for (auto &record : result->getResult()) {
-                musicFilesViewCache.records.push_back(record);
-            }
-            musicFilesViewCache.recordsOffset = offset;
-            musicFilesViewCache.recordsCount  = result->getCount();
-
-            if (callback) {
-                callback(musicFilesViewCache.records, musicFilesViewCache.recordsCount);
-            }
-            return true;
-        });
-        task->execute(application, this);
+        musicFilesViewCache.records.clear();
+        for (const auto &pathPrefix : pathPrefixes) {
+            getMusicFilesList({pathPrefix}, offset, limit, callback);
+        }
     }
 
     std::size_t SongsRepository::getCachedFileIndex(const std::string &filePath) const
@@ -270,4 +260,32 @@ namespace app::music
         return getCachedViewEntryByFilePath(filePath);
     }
 
+    void SongsRepository::getMusicFilesList(const std::vector<std::string> &paths,
+                                            const std::uint32_t offset,
+                                            const std::uint32_t limit,
+                                            const OnGetMusicFilesListCallback &callback)
+    {
+
+        auto taskCallback = [this, callback, offset](auto response) {
+            auto result = dynamic_cast<db::multimedia_files::query::GetLimitedResult *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            for (auto &record : result->getResult()) {
+                musicFilesViewCache.records.push_back(record);
+            }
+            musicFilesViewCache.recordsOffset = offset;
+            musicFilesViewCache.recordsCount  = result->getCount();
+
+            if (callback) {
+                callback(musicFilesViewCache.records, musicFilesViewCache.recordsCount);
+            }
+            return true;
+        };
+        auto query = std::make_unique<db::multimedia_files::query::GetLimitedByPaths>(
+            std::vector<std::string>{paths}, offset, limit);
+        auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::MultimediaFiles);
+        task->setCallback(taskCallback);
+        task->execute(application, this);
+    }
 } // namespace app::music

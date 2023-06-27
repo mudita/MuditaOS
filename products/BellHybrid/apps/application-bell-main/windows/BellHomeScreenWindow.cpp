@@ -190,4 +190,12 @@ namespace gui
         return false;
     }
 
+    void BellHomeScreenWindow::setUSBStatusConnected()
+    {
+        if (currentLayout) {
+            currentLayout->setUSBStatusConnected();
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+    }
+
 } // namespace gui

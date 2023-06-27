@@ -35,6 +35,8 @@
 #include <string.h>
 #include "fsl_mmc.h"
 
+#include <log/log.hpp>
+
 /*******************************************************************************
  * Definitons
  ******************************************************************************/
@@ -1621,20 +1623,21 @@ static void MMC_DecodeCid(mmc_card_t *card, uint32_t *rawCid)
 
     cid                 = &(card->cid);
     cid->manufacturerID = (uint8_t)((rawCid[3U] & 0xFF000000U) >> 24U);
-    cid->applicationID  = (uint16_t)((rawCid[3U] & 0xFFFF00U) >> 8U);
+    cid->applicationID  = (uint16_t)((rawCid[3U] & 0x00FFFF00U) >> 8U);
 
-    cid->productName[0U] = (uint8_t)((rawCid[3U] & 0xFFU));
+    cid->productName[0U] = (uint8_t)((rawCid[3U] & 0x000000FFU));
     cid->productName[1U] = (uint8_t)((rawCid[2U] & 0xFF000000U) >> 24U);
-    cid->productName[2U] = (uint8_t)((rawCid[2U] & 0xFF0000U) >> 16U);
-    cid->productName[3U] = (uint8_t)((rawCid[2U] & 0xFF00U) >> 8U);
-    cid->productName[4U] = (uint8_t)((rawCid[2U] & 0xFFU));
+    cid->productName[2U] = (uint8_t)((rawCid[2U] & 0x00FF0000U) >> 16U);
+    cid->productName[3U] = (uint8_t)((rawCid[2U] & 0x0000FF00U) >> 8U);
+    cid->productName[4U] = (uint8_t)((rawCid[2U] & 0x000000FFU));
+    cid->productName[5U] = (uint8_t)((rawCid[1U] & 0xFF000000U) >> 24U);
 
-    cid->productVersion = (uint8_t)((rawCid[1U] & 0xFF000000U) >> 24U);
+    cid->productVersion = (uint8_t)((rawCid[1U] & 0x00FF0000U) >> 16U);
 
-    cid->productSerialNumber = (uint32_t)((rawCid[1U] & 0xFFFFFFU) << 8U);
-    cid->productSerialNumber |= (uint32_t)((rawCid[0U] & 0xFF000000U) >> 24U);
+    cid->productSerialNumber = (uint32_t)((rawCid[1U] & 0x0000FFFFU) << 16U);
+    cid->productSerialNumber |= (uint32_t)((rawCid[0U] & 0xFFFF0000U) >> 16U);
 
-    cid->manufacturerData = (uint16_t)((rawCid[0U] & 0xFFF00U) >> 8U);
+    cid->manufacturerData = (uint8_t)((rawCid[0U] & 0x0000FF00U) >> 8U);
 }
 
 static status_t MMC_AllSendCid(mmc_card_t *card)
@@ -2145,11 +2148,14 @@ status_t MMC_ReadBlocks(mmc_card_t *card, uint8_t *buffer, uint32_t startBlock, 
     assert(buffer);
     assert(blockCount);
 
+    const uint8_t maxAttempts = 5;
     uint32_t blockCountOneTime; /* The block count can be erased in one time sending READ_BLOCKS command. */
     uint32_t blockDone;         /* The blocks has been read. */
     uint32_t blockLeft;         /* Left blocks to be read. */
     uint8_t *nextBuffer;
     bool dataAddrAlign = true;
+    bool errorOccured  = false;
+    bool isWriteOk     = false;
 
     blockLeft = blockCount;
     blockDone = 0U;
@@ -2176,11 +2182,37 @@ status_t MMC_ReadBlocks(mmc_card_t *card, uint8_t *buffer, uint32_t startBlock, 
             }
         }
 
-        if (kStatus_Success != MMC_Read(card,
-                                        dataAddrAlign ? nextBuffer : (uint8_t *)g_sdmmc,
-                                        (startBlock + blockDone),
-                                        FSL_SDMMC_DEFAULT_BLOCK_SIZE,
-                                        blockCountOneTime)) {
+        for (uint8_t i = 0; i < maxAttempts; i++)
+        {
+            if (errorOccured) 
+            {
+                if (MMC_Init(card) == kStatus_Success)
+                {
+                    LOG_ERROR("MMC reinit OK\n");
+                    errorOccured = false;
+                }
+                else
+                {
+                    LOG_ERROR("MMC reinit error\n");
+                    continue;
+                } 
+            }
+
+            if (kStatus_Success != MMC_Read(card, dataAddrAlign ? nextBuffer : (uint8_t *)g_sdmmc, (startBlock + blockDone),
+                                        FSL_SDMMC_DEFAULT_BLOCK_SIZE, blockCountOneTime))
+            {
+                LOG_ERROR("MMC_Read transfer failed\n");
+                errorOccured = true;
+            }
+            else
+            {
+                isWriteOk = true;
+                break;
+            }
+        }
+
+        if (!isWriteOk) 
+        {
             return kStatus_SDMMC_TransferFailed;
         }
 
@@ -2200,11 +2232,14 @@ status_t MMC_WriteBlocks(mmc_card_t *card, const uint8_t *buffer, uint32_t start
     assert(buffer);
     assert(blockCount);
 
+    const uint8_t maxAttempts = 5;
     uint32_t blockCountOneTime;
     uint32_t blockLeft;
     uint32_t blockDone;
     const uint8_t *nextBuffer;
     bool dataAddrAlign = true;
+    bool errorOccured  = false;
+    bool isWriteOk     = false;
 
     blockLeft = blockCount;
     blockDone = 0U;
@@ -2232,13 +2267,40 @@ status_t MMC_WriteBlocks(mmc_card_t *card, const uint8_t *buffer, uint32_t start
             }
         }
 
-        if (kStatus_Success != MMC_Write(card,
-                                         dataAddrAlign ? nextBuffer : (uint8_t *)g_sdmmc,
-                                         (startBlock + blockDone),
-                                         FSL_SDMMC_DEFAULT_BLOCK_SIZE,
-                                         blockCountOneTime)) {
+        for (uint8_t i = 0; i < maxAttempts; i++)
+        {
+            if (errorOccured) 
+            {
+                if (MMC_Init(card) == kStatus_Success)
+                {
+                    LOG_ERROR("MMC reinit OK\n");
+                    errorOccured = false;
+                }
+                else
+                {
+                    LOG_ERROR("MMC reinit error\n");
+                    continue;
+                } 
+            }
+
+            if (kStatus_Success != MMC_Write(card, dataAddrAlign ? nextBuffer : (uint8_t *)g_sdmmc,
+                                            (startBlock + blockDone), FSL_SDMMC_DEFAULT_BLOCK_SIZE, blockCountOneTime))
+            {
+                LOG_ERROR("MMC_Write transfer failed\n");
+                errorOccured = true;
+            }
+            else
+            {
+                isWriteOk = true;
+                break;
+            }
+        }
+
+        if (!isWriteOk) 
+        {
             return kStatus_SDMMC_TransferFailed;
         }
+
 
         blockDone += blockCountOneTime;
         if (!card->noInteralAlign) {
