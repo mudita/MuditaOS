@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallNotificationPolicy.hpp"
@@ -13,7 +13,6 @@ void CallNotificationPolicy::updateCurrentCall(sys::phone_modes::PhoneMode phone
 
     switch (phoneMode) {
     case sys::phone_modes::PhoneMode::Uninitialized:
-        [[fallthrough]];
     case sys::phone_modes::PhoneMode::Connected:
         popupOn    = true;
         ringtoneOn = true;

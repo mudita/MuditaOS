@@ -1,44 +1,46 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/magnetometer/magnetometer.hpp"
 
-static xQueueHandle qHandleIrq = NULL;
-
-namespace bsp
+namespace
 {
+    constexpr auto offlineSliderPosition = bsp::KeyCodes::SSwitchDown;
+    xQueueHandle qHandleIrq              = nullptr;
 
-    namespace magnetometer
+    void requestReadout()
     {
-
-        int32_t init(xQueueHandle qHandle)
-        {
-
-            qHandleIrq = qHandle;
-            return 1;
+        if (qHandleIrq == nullptr) {
+            return;
         }
 
-        void deinit()
-        {}
+        std::uint8_t val = 0x01;
+        xQueueSend(qHandleIrq, &val, 0);
+    }
+} // namespace
 
-        bool isPresent(void)
-        {
-            return false;
-        }
+namespace bsp::magnetometer
+{
+    std::int32_t init(xQueueHandle qHandle)
+    {
+        qHandleIrq = qHandle;
+        requestReadout();
+        return 0;
+    }
 
-        bsp::Board GetBoard(void)
-        {
-            return bsp::Board::Linux;
-        }
+    void deinit()
+    {}
 
-        std::optional<bsp::KeyCodes> WorkerEventHandler()
-        {
-            return std::nullopt;
-        }
+    bool isPresent()
+    {
+        return false;
+    }
 
-        void enableIRQ()
-        {}
-        void resetCurrentParsedValue()
-        {}
-    } // namespace magnetometer
-} // namespace bsp
+    std::optional<bsp::KeyCodes> WorkerEventHandler()
+    {
+        return offlineSliderPosition;
+    }
+
+    void resetCurrentParsedValue()
+    {}
+} // namespace bsp::magnetometer
