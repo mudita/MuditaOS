@@ -1,9 +1,8 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneMode.hpp"
 
-#include <log/log.hpp>
 #include <i18n/i18n.hpp>
 
 #include "Item.hpp"
@@ -32,7 +31,6 @@ namespace gui::status_bar
             break;
 
         case sys::phone_modes::PhoneMode::Uninitialized:
-            [[fallthrough]];
         case sys::phone_modes::PhoneMode::Connected:
             setText("");
             break;
