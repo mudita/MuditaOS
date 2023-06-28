@@ -69,6 +69,8 @@ namespace app::manager
     {
         ApplicationManagerCommon::registerMessageHandlers();
 
+        bus.channels.push_back(sys::BusChannel::AlarmNotifications);
+
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(StartIdleTimerMessage), [this](sys::Message *request) {
             handleStartIdleTimer(request);
