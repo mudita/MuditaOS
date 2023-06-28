@@ -6,7 +6,7 @@
 * Added input mode selection display timeout
 * Added MMI/USSD code confirmation
 * Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
-* Added translations for Bluetooth conenction status label
+* Added translations for Bluetooth connection status label
 * Added WCDMA recognition as 3G in status bar
 * Added extended information to crashdump filename
 * Added extended information to log filename
@@ -49,6 +49,7 @@
 * Fixed autofill data during adding previously deleted phone number from dialing window
 * Fixed redirection to dial number view by pressing BACK from add new number view
 * Fixed occasional USB crash when USB cable was disconnected during files upload
+* Fixed unsupported character in several quotes
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved
