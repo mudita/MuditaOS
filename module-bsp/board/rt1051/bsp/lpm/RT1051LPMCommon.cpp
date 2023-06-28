@@ -135,7 +135,7 @@ namespace bsp
         currentFrequency = freq;
     }
 
-    uint32_t RT1051LPMCommon::GetCpuFrequency() const noexcept
+    std::uint32_t RT1051LPMCommon::GetCpuFrequency() const noexcept
     {
         return CLOCK_GetCpuClkFreq();
     }
