@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -97,15 +97,15 @@ namespace gui
         [[nodiscard]] auto getSizeMinusPadding(Axis axis, Area val) -> Length;
         auto applyParentSizeRestrictions() -> void;
         auto calculateAndRequestSize() -> void;
-        auto makePreDrawLines(uint32_t utfVal) -> std::unique_ptr<Lines>;
+        auto makePreDrawLines(std::uint32_t utfVal) -> std::unique_ptr<Lines>;
         auto makePreDrawLines(const TextBlock &textBlock) -> std::unique_ptr<Lines>;
 
         auto checkMaxSignsLimit(unsigned int limitVal) -> AdditionBound;
         auto checkMaxSignsLimit(const TextBlock &textBlock, unsigned int limitVal)
             -> std::tuple<AdditionBound, TextBlock>;
-        auto checkMaxSizeLimit(uint32_t utfVal) -> AdditionBound;
+        auto checkMaxSizeLimit(std::uint32_t utfVal) -> AdditionBound;
         auto checkMaxSizeLimit(const TextBlock &textBlock) -> std::tuple<AdditionBound, TextBlock>;
-        auto checkMaxLinesLimit(uint32_t utfVal, unsigned int limitVal) -> AdditionBound;
+        auto checkMaxLinesLimit(std::uint32_t utfVal, unsigned int limitVal) -> AdditionBound;
         auto checkMaxLinesLimit(const TextBlock &textBlock, unsigned int limitVal)
             -> std::tuple<AdditionBound, TextBlock>;
 
@@ -119,12 +119,12 @@ namespace gui
       public:
         Text();
         Text(Item *parent,
-             const uint32_t &x     = 0,
-             const uint32_t &y     = 0,
-             const uint32_t &w     = 0,
-             const uint32_t &h     = 0,
-             ExpandMode expandMode = ExpandMode::None,
-             TextType textType     = TextType::MultiLine);
+             const std::uint32_t &x = 0,
+             const std::uint32_t &y = 0,
+             const std::uint32_t &w = 0,
+             const std::uint32_t &h = 0,
+             ExpandMode expandMode  = ExpandMode::None,
+             TextType textType      = TextType::MultiLine);
         ~Text() override;
 
         void setEditMode(EditMode mode);
@@ -134,13 +134,13 @@ namespace gui
         void setTextLimitType(TextLimitType limitType, unsigned int val = 0);
         void clearTextLimits();
         void drawUnderline(bool val);
-        size_t getScrollLeap() const
+        std::size_t getScrollStep() const noexcept
         {
-            return scrollLeap;
+            return scrollStep;
         }
-        void setScrollLeap(size_t leap)
+        void setScrollStep(std::size_t step) noexcept
         {
-            scrollLeap = leap;
+            scrollStep = step;
         }
 
         TextBackup backupText() const;
@@ -190,7 +190,9 @@ namespace gui
 
       private:
         gui::KeyInputMappedTranslation translator;
-        size_t scrollLeap = 1;
+
+        /// Default scroll step is one line
+        std::size_t scrollStep = 1;
 
       public:
         /// Callback when text changed
@@ -200,12 +202,12 @@ namespace gui
 
         TextChangedCallback textChangedCallback;
 
-        auto checkAdditionBounds(uint32_t utfVal) -> AdditionBound;
+        auto checkAdditionBounds(std::uint32_t utfVal) -> AdditionBound;
         auto checkAdditionBounds(const TextBlock &textBlock) -> std::tuple<AdditionBound, TextBlock>;
 
         auto setCursorStartPosition(CursorStartPosition val) -> void;
 
-        bool addChar(uint32_t utf8);
+        bool addChar(std::uint32_t utf8);
         bool removeChar();
         void onTextChanged();
         void setTextChangedCallback(TextChangedCallback &&callback);

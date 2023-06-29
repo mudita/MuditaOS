@@ -34,10 +34,10 @@ namespace gui
     }
 
     Text::Text(Item *parent,
-               const uint32_t &x,
-               const uint32_t &y,
-               const uint32_t &w,
-               const uint32_t &h,
+               const std::uint32_t &x,
+               const std::uint32_t &y,
+               const std::uint32_t &w,
+               const std::uint32_t &h,
                ExpandMode expandMode,
                TextType textType)
         : Rect(parent, x, y, w, h), expandMode{expandMode}, textType{textType},
@@ -591,21 +591,25 @@ namespace gui
                 return false;
             }
 
-            auto scroll_ = [this](auto activity) {
-                bool notAtEdge = true;
-                for (size_t ii = 0; ii < scrollLeap && notAtEdge; ++ii) {
-                    notAtEdge &= activity();
+            const auto applyMultilineScrolling = [this](const auto scrollFn) {
+                std::size_t scrollStepsPerformed;
+                for (scrollStepsPerformed = 0; scrollStepsPerformed < scrollStep; ++scrollStepsPerformed) {
+                    const auto atTextEnd = !scrollFn();
+                    if (atTextEnd) {
+                        break;
+                    }
                 }
-                return notAtEdge;
+                return (scrollStepsPerformed != 0);
             };
-            auto cursor_ = static_cast<TextLinesCursor *>(cursor);
 
-            if (inputEvent.is(KeyCode::KEY_DOWN)) {
-                return scroll_(std::bind(&TextLinesCursor::displayNextLine, cursor_));
-            }
+            const auto textLinesCursor = static_cast<TextLinesCursor *>(cursor);
 
             if (inputEvent.is(KeyCode::KEY_UP)) {
-                return scroll_(std::bind(&TextLinesCursor::displayPreviousLine, cursor_));
+                return applyMultilineScrolling(std::bind(&TextLinesCursor::displayPreviousLine, textLinesCursor));
+            }
+
+            if (inputEvent.is(KeyCode::KEY_DOWN)) {
+                return applyMultilineScrolling(std::bind(&TextLinesCursor::displayNextLine, textLinesCursor));
             }
         }
 
@@ -722,7 +726,7 @@ namespace gui
         return false;
     }
 
-    auto Text::makePreDrawLines(const uint32_t utfVal) -> std::unique_ptr<Lines>
+    auto Text::makePreDrawLines(const std::uint32_t utfVal) -> std::unique_ptr<Lines>
     {
         auto preDrawLines = std::make_unique<Lines>(this);
         auto documentCopy = *cursor->getDocument();
@@ -793,7 +797,7 @@ namespace gui
         }
     }
 
-    auto Text::checkMaxSizeLimit(uint32_t utfVal) -> AdditionBound
+    auto Text::checkMaxSizeLimit(std::uint32_t utfVal) -> AdditionBound
     {
         auto returnValue = AdditionBound::CanAddAll;
 
@@ -870,7 +874,7 @@ namespace gui
         return {AdditionBound::CanAddAll, textBlock};
     }
 
-    auto Text::checkMaxLinesLimit(uint32_t utfVal, unsigned int limitVal) -> AdditionBound
+    auto Text::checkMaxLinesLimit(std::uint32_t utfVal, unsigned int limitVal) -> AdditionBound
     {
         auto returnValue = AdditionBound::CanAddAll;
 
@@ -947,7 +951,7 @@ namespace gui
         return {AdditionBound::CanAddAll, textBlock};
     }
 
-    auto Text::checkAdditionBounds(const uint32_t utfVal) -> AdditionBound
+    auto Text::checkAdditionBounds(const std::uint32_t utfVal) -> AdditionBound
     {
         auto returnValue = AdditionBound::CanAddAll;
 
@@ -1009,7 +1013,7 @@ namespace gui
         return {std::get<0>(returnValue), shortestProcessedBlock};
     }
 
-    bool Text::addChar(uint32_t utf_value)
+    bool Text::addChar(std::uint32_t utf_value)
     {
         cursor->addChar(utf_value);
         auto block = document->getBlock(cursor);
