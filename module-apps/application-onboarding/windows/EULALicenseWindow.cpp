@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EULALicenseWindow.hpp"
@@ -52,7 +52,7 @@ namespace app::onBoarding
         eulaText->setPenWidth(::style::window::default_border_rect_no_focus);
         eulaText->setEditMode(gui::EditMode::Scroll);
         eulaText->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
-        eulaText->setScrollLeap(4);
+        eulaText->setScrollStep(4);
 
         navBar->setActive(gui::nav_bar::Side::Left, true);
 
