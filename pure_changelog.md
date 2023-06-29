@@ -5,7 +5,6 @@
 ### Added
 * Added input mode selection display timeout
 * Added MMI/USSD code confirmation
-* Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
 * Added translations for Bluetooth conenction status label
 * Added WCDMA recognition as 3G in status bar
 

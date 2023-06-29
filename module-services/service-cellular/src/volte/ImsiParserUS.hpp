@@ -3,16 +3,13 @@
 
 #pragma once
 
-#include "ImsiParser.hpp"
+#include "ImsiParserInterface.hpp"
 
 namespace cellular::service
 {
-    ;
-
-    struct ImsiParserAT : ImsiParser
+    class ImsiParserUS : public ImsiParserInteface
     {
-        explicit ImsiParserAT()
-            : ImsiParser(std::vector<std::string>{"23201", "23203", "23213", "23205", "23210", "23207", "23208"})
-        {}
+      public:
+        auto parse(const std::string &imsi) -> std::optional<OperatorInfo> final;
     };
 } // namespace cellular::service
