@@ -244,17 +244,37 @@ void BSP_EinkDeinit(void)
         bsp_eink_TransferComplete = NULL;
     }
 
-    pll.reset();
+    if (pll != nullptr) {
+        pll.reset();
+    }
+    else {
+        LOG_ERROR("No pll!");
+    }
 
-    dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_TX_DMA_CHANNEL));
-    dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_RX_DMA_CHANNEL));
+    if (dmamux != nullptr) {
+        dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_TX_DMA_CHANNEL));
+        dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_RX_DMA_CHANNEL));
+        dmamux.reset();
+    }
+    else {
+        LOG_ERROR("No dmamux!");
+    }
 
-    dma.reset();
-    dmamux.reset();
+    if (dma != nullptr) {
+        dma.reset();
+    }
+    else {
+        LOG_ERROR("No dma!");
+    }
 
-    gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
-    gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
-    gpio.reset();
+    if (gpio != nullptr) {
+        gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
+        gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
+        gpio.reset();
+    }
+    else {
+        LOG_ERROR("No gpio!");
+    }
 }
 
 void BSP_EinkLogicPowerOn()
@@ -297,8 +317,8 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
     }
 
     const uint8_t loopCnt = (len / (DMA_MAX_SINGLE_TRANSACTION_PAYLOAD + 1)) + 1;
-    uint32_t frameSize = 0;
-    uint32_t bytesSent = 0;
+    uint32_t frameSize    = 0;
+    uint32_t bytesSent    = 0;
 
     // Increase the SPI frequency to the SPI WRITE value
     BSP_EinkChangeSpiFrequency(BSP_EINK_TRANSFER_WRITE_CLOCK);
