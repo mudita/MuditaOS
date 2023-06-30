@@ -263,7 +263,11 @@ namespace hal::eink
 
     EinkStatus EinkDisplay::shutdown()
     {
-        return translateStatus(EinkPowerDown());
+        const auto status = translateStatus(EinkPowerDown());
+        if (driverLPSPI) {
+            driverLPSPI->Disable();
+        }
+        return status;
     }
 
     void EinkDisplay::wipeOut()
