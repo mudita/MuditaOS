@@ -515,8 +515,8 @@ namespace cellular::internal
             return std::nullopt;
         };
 
-        csqHandler->onPropagateCSQ = [this](uint32_t csq) {
-            SignalStrength signalStrength(static_cast<int>(csq));
+        csqHandler->onPropagateCSQ = [this](std::uint32_t csq) {
+            const SignalStrength signalStrength(static_cast<int>(csq));
             Store::GSM::get()->setSignalStrength(signalStrength.data);
             auto message = std::make_shared<cellular::SignalStrengthUpdateNotification>("");
             owner->bus.sendMulticast(message, sys::BusChannel::ServiceCellularNotifications);
@@ -555,36 +555,43 @@ namespace cellular::internal
     void ServiceCellularPriv::initUSSDHandler()
     {
         ussdHandler->onOpenPushSession = [this]() -> bool {
-            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+            const auto &channel = owner->cmux->get(CellularMux::Channel::Commands);
             if (channel == nullptr) {
                 LOG_ERROR("No cmux channel provided!");
                 return false;
             }
-            auto result = channel->cmd(at::AT::CUSD_OPEN_SESSION);
+            const auto &result = channel->cmd(at::AT::CUSD_OPEN_SESSION);
             return result.code == at::Result::Code::OK;
         };
 
-        ussdHandler->onAbortSession = [this]() -> bool {
-            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+        ussdHandler->onAbortSession = [this](bool ussdSessionTimeout) -> bool {
+            const auto &channel = owner->cmux->get(CellularMux::Channel::Commands);
             if (channel == nullptr) {
                 LOG_ERROR("No cmux channel provided!");
                 return false;
             }
-            auto result = channel->cmd(at::AT::CUSD_CLOSE_SESSION);
+
+            if (ussdSessionTimeout) {
+                auto msg =
+                    std::make_shared<cellular::MMIResultMessage>(mmiactions::MMIResultParams::MMIResult::Timeout);
+                owner->bus.sendUnicast(std::move(msg), ::service::name::appmgr);
+            }
+
+            const auto &result = channel->cmd(at::AT::CUSD_CLOSE_SESSION);
             return result.code == at::Result::Code::OK;
         };
 
         ussdHandler->onSendUssdCode = [this](const std::string &request) -> bool {
             const std::string commandDcs(",15");
-            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+            const auto &channel = owner->cmux->get(CellularMux::Channel::Commands);
             if (channel == nullptr) {
                 LOG_ERROR("No cmux channel provided!");
                 return false;
             }
 
             channel->cmd(at::AT::SMS_GSM);
-            std::string command = at::factory(at::AT::CUSD_SEND) + request + commandDcs;
-            const auto result   = channel->cmd(command, std::chrono::seconds(120));
+            const auto &command = at::factory(at::AT::CUSD_SEND) + request + commandDcs;
+            const auto &result  = channel->cmd(command, std::chrono::seconds(120));
             if (result.code == at::Result::Code::OK) {
                 owner->bus.sendUnicast(std::make_shared<cellular::MMIConfirmationMessage>(), ::service::name::appmgr);
                 return true;
@@ -683,5 +690,4 @@ namespace cellular::internal
         simContacts->setChannel(nullptr);
         imeiGetHandler->setChannel(nullptr);
     }
-
 } // namespace cellular::internal

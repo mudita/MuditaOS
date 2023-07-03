@@ -19,18 +19,18 @@ namespace style::desktop
 {
     namespace text
     {
-        constexpr uint32_t x = 30;
-        constexpr uint32_t y = 120;
-        constexpr uint32_t w = 440;
-        constexpr uint32_t h = 320;
+        constexpr std::uint32_t x = 30;
+        constexpr std::uint32_t y = 120;
+        constexpr std::uint32_t w = 440;
+        constexpr std::uint32_t h = 320;
     } // namespace text
 
     namespace inputWidget
     {
-        constexpr uint32_t x = 30;
-        constexpr uint32_t y = 450;
-        constexpr uint32_t w = 450;
-        constexpr uint32_t h = 50;
+        constexpr std::uint32_t x = 30;
+        constexpr std::uint32_t y = 450;
+        constexpr std::uint32_t w = 450;
+        constexpr std::uint32_t h = 50;
     } // namespace inputWidget
 
 } // namespace style::desktop

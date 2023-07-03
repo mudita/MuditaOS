@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Mmi.hpp"
@@ -17,17 +17,17 @@ namespace style::desktop
 {
     namespace image
     {
-        constexpr uint32_t x = 176;
-        constexpr uint32_t y = 135;
+        constexpr std::uint32_t x = 176;
+        constexpr std::uint32_t y = 135;
     } // namespace image
+
     namespace text
     {
-        constexpr uint32_t x = 40;
-        constexpr uint32_t y = 300;
-        constexpr uint32_t w = 400;
-        constexpr uint32_t h = 300;
+        constexpr std::uint32_t x = 40;
+        constexpr std::uint32_t y = 300;
+        constexpr std::uint32_t w = 400;
+        constexpr std::uint32_t h = 300;
     } // namespace text
-
 } // namespace style::desktop
 
 MmiPushWindow::MmiPushWindow(app::ApplicationCommon *app, const std::string &name) : gui::AppWindow(app, name)
@@ -46,9 +46,9 @@ MmiPushWindow::MmiPushWindow(app::ApplicationCommon *app, const std::string &nam
     setTitle(utils::translate("app_desktop_info"));
 }
 
-void MmiPushWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+void MmiPushWindow::onBeforeShow([[maybe_unused]] ShowMode mode, SwitchData *data)
 {
-    if (auto metadata = dynamic_cast<app::manager::actions::MMIParams *>(data); metadata != nullptr) {
+    if (const auto metadata = dynamic_cast<app::manager::actions::MMIParams *>(data); metadata != nullptr) {
         icon->text->setText(mmi::removePhrase(metadata->getData(), "\r"));
     }
 }
@@ -61,13 +61,20 @@ bool MmiPushWindow::onInput(const InputEvent &inputEvent)
             application->switchWindow(app::window::name::desktop_main_window);
             return true;
         }
-        case KeyCode::KEY_RF: {
+
+        case KeyCode::KEY_RF:
             return true;
-        }
+
         default:
             break;
         }
     }
+
+    /* Prevent leaving the window by long RF press */
+    if (inputEvent.isLongRelease() && inputEvent.getKeyCode() == KeyCode::KEY_RF) {
+        return true;
+    }
+
     return AppWindow::onInput(inputEvent);
 }
 

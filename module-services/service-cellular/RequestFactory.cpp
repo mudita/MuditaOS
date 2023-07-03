@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/RequestFactory.hpp"
@@ -28,17 +28,19 @@ namespace cellular
                                    bool simInserted)
         : request(data), channel(channel), callMode(callMode), simInserted(simInserted)
     {
-        registerRequest(ImeiRegex, ImeiRequest::create);
+        registerRequest(ImeiRegex, ImeiRequest::create, SimRequirement::NotRequired);
         registerRequest(PasswordRegistrationRegex, PasswordRegistrationRequest::create);
         registerRequest(PinChangeRegex, PinChangeRequest::create);
         registerRequest(SupplementaryServicesRegex, SupplementaryServicesRequest::create);
-        /*It have to be last check due to 3GPP TS 22.030*/
+        /* It has to be last check due to 3GPP TS 22.030 */
         registerRequest(UssdRegex, UssdRequest::create);
     }
 
-    void RequestFactory::registerRequest(std::string regex, CreateCallback callback)
+    void RequestFactory::registerRequest(const std::string &regex,
+                                         const CreateCallback &callback,
+                                         SimRequirement simRequirement)
     {
-        requestMap.emplace_back(std::make_pair(regex, callback));
+        requestMap.emplace_back(std::make_tuple(regex, callback, simRequirement));
     }
 
     std::unique_ptr<IRequest> RequestFactory::emergencyCheck()
@@ -58,9 +60,7 @@ namespace cellular
             if (simInserted || isNoSimEmergency) {
                 return std::make_unique<CallRequest>(request);
             }
-            else {
-                return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
-            }
+            return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
         }
         else if (callMode == cellular::api::CallMode::Emergency) {
             return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NotAnEmergencyNumber, request);
@@ -70,7 +70,7 @@ namespace cellular
 
     bool RequestFactory::isConnectedToNetwork()
     {
-        at::Cmd buildCmd = at::factory(at::AT::COPS) + "?";
+        const at::Cmd buildCmd = at::factory(at::AT::COPS) + "?";
         auto resp        = channel.cmd(buildCmd);
         at::response::cops::CurrentOperatorInfo ret;
         if ((resp.code == at::Result::Code::OK) && (at::response::parseCOPS(resp, ret))) {
@@ -81,7 +81,7 @@ namespace cellular
 
     std::unique_ptr<IRequest> RequestFactory::create()
     {
-        if (auto req = emergencyCheck(); req) {
+        if (auto req = emergencyCheck(); req != nullptr) {
             return req;
         }
 
@@ -91,14 +91,14 @@ namespace cellular
         std::vector<std::string> results;
 
         for (const auto &element : requestMap) {
-            auto const &requestCreateCallback = element.second;
-            re2::StringPiece input(request);
-            re2::RE2 reg(element.first);
+            const auto [regex, requestCreateCallback, simRequirement] = element;
+            const re2::StringPiece input(request);
+            const re2::RE2 reg(regex);
 
             std::vector<RE2::Arg> reArguments;
             std::vector<RE2::Arg *> reArgumentPtrs;
 
-            std::size_t numberOfGroups = reg.NumberOfCapturingGroups();
+            const std::size_t numberOfGroups = reg.NumberOfCapturingGroups();
 
             if (numberOfGroups > matchPack.size()) {
                 LOG_ERROR("Internal error, GroupMatch has to be redefined.");
@@ -116,14 +116,18 @@ namespace cellular
                 reArgumentPtrs[i] = &reArguments[i];
             }
 
-            if (re2::RE2::FullMatchN(input, reg, reArgumentPtrs.data(), numberOfGroups)) {
+            if (re2::RE2::FullMatchN(input, reg, reArgumentPtrs.data(), static_cast<int>(numberOfGroups))) {
+                if ((simRequirement == SimRequirement::Required) && !simInserted) {
+                    return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
+                }
+
                 try {
                     if (auto req = requestCreateCallback(request, matchPack)) {
                         return req;
                     }
                 }
                 catch (const std::runtime_error &except) {
-                    LOG_ERROR("Failed to create MMI request. Error message:\n%s", except.what());
+                    LOG_ERROR("Failed to create MMI request. Error message: %s", except.what());
                 }
             }
         }
@@ -131,11 +135,12 @@ namespace cellular
         if (!simInserted) {
             return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
         }
-        auto isRegisteredToNetwork = isConnectedToNetwork();
+
+        const auto isRegisteredToNetwork = isConnectedToNetwork();
         if (!isRegisteredToNetwork) {
             return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoNetworkConnection, request);
         }
+
         return std::make_unique<CallRequest>(request);
     }
-
 } // namespace cellular

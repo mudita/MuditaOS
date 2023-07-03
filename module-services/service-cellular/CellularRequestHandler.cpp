@@ -87,7 +87,7 @@ void CellularRequestHandler::handle(cellular::RejectRequest &request, at::Result
         cellular.bus.sendUnicast(message, service::name::appmgr);
     }
     else if (request.getRejectReason() == cellular::RejectRequest::RejectReason::NoNetworkConnection) {
-        auto message = std::make_shared<cellular::NoNetworkConenctionNotification>();
+        auto message = std::make_shared<cellular::NoNetworkConnectionNotification>();
         cellular.bus.sendUnicast(message, service::name::appmgr);
     }
     request.setHandled(true);
@@ -121,7 +121,7 @@ void CellularRequestHandler::handle(cellular::ClirRequest &request, at::Result &
     using namespace at::response;
     auto requestHandled = request.checkModemResponse(result);
 
-    std::shared_ptr<MMICustomResultParams> response = std::make_shared<MMIClirResult>();
+    const auto response = std::make_shared<MMIClirResult>();
     if (requestHandled) {
         auto procedureType = request.getProcedureType();
         if (procedureType == SupplementaryServicesRequest::ProcedureType::Activation) {

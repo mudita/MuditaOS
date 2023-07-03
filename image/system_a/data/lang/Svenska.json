@@ -120,6 +120,8 @@
     "app_desktop_info_mmi_registration_success": "Registrering lyckades",
     "app_desktop_info_mmi_result_failed": "Misslyckades",
     "app_desktop_info_mmi_result_success": "Lyckades",
+    "app_desktop_info_mmi_result_timeout": "Bearbetningen av USSD-koden stoppades. Felaktig kod eller nätverksfel.",
+    "app_desktop_info_mmi_result_aborted": "Avbruten operation.",
     "app_desktop_menu": "MENY",
     "app_desktop_menu_alarm": "V\u00c4CKARKLOCKA",
     "app_desktop_menu_calendar": "KALENDER",

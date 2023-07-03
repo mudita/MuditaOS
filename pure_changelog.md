@@ -7,6 +7,7 @@
 * Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
 * Added extended information to crashdump filename
 * Added extended information to log filename
+* Added GUI screens informing about failed MMI/USSD request
 
 ### Changed / Improved
 

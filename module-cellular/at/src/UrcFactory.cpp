@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <UrcFactory.hpp>
@@ -23,10 +23,10 @@ std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
     if (urcMessage.empty()) {
         return std::make_unique<Urc>(std::string());
     }
-    const char headDelimiter = ':';
-    auto it                  = std::find(urcMessage.begin(), urcMessage.end(), headDelimiter);
-    std::string head         = utils::trim(std::string(urcMessage.begin(), it));
-    std::string body         = std::string(it == urcMessage.end() ? urcMessage.begin() : it + 1, urcMessage.end());
+    const auto headDelimiter = ':';
+    const auto it            = std::find(urcMessage.begin(), urcMessage.end(), headDelimiter);
+    const auto &head         = utils::trim(std::string(urcMessage.begin(), it));
+    const auto &body         = std::string(it == urcMessage.end() ? urcMessage.begin() : it + 1, urcMessage.end());
 
     if (Ctze::isURC(head)) {
         return std::make_unique<Ctze>(body);

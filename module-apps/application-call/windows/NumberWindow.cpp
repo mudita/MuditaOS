@@ -28,7 +28,6 @@ namespace gui
         assert(interface != nullptr);
         assert(app != nullptr);
         switchFormatter(utils::country::getAlpha2Code(currentCountry));
-        preventsLongPressLock = true;
     }
 
     void NumberWindow::setNumberLabel(const std::string &num)
@@ -122,12 +121,17 @@ namespace gui
                     return true;
                 }
                 clearInput();
-
                 return true;
             }
+
             // long press of '0' key is translated to '+'
-            else if (inputEvent.is(KeyCode::KEY_0)) {
+            if (inputEvent.is(KeyCode::KEY_0)) {
                 addDigit('+');
+                return true;
+            }
+
+            // prevent locking the phone by long pound press
+            if (inputEvent.is(KeyCode::KEY_PND)) {
                 return true;
             }
         }
