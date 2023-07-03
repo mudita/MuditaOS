@@ -1,20 +1,18 @@
 // Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <log/log.hpp>
 #include "bsp_eink.h"
+
 #include "board.h"
 #include "fsl_lpspi.h"
 #include "fsl_lpspi_edma.h"
-#include "fsl_common.h"
+
 #include "dma_config.h"
 #include "bsp/eink/eink_gpio.hpp"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
-#include "queue.h"
 
-#include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
@@ -81,7 +79,6 @@ typedef struct _bsp_eink_driver
 using namespace drivers;
 static lpspi_master_config_t s_eink_lpspi_master_config;
 static std::shared_ptr<drivers::DriverGPIO> gpio;
-static std::shared_ptr<drivers::DriverPLL> pll;
 static std::shared_ptr<drivers::DriverDMA> dma;
 static std::shared_ptr<drivers::DriverDMAMux> dmamux;
 static std::unique_ptr<drivers::DriverDMAHandle> rxDMAHandle;
@@ -244,37 +241,14 @@ void BSP_EinkDeinit(void)
         bsp_eink_TransferComplete = NULL;
     }
 
-    if (pll != nullptr) {
-        pll.reset();
-    }
-    else {
-        LOG_ERROR("No pll!");
-    }
+    dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_TX_DMA_CHANNEL));
+    dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_RX_DMA_CHANNEL));
+    dmamux.reset();
+    dma.reset();
 
-    if (dmamux != nullptr) {
-        dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_TX_DMA_CHANNEL));
-        dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::EINK_RX_DMA_CHANNEL));
-        dmamux.reset();
-    }
-    else {
-        LOG_ERROR("No dmamux!");
-    }
-
-    if (dma != nullptr) {
-        dma.reset();
-    }
-    else {
-        LOG_ERROR("No dma!");
-    }
-
-    if (gpio != nullptr) {
-        gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
-        gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
-        gpio.reset();
-    }
-    else {
-        LOG_ERROR("No gpio!");
-    }
+    gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
+    gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
+    gpio.reset();
 }
 
 void BSP_EinkLogicPowerOn()
