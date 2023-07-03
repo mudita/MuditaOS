@@ -1,32 +1,15 @@
 // Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "dma_config.h"
-#include "fsl_dmamux.h"
-#include "fsl_edma.h"
 #include "ED028TC1.h"
+#include "macros.h"
 #include "bsp_eink.h"
-#include "board.h"
+#include "eink_dimensions.hpp"
+#include "eink_binarization_luts.h"
 
-#include <stdbool.h>
-#include <assert.h>
 #include <math.h>
-#include <string.h>
-
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
 
 #include <log/log.hpp>
-#include "board.h"
-#include "eink_binarization_luts.h"
-#include "macros.h"
-#include "eink_dimensions.hpp"
-
-#include <magic_enum.hpp>
-#include "drivers/pll/DriverPLL.hpp"
-#include "drivers/dmamux/DriverDMAMux.hpp"
-#include "drivers/dma/DriverDMA.hpp"
 #include "board/BoardDefinitions.hpp"
 
 #define EPD_BOOSTER_START_PERIOD_10MS 0
@@ -62,11 +45,6 @@
 
 #define ED028TC1_BUSY_STATE_TIMEOUT_MS 2000 // Time after the display should for sure exit the busy state
 
-using namespace drivers;
-using namespace magic_enum;
-static std::shared_ptr<drivers::DriverDMA> dma;
-static std::shared_ptr<drivers::DriverDMAMux> dmamux;
-
 /* Internal variable definitions */
 static bool s_einkIsPoweredOn = false; //  Variable which contains the state of the power of the EPD display
 
@@ -79,12 +57,12 @@ static CACHEABLE_SECTION_SDRAM(uint8_t s_einkServiceRotatedBuf[BOARD_EINK_DISPLA
 /**
  * @brief This lut is used for convertion of the 4bp input grayscale pixel to the 1bpp output pixel
  */
-static uint8_t s_einkMaskLut_1Bpp[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1};
+static std::uint8_t s_einkMaskLut_1Bpp[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1};
 
 /**
  * @brief This lut is used for convertion of the 4bp input grayscale pixel to the 2bpp output pixel
  */
-static uint8_t s_einkMaskLut_2Bpp[16] = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
+static std::uint8_t s_einkMaskLut_2Bpp[16] = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
 
 /* External variable definitions */
 
@@ -133,11 +111,11 @@ static uint8_t s_einkMaskLut_2Bpp[16] = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 
  *
  * @return
  */
-static uint8_t *s_EinkTransformFrameCoordinateSystem_1Bpp(const uint8_t *dataIn,
-                                                          uint16_t windowWidthPx,
-                                                          uint16_t windowHeightPx,
-                                                          uint8_t *dataOut,
-                                                          EinkDisplayColorMode_e invertColors);
+static std::uint8_t *s_EinkTransformFrameCoordinateSystem_1Bpp(const std::uint8_t *dataIn,
+                                                               std::uint16_t windowWidthPx,
+                                                               std::uint16_t windowHeightPx,
+                                                               std::uint8_t *dataOut,
+                                                               EinkDisplayColorMode_e invertColors);
 
 /**
  *  This function makes rotation of the image from the standard GUI coordinate system to the coord system used by the
@@ -182,11 +160,11 @@ static uint8_t *s_EinkTransformFrameCoordinateSystem_1Bpp(const uint8_t *dataIn,
  *
  * @return
  */
-static uint8_t *s_EinkTransformFrameCoordinateSystem_2Bpp(const uint8_t *dataIn,
-                                                          uint16_t windowWidthPx,
-                                                          uint16_t windowHeightPx,
-                                                          uint8_t *dataOut,
-                                                          EinkDisplayColorMode_e invertColors);
+static std::uint8_t *s_EinkTransformFrameCoordinateSystem_2Bpp(const std::uint8_t *dataIn,
+                                                               std::uint16_t windowWidthPx,
+                                                               std::uint16_t windowHeightPx,
+                                                               std::uint8_t *dataOut,
+                                                               EinkDisplayColorMode_e invertColors);
 
 /**
  *  This function makes rotation of the image from the standard GUI coordinate system to the coord system used by the
@@ -231,11 +209,11 @@ static uint8_t *s_EinkTransformFrameCoordinateSystem_2Bpp(const uint8_t *dataIn,
  *
  * @return
  */
-static uint8_t *s_EinkTransformFrameCoordinateSystem_3Bpp(const uint8_t *dataIn,
-                                                          uint16_t windowWidthPx,
-                                                          uint16_t windowHeightPx,
-                                                          uint8_t *dataOut,
-                                                          EinkDisplayColorMode_e invertColors);
+static std::uint8_t *s_EinkTransformFrameCoordinateSystem_3Bpp(const std::uint8_t *dataIn,
+                                                               std::uint16_t windowWidthPx,
+                                                               std::uint16_t windowHeightPx,
+                                                               std::uint8_t *dataOut,
+                                                               EinkDisplayColorMode_e invertColors);
 
 /**
  *  This function makes rotation of the image from the standard GUI coordinate system to the coord system used by the
@@ -280,11 +258,11 @@ static uint8_t *s_EinkTransformFrameCoordinateSystem_3Bpp(const uint8_t *dataIn,
  *
  * @return
  */
-static uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(const uint8_t *dataIn,
-                                                          uint16_t windowWidthPx,
-                                                          uint16_t windowHeightPx,
-                                                          uint8_t *dataOut,
-                                                          EinkDisplayColorMode_e invertColors);
+static std::uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(const std::uint8_t *dataIn,
+                                                               std::uint16_t windowWidthPx,
+                                                               std::uint16_t windowHeightPx,
+                                                               std::uint8_t *dataOut,
+                                                               EinkDisplayColorMode_e invertColors);
 
 /**
  *  This function makes rotation of the image from the standard GUI coordinate system to the coord system used by the
@@ -329,11 +307,11 @@ static uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(const uint8_t *dataIn,
  *
  * @return
  */
-static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(const uint8_t *dataIn,
-                                                                   uint16_t windowWidthPx,
-                                                                   uint16_t windowHeightPx,
-                                                                   uint8_t *dataOut,
-                                                                   EinkDisplayColorMode_e invertColors);
+static std::uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(const std::uint8_t *dataIn,
+                                                                        std::uint16_t windowWidthPx,
+                                                                        std::uint16_t windowHeightPx,
+                                                                        std::uint8_t *dataOut,
+                                                                        EinkDisplayColorMode_e invertColors);
 
 /**
  *  This function makes rotation of the image from the standard GUI coordinate system to the coord system used by the
@@ -378,11 +356,11 @@ static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(const uint8_t
  *
  * @return
  */
-static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(const uint8_t *dataIn,
-                                                                   uint16_t windowWidthPx,
-                                                                   uint16_t windowHeightPx,
-                                                                   uint8_t *dataOut,
-                                                                   EinkDisplayColorMode_e invertColors);
+static std::uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(const std::uint8_t *dataIn,
+                                                                        std::uint16_t windowWidthPx,
+                                                                        std::uint16_t windowHeightPx,
+                                                                        std::uint8_t *dataOut,
+                                                                        EinkDisplayColorMode_e invertColors);
 
 /**
  *  This function makes rotation of the image from the standard GUI coordinate system to the coord system used by the
@@ -427,11 +405,11 @@ static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(const uint8_t
  *
  * @return
  */
-static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(const uint8_t *dataIn,
-                                                                   uint16_t windowWidthPx,
-                                                                   uint16_t windowHeightPx,
-                                                                   uint8_t *dataOut,
-                                                                   EinkDisplayColorMode_e invertColors);
+static std::uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(const std::uint8_t *dataIn,
+                                                                        std::uint16_t windowWidthPx,
+                                                                        std::uint16_t windowHeightPx,
+                                                                        std::uint8_t *dataOut,
+                                                                        EinkDisplayColorMode_e invertColors);
 
 /**
  *  This function makes rotation of the image from the standard GUI coordinate system to the coord system used by the
@@ -482,11 +460,11 @@ static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(const uint8_t
  * It is used when EINK_ROTATE_90_CLOCKWISE is not defined.
  */
 
-static uint8_t *s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(const uint8_t *dataIn,
-                                                                    uint16_t windowWidthPx,
-                                                                    uint16_t windowHeightPx,
-                                                                    uint8_t *dataOut,
-                                                                    EinkDisplayColorMode_e invertColors);
+static std::uint8_t *s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(const std::uint8_t *dataIn,
+                                                                         std::uint16_t windowWidthPx,
+                                                                         std::uint16_t windowHeightPx,
+                                                                         std::uint8_t *dataOut,
+                                                                         EinkDisplayColorMode_e invertColors);
 
 /* Function bodies */
 
@@ -532,13 +510,11 @@ EinkStatus_e EinkPowerOn()
         return EinkOK;
     }
 
-
-    uint8_t cmd = EinkPowerON; // 0x04
+    std::uint8_t cmd = EinkPowerON; // 0x04
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
-    //    LOG_ERROR("Wait busy: %u", BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)));
 
     if (BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)) == 0) {
         return EinkSPIErr;
@@ -554,7 +530,7 @@ EinkStatus_e EinkPowerOff()
         return EinkOK;
     }
 
-    uint8_t cmd = EinkPowerOFF; // 0x02
+    std::uint8_t cmd = EinkPowerOFF; // 0x02
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
         EinkResetAndInitialize();
         return EinkSPIErr;
@@ -576,10 +552,10 @@ EinkStatus_e EinkPowerDown(void)
     return powerOffStatus;
 }
 
-int16_t EinkGetTemperatureInternal()
+std::int16_t EinkGetTemperatureInternal()
 {
-    uint8_t cmd[1];
-    int8_t temp[2] = {0, 0};
+    std::uint8_t cmd[1];
+    std::int8_t temp[2] = {0, 0};
 
     cmd[0] = EinkTemperatureSensorCalibration;
 
@@ -604,7 +580,7 @@ int16_t EinkGetTemperatureInternal()
     BSP_EinkWriteCS(BSP_Eink_CS_Set);
 
     // First byte of the temp describes the integer part of the temperature in degrees Celsius
-    int8_t temperatureInteger = temp[0];
+    std::int8_t temperatureInteger = temp[0];
     // The MSB bit of the second byte describes the fraction of the temperature. Bit value of 1 means .5 degree Celsius,
     // bit value of 0 means .0 degree Celsius
     // int8_t temperatureFraction =    ((temp[1] & 0x80) >> 7);
@@ -614,7 +590,7 @@ int16_t EinkGetTemperatureInternal()
 
 static void s_EinkSetGateOrder()
 {
-    uint8_t buf[3];
+    std::uint8_t buf[3];
 
     // Set the order of gate refreshing
     buf[0] = EinkGDOrderSetting;
@@ -758,9 +734,9 @@ EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
     return EinkOK;
 }
 
-static EinkStatus_e s_EinkReadFlagsRegister(uint16_t *flags)
+static EinkStatus_e s_EinkReadFlagsRegister(std::uint16_t *flags)
 {
-    uint8_t cmd = EinkFLG;
+    std::uint8_t cmd = EinkFLG;
 
     BSP_EinkWriteCS(BSP_Eink_CS_Clr);
 
@@ -770,7 +746,7 @@ static EinkStatus_e s_EinkReadFlagsRegister(uint16_t *flags)
         return EinkSPIErr;
     }
 
-    if (BSP_EinkReadData(flags, sizeof(uint16_t), SPI_MANUAL_CS) != 0) {
+    if (BSP_EinkReadData(flags, sizeof(std::uint16_t), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return EinkSPIErr;
@@ -783,7 +759,7 @@ static EinkStatus_e s_EinkReadFlagsRegister(uint16_t *flags)
 
 EinkStatus_e EinkWaitTillPipelineBusy()
 {
-    uint16_t flags = 0;
+    std::uint16_t flags = 0;
 
     s_EinkReadFlagsRegister(&flags);
 
@@ -798,14 +774,14 @@ EinkStatus_e EinkWaitTillPipelineBusy()
 EinkStatus_e EinkDitherDisplay()
 {
 
-    uint8_t cmdWithArgs[2] = {EinkDPC, EINK_DITHER_4BPP_MODE | EINK_DITHER_START};
+    std::uint8_t cmdWithArgs[2] = {EinkDPC, EINK_DITHER_4BPP_MODE | EINK_DITHER_START};
 
     if (BSP_EinkWriteData(cmdWithArgs, sizeof(cmdWithArgs), SPI_AUTOMATIC_CS) != 0) {
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
-    uint16_t flags = 0;
+    std::uint16_t flags = 0;
 
     s_EinkReadFlagsRegister(&flags);
 
@@ -818,12 +794,12 @@ EinkStatus_e EinkDitherDisplay()
 }
 
 EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
-                             const uint8_t *buffer,
+                             const std::uint8_t *buffer,
                              EinkBpp_e bpp,
                              EinkDisplayColorMode_e invertColors)
 {
-    uint8_t buf[10];
-    uint8_t pixelsInByte = 8 / bpp;
+    std::uint8_t buf[10];
+    std::uint8_t pixelsInByte = 8 / bpp;
 
     s_einkServiceRotatedBuf[0] = EinkDataStartTransmission1;
     s_einkServiceRotatedBuf[1] = bpp - 1; //  0 - 1Bpp, 1 - 2Bpp, 2 - 3Bpp, 3 - 4Bpp
@@ -880,28 +856,28 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
     }
 
     buf[0] = EinkDataStartTransmissionWindow;      // set display window
-    buf[1] = static_cast<uint8_t>(hal::eink::getDisplayXAxis(frame) >>
-                                  8);              // MSB of the X axis in the EPD display. Value converted
-                                                   // from the standard GUI coords system to the ED028TC1 one
-    buf[2] = static_cast<uint8_t>(
-        hal::eink::getDisplayXAxis(frame));        // LSB of the X axis in the EPD display. Value converted from
-                                                   // the standard GUI coords system to the ED028TC1 one
-    buf[3] = static_cast<uint8_t>(hal::eink::getDisplayYAxis(frame) >>
-                                  8);              // MSB of the Y axis in the EPD display. Value converted
-                                                   // from the standard GUI coords system to the ED028TC1 one
-    buf[4] = static_cast<uint8_t>(
-        hal::eink::getDisplayYAxis(frame));        // LSB of the Y axis in the EPD display. Value converted from
-                                                   // the standard GUI coords system to the ED028TC1 one
-    buf[5] = static_cast<uint8_t>(hal::eink::getDisplayWindowWidth(frame) >>
-                                  8);              // MSB of the window height in the EPD display. Value converted
-                                                   // from the standard GUI coords system to the ED028TC1 one
-    buf[6] = static_cast<uint8_t>(
-        hal::eink::getDisplayWindowWidth(frame));  // LSB of the window height in the EPD display. Value converted from
-                                                   // the standard GUI coords system to the ED028TC1 one
-    buf[7] = static_cast<uint8_t>(hal::eink::getDisplayWindowHeight(frame) >>
-                                  8);              // MSB of the window width in the EPD display. Value converted
-                                                   // from the standard GUI coords system to the ED028TC1 one
-    buf[8] = static_cast<uint8_t>(
+    buf[1] = static_cast<std::uint8_t>(hal::eink::getDisplayXAxis(frame) >>
+                                       8); // MSB of the X axis in the EPD display. Value converted
+                                           // from the standard GUI coords system to the ED028TC1 one
+    buf[2] = static_cast<std::uint8_t>(
+        hal::eink::getDisplayXAxis(frame)); // LSB of the X axis in the EPD display. Value converted from
+                                            // the standard GUI coords system to the ED028TC1 one
+    buf[3] = static_cast<std::uint8_t>(hal::eink::getDisplayYAxis(frame) >>
+                                       8); // MSB of the Y axis in the EPD display. Value converted
+                                           // from the standard GUI coords system to the ED028TC1 one
+    buf[4] = static_cast<std::uint8_t>(
+        hal::eink::getDisplayYAxis(frame)); // LSB of the Y axis in the EPD display. Value converted from
+                                            // the standard GUI coords system to the ED028TC1 one
+    buf[5] = static_cast<std::uint8_t>(hal::eink::getDisplayWindowWidth(frame) >>
+                                       8); // MSB of the window height in the EPD display. Value converted
+                                           // from the standard GUI coords system to the ED028TC1 one
+    buf[6] = static_cast<std::uint8_t>(
+        hal::eink::getDisplayWindowWidth(frame)); // LSB of the window height in the EPD display. Value converted from
+                                                  // the standard GUI coords system to the ED028TC1 one
+    buf[7] = static_cast<std::uint8_t>(hal::eink::getDisplayWindowHeight(frame) >>
+                                       8); // MSB of the window width in the EPD display. Value converted
+                                           // from the standard GUI coords system to the ED028TC1 one
+    buf[8] = static_cast<std::uint8_t>(
         hal::eink::getDisplayWindowHeight(frame)); // LSB of the window width in the EPD display. Value converted from
     // the standard GUI coords system to the ED028TC1 one
 
@@ -911,8 +887,8 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
         return EinkSPIErr;
     }
 
-    uint32_t msgSize = 2 + (static_cast<uint32_t>(frame.width) * static_cast<uint32_t>(frame.height) /
-                            pixelsInByte); // command (1 byte) + bpp (1 byte) + dataSize(W*H/pixelsInByte bytes)
+    std::uint32_t msgSize = 2 + (static_cast<std::uint32_t>(frame.width) * static_cast<std::uint32_t>(frame.height) /
+                                 pixelsInByte); // command (1 byte) + bpp (1 byte) + dataSize(W*H/pixelsInByte bytes)
     // Send the part of the image to the display memory
 
     if (BSP_EinkWriteData(s_einkServiceRotatedBuf, msgSize, SPI_AUTOMATIC_CS) != 0) {
@@ -925,7 +901,7 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
 
 EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 {
-    uint8_t buf[10];
+    std::uint8_t buf[10];
 
     // Set the window to the entire screen
     buf[0] = EinkDataStartTransmissionWindow; // 0x83
@@ -953,7 +929,7 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
         return EinkSPIErr;
     }
 
-    uint8_t background = colorFill;
+    std::uint8_t background = colorFill;
 
     std::unique_ptr<char[]> bg;
     try {
@@ -987,33 +963,33 @@ EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refres
 
     s_EinkSetGateOrder();
 
-    uint8_t buf[10];
+    std::uint8_t buf[10];
 
     buf[0] = EinkDisplayRefresh;
     buf[1] = UPD_CPY_TO_PRE;
 
-    buf[2] = static_cast<uint8_t>(hal::eink::getDisplayXAxis(frame) >>
-                                  8);              // MSB of the X axis in the EPD display. Value converted
-                                                   // from the standard GUI coords system to the ED028TC1 one
-    buf[3] = static_cast<uint8_t>(
-        hal::eink::getDisplayXAxis(frame));        // LSB of the X axis in the EPD display. Value converted from
-                                                   // the standard GUI coords system to the ED028TC1 one
-    buf[4] = static_cast<uint8_t>(hal::eink::getDisplayYAxis(frame) >>
-                                  8);              // MSB of the Y axis in the EPD display. Value converted
-                                                   // from the standard GUI coords system to the ED028TC1 one
-    buf[5] = static_cast<uint8_t>(
-        hal::eink::getDisplayYAxis(frame));        // LSB of the Y axis in the EPD display. Value converted from
-                                                   // the standard GUI coords system to the ED028TC1 one
-    buf[6] = static_cast<uint8_t>(hal::eink::getDisplayWindowWidth(frame) >>
-                                  8);              // MSB of the window height in the EPD display. Value converted
-                                                   // from the standard GUI coords system to the ED028TC1 one
-    buf[7] = static_cast<uint8_t>(
-        hal::eink::getDisplayWindowWidth(frame));  // LSB of the window height in the EPD display. Value converted from
-                                                   // the standard GUI coords system to the ED028TC1 one
-    buf[8] = static_cast<uint8_t>(hal::eink::getDisplayWindowHeight(frame) >>
-                                  8);              // MSB of the window width in the EPD display. Value converted
-                                                   // from the standard GUI coords system to the ED028TC1 one
-    buf[9] = static_cast<uint8_t>(
+    buf[2] = static_cast<std::uint8_t>(hal::eink::getDisplayXAxis(frame) >>
+                                       8); // MSB of the X axis in the EPD display. Value converted
+                                           // from the standard GUI coords system to the ED028TC1 one
+    buf[3] = static_cast<std::uint8_t>(
+        hal::eink::getDisplayXAxis(frame)); // LSB of the X axis in the EPD display. Value converted from
+                                            // the standard GUI coords system to the ED028TC1 one
+    buf[4] = static_cast<std::uint8_t>(hal::eink::getDisplayYAxis(frame) >>
+                                       8); // MSB of the Y axis in the EPD display. Value converted
+                                           // from the standard GUI coords system to the ED028TC1 one
+    buf[5] = static_cast<std::uint8_t>(
+        hal::eink::getDisplayYAxis(frame)); // LSB of the Y axis in the EPD display. Value converted from
+                                            // the standard GUI coords system to the ED028TC1 one
+    buf[6] = static_cast<std::uint8_t>(hal::eink::getDisplayWindowWidth(frame) >>
+                                       8); // MSB of the window height in the EPD display. Value converted
+                                           // from the standard GUI coords system to the ED028TC1 one
+    buf[7] = static_cast<std::uint8_t>(
+        hal::eink::getDisplayWindowWidth(frame)); // LSB of the window height in the EPD display. Value converted from
+                                                  // the standard GUI coords system to the ED028TC1 one
+    buf[8] = static_cast<std::uint8_t>(hal::eink::getDisplayWindowHeight(frame) >>
+                                       8); // MSB of the window width in the EPD display. Value converted
+                                           // from the standard GUI coords system to the ED028TC1 one
+    buf[9] = static_cast<std::uint8_t>(
         hal::eink::getDisplayWindowHeight(frame)); // LSB of the window width in the EPD display. Value converted from
     // the standard GUI coords system to the ED028TC1 one
 
@@ -1032,31 +1008,30 @@ EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refres
     return EinkOK;
 }
 
-__attribute__((optimize("O3"))) void EinkARGBToLuminance(const uint8_t *dataIn,
-                                                         uint8_t *dataOut,
-                                                         uint32_t displayWidth,
-                                                         uint32_t displayHeight)
+__attribute__((optimize("O3"))) void EinkARGBToLuminance(const std::uint8_t *dataIn,
+                                                         std::uint8_t *dataOut,
+                                                         std::uint32_t displayWidth,
+                                                         std::uint32_t displayHeight)
 {
-    //    uint32_t i, j;
-    uint8_t r, g, b;
+    std::uint8_t r, g, b;
     float fi;
-    uint32_t *src;
-    uint8_t *dst;
+    std::uint32_t *src;
+    std::uint8_t *dst;
 
-    src = (uint32_t *)dataIn;
-    dst = (uint8_t *)dataOut;
+    src = (std::uint32_t *)dataIn;
+    dst = (std::uint8_t *)dataOut;
 
-    for (uint32_t i = 0; i < (displayWidth * displayHeight);
+    for (std::uint32_t i = 0; i < (displayWidth * displayHeight);
          i += 2) // increase by 8 pixels - 32bit word is 8 pixels in 4BPP
     {
         *dst = 0x00000000;
-        for (uint8_t j = 0; j < 8; j += 4) {
-            r  = (uint8_t)((*(src)) >> 16);
-            g  = (uint8_t)((*(src)) >> 8);
-            b  = (uint8_t) * (src);
+        for (std::uint8_t j = 0; j < 8; j += 4) {
+            r  = (std::uint8_t)((*(src)) >> 16);
+            g  = (std::uint8_t)((*(src)) >> 8);
+            b  = (std::uint8_t) * (src);
             fi = (r + g + b) / 3;
 
-            *dst |= ((uint32_t)(floor(fi / 16))) << (4 - j);
+            *dst |= ((std::uint32_t)(floor(fi / 16))) << (4 - j);
 
             src++;
         }
@@ -1064,36 +1039,36 @@ __attribute__((optimize("O3"))) void EinkARGBToLuminance(const uint8_t *dataIn,
     }
 }
 
-__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_1Bpp(
-    const uint8_t *dataIn,
-    uint16_t windowWidthPx,
-    uint16_t windowHeightPx,
-    uint8_t *dataOut,
+__attribute__((optimize("O1"))) static std::uint8_t *s_EinkTransformFrameCoordinateSystem_1Bpp(
+    const std::uint8_t *dataIn,
+    std::uint16_t windowWidthPx,
+    std::uint16_t windowHeightPx,
+    std::uint8_t *dataOut,
     EinkDisplayColorMode_e invertColors)
 {
     // In 1bpp mode there are 8 pixels in the byte
-    const uint8_t pixelsInByte = 8;
+    const std::uint8_t pixelsInByte = 8;
 
-    uint8_t pixels    = 0;
-    uint8_t *outArray = dataOut;
+    std::uint8_t pixels    = 0;
+    std::uint8_t *outArray = dataOut;
 
-    for (int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
-        for (int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
+    for (std::int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
+        for (std::int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
             // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better
             // performance.
             //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
             //       take considerable amount of time.
-            uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
+            std::uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
 
             // Use the LUT to convert the input pixel from 4bpp to 1bpp
-            uint8_t firstPixel   = s_einkMaskLut_1Bpp[dataIn[index - 0 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t secondPixel  = s_einkMaskLut_1Bpp[dataIn[index - 1 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t thirdPixel   = s_einkMaskLut_1Bpp[dataIn[index - 2 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t fourthPixel  = s_einkMaskLut_1Bpp[dataIn[index - 3 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t fifthPixel   = s_einkMaskLut_1Bpp[dataIn[index - 4 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t sixthPixel   = s_einkMaskLut_1Bpp[dataIn[index - 5 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t seventhPixel = s_einkMaskLut_1Bpp[dataIn[index - 6 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t eightPixel   = s_einkMaskLut_1Bpp[dataIn[index - 7 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t firstPixel   = s_einkMaskLut_1Bpp[dataIn[index - 0 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t secondPixel  = s_einkMaskLut_1Bpp[dataIn[index - 1 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t thirdPixel   = s_einkMaskLut_1Bpp[dataIn[index - 2 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t fourthPixel  = s_einkMaskLut_1Bpp[dataIn[index - 3 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t fifthPixel   = s_einkMaskLut_1Bpp[dataIn[index - 4 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t sixthPixel   = s_einkMaskLut_1Bpp[dataIn[index - 5 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t seventhPixel = s_einkMaskLut_1Bpp[dataIn[index - 6 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t eightPixel   = s_einkMaskLut_1Bpp[dataIn[index - 7 * BOARD_EINK_DISPLAY_RES_X]];
 
             // Put the pixels in order: Most left positioned pixel at the most significant side of byte
             pixels = (firstPixel << 7) | (secondPixel << 6) | (thirdPixel << 5) | (fourthPixel << 4) |
@@ -1111,26 +1086,26 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
     return dataOut;
 }
 
-__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_2Bpp(
-    const uint8_t *dataIn,
-    uint16_t windowWidthPx,
-    uint16_t windowHeightPx,
-    uint8_t *dataOut,
+__attribute__((optimize("O1"))) static std::uint8_t *s_EinkTransformFrameCoordinateSystem_2Bpp(
+    const std::uint8_t *dataIn,
+    std::uint16_t windowWidthPx,
+    std::uint16_t windowHeightPx,
+    std::uint8_t *dataOut,
     EinkDisplayColorMode_e invertColors)
 {
     // In 2bpp mode there are 4 pixels in the byte
-    const uint8_t pixelsInByte = 8;
-    uint16_t pixels            = 0;
-    uint16_t *outArray         = (uint16_t *)dataOut;
-    uint8_t temp               = 0;
+    const std::uint8_t pixelsInByte = 8;
+    std::uint16_t pixels            = 0;
+    std::uint16_t *outArray         = (std::uint16_t *)dataOut;
+    std::uint8_t temp               = 0;
 
-    for (int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
-        for (int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
+    for (std::int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
+        for (std::int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
             // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better
             // performance.
             //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
             //       take considerable amount of time.
-            uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
+            std::uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
 
             // Use the LUT to convert the input pixel from 4bpp to 2bpp and put 4 pixels in single byte
             temp = (s_einkMaskLut_2Bpp[dataIn[index - 0 * BOARD_EINK_DISPLAY_RES_X]] << 6);
@@ -1162,47 +1137,47 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
     return dataOut;
 }
 
-__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_3Bpp(
-    const uint8_t *dataIn,
-    uint16_t windowWidthPx,
-    uint16_t windowHeightPx,
-    uint8_t *dataOut,
+__attribute__((optimize("O1"))) static std::uint8_t *s_EinkTransformFrameCoordinateSystem_3Bpp(
+    const std::uint8_t *dataIn,
+    std::uint16_t windowWidthPx,
+    std::uint16_t windowHeightPx,
+    std::uint8_t *dataOut,
     EinkDisplayColorMode_e invertColors)
 {
     // The 4bpp is coded the same way as the 3bpp
     return s_EinkTransformFrameCoordinateSystem_4Bpp(dataIn, windowWidthPx, windowHeightPx, dataOut, invertColors);
 }
 
-__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(
-    const uint8_t *dataIn,
-    uint16_t windowWidthPx,
-    uint16_t windowHeightPx,
-    uint8_t *dataOut,
+__attribute__((optimize("O1"))) static std::uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(
+    const std::uint8_t *dataIn,
+    std::uint16_t windowWidthPx,
+    std::uint16_t windowHeightPx,
+    std::uint8_t *dataOut,
     EinkDisplayColorMode_e invertColors)
 {
     // In 1bpp mode there are 8 pixels in the byte
-    const uint8_t pixelsInByte = 8;
-    uint8_t pixels             = 0;
-    uint8_t *outArray          = dataOut;
+    const std::uint8_t pixelsInByte = 8;
+    std::uint8_t pixels             = 0;
+    std::uint8_t *outArray          = dataOut;
 
-    for (int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
-        for (int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
+    for (std::int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
+        for (std::int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
             // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better
             // performance.
             //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
             //       take considerable amount of time.
 
-            uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
+            std::uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
 
             // Use the LUT to convert the input pixel from 4bpp to 1bpp
-            uint8_t firstPixel   = s_einkMaskLut_1Bpp[dataIn[index - 0 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t secondPixel  = s_einkMaskLut_1Bpp[dataIn[index - 1 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t thirdPixel   = s_einkMaskLut_1Bpp[dataIn[index - 2 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t fourthPixel  = s_einkMaskLut_1Bpp[dataIn[index - 3 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t fifthPixel   = s_einkMaskLut_1Bpp[dataIn[index - 4 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t sixthPixel   = s_einkMaskLut_1Bpp[dataIn[index - 5 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t seventhPixel = s_einkMaskLut_1Bpp[dataIn[index - 6 * BOARD_EINK_DISPLAY_RES_X]];
-            uint8_t eightPixel   = s_einkMaskLut_1Bpp[dataIn[index - 7 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t firstPixel   = s_einkMaskLut_1Bpp[dataIn[index - 0 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t secondPixel  = s_einkMaskLut_1Bpp[dataIn[index - 1 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t thirdPixel   = s_einkMaskLut_1Bpp[dataIn[index - 2 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t fourthPixel  = s_einkMaskLut_1Bpp[dataIn[index - 3 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t fifthPixel   = s_einkMaskLut_1Bpp[dataIn[index - 4 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t sixthPixel   = s_einkMaskLut_1Bpp[dataIn[index - 5 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t seventhPixel = s_einkMaskLut_1Bpp[dataIn[index - 6 * BOARD_EINK_DISPLAY_RES_X]];
+            std::uint8_t eightPixel   = s_einkMaskLut_1Bpp[dataIn[index - 7 * BOARD_EINK_DISPLAY_RES_X]];
 
             // Put the pixels in order: Most left positioned pixel at the most significant side of byte
             pixels = (firstPixel << 7) | (secondPixel << 6) | (thirdPixel << 5) | (fourthPixel << 4) |
@@ -1220,25 +1195,25 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoo
     return dataOut;
 }
 
-__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(
-    const uint8_t *dataIn,
-    uint16_t windowWidthPx,
-    uint16_t windowHeightPx,
-    uint8_t *dataOut,
+__attribute__((optimize("O1"))) static std::uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(
+    const std::uint8_t *dataIn,
+    std::uint16_t windowWidthPx,
+    std::uint16_t windowHeightPx,
+    std::uint8_t *dataOut,
     EinkDisplayColorMode_e invertColors)
 {
     // In 2bpp mode there are 4 pixels in the byte
-    const uint8_t pixelsInByte = 8;
-    uint16_t pixels            = 0;
-    uint16_t *outArray         = (uint16_t *)dataOut;
-    uint8_t temp               = 0;
-    for (int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
-        for (int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
+    const std::uint8_t pixelsInByte = 8;
+    std::uint16_t pixels            = 0;
+    std::uint16_t *outArray         = (std::uint16_t *)dataOut;
+    std::uint8_t temp               = 0;
+    for (std::int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
+        for (std::int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
             // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better
             // performance.
             //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
             //       take considerable amount of time.
-            uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
+            std::uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
 
             // Use the LUT to convert the input pixel from 4bpp to 2bpp and put 4 pixels in single byte
             temp = (s_einkMaskLut_2Bpp[dataIn[index - 0 * BOARD_EINK_DISPLAY_RES_X]] << 6);
@@ -1269,46 +1244,46 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoo
     return dataOut;
 }
 
-__attribute__((optimize("O3"))) static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(
-    const uint8_t *dataIn,
-    uint16_t windowWidthPx,
-    uint16_t windowHeightPx,
-    uint8_t *dataOut,
+__attribute__((optimize("O3"))) static std::uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(
+    const std::uint8_t *dataIn,
+    std::uint16_t windowWidthPx,
+    std::uint16_t windowHeightPx,
+    std::uint8_t *dataOut,
     EinkDisplayColorMode_e invertColors)
 {
     // The 4bpp is coded the same way as the 3bpp
     return s_EinkTransformFrameCoordinateSystem_4Bpp(dataIn, windowWidthPx, windowHeightPx, dataOut, invertColors);
 }
 
-__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(
-    const uint8_t *dataIn,
-    uint16_t windowWidthPx,
-    uint16_t windowHeightPx,
-    uint8_t *dataOut,
+__attribute__((optimize("O1"))) static std::uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(
+    const std::uint8_t *dataIn,
+    std::uint16_t windowWidthPx,
+    std::uint16_t windowHeightPx,
+    std::uint8_t *dataOut,
     EinkDisplayColorMode_e invertColors)
 {
     // In 3bpp and 4bpp modes there are 2 pixels in the byte. Using 8bpp to process the whole uint32_t at once for
     // faster execution
-    const uint8_t pixelsInByte = 8;
+    const std::uint8_t pixelsInByte = 8;
 
-    uint32_t pixels    = 0;
-    uint32_t *outArray = (uint32_t *)dataOut;
+    std::uint32_t pixels    = 0;
+    std::uint32_t *outArray = (std::uint32_t *)dataOut;
 
-    for (int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
-        for (int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
+    for (std::int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
+        for (std::int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
             // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better
             // performance.
             //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
             //       take considerable amount of time. Using 8 pixels at a time for better performance
-            uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
+            std::uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
 
-            uint8_t firstPixelPair =
+            std::uint8_t firstPixelPair =
                 (dataIn[index - 0 * BOARD_EINK_DISPLAY_RES_X] << 4) | dataIn[index - 1 * BOARD_EINK_DISPLAY_RES_X];
-            uint8_t secondPixelPair =
+            std::uint8_t secondPixelPair =
                 (dataIn[index - 2 * BOARD_EINK_DISPLAY_RES_X] << 4) | dataIn[index - 3 * BOARD_EINK_DISPLAY_RES_X];
-            uint8_t thirdPixelPair =
+            std::uint8_t thirdPixelPair =
                 (dataIn[index - 4 * BOARD_EINK_DISPLAY_RES_X] << 4) | dataIn[index - 5 * BOARD_EINK_DISPLAY_RES_X];
-            uint8_t fourthPixelPair =
+            std::uint8_t fourthPixelPair =
                 (dataIn[index - 6 * BOARD_EINK_DISPLAY_RES_X] << 4) | dataIn[index - 7 * BOARD_EINK_DISPLAY_RES_X];
 
             // Put the pixels in the uint32_t for faster processing
@@ -1327,21 +1302,21 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
     return dataOut;
 }
 
-__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(
-    const uint8_t *dataIn,
-    uint16_t windowWidthPx,
-    uint16_t windowHeightPx,
-    uint8_t *dataOut,
+__attribute__((optimize("O1"))) static std::uint8_t *s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(
+    const std::uint8_t *dataIn,
+    std::uint16_t windowWidthPx,
+    std::uint16_t windowHeightPx,
+    std::uint8_t *dataOut,
     EinkDisplayColorMode_e invertColors)
 {
     // In 3bpp and 4bpp modes there are 2 pixels in the byte. Using 8bpp to process the whole uint32_t at once for
     // faster execution
-    const uint8_t pixelsInByte = 8;
+    const std::uint8_t pixelsInByte = 8;
 
-    uint32_t pixels    = 0;
-    uint32_t *outArray = (uint32_t *)dataOut;
-    int32_t inputRow   = 0;
-    int32_t inputCol   = 0;
+    std::uint32_t pixels    = 0;
+    std::uint32_t *outArray = (std::uint32_t *)dataOut;
+    std::int32_t inputRow   = 0;
+    std::int32_t inputCol   = 0;
 
     for (inputRow = 0; inputRow < windowHeightPx; ++inputRow) {
         for (inputCol = windowWidthPx - 7; inputCol >= 0; inputCol -= pixelsInByte) {
@@ -1349,13 +1324,13 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
             // performance.
             //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
             //       take considerable amount of time. Using 8 pixels at a time for better performance
-            uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
+            std::uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
 
             // Get 4x 2 adjacent pixels to process them as uint32_t for better execution timings
-            uint8_t firstPixelPair  = (dataIn[index]) | (dataIn[index + 1] << 4);
-            uint8_t secondPixelPair = (dataIn[index + 2]) | (dataIn[index + 3] << 4);
-            uint8_t thirdPixelPair  = (dataIn[index + 4]) | (dataIn[index + 5] << 4);
-            uint8_t fourthPixelPair = (dataIn[index + 6]) | (dataIn[index + 7] << 4);
+            std::uint8_t firstPixelPair  = (dataIn[index]) | (dataIn[index + 1] << 4);
+            std::uint8_t secondPixelPair = (dataIn[index + 2]) | (dataIn[index + 3] << 4);
+            std::uint8_t thirdPixelPair  = (dataIn[index + 4]) | (dataIn[index + 5] << 4);
+            std::uint8_t fourthPixelPair = (dataIn[index + 6]) | (dataIn[index + 7] << 4);
 
             // Put the pixels in the uint32_t for faster processing
             pixels = (firstPixelPair << 24) | (secondPixelPair << 16) | (thirdPixelPair << 8) | (fourthPixelPair);

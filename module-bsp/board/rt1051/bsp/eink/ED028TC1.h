@@ -14,10 +14,6 @@
 #ifndef __ED028TC1_H
 #define __ED028TC1_H
 
-/* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdbool.h>
-#include <functional>
 #include "FreeRTOS.h"
 #include "semphr.h"
 
