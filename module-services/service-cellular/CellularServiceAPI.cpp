@@ -259,11 +259,12 @@ bool CellularServiceAPI::TransmitDtmfTones(sys::Service *serv, DTMFCode code)
     return serv->bus.sendUnicast(msg, service::name::cellular);
 }
 
-bool CellularServiceAPI::USSDRequest(sys::Service *serv, cellular::USSDMessage::RequestType type, std::string data)
+bool CellularServiceAPI::USSDRequest(sys::Service *serv,
+                                     cellular::USSDMessage::RequestType type,
+                                     const std::string &data)
 {
     auto msg = std::make_shared<cellular::USSDMessage>(type, data);
     return serv->bus.sendUnicast(msg, service::name::cellular);
-    ;
 }
 
 bool CellularServiceAPI::GetAPN(sys::Service *serv)

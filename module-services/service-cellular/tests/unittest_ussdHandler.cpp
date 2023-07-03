@@ -24,7 +24,7 @@ TEST_CASE("ussd handler")
         return true;
     };
 
-    handler.onAbortSession = [&onAbortSessionCalled]() -> bool {
+    handler.onAbortSession = [&onAbortSessionCalled]([[maybe_unused]] bool ussdSessionTimeout) -> bool {
         onAbortSessionCalled++;
         return true;
     };
@@ -90,7 +90,7 @@ TEST_CASE("ussd handler")
 
     SECTION("HandleUSSDRequest - failed abort session request")
     {
-        handler.onAbortSession = [&onAbortSessionCalled]() -> bool {
+        handler.onAbortSession = [&onAbortSessionCalled]([[maybe_unused]] bool ussdSessionTimeout) -> bool {
             onAbortSessionCalled++;
             return false;
         };

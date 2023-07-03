@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UrcCusd.hpp"
@@ -58,7 +58,7 @@ auto Cusd::getMessage() const noexcept -> std::optional<std::string>
     }
 
     if (auto const &messageToken = tokens[Tokens::Response]; !messageToken.empty()) {
-        return std::make_optional(std::move(messageToken));
+        return std::make_optional(messageToken);
     }
 
     return std::nullopt;
@@ -80,7 +80,7 @@ auto Cusd::getDCS() const noexcept -> std::optional<int>
 
 auto Cusd::split(const std::string &str) -> void
 {
-    size_t constexpr maxNumberOfDcsTokens = 3;
+    auto constexpr maxNumberOfDcsTokens = 3;
     tokens.resize(maxNumberOfDcsTokens);
 
     using namespace re2;
@@ -89,7 +89,7 @@ auto Cusd::split(const std::string &str) -> void
     auto constexpr numberOfStatusTypes = magic_enum::enum_count<StatusType>();
     static_assert(numberOfStatusTypes <= 9,
                   "StatusType: too many enum entries to handle - please revise regex/algorithm");
-    std::string regexForStatus(" ([0-" + std::to_string(numberOfStatusTypes) + "])");
+    std::string const regexForStatus(" ([0-" + std::to_string(numberOfStatusTypes) + "])");
 
     if (!RE2::Consume(&input, regexForStatus, &tokens[Tokens::Status])) {
         throw std::runtime_error("unrecognized CUSD status field or corrupted CUSD format");
@@ -101,9 +101,9 @@ auto Cusd::split(const std::string &str) -> void
         return;
     }
 
-    size_t startQuotationMarkPosition = input.find('"');
+    auto const startQuotationMarkPosition = input.find('"');
     // must give the size to rfind() because called in the default way is broken
-    size_t endQuotationMarkPosition = input.rfind('"', input.size());
+    auto const endQuotationMarkPosition = input.rfind('"', input.size());
     if (startQuotationMarkPosition == StringPiece::npos || endQuotationMarkPosition == StringPiece::npos) {
         throw std::runtime_error("cannot locate message - corrupted CUSD format");
     }

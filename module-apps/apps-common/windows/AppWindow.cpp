@@ -183,10 +183,8 @@ namespace gui
         }
 
         if (inputEvent.isLongRelease(gui::KeyCode::KEY_PND)) {
-            if (not preventsLongPressLock) {
-                LOG_INFO("Locking phone");
-                application->getPhoneLockSubject().lock();
-            }
+            LOG_INFO("Locking phone");
+            application->getPhoneLockSubject().lock();
         }
 
         if (inputEvent.isShortRelease()) {

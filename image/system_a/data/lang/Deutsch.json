@@ -253,6 +253,8 @@
     "app_desktop_info_mmi_registration_success": "Registrierung erfolgreich",
     "app_desktop_info_mmi_result_failed": "Fehlgeschlagen",
     "app_desktop_info_mmi_result_success": "Erfolgreich",
+    "app_desktop_info_mmi_result_timeout": "Bei der Verarbeitung des USSD-Codes wurde das Zeitlimit überschritten. Falscher Code oder Netzwerkfehler.",
+    "app_desktop_info_mmi_result_aborted": "Vorgang abgebrochen.",
     "app_desktop_menu": "MEN\u00dc",
     "app_desktop_menu_alarm": "ALARM",
     "app_desktop_menu_calendar": "KALENDER",

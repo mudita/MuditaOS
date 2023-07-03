@@ -71,6 +71,7 @@ namespace app
                                   SwitchReason::Popup);
                 return true;
             });
+
         popupBlueprint.registerBlueprint(
             ID::BluetoothInfo, [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
                 switchWindowPopup(resolveWindowName(id),

@@ -172,8 +172,8 @@ namespace gui
         // process only if key is released
         // InputEvent::State::keyReleasedLong is necessary for KeyCode::KEY_RF to properly abort the active call
         if (inputEvent.isKeyRelease()) {
-            LOG_INFO("key released");
             const auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
+
             switch (keyCode) {
             case KeyCode::KEY_LF:
                 handled = presenter.handleLeftButton();
@@ -187,6 +187,7 @@ namespace gui
             default:
                 break;
             }
+
             if (!handled && code != 0) {
                 handled = presenter.handleDigitButton(code);
             }
@@ -196,9 +197,12 @@ namespace gui
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             return true;
         }
-        else {
-            return keyCode == KeyCode::KEY_RF ? true : AppWindow::onInput(inputEvent);
+
+        if (keyCode == KeyCode::KEY_RF) {
+            return true;
         }
+
+        return AppWindow::onInput(inputEvent);
     }
 
     void CallWindow::connectTimerOnExit()

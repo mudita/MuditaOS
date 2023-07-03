@@ -9,7 +9,6 @@
 
 namespace cellular
 {
-
     namespace api
     {
         enum class CallMode

@@ -252,6 +252,8 @@
     "app_desktop_info_mmi_registration_success": "Registro correcto",
     "app_desktop_info_mmi_result_failed": "Error",
     "app_desktop_info_mmi_result_success": "Correcto",
+    "app_desktop_info_mmi_result_timeout": "Se ha agotado el tiempo de procesamiento del código USSD. Código incorrecto o error de red.",
+    "app_desktop_info_mmi_result_aborted": "Se ha abortado la operación.",
     "app_desktop_menu": "MEN\u00da",
     "app_desktop_menu_alarm": "ALARMA",
     "app_desktop_menu_calendar": "CALENDARIO",

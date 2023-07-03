@@ -50,7 +50,7 @@ void CellularUrcHandler::Handle(Creg &urc)
             cellularService.bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
         }
 
-        Store::Network network{status, accessTechnology};
+        const Store::Network network{status, accessTechnology};
         if (Store::GSM::get()->getNetwork() != network) {
             Store::GSM::get()->setNetwork(network);
             response = std::make_unique<cellular::NetworkStatusUpdateNotification>();
@@ -77,9 +77,14 @@ void CellularUrcHandler::Handle(Cmti &urc)
 void CellularUrcHandler::Handle(Cusd &urc)
 {
     response     = std::nullopt;
-    auto message = urc.getMessage();
+    const auto message = urc.getMessage();
     if (!message) {
-        LOG_WARN("CUSD with empty message - will be treated as not handled");
+        LOG_WARN("CUSD with empty message!");
+
+        CellularServiceAPI::USSDRequest(&cellularService, cellular::USSDMessage::RequestType::abortSession);
+        auto msg = std::make_shared<cellular::MMIResultMessage>(mmiactions::MMIResultParams::MMIResult::Failed);
+        cellularService.bus.sendUnicast(std::move(msg), service::name::appmgr);
+
         return;
     }
 
@@ -92,17 +97,15 @@ void CellularUrcHandler::Handle(Cusd &urc)
 
     urc.setHandled(true);
 
-    if (urc.isActionNeeded()) {
-        if (cellularService.handleUSSDURC()) {
-            auto msg = std::make_shared<cellular::MMIResponseMessage>(*message);
-            cellularService.bus.sendUnicast(msg, service::name::appmgr);
-            return;
-        }
+    if (urc.isActionNeeded() && cellularService.handleUSSDURC()) {
+        auto msg = std::make_shared<cellular::MMIResponseMessage>(*message);
+        cellularService.bus.sendUnicast(std::move(msg), service::name::appmgr);
+        return;
     }
 
     CellularServiceAPI::USSDRequest(&cellularService, cellular::USSDMessage::RequestType::abortSession);
     auto msg = std::make_shared<cellular::MMIPushMessage>(*message);
-    cellularService.bus.sendUnicast(msg, service::name::appmgr);
+    cellularService.bus.sendUnicast(std::move(msg), service::name::appmgr);
 }
 
 void CellularUrcHandler::Handle(Ctze &urc)
@@ -113,7 +116,7 @@ void CellularUrcHandler::Handle(Ctze &urc)
 
     auto msg = std::make_shared<cellular::TimeNotificationMessage>(
         urc.getGMTTime(), urc.getTimeZoneOffset(), urc.getTimeZoneString());
-    cellularService.bus.sendUnicast(msg, service::name::service_time);
+    cellularService.bus.sendUnicast(std::move(msg), service::name::service_time);
 
     urc.setHandled(true);
 }
@@ -128,7 +131,7 @@ void CellularUrcHandler::Handle(Qind &urc)
             AntennaServiceAPI::InvalidCSQNotification(&cellularService);
         }
         else {
-            SignalStrength signalStrength(*rssi);
+            const SignalStrength signalStrength(*rssi);
 
             Store::GSM::get()->setSignalStrength(signalStrength.data);
             response = std::make_unique<cellular::SignalStrengthUpdateNotification>(urc.getUrcBody());
@@ -150,7 +153,7 @@ void CellularUrcHandler::Handle(Qind &urc)
         urc.setHandled(true);
     }
     else if (urc.isFota()) {
-        std::string httpSuccess = "0";
+        const auto httpSuccess = "0";
         if (urc.getFotaStage() == Qind::FotaStage::HTTPEND && urc.getFotaParameter() == httpSuccess) {
             LOG_DEBUG("Fota UPDATE, switching to AT mode");
             cellularService.cmux->setMode(CellularMux::Mode::AT);
@@ -205,7 +208,7 @@ void CellularUrcHandler::Handle(PoweredDown &urc)
 
 void CellularUrcHandler::Handle(UrcResponse &urc)
 {
-    std::vector<UrcResponse::URCResponseType> typesToHandle = {
+    const std::vector<UrcResponse::URCResponseType> typesToHandle = {
         UrcResponse::URCResponseType::NoCarrier,
         UrcResponse::URCResponseType::Busy,
         UrcResponse::URCResponseType::NoAnswer,

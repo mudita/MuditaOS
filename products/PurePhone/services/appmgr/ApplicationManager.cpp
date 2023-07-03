@@ -405,7 +405,7 @@ namespace app::manager
         connect(typeid(cellular::MMIConfirmationMessage), convertibleToActionHandler);
         connect(typeid(cellular::NoSimNotification), convertibleToActionHandler);
         connect(typeid(cellular::NotAnEmergencyNotification), convertibleToActionHandler);
-        connect(typeid(cellular::NoNetworkConenctionNotification), convertibleToActionHandler);
+        connect(typeid(cellular::NoNetworkConnectionNotification), convertibleToActionHandler);
         connect(typeid(cellular::CallRequestGeneralError), convertibleToActionHandler);
         connect(typeid(cellular::SmsNoSimRequestMessage), convertibleToActionHandler);
         connect(typeid(cellular::SMSRejectedByOfflineNotification), convertibleToActionHandler);

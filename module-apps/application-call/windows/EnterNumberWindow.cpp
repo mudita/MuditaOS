@@ -1,18 +1,13 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallAppStyle.hpp"
 #include "CallSwitchData.hpp"
 #include "EnterNumberWindow.hpp"
 
-#include <ContactRecord.hpp>
 #include <country.hpp>
 #include <i18n/i18n.hpp>
-#include <text/modes/InputMode.hpp>
-#include <phonenumbers/asyoutypeformatter.h>
-#include <phonenumbers/phonenumberutil.h>
 #include <service-appmgr/Controller.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
 
 #include <cassert>
 

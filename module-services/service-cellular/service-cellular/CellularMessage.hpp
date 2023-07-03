@@ -280,7 +280,7 @@ namespace cellular
     class RequestMessage : public CellularMessage
     {
       public:
-        RequestMessage(Type type, std::string data = "") : CellularMessage(type), data(data)
+        RequestMessage(Type type, std::string data = "") : CellularMessage(type), data(std::move(data))
         {}
 
         std::string data;
@@ -339,7 +339,7 @@ namespace cellular
         ResponseMessage(bool retCode,
                         std::string retdata              = std::string(),
                         CellularMessage::Type responseTo = CellularMessage::Type::Uninitialized)
-            : sys::ResponseMessage(sys::ReturnCodes::Success), retCode(retCode), data(retdata),
+            : sys::ResponseMessage(sys::ReturnCodes::Success), retCode(retCode), data(std::move(retdata)),
               cellResponse(responseTo){};
 
         ResponseMessage(bool retCode, CellularMessage::Type responseTo)
@@ -403,7 +403,7 @@ namespace cellular
         app::manager::actions::MMIParams params;
 
       public:
-        explicit MMIDataMessage(std::string mmiData) : CellularMessage(Type::MMIData), params(mmiData)
+        explicit MMIDataMessage(std::string mmiData) : CellularMessage(Type::MMIData), params(std::move(mmiData))
         {}
     };
     class MMIResponseMessage : public MMIDataMessage, public app::manager::actions::ConvertibleToAction
@@ -466,7 +466,7 @@ namespace cellular
     class NoSimNotification : public ResponseMessage, public app::manager::actions::ConvertibleToAction
     {
       public:
-        NoSimNotification(std::string data) : ResponseMessage(false, data)
+        NoSimNotification(std::string data) : ResponseMessage(false, std::move(data))
         {}
 
         [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
@@ -481,7 +481,7 @@ namespace cellular
     class NotAnEmergencyNotification : public ResponseMessage, public app::manager::actions::ConvertibleToAction
     {
       public:
-        NotAnEmergencyNotification(std::string data) : ResponseMessage(false, data)
+        NotAnEmergencyNotification(std::string data) : ResponseMessage(false, std::move(data))
         {}
 
         [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
@@ -493,10 +493,10 @@ namespace cellular
         }
     };
 
-    class NoNetworkConenctionNotification : public ResponseMessage, public app::manager::actions::ConvertibleToAction
+    class NoNetworkConnectionNotification : public ResponseMessage, public app::manager::actions::ConvertibleToAction
     {
       public:
-        NoNetworkConenctionNotification() : ResponseMessage(false)
+        NoNetworkConnectionNotification() : ResponseMessage(false)
         {}
 
         [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
@@ -845,7 +845,7 @@ namespace cellular
     {
       public:
         explicit GetSimContactsResponse(std::shared_ptr<std::vector<SimContact>> contacts)
-            : sys::ResponseMessage(sys::ReturnCodes::Success), contacts(contacts)
+            : sys::ResponseMessage(sys::ReturnCodes::Success), contacts(std::move(contacts))
         {}
         GetSimContactsResponse() : sys::ResponseMessage(sys::ReturnCodes::Failure)
         {}
@@ -868,7 +868,7 @@ namespace cellular
     {
       public:
         explicit GetImeiResponse(std::shared_ptr<std::string> imei)
-            : sys::ResponseMessage(sys::ReturnCodes::Success), imei(imei)
+            : sys::ResponseMessage(sys::ReturnCodes::Success), imei(std::move(imei))
         {}
         GetImeiResponse() : sys::ResponseMessage(sys::ReturnCodes::Failure)
         {}
@@ -905,7 +905,7 @@ namespace cellular
     class URCCounterMessage : public sys::DataMessage
     {
       public:
-        explicit URCCounterMessage(const uint32_t urcCounter)
+        explicit URCCounterMessage(const std::uint32_t urcCounter)
             : sys::DataMessage(MessageType::MessageTypeUninitialized), urcCounter(urcCounter){};
         auto getCounter()
         {
@@ -913,7 +913,7 @@ namespace cellular
         }
 
       private:
-        uint32_t urcCounter;
+        std::uint32_t urcCounter;
     };
 
     class RetrySwitchCSQMode : public sys::DataMessage
@@ -969,7 +969,7 @@ namespace cellular
     {
       public:
         CallStartedNotification(utils::PhoneNumber phoneNumber, bool isIncoming)
-            : sys::DataMessage(MessageType::MessageTypeUninitialized), phoneNumber(phoneNumber),
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), phoneNumber(std::move(phoneNumber)),
               isIncoming(isIncoming){};
         utils::PhoneNumber getNumber()
         {
@@ -1022,9 +1022,9 @@ namespace cellular
     class CallDurationNotification : public sys::DataMessage
     {
       public:
-        explicit CallDurationNotification(const time_t duration)
+        explicit CallDurationNotification(const std::time_t duration)
             : sys::DataMessage(MessageType::MessageTypeUninitialized), callDuration(duration){};
-        time_t callDuration;
+        std::time_t callDuration;
     };
     class CallerIdMessage : public CellularMessage
     {

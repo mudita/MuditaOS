@@ -201,18 +201,16 @@ class ServiceCellular : public sys::Service
 
     bool transmitDtmfTone(DTMFCode code);
 
-    bool SetScanMode(std::string mode);
+    bool SetScanMode(const std::string &mode);
     std::string GetScanMode();
 
-    uint32_t stateTimeout = 0;
-    void startStateTimer(uint32_t timeout);
+    std::uint32_t stateTimeout = 0;
+    void startStateTimer(std::uint32_t timeout);
     void stopStateTimer();
     void handleStateTimer();
 
     // db response handlers
     auto handle(db::query::SMSSearchByTypeResult *response) -> bool;
-
-    bool handleIMEIRequest();
 
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         cellular::StartOperatorsScanMessage *msg);
@@ -250,14 +248,12 @@ class ServiceCellular : public sys::Service
     auto handleCellularCallRequestMessage(cellular::CallRequestMessage *msg)
         -> std::shared_ptr<cellular::ResponseMessage>;
     void handleCellularHangupCallMessage(cellular::HangupCallMessage *msg);
-    void handleCellularDismissCallMessage(sys::Message *msg);
     auto handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>;
     /// when we start call from Pure -> to the calee, then we poll for the moment that the calee answered the call
     auto handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleDBNotificationMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     /// handle mudita phone -> world ringing (not AT RING!)
     auto handleCellularRingingMessage(cellular::RingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetOwnNumberMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetNetworkInfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
@@ -272,7 +268,6 @@ class ServiceCellular : public sys::Service
     auto handleCellularGetAntennaMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularDtmfRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularUSSDMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleSimStateMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleStateRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
 
     auto handleCallActiveNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
@@ -280,13 +275,11 @@ class ServiceCellular : public sys::Service
     auto handlePowerDownDeregisteringNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handlePowerDownDeregisteredNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleNewIncomingSMSNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleRawCommandNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleSmsDoneNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleSignalStrengthUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleNetworkStatusUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetFlightModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCellularSetRadioOnOffMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetConnectionFrequencyMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
@@ -297,7 +290,6 @@ class ServiceCellular : public sys::Service
 
     auto tetheringTurnOffURC() -> bool;
     auto tetheringTurnOnURC() -> bool;
-    auto logTetheringCalls() -> void;
     std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;
     TaskHandle_t getTaskHandle();
 };

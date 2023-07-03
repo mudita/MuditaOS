@@ -51,8 +51,7 @@ namespace gui
         /**
          * A flag that is set if current window state requires the phone to stay unlocked
          */
-        bool preventsAutoLock      = false;
-        bool preventsLongPressLock = false;
+        bool preventsAutoLock = false;
 
         const std::chrono::milliseconds inputModeRestoreTimeout = std::chrono::seconds{3};
         sys::TimerHandle inputModeRestoreTimer;

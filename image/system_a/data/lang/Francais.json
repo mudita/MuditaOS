@@ -220,6 +220,8 @@
     "app_desktop_info_mmi_registration_success": "L'enregistrement fut un succ\u00e8s",
     "app_desktop_info_mmi_result_failed": "\u00c9chou\u00e9",
     "app_desktop_info_mmi_result_success": "Succ\u00e8s",
+    "app_desktop_info_mmi_result_timeout": "Le traitement du code USSD a été interrompu. Code incorrect ou erreur réseau.",
+    "app_desktop_info_mmi_result_aborted": "Opération annulée.",
     "app_desktop_menu": "MENU",
     "app_desktop_menu_alarm": "ALARME",
     "app_desktop_menu_calendar": "CALENDRIER",
