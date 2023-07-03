@@ -169,12 +169,12 @@ namespace service::eink
     {
         setState(State::Running);
 
-        if (const auto status = display->resetAndInit(); status != hal::eink::EinkStatus::EinkOK) {
+        if (const auto status = display->reinitAndPowerOn(); status != hal::eink::EinkStatus::EinkOK) {
             LOG_FATAL("Error: Could not initialize Eink display!");
         }
         eInkSentinel->HoldMinimumFrequency();
-        display->powerOn();
-        display->powerOff();
+        //        display->powerOn();
+        display->shutdown();
         eInkSentinel->ReleaseMinimumFrequency();
     }
 
@@ -432,12 +432,18 @@ namespace service::eink
         const auto message = static_cast<service::eink::RefreshMessage *>(request);
 
         if (einkDisplayState == EinkDisplayState::NeedRefresh) {
+            if (imageDrawingFailed) {
+                refreshModeSum = hal::eink::EinkRefreshMode::REFRESH_DEEP;
+            }
             const auto status = display->showImageRefresh(refreshFramesSum, refreshModeSum);
             if (status != hal::eink::EinkStatus::EinkOK) {
                 previousContext.reset();
                 previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
                 LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
-                //                imageDrawingFailed = true;
+                imageDrawingFailed = true;
+            }
+            else {
+                imageDrawingFailed = false;
             }
             //            else if (imageDrawingFailed) {
             //                display->resetAndInit();

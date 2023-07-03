@@ -202,7 +202,8 @@ namespace service::gui
     void ServiceGUI::sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode)
     {
         isDisplaying = true;
-        auto msg     = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
+
+        auto msg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
         bus.sendUnicast(std::move(msg), service::name::eink);
         scheduleContextRelease(contextId);
     }

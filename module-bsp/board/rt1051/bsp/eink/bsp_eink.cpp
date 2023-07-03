@@ -229,6 +229,7 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
 
 void BSP_EinkDeinit(void)
 {
+
     LPSPI_Enable(BSP_EINK_LPSPI_BASE, false);
 
     if (bsp_eink_busySemaphore != NULL) {
