@@ -169,6 +169,7 @@ namespace service::eink
     {
         setState(State::Running);
 
+        // this is probably not needed any more
         if (const auto status = display->reinitAndPowerOn(); status != hal::eink::EinkStatus::EinkOK) {
             LOG_FATAL("Error: Could not initialize Eink display!");
         }

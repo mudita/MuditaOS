@@ -495,7 +495,6 @@ void EinkChangeDisplayUpdateTimings(EinkDisplayTimingsMode_e timingsMode)
     }
 
     if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
-        //        EinkResetAndInitialize();
         return;
     }
 }
@@ -513,7 +512,6 @@ EinkStatus_e EinkPowerOn()
 
     std::uint8_t cmd = EinkPowerON; // 0x04
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -534,7 +532,6 @@ EinkStatus_e EinkPowerOff()
 
     std::uint8_t cmd = EinkPowerOFF; // 0x02
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -569,7 +566,6 @@ std::int16_t EinkGetTemperatureInternal()
 
     if (BSP_EinkWriteData(cmd, sizeof(cmd), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        EinkResetAndInitialize();
         return -1;
     }
 
@@ -579,7 +575,6 @@ std::int16_t EinkGetTemperatureInternal()
 
     if (BSP_EinkReadData(temp, sizeof(temp), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        EinkResetAndInitialize();
         return -1;
     }
 
@@ -603,7 +598,6 @@ static void s_EinkSetGateOrder()
     buf[1] = 0x02; // Magic value required by the ED028TC1 display manufacturer
     buf[2] = 0x00;
     if (BSP_EinkWriteData(buf, 3, SPI_AUTOMATIC_CS) != 0) {
-        //        EinkResetAndInitialize();
         return;
     }
 }
@@ -726,13 +720,11 @@ EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
     auto startTicks = xTaskGetTickCount();
     /// LUTD
     if (BSP_EinkWriteData(settings->LUTDData, settings->LUTDSize, SPI_AUTOMATIC_CS) != 0) {
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
     /// LUTC
     if (BSP_EinkWriteData(settings->LUTCData, settings->LUTCSize + 1, SPI_AUTOMATIC_CS) != 0) {
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -751,13 +743,11 @@ static EinkStatus_e s_EinkReadFlagsRegister(std::uint16_t *flags)
 
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
     if (BSP_EinkReadData(flags, sizeof(std::uint16_t), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -782,11 +772,9 @@ EinkStatus_e EinkWaitTillPipelineBusy()
 
 EinkStatus_e EinkDitherDisplay()
 {
-
     std::uint8_t cmdWithArgs[2] = {EinkDPC, EINK_DITHER_4BPP_MODE | EINK_DITHER_START};
 
     if (BSP_EinkWriteData(cmdWithArgs, sizeof(cmdWithArgs), SPI_AUTOMATIC_CS) != 0) {
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -795,7 +783,6 @@ EinkStatus_e EinkDitherDisplay()
     s_EinkReadFlagsRegister(&flags);
 
     if ((flags & EINK_FLAG_DITHER_IN_PROGRESS)) {
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -892,7 +879,6 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
 
     auto status = BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS);
     if (status != 0) {
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -901,7 +887,6 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
     // Send the part of the image to the display memory
 
     if (BSP_EinkWriteData(s_einkServiceRotatedBuf, msgSize, SPI_AUTOMATIC_CS) != 0) {
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -924,7 +909,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     buf[8] = EINK_DISPLAY_RES_Y & 0x00FF;
 
     if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -934,7 +918,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     buf[1] = Eink1Bpp - 1;
     if (BSP_EinkWriteData(buf, 2, SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -953,7 +936,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 
     if (BSP_EinkWriteData(bg.get(), BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8, SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
@@ -1006,7 +988,6 @@ EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refres
     LOG_ERROR("status: %ld", status);
     if (status != 0) {
         LOG_ERROR("ERROR: BSP_EinkWriteData");
-        //        EinkResetAndInitialize();
         return EinkSPIErr;
     }
 

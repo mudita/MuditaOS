@@ -191,7 +191,7 @@ namespace hal::eink
         return EinkStatus::EinkOK;
     }
 
-    EinkStatus EinkDisplay::showImageRefresh(const EinkFrame &refreshFrame, EinkRefreshMode refreshMode)
+    EinkStatus EinkDisplay::showImageRefresh(const EinkFrame &refreshFrame, const EinkRefreshMode refreshMode)
     {
         if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
             status != EinkStatus::EinkOK) {
