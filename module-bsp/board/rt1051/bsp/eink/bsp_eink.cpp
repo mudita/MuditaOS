@@ -118,6 +118,8 @@ static bsp_eink_driver_t BSP_EINK_LPSPI_EdmaDriverState = {
     EventWaitRegistered,
 };
 
+static bool bsp_eink_IsInitialised = false;
+
 static SemaphoreHandle_t bsp_eink_TransferComplete;
 
 static SemaphoreHandle_t bsp_eink_busySemaphore; //  This semaphore suspends the task until the EPD display is busy
@@ -144,6 +146,9 @@ static void s_LPSPI_MasterEdmaCallback(LPSPI_Type *base,
 
 status_t BSP_EinkInit(bsp_eink_BusyEvent event)
 {
+    if (bsp_eink_IsInitialised) {
+        return kStatus_Success;
+    }
     bsp_eink_driver_t *lpspi = &BSP_EINK_LPSPI_EdmaDriverState;
     // lpspi_edma_resource_t *dmaResource = lpspi->dmaResource;
 
@@ -224,12 +229,16 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
                                          lpspi->edmaRxRegToRxDataHandle,
                                          lpspi->edmaTxDataToTxRegHandle);
 
+    bsp_eink_IsInitialised = true;
+
     return kStatus_Success;
 }
 
 void BSP_EinkDeinit(void)
 {
-
+    if (!bsp_eink_IsInitialised) {
+        return;
+    }
     LPSPI_Enable(BSP_EINK_LPSPI_BASE, false);
 
     if (bsp_eink_busySemaphore != NULL) {
@@ -250,6 +259,8 @@ void BSP_EinkDeinit(void)
     gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
     gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
     gpio.reset();
+
+    bsp_eink_IsInitialised = false;
 }
 
 void BSP_EinkLogicPowerOn()

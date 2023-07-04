@@ -168,21 +168,11 @@ namespace service::eink
     void ServiceEink::enterActiveMode()
     {
         setState(State::Running);
-
-        // this is probably not needed any more
-        if (const auto status = display->reinitAndPowerOn(); status != hal::eink::EinkStatus::EinkOK) {
-            LOG_FATAL("Error: Could not initialize Eink display!");
-        }
-        eInkSentinel->HoldMinimumFrequency();
-        //        display->powerOn();
-        display->shutdown();
-        eInkSentinel->ReleaseMinimumFrequency();
     }
 
     void ServiceEink::suspend()
     {
         setState(State::Suspended);
-        display->shutdown();
     }
 
     sys::MessagePointer ServiceEink::handleEinkModeChangedMessage(sys::Message *message)
