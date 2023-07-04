@@ -313,7 +313,6 @@ namespace hal::eink
 
     EinkStatus EinkDisplay::setWaveform(const EinkWaveforms_e mode, const std::int32_t temperature)
     {
-        auto startTicks = xTaskGetTickCount();
         if (!isNewWaveformNeeded(mode, temperature)) {
             EinkUpdateWaveform(&currentWaveform);
             return EinkStatus::EinkOK;
@@ -354,7 +353,6 @@ namespace hal::eink
         std::fread(&currentWaveform.LUTCData[1], 1, LUTCSize, file);
 
         EinkUpdateWaveform(&currentWaveform);
-        LOG_ERROR("Total time of LUTS calculating and updating: %lu", xTaskGetTickCount() - startTicks);
         return EinkStatus::EinkOK;
     }
 
@@ -398,13 +396,14 @@ namespace hal::eink
 
     EinkStatus EinkDisplay::reinitAndPowerOn()
     {
-        if (!EinkIsPoweredOn()) {
-            if (resetAndInit() != EinkStatus::EinkOK) {
-                return EinkStatus::EinkError;
-            }
-            if (powerOn() != EinkStatus::EinkOK) {
-                return EinkStatus::EinkError;
-            }
+        if (EinkIsPoweredOn()) {
+            return EinkStatus::EinkOK;
+        }
+        if (resetAndInit() != EinkStatus::EinkOK) {
+            return EinkStatus::EinkError;
+        }
+        if (powerOn() != EinkStatus::EinkOK) {
+            return EinkStatus::EinkError;
         }
         return EinkStatus::EinkOK;
     }

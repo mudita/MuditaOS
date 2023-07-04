@@ -47,7 +47,6 @@
 
 /* Internal variable definitions */
 static bool s_einkIsPoweredOn = false; //  Variable which contains the state of the power of the EPD display
-static int initCounter        = 0;
 
 static EinkWaveforms_e s_einkConfiguredWaveform =
     EinkWaveformGC16; //  This variable contains the current waveform set in the display
@@ -546,11 +545,8 @@ EinkStatus_e EinkPowerOff()
 
 EinkStatus_e EinkPowerDown(void)
 {
-    auto startTicks = xTaskGetTickCount();
-    LOG_ERROR("deinitializing EINK: %d", --initCounter);
     const auto powerOffStatus = EinkPowerOff();
     BSP_EinkDeinit();
-    LOG_ERROR("Total time of EinkPowerDown: %lu", xTaskGetTickCount() - startTicks);
 
     return powerOffStatus;
 }
@@ -698,8 +694,6 @@ static void s_EinkSetInitialConfig()
 
 EinkStatus_e EinkResetAndInitialize()
 {
-    auto startTicks = xTaskGetTickCount();
-    LOG_ERROR("initializing EINK: %d", ++initCounter);
     BSP_EinkLogicPowerOn();
 
     // Initialize the synchronization resources, SPI and GPIOs for the Eink BSP
@@ -710,14 +704,12 @@ EinkStatus_e EinkResetAndInitialize()
     s_EinkSetInitialConfig();
 
     // After the reset the display is powered off
-    LOG_ERROR("Total time of EinkResetAndInitialize: %lu", xTaskGetTickCount() - startTicks);
     s_einkIsPoweredOn = false;
     return EinkOK;
 }
 
 EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
 {
-    auto startTicks = xTaskGetTickCount();
     /// LUTD
     if (BSP_EinkWriteData(settings->LUTDData, settings->LUTDSize, SPI_AUTOMATIC_CS) != 0) {
         return EinkSPIErr;
@@ -729,8 +721,6 @@ EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
     }
 
     s_einkConfiguredWaveform = settings->mode;
-
-    LOG_ERROR("Total time of EinkUpdateWaveform: %lu", xTaskGetTickCount() - startTicks);
 
     return EinkOK;
 }
@@ -877,8 +867,7 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
         hal::eink::getDisplayWindowHeight(frame)); // LSB of the window width in the EPD display. Value converted from
     // the standard GUI coords system to the ED028TC1 one
 
-    auto status = BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS);
-    if (status != 0) {
+    if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
         return EinkSPIErr;
     }
 
@@ -949,7 +938,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 
 EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refreshTimingsMode)
 {
-    LOG_ERROR("frame: h: %u, w: %u, x: %u, y: %u", frame.height, frame.width, frame.pos_x, frame.pos_y);
     EinkChangeDisplayUpdateTimings(refreshTimingsMode);
 
     s_EinkSetGateOrder();
@@ -984,10 +972,7 @@ EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refres
         hal::eink::getDisplayWindowHeight(frame)); // LSB of the window width in the EPD display. Value converted from
     // the standard GUI coords system to the ED028TC1 one
 
-    auto status = BSP_EinkWriteData(buf, sizeof(buf), SPI_AUTOMATIC_CS);
-    LOG_ERROR("status: %ld", status);
-    if (status != 0) {
-        LOG_ERROR("ERROR: BSP_EinkWriteData");
+    if (BSP_EinkWriteData(buf, sizeof(buf), SPI_AUTOMATIC_CS) != 0) {
         return EinkSPIErr;
     }
 

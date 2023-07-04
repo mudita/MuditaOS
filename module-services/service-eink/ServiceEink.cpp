@@ -1,9 +1,6 @@
 ﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-// check how shoutDown works with EINK
-// make error handling for busy FLAG
-
 #include <board.h>
 #include "ServiceEink.hpp"
 #include "internal/StaticData.hpp"
@@ -105,10 +102,6 @@ namespace service::eink
         const auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(eInkSentinel);
         bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
-        //        if (display->powerOn() != hal::eink::EinkStatus::EinkOK) {
-        //            LOG_ERROR("Error during display powerOn. Eink may not work correctly.");
-        //            return sys::ReturnCodes::Failure;
-        //        }
         eInkSentinel->HoldMinimumFrequency();
 
         return sys::ReturnCodes::Success;
@@ -316,9 +309,6 @@ namespace service::eink
         tick1 = xTaskGetTickCount();
 #endif
 
-        //        if (isInState(State::Suspended)) {
-        //            enterActiveMode();
-        //        }
         const auto message = static_cast<service::eink::ImageMessage *>(request);
         if (isInState(State::Suspended)) {
             LOG_WARN("Received image while suspended, ignoring");
@@ -400,7 +390,6 @@ namespace service::eink
                 expandFrame(refreshFramesSum, refreshFrame);
             }
             einkDisplayState = EinkDisplayState::NeedRefresh;
-            LOG_ERROR("RefreshMessage");
             const auto msg = std::make_shared<service::eink::RefreshMessage>(
                 message->getContextId(), refreshFrame, refreshMode, message->sender);
             bus.sendUnicast(msg, this->GetName());
@@ -408,7 +397,6 @@ namespace service::eink
             return sys::MessageNone{};
         }
         else {
-            LOG_ERROR("ImageDisplayedNotification");
             einkDisplayState = EinkDisplayState::Idle;
             restartDisplayPowerOffTimer();
             return std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
@@ -417,13 +405,10 @@ namespace service::eink
 
     sys::MessagePointer ServiceEink::handleRefreshMessage(sys::Message *request)
     {
-        //        if (isInState(State::Suspended)) {
-        //            enterActiveMode();
-        //        }
         const auto message = static_cast<service::eink::RefreshMessage *>(request);
 
         if (einkDisplayState == EinkDisplayState::NeedRefresh) {
-            if (imageDrawingFailed) {
+            if (previousRefreshMode == hal::eink::EinkRefreshMode::REFRESH_NONE) {
                 refreshModeSum = hal::eink::EinkRefreshMode::REFRESH_DEEP;
             }
             const auto status = display->showImageRefresh(refreshFramesSum, refreshModeSum);
@@ -431,15 +416,7 @@ namespace service::eink
                 previousContext.reset();
                 previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
                 LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
-                imageDrawingFailed = true;
             }
-            else {
-                imageDrawingFailed = false;
-            }
-            //            else if (imageDrawingFailed) {
-            //                display->resetAndInit();
-            //                imageDrawingFailed = false;
-            //            }
 
             einkDisplayState        = EinkDisplayState::Idle;
             isRefreshFramesSumValid = false;
@@ -477,9 +454,6 @@ namespace service::eink
 
     sys::MessagePointer ServiceEink::handlePrepareEarlyRequest(sys::Message *message)
     {
-        //        if (isInState(State::Suspended)) {
-        //            enterActiveMode();
-        //        }
         const auto waveformUpdateMsg = static_cast<service::eink::PrepareDisplayEarlyRequest *>(message);
         display->prepareEarlyRequest(translateToEinkRefreshMode(waveformUpdateMsg->getRefreshMode()),
                                      hal::eink::WaveformTemperature::MEASURE_NEW);

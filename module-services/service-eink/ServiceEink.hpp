@@ -88,7 +88,6 @@ namespace service::eink
         hal::eink::EinkFrame refreshFramesSum;
         hal::eink::EinkRefreshMode refreshModeSum = hal::eink::EinkRefreshMode::REFRESH_NONE;
         bool isRefreshFramesSumValid              = false;
-        bool imageDrawingFailed                   = false;
 
         sys::CloseReason systemCloseReason = sys::CloseReason::RegularPowerDown;
     };
