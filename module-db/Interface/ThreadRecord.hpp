@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,14 +13,15 @@
 #include <utf8/UTF8.hpp>
 
 #include <cstdint>
+
 struct ThreadRecord : Record
 {
-    uint32_t date           = 0;
-    uint32_t msgCount       = 0;
-    uint32_t unreadMsgCount = 0;
+    std::uint32_t date           = 0;
+    std::uint32_t msgCount       = 0;
+    std::uint32_t unreadMsgCount = 0;
     UTF8 snippet;
     SMSType type      = SMSType::UNKNOWN;
-    uint32_t numberID = DB_ID_NONE;
+    std::uint32_t numberID = DB_ID_NONE;
 
     ThreadRecord() = default;
     ThreadRecord(const ThreadsTableRow &rec)
@@ -47,19 +48,18 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     ~ThreadRecordInterface() = default;
 
     bool Add(const ThreadRecord &rec) override final;
-    bool RemoveByID(uint32_t id) override final;
+    bool RemoveByID(std::uint32_t id) override final;
     bool Update(const ThreadRecord &rec) override final;
-    ThreadRecord GetByID(uint32_t id) override final;
-    ThreadRecord GetByContact(uint32_t contact_id);
+    ThreadRecord GetByID(std::uint32_t id) override final;
     ThreadRecord GetByNumber(const utils::PhoneNumber::View &phoneNumber);
 
-    uint32_t GetCount() override final;
-    uint32_t GetCount(EntryState state);
+    std::uint32_t GetCount() override final;
+    std::uint32_t GetCount(EntryState state);
 
-    std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffset(std::uint32_t offset, std::uint32_t limit) override final;
 
-    std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffsetByField(uint32_t offset,
-                                                                     uint32_t limit,
+    std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffsetByField(std::uint32_t offset,
+                                                                     std::uint32_t limit,
                                                                      ThreadRecordField field,
                                                                      const char *str) override final;
 

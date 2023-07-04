@@ -15,11 +15,8 @@
 #include <Style.hpp>
 #include <TextBubble.hpp>
 
-#include <cassert>
-
 namespace gui
 {
-
     SMSThreadViewWindow::SMSThreadViewWindow(app::ApplicationCommon *app)
         : AppWindow(app, name::window::thread_view), app::AsyncCallbackReceiver{app},
           smsModel{std::make_shared<SMSThreadModel>(app)}
@@ -62,24 +59,23 @@ namespace gui
     void SMSThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (mode == ShowMode::GUI_SHOW_RETURN) {
+            smsModel->markCurrentThreadAsRead();
             smsList->rebuildList();
         }
 
-        if (auto pdata = dynamic_cast<SMSThreadData *>(data); pdata) {
+        if (const auto pdata = dynamic_cast<SMSThreadData *>(data); pdata != nullptr) {
             LOG_INFO("Thread data received: %" PRIu32, pdata->thread->ID);
             saveInfoAboutPreviousAppForProperSwitchBack(data);
-            requestContact(pdata->thread->numberID);
 
-            // Mark thread as Read
-            if (pdata->thread->isUnread()) {
-                auto app = dynamic_cast<app::ApplicationMessages *>(application);
-                assert(app != nullptr);
-                if (application->getCurrentWindow() == this) {
-                    app->markSmsThreadAsRead(pdata->thread.get());
-                }
-            }
             smsModel->numberID    = pdata->thread->numberID;
             smsModel->smsThreadID = pdata->thread->ID;
+            requestContact(smsModel->numberID);
+
+            // Mark thread as read
+            if (pdata->thread->isUnread() && (this == application->getCurrentWindow())) {
+                smsModel->markCurrentThreadAsRead();
+            }
+
             smsList->rebuildList();
         }
         else if (smsModel->numberID != DB_ID_NONE) {
@@ -125,20 +121,27 @@ namespace gui
     bool SMSThreadViewWindow::onDatabaseMessage(sys::Message *msgl)
     {
         const auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
-        if (msg != nullptr) {
-            if ((msg->interface == db::Interface::Name::SMS) && msg->dataModified()) {
-                rebuild();
-                return true;
-            }
-            if ((msg->interface == db::Interface::Name::SMSThread) && (msg->type == db::Query::Type::Delete) &&
-                (this == application->getCurrentWindow())) {
+        if (msg == nullptr) {
+            return false;
+        }
+
+        if ((msg->interface == db::Interface::Name::SMS) && msg->dataModified()) {
+            rebuild();
+            return true;
+        }
+
+        if ((msg->interface == db::Interface::Name::SMSThread) && (this == application->getCurrentWindow())) {
+            if (msg->type == db::Query::Type::Delete) {
                 application->switchWindow(gui::name::window::main_window);
+            }
+            else {
+                smsModel->markCurrentThreadAsRead();
             }
         }
         return false;
     }
 
-    auto SMSThreadViewWindow::requestContact(unsigned int numberID) -> void
+    void SMSThreadViewWindow::requestContact(unsigned int numberID)
     {
         auto query = std::make_unique<db::query::ContactGetByNumberID>(numberID);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
@@ -152,7 +155,7 @@ namespace gui
         task->execute(application, this);
     }
 
-    auto SMSThreadViewWindow::handleContactQueryResponse(db::QueryResult *queryResult) -> bool
+    bool SMSThreadViewWindow::handleContactQueryResponse(db::QueryResult *queryResult)
     {
         auto msgResponse = dynamic_cast<db::query::ContactGetByNumberIDResult *>(queryResult);
         if (msgResponse == nullptr) {
@@ -173,7 +176,7 @@ namespace gui
         task->execute(application, this);
     }
 
-    auto SMSThreadViewWindow::handleNumberQueryResponse(db::QueryResult *queryResult) -> bool
+    bool SMSThreadViewWindow::handleNumberQueryResponse(db::QueryResult *queryResult)
     {
         auto msgResponse = dynamic_cast<db::query::NumberGetByIDResult *>(queryResult);
         if (msgResponse == nullptr) {
