@@ -32,6 +32,7 @@ namespace hal::eink
         EinkStatus shutdown() override;
         void wipeOut() override;
         EinkStatus resetAndInit() override;
+        EinkStatus reinitAndPowerOn() override;
         [[nodiscard]] std::shared_ptr<devices::Device> getDevice() const noexcept override;
 
         FrameSize size;

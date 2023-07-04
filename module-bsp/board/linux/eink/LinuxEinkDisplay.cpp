@@ -111,6 +111,12 @@ namespace hal::eink
         return EinkStatus::EinkOK;
     }
 
+    EinkStatus LinuxEinkDisplay::reinitAndPowerOn()
+    {
+        resetAndInit();
+        return EinkStatus::EinkOK;
+    }
+
     [[nodiscard]] auto LinuxEinkDisplay::getDevice() const noexcept -> std::shared_ptr<devices::Device>
     {
         return {};
