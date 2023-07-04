@@ -53,7 +53,7 @@ unsigned int SMSThreadModel::requestRecordsCount()
     return recordsCount;
 }
 
-void SMSThreadModel::requestRecords(uint32_t offset, uint32_t limit)
+void SMSThreadModel::requestRecords(std::uint32_t offset, std::uint32_t limit)
 {
     auto query = std::make_unique<db::query::SMSGetForList>(smsThreadID, offset, limit, numberID);
     auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
@@ -80,8 +80,6 @@ auto SMSThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
         // Additional one element for SMSInputWidget.
         recordsCount = msgResponse->getCount() + 1;
         list->reSendLastRebuildRequest();
-
-        markCurrentThreadAsRead();
         return false;
     }
 
@@ -129,6 +127,7 @@ void SMSThreadModel::resetInputWidget()
     smsInput->clearNavigationItem(gui::NavigationDirection::UP);
     smsInput->clearNavigationItem(gui::NavigationDirection::DOWN);
 }
+
 void SMSThreadModel::markCurrentThreadAsRead()
 {
     const auto [code, msg] = DBServiceAPI::GetQueryWithReply(application,

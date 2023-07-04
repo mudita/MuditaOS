@@ -32,7 +32,7 @@ class SMSThreadModel : public app::DatabaseModel<SMSRecord>,
 
     unsigned int requestRecordsCount() override;
     bool updateRecords(std::vector<SMSRecord> records) override;
-    void requestRecords(uint32_t offset, uint32_t limit) override;
+    void requestRecords(std::uint32_t offset, std::uint32_t limit) override;
     unsigned int getMinimalItemSpaceRequired() const override;
     gui::ListItem *getItem(gui::Order order) override;
 };
