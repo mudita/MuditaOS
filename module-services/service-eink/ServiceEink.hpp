@@ -58,6 +58,12 @@ namespace service::eink
             Canceled
         };
 
+        enum class RefreshStatus
+        {
+            Succes,
+            Failed
+        };
+
         void setState(State state) noexcept;
         bool isInState(State state) const noexcept;
         void restartDisplayPowerOffTimer();
@@ -88,6 +94,7 @@ namespace service::eink
         hal::eink::EinkFrame refreshFramesSum;
         hal::eink::EinkRefreshMode refreshModeSum = hal::eink::EinkRefreshMode::REFRESH_NONE;
         bool isRefreshFramesSumValid              = false;
+        RefreshStatus previousRefreshStatus       = RefreshStatus::Succes;
 
         sys::CloseReason systemCloseReason = sys::CloseReason::RegularPowerDown;
     };

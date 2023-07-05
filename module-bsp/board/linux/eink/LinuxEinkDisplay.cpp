@@ -100,9 +100,9 @@ namespace hal::eink
         return EinkStatus::EinkOK;
     }
 
-    void LinuxEinkDisplay::wipeOut()
+    EinkStatus LinuxEinkDisplay::wipeOut()
     {
-        EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite);
+        return translateStatus(EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite));
     }
 
     EinkStatus LinuxEinkDisplay::resetAndInit()

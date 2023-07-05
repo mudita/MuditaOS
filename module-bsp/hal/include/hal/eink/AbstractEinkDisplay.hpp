@@ -83,7 +83,7 @@ namespace hal::eink
         virtual EinkStatus powerOn()                                        = 0;
         virtual EinkStatus powerOff()                                       = 0;
         virtual EinkStatus shutdown()                                       = 0;
-        virtual void wipeOut()                                              = 0;
+        virtual EinkStatus wipeOut()                                        = 0;
         virtual EinkStatus resetAndInit()                                   = 0;
         virtual std::shared_ptr<devices::Device> getDevice() const noexcept = 0;
         virtual EinkStatus reinitAndPowerOn()                               = 0;

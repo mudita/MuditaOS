@@ -118,7 +118,7 @@ namespace service::eink
     sys::ReturnCodes ServiceEink::DeinitHandler()
     {
         // Eink must be turned on before wiping out the display
-        display->powerOn();
+        display->reinitAndPowerOn();
 
         if ((exitAction == ExitAction::WipeOut) ||
             ((display->getMode() == hal::eink::EinkDisplayColorMode::EinkDisplayColorModeInverted) &&
@@ -343,6 +343,9 @@ namespace service::eink
                 previousContext->insert(0, 0, ctx);
             }
         }
+        if (previousRefreshStatus == RefreshStatus::Failed) {
+            updateFrames.front() = {0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y};
+        }
 
         // If parts of the screen were changed, update eink
         bool isImageUpdated = false;
@@ -408,14 +411,16 @@ namespace service::eink
         const auto message = static_cast<service::eink::RefreshMessage *>(request);
 
         if (einkDisplayState == EinkDisplayState::NeedRefresh) {
-            if (previousRefreshMode == hal::eink::EinkRefreshMode::REFRESH_NONE) {
-                refreshModeSum = hal::eink::EinkRefreshMode::REFRESH_DEEP;
+            if (previousRefreshStatus == RefreshStatus::Failed) {
+                previousRefreshStatus = RefreshStatus::Succes;
+                LOG_ERROR("\n\nREFRESH_DEEP\n");
             }
             const auto status = display->showImageRefresh(refreshFramesSum, refreshModeSum);
             if (status != hal::eink::EinkStatus::EinkOK) {
                 previousContext.reset();
                 previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
-                LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
+                LOG_ERROR("\n\nError during drawing image on eink: %s\n", magic_enum::enum_name(status).data());
+                previousRefreshStatus = RefreshStatus::Failed;
             }
 
             einkDisplayState        = EinkDisplayState::Idle;

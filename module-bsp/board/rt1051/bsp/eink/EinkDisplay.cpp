@@ -270,9 +270,12 @@ namespace hal::eink
         return status;
     }
 
-    void EinkDisplay::wipeOut()
+    EinkStatus EinkDisplay::wipeOut()
     {
-        EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite);
+        if (const auto status = reinitAndPowerOn(); status != EinkStatus::EinkOK) {
+            return status;
+        }
+        return translateStatus(EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite));
     }
 
     EinkBpp_e EinkDisplay::getCurrentBitsPerPixelFormat() const noexcept

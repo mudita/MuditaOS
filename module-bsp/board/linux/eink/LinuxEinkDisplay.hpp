@@ -30,7 +30,7 @@ namespace hal::eink
         EinkStatus powerOn() override;
         EinkStatus powerOff() override;
         EinkStatus shutdown() override;
-        void wipeOut() override;
+        EinkStatus wipeOut() override;
         EinkStatus resetAndInit() override;
         EinkStatus reinitAndPowerOn() override;
         [[nodiscard]] std::shared_ptr<devices::Device> getDevice() const noexcept override;
