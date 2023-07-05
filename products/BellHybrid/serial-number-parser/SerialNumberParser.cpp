@@ -39,20 +39,36 @@ namespace serial_number_parser
         /* Common constants */
         constexpr auto serialNumberOffset  = 0;
         constexpr auto serialNumberLength  = 13;
+        constexpr auto modelCodeOffset     = 0;
+        constexpr auto modelCodeLength     = 2;
         constexpr auto unknownSerialNumber = "0000000000000";
+
+        constexpr auto grayColor           = "gray";
+        constexpr auto blackColor          = "black";
         constexpr auto unknownColour       = "unknown";
+
+        constexpr auto firstVersion   = 1;
+        constexpr auto secondVersion  = 2;
+        constexpr auto unknownVersion = 0;
+
+        constexpr auto firstModelCode = "04";
+
+        const auto unknownVersionMetadata = VersionMetadata(unknownColour, unknownVersion);
+        const auto unknownDeviceMetadata  = DeviceMetadata(unknownSerialNumber, unknownVersionMetadata);
 
         /* Old serial number constants */
         constexpr auto idStringOffset = 0;
         constexpr auto idStringLength = 6;
 
-        /* ID string to colour map for already released batches */
-        const std::map<std::string, std::string> idStringToColourMap{
-            {"042148", "gray"}, {"042213", "gray"}, {"042242", "black"}};
+        /* ID string to version metadata map for already released batches */
+        const std::map<std::string, VersionMetadata> idStringToVersionInfoMap{
+            {"042148", VersionMetadata(grayColor, firstVersion)},
+            {"042213", VersionMetadata(grayColor, firstVersion)},
+            {"042242", VersionMetadata(blackColor, secondVersion)}};
 
         /* New serial number constants */
         constexpr auto colourCodeOffset = 4;
-        const std::map<char, std::string> colourCodeToColourMap{{'G', "gray"}, {'B', "black"}};
+        const std::map<char, std::string> colourCodeToColourMap{{'G', grayColor}, {'B', blackColor}};
 
         bool isOldSerialNumberFormat(const std::string &serialNumber)
         {
@@ -76,14 +92,14 @@ namespace serial_number_parser
             return std::string(&block[serialNumberOffset], serialNumberLength);
         }
 
-        std::string getDeviceColour(const std::string &serialNumber)
+        std::optional<VersionMetadata> getDeviceVersionMetadata(const std::string &serialNumber)
         {
             if (isOldSerialNumberFormat(serialNumber)) {
                 LOG_INFO("Device has old serial number format");
                 const auto idString = serialNumber.substr(idStringOffset, idStringLength);
-                const auto item     = idStringToColourMap.find(idString);
-                if (item == idStringToColourMap.end()) {
-                    return "";
+                const auto item     = idStringToVersionInfoMap.find(idString);
+                if (item == idStringToVersionInfoMap.end()) {
+                    return std::nullopt;
                 }
                 return item->second;
             }
@@ -92,27 +108,37 @@ namespace serial_number_parser
                 const auto colourCode = serialNumber[colourCodeOffset];
                 const auto item       = colourCodeToColourMap.find(colourCode);
                 if (item == colourCodeToColourMap.end()) {
-                    return "";
+                    return std::nullopt;
                 }
-                return item->second;
+
+                /* TODO
+                 * Verify this algorithm. It will work when next Harmony versions will have
+                 * next model codes starting from "04", i.e. Harmony 2 is "05", Harmony 3 is "06",-u etc.
+                 * Maybe it should be determined using hardware version? (see SN description at the
+                 * beginning of this file) */
+                const auto modelCode     = serialNumber.substr(modelCodeOffset, modelCodeLength);
+                const auto versionNumber = utils::toNumeric(modelCode) - utils::toNumeric(firstModelCode) + 1;
+
+                return VersionMetadata(item->second, versionNumber);
             }
         }
     } // namespace
 
-    std::pair<std::string, std::string> getDeviceMetadata()
+    DeviceMetadata getDeviceMetadata()
     {
         const auto serialNumber = readSerialNumber();
         if (serialNumber.empty()) {
             LOG_ERROR("Error reading serial number from eMMC!");
-            return {unknownSerialNumber, unknownColour};
+            return unknownDeviceMetadata;
         }
 
-        const auto deviceColour = getDeviceColour(serialNumber);
-        if (deviceColour.empty()) {
-            LOG_ERROR("Failed to read colour for device with serial number '%s'!", serialNumber.c_str());
-            return {serialNumber, unknownColour};
+        const auto deviceVersionMetadata = getDeviceVersionMetadata(serialNumber);
+        if (!deviceVersionMetadata.has_value()) {
+            LOG_ERROR("Failed to read device version metadata for device with serial number '%s'!",
+                      serialNumber.c_str());
+            return DeviceMetadata(serialNumber, unknownVersionMetadata);
         }
 
-        return {serialNumber, deviceColour};
+        return DeviceMetadata(serialNumber, deviceVersionMetadata.value());
     }
 } // namespace serial_number_parser

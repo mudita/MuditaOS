@@ -6,5 +6,9 @@
 
 namespace serial_number_parser
 {
-    std::pair<std::string, std::string> getDeviceMetadata();
+    /* Serial number and device version */
+    using VersionMetadata = std::pair<std::string, unsigned>;
+    using DeviceMetadata  = std::pair<std::string, VersionMetadata>;
+
+    DeviceMetadata getDeviceMetadata();
 } // namespace serial_number_parser
