@@ -412,14 +412,14 @@ namespace service::eink
 
         if (einkDisplayState == EinkDisplayState::NeedRefresh) {
             if (previousRefreshStatus == RefreshStatus::Failed) {
+                refreshModeSum        = hal::eink::EinkRefreshMode::REFRESH_DEEP;
                 previousRefreshStatus = RefreshStatus::Succes;
-                LOG_ERROR("\n\nREFRESH_DEEP\n");
             }
             const auto status = display->showImageRefresh(refreshFramesSum, refreshModeSum);
             if (status != hal::eink::EinkStatus::EinkOK) {
                 previousContext.reset();
                 previousRefreshMode = hal::eink::EinkRefreshMode::REFRESH_NONE;
-                LOG_ERROR("\n\nError during drawing image on eink: %s\n", magic_enum::enum_name(status).data());
+                LOG_ERROR("Error during drawing image on eink: %s", magic_enum::enum_name(status).data());
                 previousRefreshStatus = RefreshStatus::Failed;
             }
 
