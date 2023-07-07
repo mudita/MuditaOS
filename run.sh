@@ -5,7 +5,6 @@
 source config/common.sh
 
 BIN_DIR="build-rt1051-Debug"
-GDB_ARM=$( hash arm-none-eabi-gdb-py3 2> /dev/null && echo "arm-none-eabi-gdb-py3" || echo "arm-none-eabi-gdb" )
 
 help() 
 {
@@ -60,6 +59,44 @@ while [[ $# -gt 0 ]]; do
     esac;
     shift
 done
+
+if [ -z ${GDB_ARM+x} ]; then # if GDB_ARM unset, check which GDB binaries are present and choose one
+    ALL_GDB_VERSIONS=( $(compgen -A command arm-none-eabi-gdb | sort -n) )
+    PY_VER=()
+
+    # check python version for all present GDB binaries
+    for GDB_VERSION in "${ALL_GDB_VERSIONS[@]}"; do
+        PY_VER+=( "$($GDB_VERSION --batch -iex 'python import sys; print(sys.version)' 2> /dev/null || echo "no python")" )
+    done
+
+    # check for GDB versions with python 3
+    for i in "${!PY_VER[@]}"; do
+        if [[ "${PY_VER[$i]}" == "3."* ]]; then 
+            GDB_ARM=${ALL_GDB_VERSIONS[$i]}
+            echo "GDB with python 3 found"
+            break
+        fi 
+    done
+
+    if [ -z ${GDB_ARM+x} ]; then # if GDB_ARM still unset check for GDB versions with python 2 
+        for i in "${!PY_VER[@]}"; do
+            if [[ "${PY_VER[$i]}" == "2."* ]]; then 
+                GDB_ARM=${ALL_GDB_VERSIONS[$i]}
+                echo "GDB with python 2 found. For the best debugging experience update your GDB binaries from the most recent toolchain release"
+                break
+            fi 
+        done
+    fi
+
+    if [ -z ${GDB_ARM+x} ]; then 
+        if command -v arm-none-eabi-gdb &> /dev/null; then
+            echo "No GDB with python found. If you want to use debugging tools please install a GDB version that supports python."
+            GDB_ARM="arm-none-eabi-gdb"
+        else 
+            echo "looks like you don't have any compatible GDB versions installed. Use the bootstrap.sh script to download and configure the ARM toolchain."
+        fi
+    fi
+fi
 
 if [ -z "${PRODUCT_NAME}" ]; then
     echo "ERROR! Product param not provided"
