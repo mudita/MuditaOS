@@ -91,8 +91,7 @@ namespace gui
         auto requestingWindow  = switchData->requestingWindow;
         app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
             LOG_DEBUG("SMS template id = %" PRIu32 "chosen", templ->ID);
-            std::unique_ptr<gui::SwitchData> data =
-                std::make_unique<SMSTextData>(templ->text, SMSTextData::Concatenate::True);
+            auto data = std::make_unique<SMSTextData>(templ->text, SMSTextData::Concatenate::True);
             application->switchWindow(requestingWindow, std::move(data));
             return true;
         };
@@ -100,7 +99,8 @@ namespace gui
 
     void SMSTemplatesWindow::smsSendTemplateRequestHandler(const SMSSendTemplateRequest *const switchData)
     {
-        preventsAutoLock = switchData->isAutoLockPrevented();
+        preventsAutoLock = (switchData->getAutolockBehavior() == SMSSendTemplateRequest::AutolockBehavior::Prevent);
+
         auto app         = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
 
@@ -115,10 +115,8 @@ namespace gui
         };
     }
 
-    void SMSTemplatesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void SMSTemplatesWindow::onBeforeShow([[maybe_unused]] ShowMode mode, SwitchData *data)
     {
-        preventsAutoLock = false;
-
         if (auto switchData = dynamic_cast<SMSTemplateRequest *>(data)) {
             smsTemplateRequestHandler(switchData);
         }

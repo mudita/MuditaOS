@@ -110,10 +110,10 @@ namespace gui
         };
 
         sendSmsIcon                    = new gui::SendSmsIcon(iconsBox);
-        sendSmsIcon->activatedCallback = [=](gui::Item &item) {
+        sendSmsIcon->activatedCallback = [=]([[maybe_unused]] gui::Item &item) {
             LOG_INFO("Send message template and reject the call");
-            constexpr auto preventAutoLock = true;
-            auto msg = std::make_unique<SMSSendTemplateRequest>(presenter.getPhoneNumber().getView(), preventAutoLock);
+            auto msg = std::make_unique<SMSSendTemplateRequest>(presenter.getPhoneNumber().getView(),
+                                                                SMSSendTemplateRequest::AutolockBehavior::Prevent);
             msg->ignoreCurrentWindowOnStack = true;
             msg->nameOfSenderApplication    = application->GetName();
             return app::manager::Controller::sendAction(application,

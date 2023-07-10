@@ -51,6 +51,7 @@
 * Fixed occasional USB crash when USB cable was disconnected during files upload
 * Fixed unsupported character in several quotes
 * Fixed marking new message as read in Messages app main window
+* Fixed unwanted autolock on template selection window while rejecting call
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved

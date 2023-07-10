@@ -72,18 +72,25 @@ class SMSSendRequest : public SMSRequest
 class SMSSendTemplateRequest : public SMSRequest
 {
   public:
-    explicit SMSSendTemplateRequest(const utils::PhoneNumber::View &phoneNumber, bool preventAutoLock = false)
-        : SMSRequest(phoneNumber), preventAutoLock(preventAutoLock)
+    enum class AutolockBehavior
+    {
+        Allow,
+        Prevent
+    };
+
+    explicit SMSSendTemplateRequest(const utils::PhoneNumber::View &phoneNumber,
+                                    AutolockBehavior autolockBehavior = AutolockBehavior::Allow)
+        : SMSRequest(phoneNumber), autolockBehavior(autolockBehavior)
     {}
     ~SMSSendTemplateRequest() override = default;
 
-    [[nodiscard]] bool isAutoLockPrevented() const
+    [[nodiscard]] AutolockBehavior getAutolockBehavior() const noexcept
     {
-        return preventAutoLock;
+        return autolockBehavior;
     }
 
   private:
-    bool preventAutoLock;
+    AutolockBehavior autolockBehavior;
 };
 
 class SMSTemplateSent : public gui::SwitchData
