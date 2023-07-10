@@ -6,11 +6,11 @@
 #include "HSP.hpp"
 
 #include <Bluetooth/Result.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <BluetoothWorker.hpp>
 #include <module-bluetooth/Bluetooth/interface/profiles/SCO/ScoUtils.hpp>
 #include <service-audio/AudioMessage.hpp>
-#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/ServiceBluetoothName.hpp>
 #include <service-bluetooth/messages/AudioVolume.hpp>
 #include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/Disconnect.hpp>

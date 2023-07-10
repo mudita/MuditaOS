@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FrontlightAction.hpp"
 
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 
 #include <service-db/Settings.hpp>
 #include <db/SystemSettings.hpp>

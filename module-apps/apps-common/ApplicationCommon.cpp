@@ -10,7 +10,7 @@
 #include "actions/AlarmClockStatusChangeParams.hpp"
 #include <service-cellular/CellularMessage.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
@@ -19,7 +19,7 @@
 #include "DOMResponder.hpp"
 #include <WindowsStack.hpp>
 #include <WindowsPopupFilter.hpp>
-#include <service-gui/Common.hpp>
+#include <service-gui/ServiceGUIName.hpp>
 
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>

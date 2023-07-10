@@ -521,7 +521,7 @@ void ServiceBluetooth::handleTurnOn()
 
 auto ServiceBluetooth::handle(message::bluetooth::RequestStatusIndicatorData *msg) -> std::shared_ptr<sys::Message>
 {
-    bus.sendUnicast(std::make_shared<cellular::RequestCurrentOperatorNameMessage>(), cellular::service::name);
+    bus.sendUnicast(std::make_shared<cellular::RequestCurrentOperatorNameMessage>(), service::name::cellular);
 
     // just to execute proper handle method and sending it back to worker
     bus.sendUnicast(std::make_shared<cellular::SignalStrengthUpdateNotification>(), service::name::bluetooth);

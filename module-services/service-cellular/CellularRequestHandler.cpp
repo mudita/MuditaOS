@@ -25,7 +25,7 @@
 #include <service-cellular/src/ServiceCellularPriv.hpp>
 #include <service-cellular/src/ussd/USSDHandler.hpp>
 
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp>
 

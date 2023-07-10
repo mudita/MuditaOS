@@ -10,7 +10,7 @@
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <i18n/i18n.hpp>
 #include <options/OptionBellMenu.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
 #include <GuiTimer.hpp>
 

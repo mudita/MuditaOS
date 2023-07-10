@@ -77,7 +77,7 @@ void EventManager::initProductEvents()
     });
 
     connect(typeid(sevm::SIMTrayMessage), [&]([[maybe_unused]] sys::Message *msg) {
-        bus.sendUnicast(std::make_shared<sevm::SIMTrayMessage>(), ServiceCellular::serviceName);
+        bus.sendUnicast(std::make_shared<sevm::SIMTrayMessage>(), service::name::cellular);
         return sys::MessageNone{};
     });
 
@@ -147,13 +147,13 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         if (auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl)) {
             auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
             message->state = msg->state;
-            bus.sendUnicast(message, ServiceCellular::serviceName);
+            bus.sendUnicast(message, service::name::cellular);
         }
         handled = true;
     }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {
         auto msg = std::make_shared<cellular::UrcIncomingNotification>();
-        bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
+        bus.sendUnicast(std::move(msg), service::name::cellular);
         handled = true;
     }
 

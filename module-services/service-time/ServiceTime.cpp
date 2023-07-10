@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTime.hpp"
-#include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EVMessages.hpp"
 #include <service-time/internal/StaticData.hpp>
 #include <service-time/RTCCommand.hpp>
@@ -226,7 +225,7 @@ namespace stm
         }
 
         bus.sendUnicast(std::make_shared<stm::message::AutomaticDateAndTimeChangedMessage>(message->getValue()),
-                        ServiceCellular::serviceName);
+                        service::name::cellular);
         return std::shared_ptr<sys::ResponseMessage>();
     }
 

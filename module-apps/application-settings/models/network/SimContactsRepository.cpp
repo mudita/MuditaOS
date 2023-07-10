@@ -111,7 +111,7 @@ void SimContactsRepository::read(AbstractSimContactsRepository::OnReadCallback r
         [&](const std::vector<cellular::SimContact> &simData) { updateImportedRecords(simData); };
 
     auto msg  = std::make_unique<cellular::GetSimContactsRequest>();
-    auto task = app::AsyncRequest::createFromMessage(std::move(msg), cellular::service::name);
+    auto task = app::AsyncRequest::createFromMessage(std::move(msg), ::service::name::cellular);
     auto cb   = [callback, readDoneCallback](auto response) {
         auto result = dynamic_cast<cellular::GetSimContactsResponse *>(response);
         if (result != nullptr && result->retCode == sys::ReturnCodes::Success) {

@@ -65,14 +65,14 @@
 #include <appmgr/ApplicationManager.hpp>
 #include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/agents/quotes/QuotesAgent.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <Service/ServiceCreator.hpp>
 #include <service-gui/ServiceGUI.hpp>
-#include <service-gui/Common.hpp>
+#include <service-gui/ServiceGUIName.hpp>
 #include <module-services/service-eink/ServiceEink.hpp>
 #if ENABLE_SERVICE_FILEINDEXER
 #include <service-fileindexer/ServiceFileIndexer.hpp>

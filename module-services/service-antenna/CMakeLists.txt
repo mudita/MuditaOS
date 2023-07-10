@@ -9,6 +9,7 @@ target_sources(service-antenna
         include/service-antenna/AntennaServiceAPI.hpp
         include/service-antenna/ServiceAntenna.hpp
         include/service-antenna/ServiceState.hpp
+        include/service-antenna/ServiceAntennaName.hpp
 )
 
 target_link_libraries(service-antenna

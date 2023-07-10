@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ChangeDateAndTimeWindow.hpp"
 
 #include <InputEvent.hpp>
 #include <ListView.hpp>
-#include <service-time/Constants.hpp>
+#include <service-time/ServiceTimeName.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <widgets/DateAndTimeStyle.hpp>
 

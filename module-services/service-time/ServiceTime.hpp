@@ -6,12 +6,10 @@
 #include "AlarmEventsDBRepository.hpp"
 #include "AlarmOperations.hpp"
 #include "AlarmMessageHandler.hpp"
-#include "Constants.hpp"
 #include "service-time/TimeManager.hpp"
 #include "service-time/ServiceTime.hpp"
-
-#include <service-db/DBServiceName.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
+#include "service-time/ServiceTimeDependencies.hpp"
 
 #include <MessageType.hpp>
 #include <system/Common.hpp>
@@ -74,7 +72,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::service_time;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = sys::dependencies::getDependenciesFor<stm::ServiceTime>();
             return manifest;
         }
     };

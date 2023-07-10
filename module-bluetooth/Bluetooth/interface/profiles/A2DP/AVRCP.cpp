@@ -4,7 +4,7 @@
 #include "AVRCP.hpp"
 
 #include <service-audio/AudioServiceName.hpp>
-#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/ServiceBluetoothName.hpp>
 #include <service-bluetooth/messages/AudioVolume.hpp>
 #include <service-bluetooth/messages/AudioNotify.hpp>
 

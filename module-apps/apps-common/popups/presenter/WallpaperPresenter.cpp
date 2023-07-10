@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WallpaperPresenter.hpp"
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 
 namespace gui
 {

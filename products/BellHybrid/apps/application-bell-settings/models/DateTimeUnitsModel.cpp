@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/DateTimeUnitsModel.hpp"
@@ -10,7 +10,7 @@
 
 #include <gui/widgets/ListViewEngine.hpp>
 #include <gui/widgets/Style.hpp>
-#include <service-time/Constants.hpp>
+#include <service-time/ServiceTimeName.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <widgets/DateSetSpinner.hpp>

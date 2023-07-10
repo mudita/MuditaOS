@@ -3,7 +3,7 @@
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 
 #include <MessageType.hpp>
 #include <system/Common.hpp>

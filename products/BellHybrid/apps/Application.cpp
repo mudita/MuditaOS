@@ -13,7 +13,7 @@
 #include <common/popups/BellRebootWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
 

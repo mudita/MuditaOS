@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,13 +7,12 @@
 #include "DrawCommandsQueue.hpp"
 #include "RenderCache.hpp"
 #include "messages/RenderingFinished.hpp"
-#include "Common.hpp"
+#include "ServiceGUIDependencies.hpp"
 
 #include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Timers/TimerHandle.hpp>
-#include <service-eink/Common.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -33,6 +32,14 @@ namespace service::gui
     {
         friend WorkerGUI;
 
+        enum class ServiceGUIState
+        {
+            Displaying,
+            Rendering,
+            Closing,
+            Idle
+        };
+
       public:
         explicit ServiceGUI(::gui::Size displaySize,
                             const std::string &name = service::name::gui,
@@ -47,9 +54,7 @@ namespace service::gui
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
       private:
-        bool isRendering{};
-        bool isDisplaying{};
-        bool isClosing{};
+        ServiceGUIState state = ServiceGUIState::Idle;
 
         static void initAssetManagers();
         void registerMessageHandlers();
@@ -64,6 +69,8 @@ namespace service::gui
         bool isNextFrameReady() const noexcept;
         bool isAnyFrameBeingRenderedOrDisplayed() const noexcept;
         void trySendNextFrame();
+        void setState(const ServiceGUIState &nextState);
+        bool isInState(const ServiceGUIState &serviceState);
 
         sys::MessagePointer handleDrawMessage(sys::Message *message);
         sys::MessagePointer handleGUIRenderingFinished(sys::Message *message);
@@ -89,7 +96,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::gui;
-            manifest.dependencies = {service::name::eink};
+            manifest.dependencies = sys::dependencies::getDependenciesFor<service::gui::ServiceGUI>();
             return manifest;
         }
     };

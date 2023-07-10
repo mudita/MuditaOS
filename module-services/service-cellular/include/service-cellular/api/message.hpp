@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Service/Message.hpp>
+#include <service-cellular/ServiceCellularName.hpp>
 
 namespace cellular::msg
 {
@@ -15,7 +16,7 @@ namespace cellular::msg
         }
 
       private:
-        static constexpr const char *m_target = cellular::service::name;
+        static constexpr const char *m_target = ::service::name::cellular;
     };
 
     struct Response : public sys::msg::Response

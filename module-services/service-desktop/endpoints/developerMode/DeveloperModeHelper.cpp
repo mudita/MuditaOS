@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/developerMode/DeveloperModeHelper.hpp>
@@ -7,7 +7,7 @@
 #include <endpoints/JsonKeyNames.hpp>
 #include <endpoints/message/Sender.hpp>
 
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-bluetooth/messages/Status.hpp>
@@ -65,7 +65,7 @@ namespace sdesktop::endpoints
             LOG_DEBUG("at request sent with timeout >%d<", int(timeout.count()));
             auto event = std::make_unique<ATResponseEvent>(cmd, timeout);
             auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
-            code       = toCode(owner->bus.sendUnicast(msg, ServiceCellular::serviceName));
+            code       = toCode(owner->bus.sendUnicast(msg, service::name::cellular));
             return {sent::delayed, std::nullopt};
         }
         else if (body[json::developerMode::EQ].is_string()) {
@@ -307,7 +307,7 @@ namespace sdesktop::endpoints
         else if (cellularState == 3) {
             auto event = std::make_unique<sdesktop::developerMode::CellularHotStartEvent>();
             auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-            res        = owner->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
+            res        = owner->bus.sendUnicast(std::move(msg), service::name::cellular);
         }
         return res;
     }
@@ -356,14 +356,14 @@ namespace sdesktop::endpoints
     {
         auto event = std::make_unique<sdesktop::developerMode::CellularStateInfoRequestEvent>();
         auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        return serv->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
+        return serv->bus.sendUnicast(std::move(msg), service::name::cellular);
     }
 
     bool DeveloperModeHelper::requestCellularSleepModeInfo(sys::Service *serv)
     {
         auto event = std::make_unique<sdesktop::developerMode::CellularSleepModeInfoRequestEvent>();
         auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        return serv->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
+        return serv->bus.sendUnicast(std::move(msg), service::name::cellular);
     }
 
 } // namespace sdesktop::endpoints

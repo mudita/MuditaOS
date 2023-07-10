@@ -7,7 +7,7 @@
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 
 namespace app::manager

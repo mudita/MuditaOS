@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <service-db/DBServiceName.hpp>
 #include <service-db/ServiceDBCommon.hpp>
+#include <service-db/ServiceDBDependencies.hpp>
 
 class AlarmEventRecordInterface;
 class EventsDB;
@@ -40,11 +41,9 @@ namespace sys
         static auto GetManifest() -> ServiceManifest
         {
             ServiceManifest manifest;
-            manifest.name = service::name::db;
-#if ENABLE_FILEINDEXER_SERVICE
-            manifest.dependencies = {service::name::file_indexer.data()};
-#endif
-            manifest.timeout = std::chrono::minutes{1};
+            manifest.name         = service::name::db;
+            manifest.dependencies = sys::dependencies::getDependenciesFor<ServiceDB>();
+            manifest.timeout      = std::chrono::minutes{1};
             return manifest;
         }
     };

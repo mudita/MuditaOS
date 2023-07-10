@@ -7,7 +7,7 @@
 #include <application-call/presenter/CallPresenter.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <service-cellular/CellularMessage.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <Service/Message.hpp>
 #include <service-audio/AudioMessage.hpp>

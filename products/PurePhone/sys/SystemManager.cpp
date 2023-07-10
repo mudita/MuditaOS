@@ -9,9 +9,9 @@
 #include <system/messages/SystemManagerMessage.hpp>
 #include <system/messages/TetheringQuestionRequest.hpp>
 #include <system/messages/TetheringStateRequest.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 
 namespace sys
@@ -37,7 +37,8 @@ namespace sys
                     storeGsm->simCardInserted());
         };
         auto isCallOngoing = [this]() {
-            auto request = async_call<cellular::IsCallActive, cellular::IsCallActiveResponse>(cellular::service::name);
+            auto request =
+                async_call<cellular::IsCallActive, cellular::IsCallActiveResponse>(::service::name::cellular);
             sync(request);
             return request.getResult().active;
         };

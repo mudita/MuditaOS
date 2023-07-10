@@ -16,7 +16,7 @@
 #include <Timers/SystemTimer.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <service-db/DBNotificationMessage.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <switches/LatchStatusRequest.hpp>
 
 #include <bsp/trng/trng.hpp>

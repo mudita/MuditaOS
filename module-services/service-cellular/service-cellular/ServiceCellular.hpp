@@ -10,6 +10,7 @@
 #include "PacketDataCellularMessage.hpp"
 #include <service-cellular/connection-manager/ConnectionManager.hpp>
 #include "src/URCCounter.hpp"
+#include "ServiceCellularDependencies.hpp"
 
 #include <modem/ATURCStream.hpp>
 #include <modem/mux/DLCChannel.h>
@@ -77,8 +78,6 @@ class ServiceCellular : public sys::Service
     /** Register message handlers.
      */
     void registerMessageHandlers();
-
-    static const char *serviceName;
 
     /**
      * @brief Its getting selected SIM card own number.
@@ -311,8 +310,8 @@ namespace sys
         static auto GetManifest() -> ServiceManifest
         {
             ServiceManifest manifest;
-            manifest.name         = ServiceCellular::serviceName;
-            manifest.dependencies = {service::name::db};
+            manifest.name         = service::name::cellular;
+            manifest.dependencies = sys::dependencies::getDependenciesTo<ServiceCellular>();
             return manifest;
         }
     };

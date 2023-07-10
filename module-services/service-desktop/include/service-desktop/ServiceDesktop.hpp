@@ -5,6 +5,8 @@
 
 #include <bsp/usb/usb.hpp>
 #include "Constants.hpp"
+#include "ServiceDesktopName.hpp"
+#include "ServiceDesktopDependencies.hpp"
 #include "USBSecurityModel.hpp"
 #include "DeveloperModeMessage.hpp"
 #include "DesktopMessages.hpp"
@@ -12,7 +14,6 @@
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
-#include <service-db/DBServiceName.hpp>
 #include <service-desktop/Sync.hpp>
 #include <service-desktop/OutboxNotifications.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
@@ -149,7 +150,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::service_desktop;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = sys::dependencies::getDependenciesFor<ServiceDesktop>();
             return manifest;
         }
     };

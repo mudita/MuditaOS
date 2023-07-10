@@ -24,8 +24,8 @@
 
 #include <service-db/DBServiceName.hpp>
 #include <service-db/Settings.hpp>
-#include <service-gui/Common.hpp>
-#include <service-eink/Common.hpp>
+#include <service-gui/ServiceGUIName.hpp>
+#include <service-eink/ServiceEinkName.hpp>
 
 #include <notifications/NotificationProvider.hpp>
 #include <apps-common/notifications/NotificationsHandler.hpp>

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ColorTestWindow.hpp"
@@ -6,7 +6,7 @@
 #include <application-settings/widgets/advanced/ColorTestListStyle.hpp>
 #include <application-settings/windows/WindowNames.hpp>
 
-#include <service-gui/Common.hpp>
+#include <service-gui/ServiceGUIName.hpp>
 #include <service-gui/messages/ChangeColorScheme.hpp>
 
 namespace gui

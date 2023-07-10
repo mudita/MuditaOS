@@ -3,7 +3,7 @@
 
 #include "AlarmsRepository.hpp"
 #include <service-time/include/service-time/AlarmMessage.hpp>
-#include <service-time/Constants.hpp>
+#include <service-time/ServiceTimeName.hpp>
 
 #include "AsyncTask.hpp"
 #include "log/log.hpp"

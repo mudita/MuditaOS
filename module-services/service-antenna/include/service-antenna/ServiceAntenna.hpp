@@ -1,19 +1,14 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "ServiceState.hpp"
-
+#include "ServiceAntennaDependencies.hpp"
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <PhoneModes/Observer.hpp>
-
-namespace service::name
-{
-    constexpr inline auto antenna = "ServiceAntenna";
-} // namespace service::name
 
 namespace antenna
 {
@@ -101,7 +96,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::antenna;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = sys::dependencies::getDependenciesFor<ServiceAntenna>();
             return manifest;
         }
     };

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "AudioMessage.hpp"
-#include "service-audio/AudioServiceName.hpp"
+#include "service-audio/ServiceAudioDependencies.hpp"
 
 #include <Audio/Audio.hpp>
 #include <Audio/AudioMux.hpp>
@@ -144,7 +144,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::audio;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = sys::dependencies::getDependenciesFor<ServiceAudio>();
             return manifest;
         }
     };
