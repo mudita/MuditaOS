@@ -1,9 +1,8 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <ApplicationCommon.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
-#include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <apps-common/popups/Popups.hpp>
 #include <common/data/StyleCommon.hpp>
 #include <common/popups/AlarmDeactivatedWindow.hpp>
@@ -11,8 +10,6 @@
 #include <gui/widgets/Icon.hpp>
 #include <i18n/i18n.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-time/AlarmMessage.hpp>
-#include <service-time/Constants.hpp>
 #include <application-bell-alarm/ApplicationBellAlarmNames.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <WindowsStack.hpp>

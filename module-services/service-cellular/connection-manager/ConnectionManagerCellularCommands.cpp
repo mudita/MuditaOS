@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-cellular/service-cellular/connection-manager/ConnectionManagerCellularCommands.hpp>
@@ -93,5 +93,5 @@ void ConnectionManagerCellularCommands::holdMinimumCpuFrequency()
 }
 void ConnectionManagerCellularCommands::retryPhoneModeChange()
 {
-    cellular.bus.sendUnicast(std::make_shared<cellular::RetryPhoneModeChangeRequest>(), cellular.serviceName);
+    cellular.bus.sendUnicast(std::make_shared<cellular::RetryPhoneModeChangeRequest>(), service::name::cellular);
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <ApplicationCommon.hpp>
@@ -10,8 +10,7 @@
 #include <gui/widgets/Icon.hpp>
 #include <popups/Popups.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-time/AlarmMessage.hpp>
-#include <service-time/Constants.hpp>
+#include <service-time/ServiceTimeName.hpp>
 #include <application-bell-alarm/ApplicationBellAlarmNames.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <WindowsStack.hpp>

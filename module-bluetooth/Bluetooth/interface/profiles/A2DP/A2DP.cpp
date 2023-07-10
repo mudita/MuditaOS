@@ -10,10 +10,10 @@
 #include <log/log.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <service-audio/AudioMessage.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include "service-bluetooth/messages/Connect.hpp"
 #include "service-bluetooth/messages/Disconnect.hpp"
-#include "service-bluetooth/Constants.hpp"
+#include "service-bluetooth/ServiceBluetoothName.hpp"
 #include <audio/BluetoothAudioDevice.hpp>
 
 extern "C"

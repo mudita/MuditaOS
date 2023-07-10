@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ActiveNotificationsListPresenter.hpp"
@@ -10,12 +10,12 @@
 #include <gsl/assert>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <queries/messages/threads/QueryThreadGetByNumber.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
 #include <service-time/include/service-time/AlarmServiceAPI.hpp>
 #include <service-time/AlarmMessage.hpp>
-#include <service-time/Constants.hpp>
+#include <service-time/ServiceTimeName.hpp>
 #include <apps-common/popups/data/AlarmPopupRequestParams.hpp>
 
 using namespace gui;

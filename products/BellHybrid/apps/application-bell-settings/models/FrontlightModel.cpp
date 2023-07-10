@@ -5,7 +5,7 @@
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 
 namespace app::bell_settings

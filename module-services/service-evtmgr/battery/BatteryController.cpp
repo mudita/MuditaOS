@@ -9,8 +9,8 @@
 #endif
 
 #include <service-evtmgr/BatteryMessages.hpp>
-#include <service-evtmgr/Constants.hpp>
-#include <service-desktop/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
+#include <service-desktop/ServiceDesktopName.hpp>
 #include <module-utils/EventStore/EventStore.hpp>
 #include <log/log.hpp>
 #include <magic_enum.hpp>

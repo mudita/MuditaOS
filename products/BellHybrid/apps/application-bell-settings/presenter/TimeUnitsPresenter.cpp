@@ -9,7 +9,7 @@
 #include <common/layouts/HomeScreenLayoutNames.hpp>
 
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 
 namespace
 {

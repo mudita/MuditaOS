@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,7 @@
 #include <Audio/Audio.hpp>
 #include <Audio/AudioMux.hpp>
 #include <MessageType.hpp>
-#include <service-db/DBServiceName.hpp>
+#include <service-audio/ServiceAudioDependencies.hpp>
 #include <Service/Service.hpp>
 #include <SystemManager/CpuSentinel.hpp>
 
@@ -24,6 +24,7 @@ namespace service
     {
       public:
         Audio();
+        ~Audio() override;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) final;
         sys::ReturnCodes InitHandler() final;
@@ -81,7 +82,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::audioServiceName;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = sys::dependencies::getDependenciesFor<service::Audio>();
             return manifest;
         }
     };

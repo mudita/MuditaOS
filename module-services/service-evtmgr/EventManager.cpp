@@ -4,7 +4,7 @@
 #include "service-evtmgr/BatteryMessages.hpp"
 #include "service-evtmgr/EVMessages.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
-#include "service-evtmgr/Constants.hpp"
+#include "service-evtmgr/ServiceEventManagerName.hpp"
 #include "service-evtmgr/EventManagerCommon.hpp"
 #include "service-evtmgr/WorkerEventCommon.hpp"
 #include "service-evtmgr/AppSettingsNotify.hpp"
@@ -24,12 +24,12 @@
 #include <service-audio/AudioMessage.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-db/DBNotificationMessage.hpp>
-#include <service-desktop/Constants.hpp>
+#include <service-desktop/ServiceDesktopName.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-#include <service-time/Constants.hpp>
+#include <service-time/ServiceTimeName.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <service-bluetooth/messages/Status.hpp>
-#include <service-cellular/Constans.hpp>
+#include <service-bluetooth/ServiceBluetoothName.hpp>
 
 #include <cassert>
 #include <fstream>

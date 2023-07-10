@@ -11,6 +11,7 @@
 #include <service-bluetooth/messages/Unpair.hpp>
 #include <service-bluetooth/messages/Authenticate.hpp>
 #include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/ServiceBluetoothName.hpp>
 #include <log/log.hpp>
 #include <memory>
 extern "C"

@@ -298,7 +298,7 @@ namespace sys
 
     void Worker::close()
     {
-        if (!stop() || !join()) {
+        if (!stop() || !join()) { // timeout join
             kill();
         }
         deinit();

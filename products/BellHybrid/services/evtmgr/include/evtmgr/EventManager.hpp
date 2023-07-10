@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <bsp/switches/LatchStatusRequest.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
+#include <service-evtmgr/ServiceEventManagerDependencies.hpp>
 
 #include "backlight-handler/BacklightHandler.hpp"
 #include "user-activity-handler/UserActivityHandler.hpp"
@@ -47,7 +48,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::evt_manager;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = sys::dependencies::getDependenciesFor<EventManager>();
             return manifest;
         }
     };

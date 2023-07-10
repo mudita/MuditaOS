@@ -5,7 +5,7 @@
 
 #include <service-cellular/service-cellular/CellularServiceAPI.hpp>
 #include <service-evtmgr/service-evtmgr/EVMessages.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 
 namespace app::call
 {

@@ -8,7 +8,7 @@
 #include <time/dateCommon.hpp>
 #include <service-time/AlarmServiceAPI.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
-#include <service-time/Constants.hpp>
+#include <service-time/ServiceTimeName.hpp>
 #include <service-time/AlarmMessage.hpp>
 
 namespace app

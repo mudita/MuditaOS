@@ -10,7 +10,7 @@ target_sources(service-gui
         WorkerGUI.cpp
         messages/DrawMessage.cpp
     INTERFACE
-        service-gui/Common.hpp
+        service-gui/ServiceGUIName.hpp
         service-gui/ServiceGUI.hpp
         service-gui/messages/ChangeColorScheme.hpp
         service-gui/messages/DrawMessage.hpp

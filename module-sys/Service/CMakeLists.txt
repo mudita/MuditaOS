@@ -17,6 +17,7 @@ target_sources(sys-service
         include/Service/ServiceProxy.hpp
         include/Service/Mailbox.hpp
         include/Service/Message.hpp
+        include/Service/ServiceDependencies.hpp
 
     PRIVATE
         details/bus/Bus.cpp

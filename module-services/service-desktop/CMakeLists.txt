@@ -33,6 +33,8 @@ target_sources(
         include/service-desktop/OutboxNotifications.hpp
         include/service-desktop/ServiceDesktop.hpp
         include/service-desktop/USBSecurityModel.hpp
+        include/service-desktop/ServiceDesktopName.hpp
+        include/service-desktop/ServiceDesktopDependencies.hpp
 )
 
 target_include_directories(

@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-fileindexer/ServiceFileIndexer.hpp>
 
-#include <service-fileindexer/Constants.hpp>
+#include <service-fileindexer/ServiceFileIndexerName.hpp>
 
 #include <log/log.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -20,6 +20,11 @@ namespace service
         : sys::Service{service::name::file_indexer, "", fileIndexerServiceStackSize}, mStartupIndexer{paths}
     {
         LOG_DEBUG("[%s] Initializing", service::name::file_indexer);
+    }
+
+    ServiceFileIndexer::~ServiceFileIndexer()
+    {
+        LOG_INFO("[%s] Cleaning resources", service::name::file_indexer);
     }
 
     sys::MessagePointer ServiceFileIndexer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -43,6 +48,7 @@ namespace service
 
     sys::ReturnCodes ServiceFileIndexer::DeinitHandler()
     {
+        LOG_DEBUG("[%s] Deitializing", service::name::file_indexer);
         return sys::ReturnCodes::Success;
     }
 

@@ -32,7 +32,7 @@ target_sources(service-appmgr
     PUBLIC
         include/service-appmgr/Actions.hpp
         include/service-appmgr/ApplicationManifest.hpp
-        include/service-appmgr/Constants.hpp
+        include/service-appmgr/ServiceApplicationManagerName.hpp
         include/service-appmgr/Controller.hpp
         include/service-appmgr/StartupType.hpp
         include/service-appmgr/data/CallActionsParams.hpp

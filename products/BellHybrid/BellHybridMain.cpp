@@ -24,7 +24,7 @@
 #include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
 #include <Service/ServiceCreator.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-gui/ServiceGUI.hpp>
@@ -86,11 +86,11 @@ int main()
     /// 'purefs::dir::getUserMediaPath()'. Instead, we can only pass a specific app folder which is very limiting.
     /// Hopefully, support for hierarchical folders will be added in the future and such a case won't be relevant
     /// anymore.
-    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>(paths::audio::userApp() / paths::audio::relaxation()));
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>(service::eink::ExitAction::None));
     systemServices.emplace_back(
         sys::CreatorFor<service::gui::ServiceGUI>(gui::Size{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}));
+    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>(paths::audio::userApp() / paths::audio::relaxation()));
 
     auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));
     sysmgr->StartSystem(

@@ -3,7 +3,7 @@
 
 #include "service-evtmgr/EVMessages.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
-#include "service-evtmgr/Constants.hpp"
+#include "service-evtmgr/ServiceEventManagerName.hpp"
 #include "service-evtmgr/WorkerEventCommon.hpp"
 #include "battery/BatteryController.hpp"
 

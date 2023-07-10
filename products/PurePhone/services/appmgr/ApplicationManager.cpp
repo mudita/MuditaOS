@@ -13,7 +13,7 @@
 #include <module-services/service-cellular/service-cellular/VolteState.hpp>
 #include <system/messages/TetheringQuestionRequest.hpp>
 #include <Timers/TimerFactory.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-appmgr/messages/AutoLockRequests.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 #include <service-appmgr/messages/GetWallpaperOptionRequest.hpp>
@@ -21,9 +21,9 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <service-desktop/Constants.hpp>
+#include <service-desktop/ServiceDesktopName.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-evtmgr/torch.hpp>
 #include <sys/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 #include <service-time/include/service-time/AlarmMessage.hpp>

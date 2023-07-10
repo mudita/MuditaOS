@@ -10,6 +10,7 @@
 #include "Service/Mailbox.hpp"
 #include "service-bluetooth/SettingsHolder.hpp"
 #include "service-bluetooth/WorkerLock.hpp"
+#include "service-bluetooth/ServiceBluetoothDependencies.hpp"
 #include <service-db/DBServiceName.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
@@ -158,7 +159,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::bluetooth;
-            manifest.dependencies = {service::name::db, service::name::audio};
+            manifest.dependencies = sys::dependencies::getDependenciesFor<ServiceBluetooth>();
             return manifest;
         }
     };

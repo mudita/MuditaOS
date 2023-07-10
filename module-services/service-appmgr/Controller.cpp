@@ -7,7 +7,7 @@
 #include "GetAllNotificationsRequest.hpp"
 
 #include <Service/Service.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 
 #include <utility>
 

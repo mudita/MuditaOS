@@ -6,7 +6,6 @@
 #include "SMSPartsHandler.hpp"
 
 #include <service-cellular-api>
-#include <service-cellular/Constans.hpp>
 
 #include <service-db/agents/settings/SystemSettings.hpp>
 
@@ -18,7 +17,7 @@
 #include <service-bluetooth/messages/BluetoothModeChanged.hpp>
 #include <locks/data/PhoneLockMessages.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
-#include <service-time/Constants.hpp>
+#include <service-time/ServiceTimeName.hpp>
 #include <queries/messages/sms/QuerySMSUpdate.hpp>
 
 #include <service-antenna/AntennaServiceAPI.hpp>
@@ -27,7 +26,7 @@
 #include <at/cmd/QCFGUsbnet.hpp>
 #include <at/cmd/CSQ.hpp>
 #include <ucs2/UCS2.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 
 #include "checkSmsCenter.hpp"
 

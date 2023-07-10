@@ -7,7 +7,7 @@
 #include <system/messages/SystemManagerMessage.hpp>
 
 #include <appmgr/messages/AlarmMessage.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 
 namespace sys
 {

@@ -19,8 +19,7 @@
 #include <string>
 #include <module-services/service-eink/messages/EinkModeMessage.hpp>
 #include <hal/eink/AbstractEinkDisplay.hpp>
-
-#include "Common.hpp"
+#include "service-eink/ServiceEinkDependencies.hpp"
 
 namespace service::eink
 {
@@ -109,7 +108,7 @@ namespace sys
         {
             ServiceManifest manifest;
             manifest.name         = service::name::eink;
-            manifest.dependencies = {service::name::db};
+            manifest.dependencies = sys::dependencies::getDependenciesTo<service::eink::ServiceEink>();
             return manifest;
         }
     };

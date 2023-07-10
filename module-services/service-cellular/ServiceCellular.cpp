@@ -64,13 +64,13 @@
 #include <service-antenna/AntennaMessage.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-antenna/ServiceAntenna.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-desktop/DesktopMessages.hpp>
@@ -93,7 +93,7 @@
 #include <utility>
 #include <vector>
 #include "checkSmsCenter.hpp"
-#include <service-desktop/Constants.hpp>
+#include <service-desktop/ServiceDesktopName.hpp>
 #include <gsl/util>
 #include <ticks.hpp>
 
@@ -104,8 +104,6 @@
 #include <ctime>
 
 #include <at/cmd/QCFGUsbnet.hpp>
-
-const char *ServiceCellular::serviceName = cellular::service::name;
 
 using namespace cellular;
 using namespace cellular::msg;
@@ -123,7 +121,7 @@ namespace constants
 } // namespace constants
 
 ServiceCellular::ServiceCellular()
-    : sys::Service(serviceName, "", constants::cellularStack, sys::ServicePriority::Idle),
+    : sys::Service(::service::name::cellular, "", constants::cellularStack, sys::ServicePriority::Idle),
       phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()},
       priv{std::make_unique<internal::ServiceCellularPriv>(this)}
 {
@@ -223,7 +221,7 @@ void ServiceCellular::CallStateTimerHandler()
 {
     LOG_DEBUG("CallStateTimerHandler");
     auto msg = std::make_shared<cellular::ListCallsMessage>();
-    bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
+    bus.sendUnicast(std::move(msg), ::service::name::cellular);
 }
 
 sys::ReturnCodes ServiceCellular::InitHandler()
@@ -260,7 +258,7 @@ sys::ReturnCodes ServiceCellular::InitHandler()
         settings->setValue(settings::Cellular::volteEnabled, "0", settings::SettingsScope::Global);
     }
 
-    cpuSentinel = std::make_shared<sys::CpuSentinel>(serviceName, this);
+    cpuSentinel = std::make_shared<sys::CpuSentinel>(::service::name::cellular, this);
 
     ongoingCall =
         std::make_unique<call::Call>(this,
@@ -551,7 +549,7 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(cellular::SignalStrengthUpdateNotification), [&](sys::Message *request) -> sys::MessagePointer {
         csqCounter.count();
         auto message = std::make_shared<cellular::URCCounterMessage>(csqCounter.getCounter());
-        bus.sendUnicast(std::move(message), serviceName);
+        bus.sendUnicast(std::move(message), ::service::name::cellular);
         return handleSignalStrengthUpdateNotification(request);
     });
 

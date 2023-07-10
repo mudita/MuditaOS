@@ -13,15 +13,14 @@
 #include "Logger.hpp"
 #include <service-evtmgr/KbdMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/messages/OnboardingPowerDownRequest.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
-#include <service-desktop/Constants.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-desktop/ServiceDesktopName.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-cellular/Constans.hpp>
 #include <system/messages/DeviceRegistrationMessage.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 #include <system/messages/RequestCpuFrequencyMessage.hpp>
@@ -30,10 +29,10 @@
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>
 #include <purefs/vfs_subsystem.hpp>
-#include <service-gui/Common.hpp>
+#include <service-gui/ServiceGUIName.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <module-gui/gui/Common.hpp>
-#include <service-eink/Common.hpp>
+#include <service-eink/ServiceEinkName.hpp>
 #include <hal/boot_control.h>
 #include <algorithm>
 

@@ -4,7 +4,7 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <endpoints/EndpointFactory.hpp>
 #include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
-#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <system/messages/TetheringStateRequest.hpp>
@@ -200,14 +200,15 @@ auto ServiceDesktop::usbWorkerInit() -> sys::ReturnCodes
 
 auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
 {
-    if (initialized) {
-        LOG_DEBUG(".. usbWorkerDeinit ..");
-        settings->deinit();
-        desktopWorker->closeWorker();
-        desktopWorker.reset();
-        initialized     = false;
-        isUsbConfigured = false;
+    if (!initialized) {
+        return sys::ReturnCodes::Success;
     }
+    LOG_DEBUG("Deinitializing USB worker");
+    settings->deinit();
+    desktopWorker->closeWorker();
+    desktopWorker.reset();
+    initialized     = false;
+    isUsbConfigured = false;
     return sys::ReturnCodes::Success;
 }
 

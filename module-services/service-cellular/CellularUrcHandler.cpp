@@ -8,8 +8,8 @@
 #include "service-cellular/src/ussd/USSDHandler.hpp"
 
 #include <service-antenna/AntennaServiceAPI.hpp>
-#include <service-appmgr/Constants.hpp>
-#include <service-time/Constants.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
+#include <service-time/ServiceTimeName.hpp>
 
 using namespace at::urc;
 

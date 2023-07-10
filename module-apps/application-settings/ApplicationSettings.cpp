@@ -67,6 +67,7 @@
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/ServiceBluetoothName.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/BluetoothModeChanged.hpp>
 #include <service-bluetooth/messages/Connect.hpp>
@@ -76,12 +77,11 @@
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
 #include <service-bluetooth/messages/Disconnect.hpp>
-#include <service-cellular/Constans.hpp>
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <module-services/service-appmgr/include/service-appmgr/Constants.hpp>
+#include <module-services/service-appmgr/include/service-appmgr/ServiceApplicationManagerName.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
-#include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/ServiceEventManagerName.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <service-appmgr/model/ApplicationManagerCommon.hpp>

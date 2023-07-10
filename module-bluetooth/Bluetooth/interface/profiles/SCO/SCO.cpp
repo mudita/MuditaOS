@@ -4,7 +4,7 @@
 #include "SCO.hpp"
 #include <cstdio>
 #include <Audio/AudioCommon.hpp>
-#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <cassert>
 extern "C"

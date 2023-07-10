@@ -1,18 +1,16 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothSettingsModel.hpp"
 
-#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/ServiceBluetoothName.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
 #include <service-bluetooth/messages/Disconnect.hpp>
 #include <service-bluetooth/messages/SetStatus.hpp>
 #include <service-bluetooth/messages/SetDeviceName.hpp>
-#include <service-bluetooth/messages/Authenticate.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
-#include <service-bluetooth/messages/SyncDevices.hpp>
 
 BluetoothSettingsModel::BluetoothSettingsModel(sys::Service *service) : service{service}
 {}

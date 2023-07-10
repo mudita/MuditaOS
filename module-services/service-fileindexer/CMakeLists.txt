@@ -7,10 +7,11 @@ target_sources( service-fileindexer
         ServiceFileIndexer.cpp
         StartupIndexer.cpp
     PUBLIC
-        include/service-fileindexer/Constants.hpp
+        include/service-fileindexer/ServiceFileIndexerName.hpp
         include/service-fileindexer/InotifyHandler.hpp
         include/service-fileindexer/ServiceFileIndexer.hpp
         include/service-fileindexer/StartupIndexer.hpp
+		include/service-fileindexer/ServiceFileIndexerDependencies.hpp
 )
 
 target_include_directories( service-fileindexer

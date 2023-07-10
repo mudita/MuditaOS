@@ -9,7 +9,7 @@
 #include <module-audio/Audio/VolumeScaler.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
-#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/ServiceBluetoothName.hpp>
 #include <service-bluetooth/messages/AudioNotify.hpp>
 #include <service-db/Settings.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
