@@ -50,6 +50,7 @@
 * Fixed redirection to dial number view by pressing BACK from add new number view
 * Fixed occasional USB crash when USB cable was disconnected during files upload
 * Fixed unsupported character in several quotes
+* Fixed marking new message as read in Messages app main window
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved
