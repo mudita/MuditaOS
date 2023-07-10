@@ -157,11 +157,11 @@ namespace app
             gui::name::window::thread_sms_search,
             [](ApplicationCommon *app, const std::string &name) { return std::make_unique<gui::SMSSearch>(app); });
         windowsFactory.attach(gui::name::window::sms_templates, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::SMSTemplatesWindow>(app);
+            return std::make_unique<gui::SMSTemplatesWindow>(app, name);
         });
         windowsFactory.attach(gui::name::window::call_sms_templates,
                               [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::SMSTemplatesWindow>(app);
+                                  return std::make_unique<gui::SMSTemplatesWindow>(app, name);
                               });
         windowsFactory.attach(gui::name::window::search_results, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SearchResults>(app);
