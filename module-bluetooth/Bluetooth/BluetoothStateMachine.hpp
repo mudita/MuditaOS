@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -43,7 +43,7 @@ namespace bluetooth
                 throw std::runtime_error("shouldn't happen");
             }
             // printf("driver: 0x%X %d\n", driver.get(), int(driver.use_count()));
-            if (const auto status = driver->init(); status != Error::Success) {
+            if (const auto status = driver->init(); status != Result::Code::Success) {
                 throw InitializationError{"Unable to initialize a bluetooth driver."};
             }
         }
@@ -75,7 +75,7 @@ namespace bluetooth
     {
         void operator()(DeviceRegistrationFunction registerDevice, InitializationState &data)
         {
-            if (const auto status = registerDevice(); status != Error::Success) {
+            if (const auto status = registerDevice(); status != Result::Code::Success) {
                 throw InitializationError{"Unable to initialize bluetooth"};
             }
             data.isInitDone = true;
@@ -86,7 +86,7 @@ namespace bluetooth
     {
         void operator()(std::shared_ptr<AbstractDriver> driver)
         {
-            if (const auto status = driver->run(); status != Error::Success) {
+            if (const auto status = driver->run(); status != Result::Code::Success) {
                 throw InitializationError{"Unable to run the bluetooth driver"};
             }
         }
@@ -187,63 +187,63 @@ namespace bluetooth
 
     } constexpr HandleUnsetVisibility;
 
-    struct StartRinging
+    struct IncomingCallStarted
     {
         void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
         {
-            profileManager->startRinging();
+            profileManager->incomingCallStarted();
         }
-    } constexpr StartRinging;
+    } constexpr IncomingCallStarted;
 
-    struct StopRinging
-    {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
-        {
-            profileManager->stopRinging();
-        }
-    } constexpr StopRinging;
-
-    struct InitializeCall
-    {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
-        {
-            profileManager->initializeCall();
-        }
-    } constexpr InitializeCall;
-
-    struct CallAnswered
-    {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
-        {
-            profileManager->callAnswered();
-        }
-    } constexpr CallAnswered;
-
-    struct TerminateCall
-    {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
-        {
-            profileManager->terminateCall();
-        }
-    } constexpr TerminateCall;
-
-    struct CallStarted
-    {
-        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
-                        bluetooth::event::CallStarted evt)
-        {
-            profileManager->callStarted(evt.number);
-        }
-    } constexpr CallStarted;
-
-    struct IncomingCall
+    struct IncomingCallNumber
     {
         void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
                         bluetooth::event::IncomingCallNumber evt)
         {
             profileManager->setIncomingCallNumber(evt.number);
         }
-    } constexpr IncomingCall;
+    } constexpr IncomingCallNumber;
+
+    struct OutgoingCallStarted
+    {
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
+                        bluetooth::event::OutgoingCallStarted evt)
+        {
+            profileManager->outgoingCallStarted(evt.number);
+        }
+    } constexpr OutgoingCallStarted;
+
+    struct IncomingCallAnswered
+    {
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
+        {
+            profileManager->incomingCallAnswered();
+        }
+    } constexpr IncomingCallAnswered;
+
+    struct OutgoingCallAnswered
+    {
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
+        {
+            profileManager->outgoingCallAnswered();
+        }
+    } constexpr OutgoingCallAnswered;
+
+    struct CallTerminated
+    {
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
+        {
+            profileManager->callTerminated();
+        }
+    } constexpr CallTerminated;
+
+    struct CallMissed
+    {
+        void operator()(std::shared_ptr<bluetooth::BaseProfileManager> profileManager)
+        {
+            profileManager->callMissed();
+        }
+    } constexpr CallMissed;
 
     struct SignalStrength
     {
@@ -314,26 +314,24 @@ namespace bluetooth
         {
             using namespace sml;
             // clang-format off
-            return make_transition_table(
-                *"CallSetup"_s + sml::event<bluetooth::event::StartRinging> / StartRinging = "CallRinging"_s,
-                "CallSetup"_s + sml::event<bluetooth::event::StartRouting> / InitializeCall = "CallInitiated"_s,
-                "CallSetup"_s + sml::event<bluetooth::event::CallStarted> / CallStarted = "CallInitiated"_s,
-                "CallSetup"_s + sml::event<bluetooth::event::IncomingCallNumber> / (StartRinging, IncomingCall)  = "CallRinging"_s,
+                return make_transition_table(
+                        *"CallSetup"_s + sml::event<bluetooth::event::IncomingCallStarted> / IncomingCallStarted = "CallRinging"_s,
+                        "CallSetup"_s + sml::event<bluetooth::event::IncomingCallNumber> / (IncomingCallStarted, IncomingCallNumber) = "CallRinging"_s,
+                        "CallSetup"_s + sml::event<bluetooth::event::OutgoingCallStarted> / OutgoingCallStarted = "CallInitiated"_s,
 
-                "CallRinging"_s + sml::event<bluetooth::event::StopRinging> / StopRinging = "CallDropped"_s,
-                "CallRinging"_s + sml::event<bluetooth::event::CallAnswered> / CallAnswered = "CallInProgress"_s,
-                "CallRinging"_s + sml::event<bluetooth::event::CallTerminated> / TerminateCall = "CallDropped"_s,
+                        "CallRinging"_s + sml::event<bluetooth::event::IncomingCallNumber> / IncomingCallNumber = "CallRinging"_s,
+                        "CallRinging"_s + sml::event<bluetooth::event::CallAnswered> / IncomingCallAnswered = "CallInProgress"_s,
+                        "CallRinging"_s + sml::event<bluetooth::event::CallTerminated> / CallTerminated = "CallEnded"_s,
+                        "CallRinging"_s + sml::event<bluetooth::event::CallMissed> / CallMissed = "CallEnded"_s,
 
-                "CallInitiated"_s + sml::event<bluetooth::event::CallAnswered> / CallAnswered = "CallInProgress"_s,
-               "CallInitiated"_s + sml::event<bluetooth::event::StopRinging> / StopRinging = "CallDropped"_s,
-               "CallInitiated"_s + sml::event<bluetooth::event::CallTerminated> / TerminateCall = "CallDropped"_s,
-                "CallInitiated"_s + sml::event<bluetooth::event::IncomingCallNumber> / IncomingCall= "CallInitiated"_s,
+                        "CallInitiated"_s + sml::event<bluetooth::event::CallAnswered> / OutgoingCallAnswered = "CallInProgress"_s,
+                        "CallInitiated"_s + sml::event<bluetooth::event::CallTerminated> / CallTerminated = "CallEnded"_s,
 
-                "CallInProgress"_s + sml::event<bluetooth::event::CallTerminated> / TerminateCall = "CallDropped"_s,
+                        "CallInProgress"_s + sml::event<bluetooth::event::CallTerminated> / CallTerminated = "CallEnded"_s,
 
-                "CallDropped"_s = X
-
-            );
+                        "CallEnded"_s = X
+                );
+            // clang-format on
         }
     };
 
@@ -342,7 +340,10 @@ namespace bluetooth
     {
         auto operator()() const
         {
-            auto forwardEvent = [](const auto &ev, auto &sm, auto &deps, auto &subs){sm.process_event(ev,deps,subs);};
+            const auto forwardEvent = [](const auto &ev, auto &sm, auto &deps, auto &subs) {
+                sm.process_event(ev, deps, subs);
+            };
+
             using namespace sml;
             // clang-format off
                 return make_transition_table(
@@ -364,13 +365,12 @@ namespace bluetooth
                         state<Idle> + sml::event<bluetooth::event::StartStream>/ StartAudio = state<Idle>,
                         state<Idle> + sml::event<bluetooth::event::StopStream>/ StopAudio = state<Idle>,
 
-                        state<Idle> + sml::event<bluetooth::event::StartRouting> / forwardEvent= state<Call>,
-                        state<Idle> + sml::event<bluetooth::event::IncomingCallNumber>  / forwardEvent  = state<Call>,
-                        state<Idle> + sml::event<bluetooth::event::CallStarted> / forwardEvent= state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::IncomingCallStarted> / forwardEvent = state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::IncomingCallNumber> / forwardEvent = state<Call>,
+                        state<Idle> + sml::event<bluetooth::event::OutgoingCallStarted> / forwardEvent = state<Call>,
 
                         state<Call> = state<Idle> // this one is needed to go out from Call substate properly!
-
-                            );
+                );
             // clang-format on
         }
     };

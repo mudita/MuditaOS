@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-bluetooth/ServiceBluetooth.hpp>
@@ -36,7 +36,7 @@ namespace queues
 
 namespace
 {
-    constexpr auto BluetoothWorkerStackDepth = 4096U;
+    constexpr auto BluetoothWorkerStackDepth = 1024 * 4;
 
     class DeviceRegistration
     {
@@ -61,7 +61,7 @@ namespace
             bluetooth::set_name(settingsName);
 
             settings->onLinkKeyAdded = onLinkKeyAdded;
-            return bluetooth::Error::Success;
+            return bluetooth::Result::Code::Success;
         }
 
       private:

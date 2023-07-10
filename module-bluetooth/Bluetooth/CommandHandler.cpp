@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CommandHandler.hpp"
@@ -23,7 +23,7 @@ namespace bluetooth
 {
     namespace
     {
-        [[nodiscard]] auto toString(bluetooth::Error::Code code) -> std::string
+        [[nodiscard]] auto toString(bluetooth::Result::Code code) -> std::string
         {
             return utils::enumToString(code);
         }
@@ -39,72 +39,72 @@ namespace bluetooth
         this->driver->registerPowerOnCallback([profilePtr = this->profileManager]() { profilePtr->init(); });
     }
 
-    Error::Code CommandHandler::scan()
+    Result::Code CommandHandler::scan()
     {
 
-        if (const auto ret = driver->scan(); ret.err != bluetooth::Error::Success) {
-            LOG_ERROR("Cant start scan!: %s %" PRIu32 "", toString(ret.err).c_str(), ret.lib_code);
-            return ret.err;
+        if (const auto ret = driver->scan(); ret.result != bluetooth::Result::Code::Success) {
+            LOG_ERROR("Can't start scan!: %s %d", toString(ret.result).c_str(), ret.libraryResult);
+            return ret.result;
         }
 
         LOG_INFO("Scan started!");
         // open new scan window
-        return Error::Success;
+        return Result::Code::Success;
     }
 
-    Error::Code CommandHandler::stopScan()
+    Result::Code CommandHandler::stopScan()
     {
         LOG_INFO("Stopping scan!");
         driver->stopScan();
-        return Error::Success;
+        return Result::Code::Success;
     }
 
-    Error::Code CommandHandler::setVisibility(bool visibility)
+    Result::Code CommandHandler::setVisibility(bool visibility)
     {
         driver->setVisibility(visibility);
         settings->setValue(bluetooth::Settings::Visibility, static_cast<int>(visibility));
-        return Error::Success;
+        return Result::Code::Success;
     }
 
-    Error::Code CommandHandler::connect(const DataVariant &data)
+    Result::Code CommandHandler::connect(const DataVariant &data)
     {
         auto device = std::get<Devicei>(data);
         LOG_INFO("Connecting device");
         profileManager->connect(device);
-        return Error::Success;
+        return Result::Code::Success;
     }
 
-    Error::Code CommandHandler::disconnect()
+    Result::Code CommandHandler::disconnect()
     {
         LOG_INFO("Disconnecting device");
         profileManager->disconnect();
-        return Error::Success;
+        return Result::Code::Success;
     }
-    Error::Code CommandHandler::pair(const DataVariant &data)
+
+    Result::Code CommandHandler::pair(const DataVariant &data)
     {
         auto device = std::get<Devicei>(data);
         LOG_INFO("Pairing...");
-        auto errorCode = Error::Code::Success;
+        auto errorCode = Result::Code::Success;
         driver->pair(device);
         LOG_INFO("Pairing result: %s", magic_enum::enum_name(errorCode).data());
         return errorCode;
     }
-    Error::Code CommandHandler::unpair(const DataVariant &data)
+
+    Result::Code CommandHandler::unpair(const DataVariant &data)
     {
         auto device = std::get<Devicei>(data);
         LOG_INFO("Unpairing...");
-        const auto errorCode = Error::Code::Success;
+        const auto errorCode = Result::Code::Success;
         driver->unpair(device);
         LOG_INFO("Unpairing result: %s", magic_enum::enum_name(errorCode).data());
         return errorCode;
     }
 
-    Error::Code CommandHandler::availableDevices()
+    Result::Code CommandHandler::availableDevices()
     {
         auto msg = std::make_shared<message::bluetooth::ResponseVisibleDevices>(bluetooth::GAP::getDevicesList());
         static_cast<ServiceBluetooth *>(service)->bus.sendUnicast(std::move(msg), service::name::service_desktop);
-
-        return Error::Success;
+        return Result::Code::Success;
     }
-
 } // namespace bluetooth

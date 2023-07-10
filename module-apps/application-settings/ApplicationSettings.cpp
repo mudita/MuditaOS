@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-settings/ApplicationSettings.hpp>
@@ -251,7 +251,8 @@ namespace app
             auto connectResultMsg = static_cast<::message::bluetooth::ConnectResult *>(msg);
             auto device           = connectResultMsg->getDevice();
 
-            if (connectResultMsg->isSucceed()) {
+            using message::bluetooth::ConnectResult;
+            if (connectResultMsg->getResult() == ConnectResult::Result::Success) {
                 return sys::MessageNone{};
             }
 

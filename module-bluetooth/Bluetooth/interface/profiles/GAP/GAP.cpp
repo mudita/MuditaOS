@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "GAP.hpp"
@@ -42,17 +42,17 @@ namespace bluetooth
         return *dev;
     };
 
-    auto GAP::registerScan() -> Error
+    auto GAP::registerScan() -> Result
     {
         LOG_INFO("GAP register scan!");
         /// -> this have to be called prior to power on!
         hci_set_inquiry_mode(INQUIRY_MODE_RSSI_AND_EIR);
         cb_handler.callback = &packetHandler;
         hci_add_event_handler(&cb_handler);
-        return Error();
+        return Result();
     }
 
-    auto GAP::scan() -> Error
+    auto GAP::scan() -> Result
     {
         if (hci_get_state() == HCI_STATE_WORKING) {
             if (gap::state == gap::state::scan_on) {
@@ -61,14 +61,14 @@ namespace bluetooth
             devices().clear();
             if (auto ret = startScan(); ret != 0) {
                 LOG_ERROR("Start scan error!: 0x%02X - %s", ret, error_cstr(ret));
-                return Error(Error::LibraryError, ret);
+                return Result(Result::Code::LibraryError, ret);
             }
             gap::state = gap::state::scan_on;
         }
         else {
-            return Error(Error::NotReady);
+            return Result(Result::Code::NotReady);
         }
-        return Error();
+        return Result();
     }
 
     void GAP::stopScan()

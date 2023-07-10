@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Service/Service.hpp>
-#include <Error.hpp>
+#include "Result.hpp"
 #include "Profile.hpp"
 #include "AudioProfile.hpp"
 #include "interface/profiles/A2DP/A2DP.hpp"
@@ -30,24 +30,24 @@ namespace bluetooth
     {
       public:
         virtual ~BaseProfileManager()                                                            = default;
-        virtual auto init() -> Error::Code                                                       = 0;
+        virtual auto init() -> Result::Code                                                       = 0;
         virtual void deInit()                                                                    = 0;
-        virtual auto connect(const Devicei &device) -> Error::Code                               = 0;
-        virtual auto disconnect() -> Error::Code                                                 = 0;
-        virtual auto start() -> Error::Code                                                      = 0;
-        virtual auto stop() -> Error::Code                                                       = 0;
-        virtual auto startRinging() -> Error::Code                                               = 0;
-        virtual auto stopRinging() -> Error::Code                                                = 0;
-        virtual auto initializeCall() -> Error::Code                                             = 0;
-        virtual auto terminateCall() -> Error::Code                                              = 0;
-        virtual auto callAnswered() -> Error::Code                                               = 0;
-        virtual auto callStarted(const utils::PhoneNumber &) -> Error::Code                      = 0;
-        virtual auto setIncomingCallNumber(const utils::PhoneNumber &nr) -> Error::Code          = 0;
-        virtual auto setSignalStrengthData(const DataVariant &data) -> Error::Code               = 0;
-        virtual auto setOperatorNameData(const DataVariant &data) -> Error::Code                 = 0;
-        virtual auto setBatteryLevelData(unsigned int) -> Error::Code                            = 0;
-        virtual auto setNetworkStatusData(const DataVariant &data) -> Error::Code                = 0;
-        virtual auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code = 0;
+        virtual auto connect(const Devicei &device) -> Result::Code                               = 0;
+        virtual auto disconnect() -> Result::Code                                                 = 0;
+        virtual auto start() -> Result::Code                                                      = 0;
+        virtual auto stop() -> Result::Code                                                       = 0;
+        virtual auto incomingCallStarted() -> Result::Code                                        = 0;
+        virtual auto outgoingCallStarted(const utils::PhoneNumber &) -> Result::Code              = 0;
+        virtual auto incomingCallAnswered() -> Result::Code                                       = 0;
+        virtual auto outgoingCallAnswered() -> Result::Code                                       = 0;
+        virtual auto callTerminated() -> Result::Code                                             = 0;
+        virtual auto callMissed() -> Result::Code                                                 = 0;
+        virtual auto setIncomingCallNumber(const utils::PhoneNumber &nr) -> Result::Code          = 0;
+        virtual auto setSignalStrengthData(const DataVariant &data) -> Result::Code               = 0;
+        virtual auto setOperatorNameData(const DataVariant &data) -> Result::Code                 = 0;
+        virtual auto setBatteryLevelData(unsigned int) -> Result::Code                            = 0;
+        virtual auto setNetworkStatusData(const DataVariant &data) -> Result::Code                = 0;
+        virtual auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Result::Code = 0;
     };
 
     class ProfileManager : public BaseProfileManager
@@ -56,25 +56,25 @@ namespace bluetooth
         explicit ProfileManager(sys::Service *ownerService);
         ProfileManager() = delete;
 
-        auto init() -> Error::Code override;
+        auto init() -> Result::Code override;
         void deInit() override;
-        auto connect(const Devicei &device) -> Error::Code override;
-        auto disconnect() -> Error::Code override;
-        auto start() -> Error::Code override;
-        auto stop() -> Error::Code override;
-        auto startRinging() -> Error::Code override;
-        auto stopRinging() -> Error::Code override;
-        auto initializeCall() -> Error::Code override;
-        auto terminateCall() -> Error::Code override;
-        auto callAnswered() -> Error::Code override;
-        auto callStarted(const utils::PhoneNumber &) -> Error::Code override;
-        auto setIncomingCallNumber(const utils::PhoneNumber &nr) -> Error::Code override;
-        auto setSignalStrengthData(const DataVariant &data) -> Error::Code override;
-        auto setOperatorNameData(const DataVariant &data) -> Error::Code override;
-        auto setBatteryLevelData(unsigned int) -> Error::Code override;
-        auto setNetworkStatusData(const DataVariant &data) -> Error::Code override;
+        auto connect(const Devicei &device) -> Result::Code override;
+        auto disconnect() -> Result::Code override;
+        auto start() -> Result::Code override;
+        auto stop() -> Result::Code override;
+        auto incomingCallStarted() -> Result::Code override;
+        auto outgoingCallStarted(const utils::PhoneNumber &nr) -> Result::Code override;
+        auto incomingCallAnswered() -> Result::Code override;
+        auto outgoingCallAnswered() -> Result::Code override;
+        auto callTerminated() -> Result::Code override;
+        auto callMissed() -> Result::Code override;
+        auto setIncomingCallNumber(const utils::PhoneNumber &nr) -> Result::Code override;
+        auto setSignalStrengthData(const DataVariant &data) -> Result::Code override;
+        auto setOperatorNameData(const DataVariant &data) -> Result::Code override;
+        auto setBatteryLevelData(unsigned int level) -> Result::Code override;
+        auto setNetworkStatusData(const DataVariant &data) -> Result::Code override;
 
-        auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code override;
+        auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Result::Code override;
 
       private:
         sys::Service *ownerService;

@@ -17,6 +17,7 @@
 * Fixed unsupported character in several quotes
 * Fixed unwanted autolock on template selection window while rejecting call
 * Fixed scenario when Alarm not being handled properly during a phone call
+* Fixed handsfree device still ringing after caller has hung up
 
 ## [1.7.1 2023-07-13]
 

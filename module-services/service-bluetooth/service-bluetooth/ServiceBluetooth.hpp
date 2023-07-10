@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,11 +19,13 @@
 #include <Timers/TimerHandle.hpp>
 
 #include <memory> // for unique_ptr
+
 namespace message::bluetooth
 {
     class ResponseAuthenticate;
 }
 class BluetoothWorker;
+
 namespace settings
 {
     class Settings;
@@ -35,7 +37,6 @@ namespace sdesktop
     namespace developerMode
     {
         class DeveloperModeRequest;
-        class DeveloperModeMessageWrapper;
     } // namespace developerMode
 } // namespace sdesktop
 
@@ -54,9 +55,6 @@ namespace message::bluetooth
     class A2DPVolume;
     class HSPVolume;
     class HFPVolume;
-    class Ring;
-    class StartAudioRouting;
-    class GetBluetoothDevicesModel;
     class RequestStatusIndicatorData;
 } // namespace message::bluetooth
 
@@ -68,6 +66,7 @@ namespace sevm
 namespace cellular
 {
     class CallEndedNotification;
+    class CallMissedNotification;
     class CallStartedNotification;
     class CallOutgoingAccepted;
     class IncomingCallMessage;
@@ -80,7 +79,6 @@ namespace cellular
 
 class ServiceBluetooth : public sys::Service
 {
-
   public:
     ServiceBluetooth();
     ~ServiceBluetooth();
@@ -120,7 +118,6 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::SetStatus *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(BluetoothPairMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(BluetoothPairResultMessage *msg) -> std::shared_ptr<sys::Message>;
-
     [[nodiscard]] auto handle(message::bluetooth::Unpair *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::RequestDeviceName *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::SetDeviceName *msg) -> std::shared_ptr<sys::Message>;
@@ -135,7 +132,6 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::A2DPVolume *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::HSPVolume *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::HFPVolume *msg) -> std::shared_ptr<sys::Message>;
-    [[nodiscard]] auto handle(message::bluetooth::StartAudioRouting *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponseAuthenticatePin *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponseAuthenticatePasskey *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponseAuthenticatePairCancel *msg) -> std::shared_ptr<sys::Message>;
@@ -143,6 +139,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(cellular::CallerIdMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(cellular::IncomingCallMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(cellular::CallEndedNotification *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(cellular::CallMissedNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(cellular::CallStartedNotification *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(cellular::CallOutgoingAccepted *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(cellular::SignalStrengthUpdateNotification *msg) -> std::shared_ptr<sys::Message>;
